@@ -918,8 +918,8 @@ bool DeviceTree::EditNodeDialog(uint nodeid)
     DiSEqCDevDevice *dev = m_tree.FindDevice(nodeid);
     if (!dev)
     {
-        VERBOSE(VB_IMPORTANT, QString("DeviceTree::EditNodeDialog(%1) "
-                                      "-- device not found").arg(nodeid));
+        LOG(VB_GENERAL, LOG_ERR, QString("DeviceTree::EditNodeDialog(%1) "
+                                         "-- device not found").arg(nodeid));
         return false;
     }
 
@@ -1550,7 +1550,7 @@ bool convert_diseqc_db(void)
 
             default:
             {
-                VERBOSE(VB_IMPORTANT, QString("Unknown DiSEqC device type ") +
+                LOG(VB_GENERAL, LOG_ERR, "Unknown DiSEqC device type " +
                         QString("%1 ignoring card %2").arg(type).arg(cardid));
                 break;
             }

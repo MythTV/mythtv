@@ -115,8 +115,8 @@ bool BiopMessage::Process(DSMCCCacheModuleData *cachep, DSMCCCache *filecache,
     // Parse header
     if (! ProcessMsgHdr(data, curp))
     {
-        VERBOSE(VB_DSMCC,"[biop] Invalid biop header, "
-                "dropping rest of module");
+        LOG(VB_DSMCC, LOG_ERR, 
+            "[biop] Invalid biop header, dropping rest of module");
 
         /* not valid, skip rest of data */
         return false;
@@ -125,23 +125,23 @@ bool BiopMessage::Process(DSMCCCacheModuleData *cachep, DSMCCCache *filecache,
     // Handle each message type
     if (strcmp(m_objkind, "fil") == 0)
     {
-        VERBOSE(VB_DSMCC,"[biop] Processing file");
+        LOG(VB_DSMCC, LOG_INFO, "[biop] Processing file");
         return ProcessFile(cachep, filecache, data, curp);
     }
     else if (strcmp(m_objkind, "dir") == 0)
     {
-        VERBOSE(VB_DSMCC,"[biop] Processing directory");
+        LOG(VB_DSMCC, LOG_INFO, "[biop] Processing directory");
         return ProcessDir(false, cachep, filecache, data, curp);
     }
     else if (strcmp(m_objkind, "srg") == 0)
     {
-        VERBOSE(VB_DSMCC,"[biop] Processing gateway");
+        LOG(VB_DSMCC, LOG_INFO, "[biop] Processing gateway");
         return ProcessDir(true, cachep, filecache, data, curp);
     }
     else
     {
         /* Error */
-        VERBOSE(VB_DSMCC, QString("Unknown or unsupported format %1%2%3%4")
+        LOG(VB_DSMCC, LOG_ERR, QString("Unknown or unsupported format %1%2%3%4")
                 .arg(m_objkind[0]).arg(m_objkind[1])
                 .arg(m_objkind[2]).arg(m_objkind[3]));
         return false;
@@ -161,7 +161,7 @@ bool BiopMessage::ProcessMsgHdr(unsigned char *data, unsigned long *curp)
 
     if (buf[0] !='B' || buf[1] !='I' || buf[2] !='O' || buf[3] !='P')
     {
-        VERBOSE(VB_DSMCC, "BiopMessage - invalid header");
+        LOG(VB_DSMCC, LOG_ERR, "BiopMessage - invalid header");
         return false;
     }
 
@@ -225,7 +225,7 @@ bool BiopMessage::ProcessDir(
     else
         pDir = filecache->Directory(ref);
 
-    VERBOSE(VB_DSMCC, QString("[Biop] Processing %1 reference %2")
+    LOG(VB_DSMCC, LOG_INFO, QString("[Biop] Processing %1 reference %2")
             .arg(isSrg ? "gateway" : "directory").arg(ref.toString()));
 
     for (uint i = 0; i < bindings_count; i++)
@@ -427,7 +427,7 @@ int BiopObjLocation::Process(const unsigned char *data)
 // a different PMT, We don't support that, at least at the moment.
 int ProfileBodyLite::Process(const unsigned char * /*data*/)
 {
-    VERBOSE(VB_DSMCC, "Found LiteProfileBody - Not Implemented Yet");
+    LOG(VB_DSMCC, LOG_INFO, "Found LiteProfileBody - Not Implemented Yet");
     return 0;
 }
 

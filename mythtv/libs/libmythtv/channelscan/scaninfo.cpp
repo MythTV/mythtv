@@ -21,7 +21,7 @@ ScanInfo::ScanInfo(uint _scanid, uint _cardid, uint _sourceid,
 
 uint SaveScan(const ScanDTVTransportList &scan)
 {
-    VERBOSE(VB_CHANSCAN, QString("SaveScan() scan.size(): %1")
+    LOG(VB_CHANSCAN, LOG_INFO, QString("SaveScan() scan.size(): %1")
             .arg(scan.size()));
 
     uint scanid = 0;

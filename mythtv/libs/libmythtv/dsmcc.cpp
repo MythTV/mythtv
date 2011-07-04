@@ -91,8 +91,8 @@ ObjCarousel *Dsmcc::AddTap(unsigned short componentTag, unsigned carouselId)
     if (it == car->m_Tags.end())
     { // Not there.
         car->m_Tags.push_back(componentTag);
-        VERBOSE(VB_DSMCC, QString("[dsmcc] Adding tap for stream "
-                                  "tag %1 with carousel %2")
+        LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Adding tap for stream "
+                                        "tag %1 with carousel %2")
                 .arg(componentTag).arg(carouselId));
     }
 
@@ -112,7 +112,7 @@ bool Dsmcc::ProcessSectionHeader(DsmccSectionHeader *header,
      * else skip packet */
     if (((header->flags[0] & 0x80) == 0) || (header->flags[0] & 0x40) != 0)
     {
-        VERBOSE(VB_DSMCC, "[dsmcc] Invalid section\n");
+        LOG(VB_DSMCC, LOG_ERR, "[dsmcc] Invalid section");
         return false;
     }
 
@@ -168,7 +168,7 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
         return; /* TODO error */
     }
 
-    VERBOSE(VB_DSMCC, QString("[dsmcc] Gateway Module %1 on carousel %2")
+    LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Gateway Module %1 on carousel %2")
             .arg(gatewayProfile.m_profile_body->GetReference()->m_nModuleId)
             .arg(gatewayProfile.m_profile_body->
                  GetReference()->m_nCarouselId));
@@ -176,8 +176,8 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
     // This provides us with a map from component tag to carousel ID.
     ProfileBodyFull *full = (ProfileBodyFull*)gatewayProfile.m_profile_body;
 
-    VERBOSE(VB_DSMCC, QString("[dsmcc] DSI tap identifies "
-                              "tag %1 with carousel %2")
+    LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] DSI tap identifies "
+                                    "tag %1 with carousel %2")
             .arg(full->dsm_conn.tap.assoc_tag)
             .arg(gatewayProfile.m_profile_body->
                  GetReference()->m_nCarouselId));
@@ -220,8 +220,8 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
 
     if (car == NULL)
     {
-        VERBOSE(VB_DSMCC, QString("[dsmcc] Section Info for "
-                                  "unknown carousel %1")
+        LOG(VB_DSMCC, LOG_ERR, QString("[dsmcc] Section Info for "
+                                       "unknown carousel %1")
                 .arg(dii.download_id));
         // No known carousels yet (possible?)
         return;
@@ -253,8 +253,8 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
         dii.modules[i].module_version  = data[off++];
         dii.modules[i].module_info_len = data[off++];
 
-        VERBOSE(VB_DSMCC, QString("[dsmcc] Module %1 -> "
-                                  "Size = %2 Version = %3")
+        LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Module %1 -> "
+                                        "Size = %2 Version = %3")
                 .arg(dii.modules[i].module_id)
                 .arg(dii.modules[i].module_size)
                 .arg(dii.modules[i].module_version));
@@ -309,7 +309,7 @@ void Dsmcc::ProcessSectionIndication(const unsigned char *data,
 
     if (message_id == DSMCC_MESSAGE_DSI)
     {
-        VERBOSE(VB_DSMCC, "[dsmcc] Server Gateway");
+        LOG(VB_DSMCC, LOG_INFO, "[dsmcc] Server Gateway");
         // We only process DSI messages if they are received on the initial
         // stream. Because we add taps eagerly we could see a DSI on a
         // different stream before we see the one we actually want.
@@ -320,19 +320,19 @@ void Dsmcc::ProcessSectionIndication(const unsigned char *data,
         }
         else
         {
-            VERBOSE(VB_DSMCC, QString("[dsmcc] Discarding DSI from tag %1")
-                    .arg(streamTag));
+            LOG(VB_DSMCC, LOG_INFO,
+                QString("[dsmcc] Discarding DSI from tag %1") .arg(streamTag));
         }
         // Otherwise discard it.
     }
     else if (message_id == DSMCC_MESSAGE_DII)
     {
-        VERBOSE(VB_DSMCC, "[dsmcc] Module Info");
+        LOG(VB_DSMCC, LOG_INFO, "[dsmcc] Module Info");
         ProcessDownloadInfoIndication(data + DSMCC_DII_OFFSET, streamTag);
     }
     else
     {
-        VERBOSE(VB_DSMCC, "[dsmcc] Unknown section");
+        LOG(VB_DSMCC, LOG_ERR, "[dsmcc] Unknown section");
         /* Error */
     }
 
@@ -365,7 +365,8 @@ void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
     ddb.block_number   = (blockData[4] << 8) | blockData[5];
     ddb.len = message_len - 6;
 
-    VERBOSE(VB_DSMCC, QString("[dsmcc] Data Block ModID %1 Pos %2 Version %3")
+    LOG(VB_DSMCC, LOG_INFO,
+        QString("[dsmcc] Data Block ModID %1 Pos %2 Version %3")
             .arg(ddb.module_id).arg(ddb.block_number).arg(ddb.module_version));
 
     ObjCarousel *car = GetCarouselById(download_id);
@@ -392,8 +393,8 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
     QLinkedList<ObjCarousel*>::iterator it = carousels.begin();
     ObjCarousel *car = NULL;
 
-    VERBOSE(VB_DSMCC, QString("[dsmcc] Read block size %1 from tag %2 "
-                              "carousel id %3 data broadcast Id %4")
+    LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Read block size %1 from tag %2 "
+                                    "carousel id %3 data broadcast Id %4")
             .arg(length).arg(componentTag)
             .arg(carouselId).arg(dataBroadcastId));
 
@@ -428,7 +429,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
 
     if (!found)
     {
-        VERBOSE(VB_DSMCC, QString("[dsmcc] Dropping block from tag %1")
+        LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Dropping block from tag %1")
                 .arg(componentTag));
 
         return; // Ignore this stream.
@@ -441,8 +442,8 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
 
     if (crc32_decode != 0)
     {
-        VERBOSE(VB_DSMCC,
-                QString("[dsmcc] Dropping corrupt section (Got %1)")
+        LOG(VB_DSMCC, LOG_INFO,
+            QString("[dsmcc] Dropping corrupt section (Got %1)")
                 .arg(crc32_decode));
         return;
     }
@@ -450,19 +451,19 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
     switch (data[0])
     {
         case DSMCC_SECTION_INDICATION:
-            VERBOSE(VB_DSMCC, "[dsmcc] Server/Info Section");
+            LOG(VB_DSMCC, LOG_INFO, "[dsmcc] Server/Info Section");
             ProcessSectionIndication(data, length, componentTag);
             break;
         case DSMCC_SECTION_DATA:
-            VERBOSE(VB_DSMCC, "[dsmcc] Data Section");
+            LOG(VB_DSMCC, LOG_INFO, "[dsmcc] Data Section");
             ProcessSectionData(data, length);
             break;
         case DSMCC_SECTION_DESCR:
-            VERBOSE(VB_DSMCC, "[dsmcc] Descriptor Section");
+            LOG(VB_DSMCC, LOG_INFO, "[dsmcc] Descriptor Section");
             ProcessSectionDesc(data, length);
             break;
         default:
-            VERBOSE(VB_DSMCC, QString("[dsmcc] Unknown Section %1")
+            LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Unknown Section %1")
                     .arg(data[0]));
             break;
     }
@@ -471,7 +472,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
 // Reset the object carousel and clear the caches.
 void Dsmcc::Reset()
 {
-    VERBOSE(VB_DSMCC, "Resetting carousel");
+    LOG(VB_DSMCC, LOG_INFO, "Resetting carousel");
     QLinkedList<ObjCarousel*>::iterator it = carousels.begin();
     for (; it != carousels.end(); ++it)
         delete *it;

@@ -52,13 +52,14 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
         return NULL; // Already got it.
 
     // Check if we have this block already or not. If not append to list
-    VERBOSE(VB_DSMCC, QString("[dsmcc] Module %1 block number %2 length %3")
+    LOG(VB_DSMCC, LOG_INFO,
+        QString("[dsmcc] Module %1 block number %2 length %3")
             .arg(ddb->module_id).arg(ddb->block_number).arg(ddb->len));
 
     if (ddb->block_number >= m_blocks.size())
     {
-        VERBOSE(VB_DSMCC, QString("[dsmcc] Module %1 block number %2 "
-                                  "is larger than %3")
+        LOG(VB_DSMCC, LOG_ERR,
+            QString("[dsmcc] Module %1 block number %2 is larger than %3")
                 .arg(ddb->module_id).arg(ddb->block_number)
                 .arg(m_blocks.size()));
 
@@ -73,14 +74,15 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
         m_receivedData += ddb->len;
     }
 
-    VERBOSE(VB_DSMCC, QString("[dsmcc] Module %1 Current Size %2 "
-                              "Total Size %3")
+    LOG(VB_DSMCC, LOG_INFO,
+        QString("[dsmcc] Module %1 Current Size %2 Total Size %3")
             .arg(m_module_id).arg(m_receivedData).arg(m_moduleSize));
 
     if (m_receivedData < m_moduleSize)
         return NULL; // Not yet complete
 
-    VERBOSE(VB_DSMCC, QString("[dsmcc] Reconstructing module %1 from blocks")
+    LOG(VB_DSMCC, LOG_INFO,
+        QString("[dsmcc] Reconstructing module %1 from blocks")
             .arg(m_module_id));
 
     // Re-assemble the blocks into the complete module.
@@ -103,15 +105,15 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
     if (m_descriptorData.isCompressed)
     {
         unsigned long dataLen = m_descriptorData.originalSize + 1;
-        VERBOSE(VB_DSMCC, QString("[dsmcc] uncompressing: "
-                                  "compressed size %1, final size %2")
+        LOG(VB_DSMCC, LOG_INFO,
+            QString("[dsmcc] uncompressing: compressed size %1, final size %2")
                 .arg(m_moduleSize).arg(dataLen));
 
         unsigned char *uncompressed = (unsigned char*) malloc(dataLen + 1);
         int ret = uncompress(uncompressed, &dataLen, tmp_data, m_moduleSize);
         if (ret != Z_OK)
         {
-            VERBOSE(VB_DSMCC,"[dsmcc] compression error, skipping");
+            LOG(VB_DSMCC, LOG_ERR, "[dsmcc] compression error, skipping");
             free(tmp_data);
             free(uncompressed);
             return NULL;
@@ -161,24 +163,23 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
                 /* already known */
                 if (cachep->Version() == info->module_version)
                 {
-                    VERBOSE(VB_DSMCC, QString("[dsmcc] Already Know "
-                                              "Module %1")
+                    LOG(VB_DSMCC, LOG_ERR,
+                        QString("[dsmcc] Already Know Module %1")
                             .arg(info->module_id));
                     if (cachep->ModuleSize() == info->module_size)
                         return;
                     // It seems that when ITV4 starts broadcasting it
                     // updates the contents of a file but doesn't
                     // update the version.  This is a work-around.
-                    VERBOSE(VB_DSMCC, QString("[dsmcc] Module %1 size "
-                                              "has changed (%2 to %3) "
-                                              "but version has not!!")
+                    LOG(VB_DSMCC, LOG_ERR,
+                        QString("[dsmcc] Module %1 size has changed (%2 to %3) "
+                                "but version has not!!")
                              .arg(info->module_id)
                              .arg(info->module_size)
                              .arg(cachep->DataSize()));
                 }
                 // Version has changed - Drop old data.
-                VERBOSE(VB_DSMCC, QString("[dsmcc] Updated "
-                                          "Module %1")
+                LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Updated Module %1")
                         .arg(info->module_id));
 
                 // Remove and delete the cache object.
@@ -188,15 +189,15 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
             }
         }
 
-        VERBOSE(VB_DSMCC, QString("[dsmcc] Saving info for module %1")
+        LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Saving info for module %1")
                 .arg(dii->modules[i].module_id));
 
         // Create a new cache module data object.
-        DSMCCCacheModuleData *cachep = new DSMCCCacheModuleData(dii, info, streamTag);
-
+        DSMCCCacheModuleData *cachep = new DSMCCCacheModuleData(dii, info,
+								streamTag);
         int tag = info->modinfo.tap.assoc_tag;
-        VERBOSE(VB_DSMCC, QString("[dsmcc] Module info tap "
-                                  "identifies tag %1 with carousel %2\n")
+        LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Module info tap identifies "
+                                        "tag %1 with carousel %2")
                 .arg(tag).arg(cachep->CarouselId()));
 
         // If a carousel with this id does not exist create it.
@@ -215,7 +216,8 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
 void ObjCarousel::AddModuleData(unsigned long carousel, DsmccDb *ddb,
                                 const unsigned char *data)
 {
-    VERBOSE(VB_DSMCC, QString("[dsmcc] Data block on carousel %1").arg(m_id));
+    LOG(VB_DSMCC, LOG_INFO,
+        QString("[dsmcc] Data block on carousel %1").arg(m_id));
 
     // Search the saved module info for this module
     QLinkedList<DSMCCCacheModuleData*>::iterator it = m_Cache.begin();
@@ -241,8 +243,8 @@ void ObjCarousel::AddModuleData(unsigned long carousel, DsmccDb *ddb,
         // It is complete and we have the data
         unsigned int len   = cachep->DataSize();
         unsigned long curp = 0;
-        VERBOSE(VB_DSMCC, QString("[biop] Module size (uncompressed) = %1")
-                .arg(len));
+        LOG(VB_DSMCC, LOG_INFO, 
+            QString("[biop] Module size (uncompressed) = %1") .arg(len));
 
         // Now process the BIOP tables in this module.
         // Tables may be file contents or the descriptions of

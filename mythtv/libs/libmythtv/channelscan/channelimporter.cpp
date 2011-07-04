@@ -36,7 +36,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     {
         if (use_gui)
         {
-            VERBOSE(VB_IMPORTANT, LOC + (ChannelUtil::GetChannelCount()
+            LOG(VB_GENERAL, LOG_INFO, (ChannelUtil::GetChannelCount()
                                          ? "No new channels to process"
                                          : "No channels to process.."));
             MythPopupBox::showOkPopup(
@@ -244,7 +244,7 @@ uint ChannelImporter::DeleteUnusedTransports(uint sourceid)
 
     QString msg = QObject::tr("Found %n unused transport(s).", "", query.size());
 
-    VERBOSE(VB_IMPORTANT, msg);
+    LOG(VB_GENERAL, LOG_INFO, msg);
 
     if (query.size() == 0)
         return 0;

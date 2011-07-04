@@ -91,8 +91,9 @@ bool PixmapChannel::CacheChannelIcon(void)
 
     if (!localDir.exists() && !localDir.mkdir(localDirStr))
     {
-        VERBOSE(VB_IMPORTANT, QString("Icons directory is missing and could "
-                                      "not be created: %1").arg(localDirStr));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Icons directory is missing and could not be created: %1")
+                .arg(localDirStr));
         icon.clear();
         return false;
     }
@@ -137,11 +138,13 @@ bool PixmapChannel::CacheChannelIcon(void)
 
         if (image.save(m_localIcon))
         {
-            VERBOSE(VB_GENERAL, QString("Caching channel icon %1").arg(m_localIcon));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Caching channel icon %1").arg(m_localIcon));
             return true;
         }
         else
-            VERBOSE(VB_GENERAL, QString("Failed to save to %1").arg(m_localIcon));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Failed to save to %1").arg(m_localIcon));
     }
 
     // if we get here then the icon is set in the db but couldn't be found

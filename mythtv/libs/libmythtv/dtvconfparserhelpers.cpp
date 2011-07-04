@@ -29,8 +29,8 @@ QString DTVParamHelper::toString(const char *strings[], int index,
 {
     if ((index < 0) || ((uint)index >= strings_size))
     {
-        VERBOSE(VB_IMPORTANT,
-                "DTVParamHelper::toString() index out of bounds");
+        LOG(VB_GENERAL, LOG_CRIT,
+            "DTVParamHelper::toString() index out of bounds");
 
         return QString::null;
     }

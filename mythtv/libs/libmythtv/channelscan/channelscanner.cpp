@@ -120,12 +120,11 @@ void ChannelScanner::Scan(
     PreScanCommon(scantype, cardid, inputname,
                   sourceid, do_ignore_signal_timeout, do_test_decryption);
 
-    VERBOSE(VB_CHANSCAN, LOC + "Scan()");
+    LOG(VB_CHANSCAN, LOG_INFO, "Scan()");
 
     if (!sigmonScanner)
     {
-        VERBOSE(VB_CHANSCAN, LOC + "Scan(): "
-                "scanner does not exist...");
+        LOG(VB_CHANSCAN, LOG_ERR, "Scan(): scanner does not exist...");
         return;
     }
 
@@ -139,8 +138,7 @@ void ChannelScanner::Scan(
         (ScanTypeSetting::FullScan_DVBT   == scantype) ||
         (ScanTypeSetting::FullScan_Analog == scantype))
     {
-        VERBOSE(VB_CHANSCAN, LOC +
-                QString("ScanTransports(%1, %2, %3)")
+        LOG(VB_CHANSCAN, LOG_INFO, QString("ScanTransports(%1, %2, %3)")
                 .arg(freq_std).arg(mod).arg(tbl));
 
         // HACK HACK HACK -- begin
@@ -162,13 +160,13 @@ void ChannelScanner::Scan(
              (ScanTypeSetting::NITAddScan_DVBS2 == scantype) ||
              (ScanTypeSetting::NITAddScan_DVBC  == scantype))
     {
-        VERBOSE(VB_CHANSCAN, LOC + "ScanTransports()");
+        LOG(VB_CHANSCAN, LOG_INFO, "ScanTransports()");
 
         ok = sigmonScanner->ScanTransportsStartingOn(sourceid, startChan);
     }
     else if (ScanTypeSetting::FullTransportScan == scantype)
     {
-        VERBOSE(VB_CHANSCAN, LOC + QString("ScanExistingTransports(%1)")
+        LOG(VB_CHANSCAN, LOG_INFO, QString("ScanExistingTransports(%1)")
                 .arg(sourceid));
 
         ok = sigmonScanner->ScanExistingTransports(sourceid, do_follow_nit);
@@ -186,7 +184,8 @@ void ChannelScanner::Scan(
     {
         ok = true;
 
-        VERBOSE(VB_CHANSCAN, LOC + QString("ScanForChannels(%1)").arg(sourceid));
+        LOG(VB_CHANSCAN, LOG_INFO,
+            QString("ScanForChannels(%1)").arg(sourceid));
 
         QString card_type = CardUtil::GetRawCardType(cardid);
         QString sub_type  = card_type;
@@ -216,20 +215,20 @@ void ChannelScanner::Scan(
     }
     else if (ScanTypeSetting::TransportScan == scantype)
     {
-        VERBOSE(VB_CHANSCAN, LOC + QString("ScanTransport(%1)").arg(mplexid));
+        LOG(VB_CHANSCAN, LOG_INFO, QString("ScanTransport(%1)").arg(mplexid));
 
         ok = sigmonScanner->ScanTransport(mplexid, do_follow_nit);
     }
     else if (ScanTypeSetting::CurrentTransportScan == scantype)
     {
         QString sistandard = "mpeg";
-        VERBOSE(VB_CHANSCAN, LOC + "ScanCurrentTransport(" + sistandard + ")");
+        LOG(VB_CHANSCAN, LOG_INFO, "ScanCurrentTransport(" + sistandard + ")");
         ok = sigmonScanner->ScanCurrentTransport(sistandard);
     }
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to handle tune complete.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to handle tune complete.");
         InformUser(QObject::tr("Programmer Error: "
                                "Failed to handle tune complete."));
     }
@@ -313,7 +312,7 @@ void ChannelScanner::PreScanCommon(
     QString device = CardUtil::GetVideoDevice(cardid);
     if (device.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No Device");
+        LOG(VB_GENERAL, LOG_ERR, "No Device");
         InformUser(QObject::tr("Programmer Error: No Device"));
         return;
     }
@@ -373,7 +372,7 @@ void ChannelScanner::PreScanCommon(
 
     if (!channel)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Channel not created");
+        LOG(VB_GENERAL, LOG_ERR, "Channel not created");
         InformUser(QObject::tr("Programmer Error: Channel not created"));
         return;
     }
@@ -384,7 +383,7 @@ void ChannelScanner::PreScanCommon(
     // If the backend is running this may fail...
     if (!channel->Open())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Channel could not be opened");
+        LOG(VB_GENERAL, LOG_ERR, "Channel could not be opened");
         InformUser(QObject::tr("Channel could not be opened."));
         return;
     }

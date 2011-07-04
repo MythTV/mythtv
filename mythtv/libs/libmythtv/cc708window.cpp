@@ -346,8 +346,8 @@ void CC708Window::AddChar(QChar ch)
 
     if (!IsPenValid())
     {
-        VERBOSE(VB_VBI,
-                QString("AddChar(%1) at (c %2, r %3) INVALID win(%4,%5)")
+        LOG(VB_VBI, LOG_INFO,
+            QString("AddChar(%1) at (c %2, r %3) INVALID win(%4,%5)")
                 .arg(dbg_char).arg(pen.column).arg(pen.row)
                 .arg(true_column_count).arg(true_row_count));
         return;
@@ -384,7 +384,7 @@ void CC708Window::AddChar(QChar ch)
     IncrPenLocation();
     changed = true;
 
-    VERBOSE(VB_VBI, QString("AddChar(%1) at (c %2, r %3) -> (%4,%5)")
+    LOG(VB_VBI, LOG_INFO, QString("AddChar(%1) at (c %2, r %3) -> (%4,%5)")
             .arg(dbg_char).arg(c).arg(r).arg(pen.column).arg(pen.row));
 }
 
@@ -433,7 +433,7 @@ void CC708Window::IncrPenLocation(void)
     new_row    += (print_dir == k708DirBottomToTop) ? -1 : 0;
 
 #if 0
-    VERBOSE(VB_VBI, QString("IncrPen dir%1: (c %2, r %3) -> (%4,%5)")
+    LOG(VB_VBI, LOG_INFO, QString("IncrPen dir%1: (c %2, r %3) -> (%4,%5)")
             .arg(print_dir).arg(pen.column).arg(pen.row)
             .arg(new_column).arg(new_row));
 #endif
@@ -475,7 +475,7 @@ void CC708Window::DecrPenLocation(void)
     new_row    -= (print_dir == k708DirBottomToTop) ? -1 : 0;
 
 #if 0
-    VERBOSE(VB_VBI, QString("DecrPen dir%1: (c %2, r %3) -> (%4,%5)")
+    LOG(VB_VBI, LOG_INFO, QString("DecrPen dir%1: (c %2, r %3) -> (%4,%5)")
             .arg(print_dir).arg(pen.column).arg(pen.row)
             .arg(new_column).arg(new_row));
 #endif

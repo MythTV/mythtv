@@ -366,7 +366,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver)
             .arg(thequery)
             .arg(MythDB::DBErrorMessage(query.lastError()))
             .arg(newnumber);
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return false;
     }
 
@@ -383,7 +383,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver)
             .arg(thequery)
             .arg(MythDB::DBErrorMessage(query.lastError()))
             .arg(newnumber);
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return false;
     }
 
@@ -406,7 +406,7 @@ static bool performActualUpdate(
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythTV schema version ") +
+    LOG(VB_GENERAL, LOG_CRIT, QString("Upgrading to MythTV schema version ") +
             version);
 
     int counter = 0;
@@ -422,7 +422,7 @@ static bool performActualUpdate(
                 .arg(thequery)
                 .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
-            VERBOSE(VB_IMPORTANT, msg);
+            LOG(VB_GENERAL, LOG_ERR, msg);
             return false;
         }
 
@@ -477,7 +477,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     }
 
     if (!upgradeAllowed)
-        VERBOSE(VB_IMPORTANT, "Not allowed to upgrade the database.");
+        LOG(VB_GENERAL, LOG_ERR, "Not allowed to upgrade the database.");
 
     // Pop up messages, questions, warnings, etc.
     switch (DBup->PromptForUpgrade("TV", upgradeAllowed,
@@ -502,7 +502,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
         MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
 
 
-    VERBOSE(VB_IMPORTANT, "Newest MythTV Schema Version : "+
+    LOG(VB_GENERAL, LOG_CRIT, "Newest MythTV Schema Version : "+
             currentDatabaseVersion);
 
     if (!DBUtil::lockSchema(query))
@@ -514,9 +514,10 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     bool ret = doUpgradeTVDatabaseSchema();
 
     if (ret)
-        VERBOSE(VB_IMPORTANT, "Database Schema upgrade complete, unlocking.");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Database Schema upgrade complete, unlocking.");
     else
-        VERBOSE(VB_IMPORTANT, "Database Schema upgrade FAILED, unlocking.");
+        LOG(VB_GENERAL, LOG_ERR, "Database Schema upgrade FAILED, unlocking.");
 
     DBUtil::unlockSchema(query);
     gCoreContext->ActivateSettingsCache(true);
@@ -556,8 +557,8 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver.isEmpty() || dbver.toInt() <  1027)
     {
-        VERBOSE(VB_IMPORTANT, "Unrecognized database schema version. "
-                              "Unable to upgrade database.");
+        LOG(VB_GENERAL, LOG_ERR, "Unrecognized database schema version. "
+                                 "Unable to upgrade database.");
         return false;
     }
 
@@ -1684,7 +1685,7 @@ NULL
 
     if (dbver == "1093")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1094");
+        LOG(VB_GENERAL, LOG_NOTICE, "Upgrading to MythTV schema version 1094");
 
         MSqlQuery recordids(MSqlQuery::InitCon());
         recordids.prepare("SELECT recordid,recpriority FROM record;");
@@ -2778,7 +2779,7 @@ NULL
                 .arg(thequery)
                 .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg("1170");
-            VERBOSE(VB_IMPORTANT, msg);
+            LOG(VB_GENERAL, LOG_ERR, msg);
             return false;
         }
 
@@ -2899,7 +2900,7 @@ NULL
                 .arg(thequery)
                 .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg("1176");
-            VERBOSE(VB_IMPORTANT, msg);
+            LOG(VB_GENERAL, LOG_ERR, msg);
             return false;
         }
 
@@ -3008,7 +3009,7 @@ NULL
 
     if (dbver == "1181")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1182");
+        LOG(VB_GENERAL, LOG_NOTICE, "Upgrading to MythTV schema version 1182");
 
         MSqlQuery airdates(MSqlQuery::InitCon());
         airdates.prepare("SELECT chanid, starttime FROM recordedprogram "
@@ -3075,7 +3076,7 @@ NULL
 
     if (dbver == "1185")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1186");
+        LOG(VB_GENERAL, LOG_NOTICE, "Upgrading to MythTV schema version 1186");
 
         MSqlQuery ppuq(MSqlQuery::InitCon());
 
@@ -3289,7 +3290,7 @@ NULL
                 .arg(thequery)
                 .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg("1198");
-            VERBOSE(VB_IMPORTANT, msg);
+            LOG(VB_GENERAL, LOG_ERR, msg);
             return false;
         }
 
@@ -3685,8 +3686,9 @@ NULL
                                           "Unable to proceed with database "
                                           "upgrade. (Table: %1, Warnings: %2)")
                                           .arg(table).arg(warnings);
-                    VERBOSE(VB_IMPORTANT, msg);
-                    VERBOSE(VB_IMPORTANT, "Your database must be fixed before "
+                    LOG(VB_GENERAL, LOG_WARNING, msg);
+                    LOG(VB_GENERAL, LOG_WARNING,
+                            "Your database must be fixed before "
                             "you can upgrade beyond 0.21-fixes. Please see "
                             "http://www.mythtv.org/wiki/"
                             "Fixing_Corrupt_Database_Encoding for information "
@@ -3713,7 +3715,7 @@ NULL
                 {
                     MythDB::DBError(QString("Index creation failed."),
                                     thequery);
-                    VERBOSE(VB_IMPORTANT, "DB charset pre-conversion test "
+                    LOG(VB_GENERAL, LOG_ERR, "DB charset pre-conversion test "
                             "failed! Your database seems to be partially "
                             "corrupted. Please move the backup to a safe "
                             "place. Your database must be fixed before you "
@@ -3969,7 +3971,7 @@ NULL
 
         if (!performActualUpdate(updates, "1216", dbver))
         {
-            VERBOSE(VB_IMPORTANT, "DB charset conversions update failed! "
+            LOG(VB_GENERAL, LOG_ERR, "DB charset conversions update failed! "
                     "Your database seems to be partially corrupted. Please "
                     "move the backup to a safe place. Your database must be "
                     "fixed before you can upgrade beyond 0.21-fixes. Please "
@@ -4279,7 +4281,7 @@ NULL
 
         if (!performActualUpdate(updates, "1217", dbver))
         {
-            VERBOSE(VB_IMPORTANT, "DB charset conversions update failed! "
+            LOG(VB_GENERAL, LOG_ERR, "DB charset conversions update failed! "
                     "Your database seems to be partially corrupted. Please "
                     "move the backup to a safe place. Your database must be "
                     "fixed before you can upgrade beyond 0.21-fixes. Please "
@@ -4964,7 +4966,7 @@ NULL
 
     if (dbver == "1249")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1250");
+        LOG(VB_GENERAL, LOG_NOTICE, "Upgrading to MythTV schema version 1250");
 
         MSqlQuery select(MSqlQuery::InitCon());
         select.prepare("SELECT hostname, data FROM settings "
@@ -5059,7 +5061,7 @@ NULL
 
     if (dbver == "1251")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1252");
+        LOG(VB_GENERAL, LOG_NOTICE, "Upgrading to MythTV schema version 1252");
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SHOW INDEX FROM recgrouppassword");
@@ -5096,7 +5098,7 @@ NULL
 
     if (dbver == "1252")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1253");
+        LOG(VB_GENERAL, LOG_NOTICE, "Upgrading to MythTV schema version 1253");
 
         MSqlQuery select(MSqlQuery::InitCon());
         select.prepare("SELECT hostname, data FROM settings "
@@ -5160,7 +5162,8 @@ NULL
         if (gCoreContext->GetNumSetting("have-nit-fix") == 1)
         {
             // User has previously applied patch from ticket #7486.
-            VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1254");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "Upgrading to MythTV schema version 1254");
             if (!UpdateDBVersionNumber("1254", dbver))
                 return false;
         }
@@ -5263,7 +5266,7 @@ NULL
 
     if (dbver == "1258")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1259");
+        LOG(VB_GENERAL, LOG_NOTICE, "Upgrading to MythTV schema version 1259");
 
         MSqlQuery select(MSqlQuery::InitCon());
         select.prepare("SELECT hostname, data FROM settings "
@@ -5347,7 +5350,7 @@ NULL
 
     if (dbver == "1259")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1260");
+        LOG(VB_GENERAL, LOG_NOTICE, "Upgrading to MythTV schema version 1260");
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM keybindings WHERE "
@@ -5438,7 +5441,8 @@ NULL
     {
         if (gCoreContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
         {
-            VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1261");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "Upgrading to MythTV schema version 1261");
             if (!UpdateDBVersionNumber("1261", dbver))
                 return false;
         }
@@ -5810,11 +5814,12 @@ bool InitializeMythSchema(void)
             "If you are sure this is a good MythTV database, verify\n"
             "that the settings table has the DBSchemaVer variable.\n")
             .arg(query.size() - 1);
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return false;
     }
 
-    VERBOSE(VB_IMPORTANT, "Inserting MythTV initial database information.");
+    LOG(VB_GENERAL, LOG_NOTICE,
+        "Inserting MythTV initial database information.");
 
     QString qtmp = QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8;")
         .arg(gCoreContext->GetDatabaseParams().dbName);

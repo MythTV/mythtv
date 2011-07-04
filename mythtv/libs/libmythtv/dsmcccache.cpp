@@ -138,7 +138,7 @@ DSMCCCacheDir *DSMCCCache::Srg(const DSMCCCacheReference &ref)
 
     if (dir != m_Gateways.end())
     {
-        VERBOSE(VB_DSMCC, QString("[DSMCCCache] Already seen gateway %1")
+        LOG(VB_DSMCC, LOG_ERR, QString("[DSMCCCache] Already seen gateway %1")
                 .arg(ref.toString()));
         return NULL;
     }
@@ -158,7 +158,7 @@ DSMCCCacheDir *DSMCCCache::Directory(const DSMCCCacheReference &ref)
 
     if (dir != m_Directories.end())
     {
-        VERBOSE(VB_DSMCC, QString("[DSMCCCache] Already seen directory %1")
+        LOG(VB_DSMCC, LOG_ERR, QString("[DSMCCCache] Already seen directory %1")
                 .arg(ref.toString()));
         return NULL;
     }
@@ -176,8 +176,8 @@ void DSMCCCache::CacheFileData(const DSMCCCacheReference &ref,
     DSMCCCacheFile *pFile;
 
     // Do we have the file already?
-    VERBOSE(VB_DSMCC,
-            QString("[DSMCCCache] Adding file data size %1 for reference %2")
+    LOG(VB_DSMCC, LOG_INFO,
+        QString("[DSMCCCache] Adding file data size %1 for reference %2")
             .arg(data.size()).arg(ref.toString()));
 
     QMap<DSMCCCacheReference, DSMCCCacheFile*>::Iterator fil =
@@ -208,8 +208,8 @@ void DSMCCCache::AddFileInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
 
     pDir->m_Files.insert(name, *entry);
 
-    VERBOSE(VB_DSMCC,
-            QString("[DSMCCCache] Adding file with name %1 reference %2")
+    LOG(VB_DSMCC, LOG_INFO,
+        QString("[DSMCCCache] Adding file with name %1 reference %2")
             .arg(name).arg(entry->toString()));
 }
 
@@ -225,8 +225,8 @@ void DSMCCCache::AddDirInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
 
     pDir->m_SubDirectories.insert(name, *entry);
 
-    VERBOSE(VB_DSMCC,
-            QString("[DSMCCCache] Adding directory with name %1 reference %2")
+    LOG(VB_DSMCC, LOG_INFO,
+        QString("[DSMCCCache] Adding directory with name %1 reference %2")
             .arg(name).arg(entry->toString()));
 }
 
@@ -321,7 +321,8 @@ int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
 // Set the gateway reference from a DSI message.
 void DSMCCCache::SetGateway(const DSMCCCacheReference &ref)
 {
-    VERBOSE(VB_DSMCC, QString("[DSMCCCache] Setting gateway to reference %1")
+    LOG(VB_DSMCC, LOG_INFO,
+        QString("[DSMCCCache] Setting gateway to reference %1")
             .arg(ref.toString()));
 
     m_GatewayRef = ref;

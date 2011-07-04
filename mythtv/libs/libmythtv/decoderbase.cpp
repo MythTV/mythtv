@@ -69,7 +69,7 @@ void DecoderBase::SetProgramInfo(const ProgramInfo &pginfo)
 
 void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("Reset: Video %1, Seek %2, File %3")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Reset: Video %1, Seek %2, File %3")
             .arg(reset_video_data).arg(seek_reset).arg(reset_file));
 
     if (seek_reset)
@@ -138,8 +138,13 @@ bool DecoderBase::PosMapFromDb(void)
            keyframedist = 12;
         totframes = (long long)(ringBuffer->BD()->GetTotalTimeOfTitle() * fps);
         posMap[totframes] = ringBuffer->BD()->GetTotalReadPosition();
-//        VERBOSE(VB_PLAYBACK, QString("%1 TotalTimeOfTitle() in ticks, %2 TotalReadPosition() in bytes, %3 is fps")
-//                .arg(ringBuffer->BD()->GetTotalTimeOfTitle()).arg(ringBuffer->BD()->GetTotalReadPosition()).arg(fps));
+#if 0
+        LOG(VB_PLAYBACK, LOG_DEBUG,
+            QString("%1 TotalTimeOfTitle() in ticks, %2 TotalReadPosition() "
+                    "in bytes, %3 is fps")
+                .arg(ringBuffer->BD()->GetTotalTimeOfTitle())
+                .arg(ringBuffer->BD()->GetTotalReadPosition()).arg(fps));
+#endif
     }
     else if ((positionMapType == MARK_UNSET) ||
         (keyframedist == -1))
@@ -200,7 +205,7 @@ bool DecoderBase::PosMapFromDb(void)
 
     if (!m_positionMap.empty())
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("Position map filled from DB to: %1")
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Position map filled from DB to: %1")
                 .arg(m_positionMap.back().index));
     }
 
@@ -251,8 +256,8 @@ bool DecoderBase::PosMapFromEnc(void)
 
     if (!m_positionMap.empty())
     {
-        VERBOSE(VB_PLAYBACK, LOC +
-                QString("Position map filled from Encoder to: %1")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("Position map filled from Encoder to: %1")
                 .arg(m_positionMap.back().index));
     }
 
@@ -289,8 +294,9 @@ unsigned long DecoderBase::GetPositionMapSize(void) const
  */
 bool DecoderBase::SyncPositionMap(void)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("Resyncing position map. posmapStarted = %1"
-            " livetv(%2) watchingRec(%3)")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("Resyncing position map. posmapStarted = %1"
+                " livetv(%2) watchingRec(%3)")
             .arg((int) posmapStarted).arg(livetv).arg(watchingrecording));
 
     if (dontSyncPositionMap)
@@ -306,23 +312,22 @@ bool DecoderBase::SyncPositionMap(void)
             // starting up -- try first from database
             PosMapFromDb();
             new_posmap_size = GetPositionMapSize();
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("SyncPositionMap watchingrecording, from DB: "
-                            "%1 entries")
-                    .arg(new_posmap_size));
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("SyncPositionMap watchingrecording, from DB: "
+                        "%1 entries") .arg(new_posmap_size));
         }
         // always try to get more from encoder
         if (!PosMapFromEnc())
         {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("SyncPositionMap watchingrecording no entries "
-                            "from encoder, try DB"));
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("SyncPositionMap watchingrecording no entries "
+                        "from encoder, try DB"));
             PosMapFromDb(); // try again from db
         }
 
         new_posmap_size = GetPositionMapSize();
-        VERBOSE(VB_PLAYBACK, LOC +
-                QString("SyncPositionMap watchingrecording total: %1 entries")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("SyncPositionMap watchingrecording total: %1 entries")
                 .arg(new_posmap_size));
     }
     else
@@ -333,8 +338,8 @@ bool DecoderBase::SyncPositionMap(void)
             PosMapFromDb();
 
             new_posmap_size = GetPositionMapSize();
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("SyncPositionMap prerecorded, from DB: %1 entries")
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("SyncPositionMap prerecorded, from DB: %1 entries")
                     .arg(new_posmap_size));
         }
     }
@@ -370,9 +375,9 @@ bool DecoderBase::SyncPositionMap(void)
         m_parent->SetKeyframeDistance(keyframedist);
         posmapStarted = true;
 
-        VERBOSE(VB_PLAYBACK, LOC +
-                QString("SyncPositionMap, new totframes: %1, new length: %2, "
-                        "posMap size: %3")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("SyncPositionMap, new totframes: %1, new length: %2, "
+                    "posMap size: %3")
                 .arg(totframes).arg(length).arg(new_posmap_size));
     }
     recordingHasPositionMap |= (0 != new_posmap_size);
@@ -407,10 +412,10 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
             upper_bound = i;
             lower_bound = i;
 
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("FindPosition(%1, search%2 adjusted)")
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("FindPosition(%1, search%2 adjusted)")
                     .arg(desired_value).arg((search_adjusted) ? "" : " not") +
-                    QString(" --> [%1:%2(%3)]")
+                QString(" --> [%1:%2(%3)]")
                     .arg(i).arg(GetKey(m_positionMap[i]))
                     .arg(m_positionMap[i].pos));
 
@@ -446,10 +451,10 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     upper_bound = upper;
     lower_bound = lower;
 
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("FindPosition(%1, search%3 adjusted)")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("FindPosition(%1, search%3 adjusted)")
             .arg(desired_value).arg((search_adjusted) ? "" : " not") +
-            QString(" --> \n\t\t\t[%1:%2(%3),%4:%5(%6)]")
+        QString(" --> \n\t\t\t[%1:%2(%3),%4:%5(%6)]")
             .arg(lower_bound).arg(GetKey(m_positionMap[lower_bound]))
             .arg(m_positionMap[lower_bound].pos)
             .arg(upper_bound).arg(GetKey(m_positionMap[upper_bound]))
@@ -489,9 +494,9 @@ uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
     m_playbackinfo->SavePositionMapDelta(posMap, type);
 
 #if 0
-    VERBOSE(VB_IMPORTANT, LOC +
-            QString("Saving position map [%1,%2] w/%3 keyframes, "
-                    "took (%4,%5,%6) ms\n")
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("Saving position map [%1,%2] w/%3 keyframes, "
+                "took (%4,%5,%6) ms")
             .arg(first).arg(last).arg(saved)
             .arg(ttm.elapsed())
             .arg(ctm.elapsed()-stm.elapsed()).arg(stm.elapsed()));
@@ -502,8 +507,8 @@ uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
 
 bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
 {
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("DoRewind(%1 (%2), %3 discard frames)")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("DoRewind(%1 (%2), %3 discard frames)")
             .arg(desiredFrame).arg(framesPlayed)
             .arg((discardFrames) ? "do" : "don't"));
 
@@ -552,7 +557,7 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
 
     if (!GetPositionMapSize())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "PosMap is empty, can't seek");
+        LOG(VB_GENERAL, LOG_ERR, "PosMap is empty, can't seek");
         return false;
     }
 
@@ -614,9 +619,9 @@ long long DecoderBase::ConditionallyUpdatePosMap(long long desiredFrame)
     if (desiredFrame < last_frame)
         return last_frame;
 
-    VERBOSE(VB_PLAYBACK, LOC + "ConditionallyUpdatePosMap: "
-            "Not enough info in positionMap," +
-            QString("\n\t\t\twe need frame %1 but highest we have is %2.")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        "ConditionallyUpdatePosMap: Not enough info in positionMap," +
+        QString("\n\t\t\twe need frame %1 but highest we have is %2.")
             .arg(desiredFrame).arg(last_frame));
 
     SyncPositionMap();
@@ -625,10 +630,10 @@ long long DecoderBase::ConditionallyUpdatePosMap(long long desiredFrame)
 
     if (desiredFrame > last_frame)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "ConditionallyUpdatePosMap: "
-                "Still not enough info in positionMap after sync, " +
-                QString("\n\t\t\twe need frame %1 but highest we have "
-                        "is %2. Will attempt to seek frame-by-frame")
+        LOG(VB_PLAYBACK, LOG_INFO, "ConditionallyUpdatePosMap: Still not "
+                                   "enough info in positionMap after sync, " +
+            QString("\n\t\t\twe need frame %1 but highest we have "
+                    "is %2. Will attempt to seek frame-by-frame")
                 .arg(desiredFrame).arg(last_frame));
     }
 
@@ -646,8 +651,8 @@ long long DecoderBase::ConditionallyUpdatePosMap(long long desiredFrame)
  */
 bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
 {
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("DoFastForward(%1 (%2), %3 discard frames)")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("DoFastForward(%1 (%2), %3 discard frames)")
             .arg(desiredFrame).arg(framesPlayed)
             .arg((discardFrames) ? "do" : "don't"));
 
@@ -680,13 +685,13 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     bool needflush = false;
     if (desiredFrame > last_frame)
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("DoFastForward(): desiredFrame(%1) > last_frame(%2)")
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("DoFastForward(): desiredFrame(%1) > last_frame(%2)")
                 .arg(desiredFrame).arg(last_frame));
 
         if (desiredFrame - last_frame > 32)
         {
-            VERBOSE(VB_IMPORTANT, LOC + "DoFastForward(): "
+            LOG(VB_GENERAL, LOG_ERR, "DoFastForward(): "
                     "Desired frame is way past the end of the keyframe map!"
                     "\n\t\t\tSeeking to last keyframe instead.");
             desiredFrame = last_frame;
@@ -1039,7 +1044,7 @@ int DecoderBase::AutoSelectTrack(uint type)
     if ((selTrack < 0) &&
         wantedTrack[type].language>=-1 && numStreams)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "Trying to reselect track");
+        LOG(VB_PLAYBACK, LOG_INFO, "Trying to reselect track");
         // Try to reselect user selected track stream.
         // This should find the stream after a commercial
         // break and in some cases after a channel change.
@@ -1056,7 +1061,7 @@ int DecoderBase::AutoSelectTrack(uint type)
 
     if (selTrack < 0 && numStreams)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "Trying to select track (w/lang)");
+        LOG(VB_PLAYBACK, LOG_INFO, "Trying to select track (w/lang)");
         // Find first track stream that matches a language in
         // order of most preferred to least preferred language.
         vector<int>::iterator it = languagePreference.begin();
@@ -1075,7 +1080,7 @@ int DecoderBase::AutoSelectTrack(uint type)
 
     if (selTrack < 0 && numStreams)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "Selecting first track");
+        LOG(VB_PLAYBACK, LOG_INFO, "Selecting first track");
         selTrack = 0;
     }
 
@@ -1088,8 +1093,8 @@ int DecoderBase::AutoSelectTrack(uint type)
         wantedTrack[type] = tmp;
 
     int lang = tracks[type][currentTrack[type]].language;
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("Selected track #%1 in the %2 language(%3)")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("Selected track #%1 in the %2 language(%3)")
             .arg(currentTrack[type]+1)
             .arg(iso639_key_toName(lang)).arg(lang));
 

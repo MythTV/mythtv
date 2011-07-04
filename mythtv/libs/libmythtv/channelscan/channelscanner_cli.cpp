@@ -110,7 +110,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
         static QString old_msg;
         if (msg != old_msg)
         {
-            VERBOSE(VB_CHANSCAN, LOC + msg);
+            LOG(VB_CHANSCAN, LOG_INFO, msg);
             old_msg = msg;
         }
     }
@@ -131,7 +131,7 @@ void ChannelScannerCLI::InformUser(const QString &error)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + error);
+        LOG(VB_GENERAL, LOG_ERR, error);
     }
     post_event(scanMonitor, ScannerEvent::ScanComplete, 0);
 }

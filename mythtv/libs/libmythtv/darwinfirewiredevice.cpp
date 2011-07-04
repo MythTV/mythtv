@@ -128,7 +128,7 @@ DarwinFirewireDevice::~DarwinFirewireDevice()
 {
     if (IsPortOpen())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "ctor called with open port");
+        LOG(VB_GENERAL, LOG_ERR, "ctor called with open port");
         while (IsPortOpen())
             ClosePort();
     }
@@ -229,7 +229,7 @@ bool DarwinFirewireDevice::OpenPort(void)
 {
     QMutexLocker locker(&m_lock);
 
-    VERBOSE(VB_RECORD, LOC + "OpenPort()");
+    LOG(VB_RECORD, LOG_INFO, "OpenPort()");
 
     if (GetInfoPtr() && GetInfoPtr()->IsPortOpen())
     {
@@ -241,25 +241,25 @@ bool DarwinFirewireDevice::OpenPort(void)
 
     if (!m_priv->controller_thread_running)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to start firewire thread.");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to start firewire thread.");
         return false;
     }
 
     if (!GetInfoPtr())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No IEEE-1394 device with our GUID");
+        LOG(VB_GENERAL, LOG_ERR, "No IEEE-1394 device with our GUID");
 
         StopController();
         return false;
     }
 
-    VERBOSE(VB_RECORD, LOC + "Opening AVC Device");
-    VERBOSE(VB_RECORD, LOC + GetInfoPtr()->GetSubunitInfoString());
+    LOG(VB_RECORD, LOG_INFO, "Opening AVC Device");
+    LOG(VB_RECORD, LOG_INFO, GetInfoPtr()->GetSubunitInfoString());
 
     if (!GetInfoPtr()->IsSubunitType(kAVCSubunitTypeTuner) ||
         !GetInfoPtr()->IsSubunitType(kAVCSubunitTypePanel))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("No STB at guid: 0x%1")
+        LOG(VB_GENERAL, LOG_ERR, QString("No STB at guid: 0x%1")
                 .arg(m_guid,0,16));
 
         StopController();
@@ -269,7 +269,7 @@ bool DarwinFirewireDevice::OpenPort(void)
     bool ok = GetInfoPtr()->OpenPort(m_priv->controller_thread_cf_ref);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to get handle for port");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to get handle for port");
 
         return false;
     }
@@ -279,13 +279,13 @@ bool DarwinFirewireDevice::OpenPort(void)
     {
         if (m_local_node < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN + "Failed to query local node");
+            LOG(VB_GENERAL, LOG_WARNING, "Failed to query local node");
             m_local_node = 0;
         }
 
         if (m_remote_node < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN + "Failed to query remote node");
+            LOG(VB_GENERAL, LOG_WARNING, "Failed to query remote node");
             m_remote_node = 0;
         }
     }
@@ -299,7 +299,7 @@ bool DarwinFirewireDevice::ClosePort(void)
 {
     QMutexLocker locker(&m_lock);
 
-    VERBOSE(VB_RECORD, LOC + "ClosePort()");
+    LOG(VB_RECORD, LOG_INFO, "ClosePort()");
 
     if (m_open_port_cnt < 1)
         return false;
@@ -311,7 +311,7 @@ bool DarwinFirewireDevice::ClosePort(void)
 
     if (GetInfoPtr() && GetInfoPtr()->IsPortOpen())
     {
-        VERBOSE(VB_RECORD, LOC + "Closing AVC Device");
+        LOG(VB_RECORD, LOG_INFO, "Closing AVC Device");
 
         GetInfoPtr()->ClosePort();
     }
@@ -329,13 +329,14 @@ bool DarwinFirewireDevice::OpenAVStream(void)
         return true;
 
     int max_speed = GetMaxSpeed();
-    VERBOSE(VB_IMPORTANT, QString("Max Speed: %1, Our speed: %2")
+    LOG(VB_GENERAL, LOG_INFO, QString("Max Speed: %1, Our speed: %2")
                           .arg(max_speed).arg(m_speed));
     m_speed = min((uint)max_speed, m_speed);
 
     uint fwchan = 0;
     bool streaming = IsSTBStreaming(&fwchan);
-    VERBOSE(VB_IMPORTANT, QString("STB is %1already streaming on fwchan: %2")
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("STB is %1already streaming on fwchan: %2")
             .arg(streaming?"":"not ").arg(fwchan));
 
     // TODO we should use the stream if it already exists,
@@ -353,7 +354,7 @@ bool DarwinFirewireDevice::OpenAVStream(void)
 
     if (kIOReturnSuccess != ret)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't create A/V stream object");
+        LOG(VB_GENERAL, LOG_ERR, "Couldn't create A/V stream object");
         return false;
     }
 
@@ -423,7 +424,7 @@ bool DarwinFirewireDevice::CloseAVStream(void)
 
     StopStreaming();
 
-    VERBOSE(VB_RECORD, LOC + "Destroying A/V stream object");
+    LOG(VB_RECORD, LOG_INFO, "Destroying A/V stream object");
     AVS::DestroyMPEG2Receiver(m_priv->avstream);
     m_priv->avstream = NULL;
 
@@ -437,7 +438,7 @@ bool DarwinFirewireDevice::IsAVStreamOpen(void) const
 
 bool DarwinFirewireDevice::ResetBus(void)
 {
-    VERBOSE(VB_IMPORTANT, LOC + "ResetBus() -- begin");
+    LOG(VB_GENERAL, LOG_DEBUG, "ResetBus() -- begin");
 
     if (!GetInfoPtr() || !GetInfoPtr()->fw_handle)
         return false;
@@ -446,9 +447,9 @@ bool DarwinFirewireDevice::ResetBus(void)
     bool ok = (*fw_handle)->BusReset(fw_handle) == kIOReturnSuccess;
 
     if (!ok)
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Bus Reset failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, "Bus Reset failed" + ENO);
 
-    VERBOSE(VB_IMPORTANT, LOC + "ResetBus() -- end");
+    LOG(VB_GENERAL, LOG_DEBUG, "ResetBus() -- end");
 
     return ok;
 }
@@ -458,11 +459,11 @@ bool DarwinFirewireDevice::StartStreaming(void)
     if (m_priv->is_streaming)
         return m_priv->is_streaming;
 
-    VERBOSE(VB_RECORD, LOC + "Starting A/V streaming");
+    LOG(VB_RECORD, LOG_INFO, "Starting A/V streaming");
 
     if (!IsAVStreamOpen() && !OpenAVStream())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Starting A/V streaming: FAILED");
+        LOG(VB_GENERAL, LOG_ERR, "Starting A/V streaming: FAILED");
         return false;
     }
 
@@ -472,7 +473,7 @@ bool DarwinFirewireDevice::StartStreaming(void)
 
     m_priv->is_streaming = (kIOReturnSuccess == ret);
 
-    VERBOSE(VB_IMPORTANT, (LOC + "Starting A/V streaming: %1")
+    LOG(VB_GENERAL, LOG_INFO, QString("Starting A/V streaming: %1")
                           .arg((m_priv->is_streaming)?"success":"failure"));
 
     return m_priv->is_streaming;
@@ -483,18 +484,18 @@ bool DarwinFirewireDevice::StopStreaming(void)
     if (!m_priv->is_streaming)
         return true;
 
-    VERBOSE(VB_RECORD, LOC + "Stopping A/V streaming");
+    LOG(VB_RECORD, LOG_INFO, "Stopping A/V streaming");
 
     bool ok = (kIOReturnSuccess == m_priv->avstream->stopReceive());
     m_priv->is_streaming = !ok;
 
     if (!ok)
     {
-        VERBOSE(VB_RECORD, LOC_ERR + "Failed to stop A/V streaming");
+        LOG(VB_RECORD, LOG_ERR, "Failed to stop A/V streaming");
         return false;
     }
 
-    VERBOSE(VB_RECORD, LOC + "Stopped A/V streaming");
+    LOG(VB_RECORD, LOG_INFO, "Stopped A/V streaming");
     return true;
 }
 
@@ -556,7 +557,7 @@ void DarwinFirewireDevice::ProcessNoDataMessage(void)
     m_priv->no_data_timer_set = true;
     m_priv->no_data_timer.start();
 
-    VERBOSE(VB_IMPORTANT, LOC_WARN + QString("No Input in %1 msecs")
+    LOG(VB_GENERAL, LOG_WARNING, QString("No Input in %1 msecs")
             .arg(m_priv->no_data_cnt * kNoDataTimeout));
 
     if (m_priv->no_data_cnt > (kResetTimeout / kNoDataTimeout))
@@ -579,28 +580,27 @@ void DarwinFirewireDevice::ProcessStreamingMessage(
         bool ok = UpdatePlugRegister(
             plug_number, fw_channel, speed, true, false);
 
-        VERBOSE(VB_IMPORTANT, LOC + QString("AllocateIsochPort(%1,%2) %3")
+        LOG(VB_GENERAL, LOG_INFO, QString("AllocateIsochPort(%1,%2) %3")
                 .arg(fw_channel).arg(speed).arg(((ok)?"ok":"error")));
     }
     else if (AVS::kMpeg2ReceiverReleaseIsochPort == msg)
     {
         int ret = UpdatePlugRegister(plug_number, -1, -1, false, true);
 
-        VERBOSE(VB_IMPORTANT, (LOC + "ReleaseIsochPort %1")
+        LOG(VB_GENERAL, LOG_INFO, QString("ReleaseIsochPort %1")
                               .arg((kIOReturnSuccess == ret)?"ok":"error"));
     }
     else if (AVS::kMpeg2ReceiverDCLOverrun == msg)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "DCL Overrun");
+        LOG(VB_GENERAL, LOG_ERR, "DCL Overrun");
     }
     else if (AVS::kMpeg2ReceiverReceivedBadPacket == msg)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Received Bad Packet");
+        LOG(VB_GENERAL, LOG_ERR, "Received Bad Packet");
     }
     else
     {
-        VERBOSE(VB_GENERAL, LOC +
-                QString("Streaming Message: %1").arg(msg));
+        LOG(VB_GENERAL, LOG_INFO, QString("Streaming Message: %1").arg(msg));
     }
 }
 
@@ -627,9 +627,13 @@ vector<AVCInfo> DarwinFirewireDevice::GetSTBList(void)
 
 vector<AVCInfo> DarwinFirewireDevice::GetSTBListPrivate(void)
 {
-    //VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- begin");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- begin");
+#endif
     QMutexLocker locker(&m_lock);
-    //VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- got lock");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- got lock");
+#endif
 
     vector<AVCInfo> list;
 
@@ -643,7 +647,9 @@ vector<AVCInfo> DarwinFirewireDevice::GetSTBListPrivate(void)
         }
     }
 
-    //VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- end");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- end");
+#endif
     return list;
 }
 
@@ -657,7 +663,7 @@ void DarwinFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
     {
         DarwinAVCInfo *ptr = new DarwinAVCInfo();
 
-        VERBOSE(VB_IMPORTANT, QString("Adding   0x%1").arg(guid, 0, 16));
+        LOG(VB_GENERAL, LOG_INFO, QString("Adding   0x%1").arg(guid, 0, 16));
 
         m_priv->devices[guid] = ptr;
         it = m_priv->devices.find(guid);
@@ -666,7 +672,7 @@ void DarwinFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
     io_object_t &item = *((io_object_t*) pitem);
     if (it != m_priv->devices.end())
     {
-        VERBOSE(VB_IMPORTANT, QString("Updating 0x%1").arg(guid, 0, 16));
+        LOG(VB_GENERAL, LOG_INFO, QString("Updating 0x%1").arg(guid, 0, 16));
         (*it)->Update(guid, this, m_priv->notify_port,
                       m_priv->controller_thread_cf_ref, item);
     }
@@ -716,7 +722,7 @@ bool DarwinFirewireDevice::UpdatePlugRegisterPrivate(
     new_plug_cnt += ((add_plug) ? 1 : 0) - ((remove_plug) ? 1 : 0);
     if ((new_plug_cnt > 0x3f) || (new_plug_cnt < 0))
     {
-        VERBOSE(VB_IMPORTANT, (LOC_ERR + "Invalid Plug Count %1")
+        LOG(VB_GENERAL, LOG_ERR, QString("Invalid Plug Count %1")
                               .arg(new_plug_cnt));
         return false;
     }
@@ -724,7 +730,7 @@ bool DarwinFirewireDevice::UpdatePlugRegisterPrivate(
     new_fw_chan = (new_fw_chan >= 0) ? new_fw_chan : old_fw_chan;
     if (old_plug_cnt && (new_fw_chan != old_fw_chan))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
+        LOG(VB_GENERAL, LOG_WARNING,
                 "Ignoring FWChan change request, plug already open");
 
         new_fw_chan = old_fw_chan;
@@ -733,7 +739,7 @@ bool DarwinFirewireDevice::UpdatePlugRegisterPrivate(
     new_speed = (new_speed >= 0) ? new_speed : old_speed;
     if (old_plug_cnt && (new_speed != old_speed))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
+        LOG(VB_GENERAL, LOG_WARNING,
                 "Ignoring speed change request, plug already open");
 
         new_speed = old_speed;
@@ -771,9 +777,9 @@ void DarwinFirewireDevice::HandleBusReset(void)
     }
 
     if (!ok)
-        VERBOSE(VB_IMPORTANT, LOC + "Reset: Failed to reconnect");
+        LOG(VB_GENERAL, LOG_ERR, "Reset: Failed to reconnect");
     else
-        VERBOSE(VB_RECORD, LOC + "Reset: Reconnected succesfully");
+        LOG(VB_RECORD, LOG_INFO, "Reset: Reconnected succesfully");
 }
 
 bool DarwinFirewireDevice::UpdatePlugRegister(
@@ -802,27 +808,27 @@ void DarwinFirewireDevice::HandleDeviceChange(uint messageType)
 
     if (kIOMessageServiceIsTerminated == messageType)
     {
-        VERBOSE(VB_RECORD, loc + "Disconnect");
+        LOG(VB_RECORD, LOG_INFO, loc + "Disconnect");
         // stop printing no data messages.. don't try to open
         return;
     }
 
     if (kIOMessageServiceIsAttemptingOpen == messageType)
     {
-        VERBOSE(VB_RECORD, loc + "Attempting open");
+        LOG(VB_RECORD, LOG_INFO, loc + "Attempting open");
         return;
     }
 
     if (kIOMessageServiceWasClosed == messageType)
     {
-        VERBOSE(VB_RECORD, loc + "Device Closed");
+        LOG(VB_RECORD, LOG_INFO, loc + "Device Closed");
         // fill unit_table
         return;
     }
 
     if (kIOMessageServiceIsSuspended == messageType)
     {
-        VERBOSE(VB_RECORD, loc + "kIOMessageServiceIsSuspended");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageServiceIsSuspended");
         // start of reset
         return;
     }
@@ -834,42 +840,42 @@ void DarwinFirewireDevice::HandleDeviceChange(uint messageType)
     }
 
     if (kIOMessageServiceIsTerminated == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageServiceIsTerminated");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageServiceIsTerminated");
     else if (kIOMessageServiceIsRequestingClose == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageServiceIsRequestingClose");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageServiceIsRequestingClose");
     else if (kIOMessageServiceIsAttemptingOpen == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageServiceIsAttemptingOpen");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageServiceIsAttemptingOpen");
     else if (kIOMessageServiceWasClosed == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageServiceWasClosed");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageServiceWasClosed");
     else if (kIOMessageServiceBusyStateChange == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageServiceBusyStateChange");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageServiceBusyStateChange");
     else if (kIOMessageCanDevicePowerOff == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageCanDevicePowerOff");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageCanDevicePowerOff");
     else if (kIOMessageDeviceWillPowerOff == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageDeviceWillPowerOff");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageDeviceWillPowerOff");
     else if (kIOMessageDeviceWillNotPowerOff == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageDeviceWillNotPowerOff");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageDeviceWillNotPowerOff");
     else if (kIOMessageDeviceHasPoweredOn == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageDeviceHasPoweredOn");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageDeviceHasPoweredOn");
     else if (kIOMessageCanSystemPowerOff == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageCanSystemPowerOff");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageCanSystemPowerOff");
     else if (kIOMessageSystemWillPowerOff == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageSystemWillPowerOff");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageSystemWillPowerOff");
     else if (kIOMessageSystemWillNotPowerOff == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageSystemWillNotPowerOff");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageSystemWillNotPowerOff");
     else if (kIOMessageCanSystemSleep == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageCanSystemSleep");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageCanSystemSleep");
     else if (kIOMessageSystemWillSleep == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageSystemWillSleep");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageSystemWillSleep");
     else if (kIOMessageSystemWillNotSleep == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageSystemWillNotSleep");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageSystemWillNotSleep");
     else if (kIOMessageSystemHasPoweredOn == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageSystemHasPoweredOn");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageSystemHasPoweredOn");
     else if (kIOMessageSystemWillRestart == messageType)
-        VERBOSE(VB_RECORD, loc + "kIOMessageSystemWillRestart");
+        LOG(VB_RECORD, LOG_INFO, loc + "kIOMessageSystemWillRestart");
     else
     {
-        VERBOSE(VB_RECORD, (loc + "unknown message 0x%1")
+        LOG(VB_RECORD, LOG_ERR, loc + QString("unknown message 0x%1")
                            .arg(messageType, 0, 16));
     }
 }
@@ -949,5 +955,5 @@ static void dfd_update_device_list(void *dfd, io_iterator_t deviter)
 
 static void dfd_streaming_log_message(char *msg)
 {
-    VERBOSE(VB_RECORD, QString("MPEG2Receiver: %1").arg(msg));
+    LOG(VB_RECORD, LOG_INFO, QString("MPEG2Receiver: %1").arg(msg));
 }

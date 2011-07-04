@@ -9,7 +9,7 @@
 #define LOC     QString("DelMap: ")
 #define LOC_ERR QString("DelMap Err: ")
 #define EDIT_CHECK if(!m_editing) \
-  { VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot edit outside edit mode."); return; }
+  { LOG(VB_GENERAL, LOG_ERR, "Cannot edit outside edit mode."); return; }
 
 DeleteMapUndoEntry::DeleteMapUndoEntry(frm_dir_map_t dm, QString msg) :
     deleteMap(dm), message(msg) { }
@@ -408,7 +408,7 @@ void DeleteMap::NewCut(uint64_t frame, uint64_t total)
             // Don't cut the entire recording
             if ((startframe == 0) && (endframe == total))
             {
-                VERBOSE(VB_IMPORTANT, "Refusing to cut entire recording.");
+                LOG(VB_GENERAL, LOG_CRIT, "Refusing to cut entire recording.");
                 return;
             }
 
@@ -423,8 +423,8 @@ void DeleteMap::NewCut(uint64_t frame, uint64_t total)
                 otherframe = it.key();
                 if ((startframe < otherframe) && (endframe > otherframe))
                 {
-                    VERBOSE(VB_PLAYBACK, QString("Deleting bounded marker: %1")
-                                                 .arg(otherframe));
+                    LOG(VB_PLAYBACK, LOG_INFO,
+                        QString("Deleting bounded marker: %1").arg(otherframe));
                     Delete(otherframe);
                 }
             }
@@ -753,8 +753,8 @@ void DeleteMap::TrackerReset(uint64_t frame, uint64_t total)
     }
     else
         m_nextCutStart = GetNearestMark(frame, total, !IsInDelete(frame));
-    VERBOSE(VB_PLAYBACK, LOC + QString("Tracker next CUT_START: %1")
-                                       .arg(m_nextCutStart));
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Tracker next CUT_START: %1")
+                                   .arg(m_nextCutStart));
 }
 
 /**
@@ -767,7 +767,7 @@ bool DeleteMap::TrackerWantsToJump(uint64_t frame, uint64_t total, uint64_t &to)
         return false;
 
     to = GetNearestMark(m_nextCutStart, total, true);
-    VERBOSE(VB_PLAYBACK, LOC + QString("Tracker wants to jump to: %1").arg(to));
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Tracker wants to jump to: %1").arg(to));
     return true;
 }
 
