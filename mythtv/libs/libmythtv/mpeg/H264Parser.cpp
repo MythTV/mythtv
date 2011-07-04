@@ -339,8 +339,8 @@ bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
         if (new_buffer == NULL)
         {
             /* Allocation failed. Discard the new bytes */
-            VERBOSE(VB_GENERAL, "H264Parser::fillRBSP: "
-                                "FAILED to allocate RBSP buffer!");
+            LOG(VB_GENERAL, LOG_ERR,
+                "H264Parser::fillRBSP: FAILED to allocate RBSP buffer!");
             return false;
         }
 
@@ -383,10 +383,10 @@ bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
         else
         {
             /* This should never happen. */
-            VERBOSE(VB_GENERAL, QString("H264Parser::fillRBSP: "
-                                        "Found start code, rbsp_index is %1 "
-                                        "but it should be >4")
-                .arg(rbsp_index));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("H264Parser::fillRBSP: Found start code, rbsp_index "
+                        "is %1 but it should be >4")
+                    .arg(rbsp_index));
         }
     }
 
@@ -439,8 +439,9 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                  * parsing the previous NAL. Either there's a
                  * problem with the stream or with this parser.
                  */
-                VERBOSE(VB_GENERAL, "H264Parser::addBytes: Found new start "
-                                    "code, but previous NAL is incomplete!");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "H264Parser::addBytes: Found new start "
+                    "code, but previous NAL is incomplete!");
             }
 
             /* Prepare for accepting the new NAL */

@@ -43,7 +43,7 @@ HDHRSignalMonitor::HDHRSignalMonitor(
     DTVSignalMonitor(db_cardnum, _channel, _flags),
     streamHandlerStarted(false), streamHandler(NULL)
 {
-    VERBOSE(VB_CHANNEL, LOC + "ctor");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
     signalStrength.SetThreshold(45);
 
@@ -57,7 +57,7 @@ HDHRSignalMonitor::HDHRSignalMonitor(
  */
 HDHRSignalMonitor::~HDHRSignalMonitor()
 {
-    VERBOSE(VB_CHANNEL, LOC + "dtor");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
     HDHRStreamHandler::Return(streamHandler);
 }
@@ -67,13 +67,13 @@ HDHRSignalMonitor::~HDHRSignalMonitor()
  */
 void HDHRSignalMonitor::Stop(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Stop() -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
     if (GetStreamData())
         streamHandler->RemoveListener(GetStreamData());
     streamHandlerStarted = false;
 
-    VERBOSE(VB_CHANNEL, LOC + "Stop() -- end");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
 
 HDHRChannel *HDHRSignalMonitor::GetHDHRChannel(void)
@@ -114,7 +114,7 @@ void HDHRSignalMonitor::UpdateValues(void)
     (void) snq; // TODO should convert to S/N
     (void) seq; // TODO should report this...
 
-    VERBOSE(VB_RECORD|VB_EXTRA, LOC + "Tuner status: " + QString("'%1:%2:%3'")
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "Tuner status: " + QString("'%1:%2:%3'")
             .arg(sig).arg(snq).arg(seq));
 
     // Set SignalMonitorValues from info from card.

@@ -55,7 +55,7 @@ FirewireSignalMonitor::FirewireSignalMonitor(
     stb_needs_to_wait_for_pat(false),
     stb_needs_to_wait_for_power(false)
 {
-    VERBOSE(VB_CHANNEL, LOC + "ctor");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
     signalStrength.SetThreshold(65);
 
@@ -70,7 +70,7 @@ FirewireSignalMonitor::FirewireSignalMonitor(
  */
 FirewireSignalMonitor::~FirewireSignalMonitor()
 {
-    VERBOSE(VB_CHANNEL, LOC + "dtor");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
 }
 
@@ -79,7 +79,7 @@ FirewireSignalMonitor::~FirewireSignalMonitor()
  */
 void FirewireSignalMonitor::Stop(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Stop() -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
     if (tableMonitorThread)
     {
@@ -88,7 +88,7 @@ void FirewireSignalMonitor::Stop(void)
         delete tableMonitorThread;
         tableMonitorThread = NULL;
     }
-    VERBOSE(VB_CHANNEL, LOC + "Stop() -- end");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
 
 void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
@@ -103,7 +103,7 @@ void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
     if (crc_bogus && stb_needs_to_wait_for_pat &&
         (stb_wait_for_pat_timer.elapsed() < (int)kBufferTimeout))
     {
-        VERBOSE(VB_CHANNEL, LOC + "HandlePAT() ignoring PAT");
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "HandlePAT() ignoring PAT");
         uint tsid = pat->TransportStreamID();
         GetStreamData()->SetVersionPAT(tsid, -1,0);
         return;
@@ -111,7 +111,7 @@ void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
 
     if (crc_bogus && stb_needs_to_wait_for_pat)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Wait for valid PAT timed out");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Wait for valid PAT timed out");
         stb_needs_to_wait_for_pat = false;
     }
 
@@ -120,14 +120,14 @@ void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
 
 void FirewireSignalMonitor::HandlePMT(uint pnum, const ProgramMapTable *pmt)
 {
-    VERBOSE(VB_CHANNEL, LOC + "HandlePMT()");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "HandlePMT()");
 
     AddFlags(kDTVSigMon_PMTSeen);
 
     if (!HasFlags(kDTVSigMon_PATMatch))
     {
         GetStreamData()->SetVersionPMT(pnum, -1,0);
-        VERBOSE(VB_CHANNEL, LOC + "HandlePMT() ignoring PMT");
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "HandlePMT() ignoring PMT");
         return;
     }
 
@@ -140,15 +140,15 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     stb_wait_for_pat_timer.start();
     dtvMonitorRunning = true;
 
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- begin");
 
     FirewireChannel *lchan = dynamic_cast<FirewireChannel*>(channel);
     if (!lchan)
     {
-        VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- err");
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err");
         while (dtvMonitorRunning)
             usleep(10000);
-        VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- err end");
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err end");
         return;
     }
 
@@ -160,7 +160,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     while (dtvMonitorRunning && GetStreamData())
         usleep(10000);
 
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- shutdown ");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- shutdown ");
 
     dev->RemoveListener(this);
     dev->ClosePort();
@@ -168,7 +168,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     while (dtvMonitorRunning)
         usleep(10000);
 
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- end");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- end");
 }
 
 void FirewireSignalMonitor::AddData(const unsigned char *data, uint len)
@@ -243,8 +243,8 @@ void FirewireSignalMonitor::UpdateValues(void)
                     continue;
                 }
 
-                VERBOSE(VB_RECORD, "Can't determine if STB is power on, "
-                        "assuming it is...");
+                LOG(VB_RECORD, LOG_WARNING,
+                    "Can't determine if STB is power on, assuming it is...");
                 AddFlags(kFWSigMon_PowerSeen | kFWSigMon_PowerMatch);
             }
             break;
@@ -288,13 +288,13 @@ void FirewireSignalMonitor::UpdateValues(void)
     {
         tableMonitorThread = new FirewireTableMonitorThread(this);
 
-        VERBOSE(VB_CHANNEL, LOC + "UpdateValues() -- "
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues() -- "
                 "Waiting for table monitor to start");
 
         while (!dtvMonitorRunning)
             usleep(5000);
 
-        VERBOSE(VB_CHANNEL, LOC + "UpdateValues() -- "
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues() -- "
                 "Table monitor started");
     }
 

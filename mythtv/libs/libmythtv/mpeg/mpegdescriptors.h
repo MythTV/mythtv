@@ -218,7 +218,10 @@ class RegistrationDescriptor : public MPEGDescriptor
         assert(DescriptorID::registration == DescriptorTag());
         if (0x04 != DescriptorLength())
         {
-            //VERBOSE(VB_GENERAL, "Registration Descriptor length != 4 !!!!");
+#if 0
+            LOG(VB_GENERAL, LOG_ERR, 
+                "Registration Descriptor length != 4 !!!!");
+#endif
         }
     }
 

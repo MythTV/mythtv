@@ -55,12 +55,12 @@ void FirewireRecorder::StopStreaming(void)
 
 void FirewireRecorder::StartRecording(void)
 {
-    VERBOSE(VB_RECORD, LOC + "StartRecording");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording");
 
     if (!Open())
     {
         _error = "Failed to open firewire device";
-        VERBOSE(VB_IMPORTANT, LOC_ERR + _error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
         return;
     }
 
@@ -194,7 +194,8 @@ bool FirewireRecorder::PauseAndWait(int timeout)
     QMutexLocker locker(&pauseLock);
     if (request_pause)
     {
-        VERBOSE(VB_RECORD, LOC + QString("PauseAndWait(%1) -- pause").arg(timeout));
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("PauseAndWait(%1) -- pause").arg(timeout));
         if (!IsPaused(true))
         {
             StopStreaming();
@@ -208,7 +209,8 @@ bool FirewireRecorder::PauseAndWait(int timeout)
 
     if (!request_pause && IsPaused(true))
     {
-        VERBOSE(VB_RECORD, LOC + QString("PauseAndWait(%1) -- unpause").arg(timeout));
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("PauseAndWait(%1) -- unpause").arg(timeout));
         StartStreaming();
         unpauseWait.wakeAll();
     }

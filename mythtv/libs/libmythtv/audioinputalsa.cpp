@@ -156,7 +156,7 @@ bool AudioInputALSA::PrepHwParams(void)
                 QString("failed to set sample format %1")
                         .arg(snd_pcm_format_description(format))))
         return false;
-    if (VERBOSE_LEVEL_CHECK(VB_AUDIO|VB_EXTRA))
+    if (VERBOSE_LEVEL_CHECK(VB_AUDIO) && logLevel <= LOG_DEBUG)
     {
         uint min_chans, max_chans;
         if(AlsaBad(snd_pcm_hw_params_get_channels_min(hwparams, &min_chans),
@@ -165,7 +165,7 @@ bool AudioInputALSA::PrepHwParams(void)
         if(AlsaBad(snd_pcm_hw_params_get_channels_max(hwparams, &max_chans),
                     QString("unable to get max channel count")))
             max_chans = 0;
-        LOG(VB_AUDIO, LOG_INFO, LOC_DEV +
+        LOG(VB_AUDIO, LOG_DEBUG, LOC_DEV +
             QString("min channels %1, max channels %2, myth requests %3")
                           .arg(min_chans).arg(max_chans).arg(m_audio_channels));
     }

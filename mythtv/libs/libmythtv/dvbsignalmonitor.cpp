@@ -71,17 +71,17 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     bool ok;
     _channel->HasLock(&ok);
     if (!ok)
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot read DVB status" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot read DVB status" + ENO);
 
     uint64_t rmflags = 0;
 
 #define DVB_IO(FLAG, METHOD, MSG) \
   do { if (HasFlags(FLAG)) { bool ok; _channel->METHOD(&ok); \
           if (!ok) { \
-              VERBOSE(VB_IMPORTANT, LOC_WARN+"Cannot "+MSG+ENO); \
+              LOG(VB_GENERAL, LOG_WARNING, LOC+"Cannot "+MSG+ENO); \
               rmflags |= FLAG; } \
           else { \
-              VERBOSE(VB_CHANNEL, LOC + "Can " + MSG); } } } while (false)
+              LOG(VB_CHANNEL, LOG_INFO, LOC + "Can " + MSG); } } } while (false)
 
     DVB_IO(kSigMon_WaitForSig, GetSignalStrength,
            "measure Signal Strength");
@@ -96,7 +96,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
 
     RemoveFlags(rmflags);
 
-    VERBOSE(VB_CHANNEL, LOC + "DVBSignalMonitor::ctor " +
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "DVBSignalMonitor::ctor " +
             QString("initial flags %1").arg(sm_flags_to_string(flags)));
 
     minimum_update_rate = _channel->GetMinSignalMonitorDelay();
@@ -144,13 +144,13 @@ void DVBSignalMonitor::GetRotorStatus(bool &was_moving, bool &is_moving)
  */
 void DVBSignalMonitor::Stop(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Stop() -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
     if (GetStreamData())
         streamHandler->RemoveListener(GetStreamData());
     streamHandlerStarted = false;
     streamHandler->SetRetuneAllowed(false, NULL, NULL);
-    VERBOSE(VB_CHANNEL, LOC + "Stop() -- end");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
 
 QStringList DVBSignalMonitor::GetStatusList(void) const
@@ -293,7 +293,7 @@ void DVBSignalMonitor::UpdateValues(void)
     // Debug output
     if (wasLocked != isLocked)
     {
-        VERBOSE(VB_CHANNEL, LOC + "UpdateValues -- Signal " +
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues -- Signal " +
                 (isLocked ? "Locked" : "Lost"));
     }
 

@@ -31,7 +31,7 @@ class PESPacket
             _psiOffset = tspacket.AFCOffset() + tspacket.StartOfFieldPointer();
         else
         {
-            VERBOSE(VB_IMPORTANT, "Started PESPacket, but !payloadStart()");
+            LOG(VB_GENERAL, LOG_ERR, "Started PESPacket, but !payloadStart()");
             _psiOffset = tspacket.AFCOffset();
         }
         _pesdata = tspacket.data() + _psiOffset + 1;

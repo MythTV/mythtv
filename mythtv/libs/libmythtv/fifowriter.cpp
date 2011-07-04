@@ -98,11 +98,12 @@ int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
     const char *aname = fname.constData();
     if (mkfifo(aname, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH) == -1)
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't create fifo for file: '%1'")
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't create fifo for file: '%1'")
                 .arg(name) + ENO);
         return false;
     }
-    VERBOSE(VB_GENERAL, QString("Created %1 fifo: %2").arg(desc).arg(name));
+    LOG(VB_GENERAL, LOG_INFO, QString("Created %1 fifo: %2")
+            .arg(desc).arg(name));
     maxblksize[id] = size;
     filename[id] = name;
     fbdesc[id] = desc;
@@ -168,7 +169,8 @@ void FIFOWriter::FIFOWriteThread(int id)
                                 fb_outptr[id]->blksize-written);
                 if (ret < 0)
                 {
-                    VERBOSE(VB_IMPORTANT, QString("FIFOW: write failed with %1")
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("FIFOW: write failed with %1")
                             .arg(strerror(errno)));
                     ///FIXME: proper error propagation
                     break;
@@ -226,7 +228,7 @@ void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
             fb_inptr[id]->next->next = tmpfifo;
             QString msg = QString("allocating additonal buffer for : %1(%2)")
                           .arg(fbdesc[id]).arg(++fbcount[id]);
-            VERBOSE(VB_FILE, msg);
+            LOG(VB_FILE, LOG_INFO, msg);
         }
         else
         {

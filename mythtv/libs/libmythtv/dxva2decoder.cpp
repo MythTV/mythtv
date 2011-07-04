@@ -122,7 +122,7 @@ static const dxva2_mode dxva2_modes[] =
   { \
       ok = arg1; \
       if (!ok) \
-          VERBOSE(VB_IMPORTANT, ERR + arg2); \
+          LOG(VB_GENERAL, LOG_ERR, LOC + arg2); \
   }
 
 DXVA2Decoder::DXVA2Decoder(uint num_bufs, MythCodecID codec_id,
@@ -176,14 +176,14 @@ bool DXVA2Decoder::CreateVideoService(MythRenderD3D9* render)
     m_deviceManager = render->GetDeviceManager();
     if (!m_deviceManager)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to get device manager.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get device manager.");
         return false;
     }
 
     HRESULT hr = IDirect3DDeviceManager9_OpenDeviceHandle(m_deviceManager, &m_device);
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to get device handle.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get device handle.");
         return false;
     }
 
@@ -193,11 +193,11 @@ bool DXVA2Decoder::CreateVideoService(MythRenderD3D9* render)
                                                  (void**)&m_service);
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to get video service.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get video service.");
         return false;
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + "Created DXVA2 video service.");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created DXVA2 video service.");
     return true;
 }
 
@@ -216,7 +216,7 @@ bool DXVA2Decoder::GetInputOutput(void)
 {
     if (!m_service)
         return false;
-    VERBOSE(VB_PLAYBACK, LOC + QString("Looking for support for %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Looking for support for %1")
                                         .arg(toString(m_codec_id)));
     uint input_count;
     GUID *input_list;
@@ -234,7 +234,7 @@ bool DXVA2Decoder::GetInputOutput(void)
         {
             if (IsEqualGUID(input_list[j], *mode->guid))
             {
-                VERBOSE(VB_PLAYBACK, LOC + QString("Testing %1")
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Testing %1")
                                            .arg(mode->name));
                 if (TestTarget(input_list[j]))
                     break;
@@ -309,7 +309,7 @@ bool DXVA2Decoder::GetDecoderConfig(void)
         return false;
     m_config = config;
     //*const_cast<DXVA2_ConfigPictureDecode*>(m_context.cfg) = config;
-    VERBOSE(VB_PLAYBACK, LOC + QString("Found bitstream type %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found bitstream type %1")
         .arg(m_context.cfg->ConfigBitstreamRaw));
     return true;
 }
@@ -328,8 +328,8 @@ bool DXVA2Decoder::CreateSurfaces(void)
     if (FAILED(hr))
         return false;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Created %1 decoder surfaces.")
-                                       .arg(m_context.surface_count));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 decoder surfaces.")
+                                         .arg(m_context.surface_count));
 
     for (uint i = 0; i < m_context.surface_count; i++)
         m_context.surface[i]->AddRef();
@@ -358,9 +358,10 @@ bool DXVA2Decoder::CreateDecoder(void)
     if (FAILED(hr))
         return false;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Created decoder: %1->%2x%3 (%4 surfaces)")
-        .arg(toString(m_codec_id)).arg(m_width).arg(m_height)
-        .arg(m_context.surface_count));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Created decoder: %1->%2x%3 (%4 surfaces)")
+            .arg(toString(m_codec_id)).arg(m_width).arg(m_height)
+            .arg(m_context.surface_count));
     return true;
 }
 

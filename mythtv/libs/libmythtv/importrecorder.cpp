@@ -81,7 +81,7 @@ void ImportRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 void ImportRecorder::StartRecording(void)
 {
-    VERBOSE(VB_RECORD, LOC + "StartRecording -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- begin");
 
     _continuity_error_count = 0;
 
@@ -92,8 +92,8 @@ void ImportRecorder::StartRecording(void)
         recordingWait.wakeAll();
     }
 
-    VERBOSE(VB_RECORD, LOC + "StartRecording -- " +
-            QString("attempting to open '%1'")
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- " +
+        QString("attempting to open '%1'")
             .arg(curRecording->GetPathname()));
 
     // retry opening the file until StopRecording() is called.
@@ -136,7 +136,7 @@ void ImportRecorder::StartRecording(void)
     recording = false;
     recordingWait.wakeAll();
 
-    VERBOSE(VB_RECORD, LOC + "StartRecording -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- end");
 }
 
 bool ImportRecorder::Open(void)
@@ -146,7 +146,7 @@ bool ImportRecorder::Open(void)
 
     if (!curRecording)
     {
-        VERBOSE(VB_RECORD, LOC_ERR + "no current recording!");
+        LOG(VB_RECORD, LOG_ERR, LOC + "no current recording!");
         return false;
     }
 
@@ -165,26 +165,26 @@ bool ImportRecorder::Open(void)
             targetDir.remove(fn);
         }
 
-        VERBOSE(VB_RECORD, (LOC + "Trying to link %1 to %2")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Trying to link %1 to %2")
                            .arg(videodevice).arg(fn));
 
         if (preRecorded.link(fn))
-            VERBOSE(VB_RECORD+VB_EXTRA, LOC + "success!");
+            LOG(VB_RECORD, LOG_DEBUG, LOC + "success!");
         else
-            VERBOSE(VB_RECORD, LOC_ERR + preRecorded.errorString());
+            LOG(VB_RECORD, LOG_ERR, LOC + preRecorded.errorString());
     }
 
     if (fn.toLower().startsWith("myth://"))
     {
-        VERBOSE(VB_RECORD, LOC_ERR + "Malformed recording ProgramInfo.");
+        LOG(VB_RECORD, LOG_ERR, LOC + "Malformed recording ProgramInfo.");
         return false;
     }
 
     QFileInfo f(fn);
     if (!f.exists())
     {
-        VERBOSE(VB_RECORD, LOC +
-                QString("'%1' does not exist yet").arg(fn));
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("'%1' does not exist yet").arg(fn));
 
         // Slow down StartRecording open loop when debugging -v record.
         // This is just to make the debugging output less spammy.
@@ -195,16 +195,16 @@ bool ImportRecorder::Open(void)
     }
     else if (!f.isReadable())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("'%1' is not readable").arg(fn));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("'%1' is not readable").arg(fn));
         return false;
     }
 
     _import_fd = open(fn.toLocal8Bit().constData(), O_RDONLY);
     if (_import_fd < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Couldn't open '%1'").arg(fn) + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Couldn't open '%1'").arg(fn) + ENO);
     }
 
     return _import_fd >= 0;

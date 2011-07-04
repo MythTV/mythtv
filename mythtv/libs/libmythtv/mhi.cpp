@@ -103,7 +103,7 @@ bool MHIContext::LoadFont(QString name)
     if (!errorD)
         return true;
 
-    VERBOSE(VB_IMPORTANT, QString("Unable to find font: %1").arg(name));
+    LOG(VB_GENERAL, LOG_ERR, QString("Unable to find font: %1").arg(name));
     return false;
 }
 
@@ -438,7 +438,7 @@ bool MHIContext::OfferKey(QString key)
     if (action != 0)
     {
         m_keyQueue.enqueue(action);
-        VERBOSE(VB_IMPORTANT, QString("Adding MHEG key %1:%2:%3").arg(key)
+        LOG(VB_GENERAL, LOG_INFO, QString("Adding MHEG key %1:%2:%3").arg(key)
                 .arg(action).arg(m_keyQueue.size()));
         locker.unlock();
         QMutexLocker locker2(&m_runLock);

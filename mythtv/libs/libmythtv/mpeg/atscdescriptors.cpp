@@ -136,9 +136,10 @@ QString MultipleStringStructure::Uncompressed(
         (0x20<=mode && mode<=0x27) ||
         (0x30<=mode && mode<=0x33)) { // basic runlength encoding
         int hb=mode<<8;
-        for (int j=0; j<len; j++) {
+        for (int j=0; j<len; j++)
+        {
 #if 0
-            VERBOSE(VB_GENERAL, QString("str.append(0x%1:0x%2) -> %3")
+            LOG(VB_GENERAL, LOG_DEBUG, QString("str.append(0x%1:0x%2) -> %3")
                 .arg(mode, 0, 16) .arg(buf[j], 0, 16) .arg(QChar(hb|buf[j])));
 #endif
             str.append( QChar( hb|buf[j] ) );

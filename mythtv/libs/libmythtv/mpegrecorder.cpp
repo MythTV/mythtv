@@ -158,8 +158,8 @@ void MpegRecorder::SetOption(const QString &opt, int value)
             audbitratel1 = index + 1;
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Audiorate(L1): " +
-                    QString("%1 is invalid").arg(value));
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Audiorate(L1): " +
+                QString("%1 is invalid").arg(value));
         }
     }
     else if (opt == "mpeg2audbitratel2")
@@ -169,7 +169,7 @@ void MpegRecorder::SetOption(const QString &opt, int value)
             audbitratel2 = index + 1;
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Audiorate(L2): " +
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Audiorate(L2): " +
                     QString("%1 is invalid").arg(value));
         }
     }
@@ -180,7 +180,7 @@ void MpegRecorder::SetOption(const QString &opt, int value)
             audbitratel3 = index + 1;
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Audiorate(L2): " +
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Audiorate(L2): " +
                     QString("%1 is invalid").arg(value));
         }
     }
@@ -229,7 +229,7 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
 
         if (!found)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "MPEG2 stream type: " +
+            LOG(VB_GENERAL, LOG_ERR, LOC + "MPEG2 stream type: " +
                     QString("%1 is invalid").arg(value));
         }
     }
@@ -239,7 +239,7 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
         language = value.toInt(&ok); // on failure language will be 0
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "MPEG2 language (stereo) flag " +
+            LOG(VB_GENERAL, LOG_ERR, LOC + "MPEG2 language (stereo) flag " +
                     QString("'%1' is invalid").arg(value));
         }
     }
@@ -258,7 +258,7 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
 
         if (!found)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "MPEG2 Aspect-ratio: " +
+            LOG(VB_GENERAL, LOG_ERR, LOC + "MPEG2 Aspect-ratio: " +
                     QString("%1 is invalid").arg(value));
         }
     }
@@ -272,7 +272,7 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
             audtype = 3;
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "MPEG2 audio layer: " +
+            LOG(VB_GENERAL, LOG_ERR, LOC + "MPEG2 audio layer: " +
                     QString("%1 is invalid").arg(value));
         }
     }
@@ -365,7 +365,7 @@ bool MpegRecorder::OpenMpegFileAsInput(void)
 
     if (readfd < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Can't open MPEG File '%1'")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Can't open MPEG File '%1'")
                 .arg(videodevice) + ENO);
 
         return false;
@@ -382,7 +382,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     chanfd = open(vdevice.constData(), O_RDWR);
     if (chanfd < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device. " + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Can't open video device. " + ENO);
         return false;
     }
 
@@ -405,7 +405,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     if (!(capabilities & V4L2_CAP_VIDEO_CAPTURE))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "V4L version 1, unsupported");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "V4L version 1, unsupported");
         close(chanfd);
         chanfd = -1;
         return false;
@@ -433,7 +433,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     if (readfd < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device." + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Can't open video device." + ENO);
         close(chanfd);
         chanfd = -1;
         return false;
@@ -452,7 +452,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     if (!_device_read_buffer)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate DRB buffer");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
         _error = true;
         close(chanfd);
         chanfd = -1;
@@ -463,7 +463,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     if (!_device_read_buffer->Setup(vdevice.constData(), readfd))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate DRB buffer");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
         _error = true;
         close(chanfd);
         chanfd = -1;
@@ -472,7 +472,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         return false;
     }
 
-    VERBOSE(VB_RECORD, LOC + "DRB ready");
+    LOG(VB_RECORD, LOG_INFO, LOC + "DRB ready");
 
     if (vbi_fd >= 0)
         vbi_thread = new VBIThread(this);
@@ -493,7 +493,7 @@ bool MpegRecorder::SetVideoCaptureFormat(int chanfd)
 
     if (ioctl(chanfd, VIDIOC_G_FMT, &vfmt) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Error getting format" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Error getting format" + ENO);
         return false;
     }
 
@@ -502,7 +502,7 @@ bool MpegRecorder::SetVideoCaptureFormat(int chanfd)
 
     if (ioctl(chanfd, VIDIOC_S_FMT, &vfmt) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Error setting format" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Error setting format" + ENO);
         return false;
     }
 
@@ -516,7 +516,7 @@ bool MpegRecorder::SetLanguageMode(int chanfd)
     memset(&vt, 0, sizeof(struct v4l2_tuner));
     if (ioctl(chanfd, VIDIOC_G_TUNER, &vt) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to get audio mode" + ENO);
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Unable to get audio mode" + ENO);
         return false;
     }
 
@@ -539,15 +539,16 @@ bool MpegRecorder::SetLanguageMode(int chanfd)
     bool success = true;
     if ((2 == language) && (1 == audio_layer))
     {
-        VERBOSE(VB_GENERAL, "Dual audio mode incompatible with Layer I audio."
-                "\n\t\t\tFalling back to Main Language");
+        LOG(VB_GENERAL, LOG_WARNING,
+            "Dual audio mode incompatible with Layer I audio."
+            "\n\t\t\tFalling back to Main Language");
         vt.audmode = V4L2_TUNER_MODE_LANG1;
         success = false;
     }
 
     if (ioctl(chanfd, VIDIOC_S_TUNER, &vt) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to set audio mode" + ENO);
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Unable to set audio mode" + ENO);
         success = false;
     }
 
@@ -563,7 +564,8 @@ bool MpegRecorder::SetRecordingVolume(int chanfd)
     if ((ioctl(chanfd, VIDIOC_QUERYCTRL, &qctrl) < 0) ||
         (qctrl.flags & V4L2_CTRL_FLAG_DISABLED))
     {
-        VERBOSE(VB_CHANNEL, LOC_WARN + "Audio volume control not supported.");
+        LOG(VB_CHANNEL, LOG_WARNING,
+            LOC + "Audio volume control not supported.");
         return false;
     }
 
@@ -579,9 +581,9 @@ bool MpegRecorder::SetRecordingVolume(int chanfd)
 
     if (ioctl(chanfd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "Unable to set recording volume" + ENO + "\n\t\t\t" +
-                "If you are using an AverMedia M179 card this is normal.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Unable to set recording volume" + ENO + "\n\t\t\t" +
+            "If you are using an AverMedia M179 card this is normal.");
         return false;
     }
 
@@ -608,9 +610,9 @@ uint MpegRecorder::GetFilteredStreamType(void) const
 
     if (st != (uint) streamtype)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("Stream type '%1'\n\t\t\t"
-                        "is not supported by %2 driver, using '%3' instead.")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Stream type '%1'\n\t\t\t"
+                    "is not supported by %2 driver, using '%3' instead.")
                 .arg(streamType[streamtype]).arg(driver).arg(streamType[st]));
     }
 
@@ -625,9 +627,9 @@ uint MpegRecorder::GetFilteredAudioSampleRate(void) const
 
     if (sr != (uint) audsamplerate)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("Audio sample rate %1 Hz\n\t\t\t"
-                        "is not supported by %2 driver, using %3 Hz instead.")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Audio sample rate %1 Hz\n\t\t\t"
+                    "is not supported by %2 driver, using %3 Hz instead.")
                 .arg(audsamplerate).arg(driver).arg(sr));
     }
 
@@ -650,9 +652,9 @@ uint MpegRecorder::GetFilteredAudioLayer(void) const
 
     if (layer != (uint) audtype)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("MPEG layer %1 does not work properly\n\t\t\t"
-                        "with %2 driver. Using MPEG layer %3 audio instead.")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("MPEG layer %1 does not work properly\n\t\t\t"
+                    "with %2 driver. Using MPEG layer %3 audio instead.")
                 .arg(audtype).arg(driver).arg(layer));
     }
 
@@ -735,8 +737,8 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
         if (ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
         {
             QMutexLocker locker(&control_description_lock);
-            VERBOSE(VB_IMPORTANT, QString("mpegrecorder.cpp:set_ctrls(): ") +
-                    QString("Could not set %1 to %2")
+            LOG(VB_GENERAL, LOG_ERR, QString("mpegrecorder.cpp:set_ctrls(): ") +
+                QString("Could not set %1 to %2")
                     .arg(control_description[ext_ctrls[i].id]).arg(value) +
                     ENO);
         }
@@ -803,16 +805,15 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
         ain.index = audioinput;
         if (ioctl(chanfd, VIDIOC_ENUMAUDIO, &ain) < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Unable to get audio input.");
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Unable to get audio input.");
         }
         else
         {
             ain.index = audioinput;
             if (ioctl(chanfd, VIDIOC_S_AUDIO, &ain) < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_WARN +
-                        "Unable to set audio input.");
+                LOG(VB_GENERAL, LOG_WARNING,
+                    LOC + "Unable to set audio input.");
             }
         }
     }
@@ -830,8 +831,8 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Unable to get supported audio codecs." + ENO);
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "Unable to get supported audio codecs." + ENO);
         }
     }
 
@@ -857,12 +858,13 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
 
         if (ioctl(chanfd, VIDIOC_S_FMT, &vbifmt) < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Unable to enable VBI embedding" + ENO);
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "Unable to enable VBI embedding" + ENO);
         }
         else if (ioctl(chanfd, VIDIOC_G_FMT, &vbifmt) >= 0)
         {
-            VERBOSE(VB_RECORD, LOC + QString("VBI service: %1, io size: %2")
+            LOG(VB_RECORD, LOG_INFO, 
+                LOC + QString("VBI service: %1, io size: %2")
                     .arg(vbifmt.fmt.sliced.service_set)
                     .arg(vbifmt.fmt.sliced.io_size));
 
@@ -878,8 +880,8 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
 
             if (ioctl(chanfd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_WARN +
-                        "Unable to set VBI embedding format" + ENO);
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    "Unable to set VBI embedding format" + ENO);
             }
             else
             {
@@ -956,8 +958,9 @@ void MpegRecorder::StartRecording(void)
     if (getenv("DUMMYBPS"))
     {
         dummyBPS = atoi(getenv("DUMMYBPS")) / 8;
-        VERBOSE(VB_IMPORTANT, LOC + QString("Throttling dummy recorder to %1 "
-                "bits per second").arg(dummyBPS * 8));
+        LOG(VB_GENERAL, LOG_INFO,
+            LOC + QString("Throttling dummy recorder to %1 bits per second")
+                .arg(dummyBPS * 8));
     }
 
     struct timeval tv;
@@ -967,11 +970,11 @@ void MpegRecorder::StartRecording(void)
         elapsedTimer.start();
     else if (_device_read_buffer)
     {
-        VERBOSE(VB_RECORD, LOC + "Initial startup of recorder");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Initial startup of recorder");
 
         if (!StartEncoding(readfd))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to start recording");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to start recording");
             _error = true;
         }
         else
@@ -1017,8 +1020,8 @@ void MpegRecorder::StartRecording(void)
 
                 if (readfd < 0)
                 {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR +
-                            QString("Failed to open device '%1'")
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("Failed to open device '%1'")
                             .arg(videodevice));
                     continue;
                 }
@@ -1033,14 +1036,14 @@ void MpegRecorder::StartRecording(void)
             // Check for DRB errors
             if (_device_read_buffer->IsErrored())
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Device error detected");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Device error detected");
 
                 RestartEncoding();
             }
             else if (_device_read_buffer->IsEOF() &&
                      IsRecordingRequested())
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Device EOF detected");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
                 _error = true;
             }
         }
@@ -1059,17 +1062,16 @@ void MpegRecorder::StartRecording(void)
                         if (errno == EINTR)
                             continue;
 
-                        VERBOSE(VB_IMPORTANT, LOC_ERR + "Select error" + ENO);
+                        LOG(VB_GENERAL, LOG_ERR, LOC + "Select error" + ENO);
                         continue;
 
                     case 0:
-                        VERBOSE(VB_IMPORTANT, LOC_ERR + "select timeout - "
+                        LOG(VB_GENERAL, LOG_ERR, LOC + "select timeout - "
                                 "driver has stopped responding");
 
                         if (close(readfd) != 0)
                         {
-                            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                                    "Close error" + ENO);
+                            LOG(VB_GENERAL, LOG_ERR, LOC + "Close error" + ENO);
                         }
 
                         // Force card to be reopened on next iteration..
@@ -1110,8 +1112,7 @@ void MpegRecorder::StartRecording(void)
             }
             else if (len < 0 && errno != EAGAIN)
             {
-                VERBOSE(VB_IMPORTANT,
-                        LOC_ERR + QString("error reading from: %1")
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("error reading from: %1")
                         .arg(videodevice) + ENO);
                 continue;
             }
@@ -1138,7 +1139,7 @@ void MpegRecorder::StartRecording(void)
         }
     }
 
-    VERBOSE(VB_RECORD, LOC + "StartRecording finishing up");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording finishing up");
 
     if (_device_read_buffer)
     {
@@ -1200,7 +1201,7 @@ bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
 
 void MpegRecorder::Reset(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Reset(void)");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Reset(void)");
     ResetForNewFile();
 
     _start_code = 0xffffffff;
@@ -1228,7 +1229,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
     {
         if (!IsPaused(true))
         {
-            VERBOSE(VB_RECORD, LOC + "PauseAndWait pause");
+            LOG(VB_RECORD, LOG_INFO, LOC + "PauseAndWait pause");
 
             if (_device_read_buffer)
             {
@@ -1250,7 +1251,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
 
     if (!request_pause && IsPaused(true))
     {
-        VERBOSE(VB_RECORD, LOC + "PauseAndWait unpause");
+        LOG(VB_RECORD, LOG_INFO, LOC + "PauseAndWait unpause");
 
         if (driver == "hdpvr")
         {
@@ -1275,7 +1276,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
 
 void MpegRecorder::RestartEncoding(void)
 {
-    VERBOSE(VB_RECORD, LOC + "RestartEncoding");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RestartEncoding");
 
     _device_read_buffer->Stop();
 
@@ -1296,7 +1297,7 @@ void MpegRecorder::RestartEncoding(void)
     if (!StartEncoding(readfd))
     {
         if (0 != close(readfd))
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Close error" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Close error" + ENO);
 
         readfd = -1;
         return;
@@ -1316,7 +1317,7 @@ bool MpegRecorder::StartEncoding(int fd)
     if (driver == "hdpvr")
         HandleResolutionChanges();
 
-    VERBOSE(VB_RECORD, LOC + "StartEncoding");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartEncoding");
 
     if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
     {
@@ -1327,7 +1328,7 @@ bool MpegRecorder::StartEncoding(int fd)
             _seen_sps = false;
         }
 
-        VERBOSE(VB_RECORD, LOC + "Encoding started");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Encoding started");
         return true;
     }
 
@@ -1340,7 +1341,7 @@ bool MpegRecorder::StartEncoding(int fd)
     if (errno == EINVAL)
         return true;
 
-    VERBOSE(VB_IMPORTANT, LOC_WARN + "StartEncoding failed" + ENO);
+    LOG(VB_GENERAL, LOG_WARNING, LOC + "StartEncoding failed" + ENO);
     return false;
 }
 
@@ -1353,11 +1354,11 @@ bool MpegRecorder::StopEncoding(int fd)
     command.cmd   = V4L2_ENC_CMD_STOP;
     command.flags = V4L2_ENC_CMD_STOP_AT_GOP_END;
 
-    VERBOSE(VB_RECORD, LOC + "StopEncoding");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StopEncoding");
 
     if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
     {
-        VERBOSE(VB_RECORD, LOC + "Encoding stopped");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Encoding stopped");
         return true;
     }
 
@@ -1370,7 +1371,7 @@ bool MpegRecorder::StopEncoding(int fd)
     if (errno == EINVAL)
         return true;
 
-    VERBOSE(VB_IMPORTANT, LOC_WARN + "StopEncoding failed" + ENO);
+    LOG(VB_GENERAL, LOG_WARNING, LOC + "StopEncoding failed" + ENO);
     return false;
 }
 
@@ -1385,12 +1386,12 @@ void MpegRecorder::SetBitrate(int bitrate, int maxbitrate,
 {
     if (maxbitrate == bitrate)
     {
-        VERBOSE(VB_RECORD, LOC + QString("%1 bitrate %2 kbps CBR")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("%1 bitrate %2 kbps CBR")
                 .arg(reason).arg(bitrate));
     }
     else
     {
-        VERBOSE(VB_RECORD, LOC + QString("%1 bitrate %2/%3 kbps VBR")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("%1 bitrate %2/%3 kbps VBR")
                 .arg(reason).arg(bitrate).arg(maxbitrate));
     }
 
@@ -1411,7 +1412,7 @@ void MpegRecorder::SetBitrate(int bitrate, int maxbitrate,
 
 void MpegRecorder::HandleResolutionChanges(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Checking Resolution");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Checking Resolution");
     uint pix = 0;
     struct v4l2_format vfmt;
     memset(&vfmt, 0, sizeof(vfmt));
@@ -1419,14 +1420,14 @@ void MpegRecorder::HandleResolutionChanges(void)
 
     if (0 == ioctl(chanfd, VIDIOC_G_FMT, &vfmt))
     {
-        VERBOSE(VB_RECORD, LOC + QString("Got Resolution %1x%2")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Got Resolution %1x%2")
                 .arg(vfmt.fmt.pix.width).arg(vfmt.fmt.pix.height));
         pix = vfmt.fmt.pix.width * vfmt.fmt.pix.height;
     }
 
     if (!pix)
     {
-        VERBOSE(VB_RECORD, LOC + "Giving up detecting resolution");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Giving up detecting resolution");
         return; // nothing to do, we don't have a resolution yet
     }
 
@@ -1452,14 +1453,13 @@ void MpegRecorder::HandleResolutionChanges(void)
     {
         if (old_max == old_avg)
         {
-            VERBOSE(VB_RECORD, LOC +
-                    QString("Old bitrate %1 CBR").arg(old_avg));
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                QString("Old bitrate %1 CBR").arg(old_avg));
         }
         else
         {
-            VERBOSE(VB_RECORD, LOC +
-                    QString("Old bitrate %1/%2 VBR")
-                    .arg(old_avg).arg(old_max));
+            LOG(VB_RECORD, LOG_INFO,LOC +
+                QString("Old bitrate %1/%2 VBR") .arg(old_avg).arg(old_max));
         }
 
         SetBitrate(bitrate, maxbitrate, "New");
@@ -1468,7 +1468,7 @@ void MpegRecorder::HandleResolutionChanges(void)
 
 void MpegRecorder::FormatCC(uint code1, uint code2)
 {
-    VERBOSE(VB_VBI, LOC + QString("FormatCC(0x%1,0x%2)")
+    LOG(VB_VBI, LOG_INFO, LOC + QString("FormatCC(0x%1,0x%2)")
             .arg(code1,0,16).arg(code2,0,16));
     // TODO add to CC data vector
 

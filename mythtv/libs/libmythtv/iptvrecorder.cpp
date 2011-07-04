@@ -37,7 +37,7 @@ IPTVRecorder::~IPTVRecorder()
 
 bool IPTVRecorder::Open(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Open() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- begin");
 
     if (_channel->GetFeeder()->IsOpen())
         _channel->GetFeeder()->Close();
@@ -50,7 +50,7 @@ bool IPTVRecorder::Open(void)
         _error = QString("Failed to open URL %1")
             .arg(chaninfo.m_url);
 
-    VERBOSE(VB_RECORD, LOC + QString("Open() -- end err(%1)")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Open() -- end err(%1)")
             .arg(_error));
 
     return !IsErrored();
@@ -58,10 +58,10 @@ bool IPTVRecorder::Open(void)
 
 void IPTVRecorder::Close(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Close() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
     _channel->GetFeeder()->Stop();
     _channel->GetFeeder()->Close();
-    VERBOSE(VB_RECORD, LOC + "Close() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
 bool IPTVRecorder::PauseAndWait(int timeout)
@@ -101,7 +101,7 @@ bool IPTVRecorder::PauseAndWait(int timeout)
 
 void IPTVRecorder::StartRecording(void)
 {
-    VERBOSE(VB_RECORD, LOC + "StartRecording() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording() -- begin");
     if (!Open())
     {
         _error = "Failed to open IPTV stream";
@@ -142,7 +142,7 @@ void IPTVRecorder::StartRecording(void)
     recording = false;
     recordingWait.wakeAll();
 
-    VERBOSE(VB_RECORD, LOC + "StartRecording() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording() -- end");
 }
 
 // ===================================================
@@ -184,23 +184,23 @@ void IPTVRecorder::AddData(const unsigned char *data, unsigned int dataSize)
         // if no TS, something bad happens
         if (tsPos == -1)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "No TS header.");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "No TS header.");
             break;
         }
 
         // if TS Header not at start of data, we receive out of sync data
         if (tsPos > 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("TS packet at %1, not in sync.").arg(tsPos));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("TS packet at %1, not in sync.").arg(tsPos));
         }
 
         // Check if the next packet in buffer is complete :
         // packet size is 188 bytes long
         if ((dataSize - tsPos - readIndex) < TSPacket::kSize)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "TS packet at stradles end of buffer.");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "TS packet at stradles end of buffer.");
             break;
         }
 

@@ -706,7 +706,7 @@ bool DVBStreamData::HasCachedAnyNIT(bool current) const
     QMutexLocker locker(&_cache_lock);
 
     if (!current)
-        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+        LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
     return (bool)(_cached_nit.size());
 }
@@ -716,7 +716,7 @@ bool DVBStreamData::HasCachedAllNIT(bool current) const
     QMutexLocker locker(&_cache_lock);
 
     if (!current)
-        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+        LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
     if (_cached_nit.empty())
         return false;
@@ -737,7 +737,7 @@ bool DVBStreamData::HasCachedAllSDT(uint tsid, bool current) const
     QMutexLocker locker(&_cache_lock);
 
     if (!current)
-        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+        LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
     sdt_cache_t::const_iterator it = _cached_sdts.find(tsid << 8);
     if (it == _cached_sdts.end())
@@ -759,7 +759,7 @@ bool DVBStreamData::HasCachedAnySDT(uint tsid, bool current) const
     QMutexLocker locker(&_cache_lock);
 
     if (!current)
-        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+        LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
     for (uint i = 0; i <= 255; i++)
         if (_cached_sdts.find((tsid << 8) | i) != _cached_sdts.end())
@@ -821,7 +821,7 @@ const nit_ptr_t DVBStreamData::GetCachedNIT(
     QMutexLocker locker(&_cache_lock);
 
     if (!current)
-        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+        LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
     nit_ptr_t nit = NULL;
 
@@ -854,7 +854,7 @@ const sdt_ptr_t DVBStreamData::GetCachedSDT(
     QMutexLocker locker(&_cache_lock);
 
     if (!current)
-        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+        LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
     sdt_ptr_t sdt = NULL;
 
@@ -871,7 +871,7 @@ const sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
     QMutexLocker locker(&_cache_lock);
 
     if (!current)
-        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+        LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
     sdt_vec_t sdts;
 

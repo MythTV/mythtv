@@ -28,7 +28,7 @@ bool HDHRRecorder::Open(void)
 {
     if (IsOpen())
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Card already open");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Card already open");
         return true;
     }
 
@@ -38,30 +38,30 @@ bool HDHRRecorder::Open(void)
 
     _stream_handler = HDHRStreamHandler::Get(_channel->GetDevice());
 
-    VERBOSE(VB_RECORD, LOC + "HDHR opened successfully");
+    LOG(VB_RECORD, LOG_INFO, LOC + "HDHR opened successfully");
 
     return true;
 }
 
 void HDHRRecorder::Close(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Close() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (IsOpen())
         HDHRStreamHandler::Return(_stream_handler);
 
-    VERBOSE(VB_RECORD, LOC + "Close() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
 void HDHRRecorder::StartRecording(void)
 {
-    VERBOSE(VB_RECORD, LOC + "StartRecording -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- begin");
 
     /* Create video socket. */
     if (!Open())
     {
         _error = "Failed to open HDHRRecorder device";
-        VERBOSE(VB_IMPORTANT, LOC_ERR + _error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
         return;
     }
 
@@ -103,7 +103,7 @@ void HDHRRecorder::StartRecording(void)
 
         if (!_input_pmt)
         {
-            VERBOSE(VB_GENERAL, LOC_WARN +
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
             usleep(5000);
             continue;
@@ -112,11 +112,11 @@ void HDHRRecorder::StartRecording(void)
         if (!_stream_handler->IsRunning())
         {
             _error = "Stream handler died unexpectedly."; 
-            VERBOSE(VB_IMPORTANT, LOC_ERR + _error);
+            LOG(VB_GENERAL, LOG_ERR, LOC + _error);
         }
     }
 
-    VERBOSE(VB_RECORD, LOC + "StartRecording -- ending...");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- ending...");
 
     _stream_handler->RemoveListener(_stream_data);
     _stream_data->RemoveWritingListener(this);
@@ -130,7 +130,7 @@ void HDHRRecorder::StartRecording(void)
     recording = false;
     recordingWait.wakeAll();
 
-    VERBOSE(VB_RECORD, LOC + "StartRecording -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- end");
 }
 
 bool HDHRRecorder::PauseAndWait(int timeout)
