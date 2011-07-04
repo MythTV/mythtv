@@ -43,7 +43,7 @@ ASISignalMonitor::ASISignalMonitor(
     DTVSignalMonitor(db_cardnum, _channel, _flags),
     streamHandlerStarted(false), streamHandler(NULL)
 {
-    VERBOSE(VB_CHANNEL, LOC + "ctor");
+    LOG(VB_CHANNEL, LOG_INFO, "ctor");
     streamHandler = ASIStreamHandler::Get(_channel->GetDevice());
 }
 
@@ -52,7 +52,7 @@ ASISignalMonitor::ASISignalMonitor(
  */
 ASISignalMonitor::~ASISignalMonitor()
 {
-    VERBOSE(VB_CHANNEL, LOC + "dtor");
+    LOG(VB_CHANNEL, LOG_INFO, "dtor");
     Stop();
     ASIStreamHandler::Return(streamHandler);
 }
@@ -62,13 +62,13 @@ ASISignalMonitor::~ASISignalMonitor()
  */
 void ASISignalMonitor::Stop(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Stop() -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, "Stop() -- begin");
     SignalMonitor::Stop();
     if (GetStreamData())
         streamHandler->RemoveListener(GetStreamData());
     streamHandlerStarted = false;
 
-    VERBOSE(VB_CHANNEL, LOC + "Stop() -- end");
+    LOG(VB_CHANNEL, LOG_INFO, "Stop() -- end");
 }
 
 ASIChannel *ASISignalMonitor::GetASIChannel(void)

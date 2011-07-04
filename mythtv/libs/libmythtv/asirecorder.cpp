@@ -70,14 +70,14 @@ void ASIRecorder::StartRecording(void)
     if (!Open())
     {
         _error = "Failed to open device";
-        VERBOSE(VB_IMPORTANT, LOC_ERR + _error);
+        LOG(VB_GENERAL, LOG_ERR, _error);
         return;
     }
 
     if (!_stream_data)
     {
         _error = "MPEGStreamData pointer has not been set";
-        VERBOSE(VB_IMPORTANT, LOC_ERR + _error);
+        LOG(VB_GENERAL, LOG_ERR, _error);
         Close();
         return;        
     }
@@ -132,8 +132,8 @@ void ASIRecorder::StartRecording(void)
 
         if (!_input_pmt)
         {
-            VERBOSE(VB_GENERAL, LOC_WARN +
-                    "Recording will not commence until a PMT is set.");
+            LOG(VB_GENERAL, LOG_WARNING,
+                "Recording will not commence until a PMT is set.");
             usleep(5000);
             continue;
         }
@@ -141,7 +141,7 @@ void ASIRecorder::StartRecording(void)
         if (!m_stream_handler->IsRunning())
         {
             _error = "Stream handler died unexpectedly.";
-            VERBOSE(VB_IMPORTANT, LOC_ERR + _error);
+            LOG(VB_GENERAL, LOG_ERR, _error);
         }
     }
 
@@ -162,7 +162,7 @@ bool ASIRecorder::Open(void)
 {
     if (IsOpen())
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Card already open");
+        LOG(VB_GENERAL, LOG_WARNING, "Card already open");
         return true;
     }
 
@@ -173,7 +173,7 @@ bool ASIRecorder::Open(void)
 
     m_stream_handler = ASIStreamHandler::Get(m_channel->GetDevice());
 
-    VERBOSE(VB_RECORD, LOC + "Opened successfully");
+    LOG(VB_RECORD, LOG_INFO, "Opened successfully");
 
     return true;
 }
@@ -185,10 +185,10 @@ bool ASIRecorder::IsOpen(void) const
 
 void ASIRecorder::Close(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Close() -- begin");
+    LOG(VB_RECORD, LOG_INFO, "Close() -- begin");
 
     if (IsOpen())
         ASIStreamHandler::Return(m_stream_handler);
 
-    VERBOSE(VB_RECORD, LOC + "Close() -- end");
+    LOG(VB_RECORD, LOG_INFO, "Close() -- end");
 }

@@ -17,7 +17,7 @@ BDOverlayScreen::BDOverlayScreen(MythPlayer *player, const QString &name)
 
 BDOverlayScreen::~BDOverlayScreen()
 {
-    VERBOSE(VB_PLAYBACK, LOC + "dtor");
+    LOG(VB_PLAYBACK, LOG_DEBUG, "dtor");
     m_overlayMap.clear();
 }
 
@@ -33,7 +33,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
         DeleteAllChildren();
         m_overlayMap.clear();
         SetRedraw();
-        VERBOSE(VB_PLAYBACK, LOC +
+        LOG(VB_PLAYBACK, LOG_INFO,
             QString("Initialised Size: %1x%2 (%3+%4) Plane: %5 Pts: %6")
                 .arg(overlay->m_position.width())
                 .arg(overlay->m_position.height())
@@ -47,8 +47,8 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
 
     if (!m_overlayArea.isValid())
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Error: Overlay image submitted "
-                                    "before initialisation.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Error: Overlay image submitted before initialisation.");
     }
 
     VideoOutput *vo = m_player->GetVideoOutput();
@@ -63,7 +63,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     // remove if we already have this overlay
     if (m_overlayMap.contains(hash))
     {
-        VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Removing %1 (%2 left)")
+        LOG(VB_PLAYBACK | VB_EXTRA, LOG_INFO, QString("Removing %1 (%2 left)")
             .arg(hash).arg(m_overlayMap.size()));
         MythUIImage *old = m_overlayMap.take(hash);
         DeleteChild(old);
@@ -118,7 +118,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
             uiimage->SetImage(image);
             uiimage->SetArea(MythRect(scaled));
             m_overlayMap.insert(hash, uiimage);
-            VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Added %1 (%2 tot)")
+            LOG(VB_PLAYBACK | VB_EXTRA, LOG_INFO, QString("Added %1 (%2 tot)")
                 .arg(hash).arg(m_overlayMap.size()));
         }
     }

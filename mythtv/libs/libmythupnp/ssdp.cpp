@@ -215,7 +215,7 @@ void SSDP::PerformSearch(const QString &sST, uint timeout_secs)
                                "\r\n")
         .arg(timeout_secs).arg(sST);
 
-    VERBOSE(VB_UPNP, QString("\n\n%1\n").arg(rRequest));
+    LOG(VB_UPNP, LOG_DEBUG, QString("\n\n%1\n").arg(rRequest));
 
     QByteArray sRequest = rRequest.toUtf8();
 
@@ -296,7 +296,7 @@ void SSDP::run()
                 FD_ISSET(m_Sockets[nIdx]->socket(), &read_set))
 	    {
 #if 0
-                VERBOSE(VB_IMPORTANT, QString("FD_ISSET( %1 )") .arg(nIdx));
+                LOG(VB_GENERAL, LOG_DEBUG, QString("FD_ISSET( %1 )").arg(nIdx));
 #endif
                 ProcessData(m_Sockets[nIdx]);
                 count--;

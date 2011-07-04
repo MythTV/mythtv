@@ -48,12 +48,12 @@ AudioInput *AudioInput::CreateDevice(const QByteArray &device)
     }
     else if (device == "NULL")
     {
-        VERBOSE(VB_GENERAL, LOC + "creating NULL audio device");
+        LOG(VB_GENERAL, LOG_INFO, "creating NULL audio device");
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "unknown or unsupported audio input "
-                "device '" + device + "'");
+        LOG(VB_GENERAL, LOG_ERR, 
+            "unknown or unsupported audio input device '" + device + "'");
     }
 
     return audio;

@@ -66,22 +66,23 @@ void DetectLetterbox::Detect(VideoFrame *frame)
             if (!firstFrameChecked)
             {
                 firstFrameChecked = frameNumber;
-                VERBOSE(VB_PLAYBACK,
-                        QString("Detect Letterbox: YV12 frame format detected"));
+                LOG(VB_PLAYBACK, LOG_INFO,
+                    QString("Detect Letterbox: YV12 frame format detected"));
             }
             break;
         default:
-            VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: The source is not "
-                    "a supported frame format (was %1)").arg(frame->codec));
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("Detect Letterbox: The source is not "
+                        "a supported frame format (was %1)").arg(frame->codec));
             isDetectLetterbox = false;
             return;
     }
 
     if (frameNumber < 0)
     {
-        VERBOSE(VB_PLAYBACK,
-                QString("Detect Letterbox: Strange frame number %1")
-                .arg(frameNumber));
+        LOG(VB_PLAYBACK, LOG_INFO,
+             QString("Detect Letterbox: Strange frame number %1")
+                 .arg(frameNumber));
         return;
     }
 
@@ -89,8 +90,9 @@ void DetectLetterbox::Detect(VideoFrame *frame)
     {
         if (detectLetterboxDetectedMode != detectLetterboxDefaultMode)
         {
-            VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: The source is "
-                    "already in widescreen (aspect: %1)")
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("Detect Letterbox: The source is "
+                        "already in widescreen (aspect: %1)")
                     .arg(m_player->GetVideoAspect()));
             detectLetterboxLock.lock();
             detectLetterboxConsecutiveCounter = 0;
@@ -102,8 +104,9 @@ void DetectLetterbox::Detect(VideoFrame *frame)
         {
             detectLetterboxConsecutiveCounter++;
         }
-        VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: The source is already "
-                "in widescreen (aspect: %1)")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("Detect Letterbox: The source is already "
+                    "in widescreen (aspect: %1)")
                 .arg(m_player->GetVideoAspect()));
         isDetectLetterbox = false;
         return;
@@ -212,8 +215,9 @@ void DetectLetterbox::Detect(VideoFrame *frame)
         // No Letterbox
         if (detectLetterboxDetectedMode != detectLetterboxDefaultMode)
         {
-            VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: Non Letterbox "
-                    "detected on line: %1 (limit: %2)")
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("Detect Letterbox: Non Letterbox "
+                        "detected on line: %1 (limit: %2)")
                     .arg(min(maxTop, maxBottom)).arg(halfLimit));
             detectLetterboxLock.lock();
             detectLetterboxConsecutiveCounter = 0;
@@ -232,8 +236,9 @@ void DetectLetterbox::Detect(VideoFrame *frame)
         // Letterbox (with narrow bars)
         if (detectLetterboxDetectedMode != kAdjustFill_Half)
         {
-            VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: Narrow Letterbox "
-                    "detected on line: %1 (limit: %2) frame: %3")
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("Detect Letterbox: Narrow Letterbox "
+                        "detected on line: %1 (limit: %2) frame: %3")
                     .arg(minTop).arg(halfLimit)
                     .arg(detectLetterboxPossibleHalfFrame));
             detectLetterboxLock.lock();
@@ -258,8 +263,9 @@ void DetectLetterbox::Detect(VideoFrame *frame)
         detectLetterboxPossibleHalfFrame = -1;
         if (detectLetterboxDetectedMode != kAdjustFill_Full)
         {
-            VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: Detected Letterbox "
-                    "on line: %1 (limit: %2) frame: %3").arg(minTop)
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("Detect Letterbox: Detected Letterbox "
+                        "on line: %1 (limit: %2) frame: %3").arg(minTop)
                     .arg(fullLimit).arg(detectLetterboxPossibleFullFrame));
             detectLetterboxLock.lock();
             detectLetterboxConsecutiveCounter = 0;
@@ -289,32 +295,35 @@ void DetectLetterbox::SwitchTo(VideoFrame *frame)
     if (!GetDetectLetterbox())
         return;
 
-    if (detectLetterboxSwitchFrame != -1)
-    {
-        detectLetterboxLock.lock();
-        if (detectLetterboxSwitchFrame <= frame->frameNumber &&
-            detectLetterboxConsecutiveCounter > 3)
-        {
-            if (m_player->GetAdjustFill() != detectLetterboxDetectedMode)
-            {
-                VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: Switched to %1 "
-                        "on frame %2 (%3)").arg(detectLetterboxDetectedMode)
-                        .arg(frame->frameNumber).arg(detectLetterboxSwitchFrame));
-                m_player->GetVideoOutput()->ToggleAdjustFill(detectLetterboxDetectedMode);
-                m_player->ReinitOSD();
-            }
-            detectLetterboxSwitchFrame = -1;
-        }
-        else if (detectLetterboxSwitchFrame <= frame->frameNumber)
-            VERBOSE(VB_PLAYBACK,
-                    QString("Detect Letterbox: Not Switched to %1 on frame %2 "
-                            "(%3) Not enough consecutive detections (%4)")
-                    .arg(detectLetterboxDetectedMode)
-                    .arg(frame->frameNumber).arg(detectLetterboxSwitchFrame)
-                    .arg(detectLetterboxConsecutiveCounter));
+    if (detectLetterboxSwitchFrame == -1)
+        return;
 
-        detectLetterboxLock.unlock();
+    detectLetterboxLock.lock();
+    if (detectLetterboxSwitchFrame <= frame->frameNumber &&
+        detectLetterboxConsecutiveCounter > 3)
+    {
+        if (m_player->GetAdjustFill() != detectLetterboxDetectedMode)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("Detect Letterbox: Switched to %1 "
+                        "on frame %2 (%3)").arg(detectLetterboxDetectedMode)
+                    .arg(frame->frameNumber)
+                    .arg(detectLetterboxSwitchFrame));
+            m_player->GetVideoOutput()->
+                      ToggleAdjustFill(detectLetterboxDetectedMode);
+            m_player->ReinitOSD();
+        }
+        detectLetterboxSwitchFrame = -1;
     }
+    else if (detectLetterboxSwitchFrame <= frame->frameNumber)
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("Detect Letterbox: Not Switched to %1 on frame %2 "
+                    "(%3) Not enough consecutive detections (%4)")
+                .arg(detectLetterboxDetectedMode)
+                .arg(frame->frameNumber).arg(detectLetterboxSwitchFrame)
+                .arg(detectLetterboxConsecutiveCounter));
+
+    detectLetterboxLock.unlock();
 }
 
 void DetectLetterbox::SetDetectLetterbox(bool detect)
