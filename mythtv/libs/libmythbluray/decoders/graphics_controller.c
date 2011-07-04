@@ -43,6 +43,7 @@
 typedef struct {
     uint16_t enabled_button;  /* enabled button id */
     uint16_t x, y, w, h;      /* button rect on overlay plane (if drawn) */
+    int      animate_indx;    /* currently showing object index of animated button, < 0 for static buttons */
 } BOG_DATA;
 
 struct graphics_controller_s {
@@ -148,21 +149,51 @@ static BD_IG_PAGE *_find_page(BD_IG_INTERACTIVE_COMPOSITION *c, unsigned page_id
 enum { BTN_NORMAL, BTN_SELECTED, BTN_ACTIVATED };
 
 static BD_PG_OBJECT *_find_object_for_button(PG_DISPLAY_SET *s,
-                                             BD_IG_BUTTON *button, int state)
+                                             BD_IG_BUTTON *button, int state,
+                                             BOG_DATA *bog_data)
 {
     BD_PG_OBJECT *object   = NULL;
     unsigned object_id     = 0xffff;
+    unsigned object_id_end = 0xffff;
+    unsigned repeat        = 0;
 
     switch (state) {
         case BTN_NORMAL:
-            object_id = button->normal_start_object_id_ref;
+            object_id     = button->normal_start_object_id_ref;
+            object_id_end = button->normal_end_object_id_ref;
+            repeat        = button->normal_repeat_flag;
             break;
         case BTN_SELECTED:
-            object_id = button->selected_start_object_id_ref;
+            object_id     = button->selected_start_object_id_ref;
+            object_id_end = button->selected_end_object_id_ref;
+            repeat        = button->selected_repeat_flag;
             break;
         case BTN_ACTIVATED:
-            object_id = button->activated_start_object_id_ref;
+            object_id     = button->activated_start_object_id_ref;
+            object_id_end = button->activated_end_object_id_ref;
             break;
+    }
+
+    if (bog_data) {
+        if (bog_data->animate_indx >= 0) {
+            int range = object_id_end - object_id;
+
+            if (range > 0 && object_id < 0xffff && object_id_end < 0xffff) {
+                GC_TRACE("animate button #%d: animate_indx %d, range %d, repeat %d\n",
+                         button->id, bog_data->animate_indx, range, repeat);
+
+                object_id += bog_data->animate_indx % (range + 1);
+                bog_data->animate_indx++;
+                if (!repeat && bog_data->animate_indx > range) {
+                /* terminate animation to the last object */
+                    bog_data->animate_indx = -1;
+                }
+
+            } else {
+                /* no animation for this button */
+                bog_data->animate_indx = -1;
+            }
+        }
     }
 
     object = _find_object(s, object_id);
@@ -265,6 +296,7 @@ static int _save_page_state(GRAPHICS_CONTROLLER *gc)
 
     for (ii = 0; ii < page->num_bogs; ii++) {
         gc->saved_bog_data[ii].enabled_button = gc->bog_data[ii].enabled_button;
+        gc->saved_bog_data[ii].animate_indx   = gc->bog_data[ii].animate_indx >= 0 ? 0 : -1;
     }
 
     return 1;
@@ -306,6 +338,7 @@ static void _reset_page_state(GRAPHICS_CONTROLLER *gc)
 
     for (ii = 0; ii < page->num_bogs; ii++) {
         gc->bog_data[ii].enabled_button = page->bog[ii].default_valid_button_id_ref;
+        gc->bog_data[ii].animate_indx   = 0;
     }
 }
 
@@ -474,9 +507,14 @@ int gc_decode_ts(GRAPHICS_CONTROLLER *gc, uint16_t pid, uint8_t *block, unsigned
 
         bd_mutex_lock(&gc->mutex);
 
-        graphics_processor_decode_ts(gc->igp, &gc->igs,
-                                     pid, block, num_blocks,
-                                     stc);
+        if (!graphics_processor_decode_ts(gc->igp, &gc->igs,
+                                          pid, block, num_blocks,
+                                          stc)) {
+            /* no new complete display set */
+            bd_mutex_unlock(&gc->mutex);
+            return 0;
+        }
+
         if (!gc->igs || !gc->igs->complete) {
             bd_mutex_unlock(&gc->mutex);
             return 0;
@@ -520,7 +558,7 @@ static void _render_button(GRAPHICS_CONTROLLER *gc, BD_IG_BUTTON *button, BD_PG_
     BD_PG_OBJECT *object    = NULL;
     BD_OVERLAY    ov;
 
-    object = _find_object_for_button(gc->igs, button, state);
+    object = _find_object_for_button(gc->igs, button, state, bog_data);
     if (!object) {
         GC_TRACE("_render_button(#%d): object (state %d) not found\n", button->id, state);
 
@@ -900,7 +938,7 @@ static int _mouse_move(GRAPHICS_CONTROLLER *gc, unsigned x, unsigned y, GC_NAV_C
             continue;
 
         /* Check for SELECTED state object (button that can be selected) */
-        BD_PG_OBJECT *object = _find_object_for_button(s, button, BTN_SELECTED);
+        BD_PG_OBJECT *object = _find_object_for_button(s, button, BTN_SELECTED, NULL);
         if (!object)
             continue;
 
