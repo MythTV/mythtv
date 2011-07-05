@@ -1,3 +1,5 @@
+#ifndef _OUTBOUNDREQUESTHANDLER_H_
+#define _OUTBOUNDREQUESTHANDLER_H_
 
 using namespace std;
 
@@ -18,19 +20,19 @@ class PROTOSERVER_PUBLIC OutboundRequestHandler : public SocketRequestHandler
     Q_OBJECT
   public:
     OutboundRequestHandler(void);
-
     QString GetHandlerName(void)                    { return "OUTBOUND"; }
-    virtual bool AnnounceSocket(void)               { return false; }
     void connectionClosed(MythSocket *socket);
 
   public slots:
     void ConnectToMaster(void);
 
+  protected:
+    virtual bool AnnounceSocket(void)               { return false; }
+    MythSocket *m_socket;
+
   private:
     bool DoConnectToMaster(void);
-
-    MythSocket *m_socket;
     QTimer      m_timer;
 };
 
-
+#endif

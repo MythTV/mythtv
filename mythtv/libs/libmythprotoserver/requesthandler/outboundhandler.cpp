@@ -41,6 +41,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     }
 
     QString server   = gCoreContext->GetSetting("MasterServerIP", "localhost");
+    QString hostname = gCoreContext->GetMasterHostName();
     int port         = gCoreContext->GetNumSetting("MasterServerPort", 6543);
 
     if (!m_socket->connect(server, port))
@@ -53,6 +54,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
 
     m_socket->Lock();
 
+#ifndef IGNORE_PROTO_VER_MISMATCH
     if (!m_socket->Validate())
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Unable to confirm protocol version with backend.");
@@ -60,6 +62,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
         m_socket = NULL;
         return false;
     }
+#endif
 
     if (!AnnounceSocket())
     {
@@ -69,7 +72,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
         return false;
     }
 
-    SocketHandler *handler = new SocketHandler(m_socket, m_parent, server);
+    SocketHandler *handler = new SocketHandler(m_socket, m_parent, hostname);
     handler->BlockShutdown(true);
     handler->AllowStandardEvents(true);
     handler->AllowSystemEvents(true);

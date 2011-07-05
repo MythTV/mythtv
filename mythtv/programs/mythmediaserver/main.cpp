@@ -22,6 +22,7 @@
 #include "mythsystemevent.h"
 #include "commandlineparser.h"
 
+#include "controlrequesthandler.h"
 #include "requesthandler/basehandler.h"
 #include "requesthandler/fileserverhandler.h"
 
@@ -111,6 +112,7 @@ int main(int argc, char *argv[])
 
     cmdline.ApplySettingsOverride();
 
+    gCoreContext->SetBackend(false);
     if (!gCoreContext->ConnectToMasterServer())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to connect to master server");
@@ -137,6 +139,10 @@ int main(int argc, char *argv[])
 
     sockmanager->RegisterHandler(new BaseRequestHandler());
     sockmanager->RegisterHandler(new FileServerHandler());
+
+    ControlRequestHandler *controlRequestHandler = new ControlRequestHandler();
+    sockmanager->RegisterHandler(controlRequestHandler);
+    controlRequestHandler->ConnectToMaster();
 
     MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
 
