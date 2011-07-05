@@ -140,13 +140,13 @@ VideoOutput *VideoOutput::Create(
     renderers += VideoOutputOpenGLVAAPI::GetAllowedRenderers(codec_id, video_dim);
 #endif // USING_VAAPI
 
-    VERBOSE(VB_PLAYBACK, LOC + "Allowed renderers: " +
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Allowed renderers: " +
             to_comma_list(renderers));
 
     renderers = VideoDisplayProfile::GetFilteredRenderers(decoder, renderers);
 
-    VERBOSE(VB_PLAYBACK, LOC + "Allowed renderers (filt: " + decoder + "): " +
-            to_comma_list(renderers));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Allowed renderers (filt: " + decoder +
+            "): " + to_comma_list(renderers));
 
     QString renderer = QString::null;
     if (renderers.size() > 0)
@@ -158,7 +158,7 @@ VideoOutput *VideoOutput::Create(
         if (vprof.IsDecoderCompatible(decoder) && renderers.contains(tmp))
         {
             renderer = tmp;
-            VERBOSE(VB_PLAYBACK, LOC + "Preferred renderer: " + renderer);
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Preferred renderer: " + renderer);
         }
     }
 
@@ -167,8 +167,8 @@ VideoOutput *VideoOutput::Create(
 
     while (!renderers.empty())
     {
-        VERBOSE(VB_PLAYBACK, LOC +
-                QString("Trying video renderer: '%1'").arg(renderer));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Trying video renderer: '%1'").arg(renderer));
         int index = renderers.indexOf(renderer);
         if (index >= 0)
             renderers.removeAt(index);
@@ -225,8 +225,8 @@ VideoOutput *VideoOutput::Create(
         renderer = VideoDisplayProfile::GetBestVideoRenderer(renderers);
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR +
-            "Not compiled with any useable video output method.");
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        "Not compiled with any useable video output method.");
 
     return NULL;
 }
@@ -507,7 +507,8 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
         int btmp;
 
         if (db_vdisp_profile)
-            m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
+            m_deintfiltername =
+                db_vdisp_profile->GetFilteredDeint(overridefilter);
         else
             m_deintfiltername = "";
 
@@ -518,9 +519,9 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
         {
             if (!ApproveDeintFilter(m_deintfiltername))
             {
-                VERBOSE(VB_IMPORTANT,
-                        QString("Failed to approve '%1' deinterlacer "
-                        "as a software deinterlacer")
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Failed to approve '%1' deinterlacer "
+                            "as a software deinterlacer")
                         .arg(m_deintfiltername));
                 m_deintfiltername = QString::null;
             }
@@ -540,14 +541,14 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
 
         if (m_deintFilter == NULL)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Couldn't load deinterlace filter %1")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Couldn't load deinterlace filter %1")
                     .arg(m_deintfiltername));
             m_deinterlacing = false;
             m_deintfiltername = "";
         }
 
-        VERBOSE(VB_PLAYBACK, LOC + QString("Using deinterlace method %1")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using deinterlace method %1")
                                    .arg(m_deintfiltername));
 
         if (m_deintfiltername == "bobdeint")
@@ -1265,7 +1266,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     QSize osd_size = GetTotalOSDBounds().size();
     if (osd_image && (osd_image->size() != osd_size))
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("OSD size changed."));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("OSD size changed."));
         osd_image->DownRef();
         osd_image = NULL;
     }
@@ -1275,11 +1276,13 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
         osd_image = osd_painter->GetFormatImage();
         if (osd_image)
         {
-            QImage blank = QImage(osd_size, QImage::Format_ARGB32_Premultiplied);
+            QImage blank = QImage(osd_size,
+                                  QImage::Format_ARGB32_Premultiplied);
             osd_image->Assign(blank);
             osd_image->ConvertToYUV();
-            osd_painter->Clear(osd_image, QRegion(QRect(QPoint(0,0), osd_size)));
-            VERBOSE(VB_IMPORTANT, LOC + QString("Created YV12 OSD."));
+            osd_painter->Clear(osd_image,
+                               QRegion(QRect(QPoint(0,0), osd_size)));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Created YV12 OSD."));
         }
         else
             return false;
@@ -1287,7 +1290,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
 
     if (m_visual)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Visualiser not supported here");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Visualiser not supported here");
         // Clear the audio buffer
         m_visual->Draw(QRect(), NULL, NULL);
     }
@@ -1333,8 +1336,8 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Display OSD: Frame format not supported."));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Display OSD: Frame format not supported.");
         }
     }
     return show;
@@ -1666,8 +1669,8 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     float pixel_aspect = (float)screen_size.width() /
                          (float)screen_size.height();
 
-    VERBOSE(VB_PLAYBACK, LOC + QString(
-            "Pixel dimensions: Screen %1x%2, window %3x%4")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Pixel dimensions: Screen %1x%2, window %3x%4")
             .arg(screen_size.width()).arg(screen_size.height())
             .arg(window_size.width()).arg(window_size.height()));
 
@@ -1693,14 +1696,14 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     if (disp_dim.isEmpty())
     {
         source = "Guessed!";
-        VERBOSE(VB_GENERAL, LOC + "Physical size of display unknown."
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Physical size of display unknown."
                 "\n\t\t\tAssuming 17\" monitor with square pixels.");
         disp_dim = QSize((int) ((300 * pixel_aspect) + 0.5), 300);
     }
 
     disp_aspect = (float) disp_dim.width() / (float) disp_dim.height();
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("%1 display dimensions: %2x%3 mm  Aspect: %4")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("%1 display dimensions: %2x%3 mm  Aspect: %4")
             .arg(source).arg(disp_dim.width()).arg(disp_dim.height())
             .arg(disp_aspect));
 
@@ -1710,8 +1713,10 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
 
     // We must now scale the display measurements to our window size and save
     // them. If we are running fullscreen this is a no-op.
-    disp_dim = QSize((disp_dim.width()  * window_size.width()) / screen_size.width(),
-                     (disp_dim.height() * window_size.height()) / screen_size.height());
+    disp_dim = QSize((disp_dim.width()  * window_size.width()) /
+                      screen_size.width(),
+                     (disp_dim.height() * window_size.height()) /
+                      screen_size.height());
     disp_aspect = (float) disp_dim.width() / (float) disp_dim.height();
     window.SetDisplayDim(disp_dim);
     window.SetDisplayAspect(disp_aspect);
@@ -1720,8 +1725,8 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     if (display_res)
         window.SetDisplayAspect(display_res->GetAspectRatio());
 
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("Estimated window dimensions: %1x%2 mm  Aspect: %3")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Estimated window dimensions: %1x%2 mm  Aspect: %3")
             .arg(window.GetDisplayDim().width())
             .arg(window.GetDisplayDim().height())
             .arg(window.GetDisplayAspect()));

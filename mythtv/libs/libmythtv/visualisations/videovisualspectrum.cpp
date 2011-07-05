@@ -170,7 +170,7 @@ bool VideoVisualSpectrum::InitialisePriv(void)
     m_scaleFactor = double(m_area.height() / 2) / log((double)(FFTW_N));
     m_falloff = (double)m_area.height() / 150.0;
 
-    VERBOSE(VB_GENERAL, DESC + QString("Initialised Spectrum with %1 bars")
-        .arg(m_scale.range()));
+    LOG(VB_GENERAL, LOG_INFO, DESC +
+        QString("Initialised Spectrum with %1 bars") .arg(m_scale.range()));
     return true;
 }

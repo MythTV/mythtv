@@ -81,7 +81,7 @@ bool V4LChannel::Open(void)
     videofd = open(ascii_device.constData(), O_RDWR);
     if (videofd < 0)
     {
-         VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device." + ENO);
+         LOG(VB_GENERAL, LOG_ERR, LOC + "Can't open video device." + ENO);
          return false;
     }
 
@@ -89,8 +89,7 @@ bool V4LChannel::Open(void)
     if (!CardUtil::GetV4LInfo(videofd, device_name, driver_name,
                               version, capabilities))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to query capabilities." + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to query capabilities." + ENO);
         Close();
         return false;
     }
@@ -102,16 +101,15 @@ bool V4LChannel::Open(void)
     has_tuner      = !!(capabilities & V4L2_CAP_TUNER);
     has_sliced_vbi = !!(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE);
 
-    VERBOSE(VB_CHANNEL, LOC + QString("Device name '%1' driver '%2'.")
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Device name '%1' driver '%2'.")
             .arg(device_name).arg(driver_name));
 
-    VERBOSE(VB_CHANNEL, LOC + QString(
-                "v4l2: %1 stream io: %2 std io: %3 async io: %4 "
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        QString("v4l2: %1 stream io: %2 std io: %3 async io: %4 "
                 "tuner %5 sliced vbi %6")
             .arg(usingv4l2)
             .arg(has_stream_io).arg(has_std_io).arg(has_async_io)
             .arg(has_tuner).arg(has_sliced_vbi));
-
 
     if (!InitializeInputs())
     {
@@ -199,8 +197,8 @@ static int format_to_mode(const QString &fmt, int v4l_version)
     }
 #endif
 
-    VERBOSE(VB_IMPORTANT,
-            "format_to_mode() does not recognize V4L" + v4l_version);
+    LOG(VB_GENERAL, LOG_ERR,
+        "format_to_mode() does not recognize V4L" + v4l_version);
 
     return V4L2_STD_NTSC; // assume V4L version 2
 }
@@ -285,8 +283,8 @@ static QString mode_to_format(int mode, int v4l_version)
 #endif
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                "mode_to_format() does not recognize V4L" + v4l_version);
+        LOG(VB_GENERAL, LOG_ERR,
+            "mode_to_format() does not recognize V4L" + v4l_version);
     }
 
     return "Unknown";
@@ -306,7 +304,7 @@ bool V4LChannel::InitializeInputs(void)
 
     // Get global TVFormat setting
     QString fmt = gCoreContext->GetSetting("TVFormat");
-    VERBOSE(VB_CHANNEL, QString("Global TVFormat Setting '%1'").arg(fmt));
+    LOG(VB_CHANNEL, LOG_INFO, QString("Global TVFormat Setting '%1'").arg(fmt));
     int videomode_v4l1 = format_to_mode(fmt.toUpper(), 1);
     int videomode_v4l2 = format_to_mode(fmt.toUpper(), 2);
 
@@ -334,8 +332,8 @@ bool V4LChannel::InitializeInputs(void)
     // print em
     for (it = m_inputs.begin(); it != m_inputs.end(); ++it)
     {
-        VERBOSE(VB_CHANNEL, LOC + QString("Input #%1: '%2' schan(%3) "
-                                          "tun(%4) v4l1(%5) v4l2(%6)")
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("Input #%1: '%2' schan(%3) tun(%4) v4l1(%5) v4l2(%6)")
                 .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
                 .arg((*it)->tuneToChannel)
                 .arg(mode_to_format((*it)->videoModeV4L1,1))
@@ -371,7 +369,7 @@ void V4LChannel::SetFormat(const QString &format)
             fmt = mode_to_format((*it)->videoModeV4L2, 2);
     }
 
-    VERBOSE(VB_CHANNEL, LOC + QString("SetFormat(%1) fmt(%2) input(%3)")
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetFormat(%1) fmt(%2) input(%3)")
             .arg(format).arg(fmt).arg(inputNum));
 
     if ((fmt == currentFormat) || SetInputAndFormat(inputNum, fmt))
@@ -420,8 +418,9 @@ int V4LChannel::SetFreqTable(const QString &tablename)
         listname = (char *)chanlists[i].name;
     }
 
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::SetFreqTable(): Invalid "
-                                "frequency table name %2, using %3.").
+    LOG(VB_CHANNEL, LOG_ERR, 
+        QString("Channel(%1)::SetFreqTable(): Invalid "
+                "frequency table name %2, using %3.").
             arg(device).arg(name).arg((char *)chanlists[1].name));
     SetFreqTable(1);
     return 1;
@@ -435,9 +434,9 @@ int V4LChannel::GetCurrentChannelNum(const QString &channame)
             return i;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR +
-            QString("GetCurrentChannelNum(%1): "
-                    "Failed to find Channel").arg(channame));
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        QString("GetCurrentChannelNum(%1): Failed to find Channel")
+            .arg(channame));
 
     return -1;
 }
@@ -445,15 +444,15 @@ int V4LChannel::GetCurrentChannelNum(const QString &channame)
 bool V4LChannel::Tune(const QString &freqid, int finetune)
 {
     int i = GetCurrentChannelNum(freqid);
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::Tune(%2): "
-                                "curList[%3].freq(%4)")
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("Channel(%1)::Tune(%2): curList[%3].freq(%4)")
             .arg(device).arg(freqid).arg(i)
             .arg((i != -1) ? curList[i].freq : -1));
 
     if (i == -1)
     {
-        VERBOSE(VB_IMPORTANT, QString("Channel(%1)::Tune(%2): Error, "
-                                      "failed to find channel.")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Channel(%1)::Tune(%2): Error, failed to find channel.")
                 .arg(device).arg(freqid));
         return false;
     }
@@ -482,7 +481,7 @@ bool V4LChannel::Tune(const DTVMultiplex &tuning, QString inputname)
  */
 bool V4LChannel::Tune(uint64_t frequency, QString inputname)
 {
-    VERBOSE(VB_CHANNEL, LOC + QString("Tune(%1, %2)")
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(%1, %2)")
             .arg(frequency).arg(inputname));
 
     int ioctlval = 0;
@@ -509,8 +508,9 @@ bool V4LChannel::Tune(uint64_t frequency, QString inputname)
         if (ioctlval >= 0)
         {
             isTunerCapLow = (mod.capability & V4L2_TUNER_CAP_LOW);
-            VERBOSE(VB_CHANNEL, QString("  name: %1").arg((char *)mod.name));
-            VERBOSE(VB_CHANNEL, QString("CapLow: %1").arg(isTunerCapLow));
+            LOG(VB_CHANNEL, LOG_INFO, 
+                QString("  name: %1").arg((char *)mod.name));
+            LOG(VB_CHANNEL, LOG_INFO, QString("CapLow: %1").arg(isTunerCapLow));
         }
 
         struct v4l2_frequency vf;
@@ -525,9 +525,9 @@ bool V4LChannel::Tune(uint64_t frequency, QString inputname)
         ioctlval = ioctl(videofd, VIDIOC_S_FREQUENCY, &vf);
         if (ioctlval < 0)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Channel(%1)::Tune(): Error %2 "
-                            "while setting frequency (v2): %3")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Channel(%1)::Tune(): Error %2 "
+                        "while setting frequency (v2): %3")
                     .arg(device).arg(ioctlval).arg(strerror(errno)));
             return false;
         }
@@ -535,8 +535,8 @@ bool V4LChannel::Tune(uint64_t frequency, QString inputname)
 
         if (ioctlval >= 0)
         {
-            VERBOSE(VB_CHANNEL, QString(
-                        "Channel(%1)::Tune(): Frequency is now %2")
+            LOG(VB_CHANNEL, LOG_INFO,
+                QString("Channel(%1)::Tune(): Frequency is now %2")
                     .arg(device).arg(vf.frequency * 62500));
         }
 
@@ -549,9 +549,9 @@ bool V4LChannel::Tune(uint64_t frequency, QString inputname)
     ioctlval = ioctl(videofd, VIDIOCSFREQ, &freq);
     if (ioctlval < 0)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Channel(%1)::Tune(): Error %2 "
-                        "while setting frequency (v1): %3")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Channel(%1)::Tune(): Error %2 "
+                    "while setting frequency (v1): %3")
                 .arg(device).arg(ioctlval).arg(strerror(errno)));
         return false;
     }
@@ -580,7 +580,7 @@ bool V4LChannel::Retune(void)
         int ioctlval = ioctl(videofd, VIDIOC_G_FREQUENCY, &vf);
         if (ioctlval < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Retune failed (1)" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Retune failed (1)" + ENO);
             return false;
         }
 
@@ -588,7 +588,7 @@ bool V4LChannel::Retune(void)
         ioctlval = ioctl(videofd, VIDIOC_S_FREQUENCY, &vf);
         if (ioctlval < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Retune failed (2)" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Retune failed (2)" + ENO);
             return false;
         }
 
@@ -645,8 +645,8 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
         bool mode_switch = (0 != ioctlval || new_vid_mode != cur_vid_mode);
         bool needs_switch = input_switch || mode_switch;
 
-        VERBOSE(VB_IMPORTANT, LOC + msg + "(v4l v2) " +
-                QString("input_switch: %1 mode_switch: %2")
+        LOG(VB_GENERAL, LOG_INFO, LOC + msg + "(v4l v2) " +
+            QString("input_switch: %1 mode_switch: %2")
                 .arg(input_switch).arg(mode_switch));
 
         // ConvertX (wis-go7007) requires streaming to be disabled
@@ -658,8 +658,8 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
             ioctlval = ioctl(videofd, VIDIOC_STREAMOFF, &streamType);
             if (ioctlval < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
-                        "\n\t\t\twhile disabling streaming (v4l v2)" + ENO);
+                LOG(VB_GENERAL, LOG_ERR, LOC + msg +
+                    "\n\t\t\twhile disabling streaming (v4l v2)" + ENO);
                 ok = false;
             }
             else
@@ -674,8 +674,8 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
             ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &inputNumV4L);
             if (ioctlval < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
-                        "\n\t\t\twhile setting input (v4l v2)" + ENO);
+                LOG(VB_GENERAL, LOG_ERR, LOC + msg +
+                    "\n\t\t\twhile setting input (v4l v2)" + ENO);
 
                 ok = false;
             }
@@ -686,8 +686,8 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
             ioctlval = ioctl(videofd, VIDIOC_S_STD, &new_vid_mode);
             if (ioctlval < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
-                        "\n\t\t\twhile setting format (v4l v2)" + ENO);
+                LOG(VB_GENERAL, LOG_ERR, LOC + msg +
+                    "\n\t\t\twhile setting format (v4l v2)" + ENO);
 
                 ok = false;
             }
@@ -698,8 +698,8 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
             ioctlval = ioctl(videofd, VIDIOC_STREAMON, &streamType);
             if (ioctlval < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
-                        "\n\t\t\twhile reenabling streaming (v4l v2)" + ENO);
+                LOG(VB_GENERAL, LOG_ERR, LOC + msg +
+                    "\n\t\t\twhile reenabling streaming (v4l v2)" + ENO);
 
                 ok = false;
             }
@@ -710,7 +710,7 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
 #ifdef USING_V4L1
     if (usingv4l1)
     {
-        VERBOSE(VB_CHANNEL, LOC + msg + "(v4l v1)");
+        LOG(VB_CHANNEL, LOG_INFO, LOC + msg + "(v4l v1)");
 
         // read in old settings
         struct video_channel set;
@@ -725,13 +725,13 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
         ok = (ioctlval >= 0);
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
-                    "\n\t\t\twhile setting format (v4l v1)" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC + msg +
+                "\n\t\t\twhile setting format (v4l v1)" + ENO);
         }
         else if (usingv4l2)
         {
-            VERBOSE(VB_IMPORTANT, LOC + msg +
-                    "\n\t\t\tSetting video mode with v4l version 1 worked");
+            LOG(VB_GENERAL, LOG_INFO, LOC + msg +
+                "\n\t\t\tSetting video mode with v4l version 1 worked");
         }
     }
 #endif // USING_V4L1
@@ -749,7 +749,7 @@ bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
     QString channum    = (*it)->startChanNum;
     QString inputname  = (*it)->name;
 
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::SwitchToInput(in %2, '%3')")
+    LOG(VB_CHANNEL, LOG_INFO, QString("Channel(%1)::SwitchToInput(in %2, '%3')")
             .arg(device).arg(inputnum)
             .arg(setstarting ? channum : QString("")));
 
@@ -772,7 +772,7 @@ bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "SetInputAndFormat() failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "SetInputAndFormat() failed");
         return false;
     }
 
@@ -790,10 +790,9 @@ bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
         ok = SetChannelByString(channum);
     else if (setstarting && !chanValid)
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("SwitchToInput(in %2, set ch): ").arg(inputnum) +
-                QString("\n\t\t\tDefault channel '%1' is not valid.")
-                .arg(channum));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("SwitchToInput(in %2, set ch): ").arg(inputnum) +
+            QString("\n\t\t\tDefault channel '%1' is not valid.").arg(channum));
         ok = false;
     }
 
@@ -815,8 +814,9 @@ static unsigned short *get_v4l1_field(
         case V4L2_CID_HUE:
             return &vid_pic.hue;
         default:
-            VERBOSE(VB_IMPORTANT, QString("get_v4l1_field: "
-                    "invalid attribute argument %1").arg(v4l2_attrib));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("get_v4l1_field: invalid attribute argument %1")
+                    .arg(v4l2_attrib));
     }
     return NULL;
 }
@@ -869,7 +869,7 @@ bool V4LChannel::InitPictureAttribute(const QString db_col_name)
         ctrl.id = qctrl.id = v4l2_attrib;
         if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
         {
-            VERBOSE(VB_IMPORTANT, loc_err + "failed to query controls." + ENO);
+            LOG(VB_GENERAL, LOG_ERR, loc + "failed to query controls." + ENO);
             return false;
         }
 
@@ -901,8 +901,8 @@ bool V4LChannel::InitPictureAttribute(const QString db_col_name)
         ctrl.value = max(value1, (int)qctrl.minimum);
 
 #if DEBUG_ATTRIB
-        VERBOSE(VB_CHANNEL, loc + QString(" %1\n\t\t\t"
-                                          "[%2,%3] dflt(%4, %5, %6)")
+        LOG(VB_CHANNEL, LOG_DEBUG, loc + QString(" %1\n\t\t\t"
+                                                 "[%2,%3] dflt(%4, %5, %6)")
                 .arg(value0).arg(qctrl.minimum, 5).arg(qctrl.maximum, 5)
                 .arg(qctrl.default_value, 5).arg(dfl, 4, 'f', 2)
                 .arg(norm_dfl));
@@ -910,7 +910,7 @@ bool V4LChannel::InitPictureAttribute(const QString db_col_name)
 
         if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
         {
-            VERBOSE(VB_IMPORTANT, loc_err + "failed to set controls" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, loc + "failed to set controls" + ENO);
             return false;
         }
 
@@ -925,7 +925,7 @@ bool V4LChannel::InitPictureAttribute(const QString db_col_name)
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        VERBOSE(VB_IMPORTANT, loc_err + "failed to query controls." + ENO);
+        LOG(VB_GENERAL, LOG_ERR, loc + "failed to query controls." + ENO);
         return false;
     }
     setfield = get_v4l1_field(v4l2_attrib, vid_pic);
@@ -936,7 +936,7 @@ bool V4LChannel::InitPictureAttribute(const QString db_col_name)
     *setfield = field;
     if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
     {
-        VERBOSE(VB_IMPORTANT, loc_err + "failed to set controls." + ENO);
+        LOG(VB_GENERAL, LOG_ERR, loc + "failed to set controls." + ENO);
         return false;
     }
 
@@ -972,8 +972,8 @@ int V4LChannel::GetPictureAttribute(PictureAttribute attr) const
     int val = (cfield + sfield + dfield) & 0xFFFF;
 
 #if DEBUG_ATTRIB
-    VERBOSE(VB_CHANNEL, QString(
-                "GetPictureAttribute(%1) -> cdb %2 rdb %3 d %4 -> %5")
+    LOG(VB_CHANNEL, LOG_DEBUG,
+        QString("GetPictureAttribute(%1) -> cdb %2 rdb %3 d %4 -> %5")
             .arg(db_col_name).arg(cfield).arg(sfield)
             .arg(dfield).arg(val));
 #endif
@@ -991,15 +991,15 @@ static int get_v4l2_attribute_value(int videofd, int v4l2_attrib)
     ctrl.id = qctrl.id = v4l2_attrib;
     if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "get_v4l2_attribute_value: "
-                "failed to query controls (1)" + ENO);
+        LOG(VB_GENERAL, LOG_ERR,
+            "get_v4l2_attribute_value: failed to query controls (1)" + ENO);
         return -1;
     }
 
     if (ioctl(videofd, VIDIOC_G_CTRL, &ctrl) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "get_v4l2_attribute_value: "
-                "failed to get controls (2)" + ENO);
+        LOG(VB_GENERAL, LOG_ERR,
+            "get_v4l2_attribute_value: failed to get controls (2)" + ENO);
         return -1;
     }
 
@@ -1017,8 +1017,8 @@ static int get_v4l1_attribute_value(int videofd, int v4l2_attrib)
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "get_v4l1_attribute_value: "
-                "failed to get picture control (1)" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, "get_v4l1_attribute_value: failed to get "
+                                 "picture control (1)" + ENO);
         return -1;
     }
 
@@ -1046,8 +1046,8 @@ static int set_v4l2_attribute_value(int videofd, int v4l2_attrib, int newvalue)
     ctrl.id = qctrl.id = v4l2_attrib;
     if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "set_v4l2_attribute_value: "
-                "failed to query control" + ENO);
+        LOG(VB_GENERAL, LOG_ERR,
+            "set_v4l2_attribute_value: failed to query control" + ENO);
         return -1;
     }
 
@@ -1058,8 +1058,8 @@ static int set_v4l2_attribute_value(int videofd, int v4l2_attrib, int newvalue)
 
     if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "set_v4l2_attribute_value: "
-                "failed to set control" + ENO);
+        LOG(VB_GENERAL, LOG_ERR,
+            "set_v4l2_attribute_value: failed to set control" + ENO);
         return -1;
     }
 
@@ -1075,8 +1075,8 @@ static int set_v4l1_attribute_value(int videofd, int v4l2_attrib, int newvalue)
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "set_v4l1_attribute_value: "
-                "failed to get picture control." + ENO);
+        LOG(VB_GENERAL, LOG_ERR,
+            "set_v4l1_attribute_value: failed to get picture control." + ENO);
         return -1;
     }
     setfield = get_v4l1_field(v4l2_attrib, vid_pic);
@@ -1085,8 +1085,8 @@ static int set_v4l1_attribute_value(int videofd, int v4l2_attrib, int newvalue)
         *setfield = newvalue;
         if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
         {
-            VERBOSE(VB_IMPORTANT, "set_v4l1_attribute_value: "
-                    "failed to set picture control." + ENO);
+            LOG(VB_GENERAL, LOG_ERR, "set_v4l1_attribute_value: failed to set "
+                                     "picture control." + ENO);
             return -1;
         }
     }
@@ -1138,8 +1138,8 @@ int V4LChannel::ChangePictureAttribute(
     new_value = min(max(new_value, 0), 65535);
 
 #if DEBUG_ATTRIB
-    VERBOSE(VB_CHANNEL, QString(
-                "ChangePictureAttribute(%1,%2,%3) cur %4 -> new %5")
+    LOG(VB_CHANNEL, LOG_DEBUG,
+        QString("ChangePictureAttribute(%1,%2,%3) cur %4 -> new %5")
             .arg(type).arg(db_col_name).arg(up)
             .arg(old_value).arg(new_value));
 #endif

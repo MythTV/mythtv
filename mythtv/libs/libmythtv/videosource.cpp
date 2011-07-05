@@ -263,7 +263,7 @@ void TransFreqTableSelector::Load(void)
 
 void TransFreqTableSelector::Save(void)
 {
-    VERBOSE(VB_IMPORTANT, "TransFreqTableSelector::Save(void)");
+    LOG(VB_GENERAL, LOG_INFO, "TransFreqTableSelector::Save(void)");
 
     if ((loaded_freq_table == getValue()) ||
         ((loaded_freq_table.toLower() == "default") &&
@@ -346,7 +346,7 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
     QString waitMsg = tr("Fetching lineups from %1...")
         .arg(ddp.GetListingsProviderName());
 
-    VERBOSE(VB_GENERAL, waitMsg);
+    LOG(VB_GENERAL, LOG_INFO, waitMsg);
     MythProgressDialog *pdlg = new MythProgressDialog(waitMsg, 2);
 
     clearSelections();
@@ -355,8 +355,8 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 
     if (!ddp.GrabLineupsOnly())
     {
-        VERBOSE(VB_IMPORTANT, "DDLS: fillSelections "
-                "did not successfully load selections");
+        LOG(VB_GENERAL, LOG_ERR,
+            "DDLS: fillSelections did not successfully load selections");
         pdlg->deleteLater();
         return;
     }
@@ -370,8 +370,8 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
     pdlg->Close();
     pdlg->deleteLater();
 #else // USING_BACKEND
-    VERBOSE(VB_IMPORTANT, "You must compile the backend "
-            "to set up a DataDirect line-up");
+    LOG(VB_GENERAL, LOG_ERR,
+        "You must compile the backend to set up a DataDirect line-up");
 #endif // USING_BACKEND
 }
 
@@ -458,7 +458,7 @@ void XMLTV_generic_config::Save()
 
     if (is_grabber_external(grabber))
     {
-        VERBOSE(VB_IMPORTANT, "\n" << err_msg);
+        LOG(VB_GENERAL, LOG_ERR, err_msg);
         MythPopupBox::showOkPopup(
             GetMythMainWindow(), QObject::tr("Warning."), err_msg);
     }
@@ -569,8 +569,8 @@ void XMLTVConfig::Load(void)
     MythSystem find_grabber_proc("tv_find_grabbers", args, 
                                  kMSStdOut | kMSBuffered | kMSRunShell);
     find_grabber_proc.Run(25);
-    VERBOSE(VB_GENERAL,
-            loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
+    LOG(VB_GENERAL, LOG_INFO,
+        loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
     uint status = find_grabber_proc.Wait();
 
     if (status == GENERIC_EXIT_OK)
@@ -587,12 +587,12 @@ void XMLTVConfig::Load(void)
 
             name_list.push_back(grabber_name);
             prog_list.push_back(grabber_file.fileName());
-            VERBOSE(VB_GENERAL+VB_EXTRA, "Found " + grabber_split[0]);
+            LOG(VB_GENERAL, LOG_DEBUG, "Found " + grabber_split[0]);
         }
-        VERBOSE(VB_GENERAL, loc + "Finished running tv_find_grabbers");
+        LOG(VB_GENERAL, LOG_INFO, loc + "Finished running tv_find_grabbers");
     }
     else
-        VERBOSE(VB_IMPORTANT, loc + "Failed to run tv_find_grabbers");
+        LOG(VB_GENERAL, LOG_ERR, loc + "Failed to run tv_find_grabbers");
 
     LoadXMLTVGrabbers(name_list, prog_list);
 
@@ -765,10 +765,10 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
             QString filepath = fi.absoluteFilePath();
             int err = lstat(filepath.toLocal8Bit().constData(), &st);
 
-            if (0 != err)
+            if (err)
             {
-                VERBOSE(VB_IMPORTANT,
-                        QString("Could not stat file: %1").arg(filepath));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Could not stat file: %1").arg(filepath));
                 continue;
             }
 
@@ -1328,7 +1328,9 @@ void HDHomeRunIP::UpdateDevices(const QString &v)
 {
    if (isEnabled())
    {
-       //VERBOSE(VB_IMPORTANT, QString("Emitting NewIP(%1)").arg(v));
+#if 0
+       LOG(VB_GENERAL, LOG_DEBUG, QString("Emitting NewIP(%1)").arg(v));
+#endif
        emit NewIP(v);
    }
 }
@@ -1360,7 +1362,9 @@ void HDHomeRunTunerIndex::UpdateDevices(const QString &v)
 {
    if (isEnabled())
    {
-       //VERBOSE(VB_IMPORTANT, QString("Emitting NewTuner(%1)").arg(v));
+#if 0
+       LOG(VB_GENERAL, LOG_DEBUG, QString("Emitting NewTuner(%1)").arg(v));
+#endif
        emit NewTuner(v);
    }
 }
@@ -1378,18 +1382,26 @@ HDHomeRunDeviceID::HDHomeRunDeviceID(const CaptureCard &parent) :
 
 void HDHomeRunDeviceID::SetIP(const QString &ip)
 {
-    //VERBOSE(VB_IMPORTANT, QString("Setting IP to %1").arg(ip));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Setting IP to %1").arg(ip));
+#endif
     _ip = ip;
     setValue(QString("%1-%2").arg(_ip).arg(_tuner));
-    //VERBOSE(VB_IMPORTANT, QString("Done Setting IP to %1").arg(ip));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Done Setting IP to %1").arg(ip));
+#endif
 }
 
 void HDHomeRunDeviceID::SetTuner(const QString &tuner)
 {
-    //VERBOSE(VB_IMPORTANT, QString("Setting Tuner to %1").arg(tuner));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Setting Tuner to %1").arg(tuner));
+#endif
     _tuner = tuner;
     setValue(QString("%1-%2").arg(_ip).arg(_tuner));
-    //VERBOSE(VB_IMPORTANT, QString("Done Setting Tuner to %1").arg(tuner));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Done Setting Tuner to %1").arg(tuner));
+#endif
 }
 
 void HDHomeRunDeviceID::SetOverrideDeviceID(const QString &deviceid)
@@ -1443,8 +1455,10 @@ void HDHomeRunDeviceIDList::fillSelections(const QString &cur)
 
     QString current = cur;
 
-    //VERBOSE(VB_IMPORTANT, QString("Filling List, current = '%1'")
-    //        .arg(current));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Filling List, current = '%1'")
+            .arg(current));
+#endif
 
     HDHomeRunDeviceList::iterator it = _devicelist->begin();
     for (; it != _devicelist->end(); it++)
@@ -1509,12 +1523,16 @@ void HDHomeRunDeviceIDList::Load(void)
 
 void HDHomeRunDeviceIDList::UpdateDevices(const QString &v)
 {
-    //VERBOSE(VB_IMPORTANT, QString("Got signal with %1").arg(v));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Got signal with %1").arg(v));
+#endif
     if (v == HDHomeRunDeviceIDList::tr("Manually Enter IP Address"))
     {
         _cardip->setEnabled(true);
         _cardtuner->setEnabled(true);
-        //VERBOSE(VB_IMPORTANT, "Done");
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, "Done");
+#endif
     }
     else if (!v.isEmpty())
     {
@@ -1689,8 +1707,8 @@ void ASIConfigurationGroup::probeCard(const QString &device)
     if (device_num < 0)
     {
         cardinfo->setValue(tr("Not a valid DVEO ASI card"));
-        VERBOSE(VB_IMPORTANT,
-                "ASIConfigurationGroup::probeCard(), Warning: " + error);
+        LOG(VB_GENERAL, LOG_WARNING,
+            "ASIConfigurationGroup::probeCard(), Warning: " + error);
         return;
     }
     cardinfo->setValue(tr("Valid DVEO ASI card"));
@@ -1896,7 +1914,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
     QMap<QString, HDHomeRunDevice>::iterator debugit;
     for (debugit = devicelist.begin(); debugit != devicelist.end(); debugit++)
     {
-        VERBOSE(VB_IMPORTANT, QString("%1: %2 %3 %4 %5 %6 %7")
+        LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2 %3 %4 %5 %6 %7")
                 .arg(debugit.key())
                 .arg((*debugit).mythdeviceid)
                 .arg((*debugit).deviceid)
@@ -2291,8 +2309,9 @@ void CaptureCard::Save(void)
     QString init_dev = CardUtil::GetVideoDevice(cardid);
     if (init_dev.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("Cannot clone card #%1 with empty"
-                                      " videodevice").arg(cardid));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Cannot clone card #%1 with empty videodevice")
+                .arg(cardid));
         return;
     }
     vector<uint> cardids = CardUtil::GetCardIDs(init_dev, type);
@@ -2511,8 +2530,7 @@ class InputGroup : public TransComboBoxSetting
 void InputGroup::Load(void)
 {
 #if 0
-    VERBOSE(VB_IMPORTANT,
-            QString("InputGroup::Load() %1 %2")
+    LOG(VB_GENERAL, LOG_DEBUG, QString("InputGroup::Load() %1 %2")
             .arg(groupnum).arg(cardinput.getInputID()));
 #endif
 
@@ -2560,13 +2578,13 @@ void InputGroup::Load(void)
         groupid = selected_groupids[groupnum];
 
 #if 0
-    VERBOSE(VB_IMPORTANT, QString("Group num: %1 id: %2")
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Group num: %1 id: %2")
             .arg(groupnum).arg(groupid));
     {
         QString msg;
         for (uint i = 0; i < selected_groupids.size(); i++)
             msg += QString("%1 ").arg(selected_groupids[i]);
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_DEBUG, msg);
     }
 #endif
 
@@ -2579,15 +2597,16 @@ void InputGroup::Load(void)
         index = (sel) ? i : index;
 
 #if 0
-        VERBOSE(VB_IMPORTANT, QString("grpid %1, name '%2', i %3, s %4")
-                .arg(grpid[i]).arg(names[i])
-                .arg(index).arg(sel ? "T" : "F"));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("grpid %1, name '%2', i %3, s %4")
+                .arg(grpid[i]).arg(names[i]) .arg(index).arg(sel ? "T" : "F"));
 #endif
 
         addSelection(names[i], QString::number(grpid[i]), sel);
     }
 
-    //VERBOSE(VB_IMPORTANT, QString("Group index: %1").arg(index));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Group index: %1").arg(index));
+#endif
 
     if (names.size())
         setValue(index);
@@ -2648,7 +2667,10 @@ class PresetTuner : public LineEditSetting, public CardInputDBStorage
 
 void StartingChannel::SetSourceID(const QString &sourceid)
 {
-    //VERBOSE(VB_IMPORTANT, "StartingChannel::SetSourceID("<<sourceid<<")");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("StartingChannel::SetSourceID(%1)")
+            .arg(sourceid));
+#endif
     clearSelections();
     if (sourceid.isEmpty() || !sourceid.toUInt())
         return;
@@ -2922,8 +2944,9 @@ void CardInput::channelScanner(void)
     QString cardtype = CardUtil::GetRawCardType(crdid);
     if (CardUtil::IsUnscanable(cardtype))
     {
-        VERBOSE(VB_IMPORTANT, QString("Sorry, %1 cards do not "
-                                      "yet support scanning.").arg(cardtype));
+        LOG(VB_GENERAL, LOG_ERR, 
+            QString("Sorry, %1 cards do not yet support scanning.")
+                .arg(cardtype));
         return;
     }
 
@@ -2939,10 +2962,9 @@ void CardInput::channelScanner(void)
         startchan->Save();
     }
 #else
-    VERBOSE(VB_IMPORTANT, "You must compile the backend "
-            "to be able to scan for channels");
+    LOG(VB_GENERAL, LOG_ERR, "You must compile the backend "
+                             "to be able to scan for channels");
 #endif
-
 }
 
 void CardInput::sourceFetch(void)
@@ -2962,8 +2984,8 @@ void CardInput::sourceFetch(void)
             !CardUtil::IsEncoder(cardtype)    &&
             !num_channels_before)
         {
-            VERBOSE(VB_IMPORTANT, "Skipping channel fetch, you need to "
-                    "scan for channels first.");
+            LOG(VB_GENERAL, LOG_ERR, "Skipping channel fetch, you need to "
+                                     "scan for channels first.");
             return;
         }
 

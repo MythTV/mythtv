@@ -85,7 +85,7 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
     int skip = 0;
     if (m_forceskip)
     {
-        VERBOSE(VB_PLAYBACK, LOC +
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("A previous trial crashed, skipping %1").arg(m_forceskip));
 
         skip = m_forceskip;
@@ -147,12 +147,16 @@ void VideoSync::Start(void)
 int VideoSync::CalcDelay()
 {
     int64_t now = GetTime();
-    //VERBOSE(VB_IMPORTANT, QString("CalcDelay: next: %1 now %2")
-    //    .arg(timeval_str(m_nexttrigger)) .arg(timeval_str(now)));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("CalcDelay: next: %1 now %2")
+        .arg(timeval_str(m_nexttrigger)) .arg(timeval_str(now)));
+#endif
 
     int ret_val = m_nexttrigger - now;
 
-    //VERBOSE(VB_IMPORTANT, QString("delay %1").arg(ret_val);
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("delay %1").arg(ret_val);
+#endif
 
     if (ret_val > m_frame_interval * 4)
     {
@@ -187,7 +191,9 @@ int VideoSync::CalcDelay()
  */
 void VideoSync::KeepPhase()
 {
-    // VERBOSE(VB_GENERAL, QString("%1").arg(m_delay));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("%1").arg(m_delay));
+#endif
     if (m_delay < -(m_refresh_interval/2))
         m_nexttrigger += 200;
     else if (m_delay > -500)
@@ -254,8 +260,9 @@ bool DRMVideoSync::TryInit(void)
     m_dri_fd = open(sm_dri_dev, O_RDWR);
     if (m_dri_fd < 0)
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("DRMVideoSync: Could not open device"
-                " %1, %2").arg(sm_dri_dev).arg(strerror(errno)));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("DRMVideoSync: Could not open device %1, %2")
+                .arg(sm_dri_dev).arg(strerror(errno)));
         return false; // couldn't open device
     }
 
@@ -263,8 +270,9 @@ bool DRMVideoSync::TryInit(void)
     blank.request.sequence = 1;
     if (drmWaitVBlank(m_dri_fd, &blank))
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("DRMVideoSync: VBlank ioctl did not"
-                " work, unimplemented in this driver?"));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            QString("DRMVideoSync: VBlank ioctl did not"
+                    " work, unimplemented in this driver?"));
         return false; // VBLANK ioctl didn't worko
     }
 
@@ -287,7 +295,9 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
     m_nexttrigger += sync_delay;
 
     m_delay = CalcDelay();
-    //VERBOSE(VB_GENERAL, QString("WaitForFrame at : %1").arg(m_delay));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("WaitForFrame at : %1").arg(m_delay));
+#endif
 
     // Always sync to the next retrace execpt when we are very late.
     if (m_delay > -(m_refresh_interval/2))
@@ -297,7 +307,9 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
         blank.request.sequence = 1;
         drmWaitVBlank(m_dri_fd, &blank);
         m_delay = CalcDelay();
-        //VERBOSE(VB_GENERAL, QString("Delay at sync: %1").arg(m_delay));
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Delay at sync: %1").arg(m_delay));
+#endif
     }
 
     if (m_delay > 0)
@@ -311,8 +323,9 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
         drmWaitVBlank(m_dri_fd, &blank);
         m_delay = CalcDelay();
 #if 0
-        VERBOSE(VB_GENERAL, QString("Wait %1 intervals. Count %2 Delay %3")
-            .arg(n) .arg(blank.request.sequence) .arg(m_delay));
+        LOG(VB_GENERAL, LOG_DEBUG, 
+            QString("Wait %1 intervals. Count %2 Delay %3")
+                .arg(n) .arg(blank.request.sequence) .arg(m_delay));
 #endif
     }
 
@@ -339,23 +352,23 @@ bool RTCVideoSync::TryInit(void)
     m_rtcfd = open("/dev/rtc", O_RDONLY);
     if (m_rtcfd < 0)
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("RTCVideoSync: Could not"
-                " open /dev/rtc, %1.").arg(strerror(errno)));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + 
+            "RTCVideoSync: Could not open /dev/rtc: " + ENO);
         return false;
     }
 
     // FIXME, does it make sense to tie RTCRATE to the desired framerate?
     if ((ioctl(m_rtcfd, RTC_IRQP_SET, RTCRATE) < 0))
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("RTCVideoSync: Could not"
-                " set RTC frequency, %1.").arg(strerror(errno)));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + 
+            "RTCVideoSync: Could not set RTC frequency: " + ENO);
         return false;
     }
 
     if (ioctl(m_rtcfd, RTC_PIE_ON, 0) < 0)
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("RTCVideoSync: Could not enable "
-                "periodic timer interrupts, %1.").arg(strerror(errno)));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + 
+            "RTCVideoSync: Could not enable periodic timer interrupts: " + ENO);
         return false;
     }
 

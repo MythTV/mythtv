@@ -41,7 +41,7 @@ bool VideoVisualCircles::InitialisePriv(void)
     m_scaleFactor = 10.0;
     m_falloff = 1.0;
 
-    VERBOSE(VB_GENERAL, DESC + QString("Initialised Circles with %1 circles.")
-        .arg(m_scale.range()));
+    LOG(VB_GENERAL, LOG_INFO, DESC +
+        QString("Initialised Circles with %1 circles.") .arg(m_scale.range()));
     return true;
 }

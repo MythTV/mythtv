@@ -28,7 +28,8 @@ bool TvPlayWindow::Create()
 
     if (!foundtheme)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen videowindow from base.xml");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Cannot load screen videowindow from base.xml");
         return false;
     }
 

@@ -22,12 +22,12 @@ QMap<int,port_info> open_xv_ports;
 
 void close_all_xv_ports_signal_handler(int sig)
 {
-    VERBOSE(VB_GENERAL, QString("Signal: %1").arg(sys_siglist[sig]));
+    LOG(VB_GENERAL, LOG_INFO, QString("Signal: %1").arg(sys_siglist[sig]));
     QMap<int,port_info>::iterator it;
     for (it = open_xv_ports.begin(); it != open_xv_ports.end(); ++it)
     {
         restore_port_attributes((*it).port);
-        VERBOSE(VB_GENERAL, QString("Ungrabbing XVideo port: %1")
+        LOG(VB_GENERAL, LOG_INFO, QString("Ungrabbing XVideo port: %1")
             .arg((*it).port));
         XvUngrabPort((*it).disp->GetDisplay(), (*it).port, CurrentTime);
     }

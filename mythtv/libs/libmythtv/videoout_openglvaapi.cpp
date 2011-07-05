@@ -44,7 +44,7 @@ bool VideoOutputOpenGLVAAPI::InputChanged(const QSize &input_size, float aspect,
                               MythCodecID  av_codec_id, void *codec_private,
                               bool &aspect_only)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) %4->%5")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("InputChanged(%1,%2,%3) %4->%5")
             .arg(input_size.width()).arg(input_size.height()).arg(aspect)
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
@@ -95,8 +95,7 @@ bool VideoOutputOpenGLVAAPI::InputChanged(const QSize &input_size, float aspect,
         return true;
     }
 
-    VERBOSE(VB_IMPORTANT, ERR +
-            QString("Failed to re-initialise video output."));
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to re-initialise video output.");
     errorState = kError_Unknown;
 
     return false;
@@ -143,7 +142,7 @@ bool VideoOutputOpenGLVAAPI::CreateVAAPIContext(QSize size)
         return ok;
     }
 
-    VERBOSE(VB_IMPORTANT, ERR + QString("Failed to create VAAPI context."));
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VAAPI context.");
     errorState = kError_Unknown;
     return false;
 }
@@ -244,8 +243,8 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(void)
         m_pauseBuffer = frame->buf;
     }
     else
-        VERBOSE(VB_PLAYBACK, LOC +
-            QString("WARNING: Could not update pause frame - no used frames."));
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            "Could not update pause frame - no used frames.");
 
     vbuffers.end_lock();
 }

@@ -42,15 +42,15 @@ static void print(
         raw_mins += QString("%1,").arg(raw_minimas[i]);
     for (uint i = 0; i < uint(raw_maximas.size()); i++)
         raw_maxs += QString("%1,").arg(raw_maximas[i]);
-    VERBOSE(VB_VBI|VB_EXTRA, QString("raw mins: %1").arg(raw_mins));
-    VERBOSE(VB_VBI|VB_EXTRA, QString("raw maxs: %1").arg(raw_maxs));
+    LOG(VB_VBI, LOG_DEBUG, QString("raw mins: %1").arg(raw_mins));
+    LOG(VB_VBI, LOG_DEBUG, QString("raw maxs: %1").arg(raw_maxs));
 
     QString mins, maxs;
     for (uint i = 0; i < uint(minimas.size()); i++)
         mins += QString("%1,").arg(minimas[i]);
     for (uint i = 0; i < uint(maximas.size()); i++)
         maxs += QString("%1,").arg(maximas[i]);
-    VERBOSE(VB_VBI|VB_EXTRA, QString("mins: %1 maxs: %2")
+    LOG(VB_VBI, LOG_DEBUG, QString("mins: %1 maxs: %2")
             .arg(mins).arg(maxs));
 }
 
@@ -70,12 +70,12 @@ static float find_clock_diff(const QList<float> &list)
         avg_diff /= (list.size() - 1);
     if (avg_diff * 1.15 < max_diff)
     {
-        VERBOSE(VB_VBI|VB_EXTRA, "max_diff too big");
+        LOG(VB_VBI, LOG_DEBUG, "max_diff too big");
         return 0.0f;
     }
     if (avg_diff * 0.85 > max_diff)
     {
-        VERBOSE(VB_VBI|VB_EXTRA, "min_diff too small");
+        LOG(VB_VBI, LOG_DEBUG, "min_diff too small");
         return 0.0f;
     }
 
@@ -105,7 +105,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     uint avgv = (maxv<minv) ? 0 : minv + ((maxv-minv) / 2);
     if (avgv <= 11)
     {
-        VERBOSE(VB_VBI|VB_EXTRA, QString("FindClocks: avgv(%1) <= 11").arg(avgv));
+        LOG(VB_VBI, LOG_DEBUG, QString("FindClocks: avgv(%1) <= 11").arg(avgv));
         return false;
     }
 
@@ -137,8 +137,8 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
 
     if (maximas.size() < 7)
     {
-        VERBOSE(VB_VBI|VB_EXTRA, LOC +
-                QString("FindClocks: maximas %1 < 7").arg(maximas.size()));
+        LOG(VB_VBI, LOG_DEBUG, LOC +
+            QString("FindClocks: maximas %1 < 7").arg(maximas.size()));
         print(raw_minimas, raw_maximas, minimas, maximas);
         return false;
     }
@@ -198,7 +198,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
 
     if (maximas.size() != 7)
     {
-        VERBOSE(VB_VBI|VB_EXTRA, LOC + QString("FindClocks: maximas: %1 != 7")
+        LOG(VB_VBI, LOG_DEBUG, LOC + QString("FindClocks: maximas: %1 != 7")
                 .arg(maximas.size()));
         print(raw_minimas, raw_maximas, minimas, maximas);
         return false;
@@ -221,7 +221,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
 
     if (minimas.size() != 6)
     {
-        VERBOSE(VB_VBI|VB_EXTRA, LOC + QString("FindClocks: minimas: %1 != 6")
+        LOG(VB_VBI, LOG_DEBUG, LOC + QString("FindClocks: minimas: %1 != 6")
                 .arg(minimas.size()));
         print(raw_minimas, raw_maximas, minimas, maximas);
         return false;
@@ -248,14 +248,16 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     // 7 clocks + 3 bits run in + 16 bits data
     if (start+((7+3+8+8-1) * rate) > width)
     {
-        VERBOSE(VB_VBI|VB_EXTRA, LOC + QString("FindClocks: end %1 > width %2")
+        LOG(VB_VBI, LOG_DEBUG, LOC + QString("FindClocks: end %1 > width %2")
                 .arg(start+((7+3+8+8-1) * rate)).arg(width));
 
         return false;
     }
 
-    //VERBOSE(VB_VBI|VB_EXTRA, LOC + QString("FindClocks: Clock start %1, rate %2")
-    //        .arg(start).arg(rate));
+#if 0
+    LOG(VB_VBI, LOG_DEBUG, LOC + QString("FindClocks: Clock start %1, rate %2")
+            .arg(start).arg(rate));
+#endif
 
     return true;
 }
@@ -337,7 +339,7 @@ bool VBI608Extractor::ExtractCC12(const unsigned char *buf, uint width)
             buf[uint(start + (1+7) * rate)] > avgv ||
             buf[uint(start + (2+7) * rate)] < avgv)
         {
-            VERBOSE(VB_VBI|VB_EXTRA, LOC + "did not find VBI 608 header");
+            LOG(VB_VBI, LOG_DEBUG, LOC + "did not find VBI 608 header");
             return false;
         }
 

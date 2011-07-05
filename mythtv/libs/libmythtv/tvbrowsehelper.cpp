@@ -349,8 +349,7 @@ void TVBrowseHelper::GetNextProgramDB(
     uint chanid = infoMap["chanid"].toUInt();
     if (!chanid)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "GetNextProgramDB() requires a chanid");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GetNextProgramDB() requires a chanid");
         return;
     }
 

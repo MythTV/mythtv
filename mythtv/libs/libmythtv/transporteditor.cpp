@@ -81,7 +81,10 @@ static QString pp_modulation(QString mod)
 
 void TransportList::fillSelections(void)
 {
-    //VERBOSE(VB_IMPORTANT, "TransportList::fillSelections() "<<sourceid);
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("TransportList::fillSelections() %1")
+                                   .arg(sourceid));
+#endif
 
     clearSelections();
     addSelection("(" + tr("New Transport") + ")", "0");
@@ -247,7 +250,10 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
 
 void TransportList::SetSourceID(uint _sourceid)
 {
-    //VERBOSE(VB_IMPORTANT, "TransportList::SetSourceID("<<_sourceid<<")");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("TransportList::SetSourceID(%1)")
+                                   .arg(_sourceid));
+#endif
 
     if (!_sourceid)
     {

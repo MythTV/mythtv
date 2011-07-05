@@ -265,8 +265,10 @@ InputInfo RemoteRequestBusyInputID(uint cardid)
 
 bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input)
 {
-    //VERBOSE(VB_IMPORTANT, QString("RemoteIsBusy(%1) %2")
-    //        .arg(cardid).arg(gCoreContext->IsBackend() ? "be" : "fe"));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("RemoteIsBusy(%1) %2")
+            .arg(cardid).arg(gCoreContext->IsBackend() ? "be" : "fe"));
+#endif
 
     busy_input.Clear();
 

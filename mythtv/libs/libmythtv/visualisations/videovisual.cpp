@@ -100,11 +100,12 @@ VisualNode* VideoVisual::GetNode(void)
 }
 
 // caller holds lock
-void VideoVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int p)
+void VideoVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c,
+                      int p)
 {
     if (!m_disabled && m_nodes.size() > 500)
     {
-        VERBOSE(VB_GENERAL, DESC +
+        LOG(VB_GENERAL, LOG_ERR, DESC +
             QString("Over 500 nodes buffered - disabling visualiser."));
         DeleteNodes();
         m_disabled = true;

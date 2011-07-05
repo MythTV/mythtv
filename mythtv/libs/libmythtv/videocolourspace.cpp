@@ -67,17 +67,17 @@ void Matrix::product(int row, const Matrix &r)
 
 void Matrix::debug(void)
 {
-    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("%1 %2 %3 %4")
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("%1 %2 %3 %4")
         .arg(m[0][0], 4, 'f', 4, QLatin1Char('0'))
         .arg(m[0][1], 4, 'f', 4, QLatin1Char('0'))
         .arg(m[0][2], 4, 'f', 4, QLatin1Char('0'))
         .arg(m[0][3], 4, 'f', 4, QLatin1Char('0')));
-    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("%1 %2 %3 %4")
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("%1 %2 %3 %4")
         .arg(m[1][0], 4, 'f', 4, QLatin1Char('0'))
         .arg(m[1][1], 4, 'f', 4, QLatin1Char('0'))
         .arg(m[1][2], 4, 'f', 4, QLatin1Char('0'))
         .arg(m[1][3], 4, 'f', 4, QLatin1Char('0')));
-    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("%1 %2 %3 %4")
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("%1 %2 %3 %4")
         .arg(m[2][0], 4, 'f', 4, QLatin1Char('0'))
         .arg(m[2][1], 4, 'f', 4, QLatin1Char('0'))
         .arg(m[2][2], 4, 'f', 4, QLatin1Char('0'))
@@ -111,7 +111,7 @@ VideoColourSpace::VideoColourSpace(VideoCStd colour_std)
 void VideoColourSpace::SetSupportedAttributes(PictureAttributeSupported supported)
 {
     m_supported_attributes = supported;
-    VERBOSE(VB_PLAYBACK, LOC + QString("PictureAttributes: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PictureAttributes: %1")
         .arg(toString(m_supported_attributes)));
 }
 
@@ -213,8 +213,9 @@ void VideoColourSpace::Update(void)
 
 void VideoColourSpace::Debug(void)
 {
-    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC +
-        QString("Brightness: %1 Contrast: %2 Saturation: %3 Hue: %4 StudioLevels: %5")
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("Brightness: %1 Contrast: %2 Saturation: %3 Hue: %4 "
+                "StudioLevels: %5")
         .arg(m_brightness, 2, 'f', 4, QLatin1Char('0'))
         .arg(m_contrast  , 2, 'f', 4, QLatin1Char('0'))
         .arg(m_saturation, 2, 'f', 4, QLatin1Char('0'))
