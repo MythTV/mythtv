@@ -361,6 +361,7 @@ int Transcode::TranscodeFile(
     const QString &profileName,
     bool honorCutList, bool framecontrol,
     int jobID, QString fifodir,
+    bool fifo_info,
     frm_dir_map_t &deleteMap)
 {
     QDateTime curtime = QDateTime::currentDateTime();
@@ -727,6 +728,31 @@ int Transcode::TranscodeFile(
 
     if (!fifodir.isEmpty())
     {
+        const char  *audio_codec_name;
+
+        audio_codec_name = "raw";
+
+        // Display details of the format of the fifo data.
+        // Circumvent logging system so that output is independent
+        // of logging level.
+        cout << "FifoVideoWidth "      << video_width              << endl;
+        cout << "FifoVideoHeight "     << video_height             << endl;
+        cout << "FifoVideoAspectRatio "<< player->GetVideoAspect() << endl;
+        cout << "FifoVideoFrameRate "  << video_frame_rate         << endl;
+        cout << "FifoAudioFormat "     << audio_codec_name         << endl;
+        cout << "FifoAudioChannels "   << arb->channels            << endl;
+        cout << "FifoAudioHz "         << arb->eff_audiorate       << endl;
+
+        if(fifo_info)
+        {
+            // Request was for just the format of fifo data, not for
+            // the actual transcode, so stop here.
+            unlink(outputname.toLocal8Bit().constData());
+            if (player_ctx)
+                delete player_ctx;
+            return REENCODE_OK;
+        }
+
         QString audfifo = fifodir + QString("/audout");
         QString vidfifo = fifodir + QString("/vidout");
         int audio_size = arb->eff_audiorate * arb->bytes_per_frame;
