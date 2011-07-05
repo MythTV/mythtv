@@ -1305,6 +1305,26 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
                                         .arg(commands[2]));
     }
+    if (commands[1] == "MediaServer")
+    {
+        if (commands.size() < 3)
+        {
+            VERBOSE(VB_IMPORTANT, "Received malformed ANN MediaServer query");
+            errlist << "malformed_ann_query";
+            socket->writeStringList(errlist);
+            return;
+        }
+
+        PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
+                                              kPBSEvents_Normal);
+        pbs->setBlockShutdown(false);
+        sockListLock.lockForWrite();
+        playbackList.push_back(pbs);
+        sockListLock.unlock();
+
+        SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
+                                .arg(commands[2]));
+    }
     else if (commands[1] == "SlaveBackend")
     {
         if (commands.size() < 4)
