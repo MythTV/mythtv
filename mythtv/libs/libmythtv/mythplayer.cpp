@@ -982,7 +982,6 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
         return -1;
     }
 
-    video_aspect = decoder->GetVideoAspectRatio();
     audio.CheckFormat();
 
     if (ret > 0)

@@ -136,7 +136,6 @@ class DecoderBase
     virtual long UpdateStoredFrameNum(long frame) = 0;
 
     virtual double  GetFPS(void) const { return fps; }
-    float           GetVideoAspectRatio(void) { return current_aspect; }
     /// Returns the estimated bitrate if the video were played at normal speed.
     uint GetRawBitrate(void) const { return bitrate; }
 
