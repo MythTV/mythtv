@@ -1398,7 +1398,7 @@ void TVRec::RunTV(void)
     // check whether we should use the EITScanner in this TVRec instance
     if (CardUtil::IsEITCapable(genOpt.cardtype) &&
         (!GetDVBChannel() || GetDVBChannel()->IsMaster()) && 
-        (dvbOpt.dvb_eitscan && get_use_eit(cardid)))
+        (dvbOpt.dvb_eitscan || get_use_eit(cardid)))
     {
         scanner = new EITScanner(cardid);
         uint timeout = eitCrawlIdleStart;
