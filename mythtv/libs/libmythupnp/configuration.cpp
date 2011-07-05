@@ -165,8 +165,8 @@ QDomNode XmlConfiguration::FindNode( QStringList &sParts, QDomNode &curNode, boo
         if (bCreate)
         {
             QDomNode newNode = m_config.createElement( sName );
-
-            child = curNode.appendChild( newNode );
+            if (!curNode.isNull())
+                child = curNode.appendChild( newNode );
         }
         else
             sParts.clear();
