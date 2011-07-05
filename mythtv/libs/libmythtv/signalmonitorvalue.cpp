@@ -49,11 +49,11 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
 
     Init();
 #if DEBUG_SIGNAL_MONITOR_VALUE
-    VERBOSE(VB_GENERAL, QString("SignalMonitorValue(%1, %2, %3, %4, %5, %6, %7,"
-                                " %8, %9)")
-        .arg(name) .arg(noSpaceName) .arg(value) .arg(threshold) .arg(minval)
-        .arg(maxval) .arg(timeout) .arg(high_threshold)
-        .arg((set ? "true" : "false")));
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("SignalMonitorValue(%1, %2, %3, %4, %5, %6, %7, %8, %9)")
+            .arg(name) .arg(noSpaceName) .arg(value) .arg(threshold)
+            .arg(minval) .arg(maxval) .arg(timeout) .arg(high_threshold)
+            .arg((set ? "true" : "false")));
 #endif
 }
 
@@ -75,11 +75,11 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
 
     Init();
 #if DEBUG_SIGNAL_MONITOR_VALUE
-    VERBOSE(VB_GENERAL, QString("SignalMonitorValue(%1, %2, %3, %4, %5, %6, %7,"
-                                " %8, %9)")
-        .arg(name) .arg(noSpaceName) .arg(value) .arg(threshold) .arg(minval)
-        .arg(maxval) .arg(timeout) .arg(high_threshold)
-        .arg((set ? "true" : "false")));
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("SignalMonitorValue(%1, %2, %3, %4, %5, %6, %7, %8, %9)")
+            .arg(name) .arg(noSpaceName) .arg(value) .arg(threshold)
+            .arg(minval) .arg(maxval) .arg(timeout) .arg(high_threshold)
+            .arg((set ? "true" : "false")));
 #endif
 }
 
@@ -165,15 +165,16 @@ SignalMonitorList SignalMonitorValue::Parse(const QStringList& slist)
     for (int i=0; i+1<slist.size(); i+=2)
     {
 #if DEBUG_SIGNAL_MONITOR_VALUE
-        VERBOSE(VB_GENERAL, "Parse(" + slist[i] + ", (" + slist[i+1] + "))");
+        LOG(VB_GENERAL, LOG_DEBUG,
+            "Parse(" + slist[i] + ", (" + slist[i+1] + "))");
 #endif
         if (smv.Set(slist[i], slist[i+1]))
             monitor_list.push_back(smv);
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("SignalMonitorValue::Parse(): Error, "
-                            "unable to parse (%1, (%2))")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("SignalMonitorValue::Parse(): Error, "
+                        "unable to parse (%1, (%2))")
                     .arg(slist[i]).arg(slist[i+1]));
         }
     }
@@ -204,7 +205,7 @@ bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
                            .arg(it->high_threshold ? "<" : ">")
                            .arg(it->GetThreshold());
             }
-        VERBOSE(VB_GENERAL, msg);
+        LOG(VB_GENERAL, LOG_DEBUG, msg);
     }
 #endif
     return good;

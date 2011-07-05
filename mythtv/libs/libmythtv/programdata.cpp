@@ -229,8 +229,8 @@ uint DBEvent::UpdateDB(
 
     if (match >= match_threshold)
     {
-        VERBOSE(VB_EIT | VB_EXTRA, QString("EIT: accept match[%1]: %2 '%3' "
-                                           "vs. '%4'")
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: accept match[%1]: %2 '%3' vs. '%4'")
                 .arg(i).arg(match).arg(title).arg(programs[i].title));
         return UpdateDB(query, chanid, programs, i);
     }
@@ -238,7 +238,8 @@ uint DBEvent::UpdateDB(
     {
         if (i >= 0)
         {
-            VERBOSE(VB_EIT, QString("EIT: reject match[%1]: %2 '%3' vs. '%4'")
+            LOG(VB_EIT, LOG_DEBUG,
+                QString("EIT: reject match[%1]: %2 '%3' vs. '%4'")
                     .arg(i).arg(match).arg(title).arg(programs[i].title));
         }
         return UpdateDB(query, chanid, programs, -1);
@@ -421,8 +422,9 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, QString("Unexpected result: shows don't "
-                                  "overlap\n\t%1: %2 - %3\n\t%4: %5 - %6")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Unexpected result: shows don't "
+                        "overlap\n\t%1: %2 - %3\n\t%4: %5 - %6")
                     .arg(title.left(30), 30)
                     .arg(starttime.toString(Qt::ISODate))
                     .arg(endtime.toString(Qt::ISODate))
@@ -434,7 +436,9 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
 
         if (mv > match_val)
         {
-            VERBOSE(VB_EIT+VB_EXTRA, QString("GM : %1 new best match %2 with score %3").arg(title.left(25))
+            LOG(VB_EIT, LOG_DEBUG,
+                QString("GM : %1 new best match %2 with score %3")
+                    .arg(title.left(25))
                     .arg(programs[i].title.left(25)).arg(mv));
             bestmatch = i;
             match_val = mv;
@@ -803,8 +807,8 @@ void ProgInfo::Squeeze(void)
 
 uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
 {
-    VERBOSE(VB_XMLTV,
-            QString("Inserting new program    : %1 - %2 %3 %4")
+    LOG(VB_XMLTV, LOG_INFO,
+        QString("Inserting new program    : %1 - %2 %3 %4")
             .arg(starttime.toString(Qt::ISODate))
             .arg(endtime.toString(Qt::ISODate))
             .arg(channel)
@@ -1031,14 +1035,14 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
                 tokeep = it, todelete = cur;
 
 
-            VERBOSE(VB_XMLTV,
+            LOG(VB_XMLTV, LOG_INFO,
                 QString("Removing conflicting program: %1 - %2 %3 %4")
                     .arg((*todelete)->starttime.toString(Qt::ISODate))
                     .arg((*todelete)->endtime.toString(Qt::ISODate))
                     .arg((*todelete)->channel)
                     .arg((*todelete)->title));
 
-            VERBOSE(VB_XMLTV,
+            LOG(VB_XMLTV, LOG_INFO,
                 QString("Conflicted with            : %1 - %2 %3 %4")
                     .arg((*tokeep)->starttime.toString(Qt::ISODate))
                     .arg((*tokeep)->endtime.toString(Qt::ISODate))
@@ -1086,8 +1090,8 @@ void ProgramData::HandlePrograms(
 
         if (chanids.empty())
         {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "Unknown xmltv channel identifier: %1"
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Unknown xmltv channel identifier: %1"
                         " - Skipping channel.").arg(mapiter.key()));
             continue;
         }
@@ -1106,10 +1110,9 @@ void ProgramData::HandlePrograms(
         }
     }
 
-    VERBOSE(VB_GENERAL,
-            QString("Updated programs: %1 Unchanged programs: %2")
-                .arg(updated)
-                .arg(unchanged));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Updated programs: %1 Unchanged programs: %2")
+                .arg(updated) .arg(unchanged));
 }
 
 void ProgramData::HandlePrograms(MSqlQuery             &query,
@@ -1146,8 +1149,8 @@ int ProgramData::fix_end_times(void)
 
     if (!query1.exec(querystr))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("fix_end_times query failed: %1").arg(querystr));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("fix_end_times query failed: %1").arg(querystr));
         return -1;
     }
 
@@ -1167,8 +1170,8 @@ int ProgramData::fix_end_times(void)
 
         if (!query2.exec(querystr))
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("fix_end_times query failed: %1").arg(querystr));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("fix_end_times query failed: %1").arg(querystr));
             return -1;
         }
 
@@ -1186,8 +1189,8 @@ int ProgramData::fix_end_times(void)
 
             if (!query2.exec(querystr))
             {
-                VERBOSE(VB_IMPORTANT,
-                       QString("fix_end_times query failed: %1").arg(querystr));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("fix_end_times query failed: %1").arg(querystr));
                 return -1;
             }
         }
@@ -1261,7 +1264,7 @@ bool ProgramData::IsUnchanged(
 bool ProgramData::DeleteOverlaps(
     MSqlQuery &query, uint chanid, const ProgInfo &pi)
 {
-    if (VERBOSE_LEVEL_CHECK(VB_XMLTV))
+    if (VERBOSE_LEVEL_CHECK(VB_XMLTV) && logLevel <= LOG_INFO)
     {
         // Get overlaps..
         query.prepare(
@@ -1282,13 +1285,10 @@ bool ProgramData::DeleteOverlaps(
 
         do
         {
-            VERBOSE(VB_XMLTV,
-                    QString(
-                        "Removing existing program: %1 - %2 %3 %4")
-                    .arg(query.value(1).toDateTime()
-                         .toString(Qt::ISODate))
-                    .arg(query.value(2).toDateTime()
-                         .toString(Qt::ISODate))
+            LOG(VB_XMLTV, LOG_INFO,
+                QString("Removing existing program: %1 - %2 %3 %4")
+                    .arg(query.value(1).toDateTime().toString(Qt::ISODate))
+                    .arg(query.value(2).toDateTime().toString(Qt::ISODate))
                     .arg(pi.channel)
                     .arg(query.value(0).toString()));
         } while (query.next());
@@ -1296,8 +1296,8 @@ bool ProgramData::DeleteOverlaps(
 
     if (!ClearDataByChannel(chanid, pi.starttime, pi.endtime, false))
     {
-        VERBOSE(VB_XMLTV,
-                QString("Program delete failed    : %1 - %2 %3 %4")
+        LOG(VB_XMLTV, LOG_ERR,
+            QString("Program delete failed    : %1 - %2 %3 %4")
                 .arg(pi.starttime.toString(Qt::ISODate))
                 .arg(pi.endtime.toString(Qt::ISODate))
                 .arg(pi.channel)

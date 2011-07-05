@@ -2,7 +2,7 @@
 #include "mythcommflagplayer.h"
 #include "mythlogging.h"
 
-#define LOC_ERR QString("CommFlagPlayer err: ")
+#define LOC QString("CommFlagPlayer: ")
 
 class RebuildSaver : public QRunnable
 {
@@ -84,8 +84,8 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
     if (!InitVideo())
     {
-        VERBOSE(VB_IMPORTANT,
-                LOC_ERR + "RebuildSeekTable unable to initialize video");
+        LOG(VB_GENERAL, LOG_ERR,
+            LOC + "RebuildSeekTable unable to initialize video");
         SetPlaying(false);
         return false;
     }
@@ -163,7 +163,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 		if (percentage % 10 == 0 && prevperc != percentage)
                 {
                     prevperc = percentage;
-		    VERBOSE(VB_GENERAL, QString("%1%/%2""fps")
+		    LOG(VB_GENERAL, LOG_INFO, QString("%1%/%2""fps")
                                         .arg(percentage).arg(flagFPS));
                 }
             }
@@ -176,7 +176,8 @@ bool MythCommFlagPlayer::RebuildSeekTable(
                     fflush( stdout );
                 }
                 if (myFramesPlayed % 1000 == 0)
-                    VERBOSE(VB_GENERAL, QString("%1").arg(myFramesPlayed));
+                    LOG(VB_GENERAL, LOG_INFO, QString("%1")
+                            .arg(myFramesPlayed));
             }
         }
 

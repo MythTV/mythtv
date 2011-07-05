@@ -129,7 +129,8 @@ int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
             vdpau = true;
             break;
         case kCodec_H263_VDPAU:
-            VERBOSE(VB_IMPORTANT, "Error: VDPAU H.263 not supported by ffmpeg");
+            LOG(VB_GENERAL, LOG_ERR,
+                "Error: VDPAU H.263 not supported by ffmpeg");
             break;
         case kCodec_MPEG4_VDPAU:
             ret = CODEC_ID_MPEG4;
@@ -193,9 +194,9 @@ int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
             break;
 
         default:
-            VERBOSE(VB_IMPORTANT,
-                    QString("Error: MythCodecID %1 has not been "
-                            "added to myth2av_codecid").arg(codec_id));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Error: MythCodecID %1 has not been "
+                        "added to myth2av_codecid").arg(codec_id));
             break;
     } // switch(codec_id)
     return ret;

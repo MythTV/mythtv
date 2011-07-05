@@ -379,7 +379,7 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
 
     if (HasPlayer())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Attempting to setup a player, but it already exists.");
         return false;
     }
@@ -395,8 +395,8 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
     if (nohardwaredecoders)
         player->DisableHardwareDecoders();
 
-    QString passthru_device = gCoreContext->GetNumSetting(
-        "PassThruDeviceOverride", false) ?
+    QString passthru_device = 
+        gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
         gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
 
     player->SetPlayerInfo(tv, widget, exact_seeking, this);
@@ -466,14 +466,14 @@ bool PlayerContext::StartPlaying(int maxWait)
 
     if (player->IsPlaying())
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("StartPlaying(): took %1"
-                " ms to start player.").arg(t.elapsed()));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("StartPlaying(): took %1 ms to start player.")
+                .arg(t.elapsed()));
         return true;
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "StartPlaying() "
-                "Failed to start player");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "StartPlaying() Failed to start player");
         StopPlaying();
         return false;
     }
@@ -570,15 +570,19 @@ QString PlayerContext::GetPreviousChannel(void) const
 
 void PlayerContext::LockPlayingInfo(const char *file, int line) const
 {
-    //VERBOSE(VB_IMPORTANT, QString("LockPlayingInfo(%1,%2)")
-    //        .arg(file).arg(line));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("LockPlayingInfo(%1,%2)")
+            .arg(file).arg(line));
+#endif
     playingInfoLock.lock();
 }
 
 void PlayerContext::UnlockPlayingInfo(const char *file, int line) const
 {
-    //VERBOSE(VB_IMPORTANT, QString("UnlockPlayingInfo(%1,%2)")
-    //        .arg(file).arg(line));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("UnlockPlayingInfo(%1,%2)")
+            .arg(file).arg(line));
+#endif
     playingInfoLock.unlock();
 }
 
@@ -589,8 +593,10 @@ void PlayerContext::UnlockPlayingInfo(const char *file, int line) const
  */
 void PlayerContext::LockDeletePlayer(const char *file, int line) const
 {
-    //VERBOSE(VB_IMPORTANT, QString("LockDeletePlayer(%1,%2)")
-    //        .arg(file).arg(line));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("LockDeletePlayer(%1,%2)")
+            .arg(file).arg(line));
+#endif
     deletePlayerLock.lock();
 }
 
@@ -599,8 +605,10 @@ void PlayerContext::LockDeletePlayer(const char *file, int line) const
  */
 void PlayerContext::UnlockDeletePlayer(const char *file, int line) const
 {
-    //VERBOSE(VB_IMPORTANT, QString("UnlockDeletePlayer(%1,%2)")
-    //        .arg(file).arg(line));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("UnlockDeletePlayer(%1,%2)")
+            .arg(file).arg(line));
+#endif
     deletePlayerLock.unlock();
 }
 
@@ -737,8 +745,8 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
         }
     }
 
-    VERBOSE(VB_CHANNEL, LOC +
-            QString("Output filters for this channel are: '%1'")
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        QString("Output filters for this channel are: '%1'")
                     .arg(filters));
 
     filters.detach();
@@ -884,7 +892,7 @@ void PlayerContext::SetPseudoLiveTV(
             .arg(new_rec->GetTitle()).arg(new_rec->GetChanNum())
             .arg(new_rec->GetRecordingStartTime(ISODate))
             .arg(new_rec->GetRecordingEndTime(ISODate));
-        VERBOSE(VB_PLAYBACK, LOC + msg);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + msg);
     }
 
     pseudoLiveTVRec   = new_rec;
@@ -896,7 +904,7 @@ void PlayerContext::SetPseudoLiveTV(
             .arg(old_rec->GetTitle()).arg(old_rec->GetChanNum())
             .arg(old_rec->GetRecordingStartTime(ISODate))
             .arg(old_rec->GetRecordingEndTime(ISODate));
-        VERBOSE(VB_PLAYBACK, LOC + msg);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + msg);
         delete old_rec;
     }
 }

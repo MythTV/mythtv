@@ -160,9 +160,9 @@ class SampleRate : public ComboBoxSetting, public CodecParamStorage
         }
         else
         {
-            VERBOSE(VB_GENERAL, QString("SampleRate: ") +
-                    QString("Attempted to add a rate %1 Hz, which is "
-                            "not in the list of allowed rates.").arg(rate));
+            LOG(VB_GENERAL, LOG_ERR, QString("SampleRate: ") +
+                QString("Attempted to add a rate %1 Hz, which is "
+                        "not in the list of allowed rates.").arg(rate));
         }
     }
 
@@ -1627,8 +1627,9 @@ QMap<int, QString> RecordingProfile::listProfiles(int group)
     }
     else if (!result.next())
     {
-        VERBOSE(VB_GENERAL, "RecordingProfile::fillselections, Warning: "
-                "Failed to locate recording id for recording group.");
+        LOG(VB_GENERAL, LOG_WARNING,
+            "RecordingProfile::fillselections, Warning: "
+            "Failed to locate recording id for recording group.");
         return profiles;
     }
 

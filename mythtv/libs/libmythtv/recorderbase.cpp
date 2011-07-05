@@ -67,12 +67,12 @@ RecorderBase::~RecorderBase(void)
 
 void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
 {
-    if (VERBOSE_LEVEL_CHECK(VB_RECORD))
+    if (VERBOSE_LEVEL_CHECK(VB_RECORD) && logLevel <= LOG_INFO)
     {
         QString msg("");
         if (rbuf)
             msg = " '" + rbuf->GetFilename() + "'";
-        VERBOSE(VB_RECORD,  LOC + QString("SetRingBuffer(0x%1)")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("SetRingBuffer(0x%1)")
                 .arg((uint64_t)rbuf,0,16) + msg);
     }
     ringBuffer = rbuf;
@@ -82,10 +82,10 @@ void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
 void RecorderBase::SetRecording(const ProgramInfo *pginfo)
 {
     if (pginfo)
-        VERBOSE(VB_RECORD, LOC + QString("SetRecording(0x%1) title(%2)")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("SetRecording(0x%1) title(%2)")
                 .arg((uint64_t)pginfo,0,16).arg(pginfo->GetTitle()));
     else
-        VERBOSE(VB_RECORD, LOC + "SetRecording(0x0)");
+        LOG(VB_RECORD, LOG_INFO, LOC + "SetRecording(0x0)");
 
     ProgramInfo *oldrec = curRecording;
     if (pginfo)
@@ -130,16 +130,16 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
     }
     else
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                QString("SetOption(%1,%2): Option not recognized")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("SetOption(%1,%2): Option not recognized")
                 .arg(name).arg(value));
     }
 }
 
 void RecorderBase::SetOption(const QString &name, int value)
 {
-    VERBOSE(VB_IMPORTANT, LOC_ERR +
-            QString("SetOption(): Unknown int option: %1: %2")
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        QString("SetOption(): Unknown int option: %1: %2")
             .arg(name).arg(value));
 }
 
@@ -149,8 +149,8 @@ void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
     if (setting)
         SetOption(name, setting->getValue().toInt());
     else
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
-                    "SetIntOption(...%1): Option not in profile.").arg(name));
+        LOG(VB_GENERAL, LOG_ERR, LOC + 
+            QString("SetIntOption(...%1): Option not in profile.").arg(name));
 }
 
 void RecorderBase::SetStrOption(RecordingProfile *profile, const QString &name)
@@ -159,8 +159,8 @@ void RecorderBase::SetStrOption(RecordingProfile *profile, const QString &name)
     if (setting)
         SetOption(name, setting->getValue());
     else
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
-                    "SetStrOption(...%1): Option not in profile.").arg(name));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("SetStrOption(...%1): Option not in profile.").arg(name));
 }
 
 /** \brief StopRecording() signals to the StartRecording() function that
@@ -178,8 +178,9 @@ void RecorderBase::StopRecording(void)
         recordingWait.wait(&pauseLock, 100);
         if (request_recording)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Programmer Error: StartRecording called while we were in StopRecording");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Programmer Error: StartRecording called while we were in "
+                "StopRecording");
             request_recording = false;
         }
     }
@@ -359,8 +360,8 @@ bool RecorderBase::GetKeyframePositions(
              (it.key() <= (uint64_t)end); ++it)
         map[it.key()] = *it;
 
-    VERBOSE(VB_IMPORTANT, LOC +
-            QString("GetKeyframePositions(%1,%2,#%3) out of %4")
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("GetKeyframePositions(%1,%2,#%3) out of %4")
             .arg(start).arg(end).arg(map.size()).arg(positionMap.size()));
 
     return true;
@@ -556,7 +557,8 @@ RecorderBase *RecorderBase::CreateRecorder(
     {
         QString msg = "Need %1 recorder, but compiled without %2 support!";
         msg = msg.arg(genOpt.cardtype).arg(genOpt.cardtype);
-        VERBOSE(VB_IMPORTANT, "RecorderBase::CreateRecorder() Error, " + msg);
+        LOG(VB_GENERAL, LOG_ERR,
+            "RecorderBase::CreateRecorder() Error, " + msg);
     }
 
     return recorder;

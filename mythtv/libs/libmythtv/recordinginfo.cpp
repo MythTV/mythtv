@@ -494,8 +494,8 @@ void RecordingInfo::ApplyRecordRecID(void)
 
     if (getRecordID() < 0)
     {
-        VERBOSE(VB_IMPORTANT,
-                "ProgInfo Error: ApplyRecordRecID(void) needs recordid");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ProgInfo Error: ApplyRecordRecID(void) needs recordid");
         return;
     }
 
@@ -728,8 +728,8 @@ void RecordingInfo::ApplyTranscoderProfileChange(const QString &profile) const
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "ProgramInfo: unable to query transcoder "
-                    "profile ID");
+            LOG(VB_GENERAL, LOG_ERR,
+                "ProgramInfo: unable to query transcoder profile ID");
         }
     }
 }
@@ -870,13 +870,13 @@ void RecordingInfo::StartedRecording(QString ext)
 
     if (count >= 50)
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't insert program");
+        LOG(VB_GENERAL, LOG_ERR, "Couldn't insert program");
         return;
     }
 
     pathname = dirname + "/" + pathname;
 
-    VERBOSE(VB_FILE, QString(LOC + "StartedRecording: Recording to '%1'")
+    LOG(VB_FILE, LOG_INFO, QString(LOC + "StartedRecording: Recording to '%1'")
                              .arg(pathname));
 
 
@@ -953,8 +953,8 @@ bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
     }
     else if (query.next())
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("RecordingInfo::InsertProgram(%1): ")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("RecordingInfo::InsertProgram(%1): ")
                 .arg(pg->toString()) + "recording already exists...");
     }
     else
@@ -1102,7 +1102,7 @@ void RecordingInfo::FinishedRecording(bool prematurestop)
                                         .arg(msg_subtitle)
                                         .arg(chanid);
 
-        VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details));
+        LOG(VB_GENERAL, LOG_INFO, QString("%1 %2").arg(msg).arg(details));
     }
 
     SendUpdateEvent();
@@ -1158,7 +1158,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     bool dup = (GetRecordingStatus() == rsRecorded || forcedup);
     RecStatusType rs = (GetRecordingStatus() == rsCurrentRecording &&
                         !future) ? rsPreviousRecording : GetRecordingStatus();
-    VERBOSE(VB_SCHEDULE, QString("AddHistory: %1/%2, %3, %4, %5/%6")
+    LOG(VB_SCHEDULE, LOG_INFO, QString("AddHistory: %1/%2, %3, %4, %5/%6")
             .arg(int(rs)).arg(int(oldrecstatus)).arg(future).arg(dup)
             .arg(GetScheduledStartTime().toString()).arg(GetTitle()));
     if (!future)

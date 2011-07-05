@@ -35,7 +35,7 @@ bool RemoteEncoder::Setup(void)
 {
     if (!controlSock)
     {
-        VERBOSE(VB_NETWORK|VB_EXTRA, "RemoteEncoder::Setup(): Connecting...");
+        LOG(VB_NETWORK, LOG_DEBUG, "RemoteEncoder::Setup(): Connecting...");
 
         QString ann = QString("ANN Playback %1 %2")
             .arg(gCoreContext->GetHostName()).arg(false);
@@ -45,18 +45,17 @@ bool RemoteEncoder::Setup(void)
 
         if (controlSock)
         {
-            VERBOSE(VB_NETWORK|VB_EXTRA, "RemoteEncoder::Setup(): Connected");
+            LOG(VB_NETWORK, LOG_DEBUG, "RemoteEncoder::Setup(): Connected");
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    "RemoteEncoder::Setup(): Failed to connect to backend");
+            LOG(VB_GENERAL, LOG_ERR,
+                "RemoteEncoder::Setup(): Failed to connect to backend");
         }
     }
     else
     {
-        VERBOSE(VB_NETWORK|VB_EXTRA,
-                "RemoteEncoder::Setup(): Already connected");
+        LOG(VB_NETWORK, LOG_DEBUG, "RemoteEncoder::Setup(): Already connected");
     }
     return controlSock;
 }
@@ -82,34 +81,32 @@ bool RemoteEncoder::SendReceiveStringList(
 
     if (!controlSock)
     {
-        VERBOSE(VB_IMPORTANT,
-                "RemoteEncoder::SendReceiveStringList(): "
-                "Failed to reconnect with backend.");
+        LOG(VB_GENERAL, LOG_ERR, "RemoteEncoder::SendReceiveStringList(): "
+                                 "Failed to reconnect with backend.");
         backendError = true;
         return false;
     }
 
     if (!controlSock->writeStringList(strlist))
     {
-        VERBOSE(VB_IMPORTANT,
-                "RemoteEncoder::SendReceiveStringList(): "
-                "Failed to write data.");
+        LOG(VB_GENERAL, LOG_ERR, "RemoteEncoder::SendReceiveStringList(): "
+                                 "Failed to write data.");
         backendError = true;
     }
 
     if (!backendError &&
         !controlSock->readStringList(strlist, MythSocket::kShortTimeout))
     {
-        VERBOSE(VB_IMPORTANT,
-                "RemoteEncoder::SendReceiveStringList(): No response.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "RemoteEncoder::SendReceiveStringList(): No response.");
         backendError = true;
     }
 
     if (!backendError &&
         min_reply_length && ((uint)strlist.size() < min_reply_length))
     {
-        VERBOSE(VB_IMPORTANT,
-                "RemoteEncoder::SendReceiveStringList(): Response too short");
+        LOG(VB_GENERAL, LOG_ERR,
+            "RemoteEncoder::SendReceiveStringList(): Response too short");
         backendError = true;
     }
 
@@ -179,15 +176,15 @@ float RemoteEncoder::GetFrameRate(void)
 
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("GetFrameRate() failed to parse response '%1'")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("GetFrameRate() failed to parse response '%1'")
                     .arg(strlist[0]));
         }
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("GetFrameRate(): SendReceiveStringList() failed"));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "GetFrameRate(): SendReceiveStringList() failed");
     }
 
     return (ok) ? retval : 30.0f;
@@ -207,7 +204,7 @@ long long RemoteEncoder::GetFramesWritten(void)
 
     if (!SendReceiveStringList(strlist, 1))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetFramesWritten() -- network error");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GetFramesWritten() -- network error");
         return -1;
     }
 
@@ -504,11 +501,11 @@ uint RemoteEncoder::GetSignalLockTimeout(QString input)
              SignalMonitor::IsRequired(query.value(1).toString()))
         timeout = max(query.value(0).toInt(), 500);
 
-/*
-    VERBOSE(VB_PLAYBACK, "RemoteEncoder: " +
-            QString("GetSignalLockTimeout(%1): Set lock timeout to %2 ms")
+#if 0
+    LOG(VB_PLAYBACK, LOG_DEBUG, "RemoteEncoder: " +
+        QString("GetSignalLockTimeout(%1): Set lock timeout to %2 ms")
             .arg(cardid).arg(timeout));
-*/
+#endif
     cachedTimeout[input] = timeout;
     return timeout;
 }

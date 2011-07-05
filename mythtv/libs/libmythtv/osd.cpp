@@ -59,7 +59,7 @@ bool ChannelEditor::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'ChannelEditor'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'ChannelEditor'");
         return false;
     }
 
@@ -185,13 +185,14 @@ bool OSD::Init(const QRect &rect, float font_aspect)
 
     if (!m_Children.size())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to load any windows."));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load any windows.");
         return false;
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Loaded OSD: size %1x%2 offset %3+%4")
-                         .arg(m_Rect.width()).arg(m_Rect.height())
-                         .arg(m_Rect.left()).arg(m_Rect.top()));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Loaded OSD: size %1x%2 offset %3+%4")
+            .arg(m_Rect.width()).arg(m_Rect.height())
+            .arg(m_Rect.left()).arg(m_Rect.top()));
     HideAll(false);
     return true;
 }
@@ -224,12 +225,13 @@ void OSD::OverrideUIScale(void)
                                                  height, m_SavedHMult);
     QSize theme_size = MythUIHelper::getMythUI()->GetBaseSize();
     m_SavedUIRect = uirect;
-    VERBOSE(VB_GENERAL, LOC + QString("Base theme size: %1x%2")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Base theme size: %1x%2")
                .arg(theme_size.width()).arg(theme_size.height()));
     float tmp_wmult = (float)m_Rect.size().width() / (float)theme_size.width();
-    float tmp_hmult = (float)m_Rect.size().height() / (float)theme_size.height();
-    VERBOSE(VB_IMPORTANT, LOC + QString("Scaling factors: %1x%2")
-                                .arg(tmp_wmult).arg(tmp_hmult));
+    float tmp_hmult = (float)m_Rect.size().height() /
+                      (float)theme_size.height();
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Scaling factors: %1x%2")
+               .arg(tmp_wmult).arg(tmp_hmult));
     m_UIScaleOverride = true;
     GetMythMainWindow()->SetScalingFactors(tmp_wmult, tmp_hmult);
     GetMythMainWindow()->SetUIScreenRect(m_Rect);
@@ -257,7 +259,7 @@ bool OSD::Reinit(const QRect &rect, float font_aspect)
     TearDown();
     if (!Init(rect, font_aspect))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to re-init OSD."));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to re-init OSD."));
         return false;
     }
     return true;
@@ -306,13 +308,14 @@ void OSD::LoadWindows(void)
             if (win->Create())
             {
                 PositionWindow(win);
-                VERBOSE(VB_PLAYBACK, LOC + QString("Loaded window %1").arg(window));
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    QString("Loaded window %1").arg(window));
                 m_Children.insert(window, win);
             }
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to load window %1")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to load window %1")
                 .arg(window));
             delete win;
         }
@@ -512,7 +515,7 @@ void OSD::SetRegions(const QString &window, frm_dir_map_t &map,
 
         if (error)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "deleteMap discontinuity");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "deleteMap discontinuity");
             start = -1;
             end   = -1;
         }
@@ -809,12 +812,13 @@ MythScreenType *OSD::GetWindow(const QString &window)
         if (new_window->Create())
         {
             m_Children.insert(window, new_window);
-            VERBOSE(VB_PLAYBACK, LOC + QString("Created window %1").arg(window));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Created window %1").arg(window));
             return new_window;
         }
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to create window %1")
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create window %1")
             .arg(window));
     delete new_window;
     return NULL;
@@ -1007,7 +1011,7 @@ TeletextScreen* OSD::InitTeletext(void)
             if (tt->Create())
             {
                 m_Children.insert(OSD_WIN_TELETEXT, tt);
-                VERBOSE(VB_PLAYBACK, LOC + QString("Created window %1")
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created window %1")
                     .arg(OSD_WIN_TELETEXT));
             }
             else
@@ -1020,7 +1024,7 @@ TeletextScreen* OSD::InitTeletext(void)
     }
     if (!tt)
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString("Failed to create Teletext window"));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Teletext window");
         return NULL;
     }
 
@@ -1040,11 +1044,11 @@ void OSD::EnableTeletext(bool enable, int page)
     if (enable)
     {
         tt->SetPage(page, -1);
-        VERBOSE(VB_PLAYBACK, LOC + QString("Enabled teletext page %1")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Enabled teletext page %1")
                                    .arg(page));
     }
     else
-        VERBOSE(VB_PLAYBACK, LOC + "Disabled teletext");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled teletext");
 }
 
 bool OSD::TeletextAction(const QString &action)
@@ -1085,7 +1089,7 @@ SubtitleScreen* OSD::InitSubtitles(void)
             if (sub->Create())
             {
                 m_Children.insert(OSD_WIN_SUBTITLE, sub);
-                VERBOSE(VB_PLAYBACK, LOC + QString("Created window %1")
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created window %1")
                     .arg(OSD_WIN_SUBTITLE));
             }
             else
@@ -1098,7 +1102,7 @@ SubtitleScreen* OSD::InitSubtitles(void)
     }
     if (!sub)
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString("Failed to create subtitle window"));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create subtitle window");
         return NULL;
     }
     return sub;
