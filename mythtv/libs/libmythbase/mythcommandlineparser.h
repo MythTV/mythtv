@@ -149,6 +149,7 @@ class MBASE_PUBLIC MythCommandLineParser
     int                     Daemonize(void);
 
   protected:
+    void allowArgs(bool allow=true) { m_allowArgs = allow; }
     void allowExtras(bool allow=true) { m_allowExtras = allow; }
     void allowPassthrough(bool allow=true) { m_allowPassthrough = allow; }
 
@@ -174,6 +175,7 @@ class MBASE_PUBLIC MythCommandLineParser
     QMap<QString,QVariant>          m_defaults;
     QMap<QString,CommandLineArg>    m_registeredArgs;
     bool                            m_allowExtras;
+    bool                            m_allowArgs;
     QStringList                     m_remainingArgs;
     bool                            m_allowPassthrough;
     bool                            m_passthroughActive;

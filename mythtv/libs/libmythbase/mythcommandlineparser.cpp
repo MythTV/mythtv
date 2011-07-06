@@ -71,8 +71,9 @@ typedef struct helptmp {
 } HelpTmp;
 
 MythCommandLineParser::MythCommandLineParser(QString appname) :
-    m_appname(appname), m_allowExtras(false), m_allowPassthrough(false), 
-    m_passthroughActive(false), m_overridesImported(false), m_verbose(false)
+    m_appname(appname), m_allowExtras(false), m_allowArgs(false),
+    m_allowPassthrough(false), m_passthroughActive(false),
+    m_overridesImported(false), m_verbose(false)
 {
     char *verbose = getenv("VERBOSE_PARSER");
     if (verbose != NULL)
@@ -383,6 +384,15 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         }
         else if (res == kArg)
         {
+            if (!m_allowArgs)
+            {
+                cerr << "Received '"
+                     << val.toAscii().constData()
+                     << "' but unassociated arguments have not been enabled"
+                     << endl;
+                return false;        
+            }
+
             m_remainingArgs << val;
             continue;
         }
