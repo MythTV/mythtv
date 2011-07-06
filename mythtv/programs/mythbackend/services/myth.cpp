@@ -603,14 +603,17 @@ bool Myth::SendMessage( const QString &sMessage,
 
     if (sock->writeDatagram(utf8.constData(), size, address, port) < 0)
     {
-        VERBOSE(VB_GENERAL, QString("Failed to send UDP/XML packet (Message: %1 "
-                                      "Address: %2 Port: %3").arg(sMessage).arg(sAddress).arg(port));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Failed to send UDP/XML packet (Message: %1 "
+                    "Address: %2 Port: %3")
+                .arg(sMessage).arg(sAddress).arg(port));
     }
     else
     {
-        VERBOSE(VB_GENERAL, QString("UDP/XML packet sent! (Message: %1 Address: %2 "
-                                      "Port: %3").arg(sMessage)
-                                      .arg(address.toString().toLocal8Bit().constData()).arg(port));
+        LOG(VB_GENERAL, LOG_DEBUG, 
+            QString("UDP/XML packet sent! (Message: %1 Address: %2 Port: %3")
+                .arg(sMessage)
+                .arg(address.toString().toLocal8Bit().constData()).arg(port));
         bResult = true;
     }
 
@@ -631,18 +634,18 @@ bool Myth::BackupDatabase(void)
     MythDBBackupStatus status = kDB_Backup_Unknown;
     QString filename;
 
-    VERBOSE(VB_GENERAL, QString("Performing API invoked DB Backup."));
+    LOG(VB_GENERAL, LOG_NOTICE, "Performing API invoked DB Backup.");
 
     if (dbutil)
         status = dbutil->BackupDB(filename);
 
     if (status == kDB_Backup_Completed)
     {
-        VERBOSE(VB_GENERAL, QString("Database backup succeeded."));
+        LOG(VB_GENERAL, LOG_NOTICE, "Database backup succeeded.");
         bResult = true;
     }
     else
-        VERBOSE(VB_GENERAL, QString("Database backup failed."));
+        LOG(VB_GENERAL, LOG_ERR, "Database backup failed.");
 
     delete dbutil;
 
@@ -659,15 +662,15 @@ bool Myth::CheckDatabase( bool repair )
 
     DBUtil *dbutil = new DBUtil();
 
-    VERBOSE(VB_GENERAL, QString("Performing API invoked DB Check."));
+    LOG(VB_GENERAL, LOG_NOTICE, "Performing API invoked DB Check.");
 
     if (dbutil)
         bResult = dbutil->CheckTables(repair);
 
     if (bResult)
-        VERBOSE(VB_GENERAL, QString("Database check complete."));
+        LOG(VB_GENERAL, LOG_NOTICE, "Database check complete.");
     else
-        VERBOSE(VB_GENERAL, QString("Database check failed."));
+        LOG(VB_GENERAL, LOG_ERR, "Database check failed.");
 
     delete dbutil;
 
@@ -685,11 +688,11 @@ bool Myth::ProfileSubmit()
     HardwareProfile *profile = new HardwareProfile();
     if (profile)
     {
-        VERBOSE(VB_GENERAL, QString("Profile Submission..."));
+        LOG(VB_GENERAL, LOG_NOTICE, "Profile Submission...");
         profile->GenerateUUIDs();
         bResult = profile->SubmitProfile();
         if (bResult)
-            VERBOSE(VB_GENERAL, QString("Profile Submitted."));
+            LOG(VB_GENERAL, LOG_NOTICE, "Profile Submitted.");
     }
     delete profile;
 
@@ -707,11 +710,11 @@ bool Myth::ProfileDelete()
     HardwareProfile *profile = new HardwareProfile();
     if (profile)
     {
-        VERBOSE(VB_GENERAL, QString("Profile Deletion..."));
+        LOG(VB_GENERAL, LOG_NOTICE, "Profile Deletion...");
         profile->GenerateUUIDs();
         bResult = profile->DeleteProfile();
         if (bResult)
-            VERBOSE(VB_GENERAL, QString("Profile Deleted."));
+            LOG(VB_GENERAL, LOG_NOTICE, "Profile Deleted.");
     }
     delete profile;
 
@@ -731,7 +734,7 @@ QString Myth::ProfileURL()
     {
         profile->GenerateUUIDs();
         sProfileURL = profile->GetProfileURL();
-        VERBOSE(VB_GENERAL, QString("ProfileURL: %1").arg(sProfileURL));
+        LOG(VB_GENERAL, LOG_NOTICE, QString("ProfileURL: %1").arg(sProfileURL));
     }
     delete profile;
 

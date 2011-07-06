@@ -188,7 +188,8 @@ bool UPnpCDSMusic::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     {
         pRequest->m_sObjectId = "Music";
 
-        VERBOSE( VB_UPNP, "UPnpCDSMusic::IsBrowseRequestForUs - Yes, ContainerId == 7" );
+        LOG(VB_UPNP, LOG_INFO,
+            "UPnpCDSMusic::IsBrowseRequestForUs - Yes, ContainerId == 7");
 
         return true;
     }
@@ -197,7 +198,8 @@ bool UPnpCDSMusic::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
         (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
-    VERBOSE( VB_UPNP, "UPnpCDSMusic::IsBrowseRequestForUs - Not sure... Calling base class." );
+    LOG(VB_UPNP, LOG_INFO,
+        "UPnpCDSMusic::IsBrowseRequestForUs - Not sure... Calling base class.");
 
     return UPnpCDSExtension::IsBrowseRequestForUs( pRequest );
 }
@@ -221,7 +223,7 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         pRequest->m_sSearchCriteria = "object.container.album.musicAlbum";
         pRequest->m_sSearchList.append( pRequest->m_sSearchCriteria );
 
-        VERBOSE( VB_UPNP, "UPnpCDSMusic::IsSearchRequestForUs... Yes." );
+        LOG(VB_UPNP, LOG_INFO, "UPnpCDSMusic::IsSearchRequestForUs... Yes.");
 
         return true;
     }
@@ -232,7 +234,7 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         pRequest->m_sSearchCriteria = "object.item.audioItem.musicTrack";
         pRequest->m_sSearchList.append( pRequest->m_sSearchCriteria );
 
-        VERBOSE( VB_UPNP, "UPnpCDSMusic::IsSearchRequestForUs... Yes." );
+        LOG(VB_UPNP, LOG_INFO, "UPnpCDSMusic::IsSearchRequestForUs... Yes.");
 
         return true;
     }
@@ -241,7 +243,8 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
-    VERBOSE( VB_UPNP, "UPnpCDSMusic::IsSearchRequestForUs... Don't know, calling base class." );
+    LOG(VB_UPNP, LOG_INFO,
+        "UPnpCDSMusic::IsSearchRequestForUs.. Don't know, calling base class.");
 
     return UPnpCDSExtension::IsSearchRequestForUs( pRequest );
 }

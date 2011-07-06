@@ -104,8 +104,15 @@ int main(int argc, char **argv)
     signal(SIGTERM, qt_exit);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
+    if (!gContext->Init(false))
+    {
+        LOG(VB_GENERAL, LOG_CRIT, "Failed to init MythContext.");
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
+    }
 
     setHttpProxy();
+
+    cmdline.ApplySettingsOverride();
 
     if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
         cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
@@ -113,25 +120,12 @@ int main(int argc, char **argv)
         cmdline.toBool("scanvideos")    || cmdline.toBool("clearcache") ||
         cmdline.toBool("printexpire"))
     {
-        if (!setup_context(cmdline))
-            return GENERIC_EXIT_NO_MYTHCONTEXT;
+        gCoreContext->SetBackend(false);
         return handle_command(cmdline);
     }
 
-#if 0
-    /////////////////////////////////////////////////////////////////////////
-    // Not sure we want to keep running the backend when there is an error.
-    // Currently, it keeps repeating the same error over and over.
-    // Removing loop until reason for having it is understood.
-    //
-    while (true)
-    {
-#endif
-        retval = run_backend(cmdline);
-#if 0
-    }
-#endif
-
+    gCoreContext->SetBackend(true);
+    retval = run_backend(cmdline);
     return retval;
 }
 

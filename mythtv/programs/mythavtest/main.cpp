@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     {
         QString msg = QString("Fatal Error: Couldn't find theme '%1'.")
             .arg(themename);
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return GENERIC_EXIT_NO_THEME;
     }
 
@@ -96,8 +96,8 @@ int main(int argc, char *argv[])
     QString auddevice = gCoreContext->GetSetting("AudioOutputDevice");
     if (auddevice.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "Fatal Error: Audio not configured, you need "
-                "to run 'mythfrontend', not 'mythtv'.");
+        LOG(VB_GENERAL, LOG_ERR, "Fatal Error: Audio not configured, you need "
+                                 "to run 'mythfrontend', not 'mythtv'.");
         return GENERIC_EXIT_SETUP_ERROR;
     }
 #endif
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 
     if (!UpgradeTVDatabaseSchema(false))
     {
-        VERBOSE(VB_IMPORTANT, "Fatal Error: Incorrect database schema.");
+        LOG(VB_GENERAL, LOG_ERR, "Fatal Error: Incorrect database schema.");
         delete gContext;
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     TV *tv = new TV();
     if (!tv->Init())
     {
-        VERBOSE(VB_IMPORTANT, "Fatal Error: Could not initialize TV class.");
+        LOG(VB_GENERAL, LOG_ERR, "Fatal Error: Could not initialize TV class.");
         return GENERIC_EXIT_NOT_OK;
     }
 

@@ -123,8 +123,8 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */,
     }
     catch( ... )
     {
-        VERBOSE(VB_GENERAL, "HttpStatus::ProcessRequest() - Unexpected "
-                            "Exception");
+        LOG(VB_GENERAL, LOG_ERR,
+            "HttpStatus::ProcessRequest() - Unexpected Exception");
     }
 
     return( false );
@@ -540,9 +540,12 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                                                      Qt::ISODate);
     }
 
-    guide.setAttribute("start", gCoreContext->GetSetting("mythfilldatabaseLastRunStart"));
-    guide.setAttribute("end", gCoreContext->GetSetting("mythfilldatabaseLastRunEnd"));
-    guide.setAttribute("status", gCoreContext->GetSetting("mythfilldatabaseLastRunStatus"));
+    guide.setAttribute("start",
+        gCoreContext->GetSetting("mythfilldatabaseLastRunStart"));
+    guide.setAttribute("end",
+        gCoreContext->GetSetting("mythfilldatabaseLastRunEnd"));
+    guide.setAttribute("status",
+        gCoreContext->GetSetting("mythfilldatabaseLastRunStatus"));
     if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 0))
     {
         guide.setAttribute("next",
@@ -551,11 +554,13 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     if (!GuideDataThrough.isNull())
     {
-        guide.setAttribute("guideThru", QDateTime(GuideDataThrough).toString(Qt::ISODate));
+        guide.setAttribute("guideThru",
+            QDateTime(GuideDataThrough).toString(Qt::ISODate));
         guide.setAttribute("guideDays", qdtNow.daysTo(GuideDataThrough));
     }
 
-    QDomText dataDirectMessage = pDoc->createTextNode(gCoreContext->GetSetting("DataDirectMessage"));
+    QDomText dataDirectMessage =
+        pDoc->createTextNode(gCoreContext->GetSetting("DataDirectMessage"));
     guide.appendChild(dataDirectMessage);
 
     // Add Miscellaneous information
@@ -571,8 +576,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         ms.Run(10);
         if (ms.Wait() != GENERIC_EXIT_OK)
         {
-            VERBOSE(VB_IMPORTANT, QString("Error running miscellaneous "
-                    "status information script: %1").arg(info_script));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Error running miscellaneous "
+                        "status information script: %1").arg(info_script));
             return;
         }
     

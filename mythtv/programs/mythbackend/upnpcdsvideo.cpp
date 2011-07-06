@@ -118,7 +118,8 @@ bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     {
         pRequest->m_sObjectId = "Videos/0";
 
-        VERBOSE( VB_UPNP, "UPnpCDSVideo::IsBrowseRequestForUs - Yes ContainerID == 15" );
+        LOG(VB_UPNP, LOG_INFO,
+            "UPnpCDSVideo::IsBrowseRequestForUs - Yes ContainerID == 15");
         return true;
     }
 
@@ -141,11 +142,13 @@ bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     {
         pRequest->m_sObjectId = "Videos/0";
 
-        VERBOSE( VB_UPNP, "UPnpCDSVideo::IsBrowseRequestForUs - Yes ContainerID == 13" );
+        LOG(VB_UPNP, LOG_INFO,
+            "UPnpCDSVideo::IsBrowseRequestForUs - Yes ContainerID == 13");
         return true;
     }
 
-    VERBOSE( VB_UPNP, "UPnpCDSVideo::IsBrowseRequestForUs - Not sure... Calling base class." );
+    LOG(VB_UPNP, LOG_INFO,
+        "UPnpCDSVideo::IsBrowseRequestForUs - Not sure... Calling base class.");
 
     return UPnpCDSExtension::IsBrowseRequestForUs( pRequest );
 }
@@ -171,7 +174,7 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     {
         pRequest->m_sObjectId = "Videos/0";
 
-        VERBOSE( VB_UPNP, "UPnpCDSVideo::IsSearchRequestForUs... Yes." );
+        LOG(VB_UPNP, LOG_INFO, "UPnpCDSVideo::IsSearchRequestForUs... Yes.");
 
         return true;
     }

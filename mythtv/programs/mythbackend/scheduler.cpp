@@ -161,7 +161,7 @@ bool Scheduler::VerifyCards(void)
     uint numcards = query.value(0).toUInt();
     if (!numcards)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
                 "No capture cards are defined in the database.\n\t\t\t"
                 "Perhaps you should re-read the installation instructions?");
         error = GENERIC_EXIT_SETUP_ERROR;
@@ -194,9 +194,9 @@ bool Scheduler::VerifyCards(void)
         }
         else if (!subquery.next())
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    QString("Listings source '%1' is defined, "
-                            "but is not attached to a card input.")
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("Listings source '%1' is defined, "
+                        "but is not attached to a card input.")
                     .arg(query.value(1).toString()));
         }
         else
@@ -207,8 +207,8 @@ bool Scheduler::VerifyCards(void)
 
     if (!numsources)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "No channel sources defined in the database");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "No channel sources defined in the database");
         error = GENERIC_EXIT_SETUP_ERROR;
         return false;
     }
@@ -349,42 +349,42 @@ bool Scheduler::FillRecordList(void)
     schedMoveHigher = (bool)gCoreContext->GetNumSetting("SchedMoveHigher");
     schedTime = QDateTime::currentDateTime();
 
-    VERBOSE(VB_SCHEDULE, "BuildWorkList...");
+    LOG(VB_SCHEDULE, LOG_INFO, "BuildWorkList...");
     BuildWorkList();
 
     schedLock.unlock();
 
-    VERBOSE(VB_SCHEDULE, "AddNewRecords...");
+    LOG(VB_SCHEDULE, LOG_INFO, "AddNewRecords...");
     AddNewRecords();
-    VERBOSE(VB_SCHEDULE, "AddNotListed...");
+    LOG(VB_SCHEDULE, LOG_INFO, "AddNotListed...");
     AddNotListed();
 
-    VERBOSE(VB_SCHEDULE, "Sort by time...");
+    LOG(VB_SCHEDULE, LOG_INFO, "Sort by time...");
     SORT_RECLIST(worklist, comp_overlap);
-    VERBOSE(VB_SCHEDULE, "PruneOverlaps...");
+    LOG(VB_SCHEDULE, LOG_INFO, "PruneOverlaps...");
     PruneOverlaps();
 
-    VERBOSE(VB_SCHEDULE, "Sort by priority...");
+    LOG(VB_SCHEDULE, LOG_INFO, "Sort by priority...");
     SORT_RECLIST(worklist, comp_priority);
-    VERBOSE(VB_SCHEDULE, "BuildListMaps...");
+    LOG(VB_SCHEDULE, LOG_INFO, "BuildListMaps...");
     BuildListMaps();
-    VERBOSE(VB_SCHEDULE, "SchedNewRecords...");
+    LOG(VB_SCHEDULE, LOG_INFO, "SchedNewRecords...");
     SchedNewRecords();
-    VERBOSE(VB_SCHEDULE, "SchedPreserveLiveTV...");
+    LOG(VB_SCHEDULE, LOG_INFO, "SchedPreserveLiveTV...");
     SchedPreserveLiveTV();
-    VERBOSE(VB_SCHEDULE, "ClearListMaps...");
+    LOG(VB_SCHEDULE, LOG_INFO, "ClearListMaps...");
     ClearListMaps();
 
     schedLock.lock();
 
-    VERBOSE(VB_SCHEDULE, "Sort by time...");
+    LOG(VB_SCHEDULE, LOG_INFO, "Sort by time...");
     SORT_RECLIST(worklist, comp_redundant);
-    VERBOSE(VB_SCHEDULE, "PruneRedundants...");
+    LOG(VB_SCHEDULE, LOG_INFO, "PruneRedundants...");
     PruneRedundants();
 
-    VERBOSE(VB_SCHEDULE, "Sort by time...");
+    LOG(VB_SCHEDULE, LOG_INFO, "Sort by time...");
     SORT_RECLIST(worklist, comp_recstart);
-    VERBOSE(VB_SCHEDULE, "ClearWorkList...");
+    LOG(VB_SCHEDULE, LOG_INFO, "ClearWorkList...");
     bool res = ClearWorkList();
 
     return res;
@@ -454,7 +454,7 @@ void Scheduler::FillRecordListFromDB(int recordid)
     msg.sprintf("Speculative scheduled %d items in "
                 "%.1f = %.2f match + %.2f place", (int)reclist.size(),
                 matchTime + placeTime, matchTime, placeTime);
-    VERBOSE(VB_GENERAL, msg);
+    LOG(VB_GENERAL, LOG_INFO, msg);
 }
 
 void Scheduler::FillRecordListFromMaster(void)
@@ -472,14 +472,14 @@ void Scheduler::FillRecordListFromMaster(void)
 
 void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
 {
-    if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE))
+    if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE) || logLevel < LOG_INFO)
         return;
 
     QDateTime now = QDateTime::currentDateTime();
 
-    VERBOSE(VB_SCHEDULE, "--- print list start ---");
-    VERBOSE(VB_SCHEDULE, "Title - Subtitle                    Ch Station "
-                         "Day Start  End   S C I  T N Pri");
+    LOG(VB_SCHEDULE, LOG_INFO, "--- print list start ---");
+    LOG(VB_SCHEDULE, LOG_INFO, "Title - Subtitle                    Ch Station "
+                               "Day Start  End   S C I  T N Pri");
 
     RecIter i = list.begin();
     for ( ; i != list.end(); ++i)
@@ -495,12 +495,12 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
         PrintRec(first);
     }
 
-    VERBOSE(VB_SCHEDULE, "---  print list end  ---");
+    LOG(VB_SCHEDULE, LOG_INFO, "---  print list end  ---");
 }
 
 void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
 {
-    if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE))
+    if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE) || logLevel < LOG_INFO)
         return;
 
     QString outstr;
@@ -528,7 +528,7 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
     if (p->GetRecordingPriority2())
         outstr += QString("/%1").arg(p->GetRecordingPriority2());
 
-    VERBOSE(VB_SCHEDULE, outstr);
+    LOG(VB_SCHEDULE, LOG_INFO, outstr);
 }
 
 void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
@@ -543,7 +543,7 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
         {
             if (p->GetRecordingStatus() != pginfo->GetRecordingStatus())
             {
-                VERBOSE(VB_IMPORTANT,
+                LOG(VB_GENERAL, LOG_INFO,
                     QString("Updating status for %1 on cardid %2 (%3 => %4)")
                         .arg(p->toString(ProgramInfo::kTitleSubtitle))
                         .arg(p->GetCardID())
@@ -593,7 +593,7 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
 
             if (p->GetRecordingStatus() != recstatus)
             {
-                VERBOSE(VB_IMPORTANT,
+                LOG(VB_GENERAL, LOG_INFO,
                     QString("Updating status for %1 on cardid %2 (%3 => %4)")
                         .arg(p->toString(ProgramInfo::kTitleSubtitle))
                         .arg(p->GetCardID())
@@ -656,8 +656,8 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
     RecStatusType rs = tv->StartRecording(oldp);
     if (rs != rsRecording)
     {
-        VERBOSE(VB_IMPORTANT, QString(
-                    "Failed to change end time on card %1 to %2")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Failed to change end time on card %1 to %2")
                 .arg(oldp->GetCardID())
                 .arg(newp->GetRecordingEndTime(ISODate)));
         oldp->SetRecordingRuleType(oldrectype);
@@ -707,7 +707,8 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
                     rp->SetRecordingStatus(sp->GetRecordingStatus());
                     reclist_changed = true;
                     rp->AddHistory(false);
-                    VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as %4")
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("setting %1/%2/\"%3\" as %4")
                             .arg(sp->GetCardID())
                             .arg(sp->GetChannelSchedulingID())
                             .arg(sp->GetTitle())
@@ -715,8 +716,8 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT, QString("%1/%2/\"%3\" is already "
-                                                  "recording on card %4")
+                    LOG(VB_GENERAL, LOG_NOTICE,
+                        QString("%1/%2/\"%3\" is already recording on card %4")
                             .arg(sp->GetCardID())
                             .arg(sp->GetChannelSchedulingID())
                             .arg(sp->GetTitle())
@@ -730,7 +731,8 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
                 rp->SetRecordingStatus(rsAborted);
                 reclist_changed = true;
                 rp->AddHistory(false);
-                VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as aborted")
+                LOG(VB_GENERAL, LOG_INFO, 
+                    QString("setting %1/%2/\"%3\" as aborted")
                         .arg(rp->GetCardID())
                         .arg(rp->GetChannelSchedulingID())
                         .arg(rp->GetTitle()));
@@ -742,7 +744,8 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
             reclist.push_back(new RecordingInfo(*sp));
             reclist_changed = true;
             sp->AddHistory(false);
-            VERBOSE(VB_IMPORTANT, QString("adding %1/%2/\"%3\" as recording")
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("adding %1/%2/\"%3\" as recording")
                     .arg(sp->GetCardID())
                     .arg(sp->GetChannelSchedulingID())
                     .arg(sp->GetTitle()));
@@ -766,7 +769,7 @@ void Scheduler::SlaveDisconnected(uint cardid)
             rp->SetRecordingStatus(rsAborted);
             reclist_changed = true;
             rp->AddHistory(false);
-            VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as aborted")
+            LOG(VB_GENERAL, LOG_INFO, QString("setting %1/%2/\"%3\" as aborted")
                     .arg(rp->GetCardID()).arg(rp->GetChannelSchedulingID())
                     .arg(rp->GetTitle()));
         }
@@ -952,10 +955,10 @@ bool Scheduler::FindNextConflict(
 
         if (debugConflicts)
         {
-            VERBOSE(VB_SCHEDULE, msg);
-            VERBOSE(VB_SCHEDULE, QString("  cardid's: %1, %2 "
-                                         "Shared input group: %3 "
-                                         "mplexid's: %4, %5")
+            LOG(VB_SCHEDULE, LOG_INFO, msg);
+            LOG(VB_SCHEDULE, LOG_INFO, 
+                QString("  cardid's: %1, %2 Shared input group: %3 "
+                        "mplexid's: %4, %5")
                      .arg(p->GetCardID()).arg(q->GetCardID())
                      .arg(igrp.GetSharedInputGroup(
                               p->GetInputID(), q->GetInputID()))
@@ -973,13 +976,13 @@ bool Scheduler::FindNextConflict(
         }
 
         if (debugConflicts)
-            VERBOSE(VB_SCHEDULE, "Found conflict");
+            LOG(VB_SCHEDULE, LOG_INFO, "Found conflict");
 
         return true;
     }
 
     if (debugConflicts)
-        VERBOSE(VB_SCHEDULE, "No conflict");
+        LOG(VB_SCHEDULE, LOG_INFO, "No conflict");
 
     return false;
 }
@@ -993,9 +996,9 @@ const RecordingInfo *Scheduler::FindConflict(
     for (; it != reclists.end(); ++it)
     {
         if (debugConflicts)
-            VERBOSE(VB_SCHEDULE, QString("Checking '%1' for conflicts on "
-                                         "cardid %2")
-                .arg(p->GetTitle()).arg(it.key()));
+            LOG(VB_SCHEDULE, LOG_INFO,
+                QString("Checking '%1' for conflicts on cardid %2")
+                    .arg(p->GetTitle()).arg(it.key()));
 
         const RecList &cardlist = *it;
         RecConstIter k = cardlist.begin();
@@ -1191,8 +1194,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
                 "to avoid LiveTV conflict")
                 .arg(p->GetTitle()).arg(p->GetChanID())
                 .arg(p->GetCardID()).arg(q->GetCardID());
-            QByteArray amsg = msg.toLocal8Bit();
-            VERBOSE(VB_SCHEDULE, amsg.constData());
+            LOG(VB_SCHEDULE, LOG_INFO, msg);
         }
 
         q->SetRecordingStatus(rsWillRecord);
@@ -1208,19 +1210,28 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
 
 void Scheduler::SchedNewRecords(void)
 {
-    VERBOSE(VB_SCHEDULE, "Scheduling:");
+    LOG(VB_SCHEDULE, LOG_INFO, "Scheduling:");
 
-    if (VERBOSE_LEVEL_CHECK(VB_SCHEDULE))
+    if (VERBOSE_LEVEL_CHECK(VB_SCHEDULE) || logLevel < LOG_INFO)
     {
-        cout << "+ = schedule this showing to be recorded" << endl;
-        cout << "# = could not schedule this showing, retry later" << endl;
-        cout << "! = conflict caused by this showing" << endl;
-        cout << "/ = retry this showing, same priority pass" << endl;
-        cout << "? = retry this showing, lower priority pass" << endl;
-        cout << "> = try another showing for this program" << endl;
-        cout << "% = found another showing, same priority required" << endl;
-        cout << "$ = found another showing, lower priority allowed" << endl;
-        cout << "- = unschedule a showing in favor of another one" << endl;
+        LOG(VB_SCHEDULE, LOG_INFO,
+            "+ = schedule this showing to be recorded");
+        LOG(VB_SCHEDULE, LOG_INFO,
+            "# = could not schedule this showing, retry later");
+        LOG(VB_SCHEDULE, LOG_INFO,
+            "! = conflict caused by this showing");
+        LOG(VB_SCHEDULE, LOG_INFO,
+            "/ = retry this showing, same priority pass");
+        LOG(VB_SCHEDULE, LOG_INFO,
+            "? = retry this showing, lower priority pass");
+        LOG(VB_SCHEDULE, LOG_INFO,
+            "> = try another showing for this program");
+        LOG(VB_SCHEDULE, LOG_INFO,
+            "% = found another showing, same priority required");
+        LOG(VB_SCHEDULE, LOG_INFO,
+            "$ = found another showing, lower priority allowed");
+        LOG(VB_SCHEDULE, LOG_INFO,
+            "- = unschedule a showing in favor of another one");
     }
 
     int openEnd = gCoreContext->GetNumSetting("SchedOpenEnd", 0);
@@ -1234,7 +1245,8 @@ void Scheduler::SchedNewRecords(void)
             MarkOtherShowings(p);
         else if (p->GetRecordingStatus() == rsUnknown)
         {
-            const RecordingInfo *conflict = FindConflict(cardlistmap, p, openEnd);
+            const RecordingInfo *conflict = FindConflict(cardlistmap, p,
+                                                         openEnd);
             if (!conflict)
             {
                 p->SetRecordingStatus(rsWillRecord);
@@ -1486,8 +1498,8 @@ void Scheduler::UpdateNextRecord(void)
             if (!subquery.exec())
                 MythDB::DBError("Update next_record", subquery);
             else
-                VERBOSE(VB_SCHEDULE, LOC +
-                        QString("Update next_record for %1").arg(recid));
+                LOG(VB_SCHEDULE, LOG_INFO, LOC +
+                    QString("Update next_record for %1").arg(recid));
         }
     }
 }
@@ -1623,8 +1635,7 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
 {
     QMutexLocker lockit(&schedLock);
 
-    VERBOSE(VB_GENERAL, LOC +
-            QString("AddRecording() recid: %1")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("AddRecording() recid: %1")
             .arg(pi.GetRecordingRuleID()));
 
     for (RecIter it = reclist.begin(); it != reclist.end(); ++it)
@@ -1633,15 +1644,15 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
         if (p->GetRecordingStatus() == rsRecording &&
             p->IsSameProgramTimeslot(pi))
         {
-            VERBOSE(VB_IMPORTANT, LOC + "Not adding recording, " +
-                    QString("'%1' is already in reclist.")
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Not adding recording, " +
+                QString("'%1' is already in reclist.")
                     .arg(pi.GetTitle()));
             return;
         }
     }
 
-    VERBOSE(VB_SCHEDULE, LOC +
-            QString("Adding '%1' to reclist.").arg(pi.GetTitle()));
+    LOG(VB_SCHEDULE, LOG_INFO, LOC +
+        QString("Adding '%1' to reclist.").arg(pi.GetTitle()));
 
     RecordingInfo * new_pi = new RecordingInfo(pi);
     reclist.push_back(new_pi);
@@ -1663,8 +1674,8 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 {
     if (!m_tvList || !rcinfo)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsBusyRecording() -> true, "
-                "no tvList or no rcinfo");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "IsBusyRecording() -> true, no tvList or no rcinfo");
 
         return true;
     }
@@ -1684,10 +1695,11 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         rctv = (*m_tvList)[cardids[i]];
         if (!rctv)
         {
-            // VERBOSE(VB_SCHEDULE,
-            //         QString(LOC_ERR + "IsBusyRecording() -> true, "
-            //         "rctv(NULL) for card %2").arg(cardids[i]));
-
+#if 0
+            LOG(VB_SCHEDULE, LOG_ERR, LOC +
+                QString("IsBusyRecording() -> true, rctv(NULL) for card %2")
+                    .arg(cardids[i]));
+#endif
             return true;
         }
 
@@ -1786,8 +1798,8 @@ void Scheduler::run(void)
         {
             int msecs = CalcTimeToNextHandleRecordingEvent(
                 curtime, startIter, reclist, prerollseconds, maxSleep);
-            VERBOSE(VB_SCHEDULE, QString(
-                        "sleeping for %1 ms (s2n: %2 sr: %3)")
+            LOG(VB_SCHEDULE, LOG_INFO,
+                QString("sleeping for %1 ms (s2n: %2 sr: %3)")
                     .arg(msecs).arg(secs_to_next).arg(schedRunTime));
             if (msecs < 100)
                 (void) ::usleep(msecs * 1000);
@@ -1800,8 +1812,8 @@ void Scheduler::run(void)
             {
                 int sched_sleep = (secs_to_next - schedRunTime - 1) * 1000;
                 sched_sleep = min(sched_sleep, maxSleep);
-                VERBOSE(VB_SCHEDULE,
-                        QString("sleeping for %1 ms (interuptable)")
+                LOG(VB_SCHEDULE, LOG_INFO,
+                    QString("sleeping for %1 ms (interuptable)")
                         .arg(sched_sleep));
                 reschedWait.wait(&schedLock, sched_sleep);
                 if (!doRun)
@@ -1989,8 +2001,7 @@ bool Scheduler::HandleReschedule(void)
     {
         int recordid = reschedQueue.dequeue();
 
-        VERBOSE(VB_GENERAL,
-                QString("Reschedule requested for id %1.")
+        LOG(VB_GENERAL, LOG_INFO, QString("Reschedule requested for id %1.")
                 .arg(recordid));
 
         if (recordid != 0)
@@ -2038,7 +2049,7 @@ bool Scheduler::HandleReschedule(void)
     }
     else
     {
-        VERBOSE(VB_GENERAL, "Reschedule interrupted, will retry");
+        LOG(VB_GENERAL, LOG_INFO, "Reschedule interrupted, will retry");
         reschedQueue.enqueue(0);
         return false;
     }
@@ -2046,15 +2057,12 @@ bool Scheduler::HandleReschedule(void)
     float placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                        (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
-    msg.sprintf("Scheduled %d items in "
-                "%.1f = %.2f match + %.2f place",
-                (int)reclist.size(),
-                matchTime + placeTime, matchTime, placeTime);
+    msg.sprintf("Scheduled %d items in %.1f = %.2f match + %.2f place",
+                (int)reclist.size(), matchTime + placeTime, matchTime,
+                placeTime);
+    LOG(VB_GENERAL, LOG_INFO, msg);
 
-    VERBOSE(VB_GENERAL, msg);
-
-    fsInfoCacheFillTime =
-        QDateTime::currentDateTime().addSecs(-1000);
+    fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
 
     // Write changed entries to oldrecorded.
     RecIter it = reclist.begin();
@@ -2110,7 +2118,7 @@ bool Scheduler::HandleRunSchedulerStartup(
          ((curtime.secsTo((*firstRunIter)->GetRecordingStartTime()) -
            prerollseconds) < (idleWaitForRecordingTime * 60))))
     {
-        VERBOSE(VB_GENERAL, LOC + "AUTO-Startup assumed");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "AUTO-Startup assumed");
         startupParam = "auto";
 
         // Since we've started automatically, don't wait for
@@ -2119,7 +2127,7 @@ bool Scheduler::HandleRunSchedulerStartup(
     }
     else
     {
-        VERBOSE(VB_GENERAL, LOC + "Seem to be woken up by USER");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Seem to be woken up by USER");
     }
 
     QString startupCommand = gCoreContext->GetSetting("startupCommand", "");
@@ -2175,8 +2183,8 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 
     if (nexttv->IsAsleep() && !nexttv->IsWaking())
     {
-        VERBOSE(VB_SCHEDULE, LOC +
-                QString("Slave Backend %1 is being awakened to record: %2")
+        LOG(VB_SCHEDULE, LOG_INFO, LOC +
+            QString("Slave Backend %1 is being awakened to record: %2")
                 .arg(nexttv->GetHostName()).arg(ri.GetTitle()));
 
         if (!WakeUpSlave(nexttv->GetHostName()))
@@ -2187,9 +2195,9 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
              (nexttv->GetSleepStatusTime().secsTo(curtime) < 300) &&
              (nexttv->GetLastWakeTime().secsTo(curtime) > 10))
     {
-        VERBOSE(VB_SCHEDULE, LOC +
-                QString("Slave Backend %1 not available yet, "
-                        "trying to wake it up again.")
+        LOG(VB_SCHEDULE, LOG_INFO, LOC +
+            QString("Slave Backend %1 not available yet, "
+                    "trying to wake it up again.")
                 .arg(nexttv->GetHostName()));
 
         if (!WakeUpSlave(nexttv->GetHostName(), false))
@@ -2199,11 +2207,11 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
              ((secsleft - prerollseconds) < 150) &&
              (nexttv->GetSleepStatusTime().secsTo(curtime) < 300))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                QString("Slave Backend %1 has NOT come "
-                        "back from sleep yet in 150 seconds. Setting "
-                        "slave status to unknown and attempting "
-                        "to reschedule around its tuners.")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Slave Backend %1 has NOT come "
+                    "back from sleep yet in 150 seconds. Setting "
+                    "slave status to unknown and attempting "
+                    "to reschedule around its tuners.")
                 .arg(nexttv->GetHostName()));
 
         QMap<int, EncoderLink*>::iterator it = m_tvList->begin();
@@ -2262,7 +2270,7 @@ bool Scheduler::HandleRecording(
     {
         QString msg = QString("Invalid cardid (%1) for %2")
             .arg(ri.GetCardID()).arg(ri.GetTitle());
-        VERBOSE(VB_GENERAL, LOC + msg);
+        LOG(VB_GENERAL, LOG_ERR, LOC + msg);
 
         ri.SetRecordingStatus(rsTunerBusy);
         ri.AddHistory(true);
@@ -2281,7 +2289,7 @@ bool Scheduler::HandleRecording(
             .arg(ri.GetChanID())
             .arg(ri.GetCardID())
             .arg(ri.GetSourceID());
-        VERBOSE(VB_GENERAL, msg);
+        LOG(VB_GENERAL, LOG_NOTICE, msg);
 
         ri.SetRecordingStatus(rsTunerBusy);
         ri.AddHistory(true);
@@ -2296,8 +2304,10 @@ bool Scheduler::HandleRecording(
         secsleft -= prerollseconds;
     }
 
-    //VERBOSE(VB_GENERAL, secsleft << " seconds until "
-    //<< ri.GetTitle());
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("%1 seconds until %2").
+            .arg(secsleft) .arg(ri.GetTitle()));
+#endif
 
     if (secsleft > 30)
         return false;
@@ -2306,20 +2316,20 @@ bool Scheduler::HandleRecording(
     {
         if (secsleft > 0)
         {
-            VERBOSE(VB_SCHEDULE,
-                    QString("WARNING: Slave Backend %1 has NOT come "
-                            "back from sleep yet.  Recording can "
-                            "not begin yet for: %2")
+            LOG(VB_SCHEDULE, LOG_WARNING,
+                QString("WARNING: Slave Backend %1 has NOT come "
+                        "back from sleep yet.  Recording can "
+                        "not begin yet for: %2")
                     .arg(nexttv->GetHostName())
                     .arg(ri.GetTitle()));
         }
         else if (nexttv->GetLastWakeTime().secsTo(curtime) > 300)
         {
-            VERBOSE(VB_SCHEDULE,
-                    QString("WARNING: Slave Backend %1 has NOT come "
-                            "back from sleep yet. Setting slave "
-                            "status to unknown and attempting "
-                            "to reschedule around its tuners.")
+            LOG(VB_SCHEDULE, LOG_WARNING,
+                QString("WARNING: Slave Backend %1 has NOT come "
+                        "back from sleep yet. Setting slave "
+                        "status to unknown and attempting "
+                        "to reschedule around its tuners.")
                     .arg(nexttv->GetHostName()));
 
             QMap<int, EncoderLink *>::Iterator enciter =
@@ -2341,15 +2351,14 @@ bool Scheduler::HandleRecording(
     if (ri.GetPathname().isEmpty())
     {
         QString recording_dir;
-        fsID = FillRecordingDir(
-            ri.GetTitle(),
-            ri.GetHostname(),
-            ri.GetStorageGroup(),
-            ri.GetRecordingStartTime(),
-            ri.GetRecordingEndTime(),
-            ri.GetCardID(),
-            recording_dir,
-            reclist);
+        fsID = FillRecordingDir(ri.GetTitle(),
+                                ri.GetHostname(),
+                                ri.GetStorageGroup(),
+                                ri.GetRecordingStartTime(),
+                                ri.GetRecordingEndTime(),
+                                ri.GetCardID(),
+                                recording_dir,
+                                reclist);
         ri.SetPathname(recording_dir);
     }
 
@@ -2419,7 +2428,7 @@ void Scheduler::HandleRecordingStatusChange(
          QString("Canceled recording (%1)")
          .arg(toString(ri.GetRecordingStatus(), ri.GetRecordingRuleType())));
 
-    VERBOSE(VB_GENERAL, QString("%1: %2").arg(msg).arg(details));
+    LOG(VB_GENERAL, LOG_INFO, QString("%1: %2").arg(msg).arg(details));
 
     if ((rsRecording == recStatus) || (rsTuning == recStatus))
     {
@@ -2446,7 +2455,7 @@ void Scheduler::HandleTuning(RecordingInfo &ri, bool &statuschanged)
     {
         QString msg = QString("Invalid cardid (%1) for %2")
             .arg(ri.GetCardID()).arg(ri.GetTitle());
-        VERBOSE(VB_GENERAL, LOC + msg);
+        LOG(VB_GENERAL, LOG_ERR, LOC + msg);
     }
     else
     {
@@ -2547,9 +2556,10 @@ void Scheduler::HandleIdleShutdown(
                         if (idleSince.addSecs(idleTimeoutSecs + 60) <
                             curtime)
                         {
-                            VERBOSE(VB_IMPORTANT, "Waited more than 60"
-                                    " seconds for shutdown to complete"
-                                    " - resetting idle time");
+                            LOG(VB_GENERAL, LOG_WARNING,
+                                "Waited more than 60"
+                                " seconds for shutdown to complete"
+                                " - resetting idle time");
                             idleSince = QDateTime();
                             m_isShuttingDown = false;
                         }
@@ -2571,17 +2581,16 @@ void Scheduler::HandleIdleShutdown(
                         msg = QString("I\'m idle now... shutdown will "
                                       "occur in %1 seconds.")
                             .arg(idleTimeoutSecs);
-                        VERBOSE(VB_IMPORTANT, msg);
+                        LOG(VB_GENERAL, LOG_CRIT, msg);
                         MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
                                      .arg(idleTimeoutSecs));
                         gCoreContext->dispatch(me);
                     }
                     else if (itime % 10 == 0)
                     {
-                        msg = QString("%1 secs left to system "
-                                      "shutdown!")
+                        msg = QString("%1 secs left to system shutdown!")
                             .arg(idleTimeoutSecs - itime);
-                        VERBOSE(VB_IDLE, msg);
+                        LOG(VB_IDLE, LOG_CRIT, msg);
                         MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
                                      .arg(idleTimeoutSecs - itime));
                         gCoreContext->dispatch(me);
@@ -2620,28 +2629,34 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
             switch(state)
             {
                 case 0:
-                    VERBOSE(VB_GENERAL, "CheckShutdownServer returned - OK to shutdown");
+                    LOG(VB_GENERAL, LOG_INFO,
+                        "CheckShutdownServer returned - OK to shutdown");
                     retval = true;
                     break;
                 case 1:
-                    VERBOSE(VB_IDLE, "CheckShutdownServer returned - Not OK to shutdown");
+                    LOG(VB_IDLE, LOG_NOTICE,
+                        "CheckShutdownServer returned - Not OK to shutdown");
                     // just reset idle'ing on retval == 1
                     idleSince = QDateTime();
                     break;
                 case 2:
-                    VERBOSE(VB_IDLE, "CheckShutdownServer returned - Not OK to shutdown, need reconnect");
+                    LOG(VB_IDLE, LOG_NOTICE,
+                        "CheckShutdownServer returned - Not OK to shutdown, "
+                        "need reconnect");
                     // reset shutdown status on retval = 2
                     // (needs a clientconnection again,
                     // before shutdown is executed)
-                    blockShutdown
-                             = gCoreContext->GetNumSetting("blockSDWUwithoutClient",
-                                                       1);
+                    blockShutdown =
+                        gCoreContext->GetNumSetting("blockSDWUwithoutClient",
+                                                    1);
                     idleSince = QDateTime();
                     break;
-                // case 3:
-                //    //disable shutdown routine generally
-                //    m_noAutoShutdown = true;
-                //    break;
+#if 0
+                case 3:
+                    //disable shutdown routine generally
+                    m_noAutoShutdown = true;
+                    break;
+#endif
                 default:
                     break;
             }
@@ -2682,7 +2697,8 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
         if (setwakeup_cmd.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, "SetWakeuptimeCommand is empty, shutdown aborted");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "SetWakeuptimeCommand is empty, shutdown aborted");
             idleSince = QDateTime();
             m_isShuttingDown = false;
             return;
@@ -2697,15 +2713,15 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
             setwakeup_cmd.replace("$time",
                                   restarttime.toString(wakeup_timeformat));
 
-        VERBOSE(VB_GENERAL, QString("Running the command to set the next "
-                                    "scheduled wakeup time :-\n\t\t\t\t\t\t") +
-                                    setwakeup_cmd);
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Running the command to set the next "
+                    "scheduled wakeup time :-\n\t\t\t\t\t\t") + setwakeup_cmd);
 
         // now run the command to set the wakeup time
         if (myth_system(setwakeup_cmd) != GENERIC_EXIT_OK)
         {
-            VERBOSE(VB_IMPORTANT, "SetWakeuptimeCommand failed, "
-                    "shutdown aborted");
+            LOG(VB_GENERAL, LOG_ERR,
+                "SetWakeuptimeCommand failed, shutdown aborted");
             idleSince = QDateTime();
             m_isShuttingDown = false;
             return;
@@ -2724,8 +2740,9 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
         // now we shut the slave backends down...
         m_mainServer->ShutSlaveBackendsDown(halt_cmd);
 
-        VERBOSE(VB_GENERAL, QString("Running the command to shutdown "
-                                    "this computer :-\n\t\t\t\t\t\t") + halt_cmd);
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Running the command to shutdown "
+                    "this computer :-\n\t\t\t\t\t\t") + halt_cmd);
 
         // and now shutdown myself
         schedLock.unlock();
@@ -2734,7 +2751,7 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
         if (res == GENERIC_EXIT_OK)
             return;
 
-        VERBOSE(VB_IMPORTANT, "ServerHaltCommand failed, shutdown aborted");
+        LOG(VB_GENERAL, LOG_ERR, "ServerHaltCommand failed, shutdown aborted");
     }
 
     // If we make it here then either the shutdown failed
@@ -2762,17 +2779,17 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     if (!someSlavesCanSleep)
         return;
 
-    VERBOSE(VB_SCHEDULE,
-            "Scheduler, Checking for slaves that can be shut down");
+    LOG(VB_SCHEDULE, LOG_INFO,
+        "Scheduler, Checking for slaves that can be shut down");
 
     int sleepThreshold =
         gCoreContext->GetNumSetting( "SleepThreshold", 60 * 45);
 
-    VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("  Getting list of slaves that "
-            "will be active in the next %1 minutes.")
-            .arg(sleepThreshold / 60));
+    LOG(VB_SCHEDULE, LOG_DEBUG,
+        QString("  Getting list of slaves that will be active in the "
+                "next %1 minutes.") .arg(sleepThreshold / 60));
 
-    VERBOSE(VB_SCHEDULE+VB_EXTRA, "Checking scheduler's reclist");
+    LOG(VB_SCHEDULE, LOG_DEBUG, "Checking scheduler's reclist");
     RecIter recIter = reclist.begin();
     QDateTime curtime = QDateTime::currentDateTime();
     QStringList SlavesInUse;
@@ -2797,19 +2814,20 @@ void Scheduler::PutInactiveSlavesToSleep(void)
                 (!SlavesInUse.contains(enc->GetHostName())))
             {
                 if (pginfo->GetRecordingStatus() == rsWillRecord)
-                    VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("    Slave %1 will "
-                            "be in use in %2 minutes").arg(enc->GetHostName())
-                            .arg(secsleft / 60));
+                    LOG(VB_SCHEDULE, LOG_DEBUG,
+                        QString("    Slave %1 will be in use in %2 minutes")
+                            .arg(enc->GetHostName()) .arg(secsleft / 60));
                 else
-                    VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("    Slave %1 is "
-                            "in use currently recording '%1'")
+                    LOG(VB_SCHEDULE, LOG_DEBUG,
+                        QString("    Slave %1 is in use currently "
+                                "recording '%1'")
                             .arg(enc->GetHostName()).arg(pginfo->GetTitle()));
                 SlavesInUse << enc->GetHostName();
             }
         }
     }
 
-    VERBOSE(VB_SCHEDULE+VB_EXTRA, "  Checking inuseprograms table:");
+    LOG(VB_SCHEDULE, LOG_DEBUG, "  Checking inuseprograms table:");
     QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT DISTINCT hostname, recusage FROM inuseprograms "
@@ -2819,15 +2837,15 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     {
         while(query.next()) {
             SlavesInUse << query.value(0).toString();
-            VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("    Slave %1 is marked as "
-                    "in use by a %2")
+            LOG(VB_SCHEDULE, LOG_DEBUG,
+                QString("    Slave %1 is marked as in use by a %2")
                     .arg(query.value(0).toString())
                     .arg(query.value(1).toString()));
         }
     }
 
-    VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("  Shutting down slaves which will "
-            "be inactive for the next %1 minutes and can be put to sleep.")
+    LOG(VB_SCHEDULE, LOG_DEBUG, QString("  Shutting down slaves which will "
+        "be inactive for the next %1 minutes and can be put to sleep.")
             .arg(sleepThreshold / 60));
 
     enciter = m_tvList->begin();
@@ -2840,17 +2858,20 @@ void Scheduler::PutInactiveSlavesToSleep(void)
             (!SlavesInUse.contains(enc->GetHostName())) &&
             (!enc->IsFallingAsleep()))
         {
-            QString sleepCommand = gCoreContext->GetSettingOnHost("SleepCommand",
-                enc->GetHostName());
-            QString wakeUpCommand = gCoreContext->GetSettingOnHost("WakeUpCommand",
-                enc->GetHostName());
+            QString sleepCommand =
+                gCoreContext->GetSettingOnHost("SleepCommand",
+                                               enc->GetHostName());
+            QString wakeUpCommand =
+                gCoreContext->GetSettingOnHost("WakeUpCommand",
+                                               enc->GetHostName());
 
             if (!sleepCommand.isEmpty() && !wakeUpCommand.isEmpty())
             {
                 QString thisHost = enc->GetHostName();
 
-                VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("    Commanding %1 to "
-                        "go to sleep.").arg(thisHost));
+                LOG(VB_SCHEDULE, LOG_DEBUG,
+                    QString("    Commanding %1 to go to sleep.")
+                        .arg(thisHost));
 
                 if (enc->GoToSleep())
                 {
@@ -2861,20 +2882,20 @@ void Scheduler::PutInactiveSlavesToSleep(void)
                         EncoderLink *slv = *slviter;
                         if (slv->GetHostName() == thisHost)
                         {
-                            VERBOSE(VB_SCHEDULE+VB_EXTRA,
-                                    QString("    Marking card %1 on slave %2 "
-                                            "as falling asleep.")
-                                            .arg(slv->GetCardID())
-                                            .arg(slv->GetHostName()));
+                            LOG(VB_SCHEDULE, LOG_DEBUG,
+                                QString("    Marking card %1 on slave %2 "
+                                        "as falling asleep.")
+                                    .arg(slv->GetCardID())
+                                    .arg(slv->GetHostName()));
                             slv->SetSleepStatus(sStatus_FallingAsleep);
                         }
                     }
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Unable to "
-                            "shutdown %1 slave backend, setting sleep "
-                            "status to undefined.").arg(thisHost));
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("Unable to shutdown %1 slave backend, setting "
+                                "sleep status to undefined.").arg(thisHost));
                     QMap<int, EncoderLink *>::Iterator slviter =
                         m_tvList->begin();
                     for (; slviter != m_tvList->end(); ++slviter)
@@ -2893,8 +2914,9 @@ bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
 {
     if (slaveHostname == gCoreContext->GetHostName())
     {
-        VERBOSE(VB_IMPORTANT, QString("Tried to Wake Up %1, but this is the "
-                "master backend and it is not asleep.")
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Tried to Wake Up %1, but this is the "
+                    "master backend and it is not asleep.")
                 .arg(slaveHostname));
         return false;
     }
@@ -2903,8 +2925,9 @@ bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
         slaveHostname);
 
     if (wakeUpCommand.isEmpty()) {
-        VERBOSE(VB_IMPORTANT, QString("Trying to Wake Up %1, but this slave "
-                "does not have a WakeUpCommand set.").arg(slaveHostname));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Trying to Wake Up %1, but this slave "
+                    "does not have a WakeUpCommand set.").arg(slaveHostname));
 
         QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
         for (; enciter != m_tvList->end(); ++enciter)
@@ -2929,7 +2952,7 @@ bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
 
     if (!IsMACAddress(wakeUpCommand))
     {
-        VERBOSE(VB_SCHEDULE, QString("Executing '%1' to wake up slave.")
+        LOG(VB_SCHEDULE, LOG_NOTICE, QString("Executing '%1' to wake up slave.")
                 .arg(wakeUpCommand));
         myth_system(wakeUpCommand);
         return true;
@@ -2962,9 +2985,9 @@ void Scheduler::WakeUpSlaves(void)
     for (; slave < SlavesThatCanWake.count(); slave++)
     {
         thisSlave = SlavesThatCanWake[slave];
-        VERBOSE(VB_SCHEDULE,
-                QString("Scheduler, Sending wakeup command to slave: %1")
-                        .arg(thisSlave));
+        LOG(VB_SCHEDULE, LOG_NOTICE,
+            QString("Scheduler, Sending wakeup command to slave: %1")
+                .arg(thisSlave));
         WakeUpSlave(thisSlave, false);
     }
 }
@@ -3036,8 +3059,8 @@ void Scheduler::UpdateManuals(int recordid)
         startdt = startdt.addDays(weeksoff * 7);
         break;
     default:
-        VERBOSE(VB_IMPORTANT, QString("Invalid rectype for manual "
-                                      "recordid %1").arg(recordid));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Invalid rectype for manual recordid %1").arg(recordid));
         return;
     }
 
@@ -3099,8 +3122,9 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
 
         if (qphrase.isEmpty() && searchtype != kManualSearch)
         {
-            VERBOSE(VB_IMPORTANT, QString("Invalid search key in recordid %1")
-                                         .arg(result.value(0).toString()));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Invalid search key in recordid %1")
+                    .arg(result.value(0).toString()));
             continue;
         }
 
@@ -3153,14 +3177,16 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         case kManualSearch:
             UpdateManuals(result.value(0).toInt());
             from << "";
-            where << ((QString("%1.recordid = ").arg(recordTable)) + bindrecid + " AND " +
-                              QString("program.manualid = %1.recordid ").arg(recordTable));
+            where << (QString("%1.recordid = ").arg(recordTable) + bindrecid +
+                      " AND " +
+                      QString("program.manualid = %1.recordid ")
+                          .arg(recordTable));
             break;
         default:
-            VERBOSE(VB_IMPORTANT, QString("Unknown RecSearchType "
-                                         "(%1) for recordid %2")
-                                         .arg(result.value(1).toInt())
-                                         .arg(result.value(0).toString()));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Unknown RecSearchType (%1) for recordid %2")
+                    .arg(result.value(1).toInt())
+                    .arg(result.value(0).toString()));
             bindings.remove(bindrecid);
             break;
         }
@@ -3271,13 +3297,13 @@ void Scheduler::UpdateMatches(int recordid) {
 
     BuildNewRecordsQueries(recordid, fromclauses, whereclauses, bindings);
 
-    if (VERBOSE_LEVEL_CHECK(VB_SCHEDULE))
+    if (VERBOSE_LEVEL_CHECK(VB_SCHEDULE) && logLevel >= LOG_INFO)
     {
         for (clause = 0; clause < fromclauses.count(); ++clause)
         {
-            VERBOSE(VB_SCHEDULE, QString("Query %1: %2/%3")
-                .arg(clause).arg(fromclauses[clause]).
-                arg(whereclauses[clause]));
+            LOG(VB_SCHEDULE, LOG_INFO, QString("Query %1: %2/%3")
+                .arg(clause).arg(fromclauses[clause])
+                .arg(whereclauses[clause]));
         }
     }
 
@@ -3342,7 +3368,8 @@ void Scheduler::UpdateMatches(int recordid) {
             query = query.replace(i, strlen("RECTABLE"), recordTable);
         }
 
-        VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query %1...").arg(clause));
+        LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query %1...")
+                .arg(clause));
 
         gettimeofday(&dbstart, NULL);
         MSqlQuery result(dbConn);
@@ -3364,14 +3391,14 @@ void Scheduler::UpdateMatches(int recordid) {
             continue;
         }
 
-        VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec.")
+        LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- %1 results in %2 sec.")
                 .arg(result.size())
                 .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
                       (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
 
     }
 
-    VERBOSE(VB_SCHEDULE, " +-- Done.");
+    LOG(VB_SCHEDULE, LOG_INFO, " +-- Done.");
 }
 
 void Scheduler::AddNewRecords(void)
@@ -3716,7 +3743,7 @@ void Scheduler::AddNewRecords(void)
         "ORDER BY RECTABLE.recordid DESC ");
     query.replace("RECTABLE", schedTmpRecord);
 
-    VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
+    LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query..."));
 
     gettimeofday(&dbstart, NULL);
     result.prepare(rmquery);
@@ -3733,7 +3760,8 @@ void Scheduler::AddNewRecords(void)
     }
     gettimeofday(&dbend, NULL);
 
-    VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec. Processing...")
+    LOG(VB_SCHEDULE, LOG_INFO,
+        QString(" |-- %1 results in %2 sec. Processing...")
             .arg(result.size())
             .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
                   (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
@@ -3903,7 +3931,7 @@ void Scheduler::AddNewRecords(void)
         tmpList.push_back(p);
     }
 
-    VERBOSE(VB_SCHEDULE, " +-- Cleanup...");
+    LOG(VB_SCHEDULE, LOG_INFO, " +-- Cleanup...");
     RecIter tmp = tmpList.begin();
     for ( ; tmp != tmpList.end(); ++tmp)
         worklist.push_back(*tmp);
@@ -3953,7 +3981,7 @@ void Scheduler::AddNotListed(void) {
 
     query.replace("RECTABLE", recordTable);
 
-    VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
+    LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query..."));
 
     gettimeofday(&dbstart, NULL);
     MSqlQuery result(dbConn);
@@ -3967,7 +3995,8 @@ void Scheduler::AddNotListed(void) {
         return;
     }
 
-    VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec. Processing...")
+    LOG(VB_SCHEDULE, LOG_INFO,
+        QString(" |-- %1 results in %2 sec. Processing...")
             .arg(result.size())
             .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
                   (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
@@ -4248,7 +4277,7 @@ void Scheduler::GetNextLiveTVDir(uint cardid)
 
     tv->SetNextLiveTVDir(recording_dir);
 
-    VERBOSE(VB_FILE, LOC + QString("FindNextLiveTVDir: next dir is '%1'")
+    LOG(VB_FILE, LOG_INFO, LOC + QString("FindNextLiveTVDir: next dir is '%1'")
             .arg(recording_dir));
 
     if (m_expirer) // update auto expirer
@@ -4265,7 +4294,7 @@ int Scheduler::FillRecordingDir(
     QString &recording_dir,
     const RecList &reclist)
 {
-    VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Starting");
+    LOG(VB_SCHEDULE, LOG_INFO, LOC + "FillRecordingDir: Starting");
 
     int fsID = -1;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -4284,13 +4313,12 @@ int Scheduler::FillRecordingDir(
 
     if (dirlist.size() == 1)
     {
-        VERBOSE(VB_FILE|VB_SCHEDULE, LOC + QString("FillRecordingDir: The only "
-                "directory in the %1 Storage Group is %2, so it will be used "
-                "by default.")
-                .arg(storagegroup)
-                .arg(dirlist[0]));
+        LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
+            QString("FillRecordingDir: The only directory in the %1 Storage "
+                    "Group is %2, so it will be used by default.")
+                .arg(storagegroup) .arg(dirlist[0]));
         recording_dir = dirlist[0];
-        VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Finished");
+        LOG(VB_SCHEDULE, LOG_INFO, LOC + "FillRecordingDir: Finished");
 
         return -1;
     }
@@ -4316,8 +4344,8 @@ int Scheduler::FillRecordingDir(
 
     FillDirectoryInfoCache();
 
-    VERBOSE(VB_FILE|VB_SCHEDULE, LOC +
-            "FillRecordingDir: Calculating initial FS Weights.");
+    LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
+        "FillRecordingDir: Calculating initial FS Weights.");
 
     for (fsit = fsInfoCache.begin(); fsit != fsInfoCache.end(); ++fsit)
     {
@@ -4348,13 +4376,13 @@ int Scheduler::FillRecordingDir(
                    + QString::number(tmpWeight) + ")";
 
         msg += ". initial dir weight = " + QString::number(fs->getWeight());
-        VERBOSE(VB_FILE|VB_SCHEDULE, msg);
+        LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, msg);
 
         fsInfoList.push_back(fs);
     }
 
-    VERBOSE(VB_FILE|VB_SCHEDULE, LOC +
-            "FillRecordingDir: Adjusting FS Weights from inuseprograms.");
+    LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
+        "FillRecordingDir: Adjusting FS Weights from inuseprograms.");
 
     MSqlQuery saveRecDir(MSqlQuery::InitCon());
     saveRecDir.prepare("UPDATE inuseprograms "
@@ -4426,9 +4454,9 @@ int Scheduler::FillRecordingDir(
 
                     if (weightOffset)
                     {
-                        VERBOSE(VB_FILE|VB_SCHEDULE, QString(
-                                "  %1 @ %2 in use by '%3' on %4:%5, FSID #%6, "
-                                "FSID weightOffset +%7.")
+                        LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
+                            QString("  %1 @ %2 in use by '%3' on %4:%5, FSID "
+                                    "#%6, FSID weightOffset +%7.")
                                 .arg(recChanid)
                                 .arg(recStart.toString(Qt::ISODate))
                                 .arg(recUsage).arg(recHost).arg(recDir)
@@ -4441,10 +4469,13 @@ int Scheduler::FillRecordingDir(
                             FileSystemInfo *fs2 = &(*fsit2);
                             if (fs2->getFSysID() == fs->getFSysID())
                             {
-                                VERBOSE(VB_FILE|VB_SCHEDULE, QString("    "
-                                        "%1:%2 => old weight %3 plus %4 = %5")
-                                        .arg(fs2->getHostname()).arg(fs2->getPath())
-                                        .arg(fs2->getWeight()).arg(weightOffset)
+                                LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
+                                    QString("    %1:%2 => old weight %3 plus "
+                                            "%4 = %5")
+                                        .arg(fs2->getHostname())
+                                        .arg(fs2->getPath())
+                                        .arg(fs2->getWeight())
+                                        .arg(weightOffset)
                                         .arg(fs2->getWeight() + weightOffset));
 
                                 fs2->setWeight(fs2->getWeight() + weightOffset);
@@ -4457,8 +4488,8 @@ int Scheduler::FillRecordingDir(
         }
     }
 
-    VERBOSE(VB_FILE|VB_SCHEDULE, LOC +
-            "FillRecordingDir: Adjusting FS Weights from scheduler.");
+    LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
+        "FillRecordingDir: Adjusting FS Weights from scheduler.");
 
     RecConstIter recIter;
     for (recIter = reclist.begin(); recIter != reclist.end(); ++recIter)
@@ -4481,9 +4512,9 @@ int Scheduler::FillRecordingDir(
             if ((fs->getHostname() == thispg->GetHostname()) &&
                 (fs->getPath() == thispg->GetPathname()))
             {
-                VERBOSE(VB_FILE|VB_SCHEDULE, QString(
-                        "%1 @ %2 will record on %3:%4, FSID #%5, "
-                        "weightPerRecording +%6.")
+                LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
+                    QString("%1 @ %2 will record on %3:%4, FSID #%5, "
+                            "weightPerRecording +%6.")
                         .arg(thispg->GetChanID())
                         .arg(thispg->GetRecordingStartTime(ISODate))
                         .arg(fs->getHostname()).arg(fs->getPath())
@@ -4495,8 +4526,8 @@ int Scheduler::FillRecordingDir(
                     FileSystemInfo *fs2 = &(*fsit2);
                     if (fs2->getFSysID() == fs->getFSysID())
                     {
-                        VERBOSE(VB_FILE|VB_SCHEDULE, QString("    "
-                                "%1:%2 => old weight %3 plus %4 = %5")
+                        LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
+                            QString("    %1:%2 => old weight %3 plus %4 = %5")
                                 .arg(fs2->getHostname()).arg(fs2->getPath())
                                 .arg(fs2->getWeight()).arg(weightPerRecording)
                                 .arg(fs2->getWeight() + weightPerRecording));
@@ -4509,8 +4540,9 @@ int Scheduler::FillRecordingDir(
         }
     }
 
-    VERBOSE(VB_FILE|VB_SCHEDULE, QString("Using '%1' Storage Scheduler "
-            "directory sorting algorithm.").arg(storageScheduler));
+    LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
+        QString("Using '%1' Storage Scheduler directory sorting algorithm.")
+            .arg(storageScheduler));
 
     if (storageScheduler == "BalancedFreeSpace")
         fsInfoList.sort(comp_storage_free_space);
@@ -4521,25 +4553,25 @@ int Scheduler::FillRecordingDir(
     else // default to using original method
         fsInfoList.sort(comp_storage_combination);
 
-    if (VERBOSE_LEVEL_CHECK(VB_FILE|VB_SCHEDULE))
+    if (VERBOSE_LEVEL_CHECK(VB_FILE | VB_SCHEDULE) && logLevel >= LOG_INFO)
     {
-        VERBOSE(VB_FILE|VB_SCHEDULE, "--- FillRecordingDir Sorted fsInfoList "
-                                     "start ---");
+        LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
+            "--- FillRecordingDir Sorted fsInfoList start ---");
         for (fslistit = fsInfoList.begin();fslistit != fsInfoList.end();
              ++fslistit)
         {
             FileSystemInfo *fs = *fslistit;
-            VERBOSE(VB_FILE|VB_SCHEDULE, QString("%1:%2")
+            LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("%1:%2")
                 .arg(fs->getHostname()) .arg(fs->getPath()));
-            VERBOSE(VB_FILE|VB_SCHEDULE, QString("    Location    : %1")
+            LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("    Location    : %1")
                 .arg((fs->isLocal()) ? "local" : "remote"));
-            VERBOSE(VB_FILE|VB_SCHEDULE, QString("    weight      : %1")
+            LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("    weight      : %1")
                 .arg(fs->getWeight()));
-            VERBOSE(VB_FILE|VB_SCHEDULE, QString("    free space  : %5")
+            LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("    free space  : %5")
                 .arg(fs->getFreeSpace()));
         }
-        VERBOSE(VB_FILE|VB_SCHEDULE, "--- FillRecordingDir Sorted fsInfoList "
-                                     "end ---");
+        LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
+            "--- FillRecordingDir Sorted fsInfoList end ---");
     }
 
     // This code could probably be expanded to check the actual bitrate the
@@ -4648,8 +4680,9 @@ int Scheduler::FillRecordingDir(
 
                 if (!fs)
                 {
-                    VERBOSE(VB_IMPORTANT, QString("Unable to match '%1' "
-                            "to any file system.  Ignoring it.")
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Unable to match '%1' "
+                                "to any file system.  Ignoring it.")
                             .arg((*it)->GetBasename()));
                     continue;
                 }
@@ -4668,8 +4701,8 @@ int Scheduler::FillRecordingDir(
                     recording_dir = fs->getPath();
                     fsID = fs->getFSysID();
 
-                    VERBOSE(VB_FILE, QString(
-                                "pass 2: '%1' will record in '%2' "
+                    LOG(VB_FILE, LOG_INFO,
+                        QString("pass 2: '%1' will record in '%2' "
                                 "although there is only %3 MB free and the "
                                 "AutoExpirer wants at least %4 MB.  This "
                                 "directory has the highest priority files "
@@ -4695,7 +4728,8 @@ int Scheduler::FillRecordingDir(
                 long long desiredSpaceKB = 0;
                 FileSystemInfo *fs = *fslistit;
                 if (m_expirer)
-                    desiredSpaceKB = m_expirer->GetDesiredSpace(fs->getFSysID());
+                    desiredSpaceKB =
+                        m_expirer->GetDesiredSpace(fs->getFSysID());
 
                 if ((fs->getHostname() == hostname) &&
                     (dirlist.contains(fs->getPath())) &&
@@ -4706,17 +4740,19 @@ int Scheduler::FillRecordingDir(
                     fsID = fs->getFSysID();
 
                     if (pass == 1)
-                        VERBOSE(VB_FILE, QString("pass 1: '%1' will record in "
-                                "'%2' which has %3 MB free. This recording "
-                                "could use a max of %4 MB and the AutoExpirer "
-                                "wants to keep %5 MB free.")
+                        LOG(VB_FILE, LOG_INFO,
+                            QString("pass 1: '%1' will record in "
+                                    "'%2' which has %3 MB free. This recording "
+                                    "could use a max of %4 MB and the "
+                                    "AutoExpirer wants to keep %5 MB free.")
                                 .arg(title)
                                 .arg(recording_dir)
                                 .arg(fs->getFreeSpace() / 1024)
                                 .arg(maxSizeKB / 1024)
                                 .arg(desiredSpaceKB / 1024));
                     else
-                        VERBOSE(VB_FILE, QString("pass %1: '%2' will record in "
+                        LOG(VB_FILE, LOG_INFO,
+                            QString("pass %1: '%2' will record in "
                                 "'%3' although there is only %4 MB free and "
                                 "the AutoExpirer wants at least %5 MB.  "
                                 "Something will have to be deleted or expired "
@@ -4737,7 +4773,7 @@ int Scheduler::FillRecordingDir(
             break;
     }
 
-    VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Finished");
+    LOG(VB_SCHEDULE, LOG_INFO, LOC + "FillRecordingDir: Finished");
     return fsID;
 }
 
@@ -4762,8 +4798,9 @@ void Scheduler::FillDirectoryInfoCache(bool force)
         fsInfoCache[it1->getHostname() + ":" + it1->getPath()] = *it1;
     }
 
-    VERBOSE(VB_FILE, LOC + QString("FillDirectoryInfoCache: found %1 unique "
-            "filesystems").arg(fsMap.size()));
+    LOG(VB_FILE, LOG_INFO, LOC +
+        QString("FillDirectoryInfoCache: found %1 unique filesystems")
+            .arg(fsMap.size()));
 
     fsInfoCacheFillTime = QDateTime::currentDateTime();
 }
@@ -4839,17 +4876,18 @@ bool Scheduler::WasStartedAutomatically()
 
         if (abs(startupTime.secsTo(QDateTime::currentDateTime())) < (15 * 60))
         {
-            VERBOSE(VB_SCHEDULE,
-                    "Close to auto-start time, AUTO-Startup assumed");
+            LOG(VB_SCHEDULE, LOG_INFO,
+                "Close to auto-start time, AUTO-Startup assumed");
             autoStart = true;
         }
         else
-            VERBOSE(VB_SCHEDULE+VB_EXTRA, "NOT close to auto-start time, "
-                    "USER-initiated startup assumed");
+            LOG(VB_SCHEDULE, LOG_DEBUG,
+                "NOT close to auto-start time, USER-initiated startup assumed");
     }
     else if (!s.isEmpty())
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Invalid "
-                "MythShutdownWakeupTime specified in database (%1)").arg(s));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Invalid MythShutdownWakeupTime specified in database (%1)")
+                .arg(s));
 
     return autoStart;
 }

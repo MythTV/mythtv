@@ -220,9 +220,8 @@ bool Video::AddVideo( const QString &sFilename,
 
     if (hash == "NULL")
     {
-        VERBOSE(VB_GENERAL, QString("Video Hash Failed. Unless this is a DVD "
-                                    "or Blu-ray, something has probably gone "
-                                    "wrong."));
+        LOG(VB_GENERAL, LOG_ERR, "Video Hash Failed. Unless this is a DVD or "
+                                 "Blu-ray, something has probably gone wrong.");
         hash = "";
     }
 
@@ -299,7 +298,8 @@ DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
     if (sPath.isEmpty())
         path = gCoreContext->GetSetting( "BluRayMountpoint", "/media/cdrom");
 
-    VERBOSE(VB_GENERAL, QString("Parsing Blu-ray at path: %1 ").arg(path));
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Parsing Blu-ray at path: %1 ").arg(path));
 
     BlurayMetadata *bdmeta = new BlurayMetadata(path);
 
