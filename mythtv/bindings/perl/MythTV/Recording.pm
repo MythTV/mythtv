@@ -308,7 +308,7 @@ package MythTV::Recording;
     # Nothing found?  Die
         die "You need mplayer to use this script on mpeg-based files.\n\n" unless ($program);
     # Grab the info we want from mplayer (go uber-verbose to override --really-quiet)
-        my $idargs = "-v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 1 -identify";
+        my $idargs = "-v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 0 -identify";
         my $data = `$program $idargs '$file' 2>/dev/null`;
         study $data;
         ($info{'video_type'})            = $data =~ m/^VIDEO:?\s*(MPEG[12]|H264)/m;
