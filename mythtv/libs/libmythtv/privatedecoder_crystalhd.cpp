@@ -629,7 +629,7 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
     {
         if (out->PicInfo.picture_number != m_frame->frameNumber)
         {
-            LOG(VB_PLAYBACK, LOG_WARN, LOC + "Missing second field");
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Missing second field");
             AddFrameToQueue();
         }
         else
