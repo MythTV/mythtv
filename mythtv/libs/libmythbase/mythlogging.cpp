@@ -42,8 +42,10 @@ using namespace std;
 #if defined(linux)
 #include <sys/syscall.h>
 #elif defined(__FreeBSD__)
+extern "C" {
 #include <sys/ucontext.h>
 #include <sys/thr.h>
+}
 #elif CONFIG_DARWIN
 #include <mach/mach.h>
 #endif
@@ -538,9 +540,10 @@ void setThreadTid( LoggingItem_t *item )
     {
 #if defined(linux)
         tid = (int64_t)syscall(SYS_gettid);
-#elif defined(__FreeBSD__) && 0
+#elif defined(__FreeBSD__)
         long lwpid;
         int dummy = thr_self( &lwpid );
+        (void)dummy;
         tid = (int64_t)lwpid;
 #elif CONFIG_DARWIN
         tid = (int64_t)mach_thread_self();
