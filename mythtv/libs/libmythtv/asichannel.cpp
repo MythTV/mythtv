@@ -24,7 +24,7 @@ ASIChannel::~ASIChannel(void)
 
 bool ASIChannel::Open(void)
 {
-    LOG(VB_CHANNEL, LOG_INFO, "Open()");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Open()");
 
     if (m_device.isEmpty())
         return false;
@@ -45,6 +45,6 @@ bool ASIChannel::Open(void)
 
 void ASIChannel::Close()
 {
-    LOG(VB_CHANNEL, LOG_INFO, "Close()");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Close()");
     m_isopen = false;
 }

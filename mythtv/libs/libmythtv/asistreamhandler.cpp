@@ -133,11 +133,11 @@ void ASIStreamHandler::SetRunningDesired(bool desired)
 
 void ASIStreamHandler::run(void)
 {
-    LOG(VB_RECORD, LOG_INFO, "run(): begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run(): begin");
 
     if (!Open())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open device %1 : %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open device %1 : %2")
                 .arg(_device).arg(strerror(errno)));
         _error = true;
         return;
@@ -147,7 +147,7 @@ void ASIStreamHandler::run(void)
     bool ok = drb->Setup(_device, _fd, _packet_size, _buf_size);
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to allocate DRB buffer");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
         delete drb;
         drb = NULL;
         Close();
@@ -159,7 +159,7 @@ void ASIStreamHandler::run(void)
     unsigned char *buffer = new unsigned char[buffer_size];
     if (!buffer)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to allocate buffer");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate buffer");
         delete drb;
         drb = NULL;
         Close();
@@ -193,13 +193,13 @@ void ASIStreamHandler::run(void)
         // Check for DRB errors
         if (drb->IsErrored())
         {
-            LOG(VB_GENERAL, LOG_ERR, "Device error detected");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Device error detected");
             _error = true;
         }
 
         if (drb->IsEOF())
         {
-            LOG(VB_GENERAL, LOC_ERR, "Device EOF detected");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
             _error = true;
         }
 
@@ -241,7 +241,7 @@ void ASIStreamHandler::run(void)
         if (remainder > 0 && (len > remainder)) // leftover bytes
             memmove(buffer, &(buffer[len - remainder]), remainder);
     }
-    LOG(VB_RECORD, LOG_INFO, "run(): " + "shutdown");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run(): " + "shutdown");
 
     RemoveAllPIDFilters();
 
@@ -257,7 +257,7 @@ void ASIStreamHandler::run(void)
     delete[] buffer;
     Close();
 
-    LOG(VB_RECORD, LOG_INFO, "run(): " + "end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run(): " + "end");
 
     SetRunning(false, true, false);
 }
@@ -271,20 +271,20 @@ bool ASIStreamHandler::Open(void)
     _device_num = CardUtil::GetASIDeviceNumber(_device, &error);
     if (_device_num < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
     }
 
     _buf_size = CardUtil::GetASIBufferSize(_device_num, &error);
     if (_buf_size <= 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
     }
 
     if (!CardUtil::SetASIMode(_device_num, (uint)_rx_mode, &error))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to set RX Mode: " + error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set RX Mode: " + error);
         return false;
     }
 
@@ -292,7 +292,7 @@ bool ASIStreamHandler::Open(void)
     _fd = open(_device.toLocal8Bit().constData(), O_RDONLY, 0);
     if (_fd < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to open '%1'").arg(_device) + ENO);
         return false;
     }
@@ -301,8 +301,8 @@ bool ASIStreamHandler::Open(void)
     unsigned int cap;
     if (ioctl(_fd, ASI_IOC_RXGETCAP, &cap) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to query capabilities '%1'")
-                .arg(_device) + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to query capabilities '%1'").arg(_device) + ENO);
         Close();
         return false;
     }
@@ -375,8 +375,9 @@ static bool named_output_file_common(
         int ret = link(ba.constData(), it.key().toLocal8Bit().constData());
         if (ret < 0)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to link '%1' to '%2'")
-                    .arg(it.key()).arg(fn) + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Failed to link '%1' to '%2'").arg(it.key()).arg(fn) +
+                ENO);
         }
         ok &= ret >= 0;
     }
