@@ -769,7 +769,6 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             (enum SkipTypes)gCoreContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
 
-    cerr << "selecting flagging method" << endl;
     if (cmdline.toBool("commmethod"))
     {
         // pull commercial detection method from command line
@@ -781,8 +780,6 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             commDetectMethod = (SkipTypes) commmethod.toInt(&ok);
         if (!ok)
         {
-            cerr << "method input not an integer, parsing" << endl;
-
             // not an integer, attempt comma separated list
             commDetectMethod = COMM_DETECT_UNINIT;
             QMap<QString, SkipTypes>::const_iterator sit;
@@ -792,7 +789,6 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             for (; it != list.end(); ++it)
             {
                 QString val = (*it).toLower();
-                cerr << "parsing " << val.toLocal8Bit().constData();
                 if (val == "off")
                 {
                     commDetectMethod = COMM_DETECT_OFF;
@@ -808,12 +804,9 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                 }
 
                 // append flag method to list
-                cerr << ": " << (int)skipTypes->value(val) << endl;
                 commDetectMethod = (SkipTypes) ((int)commDetectMethod
                                              || (int)skipTypes->value(val));
             }
-
-            cerr << "parsing complete: " << commDetectMethod << endl;
 
         }
         if (commDetectMethod == COMM_DETECT_UNINIT)
@@ -860,15 +853,11 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
 
     }
 
-    cerr << "running commflagging with method " << commDetectMethod << endl;
-
     // if selection has failed, or intentionally disabled, drop out
     if (commDetectMethod == COMM_DETECT_UNINIT)
         return GENERIC_EXIT_NOT_OK;
     else if (commDetectMethod == COMM_DETECT_OFF)
         return GENERIC_EXIT_OK;
-
-    cerr << "running commflagging with method " << commDetectMethod << endl;
 
     frm_dir_map_t blanks;
     recorder = NULL;
@@ -887,8 +876,6 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         return GENERIC_EXIT_OK;
     }
 */
-
-    cerr << "checking for file existence" << endl;
 
     if (!DoesFileExist(program_info))
         return GENERIC_EXIT_PERMISSIONS_ERROR;
@@ -915,7 +902,6 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         }
     }
 
-    cerr << "starting commflagging" << endl;
     MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
 
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
@@ -1120,16 +1106,11 @@ int main(int argc, char *argv[])
     QString filename;
     QString outputfilename = QString::null;
 
-    uint chanid = 0;
     QDateTime starttime;
     QString allStart = "19700101000000";
     QString allEnd   = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
     int jobType = JOB_NONE;
     QDir fullfile;
-    time_t time_now;
-    bool useDB = true;
-    bool allRecorded = false;
-    bool queueJobInstead = false;
     QString newCutList = QString::null;
 
     if (!cmdline.Parse(argc, argv))
@@ -1152,7 +1133,6 @@ int main(int argc, char *argv[])
 
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCOMMFLAG);
-    cerr << "prepping logging" << endl;
     int retval;
     if ((retval = cmdline.ConfigureLogging(
                         "important general",
@@ -1160,7 +1140,6 @@ int main(int argc, char *argv[])
         return retval;
 
     CleanupGuard callCleanup(cleanup);
-    cerr << "creating context" << endl;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init( false, /*use gui*/
                          false, /*prompt for backend*/
@@ -1170,7 +1149,6 @@ int main(int argc, char *argv[])
         LOG(VB_GENERAL, LOG_EMERG, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-    cerr << "loading overrides" << endl;
     cmdline.ApplySettingsOverride();
     
     MythTranslation::load("mythfrontend");
