@@ -503,7 +503,7 @@ class Episode( tvdb_api.Episode ):
             if key is not None and cur_key != key:
                 continue
             distance = levenshtein(cur_value, term)
-            if distance <= 2:
+            if distance <= 3:
                 self.distance = distance
                 return self
         return None
