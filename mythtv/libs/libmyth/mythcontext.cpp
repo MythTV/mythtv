@@ -738,14 +738,19 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 
     SSDP::Instance()->PerformSearch( gBackendURI );
 
-    for (timer.start(); timer.elapsed() < milliSeconds; usleep(25000))
+    for (timer.start(); timer.elapsed() < milliSeconds; )
     {
+        usleep(25000);
         backends = SSDP::Instance()->Find( gBackendURI );
         if (backends)
             break;
+#if 0
         putchar('.');
+#endif
     }
+#if 0
     putchar('\n');
+#endif
 
     if (!backends)
     {
@@ -823,16 +828,21 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
     DeviceLocation *pDevLoc = NULL;
     QTime           timer;
 
-    for (timer.start(); timer.elapsed() < 5000; usleep(25000))
+    for (timer.start(); timer.elapsed() < 5000; )
     {
+        usleep(25000);
         pDevLoc = SSDP::Instance()->Find( gBackendURI, USN );
 
         if (pDevLoc)
             break;
 
+#if 0
         putchar('.');
+#endif
     }
+#if 0
     putchar('\n');
+#endif
 
     // ----------------------------------------------------------------------
 
