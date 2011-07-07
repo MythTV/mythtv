@@ -7,7 +7,7 @@
 StreamingRingBuffer::StreamingRingBuffer(const QString &lfilename)
   : RingBuffer(kRingBuffer_HTTP), m_context(NULL)
 {
-    startreadahead = true;
+    startreadahead = false;
     OpenFile(lfilename);
 }
 
