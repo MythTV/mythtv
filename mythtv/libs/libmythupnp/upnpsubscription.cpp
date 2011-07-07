@@ -235,6 +235,8 @@ bool UPNPSubscription::ProcessRequest(HttpWorkerThread *pThread,
         return true;
     }
 
+    VERBOSE(VB_UPNP|VB_EXTRA, "/n/n" + body.toString(4) + "/n/n");
+
     QDomNodeList properties = body.elementsByTagName("property");
     QHash<QString,QString> results;
 

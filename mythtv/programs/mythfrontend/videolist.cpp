@@ -21,6 +21,8 @@
 #include "videolist.h"
 #include "videodlg.h"
 
+#include "upnpscanner.h"
+
 class TreeNodeDataPrivate
 {
   public:
@@ -1050,6 +1052,10 @@ void VideoListImp::buildFsysList()
     //  Fill metadata from directory structure
     //
 
+    // if available, start a UPnP MediaServer update first
+    if (UPNPScanner::Instance())
+        UPNPScanner::Instance()->StartFullScan();
+
     typedef std::vector<std::pair<QString, QString> > node_to_path_list;
 
     node_to_path_list node_paths;
@@ -1114,6 +1120,10 @@ void VideoListImp::buildFsysList()
 
         buildFileList(root, ml, p->second);
     }
+
+    // retrieve any MediaServer data that may be available
+    if (UPNPScanner::Instance())
+        UPNPScanner::Instance()->GetMetadata(&ml, &m_metadata_tree);
 
     // See if we can find this filename in DB
     if (m_LoadMetaData)
