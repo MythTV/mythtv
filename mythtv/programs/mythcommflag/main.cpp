@@ -159,14 +159,15 @@ static int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
     RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
     if (!tmprbuf)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Unable to create RingBuffer for %1").arg(filename));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Unable to create RingBuffer for %1").arg(filename));
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
     if (useDB && !MSqlQuery::testDBConnection())
     {
-        VERBOSE(VB_IMPORTANT, "Unable to open DB connection for commercial flagging.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unable to open DB connection for commercial flagging.");
         delete tmprbuf;
         return GENERIC_EXIT_DB_ERROR;
     }
@@ -242,8 +243,8 @@ static int CopySkipListToCutList(QString chanid, QDateTime starttime)
 
     if (!pginfo.GetChanID())
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("No program data exists for channel %1 at %2")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("No program data exists for channel %1 at %2")
                 .arg(chanid).arg(startstring));
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
@@ -266,8 +267,8 @@ static int ClearSkipList(QString chanid, QDateTime starttime)
 
     if (!pginfo.GetChanID())
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("No program data exists for channel %1 at %2")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("No program data exists for channel %1 at %2")
                 .arg(chanid).arg(startstring));
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
@@ -275,7 +276,7 @@ static int ClearSkipList(QString chanid, QDateTime starttime)
     frm_dir_map_t skiplist;
     pginfo.SaveCommBreakList(skiplist);
 
-    VERBOSE(VB_IMPORTANT, "Commercial skip list cleared");
+    LOG(VB_GENERAL, LOG_NOTICE, "Commercial skip list cleared");
 
     return GENERIC_EXIT_OK;
 }
@@ -300,15 +301,15 @@ static int SetCutList(QString chanid, QDateTime starttime, QString newCutList)
 
     if (!pginfo.GetChanID())
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("No program data exists for channel %1 at %2")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("No program data exists for channel %1 at %2")
                 .arg(chanid).arg(startstring));
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
     pginfo.SaveCutList(cutlist);
 
-    VERBOSE(VB_IMPORTANT, QString("Cutlist set to: %1").arg(newCutList));
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Cutlist set to: %1").arg(newCutList));
 
     return GENERIC_EXIT_OK;
 }
@@ -324,8 +325,8 @@ static int GetMarkupList(QString list, QString chanid, QDateTime starttime)
 
     if (!pginfo.GetChanID())
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("No program data exists for channel %1 at %2")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("No program data exists for channel %1 at %2")
                 .arg(chanid).arg(startstring));
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
@@ -512,8 +513,8 @@ static void commDetectorGotNewCommercialBreakList(void)
                    .arg(*it);
     }
 
-    VERBOSE(VB_COMMFLAG,
-            QString("mythcommflag sending update: %1").arg(message));
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("mythcommflag sending update: %1").arg(message));
 
     RemoteSendMessage(message);
 }
@@ -528,9 +529,8 @@ static void incomingCustomEvent(QEvent* e)
         message = message.simplified();
         QStringList tokens = message.split(" ", QString::SkipEmptyParts);
 
-        VERBOSE(VB_COMMFLAG,
-                QString("mythcommflag: Received Event: '%1'")
-                .arg(message));
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("mythcommflag: Received Event: '%1'") .arg(message));
 
         if ((watchingRecording) && (tokens.size() >= 3) &&
             (tokens[0] == "DONE_RECORDING"))
@@ -547,7 +547,7 @@ static void incomingCustomEvent(QEvent* e)
                 commDetector->recordingFinished(filelen);
                 watchingRecording = false;
                 message += "Informed CommDetector that recording has finished.";
-                VERBOSE(VB_COMMFLAG, message);
+                LOG(VB_COMMFLAG, LOG_INFO, message);
             }
         }
 
@@ -566,7 +566,7 @@ static void incomingCustomEvent(QEvent* e)
             {
                 commDetector->requestCommBreakMapUpdate();
                 message += "Requested CommDetector to generate new break list.";
-                VERBOSE(VB_COMMFLAG, message);
+                LOG(VB_COMMFLAG, LOG_INFO, message);
             }
         }
     }
@@ -595,10 +595,11 @@ static int DoFlagCommercials(
             program_info->GetChanID(), program_info->GetRecordingStartTime());
 
         if (jobID != -1)
-            VERBOSE(VB_COMMFLAG,
+            LOG(VB_COMMFLAG, LOG_INFO,
                 QString("mythcommflag processing JobID %1").arg(jobID));
         else
-            VERBOSE(VB_COMMFLAG, "mythcommflag: Unable to determine jobID");
+            LOG(VB_COMMFLAG, LOG_ERR,
+                "mythcommflag: Unable to determine jobID");
     }
 
     if (useDB)
@@ -617,7 +618,8 @@ static int DoFlagCommercials(
 
     if (useDB)
     {
-        VERBOSE(VB_COMMFLAG, "mythcommflag sending COMMFLAG_START notification");
+        LOG(VB_COMMFLAG, LOG_INFO,
+            "mythcommflag sending COMMFLAG_START notification");
         QString message = "COMMFLAG_START ";
         message += program_info->MakeUniqueKey();
         RemoteSendMessage(message);
@@ -692,13 +694,14 @@ static int FlagCommercials(
             if (commDetectMethod == COMM_DETECT_COMMFREE)
             {
                 commDetectMethod = COMM_DETECT_UNINIT;
-                VERBOSE(VB_COMMFLAG,
-                        QString("Chanid %1 is marked as being Commercial Free, "
-                                "we will use the default commercial detection "
-                                "method").arg(program_info->GetChanID()));
+                LOG(VB_COMMFLAG, LOG_INFO,
+                    QString("Chanid %1 is marked as being Commercial Free, "
+                            "we will use the default commercial detection "
+                            "method").arg(program_info->GetChanID()));
             }
             else if (commDetectMethod != COMM_DETECT_UNINIT)
-                VERBOSE(VB_COMMFLAG, QString("Using method: %1 from channel %2")
+                LOG(VB_COMMFLAG, LOG_INFO,
+                    QString("Using method: %1 from channel %2")
                         .arg(commDetectMethod).arg(program_info->GetChanID()));
         }
     }
@@ -737,7 +740,7 @@ static int FlagCommercials(
 
         cerr << out.constData() << flush;
     }
-    VERBOSE(VB_IMPORTANT, outstr);
+    LOG(VB_GENERAL, LOG_INFO, outstr);
 
     if (!force && JobQueue::IsJobRunning(JOB_COMMFLAG, *program_info))
     {
@@ -747,7 +750,8 @@ static int FlagCommercials(
             cerr << "                        "
                     "(the program is already being flagged elsewhere)\n";
         }
-        VERBOSE(VB_IMPORTANT, "Program is already being flagged elsewhere");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Program is already being flagged elsewhere");
         global_program_info = NULL;
         return GENERIC_EXIT_IN_USE;
     }
@@ -779,7 +783,7 @@ static int FlagCommercials(
 
     if (!exists)
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find file %1, aborting.")
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find file %1, aborting.")
                 .arg(filename));
         global_program_info = NULL;
         return GENERIC_EXIT_PERMISSIONS_ERROR;
@@ -787,7 +791,7 @@ static int FlagCommercials(
 
     if (size == 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("File %1 is zero-byte, aborting.")
+        LOG(VB_GENERAL, LOG_ERR, QString("File %1 is zero-byte, aborting.")
                 .arg(filename));
         global_program_info = NULL;
         return GENERIC_EXIT_PERMISSIONS_ERROR;
@@ -796,15 +800,15 @@ static int FlagCommercials(
     RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
     if (!tmprbuf)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Unable to create RingBuffer for %1").arg(filename));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Unable to create RingBuffer for %1").arg(filename));
         global_program_info = NULL;
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
     if (useDB && !MSqlQuery::testDBConnection())
     {
-        VERBOSE(VB_IMPORTANT, "Unable to open commflag DB connection");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to open commflag DB connection");
         delete tmprbuf;
         global_program_info = NULL;
         return GENERIC_EXIT_DB_ERROR;
@@ -857,16 +861,18 @@ static int FlagCommercials(
             watchingRecording = true;
             ctx->SetRecorder(recorder);
 
-            VERBOSE(VB_COMMFLAG, QString("mythcommflag will flag recording "
-                    "currently in progress on cardid %1").arg(recorderNum));
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("mythcommflag will flag recording "
+                        "currently in progress on cardid %1").arg(recorderNum));
         }
         else
         {
             recorderNum = -1;
             watchingRecording = false;
 
-            VERBOSE(VB_IMPORTANT, "Unable to find active recorder for this "
-                    "recording, realtime flagging will not be enabled.");
+            LOG(VB_GENERAL, LOG_ERR, 
+                "Unable to find active recorder for this "
+                "recording, realtime flagging will not be enabled.");
         }
         cfp->SetWatchingRecording(watchingRecording);
     }
@@ -884,7 +890,7 @@ static int FlagCommercials(
             program_info->GetChanID(), program_info->GetRecordingStartTime());
 
         jobID = fakeJobID;
-        VERBOSE(VB_COMMFLAG,
+        LOG(VB_COMMFLAG, LOG_INFO,
             QString("Not in JobQueue, creating fake Job ID %1").arg(jobID));
     }
     else
@@ -905,7 +911,7 @@ static int FlagCommercials(
     if (progress)
         cerr << breaksFound << "\n";
 
-    VERBOSE(VB_IMPORTANT, QString("Finished, %1 break(s) found.")
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Finished, %1 break(s) found.")
         .arg(breaksFound));
 
     delete ctx;
@@ -923,8 +929,8 @@ static int FlagCommercials(
 
     if (!pginfo.GetChanID())
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("No program data exists for channel %1 at %2")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("No program data exists for channel %1 at %2")
                 .arg(chanid).arg(startstring));
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
@@ -1088,7 +1094,7 @@ int main(int argc, char *argv[])
                          false, /*bypass auto discovery*/
                          !useDB)) /*ignoreDB*/
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_EMERG, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -1119,8 +1125,8 @@ int main(int argc, char *argv[])
     if ((!chanid && starttime.isValid()) ||
         (chanid && !starttime.isValid()))
     {
-        VERBOSE(VB_IMPORTANT, "You must specify both the Channel ID "
-                "and the Start Time.");
+        LOG(VB_GENERAL, LOG_ERR, "You must specify both the Channel ID "
+                                 "and the Start Time.");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
@@ -1232,7 +1238,7 @@ int main(int argc, char *argv[])
     {
         if (!QFile::exists(filename))
         {
-            VERBOSE(VB_IMPORTANT, QString("Filename: '%1' does not exist")
+            LOG(VB_GENERAL, LOG_ERR, QString("Filename: '%1' does not exist")
                     .arg(filename));
             return -1;
         }
@@ -1254,8 +1260,7 @@ int main(int argc, char *argv[])
             result = BuildVideoMarkup(pginfo, useDB);
             if (result != GENERIC_EXIT_OK)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Failed to build video markup");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to build video markup");
                 return result;
             }
         }
@@ -1340,11 +1345,11 @@ int main(int argc, char *argv[])
                                         break;
                             }
 
-                            VERBOSE(VB_COMMFLAG,
-                                    QString("Status for chanid %1 @ %2 is '%3'")
-                                            .arg(chanid)
-                                            .arg(starttime.toString("yyyyMMddhhmmss"))
-                                            .arg(flagStatusStr));
+                            LOG(VB_COMMFLAG, LOG_INFO,
+                                QString("Status for chanid %1 @ %2 is '%3'")
+                                    .arg(chanid)
+                                    .arg(starttime.toString("yyyyMMddhhmmss"))
+                                    .arg(flagStatusStr));
 
                             if ((flagStatus == COMM_FLAG_NOT_FLAGGED) &&
                                 (marksFound == 0))
@@ -1377,8 +1382,9 @@ int main(int argc, char *argv[])
              << ctime(&time_now) << endl;
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Finished commercial break flagging at %1")
-        .arg(ctime(&time_now)));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Finished commercial break flagging at %1")
+            .arg(ctime(&time_now)));
 
     return result;
 }

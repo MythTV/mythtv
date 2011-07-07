@@ -81,8 +81,8 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
     if (!nblanks)
     {
         /* No monochromatic frames. */
-        VERBOSE(VB_COMMFLAG,
-                "BlankFrameDetector::computeBlankMap: No blank frames.");
+        LOG(VB_COMMFLAG, LOG_INFO,
+            "BlankFrameDetector::computeBlankMap: No blank frames.");
         return;
     }
 
@@ -134,8 +134,8 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
     if (stddevno2 == nblanks)
         stddevno2--;
 
-    VERBOSE(VB_COMMFLAG, QString("Blanks selecting"
-                " median<=%1 (%2-%3%), stddev<=%4 (%5-%6%)")
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("Blanks selecting median<=%1 (%2-%3%), stddev<=%4 (%5-%6%)")
             .arg(maxmedian)
             .arg(blankno1 * 100 / nblanks).arg(blankno2 * 100 / nblanks)
             .arg(maxstddev)
@@ -269,7 +269,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                     long long newbrkb = brkb + jj;
                     if (newbrkb >= brke)
                     {
-                        VERBOSE(VB_COMMFLAG,
+                        LOG(VB_COMMFLAG, LOG_INFO,
                             QString("BF [%1,%2] ran out of slots")
                                 .arg(brkb).arg(brke - 1));
                         break;
@@ -290,7 +290,8 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
     if (debugLevel >= 1)
     {
         frameAnalyzerReportMap(breakMap, fps, "BF Break");
-        VERBOSE(VB_COMMFLAG, "BF coalescing overlapping/nearby breaks ...");
+        LOG(VB_COMMFLAG, LOG_INFO,
+            "BF coalescing overlapping/nearby breaks ...");
     }
 
     /*
@@ -400,8 +401,8 @@ BlankFrameDetector::MythPlayerInited(MythPlayer *player, long long nframes)
 
     QSize video_disp_dim = player->GetVideoSize();
 
-    VERBOSE(VB_COMMFLAG, QString(
-                "BlankFrameDetector::MythPlayerInited %1x%2")
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("BlankFrameDetector::MythPlayerInited %1x%2")
             .arg(video_disp_dim.width())
             .arg(video_disp_dim.height()));
 
@@ -418,8 +419,8 @@ BlankFrameDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
             FrameAnalyzer::ANALYZE_OK)
         return ANALYZE_OK;
 
-    VERBOSE(VB_COMMFLAG,
-            QString("BlankFrameDetector::analyzeFrame error at frame %1")
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("BlankFrameDetector::analyzeFrame error at frame %1")
             .arg(frameno));
     return ANALYZE_ERROR;
 }
@@ -430,7 +431,7 @@ BlankFrameDetector::finished(long long nframes, bool final)
     if (histogramAnalyzer->finished(nframes, final))
         return -1;
 
-    VERBOSE(VB_COMMFLAG, QString("BlankFrameDetector::finished(%1)")
+    LOG(VB_COMMFLAG, LOG_INFO, QString("BlankFrameDetector::finished(%1)")
             .arg(nframes));
 
     /* Identify all sequences of blank frames (blankMap). */
@@ -457,7 +458,7 @@ BlankFrameDetector::computeForLogoSurplus(
     /* TUNABLE: see TemplateMatcher::adjustForBlanks */
     const int       MAXBLANKADJUSTMENT = (int)roundf(5 * fps);  /* frames */
 
-    VERBOSE(VB_COMMFLAG, "BlankFrameDetector adjusting for logo surplus");
+    LOG(VB_COMMFLAG, LOG_INFO, "BlankFrameDetector adjusting for logo surplus");
 
     /*
      * For each logo break, find the blank frames closest to its beginning and
@@ -633,8 +634,8 @@ BlankFrameDetector::computeForLogoDeficit(
 {
     (void)templateMatcher;  /* gcc */
 
-    VERBOSE(VB_COMMFLAG, "BlankFrameDetector adjusting for"
-            " too little logo coverage (unimplemented)");
+    LOG(VB_COMMFLAG, LOG_INFO, "BlankFrameDetector adjusting for "
+                               "too little logo coverage (unimplemented)");
     return 0;
 }
 

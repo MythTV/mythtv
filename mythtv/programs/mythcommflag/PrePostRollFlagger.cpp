@@ -61,12 +61,13 @@ bool PrePostRollFlagger::go()
     if ((wereRecording) && (!stillRecording) && (secsSince < requiredHeadStart))
         return false;
 
-    aggressiveDetection = gCoreContext->GetNumSetting("AggressiveCommDetect", 1);
+    aggressiveDetection =
+        gCoreContext->GetNumSetting("AggressiveCommDetect", 1);
 
     if (!player->InitVideo())
     {
-        VERBOSE(VB_IMPORTANT,
-                "NVP: Unable to initialize video for FlagCommercials.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "NVP: Unable to initialize video for FlagCommercials.");
         return false;
     }
     player->EnableSubtitles(false);
@@ -116,13 +117,14 @@ bool PrePostRollFlagger::go()
     if(preRoll > 0)
     {
         //check from preroll after
-        VERBOSE(VB_COMMFLAG, QString("Finding closest after preroll(%1-%2)")
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("Finding closest after preroll(%1-%2)")
                 .arg(preRoll).arg(stopFrame));
 
         closestAfterPre = findBreakInrange(preRoll, stopFrame, framesToProcess,
                                            framesProcessed, flagTime, false);
 
-        VERBOSE(VB_COMMFLAG, QString("Closest after preroll: %1")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("Closest after preroll: %1")
                 .arg(closestAfterPre));
 
 
@@ -131,12 +133,12 @@ bool PrePostRollFlagger::go()
         if(closestAfterPre)
             startFrame = preRoll - (closestAfterPre - preRoll) - 1;
 
-        VERBOSE(VB_COMMFLAG, QString("Finding before preroll (%1-%2)")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("Finding before preroll (%1-%2)")
                 .arg(startFrame).arg(preRoll));
         closestBeforePre = findBreakInrange(startFrame, preRoll,
                                             framesToProcess, framesProcessed,
                                             flagTime, true);
-        VERBOSE(VB_COMMFLAG, QString("Closest before preroll: %1")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("Closest before preroll: %1")
                 .arg(closestBeforePre));
 
         if(closestBeforePre || closestAfterPre)
@@ -165,12 +167,13 @@ bool PrePostRollFlagger::go()
     {
         //check from preroll after
         long long postRollStartLoc = myTotalFrames - postRoll;
-        VERBOSE(VB_COMMFLAG, QString("Finding closest after postroll(%1-%2)")
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("Finding closest after postroll(%1-%2)")
                 .arg(postRollStartLoc).arg(myTotalFrames));
         closestAfterPost = findBreakInrange(postRollStartLoc, myTotalFrames,
                                             framesToProcess, framesProcessed,
                                             flagTime, false);
-        VERBOSE(VB_COMMFLAG, QString("Closest after postRoll: %1")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("Closest after postRoll: %1")
                 .arg(closestAfterPost));
 
         //check before preroll
@@ -179,12 +182,13 @@ bool PrePostRollFlagger::go()
             startFrame = postRollStartLoc
                          - (closestAfterPost - postRollStartLoc) - 1;
 
-        VERBOSE(VB_COMMFLAG, QString("finding closest before preroll(%1-%2)")
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("finding closest before preroll(%1-%2)")
                 .arg(startFrame).arg(postRollStartLoc));
         closestBeforePost = findBreakInrange(startFrame, postRollStartLoc,
                                              framesToProcess, framesProcessed,
                                              flagTime, true);
-        VERBOSE(VB_COMMFLAG, QString("Closest before postroll: %1")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("Closest before postroll: %1")
                 .arg(closestBeforePost));
 
         framesToProcess = framesProcessed;
@@ -234,7 +238,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
     VideoFrame* f = player->GetRawVideoFrame(tmpStartFrame);
     float aspect = player->GetVideoAspect();
     currentFrameNumber = f->frameNumber;
-    VERBOSE(VB_COMMFLAG, QString("Starting with frame %1")
+    LOG(VB_COMMFLAG, LOG_INFO, QString("Starting with frame %1")
             .arg(currentFrameNumber));
     player->DiscardVideoFrame(f);
 
@@ -251,7 +255,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
 
         if(currentFrameNumber % 1000 == 0)
         {
-            VERBOSE(VB_COMMFLAG, QString("Processing frame %1")
+            LOG(VB_COMMFLAG, LOG_INFO, QString("Processing frame %1")
                     .arg(currentFrameNumber));
         }
 
@@ -339,7 +343,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             if (percentage % 10 == 0 && prevpercent != percentage)
             {
                 prevpercent = percentage;
-                VERBOSE(VB_GENERAL|VB_EXTRA, QString("%1%% Completed @ %2 fps.")
+                LOG(VB_GENERAL, LOG_INFO, QString("%1%% Completed @ %2 fps.")
                     .arg(percentage) .arg(flagFPS));
             }
         }
@@ -391,7 +395,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
 
 void PrePostRollFlagger::GetCommercialBreakList(frm_dir_map_t &marks)
 {
-    VERBOSE(VB_COMMFLAG, "PrePostRollFlagger::GetCommBreakMap()");
+    LOG(VB_COMMFLAG, LOG_INFO, "PrePostRollFlagger::GetCommBreakMap()");
     marks.clear();
 
     long long end = 0;

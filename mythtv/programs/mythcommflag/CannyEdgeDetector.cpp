@@ -96,29 +96,29 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
 
     if (avpicture_alloc(&s1, PIX_FMT_GRAY8, padded_width, padded_height))
     {
-        VERBOSE(VB_COMMFLAG, "CannyEdgeDetector::resetBuffers "
-                "avpicture_alloc s1 failed");
+        LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
+                                  "avpicture_alloc s1 failed");
         return -1;
     }
 
     if (avpicture_alloc(&s2, PIX_FMT_GRAY8, padded_width, padded_height))
     {
-        VERBOSE(VB_COMMFLAG, "CannyEdgeDetector::resetBuffers "
-                "avpicture_alloc s2 failed");
+        LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
+                                  "avpicture_alloc s2 failed");
         goto free_s1;
     }
 
     if (avpicture_alloc(&convolved, PIX_FMT_GRAY8, padded_width, padded_height))
     {
-        VERBOSE(VB_COMMFLAG, "CannyEdgeDetector::resetBuffers "
-                "avpicture_alloc convolved failed");
+        LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
+                                  "avpicture_alloc convolved failed");
         goto free_s2;
     }
 
     if (avpicture_alloc(&edges, PIX_FMT_GRAY8, newwidth, newheight))
     {
-        VERBOSE(VB_COMMFLAG, "CannyEdgeDetector::resetBuffers "
-                "avpicture_alloc edges failed");
+        LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
+                                  "avpicture_alloc edges failed");
         goto free_convolved;
     }
 

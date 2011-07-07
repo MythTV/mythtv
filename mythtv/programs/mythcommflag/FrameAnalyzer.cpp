@@ -33,7 +33,7 @@ frameAnalyzerReportMap(const FrameAnalyzer::FrameMap *frameMap, float fps,
             ee = bb + *ii;
             len = ee - bb;
 
-            VERBOSE(VB_COMMFLAG, QString("%1: %2-%3 (%4-%5, %6)")
+            LOG(VB_COMMFLAG, LOG_INFO, QString("%1: %2-%3 (%4-%5, %6)")
                     .arg(comment)
                     .arg(bb, 6).arg(ee - 1, 6)
                     .arg(frameToTimestamp(bb, fps))
@@ -42,7 +42,7 @@ frameAnalyzerReportMap(const FrameAnalyzer::FrameMap *frameMap, float fps,
         }
         else
         {
-            VERBOSE(VB_COMMFLAG, QString("%1: %2 (%3)")
+            LOG(VB_COMMFLAG, LOG_INFO, QString("%1: %2 (%3)")
                     .arg(comment)
                     .arg(bb, 6)
                     .arg(frameToTimestamp(bb, fps)));
@@ -70,7 +70,7 @@ frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap, float fps,
             ee = bb + *ii;
             len = ee - bb;
 
-            VERBOSE(VB_COMMFLAG, QString("%1: %2-%3 (%4-%5, %6)")
+            LOG(VB_COMMFLAG, LOG_INFO, QString("%1: %2-%3 (%4-%5, %6)")
                     .arg(comment)
                     .arg(bb, 6).arg(ee - 1, 6)
                     .arg(frameToTimestamp(bb, fps))
@@ -79,7 +79,7 @@ frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap, float fps,
         }
         else
         {
-            VERBOSE(VB_COMMFLAG, QString("%1: %2 (%3)")
+            LOG(VB_COMMFLAG, LOG_INFO, QString("%1: %2 (%3)")
                     .arg(comment)
                     .arg(bb, 6)
                     .arg(frameToTimestamp(bb, fps)));
@@ -134,7 +134,7 @@ removeShortBreaks(FrameAnalyzer::FrameMap *breakMap, float fps, int minbreaklen,
         {
             long long start = bb1.key();
             long long end = start + *bb1 - 1;
-            VERBOSE(VB_COMMFLAG, QString("Removing break %1-%2 (%3-%4)")
+            LOG(VB_COMMFLAG, LOG_INFO, QString("Removing break %1-%2 (%3-%4)")
                 .arg(frameToTimestamp(start, fps))
                 .arg(frameToTimestamp(end, fps))
                 .arg(start + 1).arg(end + 1));
@@ -189,12 +189,12 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
                     long long old2 = segb - 1;
                     long long new1 = brkb;
                     long long new2 = nframes - 1;
-                    VERBOSE(VB_COMMFLAG,
+                    LOG(VB_COMMFLAG, LOG_INFO,
                         QString("Removing segment %1-%2 (%3-%4)")
                         .arg(frameToTimestamp(segb + 1, fps))
                         .arg(frameToTimestamp(sege + 1, fps))
                         .arg(segb + 1).arg(sege + 1));
-                    VERBOSE(VB_COMMFLAG,
+                    LOG(VB_COMMFLAG, LOG_INFO,
                         QString("Replacing break %1-%2 (%3-%4)"
                         " with %5-%6 (%7-%8, EOF)")
                         .arg(frameToTimestamp(old1 + 1, fps))
@@ -218,14 +218,14 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
                 long long old2 = segb - 1;
                 long long new1 = brkb;
                 long long new2 = bbnext.key() + *bbnext - 1;
-                VERBOSE(VB_COMMFLAG,
+                LOG(VB_COMMFLAG, LOG_INFO,
                     QString("Removing segment %1-%2 (%3-%4)")
                     .arg(frameToTimestamp(segb + 1, fps))
                     .arg(frameToTimestamp(sege + 1, fps))
                     .arg(segb + 1).arg(sege + 1));
-                VERBOSE(VB_COMMFLAG,
+                LOG(VB_COMMFLAG, LOG_INFO,
                     QString("Replacing break %1-%2 (%3-%4)"
-                    " with %5-%6 (%7-%8)")
+                            " with %5-%6 (%7-%8)")
                     .arg(frameToTimestamp(old1 + 1, fps))
                     .arg(frameToTimestamp(old2 + 1, fps))
                     .arg(old1 + 1).arg(old2 + 1)
@@ -242,7 +242,8 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
             {
                 long long start = bb.key();
                 long long end = start + *bb - 1;
-                VERBOSE(VB_COMMFLAG, QString("Removing break %1-%2 (%3-%4)")
+                LOG(VB_COMMFLAG, LOG_INFO,
+                    QString("Removing break %1-%2 (%3-%4)")
                     .arg(frameToTimestamp(start + 1, fps))
                     .arg(frameToTimestamp(end + 1, fps))
                     .arg(start + 1).arg(end + 1));

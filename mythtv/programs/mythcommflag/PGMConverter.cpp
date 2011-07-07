@@ -55,16 +55,16 @@ PGMConverter::MythPlayerInited(const MythPlayer *player)
 #ifdef PGM_CONVERT_GREYSCALE
     if (avpicture_alloc(&pgm, PIX_FMT_GRAY8, width, height))
     {
-        VERBOSE(VB_COMMFLAG, QString("PGMConverter::MythPlayerInited "
-                "avpicture_alloc pgm (%1x%2) failed")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("PGMConverter::MythPlayerInited "
+                                          "avpicture_alloc pgm (%1x%2) failed")
                 .arg(width).arg(height));
         return -1;
     }
-    VERBOSE(VB_COMMFLAG, QString("PGMConverter::MythPlayerInited "
-                "using true greyscale conversion"));
+    LOG(VB_COMMFLAG, LOG_INFO, QString("PGMConverter::MythPlayerInited "
+                                       "using true greyscale conversion"));
 #else  /* !PGM_CONVERT_GREYSCALE */
-    VERBOSE(VB_COMMFLAG, QString("PGMConverter::MythPlayerInited "
-                "(YUV shortcut)"));
+    LOG(VB_COMMFLAG, LOG_INFO, QString("PGMConverter::MythPlayerInited "
+                                       "(YUV shortcut)"));
 #endif /* !PGM_CONVERT_GREYSCALE */
 
     return 0;
@@ -83,7 +83,7 @@ PGMConverter::getImage(const VideoFrame *frame, long long _frameno,
 
     if (!frame->buf)
     {
-        VERBOSE(VB_COMMFLAG, "PGMConverter::getImage no buf");
+        LOG(VB_COMMFLAG, LOG_ERR, "PGMConverter::getImage no buf");
         goto error;
     }
 
@@ -97,8 +97,8 @@ PGMConverter::getImage(const VideoFrame *frame, long long _frameno,
 #else  /* !PGM_CONVERT_GREYSCALE */
     if (avpicture_fill(&pgm, frame->buf, PIX_FMT_GRAY8, width, height) == -1)
     {
-        VERBOSE(VB_COMMFLAG, QString(
-                    "PGMConverter::getImage error at frame %1 (%2x%3)")
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("PGMConverter::getImage error at frame %1 (%2x%3)")
                 .arg(_frameno).arg(width).arg(height));
         goto error;
     }
@@ -121,7 +121,7 @@ PGMConverter::reportTime(void)
 #ifdef PGM_CONVERT_GREYSCALE
     if (!time_reported)
     {
-        VERBOSE(VB_COMMFLAG, QString("PGM Time: convert=%1s")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("PGM Time: convert=%1s")
                 .arg(strftimeval(&convert_time)));
         time_reported = true;
     }

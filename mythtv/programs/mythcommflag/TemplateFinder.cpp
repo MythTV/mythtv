@@ -30,8 +30,7 @@ using namespace commDetector2;
 
 namespace {
 
-int
-writeJPG(QString prefix, const AVPicture *img, int imgheight)
+int writeJPG(QString prefix, const AVPicture *img, int imgheight)
 {
     const int imgwidth = img->linesize[0];
     QFileInfo jpgfi(prefix + ".jpg");
@@ -55,8 +54,8 @@ writeJPG(QString prefix, const AVPicture *img, int imgheight)
 
         if (!pgmfile.remove())
         {
-            VERBOSE(VB_COMMFLAG, QString(
-                        "TemplateFinder.writeJPG error removing %1 (%2)")
+            LOG(VB_COMMFLAG, LOG_ERR, 
+                QString("TemplateFinder.writeJPG error removing %1 (%2)")
                     .arg(pgmfile.fileName()).arg(strerror(errno)));
             return -1;
         }
@@ -175,7 +174,7 @@ bounding_box(const AVPicture *img, int imgheight,
         int             ii;
         bool            improved = false;
 
-        VERBOSE(VB_COMMFLAG, QString("bounding_box %1x%2@(%3,%4)")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("bounding_box %1x%2@(%3,%4)")
                 .arg(width).arg(height).arg(col).arg(row));
 
         /* Chop top. */
@@ -266,8 +265,8 @@ bounding_box(const AVPicture *img, int imgheight,
 
             left = bounding_score(img, row, col, chopwidth, height);
             right = bounding_score(img, row, col + chop, chopwidth, height);
-            VERBOSE(VB_COMMFLAG, QString(
-                        "bounding_box too wide (%1 > %2); left=%3, right=%4")
+            LOG(VB_COMMFLAG, LOG_INFO, 
+                QString("bounding_box too wide (%1 > %2); left=%3, right=%4")
                     .arg(width).arg(maxwidth)
                     .arg(left, 0, 'f', 3).arg(right, 0, 'f', 3));
             minscore = min(left, right);
@@ -279,8 +278,8 @@ bounding_box(const AVPicture *img, int imgheight,
                  *
                  * XXX: also fails for horizontally-centered templates ...
                  */
-                VERBOSE(VB_COMMFLAG, "bounding_box giving up"
-                        " (edge pixels distributed too uniformly)");
+                LOG(VB_COMMFLAG, LOG_ERR, "bounding_box giving up (edge "
+                                          "pixels distributed too uniformly)");
                 return -1;
             }
 
@@ -299,8 +298,8 @@ bounding_box(const AVPicture *img, int imgheight,
 
             upper = bounding_score(img, row, col, width, chopheight);
             lower = bounding_score(img, row + chop, col, width, chopheight);
-            VERBOSE(VB_COMMFLAG, QString(
-                        "bounding_box too tall (%1 > %2); upper=%3, lower=%4")
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("bounding_box too tall (%1 > %2); upper=%3, lower=%4")
                     .arg(height).arg(maxheight)
                     .arg(upper, 0, 'f', 3).arg(lower, 0, 'f', 3));
             minscore = min(upper, lower);
@@ -312,8 +311,8 @@ bounding_box(const AVPicture *img, int imgheight,
                  *
                  * XXX: also fails for vertically-centered templates ...
                  */
-                VERBOSE(VB_COMMFLAG, "bounding_box giving up"
-                        " (edge pixel distribution too uniform)");
+                LOG(VB_COMMFLAG, LOG_ERR, "bounding_box giving up (edge "
+                                          "pixel distribution too uniform)");
                 return -1;
             }
 
@@ -333,8 +332,8 @@ bounding_box(const AVPicture *img, int imgheight,
      * each direction) to include all edge pixels.
      */
 
-    VERBOSE(VB_COMMFLAG, QString("bounding_box %1x%2@(%3,%4);"
-                " horizslop=%5,vertslop=%6")
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("bounding_box %1x%2@(%3,%4); horizslop=%5,vertslop=%6")
             .arg(width).arg(height).arg(col).arg(row)
             .arg(HORIZSLOP).arg(VERTSLOP));
 
@@ -429,7 +428,7 @@ bounding_box(const AVPicture *img, int imgheight,
     width = newright - newcol;
     height = newbottom - newrow;
 
-    VERBOSE(VB_COMMFLAG, QString("bounding_box %1x%2@(%3,%4)")
+    LOG(VB_COMMFLAG, LOG_INFO, QString("bounding_box %1x%2@(%3,%4)")
             .arg(width).arg(height).arg(col).arg(row));
 
     *prow = row;
@@ -463,8 +462,8 @@ template_alloc(const unsigned int *scores, int width, int height,
 
     if (avpicture_alloc(&thresh, PIX_FMT_GRAY8, width, height))
     {
-        VERBOSE(VB_COMMFLAG, QString("template_alloc "
-                "avpicture_alloc thresh (%1x%2) failed")
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("template_alloc avpicture_alloc thresh (%1x%2) failed")
                 .arg(width).arg(height));
         return -1;
     }
@@ -476,8 +475,8 @@ template_alloc(const unsigned int *scores, int width, int height,
     if (sortedscores[0] == sortedscores[nn - 1])
     {
         /* All pixels in the template area look the same; no template. */
-        VERBOSE(VB_COMMFLAG, QString(
-                    "template_alloc: %1x%2 pixels all identical!")
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("template_alloc: %1x%2 pixels all identical!")
                 .arg(width).arg(height));
         goto free_thresh;
     }
@@ -495,7 +494,7 @@ template_alloc(const unsigned int *scores, int width, int height,
     if (sortedscores[last] != threshscore)
         last--;
 
-    VERBOSE(VB_COMMFLAG, QString("template_alloc wanted %1, got %2-%3")
+    LOG(VB_COMMFLAG, LOG_INFO, QString("template_alloc wanted %1, got %2-%3")
             .arg(MINSCOREPCTILE, 0, 'f', 6)
             .arg((float)first / nn, 0, 'f', 6)
             .arg((float)last / nn, 0, 'f', 6));
@@ -509,8 +508,8 @@ template_alloc(const unsigned int *scores, int width, int height,
         AVPicture scored;
         if (avpicture_alloc(&scored, PIX_FMT_GRAY8, width, height))
         {
-            VERBOSE(VB_COMMFLAG, QString("template_alloc "
-                    "avpicture_alloc scored (%1x%2) failed")
+            LOG(VB_COMMFLAG, LOG_ERR,
+                QString("template_alloc avpicture_alloc scored (%1x%2) failed")
                     .arg(width).arg(height));
             goto free_thresh;
         }
@@ -537,16 +536,16 @@ template_alloc(const unsigned int *scores, int width, int height,
     if ((uint)(*ptmplwidth * *ptmplheight) > USHRT_MAX)
     {
         /* Max value of data type of TemplateMatcher::edgematch */
-        VERBOSE(VB_COMMFLAG, QString(
-                    "template_alloc bounding_box too big (%1x%2)")
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("template_alloc bounding_box too big (%1x%2)")
                 .arg(*ptmplwidth).arg(*ptmplheight));
         goto free_thresh;
     }
 
     if (avpicture_alloc(tmpl, PIX_FMT_GRAY8, *ptmplwidth, *ptmplheight))
     {
-        VERBOSE(VB_COMMFLAG, QString("template_alloc "
-                "avpicture_alloc tmpl (%1x%2) failed")
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("template_alloc avpicture_alloc tmpl (%1x%2) failed")
                 .arg(*ptmplwidth).arg(*ptmplheight));
         goto free_thresh;
     }
@@ -583,7 +582,8 @@ analyzeFrameDebug(long long frameno, const AVPicture *pgm, int pgmheight,
     if (frameno > 0 && rowsame + colsame + widthsame + heightsame >= 3)
         return 0;
 
-    VERBOSE(VB_COMMFLAG, QString("TemplateFinder Frame %1: %2x%3@(%4,%5)")
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("TemplateFinder Frame %1: %2x%3@(%4,%5)")
             .arg(frameno, 5)
             .arg(cropwidth).arg(cropheight)
             .arg(cropcol).arg(croprow));
@@ -640,8 +640,8 @@ readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
 
     if (avpicture_alloc(tmpl, PIX_FMT_GRAY8, *pwidth, *pheight))
     {
-        VERBOSE(VB_COMMFLAG, QString(
-                    "readTemplate avpicture_alloc %1 (%2x%3) failed")
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("readTemplate avpicture_alloc %1 (%2x%3) failed")
                 .arg(tmplfile).arg(*pwidth).arg(*pheight));
         return false;
     }
@@ -663,7 +663,8 @@ writeDummyTemplate(QString datafile)
     /* Leave a 0-byte file. */
     QFile dfile(datafile);
 
-    if (!dfile.open(QIODevice::WriteOnly | QIODevice::Truncate) && dfile.exists())
+    if (!dfile.open(QIODevice::WriteOnly | QIODevice::Truncate) &&
+        dfile.exists())
         (void)dfile.remove();
 }
 
@@ -753,8 +754,8 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
     frameInterval = (int)roundf(sampleTime * fps / samplesNeeded);
     endFrame = 0 + frameInterval * samplesNeeded - 1;
 
-    VERBOSE(VB_COMMFLAG, QString("TemplateFinder: sampleTime=%1s"
-                ", samplesNeeded=%2, endFrame=%3")
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("TemplateFinder: sampleTime=%1s, samplesNeeded=%2, endFrame=%3")
             .arg(sampleTime).arg(samplesNeeded).arg(endFrame));
 
     memset(&cropped, 0, sizeof(cropped));
@@ -821,8 +822,8 @@ TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
                 .arg(tmplwidth).arg(tmplheight).arg(tmplcol).arg(tmplrow) :
                     "no template";
 
-            VERBOSE(VB_COMMFLAG, QString(
-                        "TemplateFinder::MythPlayerInited read %1: %2")
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("TemplateFinder::MythPlayerInited read %1: %2")
                     .arg(debugtmpl)
                     .arg(tmpldims));
         }
@@ -838,16 +839,15 @@ TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
     {
         if (tmpl_valid)
         {
-            VERBOSE(VB_COMMFLAG, QString(
-                        "TemplateFinder::MythPlayerInited"
-                        " %1 of %2 (%3)")
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("TemplateFinder::MythPlayerInited %1 of %2 (%3)")
                     .arg(tmpldims).arg(playerdims).arg(debugtmpl));
         }
         return ANALYZE_FINISHED;
     }
 
-    VERBOSE(VB_COMMFLAG, QString("TemplateFinder::MythPlayerInited"
-                " framesize %1")
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("TemplateFinder::MythPlayerInited framesize %1")
             .arg(playerdims));
     scores = new unsigned int[width * height];
 
@@ -868,8 +868,8 @@ TemplateFinder::resetBuffers(int newwidth, int newheight)
 
     if (avpicture_alloc(&cropped, PIX_FMT_GRAY8, newwidth, newheight))
     {
-        VERBOSE(VB_COMMFLAG, QString(
-                    "TemplateFinder::resetBuffers "
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("TemplateFinder::resetBuffers "
                     "avpicture_alloc cropped (%1x%2) failed")
                 .arg(newwidth).arg(newheight));
         return -1;
@@ -992,8 +992,8 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
     return ANALYZE_OK;
 
 error:
-    VERBOSE(VB_COMMFLAG,
-            QString("TemplateFinder::analyzeFrame error at frame %1")
+    LOG(VB_COMMFLAG, LOG_ERR,
+        QString("TemplateFinder::analyzeFrame error at frame %1")
             .arg(frameno));
 
     if (nextFrame > endFrame)
@@ -1025,7 +1025,8 @@ TemplateFinder::finished(long long nframes, bool final)
                                 tmplrow, tmplcol, tmplwidth, tmplheight)))
                     goto free_tmpl;
 
-                VERBOSE(VB_COMMFLAG, QString("TemplateFinder::finished wrote %1"
+                LOG(VB_COMMFLAG, LOG_INFO,
+                    QString("TemplateFinder::finished wrote %1"
                             " and %2 [%3x%4@(%5,%6)]")
                         .arg(debugtmpl).arg(debugdata)
                         .arg(tmplwidth).arg(tmplheight)
@@ -1055,7 +1056,7 @@ TemplateFinder::reportTime(void) const
     if (borderDetector->reportTime())
         return -1;
 
-    VERBOSE(VB_COMMFLAG, QString("TF Time: analyze=%1s")
+    LOG(VB_COMMFLAG, LOG_INFO, QString("TF Time: analyze=%1s")
             .arg(strftimeval(&analyze_time)));
     return 0;
 }

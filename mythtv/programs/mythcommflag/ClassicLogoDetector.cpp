@@ -83,7 +83,8 @@ void ClassicLogoDetector::deleteLater(void)
 
 bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 {
-    int seekIncrement = (int)(commDetectLogoSampleSpacing * player->GetFrameRate());
+    int seekIncrement = 
+        (int)(commDetectLogoSampleSpacing * player->GetFrameRate());
     long long seekFrame;
     int loops;
     int maxLoops = commDetectLogoSamplesNeeded;
@@ -92,7 +93,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
     int edgeDiffs[] = {5, 7, 10, 15, 20, 30, 40, 50, 60, 0 };
 
 
-    VERBOSE(VB_COMMFLAG, "Searching for Station Logo");
+    LOG(VB_COMMFLAG, LOG_INFO, "Searching for Station Logo");
 
     logoInfoAvailable = false;
 
@@ -102,7 +103,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
     {
         int pixelsInMask = 0;
 
-        VERBOSE(VB_COMMFLAG, QString("Trying with edgeDiff == %1")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("Trying with edgeDiff == %1")
                 .arg(edgeDiffs[i]));
 
         memset(edgeCounts, 0, sizeof(EdgeMaskEntry) * width * height);
@@ -137,7 +138,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
             player->DiscardVideoFrame(vf);
         }
 
-        VERBOSE(VB_COMMFLAG, "Analyzing edge data");
+        LOG(VB_COMMFLAG, LOG_INFO, "Analyzing edge data");
 
 #ifdef SHOW_DEBUG_WIN
         unsigned char *fakeFrame;
@@ -206,10 +207,10 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
         }
 
         SetLogoMaskArea();
-        VERBOSE(VB_COMMFLAG, QString("Testing Logo area: topleft "
-                                     "(%1,%2), bottomright (%3,%4)")
-                                     .arg(logoMinX).arg(logoMinY)
-                                     .arg(logoMaxX).arg(logoMaxY));
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("Testing Logo area: topleft (%1,%2), bottomright (%3,%4)")
+                .arg(logoMinX).arg(logoMinY)
+                .arg(logoMaxX).arg(logoMaxY));
 
 #ifdef SHOW_DEBUG_WIN
         for (x = logoMinX; x < logoMaxX; x++)
@@ -240,17 +241,18 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
             logoInfoAvailable = true;
             logoEdgeDiff = edgeDiffs[i];
 
-            VERBOSE(VB_COMMFLAG, QString("Using Logo area: topleft "
-                                         "(%1,%2), bottomright (%3,%4)")
+            LOG(VB_COMMFLAG, LOG_INFO, 
+                QString("Using Logo area: topleft (%1,%2), "
+                        "bottomright (%3,%4)")
                     .arg(logoMinX).arg(logoMinY)
                     .arg(logoMaxX).arg(logoMaxY));
         }
         else
         {
-            VERBOSE(VB_COMMFLAG, QString("Rejecting Logo area: topleft "
-                                         "(%1,%2), bottomright (%3,%4), "
-                                         "pixelsInMask (%5). "
-                                         "Not within specified limits.")
+            LOG(VB_COMMFLAG, LOG_INFO, 
+                QString("Rejecting Logo area: topleft (%1,%2), "
+                        "bottomright (%3,%4), pixelsInMask (%5). "
+                        "Not within specified limits.")
                     .arg(logoMinX).arg(logoMinY)
                     .arg(logoMaxX).arg(logoMaxY)
                     .arg(pixelsInMask));
@@ -260,7 +262,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
     delete [] edgeCounts;
 
     if (!logoInfoAvailable)
-        VERBOSE(VB_COMMFLAG, "No suitable logo area found.");
+        LOG(VB_COMMFLAG, LOG_NOTICE, "No suitable logo area found.");
 
     player->DiscardVideoFrame(player->GetRawVideoFrame(0));
     return logoInfoAvailable;
@@ -269,7 +271,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
 void ClassicLogoDetector::SetLogoMaskArea()
 {
-    VERBOSE(VB_COMMFLAG, "SetLogoMaskArea()");
+    LOG(VB_COMMFLAG, LOG_INFO, "SetLogoMaskArea()");
 
     logoMinX = width - 1;
     logoMaxX = 0;
