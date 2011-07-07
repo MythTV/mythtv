@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <QString>
+#include <QDate>
 
 #include "parentalcontrols.h"
 #include "mythmetaexp.h"
