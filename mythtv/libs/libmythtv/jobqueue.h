@@ -58,7 +58,8 @@ enum JobFlags {
     JOB_NO_FLAGS     = 0x0000,
     JOB_USE_CUTLIST  = 0x0001,
     JOB_LIVE_REC     = 0x0002,
-    JOB_EXTERNAL     = 0x0004
+    JOB_EXTERNAL     = 0x0004,
+    JOB_REBUILD      = 0x0008
 };
 
 enum JobLists {

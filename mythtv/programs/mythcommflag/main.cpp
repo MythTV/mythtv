@@ -81,6 +81,8 @@ int  quiet = 0;
 bool progress = true;
 bool force = false;
 
+MythCommFlagCommandLineParser cmdline;
+
 bool fullSpeed = true;
 bool rebuildSeekTable = false;
 bool beNice = true;
@@ -189,7 +191,7 @@ static int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
     return GENERIC_EXIT_OK;
 }
 
-static int QueueCommFlagJob(uint chanid, QDateTime starttime)
+static int QueueCommFlagJob(uint chanid, QDateTime starttime, bool rebuild)
 {
     QString startstring = starttime.toString("yyyyMMddhhmmss");
     const ProgramInfo pginfo(chanid, starttime);
@@ -206,8 +208,9 @@ static int QueueCommFlagJob(uint chanid, QDateTime starttime)
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
-    bool result = JobQueue::QueueJob(
-        JOB_COMMFLAG, pginfo.GetChanID(), pginfo.GetRecordingStartTime());
+    bool result = JobQueue::QueueJob(JOB_COMMFLAG,
+        pginfo.GetChanID(), pginfo.GetRecordingStartTime(), "", "", "",
+        rebuild ? JOB_REBUILD : 0, JOB_QUEUED, QDateTime());
 
     if (result)
     {
@@ -233,13 +236,13 @@ static int QueueCommFlagJob(uint chanid, QDateTime starttime)
     return GENERIC_EXIT_OK;
 }
 
-static int CopySkipListToCutList(QString chanid, QDateTime starttime)
+static int CopySkipListToCutList(uint chanid, QDateTime starttime)
 {
     frm_dir_map_t cutlist;
     frm_dir_map_t::const_iterator it;
 
     QString startstring = starttime.toString("yyyyMMddhhmmss");
-    const ProgramInfo pginfo(chanid.toUInt(), starttime);
+    const ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
     {
@@ -260,10 +263,10 @@ static int CopySkipListToCutList(QString chanid, QDateTime starttime)
     return GENERIC_EXIT_OK;
 }
 
-static int ClearSkipList(QString chanid, QDateTime starttime)
+static int ClearSkipList(uint chanid, QDateTime starttime)
 {
     QString startstring = starttime.toString("yyyyMMddhhmmss");
-    const ProgramInfo pginfo(chanid.toUInt(), starttime);
+    const ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
     {
@@ -281,7 +284,7 @@ static int ClearSkipList(QString chanid, QDateTime starttime)
     return GENERIC_EXIT_OK;
 }
 
-static int SetCutList(QString chanid, QDateTime starttime, QString newCutList)
+static int SetCutList(uint chanid, QDateTime starttime, QString newCutList)
 {
     frm_dir_map_t cutlist;
 
@@ -297,7 +300,7 @@ static int SetCutList(QString chanid, QDateTime starttime, QString newCutList)
     }
 
     QString startstring = starttime.toString("yyyyMMddhhmmss");
-    const ProgramInfo pginfo(chanid.toUInt(), starttime);
+    const ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
     {
@@ -314,14 +317,14 @@ static int SetCutList(QString chanid, QDateTime starttime, QString newCutList)
     return GENERIC_EXIT_OK;
 }
 
-static int GetMarkupList(QString list, QString chanid, QDateTime starttime)
+static int GetMarkupList(QString list, uint chanid, QDateTime starttime)
 {
     frm_dir_map_t cutlist;
     frm_dir_map_t::const_iterator it;
     QString result;
 
     QString startstring = starttime.toString("yyyyMMddhhmmss");
-    const ProgramInfo pginfo(chanid.toUInt(), starttime);
+    const ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
     {
@@ -574,7 +577,7 @@ static void incomingCustomEvent(QEvent* e)
 
 static int DoFlagCommercials(
     ProgramInfo *program_info,
-    bool showPercentage, bool fullSpeed, bool inJobQueue,
+    bool showPercentage, bool fullSpeed, int jobid,
     MythCommFlagPlayer* cfp, enum SkipTypes commDetectMethod,
     const QString &outputfilename, bool useDB)
 {
@@ -588,19 +591,9 @@ static int DoFlagCommercials(
         program_info->GetRecordingStartTime(),
         program_info->GetRecordingEndTime(), useDB);
 
-    if (inJobQueue && useDB)
-    {
-        jobID = JobQueue::GetJobID(
-            JOB_COMMFLAG,
-            program_info->GetChanID(), program_info->GetRecordingStartTime());
-
-        if (jobID != -1)
-            LOG(VB_COMMFLAG, LOG_INFO,
-                QString("mythcommflag processing JobID %1").arg(jobID));
-        else
-            LOG(VB_COMMFLAG, LOG_ERR,
-                "mythcommflag: Unable to determine jobID");
-    }
+    if (jobid > 0)
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("mythcommflag processing JobID %1").arg(jobid));
 
     if (useDB)
         program_info->SaveCommFlagged(COMM_FLAG_PROCESSING);
@@ -667,95 +660,8 @@ static int DoFlagCommercials(
     return comms_found;
 }
 
-static int FlagCommercials(
-    ProgramInfo *program_info, const QString &outputfilename, bool useDB)
+static bool DoesFileExist(ProgramInfo *program_info)
 {
-    global_program_info = program_info;
-
-    int breaksFound = 0;
-
-    if (!useDB && COMM_DETECT_UNINIT == commDetectMethod)
-        commDetectMethod = COMM_DETECT_ALL;
-
-    if (commDetectMethod == COMM_DETECT_UNINIT)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT commmethod FROM channel "
-                        "WHERE chanid = :CHANID;");
-        query.bindValue(":CHANID", program_info->GetChanID());
-
-        if (!query.exec())
-        {
-            MythDB::DBError("FlagCommercials", query);
-        }
-        else if (query.next())
-        {
-            commDetectMethod = (enum SkipTypes)query.value(0).toInt();
-            if (commDetectMethod == COMM_DETECT_COMMFREE)
-            {
-                commDetectMethod = COMM_DETECT_UNINIT;
-                LOG(VB_COMMFLAG, LOG_INFO,
-                    QString("Chanid %1 is marked as being Commercial Free, "
-                            "we will use the default commercial detection "
-                            "method").arg(program_info->GetChanID()));
-            }
-            else if (commDetectMethod != COMM_DETECT_UNINIT)
-                LOG(VB_COMMFLAG, LOG_INFO,
-                    QString("Using method: %1 from channel %2")
-                        .arg(commDetectMethod).arg(program_info->GetChanID()));
-        }
-    }
-
-    if (commDetectMethod == COMM_DETECT_UNINIT)
-        commDetectMethod = (enum SkipTypes)gCoreContext->GetNumSetting(
-                                    "CommercialSkipMethod", COMM_DETECT_ALL);
-    frm_dir_map_t blanks;
-    recorder = NULL;
-
-    if (onlyDumpDBCommercialBreakList)
-    {
-        frm_dir_map_t commBreakList;
-        program_info->QueryCommBreakList(commBreakList);
-
-        print_comm_flag_output(program_info, commBreakList,
-                               0, NULL, outputfilename);
-
-        global_program_info = NULL;
-        return GENERIC_EXIT_OK;
-    }
-
-    QString chanid = QString::number(program_info->GetChanID())
-        .leftJustified(6, ' ', true);
-    QString recstartts = program_info->GetRecordingStartTime(MythDate)
-        .leftJustified(14, ' ', true);
-    QString title = program_info->GetTitle()
-        .leftJustified(41, ' ', true);
-
-    QString outstr = QString("%1  %2  %3  ")
-        .arg(chanid).arg(recstartts).arg(title);
-
-    if (progress)
-    {
-        QByteArray out = outstr.toLocal8Bit();
-
-        cerr << out.constData() << flush;
-    }
-    LOG(VB_GENERAL, LOG_INFO, outstr);
-
-    if (!force && JobQueue::IsJobRunning(JOB_COMMFLAG, *program_info))
-    {
-        if (progress)
-        {
-            cerr << "IN USE\n";
-            cerr << "                        "
-                    "(the program is already being flagged elsewhere)\n";
-        }
-        LOG(VB_GENERAL, LOG_NOTICE,
-            "Program is already being flagged elsewhere");
-        global_program_info = NULL;
-        return GENERIC_EXIT_IN_USE;
-    }
-
     QString filename = get_filename(program_info);
     long long size = 0;
     bool exists = false;
@@ -783,19 +689,211 @@ static int FlagCommercials(
 
     if (!exists)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find file %1, aborting.")
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find file %1, aborting.")
                 .arg(filename));
-        global_program_info = NULL;
-        return GENERIC_EXIT_PERMISSIONS_ERROR;
+        return false;
     }
 
     if (size == 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("File %1 is zero-byte, aborting.")
+        VERBOSE(VB_IMPORTANT, QString("File %1 is zero-byte, aborting.")
                 .arg(filename));
-        global_program_info = NULL;
-        return GENERIC_EXIT_PERMISSIONS_ERROR;
+        return false;
     }
+
+    return true;
+}
+
+static bool IsMarked(uint chanid, QDateTime starttime)
+{
+    MSqlQuery mark_query(MSqlQuery::InitCon());
+    mark_query.prepare("SELECT commflagged, count(rm.type) "
+                       "FROM recorded r "
+                       "LEFT JOIN recordedmarkup rm ON "
+                           "( r.chanid = rm.chanid AND "
+                             "r.starttime = rm.starttime AND "
+                             "type in (:MARK_START,:MARK_END)) "
+                       "WHERE r.chanid = :CHANID AND "
+                             "r.starttime = :STARTTIME "
+                       "GROUP BY COMMFLAGGED;");
+    mark_query.bindValue(":MARK_START", MARK_COMM_START);
+    mark_query.bindValue(":MARK_END", MARK_COMM_END);
+    mark_query.bindValue(":CHANID", chanid);
+    mark_query.bindValue(":STARTTIME", starttime);
+
+    if (mark_query.exec() && mark_query.isActive() &&
+        mark_query.size() > 0)
+    {
+        if (mark_query.next())
+        {
+            int flagStatus = mark_query.value(0).toInt();
+            int marksFound = mark_query.value(1).toInt();
+
+            QString flagStatusStr = "UNKNOWN";
+            switch (flagStatus) {
+              case COMM_FLAG_NOT_FLAGGED:
+                flagStatusStr = "Not Flagged";
+                break;
+              case COMM_FLAG_DONE:
+                flagStatusStr = QString("Flagged with %1 breaks")
+                                    .arg(marksFound / 2);
+                break;
+              case COMM_FLAG_PROCESSING:
+                flagStatusStr = "Flagging";
+                break;
+              case COMM_FLAG_COMMFREE:
+                flagStatusStr = "Commercial Free";
+                break;
+            }
+
+            VERBOSE(VB_COMMFLAG, QString("Status for chanid %1 @ %2 is '%3'")
+                               .arg(chanid).arg(starttime.toString(Qt::ISODate))
+                               .arg(flagStatusStr));
+
+            if ((flagStatus == COMM_FLAG_NOT_FLAGGED) && (marksFound == 0))
+                return false;
+        }
+    }
+    return true;
+}
+
+static int FlagCommercials(ProgramInfo *program_info, int jobid,
+            const QString &outputfilename, bool useDB)
+{
+    global_program_info = program_info;
+
+    int breaksFound = 0;
+
+    // configure commercial detection method
+    SkipTypes commDetectMethod = 
+            (enum SkipTypes)gCoreContext->GetNumSetting(
+                                    "CommercialSkipMethod", COMM_DETECT_ALL);
+
+    cerr << "selecting flagging method" << endl;
+    if (cmdline.toBool("commmethod"))
+    {
+        // pull commercial detection method from command line
+        QString commmethod = cmdline.toString("commmethod");
+
+        // assume definition as integer value
+        bool ok = true;
+        if (cmdline.toBool("commmethod"))
+            commDetectMethod = (SkipTypes) commmethod.toInt(&ok);
+        if (!ok)
+        {
+            cerr << "method input not an integer, parsing" << endl;
+
+            // not an integer, attempt comma separated list
+            commDetectMethod = COMM_DETECT_UNINIT;
+            QMap<QString, SkipTypes>::const_iterator sit;
+
+            QStringList list = commmethod.split(",", QString::SkipEmptyParts);
+            QStringList::const_iterator it = list.begin();
+            for (; it != list.end(); ++it)
+            {
+                QString val = (*it).toLower();
+                cerr << "parsing " << val.toLocal8Bit().constData();
+                if (val == "off")
+                {
+                    commDetectMethod = COMM_DETECT_OFF;
+                    break;
+                }
+
+                if (!skipTypes->contains(val))
+                {
+                    cerr << "Failed to decode --method option '"
+                         << val.toAscii().constData()
+                         << "'" << endl;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
+                }
+
+                // append flag method to list
+                cerr << ": " << (int)skipTypes->value(val) << endl;
+                commDetectMethod = (SkipTypes) ((int)commDetectMethod
+                                             || (int)skipTypes->value(val));
+            }
+
+            cerr << "parsing complete: " << commDetectMethod << endl;
+
+        }
+        if (commDetectMethod == COMM_DETECT_UNINIT)
+            return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+    else if (!cmdline.toBool("skipdb"))
+    {
+        // if not manually specified, and we have a database to access
+        // pull the commflag type from the channel
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT commmethod FROM channel "
+                        "WHERE chanid = :CHANID;");
+        query.bindValue(":CHANID", program_info->GetChanID());
+
+        if (!query.exec())
+        {
+            // if the query fails, return with an error
+            commDetectMethod = COMM_DETECT_UNINIT;
+            MythDB::DBError("FlagCommercials", query);
+        }
+        else if (query.next())
+        {
+            commDetectMethod = (enum SkipTypes)query.value(0).toInt();
+            if (commDetectMethod == COMM_DETECT_COMMFREE)
+            {
+                // if the channel is commercial free, drop to the default instead
+                commDetectMethod = 
+                        (enum SkipTypes)gCoreContext->GetNumSetting(
+                                    "CommercialSkipMethod", COMM_DETECT_ALL);
+                LOG(VB_COMMFLAG, LOG_INFO,
+                        QString("Chanid %1 is marked as being Commercial Free, "
+                                "we will use the default commercial detection "
+                                "method").arg(program_info->GetChanID()));
+            }
+            else if (commDetectMethod == COMM_DETECT_UNINIT)
+                // no value set, so use the database default
+                commDetectMethod = 
+                        (enum SkipTypes)gCoreContext->GetNumSetting(
+                                     "CommercialSkipMethod", COMM_DETECT_ALL);
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("Using method: %1 from channel %2")
+                    .arg(commDetectMethod).arg(program_info->GetChanID()));
+        }
+
+    }
+
+    cerr << "running commflagging with method " << commDetectMethod << endl;
+
+    // if selection has failed, or intentionally disabled, drop out
+    if (commDetectMethod == COMM_DETECT_UNINIT)
+        return GENERIC_EXIT_NOT_OK;
+    else if (commDetectMethod == COMM_DETECT_OFF)
+        return GENERIC_EXIT_OK;
+
+    cerr << "running commflagging with method " << commDetectMethod << endl;
+
+    frm_dir_map_t blanks;
+    recorder = NULL;
+
+/*
+ * is there a purpose to this not fulfilled by --getskiplist?
+    if (onlyDumpDBCommercialBreakList)
+    {
+        frm_dir_map_t commBreakList;
+        program_info->QueryCommBreakList(commBreakList);
+
+        print_comm_flag_output(program_info, commBreakList,
+                               0, NULL, outputfilename);
+
+        global_program_info = NULL;
+        return GENERIC_EXIT_OK;
+    }
+*/
+
+    cerr << "checking for file existence" << endl;
+
+    if (!DoesFileExist(program_info))
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
+
+    QString filename = get_filename(program_info);
 
     RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
     if (!tmprbuf)
@@ -806,14 +904,18 @@ static int FlagCommercials(
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
-    if (useDB && !MSqlQuery::testDBConnection())
+    if (useDB)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Unable to open commflag DB connection");
-        delete tmprbuf;
-        global_program_info = NULL;
-        return GENERIC_EXIT_DB_ERROR;
+        if (!MSqlQuery::testDBConnection())
+        {
+            VERBOSE(VB_IMPORTANT, "Unable to open commflag DB connection");
+            delete tmprbuf;
+            global_program_info = NULL;
+            return GENERIC_EXIT_DB_ERROR;
+        }
     }
 
+    cerr << "starting commflagging" << endl;
     MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
 
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
@@ -837,76 +939,39 @@ static int FlagCommercials(
     ctx->SetPlayer(cfp);
     cfp->SetPlayerInfo(NULL, NULL, true, ctx);
 
-    if (rebuildSeekTable)
+    if (useDB)
     {
-        cfp->RebuildSeekTable(progress);
-
-        if (progress)
-            cerr << "Rebuilt\n";
-
-        delete ctx;
-        global_program_info = NULL;
-
-        return GENERIC_EXIT_OK;
-    }
-
-    if (program_info->GetRecordingEndTime() > QDateTime::currentDateTime())
-    {
-        gCoreContext->ConnectToMasterServer();
-
-        recorder = RemoteGetExistingRecorder(program_info);
-        if (recorder && (recorder->GetRecorderNumber() != -1))
+        if (program_info->GetRecordingEndTime() > QDateTime::currentDateTime())
         {
-            recorderNum =  recorder->GetRecorderNumber();
-            watchingRecording = true;
-            ctx->SetRecorder(recorder);
+            gCoreContext->ConnectToMasterServer();
 
-            LOG(VB_COMMFLAG, LOG_INFO,
-                QString("mythcommflag will flag recording "
+            recorder = RemoteGetExistingRecorder(program_info);
+            if (recorder && (recorder->GetRecorderNumber() != -1))
+            {
+                recorderNum =  recorder->GetRecorderNumber();
+                watchingRecording = true;
+                ctx->SetRecorder(recorder);
+
+                VERBOSE(VB_COMMFLAG, QString("mythcommflag will flag recording "
                         "currently in progress on cardid %1").arg(recorderNum));
-        }
-        else
-        {
-            recorderNum = -1;
-            watchingRecording = false;
+            }
+            else
+            {
+                recorderNum = -1;
+                watchingRecording = false;
 
-            LOG(VB_GENERAL, LOG_ERR, 
-                "Unable to find active recorder for this "
-                "recording, realtime flagging will not be enabled.");
+                LOG(VB_IMPORTANT, LOG_ERR, "Unable to find active recorder for this "
+                        "recording, realtime flagging will not be enabled.");
+            }
+            cfp->SetWatchingRecording(watchingRecording);
         }
-        cfp->SetWatchingRecording(watchingRecording);
     }
 
-    int fakeJobID = -1;
-    if (!inJobQueue && useDB)
-    {
-        JobQueue::QueueJob(
-            JOB_COMMFLAG,
-            program_info->GetChanID(), program_info->GetRecordingStartTime(),
-            "", "", gCoreContext->GetHostName(), JOB_EXTERNAL, JOB_RUNNING);
-
-        fakeJobID = JobQueue::GetJobID(
-            JOB_COMMFLAG,
-            program_info->GetChanID(), program_info->GetRecordingStartTime());
-
-        jobID = fakeJobID;
-        LOG(VB_COMMFLAG, LOG_INFO,
-            QString("Not in JobQueue, creating fake Job ID %1").arg(jobID));
-    }
-    else
-        jobID = -1;
-
+    // TODO: Add back insertion of job if not in jobqueue
 
     breaksFound = DoFlagCommercials(
-        program_info, progress, fullSpeed, inJobQueue,
+        program_info, progress, fullSpeed, jobid,
         cfp, commDetectMethod, outputfilename, useDB);
-
-    if (fakeJobID >= 0)
-    {
-        jobID = -1;
-        JobQueue::ChangeJobStatus(fakeJobID, JOB_FINISHED,
-            QObject::tr("Finished, %n break(s) found.", "", breaksFound));
-    }
 
     if (progress)
         cerr << breaksFound << "\n";
@@ -920,9 +985,8 @@ static int FlagCommercials(
     return breaksFound;
 }
 
-static int FlagCommercials(
-    uint chanid, const QDateTime &starttime,
-    const QString &outputfilename, bool useDB)
+static int FlagCommercials( uint chanid, const QDateTime &starttime,
+                            int jobid, const QString &outputfilename)
 {
     QString startstring = starttime.toString("yyyyMMddhhmmss");
     ProgramInfo pginfo(chanid, starttime);
@@ -935,9 +999,117 @@ static int FlagCommercials(
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
-    int ret = FlagCommercials(&pginfo, outputfilename, useDB);
+    if (!force && JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo))
+    {
+        if (progress)
+        {
+            cerr << "IN USE\n";
+            cerr << "                        "
+                    "(the program is already being flagged elsewhere)\n";
+        }           
+        VERBOSE(VB_IMPORTANT, "Program is already being flagged elsewhere");
+        return GENERIC_EXIT_IN_USE;
+    }
+     
 
-    return ret;
+    if (progress)
+    {   
+        cerr << "MythTV Commercial Flagger, flagging commercials for:" << endl;
+        if (pginfo.GetSubtitle().isEmpty())
+            cerr << "    " << pginfo.GetTitle().toLocal8Bit().constData() << endl;
+        else
+            cerr << "    " << pginfo.GetTitle().toLocal8Bit().constData() << " - "
+                 << pginfo.GetSubtitle().toLocal8Bit().constData() << endl;
+    }
+
+    return FlagCommercials(&pginfo, jobid, outputfilename, true);
+}
+
+static int FlagCommercials(QString filename, int jobid,
+                const QString outputfilename, bool useDB)
+{
+
+    if (progress)
+    {   
+        cerr << "MythTV Commercial Flagger, flagging commercials for:" << endl
+             << "    " << filename.toAscii().constData() << endl;
+    }    
+
+    ProgramInfo pginfo(filename);
+    return FlagCommercials(&pginfo, jobid, outputfilename, useDB);
+}
+
+static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
+{
+    if (!DoesFileExist(pginfo))
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
+
+    QString filename = get_filename(pginfo);
+
+    RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
+    if (!tmprbuf)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Unable to create RingBuffer for %1").arg(filename));
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
+    }
+
+    MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
+    PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
+    AVSpecialDecode sp = (AVSpecialDecode) (kAVSpecialDecode_LowRes         |
+                                            kAVSpecialDecode_SingleThreaded |
+                                            kAVSpecialDecode_NoLoopFilter);
+
+    ctx->SetSpecialDecode(sp);
+    ctx->SetPlayingInfo(pginfo);
+    ctx->SetRingBuffer(tmprbuf);
+    ctx->SetPlayer(cfp);
+    cfp->SetPlayerInfo(NULL, NULL, true, ctx);
+
+    time_t time_now;
+    if (progress)
+    {
+        time_now = time(NULL);
+        cerr << "Rebuild started at " << ctime(&time_now) << endl;
+    }
+
+    cfp->RebuildSeekTable(progress);
+
+    if (progress)
+    {
+        time_now = time(NULL);
+        cerr << "Rebuild completed at " << ctime(&time_now) << endl;
+    }
+
+    delete ctx;
+
+    return GENERIC_EXIT_OK;
+}
+
+static int RebuildSeekTable(QString filename, int jobid)
+{
+    if (progress)
+    {
+        cerr << "MythTV Commercial Flagger, building seek table for:" << endl
+             << "    " << filename.toAscii().constData() << endl;
+    }
+    ProgramInfo pginfo(filename);
+    return RebuildSeekTable(&pginfo, jobid);
+}
+
+static int RebuildSeekTable(uint chanid, QDateTime starttime, int jobid)
+{
+    ProgramInfo pginfo(chanid, starttime);
+    if (progress)
+    {
+        cerr << "MythTV Commercial Flagger, building seek table for:" << endl;
+        if (pginfo.GetSubtitle().isEmpty())
+            cerr << "    " << pginfo.GetTitle().toLocal8Bit().constData() << endl;
+        else
+            cerr << "    " << pginfo.GetTitle().toLocal8Bit().constData() << " - "
+                 << pginfo.GetSubtitle().toLocal8Bit().constData() << endl;
+    }
+    return RebuildSeekTable(&pginfo, jobid);
 }
 
 int main(int argc, char *argv[])
@@ -952,7 +1124,6 @@ int main(int argc, char *argv[])
     QDateTime starttime;
     QString allStart = "19700101000000";
     QString allEnd   = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
-    int jobID = -1;
     int jobType = JOB_NONE;
     QDir fullfile;
     time_t time_now;
@@ -961,7 +1132,6 @@ int main(int argc, char *argv[])
     bool queueJobInstead = false;
     QString newCutList = QString::null;
 
-    MythCommFlagCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
         cmdline.PrintHelp();
@@ -982,176 +1152,64 @@ int main(int argc, char *argv[])
 
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCOMMFLAG);
-
-    progress = !cmdline.toBool("noprogress");
+    cerr << "prepping logging" << endl;
     int retval;
-    QString mask("important general");
-    if ((retval = cmdline.ConfigureLogging(mask, progress)) != GENERIC_EXIT_OK)
+    if ((retval = cmdline.ConfigureLogging(
+                        "important general",
+                        !cmdline.toBool("noprogress"))) != GENERIC_EXIT_OK)
         return retval;
 
-    if (!cmdline.toString("chanid").isEmpty())
-        chanid = cmdline.toUInt("chanid");
-    if (!cmdline.toString("starttime").isEmpty())
-        starttime = cmdline.toDateTime("starttime");
-    if (!cmdline.toString("file").isEmpty())
-    {
-        filename = cmdline.toString("file");
-        fullfile = cmdline.toString("file");
-    }
-    if (!cmdline.toString("video").isEmpty())
-    {
-        filename = cmdline.toString("video");
-        isVideo = true;
-        rebuildSeekTable = true;
-        beNice = false;
-    }
-
-    if (cmdline.toBool("commmethod"))
-    {
-        QString method = cmdline.toString("commmethod");
-        bool ok;
-        commDetectMethod = (SkipTypes) method.toInt(&ok);
-        if (!ok)
-        {
-            commDetectMethod = COMM_DETECT_OFF;
-            bool off_seen = false;
-            QMap<QString,SkipTypes>::const_iterator sit;
-            QStringList list =
-                method.split(",", QString::SkipEmptyParts);
-            QStringList::const_iterator it = list.begin();
-            for (; it != list.end(); ++it)
-            {
-                QString val = (*it).toLower();
-                QByteArray aval = val.toAscii();
-                off_seen |= val == "off";
-                sit = skipTypes->find(val);
-                if (sit == skipTypes->end())
-                {
-                    cerr << "Failed to decode --method option '"
-                         << aval.constData() << "'" << endl;
-                    return -1;
-                }
-                commDetectMethod = (SkipTypes)
-                    ((int)commDetectMethod | (int)*sit);
-            }
-            if (COMM_DETECT_OFF == commDetectMethod)
-                commDetectMethod = COMM_DETECT_UNINIT;
-        }
-    }
-    if (cmdline.toBool("outputmethod"))
-    {
-        QString method = cmdline.toString("outputmethod");
-        bool ok;
-        outputMethod = (OutputMethod) method.toInt(&ok);
-        if (!ok)
-        {
-            outputMethod = kOutputMethodEssentials;
-            QString val = method.toLower();
-            QByteArray aval = val.toAscii();
-            QMap<QString,OutputMethod>::const_iterator it =
-                outputTypes->find(val);
-            if (it == outputTypes->end())
-            {
-                cerr << "Failed to decode --outputmethod option '"
-                     << aval.constData() << "'" << endl;
-                return -1;
-            }
-            outputMethod = (OutputMethod) *it;
-        }
-    }
-
-    if (cmdline.toBool("skipdb"))
-    {
-        useDB = false;
-        dontSubmitCommbreakListToDB = true;
-        force = true;
-    }
-
-    if (cmdline.toBool("queue"))
-        queueJobInstead = true;
-    if (cmdline.toBool("rebuild"))
-    {
-        rebuildSeekTable = true;
-        beNice = false;
-    }
-    if (cmdline.toBool("force"))
-        force = true;
-    if (cmdline.toBool("dontwritedb"))
-        dontSubmitCommbreakListToDB = true;
-    if (cmdline.toBool("dumpdb"))
-        onlyDumpDBCommercialBreakList = true;
-    if (cmdline.toBool("outputfile"))
-    {
-        outputfilename = cmdline.toString("outputfile");
-        fstream output(outputfilename.toLocal8Bit().constData(), ios::out);
-    }
-
     CleanupGuard callCleanup(cleanup);
-
+    cerr << "creating context" << endl;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init( false, /*use gui*/
                          false, /*prompt for backend*/
                          false, /*bypass auto discovery*/
-                         !useDB)) /*ignoreDB*/
-    {
+                         cmdline.toBool("skipdb"))) /*ignoreDB*/
+    {   
         LOG(VB_GENERAL, LOG_EMERG, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-
+    cerr << "loading overrides" << endl;
     cmdline.ApplySettingsOverride();
-
+    
     MythTranslation::load("mythfrontend");
 
-    if ((fullfile.path() != ".") && useDB)
+    if (cmdline.toBool("chanid") && cmdline.toBool("starttime"))
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT chanid, starttime FROM recorded "
-                      "WHERE basename = :BASENAME ;");
-        query.bindValue(":BASENAME", fullfile.dirName());
+        // operate on a recording in the database
+        uint chanid = cmdline.toUInt("chanid");
+        QDateTime starttime = cmdline.toDateTime("starttime");
 
-        if (query.exec() && query.next())
-        {
-            chanid = query.value(0).toUInt();
-            starttime = query.value(1).toDateTime();
-        }
+        if (cmdline.toBool("clearskiplist"))
+            return ClearSkipList(chanid, starttime);
+        if (cmdline.toBool("gencutlist"))
+            return CopySkipListToCutList(chanid, starttime);
+        if (cmdline.toBool("clearcutlist"))
+            return SetCutList(chanid, starttime, "");
+        if (cmdline.toBool("setcutlist"))
+            return SetCutList(chanid, starttime, cmdline.toString("setcutlist"));
+        if (cmdline.toBool("getcutlist"))
+            return GetMarkupList("cutlist", chanid, starttime);
+        if (cmdline.toBool("getskiplist"))
+            return GetMarkupList("commflag", chanid, starttime);
+
+        // TODO: check for matching jobid
+        // create temporary id to operate off of if not
+
+        if (cmdline.toBool("queue"))
+            QueueCommFlagJob(chanid, starttime, cmdline.toBool("rebuild"));
+        else if (cmdline.toBool("rebuild"))
+            result = RebuildSeekTable(chanid, starttime, -1);
         else
-        {
-            cerr << "mythcommflag: ERROR: Unable to find DB info for "
-                 << fullfile.dirName().toLocal8Bit().constData() << endl;
-            return GENERIC_EXIT_NO_RECORDING_DATA;
-        }
+            result = FlagCommercials(chanid, starttime, -1, "");
     }
-
-    if ((!chanid && starttime.isValid()) ||
-        (chanid && !starttime.isValid()))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "You must specify both the Channel ID "
-                                 "and the Start Time.");
-        return GENERIC_EXIT_INVALID_CMDLINE;
-    }
-
-    if (cmdline.toBool("clearskiplist"))
-        return ClearSkipList(QString::number(chanid), starttime);
-
-    if (cmdline.toBool("gencutlist"))
-        return CopySkipListToCutList(QString::number(chanid), starttime);
-
-    if (cmdline.toBool("clearcutlist"))
-        return SetCutList(QString::number(chanid), starttime, "");
-
-    if (cmdline.toBool("setcutlist"))
-        return SetCutList(QString::number(chanid), starttime,
-                          cmdline.toString("setcutlist"));
-
-    if (cmdline.toBool("getcutlist"))
-        return GetMarkupList("cutlist", QString::number(chanid), starttime);
-
-    if (cmdline.toBool("getskiplist"))
-        return GetMarkupList("commflag", QString::number(chanid), starttime);
-
-    if (cmdline.toBool("jobid"))
+    else if (cmdline.toBool("jobid"))
     {
         jobID = cmdline.toInt("jobid");
+        uint chanid;
+        QDateTime starttime;
+
         if (!JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
         {
             cerr << "mythcommflag: ERROR: Unable to find DB info for "
@@ -1173,218 +1231,84 @@ int main(int argc, char *argv[])
         progress = false;
         isVideo = false;
 
-        int breaksFound = FlagCommercials(
-            chanid, starttime, outputfilename, useDB);
+        int ret = 0;
 
-        return breaksFound; // exit(breaksFound);
-    }
-
-    // be nice to other programs since FlagCommercials() can consume 100% CPU
-    if (beNice)
-    {
-        myth_nice(17);
-        myth_ioprio(7);
-    }
-
-    time_now = time(NULL);
-    if (progress)
-    {
-        cerr << "\nMythTV Commercial Flagger, started at "
-             << ctime(&time_now);
-
-        if (!isVideo)
-        {
-            if (!rebuildSeekTable)
-            {
-                cerr << "Flagging commercial breaks for:\n";
-                if (a.argc() == 1)
-                    cerr << "ALL Un-flagged programs\n";
-            }
-            else
-            {
-                cerr << "Rebuilding SeekTable(s) for:\n";
-            }
-
-            cerr << "ChanID  Start Time      "
-                    "Title                                      ";
-            if (rebuildSeekTable)
-                cerr << "Status\n";
-            else
-                cerr << "Breaks\n";
-
-            cerr << "------  --------------  "
-                    "-----------------------------------------  ------\n";
-        }
+        if (JobQueue::GetJobFlags(jobID) && JOB_REBUILD)
+            RebuildSeekTable(chanid, starttime, jobID);
         else
-        {
-            cerr << "Building seek table for: "
-                 << filename.toLocal8Bit().constData() << endl;
-        }
-    }
+            ret = FlagCommercials(chanid, starttime, jobID, "");
 
-    if (isVideo)
-    {
-        ProgramInfo pginfo(filename);
-        result = BuildVideoMarkup(&pginfo, useDB);
-    }
-    else if (chanid && starttime.isValid())
-    {
-        if (queueJobInstead)
-            QueueCommFlagJob(chanid, starttime);
+        if (ret > GENERIC_EXIT_NOT_OK)
+            JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
+                        QString("Failed with exit status %1").arg(ret));
         else
-            result = FlagCommercials(chanid, starttime, outputfilename, useDB);
+            JobQueue::ChangeJobStatus(jobID, JOB_FINISHED,
+                        QString("%1 commercial breaks").arg(ret));
     }
-    else if (!useDB)
+    else if (cmdline.toBool("video"))
     {
-        if (!QFile::exists(filename))
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Filename: '%1' does not exist")
-                    .arg(filename));
-            return -1;
-        }
+        // build skiplist for video file
+        return RebuildSeekTable(cmdline.toString(filename), -1);
+    }
+    else if (cmdline.toBool("file"))
+    {
+        // TODO: add back handling of recording defined by the basename
 
-        ProgramInfo *pginfo = new ProgramInfo(filename);
-        PMapDBReplacement *pmap = new PMapDBReplacement();
-        pginfo->SetPositionMapDBReplacement(pmap);
-
-        // RingBuffer doesn't like relative pathnames
-        if (filename.left(1) != "/" && !filename.contains("://"))
+        // perform commercial flagging on file outside the database
+        FlagCommercials(cmdline.toString("file"), -1,
+                        cmdline.toString("outputfile"),
+                        !cmdline.toBool("skipdb"));
+    }
+    else if (cmdline.toBool("queue"))
+    {
+        // run flagging for all recordings with no skiplist
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT r.chanid, r.starttime, c.commmethod "
+                        "FROM recorded AS r "
+                   "LEFT JOIN channel AS c ON r.chanid=c.chanid "
+//                     "WHERE startime >= :STARTTIME AND endtime <= :ENDTIME "
+                    "ORDER BY starttime;");
+        //query.bindValue(":STARTTIME", allStart);
+        //query.bindValue(":ENDTIME", allEnd);
+        
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
-            pginfo->SetPathname(
-                QDir::currentPath() + '/' + pginfo->GetPathname());
-        }
+            QDateTime starttime;
+            uint chanid;
 
-        if ((filename.right(3).toLower() == "mpg") ||
-            (filename.right(4).toLower() == "mpeg"))
-        {
-            result = BuildVideoMarkup(pginfo, useDB);
-            if (result != GENERIC_EXIT_OK)
+            while (query.next())
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to build video markup");
-                return result;
+                starttime = QDateTime::fromString(query.value(1).toString(),
+                                                        Qt::ISODate);
+                chanid = query.value(0).toUInt();
+
+                if (!cmdline.toBool("force") && !cmdline.toBool("rebuild"))
+                {
+                    // recording is already flagged
+                    if (IsMarked(chanid, starttime))
+                        continue;
+
+                    // channel is marked as commercial free
+                    if (query.value(2).toInt() == COMM_DETECT_COMMFREE)
+                        continue;
+
+                    // recording rule did not enable commflagging
+//                    RecordingInfo recinfo(chanid, starttime);
+//                    if (!(recinfo.GetAutoRunJobs() & JOB_COMMFLAG))
+//                        continue;
+                }
+
+                QueueCommFlagJob(chanid, starttime, cmdline.toBool("rebuild"));
             }
         }
 
-        result = FlagCommercials(pginfo, outputfilename, useDB);
-
-        delete pginfo;
-        delete pmap;
     }
     else
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(
-            "SELECT chanid, starttime "
-                "FROM recorded "
-                "WHERE starttime >= :STARTTIME AND endtime <= :ENDTIME "
-                "ORDER BY starttime;");
-        query.bindValue(":STARTTIME", allStart);
-        query.bindValue(":ENDTIME", allEnd);
-
-        if (query.exec() && query.isActive() && query.size() > 0)
-        {
-            while (query.next())
-            {
-                starttime =
-                    QDateTime::fromString(query.value(1).toString(),
-                                          Qt::ISODate);
-
-                chanid = query.value(0).toUInt();
-
-                if ( allRecorded )
-                {
-                    if (queueJobInstead)
-                        QueueCommFlagJob(chanid, starttime);
-                    else
-                    {
-                        FlagCommercials(chanid, starttime,
-                                        outputfilename, useDB);
-                    }
-                }
-                else
-                {
-                    // check to see if this show is already marked
-                    MSqlQuery mark_query(MSqlQuery::InitCon());
-                    mark_query.prepare("SELECT commflagged, count(rm.type) "
-                                       "FROM recorded r "
-                                       "LEFT JOIN recordedmarkup rm ON "
-                                           "( r.chanid = rm.chanid AND "
-                                             "r.starttime = rm.starttime AND "
-                                             "type in (:MARK_START,:MARK_END)) "
-                                        "WHERE r.chanid = :CHANID AND "
-                                            "r.starttime = :STARTTIME "
-                                        "GROUP BY COMMFLAGGED;");
-                    mark_query.bindValue(":MARK_START", MARK_COMM_START);
-                    mark_query.bindValue(":MARK_END", MARK_COMM_END);
-                    mark_query.bindValue(":CHANID", chanid);
-                    mark_query.bindValue(":STARTTIME", starttime);
-
-                    if (mark_query.exec() && mark_query.isActive() &&
-                        mark_query.size() > 0)
-                    {
-                        if (mark_query.next())
-                        {
-                            int flagStatus = mark_query.value(0).toInt();
-                            int marksFound = mark_query.value(1).toInt();
-
-                            QString flagStatusStr = "UNKNOWN";
-                            switch (flagStatus) {
-                                case COMM_FLAG_NOT_FLAGGED:
-                                        flagStatusStr = "Not Flagged";
-                                        break;
-                                case COMM_FLAG_DONE:
-                                        flagStatusStr =
-                                            QString("Flagged with %1 breaks")
-                                                    .arg(marksFound / 2);
-                                        break;
-                                case COMM_FLAG_PROCESSING:
-                                        flagStatusStr = "Flagging";
-                                        break;
-                                case COMM_FLAG_COMMFREE:
-                                        flagStatusStr = "Commercial Free";
-                                        break;
-                            }
-
-                            LOG(VB_COMMFLAG, LOG_INFO,
-                                QString("Status for chanid %1 @ %2 is '%3'")
-                                    .arg(chanid)
-                                    .arg(starttime.toString("yyyyMMddhhmmss"))
-                                    .arg(flagStatusStr));
-
-                            if ((flagStatus == COMM_FLAG_NOT_FLAGGED) &&
-                                (marksFound == 0))
-                            {
-                                if (queueJobInstead)
-                                    QueueCommFlagJob(chanid, starttime);
-                                else
-                                {
-                                    FlagCommercials(chanid, starttime,
-                                                    outputfilename, useDB);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            MythDB::DBError("Querying recorded programs", query);
-            return GENERIC_EXIT_DB_ERROR;
-        }
+        VERBOSE(VB_IMPORTANT, "No valid combination of command inputs received.");
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
-
-    time_now = time(NULL);
-
-    if (progress)
-    {
-        cerr << "\nFinished commercial break flagging at "
-             << ctime(&time_now) << endl;
-    }
-
-    LOG(VB_GENERAL, LOG_INFO,
-        QString("Finished commercial break flagging at %1")
-            .arg(ctime(&time_now)));
 
     return result;
 }
