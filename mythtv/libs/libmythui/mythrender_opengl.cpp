@@ -82,6 +82,24 @@ void MythRenderOpenGL::Init(void)
     LOG(VB_GENERAL, LOG_INFO, "Initialised MythRenderOpenGL");
 }
 
+bool MythRenderOpenGL::IsRecommendedRenderer(void)
+{
+    bool recommended = true;
+    OpenGLLocker locker(this);
+    if (!(this->format().directRendering()))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "OpenGL is using software rendering. ");
+        recommended = false;
+    }
+    else if (QString((const char*) glGetString(GL_RENDERER))
+             .contains("Software Rasterizer", Qt::CaseInsensitive))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "OpenGL is using software rasterizer. ");
+        recommended = false;
+    }
+    return recommended;
+}
+
 void MythRenderOpenGL::makeCurrent()
 {
     m_lock->lock();

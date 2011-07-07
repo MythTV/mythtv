@@ -977,11 +977,11 @@ void MythMainWindow::Init(void)
                                          "Check your OpenGL installation.");
                 teardown = true;
             }
-            else if (painter == "auto" && !qgl->format().directRendering())
+            else if (painter == "auto" && gl && !gl->IsRecommendedRenderer())
             {
                 LOG(VB_GENERAL, LOG_WARNING,
-                    "OpenGL is using software rendering. "
-                    "Falling back to Qt painter.");
+                    "OpenGL painter not recommended with this system's "
+                    "hardware/drivers. Falling back to Qt painter.");
                 teardown = true;
             }
             if (teardown)
