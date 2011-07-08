@@ -76,7 +76,7 @@ VDALibrary::VDALibrary(void)
             "Loaded VideoDecodeAcceleration library.");
     }
     else
-        LOG(VB_GENERAL, LOC_ERR, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "Failed to load VideoDecodeAcceleration library.");
 }
 
