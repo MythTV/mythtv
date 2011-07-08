@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     gCoreContext->SetBackend(false);
     if (!gCoreContext->ConnectToMasterServer())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to connect to master server");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to connect to master server");
         return GENERIC_EXIT_CONNECT_ERROR;
     }
 
@@ -132,7 +132,8 @@ int main(int argc, char *argv[])
     MythSocketManager *sockmanager = new MythSocketManager();
     if (!sockmanager->Listen(port))
     {
-        VERBOSE(VB_IMPORTANT, "Mediaserver exiting, failed to bind to listen port.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Mediaserver exiting, failed to bind to listen port.");
         delete sockmanager;
         return GENERIC_EXIT_SOCKET_ERROR;
     }

@@ -92,7 +92,7 @@ int preview_helper(uint chanid, QDateTime starttime,
 {
     // Lower scheduling priority, to avoid problems with recordings.
     if (setpriority(PRIO_PROCESS, 0, 9))
-        VERBOSE(VB_GENERAL, "Setting priority failed." + ENO);
+        LOG(VB_GENERAL, LOG_ERR, "Setting priority failed." + ENO);
 
     if (!chanid || !starttime.isValid())
         ProgramInfo::ExtractKeyFromPathname(infile, chanid, starttime);
@@ -103,8 +103,8 @@ int preview_helper(uint chanid, QDateTime starttime,
         pginfo = new ProgramInfo(chanid, starttime);
         if (!pginfo->GetChanID())
         {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "Cannot locate recording made on '%1' at '%2'")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Cannot locate recording made on '%1' at '%2'")
                     .arg(chanid).arg(starttime.toString("yyyyMMddhhmmss")));
             delete pginfo;
             return GENERIC_EXIT_NOT_OK;
@@ -115,8 +115,8 @@ int preview_helper(uint chanid, QDateTime starttime,
     {
         if (!QFileInfo(infile).isReadable())
         {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "Cannot read this file '%1'").arg(infile));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Cannot read this file '%1'").arg(infile));
             return GENERIC_EXIT_NOT_OK;
         }
         pginfo = new ProgramInfo(
@@ -126,7 +126,7 @@ int preview_helper(uint chanid, QDateTime starttime,
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Cannot locate recording to preview");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot locate recording to preview");
         return GENERIC_EXIT_NOT_OK;
     }
 
@@ -202,13 +202,13 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Unable to ignore SIGPIPE");
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
     gCoreContext->SetBackend(false); // TODO Required?

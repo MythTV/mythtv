@@ -42,9 +42,9 @@ static void setGlobalSetting(const QString &key, const QString &value)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Database not open while trying to save setting: %1")
-                        .arg(key));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Database not open while trying to save setting: %1")
+                .arg(key));
     }
 }
 
@@ -63,9 +63,9 @@ static QString getGlobalSetting(const QString &key, const QString &defaultval)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Database not open while trying to load setting: %1")
-                        .arg(key));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Database not open while trying to load setting: %1")
+                .arg(key));
     }
 
     return value;
@@ -73,7 +73,7 @@ static QString getGlobalSetting(const QString &key, const QString &defaultval)
 
 static int lockShutdown()
 {
-    VERBOSE(VB_GENERAL, "Mythshutdown: --lock");
+    LOG(VB_GENERAL, LOG_INFO, "Mythshutdown: --lock");
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -81,14 +81,15 @@ static int lockShutdown()
     int tries = 0;
     while (!query.exec("LOCK TABLE settings WRITE;") && tries < 5)
     {
-        VERBOSE(VB_GENERAL, "Waiting for lock on setting table");
+        LOG(VB_GENERAL, LOG_INFO, "Waiting for lock on setting table");
         sleep(1);
         tries++;
     }
 
     if (tries >= 5)
     {
-        VERBOSE(VB_GENERAL, "Waited too long to obtain lock on setting table");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Waited too long to obtain lock on setting table");
         return 1;
     }
 
@@ -125,7 +126,7 @@ static int lockShutdown()
 
 static int unlockShutdown()
 {
-    VERBOSE(VB_GENERAL, "Mythshutdown: --unlock");
+    LOG(VB_GENERAL, LOG_INFO, "Mythshutdown: --unlock");
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -133,14 +134,15 @@ static int unlockShutdown()
     int tries = 0;
     while (!query.exec("LOCK TABLE settings WRITE;") && tries < 5)
     {
-        VERBOSE(VB_GENERAL, "Waiting for lock on setting table");
+        LOG(VB_GENERAL, LOG_INFO, "Waiting for lock on setting table");
         sleep(1);
         tries++;
     }
 
     if (tries >= 5)
     {
-        VERBOSE(VB_GENERAL, "Waited too long to obtain lock on setting table");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Waited too long to obtain lock on setting table");
         return 1;
     }
 
@@ -210,11 +212,11 @@ static bool isRecording()
 {
     if (!gCoreContext->IsConnectedToMaster())
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_NOTICE,
                 "isRecording: Attempting to connect to master server...");
         if (!gCoreContext->ConnectToMasterServer(false))
         {
-            VERBOSE(VB_IMPORTANT,
+            LOG(VB_GENERAL, LOG_ERR,
                     "isRecording: Could not connect to master server!");
             return false;
         }
@@ -225,43 +227,43 @@ static bool isRecording()
 
 static int getStatus(bool bWantRecStatus)
 {
-    VERBOSE(VB_GENERAL, "Mythshutdown: --status");
+    LOG(VB_GENERAL, LOG_INFO, "Mythshutdown: --status");
 
     int res = 0;
 
     if (isRunning("mythtranscode"))
     {
-        VERBOSE(VB_IMPORTANT, "Transcoding in progress...");
+        LOG(VB_GENERAL, LOG_NOTICE, "Transcoding in progress...");
         res |= 1;
     }
 
     if (isRunning("mythcommflag"))
     {
-        VERBOSE(VB_IMPORTANT, "Commercial Detection in progress...");
+        LOG(VB_GENERAL, LOG_NOTICE, "Commercial Detection in progress...");
         res |= 2;
     }
 
     if (isRunning("mythfilldatabase"))
     {
-        VERBOSE(VB_IMPORTANT, "Grabbing EPG data in progress...");
+        LOG(VB_GENERAL, LOG_NOTICE, "Grabbing EPG data in progress...");
         res |= 4;
     }
 
     if (bWantRecStatus && isRecording())
     {
-        VERBOSE(VB_IMPORTANT, "Recording in progress...");
+        LOG(VB_GENERAL, LOG_NOTICE, "Recording in progress...");
         res |= 8;
     }
 
     if (getGlobalSetting("MythShutdownLock", "0") != "0")
     {
-        VERBOSE(VB_IMPORTANT, "Shutdown is locked");
+        LOG(VB_GENERAL, LOG_NOTICE, "Shutdown is locked");
         res |= 16;
     }
 
     if (JobQueue::HasRunningOrPendingJobs(15))
     {
-        VERBOSE(VB_IMPORTANT, "Has queued or pending jobs");
+        LOG(VB_GENERAL, LOG_NOTICE, "Has queued or pending jobs");
         res |= 32;
     }
 
@@ -293,7 +295,7 @@ static int getStatus(bool bWantRecStatus)
     {
         if (dtCurrent >= dtPeriod1Start && dtCurrent <= dtPeriod1End)
         {
-            VERBOSE(VB_IMPORTANT, "In a daily wakeup period (1).");
+            LOG(VB_GENERAL, LOG_NOTICE, "In a daily wakeup period (1).");
             res |= 64;
         }
     }
@@ -302,7 +304,7 @@ static int getStatus(bool bWantRecStatus)
     {
         if (dtCurrent >= dtPeriod2Start && dtCurrent <= dtPeriod2End)
         {
-            VERBOSE(VB_IMPORTANT, "In a daily wakeup period (2).");
+            LOG(VB_GENERAL, LOG_NOTICE, "In a daily wakeup period (2).");
             res |= 64;
         }
     }
@@ -314,7 +316,8 @@ static int getStatus(bool bWantRecStatus)
         int delta = dtCurrent.secsTo(dtPeriod1Start);
         if (delta >= 0 && delta <= 15 * 60)
         {
-            VERBOSE(VB_IMPORTANT, "About to start daily wakeup period (1)");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "About to start daily wakeup period (1)");
             res |= 128;
         }
     }
@@ -324,18 +327,20 @@ static int getStatus(bool bWantRecStatus)
         int delta = dtCurrent.secsTo(dtPeriod2Start);
         if (delta >= 0 && delta <= 15 * 60)
         {
-            VERBOSE(VB_IMPORTANT, "About to start daily wakeup period (2)");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "About to start daily wakeup period (2)");
             res |= 128;
         }
     }
 
     if (isRunning("mythtv-setup"))
     {
-        VERBOSE(VB_IMPORTANT, "Setup is running...");
+        LOG(VB_GENERAL, LOG_NOTICE, "Setup is running...");
         res = 255;
     }
 
-    VERBOSE(VB_GENERAL, QString("Mythshutdown: --status returned: %1").arg(res));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Mythshutdown: --status returned: %1").arg(res));
 
     return res;
 }
@@ -345,32 +350,33 @@ static int checkOKShutdown(bool bWantRecStatus)
     // mythbackend wants 0=ok to shutdown,
     // 1=reset idle count, 2=wait for frontend
 
-    VERBOSE(VB_GENERAL, "Mythshutdown: --check");
+    LOG(VB_GENERAL, LOG_INFO, "Mythshutdown: --check");
 
     int res = getStatus(bWantRecStatus);
 
     if (res > 0)
     {
-        VERBOSE(VB_IMPORTANT, "Not OK to shutdown");
+        LOG(VB_GENERAL, LOG_NOTICE, "Not OK to shutdown");
         res = 1;
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "OK to shutdown");
+        LOG(VB_GENERAL, LOG_NOTICE, "OK to shutdown");
         res = 0;
     }
 
-    VERBOSE(VB_GENERAL, QString("Mythshutdown: --check returned: %1").arg(res));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Mythshutdown: --check returned: %1").arg(res));
 
     return res;
 }
 
 static int setWakeupTime(QString sWakeupTime)
 {
-    VERBOSE(VB_GENERAL, "Mythshutdown: --setwakeup");
+    LOG(VB_GENERAL, LOG_INFO, "Mythshutdown: --setwakeup");
 
-    VERBOSE(VB_IMPORTANT,
-            QString("Mythshutdown: wakeup time given is: %1").arg(sWakeupTime));
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Mythshutdown: wakeup time given is: %1").arg(sWakeupTime));
 
     // check time given is valid
     QDateTime dtWakeupTime;
@@ -378,7 +384,8 @@ static int setWakeupTime(QString sWakeupTime)
 
     if (!dtWakeupTime.isValid())
     {
-        VERBOSE(VB_IMPORTANT, QString("Mythshutdown: --setwakeup invalid date "
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Mythshutdown: --setwakeup invalid date "
                                       "format (%1)\n\t\t\t"
                                       "must be yyyy-MM-ddThh:mm:ss")
                                       .arg(sWakeupTime));
@@ -395,12 +402,14 @@ static int setScheduledWakeupTime()
 {
     if (!gCoreContext->IsConnectedToMaster())
     {
-        VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: "
-                              "Attempting to connect to master server...");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "setScheduledWakeupTime: "
+            "Attempting to connect to master server...");
         if (!gCoreContext->ConnectToMasterServer(false))
         {
-            VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: "
-                                  "Could not connect to master server!");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "setScheduledWakeupTime: "
+                "Could not connect to master server!");
             return 1;
         }
     }
@@ -428,7 +437,7 @@ static int setScheduledWakeupTime()
 
 static int shutdown()
 {
-    VERBOSE(VB_GENERAL, "Mythshutdown: --shutdown");
+    LOG(VB_GENERAL, LOG_INFO, "Mythshutdown: --shutdown");
 
     // get next daily wakeup times if any are set
     QDateTime dtPeriod1Start = getDailyWakeupTime("DailyWakeupStartPeriod1");
@@ -471,8 +480,8 @@ static int shutdown()
     {
         if (dtCurrent < dtPeriod1Start)
         {
-            VERBOSE(VB_IMPORTANT, "daily wakeup today at " +
-                        dtPeriod1Start.toString("hh:mm:ss"));
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "daily wakeup today at " + dtPeriod1Start.toString("hh:mm:ss"));
             dtNextDailyWakeup = dtPeriod1Start;
         }
     }
@@ -482,8 +491,8 @@ static int shutdown()
     {
         if (dtCurrent < dtPeriod2Start)
         {
-            VERBOSE(VB_IMPORTANT, "daily wakeup today at " +
-                        dtPeriod2Start.toString("hh:mm:ss"));
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "daily wakeup today at " + dtPeriod2Start.toString("hh:mm:ss"));
             dtNextDailyWakeup = dtPeriod2Start;
         }
     }
@@ -502,14 +511,14 @@ static int shutdown()
         {
             dtNextDailyWakeup = dtNextDailyWakeup.addDays(1);
 
-            VERBOSE(VB_IMPORTANT, "next daily wakeup is tomorrow at " +
-                        dtNextDailyWakeup.toString("hh:mm:ss"));
+            LOG(VB_GENERAL, LOG_NOTICE, "next daily wakeup is tomorrow at " +
+                dtNextDailyWakeup.toString("hh:mm:ss"));
         }
     }
 
     // if dtNextDailyWakeup is still not valid then no daily wakeups are set
     if (!dtNextDailyWakeup.isValid())
-        VERBOSE(VB_IMPORTANT,"no daily wakeup times are set");
+        LOG(VB_GENERAL, LOG_ERR, "no daily wakeup times are set");
 
     // get next scheduled wake up for a recording if any
     QDateTime dtNextRecordingStart = QDateTime();
@@ -518,9 +527,9 @@ static int shutdown()
         dtNextRecordingStart = QDateTime::fromString(s, Qt::ISODate);
 
     if (!dtNextRecordingStart.isValid())
-        VERBOSE(VB_IMPORTANT,"no recording time is set");
-    else
-        VERBOSE(VB_IMPORTANT, "recording scheduled at: " +
+        LOG(VB_GENERAL, LOG_ERR, "no recording time is set");
+    else 
+        LOG(VB_GENERAL, LOG_NOTICE, "recording scheduled at: " +
                     dtNextRecordingStart.toString(Qt::ISODate));
 
     // check if scheduled recording time has already passed
@@ -530,8 +539,9 @@ static int shutdown()
 
         if (delta < 0)
         {
-            VERBOSE(VB_IMPORTANT, "Scheduled recording time has"
-                                  " already passed. Schedule deleted");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "Scheduled recording time has already passed. "
+                "Schedule deleted");
 
             dtNextRecordingStart = QDateTime();
             setGlobalSetting("MythShutdownNextScheduled", "");
@@ -547,7 +557,8 @@ static int shutdown()
     if (!dtNextRecordingStart.isValid() && !dtNextDailyWakeup.isValid())
     {
         dtWakeupTime = QDateTime();
-        VERBOSE(VB_IMPORTANT, "no wake up time set and no scheduled program");
+        LOG(VB_GENERAL, LOG_ERR,
+            "no wake up time set and no scheduled program");
     }
 
     // no daily wakeup set
@@ -555,7 +566,7 @@ static int shutdown()
     if (dtNextRecordingStart.isValid() && !dtNextDailyWakeup.isValid())
     {
         dtWakeupTime = dtNextRecordingStart;
-        VERBOSE(VB_IMPORTANT, "will wake up at next scheduled program");
+        LOG(VB_GENERAL, LOG_NOTICE, "will wake up at next scheduled program");
     }
 
     // daily wakeup is set
@@ -563,7 +574,7 @@ static int shutdown()
     if (!dtNextRecordingStart.isValid() && dtNextDailyWakeup.isValid())
     {
         dtWakeupTime = dtNextDailyWakeup;
-        VERBOSE(VB_IMPORTANT, "will wake up at next daily wakeup");
+        LOG(VB_GENERAL, LOG_NOTICE, "will wake up at next daily wakeup");
     }
 
     // daily wakeup is set
@@ -573,14 +584,14 @@ static int shutdown()
     {
         if (dtNextDailyWakeup < dtNextRecordingStart)
         {
-            VERBOSE(VB_IMPORTANT,  "program is scheduled but will wake up "
-                                   "at next daily wakeup");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "program is scheduled but will wake up at next daily wakeup");
             dtWakeupTime = dtNextDailyWakeup;
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "daily wakeup is set but will wake up "
-                                  "at next scheduled program");
+            LOG(VB_GENERAL, LOG_NOTICE, "daily wakeup is set but will wake up "
+                                        "at next scheduled program");
             dtWakeupTime = dtNextRecordingStart;
         }
     }
@@ -601,7 +612,8 @@ static int shutdown()
         // dont't shutdown if we are within 15 mins of the next wakeup time
         if (dtCurrent.secsTo(dtWakeupTime) > 15 * 60)
         {
-            QString nvramCommand = gCoreContext->GetSetting("MythShutdownNvramCmd",
+            QString nvramCommand =
+                gCoreContext->GetSetting("MythShutdownNvramCmd",
                      "/usr/bin/nvram-wakeup --settime $time");
 
             QString wakeup_timeformat = gCoreContext->GetSetting(
@@ -617,18 +629,18 @@ static int shutdown()
                 nvramCommand.replace(
                     "$time", dtWakeupTime.toString(wakeup_timeformat));
 
-            VERBOSE(VB_IMPORTANT,
-                    "sending command to set time in bios\n\t\t\t"
-                    + nvramCommand);
+            LOG(VB_GENERAL, LOG_NOTICE, "sending command to set time in bios" +
+                nvramCommand);
 
             shutdownmode = myth_system(nvramCommand);
 
-            VERBOSE(VB_IMPORTANT, (nvramCommand + " exited with code %2")
-                                  .arg(shutdownmode));
+            LOG(VB_GENERAL, LOG_NOTICE, (nvramCommand + " exited with code %2")
+                    .arg(shutdownmode));
 
             if (shutdownmode == 2)
             {
-                VERBOSE(VB_IMPORTANT, "nvram-wakeup failed to set time in bios");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "nvram-wakeup failed to set time in bios");
                 return 1;
             }
 
@@ -641,8 +653,8 @@ static int shutdown()
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "The next wakeup time is less than"
-                                  " 15 mins away, not shutting down");
+            LOG(VB_GENERAL, LOG_NOTICE, "The next wakeup time is less than "
+                                        "15 mins away, not shutting down");
             return 0;
         }
     }
@@ -653,12 +665,13 @@ static int shutdown()
     {
         case 0:
         {
-            VERBOSE(VB_IMPORTANT, "everything looks fine, shutting down ...");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "everything looks fine, shutting down ...");
             QString poweroffCmd = gCoreContext->GetSetting(
                 "MythShutdownPoweroff", "/sbin/poweroff");
-            VERBOSE(VB_IMPORTANT, "..");
-            VERBOSE(VB_IMPORTANT, ".");
-            VERBOSE(VB_IMPORTANT, "shutting down ...");
+            LOG(VB_GENERAL, LOG_NOTICE, "..");
+            LOG(VB_GENERAL, LOG_NOTICE, ".");
+            LOG(VB_GENERAL, LOG_NOTICE, "shutting down ...");
 
             myth_system(poweroffCmd);
             res = 0;
@@ -666,25 +679,26 @@ static int shutdown()
         }
         case 1:
         {
-            VERBOSE(VB_IMPORTANT,
-                    "everything looks fine, but reboot is needed");
-            VERBOSE(VB_IMPORTANT, "sending command to bootloader ...");
-            VERBOSE(VB_IMPORTANT, nvramRestartCmd);
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "everything looks fine, but reboot is needed");
+            LOG(VB_GENERAL, LOG_NOTICE, "sending command to bootloader ...");
+            LOG(VB_GENERAL, LOG_NOTICE, nvramRestartCmd);
 
             myth_system(nvramRestartCmd);
 
-            VERBOSE(VB_IMPORTANT, "..");
-            VERBOSE(VB_IMPORTANT, ".");
-            VERBOSE(VB_IMPORTANT, "rebooting ...");
+            LOG(VB_GENERAL, LOG_NOTICE, "..");
+            LOG(VB_GENERAL, LOG_NOTICE, ".");
+            LOG(VB_GENERAL, LOG_NOTICE, "rebooting ...");
 
             QString rebootCmd =
-                    gCoreContext->GetSetting("MythShutdownReboot", "/sbin/reboot");
+                gCoreContext->GetSetting("MythShutdownReboot", "/sbin/reboot");
             myth_system(rebootCmd);
             res = 0;
             break;
         }
         default:
-            VERBOSE(VB_IMPORTANT, "panic. invalid shutdown mode, do nothing");
+            LOG(VB_GENERAL, LOG_ERR,
+                "panic. invalid shutdown mode, do nothing");
             res = 1;
             break;
     }
@@ -694,7 +708,7 @@ static int shutdown()
 
 static int startup()
 {
-    VERBOSE(VB_GENERAL, "Mythshutdown: --startup");
+    LOG(VB_GENERAL, LOG_INFO, "Mythshutdown: --startup");
 
     int res = 0;
     QDateTime startupTime = QDateTime();
@@ -721,12 +735,15 @@ static int startup()
     }
 
     if (res)
-        VERBOSE(VB_IMPORTANT, QString("looks like we were started manually: %1").arg(res));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("looks like we were started manually: %1").arg(res));
     else
-        VERBOSE(VB_IMPORTANT, QString("looks like we were started automatically: %1").arg(res));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("looks like we were started automatically: %1").arg(res));
 
 
-    VERBOSE(VB_GENERAL, QString("Mythshutdown: --startup returned: %1").arg(res));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Mythshutdown: --startup returned: %1").arg(res));
 
     return res;
 }
@@ -800,8 +817,8 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "mythshutdown: Could not initialize MythContext. "
-                              "Exiting.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "mythshutdown: Could not initialize MythContext. Exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 

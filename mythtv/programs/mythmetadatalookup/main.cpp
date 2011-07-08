@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         delete gContext;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
@@ -99,8 +99,8 @@ int main(int argc, char *argv[])
 
     if (refreshall && (usedchanid || usedstarttime))
     {
-        VERBOSE(VB_IMPORTANT, "--refresh-all must not be accompanied by "
-                              "--chanid or --starttime");
+        LOG(VB_GENERAL, LOG_ERR,
+            "--refresh-all must not be accompanied by --chanid or --starttime");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
@@ -111,13 +111,15 @@ int main(int argc, char *argv[])
 
     if (addjob && (refreshall || usedchanid || usedstarttime))
     {
-        VERBOSE(VB_IMPORTANT, "The jobqueue (-j) command cannot be use with other options.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "The jobqueue (-j) command cannot be used with other options.");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     if (!refreshall && !addjob && !(usedchanid && usedstarttime))
     {
-        VERBOSE(VB_IMPORTANT, "--chanid and --starttime must be used together.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "--chanid and --starttime must be used together.");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
@@ -147,7 +149,7 @@ int main(int argc, char *argv[])
     delete lookup;
     delete gContext;
 
-    VERBOSE(VB_IMPORTANT, "MythMetadataLookup run complete.");
+    LOG(VB_GENERAL, LOG_NOTICE, "MythMetadataLookup run complete.");
 
     return GENERIC_EXIT_OK;
 }

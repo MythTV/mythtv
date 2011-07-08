@@ -71,7 +71,7 @@ int main(int argc, char **argv)
         special_port = cmdline.toInt("port");
         if (special_port < 1 || special_port > 65534)
         {
-            VERBOSE(VB_IMPORTANT, "lcdserver: Bad port number");
+            LOG(VB_GENERAL, LOG_ERR, "lcdserver: Bad port number");
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
         message_time = cmdline.toInt("messagetime");
         if (message_time < 1 || message_time > 1000)
         {
-            VERBOSE(VB_IMPORTANT, "lcdserver: Bad message duration");
+            LOG(VB_GENERAL, LOG_ERR, "lcdserver: Bad message duration");
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
         debug_level = cmdline.toInt("debug");
         if (debug_level < 0 || debug_level > 10)
         {
-            VERBOSE(VB_IMPORTANT, "lcdserver: Bad debug level");
+            LOG(VB_GENERAL, LOG_ERR, "lcdserver: Bad debug level");
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
@@ -100,8 +100,8 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "lcdserver: Could not initialize MythContext. "
-                        "Exiting.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "lcdserver: Could not initialize MythContext. Exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
