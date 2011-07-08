@@ -662,6 +662,12 @@ int main(int argc, char *argv[])
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
     }
 
+    if (fifo_info)
+    {
+        delete gContext;
+        return TRANSCODE_EXIT_OK;
+    }
+
     int exitcode = TRANSCODE_EXIT_OK;
     if ((result == REENCODE_MPEG2TRANS) || mpeg2 || build_index)
     {
