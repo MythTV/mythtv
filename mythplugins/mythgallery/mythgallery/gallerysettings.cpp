@@ -123,7 +123,7 @@ static HostComboBox *SlideshowOpenGLTransition()
 static HostSpinBox *SlideshowOpenGLTransitionLength()
 {
     HostSpinBox *gc = new HostSpinBox(
-        "SlideshowOpenGLTransitionLength", 500, 30000, 500);
+        "SlideshowOpenGLTransitionLength", 500, 120000, 500);
     gc->setLabel(QObject::tr("Duration of OpenGL Transition (milliseconds)"));
     gc->setValue(2000);
     return gc;
@@ -169,7 +169,7 @@ static HostComboBox *SlideshowBackground()
 
 static HostSpinBox *SlideshowDelay()
 {
-    HostSpinBox *gc = new HostSpinBox("SlideshowDelay", 0, 600, 1);
+    HostSpinBox *gc = new HostSpinBox("SlideshowDelay", 0, 86400, 1);
     gc->setLabel(QObject::tr("Slideshow Delay"));
     gc->setValue(5);
     gc->setHelpText(QObject::tr("This is the number of seconds to display each "
