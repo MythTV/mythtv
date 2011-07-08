@@ -20,12 +20,6 @@ using namespace std;
 #include "compat.h"
 #include "commandlineparser.h"
 
-#ifndef VERBOSE
-#define VB_IMPORTANT 0
-#define VERBOSE(LEVEL, MSG) \
-    do { cout << QString(MSG).toLocal8Bit().constData() << endl; } while (0)
-#endif
-
 const QString kMessage =
 "<mythmessage version=\"1\">\n"
 "  <text>%message_text%</text>\n"
