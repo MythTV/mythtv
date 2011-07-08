@@ -121,6 +121,34 @@ static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
     return GENERIC_EXIT_DB_ERROR;
 }
 
+namespace
+{
+    void cleanup()
+    {
+        delete gContext;
+        gContext = NULL;
+
+    }
+
+    class CleanupGuard
+    {
+      public:
+        typedef void (*CleanupFunc)();
+
+      public:
+        CleanupGuard(CleanupFunc cleanFunction) :
+            m_cleanFunction(cleanFunction) {}
+
+        ~CleanupGuard()
+        {
+            m_cleanFunction();
+        }
+
+      private:
+        CleanupFunc m_cleanFunction;
+    };
+}
+
 int main(int argc, char *argv[])
 {
     uint chanid;
@@ -134,6 +162,7 @@ int main(int argc, char *argv[])
     bool useCutlist = false, keyframesonly = false;
     bool build_index = false, fifosync = false;
     bool mpeg2 = false;
+    bool fifo_info = false;
     QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap;
@@ -274,6 +303,8 @@ int main(int argc, char *argv[])
         build_index = true;
     if (cmdline.toBool("fifodir"))
         fifodir = cmdline.toString("fifodir");
+    if (cmdline.toBool("fifoinfo"))
+        fifo_info = true;
     if (cmdline.toBool("fifosync"))
         fifosync = true;
     if (cmdline.toBool("recopt"))
@@ -299,6 +330,7 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("passthru"))
         passthru = true;
 
+    CleanupGuard callCleanup(cleanup);
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -357,6 +389,18 @@ int main(int argc, char *argv[])
          cerr << "Must specify --fifodir to use --fifosync\n";
          return GENERIC_EXIT_INVALID_CMDLINE;
     }
+    if (fifo_info && !fifodir.isEmpty())
+    {
+        cerr << "Cannot specify both --fifodir and --fifoinfo\n";
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (fifo_info)
+    {
+        // Setup a dummy fifodir path, so that the "fifodir" code path
+        // is taken. The path wont actually be used.
+        fifodir = "DummyFifoPath";
+    }
 
     if (!MSqlQuery::testDBConnection())
     {
@@ -412,7 +456,8 @@ int main(int argc, char *argv[])
         return QueueTranscodeJob(pginfo, profilename, hostname, useCutlist);
     }
 
-    if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-"))
+    if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-") &&
+        fifodir.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, QString("Attempted to transcode %1. "
                "Mythtranscode is currently unable to transcode remote "
@@ -421,7 +466,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_REMOTE_FILE;
     }
 
-    if (outfile.isNull() && !build_index)
+    if (outfile.isNull() && !build_index && fifodir.isEmpty())
         outfile = infile + ".tmp";
 
     if (jobID >= 0)
@@ -443,10 +488,16 @@ int main(int argc, char *argv[])
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,
                                           (fifosync || keyframesonly), jobID,
-                                          fifodir, deleteMap, AudioTrackNo,
-                                          passthru);
+                                          fifodir, fifo_info, deleteMap,
+                                          AudioTrackNo, passthru);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
+    }
+
+    if (fifo_info)
+    {
+        delete transcode;
+        return GENERIC_EXIT_OK;
     }
 
     int exitcode = GENERIC_EXIT_OK;
