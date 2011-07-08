@@ -212,8 +212,8 @@ int main(int argc, char *argv[])
         fill_data.chan_data.remove_new_channels = true;
     if (cmdline.toBool("nofilterchannels"))
         fill_data.chan_data.filter_new_channels = false;
-    if (cmdline.toBool("graboptions"))
-        fill_data.graboptions = " " + cmdline.toString("graboptions");
+    if (!cmdline.GetPassthrough().isEmpty())
+        fill_data.graboptions = " " + cmdline.GetPassthrough();
     if (cmdline.toBool("sourceid"))
         sourceid = cmdline.toInt("sourceid");
     if (cmdline.toBool("cardtype"))
