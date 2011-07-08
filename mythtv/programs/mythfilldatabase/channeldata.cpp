@@ -150,8 +150,8 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
             if (!actualfile.exists() &&
                 !HttpComms::getHttpFile(localfile, (*i).iconpath))
             {
-                VERBOSE(VB_IMPORTANT,
-                        QString("Failed to fetch icon from '%1'")
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Failed to fetch icon from '%1'")
                         .arg((*i).iconpath));
             }
         }
@@ -172,8 +172,8 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
             }
             else if (query.next())
             {
-                VERBOSE(VB_GENERAL,
-                        QString("Converting old xmltvid (%1) to new (%2)")
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Converting old xmltvid (%1) to new (%2)")
                         .arg((*i).old_xmltvid).arg((*i).xmltvid));
 
                 query.prepare("UPDATE channel "

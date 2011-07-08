@@ -160,8 +160,8 @@ IconData::~IconData()
 
 void IconData::UpdateSourceIcons(uint sourceid)
 {
-    VERBOSE(VB_GENERAL, LOC +
-            QString("Updating icons for sourceid: %1").arg(sourceid));
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Updating icons for sourceid: %1").arg(sourceid));
 
     QString fileprefix = SetupIconCacheDirectory();
 
@@ -193,9 +193,8 @@ void IconData::UpdateSourceIcons(uint sourceid)
 
         if (!localfile.exists() || 0 == localfile.size())
         {
-            VERBOSE(VB_GENERAL, LOC +
-                    QString("Attempting to fetch icon at '%1'")
-                    .arg(icon_url));
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Attempting to fetch icon at '%1'") .arg(icon_url));
 
             FI fi;
             fi.filename = localfile.fileName();
@@ -234,9 +233,9 @@ void IconData::UpdateSourceIcons(uint sourceid)
 
         if ((uint)tm.elapsed() > (count * 500) + 2000)
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Timed out waiting for some icons to download, "
-                    "you may wish to try again later.");
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "Timed out waiting for some icons to download, "
+                "you may wish to try again later.");
             break;
         }
     }
@@ -253,14 +252,14 @@ void IconData::Update(
     bool http_error = false;
     if (QHttp::NoError != error)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("fetching '%1'\n\t\t\t%2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("fetching '%1'\n\t\t\t%2")
                 .arg(url.toString()).arg(error_str));
         http_error = true;
     }
 
     if (!data.size())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Did not get any data from '%1'")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Did not get any data from '%1'")
                 .arg((url.toString())));
         http_error = true;
     }
@@ -271,9 +270,9 @@ void IconData::Update(
         Url2FIL::iterator it = m_u2fl.find(url);
         if (it == m_u2fl.end())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Programmer Error, got data for '%1',"
-                            "but have no record of requesting it.")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Programmer Error, got data for '%1',"
+                        "but have no record of requesting it.")
                     .arg(url.toString()));
             return;
         }
@@ -294,23 +293,23 @@ bool IconData::Save(const FI &fi, const QByteArray &data)
     QFile file(fi.filename);
     if (!file.open(QIODevice::WriteOnly))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to open '%1' for writing")
-                .arg(fi.filename));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+             QString("Failed to open '%1' for writing") .arg(fi.filename));
         return false;
     }
 
     if (file.write(data) < data.size())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to write icon data to '%1'")
-                .arg(fi.filename));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to write icon data to '%1'") .arg(fi.filename));
         file.remove();
         return false;
     }
 
     file.flush();
 
-    VERBOSE(VB_GENERAL, LOC +
-            QString("Updating channel icon for chanid: %1").arg(fi.chanid));
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Updating channel icon for chanid: %1").arg(fi.chanid));
 
     MSqlQuery update(MSqlQuery::InitCon());
     update.prepare(
@@ -331,9 +330,8 @@ bool IconData::Save(const FI &fi, const QByteArray &data)
 
 void IconData::ImportIconMap(const QString &filename)
 {
-
-    VERBOSE(VB_GENERAL, LOC +
-            QString("Importing icon mapping from %1...").arg(filename));
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Importing icon mapping from %1...").arg(filename));
 
     QFile xml_file;
 
@@ -418,8 +416,8 @@ void IconData::ImportIconMap(const QString &filename)
                 }
                 catch (DOMException &e)
                 {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR +
-                            QString("while processing %1: %2")
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("while processing %1: %2")
                             .arg(node.nodeName()).arg(e.getMessage()));
                 }
                 node = node.nextSibling();
@@ -427,23 +425,22 @@ void IconData::ImportIconMap(const QString &filename)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("unable to set document content: %1:%2c%3 %4")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("unable to set document content: %1:%2c%3 %4")
                     .arg(filename).arg(de_ln).arg(de_column).arg(de_msg));
         }
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("unable to open '%1' for reading.").arg(filename));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("unable to open '%1' for reading.").arg(filename));
     }
 }
 
 void IconData::ExportIconMap(const QString &filename)
 {
-
-    VERBOSE(VB_GENERAL, LOC +
-            QString("Exporting icon mapping to '%1'").arg(filename));
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Exporting icon mapping to '%1'").arg(filename));
 
     QFile xml_file(filename);
     if (dash_open(xml_file, filename, QIODevice::WriteOnly))
@@ -541,8 +538,8 @@ void IconData::ExportIconMap(const QString &filename)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("unable to open '%1' for writing.").arg(filename));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("unable to open '%1' for writing.").arg(filename));
     }
 }
 
