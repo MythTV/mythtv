@@ -317,14 +317,11 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
         result = QString("INVALID command '%1', try 'help' for more info")
                          .arg(nc->getArg(0));
 
-    if (!result.isEmpty())
-    {
-        nrLock.lock();
-        networkControlReplies.push_back(new NetworkCommand(nc->getClient(),result));
-        nrLock.unlock();
+    nrLock.lock();
+    networkControlReplies.push_back(new NetworkCommand(nc->getClient(),result));
+    nrLock.unlock();
 
-        notifyDataAvailable();
-    }
+    notifyDataAvailable();
 }
 
 void NetworkControl::deleteClient(void)
