@@ -794,23 +794,26 @@ int Transcode::TranscodeFile(
             audio_codec_name = "raw";
 
         // Display details of the format of the fifo data.
-        // Circumvent logging system so that output is independent
-        // of logging level.
-        cout << "FifoVideoWidth "      << video_width              << endl;
-        cout << "FifoVideoHeight "     << video_height             << endl;
-        cout << "FifoVideoAspectRatio "<< player->GetVideoAspect() << endl;
-        cout << "FifoVideoFrameRate "  << video_frame_rate         << endl;
-        cout << "FifoAudioFormat "     << audio_codec_name         << endl;
-        cout << "FifoAudioChannels "   << arb->channels            << endl;
-        cout << "FifoAudioHz "         << arb->eff_audiorate       << endl;
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoVideoWidth %1").arg(video_width));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoVideoHeight %1").arg(video_height));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoVideoAspectRatio %1").arg(player->GetVideoAspect()));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoVideoFrameRate %1").arg(video_frame_rate));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoAudioFormat %1").arg(audio_codec_name));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoAudioChannels %1").arg(arb->channels));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoAudioSampleRate %1").arg(arb->eff_audiorate));
 
         if(fifo_info)
         {
             // Request was for just the format of fifo data, not for
             // the actual transcode, so stop here.
             unlink(outputname.toLocal8Bit().constData());
-            if (player_ctx)
-                delete player_ctx;
             return REENCODE_OK;
         }
 

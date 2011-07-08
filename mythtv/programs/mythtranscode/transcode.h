@@ -15,6 +15,7 @@ class Transcode : public QObject
 {
   public:
     Transcode(ProgramInfo *pginfo);
+    ~Transcode();
     int TranscodeFile(
         const QString &inputname,
         const QString &outputname,
@@ -26,7 +27,6 @@ class Transcode : public QObject
     void SetRecorderOptions(QString options) { recorderOptions = options; }
 
   private:
-    ~Transcode();
     bool GetProfile(QString profileName, QString encodingType, int height,
                     int frameRate);
     void ReencoderAddKFA(long curframe, long lastkey, long num_keyframes);

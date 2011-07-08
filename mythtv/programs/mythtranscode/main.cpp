@@ -121,6 +121,34 @@ static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
     return GENERIC_EXIT_DB_ERROR;
 }
 
+namespace
+{
+    void cleanup()
+    {
+        delete gContext;
+        gContext = NULL;
+
+    }
+
+    class CleanupGuard
+    {
+      public:
+        typedef void (*CleanupFunc)();
+
+      public:
+        CleanupGuard(CleanupFunc cleanFunction) :
+            m_cleanFunction(cleanFunction) {}
+
+        ~CleanupGuard()
+        {
+            m_cleanFunction();
+        }
+
+      private:
+        CleanupFunc m_cleanFunction;
+    };
+}
+
 int main(int argc, char *argv[])
 {
     uint chanid;
@@ -302,6 +330,7 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("passthru"))
         passthru = true;
 
+    CleanupGuard callCleanup(cleanup);
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -427,7 +456,8 @@ int main(int argc, char *argv[])
         return QueueTranscodeJob(pginfo, profilename, hostname, useCutlist);
     }
 
-    if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-") && fifodir.isEmpty())
+    if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-") &&
+        fifodir.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, QString("Attempted to transcode %1. "
                "Mythtranscode is currently unable to transcode remote "
@@ -458,10 +488,16 @@ int main(int argc, char *argv[])
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,
                                           (fifosync || keyframesonly), jobID,
-                                          fifodir, fifo_info, deleteMap, AudioTrackNo,
-                                          passthru);
+                                          fifodir, fifo_info, deleteMap,
+                                          AudioTrackNo, passthru);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
+    }
+
+    if (fifo_info)
+    {
+        delete transcode;
+        return GENERIC_EXIT_OK;
     }
 
     int exitcode = GENERIC_EXIT_OK;
