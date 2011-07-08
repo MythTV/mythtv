@@ -60,6 +60,9 @@ void FillProgramInfo( DTC::Program *pProgram,
             pProgram->setAirdate( pInfo->GetOriginalAirDate() );
 
         pProgram->setDescription( pInfo->GetDescription() );
+        pProgram->setInetref    ( pInfo->GetInetRef()     );
+        pProgram->setSeason     ( pInfo->GetSeason()      );
+        pProgram->setEpisode    ( pInfo->GetEpisode()     );
     }
 
     pProgram->setSerializeChannel( bIncChannel );
