@@ -657,43 +657,43 @@ void VideoListImp::refreshList(bool filebrowser,
         { 
             case VideoDialog::BRS_FOLDER: 
                 fillMetadata(ltDBMetadata); 
-                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Folder mode")); 
+                LOG(VB_GENERAL, LOG_INFO, "Using Folder mode"); 
                 break; 
             case VideoDialog::BRS_GENRE: 
                 fillMetadata(ltDBGenreGroup); 
-                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Genre mode")); 
+                LOG(VB_GENERAL, LOG_INFO, "Using Genre mode"); 
                 break; 
             case VideoDialog::BRS_CATEGORY:
                 fillMetadata(ltDBCategoryGroup);
-                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Category mode")); 
+                LOG(VB_GENERAL, LOG_INFO, "Using Category mode"); 
                 break; 
             case VideoDialog::BRS_YEAR:
                 fillMetadata(ltDBYearGroup);
-                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Year mode"));
+                LOG(VB_GENERAL, LOG_INFO, "Using Year mode");
                 break;
             case VideoDialog::BRS_DIRECTOR:
                 fillMetadata(ltDBDirectorGroup);
-                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Director mode"));
+                LOG(VB_GENERAL, LOG_INFO, "Using Director mode");
                 break;
             case VideoDialog::BRS_STUDIO:
                 fillMetadata(ltDBStudioGroup);
-                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Studio mode"));
+                LOG(VB_GENERAL, LOG_INFO, "Using Studio mode");
                 break;
             case VideoDialog::BRS_CAST:
                 fillMetadata(ltDBCastGroup);
-                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Cast Mode"));
+                LOG(VB_GENERAL, LOG_INFO, "Using Cast Mode");
                 break;
             case VideoDialog::BRS_USERRATING:
                 fillMetadata(ltDBUserRatingGroup);
-                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using User Rating Mode"));
+                LOG(VB_GENERAL, LOG_INFO, "Using User Rating Mode");
                 break;
             case VideoDialog::BRS_INSERTDATE:
                 fillMetadata(ltDBInsertDateGroup);
-                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Insert Date Mode"));
+                LOG(VB_GENERAL, LOG_INFO, "Using Insert Date Mode");
                 break;
             case VideoDialog::BRS_TVMOVIE:
                 fillMetadata(ltTVMetadata);
-                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using TV/Movie Mode"));
+                LOG(VB_GENERAL, LOG_INFO, "Using TV/Movie Mode");
                 break;
             default:
                 fillMetadata(ltDBMetadata);
@@ -842,13 +842,13 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             case ltDBInsertDateGroup:
             {
                 QDate date = data->GetInsertdate();
-                groups.push_back(date.toString(gCoreContext->GetSetting("DateFormat")));
+                groups.push_back(date.toString(gCoreContext->
+                                                   GetSetting("DateFormat")));
                 break;
             }
             default: 
             { 
-                VERBOSE(VB_IMPORTANT, 
-                    QString("Invalid type of grouping")); 
+                LOG(VB_GENERAL, LOG_ERR, "Invalid type of grouping"); 
                 break; 
             } 
         } 
@@ -1095,9 +1095,9 @@ void VideoListImp::buildFsysList()
                 QString path = pDev->getMountPath();
                 if (path.length())
                 {
-                    VERBOSE(VB_GENERAL,
-                            QString("Video: Adding MediaMonitor "
-                                    "device: %1").arg(path));
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("Video: Adding MediaMonitor device: %1")
+                            .arg(path));
                     node_paths.push_back(node_to_path_list::
                                          value_type(path_to_node_name(path),
                                                     path));

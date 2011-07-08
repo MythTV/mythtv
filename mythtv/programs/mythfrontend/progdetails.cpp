@@ -39,7 +39,7 @@ bool ProgDetails::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'progdetails'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'progdetails'");
         return false;
     }
 

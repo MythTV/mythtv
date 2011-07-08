@@ -68,7 +68,7 @@ bool CustomEdit::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'customedit'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'customedit'");
         return false;
     }
 

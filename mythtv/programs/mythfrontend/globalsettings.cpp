@@ -994,16 +994,16 @@ void PlaybackProfileConfig::Save(void)
     bool ok = VideoDisplayProfile::DeleteDB(groupid, del_items);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT,
-                "PlaybackProfileConfig::Save() -- failed to delete items");
+        LOG(VB_GENERAL, LOG_ERR,
+            "PlaybackProfileConfig::Save() -- failed to delete items");
         return;
     }
 
     ok = VideoDisplayProfile::SaveDB(groupid, items);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT,
-                "PlaybackProfileConfig::Save() -- failed to save items");
+        LOG(VB_GENERAL, LOG_ERR,
+            "PlaybackProfileConfig::Save() -- failed to save items");
         return;
     }
 }
@@ -1016,7 +1016,7 @@ void PlaybackProfileConfig::pressed(QString cmd)
         PlaybackProfileItemConfig itemcfg(items[i]);
 
         if (itemcfg.exec() != kDialogCodeAccepted)
-            VERBOSE(VB_IMPORTANT, QString("edit #%1").arg(i) + " rejected");
+            LOG(VB_GENERAL, LOG_ERR, QString("edit #%1").arg(i) + " rejected");
 
         InitLabel(i);
         needs_save = true;
@@ -1036,7 +1036,7 @@ void PlaybackProfileConfig::pressed(QString cmd)
         PlaybackProfileItemConfig itemcfg(item);
 
         if (itemcfg.exec() != kDialogCodeAccepted)
-            VERBOSE(VB_IMPORTANT, "addentry rejected");
+            LOG(VB_GENERAL, LOG_ERR, "addentry rejected");
 
         items.push_back(item);
         InitUI();
@@ -1181,7 +1181,9 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
 
 PlaybackProfileConfigs::~PlaybackProfileConfigs()
 {
-    //VERBOSE(VB_IMPORTANT, "~PlaybackProfileConfigs()");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, "~PlaybackProfileConfigs()");
+#endif
 }
 
 void PlaybackProfileConfigs::btnPress(QString cmd)

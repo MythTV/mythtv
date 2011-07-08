@@ -262,7 +262,7 @@ bool NetworkControl::listen(const QHostAddress & address, quint16 port)
 {
     if (QTcpServer::listen(address,port))
     {
-        VERBOSE(VB_GENERAL, LOC +
+        LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Listening for remote connections on port %1").arg(port));
         return true;
     }
@@ -326,7 +326,7 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
 
 void NetworkControl::deleteClient(void)
 {
-    VERBOSE(VB_GENERAL, LOC + "Client Socket disconnected");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Client Socket disconnected");
     QMutexLocker locker(&clientLock);
 
     SendMythSystemEvent("NET_CTRL_DISCONNECTED");
@@ -353,7 +353,7 @@ void NetworkControl::deleteClient(NetworkControlClient *ncc)
         delete ncc;
     }
     else
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("deleteClient(%1), unable to "
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("deleteClient(%1), unable to "
                 "locate specified NetworkControlClient").arg((long long)ncc));
 }
 
@@ -361,8 +361,7 @@ void NetworkControl::newConnection()
 {
     QString welcomeStr;
 
-    VERBOSE(VB_GENERAL, LOC +
-            QString("New connection established."));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection established."));
 
     SendMythSystemEvent("NET_CTRL_CONNECTED");
 
@@ -412,14 +411,19 @@ void NetworkControlClient::readClient(void)
     while (socket->canReadLine())
     {
         lineIn = socket->readLine();
-//        lineIn.replace(QRegExp("[^-a-zA-Z0-9\\s\\.:_#/$%&()*+,;<=>?\\[\\]\\|]"), "");
+#if 0
+        lineIn.replace(QRegExp("[^-a-zA-Z0-9\\s\\.:_#/$%&()*+,;<=>?\\[\\]\\|]"),
+                       "");
+#endif
+
+        // TODO: can this be replaced with lineIn.simplify()?
         lineIn.replace(QRegExp("[\r\n]"), "");
         lineIn.replace(QRegExp("^\\s"), "");
 
         if (lineIn.isEmpty())
             continue;
 
-        VERBOSE(VB_NETWORK, LOC +
+        LOG(VB_NETWORK, LOG_INFO, LOC +
             QString("emit commandReceived(%1)").arg(lineIn));
         emit commandReceived(lineIn);
     }
@@ -427,8 +431,8 @@ void NetworkControlClient::readClient(void)
 
 void NetworkControl::receiveCommand(QString &command)
 {
-    VERBOSE(VB_NETWORK, LOC +
-            QString("NetworkControl::receiveCommand(%1)").arg(command));
+    LOG(VB_NETWORK, LOG_INFO, LOC +
+        QString("NetworkControl::receiveCommand(%1)").arg(command));
     NetworkControlClient *ncc = static_cast<NetworkControlClient *>(sender());
     if (!ncc)
          return;
@@ -1024,8 +1028,9 @@ QString NetworkControl::processSet(NetworkCommand *nc)
         result += " Previous filter: " + oldVerboseString + "\r\n";
         result += "      New Filter: " + verboseString + "\r\n";
 
-        VERBOSE(VB_IMPORTANT, QString("Verbose mask changed, new level is: %1")
-                                      .arg(verboseString));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Verbose mask changed, new level is: %1")
+                .arg(verboseString));
 
         return result;
     }
@@ -1144,7 +1149,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "query memstats        - List free and total, physical and swap memory\r\n"
             "query time            - Query current time on frontend\r\n"
             "query uptime          - Query machine uptime\r\n"
-            "query verbose         - Get current VERBOSE filter\r\n"
+            "query verbose         - Get current VERBOSE mask\r\n"
             "query version         - Query Frontend version details\r\n"
             "query channels        - Query available channels\r\n"
             "query channels START LIMIT - Query available channels from START and limit results to LIMIT lines\r\n";
@@ -1152,10 +1157,11 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
     else if (is_abbrev("set", command))
     {
         helpText +=
-            "set verbose debug-level - Change the VERBOSE filter to 'debug-level'\r\n"
-            "                          (i.e. 'set verbose playback,audio')\r\n"
-            "                          use 'set verbose default' to revert\r\n"
-            "                          back to the default level of\r\n";
+            "set verbose debug-mask - "
+            "Change the VERBOSE mask to 'debug-mask'\r\n"
+            "                         (i.e. 'set verbose playback,audio')\r\n"
+            "                         use 'set verbose default' to revert\r\n"
+            "                         back to the default level of\r\n";
     }
     else if (is_abbrev("screenshot", command))
     {

@@ -121,9 +121,8 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
         // when necessary, we rely on this.
         if (!evinfo.IsFileReadable())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("CHECK_AVAILABILITY '%1' "
-                            "file not found")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("CHECK_AVAILABILITY '%1' file not found")
                     .arg(evinfo.GetPathname()));
             availableStatus = asFileNotFound;
         }

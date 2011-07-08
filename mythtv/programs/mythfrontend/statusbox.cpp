@@ -95,8 +95,8 @@ bool StatusBox::Create()
 
     if (!m_categoryList || !m_logList || (!m_helpText && !m_justHelpText))
     {
-        VERBOSE(VB_IMPORTANT, "StatusBox, theme is missing "
-                              "required elements");
+        LOG(VB_GENERAL, LOG_ERR, "StatusBox, theme is missing "
+                                 "required elements");
         return false;
     }
 

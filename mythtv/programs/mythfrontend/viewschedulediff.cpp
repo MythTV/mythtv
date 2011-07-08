@@ -50,7 +50,7 @@ bool ViewScheduleDiff::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'schedulediff'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'schedulediff'");
         return false;
     }
 

@@ -15,7 +15,8 @@
 #include "setupwizard_audio.h"
 #include "setupwizard_video.h"
 
-AudioSetupWizard::AudioSetupWizard(MythScreenStack *parent, MythScreenType *previous,
+AudioSetupWizard::AudioSetupWizard(MythScreenStack *parent,
+                                   MythScreenType *previous,
                                    const char *name)
     : MythScreenType(parent, name),
       m_outputlist(NULL),                m_testThread(NULL),
@@ -39,8 +40,10 @@ bool AudioSetupWizard::Create()
     if (!foundtheme)
         return false;
 
-    m_audioDeviceButtonList = dynamic_cast<MythUIButtonList *> (GetChild("audiodevices"));
-    m_speakerNumberButtonList = dynamic_cast<MythUIButtonList *> (GetChild("speakers"));
+    m_audioDeviceButtonList =
+        dynamic_cast<MythUIButtonList *> (GetChild("audiodevices"));
+    m_speakerNumberButtonList =
+        dynamic_cast<MythUIButtonList *> (GetChild("speakers"));
 
     m_dtsCheck = dynamic_cast<MythUICheckBox *> (GetChild("dtscheck"));
     m_ac3Check = dynamic_cast<MythUICheckBox *> (GetChild("ac3check"));
@@ -48,7 +51,8 @@ bool AudioSetupWizard::Create()
     m_truehdCheck = dynamic_cast<MythUICheckBox *> (GetChild("truehdcheck"));
     m_dtshdCheck = dynamic_cast<MythUICheckBox *> (GetChild("dtshdcheck"));
 
-    m_testSpeakerButton = dynamic_cast<MythUIButton *> (GetChild("testspeakers"));
+    m_testSpeakerButton =
+        dynamic_cast<MythUIButton *> (GetChild("testspeakers"));
 
     m_nextButton = dynamic_cast<MythUIButton *> (GetChild("next"));
     m_prevButton = dynamic_cast<MythUIButton *> (GetChild("previous"));
@@ -57,7 +61,7 @@ bool AudioSetupWizard::Create()
         !m_dtsCheck || !m_ac3Check || !m_eac3Check || !m_truehdCheck ||
         !m_dtshdCheck || !m_testSpeakerButton || !m_nextButton || !m_prevButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 

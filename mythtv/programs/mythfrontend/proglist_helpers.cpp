@@ -37,7 +37,7 @@ bool PhrasePopup::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'phrasepopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'phrasepopup'");
         return false;
     }
 
@@ -179,7 +179,7 @@ void PhrasePopup::recordClicked(void)
 
     if (m_searchType == kNoSearch)
     {
-        VERBOSE(VB_IMPORTANT, "Unknown search in ProgLister");
+        LOG(VB_GENERAL, LOG_ERR, "Unknown search in ProgLister");
         return;
     }
 
@@ -243,7 +243,7 @@ bool TimePopup::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'timepopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'timepopup'");
         return false;
     }
 
@@ -327,7 +327,7 @@ bool PowerSearchPopup::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'powersearchpopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'powersearchpopup'");
         return false;
     }
 
@@ -457,7 +457,7 @@ void PowerSearchPopup::recordClicked(void)
 
     if (m_searchType == kNoSearch)
     {
-        VERBOSE(VB_IMPORTANT, "Unknown search in ProgLister");
+        LOG(VB_GENERAL, LOG_ERR, "Unknown search in ProgLister");
         return;
     }
 
@@ -516,7 +516,7 @@ EditPowerSearchPopup::EditPowerSearchPopup(MythScreenStack *parentStack,
     QStringList field = m_currentValue.split(':');
     if (field.count() != 6)
     {
-        VERBOSE(VB_IMPORTANT, QString("Error. PowerSearch %1 has %2 fields")
+        LOG(VB_GENERAL, LOG_ERR, QString("Error. PowerSearch %1 has %2 fields")
                 .arg(m_currentValue).arg(field.count()));
         m_currentValue = ":::::";
     }
@@ -538,7 +538,7 @@ bool EditPowerSearchPopup::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'editpowersearchpopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'editpowersearchpopup'");
         return false;
     }
 

@@ -67,8 +67,8 @@ bool CustomPriority::Create()
         !m_descriptionEdit || !m_addButton || !m_installButton ||
         !m_testButton || !m_deleteButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "CustomPriority, theme is missing "
-                              "required elements");
+        LOG(VB_GENERAL, LOG_ERR,
+            "CustomPriority, theme is missing required elements");
         return false;
     }
 
@@ -402,7 +402,7 @@ void CustomPriority::testSchedule(void)
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
             .arg(MythDB::DBErrorMessage(query.lastError()));
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return;
     }
 
@@ -415,7 +415,7 @@ void CustomPriority::testSchedule(void)
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
             .arg(MythDB::DBErrorMessage(query.lastError()));
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return;
     }
 
@@ -429,7 +429,7 @@ void CustomPriority::testSchedule(void)
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
             .arg(MythDB::DBErrorMessage(query.lastError()));
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return;
     }
 
@@ -473,6 +473,6 @@ void CustomPriority::testSchedule(void)
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
             .arg(MythDB::DBErrorMessage(query.lastError()));
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
     }
 }

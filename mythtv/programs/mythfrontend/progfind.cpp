@@ -79,7 +79,7 @@ bool ProgFinder::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'programfind'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'programfind'");
         return false;
     }
 
@@ -1093,7 +1093,7 @@ bool SearchInputDialog::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'searchpopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'searchpopup'");
         return false;
     }
 

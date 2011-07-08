@@ -13,6 +13,7 @@
 #include "mythscreenstack.h"
 #include "mythsystem.h"
 #include "mythlogging.h"
+#include "exitcodes.h"
 
 void ExitPrompter::quit()
 {
@@ -69,11 +70,14 @@ void ExitPrompter::halt()
     if (!halt_cmd.isEmpty()) /* Use user specified command if it exists */
     {
         ret = myth_system(halt_cmd);
-        if (ret != 0)
-            VERBOSE(VB_IMPORTANT, "User defined HaltCommand failed, falling back to alternative methods.");
+        if (ret != GENERIC_EXIT_OK)
+            LOG(VB_GENERAL, LOG_ERR,
+                "User defined HaltCommand failed, falling back to "
+                "alternative methods.");
     }
 
-    if (ret != 0 && !DBusHalt()) /* If supported, use DBus to shutdown */
+    /* If supported, use DBus to shutdown */
+    if (ret != GENERIC_EXIT_OK && !DBusHalt())
         myth_system("sudo /sbin/halt -p"); 
 }
 
@@ -127,11 +131,14 @@ void ExitPrompter::reboot()
     if (!reboot_cmd.isEmpty()) /* Use user specified command if it exists */
     {
         ret = myth_system(reboot_cmd);
-        if (ret != 0)
-            VERBOSE(VB_IMPORTANT, "User defined RebootCommand failed, falling back to alternative methods.");
+        if (ret != GENERIC_EXIT_OK)
+            LOG(VB_GENERAL, LOG_ERR, 
+                "User defined RebootCommand failed, falling back to "
+                "alternative methods.");
     }
 
-    if (ret != 0 && !DBusReboot()) /* If supported, use DBus to reboot */
+    /* If supported, use DBus to reboot */
+    if (ret != GENERIC_EXIT_OK && !DBusReboot())
         myth_system("sudo /sbin/reboot");
 }
 
@@ -190,7 +197,7 @@ void ExitPrompter::handleExit()
 
     if (!dlg->Create())
     {
-        VERBOSE(VB_IMPORTANT, "Can't create Exit Prompt dialog?");
+        LOG(VB_GENERAL, LOG_ERR, "Can't create Exit Prompt dialog?");
         delete dlg;
         quit();
     }

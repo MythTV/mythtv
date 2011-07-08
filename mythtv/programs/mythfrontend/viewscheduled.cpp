@@ -81,7 +81,7 @@ bool ViewScheduled::Create()
 
     if (!m_schedulesList)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
@@ -90,7 +90,8 @@ bool ViewScheduled::Create()
     connect(m_schedulesList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(selected(MythUIButtonListItem*)));
 
-    m_schedulesList->SetLCDTitles(tr("Scheduled Recordings"), "shortstarttimedate|channel|titlesubtitle|card");
+    m_schedulesList->SetLCDTitles(tr("Scheduled Recordings"),
+                              "shortstarttimedate|channel|titlesubtitle|card");
     m_schedulesList->SetSearchFields("titlesubtitle");
 
     if (m_groupList)
@@ -153,7 +154,8 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event,
+                                                     actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -202,7 +204,8 @@ void ViewScheduled::ShowMenu(void)
     QString label = tr("Options");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
+                                                 "menuPopup");
 
     if (menuPopup->Create())
     {
@@ -706,13 +709,15 @@ void ViewScheduled::customEvent(QEvent *event)
 
         if (resultid == "deleterule")
         {
-            RecordingRule *record = qVariantValue<RecordingRule *>(dce->GetData());
+            RecordingRule *record =
+                qVariantValue<RecordingRule *>(dce->GetData());
             if (record)
             {
                 if (buttonnum > 0)
                 {
                     if (!record->Delete())
-                        VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
+                        LOG(VB_GENERAL, LOG_ERR,
+                            "Failed to delete recording rule");
                 }
                 delete record;
             }

@@ -79,22 +79,21 @@ void BackendConnectionManager::customEvent(QEvent *event)
             {
                 // Check for different time zones, 
                 // different offsets, different times
-                VERBOSE(VB_IMPORTANT,
-                        "The time and/or time zone settings on this "
-                        "system do not match those in use on the master "
-                        "backend. Please ensure all frontend and backend "
-                        "systems are configured to use the same time "
-                        "zone and have the current time properly set.");
-                VERBOSE(VB_IMPORTANT,
-                        "Unable to run with invalid time settings. "
-                        "Exiting.");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "The time and/or time zone settings on this "
+                    "system do not match those in use on the master "
+                    "backend. Please ensure all frontend and backend "
+                    "systems are configured to use the same time "
+                    "zone and have the current time properly set.");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Unable to run with invalid time settings. Exiting.");
                 MythScreenStack *popupStack = GetMythMainWindow()->
                                                  GetStack("popup stack");
                 QString message = tr("Your frontend and backend are configured "
-                                     "in different timezones.  You must correct "
-                                     "this mismatch to continue.");
-                MythConfirmationDialog *error =  new MythConfirmationDialog(
-                                                     popupStack, message, false);
+                                     "in different timezones.  You must "
+                                     "correct this mismatch to continue.");
+                MythConfirmationDialog *error = new MythConfirmationDialog(
+                                                    popupStack, message, false);
                 if (error->Create())
                 {
                     QObject::connect(error, SIGNAL(haveResult(bool)), 

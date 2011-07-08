@@ -440,7 +440,7 @@ bool ProgramRecPriority::Create()
 
     if (!m_programList)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
@@ -449,7 +449,8 @@ bool ProgramRecPriority::Create()
     connect(m_programList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(edit(MythUIButtonListItem*)));
 
-    m_programList->SetLCDTitles(tr("Schedule Priorities"), "rec_type|titlesubtitle|progpriority|finalpriority");
+    m_programList->SetLCDTitles(tr("Schedule Priorities"),
+                          "rec_type|titlesubtitle|progpriority|finalpriority");
     m_programList->SetSearchFields("titlesubtitle");
 
     BuildFocusList();
@@ -811,16 +812,20 @@ void ProgramRecPriority::customEvent(QEvent *event)
         }
         else if (resultid == "deleterule")
         {
-            RecordingRule *record = qVariantValue<RecordingRule *>(dce->GetData());
+            RecordingRule *record =
+                qVariantValue<RecordingRule *>(dce->GetData());
             if (record)
             {
                 if (buttonnum > 0)
                 {
-                    MythUIButtonListItem *item = m_programList->GetItemCurrent();
+                    MythUIButtonListItem *item =
+                        m_programList->GetItemCurrent();
+
                     if (record->Delete() && item)
                         RemoveItemFromList(item);
                     else
-                        VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
+                        LOG(VB_GENERAL, LOG_ERR,
+                            "Failed to delete recording rule");
                 }
                 delete record;
             }

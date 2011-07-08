@@ -168,11 +168,11 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo, bool startActive)
     RecordingRule *recrule = new RecordingRule();
     
     if (!recrule->LoadByProgram(static_cast<ProgramInfo*>(recinfo)))
-        VERBOSE(VB_IMPORTANT, QString("Failed to load by program info"));
+        LOG(VB_GENERAL, LOG_ERR, "Failed to load by program info");
     
     if (!recrule->MakeOverride())
     {
-        VERBOSE(VB_IMPORTANT, QString("Failed to make Override"));
+        LOG(VB_GENERAL, LOG_ERR, "Failed to make Override");
         delete recrule;
         return;
     }

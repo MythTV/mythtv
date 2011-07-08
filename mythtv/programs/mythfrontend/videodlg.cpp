@@ -996,7 +996,7 @@ bool VideoDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen '" + windowName + "'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen '" + windowName + "'");
         return false;
     }
 
@@ -1007,7 +1007,8 @@ bool VideoDialog::Create()
 
     BuildFocusList();
 
-    CheckedSet(m_novideoText, tr("Video dialog loading, or no videos available..."));
+    CheckedSet(m_novideoText,
+               tr("Video dialog loading, or no videos available..."));
 
     if (m_d->m_type == DLG_TREE)
     {
@@ -1336,7 +1337,9 @@ void VideoDialog::fetchVideos()
 QString VideoDialog::RemoteImageCheck(QString host, QString filename)
 {
     QString result = "";
-    //VERBOSE(VB_GENERAL, QString("RemoteImageCheck(%1)").arg(filename));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("RemoteImageCheck(%1)").arg(filename));
+#endif
 
     QStringList dirs = GetVideoDirsByHost(host);
 
@@ -1359,8 +1362,9 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
 
             if (!ok || list.at(0).startsWith("SLAVE UNREACHABLE"))
             {
-                VERBOSE(VB_GENERAL, QString("Backend : %1 currently Unreachable. Skipping this one.")
-                                    .arg(host));
+                LOG(VB_GENERAL, LOG_WARNING,
+                    QString("Backend : %1 currently Unreachable. Skipping "
+                            "this one.") .arg(host));
                 break;
             }
 
@@ -1369,8 +1373,11 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
 
             if (!result.isEmpty())
             {
-            //    VERBOSE(VB_GENERAL, QString("RemoteImageCheck(%1) res :%2: :%3:")
-            //                        .arg(fname).arg(result).arg(*iter));
+#if 0
+                LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("RemoteImageCheck(%1) res :%2: :%3:")
+                        .arg(fname).arg(result).arg(*iter));
+#endif
                 break;
             }
 
@@ -1503,12 +1510,11 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
     }
 
     if (!icon_file.isEmpty())
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Found Image : %1 :")
-                                    .arg(icon_file));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Found Image : %1 :")
+                .arg(icon_file));
     else
-        VERBOSE(VB_GENERAL|VB_EXTRA,
-                QString("Could not find cover Image : %1 ")
-                    .arg(prefix));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Could not find cover Image : %1 ")
+                .arg(prefix));
 
     if (IsDefaultCoverFile(icon_file))
         icon_file.clear();
@@ -1539,8 +1545,11 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
         QString filename = QString("%1/folder").arg(folder_path);
 
-        // VERBOSE(VB_GENERAL, QString("GetCoverImage host : %1  prefix : %2 file : %3")
-        //                            .arg(host).arg(prefix).arg(filename));
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("GetCoverImage host : %1  prefix : %2 file : %3")
+                .arg(host).arg(prefix).arg(filename));
+#endif
 
         QStringList test_files;
         test_files.append(filename + ".png");
@@ -1552,7 +1561,9 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                 tfp != test_files.end(); ++tfp)
         {
             QString imagePath = *tfp;
-            //VERBOSE(VB_GENERAL, QString("Cover check :%1 : ").arg(*tfp));
+#if 0
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Cover check :%1 : ").arg(*tfp));
+#endif
 
             foundCover = false;
             if (!host.isEmpty())
@@ -1693,11 +1704,11 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
         }
 
         if (!icon_file.isEmpty())
-            VERBOSE(VB_GENERAL|VB_EXTRA, QString("Found Image : %1 :")
-                                        .arg(icon_file));
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Found Image : %1 :")
+                    .arg(icon_file));
         else
-            VERBOSE(VB_GENERAL|VB_EXTRA,
-                    QString("Could not find folder cover Image : %1 ")
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("Could not find folder cover Image : %1 ")
                     .arg(folder_path));
     }
     else
@@ -2103,8 +2114,7 @@ void VideoDialog::createOkDialog(QString title)
  */
 void VideoDialog::searchComplete(QString string)
 {
-    VERBOSE(VB_GENERAL | VB_EXTRA,
-            QString("Jumping to: %1").arg(string));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Jumping to: %1").arg(string));
 
     MythGenericTree *parent = m_d->m_currentNode->getParent();
     QStringList childList;
@@ -3101,8 +3111,8 @@ void VideoDialog::playVideoWithTrailers()
         ++i;
         QString trailer = trailers.takeAt(rand() % trailers.size());
 
-        VERBOSE(VB_GENERAL | VB_EXTRA,
-                QString("Random trailer to play will be: %1").arg(trailer));
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("Random trailer to play will be: %1").arg(trailer));
 
         VideoPlayerCommand::PlayerFor(trailer).Play();
     }
@@ -3250,15 +3260,16 @@ void VideoDialog::customEvent(QEvent *levent)
             m_busyPopup = NULL;
         }
 
-        VideoMetadata *metadata = qVariantValue<VideoMetadata *>(lookup->GetData());
+        VideoMetadata *metadata =
+            qVariantValue<VideoMetadata *>(lookup->GetData());
         if (metadata)
         {
             metadata->SetProcessed(true);
             metadata->UpdateDatabase();
         }
-        VERBOSE(VB_GENERAL,
+        LOG(VB_GENERAL, LOG_INFO,
             QString("No results found for %1 %2 %3").arg(lookup->GetTitle())
-                    .arg(lookup->GetSeason()).arg(lookup->GetEpisode()));
+                .arg(lookup->GetSeason()).arg(lookup->GetEpisode()));
     }
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {
@@ -3362,8 +3373,8 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
     typedef QList<MythGenericTree *> MGTreeChildList;
     MGTreeChildList *lchildren = node->getAllChildren();
 
-    VERBOSE(VB_GENERAL|VB_EXTRA,
-            QString("Fetching details in %1").arg(node->getString()));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Fetching details in %1").arg(node->getString()));
 
     for (MGTreeChildList::const_iterator p = lchildren->begin();
             p != lchildren->end(); ++p)

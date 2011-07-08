@@ -47,7 +47,7 @@ bool GrabberSettings::Create()
     if (!m_movieGrabberButtonList || !m_tvGrabberButtonList ||
         !m_gameGrabberButtonList ||!m_okButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 

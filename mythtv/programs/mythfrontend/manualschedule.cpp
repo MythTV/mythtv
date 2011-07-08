@@ -64,8 +64,8 @@ bool ManualSchedule::Create(void)
         !m_startminuteSpin || !m_durationSpin || !m_titleEdit ||
         !m_recordButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "ManualSchedule, theme is missing "
-                              "required elements");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ManualSchedule, theme is missing required elements");
         return false;
     }
 
@@ -181,8 +181,8 @@ void ManualSchedule::dateChanged(void)
     int min = m_startminuteSpin->GetIntValue();
     m_startDateTime.setTime(QTime(hr, min));
 
-    VERBOSE(VB_SCHEDULE, QString("Start Date Time: %1")
-                                    .arg(m_startDateTime.toString()));
+    LOG(VB_SCHEDULE, LOG_INFO, QString("Start Date Time: %1")
+                                   .arg(m_startDateTime.toString()));
 
     // Note we allow start times up to one hour in the past so
     // if it is 20:25 the user can start a recording at 20:30

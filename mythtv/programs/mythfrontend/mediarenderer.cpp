@@ -38,20 +38,24 @@ class MythFrontendStatus : public HttpServerExtension
             return false;
 
         pRequest->m_eResponseType = ResponseTypeHTML;
-        pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+        pRequest->m_mapRespHeaders["Cache-Control"] =
+            "no-cache=\"Ext\", max-age = 5000";
 
         SSDPCacheEntries* cache = NULL;
         QString ipaddress = QString();
         if (!UPnp::g_IPAddrList.isEmpty())
             ipaddress = UPnp::g_IPAddrList.at(0);
 
-        QString shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-        QString timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+        QString shortdateformat = gCoreContext->GetSetting("ShortDateFormat",
+                                                           "M/d");
+        QString timeformat      = gCoreContext->GetSetting("TimeFormat",
+                                                           "h:mm AP");
         QString hostname   = gCoreContext->GetHostName();
         QDateTime qdtNow   = QDateTime::currentDateTime();
         QString masterhost = gCoreContext->GetMasterHostName();
         QString masterip   = gCoreContext->GetSetting("MasterServerIP");
-        QString masterport = gCoreContext->GetSettingOnHost("BackendStatusPort", masterhost, "6544");
+        QString masterport = gCoreContext->GetSettingOnHost("BackendStatusPort",
+                                                            masterhost, "6544");
 
         QTextStream stream ( &pRequest->m_response );
         stream.setCodec("UTF-8");
@@ -193,7 +197,7 @@ class MythFrontendStatus : public HttpServerExtension
 
 MediaRenderer::MediaRenderer()
 {
-    VERBOSE(VB_UPNP, "MediaRenderer::Begin" );
+    LOG(VB_UPNP, LOG_INFO, "MediaRenderer::Begin");
 
     // ----------------------------------------------------------------------
     // Initialize Configuration class (XML file for frontend)
@@ -212,9 +216,10 @@ MediaRenderer::MediaRenderer()
     if (!m_pHttpServer)
         return;
 
-    if (!m_pHttpServer->listen(QHostAddress(gCoreContext->MythHostAddressAny()), nPort))
+    if (!m_pHttpServer->listen(QHostAddress(gCoreContext->MythHostAddressAny()),
+                               nPort))
     {
-        VERBOSE(VB_IMPORTANT, "MediaRenderer::HttpServer Create Error");
+        LOG(VB_GENERAL, LOG_ERR, "MediaRenderer::HttpServer Create Error");
         delete m_pHttpServer;
         m_pHttpServer = NULL;
         return;
@@ -230,11 +235,11 @@ MediaRenderer::MediaRenderer()
         // Create device Description
         // ------------------------------------------------------------------
 
-        VERBOSE(VB_UPNP, QString( "MediaRenderer::Creating UPnp Description" ));
+        LOG(VB_UPNP, LOG_INFO, "MediaRenderer::Creating UPnp Description");
 
         UPnpDevice &device = g_UPnpDeviceDesc.m_rootDevice;
 
-        device.m_sDeviceType        = "urn:schemas-upnp-org:device:MediaRenderer:1";
+        device.m_sDeviceType   = "urn:schemas-upnp-org:device:MediaRenderer:1";
         device.m_sFriendlyName      = "MythTv AV Renderer";
         device.m_sManufacturer      = "MythTV";
         device.m_sManufacturerURL   = "http://www.mythtv.org";
@@ -248,8 +253,10 @@ MediaRenderer::MediaRenderer()
         // Register any HttpServerExtensions...
         // ------------------------------------------------------------------
 
-        VERBOSE(VB_UPNP, "MediaRenderer::Registering MythFrontendStatus service.");
-        m_pHttpServer->RegisterExtension(new MythFrontendStatus(m_pHttpServer->m_sSharePath));
+        LOG(VB_UPNP, LOG_INFO,
+            "MediaRenderer::Registering MythFrontendStatus service.");
+        m_pHttpServer->RegisterExtension(
+            new MythFrontendStatus(m_pHttpServer->m_sSharePath));
 
         QString sSinkProtocols = "http-get:*:image/gif:*,"
                                  "http-get:*:image/jpeg:*,"
@@ -263,30 +270,38 @@ MediaRenderer::MediaRenderer()
         // ------------------------------------------------------------------
         // Register the MythFEXML protocol...
         // ------------------------------------------------------------------
-        VERBOSE(VB_UPNP, "MediaRenderer::Registering MythFEXML Service." );
+        LOG(VB_UPNP, LOG_INFO, "MediaRenderer::Registering MythFEXML Service.");
         m_pHttpServer->RegisterExtension( new MythFEXML( RootDevice(),
                                           m_pHttpServer->m_sSharePath));
 
-        // VERBOSE(VB_UPNP, QString( "MediaRenderer::Registering AVTransport Service." ));
-        // m_pHttpServer->RegisterExtension( m_pUPnpAVT = new UPnpAVTransport( RootDevice() ));
+#if 0
+        LOG(VB_UPNP, LOG_INFO,
+            "MediaRenderer::Registering AVTransport Service.");
+        m_pUPnpAVT = new UPnpAVTransport( RootDevice() );
+        m_pHttpServer->RegisterExtension( m_pUPnpAVT );
+#endif
 
-        VERBOSE(VB_UPNP, QString( "MediaRenderer::Registering CMGR Service." ));
+        LOG(VB_UPNP, LOG_INFO, "MediaRenderer::Registering CMGR Service.");
         // HttpServer will be responsible for deleting UPnpCMGR
-        m_pHttpServer->RegisterExtension( m_pUPnpCMGR = new UPnpCMGR(
-                                                RootDevice(),
-                                                m_pHttpServer->m_sSharePath,
-                                                "", sSinkProtocols ));
+        m_pUPnpCMGR = new UPnpCMGR(RootDevice(), m_pHttpServer->m_sSharePath,
+                                   "", sSinkProtocols );
+        m_pHttpServer->RegisterExtension( m_pUPnpCMGR );
 
-        // VERBOSE(VB_UPNP, QString( "MediaRenderer::Registering RenderingControl Service." ));
-        // m_pHttpServer->RegisterExtension( m_pUPnpRCTL= new UPnpRCTL( RootDevice() ));
+#if 0
+        LOG(VB_UPNP, LOG_INFO, 
+            "MediaRenderer::Registering RenderingControl Service.");
+        m_pUPnpRCTL= new UPnpRCTL( RootDevice() );
+        m_pHttpServer->RegisterExtension( m_pUPnpRCTL );
+#endif
 
         UPNPSubscription *subscription = NULL;
         if (getenv("MYTHTV_UPNPSCANNER"))
         {
-            VERBOSE(VB_UPNP,
-                QString("MediaRenderer: Registering subscription service."));
+            LOG(VB_UPNP, LOG_INFO,
+                "MediaRenderer: Registering subscription service.");
 
-            subscription = new UPNPSubscription(m_pHttpServer->m_sSharePath, nPort);
+            subscription = new UPNPSubscription(m_pHttpServer->m_sSharePath,
+                                                nPort);
             m_pHttpServer->RegisterExtension(subscription);
         }
 
@@ -302,10 +317,11 @@ MediaRenderer::MediaRenderer()
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "MediaRenderer::Unable to Initialize UPnp Stack");
+        LOG(VB_GENERAL, LOG_ERR,
+            "MediaRenderer::Unable to Initialize UPnp Stack");
     }
 
-    VERBOSE(VB_UPNP, QString( "MediaRenderer::End" ));
+    LOG(VB_UPNP, LOG_INFO, "MediaRenderer::End");
 }
 
 /////////////////////////////////////////////////////////////////////////////

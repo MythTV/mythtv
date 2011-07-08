@@ -131,8 +131,8 @@ bool ScheduleEditor::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "ScheduleEditor, theme is missing "
-                              "required elements");
+        LOG(VB_GENERAL, LOG_ERR, "ScheduleEditor, theme is missing "
+                                 "required elements");
         return false;
     }
 
@@ -161,8 +161,8 @@ bool ScheduleEditor::Create()
 
         if (!m_recordingRule->IsLoaded())
         {
-            VERBOSE(VB_IMPORTANT, "ScheduleEditor::Create() - Failed to load "
-                                  "recording rule");
+            LOG(VB_GENERAL, LOG_ERR,
+                "ScheduleEditor::Create() - Failed to load recording rule");
             return false;
         }
     }
@@ -523,8 +523,8 @@ bool SchedOptEditor::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "SchedOptEditor, theme is missing "
-                              "required elements");
+        LOG(VB_GENERAL, LOG_ERR, "SchedOptEditor, theme is missing "
+                                 "required elements");
         return false;
     }
 
@@ -752,8 +752,8 @@ bool SchedFilterEditor::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "SchedFilterEditor, theme is missing "
-                "required elements");
+        LOG(VB_GENERAL, LOG_ERR, "SchedFilterEditor, theme is missing "
+                                 "required elements");
         return false;
     }
 
@@ -881,8 +881,8 @@ bool StoreOptEditor::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "StoreOptEditor, theme is missing "
-                              "required elements");
+        LOG(VB_GENERAL, LOG_ERR, "StoreOptEditor, theme is missing "
+                                 "required elements");
         return false;
     }
 
@@ -1185,8 +1185,8 @@ bool PostProcEditor::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "PostProcEditor, theme is missing "
-                              "required elements");
+        LOG(VB_GENERAL, LOG_ERR, "PostProcEditor, theme is missing "
+                                 "required elements");
         return false;
     }
 
@@ -1362,7 +1362,8 @@ bool MetadataOptions::Create()
     UIUtilE::Assign(this, m_seasonSpin, "season_spinbox", &err);
     UIUtilE::Assign(this, m_episodeSpin, "episode_spinbox", &err);
     UIUtilE::Assign(this, m_queryButton, "query_button", &err);
-/*    UIUtilE::Assign(this, m_localFanartButton, "local_fanart_button", &err);
+#if 0
+    UIUtilE::Assign(this, m_localFanartButton, "local_fanart_button", &err);
     UIUtilE::Assign(this, m_localCoverartButton, "local_coverart_button", &err);
     UIUtilE::Assign(this, m_localBannerButton, "local_banner_button", &err);
     UIUtilE::Assign(this, m_onlineFanartButton, "online_fanart_button", &err);
@@ -1370,13 +1371,14 @@ bool MetadataOptions::Create()
     UIUtilE::Assign(this, m_onlineBannerButton, "online_banner_button", &err);
     UIUtilW::Assign(this, m_fanart, "fanart");
     UIUtilW::Assign(this, m_coverart, "coverart");
-    UIUtilW::Assign(this, m_banner, "banner");*/
+    UIUtilW::Assign(this, m_banner, "banner");
+#endif
     UIUtilW::Assign(this, m_backButton, "back");
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "MetadataOptions, theme is missing "
-                              "required elements");
+        LOG(VB_GENERAL, LOG_ERR, "MetadataOptions, theme is missing "
+                                 "required elements");
         return false;
     }
 
@@ -1384,7 +1386,8 @@ bool MetadataOptions::Create()
             SLOT(Close()));
     connect(m_queryButton, SIGNAL(Clicked()),
             SLOT(PerformQuery()));
-/*    connect(m_localFanartButton, SIGNAL(Clicked()),
+#if 0
+    connect(m_localFanartButton, SIGNAL(Clicked()),
             SLOT(SelectLocalFanart()));
     connect(m_localCoverartButton, SIGNAL(Clicked()),
             SLOT(SelectLocalCoverart()));
@@ -1395,7 +1398,8 @@ bool MetadataOptions::Create()
     connect(m_onlineCoverartButton, SIGNAL(Clicked()),
             SLOT(SelectOnlineCoverart()));
     connect(m_onlineBannerButton, SIGNAL(Clicked()),
-            SLOT(SelectOnlineBanner()));*/
+            SLOT(SelectOnlineBanner()));
+#endif
 
     // InetRef
     m_inetrefEdit->SetText(m_recordingRule->m_inetref);

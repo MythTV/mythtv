@@ -189,7 +189,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
                          .arg(ChannelGroup::GetChannelGroupName(changrpid));
         }
 
-        VERBOSE(VB_IMPORTANT, LOC_WARN + message);
+        LOG(VB_GENERAL, LOG_WARNING, LOC + message);
 
         if (!player)
             ShowOkPopup(message);
@@ -288,7 +288,8 @@ bool GuideGrid::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, QString("Cannot load screen '%1'").arg(windowName));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Cannot load screen '%1'").arg(windowName));
         return false;
     }
 
@@ -893,7 +894,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
 
     if (m_channelInfos.empty())
     {
-        VERBOSE(VB_IMPORTANT, "GuideGrid: "
+        LOG(VB_GENERAL, LOG_ERR, "GuideGrid: "
                 "\n\t\t\tYou don't have any channels defined in the database."
                 "\n\t\t\tGuide grid will have nothing to show you.");
     }
@@ -1346,7 +1347,7 @@ void GuideGrid::customEvent(QEvent *event)
             if (record)
             {
                 if ((buttonnum > 0) && !record->Delete())
-                    VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
+                    LOG(VB_GENERAL, LOG_ERR, "Failed to delete recording rule");
                 delete record;
             }
         }

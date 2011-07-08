@@ -92,7 +92,7 @@ bool EditMetadataDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'edit_metadata'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'edit_metadata'");
         return false;
     }
 
@@ -1057,7 +1057,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
         if (lul.size())
         {
             MetadataLookup *lookup = lul.takeFirst();
-            VERBOSE(VB_GENERAL,
+            LOG(VB_GENERAL, LOG_INFO,
                 QString("No results found for %1 %2 %3").arg(lookup->GetTitle())
                     .arg(lookup->GetSeason()).arg(lookup->GetEpisode()));
         }

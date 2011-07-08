@@ -130,8 +130,9 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
         AudioOutput::GetAudioDeviceConfig(name, name, true);
     if (adc->settings.IsInvalid())
     {
-        VERBOSE(VB_IMPORTANT, QString("Audio device %1 isn't usable "
-                                      "Check audio configuration").arg(name));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Audio device %1 isn't usable Check audio configuration")
+                .arg(name));
     }
     audiodevs.insert(name, *adc);
     devices.append(*adc);
@@ -224,7 +225,7 @@ void AudioConfigSettings::AudioRescan()
             QString msg = name + QObject::tr(" is invalid or not useable.");
             MythPopupBox::showOkPopup(
                 GetMythMainWindow(), QObject::tr("Warning"), msg);
-            VERBOSE(VB_IMPORTANT, QString("Audio device %1 isn't usable ")
+            LOG(VB_GENERAL, LOG_ERR, QString("Audio device %1 isn't usable")
                     .arg(name));
         }
         audiodevs.insert(name, *adc);
@@ -239,7 +240,7 @@ void AudioConfigSettings::AudioRescan()
             gCoreContext->GetSetting("PassThruOutputDevice");
         MythPopupBox::showOkPopup(
             GetMythMainWindow(), QObject::tr("Warning"), msg);
-        VERBOSE(VB_IMPORTANT, QString("Audio device %1 isn't usable ")
+        LOG(VB_GENERAL, LOG_ERR, QString("Audio device %1 isn't usable")
                 .arg(name));
     }
     slotlock.unlock();
@@ -284,7 +285,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     QString out = m_OutputDevice->getValue();
     if (!audiodevs.contains(out))
     {
-        VERBOSE(VB_AUDIO, QString("Update not found (%1)").arg(out));
+        LOG(VB_AUDIO, LOG_ERR, QString("Update not found (%1)").arg(out));
         invalid = true;
     }
     else
@@ -330,7 +331,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
 
     if (cur_speakers > max_speakers)
     {
-        VERBOSE(VB_AUDIO, QString("Reset device %1").arg(out));
+        LOG(VB_AUDIO, LOG_INFO, QString("Reset device %1").arg(out));
         cur_speakers = max_speakers;
     }
 
@@ -494,8 +495,9 @@ bool AudioConfigSettings::CheckPassthrough()
             AudioOutput::GetAudioDeviceConfig(name, name, true);
         if (adc->settings.IsInvalid())
         {
-            VERBOSE(VB_IMPORTANT, QString("Passthru device %1 isn't usable "
-                                 "Check audio configuration").arg(name));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Passthru device %1 isn't usable "
+                        "Check audio configuration").arg(name));
             ok = false;
         }
         // add it to list of known devices
@@ -649,7 +651,7 @@ void AudioTestThread::run()
                     QCoreApplication::postEvent(
                         m_parent, new ChannelChangedEvent(channel,
                                                           m_channel < 0));
-                    VERBOSE(VB_AUDIO, QString("AudioTest: %1 (%2->%3)")
+                    LOG(VB_AUDIO, LOG_INFO, QString("AudioTest: %1 (%2->%3)")
                             .arg(channel).arg(i).arg(current));
                 }
 
@@ -662,8 +664,8 @@ void AudioTestThread::run()
                                                         m_hd ? 32 : 16);
                     if (!m_audioOutput->AddFrames(frames, 1000 , -1))
                     {
-                        VERBOSE(VB_AUDIO, "AddData() "
-                                "Audio buffer overflow, audio data lost!");
+                        LOG(VB_AUDIO, LOG_ERR, "AddData() Audio buffer "
+                                               "overflow, audio data lost!");
                     }
                      // a tad less than 1/48th of a second to avoid underruns
                     usleep((1000000 / m_samplerate) * 1000);

@@ -206,7 +206,7 @@ void UPNPScanner::GetMetadata(VideoMetadataListManager::metadata_list* list,
     StartFullScan();
 
     // wait for the scanner to complete - with a 30 second timeout
-    VERBOSE(VB_GENERAL, LOC + "Waiting for scan to complete.");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Waiting for scan to complete.");
 
     int count = 0;
     while (!m_scanComplete && (count++ < 300))
@@ -214,9 +214,9 @@ void UPNPScanner::GetMetadata(VideoMetadataListManager::metadata_list* list,
 
     // some scans may just take too long (PlayOn)
     if (!m_scanComplete)
-        VERBOSE(VB_GENERAL, LOC + "MediaServer scan is incomplete.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "MediaServer scan is incomplete.");
     else
-        VERBOSE(VB_GENERAL, LOC + "MediaServer scanning finished.");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "MediaServer scanning finished.");
 
 
     smart_dir_node mediaservers = node->addSubDir(tr("Media Servers"));
@@ -313,7 +313,7 @@ void UPNPScanner::Start()
                                              m_masterHost, "6544").toInt();
 
     m_lock.unlock();
-    VERBOSE(VB_GENERAL, LOC + "Started");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Started");
 }
 
 /**
@@ -365,7 +365,7 @@ void UPNPScanner::Stop(void)
     m_watchdogTimer = NULL;
 
     m_lock.unlock();
-    VERBOSE(VB_GENERAL, LOC + "Finished");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Finished");
 }
 
 /**
@@ -433,8 +433,9 @@ void UPNPScanner::CheckStatus(void)
         it.next();
         if (!SSDP::Find("urn:schemas-upnp-org:device:MediaServer:1", it.key()))
         {
-            VERBOSE(VB_UPNP, LOC + QString("%1 no longer in SSDP cache. Removing")
-                .arg(it.value()->m_URL.toString()));
+            LOG(VB_UPNP, LOG_INFO, LOC +
+                QString("%1 no longer in SSDP cache. Removing")
+                    .arg(it.value()->m_URL.toString()));
             MediaServer* last = it.value();
             it.remove();
             delete last;
@@ -458,9 +459,9 @@ void UPNPScanner::replyFinished(QNetworkReply *reply)
 
     if (!valid)
     {
-        VERBOSE(VB_UPNP, ERR +
+        LOG(VB_UPNP, LOG_ERR, LOC +
             QString("Network request for '%1' returned error '%2'")
-            .arg(url.toString()).arg(reply->errorString()));
+                .arg(url.toString()).arg(reply->errorString()));
     }
 
     bool description = false;
@@ -496,7 +497,7 @@ void UPNPScanner::replyFinished(QNetworkReply *reply)
         }
     }
     else
-        VERBOSE(VB_UPNP, ERR + "Received unknown reply");
+        LOG(VB_UPNP, LOG_ERR, LOC + "Received unknown reply");
 
     reply->deleteLater();
 }
@@ -539,7 +540,7 @@ void UPNPScanner::customEvent(QEvent *event)
             if (m_servers[usn]->m_systemUpdateID != newid)
             {
                 m_scanComplete &= m_servers[usn]->ResetContent(newid);
-                VERBOSE(VB_GENERAL, LOC +
+                LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("New SystemUpdateID '%1' for %2").arg(id).arg(usn));
                 Debug();
             }
@@ -590,7 +591,8 @@ void UPNPScanner::timerEvent(QTimerEvent * event)
     if (timeout > 0)
     {
         ScheduleRenewal(usn, timeout);
-        VERBOSE(VB_GENERAL, LOC + QString("Re-subscribed for %1 seconds to %2")
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Re-subscribed for %1 seconds to %2")
                 .arg(timeout).arg(usn));
     }
 }
@@ -633,7 +635,7 @@ void UPNPScanner::CheckFailure(const QUrl &url)
 void UPNPScanner::Debug(void)
 {
     m_lock.lock();
-    VERBOSE(VB_UPNP, LOC + QString("%1 media servers discovered:")
+    LOG(VB_UPNP, LOG_INFO, LOC + QString("%1 media servers discovered:")
                                    .arg(m_servers.size()));
     QHashIterator<QString,MediaServer*> it(m_servers);
     while (it.hasNext())
@@ -647,12 +649,13 @@ void UPNPScanner::Debug(void)
         }
         else
             status = "Yes";
-        VERBOSE(VB_UPNP, LOC +
-            QString("'%1' Connected: %2 Subscribed: %3 SystemUpdateID: %4 timerId: %5")
-            .arg(it.value()->m_friendlyName).arg(status)
-            .arg(it.value()->m_subscribed ? "Yes" : "No")
-            .arg(it.value()->m_systemUpdateID)
-            .arg(it.value()->m_renewalTimerId));
+        LOG(VB_UPNP, LOG_INFO, LOC +
+            QString("'%1' Connected: %2 Subscribed: %3 SystemUpdateID: "
+                    "%4 timerId: %5")
+                .arg(it.value()->m_friendlyName).arg(status)
+                .arg(it.value()->m_subscribed ? "Yes" : "No")
+                .arg(it.value()->m_systemUpdateID)
+                .arg(it.value()->m_renewalTimerId));
     }
     m_lock.unlock();
 }
@@ -691,14 +694,15 @@ void UPNPScanner::BrowseNextContainer(void)
                 continue;
             }
 
-            VERBOSE(VB_UPNP, LOC + QString("Scan completed for %1")
+            LOG(VB_UPNP, LOG_INFO, LOC + QString("Scan completed for %1")
                 .arg(it.value()->m_friendlyName));
         }
     }
 
     if (complete)
     {
-        VERBOSE(VB_GENERAL, LOC + QString("Media Server scan is complete."));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Media Server scan is complete."));
         m_scanComplete = true;
     }
 }
@@ -712,9 +716,13 @@ void UPNPScanner::SendBrowseRequest(const QUrl &url, const QString &objectid)
 {
     QNetworkRequest req = QNetworkRequest(url);
     req.setRawHeader("CONTENT-TYPE", "text/xml; charset=\"utf-8\"");
-    req.setRawHeader("SOAPACTION", "\"urn:schemas-upnp-org:service:ContentDirectory:1#Browse\"");
-    //req.setRawHeader("MAN", "\"http://schemasxmlsoap.org/soap/envelope/\"");
-    //req.setRawHeader("01-SOAPACTION", "\"urn:schemas-upnp-org:service:ContentDirectory:1#Browse\"");
+    req.setRawHeader("SOAPACTION",
+                  "\"urn:schemas-upnp-org:service:ContentDirectory:1#Browse\"");
+#if 0
+    req.setRawHeader("MAN", "\"http://schemasxmlsoap.org/soap/envelope/\"");
+    req.setRawHeader("01-SOAPACTION",
+                  "\"urn:schemas-upnp-org:service:ContentDirectory:1#Browse\"");
+#endif
 
     QByteArray body;
     QTextStream data(&body);
@@ -765,7 +773,7 @@ void UPNPScanner::AddServer(const QString &usn, const QString &url)
     QUrl qurl(url);
     if (qurl.host() == m_masterHost && qurl.port() == m_masterPort)
     {
-        VERBOSE(VB_UPNP, LOC + "Ignoring master backend.");
+        LOG(VB_UPNP, LOG_INFO, LOC + "Ignoring master backend.");
         return;
     }
 
@@ -773,7 +781,7 @@ void UPNPScanner::AddServer(const QString &usn, const QString &url)
     if (!m_servers.contains(usn))
     {
         m_servers.insert(usn, new MediaServer(url));
-        VERBOSE(VB_GENERAL, LOC + QString("Adding: %1").arg(usn));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Adding: %1").arg(usn));
         ScheduleUpdate();
     }
     m_lock.unlock();
@@ -787,7 +795,7 @@ void UPNPScanner::RemoveServer(const QString &usn)
     m_lock.lock();
     if (m_servers.contains(usn))
     {
-        VERBOSE(VB_GENERAL, LOC + QString("Removing: %1").arg(usn));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Removing: %1").arg(usn));
         MediaServer* old = m_servers[usn];
         if (old->m_renewalTimerId)
             killTimer(old->m_renewalTimerId);
@@ -835,15 +843,17 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
     QString errorMessage;
     int errorLine   = 0;
     int errorColumn = 0;
-    if (!parent->setContent(data, false, &errorMessage, &errorLine, &errorColumn))
+    if (!parent->setContent(data, false, &errorMessage, &errorLine,
+                            &errorColumn))
     {
-        VERBOSE(VB_GENERAL, ERR + QString("DIDL Parse error, Line: %1 Col: %2 Error: '%3'")
-            .arg(errorLine).arg(errorColumn).arg(errorMessage));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("DIDL Parse error, Line: %1 Col: %2 Error: '%3'")
+                .arg(errorLine).arg(errorColumn).arg(errorMessage));
         delete parent;
         return;
     }
 
-    VERBOSE(VB_UPNP|VB_EXTRA, "\n\n" + parent->toString(4) + "\n\n");
+    LOG(VB_UPNP, LOG_INFO, "\n\n" + parent->toString(4) + "\n\n");
 
     // pull out the actual result
     QDomDocument *result = NULL;
@@ -858,8 +868,8 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
 
     if (!result || num < 1 || total < 1)
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString("Failed to find result for %1")
-                                            .arg(url.toString()));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to find result for %1") .arg(url.toString()));
         return;
     }
 
@@ -882,7 +892,7 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
     if (!server)
     {
         m_lock.unlock();
-        VERBOSE(VB_IMPORTANT, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Received unknown response for %1").arg(url.toString()));
         return;
     }
@@ -892,10 +902,10 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
     {
         // if this is not the root container, this browse will now fail
         // as the appropriate parentID will not be found
-        VERBOSE(VB_IMPORTANT, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("%1 updateID changed during browse (old %2 new %3)")
-            .arg(server->m_friendlyName).arg(server->m_systemUpdateID)
-            .arg(updateid));
+                .arg(server->m_friendlyName).arg(server->m_systemUpdateID)
+                .arg(updateid));
         m_scanComplete &= server->ResetContent(updateid);
         Debug();
     }
@@ -995,8 +1005,9 @@ QDomDocument* UPNPScanner::FindResult(const QDomNode &n, uint &num,
         result = new QDomDocument();
         if (!result->setContent(node.text(), true, &errorMessage, &errorLine, &errorColumn))
         {
-            VERBOSE(VB_GENERAL, ERR + QString("DIDL Parse error, Line: %1 Col: %2 Error: '%3'")
-                .arg(errorLine).arg(errorColumn).arg(errorMessage));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("DIDL Parse error, Line: %1 Col: %2 Error: '%3'")
+                    .arg(errorLine).arg(errorColumn).arg(errorMessage));
             delete result;
             result = NULL;
         }
@@ -1025,8 +1036,9 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     QByteArray data = reply->readAll();
     if (data.isEmpty())
     {
-        VERBOSE(VB_GENERAL, ERR + QString("%1 returned an empty device description.")
-            .arg(url.toString()));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("%1 returned an empty device description.")
+                .arg(url.toString()));
         return false;
     }
 
@@ -1042,9 +1054,10 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     int errorColumn = 0;
     if (!doc.setContent(data, false, &errorMessage, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_GENERAL, ERR + QString("Failed to parse device description from %1")
-            .arg(url.toString()));
-        VERBOSE(VB_GENERAL, ERR + QString("Line: %1 Col: %2 Error: '%3'")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to parse device description from %1")
+                .arg(url.toString()));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Line: %1 Col: %2 Error: '%3'")
             .arg(errorLine).arg(errorColumn).arg(errorMessage));
         return false;
     }
@@ -1066,14 +1079,16 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
 
     if (controlURL.isEmpty())
     {
-        VERBOSE(VB_UPNP, ERR + QString("Failed to parse device description for %1")
-            .arg(url.toString()));
+        LOG(VB_UPNP, LOG_ERR, LOC +
+            QString("Failed to parse device description for %1")
+                .arg(url.toString()));
         return false;
     }
 
     // if no URLBase was provided, use the known url
     if (URLBase.isEmpty())
-        URLBase = url.toString(QUrl::RemovePath  | QUrl::RemoveFragment | QUrl::RemoveQuery);
+        URLBase = url.toString(QUrl::RemovePath | QUrl::RemoveFragment |
+                               QUrl::RemoveQuery);
 
     // strip leading slashes off the controlURL
     while (!controlURL.isEmpty() && controlURL.left(1) == "/")
@@ -1090,9 +1105,9 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     controlURL = URLBase + "/" + controlURL;
     QString fulleventURL = URLBase + "/" + eventURL;
 
-    VERBOSE(VB_UPNP, LOC + QString("Control URL for %1 at %2")
+    LOG(VB_UPNP, LOG_INFO, LOC + QString("Control URL for %1 at %2")
             .arg(friendlyName).arg(controlURL));
-    VERBOSE(VB_UPNP, LOC + QString("Event URL for %1 at %2")
+    LOG(VB_UPNP, LOG_INFO, LOC + QString("Event URL for %1 at %2")
             .arg(friendlyName).arg(fulleventURL));
 
     // update the server details. If the server has gone away since the request
@@ -1128,8 +1143,8 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
 
     if (timeout > 0)
     {
-        VERBOSE(VB_GENERAL, LOC + QString("Subscribed for %1 seconds to %2")
-                .arg(timeout).arg(usn));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Subscribed for %1 seconds to %2") .arg(timeout).arg(usn));
         ScheduleRenewal(usn, timeout);
         // we only scan servers we are subscribed to - and the scan is now
         // incomplete
