@@ -77,9 +77,10 @@ void LookerUpper::customEvent(QEvent *levent)
 {
     if (levent->type() == MetadataFactoryMultiResult::kEventType)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Got a multiresult.");
-        // We shouldn't get any of these.  If we do, metadataFactory->Lookup
-        // was called with the wrong arguments.
+        LOG(VB_GENERAL, LOG_INFO, "Unable to match this title, too many possible matches. "
+                                  "You may wish to manually set the season, episode, and "
+                                  "inetref in the 'Watch Recordings' screen.");
+
         MetadataFactoryMultiResult *mfmr = dynamic_cast<MetadataFactoryMultiResult*>(levent);
 
         if (!mfmr)
