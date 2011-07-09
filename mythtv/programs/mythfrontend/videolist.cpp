@@ -657,43 +657,43 @@ void VideoListImp::refreshList(bool filebrowser,
         { 
             case VideoDialog::BRS_FOLDER: 
                 fillMetadata(ltDBMetadata); 
-                LOG(VB_GENERAL, LOG_INFO, "Using Folder mode"); 
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Folder mode"); 
                 break; 
             case VideoDialog::BRS_GENRE: 
                 fillMetadata(ltDBGenreGroup); 
-                LOG(VB_GENERAL, LOG_INFO, "Using Genre mode"); 
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Genre mode"); 
                 break; 
             case VideoDialog::BRS_CATEGORY:
                 fillMetadata(ltDBCategoryGroup);
-                LOG(VB_GENERAL, LOG_INFO, "Using Category mode"); 
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Category mode"); 
                 break; 
             case VideoDialog::BRS_YEAR:
                 fillMetadata(ltDBYearGroup);
-                LOG(VB_GENERAL, LOG_INFO, "Using Year mode");
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Year mode");
                 break;
             case VideoDialog::BRS_DIRECTOR:
                 fillMetadata(ltDBDirectorGroup);
-                LOG(VB_GENERAL, LOG_INFO, "Using Director mode");
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Director mode");
                 break;
             case VideoDialog::BRS_STUDIO:
                 fillMetadata(ltDBStudioGroup);
-                LOG(VB_GENERAL, LOG_INFO, "Using Studio mode");
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Studio mode");
                 break;
             case VideoDialog::BRS_CAST:
                 fillMetadata(ltDBCastGroup);
-                LOG(VB_GENERAL, LOG_INFO, "Using Cast Mode");
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Cast Mode");
                 break;
             case VideoDialog::BRS_USERRATING:
                 fillMetadata(ltDBUserRatingGroup);
-                LOG(VB_GENERAL, LOG_INFO, "Using User Rating Mode");
+                LOG(VB_GENERAL, LOG_DEBUG, "Using User Rating Mode");
                 break;
             case VideoDialog::BRS_INSERTDATE:
                 fillMetadata(ltDBInsertDateGroup);
-                LOG(VB_GENERAL, LOG_INFO, "Using Insert Date Mode");
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Insert Date Mode");
                 break;
             case VideoDialog::BRS_TVMOVIE:
                 fillMetadata(ltTVMetadata);
-                LOG(VB_GENERAL, LOG_INFO, "Using TV/Movie Mode");
+                LOG(VB_GENERAL, LOG_DEBUG, "Using TV/Movie Mode");
                 break;
             default:
                 fillMetadata(ltDBMetadata);
