@@ -558,7 +558,7 @@ MetadataLookupList MetadataDownload::handleRecordingUndetermined(
         list = runGrabber(cmd, args, lookup, true);
 
     // If there were no results for that, fall back to a movie lookup.
-    if (!list.size())
+    if (!list.size() && lookup->GetSubtitle().isEmpty())
     {
         lookup->SetSeason(0);
         lookup->SetEpisode(0);
