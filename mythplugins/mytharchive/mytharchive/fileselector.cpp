@@ -62,7 +62,7 @@ bool FileSelector::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'file_selector'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'file_selector'");
         return false;
     }
 
@@ -441,7 +441,7 @@ void FileSelector::updateFileList()
 
                 // add a row to the UIListBtnArea
                 MythUIButtonListItem* item = 
-                        new MythUIButtonListItem(m_fileButtonList, data->filename);
+                     new MythUIButtonListItem(m_fileButtonList, data->filename);
                 item->SetText(formatSize(data->size / 1024, 2), "size");
 
                 if (m_selectorType == FSTYPE_FILELIST)
@@ -473,6 +473,7 @@ void FileSelector::updateFileList()
     else
     {
         m_locationEdit->SetText("/");
-        VERBOSE(VB_IMPORTANT, "MythArchive:  current directory does not exist!");
+        LOG(VB_GENERAL, LOG_ERR,
+            "MythArchive:  current directory does not exist!");
     }
 }

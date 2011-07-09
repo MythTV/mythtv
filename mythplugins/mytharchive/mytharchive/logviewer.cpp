@@ -75,7 +75,7 @@ bool LogViewer::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'logviewer'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'logviewer'");
         return false;
     }
 
@@ -157,7 +157,8 @@ void LogViewer::cancelClicked(void)
     QFile lockFile(tempDir + "/logs/mythburncancel.lck");
 
     if (!lockFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        VERBOSE(VB_IMPORTANT, "LogViewer: Failed to create mythburncancel.lck file");
+        LOG(VB_GENERAL, LOG_ERR,
+            "LogViewer: Failed to create mythburncancel.lck file");
 
     lockFile.write("Cancel\n\r");
     lockFile.close();
@@ -223,9 +224,9 @@ QString LogViewer::getSetting(const QString &key)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, 
-                QString("Database not open while trying to load setting: %1")
-                        .arg(key));
+        LOG(VB_GENERAL, LOG_ERR, 
+            QString("Database not open while trying to load setting: %1")
+                .arg(key));
     }
 
     return QString("");

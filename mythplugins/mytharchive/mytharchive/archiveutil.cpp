@@ -22,6 +22,7 @@ using namespace std;
 #include <util.h>
 #include <mythsystem.h>
 #include <exitcodes.h>
+#include <mythlogging.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -105,8 +106,8 @@ void checkTempDirectory()
     {
         dir.mkdir(tempDir);
         if( chmod(qPrintable(tempDir), 0777) )
-            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive directory: %1")
-                .arg(strerror(errno)));
+            LOG(VB_GENERAL, LOG_ERR,
+                "Failed to change permissions on archive directory: " + ENO);
     }
 
     dir = QDir(workDir);
@@ -114,8 +115,9 @@ void checkTempDirectory()
     {
         dir.mkdir(workDir);
         if( chmod(qPrintable(workDir), 0777) )
-            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive work directory: %1")
-                .arg(strerror(errno)));
+            LOG(VB_GENERAL, LOG_ERR,
+                "Failed to change permissions on archive work directory: " +
+                ENO);
     }
 
     dir = QDir(logDir);
@@ -123,17 +125,18 @@ void checkTempDirectory()
     {
         dir.mkdir(logDir);
         if( chmod(qPrintable(logDir), 0777) )
-            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive log directory: %1")
-                .arg(strerror(errno)));
-
+            LOG(VB_GENERAL, LOG_ERR,
+                "Failed to change permissions on archive log directory: " +
+                ENO);
     }
     dir = QDir(configDir);
     if (!dir.exists())
     {
         dir.mkdir(configDir);
         if( chmod(qPrintable(configDir), 0777) )
-            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive config directory: %1")
-                .arg(strerror(errno)));
+            LOG(VB_GENERAL, LOG_ERR, 
+                "Failed to change permissions on archive config directory: " +
+                ENO);
     }
 }
 
@@ -150,7 +153,7 @@ QString getBaseName(const QString &filename)
 bool extractDetailsFromFilename(const QString &inFile,
                                 QString &chanID, QString &startTime)
 {
-    VERBOSE(VB_JOBQUEUE, "Extracting details from: " + inFile);
+    LOG(VB_JOBQUEUE, LOG_INFO, "Extracting details from: " + inFile);
 
     QString baseName = getBaseName(inFile);
 
@@ -166,12 +169,13 @@ bool extractDetailsFromFilename(const QString &inFile,
     }
     else
     {
-        VERBOSE(VB_JOBQUEUE,
-                QString("Cannot find details for %1").arg(inFile));
+        LOG(VB_JOBQUEUE, LOG_ERR,
+            QString("Cannot find details for %1").arg(inFile));
         return false;
     }
 
-    VERBOSE(VB_JOBQUEUE, QString("chanid: %1 starttime:%2 ").arg(chanID).arg(startTime));
+    LOG(VB_JOBQUEUE, LOG_INFO,
+        QString("chanid: %1 starttime:%2 ").arg(chanID).arg(startTime));
 
     return true;
 }
@@ -204,10 +208,10 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
     {
         // file is not a myth recording or is no longer in the db
         pinfo = new ProgramInfo(inFile);
-        VERBOSE(VB_JOBQUEUE, "File is not a MythTV recording.");
+        LOG(VB_JOBQUEUE, LOG_NOTICE, "File is not a MythTV recording.");
     }
     else
-        VERBOSE(VB_JOBQUEUE, "File is a MythTV recording.");
+        LOG(VB_JOBQUEUE, LOG_NOTICE, "File is a MythTV recording.");
 
     return pinfo;
 }

@@ -50,7 +50,8 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
 
         if (itemNodeList.count() < 1)
         {
-            VERBOSE(VB_IMPORTANT, "Couldn't find an 'item' element in XML file");
+            LOG(VB_GENERAL, LOG_ERR,
+                "Couldn't find an 'item' element in XML file");
             return false;
         }
 
@@ -63,8 +64,8 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
             QDomNodeList nodeList = e.elementsByTagName("recorded");
             if (nodeList.count() < 1)
             {
-                VERBOSE(VB_IMPORTANT,
-                        "Couldn't find a 'recorded' element in XML file");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Couldn't find a 'recorded' element in XML file");
                 return false;
             }
 
@@ -97,8 +98,8 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
             nodeList = e.elementsByTagName("channel");
             if (nodeList.count() < 1)
             {
-                VERBOSE(VB_IMPORTANT,
-                        "Couldn't find a 'channel' element in XML file");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Couldn't find a 'channel' element in XML file");
                 details->chanID = "";
                 details->chanNo = "";
                 details->chanName = "";
@@ -119,8 +120,8 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
             QDomNodeList nodeList = e.elementsByTagName("videometadata");
             if (nodeList.count() < 1)
             {
-                VERBOSE(VB_IMPORTANT,
-                        "Couldn't find a 'videometadata' element in XML file");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Couldn't find a 'videometadata' element in XML file");
                 return false;
             }
 
@@ -197,7 +198,7 @@ bool ArchiveFileSelector::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'archivefile_selector'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'archivefile_selector'");
         return false;
     }
 
@@ -336,7 +337,7 @@ bool ImportNative::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'importarchive'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'importarchive'");
         return false;
     }
 

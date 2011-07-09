@@ -92,7 +92,7 @@ bool RecordingSelector::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'recording_selector'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'recording_selector'");
         return false;
     }
 
@@ -447,9 +447,10 @@ void RecordingSelector::getRecordingList(void)
             // we can't handle recordings that have to be streamed to us
             if (p->GetPlaybackURL(false, true).startsWith("myth://"))
             {
-                VERBOSE(VB_FILE,
-                        QString("MythArchive cannot handle this file because it isn't available locally - %1")
-                                .arg(p->GetPlaybackURL(false, true)));
+                LOG(VB_FILE, LOG_ERR,
+                    QString("MythArchive cannot handle this file because it "
+                            "isn't available locally - %1")
+                        .arg(p->GetPlaybackURL(false, true)));
                 i = m_recordingList->erase(i);
                 i--;
                 continue;

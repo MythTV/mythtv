@@ -154,7 +154,7 @@ bool ThumbFinder::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'mythburn'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'mythburn'");
         return false;
     }
 
@@ -255,13 +255,13 @@ int  ThumbFinder::getChapterCount(const QString &menuTheme)
 
     if (!file.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to open theme file: " + filename);
+        LOG(VB_GENERAL, LOG_ERR, "Failed to open theme file: " + filename);
         return 0; //??
     }
     if (!doc.setContent(&file))
     {
         file.close();
-        VERBOSE(VB_IMPORTANT, "Failed to parse theme file: " + filename);
+        LOG(VB_GENERAL, LOG_ERR, "Failed to parse theme file: " + filename);
         return 0;
     }
     file.close();
@@ -353,8 +353,8 @@ QString ThumbFinder::createThumbDir(void)
     {
         dir.mkdir(thumbDir);
         if( chmod(qPrintable(thumbDir), 0777) )
-            VERBOSE(VB_IMPORTANT, QString("ThumbFinder: Failed to change permissions on thumb directory: %1")
-                .arg(strerror(errno)));
+            LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: Failed to change permissions"
+                                     " on thumb directory: " + ENO);
     }
 
     QString path;
@@ -366,8 +366,8 @@ QString ThumbFinder::createThumbDir(void)
 
     dir.mkdir(path);
     if( chmod(qPrintable(path), 0777) )
-        VERBOSE(VB_IMPORTANT, QString("ThumbFinder: Failed to change permissions on thumb directory: %1")
-            .arg(strerror(errno)));
+        LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: Failed to change permissions on "
+                                 "thumb directory: %1" + ENO);
 
     return path;
 }
@@ -424,8 +424,9 @@ bool ThumbFinder::getThumbImages()
 {
     if (!getFileDetails(m_archiveItem))
     {
-        VERBOSE(VB_IMPORTANT, QString("ThumbFinder:: Failed to get file details for %1")
-                              .arg(m_archiveItem->filename));
+        LOG(VB_GENERAL, LOG_ERR, 
+            QString("ThumbFinder:: Failed to get file details for %1")
+                .arg(m_archiveItem->filename));
         return false;
     }
 
@@ -543,8 +544,8 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     m_inputFC = NULL;
 
     // Open recording
-    VERBOSE(VB_JOBQUEUE, QString("ThumbFinder: ") +
-            QString("Opening '%1'").arg(inFile));
+    LOG(VB_JOBQUEUE, LOG_INFO, QString("ThumbFinder: Opening '%1'")
+            .arg(inFile));
 
     QByteArray inFileBA = inFile.toLocal8Bit();
 
@@ -553,16 +554,15 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
 
     if (ret)
     {
-        VERBOSE(VB_IMPORTANT, QString("ThumbFinder, Error: ") +
-                "Couldn't open input file" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, "ThumbFinder, Couldn't open input file" + ENO);
         return false;
     }
 
     // Getting stream information
     if ((ret = av_find_stream_info(m_inputFC)) < 0)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Couldn't get stream info, error #%1").arg(ret));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Couldn't get stream info, error #%1").arg(ret));
         av_close_input_file(m_inputFC);
         m_inputFC = NULL;
         return false;
@@ -583,7 +583,8 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
                 m_startTime = m_inputFC->streams[i]->start_time;
             else
             {
-                VERBOSE(VB_IMPORTANT, "ThumbFinder: Failed to get start time");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "ThumbFinder: Failed to get start time");
                 return false;
             }
 
@@ -600,7 +601,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
 
     if (m_videostream == -1)
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't find a video stream");
+        LOG(VB_GENERAL, LOG_ERR, "Couldn't find a video stream");
         return false;
     }
 
@@ -622,14 +623,16 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
 
     if (m_codec == NULL)
     {
-        VERBOSE(VB_IMPORTANT, "ThumbFinder: Couldn't find codec for video stream");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ThumbFinder: Couldn't find codec for video stream");
         return false;
     }
 
     // open codec
     if (avcodec_open(m_codecCtx, m_codec) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "ThumbFinder: Couldn't open codec for video stream");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ThumbFinder: Couldn't open codec for video stream");
         return false;
     }
 
@@ -673,7 +676,8 @@ bool ThumbFinder::seekToFrame(int frame, bool checkPos)
         frame = checkFramePosition(frame);
 
     // seek to a position PRE_SEEK_AMOUNT frames before the required frame
-    int64_t timestamp = m_startTime + (frame * m_frameTime) - (PRE_SEEK_AMOUNT * m_frameTime);
+    int64_t timestamp = m_startTime + (frame * m_frameTime) -
+                        (PRE_SEEK_AMOUNT * m_frameTime);
     int64_t requiredPTS = m_startPTS + (frame * m_frameTime);
 
     if (timestamp < m_startTime)
@@ -681,7 +685,7 @@ bool ThumbFinder::seekToFrame(int frame, bool checkPos)
 
     if (av_seek_frame(m_inputFC, m_videostream, timestamp, AVSEEK_FLAG_ANY) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "ThumbFinder::SeekToFrame: seek failed") ;
+        LOG(VB_GENERAL, LOG_ERR, "ThumbFinder::SeekToFrame: seek failed") ;
         return false;
     }
 
@@ -781,8 +785,8 @@ static int myth_sws_img_convert(
                                        SWS_FAST_BILINEAR, NULL, NULL, NULL);
     if (!convert_ctx)
     {
-        VERBOSE(VB_IMPORTANT, "myth_sws_img_convert: Cannot initialize "
-                "the image conversion context");
+        LOG(VB_GENERAL, LOG_ERR, "myth_sws_img_convert: Cannot initialize "
+                                 "the image conversion context");
         return -1;
     }
 
@@ -861,7 +865,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         QByteArray ffile = m_frameFile.toLocal8Bit();
         if (!img.save(ffile.constData(), "JPEG"))
         {
-            VERBOSE(VB_IMPORTANT, "Failed to save thumb: " + m_frameFile);
+            LOG(VB_GENERAL, LOG_ERR, "Failed to save thumb: " + m_frameFile);
         }
 
         if (m_updateFrame)

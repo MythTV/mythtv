@@ -66,7 +66,7 @@ bool DVDThemeSelector::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'themeselector'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'themeselector'");
         return false;
     }
 
@@ -150,7 +150,8 @@ void DVDThemeSelector::getThemeList(void)
         }
     }
     else
-        VERBOSE(VB_IMPORTANT, "MythArchive:  Theme directory does not exist!");
+        LOG(VB_GENERAL, LOG_ERR,
+            "MythArchive:  Theme directory does not exist!");
 }
 
 void DVDThemeSelector::themeChanged(MythUIButtonListItem *item)
