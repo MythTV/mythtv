@@ -68,7 +68,7 @@ bool SearchEditor::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'treeeditor'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'treeeditor'");
         return false;
     }
 
@@ -129,7 +129,8 @@ void SearchEditor::slotLoadedData()
 
         if (type.toLower() == "video" && search)
         {
-            VERBOSE(VB_GENERAL, QString("Found Search Source %1...").arg(title));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Found Search Source %1...").arg(title));
             m_grabberList.append(new GrabberScript(title, image, VIDEO_FILE, author,
                        search, tree, description, commandline, version));
         }

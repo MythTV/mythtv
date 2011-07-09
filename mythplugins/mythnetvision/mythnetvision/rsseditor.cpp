@@ -92,7 +92,7 @@ bool RSSEditPopup::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'rsseditpopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'rsseditpopup'");
         return false;
     }
 
@@ -228,7 +228,7 @@ void RSSEditPopup::slotSave(QNetworkReply* reply)
     else
         download = false;
 
-    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Text to Parse: %1").arg(text));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Text to Parse: %1").arg(text));
 
     QDomElement root = document.documentElement();
     QDomElement channel = root.firstChildElement ("channel");
@@ -393,7 +393,7 @@ bool RSSEditor::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'rsseditor'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'rsseditor'");
         return false;
     }
 

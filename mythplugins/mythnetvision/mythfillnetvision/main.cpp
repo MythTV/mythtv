@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         delete gContext;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
@@ -99,15 +99,15 @@ int main(int argc, char *argv[])
 
     if (refreshall && (refreshrss || refreshtree))
     {
-        VERBOSE(VB_IMPORTANT, "--refresh-all must not be accompanied by "
-                              "--refresh-rss or --refresh-tree");
+        LOG(VB_GENERAL, LOG_ERR, "--refresh-all must not be accompanied by "
+                                 "--refresh-rss or --refresh-tree");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     if (refreshrss && refreshtree)
     {
-        VERBOSE(VB_IMPORTANT, "--refresh-rss and --refresh-tree are mutually "
-                              "exclusive options");
+        LOG(VB_GENERAL, LOG_ERR, "--refresh-rss and --refresh-tree are "
+                                 "mutually exclusive options");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     delete rssMan;
     delete gContext;
 
-    VERBOSE(VB_IMPORTANT, "MythFillNetvision run complete.");
+    LOG(VB_GENERAL, LOG_INFO, "MythFillNetvision run complete.");
 
     return GENERIC_EXIT_OK;
 }
