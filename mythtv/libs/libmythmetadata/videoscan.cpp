@@ -18,6 +18,7 @@
 #include "videometadatalistmanager.h"
 #include "videoscan.h"
 #include "videoutils.h"
+#include "mythevent.h"
 #include "remoteutil.h"
 #include "mythlogging.h"
 
@@ -140,8 +141,23 @@ class VideoScannerThread : public QThread
         PurgeList db_remove;
         verifyFiles(fs_files, db_remove);
         m_DBDataChanged = updateDB(fs_files, db_remove);
+
         if (m_DBDataChanged)
-            RemoteSendMessage("VIDEO_LIST_CHANGE");
+        {
+            QStringList slist;
+
+            QList<int>::const_iterator i;
+            for (i = m_addList.begin(); i != m_addList.end(); ++i)
+                slist << QString("added::%1").arg(*i);
+            for (i = m_movList.begin(); i != m_movList.end(); ++i)
+                slist << QString("moved::%1").arg(*i);
+            for (i = m_delList.begin(); i != m_delList.end(); ++i)
+                slist << QString("deleted::%1").arg(*i);
+            
+            MythEvent me("VIDEO_LIST_CHANGE", slist);
+
+            RemoteSendEvent(me);
+        }
         threadDeregister();
     }
 
@@ -244,7 +260,6 @@ class VideoScannerThread : public QThread
     {
         int ret = 0;
         uint counter = 0;
-        QList<int> preservelist;
         if (m_HasGUI)
             SendProgressEvent(counter, (uint)(add.size() + remove.size()),
                               tr("Updating video database"));
@@ -270,7 +285,7 @@ class VideoScannerThread : public QThread
                                     "database, updating record %2 "
                                     "with new filename %3")
                                 .arg(hash).arg(id).arg(p->first));
-                        preservelist.append(id);
+                        m_movList.append(id);
                     }
                 }
                 if (id == -1)
@@ -299,6 +314,7 @@ class VideoScannerThread : public QThread
                             .arg(hash));
                     newFile.SetHost(p->second.host);
                     newFile.SaveToDatabase();
+                    m_addList << newFile.GetID();
                 }
                 ret += 1;
             }
@@ -311,8 +327,11 @@ class VideoScannerThread : public QThread
         for (PurgeList::const_iterator p = remove.begin(); p != remove.end();
                 ++p)
         {
-            if (!preservelist.contains(p->first))
+            if (!m_movList.contains(p->first))
+            {
                 removeOrphans(p->first, p->second);
+                m_delList << p->first;
+            }
             if (m_HasGUI)
                 SendProgressEvent(++counter);
         }
@@ -344,7 +363,6 @@ class VideoScannerThread : public QThread
         QApplication::postEvent(m_dialog, pue);
     }
 
-
     bool m_ListUnknown;
     bool m_RemoveAll;
     bool m_KeepAll;
@@ -355,6 +373,9 @@ class VideoScannerThread : public QThread
     VideoMetadataListManager *m_dbmetadata;
     MythUIProgressDialog *m_dialog;
 
+    QList<int> m_addList; // newly added intids
+    QList<int> m_movList; // intids moved to new filename
+    QList<int> m_delList; // orphaned/deleted intids
     bool m_DBDataChanged;
 };
 
