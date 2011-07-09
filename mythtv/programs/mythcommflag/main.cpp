@@ -689,14 +689,14 @@ static bool DoesFileExist(ProgramInfo *program_info)
 
     if (!exists)
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find file %1, aborting.")
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find file %1, aborting.")
                 .arg(filename));
         return false;
     }
 
     if (size == 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("File %1 is zero-byte, aborting.")
+        LOG(VB_GENERAL, LOG_ERR, QString("File %1 is zero-byte, aborting.")
                 .arg(filename));
         return false;
     }
@@ -746,9 +746,10 @@ static bool IsMarked(uint chanid, QDateTime starttime)
                 break;
             }
 
-            VERBOSE(VB_COMMFLAG, QString("Status for chanid %1 @ %2 is '%3'")
-                               .arg(chanid).arg(starttime.toString(Qt::ISODate))
-                               .arg(flagStatusStr));
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("Status for chanid %1 @ %2 is '%3'")
+                    .arg(chanid).arg(starttime.toString(Qt::ISODate))
+                    .arg(flagStatusStr));
 
             if ((flagStatus == COMM_FLAG_NOT_FLAGGED) && (marksFound == 0))
                 return false;
@@ -895,7 +896,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     {
         if (!MSqlQuery::testDBConnection())
         {
-            VERBOSE(VB_IMPORTANT, "Unable to open commflag DB connection");
+            LOG(VB_GENERAL, LOG_ERR, "Unable to open commflag DB connection");
             delete tmprbuf;
             global_program_info = NULL;
             return GENERIC_EXIT_DB_ERROR;
@@ -938,8 +939,10 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                 watchingRecording = true;
                 ctx->SetRecorder(recorder);
 
-                VERBOSE(VB_COMMFLAG, QString("mythcommflag will flag recording "
-                        "currently in progress on cardid %1").arg(recorderNum));
+                LOG(VB_COMMFLAG, LOG_INFO,
+                    QString("mythcommflag will flag recording "
+                            "currently in progress on cardid %1")
+                        .arg(recorderNum));
             }
             else
             {
@@ -993,7 +996,7 @@ static int FlagCommercials( uint chanid, const QDateTime &starttime,
             cerr << "                        "
                     "(the program is already being flagged elsewhere)\n";
         }           
-        VERBOSE(VB_IMPORTANT, "Program is already being flagged elsewhere");
+        LOG(VB_GENERAL, LOG_ERR, "Program is already being flagged elsewhere");
         return GENERIC_EXIT_IN_USE;
     }
      
@@ -1271,9 +1274,11 @@ int main(int argc, char *argv[])
                         continue;
 
                     // recording rule did not enable commflagging
-//                    RecordingInfo recinfo(chanid, starttime);
-//                    if (!(recinfo.GetAutoRunJobs() & JOB_COMMFLAG))
-//                        continue;
+#if 0
+                    RecordingInfo recinfo(chanid, starttime);
+                    if (!(recinfo.GetAutoRunJobs() & JOB_COMMFLAG))
+                        continue;
+#endif
                 }
 
                 QueueCommFlagJob(chanid, starttime, cmdline.toBool("rebuild"));
@@ -1283,7 +1288,8 @@ int main(int argc, char *argv[])
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "No valid combination of command inputs received.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "No valid combination of command inputs received.");
         cmdline.PrintHelp();
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
