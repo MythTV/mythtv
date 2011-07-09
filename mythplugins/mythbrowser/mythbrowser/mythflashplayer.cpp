@@ -55,7 +55,7 @@ bool MythFlashPlayer::Create(void)
     SetFocusWidget(m_browser);
 
     m_url.replace("mythflash://", "http://");
-    VERBOSE(VB_GENERAL, QString("Opening %1").arg(m_url));
+    LOG(VB_GENERAL, LOG_INFO, QString("Opening %1").arg(m_url));
     m_browser->LoadPage(QUrl::fromEncoded(m_url.toLocal8Bit()));
 
     return true;

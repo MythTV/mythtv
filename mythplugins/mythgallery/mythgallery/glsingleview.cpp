@@ -276,7 +276,7 @@ void GLSingleView::paintGL(void)
     }
 
     if (glGetError())
-        VERBOSE(VB_GENERAL, LOC_ERR + "OpenGL error detected");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "OpenGL error detected");
 }
 
 void GLSingleView::keyPressEvent(QKeyEvent *e)
@@ -627,7 +627,7 @@ void GLSingleView::Load(void)
     ThumbItem *item = m_itemList.at(m_pos);
     if (!item)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("No item at %1").arg(m_pos));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("No item at %1").arg(m_pos));
         return;
     }
 
@@ -1391,7 +1391,7 @@ void GLSingleView::SlideTimeout(void)
     bool wasMovie = false, isMovie = false;
     if (m_effect_method.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No transition method");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No transition method");
         return;
     }
 
@@ -1537,7 +1537,7 @@ void KenBurnsImageLoader::run()
     ThumbItem *item = m_itemList.at(m_pos);
     if (!item)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("No item at %1").arg(m_pos));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("No item at %1").arg(m_pos));
         return;
     }
     QImage image(item->GetPath());

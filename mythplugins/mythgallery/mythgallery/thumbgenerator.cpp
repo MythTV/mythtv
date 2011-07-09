@@ -295,8 +295,9 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
         {
             if (!tmpDir.mkdir(tmpDir.absolutePath()))
             {
-                VERBOSE(VB_IMPORTANT, "Unable to create temp dir for movie "
-                        "thumbnail creation: " + tmpDir.absolutePath());
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Unable to create temp dir for movie thumbnail creation: " +
+                    tmpDir.absolutePath());
             }
         }
 

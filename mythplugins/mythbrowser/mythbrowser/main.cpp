@@ -24,7 +24,7 @@ static int handleMedia(const QString &url, const QString &directory, const QStri
 {
     if (url.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "MythBrowser: handleMedia got empty url!");
+        LOG(VB_GENERAL, LOG_ERR, "MythBrowser: handleMedia got empty url!");
         return 1;
     }
 

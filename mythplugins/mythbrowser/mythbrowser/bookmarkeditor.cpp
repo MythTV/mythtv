@@ -70,7 +70,7 @@ bool BookmarkEditor::Create()
     if (!m_categoryEdit || !m_nameEdit || !m_urlEdit ||  !m_okButton
         || !m_cancelButton || !m_findCategoryButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 

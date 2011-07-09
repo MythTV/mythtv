@@ -57,7 +57,7 @@ bool BrowserConfig::Create()
 
     if (!m_commandEdit || !m_zoomEdit || !m_enablePluginsCheck || !m_okButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
@@ -178,7 +178,7 @@ bool BookmarkManager::Create(void)
 
     if (!m_groupList || !m_bookmarkList)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
@@ -429,8 +429,8 @@ void BookmarkManager::ShowEditDialog(bool edit)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "BookmarkManager: Something is wrong. "
-                                  "Asked to edit a non existent bookmark!");
+            LOG(VB_GENERAL, LOG_ERR, "BookmarkManager: Something is wrong. "
+                                     "Asked to edit a non existent bookmark!");
             return;
         }
     }
