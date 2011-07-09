@@ -80,6 +80,20 @@ void LookerUpper::customEvent(QEvent *levent)
         LOG(VB_GENERAL, LOG_INFO, "Got a multiresult.");
         // We shouldn't get any of these.  If we do, metadataFactory->Lookup
         // was called with the wrong arguments.
+        MetadataFactoryMultiResult *mfmr = dynamic_cast<MetadataFactoryMultiResult*>(levent);
+
+        if (!mfmr)
+            return;
+
+        MetadataLookupList list = mfmr->results;
+
+        if (list.count() >= 1)
+        {
+            ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(list.takeFirst()->GetData());
+
+            if (pginfo)
+                m_busyRecList.removeAll(pginfo);
+        }
     }
     else if (levent->type() == MetadataFactorySingleResult::kEventType)
     {
