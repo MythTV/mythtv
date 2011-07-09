@@ -493,6 +493,7 @@ class Season( tvdb_api.Season ):
 
 # modified Episode class implementing a fuzzy search
 class Episode( tvdb_api.Episode ):
+    _re_strippart = re.compile('(.*) \([0-9]+\)')
     def fuzzysearch(self, term = None, key = None):
         if term == None:
             raise TypeError("must supply string to search for (contents)")
@@ -504,8 +505,17 @@ class Episode( tvdb_api.Episode ):
                 continue
             distance = levenshtein(cur_value, term)
             if distance <= 3:
+                # handle most matches
                 self.distance = distance
                 return self
+            if distance <= 5:
+                # handle part numbers, 'subtitle (nn)'
+                match = self._re_strippart.match(cur_value)
+                if match:
+                    tmp = match.group(1)
+                    if levenshtein(tmp, term) <= 3:
+                        self.distance = distance
+                        return self
         return None
 #end Episode
 
