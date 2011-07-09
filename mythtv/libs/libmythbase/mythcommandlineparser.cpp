@@ -1116,8 +1116,9 @@ void MythCommandLineParser::ApplySettingsOverride(void)
         QMap<QString, QString>::iterator it;
         for (it = override.begin(); it != override.end(); ++it)
         {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                        .arg(it.key()).arg(*it));
+            LOG(VB_GENERAL, LOG_NOTICE,
+                 QString("Setting '%1' being forced to '%2'")
+                     .arg(it.key()).arg(*it));
             gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }
