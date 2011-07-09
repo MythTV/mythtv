@@ -130,12 +130,11 @@ void GameHandler::InitMetaDataMap(QString GameType)
     }
 
     if (romDB.count() == 0)
-        VERBOSE(VB_GENERAL, LOC_ERR + QString("No romDB data read from "
-                "database for gametype %1 . Not imported?").arg(GameType));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("No romDB data read from "
+            "database for gametype %1 . Not imported?").arg(GameType));
     else
-        VERBOSE(VB_GENERAL, LOC + QString("Loaded %1 items from romDB Database")
-                      .arg(romDB.count()));
-
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Loaded %1 items from romDB Database") .arg(romDB.count()));
 }
 
 void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre, QString* Year,
@@ -148,7 +147,9 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
 
     *CRC32 = crcinfo(rom, handler->GameType(), &key, &romDB);
 
-    //VERBOSE(VB_IMPORTANT, "Key = " + key);
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, "Key = " + key);
+#endif
 
     // Set our default values
     *Year = QObject::tr("19xx");
@@ -165,7 +166,7 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
     {
         if (romDB.contains(key))
         {
-            VERBOSE(VB_GENERAL, LOC + QString("ROMDB FOUND for %1 - %2")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("ROMDB FOUND for %1 - %2")
                      .arg(romDB[key].GameName()).arg(key));
             *Year = romDB[key].Year();
             *Country = romDB[key].Country();
@@ -176,7 +177,7 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
         }
         else
         {
-            VERBOSE(VB_GENERAL, LOC + QString("NO ROMDB FOUND for %1 (%2)")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("NO ROMDB FOUND for %1 (%2)")
                     .arg(rom).arg(*CRC32));
         }
 
@@ -189,7 +190,7 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
 
 static void purgeGameDB(QString filename, QString RomPath)
 {
-    VERBOSE(VB_GENERAL, LOC + QString("Purging %1 - %2").arg(RomPath)
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Purging %1 - %2").arg(RomPath)
             .arg(filename));
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -299,7 +300,8 @@ static void UpdateGameCounts(QStringList updatelist)
     {
         diskcount = 0;
         QString GameType = *it;
-        VERBOSE(VB_GENERAL, LOC + QString("Update gametype %1").arg(GameType));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            LOC + QString("Update gametype %1").arg(GameType));
 
         query.prepare("SELECT romname,system,spandisks,gamename FROM "
               "gamemetadata,gameplayers WHERE "
@@ -440,8 +442,11 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             else
                 ScreenShot.clear();
 
-            //VERBOSE(VB_GENERAL, QString("file %1 - genre %2 ").arg(iter.data().Rom()).arg(Genre));
-            //VERBOSE(VB_GENERAL, QString("screenshot %1").arg(ScreenShot));
+#if 0
+            LOG(VB_GENERAL, LOG_INFO, QString("file %1 - genre %2 ")
+                    .arg(iter.data().Rom()).arg(Genre));
+            LOG(VB_GENERAL, LOG_INFO, QString("screenshot %1").arg(ScreenShot));
+#endif
 
             query.prepare("INSERT INTO gamemetadata "
                           "(system, romname, gamename, genre, year, gametype, "
@@ -672,7 +677,7 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
             m_GameMap[RomName] = GameScan(RomName,Info.filePath(),inFileSystem,
                                  GameName, Info.absoluteDir().path());
 
-            VERBOSE(VB_GENERAL, LOC + QString("Found Rom : (%1) - %2")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found Rom : (%1) - %2")
                     .arg(handler->SystemName()).arg(RomName));
 
             *filecount = *filecount + 1;
@@ -696,8 +701,9 @@ void GameHandler::processGames(GameHandler *handler)
             maxcount = buildFileCount(handler->SystemRomPath(),handler);
         else
         {
-            VERBOSE(VB_GENERAL, LOC_ERR + QString("Rom Path does not exist: %1")
-                              .arg(handler->SystemRomPath()));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Rom Path does not exist: %1")
+                    .arg(handler->SystemRomPath()));
             return;
         }
     }
@@ -728,7 +734,8 @@ void GameHandler::processGames(GameHandler *handler)
         if (busyDialog)
             busyDialog->Close();
 
-        VERBOSE(VB_GENERAL, LOC + QString("PC Game %1").arg(handler->SystemName()));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("PC Game %1").arg(handler->SystemName()));
     }
     else
     {
@@ -899,11 +906,12 @@ void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
     {
         if (!d.cd(handler->SystemWorkingPath()))
         {
-            VERBOSE(VB_GENERAL, LOC_ERR + QString("Failed to change to specified Working Directory: %1")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Failed to change to specified Working Directory: %1")
                     .arg(handler->SystemWorkingPath()));
         }
     }
-    VERBOSE(VB_GENERAL, LOC + QString("Launching Game : %1 : %2")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Launching Game : %1 : %2")
            .arg(handler->SystemName())
            .arg(exec));
 
@@ -915,13 +923,14 @@ void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
         for (QStringList::Iterator cmd = cmdlist.begin(); cmd != cmdlist.end();
              ++cmd )
         {
-            VERBOSE(VB_GENERAL, LOC + QString("Executing : %1").arg(*cmd));
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Executing : %1").arg(*cmd));
             myth_system(*cmd, kMSProcessEvents);
         }
     }
     else
     {
-        VERBOSE(VB_GENERAL, LOC + QString("Executing : %1").arg(exec));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Executing : %1").arg(exec));
         myth_system(exec, kMSProcessEvents);
     }
 

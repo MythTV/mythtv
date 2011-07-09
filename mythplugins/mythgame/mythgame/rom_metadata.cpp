@@ -57,7 +57,10 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
     int blocksize;
 
     blocksize = 8192;
-    // VERBOSE(VB_GENERAL, QString("crcinfo : %1 : %2 :").arg(romname).arg(GameType));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("crcinfo : %1 : %2 :").arg(romname).arg(GameType));
+#endif
 
     if ((zf = unzOpen(qPrintable(romname))))
     {

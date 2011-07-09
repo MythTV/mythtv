@@ -72,7 +72,7 @@ bool GameUI::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'gameui'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'gameui'");
         return false;
     }
 
@@ -104,7 +104,7 @@ bool GameUI::Create()
     if (systemFilter.isEmpty())
     {
         systemFilter = "1=0";
-        VERBOSE(VB_GENERAL, QString("Couldn't find any game handlers!"));
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find any game handlers!"));
     }
     else
         systemFilter += ")";
@@ -597,7 +597,7 @@ void GameUI::customEvent(QEvent *event)
                 {
                 }
             }
-            VERBOSE(VB_GENERAL,
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("No results found for %1").arg(lookup->GetTitle()));
         }
     }

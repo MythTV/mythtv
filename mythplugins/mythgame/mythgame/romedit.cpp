@@ -57,7 +57,7 @@ bool EditRomInfoDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'edit_metadata'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'edit_metadata'");
         return false;
     }
 

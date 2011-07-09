@@ -79,7 +79,7 @@ static int runMenu(QString which_menu)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
                               .arg(which_menu).arg(themedir));
         delete menu;
         return -1;
@@ -128,23 +128,25 @@ int mythplugin_init(const char *libversion)
     if (!gContext->TestPopupVersion("mythgame", libversion,
                                     MYTH_BINARY_VERSION))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("libmythgame.so/main.o: binary version mismatch"));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("libmythgame.so/main.o: binary version mismatch"));
         return -1;
     }
 
     gCoreContext->ActivateSettingsCache(false);
     if (!UpgradeGameDatabaseSchema())
     {
-        VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade database to new schema, exiting.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Couldn't upgrade database to new schema, exiting.");
         return -1;
     }
     gCoreContext->ActivateSettingsCache(true);
 
     MythGamePlayerSettings settings;
-//    settings.Load();
-//    settings.Save();
+#if 0
+    settings.Load();
+    settings.Save();
+#endif
 
     setupKeys();
 
