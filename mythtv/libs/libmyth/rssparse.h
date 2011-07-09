@@ -19,9 +19,9 @@ using namespace std;
 typedef QHash<QString,QString> MetadataMap;
 
 typedef enum ArticleTypes {
-    VIDEO = 0,
+    VIDEO_FILE = 0,
     VIDEO_PODCAST = 1,
-    AUDIO = 2,
+    AUDIO_FILE = 2,
     AUDIO_PODCAST = 3
 } ArticleType;
 

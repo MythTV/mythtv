@@ -17,6 +17,7 @@
 #include "mythuistatetype.h"
 #include "mythuicheckbox.h"
 #include "mythuitextedit.h"
+#include "mythuispinbox.h"
 #include "mythdialogbox.h"
 #include "recordinginfo.h"
 #include "mythuihelper.h"
@@ -30,6 +31,7 @@
 #include "remoteutil.h"
 #include "mythdbcon.h"
 #include "playgroup.h"
+#include "netutils.h"
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "util.h"
@@ -4653,8 +4655,9 @@ void PlaybackBox::showMetadataEditor()
     if (editMetadata->Create())
     {
         connect(editMetadata, SIGNAL(result(const QString &, const QString &,
-                const QString &)), SLOT(saveRecMetadata(const QString &,
-                const QString &, const QString &)));
+                const QString &, const QString &, uint, uint)), SLOT(
+                saveRecMetadata(const QString &, const QString &,
+                const QString &, const QString &, uint, uint)));
         mainStack->AddScreen(editMetadata);
     }
     else
@@ -4663,7 +4666,10 @@ void PlaybackBox::showMetadataEditor()
 
 void PlaybackBox::saveRecMetadata(const QString &newTitle,
                                   const QString &newSubtitle,
-                                  const QString &newDescription)
+                                  const QString &newDescription,
+                                  const QString &newInetref,
+                                  uint newSeason,
+                                  uint newEpisode)
 {
     MythUIButtonListItem *item = m_recordingList->GetItemCurrent();
 
@@ -4688,13 +4694,27 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         if (!newSubtitle.trimmed().isEmpty())
             tempSubTitle = QString("%1 - \"%2\"")
                             .arg(tempSubTitle).arg(newSubtitle);
+        QString seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                                             (newSeason, 2))
+                        .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+        QString seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
+                                             (newSeason, 1))
+                        .arg(GetDisplaySeasonEpisode(newEpisode, 2));
 
         item->SetText(tempSubTitle, "titlesubtitle");
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
+        item->SetText(newInetref, "inetref");
+        item->SetText(QString::number(newSeason), "season");
+        item->SetText(QString::number(newEpisode), "episode");
+        item->SetText(seasonx, "00x00");
+        item->SetText(seasone, "s00e00");
         if (newDescription != NULL)
             item->SetText(newDescription, "description");
     }
+
+    pginfo->SaveInetRef(newInetref);
+    pginfo->SaveSeasonEpisode(newSeason, newEpisode);
 
     RecordingInfo ri(*pginfo);
     ri.ApplyRecordRecTitleChange(newTitle, newSubtitle, newDescription);
@@ -5077,7 +5097,8 @@ RecMetadataEdit::RecMetadataEdit(MythScreenStack *lparent, ProgramInfo *pginfo)
                 : MythScreenType(lparent, "recmetadataedit"),
                     m_progInfo(pginfo)
 {
-    m_titleEdit = m_subtitleEdit = m_descriptionEdit = NULL;
+    m_titleEdit = m_subtitleEdit = m_descriptionEdit = m_inetrefEdit = NULL;
+    m_seasonSpin = m_episodeSpin = NULL;
 }
 
 bool RecMetadataEdit::Create()
@@ -5088,9 +5109,13 @@ bool RecMetadataEdit::Create()
     m_titleEdit = dynamic_cast<MythUITextEdit*>(GetChild("title"));
     m_subtitleEdit = dynamic_cast<MythUITextEdit*>(GetChild("subtitle"));
     m_descriptionEdit = dynamic_cast<MythUITextEdit*>(GetChild("description"));
+    m_inetrefEdit = dynamic_cast<MythUITextEdit*>(GetChild("inetref"));
+    m_seasonSpin = dynamic_cast<MythUISpinBox*>(GetChild("season"));
+    m_episodeSpin = dynamic_cast<MythUISpinBox*>(GetChild("episode"));
     MythUIButton *okButton = dynamic_cast<MythUIButton*>(GetChild("ok"));
 
-    if (!m_titleEdit || !m_subtitleEdit || !okButton)
+    if (!m_titleEdit || !m_subtitleEdit || !m_inetrefEdit || !m_seasonSpin ||
+        !m_episodeSpin || !okButton)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Window 'editmetadata' is missing required elements.");
@@ -5106,6 +5131,12 @@ bool RecMetadataEdit::Create()
         m_descriptionEdit->SetText(m_progInfo->GetDescription());
         m_descriptionEdit->SetMaxLength(255);
     }
+    m_inetrefEdit->SetText(m_progInfo->GetInetRef());
+    m_inetrefEdit->SetMaxLength(255);
+    m_seasonSpin->SetRange(0,100,1,1);
+    m_seasonSpin->SetValue(m_progInfo->GetSeason());
+    m_episodeSpin->SetRange(0,999,1,1);
+    m_episodeSpin->SetValue(m_progInfo->GetEpisode());
 
     connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));
 
@@ -5119,13 +5150,19 @@ void RecMetadataEdit::SaveChanges()
     QString newRecTitle = m_titleEdit->GetText();
     QString newRecSubtitle = m_subtitleEdit->GetText();
     QString newRecDescription = NULL;
+    QString newRecInetref = NULL;
+    uint newRecSeason = 0, newRecEpisode = 0;
     if (m_descriptionEdit)
-       newRecDescription = m_descriptionEdit->GetText();
+        newRecDescription = m_descriptionEdit->GetText();
+    newRecInetref = m_inetrefEdit->GetText();
+    newRecSeason = m_seasonSpin->GetIntValue();
+    newRecEpisode = m_episodeSpin->GetIntValue();
 
     if (newRecTitle.isEmpty())
         return;
 
-    emit result(newRecTitle, newRecSubtitle, newRecDescription);
+    emit result(newRecTitle, newRecSubtitle, newRecDescription,
+                newRecInetref, newRecSeason, newRecEpisode);
     Close();
 }
 

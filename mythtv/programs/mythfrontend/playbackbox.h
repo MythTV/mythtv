@@ -211,7 +211,8 @@ class PlaybackBox : public ScheduleCommon
     void setPlayGroup(QString newPlayGroup);
 
     void saveRecMetadata(const QString &newTitle, const QString &newSubtitle,
-                         const QString &newDescription);
+                         const QString &newDescription, const QString &newInetref,
+                         uint season, uint episode);
 
     void SetRecGroupPassword(const QString &newPasswd);
 
@@ -525,7 +526,8 @@ class RecMetadataEdit : public MythScreenType
     bool Create(void);
 
   signals:
-    void result(const QString &, const QString &, const QString &);
+    void result(const QString &, const QString &, const QString &,
+                const QString &, uint, uint);
 
   protected slots:
     void SaveChanges(void);
@@ -534,6 +536,9 @@ class RecMetadataEdit : public MythScreenType
     MythUITextEdit     *m_titleEdit;
     MythUITextEdit     *m_subtitleEdit;
     MythUITextEdit     *m_descriptionEdit;
+    MythUITextEdit     *m_inetrefEdit;
+    MythUISpinBox      *m_seasonSpin;
+    MythUISpinBox      *m_episodeSpin;
 
     ProgramInfo *m_progInfo;
 };
