@@ -148,8 +148,8 @@ int mythplugin_config()
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
-                              .arg(menuname).arg(themedir));
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
+                .arg(menuname).arg(themedir));
         delete menu;
         return -1;
     }

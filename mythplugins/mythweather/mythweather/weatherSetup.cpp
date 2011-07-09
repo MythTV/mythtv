@@ -47,7 +47,7 @@ bool GlobalSetup::Create()
 
     if (!m_timeoutSpinbox || !m_finishButton || !m_backgroundCheckbox)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing required elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing required elements.");
         return false;
     }
 
@@ -156,7 +156,7 @@ bool ScreenSetup::Create()
 
     if (!m_activeList || !m_inactiveList || !m_finishButton || !m_helpText)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing required elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing required elements.");
         return false;
     }
 
@@ -334,7 +334,7 @@ void ScreenSetup::loadData()
     db.bindValue(":HOST", gCoreContext->GetHostName());
     if (!db.exec())
     {
-        VERBOSE(VB_IMPORTANT, db.lastError().text());
+        LOG(VB_GENERAL, LOG_ERR, db.lastError().text());
         return;
     }
 
@@ -394,7 +394,8 @@ void ScreenSetup::saveData()
 {
     if (m_activeList->GetCount() <= 0)
     {
-        VERBOSE(VB_IMPORTANT, "No Active Screens are defined. Nothing Saved.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "No Active Screens are defined. Nothing Saved.");
         return;
     }
 
@@ -412,14 +413,14 @@ void ScreenSetup::saveData()
                 continue;
 
             notDefined << (*it).name;
-            VERBOSE(VB_IMPORTANT, QString("Not defined %1").arg((*it).name));
+            LOG(VB_GENERAL, LOG_ERR, QString("Not defined %1").arg((*it).name));
         }
     }
 
     if (!notDefined.empty())
     {
-        VERBOSE(VB_IMPORTANT, "A Selected screen has data items with no "
-                              "sources defined.");
+        LOG(VB_GENERAL, LOG_ERR, "A Selected screen has data items with no "
+                                 "sources defined.");
         return;
     }
 
@@ -454,8 +455,8 @@ void ScreenSetup::saveData()
             db2.bindValue(":HOST", gCoreContext->GetHostName());
             if (!db2.exec())
             {
-                VERBOSE(VB_IMPORTANT, db2.executedQuery());
-                VERBOSE(VB_IMPORTANT, db2.lastError().text());
+                LOG(VB_GENERAL, LOG_ERR, db2.executedQuery());
+                LOG(VB_GENERAL, LOG_ERR, db2.lastError().text());
                 return;
             }
 
@@ -475,16 +476,16 @@ void ScreenSetup::saveData()
                 db2.bindValue(":SRCID",    (*it).src->id);
                 if (!db2.exec())
                 {
-                    VERBOSE(VB_IMPORTANT, db2.executedQuery());
-                    VERBOSE(VB_IMPORTANT, db2.lastError().text());
+                    LOG(VB_GENERAL, LOG_ERR, db2.executedQuery());
+                    LOG(VB_GENERAL, LOG_ERR, db2.lastError().text());
                     return;
                 }
             }
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, db.executedQuery());
-            VERBOSE(VB_IMPORTANT, db.lastError().text());
+            LOG(VB_GENERAL, LOG_ERR, db.executedQuery());
+            LOG(VB_GENERAL, LOG_ERR, db.lastError().text());
             return;
         }
 
@@ -560,8 +561,8 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
                 doLocationDialog(si);
         }
         else
-            VERBOSE(VB_IMPORTANT, "Screen cannot be used, not all required "
-                                  " data is supplied by existing sources");
+            LOG(VB_GENERAL, LOG_ERR, "Screen cannot be used, not all required "
+                                     "data is supplied by existing sources");
     }
 }
 
@@ -765,7 +766,7 @@ bool SourceSetup::Create()
     if (!m_sourceList || !m_updateSpinbox || !m_retrieveSpinbox
         || !m_finishButton || !m_sourceText)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing required elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing required elements.");
         return false;
     }
 
@@ -774,8 +775,10 @@ bool SourceSetup::Create()
 
     connect(m_sourceList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             SLOT(sourceListItemSelected(MythUIButtonListItem *)));
-//     connect(m_sourceList, SIGNAL(TakingFocus()),
-//             this, SLOT(sourceListItemSelected()));
+#if 0
+    connect(m_sourceList, SIGNAL(TakingFocus()),
+            this, SLOT(sourceListItemSelected()));
+#endif
 
     // 12 Hour max interval
     m_updateSpinbox->SetRange(10, 720, 10);
@@ -807,7 +810,7 @@ bool SourceSetup::loadData()
     db.bindValue(":HOST", gCoreContext->GetHostName());
     if (!db.exec())
     {
-        VERBOSE(VB_IMPORTANT, db.lastError().text());
+        LOG(VB_GENERAL, LOG_ERR, db.lastError().text());
         return false;
     }
 
@@ -859,7 +862,7 @@ void SourceSetup::saveData()
         db.bindValue(":RETRIEVE", si->retrieve_timeout);
         if (!db.exec())
         {
-            VERBOSE(VB_IMPORTANT, db.lastError().text());
+            LOG(VB_GENERAL, LOG_ERR, db.lastError().text());
             return;
         }
     }
@@ -953,7 +956,7 @@ bool LocationDialog::Create()
     if (!m_sourceText || !m_resultsText || !m_locationEdit || !m_locationList
         || !m_searchButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing required elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing required elements.");
         return false;
     }
 

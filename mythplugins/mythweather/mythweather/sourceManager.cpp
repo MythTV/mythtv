@@ -86,7 +86,7 @@ bool SourceManager::findScripts()
 
     if (!dir.exists())
     {
-        VERBOSE(VB_IMPORTANT, "MythWeather: Scripts directory not found");
+        LOG(VB_GENERAL, LOG_ERR, "MythWeather: Scripts directory not found");
         return false;
     }
     QString busymessage = tr("Searching for scripts");
@@ -127,8 +127,7 @@ bool SourceManager::findScripts()
         if (!fi.isExecutable())
         {
             toRemove << db.value(0).toString();
-            VERBOSE(VB_IMPORTANT,
-                    QString("'%1' no longer exists")
+            LOG(VB_GENERAL, LOG_ERR, QString("'%1' no longer exists")
                     .arg(fi.absoluteFilePath()));
         }
     }
@@ -208,7 +207,7 @@ ScriptInfo *SourceManager::getSourceByName(const QString &name)
 
     if (!src)
     {
-        VERBOSE(VB_IMPORTANT, "No Source found for " + name);
+        LOG(VB_GENERAL, LOG_ERR, "No Source found for " + name);
     }
 
     return NULL;
@@ -257,8 +256,9 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
         }
     }
 
-    VERBOSE(VB_IMPORTANT, LOC + QString("NeedSourceFor: Unable to find source "
-            "for %1, %2, %3").arg(id).arg(loc).arg(units));
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        QString("NeedSourceFor: Unable to find source for %1, %2, %3")
+            .arg(id).arg(loc).arg(units));
     return NULL;
 }
 
@@ -322,8 +322,8 @@ bool SourceManager::connectScreen(uint id, WeatherScreen *screen)
 {
     if (!screen)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Cannot connect nonexistent screen 0x%1")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Cannot connect nonexistent screen 0x%1")
                 .arg((uint64_t)screen,0,16));
 
         return false;
@@ -332,8 +332,8 @@ bool SourceManager::connectScreen(uint id, WeatherScreen *screen)
     SourceMap::iterator it = m_sourcemap.find(id);
     if (it == m_sourcemap.end())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Cannot connect nonexistent source '%1'").arg(id));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Cannot connect nonexistent source '%1'").arg(id));
 
         return false;
     }
@@ -347,8 +347,8 @@ bool SourceManager::disconnectScreen(WeatherScreen *screen)
 {
     if (!screen)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Cannot disconnect nonexistent screen 0x%1")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Cannot disconnect nonexistent screen 0x%1")
                 .arg((uint64_t)screen,0,16));
 
         return false;
@@ -357,8 +357,9 @@ bool SourceManager::disconnectScreen(WeatherScreen *screen)
     SourceMap::iterator it = m_sourcemap.find(screen->getId());
     if (it == m_sourcemap.end())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Cannot disconnect nonexistent source %1").arg(screen->getId()));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Cannot disconnect nonexistent source %1")
+                .arg(screen->getId()));
 
         return false;
     }
@@ -396,8 +397,7 @@ void SourceManager::recurseDirs( QDir dir )
             if (info)
             {
                 m_scripts.append(info);
-                VERBOSE(VB_FILE,
-                        QString("Found Script '%1'")
+                LOG(VB_FILE, LOG_INFO, QString("Found Script '%1'")
                         .arg(file.absoluteFilePath()));
             }
         }

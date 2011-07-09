@@ -42,7 +42,8 @@ ScreenListMap loadScreens()
         QString filename = *i + "weather-screens.xml";
         if (doLoadScreens(filename, screens))
         {
-            VERBOSE(VB_GENERAL, QString("Loading from: %1").arg(filename));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Loading from: %1").arg(filename));
             break;
         }
     }
@@ -54,7 +55,8 @@ ScreenListMap loadScreens()
     
     if (!doLoadScreens(filename, screens))
     {
-        VERBOSE(VB_IMPORTANT, QString("Unable to parse weather-screens.xml"));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Unable to parse weather-screens.xml"));
     }
 
     return screens;
