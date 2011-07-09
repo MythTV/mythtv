@@ -137,7 +137,7 @@ bool NetTree::Create()
 
 void NetTree::Load()
 {
-    m_grabberList = findAllDBTreeGrabbersByHost(VIDEO);
+    m_grabberList = findAllDBTreeGrabbersByHost(VIDEO_FILE);
     m_rssList = findAllDBRSS();
 
     fillTree();
@@ -652,7 +652,7 @@ void NetTree::fillTree()
     {
 
         QMultiMap<QPair<QString,QString>, ResultItem*> treePathsNodes =
-                           getTreeArticles((*i)->GetTitle(), VIDEO);
+                           getTreeArticles((*i)->GetTitle(), VIDEO_FILE);
 
         QList< QPair<QString,QString> > paths = treePathsNodes.uniqueKeys();
 

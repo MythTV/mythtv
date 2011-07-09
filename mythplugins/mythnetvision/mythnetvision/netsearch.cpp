@@ -113,7 +113,7 @@ bool NetSearch::Create()
 
 void NetSearch::Load()
 {
-    m_grabberList = findAllDBSearchGrabbers(VIDEO);
+    m_grabberList = findAllDBSearchGrabbers(VIDEO_FILE);
 }
 
 void NetSearch::Init()
@@ -646,7 +646,7 @@ void NetSearch::runSearchEditor()
 
 void NetSearch::doListRefresh()
 {
-    m_grabberList = findAllDBSearchGrabbers(VIDEO);
+    m_grabberList = findAllDBSearchGrabbers(VIDEO_FILE);
     if (m_grabberList.isEmpty())
         runSearchEditor();
 
