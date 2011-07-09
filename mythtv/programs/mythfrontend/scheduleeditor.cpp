@@ -1362,8 +1362,7 @@ bool MetadataOptions::Create()
     UIUtilE::Assign(this, m_seasonSpin, "season_spinbox", &err);
     UIUtilE::Assign(this, m_episodeSpin, "episode_spinbox", &err);
     UIUtilE::Assign(this, m_queryButton, "query_button", &err);
-#if 0
-    UIUtilE::Assign(this, m_localFanartButton, "local_fanart_button", &err);
+/*    UIUtilE::Assign(this, m_localFanartButton, "local_fanart_button", &err);
     UIUtilE::Assign(this, m_localCoverartButton, "local_coverart_button", &err);
     UIUtilE::Assign(this, m_localBannerButton, "local_banner_button", &err);
     UIUtilE::Assign(this, m_onlineFanartButton, "online_fanart_button", &err);
@@ -1371,8 +1370,7 @@ bool MetadataOptions::Create()
     UIUtilE::Assign(this, m_onlineBannerButton, "online_banner_button", &err);
     UIUtilW::Assign(this, m_fanart, "fanart");
     UIUtilW::Assign(this, m_coverart, "coverart");
-    UIUtilW::Assign(this, m_banner, "banner");
-#endif
+    UIUtilW::Assign(this, m_banner, "banner");*/
     UIUtilW::Assign(this, m_backButton, "back");
 
     if (err)
@@ -1386,8 +1384,7 @@ bool MetadataOptions::Create()
             SLOT(Close()));
     connect(m_queryButton, SIGNAL(Clicked()),
             SLOT(PerformQuery()));
-#if 0
-    connect(m_localFanartButton, SIGNAL(Clicked()),
+/*    connect(m_localFanartButton, SIGNAL(Clicked()),
             SLOT(SelectLocalFanart()));
     connect(m_localCoverartButton, SIGNAL(Clicked()),
             SLOT(SelectLocalCoverart()));
@@ -1398,8 +1395,7 @@ bool MetadataOptions::Create()
     connect(m_onlineCoverartButton, SIGNAL(Clicked()),
             SLOT(SelectOnlineCoverart()));
     connect(m_onlineBannerButton, SIGNAL(Clicked()),
-            SLOT(SelectOnlineBanner()));
-#endif
+            SLOT(SelectOnlineBanner()));*/
 
     // InetRef
     m_inetrefEdit->SetText(m_recordingRule->m_inetref);
@@ -1790,6 +1786,12 @@ void MetadataOptions::customEvent(QEvent *levent)
     }
     else if (levent->type() == ImageDLEvent::kEventType)
     {
+        if (m_busyPopup)
+        {
+            m_busyPopup->Close();
+            m_busyPopup = NULL;
+        }
+
         ImageDLEvent *ide = (ImageDLEvent *)levent;
 
         MetadataLookup *lookup = ide->item;
