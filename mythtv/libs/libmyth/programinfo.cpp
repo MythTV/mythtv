@@ -804,11 +804,8 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     if (!_subtitle.isEmpty())
         subtitle = _subtitle;
 
-    if ((_season > 0) || (_episode > 0))
-    {
-        chanstr = QString("%1x%2")
-            .arg(_season).arg(_episode,2,10,QChar('0'));
-    }
+    season = _season;
+    episode = _episode;
 
     title = _title;
 }
