@@ -247,7 +247,7 @@ void MHOctetStrVar::SetVariableValue(const MHUnion &value)
         m_Value.Copy(value.m_StrVal);
     }
     // Debug
-    MHOctetString sample(m_Value, 0, 10);
+    MHOctetString sample(m_Value, 0, 60);
     MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable())
         .arg(sample.Printable()));
 }

@@ -374,8 +374,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 QString str = QString::fromUtf8((const char *)string.Bytes(), string.Size());
                 int nResult = engine->GetContext()->GetChannelIndex(str);
                 engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(nResult);
-                MHLOG(MHLogDetail, QString("Get service index for %1 - result %2").arg(string.Printable()).arg(nResult));
-                SetSuccessFlag(success, true, engine);
+                SetSuccessFlag(success, nResult >= 0, engine);
             }
             else SetSuccessFlag(success, false, engine);
         }
@@ -384,14 +383,20 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             // Tunes to an index returned by GSI
             if (args.Size() == 1) {
                 int nChannel = GetInt(args.GetAt(0), engine);
-                bool res = engine->GetContext()->TuneTo(nChannel);
+                bool res = nChannel >= 0 ? engine->GetContext()->TuneTo(
+                    nChannel, engine->GetTuneInfo()) : false;
                 SetSuccessFlag(success, res, engine);
             }
             else SetSuccessFlag(success, false, engine);
         }
         else if (m_Name.Equal("TII")) { // SI_TuneIndexInfo
             // Indicates whether to perform a subsequent TIn quietly or normally. 
-            MHERROR("SI_TuneIndexInfo ResidentProgram is not implemented");
+            if (args.Size() == 1) {
+                int tuneinfo = GetInt(args.GetAt(0), engine);
+                engine->SetTuneInfo(tuneinfo);
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
         }
         else if (m_Name.Equal("BSI")) { // SI_GetBasicSI
             // Returns basic SI information about the service indicated by an index
@@ -515,6 +520,17 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 }
             }
             MHLOG(MHLogNotifications, message);
+        }
+
+        else if (m_Name.Equal("SBI")) { // SetBroadcastInterrupt
+            // Required for InteractionChannelExtension
+            // En/dis/able program interruptions e.g. green button
+            MHERROR("SetBroadcastInterrupt ResidentProgram is not implemented");
+        }
+
+        else if (m_Name.Equal("GIS")) { // GetICStatus
+            // Required for NativeApplicationExtension
+            MHERROR("GetICStatus ResidentProgram is not implemented");
         }
 
         else {

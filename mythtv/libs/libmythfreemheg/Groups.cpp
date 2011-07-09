@@ -275,6 +275,7 @@ MHApplication::MHApplication()
     m_nStrCHook = 0;
     m_nBitmapCHook = 0; 
     m_nLineArtCHook = 0;
+    m_tuneinfo = 0;
 
     m_pCurrentScene = NULL;
     m_nLockCount = 0;

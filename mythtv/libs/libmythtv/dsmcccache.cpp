@@ -140,8 +140,11 @@ DSMCCCacheDir *DSMCCCache::Srg(const DSMCCCacheReference &ref)
     {
         LOG(VB_DSMCC, LOG_ERR, QString("[DSMCCCache] Already seen gateway %1")
                 .arg(ref.toString()));
-        return NULL;
+        return *dir;
     }
+
+    LOG(VB_DSMCC, LOG_INFO, QString("[DSMCCCache] New gateway reference %1")
+            .arg(ref.toString()));
 
     DSMCCCacheDir *pSrg = new DSMCCCacheDir(ref);
     m_Gateways.insert(ref, pSrg);
@@ -160,8 +163,11 @@ DSMCCCacheDir *DSMCCCache::Directory(const DSMCCCacheReference &ref)
     {
         LOG(VB_DSMCC, LOG_ERR, QString("[DSMCCCache] Already seen directory %1")
                 .arg(ref.toString()));
-        return NULL;
+        return *dir;
     }
+
+    LOG(VB_DSMCC, LOG_INFO, QString("[DSMCCCache] New directory reference %1")
+            .arg(ref.toString()));
 
     DSMCCCacheDir *pDir = new DSMCCCacheDir(ref);
     m_Directories.insert(ref, pDir);
@@ -209,8 +215,8 @@ void DSMCCCache::AddFileInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
     pDir->m_Files.insert(name, *entry);
 
     LOG(VB_DSMCC, LOG_INFO,
-        QString("[DSMCCCache] Adding file with name %1 reference %2")
-            .arg(name).arg(entry->toString()));
+        QString("[DSMCCCache] Added file name %1 reference %2 parent %3")
+        .arg(name).arg(entry->toString()).arg(pDir->m_Reference.toString()));
 }
 
 // Add a sub-directory to the directory.
@@ -226,8 +232,8 @@ void DSMCCCache::AddDirInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
     pDir->m_SubDirectories.insert(name, *entry);
 
     LOG(VB_DSMCC, LOG_INFO,
-        QString("[DSMCCCache] Adding directory with name %1 reference %2")
-            .arg(name).arg(entry->toString()));
+        QString("[DSMCCCache] added subdirectory name %1 reference %2 parent %3")
+        .arg(name).arg(entry->toString()).arg(pDir->m_Reference.toString()));
 }
 
 // Find File, Directory or Gateway by reference.
@@ -321,9 +327,10 @@ int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
 // Set the gateway reference from a DSI message.
 void DSMCCCache::SetGateway(const DSMCCCacheReference &ref)
 {
-    LOG(VB_DSMCC, LOG_INFO,
-        QString("[DSMCCCache] Setting gateway to reference %1")
+    if (!m_GatewayRef.Equal(ref))
+    {
+        LOG(VB_DSMCC, LOG_INFO, QString("[DSMCCCache] Setting gateway to reference %1")
             .arg(ref.toString()));
-
-    m_GatewayRef = ref;
+        m_GatewayRef = ref;
+    }
 }

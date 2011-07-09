@@ -36,6 +36,7 @@
 #include <QList>
 #include <QStack>
 #include <QQueue>
+#include <QTime>
 
 class MHDLADisplay;
 
@@ -62,6 +63,7 @@ class MHExternContent {
 public:
     QString m_FileName;
     MHIngredient *m_pRequester; 
+    QTime m_time;
 };
 
 class MHInteractible;
@@ -114,6 +116,7 @@ public:
     void RunActions();
     // Generate a UserAction event i.e. a key press.
     virtual void GenerateUserAction(int nCode);
+    virtual void EngineEvent(int nCode);
 
     // Called from an ingredient to request a load of external content.
     void RequestExternalContent(MHIngredient *pRequester);
@@ -154,6 +157,9 @@ public:
     // Interaction: Set if an Interactible has the focus and is receiving key presses.
     MHInteractible *GetInteraction(void) { return m_Interacting; }
     void SetInteraction(MHInteractible *p) { m_Interacting = p; }
+
+    int GetTuneInfo() { return CurrentApp() ? CurrentApp()->m_tuneinfo : 0; }
+    void SetTuneInfo(int tuneinfo) { if (CurrentApp()) CurrentApp()->m_tuneinfo = tuneinfo; }
 
 protected:
     void CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un);

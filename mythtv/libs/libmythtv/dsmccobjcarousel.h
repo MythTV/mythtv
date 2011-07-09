@@ -67,8 +67,7 @@ class ObjCarousel
     ObjCarousel(Dsmcc*);
     ~ObjCarousel();
     void AddModuleInfo(DsmccDii *dii, Dsmcc *status, unsigned short streamTag);
-    void AddModuleData(unsigned long carousel, DsmccDb *ddb,
-                       const unsigned char *data);
+    void AddModuleData(DsmccDb *ddb, const unsigned char *data);
 
     DSMCCCache                     filecache;
     QLinkedList<DSMCCCacheModuleData*> m_Cache;

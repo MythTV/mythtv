@@ -122,6 +122,7 @@ protected:
     int         m_nTextCHook, m_nIPCHook, m_nStrCHook, m_nBitmapCHook, m_nLineArtCHook;
     MHFontBody  m_Font;
     MHOctetString   m_FontAttrs;
+    int         m_tuneinfo;
 
     // Internal attributes and additional state
     int  m_nLockCount; // Count for locking the screen
