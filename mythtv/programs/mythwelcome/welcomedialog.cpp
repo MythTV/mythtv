@@ -82,7 +82,7 @@ bool WelcomeDialog::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'welcome_screen'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'welcome_screen'");
         return false;
     }
 
@@ -131,7 +131,8 @@ void WelcomeDialog::checkAutoStart(void)
     command += logPropagateArgs;
     uint state = myth_system(command);
 
-    VERBOSE(VB_GENERAL, QString("mythshutdown --startup returned: %1").arg(state));
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("mythshutdown --startup returned: %1").arg(state));
 
     bool bAutoStartFrontend = gCoreContext->GetNumSetting("AutoStartFrontend", 1);
 
@@ -151,14 +152,15 @@ void WelcomeDialog::customEvent(QEvent *e)
         if (me->Message().left(21) == "RECORDING_LIST_CHANGE" ||
             me->Message() == "UPDATE_PROG_INFO")
         {
-            VERBOSE(VB_GENERAL, "MythWelcome received a "
-                    "recording list change event");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "MythWelcome received a recording list change event");
 
             QMutexLocker lock(&m_RecListUpdateMuxtex);
 
             if (pendingRecListUpdate())
             {
-                VERBOSE(VB_GENERAL, "            [deferred to pending handler]");
+                LOG(VB_GENERAL, LOG_NOTICE,
+                    "            [deferred to pending handler]");
             }
             else
             {
@@ -169,13 +171,15 @@ void WelcomeDialog::customEvent(QEvent *e)
         }
         else if (me->Message().left(15) == "SCHEDULE_CHANGE")
         {
-            VERBOSE(VB_GENERAL, "MythWelcome received a SCHEDULE_CHANGE event");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "MythWelcome received a SCHEDULE_CHANGE event");
 
             QMutexLocker lock(&m_SchedUpdateMuxtex);
 
             if (pendingSchedUpdate())
             {
-                VERBOSE(VB_GENERAL, "            [deferred to pending handler]");
+                LOG(VB_GENERAL, LOG_NOTICE,
+                    "            [deferred to pending handler]");
             }
             else
             {
@@ -185,7 +189,10 @@ void WelcomeDialog::customEvent(QEvent *e)
         }
         else if (me->Message().left(18) == "SHUTDOWN_COUNTDOWN")
         {
-            //VERBOSE(VB_GENERAL, "MythWelcome received a SHUTDOWN_COUNTDOWN event");
+#if 0
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "MythWelcome received a SHUTDOWN_COUNTDOWN event");
+#endif
             QString secs = me->Message().mid(19);
             m_secondsToShutdown = secs.toInt();
             updateStatusMessage();
@@ -193,14 +200,16 @@ void WelcomeDialog::customEvent(QEvent *e)
         }
         else if (me->Message().left(12) == "SHUTDOWN_NOW")
         {
-            VERBOSE(VB_GENERAL, "MythWelcome received a SHUTDOWN_NOW event");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "MythWelcome received a SHUTDOWN_NOW event");
             if (gCoreContext->IsFrontendOnly())
             {
                 // does the user want to shutdown this frontend only machine
                 // when the BE shuts down?
                 if (gCoreContext->GetNumSetting("ShutdownWithMasterBE", 0) == 1)
                 {
-                     VERBOSE(VB_GENERAL, "MythWelcome is shutting this computer down now");
+                     LOG(VB_GENERAL, LOG_NOTICE,
+                         "MythWelcome is shutting this computer down now");
                      QString poweroff_cmd = gCoreContext->GetSetting("MythShutdownPowerOff", "");
                      if (!poweroff_cmd.isEmpty())
                          myth_system(poweroff_cmd);
@@ -441,6 +450,7 @@ void WelcomeDialog::runMythFillDatabase()
     QString mflog = gCoreContext->GetSetting("MythFillDatabaseLog",
                                          "/var/log/mythfilldatabase.log");
 
+    // TODO: cleanup after mfd no longer uses wget
     if (mflog.isEmpty())
     {
         command = QString("%1 %2").arg(mfpath).arg(mfarg);
@@ -451,7 +461,7 @@ void WelcomeDialog::runMythFillDatabase()
 
     command += "&";
 
-    VERBOSE(VB_GENERAL, QString("Grabbing EPG data using command: %1\n")
+    LOG(VB_GENERAL, LOG_INFO, QString("Grabbing EPG data using command: %1\n")
             .arg(command));
 
     myth_system(command);
@@ -645,7 +655,8 @@ void WelcomeDialog::shutdownNow(void)
     // if this is a frontend only machine just shut down now
     if (gCoreContext->IsFrontendOnly())
     {
-        VERBOSE(VB_GENERAL, "MythWelcome is shutting this computer down now");
+        LOG(VB_GENERAL, LOG_INFO,
+            "MythWelcome is shutting this computer down now");
         QString poweroff_cmd = gCoreContext->GetSetting("MythShutdownPowerOff", "");
         if (!poweroff_cmd.isEmpty())
             myth_system(poweroff_cmd);

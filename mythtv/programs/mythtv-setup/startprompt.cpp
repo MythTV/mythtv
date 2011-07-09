@@ -43,13 +43,13 @@ void StartPrompter::handleStart()
 
 void StartPrompter::leaveBackendRunning()
 {
-    VERBOSE(VB_GENERAL, "Continuing with backend running");
+    LOG(VB_GENERAL, LOG_INFO, "Continuing with backend running");
     gCoreContext->SetSetting("AutoRestartBackend", "0");
 }
 
 void StartPrompter::stopBackend()
 {
-    VERBOSE(VB_GENERAL, "Trying to stop backend");
+    LOG(VB_GENERAL, LOG_INFO, "Trying to stop backend");
 
     QString commandString = gCoreContext->GetSetting("BackendStopCommand");
     if (!commandString.isEmpty())
@@ -86,7 +86,7 @@ void StartPrompter::backendRunningPrompt(void)
 
     if (!dia->Create())
     {
-        VERBOSE(VB_IMPORTANT, "Can't create Prompt dialog?");
+        LOG(VB_GENERAL, LOG_ERR, "Can't create Prompt dialog?");
         delete dia;
         quit();
     }

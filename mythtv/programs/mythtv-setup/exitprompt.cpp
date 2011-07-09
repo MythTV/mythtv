@@ -46,7 +46,7 @@ void ExitPrompter::masterPromptExit()
                                                                  false);
         if (!dia->Create())
         {
-            VERBOSE(VB_IMPORTANT, "Can't create fill DB prompt?");
+            LOG(VB_GENERAL, LOG_ERR, "Can't create fill DB prompt?");
             delete dia;
             quit();
         }
@@ -75,7 +75,7 @@ void ExitPrompter::handleExit()
                                                 m_d->stk, "exit prompt");
         if (!dia->Create())
         {
-            VERBOSE(VB_IMPORTANT, "Can't create Exit Prompt dialog?");
+            LOG(VB_GENERAL, LOG_ERR, "Can't create Exit Prompt dialog?");
             delete dia;
             quit();
         }
@@ -127,7 +127,7 @@ void ExitPrompter::quit()
         QString commandString = gCoreContext->GetSetting("BackendStartCommand");
         if (!commandString.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, "backendrestart"+commandString);
+            LOG(VB_GENERAL, LOG_ERR, "backendrestart"+commandString);
             myth_system(commandString);
         }
     }

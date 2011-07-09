@@ -108,7 +108,7 @@ static void SetupMenuCallback(void* data, QString& selection)
         exitPrompt->handleExit();
     }
     else
-        VERBOSE(VB_IMPORTANT, "Unknown menu action: " + selection);
+        LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
 }
 
 static bool RunMenu(QString themedir, QString themename)
@@ -125,7 +125,7 @@ static bool RunMenu(QString themedir, QString themename)
         return true;
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Couldn't use theme '%1'").arg(themename));
+    LOG(VB_GENERAL, LOG_ERR, QString("Couldn't use theme '%1'").arg(themename));
     delete menu;
     menu = NULL;
 
@@ -141,8 +141,8 @@ static bool resetTheme(QString themedir, const QString badtheme)
     if (badtheme == DEFAULT_UI_THEME)
         themename = FALLBACK_UI_THEME;
 
-    VERBOSE(VB_IMPORTANT,
-                QString("Overriding broken theme '%1' with '%2'")
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("Overriding broken theme '%1' with '%2'")
                 .arg(badtheme).arg(themename));
 
     gCoreContext->OverrideSettingForSession("Theme", themename);
@@ -163,7 +163,7 @@ static int reloadTheme(void)
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find theme '%1'")
                 .arg(themename));
         return GENERIC_EXIT_NO_THEME;
     }
@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
 
     if (!gContext->Init(use_display)) // No Upnp, Prompt for db
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -456,7 +456,7 @@ int main(int argc, char *argv[])
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find theme '%1'")
                 .arg(themename));
         return GENERIC_EXIT_NO_THEME;
     }
@@ -476,7 +476,7 @@ int main(int argc, char *argv[])
 
     if (!UpgradeTVDatabaseSchema(true))
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema.");
+        LOG(VB_GENERAL, LOG_ERR, "Couldn't upgrade database to new schema.");
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
@@ -504,8 +504,8 @@ int main(int argc, char *argv[])
         {
             delete expertEditor;
             expertEditor = NULL;
-            VERBOSE(VB_IMPORTANT, "Unable to create expert settings editor "
-                    "window");
+            LOG(VB_GENERAL, LOG_ERR,
+                "Unable to create expert settings editor window");
             return GENERIC_EXIT_OK;
         }
     }

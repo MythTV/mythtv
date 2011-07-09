@@ -79,15 +79,15 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {
-        VERBOSE(VB_IMPORTANT, "mythwelcome: Could not initialize MythContext. "
-                        "Exiting.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "mythwelcome: Could not initialize MythContext. Exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     if (!MSqlQuery::testDBConnection())
     {
-        VERBOSE(VB_IMPORTANT, "mythwelcome: Could not open the database. "
-                        "Exiting.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "mythwelcome: Could not open the database. Exiting.");
         return -1;
     }
 
