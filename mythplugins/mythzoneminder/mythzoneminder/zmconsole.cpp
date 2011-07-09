@@ -49,7 +49,7 @@ bool FunctionDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'functionpopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'functionpopup'");
         return false;
     }
 
@@ -85,14 +85,16 @@ void FunctionDialog::setMonitorFunction(void)
     QString function = m_functionList->GetValue();
     bool enabled = (m_enabledCheck->GetCheckState() == MythUIStateType::Full);
 
-    VERBOSE(VB_GENERAL, "Monitor id : " + QString::number(m_monitor->id) +
-            " function change " + m_monitor->function + " -> " + function +
-            ", enable value " + QString::number(m_monitor->enabled) + " -> " +
-            QString::number(enabled));
+    LOG(VB_GENERAL, LOG_INFO,
+        "Monitor id : " + QString::number(m_monitor->id) +
+        " function change " + m_monitor->function + " -> " + function +
+        ", enable value " + QString::number(m_monitor->enabled) + " -> " +
+        QString::number(enabled));
 
     if (m_monitor->function == function && m_monitor->enabled == enabled)
     {
-        VERBOSE(VB_IMPORTANT, "Monitor Function/Enable values not changed so not updating.");
+        LOG(VB_GENERAL, LOG_WARNING,
+            "Monitor Function/Enable values not changed so not updating.");
         emit haveResult(false);
         Close();
         return;
@@ -158,7 +160,7 @@ bool ZMConsole::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'zmconsole'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'zmconsole'");
         return false;
     }
 

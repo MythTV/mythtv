@@ -68,7 +68,7 @@ bool ZMEvents::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'zmevents'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'zmevents'");
         return false;
     }
 
@@ -424,7 +424,7 @@ void ZMEvents::setGridLayout(int layout)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Theme is missing grid layout (%1).")
+        LOG(VB_GENERAL, LOG_ERR, QString("Theme is missing grid layout (%1).")
                                       .arg(layoutName + "_eventlist"));
         Close();
     }

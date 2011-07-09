@@ -97,7 +97,7 @@ bool ZMPlayer::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'zmplayer'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'zmplayer'");
         return false;
     }
 

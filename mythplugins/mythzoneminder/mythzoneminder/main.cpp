@@ -22,6 +22,7 @@
 #include <mythmainwindow.h>
 #include <myththemedmenu.h>
 #include <mythuihelper.h>
+#include <mythlogging.h>
 
 //zone minder
 #include "zmsettings.h"
@@ -117,8 +118,8 @@ static int runMenu(QString which_menu)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
-                              .arg(which_menu).arg(themedir));
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
+                .arg(which_menu).arg(themedir));
         delete diag;
         return -1;
     }

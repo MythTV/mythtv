@@ -106,8 +106,9 @@ bool ZMLivePlayer::hideAll(void)
     }
     catch (const QString name)
     {
-        VERBOSE(VB_IMPORTANT, QString("Theme is missing a critical theme element ('%1')")
-                                      .arg(name));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Theme is missing a critical theme element ('%1')")
+                .arg(name));
         return false;
     }
 
@@ -119,7 +120,7 @@ bool ZMLivePlayer::initMonitorLayout()
     // if we haven't got any monitors there's not much we can do so bail out!
     if (m_monitors->size() == 0)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot find any monitors. Bailing out!");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot find any monitors. Bailing out!");
         ShowOkPopup(tr("Can't show live view.\nYou don't have any monitors defined!"));
         return false;
     }
