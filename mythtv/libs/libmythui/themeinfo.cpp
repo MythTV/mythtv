@@ -137,7 +137,7 @@ bool ThemeInfo::parseThemeInfo()
                             }
                             else
                             {
-                                VERBOSE_XML(VB_IMPORTANT, LOG_ERR,
+                                VERBOSE_XML(VB_GENERAL, LOG_ERR,
                                             m_theme.fileName(), ce, 
                                             "Invalid theme type");
                             }

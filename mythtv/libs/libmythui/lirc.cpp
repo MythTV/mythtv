@@ -170,7 +170,7 @@ bool LIRC::Init(void)
     if (d->lircState)
         return true;
 
-    uint64_t vtype = (0 == retryCount) ? VB_IMPORTANT : VB_FILE;
+    uint64_t vtype = (0 == retryCount) ? VB_GENERAL : VB_FILE;
 
     int lircd_socket = -1;
     if (lircdDevice.startsWith('/'))
