@@ -1823,9 +1823,11 @@ def updateMythRecorded(items):
 
     # Add new Miro unwatched videos to MythTV'd data base
     for item in items_copy:
+        if item[u'videoFilename'] is None:
+            continue
         if not os.path.isfile(os.path.realpath(item[u'videoFilename'])):
             continue # Do not create records for Miro video files that do not exist
-        records = createRecordedRecords(item)
+        records = createRecordedRecords(item) 
         if records:
             if simulation:
                 logger.info(u"Simulation: Added recorded and recordedprogram records for (%s - %s)" % (item[u'channelTitle'], item[u'title'],))
