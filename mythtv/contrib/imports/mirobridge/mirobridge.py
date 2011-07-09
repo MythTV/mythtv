@@ -2341,15 +2341,15 @@ def main():
     if not opts.no_autodownload:
         if opts.verbose:
             app.cli_interpreter.verbose = False
-        if miroConfiguration(prefs.APP_VERSION) < u"4.0": # Miro 4 automatically refreshes feeds and downloads
-            app.cli_interpreter.do_mythtv_update_autodownload(u'')
+        app.cli_interpreter.do_mythtv_getunwatched(u'')
         before_download = len(app.cli_interpreter.videofiles)
         if opts.verbose:
             app.cli_interpreter.verbose = True
-        app.cli_interpreter.do_mythtv_update_autodownload(u'')
+        if miroConfiguration(prefs.APP_VERSION) < u"4.0": # Miro 4 automatically refreshes feeds and downloads
+            app.cli_interpreter.do_mythtv_update_autodownload(u'')
         time.sleep(download_sleeptime)
         firsttime = True
-        while True:
+        while True: 
             app.cli_interpreter.do_mythtv_check_downloading(u'')
             if app.cli_interpreter.downloading:
                 time.sleep(30)
