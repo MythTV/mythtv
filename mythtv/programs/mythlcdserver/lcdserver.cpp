@@ -273,7 +273,7 @@ void LCDServer::parseTokens(const QStringList &tokens, QTcpSocket *socket)
         QString did_not_parse = tokens.join(" ");
 
         if (debug_level > 0)
-            LOG(VB_IMPORTANT, LOG_ERR, "LCDServer::failed to parse this: " +
+            LOG(VB_GENERAL, LOG_ERR, "LCDServer::failed to parse this: " +
                 did_not_parse);
 
         sendMessage(socket, "HUH?");

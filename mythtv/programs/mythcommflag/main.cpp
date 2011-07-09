@@ -949,7 +949,8 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                 recorderNum = -1;
                 watchingRecording = false;
 
-                LOG(VB_IMPORTANT, LOG_ERR, "Unable to find active recorder for this "
+                LOG(VB_GENERAL, LOG_ERR,
+                        "Unable to find active recorder for this "
                         "recording, realtime flagging will not be enabled.");
             }
             cfp->SetWatchingRecording(watchingRecording);
@@ -1136,10 +1137,9 @@ int main(int argc, char *argv[])
 
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCOMMFLAG);
-    int retval;
-    if ((retval = cmdline.ConfigureLogging(
-                        "important general",
-                        !cmdline.toBool("noprogress"))) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging("general",
+                                          !cmdline.toBool("noprogress"));
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     CleanupGuard callCleanup(cleanup);

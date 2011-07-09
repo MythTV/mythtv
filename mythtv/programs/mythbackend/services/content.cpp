@@ -365,7 +365,7 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
         QString sMsg = QString("GetPreviewImage: bad start time '%1'")
                           .arg( dtStartTime.toString() );
 
-        LOG(VB_IMPORTANT, LOG_ERR, sMsg);
+        LOG(VB_GENERAL, LOG_ERR, sMsg);
 
         throw sMsg;
     }

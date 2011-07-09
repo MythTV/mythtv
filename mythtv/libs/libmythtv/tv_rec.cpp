@@ -652,7 +652,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
                 .arg(curRecording->GetRecordingStartTime(ISODate))
                 .arg(curRecording->GetRecordingEndTime(ISODate));
 
-        LOG(VB_IMPORTANT, LOG_INFO, LOC + msg);
+        LOG(VB_GENERAL, LOG_INFO, LOC + msg);
     }
 
     for (int i = 0; i < pendingRecordings.size(); i++)

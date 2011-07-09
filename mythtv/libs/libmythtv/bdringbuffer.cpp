@@ -672,7 +672,7 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     }
 
     if (m_currentTitleInfo->clip_count > 1 && still != BLURAY_STILL_NONE)
-        LOG(VB_IMPORTANT, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING,
             "Warning: more than 1 clip, following still "
             "frame analysis may be wrong");
 
@@ -705,7 +705,7 @@ bool BDRingBuffer::SwitchAngle(uint angle)
     if (!bdnav)
         return false;
 
-    LOG(VB_IMPORTANT, LOG_INFO, QString("Switching to Angle %1...").arg(angle));
+    LOG(VB_GENERAL, LOG_INFO, QString("Switching to Angle %1...").arg(angle));
     bd_seamless_angle_change(bdnav, angle);
     m_currentAngle = angle;
     return true;

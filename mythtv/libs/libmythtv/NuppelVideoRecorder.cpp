@@ -1188,7 +1188,7 @@ void NuppelVideoRecorder::DoV4L1(void)
         if (ioctl(fd, VIDIOCGAUDIO, &va) < 0)
         {
             bool reports_audio = vchan.flags & VIDEO_VC_AUDIO;
-            uint err_level = reports_audio ? VB_IMPORTANT : VB_AUDIO;
+            uint err_level = reports_audio ? VB_GENERAL : VB_AUDIO;
             // print at VB_IMPORTANT if driver reports audio.
             LOG(err_level, LOG_ERR, "Failed to get audio" + ENO);
         }
@@ -2484,7 +2484,7 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
     int act = act_text_buffer;
     if (!textbuffer[act]->freeToBuffer)
     {
-        LOG(VB_IMPORTANT, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
             QString("Teletext #%1: ran out of free TEXT buffers :-(").arg(act));
         return;
     }

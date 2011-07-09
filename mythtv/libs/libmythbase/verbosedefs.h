@@ -52,8 +52,10 @@ VERBOSE_MAP(VB_ALL,       0xfffffffff, false,
             "ALL available debug output")
 VERBOSE_MAP(VB_MOST,      0xf3ffeffff, false,
             "Most debug (nodatabase,notimestamp,noextra)")
+#if 0
 VERBOSE_MAP(VB_IMPORTANT, 0x00000001, false,
             "Errors or other very important messages")
+#endif
 VERBOSE_MAP(VB_GENERAL,   0x00000002, true,
             "General info")
 VERBOSE_MAP(VB_RECORD,    0x00000004, true,
@@ -108,8 +110,10 @@ VERBOSE_MAP(VB_GUI,       0x04000000, true,
             "GUI related messages")
 VERBOSE_MAP(VB_SYSTEM,    0x08000000, true,
             "External executable related messages")
+#if 0
 VERBOSE_MAP(VB_EXTRA,     0x40000000, true,
             "More detailed messages in selected levels")
+#endif
 VERBOSE_MAP(VB_TIMESTAMP, 0x80000000, true,
             "Conditional data driven messages")
 VERBOSE_MAP(VB_PROCESS,   0x100000000, true,

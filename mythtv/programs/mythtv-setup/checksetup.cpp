@@ -165,7 +165,7 @@ bool checkImageStoragePaths(QStringList &probs)
                             "your Videos Storage Group.  Do you want "
                             "to store them in their own groups?");
             probs.push_back(trMesg);
-            LOG(VB_IMPORTANT, LOG_ERR, trMesg);
+            LOG(VB_GENERAL, LOG_ERR, trMesg);
             problemFound = true;
         }
     }            

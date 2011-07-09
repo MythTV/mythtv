@@ -703,7 +703,7 @@ bool MSqlQuery::next()
 {
     bool result = QSqlQuery::next();
 
-    if (result && VERBOSE_LEVEL_CHECK(VB_DATABASE|VB_EXTRA))
+    if (result && VERBOSE_LEVEL_CHECK(VB_DATABASE) && logLevel <= LOG_DEBUG)
     {
         QString str;
         QSqlRecord record=QSqlQuery::record();

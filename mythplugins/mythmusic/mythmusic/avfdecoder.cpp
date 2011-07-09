@@ -210,7 +210,7 @@ bool avfDecoder::initialize()
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Could not open file (%1)").arg(filename));
-        LOG(VB_IMPORTANT, LOG_ERR, QString("AV decoder. Error: %1").arg(err));
+        LOG(VB_GENERAL, LOG_ERR, QString("AV decoder. Error: %1").arg(err));
         error(QString("Could not open file  (%1)").arg(filename) +
               QString("\nAV decoder. Error: %1").arg(err));
         deinit();

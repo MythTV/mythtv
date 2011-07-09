@@ -949,7 +949,7 @@ void MythCommandLineParser::addUPnP(void)
 void MythCommandLineParser::addLogging(void)
 {
     add(QStringList( QStringList() << "-v" << "--verbose" ), "verbose",
-            "important,general",
+            "general",
             "Specify log filtering. Use '-v help' for level info.", "");
     add("-V", "verboseint", 0U, "",
             "This option is intended for internal use only.\n"

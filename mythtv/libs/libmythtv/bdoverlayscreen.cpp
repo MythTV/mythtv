@@ -63,7 +63,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     // remove if we already have this overlay
     if (m_overlayMap.contains(hash))
     {
-        LOG(VB_PLAYBACK | VB_EXTRA, LOG_INFO, QString("Removing %1 (%2 left)")
+        LOG(VB_PLAYBACK, LOG_DEBUG, QString("Removing %1 (%2 left)")
             .arg(hash).arg(m_overlayMap.size()));
         MythUIImage *old = m_overlayMap.take(hash);
         DeleteChild(old);
@@ -118,7 +118,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
             uiimage->SetImage(image);
             uiimage->SetArea(MythRect(scaled));
             m_overlayMap.insert(hash, uiimage);
-            LOG(VB_PLAYBACK | VB_EXTRA, LOG_INFO, QString("Added %1 (%2 tot)")
+            LOG(VB_PLAYBACK, LOG_DEBUG, QString("Added %1 (%2 tot)")
                 .arg(hash).arg(m_overlayMap.size()));
         }
     }

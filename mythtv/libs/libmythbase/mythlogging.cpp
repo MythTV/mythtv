@@ -99,8 +99,8 @@ bool verboseInitialized = false;
 VerboseMap verboseMap;
 QMutex verboseMapMutex;
 
-const uint64_t verboseDefaultInt = VB_IMPORTANT | VB_GENERAL;
-const char    *verboseDefaultStr = " important general";
+const uint64_t verboseDefaultInt = VB_GENERAL;
+const char    *verboseDefaultStr = " general";
 
 uint64_t verboseMask = verboseDefaultInt;
 QString verboseString = QString(verboseDefaultStr);
@@ -1053,8 +1053,8 @@ void verboseHelp()
     cerr << endl <<
       "The default for this program appears to be: '-v " <<
       m_verbose.toLocal8Bit().constData() << "'\n\n"
-      "Most options are additive except for none, all, and important.\n"
-      "These three are semi-exclusive and take precedence over any\n"
+      "Most options are additive except for none, and all.\n"
+      "These two are semi-exclusive and take precedence over any\n"
       "prior options given.  You can however use something like\n"
       "'-v none,jobqueue' to get only JobQueue related messages\n"
       "and override the default verbosity level.\n\n"
@@ -1099,6 +1099,14 @@ int verboseArgParse(QString arg)
         {
             verboseHelp();
             return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+        else if (option == "important")
+        {
+            cerr << "The \"important\" log mask is no longer valid.\n";
+        }
+        else if (option == "extra")
+        {
+            cerr << "The \"extra\" log mask is no longer valid.  Please try --loglevel debug instead.\n";
         }
         else if (option == "default")
         {

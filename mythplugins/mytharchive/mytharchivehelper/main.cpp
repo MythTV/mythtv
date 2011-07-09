@@ -2617,7 +2617,7 @@ int main(int argc, char **argv)
     
     // by default we only output our messages
     int retval;
-    QString mask("important jobqueue");
+    QString mask("jobqueue");
     if ((retval = cmdline.ConfigureLogging(mask)) != GENERIC_EXIT_OK)
         return retval;
 
@@ -2628,7 +2628,7 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        LOG(VB_IMPORTANT, LOG_ERR, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         delete gContext;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }

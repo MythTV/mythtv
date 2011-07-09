@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
     }
 
     int retval;
-    QString mask("important general");
+    QString mask("general");
     if ((retval = cmdline.ConfigureLogging(mask, quiet)) != GENERIC_EXIT_OK)
         return retval;
 

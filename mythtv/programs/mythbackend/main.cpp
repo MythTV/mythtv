@@ -91,7 +91,7 @@ int main(int argc, char **argv)
         return retval;
 
     bool daemonize = cmdline.toBool("daemon");
-    QString mask("important general");
+    QString mask("general");
     if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
         return retval;
 

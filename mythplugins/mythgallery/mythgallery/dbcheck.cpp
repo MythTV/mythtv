@@ -50,7 +50,7 @@ static bool performActualUpdate(const QString updates[], QString version,
                 .arg(thequery)
                 .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
-            LOG(VB_IMPORTANT, LOG_ERR, msg);
+            LOG(VB_GENERAL, LOG_ERR, msg);
             return false;
         }
 

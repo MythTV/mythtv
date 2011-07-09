@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
     bool showprogress = cmdline.toBool("showprogress");
 
     int retval;
-    QString mask("important general");
+    QString mask("general");
     bool quiet = (outfile == "-") || showprogress;
     if ((retval = cmdline.ConfigureLogging(mask, quiet)) != GENERIC_EXIT_OK)
         return retval;
