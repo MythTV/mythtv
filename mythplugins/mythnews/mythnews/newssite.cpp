@@ -155,8 +155,8 @@ void NewsSite::Update(QHttp::Error      error,
 
     if (QHttp::NoError != error)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "HTTP Connection Error" +
-                QString("\n\t\t\tExplanation: %1: %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + "HTTP Connection Error" +
+            QString("\n\t\t\tExplanation: %1: %2")
                 .arg(error).arg(error_str));
 
         m_state = NewsSite::RetrieveFailed;
@@ -167,8 +167,8 @@ void NewsSite::Update(QHttp::Error      error,
 
     if (200 != http_status_id)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "HTTP Protocol Error" +
-                QString("\n\t\t\tExplanation: %1: %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + "HTTP Protocol Error" +
+            QString("\n\t\t\tExplanation: %1: %2")
                 .arg(http_status_id).arg(http_status_str));
 
         m_state = NewsSite::RetrieveFailed;
@@ -202,7 +202,7 @@ void NewsSite::Update(QHttp::Error      error,
     }
 
     if (NewsSite::WriteFailed == m_state)
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Write failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Write failed");
 
     emit finished(this);
 }
@@ -232,7 +232,7 @@ void NewsSite::process(void)
     if (!xmlFile.open(QIODevice::ReadOnly))
     {
         insertNewsArticle(NewsArticle(tr("Failed to retrieve news")));
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open xmlfile");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to open xmlfile");
         if (!m_updateErrorString.isEmpty())
             m_errorString += "\n" + m_updateErrorString;
         return;
@@ -241,7 +241,7 @@ void NewsSite::process(void)
     if (!domDoc.setContent(&xmlFile))
     {
         insertNewsArticle(NewsArticle(tr("Failed to retrieve news")));
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set content from xmlfile");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set content from xmlfile");
         m_errorString += tr("Failed to read downloaded file.");
         if (!m_updateErrorString.isEmpty())
             m_errorString += "\n" + m_updateErrorString;
@@ -270,7 +270,7 @@ void NewsSite::process(void)
         return;
     }
     else {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "XML-file is not valid RSS-feed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "XML-file is not valid RSS-feed");
         m_errorString += tr("XML-file is not valid RSS-feed");
         return;
     }

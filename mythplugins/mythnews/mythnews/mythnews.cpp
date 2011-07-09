@@ -116,7 +116,7 @@ bool MythNews::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'news'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'news'");
         return false;
     }
 
@@ -859,7 +859,8 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
             cmdURL = QString("http://youtube.com/get_video.php"
                              "?video_id=%2&t=%1")
                 .arg(tArgString).arg(vidString);
-            VERBOSE(VB_GENERAL, LOC + QString("VideoURL '%1'").arg(cmdURL));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("VideoURL '%1'")
+                    .arg(cmdURL));
         }
     }
 

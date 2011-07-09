@@ -71,7 +71,7 @@ bool MythNewsEditor::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'editor'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'editor'");
         return false;
     }
 
