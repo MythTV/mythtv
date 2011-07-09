@@ -90,6 +90,11 @@ typedef struct
 extern "C" {
 #endif
 
+// There are two LOG macros now.  One for use with Qt/C++, one for use
+// without Qt.
+//
+// Neither of them will lock the calling thread other than momentarily to put
+// the log message onto a queue.
 #ifdef __cplusplus
 #define LOG(mask, level, string) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
@@ -232,20 +237,8 @@ extern MBASE_PUBLIC uint64_t verboseMask;
 #define VERBOSE_LEVEL_NONE        (verboseMask == 0)
 #define VERBOSE_LEVEL_CHECK(mask) ((verboseMask & (mask)) == (mask))
 
-// There are two VERBOSE macros now.  One for use with Qt/C++, one for use
-// without Qt.
-//
-// Neither of them will lock the calling thread, but rather put the log message
-// onto a queue.
-
-#ifdef __cplusplus
-#define VERBOSE(mask, ...) \
-    LOG((uint64_t)(mask), LOG_INFO, QString(__VA_ARGS__))
-#else
-#define VERBOSE(mask, ...) \
-    LOG((uint64_t)(mask), LOG_INFO, __VA_ARGS__)
-#endif
-
+MBASE_PUBLIC __attribute__((error("VERBOSE is gone, use LOG")))
+    void VERBOSE(uint64_t mask, ...);
 
 #ifdef  __cplusplus
 /// Verbose helper function for ENO macro
