@@ -457,7 +457,7 @@ static int KernelDeint(VideoFilter *f, VideoFrame *frame, int field)
 
     if (!AllocFilter(filter, frame->width, frame->height))
     {
-        VERBOSE(VB_IMPORTANT, "KernelDeint: failed to allocate buffers.");
+        LOG(VB_GENERAL, LOG_ERR, "KernelDeint: failed to allocate buffers.");
         return -1;
     }
 
@@ -545,16 +545,15 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
 
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
     {
-        VERBOSE(VB_IMPORTANT, "KernelDeint: valid formats are"
-                            " YV12->YV12");
+        LOG(VB_GENERAL, LOG_ERR, "KernelDeint: valid formats are YV12->YV12");
         return NULL;
     }
 
     filter = (ThisFilter *) malloc (sizeof(ThisFilter));
     if (filter == NULL)
     {
-        VERBOSE(VB_IMPORTANT,
-                "KernelDeint: failed to allocate memory for filter.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "KernelDeint: failed to allocate memory for filter.");
         return NULL;
     }
 
@@ -579,7 +578,7 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
     memset(filter->ref, 0, sizeof(filter->ref));
     if (!AllocFilter(filter, *width, *height))
     {
-        VERBOSE(VB_IMPORTANT, "KernelDeint: failed to allocate buffers.");
+        LOG(VB_GENERAL, LOG_ERR, "KernelDeint: failed to allocate buffers.");
         free (filter);
         return NULL;
     }
@@ -603,7 +602,7 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
                           sizeof(struct DeintThread));
         if (filter->threads == NULL)
         {
-            VERBOSE(VB_IMPORTANT, "KernelDeint: failed to allocate memory "
+            LOG(VB_GENERAL, LOG_ERR, "KernelDeint: failed to allocate memory "
                     "for threads - falling back to existing, single thread.");
             filter->requested_threads = 1;
         }
@@ -627,8 +626,9 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
 
         if (success < filter->requested_threads)
         {
-            VERBOSE(VB_IMPORTANT, "KernelDeint: failed to create all threads"
-                   " - falling back to existing, single thread.");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "KernelDeint: failed to create all threads - "
+                "falling back to existing, single thread.");
         }
         else
         {
@@ -638,18 +638,19 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
                 timeout++;
                 if (timeout > 5000)
                 {
-                    VERBOSE(VB_IMPORTANT, "KernelDeint: waited too long for"
-                            " threads to start.- continuing.");
+                    LOG(VB_GENERAL, LOG_NOTICE,
+                        "KernelDeint: waited too long for "
+                        "threads to start.- continuing.");
                     break;
                 }
                 usleep(1000);
             }
-            VERBOSE(VB_PLAYBACK, "KernelDeint: Created threads.");
+            LOG(VB_PLAYBACK, LOG_INFO, "KernelDeint: Created threads.");
         }
     }
 
     if (filter->actual_threads < 1 )
-        VERBOSE(VB_PLAYBACK, "KernelDeint: Using existing thread.");
+        LOG(VB_PLAYBACK, LOG_INFO, "KernelDeint: Using existing thread.");
 
     return (VideoFilter *) filter;
 }
