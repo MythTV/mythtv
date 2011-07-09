@@ -48,15 +48,15 @@ void StreamInput::Setup(void)
 
     while (stage != -1 && stage < 4)
     {
-        VERBOSE(VB_GENERAL, LOC +
-                QString("Processing one event: stage %1 %2 %3")
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Processing one event: stage %1 %2 %3")
                 .arg(stage).arg(sock->canReadLine())
                 .arg(sock->bytesAvailable()));
 
         qApp->processEvents();
     }
 
-    VERBOSE(VB_GENERAL, LOC + "Disconnecting from socket");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Disconnecting from socket");
     disconnect(sock, SIGNAL(Error(QAbstractSocket::SocketError)),
                this, SLOT(  Error(QAbstractSocket::SocketError)));
     disconnect(sock, SIGNAL(hostFound()), this, SLOT(HostFound()));
@@ -74,7 +74,7 @@ void StreamInput::Setup(void)
 
 void StreamInput::HostFound(void)
 {
-    VERBOSE(VB_GENERAL, LOC + "Host found");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Host found");
     stage = 1;
 }
 
@@ -84,8 +84,8 @@ void StreamInput::Connected(void)
     QString tmp = QString(".song %1\r\n").arg(QString(request.toUtf8()));
     QByteArray ba = tmp.toAscii();
 
-    VERBOSE(VB_GENERAL, LOC +
-            QString("Connected... sending request '%1' %2")
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Connected... sending request '%1' %2")
             .arg(ba.constData()).arg(ba.length()));
 
     sock->write(ba.constData(), ba.length());
@@ -99,12 +99,12 @@ void StreamInput::ReadyRead(void)
 {
     if (stage == 2)
     {
-        VERBOSE(VB_GENERAL, LOC + "ReadyRead... checking response");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "ReadyRead... checking response");
 
         if (! sock->canReadLine())
         {
             stage = -1;
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "ReadyRead... can't read line");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "ReadyRead... can't read line");
             return;
         }
 
@@ -112,14 +112,14 @@ void StreamInput::ReadyRead(void)
         if (line.isEmpty())
         {
             stage = -1;
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "ReadyRead... line is empty");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "ReadyRead... line is empty");
             return;
         }
 
         if (line.left(5) != "*GOOD")
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Server error response: %1").arg(line));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Server error response: %1").arg(line));
             stage = -1;
             return;
         }
@@ -134,8 +134,8 @@ void StreamInput::ReadyRead(void)
 
 void StreamInput::Error(QAbstractSocket::SocketError)
 {
-    VERBOSE(VB_IMPORTANT, LOC_ERR +
-            QString("Socket error: %1").arg(sock->errorString()));
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        QString("Socket error: %1").arg(sock->errorString()));
 
     stage = -1;
 }

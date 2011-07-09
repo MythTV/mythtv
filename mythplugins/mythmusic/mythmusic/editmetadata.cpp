@@ -174,7 +174,9 @@ QPixmap *EditMetadataDialog::createScaledPixmap(QString filename,
         QImage *img = GetMythUI()->LoadScaleImage(filename);
         if (!img)
         {
-            VERBOSE(VB_IMPORTANT, QString("EditMetadataDialog: Failed to load image %1").arg(filename));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("EditMetadataDialog: Failed to load image %1")
+                    .arg(filename));
             return NULL;
         }
         else

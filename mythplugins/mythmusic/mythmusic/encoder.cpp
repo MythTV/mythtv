@@ -17,7 +17,7 @@ Encoder::Encoder(const QString &outfile, int qualitylevel, Metadata *metadata)
         m_out = fopen(outfile.constData(), "w+");
         if (!m_out)
         {
-            VERBOSE(VB_GENERAL, QString("Error opening output file: '%1'")
+            LOG(VB_GENERAL, LOG_ERR, QString("Error opening output file: '%1'")
                     .arg(m_outfile));
         }
     }

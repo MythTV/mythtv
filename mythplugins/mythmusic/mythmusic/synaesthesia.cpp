@@ -58,7 +58,7 @@ Synaesthesia::Synaesthesia(long int winid)
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "Unable to init SDL");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to init SDL");
         return;
     }
 
@@ -158,7 +158,8 @@ void Synaesthesia::resize(const QSize &newsize)
 
     if (!outputImage) 
     {
-        VERBOSE(VB_IMPORTANT, "outputImage in Synaesthesia::resize() is NULL");
+        LOG(VB_GENERAL, LOG_ERR,
+            "outputImage in Synaesthesia::resize() is NULL");
         return;
     }
 
@@ -171,7 +172,7 @@ void Synaesthesia::resize(const QSize &newsize)
 
     if (!surface)
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't get SDL surface");
+        LOG(VB_GENERAL, LOG_ERR, "Couldn't get SDL surface");
         return;
     }
 
@@ -616,7 +617,7 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
 #ifdef SDL_SUPPORT
     if (!surface)
     {
-        VERBOSE(VB_IMPORTANT, "No sdl surface");
+        LOG(VB_GENERAL, LOG_ERR, "No sdl surface");
         return false;
     }
 

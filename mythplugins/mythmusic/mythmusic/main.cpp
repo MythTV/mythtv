@@ -68,7 +68,9 @@ static void CheckFreeDBServerFile(void)
 
     if (homeDir.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "main.o: You don't have a HOME environment variable. CD lookup will almost certainly not work.");
+        LOG(VB_GENERAL, LOG_ERR, "main.o: You don't have a HOME environment "
+                                 "variable. CD lookup will almost certainly "
+                                 "not work.");
         return;
     }
 
@@ -375,7 +377,7 @@ static int runMenu(QString which_menu)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
                               .arg(which_menu).arg(themedir));
         delete diag;
         return -1;
@@ -463,12 +465,13 @@ static void handleMedia(MythMediaDevice *cd)
             // so the user has to choose (via MediaMonitor::defaultCDdevice())
 
             gCDdevice = QString::null;
-            VERBOSE(VB_MEDIA, "MythMusic: Forgetting existing CD");
+            LOG(VB_MEDIA, LOG_INFO, "MythMusic: Forgetting existing CD");
         }
         else
         {
             gCDdevice = newDevice;
-            VERBOSE(VB_MEDIA, "MythMusic: Storing CD device " + gCDdevice);
+            LOG(VB_MEDIA, LOG_INFO,
+                "MythMusic: Storing CD device " + gCDdevice);
         }
     }
     else
@@ -571,8 +574,8 @@ int mythplugin_init(const char *libversion)
 
     if (!upgraded)
     {
-        VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade music database schema, exiting.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Couldn't upgrade music database schema, exiting.");
         return -1;
     }
 

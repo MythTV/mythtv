@@ -82,8 +82,9 @@ Metadata *Decoder::readMetadata(void)
 
     if (!mdata)
     {
-        VERBOSE(VB_IMPORTANT, "Decoder::readMetadata(): " +
-                QString("Could not read '%1'").arg(filename));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Decoder::readMetadata(): Could not read '%1'")
+                .arg(filename));
     }
 
     return mdata;

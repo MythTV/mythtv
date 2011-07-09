@@ -86,8 +86,9 @@ void MetaIOTagLib::ReadGenericMetadata(Tag *tag, Metadata *metadata)
     // If we don't have title and artist or don't have the length return NULL
     if (metadata->Title().isEmpty() && metadata->Artist().isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("MetaIOTagLib: Failed to read metadata from '%1'")
-        .arg(metadata->Filename()));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MetaIOTagLib: Failed to read metadata from '%1'")
+                .arg(metadata->Filename()));
     }
 }
 
@@ -123,8 +124,9 @@ int MetaIOTagLib::getTrackLength(QString filename)
 
     // If we didn't get a valid length, add the metadata but show warning.
     if (milliseconds <= 1000)
-        VERBOSE(VB_GENERAL, QString("MetaIOTagLib: Failed to read length "
-        "from '%1'. It may be corrupt.").arg(filename));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MetaIOTagLib: Failed to read length "
+                    "from '%1'. It may be corrupt.").arg(filename));
     
     return milliseconds;
 }

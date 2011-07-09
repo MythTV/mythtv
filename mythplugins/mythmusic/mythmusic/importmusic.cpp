@@ -260,7 +260,7 @@ bool ImportMusicDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'import_music'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'import_music'");
         return false;
     }
 
@@ -843,7 +843,7 @@ bool ImportCoverArtDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'import_coverart'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'import_coverart'");
         return false;
     }
 

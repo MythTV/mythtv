@@ -70,8 +70,9 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
     if (ret != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
 #endif
     {
-        VERBOSE(VB_GENERAL, QString("Error initializing FLAC encoder."
-                                    " Got return code: %1").arg(ret));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error initializing FLAC encoder. Got return code: %1")
+                .arg(ret));
     }
 
     for (int i = 0; i < NUM_CHANNELS; i++)
@@ -116,8 +117,8 @@ int FlacEncoder::addSamples(int16_t *bytes, unsigned int length)
             if (!encoder_process(encoder, (const FLAC__int32 * const *) input,
                                  sampleindex))
             {
-                VERBOSE(VB_GENERAL, QString("Failed to write flac data."
-                                            " Aborting."));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Failed to write flac data. Aborting."));
                 return EENCODEERROR;
             }
             sampleindex = 0;

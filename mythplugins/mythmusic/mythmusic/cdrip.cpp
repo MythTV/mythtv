@@ -298,8 +298,8 @@ void CDRipperThread::run(void)
                         new RipStatusEvent(
                             RipStatusEvent::kEncoderErrorEvent,
                             "Encoder failed to open file for writing"));
-                    VERBOSE(VB_IMPORTANT, "MythMusic: Encoder failed"
-                                          " to open file for writing");
+                    LOG(VB_GENERAL, LOG_ERR, "MythMusic: Encoder failed"
+                                             " to open file for writing");
 
                     return;
                 }
@@ -312,8 +312,7 @@ void CDRipperThread::run(void)
                     m_parent,
                     new RipStatusEvent(RipStatusEvent::kEncoderErrorEvent,
                                        "Failed to create encoder"));
-                VERBOSE(VB_IMPORTANT,
-                        QString("MythMusic: Error: No encoder, failing"));
+                LOG(VB_GENERAL, LOG_ERR, "MythMusic: No encoder, failing");
                 return;
             }
             ripTrack(m_CDdevice, encoder.get(), trackno + 1);
@@ -349,9 +348,9 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 
     if (!device)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Error: cdda_identify failed for device '%1', "
-                        "CDRipperThread::ripTrack(tracknum = %2) exiting.")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("cdda_identify failed for device '%1', "
+                    "CDRipperThread::ripTrack(tracknum = %2) exiting.")
                 .arg(cddevice).arg(tracknum));
         return -1;
     }
@@ -528,7 +527,8 @@ bool Ripper::Create(void)
         || !m_yearEdit || !m_genreEdit || !m_searchArtistButton
         || !m_albumEdit || !m_searchAlbumButton || !m_qualityList)
     {
-        VERBOSE(VB_IMPORTANT, "Missing theme elements for screen 'cdripper'");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Missing theme elements for screen 'cdripper'");
         return false;
     }
 
@@ -751,7 +751,7 @@ void Ripper::scanCD(void)
 #ifdef HAVE_CDAUDIO
     QByteArray devname = m_CDdevice.toAscii();
     int cdrom_fd = cd_init_device(const_cast<char*>(devname.constData()));
-    VERBOSE(VB_MEDIA, "Ripper::scanCD() - dev:" + m_CDdevice);
+    LOG(VB_MEDIA, LOG_INFO, "Ripper::scanCD() - dev:" + m_CDdevice);
     if (cdrom_fd == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, "Could not open cdrom_fd: " + ENO);
@@ -944,7 +944,7 @@ QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
         QString tempstr = QString::number(track->Track(), 10);
         tempstr += " - " + track->FormatTitle();
         filename = musicdir + fixFileToken(tempstr);
-        VERBOSE(VB_GENERAL, QString("Invalid file storage definition."));
+        LOG(VB_GENERAL, LOG_ERR, "Invalid file storage definition.");
     }
 
     QStringList directoryList = filename.split("/");
@@ -1220,7 +1220,7 @@ void Ripper::ejectCD()
 #ifdef HAVE_CDAUDIO
         QByteArray devname = m_CDdevice.toAscii();
         int cdrom_fd = cd_init_device(const_cast<char*>(devname.constData()));
-        VERBOSE(VB_MEDIA, "Ripper::ejectCD() - dev " + m_CDdevice);
+        LOG(VB_MEDIA, LOG_INFO, "Ripper::ejectCD() - dev " + m_CDdevice);
         if (cdrom_fd != -1)
         {
             if (cd_eject(cdrom_fd) == -1)
@@ -1569,7 +1569,7 @@ void RipStatus::customEvent(QEvent *event)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Received an unknown event type!");
+        LOG(VB_GENERAL, LOG_ERR, "Received an unknown event type!");
     }
 }
 

@@ -55,7 +55,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
     int ret = vorbis_encode_setup_vbr(&vi, 2, 44100, quality);
     if (ret)
     {
-        VERBOSE(VB_GENERAL, QString("Error initializing VORBIS encoder."
+        LOG(VB_GENERAL, LOG_ERR, QString("Error initializing VORBIS encoder."
                                     " Got return code: %1").arg(ret));
         vorbis_info_clear(&vi);
         return;
@@ -88,8 +88,8 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
         int ret = write_page(&og, m_out);
         if (ret != og.header_len + og.body_len)
         {
-            VERBOSE(VB_IMPORTANT, QString("Failed to write header"
-                                    " to output stream."));
+            LOG(VB_GENERAL, LOG_ERR,
+                "Failed to write header to output stream.");
         }
     }
 }
@@ -156,8 +156,8 @@ int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)
                 int ret = write_page(&og, m_out);
                 if (ret != og.header_len + og.body_len)
                 {
-                    VERBOSE(VB_GENERAL, QString("Failed to write ogg data."
-                                            " Aborting."));
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Failed to write ogg data. Aborting."));
                     return EENCODEERROR;
                 }
                 bytes_written += ret;

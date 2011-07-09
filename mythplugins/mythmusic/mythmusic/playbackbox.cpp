@@ -125,8 +125,9 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
             vis_button->setText(tr("Visualize"));
         if (!assignFirstFocus())
         {
-            VERBOSE(VB_IMPORTANT, "playbackbox.o: Could not find a button to "
-                                  "assign focus to. What's in your theme?");
+            LOG(VB_GENERAL, LOG_ERR,
+                "playbackbox.o: Could not find a button to "
+                "assign focus to. What's in your theme?");
             // TODO: is this OK?
             exit(0);
         }
@@ -2016,7 +2017,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
 
         OutputEvent *aoe = (OutputEvent *) event;
 
-        VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
                 .arg(*aoe->errorMessage()));
         MythPopupBox::showOkPopup(
             GetMythMainWindow(),
@@ -2045,7 +2046,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
 
         DecoderEvent *dxe = (DecoderEvent*) event;
 
-        VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
                 .arg(*dxe->errorMessage()));
         MythPopupBox::showOkPopup(
             GetMythMainWindow(),
@@ -2141,8 +2142,9 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
 {
     if (attributes->size() < 4)
     {
-        VERBOSE(VB_IMPORTANT, "playbackbox.o: Worringly, a managed tree "
-                "list is handing back item attributes of the wrong size");
+        LOG(VB_GENERAL, LOG_ERR, "playbackbox.o: Worringly, a managed tree "
+                                 "list is handing back item attributes of the "
+                                 "wrong size");
         return;
     }
 
@@ -2274,8 +2276,8 @@ void PlaybackBoxMusic::wireUpTheme()
     music_tree_list = getUIManagedTreeListType("musictreelist");
     if (!music_tree_list)
     {
-        VERBOSE(VB_IMPORTANT, "playbackbox.o: Couldn't find a music tree list "
-                              "in your theme");
+        LOG(VB_GENERAL, LOG_ERR, "playbackbox.o: Couldn't find a music tree "
+                                 "list in your theme");
         // TODO: is this OK?
         exit(0);
     }

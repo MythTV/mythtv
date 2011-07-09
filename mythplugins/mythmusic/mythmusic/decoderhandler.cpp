@@ -123,7 +123,8 @@ QIODevice* DecoderIOFactoryFile::takeInput(void)
 void DecoderIOFactoryFile::start(void)
 {
     QString sourcename = getMetadata().Filename();
-    VERBOSE(VB_PLAYBACK, QString("DecoderIOFactory: Opening Local File %1").arg(sourcename));
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("DecoderIOFactory: Opening Local File %1").arg(sourcename));
     m_input = new QFile(sourcename);
     doConnectDecoder(getUrl().toLocalFile());
 }
@@ -159,7 +160,8 @@ QIODevice* DecoderIOFactoryUrl::takeInput(void)
 
 void DecoderIOFactoryUrl::start(void)
 {
-    VERBOSE(VB_PLAYBACK, QString("DecoderIOFactory: Url %1").arg(getUrl().toString()));
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("DecoderIOFactory: Url %1").arg(getUrl().toString()));
 
     m_started = false;
 
@@ -189,7 +191,9 @@ void DecoderIOFactoryUrl::replyFinished(QNetworkReply *reply)
 
     if (!possibleRedirectUrl.isEmpty() && (m_redirectedURL != possibleRedirectUrl))
     {
-        VERBOSE(VB_PLAYBACK, QString("DecoderIOFactory: Got redirected to %1").arg(possibleRedirectUrl));
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("DecoderIOFactory: Got redirected to %1")
+                .arg(possibleRedirectUrl));
 
         m_redirectCount++;
 
@@ -227,7 +231,11 @@ void DecoderIOFactoryUrl::readyRead(void)
         doStart();
     }
 
-//    VERBOSE(VB_IMPORTANT, QString("DecoderIOFactoryUrl::readyRead file size: %1").arg(m_bytesWritten));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("DecoderIOFactoryUrl::readyRead file size: %1")
+            .arg(m_bytesWritten));
+#endif
 }
 
 void DecoderIOFactoryUrl::doStart(void)
@@ -277,9 +285,8 @@ void DecoderHandler::start(Metadata *mdata)
     if (m_state == LOADING && result)
     {
         for (int ii = 0; ii < m_playlist.size(); ii++)
-            VERBOSE(VB_PLAYBACK, QString("Track %1 = %2")
-                .arg(ii)
-                .arg(m_playlist.get(ii)->File()));
+            LOG(VB_PLAYBACK, LOG_INFO, QString("Track %1 = %2")
+                .arg(ii) .arg(m_playlist.get(ii)->File()));
         next();
     }
     else
@@ -334,7 +341,7 @@ bool DecoderHandler::next(void)
     else
         url.setUrl(entry->File());
 
-    VERBOSE(VB_PLAYBACK, QString("Now playing '%1'").arg(url.toString()));
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Now playing '%1'").arg(url.toString()));
 
     deleteIOFactory();
     createIOFactory(url);
@@ -353,7 +360,7 @@ bool DecoderHandler::next(void)
 
 void DecoderHandler::stop(void)
 {
-    VERBOSE(VB_PLAYBACK, QString("DecoderHandler: Stopping decoder"));
+    LOG(VB_PLAYBACK, LOG_INFO, QString("DecoderHandler: Stopping decoder"));
 
     if (m_decoder && m_decoder->isRunning())
     {
@@ -395,7 +402,9 @@ void DecoderHandler::customEvent(QEvent *e)
 bool DecoderHandler::createPlaylist(const QUrl &url)
 {
     QString extension = QFileInfo(url.path()).suffix();
-    VERBOSE (VB_NETWORK, QString ("File %1 has extension %2").arg (url.fileName()).arg(extension));
+    LOG(VB_NETWORK, LOG_INFO,
+        QString("File %1 has extension %2")
+            .arg(url.fileName()).arg(extension));
 
     if (extension == "pls" || extension == "m3u")
     {
@@ -436,7 +445,8 @@ bool DecoderHandler::createPlaylistFromFile(const QUrl &url)
 
 bool DecoderHandler::createPlaylistFromRemoteUrl(const QUrl &url) 
 {
-    VERBOSE(VB_NETWORK, QString("Retrieving playlist from '%1'").arg(url.toString()));
+    LOG(VB_NETWORK, LOG_INFO,
+        QString("Retrieving playlist from '%1'").arg(url.toString()));
 
     doOperationStart("Retrieving playlist");
 
@@ -480,7 +490,8 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
 
 void DecoderHandler::doFailed(const QUrl &url, const QString &message)
 {
-    VERBOSE(VB_NETWORK, QString("DecoderHandler: Unsupported file format: '%1' - %2")
+    LOG(VB_NETWORK, LOG_ERR,
+        QString("DecoderHandler: Unsupported file format: '%1' - %2")
             .arg(url.toString()).arg(message));
     DecoderHandlerEvent ev(DecoderHandlerEvent::Error, new QString(message));
     dispatch(ev);

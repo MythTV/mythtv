@@ -955,7 +955,7 @@ void MusicCommon::customEvent(QEvent *event)
 
         OutputEvent *aoe = (OutputEvent *) event;
 
-        VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*aoe->errorMessage()));
         //TODO change to mythui
         MythPopupBox::showOkPopup(GetMythMainWindow(),
@@ -994,7 +994,7 @@ void MusicCommon::customEvent(QEvent *event)
 
         DecoderEvent *dxe = (DecoderEvent *) event;
 
-        VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*dxe->errorMessage()));
 
         ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")

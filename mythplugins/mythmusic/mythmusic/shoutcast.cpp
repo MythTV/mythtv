@@ -241,8 +241,9 @@ void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)
             assign_index++;
         }
         else
-            VERBOSE(VB_IMPORTANT, QString("ShoutCastMetaParser: malformed metaformat '%1'")
-                                          .arg(m_meta_format));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("ShoutCastMetaParser: malformed metaformat '%1'")
+                    .arg(m_meta_format));
 
         pos = m_meta_format.indexOf("%", pos);
     }
@@ -271,9 +272,10 @@ ShoutCastMetaMap ShoutCastMetaParser::parseMeta(QString meta)
         rx.setPattern(m_meta_format);
         if (rx.indexIn(title) != -1)
         {
-            VERBOSE(VB_PLAYBACK, QString("ShoutCast: Meta     : '%1'")
+            LOG(VB_PLAYBACK, LOG_INFO, QString("ShoutCast: Meta     : '%1'")
                     .arg(meta));
-            VERBOSE(VB_PLAYBACK, QString("ShoutCast: Parsed as: '%1' by '%2'")
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("ShoutCast: Parsed as: '%1' by '%2'")
                     .arg(rx.cap(m_meta_title_pos))
                     .arg(rx.cap(m_meta_artist_pos)));
 
@@ -357,7 +359,7 @@ qint64 ShoutCastIODevice::readData(char *data, qint64 maxlen)
 
     if (m_buffer->readBufAvail() == 0)
     {
-        VERBOSE(VB_PLAYBACK, "ShoutCastIODevice: No data in buffer!!");
+        LOG(VB_PLAYBACK, LOG_ERR, "ShoutCastIODevice: No data in buffer!!");
         switchToState(STOPPED);
         return -1;
     }
@@ -380,14 +382,16 @@ qint64 ShoutCastIODevice::readData(char *data, qint64 maxlen)
     }
 
     if (m_state != STOPPED) 
-        VERBOSE(VB_NETWORK, QString("ShoutCastIODevice: %1 kb in buffer, btnm=%2/%3 state=%4, len=%5")
+        LOG(VB_NETWORK, LOG_INFO,
+            QString("ShoutCastIODevice: %1 kb in buffer, btnm=%2/%3 "
+                    "state=%4, len=%5")
                 .arg(m_buffer->readBufAvail() / 1024, 4)
                 .arg(m_bytesTillNextMeta, 4)
                 .arg(m_response->getMetaint())
                 .arg(stateString (m_state))
                 .arg(maxlen));
     else
-        VERBOSE(VB_NETWORK, QString("ShoutCastIODevice: stopped"));
+        LOG(VB_NETWORK, LOG_INFO, QString("ShoutCastIODevice: stopped"));
 
     return maxlen;
 }
@@ -404,18 +408,20 @@ qint64 ShoutCastIODevice::bytesAvailable(void) const
 
 void ShoutCastIODevice::socketHostFound(void)
 {
-    VERBOSE(VB_NETWORK, "ShoutCastIODevice: Host Found");
+    LOG(VB_NETWORK, LOG_ERR, "ShoutCastIODevice: Host Found");
     switchToState(CONNECTING);
 }
 
 void ShoutCastIODevice::socketConnected(void)
 {
-    VERBOSE(VB_NETWORK, "ShoutCastIODevice: Connected");
+    LOG(VB_NETWORK, LOG_INFO, "ShoutCastIODevice: Connected");
     switchToState(CONNECTED);
 
     ShoutCastRequest request(m_url);
     qint64 written = m_socket->write(request.data(), request.size());
-    VERBOSE(VB_NETWORK, QString("ShoutCastIODevice: Sending Request, %1 of %2 bytes").arg(written).arg(request.size()));
+    LOG(VB_NETWORK, LOG_INFO,
+        QString("ShoutCastIODevice: Sending Request, %1 of %2 bytes")
+            .arg(written).arg(request.size()));
 
     if (written != request.size())
     {
@@ -435,7 +441,7 @@ void ShoutCastIODevice::socketConnected(void)
 
 void ShoutCastIODevice::socketConnectionClosed(void)
 {
-    VERBOSE(VB_NETWORK, "ShoutCastIODevice: Connection Closed");
+    LOG(VB_NETWORK, LOG_INFO, "ShoutCastIODevice: Connection Closed");
     switchToState(STOPPED);
 }
 
@@ -474,19 +480,21 @@ void ShoutCastIODevice::socketReadyRead(void)
             {
                 if (++m_redirects > MAX_REDIRECTS)
                 {
-                    VERBOSE (VB_NETWORK, QString("Too many redirects"));
+                    LOG(VB_NETWORK, LOG_ERR, QString("Too many redirects"));
                     switchToState(STOPPED);
                 }
                 else
                 {
-                    VERBOSE (VB_NETWORK, QString("Redirect to %1").arg(m_response->getLocation()));
+                    LOG(VB_NETWORK, LOG_INFO, QString("Redirect to %1")
+                            .arg(m_response->getLocation()));
                     connectToUrl(m_url);
                     return;
                 }
             }
             else
             {
-                VERBOSE (VB_NETWORK, QString("Unknown response status %1").arg(m_response->getStatus ()));
+                LOG(VB_NETWORK, LOG_ERR, QString("Unknown response status %1")
+                        .arg(m_response->getStatus()));
                 switchToState(STOPPED);
             }
         }
@@ -497,7 +505,8 @@ void ShoutCastIODevice::socketBytesWritten(qint64)
 {
     qint64 written = m_socket->write(m_scratchpad.data() + m_scratchpad_pos,
                                      m_scratchpad.size() - m_scratchpad_pos);
-    VERBOSE(VB_NETWORK, QString ("ShoutCastIO: %1 bytes written").arg(written));
+    LOG(VB_NETWORK, LOG_INFO,
+        QString("ShoutCastIO: %1 bytes written").arg(written));
 
     m_scratchpad_pos += written;
     if (m_scratchpad_pos == m_scratchpad.size())
@@ -513,23 +522,27 @@ void ShoutCastIODevice::socketError(QAbstractSocket::SocketError error)
     switch (error)
     {
         case QAbstractSocket::ConnectionRefusedError:
-            VERBOSE(VB_NETWORK, "ShoutCastIODevice: Error Connection Refused");
+            LOG(VB_NETWORK, LOG_ERR,
+                "ShoutCastIODevice: Error Connection Refused");
             switchToState(CANT_CONNECT);
             break;
         case QAbstractSocket::RemoteHostClosedError:
-            VERBOSE(VB_NETWORK, "ShoutCastIODevice: Error Remote Host Closed The Connection");
+            LOG(VB_NETWORK, LOG_ERR,
+                "ShoutCastIODevice: Error Remote Host Closed The Connection");
             switchToState(CANT_CONNECT);
             break;
         case QAbstractSocket::HostNotFoundError:
-            VERBOSE(VB_NETWORK, "ShoutCastIODevice: Error Host Not Found"); 
+            LOG(VB_NETWORK, LOG_ERR,
+                "ShoutCastIODevice: Error Host Not Found");
             switchToState(CANT_RESOLVE);
             break;
         case QAbstractSocket::SocketTimeoutError:
-            VERBOSE(VB_NETWORK, "ShoutCastIODevice: Error Socket Timeout");
+            LOG(VB_NETWORK, LOG_ERR, "ShoutCastIODevice: Error Socket Timeout");
             switchToState(STOPPED);
             break;
         default:
-            VERBOSE(VB_NETWORK, QString("ShoutCastIODevice: Got socket error '%1'")
+            LOG(VB_NETWORK, LOG_ERR,
+                QString("ShoutCastIODevice: Got socket error '%1'")
                     .arg(errorString()));
             switchToState(STOPPED);
             break;
@@ -541,7 +554,7 @@ void ShoutCastIODevice::switchToState(const State &state)
     switch (state) 
     {
         case PLAYING:
-            VERBOSE(VB_PLAYBACK, QString ("Playing %1 (%2) at %3 kbps")
+            LOG(VB_PLAYBACK, LOG_INFO, QString("Playing %1 (%2) at %3 kbps")
                 .arg(m_response->getName())
                 .arg(m_response->getGenre())
                 .arg(m_response->getBitrate()));
@@ -568,11 +581,13 @@ bool ShoutCastIODevice::parseHeader(void)
     m_buffer->read(data, available, false);
     int consumed = m_response->fillResponse(data.data(), data.size());
 
-    VERBOSE(VB_NETWORK, QString ("ShoutCastIODevice: Receiving header, %1 bytes").arg(consumed));
+    LOG(VB_NETWORK, LOG_INFO,
+        QString("ShoutCastIODevice: Receiving header, %1 bytes").arg(consumed));
     {
         QString tmp;
         tmp = QString::fromAscii(data.data(), consumed);
-        VERBOSE(VB_NETWORK, QString ("ShoutCastIODevice: Receiving header\n%1").arg(tmp));
+        LOG(VB_NETWORK, LOG_INFO,
+            QString("ShoutCastIODevice: Receiving header\n%1").arg(tmp));
     }
 
     m_buffer->remove(0, consumed);
@@ -613,12 +628,15 @@ bool ShoutCastIODevice::parseMeta(void)
     // sanity check 
     if (meta_size > MAX_ALLOWED_META_SIZE)
     {
-        VERBOSE(VB_PLAYBACK, QString ("ShoutCastIODevice: Error in stream, got a meta size of %1").arg(meta_size));
+        LOG(VB_PLAYBACK, LOG_ERR,
+            QString("ShoutCastIODevice: Error in stream, got a meta size of %1")
+                .arg(meta_size));
         switchToState(STOPPED);
         return false;
     }
 
-    VERBOSE(VB_NETWORK, QString("ShoutCastIODevice: Reading %1 bytes of meta").arg(meta_size));
+    LOG(VB_NETWORK, LOG_INFO,
+        QString("ShoutCastIODevice: Reading %1 bytes of meta").arg(meta_size));
 
     // read metadata from our buffer
     data.clear();
@@ -627,7 +645,9 @@ bool ShoutCastIODevice::parseMeta(void)
     // sanity check, check we have enough data
     if (meta_size > data.size())
     {
-        VERBOSE(VB_PLAYBACK, QString ("ShoutCastIODevice: Not enough data, we have %1, but the metadata size is %1")
+        LOG(VB_PLAYBACK, LOG_ERR,
+            QString("ShoutCastIODevice: Not enough data, we have %1, but the "
+                    "metadata size is %1")
                 .arg(data.size()).arg(meta_size));
         switchToState(STOPPED);
         return false;
@@ -694,7 +714,8 @@ void DecoderIOFactoryShoutCast::closeIODevice(void)
 
 void DecoderIOFactoryShoutCast::start(void)
 {
-    VERBOSE(VB_PLAYBACK, QString("DecoderIOFactoryShoutCast %1").arg(getUrl().toString()));
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("DecoderIOFactoryShoutCast %1").arg(getUrl().toString()));
     doOperationStart("Connecting");
 
     makeIODevice();
@@ -725,8 +746,10 @@ void DecoderIOFactoryShoutCast::periodicallyCheckResponse(void)
         ShoutCastResponse response;
         m_input->getResponse(response);
         m_prebuffer = PREBUFFER_SECS * response.getBitrate() * 125; // 125 = 1000/8 (kilo, bits...)
-        VERBOSE(VB_NETWORK, QString("kbps is %1, prebuffering %2 secs = %3 kb")
-                .arg(response.getBitrate()).arg(PREBUFFER_SECS).arg(m_prebuffer/1024));
+        LOG(VB_NETWORK, LOG_INFO,
+            QString("kbps is %1, prebuffering %2 secs = %3 kb")
+                .arg(response.getBitrate()).arg(PREBUFFER_SECS)
+                .arg(m_prebuffer/1024));
         m_timer->stop();
         m_timer->disconnect();
         connect(m_timer, SIGNAL(timeout()), this, SLOT(periodicallyCheckBuffered()));
@@ -741,15 +764,17 @@ void DecoderIOFactoryShoutCast::periodicallyCheckResponse(void)
 
 void DecoderIOFactoryShoutCast::periodicallyCheckBuffered(void)
 {
-    VERBOSE(VB_NETWORK, QString("DecoderIOFactoryShoutCast: prebuffered %1/%2KB")
-        .arg(m_input->bytesAvailable()/1024).arg(m_prebuffer/1024));
+    LOG(VB_NETWORK, LOG_INFO,
+        QString("DecoderIOFactoryShoutCast: prebuffered %1/%2KB")
+            .arg(m_input->bytesAvailable()/1024).arg(m_prebuffer/1024));
 
     if (m_input->bytesAvailable() < m_prebuffer || m_input->bytesAvailable() == 0)
         return;
 
     ShoutCastResponse response;
     m_input->getResponse(response);
-    VERBOSE(VB_PLAYBACK, QString("contents '%1'").arg(response.getContent()));
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("contents '%1'").arg(response.getContent()));
     if (response.getContent() == "audio/mpeg")
         doConnectDecoder("create-mp3-decoder.mp3");
     else if (response.getContent() == "audio/aacp")
@@ -766,7 +791,8 @@ void DecoderIOFactoryShoutCast::periodicallyCheckBuffered(void)
 
 void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
 {
-    VERBOSE(VB_PLAYBACK, QString("DecoderIOFactoryShoutCast: metadata changed - %1")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("DecoderIOFactoryShoutCast: metadata changed - %1")
             .arg(metadata));
     ShoutCastMetaParser parser;
     parser.setMetaFormat(getMetadata().CompilationArtist());
@@ -785,7 +811,8 @@ void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
 
 void DecoderIOFactoryShoutCast::shoutcastChangedState(ShoutCastIODevice::State state)
 {
-    VERBOSE(VB_PLAYBACK, QString ("ShoutCast changed state to %1").arg(ShoutCastIODevice::stateString (state)));
+    LOG(VB_PLAYBACK, LOG_INFO, QString("ShoutCast changed state to %1")
+            .arg(ShoutCastIODevice::stateString (state)));
     if (state == ShoutCastIODevice::RESOLVING)
         doOperationStart("Finding radio");
 

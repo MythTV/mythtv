@@ -353,8 +353,9 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
             // 100 bytes of data (1x1 indexed gif is 35 bytes)
             if (frame->picture().size() < 100)
             {
-                VERBOSE(VB_GENERAL, "Music Scanner - Discarding APIC frame "
-                                    "with size less than 100 bytes");
+                LOG(VB_GENERAL, LOG_NOTICE,
+                    "Music Scanner - Discarding APIC frame "
+                    "with size less than 100 bytes");
                 continue;
             }
 
@@ -392,8 +393,8 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
                     art->filename = QString("unknown") + ext;
                     break;
                 default:
-                    VERBOSE(VB_GENERAL, "Music Scanner - APIC tag found "
-                                        "with unsupported type");
+                    LOG(VB_GENERAL, LOG_ERR, "Music Scanner - APIC tag found "
+                                             "with unsupported type");
                     continue;
             }
 
@@ -415,7 +416,8 @@ QString MetaIOID3::getExtFromMimeType(const QString &mimeType)
     else if (mimeType == "image/bmp")
         return QString(".bmp");
 
-    VERBOSE(VB_GENERAL, QString("Music Scanner - Unknow image mimetype found - %1").arg(mimeType));
+    LOG(VB_GENERAL, LOG_ERR,
+        "Music Scanner - Unknown image mimetype found - " + mimeType);
 
     return QString();
 }

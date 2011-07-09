@@ -655,8 +655,8 @@ void Metadata::setField(const QString &field, const QString &data)
 
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Something asked me to set data "
-                              "for a field called %1").arg(field));
+        LOG(VB_GENERAL, LOG_ERR, QString("Something asked me to set data "
+                                         "for a field called %1").arg(field));
     }
 }
 
@@ -672,8 +672,8 @@ void Metadata::getField(const QString &field, QString *data)
         *data = m_genre;
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Something asked me to return data "
-                              "about a field called %1").arg(field));
+        LOG(VB_GENERAL, LOG_ERR, QString("Something asked me to return data "
+                                         "about a field called %1").arg(field));
         *data = "I Dunno";
     }
 }
@@ -1122,8 +1122,8 @@ void AllMusic::resync()
     }
     else
     {
-         VERBOSE(VB_IMPORTANT, "MythMusic hasn't found any tracks! "
-                               "That's ok with me if it's ok with you.");
+         LOG(VB_GENERAL, LOG_ERR, "MythMusic hasn't found any tracks! "
+                                  "That's ok with me if it's ok with you.");
     }
 
     //  Build a tree to reflect current state of
@@ -1355,8 +1355,9 @@ void AllMusic::setSorting(QString a_paths)
             *it != "album"        &&
             *it != "title")
         {
-            VERBOSE(VB_IMPORTANT, QString("AllMusic::setSorting() "
-                    "Unknown tree level '%1'").arg(*it));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("AllMusic::setSorting() Unknown tree level '%1'")
+                    .arg(*it));
         }
     }
 }
@@ -1774,7 +1775,8 @@ void AlbumArtImages::dumpToDatabase(void)
     // sanity check we have a valid songid and directoryid
     if (trackID == 0 || directoryID == -1)
     {
-        VERBOSE(VB_ALL, "AlbumArtImages: Asked to save to the DB but have invalid songid or directoryid");
+        LOG(VB_GENERAL, LOG_ERR, "AlbumArtImages: Asked to save to the DB but "
+                                 "have invalid songid or directoryid");
         return;
     }
 
