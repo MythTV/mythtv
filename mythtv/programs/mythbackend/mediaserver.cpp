@@ -242,7 +242,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
 
     }
 
-    VERBOSE(VB_UPNP, "MediaServer:Init:End");
+    LOG(VB_UPNP, LOG_INFO, "MediaServer:Init:End");
 }
 
 //////////////////////////////////////////////////////////////////////////////
