@@ -3373,7 +3373,7 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
     typedef QList<MythGenericTree *> MGTreeChildList;
     MGTreeChildList *lchildren = node->getAllChildren();
 
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GENERAL, LOG_DEBUG,
         QString("Fetching details in %1").arg(node->getString()));
 
     for (MGTreeChildList::const_iterator p = lchildren->begin();
