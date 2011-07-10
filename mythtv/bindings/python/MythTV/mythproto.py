@@ -139,7 +139,7 @@ class BECache( object ):
     def __del__(self):
         # downref block of shutdown
         # issue command to backend if needed
-        print 'destructing BECache'
+        #print 'destructing BECache'
         if self.blockshutdown:
             self._conn.blockshutdown -= 1
             if not self._conn.blockshutdown:
@@ -556,7 +556,7 @@ class RecordFileTransfer( FileTransfer ):
                           self.starttime.isoformat()),
                       'empty']))
             return self.re_update
-        match = self.re_update(event)
+        match = self.re_update.match(event)
         self._size = int(match.group('size'))
 
     def __init__(self, host, filename, sgroup, mode,
@@ -1002,12 +1002,13 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
                     (self.chanid, self.recstartts.isoformat()))
 
 
-class EventLock( BEEvent ):
+class EventLock( BECache ):
+    event = None
     def __init__(self, regex, backend=None, db=None):
         self.regex = regex
         self._lock = allocate_lock()
         self._lock.acquire()
-        BEEvent.__init__(self, backend, db=db)
+        super(EventLock, self).__init__(backend, False, True, db)
 
     def _listhandlers(self):
         return [self._unlock]
@@ -1017,6 +1018,7 @@ class EventLock( BEEvent ):
             return self.regex
         self._lock.release()
         self._events = []
+        self.event = event
 
     def wait(self, blocking=True):
         res = self._lock.acquire(blocking)

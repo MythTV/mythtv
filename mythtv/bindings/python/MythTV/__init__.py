@@ -18,8 +18,7 @@ __all_data__        = ['Record', 'Recorded', 'RecordedProgram', 'OldRecorded', \
                        'MusicPlaylist', 'MusicDirectory']
 
 __all_method__      = ['MythBE', 'BEEventMonitor', 'MythSystemEvent', \
-                       'Frontend', 'MythDB', 'MythVideo', \
-                       'MythXML', 'MythMusic']
+                       'Frontend', 'MythDB', 'MythXML', 'MythMusic']
 
 __all__             = ['static', 'MSearch', 'MythLog', 'StorageGroup']\
                         +__all_exceptions__\

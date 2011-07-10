@@ -11,7 +11,7 @@ from connections import FEConnection, XMLConnection, BEEventConnection
 from utility import databaseSearch, datetime
 from database import DBCache, DBData
 from system import SystemEvent
-from mythproto import BECache, FileOps, Program, FreeSpace
+from mythproto import BECache, FileOps, Program, FreeSpace, EventLock
 from dataheap import *
 
 from datetime import timedelta
@@ -887,6 +887,103 @@ class MythDB( DBCache ):
         port = self.settings[host].NetworkControlPort
         return Frontend(host,port)
 
+    def scanVideos(self):
+        """
+        obj.scanVideo() --> list of new, moved, and deleted Videos
+        """
+        startvids = dict([(vid.intid, vid) for vid in Video.getAllEntries(db=self)])
+
+        be = MythBE(db=self)
+        r = re.compile(re.escape(BACKEND_SEP).\
+                join(['BACKEND_MESSAGE',
+                      '(VIDEO_LIST(_NO)?_CHANGE)',
+                      '(.*)']))
+        lock = EventLock(r, db=self)
+
+        be.backendCommand("SCAN_VIDEOS")
+        lock.wait()
+
+        newvids = []
+        movvids = []
+        oldvids = []
+
+        match = r.match(lock.event)
+        if match.group(1) == "VIDEO_LIST_CHANGE":
+            for entry in match.group(3).split(BACKEND_SEP):
+                type,intid = entry.split('::')
+                intid = int(intid)
+                if type == 'added':
+                    newvids.append(Video(intid))
+                elif type == 'moved':
+                    v = startvids[intid]
+                    v._pull()
+                    movvids.append(v)
+                elif type == 'deleted':
+                    oldvids.append(startvids[intid])
+
+        return newvids,movvids,oldvids
+
+    def searchVideos(self, init=False, key=None, value=None):
+        """
+        obj.searchVideos(**kwargs) -> list of Video objects
+
+        Supports the following keywords:
+            title, subtitle, season, episode, host, director, year, cast,
+            genre, country, category, insertedbefore, insertedafter, custom
+        """
+        if init:
+            init.table = 'videometadata'
+            init.handler = Video
+            init.joins = (init.Join(table='videometadatacast',
+                                    tableto='videometadata',
+                                    fieldsfrom=('idvideo',),
+                                    fieldsto=('intid',)),
+                          init.Join(table='videocast',
+                                    tableto='videometadatacast',
+                                    fieldsfrom=('intid',),
+                                    fieldsto=('idcast',)),
+                          init.Join(table='videometadatagenre',
+                                    tableto='videometadata',
+                                    fieldsfrom=('idvideo',),
+                                    fieldsto=('intid',)),
+                          init.Join(table='videogenre',
+                                    tableto='videometadatagenre',
+                                    fieldsfrom=('intid',),
+                                    fieldsto=('idgenre',)),
+                          init.Join(table='videometadatacountry',
+                                    tableto='videometadata',
+                                    fieldsfrom=('idvideo',),
+                                    fieldsto=('intid',)),
+                          init.Join(table='videocountry',
+                                    tableto='videometadatacountry',
+                                    fieldsfrom=('intid',),
+                                    fieldsto=('idcountry',)),
+                          init.Join(table='videocategory',
+                                    tableto='videometadata',
+                                    fieldsfrom=('intid',),
+                                    fieldsto=('category',)))
+
+        if key in ('title','subtitle','season','episode','host',
+                        'director','year'):
+            return('videometadata.%s=%%s' % key, value, 0)
+        vidref = {'cast':(2,0), 'genre':(8,2), 'country':(32,4)}
+        if key in vidref:
+            return ('video%s.%s' % (key,key),
+                    'videometadata%s' % key,
+                    vidref[key][0],
+                    vidref[key][1])
+        if key == 'category':
+            return ('videocategory.%s=%%s' % key, value, 64)
+        if key == 'exactfile':
+            return ('videometadata.filename=%s', value, 0)
+        if key == 'file':
+            return ('videometadata.filename LIKE %s', '%'+value, 0)
+        if key == 'insertedbefore':
+            return ('videometadata.insertdate<%s', value, 0)
+        if key == 'insertedafter':
+            return ('videometadata.insertdate>%s', value, 0)
+        return None
+
     def getRecorded(self, title=None, subtitle=None, chanid=None,
                         starttime=None, progstart=None):
         """legacy - do not use"""
@@ -1047,159 +1144,6 @@ class MythXML( XMLConnection ):
         if secsin: args['SecsIn'] = secsin
 
         return self._result('Content/GetPreviewImage', **args).read()
-
-class MythVideo( VideoSchema, DBCache ):
-    """
-    Provides convenient methods to access the MythTV MythVideo database.
-    """
-    def scanStorageGroups(self, deleteold=True):
-        """
-        obj.scanStorageGroups(deleteold=True) ->
-                            tuple of (new videos, missing videos)
-
-        If deleteold is true, missing videos will be automatically
-            deleted from videometadata, as well as any matching 
-            country, cast, genre or markup data.
-        """
-        # pull available hosts
-        groups = self.getStorageGroup(groupname='Videos')
-        newvids = {}
-
-        # pull available types
-        with self.cursor(self.log) as cursor:
-            cursor.execute("""SELECT extension
-                              FROM videotypes
-                              WHERE f_ignore=False""")
-            extensions = [a[0].lower() for a in cursor]
-
-        # connect to backends
-        befilter = ['',None]
-        backends = {}
-        for sg in groups:
-            hostname = sg.hostname
-            if hostname not in backends:
-                try:
-                    backends[hostname] = MythBE(backend=hostname, db=self)
-                    newvids[hostname] = []
-                except:
-                    befilter.append(hostname)
-
-        # filter existing videos on reachable backends, index by file path
-        curvids = dict([(vid.filename, vid) \
-                        for vid in Video.getAllEntries(self) \
-                        if vid.host not in befilter])
-
-        # loop through all accessible backends
-        for hostname, be in backends.iteritems():
-            folders = be.walkSG(hostname, 'Videos', '/')
-            # loop through each folder
-            for sgfold in folders:
-                prepend = ''
-                if sgfold[0] != '/':
-                    prepend = '%s/' % sgfold[0][1:]
-                # loop through each file
-                for sgfile in sgfold[2]:
-                    # filter by extension
-                    if sgfile.rsplit('.',1)[-1].lower() not in extensions:
-                        continue
-
-                    tpath = prepend+sgfile
-                    # existing file in existing location
-                    if tpath in curvids:
-                        # update if moved to alternate host
-                        if hostname != curvids[tpath].host:
-                            curvids[tpath].update({'host':hostname})
-                        del curvids[tpath]
-                    else:
-                        newvids[hostname].append(tpath)
-
-        # re-index by hash value
-        curvids = dict([(vid.hash, vid) for vid in curvids.itervalues()])
-
-        # loop through unmatched videos for missing files
-        newvidlist = []
-        for hostname in newvids:
-            be = MythBE(backend=hostname, db=self)
-            for tpath in newvids[hostname]:
-                thash = be.getHash(tpath, 'Videos')
-                if thash in curvids:
-                    #print 'matching hash: '+tpath
-                    curvids[thash].update({'filename':tpath})
-                    del curvids[thash]
-                else:
-                    vid = Video.fromFilename(tpath, self)
-                    vid.host = hostname
-                    vid.hash = thash
-                    newvidlist.append(vid)
-
-        if deleteold:
-            for vid in curvids.values():
-                vid.delete()
-
-        return (newvidlist, curvids.values())
-
-    @databaseSearch
-    def searchVideos(self, init=False, key=None, value=None):
-        """
-        obj.searchVideos(**kwargs) -> list of Video objects
-
-        Supports the following keywords:
-            title, subtitle, season, episode, host, director, year, cast,
-            genre, country, category, insertedbefore, insertedafter, custom
-        """
-
-        if init:
-            init.table = 'videometadata'
-            init.handler = Video
-            init.joins = (init.Join(table='videometadatacast',
-                                    tableto='videometadata',
-                                    fieldsfrom=('idvideo',),
-                                    fieldsto=('intid',)),
-                          init.Join(table='videocast',
-                                    tableto='videometadatacast',
-                                    fieldsfrom=('intid',),
-                                    fieldsto=('idcast',)),
-                          init.Join(table='videometadatagenre',
-                                    tableto='videometadata',
-                                    fieldsfrom=('idvideo',),
-                                    fieldsto=('intid',)),
-                          init.Join(table='videogenre',
-                                    tableto='videometadatagenre',
-                                    fieldsfrom=('intid',),
-                                    fieldsto=('idgenre',)),
-                          init.Join(table='videometadatacountry',
-                                    tableto='videometadata',
-                                    fieldsfrom=('idvideo',),
-                                    fieldsto=('intid',)),
-                          init.Join(table='videocountry',
-                                    tableto='videometadatacountry',
-                                    fieldsfrom=('intid',),
-                                    fieldsto=('idcountry',)),
-                          init.Join(table='videocategory',
-                                    tableto='videometadata',
-                                    fieldsfrom=('intid',),
-                                    fieldsto=('category',)))
-
-        if key in ('title','subtitle','season','episode','host',
-                        'director','year'):
-            return('videometadata.%s=%%s' % key, value, 0)
-        vidref = {'cast':(2,0), 'genre':(8,2), 'country':(32,4)}
-        if key in vidref:
-            return ('video%s.%s' % (key,key),
-                    'videometadata%s' % key,
-                    vidref[key][0],
-                    vidref[key][1])
-        if key == 'category':
-            return ('videocategory.%s=%%s' % key, value, 64)
-        if key == 'exactfile':
-            return ('videometadata.filename=%s', value, 0)
-        if key == 'file':
-            return ('videometadata.filename LIKE %s', '%'+value, 0)
-        if key == 'insertedbefore':
-            return ('videometadata.insertdate<%s', value, 0)
-        if key == 'insertedafter':
-            return ('videometadata.insertdate>%s', value, 0)
-        return None
 
 class MythMusic( MusicSchema, DBCache ):
     """
