@@ -575,19 +575,6 @@ class Frontend( FEConnection ):
         self.jump = self._Jump(self)
         self.key = self._Key(self)
 
-    def sendJump(self,jumppoint): 
-        """legacy - do not use"""
-        return self.jump[jumppoint]
-    def getJump(self):  
-        """legacy - do not use"""
-        return self.jump.list()
-    def sendKey(self,key):  
-        """legacy - do not use"""
-        return self.key[key]
-    def getKey(self):  
-        """legacy - do not use"""
-        return self.key.list()
-
     def sendQuery(self,query): return self.send('query', query)
     def getQuery(self): return self.send('query')
     def sendPlay(self,play): return self.send('play', play)
@@ -984,20 +971,12 @@ class MythDB( DBCache ):
             return ('videometadata.insertdate>%s', value, 0)
         return None
 
-    def getRecorded(self, title=None, subtitle=None, chanid=None,
-                        starttime=None, progstart=None):
+class MythVideo( MythDB ):
+    """legacy - do not use"""
+    def scanStorageGroups(self, delete=True):
         """legacy - do not use"""
-        records = self.searchRecorded(title=title, subtitle=subtitle,\
-                            chanid=chanid, starttime=starttime,\
-                            progstart=progstart)
-        try:
-            return records.next()
-        except StopIteration:
-            return None
-
-    def getChannels(self):
-        """legacy - do not use"""
-        return Channel.getAllEntries()
+        added, moved, deleted = scanVideos()
+        return (added, deleted)
 
 class MythXML( XMLConnection ):
     """

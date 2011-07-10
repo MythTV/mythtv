@@ -361,10 +361,6 @@ class Grabber( System ):
                 args = (inetref,)
         return self.command('-D', *args).next()
 
-    def grabTitle(self, title, subtitle):
-        """legacy - do not use"""
-        return self.search(title, subtitle)
-
 class SystemEvent( System ):
     """
     SystemEvent(eventname, db=None) -> SystemEvent object
