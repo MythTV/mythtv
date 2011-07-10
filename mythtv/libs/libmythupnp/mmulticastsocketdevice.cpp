@@ -41,12 +41,8 @@
 #include "mmulticastsocketdevice.h"
 #include "mythlogging.h"
 
-#define LOC      (QString("MMulticastSocketDevice(%1:%2): ") \
-                  .arg(m_address.toString()).arg(socket()))
-#define LOC_WARN (QString("MMulticastSocketDevice(%1:%2) Warning: ") \
-                  .arg(m_address.toString()).arg(socket()))
-#define LOC_ERR  (QString("MMulticastSocketDevice(%1:%2) Error: ") \
-                  .arg(m_address.toString()).arg(socket()))
+#define LOC      QString("MMulticastSocketDevice(%1:%2): ") \
+                     .arg(m_address.toString()).arg(socket())
 
 MMulticastSocketDevice::MMulticastSocketDevice(
     QString sAddress, quint16 nPort, u_char ttl) :
@@ -69,19 +65,19 @@ MMulticastSocketDevice::MMulticastSocketDevice(
     if (setsockopt(socket(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
                    &m_imr, sizeof( m_imr )) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, "setsockopt - IP_ADD_MEMBERSHIP " + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "setsockopt - IP_ADD_MEMBERSHIP " + ENO);
     }
 
     if (setsockopt(socket(), IPPROTO_IP, IP_MULTICAST_TTL,
                    &ttl, sizeof(ttl)) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, "setsockopt - IP_MULTICAST_TTL " + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "setsockopt - IP_MULTICAST_TTL " + ENO);
     }
 
     setAddressReusable(true);
 
     if (bind(m_address, m_port) < 0)
-        LOG(VB_GENERAL, LOG_ERR, "bind failed " + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "bind failed " + ENO);
 }
 
 MMulticastSocketDevice::~MMulticastSocketDevice()
@@ -92,7 +88,8 @@ MMulticastSocketDevice::~MMulticastSocketDevice()
     {
         // This isn't really an error, we will drop out of
         // the group anyway when we close the socket.
-        LOG(VB_GENERAL, LOG_DEBUG, "setsockopt - IP_DROP_MEMBERSHIP " + ENO);
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "setsockopt - IP_DROP_MEMBERSHIP " +
+            ENO);
     }
 }
 
@@ -119,7 +116,7 @@ qint64 MMulticastSocketDevice::writeBlock(
                        &interface_addr, sizeof(interface_addr));
             retx = MSocketDevice::writeBlock(data, len, host, port);
 #if 0
-            LOG(VB_GENERAL, LOG_DEBUG, QString("writeBlock on %1 %2")
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("writeBlock on %1 %2")
                     .arg((*it).toString()).arg((retx==(int)len)?"ok":"err"));
 #endif
             usleep(5000 + (rand() % 5000));

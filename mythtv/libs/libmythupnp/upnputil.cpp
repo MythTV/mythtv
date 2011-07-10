@@ -98,7 +98,7 @@ long GetIPAddressList(QStringList &sStrList)
 
     if (getifaddrs(&list) == -1)
     {
-        LOG(VB_UPNP, LOG_ERR, "getifaddrs failed: " + ENO);
+        LOG(VB_UPNP, LOG_ERR, LOC + "getifaddrs failed: " + ENO);
         return 0;
     }
 
@@ -120,13 +120,13 @@ long GetIPAddressList(QStringList &sStrList)
                       &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
                       address, sizeof(address)) == NULL)
         {
-            LOG(VB_UPNP, LOG_ERR, "inet_ntop failed: " + ENO);
+            LOG(VB_UPNP, LOG_ERR, LOC + "inet_ntop failed: " + ENO);
             continue;
         }
 
         sStrList.append(address);
-        LOG(VB_UPNP, LOG_DEBUG, QString("Added %1 as %2")
-                                    .arg(ifa->ifa_name).arg(address));
+        LOG(VB_UPNP, LOG_DEBUG, LOC + QString("Added %1 as %2")
+                .arg(ifa->ifa_name).arg(address));
     }
 
     freeifaddrs(list);

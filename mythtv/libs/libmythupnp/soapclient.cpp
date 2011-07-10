@@ -30,9 +30,6 @@
 #include "upnp.h"
 
 #define LOC      QString("SOAPClient: ")
-#define LOC_WARN QString("SOAPClient, Warning: ")
-#define LOC_ERR  QString("SOAPClient, Error: ")
-
 
 /** \brief Full SOAPClient constructor. After constructing the client
  *         with this constructor it is ready for SendSOAPRequest().
@@ -60,7 +57,7 @@ bool SOAPClient::Init(const QUrl    &url,
     if (sNamespace.isEmpty())
     {
         ok = false;
-        LOG(VB_GENERAL, LOG_ERR, "Init() given blank namespace");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Init() given blank namespace");
     }
 
     QUrl test(url);
@@ -68,7 +65,8 @@ bool SOAPClient::Init(const QUrl    &url,
     if (!test.isValid())
     {
         ok = false;
-        LOG(VB_GENERAL, LOG_ERR, QString("Init() given invalid control URL %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Init() given invalid control URL %1")
                 .arg(test.toString()));
     }
 

@@ -808,7 +808,7 @@ QString HTTPRequest::TestMimeType( const QString &sFileName )
             QByteArray head = file.read(8);
             QString    sHex = head.toHex();
 
-            LOG(VB_UPNP, LOG_DEBUG, "file starts with " + sHex);
+            LOG(VB_UPNP, LOG_DEBUG, sLOC + "file starts with " + sHex);
 
             if ( sHex == "000001ba44000400" )  // MPEG2 PS
                 sMIME = "video/mpeg";
@@ -820,7 +820,7 @@ QString HTTPRequest::TestMimeType( const QString &sFileName )
 
                 if ( head == "DIVX" )
                 {
-                    LOG(VB_UPNP, LOG_DEBUG, "('MythTVVi...DIVXLAME')");
+                    LOG(VB_UPNP, LOG_DEBUG, sLOC + "('MythTVVi...DIVXLAME')");
                     sMIME = "video/mp4";
                 }
                 // NuppelVideo is "RJPG" at byte 612
@@ -831,10 +831,10 @@ QString HTTPRequest::TestMimeType( const QString &sFileName )
             file.close();
         }
         else
-            LOG(VB_GENERAL, LOG_ERR, "Could not read file");
+            LOG(VB_GENERAL, LOG_ERR, sLOC + "Could not read file");
     }
 
-    LOG(VB_UPNP, LOG_INFO, "type is " + sMIME);
+    LOG(VB_UPNP, LOG_INFO, sLOC + "type is " + sMIME);
     return sMIME;
 }
 
