@@ -23,8 +23,6 @@
 #define SHOW_WGET_OUTPUT 0
 
 #define LOC QString("DataDirect: ")
-#define LOC_WARN QString("DataDirect, Warning: ")
-#define LOC_ERR QString("DataDirect, Error: ")
 
 static QMutex  user_agent_lock;
 static QString user_agent;
@@ -424,7 +422,7 @@ bool DDStructureParser::endDocument()
 bool DDStructureParser::characters(const QString& pchars)
 {
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "Characters : " + pchars);
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Characters : " + pchars);
 #endif
     if (pchars.trimmed().isEmpty())
         return true;
@@ -566,7 +564,7 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
 
 DataDirectProcessor::~DataDirectProcessor()
 {
-    LOG(VB_GENERAL, LOG_INFO, "Deleting temporary files");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting temporary files");
 
     if (!tmpPostFile.isEmpty())
     {
@@ -683,7 +681,7 @@ int DataDirectProcessor::UpdateChannelsSafe(
 
     if (!SourceUtil::GetConnectionCount(sourceid))
     {
-        LOG(VB_GENERAL, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("Not inserting channels into disconnected source %1.")
                 .arg(sourceid));
         return -1;
@@ -728,7 +726,7 @@ int DataDirectProcessor::UpdateChannelsSafe(
             (query.value(5).toUInt() > 0))
         {
 #if 0
-            LOG(VB_GENERAL, LOG_INFO, 
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Not adding channel %1-%2 '%3' (%4),\n\t\t\t"
                         "looks like a digital channel on an analog source.")
                     .arg(chan_major).arg(chan_minor).arg(name).arg(callsign));
@@ -745,7 +743,8 @@ int DataDirectProcessor::UpdateChannelsSafe(
 #if 0
         if (!insert_channels && !mods)
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Not adding channel '%1' (%2).")
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Not adding channel '%1' (%2).")
                     .arg(name).arg(callsign));
         }
 #endif
@@ -802,7 +801,7 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(
             (dd_station_info.value(5).toUInt() > 0))
         {
 #if 0
-            LOG(VB_GENERAL, LOG_INFO,
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Not adding channel %1-%2 '%3' (%4),\n\t\t\t"
                         "looks like a digital channel on an analog source.")
                     .arg(chan_major).arg(chan_minor)
@@ -836,7 +835,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
     MSqlQuery query(MSqlQuery::DDCon());
 
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG,
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
         "Adding rows to main program table from view table");
 #endif
     query.prepare(
@@ -876,8 +875,9 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
         MythDB::DBError("Inserting into program table", query);
 
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "Finished adding rows to main program table");
-    LOG(VB_GENERAL, LOG_DEBUG, "Adding program ratings");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+        "Finished adding rows to main program table");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Adding program ratings");
 #endif
 
     if (!query.exec("INSERT IGNORE INTO programrating (chanid, starttime, "
@@ -898,8 +898,8 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
         MythDB::DBError("Inserting into programrating table", query);
 
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "Finished adding program ratings");
-    LOG(VB_GENERAL, LOG_DEBUG,
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Finished adding program ratings");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
         "Populating people table from production crew list");
 #endif
 
@@ -912,8 +912,8 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
         MythDB::DBError("Inserting into people table", query);
 
 #if 0
-    LOG(VB_GENERAL, LOG_INFO, "Finished adding people");
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Finished adding people");
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         "Adding credits entries from production crew list");
 #endif
 
@@ -938,8 +938,8 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
         MythDB::DBError("Inserting into credits table", query);
 
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "Finished inserting credits");
-    LOG(VB_GENERAL, LOG_DEBUG, "Adding genres");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Finished inserting credits");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Adding genres");
 #endif
 
     if (!query.exec("INSERT IGNORE INTO programgenres (chanid, starttime, "
@@ -951,7 +951,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
         MythDB::DBError("Inserting into programgenres table",query);
 
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "Done");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Done");
 #endif
 }
 
@@ -1031,7 +1031,7 @@ bool DataDirectProcessor::DDPost(
 #endif
 
     if (SHOW_WGET_OUTPUT)
-        LOG(VB_GENERAL, LOG_DEBUG, "command: " + command);
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "command: " + command);
 
     err_txt = "Returned failure";
     if (myth_system(command, kMSAnonLog) != GENERIC_EXIT_OK)
@@ -1051,7 +1051,7 @@ bool DataDirectProcessor::DDPost(
 
 bool DataDirectProcessor::GrabNextSuggestedTime(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Grabbing next suggested grabbing time");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Grabbing next suggested grabbing time");
 
     QString ddurl = providers[listings_provider].webServiceURL;
 
@@ -1059,14 +1059,14 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     QString postFilename = GetPostFilename(ok);
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "GrabNextSuggestedTime: Creating temp post file");
         return false;
     }
     QString resultFilename = GetResultFilename(ok);
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "GrabNextSuggestedTime: Creating temp result file");
         return false;
     }
@@ -1074,7 +1074,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     QFile postfile(postFilename);
     if (!postfile.open(QIODevice::WriteOnly))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Opening '%1'")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Opening '%1'")
                 .arg(postFilename) + ENO);
         return false;
     }
@@ -1115,7 +1115,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     }
 
     if (SHOW_WGET_OUTPUT)
-        LOG(VB_GENERAL, LOG_DEBUG, "command: " + command);
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "command: " + command);
 #ifndef USING_MINGW
     else
         command += " 2> /dev/null ";
@@ -1148,8 +1148,9 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
                 GotNextSuggestedTime = TRUE;
                 QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
                 NextSuggestedTime = MythUTCToLocal(UTCdt);
-                LOG(VB_GENERAL, LOG_INFO, QString("NextSuggestedTime is: ")
-                        + NextSuggestedTime.toString(Qt::ISODate));
+                LOG(VB_GENERAL, LOG_INFO, LOC +
+                    QString("NextSuggestedTime is: ") +
+                    NextSuggestedTime.toString(Qt::ISODate));
             }
 
             if (line.contains("<blockedTime>", Qt::CaseInsensitive))
@@ -1161,7 +1162,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
                 GotBlockedTime = TRUE;
                 QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
                 BlockedTime = MythUTCToLocal(UTCdt);
-                LOG(VB_GENERAL, LOG_INFO, QString("BlockedTime is: ")
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("BlockedTime is: ")
                         + BlockedTime.toString(Qt::ISODate));
             }
         }
@@ -1179,7 +1180,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
                                    const QDateTime pendDate)
 {
     QString msg = (pstartDate.addSecs(1) == pendDate) ? "channel" : "listing";
-    LOG(VB_GENERAL, LOG_INFO, "Grabbing " + msg + " data");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Grabbing " + msg + " data");
 
     QString err = "";
     QString ddurl = providers[listings_provider].webServiceURL;
@@ -1197,7 +1198,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
         if (QFile(cache_dd_data).exists() && inputfilename.isEmpty())
         {
-            LOG(VB_GENERAL, LOG_INFO, "Using DD cache");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Using DD cache");
         }
 
         if( inputfilename.isEmpty() )
@@ -1208,14 +1209,14 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
     QString postFilename = GetPostFilename(ok);
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "GrabData: Creating temp post file");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabData: Creating temp post file");
         return false;
     }
 
     if (!DDPost(ddurl, postFilename, inputfile, GetUserID(), GetPassword(),
                 pstartDate, pendDate, err))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to get data: %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to get data: %1")
                 .arg(err));
         return false;
     }
@@ -1227,7 +1228,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
     if (data.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Data is empty");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Data is empty");
         return false;
     }
 
@@ -1241,7 +1242,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
     xmlsimplereader.setContentHandler(&ddhandler);
     if (!xmlsimplereader.parse(xmlsource))
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "DataDirect XML failed to properly parse, downloaded listings "
             "were probably corrupt.");
         ok = false;
@@ -1365,7 +1366,7 @@ void DataDirectProcessor::CreateTempTables()
 
 bool DataDirectProcessor::GrabLoginCookiesAndLineups(bool parse_lineups)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Grabbing login cookies and lineups");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Grabbing login cookies and lineups");
 
     PostList list;
     list.push_back(PostItem("username", GetUserID()));
@@ -1379,14 +1380,14 @@ bool DataDirectProcessor::GrabLoginCookiesAndLineups(bool parse_lineups)
     QString resultFilename = GetResultFilename(ok);
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "GrabLoginCookiesAndLineups: "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabLoginCookiesAndLineups: "
                 "Creating temp result file");
         return false;
     }
     QString cookieFilename = GetCookieFilename(ok);
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "GrabLoginCookiesAndLineups: "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabLoginCookiesAndLineups: "
                 "Creating temp cookie file");
         return false;
     }
@@ -1405,8 +1406,8 @@ bool DataDirectProcessor::GrabLoginCookiesAndLineups(bool parse_lineups)
 
 bool DataDirectProcessor::GrabLineupForModify(const QString &lineupid)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("Grabbing lineup %1 for modification")
-            .arg(lineupid));
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Grabbing lineup %1 for modification").arg(lineupid));
 
     RawLineupMap::const_iterator it = rawlineups.find(lineupid);
     if (it == rawlineups.end())
@@ -1422,14 +1423,14 @@ bool DataDirectProcessor::GrabLineupForModify(const QString &lineupid)
     QString resultFilename = GetResultFilename(ok);
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "GrabLoginCookiesAndLineups: "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabLoginCookiesAndLineups: "
                 "Creating temp result file");
         return false;
     }
     QString cookieFilename = GetCookieFilename(ok);
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "GrabLoginCookiesAndLineups: "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabLoginCookiesAndLineups: "
                 "Creating temp cookie file");
         return false;
     }
@@ -1443,7 +1444,7 @@ bool DataDirectProcessor::GrabLineupForModify(const QString &lineupid)
 
 void DataDirectProcessor::SetAll(const QString &lineupid, bool val)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("%1 all channels in lineup %2")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 all channels in lineup %2")
             .arg((val) ? "Selecting" : "Deselecting").arg(lineupid));
 
     RawLineupMap::iterator lit = rawlineups.find(lineupid);
@@ -1466,21 +1467,24 @@ QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
     QFile lfile(get_cache_filename(lineupid));
     if (!lfile.exists())
     {
-        LOG(VB_GENERAL, LOG_ERR, "GrabLineupCacheAge("+lineupid+") failed -- " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabLineupCacheAge("+lineupid+
+            ") failed -- " +
             QString("file '%1' doesn't exist")
                 .arg(get_cache_filename(lineupid)));
         return cache_dt;
     }
     if (lfile.size() < 8)
     {
-        LOG(VB_GENERAL, LOG_ERR, "GrabLineupCacheAge("+lineupid+") failed -- " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabLineupCacheAge("+lineupid+
+            ") failed -- " +
             QString("file '%1' size %2 too small")
                 .arg(get_cache_filename(lineupid)).arg(lfile.size()));
         return cache_dt;
     }
     if (!lfile.open(QIODevice::ReadOnly))
     {
-        LOG(VB_GENERAL, LOG_ERR, "GrabLineupCacheAge("+lineupid+") failed -- " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabLineupCacheAge("+lineupid+
+            ") failed -- " +
             QString("cannot open file '%1'")
                 .arg(get_cache_filename(lineupid)));
         return cache_dt;
@@ -1491,7 +1495,7 @@ QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
     io >> tmp;
     cache_dt = QDateTime::fromString(tmp, Qt::ISODate);
 
-    LOG(VB_GENERAL, LOG_INFO, "GrabLineupCacheAge("+lineupid+") -> " +
+    LOG(VB_GENERAL, LOG_INFO, LOC + "GrabLineupCacheAge("+lineupid+") -> " +
             cache_dt.toString(Qt::ISODate));
 
     return cache_dt;
@@ -1503,7 +1507,8 @@ bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
     if (!lfile.exists() || (lfile.size() < 8) ||
         !lfile.open(QIODevice::ReadOnly))
     {
-        LOG(VB_GENERAL, LOG_ERR, "GrabLineupFromCache("+lineupid+") -- failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabLineupFromCache("+lineupid+
+            ") -- failed");
         return false;
     }
 
@@ -1552,7 +1557,8 @@ bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
         stations[station.stationid] = station;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "GrabLineupFromCache("+lineupid+") -- success");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "GrabLineupFromCache("+lineupid+
+        ") -- success");
 
     return true;
 }
@@ -1564,7 +1570,8 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
     QFile lfile(fna.constData());
     if (!lfile.open(QIODevice::WriteOnly))
     {
-        LOG(VB_GENERAL, LOG_ERR, "SaveLineupToCache("+lineupid+") -- failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "SaveLineupToCache("+lineupid+
+            ") -- failed");
         return false;
     }
 
@@ -1607,7 +1614,8 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
     }
     io << flush;
 
-    LOG(VB_GENERAL, LOG_INFO, "SaveLineupToCache("+lineupid+") -- success");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "SaveLineupToCache("+lineupid+
+        ") -- success");
 
     makeFileAccessible(fna.constData()); // Let anybody update it
 
@@ -1716,14 +1724,14 @@ bool DataDirectProcessor::SaveLineupChanges(const QString &lineupid)
     }
     list.push_back(PostItem("action", "Update"));
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Saving lineup %1 with %2 channels")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Saving lineup %1 with %2 channels")
             .arg(lineupid).arg(list.size() - 1));
 
     bool ok;
     QString cookieFilename = GetCookieFilename(ok);
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "GrabLoginCookiesAndLineups: "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabLoginCookiesAndLineups: "
                 "Creating temp cookie file");
         return false;
     }
@@ -1759,11 +1767,11 @@ bool DataDirectProcessor::UpdateListings(uint sourceid)
             xmltvids[query.value(0).toString()] = true;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "Saving updated DataDirect listing");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Saving updated DataDirect listing");
     bool ok = SaveLineup(lineupid, xmltvids);
 
     if (!ok)
-        LOG(VB_GENERAL, LOG_ERR, "Failed to update DataDirect listings.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to update DataDirect listings.");
 
     return ok;
 }
@@ -1936,7 +1944,7 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
 #endif
 
     if (SHOW_WGET_OUTPUT)
-        LOG(VB_GENERAL, LOG_DEBUG, "command: " + command);
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "command: " + command);
     else
     {
         command += (documentFile.isEmpty()) ? "&> " : "2> ";
@@ -1957,7 +1965,7 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
     QFile file(documentFile);
     if (!file.open(QIODevice::ReadOnly))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1'")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open '%1'")
                 .arg(documentFile));
         return false;
     }
@@ -1980,7 +1988,7 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
             get_action = get_setting(line.mid(frm + 5), "action");
             name_value.clear();
 #if 0
-            LOG(VB_GENERAL, LOG_DEBUG, QString("action: %1").arg(action));
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("action: %1").arg(action));
 #endif
         }
 
@@ -1992,13 +2000,14 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
         {
             QString input_line = line.mid(inp + 6);
 #if 0
-            LOG(VB_GENERAL, LOG_DEBUG, QString("input: %1").arg(input_line));
+            LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                QString("input: %1").arg(input_line));
 #endif
             QString name  = get_setting(input_line, "name");
             QString value = get_setting(input_line, "value");
 #if 0
-            LOG(VB_GENERAL, LOG_DEBUG, QString("name: %1").arg(name));
-            LOG(VB_GENERAL, LOG_DEBUG, QString("value: %1").arg(value));
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("name: %1").arg(name));
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("value: %1").arg(value));
 #endif
             if (!name.isEmpty() && !value.isEmpty())
                 name_value[name] = value;
@@ -2017,7 +2026,8 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
 
                 rawlineups[name_value["lineup_id"]] = item;
 #if 0
-                LOG(VB_GENERAL, LOG_DEBUG, QString("<%1>  \t--> <%2,%3,%4>")
+                LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                    QString("<%1>  \t--> <%2,%3,%4>")
                         .arg(name_value["lineup_id"])
                         .arg(item.udl_id).arg(item.zipcode)
                         .arg(item.get_action));
@@ -2034,7 +2044,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
     QFile file(documentFile);
     if (!file.open(QIODevice::ReadOnly))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1'")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open '%1'")
                 .arg(documentFile));
 
         return false;
@@ -2058,7 +2068,8 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
             in_form = true;
             lineup.set_action = get_setting(line.mid(frm + 5), "action");
 #if 0
-            LOG(VB_GENERAL, LOG_DEBUG, "set_action: " + lineup.set_action);
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + "set_action: " +
+                lineup.set_action);
 #endif
         }
 
@@ -2116,9 +2127,9 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
                 settings["lbl_ch"],    settings["lbl_callsign"]);
 
 #if 0
-            LOG(VB_GENERAL, LOG_DEBUG,
-                    QString("name: %1  id: %2  value: %3  "
-                            "checked: %4  ch: %5  call: %6")
+            LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                QString("name: %1  id: %2  value: %3  "
+                        "checked: %4  ch: %5  call: %6")
                     .arg(settings["chk_name"]).arg(settings["chk_id"])
                     .arg(settings["chk_value"]).arg(settings["chk_checked"])
                     .arg(settings["lbl_ch"],4).arg(settings["lbl_callsign"]));
@@ -2290,8 +2301,8 @@ static uint update_channel_basic(uint    sourceid,   bool    insert,
             chan_update_q.bindValue(":SOURCEID", sourceid);
 
 #if 0
-            LOG(VB_GENERAL, LOG_INFO,
-                    QString("Updating channel %1: '%2' (%3).")
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Updating channel %1: '%2' (%3).")
                     .arg(chanid).arg(name).arg(callsign));
 #endif
 
@@ -2323,7 +2334,7 @@ static uint update_channel_basic(uint    sourceid,   bool    insert,
     if ((mplexid > 0) || (minorC == 0))
         chanid = ChannelUtil::CreateChanID(sourceid, channum);
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Adding channel %1 '%2' (%3).")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Adding channel %1 '%2' (%3).")
             .arg(channum).arg(name).arg(callsign));
 
     if (chanid > 0)
@@ -2378,8 +2389,8 @@ static void set_lineup_type(const QString &lineupid, const QString &type)
         tmptype.detach();
         srcid_to_type[srcid] = tmptype;
 
-        LOG(VB_GENERAL, LOG_INFO, QString("sourceid %1 has lineup type: %2")
-                .arg(srcid).arg(type));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("sourceid %1 has lineup type: %2").arg(srcid).arg(type));
     }
 }
 

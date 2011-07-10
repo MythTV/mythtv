@@ -44,8 +44,6 @@
 #endif
 
 #define LOC      QString("CardUtil: ")
-#define LOC_WARN QString("CardUtil, Warning: ")
-#define LOC_ERR  QString("CardUtil, Error: ")
 
 QString CardUtil::GetScanableCardTypes(void)
 {
@@ -1457,7 +1455,7 @@ vector<uint> CardUtil::GetConflictingCards(uint inputid, uint exclude_cardid)
 
     for (uint i = 0; i < inputgroupids.size(); i++)
     {
-        LOG(VB_RECORD, LOG_INFO, QString("  Group ID %1")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("  Group ID %1")
                                      .arg(inputgroupids[i]));
     }
 
@@ -1478,7 +1476,7 @@ vector<uint> CardUtil::GetConflictingCards(uint inputid, uint exclude_cardid)
     }
 
     for (uint i = 0; i < cardids.size(); i++)
-        LOG(VB_RECORD, LOG_INFO, QString("  Card ID %1").arg(cardids[i]));
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("  Card ID %1").arg(cardids[i]));
 
     return cardids;
 }

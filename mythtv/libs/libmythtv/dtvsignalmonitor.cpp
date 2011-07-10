@@ -14,7 +14,6 @@
     QString("DTVSM(%1)::%2: %3").arg(channel->GetDevice()).arg(FUNC).arg(MSG))
 
 #define LOC QString("DTVSM(%1): ").arg(channel->GetDevice())
-#define LOC_ERR QString("DTVSM(%1) Error: ").arg(channel->GetDevice())
 
 /** \class DTVSignalMonitor
  *  \brief This class is intended to detect the presence of needed tables.
@@ -300,12 +299,12 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
             last_pat_crc = pat->CRC();
             QString errStr = QString("Program #%1 not found in PAT!")
                 .arg(programNumber);
-            LOG(VB_GENERAL, LOG_ERR, errStr + "\n" + pat->toString());
+            LOG(VB_GENERAL, LOG_ERR, LOC + errStr + "\n" + pat->toString());
         }
         if (pat->ProgramCount() == 1)
         {
-            LOG(VB_GENERAL, LOG_ERR, "But there is only one program "
-                                     "in the PAT, so we'll just use it");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "But there is only one program "
+                                           "in the PAT, so we'll just use it");
             SetProgramNumber(pat->ProgramNumber(0));
             AddFlags(kDTVSigMon_PATMatch);
             GetStreamData()->AddListeningPID(pat->ProgramPID(0));
@@ -323,13 +322,14 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
 
     if (pmt->ProgramNumber() != (uint)programNumber)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Wrong PMT; pmt->pn(%1) desired(%2)")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Wrong PMT; pmt->pn(%1) desired(%2)")
                 .arg(pmt->ProgramNumber()).arg(programNumber));
         return; // Not the PMT we are looking for...
     }
 
     if (pmt->IsEncrypted(GetDTVChannel()->GetSIStandard())) {
-        LOG(VB_GENERAL, LOG_NOTICE, 
+        LOG(VB_GENERAL, LOG_NOTICE, LOC +
             QString("PMT says program %1 is encrypted").arg(programNumber));
         GetStreamData()->TestDecryption(pmt);
     }
@@ -355,7 +355,7 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("We want %1 audio and %2 video streams")
                 .arg(GetStreamData()->GetAudioStreamsRequired())
                 .arg(GetStreamData()->GetVideoStreamsRequired()) +
@@ -399,9 +399,10 @@ void DTVSignalMonitor::HandleTVCT(
 
     if (idx < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Could not find channel %1_%2 in TVCT")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Could not find channel %1_%2 in TVCT")
                 .arg(majorChannel).arg(minorChannel));
-        LOG(VB_GENERAL, LOG_ERR, tvct->toString());
+        LOG(VB_GENERAL, LOG_ERR, LOC + tvct->toString());
         GetATSCStreamData()->SetVersionTVCT(tvct->TransportStreamID(),-1);
         return;
     }
@@ -420,9 +421,10 @@ void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
 
     if (idx < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Could not find channel %1_%2 in CVCT")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Could not find channel %1_%2 in CVCT")
                 .arg(majorChannel).arg(minorChannel));
-        LOG(VB_GENERAL, LOG_ERR, cvct->toString());
+        LOG(VB_GENERAL, LOG_ERR, LOC + cvct->toString());
         GetATSCStreamData()->SetVersionCVCT(cvct->TransportStreamID(),-1);
         return;
     }

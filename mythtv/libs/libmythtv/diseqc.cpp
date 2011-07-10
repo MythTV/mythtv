@@ -84,8 +84,6 @@
 #define EPS     1E-4
 
 #define LOC      QString("DiSEqCDevTree: ")
-#define LOC_WARN QString("DiSEqCDevTree, Warning: ")
-#define LOC_ERR  QString("DiSEqCDevTree, Error: ")
 
 QString DiSEqCDevDevice::TableToString(uint type, const TypeTable *table)
 {
@@ -357,7 +355,7 @@ bool DiSEqCDevTree::Load(uint cardid)
     }
     else if (query.value(1).toString().toUpper() == "DVB")
     {
-        LOG(VB_GENERAL, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("No device tree for cardid %1").arg(cardid));
     }
 
@@ -434,7 +432,7 @@ bool DiSEqCDevTree::Store(uint cardid)
         devid = m_root->GetDeviceID();
     else if (m_root)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to save DiSEqC tree.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to save DiSEqC tree.");
         return false;
     }
 
@@ -472,7 +470,7 @@ bool DiSEqCDevTree::SetTone(bool on)
 #endif // USING_DVB
 
     if (!success)
-        LOG(VB_GENERAL, LOG_ERR, "FE_SET_TONE failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "FE_SET_TONE failed" + ENO);
 
     return success;
 }
@@ -488,7 +486,7 @@ bool DiSEqCDevTree::Execute(const DiSEqCDevSettings &settings,
 {
     if (!m_root)
     {
-        LOG(VB_GENERAL, LOG_ERR, "No root device tree node!");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No root device tree node!");
         return false;
     }
 
@@ -611,7 +609,7 @@ static bool send_diseqc(int fd, const dvb_diseqc_master_cmd &cmd)
 
     if (!success)
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "send_diseqc FE_DISEQC_SEND_MASTER_CMD failed" + ENO);
     }
 
@@ -633,7 +631,7 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
     // check payload validity
     if (data_len > 3 || (data_len > 0 && !data))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Bad DiSEqC command");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Bad DiSEqC command");
         return false;
     }
 
@@ -661,14 +659,14 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
     for (uint byte = 0; byte < mcmd.msg_len; byte++)
         cmdstr += QString("%1 ").arg(mcmd.msg[byte], 2, 16);
 
-    LOG(VB_CHANNEL, LOG_INFO, "Sending DiSEqC Command: " + cmdstr);
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Sending DiSEqC Command: " + cmdstr);
 
     // send the command
     for (uint i = 0; i <= repeats; i++)
     {
         if (!send_diseqc(GetFD(), mcmd))
         {
-            LOG(VB_GENERAL, LOG_ERR, "DiSEqC command failed" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "DiSEqC command failed" + ENO);
             return false;
         }
 
@@ -694,7 +692,7 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset)
     // tests show that the wait times required can be very long (~1sec)
     if (hard_reset)
     {
-        LOG(VB_CHANNEL, LOG_INFO, "Power-cycling DiSEqC Bus");
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "Power-cycling DiSEqC Bus");
 
         SetVoltage(SEC_VOLTAGE_OFF);
         usleep(DISEQC_POWER_OFF_WAIT);
@@ -707,10 +705,10 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset)
     usleep(DISEQC_POWER_ON_WAIT);
 
     // issue a global reset command
-    LOG(VB_CHANNEL, LOG_INFO, "Resetting DiSEqC Bus");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Resetting DiSEqC Bus");
     if (!SendCommand(DISEQC_ADR_ALL, DISEQC_CMD_RESET))
     {
-        LOG(VB_GENERAL, LOG_ERR, "DiSEqC reset failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "DiSEqC reset failed" + ENO);
         return false;
     }
 
@@ -736,7 +734,7 @@ bool DiSEqCDevTree::SetVoltage(uint voltage)
     int volts = ((voltage == SEC_VOLTAGE_18) ? 18 :
                  ((voltage == SEC_VOLTAGE_13) ? 13 : 0));
 
-    LOG(VB_CHANNEL, LOG_INFO, "Changing LNB voltage to " +
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing LNB voltage to " +
             QString("%1V").arg(volts));
 
     bool success = false;
@@ -753,7 +751,7 @@ bool DiSEqCDevTree::SetVoltage(uint voltage)
 
     if (!success)
     {
-        LOG(VB_GENERAL, LOG_ERR, "FE_SET_VOLTAGE failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "FE_SET_VOLTAGE failed" + ENO);
         return false;
     }
 
@@ -854,7 +852,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateById(DiSEqCDevTree &tree, uint devid)
     }
     else if (!query.next())
     {
-        LOG(VB_GENERAL, LOG_ERR, "CreateById failed to find dtv dev " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "CreateById failed to find dtv dev " +
                 QString("%1").arg(devid));
 
         return NULL;
@@ -1053,15 +1051,15 @@ bool DiSEqCDevSwitch::Execute(const DiSEqCDevSettings &settings,
                 break;
             default:
                 success = false;
-                LOG(VB_GENERAL, LOG_ERR, QString("Unknown switch type (%1)")
-                        .arg((uint)m_type));
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("Unknown switch type (%1)").arg((uint)m_type));
                 break;
         }
 
         // if a child device will be sending a diseqc command, wait 100ms
         if (m_children[pos]->IsCommandNeeded(settings, tuning))
         {
-            LOG(VB_CHANNEL, LOG_INFO, "Waiting for switch");
+            LOG(VB_CHANNEL, LOG_INFO, LOC + "Waiting for switch");
             usleep(DISEQC_LONG_WAIT);
         }
 
@@ -1207,7 +1205,7 @@ bool DiSEqCDevSwitch::Load(void)
         DiSEqCDevDevice *child        = CreateById(m_tree, child_dev_id);
         if (child && !SetChild(ordinal, child))
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Switch port out of range (%1 > %2)")
                     .arg(ordinal + 1).arg(m_num_ports));
             delete child;
@@ -1355,14 +1353,16 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
     if (num_ports)
         pos %= num_ports;
 
-    LOG(VB_CHANNEL, LOG_INFO, QString("Changing to Legacy switch port %1/%2")
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        QString("Changing to Legacy switch port %1/%2")
             .arg(pos + 1).arg(num_ports));
 
     // send command
     if (ioctl(m_tree.GetFD(), FE_DISHNETWORK_SEND_LEGACY_CMD,
               cmds[pos] | horizcmd) == -1)
     {
-        LOG(VB_GENERAL, LOG_ERR, "FE_DISHNETWORK_SEND_LEGACY_CMD failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "FE_DISHNETWORK_SEND_LEGACY_CMD failed" + ENO);
 
         return false;
     }
@@ -1371,7 +1371,7 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
 
 #else // !FE_DISHNETWORK_SEND_LEGACY_CMD
 
-    LOG(VB_GENERAL, LOG_ERR, "You must compile with a newer "
+    LOG(VB_GENERAL, LOG_ERR, LOC + "You must compile with a newer "
             "version of the linux headers for DishNet Legacy switch support.");
     return false;
 
@@ -1396,7 +1396,7 @@ static bool set_tone(int fd, fe_sec_tone_mode tone)
 
     if (!success)
     {
-        LOG(VB_GENERAL, LOG_ERR, "set_tone failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "set_tone failed" + ENO);
     }
 
     return success;
@@ -1421,7 +1421,7 @@ static bool set_voltage(int fd, fe_sec_voltage volt)
 
     if (!success)
     {
-        LOG(VB_GENERAL, LOG_ERR, "FE_SET_VOLTAGE failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "FE_SET_VOLTAGE failed" + ENO);
     }
 
     return success;
@@ -1446,7 +1446,7 @@ static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 
     if (!success)
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "mini_diseqc FE_DISEQC_SEND_BURST failed" + ENO);
     }
 
@@ -1458,7 +1458,7 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
                                   const DTVMultiplex &/*tuning*/,
                                   uint pos)
 {
-    LOG(VB_CHANNEL, LOG_INFO, "Changing to Tone switch port " +
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing to Tone switch port " +
             QString("%1/2").arg(pos + 1));
 
 #ifdef USING_DVB
@@ -1466,7 +1466,7 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
         return true;
 #endif // USING_DVB
 
-    LOG(VB_GENERAL, LOG_ERR, "Setting Tone Switch failed." + ENO);
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Setting Tone Switch failed." + ENO);
     return false;
 }
 
@@ -1476,7 +1476,7 @@ bool DiSEqCDevSwitch::ExecuteVoltage(const DiSEqCDevSettings &settings,
     (void) settings;
     (void) tuning;
 
-    LOG(VB_CHANNEL, LOG_INFO, "Changing to Voltage Switch port " +
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing to Voltage Switch port " +
             QString("%1/2").arg(pos + 1));
 
 #ifdef USING_DVB
@@ -1487,7 +1487,7 @@ bool DiSEqCDevSwitch::ExecuteVoltage(const DiSEqCDevSettings &settings,
     }
 #endif // USING_DVB
 
-    LOG(VB_GENERAL, LOG_ERR, "Setting Voltage Switch failed." + ENO);
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Setting Voltage Switch failed." + ENO);
 
     return false;
 }
@@ -1498,7 +1498,7 @@ bool DiSEqCDevSwitch::ExecuteMiniDiSEqC(const DiSEqCDevSettings &settings,
     (void) settings;
     (void) tuning;
 
-    LOG(VB_CHANNEL, LOG_INFO, "Changing to MiniDiSEqC Switch port " +
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing to MiniDiSEqC Switch port " +
             QString("%1/2").arg(pos + 1));
 
 #ifdef USING_DVB
@@ -1506,7 +1506,7 @@ bool DiSEqCDevSwitch::ExecuteMiniDiSEqC(const DiSEqCDevSettings &settings,
         return true;
 #endif // USING_DVB
 
-    LOG(VB_GENERAL, LOG_ERR, "Setting Mini DiSEqC Switch failed." + ENO);
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Setting Mini DiSEqC Switch failed." + ENO);
 
     return false;
 }
@@ -1572,7 +1572,7 @@ bool DiSEqCDevSwitch::ExecuteDiseqc(const DiSEqCDevSettings &settings,
     if (((kTypeDiSEqCCommitted   == m_type) && (m_num_ports > 4)) ||
         ((kTypeDiSEqCUncommitted == m_type) && (m_num_ports > 16)))
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Invalid number of ports for DiSEqC 1.x Switch (%1)")
                 .arg(m_num_ports));
         return false;
@@ -1588,7 +1588,7 @@ bool DiSEqCDevSwitch::ExecuteDiseqc(const DiSEqCDevSettings &settings,
     }
     data |= 0xf0;
 
-    LOG(VB_CHANNEL, LOG_INFO, "Changing to DiSEqC switch port " +
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing to DiSEqC switch port " +
             QString("%1/%2").arg(pos + 1).arg(m_num_ports));
 
     bool ret = m_tree.SendCommand(m_address, cmd, m_repeat, 1, &data);
@@ -1606,7 +1606,7 @@ int DiSEqCDevSwitch::GetPosition(const DiSEqCDevSettings &settings) const
 
     if (pos >= (int)m_num_ports)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Port %1 ").arg(pos + 1) +
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Port %1 ").arg(pos + 1) +
                 QString("is not in range [0..%1)").arg(m_num_ports));
 
         return -1;
@@ -1614,7 +1614,7 @@ int DiSEqCDevSwitch::GetPosition(const DiSEqCDevSettings &settings) const
 
     if ((pos >= 0) && !m_children[pos])
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Port %1 ").arg(pos + 1) +
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Port %1 ").arg(pos + 1) +
                 "has no connected devices configured.");
 
         return -1;
@@ -1679,7 +1679,7 @@ bool DiSEqCDevRotor::Execute(const DiSEqCDevSettings &settings,
                 break;
             default:
                 success = false;
-                LOG(VB_GENERAL, LOG_ERR, "Unknown rotor type " +
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown rotor type " +
                         QString("(%1)").arg((uint) m_type));
                 break;
         }
@@ -1759,7 +1759,7 @@ uint DiSEqCDevRotor::GetVoltage(const DiSEqCDevSettings &settings,
     // override voltage if the last position is known and the rotor is moving
     if (IsMoving(settings))
     {
-        LOG(VB_CHANNEL, LOG_INFO,
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
             "Overriding voltage to 18V for faster rotor movement");
     }
     else if (m_child)
@@ -1980,7 +1980,7 @@ bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
         StartRotorPositionTracking(CalculateAzimuth(angle));
     }
 
-    LOG(VB_CHANNEL, LOG_INFO, "Rotor - " +
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Rotor - " +
             QString("Goto Stored Position %1").arg(index));
 
     return m_tree.SendCommand(DISEQC_ADR_POS_AZ, DISEQC_CMD_GOTO_POS,
@@ -1993,7 +1993,7 @@ bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings&, const DTVMultiplex&,
     double azimuth = CalculateAzimuth(angle);
     StartRotorPositionTracking(azimuth);
 
-    LOG(VB_CHANNEL, LOG_INFO, "USALS Rotor - " +
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "USALS Rotor - " +
             QString("Goto %1 (Azimuth %2)").arg(angle).arg(azimuth));
 
     uint az16 = (uint) (abs(azimuth) * 16.0);

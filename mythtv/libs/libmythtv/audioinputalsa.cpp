@@ -24,7 +24,6 @@
 
 #define LOC     QString("AudioInALSA: ")
 #define LOC_DEV QString("AudioInALSA(%1): ").arg(alsa_device.constData())
-#define LOC_ERR QString("AudioInALSA(%1) Error: ").arg(alsa_device.constData())
 
 AudioInputALSA::AudioInputALSA(const QString &device):
     AudioInput(device),
@@ -39,7 +38,7 @@ bool AudioInputALSA::Open(uint sample_bits, uint sample_rate, uint channels)
 {
     if (alsa_device.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("invalid alsa device name, %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("invalid alsa device name, %1")
                           .arg(alsa_device.constData()));
         return false;
     }
@@ -111,7 +110,7 @@ int AudioInputALSA::GetSamples(void* buf, uint nbytes)
             bytes_read = PcmRead(buf, nbytes);
             break;
         default:
-            LOG(VB_AUDIO, LOG_ERR,
+            LOG(VB_AUDIO, LOG_ERR, LOC_DEV +
                 QString("weird pcm state through GetSamples, %1")
                     .arg(pcm_state));
             break;
@@ -184,7 +183,7 @@ bool AudioInputALSA::PrepHwParams(void)
         if (!AlsaBad(snd_pcm_hw_params_get_rate_numden(hwparams, &rate_num,
                      &rate_den), "snd_pcm_hw_params_get_rate_numden failed"))
             if (m_audio_sample_rate != (int)(rate_num / rate_den))
-                LOG(VB_GENERAL, LOG_ERR,
+                LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                     QString("device reports sample rate as %1")
                         .arg(rate_num / rate_den));
         return false;
@@ -266,7 +265,7 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
                 case -EAGAIN:
                     break;
                 case -EBADFD:
-                    LOG(VB_GENERAL, LOG_ERR,
+                    LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                         QString("in a state unfit to read (%1): %2")
                             .arg(nread).arg(snd_strerror(nread)));
                     break;
@@ -276,7 +275,7 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
                     Recovery(nread);
                     break;
                 default:
-                    LOG(VB_GENERAL, LOG_ERR,
+                    LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                         QString("weird return from snd_pcm_readi: %1")
                             .arg(snd_strerror(nread)));
                     break;
@@ -290,7 +289,7 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
         ++retries;
     }
     if (nframes > 0)
-        LOG(VB_AUDIO, LOG_ERR,
+        LOG(VB_AUDIO, LOG_ERR, LOC_DEV +
             QString("short pcm read, %1 of %2 frames, retries %1")
                 .arg(to_read - nframes).arg(to_read).arg(retries));
     return snd_pcm_frames_to_bytes(pcm_handle, to_read - nframes);
@@ -314,7 +313,7 @@ bool AudioInputALSA::Recovery(int err)
             int ret = snd_pcm_prepare(pcm_handle);
             if (ret < 0)
             {
-                LOG(VB_GENERAL, LOG_ERR,
+                LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                     QString("failed to recover from %1. %2")
                         .arg(suspense ? "suspend" : "underrun")
                         .arg(snd_strerror(ret)));
@@ -333,7 +332,8 @@ bool AudioInputALSA::AlsaBad(int op_result, QString errmsg)
 {   // (op_result < 0) => return true
     bool bad = (op_result < 0);
     if (bad)
-        LOG(VB_GENERAL, LOG_ERR, errmsg + ": " + snd_strerror(op_result));
+        LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
+            errmsg + ": " + snd_strerror(op_result));
     return bad;
 }
 

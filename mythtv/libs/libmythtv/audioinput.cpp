@@ -25,7 +25,6 @@
 #include "audioinputalsa.h"
 
 #define LOC     QString("AudioIn: ")
-#define LOC_ERR QString("AudioIn Error: ")
 
 AudioInput::AudioInput(const QString &device)
 {
@@ -48,11 +47,11 @@ AudioInput *AudioInput::CreateDevice(const QByteArray &device)
     }
     else if (device == "NULL")
     {
-        LOG(VB_GENERAL, LOG_INFO, "creating NULL audio device");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "creating NULL audio device");
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "unknown or unsupported audio input device '" + device + "'");
     }
 

@@ -22,6 +22,8 @@
 #include "mythtimer.h"
 #include "compat.h"
 
+#define LOC QString("TFW(%1:%2): ").arg(filename).arg(fd)
+
 /// \brief Runs ThreadedFileWriter::DiskLoop(void)
 void TFWWriteThread::run(void)
 {
@@ -55,10 +57,6 @@ const uint ThreadedFileWriter::kMinWriteSize = 64 * 1024;
  *   possible when the classes using this class want to add data
  *   to the stream.
  */
-
-#define LOC QString("TFW(%1:%2): ").arg(filename).arg(fd)
-#define LOC_WARN QString("TFW(%1:%2), Warning: ").arg(filename).arg(fd)
-#define LOC_ERR QString("TFW(%1:%2), Error: ").arg(filename).arg(fd)
 
 /** \fn ThreadedFileWriter::ThreadedFileWriter(const QString&,int,mode_t)
  *  \brief Creates a threaded file writer.
@@ -96,13 +94,13 @@ bool ThreadedFileWriter::Open(void)
 
     if (fd < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Opening file '%1'.").arg(filename) + ENO);
         return false;
     }
     else
     {
-        LOG(VB_FILE, LOG_INFO, "Open() successful");
+        LOG(VB_FILE, LOG_INFO, LOC + "Open() successful");
 
 #ifdef USING_MINGW
         _setmode(fd, _O_BINARY);
@@ -181,7 +179,7 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
 
     if (totalBufferUse + count > kMaxBufferSize)
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Maximum buffer size exceeded."
                 "\n\t\t\tfile will be truncated, no further writing "
                 "will be done."
@@ -223,7 +221,7 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
 
     bufferHasData.wakeAll();
 
-    LOG(VB_FILE, LOG_DEBUG, QString("Write(*, %1) total %2 cnt %3")
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("Write(*, %1) total %2 cnt %3")
             .arg(count,4).arg(totalBufferUse).arg(writeBuffers.size()));
 
     return count;
@@ -249,7 +247,7 @@ long long ThreadedFileWriter::Seek(long long pos, int whence)
         bufferHasData.wakeAll();
         if (!bufferEmpty.wait(locker.mutex(), 2000))
         {
-            LOG(VB_GENERAL, LOG_WARNING,
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Taking a long time to flush.. buffer size %1")
                     .arg(totalBufferUse));
         }
@@ -270,7 +268,7 @@ void ThreadedFileWriter::Flush(void)
         bufferHasData.wakeAll();
         if (!bufferEmpty.wait(locker.mutex(), 2000))
         {
-            LOG(VB_GENERAL, LOG_WARNING,
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Taking a long time to flush.. buffer size %1")
                     .arg(totalBufferUse));
         }
@@ -421,12 +419,12 @@ void ThreadedFileWriter::DiskLoop(void)
             {
                 if (errno == EAGAIN)
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, "Got EAGAIN.");
+                    LOG(VB_GENERAL, LOG_WARNING, LOC + "Got EAGAIN.");
                 }
                 else
                 {
                     errcnt++;
-                    LOG(VB_GENERAL, LOG_ERR, "File I/O " +
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "File I/O " +
                         QString(" errcnt: %1").arg(errcnt) + ENO);
                 }
 
@@ -455,7 +453,7 @@ void ThreadedFileWriter::DiskLoop(void)
 
         if (writeTimer.elapsed() > 1000)
         {
-            LOG(VB_GENERAL, LOG_WARNING,
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("write(%1) cnt %2 total %3 -- took a long time, %4 ms")
                     .arg(sz).arg(writeBuffers.size())
                     .arg(totalBufferUse).arg(writeTimer.elapsed()));
@@ -488,7 +486,7 @@ void ThreadedFileWriter::DiskLoop(void)
                     break;
             }
 
-            LOG(VB_GENERAL, LOG_ERR, msg.arg(filename));
+            LOG(VB_GENERAL, LOG_ERR, LOC + msg.arg(filename));
             ignore_writes = true;
         }
     }

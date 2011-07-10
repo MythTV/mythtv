@@ -147,14 +147,14 @@ QString AudioPlayer::ReinitAudio(void)
     {
         if (!firstinit)
         {
-            LOG(VB_GENERAL, LOG_NOTICE, "Disabling Audio" +
+            LOG(VB_GENERAL, LOG_NOTICE, LOC + "Disabling Audio" +
                     QString(", reason is: %1").arg(errMsg));
         }
         m_no_audio_out = true;
     }
     else if (m_no_audio_out && m_audioOutput)
     {
-        LOG(VB_GENERAL, LOG_NOTICE, "Enabling Audio");
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + "Enabling Audio");
         m_no_audio_out = false;
     }
 
@@ -436,7 +436,7 @@ void AudioPlayer::AddAudioData(char *buffer, int len,
         frames = len / samplesize;
 
     if (!m_audioOutput->AddData(buffer, len, timecode, frames))
-        LOG(VB_PLAYBACK, LOG_ERR, "AddAudioData(): "
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "AddAudioData(): "
                 "Audio buffer overflow, audio data lost!");
 }
 

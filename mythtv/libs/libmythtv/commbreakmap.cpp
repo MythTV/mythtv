@@ -87,7 +87,7 @@ void CommBreakMap::SetTracker(uint64_t framesPlayed)
 
     if (commBreakIter != commBreakMap.end())
     {
-        LOG(VB_COMMFLAG, LOG_INFO,
+        LOG(VB_COMMFLAG, LOG_INFO, LOC +
             QString("new commBreakIter = %1 @ frame %2, framesPlayed = %3")
                 .arg(*commBreakIter).arg(commBreakIter.key())
                 .arg(framesPlayed));
@@ -138,7 +138,7 @@ bool CommBreakMap::IsInCommBreak(uint64_t frameNumber)
 void CommBreakMap::SetMap(const frm_dir_map_t &newMap, uint64_t framesPlayed)
 {
     QMutexLocker locker(&commBreakMapLock);
-    LOG(VB_COMMFLAG, LOG_INFO,
+    LOG(VB_COMMFLAG, LOG_INFO, LOC +
         QString("Setting New Commercial Break List, old size %1, new %2")
                     .arg(commBreakMap.size()).arg(newMap.size()));
 
@@ -185,7 +185,7 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
         return false;
     }
 
-    LOG(VB_COMMFLAG, LOG_INFO,
+    LOG(VB_COMMFLAG, LOG_INFO, LOC +
         QString("AutoCommercialSkip(), current framesPlayed %1, commBreakIter "
                 "frame %2, incrementing commBreakIter")
             .arg(framesPlayed).arg(commBreakIter.key()));
@@ -196,27 +196,29 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
 
     if (commBreakIter == commBreakMap.end())
     {
-        LOG(VB_COMMFLAG, LOG_INFO, "AutoCommercialSkip(), at end of commercial "
-                                   "break list, will not skip.");
+        LOG(VB_COMMFLAG, LOG_INFO, LOC + "AutoCommercialSkip(), at end of "
+                                       "commercial break list, will not skip.");
         return false;
     }
 
     if (*commBreakIter == MARK_COMM_START)
     {
-        LOG(VB_COMMFLAG, LOG_INFO, "AutoCommercialSkip(), new commBreakIter "
-                                   "mark is another start, will not skip.");
+        LOG(VB_COMMFLAG, LOG_INFO, LOC + "AutoCommercialSkip(), new "
+                                         "commBreakIter mark is another start, "
+                                         "will not skip.");
         return false;
     }
 
     if (totalFrames &&
         ((commBreakIter.key() + (10 * video_frame_rate)) > totalFrames))
     {
-        LOG(VB_COMMFLAG, LOG_INFO, "AutoCommercialSkip(), skipping would take "
-                                   "us to the end of the file, will not skip.");
+        LOG(VB_COMMFLAG, LOG_INFO, LOC + "AutoCommercialSkip(), skipping would "
+                                         "take us to the end of the file, will "
+                                         "not skip.");
         return false;
     }
 
-    LOG(VB_COMMFLAG, LOG_INFO,
+    LOG(VB_COMMFLAG, LOG_INFO, LOC +
         QString("AutoCommercialSkip(), new commBreakIter frame %1")
             .arg(commBreakIter.key()));
 
@@ -232,7 +234,7 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
 
     if (kCommSkipOn == autocommercialskip)
     {
-        LOG(VB_COMMFLAG, LOG_INFO,
+        LOG(VB_COMMFLAG, LOG_INFO, LOC +
             QString("AutoCommercialSkip(), auto-skipping to frame %1")
                 .arg(commBreakIter.key() -
                      (int)(commrewindamount * video_frame_rate)));

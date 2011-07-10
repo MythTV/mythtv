@@ -54,8 +54,6 @@ namespace AVS
 }
 
 #define LOC      QString("DFireDev(%1): ").arg(guid_to_string(m_guid))
-#define LOC_WARN QString("DFireDev(%1), Warning: ").arg(guid_to_string(m_guid))
-#define LOC_ERR  QString("DFireDev(%1), Error: ").arg(guid_to_string(m_guid))
 
 #define kAnyAvailableIsochChannel 0xFFFFFFFF
 #define kNoDataTimeout            300  /* msec */
@@ -128,7 +126,7 @@ DarwinFirewireDevice::~DarwinFirewireDevice()
 {
     if (IsPortOpen())
     {
-        LOG(VB_GENERAL, LOG_ERR, "ctor called with open port");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "dtor called with open port");
         while (IsPortOpen())
             ClosePort();
     }
@@ -229,7 +227,7 @@ bool DarwinFirewireDevice::OpenPort(void)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_RECORD, LOG_INFO, "OpenPort()");
+    LOG(VB_RECORD, LOG_INFO, LOC + "OpenPort()");
 
     if (GetInfoPtr() && GetInfoPtr()->IsPortOpen())
     {
@@ -241,25 +239,25 @@ bool DarwinFirewireDevice::OpenPort(void)
 
     if (!m_priv->controller_thread_running)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Unable to start firewire thread.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to start firewire thread.");
         return false;
     }
 
     if (!GetInfoPtr())
     {
-        LOG(VB_GENERAL, LOG_ERR, "No IEEE-1394 device with our GUID");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No IEEE-1394 device with our GUID");
 
         StopController();
         return false;
     }
 
-    LOG(VB_RECORD, LOG_INFO, "Opening AVC Device");
-    LOG(VB_RECORD, LOG_INFO, GetInfoPtr()->GetSubunitInfoString());
+    LOG(VB_RECORD, LOG_INFO, LOC + "Opening AVC Device");
+    LOG(VB_RECORD, LOG_INFO, LOC + GetInfoPtr()->GetSubunitInfoString());
 
     if (!GetInfoPtr()->IsSubunitType(kAVCSubunitTypeTuner) ||
         !GetInfoPtr()->IsSubunitType(kAVCSubunitTypePanel))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("No STB at guid: 0x%1")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("No STB at guid: 0x%1")
                 .arg(m_guid,0,16));
 
         StopController();
@@ -269,7 +267,7 @@ bool DarwinFirewireDevice::OpenPort(void)
     bool ok = GetInfoPtr()->OpenPort(m_priv->controller_thread_cf_ref);
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Unable to get handle for port");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to get handle for port");
 
         return false;
     }
@@ -279,13 +277,13 @@ bool DarwinFirewireDevice::OpenPort(void)
     {
         if (m_local_node < 0)
         {
-            LOG(VB_GENERAL, LOG_WARNING, "Failed to query local node");
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to query local node");
             m_local_node = 0;
         }
 
         if (m_remote_node < 0)
         {
-            LOG(VB_GENERAL, LOG_WARNING, "Failed to query remote node");
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to query remote node");
             m_remote_node = 0;
         }
     }
@@ -299,7 +297,7 @@ bool DarwinFirewireDevice::ClosePort(void)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_RECORD, LOG_INFO, "ClosePort()");
+    LOG(VB_RECORD, LOG_INFO, LOC + "ClosePort()");
 
     if (m_open_port_cnt < 1)
         return false;
@@ -311,7 +309,7 @@ bool DarwinFirewireDevice::ClosePort(void)
 
     if (GetInfoPtr() && GetInfoPtr()->IsPortOpen())
     {
-        LOG(VB_RECORD, LOG_INFO, "Closing AVC Device");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Closing AVC Device");
 
         GetInfoPtr()->ClosePort();
     }
@@ -329,13 +327,13 @@ bool DarwinFirewireDevice::OpenAVStream(void)
         return true;
 
     int max_speed = GetMaxSpeed();
-    LOG(VB_GENERAL, LOG_INFO, QString("Max Speed: %1, Our speed: %2")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max Speed: %1, Our speed: %2")
                           .arg(max_speed).arg(m_speed));
     m_speed = min((uint)max_speed, m_speed);
 
     uint fwchan = 0;
     bool streaming = IsSTBStreaming(&fwchan);
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("STB is %1already streaming on fwchan: %2")
             .arg(streaming?"":"not ").arg(fwchan));
 
@@ -354,7 +352,7 @@ bool DarwinFirewireDevice::OpenAVStream(void)
 
     if (kIOReturnSuccess != ret)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Couldn't create A/V stream object");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't create A/V stream object");
         return false;
     }
 
@@ -424,7 +422,7 @@ bool DarwinFirewireDevice::CloseAVStream(void)
 
     StopStreaming();
 
-    LOG(VB_RECORD, LOG_INFO, "Destroying A/V stream object");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Destroying A/V stream object");
     AVS::DestroyMPEG2Receiver(m_priv->avstream);
     m_priv->avstream = NULL;
 
@@ -438,7 +436,7 @@ bool DarwinFirewireDevice::IsAVStreamOpen(void) const
 
 bool DarwinFirewireDevice::ResetBus(void)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, "ResetBus() -- begin");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "ResetBus() -- begin");
 
     if (!GetInfoPtr() || !GetInfoPtr()->fw_handle)
         return false;
@@ -447,9 +445,9 @@ bool DarwinFirewireDevice::ResetBus(void)
     bool ok = (*fw_handle)->BusReset(fw_handle) == kIOReturnSuccess;
 
     if (!ok)
-        LOG(VB_GENERAL, LOG_ERR, "Bus Reset failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Bus Reset failed" + ENO);
 
-    LOG(VB_GENERAL, LOG_DEBUG, "ResetBus() -- end");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "ResetBus() -- end");
 
     return ok;
 }
@@ -459,11 +457,11 @@ bool DarwinFirewireDevice::StartStreaming(void)
     if (m_priv->is_streaming)
         return m_priv->is_streaming;
 
-    LOG(VB_RECORD, LOG_INFO, "Starting A/V streaming");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Starting A/V streaming");
 
     if (!IsAVStreamOpen() && !OpenAVStream())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Starting A/V streaming: FAILED");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Starting A/V streaming: FAILED");
         return false;
     }
 
@@ -473,7 +471,7 @@ bool DarwinFirewireDevice::StartStreaming(void)
 
     m_priv->is_streaming = (kIOReturnSuccess == ret);
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Starting A/V streaming: %1")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Starting A/V streaming: %1")
                           .arg((m_priv->is_streaming)?"success":"failure"));
 
     return m_priv->is_streaming;
@@ -484,18 +482,18 @@ bool DarwinFirewireDevice::StopStreaming(void)
     if (!m_priv->is_streaming)
         return true;
 
-    LOG(VB_RECORD, LOG_INFO, "Stopping A/V streaming");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stopping A/V streaming");
 
     bool ok = (kIOReturnSuccess == m_priv->avstream->stopReceive());
     m_priv->is_streaming = !ok;
 
     if (!ok)
     {
-        LOG(VB_RECORD, LOG_ERR, "Failed to stop A/V streaming");
+        LOG(VB_RECORD, LOG_ERR, LOC + "Failed to stop A/V streaming");
         return false;
     }
 
-    LOG(VB_RECORD, LOG_INFO, "Stopped A/V streaming");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stopped A/V streaming");
     return true;
 }
 
@@ -557,7 +555,7 @@ void DarwinFirewireDevice::ProcessNoDataMessage(void)
     m_priv->no_data_timer_set = true;
     m_priv->no_data_timer.start();
 
-    LOG(VB_GENERAL, LOG_WARNING, QString("No Input in %1 msecs")
+    LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No Input in %1 msecs")
             .arg(m_priv->no_data_cnt * kNoDataTimeout));
 
     if (m_priv->no_data_cnt > (kResetTimeout / kNoDataTimeout))
@@ -580,27 +578,28 @@ void DarwinFirewireDevice::ProcessStreamingMessage(
         bool ok = UpdatePlugRegister(
             plug_number, fw_channel, speed, true, false);
 
-        LOG(VB_GENERAL, LOG_INFO, QString("AllocateIsochPort(%1,%2) %3")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("AllocateIsochPort(%1,%2) %3")
                 .arg(fw_channel).arg(speed).arg(((ok)?"ok":"error")));
     }
     else if (AVS::kMpeg2ReceiverReleaseIsochPort == msg)
     {
         int ret = UpdatePlugRegister(plug_number, -1, -1, false, true);
 
-        LOG(VB_GENERAL, LOG_INFO, QString("ReleaseIsochPort %1")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("ReleaseIsochPort %1")
                               .arg((kIOReturnSuccess == ret)?"ok":"error"));
     }
     else if (AVS::kMpeg2ReceiverDCLOverrun == msg)
     {
-        LOG(VB_GENERAL, LOG_ERR, "DCL Overrun");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "DCL Overrun");
     }
     else if (AVS::kMpeg2ReceiverReceivedBadPacket == msg)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Received Bad Packet");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Received Bad Packet");
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Streaming Message: %1").arg(msg));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Streaming Message: %1").arg(msg));
     }
 }
 
@@ -628,11 +627,11 @@ vector<AVCInfo> DarwinFirewireDevice::GetSTBList(void)
 vector<AVCInfo> DarwinFirewireDevice::GetSTBListPrivate(void)
 {
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- begin");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "GetSTBListPrivate -- begin");
 #endif
     QMutexLocker locker(&m_lock);
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- got lock");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "GetSTBListPrivate -- got lock");
 #endif
 
     vector<AVCInfo> list;
@@ -648,7 +647,7 @@ vector<AVCInfo> DarwinFirewireDevice::GetSTBListPrivate(void)
     }
 
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- end");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "GetSTBListPrivate -- end");
 #endif
     return list;
 }
@@ -663,7 +662,8 @@ void DarwinFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
     {
         DarwinAVCInfo *ptr = new DarwinAVCInfo();
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Adding   0x%1").arg(guid, 0, 16));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Adding   0x%1").arg(guid, 0, 16));
 
         m_priv->devices[guid] = ptr;
         it = m_priv->devices.find(guid);
@@ -672,7 +672,8 @@ void DarwinFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
     io_object_t &item = *((io_object_t*) pitem);
     if (it != m_priv->devices.end())
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Updating 0x%1").arg(guid, 0, 16));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Updating 0x%1").arg(guid, 0, 16));
         (*it)->Update(guid, this, m_priv->notify_port,
                       m_priv->controller_thread_cf_ref, item);
     }
@@ -722,7 +723,7 @@ bool DarwinFirewireDevice::UpdatePlugRegisterPrivate(
     new_plug_cnt += ((add_plug) ? 1 : 0) - ((remove_plug) ? 1 : 0);
     if ((new_plug_cnt > 0x3f) || (new_plug_cnt < 0))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Invalid Plug Count %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid Plug Count %1")
                               .arg(new_plug_cnt));
         return false;
     }
@@ -730,8 +731,8 @@ bool DarwinFirewireDevice::UpdatePlugRegisterPrivate(
     new_fw_chan = (new_fw_chan >= 0) ? new_fw_chan : old_fw_chan;
     if (old_plug_cnt && (new_fw_chan != old_fw_chan))
     {
-        LOG(VB_GENERAL, LOG_WARNING,
-                "Ignoring FWChan change request, plug already open");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Ignoring FWChan change request, plug already open");
 
         new_fw_chan = old_fw_chan;
     }
@@ -739,8 +740,8 @@ bool DarwinFirewireDevice::UpdatePlugRegisterPrivate(
     new_speed = (new_speed >= 0) ? new_speed : old_speed;
     if (old_plug_cnt && (new_speed != old_speed))
     {
-        LOG(VB_GENERAL, LOG_WARNING,
-                "Ignoring speed change request, plug already open");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Ignoring speed change request, plug already open");
 
         new_speed = old_speed;
     }
@@ -777,9 +778,9 @@ void DarwinFirewireDevice::HandleBusReset(void)
     }
 
     if (!ok)
-        LOG(VB_GENERAL, LOG_ERR, "Reset: Failed to reconnect");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Reset: Failed to reconnect");
     else
-        LOG(VB_RECORD, LOG_INFO, "Reset: Reconnected succesfully");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Reset: Reconnected succesfully");
 }
 
 bool DarwinFirewireDevice::UpdatePlugRegister(

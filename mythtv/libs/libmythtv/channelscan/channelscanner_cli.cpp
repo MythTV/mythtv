@@ -35,8 +35,6 @@ using namespace std;
 #include "channelimporter.h"
 
 #define LOC      QString("ChScanCLI: ")
-#define LOC_WARN QString("ChScanCLI, Warning: ")
-#define LOC_ERR  QString("ChScanCLI, Error: ")
 
 ChannelScannerCLI::ChannelScannerCLI(bool doScanSaveOnly, bool promptsOk) :
     done(false), onlysavescan(doScanSaveOnly), interactive(promptsOk),
@@ -110,7 +108,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
         static QString old_msg;
         if (msg != old_msg)
         {
-            LOG(VB_CHANSCAN, LOG_INFO, msg);
+            LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
             old_msg = msg;
         }
     }
@@ -131,7 +129,7 @@ void ChannelScannerCLI::InformUser(const QString &error)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + error);
     }
     post_event(scanMonitor, ScannerEvent::ScanComplete, 0);
 }

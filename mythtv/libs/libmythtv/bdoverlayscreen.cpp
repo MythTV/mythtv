@@ -7,7 +7,6 @@
 #include "bdoverlayscreen.h"
 
 #define LOC QString("BDScreen: ")
-#define ERR QString("BDScreen Error: ")
 
 BDOverlayScreen::BDOverlayScreen(MythPlayer *player, const QString &name)
   : MythScreenType((MythScreenType*)NULL, name),
@@ -17,7 +16,7 @@ BDOverlayScreen::BDOverlayScreen(MythPlayer *player, const QString &name)
 
 BDOverlayScreen::~BDOverlayScreen()
 {
-    LOG(VB_PLAYBACK, LOG_DEBUG, "dtor");
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "dtor");
     m_overlayMap.clear();
 }
 
@@ -33,7 +32,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
         DeleteAllChildren();
         m_overlayMap.clear();
         SetRedraw();
-        LOG(VB_PLAYBACK, LOG_INFO,
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Initialised Size: %1x%2 (%3+%4) Plane: %5 Pts: %6")
                 .arg(overlay->m_position.width())
                 .arg(overlay->m_position.height())
@@ -47,7 +46,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
 
     if (!m_overlayArea.isValid())
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "Error: Overlay image submitted before initialisation.");
     }
 
@@ -63,7 +62,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     // remove if we already have this overlay
     if (m_overlayMap.contains(hash))
     {
-        LOG(VB_PLAYBACK, LOG_DEBUG, QString("Removing %1 (%2 left)")
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Removing %1 (%2 left)")
             .arg(hash).arg(m_overlayMap.size()));
         MythUIImage *old = m_overlayMap.take(hash);
         DeleteChild(old);
@@ -118,7 +117,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
             uiimage->SetImage(image);
             uiimage->SetArea(MythRect(scaled));
             m_overlayMap.insert(hash, uiimage);
-            LOG(VB_PLAYBACK, LOG_DEBUG, QString("Added %1 (%2 tot)")
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Added %1 (%2 tot)")
                 .arg(hash).arg(m_overlayMap.size()));
         }
     }
