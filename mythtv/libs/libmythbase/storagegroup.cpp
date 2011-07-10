@@ -382,8 +382,8 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
     QString result = filename;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    LOG(VB_FILE, LOG_DEBUG, LOC +
-        QString("GetRelativePathname(%1)").arg(filename));
+    LOG(VB_FILE, LOG_DEBUG,
+        QString("StorageGroup::GetRelativePathname(%1)").arg(filename));
 
     StaticInit();
 
@@ -421,8 +421,8 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
                 if (result.startsWith("/"))
                     result.replace(0, 1, "");
 
-                LOG(VB_FILE, LOG_DEBUG, LOC +
-                    QString("GetRelativePathname(%1) = '%2'")
+                LOG(VB_FILE, LOG_DEBUG, 
+                    QString("StorageGroup::GetRelativePathname(%1) = '%2'")
                         .arg(filename).arg(result));
                 return result;
             }
@@ -450,8 +450,8 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
                     if (result.startsWith("/"))
                         result.replace(0, 1, "");
 
-                    LOG(VB_FILE, LOG_DEBUG, LOC +
-                        QString("GetRelativePathname(%1) = '%2'")
+                    LOG(VB_FILE, LOG_DEBUG,
+                        QString("StorageGroup::GetRelativePathname(%1) = '%2'")
                             .arg(filename).arg(result));
                     return result;
                 }
@@ -474,8 +474,8 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
             if (result.startsWith("/"))
                 result.replace(0, 1, "");
 
-            LOG(VB_FILE, LOG_DEBUG, LOC +
-                QString("GetRelativePathname(%1) = '%2'")
+            LOG(VB_FILE, LOG_DEBUG,
+                QString("StorageGroup::GetRelativePathname(%1) = '%2'")
                     .arg(filename).arg(result));
             return result;
         }
