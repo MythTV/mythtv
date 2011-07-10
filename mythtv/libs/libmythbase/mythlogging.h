@@ -20,6 +20,7 @@
 
 typedef enum
 {
+    LOG_ANY = -1,       // For use with masking, not actual logging
     LOG_EMERG = 0,
     LOG_ALERT,
     LOG_CRIT,
@@ -233,9 +234,10 @@ class DBLoggerThread : public QThread {
 /// of the verbose messages we want to see.
 extern MBASE_PUBLIC uint64_t verboseMask;
 
-// Helper for checking verbose flags outside of VERBOSE macro
+// Helper for checking verbose mask & level outside of LOG macro
 #define VERBOSE_LEVEL_NONE        (verboseMask == 0)
-#define VERBOSE_LEVEL_CHECK(mask) ((verboseMask & (mask)) == (mask))
+#define VERBOSE_LEVEL_CHECK(mask, level) \
+   (((verboseMask & (mask)) == (mask)) && logLevel >= (level))
 
 MBASE_PUBLIC __attribute__((error("VERBOSE is gone, use LOG")))
     void VERBOSE(uint64_t mask, ...);

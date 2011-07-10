@@ -93,7 +93,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
 
     //cout<<"HERE<"<<verboseMask<<">"<<endl;
     QString msg;
-    if (VERBOSE_LEVEL_NONE || VERBOSE_LEVEL_CHECK(VB_CHANSCAN))
+    if (VERBOSE_LEVEL_NONE || VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))
     {
         msg.sprintf("%3i%% S/N %3.1f %s : %s (%s) %20s",
                     status_complete, status_snr,
@@ -103,7 +103,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
     }
     //cout<<msg.toAscii().constData()<<endl;
 
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN))
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))
     {
         static QString old_msg;
         if (msg != old_msg)

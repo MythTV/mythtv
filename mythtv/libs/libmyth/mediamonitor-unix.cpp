@@ -363,8 +363,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
          << "-rp" << sysfs;
 
     uint flags = kMSStdOut | kMSBuffered;
-    // TODO: rename to LOG_MASK_CHECK and LOG_LEVEL_CHECK
-    if( VERBOSE_LEVEL_CHECK(VB_MEDIA) && logLevel <= LOG_DEBUG )
+    if (VERBOSE_LEVEL_CHECK(VB_MEDIA, LOG_DEBUG))
         flags |= kMSStdErr;
 
     // TODO: change this to a MythSystem on the stack?
@@ -376,7 +375,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         return ret;
     }
 
-    if( VERBOSE_LEVEL_CHECK(VB_MEDIA) && logLevel <= LOG_DEBUG )
+    if (VERBOSE_LEVEL_CHECK(VB_MEDIA, LOG_DEBUG))
     {
         QTextStream estream(udevinfo->ReadAllErr());
         while( !estream.atEnd() )

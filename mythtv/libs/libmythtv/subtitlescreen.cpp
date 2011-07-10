@@ -1083,7 +1083,7 @@ static void myth_libass_log(int level, const char *fmt, va_list vl, void *ctx)
             return;
     }
 
-    if (!VERBOSE_LEVEL_CHECK(verbose_mask) || logLevel > verbose_level)
+    if (!VERBOSE_LEVEL_CHECK(verbose_mask, verbose_level))
         return;
 
     string_lock.lock();

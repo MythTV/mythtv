@@ -377,7 +377,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
  */
 uint EITCache::PruneOldEntries(uint timestamp)
 {
-    if (VERBOSE_LEVEL_CHECK(VB_EIT) && logLevel <= LOG_INFO)
+    if (VERBOSE_LEVEL_CHECK(VB_EIT, LOG_INFO))
     {
         QDateTime tmptime;
         tmptime.setTime_t(timestamp);

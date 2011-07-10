@@ -320,7 +320,7 @@ bool MythSocket::writeStringList(QStringList &list)
     payload += utf8;
     size = payload.length();
 
-    if (VERBOSE_LEVEL_CHECK(VB_NETWORK))
+    if (VERBOSE_LEVEL_CHECK(VB_NETWORK, LOG_INFO))
     {
         QString msg = QString("write -> %1 %2")
             .arg(socket(), 2).arg(payload.data());
@@ -330,7 +330,7 @@ bool MythSocket::writeStringList(QStringList &list)
             msg.truncate(85);
             msg += "...";
         }
-        LOG(VB_NETWORK, LOG_DEBUG, LOC + msg);
+        LOG(VB_NETWORK, LOG_INFO, LOC + msg);
     }
 
     MythTimer timer; timer.start();
@@ -646,7 +646,7 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
     payload.truncate(8);
     payload += str;
 
-    if (VERBOSE_LEVEL_CHECK(VB_NETWORK))
+    if (VERBOSE_LEVEL_CHECK(VB_NETWORK, LOG_INFO))
     {
         QString msg = QString("read  <- %1 %2").arg(socket(), 2)
             .arg(payload.data());
@@ -656,7 +656,7 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
             msg.truncate(85);
             msg += "...";
         }
-        LOG(VB_NETWORK, LOG_ERR, LOC + msg);
+        LOG(VB_NETWORK, LOG_INFO, LOC + msg);
     }
 
     list = str.split("[]:[]");

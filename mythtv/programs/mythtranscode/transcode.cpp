@@ -1209,7 +1209,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 return REENCODE_CUTLIST_CHANGE;
             }
 
-            if ((jobID >= 0) || (VERBOSE_LEVEL_CHECK(VB_GENERAL)))
+            if ((jobID >= 0) || (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_INFO)))
             {
                 if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
                 {

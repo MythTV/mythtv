@@ -63,7 +63,7 @@ RecorderBase::~RecorderBase(void)
 
 void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
 {
-    if (VERBOSE_LEVEL_CHECK(VB_RECORD) && logLevel <= LOG_INFO)
+    if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_INFO))
     {
         QString msg("");
         if (rbuf)

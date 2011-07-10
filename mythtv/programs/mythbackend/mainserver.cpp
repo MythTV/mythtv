@@ -4479,7 +4479,7 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos)
     FileSystemInfo::Consolidate(fsInfos, false, maxWriteFiveSec);
 
     QList<FileSystemInfo>::iterator it1;
-    if (VERBOSE_LEVEL_CHECK(VB_FILE | VB_SCHEDULE) && logLevel >= LOG_INFO)
+    if (VERBOSE_LEVEL_CHECK(VB_FILE | VB_SCHEDULE, LOG_INFO))
     {
         LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
             "--- GetFilesystemInfos directory list start ---");

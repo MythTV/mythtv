@@ -642,7 +642,7 @@ bool MSqlQuery::exec()
     if (!result && QSqlQuery::lastError().number() == 2006 && m_db->Reconnect())
         result = QSqlQuery::exec();
 
-    if (VERBOSE_LEVEL_CHECK(VB_DATABASE) && logLevel <= LOG_DEBUG)
+    if (VERBOSE_LEVEL_CHECK(VB_DATABASE, LOG_DEBUG))
     {
         QString str = lastQuery();
 
@@ -703,7 +703,7 @@ bool MSqlQuery::next()
 {
     bool result = QSqlQuery::next();
 
-    if (result && VERBOSE_LEVEL_CHECK(VB_DATABASE) && logLevel <= LOG_DEBUG)
+    if (result && VERBOSE_LEVEL_CHECK(VB_DATABASE, LOG_DEBUG))
     {
         QString str;
         QSqlRecord record=QSqlQuery::record();

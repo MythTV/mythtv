@@ -181,7 +181,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
             return;
     }
 
-    if (!VERBOSE_LEVEL_CHECK(verbose_mask))
+    if (!VERBOSE_LEVEL_CHECK(verbose_mask, verbose_level))
         return;
 
     string_lock.lock();
@@ -310,7 +310,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
                                            sizeof(int32_t));
     ccd608->SetIgnoreTimecode(true);
 
-    bool debug = (VERBOSE_LEVEL_CHECK(VB_LIBAV) && logLevel <= LOG_DEBUG);
+    bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
     av_log_set_callback(myth_av_log);
 
@@ -2018,7 +2018,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             // Nigel's bogus codec-debug. Dump the list of codecs & decoders,
             // and have one last attempt to find a decoder. This is usually
             // only caused by build problems, where libavcodec needs a rebuild
-            if (VERBOSE_LEVEL_CHECK(VB_LIBAV) && logLevel <= LOG_DEBUG)
+            if (VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY))
             {
                 AVCodec *p = av_codec_next(NULL);
                 int      i = 1;
@@ -2034,7 +2034,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     if (p->decode == NULL)
                         msg += "decoder is null";
 
-                    LOG(VB_LIBAV, LOG_DEBUG, LOC + msg);
+                    LOG(VB_LIBAV, LOG_INFO, LOC + msg);
 
                     if (p->id == enc->codec_id)
                     {
@@ -2042,7 +2042,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         break;
                     }
 
-                    LOG(VB_LIBAV, LOG_DEBUG, LOC +
+                    LOG(VB_LIBAV, LOG_INFO, LOC +
                         QString("Codec 0x%1 != 0x%2") .arg(p->id, 0, 16)
                             .arg(enc->codec_id, 0, 16));
                     p = av_codec_next(p);

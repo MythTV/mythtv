@@ -762,7 +762,7 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
     }
 
     // Dump stream information
-    if (VERBOSE_LEVEL_CHECK(VB_GENERAL))
+    if (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_INFO))
         av_dump_format(inputFC, 0, inputfile, 0);
 
     for (unsigned int i = 0; i < inputFC->nb_streams; i++)
@@ -822,7 +822,7 @@ void MPEG2fixup::AddSequence(MPEG2frame *frame1, MPEG2frame *frame2)
     memcpy(frame1->pkt.data, frame2->pkt.data, head_size);
     frame1->pkt.size+=head_size;
     ProcessVideo(frame1, header_decoder);
-    if (VERBOSE_LEVEL_CHECK(VB_PROCESS))
+    if (VERBOSE_LEVEL_CHECK(VB_PROCESS, LOG_ANY))
     {
         static int count = 0;
         QString filename = QString("hdr%1.yuv").arg(count++);
@@ -912,7 +912,7 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
         }   
     }
 
-    if (VERBOSE_LEVEL_CHECK(VB_DECODE))
+    if (VERBOSE_LEVEL_CHECK(VB_DECODE, LOG_INFO))
     {
         QString msg = QString("");
         //msg += QString("unused:%1 ")
@@ -1675,7 +1675,7 @@ int MPEG2fixup::ConvertToI(Q3PtrList<MPEG2frame> *orderedFrames, int headPos)
         pkt = spare->pkt;
         //pkt.data is a newly malloced area
         {
-            QString fname = (VERBOSE_LEVEL_CHECK(VB_PROCESS)) ?
+            QString fname = (VERBOSE_LEVEL_CHECK(VB_PROCESS, LOG_ANY)) ?
                              QString("cnv%1").arg(ins_count++) : QString();
             if(BuildFrame(&pkt, fname))
                 return 1;
@@ -1713,7 +1713,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
     pkt = spare->pkt;
     //pkt.data is a newly malloced area
     {
-        QString fname = (VERBOSE_LEVEL_CHECK(VB_PROCESS) ?
+        QString fname = (VERBOSE_LEVEL_CHECK(VB_PROCESS, LOG_ANY) ?
                          (QString("ins%1").arg(ins_count++)) : QString());
         if (BuildFrame(&pkt, fname))
             return -1;

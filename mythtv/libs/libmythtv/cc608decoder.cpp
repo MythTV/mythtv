@@ -647,10 +647,10 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
                            .arg(row[mode], 2).arg(rowcount[mode])
                            .arg(style[mode]).arg(f, 2, 16)
                            .arg(clr).arg(len, 3));
-    if (len && VERBOSE_LEVEL_CHECK(VB_VBI) && logLevel <= LOG_DEBUG)
+    if (len && VERBOSE_LEVEL_CHECK(VB_VBI, LOG_INFO))
     {
         QString dispbuf = QString::fromUtf8(tmpbuf.constData(), len);
-        LOG(VB_VBI, LOG_DEBUG, QString("%1 '").arg(timecode[mode], 10));
+        LOG(VB_VBI, LOG_INFO, QString("%1 '").arg(timecode[mode], 10));
         QString vbuf = "";
         int i = 0;
         while (i < dispbuf.length()) {
@@ -673,7 +673,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
             }
             i++;
         }
-        LOG(VB_VBI, LOG_DEBUG, vbuf);
+        LOG(VB_VBI, LOG_INFO, vbuf);
     }
 
     reader->AddTextData(rbuf, len, timecode[mode], 'C');

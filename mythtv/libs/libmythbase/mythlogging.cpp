@@ -737,10 +737,11 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     char           *message;
     LoggingItem_t  *item;
 
-    if( !VERBOSE_LEVEL_CHECK(mask) )
+    // Discard any LOG_ANY attempts
+    if( level < 0 )
         return;
 
-    if( level > logLevel )
+    if( !VERBOSE_LEVEL_CHECK(mask, level) )
         return;
 
     item = new LoggingItem_t;
