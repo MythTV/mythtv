@@ -404,6 +404,9 @@ _clean_stn(MPLS_STN *stn)
     X_FREE(stn->video);
     X_FREE(stn->audio);
     X_FREE(stn->pg);
+    X_FREE(stn->ig);
+    X_FREE(stn->secondary_audio);
+    X_FREE(stn->secondary_video);
 }
 
 static int
