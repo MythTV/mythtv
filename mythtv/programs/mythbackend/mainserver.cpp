@@ -2877,36 +2877,78 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
  */
 void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
 {
-    QString filename = slist[1];
     QString storageGroup = "Default";
-    QStringList retlist;
+    QString hostname     = gCoreContext->GetHostName();
+    QString filename     = "";
+    QStringList res;
 
-    if (slist.size() > 2)
-        storageGroup = slist[2];
-
-    if ((filename.isEmpty()) ||
-        (filename.contains("/../")) ||
-        (filename.startsWith("../")))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("ERROR checking for file, filename '%1' "
-                    "fails sanity checks").arg(filename));
-        retlist << "";
-        SendResponse(pbs->getSocket(), retlist);
+    switch (slist.size()) {
+      case 4:
+        if (!slist[3].isEmpty())
+            hostname = slist[3];
+      case 3:
+        if (slist[2].isEmpty())
+            storageGroup = slist[2];
+      case 2:
+        filename = slist[1];
+        if (filename.isEmpty() ||
+            filename.contains("/../") ||
+            filename.startsWith("../"))
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("ERROR checking for file, filename '%1' "
+                        "fails sanity checks").arg(filename));
+            res << "";
+            SendResponse(pbs->getSocket(), res);
+            return;
+        }
+        break;
+      default:
+        LOG(VB_GENERAL, LOG_ERR, "ERROR, invalid input count for QUERY_FILE_HASH");
+        res << "";
+        SendResponse(pbs->getSocket(), res);
         return;
     }
 
-    if (storageGroup.isEmpty())
-        storageGroup = "Default";
+    QString hash = "";
 
-    StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
+    if (hostname == gCoreContext->GetHostName())
+    {
+        StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
+        QString fullname = sgroup.FindFile(filename);
+        hash = FileHash(fullname);
+    }
+    else
+    {
+        PlaybackSock *slave = GetSlaveByHostname(hostname);
+        if (slave)
+        {
+            hash = slave->GetFileHash(filename, storageGroup);
+            slave->DownRef();
+        }
+        else
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT hostname FROM settings "
+                           "WHERE value='BackendServerIP' "
+                             "AND data=:HOSTNAME;");
+            query.bindValue(":HOSTNAME", hostname);
 
-    QString fullname = sgroup.FindFile(filename);
-    QString hash = FileHash(fullname);
+            if (query.exec() && query.next())
+            {
+                hostname = query.value(0).toString();
+                slave = GetSlaveByHostname(hostname);
+                if (slave)
+                {
+                    hash = slave->GetFileHash(filename, storageGroup);
+                    slave->DownRef();
+                }
+            }
+        }
+    }
 
-    retlist << hash;
-
-    SendResponse(pbs->getSocket(), retlist);
+    res << hash;
+    SendResponse(pbs->getSocket(), res);
 }
 
 /**

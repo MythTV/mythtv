@@ -263,6 +263,16 @@ QStringList PlaybackSock::GetSGFileQuery(QString &host, QString &groupname,
     return strlist;
 }
 
+QString PlaybackSock::GetFileHash(QString filename, QString storageGroup)
+{
+    QStringList strlist(QString("QUERY_FILE_HASH"));
+    strlist << filename
+            << storageGroup;
+
+    SendReceiveStringList(strlist);
+    return strlist[0];
+}
+
 QStringList PlaybackSock::GenPreviewPixmap(const QString &token,
                                            const ProgramInfo *pginfo)
 {

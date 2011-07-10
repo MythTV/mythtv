@@ -306,6 +306,7 @@ QString RemoteFile::GetFileHash(const QString &url)
     QString result;
     QUrl qurl(url);
     QString filename = qurl.path();
+    QString hostname = qurl.host();
     QString sgroup   = qurl.userName();
 
     if (!qurl.fragment().isEmpty() || url.right(1) == "#")
@@ -320,6 +321,7 @@ QString RemoteFile::GetFileHash(const QString &url)
     QStringList strlist("QUERY_FILE_HASH");
     strlist << filename;
     strlist << sgroup;
+    strlist << hostname;
 
     gCoreContext->SendReceiveStringList(strlist);
     result = strlist[0];

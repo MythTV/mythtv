@@ -35,8 +35,8 @@
  *       mythtv/bindings/python/MythTV/static.py (version number)
  *       mythtv/bindings/python/MythTV/mythproto.py (layout)
  */
-#define MYTH_PROTO_VERSION "68"
-#define MYTH_PROTO_TOKEN "90094EAD"
+#define MYTH_PROTO_VERSION "69"
+#define MYTH_PROTO_TOKEN "63835135"
  MBASE_PUBLIC  const char *GetMythSourceVersion();
 
 #endif

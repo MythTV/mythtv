@@ -668,10 +668,12 @@ class FileOps( BECache ):
         return self.backendCommand(BACKEND_SEP.join(\
                     ['DELETE_FILE',file,sgroup]))
 
-    def getHash(self, file, sgroup):
-        """FileOps.getHash(file, storagegroup) -> hash string"""
-        return self.backendCommand(BACKEND_SEP.join((\
-                    'QUERY_FILE_HASH',file, sgroup)))
+    def getHash(self, file, sgroup, host=None):
+        """FileOps.getHash(file, storagegroup, host) -> hash string"""
+        m = [file, sgroup]
+        if host:
+            m.append(host)
+        return self.backendCommand(BACKEND_SEP.join(m))
 
     def reschedule(self, recordid=-1, wait=False):
         """FileOps.reschedule() -> None"""
