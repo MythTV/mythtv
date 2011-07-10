@@ -26,8 +26,6 @@
 #include <dveo/master.h>
 
 #define LOC      QString("ASISH(%1): ").arg(_device)
-#define LOC_WARN QString("ASISH(%1) Warning: ").arg(_device)
-#define LOC_ERR  QString("ASISH(%1) Error: ").arg(_device)
 
 QMap<QString,ASIStreamHandler*> ASIStreamHandler::_handlers;
 QMap<QString,uint>              ASIStreamHandler::_handlers_refcnt;

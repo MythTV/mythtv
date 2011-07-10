@@ -66,8 +66,6 @@ using namespace std;
 #define DEBUG_ACTIONS        0 /**< set to 1 to debug actions           */
 
 #define LOC      QString("TV: ")
-#define LOC_WARN QString("TV Warning: ")
-#define LOC_ERR  QString("TV Error: ")
 
 #define GetPlayer(X,Y) GetPlayerHaveLock(X, Y, __FILE__ , __LINE__)
 #define GetOSDLock(X) GetOSDL(X, __FILE__, __LINE__)

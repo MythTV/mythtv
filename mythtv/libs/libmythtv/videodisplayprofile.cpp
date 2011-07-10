@@ -198,7 +198,6 @@ QString ProfileItem::toString(void) const
 //////////////////////////////////////////////////////////////////////////////
 
 #define LOC     QString("VDP: ")
-#define LOC_ERR QString("VDP, Error: ")
 
 QMutex      VideoDisplayProfile::safe_lock(QMutex::Recursive);
 bool        VideoDisplayProfile::safe_initialized = false;

@@ -13,7 +13,6 @@
 #include "tv_rec.h"
 
 #define LOC QString("FireRecBase(%1): ").arg(channel->GetDevice())
-#define LOC_ERR QString("FireRecBase(%1), Error: ").arg(channel->GetDevice())
 
 FirewireRecorder::FirewireRecorder(TVRec *rec, FirewireChannel *chan) :
     DTVRecorder(rec),

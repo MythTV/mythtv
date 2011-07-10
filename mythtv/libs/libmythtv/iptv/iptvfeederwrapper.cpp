@@ -20,7 +20,6 @@ using namespace std;
 #include "mythlogging.h"
 
 #define LOC QString("IPTVFeed: ")
-#define LOC_ERR QString("IPTVFeed, Error: ")
 
 
 IPTVFeederWrapper::IPTVFeederWrapper() :

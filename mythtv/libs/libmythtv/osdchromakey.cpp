@@ -22,7 +22,6 @@ extern "C" {
 #endif
 
 #define LOC QString("OSDChroma: ")
-#define LOC_ERR QString("OSDChroma Error: ")
 
 ChromaKeyOSD::~ChromaKeyOSD(void)
 {

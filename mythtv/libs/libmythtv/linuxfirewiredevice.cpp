@@ -37,8 +37,6 @@ using namespace std;
 #include "mythlogging.h"
 
 #define LOC      QString("LFireDev(%1): ").arg(guid_to_string(m_guid))
-#define LOC_WARN QString("LFireDev(%1), Warning: ").arg(guid_to_string(m_guid))
-#define LOC_ERR  QString("LFireDev(%1), Error: ").arg(guid_to_string(m_guid))
 
 #define kNoDataTimeout            50   /* msec */
 #define kResetTimeout             1000 /* msec */

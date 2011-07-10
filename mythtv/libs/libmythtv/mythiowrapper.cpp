@@ -58,7 +58,6 @@ QMutex                        m_callbackLock;
 QMultiHash<QString, Callback> m_fileOpenCallbacks;
 
 #define LOC     QString("mythiowrapper: ")
-#define LOC_ERR QString("mythiowrapper: ERROR: ")
 
 /////////////////////////////////////////////////////////////////////////////
 

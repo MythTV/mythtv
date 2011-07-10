@@ -40,7 +40,6 @@ using namespace std;
 #include "mythdb.h"
 
 #define LOC QString("DTVMux: ")
-#define LOC_ERR QString("DTVMux, Error: ")
 
 class MultiplexID : public AutoIncrementDBSetting
 {

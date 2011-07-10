@@ -33,8 +33,6 @@ using namespace std;
 #define DEBUG_ATTRIB 1
 
 #define LOC      QString("V4LChannel(%1): ").arg(device)
-#define LOC_WARN QString("V4LChannel(%1) Warning: ").arg(device)
-#define LOC_ERR  QString("V4LChannel(%1) Error: ").arg(device)
 
 static int format_to_mode(const QString& fmt, int v4l_version);
 static QString mode_to_format(int mode, int v4l_version);
@@ -855,8 +853,6 @@ bool V4LChannel::InitPictureAttribute(const QString db_col_name)
     int field = (cfield + sfield) & 0xFFFF;
 
     QString loc = LOC +
-        QString("InitPictureAttribute(%1): ").arg(db_col_name, 10);
-    QString loc_err = LOC_ERR +
         QString("InitPictureAttribute(%1): ").arg(db_col_name, 10);
 
     if (usingv4l2)

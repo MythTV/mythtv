@@ -11,7 +11,6 @@
 #include "timeoutedtaskscheduler.h"
 
 #define LOC QString("FbFeedLive:")
-#define LOC_ERR QString("FbFeedLive, Error:")
 
 
 IPTVFeederLive::IPTVFeederLive() :

@@ -38,7 +38,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix);
 static int calc_eit_utc_offset(void);
 
 #define LOC QString("EITHelper: ")
-#define LOC_ERR QString("EITHelper, Error: ")
 
 EITHelper::EITHelper() :
     eitfixup(new EITFixUp()),

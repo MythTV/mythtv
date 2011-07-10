@@ -29,10 +29,6 @@
 #include "tv_rec.h"
 
 #define LOC QString("ASIRec(%1): ").arg(tvrec->GetCaptureCardNum())
-#define LOC_WARN QString("ASIRec(%1), Warning: ") \
-                     .arg(tvrec->GetCaptureCardNum())
-#define LOC_ERR QString("ASIRec(%1), Error: ") \
-                    .arg(tvrec->GetCaptureCardNum())
 
 ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
     DTVRecorder(rec), m_channel(channel), m_stream_handler(NULL)

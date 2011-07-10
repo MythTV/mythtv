@@ -17,8 +17,6 @@
 #include "mythdirs.h"
 
 #define LOC QString("FilterManager: ")
-#define LOC_WARN QString("FilterManager, Warning: ")
-#define LOC_ERR QString("FilterManager, Error: ")
 
 static const char *FmtToString(VideoFrameType ft)
 {

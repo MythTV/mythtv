@@ -15,8 +15,6 @@
 using namespace std;
 
 #define LOC QString("RemoteEncoder(%1): ").arg(recordernum)
-#define LOC_WARN QString("RemoteEncoder(%1), Warning: ").arg(recordernum)
-#define LOC_ERR QString("RemoteEncoder(%1), Error: ").arg(recordernum)
 
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
     : recordernum(num),       controlSock(NULL),      remotehost(host),

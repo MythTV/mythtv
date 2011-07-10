@@ -48,8 +48,6 @@ using namespace std;
 #include "mythuihelper.h"
 
 #define LOC      QString("VideoOutputXv: ")
-#define LOC_WARN QString("VideoOutputXv Warning: ")
-#define LOC_ERR  QString("VideoOutputXv Error: ")
 
 extern "C" {
 #include <X11/extensions/xf86vmode.h>

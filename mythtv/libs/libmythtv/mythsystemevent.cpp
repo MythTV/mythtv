@@ -13,8 +13,6 @@
 #include "mythlogging.h"
 
 #define LOC      QString("MythSystemEventHandler: ")
-#define LOC_ERR  QString("MythSystemEventHandler ERROR: ")
-#define LOC_WARN QString("MythSystemEventHandler WARNING: ")
 
 /** \class SystemEventThread
  *  \brief QRunnable class for running MythSystemEvent handler commands

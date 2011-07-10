@@ -4,8 +4,6 @@
 #include "streamhandler.h"
 
 #define LOC      QString("SH(%1): ").arg(_device)
-#define LOC_WARN QString("SH(%1) Warning: ").arg(_device)
-#define LOC_ERR  QString("SH(%1) Error: ").arg(_device)
 
 StreamHandler::StreamHandler(const QString &device) :
     _device(device),

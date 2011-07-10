@@ -31,7 +31,6 @@ using namespace std;
 #define DEBUG_PID_FILTERS
 
 #define LOC     QString("HDHRChan(%1): ").arg(GetDevice())
-#define LOC_ERR QString("HDHRChan(%1), Error: ").arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
     : DTVChannel(parent),

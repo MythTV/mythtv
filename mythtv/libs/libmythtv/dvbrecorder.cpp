@@ -31,10 +31,6 @@
 
 #define LOC      QString("DVBRec(%1:%2): ") \
                  .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
-#define LOC_WARN QString("DVBRec(%1:%2) Warning: ") \
-                 .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
-#define LOC_ERR  QString("DVBRec(%1:%2) Error: ") \
-                 .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
 
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel *channel)
     : DTVRecorder(rec), _channel(channel), _stream_handler(NULL)

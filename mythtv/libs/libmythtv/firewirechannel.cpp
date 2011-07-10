@@ -12,8 +12,6 @@
 #include "firewirechannel.h"
 
 #define LOC QString("FireChan(%1): ").arg(GetDevice())
-#define LOC_WARN QString("FireChan(%1), Warning: ").arg(GetDevice())
-#define LOC_ERR QString("FireChan(%1), Error: ").arg(GetDevice())
 
 FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
                                  const FireWireDBOptions &firewire_opts) :

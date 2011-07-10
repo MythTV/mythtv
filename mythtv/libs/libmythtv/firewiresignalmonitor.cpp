@@ -14,8 +14,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("FireSM(%1): ").arg(channel->GetDevice())
-#define LOC_WARN QString("FireSM(%1), Warning: ").arg(channel->GetDevice())
-#define LOC_ERR QString("FireSM(%1), Error: ").arg(channel->GetDevice())
 
 void FirewireTableMonitorThread::run(void)
 {

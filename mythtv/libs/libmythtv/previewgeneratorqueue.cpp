@@ -11,8 +11,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("PreviewQueue: ")
-#define LOC_ERR QString("PreviewQueue Error: ")
-#define LOC_WARN QString("PreviewQueue Warning: ")
 
 PreviewGeneratorQueue *PreviewGeneratorQueue::s_pgq = NULL;
 

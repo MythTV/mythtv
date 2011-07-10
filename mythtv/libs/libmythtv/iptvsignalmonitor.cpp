@@ -14,7 +14,6 @@
     QString("IPTVSM(%1)::%2: %3").arg(channel->GetDevice()).arg(FUNC).arg(MSG))
 
 #define LOC QString("IPTVSM(%1): ").arg(channel->GetDevice())
-#define LOC_ERR QString("IPTVSM(%1), Error: ").arg(channel->GetDevice())
 
 void IPTVTableMonitorThread::run(void)
 {

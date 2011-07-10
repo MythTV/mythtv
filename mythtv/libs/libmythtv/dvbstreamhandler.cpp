@@ -21,8 +21,6 @@
 #include "mythlogging.h"
 
 #define LOC      QString("DVBSH(%1): ").arg(_device)
-#define LOC_WARN QString("DVBSH(%1) Warning: ").arg(_device)
-#define LOC_ERR  QString("DVBSH(%1) Error: ").arg(_device)
 
 QMap<QString,bool> DVBStreamHandler::_rec_supports_ts_monitoring;
 QMutex             DVBStreamHandler::_rec_supports_ts_monitoring_lock;
@@ -585,12 +583,8 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
 }
 
 #undef LOC
-#undef LOC_WARN
-#undef LOC_ERR
 
 #define LOC      QString("PIDInfo(%1): ").arg(dvb_dev)
-#define LOC_WARN QString("PIDInfo(%1) Warning: ").arg(dvb_dev)
-#define LOC_ERR  QString("PIDInfo(%1) Error: ").arg(dvb_dev)
 
 bool DVBPIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
 {

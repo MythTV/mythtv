@@ -18,8 +18,6 @@
 #include "mythlogging.h"
 
 #define LOC      QString("HDHRSH(%1): ").arg(_device)
-#define LOC_WARN QString("HDHRSH(%1) Warning: ").arg(_device)
-#define LOC_ERR  QString("HDHRSH(%1) Error: ").arg(_device)
 
 QMap<QString,HDHRStreamHandler*> HDHRStreamHandler::_handlers;
 QMap<QString,uint>               HDHRStreamHandler::_handlers_refcnt;

@@ -67,7 +67,6 @@ using namespace std;
 #include "videodisplayprofile.h"
 
 #define LOC     QString("VideoOutputQuartz::")
-#define LOC_ERR QString("VideoOutputQuartz Error: ")
 
 /**
  * An abstract class for implementing QuickTime output viewports.

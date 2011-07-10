@@ -30,8 +30,6 @@ using namespace std;
 #include "mythlogging.h"
 
 #define LOC      QString("VBI608Extractor: ")
-#define LOC_WARN QString("VBI608Extractor, Warning: ")
-#define LOC_ERR  QString("VBI608Extractor, Error: ")
 
 static void print(
     const QList<uint>  &raw_minimas, const QList<uint>  &raw_maximas,

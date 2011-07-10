@@ -15,8 +15,6 @@ using namespace std;
 #include "mythlogging.h"
 
 #define LOC      QString("BH: ")
-#define LOC_WARN QString("BH Warning: ")
-#define LOC_ERR  QString("BH Error: ")
 
 #define GetPlayer(X,Y) GetPlayerHaveLock(X, Y, __FILE__ , __LINE__)
 #define GetOSDLock(X) GetOSDL(X, __FILE__, __LINE__)

@@ -40,8 +40,6 @@ const int  RingBuffer::kLiveTVOpenTimeout  = 10000;
 #define CHUNK 32768 /* readblocksize increments */
 
 #define LOC      QString("RingBuf(%1): ").arg(filename)
-#define LOC_WARN QString("RingBuf(%1) Warning: ").arg(filename)
-#define LOC_ERR  QString("RingBuf(%1) Error: ").arg(filename)
 
 QMutex      RingBuffer::subExtLock;
 QStringList RingBuffer::subExt;

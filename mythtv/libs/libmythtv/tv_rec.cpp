@@ -40,7 +40,6 @@
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
 
 #define LOC QString("TVRec(%1): ").arg(cardid)
-#define LOC_ERR QString("TVRec(%1) Error: ").arg(cardid)
 
 /// How many milliseconds the signal monitor should wait between checks
 const uint TVRec::kSignalMonitoringRate = 50; /* msec */

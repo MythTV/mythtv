@@ -18,7 +18,6 @@ using namespace std;
 #include "tv.h" // for CHANNEL_DIRECTION
 
 #define LOC QString("ChanUtil: ")
-#define LOC_ERR QString("ChanUtil, Error: ")
 
 const QString ChannelUtil::kATSCSeparators = "(_|-|#|\\.)";
 

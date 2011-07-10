@@ -40,7 +40,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("SWiz: ")
-#define LOC_ERR QString("SWiz, Error: ")
 
 ScanWizard::ScanWizard(uint    default_sourceid,
                        uint    default_cardid,

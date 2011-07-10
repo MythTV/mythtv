@@ -22,8 +22,6 @@
 #include "dvbstreamhandler.h"
 
 #define LOC QString("DVBSM(%1): ").arg(channel->GetDevice())
-#define LOC_WARN QString("DVBSM(%1), Warning: ").arg(channel->GetDevice())
-#define LOC_ERR QString("DVBSM(%1), Error: ").arg(channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.

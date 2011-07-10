@@ -38,8 +38,6 @@ static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 #endif
 
 #define LOC      QString("FileRingBuf(%1): ").arg(filename)
-#define LOC_WARN QString("FileRingBuf(%1) Warning: ").arg(filename)
-#define LOC_ERR  QString("FileRingBuf(%1) Error: ").arg(filename)
 
 FileRingBuffer::FileRingBuffer(const QString &lfilename,
                                bool write, bool readahead, int timeout_ms)

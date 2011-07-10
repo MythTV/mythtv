@@ -4,8 +4,6 @@
 #include "mythcontext.h"
 
 #define LOC      QString("LAVCInfo(): ")
-#define LOC_WARN QString("LAVCInfo(), Warning: ")
-#define LOC_ERR  QString("LAVCInfo(), Error: ")
 
 bool LinuxAVCInfo::Update(uint64_t _guid, raw1394handle_t handle,
                           uint _port, uint _node)

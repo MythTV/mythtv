@@ -18,7 +18,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("IPTVChanFetch: ")
-#define LOC_ERR QString("IPTVChanFetch, Error: ")
 
 static bool parse_chan_info(const QString   &rawdata,
                             IPTVChannelInfo &info,

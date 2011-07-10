@@ -41,10 +41,6 @@
 
 #define LOC      QString("ImportRec(%1:%2): ") \
                  .arg(TVREC_CARDNUM).arg(videodevice)
-#define LOC_WARN QString("ImportRec(%1:%2) Warning: ") \
-                 .arg(TVREC_CARDNUM).arg(videodevice)
-#define LOC_ERR  QString("ImportREc(%1:%2) Error: ") \
-                 .arg(TVREC_CARDNUM).arg(videodevice)
 
 ImportRecorder::ImportRecorder(TVRec *rec) :
     DTVRecorder(rec), _import_fd(-1)

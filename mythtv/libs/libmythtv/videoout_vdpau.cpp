@@ -10,7 +10,6 @@
 #include "mythpainter_vdpau.h"
 
 #define LOC      QString("VidOutVDPAU: ")
-#define LOC_ERR  QString("VidOutVDPAU Error: ")
 
 #define MIN_REFERENCE_FRAMES 2
 #define MAX_REFERENCE_FRAMES 16

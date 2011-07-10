@@ -13,7 +13,6 @@
 #include "iptvfeederwrapper.h"
 
 #define LOC QString("IPTVChan(%1): ").arg(GetCardID())
-#define LOC_ERR QString("IPTVChan(%1), Error: ").arg(GetCardID())
 
 IPTVChannel::IPTVChannel(TVRec         *parent,
                          const QString &videodev)

@@ -14,10 +14,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("HDHRRec(%1): ").arg(tvrec->GetCaptureCardNum())
-#define LOC_WARN QString("HDHRRec(%1), Warning: ") \
-                     .arg(tvrec->GetCaptureCardNum())
-#define LOC_ERR QString("HDHRRec(%1), Error: ") \
-                    .arg(tvrec->GetCaptureCardNum())
 
 HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
     : DTVRecorder(rec), _channel(channel), _stream_handler(NULL)

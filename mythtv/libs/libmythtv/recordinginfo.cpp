@@ -32,8 +32,6 @@ using namespace std;
 #include "channelutil.h"
 
 #define LOC      QString("RecordingInfo(%1): ").arg(GetBasename())
-#define LOC_WARN QString("RecordingInfo(%1), Warning: ").arg(GetBasename())
-#define LOC_ERR  QString("RecordingInfo(%1), Error: ").arg(GetBasename())
 
 QString RecordingInfo::unknownTitle;
 // works only for integer divisors of 60

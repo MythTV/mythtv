@@ -24,7 +24,6 @@
 #include "tspacket.h"
 
 #define LOC QString("IPTVFeedRTP: ")
-#define LOC_ERR QString("IPTVFeedRTP, Error: ")
 
 IPTVFeederRTP::IPTVFeederRTP() :
     _source(NULL),

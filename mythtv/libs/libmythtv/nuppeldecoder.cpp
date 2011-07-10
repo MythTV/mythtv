@@ -32,7 +32,6 @@ extern "C" {
 #endif
 
 #define LOC QString("NVD: ")
-#define LOC_ERR QString("NVD Error: ")
 
 NuppelDecoder::NuppelDecoder(MythPlayer *parent,
                              const ProgramInfo &pginfo)

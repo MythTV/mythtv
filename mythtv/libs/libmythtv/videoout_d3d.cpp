@@ -33,8 +33,6 @@ const int kKeepPrebuffer = 2;
 #define NUM_DXVA2_BUFS 30
 
 #define LOC      QString("VideoOutputD3D: ")
-#define LOC_WARN QString("VideoOutputD3D Warning: ")
-#define LOC_ERR  QString("VideoOutputD3D Error: ")
 
 void VideoOutputD3D::GetRenderOptions(render_opts &opts,
                                       QStringList &cpudeints)

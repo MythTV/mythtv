@@ -3,8 +3,6 @@
 #include "avformatdecoderbd.h"
 
 #define LOC QString("AFD_BD: ")
-#define LOC_ERR QString("AFD_BD Error: ")
-#define LOC_WARN QString("AFD_BD Warning: ")
 
 AvFormatDecoderBD::AvFormatDecoderBD(
     MythPlayer *parent, const ProgramInfo &pginfo,

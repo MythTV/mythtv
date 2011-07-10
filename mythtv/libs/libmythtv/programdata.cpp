@@ -15,8 +15,6 @@ using namespace std;
 #include "dvbdescriptors.h"
 
 #define LOC      QString("ProgramData: ")
-#define LOC_WARN QString("ProgramData, Warning: ")
-#define LOC_ERR  QString("ProgramData, Error: ")
 
 static const char *roles[] =
 {

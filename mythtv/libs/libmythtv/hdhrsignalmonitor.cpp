@@ -22,7 +22,6 @@
 #include "hdhrstreamhandler.h"
 
 #define LOC QString("HDHRSM(%1): ").arg(channel->GetDevice())
-#define LOC_ERR QString("HDHRSM(%1), Error: ").arg(channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.

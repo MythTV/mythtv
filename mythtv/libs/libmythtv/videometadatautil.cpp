@@ -7,8 +7,6 @@
 #include "mythdb.h"
 
 #define LOC      QString("VideoMetaDataUtil: ")
-#define LOC_WARN QString("VideoMetaDataUtil, Warning: ")
-#define LOC_ERR  QString("VideoMetaDataUtil, Error: ")
 
 static QReadWriteLock art_path_map_lock;
 typedef QPair< QString, QString > ArtPair;

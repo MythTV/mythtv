@@ -14,8 +14,6 @@
 #include "mythuihelper.h"
 
 #define LOC      QString("DVDRB: ")
-#define LOC_ERR  QString("DVDRB, Error: ")
-#define LOC_WARN QString("DVDRB, Warning: ")
 
 #define IncrementButtonVersion \
     if (++m_buttonVersion > 1024) \

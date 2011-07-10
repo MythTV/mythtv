@@ -36,8 +36,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("Preview: ")
-#define LOC_ERR QString("Preview Error: ")
-#define LOC_WARN QString("Preview Warning: ")
 
 /** \class PreviewGenerator
  *  \brief This class creates a preview image of a recording.

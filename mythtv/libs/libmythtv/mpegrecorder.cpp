@@ -47,8 +47,6 @@ extern "C" {
 #define IVTV_KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 
 #define LOC QString("MPEGRec(%1): ").arg(videodevice)
-#define LOC_WARN QString("MPEGRec(%1) Warning: ").arg(videodevice)
-#define LOC_ERR QString("MPEGRec(%1) Error: ").arg(videodevice)
 
 const int MpegRecorder::audRateL1[] =
 {

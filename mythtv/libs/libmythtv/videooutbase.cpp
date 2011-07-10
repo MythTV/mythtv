@@ -53,7 +53,6 @@ extern "C" {
 #include "videooutbase.h"
 
 #define LOC QString("VideoOutput: ")
-#define LOC_ERR QString("VideoOutput, Error: ")
 
 static QString to_comma_list(const QStringList &list);
 

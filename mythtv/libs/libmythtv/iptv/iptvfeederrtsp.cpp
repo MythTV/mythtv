@@ -19,7 +19,6 @@
 #include "tspacket.h"
 
 #define LOC QString("IPTVFeedRTSP:")
-#define LOC_ERR QString("IPTVFeedRTSP, Error:")
 
 /** \class RTSPData
  *  \brief Helper class use for static Callback handler

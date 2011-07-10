@@ -17,8 +17,6 @@
 #include "pespacket.h"
 
 #define LOC      QString("FireDev(%1): ").arg(guid_to_string(m_guid))
-#define LOC_WARN QString("FireDev(%1), Warning: ").arg(guid_to_string(m_guid))
-#define LOC_ERR  QString("FireDev(%1), Error: ").arg(guid_to_string(m_guid))
 
 static void fw_init(QMap<uint64_t,QString> &id_to_model);
 

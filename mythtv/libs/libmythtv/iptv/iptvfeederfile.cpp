@@ -28,7 +28,6 @@
 #include "tspacket.h"
 
 #define LOC QString("FbFeedFile: ")
-#define LOC_ERR QString("FbFeedFile, Error: ")
 
 
 IPTVFeederFile::IPTVFeederFile() :

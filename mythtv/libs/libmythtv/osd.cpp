@@ -26,7 +26,6 @@
 #include "osd.h"
 
 #define LOC     QString("OSD: ")
-#define LOC_ERR QString("OSD_ERR: ")
 
 QEvent::Type OSDHideEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();

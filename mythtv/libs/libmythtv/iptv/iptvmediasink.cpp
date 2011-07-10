@@ -11,7 +11,6 @@
 #include "streamlisteners.h"
 
 #define LOC QString("IPTVSink:")
-#define LOC_ERR QString("IPTVSink, Error:")
 
 IPTVMediaSink::IPTVMediaSink(UsageEnvironment &env,
                              unsigned int      bufferSize) :

@@ -26,10 +26,6 @@
 
 #define LOC      QString("V4LRec(%1:%2): ") \
                  .arg(TVREC_CARDNUM).arg(videodevice)
-#define LOC_WARN QString("V4LRec(%1:%2) Warning: ") \
-                 .arg(TVREC_CARDNUM).arg(videodevice)
-#define LOC_ERR  QString("V4LRec(%1:%2) Error: ") \
-                 .arg(TVREC_CARDNUM).arg(videodevice)
 
 V4LRecorder::V4LRecorder(TVRec *tv) :
     DTVRecorder(tv),          vbimode(VBIMode::None),

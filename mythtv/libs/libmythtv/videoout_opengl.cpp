@@ -9,7 +9,6 @@
 #include "mythuihelper.h"
 
 #define LOC      QString("VidOutGL: ")
-#define LOC_ERR  QString("VidOutGL Error: ")
 
 void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
                                          QStringList &cpudeints)

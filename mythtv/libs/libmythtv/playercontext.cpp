@@ -19,7 +19,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("playCtx: ")
-#define LOC_ERR QString("playCtx, Error: ")
 
 const uint PlayerContext::kSMExitTimeout     = 2000;
 const uint PlayerContext::kMaxChannelHistory = 30;

@@ -84,8 +84,6 @@ int isnan(double);
 static unsigned dbg_ident(const MythPlayer*);
 
 #define LOC      QString("Player(%1): ").arg(dbg_ident(this),0,36)
-#define LOC_WARN QString("Player(%1), Warning: ").arg(dbg_ident(this),0,36)
-#define LOC_ERR  QString("Player(%1), Error: ").arg(dbg_ident(this),0,36)
 #define LOC_DEC  QString("Player(%1): ").arg(dbg_ident(m_mp),0,36)
 
 void DecoderThread::run(void)

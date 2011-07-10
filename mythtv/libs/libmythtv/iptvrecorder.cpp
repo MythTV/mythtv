@@ -16,7 +16,6 @@
 #include "tv_rec.h"
 
 #define LOC QString("IPTVRec: ")
-#define LOC_ERR QString("IPTVRec, Error: ")
 
 // ============================================================================
 // IPTVRecorder : Processes data from RTSPComms and writes it to disk

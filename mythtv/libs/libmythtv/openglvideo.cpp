@@ -22,7 +22,6 @@ extern "C" {
 #endif // USING_X11
 
 #define LOC QString("GLVid: ")
-#define LOC_ERR QString("GLVid, Error: ")
 
 #define COLOUR_UNIFORM "m_colourMatrix"
 

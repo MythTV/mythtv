@@ -6,8 +6,6 @@
 #include "mythdvdplayer.h"
 
 #define LOC      QString("DVDPlayer: ")
-#define LOC_WARN QString("DVDPlayer, Warning: ")
-#define LOC_ERR  QString("DVDPlayer, Error: ")
 
 MythDVDPlayer::MythDVDPlayer(bool muted)
   : MythPlayer(muted), m_buttonVersion(0),
