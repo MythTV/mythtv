@@ -17,13 +17,8 @@ using namespace std;
 #include "util.h"
 
 #define LOC QString("AOJack: ")
-#define LOC_WARN QString("AOJack, WARNING: ")
-#define LOC_ERR QString("AOJack, ERROR: ")
 
-// TODO: get rid of this
-#define VBAUDIO(str)  LOG(VB_AUDIO, LOG_INFO, str)
-#define VBERROR(str)  LOG(VB_GENERAL, LOG_ERR, str)
-#define JERROR(str)   VBERROR(str)
+#define JERROR(str) Error(LOC + str)
 
 AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     AudioOutputBase(settings),
@@ -47,7 +42,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     if (!client)
     {
         JERROR("Cannot start/connect to jack server "
-                "(to check supported rate/channels)");
+               "(to check supported rate/channels)");
         delete settings;
         return NULL;
     }
@@ -112,7 +107,7 @@ bool AudioOutputJACK::OpenDevice()
     if (channels > JACK_CHANNELS_MAX)
     {
         JERROR(QString("Requested more channels: (%1), than the maximum: %2")
-                        .arg(channels).arg(JACK_CHANNELS_MAX));
+                   .arg(channels).arg(JACK_CHANNELS_MAX));
         return false;
     }
 
@@ -189,7 +184,7 @@ bool AudioOutputJACK::OpenDevice()
     // Activate! Everything comes into life after here. Beware races
     if (jack_activate(client))
     {
-        JERROR("Calling jack_activate failed\n");
+        JERROR("Calling jack_activate failed");
         goto err_out;
     }
 
@@ -612,7 +607,7 @@ void AudioOutputJACK::_jack_client_close(jack_client_t **client)
         int err = jack_client_close(*client);
         if (err != 0)
             JERROR(QString("Error closing Jack output device. Error: %1")
-                                .arg(err));
+                       .arg(err));
         *client = NULL;
     }
 }

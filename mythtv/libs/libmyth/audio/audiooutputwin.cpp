@@ -9,7 +9,6 @@ using namespace std;
 #include <mmsystem.h>
 
 #define LOC QString("AOWin: ")
-#define LOC_ERR QString("AOWin, error: ")
 
 #ifndef WAVE_FORMAT_IEEE_FLOAT
 #define WAVE_FORMAT_IEEE_FLOAT 0x0003

@@ -233,7 +233,8 @@ bool AudioOutput::CanPassthrough(int /*samplerate*/,
     return false;
 }
 
-// TODO: get rid of this
+// TODO: get rid of this if possible...  need to see what uses GetError() and
+//       GetWarning() and why.  These would give more useful logs as macros
 void AudioOutput::Error(const QString &msg)
 {
     lastError = msg;

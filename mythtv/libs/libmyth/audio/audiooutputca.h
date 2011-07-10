@@ -31,7 +31,7 @@ public:
     virtual int  GetVolumeChannel(int channel) const;
     virtual void SetVolumeChannel(int channel, int volume);
 
-    // TODO: get rid of these
+    // TODO: convert these to macros!
     void Debug(QString msg)
     {   LOG(VB_AUDIO, LOG_INFO,     "AudioOutputCA::" + msg);   }
 

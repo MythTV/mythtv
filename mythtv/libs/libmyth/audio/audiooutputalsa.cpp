@@ -11,8 +11,6 @@ using namespace std;
 #include "audiooutputalsa.h"
 
 #define LOC QString("ALSA: ")
-#define LOC_WARN QString("ALSA, Warning: ")
-#define LOC_ERR QString("ALSA, Error: ")
 
 // redefine assert as no-op to quiet some compiler warnings
 // about assert always evaluating true in alsa headers.

@@ -287,6 +287,7 @@ QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
 QDateTime RemoteGetPreviewIfModified(
     const ProgramInfo &pginfo, const QString &cachefile)
 {
+    QString loc("RemoteGetPreviewIfModified: ");
     QDateTime cacheLastModified;
     QFileInfo cachefileinfo(cachefile);
     if (cachefileinfo.exists())
@@ -301,15 +302,15 @@ QDateTime RemoteGetPreviewIfModified(
     if (!gCoreContext->SendReceiveStringList(strlist) ||
         strlist.empty() || strlist[0] == "ERROR")
     {
-        LOG(VB_GENERAL, LOG_ERR, "Remote error" +
-                 ((strlist.size() >= 2) ? (":\n\t\t\t" + strlist[1]) : ""));
+        LOG(VB_GENERAL, LOG_ERR, loc + "Remote error" +
+            ((strlist.size() >= 2) ? (":\n\t\t\t" + strlist[1]) : ""));
 
         return QDateTime();
     }
 
     if (strlist[0] == "WARNING")
     {
-        LOG(VB_NETWORK, LOG_WARNING, "Remote warning" +
+        LOG(VB_NETWORK, LOG_WARNING, loc + "Remote warning" +
                  ((strlist.size() >= 2) ? (":\n\t\t\t" + strlist[1]) : ""));
 
         return QDateTime();
@@ -330,16 +331,16 @@ QDateTime RemoteGetPreviewIfModified(
     QByteArray data = QByteArray::fromBase64(strlist[3].toAscii());
     if ((size_t) data.size() < length)
     { // (note data.size() may be up to 3 bytes longer after decoding
-        LOG(VB_GENERAL, LOG_ERR,
-                 QString("Preview size check failed %1 < %2")
-                     .arg(data.size()).arg(length));
+        LOG(VB_GENERAL, LOG_ERR, loc +
+            QString("Preview size check failed %1 < %2")
+                .arg(data.size()).arg(length));
         return QDateTime();
     }
     data.resize(length);
 
     if (checksum16 != qChecksum(data.constData(), data.size()))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Preview checksum failed");
+        LOG(VB_GENERAL, LOG_ERR, loc + "Preview checksum failed");
         return QDateTime();
     }
 
@@ -347,9 +348,9 @@ QDateTime RemoteGetPreviewIfModified(
     QDir cfd(pdir);
     if (!cfd.exists() && !cfd.mkdir(pdir))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                 QString("Unable to create remote cache directory '%1'")
-                     .arg(pdir));
+        LOG(VB_GENERAL, LOG_ERR, loc +
+            QString("Unable to create remote cache directory '%1'")
+                .arg(pdir));
 
         return QDateTime();
     }
@@ -357,9 +358,9 @@ QDateTime RemoteGetPreviewIfModified(
     QFile file(cachefile);
     if (!file.open(QIODevice::WriteOnly|QIODevice::Truncate))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                 QString("Unable to open cached preview file for writing '%1'")
-                     .arg(cachefile));
+        LOG(VB_GENERAL, LOG_ERR, loc +
+            QString("Unable to open cached preview file for writing '%1'")
+                .arg(cachefile));
 
         return QDateTime();
     }
@@ -384,9 +385,9 @@ QDateTime RemoteGetPreviewIfModified(
 
     if (remaining)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                 QString("Failed to write cached preview file '%1'")
-                     .arg(cachefile));
+        LOG(VB_GENERAL, LOG_ERR, loc +
+            QString("Failed to write cached preview file '%1'")
+                .arg(cachefile));
 
         file.resize(0); // in case unlink fails..
         file.remove();  // closes fd

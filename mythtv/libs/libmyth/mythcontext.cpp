@@ -45,8 +45,6 @@ using namespace std;
 #endif
 
 #define LOC      QString("MythContext: ")
-#define LOC_WARN QString("MythContext, Warning: ")
-#define LOC_ERR  QString("MythContext, Error: ")
 
 MythContext *gContext = NULL;
 
@@ -734,6 +732,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 {
     SSDPCacheEntries *backends = NULL;
     int               count;
+    QString           loc = "UPnPautoconf() - ";
     QTime             timer;
 
     SSDP::Instance()->PerformSearch( gBackendURI );
@@ -754,7 +753,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 
     if (!backends)
     {
-        LOG(VB_GENERAL, LOG_INFO, "No UPnP backends found");
+        LOG(VB_GENERAL, LOG_INFO, loc + "No UPnP backends found");
         return 0;
     }
 
@@ -762,16 +761,15 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
     switch (count)
     {
         case 0:
-            LOG(VB_GENERAL, LOG_ALERT,
-                     "No UPnP backends found, but SSDP::Find() not NULL!");
+            LOG(VB_GENERAL, LOG_ALERT, loc +
+                "No UPnP backends found, but SSDP::Find() not NULL!");
             break;
         case 1:
-            LOG(VB_GENERAL, LOG_INFO, "Found one UPnP backend");
+            LOG(VB_GENERAL, LOG_INFO, loc + "Found one UPnP backend");
             break;
         default:
-            LOG(VB_GENERAL, LOG_INFO,
-                     QString("More than one UPnP backend found (%1)")
-                         .arg(count));
+            LOG(VB_GENERAL, LOG_INFO, loc +
+                QString("More than one UPnP backend found (%1)") .arg(count));
     }
 
     if (count != 1)
@@ -801,7 +799,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 bool MythContextPrivate::DefaultUPnP(QString &error)
 {
     Configuration *pConfig = new XmlConfiguration("config.xml");
-    QString            loc = "MCP::DefaultUPnP() - ";
+    QString            loc = "DefaultUPnP() - ";
     QString  localHostName = pConfig->GetValue(kDefaultBE + "LocalHostName", "");
     QString            PIN = pConfig->GetValue(kDefaultPIN, "");
     QString            USN = pConfig->GetValue(kDefaultUSN, "");
@@ -810,11 +808,11 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
 
     if (USN.isEmpty())
     {
-        LOG(VB_UPNP, LOG_INFO, "No default UPnP backend");
+        LOG(VB_UPNP, LOG_INFO, loc + "No default UPnP backend");
         return false;
     }
 
-    LOG(VB_UPNP, LOG_INFO, "config.xml has default " +
+    LOG(VB_UPNP, LOG_INFO, loc + "config.xml has default " +
              QString("PIN '%1' and host USN: %2") .arg(PIN).arg(USN));
 
     // ----------------------------------------------------------------------
@@ -883,24 +881,24 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     QString        URL = backend->m_sLocation;
     MythXMLClient  client(URL);
 
-    LOG(VB_UPNP, LOG_INFO, QString("Trying host at %1").arg(URL));
+    LOG(VB_UPNP, LOG_INFO, loc + QString("Trying host at %1").arg(URL));
     switch (client.GetConnectionInfo(PIN, &m_DBparams, error))
     {
         case UPnPResult_Success:
             gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
-            LOG(VB_UPNP, LOG_INFO,
-                     "Got database hostname: " + m_DBparams.dbHostName);
+            LOG(VB_UPNP, LOG_INFO, loc +
+                "Got database hostname: " + m_DBparams.dbHostName);
             return true;
 
         case UPnPResult_ActionNotAuthorized:
             // The stored PIN is probably not correct.
             // We could prompt for the PIN and try again, but that needs a UI.
             // Easier to fail for now, and put up the full UI selector later
-            LOG(VB_UPNP, LOG_ERR, "Wrong PIN?");
+            LOG(VB_UPNP, LOG_ERR, loc + "Wrong PIN?");
             return false;
 
         default:
-            LOG(VB_UPNP, LOG_ERR, error);
+            LOG(VB_UPNP, LOG_ERR, loc + error);
             break;
     }
 
@@ -991,7 +989,7 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, message);
+        LOG(VB_GENERAL, LOG_ERR, LOC + message);
         qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
     }
 }
@@ -1026,7 +1024,7 @@ MythContext::MythContext(const QString &binversion)
 
     if (!gCoreContext || !gCoreContext->Init())
     {
-        LOG(VB_GENERAL, LOG_EMERG, "Unable to allocate MythCoreContext");
+        LOG(VB_GENERAL, LOG_EMERG, LOC + "Unable to allocate MythCoreContext");
         qApp->exit(GENERIC_EXIT_NO_MYTHCONTEXT);
     }
 }
@@ -1038,7 +1036,7 @@ bool MythContext::Init(const bool gui,
 {
     if (!d)
     {
-        LOG(VB_GENERAL, LOG_EMERG, "Init() Out-of-memory");
+        LOG(VB_GENERAL, LOG_EMERG, LOC + "Init() Out-of-memory");
         return false;
     }
 

@@ -18,7 +18,7 @@ extern "C" {
 #include "libavutil/avutil.h"    // to check version of libavformat
 }
 
-#define LOC QString("AO: ")
+#define LOC QString("AOS: ")
 
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
     m_passthrough(-1),  m_features(FEATURE_NONE),
@@ -74,7 +74,8 @@ int AudioOutputSettings::GetNextRate()
 void AudioOutputSettings::AddSupportedRate(int rate)
 {
     m_rates.push_back(rate);
-    LOG(VB_AUDIO, LOG_INFO, QString("Sample rate %1 is supported").arg(rate));
+    LOG(VB_AUDIO, LOG_INFO, LOC + 
+        QString("Sample rate %1 is supported").arg(rate));
 }
 
 bool AudioOutputSettings::IsSupportedRate(int rate)
@@ -199,7 +200,7 @@ int AudioOutputSettings::SampleSize(AudioFormat format)
 void AudioOutputSettings::AddSupportedChannels(int channels)
 {
     m_channels.push_back(channels);
-    LOG(VB_AUDIO, LOG_INFO, QString("%1 channel(s) are supported")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("%1 channel(s) are supported")
             .arg(channels));
 }
 
@@ -298,7 +299,7 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
         {
             if (mchannels == 2)
             {
-                LOG(VB_AUDIO, LOG_INFO, "may be AC3 or DTS capable");
+                LOG(VB_AUDIO, LOG_INFO, LOC + "may be AC3 or DTS capable");
                 aosettings->AddSupportedChannels(6);
             }
             aosettings->setFeature(FEATURE_AC3 | FEATURE_DTS);

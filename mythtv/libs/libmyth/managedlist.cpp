@@ -11,8 +11,6 @@ using namespace std;
 #include "mythfontproperties.h"
 
 #define LOC      QString("ManagedList*: ")
-#define LOC_WARN QString("ManagedList*, Warning: ")
-#define LOC_ERR  QString("ManagedList*, Error: ")
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -437,7 +435,7 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, 
              QString("adding '%1' value == %2 curval == %3")
-	             .arg(label) .arg(value) .arg(valueText));
+                     .arg(label) .arg(value) .arg(valueText));
 #endif
 
     // If we're adding an item with the same value as what we have selected
@@ -806,7 +804,7 @@ bool ManagedList::init(XMLParse       *themeIn,
 
     if (!themeIn || containerNameIn.isEmpty() || listNameIn.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ALERT, "sanity check failed");
+        LOG(VB_GENERAL, LOG_ALERT, LOC + "sanity check failed");
         return false;
     }
 
@@ -816,8 +814,8 @@ bool ManagedList::init(XMLParse       *themeIn,
     container = theme->GetSet(containerName);
     if (!container)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
-                 QString("Failed to get container %1") .arg(containerName));
+        LOG(VB_GENERAL, LOG_ALERT, LOC +
+            QString("Failed to get container %1") .arg(containerName));
         return false;
     }
 
@@ -826,8 +824,8 @@ bool ManagedList::init(XMLParse       *themeIn,
     ltype = (UIListType *)container->GetType(listName);
     if (!ltype)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
-		 QString("Failed to get list %1") .arg(listName));
+        LOG(VB_GENERAL, LOG_ALERT, LOC +
+            QString("Failed to get list %1") .arg(listName));
         return false;
     }
 

@@ -21,7 +21,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("AO: ")
-#define LOC_ERR QString("AO, ERROR: ")
 
 #define WPOS audiobuffer + org_waud
 #define RPOS audiobuffer + raud
@@ -1253,8 +1252,8 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
              * timestretch just got activated. So we will just drop the
              * data
              */
-            LOG(VB_AUDIO, LOG_INFO, QString("Passthrough activated with audio "
-                                            "processing. Dropping audio"));
+            LOG(VB_AUDIO, LOG_INFO,
+                "Passthrough activated with audio processing. Dropping audio");
             return false;
         }
         // mux into an IEC958 packet

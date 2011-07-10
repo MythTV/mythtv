@@ -19,11 +19,12 @@ using namespace std;
 #include "samplerate.h"
 #include "mythlogging.h"
 
-// TODO: get rid of this
-#define VBAUDIO(str)   LOG(VB_AUDIO, LOG_INFO, str)
-#define VBAUDIOTS(str) LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, str)
-#define VBGENERAL(str) LOG(VB_GENERAL, LOG_INFO, str)
-#define VBERROR(str)   LOG(VB_GENERAL, LOG_ERR, str)
+#define VBAUDIO(str)   LOG(VB_AUDIO, LOG_INFO, LOC + str)
+#define VBAUDIOTS(str) LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + str)
+#define VBGENERAL(str) LOG(VB_GENERAL, LOG_INFO, LOC + str)
+#define VBERROR(str)   LOG(VB_GENERAL, LOG_ERR, LOC + str)
+#define VBWARN(str)    LOG(VB_GENERAL, LOG_WARNING, LOC + str)
+#define VBERRENO(str)  Error(LOC + str + ": " + ENO)
 
 namespace soundtouch {
 class SoundTouch;

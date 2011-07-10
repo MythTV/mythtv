@@ -12,7 +12,6 @@ using namespace std;
 #include <unistd.h>
 
 #define LOC QString("AODX: ")
-#define LOC_ERR QString("AODX, ERROR: ")
 
 #include <initguid.h>
 DEFINE_GUID(IID_IDirectSoundNotify, 0xb0210783, 0x89cd, 0x11d0,

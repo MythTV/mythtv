@@ -22,7 +22,6 @@
 #include "audiooutputpulse.h"
 
 #define LOC     QString("PulseAudio: ")
-#define LOC_ERR QString("PulseAudio Error: ")
 
 #define PULSE_MAX_CHANNELS 8
 
@@ -551,8 +550,8 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
         {
             case PA_CONTEXT_FAILED:
             case PA_CONTEXT_TERMINATED:
-                LOG(VB_GENERAL, LOG_ERR, QString("context is stuffed, %1")
-                        .arg(pa_strerror(pa_context_errno(pcontext))));
+                VBERROR(QString("context is stuffed, %1")
+                            .arg(pa_strerror(pa_context_errno(pcontext))));
                 failed = true;
                 break;
             default:
@@ -565,7 +564,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
                     case PA_STREAM_TERMINATED:
                         VBERROR(QString("stream failed or was terminated, "
                                         "context state %1, stream state %2")
-                                .arg(cstate).arg(sstate));
+                                    .arg(cstate).arg(sstate));
                         failed = true;
                         break;
                     default:

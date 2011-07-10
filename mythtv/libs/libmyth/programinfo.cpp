@@ -34,8 +34,6 @@ using namespace std;
 #include "remotefile.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
-#define LOC_WARN QString("ProgramInfo(%1), Warning: ").arg(GetBasename())
-#define LOC_ERR  QString("ProgramInfo(%1), Error: ").arg(GetBasename())
 
 //#define DEBUG_IN_USE
 
@@ -1713,9 +1711,9 @@ bool ProgramInfo::LoadProgramFromRecorded(
     {
         if (is_reload)
         {
-            LOG(VB_FILE, LOG_INFO,
-                     QString("Updated pathname '%1':'%2' -> '%3'")
-                          .arg(pathname).arg(GetBasename()).arg(new_basename));
+            LOG(VB_FILE, LOG_INFO, LOC +
+                QString("Updated pathname '%1':'%2' -> '%3'")
+                    .arg(pathname).arg(GetBasename()).arg(new_basename));
         }
         SetPathname(new_basename);
     }
@@ -2131,23 +2129,22 @@ QString ProgramInfo::GetPlaybackURL(
         // Check to see if the file exists locally
         StorageGroup sgroup(storagegroup);
 #if 0
-        LOG(VB_FILE, LOG_DEBUG,
-                 QString("GetPlaybackURL: CHECKING SG : %1 : ").arg(tmpURL));
+        LOG(VB_FILE, LOG_DEBUG, LOC +
+            QString("GetPlaybackURL: CHECKING SG : %1 : ").arg(tmpURL));
 #endif
         tmpURL = sgroup.FindFile(basename);
 
         if (!tmpURL.isEmpty())
         {
-            LOG(VB_FILE, LOG_INFO,
-                     QString("GetPlaybackURL: File is local: '%1'")
-                         .arg(tmpURL));
+            LOG(VB_FILE, LOG_INFO, LOC +
+                QString("GetPlaybackURL: File is local: '%1'") .arg(tmpURL));
             return tmpURL;
         }
         else if (hostname == gCoreContext->GetHostName())
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                     QString("GetPlaybackURL: '%1' should be local, but it can "
-                             "not be found.").arg(basename));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("GetPlaybackURL: '%1' should be local, but it can "
+                        "not be found.").arg(basename));
             // Note do not preceed with "/" that will cause existing code
             // to look for a local file with this name...
             return QString("GetPlaybackURL/UNABLE/TO/FIND/LOCAL/FILE/ON/%1/%2")
@@ -2164,8 +2161,8 @@ QString ProgramInfo::GetPlaybackURL(
                                           gCoreContext->GetSetting("MasterServerPort").toInt(),
                                           basename);
 
-        LOG(VB_FILE, LOG_INFO,
-                 QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
+        LOG(VB_FILE, LOG_INFO, LOC +
+            QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
         return tmpURL;
         }
 
@@ -2174,9 +2171,8 @@ QString ProgramInfo::GetPlaybackURL(
                                       gCoreContext->GetSettingOnHost("BackendServerPort", hostname).toInt(),
                                       basename);
 
-    LOG(VB_FILE, LOG_INFO,
-             QString("GetPlaybackURL: Using default of: '%1'")
-                 .arg(tmpURL));
+    LOG(VB_FILE, LOG_INFO, LOC +
+        QString("GetPlaybackURL: Using default of: '%1'") .arg(tmpURL));
 
     return tmpURL;
 }
@@ -3644,7 +3640,7 @@ QString ProgramInfo::ChannelText(const QString &format) const
 void ProgramInfo::UpdateInUseMark(bool force)
 {
 #ifdef DEBUG_IN_USE
-    LOG(VB_GENERAL, LOG_DEBUG, QString("UpdateInUseMark(%1) '%2'")
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UpdateInUseMark(%1) '%2'")
              .arg(force?"force":"no force").arg(inUseForWhat));
 #endif
 
@@ -3842,15 +3838,15 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 #ifdef DEBUG_IN_USE
             if (!inUseForWhat.isEmpty())
             {
-                LOG(VB_GENERAL, LOG_INFO,
-                         QString("MarkAsInUse(true, '%1'->'%2')")
-                             .arg(inUseForWhat).arg(usedFor) +
-                         " -- use has changed");
+                LOG(VB_GENERAL, LOG_INFO, LOC +
+                    QString("MarkAsInUse(true, '%1'->'%2')")
+                        .arg(inUseForWhat).arg(usedFor) +
+                    " -- use has changed");
             }
             else
             {
-                LOG(VB_GENERAL, LOG_INFO,
-                         QString("MarkAsInUse(true, ''->'%1')").arg(usedFor));
+                LOG(VB_GENERAL, LOG_INFO, LOC +
+                    QString("MarkAsInUse(true, ''->'%1')").arg(usedFor));
             }
 #endif // DEBUG_IN_USE
 
@@ -3861,9 +3857,9 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
             QString oldInUseForWhat = inUseForWhat;
             inUseForWhat = QString("%1 [%2]")
                 .arg(QObject::tr("Unknown")).arg(getpid());
-            LOG(VB_GENERAL, LOG_WARNING,
-                     QString("MarkAsInUse(true, ''->'%1')").arg(inUseForWhat) +
-                     " -- use was not explicitly set");
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("MarkAsInUse(true, ''->'%1')").arg(inUseForWhat) +
+                " -- use was not explicitly set");
         }
 
         notifyOfChange = true;
@@ -3871,15 +3867,15 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     if (!inuse && !inUseForWhat.isEmpty() && usedFor != inUseForWhat)
     {
-        LOG(VB_GENERAL, LOG_WARNING,
-                 QString("MarkAsInUse(false, '%1'->'%2')")
-                     .arg(inUseForWhat).arg(usedFor) +
-                 " -- use has changed since first setting as in use.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("MarkAsInUse(false, '%1'->'%2')")
+                .arg(inUseForWhat).arg(usedFor) +
+            " -- use has changed since first setting as in use.");
     }
 #ifdef DEBUG_IN_USE
     else if (!inuse)
     {
-        LOG(VB_GENERAL, LOG_DEBUG, QString("MarkAsInUse(false, '%1')")
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("MarkAsInUse(false, '%1')")
                  .arg(inUseForWhat));
     }
 #endif // DEBUG_IN_USE
@@ -3889,8 +3885,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     if (!inuse && inUseForWhat.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_WARNING,
-                 "MarkAsInUse requires a key to delete in use mark");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "MarkAsInUse requires a key to delete in use mark");
         return; // can't delete if we don't have a key
     }
 
@@ -3939,7 +3935,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     }
     else if (!query.next())
     {
-        LOG(VB_GENERAL, LOG_ERR, "MarkAsInUse -- select query failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "MarkAsInUse -- select query failed");
     }
     else if (query.value(0).toUInt())
     {

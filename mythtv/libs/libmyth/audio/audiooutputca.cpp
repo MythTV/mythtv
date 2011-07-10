@@ -25,8 +25,6 @@ using namespace std;
 #include "SoundTouch.h"
 
 #define LOC QString("CoreAudio: ")
-#define LOC_WARN QString("CoreAudio, Warning: ")
-#define LOC_ERR QString("CoreAudio, Error: ")
 
 #define CHANNELS_MIN 1
 #define CHANNELS_MAX 8
@@ -124,7 +122,7 @@ public:
     int  AudioStreamChangeFormat(AudioStreamID               s,
                                  AudioStreamBasicDescription format);
 
-    // TODO: Get rid of these!
+    // TODO: Convert these to macros!
     void  Debug(QString msg)
     {   LOG(VB_AUDIO, LOG_INFO,      "CoreAudioData::" + msg);   }
 

@@ -18,7 +18,6 @@ extern "C" {
 #include "mythlogging.h"
 
 #define LOC QString("DEnc: ")
-#define LOC_ERR QString("DEnc, Error: ")
 
 AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
     av_context(NULL),
@@ -93,7 +92,8 @@ bool AudioOutputDigitalEncoder::Init(
     AVCodec *codec;
     int ret;
 
-    LOG(VB_AUDIO, LOG_INFO, QString("Init codecid=%1, br=%2, sr=%3, ch=%4")
+    LOG(VB_AUDIO, LOG_INFO, LOC + 
+        QString("Init codecid=%1, br=%2, sr=%3, ch=%4")
             .arg(ff_codec_id_string(codec_id)) .arg(bitrate)
             .arg(samplerate) .arg(channels));
 
@@ -107,7 +107,7 @@ bool AudioOutputDigitalEncoder::Init(
 #endif
     if (!codec)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Could not find codec");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec");
         return false;
     }
 
@@ -129,7 +129,7 @@ bool AudioOutputDigitalEncoder::Init(
     ret = avcodec_open(av_context, codec);
     if (ret < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "Could not open codec, invalid bitrate or samplerate");
 
         Dispose();
@@ -145,7 +145,7 @@ bool AudioOutputDigitalEncoder::Init(
     if (!m_spdifenc->Succeeded())
     {
         Dispose();
-        LOG(VB_GENERAL, LOG_ERR, "Could not create spdif muxer");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Could not create spdif muxer");
         return false;
     }
 
@@ -168,13 +168,14 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     if (required_len > (int)in_size)
     {
         required_len = ((required_len / INBUFSIZE) + 1) * INBUFSIZE;
-        LOG(VB_AUDIO, LOG_INFO,
+        LOG(VB_AUDIO, LOG_INFO, LOC +
             QString("low mem, reallocating in buffer from %1 to %2")
                 .arg(in_size) .arg(required_len));
         if (!(in = (inbuf_t *)realloc(in, in_size, required_len)))
         {
             in_size = 0;
-            LOG(VB_AUDIO, LOG_ERR, "AC-3 encode error, insufficient memory");
+            LOG(VB_AUDIO, LOG_ERR, LOC +
+                "AC-3 encode error, insufficient memory");
             return outlen;
         }
         in_size = required_len;
@@ -201,7 +202,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
                                        (short *)(in + i * samples_per_frame));
         if (outsize < 0)
         {
-            LOG(VB_AUDIO, LOG_ERR, "AC-3 encode error");
+            LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error");
             return outlen;
         }
 
@@ -215,13 +216,13 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         if (required_len > (int)out_size)
         {
             required_len = ((required_len / OUTBUFSIZE) + 1) * OUTBUFSIZE;
-            LOG(VB_AUDIO, LOG_WARNING,
+            LOG(VB_AUDIO, LOG_WARNING, LOC +
                 QString("low mem, reallocating out buffer from %1 to %2")
                     .arg(out_size) .arg(required_len));
             if (!(out = (outbuf_t *)realloc(out, out_size, required_len)))
             {
                 out_size = 0;
-                LOG(VB_AUDIO, LOG_ERR,
+                LOG(VB_AUDIO, LOG_ERR, LOC +
                     "AC-3 encode error, insufficient memory");
                 return outlen;
             }
@@ -242,7 +243,7 @@ size_t AudioOutputDigitalEncoder::GetFrames(void *ptr, int maxlen)
     int len = std::min(maxlen, outlen);
     if (len != maxlen)
     {
-        LOG(VB_AUDIO, LOG_INFO, "GetFrames: getting less than requested");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "GetFrames: getting less than requested");
     }
     memcpy(ptr, out, len);
     outlen -= len;

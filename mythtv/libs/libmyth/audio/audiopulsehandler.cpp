@@ -3,8 +3,6 @@
 #include "audiopulsehandler.h"
 
 #define LOC QString("Pulse: ")
-#define ERR QString("Pulse err: ")
-#define WAR QString("Pulse Warning: ")
 
 #define IS_READY(arg) ((PA_CONTEXT_READY      == arg) || \
                        (PA_CONTEXT_FAILED     == arg) || \
@@ -40,7 +38,7 @@ bool PulseHandler::Suspend(enum PulseAction action)
     {
         if (g_pulseHandler)
         {
-            LOG(VB_GENERAL, LOG_INFO, "Cleaning up PulseHandler");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Cleaning up PulseHandler");
             delete g_pulseHandler;
             g_pulseHandler = NULL;
         }
@@ -50,14 +48,14 @@ bool PulseHandler::Suspend(enum PulseAction action)
     // do nothing if PulseAudio is not currently running
     if (!IsPulseAudioRunning())
     {
-        LOG(VB_AUDIO, LOG_INFO, "PulseAudio not running");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "PulseAudio not running");
         return false;
     }
 
     // make sure any pre-existing handler is still valid
     if (g_pulseHandler && !g_pulseHandler->Valid())
     {
-        LOG(VB_AUDIO, LOG_INFO, "PulseHandler invalidated. Deleting.");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "PulseHandler invalidated. Deleting.");
         delete g_pulseHandler;
         g_pulseHandler = NULL;
     }
@@ -68,12 +66,13 @@ bool PulseHandler::Suspend(enum PulseAction action)
         PulseHandler* handler = new PulseHandler();
         if (handler)
         {
-            LOG(VB_AUDIO, LOG_INFO, "Created PulseHandler object");
+            LOG(VB_AUDIO, LOG_INFO, LOC + "Created PulseHandler object");
             g_pulseHandler = handler;
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to create PulseHandler object");
+            LOG(VB_GENERAL, LOG_ERR, LOC + 
+                "Failed to create PulseHandler object");
             return false;
         }
     }
@@ -99,13 +98,13 @@ static void StatusCallback(pa_context *ctx, void *userdata)
     PulseHandler *handler = static_cast<PulseHandler*>(userdata);
     if (!handler)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Callback: no handler.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Callback: no handler.");
         return;
     }
 
     if (handler->m_ctx != ctx)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Callback: handler/context mismatch.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Callback: handler/context mismatch.");
         return;
     }
 
@@ -118,7 +117,7 @@ static void StatusCallback(pa_context *ctx, void *userdata)
 
     // update our status
     pa_context_state state = pa_context_get_state(ctx);
-    LOG(VB_AUDIO, LOG_INFO, QString("Callback: State changed %1->%2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Callback: State changed %1->%2")
             .arg(state_to_string(handler->m_ctx_state))
             .arg(state_to_string(state)));
     handler->m_ctx_state = state;
@@ -132,8 +131,8 @@ static void OperationCallback(pa_context *ctx, int success, void *userdata)
     // ignore late updates but flag them as they may be an issue
     if (!PulseHandler::g_pulseHandlerActive)
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Received a late/unexpected operation "
-                                     "callback. Ignoring.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Received a late/unexpected operation callback. Ignoring.");
         return;
     }
 
@@ -141,26 +140,26 @@ static void OperationCallback(pa_context *ctx, int success, void *userdata)
     PulseHandler *handler = static_cast<PulseHandler*>(userdata);
     if (!handler)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Operation: no handler.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Operation: no handler.");
         return;
     }
 
     if (handler->m_ctx != ctx)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Operation: handler/context mismatch.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Operation: handler/context mismatch.");
         return;
     }
 
     if (handler != PulseHandler::g_pulseHandler)
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "Operation: returned handler is not the global handler.");
         return;
     }
 
     // update the context
     handler->m_pending_operations--;
-    LOG(VB_AUDIO, LOG_INFO, QString("Operation: success %1 remaining %2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Operation: success %1 remaining %2")
             .arg(success).arg(handler->m_pending_operations));
 }
 
@@ -175,7 +174,7 @@ PulseHandler::~PulseHandler(void)
 {
     // TODO - do we need to drain the context??
 
-    LOG(VB_AUDIO, LOG_INFO, "Destroying PulseAudio handler");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Destroying PulseAudio handler");
 
     // is this correct?
     if (m_ctx)
@@ -211,20 +210,20 @@ bool PulseHandler::Init(void)
     m_loop = pa_mainloop_new();
     if (!m_loop)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to get PulseAudio mainloop");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get PulseAudio mainloop");
         return m_valid;
     }
 
     pa_mainloop_api *api = pa_mainloop_get_api(m_loop);
     if (!api)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to get PulseAudio api");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get PulseAudio api");
         return m_valid;
     }
 
     if (pa_signal_init(api) != 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to initialise signaling");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise signaling");
         return m_valid;
     }
 
@@ -232,7 +231,7 @@ bool PulseHandler::Init(void)
     m_ctx = pa_context_new(api, client);
     if (!m_ctx)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create context");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create context");
         return m_valid;
     }
 
@@ -253,11 +252,11 @@ bool PulseHandler::Init(void)
 
     if (PA_CONTEXT_READY != m_ctx_state)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Context not ready after 1000ms");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Context not ready after 1000ms");
         return m_valid;
     }
 
-    LOG(VB_AUDIO, LOG_INFO, "Initialised handler");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Initialised handler");
     m_valid = true;
     return m_valid;
 }
@@ -270,14 +269,14 @@ bool PulseHandler::SuspendInternal(bool suspend)
 
     // just in case it all goes pete tong
     if (QThread::currentThread() != m_thread)
-        LOG(VB_AUDIO, LOG_WARNING, 
+        LOG(VB_AUDIO, LOG_WARNING, LOC +
             "PulseHandler called from a different thread");
 
     QString action = suspend ? "suspend" : "resume";
     // don't bother to suspend a networked server
     if (!pa_context_is_local(m_ctx))
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
                 "PulseAudio server is remote. No need to " + action);
         return false;
     }
@@ -308,11 +307,11 @@ bool PulseHandler::SuspendInternal(bool suspend)
     if (m_pending_operations)
     {
         m_pending_operations = 0;
-        LOG(VB_GENERAL, LOG_ERR, "Failed to " + action);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to " + action);
         return false;
     }
 
     // rejoice
-    LOG(VB_GENERAL, LOG_INFO, "PulseAudio " + action + " OK");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "PulseAudio " + action + " OK");
     return true;
 }

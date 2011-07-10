@@ -36,8 +36,6 @@ using namespace std;
 #include "mythuihelper.h"
 
 #define LOC      QString("UIListBtn*: ")
-#define LOC_WARN QString("UIListBtn*, Warning: ")
-#define LOC_ERR  QString("UIListBtn*, Error: ")
 
 UIListGenericTree::UIListGenericTree(UIListGenericTree *parent,
                                      const QString &name, const QString &action,
@@ -462,7 +460,7 @@ UIListBtnType *UIListTreeType::GetLevel(int levelnum)
 {
     if ((uint)levelnum > (uint)listLevels.size())
     {
-        LOG(VB_GENERAL, LOG_ERR, "OOB GetLevel call");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "OOB GetLevel call");
         return NULL;
     }
 
@@ -1420,7 +1418,7 @@ bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
 
     if (item != m_selItem)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Can't move non-selected item");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Can't move non-selected item");
         return false;
     }
 
