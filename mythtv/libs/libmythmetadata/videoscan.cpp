@@ -158,6 +158,8 @@ class VideoScannerThread : public QThread
 
             RemoteSendEvent(me);
         }
+        else
+            RemoteSendMessage("VIDEO_LIST_NO_CHANGE");
         threadDeregister();
     }
 
