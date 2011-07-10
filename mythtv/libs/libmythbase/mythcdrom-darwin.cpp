@@ -9,7 +9,6 @@
 #include "mythlogging.h"
 
 #define LOC     QString("MythCDROMDarwin:")
-#define LOC_ERR QString("mythcdrom-darwin, Error: ")
 
 class MythCDROMDarwin: public MythCDROM
 {
@@ -43,18 +42,18 @@ void MythCDROMDarwin::setSpeed(const char *device, int speed)
     fd = open(raw.toLocal8Bit().constData(), O_RDONLY | O_NONBLOCK);
     if (fd == -1)
     {
-        LOG(VB_MEDIA, LOG_ERR, "setSpeed() can't open drive " + raw);
+        LOG(VB_MEDIA, LOG_ERR, LOC + "setSpeed() can't open drive " + raw);
         return;
     }
 
     if (ioctl(fd, DKIOCCDSETSPEED, &spd) == -1 &&
         ioctl(fd, DKIOCDVDSETSPEED, &spd) == -1)
     {
-        LOG(VB_MEDIA, LOG_ERR, "setSpeed() failed: " + ENO);
+        LOG(VB_MEDIA, LOG_ERR, LOC + "setSpeed() failed: " + ENO);
         close(fd);
         return;
     }
-    LOG(VB_MEDIA, LOG_INFO, ":setSpeed() - CD/DVD Speed Set to " +
+    LOG(VB_MEDIA, LOG_INFO, LOC + ":setSpeed() - CD/DVD Speed Set to " +
                             QString::number(spd));
     close(fd);
 }

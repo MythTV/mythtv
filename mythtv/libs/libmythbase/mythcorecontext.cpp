@@ -31,8 +31,6 @@ using namespace std;
 #include "mythversion.h"
 
 #define LOC      QString("MythCoreContext: ")
-#define LOC_WARN QString("MythCoreContext, Warning: ")
-#define LOC_ERR  QString("MythCoreContext, Error: ")
 
 MythCoreContext *gCoreContext = NULL;
 QMutex *avcodeclock = new QMutex(QMutex::Recursive);
@@ -126,7 +124,7 @@ bool MythCoreContextPrivate::WaitForWOL(int timeout_in_ms)
     int timeout_remaining = timeout_in_ms;
     while (m_WOLInProgress && (timeout_remaining > 0))
     {
-        LOG(VB_GENERAL, LOG_INFO, "Wake-On-LAN in progress, waiting...");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Wake-On-LAN in progress, waiting...");
 
         int max_wait = min(1000, timeout_remaining);
         m_WOLInProgressWaitCondition.wait(
@@ -148,7 +146,7 @@ bool MythCoreContext::Init(void)
 {
     if (!d)
     {
-        LOG(VB_GENERAL, LOG_EMERG, "Init() Out-of-memory");
+        LOG(VB_GENERAL, LOG_EMERG, LOC + "Init() Out-of-memory");
         return false;
     }
 
@@ -209,8 +207,8 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
 
     if (!serverSock->writeStringList(strlist))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Connecting server socket to "
-                                 "master backend, socket write failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Connecting server socket to "
+                                       "master backend, socket write failed");
         return false;
     }
 
@@ -218,11 +216,11 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
         (strlist[0] == "ERROR"))
     {
         if (!strlist.empty())
-            LOG(VB_GENERAL, LOG_ERR, "Problem connecting "
-                                     "server socket to master backend");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Problem connecting "
+                                           "server socket to master backend");
         else
-            LOG(VB_GENERAL, LOG_ERR, "Timeout connecting "
-                                     "server socket to master backend");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Timeout connecting "
+                                           "server socket to master backend");
         return false;
     }
 
@@ -307,8 +305,8 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
     bool proto_mismatch = false;
     for (int cnt = 1; cnt <= maxConnTry; cnt++)
     {
-        LOG(VB_GENERAL, LOG_INFO,
-                QString("Connecting to backend server: %1:%2 (try %3 of %4)")
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Connecting to backend server: %1:%2 (try %3 of %4)")
                 .arg(hostname).arg(port).arg(cnt).arg(maxConnTry));
 
         m_serverSock = new MythSocket();
@@ -404,8 +402,8 @@ MythSocket *MythCoreContext::ConnectEventSocket(const QString &hostname,
     // this one won't need multiple retries to work...
     if (!m_eventSock->connect(hostname, port))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to connect event "
-                                 "socket to master backend");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to connect event "
+                                       "socket to master backend");
         m_eventSock->DownRef();
         m_eventSock = NULL;
         return NULL;
@@ -421,11 +419,11 @@ MythSocket *MythCoreContext::ConnectEventSocket(const QString &hostname,
         (strlist[0] == "ERROR"))
     {
         if (!strlist.empty())
-            LOG(VB_GENERAL, LOG_ERR, "Problem connecting "
-                                     "event socket to master backend");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Problem connecting "
+                                           "event socket to master backend");
         else
-            LOG(VB_GENERAL, LOG_ERR, "Timeout connecting "
-                                     "event socket to master backend");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Timeout connecting "
+                                           "event socket to master backend");
 
         m_eventSock->DownRef();
         m_eventSock->Unlock();
@@ -604,7 +602,8 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
     ret = QString("myth://%1%2%3%4%5").arg(m_storageGroup).arg(m_host).arg(m_port).arg(seperator).arg(path);
 
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("GenMythURL returning %1").arg(ret));
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + 
+        QString("GenMythURL returning %1").arg(ret));
 #endif
 
     return ret;

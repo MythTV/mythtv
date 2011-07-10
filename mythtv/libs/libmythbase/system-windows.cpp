@@ -549,7 +549,7 @@ void MythSystemWindows::Fork(time_t timeout)
     {
         if (!CreatePipe(&p_stdin[0], &p_stdin[1], &saAttr, 0)) 
         {
-            LOG(VB_GENERAL, LOG_ERR, "stdin pipe() failed");
+            LOG(VB_GENERAL, LOG_ERR, LOC_ERR + "stdin pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
         }
         else
@@ -557,7 +557,7 @@ void MythSystemWindows::Fork(time_t timeout)
             // Ensure the write handle to the pipe for STDIN is not inherited. 
             if (!SetHandleInformation(p_stdin[1], HANDLE_FLAG_INHERIT, 0))
             {
-                LOG(VB_SYSTEM, LOG_ERR, "stdin inheritance error");
+                LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stdin inheritance error");
                 SetStatus( GENERIC_EXIT_NOT_OK );
             }
             else
@@ -572,7 +572,7 @@ void MythSystemWindows::Fork(time_t timeout)
     {
         if (!CreatePipe(&p_stdout[0], &p_stdout[1], &saAttr, 0)) 
         {
-            LOG(VB_SYSTEM, LOG_ERR, "stdout pipe() failed");
+            LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stdout pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
         }
         else
@@ -580,7 +580,7 @@ void MythSystemWindows::Fork(time_t timeout)
             // Ensure the read handle to the pipe for STDOUT is not inherited.
             if (!SetHandleInformation(p_stdout[0], HANDLE_FLAG_INHERIT, 0))
             {
-                LOG(VB_SYSTEM, LOG_ERR, "stdout inheritance error");
+                LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stdout inheritance error");
                 SetStatus( GENERIC_EXIT_NOT_OK );
             }
             else
@@ -595,7 +595,7 @@ void MythSystemWindows::Fork(time_t timeout)
     {
         if (!CreatePipe(&p_stderr[0], &p_stderr[1], &saAttr, 0)) 
         {
-            LOG(VB_SYSTEM, LOG_ERR, "stderr pipe() failed");
+            LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stderr pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
         }
         else
@@ -603,7 +603,7 @@ void MythSystemWindows::Fork(time_t timeout)
             // Ensure the read handle to the pipe for STDERR is not inherited.
             if (!SetHandleInformation(p_stderr[0], HANDLE_FLAG_INHERIT, 0))
             {
-                LOG(VB_SYSTEM, LOG_ERR, "stderr inheritance error");
+                LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stderr inheritance error");
                 SetStatus( GENERIC_EXIT_NOT_OK );
             }
             else
@@ -649,7 +649,7 @@ void MythSystemWindows::Fork(time_t timeout)
 
     if (!success)
     {
-        LOG(VB_SYSTEM, LOG_ERR, "CreateProcess() failed");
+        LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "CreateProcess() failed");
         SetStatus( GENERIC_EXIT_NOT_OK );
     }
     else

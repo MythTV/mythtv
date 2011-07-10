@@ -1324,7 +1324,7 @@ bool MythRemoveDirectory(QDir &aDir)
     return(has_err);
 }
 
- MBASE_PUBLIC  QString &ShellEscape(QString &string)
+QString &ShellEscape(QString &string)
 {
     if (string.contains("\""))
         string = string.replace("\"", "\\\"");
@@ -1349,7 +1349,7 @@ bool MythRemoveDirectory(QDir &aDir)
  * If there is was no env. var, we use Qt to get proxy settings from the OS,
  * and search through them for a proxy server we can connect to.
  */
- MBASE_PUBLIC void setHttpProxy(void)
+void setHttpProxy(void)
 {
     QString       LOC = "setHttpProxy() - ";
     QNetworkProxy p;
@@ -1379,23 +1379,23 @@ bool MythRemoveDirectory(QDir &aDir)
             if (telnet(host, 8080))  // MS ISA
                 port = 8080;
 
-            LOG(VB_NETWORK, LOG_INFO, QString("assuming port %1 on host %2")
-                                .arg(port).arg(host));
+            LOG(VB_NETWORK, LOG_INFO, LOC + 
+                QString("assuming port %1 on host %2") .arg(port).arg(host));
             url.setPort(port);
         }
         else if (!ping(host, 1))
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("cannot locate host %1").arg(host) +
-                    "\n\t\t\tPlease check HTTP_PROXY environment variable!");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("cannot locate host %1").arg(host) +
+                "\n\t\t\tPlease check HTTP_PROXY environment variable!");
         else if (!telnet(host,port))
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("%1:%2 - cannot connect!").arg(host).arg(port) +
-                    "\n\t\t\tPlease check HTTP_PROXY environment variable!");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("%1:%2 - cannot connect!").arg(host).arg(port) +
+                "\n\t\t\tPlease check HTTP_PROXY environment variable!");
 
 #if 0
-        LOG(VB_NETWORK, LOG_DEBUG, QString("using http://%1:%2@%3:%4")
-                            .arg(url.userName()).arg(url.password())
-                            .arg(host).arg(port));
+        LOG(VB_NETWORK, LOG_DEBUG, LOC + QString("using http://%1:%2@%3:%4")
+                .arg(url.userName()).arg(url.password())
+                .arg(host).arg(port));
 #endif
         p = QNetworkProxy(QNetworkProxy::HttpProxy,
                           host, port, url.userName(), url.password());
@@ -1403,7 +1403,7 @@ bool MythRemoveDirectory(QDir &aDir)
         return;
     }
 
-    LOG(VB_NETWORK, LOG_DEBUG, "no HTTP_PROXY environment var.");
+    LOG(VB_NETWORK, LOG_DEBUG, LOC + "no HTTP_PROXY environment var.");
 
     // Use Qt to look for user proxy settings stored by the OS or browser:
 
@@ -1422,11 +1422,12 @@ bool MythRemoveDirectory(QDir &aDir)
 
         if (!telnet(host, port))
         {
-            LOG(VB_NETWORK, LOG_ERR, "failed to contact proxy host " + host);
+            LOG(VB_NETWORK, LOG_ERR, LOC +
+                "failed to contact proxy host " + host);
             continue;
         }
 
-        LOG(VB_NETWORK, LOG_INFO, QString("using proxy host %1:%2")
+        LOG(VB_NETWORK, LOG_INFO, LOC + QString("using proxy host %1:%2")
                             .arg(host).arg(port));
         QNetworkProxy::setApplicationProxy(p);
 
@@ -1447,10 +1448,10 @@ bool MythRemoveDirectory(QDir &aDir)
         return;
     }
 
-    LOG(VB_NETWORK, LOG_ERR, "failed to find a network proxy");
+    LOG(VB_NETWORK, LOG_ERR, LOC + "failed to find a network proxy");
 }
 
-MBASE_PUBLIC void wrapList(QStringList &list, int width)
+void wrapList(QStringList &list, int width)
 {
     int i;
 
