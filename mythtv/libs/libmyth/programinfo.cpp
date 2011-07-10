@@ -1757,8 +1757,8 @@ bool ProgramInfo::LoadProgramFromRecorded(
     findid       = query.value(45).toUInt();
 
     /**///rectype;
-    dupin        = RecordingDupInType(query.value(43).toInt());
-    dupmethod    = RecordingDupMethodType(query.value(44).toInt());
+    dupin        = RecordingDupInType(query.value(46).toInt());
+    dupmethod    = RecordingDupMethodType(query.value(47).toInt());
 
     // ancillary data -- begin
     set_flag(programflags, FL_CHANCOMMFREE,
