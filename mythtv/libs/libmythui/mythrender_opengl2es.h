@@ -83,15 +83,15 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
         if (!debugged)
         {
             debugged = true;
-            LOG(VB_GENERAL, LOG_INFO, QString("Vendor  : %1")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Vendor  : %1")
                     .arg((const char*) glGetString(GL_VENDOR)));
-            LOG(VB_GENERAL, LOG_INFO, QString("Renderer: %1")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Renderer: %1")
                     .arg((const char*) glGetString(GL_RENDERER)));
-            LOG(VB_GENERAL, LOG_INFO, QString("Version : %1")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Version : %1")
                     .arg((const char*) glGetString(GL_VERSION)));
-            LOG(VB_GENERAL, LOG_INFO, QString("Max texture size: %1 x %2")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size: %1 x %2")
                     .arg(m_max_tex_size).arg(m_max_tex_size));
-            LOG(VB_GENERAL, LOG_INFO, QString("Direct rendering: %1")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering: %1")
                     .arg((this->format().directRendering()) ? "Yes" : "No"));
         }
 

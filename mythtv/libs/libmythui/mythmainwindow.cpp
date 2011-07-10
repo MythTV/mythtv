@@ -78,8 +78,6 @@ using namespace std;
 #define GESTURE_TIMEOUT 1000
 
 #define LOC      QString("MythMainWindow: ")
-#define LOC_WARN QString("MythMainWindow, Warning: ")
-#define LOC_ERR  QString("MythMainWindow, Error: ")
 
 class KeyContext
 {

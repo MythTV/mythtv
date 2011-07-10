@@ -14,8 +14,6 @@
 #define NUM_SCALING_LEVELS 9
 
 #define LOC      QString("VDPAU: ")
-#define LOC_ERR  QString("VDPAU Error: ")
-#define LOC_WARN QString("VDPAU Warning: ")
 
 #define LOCK_RENDER QMutexLocker locker1(&m_render_lock);
 #define LOCK_DECODE QMutexLocker locker2(&m_decode_lock);
@@ -29,7 +27,7 @@
   ok &= (vdp_st == VDP_STATUS_OK); \
   if (!ok) \
   { \
-      LOG(VB_GENERAL, LOG_ERR, QString("Error at %1:%2 (#%3, %4)") \
+      LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
               .arg(__FILE__).arg( __LINE__).arg(vdp_st) \
               .arg(vdp_get_error_string(vdp_st))); \
   }
@@ -53,7 +51,7 @@
   { \
       ok = arg1; \
       if (!ok) \
-          LOG(VB_GENERAL, LOG_ERR, arg2); \
+          LOG(VB_GENERAL, LOG_ERR, LOC + arg2); \
   }
 
 #define CHECK_VIDEO_SURFACES(arg1) \
@@ -244,7 +242,7 @@ class VDPAUVideoMixer : public VDPAUResource
 static void vdpau_preemption_callback(VdpDevice device, void *myth_render)
 {
     (void)device;
-    LOG(VB_GENERAL, LOG_WARNING, "Display pre-empted.");
+    LOG(VB_GENERAL, LOG_WARNING, LOC + "Display pre-empted.");
     MythRenderVDPAU *render = (MythRenderVDPAU*)myth_render;
     if (render)
         render->SetPreempted();
@@ -278,7 +276,7 @@ bool MythRenderVDPAU::IsMPEG4Available(void)
     if (gVDPAUSupportChecked)
         return gVDPAUMPEG4Accel;
 
-    LOG(VB_PLAYBACK, LOG_INFO, "Checking VDPAU capabilities.");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Checking VDPAU capabilities.");
     MythRenderVDPAU *dummy = new MythRenderVDPAU();
     if (dummy)
     {
@@ -299,7 +297,7 @@ bool MythRenderVDPAU::H264DecoderSizeSupported(uint width, uint height)
     if (!check)
         return true;
 
-    LOG(VB_PLAYBACK, LOG_INFO,
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Checking support for H.264 video with width %1").arg(width));
     bool supported = true;
     MythRenderVDPAU *dummy = new MythRenderVDPAU();
@@ -312,9 +310,9 @@ bool MythRenderVDPAU::H264DecoderSizeSupported(uint width, uint height)
         else
             dummy->DestroyDecoder(test);
     }
-    LOG(VB_GENERAL, (supported ? LOG_INFO : LOG_WARNING),
-            QString("Hardware decoding of this H.264 video is %1supported "
-                    "on this video card.").arg(supported ? "" : "NOT "));
+    LOG(VB_GENERAL, (supported ? LOG_INFO : LOG_WARNING), LOC +
+        QString("Hardware decoding of this H.264 video is %1supported "
+                "on this video card.").arg(supported ? "" : "NOT "));
     if (dummy)
         delete dummy;
     return supported;
@@ -332,7 +330,7 @@ bool MythRenderVDPAU::CreateDummy(void)
     CREATE_CHECK(CheckHardwareSupport(), "")
 
     if (!ok)
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create dummy device.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create dummy device.");
 
     return ok;
 }
@@ -365,12 +363,13 @@ bool MythRenderVDPAU::Create(const QSize &size, WId window, uint colorkey)
 
     if (ok)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Created VDPAU render device %1x%2")
-           .arg(size.width()).arg(size.height()));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Created VDPAU render device %1x%2")
+                .arg(size.width()).arg(size.height()));
         return ok;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, "Failed to create VDPAU render device.");
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VDPAU render device.");
     return ok;
 }
 
@@ -400,7 +399,7 @@ bool MythRenderVDPAU::SetColorKey(uint colorkey)
                                                         &(color.m_vdp_color));
     CHECK_ST
 
-    LOG(VB_PLAYBACK, LOG_INFO, QString("Set colorkey to 0x%1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Set colorkey to 0x%1")
             .arg(m_colorKey, 0, 16));
     return ok;
 }
@@ -549,7 +548,7 @@ void MythRenderVDPAU::CheckOutputSurfaces(void)
             break;
     }
 
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Added %1 output surfaces (total %2, max %3)")
             .arg(created).arg(m_surfaces.size()).arg(need));
 }
@@ -571,7 +570,7 @@ uint MythRenderVDPAU::CreateOutputSurface(const QSize &size, VdpRGBAFormat fmt,
 
     if (!ok || !tmp)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create output surface.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create output surface.");
         return 0;
     }
 
@@ -614,7 +613,7 @@ uint MythRenderVDPAU::CreateVideoSurface(const QSize &size, VdpChromaType type,
 
     if (!ok || !tmp)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, "Failed to create video surface.");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to create video surface.");
         return 0;
     }
 
@@ -658,7 +657,7 @@ uint MythRenderVDPAU::CreateBitmapSurface(const QSize &size, VdpRGBAFormat fmt,
 
     if (!ok || !tmp)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create bitmap surface.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create bitmap surface.");
         return 0;
     }
 
@@ -702,7 +701,7 @@ uint MythRenderVDPAU::CreateDecoder(const QSize &size,
 
     if (!ok || !tmp)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, "Failed to create decoder.");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to create decoder.");
         return 0;
     }
 
@@ -794,10 +793,11 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
         {
             feat[count] = gVDPAUBestScaling;
             count++;
-            LOG(VB_PLAYBACK, LOG_INFO, "Enabling high quality scaling.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabling high quality scaling.");
         }
         else
-            LOG(VB_PLAYBACK, LOG_INFO, "High quality scaling not available");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                "High quality scaling not available");
     }
 
     vdp_st = vdp_video_mixer_create(m_device, count, count ? feat : NULL,
@@ -806,7 +806,7 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
 
     if (!ok || !tmp)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, QString("Failed to create video mixer."));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to create video mixer.");
         return 0;
     }
 
@@ -815,7 +815,7 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
     CHECK_ST
 
     if (!ok)
-        LOG(VB_PLAYBACK, LOG_WARNING,
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
             "WARNING: Failed to enable video mixer features.");
 
     if (existing)
@@ -1438,7 +1438,7 @@ bool MythRenderVDPAU::CreateDevice(void)
 
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create VDPAU device.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VDPAU device.");
         return false;
     }
 
@@ -1560,8 +1560,8 @@ bool MythRenderVDPAU::CreatePresentationSurfaces(void)
     if (m_surfaces.size() >= MIN_OUTPUT_SURFACES)
     {
         m_flipReady = m_flipQueue;
-        LOG(VB_GENERAL, LOG_INFO, QString("Created %1 output surfaces.")
-                                  .arg(m_surfaces.size()));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Created %1 output surfaces.") .arg(m_surfaces.size()));
     }
     return ok;
 }
@@ -1595,13 +1595,14 @@ bool MythRenderVDPAU::CheckHardwareSupport(void)
         {
             uint version;
             vdp_get_api_version(&version);
-            LOG(VB_GENERAL, LOG_INFO, QString("Version %1").arg(version));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Version %1").arg(version));
         }
         if (vdp_get_information_string)
         {
             const char * info;
             vdp_get_information_string(&info);
-            LOG(VB_GENERAL, LOG_INFO, QString("Information %2").arg(info));
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Information %2").arg(info));
         }
 
         for (int i = 0; i < NUM_SCALING_LEVELS; i++)
@@ -1610,13 +1611,13 @@ bool MythRenderVDPAU::CheckHardwareSupport(void)
 
         if (gVDPAUBestScaling)
         {
-            LOG(VB_PLAYBACK, LOG_INFO,
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("HQ scaling level %1 of %2 available.")
                 .arg(gVDPAUBestScaling - VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + 1)
                 .arg(NUM_SCALING_LEVELS));
         }
         else
-            LOG(VB_PLAYBACK, LOG_INFO, "HQ Scaling not supported.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "HQ Scaling not supported.");
 
         VdpBool supported = false;
 
@@ -1631,9 +1632,9 @@ bool MythRenderVDPAU::CheckHardwareSupport(void)
 
         gVDPAUMPEG4Accel = (bool)supported;
 
-        LOG(VB_PLAYBACK, LOG_INFO,
-                    QString("MPEG4 hardware acceleration %1supported.")
-                    .arg(gVDPAUMPEG4Accel ? "" : "not "));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("MPEG4 hardware acceleration %1supported.")
+                .arg(gVDPAUMPEG4Accel ? "" : "not "));
     }
 
     return true;
@@ -1757,7 +1758,7 @@ void MythRenderVDPAU::DestroyOutputSurfaces(void)
         return;
 
     if (m_outputSurfaces.size())
-        LOG(VB_GENERAL, LOG_WARNING, "Orphaned output surfaces.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned output surfaces.");
 
     INIT_ST
     QHash<uint, VDPAUOutputSurface>::iterator it;
@@ -1775,7 +1776,7 @@ void MythRenderVDPAU::DestroyVideoSurfaces(void)
         return;
 
     if (m_videoSurfaces.size())
-        LOG(VB_GENERAL, LOG_WARNING, "Orphaned video surfaces.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned video surfaces.");
 
     INIT_ST
     QHash<uint, VDPAUVideoSurface>::iterator it;;
@@ -1791,7 +1792,7 @@ void MythRenderVDPAU::DestroyVideoSurfaces(void)
 void MythRenderVDPAU::DestroyLayers(void)
 {
     if (m_layers.size())
-        LOG(VB_GENERAL, LOG_WARNING, "Orphaned layers.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned layers.");
     m_layers.clear();
 }
 
@@ -1801,7 +1802,7 @@ void MythRenderVDPAU::DestroyBitmapSurfaces(void)
         return;
 
     if (m_bitmapSurfaces.size())
-        LOG(VB_GENERAL, LOG_WARNING, "Orphaned bitmap surfaces.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned bitmap surfaces.");
 
     INIT_ST
     QHash<uint, VDPAUBitmapSurface>::iterator it;
@@ -1819,7 +1820,7 @@ void MythRenderVDPAU::DestroyDecoders(void)
         return;
 
     if (m_decoders.size())
-        LOG(VB_GENERAL, LOG_WARNING, "Orphaned decoders.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned decoders.");
 
     INIT_ST
     QHash<uint, VDPAUDecoder>::iterator it;
@@ -1837,7 +1838,7 @@ void MythRenderVDPAU::DestroyVideoMixers(void)
         return;
 
     if (m_videoMixers.size())
-        LOG(VB_GENERAL, LOG_WARNING, "Orphaned video mixers.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Orphaned video mixers.");
 
     INIT_ST
     QHash<uint, VDPAUVideoMixer>::iterator it;
@@ -1869,7 +1870,8 @@ void MythRenderVDPAU::Preempted(void)
     if (!m_preempted || m_recreating)
         return;
 
-    LOG(VB_GENERAL, LOG_NOTICE, "Attempting to re-create VDPAU resources.");
+    LOG(VB_GENERAL, LOG_NOTICE, LOC +
+        "Attempting to re-create VDPAU resources.");
     m_recreating = true;
     m_flipReady  = false;
     ResetProcs();
@@ -1903,7 +1905,7 @@ void MythRenderVDPAU::Preempted(void)
                 layers.value().m_layer.source_surface = old_surfaces[old];
         }
         if (ok)
-            LOG(VB_GENERAL, LOG_INFO, "Re-created output surfaces.");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Re-created output surfaces.");
     }
 
     if (ok && m_bitmapSurfaces.size())
@@ -1917,7 +1919,7 @@ void MythRenderVDPAU::Preempted(void)
                 ok = false;
         }
         if (ok)
-            LOG(VB_GENERAL, LOG_INFO, "Re-created bitmap surfaces.");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Re-created bitmap surfaces.");
 
     }
 
@@ -1932,7 +1934,7 @@ void MythRenderVDPAU::Preempted(void)
                 ok = false;
         }
         if (ok)
-            LOG(VB_GENERAL, LOG_INFO, "Re-created decoders.");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Re-created decoders.");
     }
 
     if (ok && m_videoMixers.size())
@@ -1948,7 +1950,7 @@ void MythRenderVDPAU::Preempted(void)
                 ok = false;
         }
         if (ok)
-            LOG(VB_GENERAL, LOG_INFO, "Re-created video mixers.");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Re-created video mixers.");
     }
 
     // reset of hardware surfaces needs to be done in the correct thread
@@ -1961,7 +1963,7 @@ void MythRenderVDPAU::Preempted(void)
 
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Failed to re-create VDPAU resources.");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to re-create VDPAU resources.");
         m_errored = true;
         return;
     }
@@ -1982,7 +1984,7 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
     int surfaces_owned = 0;
 
     // save map of existing surfaces and create new surfaces
-    QHash<uint ,uint> old_surfaces;
+    QHash<uint, uint> old_surfaces;
     for (it = m_videoSurfaces.begin(); it != m_videoSurfaces.end(); ++it)
     {
         old_surfaces.insert(it.value().m_id, it.key());
@@ -2000,7 +2002,7 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
     if (!surfaces_owned)
         return;
 
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Attempting to reset %1 video surfaces owned by this thread %2")
             .arg(surfaces_owned).arg((long long)this_thread));
 
@@ -2049,19 +2051,19 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
     }
 
     if (ok)
-        LOG(VB_GENERAL, LOG_INFO, QString("Re-created %1 video surfaces.")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Re-created %1 video surfaces.")
                                             .arg(surfaces_owned));
     else
-        LOG(VB_GENERAL, LOG_ERR, "Error re-creating video surfaces.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Error re-creating video surfaces.");
 
     int remaining = 0;
     for (it = m_videoSurfaces.begin(); it != m_videoSurfaces.end(); ++it)
         if (it.value().m_needs_reset)
             remaining++;
 
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("%1 of %2 video surfaces still need to be reset")
-        .arg(remaining).arg(m_videoSurfaces.size()));
+            .arg(remaining).arg(m_videoSurfaces.size()));
 
     m_reset_video_surfaces = remaining;
     m_errored = !ok;

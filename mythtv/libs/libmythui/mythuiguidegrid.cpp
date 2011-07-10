@@ -23,7 +23,6 @@ using namespace std;
 #include "mythdb.h"
 
 #define LOC QString("MythUIGuideGrid: ")
-#define LOC_ERR QString("MythUIGuideGrid, Error: ")
 
 MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
                : MythUIType(parent, name)
@@ -194,7 +193,7 @@ bool MythUIGuideGrid::ParseElement(
             *m_font = fontcopy;
         }
         else
-            LOG(VB_GENERAL, LOG_ERR, "Unknown font: " + fontname);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown font: " + fontname);
     }
     else if (element.tagName() == "recordstatus")
     {
@@ -246,7 +245,7 @@ void MythUIGuideGrid::CopyFrom(MythUIType *base)
     MythUIGuideGrid *gg = dynamic_cast<MythUIGuideGrid *>(base);
     if (!gg)
     {
-        LOG(VB_GENERAL, LOG_ERR, "bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "bad parsing");
         return;
     }
 
@@ -575,7 +574,7 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
     }
     if (f.handle() == -1)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unable to open '%1'")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to open '%1'")
                 .arg(f.fileName()));
         return false;
     }
@@ -587,10 +586,10 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Parsing colors: %1 at line: %2 column: %3")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Parsing colors: %1 at line: %2 column: %3")
                 .arg(f.fileName()).arg(errorLine).arg(errorColumn) +
-                QString("\n\t\t\t%1").arg(errorMsg));
+            QString("\n\t\t\t%1").arg(errorMsg));
         f.close();
         return false;
     }

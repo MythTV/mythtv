@@ -108,7 +108,7 @@ void MythVDPAUPainter::End(void)
 
 void MythVDPAUPainter::ClearCache(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Clearing VDPAU painter cache.");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Clearing VDPAU painter cache.");
 
     QMutexLocker locker(&m_bitmapDeleteLock);
     QMapIterator<MythImage *, uint32_t> it(m_ImageBitmapMap);
@@ -190,7 +190,7 @@ uint MythVDPAUPainter::GetTextureFromCache(MythImage *im)
     }
     else
     {
-       LOG(VB_GENERAL, LOG_ERR, "Failed to create VDPAU UI bitmap.");
+       LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VDPAU UI bitmap.");
     }
 
     return newbitmap;

@@ -21,8 +21,6 @@
 
 
 #define LOC      QString("MythUIVirtualKeyboard: ")
-#define LOC_WARN QString("MythUIVirtualKeyboard, Warning: ")
-#define LOC_ERR  QString("MythUIVirtualKeyboard, Error: ")
 
 static const int numcomps = 95;
 

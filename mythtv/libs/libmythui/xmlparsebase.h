@@ -11,7 +11,7 @@ class QDomElement;
 class QBrush;
 
 #define VERBOSE_XML(type, level, filename, element, msg)                  \
-    LOG(type, level, QString("%1\n\t\t\t"                                 \
+    LOG(type, level, LOC + QString("%1\n\t\t\t"                           \
                              "Location: %2 @ %3\n\t\t\t"                  \
                              "Name: '%4'\tType: '%5'")                    \
             .arg(msg).arg(filename).arg(element.lineNumber())             \

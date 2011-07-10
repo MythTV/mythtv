@@ -96,14 +96,14 @@ MythUIBusyDialog  *ShowBusyPopup(const QString &message)
             stk = win->GetStack("popup stack");
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "no main window?");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
             return NULL;
         }
 
         if (!stk)
         {
-            LOG(VB_GENERAL, LOG_ERR, "no popup stack?\n"
-                                     "Is there a MythThemeBase?");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
+                                           "Is there a MythThemeBase?");
             return NULL;
         }
     }

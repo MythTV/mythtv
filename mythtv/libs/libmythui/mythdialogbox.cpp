@@ -382,14 +382,14 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
             stk = win->GetStack("popup stack");
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "no main window?");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
             return NULL;
         }
 
         if (!stk)
         {
-            LOG(VB_GENERAL, LOG_ERR, "no popup stack? "
-                                     "Is there a MythThemeBase?");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
+                                           "Is there a MythThemeBase?");
             return NULL;
         }
     }
@@ -406,7 +406,7 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
     {
         delete pop;
         pop = NULL;
-        LOG(VB_GENERAL, LOG_ERR, "Couldn't Create() Dialog");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't Create() Dialog");
     }
 
     return pop;

@@ -14,8 +14,6 @@
 #include "xmlparsebase.h"
 
 #define LOC      QString("MythFontProperties: ")
-#define LOC_WARN QString("MythFontProperties, Warning: ")
-#define LOC_ERR  QString("MythFontProperties, Error: ")
 
 MythFontProperties::MythFontProperties() :
     m_brush(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
@@ -176,7 +174,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     newFont->Freeze();
 
     if (element.tagName() == "font")
-        LOG(VB_GENERAL, LOG_WARNING, 
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("File %1: Use of 'font' is deprecated in favour of "
                     "'fontdef'") .arg(filename));
 
@@ -465,7 +463,8 @@ bool FontMap::AddFont(const QString &text, MythFontProperties *font)
 
     if (m_FontMap.contains(text))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Already have a font: %1").arg(text));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Already have a font: %1").arg(text));
         return false;
     }
 

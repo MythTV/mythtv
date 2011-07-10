@@ -118,7 +118,7 @@ void MythD3D9Painter::End(void)
 
 void MythD3D9Painter::ClearCache(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Clearing D3D9 painter cache.");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Clearing D3D9 painter cache.");
 
     QMutexLocker locker(&m_bitmapDeleteLock);
     QMapIterator<MythImage *, D3D9Image*> it(m_ImageBitmapMap);
@@ -238,7 +238,7 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
     }
     else
     {
-       LOG(VB_GENERAL, LOG_ERR, "Failed to create D3D9 UI bitmap.");
+       LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create D3D9 UI bitmap.");
        if (newimage)
            delete newimage;
     }
