@@ -135,6 +135,7 @@ function editSelectedChannel() {
     $("#channelDetailSettingChanNum").val(rowdata.ChanNum);
     $("#channelDetailSettingChannelName").val(rowdata.ChannelName);
     $("#channelDetailSettingCallSign").val(rowdata.CallSign);
+    initXMLTVIdList();
     $("#channelDetailSettingXMLTVID").val(rowdata.XMLTVID);
     $("#channelDetailSettingIconURL").val(rowdata.IconURL);
     var preview = $("#channelDetailSettingIconPreview");
@@ -451,6 +452,25 @@ function initVideoMultiplexSelect(sourceid) {
 
     return result;
 }
+
+
+function initXMLTVIdList() {
+    var sourceid = $("#sourceList").val();
+    var ids = new Array();
+    var x = 0;
+    $.ajaxSetup({ async: false });
+    $.post("/Channel/GetXMLTVIds", { SourceID : sourceid }, function(data) {
+       $.each(data.QStringList, function(i, value) {
+            ids[x] = value;
+            x++;
+        });
+    }, "json");
+
+    $.ajaxSetup({ async: true });
+
+    $( "#channelDetailSettingXMLTVID" ).autocomplete({ source: ids });
+}
+
 
 function choseNewChanIcon(url) {
     $("#channelDetailSettingIconURL").val(url);

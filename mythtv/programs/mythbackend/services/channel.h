@@ -117,6 +117,8 @@ class Channel : public ChannelServices
 
         DTC::VideoMultiplex*      GetVideoMultiplex      ( int MplexID    );
 
+        QStringList               GetXMLTVIds            ( int SourceID );
+
 };
 
 // --------------------------------------------------------------------------
@@ -269,6 +271,11 @@ class ScriptableChannel : public QObject
         QObject* GetVideoMultiplex  ( int      MplexID )
         {
             return m_obj.GetVideoMultiplex( MplexID );
+        }
+
+        QStringList GetXMLTVIds ( int SourceID )
+        {
+            return m_obj.GetXMLTVIds(SourceID);
         }
 };
 

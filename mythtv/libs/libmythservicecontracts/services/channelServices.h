@@ -51,7 +51,7 @@
 class SERVICE_PUBLIC ChannelServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.04" );
+    Q_CLASSINFO( "version"    , "1.05" );
     Q_CLASSINFO( "CreateDBChannel_Method",           "POST" )
     Q_CLASSINFO( "UpdateDBChannel_Method",           "POST" )
     Q_CLASSINFO( "DeleteDBChannel_Method",           "POST" )
@@ -155,6 +155,8 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                                    int Count      ) = 0;
 
         virtual DTC::VideoMultiplex*      GetVideoMultiplex      ( int MplexID    ) = 0;
+
+        virtual QStringList               GetXMLTVIds            ( int SourceID ) = 0;
 };
 
 #endif

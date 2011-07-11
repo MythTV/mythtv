@@ -27,6 +27,7 @@
 
 #include "compat.h"
 #include "mythdbcon.h"
+#include "mythdirs.h"
 #include "mythversion.h"
 #include "mythcorecontext.h"
 #include "channelutil.h"
@@ -574,3 +575,57 @@ DTC::VideoMultiplex* Channel::GetVideoMultiplex( int nMplexID )
     return pVideoMultiplex;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList Channel::GetXMLTVIds( int SourceID )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to get source name."));
+
+    query.prepare("SELECT name FROM videosource WHERE sourceid = :SOURCEID ");
+    query.bindValue(":SOURCEID", SourceID);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetXMLTVIds()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    QStringList idList;
+
+    if (query.next())
+    {
+        QString sourceName = query.value(0).toString();
+
+        QString xmltvFile = GetConfDir() + '/' + sourceName + ".xmltv";
+
+        if (QFile::exists(xmltvFile))
+        {
+            QFile file(xmltvFile);
+            if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+                return idList;
+
+            while (!file.atEnd())
+            {
+                QByteArray line = file.readLine();
+
+                if (line.startsWith("channel="))
+                {
+                    QString id = line.mid(8, -1).trimmed();
+                    idList.append(id);
+                }
+            }
+
+            idList.sort();
+        }
+    }
+    else
+        throw(QString("SourceID (%1) not found").arg(SourceID));
+
+    return idList;
+}
