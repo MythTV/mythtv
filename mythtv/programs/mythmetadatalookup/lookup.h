@@ -16,8 +16,10 @@ class LookerUpper : public QObject
     bool StillWorking();
 
     void HandleSingleRecording(const uint chanid,
-                               const QDateTime starttime);
-    void HandleAllRecordings();
+                               const QDateTime starttime,
+                               bool updaterules = false);
+    void HandleAllRecordings(bool updaterules = false);
+    void HandleAllRecordingRules(void);
 
   private:
     void customEvent(QEvent *event);
@@ -25,6 +27,7 @@ class LookerUpper : public QObject
     MetadataFactory      *m_metadataFactory;
 
     QList<ProgramInfo*>   m_busyRecList;
+    bool                  m_updaterules;
 };
 
 #endif //LOOKUP_H_

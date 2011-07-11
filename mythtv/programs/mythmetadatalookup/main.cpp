@@ -45,7 +45,14 @@ void MythMetadataLookupCommandLineParser::LoadArguments(void)
     addLogging();
 
     add("--refresh-all", "refresh-all", false,
-            "Refresh all recorded programs and recording rules metadata", "");
+            "Batch update recorded program metadata.", "");
+    add("--refresh-rules", "refresh-rules", false,
+            "Also update inetref for recording rules when metadata is "
+            "found for a recording (Best effort only, imperfect)", "");
+    add("--refresh-all-rules", "refresh-all-rules", false,
+            "Batch update metadata for recording rules. This will "
+            "set inetrefs for your recording rules based on an automated "
+            "lookup. This is a best effort, and not guaranteed!", "");
 }
 
 int main(int argc, char *argv[])
@@ -88,35 +95,47 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    bool refreshall     = cmdline.toBool("refresh-all");
-    bool usedchanid     = cmdline.toBool("chanid");
-    bool usedstarttime  = cmdline.toBool("starttime");
-    bool addjob         = cmdline.toBool("jobid");
+    bool refreshall      = cmdline.toBool("refresh-all");
+    bool refreshrules    = cmdline.toBool("refresh-rules");
+    bool refreshallrules = cmdline.toBool("refresh-all-rules");
+    bool usedchanid      = cmdline.toBool("chanid");
+    bool usedstarttime   = cmdline.toBool("starttime");
+    bool addjob          = cmdline.toBool("jobid");
 
-    int jobid           = cmdline.toInt("jobid");
-    uint chanid         = cmdline.toUInt("chanid");
-    QDateTime starttime = cmdline.toDateTime("starttime");
+    int jobid            = cmdline.toInt("jobid");
+    uint chanid          = cmdline.toUInt("chanid");
+    QDateTime starttime  = cmdline.toDateTime("starttime");
+
+    if (refreshallrules && (refreshall || usedchanid || usedstarttime))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "--refresh-all-rules must not be accompanied by any other argument.");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
 
     if (refreshall && (usedchanid || usedstarttime))
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "--refresh-all must not be accompanied by --chanid or --starttime");
+            "--refresh-all must not be accompanied by any other argument.");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (!addjob && !refreshall && !usedchanid && !usedstarttime)
+    if (!addjob && !refreshall && !refreshallrules &&
+        !usedchanid && !usedstarttime)
     {
         refreshall = true;
     }
 
-    if (addjob && (refreshall || usedchanid || usedstarttime))
+    if (addjob && (refreshall || refreshallrules || usedchanid ||
+                   usedstarttime))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "The jobqueue (-j) command cannot be used with other options.");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (!refreshall && !addjob && !(usedchanid && usedstarttime))
+    if (!refreshall && !refreshallrules && !addjob &&
+        !(usedchanid && usedstarttime))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "--chanid and --starttime must be used together.");
@@ -136,9 +155,11 @@ int main(int argc, char *argv[])
     }
 
     if (refreshall)
-        lookup->HandleAllRecordings();
+        lookup->HandleAllRecordings(refreshrules);
+    else if (refreshallrules)
+        lookup->HandleAllRecordingRules();
     else
-        lookup->HandleSingleRecording(chanid, starttime);
+        lookup->HandleSingleRecording(chanid, starttime, refreshrules);
 
     while (lookup->StillWorking())
     {

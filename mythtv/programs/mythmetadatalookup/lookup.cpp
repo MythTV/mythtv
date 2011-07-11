@@ -3,13 +3,16 @@
 #include <QList>
 
 #include "programinfo.h"
+#include "recordingrule.h"
 #include "mythlogging.h"
 #include "jobqueue.h"
+#include "remoteutil.h"
 
 #include "lookup.h"
 
 LookerUpper::LookerUpper() :
-    m_busyRecList(QList<ProgramInfo*>())
+    m_busyRecList(QList<ProgramInfo*>()),
+    m_updaterules(false)
 {
     m_metadataFactory = new MetadataFactory(this);
 }
@@ -30,7 +33,8 @@ bool LookerUpper::StillWorking()
 }
 
 void LookerUpper::HandleSingleRecording(const uint chanid,
-                                        const QDateTime starttime)
+                                        const QDateTime starttime,
+                                        bool updaterules)
 {
     ProgramInfo *pginfo = new ProgramInfo(chanid, starttime);
 
@@ -41,15 +45,19 @@ void LookerUpper::HandleSingleRecording(const uint chanid,
         return;
     }
 
+    m_updaterules = updaterules;
+
     m_busyRecList.append(pginfo);
     m_metadataFactory->Lookup(pginfo, false, false);
 }
 
-void LookerUpper::HandleAllRecordings()
+void LookerUpper::HandleAllRecordings(bool updaterules)
 {
     QMap< QString, ProgramInfo* > recMap;
     QMap< QString, uint32_t > inUseMap = ProgramInfo::QueryInUseMap();
     QMap< QString, bool > isJobRunning = ProgramInfo::QueryJobsRunning(JOB_COMMFLAG);
+
+    m_updaterules = updaterules;
 
     ProgramList progList;
 
@@ -62,6 +70,29 @@ void LookerUpper::HandleAllRecordings()
             (!pginfo->GetSubtitle().isEmpty() &&
               (pginfo->GetSeason() == 0) &&
               (pginfo->GetEpisode() == 0)))
+        {
+            QString msg = QString("Looking up: %1 %2").arg(pginfo->GetTitle())
+                                           .arg(pginfo->GetSubtitle());
+            LOG(VB_GENERAL, LOG_INFO, msg);
+
+            m_busyRecList.append(pginfo);
+            m_metadataFactory->Lookup(pginfo, false, false);
+        }
+    }
+}
+
+void LookerUpper::HandleAllRecordingRules()
+{
+    m_updaterules = true;
+
+    vector<ProgramInfo *> recordingList;
+
+    RemoteGetAllScheduledRecordings(recordingList);
+
+    for( int n = 0; n < (int)recordingList.size(); n++)
+    {
+        ProgramInfo *pginfo = new ProgramInfo(*(recordingList[n]));
+        if (pginfo->GetInetRef().isEmpty())
         {
             QString msg = QString("Looking up: %1 %2").arg(pginfo->GetTitle())
                                            .arg(pginfo->GetSubtitle());
@@ -136,6 +167,16 @@ void LookerUpper::customEvent(QEvent *levent)
 
         pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
         pginfo->SaveInetRef(lookup->GetInetref());
+
+        if (m_updaterules)
+        {
+            RecordingRule *rule = new RecordingRule();
+            rule->LoadByProgram(pginfo);
+            rule->m_inetref = lookup->GetInetref();
+            rule->Save();
+
+            delete rule;
+        }
 
         m_busyRecList.removeAll(pginfo);
     }
