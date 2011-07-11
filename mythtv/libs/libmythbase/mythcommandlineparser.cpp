@@ -22,6 +22,7 @@ using namespace std;
 #include <QString>
 #include <QCoreApplication>
 #include <QTextStream>
+#include <QDateTime>
 
 #include "mythcommandlineparser.h"
 #include "mythcorecontext.h"
@@ -959,7 +960,7 @@ void MythCommandLineParser::addLogging(void)
             "logpath", "",
             "Writes logging messages to a file at logpath.\n"
             "If a directory is given, a logfile will be created in that "
-            "directory with a filename of applicationName.pid.log.\n"
+            "directory with a filename of applicationName.date.pid.log.\n"
             "If a full filename is given, that file will be used.\n"
             "This is typically used in combination with --daemon, and if used "
             "in combination with --pidfile, this can be used with log "
@@ -1012,7 +1013,8 @@ QString MythCommandLineParser::GetLogFilePath(void)
     {
         m_parsed.insert("islogpath", true);
         logdir  = finfo.filePath();
-        logfile = QCoreApplication::applicationName() + 
+        logfile = QCoreApplication::applicationName() + "." +
+                  QDateTime::currentDateTime().toString("yyyyMMddhhmmss") +
                   QString(".%1").arg(pid) + ".log";
     }
     else
