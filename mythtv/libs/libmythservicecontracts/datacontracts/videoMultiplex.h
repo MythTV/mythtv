@@ -15,7 +15,7 @@ namespace DTC
 class SERVICE_PUBLIC VideoMultiplex : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.1" );
 
     Q_PROPERTY( int             MplexId          READ MplexId          WRITE setMplexId           )
     Q_PROPERTY( int             SourceId         READ SourceId         WRITE setSourceId          )
