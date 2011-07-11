@@ -910,6 +910,7 @@ class MythDB( DBCache ):
 
         return newvids,movvids,oldvids
 
+    @databaseSearch
     def searchVideos(self, init=False, key=None, value=None):
         """
         obj.searchVideos(**kwargs) -> list of Video objects
