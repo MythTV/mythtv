@@ -1329,6 +1329,9 @@ QString &ShellEscape(QString &string)
     if (string.contains("\""))
         string = string.replace("\"", "\\\"");
 
+    if (string.contains("\'"))
+        string = string.replace("\'", "\\\'");
+
     if (string.contains(" "))
     {
         string.prepend("\"");
