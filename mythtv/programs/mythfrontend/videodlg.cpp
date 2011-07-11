@@ -122,13 +122,15 @@ namespace
 
     bool GetLocalVideoImage(const QString &video_uid, const QString &filename,
                              const QStringList &in_dirs, QString &image,
-                             const QString &title, int season,
+                             QString title, int season,
                              const QString host, QString sgroup,
                              int episode = 0, bool isScreenshot = false)
     {
         QStringList search_dirs(in_dirs);
         QFileInfo qfi(filename);
         search_dirs += qfi.absolutePath();
+        if (title.contains("/"))
+            title.replace("/", "-");
 
         const QString base_name = qfi.completeBaseName();
         QList<QByteArray> image_types = QImageReader::supportedImageFormats();
