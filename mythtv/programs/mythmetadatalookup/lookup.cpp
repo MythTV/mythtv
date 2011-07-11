@@ -104,6 +104,38 @@ void LookerUpper::HandleAllRecordingRules()
     }
 }
 
+void LookerUpper::CopyRuleInetrefsToRecordings()
+{
+    QMap< QString, ProgramInfo* > recMap;
+    QMap< QString, uint32_t > inUseMap = ProgramInfo::QueryInUseMap();
+    QMap< QString, bool > isJobRunning = ProgramInfo::QueryJobsRunning(JOB_COMMFLAG);
+
+    ProgramList progList;
+
+    LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, -1 );
+
+    for( int n = 0; n < (int)progList.size(); n++)
+    {
+        ProgramInfo *pginfo = new ProgramInfo(*(progList[n]));
+        if (pginfo && pginfo->GetInetRef().isEmpty())
+        {
+            RecordingRule *rule = new RecordingRule();
+            rule->LoadByProgram(pginfo);
+            if (rule && rule->Load() && !rule->m_inetref.isEmpty())
+            {
+                QString msg = QString("%1").arg(pginfo->GetTitle());
+                if (!pginfo->GetSubtitle().isEmpty())
+                    msg += QString(": %1").arg(pginfo->GetSubtitle());
+                msg += " has no inetref, but its recording rule does. Copying...";
+                LOG(VB_GENERAL, LOG_INFO, msg);
+                pginfo->SaveInetRef(rule->m_inetref);
+                delete rule;
+            }
+            delete pginfo;
+        }
+    }
+}
+
 void LookerUpper::customEvent(QEvent *levent)
 {
     if (levent->type() == MetadataFactoryMultiResult::kEventType)

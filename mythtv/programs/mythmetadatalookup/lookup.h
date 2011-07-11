@@ -21,6 +21,8 @@ class LookerUpper : public QObject
     void HandleAllRecordings(bool updaterules = false);
     void HandleAllRecordingRules(void);
 
+    void CopyRuleInetrefsToRecordings();
+
   private:
     void customEvent(QEvent *event);
 

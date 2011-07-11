@@ -45,14 +45,18 @@ void MythMetadataLookupCommandLineParser::LoadArguments(void)
     addLogging();
 
     add("--refresh-all", "refresh-all", false,
-            "Batch update recorded program metadata.", "");
+            "Batch update recorded program metadata. If a recording's "
+            "rule has an inetref but the recording does not, it will "
+            "be inherited.", "");
     add("--refresh-rules", "refresh-rules", false,
             "Also update inetref for recording rules when metadata is "
             "found for a recording (Best effort only, imperfect)", "");
     add("--refresh-all-rules", "refresh-all-rules", false,
             "Batch update metadata for recording rules. This will "
             "set inetrefs for your recording rules based on an automated "
-            "lookup. This is a best effort, and not guaranteed!", "");
+            "lookup. This is a best effort, and not guaranteed! If your "
+            "recordings lack inetrefs but one is found for the rule, it "
+            "will be inherited.", "");
 }
 
 int main(int argc, char *argv[])
@@ -155,9 +159,15 @@ int main(int argc, char *argv[])
     }
 
     if (refreshall)
+    {
+        lookup->CopyRuleInetrefsToRecordings();
         lookup->HandleAllRecordings(refreshrules);
+    }
     else if (refreshallrules)
+    {
         lookup->HandleAllRecordingRules();
+        lookup->CopyRuleInetrefsToRecordings();
+    }
     else
         lookup->HandleSingleRecording(chanid, starttime, refreshrules);
 
