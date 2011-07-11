@@ -239,8 +239,8 @@ extern MBASE_PUBLIC uint64_t verboseMask;
 #define VERBOSE_LEVEL_CHECK(mask, level) \
    (((verboseMask & (mask)) == (mask)) && logLevel >= (level))
 
-MBASE_PUBLIC __attribute__((error("VERBOSE is gone, use LOG")))
-    void VERBOSE(uint64_t mask, ...);
+MBASE_PUBLIC void VERBOSE(uint64_t mask, ...)
+    MERROR("VERBOSE is gone, use LOG");
 
 #ifdef  __cplusplus
 /// Verbose helper function for ENO macro

@@ -25,4 +25,10 @@
 # define MDEPRECATED
 #endif
 
+#if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)))
+# define MERROR(x)   __attribute__((error(x)))
+#else
+# define MERROR(x)
+#endif
+
 #endif // MYTHBASEEXP_H_
