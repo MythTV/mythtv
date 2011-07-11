@@ -22,7 +22,7 @@
 AppleRemote*      AppleRemote::_instance = 0;
 const int         AppleRemote::REMOTE_SWITCH_COOKIE = 19;
 
-#define LOG QString("AppleRemote::")
+#define LOC QString("AppleRemote::")
 
 static io_object_t _findAppleRemoteDevice(const char *devName);
 

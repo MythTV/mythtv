@@ -78,7 +78,7 @@ MythMediaType FindMediaType(io_service_t service)
                               kCFAllocatorDefault, 0);
 
                 if (!wholeMedia)
-                    LOG(VB_GENERAL, LOG_ALERT, LOC +
+                    LOG(VB_GENERAL, LOG_ALERT,
                         "Could not retrieve Whole property");
                 else
                 {
