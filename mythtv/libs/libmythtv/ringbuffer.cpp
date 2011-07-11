@@ -1091,7 +1091,7 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
             // seek should always succeed since we were at this position
             if (remotefile)
                 remotefile->Seek(old_pos, SEEK_SET);
-            else
+            else if (fd2 >= 0)
                 lseek64(fd2, old_pos, SEEK_SET);
         }
         else
