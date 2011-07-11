@@ -26,7 +26,6 @@ class SERVICE_PUBLIC VideoMultiplex : public QObject
     Q_PROPERTY( long long       SymbolRate       READ SymbolRate       WRITE setSymbolRate        )
     Q_PROPERTY( QString         FEC              READ FEC              WRITE setFEC               )
     Q_PROPERTY( QString         Polarity         READ Polarity         WRITE setPolarity          )
-    Q_PROPERTY( QString         MSystem          READ MSystem          WRITE setMSystem           )
     Q_PROPERTY( QString         Modulation       READ Modulation       WRITE setModulation        )
     Q_PROPERTY( QString         Bandwidth        READ Bandwidth        WRITE setBandwidth         )
     Q_PROPERTY( QString         LPCodeRate       READ LPCodeRate       WRITE setLPCodeRate        )
@@ -52,7 +51,6 @@ class SERVICE_PUBLIC VideoMultiplex : public QObject
     PROPERTYIMP    ( long long  , SymbolRate       )
     PROPERTYIMP    ( QString    , FEC              )
     PROPERTYIMP    ( QString    , Polarity         )
-    PROPERTYIMP    ( QString    , MSystem          )
     PROPERTYIMP    ( QString    , Modulation       )
     PROPERTYIMP    ( QString    , Bandwidth        )
     PROPERTYIMP    ( QString    , LPCodeRate       )
@@ -101,7 +99,6 @@ class SERVICE_PUBLIC VideoMultiplex : public QObject
             m_SymbolRate       = src.m_SymbolRate       ;
             m_FEC              = src.m_FEC              ;
             m_Polarity         = src.m_Polarity         ;
-            m_MSystem          = src.m_MSystem          ;
             m_Modulation       = src.m_Modulation       ;
             m_Bandwidth        = src.m_Bandwidth        ;
             m_LPCodeRate       = src.m_LPCodeRate       ;
