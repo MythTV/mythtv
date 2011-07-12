@@ -63,6 +63,7 @@ class HouseKeeper
     void CleanupProgramListings(void);
     void RunStartupTasks(void);
     void UpdateThemeChooserInfoCache(void);
+    void UpdateRecordedArtwork(void);
 
   private:
     bool                    isMaster;

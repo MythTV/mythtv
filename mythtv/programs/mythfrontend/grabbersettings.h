@@ -8,6 +8,7 @@
 // libmythui
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
+#include "mythuicheckbox.h"
 #include "mythscreentype.h"
 #include "mythdialogbox.h"
 
@@ -35,6 +36,8 @@ class GrabberSettings : public MythScreenType
     MythUIButtonList   *m_movieGrabberButtonList;
     MythUIButtonList   *m_tvGrabberButtonList;
     MythUIButtonList   *m_gameGrabberButtonList;
+
+    MythUICheckBox     *m_dailyUpdatesCheck;
 
     MythUIButton       *m_okButton;
     MythUIButton       *m_cancelButton;

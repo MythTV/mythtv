@@ -22,8 +22,8 @@ using namespace std;
 GrabberSettings::GrabberSettings(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_movieGrabberButtonList(NULL),      m_tvGrabberButtonList(NULL),
-      m_gameGrabberButtonList(NULL),          m_okButton(NULL),
-      m_cancelButton(NULL)
+      m_gameGrabberButtonList(NULL),       m_dailyUpdatesCheck(NULL),
+      m_okButton(NULL),                    m_cancelButton(NULL)
 {
 }
 
@@ -40,6 +40,8 @@ bool GrabberSettings::Create()
     m_movieGrabberButtonList = dynamic_cast<MythUIButtonList *> (GetChild("moviegrabber"));
     m_tvGrabberButtonList = dynamic_cast<MythUIButtonList *> (GetChild("tvgrabber"));
     m_gameGrabberButtonList = dynamic_cast<MythUIButtonList *> (GetChild("gamegrabber"));
+
+    m_dailyUpdatesCheck = dynamic_cast<MythUICheckBox *> (GetChild("dailyupdates"));
 
     m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
@@ -59,6 +61,13 @@ bool GrabberSettings::Create()
                                             "information and artwork about video games."));
     m_okButton->SetHelpText(tr("Save your changes and close this window."));
     m_cancelButton->SetHelpText(tr("Discard your changes and close this window."));
+
+    if (m_dailyUpdatesCheck)
+        m_dailyUpdatesCheck->SetHelpText(tr("If set, the backend will attempt to "
+                            "perform artwork updates for recordings daily. When "
+                            "new seasons begin to record, this will attempt to "
+                            "provide you with fresh, relevant artwork while "
+                            "preserving the artwork assigned to old recordings."));
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
@@ -248,6 +257,14 @@ void GrabberSettings::Init(void)
     m_movieGrabberButtonList->SetValueByData(qVariantFromValue(currentMovieGrabber));
     m_tvGrabberButtonList->SetValueByData(qVariantFromValue(currentTVGrabber));
     m_gameGrabberButtonList->SetValueByData(qVariantFromValue(currentGameGrabber));
+
+    if (m_dailyUpdatesCheck)
+    {
+        int updates =
+            gCoreContext->GetNumSetting("DailyArtworkUpdates", 1);
+        if (updates == 1)
+            m_dailyUpdatesCheck->SetCheckState(MythUIStateType::Full);
+    }
 }
 
 void GrabberSettings::slotSave(void)
@@ -255,6 +272,14 @@ void GrabberSettings::slotSave(void)
     gCoreContext->SaveSettingOnHost("TelevisionGrabber", m_tvGrabberButtonList->GetDataValue().toString(), "");
     gCoreContext->SaveSettingOnHost("MovieGrabber", m_movieGrabberButtonList->GetDataValue().toString(), "");
     gCoreContext->SaveSetting("mythgame.MetadataGrabber", m_gameGrabberButtonList->GetDataValue().toString());
+
+    if (m_dailyUpdatesCheck)
+    {
+        int dailyupdatestate = 0;
+        if (m_dailyUpdatesCheck->GetCheckState() == MythUIStateType::Full)
+            dailyupdatestate = 1;
+        gCoreContext->SaveSetting("DailyArtworkUpdates", dailyupdatestate);
+    }
 
     Close();
 }

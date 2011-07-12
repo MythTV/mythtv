@@ -318,6 +318,13 @@ void HouseKeeper::RunHouseKeeping(void)
                 UpdateThemeChooserInfoCache();
                 updateLastrun("ThemeChooserInfoCacheUpdate");
             }
+
+            if ((gCoreContext->GetNumSetting("DailyArtworkUpdates", 1)) &&
+                (wantToRun("RecordedArtworkUpdate", 1, 0, 24, true)))
+            {
+                UpdateRecordedArtwork();
+                updateLastrun("RecordedArtworkUpdate");
+            }
         }
 
         dbTag = QString("JobQueueRecover-%1").arg(gCoreContext->GetHostName());
@@ -821,6 +828,23 @@ void HouseKeeper::UpdateThemeChooserInfoCache(void)
         QFile::remove(remoteThemesFile);
         return;
     }
+}
+
+void HouseKeeper::UpdateRecordedArtwork(void)
+{
+    QString command = GetInstallPrefix() + "/bin/mythmetadatalookup";
+    QStringList args;
+    args << "--refresh-all-artwork";
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Performing Artwork Refresh: %1 %2")
+        .arg(command).arg(args.join(" ")));
+
+    MythSystem artupd(command, args, kMSRunShell | kMSAutoCleanup);
+
+    artupd.Run();
+    artupd.Wait();
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Artwork Refresh Complete"));
 }
 
 void HouseKeeper::RunStartupTasks(void)
