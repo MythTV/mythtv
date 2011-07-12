@@ -4,6 +4,7 @@
 
 #include "multiplex.h"
 #include "ts.h"
+#include "mythlogging.h"
 
 static int buffers_filled(multiplex_t *mx)
 {
@@ -54,13 +55,15 @@ static int peek_next_video_unit(multiplex_t *mx, index_unit *viu)
 
 	while (ring_avail(mx->index_vrbuffer) < sizeof(index_unit))
 		if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-			fprintf(stderr,"error in peek next video unit\n");
+			LOG(VB_GENERAL, LOG_ERR,
+                            "error in peek next video unit");
 			return 0;
 		}
 
 	ring_peek(mx->index_vrbuffer, (uint8_t *)viu, sizeof(index_unit),0);
 #ifdef OUT_DEBUG
-	fprintf(stderr,"video index start: %d  stop: %d  (%d)  rpos: %d\n", 
+	LOG(VB_GENERAL, LOG_DEBUG,
+	    "video index start: %d  stop: %d  (%d)  rpos: %d\n",
 		viu->start, (viu->start+viu->length),
 		viu->length, ring_rpos(mx->vrbuffer));
 #endif
@@ -75,13 +78,15 @@ static int get_next_video_unit(multiplex_t *mx, index_unit *viu)
 
 	while (ring_avail(mx->index_vrbuffer) < sizeof(index_unit))
 		if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-			fprintf(stderr,"error in get next video unit\n");
+			LOG(VB_GENERAL, LOG_ERR,
+			    "error in get next video unit");
 			return 0;
 		}
 
 	ring_read(mx->index_vrbuffer, (uint8_t *)viu, sizeof(index_unit));
 #ifdef OUT_DEBUG
-	fprintf(stderr,"video index start: %d  stop: %d  (%d)  rpos: %d\n", 
+	LOG(VB_GENERAL, LOG_INFO,
+	    "video index start: %d  stop: %d  (%d)  rpos: %d\n",
 		viu->start, (viu->start+viu->length),
 		viu->length, ring_rpos(mx->vrbuffer));
 #endif
@@ -98,14 +103,16 @@ static int peek_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 
 	while (ring_avail(&mx->index_extrbuffer[i]) < sizeof(index_unit))
 		if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-			fprintf(stderr,"error in peek next video unit\n");
+			LOG(VB_GENERAL, LOG_ERR,
+			    "error in peek next video unit");
 			return 0;
 		}
 
 	ring_peek(&mx->index_extrbuffer[i], (uint8_t *)extiu,
 		  sizeof(index_unit),0);
 #ifdef OUT_DEBUG
-	fprintf(stderr,"ext index start: %d  stop: %d  (%d)  rpos: %d\n", 
+	LOG(VB_GENERAL, LOG_DEBUG,
+	    "ext index start: %d  stop: %d  (%d)  rpos: %d",
 		extiu->start, (extiu->start+extiu->length),
 		extiu->length, ring_rpos(mx->extrbuffer));
 #endif
@@ -123,7 +130,8 @@ static int get_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 
 		while(ring_avail(&mx->index_extrbuffer[i]) < sizeof(index_unit))
 			if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-				fprintf(stderr,"error in get next ext unit\n");
+				LOG(VB_GENERAL, LOG_ERR,
+				    "error in get next ext unit");
 				break;
 			}
 	
@@ -142,7 +150,8 @@ static int get_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 	extiu->ptsrate = (uptsdiff(niu.pts, extiu->pts) << 8) / extiu->length;
 
 #ifdef OUT_DEBUG
-	fprintf(stderr,"ext index start: %d  stop: %d  (%d)  rpos: %d\n", 
+	LOG(VB_GENERAL, LOG_DEBUG,
+	    "ext index start: %d  stop: %d  (%d)  rpos: %d",
 		extiu->start, (extiu->start+extiu->length),
 		extiu->length, ring_rpos(&mx->extrbuffer[i]));
 #endif
@@ -179,7 +188,7 @@ static void writeout_video(multiplex_t *mx)
 	index_unit *viu = &mx->viu;
 
 #ifdef OUT_DEBUG
-	fprintf(stderr,"writing VIDEO pack\n");
+	LOG(VB_GENERAL, LOG_DEBUG, "writing VIDEO pack");
 #endif
 
 	if(viu->frame_start) {
@@ -200,7 +209,7 @@ static void writeout_video(multiplex_t *mx)
 			ptsinc(&mx->SCR, mx->SCRinc);
 		} else mx->startup = 0;
 #ifdef OUT_DEBUG
-		fprintf (stderr, " with sequence and gop header\n");
+		LOG(VB_GENERAL, LOG_DEBUG, " with sequence and gop header");
 #endif
 	}
 
@@ -247,10 +256,12 @@ static void writeout_video(multiplex_t *mx)
 			mx->extra_clock = ptsdiff(viu->dts + mx->video_delay, 
 						  mx->SCR + 500*CLOCK_MS);
 #ifdef OUT_DEBUG1
-			fprintf(stderr,"EXTRACLOCK2: %lli %lli %lli\n", viu->dts, mx->video_delay, mx->SCR);
-			fprintf(stderr,"EXTRACLOCK2: %lli ", mx->extra_clock);
+			LOG(VB_GENERAL, LOG_DEBUG,
+			    "EXTRACLOCK2: %lli %lli %lli",
+				viu->dts, mx->video_delay, mx->SCR);
+			LOG(VB_GENERAL, LOG_DEBUG, "EXTRACLOCK2: %lli",
+				 mx->extra_clock);
 			printpts(mx->extra_clock);
-			fprintf(stderr,"\n");
 #endif
 
 			if (mx->extra_clock < 0)
@@ -287,12 +298,11 @@ static void writeout_video(multiplex_t *mx)
 	write(mx->fd_out, outbuf, written);
 
 #ifdef OUT_DEBUG
-	fprintf(stderr,"VPTS");
+	LOG(VB_GENERAL, LOG_DEBUG, "VPTS");
 	printpts(viu->pts);
-	fprintf(stderr," DTS");
+	LOG(VB_GENERAL, LOG_DEBUG, " DTS");
 	printpts(viu->dts);
 	printpts(mx->video_delay);
-	fprintf(stderr,"\n");
 #endif
 	
 	if (viu->length == 0){
@@ -324,13 +334,13 @@ static void writeout_ext(multiplex_t *mx, int n)
 
 	case MPEG_AUDIO:
 #ifdef OUT_DEBUG
-		fprintf(stderr,"writing AUDIO%d pack\n",n);
+		LOG(VB_GENERAL, LOG_DEBUG, "writing AUDIO%d pack\n", n);
 #endif
 		break;
 
 	case AC3:
 #ifdef OUT_DEBUG
-		fprintf(stderr,"writing AC3%d pack\n",n);
+		LOG(VB_GENERAL, LOG_DEBUG, "writing AC3%d pack\n", n);
 #endif
 		rest_data = 1; // 4 bytes AC3 header
 		break;
@@ -353,7 +363,7 @@ static void writeout_ext(multiplex_t *mx, int n)
 	dummy_add(dbuf, pts, aiu->length);
 
 #ifdef OUT_DEBUG
-	fprintf(stderr,"start: %d  stop: %d (%d)  length %d ", 
+	LOG(VB_GENERAL, LOG_DEBUG, "start: %d  stop: %d (%d)  length %d",
 		aiu->start, (aiu->start+aiu->length),
 		aiu->length, length);
 	printpts(*apts);
@@ -361,7 +371,6 @@ static void writeout_ext(multiplex_t *mx, int n)
 	printpts(mx->audio_delay);
 	printpts(adelay);
 	printpts(pts);
-	fprintf(stderr,"\n");
 #endif
 	while (!mx->is_ts && length  < mx->data_size + rest_data){
 		if (ring_read(airbuffer, (uint8_t *)aiu, sizeof(index_unit)) > 0){
@@ -379,19 +388,19 @@ static void writeout_ext(multiplex_t *mx, int n)
 			*apts = dpts;
 			nframes++;
 #ifdef OUT_DEBUG
-			fprintf(stderr,"start: %d  stop: %d (%d)  length %d ", 
+			LOG(VB_GENERAL, LOG_DEBUG,
+			     "start: %d  stop: %d (%d)  length %d",
 				aiu->start, (aiu->start+aiu->length),
 				aiu->length, length);
 			printpts(*apts);
 			printpts(aiu->pts);
 			printpts(mx->audio_delay);
 			printpts(adelay);
-			fprintf(stderr,"\n");
 #endif
 		} else if (mx->finish){
 			break;
 		} else if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-			fprintf(stderr,"error in writeout ext\n");
+			LOG(VB_GENERAL, LOG_ERR, "error in writeout ext");
 			exit(1);
 		}
 	}
@@ -444,17 +453,16 @@ static void writeout_ext(multiplex_t *mx, int n)
 	}
 	*apts = uptsdiff(aiu->pts + mx->audio_delay, adelay);
 #ifdef OUT_DEBUG
-	if ((int64_t)*apts < 0) fprintf(stderr,"SCHEISS ");
-	fprintf(stderr,"APTS");
+	if ((int64_t)*apts < 0)
+		LOG(VB_GENERAL, LOG_DEBUG, "SCHEISS APTS");
 	printpts(*apts);
 	printpts(aiu->pts);
 	printpts(mx->audio_delay);
 	printpts(adelay);
-	fprintf(stderr,"\n");
 #endif
 
 	if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-		fprintf(stderr,"error in writeout ext\n");
+		LOG(VB_GENERAL, LOG_ERR, "error in writeout ext");
 		exit(1);
 	}
 }
@@ -462,7 +470,9 @@ static void writeout_ext(multiplex_t *mx, int n)
 static void writeout_padding (multiplex_t *mx)
 {
 	uint8_t outbuf[3000];
-	//fprintf(stderr,"writing PADDING pack\n");
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, "writing PADDING pack");
+#endif
 
 	write_padding_pes( mx->pack_size, mx->extcnt, mx->SCR, 
 			   mx->muxr, outbuf);
@@ -478,7 +488,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 	*video_ok = 0;
 	
 	if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-		fprintf(stderr,"error in get next video unit\n");
+		LOG(VB_GENERAL, LOG_ERR, "error in get next video unit");
 		return;
 	}
 
@@ -490,9 +500,8 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 	
 	if (mx->VBR) {
 #ifdef OUT_DEBUG1
-		fprintf(stderr,"EXTRACLOCK: %lli ", mx->extra_clock);
+		LOG(VB_GENERAL, LOG_DEBUG, "EXTRACLOCK: %lli", mx->extra_clock);
 		printpts(mx->extra_clock);
-		fprintf(stderr,"\n");
 #endif
 		
 		if (mx->extra_clock > 0.0) {
@@ -549,18 +558,16 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 	}
 #ifdef OUT_DEBUG
 	if (set_ok) {
-		fprintf(stderr, "SCR");
+		LOG(VB_GENERAL, LOG_DEBUG, "SCR");
 		printpts(mx->oldSCR);
-		fprintf(stderr, "VDTS");
+		LOG(VB_GENERAL, LOG_DEBUG, "VDTS");
 		printpts(mx->viu.dts);
-		fprintf(stderr, " (%d)", *video_ok);
-		fprintf(stderr, " EXT");
+		LOG(VB_GENERAL, LOG_DEBUG, " (%d) EXT", *video_ok);
 		for (i = 0; i < mx->extcnt; i++){
-			fprintf(stderr, "%d:", mx->ext[i].type);
+			LOG(VB_GENERAL, LOG_DEBUG, "%d:", mx->ext[i].type);
 			printpts(mx->ext[i].pts);
-			fprintf(stderr, " (%d)", ext_ok[i]);
+			LOG(VB_GENERAL, LOG_DEBUG, " (%d)", ext_ok[i]);
 		}
-		fprintf(stderr, "\n");
 	}
 #endif
 }
@@ -770,7 +777,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 	for (mx->extcnt = 0, data_rate = 0, i = 0;
 			 i < N_AUDIO && exttype[i]; i++){
 		if (exttype[i] >= MAX_TYPES) {
-			fprintf(stderr, "Found illegal stream type %d\n",
+			LOG(VB_GENERAL, LOG_ERR, "Found illegal stream type %d",
 				exttype[i]);
 			exit(1);
 		}
@@ -813,10 +820,12 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 
 	if (mx->mux_rate) {
 		if ( mx->mux_rate < mx->muxr)
-                        fprintf(stderr, "data rate may be to high for required mux rate\n");
+                        LOG(VB_GENERAL, LOG_WARNING,
+			    "data rate may be to high for required mux rate");
                 mx->muxr = mx->mux_rate;
         }
-	fprintf(stderr, "Mux rate: %.2f Mbit/s\n", mx->muxr*8.0/1000000.);
+	LOG(VB_GENERAL, LOG_INFO, "Mux rate: %.2f Mbit/s",
+	    mx->muxr*8.0/1000000.0);
 	
 	mx->SCRinc = 27000000ULL/((uint64_t)mx->muxr / 
 				     (uint64_t) mx->pack_size);

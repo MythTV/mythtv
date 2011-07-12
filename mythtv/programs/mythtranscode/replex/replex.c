@@ -4,6 +4,8 @@
  *
  * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
+ * Changes to use MythTV logging
+ * Copyright (C) 2011 Gavin Hurlbut <ghurlbut@mythtv.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,6 +30,7 @@
 
 #include <stdlib.h>
 #include <getopt.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <sys/types.h>
@@ -57,6 +60,8 @@
 #define O_LARGEFILE 0
 #endif
 
+#include "mythlogging.h"
+
 static int replex_all_set(struct replex *rx);
 
 static int replex_check_id(struct replex *rx, uint16_t id)
@@ -84,12 +89,12 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 	int frame_size, j, out_size;
 	short *samples;
 	
-	fprintf(stderr, "encoding an MP2 audio frame\n");
+	LOG(VB_GENERAL, LOG_INFO, "encoding an MP2 audio frame");
 
 	/* find the MP2 encoder */
 	codec = avcodec_find_encoder(CODEC_ID_MP2);
 	if (!codec) {
-		fprintf(stderr, "codec not found\n");
+		LOG(VB_GENERAL, LOG_ERR, "codec not found");
 		return 1;
 	}
  
@@ -102,7 +107,7 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 	 
 	/* open it */
 	if (avcodec_open(c, codec) < 0) {
-		fprintf(stderr, "could not open codec\n");
+		LOG(VB_GENERAL, LOG_ERR, "could not open codec");
 		av_free(c);
 		return 1;
 	}
@@ -121,8 +126,9 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 	out_size = avcodec_encode_audio(c, buffer, bufsize, samples);
 	
 	if (out_size != bufsize) {
-		fprintf(stderr, "frame size (%d) does not equal required size (%d)?\n",
-				out_size, bufsize);
+		LOG(VB_GENERAL, LOG_ERR,
+		    "frame size (%d) does not equal required size (%d)?",
+			out_size, bufsize);
 		free(samples);
 		avcodec_close(c);
 		av_free(c);
@@ -156,7 +162,7 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 	switch ( type ){
 	case AC3:
 #ifdef IN_DEBUG
-		fprintf(stderr, "AC3\n");
+		LOG(VB_GENERAL, LOG_DEBUG, "AC3");
 #endif
 		aframe = &rx->ac3frame[num];	
 		iu = &rx->current_ac3index[num];
@@ -171,7 +177,7 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 
 	case MPEG_AUDIO:
 #ifdef IN_DEBUG
-		fprintf(stderr, "MPEG AUDIO\n");
+		LOG(VB_GENERAL, LOG_DEBUG, "MPEG AUDIO");
 #endif
 		aframe = &rx->aframe[num];	
 		iu = &rx->current_aindex[num];
@@ -213,10 +219,9 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 				if (!rx->ignore_pts){
 					if ((p->flag2 & PTS_ONLY)){
 						*fpts = trans_pts_dts(p->pts);
-						fprintf(stderr,
+						LOG(VB_GENERAL, LOG_INFO,
 							"starting audio PTS: ");
 						printpts(*fpts);
-						fprintf(stderr,"\n");
 					} else aframe->set = 0;
 				}
 
@@ -244,14 +249,18 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 					
 						c += pos+2;
 #ifdef IN_DEBUG
-						fprintf(stderr,"WRONG HEADER1 %d\n", diff);
+						LOG(VB_GENERAL, LOG_DEBUG,"
+						    WRONG HEADER1 %d", diff);
 #endif
 						continue;
 					}
 				}
 				if ((int) aframe->framesize > diff){
 					c += pos+2;
-					//fprintf(stderr,"WRONG HEADER2 %d\n", diff);
+#if 0
+					LOG(VB_GENERAL, LOG_ERR,
+					    "WRONG HEADER2 %d", diff);
+#endif
 					continue;
 				}
 			}
@@ -262,13 +271,16 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 				int64_t diff;
 				diff = ptsdiff(trans_pts_dts(p->pts), add_pts_audio(0, aframe,*acount + 1) + *fpts);
 				if (abs ((int)diff) >= frame_time){
-					fprintf(stderr,"fixing audio PTS inconsistency - diff: ");
+					LOG(VB_GENERAL, LOG_INFO,
+					    "fixing audio PTS inconsistency - diff: ");
 					printpts(abs(diff));
 
 					if (diff < 0){
 						diff = abs(diff);
 						int framesdiff = diff / frame_time;
-						fprintf(stderr, " - need to remove %d frame(s)\n", framesdiff);
+						LOG(VB_GENERAL, LOG_INFO,
+						    " - need to remove %d frame(s)",
+							framesdiff);
 						
 						// FIXME can only remove one frame at a time for now
 						if (framesdiff > 1)
@@ -278,7 +290,9 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 						continue;
 					} else {
 						int framesdiff = diff / frame_time;
-						fprintf(stderr, " - need to add %d frame(s)\n", framesdiff);
+						LOG(VB_GENERAL, LOG_INFO,
+						    " - need to add %d frame(s)",
+							framesdiff);
 						
 						// limit inserts to a maximum of 5 frames
 						if (framesdiff > 5)
@@ -287,7 +301,8 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 						// alloc memmory for  audio frame
 						uint8_t *framebuf;
 						if ( !(framebuf = (uint8_t *) malloc(sizeof(uint8_t) * aframe->framesize))) {
-							fprintf(stderr,"Not enough memory for audio frame\n");
+							LOG(VB_GENERAL, LOG_ERR,
+							    "Not enough memory for audio frame");
 							exit(1);
 						}
 
@@ -297,7 +312,9 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 							int res;
 							res = ring_peek(rbuf, framebuf, aframe->framesize, 0);
 							if (res != (int) aframe->framesize) {
-								fprintf(stderr,"ring buffer failed to peek frame res: %d\n", res);
+								LOG(VB_GENERAL, LOG_ERR,
+								    "ring buffer failed to peek frame res: %d",
+									res);
 								exit(1);
 							}
 						}	
@@ -329,13 +346,16 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 
 					if (iu->length < aframe->framesize ||
 					    iu->length > aframe->framesize+1){
-						fprintf(stderr,"Wrong audio frame size: %d\n", iu->length);
+						LOG(VB_GENERAL, LOG_ERR,
+						    "Wrong audio frame size: %d",
+							 iu->length);
 						iu->err= FRAME_ERR;
 					}
 					if (ring_write(index_buf, 
 							(uint8_t *)iu,
 							sizeof(index_unit)) < 0){
-						fprintf(stderr,"audio ring buffer overrun error\n");
+						LOG(VB_GENERAL, LOG_ERR,
+						    "audio ring buffer overrun error");
 						exit(1);
 					}
 					*acount += 1;
@@ -353,12 +373,13 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 					diff = ptsdiff(trans_pts_dts(p->pts),
 							iu->pts + *fpts);
 					if( !rx->keep_pts && abs ((int)diff) > 40*CLOCK_MS){
-						fprintf(stderr,"audio PTS inconsistent: ");
+						LOG(VB_GENERAL, LOG_ERR,
+						    "audio PTS inconsistent:");
 						printpts(trans_pts_dts(p->pts)-*fpts);
 						printpts(iu->pts);
-						fprintf(stderr,"diff: ");
+						LOG(VB_GENERAL, LOG_ERR,
+						    "diff: ");
 						printpts(abs(diff));
-						fprintf(stderr,"\n");
 					}	
 					if (rx->keep_pts){
 						fix_audio_count(acount, aframe, 
@@ -369,8 +390,8 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 						iu->pts = uptsdiff(trans_pts_dts(p->pts),
 								   *fpts);
 						if (*lpts && ptsdiff(iu->pts,*lpts)<0) 
-							fprintf(stderr, 
-								"Warning negative audio PTS increase!\n");
+							LOG(VB_GENERAL, LOG_WARNING,
+							    "Warning negative audio PTS increase!\n");
 						*lpts = iu->pts;
 					}
 					first = 0;
@@ -386,7 +407,9 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 			}
 			c += pos;
 			if (c + (int) aframe->framesize > len){
-//				fprintf(stderr,"SHORT %d\n", len -c);
+#if 0
+				LOG(VB_GENERAL, LOG_INFO, "SHORT %d", len -c);
+#endif
 				c = len;
 			} else {
 				c += aframe->framesize;
@@ -431,19 +454,20 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 	rx->vpes_abort = 0;
 	off = ring_rdiff(rbuf, p->ini_pos);
 #ifdef IN_DEBUG
-	fprintf(stderr, " ini pos %d\n",
-		(p->ini_pos)%rx->videobuf);
+	LOG(VB_GENERAL, LOG_DEBUG, " ini pos %d", (p->ini_pos)%rx->videobuf);
 #endif
 
 	
-//	fprintf(stderr, "len %d  %d\n",len,off);
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, "len %d  %d",len,off);
+#endif
 	while (c < len){
 		if ((pos = ring_find_any_header( rbuf, &head, c+off, len-c)) 
 		    >=0 ){
 			switch(head){
 			case SEQUENCE_HDR_CODE:
 #ifdef IN_DEBUG
-				fprintf(stderr, " seq headr %d\n",
+				LOG(VB_GENERAL, LOG_DEBUG, " seq headr %d",
 					(p->ini_pos+c+pos)%rx->videobuf);
 #endif
 
@@ -457,7 +481,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 							    pos+c+off, len -c -pos);
 
 #ifdef IN_DEBUG
-					fprintf(stderr, " seq headr result %d\n",re);
+					LOG(VB_GENERAL, LOG_DEBUG,
+					    " seq headr result %d", re);
 #endif
 					if (re == -2){
 						rx->vpes_abort = len -(c+pos-1);
@@ -479,7 +504,7 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 				int ext_id = 0;
 
 #ifdef IN_DEBUG
-				fprintf(stderr," seq ext headr %d\n",
+				LOG(VB_GENERAL, LOG_DEBUG, " seq ext headr %d",
 					(p->ini_pos+c+pos)+rx->videobuf);
 #endif
 				ext_id = get_video_ext_info(rbuf, 
@@ -503,15 +528,16 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 						for (i = 0; i< s->current_tmpref;
 						     i++) ptsdec(&rx->first_vpts,
 								 SEC_PER);
-						fprintf(stderr,"starting with video PTS: ");
+						LOG(VB_GENERAL, LOG_INFO,
+						    "starting with video PTS:");
 						printpts(rx->first_vpts);
-						fprintf(stderr,"\n");
 					}
 
 					newpts = 0;
 #ifdef IN_DEBUG
 					
-					fprintf(stderr,"fcount %d  gcount %d  tempref %d  %d\n",
+					LOG(VB_GENERAL, LOG_DEBUG,
+					    "fcount %d  gcount %d  tempref %d  %d",
 						(int)rx->vframe_count, (int)rx->vgroup_count, 
 						(int)s->current_tmpref,
 						(int)(s->current_tmpref - rx->vgroup_count 
@@ -531,14 +557,15 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 
 						if (!rx->keep_pts &&
 						    abs((int)(diff)) > 3*SEC_PER/2){
-							fprintf(stderr,"video PTS inconsistent: ");
+							LOG(VB_GENERAL, LOG_INFO,
+							    "video PTS inconsistent:");
 							printpts(trans_pts_dts(p->pts));
 							printpts(iu->pts);
 							printpts(newpts+rx->first_vpts);
 							printpts(newpts);
-							fprintf(stderr," diff: ");
+							LOG(VB_GENERAL, LOG_INFO,
+							    " diff: ");
 							printpts(abs((int)diff));
-							fprintf(stderr,"\n");
 						}
 					}
 
@@ -550,14 +577,15 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 							       rx->first_vpts); 
 						if (!rx->keep_pts &&
 						    abs((int)diff) > 3*SEC_PER/2){
-							fprintf(stderr,"video DTS inconsistent: ");
+							LOG(VB_GENERAL, LOG_INFO,
+							    "video DTS inconsistent: ");
 							printpts(trans_pts_dts(p->dts));
 							printpts(iu->dts);
 							printpts(newdts+rx->first_vpts);
 							printpts(newdts);
-							fprintf(stderr,"diff: ");
+							LOG(VB_GENERAL, LOG_INFO,
+							    "diff: ");
 							printpts(abs((int)diff));
-							fprintf(stderr,"\n");
 						}
 					}
 					if (!rx->keep_pts){
@@ -584,8 +612,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 					}
 					if (rx->last_vpts && 
 					    ptsdiff(iu->dts, rx->last_vpts) <0)
-						fprintf(stderr,
-							"Warning negative video PTS increase!\n");
+						LOG(VB_GENERAL, LOG_WARNING,
+						    "Warning negative video PTS increase!");
 					rx->last_vpts = iu->dts;
 				}
 
@@ -608,7 +636,7 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 
 			case SEQUENCE_END_CODE:
 #ifdef IN_DEBUG
-				fprintf(stderr, " seq end %d\n",
+				LOG(VB_GENERAL, LOG_DEBUG, " seq end %d",
 					(p->ini_pos+c+pos)%rx->videobuf);
 #endif
 				if (s->set)
@@ -620,10 +648,10 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 				int hour, min, sec;
 //#define ANA
 #ifdef ANA
-				fprintf(stderr,"  %d", (int)rx->vgroup_count);
-				fprintf(stderr,"\n");
-
+				LOG(VB_GENERAL, LOG_DEBUG, "  %d",
+				    (int)rx->vgroup_count);
 #endif
+
 				if (s->set){
 					if (!seq_h) flush = 1;
 				}
@@ -641,7 +669,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 				sec  = (int)(((buf[5]<<3)& 0x38)|
 					     ((buf[6]>>5)& 0x07));
 #ifdef IN_DEBUG
-				fprintf(stderr,	" gop %02d:%02d.%02d %d\n",
+				LOG(VB_GENERAL, LOG_DEBUG,
+				    " gop %02d:%02d.%02d %d",
 					hour,min,sec, 
 					(p->ini_pos+c+pos)%rx->videobuf);
 #endif
@@ -684,28 +713,31 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 				switch (frame){
 				case I_FRAME:
 #ifdef ANA
-				fprintf(stderr,"I");
+				LOG(VB_GENERAL, LOG_DEBUG, "I");
 #endif
 #ifdef IN_DEBUG
-					fprintf(stderr, " I-frame %d\n",
+					LOG(VB_GENERAL, LOG_DEBUG,
+					    " I-frame %d",
 						(p->ini_pos+c+pos)%rx->videobuf);
 #endif
 					break;
 				case B_FRAME:
 #ifdef ANA
-				fprintf(stderr,"B");
+				LOG(VB_GENERAL, LOG_DEBUG, "B");
 #endif
 #ifdef IN_DEBUG
-					fprintf(stderr, " B-frame %d\n",
+					LOG(VB_GENERAL, LOG_DEBUG,
+					    " B-frame %d",
 						(p->ini_pos+c+pos)%rx->videobuf);
 #endif
 					break;
 				case P_FRAME:
 #ifdef ANA
-				fprintf(stderr,"P");
+				LOG(VB_GENERAL, LOG_DEBUG, "P");
 #endif
 #ifdef IN_DEBUG
-					fprintf(stderr,  " P-frame %d\n",
+					LOG(VB_GENERAL, LOG_DEBUG,
+					    " P-frame %d",
 						(p->ini_pos+c+pos)%rx->videobuf);
 #endif
 					break;
@@ -717,7 +749,10 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 			}
 			default:
 #ifdef IN_DEBUG
-				//fprintf(stderr,"other header 0x%02x (%d+%d)\n",head,c,pos);
+#if 0
+				LOG(VB_GENERAL, LOG_ERR,
+				    "other header 0x%02x (%d+%d)", head, c, pos);
+#endif
 #endif
 			  break;
 			}
@@ -735,7 +770,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 					if ( ring_write(index_buf, (uint8_t *)
 							 &rx->current_vindex,
 							 sizeof(index_unit))<0){
-						fprintf(stderr,"video ring buffer overrun error\n");
+						LOG(VB_GENERAL, LOG_ERR,
+						    "video ring buffer overrun error");
 						exit(1);
 
 					}
@@ -754,7 +790,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 				iu->start =  (p->ini_pos+pos+c-frame_off)
 					%rx->videobuf;
 #ifdef IN_DEBUG
-				fprintf(stderr,"START %d\n", iu->start);
+				LOG(VB_GENERAL, LOG_DEBUG, "START %d",
+					iu->start);
 #endif
 			}
 
@@ -841,14 +878,14 @@ static void es_out(pes_in_t *p)
 	}
 
 	default:
-                fprintf(stderr, "UNKNOWN AUDIO type %d\n", p->type);
+                LOG(VB_GENERAL, LOG_ERR, "UNKNOWN AUDIO type %d", p->type);
 		return;
 
 
 	}
 
 #ifdef IN_DEBUG
-	fprintf(stderr,"%s PES\n", t);
+	LOG(VB_GENERAL, LOG_DEBUG, "%s PES", t);
 #endif
 }
 
@@ -870,7 +907,8 @@ static void pes_es_out(pes_in_t *p)
 		p->ini_pos = ring_wpos(&rx->vrbuffer);
 
 		if (ring_write(&rx->vrbuffer, p->buf+9+p->hlength, len)<0){
-			fprintf(stderr,"video ring buffer overrun error\n");
+			LOG(VB_GENERAL, LOG_ERR,
+			    "video ring buffer overrun error");
 			exit(1);
 		}
 		if (rx->vpes_abort){
@@ -893,7 +931,8 @@ static void pes_es_out(pes_in_t *p)
 		if (l < 0) break;
 		p->ini_pos = ring_wpos(&rx->arbuffer[l]);
 		if (ring_write(&rx->arbuffer[l], p->buf+9+p->hlength, len)<0){
-			fprintf(stderr,"video ring buffer overrun error\n");
+			LOG(VB_GENERAL, LOG_ERR,
+			    "video ring buffer overrun error");
 			exit(1);
 		}
 		if (rx->apes_abort[l]){
@@ -935,7 +974,8 @@ static void pes_es_out(pes_in_t *p)
 		p->ini_pos = ring_wpos(&rx->ac3rbuffer[l]);
 	
 		if (ring_write(&rx->ac3rbuffer[l], p->buf+9+hl+p->hlength, len)<0){
-			fprintf(stderr,"video ring buffer overrun error\n");
+			LOG(VB_GENERAL, LOG_ERR,
+			    "video ring buffer overrun error");
 			exit(1);
 		}
 		if (rx->ac3pes_abort[l]){
@@ -957,7 +997,7 @@ static void pes_es_out(pes_in_t *p)
 	}
 	
 #ifdef IN_DEBUG
-	fprintf(stderr,"%s PES %d\n", t,len);
+	LOG(VB_GENERAL, LOG_DEBUG, "%s PES %d", t, len);
 #endif
 }
 
@@ -1024,7 +1064,7 @@ static void avi_es_out(pes_in_t *p)
 
 	}
 #ifdef IN_DEBUG
-	fprintf(stderr,"%s PES\n", t);
+	LOG(VB_GENERAL, LOG_DEBUG, "%s PES", t);
 #endif
 
 }
@@ -1101,11 +1141,13 @@ static ssize_t save_read(struct replex *rx, void *buf, size_t count)
 		uint8_t per=0;
 		
 		per = (uint8_t)(rx->finread*100/rx->inflength);
-		if (rx->lastper < per){
-			fprintf(stderr,"read %3d%%\r", (int)per);
+		if (per % 10 == 0 && rx->lastper < per){
+			LOG(VB_GENERAL, LOG_DEBUG, "read %3d%%", (int)per);
 			rx->lastper = per;
 		}
-	} else fprintf(stderr,"read %.2f MB\r", rx->finread/1024./1024.);
+	} else
+		LOG(VB_GENERAL, LOG_DEBUG, "read %.2f MB",
+		    rx->finread/1024.0/1024.0);
 #endif
 	if (neof < 0 && re == 0) return neof;
 	else return re;
@@ -1139,7 +1181,10 @@ static int guess_fill( struct replex *rx)
 				fill = ring_free(&rx->ac3rbuffer[i]);
 	}
 
-//	fprintf(stderr,"free %d  %d %d %d\n",fill, vavail, aavail, ac3avail);
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, "free %d  %d %d %d", fill, vavail, aavail,
+		ac3avail);
+#endif
 
 	if (!fill){ 
 		if(vavail && (aavail || ac3avail)) return 0;
@@ -1161,31 +1206,32 @@ static void find_pids_file(struct replex *rx)
 	int re=0;
 	uint16_t vpid=0, apid=0, ac3pid=0;
 		
-	fprintf(stderr,"Trying to find PIDs\n");
+	LOG(VB_GENERAL, LOG_INFO, "Trying to find PIDs");
 	while (!afound && !vfound && count < (int) rx->inflength){
 		if (rx->vpid) vfound = 1;
 		if (rx->apidn) afound = 1;
 		if ((re = save_read(rx,buf,IN_SIZE))<0)
-			perror("reading");
+			LOG(VB_GENERAL, LOG_ERR, "reading: %s",
+				strerror(errno));
 		else 
 			count += re;
 		if ( (re = find_pids(&vpid, &apid, &ac3pid, buf, re))){
 			if (!rx->vpid && vpid){
 				rx->vpid = vpid;
-				fprintf(stderr,"vpid 0x%04x  \n",
+				LOG(VB_GENERAL, LOG_INFO,"vpid 0x%04x",
 					(int)rx->vpid);
 				vfound++;
 			}
 			if (!rx->apidn && apid){
 				rx->apid[0] = apid;
-				fprintf(stderr,"apid 0x%04x  \n",
+				LOG(VB_GENERAL, LOG_INFO, "apid 0x%04x",
 					(int)rx->apid[0]);
 				rx->apidn++;
 				afound++;
 			}
 			if (!rx->ac3n && ac3pid){
 				rx->ac3_id[0] = ac3pid;
-				fprintf(stderr,"ac3pid 0x%04x  \n",
+				LOG(VB_GENERAL, LOG_INFO, "ac3pid 0x%04x",
 					(int)rx->ac3_id[0]);
 				rx->ac3n++;
 				afound++;
@@ -1197,7 +1243,7 @@ static void find_pids_file(struct replex *rx)
 	
 	lseek(rx->fd_in,0,SEEK_SET);
 	if (!afound || !vfound){
-		fprintf(stderr,"Couldn't find all pids\n");
+		LOG(VB_GENERAL, LOG_ERR, "Couldn't find all pids");
 		exit(1);
 	}
 	
@@ -1219,12 +1265,13 @@ static void find_all_pids_file(struct replex *rx)
 		
 	memset (vpid , 0 , MAXVPID*sizeof(uint16_t));
 	memset (apid , 0 , MAXAPID*sizeof(uint16_t));
-    memset (ac3pid , 0 , MAXAC3PID*sizeof(uint16_t));
+	memset (ac3pid , 0 , MAXAC3PID*sizeof(uint16_t));
 
-	fprintf(stderr,"Trying to find PIDs\n");
+	LOG(VB_GENERAL, LOG_INFO, "Trying to find PIDs");
 	while (count < (int) rx->inflength-IN_SIZE){
 		if ((re = save_read(rx,buf,IN_SIZE))<0)
-			perror("reading");
+			LOG(VB_GENERAL, LOG_ERR, "reading: %s",
+				strerror(errno));
 		else 
 			count += re;
 		if ( (re = find_pids_pos(&vp, &ap, &cp, buf, re, 
@@ -1232,7 +1279,10 @@ static void find_all_pids_file(struct replex *rx)
 			if (vp){
 				int old=0;
 				for (j=0; j < vn; j++){
-//					printf("%d. %d\n",j+1,vpid[j]);
+#if 0
+					LOG(VB_GENERAL, LOG_INFO,
+					    "%d. %d", j+1, vpid[j]);
+#endif
 					if (vpid[j] == vp){
 						old = 1;
 						break;
@@ -1241,7 +1291,8 @@ static void find_all_pids_file(struct replex *rx)
 				if (!old){
 					vpid[vn]=vp;
 					
-					printf("vpid %d: 0x%04x (%d)  PES ID: 0x%02x\n",
+					LOG(VB_GENERAL, LOG_INFO,
+					    "vpid %d: 0x%04x (%d)  PES ID: 0x%02x",
 					       vn+1,
 					       (int)vpid[vn], (int)vpid[vn],
 					       buf[vpos]);
@@ -1258,7 +1309,8 @@ static void find_all_pids_file(struct replex *rx)
 					}
 				if (!old){
 					apid[an]=ap;
-					printf("apid %d: 0x%04x (%d)  PES ID: 0x%02x\n",
+					LOG(VB_GENERAL, LOG_INFO,
+					    "apid %d: 0x%04x (%d)  PES ID: 0x%02x",
 					       an +1,
 					       (int)apid[an],(int)apid[an],
 					       buf[apos]);
@@ -1275,7 +1327,8 @@ static void find_all_pids_file(struct replex *rx)
 					}
 				if (!old){
 					ac3pid[ac3n]=cp;
-					printf("ac3pid %d: 0x%04x (%d) \n", 
+					LOG(VB_GENERAL, LOG_INFO,
+					    "ac3pid %d: 0x%04x (%d)",
 					       ac3n+1,
 					       (int)ac3pid[ac3n],
 					       (int)ac3pid[ac3n]);
@@ -1297,7 +1350,7 @@ static void find_pids_stdin(struct replex *rx, uint8_t *buf, int len)
 		
 	if (rx->vpid) vfound = 1;
 	if (rx->apidn) afound = 1;
-	fprintf(stderr,"Trying to find PIDs\n");
+	LOG(VB_GENERAL, LOG_INFO, "Trying to find PIDs");
 	if ( find_pids(&vpid, &apid, &ac3pid, buf, len) ){
 		if (!rx->vpid && vpid){
 			rx->vpid = vpid;
@@ -1334,16 +1387,18 @@ static void find_pids_stdin(struct replex *rx, uint8_t *buf, int len)
 	} 
 
 	if (afound && vfound){
-		fprintf(stderr,"found ");
-		if (rx->vpid) fprintf(stderr,"vpid %d (0x%04x)  ",
-				      rx->vpid, rx->vpid);
-		if (rx->apidn) fprintf(stderr,"apid %d (0x%04x)  ",
-				       rx->apid[0], rx->apid[0]);
-		if (rx->ac3n) fprintf(stderr,"ac3pid %d (0x%04x)  ",
-				      rx->ac3_id[0], rx->ac3_id[0]);
-		fprintf(stderr,"\n");
+		LOG(VB_GENERAL, LOG_INFO, "found");
+		if (rx->vpid)
+			LOG(VB_GENERAL, LOG_INFO, "vpid %d (0x%04x)",
+			      rx->vpid, rx->vpid);
+		if (rx->apidn)
+			LOG(VB_GENERAL, LOG_INFO, "apid %d (0x%04x)",
+			      rx->apid[0], rx->apid[0]);
+		if (rx->ac3n)
+			LOG(VB_GENERAL, LOG_INFO, "ac3pid %d (0x%04x)",
+			      rx->ac3_id[0], rx->ac3_id[0]);
 	} else {
-		fprintf(stderr,"Couldn't find pids\n");
+		LOG(VB_GENERAL, LOG_ERR, "Couldn't find pids");
 		exit(1);
 	}
 
@@ -1391,10 +1446,13 @@ static void pes_id_out(pes_in_t *p)
 							    9+p->hlength+4+fframe, 
 							    AC3, p->plength+6)) >= 0){
 						rx->scan_found = id;
-						//fprintf(stderr,"0x%04x  0x%04x \n",
-						//c-9-p->hlength-4,fframe);
-//					if (id>0x80)show_buf(p->buf+9+p->hlength,8);
-						//				if (id>0x80)show_buf(p->buf+c,8);
+#if 0
+						LOG(VB_GENERAL, LOG_INFO,
+						    "0x%04x  0x%04x \n",
+						    c-9-p->hlength-4, fframe);
+						if (id>0x80)show_buf(p->buf+9+p->hlength,8);
+						if (id>0x80)show_buf(p->buf+c,8);
+#endif
 					}
 				}
 				break;
@@ -1424,12 +1482,13 @@ static void find_pes_ids(struct replex *rx)
 	memset (apid , 0 , MAXAPID*sizeof(uint16_t));
 	memset (ac3pid , 0 , MAXAC3PID*sizeof(uint16_t));
 
-	fprintf(stderr,"Trying to find PES IDs\n");
+	LOG(VB_GENERAL, LOG_INFO, "Trying to find PES IDs");
 	rx->scan_found=0;
 	rx->pvideo.priv = rx ;
 	while (count < (int) rx->inflength-IN_SIZE){
 		if ((re = save_read(rx,buf,IN_SIZE))<0)
-			perror("reading");
+			LOG(VB_GENERAL, LOG_ERR, "reading: %s",
+				strerror(errno));
 		else 
 			count += re;
 		
@@ -1443,7 +1502,10 @@ static void find_pes_ids(struct replex *rx)
 			{
 				int old=0;
 				for (j=0; j < vn; j++){
-//					printf("%d. %d\n",j+1,vpid[j]);
+#if 0
+					LOG(VB_GENERAL, LOG_INFO,
+					    "%d. %d", j+1, vpid[j]);
+#endif
 					if (vpid[j] == rx->scan_found){
 						old = 1;
 						break;
@@ -1452,7 +1514,8 @@ static void find_pes_ids(struct replex *rx)
 				if (!old){
 					vpid[vn]=rx->scan_found;
 					
-					printf("MPEG VIDEO %d: 0x%02x (%d)\n",
+					LOG(VB_GENERAL, LOG_INFO,
+					    "MPEG VIDEO %d: 0x%02x (%d)",
 					       vn+1,
 					       (int)vpid[vn], (int)vpid[vn]);
 					if (vn+1 < MAXVPID) vn++;
@@ -1471,7 +1534,8 @@ static void find_pes_ids(struct replex *rx)
 					}
 				if (!old){
 					apid[an]=rx->scan_found;
-					printf("MPEG AUDIO %d: 0x%02x (%d)\n",
+					LOG(VB_GENERAL, LOG_INFO,
+					    "MPEG AUDIO %d: 0x%02x (%d)",
 					       an +1,
 					       (int)apid[an],(int)apid[an]);
 					if (an+1 < MAXAPID) an++;
@@ -1490,9 +1554,11 @@ static void find_pes_ids(struct replex *rx)
 				if (!old){
 					ac3pid[ac3n]=rx->scan_found;
 					if (rx->vdr){
-						printf("possible AC3 AUDIO with private stream 1 pid (0xbd) \n");
+						LOG(VB_GENERAL, LOG_INFO,
+						    "possible AC3 AUDIO with private stream 1 pid (0xbd)");
 					}else{
-						printf("AC3 AUDIO %d: 0x%02x (%d) \n", 
+						LOG(VB_GENERAL, LOG_INFO,
+						    "AC3 AUDIO %d: 0x%02x (%d)",
 						       ac3n+1,
 						       (int)ac3pid[ac3n],
 						       (int)ac3pid[ac3n]);
@@ -1512,12 +1578,11 @@ static void find_pes_ids(struct replex *rx)
 
 static void replex_finish(struct replex *rx)
 {
-
-	fprintf(stderr,"\n");
 	if (!replex_all_set(rx)){
-		fprintf(stderr,"Can't find all required streams\n");
+		LOG(VB_GENERAL, LOG_ERR, "Can't find all required streams");
 		if (rx->itype == REPLEX_PS){
-			fprintf(stderr,"Please check if audio and video have standard IDs (0xc0 or 0xe0)\n");
+			LOG(VB_GENERAL, LOG_ERR,
+			    "Please check if audio and video have standard IDs (0xc0 or 0xe0)");
 		}
 		exit(1);
 	}
@@ -1539,7 +1604,9 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 
 	if (rx->finish) return 0;
 	fill =  guess_fill(rx);
-	//fprintf(stderr,"trying to fill buffers with %d\n",fill);
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, "trying to fill buffers with %d", fill);
+#endif
 	if (fill < 0) return -1;
 
 	memset(buf, 0, IN_SIZE);
@@ -1550,7 +1617,9 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 			rsize = fill - (fill%188);
 		} else rsize = IN_SIZE;
 		
-//	fprintf(stderr,"filling with %d\n",rsize);
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, "filling with %d", rsize);
+#endif
 		
 		if (!rsize) return 0;
 		
@@ -1562,12 +1631,13 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 			}
 			
 			if ( i == 188){
-				fprintf(stderr,"Not a TS\n");
+				LOG(VB_GENERAL, LOG_ERR, "Not a TS");
 				return -1;
 			} else {
 				memcpy(buf,mbuf+i,2*TS_SIZE-i);
 				if ((count = save_read(rx,mbuf,i))<0)
-					perror("reading");
+					LOG(VB_GENERAL, LOG_ERR, "reading: %s",
+						strerror(errno));
 				memcpy(buf+2*TS_SIZE-i,mbuf,i);
 				i = 188;
 			}
@@ -1577,7 +1647,8 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 #define MAX_TRIES 5
 		while (count < rsize && tries < MAX_TRIES){
 			if ((re = save_read(rx,buf+i,rsize-i)+i)<0)
-				perror("reading");
+				LOG(VB_GENERAL, LOG_ERR, "reading: %s",
+					strerror(errno));
 			else 
 				count += re;
 			tries++;
@@ -1591,7 +1662,8 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 				if ( re - j < TS_SIZE) break;
 				
 				if ( replex_tsp( rx, buf+j) < 0){
-					fprintf(stderr, "Error reading TS\n");
+					LOG(VB_GENERAL, LOG_ERR,
+					    "Error reading TS");
 					exit(1);
 				}
 			}
@@ -1611,7 +1683,8 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 		
 		while (count < rsize && tries < MAX_TRIES){
 			if ((re = save_read(rx, buf, rsize))<0)
-				perror("reading PS");
+				LOG(VB_GENERAL, LOG_ERR, "reading PS: %s",
+					strerror(errno));
 			else 
 				count += re;
 	
@@ -1639,7 +1712,8 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 
 			while (count < rsize && tries < MAX_TRIES){
 				if ((re = save_read(rx, buf, rsize))<0)
-					perror("reading AVI");
+					LOG(VB_GENERAL, LOG_ERR, "reading AVI: %s",
+						strerror(errno));
 				else 
 					count += re;
 				
@@ -1705,35 +1779,35 @@ static int check_stream_type(struct replex *rx, uint8_t * buf, int len)
 	if (rx->itype != REPLEX_TS) return rx->itype;
 
 	if (len< 2*TS_SIZE){
-		fprintf(stderr,"cannot determine streamtype");
+		LOG(VB_GENERAL, LOG_ERR, "cannot determine streamtype");
 		exit(1);
 	}
 
-	fprintf(stderr, "Checking for TS: ");
+	LOG(VB_GENERAL, LOG_INFO, "Checking for TS: ");
 	while (c < len && buf[c]!=0x47) c++;
 	if (c<len && len-c>=TS_SIZE){
 		if (buf[c+TS_SIZE] == 0x47){
-			fprintf(stderr,"confirmed\n");
+			LOG(VB_GENERAL, LOG_INFO, "confirmed");
 			return REPLEX_TS;
-		} else  fprintf(stderr,"failed\n");
-	} else  fprintf(stderr,"failed\n");
+		} else  LOG(VB_GENERAL, LOG_INFO, "failed");
+	} else  LOG(VB_GENERAL, LOG_INFO, "failed");
 
-	fprintf(stderr, "Checking for AVI: ");
+	LOG(VB_GENERAL, LOG_INFO, "Checking for AVI: ");
 	if (check_riff(&ac, buf, len)>=0){
-		fprintf(stderr,"confirmed\n");
+		LOG(VB_GENERAL, LOG_INFO, "confirmed");
 		rx->itype = REPLEX_AVI;
 		rx->vpid = 0xE0;
 		rx->apidn = 1;
 		rx->apid[0] = 0xC0;
 		rx->ignore_pts =1;
 		return REPLEX_AVI;
-	} else fprintf(stderr,"failed\n");
+	} else LOG(VB_GENERAL, LOG_INFO, "failed");
 
-	fprintf(stderr, "Checking for PS: ");
+	LOG(VB_GENERAL, LOG_INFO, "Checking for PS: ");
 	if (find_any_header(&head, buf, len) >= 0){
-		fprintf(stderr,"confirmed(maybe)\n");
+		LOG(VB_GENERAL, LOG_INFO, "confirmed(maybe)");
 	} else {
-		fprintf(stderr,"failed, trying it anyway\n");
+		LOG(VB_GENERAL, LOG_INFO,"failed, trying it anyway");
 	}
 	rx->itype=REPLEX_PS;
 	if (!rx->vpid) rx->vpid = 0xE0;
@@ -1753,7 +1827,8 @@ static void init_replex(struct replex *rx)
 	rx->analyze=0;
 
 	if (save_read(rx, mbuf, 2*TS_SIZE)<0)
-		perror("reading");
+		LOG(VB_GENERAL, LOG_ERR, "reading: %s",
+			strerror(errno));
 	
 	check_stream_type(rx, mbuf, 2*TS_SIZE);
 	if (rx->itype == REPLEX_TS){
@@ -1834,7 +1909,7 @@ static void init_replex(struct replex *rx)
 	
 	if (rx->itype == REPLEX_TS){
 		if (replex_fill_buffers(rx, mbuf)< 0) {
-			fprintf(stderr,"error filling buffer\n");
+			LOG(VB_GENERAL, LOG_ERR, "error filling buffer");
 			exit(1);
 		}
 	} else if ( rx->itype == REPLEX_AVI){
@@ -1848,23 +1923,23 @@ static void init_replex(struct replex *rx)
 		ac = &rx->ac;
 		memset(ac, 0, sizeof(avi_context));
 		if ((read_count = save_read(rx, buf, 12)) != 12) {
-			fprintf(stderr,
-				"Error reading in 12 bytes from replex. Read %d bytes\n",
+			LOG(VB_GENERAL, LOG_ERR,
+			    "Error reading in 12 bytes from replex. Read %d bytes",
 				(int)read_count);
 			exit(1);
 		}
 		
 		if (check_riff(ac, buf, 12) < 0){
-			fprintf(stderr, "Wrong RIFF header\n");
+			LOG(VB_GENERAL, LOG_ERR, "Wrong RIFF header");
 			exit(1);
 		} else {
-			fprintf(stderr,"Found RIFF header\n");
+			LOG(VB_GENERAL, LOG_INFO, "Found RIFF header");
 		}
 		
 		memset(ac, 0, sizeof(avi_context));
 		re = read_avi_header(ac, rx->fd_in);
 		if (avi_read_index(ac,rx->fd_in) < 0 || re < 0){
-			fprintf(stderr, "Error reading index\n");
+			LOG(VB_GENERAL, LOG_ERR, "Error reading index");
 			exit(1);
 		}
 //		rx->aframe_count[0] = ac->ai[0].initial_frames;
@@ -1873,20 +1948,20 @@ static void init_replex(struct replex *rx)
 
 		rx->inflength = lseek(rx->fd_in, 0, SEEK_CUR)+ac->movi_length;
 
-		fprintf(stderr,"AVI initial frames %d\n",
+		LOG(VB_GENERAL, LOG_INFO, "AVI initial frames %d",
 			(int)rx->vframe_count);
 		if (!ac->done){
-			fprintf(stderr,"Error reading AVI header\n");
+			LOG(VB_GENERAL, LOG_ERR, "Error reading AVI header");
 			exit(1);
 		}
 
 		if (replex_fill_buffers(rx, buf+re)< 0) {
-			fprintf(stderr,"error filling buffer\n");
+			LOG(VB_GENERAL, LOG_ERR, "error filling buffer");
 			exit(1);
 		}
 	} else {
 		if (replex_fill_buffers(rx, mbuf)< 0) {
-			fprintf(stderr,"error filling buffer\n");
+			LOG(VB_GENERAL, LOG_ERR, "error filling buffer");
 			exit(1);
 		}
 	}
@@ -1907,8 +1982,8 @@ static void fix_audio(struct replex *rx, multiplex_t *mx)
 			while (ring_avail(&rx->index_arbuffer[i]) < 
 			       sizeof(index_unit)){
 				if (replex_fill_buffers(rx, 0)< 0) {
-					fprintf(stderr,
-						"error in fix audio\n");
+					LOG(VB_GENERAL, LOG_ERR,
+					    "error in fix audio");
 					exit(1);
 				}	
 			}
@@ -1921,10 +1996,9 @@ static void fix_audio(struct replex *rx, multiplex_t *mx)
 		} while (1);
 		mx->ext[i].pts_off = aiu.pts;
 		
-		fprintf(stderr,"Audio%d  offset: ",i);
+		LOG(VB_GENERAL, LOG_INFO, "Audio%d  offset: ", i);
 		printpts(mx->ext[i].pts_off);
 		printpts(rx->first_apts[i]+mx->ext[i].pts_off);
-		fprintf(stderr,"\n");
 	}
 			  
 	for ( i = 0; i < rx->ac3n; i++){
@@ -1932,8 +2006,8 @@ static void fix_audio(struct replex *rx, multiplex_t *mx)
 			while (ring_avail(&rx->index_ac3rbuffer[i]) < 
 			       sizeof(index_unit)){
 				if (replex_fill_buffers(rx, 0)< 0) {
-					fprintf(stderr,
-						"error in fix audio\n");
+					LOG(VB_GENERAL, LOG_ERR,
+					    "error in fix audio");
 					exit(1);
 				}	
 			}
@@ -1946,10 +2020,9 @@ static void fix_audio(struct replex *rx, multiplex_t *mx)
 		} while (1);
 		mx->ext[i].pts_off = aiu.pts;
 		
-		fprintf(stderr,"AC3%d  offset: ",i);
+		LOG(VB_GENERAL, LOG_INFO, "AC3%d  offset: ", i);
 		printpts(mx->ext[i].pts_off);
 		printpts(rx->first_ac3pts[i]+mx->ext[i].pts_off);
-		fprintf(stderr,"\n");
 
 	}
 }
@@ -2006,12 +2079,13 @@ static void do_analyze(struct replex *rx)
 	memset(lastapts, 0, N_AUDIO*sizeof(uint64_t));
 	memset(lastac3pts, 0, N_AC3*sizeof(uint64_t));
 	
-	fprintf(stderr,"STARTING ANALYSIS\n");
+	LOG(VB_GENERAL, LOG_INFO, "STARTING ANALYSIS");
 	
 	
 	while(!rx->finish){
 		if (replex_fill_buffers(rx, 0)< 0) {
-			fprintf(stderr,"error in get next video unit\n");
+			LOG(VB_GENERAL, LOG_ERR,
+			    "error in get next video unit");
 			return;
 		}
 		for (i=0; i< rx->apidn; i++){
@@ -2019,21 +2093,17 @@ static void do_analyze(struct replex *rx)
 				ring_skip(&rx->arbuffer[i], 
 					  dummy2.length);
 				if (av>=1){
-					fprintf(stdout,
-						"MPG2 Audio%d unit: ",
-						i);
-					fprintf(stdout,
-						" length %d  PTS ",
-						dummy2.length);
+					LOG(VB_GENERAL, LOG_INFO,
+					    "MPG2 Audio%d unit:  length %d  "
+					    "PTS ", i, dummy2.length);
 					printptss(dummy2.pts);
 					
 					if (lastapts[i]){
-						fprintf(stdout,"  diff:");
+						LOG(VB_GENERAL, LOG_INFO,
+						    "  diff:");
 						printptss(ptsdiff(dummy2.pts,lastapts[i]));
 					}
 					lastapts[i] = dummy2.pts;
-					
-					fprintf(stdout,"\n");
 				}
 			}
 		}
@@ -2043,20 +2113,16 @@ static void do_analyze(struct replex *rx)
 				ring_skip(&rx->ac3rbuffer[i], 
 					  dummy2.length);
 				if (av>=1){
-					fprintf(stdout,
-						"AC3 Audio%d unit: ",
-						i);
-					fprintf(stdout,
-						" length %d  PTS ",
-						dummy2.length);
+					LOG(VB_GENERAL, LOG_INFO,
+					    "AC3 Audio%d unit:  length %d  "
+					    "PTS ", i, dummy2.length);
 					printptss(dummy2.pts);
 					if (lastac3pts[i]){
-						fprintf(stdout,"  diff:");
+						LOG(VB_GENERAL, LOG_INFO,
+						    "  diff:");
 						printptss(ptsdiff(dummy2.pts, lastac3pts[i]));
 					}
 					lastac3pts[i] = dummy2.pts;
-					
-					fprintf(stdout,"\n");
 				}
 			}
 		}
@@ -2065,45 +2131,42 @@ static void do_analyze(struct replex *rx)
 			ring_skip(&rx->vrbuffer,
 				  dummy.length);
 			if (av==0 || av==2){
-				fprintf(stdout,
-					"Video unit: ");
+				LOG(VB_GENERAL, LOG_INFO, "Video unit: ");
 	                        if (dummy.seq_header){
-					fprintf(stdout,"Sequence header ");
+					LOG(VB_GENERAL, LOG_INFO,
+					    "Sequence header ");
 				}
 				if (dummy.gop){
-					fprintf(stdout,"GOP header ");
+					LOG(VB_GENERAL, LOG_INFO,
+					    "GOP header ");
 				}
 				switch (dummy.frame){
 				case I_FRAME:
-					fprintf(stdout, "I-frame");
+					LOG(VB_GENERAL, LOG_INFO, "I-frame");
 					break;
 				case B_FRAME:
-					fprintf(stdout, "B-frame");
+					LOG(VB_GENERAL, LOG_INFO, "B-frame");
 					break;
 				case P_FRAME:
-					fprintf(stdout, "P-frame");
+					LOG(VB_GENERAL, LOG_INFO, "P-frame");
 					break;
 				}
-				fprintf(stdout,
-					" length %d  PTS ",
+				LOG(VB_GENERAL, LOG_INFO, " length %d  PTS ",
 					dummy.length);
 				printptss(dummy.pts);
 				if (lastvpts){
-					fprintf(stdout,"  diff:");
+					LOG(VB_GENERAL, LOG_INFO,"  diff:");
 					printptss(ptsdiff(dummy.pts, lastvpts));
 				}
 				lastvpts = dummy.pts;
 					
-				fprintf(stdout,
-					"  DTS ");
+				LOG(VB_GENERAL, LOG_INFO, "  DTS ");
 				printptss(dummy.dts);
 				if (lastvdts){
-					fprintf(stdout,"  diff:");
+					LOG(VB_GENERAL, LOG_INFO, "  diff:");
 					printptss(ptsdiff(dummy.dts,lastvdts));
 				}
 				lastvdts = dummy.dts;
-					
-				fprintf(stdout,"\n");
 			}
 		}
 	}
@@ -2118,9 +2181,10 @@ static void do_scan(struct replex *rx)
 	rx->analyze=0;
 
 	if (save_read(rx, mbuf, 2*TS_SIZE)<0)
-		perror("reading");
+		LOG(VB_GENERAL, LOG_ERR, "reading: %s",
+			strerror(errno));
 	
-	fprintf(stderr,"STARTING SCAN\n");
+	LOG(VB_GENERAL, LOG_INFO, "STARTING SCAN");
 	
 	check_stream_type(rx, mbuf, 2*TS_SIZE);
 
@@ -2145,11 +2209,12 @@ static void do_demux(struct replex *rx)
 	index_unit dummy;
 	index_unit dummy2;
 	int i;
-	fprintf(stderr,"STARTING DEMUX\n");
+	LOG(VB_GENERAL, LOG_INFO, "STARTING DEMUX");
 	
 	while(!rx->finish){
 		if (replex_fill_buffers(rx, 0)< 0) {
-			fprintf(stderr,"error in get next video unit\n");
+			LOG(VB_GENERAL, LOG_ERR,
+			    "error in get next video unit");
 			return;
 		}
 		for (i=0; i< rx->apidn; i++){
@@ -2184,13 +2249,13 @@ static void do_replex(struct replex *rx)
 	multiplex_t mx;
 
 
-	fprintf(stderr,"STARTING REPLEX\n");
+	LOG(VB_GENERAL, LOG_INFO, "STARTING REPLEX");
 	memset(&mx, 0, sizeof(mx));
 	memset(ext_ok, 0, N_AUDIO*sizeof(int));
 
 	while (!replex_all_set(rx)){
 		if (replex_fill_buffers(rx, 0)< 0) {
-			fprintf(stderr,"error filling buffer\n");
+			LOG(VB_GENERAL, LOG_INFO, "error filling buffer");
 			exit(1);
 		}
 	}
@@ -2315,7 +2380,7 @@ int main(int argc, char **argv)
 			break;
 		case 'a':
 			if (rx.apidn==N_AUDIO){
-				fprintf(stderr,"Too many audio PIDs\n");
+				LOG(VB_GENERAL, LOG_ERR, "Too many audio PIDs");
 				exit(1);
 			}
                         rx.apid[rx.apidn] = strtol(optarg,(char **)NULL, 0);
@@ -2326,7 +2391,7 @@ int main(int argc, char **argv)
 			break;
 		case 'c':
 			if (rx.ac3n==N_AC3){
-				fprintf(stderr,"Too many audio PIDs\n");
+				LOG(VB_GENERAL, LOG_ERR, "Too many audio PIDs");
 				exit(1);
 			}
 			rx.ac3_id[rx.ac3n] = strtol(optarg,(char **)NULL, 0);
@@ -2373,14 +2438,15 @@ int main(int argc, char **argv)
 			perror("Error opening input file ");
 			exit(1);
 		}
-		fprintf(stderr,"Reading from %s\n", argv[optind]);
+		LOG(VB_GENERAL, LOG_INFO, "Reading from %s", argv[optind]);
 		rx.inflength = lseek(rx.fd_in, 0, SEEK_END);
-		fprintf(stderr,"Input file length: %.2f MB\n",rx.inflength/1024./1024.);
+		LOG(VB_GENERAL, LOG_INFO, "Input file length: %.2f MB",
+			rx.inflength/1024.0/1024.0);
 		lseek(rx.fd_in,0,SEEK_SET);
 		rx.lastper = 0;
 		rx.finread = 0;
 	} else {
-		fprintf(stderr,"using stdin as input\n");
+		LOG(VB_GENERAL, LOG_INFO, "using stdin as input");
 		rx.fd_in = STDIN_FILENO;
 		rx.inflength = 0;
 	}
@@ -2395,16 +2461,16 @@ int main(int argc, char **argv)
 				perror("Error opening output file");
 				exit(1);
 			}
-			fprintf(stderr,"Output File is: %s\n", 
+			LOG(VB_GENERAL, LOG_INFO, "Output File is: %s",
 				filename);
 		} else {
 			rx.fd_out = STDOUT_FILENO;
-			fprintf(stderr,"using stdout as output\n");
+			LOG(VB_GENERAL, LOG_INFO, "using stdout as output");
 		}
 	}
 	if (scan){
 		if (rx.fd_in == STDIN_FILENO){
-			fprintf(stderr,"Can`t scan from pipe\n");
+			LOG(VB_GENERAL, LOG_ERR, "Can`t scan from pipe");
 			exit(1);
 		}
 		do_scan(&rx);
@@ -2450,7 +2516,7 @@ int main(int argc, char **argv)
 			strcpy(filename,"out");
 		}
 		if (strlen(filename) > 250){
-			fprintf(stderr,"Basename too long\n");
+			LOG(VB_GENERAL, LOG_ERR, "Basename too long");
 			exit(0);
 		}
 			
@@ -2465,7 +2531,7 @@ int main(int argc, char **argv)
 			perror("Error opening output file");
 			exit(1);
 		}
-		fprintf(stderr,"Video output File is: %s\n", 
+		LOG(VB_GENERAL, LOG_INFO, "Video output File is: %s",
 			fname);
 		
 		for (i=0; i < rx.apidn; i++){
@@ -2482,7 +2548,8 @@ int main(int argc, char **argv)
 				perror("Error opening output file");
 				exit(1);
 			}
-			fprintf(stderr,"Audio%d output File is: %s\n",i,fname);
+			LOG(VB_GENERAL, LOG_INFO, "Audio%d output File is: %s",
+				i, fname);
 		}
 		
 		
@@ -2500,7 +2567,8 @@ int main(int argc, char **argv)
 				perror("Error opening output file");
 				exit(1);
 			}
-			fprintf(stderr,"AC3%d output File is: %s\n",i,fname);
+			LOG(VB_GENERAL, LOG_INFO, "AC3%d output File is: %s",
+				i, fname);
 		}
 		do_demux(&rx);
 	} else if (analyze){
@@ -2511,4 +2579,15 @@ int main(int argc, char **argv)
 	}
 
 	return 0;
+}
+
+void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
+                   const char *function, const char *format, ... )
+{
+	va_list         arguments;
+
+	va_start(arguments, format);
+	vfprintf(stderr, format, arguments);
+	va_end(arguments);
+	fprintf(stderr, "\n");
 }

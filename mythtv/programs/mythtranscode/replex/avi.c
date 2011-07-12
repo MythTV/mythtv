@@ -4,6 +4,8 @@
  *
  * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
+ * Changes to use MythTV logging
+ * Copyright (C) 2011 Gavin Hurlbut <ghurlbut@mythtv.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,6 +40,9 @@
 #ifdef DEBUG
 #include "mpg_common.h"
 #endif
+
+#include "mythlogging.h"
+
 static uint32_t getle32(uint8_t *buf)
 {
 	return (buf[3]<<24)|(buf[2]<<16)|(buf[1]<<8)|buf[0];
@@ -50,7 +55,7 @@ static uint32_t getbe32(uint8_t *buf)
 
 static void printhead(uint8_t *buf)
 {
-	printf("%c%c%c%c ", buf[0], buf[1], buf[2], buf[3]);
+	LOG(VB_GENERAL, LOG_INFO, "%c%c%c%c ", buf[0], buf[1], buf[2], buf[3]);
 }
 
 static uint32_t getsize(int fd)
@@ -121,15 +126,10 @@ int new_idx_frame( avi_context *ac, uint32_t pos, uint32_t len,
 static void print_index(avi_context *ac, int num){
 	char *cc;
 	cc = (char *) &ac->idx[num].id;
-	fprintf(stderr,"%d chunkid: %c%c%c%c ", 
-		num,
-		*cc,*(cc+1),*(cc+2),*(cc+3));
-	fprintf(stderr,"  chunkoff: 0x%04x ",
-		(int)ac->idx[num].off);
-	fprintf(stderr,"  chunksize: 0x%04x ",
-		ac->idx[num].len);
-	fprintf(stderr,"  chunkflags: 0x%04x \n",
-		ac->idx[num].flags);
+	LOG(VB_GENERAL, LOG_DEBUG,
+	    "%d chunkid: %c%c%c%c   chunkoff: 0x%04x   chunksize: 0x%04x "
+	    "  chunkflags: 0x%04x", num, *cc,*(cc+1),*(cc+2),*(cc+3),
+	    (int)ac->idx[num].off, ac->idx[num].len, ac->idx[num].flags);
 }
 
 int avi_read_index(avi_context *ac, int fd)
@@ -142,7 +142,7 @@ int avi_read_index(avi_context *ac, int fd)
 	char *cc;
 
 	if (!(ac->avih_flags & AVI_HASINDEX)) return -2;
-	fprintf(stderr,"READING INDEX\n");
+	LOG(VB_GENERAL, LOG_INFO, "READING INDEX");
 	if ((start = lseek(fd, 0, SEEK_CUR)) < 0) return -3;
 	if (lseek(fd, ac->movi_length+ac->movi_start+4, SEEK_SET) < 0) return -4;
 
@@ -151,8 +151,8 @@ int avi_read_index(avi_context *ac, int fd)
 
 	if (tag != TAG_IT('i','d','x','1')){
 		cc = (char *) &tag;
-		fprintf(stderr,"  tag: %c%c%c%c\n ",*cc,
-			*(cc+1),*(cc+2),*(cc+3));
+		LOG(VB_GENERAL, LOG_INFO, "  tag: %c%c%c%c\n ", *cc, *(cc+1),
+		    *(cc+2), *(cc+3));
 
 		if (lseek(fd, start, SEEK_SET) < 0 ) return -5;
 		return -1;
@@ -193,7 +193,10 @@ int avi_read_index(avi_context *ac, int fd)
 		c+=16;
 	}
 #ifdef DEBUG
-	fprintf(stderr,"Found %d video (%d were empty) and %d audio (%d were empty) chunks\n", (int)ac->vchunks, (int)ac->zero_vchunks, (int)ac->achunks, (int)ac->zero_achunks);
+	LOG(VB_GENERAL, LOG_DEBUG, "Found %d video (%d were empty) and %d "
+	                           "audio (%d were empty) chunks",
+	     (int)ac->vchunks, (int)ac->zero_vchunks, (int)ac->achunks,
+	     (int)ac->zero_achunks);
 
 #endif	
 	lseek(fd, start, SEEK_SET);
@@ -220,7 +223,8 @@ int read_avi_header( avi_context *ac, int fd)
 
 #ifdef DEBUG
 		cc = (char *) &tag;
-		fprintf(stderr,"tag: %c%c%c%c ",*cc,*(cc+1),*(cc+2),*(cc+3));
+		LOG(VB_GENERAL, LOG_DEBUG, "tag: %c%c%c%c",
+		    *cc, *(cc+1), *(cc+2), *(cc+3));
 #endif
 		switch(tag){
 		case TAG_IT('L','I','S','T'):
@@ -233,8 +237,8 @@ int read_avi_header( avi_context *ac, int fd)
 			ac->movi_start = lseek(fd, 0, SEEK_CUR);
 			ac->movi_length = size-8;
 #ifdef DEBUG
-			fprintf(stderr,"  size: %d",size);
-			fprintf(stderr," header done\n");
+			LOG(VB_GENERAL, LOG_DEBUG, "  size: %d header done",
+			    size);
 #endif
 			return 0;
 			break;
@@ -274,22 +278,24 @@ int read_avi_header( avi_context *ac, int fd)
 
 
 #ifdef DEBUG
-			fprintf(stderr,"  size: %d\n",size);
-			fprintf(stderr,"    microsecs per frame %d\n",
+			LOG(VB_GENERAL, LOG_DEBUG, "  size: %d", size);
+			LOG(VB_GENERAL, LOG_DEBUG, "    microsecs per frame %d",
 				ac->msec_per_frame);
 			if (ac->avih_flags & AVI_HASINDEX)
-				fprintf(stderr,"    AVI has index\n");
+				LOG(VB_GENERAL, LOG_DEBUG, "    AVI has index");
 			if (ac->avih_flags & AVI_USEINDEX)
-				fprintf(stderr,"    AVI must use index\n");
+				LOG(VB_GENERAL, LOG_DEBUG,
+				    "    AVI must use index");
 			if (ac->avih_flags & AVI_INTERLEAVED)
-				fprintf(stderr,"    AVI is interleaved\n");
+				LOG(VB_GENERAL, LOG_DEBUG,
+				    "    AVI is interleaved");
 			if(ac->total_frames)
-				fprintf(stderr,"    total frames: %d\n",
-					ac->total_frames);
+				LOG(VB_GENERAL, LOG_DEBUG,
+				    "    total frames: %d", ac->total_frames);
 
-			fprintf(stderr,"    number of streams: %d\n",
+			LOG(VB_GENERAL, LOG_DEBUG, "    number of streams: %d",
 				ac->nstreams);
-			fprintf(stderr,"    size: %dx%d\n",
+			LOG(VB_GENERAL, LOG_DEBUG, "    size: %dx%d",
 				ac->width, ac->height);
 #endif
 			break;
@@ -297,7 +303,7 @@ int read_avi_header( avi_context *ac, int fd)
 		case TAG_IT('s','t','r','h'):
 			size = getsize(fd);
 #ifdef DEBUG
-			fprintf(stderr,"  size: %d\n",size);
+			LOG(VB_GENERAL, LOG_DEBUG, "  size: %d", size);
 #endif
 
 			c=0;
@@ -306,8 +312,8 @@ int read_avi_header( avi_context *ac, int fd)
 			c+=16;
 #ifdef DEBUG
 			cc = (char *) &tag;
-			fprintf(stderr,"    tag: %c%c%c%c ",*cc,
-				*(cc+1),*(cc+2),*(cc+3));
+			LOG(VB_GENERAL, LOG_DEBUG, "    tag: %c%c%c%c",
+			    *cc, *(cc+1), *(cc+2), *(cc+3));
 #endif
 			switch ( tag ){
 			case TAG_IT('v','i','d','s'):
@@ -315,8 +321,9 @@ int read_avi_header( avi_context *ac, int fd)
 #ifdef DEBUG
 				if (ac->vhandler){
 					cc = (char *) &ac->vhandler;
-					fprintf(stderr,"     video handler: %c%c%c%c "
-						,*cc,*(cc+1),*(cc+2),*(cc+3));
+					LOG(VB_GENERAL, LOG_DEBUG,
+					    "     video handler: %c%c%c%c",
+					    *cc, *(cc+1), *(cc+2), *(cc+3));
 				}
 #endif
 				ac->vi.initial_frames = getle32(buf+c);
@@ -331,24 +338,21 @@ int read_avi_header( avi_context *ac, int fd)
 					ac->vi.fps = (ac->vi.dw_rate*1000)/
 						ac->vi.dw_scale;
 
-#ifdef DEBUG
-				fprintf(stderr,"\n");
-#endif 
-				fprintf(stderr,"AVI video info:  ");
-				fprintf(stderr,"dw_scale %d  dw_rate %d ", 
-					ac->vi.dw_scale, ac->vi.dw_rate);
-				fprintf(stderr,"fps %0.3f  ini_frames %d  dw_start %d\n", 
+				LOG(VB_GENERAL, LOG_INFO,
+				    "AVI video info:  dw_scale %d  dw_rate %d "
+				    "fps %0.3f  ini_frames %d  dw_start %d",
+					ac->vi.dw_scale, ac->vi.dw_rate,
 					ac->vi.fps/1000.0, 
-					ac->vi.initial_frames,
-					ac->vi.dw_start);
+					ac->vi.initial_frames, ac->vi.dw_start);
 				break;	
 			case TAG_IT('a','u','d','s'):
 				ac->ahandler = getle32(buf+4);
 #ifdef DEBUG
 				if (ac->vhandler){
 					cc = (char *) &ac->ahandler;
-					fprintf(stderr,"     audio handler: %c%c%c%c "
-						,*cc,*(cc+1),*(cc+2),*(cc+3));
+					LOG(VB_GENERAL, LOG_DEBUG,
+					    "     audio handler: %c%c%c%c",
+					    *cc, *(cc+1), *(cc+2), *(cc+3));
 				}
 #endif
 
@@ -367,17 +371,15 @@ int read_avi_header( avi_context *ac, int fd)
 					ac->ai[n].fps = 
 						(ac->ai[n].dw_rate*1000)/
 						ac->ai[n].dw_scale;
-#ifdef DEBUG
-				fprintf(stderr,"\n");
-#endif 
-				fprintf(stderr,"AVI audio%d info:  ",n);
-				fprintf(stderr,"dw_scale %d  dw_rate %d ", 
-					ac->ai[n].dw_scale, ac->ai[n].dw_rate);
-				fprintf(stderr,"ini_frames %d  dw_start %d",
+
+				LOG(VB_GENERAL, LOG_INFO,
+				    "AVI audio%d info:  dw_scale %d  dw_rate "
+				    "%d ini_frames %d  dw_start %d  fps %0.3f "
+				    " sam_size %d", n,
+					ac->ai[n].dw_scale, ac->ai[n].dw_rate,
 					ac->ai[n].initial_frames,
-					ac->ai[n].dw_start);
-				fprintf(stderr,"  fps %0.3f  sam_size %d\n",
-					ac->ai[n].fps/1000.,
+					ac->ai[n].dw_start,
+					ac->ai[n].fps/1000.0,
 					ac->ai[n].dw_ssize);
 				
 				ac->ntracks++;
@@ -389,14 +391,11 @@ int read_avi_header( avi_context *ac, int fd)
 			size -=4;
 			skip =1;
 #ifdef DEBUG
-			fprintf(stderr,"  size: %d",size);
+			LOG(VB_GENERAL, LOG_DEBUG, "  size: %d", size);
 #endif
 			break;
 
 		}
-#ifdef DEBUG
-		fprintf(stderr,"\n");
-#endif
 
 		if (skip){
 			lseek(fd, size, SEEK_CUR);
@@ -437,9 +436,9 @@ int get_avi_from_index(pes_in_t *p, int fd, avi_context *ac,
 		break;
 
 	default:
-		fprintf(stderr,"strange chunk :\n");
+		LOG(VB_GENERAL, LOG_ERR, "strange chunk :");
 		show_buf((uint8_t *) &idx[cidx].id,4);
-		fprintf(stderr,"offset: 0x%04x  length: 0x%04x\n", 
+		LOG(VB_GENERAL, LOG_ERR, "offset: 0x%04x  length: 0x%04x",
 			(int)idx[cidx].off, (int)idx[cidx].len);
 		ac->current_idx++;
 		p->found=0;
@@ -457,7 +456,8 @@ int get_avi_from_index(pes_in_t *p, int fd, avi_context *ac,
 	if (idx[cidx].len > insize) return 0;
 
 	if (idx[cidx].len > MAX_BUF_SIZE){
-		fprintf(stderr,"Buffer too small in get_avi_from_index\n");
+		LOG(VB_GENERAL, LOG_ERR,
+		    "Buffer too small in get_avi_from_index");
 		exit(1);
 	}
 	if (!idx[cidx].len){
@@ -469,15 +469,15 @@ int get_avi_from_index(pes_in_t *p, int fd, avi_context *ac,
 	if (cid != idx[cidx].id){
 		char *cc;
 		cc = (char *)&idx[cidx].id;
-		fprintf(stderr,"wrong chunk id: %c%c%c%c != %c%c%c%c\n", 
-			buf[0],buf[1],buf[2],buf[3]
-			,*cc,*(cc+1),*(cc+2),*(cc+3));
+		LOG(VB_GENERAL, LOG_ERR, "wrong chunk id: %c%c%c%c != %c%c%c%c",
+			buf[0], buf[1], buf[2], buf[3],
+			*cc, *(cc+1), *(cc+2), *(cc+3));
 		
 		print_index(ac,cidx);
 		exit(1);
 	}
 	if (p->plength != idx[cidx].len){
-		fprintf(stderr,"wrong chunk size: %d != %d\n", 
+		LOG(VB_GENERAL, LOG_ERR, "wrong chunk size: %d != %d",
 			(int)p->plength, idx[cidx].len);
 		exit(1);
 	}
@@ -486,12 +486,13 @@ int get_avi_from_index(pes_in_t *p, int fd, avi_context *ac,
 	p->ini_pos = ring_wpos(p->rbuf);
 	
 	per = (int)(100*(pos-ac->movi_start)/ac->movi_length);
-	if (per>lastper) fprintf(stderr,"read %3d%%\r", per);
+	if (per % 10 == 0 && per>lastper)
+		LOG(VB_GENERAL, LOG_INFO, "read %3d%%", per);
 	lastper = per;
 
 	if (ring_write(p->rbuf, buf+c, p->plength)<0){
-		fprintf(stderr,	"ring buffer overflow %d 0x%02x\n"
-			,p->rbuf->size,p->type);
+		LOG(VB_GENERAL, LOG_ERR, "ring buffer overflow %d 0x%02x",
+		    p->rbuf->size, p->type);
 		exit(1);
 	}
 	
@@ -604,12 +605,14 @@ void get_avi(pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 			}
 			p->done = 1;
 			p->ini_pos = ring_wpos(p->rbuf); 
-			/*
-			if (p->type == 1) fprintf(stderr,"audio 0x%x 0x%x\n",
-						  p->plength,ALIGN(p->plength));
-			if (p->type == 1) fprintf(stderr,"video 0x%x 0x%x\n",
-						  p->plength,ALIGN(p->plength));
-			*/
+#if 0
+			if (p->type == 1)
+			{
+				LOG(VB_GENERAL, LOG_ERR, "audio 0x%x 0x%x",
+				    p->plength, ALIGN(p->plength));
+				LOG(VB_GENERAL, LOG_ERR, "video 0x%x 0x%x",
+				    p->plength, ALIGN(p->plength));
+#endif
 			break;
 
 		default:
@@ -623,8 +626,8 @@ void get_avi(pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 			if (l+p->found > p->plength+8)
 				l = p->plength+8-p->found;
 			if (ring_write(p->rbuf, buf+c, l)<0){
-				fprintf(stderr,	"ring buffer overflow %d\n"
-					,p->rbuf->size);
+				LOG(VB_GENERAL, LOG_ERR,
+				    "ring buffer overflow %d", p->rbuf->size);
 				exit(1);
 			}
 			p->found += l;

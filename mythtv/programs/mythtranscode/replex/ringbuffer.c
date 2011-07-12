@@ -4,6 +4,8 @@
  *
  * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
+ * Changes to use MythTV logging
+ * Copyright (C) 2011 Gavin Hurlbut <ghurlbut@mythtv.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,17 +31,20 @@
 #include "ringbuffer.h"
 #include "pes.h"
 
+#include "mythlogging.h"
+
 #define DEBUG 1
 int ring_init (ringbuffer *rbuf, int size)
 {
 	if (size > 0){
 		rbuf->size = size;
 		if( !(rbuf->buffer = (uint8_t *) malloc(sizeof(uint8_t)*size)) ){
-			fprintf(stderr,"Not enough memory for ringbuffer\n");
+			LOG(VB_GENERAL, LOG_ERR,
+			    "Not enough memory for ringbuffer");
 			return -1;
 		}
 	} else {
-		fprintf(stderr,"Wrong size for ringbuffer\n");
+		LOG(VB_GENERAL, LOG_ERR, "Wrong size for ringbuffer");
 		return -1;
 	}
 	rbuf->read_pos = 0;	
@@ -92,8 +97,10 @@ int ring_write(ringbuffer *rbuf, uint8_t *data, int count)
 	free = ring_free(rbuf);
 
 	if ( free < count ){
-		if (DEBUG) fprintf(stderr,"ringbuffer overflow %d<%d %d\n", 
-				   free, count, rbuf->size);
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_ERR,
+			    "ringbuffer overflow %d<%d %d",
+				free, count, rbuf->size);
 		return FULL_BUFFER;
 	}
 	
@@ -107,8 +114,9 @@ int ring_write(ringbuffer *rbuf, uint8_t *data, int count)
 		rbuf->write_pos += count;
 	}
 
-	if (DEBUG>1) fprintf(stderr,"Buffer empty %.2f%%\n", 
-			     ring_free(rbuf)*100.0/rbuf->size);
+	if (DEBUG>1)
+		LOG(VB_GENERAL, LOG_ERR, "Buffer empty %.2f%%",
+		     ring_free(rbuf)*100.0/rbuf->size);
 	return count;
 }
 
@@ -124,8 +132,12 @@ int ring_peek(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 
 	
 	if ( avail < count ){
-//		if (DEBUG) fprintf(stderr,"ringbuffer peek underflow %d<%d %d %d\n", 
-//				   avail, count, pos, rbuf->write_pos);
+#if 0
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_ERR,
+			    "ringbuffer peek underflow %d<%d %d %d",
+				avail, count, pos, rbuf->write_pos);
+#endif
 		return EMPTY_BUFFER;
 	}
 
@@ -152,8 +164,12 @@ int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 
 	
 	if ( avail < count ){
-//		if (DEBUG) fprintf(stderr,"ringbuffer peek underflow %d<%d %d %d\n", 
-//				   avail, count, pos, rbuf->write_pos);
+#if 0
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_ERR,
+			    "ringbuffer peek underflow %d<%d %d %d",
+				avail, count, pos, rbuf->write_pos);
+#endif
 		return EMPTY_BUFFER;
 	}
 
@@ -179,8 +195,12 @@ int ring_read(ringbuffer *rbuf, uint8_t *data, int count)
 	avail = ring_avail(rbuf);
 	
 	if ( avail < count ){
-//		if (DEBUG) fprintf(stderr,"ringbuffer underflow %d<%d %d \n", 
-//				   avail, count, rbuf->size);
+#if 0
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_ERR,
+			    "ringbuffer underflow %d<%d %d \n",
+				avail, count, rbuf->size);
+#endif
 		return EMPTY_BUFFER;
 	}
 
@@ -194,8 +214,9 @@ int ring_read(ringbuffer *rbuf, uint8_t *data, int count)
 		rbuf->read_pos = count - rest;
 	}
 
-	if (DEBUG>1) fprintf(stderr,"Buffer empty %.2f%%\n", 
-			     ring_free(rbuf)*100.0/rbuf->size);
+	if (DEBUG>1)
+		LOG(VB_GENERAL, LOG_ERR, "Buffer empty %.2f%%",
+		     ring_free(rbuf)*100.0/rbuf->size);
 	return count;
 }
 
@@ -210,8 +231,11 @@ int ring_skip(ringbuffer *rbuf, int count)
 	avail = ring_avail(rbuf);
 
 	if ( avail < count ){
-//		fprintf(stderr,"ringbuffer skip underflow %d<%d %d %d\n", 
-//			avail, count, pos, rbuf->write_pos);
+#if 0
+		LOG(VB_GENERAL, LOG_ERR,
+		    "ringbuffer skip underflow %d<%d %d %d\n",
+			avail, count, pos, rbuf->write_pos);
+#endif
 		return EMPTY_BUFFER;
 	}
 	if ( count < rest ){
@@ -220,8 +244,9 @@ int ring_skip(ringbuffer *rbuf, int count)
 		rbuf->read_pos = count - rest;
 	}
 
-	if (DEBUG>1) fprintf(stderr,"Buffer empty %.2f%%\n", 
-			     ring_free(rbuf)*100.0/rbuf->size);
+	if (DEBUG>1)
+		LOG(VB_GENERAL, LOG_ERR, "Buffer empty %.2f%%",
+		     ring_free(rbuf)*100.0/rbuf->size);
 	return count;
 }
 
@@ -238,8 +263,10 @@ int ring_write_file(ringbuffer *rbuf, int fd, int count)
 	free = ring_free(rbuf);
 
 	if ( free < count ){
-		if (DEBUG) fprintf(stderr,"ringbuffer overflow %d<%d %d %d\n", 
-				   free, count, pos, rbuf->read_pos);
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_ERR,
+			    "ringbuffer overflow %d<%d %d %d\n",
+				free, count, pos, rbuf->read_pos);
 		return FULL_BUFFER;
 	}
 	
@@ -255,8 +282,9 @@ int ring_write_file(ringbuffer *rbuf, int fd, int count)
 			rbuf->write_pos += rr;
 	}
 
-	if (DEBUG>1) fprintf(stderr,"Buffer empty %.2f%%\n", 
-			   ring_free(rbuf)*100.0/rbuf->size);
+	if (DEBUG>1)
+		LOG(VB_GENERAL, LOG_ERR, "Buffer empty %.2f%%",
+		   ring_free(rbuf)*100.0/rbuf->size);
 	return rr;
 }
 
@@ -273,8 +301,12 @@ int ring_read_file(ringbuffer *rbuf, int fd, int count)
 	avail = ring_avail(rbuf);
 
 	if ( avail < count ){
-//		if (DEBUG) fprintf(stderr,"ringbuffer underflow %d<%d %d %d\n", 
-//				   avail, count, pos, rbuf->write_pos);
+#if 0
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_ERR,
+			    "ringbuffer underflow %d<%d %d %d",
+				avail, count, pos, rbuf->write_pos);
+#endif
 		return EMPTY_BUFFER;
 	}
 
@@ -291,8 +323,9 @@ int ring_read_file(ringbuffer *rbuf, int fd, int count)
 	}
 
 
-	if (DEBUG>1) fprintf(stderr,"Buffer empty %.2f%%\n", 
-			     ring_free(rbuf)*100.0/rbuf->size);
+	if (DEBUG>1)
+		LOG(VB_GENERAL, LOG_ERR, "Buffer empty %.2f%%",
+		     ring_free(rbuf)*100.0/rbuf->size);
 	return rr;
 }
 
@@ -300,32 +333,41 @@ int ring_read_file(ringbuffer *rbuf, int fd, int count)
 static void show(uint8_t *buf, int length)
 {
 	int i,j,r;
+	uint8_t temp[8];
+	uint8_t buffer[100];
+	buffer[0] = '\0';
 
-	fprintf(stderr,"\n");
 	for (i=0; i<length; i+=16){
 		for (j=0; j < 8 && j+i<length; j++)
-			fprintf(stderr,"0x%02x ", (int)(buf[i+j]));
+		{
+			sprintf(temp, "0x%02x ", (int)(buf[i+j]));
+			strcat(buffer, temp);
+		}
 		for (r=j; r<8; r++) 			
-			fprintf(stderr,"     ");
+			strcat(buffer, "     ");
 
-		fprintf(stderr,"  ");
+		strcat(buffer,"  ");
 
 		for (j=8; j < 16 && j+i<length; j++)
-			fprintf(stderr,"0x%02x ", (int)(buf[i+j]));
+		{
+			sprintf(temp, "0x%02x ", (int)(buf[i+j]));
+			strcat(buffer, temp);
+		}
 		for (r=j; r<16; r++) 			
-			fprintf(stderr,"     ");
+			strcat(buffer, "     ");
 
 		for (j=0; j < 16 && j+i<length; j++){
 			switch(buf[i+j]){
 			case '0'...'Z':
 			case 'a'...'z':
-				fprintf(stderr,"%c", buf[i+j]);
+				sprintf(temp, "%c", buf[i+j]);
 				break;
 			default:
-				fprintf(stderr,".");
+				sprintf(temp, ".");
 			}
+			strcat(buffer, temp);
 		}
-		fprintf(stderr,"\n");
+		LOG(VB_GENERAL, LOG_INFO, buffer);
 	}
 }
 
@@ -341,8 +383,12 @@ void ring_show(ringbuffer *rbuf, unsigned int count, uint32_t off)
 
 	
 	if ( avail < count ){
-//		if (DEBUG) fprintf(stderr,"ringbuffer peek underflow %d<%d %d %d\n", 
-//				   avail, count, pos, rbuf->write_pos);
+#if 0
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_ERR,
+			    "ringbuffer peek underflow %d<%d %d %d\n",
+				avail, count, pos, rbuf->write_pos);
+#endif
 		return;
 	}
 
@@ -384,14 +430,17 @@ void dummy_clear(dummy_buffer *dbuf)
 int dummy_add(dummy_buffer *dbuf, uint64_t time, uint32_t size)
 {
 	if (dummy_space(dbuf) < size) return -1;
-//	fprintf(stderr,"add %d ",dummy_space(dbuf));    
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, "add %d ", dummy_space(dbuf));
+#endif
 	dbuf->fill += size;
 	if (ring_write(&dbuf->time_index, (uint8_t *)&time, sizeof(uint64_t)) < 0) 
 		return -2;
 	if (ring_write(&dbuf->data_index, (uint8_t *)&size, sizeof(uint32_t)) < 0) 
 		return -3;
-//	fprintf(stderr," - %d = ",size);    
-//	fprintf(stderr,"%d\n",dummy_space(dbuf));    
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, " - %d = "%d", size, dummy_space(dbuf));
+#endif
 	return size;
 }
 
@@ -416,10 +465,13 @@ int dummy_delete(dummy_buffer *dbuf, uint64_t time)
 			dsize += size;
 		} else ex = 1;
 	} while (!ex);
-//	fprintf(stderr,"delete %d ",dummy_space(dbuf));    
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, "delete %d ", dummy_space(dbuf));
+#endif
 	dbuf->fill -= dsize;
-//	fprintf(stderr," + %d = ",dsize);    
-//	fprintf(stderr,"%d\n",dummy_space(dbuf));    
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, " + %d = %d", dsize, dummy_space(dbuf));
+#endif
 
 	return dsize;
 }
@@ -436,7 +488,9 @@ static void dummy_print(dummy_buffer *dbuf)
        ring_peek(&dbuf->data_index,(uint8_t *) &size, 
 			      sizeof(uint32_t), i * sizeof(uint32_t));
 
-       printf("%d : %llu %u\n", i, (long long unsigned int)rtime, size);
+       LOG(VB_GENERAL, LOG_INFO, "%d : %llu %u", i,
+           (long long unsigned int)rtime, size);
    }
-   printf("Used: %d Free: %d data-free: %d\n", avail, 1000-avail, dbuf->size - dbuf->fill);
+   LOG(VB_GENERAL, LOG_INFO, "Used: %d Free: %d data-free: %d", avail,
+       1000-avail, dbuf->size - dbuf->fill);
 }

@@ -4,6 +4,8 @@
  *
  * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
+ * Changes to use MythTV logging
+ * Copyright (C) 2011 Gavin Hurlbut <ghurlbut@mythtv.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,39 +27,51 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include "element.h"
 #include "pes.h"
 #include "ts.h"
 
+#include "mythlogging.h"
+
 void show_buf(uint8_t *buf, int length)
 {
 	int i,j,r;
+	uint8_t buffer[100];
+	uint8_t temp[8];
+	buffer[0] = '\0';
 
-	fprintf(stderr,"\n");
 	for (i=0; i<length; i+=16){
 		for (j=0; j < 8 && j+i<length; j++)
-			fprintf(stderr,"0x%02x ", (int)(buf[i+j]));
+		{
+			sprintf(temp,"0x%02x ", (int)(buf[i+j]));
+			strcat(buffer, temp);
+		}
 		for (r=j; r<8; r++) 			
-			fprintf(stderr,"     ");
+			strcat(buffer, "     ");
 
-		fprintf(stderr,"  ");
+		strcat(buffer, "  ");
 
 		for (j=8; j < 16 && j+i<length; j++)
-			fprintf(stderr,"0x%02x ", (int)(buf[i+j]));
+		{
+			sprintf(temp, "0x%02x ", (int)(buf[i+j]));
+			strcat(buffer, temp);
+		}
 		for (r=j; r<16; r++) 			
-			fprintf(stderr,"     ");
+			strcat(buffer, "     ");
 
 		for (j=0; j < 16 && j+i<length; j++){
 			switch(buf[i+j]){
 			case '0'...'Z':
 			case 'a'...'z':
-				fprintf(stderr,"%c", buf[i+j]);
+				sprintf(temp, "%c", buf[i+j]);
 				break;
 			default:
-				fprintf(stderr,".");
+				sprintf(temp, ".");
 			}
+			strcat(buffer, temp);
 		}
-		fprintf(stderr,"\n");
+		LOG(VB_GENERAL, LOG_INFO, buffer);
 	}
 }
 

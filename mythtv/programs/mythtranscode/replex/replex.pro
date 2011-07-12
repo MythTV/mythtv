@@ -17,6 +17,7 @@ HEADERS += ts.h replex.h pes.h
 INCLUDEPATH += replex
 INCLUDEPATH += ../../../external/FFmpeg
 INCLUDEPATH += ../../../libs
+INCLUDEPATH += ../../../libs/libmythbase
 
 QMAKE_CFLAGS += -w
 
