@@ -92,8 +92,12 @@ void MythSystem::SetCommand(const QString &command,
     ProcessFlags(flags);
 
     // check for execute rights
-    if (!GetSetting("UseShell") && !access(command.toUtf8().constData(), X_OK))
+    if (!GetSetting("UseShell") && access(command.toUtf8().constData(), X_OK))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("MythSystem(%1) command not executable, ")
+                .arg(command) + ENO);
         m_status = GENERIC_EXIT_CMD_NOT_FOUND;
+    }
 
     m_logcmd = (m_command + " " + m_args.join(" ")).trimmed();
 
