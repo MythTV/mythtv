@@ -123,7 +123,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
             dolookup = false;
         if (dolookup)
         {
-            ArtworkMap map = GetArtwork(pginfo->GetInetRef(), pginfo->GetSeason());
+            ArtworkMap map = GetArtwork(pginfo->GetInetRef(), pginfo->GetSeason(), true);
             if (map.isEmpty())
             {
                 QString msg = QString("Looking up artwork for recording rule: %1 %2")
@@ -154,7 +154,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
             dolookup = false;
         if (dolookup)
         {
-            ArtworkMap map = GetArtwork(pginfo->GetInetRef(), pginfo->GetSeason());
+            ArtworkMap map = GetArtwork(pginfo->GetInetRef(), pginfo->GetSeason(), true);
             if (map.isEmpty())
             {
                QString msg = QString("Looking up artwork for recording: %1 %2")

@@ -4,7 +4,8 @@
 #include "mythmetaexp.h"
 
 META_PUBLIC ArtworkMap GetArtwork(QString inetref,
-                                         uint season);
+                                       uint season,
+                                       bool strict = false);
 META_PUBLIC bool SetArtwork(const QString &inetref,
                                    uint season,
                                    const QString &host,

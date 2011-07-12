@@ -7,14 +7,22 @@
 #include "metadataimagehelper.h"
 
 ArtworkMap GetArtwork(QString inetref,
-                             uint season)
+                      uint season,
+                      bool strict)
 {
     ArtworkMap map;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT host, coverart, fanart, banner "
-        "FROM recordedartwork WHERE inetref = :INETREF "
-        "ORDER BY season = :SEASON DESC, season DESC;");
+
+    QString querystring = "SELECT host, coverart, fanart, banner "
+        "FROM recordedartwork WHERE inetref = :INETREF ";
+
+    if (strict)
+        querystring += "AND season = :SEASON;";
+    else
+        querystring += "ORDER BY season = :SEASON DESC, season DESC;";
+
+    query.prepare(querystring);
 
     query.bindValue(":INETREF", inetref);
     query.bindValue(":SEASON", season);
