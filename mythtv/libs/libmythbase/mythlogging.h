@@ -7,6 +7,7 @@
 #include <QQueue>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QRegExp>
 #endif
 #include <stdint.h>
 #include <time.h>
@@ -99,7 +100,8 @@ extern "C" {
 #ifdef __cplusplus
 #define LOG(mask, level, string) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
-                 QString(string).toLocal8Bit().constData())
+                 QString(string).replace(QRegExp("[%]{1,2}"), "%%") \
+                                .toLocal8Bit().constData())
 #else
 #define LOG(mask, level, format, ...) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
