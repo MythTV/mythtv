@@ -195,7 +195,7 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
                                                 MetadataLookup* lookup,
                                                 bool passseas)
 {
-    MythSystem grabber(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+    MythSystem grabber(cmd, args, kMSNoRunShell | kMSStdOut | kMSBuffered);
     MetadataLookupList list;
 
     LOG(VB_GENERAL, LOG_INFO, QString("Running Grabber: %1 %2")
@@ -376,7 +376,7 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
     {
         args.append(QString("-M"));
         QString title = lookup->GetTitle();
-        args.append(ShellEscape(title));
+        args.append(title);
     }
     else if (lookup->GetStep() == GETDATA)
     {
@@ -418,7 +418,7 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
         {
             args.append(QString("-M"));
             QString title = lookup->GetTitle();
-            args.append(ShellEscape(title));
+            args.append(title);
         }
         else if (lookup->GetStep() == GETDATA)
         {
@@ -460,7 +460,7 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
     {
         args.append(QString("-M"));
         QString title = lookup->GetTitle();
-        args.append(ShellEscape(title));
+        args.append(title);
     }
     else if (lookup->GetStep() == GETDATA)
     {
@@ -491,9 +491,9 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
     args.append(gCoreContext->GetLanguage()); // UI Language
     args.append(QString("-N"));
     QString title = lookup->GetTitle();
-    args.append(ShellEscape(title));
+    args.append(title);
     QString subtitle = lookup->GetSubtitle();
-    args.append(ShellEscape(subtitle));
+    args.append(subtitle);
 
     // Try to do a title/subtitle lookup
     list = runGrabber(cmd, args, lookup, false);
@@ -540,18 +540,18 @@ MetadataLookupList MetadataDownload::handleRecordingUndetermined(
     if (!lookup->GetInetref().isEmpty())
     {
         QString inetref = lookup->GetInetref();
-        args.append(ShellEscape(inetref));
+        args.append(inetref);
     }
     else
     {
         QString title = lookup->GetTitle();
-        args.append(ShellEscape(title));
+        args.append(title);
     }
 
     if (!lookup->GetSubtitle().isEmpty())
     {
         QString subtitle = lookup->GetSubtitle();
-        args.append(ShellEscape(subtitle));
+        args.append(subtitle);
         list = runGrabber(cmd, args, lookup, false);
     }
     else
