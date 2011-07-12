@@ -10,6 +10,9 @@
 #include <QHash>
 #include <QMap>
 
+#include "mythcorecontext.h"
+#include "metadatacommon.h"
+
 class PreviewGenerator;
 class PBHEventHandler;
 class ProgramInfo;
@@ -23,16 +26,6 @@ typedef enum CheckAvailabilityType {
     kCheckForPlayAction,
     kCheckForPlaylistAction,
 } CheckAvailabilityType;
-
-typedef enum ArtworkTypes
-{
-    kArtworkFan    = 0,
-    kArtworkBanner = 1,
-    kArtworkCover  = 2,
-} ArtworkType;
-QString toString(ArtworkType t);
-QString toLocalDir(ArtworkType t);
-QString toSG(ArtworkType t);
 
 class PlaybackBoxHelper : public QThread
 {
@@ -55,9 +48,9 @@ class PlaybackBoxHelper : public QThread
                            CheckAvailabilityType cat = kCheckForCache);
     QString GetPreviewImage(const ProgramInfo&, bool check_availibility = true);
 
-    QString LocateArtwork(const QString &seriesid, const QString &title,
-                          ArtworkType, const QString &host,
-                          const ProgramInfo *pginfo);
+    QString LocateArtwork(const QString &inetref, uint season,
+                          VideoArtworkType type, const ProgramInfo *pginfo,
+                          const QString &groupname = NULL);
 
     virtual void run(void);      // QThread
 

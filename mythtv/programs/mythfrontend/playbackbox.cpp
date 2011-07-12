@@ -164,8 +164,6 @@ static bool comp_recordDate_rev_less_than(
     return comp_recordDate_rev(a, b) < 0;
 }
 
-static const ArtworkType s_artType[] =
-    { kArtworkFan,        kArtworkBanner,        kArtworkCover, };
 static const uint s_artDelay[] =
     { kArtworkFanTimeout, kArtworkBannerTimeout, kArtworkCoverTimeout,};
 
@@ -489,9 +487,9 @@ bool PlaybackBox::Create()
     m_noRecordingsText = dynamic_cast<MythUIText *> (GetChild("norecordings"));
 
     m_previewImage = dynamic_cast<MythUIImage *>(GetChild("preview"));
-    m_artImage[kArtworkFan] = dynamic_cast<MythUIImage*>(GetChild("fanart"));
-    m_artImage[kArtworkBanner] = dynamic_cast<MythUIImage*>(GetChild("banner"));
-    m_artImage[kArtworkCover]= dynamic_cast<MythUIImage*>(GetChild("coverart"));
+    m_artImage[FANART] = dynamic_cast<MythUIImage*>(GetChild("fanart"));
+    m_artImage[BANNER] = dynamic_cast<MythUIImage*>(GetChild("banner"));
+    m_artImage[COVERART]= dynamic_cast<MythUIImage*>(GetChild("coverart"));
 
     if (!m_recordingList || !m_groupList)
     {
@@ -515,9 +513,9 @@ bool PlaybackBox::Create()
             SLOT(ItemVisible(MythUIButtonListItem*)));
 
     // connect up timers...
-    connect(m_artTimer[kArtworkFan],   SIGNAL(timeout()), SLOT(fanartLoad()));
-    connect(m_artTimer[kArtworkBanner],SIGNAL(timeout()), SLOT(bannerLoad()));
-    connect(m_artTimer[kArtworkCover], SIGNAL(timeout()), SLOT(coverartLoad()));
+    connect(m_artTimer[FANART],   SIGNAL(timeout()), SLOT(fanartLoad()));
+    connect(m_artTimer[BANNER],   SIGNAL(timeout()), SLOT(bannerLoad()));
+    connect(m_artTimer[COVERART], SIGNAL(timeout()), SLOT(coverartLoad()));
 
     BuildFocusList();
     m_programInfoCache.ScheduleLoad(false);
@@ -622,32 +620,29 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         infoMap["show"]  = grouplabel;
     }
 
-    if (m_artImage[kArtworkFan])
+    if (m_artImage[FANART])
     {
         if (!groupname.isEmpty() && !m_progLists[groupname].empty())
         {
             ProgramInfo *pginfo = *m_progLists[groupname].begin();
-            QString arthost((!m_artHostOverride.isEmpty()) ?
-                            m_artHostOverride : pginfo->GetHostname());
 
-            QString artworkSeriesID = "_GROUP_";
             QString fn = m_helper.LocateArtwork(
-                artworkSeriesID, groupname, kArtworkFan, arthost, NULL);
+                pginfo->GetInetRef(), pginfo->GetSeason(), FANART, NULL, groupname);
 
             if (fn.isEmpty())
             {
-                m_artTimer[kArtworkFan]->stop();
-                m_artImage[kArtworkFan]->Reset();
+                m_artTimer[FANART]->stop();
+                m_artImage[FANART]->Reset();
             }
-            else if (m_artImage[kArtworkFan]->GetFilename() != fn)
+            else if (m_artImage[FANART]->GetFilename() != fn)
             {
-                m_artImage[kArtworkFan]->SetFilename(fn);
-                m_artTimer[kArtworkFan]->start(kArtworkFanTimeout);
+                m_artImage[FANART]->SetFilename(fn);
+                m_artTimer[FANART]->start(kArtworkFanTimeout);
             }
         }
         else
         {
-            m_artImage[kArtworkFan]->Reset();
+            m_artImage[FANART]->Reset();
         }
     }
 
@@ -696,11 +691,11 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     if (m_previewImage)
         m_previewImage->Reset();
 
-    if (m_artImage[kArtworkBanner])
-        m_artImage[kArtworkBanner]->Reset();
+    if (m_artImage[BANNER])
+        m_artImage[BANNER]->Reset();
 
-    if (m_artImage[kArtworkCover])
-        m_artImage[kArtworkCover]->Reset();
+    if (m_artImage[COVERART])
+        m_artImage[COVERART]->Reset();
 
     updateIcons();
 }
@@ -847,8 +842,8 @@ void PlaybackBox::UpdateUIListItem(
             }
 
             QString fn = m_helper.LocateArtwork(
-                pginfo->GetSeriesID(), pginfo->GetTitle(),
-                s_artType[i], arthost, pginfo);
+                pginfo->GetInetRef(), pginfo->GetSeason(),
+                (VideoArtworkType)i, pginfo);
 
             if (fn.isEmpty())
             {
@@ -2442,17 +2437,17 @@ void PlaybackBox::RemoveProgram(
 
 void PlaybackBox::fanartLoad(void)
 {
-    m_artImage[kArtworkFan]->Load();
+    m_artImage[FANART]->Load();
 }
 
 void PlaybackBox::bannerLoad(void)
 {
-    m_artImage[kArtworkBanner]->Load();
+    m_artImage[BANNER]->Load();
 }
 
 void PlaybackBox::coverartLoad(void)
 {
-    m_artImage[kArtworkCover]->Load();
+    m_artImage[COVERART]->Load();
 }
 
 void PlaybackBox::ShowDeletePopup(DeletePopupType type)
@@ -4116,15 +4111,14 @@ void PlaybackBox::customEvent(QEvent *event)
             if (info)
                 info->SetPathname(me->ExtraData(1));
         }
-        else if ((message == "FOUND_ARTWORK") && (me->ExtraDataCount() >= 6))
+        else if ((message == "FOUND_ARTWORK") && (me->ExtraDataCount() >= 5))
         {
-            QString     seriesid  = me->ExtraData(0);
-            QString     groupname = me->ExtraData(1);
-            ArtworkType type      = (ArtworkType) me->ExtraData(2).toInt();
-            QString     pikey     = me->ExtraData(4);
-            QString     fn        = me->ExtraData(5);
+            VideoArtworkType type      = (VideoArtworkType) me->ExtraData(2).toInt();
+            QString          pikey     = me->ExtraData(3);
+            QString          group     = me->ExtraData(4);
+            QString          fn        = me->ExtraData(5);
 
-            if (seriesid != "_GROUP_" && !pikey.isEmpty())
+            if (!pikey.isEmpty())
             {
                 ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(pikey);
                 if (pginfo &&
@@ -4136,8 +4130,8 @@ void PlaybackBox::customEvent(QEvent *event)
                     m_artTimer[(uint)type]->start(s_artDelay[(uint)type]);
                 }
             }
-            else if (seriesid == "_GROUP_" && !groupname.isEmpty() &&
-                     (m_currentGroup == groupname) &&
+            else if (!group.isEmpty() &&
+                     (m_currentGroup == group) &&
                      m_artImage[type] &&
                      m_groupList->GetItemCurrent() &&
                      m_artImage[(uint)type]->GetFilename() != fn)
