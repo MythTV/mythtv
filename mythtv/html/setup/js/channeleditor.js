@@ -388,7 +388,7 @@ function deleteSelectedChannel() {
     var rowArray = $('#channels').jqGrid('getGridParam','selarrrow');
     if (rowArray.length > 0) {
         var len = rowArray.length;
-        for (var i=0; i < len; i++) {
+        for (var i = len - 1; i >= 0; i--) {
             var chanid = rowArray[i];
             if ($("#channels").jqGrid('delRowData', chanid)) {
                 $.post("/Channel/DeleteDBChannel",
