@@ -861,6 +861,14 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 
 # Get Series Season and Episode numbers
 def Getseries_episode_numbers(t, opts, series_season_ep):
+    def _episode_sort(episode):
+        seasonnumber = 0
+        episodenumber = 0
+        try: seasonnumber = int(episode['seasonnumber'])
+        except: pass
+        try: episodenumber = int(episode['episodenumber'])
+        except: pass
+        return (episode.distance, seasonnumber, episodenumber)
     global xmlFlag
     series_name=''
     ep_name=''
@@ -875,7 +883,7 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
 
     season_ep_num=search_for_series(t, series_name).fuzzysearch(ep_name, 'episodename')
     if len(season_ep_num) != 0:
-        for episode in sorted(season_ep_num, key=lambda ep: ep.distance):
+        for episode in sorted(season_ep_num, key=lambda ep: _episode_sort(ep), reverse=True):
 #            if episode.distance == 0: # exact match
                 if xmlFlag:
                     displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
