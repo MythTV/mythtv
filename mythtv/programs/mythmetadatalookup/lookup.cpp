@@ -106,7 +106,7 @@ void LookerUpper::HandleAllRecordingRules()
     }
 }
 
-void LookerUpper::HandleAllArtwork(bool withinetrefsonly)
+void LookerUpper::HandleAllArtwork(bool aggressive)
 {
     m_updateartwork = true;
 
@@ -119,7 +119,7 @@ void LookerUpper::HandleAllArtwork(bool withinetrefsonly)
     {
         ProgramInfo *pginfo = new ProgramInfo(*(recordingList[n]));
         bool dolookup = true;
-        if (withinetrefsonly && pginfo->GetInetRef().isEmpty())
+        if (!aggressive && pginfo->GetInetRef().isEmpty())
             dolookup = false;
         if (dolookup)
         {
@@ -150,7 +150,7 @@ void LookerUpper::HandleAllArtwork(bool withinetrefsonly)
     {
         ProgramInfo *pginfo = new ProgramInfo(*(progList[n]));
         bool dolookup = true;
-        if (withinetrefsonly && pginfo->GetInetRef().isEmpty())
+        if (!aggressive && pginfo->GetInetRef().isEmpty())
             dolookup = false;
         if (dolookup)
         {

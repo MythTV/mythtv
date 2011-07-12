@@ -20,7 +20,7 @@ class LookerUpper : public QObject
                                bool updaterules = false);
     void HandleAllRecordings(bool updaterules = false);
     void HandleAllRecordingRules(void);
-    void HandleAllArtwork(bool withinetrefsonly = true);
+    void HandleAllArtwork(bool aggressive = false);
 
     void CopyRuleInetrefsToRecordings();
 

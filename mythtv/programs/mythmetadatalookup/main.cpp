@@ -205,11 +205,11 @@ int main(int argc, char *argv[])
     }
     else if (refreshallsafeart)
     {
-        lookup->HandleAllArtwork(true);
+        lookup->HandleAllArtwork(false);
     }
     else if (refreshallart)
     {
-        lookup->HandleAllArtwork(false);
+        lookup->HandleAllArtwork(true);
     }
     else
         lookup->HandleSingleRecording(chanid, starttime, refreshrules);
