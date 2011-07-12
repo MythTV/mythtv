@@ -511,51 +511,65 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
 MetadataLookupList MetadataDownload::handleRecordingUndetermined(
                                                     MetadataLookup* lookup)
 {
+    // Ground rules: if we are here, we're operating on a recording.
+    // If this lookup is trying to handle images, the only place that can
+    // be in a --refresh-all-artwork run of mythmetadatalookup.
+
+    // Thus, TRUST the season and episode if there's an inetref + handleimages!
+
     MetadataLookupList list;
 
-    QString def_cmd = QDir::cleanPath(QString("%1/%2")
-        .arg(GetShareDir())
-        .arg("metadata/Television/ttvdb.py"));
-
-    QString cmd = gCoreContext->GetSetting("TelevisionGrabber", def_cmd);
-
-    QStringList args;
-    args.append(QString("-l")); // Language Flag
-    args.append(gCoreContext->GetLanguage()); // UI Language
-    if (!lookup->GetSubtitle().isEmpty())
-        args.append(QString("-N"));
-    else
+    if ((lookup->GetHandleImages() && !lookup->GetInetref().isEmpty() &&
+        (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)) ||
+        !lookup->GetHandleImages())
     {
-        // The input lookup doesn't have Subtitle, Season or Episode information.
-        // We're going to "artificially" set Seas/Ep to 1 since the input
-        // isn't enough information to get conclusive metadata anyway.
-        // This is needed in case of a multi-result, so that on the second
-        // pass through, we definitely get the TV grabber and at least get
-        // an inetref.
-        lookup->SetSeason(1);
-        lookup->SetEpisode(1);
-        args.append(QString("-M"));
-    }
+        QString def_cmd = QDir::cleanPath(QString("%1/%2")
+            .arg(GetShareDir())
+            .arg("metadata/Television/ttvdb.py"));
 
-    if (!lookup->GetInetref().isEmpty())
-    {
-        QString inetref = lookup->GetInetref();
-        args.append(inetref);
-    }
-    else
-    {
-        QString title = lookup->GetTitle();
-        args.append(title);
-    }
+        QString cmd = gCoreContext->GetSetting("TelevisionGrabber", def_cmd);
 
-    if (!lookup->GetSubtitle().isEmpty())
-    {
-        QString subtitle = lookup->GetSubtitle();
-        args.append(subtitle);
-        list = runGrabber(cmd, args, lookup, false);
+        QStringList args;
+        args.append(QString("-l")); // Language Flag
+        args.append(gCoreContext->GetLanguage()); // UI Language
+        if (!lookup->GetSubtitle().isEmpty())
+            args.append(QString("-N"));
+        else
+        {
+            // If the input lookup doesn't have Subtitle, Season or Episode,
+            // We're going to "artificially" set Seas/Ep to 1 since the input
+            // isn't enough information to get conclusive metadata anyway.
+            // This is needed in case of a multi-result, so that on the second
+            // pass through, we definitely get the TV grabber and at least get
+            // an inetref.
+            if (lookup->GetSeason() == 0 && lookup->GetEpisode() == 0)
+            {
+                lookup->SetSeason(1);
+                lookup->SetEpisode(1);
+            }
+            args.append(QString("-M"));
+        }
+
+        if (!lookup->GetInetref().isEmpty())
+        {
+            QString inetref = lookup->GetInetref();
+            args.append(inetref);
+        }
+        else
+        {
+            QString title = lookup->GetTitle();
+            args.append(title);
+        }
+
+        if (!lookup->GetSubtitle().isEmpty())
+        {
+            QString subtitle = lookup->GetSubtitle();
+            args.append(subtitle);
+            list = runGrabber(cmd, args, lookup, false);
+        }
+        else
+            list = runGrabber(cmd, args, lookup, true);
     }
-    else
-        list = runGrabber(cmd, args, lookup, true);
 
     // If there were no results for that, fall back to a movie lookup.
     if (!list.size() && lookup->GetSubtitle().isEmpty())
