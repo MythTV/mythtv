@@ -1474,8 +1474,7 @@ void MetadataOptions::CreateBusyDialog(QString title)
 
 void MetadataOptions::PerformQuery()
 {
-    if (!m_lookup)
-        m_lookup = new MetadataLookup();
+    m_lookup = new MetadataLookup();
 
     CreateBusyDialog("Trying to manually find this "
                      "recording online...");
@@ -1645,8 +1644,7 @@ QStringList MetadataOptions::GetSupportedImageExtensionFilter()
 
 void MetadataOptions::FindNetArt(VideoArtworkType type)
 {
-    if (!m_lookup)
-        m_lookup = new MetadataLookup();
+    m_lookup = new MetadataLookup();
 
     QString msg = tr("Searching for available artwork...");
     CreateBusyDialog(msg);
@@ -1803,6 +1801,16 @@ void MetadataOptions::customEvent(QEvent *levent)
             m_busyPopup->Close();
             m_busyPopup = NULL;
         }
+
+        MetadataFactoryNoResult *mfnr = dynamic_cast<MetadataFactoryNoResult*>(levent);
+
+        if (!mfnr)
+            return;
+
+        MetadataLookup *lookup = mfnr->result;
+
+        delete lookup;
+        lookup = NULL;
 
         QString title = "No match found for this recording. You can "
                         "try entering a TVDB/TMDB number, season, and "
