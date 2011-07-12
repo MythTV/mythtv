@@ -64,6 +64,9 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
     lookup->SetHost(gCoreContext->GetMasterHostName());
     lookup->SetTitle(recrule->m_title);
     lookup->SetSubtitle(recrule->m_subtitle);
+    lookup->SetInetref(recrule->m_inetref);
+    lookup->SetSeason(recrule->m_season);
+    lookup->SetEpisode(recrule->m_episode);
 
     if (m_lookupthread->isRunning())
         m_lookupthread->prependLookup(lookup);
