@@ -244,6 +244,8 @@ class MetadataOptions : public MythScreenType
     void OnArtworkSearchDone(MetadataLookup *lookup);
     void FindNetArt(VideoArtworkType type);
 
+    void ValuesChanged();
+
   private:
     void Load(void);
     void Save(void);
@@ -254,6 +256,8 @@ class MetadataOptions : public MythScreenType
                         QObject &inst,
                         const QString &returnEvent);
     QStringList GetSupportedImageExtensionFilter();
+
+    void HandleDownloadedImages(MetadataLookup *lookup);
 
     void customEvent(QEvent *event);
 
@@ -290,6 +294,8 @@ class MetadataOptions : public MythScreenType
     MythUIButton    *m_onlineBannerButton;
 
     MythUIButton    *m_backButton;
+
+    ArtworkMap       m_artworkMap;
 };
 
 #endif

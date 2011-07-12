@@ -33,6 +33,9 @@
 #include "videoutils.h"
 #include "mythuiutils.h"
 
+// libmythmetadata
+#include "metadataimagehelper.h"
+
 // Mythfrontend
 #include "proglist.h"
 #include "viewschedulediff.h"
@@ -1328,6 +1331,9 @@ MetadataOptions::MetadataOptions(MythScreenStack *parent,
     m_imageLookup = new MetadataDownload(this);
     m_imageDownload = new MetadataImageDownload(this);
 
+    m_artworkMap = GetArtwork(m_recordingRule->m_inetref,
+                              m_recordingRule->m_season);
+
     if (recInfo)
         m_recInfo = new RecordingInfo(*recInfo);
 }
@@ -1362,7 +1368,7 @@ bool MetadataOptions::Create()
     UIUtilE::Assign(this, m_seasonSpin, "season_spinbox", &err);
     UIUtilE::Assign(this, m_episodeSpin, "episode_spinbox", &err);
     UIUtilE::Assign(this, m_queryButton, "query_button", &err);
-/*    UIUtilE::Assign(this, m_localFanartButton, "local_fanart_button", &err);
+    UIUtilE::Assign(this, m_localFanartButton, "local_fanart_button", &err);
     UIUtilE::Assign(this, m_localCoverartButton, "local_coverart_button", &err);
     UIUtilE::Assign(this, m_localBannerButton, "local_banner_button", &err);
     UIUtilE::Assign(this, m_onlineFanartButton, "online_fanart_button", &err);
@@ -1370,7 +1376,7 @@ bool MetadataOptions::Create()
     UIUtilE::Assign(this, m_onlineBannerButton, "online_banner_button", &err);
     UIUtilW::Assign(this, m_fanart, "fanart");
     UIUtilW::Assign(this, m_coverart, "coverart");
-    UIUtilW::Assign(this, m_banner, "banner");*/
+    UIUtilW::Assign(this, m_banner, "banner");
     UIUtilW::Assign(this, m_backButton, "back");
 
     if (err)
@@ -1384,7 +1390,7 @@ bool MetadataOptions::Create()
             SLOT(Close()));
     connect(m_queryButton, SIGNAL(Clicked()),
             SLOT(PerformQuery()));
-/*    connect(m_localFanartButton, SIGNAL(Clicked()),
+    connect(m_localFanartButton, SIGNAL(Clicked()),
             SLOT(SelectLocalFanart()));
     connect(m_localCoverartButton, SIGNAL(Clicked()),
             SLOT(SelectLocalCoverart()));
@@ -1395,7 +1401,10 @@ bool MetadataOptions::Create()
     connect(m_onlineCoverartButton, SIGNAL(Clicked()),
             SLOT(SelectOnlineCoverart()));
     connect(m_onlineBannerButton, SIGNAL(Clicked()),
-            SLOT(SelectOnlineBanner()));*/
+            SLOT(SelectOnlineBanner()));
+
+    connect(m_seasonSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
+                          SLOT(ValuesChanged()));
 
     // InetRef
     m_inetrefEdit->SetText(m_recordingRule->m_inetref);
@@ -1407,6 +1416,24 @@ bool MetadataOptions::Create()
     // Episode
     m_episodeSpin->SetRange(0,100,1,1);
     m_episodeSpin->SetValue(m_recordingRule->m_episode);
+
+    if (m_coverart)
+    {
+        m_coverart->SetFilename(m_artworkMap.value(COVERART).url);
+        m_coverart->Load();
+    }
+
+    if (m_fanart)
+    {
+        m_fanart->SetFilename(m_artworkMap.value(FANART).url);
+        m_fanart->Load();
+    }
+
+    if (m_banner)
+    {
+        m_banner->SetFilename(m_artworkMap.value(BANNER).url);
+        m_banner->Load();
+    }
 
     BuildFocusList();
 
@@ -1625,7 +1652,7 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
     CreateBusyDialog(msg);
 
     m_lookup->SetStep(SEARCH);
-    m_lookup->SetType(RECDNG);
+    m_lookup->SetType(VID);
     m_lookup->SetAutomatic(true);
     m_lookup->SetHandleImages(false);
     m_lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
@@ -1664,6 +1691,59 @@ void MetadataOptions::OnArtworkSearchDone(MetadataLookup *lookup)
 
     if (resultsdialog->Create())
         m_popupStack->AddScreen(resultsdialog);
+}
+
+void MetadataOptions::HandleDownloadedImages(MetadataLookup *lookup)
+{
+    if (!lookup)
+        return;
+
+    DownloadMap map = lookup->GetDownloads();
+
+    if (!map.size())
+        return;
+
+    for (DownloadMap::const_iterator i = map.begin(); i != map.end(); ++i)
+    {
+        VideoArtworkType type = i.key();
+        ArtworkInfo info = i.value();
+
+        if (type == COVERART)
+            m_artworkMap.replace(COVERART, info);
+        else if (type == FANART)
+            m_artworkMap.replace(FANART, info);
+        else if (type == BANNER)
+            m_artworkMap.replace(BANNER, info);
+    }
+
+    SetArtwork(m_inetrefEdit->GetText(), m_seasonSpin->GetIntValue(),
+               gCoreContext->GetMasterHostName(), m_artworkMap);
+
+    ValuesChanged();
+}
+
+void MetadataOptions::ValuesChanged()
+{
+    m_artworkMap = GetArtwork(m_inetrefEdit->GetText(),
+                              m_seasonSpin->GetIntValue());
+
+    if (m_coverart)
+    {
+        m_coverart->SetFilename(m_artworkMap.value(COVERART).url);
+        m_coverart->Load();
+    }
+
+    if (m_fanart)
+    {
+        m_fanart->SetFilename(m_artworkMap.value(FANART).url);
+        m_fanart->Load();
+    }
+
+    if (m_banner)
+    {
+        m_banner->SetFilename(m_artworkMap.value(BANNER).url);
+        m_banner->Load();
+    }
 }
 
 void MetadataOptions::customEvent(QEvent *levent)
@@ -1799,7 +1879,36 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (!lookup)
             return;
 
-//        handleDownloadedImages(lookup);
+        HandleDownloadedImages(lookup);
     }
+    else if (levent->type() == DialogCompletionEvent::kEventType)
+    {
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(levent);
+
+        LOG(VB_GENERAL, LOG_ERR, "DCE!");
+
+        const QString resultid = dce->GetId();
+        ArtworkInfo info;
+        info.url = dce->GetResultText();
+
+        if (resultid == "coverart")
+        {
+            m_artworkMap.replace(COVERART, info);
+        }
+        else if (resultid == "fanart")
+        {
+            m_artworkMap.replace(FANART, info);
+        }
+        else if (resultid == "banner")
+        {
+            m_artworkMap.replace(BANNER, info);
+        }
+
+        SetArtwork(m_inetrefEdit->GetText(), m_seasonSpin->GetIntValue(),
+               gCoreContext->GetMasterHostName(), m_artworkMap);
+
+        ValuesChanged();
+    }
+
 }
 

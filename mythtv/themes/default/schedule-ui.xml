@@ -2113,12 +2113,42 @@
         </spinbox>
 
         <button name="query_button" from="basewidebutton">
-            <position>215,220</position>
+            <position>265,220</position>
             <value>Perform Query</value>
         </button>
 
+        <button name="online_coverart_button" from="basewidebutton">
+            <position>115,275</position>
+            <value>Find Online Coverart</value>
+        </button>
+
+        <button name="online_fanart_button" from="basewidebutton">
+            <position>115,330</position>
+            <value>Find Online Fanart</value>
+        </button>
+
+        <button name="online_banner_button" from="basewidebutton">
+            <position>115,385</position>
+            <value>Find Online Banners</value>
+        </button>
+
+        <button name="local_coverart_button" from="basewidebutton">
+            <position>415,275</position>
+            <value>Find Local Coverart</value>
+        </button>
+
+        <button name="local_fanart_button" from="basewidebutton">
+            <position>415,330</position>
+            <value>Find Local Fanart</value>
+        </button>
+
+        <button name="local_banner_button" from="basewidebutton">
+            <position>415,385</position>
+            <value>Find Local Banners</value>
+        </button>
+
         <button name="back" from="basebutton">
-            <position>40,525</position>
+            <position>335,500</position>
             <value>Back</value>
         </button>
     </window>

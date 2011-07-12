@@ -22,7 +22,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1278";
+const QString currentDatabaseVersion = "1279";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5767,6 +5767,22 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1278", dbver))
+            return false;
+    }
+
+    if (dbver == "1278")
+    {
+        const char *updates[] = {
+"CREATE TABLE recordedartwork ( "
+"    inetref VARCHAR(255) NOT NULL, "
+"    season SMALLINT(5) NOT NULL, "
+"    host TEXT NOT NULL, "
+"    coverart TEXT NOT NULL, "
+"    fanart TEXT NOT NULL, "
+"    banner TEXT NOT NULL);",
+NULL
+};
+        if (!performActualUpdate(updates, "1279", dbver))
             return false;
     }
 

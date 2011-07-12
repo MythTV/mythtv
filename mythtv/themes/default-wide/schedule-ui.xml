@@ -2201,8 +2201,38 @@
             <value>Perform Query</value>
         </button>
 
+        <button name="online_coverart_button" from="basewidebutton">
+            <position>545,275</position>
+            <value>Find Online Coverart</value>
+        </button>
+
+        <button name="online_fanart_button" from="basewidebutton">
+            <position>545,330</position>
+            <value>Find Online Fanart</value>
+        </button>
+
+        <button name="online_banner_button" from="basewidebutton">
+            <position>545,385</position>
+            <value>Find Online Banners</value>
+        </button>
+
+        <button name="local_coverart_button" from="basewidebutton">
+            <position>545,440</position>
+            <value>Find Local Coverart</value>
+        </button>
+
+        <button name="local_fanart_button" from="basewidebutton">
+            <position>545,495</position>
+            <value>Find Local Fanart</value>
+        </button>
+
+        <button name="local_banner_button" from="basewidebutton">
+            <position>545,550</position>
+            <value>Find Local Banners</value>
+        </button>
+
         <button name="back" from="basebutton">
-            <position>590,525</position>
+            <position>600,640</position>
             <value>Back</value>
         </button>
     </window>
