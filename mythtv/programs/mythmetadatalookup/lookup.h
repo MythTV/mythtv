@@ -20,6 +20,7 @@ class LookerUpper : public QObject
                                bool updaterules = false);
     void HandleAllRecordings(bool updaterules = false);
     void HandleAllRecordingRules(void);
+    void HandleAllArtwork(bool withinetrefsonly = true);
 
     void CopyRuleInetrefsToRecordings();
 
@@ -30,6 +31,7 @@ class LookerUpper : public QObject
 
     QList<ProgramInfo*>   m_busyRecList;
     bool                  m_updaterules;
+    bool                  m_updateartwork;
 };
 
 #endif //LOOKUP_H_

@@ -57,6 +57,21 @@ void MythMetadataLookupCommandLineParser::LoadArguments(void)
             "lookup. This is a best effort, and not guaranteed! If your "
             "recordings lack inetrefs but one is found for the rule, it "
             "will be inherited.", "");
+    add("--refresh-all-artwork", "refresh-all-artwork", false,
+            "Batch update artwork for recording rules and recording which "
+            "have an inetref set.  No lookups will be performed on items "
+            "which don't already have an inetref.  This is a more "
+            "conservative option that presumes you have set the inetrefs "
+            "you want for all of your recordings.  This option will not "
+            "overwrite any existing artwork.", "");
+    add("--refresh-all-artwork-dangerously", "refresh-all-artwork-dangerously", false,
+            "Batch update artwork for ALL recording rules and recordings. "
+            "This will attempt to download fanart, coverart, and banner "
+            "for each season of each recording rule and all recordings. "
+            "This option will not overwrite any existing artwork. If a "
+            "rule or recording has not been looked up, this will attempt "
+            "to look it up. This is a very aggressive option!  Use with "
+            "care.", "");
 }
 
 int main(int argc, char *argv[])
@@ -99,47 +114,67 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    bool refreshall      = cmdline.toBool("refresh-all");
-    bool refreshrules    = cmdline.toBool("refresh-rules");
-    bool refreshallrules = cmdline.toBool("refresh-all-rules");
-    bool usedchanid      = cmdline.toBool("chanid");
-    bool usedstarttime   = cmdline.toBool("starttime");
-    bool addjob          = cmdline.toBool("jobid");
+    bool refreshall          = cmdline.toBool("refresh-all");
+    bool refreshrules        = cmdline.toBool("refresh-rules");
+    bool refreshallrules     = cmdline.toBool("refresh-all-rules");
+    bool refreshallsafeart   = cmdline.toBool("refresh-all-artwork");
+    bool refreshallart       = cmdline.toBool("refresh-all-artwork-dangerously");
+    bool usedchanid          = cmdline.toBool("chanid");
+    bool usedstarttime       = cmdline.toBool("starttime");
+    bool addjob              = cmdline.toBool("jobid");
 
     int jobid            = cmdline.toInt("jobid");
     uint chanid          = cmdline.toUInt("chanid");
     QDateTime starttime  = cmdline.toDateTime("starttime");
 
-    if (refreshallrules && (refreshall || usedchanid || usedstarttime))
+    if (refreshallsafeart && (refreshall || refreshallrules ||
+                              refreshallart || usedchanid || usedstarttime))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "--refresh-all-safe-art must not be accompanied by any other argument.");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (refreshallart && (refreshall || refreshallrules ||
+                          refreshallsafeart || usedchanid || usedstarttime))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "--refresh-all-art must not be accompanied by any other argument.");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (refreshallrules && (refreshall || refreshallart ||
+                            refreshallsafeart ||  usedchanid || usedstarttime))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "--refresh-all-rules must not be accompanied by any other argument.");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (refreshall && (usedchanid || usedstarttime))
+    if (refreshall && (refreshallrules || refreshallart ||
+                       refreshallsafeart || usedchanid || usedstarttime))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "--refresh-all must not be accompanied by any other argument.");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (!addjob && !refreshall && !refreshallrules &&
-        !usedchanid && !usedstarttime)
+    if (!addjob && !refreshall && !refreshallrules && !refreshallart &&
+        !usedchanid && !usedstarttime && !refreshallsafeart)
     {
         refreshall = true;
     }
 
-    if (addjob && (refreshall || refreshallrules || usedchanid ||
-                   usedstarttime))
+    if (addjob && (refreshall || refreshallrules || refreshallart ||
+                   refreshallsafeart || usedchanid || usedstarttime))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "The jobqueue (-j) command cannot be used with other options.");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (!refreshall && !refreshallrules && !addjob &&
-        !(usedchanid && usedstarttime))
+    if (!refreshall && !refreshallrules && !refreshallart && !addjob &&
+        !refreshallsafeart && !(usedchanid && usedstarttime))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "--chanid and --starttime must be used together.");
@@ -167,6 +202,14 @@ int main(int argc, char *argv[])
     {
         lookup->HandleAllRecordingRules();
         lookup->CopyRuleInetrefsToRecordings();
+    }
+    else if (refreshallsafeart)
+    {
+        lookup->HandleAllArtwork(true);
+    }
+    else if (refreshallart)
+    {
+        lookup->HandleAllArtwork(false);
     }
     else
         lookup->HandleSingleRecording(chanid, starttime, refreshrules);

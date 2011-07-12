@@ -8,11 +8,13 @@
 #include "jobqueue.h"
 #include "remoteutil.h"
 
+#include "metadataimagehelper.h"
+
 #include "lookup.h"
 
 LookerUpper::LookerUpper() :
     m_busyRecList(QList<ProgramInfo*>()),
-    m_updaterules(false)
+    m_updaterules(false), m_updateartwork(false)
 {
     m_metadataFactory = new MetadataFactory(this);
 }
@@ -102,6 +104,70 @@ void LookerUpper::HandleAllRecordingRules()
             m_metadataFactory->Lookup(pginfo, false, false);
         }
     }
+}
+
+void LookerUpper::HandleAllArtwork(bool withinetrefsonly)
+{
+    m_updateartwork = true;
+
+    // First, handle all recording rules w/ inetrefs
+    vector<ProgramInfo *> recordingList;
+
+    RemoteGetAllScheduledRecordings(recordingList);
+
+    for( int n = 0; n < (int)recordingList.size(); n++)
+    {
+        ProgramInfo *pginfo = new ProgramInfo(*(recordingList[n]));
+        bool dolookup = true;
+        if (withinetrefsonly && pginfo->GetInetRef().isEmpty())
+            dolookup = false;
+        if (dolookup)
+        {
+            ArtworkMap map = GetArtwork(pginfo->GetInetRef(), pginfo->GetSeason());
+            if (map.isEmpty())
+            {
+                QString msg = QString("Looking up artwork for recording rule: %1 %2")
+                                               .arg(pginfo->GetTitle())
+                                               .arg(pginfo->GetSubtitle());
+                LOG(VB_GENERAL, LOG_INFO, msg);
+
+                m_busyRecList.append(pginfo);
+                m_metadataFactory->Lookup(pginfo, false, true);
+            }
+        }
+    }
+
+    // Now, Attempt to fill in the gaps for recordings
+    QMap< QString, ProgramInfo* > recMap;
+    QMap< QString, uint32_t > inUseMap = ProgramInfo::QueryInUseMap();
+    QMap< QString, bool > isJobRunning = ProgramInfo::QueryJobsRunning(JOB_COMMFLAG);
+
+    ProgramList progList;
+
+    LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, -1 );
+
+    for( int n = 0; n < (int)progList.size(); n++)
+    {
+        ProgramInfo *pginfo = new ProgramInfo(*(progList[n]));
+        bool dolookup = true;
+        if (withinetrefsonly && pginfo->GetInetRef().isEmpty())
+            dolookup = false;
+        if (dolookup)
+        {
+            ArtworkMap map = GetArtwork(pginfo->GetInetRef(), pginfo->GetSeason());
+            if (map.isEmpty())
+            {
+               QString msg = QString("Looking up artwork for recording: %1 %2")
+                                           .arg(pginfo->GetTitle())
+                                           .arg(pginfo->GetSubtitle());
+                LOG(VB_GENERAL, LOG_INFO, msg);
+
+                m_busyRecList.append(pginfo);
+                m_metadataFactory->Lookup(pginfo, false, true);
+            }
+        }
+    }
+
 }
 
 void LookerUpper::CopyRuleInetrefsToRecordings()
@@ -208,6 +274,13 @@ void LookerUpper::customEvent(QEvent *levent)
             rule->Save();
 
             delete rule;
+        }
+
+        if (m_updateartwork)
+        {
+            ArtworkMap map = lookup->GetDownloads();
+            SetArtwork(lookup->GetInetref(), lookup->GetSeason(),
+                       gCoreContext->GetMasterHostName(), map);
         }
 
         m_busyRecList.removeAll(pginfo);
