@@ -868,7 +868,8 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
         except: pass
         try: episodenumber = int(episode['episodenumber'])
         except: pass
-        return (episode.distance, seasonnumber, episodenumber)
+        return (-episode.distance, seasonnumber, episodenumber)
+
     global xmlFlag
     series_name=''
     ep_name=''
