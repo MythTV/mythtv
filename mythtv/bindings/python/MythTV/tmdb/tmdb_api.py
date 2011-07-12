@@ -591,7 +591,18 @@ class MovieDb(object):
         else:
             URL = self.config[u'urls'][u'movie.search']
         org_title = title
+
+        # strip out leading periods
+        if title.startswith('.'):
+            prepend = ''
+            for char in title:
+                if char != '.':
+                    break
+                prepend += '\.'
+            title = prepend + title.lstrip('.')
+
         title = urllib.quote(title.encode("utf-8"))
+
         url = URL % (title)
         if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
             sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
