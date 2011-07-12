@@ -27,6 +27,19 @@ class META_PUBLIC ImageDLEvent : public QEvent
     static Type kEventType;
 };
 
+class META_PUBLIC ImageDLFailureEvent : public QEvent
+{
+  public:
+    ImageDLFailureEvent(MetadataLookup *lookup) :
+                 QEvent(kEventType),
+                 item(lookup) {}
+    ~ImageDLFailureEvent() {}
+
+    MetadataLookup *item;
+
+    static Type kEventType;
+};
+
 class META_PUBLIC ThumbnailDLEvent : public QEvent
 {
   public:

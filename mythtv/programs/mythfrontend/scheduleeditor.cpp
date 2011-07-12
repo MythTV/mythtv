@@ -1889,6 +1889,24 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         HandleDownloadedImages(lookup);
     }
+    else if (levent->type() == ImageDLFailureEvent::kEventType)
+    {
+        if (m_busyPopup)
+        {
+            m_busyPopup->Close();
+            m_busyPopup = NULL;
+        }
+
+        ImageDLFailureEvent *ide = (ImageDLFailureEvent *)levent;
+
+        MetadataLookup *lookup = ide->item;
+
+        if (!lookup)
+            return;
+
+        delete lookup;
+        lookup = NULL;
+    }
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {
         DialogCompletionEvent *dce = (DialogCompletionEvent*)(levent);
