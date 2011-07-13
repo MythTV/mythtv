@@ -1589,8 +1589,6 @@ void MetadataOptions::Save()
     // InetRef
     if (m_inetrefEdit)
         m_recordingRule->m_inetref = m_inetrefEdit->GetText();
-
-    m_recordingRule->Save(true);
 }
 
 void MetadataOptions::QueryComplete(MetadataLookup *lookup)
