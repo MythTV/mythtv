@@ -637,7 +637,7 @@ static int DoFlagCommercials(
         commDetector->GetCommercialBreakList(commBreakList);
         comms_found = commBreakList.size() / 2;
 
-        if (!dontSubmitCommbreakListToDB)
+        if (!dontSubmitCommbreakListToDB && useDB)
         {
             program_info->SaveMarkupFlag(MARK_UPDATED_CUT);
             program_info->SaveCommBreakList(commBreakList);
@@ -1252,9 +1252,12 @@ int main(int argc, char *argv[])
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
 
+        QString outputfile = cmdline.toString("outputfile");
+        if (outputfile.isEmpty() && cmdline.toBool("skipdb"))
+            outputfile = "-";
+
         // perform commercial flagging on file outside the database
-        FlagCommercials(cmdline.toString("file"), -1,
-                        cmdline.toString("outputfile"),
+        FlagCommercials(cmdline.toString("file"), -1, outputfile,
                         !cmdline.toBool("skipdb"));
     }
     else if (cmdline.toBool("queue"))
