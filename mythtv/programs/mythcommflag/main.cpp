@@ -770,15 +770,15 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             (enum SkipTypes)gCoreContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
 
-    if (cmdline.toBool("commmethod"))
+    if (cmdline.toBool("commmethod") || cmdline.toBool("skipdb"))
     {
         // pull commercial detection method from command line
-        QString commmethod = cmdline.toString("commmethod");
+        QString commmethod = cmdline.toBool("commmethod") ?
+            cmdline.toString("commmethod") : "blank";
 
         // assume definition as integer value
         bool ok = true;
-        if (cmdline.toBool("commmethod"))
-            commDetectMethod = (SkipTypes) commmethod.toInt(&ok);
+        commDetectMethod = (SkipTypes) commmethod.toInt(&ok);
         if (!ok)
         {
             // not an integer, attempt comma separated list
