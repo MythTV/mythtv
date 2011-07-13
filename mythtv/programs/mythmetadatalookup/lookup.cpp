@@ -150,7 +150,18 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
     {
         ProgramInfo *pginfo = new ProgramInfo(*(progList[n]));
         bool dolookup = true;
-        if (!aggressive && pginfo->GetInetRef().isEmpty())
+
+        RecordingRule *rule = new RecordingRule();
+        rule->LoadByProgram(pginfo);
+        int ruleepisode = 0;
+        if (rule && rule->Load())
+            ruleepisode = rule->m_episode;
+        delete rule;
+
+        if ((!aggressive && pginfo->GetInetRef().isEmpty()) ||
+             pginfo->GetRecordingGroup() == "Deleted" ||
+             pginfo->GetRecordingGroup() == "LiveTV" ||
+             (!aggressive && ruleepisode > 0 && pginfo->GetEpisode() == 0))
             dolookup = false;
         if (dolookup)
         {
