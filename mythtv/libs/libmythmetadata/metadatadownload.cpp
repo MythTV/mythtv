@@ -572,9 +572,14 @@ MetadataLookupList MetadataDownload::handleRecordingUndetermined(
                 // Hail Mary lookup.  Drop the subtitle.
                 // (Because really, this should be a TV show)
                 args.clear();
+                args.append(QString("-l")); // Language Flag
+                args.append(gCoreContext->GetLanguage()); // UI Language
                 args.append("-M");
-                args.append(lookup->GetTitle());
-                list = runGrabber(cmd, args, lookup, false);
+                QString title = lookup->GetTitle();
+                args.append(title);
+                lookup->SetSeason(1);
+                lookup->SetEpisode(1);
+                list = runGrabber(cmd, args, lookup, true);
             }
         }
         else
