@@ -208,6 +208,14 @@ static int QueueCommFlagJob(uint chanid, QDateTime starttime, bool rebuild)
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
+    if (cmdline.toBool("dryrun"))
+    {
+        QString tmp = QString("Job have been queued for chanid %1 @ %2")
+                        .arg(chanid).arg(startstring);
+        cerr << tmp.toLocal8Bit().constData() << endl;
+        return GENERIC_EXIT_OK;
+    }
+
     bool result = JobQueue::QueueJob(JOB_COMMFLAG,
         pginfo.GetChanID(), pginfo.GetRecordingStartTime(), "", "", "",
         rebuild ? JOB_REBUILD : 0, JOB_QUEUED, QDateTime());
@@ -770,11 +778,10 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             (enum SkipTypes)gCoreContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
 
-    if (cmdline.toBool("commmethod") || cmdline.toBool("skipdb"))
+    if (cmdline.toBool("commmethod"))
     {
         // pull commercial detection method from command line
-        QString commmethod = cmdline.toBool("commmethod") ?
-            cmdline.toString("commmethod") : "blank";
+        QString commmethod = cmdline.toString("commmethod");
 
         // assume definition as integer value
         bool ok = true;
@@ -853,6 +860,9 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         }
 
     }
+    else if (cmdline.toBool("skipdb"))
+        // default to a cheaper method for debugging purposes
+        commDetectMethod = COMM_DETECT_BLANK;
 
     // if selection has failed, or intentionally disabled, drop out
     if (commDetectMethod == COMM_DETECT_UNINIT)

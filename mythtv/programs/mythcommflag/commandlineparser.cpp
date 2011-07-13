@@ -43,5 +43,6 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     add("--dontwritetodb", "dontwritedb", false, "", "Intended for external 3rd party use.");
     add("--onlydumpdb", "dumpdb", false, "", "?");
     add("--outputfile", "outputfile", "", "File to write commercial flagging output [debug].", "");
+    add("--dry-run", "dryrun", false, "Don't actually queue operation, just list what would be done", "");
 }
 
