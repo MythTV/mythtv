@@ -1254,6 +1254,9 @@ int main(int argc, char *argv[])
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
+            if (!cmdline.toBool("outputfile"))
+                cmdline.SetValue("outputfile", "-");
+
             // perform commercial flagging on file outside the database
             FlagCommercials(cmdline.toString("file"), -1,
                             cmdline.toString("outputfile"),

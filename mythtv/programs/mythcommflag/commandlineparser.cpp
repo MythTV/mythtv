@@ -42,7 +42,7 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     add("--force", "force", false, "Force operation, even if program appears to be in use.", "");
     add("--dontwritetodb", "dontwritedb", false, "", "Intended for external 3rd party use.");
     add("--onlydumpdb", "dumpdb", false, "", "?");
-    add("--outputfile", "outputfile", "-", "File to write commercial flagging output [debug].", "");
+    add("--outputfile", "outputfile", "", "File to write commercial flagging output [debug].", "");
     add("--dry-run", "dryrun", false, "Don't actually queue operation, just list what would be done", "");
 }
 
