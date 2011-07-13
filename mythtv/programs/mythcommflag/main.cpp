@@ -1234,6 +1234,13 @@ int main(int argc, char *argv[])
     else if (cmdline.toBool("file"))
     {
         // TODO: add back handling of recording defined by the basename
+        if (cmdline.toBool("rebuild"))
+        {
+            cerr << "You can no longer use --file with --rebuild.  Please "
+                    "use --chanid and " << endl
+                 << "--starttime" << endl;
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
 
         // perform commercial flagging on file outside the database
         FlagCommercials(cmdline.toString("file"), -1,
