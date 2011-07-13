@@ -45,12 +45,13 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythmedia.h"
 
-// Libmythui headers
+// libmythui headers
 #include "myththemebase.h"
 #include "screensaver.h"
 #include "lirc.h"
 #include "lircevent.h"
 #include "mythudplistener.h"
+#include "mythrender_base.h"
 
 #ifdef USING_APPLEREMOTE
 #include "AppleRemoteListener.h"
