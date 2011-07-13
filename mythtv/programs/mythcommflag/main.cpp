@@ -1193,7 +1193,8 @@ int main(int argc, char *argv[])
         else if (cmdline.toBool("rebuild"))
             result = RebuildSeekTable(chanid, starttime, -1);
         else
-            result = FlagCommercials(chanid, starttime, -1, "");
+            result = FlagCommercials(chanid, starttime, -1, 
+                                     cmdline.toString("outputfile"));
     }
     else if (cmdline.toBool("jobid"))
     {
@@ -1243,22 +1244,36 @@ int main(int argc, char *argv[])
     }
     else if (cmdline.toBool("file"))
     {
-        // TODO: add back handling of recording defined by the basename
-        if (cmdline.toBool("rebuild"))
+        if (cmdline.toBool("skipdb"))
         {
-            cerr << "You can no longer use --file with --rebuild.  Please "
-                    "use --chanid and " << endl
-                 << "--starttime" << endl;
-            return GENERIC_EXIT_INVALID_CMDLINE;
+            if (cmdline.toBool("rebuild"))
+            {
+                cerr << "The --rebuild parameter builds the seektable for "
+                        "internal MythTV use only. It cannot be used in "
+                        "combination with --skipdb." << endl;
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+
+            // perform commercial flagging on file outside the database
+            FlagCommercials(cmdline.toString("file"), -1,
+                            cmdline.toString("outputfile"),
+                            !cmdline.toBool("skipdb"));
         }
-
-        QString outputfile = cmdline.toString("outputfile");
-        if (outputfile.isEmpty() && cmdline.toBool("skipdb"))
-            outputfile = "-";
-
-        // perform commercial flagging on file outside the database
-        FlagCommercials(cmdline.toString("file"), -1, outputfile,
-                        !cmdline.toBool("skipdb"));
+        else
+        {
+            ProgramInfo pginfo(cmdline.toString("file"));
+            // pass chanid and starttime
+            // inefficient, but it lets the other function
+            // handle sanity checking
+            if (cmdline.toBool("rebuild"))
+                result = RebuildSeekTable(pginfo.GetChanID(),
+                                          pginfo.GetRecordingStartTime(),
+                                          -1);
+            else
+                result = FlagCommercials(pginfo.GetChanID(),
+                                         pginfo.GetRecordingStartTime(),
+                                         -1, cmdline.toString("outputfile"));
+        }
     }
     else if (cmdline.toBool("queue"))
     {
