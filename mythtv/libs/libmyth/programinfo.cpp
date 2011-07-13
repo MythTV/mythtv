@@ -2422,6 +2422,33 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
         MythDB::DBError("SetDVDBookmark updating", query);
 }
 
+/** \brief Queries recordedprogram to get the category_type of the
+ *         recording.
+ *
+ *  \return string category_type
+ */
+QString ProgramInfo::QueryCategoryType(void) const
+{
+    QString ret;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(" SELECT category_type "
+                  " FROM recordedprogram "
+                  " WHERE chanid = :CHANID "
+                  " AND starttime = :STARTTIME;");
+
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", startts);
+
+    if (query.exec() && query.next())
+    {
+        ret = query.value(0).toString();
+    }
+
+    return ret;
+}
+
 /// \brief Set "watched" field in recorded/videometadata to "watchedFlag".
 void ProgramInfo::SaveWatched(bool watched)
 {
