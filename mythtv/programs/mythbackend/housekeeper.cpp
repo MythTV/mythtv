@@ -835,6 +835,7 @@ void HouseKeeper::UpdateRecordedArtwork(void)
     QString command = GetInstallPrefix() + "/bin/mythmetadatalookup";
     QStringList args;
     args << "--refresh-all-artwork";
+    args << logPropagateArgs;
 
     LOG(VB_GENERAL, LOG_INFO, QString("Performing Artwork Refresh: %1 %2")
         .arg(command).arg(args.join(" ")));
