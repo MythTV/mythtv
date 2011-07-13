@@ -188,12 +188,15 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
             map.insert(BANNER, info);
         }
 
-        ArtworkList screenshotlist = lookup->GetArtwork(SCREENSHOT);
-        if (screenshotlist.size())
+        if (!lookup->GetType() == RECDNG)
         {
-            ArtworkInfo info;
-            info.url = screenshotlist.takeLast().url;
-            map.insert(SCREENSHOT, info);
+            ArtworkList screenshotlist = lookup->GetArtwork(SCREENSHOT);
+            if (screenshotlist.size())
+            {
+                ArtworkInfo info;
+                info.url = screenshotlist.takeLast().url;
+                map.insert(SCREENSHOT, info);
+            }
         }
         lookup->SetDownloads(map);
         m_imagedownload->addDownloads(lookup);
