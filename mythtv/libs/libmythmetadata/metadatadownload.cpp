@@ -566,6 +566,16 @@ MetadataLookupList MetadataDownload::handleRecordingUndetermined(
             QString subtitle = lookup->GetSubtitle();
             args.append(subtitle);
             list = runGrabber(cmd, args, lookup, false);
+
+            if (!list.size() && !lookup->GetHandleImages())
+            {
+                // Hail Mary lookup.  Drop the subtitle.
+                // (Because really, this should be a TV show)
+                args.clear();
+                args.append("-M");
+                args.append(lookup->GetTitle());
+                list = runGrabber(cmd, args, lookup, false);
+            }
         }
         else
             list = runGrabber(cmd, args, lookup, true);
