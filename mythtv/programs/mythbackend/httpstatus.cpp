@@ -1151,7 +1151,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                     if (!text.isNull())
                         sComment = text.nodeValue();
 
-                    os << "<a href=\"#\">"
+                    os << "<a href=\"javascript:void(0)\">"
                        << recStartTs.toString("ddd") << " "
                        << recStartTs.toString(shortdateformat) << " "
                        << recStartTs.toString(timeformat) << " - "
