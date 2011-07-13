@@ -164,7 +164,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         if (coverartlist.size())
         {
             ArtworkInfo info;
-            info.url = coverartlist.takeFirst().url;
+            info.url = coverartlist.takeLast().url;
             map.insert(COVERART, info);
         }
 
@@ -172,7 +172,11 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         if (fanartlist.size())
         {
             ArtworkInfo info;
-            info.url = fanartlist.takeFirst().url;
+            int index = 0;
+            int season = (int)lookup->GetSeason();
+            if (season > 0 && season <= fanartlist.count())
+                index = season - 1;
+            info.url = fanartlist.takeAt(index).url;
             map.insert(FANART, info);
         }
 
@@ -180,7 +184,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         if (bannerlist.size())
         {
             ArtworkInfo info;
-            info.url = bannerlist.takeFirst().url;
+            info.url = bannerlist.takeLast().url;
             map.insert(BANNER, info);
         }
 
@@ -188,7 +192,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         if (screenshotlist.size())
         {
             ArtworkInfo info;
-            info.url = screenshotlist.takeFirst().url;
+            info.url = screenshotlist.takeLast().url;
             map.insert(SCREENSHOT, info);
         }
         lookup->SetDownloads(map);
