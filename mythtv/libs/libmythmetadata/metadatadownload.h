@@ -56,7 +56,7 @@ class META_PUBLIC MetadataDownload : public QThread
     MetadataLookupList  handleMovie(MetadataLookup* lookup);
     MetadataLookupList  handleTelevision(MetadataLookup* lookup);
     MetadataLookupList  handleVideoUndetermined(MetadataLookup* lookup);
-    MetadataLookupList  handleRecordingUndetermined(MetadataLookup* lookup);
+    MetadataLookupList  handleRecordingGeneric(MetadataLookup* lookup);
 
     MetadataLookupList  handleGame(MetadataLookup* lookup);
 

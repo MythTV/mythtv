@@ -8,6 +8,7 @@
 // null constructor
 MetadataLookup::MetadataLookup(void) :
     m_type(VID),
+    m_subtype(kUnknownVideo),
     m_data(),
     m_step(SEARCH),
     m_automatic(false),
@@ -71,6 +72,7 @@ MetadataLookup::MetadataLookup(void) :
 // full constructor
 MetadataLookup::MetadataLookup(
     MetadataType type,
+    LookupType subtype,
     QVariant data,
     LookupStep step,
     bool automatic,
@@ -130,6 +132,7 @@ MetadataLookup::MetadataLookup(
     DownloadMap downloads) :
 
     m_type(type),
+    m_subtype(subtype),
     m_data(data),
     m_step(step),
     m_automatic(automatic),
@@ -193,6 +196,7 @@ MetadataLookup::MetadataLookup(
 // ProgramInfo-style constructor
 MetadataLookup::MetadataLookup(
     MetadataType type,
+    LookupType subtype,
     QVariant data,
     LookupStep step,
     bool automatic,
@@ -231,6 +235,7 @@ MetadataLookup::MetadataLookup(
     const uint runtimesecs) :
 
     m_type(type),
+    m_subtype(subtype),
     m_data(data),
     m_step(step),
     m_automatic(automatic),
@@ -273,6 +278,7 @@ MetadataLookup::MetadataLookup(
 // XBMC NFO-style constructor
 MetadataLookup::MetadataLookup(
     MetadataType type,
+    LookupType subtype,
     QVariant data,
     LookupStep step,
     bool automatic,
@@ -301,6 +307,7 @@ MetadataLookup::MetadataLookup(
     DownloadMap downloads) :
 
     m_type(type),
+    m_subtype(subtype),
     m_data(data),
     m_step(step),
     m_automatic(automatic),
@@ -599,12 +606,13 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
             .arg(season).arg(episode));
     }
 
-    return new MetadataLookup(lookup->GetType(), lookup->GetData(),
-        lookup->GetStep(), lookup->GetAutomatic(), lookup->GetHandleImages(),
-        lookup->GetAllowOverwrites(), lookup->GetPreferDVDOrdering(),
-        lookup->GetHost(), lookup->GetFilename(), title, categories,
-        userrating, language, subtitle, tagline, description,
-        season, episode, chanid, channum, chansign, channame,
+    return new MetadataLookup(lookup->GetType(), lookup->GetSubtype(),
+        lookup->GetData(), lookup->GetStep(), lookup->GetAutomatic(),
+        lookup->GetHandleImages(), lookup->GetAllowOverwrites(),
+        lookup->GetPreferDVDOrdering(), lookup->GetHost(),
+        lookup->GetFilename(), title, categories, userrating,
+        language, subtitle, tagline, description, season,
+        episode, chanid, channum, chansign, channame,
         chanplaybackfilters, recgroup, playgroup, seriesid, programid,
         storagegroup, startts, endts, recstartts, recendts, programflags,
         audioproperties, videoproperties, subtitletype, certification,
@@ -679,8 +687,9 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
         people.insert(DIRECTOR, info);
     }
 
-    return new MetadataLookup(lookup->GetType(), lookup->GetData(),
-        lookup->GetStep(), lookup->GetAutomatic(), lookup->GetHandleImages(),
+    return new MetadataLookup(lookup->GetType(), lookup->GetSubtype(),
+        lookup->GetData(), lookup->GetStep(),
+        lookup->GetAutomatic(), lookup->GetHandleImages(),
         lookup->GetAllowOverwrites(), lookup->GetPreferDVDOrdering(),
         lookup->GetHost(), lookup->GetFilename(), title, categories,
         userrating, subtitle, tagline, description, season, episode,

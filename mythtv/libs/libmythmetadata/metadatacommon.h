@@ -55,6 +55,15 @@ enum MetadataType {
     GAME = 3
 };
 
+enum LookupType {
+    kProbableTelevision = 0,
+    kProbableGenericTelevision = 1,
+    kProbableMovie = 2,
+    kUnknownVideo = 3,
+    kProbableMusic = 4,
+    kProbableGame = 5
+};
+
 enum PeopleType {
     ACTOR = 0,
     AUTHOR = 1,
@@ -88,6 +97,7 @@ class META_PUBLIC MetadataLookup : public QObject
 
     MetadataLookup(
         MetadataType type,
+        LookupType subtype,
         QVariant data,
         LookupStep step,
         bool automatic,
@@ -149,6 +159,7 @@ class META_PUBLIC MetadataLookup : public QObject
     //ProgramInfo Constructor
     MetadataLookup(
         MetadataType type,
+        LookupType subtype,
         QVariant data,
         LookupStep step,
         bool automatic,
@@ -189,6 +200,7 @@ class META_PUBLIC MetadataLookup : public QObject
     // XBMC NFO Constructor
     MetadataLookup(
         MetadataType type,
+        LookupType subtype,
         QVariant data,
         LookupStep step,
         bool automatic,
@@ -222,6 +234,8 @@ class META_PUBLIC MetadataLookup : public QObject
 
     // Must set a type, data, and step.
     void SetType(MetadataType type) { m_type = type; };
+    // For some lookup, it helps to know the subtype (TV vs. Movie)
+    void SetSubtype(LookupType subtype) { m_subtype = subtype; };
     // Reference value- when the event comes back, need to associate with an item.
     void SetData(QVariant data) { m_data = data; };
     // Steps: SEARCH, GETDATA
@@ -258,6 +272,7 @@ class META_PUBLIC MetadataLookup : public QObject
     // GETS
 
     MetadataType GetType() const { return m_type; };
+    LookupType GetSubtype() const { return m_subtype; };
     QVariant GetData() const { return m_data; };
     LookupStep GetStep() const { return m_step; };
     bool GetAutomatic() const { return m_automatic; };
@@ -340,6 +355,7 @@ class META_PUBLIC MetadataLookup : public QObject
   private:
     // General
     MetadataType m_type;
+    LookupType m_subtype;
     QVariant m_data;
     LookupStep m_step;
     bool m_automatic;

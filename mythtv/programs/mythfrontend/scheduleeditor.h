@@ -246,6 +246,8 @@ class MetadataOptions : public MythScreenType
 
     void ValuesChanged();
 
+    void Close(void);
+
   private:
     void Load(void);
     void Save(void);

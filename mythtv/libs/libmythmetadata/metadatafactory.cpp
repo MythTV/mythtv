@@ -58,6 +58,7 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
     MetadataLookup *lookup = new MetadataLookup();
     lookup->SetStep(SEARCH);
     lookup->SetType(RECDNG);
+    lookup->SetSubtype(GuessLookupType(recrule));
     lookup->SetData(qVariantFromValue(recrule));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
@@ -83,6 +84,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
     MetadataLookup *lookup = new MetadataLookup();
     lookup->SetStep(SEARCH);
     lookup->SetType(RECDNG);
+    lookup->SetSubtype(GuessLookupType(pginfo));
     lookup->SetData(qVariantFromValue(pginfo));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
@@ -108,6 +110,12 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
     MetadataLookup *lookup = new MetadataLookup();
     lookup->SetStep(SEARCH);
     lookup->SetType(VID);
+    if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
+        lookup->SetSubtype(kProbableTelevision);
+    else if (metadata->GetSubtitle().isEmpty())
+        lookup->SetSubtype(kProbableMovie);
+    else
+        lookup->SetSubtype(kUnknownVideo);
     lookup->SetData(qVariantFromValue(metadata));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
@@ -271,5 +279,64 @@ void MetadataFactory::customEvent(QEvent *levent)
 
         OnImageResult(lookup);
     }
+}
+
+// These functions exist to determine if we have enough
+// information to conclusively call something a Show vs. Movie
+
+LookupType GuessLookupType(ProgramInfo *pginfo)
+{
+    LookupType ret = kUnknownVideo;
+
+    QString catType = pginfo->QueryCategoryType();
+
+    if (catType == "series" || catType == "tvshow" ||
+        catType == "show")
+        ret = kProbableTelevision;
+    else if (catType == "movie" || catType == "film")
+        ret = kProbableMovie;
+    else if (pginfo->GetSeason() > 0 || pginfo->GetEpisode() > 0 ||
+        !pginfo->GetSubtitle().isEmpty())
+        ret = kProbableTelevision;
+    else
+    {
+        // Before committing to something being a movie, we
+        // want to check its rule.  If the rule has a season
+        // or episode number, but the recording doesn't,
+        // and the rec doesn't have a subtitle, this is a
+        // generic recording. If neither the rule nor the
+        // recording have an inetref, season, episode, or
+        // subtitle, it's *probably* a movie.  If it's some
+        // weird combination of both, we've got to try everything.
+        RecordingRule *rule = new RecordingRule();
+        rule->LoadByProgram(pginfo);
+        int ruleepisode = 0;
+        if (rule && rule->Load())
+            ruleepisode = rule->m_episode;
+        delete rule;
+
+        if (ruleepisode == 0 && pginfo->GetEpisode() == 0 &&
+            pginfo->GetSubtitle().isEmpty())
+            ret = kProbableMovie;
+        else if (ruleepisode > 0 && pginfo->GetSubtitle().isEmpty())
+            ret = kProbableGenericTelevision;
+        else
+            ret = kUnknownVideo;
+    }
+
+    return ret;
+}
+
+LookupType GuessLookupType(RecordingRule *recrule)
+{
+    LookupType ret = kUnknownVideo;
+
+    if (recrule->m_season > 0 || recrule->m_episode > 0 ||
+        !recrule->m_subtitle.isEmpty())
+        ret = kProbableTelevision;
+    else
+        ret = kProbableMovie;
+
+    return ret;
 }
 

@@ -110,6 +110,9 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
 {
     m_updateartwork = true;
 
+    if (aggressive)
+        m_updaterules = true;
+
     // First, handle all recording rules w/ inetrefs
     vector<ProgramInfo *> recordingList;
 
@@ -119,6 +122,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
     {
         ProgramInfo *pginfo = new ProgramInfo(*(recordingList[n]));
         bool dolookup = true;
+
         if (!aggressive && pginfo->GetInetRef().isEmpty())
             dolookup = false;
         if (dolookup)
@@ -150,23 +154,21 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
     {
         ProgramInfo *pginfo = new ProgramInfo(*(progList[n]));
         bool dolookup = true;
+        int maxartnum = 3;
 
-        RecordingRule *rule = new RecordingRule();
-        rule->LoadByProgram(pginfo);
-        int ruleepisode = 0;
-        if (rule && rule->Load())
-            ruleepisode = rule->m_episode;
-        delete rule;
+        LookupType type = GuessLookupType(pginfo);
 
-        if ((!aggressive && pginfo->GetInetRef().isEmpty()) ||
+        if (type == kProbableMovie || type == kUnknownVideo)
+           maxartnum = 3;
+
+        if ((!aggressive && type == kProbableGenericTelevision) ||
              pginfo->GetRecordingGroup() == "Deleted" ||
-             pginfo->GetRecordingGroup() == "LiveTV" ||
-             (!aggressive && ruleepisode > 0 && pginfo->GetEpisode() == 0))
+             pginfo->GetRecordingGroup() == "LiveTV")
             dolookup = false;
         if (dolookup)
         {
             ArtworkMap map = GetArtwork(pginfo->GetInetRef(), pginfo->GetSeason(), true);
-            if (map.isEmpty())
+            if (map.isEmpty() || (aggressive && map.count() < maxartnum))
             {
                QString msg = QString("Looking up artwork for recording: %1 %2")
                                            .arg(pginfo->GetTitle())
@@ -280,11 +282,17 @@ void LookerUpper::customEvent(QEvent *levent)
         if (m_updaterules)
         {
             RecordingRule *rule = new RecordingRule();
-            rule->LoadByProgram(pginfo);
-            rule->m_inetref = lookup->GetInetref();
-            rule->Save();
+            if (rule)
+            {
+                rule->LoadByProgram(pginfo);
+                if (rule->m_inetref.isEmpty())
+                    rule->m_inetref = lookup->GetInetref();
+                rule->m_season = lookup->GetSeason();
+                rule->m_episode = lookup->GetEpisode();
+                rule->Save();
 
-            delete rule;
+                delete rule;
+            }
         }
 
         if (m_updateartwork)

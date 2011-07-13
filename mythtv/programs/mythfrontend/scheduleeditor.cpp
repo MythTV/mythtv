@@ -1340,8 +1340,6 @@ MetadataOptions::MetadataOptions(MythScreenStack *parent,
 
 MetadataOptions::~MetadataOptions(void)
 {
-    Save();
-
     if (m_imageLookup)
     {
         m_imageLookup->cancel();
@@ -1481,6 +1479,11 @@ void MetadataOptions::PerformQuery()
 
     m_lookup->SetStep(SEARCH);
     m_lookup->SetType(RECDNG);
+    if (m_seasonSpin->GetIntValue() > 0 ||
+           m_episodeSpin->GetIntValue() > 0)
+        m_lookup->SetSubtype(kProbableTelevision);
+    else
+        m_lookup->SetSubtype(kProbableMovie);
     m_lookup->SetAutomatic(false);
     m_lookup->SetHandleImages(false);
     m_lookup->SetHost(gCoreContext->GetMasterHostName());
@@ -1565,6 +1568,12 @@ void MetadataOptions::SelectOnlineCoverart()
 void MetadataOptions::SelectOnlineBanner()
 {
     FindNetArt(BANNER);
+}
+
+void MetadataOptions::Close()
+{
+    Save();
+    MythScreenType::Close();
 }
 
 void MetadataOptions::Save()
@@ -1655,6 +1664,11 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
     m_lookup->SetType(VID);
     m_lookup->SetAutomatic(true);
     m_lookup->SetHandleImages(false);
+    if (m_seasonSpin->GetIntValue() > 0 ||
+           m_episodeSpin->GetIntValue() > 0)
+        m_lookup->SetSubtype(kProbableTelevision);
+    else
+        m_lookup->SetSubtype(kProbableMovie);
     m_lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
     m_lookup->SetHost(gCoreContext->GetMasterHostName());
     m_lookup->SetTitle(m_recordingRule->m_title);
@@ -1912,8 +1926,6 @@ void MetadataOptions::customEvent(QEvent *levent)
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {
         DialogCompletionEvent *dce = (DialogCompletionEvent*)(levent);
-
-        LOG(VB_GENERAL, LOG_ERR, "DCE!");
 
         const QString resultid = dce->GetId();
         ArtworkInfo info;

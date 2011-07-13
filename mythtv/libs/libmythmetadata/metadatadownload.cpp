@@ -68,20 +68,42 @@ void MetadataDownload::run()
     {
         MetadataLookupList list;
         // Go go gadget Metadata Lookup
-        if (lookup->GetType() == VID || lookup->GetType() == RECDNG)
+        if (lookup->GetType() == VID)
         {
-            if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)
+            if (lookup->GetSubtype() == kProbableTelevision)
                 list = handleTelevision(lookup);
-            else if (!lookup->GetSubtitle().isEmpty() &&
-                     lookup->GetType() == VID)
-                list = handleVideoUndetermined(lookup);
-            else if (lookup->GetType() == RECDNG)
-                list = handleRecordingUndetermined(lookup);
-            else
+            else if (lookup->GetSubtype() == kProbableMovie)
                 list = handleMovie(lookup);
+            else
+                list = handleVideoUndetermined(lookup);
+
+            if (!list.size() &&
+                lookup->GetSubtype() == kUnknownVideo)
+            {
+                list = handleMovie(lookup);
+            }
         }
-//        else if (lookup->GetType() == MUSIC)
-//            list = handleMusic(lookup);
+        else if (lookup->GetType() == RECDNG)
+        {
+            if (lookup->GetSubtype() == kProbableTelevision)
+            {
+                if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)
+                    list = handleTelevision(lookup);
+                else if (!lookup->GetSubtitle().isEmpty())
+                    list = handleVideoUndetermined(lookup);
+            }
+            else if (lookup->GetSubtype() == kProbableMovie)
+                list = handleMovie(lookup);
+            else
+                list = handleRecordingGeneric(lookup);
+
+            if (!list.size() &&
+                (lookup->GetSubtype() == kProbableMovie ||
+                lookup->GetSubtype() == kProbableTelevision))
+            {
+                list = handleRecordingGeneric(lookup);
+            }
+        }
         else if (lookup->GetType() == GAME)
             list = handleGame(lookup);
 
@@ -172,16 +194,6 @@ bool MetadataDownload::findBestMatch(MetadataLookupList list,
         {
             MetadataLookup *newlookup = (*i);
             newlookup->SetStep(GETDATA);
-
-            // If searching for TV without a subtitle, but we've found
-            // a series match, arbitrarily set season/episode to "1" to
-            // avoid looping forever trying to figure it out.
-
-            if (newlookup->GetType() == RECDNG)
-            {
-                newlookup->SetSeason(1);
-                newlookup->SetEpisode(1);
-            }
 
             prependLookup(newlookup);
             return true;
@@ -498,104 +510,51 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
     // Try to do a title/subtitle lookup
     list = runGrabber(cmd, args, lookup, false);
 
-    // If there were no results for that, fall back to a movie lookup.
-    if (!list.size())
-        list = handleMovie(lookup);
-
     if (list.count() == 1)
         list.at(0)->SetStep(GETDATA);
 
     return list;
 }
 
-MetadataLookupList MetadataDownload::handleRecordingUndetermined(
+MetadataLookupList MetadataDownload::handleRecordingGeneric(
                                                     MetadataLookup* lookup)
 {
-    // Ground rules: if we are here, we're operating on a recording.
-    // If this lookup is trying to handle images, the only place that can
-    // be in a --refresh-all-artwork run of mythmetadatalookup.
-
-    // Thus, TRUST the season and episode if there's an inetref + handleimages!
+    // We only enter this mode if we are pretty darn sure this is a TV show,
+    // but we're for some reason looking up a generic, or the title didn't
+    // exactly match in one of the earlier lookups.  This is a total
+    // hail mary to try to get at least *series* level info and art/inetref.
 
     MetadataLookupList list;
 
-    if ((lookup->GetHandleImages() && !lookup->GetInetref().isEmpty() &&
-        (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)) ||
-        !lookup->GetHandleImages())
-    {
-        QString def_cmd = QDir::cleanPath(QString("%1/%2")
+    QString def_cmd = QDir::cleanPath(QString("%1/%2")
             .arg(GetShareDir())
             .arg("metadata/Television/ttvdb.py"));
 
-        QString cmd = gCoreContext->GetSetting("TelevisionGrabber", def_cmd);
+    QString cmd = gCoreContext->GetSetting("TelevisionGrabber", def_cmd);
 
-        QStringList args;
-        args.append(QString("-l")); // Language Flag
-        args.append(gCoreContext->GetLanguage()); // UI Language
-        if (!lookup->GetSubtitle().isEmpty())
-            args.append(QString("-N"));
-        else
-        {
-            // If the input lookup doesn't have Subtitle, Season or Episode,
-            // We're going to "artificially" set Seas/Ep to 1 since the input
-            // isn't enough information to get conclusive metadata anyway.
-            // This is needed in case of a multi-result, so that on the second
-            // pass through, we definitely get the TV grabber and at least get
-            // an inetref.
-            if (lookup->GetSeason() == 0 && lookup->GetEpisode() == 0)
-            {
-                lookup->SetSeason(1);
-                lookup->SetEpisode(1);
-            }
-            args.append(QString("-M"));
-        }
+    QStringList args;
 
-        if (!lookup->GetInetref().isEmpty())
-        {
-            QString inetref = lookup->GetInetref();
-            args.append(inetref);
-        }
-        else
-        {
-            QString title = lookup->GetTitle();
-            args.append(title);
-        }
+    args.append(QString("-l")); // Language Flag
+    args.append(gCoreContext->GetLanguage()); // UI Language
+    args.append("-M");
+    QString title = lookup->GetTitle();
+    args.append(title);
+    int origseason = lookup->GetSeason();
+    int origepisode = lookup->GetEpisode();
 
-        if (!lookup->GetSubtitle().isEmpty())
-        {
-            QString subtitle = lookup->GetSubtitle();
-            args.append(subtitle);
-            list = runGrabber(cmd, args, lookup, false);
-
-            if (!list.size() && !lookup->GetHandleImages())
-            {
-                // Hail Mary lookup.  Drop the subtitle.
-                // (Because really, this should be a TV show)
-                args.clear();
-                args.append(QString("-l")); // Language Flag
-                args.append(gCoreContext->GetLanguage()); // UI Language
-                args.append("-M");
-                QString title = lookup->GetTitle();
-                args.append(title);
-                lookup->SetSeason(1);
-                lookup->SetEpisode(1);
-                list = runGrabber(cmd, args, lookup, true);
-            }
-        }
-        else
-            list = runGrabber(cmd, args, lookup, true);
-    }
-
-    // If there were no results for that, fall back to a movie lookup.
-    if (!list.size() && lookup->GetSubtitle().isEmpty())
+    if (origseason == 0 && origepisode == 0)
     {
-        lookup->SetSeason(0);
-        lookup->SetEpisode(0);
-        list = handleMovie(lookup);
+        lookup->SetSeason(1);
+        lookup->SetEpisode(1);
     }
+
+    list = runGrabber(cmd, args, lookup, true);
 
     if (list.count() == 1)
         list.at(0)->SetStep(GETDATA);
+
+    lookup->SetSeason(origseason);
+    lookup->SetEpisode(origepisode);
 
     return list;
 }

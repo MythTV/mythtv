@@ -710,6 +710,13 @@ void EditMetadataDialog::OnSearchListSelection(ArtworkInfo info, VideoArtworkTyp
 
     MetadataLookup *lookup = new MetadataLookup();
     lookup->SetType(VID);
+    if (m_workingMetadata->GetSeason() > 0 ||
+            m_workingMetadata->GetEpisode() > 0)
+        lookup->SetSubtype(kProbableTelevision);
+    else if (m_workingMetadata->GetSubtitle().isEmpty())
+        lookup->SetSubtype(kProbableMovie);
+    else
+        lookup->SetSubtype(kUnknownVideo);
     lookup->SetHost(m_workingMetadata->GetHost());
     lookup->SetAutomatic(true);
     lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
@@ -766,6 +773,13 @@ void EditMetadataDialog::FindNetArt(VideoArtworkType type)
     lookup->SetStep(SEARCH);
     lookup->SetType(VID);
     lookup->SetAutomatic(true);
+    if (m_workingMetadata->GetSeason() > 0 ||
+            m_workingMetadata->GetEpisode() > 0)
+        lookup->SetSubtype(kProbableTelevision);
+    else if (m_workingMetadata->GetSubtitle().isEmpty())
+        lookup->SetSubtype(kProbableMovie);
+    else
+        lookup->SetSubtype(kUnknownVideo);
     lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
 
     lookup->SetTitle(m_workingMetadata->GetTitle());

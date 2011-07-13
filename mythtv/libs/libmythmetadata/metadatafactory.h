@@ -81,4 +81,7 @@ class META_PUBLIC MetadataFactory : public QObject
     MetadataImageDownload *m_imagedownload;
 };
 
+META_PUBLIC LookupType GuessLookupType(ProgramInfo *pginfo);
+META_PUBLIC LookupType GuessLookupType(RecordingRule *recrule);
+
 #endif
