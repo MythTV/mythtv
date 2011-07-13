@@ -736,7 +736,8 @@ ProgramInfo::ProgramInfo(const QString &_pathname) :
 
     uint _chanid;
     QDateTime _recstartts;
-    if (ExtractKeyFromPathname(_pathname, _chanid, _recstartts) &&
+    if (!gCoreContext->IsDatabaseIgnored() &&
+        QueryKeyFromPathname(_pathname, _chanid, _recstartts) &&
         LoadProgramFromRecorded(_chanid, _recstartts))
     {
         return;
@@ -1096,19 +1097,6 @@ bool ProgramInfo::ExtractKeyFromPathname(
     if (basename.isEmpty())
         return false;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT chanid, starttime "
-        "FROM recorded "
-        "WHERE basename = :BASENAME");
-    query.bindValue(":BASENAME", basename);
-    if (query.exec() && query.next())
-    {
-        chanid     = query.value(0).toUInt();
-        recstartts = query.value(1).toDateTime();
-        return true;
-    }
-
     QStringList lr = basename.split("_");
     if (lr.size() == 2)
     {
@@ -1124,6 +1112,28 @@ bool ProgramInfo::ExtractKeyFromPathname(
     return false;
 }
 
+bool ProgramInfo::QueryKeyFromPathname(
+    const QString &pathname, uint &chanid, QDateTime &recstartts)
+{
+    QString basename = pathname.section('/', -1);
+    if (basename.isEmpty())
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT chanid, starttime "
+        "FROM recorded "
+        "WHERE basename = :BASENAME");
+    query.bindValue(":BASENAME", basename);
+    if (query.exec() && query.next())
+    {
+        chanid     = query.value(0).toUInt();
+        recstartts = query.value(1).toDateTime();
+        return true;
+    }
+
+    return ExtractKeyFromPathname(pathname, chanid, recstartts);
+}
 
 #define INT_TO_LIST(x)       do { list << QString::number(x); } while (0)
 

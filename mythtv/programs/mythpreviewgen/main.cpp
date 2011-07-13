@@ -95,7 +95,7 @@ int preview_helper(uint chanid, QDateTime starttime,
         LOG(VB_GENERAL, LOG_ERR, "Setting priority failed." + ENO);
 
     if (!chanid || !starttime.isValid())
-        ProgramInfo::ExtractKeyFromPathname(infile, chanid, starttime);
+        ProgramInfo::QueryKeyFromPathname(infile, chanid, starttime);
 
     ProgramInfo *pginfo = NULL;
     if (chanid && starttime.isValid())

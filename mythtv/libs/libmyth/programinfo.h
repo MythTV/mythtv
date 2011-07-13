@@ -580,6 +580,8 @@ class MPUBLIC ProgramInfo
                            uint &chanid, QDateTime &recstartts);
     static bool ExtractKeyFromPathname(
         const QString &pathname, uint &chanid, QDateTime &recstartts);
+    static bool QueryKeyFromPathname(
+        const QString &pathname, uint &chanid, QDateTime &recstartts);
 
     static QString  QueryRecordingGroupPassword(const QString &group);
     static uint64_t QueryBookmark(uint chanid, const QDateTime &recstartts);
