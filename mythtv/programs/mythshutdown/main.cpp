@@ -750,17 +750,6 @@ static int startup()
 
 int main(int argc, char **argv)
 {
-    bool bLockShutdown = false;
-    bool bUnlockShutdown = false;
-    bool bCheckOKShutdown = false;
-    bool bStartup = false;
-    bool bShutdown = false;
-    bool bGetStatus = false;
-    QString sWakeupTime = "";
-    bool bSetScheduledWakeupTime = false;
-    bool bCheckAndShutdown = false;
-    bool bWantRecStatus = true;
-
     MythShutdownCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -788,32 +777,6 @@ int main(int argc, char **argv)
     if ((retval = cmdline.ConfigureLogging(mask)) != GENERIC_EXIT_OK)
         return retval;
 
-    if (cmdline.toBool("lock"))
-        bLockShutdown = true;
-    if (cmdline.toBool("unlock"))
-        bUnlockShutdown = true;
-    if (cmdline.toBool("shutdown"))
-        bShutdown = true;
-    if (cmdline.toBool("startup"))
-        bStartup = true;
-    if (cmdline.toBool("setschedwakeup"))
-        bSetScheduledWakeupTime = true;
-    if (cmdline.toBool("safeshutdown"))
-        bCheckAndShutdown = true;
-    if (cmdline.toBool("setwakeup"))
-        sWakeupTime = cmdline.toString("setwakeup");
-
-    if (cmdline.toBool("check"))
-    {
-        bCheckOKShutdown = true;
-        bWantRecStatus = (bool)(cmdline.toInt("check") == 1);
-    }
-    if (cmdline.toBool("status"))
-    {
-        bGetStatus = true;
-        bWantRecStatus = (bool)(cmdline.toInt("status") == 1);
-    }
-
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
@@ -824,24 +787,24 @@ int main(int argc, char **argv)
 
     int res = 0;
 
-    if (bLockShutdown)
+    if (cmdline.toBool("lock"))
         res = lockShutdown();
-    else if (bUnlockShutdown)
+    else if (cmdline.toBool("unlock"))
         res = unlockShutdown();
-    else if (bCheckOKShutdown)
-        res = checkOKShutdown(bWantRecStatus);
-    else if (bSetScheduledWakeupTime)
+    else if (cmdline.toBool("check"))
+        res = checkOKShutdown((bool)(cmdline.toInt("status") == 1));
+    else if (cmdline.toBool("setschedwakeup"))
         res = setScheduledWakeupTime();
-    else if (bStartup)
+    else if (cmdline.toBool("startup"))
         res = startup();
-    else if (bShutdown)
+    else if (cmdline.toBool("shutdown"))
         res = shutdown();
-    else if (bGetStatus)
-        res = getStatus(bWantRecStatus);
-    else if (!sWakeupTime.isEmpty())
-        res = setWakeupTime(sWakeupTime);
-    else if (bCheckAndShutdown)
-    {
+    else if (cmdline.toBool("status"))
+        res = getStatus((bool)(cmdline.toInt("status") == 1));
+    else if (cmdline.toBool("setwakeup"))
+        res = setWakeupTime(cmdline.toString("setwakeup"));
+    else if (cmdline.toBool("check"))
+    { 
         res = checkOKShutdown(true);
         if (res == 0)
         {
@@ -849,6 +812,7 @@ int main(int argc, char **argv)
              res = setScheduledWakeupTime();
              res = shutdown();
         }
+
     }
     else
         cmdline.PrintHelp();
