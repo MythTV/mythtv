@@ -168,15 +168,15 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
     {
         DownloadMap map;
 
-        ArtworkList coverartlist = lookup->GetArtwork(COVERART);
+        ArtworkList coverartlist = lookup->GetArtwork(kArtworkCoverart);
         if (coverartlist.size())
         {
             ArtworkInfo info;
             info.url = coverartlist.takeLast().url;
-            map.insert(COVERART, info);
+            map.insert(kArtworkCoverart, info);
         }
 
-        ArtworkList fanartlist = lookup->GetArtwork(FANART);
+        ArtworkList fanartlist = lookup->GetArtwork(kArtworkFanart);
         if (fanartlist.size())
         {
             ArtworkInfo info;
@@ -185,25 +185,25 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
             if (season > 0 && season <= fanartlist.count())
                 index = season - 1;
             info.url = fanartlist.takeAt(index).url;
-            map.insert(FANART, info);
+            map.insert(kArtworkFanart, info);
         }
 
-        ArtworkList bannerlist = lookup->GetArtwork(BANNER);
+        ArtworkList bannerlist = lookup->GetArtwork(kArtworkBanner);
         if (bannerlist.size())
         {
             ArtworkInfo info;
             info.url = bannerlist.takeLast().url;
-            map.insert(BANNER, info);
+            map.insert(kArtworkBanner, info);
         }
 
         if (!lookup->GetType() == RECDNG)
         {
-            ArtworkList screenshotlist = lookup->GetArtwork(SCREENSHOT);
+            ArtworkList screenshotlist = lookup->GetArtwork(kArtworkScreenshot);
             if (screenshotlist.size())
             {
                 ArtworkInfo info;
                 info.url = screenshotlist.takeLast().url;
-                map.insert(SCREENSHOT, info);
+                map.insert(kArtworkScreenshot, info);
             }
         }
         lookup->SetDownloads(map);
@@ -288,7 +288,9 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
 {
     LookupType ret = kUnknownVideo;
 
-    QString catType = pginfo->QueryCategoryType();
+    QString catType = pginfo->GetCategoryType();
+    if (catType.isEmpty())
+        catType = pginfo->QueryCategoryType();
 
     if (catType == "series" || catType == "tvshow" ||
         catType == "show")

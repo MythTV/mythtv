@@ -753,13 +753,13 @@ void EditMetadataDialog::handleDownloadedImages(MetadataLookup *lookup)
         ArtworkInfo info = map.value(type);
         QString filename = info.url;
 
-        if (type == COVERART)
+        if (type == kArtworkCoverart)
             SetCoverArt(filename);
-        else if (type == FANART)
+        else if (type == kArtworkFanart)
             SetFanart(filename);
-        else if (type == BANNER)
+        else if (type == kArtworkBanner)
             SetBanner(filename);
-        else if (type == SCREENSHOT)
+        else if (type == kArtworkScreenshot)
             SetScreenshot(filename);
     }
 }
@@ -793,22 +793,22 @@ void EditMetadataDialog::FindNetArt(VideoArtworkType type)
 
 void EditMetadataDialog::FindNetCoverArt()
 {
-    FindNetArt(COVERART);
+    FindNetArt(kArtworkCoverart);
 }
 
 void EditMetadataDialog::FindNetFanart()
 {
-    FindNetArt(FANART);
+    FindNetArt(kArtworkFanart);
 }
 
 void EditMetadataDialog::FindNetBanner()
 {
-    FindNetArt(BANNER);
+    FindNetArt(kArtworkBanner);
 }
 
 void EditMetadataDialog::FindNetScreenshot()
 {
-    FindNetArt(SCREENSHOT);
+    FindNetArt(kArtworkScreenshot);
 }
 
 void EditMetadataDialog::SetCoverArt(QString file)

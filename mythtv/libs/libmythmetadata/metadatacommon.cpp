@@ -602,7 +602,7 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
             season = item.firstChildElement("season").text().toUInt();
             episode = item.firstChildElement("episode").text().toUInt();
         }
-        LOG(VB_GENERAL, LOG_INFO, QString("Parsing Season, %1 %2")
+        LOG(VB_GENERAL, LOG_INFO, QString("Result Found, Season %1 Episode %2")
             .arg(season).arg(episode));
     }
 
@@ -769,23 +769,23 @@ ArtworkMap ParseArtwork(QDomElement artwork)
                 QString typestring = image.attribute("type");
                 VideoArtworkType type;
                 if (typestring.toLower() == "coverart")
-                    type = COVERART;
+                    type = kArtworkCoverart;
                 else if (typestring.toLower() == "fanart")
-                    type = FANART;
+                    type = kArtworkFanart;
                 else if (typestring.toLower() == "banner")
-                    type = BANNER;
+                    type = kArtworkBanner;
                 else if (typestring.toLower() == "screenshot")
-                    type = SCREENSHOT;
+                    type = kArtworkScreenshot;
                 else if (typestring.toLower() == "poster")
-                    type = POSTER;
+                    type = kArtworkPoster;
                 else if (typestring.toLower() == "back cover")
-                    type = BACKCOVER;
+                    type = kArtworkBackCover;
                 else if (typestring.toLower() == "inside cover")
-                    type = INSIDECOVER;
+                    type = kArtworkInsideCover;
                 else if (typestring.toLower() == "cd image")
-                    type = CDIMAGE;
+                    type = kArtworkCDImage;
                 else
-                    type = COVERART;
+                    type = kArtworkCoverart;
 
                 ArtworkInfo info;
                 if (image.hasAttribute("thumb"))

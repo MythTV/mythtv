@@ -487,9 +487,9 @@ bool PlaybackBox::Create()
     m_noRecordingsText = dynamic_cast<MythUIText *> (GetChild("norecordings"));
 
     m_previewImage = dynamic_cast<MythUIImage *>(GetChild("preview"));
-    m_artImage[FANART] = dynamic_cast<MythUIImage*>(GetChild("fanart"));
-    m_artImage[BANNER] = dynamic_cast<MythUIImage*>(GetChild("banner"));
-    m_artImage[COVERART]= dynamic_cast<MythUIImage*>(GetChild("coverart"));
+    m_artImage[kArtworkFanart] = dynamic_cast<MythUIImage*>(GetChild("fanart"));
+    m_artImage[kArtworkBanner] = dynamic_cast<MythUIImage*>(GetChild("banner"));
+    m_artImage[kArtworkCoverart]= dynamic_cast<MythUIImage*>(GetChild("coverart"));
 
     if (!m_recordingList || !m_groupList)
     {
@@ -513,9 +513,9 @@ bool PlaybackBox::Create()
             SLOT(ItemVisible(MythUIButtonListItem*)));
 
     // connect up timers...
-    connect(m_artTimer[FANART],   SIGNAL(timeout()), SLOT(fanartLoad()));
-    connect(m_artTimer[BANNER],   SIGNAL(timeout()), SLOT(bannerLoad()));
-    connect(m_artTimer[COVERART], SIGNAL(timeout()), SLOT(coverartLoad()));
+    connect(m_artTimer[kArtworkFanart],   SIGNAL(timeout()), SLOT(fanartLoad()));
+    connect(m_artTimer[kArtworkBanner],   SIGNAL(timeout()), SLOT(bannerLoad()));
+    connect(m_artTimer[kArtworkCoverart], SIGNAL(timeout()), SLOT(coverartLoad()));
 
     BuildFocusList();
     m_programInfoCache.ScheduleLoad(false);
@@ -620,29 +620,29 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         infoMap["show"]  = grouplabel;
     }
 
-    if (m_artImage[FANART])
+    if (m_artImage[kArtworkFanart])
     {
         if (!groupname.isEmpty() && !m_progLists[groupname].empty())
         {
             ProgramInfo *pginfo = *m_progLists[groupname].begin();
 
             QString fn = m_helper.LocateArtwork(
-                pginfo->GetInetRef(), pginfo->GetSeason(), FANART, NULL, groupname);
+                pginfo->GetInetRef(), pginfo->GetSeason(), kArtworkFanart, NULL, groupname);
 
             if (fn.isEmpty())
             {
-                m_artTimer[FANART]->stop();
-                m_artImage[FANART]->Reset();
+                m_artTimer[kArtworkFanart]->stop();
+                m_artImage[kArtworkFanart]->Reset();
             }
-            else if (m_artImage[FANART]->GetFilename() != fn)
+            else if (m_artImage[kArtworkFanart]->GetFilename() != fn)
             {
-                m_artImage[FANART]->SetFilename(fn);
-                m_artTimer[FANART]->start(kArtworkFanTimeout);
+                m_artImage[kArtworkFanart]->SetFilename(fn);
+                m_artTimer[kArtworkFanart]->start(kArtworkFanTimeout);
             }
         }
         else
         {
-            m_artImage[FANART]->Reset();
+            m_artImage[kArtworkFanart]->Reset();
         }
     }
 
@@ -691,11 +691,11 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     if (m_previewImage)
         m_previewImage->Reset();
 
-    if (m_artImage[BANNER])
-        m_artImage[BANNER]->Reset();
+    if (m_artImage[kArtworkBanner])
+        m_artImage[kArtworkBanner]->Reset();
 
-    if (m_artImage[COVERART])
-        m_artImage[COVERART]->Reset();
+    if (m_artImage[kArtworkCoverart])
+        m_artImage[kArtworkCoverart]->Reset();
 
     updateIcons();
 }
@@ -2437,17 +2437,17 @@ void PlaybackBox::RemoveProgram(
 
 void PlaybackBox::fanartLoad(void)
 {
-    m_artImage[FANART]->Load();
+    m_artImage[kArtworkFanart]->Load();
 }
 
 void PlaybackBox::bannerLoad(void)
 {
-    m_artImage[BANNER]->Load();
+    m_artImage[kArtworkBanner]->Load();
 }
 
 void PlaybackBox::coverartLoad(void)
 {
-    m_artImage[COVERART]->Load();
+    m_artImage[kArtworkCoverart]->Load();
 }
 
 void PlaybackBox::ShowDeletePopup(DeletePopupType type)

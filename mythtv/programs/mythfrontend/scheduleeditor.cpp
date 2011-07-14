@@ -1417,19 +1417,19 @@ bool MetadataOptions::Create()
 
     if (m_coverart)
     {
-        m_coverart->SetFilename(m_artworkMap.value(COVERART).url);
+        m_coverart->SetFilename(m_artworkMap.value(kArtworkCoverart).url);
         m_coverart->Load();
     }
 
     if (m_fanart)
     {
-        m_fanart->SetFilename(m_artworkMap.value(FANART).url);
+        m_fanart->SetFilename(m_artworkMap.value(kArtworkFanart).url);
         m_fanart->Load();
     }
 
     if (m_banner)
     {
-        m_banner->SetFilename(m_artworkMap.value(BANNER).url);
+        m_banner->SetFilename(m_artworkMap.value(kArtworkBanner).url);
         m_banner->Load();
     }
 
@@ -1557,17 +1557,17 @@ void MetadataOptions::SelectLocalBanner()
 
 void MetadataOptions::SelectOnlineFanart()
 {
-    FindNetArt(FANART);
+    FindNetArt(kArtworkFanart);
 }
 
 void MetadataOptions::SelectOnlineCoverart()
 {
-    FindNetArt(COVERART);
+    FindNetArt(kArtworkCoverart);
 }
 
 void MetadataOptions::SelectOnlineBanner()
 {
-    FindNetArt(BANNER);
+    FindNetArt(kArtworkBanner);
 }
 
 void MetadataOptions::Close()
@@ -1720,12 +1720,12 @@ void MetadataOptions::HandleDownloadedImages(MetadataLookup *lookup)
         VideoArtworkType type = i.key();
         ArtworkInfo info = i.value();
 
-        if (type == COVERART)
-            m_artworkMap.replace(COVERART, info);
-        else if (type == FANART)
-            m_artworkMap.replace(FANART, info);
-        else if (type == BANNER)
-            m_artworkMap.replace(BANNER, info);
+        if (type == kArtworkCoverart)
+            m_artworkMap.replace(kArtworkCoverart, info);
+        else if (type == kArtworkFanart)
+            m_artworkMap.replace(kArtworkFanart, info);
+        else if (type == kArtworkBanner)
+            m_artworkMap.replace(kArtworkBanner, info);
     }
 
     SetArtwork(m_inetrefEdit->GetText(), m_seasonSpin->GetIntValue(),
@@ -1741,19 +1741,19 @@ void MetadataOptions::ValuesChanged()
 
     if (m_coverart)
     {
-        m_coverart->SetFilename(m_artworkMap.value(COVERART).url);
+        m_coverart->SetFilename(m_artworkMap.value(kArtworkCoverart).url);
         m_coverart->Load();
     }
 
     if (m_fanart)
     {
-        m_fanart->SetFilename(m_artworkMap.value(FANART).url);
+        m_fanart->SetFilename(m_artworkMap.value(kArtworkFanart).url);
         m_fanart->Load();
     }
 
     if (m_banner)
     {
-        m_banner->SetFilename(m_artworkMap.value(BANNER).url);
+        m_banner->SetFilename(m_artworkMap.value(kArtworkBanner).url);
         m_banner->Load();
     }
 }
@@ -1931,15 +1931,15 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         if (resultid == "coverart")
         {
-            m_artworkMap.replace(COVERART, info);
+            m_artworkMap.replace(kArtworkCoverart, info);
         }
         else if (resultid == "fanart")
         {
-            m_artworkMap.replace(FANART, info);
+            m_artworkMap.replace(kArtworkFanart, info);
         }
         else if (resultid == "banner")
         {
-            m_artworkMap.replace(BANNER, info);
+            m_artworkMap.replace(kArtworkBanner, info);
         }
 
         SetArtwork(m_inetrefEdit->GetText(), m_seasonSpin->GetIntValue(),

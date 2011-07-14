@@ -323,7 +323,7 @@ QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
         if (title.contains("/"))
             title.replace("/", "-");
         inter = QString(" Season %1").arg(QString::number(season));
-        if (type == SCREENSHOT)
+        if (type == kArtworkScreenshot)
             inter += QString("x%1").arg(QString::number(episode));
     }
     else if (lookup->GetType() == VID || lookup->GetType() == RECDNG)
@@ -341,21 +341,21 @@ QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
     QUrl qurl(url);
     QString ext = QFileInfo(qurl.path()).suffix();
 
-    if (type == COVERART)
+    if (type == kArtworkCoverart)
         suffix = "_coverart";
-    else if (type == FANART)
+    else if (type == kArtworkFanart)
         suffix = "_fanart";
-    else if (type == BANNER)
+    else if (type == kArtworkBanner)
         suffix = "_banner";
-    else if (type == SCREENSHOT)
+    else if (type == kArtworkScreenshot)
         suffix = "_screenshot";
-    else if (type == POSTER)
+    else if (type == kArtworkPoster)
         suffix = "_poster";
-    else if (type == BACKCOVER)
+    else if (type == kArtworkBackCover)
         suffix = "_backcover";
-    else if (type == INSIDECOVER)
+    else if (type == kArtworkInsideCover)
         suffix = "_insidecover";
-    else if (type == CDIMAGE)
+    else if (type == kArtworkCDImage)
         suffix = "_cdimage";
 
     basefilename = title + inter + suffix + "." + ext;
@@ -369,13 +369,13 @@ QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type)
 
     if (metadatatype == VID)
     {
-        if (type == COVERART)
+        if (type == kArtworkCoverart)
             ret = gCoreContext->GetSetting("VideoArtworkDir");
-        else if (type == FANART)
+        else if (type == kArtworkFanart)
             ret = gCoreContext->GetSetting("mythvideo.fanartDir");
-        else if (type == BANNER)
+        else if (type == kArtworkBanner)
             ret = gCoreContext->GetSetting("mythvideo.bannerDir");
-        else if (type == SCREENSHOT)
+        else if (type == kArtworkScreenshot)
             ret = gCoreContext->GetSetting("mythvideo.screenshotDir");
     }
     else if (metadatatype == MUSIC)
@@ -383,11 +383,11 @@ QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type)
     }
     else if (metadatatype == GAME)
     {
-        if (type == COVERART)
+        if (type == kArtworkCoverart)
             ret = gCoreContext->GetSetting("mythgame.boxartdir");
-        else if (type == FANART)
+        else if (type == kArtworkFanart)
             ret = gCoreContext->GetSetting("mythgame.fanartdir");
-        else if (type == SCREENSHOT)
+        else if (type == kArtworkScreenshot)
             ret = gCoreContext->GetSetting("mythgame.screenshotdir");
     }
 
@@ -401,13 +401,13 @@ QString getStorageGroupURL(VideoArtworkType type, QString host)
     uint port = gCoreContext->GetSettingOnHost("BackendServerPort",
                                                host).toUInt();
 
-    if (type == COVERART)
+    if (type == kArtworkCoverart)
         sgroup = "Coverart";
-    else if (type == FANART)
+    else if (type == kArtworkFanart)
         sgroup = "Fanart";
-    else if (type == BANNER)
+    else if (type == kArtworkBanner)
         sgroup = "Banners";
-    else if (type == SCREENSHOT)
+    else if (type == kArtworkScreenshot)
         sgroup = "Screenshots";
     else
         sgroup = "Default";

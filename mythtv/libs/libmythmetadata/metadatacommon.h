@@ -19,14 +19,14 @@ enum LookupStep {
 };
 
 enum VideoArtworkType {
-    COVERART = 0,
-    FANART = 1,
-    BANNER = 2,
-    SCREENSHOT = 3,
-    POSTER = 4,
-    BACKCOVER = 5,
-    INSIDECOVER = 6,
-    CDIMAGE = 7
+    kArtworkCoverart = 0,
+    kArtworkFanart = 1,
+    kArtworkBanner = 2,
+    kArtworkScreenshot = 3,
+    kArtworkPoster = 4,
+    kArtworkBackCover = 5,
+    kArtworkInsideCover = 6,
+    kArtworkCDImage = 7
 };
 Q_DECLARE_METATYPE(VideoArtworkType)
 

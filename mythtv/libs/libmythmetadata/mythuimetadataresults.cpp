@@ -52,20 +52,20 @@ bool MetadataResultsDialog::Create()
         (*i)->toMap(metadataMap);
 
         QString coverartfile;
-        ArtworkList art = (*i)->GetArtwork(COVERART);
+        ArtworkList art = (*i)->GetArtwork(kArtworkCoverart);
         if (art.count() > 0)
             coverartfile = art.takeFirst().thumbnail;
 
         if (coverartfile.isEmpty())
         {
-            art = (*i)->GetArtwork(BANNER);
+            art = (*i)->GetArtwork(kArtworkBanner);
             if (art.count() > 0)
                coverartfile = art.takeFirst().thumbnail;
         }
 
         if (coverartfile.isEmpty())
         {
-            art = (*i)->GetArtwork(SCREENSHOT);
+            art = (*i)->GetArtwork(kArtworkScreenshot);
             if (art.count() > 0)
                 coverartfile = art.takeFirst().thumbnail;
         }
