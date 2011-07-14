@@ -143,7 +143,7 @@ Advanced options (experts only):
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
 
-mythffmpeg options (These only effect the internal ffmpeg binary, not MythTV):
+mythffmpeg options (These only affect the internal ffmpeg binary, not MythTV):
   --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
   --enable-libx264         enable H.264 encoding via x264 [no]
   --enable-libxvid         enable Xvid encoding via xvidcore,
