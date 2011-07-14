@@ -701,6 +701,9 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
 
         needflush = true;
 
+        // Handle non-frame-by-frame seeking
+        DoFastForwardSeek(last_frame, needflush);
+
         exitafterdecoded = true; // don't actualy get a frame
         while ((desiredFrame > last_frame) && !ateof)
         {

@@ -3460,7 +3460,7 @@ bool MythPlayer::DoFastForward(uint64_t frames, bool override_seeks,
     if (player_ctx->buffer && !player_ctx->buffer->IsSeekingAllowed())
         return false;
 
-    uint64_t number = frames - 1;
+    uint64_t number = (frames ? frames - 1 : 0);
     uint64_t desiredFrame = framesPlayed + number;
 
     if (!deleteMap.IsEditing() && IsInDelete(desiredFrame))

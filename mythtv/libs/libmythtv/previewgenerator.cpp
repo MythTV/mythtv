@@ -622,7 +622,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
             captime = -1;
     }
 
-    if (captime < 0)
+    if (captime <= 0)
     {
         timeInSeconds = true;
         int startEarly = 0;
