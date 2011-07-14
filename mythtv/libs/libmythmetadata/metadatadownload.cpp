@@ -68,7 +68,7 @@ void MetadataDownload::run()
     {
         MetadataLookupList list;
         // Go go gadget Metadata Lookup
-        if (lookup->GetType() == VID)
+        if (lookup->GetType() == kMetadataVideo)
         {
             if (lookup->GetSubtype() == kProbableTelevision)
                 list = handleTelevision(lookup);
@@ -83,7 +83,7 @@ void MetadataDownload::run()
                 list = handleMovie(lookup);
             }
         }
-        else if (lookup->GetType() == RECDNG)
+        else if (lookup->GetType() == kMetadataRecording)
         {
             if (lookup->GetSubtype() == kProbableTelevision)
             {
@@ -104,7 +104,7 @@ void MetadataDownload::run()
                 list = handleRecordingGeneric(lookup);
             }
         }
-        else if (lookup->GetType() == GAME)
+        else if (lookup->GetType() == kMetadataGame)
             list = handleGame(lookup);
 
         // inform parent we have lookup ready for it
@@ -112,11 +112,11 @@ void MetadataDownload::run()
         {
             // If there's only one result, don't bother asking
             // our parent about it, just add it to the back of
-            // the queue in GETDATA mode.
-            if (list.count() == 1 && list.at(0)->GetStep() == SEARCH)
+            // the queue in kLookupData mode.
+            if (list.count() == 1 && list.at(0)->GetStep() == kLookupSearch)
             {
                 MetadataLookup *newlookup = list.takeFirst();
-                newlookup->SetStep(GETDATA);
+                newlookup->SetStep(kLookupData);
                 prependLookup(newlookup);
                 continue;
             }
@@ -193,7 +193,7 @@ bool MetadataDownload::findBestMatch(MetadataLookupList list,
         if ((*i)->GetTitle() == bestTitle)
         {
             MetadataLookup *newlookup = (*i);
-            newlookup->SetStep(GETDATA);
+            newlookup->SetStep(kLookupData);
 
             prependLookup(newlookup);
             return true;
@@ -244,7 +244,7 @@ MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
         QString("Matching MXML file found. Parsing %1 for metadata...")
                .arg(MXMLpath));
 
-    if (lookup->GetType() == VID)
+    if (lookup->GetType() == kMetadataVideo)
     {
         QByteArray mxmlraw;
         QDomElement item;
@@ -259,7 +259,7 @@ MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
                     QDomDocument doc;
                     if (doc.setContent(mxmlraw, true))
                     {
-                        lookup->SetStep(GETDATA);
+                        lookup->SetStep(kLookupData);
                         QDomElement root = doc.documentElement();
                         item = root.firstChildElement("item");
                     }
@@ -282,7 +282,7 @@ MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
                 QDomDocument doc;
                 if (doc.setContent(mxmlraw, true))
                 {
-                    lookup->SetStep(GETDATA);
+                    lookup->SetStep(kLookupData);
                     QDomElement root = doc.documentElement();
                     item = root.firstChildElement("item");
                 }
@@ -309,7 +309,7 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
         QString("Matching NFO file found. Parsing %1 for metadata...")
                .arg(NFOpath));
 
-    if (lookup->GetType() == VID)
+    if (lookup->GetType() == kMetadataVideo)
     {
         QByteArray nforaw;
         QDomElement item;
@@ -324,7 +324,7 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
                     QDomDocument doc;
                     if (doc.setContent(nforaw, true))
                     {
-                        lookup->SetStep(GETDATA);
+                        lookup->SetStep(kLookupData);
                         item = doc.documentElement();
                     }
                     else
@@ -346,7 +346,7 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
                 QDomDocument doc;
                 if (doc.setContent(nforaw, true))
                 {
-                    lookup->SetStep(GETDATA);
+                    lookup->SetStep(kLookupData);
                     item = doc.documentElement();
                 }
                 else
@@ -377,20 +377,20 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
 
-    // If the inetref is populated, even in search mode,
-    // become a getdata grab and use that.
-    if (lookup->GetStep() == SEARCH &&
+    // If the inetref is populated, even in kLookupSearch mode,
+    // become a kLookupData grab and use that.
+    if (lookup->GetStep() == kLookupSearch &&
         (!lookup->GetInetref().isEmpty() &&
          lookup->GetInetref() != "00000000"))
-        lookup->SetStep(GETDATA);
+        lookup->SetStep(kLookupData);
 
-    if (lookup->GetStep() == SEARCH)
+    if (lookup->GetStep() == kLookupSearch)
     {
         args.append(QString("-M"));
         QString title = lookup->GetTitle();
         args.append(title);
     }
-    else if (lookup->GetStep() == GETDATA)
+    else if (lookup->GetStep() == kLookupData)
     {
         args.append(QString("-D"));
         args.append(lookup->GetInetref());
@@ -419,20 +419,20 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
         args.append(QString("-l")); // Language Flag
         args.append(gCoreContext->GetLanguage()); // UI Language
 
-        // If the inetref is populated, even in search mode,
-        // become a getdata grab and use that.
-        if (lookup->GetStep() == SEARCH &&
+        // If the inetref is populated, even in kLookupSearch mode,
+        // become a kLookupData grab and use that.
+        if (lookup->GetStep() == kLookupSearch &&
             (!lookup->GetInetref().isEmpty() &&
              lookup->GetInetref() != "00000000"))
-            lookup->SetStep(GETDATA);
+            lookup->SetStep(kLookupData);
 
-        if (lookup->GetStep() == SEARCH)
+        if (lookup->GetStep() == kLookupSearch)
         {
             args.append(QString("-M"));
             QString title = lookup->GetTitle();
             args.append(title);
         }
-        else if (lookup->GetStep() == GETDATA)
+        else if (lookup->GetStep() == kLookupData)
         {
             args.append(QString("-D"));
             args.append(lookup->GetInetref());
@@ -461,20 +461,20 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
 
-    // If the inetref is populated, even in search mode,
-    // become a getdata grab and use that.
-    if (lookup->GetStep() == SEARCH &&
+    // If the inetref is populated, even in kLookupSearch mode,
+    // become a kLookupData grab and use that.
+    if (lookup->GetStep() == kLookupSearch &&
         (!lookup->GetInetref().isEmpty() &&
          lookup->GetInetref() != "00000000"))
-        lookup->SetStep(GETDATA);
+        lookup->SetStep(kLookupData);
 
-    if (lookup->GetStep() == SEARCH)
+    if (lookup->GetStep() == kLookupSearch)
     {
         args.append(QString("-M"));
         QString title = lookup->GetTitle();
         args.append(title);
     }
-    else if (lookup->GetStep() == GETDATA)
+    else if (lookup->GetStep() == kLookupData)
     {
         args.append(QString("-D"));
         args.append(lookup->GetInetref());
@@ -511,7 +511,7 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
     list = runGrabber(cmd, args, lookup, false);
 
     if (list.count() == 1)
-        list.at(0)->SetStep(GETDATA);
+        list.at(0)->SetStep(kLookupData);
 
     return list;
 }
@@ -551,7 +551,7 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
     list = runGrabber(cmd, args, lookup, true);
 
     if (list.count() == 1)
-        list.at(0)->SetStep(GETDATA);
+        list.at(0)->SetStep(kLookupData);
 
     lookup->SetSeason(origseason);
     lookup->SetEpisode(origepisode);

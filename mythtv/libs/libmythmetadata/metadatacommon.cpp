@@ -7,10 +7,10 @@
 
 // null constructor
 MetadataLookup::MetadataLookup(void) :
-    m_type(VID),
+    m_type(kMetadataVideo),
     m_subtype(kUnknownVideo),
     m_data(),
-    m_step(SEARCH),
+    m_step(kLookupSearch),
     m_automatic(false),
     m_handleimages(false),
     m_allowoverwrites(false),
@@ -674,7 +674,7 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
             info.name = actor.firstChildElement("name").text();
             info.role = actor.firstChildElement("role").text();
             info.thumbnail = actor.firstChildElement("thumb").text();
-            people.insert(ACTOR, info);
+            people.insert(kPersonActor, info);
             actor = actor.nextSiblingElement("actor");
         }
     }
@@ -684,7 +684,7 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
     {
         PersonInfo info;
         info.name = director;
-        people.insert(DIRECTOR, info);
+        people.insert(kPersonDirector, info);
     }
 
     return new MetadataLookup(lookup->GetType(), lookup->GetSubtype(),
@@ -711,31 +711,31 @@ PeopleMap ParsePeople(QDomElement people)
                 QString jobstring = person.attribute("job");
                 PeopleType type;
                 if (jobstring.toLower() == "actor")
-                    type = ACTOR;
+                    type = kPersonActor;
                 else if (jobstring.toLower() == "author")
-                    type = AUTHOR;
+                    type = kPersonAuthor;
                 else if (jobstring.toLower() == "producer")
-                    type = PRODUCER;
+                    type = kPersonProducer;
                 else if (jobstring.toLower() == "executive producer")
-                    type = EXECPRODUCER;
+                    type = kPersonExecProducer;
                 else if (jobstring.toLower() == "director")
-                    type = DIRECTOR;
+                    type = kPersonDirector;
                 else if (jobstring.toLower() == "cinematographer")
-                    type = CINEMATOGRAPHER;
+                    type = kPersonCinematographer;
                 else if (jobstring.toLower() == "composer")
-                    type = COMPOSER;
+                    type = kPersonComposer;
                 else if (jobstring.toLower() == "editor")
-                    type = EDITOR;
+                    type = kPersonEditor;
                 else if (jobstring.toLower() == "casting")
-                    type = CASTINGDIRECTOR;
+                    type = kPersonCastingDirector;
                 else if (jobstring.toLower() == "artist")
-                    type = ARTIST;
+                    type = kPersonArtist;
                 else if (jobstring.toLower() == "album artist")
-                    type = ALBUMARTIST;
+                    type = kPersonAlbumArtist;
                 else if (jobstring.toLower() == "guest star")
-                    type = GUESTSTAR;
+                    type = kPersonGuestStar;
                 else
-                    type = ACTOR;
+                    type = kPersonActor;
 
                 PersonInfo info;
                 if (person.hasAttribute("name"))
@@ -955,7 +955,7 @@ MetaGrabberScript* ParseGrabberVersion(const QDomElement& item)
 {
     QString name, author, thumbnail, command, description, typestring;
     float version = 0;
-    GrabberType type = GRAB_MOVIE;
+    GrabberType type = kGrabberMovie;
 
     name = item.firstChildElement("name").text();
     author = item.firstChildElement("author").text();
@@ -968,13 +968,13 @@ MetaGrabberScript* ParseGrabberVersion(const QDomElement& item)
     if (!typestring.isEmpty())
     {
         if (typestring.toLower() == "movie")
-            type = GRAB_MOVIE;
+            type = kGrabberMovie;
         else if (typestring.toLower() == "television")
-            type = GRAB_TELEVISION;
+            type = kGrabberTelevision;
         else if (typestring.toLower() == "game")
-            type = GRAB_GAME;
+            type = kGrabberGame;
         else if (typestring.toLower() == "music")
-            type = GRAB_MUSIC;
+            type = kGrabberMusic;
     }
 
     return new MetaGrabberScript(name, author, thumbnail, command,

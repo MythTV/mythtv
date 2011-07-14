@@ -14,8 +14,8 @@
 #include "mythmetaexp.h"
 
 enum LookupStep {
-    SEARCH = 0,
-    GETDATA = 1
+    kLookupSearch = 0,
+    kLookupData = 1
 };
 
 enum VideoArtworkType {
@@ -49,10 +49,10 @@ struct ArtworkInfo
 Q_DECLARE_METATYPE(ArtworkInfo)
 
 enum MetadataType {
-    VID = 0,
-    RECDNG = 1,
-    MUSIC = 2,
-    GAME = 3
+    kMetadataVideo = 0,
+    kMetadataRecording = 1,
+    kMetadataMusic = 2,
+    kMetadataGame = 3
 };
 
 enum LookupType {
@@ -65,18 +65,18 @@ enum LookupType {
 };
 
 enum PeopleType {
-    ACTOR = 0,
-    AUTHOR = 1,
-    DIRECTOR = 2,
-    PRODUCER = 3,
-    EXECPRODUCER = 4,
-    CINEMATOGRAPHER = 5,
-    COMPOSER = 6,
-    EDITOR = 7,
-    CASTINGDIRECTOR = 8,
-    ARTIST = 9,
-    ALBUMARTIST = 10,
-    GUESTSTAR = 11
+    kPersonActor = 0,
+    kPersonAuthor = 1,
+    kPersonDirector = 2,
+    kPersonProducer = 3,
+    kPersonExecProducer = 4,
+    kPersonCinematographer = 5,
+    kPersonComposer = 6,
+    kPersonEditor = 7,
+    kPersonCastingDirector = 8,
+    kPersonArtist = 9,
+    kPersonAlbumArtist = 10,
+    kPersonGuestStar = 11
 };
 
 typedef QList< ArtworkInfo > ArtworkList;
@@ -449,10 +449,10 @@ META_PUBLIC QString nearestName(const QString& actual,
 META_PUBLIC QDateTime RFC822TimeToQDateTime(const QString& t);
 
 enum GrabberType {
-    GRAB_MOVIE = 0,
-    GRAB_TELEVISION = 1,
-    GRAB_MUSIC = 2,
-    GRAB_GAME = 3
+    kGrabberMovie = 0,
+    kGrabberTelevision = 1,
+    kGrabberMusic = 2,
+    kGrabberGame = 3
 };
 
 class META_PUBLIC MetaGrabberScript : public QObject

@@ -326,9 +326,10 @@ QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
         if (type == kArtworkScreenshot)
             inter += QString("x%1").arg(QString::number(episode));
     }
-    else if (lookup->GetType() == VID || lookup->GetType() == RECDNG)
+    else if (lookup->GetType() == kMetadataVideo ||
+             lookup->GetType() == kMetadataRecording)
         title = lookup->GetInetref();
-    else if (lookup->GetType() == GAME)
+    else if (lookup->GetType() == kMetadataGame)
         title = QString("%1 (%2)").arg(lookup->GetTitle())
                     .arg(lookup->GetSystem());
 
@@ -367,7 +368,7 @@ QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type)
 {
     QString ret;
 
-    if (metadatatype == VID)
+    if (metadatatype == kMetadataVideo)
     {
         if (type == kArtworkCoverart)
             ret = gCoreContext->GetSetting("VideoArtworkDir");
@@ -378,10 +379,10 @@ QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type)
         else if (type == kArtworkScreenshot)
             ret = gCoreContext->GetSetting("mythvideo.screenshotDir");
     }
-    else if (metadatatype == MUSIC)
+    else if (metadatatype == kMetadataMusic)
     {
     }
-    else if (metadatatype == GAME)
+    else if (metadatatype == kMetadataGame)
     {
         if (type == kArtworkCoverart)
             ret = gCoreContext->GetSetting("mythgame.boxartdir");

@@ -3414,7 +3414,7 @@ void VideoDialog::OnVideoSearchListSelection(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    lookup->SetStep(GETDATA);
+    lookup->SetStep(kLookupData);
     m_metadataFactory->Lookup(lookup);
 }
 
@@ -3628,7 +3628,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     if (metadata->GetDirector() == VIDEO_DIRECTOR_UNKNOWN ||
         metadata->GetDirector().isEmpty())
     {
-        QList<PersonInfo> director = lookup->GetPeople(DIRECTOR);
+        QList<PersonInfo> director = lookup->GetPeople(kPersonDirector);
         if (director.count() > 0)
             metadata->SetDirector(director.takeFirst().name);
     }
@@ -3659,8 +3659,8 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     m_d->AutomaticParentalAdjustment(metadata);
 
     // Cast
-    QList<PersonInfo> actors = lookup->GetPeople(ACTOR);
-    QList<PersonInfo> gueststars = lookup->GetPeople(GUESTSTAR);
+    QList<PersonInfo> actors = lookup->GetPeople(kPersonActor);
+    QList<PersonInfo> gueststars = lookup->GetPeople(kPersonGuestStar);
 
     for (QList<PersonInfo>::const_iterator p = gueststars.begin();
         p != gueststars.end(); ++p)

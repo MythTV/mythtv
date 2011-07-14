@@ -1477,8 +1477,8 @@ void MetadataOptions::PerformQuery()
     CreateBusyDialog("Trying to manually find this "
                      "recording online...");
 
-    m_lookup->SetStep(SEARCH);
-    m_lookup->SetType(RECDNG);
+    m_lookup->SetStep(kLookupSearch);
+    m_lookup->SetType(kMetadataRecording);
     if (m_seasonSpin->GetIntValue() > 0 ||
            m_episodeSpin->GetIntValue() > 0)
         m_lookup->SetSubtype(kProbableTelevision);
@@ -1513,7 +1513,7 @@ void MetadataOptions::OnImageSearchListSelection(ArtworkInfo info,
     CreateBusyDialog(msg);
 
     m_lookup = new MetadataLookup();
-    m_lookup->SetType(VID);
+    m_lookup->SetType(kMetadataVideo);
     m_lookup->SetHost(gCoreContext->GetMasterHostName());
     m_lookup->SetAutomatic(true);
     m_lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
@@ -1658,8 +1658,8 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
     QString msg = tr("Searching for available artwork...");
     CreateBusyDialog(msg);
 
-    m_lookup->SetStep(SEARCH);
-    m_lookup->SetType(VID);
+    m_lookup->SetStep(kLookupSearch);
+    m_lookup->SetType(kMetadataVideo);
     m_lookup->SetAutomatic(true);
     m_lookup->SetHandleImages(false);
     if (m_seasonSpin->GetIntValue() > 0 ||

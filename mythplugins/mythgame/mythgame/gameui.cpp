@@ -880,8 +880,8 @@ void GameUI::gameSearch(MythGenericTree *node,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetStep(SEARCH);
-    lookup->SetType(GAME);
+    lookup->SetStep(kLookupSearch);
+    lookup->SetType(kMetadataGame);
     lookup->SetData(qVariantFromValue(node));
 
     if (automode)
@@ -923,7 +923,7 @@ void GameUI::OnGameSearchListSelection(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    lookup->SetStep(GETDATA);
+    lookup->SetStep(kLookupData);
     m_query->prependLookup(lookup);
 }
 
@@ -1023,7 +1023,7 @@ void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
     lookup->SetTitle(metadata->Gamename());
     lookup->SetSystem(metadata->System());
     lookup->SetInetref(metadata->Inetref());
-    lookup->SetType(GAME);
+    lookup->SetType(kMetadataGame);
     lookup->SetDownloads(map);
     lookup->SetData(qVariantFromValue(node));
 

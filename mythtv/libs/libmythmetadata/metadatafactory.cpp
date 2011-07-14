@@ -56,8 +56,8 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetStep(SEARCH);
-    lookup->SetType(RECDNG);
+    lookup->SetStep(kLookupSearch);
+    lookup->SetType(kMetadataRecording);
     lookup->SetSubtype(GuessLookupType(recrule));
     lookup->SetData(qVariantFromValue(recrule));
     lookup->SetAutomatic(automatic);
@@ -82,8 +82,8 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetStep(SEARCH);
-    lookup->SetType(RECDNG);
+    lookup->SetStep(kLookupSearch);
+    lookup->SetType(kMetadataRecording);
     lookup->SetSubtype(GuessLookupType(pginfo));
     lookup->SetData(qVariantFromValue(pginfo));
     lookup->SetAutomatic(automatic);
@@ -108,8 +108,8 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetStep(SEARCH);
-    lookup->SetType(VID);
+    lookup->SetStep(kLookupSearch);
+    lookup->SetType(kMetadataVideo);
     if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
         lookup->SetSubtype(kProbableTelevision);
     else if (metadata->GetSubtitle().isEmpty())
@@ -196,7 +196,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
             map.insert(kArtworkBanner, info);
         }
 
-        if (!lookup->GetType() == RECDNG)
+        if (!lookup->GetType() == kMetadataRecording)
         {
             ArtworkList screenshotlist = lookup->GetArtwork(kArtworkScreenshot);
             if (screenshotlist.size())

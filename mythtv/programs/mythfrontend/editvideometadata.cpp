@@ -709,7 +709,7 @@ void EditMetadataDialog::OnSearchListSelection(ArtworkInfo info, VideoArtworkTyp
     createBusyDialog(msg);
 
     MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetType(VID);
+    lookup->SetType(kMetadataVideo);
     if (m_workingMetadata->GetSeason() > 0 ||
             m_workingMetadata->GetEpisode() > 0)
         lookup->SetSubtype(kProbableTelevision);
@@ -770,8 +770,8 @@ void EditMetadataDialog::FindNetArt(VideoArtworkType type)
     createBusyDialog(msg);
 
     MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetStep(SEARCH);
-    lookup->SetType(VID);
+    lookup->SetStep(kLookupSearch);
+    lookup->SetType(kMetadataVideo);
     lookup->SetAutomatic(true);
     if (m_workingMetadata->GetSeason() > 0 ||
             m_workingMetadata->GetEpisode() > 0)
