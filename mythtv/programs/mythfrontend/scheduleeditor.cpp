@@ -1779,7 +1779,7 @@ void MetadataOptions::customEvent(QEvent *levent)
         {
             for (uint p = 0; p != list.size(); ++p)
             {
-                if (m_recordingRule->m_seriesid == (list[p])->GetTMSref())
+                if (m_recordingRule->m_seriesid == (uint)(list[p])->GetTMSref())
                 {
                     MetadataLookup *lookup = list.takeAt(p);
                     QueryComplete(lookup);
