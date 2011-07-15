@@ -15,8 +15,7 @@ MythUDPListener::MythUDPListener()
     m_socket = new QUdpSocket(this);
     connect(m_socket, SIGNAL(readyRead()),
             this,     SLOT(ReadPending()));
-    if (m_socket->bind(QHostAddress(gCoreContext->MythHostAddressAny()),
-                                    udp_port))
+    if (m_socket->bind(gCoreContext->MythHostAddressAny(), udp_port))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + 
             QString("bound to port %1").arg(udp_port));

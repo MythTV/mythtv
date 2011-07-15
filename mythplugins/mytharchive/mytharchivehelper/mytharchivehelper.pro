@@ -29,4 +29,4 @@ LIBS += -lmythavcodec
 LIBS += -lmythavutil
 LIBS += -lz
 
-QT += xml sql opengl
+QT += xml sql opengl network

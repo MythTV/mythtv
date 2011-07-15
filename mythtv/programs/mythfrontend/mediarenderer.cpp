@@ -216,8 +216,7 @@ MediaRenderer::MediaRenderer()
     if (!m_pHttpServer)
         return;
 
-    if (!m_pHttpServer->listen(QHostAddress(gCoreContext->MythHostAddressAny()),
-                               nPort))
+    if (!m_pHttpServer->listen(gCoreContext->MythHostAddressAny(), nPort))
     {
         LOG(VB_GENERAL, LOG_ERR, "MediaRenderer::HttpServer Create Error");
         delete m_pHttpServer;

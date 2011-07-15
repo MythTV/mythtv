@@ -1582,9 +1582,8 @@ int main(int argc, char **argv)
             gCoreContext->GetNumSetting("NetworkControlPort", 6545);
         networkControl = new NetworkControl();
 
-        if (!networkControl->
-                listen(QHostAddress(gCoreContext->MythHostAddressAny()),
-                       networkPort))
+        if (!networkControl->listen(gCoreContext->MythHostAddressAny(),
+                                    networkPort))
             LOG(VB_GENERAL, LOG_ERR,
                 QString("NetworkControl failed to bind to port %1.")
                     .arg(networkPort));

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QHostAddress>
 
 #include "mythdb.h"
 #include "mythbaseexp.h"
@@ -69,7 +70,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
                            uint timeout_ms = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
-    QString MythHostAddressAny(void);
+    QHostAddress MythHostAddressAny(void);
 
     QString GenMythURL(QString host = QString(), QString port = QString(),
                        QString path = QString(), QString storageGroup = QString());

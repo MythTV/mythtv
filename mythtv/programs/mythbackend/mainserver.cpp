@@ -203,8 +203,7 @@ MainServer::MainServer(bool master, int port,
         gCoreContext->GetNumSetting("MasterBackendOverride", 0);
 
     mythserver = new MythServer();
-    if (!mythserver->listen(QHostAddress(gCoreContext->MythHostAddressAny()),
-                            port))
+    if (!mythserver->listen(gCoreContext->MythHostAddressAny(), port))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1. Exiting.")
                 .arg(port));

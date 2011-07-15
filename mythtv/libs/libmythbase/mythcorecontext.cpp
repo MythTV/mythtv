@@ -7,6 +7,7 @@
 #include <QThread>
 #include <QWaitCondition>
 #include <QNetworkInterface>
+#include <QHostAddress>
 
 #include <cmath>
 
@@ -554,13 +555,13 @@ bool MythCoreContext::IsFrontendOnly(void)
     return !backendOnLocalhost;
 }
 
-QString MythCoreContext::MythHostAddressAny(void)
+QHostAddress MythCoreContext::MythHostAddressAny(void)
 {
 
     if (has_ipv6)
-        return QString("::");
+        return QHostAddress(QHostAddress::AnyIPv6);
     else
-        return QString("0.0.0.0");
+        return QHostAddress(QHostAddress::Any);
 
 }
 
