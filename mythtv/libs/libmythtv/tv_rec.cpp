@@ -850,7 +850,10 @@ void TVRec::FinishedRecording(RecordingInfo *curRec)
 
     // if this is a dummy recorder, do no more..
     if (HasFlags(kFlagDummyRecorderRunning))
+    {
+        SendMythSystemRecEvent("REC_FINISHED", curRecording);
         return;
+    }
 
     // Get the width and set the videoprops
     uint avg_height = curRec->QueryAverageHeight();
