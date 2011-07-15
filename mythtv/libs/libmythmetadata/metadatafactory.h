@@ -6,6 +6,9 @@
 #include "metadataimagedownload.h"
 #include "metadatadownload.h"
 
+// Needed to perform scans
+#include "videoscan.h"
+
 // Symbol visibility
 #include "mythmetaexp.h"
 
@@ -48,6 +51,22 @@ class META_PUBLIC MetadataFactoryNoResult : public QEvent
     static Type kEventType;
 };
 
+class META_PUBLIC MetadataFactoryVideoChanges : public QEvent
+{
+  public:
+    MetadataFactoryVideoChanges(QList<int> adds, QList<int> movs,
+                                QList<int>dels) : QEvent(kEventType),
+                                additions(adds), moved(movs),
+                                deleted(dels) {}
+    ~MetadataFactoryVideoChanges() {}
+
+    QList<int> additions; // newly added intids
+    QList<int> moved; // intids moved to new filename
+    QList<int> deleted; // orphaned/deleted intids
+
+    static Type kEventType;
+};
+
 class META_PUBLIC MetadataFactory : public QObject
 {
 
@@ -64,8 +83,11 @@ class META_PUBLIC MetadataFactory : public QObject
            bool getimages = true);
     void Lookup(MetadataLookup *lookup);
 
+    void VideoScan();
+
     bool IsRunning() { return m_lookupthread->isRunning() ||
-                              m_imagedownload->isRunning(); };
+                              m_imagedownload->isRunning() ||
+                              m_videoscanner->isRunning(); };
 
   private:
 
@@ -76,9 +98,15 @@ class META_PUBLIC MetadataFactory : public QObject
     void OnNoResult(MetadataLookup *lookup);
     void OnImageResult(MetadataLookup *lookup);
 
+    void OnVideoResult(MetadataLookup *lookup);
+
     QObject *m_parent;
     MetadataDownload *m_lookupthread;
     MetadataImageDownload *m_imagedownload;
+
+    VideoScannerThread *m_videoscanner;
+    VideoMetadataListManager *m_mlm;
+    bool m_scanning;
 };
 
 META_PUBLIC LookupType GuessLookupType(ProgramInfo *pginfo);

@@ -110,15 +110,24 @@ bool SetArtwork(const QString &inetref,
 
     QUrl coverurl(map.value(kArtworkCoverart).url);
     if (!coverurl.path().isEmpty())
+    {
         coverart = coverurl.path();
+        coverart = coverart.remove(0,1);
+    }
 
     QUrl fanarturl(map.value(kArtworkFanart).url);
     if (!fanarturl.path().isEmpty())
+    {
         fanart = fanarturl.path();
+        fanart = fanart.remove(0,1);
+    }
 
     QUrl bannerurl(map.value(kArtworkBanner).url);
     if (!bannerurl.path().isEmpty())
+    {
         banner = bannerurl.path();
+        banner = banner.remove(0,1);
+    }
 
     // Have to delete the old row for this item
 

@@ -9,6 +9,7 @@
 #include "mythdirs.h"
 #include "mythuihelper.h"
 #include "mythsystem.h"
+#include "storagegroup.h"
 #include "metadatadownload.h"
 #include "util.h"
 #include "remotefile.h"
@@ -566,11 +567,24 @@ QString MetadataDownload::getMXMLPath(QString filename)
     QUrl qurl(filename);
     QString ext = QFileInfo(qurl.path()).suffix();
     xmlname = filename.left(filename.size() - ext.size()) + "mxml";
+    QUrl xurl(xmlname);
 
     if (xmlname.startsWith("myth://"))
     {
-        if (RemoteFile::Exists(xmlname))
-            ret = xmlname;
+        if (qurl.host().toLower() != gCoreContext->GetHostName().toLower() &&
+            (qurl.host() != gCoreContext->GetSettingOnHost("BackendServerIP",
+                                               gCoreContext->GetHostName())))
+        {
+            if (RemoteFile::Exists(xmlname))
+                ret = xmlname;
+        }
+        else
+        {
+            StorageGroup sg;
+            QString fn = sg.FindFile(xurl.path());
+            if (!fn.isEmpty() && QFile::exists(fn))
+                ret = xmlname;
+        }
     }
     else
     {
@@ -588,11 +602,24 @@ QString MetadataDownload::getNFOPath(QString filename)
     QUrl qurl(filename);
     QString ext = QFileInfo(qurl.path()).suffix();
     nfoname = filename.left(filename.size() - ext.size()) + "nfo";
+    QUrl nurl(nfoname);
 
     if (nfoname.startsWith("myth://"))
     {
-        if (RemoteFile::Exists(nfoname))
-            ret = nfoname;
+        if (qurl.host().toLower() != gCoreContext->GetHostName().toLower() &&
+            (qurl.host() != gCoreContext->GetSettingOnHost("BackendServerIP",
+                                               gCoreContext->GetHostName())))
+        {
+            if (RemoteFile::Exists(nfoname))
+                ret = nfoname;
+        }
+        else
+        {
+            StorageGroup sg;
+            QString fn = sg.FindFile(nurl.path());
+            if (!fn.isEmpty() && QFile::exists(fn))
+                ret = nfoname;
+        }
     }
     else
     {

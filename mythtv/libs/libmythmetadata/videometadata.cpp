@@ -199,7 +199,8 @@ class VideoMetadataImp
     const QString &getTitle() const { return m_title; }
     void SetTitle(const QString& title)
     {
-        m_sort_key.Clear();
+        if (gCoreContext->HasGUI())
+            m_sort_key.Clear();
         m_title = title;
     }
 

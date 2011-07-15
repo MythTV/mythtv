@@ -4,10 +4,15 @@
 
 #include "mythcontext.h"
 #include "videoutils.h"
+#include "mythlogging.h"
 
 // Needed to perform a lookup
 #include "metadatadownload.h"
 #include "metadataimagedownload.h"
+
+// Needed for video scanning
+#include "videometadatalistmanager.h"
+#include "globals.h"
 
 // Input for a lookup
 #include "videometadata.h"
@@ -25,11 +30,17 @@ QEvent::Type MetadataFactorySingleResult::kEventType =
 QEvent::Type MetadataFactoryMultiResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+QEvent::Type MetadataFactoryVideoChanges::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 MetadataFactory::MetadataFactory(QObject *parent) :
-    m_parent(parent)
+    m_parent(parent), m_scanning(false)
 {
     m_lookupthread = new MetadataDownload(this);
     m_imagedownload = new MetadataImageDownload(this);
+    m_videoscanner = new VideoScannerThread(this);
+
+    m_mlm = new VideoMetadataListManager();
 }
 
 MetadataFactory::~MetadataFactory()
@@ -47,6 +58,9 @@ MetadataFactory::~MetadataFactory()
         delete m_imagedownload;
         m_imagedownload = NULL;
     }
+
+    if (m_videoscanner && m_videoscanner->wait())
+        delete m_videoscanner;
 }
 
 void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
@@ -150,6 +164,14 @@ void MetadataFactory::Lookup(MetadataLookup *lookup)
         m_lookupthread->addLookup(lookup);
 }
 
+void MetadataFactory::VideoScan()
+{
+    m_scanning = true;
+
+    m_videoscanner->SetDirs(GetVideoDirs());
+    m_videoscanner->start();
+}
+
 void MetadataFactory::OnMultiResult(MetadataLookupList list)
 {
     if (!list.size())
@@ -211,8 +233,11 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
     }
     else
     {
-        QCoreApplication::postEvent(m_parent,
-            new MetadataFactorySingleResult(lookup));
+        if (m_scanning)
+            OnVideoResult(lookup);
+        else
+            QCoreApplication::postEvent(m_parent,
+                new MetadataFactorySingleResult(lookup));
     }
 }
 
@@ -232,6 +257,157 @@ void MetadataFactory::OnImageResult(MetadataLookup *lookup)
 
     QCoreApplication::postEvent(m_parent,
         new MetadataFactorySingleResult(lookup));
+}
+
+void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
+{
+    if (!lookup)
+       return;
+
+    VideoMetadata *metadata = qVariantValue<VideoMetadata *>(lookup->GetData());
+
+    if (!metadata)
+        return;
+
+    metadata->SetTitle(lookup->GetTitle());
+    metadata->SetSubtitle(lookup->GetSubtitle());
+
+    if (metadata->GetTagline().isEmpty())
+        metadata->SetTagline(lookup->GetTagline());
+    if (metadata->GetYear() == 1895 || metadata->GetYear() == 0)
+        metadata->SetYear(lookup->GetYear());
+    if (metadata->GetReleaseDate() == QDate())
+        metadata->SetReleaseDate(lookup->GetReleaseDate());
+    if (metadata->GetDirector() == VIDEO_DIRECTOR_UNKNOWN ||
+        metadata->GetDirector().isEmpty())
+    {
+        QList<PersonInfo> director = lookup->GetPeople(kPersonDirector);
+        if (director.count() > 0)
+            metadata->SetDirector(director.takeFirst().name);
+    }
+    if (metadata->GetStudio().isEmpty())
+    {
+        QStringList studios = lookup->GetStudios();
+        if (studios.count() > 0)
+            metadata->SetStudio(studios.takeFirst());
+    }
+    if (metadata->GetPlot() == VIDEO_PLOT_DEFAULT ||
+        metadata->GetPlot().isEmpty())
+        metadata->SetPlot(lookup->GetDescription());
+    if (metadata->GetUserRating() == 0)
+        metadata->SetUserRating(lookup->GetUserRating());
+    if (metadata->GetRating() == VIDEO_RATING_DEFAULT)
+        metadata->SetRating(lookup->GetCertification());
+    if (metadata->GetLength() == 0)
+        metadata->SetLength(lookup->GetRuntime());
+    if (metadata->GetSeason() == 0)
+        metadata->SetSeason(lookup->GetSeason());
+    if (metadata->GetEpisode() == 0)
+        metadata->SetEpisode(lookup->GetEpisode());
+    if (metadata->GetHomepage().isEmpty())
+        metadata->SetHomepage(lookup->GetHomepage());
+
+    metadata->SetInetRef(lookup->GetInetref());
+
+//    m_d->AutomaticParentalAdjustment(metadata);
+
+    // Cast
+    QList<PersonInfo> actors = lookup->GetPeople(kPersonActor);
+    QList<PersonInfo> gueststars = lookup->GetPeople(kPersonGuestStar);
+
+    for (QList<PersonInfo>::const_iterator p = gueststars.begin();
+        p != gueststars.end(); ++p)
+    {
+        actors.append(*p);
+    }
+
+    VideoMetadata::cast_list cast;
+    QStringList cl;
+
+    for (QList<PersonInfo>::const_iterator p = actors.begin();
+        p != actors.end(); ++p)
+    {
+        cl.append((*p).name);
+    }
+
+    for (QStringList::const_iterator p = cl.begin();
+        p != cl.end(); ++p)
+    {
+        QString cn = (*p).trimmed();
+        if (cn.length())
+        {
+            cast.push_back(VideoMetadata::cast_list::
+                        value_type(-1, cn));
+        }
+    }
+
+    metadata->SetCast(cast);
+
+    // Genres
+    VideoMetadata::genre_list video_genres;
+    QStringList genres = lookup->GetCategories();
+
+    for (QStringList::const_iterator p = genres.begin();
+        p != genres.end(); ++p)
+    {
+        QString genre_name = (*p).trimmed();
+        if (genre_name.length())
+        {
+            video_genres.push_back(
+                    VideoMetadata::genre_list::value_type(-1, genre_name));
+        }
+    }
+
+    metadata->SetGenres(video_genres);
+
+    // Countries
+    VideoMetadata::country_list video_countries;
+    QStringList countries = lookup->GetCountries();
+
+    for (QStringList::const_iterator p = countries.begin();
+        p != countries.end(); ++p)
+    {
+        QString country_name = (*p).trimmed();
+        if (country_name.length())
+        {
+            video_countries.push_back(
+                    VideoMetadata::country_list::value_type(-1,
+                            country_name));
+        }
+    }
+
+    metadata->SetCountries(video_countries);
+
+    ArtworkMap map = lookup->GetDownloads();
+
+    QUrl coverurl(map.value(kArtworkCoverart).url);
+    if (!coverurl.path().isEmpty())
+        metadata->SetCoverFile(coverurl.path().remove(0,1));
+
+    QUrl fanarturl(map.value(kArtworkFanart).url);
+    if (!fanarturl.path().isEmpty())
+        metadata->SetFanart(fanarturl.path().remove(0,1));
+
+    QUrl bannerurl(map.value(kArtworkBanner).url);
+    if (!bannerurl.path().isEmpty())
+        metadata->SetBanner(bannerurl.path().remove(0,1));
+
+    QUrl sshoturl(map.value(kArtworkScreenshot).url);
+    if (!sshoturl.path().isEmpty())
+        metadata->SetScreenshot(sshoturl.path().remove(0,1));
+
+    metadata->SetProcessed(true);
+    metadata->UpdateDatabase();
+
+    if (gCoreContext->HasGUI())
+    {
+        QCoreApplication::postEvent(m_parent,
+            new MetadataFactorySingleResult(lookup));
+    }
+    else
+    {
+        lookup->deleteLater();
+    }
 }
 
 void MetadataFactory::customEvent(QEvent *levent)
@@ -277,7 +453,54 @@ void MetadataFactory::customEvent(QEvent *levent)
         if (!lookup)
             return;
 
-        OnImageResult(lookup);
+        if (m_scanning)
+            OnVideoResult(lookup);
+        else
+            OnImageResult(lookup);
+    }
+    else if (levent->type() == VideoScanChanges::kEventType)
+    {
+        VideoScanChanges *vsc = (VideoScanChanges *)levent;
+
+        if (!vsc)
+            return;
+
+        QList<int> additions = vsc->additions;
+        QList<int> moves = vsc->moved;
+        QList<int> deletions = vsc->deleted;
+
+        if (!m_scanning)
+        {
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Video Scan Complete: a(%1) m(%2) d(%3)")
+                .arg(additions.count()).arg(moves.count())
+                .arg(deletions.count()));
+
+            QCoreApplication::postEvent(m_parent,
+                new MetadataFactoryVideoChanges(additions, moves,
+                                                deletions));
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Video Scan Complete: a(%1) m(%2) d(%3)")
+                .arg(additions.count()).arg(moves.count())
+                .arg(deletions.count()));
+
+            VideoMetadataListManager::metadata_list ml;
+            VideoMetadataListManager::loadAllFromDatabase(ml);
+            m_mlm->setList(ml);
+
+            for (QList<int>::const_iterator it = additions.begin();
+                it != additions.end(); ++it)
+            {
+                VideoMetadata *metadata = m_mlm->byID(*it).get();
+
+                if (metadata);
+                    Lookup(metadata, true, true);
+            }
+        }
+        m_videoscanner->ResetCounts();
     }
 }
 

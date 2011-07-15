@@ -63,7 +63,7 @@ using namespace std;
 #include "mythcoreutil.h"
 #include "mythdirs.h"
 #include "mythdownloadmanager.h"
-#include "videoscan.h"
+#include "metadatafactory.h"
 #include "videoutils.h"
 #include "mythlogging.h"
 #include "filesysteminfo.h"
@@ -235,6 +235,8 @@ MainServer::MainServer(bool master, int port,
         sched->SetMainServer(this);
     if (expirer)
         expirer->SetMainServer(this);
+
+    metadatafactory = new MetadataFactory(this);
 
     autoexpireUpdateTimer = new QTimer(this);
     connect(autoexpireUpdateTimer, SIGNAL(timeout()),
@@ -2236,14 +2238,6 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     LOG(VB_FILE, LOG_INFO, QString("Finished truncating '%1'").arg(filename));
 
     return ok;
-}
-
-void MainServer::finishVideoScan(bool changed)
-{
-    if (changed)
-        LOG(VB_GENERAL, LOG_INFO, "Video scan completed, new entries added");
-    delete videoscanner;
-    videoscanner = NULL;
 }
 
 void MainServer::HandleCheckRecordingActive(QStringList &slist,
@@ -4883,13 +4877,9 @@ void MainServer::HandleScanVideos(PlaybackSock *pbs)
 
     QStringList retlist;
 
-    videoscanner = new VideoScanner();
-
-    if (videoscanner)
+    if (metadatafactory)
     {
-        connect(videoscanner, SIGNAL(finished(bool)),
-            SLOT(finishVideoScan(bool)));
-        videoscanner->doScan(GetVideoDirs());
+        metadatafactory->VideoScan();
         retlist << "OK";
     }
     else

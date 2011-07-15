@@ -30,10 +30,9 @@ using namespace std;
 class ProcessRequestThread;
 class QUrl;
 class MythServer;
-class VideoScanner;
 class QTimer;
 class FileSystemInfo;
-
+class MetadataFactory;
 class DeleteStruct 
 {
     friend class MainServer;
@@ -121,7 +120,6 @@ class MainServer : public QObject, public MythSocketCBs
     void reconnectTimeout(void);
     void deferredDeleteSlot(void);
     void autoexpireUpdate(void);
-    void finishVideoScan(bool changed);
 
   private slots:
     void newConnection(MythSocket *);
@@ -252,7 +250,7 @@ class MainServer : public QObject, public MythSocketCBs
     QMap<int, EncoderLink *> *encoderList;
 
     MythServer *mythserver;
-    VideoScanner *videoscanner;
+    MetadataFactory *metadatafactory;
 
     QReadWriteLock sockListLock;
     vector<PlaybackSock *> playbackList;
