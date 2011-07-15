@@ -15,7 +15,6 @@ using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
-#include <QProcess>
 
 // MythTV headers
 #include "firewirechannel.h"
@@ -43,7 +42,7 @@ using namespace std;
 ChannelBase::ChannelBase(TVRec *parent) :
     m_pParent(parent), m_curchannelname(""),
     m_currentInputID(-1), m_commfree(false), m_cardid(0),
-    m_process_thread(NULL), m_process(NULL), m_process_status(0)
+    m_system(NULL), m_system_status(0)
 {
 }
 
@@ -51,16 +50,9 @@ ChannelBase::~ChannelBase(void)
 {
     ClearInputMap();
 
-    QMutexLocker locker(&m_process_lock);
-    if (m_process_thread)
-    {
-        // better to a risk zombie than risk blocking forever..
-        KillScript(500);
-        m_process_thread->exit(0);
-        if (m_process_thread->wait())
-            delete m_process_thread;
-        m_process_thread = NULL;
-    }
+    QMutexLocker locker(&m_system_lock);
+    if (m_system)
+        KillScript();
 }
 
 bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
@@ -631,47 +623,38 @@ DBChanList ChannelBase::GetChannels(const QString &inputname) const
     return GetChannels(inputid);
 }
 
-/// \note m_process_lock must be held when this is called
-bool ChannelBase::KillScript(uint timeout_ms)
+/// \note m_system_lock must be held when this is called
+bool ChannelBase::KillScript(void)
 {
-    if (!m_process)
+    if (!m_system)
         return true;
 
-    if (m_process->state() != QProcess::NotRunning)
-    {
-        m_process->terminate();
-        if (!m_process->waitForFinished(max(timeout_ms/2,1U)))
-        {
-            m_process->kill();
-            if (!m_process->waitForFinished(max(timeout_ms/2,1U)))
-                return false;
-        }
-    }
+    m_system->Term(true);
 
-    delete m_process;
-    m_process = NULL;
+    delete m_system;
+    m_system = NULL;
     return true;
 }
 
-/// \note m_process_lock must NOT be held when this is called
+/// \note m_system_lock must NOT be held when this is called
 void ChannelBase::HandleScript(const QString &freqid)
 {
-    QMutexLocker locker(&m_process_lock);
+    QMutexLocker locker(&m_system_lock);
 
     bool ok = true;
-    m_process_status = 0; // unknown
+    m_system_status = 0; // unknown
 
     InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     if (it == m_inputs.end())
     {
-        m_process_status = 2; // failed
+        m_system_status = 2; // failed
         HandleScriptEnd(true);
         return;
     }
 
     if ((*it)->externalChanger.isEmpty())
     {
-        m_process_status = 3; // success
+        m_system_status = 3; // success
         HandleScriptEnd(true);
         return;
     }
@@ -682,30 +665,30 @@ void ChannelBase::HandleScript(const QString &freqid)
                 "A channel changer is set, but the freqid field is empty."
                 "\n\t\t\tWe will return success to ease setup pains, "
                 "but no script is will actually run.");
-        m_process_status = 3; // success
+        m_system_status = 3; // success
         HandleScriptEnd(true);
         return;
     }
 
     // It's possible we simply never reaped the process, check status first.
-    if (m_process)
+    if (m_system)
         GetScriptStatus(true);
 
     // If it's still running, try killing it
-    if (m_process)
-        ok = KillScript(50);
+    if (m_system)
+        ok = KillScript();
 
-    // The GetScriptStatus() call above can reset m_process_status with
+    // The GetScriptStatus() call above can reset m_system_status with
     // the exit status of the last channel change script invocation, so
     // we must set it to pending here.
-    m_process_status = 1; // pending
+    m_system_status = 1; // pending
 
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Can not execute channel changer, previous call to script "
             "is still running.");
-        m_process_status = 2; // failed
+        m_system_status = 2; // failed
         HandleScriptEnd(ok);
     }
     else
@@ -714,88 +697,80 @@ void ChannelBase::HandleScript(const QString &freqid)
         if (!ok)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Can not execute channel changer.");
-            m_process_status = 2; // failed
+            m_system_status = 2; // failed
             HandleScriptEnd(ok);
         }
     }
 }
 
-bool ChannelBase::ChangeExternalChannel(
-    const QString &changer, const QString &freqid)
+/// \note m_system_lock must be held when this is called
+bool ChannelBase::ChangeExternalChannel(const QString &changer,
+                                        const QString &freqid)
 {
-    if (m_process)
+    if (m_system)
         return false;
 
     if (changer.isEmpty() || freqid.isEmpty())
         return false;
 
-    QString command = QString("/bin/sh -c \"%1 %2\"").arg(changer).arg(freqid);
+    QString command = QString("%1 %2").arg(changer).arg(freqid);
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("Running command: %1").arg(command));
 
-    if (!m_process_thread)
-    {
-        m_process_thread = new ProcessThread();
-        m_process_thread->start();
-    }
-
-    m_process = m_process_thread->CreateProcess(command);
+    m_system = new MythSystem(command, kMSRunShell);
+    m_system->Run(30);
 
     return true;
 }
 
 uint ChannelBase::GetScriptStatus(bool holding_lock)
 {
-    if (!holding_lock)
-        m_process_lock.lock();
-
-    if (m_process && m_process->state() == QProcess::NotRunning)
-    {
-        if (m_process->exitStatus() != QProcess::CrashExit &&
-            m_process->exitCode() == 0)
-        {
-            m_process_status = 3; // success
-        }
-        else
-        {
-            m_process_status = 2; // failed
-        }
-
-        delete m_process;
-        m_process = NULL;
-
-        LOG(VB_CHANNEL, LOG_INFO, LOC + QString("GetScriptStatus() %1")
-                .arg(m_process_status));
-
-        HandleScriptEnd(3 == m_process_status);
-    }
-    else
-    {
-        QString ps = "NULL";
-        if (m_process != NULL)
-        {
-            int s = m_process->state();
-            ps = QString::number(s);
-            switch (s)
-            {
-                case QProcess::Running:    ps = "running";     break;
-                case QProcess::NotRunning: ps = "not running"; break;
-                case QProcess::Starting:   ps = "starting";    break;
-            }
-        }
-        LOG(VB_CHANNEL, LOG_INFO, LOC + QString("GetScriptStatus() %1 (ps %2)")
-                .arg(m_process_status).arg(ps));
-    }
-
-    uint ret = m_process_status;
+    if (!m_system)
+        return m_system_status;
 
     if (!holding_lock)
-        m_process_lock.unlock();
+        m_system_lock.lock();
+
+    m_system_status = m_system->Wait();
+    if (m_system_status != GENERIC_EXIT_RUNNING &&
+        m_system_status != GENERIC_EXIT_START)
+    {
+        delete m_system;
+        m_system = NULL;
+
+        HandleScriptEnd(m_system_status == GENERIC_EXIT_OK);
+    }
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("GetScriptStatus() %1")
+            .arg(m_system_status));
+
+    uint ret;
+    switch(m_system_status)
+    {
+        case GENERIC_EXIT_OK:
+            ret = 3;	// success
+            break;
+        case GENERIC_EXIT_RUNNING:
+        case GENERIC_EXIT_START:
+            ret = 1;	// pending
+            break;
+        default:
+            ret = 2;	// fail
+            break;
+    }
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("GetScriptStatus() %1 -> %2")
+            .arg(m_system_status). arg(ret));
+
+    m_system_status = ret;
+
+    if (!holding_lock)
+        m_system_lock.unlock();
 
     return ret;
 }
 
-/// \note m_process_lock must be held when this is called
+/// \note m_system_lock must be held when this is called
 void ChannelBase::HandleScriptEnd(bool ok)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Channel change script %1")
@@ -1221,31 +1196,3 @@ ChannelBase *ChannelBase::CreateChannel(
     return channel;
 }
 
-bool ProcessThread::event(QEvent *e)
-{
-    if (MythEvent::MythEventMessage == e->type())
-    {
-        MythEvent *me = static_cast<MythEvent*>(e);
-        if (me->Message() == "CreateProcess")
-        {
-            QMutexLocker locker(&m_lock);
-            m_proc = new QProcess();
-            m_proc->start(me->ExtraData(0));
-            m_wait.wakeOne();
-            return true;
-        }
-    }
-
-    return QThread::event(e);
-}
-
-QProcess *ProcessThread::CreateProcess(const QString &command)
-{
-    QMutexLocker locker(&m_lock);
-    QStringList cmd(command);
-    QCoreApplication::postEvent(this, new MythEvent("CreateProcess", cmd));
-    m_wait.wait(&m_lock);
-    QProcess *ret = m_proc;
-    m_proc = NULL;
-    return ret;
-}

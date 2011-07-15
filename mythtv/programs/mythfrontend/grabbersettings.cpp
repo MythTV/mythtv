@@ -2,7 +2,6 @@
 
 // qt
 #include <QString>
-#include <QProcess>
 #include <QString>
 #include <QStringList>
 
