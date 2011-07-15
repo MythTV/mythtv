@@ -2195,7 +2195,11 @@ int bd_get_event(BLURAY *bd, BD_EVENT *event)
         _queue_initial_psr_events(bd);
     }
 
-    return _get_event(bd, event);
+    if (event) {
+        return _get_event(bd, event);
+    }
+
+    return 0;
 }
 
 /*

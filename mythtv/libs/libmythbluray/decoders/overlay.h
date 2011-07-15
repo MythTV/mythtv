@@ -26,6 +26,11 @@
 extern "C" {
 #endif
 
+typedef enum {
+    BD_OVERLAY_PG = 0,  /* Presentation Graphics plane */
+    BD_OVERLAY_IG = 1,  /* Interactive Graphics plane (on top of PG plane) */
+} bd_overlay_plane_e;
+
 typedef struct bd_pg_palette_entry_s {
     uint8_t Y;
     uint8_t Cr;
@@ -40,7 +45,7 @@ typedef struct bd_pg_rle_elem_s {
 
 typedef struct bd_overlay_s {
     int64_t  pts;
-    uint8_t  plane; /* 0 - PG, 1 - IG */
+    uint8_t  plane; /* bd_overlay_plane_e */
 
     uint16_t x;
     uint16_t y;
