@@ -994,6 +994,9 @@ void MainServer::customEvent(QEvent *e)
         if (me->Message() == "LOCAL_RECONNECT_TO_MASTER")
             masterServerReconnect->start(kMasterServerReconnectTimeout);
 
+        if (me->Message() == "LOCAL_SLAVE_BACKEND_ENCODERS_OFFLINE")
+            HandleSlaveDisconnectedEvent(*me);
+
         if (me->Message().left(6) == "LOCAL_")
             return;
 
@@ -5537,13 +5540,10 @@ void MainServer::connectionClosed(MythSocket *socket)
                 VERBOSE(VB_IMPORTANT, "Playback sock still exists?");
 
             sockListLock.unlock();
-            for (list<uint>::iterator p = disconnectedSlaves.begin() ;
-                p != disconnectedSlaves.end() ; p++) {
-              if (m_sched) m_sched->SlaveDisconnected(*p);
-            }
 
-            if (m_sched && needsReschedule)
-                m_sched->Reschedule(0);
+            // Since we may already be holding the scheduler lock
+            // delay handling the disconnect until a little later. #9885
+            SendSlaveDisconnectedEvent(disconnectedSlaves, needsReschedule);
 
             pbs->DownRef();
             return;
@@ -5957,6 +5957,34 @@ void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
     }
 
     sockListLock.unlock();
+}
+
+void MainServer::HandleSlaveDisconnectedEvent(const MythEvent &event)
+{
+    if (event.ExtraDataCount() > 0 && m_sched)
+    {
+        bool needsReschedule = event.ExtraData(0).toUInt();
+        for (int i = 1; i < event.ExtraDataCount(); i++)
+            m_sched->SlaveDisconnected(event.ExtraData(i).toUInt());
+
+        if (needsReschedule)
+            m_sched->Reschedule(0);
+    }
+}
+
+void MainServer::SendSlaveDisconnectedEvent(
+    const list<uint> &cardids, bool needsReschedule)
+{
+    QStringList extraData;
+    extraData.push_back(
+        QString::number(static_cast<uint>(needsReschedule)));
+
+    list<uint>::const_iterator it;
+    for (it = cardids.begin(); it != cardids.end(); ++it)
+        extraData.push_back(QString::number(*it));
+
+    MythEvent me("LOCAL_SLAVE_BACKEND_ENCODERS_OFFLINE", extraData);
+    gCoreContext->dispatch(me);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

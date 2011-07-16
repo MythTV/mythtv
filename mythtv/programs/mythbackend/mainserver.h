@@ -2,12 +2,16 @@
 #define MAINSERVER_H_
 
 #include <QReadWriteLock>
+#include <QStringList>
+#include <QThreadPool>
+#include <QRunnable>
 #include <QEvent>
 #include <QMutex>
 #include <QHash>
 #include <QMap>
 
 #include <vector>
+#include <list>
 using namespace std;
 
 #include "tv.h"
@@ -167,8 +171,11 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleQueryTimeZone(PlaybackSock *pbs);
     void HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs);
     void HandleDownloadFile(const QStringList &command, PlaybackSock *pbs);
+    void HandleSlaveDisconnectedEvent(const MythEvent &event);
 
     void SendResponse(MythSocket *pbs, QStringList &commands);
+    void SendSlaveDisconnectedEvent(const list<uint> &offlineEncoderIDs,
+                                    bool needsReschedule);
 
     void getGuideDataThrough(QDateTime &GuideDataThrough);
 
