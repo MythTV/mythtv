@@ -72,7 +72,9 @@ void MythBackendCommandLineParser::LoadArguments(void)
     add("--printexpire", "printexpire", "ALL",
             "Print upcoming list of recordings to be expired.", "");
     add("--setverbose", "setverbose", "",
-            "Change debug level of the existing master backend.", "");
+            "Change debug mask of the existing master backend.", "");
+    add("--setloglevel", "setloglevel", "",
+            "Change logging level of the existing master backend.", "");
     add("--user", "username", "",
             "Drop permissions to username after starting.", "");
 }

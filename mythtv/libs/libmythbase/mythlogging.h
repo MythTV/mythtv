@@ -33,6 +33,11 @@ typedef enum
     LOG_UNKNOWN
 } LogLevel_t;
 
+extern MBASE_PUBLIC const char *LogLevelNames[];
+extern MBASE_PUBLIC int LogLevelNameCount;
+extern MBASE_PUBLIC const char LogLevelShortNames[];
+extern MBASE_PUBLIC int LogLevelShortNameCount;
+
 #ifdef _LogLevelNames_
 const char *LogLevelNames[] =
 {
@@ -62,11 +67,6 @@ const char LogLevelShortNames[] =
 };
 int LogLevelShortNameCount = sizeof(LogLevelShortNames) / 
                              sizeof(LogLevelShortNames[0]);
-#else
-extern MBASE_PUBLIC char *LogLevelNames[];
-extern MBASE_PUBLIC int LogLevelNameCount;
-extern MBASE_PUBLIC char *LogLevelShortNames[];
-extern MBASE_PUBLIC int LogLevelShortNameCount;
 #endif
 extern MBASE_PUBLIC LogLevel_t logLevel;
 

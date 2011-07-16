@@ -118,7 +118,7 @@ int main(int argc, char **argv)
         cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
         cmdline.toBool("testsched")     || cmdline.toBool("resched") ||
         cmdline.toBool("scanvideos")    || cmdline.toBool("clearcache") ||
-        cmdline.toBool("printexpire"))
+        cmdline.toBool("printexpire")   || cmdline.toBool("setloglevel"))
     {
         gCoreContext->SetBackend(false);
         return handle_command(cmdline);

@@ -590,6 +590,9 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         if ((listline.size() >= 2) && (listline[1].left(11) == "SET_VERBOSE"))
             HandleSetVerbose(listline, pbs);
+        else if ((listline.size() >= 2) &&
+                 (listline[1].left(13) == "SET_LOG_LEVEL"))
+            HandleSetLogLevel(listline, pbs);
         else
             HandleMessage(listline, pbs);
     }
@@ -5113,6 +5116,39 @@ void MainServer::HandleSetVerbose(QStringList &slist, PlaybackSock *pbs)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Invalid SET_VERBOSE string: '%1'")
                                       .arg(newverbose));
+        retlist << "Failed";
+    }
+
+    SendResponse(pbssock, retlist);
+}
+
+void MainServer::HandleSetLogLevel(QStringList &slist, PlaybackSock *pbs)
+{
+    MythSocket *pbssock = pbs->getSocket();
+    QStringList retlist;
+    QString newstring = slist[1];
+    LogLevel_t newlevel = LOG_UNKNOWN;
+
+    int len = newstring.length();
+    if (len > 14)
+    {
+        newlevel = logLevelGet(newstring.right(len-14));
+        if (newlevel != LOG_UNKNOWN)
+        {
+            logLevel = newlevel;
+            logPropagateCalc();
+            LOG(VB_GENERAL, LOG_NOTICE,
+                QString("Log level changed, new level is: %1")
+                    .arg(LogLevelNames[logLevel]));
+
+            retlist << "OK";
+        }
+    }
+
+    if (newlevel == LOG_UNKNOWN)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Invalid SET_VERBOSE string: '%1'")
+                                      .arg(newstring));
         retlist << "Failed";
     }
 

@@ -272,7 +272,27 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         else
         {
             LOG(VB_GENERAL, LOG_ERR,
-                "Unable to connect to backend, verbose level unchanged ");
+                "Unable to connect to backend, verbose mask unchanged ");
+            return GENERIC_EXIT_CONNECT_ERROR;
+        }
+    }
+
+    if (cmdline.toBool("setloglevel"))
+    {
+        if (gCoreContext->ConnectToMasterServer())
+        {
+            QString message = "SET_LOG_LEVEL ";
+            message += cmdline.toString("setloglevel");
+
+            RemoteSendMessage(message);
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Sent '%1' message").arg(message));
+            return GENERIC_EXIT_OK;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "Unable to connect to backend, log level unchanged ");
             return GENERIC_EXIT_CONNECT_ERROR;
         }
     }
