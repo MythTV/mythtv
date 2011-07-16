@@ -717,8 +717,8 @@ bool ChannelBase::ChangeExternalChannel(const QString &changer,
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("Running command: %1").arg(command));
 
-    m_system = new MythSystem(command, kMSRunShell);
-    m_system->Run(30);
+    m_system = new MythSystem(command, kMSRunShell | kMSRunBackground);
+    m_system->Run();
 
     return true;
 }
