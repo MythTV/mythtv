@@ -286,12 +286,16 @@ class Recorded( DBDataWrite, CMPRecord ):
             return
 
         # pull direct matches
-        for tag in ('title', 'subtitle', 'description'):
+        for tag in ('title', 'subtitle', 'description', 'chanid', 
+                    'starttime', 'recgroup', 'playgroup', 'seriesid',
+                    'programid', 'storagegroup'):
             if metadata[tag] and _allow_change(self, tag, overwrite):
                 self[tag] = metadata[tag]
 
         # pull renamed matches
-        for tagf,tagt in (('userrating','stars'),):
+        for tagf,tagt in (('userrating','stars'), ('filename', 'basename'),
+                          ('startts','progstart'),('endts','progend'),
+                          ('recstartts','starttime'),('recendts','endtime')):
             if metadata[tagf] and _allow_change(self, tagt, overwrite):
                 self[tagt] = metadata[tagf]
 
@@ -324,12 +328,16 @@ class Recorded( DBDataWrite, CMPRecord ):
         metadata = VideoMetadata()
 
         # pull direct matches
-        for tag in ('title', 'subtitle', 'description'):
+        for tag in ('title', 'subtitle', 'description', 'chanid', 
+                    'recgroup', 'playgroup', 'seriesid', 'programid',
+                    'storagegroup'):
             if self[tag]:
                 metadata[tag] = self[tag]
 
         # pull translated matches
-        for tagf,tagt in (('stars','userrating'),):
+        for tagt,tagf in (('userrating','stars'), ('filename', 'basename'),
+                          ('startts','progstart'),('endts','progend'),
+                          ('recstartts','starttime'),('recendts','endtime'),):
             if self[tagf]:
                 metadata[tagt] = self[tagf]
 

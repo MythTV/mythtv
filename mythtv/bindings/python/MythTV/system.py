@@ -148,7 +148,12 @@ class Metadata( DictData ):
                     'language':3,   'releasedate':5,    'lastupdated':6,
                     'userrating':1, 'tracnum':0,        'popularity':0,
                     'budget':0,     'revenue':0,        'year':0,
-                    'runtime':0,    'runtimesecs':0}
+                    'runtime':0,    'runtimesecs':0,    'filename':3,
+                    'chanid':0,     'channum':3,        'callsign':3,
+                    'channame':3,   'playbackfilters':3,'recgroup':3,
+                    'playgroup':3,  'seriesid':3,       'programid':3,
+                    'startts':5,    'endts':5,          'storagegroup':3,
+                    'recstartts':5, 'recendts':5}
 
     class _subgroup_name( list ):
         def __init__(self, xml):
@@ -245,7 +250,11 @@ class VideoMetadata( Metadata ):
                     'episode','dvdseason','dvdepisode','inetref','imdb',
                     'tmsref','homepage','trailer','language', 'releasedate',
                     'lastupdated','userrating','popularity', 'budget',
-                    'revenue','year','runtime']
+                    'revenue','year','runtime','filename','chanid',
+                    'channum','callsign','channame','playbackfilters',
+                    'recgroup','playgroup','seriesid','programid',
+                    'startts','endts','storagegroup','recstartts',
+                    'recendts']
     _groups = ['certifications','categories','countries',
                'studios','people','images']
     def _process(self, xml):
