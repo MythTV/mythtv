@@ -7,8 +7,6 @@
 
 #include "metadatacommon.h"
 
-typedef QList<MetadataLookup*> MetadataLookupList;
-
 class META_PUBLIC MetadataLookupEvent : public QEvent
 {
   public:

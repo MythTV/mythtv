@@ -13,6 +13,8 @@
 
 #include "mythmetaexp.h"
 
+class ProgramInfo;
+
 enum LookupStep {
     kLookupSearch = 0,
     kLookupData = 1
@@ -433,6 +435,29 @@ class META_PUBLIC MetadataLookup : public QObject
     DownloadMap m_downloads;
 };
 Q_DECLARE_METATYPE(MetadataLookup*)
+
+typedef QList<MetadataLookup*> MetadataLookupList;
+
+META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookupList list);
+
+META_PUBLIC void CreateMetadataXMLItem(MetadataLookup *lookup,
+                                   QDomElement placetoadd,
+                                   QDomDocument docroot);
+
+META_PUBLIC void AddCertifications(MetadataLookup *lookup,
+                                   QDomElement placetoadd,
+                                   QDomDocument docroot);
+META_PUBLIC void AddCategories(MetadataLookup *lookup,
+                               QDomElement placetoadd,
+                               QDomDocument docroot);
+META_PUBLIC void AddStudios(MetadataLookup *lookup,
+                            QDomElement placetoadd,
+                            QDomDocument docroot);
+META_PUBLIC void AddCountries(MetadataLookup *lookup,
+                              QDomElement placetoadd,
+                              QDomDocument docroot);
+
+META_PUBLIC MetadataLookup* LookupFromProgramInfo(ProgramInfo *pginfo);
 
 META_PUBLIC MetadataLookup* ParseMetadataItem(const QDomElement& item,
                                           MetadataLookup *lookup,

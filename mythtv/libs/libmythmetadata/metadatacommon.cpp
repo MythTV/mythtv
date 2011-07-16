@@ -1,9 +1,11 @@
 #include <QLocale>
 
 #include "rssparse.h"
+#include "programinfo.h"
 #include "mythcorecontext.h"
 #include "metadatacommon.h"
 #include "mythlogging.h"
+#include "mythlocale.h"
 
 // null constructor
 MetadataLookup::MetadataLookup(void) :
@@ -273,6 +275,10 @@ MetadataLookup::MetadataLookup(
     m_runtime(runtime),
     m_runtimesecs(runtimesecs)
 {
+    m_tracknum = 0;
+    m_popularity = 0;
+    m_budget = 0;
+    m_revenue = 0;
 }
 
 // XBMC NFO-style constructor
@@ -409,6 +415,440 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
     metadataMap["trailer"] = m_trailerURL;
 }
 
+MetadataLookup* LookupFromProgramInfo(ProgramInfo *pginfo)
+{
+    uint runtimesecs = pginfo->GetRecordingStartTime()
+                           .secsTo(pginfo->GetRecordingEndTime());
+    uint runtime = (runtimesecs/60);
+
+    MetadataLookup *ret = new MetadataLookup(kMetadataRecording, kUnknownVideo,
+        qVariantFromValue(pginfo), kLookupData, false, false, false, false,
+        pginfo->GetHostname(),pginfo->GetBasename(),pginfo->GetTitle(),
+        QStringList() << pginfo->GetCategory(), pginfo->GetStars() * 10,
+        pginfo->GetSubtitle(), pginfo->GetDescription(), pginfo->GetChanID(),
+        pginfo->GetChanNum(), pginfo->GetChannelSchedulingID(),
+        pginfo->GetChannelName(), pginfo->GetChannelPlaybackFilters(),
+        pginfo->GetRecordingGroup(), pginfo->GetPlaybackGroup(),
+        pginfo->GetSeriesID(), pginfo->GetProgramID(), pginfo->GetStorageGroup(),
+        pginfo->GetScheduledStartTime(), pginfo->GetScheduledEndTime(),
+        pginfo->GetRecordingStartTime(), pginfo->GetRecordingEndTime(),
+        pginfo->GetProgramFlags(), pginfo->GetAudioProperties(),
+        pginfo->GetVideoProperties(), pginfo->GetSubtitleType(),
+        pginfo->GetYearOfInitialRelease(), pginfo->GetOriginalAirDate(),
+        pginfo->GetLastModifiedTime(), runtime, runtimesecs);
+
+    ret->SetSeason(pginfo->GetSeason());
+    ret->SetEpisode(pginfo->GetEpisode());
+    ret->SetInetref(pginfo->GetInetRef());
+
+    return ret;
+}
+
+QDomDocument CreateMetadataXML(MetadataLookupList list)
+{
+    QDomDocument doc("MythMetadataXML");
+
+    QDomElement root = doc.createElement("metadata");
+    doc.appendChild(root);
+
+    for (MetadataLookupList::const_iterator i = list.begin();
+            i != list.end(); ++i)
+    {
+        CreateMetadataXMLItem(*i, root, doc);
+    }
+
+    return doc;
+}
+
+void CreateMetadataXMLItem(MetadataLookup *lookup,
+                           QDomElement placetoadd,
+                           QDomDocument docroot)
+{
+    if (!lookup)
+        return;
+
+    QDomElement item = docroot.createElement("item");
+    placetoadd.appendChild(item);
+    QString RFC822("ddd, d MMMM yyyy hh:mm:ss");
+
+    // Language
+    if (!lookup->GetLanguage().isEmpty())
+    {
+        QDomElement language = docroot.createElement("language");
+        item.appendChild(language);
+        language.appendChild(docroot.createTextNode(lookup->GetLanguage()));
+    }
+    // Title
+    if (!lookup->GetTitle().isEmpty())
+    {
+        QDomElement title = docroot.createElement("title");
+        item.appendChild(title);
+        title.appendChild(docroot.createTextNode(lookup->GetTitle()));
+    }
+    // Subtitle
+    if (!lookup->GetSubtitle().isEmpty())
+    {
+        QDomElement subtitle = docroot.createElement("subtitle");
+        item.appendChild(subtitle);
+        subtitle.appendChild(docroot.createTextNode(lookup->GetSubtitle()));
+    }
+    // Season
+    if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)
+    {
+        QDomElement season = docroot.createElement("season");
+        item.appendChild(season);
+        season.appendChild(docroot.createTextNode(
+                           QString::number(lookup->GetSeason())));
+    }
+    // Episode
+    if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)
+    {
+        QDomElement episode = docroot.createElement("episode");
+        item.appendChild(episode);
+        episode.appendChild(docroot.createTextNode(
+                           QString::number(lookup->GetEpisode())));
+    }
+    // Tagline
+    if (!lookup->GetTagline().isEmpty())
+    {
+        QDomElement tagline = docroot.createElement("tagline");
+        item.appendChild(tagline);
+        tagline.appendChild(docroot.createTextNode(lookup->GetTagline()));
+    }
+    // Plot
+    if (!lookup->GetDescription().isEmpty())
+    {
+        QDomElement desc = docroot.createElement("description");
+        item.appendChild(desc);
+        desc.appendChild(docroot.createTextNode(lookup->GetDescription()));
+    }
+    // Album Name
+    if (!lookup->GetAlbumTitle().isEmpty())
+    {
+        QDomElement albumname = docroot.createElement("albumname");
+        item.appendChild(albumname);
+        albumname.appendChild(docroot.createTextNode(lookup->GetAlbumTitle()));
+    }
+    // Inetref
+    if (!lookup->GetInetref().isEmpty())
+    {
+        QDomElement inetref = docroot.createElement("inetref");
+        item.appendChild(inetref);
+        inetref.appendChild(docroot.createTextNode(lookup->GetInetref()));
+    }
+    // TMSref/SeriesID
+    if (!lookup->GetTMSref().isEmpty())
+    {
+        QDomElement tmsref = docroot.createElement("tmsref");
+        item.appendChild(tmsref);
+        tmsref.appendChild(docroot.createTextNode(lookup->GetTMSref()));
+    }
+    // IMDB
+    if (!lookup->GetIMDB().isEmpty())
+    {
+        QDomElement imdb = docroot.createElement("imdb");
+        item.appendChild(imdb);
+        imdb.appendChild(docroot.createTextNode(lookup->GetIMDB()));
+    }
+    // Home Page
+    if (!lookup->GetHomepage().isEmpty())
+    {
+        QDomElement homepage = docroot.createElement("homepage");
+        item.appendChild(homepage);
+        homepage.appendChild(docroot.createTextNode(lookup->GetHomepage()));
+    }
+    // Trailer
+    if (!lookup->GetTrailerURL().isEmpty())
+    {
+        QDomElement trailer = docroot.createElement("trailer");
+        item.appendChild(trailer);
+        trailer.appendChild(docroot.createTextNode(lookup->GetTrailerURL()));
+    }
+    // Chan ID
+    if (lookup->GetChanId() > 0)
+    {
+        QDomElement chanid = docroot.createElement("chanid");
+        item.appendChild(chanid);
+        chanid.appendChild(docroot.createTextNode(
+                           QString::number(lookup->GetChanId())));
+    }
+    // Channel Number
+    if (!lookup->GetChanNum().isEmpty())
+    {
+        QDomElement channum = docroot.createElement("channum");
+        item.appendChild(channum);
+        channum.appendChild(docroot.createTextNode(lookup->GetChanNum()));
+    }
+    // Callsign
+    if (!lookup->GetChanSign().isEmpty())
+    {
+        QDomElement callsign = docroot.createElement("chansign");
+        item.appendChild(callsign);
+        callsign.appendChild(docroot.createTextNode(lookup->GetChanSign()));
+    }
+    // Channel Name
+    if (!lookup->GetChanName().isEmpty())
+    {
+        QDomElement channame = docroot.createElement("channame");
+        item.appendChild(channame);
+        channame.appendChild(docroot.createTextNode(lookup->GetChanName()));
+    }
+    // Playback Filters
+    if (!lookup->GetChanPlaybackFilters().isEmpty())
+    {
+        QDomElement filters = docroot.createElement("filters");
+        item.appendChild(filters);
+        filters.appendChild(docroot.createTextNode(
+                            lookup->GetChanPlaybackFilters()));
+    }
+    // Recording Group
+    if (!lookup->GetRecGroup().isEmpty())
+    {
+        QDomElement recgroup = docroot.createElement("recgroup");
+        item.appendChild(recgroup);
+        recgroup.appendChild(docroot.createTextNode(lookup->GetRecGroup()));
+    }
+    // Playback Group
+    if (!lookup->GetPlayGroup().isEmpty())
+    {
+        QDomElement playgroup = docroot.createElement("playgroup");
+        item.appendChild(playgroup);
+        playgroup.appendChild(docroot.createTextNode(lookup->GetPlayGroup()));
+    }
+    // SeriesID
+    if (!lookup->GetSeriesId().isEmpty())
+    {
+        QDomElement seriesid = docroot.createElement("seriesid");
+        item.appendChild(seriesid);
+        seriesid.appendChild(docroot.createTextNode(lookup->GetSeriesId()));
+    }
+    // ProgramID
+    if (!lookup->GetProgramId().isEmpty())
+    {
+        QDomElement programid = docroot.createElement("programid");
+        item.appendChild(programid);
+        programid.appendChild(docroot.createTextNode(lookup->GetProgramId()));
+    }
+    // Storage Group
+    if (!lookup->GetStorageGroup().isEmpty())
+    {
+        QDomElement sgroup = docroot.createElement("storagegroup");
+        item.appendChild(sgroup);
+        sgroup.appendChild(docroot.createTextNode(lookup->GetStorageGroup()));
+    }
+    // Start TS
+    if (!lookup->GetStartTS().isNull())
+    {
+        QDomElement startts = docroot.createElement("startts");
+        item.appendChild(startts);
+        startts.appendChild(docroot.createTextNode(
+                            lookup->GetStartTS().toString(RFC822)));
+    }
+    // End TS
+    if (!lookup->GetEndTS().isNull())
+    {
+        QDomElement endts = docroot.createElement("endts");
+        item.appendChild(endts);
+        endts.appendChild(docroot.createTextNode(
+                          lookup->GetEndTS().toString(RFC822)));
+    }
+    // Rec Start TS
+    if (!lookup->GetRecStartTS().isNull())
+    {
+        QDomElement recstartts = docroot.createElement("recstartts");
+        item.appendChild(recstartts);
+        recstartts.appendChild(docroot.createTextNode(
+                          lookup->GetRecStartTS().toString(RFC822)));
+    }
+    // Rec End TS
+    if (!lookup->GetRecEndTS().isNull())
+    {
+        QDomElement recendts = docroot.createElement("recendts");
+        item.appendChild(recendts);
+        recendts.appendChild(docroot.createTextNode(
+                          lookup->GetRecEndTS().toString(RFC822)));
+    }
+    // Program Flags
+    if (lookup->GetProgramFlags() > 0)
+    {
+        QDomElement progflags = docroot.createElement("programflags");
+        item.appendChild(progflags);
+        progflags.appendChild(docroot.createTextNode(
+                          QString::number(lookup->GetProgramFlags())));
+    }
+    // Audio Properties
+    if (lookup->GetAudioProperties() > 0)
+    {
+        QDomElement audioprops = docroot.createElement("audioproperties");
+        item.appendChild(audioprops);
+        audioprops.appendChild(docroot.createTextNode(
+                          QString::number(lookup->GetAudioProperties())));
+    }
+    // Video Properties
+    if (lookup->GetVideoProperties() > 0)
+    {
+        QDomElement videoprops = docroot.createElement("videoproperties");
+        item.appendChild(videoprops);
+        videoprops.appendChild(docroot.createTextNode(
+                          QString::number(lookup->GetVideoProperties())));
+    }
+    // Subtitle Type
+    if (lookup->GetSubtitleType() > 0)
+    {
+        QDomElement subprops = docroot.createElement("subtitletype");
+        item.appendChild(subprops);
+        subprops.appendChild(docroot.createTextNode(
+                          QString::number(lookup->GetSubtitleType())));
+    }
+    // Release Date
+    if (!lookup->GetReleaseDate().isNull())
+    {
+        QDomElement releasedate = docroot.createElement("releasedate");
+        item.appendChild(releasedate);
+        releasedate.appendChild(docroot.createTextNode(
+                      lookup->GetReleaseDate().toString("yyyy-MM-dd")));
+    }
+    // Last Updated
+    if (!lookup->GetLastUpdated().isNull())
+    {
+        QDomElement lastupdated = docroot.createElement("lastupdated");
+        item.appendChild(lastupdated);
+        lastupdated.appendChild(docroot.createTextNode(
+                      lookup->GetLastUpdated().toString(RFC822)));
+    }
+    // User Rating
+    if (lookup->GetUserRating() > 0)
+    {
+        QDomElement userrating = docroot.createElement("userrating");
+        item.appendChild(userrating);
+        userrating.appendChild(docroot.createTextNode(QString::number(
+                       lookup->GetUserRating())));
+    }
+    // Track Number
+    if (lookup->GetTrackNumber() > 0)
+    {
+        QDomElement tracknum = docroot.createElement("tracknum");
+        item.appendChild(tracknum);
+        tracknum.appendChild(docroot.createTextNode(QString::number(
+                       lookup->GetTrackNumber())));
+    }
+    // Popularity
+    if (lookup->GetPopularity() > 0)
+    {
+        QDomElement popularity = docroot.createElement("popularity");
+        item.appendChild(popularity);
+        popularity.appendChild(docroot.createTextNode(QString::number(
+                       lookup->GetPopularity())));
+    }
+    // Budget
+    if (lookup->GetBudget() > 0)
+    {
+        QDomElement budget = docroot.createElement("budget");
+        item.appendChild(budget);
+        budget.appendChild(docroot.createTextNode(QString::number(
+                       lookup->GetBudget())));
+    }
+    // Revenue
+    if (lookup->GetRevenue() > 0)
+    {
+        QDomElement revenue = docroot.createElement("revenue");
+        item.appendChild(revenue);
+        revenue.appendChild(docroot.createTextNode(QString::number(
+                       lookup->GetRevenue())));
+    }
+    // Runtime
+    if (lookup->GetRuntime() > 0)
+    {
+        QDomElement runtime = docroot.createElement("runtime");
+        item.appendChild(runtime);
+        runtime.appendChild(docroot.createTextNode(QString::number(
+                       lookup->GetRuntime())));
+    }
+    // Runtimesecs
+    if (lookup->GetRuntimeSeconds() > 0)
+    {
+        QDomElement runtimesecs = docroot.createElement("runtimesecs");
+        item.appendChild(runtimesecs);
+        runtimesecs.appendChild(docroot.createTextNode(QString::number(
+                       lookup->GetRuntimeSeconds())));
+    }
+
+    if (lookup->GetCertification().size())
+        AddCertifications(lookup, item, docroot);
+    if (lookup->GetCategories().size())
+        AddCategories(lookup, item, docroot);
+    if (lookup->GetStudios().size())
+        AddStudios(lookup, item, docroot);
+    if (lookup->GetCountries().size())
+        AddCountries(lookup, item, docroot);
+}
+
+void AddCertifications(MetadataLookup *lookup,
+                       QDomElement placetoadd,
+                       QDomDocument docroot)
+{
+    QString certstr = lookup->GetCertification();
+    QDomElement certifications = docroot.createElement("certifications");
+    placetoadd.appendChild(certifications);
+
+    QDomElement cert = docroot.createElement("certification");
+    certifications.appendChild(cert);
+    cert.setAttribute("locale", gCoreContext->GetLocale()->GetCountryCode());
+    cert.setAttribute("name", certstr);
+}
+
+void AddCategories(MetadataLookup *lookup,
+                   QDomElement placetoadd,
+                   QDomDocument docroot)
+{
+    QStringList cats = lookup->GetCategories();
+    QDomElement categories = docroot.createElement("categories");
+    placetoadd.appendChild(categories);
+
+    for (QStringList::const_iterator i = cats.begin();
+            i != cats.end(); ++i)
+    {
+        QDomElement cat = docroot.createElement("category");
+        categories.appendChild(cat);
+        cat.setAttribute("type", "genre");
+        cat.setAttribute("name", *i);
+    }
+}
+
+void AddStudios(MetadataLookup *lookup,
+                   QDomElement placetoadd,
+                   QDomDocument docroot)
+{
+    QStringList studs = lookup->GetStudios();
+    QDomElement studios = docroot.createElement("studios");
+    placetoadd.appendChild(studios);
+
+    for (QStringList::const_iterator i = studs.begin();
+            i != studs.end(); ++i)
+    {
+        QDomElement stud = docroot.createElement("studio");
+        studios.appendChild(stud);
+        stud.setAttribute("name", *i);
+    }
+}
+
+void AddCountries(MetadataLookup *lookup,
+                  QDomElement placetoadd,
+                  QDomDocument docroot)
+{
+    QStringList counts = lookup->GetCountries();
+    QDomElement countries = docroot.createElement("countries");
+    placetoadd.appendChild(countries);
+
+    for (QStringList::const_iterator i = counts.begin();
+            i != counts.end(); ++i)
+    {
+        QDomElement count = docroot.createElement("country");
+        countries.appendChild(count);
+        count.setAttribute("name", *i);
+    }
+}
+
 MetadataLookup* ParseMetadataItem(const QDomElement& item,
                                   MetadataLookup *lookup,
                                   bool passseas)
@@ -432,6 +872,7 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     ArtworkMap artwork;
 
     // Get the easy parses
+    language = item.firstChildElement("language").text();
     title = Parse::UnescapeHTML(item.firstChildElement("title").text());
     subtitle = Parse::UnescapeHTML(item.firstChildElement("subtitle").text());
     tagline = Parse::UnescapeHTML(item.firstChildElement("tagline").text());
@@ -442,7 +883,6 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     imdb = item.firstChildElement("imdb").text();
     homepage = item.firstChildElement("homepage").text();
     trailerURL = item.firstChildElement("trailer").text();
-    language = item.firstChildElement("language").text();
 
     // ProgramInfo specific parsing
     chanid = item.firstChildElement("chanid").text().toUInt();
