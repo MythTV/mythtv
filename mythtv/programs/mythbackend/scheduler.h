@@ -13,6 +13,7 @@ using namespace std;
 #include <QThread>
 #include <QMutex>
 #include <QMap>
+#include <QSet>
 
 // MythTV headers
 #include "recordinginfo.h"
@@ -206,6 +207,8 @@ class Scheduler : public QThread
     QMap<QString, FileSystemInfo> fsInfoCache;
 
     int error;
+
+    QSet<QString> sysEvents[4];
 
     // Try to avoid LiveTV sessions until this time
     QDateTime livetvTime;

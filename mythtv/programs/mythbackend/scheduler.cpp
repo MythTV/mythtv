@@ -1812,6 +1812,8 @@ void Scheduler::run(void)
             {
                 int sched_sleep = (secs_to_next - schedRunTime - 1) * 1000;
                 sched_sleep = min(sched_sleep, maxSleep);
+                if (secs_to_next < prerollseconds + (maxSleep/1000))
+                    sched_sleep = min(sched_sleep, 5000);
                 LOG(VB_SCHEDULE, LOG_INFO,
                     QString("sleeping for %1 ms (interuptable)")
                         .arg(sched_sleep));
@@ -1892,7 +1894,7 @@ void Scheduler::run(void)
 
         /// Wake any slave backends that need waking
         curtime = QDateTime::currentDateTime();
-        for (RecIter it = startIter; it != reclist.end() && !done; ++it)
+        for (RecIter it = startIter; it != reclist.end(); ++it)
         {
             int secsleft = curtime.secsTo((*it)->GetRecordingStartTime());
             if ((secsleft - prerollseconds) <= wakeThreshold)
@@ -2146,8 +2148,6 @@ bool Scheduler::HandleRunSchedulerStartup(
 void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 {
     static const int sysEventSecs[5] = { 120, 90, 60, 30, 0 };
-    QString sysEventKey;
-    QList<QString> sysEvents[4];
 
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime nextrectime = ri.GetRecordingStartTime();
@@ -2157,8 +2157,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
     if (tvit == m_tvList->end())
         return;
 
-    sysEventKey = QString("%1:%2").arg(ri.GetChanID())
-        .arg(nextrectime.toString(Qt::ISODate));
+    QString sysEventKey = ri.MakeUniqueKey();
 
     int i = 0;
     bool pendingEventSent = false;
@@ -2173,10 +2172,35 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
                     QString("REC_PENDING SECS %1").arg(secsleft), &ri);
             }
 
-            sysEvents[i].append(sysEventKey);
+            sysEvents[i].insert(sysEventKey);
             pendingEventSent = true;
         }
         i++;
+    }
+
+    // cleanup old sysEvents once in a while
+    QSet<QString> keys;
+    for (i = 0; sysEventSecs[i] != 0; i++)
+    {
+        if (sysEvents[i].size() < 20)
+            continue;
+
+        if (keys.empty())
+        {
+            RecConstIter it = reclist.begin();
+            for ( ; it != reclist.end(); ++it)
+                keys.insert((*it)->MakeUniqueKey());
+            keys.insert("something");
+        }
+
+        QSet<QString>::iterator sit = sysEvents[i].begin();
+        while (sit != sysEvents[i].end())
+        {
+            if (!keys.contains(*sit))
+                sit = sysEvents[i].erase(sit);
+            else
+                ++sit;
+        }
     }
 
     EncoderLink *nexttv = *tvit;
