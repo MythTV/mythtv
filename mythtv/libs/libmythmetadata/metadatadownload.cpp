@@ -503,8 +503,16 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
     args.append(QString("-N"));
-    QString title = lookup->GetTitle();
-    args.append(title);
+    if (!lookup->GetInetref().isEmpty())
+    {
+        QString inetref = lookup->GetInetref();
+        args.append(inetref);
+    }
+    else
+    {
+        QString title = lookup->GetTitle();
+        args.append(title);
+    }
     QString subtitle = lookup->GetSubtitle();
     args.append(subtitle);
 
