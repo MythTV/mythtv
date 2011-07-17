@@ -861,7 +861,7 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
         }
         else if (ioctl(chanfd, VIDIOC_G_FMT, &vbifmt) >= 0)
         {
-            LOG(VB_RECORD, LOG_INFO, 
+            LOG(VB_RECORD, LOG_INFO,
                 LOC + QString("VBI service: %1, io size: %2")
                     .arg(vbifmt.fmt.sliced.service_set)
                     .arg(vbifmt.fmt.sliced.io_size));
@@ -1256,6 +1256,8 @@ bool MpegRecorder::PauseAndWait(int timeout)
             m_h264_parser.Reset();
             _wait_for_keyframe_option = true;
             _seen_sps = false;
+            // HD-PVR will sometimes reset to defaults
+            SetV4L2DeviceOptions(chanfd);
         }
 
         StartEncoding(readfd);
@@ -1292,6 +1294,8 @@ void MpegRecorder::RestartEncoding(void)
         HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
     }
 
+    if (driver == "hdpvr") // HD-PVR will sometimes reset to defaults
+        SetV4L2DeviceOptions(chanfd);
     if (!StartEncoding(readfd))
     {
         if (0 != close(readfd))
@@ -1330,7 +1334,7 @@ bool MpegRecorder::StartEncoding(int fd)
         return true;
     }
 
-    // Some drivers do not support this ioctl at all.  It is marked as 
+    // Some drivers do not support this ioctl at all.  It is marked as
     // "experimental" in the V4L2 API spec.  If we fail with EINVAL (which
     // happens if the ioctl isn't supported), treat it as a success, but
     // put a warning in the logs.  This should keep any driver without this
@@ -1360,7 +1364,7 @@ bool MpegRecorder::StopEncoding(int fd)
         return true;
     }
 
-    // Some drivers do not support this ioctl at all.  It is marked as 
+    // Some drivers do not support this ioctl at all.  It is marked as
     // "experimental" in the V4L2 API spec.  If we fail with EINVAL (which
     // happens if the ioctl isn't supported), treat it as a success, but
     // put a warning in the logs.  This should keep any driver without this
