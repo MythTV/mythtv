@@ -42,35 +42,35 @@ bool MetadataResultsDialog::Create()
         return false;
     }
 
-    for (MetadataLookupList::const_iterator i = m_results.begin();
-            i != m_results.end(); ++i)
+    for (int i = 0;
+            i != m_results.count(); ++i)
     {
         MythUIButtonListItem *button =
             new MythUIButtonListItem(m_resultsList,
-                (*i)->GetTitle());
+                m_results[i]->GetTitle());
         MetadataMap metadataMap;
-        (*i)->toMap(metadataMap);
+        m_results[i]->toMap(metadataMap);
 
         QString coverartfile;
-        ArtworkList art = (*i)->GetArtwork(kArtworkCoverart);
+        ArtworkList art = m_results[i]->GetArtwork(kArtworkCoverart);
         if (art.count() > 0)
             coverartfile = art.takeFirst().thumbnail;
 
         if (coverartfile.isEmpty())
         {
-            art = (*i)->GetArtwork(kArtworkBanner);
+            art = m_results[i]->GetArtwork(kArtworkBanner);
             if (art.count() > 0)
                coverartfile = art.takeFirst().thumbnail;
         }
 
         if (coverartfile.isEmpty())
         {
-            art = (*i)->GetArtwork(kArtworkScreenshot);
+            art = m_results[i]->GetArtwork(kArtworkScreenshot);
             if (art.count() > 0)
                 coverartfile = art.takeFirst().thumbnail;
         }
 
-        QString dlfile = getDownloadFilename((*i)->GetTitle(),
+        QString dlfile = getDownloadFilename(m_results[i]->GetTitle(),
             coverartfile);
 
         if (!coverartfile.isEmpty())
@@ -80,13 +80,13 @@ bool MetadataResultsDialog::Create()
             if (QFile::exists(dlfile))
                 button->SetImage(dlfile);
             else
-                m_imageDownload->addThumb((*i)->GetTitle(),
+                m_imageDownload->addThumb(m_results[i]->GetTitle(),
                                  coverartfile,
                                  qVariantFromValue<uint>(pos));
         }
 
         button->SetTextFromMap(metadataMap);
-        button->SetData(qVariantFromValue<MetadataLookup*>(*i));
+        button->SetData(qVariantFromValue<uint>(i));
     }
 
     connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
@@ -150,7 +150,9 @@ void MetadataResultsDialog::customEvent(QEvent *event)
 
 void MetadataResultsDialog::sendResult(MythUIButtonListItem* item)
 {
-    emit haveResult(qVariantValue<MetadataLookup *>(item->GetData()));
+    MetadataLookup *lookup = m_results.takeAt(qVariantValue<uint>(item->GetData()));
+    qDeleteAll(m_results);
+    emit haveResult(lookup);
     Close();
 }
 
