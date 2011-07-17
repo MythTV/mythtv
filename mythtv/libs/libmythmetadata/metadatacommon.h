@@ -439,6 +439,8 @@ Q_DECLARE_METATYPE(MetadataLookup*)
 typedef QList<MetadataLookup*> MetadataLookupList;
 
 META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookupList list);
+META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookup *lookup);
+META_PUBLIC QDomDocument CreateMetadataXML(ProgramInfo *pginfo);
 
 META_PUBLIC void CreateMetadataXMLItem(MetadataLookup *lookup,
                                    QDomElement placetoadd,

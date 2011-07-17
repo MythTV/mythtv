@@ -460,6 +460,29 @@ QDomDocument CreateMetadataXML(MetadataLookupList list)
     return doc;
 }
 
+QDomDocument CreateMetadataXML(MetadataLookup *lookup)
+{
+    QDomDocument doc("MythMetadataXML");
+
+    QDomElement root = doc.createElement("metadata");
+    doc.appendChild(root);
+
+    CreateMetadataXMLItem(lookup, root, doc);
+
+    return doc;
+}
+
+QDomDocument CreateMetadataXML(ProgramInfo *pginfo)
+{
+    QDomDocument doc("MythMetadataXML");
+
+    MetadataLookup *lookup = LookupFromProgramInfo(pginfo);
+    if (lookup)
+        doc = CreateMetadataXML(lookup);
+
+    return doc;
+}
+
 void CreateMetadataXMLItem(MetadataLookup *lookup,
                            QDomElement placetoadd,
                            QDomDocument docroot)
