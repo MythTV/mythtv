@@ -108,17 +108,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void cursorDown();
     void cursorUp();
 
-    void scrollLeft();
-    void scrollRight();
-    void scrollDown();
-    void scrollUp();
-
-    void dayLeft();
-    void dayRight();
-    void pageLeft();
-    void pageRight();
-    void pageDown();
-    void pageUp();
     void toggleGuideListing();
     void toggleChannelFavorite(int grpid = -1);
     void ChannelGroupMenu(int mode = 0);
@@ -130,7 +119,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void channelUpdate();
     void volumeUpdate(bool);
     void toggleMute(const bool muteIndividualChannels = false);
-    void infoTimeout();
 
     void quickRecord();
     void editRecSchedule();
@@ -150,7 +138,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
               bool allowFinder = true,
               int changrpid = -1);
    ~GuideGrid();
-
+   
   private slots:
     void updateTimeout(void);
     void refreshVideo(void);
@@ -159,6 +147,23 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void updateJumpToChannel(void);
 
   private:
+
+    enum MoveVector {
+        kScrollUp,
+        kScrollDown,
+        kScrollLeft,
+        kScrollRight,
+        kPageUp,
+        kPageDown,
+        kPageLeft,
+        kPageRight,
+        kDayLeft,
+        kDayRight,
+    };
+
+    void moveLeftRight(MoveVector movement);
+    void moveUpDown(MoveVector movement);
+    
     void showMenu(void);
 
     int  FindChannel(uint chanid, const QString &channum,
@@ -179,6 +184,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     ProgramList GetProgramList(uint chanid) const;
     uint GetAlternateChannelIndex(uint chan_idx, bool with_same_channum) const;
+    void updateDateText(void);
 
   private:
     bool  m_selectChangesChannel;
