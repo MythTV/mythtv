@@ -478,8 +478,6 @@ class AlbumArtImages
     AlbumArtList  *getImageList(void) { return &m_imageList; }
     AlbumArtImage *getImageAt(uint index);
 
-    bool saveImageType(const int id, ImageType type);
-
     void dumpToDatabase(void);
 
     static ImageType guessImageType(const QString &filename);

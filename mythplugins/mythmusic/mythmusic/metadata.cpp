@@ -1651,16 +1651,6 @@ AlbumArtImage *AlbumArtImages::getImageAt(uint index)
     return NULL;
 }
 
-bool AlbumArtImages::saveImageType(const int id, ImageType type)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE music_albumart SET imagetype = :TYPE "
-                    "WHERE albumart_id = :ID");
-    query.bindValue(":TYPE", type);
-    query.bindValue(":ID", id);
-    return (query.exec());
-}
-
 // static method to get a translated type name from an ImageType
 QString AlbumArtImages::getTypeName(ImageType type)
 {
@@ -1690,6 +1680,7 @@ QString AlbumArtImages::getTypeFilename(ImageType type)
 
     return QObject::tr(filename_strings[type]);
 }
+
 // static method to guess the image type from the filename
 ImageType AlbumArtImages::guessImageType(const QString &filename)
 {
@@ -1782,42 +1773,32 @@ void AlbumArtImages::dumpToDatabase(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
+    // remove all albumart for this track from the db
+    query.prepare("DELETE FROM music_albumart "
+                  "WHERE song_id = :SONGID "
+                  "OR (embedded = 0 AND directory_id = :DIRECTORYID)");
+
+    query.bindValue(":SONGID", trackID);
+    query.bindValue(":DIRECTORYID", directoryID);
+
+    query.exec();
+
+    // now add the albumart to the db
     AlbumArtList::iterator it = m_imageList.begin();
     for (; it != m_imageList.end(); ++it)
     {
         AlbumArtImage *image = (*it);
 
-        // first check to see if the image is already in the db
-        if (image->embedded)
+        if (image->id != 0)
         {
-            query.prepare("SELECT albumart_id FROM music_albumart "
-                          "WHERE song_id = :SONGID AND imagetype = :TYPE;");
-            query.bindValue(":TYPE", image->imageType);
-            query.bindValue(":SONGID", trackID);
+            // re-use the same id this image had before
+            query.prepare("INSERT INTO music_albumart ( albumart_id, "
+                          "filename, imagetype, song_id, directory_id, embedded ) "
+                          "VALUES ( :ID, :FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED );");
+            query.bindValue(":ID", image->id);
         }
         else
         {
-            query.prepare("SELECT albumart_id FROM music_albumart "
-                          "WHERE directory_id = :DIRECTORYID AND imagetype = :TYPE;");
-            query.bindValue(":TYPE", image->imageType);
-            query.bindValue(":DIRECTORYID", directoryID);
-        }
-
-        if (query.exec() && query.next())
-        {
-            // update the existing record
-            int artid = query.value(0).toInt();
-
-            query.prepare("UPDATE music_albumart SET "
-                          "filename = :FILENAME, imagetype = :TYPE, "
-                          "song_id = :SONGID, directory_id = :DIRECTORYID, embedded = :EMBED "
-                          "WHERE albumart_id = :ARTID");
-
-            query.bindValue(":ARTID", artid);
-        }
-        else
-        {
-            // add new record for this image
             query.prepare("INSERT INTO music_albumart ( filename, "
                         "imagetype, song_id, directory_id, embedded ) VALUES ( "
                         ":FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED );");

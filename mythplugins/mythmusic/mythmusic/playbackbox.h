@@ -62,6 +62,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void editPlaylist();
     void nextAuto();
     void showEditMetadataDialog();
+    void showTrackInfoDialog();
     void checkForPlaylists();
     void handleTreeListSignals(int, IntVector*);
     void visEnable();

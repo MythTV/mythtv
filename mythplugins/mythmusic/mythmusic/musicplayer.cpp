@@ -578,6 +578,15 @@ void MusicPlayer::customEvent(QEvent *event)
                     QString("MusicPlayer: got unknown/invalid MUSIC_COMMAND "
                             "- %1").arg(me->Message()));
         }
+        else if (me->Message().startsWith("MUSIC_SETTINGS_CHANGED"))
+        {
+            QString startdir = gCoreContext->GetSetting("MusicLocation");
+            startdir = QDir::cleanPath(startdir);
+            if (!startdir.endsWith("/"))
+                startdir += "/";
+
+            Metadata::SetStartdir(startdir);
+        }
     }
 
     if (m_isAutoplay)

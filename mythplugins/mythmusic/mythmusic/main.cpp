@@ -340,18 +340,30 @@ static void MusicCallback(void *data, QString &selection)
     }
     else if (sel == "music_set_general")
     {
+        gCoreContext->ActivateSettingsCache(false);
         MusicGeneralSettings settings;
         settings.exec();
+        gCoreContext->ActivateSettingsCache(true);
+
+        gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED")));
     }
     else if (sel == "music_set_player")
     {
+        gCoreContext->ActivateSettingsCache(false);
         MusicPlayerSettings settings;
         settings.exec();
+        gCoreContext->ActivateSettingsCache(true);
+
+        gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED")));
     }
     else if (sel == "music_set_ripper")
     {
+        gCoreContext->ActivateSettingsCache(false);
         MusicRipperSettings settings;
         settings.exec();
+        gCoreContext->ActivateSettingsCache(true);
+
+        gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED")));
     }
 }
 

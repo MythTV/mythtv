@@ -16,6 +16,7 @@ using namespace std;
 #include <audiooutput.h>
 #include <mythcontext.h>
 #include <mythmediamonitor.h>
+#include <util.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>

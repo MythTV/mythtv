@@ -75,10 +75,12 @@ class ImportMusicDialog : public MythScreenType
     void setArtist(void);
     void setAlbum(void);
     void setYear(void);
+    void setTrack(void);
     void setGenre(void);
     void setRating(void);
     void setTitleWordCaps(void);
     void setTitleInitialCap(void);
+    void metadataChanged(void);
 
   signals:
     void importFinished(void);
@@ -92,6 +94,7 @@ class ImportMusicDialog : public MythScreenType
     vector<TrackInfo*>  *m_tracks;
     QStringList          m_sourceFiles;
     int                  m_currentTrack;
+    Metadata            *m_playingMetaData;
 
     //  GUI stuff
     MythUITextEdit  *m_locationEdit;
@@ -176,7 +179,7 @@ class ImportCoverArtDialog : public MythScreenType
     MythUIText          *m_destinationText;
 
     MythUIImage         *m_coverartImage;
-    MythUIButtonList      *m_typeList;
+    MythUIButtonList    *m_typeList;
 
     MythUIButton    *m_nextButton;
     MythUIButton    *m_prevButton;

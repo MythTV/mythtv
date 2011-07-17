@@ -81,7 +81,8 @@ ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent)
                 :MythScreenType(parent, "musicimportfiles")
 {
     m_popupMenu = NULL;
-
+    m_playingMetaData = NULL;
+    
     m_defaultCompilation = false;
     m_defaultYear = 0;
     m_defaultRating = 0;
@@ -93,11 +94,18 @@ ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent)
 
 ImportMusicDialog::~ImportMusicDialog()
 {
+    if (gPlayer->getCurrentMetadata() && m_playingMetaData)
+    {
+        if (gPlayer->isPlaying() && gPlayer->getCurrentMetadata()->Filename() == m_playingMetaData->Filename())
+            gPlayer->next();
+    }
+
     if (m_locationEdit)
         gCoreContext->SaveSetting("MythMusicLastImportDir", m_locationEdit->GetText());
 
     delete m_tracks;
 
+    // do we need to do a resync
     if (m_somethingWasImported)
         emit importFinished();
 }
@@ -171,7 +179,7 @@ bool ImportMusicDialog::keyPressEvent(QKeyEvent *event)
         {
             m_nextButton->Push();
         }
-        else if (action == "INFO")
+        else if (action == "EDIT")
         {
             showEditMetadataDialog();
         }
@@ -217,8 +225,7 @@ bool ImportMusicDialog::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "0")
         {
-            if (m_tracks->size() > 0 && !m_tracks->at(m_currentTrack)->isNewTune)
-                showImportCoverArtDialog();
+            setTrack();
         }
         else
             handled = false;
@@ -308,9 +315,9 @@ void ImportMusicDialog::playPressed()
     if (m_tracks->size() == 0)
         return;
 
-    Metadata *meta = m_tracks->at(m_currentTrack)->metadata;
+    m_playingMetaData = m_tracks->at(m_currentTrack)->metadata;
 
-    gPlayer->playFile(*meta);
+    gPlayer->playFile(*m_playingMetaData);
 }
 
 void ImportMusicDialog::prevPressed()
@@ -536,17 +543,29 @@ void ImportMusicDialog::showEditMetadataDialog()
 
     Metadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
 
-    EditMetadataDialog editDialog(editMeta, GetMythMainWindow(),
-                                  "edit_metadata", "music-", "edit metadata");
-    editDialog.setSaveMetadataOnly();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    if (kDialogCodeRejected != editDialog.exec())
+    EditMetadataDialog *editDialog = new EditMetadataDialog(mainStack, editMeta);
+    editDialog->setSaveMetadataOnly();
+
+    if (!editDialog->Create())
     {
-        m_tracks->at(m_currentTrack)->metadataHasChanged = true;
-        m_tracks->at(m_currentTrack)->isNewTune = Ripper::isNewTune(
-                editMeta->Artist(), editMeta->Album(), editMeta->Title());
-        fillWidgets();
+        delete editDialog;
+        return;
     }
+
+    connect(editDialog, SIGNAL(metadataChanged()), this, SLOT(metadataChanged()));
+
+    mainStack->AddScreen(editDialog);
+}
+
+void ImportMusicDialog::metadataChanged(void)
+{
+    Metadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
+    m_tracks->at(m_currentTrack)->metadataHasChanged = true;
+    m_tracks->at(m_currentTrack)->isNewTune =
+        Ripper::isNewTune(editMeta->Artist(), editMeta->Album(), editMeta->Title());
+    fillWidgets();
 }
 
 void ImportMusicDialog::showMenu()
@@ -569,6 +588,7 @@ void ImportMusicDialog::showMenu()
         return;
     }
 
+    menu->SetReturnEvent(this, "menu");
     menu->AddButton(tr("Save Defaults"), SLOT(saveDefaults()));
 
     if (m_haveDefaults)
@@ -667,6 +687,14 @@ void ImportMusicDialog::setYear(void)
 
     Metadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setYear(m_defaultYear);
+
+    fillWidgets();
+}
+
+void ImportMusicDialog::setTrack(void)
+{
+    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    data->setTrack(data->Track() + 100);
 
     fillWidgets();
 }
@@ -892,7 +920,13 @@ void ImportCoverArtDialog::copyPressed()
 {
     if (m_filelist.size() > 0)
     {
-        copyFile(m_filelist[m_currentFile], m_saveFilename);
+        if (!copyFile(m_filelist[m_currentFile], m_saveFilename))
+        {
+            ShowOkPopup(QString("Copy CoverArt Failed. \nCopying to %1")
+                    .arg(m_saveFilename));
+            return;
+        }
+
         updateStatus();
     }
 }

@@ -1197,8 +1197,6 @@ void MusicCommon::updateVolume(void)
 
 void MusicCommon::editTrackInfo(Metadata *mdata)
 {
-    (void) mdata;
-#if 0
     if (!mdata)
         return;
 
@@ -1212,14 +1210,7 @@ void MusicCommon::editTrackInfo(Metadata *mdata)
         return;
     }
 
-    connect(editDialog, SIGNAL(metadataChanged()), this, SLOT(metadataChanged()));
-
     mainStack->AddScreen(editDialog);
-#endif
-}
-
-void MusicCommon::metadataChanged(void)
-{
 }
 
 void MusicCommon::updateTrackInfo(Metadata *mdata)
@@ -1241,7 +1232,7 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
             m_coverartImage->Load();
         }
         else
-             m_coverartImage->Reset();
+            m_coverartImage->Reset();
     }
 
     if (m_ratingState)
@@ -1266,21 +1257,6 @@ void MusicCommon::showTrackInfo(Metadata *mdata)
     }
 
     popupStack->AddScreen(dlg);
-}
-
-void MusicCommon::updateAlbumArtImage(Metadata *mdata)
-{
-    if (!m_coverartImage || !mdata)
-       return;
-
-    QString filename = mdata->getAlbumArtFile();
-    if (!filename.isEmpty())
-    {
-        m_coverartImage->SetFilename(filename);
-        m_coverartImage->Load();
-    }
-    else
-        m_coverartImage->Reset();
 }
 
 void MusicCommon::playlistItemClicked(MythUIButtonListItem *item)

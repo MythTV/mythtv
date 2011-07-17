@@ -32,6 +32,7 @@ using namespace std;
 #include "smartplaylist.h"
 #include "playlistcontainer.h"
 #include "search.h"
+#include "musiccommon.h"
 
 #ifndef USING_MINGW
 #include "cddecoder.h"
@@ -384,7 +385,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             if (visualizer_status == 2)
                 bannerToggle(curMeta);
             else
-                showEditMetadataDialog();
+                showTrackInfoDialog();
         else if (action == "EDIT")
             showEditMetadataDialog();
         else if (action == "ESCAPE" && visualizer_status != 2)
@@ -1016,11 +1017,6 @@ void PlaybackBoxMusic::updatePlaylistFromSmartPlaylist()
 
 void PlaybackBoxMusic::showEditMetadataDialog()
 {
-    if (!curMeta)
-    {
-        return;
-    }
-
     // store the current track metadata in case the track changes
     // while we show the edit dialog
     GenericTree *node = music_tree_list->getCurrentNode();
@@ -1029,58 +1025,100 @@ void PlaybackBoxMusic::showEditMetadataDialog()
     if (!editMeta)
         return;
 
-    EditMetadataDialog editDialog(editMeta, GetMythMainWindow(),
-                      "edit_metadata", "music-", "edit metadata");
-    if (kDialogCodeRejected != editDialog.exec())
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    EditMetadataDialog *editDialog = new EditMetadataDialog(mainStack, editMeta);
+
+    if (!editDialog->Create())
     {
-        MythBusyDialog *busy = new MythBusyDialog(
-            QObject::tr("Rebuilding music tree"));
-        busy->start();
+        delete editDialog;
+        return;
+    }
 
-        // Get a reference to the current track
-        QList<int> branches_to_current_node =
-            *music_tree_list->getRouteToActive();
+    mainStack->AddScreen(editDialog);
 
-        // reload music
-        gMusicData->all_music->save();
-        gMusicData->all_music->startLoading();
-        while (!gMusicData->all_music->doneLoading())
+    // HACK begin - remove when everything is using mythui
+    if (GetMythMainWindow()->currentWidget())
+    {
+        QWidget *widget = GetMythMainWindow()->currentWidget();
+        vector<QWidget *> widgetList;
+
+        while (widget)
+        {
+            widgetList.push_back(widget);
+            GetMythMainWindow()->detach(widget);
+            widget = GetMythMainWindow()->currentWidget();
+        }
+
+        GetMythMainWindow()->GetPaintWindow()->raise();
+        GetMythMainWindow()->GetPaintWindow()->setFocus();
+
+        int screenCount = mainStack->TotalScreens();
+        do
         {
             qApp->processEvents();
-            usleep(50000);
-        }
-        gMusicData->all_playlists->postLoad();
+            usleep(5000);
+        } while (mainStack->TotalScreens() >= screenCount);
 
-        constructPlaylistTree();
-
-        if (music_tree_list->tryToSetActive(branches_to_current_node))
+        vector<QWidget*>::reverse_iterator it;
+        for (it = widgetList.rbegin(); it != widgetList.rend(); ++it)
         {
-            //  All is well
+            GetMythMainWindow()->attach(*it);
         }
-        else
-        {
-            // should never happen
-            stop();
-            wipeTrackInfo();
-            branches_to_current_node.clear();
-            branches_to_current_node.append(0); //  Root node
-            branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
-            branches_to_current_node.append(0); //  Active play Queue
-            music_tree_list->moveToNodesFirstChild(branches_to_current_node);
-        }
-
-        GenericTree *node = music_tree_list->getCurrentNode();
-        curMeta = gMusicData->all_music->getMetadata(node->getInt());
-        if (curMeta)
-            updateTrackInfo(curMeta);
-
-        setShuffleMode(gPlayer->getShuffleMode());
-
-        music_tree_list->refresh();
-
-        busy->Close();
-        busy->deleteLater();
     }
+    // HACK end
+}
+
+void PlaybackBoxMusic::showTrackInfoDialog()
+{
+    // store the current track metadata in case the track changes
+    // while we show the edit dialog
+    GenericTree *node = music_tree_list->getCurrentNode();
+    Metadata *mdata = gMusicData->all_music->getMetadata( node->getInt() );
+
+    if (!mdata)
+        return;
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    TrackInfoDialog *infoDialog = new TrackInfoDialog(mainStack, mdata, "trackinfodialog");
+
+    if (!infoDialog->Create())
+    {
+        delete infoDialog;
+        return;
+    }
+
+    mainStack->AddScreen(infoDialog);
+
+    // HACK begin - remove when everything is using mythui
+    if (GetMythMainWindow()->currentWidget())
+    {
+        QWidget *widget = GetMythMainWindow()->currentWidget();
+        vector<QWidget *> widgetList;
+
+        while (widget)
+        {
+            widgetList.push_back(widget);
+            GetMythMainWindow()->detach(widget);
+            widget = GetMythMainWindow()->currentWidget();
+        }
+
+        GetMythMainWindow()->GetPaintWindow()->raise();
+        GetMythMainWindow()->GetPaintWindow()->setFocus();
+
+        int screenCount = mainStack->TotalScreens();
+        do
+        {
+            qApp->processEvents();
+            usleep(5000);
+        } while (mainStack->TotalScreens() >= screenCount);
+
+        vector<QWidget*>::reverse_iterator it;
+        for (it = widgetList.rbegin(); it != widgetList.rend(); ++it)
+        {
+            GetMythMainWindow()->attach(*it);
+        }
+    }
+    // HACK end
 }
 
 void PlaybackBoxMusic::checkForPlaylists()
@@ -2053,6 +2091,65 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
             statusString,
             QString("MythMusic has encountered the following error:\n%1")
             .arg(*dxe->errorMessage()));
+    }
+    else if (event->type() == MusicPlayerEvent::MetadataChangedEvent)
+    {
+        MythBusyDialog *busy = new MythBusyDialog(
+        QObject::tr("Rebuilding music tree"));
+        busy->start();
+
+        // Get a reference to the current track
+        QList<int> branches_to_current_node =
+            *music_tree_list->getRouteToActive();
+
+        // reload music
+        gMusicData->all_music->save();
+        gMusicData->all_music->startLoading();
+        while (!gMusicData->all_music->doneLoading())
+        {
+            qApp->processEvents();
+            usleep(50000);
+        }
+        gMusicData->all_playlists->postLoad();
+
+        constructPlaylistTree();
+
+        if (music_tree_list->tryToSetActive(branches_to_current_node))
+        {
+            //  All is well
+        }
+        else
+        {
+            // should never happen
+            stop();
+            wipeTrackInfo();
+            branches_to_current_node.clear();
+            branches_to_current_node.append(0); //  Root node
+            branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+            branches_to_current_node.append(0); //  Active play Queue
+            music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+        }
+
+        GenericTree *node = music_tree_list->getCurrentNode();
+        curMeta = gMusicData->all_music->getMetadata(node->getInt());
+        if (curMeta)
+            updateTrackInfo(curMeta);
+
+        setShuffleMode(gPlayer->getShuffleMode());
+
+        music_tree_list->refresh();
+
+        busy->Close();
+        busy->deleteLater();
+
+        mainvisual->setVisual("Blank");
+        mainvisual->setVisual(visual_modes[current_visual]);
+    }
+    else if (event->type() == MusicPlayerEvent::AlbumArtChangedEvent)
+    {
+        showAlbumArtImage(gPlayer->getCurrentMetadata());
+        mainvisual->setVisual("Blank");
+        mainvisual->setVisual(visual_modes[current_visual]);
     }
 
     QWidget::customEvent(event);

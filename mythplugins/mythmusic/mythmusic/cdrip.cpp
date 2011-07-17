@@ -1370,14 +1370,25 @@ void Ripper::showEditMetadataDialog(MythUIButtonListItem *item)
 
     Metadata *editMeta = qVariantValue<Metadata *>(item->GetData());
 
-    EditMetadataDialog editDialog(editMeta, GetMythMainWindow(),
-                                  "edit_metadata", "music-", "edit metadata");
-    editDialog.setSaveMetadataOnly();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    if (kDialogCodeRejected != editDialog.exec())
+    EditMetadataDialog *editDialog = new EditMetadataDialog(mainStack, editMeta);
+    editDialog->setSaveMetadataOnly();
+
+    if (!editDialog->Create())
     {
-        updateTrackList();
+        delete editDialog;
+        return;
     }
+
+    connect(editDialog, SIGNAL(metadataChanged()), this, SLOT(metadataChanged()));
+
+    mainStack->AddScreen(editDialog);
+}
+
+void Ripper::metadataChanged(void)
+{
+    updateTrackList();
 }
 
 void Ripper::toggleTrackActive(MythUIButtonListItem *item)

@@ -3,7 +3,7 @@ include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 include (config.pro)
 
-QT += xml sql opengl qt3support network
+QT += xml sql opengl qt3support network webkit
 
 !exists( config.pro ) {
    error(Missing config.pro: please run the configure script)
