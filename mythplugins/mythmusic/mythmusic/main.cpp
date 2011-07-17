@@ -186,10 +186,9 @@ static void loadMusic()
         }
     }
 
-    //  Load all available info about songs (once!)
     QString startdir = gCoreContext->GetSetting("MusicLocation");
     startdir = QDir::cleanPath(startdir);
-    if (!startdir.endsWith("/"))
+    if (!startdir.isEmpty() && !startdir.endsWith("/"))
         startdir += "/";
 
     Metadata::SetStartdir(startdir);
@@ -621,14 +620,11 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    //TODO do we need this here?
-    loadMusic();
-
     gMusicData->paths = gCoreContext->GetSetting("TreeLevels");
     gMusicData->startdir = gCoreContext->GetSetting("MusicLocation");
     gMusicData->startdir = QDir::cleanPath(gMusicData->startdir);
 
-    if (!gMusicData->startdir.endsWith("/"))
+    if (!gMusicData->startdir.isEmpty() && !gMusicData->startdir.endsWith("/"))
         gMusicData->startdir += "/";
 
     Metadata::SetStartdir(gMusicData->startdir);
