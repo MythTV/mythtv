@@ -276,7 +276,8 @@ void LookerUpper::customEvent(QEvent *levent)
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("        User Rating: %1").arg(lookup->GetUserRating()));
 
-        pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
+        if (!lookup->GetSubtype() == kProbableGenericTelevision)
+            pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
         pginfo->SaveInetRef(lookup->GetInetref());
 
         if (m_updaterules)
