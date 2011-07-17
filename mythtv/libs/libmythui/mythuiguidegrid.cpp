@@ -384,27 +384,31 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
         {
             if (m_verticalLayout)
             {
-                p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[2]->width() / 2),
-                             area.top() , m_arrowImages[2], alphaMod);
+                if (m_arrowImages[2])
+                    p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[2]->width() / 2),
+                                 area.top() , m_arrowImages[2], alphaMod);
             }
             else
             {
-                p->DrawImage(area.left(), area.top() + (area.height() / 2) -
-                            (m_arrowImages[0]->height() / 2), m_arrowImages[0], alphaMod);
+                if (m_arrowImages[0])
+                    p->DrawImage(area.left(), area.top() + (area.height() / 2) -
+                                 (m_arrowImages[0]->height() / 2), m_arrowImages[0], alphaMod);
             }
         }
         if (data->arrow == 2 || data->arrow == 3)
         {
             if (m_verticalLayout)
             {
-                p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[3]->width() / 2),
-                            area.top() + area.height() - m_arrowImages[3]->height(), m_arrowImages[3], alphaMod);
+                if (m_arrowImages[3])
+                    p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[3]->width() / 2),
+                                 area.top() + area.height() - m_arrowImages[3]->height(), m_arrowImages[3], alphaMod);
             }
             else
             {
-                p->DrawImage(area.right() - m_arrowImages[1]->width(),
-                            area.top() + (area.height() / 2) -
-                            (m_arrowImages[1]->height() / 2), m_arrowImages[1], alphaMod);
+                if (m_arrowImages[1])
+                    p->DrawImage(area.right() - m_arrowImages[1]->width(),
+                                 area.top() + (area.height() / 2) -
+                                 (m_arrowImages[1]->height() / 2), m_arrowImages[1], alphaMod);
             }
         }
     }
@@ -522,16 +526,16 @@ void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
 
     if (m_verticalLayout)
     {
-        if (data->arrow == 1 || data->arrow == 3)
+        if ((data->arrow == 1 || data->arrow == 3) && m_arrowImages[2])
             area.setTop(area.top() + m_arrowImages[2]->height());
-        if (data->arrow == 2 || data->arrow == 3)
+        if ((data->arrow == 2 || data->arrow == 3) && m_arrowImages[3])
             area.setBottom(area.bottom() - m_arrowImages[3]->height());
     }
     else
     {
-        if (data->arrow == 1 || data->arrow == 3)
+        if ((data->arrow == 1 || data->arrow == 3) && m_arrowImages[0])
             area.setLeft(area.left() + m_arrowImages[0]->width());
-        if (data->arrow == 2 || data->arrow == 3)
+        if ((data->arrow == 2 || data->arrow == 3) && m_arrowImages[1])
             area.setRight(area.right() - m_arrowImages[1]->width());
     }
 
