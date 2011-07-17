@@ -351,10 +351,6 @@ void EditMetadataDialog::fillWidgets()
     //  with all available videos.
     //
 
-    bool trip_catch = false;
-    QString caught_name = "";
-    int possible_starting_point = 0;
-
     button = new MythUIButtonListItem(m_childList,tr("None"));
 
     // TODO: maybe make the title list have the same sort order
@@ -366,61 +362,23 @@ void EditMetadataDialog::fillWidgets()
     for (VideoMetadataListManager::metadata_list::const_iterator p = mdl.begin();
             p != mdl.end(); ++p)
     {
-        tc.push_back(std::make_pair((*p)->GetID(), (*p)->GetTitle()));
+        QString title;
+        if ((*p)->GetSeason() > 0 || (*p)->GetEpisode() > 0)
+            title = QString("%1 %2x%3").arg((*p)->GetTitle())
+                                       .arg(QString::number((*p)->GetSeason()))
+                                       .arg(QString::number((*p)->GetEpisode()));
+        else
+            title = (*p)->GetTitle();
+        tc.push_back(std::make_pair((*p)->GetID(), title));
     }
     std::sort(tc.begin(), tc.end(), title_sort<title_list::value_type>());
 
     for (title_list::const_iterator p = tc.begin(); p != tc.end(); ++p)
     {
-        if (trip_catch)
-        {
-            //
-            //  Previous loop told us to check if the two
-            //  movie names are close enough to try and
-            //  set a default starting point.
-            //
-
-            QString target_name = p->second;
-            int length_compare = 0;
-            if (target_name.length() < caught_name.length())
-            {
-                length_compare = target_name.length();
-            }
-            else
-            {
-                length_compare = caught_name.length();
-            }
-
-            QString caught_name_three_quarters =
-                    caught_name.left((int)(length_compare * 0.75));
-            QString target_name_three_quarters =
-                    target_name.left((int)(length_compare * 0.75));
-
-            if (caught_name_three_quarters == target_name_three_quarters &&
-                m_workingMetadata->GetChildID() == -1 &&
-                !(m_workingMetadata->GetSeason() > 0) &&
-                !(m_workingMetadata->GetEpisode() > 0))
-            {
-                possible_starting_point = p->first;
-                m_workingMetadata->SetChildID(possible_starting_point);
-            }
-            trip_catch = false;
-        }
-
         if (p->first != m_workingMetadata->GetID())
         {
             button = new MythUIButtonListItem(m_childList,p->second);
             button->SetData(p->first);
-        }
-        else
-        {
-            //
-            //  This is the current file. Set a flag so the default
-            //  selected child will be set next loop
-            //
-
-            trip_catch = true;
-            caught_name = p->second;
         }
     }
 
@@ -428,11 +386,6 @@ void EditMetadataDialog::fillWidgets()
     {
         m_childList->SetValueByData(m_workingMetadata->GetChildID());
         cachedChildSelection = m_workingMetadata->GetChildID();
-    }
-    else
-    {
-        m_childList->SetValueByData(possible_starting_point);
-        cachedChildSelection = possible_starting_point;
     }
 
     if (m_workingMetadata->GetBrowse())
