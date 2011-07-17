@@ -18,7 +18,6 @@ class MythUIButtonListItem;
 class MythUICheckBox;
 class MythUISearchDialog;
 
-
 class EditMetadataCommon : public MythScreenType
 {
     Q_OBJECT
@@ -81,6 +80,7 @@ class EditMetadataDialog : public EditMetadataCommon
     void setCompArtist(QString compArtist);
     void setAlbum(QString album);
     void setGenre(QString genre);
+    void ratingSpinChanged(MythUIButtonListItem *item);
 
     void artistLostFocus(void);
     void albumLostFocus(void);
@@ -102,6 +102,8 @@ class EditMetadataDialog : public EditMetadataCommon
     void updateAlbumImage(void);
     void updateGenreImage(void);
 
+    void updateRating(void);
+
     void searchForArtistImages(void);
     void searchForGenreImages(void);
 
@@ -116,6 +118,7 @@ class EditMetadataDialog : public EditMetadataCommon
 
     MythUISpinBox     *m_yearSpin;
     MythUISpinBox     *m_trackSpin;
+    MythUISpinBox     *m_ratingSpin;
 
     MythUIStateType   *m_ratingState;
     MythUIButton      *m_incRatingButton;

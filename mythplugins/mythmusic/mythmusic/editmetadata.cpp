@@ -128,6 +128,10 @@ void EditMetadataCommon::updateMetadata()
     if (spin)
         m_metadata->setTrack(spin->GetIntValue());
 
+    spin = dynamic_cast<MythUISpinBox *>(GetChild("ratingspin"));
+    if (spin)
+        m_metadata->setRating(spin->GetIntValue());
+
     MythUICheckBox *check = dynamic_cast<MythUICheckBox *>(GetChild("compilationcheck"));
     if (check)
         m_metadata->setCompilation(check->GetBooleanCheckState());
@@ -345,9 +349,11 @@ bool EditMetadataDialog::Create(void)
     UIUtilW::Assign(this, m_albumIcon,      "albumicon",      &err);
     UIUtilW::Assign(this, m_genreIcon,      "genreicon",      &err);
 
-    UIUtilE::Assign(this, m_ratingState,      "ratingstate",      &err);
-    UIUtilE::Assign(this, m_incRatingButton,  "incratingbutton",  &err);
-    UIUtilE::Assign(this, m_decRatingButton,  "decratingbutton",  &err);
+    UIUtilW::Assign(this, m_ratingState,      "ratingstate",      &err);
+    UIUtilW::Assign(this, m_ratingSpin,       "ratingspin",       &err);
+
+    UIUtilW::Assign(this, m_incRatingButton,  "incratingbutton",  &err);
+    UIUtilW::Assign(this, m_decRatingButton,  "decratingbutton",  &err);
 
     UIUtilE::Assign(this, m_compilationCheck, "compilationcheck", &err);
 
@@ -362,6 +368,13 @@ bool EditMetadataDialog::Create(void)
     m_yearSpin->SetRange(0, 9999, 1);
     m_trackSpin->SetRange(0, 9999, 1);
 
+    if (m_ratingSpin)
+    {
+        m_ratingSpin->SetRange(0, 10, 1);
+        connect(m_ratingSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
+                SLOT(ratingSpinChanged(MythUIButtonListItem*)));
+    }
+
     connect(m_artistEdit, SIGNAL(LosingFocus()), SLOT(artistLostFocus()));
     connect(m_albumEdit, SIGNAL(LosingFocus()), SLOT(albumLostFocus()));
     connect(m_genreEdit, SIGNAL(LosingFocus()), SLOT(genreLostFocus()));
@@ -371,8 +384,11 @@ bool EditMetadataDialog::Create(void)
     connect(m_searchAlbumButton, SIGNAL(Clicked()), SLOT(searchAlbum()));
     connect(m_searchGenreButton, SIGNAL(Clicked()), SLOT(searchGenre()));
 
-    connect(m_incRatingButton, SIGNAL(Clicked()), SLOT(incRating()));
-    connect(m_decRatingButton, SIGNAL(Clicked()), SLOT(decRating()));
+    if (m_incRatingButton && m_decRatingButton)
+    {
+        connect(m_incRatingButton, SIGNAL(Clicked()), SLOT(incRating()));
+        connect(m_decRatingButton, SIGNAL(Clicked()), SLOT(decRating()));
+    }
 
     connect(m_compilationCheck, SIGNAL(toggled(bool)), SLOT(checkClicked(bool)));
 
@@ -412,8 +428,9 @@ void EditMetadataDialog::fillWidgets()
     m_titleEdit->SetText(m_metadata->Title());
     m_yearSpin->SetValue(m_metadata->Year());
     m_trackSpin->SetValue(m_metadata->Track());
-    m_ratingState->DisplayState(QString("%1").arg(m_metadata->Rating()));
     m_compilationCheck->SetCheckState(m_metadata->Compilation());
+
+    updateRating();
 
     updateArtistImage();
     updateAlbumImage();
@@ -423,13 +440,34 @@ void EditMetadataDialog::fillWidgets()
 void EditMetadataDialog::incRating(void)
 {
     m_metadata->incRating();
-    m_ratingState->DisplayState(QString("%1").arg(m_metadata->Rating()));
+    updateRating();
 }
 
 void EditMetadataDialog::decRating(void)
 {
     m_metadata->decRating();
-    m_ratingState->DisplayState(QString("%1").arg(m_metadata->Rating()));
+    updateRating();
+}
+
+void EditMetadataDialog::ratingSpinChanged(MythUIButtonListItem *item)
+{
+    if (item)
+    {
+        int rating = qVariantValue<int>(item->GetData());
+        m_metadata->setRating(rating);
+
+        if (m_ratingState)
+            m_ratingState->DisplayState(QString("%1").arg(m_metadata->Rating()));
+    }
+}
+
+void EditMetadataDialog::updateRating(void)
+{
+    if (m_ratingState)
+        m_ratingState->DisplayState(QString("%1").arg(m_metadata->Rating()));
+
+    if (m_ratingSpin)
+        m_ratingSpin->SetValue(m_metadata->Rating());
 }
 
 bool EditMetadataDialog::keyPressEvent(QKeyEvent *event)
