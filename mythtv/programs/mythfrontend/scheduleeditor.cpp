@@ -1777,16 +1777,45 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         if (list.count() > 1)
         {
+            int yearindex = -1;
+
             for (int p = 0; p != list.size(); ++p)
             {
-                if (m_recordingRule->m_seriesid == (list[p])->GetTMSref())
+                if (!m_recordingRule->m_seriesid.isEmpty() &&
+                    m_recordingRule->m_seriesid == (list[p])->GetTMSref())
                 {
                     MetadataLookup *lookup = list.takeAt(p);
                     QueryComplete(lookup);
+                    qDeleteAll(list);
                     return;
+                }
+                else if (m_recInfo->GetYearOfInitialRelease() != 0 &&
+                         (list[p])->GetYear() != 0 &&
+                         m_recInfo->GetYearOfInitialRelease() == (list[p])->GetYear())
+                {
+                    if (yearindex > -1)
+                    {
+                        LOG(VB_GENERAL, LOG_INFO, "Multiple results matched on year. No definite "
+                                      "match could be found based on year alone.");
+                        yearindex = -2;
+                    }
+                    else if (yearindex == -1)
+                    {
+                        LOG(VB_GENERAL, LOG_INFO, "Matched based on year. ");
+                        yearindex = p;
+                    }
                 }
             }
 
+            if (yearindex > -1)
+            {
+                MetadataLookup *lookup = list.takeAt(yearindex);
+                QueryComplete(lookup);
+                qDeleteAll(list);
+                return;
+            }
+
+            LOG(VB_GENERAL, LOG_INFO, "Falling through to selection dialog.");
             MetadataResultsDialog *resultsdialog =
                   new MetadataResultsDialog(m_popupStack, list);
 
