@@ -753,11 +753,20 @@ void EditMetadataDialog::customEvent(QEvent *event)
             if (resulttext == tr("Edit Albumart Images"))
                 switchToAlbumArt();
             else if (resulttext == tr("Search Internet For Genre Image"))
+            {
+                updateMetadata();
                 searchForGenreImages();
+            }
             else if (resulttext == tr("Search Internet For Artist Image"))
+            {
+                updateMetadata();
                 searchForArtistImages();
+            }
             else if (resulttext == tr("Search Internet For Album Image"))
+            {
+                updateMetadata();
                 searchForAlbumImages();
+            }
         }
     }
     else if (event->type() == MythEvent::MythEventMessage)
