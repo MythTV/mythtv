@@ -1521,6 +1521,10 @@ void GuideGrid::updateChannels(void)
 
         item->SetText(chinfo->GetFormatted(m_channelFormat), "buttontext", state);
 
+        InfoMap infomap;
+        chinfo->ToMap(infomap);
+        item->SetTextFromMap(infomap);
+        
         if (chinfo && !chinfo->icon.isEmpty())
         {
             if (chinfo->CacheChannelIcon())
@@ -1567,6 +1571,7 @@ void GuideGrid::updateInfo(void)
         }
     }
 
+    chinfo->ToMap(infoMap);
     pginfo->ToMap(infoMap);
     SetTextFromMap(infoMap);
 
