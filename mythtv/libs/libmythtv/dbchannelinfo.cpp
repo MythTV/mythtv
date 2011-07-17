@@ -62,7 +62,7 @@ void DBChannel::ToMap(InfoMap& infoMap) const
     infoMap["channelnumber"] = channum;
     infoMap["callsign"] = callsign;
     infoMap["channelname"] = name;
-    infoMap["channelicon"] = icon;
+    infoMap["channeliconpath"] = icon;
     infoMap["channelid"] = QString().setNum(chanid);
     infoMap["majorchan"] = QString().setNum(major_chan);
     infoMap["minorchan"] = QString().setNum(minor_chan);
@@ -93,7 +93,7 @@ QString ChannelInfo::GetFormatted(const QString &format) const
 void ChannelInfo::ToMap(InfoMap& infoMap) const
 {
     infoMap["callsign"] = callsign;
-    infoMap["channelicon"] = iconpath;
+    infoMap["channeliconpath"] = iconpath;
     infoMap["chanstr"] = chanstr;
     infoMap["channelname"] = channame;
     infoMap["channelid"] = QString().setNum(chanid);
