@@ -636,7 +636,8 @@ class MythDB( DBCache ):
             airdate,    stereo,     subtitled,  hdtv,       closecaptioned,
             partnumber, parttotal,  seriesid,   showtype,   programid,
             manualid,   generic,    cast,       livetv,     basename,
-            syndicatedepisodenumber,            olderthan,  newerthan
+            syndicatedepisodenumber,            olderthan,  newerthan,
+            inetref,    season,     episode
 
         Multiple keywords can be chained as such:
             obj.searchRecorded(title='Title', commflagged=False)
@@ -662,7 +663,8 @@ class MythDB( DBCache ):
         if key in ('title','subtitle','chanid',
                         'category','hostname','autoexpire','commflagged',
                         'stars','recgroup','playgroup','duplicate',
-                        'transcoded','watched','storagegroup','basename'):
+                        'transcoded','watched','storagegroup','basename',
+                        'inetref','season','episode'):
             return ('recorded.%s=%%s' % key, value, 0)
 
         # time matches
@@ -699,7 +701,7 @@ class MythDB( DBCache ):
         Supports the following keywords:
             title,      subtitle,   chanid,     starttime,  endtime,
             category,   seriesid,   programid,  station,    duplicate,
-            generic,    recstatus
+            generic,    recstatus,  inetref,    season,     episode
         """
 
         if init:
@@ -708,11 +710,42 @@ class MythDB( DBCache ):
 
         if key in ('title','subtitle','chanid',
                         'category','seriesid','programid','station',
-                        'duplicate','generic','recstatus'):
+                        'duplicate','generic','recstatus','inetref',
+                        'season','episode'):
             return ('oldrecorded.%s=%%s' % key, value, 0)
                 # time matches
         if key in ('starttime','endtime'):
             return ('oldrecorded.%s=%%s' % key, datetime.duck(value), 0)
+        return None
+
+    @databaseSearch
+    def searchArtwork(self, init=False, key=None, value=None):
+        """
+        obj.searchArtwork(**kwargs) -> list of RecordedArtwork objects
+
+        Supports the following keywords:
+            inetref,    season,     host,   chanid,     starttime
+            title,      subtitle
+        """
+
+        if init:
+            # table and join descriptor
+            init.table = 'recordedartwork'
+            init.handler = RecordedArtwork
+            init.joins = (init.Join(table='recorded',
+                                    tableto='recordedartwork',
+                                    fieldsfrom=('inetref','season','hostname'),
+                                    fieldsto=('inetref','season','host')),)
+
+        if key in ('inetref', 'season', 'host'):
+            return ('recordedartwork.%s=%%s' % key, value, 0)
+
+        if key in ('chanid', 'title', 'subtitle'):
+            return ('recorded.%s=%%s' % key, value, 1)
+
+        if key == 'starttime':
+            return ('recorded.%s=%%s' % key, datetime.duck(value), 1)
+
         return None
 
     @databaseSearch
@@ -808,7 +841,8 @@ class MythDB( DBCache ):
         Supports the following keywords:
             type,       chanid,     starttime,  startdate,  endtime
             enddate,    title,      subtitle,   category,   profile
-            recgroup,   station,    seriesid,   programid,  playgroup
+            recgroup,   station,    seriesid,   programid,  playgroup,
+            inetref
         """
         if init:
             init.table = 'record'
@@ -816,7 +850,7 @@ class MythDB( DBCache ):
 
         if key in ('type','chanid','starttime','startdate','endtime','enddate',
                         'title','subtitle','category','profile','recgroup',
-                        'station','seriesid','programid','playgroup'):
+                        'station','seriesid','programid','playgroup','inetref'):
             return ('%s=%%s' % key, value, 0)
         return None
 

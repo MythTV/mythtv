@@ -25,8 +25,9 @@ class Record( DBDataWrite, RECTYPE, CMPRecord ):
                  'title':u'Unknown', 'subtitle':'',      'description':'',
                  'category':'',      'station':'',       'seriesid':'',
                  'search':0,         'last_record':datetime(1900,1,1),
-                 'next_record':datetime(1900,1,1),
-                 'last_delete':datetime(1900,1,1)}
+                 'inetref':'',       'next_record':datetime(1900,1,1),
+                 'season':0,         'last_delete':datetime(1900,1,1),
+                 'episode':0}
 
     def __str__(self):
         if self._wheredat is None:
@@ -143,7 +144,8 @@ class Recorded( DBDataWrite, CMPRecord ):
                  'findid':0,         'deletepending':0,      'transcoder':0,
                  'timestretch':1,    'recpriority':0,        'playgroup':'Default',
                  'profile':'No',     'duplicate':1,          'transcoded':0,
-                 'watched':0,        'storagegroup':'Default'}
+                 'watched':0,        'storagegroup':'Default',
+                 'inetref':'',       'season':0,            'episode':0}
 
     class _Cast( DBDataCRef ):
         _table = ['recordedcredits','people']
@@ -424,7 +426,8 @@ class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
                  'category':'',  'seriesid':'',      'programid':'',
                  'findid':0,     'recordid':0,       'station':'',
                  'rectype':0,    'duplicate':0,      'recstatus':-3,
-                 'reactivate':0, 'generic':0,        'future':None}
+                 'reactivate':0, 'generic':0,        'future':None,
+                 'inetref':'',   'season':0,         'episode':0}
 
     def __str__(self):
         if self._wheredat is None:
@@ -461,6 +464,23 @@ class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
     def delete(self):
         """OldRecorded entries cannot be deleted"""
         return
+
+class RecordedArtwork( DBDataWrite ):
+    """
+    RecordedArtwork(data=None, db=None)
+    """
+    _key = ('inetref', 'season', 'host')
+    _defaults = {'inetref':'',      'season':0,     'host':'',
+                 'coverart':'',     'fanart':'',    'banner':''}
+
+    def __str__(self):
+        if self._wheredat is None:
+            return u"<Uninitialized Artwork at %s>" % hex(id(self))
+        return u"<Channel '%s','%d' at %s>" % \
+                        (self.inetref, self.season, hex(id(self)))
+
+    def __repr__(self):
+        return str(self).encode('utf-8')
 
 class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
     """
