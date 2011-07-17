@@ -170,7 +170,7 @@ bool MythUIGuideGrid::ParseElement(
     }
     else if (element.tagName() == "multiline")
     {
-        m_multilineText = parseBool(element);
+        SetMultiLine(parseBool(element));
     }
     else if (element.tagName() == "textoffset")
     {
@@ -679,4 +679,13 @@ void MythUIGuideGrid::SetProgPast(int ppast)
         m_progPastCol = m_Area.x() + (m_Area.width() * ppast / 100);
 
     SetRedraw();
+}
+
+void MythUIGuideGrid::SetMultiLine(bool multiline)
+{
+    m_multilineText = multiline;
+    if (m_multilineText)
+        m_justification |= Qt::TextWordWrap;
+    else
+        m_justification &= ~Qt::TextWordWrap;
 }
