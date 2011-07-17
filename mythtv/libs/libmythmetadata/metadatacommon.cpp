@@ -480,6 +480,9 @@ QDomDocument CreateMetadataXML(ProgramInfo *pginfo)
     if (lookup)
         doc = CreateMetadataXML(lookup);
 
+    delete lookup;
+    lookup = NULL;
+
     return doc;
 }
 
