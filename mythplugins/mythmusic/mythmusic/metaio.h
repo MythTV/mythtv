@@ -79,6 +79,14 @@ class MetaIO
         return false;
     }
 
+    virtual bool changeImageType(const QString &filename, const AlbumArtImage *albumart, ImageType newType)
+    {
+        (void)filename;
+        (void)albumart;
+        (void)newType;
+        return false;
+    }
+
     virtual QImage *getAlbumArt(QString filename, ImageType type)
     {
         (void)filename;

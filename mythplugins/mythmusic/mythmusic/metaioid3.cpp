@@ -583,6 +583,81 @@ bool MetaIOID3::removeAlbumArt(const QString &filename, const AlbumArtImage *alb
     return true;
 }
 
+bool MetaIOID3::changeImageType(const QString &filename, const AlbumArtImage* albumart,
+                                ImageType newType)
+{
+    if (!albumart)
+        return false;
+
+    if (albumart->imageType == newType)
+        return true;
+
+    AttachedPictureFrame::Type type = AttachedPictureFrame::Other;
+    switch (albumart->imageType)
+    {
+        case IT_FRONTCOVER:
+            type = AttachedPictureFrame::FrontCover;
+            break;
+        case IT_BACKCOVER:
+            type = AttachedPictureFrame::BackCover;
+            break;
+        case IT_CD:
+            type = AttachedPictureFrame::Media;
+            break;
+        case IT_INLAY:
+            type = AttachedPictureFrame::LeafletPage;
+            break;
+        default:
+            type = AttachedPictureFrame::Other;
+            break;
+    }
+
+    TagLib::MPEG::File *mpegfile = OpenFile(filename);
+
+    if (!mpegfile)
+        return false;
+
+    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+
+    if (!tag)
+    {
+        delete mpegfile;
+        return false;
+    }
+
+    AttachedPictureFrame *apic = findAPIC(tag, type, QStringToTString(albumart->description));
+    if (!apic)
+    {
+        delete mpegfile;
+        return false;
+    }
+
+    // set the new image type
+    switch (newType)
+    {
+        case IT_FRONTCOVER:
+            apic->setType(AttachedPictureFrame::FrontCover);
+            break;
+        case IT_BACKCOVER:
+            apic->setType(AttachedPictureFrame::BackCover);
+            break;
+        case IT_CD:
+            apic->setType(AttachedPictureFrame::Media);
+            break;
+        case IT_INLAY:
+            apic->setType(AttachedPictureFrame::LeafletPage);
+            break;
+        default:
+            apic->setType(AttachedPictureFrame::Other);
+            break;
+    }
+
+    mpegfile->save();
+    delete mpegfile;
+
+    return true;
+}
+
 /*!
  * \brief Find the a custom comment tag by description.
  *        This is a copy of the same function in the

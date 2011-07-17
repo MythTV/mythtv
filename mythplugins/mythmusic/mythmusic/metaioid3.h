@@ -51,6 +51,8 @@ class MetaIOID3 : public MetaIOTagLib
 
     bool supportsEmbeddedImages(void) { return true; }
 
+    bool changeImageType(const QString &filename, const AlbumArtImage *albumart, ImageType newType);
+
   private:
     TagLib::MPEG::File *OpenFile(const QString &filename);
 
