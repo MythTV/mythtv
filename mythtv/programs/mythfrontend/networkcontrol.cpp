@@ -643,10 +643,23 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             QString message = QString("NETWORK_CONTROL %1 PROGRAM %2 %3 %4")
                                       .arg(action).arg(nc->getArg(2))
                                       .arg(nc->getArg(3).toUpper()).arg(clientID);
+
+            result.clear();
+            gotAnswer = false;
+            QTime timer;
+            timer.start();
+
             MythEvent me(message);
             gCoreContext->dispatch(me);
 
-            result.clear();
+            while (timer.elapsed() < 2000 && !gotAnswer)
+                usleep(10000);
+
+            if (gotAnswer)
+                result += answer;
+            else
+                result = "ERROR: Timed out waiting for reply from player";
+
         }
         else
         {
@@ -1279,20 +1292,11 @@ void NetworkControl::customEvent(QEvent *e)
             else if ((tokens.size() >= 4) &&
                      (tokens[1] == "RESPONSE"))
             {
-                int clientID = tokens[2].toInt();
-                QString response = tokens[3];
+//                int clientID = tokens[2].toInt();
+                answer = tokens[3];
                 for (int i = 4; i < tokens.size(); i++)
-                    response += QString(" ") + tokens[i];
-
-                clientLock.lock();
-                NetworkControlClient *ncc = clients.at(clientID);
-                clientLock.unlock();
-
-                nrLock.lock();
-                networkControlReplies.push_back(new NetworkCommand(ncc, response));
-                nrLock.unlock();
-
-                notifyDataAvailable();
+                    answer += QString(" ") + tokens[i];
+                gotAnswer = true;
             }
         }
     }
