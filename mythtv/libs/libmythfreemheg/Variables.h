@@ -205,14 +205,17 @@ class MHDivide: public MHIntegerAction {
   public:
     MHDivide(): MHIntegerAction(":Divide") {}
   protected:
-    virtual int DoOp(int arg1, int arg2) { return arg1/arg2; } // What about divide by zero?
+    virtual int DoOp(int arg1, int arg2) {
+        if (arg2 == 0) throw "Divide by 0";
+        return arg1/arg2;
+    }
 };
 
 class MHModulo: public MHIntegerAction {
   public:
     MHModulo(): MHIntegerAction(":Modulo") {}
   protected:
-    virtual int DoOp(int arg1, int arg2) { return arg1%arg2; } // What about divide by zero?
+    virtual int DoOp(int arg1, int arg2) { return arg2 ? arg1%arg2 : 0; }
 };
 
 // Append - 
