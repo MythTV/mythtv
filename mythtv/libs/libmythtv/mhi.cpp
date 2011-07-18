@@ -1495,6 +1495,22 @@ void MHIBitmap::CreateFromPNG(const unsigned char *data, int length)
     m_opaque = ! m_image.hasAlphaChannel();
 }
 
+// Create a bitmap from JPEG.
+//virtual
+void MHIBitmap::CreateFromJPEG(const unsigned char *data, int length)
+{
+    m_image = QImage();
+
+    if (!m_image.loadFromData(data, length, "JPG"))
+    {
+        m_image = QImage();
+        return;
+    }
+
+    // Assume that if it has an alpha buffer then it's partly transparent.
+    m_opaque = ! m_image.hasAlphaChannel();
+}
+
 // Convert an MPEG I-frame into a bitmap.  This is used as the way of
 // sending still pictures.  We convert the image to a QImage even
 // though that actually means converting it from YUV and eventually

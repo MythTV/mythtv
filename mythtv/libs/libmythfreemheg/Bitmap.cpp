@@ -169,7 +169,10 @@ void MHBitmap::CreateContent(const unsigned char *data, int length, MHEngine *en
     {
         m_pContent->CreateFromMPEG(data, length);
     }
-
+    else if (nCHook == 6) // JPEG ISO/IEC 10918-1, JFIF file
+    {
+        m_pContent->CreateFromJPEG(data, length);
+    }
     else
     {
         // 1,3,5,8 are reserved. 7= H.264 Intra Frame
