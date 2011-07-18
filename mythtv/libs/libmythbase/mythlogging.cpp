@@ -451,13 +451,16 @@ void DBLoggerThread::run(void)
 bool DatabaseLogger::isDatabaseReady()
 {
     bool ready = false;
-    MythDB *db;
+    MythDB *db = GetMythDB();
 
-    if ( !m_loggingTableExists )
-        m_loggingTableExists = tableExists(m_handle.string);
+    if ((db) && db->HaveValidDatabase())
+    {
+        if ( !m_loggingTableExists )
+            m_loggingTableExists = tableExists(m_handle.string);
 
-    if ( m_loggingTableExists && (db = GetMythDB()) && db->HaveValidDatabase() )
-        ready = true;
+        if ( m_loggingTableExists )
+            ready = true;
+    }
 
     return ready;
 }
