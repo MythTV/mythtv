@@ -1672,7 +1672,7 @@
                 </state>
                 <state name="selected" from="active">
                     <shape name="background">
-                        <fill alpha="255" />
+                        <fill color="#FFFFFF" alpha="255" />
                     </shape>
                 </state>
                 <state name="inactive" from="active" />
@@ -1706,7 +1706,7 @@
                 </state>
                 <state name="selected" from="active">
                     <shape name="background">
-                        <fill alpha="255" />
+                        <fill color="#FFFFFF" alpha="255" />
                     </shape>
                 </state>
                 <state name="inactive" from="active" />
