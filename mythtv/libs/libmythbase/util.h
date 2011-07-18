@@ -37,11 +37,11 @@ class QFile;
                        kSimplify = 16
                       } MBASE_PUBLIC;
  MBASE_PUBLIC  QString MythDateTimeToString(const QDateTime &datetime,
-                                        DateTimeFormat format = kDateTimeFull);
+                                            uint format = kDateTimeFull);
  MBASE_PUBLIC  QString MythDateToString(const QDate &date,
-                                        DateTimeFormat format = kDateFull);
+                                        uint format = kDateFull);
  MBASE_PUBLIC  QString MythTimeToString(const QTime &time,
-                                        DateTimeFormat format = kTime);
+                                        uint format = kTime);
  
  MBASE_PUBLIC  bool getUptime(time_t &uptime);
  MBASE_PUBLIC  bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);

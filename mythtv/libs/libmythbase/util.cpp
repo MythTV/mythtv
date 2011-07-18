@@ -85,7 +85,7 @@ QDateTime myth_dt_from_string(const QString &dtstr)
  *                  Today/Yesterday/Tomorrow if applicable otherwise no changes
  *                  are made
  */
-QString MythDateTimeToString(const QDateTime& datetime, DateTimeFormat format)
+QString MythDateTimeToString(const QDateTime& datetime, uint format)
 {
     QString result;
 
@@ -109,7 +109,7 @@ QString MythDateTimeToString(const QDateTime& datetime, DateTimeFormat format)
  *  \param date     The QDate object to use
  *  \param format   The format of the string to return
  */
-QString MythDateToString(const QDate& date, DateTimeFormat format)
+QString MythDateToString(const QDate& date, uint format)
 {
     QString result;
 
@@ -144,7 +144,7 @@ QString MythDateToString(const QDate& date, DateTimeFormat format)
  *  \param time     The QTime object to use
  *  \param format   The format of the string to return
  */
-QString MythTimeToString(const QTime& time, DateTimeFormat format)
+QString MythTimeToString(const QTime& time, uint format)
 {
     QString result;
 
