@@ -76,6 +76,87 @@ QDateTime myth_dt_from_string(const QString &dtstr)
     return QDateTime::fromString(dtstr, Qt::ISODate);
 }
 
+/** \fn MythDateTimeToString
+ *  \brief Returns a formatted QString based on the supplied QDateTime
+ * 
+ *  \param datetime The QDateTime object to use
+ *  \param format   The format of the string to return
+ *  \param simplify If true then full dates will be simplified to
+ *                  Today/Yesterday/Tomorrow if applicable otherwise no changes
+ *                  are made
+ */
+QString MythDateTimeToString(const QDateTime& datetime, DateTimeFormat format)
+{
+    QString result;
+
+    if (format & (kDateFull | kDateShort))
+        result += MythDateToString(datetime.date(), format);
+
+    if (format & kTime)
+    {
+        if (!result.isEmpty())
+            result.append(", ");
+        
+        result += MythTimeToString(datetime.time(), format);
+    }
+    
+    return result;
+}
+
+/** \fn MythDateToString
+ *  \brief Returns a formatted QString based on the supplied QDate
+ * 
+ *  \param date     The QDate object to use
+ *  \param format   The format of the string to return
+ */
+QString MythDateToString(const QDate& date, DateTimeFormat format)
+{
+    QString result;
+
+    if (format & (kDateFull | kDateShort))
+    {
+        QDate now = QDate::currentDate();
+
+        if (format & kDateShort)
+        {
+            QString shortformat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
+            result = date.toString(shortformat);
+        }
+        else if ((format & kSimplify) && (now == date))
+            result = QObject::tr("Today");
+        else if ((format & kSimplify) && (now.addDays(-1) == date))
+            result = QObject::tr("Yesterday");
+        else if ((format & kSimplify) && (now.addDays(1) == date))
+            result = QObject::tr("Tomorrow");
+        else if (format & kDateFull)
+        {
+            QString fullformat = gCoreContext->GetSetting("DateFormat", "ddd d MMMM");
+            result = date.toString(fullformat);
+        }
+    }
+    
+    return result;
+}
+
+/** \fn MythTimeToString
+ *  \brief Returns a formatted QString based on the supplied QTime
+ * 
+ *  \param time     The QTime object to use
+ *  \param format   The format of the string to return
+ */
+QString MythTimeToString(const QTime& time, DateTimeFormat format)
+{
+    QString result;
+
+    if (format & kTime)
+    {
+        QString timeformat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+        result = time.toString(timeformat);
+    }    
+    
+    return result;
+}
+
 int calc_utc_offset(void)
 {
     QDateTime loc = QDateTime::currentDateTime();
