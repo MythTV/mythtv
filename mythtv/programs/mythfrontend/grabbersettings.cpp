@@ -46,7 +46,7 @@ bool GrabberSettings::Create()
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
     if (!m_movieGrabberButtonList || !m_tvGrabberButtonList ||
-        !m_gameGrabberButtonList ||!m_okButton || !m_cancelButton)
+        !m_gameGrabberButtonList || !m_dailyUpdatesCheck || !m_okButton || !m_cancelButton)
     {
         LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
@@ -61,8 +61,7 @@ bool GrabberSettings::Create()
     m_okButton->SetHelpText(tr("Save your changes and close this window."));
     m_cancelButton->SetHelpText(tr("Discard your changes and close this window."));
 
-    if (m_dailyUpdatesCheck)
-        m_dailyUpdatesCheck->SetHelpText(tr("If set, the backend will attempt to "
+    m_dailyUpdatesCheck->SetHelpText(tr("If set, the backend will attempt to "
                             "perform artwork updates for recordings daily. When "
                             "new seasons begin to record, this will attempt to "
                             "provide you with fresh, relevant artwork while "
@@ -257,13 +256,10 @@ void GrabberSettings::Init(void)
     m_tvGrabberButtonList->SetValueByData(qVariantFromValue(currentTVGrabber));
     m_gameGrabberButtonList->SetValueByData(qVariantFromValue(currentGameGrabber));
 
-    if (m_dailyUpdatesCheck)
-    {
-        int updates =
-            gCoreContext->GetNumSetting("DailyArtworkUpdates", 1);
-        if (updates == 1)
-            m_dailyUpdatesCheck->SetCheckState(MythUIStateType::Full);
-    }
+    int updates =
+        gCoreContext->GetNumSetting("DailyArtworkUpdates", 1);
+    if (updates == 1)
+        m_dailyUpdatesCheck->SetCheckState(MythUIStateType::Full);
 }
 
 void GrabberSettings::slotSave(void)
@@ -272,13 +268,10 @@ void GrabberSettings::slotSave(void)
     gCoreContext->SaveSettingOnHost("MovieGrabber", m_movieGrabberButtonList->GetDataValue().toString(), "");
     gCoreContext->SaveSetting("mythgame.MetadataGrabber", m_gameGrabberButtonList->GetDataValue().toString());
 
-    if (m_dailyUpdatesCheck)
-    {
-        int dailyupdatestate = 0;
-        if (m_dailyUpdatesCheck->GetCheckState() == MythUIStateType::Full)
-            dailyupdatestate = 1;
-        gCoreContext->SaveSetting("DailyArtworkUpdates", dailyupdatestate);
-    }
+    int dailyupdatestate = 0;
+    if (m_dailyUpdatesCheck->GetCheckState() == MythUIStateType::Full)
+        dailyupdatestate = 1;
+    gCoreContext->SaveSetting("DailyArtworkUpdates", dailyupdatestate);
 
     Close();
 }

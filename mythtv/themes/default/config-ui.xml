@@ -435,6 +435,12 @@
             <value>Game Metadata Source:</value>
         </textarea>
 
+        <textarea name="dailyupdates_text" from="basetextarea">
+            <area>330,365,500,40</area>
+            <value>Perform daily updates of recording artwork</value>
+            <align>left,vcenter</align>
+        </textarea>
+
     <!--Widgets-->
 
         <buttonlist name="moviegrabber" from="basewideselector">
@@ -448,6 +454,10 @@
         <buttonlist name="gamegrabber" from="basewideselector">
             <position>310,297</position>
         </buttonlist>
+
+        <checkbox name="dailyupdates" from="basecheckbox">
+            <position>290,370</position>
+        </checkbox>
 
         <button name="cancel" from="basebutton">
             <position>188,530</position>
