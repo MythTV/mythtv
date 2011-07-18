@@ -127,10 +127,8 @@ void MHBitmap::ContentPreparation(MHEngine *engine)
         MHERROR("Bitmap must contain a content");
     }
 
-    if (m_ContentType == IN_IncludedContent) // We can't handle included content at the moment.
-    {
-        MHERROR("Included content in bitmap is not implemented");
-    }
+    if (m_ContentType == IN_IncludedContent)
+        CreateContent(m_IncludedContent.Bytes(), m_IncludedContent.Size(), engine);
 }
 
 // Decode the content.
@@ -142,6 +140,15 @@ void MHBitmap::ContentArrived(const unsigned char *data, int length, MHEngine *e
     {
         return;    // Shouldn't happen.
     }
+
+    CreateContent(data, length, engine);
+    // Now signal that the content is available.
+    engine->EventTriggered(this, EventContentAvailable);
+}
+
+void MHBitmap::CreateContent(const unsigned char *data, int length, MHEngine *engine)
+{
+    QRegion updateArea = GetVisibleArea(); // If there's any content already we have to redraw it.
 
     int nCHook = m_nContentHook;
 
@@ -165,16 +172,13 @@ void MHBitmap::ContentArrived(const unsigned char *data, int length, MHEngine *e
 
     else
     {
+        // 1,3,5,8 are reserved. 7= H.264 Intra Frame
         MHERROR(QString("Unknown bitmap content hook %1").arg(nCHook));
     }
 
     updateArea += GetVisibleArea(); // Redraw this bitmap.
     engine->Redraw(updateArea); // Mark for redrawing
-
-    // Now signal that the content is available.
-    engine->EventTriggered(this, EventContentAvailable);
 }
-
 
 
 // Set the transparency.
