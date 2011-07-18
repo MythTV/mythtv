@@ -164,32 +164,35 @@ void MHVisible::Deactivation(MHEngine *engine)
 MHRgba MHVisible::GetColour(const MHColour &colour)
 {
     int red = 0, green = 0, blue = 0, alpha = 0;
-    int cSize = colour.m_ColStr.Size();
-
-    if (cSize != 4)
+    if (colour.IsSet())
     {
-        MHLOG(MHLogWarning, QString("Colour string has length %1 not 4.").arg(cSize));
-    }
+        int cSize = colour.m_ColStr.Size();
 
-    // Just in case the length is short we handle those properly.
-    if (cSize > 0)
-    {
-        red = colour.m_ColStr.GetAt(0);
-    }
+        if (cSize != 4)
+        {
+            MHLOG(MHLogWarning, QString("Colour string has length %1 not 4.").arg(cSize));
+        }
 
-    if (cSize > 1)
-    {
-        green = colour.m_ColStr.GetAt(1);
-    }
+        // Just in case the length is short we handle those properly.
+        if (cSize > 0)
+        {
+            red = colour.m_ColStr.GetAt(0);
+        }
 
-    if (cSize > 2)
-    {
-        blue = colour.m_ColStr.GetAt(2);
-    }
+        if (cSize > 1)
+        {
+            green = colour.m_ColStr.GetAt(1);
+        }
 
-    if (cSize > 3)
-    {
-        alpha = 255 - colour.m_ColStr.GetAt(3);    // Convert transparency to alpha
+        if (cSize > 2)
+        {
+            blue = colour.m_ColStr.GetAt(2);
+        }
+
+        if (cSize > 3)
+        {
+            alpha = 255 - colour.m_ColStr.GetAt(3);    // Convert transparency to alpha
+        }
     }
 
     return MHRgba(red, green, blue, alpha);
