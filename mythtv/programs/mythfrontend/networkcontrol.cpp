@@ -27,6 +27,9 @@
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
 
+#define FE_SHORT_TO 2000
+#define FE_LONG_TO  10000
+
 static QEvent::Type kNetworkControlDataReadyEvent =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type NetworkControlCloseEvent::kEventType =
@@ -457,7 +460,7 @@ QString NetworkControl::processJump(NetworkCommand *nc)
     // depend on all Locations matching their jumppoints
     QTime timer;
     timer.start();
-    while ((timer.elapsed() < 2000) &&
+    while ((timer.elapsed() < FE_SHORT_TO) &&
            (GetMythUI()->GetCurrentLocation().toLower() != nc->getArg(1)))
         usleep(10000);
 
@@ -584,7 +587,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
             QTime timer;
             timer.start();
-            while ((timer.elapsed() < 10000) &&
+            while ((timer.elapsed() < FE_LONG_TO) &&
                    (GetMythUI()->GetCurrentLocation().toLower() != "mainmenu"))
                 usleep(10000);
         }
@@ -613,7 +616,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
             QTime timer;
             timer.start();
-            while ((timer.elapsed() < 10000) &&
+            while ((timer.elapsed() < FE_LONG_TO) &&
                    (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
                 usleep(10000);
         }
@@ -652,7 +655,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             MythEvent me(message);
             gCoreContext->dispatch(me);
 
-            while (timer.elapsed() < 2000 && !gotAnswer)
+            while (timer.elapsed() < FE_LONG_TO && !gotAnswer)
                 usleep(10000);
 
             if (gotAnswer)
@@ -698,7 +701,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
                 QTime timer;
                 timer.start();
-                while (timer.elapsed() < 2000 && !gotAnswer)
+                while (timer.elapsed() < FE_SHORT_TO && !gotAnswer)
                 {
                     qApp->processEvents();
                     usleep(10000);
@@ -718,7 +721,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
                 QTime timer;
                 timer.start();
-                while (timer.elapsed() < 2000 && !gotAnswer)
+                while (timer.elapsed() < FE_SHORT_TO && !gotAnswer)
                 {
                     qApp->processEvents();
                     usleep(10000);
@@ -895,7 +898,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
 
             QTime timer;
             timer.start();
-            while (timer.elapsed() < 2000  && !gotAnswer)
+            while (timer.elapsed() < FE_SHORT_TO  && !gotAnswer)
                 usleep(10000);
 
             if (gotAnswer)
@@ -980,7 +983,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
 
         QTime timer;
         timer.start();
-        while (timer.elapsed() < 2000  && !gotAnswer)
+        while (timer.elapsed() < FE_SHORT_TO  && !gotAnswer)
             usleep(10000);
 
         if (gotAnswer)
