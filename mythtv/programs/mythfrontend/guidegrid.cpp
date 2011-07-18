@@ -242,9 +242,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_sortReverse = gCoreContext->GetNumSetting("EPGSortReverse", 0);
     m_selectRecThreshold = gCoreContext->GetNumSetting("SelChangeRecThreshold", 16);
 
-    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-    m_dateFormat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
-
     m_channelOrdering = gCoreContext->GetSetting("ChannelOrdering", "channum");
     m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
     m_channelFormat.replace(' ', "\n");
@@ -282,6 +279,7 @@ bool GuideGrid::Create()
     UIUtilE::Assign(this, m_channelList, "channellist", &err);
     UIUtilE::Assign(this, m_guideGrid, "guidegrid", &err);
     UIUtilW::Assign(this, m_dateText, "datetext");
+    UIUtilW::Assign(this, m_longdateText, "longdatetext");
     UIUtilW::Assign(this, m_changroupname, "channelgroup");
     UIUtilW::Assign(this, m_channelImage, "channelicon");
     UIUtilW::Assign(this, m_jumpToText, "jumptotext");
@@ -1009,14 +1007,15 @@ void GuideGrid::fillTimeInfos()
         mins = 5 * (mins / 5);
         if (mins % 30 == 0)
         {
-            QString timeStr = starttime.time().toString(m_timeFormat);
+            QString timeStr = MythDateTimeToString(starttime, kTime);
             
             InfoMap infomap;
             infomap["starttime"] = timeStr;
             
             QTime endtime = starttime.time().addSecs(60 * 30);
             
-            infomap["endtime"] = endtime.toString(m_timeFormat);
+            infomap["endtime"] = MythTimeToString(endtime, kTime);
+
             MythUIButtonListItem *item = 
                                 new MythUIButtonListItem(m_timeList, timeStr);
             item->SetTextFromMap(infomap);
@@ -1454,7 +1453,10 @@ void GuideGrid::customEvent(QEvent *event)
 void GuideGrid::updateDateText(void)
 {
     if (m_dateText)
-        m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
+        m_dateText->SetText(MythDateTimeToString(m_currentStartTime, kDateShort));
+    if (m_longdateText)
+        m_longdateText->SetText(MythDateTimeToString(m_currentStartTime,
+                                                 (kDateFull | kSimplify)));
 }
 
 void GuideGrid::updateChannels(void)

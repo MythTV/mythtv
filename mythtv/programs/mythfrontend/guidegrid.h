@@ -227,8 +227,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     QRect   m_videoRect;
 
     QString m_channelOrdering;
-    QString m_dateFormat;
-    QString m_timeFormat;
 
     QTimer *m_updateTimer; // audited ref #5318
 
@@ -242,6 +240,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     MythUIButtonList *m_channelList;
     MythUIGuideGrid  *m_guideGrid;
     MythUIText       *m_dateText;
+    MythUIText       *m_longdateText;
     MythUIText       *m_jumpToText;
     MythUIText       *m_changroupname;
     MythUIImage      *m_channelImage;
