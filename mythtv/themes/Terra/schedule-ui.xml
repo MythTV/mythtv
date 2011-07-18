@@ -1307,7 +1307,7 @@
             </statetype>
         </buttonlist>
 
-        <textarea name="datetext" from="basetextarea">
+        <textarea name="longdatetext" from="basetextarea">
             <area>10,67,220,30</area>
             <multiline>yes</multiline>
             <align>hcenter</align>
