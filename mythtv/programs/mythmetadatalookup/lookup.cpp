@@ -126,9 +126,9 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
         ProgramInfo *pginfo = new ProgramInfo(*(recordingList[n]));
         bool dolookup = true;
 
-        if (!aggressive && pginfo->GetInetRef().isEmpty())
+        if (pginfo->GetInetRef().isEmpty())
             dolookup = false;
-        if (dolookup)
+        if (dolookup || aggressive)
         {
             ArtworkMap map = GetArtwork(pginfo->GetInetRef(), pginfo->GetSeason(), true);
             if (map.isEmpty() || (aggressive && map.count() < maxartnum))
@@ -168,7 +168,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
              pginfo->GetRecordingGroup() == "Deleted" ||
              pginfo->GetRecordingGroup() == "LiveTV")
             dolookup = false;
-        if (dolookup)
+        if (dolookup || aggressive)
         {
             ArtworkMap map = GetArtwork(pginfo->GetInetRef(), pginfo->GetSeason(), true);
             if (map.isEmpty() || (aggressive && map.count() < maxartnum))
