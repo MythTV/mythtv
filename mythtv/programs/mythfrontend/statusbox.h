@@ -47,11 +47,11 @@ class StatusBox : public MythScreenType
 
   private:
     MythUIButtonListItem* AddLogLine(const QString & line,
-				     const QString & help = "",
-				     const QString & detail = "",
-				     const QString & helpdetail = "",
-				     const QString & state = "",
-				     const QString & data = "");
+                     const QString & help = "",
+                     const QString & detail = "",
+                     const QString & helpdetail = "",
+                     const QString & state = "",
+                     const QString & data = "");
 
     void getActualRecordedBPS(QString hostnames);
 
