@@ -715,7 +715,7 @@
 
       <setting data_type="select" value="MythFillMinHour"
                label="mythfilldatabase Execution Start"
-               default_data="2"
+               default_data="0"
                setting_type="global"
                help_text="This setting and the following one define a
                           time period when the mythfilldatabase process is
@@ -748,7 +748,7 @@
 
       <setting data_type="select" value="MythFillMaxHour"
                label="mythfilldatabase Execution End"
-               default_data="5"
+               default_data="23"
                setting_type="global"
                help_text="This setting and the preceding one define a
                           time period when the mythfilldatabase process is
