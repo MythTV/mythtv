@@ -119,6 +119,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
     vector<ProgramInfo *> recordingList;
 
     RemoteGetAllScheduledRecordings(recordingList);
+    int maxartnum = 3;
 
     for( int n = 0; n < (int)recordingList.size(); n++)
     {
@@ -130,7 +131,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
         if (dolookup)
         {
             ArtworkMap map = GetArtwork(pginfo->GetInetRef(), pginfo->GetSeason(), true);
-            if (map.isEmpty())
+            if (map.isEmpty() || (aggressive && map.count() < maxartnum))
             {
                 QString msg = QString("Looking up artwork for recording rule: %1 %2")
                                                .arg(pginfo->GetTitle())
@@ -157,12 +158,11 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
         ProgramInfo *pginfo = new ProgramInfo(*(progList[n]));
 
         bool dolookup = true;
-        int maxartnum = 3;
 
         LookupType type = GuessLookupType(pginfo);
 
-        if (type == kProbableMovie || type == kUnknownVideo)
-           maxartnum = 3;
+        if (type == kProbableMovie)
+           maxartnum = 2;
 
         if ((!aggressive && type == kProbableGenericTelevision) ||
              pginfo->GetRecordingGroup() == "Deleted" ||
