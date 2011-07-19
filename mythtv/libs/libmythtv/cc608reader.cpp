@@ -2,14 +2,16 @@ extern "C" {
 #include "vbitext/vbi.h"
 }
 
+#include <algorithm>
+using namespace std;
+
 #include "mythplayer.h"
 #include "cc608reader.h"
 
 CC608Reader::CC608Reader(MythPlayer *parent)
   : m_parent(parent),   m_enabled(false), m_readPosition(0),
     m_writePosition(0), m_maxTextSize(0), m_ccMode(CC_CC1),
-    m_ccPageNum(0x888), m_outputText(""), m_outputCol(0),
-    m_outputRow(0),     m_changed(true)
+    m_ccPageNum(0x888)
 {
     memset(&m_inputBuffers, 0, sizeof(m_inputBuffers));
     m_maxTextSize = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
@@ -36,8 +38,28 @@ void CC608Reader::FlushTxtBuffers(void)
     m_readPosition = m_writePosition;
 }
 
-CC608Buffer* CC608Reader::GetOutputText(bool &changed)
+CC608Buffer *CC608Reader::GetOutputText(bool &changed)
 {
+    bool last_changed = true;
+    while (last_changed)
+    {
+        last_changed = false;
+        int streamIdx = -1;
+        CC608Buffer *tmp = GetOutputText(last_changed, streamIdx);
+        if (last_changed && (streamIdx == m_ccMode))
+        {
+            changed = true;
+            return tmp;
+        }
+    }
+
+    return NULL;
+}
+
+CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
+{
+    streamIdx = -1;
+
     if (!m_enabled || !m_parent)
         return NULL;
 
@@ -50,6 +72,8 @@ CC608Buffer* CC608Reader::GetOutputText(bool &changed)
     {
         if (m_inputBuffers[m_writePosition].type == 'T')
         {
+            streamIdx = MAXOUTBUFFERS - 1;
+
             // display full page of teletext
             //
             // all formatting is always defined in the page itself,
@@ -65,7 +89,7 @@ CC608Buffer* CC608Reader::GetOutputText(bool &changed)
             if (pagenr == (m_ccPageNum<<16))
             {
                 // show teletext subtitles
-                ClearBuffers(false, true);
+                ClearBuffers(false, true, streamIdx);
                 (*inpos)++;
                 while (*inpos)
                 {
@@ -75,9 +99,11 @@ CC608Buffer* CC608Reader::GetOutputText(bool &changed)
 
                     CC608Text *cc = new CC608Text(QString((const char*) inpos),
                                         st.row, st.col, st.fg, true);
-                    m_outputBuffers.lock.lock();
-                    m_outputBuffers.buffers.push_back(cc);
-                    m_outputBuffers.lock.unlock();
+
+                    m_state[streamIdx].m_output.lock.lock();
+                    m_state[streamIdx].m_output.buffers.push_back(cc);
+                    m_state[streamIdx].m_output.lock.unlock();
+
                     inpos += st.len;
                 }
                 changed = true;
@@ -85,7 +111,7 @@ CC608Buffer* CC608Reader::GetOutputText(bool &changed)
         }
         else if (m_inputBuffers[m_writePosition].type == 'C')
         {
-            Update(m_inputBuffers[m_writePosition].buffer);
+            streamIdx = Update(m_inputBuffers[m_writePosition].buffer);
             changed = true;
         }
 
@@ -94,29 +120,35 @@ CC608Buffer* CC608Reader::GetOutputText(bool &changed)
             m_writePosition = (m_writePosition + 1) % MAXTBUFFER;
     }
 
-    m_changed = false;
-    return &m_outputBuffers;
+    if (streamIdx >= 0)
+    {
+        m_state[streamIdx].m_changed = false;
+        return &m_state[streamIdx].m_output;
+    }
+    else
+    {
+        return &m_state[MAXOUTBUFFERS - 1].m_output;
+    }
 }
 
 void CC608Reader::SetMode(int mode)
 {
-    int oldmode = m_ccMode;
+    // TODO why was the clearing code removed?
+    //int oldmode = m_ccMode;
     m_ccMode = (mode <= 2) ? ((mode == 1) ? CC_CC1 : CC_CC2) :
                            ((mode == 3) ? CC_CC3 : CC_CC4);
-    if (oldmode != m_ccMode)
-        ClearBuffers(true, true);
+    //if (oldmode != m_ccMode)
+    //    ClearBuffers(true, true);
 }
 
-void CC608Reader::Update(unsigned char *inpos)
+int CC608Reader::Update(unsigned char *inpos)
 {
     struct ccsubtitle subtitle;
 
     memcpy(&subtitle, inpos, sizeof(subtitle));
     inpos += sizeof(ccsubtitle);
 
-    // skip undisplayed streams
-    if ((subtitle.resumetext & CC_MODE_MASK) != m_ccMode)
-        return;
+    const int streamIdx = (subtitle.resumetext & CC_MODE_MASK) >> 4;
 
     if (subtitle.row == 0)
         subtitle.row = 1;
@@ -126,9 +158,9 @@ void CC608Reader::Update(unsigned char *inpos)
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, "erase displayed memory");
 #endif
-        ClearBuffers(false, true);
+        ClearBuffers(false, true, streamIdx);
         if (!subtitle.len)
-            return;
+            return streamIdx;
     }
 
 //    if (subtitle.len || !subtitle.clr)
@@ -160,22 +192,26 @@ void CC608Reader::Update(unsigned char *inpos)
                     inpos++;
                 }
                 if (bscnt)
-                    m_outputText.remove(m_outputText.length() - bscnt, bscnt);
+                {
+                    m_state[streamIdx].m_outputText.remove(
+                        m_state[streamIdx].m_outputText.length() - bscnt,
+                        bscnt);
+                }
             }
             else
             {
                 // new line:  count spaces to calculate column position
                 row++;
-                m_outputCol = 0;
-                m_outputText = "";
+                m_state[streamIdx].m_outputCol = 0;
+                m_state[streamIdx].m_outputText = "";
                 while ((inpos < end) && *inpos != 0 && (char)*inpos == ' ')
                 {
                     inpos++;
-                    m_outputCol++;
+                    m_state[streamIdx].m_outputCol++;
                 }
             }
 
-            m_outputRow = subtitle.row;
+            m_state[streamIdx].m_outputRow = subtitle.row;
             unsigned char *cur = inpos;
 
             //null terminate at EOL
@@ -186,11 +222,19 @@ void CC608Reader::Update(unsigned char *inpos)
             if (*inpos != 0 || linecont)
             {
                 if (linecont)
-                    m_outputText += QString::fromUtf8((const char *)inpos, -1);
+                {
+                    m_state[streamIdx].m_outputText +=
+                        QString::fromUtf8((const char *)inpos, -1);
+                }
                 else
-                    m_outputText = QString::fromUtf8((const char *)inpos, -1);
-                tmpcc = new CC608Text(m_outputText, m_outputCol, m_outputRow,
-                                      0, false);
+                {
+                    m_state[streamIdx].m_outputText =
+                        QString::fromUtf8((const char *)inpos, -1);
+                }
+                tmpcc = new CC608Text(
+                    m_state[streamIdx].m_outputText,
+                    m_state[streamIdx].m_outputCol,
+                    m_state[streamIdx].m_outputRow, 0, false);
                 ccbuf->push_back(tmpcc);
 #if 0
                 if (ccbuf->size() > 4)
@@ -210,10 +254,10 @@ void CC608Reader::Update(unsigned char *inpos)
             // TXT mode
             // - can use entire 15 rows
             // - scroll up when reaching bottom
-            if (m_outputRow > 15)
+            if (m_state[streamIdx].m_outputRow > 15)
             {
                 if (row)
-                    scroll = m_outputRow - 15;
+                    scroll = m_state[streamIdx].m_outputRow - 15;
                 if (tmpcc)
                     tmpcc->y = 15;
             }
@@ -222,13 +266,13 @@ void CC608Reader::Update(unsigned char *inpos)
         {
             // multi-line text
             // - fix display of old (badly-encoded) files
-            if (m_outputRow > 15)
+            if (m_state[streamIdx].m_outputRow > 15)
             {
                 ccp = ccbuf->begin();
                 for (; ccp != ccbuf->end(); ccp++)
                 {
                     tmpcc = *ccp;
-                    tmpcc->y -= (m_outputRow - 15);
+                    tmpcc->y -= (m_state[streamIdx].m_outputRow - 15);
                 }
             }
         }
@@ -241,25 +285,28 @@ void CC608Reader::Update(unsigned char *inpos)
             // - if caption is at top, row address is for first row (?)
             if (subtitle.rowcount > 4)
                 subtitle.rowcount = 4;
-            if (m_outputRow < subtitle.rowcount)
+            if (m_state[streamIdx].m_outputRow < subtitle.rowcount)
             {
-                m_outputRow = subtitle.rowcount;
+                m_state[streamIdx].m_outputRow = subtitle.rowcount;
                 if (tmpcc)
-                    tmpcc->y = m_outputRow;
+                    tmpcc->y = m_state[streamIdx].m_outputRow;
             }
             if (row)
             {
                 scroll = row;
                 scroll_prsv = true;
-                scroll_yoff = m_outputRow - subtitle.rowcount;
-                scroll_ymax = m_outputRow;
+                scroll_yoff =
+                    m_state[streamIdx].m_outputRow - subtitle.rowcount;
+                scroll_ymax = m_state[streamIdx].m_outputRow;
             }
         }
 
         Update608Text(ccbuf, replace, scroll,
-                      scroll_prsv, scroll_yoff, scroll_ymax);
+                      scroll_prsv, scroll_yoff, scroll_ymax, streamIdx);
         delete ccbuf;
     }
+
+    return streamIdx;
 }
 
 void CC608Reader::TranscodeWriteText(void (*func)
@@ -286,9 +333,9 @@ void CC608Reader::TranscodeWriteText(void (*func)
     }
 }
 
-void CC608Reader::Update608Text(vector<CC608Text*> *ccbuf,
-                              int replace, int scroll, bool scroll_prsv,
-                              int scroll_yoff, int scroll_ymax)
+void CC608Reader::Update608Text(
+    vector<CC608Text*> *ccbuf, int replace, int scroll, bool scroll_prsv,
+    int scroll_yoff, int scroll_ymax, int streamIdx)
 // ccbuf      :  new text
 // replace    :  replace last lines
 // scroll     :  scroll amount
@@ -299,14 +346,14 @@ void CC608Reader::Update608Text(vector<CC608Text*> *ccbuf,
     vector<CC608Text*>::iterator i;
     int visible = 0;
 
-    m_outputBuffers.lock.lock();
-    if (m_outputBuffers.buffers.size() && (scroll || replace))
+    m_state[streamIdx].m_output.lock.lock();
+    if (m_state[streamIdx].m_output.buffers.size() && (scroll || replace))
     {
         CC608Text *cc;
 
         // get last row
         int ylast = 0;
-        i = m_outputBuffers.buffers.end() - 1;
+        i = m_state[streamIdx].m_output.buffers.end() - 1;
         cc = *i;
         if (cc)
             ylast = cc->y;
@@ -322,13 +369,13 @@ void CC608Reader::Update608Text(vector<CC608Text*> *ccbuf,
             ykeep += ymove;
         }
 
-        i = m_outputBuffers.buffers.begin();
-        while (i < m_outputBuffers.buffers.end())
+        i = m_state[streamIdx].m_output.buffers.begin();
+        while (i < m_state[streamIdx].m_output.buffers.end())
         {
             cc = (*i);
             if (!cc)
             {
-                i = m_outputBuffers.buffers.erase(i);
+                i = m_state[streamIdx].m_output.buffers.erase(i);
                 continue;
             }
 
@@ -336,7 +383,7 @@ void CC608Reader::Update608Text(vector<CC608Text*> *ccbuf,
             {
                 // delete last lines
                 delete cc;
-                i = m_outputBuffers.buffers.erase(i);
+                i = m_state[streamIdx].m_output.buffers.erase(i);
             }
             else if (scroll)
             {
@@ -349,7 +396,7 @@ void CC608Reader::Update608Text(vector<CC608Text*> *ccbuf,
                 else
                 {
                     // delete lines outside scroll window
-                    i = m_outputBuffers.buffers.erase(i);
+                    i = m_state[streamIdx].m_output.buffers.erase(i);
                     delete cc;
                 }
             }
@@ -358,7 +405,7 @@ void CC608Reader::Update608Text(vector<CC608Text*> *ccbuf,
         }
     }
 
-    visible += m_outputBuffers.buffers.size();
+    visible += m_state[streamIdx].m_output.buffers.size();
 
     if (ccbuf)
     {
@@ -369,18 +416,17 @@ void CC608Reader::Update608Text(vector<CC608Text*> *ccbuf,
             if (*i)
             {
                 visible++;
-                m_outputBuffers.buffers.push_back(*i);
+                m_state[streamIdx].m_output.buffers.push_back(*i);
             }
             i++;
         }
     }
-    m_changed = visible;
-    m_outputBuffers.lock.unlock();
+    m_state[streamIdx].m_changed = visible;
+    m_state[streamIdx].m_output.lock.unlock();
 }
 
-void CC608Reader::ClearBuffers(bool input, bool output)
+void CC608Reader::ClearBuffers(bool input, bool output, int outputStreamIdx)
 {
-
     if (input)
     {
         for (int i = 0; i < MAXTBUFFER; i++)
@@ -395,13 +441,16 @@ void CC608Reader::ClearBuffers(bool input, bool output)
         m_writePosition = 0;
     }
 
-    if (output)
+    if (output && outputStreamIdx < 0)
     {
-        m_outputText = "";
-        m_outputCol  = 0;
-        m_outputRow  = 0;
-        m_outputBuffers.Clear();
-        m_changed = true;
+        for (int i = 0; i < MAXOUTBUFFERS; ++i)
+            m_state[i].Clear();
+    }
+
+    if (output && outputStreamIdx >= 0)
+    {
+        outputStreamIdx = min(outputStreamIdx, MAXOUTBUFFERS - 1);
+        m_state[outputStreamIdx].Clear();
     }
 }
 
@@ -432,7 +481,7 @@ void CC608Reader::AddTextData(unsigned char *buffer, int len,
     if (!m_enabled)
         return;
 
-    if (!(MAXTBUFFER - NumInputBuffers() - 1))
+    if (NumInputBuffers() >= MAXTBUFFER - 1)
     {
         LOG(VB_GENERAL, LOG_ERR, "AddTextData(): Text buffer overflow");
         return;

@@ -114,7 +114,7 @@ class MTV_PUBLIC MythPlayer
 
   public:
     MythPlayer(bool muted = false);
-   ~MythPlayer();
+    virtual ~MythPlayer();
 
     // Initialisation
     virtual int OpenFile(uint retries = 4, bool allow_libmpeg2 = true);
@@ -248,10 +248,10 @@ class MTV_PUBLIC MythPlayer
 
     // Public Closed caption and teletext stuff
     uint GetCaptionMode(void) const    { return textDisplayMode; }
-    CC708Reader* GetCC708Reader(void)  { return &cc708; }
-    CC608Reader* GetCC608Reader(void)  { return &cc608; }
-    SubtitleReader* GetSubReader(void) { return &subReader; }
-    TeletextReader* GetTeletextReader(void) { return &ttxReader; }
+    virtual CC708Reader    *GetCC708Reader(uint id=0) { return &cc708; }
+    virtual CC608Reader    *GetCC608Reader(uint id=0) { return &cc608; }
+    virtual SubtitleReader *GetSubReader(uint id=0) { return &subReader; }
+    virtual TeletextReader *GetTeletextReader(uint id=0) { return &ttxReader; }
 
     // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
     void TracksChanged(uint trackType);

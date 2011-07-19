@@ -995,9 +995,12 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     deleteMap.TrackerReset(bookmarkseek, totalFrames);
     deleteMap.TrackerWantsToJump(bookmarkseek, totalFrames, bookmarkseek);
 
-    if (player_ctx->playingInfo->QueryAutoExpire() == kLiveTVAutoExpire)
-        gCoreContext->SaveSetting("DefaultChanid",
-                                  player_ctx->playingInfo->GetChanID());
+    if (!gCoreContext->IsDatabaseIgnored() &&
+        player_ctx->playingInfo->QueryAutoExpire() == kLiveTVAutoExpire)
+    {
+        gCoreContext->SaveSetting(
+            "DefaultChanid", player_ctx->playingInfo->GetChanID());
+    }
 
     return IsErrored() ? -1 : 0;
 }

@@ -18,6 +18,7 @@
 #define MYTH_APPNAME_MYTHTV_SETUP "mythtv-setup"
 #define MYTH_APPNAME_MYTHFILLDATABASE "mythfilldatabase"
 #define MYTH_APPNAME_MYTHCOMMFLAG "mythcommflag"
+#define MYTH_APPNAME_MYTHCCEXTRACTOR "mythccextractor"
 #define MYTH_APPNAME_MYTHPREVIEWGEN "mythpreviewgen"
 #define MYTH_APPNAME_MYTHTRANSCODE "mythtranscode"
 #define MYTH_APPNAME_MYTHWELCOME "mythwelcome"

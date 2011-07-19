@@ -292,7 +292,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       ccd608(new CC608Decoder(parent->GetCC608Reader())),
       ccd708(new CC708Decoder(parent->GetCC708Reader())),
       ttd(new TeletextDecoder(parent->GetTeletextReader())),
-      subReader(parent->GetSubReader()),
       // Interactive TV
       itv(NULL),
       // Audio
@@ -741,7 +740,10 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     {
         GetFrame(kDecodeVideo);
         if (decoded_video_frame)
+        {
             m_parent->DiscardVideoFrame(decoded_video_frame);
+            decoded_video_frame = NULL;
+        }
     }
 
     if (doflush)
@@ -1003,7 +1005,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 #endif // USING_MHEG
 
     // Try to get a position map from the recorder if we don't have one yet.
-    if (!recordingHasPositionMap)
+    if (!recordingHasPositionMap && !is_db_ignored)
     {
         if ((m_playbackinfo) || livetv || watchingrecording)
         {
@@ -3042,7 +3044,13 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 
     VideoFrame *picframe = (VideoFrame *)(mpa_pic->opaque);
 
-    if (!directrendering)
+    if (special_decode & kAVSpecialDecode_NoDecode)
+    {
+        // Do nothing, we just want the pts, captions, subtites, etc.
+        // So we can release the unconverted blank video frame to the
+        // display queue.
+    }
+    else if (!directrendering)
     {
         AVPicture tmppicture;
 
@@ -3301,7 +3309,7 @@ void AvFormatDecoder::ProcessDSMCCPacket(
 
 bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 {
-    if (!subReader)
+    if (!m_parent->GetSubReader(pkt->stream_index))
         return true;
 
     long long pts = 0;
@@ -3334,7 +3342,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
             }
         }
     }
-    else if (pkt->stream_index == subIdx)
+    else if (decodeAllSubtitles || pkt->stream_index == subIdx)
     {
         QMutexLocker locker(avcodeclock);
         avcodec_decode_subtitle2(curstream->codec, &subtitle, &gotSubtitles,
@@ -3351,11 +3359,8 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
                 .arg(subtitle.start_display_time)
                 .arg(subtitle.end_display_time));
 
-        if (subReader)
-        {
-            subReader->AddAVSubtitle(subtitle,
-                                 curstream->codec->codec_id == CODEC_ID_XSUB);
-        }
+        m_parent->GetSubReader(pkt->stream_index)->AddAVSubtitle(
+            subtitle, curstream->codec->codec_id == CODEC_ID_XSUB);
     }
 
     return true;
@@ -3363,18 +3368,24 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
 bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
 {
-    if (!subReader ||
+    if (!decodeAllSubtitles ||
         selectedTrack[kTrackTypeRawText].av_stream_index != pkt->stream_index)
     {
         return false;
     }
+
+    if (!m_parent->GetSubReader(pkt->stream_index+0x2000))
+        return false;
 
     QTextCodec *codec = QTextCodec::codecForName("utf-8");
     QTextDecoder *dec = codec->makeDecoder();
     QString text      = dec->toUnicode((const char*)pkt->data, pkt->size);
     QStringList list  = text.split('\n', QString::SkipEmptyParts);
     delete dec;
-    subReader->AddRawTextSubtitle(list, pkt->convergence_duration);
+
+    m_parent->GetSubReader(pkt->stream_index+0x2000)->
+        AddRawTextSubtitle(list, pkt->convergence_duration);
+
     return true;
 }
 

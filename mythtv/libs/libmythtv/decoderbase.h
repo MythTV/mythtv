@@ -176,6 +176,7 @@ class DecoderBase
     void UpdateBDFramesPlayed(void);
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
+    void SetDecodeAllSubtitles(bool val) { decodeAllSubtitles = val; }
     virtual QStringList GetTracks(uint type) const;
     virtual uint GetTrackCount(uint type) const
         { return tracks[type].size(); }
@@ -276,6 +277,7 @@ class DecoderBase
     bool justAfterChange;
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
+    bool        decodeAllSubtitles;
     int         currentTrack[kTrackTypeCount];
     sinfo_vec_t tracks[kTrackTypeCount];
     StreamInfo  wantedTrack[kTrackTypeCount];
