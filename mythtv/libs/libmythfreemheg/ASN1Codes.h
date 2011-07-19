@@ -280,6 +280,11 @@
 #define C_SET_BITMAP_DECODE_OFFSET  246
 #define C_GET_BITMAP_DECODE_OFFSET  247
 #define C_SET_SLIDER_PARAMETERS     248
+// Added in ETSI ES 202 184 V2.1.1 (2010-01)
+#define C_GET_DESKTOP_COLOUR        249
+#define C_SET_DESKTOP_COLOUR        250
+#define C_GET_COUNTER_POSITION      251
+#define C_GET_COUNTER_MAX_POSITION  252
 
 // Pseudo-codes.  These are encoded into the link condition in binary but it's convenient
 // to give them codes here since that way we can include them in the same lookup table.
