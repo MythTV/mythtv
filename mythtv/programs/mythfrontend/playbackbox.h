@@ -354,10 +354,6 @@ class PlaybackBox : public ScheduleCommon
     /// If "Play"  this is a recording playback selection UI,
     /// if "Delete this is a recording deletion selection UI.
     BoxType             m_type;
-    // date/time formats from DB
-    QString             m_formatShortDate;
-    QString             m_formatLongDate;
-    QString             m_formatTime;
     /// titleView controls showing titles in group list
     bool                m_titleView;
     /// useCategories controls showing categories in group list

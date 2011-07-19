@@ -6,6 +6,7 @@
 #include "metadatacommon.h"
 #include "mythlogging.h"
 #include "mythlocale.h"
+#include "util.h"
 
 // null constructor
 MetadataLookup::MetadataLookup(void) :
@@ -363,9 +364,6 @@ ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
 
 void MetadataLookup::toMap(MetadataMap &metadataMap)
 {
-    QString dateformat = gCoreContext->GetSetting("DateFormat",
-                                            "yyyy-MM-dd hh:mm");
-
     metadataMap["filename"] = m_filename;
     metadataMap["title"] = m_title;
     metadataMap["category"] = m_categories.join(", ");
@@ -386,10 +384,10 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
     metadataMap["seriesid"] = m_seriesid;
     metadataMap["programid"] = m_programid;
     metadataMap["storagegroup"] = m_storagegroup;
-    metadataMap["startts"] = m_startts.toString(dateformat);
-    metadataMap["endts"] = m_endts.toString(dateformat);
-    metadataMap["recstartts"] = m_recstartts.toString(dateformat);
-    metadataMap["recendts"] = m_recendts.toString(dateformat);
+    metadataMap["startts"] = MythDateTimeToString(m_startts, kDateFull);
+    metadataMap["endts"] = MythDateTimeToString(m_endts, kDateFull);
+    metadataMap["recstartts"] = MythDateTimeToString(m_recstartts, kDateFull);
+    metadataMap["recendts"] = MythDateTimeToString(m_recendts, kDateFull);
     metadataMap["certification"] = m_certification;
     metadataMap["countries"] = m_countries.join(", ");
     metadataMap["popularity"] = QString::number(m_popularity);
@@ -400,13 +398,11 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
     metadataMap["system"] = m_system;
     metadataMap["year"] = QString::number(m_year);
 
-    metadataMap["releasedate"] = m_releasedate.toString(dateformat);
-    metadataMap["lastupdated"] = m_lastupdated.toString(dateformat);
+    metadataMap["releasedate"] = MythDateToString(m_releasedate, kDateFull);
+    metadataMap["lastupdated"] = MythDateTimeToString(m_lastupdated, kDateFull);
 
-    metadataMap["runtime"] = QString::number(m_runtime) +
-                                      QObject::tr(" Minutes");
-    metadataMap["runtimesecs"] = QString::number(m_runtimesecs) +
-                                          QObject::tr(" Seconds");
+    metadataMap["runtime"] = QObject::tr("%n minute(s)", "", m_runtime);
+    metadataMap["runtimesecs"] = QObject::tr("%n second(s)", "", m_runtimesecs);
     metadataMap["inetref"] = m_inetref;
     metadataMap["tmsref"] = m_tmsref;
     metadataMap["imdb"] = m_imdb;

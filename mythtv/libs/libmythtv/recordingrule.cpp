@@ -11,6 +11,7 @@
 #include "scheduledrecording.h" // For signalChange()
 #include "playgroup.h" // For GetInitialName()
 #include "recordingprofile.h" // For constants
+#include <util.h>
 
 RecordingRule::RecordingRule()
   : m_recordID(-1), m_parentRecID(0),
@@ -430,13 +431,6 @@ bool RecordingRule::Delete(bool sendSig)
 
 void RecordingRule::ToMap(InfoMap &infoMap) const
 {
-    QString timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-    QString dateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
-    QString fullDateFormat = dateFormat;
-    if (!fullDateFormat.contains("yyyy"))
-        fullDateFormat += " yyyy";
-    QString shortDateFormat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-
     infoMap["title"] = m_title;
     infoMap["subtitle"] = m_subtitle;
     infoMap["description"] = m_description;
@@ -446,10 +440,10 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     infoMap["category"] = m_category;
     infoMap["callsign"] = m_station;
 
-    infoMap["starttime"] = m_starttime.toString(timeFormat);
-    infoMap["startdate"] = m_startdate.toString(dateFormat);
-    infoMap["endtime"] = m_endtime.toString(timeFormat);
-    infoMap["enddate"] = m_endtime.toString(dateFormat);
+    infoMap["starttime"] = MythTimeToString(m_starttime, kTime);
+    infoMap["startdate"] = MythDateToString(m_startdate, kDateFull | kSimplify);
+    infoMap["endtime"] = MythTimeToString(m_endtime, kTime);
+    infoMap["enddate"] = MythDateToString(m_enddate, kDateFull | kSimplify);
 
     infoMap["inetref"] = m_inetref;
     infoMap["chanid"] = m_channelid;
@@ -478,17 +472,18 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     else
         infoMap["lentime"] = minstring;
 
-    infoMap["timedate"] = startts.date().toString(dateFormat) + ", " +
-                            startts.time().toString(timeFormat) + " - " +
-                            endts.time().toString(timeFormat);
+    
+    infoMap["timedate"] = MythDateTimeToString(startts,
+                                            kDateTimeFull | kSimplify) + " - " +
+                          MythDateTimeToString(endts, kTime);
 
-    infoMap["shorttimedate"] = startts.date().toString(shortDateFormat) + ", " +
-                                startts.time().toString(timeFormat) + " - " +
-                                endts.time().toString(timeFormat);
+    infoMap["shorttimedate"] = MythDateTimeToString(startts,
+                                            kDateTimeShort | kSimplify) + " - " +
+                               MythDateTimeToString(endts, kTime);
 
     if (m_type == kFindDailyRecord || m_type == kFindWeeklyRecord)
     {
-        QString findfrom = m_findtime.toString(timeFormat);
+        QString findfrom = MythTimeToString(m_findtime, kTime);
         if (m_type == kFindWeeklyRecord)
         {
             int daynum = (m_findday + 5) % 7 + 1;

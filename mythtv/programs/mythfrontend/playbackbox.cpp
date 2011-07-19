@@ -346,8 +346,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       m_artHostOverride(),
       // Settings
       m_type(ltype),
-      m_formatShortDate("M/d"),           m_formatLongDate("ddd MMMM d"),
-      m_formatTime("h:mm AP"),
       m_watchListAutoExpire(false),
       m_watchListMaxAge(60),              m_watchListBlackOut(2),
       m_groupnameAsAllProg(false),
@@ -380,9 +378,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
         m_artTimer[i]->setSingleShot(true);
     }
 
-    m_formatShortDate    = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-    m_formatLongDate     = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
-    m_formatTime         = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
     m_recGroup           = gCoreContext->GetSetting("DisplayRecGroup",
                                                 "All Programs");
     int pbOrder        = gCoreContext->GetNumSetting("PlayBoxOrdering", 1);
@@ -771,10 +766,10 @@ void PlaybackBox::UpdateUIListItem(
             m_groupList->GetItemCurrent()->GetData().toString();
 
         QString tempSubTitle  = extract_subtitle(*pginfo, groupname);
-        QString tempShortDate = pginfo->GetRecordingStartTime()
-            .toString(m_formatShortDate);
-        QString tempLongDate  = pginfo->GetRecordingStartTime()
-            .toString(m_formatLongDate);
+        QString tempShortDate = MythDateTimeToString(pginfo->GetRecordingStartTime(),
+                                                     kDateShort);
+        QString tempLongDate  = MythDateTimeToString(pginfo->GetRecordingStartTime(),
+                                                     kDateFull | kSimplify);
 
         if (groupname == pginfo->GetTitle().toLower())
             item->SetText(tempSubTitle, "titlesubtitle");
@@ -1291,15 +1286,9 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         item->SetTextFromMap(infoMap);
 
         QString tempSubTitle  = extract_subtitle(**it, groupname);
-        QString tempShortDate = ((*it)->GetRecordingStartTime())
-            .toString(m_formatShortDate);
-        QString tempLongDate  = ((*it)->GetRecordingStartTime())
-            .toString(m_formatLongDate);
 
         if (groupname == (*it)->GetTitle().toLower())
             item->SetText(tempSubTitle,       "titlesubtitle");
-        item->SetText(tempLongDate,       "longdate");
-        item->SetText(tempShortDate,      "shortdate");
 
         item->DisplayState(state, "status");
 
@@ -1975,8 +1964,8 @@ bool PlaybackBox::UpdateUILists(void)
             }
 
             LOG(VB_FILE, LOG_INFO, QString(" %1  %2  %3")
-                    .arg((*pit)->GetScheduledStartTime()
-                         .toString(m_formatShortDate))
+                    .arg(MythDateTimeToString((*pit)->GetScheduledStartTime(),
+                                              kDateShort))
                     .arg((*pit)->GetRecordingPriority2())
                     .arg((*pit)->GetTitle()));
 
@@ -3135,10 +3124,9 @@ QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo) const
     QDateTime recstartts = pginfo.GetRecordingStartTime();
     QDateTime recendts   = pginfo.GetRecordingEndTime();
 
-    QString timedate = QString("%1, %2 - %3")
-        .arg(recstartts.date().toString(m_formatLongDate))
-        .arg(recstartts.time().toString(m_formatTime))
-        .arg(recendts.time().toString(m_formatTime));
+    QString timedate = QString("%1 - %2")
+        .arg(MythDateTimeToString(recstartts, kDateTimeFull | kSimplify))
+        .arg(MythDateTimeToString(recendts, kTime));
 
     QString title = pginfo.GetTitle();
 
