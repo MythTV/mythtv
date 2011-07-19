@@ -8,6 +8,7 @@
 
 #include "mythcontext.h"
 #include "mythmediamonitor.h"
+#include "util.h"
 
 #include "mythgenerictree.h"
 #include "videometadatalistmanager.h"
@@ -842,8 +843,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             case ltDBInsertDateGroup:
             {
                 QDate date = data->GetInsertdate();
-                groups.push_back(date.toString(gCoreContext->
-                                                   GetSetting("DateFormat")));
+                groups.push_back(MythDateToString(date, kDateFull | kSimplify));
                 break;
             }
             default: 
