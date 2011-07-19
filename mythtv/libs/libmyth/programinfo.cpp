@@ -1498,9 +1498,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["playgroup"] = playgroup;
 
     if (storagegroup == "Default")
-        progMap["storagegroup"] = tr("Default");
+        progMap["storagegroup"] = QObject::tr("Default");
     else if (StorageGroup::kSpecialGroups.contains(storagegroup))
-        progMap["storagegroup"] = tr(storagegroup.toUtf8().constData());
+        progMap["storagegroup"] = QObject::tr(storagegroup.toUtf8().constData());
     else
         progMap["storagegroup"] = storagegroup;
 
