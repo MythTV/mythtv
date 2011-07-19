@@ -252,7 +252,7 @@ bool TimePopup::Create()
     for (int x = -1; x <= 14; x++)
     {
         QString text = MythDateTimeToString(m_parent->m_startTime.addDays(x),
-                                            kDateFull);
+                                            kDateFull | kSimplify);
         new MythUIButtonListItem(
             m_dateList, text,
             NULL, false);
