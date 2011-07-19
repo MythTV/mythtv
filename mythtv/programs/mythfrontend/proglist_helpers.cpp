@@ -644,11 +644,7 @@ void EditPowerSearchPopup::initLists(void)
 
     for (uint i = 0; i < channels.size(); ++i)
     {
-        QString chantext = channelFormat;
-        chantext
-            .replace("<num>",  channels[i].channum)
-            .replace("<sign>", channels[i].callsign)
-            .replace("<name>", channels[i].name);
+        QString chantext = channels[i].GetFormatted(channelFormat);
 
         m_parent->m_viewList << QString::number(channels[i].chanid);
         m_parent->m_viewTextList << chantext;

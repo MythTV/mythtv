@@ -787,11 +787,7 @@ void ProgLister::FillViewList(const QString &view)
 
         for (uint i = 0; i < channels.size(); ++i)
         {
-            QString chantext = m_channelFormat;
-            chantext
-                .replace("<num>",  channels[i].channum)
-                .replace("<sign>", channels[i].callsign)
-                .replace("<name>", channels[i].name);
+            QString chantext = channels[i].GetFormatted(m_channelFormat);
 
             m_viewList.push_back(QString::number(channels[i].chanid));
             m_viewTextList.push_back(chantext);
