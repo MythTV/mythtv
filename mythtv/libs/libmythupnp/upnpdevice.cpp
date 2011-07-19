@@ -25,6 +25,7 @@
 #include "upnpdevice.h"
 #include "httpcomms.h"
 #include "mythlogging.h"
+#include "mythversion.h"  // for MYTH_BINARY_VERSION
 
 // MythDB
 #include "mythdb.h"
@@ -712,12 +713,63 @@ QString UPnpDeviceDesc::GetHostName()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 //
-//
-//
-//
+// UPnpDevice Class Implementation
 //
 /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpDevice::UPnpDevice() :
+    m_sModelNumber(MYTH_BINARY_VERSION),
+    m_sSerialNumber(MYTH_SOURCE_VERSION),
+    m_securityPin(false),
+    m_protocolVersion(MYTH_PROTO_VERSION)
+{
+}
+
+UPnpDevice::~UPnpDevice()
+{
+    while (!m_listIcons.empty())
+    {
+        delete m_listIcons.back();
+        m_listIcons.pop_back();
+    }
+    while (!m_listServices.empty())
+    {
+        delete m_listServices.back();
+        m_listServices.pop_back();
+    }
+    while (!m_listDevices.empty())
+    {
+        delete m_listDevices.back();
+        m_listDevices.pop_back();
+    }
+}
+
+QString UPnpDevice::GetUDN(void) const
+{
+    if (m_sUDN.isEmpty())
+        m_sUDN = "uuid:" + LookupUDN( m_sDeviceType );
+
+    return m_sUDN;
+}
+
+void UPnpDevice::toMap(QHash<QString, QString> &map)
+{
+    map["name"] = m_sFriendlyName;
+    map["modelname"] = m_sModelName;
+    map["modelnumber"] = m_sModelNumber;
+    map["modelurl"] = m_sModelURL;
+    map["modeldescription"] = m_sModelDescription;
+    map["manufacturer"] = m_sManufacturer;
+    map["manufacturerurl"] = m_sManufacturerURL;
+    map["devicetype"] = m_sDeviceType;
+    map["serialnumber"] = m_sSerialNumber;
+    map["UDN"] = m_sUDN;
+    map["UPC"] = m_sUPC;
+    map["protocolversion"] = m_protocolVersion;
+}
 
 UPnpService UPnpDevice::GetService(const QString &urn, bool *found) const
 {

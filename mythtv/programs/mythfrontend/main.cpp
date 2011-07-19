@@ -72,6 +72,7 @@ using namespace std;
 #include "mythdb.h"
 #include "backendconnectionmanager.h"
 #include "themechooser.h"
+#include "mythversion.h"
 
 // Video
 #include "cleanup.h"

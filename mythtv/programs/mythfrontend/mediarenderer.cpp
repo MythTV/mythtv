@@ -9,11 +9,13 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <QTextStream>
+
+#include "upnpsubscription.h"
 #include "mediarenderer.h"
+#include "mythversion.h"
+#include "upnpscanner.h"
 #include "mythfexml.h"
 #include "compat.h"
-#include "upnpsubscription.h"
-#include "upnpscanner.h"
 #include "util.h"
 
 class MythFrontendStatus : public HttpServerExtension

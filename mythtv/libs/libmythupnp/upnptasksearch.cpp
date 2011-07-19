@@ -30,6 +30,7 @@
 
 #include "upnp.h"
 #include "upnptasksearch.h"
+#include "mythversion.h"
 #include "compat.h"
 
 /////////////////////////////////////////////////////////////////////////////

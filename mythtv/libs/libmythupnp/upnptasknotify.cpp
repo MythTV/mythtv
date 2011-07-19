@@ -32,6 +32,7 @@
 // MythTV headers
 #include "mmulticastsocketdevice.h"
 #include "mythlogging.h"
+#include "mythversion.h"
 #include "compat.h"
 #include "upnp.h"
 
