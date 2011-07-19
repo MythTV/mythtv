@@ -1189,7 +1189,7 @@ void NuppelVideoRecorder::DoV4L1(void)
         {
             bool reports_audio = vchan.flags & VIDEO_VC_AUDIO;
             uint err_level = reports_audio ? VB_GENERAL : VB_AUDIO;
-            // print at VB_IMPORTANT if driver reports audio.
+            // print at VB_GENERAL if driver reports audio.
             LOG(err_level, LOG_ERR, LOC + "Failed to get audio" + ENO);
         }
         else

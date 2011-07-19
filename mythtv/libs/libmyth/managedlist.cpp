@@ -445,7 +445,7 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
 
         int index = getValueIndex(value);
 #if 0
-        LOG(VB_IMPORTANT, LOG_DEBUG,
+        LOG(VB_GENERAL, LOG_DEBUG,
                 QString("new item matches cur value and is at: %1").arg(index));
 #endif
         if (index > 0)
