@@ -32,7 +32,8 @@ class MTV_PUBLIC DBChannel
 
     bool operator == (uint _chanid) const
         { return chanid == _chanid; }
-        
+
+    QString GetFormatted(const QString &format) const;
     void ToMap(InfoMap &infoMap) const;
 
   public:
@@ -80,7 +81,6 @@ class MTV_PUBLIC PixmapChannel : public DBChannel
         DBChannel(other) { }
 
     bool CacheChannelIcon(void);
-    QString GetFormatted(const QString &format) const;
 
   public:
     QString m_localIcon;

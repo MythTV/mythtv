@@ -73,6 +73,20 @@ void DBChannel::ToMap(InfoMap& infoMap) const
     infoMap["channelsourcename"] = SourceUtil::GetSourceName(sourceid);
 }
 
+QString DBChannel::GetFormatted(const QString &format) const
+{
+    QString tmp = format;
+
+    if (tmp.isEmpty())
+        return QString();
+
+    tmp.replace("<num>",  channum);
+    tmp.replace("<sign>", callsign);
+    tmp.replace("<name>", name);
+
+    return tmp;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
@@ -181,20 +195,6 @@ bool PixmapChannel::CacheChannelIcon(void)
     icon.clear();
 
     return false;
-}
-
-QString PixmapChannel::GetFormatted(const QString &format) const
-{
-    QString tmp = format;
-
-    if (tmp.isEmpty())
-        return "";
-
-    tmp.replace("<num>",  channum);
-    tmp.replace("<sign>", callsign);
-    tmp.replace("<name>", name);
-
-    return tmp;
 }
 
 ////////////////////////////////////////////////////////////////////////////
