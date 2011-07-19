@@ -21,10 +21,6 @@ ViewScheduleDiff::ViewScheduleDiff(MythScreenStack *parent, QString altTable,
                                    int recordidDiff, QString title)
         : MythScreenType(parent, "ViewScheduleDiff")
 {
-    m_dateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-    m_timeformat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-    m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
-
     m_altTable = altTable;
     m_recordid = recordidDiff;
     m_title = title;

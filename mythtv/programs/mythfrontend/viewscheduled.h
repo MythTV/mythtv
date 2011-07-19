@@ -66,10 +66,6 @@ class ViewScheduled : public ScheduleCommon
 
     bool m_conflictBool;
     QDate m_conflictDate;
-    QString m_shortdateFormat;
-    QString m_dateFormat;
-    QString m_timeFormat;
-    QString m_channelFormat;
 
     QRect m_tvRect;
 

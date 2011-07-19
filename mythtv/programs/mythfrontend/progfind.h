@@ -79,9 +79,6 @@ class ProgFinder : public ScheduleCommon
     ProgramList m_showData;
     ProgramList m_schedList;
 
-    QString m_dateFormat;
-    QString m_timeFormat;
-
     InfoMap m_infoMap;
 
     MythUIButtonList *m_alphabetList;
