@@ -873,6 +873,7 @@ BackendSettings::BackendSettings() {
 
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
     group2->setLabel(QObject::tr("Miscellaneous Settings"));
+
     VerticalConfigurationGroup* fm = new VerticalConfigurationGroup();
     fm->setLabel(QObject::tr("File Management Settings"));
     fm->addChild(MasterBackendOverride());
@@ -884,6 +885,11 @@ BackendSettings::BackendSettings() {
     fm->addChild(HDRingbufferSize());
     fm->addChild(StorageScheduler());
     group2->addChild(fm);
+    VerticalConfigurationGroup* upnp = new VerticalConfigurationGroup();
+    upnp->setLabel(QObject::tr("UPnP Server Settings"));
+    //upnp->addChild(UPNPShowRecordingUnderVideos());
+    upnp->addChild(UPNPWmpSource());
+    group2->addChild(upnp);
     group2->addChild(MiscStatusScript());
     group2->addChild(DisableAutomaticBackup());
     group2->addChild(DisableFirewireReset());
@@ -980,12 +986,6 @@ BackendSettings::BackendSettings() {
     group7->addChild(UserJobDesc(4));
     group7->addChild(UserJob(4));
     addChild(group7);
-
-    VerticalConfigurationGroup* group8 = new VerticalConfigurationGroup(false);
-    group8->setLabel(QObject::tr("UPnP Server Settings"));
-    //group8->addChild(UPNPShowRecordingUnderVideos());
-    group8->addChild(UPNPWmpSource());
-    addChild(group8);
 
     MythFillSettings *mythfill = new MythFillSettings();
     addChild(mythfill);
