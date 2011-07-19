@@ -1496,7 +1496,14 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["recordingggroup"] = (recgroup == "Default")
                                             ? QObject::tr("Default") : recgroup;
     progMap["playgroup"] = playgroup;
-    progMap["storagegroup"] = storagegroup;
+
+    if (storagegroup == "Default")
+        progMap["storagegroup"] = tr("Default");
+    else if (StorageGroup::kSpecialGroups.contains(storagegroup))
+        progMap["storagegroup"] = tr(storagegroup.toUtf8().constData());
+    else
+        progMap["storagegroup"] = storagegroup;
+
     progMap["programflags"] = programflags;
 
     progMap["audioproperties"] = GetAudioProperties();
