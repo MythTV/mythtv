@@ -99,18 +99,11 @@ class ProgramRecPriority : public ScheduleCommon
 
     MythUIButtonList *m_programList;
 
-    QString m_formatShortDate;
-    QString m_formatLongDate;
-    QString m_formatTime;
-
-    MythUIText *m_categoryText;
-    MythUIText *m_descriptionText;
     MythUIText *m_schedInfoText;
     MythUIText *m_rectypePriorityText;
     MythUIText *m_recPriorityText;
     MythUIText *m_recPriorityBText;
     MythUIText *m_finalPriorityText;
-    MythUIText *m_recGroupText;
     MythUIText *m_storageGroupText;
     MythUIText *m_lastRecordedText;
     MythUIText *m_lastRecordedDateText;

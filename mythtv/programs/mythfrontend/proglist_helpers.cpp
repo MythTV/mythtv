@@ -8,6 +8,7 @@
 #include "mythuibutton.h"
 #include "channelutil.h"
 #include "proglist.h"
+#include "util.h"
 
 PhrasePopup::PhrasePopup(MythScreenStack *parentStack,
                          ProgLister *parent,
@@ -250,9 +251,10 @@ bool TimePopup::Create()
     // date
     for (int x = -1; x <= 14; x++)
     {
+        QString text = MythDateTimeToString(m_parent->m_startTime.addDays(x),
+                                            kDateFull);
         new MythUIButtonListItem(
-            m_dateList,
-            m_parent->m_startTime.addDays(x).toString(m_parent->m_dayFormat),
+            m_dateList, text,
             NULL, false);
 
         if (m_parent->m_startTime.addDays(x).toString("MMdd") ==
@@ -265,9 +267,8 @@ bool TimePopup::Create()
     for (int x = 0; x < 24; x++)
     {
         hr.setHMS(x, 0, 0);
-        new MythUIButtonListItem(m_timeList,
-                                 hr.toString(m_parent->m_hourFormat),
-                                 NULL, false);
+        QString text = MythTimeToString(hr, kTime);
+        new MythUIButtonListItem(m_timeList, text, NULL, false);
 
         if (hr.toString("hh") == m_parent->m_searchTime.toString("hh"))
             m_timeList->SetItemCurrent(x);
