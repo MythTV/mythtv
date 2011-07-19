@@ -166,6 +166,9 @@ void MetadataFactory::Lookup(MetadataLookup *lookup)
 
 void MetadataFactory::VideoScan()
 {
+    if (IsRunning())
+        return;
+
     m_scanning = true;
 
     m_videoscanner->SetDirs(GetVideoDirs());
