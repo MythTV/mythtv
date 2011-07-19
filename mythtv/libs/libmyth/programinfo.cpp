@@ -1493,7 +1493,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["recpriority"] = recpriority;
     progMap["recpriority2"] = recpriority2;
-    progMap["recgroup"] = recgroup;
+    progMap["recordingggroup"] = (recgroup == "Default")
+                                            ? QObject::tr("Default") : recgroup;
     progMap["playgroup"] = playgroup;
     progMap["storagegroup"] = storagegroup;
     progMap["programflags"] = programflags;
