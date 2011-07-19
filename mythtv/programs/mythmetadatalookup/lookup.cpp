@@ -244,6 +244,7 @@ void LookerUpper::customEvent(QEvent *levent)
                     if (!lookup->GetSubtype() == kProbableGenericTelevision)
                         pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
                     pginfo->SaveInetRef(lookup->GetInetref());
+                    m_busyRecList.removeAll(pginfo);
                     qDeleteAll(list);
                     return;
                 }
@@ -255,6 +256,7 @@ void LookerUpper::customEvent(QEvent *levent)
                     {
                         LOG(VB_GENERAL, LOG_INFO, "Multiple results matched on year. No definite "
                                       "match could be found.");
+                        m_busyRecList.removeAll(pginfo);
                         qDeleteAll(list);
                         return;
                     }
