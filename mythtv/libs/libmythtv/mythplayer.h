@@ -292,6 +292,11 @@ class MTV_PUBLIC MythPlayer
     // Public MHEG/MHI stream selection
     bool SetAudioByComponentTag(int tag);
     bool SetVideoByComponentTag(int tag);
+    bool SetStream(const QString &);
+    long GetStreamPos(); // mS
+    long GetStreamMaxPos(); // mS
+    long SetStreamPos(long); // mS
+    void StreamPlay(bool play = true);
 
     // LiveTV public stuff
     void CheckTVChain();
@@ -578,6 +583,7 @@ class MTV_PUBLIC MythPlayer
     // Private LiveTV stuff
     void  SwitchToProgram(void);
     void  JumpToProgram(void);
+    void  JumpToStream(const QString&);
 
   protected:
     PlayerFlags    playerFlags;
@@ -711,6 +717,7 @@ class MTV_PUBLIC MythPlayer
     InteractiveTV *interactiveTV;
     bool       itvEnabled;
     QMutex     itvLock;
+    QString    m_newStream; // Guarded by itvLock
 
     // OSD stuff
     OSD  *osd;

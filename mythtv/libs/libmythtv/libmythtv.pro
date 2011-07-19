@@ -123,6 +123,7 @@ HEADERS += mythsystemevent.h
 HEADERS += avfringbuffer.h          ThreadedFileWriter.h
 HEADERS += ringbuffer.h             fileringbuffer.h
 HEADERS += streamingringbuffer.h    metadataimagehelper.h
+HEADERS += icringbuffer.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
@@ -150,6 +151,7 @@ SOURCES += mythsystemevent.cpp
 SOURCES += avfringbuffer.cpp        ThreadedFileWriter.cpp
 SOURCES += ringbuffer.cpp           fileringBuffer.cpp
 SOURCES += streamingringbuffer.cpp  metadataimagehelper.cpp
+SOURCES += icringbuffer.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
@@ -419,6 +421,10 @@ using_frontend {
         HEADERS += dsmccreceiver.h
         SOURCES += dsmcc.cpp                dsmcccache.cpp
         SOURCES += dsmccbiop.cpp            dsmccobjcarousel.cpp
+
+         # MHEG interaction channel
+        HEADERS += netstream.h
+        SOURCES += netstream.cpp
 
         # MHEG/MHI stuff
         HEADERS += interactivetv.h          mhi.h
