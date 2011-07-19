@@ -503,7 +503,7 @@ void ProgFinder::updateTimesList()
         {
             starttime = m_showData[i]->GetScheduledStartTime();
             itemText = MythDateTimeToString(starttime,
-                                            kDateTimeFull & kSimplify);
+                                            kDateTimeFull | kSimplify);
 
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_timesList, "");
