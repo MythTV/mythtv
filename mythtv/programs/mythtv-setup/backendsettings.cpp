@@ -94,8 +94,8 @@ static GlobalComboBox *VbiFormat()
     GlobalComboBox *gc = new GlobalComboBox("VbiFormat");
     gc->setLabel(QObject::tr("VBI format"));
     gc->addSelection("None");
-    gc->addSelection("PAL Teletext");
-    gc->addSelection("NTSC Closed Caption");
+    gc->addSelection("PAL teletext");
+    gc->addSelection("NTSC closed caption");
     gc->setHelpText(QObject::tr("The VBI (Vertical Blanking Interval) is "
                     "used to carry Teletext or Closed Captioning "
                     "data."));
@@ -433,8 +433,8 @@ static GlobalSpinBox *idleWaitForRecordingTime()
     gc->setLabel(QObject::tr("Maximum wait for recording (mins)"));
     gc->setValue(15);
     gc->setHelpText(QObject::tr("The number of minutes the master backend "
-                    "waits for a recording. If it's idle but a recording "
-                    "starts within this time period, the backends won't "
+                    "waits for a recording. If the backend is idle but a "
+                    "recording starts within this time period, it won't "
                     "shut down."));
     return gc;
 };
@@ -705,55 +705,44 @@ static GlobalCheckBox *UPNPShowRecordingUnderVideos()
     gc->setLabel(QObject::tr("Include recordings in video list"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, the master backend will include"
-                    " the list of recorded shows in the list of videos "
+                    " the list of recorded shows in the list of videos. "
                     " This is mainly to accommodate UPnP players which do not"
                     " allow more than 1 video section." ));
     return gc;
 };
 #endif
 
-static HostSpinBox *UPNPRebuildDelay()
-{
-    HostSpinBox *gc = new HostSpinBox("UPnP/RebuildDelay", 0, 1440, 1);
-    gc->setLabel(QObject::tr("UPnP media update time"));
-    gc->setHelpText(QObject::tr("How often (in minutes) MythTV will check "
-                    "for new videos to serve via UPnP. "
-                    "0 = Off. "));
-    gc->setValue(30);
-    return gc;
-};
-
 static GlobalComboBox *UPNPWmpSource()
 {
     GlobalComboBox *gc = new GlobalComboBox("UPnP/WMPSource");
-    gc->setLabel(QObject::tr("Video content to show a WMP client"));
+    gc->setLabel(QObject::tr("Video content to show a WMP cient"));
     gc->addSelection(QObject::tr("Recordings"),"0");
     gc->addSelection(QObject::tr("Videos"),"1");
     gc->setValue("0");
-    gc->setHelpText(QObject::tr("Which tree to show a Windows Media Player client "
-                    "when it requests a list of videos."));
+    gc->setHelpText(QObject::tr("Which tree to show a Windows Media Player "
+                    "client when it requests a list of videos."));
     return gc;
 };
 
 static GlobalCheckBox *MythFillEnabled()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("MythFillEnabled");
-    bc->setLabel(QObject::tr("Automatically run mythfilldatabase"));
+    bc->setLabel(QObject::tr("Automatically update program listings"));
     bc->setValue(true);
-    bc->setHelpText(QObject::tr("If enabled, execution of "
-                    "mythfilldatabase occurs automatically."));
+    bc->setHelpText(QObject::tr("If enabled, the guide data program "
+                                "will be run automatically."));
     return bc;
 }
 
 static GlobalSpinBox *MythFillMinHour()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("MythFillMinHour", 0, 23, 1);
-    bs->setLabel(QObject::tr("mythfilldatabase execution start"));
+    bs->setLabel(QObject::tr("Guide data program execution start"));
     bs->setValue(0);
     bs->setHelpText(QObject::tr("This setting and the following one define a "
-                    "time period when the mythfilldatabase process is "
-                    "allowed to run. For example, setting start to 11 and "
-                    "end to 13 would mean that the process would only "
+                    "time period when the guide data program is allowed "
+                    "to run. For example, setting start to 11 and "
+                    "end to 13 would mean that the program would only "
                     "run between 11:00 AM and 1:59 PM."));
     return bs;
 }
@@ -761,12 +750,12 @@ static GlobalSpinBox *MythFillMinHour()
 static GlobalSpinBox *MythFillMaxHour()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("MythFillMaxHour", 0, 23, 1);
-    bs->setLabel(QObject::tr("mythfilldatabase execution end"));
+    bs->setLabel(QObject::tr("Guide data program execution end"));
     bs->setValue(23);
     bs->setHelpText(QObject::tr("This setting and the preceding one define a "
-                    "time period when the mythfilldatabase process is "
-                    "allowed to run. For example, setting start to 11 and "
-                    "end to 13 would mean that the process would only "
+                    "time period when the guide data program is allowed "
+                    "to run. For example, setting start to 11 and "
+                    "end to 13 would mean that the program would only "
                     "run between 11:00 AM and 1:59 PM."));
     return bs;
 }
@@ -774,20 +763,20 @@ static GlobalSpinBox *MythFillMaxHour()
 static GlobalCheckBox *MythFillGrabberSuggestsTime()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("MythFillGrabberSuggestsTime");
-    bc->setLabel(QObject::tr("Run mythfilldatabase at time suggested by the "
+    bc->setLabel(QObject::tr("Run guide data program at time suggested by the "
                              "grabber."));
     bc->setValue(true);
     bc->setHelpText(QObject::tr("If enabled, allow a DataDirect guide data "
-                    "provider to specify the next download time in order to "
-                    "distribute load on their servers. mythfilldatabase "
-                    "Execution Start/End times are also ignored."));
+                    "provider to specify the next download time in order "
+                    "to distribute load on their servers. Guide data program "
+                    "execution start/end times are also ignored."));
     return bc;
 }
 
 static GlobalLineEdit *MythFillDatabasePath()
 {
     GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabasePath");
-    be->setLabel(QObject::tr("mythfilldatabase program"));
+    be->setLabel(QObject::tr("Guide data program"));
     be->setValue("mythfilldatabase");
     be->setHelpText(QObject::tr(
                         "Use 'mythfilldatabase' or the name of a custom "
@@ -799,20 +788,20 @@ static GlobalLineEdit *MythFillDatabasePath()
 static GlobalLineEdit *MythFillDatabaseArgs()
 {
     GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabaseArgs");
-    be->setLabel(QObject::tr("mythfilldatabase arguments"));
+    be->setLabel(QObject::tr("Guide data arguments"));
     be->setValue("");
     be->setHelpText(QObject::tr("Any arguments you want passed to the "
-                    "mythfilldatabase program. See mythfilldatabase --help"));
+                                "guide data program."));
     return be;
 }
 
 static GlobalLineEdit *MythFillDatabaseLog()
 {
     GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabaseLog");
-    be->setLabel(QObject::tr("mythfilldatabase log path"));
+    be->setLabel(QObject::tr("Guide data program log path"));
     be->setValue("");
     be->setHelpText(QObject::tr("File or directory to use for logging "
-                    "output from the mythfilldatabase program. Leave blank "
+                    "output from the guide data program. Leave blank "
                     "to disable logging."));
     return be;
 }
@@ -823,7 +812,7 @@ class MythFillSettings : public TriggeredConfigurationGroup
      MythFillSettings() :
          TriggeredConfigurationGroup(false, true, false, false)
      {
-         setLabel(QObject::tr("Mythfilldatabase"));
+         setLabel(QObject::tr("Program Schedule Downloading Options"));
          setUseLabel(false);
 
          Setting* fillEnabled = MythFillEnabled();
@@ -996,7 +985,6 @@ BackendSettings::BackendSettings() {
     group8->setLabel(QObject::tr("UPnP Server Settings"));
     //group8->addChild(UPNPShowRecordingUnderVideos());
     group8->addChild(UPNPWmpSource());
-    group8->addChild(UPNPRebuildDelay());
     addChild(group8);
 
     MythFillSettings *mythfill = new MythFillSettings();
