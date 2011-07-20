@@ -685,13 +685,11 @@ void Metadata::toMap(MetadataMap &metadataMap)
     metadataMap["compilationartist"] = m_compilation_artist;
     metadataMap["album"] = m_album;
     metadataMap["title"] = m_title;
+    metadataMap["formattitle"] = FormatTitle();
     metadataMap["tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
     metadataMap["genre"] = m_genre;
     metadataMap["year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
-    metadataMap["artisttitle"] = QObject::tr("%1  by  %2",
-                                             "Music track 'title by artist'")
-                                             .arg(FormatTitle())
-                                             .arg(FormatArtist());
+    
     int len = m_length / 1000;
     int eh = len / 3600;
     int em = (len / 60) % 60;
@@ -701,13 +699,10 @@ void Metadata::toMap(MetadataMap &metadataMap)
     else
         metadataMap["length"] = QString().sprintf("%02d:%02d", em, es);
 
-    QString dateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
-    QString fullDateFormat = dateFormat;
-    if (!fullDateFormat.contains("yyyy"))
-        fullDateFormat += " yyyy";
-    metadataMap["lastplayed"] = m_lastplay.toString(fullDateFormat);
+    metadataMap["lastplayed"] = MythDateTimeToString(m_lastplay,
+                                              kDateFull | kSimplify | kAddYear);
 
-    metadataMap["playcount"] = QString("%1").arg(m_playcount);
+    metadataMap["playcount"] = QString::number(m_playcount);
     metadataMap["filename"] = m_filename;
 }
 
