@@ -181,8 +181,9 @@ __version__=u"v0.5.8"
 #       and termination of MiroBridge with an appropriate error message has been added.
 #       Added better system error messages when an IOError exception occurs
 # 0.5.8 Add support for Miro version 3.0
-# Add support for Miro version 3.5.x
-# Add support for Miro version 4.0.2
+#       Add support for Miro version 3.5.x
+#       Add support for Miro version 4.0.2
+#       Fix command line help display (-h, --help)
 
 
 examples_txt=u'''
@@ -198,17 +199,77 @@ from socket import gethostname, gethostbyname
 import formatter
 import htmlentitydefs
 
-# Global variables
-local_only = True
-dir_dict={u'posterdir': u"VideoArtworkDir", u'bannerdir': u'mythvideo.bannerDir', u'fanartdir': 'mythvideo.fanartDir', u'episodeimagedir': u'mythvideo.screenshotDir', u'mythvideo': u'VideoStartupDir'}
-vid_graphics_dirs={u'default': u'', u'mythvideo': u'', u'posterdir': u'', u'bannerdir': u'', u'fanartdir': u'', u'episodeimagedir': u'',}
-key_trans = {u'filename': u'mythvideo', u'coverfile': u'posterdir', u'banner': u'bannerdir', u'fanart': u'fanartdir', u'screenshot': u'episodeimagedir'}
+# Command line options
+parser = OptionParser(usage=u"%prog usage: mirobridge -huevstdociVHSCWM [parameters]\n")
 
-graphic_suffix={u'default': u'', u'mythvideo': u'', u'posterdir': u'_coverart', u'bannerdir': u'_banner', u'fanartdir': u'_fanart', u'episodeimagedir': u'_screenshot',}
+parser.add_option(  "-e", "--examples", action="store_true", default=False, dest="examples",
+                    help=u"Display examples for executing the jamu script")
+parser.add_option(  "-v", "--version", action="store_true", default=False, dest="version",
+                    help=u"Display version and author information")
+parser.add_option(  "-s", "--simulation", action="store_true", default=False, dest="simulation",
+                    help=u"Simulation (dry run), no files are copied, symlinks created or MythTV data bases " \
+                         u"altered. If option (-n) is NOT specified Miro auto downloads WILL take place. See " \
+                         u"option (-n) help for details.")
+parser.add_option(  "-t", "--testenv", action="store_true", default=False, dest="testenv",
+                    help=u"Test that the local environment can run all mirobridge functionality")
+parser.add_option(  "-n", "--no_autodownload", action="store_true", default=False, dest="no_autodownload",
+                    help=u"Do not perform Miro Channel updates, video expiry and auto-downloadings. Default is " \
+                         u"to perform all perform all Channel maintenance features.")
+parser.add_option(  "-o", "--nosubdirs", action="store_true", default=False, dest="nosubdirs",
+                    help=u"Organise MythVideo's Miro directory WITHOUT Miro channel subdirectories. The default " \
+                         u"is to have Channel subdirectories.")
+parser.add_option(  "-c", "--channel", metavar="CHANNEL_ID:CHANNEL_NUM", default="", dest="channel",
+                    help=u'Specifies the channel id that is used for Miros unplayed recordings. Enter as "xxxx:yyy". ' \
+                         u'Default is 9999:999. Be warned that once you change the default channel_id "9999" you must ' \
+                         u'always use this option!')
+parser.add_option(  "-i", "--import_opml", metavar="OPMLFILEPATH", default="", dest="import_opml",
+                    help=u'Import Miro exported OPML file containing Channel configurations. File name must be a fully ' \
+                         u'qualified path. This option is exclusive to Miro v2.5.x and higher.')
+parser.add_option(  "-V", "--verbose", action="store_true", default=False, dest="verbose",
+                    help=u"Display verbose messages when processing")
+parser.add_option(  "-H", "--hostname", metavar="HOSTNAME", default="", dest="hostname",
+                    help=u"MythTV Backend hostname mirobridge is to up date")
+parser.add_option(  "-S", "--sleeptime", metavar="SLEEP_DELAY_SECONDS", default="", dest="sleeptime",
+                    help=u"The amount of seconds to wait for an auto download to start.\nThe default is 60 seconds, " \
+                         u"but this may need to be adjusted for slower Internet connections.")
+parser.add_option(  "-C", "--addchannel", metavar="ICONFILE_PATH", default="OFF", dest="addchannel",
+                    help=u'Add a Miro Channel record to MythTV. This gets rid of the "#9999 #9999" on the Watch ' \
+                         u'Recordings screen and replaces it with the usual\nthe channel number and channel name.\n' \
+                         u'The default if not overridden by the (-c) option is channel number 999.\nIf a filename and ' \
+                         u'path is supplied it will be set as the channels icon. Make sure your override channel number ' \
+                         u'is NOT one of your current MythTV channel numbers.\nThis option is typically only used once ' \
+                         u'as there can only be one Miro channel record at a time.')
+parser.add_option(  "-N", "--new_watch_copy", action="store_true", default=False, dest="new_watch_copy",
+                    help=u'For ALL Miro Channels: Use the "Watch Recording" screen to watch new Miro downloads then once ' \
+                         u'watched copy the videos, icons, screen shot and metadata to MythVideo. Once coping is complete ' \
+                         u'delete the video from Miro.\nThis option overrides any "mirobridge.conf" settings.')
+parser.add_option(  "-W", "--watch_only", action="store_true", default=False, dest="watch_only",
+                    help=u'For ALL Miro Channels: Only use "Watch Recording" never move any Miro videos to MythVideo.\nThis ' \
+                         u'option overrides any "mirobridge.conf" settings.')
+parser.add_option(  "-M", "--mythvideo_only", action="store_true", default=False, dest="mythvideo_only",
+                    help=u'For ALL Miro Channel videos: Copy newly downloaded Miro videos to MythVideo and removed from Miro. ' \
+                         u'These Miro videos never appear in the MythTV "Watch Recording" screen.\nThis option overrides any ' \
+                         u'"mirobridge.conf" settings.')
+
+
+
+# Global variables
+opts, args = parser.parse_args()
+local_only = True
+dir_dict={u'posterdir': u"VideoArtworkDir", u'bannerdir': u'mythvideo.bannerDir', u'fanartdir': 'mythvideo.fanartDir',
+          u'episodeimagedir': u'mythvideo.screenshotDir', u'mythvideo': u'VideoStartupDir'}
+vid_graphics_dirs={u'default': u'', u'mythvideo': u'', u'posterdir': u'', u'bannerdir': u'',
+                   u'fanartdir': u'', u'episodeimagedir': u'',}
+key_trans = {u'filename': u'mythvideo', u'coverfile': u'posterdir', u'banner': u'bannerdir',
+             u'fanart': u'fanartdir', u'screenshot': u'episodeimagedir'}
+
+graphic_suffix={u'default': u'', u'mythvideo': u'', u'posterdir': u'_coverart', u'bannerdir': u'_banner',
+                u'fanartdir': u'_fanart', u'episodeimagedir': u'_screenshot',}
 graphic_path_suffix = u"%s%s%s.%s"
 graphic_name_suffix = u"%s%s.%s"
 
-storagegroupnames = {u'Default': u'default', u'Videos': u'mythvideo', u'Coverart': u'posterdir', u'Banners': u'bannerdir', u'Fanart': u'fanartdir', u'Screenshots': u'episodeimagedir'}
+storagegroupnames = {u'Default': u'default', u'Videos': u'mythvideo', u'Coverart': u'posterdir',
+                     u'Banners': u'bannerdir', u'Fanart': u'fanartdir', u'Screenshots': u'episodeimagedir'}
 storagegroups={} # The gobal dictionary is only populated with the current hosts storage group entries
 image_extensions = [u"png", u"jpg", u"bmp"]
 simulation = False
@@ -236,7 +297,9 @@ emptySubTitle = u'_NO_SUBTITLE_From_Miro'
 
 
 # Initalize Report Statistics:
-statistics = {u'WR_watched': 0, u'Miro_marked_watch_seen': 0, u'Miro_videos_deleted': 0, u'Miros_videos_downloaded': 0, u'Miros_MythVideos_video_removed': 0, u'Miros_MythVideos_added': 0, u'Miros_MythVideos_copied': 0, u'Total_unwatched': 0, u'Total_Miro_expiring': 0, u'Total_Miro_MythVideos': 0,  }
+statistics = {u'WR_watched': 0, u'Miro_marked_watch_seen': 0, u'Miro_videos_deleted': 0, u'Miros_videos_downloaded': 0,
+              u'Miros_MythVideos_video_removed': 0, u'Miros_MythVideos_added': 0, u'Miros_MythVideos_copied': 0,
+              u'Total_unwatched': 0, u'Total_Miro_expiring': 0, u'Total_Miro_MythVideos': 0,  }
 
 
 class OutStreamEncoder(object):
@@ -281,7 +344,8 @@ try:
     from pyparsing import *
     import pyparsing
     if pyparsing.__version__ < "1.5.0":
-        logger.critical(u"The python library 'pyparsing' must be at version 1.5.0 or higher. Your version is v%s" % pyparsing.__version__)
+        logger.critical(u"The python library 'pyparsing' must be at version 1.5.0 or higher. Your version is v%s" % \
+                                pyparsing.__version__)
         sys.exit(1)
 except Exception, e:
     logger.critical(u"The python library 'pyparsing' must be installed and be version 1.5.0 or higher, error(%s)" % e)
@@ -362,7 +426,8 @@ try:
 
     # Required for Miro 4 as the configuration calls changed location and additional Miro 4 specific imports are required
     try:
-        dummy = app.config.get(prefs.APP_VERSION)   # A test to see if this is Miro v4 before the version can be read. If there is no exception this is Miro v4
+        dummy = app.config.get(prefs.APP_VERSION)   # A test to see if this is Miro v4 before the version can be read.
+                                                    # If there is no exception this is Miro v4
         eventloop.setup_config_watcher()
         from miro import signals
         from miro import messages
@@ -385,7 +450,8 @@ except Exception, e:
 
 logger.info(u"Miro Bridge version %s with Miro version %s" % (__version__, miroConfiguration(prefs.APP_VERSION)))
 if miroConfiguration(prefs.APP_VERSION) < u"2.0.3":
-    logger.critical(u"Your version of Miro (v%s) is not recent enough. Miro v2.0.3 is the minimum and it is preferred that you upgrade to Miro v2.5.2 or later.")
+    logger.critical((u"Your version of Miro (v%s) is not recent enough. Miro v2.0.3 is the minimum and it is "
+                     u"preferred that you upgrade to Miro v2.5.2 or later.") % miroConfiguration(prefs.APP_VERSION))
     sys.exit(1)
 
 try:
@@ -405,7 +471,9 @@ try:
         logger.info("Using mirobridge_interpreter_4_0_2")
         from mirobridge.mirobridge_interpreter_4_0_2 import MiroInterpreter
 except Exception, e:
-    logger.critical(u"Importing mirobridge functions has failed. The following mirobridge files must be in the subdirectory 'mirobridge'.\n'mirobridge_interpreter_2_0_3.py' and 'mirobridge_interpreter_2_5_2.py', error(%s)" % e)
+    logger.critical(u"Importing mirobridge functions has failed. The following mirobridge files must be in the " \
+                    u"subdirectory 'mirobridge'.\n'mirobridge_interpreter_2_0_3.py' and 'mirobridge_interpreter_2_5_2.py'" \
+                    u", error(%s)" % e)
     sys.exit(1)
 
 def _can_int(x):
@@ -533,7 +601,8 @@ def isMiroRunning():
     return False if Miro is NOT running
     '''
     try:
-        p = subprocess.Popen(u'ps aux | grep "miro.real"', shell=True, bufsize=4096, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+        p = subprocess.Popen(u'ps aux | grep "miro.real"', shell=True, bufsize=4096, stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     except:
         return False
 
@@ -709,7 +778,8 @@ def getStorageGroups():
                 try:
                     dirname = unicode(record.dirname, 'utf8')
                 except (UnicodeDecodeError):
-                    logger.error(u"The local Storage group (%s) directory contained\ncharacters that caused a UnicodeDecodeError. This storage group has been rejected." % (record.groupname))
+                    logger.error((u"The local Storage group (%s) directory contained\ncharacters that caused a " \
+                                  u"UnicodeDecodeError. This storage group has been rejected.") % record.groupname)
                     continue    # Skip any line that has non-utf8 characters in it
                 except (UnicodeEncodeError, TypeError):
                     pass
@@ -760,7 +830,8 @@ def getMythtvDirectories():
             vid_graphics_dirs[u'default'] = storagegroups[u'default']
 
     if local_only:
-        logger.warning(u'There is no "Videos" Storage Group set so ONLY MythTV Frontend local paths for videos and graphics that are accessable from this MythTV Backend can be used.')
+        logger.warning(u'There is no "Videos" Storage Group set so ONLY MythTV Frontend local paths for videos '\
+                       u'and graphics that are accessable from this MythTV Backend can be used.')
 
     for key in dir_dict.keys():
         if vid_graphics_dirs[key]:
@@ -805,27 +876,39 @@ def getMythtvDirectories():
     access_issue = False
     for key in vid_graphics_dirs.keys():
         if not os.access(vid_graphics_dirs[key], os.F_OK | os.R_OK | os.W_OK):
-            logger.critical(u"\nEvery Video and graphics directory must be read/writable for Miro Bridge to function. There is a permissions issue with (%s)." % (vid_graphics_dirs[key], ))
+            logger.critical(u"\nEvery Video and graphics directory must be read/writable for Miro Bridge to function. "\
+                            u"There is a permissions issue with (%s)." % (vid_graphics_dirs[key], ))
             access_issue = True
     if access_issue:
         sys.exit(1)
 
     # Print out the video and image directories that will be used for processing
     if verbose:
-        dir_types={'posterdir': "Cover art  ", 'bannerdir': 'Banners    ', 'fanartdir': 'Fan art    ', 'episodeimagedir': 'Screenshots', 'mythvideo': 'Video      ', 'default': 'Default    '}
-        sys.stdout.write(u"\n==========================================================================================\n")
-        sys.stdout.write(u"Listed below are the types and base directories that will be use for processing.\nThe list reflects your current configuration for the '%s' back end\nand whether a directory is a 'SG' (storage group) or not.\n" % localhostname)
-        sys.stdout.write(u"Note: All directories are from settings in the MythDB specific to hostname (%s).\n" % localhostname)
-        sys.stdout.write(u"------------------------------------------------------------------------------------------\n")
+        dir_types={'posterdir': "Cover art  ", 'bannerdir': 'Banners    ', 'fanartdir': 'Fan art    ',
+                   'episodeimagedir': 'Screenshots', 'mythvideo': 'Video      ', 'default': 'Default    '}
+        sys.stdout.write(u"""
+==========================================================================================
+Listed below are the types and base directories that will be use for processing.
+The list reflects your current configuration for the '%s' back end
+and whether a directory is a 'SG' (storage group) or not.
+Note: All directories are from settings in the MythDB specific to hostname (%s).
+------------------------------------------------------------------------------------------
+""" % (localhostname, localhostname))
         for key in vid_graphics_dirs.keys():
             sg_flag = 'NO '
             if storagegroups.has_key(key):
                 if vid_graphics_dirs[key] == storagegroups[key]:
                     sg_flag = 'YES'
             sys.stdout.write(u"Type: %s - SG-%s - Directory: (%s)\n" % (dir_types[key], sg_flag, vid_graphics_dirs[key]))
-        sys.stdout.write(u"------------------------------------------------------------------------------------------\n")
-        sys.stdout.write(u"If a directory you set from a separate Front end is not displayed it means\nthat the directory is not accessible from this backend OR\nyou must add the missing directories using the Front end on this Back end.\nFront end settings are host machine specific.\n")
-        sys.stdout.write(u"==========================================================================================\n\n")
+        sys.stdout.write(\
+u"""------------------------------------------------------------------------------------------
+If a directory you set from a separate Front end is not displayed it means
+that the directory is not accessible from this backend OR
+you must add the missing directories using the Front end on this Back end.
+Front end settings are host machine specific.
+==========================================================================================
+
+""")
     # end getMythtvDirectories()
 
 def setUseroptions():
@@ -879,7 +962,9 @@ def setUseroptions():
                     channel_mythvideo_only[filter(is_not_punct_char, option.lower())] = cfg.get(section, option)
             for key in channel_mythvideo_only.keys():
                 if not channel_mythvideo_only[key].startswith(vid_graphics_dirs[u'mythvideo']):
-                    logger.critical(u"All Mythvideo only configuration (%s) directories (%s) must be a subdirectory of the MythVideo base directory (%s)." % (key, channel_mythvideo_only[key], vid_graphics_dirs[u'mythvideo']))
+                    logger.critical((u"All Mythvideo only configuration (%s) directories (%s) must be a subdirectory "\
+                                     u"of the MythVideo base directory (%s).") % \
+                             (key, channel_mythvideo_only[key], vid_graphics_dirs[u'mythvideo']))
                     sys.exit(1)
                 if channel_mythvideo_only[key][-1] != u'/':
                     channel_mythvideo_only[key]+=u'/'
@@ -894,7 +979,9 @@ def setUseroptions():
                     channel_new_watch_copy[filter(is_not_punct_char, option.lower())] = cfg.get(section, option)
             for key in channel_new_watch_copy.keys():
                 if not channel_new_watch_copy[key].startswith(vid_graphics_dirs[u'mythvideo']):
-                    logger.critical(u"All 'new->watch->copy' channel (%s) directory (%s) must be a subdirectory of the MythVideo base directory (%s)." % (key, channel_new_watch_copy[key], vid_graphics_dirs[u'mythvideo']))
+                    logger.critical((u"All 'new->watch->copy' channel (%s) directory (%s) must be a subdirectory "\
+                                     u"of the MythVideo base directory (%s).") % \
+                                (key, channel_new_watch_copy[key], vid_graphics_dirs[u'mythvideo']))
                     sys.exit(1)
                 if channel_new_watch_copy[key][-1] != u'/':
                     channel_new_watch_copy[key]+=u'/'
@@ -930,7 +1017,8 @@ def getVideoDetails(videofilename, screenshot=False):
     audio_6C = re.compile(u' 6 channels,', re.UNICODE)
 
     try:
-        p = subprocess.Popen(u'ffmpeg -i "%s"' % (videofilename), shell=True, bufsize=4096, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+        p = subprocess.Popen(u'ffmpeg -i "%s"' % (videofilename), shell=True, bufsize=4096, stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
     except:
         if not screenshot:
             return ffmpeg_details
@@ -1213,7 +1301,8 @@ def getOldrecordedOrphans():
             except Exception, e:
                 pass
             # Attempt a clean up for orphaned recorded video files and/or graphics
-            (dirName, fileName) = os.path.split(u'%s%s - %s.%s' % (vid_graphics_dirs[u'default'], data[u'title'], data[u'subtitle'], u'png'))
+            (dirName, fileName) = os.path.split(u'%s%s - %s.%s' % (vid_graphics_dirs[u'default'], data[u'title'],
+                                                                   data[u'subtitle'], u'png'))
             (fileBaseName, fileExtension)=os.path.splitext(fileName)
             try:
                 dirName = unicode(dirName, u'utf8')
@@ -1233,7 +1322,9 @@ def getOldrecordedOrphans():
                     except OSError:
                         pass
             # Attempt a clean up for orphaned MythVideo screenshot and UNIQUE coverart
-            (dirName, fileName) = os.path.split(u'%s%s - %s%s.%s' % (vid_graphics_dirs[u'episodeimagedir'], data[u'title'], data[u'subtitle'], graphic_suffix[u'episodeimagedir'], u'png'))
+            (dirName, fileName) = os.path.split(u'%s%s - %s%s.%s' % (vid_graphics_dirs[u'episodeimagedir'], data[u'title'],
+                                                                     data[u'subtitle'], graphic_suffix[u'episodeimagedir'],
+                                                                     u'png'))
             (fileBaseName, fileExtension)=os.path.splitext(fileName)
             try:
                 dirName = unicode(dirName, u'utf8')
@@ -1255,7 +1346,9 @@ def getOldrecordedOrphans():
                     break
             # Remove any unique cover art graphic files
             if data[u'title'].lower() in channel_icon_override:
-                (dirName, fileName) = os.path.split(u'%s%s - %s%s.%s' % (vid_graphics_dirs[u'posterdir'], data[u'title'], data[u'subtitle'], graphic_suffix[u'posterdir'], u'png'))
+                (dirName, fileName) = os.path.split(u'%s%s - %s%s.%s' % (vid_graphics_dirs[u'posterdir'], data[u'title'],
+                                                                         data[u'subtitle'], graphic_suffix[u'posterdir'],
+                                                                         u'png'))
                 (fileBaseName, fileExtension)=os.path.splitext(fileName)
                 try:
                     dirName = unicode(dirName, u'utf8')
@@ -1286,7 +1379,8 @@ def getStartEndTimes(duration, downloadedTime):
     return an array of initialised values if either duration or downloadedTime is invalid
     return an array of the video's start, end times and isotime
     '''
-    start_end = [datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), datetime.datetime.now().strftime('%Y%m%d%H%M%S')]
+    start_end = [datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                 datetime.datetime.now().strftime('%Y%m%d%H%M%S')]
 
     if downloadedTime != None:
         try:
@@ -1325,13 +1419,16 @@ def setSymbolic(filename, storagegroupkey, symbolic_name, allow_symlink=False):
         convert = True
 
     if storagegroupkey in storagegroups.keys() and storagegroupkey == u'default':
-        sym_filepath = graphic_path_suffix % (storagegroups[storagegroupkey], symbolic_name, graphic_suffix[storagegroupkey], ext)
+        sym_filepath = graphic_path_suffix % (storagegroups[storagegroupkey], symbolic_name,
+                                              graphic_suffix[storagegroupkey], ext)
         sym_filename = graphic_name_suffix % (symbolic_name, graphic_suffix[storagegroupkey], ext)
     elif storagegroupkey in storagegroups.keys() and not local_only:
-        sym_filepath = graphic_path_suffix % (storagegroups[storagegroupkey], symbolic_name, graphic_suffix[storagegroupkey], ext)
+        sym_filepath = graphic_path_suffix % (storagegroups[storagegroupkey], symbolic_name,
+                                              graphic_suffix[storagegroupkey], ext)
         sym_filename = graphic_name_suffix % (symbolic_name, graphic_suffix[storagegroupkey], ext)
     else:
-        sym_filepath = graphic_path_suffix % (vid_graphics_dirs[storagegroupkey], symbolic_name, graphic_suffix[storagegroupkey], ext)
+        sym_filepath = graphic_path_suffix % (vid_graphics_dirs[storagegroupkey], symbolic_name,
+                                              graphic_suffix[storagegroupkey], ext)
         sym_filename = sym_filepath
 
     if allow_symlink:
@@ -1365,10 +1462,14 @@ def setSymbolic(filename, storagegroupkey, symbolic_name, allow_symlink=False):
                     shutil.copy2(filename, sym_filepath)
                     displayMessage(u"Copied Miro file (%s) to file (%s)" % (filename, sym_filepath))
             except OSError, e:
-                logger.critical(u"Trying to copy the Miro file (%s) to the file (%s).\nError(%s)\nThis maybe a permissions error (mirobridge.py does not have permission to write to the directory)." % (filename ,sym_filepath, e))
+                logger.critical((u"Trying to copy the Miro file (%s) to the file (%s).\n Error(%s)\n" \
+                                 u"This maybe a permissions error (mirobridge.py does not have permission "\
+                                 u"to write to the directory).") % (filename ,sym_filepath, e))
                 sys.exit(1)
     except OSError, e:
-        logger.critical(u"Trying to create the Miro file (%s) symlink (%s).\nError(%s)\nThis maybe a permissions error (mirobridge.py does not have permission to write to the directory)." % (sym_filepath, e))
+        logger.critical((u"Trying to create the Miro file (%s) symlink (%s).\nError(%s)\n"\
+                         u"This maybe a permissions error (mirobridge.py does not have permission "\
+                         u"to write to the directory).") % (sym_filepath, e))
         sys.exit(1)
 
     return sym_filename
@@ -1492,7 +1593,8 @@ def createVideometadataRecord(item):
     for ext in image_extensions:
         filename = u"%s_banner.%s" % (sanitiseFileName(item[u'channelTitle']), ext)
         if os.path.isfile(vid_graphics_dirs[u'bannerdir']+filename):
-            banners = setSymbolic(vid_graphics_dirs[u'bannerdir']+filename, u'bannerdir', sanitiseFileName(item[u'channelTitle']))
+            banners = setSymbolic(vid_graphics_dirs[u'bannerdir']+filename, u'bannerdir',
+                                  sanitiseFileName(item[u'channelTitle']))
             break
     else:
         if not os.path.isfile(vid_graphics_dirs[u'bannerdir']+banners):
@@ -1501,7 +1603,8 @@ def createVideometadataRecord(item):
     for ext in image_extensions:
         filename = u"%s_fanart.%s" % (sanitiseFileName(item[u'channelTitle']), ext)
         if os.path.isfile(vid_graphics_dirs[u'fanartdir']+filename):
-            fanart = setSymbolic(vid_graphics_dirs[u'fanartdir']+filename, u'fanartdir', sanitiseFileName(item[u'channelTitle']))
+            fanart = setSymbolic(vid_graphics_dirs[u'fanartdir']+filename, u'fanartdir',
+                                 sanitiseFileName(item[u'channelTitle']))
             break
     else:
         if not os.path.isfile(vid_graphics_dirs[u'fanartdir']+fanart):
@@ -1543,7 +1646,9 @@ def createVideometadataRecord(item):
     videometadata[u'category'] = u'Miro'
 
     if not u'copied' in item.keys():
-        videofile = setSymbolic(item[u'videoFilename'], u'mythvideo', "%s/%s - %s" % (sympath, sanitiseFileName(item[u'channelTitle']), sanitiseFileName(item[u'title'])), allow_symlink=True)
+        videofile = setSymbolic(item[u'videoFilename'], u'mythvideo',
+                                "%s/%s - %s" % (sympath, sanitiseFileName(item[u'channelTitle']),
+                                sanitiseFileName(item[u'title'])), allow_symlink=True)
         if videofile != None:
             videometadata[u'filename'] = videofile
             if not local_only and videometadata[u'filename'][0] != u'/':
@@ -1565,7 +1670,9 @@ def createVideometadataRecord(item):
                 videometadata[u'coverfile'] = filename
         else:
             if item[u'item_icon']:
-                filename = setSymbolic(item[u'item_icon'], u'posterdir', u"%s - %s" % (sanitiseFileName(item[u'channelTitle']), sanitiseFileName(item[u'title'])))
+                filename = setSymbolic(item[u'item_icon'], u'posterdir',
+                                       u"%s - %s" % (sanitiseFileName(item[u'channelTitle']),
+                                       sanitiseFileName(item[u'title'])))
                 if filename != None:
                     videometadata[u'coverfile'] = filename
     else:
@@ -1573,7 +1680,9 @@ def createVideometadataRecord(item):
 
     if not item.has_key(u'copied'):
         if item[u'screenshot']:
-            filename = setSymbolic(item[u'screenshot'], u'episodeimagedir', u"%s - %s" % (sanitiseFileName(item[u'channelTitle']), sanitiseFileName(item[u'title'])))
+            filename = setSymbolic(item[u'screenshot'], u'episodeimagedir',
+                                   u"%s - %s" % (sanitiseFileName(item[u'channelTitle']),
+                                   sanitiseFileName(item[u'title'])))
             if filename != None:
                 videometadata[u'screenshot'] = filename
     else:
@@ -1605,7 +1714,9 @@ def createChannelRecord(icon, channel_id, channel_num):
 
     if icon != u"":
         if not os.path.isfile(icon):
-            logger.critical(u'The Miro channel icon file (%s) does not exist.\nThe variable needs to be a fully qualified file name and path.\ne.g. ./mirobridge.py -C "/path to the channel icon/miro_channel_icon.jpg"' % (icon))
+            logger.critical((u'The Miro channel icon file (%s) does not exist.\nThe variable needs '\
+                             u'to be a fully qualified file name and path.\ne.g. ./mirobridge.py -C '\
+                             u'"/path to the channel icon/miro_channel_icon.jpg"') % (icon))
             sys.exit(1)
 
     data={}
@@ -1627,7 +1738,10 @@ def createChannelRecord(icon, channel_id, channel_num):
         try:
             Channel().create(data)
         except MythError, e:
-            logger.critical(u"Failed writing the Miro channel record. Most likely the Channel Id and number already exists.\nUse MythTV set up program (mythtv-setup) to alter or remove the offending channel.\nYou specified Channel ID (%d) and Channel Number (%d), error(%s)" % (channel_id, channel_num, e.args[0]))
+            logger.critical((u"Failed writing the Miro channel record. Most likely the Channel Id and "\
+                             u"number already exists.\nUse MythTV set up program (mythtv-setup) to alter "\
+                             u"or remove the offending channel.\nYou specified Channel ID (%d) and Channel "\
+                             u"Number (%d), error(%s)") % (channel_id, channel_num, e.args[0]))
             sys.exit(1)
     return True
     # end createChannelRecord(icon)
@@ -1676,20 +1790,24 @@ def createMiroMythVideoDirectory():
                 try:
                     os.mkdir(miro_path)
                 except OSError, e:
-                    logger.critical(u"Create Miro Mythvideo directory (%s).\nError(%s)\nThis may be due to a permissions error." % (miro_path, e))
+                    logger.critical((u"Create Miro Mythvideo directory (%s).\nError(%s)\nThis may "\
+                                     u"be due to a permissions error.") % (miro_path, e))
                     sys.exit(1)
             if os.path.isfile(miro_cover):
                 if simulation:
-                    logger.info(u"Simulation: Copy Miro directory cover file link from (%s) to (%s)" % (miro_cover, miro_icon_filename))
+                    logger.info(u"Simulation: Copy Miro directory cover file link from (%s) to (%s)" % \
+                                    (miro_cover, miro_icon_filename))
                 else:
                     try:
                         if not os.path.isfile(os.path.realpath(miro_cover)):
                             useImageMagick(u'convert "%s" "%s"' % (miro_cover, miro_icon_filename))
                     except OSError, e:
-                        logger.critical(u"File (%s) copy to (%s) failed.\nError(%s)\nThis may be due to a permissions error." % (miro_cover, miro_icon_filename, e))
+                        logger.critical((u"File (%s) copy to (%s) failed.\nError(%s)\nThis may be due "\
+                                         u"to a permissions error.") % (miro_cover, miro_icon_filename, e))
                         sys.exit(1)
         except OSError, e:
-            logger.critical(u"Creation of MythVideo 'Miro' directory (%s) failed.\nError(%s)\nThis may be due to a permissions error." % (miro_path, e))
+            logger.critical((u"Creation of MythVideo 'Miro' directory (%s) failed.\nError(%s)\nThis may "\
+                             u"be due to a permissions error.") % (miro_path, e))
             sys.exit(1)
     # end createMiroMythVideoDirectory()
 
@@ -1725,17 +1843,20 @@ def createMiroChannelSubdirectory(item):
             try:
                 os.mkdir(path)
             except OSError, e:
-                logger.critical(u"Creation of MythVideo 'Miro' subdirectory path (%s) failed.\nError(%s)\nThis may be due to a permissions error." % (path, e))
+                logger.critical((u"Creation of MythVideo 'Miro' subdirectory path (%s) failed.\nError(%s)\nThis may be "\
+                                 u"due to a permissions error.") % (path, e))
                 sys.exit(1)
     if item[u'channel_icon']:
         if simulation:
-            logger.info(u"Simulation: Copying subdirectory cache icon(%s) cover file(%s)" % (item[u'channel_icon'], cover_filename_path))
+            logger.info(u"Simulation: Copying subdirectory cache icon(%s) cover file(%s)" % \
+                            (item[u'channel_icon'], cover_filename_path))
         else:
             try:
                 if not os.path.isfile(os.path.realpath(cover_filename_path)):
                     useImageMagick(u'convert "%s" "%s"' % (item[u'channel_icon'], cover_filename_path))
             except OSError, e:
-                logger.critical(u"Copying subdirectory cache icon(%s) cover file(%s) failed.\nError(%s)\nThis may be due to a permissions error." % (item[u'channel_icon'], cover_filename_path, e))
+                logger.critical((u"Copying subdirectory cache icon(%s) cover file(%s) failed.\nError(%s)\nThis may be "\
+                                 u"due to a permissions error.") % (item[u'channel_icon'], cover_filename_path, e))
                 sys.exit(1)
     # end createMiroChannelSubdirectory()
 
@@ -1759,7 +1880,8 @@ def getPlayedMiroVideos():
             filenames.append(os.path.realpath(storagegroups[u'default']+record[u'basename']))
             statistics[u'WR_watched']+=1
         except OSError, e:
-            logger.info(u"Miro video file has been removed (%s) outside of mirobridge\nError(%s)" % (storagegroups[u'default']+record[u'basename'], e))
+            logger.info(u"Miro video file has been removed (%s) outside of mirobridge\nError(%s)" % \
+                            (storagegroups[u'default']+record[u'basename'], e))
             continue
         displayMessage(u"Miro video (%s) (%s) has been marked as watched in MythTV." % (record[u'title'], record[u'subtitle']))
 
@@ -1798,7 +1920,8 @@ def updateMythRecorded(items):
                 displayMessage(u"Removing watched Miro recording (%s) (%s)" % (record[u'title'], record[u'subtitle']))
                 # Remove the database recorded, recordedprogram and oldrecorded records
                 if simulation:
-                    logger.info(u"Simulation: Remove recorded/recordedprogram/oldrecorded records and associated Miro Video file for chanid(%s), starttime(%s)" % (record['chanid'], record['starttime']))
+                    logger.info(u"Simulation: Remove recorded/recordedprogram/oldrecorded records and associated Miro "\
+                                u"Video file for chanid(%s), starttime(%s)" % (record['chanid'], record['starttime']))
                 else:
                     try: # Attempting to clean up an recorded record and its associated video file (miro symlink)
                         rtn = Recorded((record['chanid'], record['starttime'])).delete(force=True)
@@ -1830,21 +1953,27 @@ def updateMythRecorded(items):
         records = createRecordedRecords(item) 
         if records:
             if simulation:
-                logger.info(u"Simulation: Added recorded and recordedprogram records for (%s - %s)" % (item[u'channelTitle'], item[u'title'],))
+                logger.info(u"Simulation: Added recorded and recordedprogram records for (%s - %s)" % \
+                                (item[u'channelTitle'], item[u'title'],))
             else:
                 try:
                     Recorded().create(records[0])
                     RecordedProgram().create(records[1])
                     OldRecorded().create(records[2])
                 except MythError, e:
-                    logger.warning(u"Inserting recorded/recordedprogram/oldrecorded records non-critical error (%s) for (%s - %s)" % (e.args[0], item[u'channelTitle'], item[u'title'],))
+                    logger.warning(u"Inserting recorded/recordedprogram/oldrecorded records non-critical "\
+                                   u"error (%s) for (%s - %s)" % \
+                                        (e.args[0], item[u'channelTitle'], item[u'title'],))
         else:
-            logger.critical(u"Creation of recorded/recordedprogram/oldrecorded record data for (%s - %s)" % (item[u'channelTitle'], item[u'title'],))
+            logger.critical(u"Creation of recorded/recordedprogram/oldrecorded record data for (%s - %s)" % \
+                                (item[u'channelTitle'], item[u'title'],))
             sys.exit(1)
 
         if item[u'channel_icon']: # Add Cover art link to channel icon
             ext = getExtention(item[u'channel_icon'])
-            coverart_filename = u"%s%s%s.%s" % (vid_graphics_dirs[u'posterdir'], sanitiseFileName(item[u'channelTitle']), graphic_suffix[u'posterdir'], ext)
+            coverart_filename = u"%s%s%s.%s" % (vid_graphics_dirs[u'posterdir'],
+                                                sanitiseFileName(item[u'channelTitle']),
+                                                graphic_suffix[u'posterdir'], ext)
             if not os.path.isfile(os.path.realpath(coverart_filename)): # Make sure it does not exist
                 if simulation:
                     logger.info(u"Simulation: Remove symbolic link(%s)" % (coverart_filename,))
@@ -1854,13 +1983,17 @@ def updateMythRecorded(items):
                     except OSError:
                         pass
                 if simulation:
-                    logger.info(u"Simulation: Create icon file(%s) cover art file(%s)" % (item[u'channel_icon'], coverart_filename))
+                    logger.info(u"Simulation: Create icon file(%s) cover art file(%s)" % \
+                                    (item[u'channel_icon'], coverart_filename))
                 else:
                     try:
                         shutil.copy2(item[u'channel_icon'], coverart_filename)
-                        displayMessage(u"Copied a Miro Channel Icon file (%s) to MythTV as file (%s)." % (item[u'channel_icon'], coverart_filename))
+                        displayMessage(u"Copied a Miro Channel Icon file (%s) to MythTV as file (%s)." % \
+                                            (item[u'channel_icon'], coverart_filename))
                     except OSError, e:
-                        logger.critical(u"Copying an icon file(%s) to coverart file(%s) failed.\nError(%s)\nThis may be due to a permissions error." (item[u'channel_icon'], coverart_filename, e))
+                        logger.critical((u"Copying an icon file(%s) to coverart file(%s) failed.\nError(%s)\nThis "\
+                                         u"may be due to a permissions error.") % \
+                                                (item[u'channel_icon'], coverart_filename, e))
                         sys.exit(1)
 
         if item[u'screenshot'] and imagemagick: # Add Miro screen shot to 'Default' recordings directory
@@ -1872,15 +2005,19 @@ def updateMythRecorded(items):
                     try:
                         demensions = u''
                         try:
-                            demensions = takeScreenShot(item[u'videoFilename'], screenshot_recorded, size_limit=True, just_demensions=False)
+                            demensions = takeScreenShot(item[u'videoFilename'], screenshot_recorded,
+                                                        size_limit=True, just_demensions=False)
                         except:
                             pass
                         if demensions:
                             demensions = u"-size %s" % demensions
                         useImageMagick(u'convert "%s" %s "%s"' % (item[u'screenshot'], demensions, screenshot_recorded))
-                        displayMessage(u"Used a Miro Channel screenshot file (%s) to\ncreate using ImageMagick the MythTV Watch Recordings screen shot file\n(%s)." % (item[u'screenshot'], screenshot_recorded))
+                        displayMessage((u"Used a Miro Channel screenshot file (%s) to\ncreate using ImageMagick the "\
+                                        u"MythTV Watch Recordings screen shot file\n(%s).") % \
+                                                (item[u'screenshot'], screenshot_recorded))
                     except OSError, e:
-                        logger.critical(u"Creating screenshot file(%s) as(%s) failed.\nError(%s)\nThis may be due to a permissions error." (item[u'screenshot'], screenshot_recorded, e))
+                        logger.critical((u"Creating screenshot file(%s) as(%s) failed.\nError(%s)\nThis may be due to "\
+                                         u"a permissions error.") % (item[u'screenshot'], screenshot_recorded, e))
                         sys.exit(1)
         else:
             screenshot_recorded = u"%s%s.png" % (vid_graphics_dirs[u'default'], records[0][u'basename'])
@@ -1919,7 +2056,8 @@ def updateMythVideo(items):
                 if os.path.islink(record[u'filename']) and os.path.isfile(record[u'filename']):
                     statistics[u'Total_Miro_expiring']+=1
             elif record[u'host'] and storagegroups.has_key(u'mythvideo'):
-                if os.path.islink(storagegroups[u'mythvideo']+record[u'filename']) and os.path.isfile(storagegroups[u'mythvideo']+record[u'filename']):
+                if os.path.islink(storagegroups[u'mythvideo']+record[u'filename']) and \
+                            os.path.isfile(storagegroups[u'mythvideo']+record[u'filename']):
                     statistics[u'Total_Miro_expiring']+=1
         for record in records:
             if checkVideometadataFails(record, flat):
@@ -1937,11 +2075,13 @@ def updateMythVideo(items):
                 if delete: # Only delete video files if they are symlinks
                     if simulation:
                         logger.info(u"Simulation: DELETE videometadata for intid = %s" % (record[u'intid'],))
-                        logger.info(u"Simulation: DELETE oldrecorded for title(%s), subtitle(%s)" % (record[u'intid'],record[u'title'], record[u'subtitle']))
+                        logger.info(u"Simulation: DELETE oldrecorded for title(%s), subtitle(%s)" % \
+                                (record[u'intid'],record[u'title'], record[u'subtitle']))
                     else:
                         Video(id=record[u'intid'], db=mythvideo).delete()
                         try: # An orphaned oldrecorded record may not exist
-                            for oldrecorded in MythDB(mythdb).searchOldRecorded(title=record[u'title'], subtitle=record[u'subtitle'] ):
+                            for oldrecorded in MythDB(mythdb).searchOldRecorded(title=record[u'title'],
+                                                                                subtitle=record[u'subtitle']):
                                 delOldRecorded((channel_id, oldrecorded.starttime)).delete()
                         except Exception, e:
                             pass
@@ -1958,7 +2098,8 @@ def updateMythVideo(items):
                     elif record[u'host'] and storagegroups.has_key(u'mythvideo'):
                         try:
                             if simulation:
-                                logger.info(u"Simulation: Remove video file (%s)" % (storagegroups[u'mythvideo']+record[u'filename']))
+                                logger.info(u"Simulation: Remove video file (%s)" % \
+                                            (storagegroups[u'mythvideo']+record[u'filename']))
                             else:
                                 os.remove(storagegroups[u'mythvideo']+record[u'filename'])
                         except OSError:
@@ -1975,7 +2116,8 @@ def updateMythVideo(items):
                     elif record[u'host'] and storagegroups.has_key(u'episodeimagedir'):
                         try:
                             if simulation:
-                                logger.info(u"Simulation: Remove file (%s)" % (storagegroups[u'episodeimagedir']+record[u'screenshot']))
+                                logger.info(u"Simulation: Remove file (%s)" % \
+                                            (storagegroups[u'episodeimagedir']+record[u'screenshot']))
                             else:
                                 os.remove(storagegroups[u'episodeimagedir']+record[u'screenshot'])
                         except OSError:
@@ -1993,7 +2135,8 @@ def updateMythVideo(items):
                     elif record[u'host'] and storagegroups.has_key(u'posterdir'):
                         try:
                             if simulation:
-                                logger.info(u"Simulation: Remove item cover art file (%s)" % (storagegroups[u'posterdir']+record[u'coverfile']))
+                                logger.info(u"Simulation: Remove item cover art file (%s)" % \
+                                            (storagegroups[u'posterdir']+record[u'coverfile']))
                             else:
                                 os.remove(storagegroups[u'posterdir']+record[u'coverfile'])
                         except OSError:
@@ -2014,7 +2157,8 @@ def updateMythVideo(items):
                     try:
                         items_copy.remove(item)
                     except ValueError:
-                        logger.info(u"Video (%s - %s) was found multiple times in list of (watched and/or saved) items from Miro - skipping" % (item[u'channelTitle'], item[u'title']))
+                        logger.info((u"Video (%s - %s) was found multiple times in list of (watched and/or saved) "\
+                                     u"items from Miro - skipping") % (item[u'channelTitle'], item[u'title']))
                         pass
                     break
 
@@ -2030,7 +2174,10 @@ def updateMythVideo(items):
         if not flat and not item.has_key(u'copied'):
             createMiroChannelSubdirectory(item)
         if not item[u'screenshot']: # If there is no screen shot then create one
-            screenshot_mythvideo = u"%s%s - %s%s.jpg" % (vid_graphics_dirs[u'episodeimagedir'], sanitiseFileName(item[u'channelTitle']), sanitiseFileName(item[u'title']), graphic_suffix[u'episodeimagedir'])
+            screenshot_mythvideo = u"%s%s - %s%s.jpg" % (vid_graphics_dirs[u'episodeimagedir'],
+                                                         sanitiseFileName(item[u'channelTitle']),
+                                                         sanitiseFileName(item[u'title']),
+                                                         graphic_suffix[u'episodeimagedir'])
             try:
                 result = takeScreenShot(item[u'videoFilename'], screenshot_mythvideo, size_limit=False)
             except:
@@ -2041,7 +2188,8 @@ def updateMythVideo(items):
         videometadata = tmp_array[0]
         oldrecorded = tmp_array[1]
         if simulation:
-            logger.info(u"Simulation: Create videometadata record for (%s - %s)" % (item[u'channelTitle'], item[u'title']))
+            logger.info(u"Simulation: Create videometadata record for (%s - %s)" % \
+                            (item[u'channelTitle'], item[u'title']))
         else:  # Check for duplicates
             if not local_only and videometadata[u'filename'][0] != u'/':
                 intid = mythvideo.getVideo(exactfile=videometadata[u'filename'], host=localhostname.lower())
@@ -2051,7 +2199,8 @@ def updateMythVideo(items):
                 try:
                     intid = Video(db=mythvideo).create(videometadata).intid
                 except MythError, e:
-                    logger.critical(u"Adding Miro video to MythVideo (%s - %s) failed for (%s)." % (item[u'channelTitle'], item[u'title'], e.args[0]))
+                    logger.critical(u"Adding Miro video to MythVideo (%s - %s) failed for (%s)." % \
+                                        (item[u'channelTitle'], item[u'title'], e.args[0]))
                     sys.exit(1)
                 if not item.has_key(u'copied'):
                     try:
@@ -2066,10 +2215,15 @@ def updateMythVideo(items):
                 statistics[u'Miros_MythVideos_added']+=1
                 statistics[u'Total_Miro_expiring']+=1
                 statistics[u'Total_Miro_MythVideos']+=1
-                displayMessage(u"Added Miro video to MythVideo (%s - %s)" % (videometadata[u'title'], videometadata[u'subtitle']))
+                displayMessage(u"Added Miro video to MythVideo (%s - %s)" % \
+                                (videometadata[u'title'], videometadata[u'subtitle']))
             else:
                 sys.stdout.write(u'')
-                displayMessage(u"Skipped adding a duplicate Miro video to MythVideo:\n(%s - %s)\nSometimes a Miro channel has the same video downloaded multiple times.\nThis is a Miro/Channel web site issue and often rectifies itself overtime.\n" % (videometadata[u'title'], videometadata[u'subtitle']))
+                displayMessage(u"""Skipped adding a duplicate Miro video to MythVideo:
+(%s - %s)
+Sometimes a Miro channel has the same video downloaded multiple times.
+This is a Miro/Channel web site issue and often rectifies itself overtime.
+""" % (videometadata[u'title'], videometadata[u'subtitle']))
 
     return True
     # end updateMythVideo()
@@ -2078,7 +2232,26 @@ def printStatistics():
     global statistics
 
     # Print statistics
-    sys.stdout.write(u"\n\n-------------------Statistics--------------------\nNumber of Watch Recording's watched...... (% 5d)\nNumber of Miro videos marked as seen..... (% 5d)\nNumber of Miro videos deleted............ (% 5d)\nNumber of New Miro videos downloaded..... (% 5d)\nNumber of Miro/MythVideo's removed....... (% 5d)\nNumber of Miro/MythVideo's added......... (% 5d)\nNumber of Miro videos copies to MythVideo (% 5d)\n-------------------------------------------------\nTotal Unwatched Miro/Watch Recordings.... (% 5d)\nTotal Miro/MythVideo videos to expire.... (% 5d)\nTotal Miro/MythVideo videos.............. (% 5d)\n-------------------------------------------------\n\n" % (statistics[u'WR_watched'],  statistics[u'Miro_marked_watch_seen'], statistics[u'Miro_videos_deleted'], statistics[u'Miros_videos_downloaded'], statistics[u'Miros_MythVideos_video_removed'], statistics[u'Miros_MythVideos_added'], statistics[u'Miros_MythVideos_copied'], statistics[u'Total_unwatched'], statistics[u'Total_Miro_expiring'], statistics[u'Total_Miro_MythVideos'], ))
+    sys.stdout.write(u"""
+
+-------------------Statistics--------------------
+Number of Watch Recording's watched...... (% 5d)
+Number of Miro videos marked as seen..... (% 5d)
+Number of Miro videos deleted............ (% 5d)
+Number of New Miro videos downloaded..... (% 5d)
+Number of Miro/MythVideo's removed....... (% 5d)
+Number of Miro/MythVideo's added......... (% 5d)
+Number of Miro videos copies to MythVideo (% 5d)
+-------------------------------------------------
+Total Unwatched Miro/Watch Recordings.... (% 5d)
+Total Miro/MythVideo videos to expire.... (% 5d)
+Total Miro/MythVideo videos.............. (% 5d)
+-------------------------------------------------
+
+""" % (statistics[u'WR_watched'],  statistics[u'Miro_marked_watch_seen'], statistics[u'Miro_videos_deleted'],
+       statistics[u'Miros_videos_downloaded'], statistics[u'Miros_MythVideos_video_removed'],
+       statistics[u'Miros_MythVideos_added'], statistics[u'Miros_MythVideos_copied'],
+       statistics[u'Total_unwatched'], statistics[u'Total_Miro_expiring'], statistics[u'Total_Miro_MythVideos'], ))
     # end printStatistics()
 
 
@@ -2094,41 +2267,7 @@ def main():
     global mythcommflag_recordings, mythcommflag_videos
     global local_only
 
-    parser = OptionParser(usage=u"%prog usage: mirobridge -huevstdociVHSCWM [parameters]\n")
-
-    parser.add_option(  "-e", "--examples", action="store_true", default=False, dest="examples",
-                        help=u"Display examples for executing the jamu script")
-    parser.add_option(  "-v", "--version", action="store_true", default=False, dest="version",
-                        help=u"Display version and author information")
-    parser.add_option(  "-s", "--simulation", action="store_true", default=False, dest="simulation",
-                        help=u"Simulation (dry run), no files are copied, symlinks created or MythTV data bases altered. If option (-n) is NOT specified Miro auto downloads WILL take place. See option (-n) help for details.")
-    parser.add_option(  "-t", "--testenv", action="store_true", default=False, dest="testenv",
-                        help=u"Test that the local environment can run all mirobridge functionality")
-    parser.add_option(  "-n", "--no_autodownload", action="store_true", default=False, dest="no_autodownload",
-                        help=u"Do not perform Miro Channel updates, video expiry and auto-downloadings. Default is to perform all perform all Channel maintenance features.")
-    parser.add_option(  "-o", "--nosubdirs", action="store_true", default=False, dest="nosubdirs",
-                        help=u"Organise MythVideo's Miro directory WITHOUT Miro channel subdirectories. The default is to have Channel subdirectories.")
-    parser.add_option(  "-c", "--channel", metavar="CHANNEL_ID:CHANNEL_NUM", default="", dest="channel",
-                        help=u'Specifies the channel id that is used for Miros unplayed recordings. Enter as "xxxx:yyy". Default is 9999:999. Be warned that once you change the default channel_id "9999" you must always use this option!')
-    parser.add_option(  "-i", "--import_opml", metavar="OPMLFILEPATH", default="", dest="import_opml",
-                        help=u'Import Miro exported OPML file containing Channel configurations. File name must be a fully qualified path. This option is exclusive to Miro v2.5.x and higher.')
-    parser.add_option(  "-V", "--verbose", action="store_true", default=False, dest="verbose",
-                        help=u"Display verbose messages when processing")
-    parser.add_option(  "-H", "--hostname", metavar="HOSTNAME", default="", dest="hostname",
-                        help=u"MythTV Backend hostname mirobridge is to up date")
-    parser.add_option(  "-S", "--sleeptime", metavar="SLEEP_DELAY_SECONDS", default="", dest="sleeptime",
-                        help=u"The amount of seconds to wait for an auto download to start.\nThe default is 60 seconds, but this may need to be adjusted for slower Internet connections.")
-    parser.add_option(  "-C", "--addchannel", metavar="ICONFILE_PATH", default="OFF", dest="addchannel",
-                        help=u'Add a Miro Channel record to MythTV. This gets rid of the "#9999 #9999" on the Watch Recordings screen and replaces it with the usual\nthe channel number and channel name.\nThe default if not overridden by the (-c) option is channel number 999.\nIf a filename and path is supplied it will be set as the channels icon. Make sure your override channel number is NOT one of your current MythTV channel numbers.\nThis option is typically only used once as there can only be one Miro channel record at a time.')
-    parser.add_option(  "-N", "--new_watch_copy", action="store_true", default=False, dest="new_watch_copy",
-                        help=u'For ALL Miro Channels: Use the "Watch Recording" screen to watch new Miro downloads then once watched copy the videos, icons, screen shot and metadata to MythVideo. Once coping is complete delete the video from Miro.\nThis option overrides any "mirobridge.conf" settings.')
-    parser.add_option(  "-W", "--watch_only", action="store_true", default=False, dest="watch_only",
-                        help=u'For ALL Miro Channels: Only use "Watch Recording" never move any Miro videos to MythVideo.\nThis option overrides any "mirobridge.conf" settings.')
-    parser.add_option(  "-M", "--mythvideo_only", action="store_true", default=False, dest="mythvideo_only",
-                        help=u'For ALL Miro Channel videos: Copy newly downloaded Miro videos to MythVideo and removed from Miro. These Miro videos never appear in the MythTV "Watch Recording" screen.\nThis option overrides any "mirobridge.conf" settings.')
-
-
-    opts, args = parser.parse_args()
+    global opts, args
 
     if opts.examples:                    # Display example information
         sys.stdout.write(examples_txt+'\n')
@@ -2155,7 +2294,8 @@ def main():
     if opts.mythvideo_only: x+=1
     if opts.import_opml: x+=1
     if x > 1:
-        logger.critical(u"The (-W), (-M), (-N) and (-i) options are mutually exclusive, so only one can be specified at a time.")
+        logger.critical(u"The (-W), (-M), (-N) and (-i) options are mutually exclusive, "\
+                        u"so only one can be specified at a time.")
         sys.exit(1)
 
     # Set option related global variables
@@ -2183,7 +2323,8 @@ def main():
             sys.exit(1)
 
     if miroConfiguration(prefs.APP_VERSION) < u"2.0.3":
-        logger.critical(u"The installed version of Miro (%s) is too old. It must be at least v2.0.3 or higher." % miroConfiguration(prefs.APP_VERSION))
+        logger.critical(u"The installed version of Miro (%s) is too old. It must be at least v2.0.3 or higher." % \
+                            miroConfiguration(prefs.APP_VERSION))
         if test_environment:
             requirements_are_met = False
         else:
@@ -2191,7 +2332,8 @@ def main():
 
     # Miro 4.0.1 has a critical bug that effects MiroBridge. Miro must be upgraded.
     if miroConfiguration(prefs.APP_VERSION) == u"4.0.1":
-        logger.critical(u"The installed version of Miro (%s) must be upgraded to Miro version 4.0.2 or higher." % miroConfiguration(prefs.APP_VERSION))
+        logger.critical(u"The installed version of Miro (%s) must be upgraded to Miro version 4.0.2 or higher." % \
+                            miroConfiguration(prefs.APP_VERSION))
         if test_environment:
             requirements_are_met = False
         else:
@@ -2200,7 +2342,8 @@ def main():
     # Verify that the import opml option can be used
     if opts.import_opml:
         if miroConfiguration(prefs.APP_VERSION) < u"2.5.2":
-            logger.critical(u"The OPML import option requires Miro v2.5.2 or higher your Miro (%s) is too old." % miroConfiguration(prefs.APP_VERSION))
+            logger.critical(u"The OPML import option requires Miro v2.5.2 or higher your Miro (%s) is too old." % \
+                                miroConfiguration(prefs.APP_VERSION))
             if test_environment:
                 requirements_are_met = False
             else:
@@ -2289,7 +2432,8 @@ def main():
     if len(channel_mythvideo_only) and len(channel_new_watch_copy):
         for key in channel_mythvideo_only.keys():
             if key in channel_new_watch_copy.keys():
-                logger.critical(u'The Miro Channel (%s) cannot be used as both a "Mythvideo Only" and "New-Watch-Copy" channel.' % key)
+                logger.critical((u'The Miro Channel (%s) cannot be used as both a "Mythvideo Only" '\
+                                 u'and "New-Watch-Copy" channel.') % key)
                 if test_environment:
                     requirements_are_met = False
                 else:
@@ -2298,7 +2442,8 @@ def main():
     # Verify that ImageMagick is installed
     ret = useImageMagick(u"convert -version")
     if ret < 0 or ret > 1:
-        logger.critical(u"ImageMagick must be installed, graphics cannot be resized or converted to the required graphics format (e.g. jpg and or png)")
+        logger.critical(u"ImageMagick must be installed, graphics cannot be resized or converted to "\
+                        u"the required graphics format (e.g. jpg and or png)")
         if test_environment:
             requirements_are_met = False
         else:
@@ -2306,7 +2451,11 @@ def main():
 
     # Verify that the "DeletesFollowLinks" setting is not set to the character '1'
     if mythdb.settings.NULL.DeletesFollowLinks == '1':
-        logger.critical(u'The MythTV back end setting "Follow symbolic links when deleting files" is checked and it is incompatible with MiroBridge processing. It must be unchecked it to use MiroBridge.\nTo uncheck this setting start "mythtv-setup" or with Mythbuntu start "MythTV Backend Setup" and then General->Miscellaneous Settings and uncheck the "Follow symbolic links when deleting files" setting')
+        logger.critical(u'The MythTV back end setting "Follow symbolic links when deleting files" is '\
+                        u'checked and it is incompatible with MiroBridge processing. It must be unchecked '\
+                        u'it to use MiroBridge.\nTo uncheck this setting start "mythtv-setup" or with '\
+                        u'Mythbuntu start "MythTV Backend Setup" and then General->Miscellaneous Settings '\
+                        u'and uncheck the "Follow symbolic links when deleting files" setting')
         if test_environment:
             requirements_are_met = False
         else:
@@ -2347,7 +2496,8 @@ def main():
     startup.startup()
     app.cli_events.startup_event.wait()
     if app.cli_events.startup_failure:
-        logger.critical(u"Starting Miro Frontend and Backend failed: (%s)\n(%s)" % (app.cli_events.startup_failure[0], app.cli_events.startup_failure[1]))
+        logger.critical(u"Starting Miro Frontend and Backend failed: (%s)\n(%s)" % \
+                            (app.cli_events.startup_failure[0], app.cli_events.startup_failure[1]))
         app.controller.shutdown()
         time.sleep(5) # Let the shutdown processing complete
         sys.exit(1)
@@ -2491,7 +2641,11 @@ def main():
                     unwatched.remove(item)
                     # Completely remove this duplicate video and item information from Miro
                     app.cli_interpreter.do_mythtv_item_remove(item[u'videoFilename'])
-                    displayMessage(u"Skipped adding a duplicate Miro video to the MythTV Watch Recordings screen (%s - %s) which is already in MythVideo.\nSometimes a Miro channel has the same video downloaded multiple times.\nThis is a Miro/Channel web site issue and often rectifies itself overtime." % (item[u'channelTitle'], item[u'title']))
+                    displayMessage((u"Skipped adding a duplicate Miro video to the MythTV Watch Recordings "\
+                                    u"screen (%s - %s) which is already in MythVideo.\nSometimes a Miro channel "\
+                                    u"has the same video downloaded multiple times.\nThis is a Miro/Channel web "\
+                                    u"site issue and often rectifies itself overtime.") % \
+                                            (item[u'channelTitle'], item[u'title']))
                 except ValueError:
                     pass
     duplicates = []
@@ -2512,7 +2666,11 @@ def main():
             unwatched.remove(duplicate)
             # Completely remove this duplicate video and item information from Miro
             app.cli_interpreter.do_mythtv_item_remove(duplicate[u'videoFilename'])
-            displayMessage(u"Skipped adding a Miro video to the MythTV Watch Recordings screen (%s - %s) as there are duplicate 'new' video items.\nSometimes a Miro channel has the same video downloaded multiple times.\nThis is a Miro/Channel web site issue and often rectifies itself overtime." % (duplicate[u'channelTitle'], duplicate[u'title']))
+            displayMessage((u"Skipped adding a Miro video to the MythTV Watch Recordings screen (%s - %s) "\
+                            u"as there are duplicate 'new' video items.\nSometimes a Miro channel has the "\
+                            u"same video downloaded multiple times.\nThis is a Miro/Channel web site issue "\
+                            u"and often rectifies itself overtime.") % \
+                                    (duplicate[u'channelTitle'], duplicate[u'title']))
         except ValueError:
             pass
 
@@ -2565,7 +2723,8 @@ def main():
                     directory_coverart = True    # If the directory was just created it needs coverart
             elif video[u'item_icon']:
                 ext = getExtention(video[u'item_icon'])
-                if not os.path.isfile(u"%s%s - %s.%s" % (copy_dir, sanitiseFileName(video[u'channelTitle'].lower()), sanitiseFileName(video[u'title'].lower()), ext)):
+                if not os.path.isfile(u"%s%s - %s.%s" % (copy_dir, sanitiseFileName(video[u'channelTitle'].lower()),
+                                                         sanitiseFileName(video[u'title'].lower()), ext)):
                     directory_coverart = True    # If the directory was just created it needs coverart
 
         # Copy the Channel icon located in the posters/coverart directory
@@ -2579,12 +2738,14 @@ def main():
                 pass
             else:
                 if simulation:
-                    logger.info(u"Simulation: Copy a Channel Icon (%s) for directory (%s)." % (video[u'channel_icon'], dirpath))
+                    logger.info(u"Simulation: Copy a Channel Icon (%s) for directory (%s)." % \
+                                    (video[u'channel_icon'], dirpath))
                 else:
                     try:    # Miro Channel icon copy for the new subdirectory
                         useImageMagick(u'convert "%s" "%s"' % (video[u'channel_icon'], dirpath))
                     except Exception, e:
-                        logger.critical(u"Copy a Channel Icon (%s) for directory (%s) failed, error(%s)." % (video[u'channel_icon'], dirpath, e))
+                        logger.critical(u"Copy a Channel Icon (%s) for directory (%s) failed, error(%s)." % \
+                                            (video[u'channel_icon'], dirpath, e))
                         # Gracefully close the Miro database and shutdown the Miro Front and Back ends
                         app.controller.shutdown()
                         time.sleep(5) # Let the shutdown processing complete
@@ -2595,9 +2756,11 @@ def main():
         ext = getExtention(video[u'videoFilename'])
         if ext.lower() == u'm4v':
             ext = u'mpg'
-        filepath = u"%s%s - %s.%s" % (copy_dir, sanitiseFileName(video[u'channelTitle']), sanitiseFileName(video[u'title']), ext)
+        filepath = u"%s%s - %s.%s" % (copy_dir, sanitiseFileName(video[u'channelTitle']),
+                                      sanitiseFileName(video[u'title']), ext)
         if simulation:
-            logger.info(u"Simulation: Copying the Miro video (%s) to the MythVideo directory (%s)." % (video[u'videoFilename'], filepath))
+            logger.info(u"Simulation: Copying the Miro video (%s) to the MythVideo directory (%s)." % \
+                            (video[u'videoFilename'], filepath))
         else:
             try:    # Miro video copied into a MythVideo directory
                 shutil.copy2(video[u'videoFilename'], filepath)
@@ -2607,7 +2770,10 @@ def main():
                 else:
                     video[u'videoFilename'] = filepath
             except Exception, e:
-                logger.critical(u"Copying the Miro video (%s) to the MythVideo directory (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory), error(%s)" % (video[u'videoFilename'], filepath, e))
+                logger.critical((u"Copying the Miro video (%s) to the MythVideo directory (%s).\n         "\
+                                 u"This maybe a permissions error (mirobridge.py does not have permission to "\
+                                 u"write to the directory), error(%s)") % \
+                                        (video[u'videoFilename'], filepath, e))
                 # Gracefully close the Miro database and shutdown the Miro Front and Back ends
                 app.controller.shutdown()
                 time.sleep(5) # Let the shutdown processing complete
@@ -2622,13 +2788,18 @@ def main():
         if video[u'channel_icon']:
             ext = getExtention(video[u'channel_icon'])
             if video[u'channelTitle'].lower() in channel_icon_override:
-                filepath = u"%s%s - %s%s.%s" % (vid_graphics_dirs[u'posterdir'], sanitiseFileName(video[u'channelTitle']), sanitiseFileName(video[u'title']), graphic_suffix[u'posterdir'], ext)
+                filepath = u"%s%s - %s%s.%s" % (vid_graphics_dirs[u'posterdir'],
+                                                sanitiseFileName(video[u'channelTitle']),
+                                                sanitiseFileName(video[u'title']),
+                                                graphic_suffix[u'posterdir'], ext)
             else:
-                filepath = u"%s%s%s.%s" % (vid_graphics_dirs[u'posterdir'], sanitiseFileName(video[u'channelTitle']), graphic_suffix[u'posterdir'], ext)
+                filepath = u"%s%s%s.%s" % (vid_graphics_dirs[u'posterdir'], sanitiseFileName(video[u'channelTitle']),
+                                           graphic_suffix[u'posterdir'], ext)
             # There may already be a Channel icon available or it is a symlink which needs to be replaced
             if not os.path.isfile(filepath) or os.path.islink(filepath):
                 if simulation:
-                    logger.info(u"Simulation: Copying the Channel Icon (%s) to the poster directory (%s)." % (video[u'channel_icon'], filepath))
+                    logger.info(u"Simulation: Copying the Channel Icon (%s) to the poster directory (%s)." % \
+                                    (video[u'channel_icon'], filepath))
                 else:
                     try:    # Miro Channel icon copied into a MythVideo directory
                         try: # Remove any old symlink file
@@ -2641,7 +2812,10 @@ def main():
                         else:
                             video[u'channel_icon'] = filepath
                     except Exception, e:
-                        logger.critical(u"Copying the Channel Icon (%s) to the poster directory (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory), error(%s)" % (video[u'channel_icon'], filepath, e))
+                        logger.critical((u"Copying the Channel Icon (%s) to the poster directory (%s).\n         "\
+                                         u"This maybe a permissions error (mirobridge.py does not have permission "\
+                                         u"to write to the directory), error(%s)") % \
+                                                (video[u'channel_icon'], filepath, e))
                         # Gracefully close the Miro database and shutdown the Miro Front and Back ends
                         app.controller.shutdown()
                         time.sleep(5) # Let the shutdown processing complete
@@ -2655,14 +2829,18 @@ def main():
         # There may already be a Screenshot available or it is a symlink which needs to be replaced
         if video[u'screenshot']:
             ext = getExtention(video[u'screenshot'])
-            filepath = u"%s%s - %s%s.%s" % (vid_graphics_dirs[u'episodeimagedir'], sanitiseFileName(video[u'channelTitle']), sanitiseFileName(video[u'title']), graphic_suffix[u'episodeimagedir'], ext)
+            filepath = u"%s%s - %s%s.%s" % (vid_graphics_dirs[u'episodeimagedir'],
+                                            sanitiseFileName(video[u'channelTitle']),
+                                            sanitiseFileName(video[u'title']),
+                                            graphic_suffix[u'episodeimagedir'], ext)
         else:
             filepath = u''
 
         if not os.path.isfile(filepath) or os.path.islink(filepath):
             if video[u'screenshot']:
                 if simulation:
-                    logger.info(u"Simulation: Copying the Screenshot (%s) to the Screenshot directory (%s)." % (video[u'screenshot'], filepath))
+                    logger.info(u"Simulation: Copying the Screenshot (%s) to the Screenshot directory (%s)." % \
+                                    (video[u'screenshot'], filepath))
                 else:
                     try:    # Miro Channel icon copied into a MythVideo directory
                         try: # Remove any old symlink file
@@ -2670,13 +2848,17 @@ def main():
                         except OSError:
                             pass
                         shutil.copy2(video[u'screenshot'], filepath)
-                        displayMessage(u"Copied Miro screenshot file (%s) to MythVideo (%s)" % (video[u'screenshot'], filepath))
+                        displayMessage(u"Copied Miro screenshot file (%s) to MythVideo (%s)" % \
+                                            (video[u'screenshot'], filepath))
                         if u'episodeimagedir' in storagegroups.keys() and not local_only:
                             video[u'screenshot'] = filepath.replace(storagegroups[u'episodeimagedir'], u'')
                         else:
                             video[u'screenshot'] = filepath
                     except Exception, e:
-                        logger.critical(u"Copying the Screenshot (%s) to the Screenshot directory (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory), error(%s)" % (video[u'screenshot'], filepath, e))
+                        logger.critical((u"Copying the Screenshot (%s) to the Screenshot directory (%s).\n         "\
+                                         u"This maybe a permissions error (mirobridge.py does not have permission to "\
+                                         u"write to the directory), error(%s)") % \
+                                                (video[u'screenshot'], filepath, e))
                         # Gracefully close the Miro database and shutdown the Miro Front and Back ends
                         app.controller.shutdown()
                         time.sleep(5) # Let the shutdown processing complete
