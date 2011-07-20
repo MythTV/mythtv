@@ -1,8 +1,10 @@
+#include <iostream>
+using namespace std;
+
 #include <QThreadPool>
+
 #include "mythcommflagplayer.h"
 #include "mythlogging.h"
-
-#define LOC QString("CommFlagPlayer: ")
 
 class RebuildSaver : public QRunnable
 {
@@ -16,14 +18,14 @@ class RebuildSaver : public QRunnable
 
     virtual void run(void)
     {
-	threadRegister("RebuildSaver");
+        threadRegister("RebuildSaver");
         m_decoder->SavePositionMapDelta(m_first, m_last);
 
         QMutexLocker locker(&s_lock);
         s_cnt[m_decoder]--;
         if (!s_cnt[m_decoder])
             s_wait.wakeAll();
-	threadDeregister();
+        threadDeregister();
     }
 
     static uint GetCount(DecoderBase *d)
@@ -85,7 +87,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     if (!InitVideo())
     {
         LOG(VB_GENERAL, LOG_ERR,
-            LOC + "RebuildSeekTable unable to initialize video");
+            "RebuildSeekTable unable to initialize video");
         SetPlaying(false);
         return false;
     }
@@ -102,13 +104,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     DecoderGetFrame(kDecodeNothing,true);
 
     if (showPercentage)
-    {
-        if (totalFrames)
-            printf("             ");
-        else
-            printf("      ");
-        fflush( stdout );
-    }
+        cout << "\r                         \r" << flush;
 
     int prevperc = -1;
     while (!GetEof())
@@ -156,28 +152,29 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
                 if (showPercentage)
                 {
-                    printf( "\b\b\b\b\b\b\b\b\b\b\b\b\b" );
-                    printf( "%3d%%/%5dfps", percentage, flagFPS );
-                    fflush( stdout );
+                    QString str = QString("\r%1%/%2fps  \r")
+                        .arg(percentage,3).arg(flagFPS,5);
+                    cout << qPrintable(str) << flush;
                 }
-		if (percentage % 10 == 0 && prevperc != percentage)
+                else if (percentage % 10 == 0 && prevperc != percentage)
                 {
                     prevperc = percentage;
-		    LOG(VB_GENERAL, LOG_INFO, QString("%1%/%2""fps")
-                                        .arg(percentage).arg(flagFPS));
+                    LOG(VB_GENERAL, LOG_INFO, QString("Progress %1% @ %2fps")
+                        .arg(percentage,3).arg(flagFPS,5));
                 }
             }
             else 
             {
                 if (showPercentage)
                 {
-                    printf( "\b\b\b\b\b\b" );
-                    printf( "%6lld", (long long)myFramesPlayed );
-                    fflush( stdout );
+                    QString str = QString("\r%1  \r").arg(myFramesPlayed,6);
+                    cout << qPrintable(str) << flush;
                 }
-                if (myFramesPlayed % 1000 == 0)
-                    LOG(VB_GENERAL, LOG_INFO, QString("%1")
-                            .arg(myFramesPlayed));
+                else if (myFramesPlayed % 1000 == 0)
+                {
+                    LOG(VB_GENERAL, LOG_INFO, QString("Frames processed %1")
+                        .arg(myFramesPlayed));
+                }
             }
         }
 
@@ -186,12 +183,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     }
 
     if (showPercentage)
-    {
-        if (totalFrames)
-            printf( "\b\b\b\b\b\b\b" );
-        printf( "\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b" );
-        fflush( stdout );
-    }
+        cout << "\r                         \r" << flush;
 
     SaveTotalDuration();
 

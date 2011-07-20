@@ -7,6 +7,7 @@
 
 // C++ headers
 #include <algorithm> // for min/max
+#include <iostream> // for cerr
 using namespace std;
 
 // Qt headers
@@ -386,10 +387,9 @@ bool ClassicCommDetector::go()
     if (showProgress)
     {
         if (myTotalFrames)
-            cerr << "  0%/      ";
+            cerr << "\r  0%/          \r" << flush;
         else
-            cerr << "     0/      ";
-        cerr.flush();
+            cerr << "\r     0/        \r" << flush;
     }
 
 
@@ -511,19 +511,16 @@ bool ClassicCommDetector::go()
             {
                 if (myTotalFrames)
                 {
-                    QString tmp = QString("\b\b\b\b\b\b\b\b\b\b\b%1%/%2fps")
-                        .arg(percentage, 3).arg((int)flagFPS, 3);
-                    QByteArray ba = tmp.toAscii();
-                    cerr << ba.constData() << flush;
+                    QString tmp = QString("\r%1%/%2fps  \r")
+                        .arg(percentage, 3).arg((int)flagFPS, 4);
+                    cerr << qPrintable(tmp) << flush;
                 }
                 else
                 {
-                    QString tmp = QString("\b\b\b\b\b\b\b\b\b\b\b\b\b%1/%2fps")
-                        .arg(currentFrameNumber, 6).arg((int)flagFPS, 3);
-                    QByteArray ba = tmp.toAscii();
-                    cerr << ba.constData() << flush;
+                    QString tmp = QString("\r%1/%2fps  \r")
+                        .arg(currentFrameNumber, 6).arg((int)flagFPS, 4);
+                    cerr << qPrintable(tmp) << flush;
                 }
-                cerr.flush();
             }
 
             if (myTotalFrames)
