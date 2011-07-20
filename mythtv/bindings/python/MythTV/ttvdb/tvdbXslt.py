@@ -12,7 +12,7 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="tvdbXslt - XPath and XSLT functions for the Tribute.ca grabber"
+__title__ ="tvdbXslt - XPath and XSLT functions for the ttvdb.com grabber"
 __author__="R.D. Vaughan"
 __purpose__='''
 This python script is intended to perform a variety of utility functions
@@ -21,9 +21,10 @@ See this link for the specifications:
 http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
 '''
 
-__version__="v0.1.1"
+__version__="v0.1.2"
 # 0.1.0 Initial development
 # 0.1.1 Converted categories, genre, ... etc text characters to be XML compliant
+# 0.1.2 Performance improvements by removing complex data searches from the XLST stylesheet
 
 
 # Specify the class names that have XPath extention functions
@@ -97,6 +98,13 @@ class xpathFunctions(object):
             'poster': [u'//Banner[BannerType/text()="season" and Language/text()="%(language)s" and Season/text()="%(season)s" and BannerType2/text()="season"]', u'//Banner[BannerType/text()="%(type)s" and Language/text()="%(language)s"]', u'//Banner[BannerType/text()="season" and Language/text()="en" and Season/text()="%(season)s" and BannerType2/text()="season"]', u'//Banner[BannerType/text()="season" and Season/text()="%(season)s" and BannerType2/text()="season"]', u'//Banner[BannerType/text()="%(type)s" and Language/text()="en"]', u'//Banner[BannerType/text()="%(type)s"]'],
             'banner': ['//Banner[BannerType/text()="season" and Language/text()="%(language)s" and Season/text()="%(season)s" and BannerType2/text()="seasonwide"]', u'//Banner[BannerType/text()="series" and Language/text()="%(language)s" and BannerType2/text()="graphical"]', '//Banner[BannerType/text()="season" and Language/text()="en" and Season/text()="%(season)s" and BannerType2/text()="seasonwide"]', '//Banner[BannerType/text()="season" and Season/text()="%(season)s" and BannerType2/text()="seasonwide"]', u'//Banner[BannerType/text()="series" and Language/text()="en" and BannerType2/text()="graphical"]', '//Banner[BannerType/text()="series" and BannerType2/text()="graphical"]'],
             }
+        self.dataFilters = {
+            'subtitle': u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/EpisodeName/text()',
+            'description': u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/Overview/text()',
+            'IMDB': u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/IMDB_ID/text()',
+            'allEpisodes': u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]',
+            }
+        self.persistentResult = ''
     # end __init__()
 
 ######################################################################################################
@@ -114,6 +122,8 @@ class xpathFunctions(object):
             'htmlToString': self.htmlToString,
             'stringToList': self.stringToList,
             'imageElements': self.imageElements,
+            'getValue': self.getValue,
+            'getResult': self.getResult,
             }
         return
     # end buildFuncDict()
@@ -253,6 +263,42 @@ class xpathFunctions(object):
             return text # leave as is
         return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
     # end massageText()
+
+    def getValue(self, context, *args):
+        ''' Use xpath filters to perform complex element tree data searching. This is significantly more
+        efficent than using the same search statements in a xslt template. Also save the results so that the
+        data can be used both in an if statement then actually use the data without performing an identical
+        element tree data search.
+        return the results of the data search
+        '''
+        if len(args) < 4:
+            allValues = False
+        else:
+            allValues = True
+        parmDict = {
+            'season': args[0][0].attrib['season'],
+            'episode': args[0][0].attrib['episode'],
+            }
+        xpathFilter = etree.XPath(self.dataFilters[args[2]] % parmDict)
+        results = xpathFilter(args[1][0])
+
+        # Sometimes all the results are required
+        if allValues == True:
+            self.persistentResult = results
+            return self.persistentResult
+
+        if len(results):
+            self.persistentResult = results[0] # Return only the first result
+        else:
+            self.persistentResult = ''
+        return self.persistentResult
+    # end getValue()
+
+    def getResult(self, context):
+        ''' Return the last saved result
+        '''
+        return self.persistentResult
+    # end getResult()
 
 ######################################################################################################
 #

@@ -2278,6 +2278,7 @@ void JobQueue::DoUserJobThread(int jobID)
         if (pginfo)
         {
             msg = QString("Finished %1 for %2 recorded from channel %3")
+                .arg(jobDesc)
                 .arg(pginfo->toString(ProgramInfo::kTitleSubtitle))
                 .arg(pginfo->toString(ProgramInfo::kRecordingKey));
         }

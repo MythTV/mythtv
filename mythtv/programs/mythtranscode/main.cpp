@@ -58,6 +58,7 @@ static void usage(char *progname)
     cerr << "\t                        will be created in the specified directory\n";
     cerr << "\t--fifosync            : Enforce fifo sync\n";
     cerr << "\t--passthrough         : Will pass through raw, unprocessed audio data stream\n";
+    cerr << "\t--fifoinfo            : Stop after displaying the format of the fifo data\n";
     cerr << "\t--buildindex     or -b: Build a new keyframe index\n";
     cerr << "\t                        (use only if audio and video fifos are read independantly)\n";
     cerr << "\t--video               : Specifies that this is not a mythtv recording\n";
@@ -146,6 +147,7 @@ int main(int argc, char *argv[])
     int otype = REPLEX_MPEG2;
     bool useCutlist = false, keyframesonly = false;
     bool build_index = false, fifosync = false, showprogress = false, mpeg2 = false;
+    bool fifo_info = false;
     QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap;
@@ -401,6 +403,10 @@ int main(int argc, char *argv[])
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"--fifoinfo"))
+        {
+            fifo_info = true;
+        }
         else if (!strcmp(a.argv()[argpos],"-ro") ||
                  !strcmp(a.argv()[argpos],"--recorderOptions"))
         {
@@ -568,6 +574,18 @@ int main(int argc, char *argv[])
          cerr << "Must specify --fifodir to use --fifosync\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
+    if (fifo_info && !fifodir.isEmpty())
+    {
+        cerr << "Cannot specify both --fifodir and --fifoinfo\n";
+        return TRANSCODE_EXIT_INVALID_CMDLINE;
+    }
+
+    if (fifo_info)
+    {
+        // Setup a dummy fifodir path, so that the "fifodir" code path
+        // is taken. The path wont actually be used.
+        fifodir = "DummyFifoPath";
+    }
 
     VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
 
@@ -614,7 +632,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-"))
+    if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-") && fifodir.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, QString("Attempted to transcode %1. "
                "Mythtranscode is currently unable to transcode remote "
@@ -623,7 +641,7 @@ int main(int argc, char *argv[])
         return TRANSCODE_EXIT_REMOTE_FILE;
     }
 
-    if (outfile.isNull() && !build_index)
+    if (outfile.isNull() && !build_index && fifodir.isEmpty())
         outfile = infile + ".tmp";
 
     if (jobID >= 0)
@@ -645,10 +663,16 @@ int main(int argc, char *argv[])
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,
                                           (fifosync || keyframesonly), jobID,
-                                          fifodir, deleteMap,
+                                          fifodir, fifo_info, deleteMap,
                                           passthru);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
+    }
+
+    if (fifo_info)
+    {
+        delete gContext;
+        return TRANSCODE_EXIT_OK;
     }
 
     int exitcode = TRANSCODE_EXIT_OK;

@@ -525,9 +525,9 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
 
     if (!blank)
     {
-        QVector<unsigned int> bg_palette;
-        for (int i = 0; i < AVPALETTE_COUNT; i++)
-            bg_palette.push_back(bgpalette[i]);
+        QVector<uint32_t> bg_palette(4);
+        for (int i = 0; i < 4; i++)
+            bg_palette[i] = bgpalette[i];
         bg_image.setColorTable(bg_palette);
         bg_image = bg_image.convertToFormat(QImage::Format_ARGB32);
         AddScaledImage(bg_image, rect);
@@ -535,12 +535,12 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     }
 
     QImage fg_image = bg_image.copy(buttonPos);
-    QVector<unsigned int> fg_palette;
+    QVector<uint32_t> fg_palette(4);
     uint32_t *fgpalette = (uint32_t *)(dvdButton->rects[1]->pict.data[1]);
     if (fgpalette)
     {
-        for (int i = 0; i < AVPALETTE_COUNT; i++)
-            fg_palette.push_back(fgpalette[i]);
+        for (int i = 0; i < 4; i++)
+            fg_palette[i] = fgpalette[i];
         fg_image.setColorTable(fg_palette);
     }
 

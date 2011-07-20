@@ -23,6 +23,7 @@ package MythTV;
     use DBI;
     use HTTP::Request;
     use LWP::UserAgent;
+    use Math::BigInt;
 
 # Load the UPNP libraries if we have them, but die nicely if we don't.
     BEGIN {
@@ -546,6 +547,16 @@ EOF
     # $seek is optional, and is the amount to seek from the start of the file
     # (for resuming downloads, etc.)
         my $seek = (shift or 0);
+    # Check to see if we were passed a URL using the myth protocol - if so,
+    # override the values set above accordingly
+        if (substr($basename, 0,7) eq "myth://") {
+            $basename = substr($basename, 7);
+            my $index = index($basename, ":");
+            $host = substr($basename, 0, $index);
+            my $endindex = index($basename, "/", $index);
+            $port = substr($basename, $index+1, $endindex-$index-1);
+            $basename = substr($basename, $endindex);
+        }
     # We need to figure out if we were passed a file handle or a filename.  If
     # it was a pathname, we should open the file for writing.
         if ($target_path) {
@@ -592,8 +603,8 @@ EOF
         my $sock = $self->new_backend_socket($host,
                                              $port,
                                              join($MythTV::BACKEND_SEP,
-                                                  'ANN FileTransfer '.hostname,
-                                                  $basename));
+                                                  'ANN FileTransfer '.hostname.
+                                                  ' 0 1 2000', $basename, '...'));
         my @recs = split($MythTV::BACKEND_SEP_rx,
                          $sock->read_data());
     # Error?
@@ -612,7 +623,8 @@ EOF
             $csock->read_data();
         }
     # Transfer the data.
-        my $total = $recs[3];
+        # File size is longlong but is sent as 2 signed ints
+        my $total = $self->decodeLongLong($recs[2], $recs[3]);
         while ($sock && $total > 0) {
         # Attempt to read in 2M chunks, or the remaining total, whichever is
         # smaller.
@@ -648,6 +660,27 @@ EOF
         }
     # Return
         return 2;
+    }
+ # Analogous to decodeLongLong in decodeencode.cpp
+    sub decodeLongLong {
+        my $self = shift;
+        my $first = shift;
+        my $longlong = Math::BigInt->bzero();
+        if($first) { # 1st unsigned int is most significant
+           my $maxInt = Math::BigInt->new('4294967296');
+           my $shifted = $self->signedToUnsignedInt($first) * $maxInt;
+           $longlong += $shifted;
+        }
+        # add the 2nd unsigned int
+        $longlong += $self->signedToUnsignedInt(shift);
+        return $longlong;
+    }
+                                                                    
+    sub signedToUnsignedInt {
+        my $self = shift;
+        $b = pack( "l", shift);
+        my @array = unpack( "L", $b );
+        return Math::BigInt->new(@array);
     }
 
 # Check the MythProto version between the backend and this script

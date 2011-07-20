@@ -190,6 +190,8 @@ __version__=u"v0.6.3"
 # Add support for Miro version 3.5.x
 # Fixed screenshot code due to changes in ffmpeg. First
 # noticed in Ubuntu 10.10 (ffmepg v 0.6-4:0.6-2ubuntu6)
+# Fixed aborts caused by bad metadata in Miro (videoFilename)
+# Added support for Miro 4.0.2
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -345,7 +347,10 @@ try:
         pass
 
     # Set up gettext before everything else
+    from miro import config             # New for Miro4 (Changed import location)
+    from miro import eventloop          # New for Miro4
     from miro import gtcache
+    config.load()                       # New for Miro4
     gtcache.init()
 
     # This fixes some/all problems with Python 2.6 support but should be
@@ -359,33 +364,55 @@ try:
 
     from miro import prefs
     from miro import startup
-    from miro import config
     from miro import app
     from miro.frontends.cli.events import EventHandler
+
+    # Required for Miro 4 as the configuration calls changed location and additional Miro 4 specific imports are required
+    try:
+        dummy = app.config.get(prefs.APP_VERSION)   # A test to see if this is Miro v4 before the version can be read. If there is no exception this is Miro v4
+        eventloop.setup_config_watcher()
+        from miro import signals
+        from miro import messages
+        from miro import eventloop
+        from miro import feed
+        from miro import workerprocess
+        from miro.frontends.cli.application import InfoUpdaterCallbackList
+        from miro.frontends.cli.application import InfoUpdater
+        from miro.plat.renderers.gstreamerrenderer import movie_data_program_info
+        miroConfiguration = app.config.get
+        from miro import controller
+        app.controller = controller.Controller()
+    except:
+        miroConfiguration = config.get
+        pass
+
 except Exception, e:
     logger.critical(u"Importing Miro functions has an issue. Miro must be installed and functional, error(%s)", e)
     sys.exit(1)
 
-logger.info(u"Miro Bridge version %s with Miro version %s" % (__version__, config.get(prefs.APP_VERSION)))
-if config.get(prefs.APP_VERSION) < u"2.0.3":
+logger.info(u"Miro Bridge version %s with Miro version %s" % (__version__, miroConfiguration(prefs.APP_VERSION)))
+if miroConfiguration(prefs.APP_VERSION) < u"2.0.3":
     logger.critical(u"Your version of Miro (v%s) is not recent enough. Miro v2.0.3 is the minimum and it is preferred that you upgrade to Miro v2.5.2 or later.")
     sys.exit(1)
 
 try:
-    if config.get(prefs.APP_VERSION) < u"2.5.2":
+    if miroConfiguration(prefs.APP_VERSION) < u"2.5.2":
         logger.info("Using mirobridge_interpreter_2_0_3")
         from mirobridge.mirobridge_interpreter_2_0_3 import MiroInterpreter
-    elif config.get(prefs.APP_VERSION) < u"3.0":
+    elif miroConfiguration(prefs.APP_VERSION) < u"3.0":
         logger.info("Using mirobridge_interpreter_2_5_2")
         from mirobridge.mirobridge_interpreter_2_5_2 import MiroInterpreter
-    elif config.get(prefs.APP_VERSION) < u"3.5":
+    elif miroConfiguration(prefs.APP_VERSION) < u"3.5":
         logger.info("Using mirobridge_interpreter_3_0_0")
         from mirobridge.mirobridge_interpreter_3_0_0 import MiroInterpreter
-    else:
+    elif miroConfiguration(prefs.APP_VERSION) < u"4.0":
         logger.info("Using mirobridge_interpreter_3_5_0")
         from mirobridge.mirobridge_interpreter_3_5_0 import MiroInterpreter
+    else:
+        logger.info("Using mirobridge_interpreter_4_0_2")
+        from mirobridge.mirobridge_interpreter_4_0_2 import MiroInterpreter
 except Exception, e:
-    logger.critical(u"Importing mirobridge functions has failed. The following mirobridge files must be in the subdirectory 'mirobridge'.\n'mirobridge_interpreter_2_0_3.py' and 'mirobridge_interpreter_2_5_2.py', error(%s)" % e)
+    logger.critical(u"Importing mirobridge functions has failed. At least a 'mirobridge_interpreter' file that matches your Miro version must be in the subdirectory 'mirobridge'.\n'e.g. mirobridge_interpreter_2_0_3.py', 'mirobridge_interpreter_2_5_2.py' ... etc, error(%s)" % e)
     sys.exit(1)
 
 def _can_int(x):
@@ -833,7 +860,7 @@ def setUseroptions():
                     channel_new_watch_copy[filter(is_not_punct_char, option.lower())] = cfg.get(section, option)
             for key in channel_new_watch_copy.keys():
                 if not channel_new_watch_copy[key].startswith(vid_graphics_dirs[u'mythvideo']):
-                    logger.critical(u"All 'new->watch->copy' channel (%s) directory (%s) must be a subrirectory of the MythVideo base directory (%s)." % (key, channel_new_watch_copy[key], vid_graphics_dirs[u'mythvideo']))
+                    logger.critical(u"All 'new->watch->copy' channel (%s) directory (%s) must be a subdirectory of the MythVideo base directory (%s)." % (key, channel_new_watch_copy[key], vid_graphics_dirs[u'mythvideo']))
                     sys.exit(1)
                 if channel_new_watch_copy[key][-1] != u'/':
                     channel_new_watch_copy[key]+=u'/'
@@ -979,7 +1006,7 @@ def takeScreenShot(videofile, screenshot_filename, size_limit=False, just_demens
 
     cmd2 = cmd % (videofile, delay, width, height, screenshot_filename)
 
-    return subprocess.call(u'%s > /dev/null' % cmd2, shell=True)
+    return subprocess.call(u'%s > /dev/null 2>/dev/null' % cmd2, shell=True)
 # end takeScreenShot()
 
 
@@ -1136,7 +1163,10 @@ def getOldrecordedOrphans():
         if simulation:
             logger.info(u"Simulation: Remove orphaned oldrecorded record (%s - %s)" % (data[u'title'], data[u'subtitle']))
         else:
-            delOldRecorded((channel_id, data['starttime'])).delete()
+            try: # Sometimes a channel issues videos with identical publishing (starttime) dates. Try to using additiional details to identify the correct oldrecord.
+                delOldRecorded((channel_id, data['starttime'], data['endtime'], data['title'], data['subtitle'], data['description'])).delete()
+            except:
+                pass
             # Attempt a clean up for orphaned recorded video files and/or graphics
             (dirName, fileName) = os.path.split(u'%s%s - %s.%s' % (vid_graphics_dirs[u'default'], data[u'title'], data[u'subtitle'], u'png'))
             (fileBaseName, fileExtension)=os.path.splitext(fileName)
@@ -2080,8 +2110,8 @@ def main():
     # Validate settings
 
     ## Video base directory and current version and revision numbers
-    base_video_dir = config.get(prefs.MOVIES_DIRECTORY)
-    miro_version_rev = u"%s r%s" % (config.get(prefs.APP_VERSION), config.get(prefs.APP_REVISION_NUM))
+    base_video_dir = miroConfiguration(prefs.MOVIES_DIRECTORY)
+    miro_version_rev = u"%s r%s" % (miroConfiguration(prefs.APP_VERSION), miroConfiguration(prefs.APP_REVISION_NUM))
 
     displayMessage(u"Miro Version (%s)" % (miro_version_rev))
     displayMessage(u"Base Miro Video Directory (%s)" % (base_video_dir,))
@@ -2095,8 +2125,16 @@ def main():
         else:
             sys.exit(1)
 
-    if config.get(prefs.APP_VERSION) < u"2.0.3":
-        logger.critical(u"The installed version of Miro (%s) is too old. It must be at least v2.0.3 or higher." % config.get(prefs.APP_VERSION))
+    if miroConfiguration(prefs.APP_VERSION) < u"2.0.3":
+        logger.critical(u"The installed version of Miro (%s) is too old. It must be at least v2.0.3 or higher." % miroConfiguration(prefs.APP_VERSION))
+        if test_environment:
+            requirements_are_met = False
+        else:
+            sys.exit(1)
+
+    # Miro 4.0.1 has a critical bug that effects MiroBridge. Miro must be upgraded.
+    if miroConfiguration(prefs.APP_VERSION) == u"4.0.1":
+        logger.critical(u"The installed version of Miro (%s) must be upgraded to Miro version 4.0.2 or higher." % miroConfiguration(prefs.APP_VERSION))
         if test_environment:
             requirements_are_met = False
         else:
@@ -2104,8 +2142,8 @@ def main():
 
     # Verify that the import opml option can be used
     if opts.import_opml:
-        if config.get(prefs.APP_VERSION) < u"2.5.2":
-            logger.critical(u"The OPML import option requires Miro v2.5.2 or higher your Miro (%s) is too old." % config.get(prefs.APP_VERSION))
+        if miroConfiguration(prefs.APP_VERSION) < u"2.5.2":
+            logger.critical(u"The OPML import option requires Miro v2.5.2 or higher your Miro (%s) is too old." % miroConfiguration(prefs.APP_VERSION))
             if test_environment:
                 requirements_are_met = False
             else:
@@ -2164,7 +2202,7 @@ def main():
 
     if opts.sleeptime:
         if not _can_int(opts.sleeptime):
-            logger.critical(u"Auto-dewnload sleep time (%s) must be numeric." % str(opts.sleeptime))
+            logger.critical(u"Auto-download sleep time (%s) must be numeric." % str(opts.sleeptime))
             if test_environment:
                 requirements_are_met = False
             else:
@@ -2240,9 +2278,15 @@ def main():
     # Start the Miro Front and Backend - This allows mirobridge to execute actions on the Miro backend
     #
     displayMessage(u"Starting Miro Frontend and Backend")
-    startup.initialize(config.get(prefs.THEME_NAME))
+    startup.initialize(miroConfiguration(prefs.THEME_NAME))
+    if miroConfiguration(prefs.APP_VERSION) > u"4.0": # Only required for Miro 4
+        app.info_updater = InfoUpdater()
     app.cli_events = EventHandler()
     app.cli_events.connect_to_signals()
+
+    if miroConfiguration(prefs.APP_VERSION) > u"4.0": # Only required for Miro 4
+        startup.install_first_time_handler(app.cli_events.handle_first_time)
+
     startup.startup()
     app.cli_events.startup_event.wait()
     if app.cli_events.startup_failure:
@@ -2250,6 +2294,11 @@ def main():
         app.controller.shutdown()
         time.sleep(5) # Let the shutdown processing complete
         sys.exit(1)
+
+    if miroConfiguration(prefs.APP_VERSION) > u"4.0": # Only required for Miro 4
+        app.movie_data_program_info = movie_data_program_info
+        messages.FrontendStarted().send_to_backend()
+
     app.cli_interpreter = MiroInterpreter()
     if opts.verbose:
         app.cli_interpreter.verbose = True
@@ -2258,11 +2307,13 @@ def main():
     app.cli_interpreter.simulation = opts.simulation
     app.cli_interpreter.videofiles = []
     app.cli_interpreter.downloading = False
-    app.cli_interpreter.icon_cache_dir = config.get(prefs.ICON_CACHE_DIRECTORY)
+    app.cli_interpreter.icon_cache_dir = miroConfiguration(prefs.ICON_CACHE_DIRECTORY)
     app.cli_interpreter.imagemagick = imagemagick
     app.cli_interpreter.statistics = statistics
-    if config.get(prefs.APP_VERSION) < u"2.5.0":
+    if miroConfiguration(prefs.APP_VERSION) < u"2.5.0":
         app.renderer = app.cli_interpreter
+    elif miroConfiguration(prefs.APP_VERSION) > u"4.0": # Only required for Miro 4
+        pass
     else:
         app.movie_data_program_info = app.cli_interpreter.movie_data_program_info
 
@@ -2294,10 +2345,11 @@ def main():
         before_download = len(app.cli_interpreter.videofiles)
         if opts.verbose:
             app.cli_interpreter.verbose = True
-        app.cli_interpreter.do_mythtv_update_autodownload(u'')
+        if miroConfiguration(prefs.APP_VERSION) < u"4.0": # Miro 4 automatically refreshes feeds and downloads
+            app.cli_interpreter.do_mythtv_update_autodownload(u'')
         time.sleep(download_sleeptime)
         firsttime = True
-        while True:
+        while True: 
             app.cli_interpreter.do_mythtv_check_downloading(u'')
             if app.cli_interpreter.downloading:
                 time.sleep(30)

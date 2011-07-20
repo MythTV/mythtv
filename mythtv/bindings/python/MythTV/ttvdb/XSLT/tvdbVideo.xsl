@@ -6,7 +6,8 @@
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
-    xmlns:tvdbXpath="http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format">
+    xmlns:tvdbXpath="http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format"
+    >
 
     <xsl:output method="xml" indent="yes" version="1.0" encoding="UTF-8" omit-xml-declaration="yes"/>
 
@@ -26,12 +27,12 @@
         <xsl:for-each select="//Data/Series">
             <item>
                 <title><xsl:value-of select="normalize-space(SeriesName)"/></title>
-                <xsl:if test="//Data/Episode[SeasonNumber/text()=//requestDetails/@season and EpisodeNumber/text()=//requestDetails/@episode]/EpisodeName/text() != ''">
-                    <subtitle><xsl:value-of select="normalize-space(//Data/Episode[SeasonNumber/text()=//requestDetails/@season and EpisodeNumber/text()=//requestDetails/@episode]/EpisodeName)"/></subtitle>
+                <xsl:if test="tvdbXpath:getValue(//requestDetails, //Data, 'subtitle') != ''">
+                    <subtitle><xsl:value-of select="normalize-space(tvdbXpath:getResult())"/></subtitle>
                 </xsl:if>
                 <language><xsl:value-of select="normalize-space(Language)"/></language>
-                <xsl:if test="//Data/Episode[SeasonNumber/text()=//requestDetails/@season and EpisodeNumber/text()=//requestDetails/@episode]/Overview/text() != ''">
-                    <description><xsl:value-of select="normalize-space(tvdbXpath:htmlToString(string(//Data/Episode[SeasonNumber/text()=//requestDetails/@season and EpisodeNumber/text()=//requestDetails/@episode]/Overview)))"/></description>
+                <xsl:if test="tvdbXpath:getValue(//requestDetails, //Data, 'description') != ''">
+                    <description><xsl:value-of select="normalize-space(tvdbXpath:htmlToString(tvdbXpath:getResult()))"/></description>
                 </xsl:if>
                 <season><xsl:value-of select="normalize-space(//requestDetails/@season)"/></season>
                 <episode><xsl:value-of select="normalize-space(//requestDetails/@episode)"/></episode>
@@ -68,13 +69,13 @@
                     <runtime><xsl:value-of select="normalize-space(Runtime)"/></runtime>
                 </xsl:if>
                 <inetref><xsl:value-of select="normalize-space(id)"/></inetref>
-                <xsl:if test="./IMDB_ID/text() != '' and //Data/Episode[SeasonNumber/text()=//requestDetails/@season and EpisodeNumber/text()=//requestDetails/@episode]/IMDB_ID/text() = ''">
+                <xsl:if test="./IMDB_ID/text() != '' and tvdbXpath:getValue(//requestDetails, //Data, 'IMDB') = ''">
                     <imdb><xsl:value-of select="normalize-space(substring-after(string(IMDB_ID), 'tt'))"/></imdb>
                 </xsl:if>
                 <xsl:if test="./zap2it_id/text() != ''">
                     <tmsref><xsl:value-of select="normalize-space(zap2it_id)"/></tmsref>
                 </xsl:if>
-                <xsl:for-each select="//Data/Episode[SeasonNumber/text()=//requestDetails/@season and EpisodeNumber/text()=//requestDetails/@episode]">
+                <xsl:for-each select="tvdbXpath:getValue(//requestDetails, //Data, 'allEpisodes', 'allresults')">
                     <xsl:if test="./IMDB_ID/text() != ''">
                         <imdb><xsl:value-of select="normalize-space(substring-after(string(IMDB_ID), 'tt'))"/></imdb>
                     </xsl:if>
