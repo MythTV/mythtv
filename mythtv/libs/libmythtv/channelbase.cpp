@@ -84,8 +84,8 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     if (start != inputs.end())
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC +
-                QString("Looking for startchannel '%1' on input '%2'")
-                .arg(startchannel).arg(*start));
+            QString("Looking for startchannel '%1' on input '%2'")
+            .arg(startchannel).arg(*start));
     }
 
     // Attempt to find an input for the requested startchannel
@@ -102,8 +102,8 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             {
                 inputname = *it;
                 LOG(VB_CHANNEL, LOG_INFO, LOC +
-                        QString("Found startchannel '%1' on input '%2'")
-                        .arg(startchannel).arg(inputname));
+                    QString("Found startchannel '%1' on input '%2'")
+                    .arg(startchannel).arg(inputname));
                 return true;
             }
         }
@@ -180,7 +180,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Requested non-existant input '%1':'%2' ")
-                .arg(input).arg(inputid));
+            .arg(input).arg(inputid));
 
         return false;
     }
@@ -191,7 +191,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Requested channel is on input '%1' "
                     "which is in a busy input group")
-                .arg(inputid));
+            .arg(inputid));
 
         return false;
     }
@@ -212,7 +212,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Failed to find channel in DB on input '%1' ")
-                .arg(inputid));
+            .arg(inputid));
 
         return false;
     }
@@ -222,7 +222,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Channel is valid, but tuner is busy "
                     "on different multiplex (%1 != %2)")
-                .arg(mplexid).arg(mplexid_restriction));
+            .arg(mplexid).arg(mplexid_restriction));
 
         return false;
     }
@@ -343,16 +343,17 @@ bool ChannelBase::SwitchToInput(const QString &inputname)
     if (input >= 0)
         return SwitchToInput(input, true);
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Could not find input: %1 on card")
-                .arg(inputname));
-    return false;
+            QString("Could not find input: %1 on card").arg(inputname));
+        return false;
+    }
 }
 
 bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
 {
     LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("SwitchToInput(%1,%2)")
-            .arg(inputname).arg(chan));
+        .arg(inputname).arg(chan));
 
     int input = GetInputByName(inputname);
 
@@ -367,7 +368,7 @@ bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Could not find input: %1 on card when setting channel %2")
-                .arg(inputname).arg(chan));
+            .arg(inputname).arg(chan));
     }
     return ok;
 }
@@ -662,9 +663,9 @@ void ChannelBase::HandleScript(const QString &freqid)
     if (freqid.isEmpty())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
-                "A channel changer is set, but the freqid field is empty."
-                "\n\t\t\tWe will return success to ease setup pains, "
-                "but no script is will actually run.");
+            "A channel changer is set, but the freqid field is empty."
+            "\n\t\t\tWe will return success to ease setup pains, "
+            "but no script is will actually run.");
         m_system_status = 3; // success
         HandleScriptEnd(true);
         return;
@@ -742,7 +743,7 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
     }
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("GetScriptStatus() %1")
-            .arg(m_system_status));
+        .arg(m_system_status));
 
     uint ret;
     switch(m_system_status)
@@ -774,7 +775,7 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
 void ChannelBase::HandleScriptEnd(bool ok)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Channel change script %1")
-            .arg((ok) ? "succeeded" : "failed"));
+        .arg((ok) ? "succeeded" : "failed"));
 
     if (ok)
     {
@@ -865,9 +866,9 @@ bool ChannelBase::InitializeInputs(void)
     else if (!query.size())
     {
         LOG(VB_GENERAL, LOG_ERR, "InitializeInputs(): "
-                "\n\t\t\tCould not get inputs for the capturecard."
-                "\n\t\t\tPerhaps you have forgotten to bind video"
-                "\n\t\t\tsources to your card's inputs?");
+            "\n\t\t\tCould not get inputs for the capturecard."
+            "\n\t\t\tPerhaps you have forgotten to bind video"
+            "\n\t\t\tsources to your card's inputs?");
         return false;
     }
 
@@ -891,7 +892,7 @@ bool ChannelBase::InitializeInputs(void)
             !m_inputs[query.value(0).toUInt()]->externalChanger.isEmpty())
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC + "External Channel changer is "
-                    "set, but this device does not support it.");
+                "set, but this device does not support it.");
             m_inputs[query.value(0).toUInt()]->externalChanger.clear();
         }
 
@@ -912,11 +913,11 @@ bool ChannelBase::InitializeInputs(void)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC +
             QString("Input #%1: '%2' schan(%3) sourceid(%4) ccid(%5)")
-                .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
-                .arg((*it)->sourceid).arg((*it)->cardid));
+            .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
+            .arg((*it)->sourceid).arg((*it)->cardid));
     }
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Current Input #%1: '%2'")
-            .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
+        .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
 
     return m_inputs.size();
 }
@@ -1169,7 +1170,7 @@ ChannelBase *ChannelBase::CreateChannel(
     if (!channel->Open())
     {
         LOG(VB_GENERAL, LOG_ERR, "ChannelBase: CreateChannel() Error: " +
-                QString("Failed to open device %1").arg(genOpt.videodev));
+            QString("Failed to open device %1").arg(genOpt.videodev));
         delete channel;
         return NULL;
     }
