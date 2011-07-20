@@ -268,6 +268,7 @@ bool FileLogger::logmsg(LoggingItem_t *item)
             close( m_fd );
         return false;
     }
+    deleteItem(item);
     return true;
 }
 
@@ -310,6 +311,7 @@ bool SyslogLogger::logmsg(LoggingItem_t *item)
         item->refcount--;
     }
 
+    deleteItem(item);
     return true;
 }
 #endif
@@ -343,6 +345,7 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
     m_thread->start();
 
     m_opened = true;
+    m_disabled = false;
 }
 
 DatabaseLogger::~DatabaseLogger()
@@ -367,8 +370,29 @@ DatabaseLogger::~DatabaseLogger()
 bool DatabaseLogger::logmsg(LoggingItem_t *item)
 {
     if( m_thread )
-        m_thread->enqueue(item);
-    return true;
+    {
+        if( !m_disabled && m_thread->queueFull() )
+        {
+            m_disabled = true;
+            LOG(VB_GENERAL, LOG_CRIT,
+                "Disabling DB Logging: too many messages queued");
+            return false;
+        }
+
+        if( m_disabled && isDatabaseReady() )
+        {
+            m_disabled = false;
+            LOG(VB_GENERAL, LOG_CRIT, "Reenabling DB Logging");
+            usleep(150000);  // Let the queue drain a touch so this won't flap
+        }
+
+        if( !m_disabled )
+        {
+            m_thread->enqueue(item);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool DatabaseLogger::logqmsg(LoggingItem_t *item)
@@ -435,15 +459,17 @@ void DBLoggerThread::run(void)
 
         qLock.unlock();
 
-        if( item->message && !aborted )
+        if( item->message && !aborted && !m_logger->logqmsg(item) )
         {
-            m_logger->logqmsg(item);
+            qLock.relock();
+            m_queue->prepend(item);
+            msleep(100);
+        } else {
+            deleteItem(item);
+            qLock.relock();
         }
-
-        deleteItem(item);
-
-        qLock.relock();
     }
+
     MSqlQuery::CloseLogCon();
     threadDeregister();
 }
@@ -669,11 +695,10 @@ void LoggerThread::run(void)
 
             for(it = loggerList.begin(); it != loggerList.end(); it++)
             {
-                (*it)->logmsg(item);
+                if( !(*it)->logmsg(item) )
+                    deleteItem(item);
             }
         }
-
-        deleteItem(item);
 
         qLock.relock();
     }

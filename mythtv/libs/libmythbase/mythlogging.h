@@ -195,6 +195,7 @@ class DatabaseLogger : public LoggerBase {
         pid_t m_pid;
         bool m_opened;
         bool m_loggingTableExists;
+        bool m_disabled;
 };
 
 class LoggerThread : public QThread {
@@ -208,6 +209,8 @@ class LoggerThread : public QThread {
     private:
         bool aborted;
 };
+
+#define MAX_QUEUE_LEN 1000
 
 class DBLoggerThread : public QThread {
     Q_OBJECT
@@ -223,6 +226,11 @@ class DBLoggerThread : public QThread {
             QMutexLocker qLock(&m_queueMutex); 
             m_queue->enqueue(item); 
             return true; 
+        }
+        bool queueFull(void)
+        {
+            QMutexLocker qLock(&m_queueMutex); 
+            return (m_queue->size() >= MAX_QUEUE_LEN);
         }
     private:
         DatabaseLogger *m_logger;
