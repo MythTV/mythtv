@@ -1,5 +1,6 @@
 # Miro - an RSS based video player application
-# Copyright (C) 2005-2010 Participatory Culture Foundation
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011
+# Participatory Culture Foundation
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,12 +37,15 @@ from miro import dialogs
 from miro import eventloop
 from miro import item
 from miro import folder
-from miro import util
 from miro import tabs
 from miro.frontends.cli import clidialog
 from miro.plat import resources
 
-## mirobridge.py import additions - All to get feed updates, auto downloads and OPML import working
+############################################################################################################
+#
+# Start of mirobridge.py import additions - All to get feed updates, auto downloads and OPML import working
+#
+############################################################################################################
 import os, sys, subprocess, re, fnmatch, string
 import logging
 from miro import moviedata
@@ -59,6 +63,12 @@ from miro import filetypes
 from miro import messages
 from miro import config
 from miro import prefs
+from miro import workerprocess
+############################################################################################################
+#
+# End of mirobridge.py import additions - All to get feed updates, auto downloads and OPML import working
+#
+############################################################################################################
 
 def run_in_event_loop(func):
     def decorated(*args, **kwargs):
@@ -93,8 +103,7 @@ class MiroInterpreter(cmd.Cmd):
 
     @run_in_event_loop
     def init_database_objects(self):
-        self.video_feed_tabs = tabs.TabOrder.video_feed_order()
-        self.audio_feed_tabs = tabs.TabOrder.audio_feed_order()
+        self.feed_tabs = tabs.TabOrder.feed_order()
         self.playlist_tabs = tabs.TabOrder.playlist_order()
         self.tab_changed()
 
@@ -153,13 +162,7 @@ class MiroInterpreter(cmd.Cmd):
     @run_in_event_loop
     def do_feed(self, line):
         """feed <name> -- Selects a feed by name."""
-        for tab in self.video_feed_tabs.get_all_tabs():
-            if tab.get_title() == line:
-                self.tab = tab
-                self.tab.type = "feed"
-                self.tab_changed()
-                return
-        for tab in self.audio_feed_tabs.get_all_tabs():
+        for tab in self.feed_tabs.get_all_tabs():
             if tab.get_title() == line:
                 self.tab = tab
                 self.tab.type = "feed"
@@ -170,11 +173,7 @@ class MiroInterpreter(cmd.Cmd):
     @run_in_event_loop
     def do_rmfeed(self, line):
         """rmfeed <name> -- Deletes a feed."""
-        for tab in self.video_feed_tabs.get_all_tabs():
-            if tab.get_title() == line:
-                tab.remove()
-                return
-        for tab in self.audio_feed_tabs.get_all_tabs():
+        for tab in self.feed_tabs.get_all_tabs():
             if tab.get_title() == line:
                 tab.remove()
                 return
@@ -182,15 +181,18 @@ class MiroInterpreter(cmd.Cmd):
 
     @run_in_event_loop
     def complete_feed(self, text, line, begidx, endidx):
-        return self.handle_tab_complete(text, list(self.video_feed_tabs.get_all_tabs()) + list(self.audio_feed_tabs.get_all_tabs()))
+        return self.handle_tab_complete(text,
+                                        list(self.feed_tabs.get_all_tabs()))
 
     @run_in_event_loop
     def complete_rmfeed(self, text, line, begidx, endidx):
-        return self.handle_tab_complete(text, list(self.video_feed_tabs.get_all_tabs()) + list(self.audio_feed_tabs.get_all_tabs()))
+        return self.handle_tab_complete(text,
+                                        list(self.feed_tabs.get_all_tabs()))
 
     @run_in_event_loop
     def complete_playlist(self, text, line, begidx, endidx):
-        return self.handle_tab_complete(text, self.playlist_tabs.get_all_tabs())
+        return self.handle_tab_complete(text,
+                                        self.playlist_tabs.get_all_tabs())
 
     def handle_tab_complete(self, text, view_items):
         text = text.lower()
@@ -203,10 +205,10 @@ class MiroInterpreter(cmd.Cmd):
     def handle_item_complete(self, text, view, filterFunc=lambda i: True):
         text = text.lower()
         matches = []
-        for item in view:
-            if (item.get_title().lower().startswith(text) and
-                    filterFunc(item)):
-                matches.append(item.get_title())
+        for item_ in view:
+            if (item_.get_title().lower().startswith(text) and
+                    filterFunc(item_)):
+                matches.append(item_.get_title())
         return matches
 
     ###################################################################################
@@ -215,37 +217,9 @@ class MiroInterpreter(cmd.Cmd):
     #
     ###################################################################################
     @run_in_event_loop
-    def do_mythtv_update_autodownload(self, line):
-        """Update feeds and auto-download"""
-        logging.info("Starting auto downloader...")
-        autodler.start_downloader()
-        feed.expire_items()
-        logging.info("Starting video data updates")
-        #item.update_incomplete_movie_data() # Miro Bridge ignores this data anyway
-        moviedata.movie_data_updater.start_thread()
-        commandline.startup()
-
-        #autoupdate.check_for_updates() # I think this is autoupdate for the Miro code not videos
-        # Wait a bit before starting the downloader daemon.  It can cause a bunch
-        # of disk/CPU load, so try to avoid it slowing other stuff down.
-        eventloop.add_timeout(5, downloader.startup_downloader,
-            "start downloader daemon")
-        # ditto for feed updates
-        eventloop.add_timeout(30, feed.start_updates, "start feed updates")
-        # ditto for clearing stale icon cache files, except it's the very lowest
-        # priority
-        eventloop.add_timeout(10, clear_icon_cache_orphans, "clear orphans")
-     # end do_mythtv_update_autodownload()
-
-    def movie_data_program_info(self, movie_path, thumbnail_path):
-        extractor_path = os.path.join(os.path.split(__file__)[0], "gst_extractor.py")
-        return ((sys.executable, extractor_path, movie_path, thumbnail_path), None)
-
-    @run_in_event_loop
     def do_mythtv_check_downloading(self, line):
         """Check if any items are being downloaded. Set True or False"""
         self.downloading = False
-        #downloadingItems = views.downloadingItems
         downloadingItems = item.Item.only_downloading_view()
         count = downloadingItems.count()
         for it in downloadingItems:
@@ -462,7 +436,7 @@ class MiroInterpreter(cmd.Cmd):
             title = title.replace(u'"', u'')	# These characters mess with filenames
             title = title.replace(u"'", u'')	# These characters mess with filenames
 
-        item_dict =  {u'feed_id': it.feed_id, u'parent_id': it.parent_id, u'isContainerItem': it.isContainerItem, u'seen': it.seen, u'autoDownloaded': it.autoDownloaded, u'pendingManualDL': it.pendingManualDL, u'downloadedTime': it.downloadedTime, u'watchedTime': it.watchedTime, u'pendingReason': it.pendingReason, u'title': title,  u'expired': it.expired, u'keep': it.keep, u'videoFilename': it.get_filename(), u'eligibleForAutoDownload': it.eligibleForAutoDownload, u'duration': it.duration, u'screenshot': it.screenshot, u'resumeTime': it.resumeTime, u'channelTitle': channel_title, u'description': it.get_description(), u'size': it._get_size(), u'releasedate': it.get_release_date_obj(), u'length': it.get_duration_value(), u'channel_icon': channel_icon, u'item_icon': item_icon_filename, u'inetref': u'', u'season': 0, u'episode': 0,}
+        item_dict =  {u'feed_id': it.feed_id, u'parent_id': it.parent_id, u'isContainerItem': it.isContainerItem, u'seen': it.seen, u'autoDownloaded': it.autoDownloaded, u'pendingManualDL': it.pendingManualDL, u'downloadedTime': it.downloadedTime, u'watchedTime': it.watchedTime, u'pendingReason': it.pendingReason, u'title': title,  u'expired': it.expired, u'keep': it.keep, u'videoFilename': it.get_filename(), u'eligibleForAutoDownload': it.eligibleForAutoDownload, u'duration': it.duration, u'screenshot': it.screenshot, u'resumeTime': it.resumeTime, u'channelTitle': channel_title, u'description': it.get_description(), u'size': it._get_size(), u'releasedate': it.get_release_date(), u'length': it.get_duration_value(), u'channel_icon': channel_icon, u'item_icon': item_icon_filename, u'inetref': u'', u'season': 0, u'episode': 0,}
 
         if not item_dict[u'screenshot']:
             if item_dict[u'item_icon']:
@@ -501,7 +475,6 @@ class MiroInterpreter(cmd.Cmd):
     #
     ###################################################################################
 
-
     def _print_feeds(self, feeds):
         current_folder = None
         for tab in feeds:
@@ -519,10 +492,15 @@ class MiroInterpreter(cmd.Cmd):
     @run_in_event_loop
     def do_feeds(self, line):
         """feeds -- Lists all feeds."""
-        print "VIDEO FEEDS"
-        self._print_feeds(self.video_feed_tabs.get_all_tabs())
-        print "AUDIO FEEDS"
-        self._print_feeds(self.audio_feed_tabs.get_all_tabs())
+        print "FEEDS"
+        self._print_feeds(self.feed_tabs.get_all_tabs())
+
+    @run_in_event_loop
+    def do_update(self, line):
+        """update -- Updates all the feeds."""
+        for mem in self.feed_tabs.get_all_tabs():
+            print "telling %s to update" % mem.get_title()
+            mem.update()
 
     @run_in_event_loop
     def do_play(self, line):
@@ -530,14 +508,14 @@ class MiroInterpreter(cmd.Cmd):
         if self.selection_type is None:
             print "Error: No feed/playlist selected."
             return
-        item = self._find_item(line)
-        if item is None:
+        item_ = self._find_item(line)
+        if item_ is None:
             print "No item named %r" % line
             return
-        if item.is_downloaded():
-            resources.open_file(item.get_video_filename())
+        if item_.is_downloaded():
+            resources.open_file(item_.get_filename())
         else:
-            print '%s is not downloaded' % item.get_title()
+            print '%s is not downloaded' % item_.get_title()
 
     @run_in_event_loop
     def do_playlists(self, line):
@@ -599,8 +577,9 @@ class MiroInterpreter(cmd.Cmd):
                     state = item.get_state()
                     if state == 'downloading':
                         state += ' (%0.0f%%)' % item.download_progress()
-                    print "%-20s %-10s %s" % (state, item.get_size_for_display(),
-                            item.get_title())
+                    print "%-20s %-10s %s" % (state,
+                                              item.get_size_for_display(),
+                                              item.get_title())
             print
         else:
             print "No items"
@@ -646,7 +625,9 @@ class MiroInterpreter(cmd.Cmd):
 
     @run_in_event_loop
     def do_download(self, line):
-        """download <name> -- Downloads an item by name in the feed/playlist selected."""
+        """download <name> -- Downloads an item by name in the feed/playlist
+        selected.
+        """
         if self.selection_type is None:
             print "Error: No feed/playlist selected."
             return
@@ -708,7 +689,8 @@ class MiroInterpreter(cmd.Cmd):
 
     @run_in_event_loop
     def do_rm(self, line):
-        """rm <name> -- Removes an item by name in the feed/playlist selected."""
+        """rm <name> -- Removes an item by name in the feed/playlist selected.
+        """
         if self.selection_type is None:
             print "Error: No feed/playlist selected."
             return
@@ -735,16 +717,7 @@ class MiroInterpreter(cmd.Cmd):
             print "TEST CHOICE: %s" % dialog.choice
         d.run(callback)
 
-    @run_in_event_loop
-    def do_dumpdatabase(self, line):
-        """dumpdatabase -- Dumps the database."""
-        from miro import database
-        print "Dumping database...."
-        database.defaultDatabase.liveStorage.dumpDatabase(database.defaultDatabase)
-        print "Done."
-
-
-###################################################################################
+    ###################################################################################
     #
     # Start of mirobridge specific routines - Part 2
     #
@@ -766,7 +739,8 @@ def clear_icon_cache_orphans():
     # delete files in the icon cache directory that don't belong to IconCache
     # objects.
 
-    cachedir = fileutil.expand_filename(config.get(prefs.ICON_CACHE_DIRECTORY))
+    cachedir = fileutil.expand_filename(app.config.get(
+        prefs.ICON_CACHE_DIRECTORY))
     if not os.path.isdir(cachedir):
         return
 
@@ -791,7 +765,7 @@ def clear_icon_cache_orphans():
             except OSError:
                 pass
         yield None
-###################################################################################
+    ###################################################################################
     #
     # End of mirobridge specific routines - Part 2
     #
