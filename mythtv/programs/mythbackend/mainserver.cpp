@@ -1486,15 +1486,6 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         else
             filename = LocalFilePath(qurl, wantgroup);
 
-        if (filename.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Empty filename, cowardly aborting!");
-            errlist << "filetransfer_filename_empty";
-            socket->writeStringList(errlist);
-            return;
-        }
-            
-
         QFileInfo finfo(filename);
         if (finfo.isDir())
         {
