@@ -117,22 +117,30 @@ QString MythDateToString(const QDate& date, uint format)
     {
         QDate now = QDate::currentDate();
 
+        QString stringformat;
         if (format & kDateShort)
+            stringformat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
+        else
+            stringformat = gCoreContext->GetSetting("DateFormat", "ddd d MMMM");
+        
+        if (format & kAddYear)
         {
-            QString shortformat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
-            result = date.toString(shortformat);
+            if (!stringformat.contains("yy")) // Matches both 2 or 4 digit year
+                stringformat.append(" yyyy");
         }
-        else if ((format & kSimplify) && (now == date))
-            result = QObject::tr("Today");
-        else if ((format & kSimplify) && (now.addDays(-1) == date))
-            result = QObject::tr("Yesterday");
-        else if ((format & kSimplify) && (now.addDays(1) == date))
-            result = QObject::tr("Tomorrow");
-        else if (format & kDateFull)
+        
+        if (format & ~kDateShort)
         {
-            QString fullformat = gCoreContext->GetSetting("DateFormat", "ddd d MMMM");
-            result = date.toString(fullformat);
+            if ((format & kSimplify) && (now == date))
+                result = QObject::tr("Today");
+            else if ((format & kSimplify) && (now.addDays(-1) == date))
+                result = QObject::tr("Yesterday");
+            else if ((format & kSimplify) && (now.addDays(1) == date))
+                result = QObject::tr("Tomorrow");
         }
+        
+        if (result.isEmpty())
+            result = date.toString(stringformat);
     }
     
     return result;
