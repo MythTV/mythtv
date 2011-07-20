@@ -4,9 +4,13 @@
 // qt
 #include <QDateTime>
 
-// myth
+// libmyth
+#include "programinfo.h"
+
+// libmythtv
 #include "tvremoteutil.h"
-#include "programdetail.h"
+
+// libmythui
 #include "mythscreentype.h"
 #include "mythuibutton.h"
 #include "mythuitext.h"
@@ -80,7 +84,7 @@ class WelcomeDialog : public MythScreenType
     bool           m_frontendIsRunning;
 
     vector<TunerStatus> m_tunerList;
-    ProgramDetailList   m_scheduledList;
+    vector<ProgramInfo> m_scheduledList;
 
     QMutex      m_RecListUpdateMuxtex;
     bool        m_pendingRecListUpdate;

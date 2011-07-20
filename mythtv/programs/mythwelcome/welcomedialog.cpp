@@ -388,21 +388,19 @@ void WelcomeDialog::updateScreen(void)
             if (m_screenScheduledNo >= m_scheduledList.size())
                 m_screenScheduledNo = 0;
 
-            ProgramDetail prog = m_scheduledList[m_screenScheduledNo];
+            ProgramInfo progInfo = m_scheduledList[m_screenScheduledNo];
+            
+            InfoMap infomap;
+            progInfo.ToMap(infomap);
 
             //status = QString("%1 of %2\n").arg(m_screenScheduledNo + 1)
             //                               .arg(m_scheduledList.size());
-            status = prog.channame + "\n";
-            status += prog.title;
-            if (!prog.subtitle.isEmpty())
-                status += "\n(" + prog.subtitle + ")";
+            status = infomap["channame"] + "\n";
+            status += infomap["title"];
+            if (!infomap["subtitle"].isEmpty())
+                status += "\n(" + infomap["subtitle"] + ")";
 
-            QString dateFormat = gCoreContext->GetSetting(
-                "DateFormat", "ddd dd MMM yyyy");
-            status += "\n" + prog.startTime.toString(
-                dateFormat + " (" + m_timeFormat) +
-                " " + tr("to") + " " +
-                prog.endTime.toString(m_timeFormat + ")");
+            status += "\n" + infomap["timedate"];
 
             if (m_screenScheduledNo < m_scheduledList.size() - 1)
                 m_screenScheduledNo++;
@@ -512,8 +510,8 @@ bool WelcomeDialog::updateScheduledList()
         return false;
     }
 
-    GetProgramDetailList(
-        m_nextRecordingStart, &m_hasConflicts, &m_scheduledList);
+    GetNextRecordingList(m_nextRecordingStart, &m_hasConflicts,
+                         &m_scheduledList);
 
     updateStatus();
     updateScreen();

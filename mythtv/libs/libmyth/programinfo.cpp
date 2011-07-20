@@ -1321,9 +1321,6 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 {
     // NOTE: Format changes and relevant additions made here should be
     //       reflected in RecordingRule
-    QString fullDateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
-    if (!fullDateFormat.contains("yyyy"))
-        fullDateFormat += " yyyy";
     QString channelFormat =
         gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
     QString longChannelFormat =
@@ -1514,7 +1511,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         {
             progMap["longrepeat"] = QString("(%1 %2) ")
                 .arg(QObject::tr("Repeat"))
-                .arg(originalAirDate.toString(fullDateFormat));
+                .arg(MythDateToString(originalAirDate, kDateFull | kAddYear));
         }
     }
     else
@@ -4695,6 +4692,47 @@ deque<int> GetPreferredSkipTypeCombinations(void)
     tmp.push_back(COMM_DETECT_PREPOSTROLL | COMM_DETECT_BLANK |
                   COMM_DETECT_SCENE);
     return tmp;
+}
+
+bool GetNextRecordingList(QDateTime &nextRecordingStart,
+                          bool *hasConflicts,
+                          vector<ProgramInfo> *list)
+{
+    nextRecordingStart = QDateTime();
+
+    bool dummy;
+    bool *conflicts = (hasConflicts) ? hasConflicts : &dummy;
+
+    ProgramList progList;
+    if (!LoadFromScheduler(progList, *conflicts))
+        return false;
+
+    // find the earliest scheduled recording
+    ProgramList::const_iterator it = progList.begin();
+    for (; it != progList.end(); ++it)
+    {
+        if (((*it)->GetRecordingStatus() == rsWillRecord) &&
+            (nextRecordingStart.isNull() ||
+             nextRecordingStart > (*it)->GetRecordingStartTime()))
+        {
+            nextRecordingStart = (*it)->GetRecordingStartTime();
+        }
+    }
+
+    if (!list)
+        return true;
+
+    // save the details of the earliest recording(s)
+    for (it = progList.begin(); it != progList.end(); ++it)
+    {
+        if (((*it)->GetRecordingStatus()    == rsWillRecord) &&
+            ((*it)->GetRecordingStartTime() == nextRecordingStart))
+        {
+            list->push_back(ProgramInfo(**it));
+        }
+    }
+
+    return true;
 }
 
 PMapDBReplacement::PMapDBReplacement() : lock(new QMutex())

@@ -5,6 +5,7 @@
 
 // ANSI C
 #include <stdint.h> // for [u]int[32,64]_t
+#include <vector> // for GetNextRecordingList
 
 #include <QStringList>
 #include <QDateTime>
@@ -588,8 +589,7 @@ class MPUBLIC ProgramInfo
     static uint64_t QueryBookmark(uint chanid, const QDateTime &recstartts);
     static QMap<QString,uint32_t> QueryInUseMap(void);
     static QMap<QString,bool> QueryJobsRunning(int type);
-    static QStringList LoadFromScheduler(
-        const QString &altTable, int recordid);
+    static QStringList LoadFromScheduler(const QString &altTable, int recordid);
 
   protected:
     // Flagging map support methods
@@ -765,6 +765,12 @@ bool LoadFromScheduler(AutoDeleteDeque<T> &destination)
     bool dummyConflicts;
     return LoadFromScheduler(destination, dummyConflicts, "", -1);
 }
+
+// Moved from programdetails.cpp/h, used by MythWelcome/MythShutdown
+// could be factored out
+MPUBLIC bool GetNextRecordingList(QDateTime &nextRecordingStart,
+                                  bool *hasConflicts = NULL,
+                                  vector<ProgramInfo> *list = NULL);
 
 class QMutex;
 class MPUBLIC PMapDBReplacement

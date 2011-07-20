@@ -12,7 +12,6 @@ using namespace std;
 #include "mythdb.h"
 #include "mythsystem.h"
 #include "mythversion.h"
-#include "programdetail.h"
 #include "jobqueue.h"
 #include "tv.h"
 #include "remoteutil.h"
@@ -20,6 +19,7 @@ using namespace std;
 #include "compat.h"
 #include "mythlogging.h"
 #include "commandlineparser.h"
+#include "programinfo.h"
 
 static void setGlobalSetting(const QString &key, const QString &value)
 {
@@ -415,7 +415,7 @@ static int setScheduledWakeupTime()
     }
 
     QDateTime nextRecordingStart;
-    GetProgramDetailList(nextRecordingStart);
+    GetNextRecordingList(nextRecordingStart);
 
     // set the wakeup time for the next scheduled recording
     if (!nextRecordingStart.isNull())
