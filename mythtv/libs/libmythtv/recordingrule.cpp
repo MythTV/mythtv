@@ -578,7 +578,6 @@ void RecordingRule::AssignProgramInfo()
     m_endtime     = m_progInfo->GetScheduledEndTime().time();
     m_seriesid    = m_progInfo->GetSeriesID();
     m_programid   = m_progInfo->GetProgramID();
-    m_inetref     = m_progInfo->GetInetRef();
     if (m_findday < 0)
     {
         m_findday =
