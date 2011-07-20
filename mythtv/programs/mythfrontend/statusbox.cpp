@@ -49,10 +49,6 @@ Q_DECLARE_METATYPE(LogLine)
 StatusBox::StatusBox(MythScreenStack *parent)
           : MythScreenType(parent, "StatusBox")
 {
-    m_dateFormat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-    m_timeDateFormat = QString("%1 %2").arg(m_timeFormat).arg(m_dateFormat);
-
     m_minLevel = gCoreContext->GetNumSetting("LogDefaultView",5);
 
     m_iconState = NULL;
@@ -564,8 +560,8 @@ void StatusBox::doListingsStatus()
     else
     {
         AddLogLine(tr("There is guide data until %1")
-                   .arg(QDateTime(GuideDataThrough)
-                        .toString("yyyy-MM-dd hh:mm")), helpmsg);
+                   .arg(MythDateTimeToString(GuideDataThrough,
+                                             kDateTimeFull | kSimplify)), helpmsg);
 
         AddLogLine(QString("(%1).").arg(tr("%n day(s)", "", DaysOfData)),
                    helpmsg);
@@ -875,25 +871,19 @@ void StatusBox::doLogEntries(void)
         {
             line = QString("%1").arg(query.value(5).toString());
 
-            if (!query.value(6).toString().isEmpty())
-                detail = tr("On %1 %2 from %3.%4\n%5\n%6")
-                               .arg(query.value(3).toDateTime()
-                                         .toString(m_dateFormat))
-                               .arg(query.value(3).toDateTime()
-                                         .toString(m_timeFormat))
-                               .arg(query.value(4).toString())
-                               .arg(query.value(1).toString())
-                               .arg(query.value(5).toString())
-                               .arg(query.value(6).toString());
+            detail = tr("On %1 from %2.%3\n%4\n")
+                        .arg(MythDateTimeToString(query.value(3).toDateTime(),
+                                                    kDateTimeShort))
+                        .arg(query.value(4).toString())
+                        .arg(query.value(1).toString())
+                        .arg(query.value(5).toString());
+            
+            QString tmp = query.value(6).toString();
+            if (!tmp.isEmpty())
+                detail.append(tmp);
             else
-                detail = tr("On %1 %2 from %3.%4\n%5\nNo other details")
-                               .arg(query.value(3).toDateTime()
-                                         .toString(m_dateFormat))
-                               .arg(query.value(3).toDateTime()
-                                         .toString(m_timeFormat))
-                               .arg(query.value(4).toString())
-                               .arg(query.value(1).toString())
-                               .arg(query.value(5).toString());
+                detail.append(tr("No further details"));
+            
             AddLogLine(line, helpmsg, detail, detail,
                        "", query.value(0).toString());
         }
@@ -944,8 +934,8 @@ void StatusBox::doJobQueueStatus()
                 .arg(pginfo.GetTitle())
                 .arg(pginfo.GetChannelName())
                 .arg(pginfo.GetChanNum())
-                .arg(pginfo.GetRecordingStartTime()
-                     .toString(m_timeDateFormat))
+                .arg(MythDateTimeToString(pginfo.GetRecordingStartTime(),
+                                          kDateTimeFull | kSimplify))
                 .arg(tr("Job:"))
                 .arg(JobQueue::JobText((*it).type))
                 .arg(tr("Status: "))
@@ -956,13 +946,15 @@ void StatusBox::doJobQueueStatus()
 
             if ((*it).schedruntime > QDateTime::currentDateTime())
                 detail += '\n' + tr("Scheduled Run Time:") + ' ' +
-                    (*it).schedruntime.toString(m_timeDateFormat);
+                    MythDateTimeToString((*it).schedruntime,
+                                         kDateTimeFull | kSimplify);
             else
                 detail += '\n' + (*it).comment;
 
             line = QString("%1 @ %2").arg(pginfo.GetTitle())
-                                     .arg(pginfo.GetRecordingStartTime()
-                                        .toString(m_timeDateFormat));
+                                          .arg(MythDateTimeToString(
+                                              pginfo.GetRecordingStartTime(),
+                                              kDateTimeFull | kSimplify));
 
             QString font;
             if ((*it).status == JOB_ERRORED)
@@ -1394,17 +1386,20 @@ void StatusBox::doAutoExpireList()
     for (it = m_expList.begin(); it != m_expList.end(); ++it)
     {
         pginfo = *it;
-        contentLine = pginfo->GetRecordingStartTime()
-            .toString(m_dateFormat) + " - ";
+        QDateTime starttime = pginfo->GetRecordingStartTime();
+        QDateTime endtime = pginfo->GetRecordingEndTime();
+        contentLine =
+            MythDateTimeToString(starttime, kDateFull | kSimplify) + " - ";
 
-        contentLine += "(" + ProgramInfo::i18n(pginfo->GetRecordingGroup()) + ") ";
+        contentLine +=
+            "(" + ProgramInfo::i18n(pginfo->GetRecordingGroup()) + ") ";
 
         contentLine += pginfo->GetTitle() +
             " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
 
         detailInfo =
-            pginfo->GetRecordingStartTime().toString(m_timeDateFormat) + " - " +
-            pginfo->GetRecordingEndTime().toString(m_timeDateFormat);
+            MythDateTimeToString(starttime, kDateTimeFull | kSimplify) + " - " +
+            MythDateTimeToString(endtime, kDateTimeFull | kSimplify);
 
         detailInfo += " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
 

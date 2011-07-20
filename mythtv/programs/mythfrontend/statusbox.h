@@ -61,8 +61,6 @@ class StatusBox : public MythScreenType
     MythUIButtonList *m_logList;
     MythUIStateType *m_iconState;
 
-    QString m_dateFormat, m_timeFormat, m_timeDateFormat;
-
     QMap<int, QString> contentData;
     recprof2bps_t      recordingProfilesBPS;
 
