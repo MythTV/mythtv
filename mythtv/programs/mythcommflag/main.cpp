@@ -1173,7 +1173,7 @@ int main(int argc, char *argv[])
 
         int ret = 0;
 
-        if (JobQueue::GetJobFlags(jobID) && JOB_REBUILD)
+        if (JobQueue::GetJobFlags(jobID) & JOB_REBUILD)
             RebuildSeekTable(chanid, starttime, jobID);
         else
             ret = FlagCommercials(chanid, starttime, jobID, "", jobQueueCPU != 0);
