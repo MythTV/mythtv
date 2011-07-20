@@ -512,7 +512,8 @@ void StatusBox::doListingsStatus()
     if (m_justHelpText)
         m_justHelpText->SetText(helpmsg);
 
-    QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus, mfdNextRunStart;
+    QDateTime mfdLastRunStart, mfdLastRunEnd, mfdNextRunStart;
+    QString mfdLastRunStatus;
     QString querytext, DataDirectMessage;
     int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
@@ -526,27 +527,40 @@ void StatusBox::doListingsStatus()
         GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
                                                  Qt::ISODate);
 
-    mfdLastRunStart = gCoreContext->GetSetting("mythfilldatabaseLastRunStart");
-    mfdLastRunEnd = gCoreContext->GetSetting("mythfilldatabaseLastRunEnd");
+    QString tmp = gCoreContext->GetSetting("mythfilldatabaseLastRunStart");
+    mfdLastRunStart = QDateTime::fromString(tmp, Qt::ISODate);
+    tmp = gCoreContext->GetSetting("mythfilldatabaseLastRunEnd");
+    mfdLastRunEnd = QDateTime::fromString(tmp, Qt::ISODate);
+    tmp = gCoreContext->GetSetting("MythFillSuggestedRunTime");
+    mfdNextRunStart = QDateTime::fromString(tmp, Qt::ISODate);
+    
     mfdLastRunStatus = gCoreContext->GetSetting("mythfilldatabaseLastRunStatus");
-    mfdNextRunStart = gCoreContext->GetSetting("MythFillSuggestedRunTime");
     DataDirectMessage = gCoreContext->GetSetting("DataDirectMessage");
-
-    mfdNextRunStart.replace('T', ' ');
 
     AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(MYTH_SOURCE_PATH)
                .arg(MYTH_SOURCE_VERSION), helpmsg);
     AddLogLine(tr("Last mythfilldatabase guide update:"), helpmsg);
-    AddLogLine(tr("Started:   %1").arg(mfdLastRunStart), helpmsg);
+    tmp = tr("Started:   %1").arg(MythDateTimeToString(mfdLastRunStart,
+                                                    kDateTimeFull | kSimplify));
+    AddLogLine(tmp, helpmsg);
 
     if (mfdLastRunEnd >= mfdLastRunStart)
-        AddLogLine(tr("Finished: %1").arg(mfdLastRunEnd), helpmsg);
+    {
+        tmp =
+            tr("Finished: %1").arg(MythDateTimeToString(mfdLastRunEnd,
+                                                    kDateTimeFull | kSimplify));
+        AddLogLine(tmp, helpmsg);
+    }
 
     AddLogLine(tr("Result: %1").arg(mfdLastRunStatus), helpmsg);
 
 
     if (mfdNextRunStart >= mfdLastRunStart)
-        AddLogLine(tr("Suggested Next: %1").arg(mfdNextRunStart), helpmsg);
+    {
+        tmp = tr("Suggested Next: %1").arg(MythDateTimeToString(mfdNextRunStart,
+                                                    kDateTimeFull | kSimplify));
+        AddLogLine(tmp, helpmsg);
+    }
 
     DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
