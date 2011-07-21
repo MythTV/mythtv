@@ -37,6 +37,13 @@
     </button>
 
     <button>
+        <type>SETTINGS_SYSTEM_EVENTS</type>
+        <text>System Event Handlers</text>
+        <description>Configure System Event handler commands</description>
+        <action>SYSTEM_EVENTS</action>
+    </button>
+
+    <button>
         <type>SETTINGS_GRABBERS</type>
         <text>Artwork and Data Sources</text>
         <description>Configure sources of artwork and metadata</description>

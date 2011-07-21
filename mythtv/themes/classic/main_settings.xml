@@ -36,6 +36,13 @@
         <action>SCREENSETUPWIZARD</action>
     </button>
 
+    <button>
+        <type>SETTINGS_SYSTEM_EVENTS</type>
+        <text>System Event Handlers</text>
+        <description>Configure System Event handler commands</description>
+        <action>SYSTEM_EVENTS</action>
+    </button>
+
     <!-- Keep this in synch with mythtv/themes/defaultmenu/util_menu.xml -->
     <button>
         <type>SETUP_KEYS</type>
