@@ -21,12 +21,14 @@
 
 #include <QList>
 #include <QFile>
+#include <QMutex>
 
 #include <math.h>
 
 #include "video.h"
 
 #include "videometadata.h"
+#include "metadatafactory.h"
 #include "bluraymetadata.h"
 
 #include "compat.h"
@@ -167,6 +169,66 @@ DTC::VideoMetadataInfo* Video::GetVideoByFilename( const QString &Filename )
     delete mlm;
 
     return pVideoMetadataInfo;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::VideoLookupInfoList* Video::LookupVideo( const QString    &Title,
+                                              const QString    &Subtitle,
+                                              const QString    &Inetref,
+                                              int              Season,
+                                              int              Episode,
+                                              const QString    &GrabberType  )
+{
+    DTC::VideoLookupInfoList *pVideoLookupInfos = new DTC::VideoLookupInfoList();
+
+    MetadataLookupList list;
+
+    MetadataFactory *factory = new MetadataFactory(NULL);
+
+    if (factory)
+        list = factory->SynchronousLookup(Title, Subtitle,
+                                         Inetref, Season, Episode, GrabberType);
+
+    if ( !list.size() )
+        return pVideoLookupInfos;
+
+    for( int n = 0; n < list.size(); n++ )
+    {
+        DTC::VideoLookupInfo *pVideoLookupInfo = pVideoLookupInfos->AddNewVideoLookupInfo();
+
+        MetadataLookup *lookup = list[n];
+
+        if (lookup)
+        {
+            pVideoLookupInfo->setTitle(lookup->GetTitle());
+            pVideoLookupInfo->setSubTitle(lookup->GetSubtitle());
+            pVideoLookupInfo->setSeason(lookup->GetSeason());
+            pVideoLookupInfo->setEpisode(lookup->GetEpisode());
+            pVideoLookupInfo->setYear(lookup->GetYear());
+            pVideoLookupInfo->setTagline(lookup->GetTagline());
+            pVideoLookupInfo->setDescription(lookup->GetDescription());
+            pVideoLookupInfo->setCertification(lookup->GetCertification());
+            pVideoLookupInfo->setInetRef(lookup->GetInetref());
+            pVideoLookupInfo->setHomePage(lookup->GetHomepage());
+            pVideoLookupInfo->setReleaseDate(QDateTime(lookup->GetReleaseDate()));
+            pVideoLookupInfo->setUserRating(lookup->GetUserRating());
+            pVideoLookupInfo->setLength(lookup->GetRuntime());
+
+            delete lookup;
+        }
+    }
+
+    pVideoLookupInfos->setCount         ( list.count()                 );
+    pVideoLookupInfos->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoLookupInfos->setVersion       ( MYTH_BINARY_VERSION          );
+    pVideoLookupInfos->setProtoVer      ( MYTH_PROTO_VERSION           );
+
+    delete factory;
+
+    return pVideoLookupInfos;
 }
 
 /////////////////////////////////////////////////////////////////////////////

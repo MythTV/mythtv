@@ -405,8 +405,14 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
 {
     MetadataLookupList list;
 
-    QString mxml = getMXMLPath(lookup->GetFilename());
-    QString nfo = getNFOPath(lookup->GetFilename());
+    QString mxml;
+    QString nfo;
+
+    if (!lookup->GetFilename().isEmpty())
+    {
+        mxml = getMXMLPath(lookup->GetFilename());
+        nfo = getNFOPath(lookup->GetFilename());
+    }
 
     if (mxml.isEmpty() && nfo.isEmpty())
     {
@@ -472,8 +478,16 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
     if (lookup->GetStep() == kLookupSearch)
     {
         args.append(QString("-M"));
-        QString title = lookup->GetTitle();
-        args.append(title);
+        if (lookup->GetInetref().isEmpty())
+        {
+            QString title = lookup->GetTitle();
+            args.append(title);
+        }
+        else
+        {
+            QString inetref = lookup->GetInetref();
+            args.append(inetref);
+        }
     }
     else if (lookup->GetStep() == kLookupData)
     {

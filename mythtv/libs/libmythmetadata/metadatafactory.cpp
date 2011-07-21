@@ -34,7 +34,8 @@ QEvent::Type MetadataFactoryVideoChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MetadataFactory::MetadataFactory(QObject *parent) :
-    m_parent(parent), m_scanning(false)
+    m_parent(parent), m_scanning(false),
+    m_returnList(), m_sync(false)
 {
     m_lookupthread = new MetadataDownload(this);
     m_imagedownload = new MetadataImageDownload(this);
@@ -162,6 +163,59 @@ void MetadataFactory::Lookup(MetadataLookup *lookup)
         m_lookupthread->prependLookup(lookup);
     else
         m_lookupthread->addLookup(lookup);
+}
+
+MetadataLookupList MetadataFactory::SynchronousLookup(QString title,
+                                                      QString subtitle,
+                                                      QString inetref,
+                                                      int season,
+                                                      int episode,
+                                                      QString grabber)
+{
+    MetadataLookup *lookup = new MetadataLookup();
+    lookup->SetStep(kLookupSearch);
+    lookup->SetType(kMetadataRecording);
+    lookup->SetAutomatic(false);
+    lookup->SetHandleImages(false);
+    lookup->SetTitle(title);
+    lookup->SetSubtitle(subtitle);
+    lookup->SetSeason(season);
+    lookup->SetEpisode(episode);
+    lookup->SetInetref(inetref);
+    if (grabber.toLower() == "movie")
+        lookup->SetSubtype(kProbableMovie);
+    else if (grabber.toLower() == "tv" ||
+             grabber.toLower() == "television")
+        lookup->SetSubtype(kProbableTelevision);
+    else
+        lookup->SetSubtype(GuessLookupType(lookup));
+
+    return SynchronousLookup(lookup);
+}
+
+MetadataLookupList MetadataFactory::SynchronousLookup(MetadataLookup *lookup)
+{
+    if (!lookup)
+        return MetadataLookupList();
+
+    m_sync = true;
+
+    if (m_lookupthread->isRunning())
+        m_lookupthread->prependLookup(lookup);
+    else
+        m_lookupthread->addLookup(lookup);
+
+    while (m_returnList.isEmpty() && m_sync)
+    {
+        sleep(1);
+        qApp->processEvents();
+    }
+
+    m_sync = false;
+
+    delete lookup;
+
+    return m_returnList;
 }
 
 void MetadataFactory::VideoScan()
@@ -424,7 +478,11 @@ void MetadataFactory::customEvent(QEvent *levent)
         if (lul.isEmpty())
             return;
 
-        if (lul.count() == 1)
+        if (m_sync)
+        {
+            m_returnList = lul;
+        }
+        else if (lul.count() == 1)
         {
             OnSingleResult(lul.takeFirst());
         }
@@ -442,6 +500,11 @@ void MetadataFactory::customEvent(QEvent *levent)
         if (lul.isEmpty())
             return;
 
+        if (m_sync)
+        {
+            m_returnList = MetadataLookupList();
+            m_sync = false;
+        }
         if (lul.size())
         {
             OnNoResult(lul.takeFirst());
@@ -554,6 +617,20 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
 
     return ret;
 }
+
+LookupType GuessLookupType(MetadataLookup *lookup)
+{
+    LookupType ret = kUnknownVideo;
+
+    if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0 ||
+        !lookup->GetSubtitle().isEmpty())
+        ret = kProbableTelevision;
+    else
+        ret = kProbableMovie;
+
+    return ret;
+}
+
 
 LookupType GuessLookupType(RecordingRule *recrule)
 {
