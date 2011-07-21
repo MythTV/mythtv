@@ -1651,68 +1651,48 @@
 
     <window name="scheduleeditor">
 
-        <shape name="details_background" from="basebackground">
-            <area>25,25,750,175</area>
-        </shape>
-
-        <textarea name="title" from="basetextarea">
-            <area>50,35,700,45</area>
-            <font>baselarge</font>
-        </textarea>
-
-        <textarea name="timedate" from="basetextarea">
-            <area>50,170,440,27</area>
-        </textarea>
-
-        <textarea name="channel" from="basetextarea">
-            <area>550,170,200,35</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="description" from="basetextarea">
-            <area>50,70,700,100</area>
-            <multiline>yes</multiline>
-            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
-        </textarea>
+        <group name="programdetails" from="baseprogramdetailsgroup">
+            <position>25,25</position>
+        </group>
 
         <buttonlist name="rules" from="basewideselector">
-            <position>215,210</position>
+            <position>200,210</position>
             <wrapstyle>selection</wrapstyle>
             <helptext>Select the recording rule</helptext>
         </buttonlist>
 
         <button name="schedoptions" from="baseverywidebutton">
-            <position>215,255</position>
+            <position>200,255</position>
             <value>Schedule Options</value>
             <helptext></helptext>
         </button>
 
         <button name="storeoptions" from="baseverywidebutton">
-            <position>215,300</position>
+            <position>200,300</position>
             <value>Storage Options</value>
             <helptext></helptext>
         </button>
 
         <button name="postprocessing" from="baseverywidebutton">
-            <position>215,345</position>
+            <position>200,345</position>
             <value>Post Processing</value>
             <helptext></helptext>
         </button>
 
         <button name="schedinfo" from="baseverywidebutton">
-            <position>215,390</position>
+            <position>200,390</position>
             <value>Schedule Info</value>
             <helptext></helptext>
         </button>
 
         <button name="preview" from="baseverywidebutton">
-            <position>215,435</position>
+            <position>200,435</position>
             <value>Preview</value>
             <helptext></helptext>
         </button>
 
         <button name="metadata" from="baseverywidebutton">
-            <position>215,480</position>
+            <position>200,480</position>
             <value>Metadata Options</value>
             <helptext></helptext>
         </button>
@@ -1723,39 +1703,19 @@
         </button>
 
         <button name="save" from="basebutton">
-            <position>540,535</position>
+            <position>610,535</position>
             <value>Save</value>
         </button>
     </window>
 
     <window name="scheduleoptionseditor">
 
-        <shape name="details_background" from="basebackground">
-            <area>25,25,750,175</area>
-        </shape>
-
-        <textarea name="title" from="basetextarea">
-            <area>50,35,700,45</area>
-            <font>baselarge</font>
-        </textarea>
-
-        <textarea name="timedate" from="basetextarea">
-            <area>50,170,440,27</area>
-        </textarea>
-
-        <textarea name="channel" from="basetextarea">
-            <area>550,170,200,35</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="description" from="basetextarea">
-            <area>50,70,700,100</area>
-            <multiline>yes</multiline>
-            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
-        </textarea>
+        <group name="programdetails" from="baseprogramdetailsgroup">
+            <position>25,25</position>
+        </group>
 
         <spinbox name="priority" from="basewidespinbox">
-            <position>215,210</position>
+            <position>200,210</position>
             <template type="negative">Reduce priority by %n</template>
             <template type="zero">Normal recording priority</template>
             <template type="positive">Raise priority by %n</template>
@@ -1763,12 +1723,12 @@
         </spinbox>
 
         <buttonlist name="input" from="basewideselector">
-            <position>215,255</position>
+            <position>200,255</position>
             <helptext></helptext>
         </buttonlist>
 
         <spinbox name="startoffset" from="basewidespinbox">
-            <position>215,300</position>
+            <position>200,300</position>
             <template type="negative">Start recording %n minute(s) late</template>
             <template type="zero">Start recording on time</template>
             <template type="positive">Start recording %n minute(s) early</template>
@@ -1776,7 +1736,7 @@
         </spinbox>
 
         <spinbox name="endoffset" from="basewidespinbox">
-            <position>215,345</position>
+            <position>200,345</position>
             <template type="negative">End recording %n minute(s) early</template>
             <template type="zero">End recording on time</template>
             <template type="positive">End recording %n minute(s) late</template>
@@ -1784,12 +1744,12 @@
         </spinbox>
 
         <buttonlist name="dupmethod" from="basewideselector">
-            <position>215,390</position>
+            <position>200,390</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="dupscope" from="basewideselector">
-            <position>215,435</position>
+            <position>200,435</position>
             <helptext></helptext>
         </buttonlist>
 
@@ -1809,84 +1769,64 @@
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>40,525</position>
+            <position>40,535</position>
             <value>Back</value>
         </button>
     </window>
 
     <window name="schedulefiltereditor">
 
-        <shape name="details_background" from="basebackground">
-            <area>25,25,750,175</area>
-        </shape>
+        <group name="programdetails" from="baseprogramdetailsgroup">
+            <position>25,25</position>
+        </group>
 
-        <textarea name="title" from="basetextarea">
-            <area>50,35,700,45</area>
-            <font>baselarge</font>
-        </textarea>
-
-        <textarea name="timedate" from="basetextarea">
-            <area>50,170,440,27</area>
-        </textarea>
-
-        <textarea name="channel" from="basetextarea">
-            <area>550,170,200,35</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="description" from="basetextarea">
-            <area>50,70,700,100</area>
-            <multiline>yes</multiline>
-            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
-        </textarea>
-
-	<buttonlist name="filters" from="basebuttonlist">
-	    <area>200,210,400,290</area>
-	    <layout>vertical</layout>
-	    <spacing>0</spacing>
-	    <scrollstyle>free</scrollstyle>
-	    <wrapstyle>items</wrapstyle>
-	    <buttonarea>5,5,390,280</buttonarea>
-	    <statetype name="buttonitem">
-		<state name="active">
-		    <area>0,0,370,40</area>
-		    <textarea name="buttontext">
-			<area>50,5,-5,30</area>
-		    </textarea>
-		    <statetype name="buttoncheck">
-			<position>5,10</position>
-			<state type="off">
-			    <imagetype name="checkoff">
-				<filename>lb-check-empty.png</filename>
-			    </imagetype>
-			</state>
-			<state type="half">
-			    <imagetype name="checkhalf">
-				<filename>lb-check-half.png</filename>
-			    </imagetype>
-			</state>
-			<state type="full">
-			    <imagetype name="checkfull">
-				<filename>lb-check-full.png</filename>
-			    </imagetype>
-			</state>
-		    </statetype>
-		</state>
-		<state name="selectedactive" from="active">
-		    <shape name="background" from="baseselectedwidgetshape" />
-		</state>
-		<state name="selectedinactive" from="active" />
-	    </statetype>
+        <buttonlist name="filters" from="basebuttonlist">
+            <area>200,210,400,290</area>
+            <layout>vertical</layout>
+            <spacing>0</spacing>
+            <scrollstyle>free</scrollstyle>
+            <wrapstyle>items</wrapstyle>
+            <buttonarea>5,5,390,280</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,370,40</area>
+                    <textarea name="buttontext">
+                        <area>50,5,-5,30</area>
+                    </textarea>
+                    <statetype name="buttoncheck">
+                        <position>5,10</position>
+                        <state type="off">
+                            <imagetype name="checkoff">
+                                <filename>lb-check-empty.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="half">
+                            <imagetype name="checkhalf">
+                                <filename>lb-check-half.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="full">
+                            <imagetype name="checkfull">
+                                <filename>lb-check-full.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="background" from="baseselectedwidgetshape" />
+                </state>
+                <state name="selectedinactive" from="active" />
+            </statetype>
             <statetype name="upscrollarrow">
                 <position>380,5</position>
             </statetype>
             <statetype name="downscrollarrow">
                 <position>380,267</position>
             </statetype>
-	</buttonlist>
+        </buttonlist>
 
         <button name="back" from="basebutton">
-            <position>40,525</position>
+            <position>40,535</position>
             <value>Back</value>
         </button>
 
@@ -1894,64 +1834,44 @@
 
     <window name="storageoptionseditor">
 
-        <shape name="details_background" from="basebackground">
-            <area>25,25,750,175</area>
-        </shape>
-
-        <textarea name="title" from="basetextarea">
-            <area>50,35,700,45</area>
-            <font>baselarge</font>
-        </textarea>
-
-        <textarea name="timedate" from="basetextarea">
-            <area>50,170,440,27</area>
-        </textarea>
-
-        <textarea name="channel" from="basetextarea">
-            <area>550,170,200,35</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="description" from="basetextarea">
-            <area>50,70,700,100</area>
-            <multiline>yes</multiline>
-            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
-        </textarea>
+        <group name="programdetails" from="baseprogramdetailsgroup">
+            <position>25,25</position>
+        </group>
 
         <buttonlist name="recprofile" from="basewideselector">
-            <position>215,210</position>
+            <position>200,210</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="recgroup" from="basewideselector">
-            <position>215,255</position>
+            <position>200,255</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="storagegroup" from="basewideselector">
-            <position>215,300</position>
+            <position>200,300</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="playgroup" from="basewideselector">
-            <position>215,345</position>
+            <position>200,345</position>
             <helptext></helptext>
         </buttonlist>
 
         <spinbox name="maxepisodes" from="basewidespinbox">
-            <position>215,390</position>
+            <position>200,390</position>
             <template type="zero">No episode limit</template>
             <template type="positive">Keep at most %n episode(s)</template>
             <helptext></helptext>
         </spinbox>
 
         <buttonlist name="maxnewest" from="basewideselector">
-            <position>215,435</position>
+            <position>200,435</position>
             <helptext></helptext>
         </buttonlist>
 
         <checkbox name="autoexpire" from="basecheckbox">
-            <position>215,480</position>
+            <position>200,480</position>
         </checkbox>
 
         <textarea name="autoexpirelabel" from="basetextarea">
@@ -1960,39 +1880,19 @@
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>40,525</position>
+            <position>40,535</position>
             <value>Back</value>
         </button>
     </window>
 
     <window name="postproceditor">
 
-        <shape name="details_background" from="basebackground">
-            <area>25,25,750,175</area>
-        </shape>
-
-        <textarea name="title" from="basetextarea">
-            <area>50,35,700,45</area>
-            <font>baselarge</font>
-        </textarea>
-
-        <textarea name="timedate" from="basetextarea">
-            <area>50,170,440,27</area>
-        </textarea>
-
-        <textarea name="channel" from="basetextarea">
-            <area>550,170,200,35</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="description" from="basetextarea">
-            <area>50,70,700,100</area>
-            <multiline>yes</multiline>
-            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
-        </textarea>
+        <group name="programdetails" from="baseprogramdetailsgroup">
+            <position>25,25</position>
+        </group>
 
         <checkbox name="autocommflag" from="basecheckbox">
-            <position>215,210</position>
+            <position>200,210</position>
         </checkbox>
 
         <textarea name="autocommflaglabel" from="basetextarea">
@@ -2001,7 +1901,7 @@
         </textarea>
 
         <checkbox name="autotranscode" from="basecheckbox">
-            <position>215,255</position>
+            <position>200,255</position>
         </checkbox>
 
         <textarea name="autotranscodelabel" from="basetextarea">
@@ -2010,12 +1910,12 @@
         </textarea>
 
         <buttonlist name="transcodeprofile" from="basewideselector">
-            <position>215,300</position>
+            <position>200,300</position>
             <helptext></helptext>
         </buttonlist>
 
         <checkbox name="userjob1" from="basecheckbox">
-            <position>215,345</position>
+            <position>200,345</position>
         </checkbox>
 
         <textarea name="userjob1label" from="basetextarea">
@@ -2024,7 +1924,7 @@
         </textarea>
 
         <checkbox name="userjob2" from="basecheckbox">
-            <position>215,390</position>
+            <position>200,390</position>
         </checkbox>
 
         <textarea name="userjob2label" from="basetextarea">
@@ -2033,7 +1933,7 @@
         </textarea>
 
         <checkbox name="userjob3" from="basecheckbox">
-            <position>215,435</position>
+            <position>200,435</position>
         </checkbox>
 
         <textarea name="userjob3label" from="basetextarea">
@@ -2042,7 +1942,7 @@
         </textarea>
 
         <checkbox name="userjob4" from="basecheckbox">
-            <position>215,480</position>
+            <position>200,480</position>
         </checkbox>
 
         <textarea name="userjob4label" from="basetextarea">
@@ -2051,9 +1951,106 @@
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>40,525</position>
+            <position>40,535</position>
             <value>Back</value>
         </button>
+    </window>
+
+    <window name="metadataoptions">
+
+        <imagetype name="fanart">
+            <area>0,0,800,600</area>
+        </imagetype>
+
+        <imagetype name="coverart">
+            <area>10,300,100,300</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <imagetype name="banner">
+            <area>690,300,100,300</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <group name="programdetails" from="baseprogramdetailsgroup">
+            <position>25,25</position>
+        </group>
+
+        <group name="optionsgroup">
+            <area>20,215,740,565</area>
+
+            <textarea name="inet" from="basetextarea">
+                <area>0,0,180,40</area>
+                <align>right,vcenter</align>
+                <value>TMDB/TVDB #:</value>
+            </textarea>
+
+            <textedit name="inetref_edit" from="basetextedit">
+                <position>195,0</position>
+            </textedit>
+
+            <textarea name="seas" from="basetextarea">
+                <area>0,55,180,40</area>
+                <align>right,vcenter</align>
+                <value>Season:</value>
+            </textarea>
+
+            <spinbox name="season_spinbox" from="basespinbox">
+                <position>195,55</position>
+            </spinbox>
+
+            <textarea name="ep" from="basetextarea">
+                <area>290,55,180,40</area>
+                <align>right,vcenter</align>
+                <value>Episode:</value>
+            </textarea>
+
+            <spinbox name="episode_spinbox" from="basespinbox">
+                <position>495,55</position>
+            </spinbox>
+
+            <button name="query_button" from="basewidebutton">
+                <position>245,110</position>
+                <value>Perform Query</value>
+            </button>
+
+            <button name="online_coverart_button" from="basewidebutton">
+                <position>95,165</position>
+                <value>Find Online Coverart</value>
+            </button>
+
+            <button name="online_fanart_button" from="basewidebutton">
+                <position>95,220</position>
+                <value>Find Online Fanart</value>
+            </button>
+
+            <button name="online_banner_button" from="basewidebutton">
+                <position>95,275</position>
+                <value>Find Online Banners</value>
+            </button>
+
+            <button name="local_coverart_button" from="basewidebutton">
+                <position>395,165</position>
+                <value>Find Local Coverart</value>
+            </button>
+
+            <button name="local_fanart_button" from="basewidebutton">
+                <position>395,220</position>
+                <value>Find Local Fanart</value>
+            </button>
+
+            <button name="local_banner_button" from="basewidebutton">
+                <position>395,275</position>
+                <value>Find Local Banners</value>
+            </button>
+
+        </group>
+
+        <button name="back" from="basebutton">
+            <position>40,535</position>
+            <value>Back</value>
+        </button>
+
     </window>
 
 </mythuitheme>

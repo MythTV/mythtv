@@ -695,6 +695,35 @@
         <cornerradius>12</cornerradius>
     </shape>
 
+    <!-- a program information group used on a few schedule editor screens -->
+    <group name="baseprogramdetailsgroup" >
+        <area>0,0,750,145</area>
+
+        <shape name="details_background" from="basebackground">
+            <area>0,0,750,175</area>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>25,5,700,45</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>25,145,440,27</area>
+        </textarea>
+
+        <textarea name="channel" from="basetextarea">
+            <area>525,145,200,35</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>25,40,700,100</area>
+            <multiline>yes</multiline>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
+        </textarea>
+    </group>
+
     <!-- Popup Dialogue Box -->
     <window name="MythPopupBox">
         <area>-1,-1,500,500</area>
