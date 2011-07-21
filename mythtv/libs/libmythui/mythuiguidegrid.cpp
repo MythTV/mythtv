@@ -52,7 +52,7 @@ MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
     m_rowCount = 0;
     m_progPastCol = 0;
 
-    m_drawCategoryColors = GetMythDB()->GetNumSetting("EPGShowCategoryColors", 1);
+    m_drawCategoryColors = true;
     m_drawCategoryText = true;
     m_categoryAlpha = 255;
 
@@ -163,6 +163,10 @@ bool MythUIGuideGrid::ParseElement(
     else if (element.tagName() == "showcategories")
     {
         m_drawCategoryText = parseBool(element);
+    }
+    else if (element.tagName() == "showcategorycolors")
+    {
+        m_drawCategoryColors = parseBool(element);
     }
     else if (element.tagName() == "cutdown")
     {

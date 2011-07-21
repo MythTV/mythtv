@@ -2291,17 +2291,6 @@ static GlobalCheckBox *LiveTVPriority()
     return bc;
 }
 
-// EPG settings
-static HostCheckBox *EPGShowCategoryColors()
-{
-    HostCheckBox *gc = new HostCheckBox("EPGShowCategoryColors");
-    gc->setLabel(QObject::tr("Display genre colors"));
-    gc->setHelpText(QObject::tr("Colorize program guide using "
-                    "genre colors (not available for all grabbers)."));
-    gc->setValue(true);
-    return gc;
-}
-
 static HostCheckBox *ChannelGroupRememberLast()
 {
     HostCheckBox *gc = new HostCheckBox("ChannelGroupRememberLast");
@@ -3605,7 +3594,6 @@ EPGSettings::EPGSettings()
 {
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
     epg->setLabel(QObject::tr("Program Guide") + " 1/1");
-    epg->addChild(EPGShowCategoryColors());
     epg->addChild(WatchTVGuide());
     epg->addChild(DefaultTVChannel());
     epg->addChild(EPGRecThreshold());
