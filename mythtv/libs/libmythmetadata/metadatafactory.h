@@ -83,6 +83,14 @@ class META_PUBLIC MetadataFactory : public QObject
            bool getimages = true);
     void Lookup(MetadataLookup *lookup);
 
+    MetadataLookupList SynchronousLookup(QString title,
+                                         QString subtitle,
+                                         QString inetref,
+                                         int season,
+                                         int episode,
+                                         QString grabber);
+    MetadataLookupList SynchronousLookup(MetadataLookup *lookup);
+
     void VideoScan();
 
     bool IsRunning() { return m_lookupthread->isRunning() ||
@@ -107,9 +115,14 @@ class META_PUBLIC MetadataFactory : public QObject
     VideoScannerThread *m_videoscanner;
     VideoMetadataListManager *m_mlm;
     bool m_scanning;
+
+    // Variables used in synchronous mode
+    MetadataLookupList m_returnList;
+    bool m_sync;
 };
 
 META_PUBLIC LookupType GuessLookupType(ProgramInfo *pginfo);
+META_PUBLIC LookupType GuessLookupType(MetadataLookup *lookup);
 META_PUBLIC LookupType GuessLookupType(RecordingRule *recrule);
 
 #endif
