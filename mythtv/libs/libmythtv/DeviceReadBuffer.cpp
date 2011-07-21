@@ -60,6 +60,8 @@ DeviceReadBuffer::~DeviceReadBuffer()
 {
     if (buffer)
         delete[] buffer;
+    if (isRunning())
+        Stop();
 }
 
 bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
@@ -128,6 +130,7 @@ void DeviceReadBuffer::Start(void)
             QMutexLocker locker(&lock);
             dorun = false;
         }
+        WakePoll();
         wait();
     }
 
