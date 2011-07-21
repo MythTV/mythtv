@@ -13,6 +13,7 @@
 #include "mythmainwindow.h"
 
 #include "progdetails.h"
+#include <util.h>
 
 
 #define LASTPAGE 2
@@ -204,9 +205,6 @@ void ProgDetails::loadPage(void)
     loadHTML();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString fullDateFormat = gCoreContext->GetSetting("DateFormat", "M/d/yyyy");
-    if (!fullDateFormat.contains("yyyy"))
-        fullDateFormat += " yyyy";
     QString category_type, showtype, year, epinum, rating, colorcode,
             title_pronounce;
     float stars = 0.0;
@@ -386,7 +384,7 @@ void ProgDetails::loadPage(void)
     if (m_progInfo.GetOriginalAirDate().isValid() &&
         category_type != "movie")
     {
-        s = m_progInfo.GetOriginalAirDate().toString(fullDateFormat);
+        s = MythDateToString(m_progInfo.GetOriginalAirDate(), kDateFull | kAddYear);
     }
     addItem("ORIGINAL_AIRDATE", tr("Original Airdate"), s);
 
@@ -567,7 +565,7 @@ void ProgDetails::loadPage(void)
     s = toString(recstatus, rectype);
 
     if (statusDate.isValid())
-        s += " " + statusDate.toString(fullDateFormat);
+        s += " " + MythDateTimeToString(statusDate, kDateFull | kAddYear);
 
     addItem("MYTHTV_STATUS", QString("MythTV " + tr("Status")), s);
 
@@ -594,9 +592,11 @@ void ProgDetails::loadPage(void)
         if (query.exec() && query.next())
         {
             if (query.value(0).toDateTime().isValid())
-                lastRecorded = query.value(0).toDateTime().toString(fullDateFormat);
+                lastRecorded = MythDateTimeToString(query.value(0).toDateTime(),
+                                                    kDateFull | kAddYear);
             if (query.value(1).toDateTime().isValid())
-                nextRecording = query.value(1).toDateTime().toString(fullDateFormat);
+                nextRecording = MythDateTimeToString(query.value(1).toDateTime(),
+                                                    kDateFull | kAddYear);
             if (query.value(2).toInt() > 0)
                 averageTimeShift = tr("%n hour(s)", "",
                                                 query.value(2).toInt());
@@ -647,7 +647,7 @@ void ProgDetails::loadPage(void)
         QDate fdate(1970, 1, 1);
         fdate = fdate.addDays((int)m_progInfo.GetFindID() - 719528);
         s = QString("%1 (%2)").arg(m_progInfo.GetFindID())
-            .arg(fdate.toString(fullDateFormat));
+            .arg(MythDateToString(fdate, kDateFull | kAddYear));
     }
     addItem("FINDID", tr("Find ID"), s);
 
