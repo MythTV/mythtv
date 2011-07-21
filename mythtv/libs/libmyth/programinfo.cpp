@@ -3695,12 +3695,14 @@ void ProgramInfo::SaveSeasonEpisode(uint seas, uint ep)
     query.prepare(
         "UPDATE recorded "
         "SET season = :SEASON, episode = :EPISODE "
-        "WHERE chanid = :CHANID AND starttime = :STARTTIME");
+        "WHERE chanid = :CHANID AND starttime = :STARTTIME "
+        "AND recordid = :RECORDID");
 
     query.bindValue(":SEASON",     seas);
     query.bindValue(":EPISODE",    ep);
     query.bindValue(":CHANID",     chanid);
     query.bindValue(":STARTTIME",  recstartts);
+    query.bindValue(":RECORDID",   recordid);
     query.exec();
 
     SendUpdateEvent();
@@ -3713,11 +3715,13 @@ void ProgramInfo::SaveInetRef(const QString &inet)
     query.prepare(
         "UPDATE recorded "
         "SET inetref = :INETREF "
-        "WHERE chanid = :CHANID AND starttime = :STARTTIME");
+        "WHERE chanid = :CHANID AND starttime = :STARTTIME "
+        "AND recordid = :RECORDID");
 
     query.bindValue(":INETREF",    inet);
     query.bindValue(":CHANID",     chanid);
     query.bindValue(":STARTTIME",  recstartts);
+    query.bindValue(":RECORDID",   recordid);
     query.exec();
 
     SendUpdateEvent();
