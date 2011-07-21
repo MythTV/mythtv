@@ -1408,11 +1408,11 @@ bool MetadataOptions::Create()
     m_inetrefEdit->SetText(m_recordingRule->m_inetref);
 
     // Season
-    m_seasonSpin->SetRange(0,100,1,1);
+    m_seasonSpin->SetRange(0,9999,1,1);
     m_seasonSpin->SetValue(m_recordingRule->m_season);
 
     // Episode
-    m_episodeSpin->SetRange(0,100,1,1);
+    m_episodeSpin->SetRange(0,9999,1,1);
     m_episodeSpin->SetValue(m_recordingRule->m_episode);
 
     if (m_coverart)
