@@ -601,8 +601,9 @@ class XMLConnection( object ):
         """
         url = 'http://{0.host}:{0.port}/{1}'.format(self, path)
         if keyvars:
-            url += '?' + '&'.join(['{0}={1}'.format(*item)
-                                for item in keyvars.items()])
+            url += '?' + '&'.join(
+                        ['{0}={1}'.format(k,urllib2.quote(v))
+                                for k,v in keyvars.items()])
         self.log(self.log.NETWORK, 'Generating request', url)
         return self._Request(url)
 

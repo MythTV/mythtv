@@ -8,7 +8,7 @@ from static import *
 from exceptions import *
 from logging import MythLog
 from connections import FEConnection, XMLConnection, BEEventConnection
-from utility import databaseSearch, datetime
+from utility import databaseSearch, datetime, check_ipv6
 from database import DBCache, DBData
 from system import SystemEvent
 from mythproto import BECache, FileOps, Program, FreeSpace, EventLock
@@ -1028,7 +1028,8 @@ class MythXML( XMLConnection ):
         if backend is None:
             # use master backend
             backend = self.db.settings.NULL.MasterServerIP
-        if re.match('(?:\d{1,3}\.){3}\d{1,3}',backend):
+        if re.match('(?:\d{1,3}\.){3}\d{1,3}',backend) or \
+                    check_ipv6(backend):
             # process ip address
             with self.db.cursor(self.log) as cursor:
                 if cursor.execute("""SELECT hostname FROM settings
@@ -1036,8 +1037,9 @@ class MythXML( XMLConnection ):
                                      AND data=%s""", backend) == 0:
                     raise MythDBError(MythError.DB_SETTING, 
                                         backend+': BackendServerIP')
-                self.host = cursor.fetchone()[0]
-            self.port = int(self.db.settings[self.host].BackendStatusPort)
+                host = cursor.fetchone()[0]
+            self.host = backend
+            self.port = int(self.db.settings[host].BackendStatusPort)
         else:
             # assume given a hostname
             self.host = backend
