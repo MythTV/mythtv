@@ -55,6 +55,7 @@ QList<LoggerBase *>     loggerList;
 
 QMutex                  logQueueMutex;
 QQueue<LoggingItem_t *> logQueue;
+QRegExp                 logRegExp = QRegExp("[%]{1,2}");
 
 QMutex                  logThreadMutex;
 QHash<uint64_t, char *> logThreadHash;
@@ -759,7 +760,8 @@ void LogTimeStamp( struct tm *tm, uint32_t *usec )
 }
 
 void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
-                   const char *function, const char *format, ... )
+                   const char *function, int fromQString,
+                   const char *format, ... )
 {
     va_list         arguments;
     char           *message;
@@ -782,6 +784,14 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     if( !message )
         return;
 
+    QMutexLocker qLock(&logQueueMutex);
+
+    if( fromQString && strchr(format, '%') )
+    {
+        QString string(format);
+        format = string.replace(logRegExp, "%%").toLocal8Bit().constData();
+    }
+
     va_start(arguments, format);
     vsnprintf(message, LOGLINE_MAX, format, arguments);
     va_end(arguments);
@@ -795,7 +805,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     item->message  = message;
     setThreadTid(item);
 
-    QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
 }
 

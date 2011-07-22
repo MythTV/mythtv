@@ -2582,7 +2582,8 @@ int main(int argc, char **argv)
 }
 
 void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
-                   const char *function, const char *format, ... )
+                   const char *function, int fromQString, 
+                   const char *format, ... )
 {
 	va_list         arguments;
 

@@ -100,18 +100,18 @@ extern "C" {
 #ifdef __cplusplus
 #define LOG(mask, level, string) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
-                 QString(string).replace(QRegExp("[%]{1,2}"), "%%") \
-                                .toLocal8Bit().constData())
+                 1, QString(string).toLocal8Bit().constData())
 #else
 #define LOG(mask, level, format, ...) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
-                 (const char *)format, ##__VA_ARGS__)
+                 0, (const char *)format, ##__VA_ARGS__)
 #endif
 
 /* Define the external prototype */
 MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level, 
                                 const char *file, int line, 
-                                const char *function, const char *format, ... );
+                                const char *function, int fromQString,
+                                const char *format, ... );
 
 #ifdef __cplusplus
 }
