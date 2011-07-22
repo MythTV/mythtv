@@ -225,9 +225,17 @@ void MythCCExtractorPlayer::Process608Subtitles(void)
 {
     foreach (uint streamId, GetCC608StreamsList())
     {
-        const int ccStreams[] = {
-            CC_CC1 >> 4, CC_CC2 >> 4, CC_CC3 >> 4, CC_CC4 >> 4
+        static const int ccIndexTbl[7] =
+        {
+            0, // CC_CC1
+            1, // CC_CC2
+            9, // sentinel
+            9, // sentinel
+            2, // CC_CC3
+            3, // CC_CC4
+            9, // sentinel
         };
+
         CC608Reader *subReader = GetCC608Reader(streamId);
 
         while (true)
@@ -240,8 +248,7 @@ void MythCCExtractorPlayer::Process608Subtitles(void)
             if (!changed)
                 break;
 
-            const int ccIdx = distance(
-                ccStreams, find(ccStreams, ccStreams + 4, streamRawIdx));
+            const int ccIdx = ccIndexTbl[min(streamRawIdx,6)];
 
             if (ccIdx >= 4)
                 continue;
