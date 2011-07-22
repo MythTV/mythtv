@@ -22,7 +22,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1279";
+const QString currentDatabaseVersion = "1280";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5783,6 +5783,69 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1279", dbver))
+            return false;
+    }
+
+    if (dbver == "1279")
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "Upgrading to MythTV schema version 1280");
+
+        MSqlQuery select(MSqlQuery::InitCon());
+        // New DBs/hosts will not have a NoPromptOnExit, so they'll get defaults
+        select.prepare("SELECT hostname, data FROM settings "
+                       " WHERE value = 'NoPromptOnExit'");
+        if (!select.exec())
+        {
+            MythDB::DBError("Unable to retrieve confirm exit values.", select);
+        }
+        else
+        {
+            MSqlQuery update(MSqlQuery::InitCon());
+            while (select.next())
+            {
+                QString hostname = select.value(0).toString();
+                // Yes, enabled NoPromptOnExit meant to prompt on exit
+                QString prompt_on_exit = select.value(1).toString();
+                // Default EXITPROMPT is wrong for all upgrades
+                update.prepare("DELETE FROM keybindings "
+                               " WHERE action = 'EXITPROMPT' "
+                               "   AND context = 'Main Menu' "
+                               "   AND hostname = :HOSTNAME ;");
+                update.bindValue(":HOSTNAME", hostname);
+                if (!update.exec())
+                     MythDB::DBError("Unable to delete EXITPROMPT binding",
+                                     update);
+
+                if ("0" == prompt_on_exit)
+                {
+                    // EXIT is already mapped appropriately, so just create a
+                    // no-keylist mapping for EXITPROMPT to prevent conflict
+                    update.prepare("INSERT INTO keybindings (context, action, "
+                                   "        description, keylist, hostname) "
+                                   "VALUES ('Main Menu', 'EXITPROMPT', '', "
+                                   "        '', :HOSTNAME );");
+                    update.bindValue(":HOSTNAME", hostname);
+                    if (!update.exec())
+                         MythDB::DBError("Unable to create EXITPROMPT binding",
+                                         update);
+                }
+                else
+                {
+                    // EXIT must be changed to EXITPROMPT
+                    update.prepare("UPDATE keybindings "
+                                   "   SET action = 'EXITPROMPT' "
+                                   " WHERE action = 'EXIT' "
+                                   "   AND context = 'Main Menu' "
+                                   "   AND hostname = :HOSTNAME ;");
+                    update.bindValue(":HOSTNAME", hostname);
+                    if (!update.exec())
+                         MythDB::DBError("Unable to update EXITPROMPT binding",
+                                         update);
+                }
+            }
+        }
+
+        if (!UpdateDBVersionNumber("1280", dbver))
             return false;
     }
 

@@ -1170,7 +1170,9 @@ void MythMainWindow::InitKeys()
         "Go forward to previous page"),     "F");
 
     RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
-        "System Exit"),                     "Esc");
+        "System Exit"),                     "");
+    RegisterKey("Main Menu",    "EXITPROMPT", QT_TRANSLATE_NOOP("MythControls",
+        "Display System Exit Prompt"),      "Esc");
 }
 
 void MythMainWindow::ResetKeys()

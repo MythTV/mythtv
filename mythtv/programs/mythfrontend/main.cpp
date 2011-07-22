@@ -92,7 +92,7 @@ static QString         logfile;
 static MediaRenderer  *g_pUPnp   = NULL;
 static MythPluginManager *pmanager = NULL;
 
-static void handleExit(void);
+static void handleExit(bool prompt);
 
 namespace
 {
@@ -996,8 +996,10 @@ static void TVMenuCallback(void *data, QString &selection)
     }
     else if (sel == "tv_status")
         showStatus();
+    else if (sel == "exiting_app_prompt")
+        handleExit(true);
     else if (sel == "exiting_app")
-        handleExit();
+        handleExit(false);
     else
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
 
@@ -1015,17 +1017,17 @@ static void TVMenuCallback(void *data, QString &selection)
     }
 }
 
-static void handleExit(void)
+static void handleExit(bool prompt)
 {
-    if (gCoreContext->GetNumSetting("NoPromptOnExit", 1) == 0)
-        qApp->quit();
-    else
+    if (prompt)
     {
         if (!exitPopup)
             exitPopup = new ExitPrompter();
 
         exitPopup->handleExit();
     }
+    else
+        qApp->quit();
 }
 
 static bool RunMenu(QString themedir, QString themename)

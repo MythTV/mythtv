@@ -101,7 +101,7 @@ static void SetupMenuCallback(void* data, QString& selection)
         else
             delete msee;
     }
-    else if (sel == "exiting_app")
+    else if (sel.startsWith("exiting_app"))
     {
         if (!exitPrompt)
             exitPrompt = new ExitPrompter();

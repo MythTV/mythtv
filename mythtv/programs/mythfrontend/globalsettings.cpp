@@ -1670,17 +1670,6 @@ static HostComboBox *OverrideExitMenu()
     return gc;
 }
 
-static HostCheckBox *NoPromptOnExit()
-{
-    HostCheckBox *gc = new HostCheckBox("NoPromptOnExit");
-    gc->setLabel(QObject::tr("Confirm exit"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, MythTV will prompt "
-                    "for confirmation when you press the System Exit "
-                    "key."));
-    return gc;
-}
-
 static HostLineEdit *RebootCommand()
 {
     HostLineEdit *ge = new HostLineEdit("RebootCommand");
@@ -3314,21 +3303,13 @@ MainGeneralSettings::MainGeneralSettings()
     media->addChild(mediaMon);
     addChild(media);
 
-    VerticalConfigurationGroup *exit =
-        new VerticalConfigurationGroup(false, true, false, false);
-    exit->setLabel(QObject::tr("Program Exit"));
-    HorizontalConfigurationGroup *ehor0 =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    ehor0->addChild(NoPromptOnExit());
     VerticalConfigurationGroup *shutdownSettings =
         new VerticalConfigurationGroup(true, true, false, false);
     shutdownSettings->setLabel(QObject::tr("Shutdown/Reboot Settings"));
     shutdownSettings->addChild(OverrideExitMenu());
     shutdownSettings->addChild(HaltCommand());
     shutdownSettings->addChild(RebootCommand());
-    exit->addChild(ehor0);
-    exit->addChild(shutdownSettings);
-    addChild(exit);
+    addChild(shutdownSettings);
 
     VerticalConfigurationGroup *remotecontrol =
         new VerticalConfigurationGroup(false, true, false, false);

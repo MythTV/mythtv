@@ -217,13 +217,16 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
             MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
             buttonAction(item);
         }
-        else if (action == "LEFT" || action == "ESCAPE" || action == "EXIT" )
+        else if (action == "LEFT" || action == "ESCAPE" ||
+                 action == "EXIT" || action == "EXITPROMPT" )
         {
             bool    callbacks  = m_state->m_callback;
             bool    lastScreen = (GetMythMainWindow()->GetMainStack()
                                                      ->TotalScreens() == 1);
             QString menuaction = "UPMENU";
-            QString selExit    = "EXITING_APP";
+            QString selExit    = "EXITING_APP_PROMPT";
+            if (action == "EXIT")
+                selExit = "EXITING_APP";
 
             if (!m_allocedstate)
                 handleAction(menuaction);
@@ -243,8 +246,9 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                     QCoreApplication::exit();
                 }
             }
-            else if ((action == "EXIT" || (action == "ESCAPE" &&
-                      (QCoreApplication::applicationName() ==
+            else if ((action == "EXIT" || action == "EXITPROMPT" ||
+                      (action == "ESCAPE" &&
+                       (QCoreApplication::applicationName() ==
                         MYTH_APPNAME_MYTHTV_SETUP))) && lastScreen)
             {
                 if (callbacks)
