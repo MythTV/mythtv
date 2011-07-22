@@ -49,7 +49,7 @@ class Video : public VideoServices
 
         DTC::VideoMetadataInfo*   GetVideoByFilename ( const QString  &Filename  );
 
-        DTC::VideoLookupInfoList* LookupVideo        ( const QString    &Title,
+        DTC::VideoLookupList*     LookupVideo        ( const QString    &Title,
                                                        const QString    &Subtitle,
                                                        const QString    &Inetref,
                                                        int              Season,

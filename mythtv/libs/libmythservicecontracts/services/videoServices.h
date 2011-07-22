@@ -64,7 +64,7 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
         VideoServices( QObject *parent = 0 ) : Service( parent )
         {
             DTC::VideoMetadataInfoList::InitializeCustomTypes();
-            DTC::VideoLookupInfoList::InitializeCustomTypes();
+            DTC::VideoLookupList::InitializeCustomTypes();
             DTC::BlurayInfo::InitializeCustomTypes();
         }
 
@@ -80,7 +80,7 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 
         virtual DTC::VideoMetadataInfo*     GetVideoByFilename ( const QString    &Filename  ) = 0;
 
-        virtual DTC::VideoLookupInfoList*   LookupVideo        ( const QString    &Title,
+        virtual DTC::VideoLookupList*   LookupVideo        ( const QString    &Title,
                                                                  const QString    &Subtitle,
                                                                  const QString    &Inetref,
                                                                  int              Season,

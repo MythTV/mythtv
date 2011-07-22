@@ -32,7 +32,7 @@
 namespace DTC
 {
 
-class SERVICE_PUBLIC VideoLookupInfoList : public QObject
+class SERVICE_PUBLIC VideoLookupList : public QObject
 {
     Q_OBJECT
     Q_CLASSINFO( "version", "1.0" );
@@ -42,62 +42,62 @@ class SERVICE_PUBLIC VideoLookupInfoList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "VideoLookupInfos_type", "DTC::VideoLookupInfo");
+    Q_CLASSINFO( "VideoLookups_type", "DTC::VideoLookup");
 
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )
     Q_PROPERTY( QDateTime    AsOf           READ AsOf            WRITE setAsOf           )
     Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )
     Q_PROPERTY( QString      ProtoVer       READ ProtoVer        WRITE setProtoVer       )
 
-    Q_PROPERTY( QVariantList VideoLookupInfos READ VideoLookupInfos DESIGNABLE true )
+    Q_PROPERTY( QVariantList VideoLookups READ VideoLookups DESIGNABLE true )
 
     PROPERTYIMP       ( int         , Count           )
     PROPERTYIMP       ( QDateTime   , AsOf            )
     PROPERTYIMP       ( QString     , Version         )
     PROPERTYIMP       ( QString     , ProtoVer        )
 
-    PROPERTYIMP_RO_REF( QVariantList, VideoLookupInfos )
+    PROPERTYIMP_RO_REF( QVariantList, VideoLookups )
 
     public:
 
         static void InitializeCustomTypes()
         {
-            qRegisterMetaType< VideoLookupInfoList  >();
-            qRegisterMetaType< VideoLookupInfoList* >();
+            qRegisterMetaType< VideoLookupList  >();
+            qRegisterMetaType< VideoLookupList* >();
 
-            VideoLookupInfo::InitializeCustomTypes();
+            VideoLookup::InitializeCustomTypes();
         }
 
     public:
 
-        VideoLookupInfoList(QObject *parent = 0)
+        VideoLookupList(QObject *parent = 0)
             : QObject( parent ),
               m_Count         ( 0      )
         {
         }
 
-        VideoLookupInfoList( const VideoLookupInfoList &src )
+        VideoLookupList( const VideoLookupList &src )
         {
             Copy( src );
         }
 
-        void Copy( const VideoLookupInfoList &src )
+        void Copy( const VideoLookupList &src )
         {
             m_Count         = src.m_Count          ;
             m_AsOf          = src.m_AsOf           ;
             m_Version       = src.m_Version        ;
             m_ProtoVer      = src.m_ProtoVer       ;
 
-            CopyListContents< VideoLookupInfo >( this, m_VideoLookupInfos, src.m_VideoLookupInfos );
+            CopyListContents< VideoLookup >( this, m_VideoLookups, src.m_VideoLookups );
         }
 
-        VideoLookupInfo *AddNewVideoLookupInfo()
+        VideoLookup *AddNewVideoLookup()
         {
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            VideoLookupInfo *pObject = new VideoLookupInfo( this );
-            m_VideoLookupInfos.append( QVariant::fromValue<QObject *>( pObject ));
+            VideoLookup *pObject = new VideoLookup( this );
+            m_VideoLookups.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;
         }
@@ -106,7 +106,7 @@ class SERVICE_PUBLIC VideoLookupInfoList : public QObject
 
 } // namespace DTC
 
-Q_DECLARE_METATYPE( DTC::VideoLookupInfoList  )
-Q_DECLARE_METATYPE( DTC::VideoLookupInfoList* )
+Q_DECLARE_METATYPE( DTC::VideoLookupList  )
+Q_DECLARE_METATYPE( DTC::VideoLookupList* )
 
 #endif

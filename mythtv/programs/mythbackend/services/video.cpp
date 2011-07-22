@@ -175,14 +175,14 @@ DTC::VideoMetadataInfo* Video::GetVideoByFilename( const QString &Filename )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::VideoLookupInfoList* Video::LookupVideo( const QString    &Title,
+DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
                                               const QString    &Subtitle,
                                               const QString    &Inetref,
                                               int              Season,
                                               int              Episode,
                                               const QString    &GrabberType  )
 {
-    DTC::VideoLookupInfoList *pVideoLookupInfos = new DTC::VideoLookupInfoList();
+    DTC::VideoLookupList *pVideoLookups = new DTC::VideoLookupList();
 
     MetadataLookupList list;
 
@@ -193,42 +193,94 @@ DTC::VideoLookupInfoList* Video::LookupVideo( const QString    &Title,
                                          Inetref, Season, Episode, GrabberType);
 
     if ( !list.size() )
-        return pVideoLookupInfos;
+        return pVideoLookups;
 
     for( int n = 0; n < list.size(); n++ )
     {
-        DTC::VideoLookupInfo *pVideoLookupInfo = pVideoLookupInfos->AddNewVideoLookupInfo();
+        DTC::VideoLookup *pVideoLookup = pVideoLookups->AddNewVideoLookup();
 
         MetadataLookup *lookup = list[n];
 
         if (lookup)
         {
-            pVideoLookupInfo->setTitle(lookup->GetTitle());
-            pVideoLookupInfo->setSubTitle(lookup->GetSubtitle());
-            pVideoLookupInfo->setSeason(lookup->GetSeason());
-            pVideoLookupInfo->setEpisode(lookup->GetEpisode());
-            pVideoLookupInfo->setYear(lookup->GetYear());
-            pVideoLookupInfo->setTagline(lookup->GetTagline());
-            pVideoLookupInfo->setDescription(lookup->GetDescription());
-            pVideoLookupInfo->setCertification(lookup->GetCertification());
-            pVideoLookupInfo->setInetRef(lookup->GetInetref());
-            pVideoLookupInfo->setHomePage(lookup->GetHomepage());
-            pVideoLookupInfo->setReleaseDate(QDateTime(lookup->GetReleaseDate()));
-            pVideoLookupInfo->setUserRating(lookup->GetUserRating());
-            pVideoLookupInfo->setLength(lookup->GetRuntime());
+            pVideoLookup->setTitle(lookup->GetTitle());
+            pVideoLookup->setSubTitle(lookup->GetSubtitle());
+            pVideoLookup->setSeason(lookup->GetSeason());
+            pVideoLookup->setEpisode(lookup->GetEpisode());
+            pVideoLookup->setYear(lookup->GetYear());
+            pVideoLookup->setTagline(lookup->GetTagline());
+            pVideoLookup->setDescription(lookup->GetDescription());
+            pVideoLookup->setCertification(lookup->GetCertification());
+            pVideoLookup->setInetRef(lookup->GetInetref());
+            pVideoLookup->setHomePage(lookup->GetHomepage());
+            pVideoLookup->setReleaseDate(QDateTime(lookup->GetReleaseDate()));
+            pVideoLookup->setUserRating(lookup->GetUserRating());
+            pVideoLookup->setLength(lookup->GetRuntime());
+            pVideoLookup->setLanguage(lookup->GetLanguage());
+            pVideoLookup->setCountries(lookup->GetCountries());
+            pVideoLookup->setPopularity(lookup->GetPopularity());
+            pVideoLookup->setBudget(lookup->GetBudget());
+            pVideoLookup->setRevenue(lookup->GetRevenue());
+            pVideoLookup->setIMDB(lookup->GetIMDB());
+            pVideoLookup->setTMSRef(lookup->GetTMSref());
+
+            ArtworkList coverartlist = lookup->GetArtwork(kArtworkCoverart);
+            ArtworkList::iterator c;
+            for (c = coverartlist.begin(); c != coverartlist.end(); ++c)
+            {
+                DTC::ArtworkItem *art = pVideoLookup->AddNewArtwork();
+                art->setType("coverart");
+                art->setUrl((*c).url);
+                art->setThumbnail((*c).thumbnail);
+                art->setWidth((*c).width);
+                art->setHeight((*c).height);
+            }
+            ArtworkList fanartlist = lookup->GetArtwork(kArtworkFanart);
+            ArtworkList::iterator f;
+            for (f = fanartlist.begin(); f != fanartlist.end(); ++f)
+            {
+                DTC::ArtworkItem *art = pVideoLookup->AddNewArtwork();
+                art->setType("fanart");
+                art->setUrl((*f).url);
+                art->setThumbnail((*f).thumbnail);
+                art->setWidth((*f).width);
+                art->setHeight((*f).height);
+            }
+            ArtworkList bannerlist = lookup->GetArtwork(kArtworkBanner);
+            ArtworkList::iterator b;
+            for (b = bannerlist.begin(); b != bannerlist.end(); ++b)
+            {
+                DTC::ArtworkItem *art = pVideoLookup->AddNewArtwork();
+                art->setType("banner");
+                art->setUrl((*b).url);
+                art->setThumbnail((*b).thumbnail);
+                art->setWidth((*b).width);
+                art->setHeight((*b).height);
+            }
+            ArtworkList screenshotlist = lookup->GetArtwork(kArtworkScreenshot);
+            ArtworkList::iterator s;
+            for (s = screenshotlist.begin(); s != screenshotlist.end(); ++s)
+            {
+                DTC::ArtworkItem *art = pVideoLookup->AddNewArtwork();
+                art->setType("screenshot");
+                art->setUrl((*s).url);
+                art->setThumbnail((*s).thumbnail);
+                art->setWidth((*s).width);
+                art->setHeight((*s).height);
+            }
 
             delete lookup;
         }
     }
 
-    pVideoLookupInfos->setCount         ( list.count()                 );
-    pVideoLookupInfos->setAsOf          ( QDateTime::currentDateTime() );
-    pVideoLookupInfos->setVersion       ( MYTH_BINARY_VERSION          );
-    pVideoLookupInfos->setProtoVer      ( MYTH_PROTO_VERSION           );
+    pVideoLookups->setCount         ( list.count()                 );
+    pVideoLookups->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoLookups->setVersion       ( MYTH_BINARY_VERSION          );
+    pVideoLookups->setProtoVer      ( MYTH_PROTO_VERSION           );
 
     delete factory;
 
-    return pVideoLookupInfos;
+    return pVideoLookups;
 }
 
 /////////////////////////////////////////////////////////////////////////////
