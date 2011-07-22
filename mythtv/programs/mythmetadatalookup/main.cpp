@@ -58,11 +58,10 @@ void MythMetadataLookupCommandLineParser::LoadArguments(void)
             "recordings lack inetrefs but one is found for the rule, it "
             "will be inherited.", "");
     add("--refresh-all-artwork", "refresh-all-artwork", false,
-            "Batch update artwork for recording rules and recording which "
-            "have an inetref set.  No lookups will be performed on items "
-            "which don't already have an inetref.  This is a more "
-            "conservative option that presumes you have set the inetrefs "
-            "you want for all of your recordings.  This option will not "
+            "Batch update artwork for non-generic recording rules "
+            "and recordings. This is a more conservative option "
+            "which only operates on items for which it is likely "
+            "to be able to find artwork.  This option will not "
             "overwrite any existing artwork.", "");
     add("--refresh-all-artwork-dangerously", "refresh-all-artwork-dangerously", false,
             "Batch update artwork for ALL recording rules and recordings. "
