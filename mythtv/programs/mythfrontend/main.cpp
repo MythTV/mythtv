@@ -1379,7 +1379,6 @@ int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
-    bool upgradeAllowed = false;
 
     MythFrontendCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -1534,7 +1533,7 @@ int main(int argc, char **argv)
             return GENERIC_EXIT_NO_THEME;
     }
 
-    if (!UpgradeTVDatabaseSchema(upgradeAllowed))
+    if (!UpgradeTVDatabaseSchema(false))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Couldn't upgrade database to new schema, exiting.");
