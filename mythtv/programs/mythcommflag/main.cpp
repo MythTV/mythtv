@@ -998,14 +998,24 @@ static int FlagCommercials(QString filename, int jobid,
 
 static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
 {
+    QString filename = get_filename(pginfo);
+
     if (!DoesFileExist(pginfo))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            "Unable to find file in defined storage paths.");
-        return GENERIC_EXIT_PERMISSIONS_ERROR;
-    }
+        // file not found on local filesystem
+        // assume file is in Video storage group on local backend
+        // and try again
 
-    QString filename = get_filename(pginfo);
+        filename = QString("myth://Video@%1/%2")
+                            .arg(gCoreContext->GetHostName()).arg(filename);
+        pginfo->SetPathname(filename);
+        if (!DoesFileExist(pginfo))
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "Unable to find file in defined storage paths.");
+            return GENERIC_EXIT_PERMISSIONS_ERROR;
+        }
+    }
 
     RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
     if (!tmprbuf)
