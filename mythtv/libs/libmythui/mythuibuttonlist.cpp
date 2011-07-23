@@ -1611,7 +1611,7 @@ int MythUIButtonList::PageUp(void)
                          (realButton->GetCurrentState());
             if (buttonstate == NULL)
             {
-                LOG(VB_GENERAL, LOG_ERR, 
+                LOG(VB_GENERAL, LOG_ERR,
                     "PageUp: Failed to query buttonlist state");
                 return pos;
             }
@@ -2669,6 +2669,9 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     if (state >= NotChecked)
         m_checkable = true;
 
+    // Set default "status"
+    m_states.insert("status", "normal");
+
     if (m_parent)
         m_parent->InsertItem(this, listPosition);
 }
@@ -2689,6 +2692,9 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_checkable = false;
     m_state     = CantCheck;
     m_showArrow = false;
+
+    // Set default "status"
+    m_states.insert("status", "normal");
 
     if (m_parent)
         m_parent->InsertItem(this, listPosition);
