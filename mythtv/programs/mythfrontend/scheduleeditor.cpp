@@ -33,7 +33,6 @@
 #include "videoutils.h"
 #include "mythuiutils.h"
 
-// libmythmetadata
 #include "metadataimagehelper.h"
 
 // Mythfrontend

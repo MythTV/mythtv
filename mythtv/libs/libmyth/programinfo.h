@@ -223,13 +223,14 @@ class MPUBLIC ProgramInfo
                 const QString &inetref);
     /// Constructs a ProgramInfo for a pathname.
     ProgramInfo(const QString &pathname);
-    /// Constructs a ProgramInfo for a pathname.
+    /// Constructs a ProgramInfo for a video.
     ProgramInfo(const QString &pathname,
                 const QString &plot,
                 const QString &title,
                 const QString &subtitle,
                 const QString &director,
                 int season, int episode,
+                const QString &inetref,
                 uint length_in_minutes,
                 uint year);
     /// Constructs a manual record ProgramInfo.

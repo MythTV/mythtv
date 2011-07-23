@@ -164,7 +164,7 @@ HEADERS += mythsystemevent.h
 HEADERS += avfringbuffer.h          ThreadedFileWriter.h
 HEADERS += ringbuffer.h             fileringbuffer.h
 HEADERS += dvdringbuffer.h          bdringbuffer.h
-HEADERS += streamingringbuffer.h
+HEADERS += streamingringbuffer.h    metadataimagehelper.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
@@ -192,7 +192,7 @@ SOURCES += mythsystemevent.cpp
 SOURCES += avfringbuffer.cpp        ThreadedFileWriter.cpp
 SOURCES += ringbuffer.cpp           fileringBuffer.cpp
 SOURCES += dvdringbuffer.cpp        bdringbuffer.cpp
-SOURCES += streamingringbuffer.cpp
+SOURCES += streamingringbuffer.cpp  metadataimagehelper.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
@@ -251,7 +251,7 @@ SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
-inc.files += mythtvexp.h
+inc.files += mythtvexp.h            metadataimagehelper.h
 
 INSTALLS += inc
 

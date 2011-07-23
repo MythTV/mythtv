@@ -1804,8 +1804,8 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
                                  const QString &plot, const QString &title,
                                  const QString &subtitle,
                                  const QString &director, int season,
-                                 int episode, int lenMins,
-                                 const QString &year)
+                                 int episode, const QString &inetref,
+                                 int lenMins, const QString &year)
 {
     QString lhandler(handler);
     if (lhandler.isEmpty())
@@ -1815,8 +1815,8 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
     if (d->mediaPluginMap.count(lhandler))
     {
         d->mediaPluginMap[lhandler].playFn(mrl, plot, title, subtitle,
-                                          director, season, episode, lenMins,
-                                          year);
+                                          director, season, episode,
+                                          inetref, lenMins, year);
         return true;
     }
 

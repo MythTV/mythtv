@@ -422,6 +422,9 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
             icon->SetFilename(iconpath);
             icon->Load(false);
         }
+    }
+    if (map.contains("inetref"))
+    {
         MythUIImage *cover = dynamic_cast<MythUIImage *> (win->GetChild("coverart"));
         if (cover && map.contains("coverartpath"))
         {

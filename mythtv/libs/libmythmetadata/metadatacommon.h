@@ -12,6 +12,7 @@
 #include <QEvent>
 
 #include "mythmetaexp.h"
+#include "metadataimagehelper.h"
 
 class ProgramInfo;
 
@@ -20,18 +21,6 @@ enum LookupStep {
     kLookupData = 1
 };
 
-enum VideoArtworkType {
-    kArtworkCoverart = 0,
-    kArtworkFanart = 1,
-    kArtworkBanner = 2,
-    kArtworkScreenshot = 3,
-    kArtworkPoster = 4,
-    kArtworkBackCover = 5,
-    kArtworkInsideCover = 6,
-    kArtworkCDImage = 7
-};
-Q_DECLARE_METATYPE(VideoArtworkType)
-
 struct PersonInfo
 {
     QString name;
@@ -39,16 +28,6 @@ struct PersonInfo
     QString thumbnail;
     QString url;
 };
-
-struct ArtworkInfo
-{
-    QString label;
-    QString thumbnail;
-    QString url;
-    uint width;
-    uint height;
-};
-Q_DECLARE_METATYPE(ArtworkInfo)
 
 enum MetadataType {
     kMetadataVideo = 0,
@@ -80,10 +59,6 @@ enum PeopleType {
     kPersonAlbumArtist = 10,
     kPersonGuestStar = 11
 };
-
-typedef QList< ArtworkInfo > ArtworkList;
-
-typedef QMultiMap< VideoArtworkType, ArtworkInfo > ArtworkMap;
 
 typedef QMap< VideoArtworkType, ArtworkInfo > DownloadMap;
 

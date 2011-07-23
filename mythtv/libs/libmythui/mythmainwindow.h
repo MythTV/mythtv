@@ -18,7 +18,7 @@ class MythMediaDevice;
 #define REG_JUMPEX(a, b, c, d, e) GetMythMainWindow()->RegisterJump(a, b, c, d, e)
 #define REG_MEDIAPLAYER(a,b,c) GetMythMainWindow()->RegisterMediaPlugin(a, b, c)
 
-typedef int (*MediaPlayCallback)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, int, const QString &);
+typedef int (*MediaPlayCallback)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &);
 
 class MythMainWindowPrivate;
 
@@ -76,8 +76,8 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     bool HandleMedia(const QString& handler, const QString& mrl,
                      const QString& plot="", const QString& title="",
                      const QString& subtitle="", const QString& director="",
-                     int season=0, int episode=0, int lenMins=120,
-                     const QString& year="1895");
+                     int season=0, int episode=0, const QString& inetref="",
+                     int lenMins=120, const QString& year="1895");
 
     void JumpTo(const QString &destination, bool pop = true);
     bool DestinationExists(const QString &destination) const;

@@ -3,7 +3,6 @@
 #include "mythdirs.h"
 #include "mythdbcon.h"
 
-#include "videoutils.h"
 #include "metadataimagehelper.h"
 
 ArtworkMap GetArtwork(QString inetref,
@@ -43,21 +42,21 @@ ArtworkMap GetArtwork(QString inetref,
         if (!coverart.isEmpty())
         {
             ArtworkInfo coverartinfo;
-            coverartinfo.url = generate_file_url("Coverart", host, coverart);
+            coverartinfo.url = generate_myth_url("Coverart", host, coverart);
             map.insert(kArtworkCoverart, coverartinfo);
         }
 
         if (!fanart.isEmpty())
         {
             ArtworkInfo fanartinfo;
-            fanartinfo.url = generate_file_url("Fanart", host, fanart);
+            fanartinfo.url = generate_myth_url("Fanart", host, fanart);
             map.insert(kArtworkFanart, fanartinfo);
         }
 
         if (!banner.isEmpty())
         {
             ArtworkInfo bannerinfo;
-            bannerinfo.url = generate_file_url("Banners", host, banner);
+            bannerinfo.url = generate_myth_url("Banners", host, banner);
             map.insert(kArtworkBanner, bannerinfo);
         }
     }
@@ -78,21 +77,21 @@ bool SetArtwork(const QString &inetref,
     if (!coverart.isEmpty())
     {
         ArtworkInfo coverartinfo;
-        coverartinfo.url = generate_file_url("Coverart", host, coverart);
+        coverartinfo.url = generate_myth_url("Coverart", host, coverart);
         map.insert(kArtworkCoverart, coverartinfo);
     }
 
     if (!fanart.isEmpty())
     {
         ArtworkInfo fanartinfo;
-        fanartinfo.url = generate_file_url("Fanart", host, fanart);
+        fanartinfo.url = generate_myth_url("Fanart", host, fanart);
         map.insert(kArtworkFanart, fanartinfo);
     }
 
     if (!banner.isEmpty())
     {
         ArtworkInfo bannerinfo;
-        bannerinfo.url = generate_file_url("Banners", host, banner);
+        bannerinfo.url = generate_myth_url("Banners", host, banner);
         map.insert(kArtworkBanner, bannerinfo);
     }
 

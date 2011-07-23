@@ -16,6 +16,7 @@
 #include "storagegroup.h"
 #include "mythcorecontext.h"
 #include "videometadatautil.h"
+#include "metadataimagehelper.h"
 #include "mythlogging.h"
 
 #define LOC QString("playCtx: ")
@@ -692,6 +693,19 @@ bool PlayerContext::GetPlayingInfoMap(InfoMap &infoMap) const
                 playingInfo->GetPathname(), "Banners");
             infoMap["screenshotpath"] = VideoMetaDataUtil::GetArtPath(
                 playingInfo->GetPathname(), "Screenshots");
+        }
+        else
+        {
+            ArtworkMap artmap = GetArtwork(playingInfo->GetInetRef(),
+                                        playingInfo->GetSeason());
+            infoMap["coverartpath"] =
+                artmap.value(kArtworkCoverart).url;
+            infoMap["fanartpath"] =
+                artmap.value(kArtworkFanart).url;
+            infoMap["bannerpath"] =
+                artmap.value(kArtworkBanner).url;
+            infoMap["screenshotpath"] =
+                artmap.value(kArtworkScreenshot).url;
         }
         if (player)
             player->GetCodecDescription(infoMap);

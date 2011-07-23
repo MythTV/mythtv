@@ -1086,7 +1086,7 @@ static void WriteDefaults()
 static int internal_play_media(const QString &mrl, const QString &plot,
                         const QString &title, const QString &subtitle,
                         const QString &director, int season, int episode,
-                        int lenMins, const QString &year)
+                        const QString &inetref, int lenMins, const QString &year)
 {
     int res = -1;
 
@@ -1106,7 +1106,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
     ProgramInfo *pginfo = new ProgramInfo(
         mrl, plot, title, subtitle, director, season, episode,
-        lenMins, (year.toUInt()) ? year.toUInt() : 1900);
+        inetref, lenMins, (year.toUInt()) ? year.toUInt() : 1900);
 
     pginfo->SetProgramInfoType(pginfo->DiscoverProgramInfoType());
 
