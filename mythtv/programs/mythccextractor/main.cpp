@@ -252,25 +252,26 @@ static int RunCCExtract(const ProgramInfo &program_info)
 {
     if (!program_info.IsLocal())
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Only locally accessible files are supported (%1).")
-                .arg(program_info.GetPathname()));
+        QString msg =
+            QString("Only locally accessible files are supported (%1).")
+            .arg(program_info.GetPathname());
+        cerr << qPrintable(msg) << endl;
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     QString filename = program_info.GetPathname();
     if (!QFile::exists(filename))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Could not open input file (%1).")
-                .arg(filename));
+        cerr << qPrintable(
+            QString("Could not open input file (%1).").arg(filename)) << endl;
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
     if (!tmprbuf)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Unable to create RingBuffer for %1").arg(filename));
+        cerr << qPrintable(QString("Unable to create RingBuffer for %1")
+                           .arg(filename)) << endl;
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
@@ -283,7 +284,16 @@ static int RunCCExtract(const ProgramInfo &program_info)
     ctx->SetPlayer(ccp);
 
     ccp->SetPlayerInfo(NULL, NULL, true, ctx);
-    ccp->run();
+    if (ccp->OpenFile() < 0)
+    {
+        cerr << "Failed to open " << qPrintable(filename) << endl;
+        return GENERIC_EXIT_NOT_OK;
+    }
+    if (!ccp->run())
+    {
+        cerr << "Failed to decode " << qPrintable(filename) << endl;
+        return GENERIC_EXIT_NOT_OK;
+    }
 
     DumpSubtitleInformation(ccp, program_info.GetPathname());
 
@@ -306,6 +316,10 @@ int main(int argc, char *argv[])
         cmdline.PrintHelp();
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
+
+    int retval = cmdline.ConfigureLogging("none");
+    if (retval != GENERIC_EXIT_OK)
+        return retval;
 
     if (cmdline.toBool("showhelp"))
     {
@@ -333,7 +347,7 @@ int main(int argc, char *argv[])
             false/*use gui*/, false/*prompt for backend*/,
             false/*bypass auto discovery*/, !useDB/*ignoreDB*/))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
+        cerr << "Failed to init MythContext, exiting." << endl;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 

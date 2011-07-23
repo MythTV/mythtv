@@ -121,9 +121,6 @@ bool MythCCExtractorPlayer::run(void)
     framesPlayed = 0;
     using_null_videoout = true;
 
-    if (OpenFile() < 0)
-        return false;
-
     decoder->SetDecodeAllSubtitles(true);
 
     SetPlaying(true);
