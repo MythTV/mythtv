@@ -1,5 +1,6 @@
 #include <QMutex>
 #include <QMutexLocker>
+#include <QWaitCondition>
 #include <QList>
 #include <QQueue>
 #include <QThread>
@@ -435,12 +436,22 @@ bool DatabaseLogger::logqmsg(LoggingItem_t *item)
     return true;
 }
 
+DBLoggerThread::DBLoggerThread(DatabaseLogger *logger) :
+    m_logger(logger), m_queue(new QQueue<LoggingItem_t *>),
+    m_wait(new QWaitCondition()), aborted(false)
+{
+}
+
+DBLoggerThread::~DBLoggerThread()
+{
+    delete m_queue;
+    delete m_wait;
+}
+
 void DBLoggerThread::run(void)
 {
     threadRegister("DBLogger");
     LoggingItem_t *item;
-
-    aborted = false;
 
     QMutexLocker qLock(&m_queueMutex);
 
@@ -448,9 +459,7 @@ void DBLoggerThread::run(void)
     {
         if (m_queue->isEmpty())
         {
-            qLock.unlock();
-            msleep(100);
-            qLock.relock();
+            m_wait->wait(qLock.mutex(), 100);
             continue;
         }
 
@@ -464,7 +473,7 @@ void DBLoggerThread::run(void)
         {
             qLock.relock();
             m_queue->prepend(item);
-            msleep(100);
+            m_wait->wait(qLock.mutex(), 100);
         } else {
             deleteItem(item);
             qLock.relock();
@@ -473,6 +482,13 @@ void DBLoggerThread::run(void)
 
     MSqlQuery::CloseLogCon();
     threadDeregister();
+}
+
+void DBLoggerThread::stop(void)
+{
+    QMutexLocker qLock(&m_queueMutex);
+    aborted = true;
+    m_wait->wakeAll();
 }
 
 bool DatabaseLogger::isDatabaseReady()
@@ -583,7 +599,8 @@ void setThreadTid( LoggingItem_t *item )
 }
 
 
-LoggerThread::LoggerThread()
+LoggerThread::LoggerThread() :
+    m_wait(new QWaitCondition()), aborted(false)
 {
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
@@ -604,6 +621,8 @@ LoggerThread::~LoggerThread()
     {
         (*it)->deleteLater();
     }
+
+    delete m_wait;
 }
 
 void LoggerThread::run(void)
@@ -612,7 +631,6 @@ void LoggerThread::run(void)
     LoggingItem_t *item;
 
     logThreadFinished = false;
-    aborted = false;
 
     QMutexLocker qLock(&logQueueMutex);
 
@@ -620,9 +638,7 @@ void LoggerThread::run(void)
     {
         if (logQueue.isEmpty())
         {
-            qLock.unlock();
-            msleep(100);
-            qLock.relock();
+            m_wait->wait(qLock.mutex(), 100);
             continue;
         }
 
@@ -705,6 +721,13 @@ void LoggerThread::run(void)
     }
 
     logThreadFinished = true;
+}
+
+void LoggerThread::stop(void)
+{
+    QMutexLocker qLock(&logQueueMutex);
+    aborted = true;
+    m_wait->wakeAll();
 }
 
 void deleteItem( LoggingItem_t *item )

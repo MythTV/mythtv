@@ -198,6 +198,7 @@ class DatabaseLogger : public LoggerBase {
         bool m_disabled;
 };
 
+class QWaitCondition;
 class LoggerThread : public QThread {
     Q_OBJECT
 
@@ -205,9 +206,10 @@ class LoggerThread : public QThread {
         LoggerThread();
         ~LoggerThread();
         void run(void);
-        void stop(void) { aborted = true; };
+        void stop(void);
     private:
-        bool aborted;
+        QWaitCondition *m_wait; // protected by logQueueMutex
+        bool aborted; // protected by logQueueMutex
 };
 
 #define MAX_QUEUE_LEN 1000
@@ -216,11 +218,10 @@ class DBLoggerThread : public QThread {
     Q_OBJECT
 
     public:
-        DBLoggerThread(DatabaseLogger *logger) : m_logger(logger), 
-            m_queue(new QQueue<LoggingItem_t *>) {}
-        ~DBLoggerThread() { delete m_queue; }
+        DBLoggerThread(DatabaseLogger *logger);
+        ~DBLoggerThread();
         void run(void);
-        void stop(void) { aborted = true; }
+        void stop(void);
         bool enqueue(LoggingItem_t *item) 
         { 
             QMutexLocker qLock(&m_queueMutex); 
@@ -236,7 +237,8 @@ class DBLoggerThread : public QThread {
         DatabaseLogger *m_logger;
         QMutex m_queueMutex;
         QQueue<LoggingItem_t *> *m_queue;
-        bool aborted;
+        QWaitCondition *m_wait; // protected by m_queueMutex
+        bool aborted; // protected by m_queueMutex
 };
 #endif
 
