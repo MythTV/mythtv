@@ -444,6 +444,9 @@ DBLoggerThread::DBLoggerThread(DatabaseLogger *logger) :
 
 DBLoggerThread::~DBLoggerThread()
 {
+    stop();
+    wait();
+
     delete m_queue;
     delete m_wait;
 }
@@ -613,6 +616,9 @@ LoggerThread::LoggerThread() :
 
 LoggerThread::~LoggerThread()
 {
+    stop();
+    wait();
+
     QMutexLocker locker(&loggerListMutex);
 
     QList<LoggerBase *>::iterator it;
