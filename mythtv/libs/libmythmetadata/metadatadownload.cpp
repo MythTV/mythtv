@@ -478,7 +478,8 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
     if (lookup->GetStep() == kLookupSearch)
     {
         args.append(QString("-M"));
-        if (lookup->GetInetref().isEmpty())
+        if (lookup->GetInetref().isEmpty() ||
+            lookup->GetInetref() == "00000000")
         {
             QString title = lookup->GetTitle();
             args.append(title);
