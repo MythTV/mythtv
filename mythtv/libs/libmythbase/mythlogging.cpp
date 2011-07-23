@@ -1197,14 +1197,18 @@ int verboseArgParse(QString arg)
                 if (reverseOption)
                 {
                     verboseMask &= ~(item->mask);
+                    verboseString = verboseString.remove(' ' + item->name);
                     verboseString += " no" + item->name;
                 }
                 else
                 {
                     if (item->additive)
                     {
-                        verboseMask |= item->mask;
-                        verboseString += ' ' + item->name;
+                        if (!(verboseMask & item->mask))
+                        {
+                            verboseMask |= item->mask;
+                            verboseString += ' ' + item->name;
+                        }
                     }
                     else
                     {
