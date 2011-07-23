@@ -3246,12 +3246,12 @@ void VideoDialog::customEvent(QEvent *levent)
     }
     else if (levent->type() == MetadataFactoryNoResult::kEventType)
     {
-        MetadataFactorySingleResult *mfsr = dynamic_cast<MetadataFactorySingleResult*>(levent);
+        MetadataFactoryNoResult *mfnr = dynamic_cast<MetadataFactoryNoResult*>(levent);
 
-        if (!mfsr)
+        if (!mfnr)
             return;
 
-        MetadataLookup *lookup = mfsr->result;
+        MetadataLookup *lookup = mfnr->result;
 
         if (!lookup)
             return;
