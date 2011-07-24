@@ -15,7 +15,6 @@
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
-#include "loggingdefs.h"
 
 #define LOGLINE_MAX 2048
 

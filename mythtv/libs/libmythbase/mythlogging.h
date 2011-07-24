@@ -8,7 +8,6 @@
 #include <errno.h>
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
-#include "loggingdefs.h"
 #include "verbosedefs.h"
 
 #ifdef __cplusplus
@@ -64,6 +63,7 @@ MBASE_PUBLIC void threadRegister(QString name);
 MBASE_PUBLIC void threadDeregister(void);
 MBASE_PUBLIC int  syslogGetFacility(QString facility);
 MBASE_PUBLIC LogLevel_t logLevelGet(QString level);
+MBASE_PUBLIC QString logLevelGetName(LogLevel_t level);
 MBASE_PUBLIC int verboseArgParse(QString arg);
 
 /// Verbose helper function for ENO macro

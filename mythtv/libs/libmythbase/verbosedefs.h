@@ -26,6 +26,10 @@
 #undef VERBOSE_POSTAMBLE
 #undef VERBOSE_MAP
 
+#undef LOGLEVEL_PREAMBLE
+#undef LOGLEVEL_POSTAMBLE
+#undef LOGLEVEL_MAP
+
 #ifdef _IMPLEMENT_VERBOSE
 
 // This is used to actually implement the mask in mythlogging.cpp
@@ -33,6 +37,11 @@
 #define VERBOSE_POSTAMBLE
 #define VERBOSE_MAP(name,mask,additive,help) \
     verboseAdd((uint64_t)(mask),QString(#name),(bool)(additive),QString(help));
+
+#define LOGLEVEL_PREAMBLE
+#define LOGLEVEL_POSTAMBLE
+#define LOGLEVEL_MAP(name,value,shortname) \
+    loglevelAdd((int)(value),QString(#name),(char)(shortname));
 
 #else // !defined(_IMPLEMENT_VERBOSE)
 
@@ -44,6 +53,13 @@
     };
 #define VERBOSE_MAP(name,mask,additive,help) \
     name = (uint64_t)(mask),
+
+#define LOGLEVEL_PREAMBLE \
+    typedef enum {
+#define LOGLEVEL_POSTAMBLE \
+    } LogLevel_t;
+#define LOGLEVEL_MAP(name,value,shortname) \
+    name = (int)(value),
 
 #endif
 
@@ -127,5 +143,19 @@ VERBOSE_MAP(VB_DECODE,    0x800000000LLU, true,
 VERBOSE_MAP(VB_NONE,      0x00000000, false,
             "NO debug output")
 VERBOSE_POSTAMBLE
+
+
+LOGLEVEL_PREAMBLE
+LOGLEVEL_MAP(LOG_ANY,    -1, ' ')
+LOGLEVEL_MAP(LOG_EMERG,   0, '!')
+LOGLEVEL_MAP(LOG_ALERT,   1, 'A')
+LOGLEVEL_MAP(LOG_CRIT,    2, 'C')
+LOGLEVEL_MAP(LOG_ERR,     3, 'E')
+LOGLEVEL_MAP(LOG_WARNING, 4, 'W')
+LOGLEVEL_MAP(LOG_NOTICE,  5, 'N')
+LOGLEVEL_MAP(LOG_INFO,    6, 'I')
+LOGLEVEL_MAP(LOG_DEBUG,   7, 'D')
+LOGLEVEL_MAP(LOG_UNKNOWN, 8, '-')
+LOGLEVEL_POSTAMBLE
 
 #endif

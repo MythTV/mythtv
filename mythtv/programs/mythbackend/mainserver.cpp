@@ -5151,7 +5151,7 @@ void MainServer::HandleSetLogLevel(QStringList &slist, PlaybackSock *pbs)
             logPropagateCalc();
             LOG(VB_GENERAL, LOG_NOTICE,
                 QString("Log level changed, new level is: %1")
-                    .arg(LogLevelNames[logLevel]));
+                    .arg(logLevelGetName(logLevel)));
 
             retlist << "OK";
         }
