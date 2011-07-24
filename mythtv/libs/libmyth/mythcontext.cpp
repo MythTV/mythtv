@@ -461,7 +461,7 @@ void MythContextPrivate::LoadDatabaseSettings(void)
             localhostname[0] = '\0';
         }
         hostname = localhostname;
-        LOG(VB_GENERAL, LOG_ALERT, "Empty LocalHostName.");
+        LOG(VB_GENERAL, LOG_NOTICE, "Empty LocalHostName.");
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Using localhost value of %1")
