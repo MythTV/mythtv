@@ -1914,7 +1914,8 @@ void Scheduler::run(void)
         if ((idleTimeoutSecs > 0) && (m_mainServer != NULL))
         {
             HandleIdleShutdown(blockShutdown, idleSince, prerollseconds,
-                               idleTimeoutSecs, idleWaitForRecordingTime);
+                               idleTimeoutSecs, idleWaitForRecordingTime,
+                               statuschanged);
         }
     }
 
@@ -2511,7 +2512,8 @@ void Scheduler::HandleTuning(RecordingInfo &ri, bool &statuschanged)
 
 void Scheduler::HandleIdleShutdown(
     bool &blockShutdown, QDateTime &idleSince,
-    int prerollseconds, int idleTimeoutSecs, int idleWaitForRecordingTime)
+    int prerollseconds, int idleTimeoutSecs, int idleWaitForRecordingTime,
+    bool &statuschanged)
 {
     if ((idleTimeoutSecs <= 0) || (m_mainServer == NULL))
         return;
@@ -2545,8 +2547,11 @@ void Scheduler::HandleIdleShutdown(
             }
             resetIdleTime_lock.unlock();
 
-            if (!idleSince.isValid())
+            if (statuschanged || !idleSince.isValid())
             {
+                if (!idleSince.isValid()) 
+                    idleSince = curtime;
+    
                 RecIter idleIter = reclist.begin();
                 for ( ; idleIter != reclist.end(); ++idleIter)
                     if ((*idleIter)->GetRecordingStatus() ==
@@ -2557,17 +2562,16 @@ void Scheduler::HandleIdleShutdown(
                 {
                     if (curtime.secsTo
                         ((*idleIter)->GetRecordingStartTime()) -
-                        prerollseconds >
+                        prerollseconds <
                         (idleWaitForRecordingTime * 60) +
                         idleTimeoutSecs)
                     {
-                        idleSince = curtime;
+                        idleSince = QDateTime();
                     }
                 }
-                else
-                    idleSince = curtime;
             }
-            else
+            
+            if (idleSince.isValid())
             {
                 // is the machine already idling the timeout time?
                 if (idleSince.addSecs(idleTimeoutSecs) < curtime)

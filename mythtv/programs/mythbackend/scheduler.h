@@ -165,7 +165,8 @@ class Scheduler : public QThread
         RecordingInfo &ri, RecStatusTypes recStatus, const QString &details);
     void HandleIdleShutdown(
         bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
-        int idleTimeoutSecs, int idleWaitForRecordingTime);
+        int idleTimeoutSecs, int idleWaitForRecordingTime,
+        bool &statuschanged);
 
 
     MythDeque<int> reschedQueue;
