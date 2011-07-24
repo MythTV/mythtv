@@ -116,7 +116,7 @@ bool NetTree::Create()
         SetFocusWidget(m_siteMap);
 
         connect(m_siteMap, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                SLOT(showWebVideo(void)));
+                SLOT(streamWebVideo(void)));
         connect(m_siteMap, SIGNAL(itemSelected(MythUIButtonListItem *)),
                 SLOT(slotItemChanged(void)));
         connect(m_siteMap, SIGNAL(nodeChanged(MythGenericTree *)),
@@ -371,7 +371,7 @@ void NetTree::handleSelect(MythUIButtonListItem *item)
             break;
         default:
         {
-            showWebVideo();
+            streamWebVideo();
         }
     };
     slotItemChanged();
@@ -488,6 +488,8 @@ void NetTree::showMenu(void)
 
         if (item)
         {
+            if (item->GetDownloadable())
+                menuPopup->AddButton(tr("Stream Video"), SLOT(streamWebVideo()));
             menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
 
             if (item->GetDownloadable())
@@ -743,6 +745,37 @@ int NetTree::AddFileNode(MythGenericTree *where_to_add, ResultItem *video)
     sub_node->SetData(qVariantFromValue(video));
     m_videos.append(video);
     return 1;
+}
+
+void NetTree::streamWebVideo()
+{
+    ResultItem *item;
+
+    if (m_type == DLG_TREE)
+        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
+    else
+    {
+        MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
+
+        if (!node)
+            return;
+
+        item = qVariantValue<ResultItem *>(node->GetData());
+    }
+
+    if (!item)
+        return;
+
+    if (!item->GetDownloadable())
+    {
+        showWebVideo();
+        return;
+    }
+
+    GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL(),
+           item->GetDescription(), item->GetTitle(), item->GetSubtitle(), QString(),
+           item->GetSeason(), item->GetEpisode(), QString(), item->GetTime().toInt(),
+           item->GetDate().toString("yyyy"));
 }
 
 void NetTree::showWebVideo()

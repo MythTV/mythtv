@@ -87,6 +87,7 @@ class NetSearch : public MythScreenType
     NetSearch::DialogType m_type;
 
   private slots:
+    void streamWebVideo(void);
     void showWebVideo(void);
     void doDownloadAndPlay(void);
     void doPlayVideo(QString filename);

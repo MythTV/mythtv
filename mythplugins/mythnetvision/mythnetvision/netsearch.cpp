@@ -100,7 +100,7 @@ bool NetSearch::Create()
     connect(m_siteList, SIGNAL(itemClicked(MythUIButtonListItem *)),
                        SLOT(doSearch(void)));
     connect(m_searchResultList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                       SLOT(showWebVideo(void)));
+                       SLOT(streamWebVideo(void)));
     connect(m_searchResultList, SIGNAL(itemSelected(MythUIButtonListItem *)),
                        SLOT(slotItemChanged()));
 
@@ -235,6 +235,8 @@ void NetSearch::showMenu(void)
 
             if (item)
             {
+                if (item && item->GetDownloadable())
+                    menuPopup->AddButton(tr("Stream Video"), SLOT(streamWebVideo()));
                 menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
 
                 filename = GetDownloadFilename(item->GetTitle(),
@@ -503,6 +505,26 @@ void NetSearch::populateResultList(ResultItem::resultList list)
         else
             delete item;
     }
+}
+
+void NetSearch::streamWebVideo()
+{
+    ResultItem *item =
+        qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
+
+    if (!item)
+        return;
+
+    if (!item->GetDownloadable())
+    {
+        showWebVideo();
+        return;
+    }
+
+    GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL(),
+           item->GetDescription(), item->GetTitle(), item->GetSubtitle(), QString(),
+           item->GetSeason(), item->GetEpisode(), QString(), item->GetTime().toInt(),
+           item->GetDate().toString("yyyy"));
 }
 
 void NetSearch::showWebVideo()
