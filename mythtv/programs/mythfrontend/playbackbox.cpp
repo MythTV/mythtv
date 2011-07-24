@@ -644,9 +644,13 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
             ProgramInfo *info = *it;
             if (info)
             {
-                uint64_t filesize = info->QueryFilesize();
+                uint64_t filesize = info->GetFilesize();
+                if (filesize == 0 || info->GetRecordingStatus() == rsRecording)
+                {
+                    filesize = info->QueryFilesize();
+                    info->SetFilesize(filesize);
+                }
                 groupSize += filesize;
-                info->SetFilesize(filesize);
             }
         }
 
