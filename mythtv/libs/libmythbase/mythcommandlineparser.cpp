@@ -1104,7 +1104,8 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int quiet)
 
     QString logfile = GetLogFilePath();
     bool propogate = toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propogate);
+    bool daemon = toBool("daemon");
+    logStart(logfile, quiet, daemon, facility, level, dblog, propogate);
 
     return GENERIC_EXIT_OK;
 }

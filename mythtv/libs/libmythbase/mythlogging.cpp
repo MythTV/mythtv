@@ -161,8 +161,9 @@ LoggerBase::~LoggerBase()
 }
 
 
-FileLogger::FileLogger(char *filename, bool quiet) : 
-        LoggerBase(filename, 0), m_opened(false), m_fd(-1), m_quiet(quiet)
+FileLogger::FileLogger(char *filename, bool quiet, bool daemon) : 
+        LoggerBase(filename, 0), m_opened(false), m_fd(-1), m_quiet(quiet),
+        m_daemon(daemon)
 {
     if( !strcmp(filename, "-") )
     {
@@ -172,6 +173,8 @@ FileLogger::FileLogger(char *filename, bool quiet) :
     }
     else
     {
+        m_quiet = false;
+        m_daemon = false;
         m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
         m_opened = (m_fd != -1);
         LOG(VB_GENERAL, LOG_INFO, QString("Added logging to %1")
@@ -220,7 +223,7 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     pid_t               pid = getpid();
     pid_t               tid = 0;
 
-    if (!m_opened || (m_quiet && item->level > LOG_ERR))
+    if (!m_opened || m_daemon || (m_quiet && item->level > LOG_ERR))
         return false;
 
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
@@ -892,8 +895,8 @@ bool logPropagateQuiet(void)
     return logPropagateOpts.quiet;
 }
 
-void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
-              bool dblog, bool propagate)
+void logStart(QString logfile, int quiet, bool daemon, int facility,
+              LogLevel_t level, bool dblog, bool propagate)
 {
     LoggerBase *logger;
 
@@ -919,12 +922,12 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
     logPropagateCalc();
 
     /* log to the console */
-    logger = new FileLogger((char *)"-", quiet);
+    logger = new FileLogger((char *)"-", quiet, daemon);
 
     /* Debug logfile */
     if( !logfile.isEmpty() )
         logger = new FileLogger((char *)logfile.toLocal8Bit().constData(),
-                                false);
+                                false, false);
 
 #ifndef _WIN32
     /* Syslog */

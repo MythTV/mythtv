@@ -118,9 +118,9 @@ MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level,
 
 extern MBASE_PUBLIC QString logPropagateArgs;
 
-MBASE_PUBLIC void logStart(QString logfile, int quiet = 0, int facility = 0,
-                           LogLevel_t level = LOG_INFO, bool dblog = true, 
-                           bool propagate = false);
+MBASE_PUBLIC void logStart(QString logfile, int quiet = 0, bool daemon = false,
+                           int facility = 0, LogLevel_t level = LOG_INFO,
+                           bool dblog = true, bool propagate = false);
 MBASE_PUBLIC void logStop(void);
 MBASE_PUBLIC void logPropagateCalc(void);
 MBASE_PUBLIC bool logPropagateQuiet(void);
@@ -151,7 +151,7 @@ class LoggerBase : public QObject {
 
 class FileLogger : public LoggerBase {
     public:
-        FileLogger(char *filename, bool quiet);
+        FileLogger(char *filename, bool quiet, bool daemon);
         ~FileLogger();
         bool logmsg(LoggingItem_t *item);
         void reopen(void);
@@ -159,6 +159,7 @@ class FileLogger : public LoggerBase {
         bool m_opened;
         int  m_fd;
         bool m_quiet;
+        bool m_daemon;
 };
 
 #ifndef _WIN32
