@@ -135,9 +135,6 @@ bool AudioSetupWizard::Create()
 
 AudioSetupWizard::~AudioSetupWizard()
 {
-    if (m_generalScreen)
-        m_generalScreen->Show();
-
     if (m_testThread)
     {
         m_testThread->cancel();
@@ -145,6 +142,13 @@ AudioSetupWizard::~AudioSetupWizard()
         delete m_testThread;
         m_testThread = NULL;
     }
+}
+
+void AudioSetupWizard::Close()
+{
+    if (m_generalScreen)
+        m_generalScreen->Show();
+    MythScreenType::Close();
 }
 
 void AudioSetupWizard::Load(void)

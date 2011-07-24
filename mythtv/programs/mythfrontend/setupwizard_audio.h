@@ -29,6 +29,8 @@ class AudioSetupWizard : public MythScreenType
 
     void save(void);
 
+    void Close(void);
+
   private:
     virtual void Load(void);
     virtual void Init(void);
