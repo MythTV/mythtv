@@ -83,11 +83,11 @@
                     <textarea name="titlesubtitle" from="buttontext">
                         <area>35,-2,652,28</area>
                     </textarea>
-                    <textarea name="shortdate" from="titlesubtitle">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>635,-2,120,28</area>
                         <align>right</align>
                     </textarea>
-                    <textarea name="starttime" from="shortdate">
+                    <textarea name="starttime" from="shortstartdate">
                         <area>761,-2,114,28</area>
                         <align>right</align>
                     </textarea>

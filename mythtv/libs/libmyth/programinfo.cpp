@@ -1386,9 +1386,11 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     else // if (IsRecording())
     {
         progMap["starttime"] = MythDateTimeToString(startts, kTime);
-        progMap["startdate"] = MythDateTimeToString(startts, kDateShort);
+        progMap["startdate"] = MythDateTimeToString(startts, kDateFull | kSimplify);
+        progMap["shortstartdate"] = MythDateTimeToString(startts, kDateShort);
         progMap["endtime"] = MythDateTimeToString(endts, kTime);
-        progMap["enddate"] = MythDateTimeToString(endts, kDateShort);
+        progMap["enddate"] = MythDateTimeToString(endts, kDateFull | kSimplify);
+        progMap["shortenddate"] = MythDateTimeToString(endts, kDateShort);
         progMap["recstarttime"] = MythDateTimeToString(recstartts, kTime);
         progMap["recstartdate"] = MythDateTimeToString(recstartts, kDateShort);
         progMap["recendtime"] = MythDateTimeToString(recendts, kTime);
