@@ -20,8 +20,8 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
 
     if (!gCoreContext->SaveSettingOnHost("MusicDBSchemaVer",newnumber,NULL))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("DB Error (Setting new DB version number): %1\n")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("DB Error (Setting new DB version number): %1\n")
                 .arg(newnumber));
 
         return false;
@@ -35,8 +35,8 @@ static bool performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythMusic schema version ") +
-            version);
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Upgrading to MythMusic schema version ") + version);
 
     int counter = 0;
     QString thequery = updates[counter];
@@ -51,7 +51,7 @@ static bool performActualUpdate(const QString updates[], QString version,
                 .arg(thequery)
                 .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
-            VERBOSE(VB_IMPORTANT, msg);
+            LOG(VB_GENERAL, LOG_ERR, msg);
             return false;
         }
 
@@ -108,7 +108,8 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
 {
     if (dbver.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "Inserting MythMusic initial database information.");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Inserting MythMusic initial database information.");
 
         const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS musicmetadata ("
@@ -174,7 +175,8 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
                         i += modify.numRowsAffected();
                 }
             }
-            VERBOSE(VB_IMPORTANT, QString("Modified %1 entries for db schema 1001").arg(i));
+            LOG(VB_GENERAL, LOG_NOTICE,
+                QString("Modified %1 entries for db schema 1001").arg(i));
         }
 
         const QString updates[] = {
@@ -214,7 +216,8 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
 
     if (dbver == "1002")
     {
-        VERBOSE(VB_IMPORTANT, "Updating music metadata to be UTF-8 in the database");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Updating music metadata to be UTF-8 in the database");
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT intid, artist, album, title, genre, "
@@ -270,7 +273,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             }
         }
 
-        VERBOSE(VB_IMPORTANT, "Done updating music metadata to UTF-8");
+        LOG(VB_GENERAL, LOG_NOTICE, "Done updating music metadata to UTF-8");
 
         const QString updates[] = {
 ""
@@ -564,7 +567,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
     // scan though the music_albumart table and make a guess at what
     // each image represents from the filename
 
-    VERBOSE(VB_IMPORTANT, "Updating music_albumart image types");
+    LOG(VB_GENERAL, LOG_NOTICE, "Updating music_albumart image types");
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT albumart_id, filename, directory_id, imagetype FROM music_albumart;");

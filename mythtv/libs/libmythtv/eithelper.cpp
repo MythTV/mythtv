@@ -38,7 +38,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix);
 static int calc_eit_utc_offset(void);
 
 #define LOC QString("EITHelper: ")
-#define LOC_ERR QString("EITHelper, Error: ")
 
 EITHelper::EITHelper() :
     eitfixup(new EITFixUp()),
@@ -54,7 +53,7 @@ EITHelper::EITHelper() :
     int hours   = diff / (60 * 60);
     int minutes = ((diff) / 60) % 60;
     int seconds = diff % 60;
-    VERBOSE(VB_EIT, LOC + QString("localtime offset %1%2:%3%4:%5%6 ")
+    LOG(VB_EIT, LOG_INFO, LOC + QString("localtime offset %1%2:%3%4:%5%6 ")
             .arg((sign < 0) ? "-" : "")
             .arg(hours).arg(minutes/10).arg(minutes%10)
             .arg(seconds/10).arg(seconds%10));
@@ -107,15 +106,16 @@ uint EITHelper::ProcessEvents(void)
 
     if (incomplete_events.size() || unmatched_etts.size())
     {
-        VERBOSE(VB_EIT, LOC +
-                QString("Added %1 events -- complete(%2) "
-                        "incomplete(%3) unmatched(%4)")
+        LOG(VB_EIT, LOG_INFO,
+            LOC + QString("Added %1 events -- complete(%2) "
+                          "incomplete(%3) unmatched(%4)")
                 .arg(insertCount).arg(db_events.size())
                 .arg(incomplete_events.size()).arg(unmatched_etts.size()));
     }
     else
     {
-        VERBOSE(VB_EIT, LOC + QString("Added %1 events").arg(insertCount));
+        LOG(VB_EIT, LOG_INFO,
+            LOC + QString("Added %1 events").arg(insertCount));
     }
 
     return insertCount;
@@ -564,9 +564,9 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
 
         if (!chanid)
         {
-            VERBOSE(VB_EIT, LOC +
-                    QString("Premiere EIT for NIT %1, TID %2, SID %3, count %4, "
-                            "title: %5. Channel not found!")
+            LOG(VB_EIT, LOG_INFO, LOC +
+                QString("Premiere EIT for NIT %1, TID %2, SID %3, "
+                        "count %4, title: %5. Channel not found!")
                     .arg(networkid).arg(tsid).arg(serviceid)
                     .arg(transmission.TransmissionCount()).arg(title));
             continue;
@@ -762,9 +762,10 @@ static uint get_chan_id_from_db(uint sourceid, uint serviceid,
     }
 
     if (query.size() > 1) {
-        VERBOSE(VB_EIT, LOC + QString("found %1 channels for networdid %2, "
-                                      "transportid %3, serviceid %4 but none "
-                                      "for current sourceid %5.")
+        LOG(VB_EIT, LOG_INFO,
+            LOC + QString("found %1 channels for networdid %2, "
+                          "transportid %3, serviceid %4 but none "
+                          "for current sourceid %5.")
                 .arg(query.size()).arg(networkid).arg(transportid)
                 .arg(serviceid).arg(sourceid));
     }

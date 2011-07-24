@@ -2,7 +2,6 @@
 #include "mythrender_opengl2.h"
 
 #define LOC QString("OpenGL2: ")
-#define LOC_ERR QString("OpenGL2 Error: ")
 
 #define VERTEX_INDEX  0
 #define COLOR_INDEX   1
@@ -214,7 +213,7 @@ bool MythRenderOpenGL2::InitFeatures(void)
         check = false;
         glslshaders = !getenv("OPENGL_NOGLSL");
         if (!glslshaders)
-            LOG(VB_GENERAL, LOG_INFO, "Disabling GLSL.");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling GLSL.");
     }
 
     // These should all be present for a valid OpenGL2.0/ES installation
@@ -233,7 +232,7 @@ bool MythRenderOpenGL2::InitFeatures(void)
         m_glBindAttribLocation &&
         m_glVertexAttrib4f && glslshaders)
     {
-        LOG(VB_GENERAL, LOG_INFO, "GLSL supported");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "GLSL supported");
         m_exts_supported += kGLSL;
     }
 
@@ -753,7 +752,7 @@ uint MythRenderOpenGL2::CreateShader(int type, const QString &source)
         {
             char *log = (char*)malloc(sizeof(char) * length);
             m_glGetShaderInfoLog(result, length, NULL, log);
-            LOG(VB_GENERAL, LOG_ERR, "Failed to compile shader.");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to compile shader.");
             LOG(VB_GENERAL, LOG_ERR, log);
             LOG(VB_GENERAL, LOG_ERR, source);
             free(log);
@@ -788,7 +787,7 @@ bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
     if (ok > 0)
         return true;
 
-    LOG(VB_GENERAL, LOG_ERR, "Failed to link shader object.");
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to link shader object.");
     int infologLength = 0;
     int charsWritten  = 0;
     char *infoLog;
@@ -826,7 +825,7 @@ void MythRenderOpenGL2::OptimiseShaderSource(QString &source)
 
 void MythRenderOpenGL2::DeleteOpenGLResources(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Deleting OpenGL Resources");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting OpenGL Resources");
     DeleteDefaultShaders();
     DeleteShaders();
     MythRenderOpenGL::DeleteOpenGLResources();

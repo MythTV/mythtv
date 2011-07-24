@@ -65,7 +65,7 @@ bool checkStoragePaths(QStringList &probs)
                             "Storage Group where new recordings will be "
                             "stored.");
         probs.push_back(trMesg);
-        VERBOSE(VB_IMPORTANT, trMesg);
+        LOG(VB_GENERAL, LOG_ERR, trMesg);
         return true;
     }
 
@@ -90,7 +90,7 @@ bool checkStoragePaths(QStringList &probs)
                                 "Default Storage Group where new recordings "
                                 "will be stored.");
             probs.push_back(trMesg);
-            VERBOSE(VB_IMPORTANT, trMesg);
+            LOG(VB_GENERAL, LOG_ERR, trMesg);
             return true;
         }
         else
@@ -165,7 +165,7 @@ bool checkImageStoragePaths(QStringList &probs)
                             "your Videos Storage Group.  Do you want "
                             "to store them in their own groups?");
             probs.push_back(trMesg);
-            VERBOSE(VB_IMPORTANT, trMesg);
+            LOG(VB_GENERAL, LOG_ERR, trMesg);
             problemFound = true;
         }
     }            

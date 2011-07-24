@@ -1,7 +1,3 @@
-#include <set>
-#include <map>
-#include <vector>
-
 #include <QImageReader>
 #include <QApplication>
 #include <QThread>
@@ -18,8 +14,12 @@
 #include "videometadatalistmanager.h"
 #include "videoscan.h"
 #include "videoutils.h"
+#include "mythevent.h"
 #include "remoteutil.h"
 #include "mythlogging.h"
+
+QEvent::Type VideoScanChanges::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
 
 namespace
 {
@@ -49,10 +49,13 @@ namespace
         void handleFile(const QString &file_name,
                         const QString &fq_file_name,
                         const QString &extension,
-			const QString &host)
+                        const QString &host)
 
         {
-		    //VERBOSE(VB_GENERAL,QString("handleFile: %1 :: %2").arg(fq_file_name).arg(host));
+#if 0
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("handleFile: %1 :: %2").arg(fq_file_name).arg(host));
+#endif
             (void) file_name;
             if (m_image_ext.find(extension.toLower()) == m_image_ext.end())
             {
@@ -71,290 +74,272 @@ namespace
 class VideoMetadataListManager;
 class MythUIProgressDialog;
 
-class VideoScannerThread : public QThread
-{
-    Q_OBJECT
-  public:
-    VideoScannerThread() : m_RemoveAll(false), m_KeepAll(false),
+VideoScannerThread::VideoScannerThread(QObject *parent) :
+        m_RemoveAll(false), m_KeepAll(false),
         m_DBDataChanged(false)
+{
+    m_parent = parent;
+    m_dbmetadata = new VideoMetadataListManager;
+    m_HasGUI = gCoreContext->HasGUI();
+    m_ListUnknown = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
+}
+
+VideoScannerThread::~VideoScannerThread()
+{
+    delete m_dbmetadata;
+}
+
+void VideoScannerThread::run()
+{
+    threadRegister("VideoScanner");
+
+    VideoMetadataListManager::metadata_list ml;
+    VideoMetadataListManager::loadAllFromDatabase(ml);
+    m_dbmetadata->setList(ml);
+
+    QList<QByteArray> image_types = QImageReader::supportedImageFormats();
+    QStringList imageExtensions;
+    for (QList<QByteArray>::const_iterator p = image_types.begin();
+         p != image_types.end(); ++p)
     {
-        m_dbmetadata = new VideoMetadataListManager;
-        VideoMetadataListManager::metadata_list ml;
-        VideoMetadataListManager::loadAllFromDatabase(ml);
-        m_dbmetadata->setList(ml);
-        m_HasGUI = gCoreContext->HasGUI();
-        m_ListUnknown = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
+        imageExtensions.push_back(QString(*p));
     }
 
-    ~VideoScannerThread()
+    LOG(VB_GENERAL, LOG_INFO, QString("Beginning Video Scan."));
+
+    uint counter = 0;
+    FileCheckList fs_files;
+    failedSGHosts.clear();
+
+    if (m_HasGUI)
+        SendProgressEvent(counter, (uint)m_directories.size(),
+                          tr("Searching for video files"));
+    for (QStringList::const_iterator iter = m_directories.begin();
+         iter != m_directories.end(); ++iter)
     {
-        delete m_dbmetadata;
-    }
-
-    void run()
-    {
-        threadRegister("VideoScanner");
-        QList<QByteArray> image_types = QImageReader::supportedImageFormats();
-        QStringList imageExtensions;
-        for (QList<QByteArray>::const_iterator p = image_types.begin();
-             p != image_types.end(); ++p)
+        if (!buildFileList(*iter, imageExtensions, fs_files))
         {
-            imageExtensions.push_back(QString(*p));
-        }
-
-        VERBOSE(VB_GENERAL, QString("Beginning Video Scan."));
-
-        uint counter = 0;
-        FileCheckList fs_files;
-        failedSGHosts.clear();
-
-        if (m_HasGUI)
-            SendProgressEvent(counter, (uint)m_directories.size(),
-                              tr("Searching for video files"));
-        for (QStringList::const_iterator iter = m_directories.begin();
-             iter != m_directories.end(); ++iter)
-        {
-            if (!buildFileList(*iter, imageExtensions, fs_files))
+            if (iter->startsWith("myth://"))
             {
-                if (iter->startsWith("myth://"))
+                QUrl sgurl = *iter;
+                QString host = sgurl.host();
+                QString path = sgurl.path();
+
+                failedSGHosts.append(host);
+
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Failed to scan :%1:").arg(*iter));
+            }
+        }
+        if (m_HasGUI)
+            SendProgressEvent(++counter);
+    }
+
+    PurgeList db_remove;
+    verifyFiles(fs_files, db_remove);
+    m_DBDataChanged = updateDB(fs_files, db_remove);
+
+    if (m_DBDataChanged)
+    {
+        QCoreApplication::postEvent(m_parent,
+            new VideoScanChanges(m_addList, m_movList,
+                                 m_delList));
+
+        QStringList slist;
+
+        QList<int>::const_iterator i;
+        for (i = m_addList.begin(); i != m_addList.end(); ++i)
+            slist << QString("added::%1").arg(*i);
+        for (i = m_movList.begin(); i != m_movList.end(); ++i)
+            slist << QString("moved::%1").arg(*i);
+        for (i = m_delList.begin(); i != m_delList.end(); ++i)
+            slist << QString("deleted::%1").arg(*i);
+
+        MythEvent me("VIDEO_LIST_CHANGE", slist);
+
+        RemoteSendEvent(me);
+    }
+    else
+        RemoteSendMessage("VIDEO_LIST_NO_CHANGE");
+    threadDeregister();
+}
+
+
+void VideoScannerThread::removeOrphans(unsigned int id,
+                                       const QString &filename)
+{
+    (void) filename;
+
+    // TODO: use single DB connection for all calls
+    if (m_RemoveAll)
+        m_dbmetadata->purgeByID(id);
+
+    if (!m_KeepAll && !m_RemoveAll)
+    {
+        m_RemoveAll = true;
+        m_dbmetadata->purgeByID(id);
+    }
+}
+
+void VideoScannerThread::verifyFiles(FileCheckList &files,
+                                     PurgeList &remove)
+{
+    int counter = 0;
+    FileCheckList::iterator iter;
+
+    if (m_HasGUI)
+        SendProgressEvent(counter, (uint)m_dbmetadata->getList().size(),
+                          tr("Verifying video files"));
+
+    // For every file we know about, check to see if it still exists.
+    for (VideoMetadataListManager::metadata_list::const_iterator p =
+         m_dbmetadata->getList().begin();
+         p != m_dbmetadata->getList().end(); ++p)
+    {
+        QString lname = (*p)->GetFilename();
+        QString lhost = (*p)->GetHost();
+        if (lname != QString::null)
+        {
+            iter = files.find(lname);
+            if (iter != files.end())
+            {
+                // If it's both on disk and in the database we're done with
+                // it.
+                iter->second.check= true;
+            }
+            else if (lhost.isEmpty())
+            {
+                // If it's only in the database, and not on a host we
+                // cannot reach, mark it as for removal later.
+                remove.push_back(std::make_pair((*p)->GetID(), lname));
+            }
+            else if (!failedSGHosts.contains(lhost))
+            {
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Removing file SG(%1) :%2:")
+                        .arg(lhost).arg(lname));
+                remove.push_back(std::make_pair((*p)->GetID(), lname));
+            }
+            else
+                LOG(VB_GENERAL, LOG_WARNING,
+                    QString("SG(%1) not available. Not removing file :%2:")
+                        .arg(lhost).arg(lname));
+        }
+        if (m_HasGUI)
+            SendProgressEvent(++counter);
+    }
+}
+
+bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &remove)
+{
+    int ret = 0;
+    uint counter = 0;
+    if (m_HasGUI)
+        SendProgressEvent(counter, (uint)(add.size() + remove.size()),
+                          tr("Updating video database"));
+
+    for (FileCheckList::const_iterator p = add.begin(); p != add.end(); ++p)
+    {
+        // add files not already in the DB
+        if (!p->second.check)
+        {
+            int id = -1;
+
+            // Are we sure this needs adding?  Let's check our Hash list.
+            QString hash = VideoMetadata::VideoFileHash(p->first, p->second.host);
+            if (hash != "NULL" && !hash.isEmpty())
+            {
+                id = VideoMetadata::UpdateHashedDBRecord(hash, p->first, p->second.host);
+                if (id != -1)
                 {
-                    QUrl sgurl = *iter;
-                    QString host = sgurl.host();
-                    QString path = sgurl.path();
-
-                    failedSGHosts.append(host);
-
-                    VERBOSE(VB_GENERAL, QString("Failed to scan :%1:").arg(*iter));
+                    // Whew, that was close.  Let's remove that thing from
+                    // our purge list, too.
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Hash %1 already exists in the "
+                                "database, updating record %2 "
+                                "with new filename %3")
+                            .arg(hash).arg(id).arg(p->first));
+                    m_movList.append(id);
                 }
             }
-            if (m_HasGUI)
-                SendProgressEvent(++counter);
-        }
-
-        PurgeList db_remove;
-        verifyFiles(fs_files, db_remove);
-        m_DBDataChanged = updateDB(fs_files, db_remove);
-        if (m_DBDataChanged)
-            RemoteSendMessage("VIDEO_LIST_CHANGE");
-        threadDeregister();
-    }
-
-    void SetDirs(const QStringList &dirs)
-    {
-        m_directories = dirs;
-    }
-
-    void SetProgressDialog(MythUIProgressDialog *dialog)
-    {
-        m_dialog = dialog;
-    }
-
-    QStringList GetFailedSGHosts(void)
-    {
-        return failedSGHosts;
-    }
-
-    bool getDataChanged()
-    {
-        return m_DBDataChanged;
-    }
-
-  private:
-
-    struct CheckStruct
-    {
-        bool check;
-        QString host;
-    };
-
-    typedef std::vector<std::pair<unsigned int, QString> > PurgeList;
-    typedef std::map<QString, CheckStruct> FileCheckList;
-
-    void removeOrphans(unsigned int id, const QString &filename)
-    {
-        (void) filename;
-
-        // TODO: use single DB connection for all calls
-        if (m_RemoveAll)
-            m_dbmetadata->purgeByID(id);
-
-        if (!m_KeepAll && !m_RemoveAll)
-        {
-            m_RemoveAll = true;
-            m_dbmetadata->purgeByID(id);
-        }
-    }
-
-    void verifyFiles(FileCheckList &files, PurgeList &remove)
-    {
-        int counter = 0;
-        FileCheckList::iterator iter;
-
-        if (m_HasGUI)
-            SendProgressEvent(counter, (uint)m_dbmetadata->getList().size(),
-                              tr("Verifying video files"));
-
-        // For every file we know about, check to see if it still exists.
-        for (VideoMetadataListManager::metadata_list::const_iterator p =
-             m_dbmetadata->getList().begin();
-             p != m_dbmetadata->getList().end(); ++p)
-        {
-            QString lname = (*p)->GetFilename();
-            QString lhost = (*p)->GetHost();
-            if (lname != QString::null)
+            if (id == -1)
             {
-                iter = files.find(lname);
-                if (iter != files.end())
-                {
-                    // If it's both on disk and in the database we're done with
-                    // it.
-                    iter->second.check= true;
-                }
-                else
-                {
-                    // If it's only in the database, and not on a host we cannot reach,
-                    //  mark it as for removal later.
-                    if (lhost.isEmpty())
-                    {
-                        remove.push_back(std::make_pair((*p)->GetID(), lname));
-                    }
-                    else
-                    {
-                        if (!failedSGHosts.contains(lhost))
-                        {
-                            VERBOSE(VB_GENERAL, QString("Removing file SG(%1) :%2: ").arg(lhost).arg(lname));
-                            remove.push_back(std::make_pair((*p)->GetID(), lname));
-                        }
-                        else
-                            VERBOSE(VB_GENERAL, QString("SG(%1) not available. Not removing file :%2: ").arg(lhost).arg(lname));
-                    }
-                }
-            }
-            if (m_HasGUI)
-                SendProgressEvent(++counter);
-        }
-    }
+                VideoMetadata newFile(p->first, hash,
+                                 VIDEO_TRAILER_DEFAULT,
+                                 VIDEO_COVERFILE_DEFAULT,
+                                 VIDEO_SCREENSHOT_DEFAULT,
+                                 VIDEO_BANNER_DEFAULT,
+                                 VIDEO_FANART_DEFAULT,
+                                 VideoMetadata::FilenameToMeta(p->first, 1),
+                                 VideoMetadata::FilenameToMeta(p->first, 4),
+                                 QString(),
+                                 VIDEO_YEAR_DEFAULT,
+                                 QDate::fromString("0000-00-00","YYYY-MM-DD"),
+                                 VIDEO_INETREF_DEFAULT, QString(),
+                                 VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
+                                 0.0, VIDEO_RATING_DEFAULT, 0,
+                                 VideoMetadata::FilenameToMeta(p->first, 2).toInt(),
+                                 VideoMetadata::FilenameToMeta(p->first, 3).toInt(),
+                                 QDate::currentDate(),
+                                 0, ParentalLevel::plLowest);
 
-    // Returns true if DB changes were made (additions or deletions).
-    bool updateDB(const FileCheckList &add, const PurgeList &remove)
-    {
-        int ret = 0;
-        uint counter = 0;
-        QList<int> preservelist;
+                LOG(VB_GENERAL, LOG_INFO, QString("Adding : %1 : %2 : %3")
+                        .arg(newFile.GetHost()).arg(newFile.GetFilename())
+                        .arg(hash));
+                newFile.SetHost(p->second.host);
+                newFile.SaveToDatabase();
+                m_addList << newFile.GetID();
+            }
+            ret += 1;
+        }
         if (m_HasGUI)
-            SendProgressEvent(counter, (uint)(add.size() + remove.size()),
-                              tr("Updating video database"));
-
-        for (FileCheckList::const_iterator p = add.begin(); p != add.end(); ++p)
-        {
-            // add files not already in the DB
-            if (!p->second.check)
-            {
-                int id = -1;
-
-                // Are we sure this needs adding?  Let's check our Hash list.
-                QString hash = VideoMetadata::VideoFileHash(p->first, p->second.host);
-                if (hash != "NULL" && !hash.isEmpty())
-                {
-                    id = VideoMetadata::UpdateHashedDBRecord(hash, p->first, p->second.host);
-                    if (id != -1)
-                    {
-                        // Whew, that was close.  Let's remove that thing from
-                        // our purge list, too.
-                        VERBOSE(VB_IMPORTANT, QString("Hash %1 already exists in the "
-                                                      "database, updating record %2 "
-                                                      "with new filename %3")
-                                                      .arg(hash).arg(id).arg(p->first));
-                        preservelist.append(id);
-                    }
-                }
-                if (id == -1)
-                {
-                    VideoMetadata newFile(p->first, hash,
-                                     VIDEO_TRAILER_DEFAULT,
-                                     VIDEO_COVERFILE_DEFAULT, 
-                                     VIDEO_SCREENSHOT_DEFAULT,
-                                     VIDEO_BANNER_DEFAULT,
-                                     VIDEO_FANART_DEFAULT,
-                                     VideoMetadata::FilenameToMeta(p->first, 1),
-                                     VideoMetadata::FilenameToMeta(p->first, 4),
-                                     QString(),
-                                     VIDEO_YEAR_DEFAULT,
-                                     QDate::fromString("0000-00-00","YYYY-MM-DD"), 
-                                     VIDEO_INETREF_DEFAULT, QString(),
-                                     VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
-                                     0.0, VIDEO_RATING_DEFAULT, 0,
-                                     VideoMetadata::FilenameToMeta(p->first, 2).toInt(), 
-                                     VideoMetadata::FilenameToMeta(p->first, 3).toInt(), 
-                                     QDate::currentDate(),
-                                     0, ParentalLevel::plLowest);
-
-                    VERBOSE(VB_GENERAL, QString("Adding : %1 : %2 : %3")
-                            .arg(newFile.GetHost()).arg(newFile.GetFilename())
-                            .arg(hash));
-                    newFile.SetHost(p->second.host);
-                    newFile.SaveToDatabase();
-                }
-                ret += 1;
-            }
-            if (m_HasGUI)
-                SendProgressEvent(++counter);
-        }
-
-        // When prompting is restored, account for the answer here.
-        ret += remove.size();
-        for (PurgeList::const_iterator p = remove.begin(); p != remove.end();
-                ++p)
-        {
-            if (!preservelist.contains(p->first))
-                removeOrphans(p->first, p->second);
-            if (m_HasGUI)
-                SendProgressEvent(++counter);
-        }
-
-        return ret;
+            SendProgressEvent(++counter);
     }
 
-    bool buildFileList(const QString &directory,
-                                        const QStringList &imageExtensions,
-                                        FileCheckList &filelist)
+    // When prompting is restored, account for the answer here.
+    ret += remove.size();
+    for (PurgeList::const_iterator p = remove.begin(); p != remove.end();
+            ++p)
     {
-        VERBOSE(VB_GENERAL, QString("buildFileList directory = %1").arg(directory));
-        FileAssociations::ext_ignore_list ext_list;
-        FileAssociations::getFileAssociation().getExtensionIgnoreList(ext_list);
-
-        dirhandler<FileCheckList> dh(filelist, imageExtensions);
-        return ScanVideoDirectory(directory, &dh, ext_list, m_ListUnknown);
+        if (!m_movList.contains(p->first))
+        {
+            removeOrphans(p->first, p->second);
+            m_delList << p->first;
+        }
+        if (m_HasGUI)
+            SendProgressEvent(++counter);
     }
 
-    void SendProgressEvent(uint progress, uint total = 0,
-            QString messsage = QString())
-    {
-        if (!m_dialog)
-            return;
+    return ret;
+}
 
-        ProgressUpdateEvent *pue = new ProgressUpdateEvent(progress, total,
-                                                           messsage);
-        QApplication::postEvent(m_dialog, pue);
-    }
+bool VideoScannerThread::buildFileList(const QString &directory,
+                                       const QStringList &imageExtensions,
+                                       FileCheckList &filelist)
+{
+    LOG(VB_GENERAL,LOG_INFO, QString("buildFileList directory = %1")
+                                 .arg(directory));
+    FileAssociations::ext_ignore_list ext_list;
+    FileAssociations::getFileAssociation().getExtensionIgnoreList(ext_list);
 
+    dirhandler<FileCheckList> dh(filelist, imageExtensions);
+    return ScanVideoDirectory(directory, &dh, ext_list, m_ListUnknown);
+}
 
-    bool m_ListUnknown;
-    bool m_RemoveAll;
-    bool m_KeepAll;
-    bool m_HasGUI;
-    QStringList m_directories;
-    QStringList failedSGHosts;
+void VideoScannerThread::SendProgressEvent(uint progress, uint total,
+                                           QString messsage)
+{
+    if (!m_dialog)
+        return;
 
-    VideoMetadataListManager *m_dbmetadata;
-    MythUIProgressDialog *m_dialog;
-
-    bool m_DBDataChanged;
-};
+    ProgressUpdateEvent *pue = new ProgressUpdateEvent(progress, total,
+                                                       messsage);
+    QApplication::postEvent(m_dialog, pue);
+}
 
 VideoScanner::VideoScanner()
 {
-    m_scanThread = new VideoScannerThread();
+    m_scanThread = new VideoScannerThread(this);
 }
 
 VideoScanner::~VideoScanner()
@@ -419,5 +404,3 @@ void VideoScanner::finishedScan()
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-#include "videoscan.moc"

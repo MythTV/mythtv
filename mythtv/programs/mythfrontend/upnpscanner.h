@@ -12,8 +12,30 @@
 #include "upnpexp.h"
 #include "upnpsubscription.h"
 
+#include "videometadatalistmanager.h"
+
 class MediaServer;
 class UPNPSubscription;
+class meta_dir_node;
+
+class MediaServerItem
+{
+  public:
+    MediaServerItem() { }
+    MediaServerItem(QString id, QString parent, QString name, QString url)
+      : m_id(id), m_parentid(parent), m_name(name), m_url(url),
+        m_scanned(false) { }
+    QString NextUnbrowsed(void);
+    bool Add(MediaServerItem &item);
+    void Reset(void);
+
+    QString m_id;
+    QString m_parentid;
+    QString m_name;
+    QString m_url;
+    bool    m_scanned;
+    QMap<QString, MediaServerItem> m_children;
+};
 
 class UPNPScanner : public QObject
 {
@@ -25,7 +47,9 @@ class UPNPScanner : public QObject
     static void         Enable(bool enable, UPNPSubscription *sub = NULL);
     static UPNPScanner* Instance(UPNPSubscription *sub = NULL);
 
-    uint ServerCount(void);
+    void StartFullScan(void);
+    void GetMetadata(VideoMetadataListManager::metadata_list* list,
+                     meta_dir_node *node);
     QMap<QString,QString> ServerList(void);
 
   protected:
@@ -44,6 +68,7 @@ class UPNPScanner : public QObject
     void ScheduleUpdate(void);
     void CheckFailure(const QUrl &url);
     void Debug(void);
+    void BrowseNextContainer(void);
     void SendBrowseRequest(const QUrl &url, const QString &objectid);
     void AddServer(const QString &usn, const QString &url);
     void RemoveServer(const QString &usn);
@@ -51,7 +76,7 @@ class UPNPScanner : public QObject
 
     // xml parsing of browse requests
     void ParseBrowse(const QUrl &url, QNetworkReply *reply);
-    void FindItems(const QDomNode &n, QList<QStringList> &items);
+    void FindItems(const QDomNode &n, MediaServerItem &content);
     QDomDocument* FindResult(const QDomNode &n, uint &num,
                              uint &total, uint &updateid);
 
@@ -63,6 +88,11 @@ class UPNPScanner : public QObject
                           QString &eventURL);
     void ParseService(QDomElement &element, QString &controlURL,
                       QString &eventURL);
+
+    // convert MediaServerItems to video metadata
+    void GetServerContent(MediaServerItem *content,
+                          VideoMetadataListManager::metadata_list* list,
+                          meta_dir_node *node);
 
   private:
     static  UPNPScanner* gUPNPScanner;
@@ -84,6 +114,8 @@ class UPNPScanner : public QObject
 
     QString m_masterHost;
     int     m_masterPort;
+
+    bool    m_scanComplete;
 };
 
 #endif // UPNPSCANNER_H

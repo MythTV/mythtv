@@ -62,7 +62,7 @@ public:
     virtual void Activation(MHEngine *engine);
     virtual void Deactivation(MHEngine *engine);
 
-    virtual void SetStreamRef(const MHContentRef &);
+    virtual void SetStreamRef(MHEngine *, const MHContentRef &);
     virtual void BeginPlaying(MHEngine *engine);
     virtual void StopPlaying(MHEngine *engine);
 
@@ -97,7 +97,7 @@ public:
     virtual void SetVideoDecodeOffset(int newXOffset, int newYOffset, MHEngine *);
     virtual void GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine *);
 
-    virtual void SetStreamRef(const MHContentRef &);
+    virtual void SetStreamRef(MHEngine *, const MHContentRef &);
     virtual void BeginPlaying(MHEngine *engine);
     virtual void StopPlaying(MHEngine *engine);
 

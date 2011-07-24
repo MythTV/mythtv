@@ -20,7 +20,6 @@ using namespace std;
 #include "mythlogging.h"
 
 #define LOC QString("IPTVFeed: ")
-#define LOC_ERR QString("IPTVFeed, Error: ")
 
 
 IPTVFeederWrapper::IPTVFeederWrapper() :
@@ -41,14 +40,14 @@ IPTVFeederWrapper::~IPTVFeederWrapper()
 
 bool IPTVFeederWrapper::InitFeeder(const QString &url)
 {
-    VERBOSE(VB_RECORD, LOC + "Init() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Init() -- begin");
     QMutexLocker locker(&_lock);
 
     if (_feeder && _feeder->CanHandle(url))
     {
         _url = url;
         _url.detach();
-        VERBOSE(VB_RECORD, LOC + "Init() -- end 0");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Init() -- end 0");
 
         return true;
     }
@@ -72,8 +71,8 @@ bool IPTVFeederWrapper::InitFeeder(const QString &url)
     }
     else
     {
-        VERBOSE(VB_RECORD, LOC_ERR +
-                QString("Init() -- unhandled url (%1)").arg(url));
+        LOG(VB_RECORD, LOG_ERR, LOC +
+            QString("Init() -- unhandled url (%1)").arg(url));
 
         return false;
     }
@@ -86,13 +85,13 @@ bool IPTVFeederWrapper::InitFeeder(const QString &url)
     _url = url;
     _url.detach();
 
-    VERBOSE(VB_RECORD, LOC + "Init() -- adding listeners");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Init() -- adding listeners");
 
     vector<TSDataListener*>::iterator it = _listeners.begin();
     for (; it != _listeners.end(); ++it)
         _feeder->AddListener(*it);
 
-    VERBOSE(VB_RECORD, LOC + "Init() -- end 1");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Init() -- end 1");
 
     return true;
 }
@@ -100,64 +99,64 @@ bool IPTVFeederWrapper::InitFeeder(const QString &url)
 
 bool IPTVFeederWrapper::Open(const QString& url)
 {
-    VERBOSE(VB_RECORD, LOC + "Open() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- begin");
 
     bool result = InitFeeder(url) && _feeder->Open(_url);
 
-    VERBOSE(VB_RECORD, LOC + "Open() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- end");
 
     return result;
 }
 
 bool IPTVFeederWrapper::IsOpen(void) const
 {
-    VERBOSE(VB_RECORD, LOC + "IsOpen() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "IsOpen() -- begin");
 
     bool result = _feeder && _feeder->IsOpen();
 
-    VERBOSE(VB_RECORD, LOC + "IsOpen() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "IsOpen() -- end");
 
     return result;
 }
 
 void IPTVFeederWrapper::Close(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Close() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (_feeder)
         _feeder->Close();
 
-    VERBOSE(VB_RECORD, LOC + "Close() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
 void IPTVFeederWrapper::Run(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Run() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Run() -- begin");
 
     if (_feeder)
         _feeder->Run();
 
-    VERBOSE(VB_RECORD, LOC + "Run() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Run() -- end");
 }
 
 void IPTVFeederWrapper::Stop(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Stop() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- begin");
 
     if (_feeder)
         _feeder->Stop();
 
-    VERBOSE(VB_RECORD, LOC + "Stop() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- end");
 }
 
 void IPTVFeederWrapper::AddListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- begin")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- begin")
                        .arg((uint64_t)item,0,16));
 
     if (!item)
     {
-        VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end 0")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end 0")
                            .arg((uint64_t)item,0,16));
         return;
     }
@@ -172,13 +171,13 @@ void IPTVFeederWrapper::AddListener(TSDataListener *item)
             _feeder->AddListener(item);
     }
 
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end 1")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end 1")
                        .arg((uint64_t)item,0,16));
 }
 
 void IPTVFeederWrapper::RemoveListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- begin")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- begin")
                        .arg((uint64_t)item,0,16));
 
     QMutexLocker locker(&_lock);
@@ -187,8 +186,8 @@ void IPTVFeederWrapper::RemoveListener(TSDataListener *item)
 
     if (it == _listeners.end())
     {
-        VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end "
-                           "(not found)")
+        LOG(VB_RECORD, LOG_ERR, LOC + QString("RemoveListener(0x%1) -- end "
+                                              "(not found)")
                            .arg((uint64_t)item,0,16));
 
         return;
@@ -200,7 +199,7 @@ void IPTVFeederWrapper::RemoveListener(TSDataListener *item)
     if (_feeder)
         _feeder->RemoveListener(item);
 
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end (ok, "
-                       "removed)")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end (ok, "
+                                           "removed)")
                        .arg((uint64_t)item,0,16));
 }

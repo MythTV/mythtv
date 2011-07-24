@@ -34,7 +34,8 @@ MythFEXML::MythFEXML( UPnpDevice *pDevice , const QString sSharePath)
   : Eventing( "MythFEXML", "MYTHTV_Event", sSharePath)
 {
 
-    QString sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", m_sSharePath );
+    QString sUPnpDescPath =
+        UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", m_sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "MFEXML_scpd.xml";
     m_sControlUrl          = "/MythFE";
@@ -90,7 +91,7 @@ bool MythFEXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest
     if (pRequest->m_sBaseUrl != m_sControlUrl)
         return false;
 
-    VERBOSE(VB_UPNP, QString("MythFEXML::ProcessRequest: %1 : %2")
+    LOG(VB_UPNP, LOG_INFO, QString("MythFEXML::ProcessRequest: %1 : %2")
             .arg(pRequest->m_sMethod).arg(pRequest->m_sRawRequest));
 
     switch(GetMethod(pRequest->m_sMethod))
@@ -144,12 +145,13 @@ void MythFEXML::GetScreenShot(HTTPRequest *pRequest)
 
     if (sFormat != "jpg" && sFormat != "png")
     {
-        VERBOSE(VB_GENERAL, "Invalid screen shot format: " + sFormat);
+        LOG(VB_GENERAL, LOG_ERR, "Invalid screen shot format: " + sFormat);
         return;
     }
    
-    VERBOSE(VB_GENERAL, QString("Screen shot requested (%1x%2), format %3")
-        .arg(nWidth).arg(nHeight).arg(sFormat));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Screen shot requested (%1x%2), format %3")
+            .arg(nWidth).arg(nHeight).arg(sFormat));
 
     QString sFileName = QString("/%1/myth-screenshot-XML.%2")
         .arg(gCoreContext->GetSetting("ScreenShotPath","/tmp"))
@@ -165,7 +167,7 @@ void MythFEXML::SendMessage(HTTPRequest *pRequest)
 {
     pRequest->m_eResponseType = ResponseTypeHTML;
     QString sText = pRequest->m_mapParams[ "text" ];
-    VERBOSE(VB_GENERAL, QString("UPNP message: ") + sText);
+    LOG(VB_GENERAL, LOG_DEBUG, QString("UPNP message: ") + sText);
 
     MythMainWindow *window = GetMythMainWindow();
     MythEvent* me = new MythEvent(MythEvent::MythUserMessage, sText);
@@ -179,7 +181,7 @@ void MythFEXML::SendAction(HTTPRequest *pRequest)
     QString sText = map->value("action");
     uint pcount   = map->size();
 
-    VERBOSE(VB_UPNP, QString("UPNP Action: %1 (total %2 params)")
+    LOG(VB_UPNP, LOG_INFO, QString("UPNP Action: %1 (total %2 params)")
         .arg(sText).arg(pcount));
 
     if (!IsValidAction(sText))
@@ -208,7 +210,8 @@ void MythFEXML::SendAction(HTTPRequest *pRequest)
             return;
         }
 
-        VERBOSE(VB_UPNP, QString("Failed to validate extra paramaters - ignoring"));
+        LOG(VB_UPNP, LOG_WARNING,
+            "Failed to validate extra paramaters - ignoring");
     }
 
     QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, sText);
@@ -369,7 +372,7 @@ bool MythFEXML::IsValidAction(const QString &action)
     InitActions();
     if (m_actionList.contains(action))
         return true;
-    VERBOSE(VB_GENERAL, QString("UPNP Action: %1 is invalid").arg(action));
+    LOG(VB_GENERAL, LOG_ERR, QString("UPNP Action: %1 is invalid").arg(action));
     return false;
 }
 
@@ -403,5 +406,5 @@ void MythFEXML::InitActions(void)
     m_actionList.sort();
 
     foreach (QString actions, m_actionList)
-        VERBOSE(VB_UPNP, QString("MythFEXML Action: %1").arg(actions));
+        LOG(VB_UPNP, LOG_INFO, QString("MythFEXML Action: %1").arg(actions));
 }

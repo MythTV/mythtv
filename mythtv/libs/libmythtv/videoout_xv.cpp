@@ -48,8 +48,6 @@ using namespace std;
 #include "mythuihelper.h"
 
 #define LOC      QString("VideoOutputXv: ")
-#define LOC_WARN QString("VideoOutputXv Warning: ")
-#define LOC_ERR  QString("VideoOutputXv Error: ")
 
 extern "C" {
 #include <X11/extensions/xf86vmode.h>
@@ -153,7 +151,7 @@ VideoOutputXv::VideoOutputXv()
 
       chroma_osd(NULL)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "ctor");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "ctor");
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
 
     if (gCoreContext->GetNumSetting("UseVideoModes", 0))
@@ -162,7 +160,7 @@ VideoOutputXv::VideoOutputXv()
 
 VideoOutputXv::~VideoOutputXv()
 {
-    VERBOSE(VB_PLAYBACK, LOC + "dtor");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "dtor");
 
     const QRect tmp_display_visible_rect =
         window.GetTmpDisplayVisibleRect();
@@ -247,7 +245,8 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
                                  void        *codec_private,
                                  bool        &aspect_only)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) '%4'->'%5'")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("InputChanged(%1,%2,%3) '%4'->'%5'")
             .arg(input_size.width()).arg(input_size.height()).arg(aspect)
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
@@ -302,8 +301,8 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "InputChanged(): "
-                "Failed to recreate buffers");
+        LOG(VB_GENERAL, LOG_ERR, LOC + 
+            "InputChanged(): Failed to recreate buffers");
         errorState = kError_Unknown;
     }
 
@@ -343,7 +342,8 @@ void VideoOutputXv::UngrabXvPort(MythXDisplay *disp, int port)
     if (!disp)
         return;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Closing XVideo port %1").arg(port));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Closing XVideo port %1").arg(port));
     disp->Lock();
     restore_port_attributes(port);
     XvUngrabPort(disp->GetDisplay(), port, CurrentTime);
@@ -401,7 +401,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                                      &p_num_adaptors, &ai));
     if (Success != ret)
     {
-        VERBOSE(VB_IMPORTANT, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
                 "XVideo supported, but no free Xv ports found."
                 "\n\t\t\tYou may need to reload video driver.");
         return -1;
@@ -413,24 +413,26 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
     // find an Xv port
     for (uint j = 0; j < req.size(); ++j)
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("@ j=%1 Looking for flag[s]: %2 %3")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("@ j=%1 Looking for flag[s]: %2 %3")
                 .arg(j).arg(xvflags2str(req[j].xv_flags))
                 .arg(req[j].feature_flags,0,16));
 
         for (int i = 0; i < (int)p_num_adaptors && (port == -1); ++i)
         {
             lastAdaptorName = ai[i].name;
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Adaptor#%1: %2 has flag[s]: %3")
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Adaptor#%1: %2 has flag[s]: %3")
                     .arg(i).arg(lastAdaptorName).arg(xvflags2str(ai[i].type)));
 
             if ((ai[i].type & req[j].xv_flags) != req[j].xv_flags)
             {
-                VERBOSE(VB_PLAYBACK, LOC + "Missing XVideo flags, rejecting.");
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    "Missing XVideo flags, rejecting.");
                 continue;
             }
             else
-                VERBOSE(VB_PLAYBACK, LOC + "Has XVideo flags...");
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XVideo flags...");
 
             const XvPortID firstPort = ai[i].base_id;
             const XvPortID lastPort = ai[i].base_id + ai[i].num_ports - 1;
@@ -439,22 +441,22 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
             if ((req[j].feature_flags & XvAttributes::kFeaturePicCtrl) &&
                 (!xv_is_attrib_supported(disp, firstPort, "XV_BRIGHTNESS")))
             {
-                VERBOSE(VB_PLAYBACK, LOC +
-                        "Missing XV_BRIGHTNESS, rejecting.");
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    "Missing XV_BRIGHTNESS, rejecting.");
                 continue;
             }
             else if (req[j].feature_flags & XvAttributes::kFeaturePicCtrl)
-                VERBOSE(VB_PLAYBACK, LOC + "Has XV_BRIGHTNESS...");
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XV_BRIGHTNESS...");
 
             if ((req[j].feature_flags & XvAttributes::kFeatureChromakey) &&
                 (!xv_is_attrib_supported(disp, firstPort, "XV_COLORKEY")))
             {
-                VERBOSE(VB_PLAYBACK, LOC +
-                        "Missing XV_COLORKEY, rejecting.");
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    "Missing XV_COLORKEY, rejecting.");
                 continue;
             }
             else if (req[j].feature_flags & XvAttributes::kFeatureChromakey)
-                VERBOSE(VB_PLAYBACK, LOC + "Has XV_COLORKEY...");
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Has XV_COLORKEY...");
 
             for (p = firstPort; (p <= lastPort) && (port == -1); ++p)
             {
@@ -462,7 +464,8 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                 ret = XvGrabPort(disp->GetDisplay(), p, CurrentTime);
                 if (Success == ret)
                 {
-                    VERBOSE(VB_PLAYBACK,  LOC + QString("Grabbed xv port %1").arg(p));
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                        QString("Grabbed xv port %1").arg(p));
                     port = p;
                     xvsetdefaults = add_open_xv_port(disp, p);
                 }
@@ -472,20 +475,22 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
 
         if (port != -1)
         {
-            VERBOSE(VB_PLAYBACK, LOC + req[j].description.arg(port));
-            VERBOSE(VB_PLAYBACK, LOC +
-                        QString("XV_SET_DEFAULTS is %1supported on this port")
-                        .arg(xvsetdefaults ? "" : "not "));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + req[j].description.arg(port));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("XV_SET_DEFAULTS is %1supported on this port")
+                    .arg(xvsetdefaults ? "" : "not "));
 
             bool xv_vsync = xv_is_attrib_supported(disp, port,
                                                    "XV_SYNC_TO_VBLANK");
-            VERBOSE(VB_PLAYBACK, LOC + QString("XV_SYNC_TO_VBLANK %1supported")
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("XV_SYNC_TO_VBLANK %1supported")
                     .arg(xv_vsync ? "" : "not "));
             if (xv_vsync)
             {
-                VERBOSE(VB_PLAYBACK, LOC + QString("XVideo Sync to VBlank %1set")
-                    .arg(xv_set_attrib(disp, port, "XV_SYNC_TO_VBLANK", 1) ?
-                         "" : "NOT "));
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    QString("XVideo Sync to VBlank %1set")
+                        .arg(xv_set_attrib(disp, port, "XV_SYNC_TO_VBLANK", 1) ?
+                             "" : "NOT "));
             }
 
             break;
@@ -493,7 +498,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
     }
 
     if (port == -1)
-        VERBOSE(VB_PLAYBACK, LOC + "No suitable XVideo port found");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "No suitable XVideo port found");
 
     // free list of Xv ports
     if (ai)
@@ -599,12 +604,12 @@ bool VideoOutputXv::InitXVideo()
                                  xv_set_defaults, &adaptor_name);
     if (xv_port == -1)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Could not find suitable XVideo surface.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Could not find suitable XVideo surface.");
         return false;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC + QString("XVideo Adaptor Name: '%1'")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("XVideo Adaptor Name: '%1'")
             .arg(adaptor_name));
 
     xv_hue_base = calc_hue_base(adaptor_name);
@@ -618,7 +623,8 @@ bool VideoOutputXv::InitXVideo()
     for (int i = 0; i < format_cnt; i++)
     {
         char *chr = (char*) &(formats[i].id);
-        VERBOSE(VB_PLAYBACK, LOC + QString("XVideo Format #%1 is '%2%3%4%5'")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("XVideo Format #%1 is '%2%3%4%5'")
                 .arg(i).arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
     }
 
@@ -641,13 +647,14 @@ bool VideoOutputXv::InitXVideo()
     if (foundimageformat)
     {
         char *chr = (char*) &xv_chroma;
-        VERBOSE(VB_PLAYBACK, LOC + QString("Using XVideo Format '%1%2%3%4'")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Using XVideo Format '%1%2%3%4'")
                 .arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Couldn't find the proper XVideo image format.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Couldn't find the proper XVideo image format.");
         UngrabXvPort(disp, xv_port);
         xv_port = -1;
     }
@@ -658,7 +665,7 @@ bool VideoOutputXv::InitXVideo()
 
     if (!disp->StopLog())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create XVideo Buffers.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create XVideo Buffers.");
         DeleteBuffers(XVideo, false);
         UngrabXvPort(disp, xv_port);
         xv_port = -1;
@@ -686,7 +693,7 @@ bool VideoOutputXv::InitXShm()
     MythXLocker lock(disp);
     disp->StartLog();
 
-    VERBOSE(VB_IMPORTANT, LOC +
+    LOG(VB_GENERAL, LOG_ERR, LOC +
             "Falling back to X shared memory video output."
             "\n\t\t\t      *** May be slow ***");
 
@@ -694,7 +701,7 @@ bool VideoOutputXv::InitXShm()
 
     if (!disp->StopLog())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate X shared memory.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate X shared memory.");
         DeleteBuffers(XShm, false);
         ok = false;
     }
@@ -720,7 +727,7 @@ bool VideoOutputXv::InitXlib()
     MythXLocker lock(disp);
     disp->StartLog();
 
-    VERBOSE(VB_IMPORTANT, LOC +
+    LOG(VB_GENERAL, LOG_ERR, LOC +
             "Falling back to X11 video output over a network socket."
             "\n\t\t\t      *** May be very slow ***");
 
@@ -728,7 +735,7 @@ bool VideoOutputXv::InitXlib()
 
     if (!disp->StopLog())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create X buffers.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create X buffers.");
         DeleteBuffers(Xlib, false);
         ok = false;
     }
@@ -758,13 +765,13 @@ bool VideoOutputXv::InitOSD(void)
         if ((xv_colorkey == (int)XJ_letterbox_colour) ||
             (video_output_subtype < XVideo))
         {
-            VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Disabling ChromaKeyOSD as"
-                    " colorkeying will not work."));
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + 
+                "Disabling ChromaKeyOSD as colorkeying will not work.");
         }
         else if (!((32 == disp->GetDepth()) || (24 == disp->GetDepth())))
         {
-            VERBOSE(VB_IMPORTANT, LOC + QString(
-                        "Number of bits per pixel is %1, \n\t\t\t"
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Number of bits per pixel is %1, \n\t\t\t"
                         "but we only support ARGB 32 bbp for ChromaKeyOSD.")
                     .arg(disp->GetDepth()));
         }
@@ -782,7 +789,7 @@ bool VideoOutputXv::InitOSD(void)
 do { \
     if (test) \
     { \
-        VERBOSE(VB_IMPORTANT, LOC_ERR + msg + " Exiting playback."); \
+        LOG(VB_GENERAL, LOG_ERR, LOC + msg + " Exiting playback."); \
         errorState = kError_Unknown; \
         return false; \
     } \
@@ -809,8 +816,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
     QString     renderer  = QString::null;
 
     QString tmp = db_vdisp_profile->GetVideoRenderer();
-    VERBOSE(VB_PLAYBACK, LOC + "InitSetupBuffers() " +
-            QString("render: %1, allowed: %2")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "InitSetupBuffers() " +
+        QString("render: %1, allowed: %2")
             .arg(tmp).arg(toCommaList(renderers)));
 
     if (renderers.contains(tmp))
@@ -826,8 +833,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
 
         renderer = renderers[0];
 
-        VERBOSE(VB_IMPORTANT, LOC + QString(
-                    "Desired video renderer '%1' not available.\n\t\t\t"
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Desired video renderer '%1' not available.\n\t\t\t"
                     "codec '%2' makes '%3' available, using '%4' instead.")
                 .arg(db_vdisp_profile->GetVideoRenderer())
                 .arg(toString(video_codec_id)).arg(tmp).arg(renderer));
@@ -933,7 +940,7 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
             if (!xv_get_attrib(disp, xv_port, attr_autopaint, xv_val) ||
                 xv_val)
             {
-                VERBOSE(VB_IMPORTANT, "Failed to disable autopaint");
+                LOG(VB_GENERAL, LOG_ERR, "Failed to disable autopaint");
                 xv_draw_colorkey = false;
             }
         }
@@ -943,7 +950,7 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
             if (!xv_get_attrib(disp, xv_port, attr_autopaint, xv_val) ||
                 !xv_val)
             {
-                VERBOSE(VB_IMPORTANT, "Failed to enable autopaint");
+                LOG(VB_GENERAL, LOG_ERR, "Failed to enable autopaint");
             }
         }
         else if (!turnoffautopaint && xv_val)
@@ -977,8 +984,8 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 
     if (xv_colorkey == letterbox_color)
     {
-        VERBOSE(VB_PLAYBACK, LOC +
-                "Chromakeying not possible with this XVideo port.");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            "Chromakeying not possible with this XVideo port.");
     }
 }
 
@@ -1030,8 +1037,8 @@ bool VideoOutputXv::ApproveDeintFilter(const QString &filtername) const
 vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
 {
     const QSize video_dim = window.GetVideoDim();
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("CreateShmImages(%1): video_dim: %2x%3")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("CreateShmImages(%1): video_dim: %2x%3")
             .arg(num).arg(video_dim.width()).arg(video_dim.height()));
 
     MythXLocker lock(disp);
@@ -1055,7 +1062,7 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
 
             if (image && size < desiredsize)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateXvShmImages(): "
+                LOG(VB_GENERAL, LOG_ERR, LOC + "CreateXvShmImages(): "
                         "XvShmCreateImage() failed to create image of the "
                         "requested size.");
                 XFree(image);
@@ -1078,7 +1085,7 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
             }
             else if (image)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateXvShmImages(): "
+                LOG(VB_GENERAL, LOG_ERR, LOC + "CreateXvShmImages(): "
                         "XvShmCreateImage() failed to create image "
                         "with the correct number of pixel planes.");
                 XFree(image);
@@ -1099,7 +1106,7 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
             desiredsize = (width * height * 3 / 2);
             if (image && size < desiredsize)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateXvShmImages(): "
+                LOG(VB_GENERAL, LOG_ERR, LOC + "CreateXvShmImages(): "
                         "XShmCreateImage() failed to create image of the "
                         "requested size.");
                 XDestroyImage((XImage *)image);
@@ -1141,14 +1148,14 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                LOG(VB_GENERAL, LOG_ERR, LOC +
                         "CreateXvShmImages(): shmget() failed." + ENO);
                 break;
             }
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateXvShmImages(): "
+            LOG(VB_GENERAL, LOG_ERR, LOC + "CreateXvShmImages(): "
                     "XvShmCreateImage() failed to create image.");
             break;
         }
@@ -1199,12 +1206,12 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
 
             if (!XJ_non_xv_image)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "XCreateImage failed: " +
-                        QString("XJ_disp(0x%1) visual(0x%2) \n")
+                LOG(VB_GENERAL, LOG_ERR, LOC + "XCreateImage failed: " +
+                    QString("XJ_disp(0x%1) visual(0x%2) \n")
                         .arg((uint64_t)d,0,16).arg((uint64_t)visual,0,16) +
-                        QString("                        ") +
-                        QString("depth(%1) ").arg(disp->GetDepth()) +
-                        QString("WxH(%1""x%2) ")
+                    QString("                        ") +
+                    QString("depth(%1) ").arg(disp->GetDepth()) +
+                    QString("WxH(%1""x%2) ")
                         .arg(display_visible_rect.width())
                         .arg(display_visible_rect.height()));
                 return false;
@@ -1228,7 +1235,7 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
                 "24, or 32 bits per pixel. But you have a %1 bpp display.")
                 .arg(disp->GetDepth()*8);
 
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
+            LOG(VB_GENERAL, LOG_ERR, LOC + msg);
         }
         else
             ok = vbuffers.CreateBuffers(FMT_YV12,
@@ -1332,17 +1339,19 @@ void VideoOutputXv::DiscardFrame(VideoFrame *frame)
 
 void VideoOutputXv::ClearAfterSeek(void)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek()");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "ClearAfterSeek()");
     DiscardFrames(false);
 }
 
 void VideoOutputXv::DiscardFrames(bool next_frame_keyframe)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames(%1)").arg(next_frame_keyframe));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("DiscardFrames(%1)").arg(next_frame_keyframe));
     if (VideoOutputSubType() <= XVideo)
     {
         vbuffers.DiscardFrames(next_frame_keyframe);
-        VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 3: %1 -- done()")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("DiscardFrames() 3: %1 -- done()")
                 .arg(vbuffers.GetStatus()));
         return;
     }
@@ -1397,8 +1406,8 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         if (non_xv_fps < 25)
         {
             non_xv_show_frame = 120 / non_xv_frames_shown + 1;
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("\n***\n"
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("\n***\n"
                     "* Your system is not capable of displaying the\n"
                     "* full framerate at %1""x%2 resolution.  Frames\n"
                     "* will be skipped in order to keep the audio and\n"
@@ -1414,7 +1423,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
 
     if (!XJ_non_xv_image)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "XJ_non_xv_image == NULL");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "XJ_non_xv_image == NULL");
         return;
     }
 
@@ -1470,12 +1479,13 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
 }
 
 // this is documented in videooutbase.cpp
-void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *osd)
+void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType scan,
+                                 OSD *osd)
 {
     (void)osd;
     if (IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() in PrepareFrame()");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "IsErrored() in PrepareFrame()");
         return;
     }
 
@@ -1550,14 +1560,17 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
 
     if (last_dest_y != dest_y)
     {
-        VERBOSE(VB_GENERAL, QString("####### Field %1 #######").arg(field));
-        VERBOSE(VB_GENERAL, QString("         src_y: %1").arg(src_y));
-        VERBOSE(VB_GENERAL, QString("        dest_y: %1").arg(dest_y));
-        VERBOSE(VB_GENERAL, QString(" xv_src_y_incr: %1").arg(xv_src_y_incr));
-        VERBOSE(VB_GENERAL, QString("xv_dest_y_incr: %1").arg(xv_dest_y_incr));
-        VERBOSE(VB_GENERAL, QString("      disphoff: %1").arg(disphoff));
-        VERBOSE(VB_GENERAL, QString("          imgh: %1").arg(imgh));
-        VERBOSE(VB_GENERAL, QString("           mod: %1").arg(mod));
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("####### Field %1 #######").arg(field));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("         src_y: %1").arg(src_y));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("        dest_y: %1").arg(dest_y));
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString(" xv_src_y_incr: %1").arg(xv_src_y_incr));
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("xv_dest_y_incr: %1").arg(xv_dest_y_incr));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("      disphoff: %1").arg(disphoff));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("          imgh: %1").arg(imgh));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("           mod: %1").arg(mod));
     }
     last_dest_y_field[field] = dest_y;
 #endif
@@ -1609,7 +1622,7 @@ void VideoOutputXv::Show(FrameScanType scan)
 {
     if (IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() is true in Show()");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "IsErrored() is true in Show()");
         return;
     }
 
@@ -1741,7 +1754,8 @@ void VideoOutputXv::UpdatePauseFrame(void)
 {
     QMutexLocker locker(&global_lock);
 
-    VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame() " + vbuffers.GetStatus());
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "UpdatePauseFrame() " +
+            vbuffers.GetStatus());
 
     if (VideoOutputSubType() <= XVideo)
     {
@@ -1772,7 +1786,7 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
 {
     if (IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() in ProcessFrame()");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "IsErrored() in ProcessFrame()");
         return;
     }
 
@@ -1837,7 +1851,7 @@ int VideoOutputXv::SetXVPictureAttribute(PictureAttribute attribute, int newValu
 
     if (attrName.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "\n\n\n attrName.isEmpty() \n\n\n");
+        LOG(VB_GENERAL, LOG_ERR, "\n\n\n attrName.isEmpty() \n\n\n");
         return -1;
     }
 
@@ -1894,7 +1908,7 @@ void VideoOutputXv::InitPictureAttributes(void)
                 xv_attribute_min[(PictureAttribute)i] = min_val;
                 xv_attribute_max[(PictureAttribute)i] = max_val;
                 xv_attribute_def[(PictureAttribute)i] = val;
-                VERBOSE(VB_PLAYBACK, LOC + QString("%1: %2:%3:%4")
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1: %2:%3:%4")
                     .arg(cname).arg(min_val).arg(val).arg(max_val));
                 SetXVPictureAttribute((PictureAttribute)i,
                     videoColourSpace.GetPictureAttribute((PictureAttribute)i));
@@ -2036,8 +2050,8 @@ static void SetFromHW(MythXDisplay *d,    Window  curwin,
                                     &p_req, &p_event, &p_err);
         if (Success != ret)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "XVideo output requested, "
-                    "but is not supported by display.");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "XVideo output requested, but is not supported by display.");
             useXVideo = false;
         }
     }

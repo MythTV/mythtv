@@ -4,6 +4,7 @@
 
 #include <mythcontext.h>
 #include <mythuibuttontree.h>
+#include <metadata/mythuimetadataresults.h>
 #include <mythuiimage.h>
 #include <mythuitext.h>
 #include <mythuistatetype.h>
@@ -39,159 +40,6 @@ class GameTreeInfo
 
 Q_DECLARE_METATYPE(GameTreeInfo *)
 
-namespace
-{
-    class SearchResultsDialog : public MythScreenType
-    {
-        Q_OBJECT
-
-      public:
-        SearchResultsDialog(MythScreenStack *lparent,
-                const MetadataLookupList results) :
-            MythScreenType(lparent, "videosearchresultspopup"),
-            m_results(results), m_resultsList(0)
-        {
-            m_imageDownload = new MetadataImageDownload(this);
-        }
-
-        ~SearchResultsDialog()
-        {
-            cleanCacheDir();
-
-            if (m_imageDownload)
-            {
-                delete m_imageDownload;
-                m_imageDownload = NULL;
-            }
-        }
-
-        bool Create()
-        {
-            if (!LoadWindowFromXML("game-ui.xml", "gamesel", this))
-                return false;
-
-            bool err = false;
-            UIUtilE::Assign(this, m_resultsList, "results", &err);
-            if (err)
-            {
-                VERBOSE(VB_IMPORTANT, "Cannot load screen 'gamesel'");
-                return false;
-            }
-
-            for (MetadataLookupList::const_iterator i = m_results.begin();
-                    i != m_results.end(); ++i)
-            {
-                MythUIButtonListItem *button =
-                    new MythUIButtonListItem(m_resultsList,
-                    (*i)->GetTitle());
-                MetadataMap metadataMap;
-                (*i)->toMap(metadataMap);
-
-                QString coverartfile;
-                ArtworkList art = (*i)->GetArtwork(COVERART);
-                if (art.count() > 0)
-                    coverartfile = art.takeFirst().thumbnail;
-                else
-                {
-                    art = (*i)->GetArtwork(SCREENSHOT);
-                    if (art.count() > 0)
-                        coverartfile = art.takeFirst().thumbnail;
-                }
-
-                QString dlfile = getDownloadFilename((*i)->GetTitle(),
-                    coverartfile);
-
-                if (!coverartfile.isEmpty())
-                {
-                    int pos = m_resultsList->GetItemPos(button);
-
-                    if (QFile::exists(dlfile))
-                        button->SetImage(dlfile);
-                    else
-                        m_imageDownload->addThumb((*i)->GetTitle(),
-                                         coverartfile,
-                                         qVariantFromValue<uint>(pos));
-                }
-
-                button->SetTextFromMap(metadataMap);
-                button->SetData(qVariantFromValue<MetadataLookup*>(*i));
-            }
-
-            connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                    SLOT(sendResult(MythUIButtonListItem *)));
-
-            BuildFocusList();
-
-            return true;
-        }
-
-        void cleanCacheDir()
-        {
-            QString cache = QString("%1/thumbcache")
-                       .arg(GetConfDir());
-            QDir cacheDir(cache);
-            QStringList thumbs = cacheDir.entryList(QDir::Files);
-
-            for (QStringList::const_iterator i = thumbs.end() - 1;
-                    i != thumbs.begin() - 1; --i)
-            {
-                QString filename = QString("%1/%2").arg(cache).arg(*i);
-                QFileInfo fi(filename);
-                QDateTime lastmod = fi.lastModified();
-                if (lastmod.addDays(2) < QDateTime::currentDateTime())
-                {
-                    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1")
-                          .arg(filename));
-                    QFile::remove(filename);
-                }
-            }
-        }
-
-        void customEvent(QEvent *event)
-        {
-            if (event->type() == ThumbnailDLEvent::kEventType)
-            {
-                ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
-
-                ThumbnailData *data = tde->thumb;
-
-                QString file = data->url;
-                uint pos = qVariantValue<uint>(data->data);
-
-                if (file.isEmpty())
-                    return;
-
-                if (!((uint)m_resultsList->GetCount() >= pos))
-                    return;
-
-                MythUIButtonListItem *item =
-                          m_resultsList->GetItemAt(pos);
-
-                if (item)
-                {
-                    item->SetImage(file);
-                }
-                delete data;
-            }
-        }
-
-     signals:
-        void haveResult(MetadataLookup*);
-
-      private:
-        MetadataLookupList m_results;
-        MythUIButtonList  *m_resultsList;
-        MetadataImageDownload *m_imageDownload;
-
-      private slots:
-        void sendResult(MythUIButtonListItem* item)
-        {
-            emit haveResult(qVariantValue<MetadataLookup *>(item->GetData()));
-            Close();
-        }
-    };
-}
-
 GameUI::GameUI(MythScreenStack *parent)
        : MythScreenType(parent, "GameUI"), m_busyPopup(0)
 {
@@ -224,7 +72,7 @@ bool GameUI::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'gameui'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'gameui'");
         return false;
     }
 
@@ -256,7 +104,7 @@ bool GameUI::Create()
     if (systemFilter.isEmpty())
     {
         systemFilter = "1=0";
-        VERBOSE(VB_GENERAL, QString("Couldn't find any game handlers!"));
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find any game handlers!"));
     }
     else
         systemFilter += ")";
@@ -715,8 +563,8 @@ void GameUI::customEvent(QEvent *event)
         }
         else
         {
-            SearchResultsDialog *resultsdialog =
-                  new SearchResultsDialog(m_popupStack, lul);
+            MetadataResultsDialog *resultsdialog =
+                  new MetadataResultsDialog(m_popupStack, lul);
 
             connect(resultsdialog, SIGNAL(haveResult(MetadataLookup*)),
                     SLOT(OnGameSearchListSelection(MetadataLookup*)),
@@ -749,7 +597,7 @@ void GameUI::customEvent(QEvent *event)
                 {
                 }
             }
-            VERBOSE(VB_GENERAL,
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("No results found for %1").arg(lookup->GetTitle()));
         }
     }
@@ -1032,8 +880,8 @@ void GameUI::gameSearch(MythGenericTree *node,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetStep(SEARCH);
-    lookup->SetType(GAME);
+    lookup->SetStep(kLookupSearch);
+    lookup->SetType(kMetadataGame);
     lookup->SetData(qVariantFromValue(node));
 
     if (automode)
@@ -1075,7 +923,7 @@ void GameUI::OnGameSearchListSelection(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    lookup->SetStep(GETDATA);
+    lookup->SetStep(kLookupData);
     m_query->prependLookup(lookup);
 }
 
@@ -1108,19 +956,19 @@ void GameUI::OnGameSearchDone(MetadataLookup *lookup)
     QStringList coverart, fanart, screenshot;
 
     // Imagery
-    ArtworkList coverartlist = lookup->GetArtwork(COVERART);
+    ArtworkList coverartlist = lookup->GetArtwork(kArtworkCoverart);
     for (ArtworkList::const_iterator p = coverartlist.begin();
         p != coverartlist.end(); ++p)
     {
         coverart.prepend((*p).url);
     }
-    ArtworkList fanartlist = lookup->GetArtwork(FANART);
+    ArtworkList fanartlist = lookup->GetArtwork(kArtworkFanart);
     for (ArtworkList::const_iterator p = fanartlist.begin();
         p != fanartlist.end(); ++p)
     {
         fanart.prepend((*p).url);
     }
-    ArtworkList screenshotlist = lookup->GetArtwork(SCREENSHOT);
+    ArtworkList screenshotlist = lookup->GetArtwork(kArtworkScreenshot);
     for (ArtworkList::const_iterator p = screenshotlist.begin();
         p != screenshotlist.end(); ++p)
     {
@@ -1154,28 +1002,28 @@ void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
     {
         ArtworkInfo info;
         info.url = coverart.takeAt(0).trimmed();
-        map.insert(COVERART, info);
+        map.insert(kArtworkCoverart, info);
     }
 
     if (metadata->Fanart().isEmpty() && fanart.size())
     {
         ArtworkInfo info;
         info.url = fanart.takeAt(0).trimmed();
-        map.insert(FANART, info);
+        map.insert(kArtworkFanart, info);
     }
 
     if (metadata->Screenshot().isEmpty() && screenshot.size())
     {
         ArtworkInfo info;
         info.url = screenshot.takeAt(0).trimmed();
-        map.insert(SCREENSHOT, info);
+        map.insert(kArtworkScreenshot, info);
     }
 
     MetadataLookup *lookup = new MetadataLookup();
     lookup->SetTitle(metadata->Gamename());
     lookup->SetSystem(metadata->System());
     lookup->SetInetref(metadata->Inetref());
-    lookup->SetType(GAME);
+    lookup->SetType(kMetadataGame);
     lookup->SetDownloads(map);
     lookup->SetData(qVariantFromValue(node));
 
@@ -1209,16 +1057,14 @@ void GameUI::handleDownloadedImages(MetadataLookup *lookup)
         ArtworkInfo info = i.value();
         QString filename = info.url;
 
-        if (type == COVERART)
+        if (type == kArtworkCoverart)
             metadata->setBoxart(filename);
-        else if (type == FANART)
+        else if (type == kArtworkFanart)
             metadata->setFanart(filename);
-        else if (type == SCREENSHOT)
+        else if (type == kArtworkScreenshot)
             metadata->setScreenshot(filename);
     }
 
     metadata->UpdateDatabase();
     updateChangedNode(node, metadata);
 }
-
-#include "gameui.moc"

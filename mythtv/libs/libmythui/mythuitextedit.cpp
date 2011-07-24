@@ -1,4 +1,3 @@
-
 // Own header
 #include "mythuitextedit.h"
 
@@ -20,8 +19,6 @@
 #include "mythuihelper.h"
 
 #define LOC      QString("MythUITextEdit: ")
-#define LOC_ERR  QString("MythUITextEdit, Error: ")
-#define LOC_WARN QString("MythUITextEdit, Warning: ")
 
 MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
            : MythUIType(parent, name)
@@ -61,14 +58,13 @@ MythUITextEdit::~MythUITextEdit()
 void MythUITextEdit::Select()
 {
     if (m_backgroundState && !m_backgroundState->DisplayState("selected"))
-        LOG(VB_GENERAL, LOG_ERR,
-            "MythUITextEdit: selected state doesn't exist");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "selected state doesn't exist");
 }
 
 void MythUITextEdit::Deselect()
 {
     if (m_backgroundState && !m_backgroundState->DisplayState("active"))
-        LOG(VB_GENERAL, LOG_ERR, "MythUITextEdit: active state doesn't exist");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "active state doesn't exist");
 }
 
 void MythUITextEdit::Reset()
@@ -160,11 +156,11 @@ void MythUITextEdit::SetInitialStates()
         dynamic_cast<MythUIStateType*>(GetChild("background"));
 
     if (!m_Text)
-        LOG(VB_GENERAL, LOG_ERR, "Missing text element.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Missing text element.");
     if (!m_cursorImage)
-        LOG(VB_GENERAL, LOG_ERR, "Missing cursor element.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Missing cursor element.");
     if (!m_backgroundState)
-        LOG(VB_GENERAL, LOG_WARNING, "Missing background element.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Missing background element.");
 
     if (!m_Text || !m_cursorImage)
     {
@@ -175,7 +171,7 @@ void MythUITextEdit::SetInitialStates()
     }
 
     if (m_backgroundState && !m_backgroundState->DisplayState("active"))
-        LOG(VB_GENERAL, LOG_ERR, "MythUITextEdit: active state doesn't exist");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "active state doesn't exist");
 
     QFontMetrics fm(m_Text->GetFontProperties()->face());
     int height = fm.height();
@@ -499,7 +495,7 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
     MythUITextEdit *textedit = dynamic_cast<MythUITextEdit *>(base);
     if (!textedit)
     {
-        LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "ERROR, bad parsing");
         return;
     }
 

@@ -15,8 +15,6 @@ using namespace std;
 #include "mythlogging.h"
 
 #define LOC      QString("BH: ")
-#define LOC_WARN QString("BH Warning: ")
-#define LOC_ERR  QString("BH Error: ")
 
 #define GetPlayer(X,Y) GetPlayerHaveLock(X, Y, __FILE__ , __LINE__)
 #define GetOSDLock(X) GetOSDL(X, __FILE__, __LINE__)
@@ -349,8 +347,7 @@ void TVBrowseHelper::GetNextProgramDB(
     uint chanid = infoMap["chanid"].toUInt();
     if (!chanid)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "GetNextProgramDB() requires a chanid");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GetNextProgramDB() requires a chanid");
         return;
     }
 

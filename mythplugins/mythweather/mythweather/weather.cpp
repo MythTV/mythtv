@@ -76,7 +76,7 @@ bool Weather::Create()
 
     if (!foundtheme)
     {
-        VERBOSE(VB_IMPORTANT, "Missing required window - weatherbase.");
+        LOG(VB_GENERAL, LOG_ERR, "Missing required window - weatherbase.");
         return false;
     }
 
@@ -88,7 +88,8 @@ bool Weather::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Window weatherbase is missing required elements.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Window weatherbase is missing required elements.");
         return false;
     }
 
@@ -203,7 +204,7 @@ bool Weather::SetupScreens()
         if( m_screens.empty() )
         {
             // We rejected every screen...  sit on this and rotate.
-            VERBOSE(VB_IMPORTANT, "No weather screens left, aborting.");
+            LOG(VB_GENERAL, LOG_ERR, "No weather screens left, aborting.");
             m_nextpage_Timer->stop();
             if( m_updatedText )
             {
@@ -392,7 +393,7 @@ void Weather::nextpage_timeout()
         showScreen(nxt);
     }
     else
-        VERBOSE(VB_GENERAL, "Next screen not ready");
+        LOG(VB_GENERAL, LOG_ERR, "Next screen not ready");
 
     m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
 }

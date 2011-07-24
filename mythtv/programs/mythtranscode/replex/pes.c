@@ -4,6 +4,8 @@
  *
  * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
+ * Changes to use MythTV logging
+ * Copyright (C) 2011 Gavin Hurlbut <ghurlbut@mythtv.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -35,35 +37,40 @@
 #endif
 
 #include "pes.h"
+#include "mythlogging.h"
+
 void printpts(int64_t pts)
 {
+	int negative = 0;
 	if (pts < 0){
-		fprintf(stderr,"-");
+		negative = 1;
 		pts = -pts;
 	}
 	pts = pts/300;
 	pts &= (MAX_PTS-1);
-	fprintf(stderr,"%2d:%02d:%02d.%04d ",
-		(unsigned int)(pts/90000.)/3600,
-		((unsigned int)(pts/90000.)%3600)/60,
-		((unsigned int)(pts/90000.)%3600)%60,
-		(((unsigned int)(pts/9.)%36000000)%600000)%10000
-		);
+	LOG(VB_GENERAL, LOG_INFO, "%s%2d:%02d:%02d.%04d",
+		(negative ? "-" : ""),
+		(unsigned int)(pts/90000.0)/3600,
+		((unsigned int)(pts/90000.0)%3600)/60,
+		((unsigned int)(pts/90000.0)%3600)%60,
+		(((unsigned int)(pts/9.0)%36000000)%600000)%10000);
 }
 
 void printptss(int64_t pts)
 {
+	int negative = 0;
 	if (pts < 0){
-		fprintf(stdout,"-");
+		negative = 0;
 		pts = -pts;
 	}
 	pts = pts/300;
 	pts &= (MAX_PTS-1);
-	fprintf(stdout,"%2d:%02d:%02d.%03d ",
-		(unsigned int)(pts/90000.)/3600,
-		((unsigned int)(pts/90000.)%3600)/60,
-		((unsigned int)(pts/90000.)%3600)%60,
-		(((unsigned int)(pts/90.)%3600000)%60000)%1000
+	LOG(VB_GENERAL, LOG_INFO, "%s%2d:%02d:%02d.%03d",
+		(negative ? "-" : ""),
+		(unsigned int)(pts/90000.0)/3600,
+		((unsigned int)(pts/90000.0)%3600)/60,
+		((unsigned int)(pts/90000.0)%3600)%60,
+		(((unsigned int)(pts/90.0)%3600000)%60000)%1000
 		);
 }
 
@@ -122,12 +129,11 @@ int ptscmp(uint64_t pts1, uint64_t pts2)
 		else 
 			ret = -2;
 	}
-/*
-	fprintf(stderr,"PTSCMP: %lli %lli %d\n", pts1, pts2, ret);
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, "PTSCMP: %lli %lli %d\n", pts1, pts2, ret);
 	printpts(pts1);
 	printpts(pts2);
-	fprintf(stderr,"\n");
-*/
+#endif
 	return ret;
 }
 
@@ -244,8 +250,8 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 					p->found++;
 					if ( (p->flag1 & 0xC0) == 0x80 ) p->mpeg = 2;
 					else {
-						fprintf(stderr, 
-							"Error: THIS IS AN MPEG1 FILE\n");
+						LOG(VB_GENERAL, LOG_ERR,
+						"Error: THIS IS AN MPEG1 FILE");
 						exit(1);
 					}
 				}
@@ -349,9 +355,9 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 							}
 						} else {
 							if (ring_write(p->rbuf, buf+c, l)<0){
-								fprintf(stderr,
-									"ring buffer overflow %d\n"
-									,p->rbuf->size);
+								LOG(VB_GENERAL, LOG_ERR,
+									"ring buffer overflow %d",
+									p->rbuf->size);
 								exit(1);
 							}
 						}
@@ -729,7 +735,7 @@ int write_video_pes( int pack_size, int extcnt, uint64_t vpts,
 	pos += write_pes_header( 0xE0, length-pos, vpts, vdts, buf+pos, 
 				 stuff, ptsdts);
 	if (length-pos > *vlength){
-		fprintf(stderr,"WHAT THE HELL  %d > %d\n", length-pos,
+		LOG(VB_GENERAL, LOG_ERR, "WHAT THE HELL  %d > %d", length-pos,
 			*vlength);
 	}
 
@@ -787,7 +793,7 @@ int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts,
 		pos = pack_size;
 	}		
 	if (pos != pack_size) {
-		fprintf(stderr,"apos: %d\n",pos);
+		LOG(VB_GENERAL, LOG_ERR, "apos: %d", pos);
 		exit(1);
 	}
 
@@ -843,7 +849,7 @@ int write_ac3_pes(  int pack_size, int extcnt, int n,
 		pos = pack_size;
 	}		
 	if (pos != pack_size) {
-		fprintf(stderr,"apos: %d\n",pos);
+		LOG(VB_GENERAL, LOG_ERR, "apos: %d", pos);
 		exit(1);
 	}
 

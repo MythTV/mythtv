@@ -878,5 +878,66 @@
 
     </window>
 
+    <window name="MythMetadataResults">
+        <area>0,42,1280,515</area>
+        <shape name="fade" from="basefadebackground" />
+
+        <imagetype name="backimg">
+            <position>877,78</position>
+            <filename>popups/alt_menu_background.png</filename>
+        </imagetype>
+
+        <imagetype name="listback">
+            <position>896,238</position>
+            <filename>recordings/filterlist_background.png</filename>
+        </imagetype>
+
+        <textarea name="label" from="basetextarea">
+            <area>889,93,378,125</area>
+            <align>allcenter</align>
+            <font>basemedium</font>
+            <multiline>yes</multiline>
+            <value>Search Results</value>
+        </textarea>
+
+        <buttonlist name="results">
+            <area>900,238,364,307</area>
+            <buttonarea>0,0,378,350</buttonarea>
+            <spacing>3</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <statetype name="buttonitem">
+                <area>0,0,367,53</area>
+                <state name="active">
+                    <area>0,0,367,53</area>
+                    <imagetype name="buttonbackground">
+                        <filename>popups/menu_button.png</filename>
+                    </imagetype>
+                    <textarea name="title">
+                        <area>18,0,260,50</area>
+                        <align>left,vcenter</align>
+                        <font>basemedium</font>
+                    </textarea>
+                    <textarea name="year">
+                        <area>280,0,70,50</area>
+                        <align>right,vcenter</align>
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+                <state name="selectedinactive" from="active" />
+                <state name="selectedactive" from="active">
+                    <imagetype name="selecteditemarrow">
+                        <position>5,16</position>
+                        <filename>popups/selected_item_arrow.png</filename>
+                    </imagetype>
+                    <textarea name="title">
+                        <font>basemediumbrown</font>
+                    </textarea>
+                    <textarea name="year">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+    </window>
 
 </mythuitheme>

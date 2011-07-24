@@ -108,7 +108,7 @@ static void replace_in_db(int chanid, uint eventid, uint64_t sig)
 
 static void delete_in_db(uint endtime)
 {
-    VERBOSE(VB_EIT, LOC + "Deleting old cache entries from the database");
+    LOG(VB_EIT, LOG_INFO, LOC + "Deleting old cache entries from the database");
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString qstr =
@@ -155,7 +155,8 @@ static bool lock_channel(int chanid, uint lastPruneTime)
 
     if (lock)
     {
-        VERBOSE(VB_EIT, LOC + QString("Ignoring channel %1 since it is locked.")
+        LOG(VB_EIT, LOG_INFO,
+            LOC + QString("Ignoring channel %1 since it is locked.")
                 .arg(chanid));
         return false;
     }
@@ -253,7 +254,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
     }
 
     if (eventMap->size())
-        VERBOSE(VB_EIT, LOC + QString("Loaded %1 entries for channel %2")
+        LOG(VB_EIT, LOG_INFO, LOC + QString("Loaded %1 entries for channel %2")
                 .arg(eventMap->size()).arg(chanid));
 
     entryCnt += eventMap->size();
@@ -287,7 +288,7 @@ void EITCache::WriteChannelToDB(uint chanid)
     unlock_channel(chanid, updated);
 
     if (updated)
-        VERBOSE(VB_EIT, LOC + QString("Wrote %1 modified entries of %2 "
+        LOG(VB_EIT, LOG_INFO, LOC + QString("Wrote %1 modified entries of %2 "
                                       "for channel %3 to database.")
                 .arg(updated).arg(size).arg(chanid));
 }
@@ -313,7 +314,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
 
     if (accessCnt % 500000 == 50000)
     {
-        VERBOSE(VB_EIT, "\n" + GetStatistics());
+        LOG(VB_EIT, LOG_INFO, GetStatistics());
         WriteToDB();
     }
 
@@ -376,12 +377,13 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
  */
 uint EITCache::PruneOldEntries(uint timestamp)
 {
-    if (VERBOSE_LEVEL_CHECK(VB_EIT))
+    if (VERBOSE_LEVEL_CHECK(VB_EIT, LOG_INFO))
     {
         QDateTime tmptime;
         tmptime.setTime_t(timestamp);
-        VERBOSE(VB_EIT, LOC + "Pruning all entries that ended before UTC " +
-                tmptime.toString(Qt::ISODate));
+        LOG(VB_EIT, LOG_INFO,
+            LOC + "Pruning all entries that ended before UTC " +
+            tmptime.toString(Qt::ISODate));
     }
 
     lastPruneTime  = timestamp;

@@ -65,7 +65,7 @@ bool WeatherScreen::canShowScreen()
         i.next();
         if (i.key().isEmpty())
         {
-            VERBOSE(VB_GENERAL, i.key());
+            LOG(VB_GENERAL, LOG_DEBUG, i.key());
             ok = false;
         }
     }
@@ -95,7 +95,7 @@ void WeatherScreen::newData(QString loc, units_t units, DataMap data)
     // This may seem like overkill, but it is necessary to actually update the
     // static and animated maps when they are redownloaded on an update
     if (!prepareScreen())
-        VERBOSE(VB_IMPORTANT, "Theme is missing a required widget!");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing a required widget!");
 
     emit screenReady(this);
 }
@@ -118,13 +118,13 @@ bool WeatherScreen::prepareScreen(bool checkOnly)
 
         if (!widget)
         {
-            VERBOSE(VB_GENERAL, "Widget not found " + itr.key());
+            LOG(VB_GENERAL, LOG_ERR, "Widget not found " + itr.key());
 
             if (name == "copyright")
             {
-                VERBOSE(VB_IMPORTANT, 
+                LOG(VB_GENERAL, LOG_WARNING,
                     QString("No copyright widget found, skipping screen %1.")
-                    .arg(m_name));
+                        .arg(m_name));
                 return false;
             }
         }

@@ -1725,6 +1725,12 @@
             <helptext></helptext>
         </button>
 
+        <button name="metadata" from="baseverywidebutton">
+            <position>455,580</position>
+            <value>Metadata Options</value>
+            <helptext></helptext>
+        </button>
+
         <button name="cancel" from="basebutton">
             <position>330,645</position>
             <value>Cancel</value>
@@ -1999,62 +2005,71 @@
             <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
-        <checkbox name="autocommflag" from="basecheckbox">
+        <checkbox name="metadatalookup" from="basecheckbox">
             <position>455,310</position>
         </checkbox>
 
-        <textarea name="autocommflaglabel" from="basetextarea">
+        <textarea name="metadatalookuplabel" from="basetextarea">
             <area>500,313,450,30</area>
+            <value>Automatically Look Up Metadata</value>
+        </textarea>
+
+        <checkbox name="autocommflag" from="basecheckbox">
+            <position>455,355</position>
+        </checkbox>
+
+        <textarea name="autocommflaglabel" from="basetextarea">
+            <area>500,357,450,30</area>
             <value>Commercial Flag new recordings</value>
         </textarea>
 
         <checkbox name="autotranscode" from="basecheckbox">
-            <position>455,355</position>
+            <position>455,400</position>
         </checkbox>
 
         <textarea name="autotranscodelabel" from="basetextarea">
-            <area>500,358,300,30</area>
+            <area>500,403,300,30</area>
             <value>Transcode new recordings</value>
         </textarea>
 
         <buttonlist name="transcodeprofile" from="basewideselector">
-            <position>455,397</position>
+            <position>455,437</position>
             <helptext></helptext>
         </buttonlist>
 
         <checkbox name="userjob1" from="basecheckbox">
-            <position>455,445</position>
+            <position>455,480</position>
         </checkbox>
 
         <textarea name="userjob1label" from="basetextarea">
-            <area>500,448,300,30</area>
+            <area>500,483,300,30</area>
             <value>Run User Job #1</value>
         </textarea>
 
         <checkbox name="userjob2" from="basecheckbox">
-            <position>455,490</position>
+            <position>455,520</position>
         </checkbox>
 
         <textarea name="userjob2label" from="basetextarea">
-            <area>500,493,300,30</area>
+            <area>500,523,300,30</area>
             <value>Run User Job #2</value>
         </textarea>
 
         <checkbox name="userjob3" from="basecheckbox">
-            <position>455,535</position>
+            <position>455,560</position>
         </checkbox>
 
         <textarea name="userjob3label" from="basetextarea">
-            <area>500,538,300,30</area>
+            <area>500,564,300,30</area>
             <value>Run User Job #3</value>
         </textarea>
 
         <checkbox name="userjob4" from="basecheckbox">
-            <position>455,580</position>
+            <position>455,600</position>
         </checkbox>
 
         <textarea name="userjob4label" from="basetextarea">
-            <area>500,583,300,30</area>
+            <area>500,603,300,30</area>
             <value>Run User Job #4</value>
         </textarea>
 
@@ -2147,6 +2162,79 @@
             <multiline>yes</multiline>
         </textarea>
 
+    </window>
+
+    <window name="metadataoptions">
+
+        <textarea name="inet" from="basetextarea">
+            <area>320,110,180,40</area>
+            <align>right,vcenter</align>
+            <value>TMDB/TVDB #:</value>
+        </textarea>
+
+        <textedit name="inetref_edit" from="basetextedit">
+            <position>515,110</position>
+        </textedit>
+
+        <textarea name="seas" from="basetextarea">
+            <area>320,165,180,40</area>
+            <align>right,vcenter</align>
+            <value>Season:</value>
+        </textarea>
+
+        <spinbox name="season_spinbox" from="basespinbox">
+            <position>515,165</position>
+        </spinbox>
+
+        <textarea name="ep" from="basetextarea">
+            <area>610,165,180,40</area>
+            <align>right,vcenter</align>
+            <value>Episode:</value>
+        </textarea>
+
+        <spinbox name="episode_spinbox" from="basespinbox">
+            <position>805,165</position>
+        </spinbox>
+
+        <button name="query_button" from="basewidebutton">
+            <position>545,220</position>
+            <value>Perform Query</value>
+        </button>
+
+        <button name="online_coverart_button" from="basewidebutton">
+            <position>545,275</position>
+            <value>Find Online Coverart</value>
+        </button>
+
+        <button name="online_fanart_button" from="basewidebutton">
+            <position>545,330</position>
+            <value>Find Online Fanart</value>
+        </button>
+
+        <button name="online_banner_button" from="basewidebutton">
+            <position>545,385</position>
+            <value>Find Online Banners</value>
+        </button>
+
+        <button name="local_coverart_button" from="basewidebutton">
+            <position>545,440</position>
+            <value>Find Local Coverart</value>
+        </button>
+
+        <button name="local_fanart_button" from="basewidebutton">
+            <position>545,495</position>
+            <value>Find Local Fanart</value>
+        </button>
+
+        <button name="local_banner_button" from="basewidebutton">
+            <position>545,550</position>
+            <value>Find Local Banners</value>
+        </button>
+
+        <button name="back" from="basebutton">
+            <position>600,640</position>
+            <value>Back</value>
+        </button>
     </window>
 
 </mythuitheme>

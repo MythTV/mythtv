@@ -116,7 +116,7 @@ class MHIContext : public MHContext
     /// Get netId etc from the channel index.
     virtual bool GetServiceInfo(int channelId, int &netId, int &origNetId,
                                 int &transportId, int &serviceId);
-    virtual bool TuneTo(int channel);
+    virtual bool TuneTo(int channel, int tuneinfo);
 
     /// Begin playing audio from the specified stream
     virtual bool BeginAudio(const QString &stream, int tag);
@@ -186,12 +186,13 @@ class MHIContext : public MHContext
     MHEGEngineThread *m_engineThread;
 
     int              m_currentChannel;
+    int              m_currentStream;
     bool             m_isLive;
     int              m_currentCard;
 
     int              m_audioTag;
     int              m_videoTag;
-    int              m_tuningTo;
+    QList<int>       m_tuneinfo;
 
     uint             m_lastNbiVersion;
     vector<unsigned char> m_nbiData;

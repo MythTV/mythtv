@@ -97,14 +97,14 @@ void DarwinAVCInfo::Update(uint64_t _guid, DarwinFirewireDevice *dev,
     //////////////////////////
     // get subunit info
 
-    VERBOSE(VB_RECORD, QString("Scanning guid: 0x%1").arg(guid, 0, 16));
+    LOG(VB_RECORD, LOG_INFO, QString("Scanning guid: 0x%1").arg(guid, 0, 16));
 
     bool wasOpen = IsAVCInterfaceOpen();
     if (OpenAVCInterface(thread_cf_ref))
     {
         if (!GetSubunitInfo())
         {
-            VERBOSE(VB_IMPORTANT, "GetSubunitInfo failed");
+            LOG(VB_GENERAL, LOG_ERR, "GetSubunitInfo failed");
         }
 
         if (!wasOpen)

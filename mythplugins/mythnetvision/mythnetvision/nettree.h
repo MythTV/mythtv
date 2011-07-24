@@ -123,6 +123,7 @@ class NetTree : public MythScreenType
     bool                m_treeAutoUpdate;
 
   private slots:
+    void streamWebVideo(void);
     void showWebVideo(void);
     void doDownloadAndPlay(void);
     void doPlayVideo(QString filename);

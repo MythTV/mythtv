@@ -198,8 +198,8 @@ bool MediaMonitorUnix::CheckMountable(void)
         QDBusConnection::systemBus() );
     if (!iface.isValid())
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
-                 "CheckMountable: DBus interface error: " +
+        LOG(VB_GENERAL, LOG_ALERT, LOC +
+            "CheckMountable: DBus interface error: " +
                  iface.lastError().message() );
         return false;
     }
@@ -209,8 +209,8 @@ bool MediaMonitorUnix::CheckMountable(void)
     QDBusReply<QDBusObjectPathList> reply = iface.call("EnumerateDevices");
     if (!reply.isValid())
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
-                 "CheckMountable DBus EnumerateDevices error: " +
+        LOG(VB_GENERAL, LOG_ALERT, LOC +
+            "CheckMountable DBus EnumerateDevices error: " +
                  reply.error().message() );
         return false;
     }
@@ -284,7 +284,7 @@ bool MediaMonitorUnix::CheckRemovable(const QString &dev)
         if (removable.exists() && removable.open(QIODevice::ReadOnly))
         {
             char    c   = 0;
-            QString msg = "CheckRemovable(" + dev + ")/removable ";
+            QString msg = LOC + ":CheckRemovable(" + dev + ")/removable ";
             bool    ok  = removable.getChar(&c);
             removable.close();
 
@@ -312,7 +312,7 @@ bool MediaMonitorUnix::CheckRemovable(const QString &dev)
  */
 QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
 {
-    QString msg = "GetDeviceFile(" + sysfs + ")";
+    QString msg = LOC + ":GetDeviceFile(" + sysfs + ")";
     QString ret = sysfs;
 
     // In case of error, a working default?  (device names usually match)
@@ -363,8 +363,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
          << "-rp" << sysfs;
 
     uint flags = kMSStdOut | kMSBuffered;
-    // TODO: rename to LOG_MASK_CHECK and LOG_LEVEL_CHECK
-    if( VERBOSE_LEVEL_CHECK(VB_MEDIA) && logLevel <= LOG_DEBUG )
+    if (VERBOSE_LEVEL_CHECK(VB_MEDIA, LOG_DEBUG))
         flags |= kMSStdErr;
 
     // TODO: change this to a MythSystem on the stack?
@@ -376,7 +375,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         return ret;
     }
 
-    if( VERBOSE_LEVEL_CHECK(VB_MEDIA) && logLevel <= LOG_DEBUG )
+    if (VERBOSE_LEVEL_CHECK(VB_MEDIA, LOG_DEBUG))
     {
         QTextStream estream(udevinfo->ReadAllErr());
         while( !estream.atEnd() )
@@ -538,8 +537,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
 {
     if ( ! pDevice )
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
-                 "Error - MediaMonitorUnix::AddDevice(null)");
+        LOG(VB_GENERAL, LOG_ERR, "MediaMonitorUnix::AddDevice(null)");
         return false;
     }
 

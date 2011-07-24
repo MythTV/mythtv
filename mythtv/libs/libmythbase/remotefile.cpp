@@ -67,7 +67,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     MythSocket *lsock = new MythSocket();
     QString stype = (control) ? "control socket" : "file data socket";
 
-    QString loc_err = QString("RemoteFile::openSocket(%1), Error: ").arg(stype);
+    QString loc = QString("RemoteFile::openSocket(%1): ").arg(stype);
 
     if (port <= 0)
     {
@@ -80,9 +80,8 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     if (!lsock->connect(host, port))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Could not connect to server %1:%2")
-                    .arg(host).arg(port));
+        LOG(VB_GENERAL, LOG_ERR, loc +
+            QString("Could not connect to server %1:%2") .arg(host).arg(port));
         lsock->DownRef();
         return NULL;
     }
@@ -97,9 +96,9 @@ MythSocket *RemoteFile::openSocket(bool control)
         lsock->writeStringList(strlist);
         if (!lsock->readStringList(strlist, true))
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("\n\t\t\tCould not read string list from server "
-                            "%1:%2").arg(host).arg(port));
+            LOG(VB_GENERAL, LOG_ERR, loc +
+                QString("Could not read string list from server %1:%2")
+                    .arg(host).arg(port));
             lsock->DownRef();
             return NULL;
         }
@@ -119,8 +118,8 @@ MythSocket *RemoteFile::openSocket(bool control)
         if (!lsock->writeStringList(strlist) ||
             !lsock->readStringList(strlist, true))
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("Did not get proper response from %1:%2")
+            LOG(VB_GENERAL, LOG_ERR, loc +
+                QString("Did not get proper response from %1:%2")
                     .arg(host).arg(port));
             strlist.clear();
             strlist.push_back("ERROR");
@@ -138,8 +137,8 @@ MythSocket *RemoteFile::openSocket(bool control)
         else if (0 < strlist.size() && strlist.size() < 3 &&
                  strlist[0] != "ERROR")
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("Did not get proper response from %1:%2")
+            LOG(VB_GENERAL, LOG_ERR, loc +
+                QString("Did not get proper response from %1:%2")
                     .arg(host).arg(port));
             strlist.clear();
             strlist.push_back("ERROR");
@@ -153,14 +152,14 @@ MythSocket *RemoteFile::openSocket(bool control)
         lsock = NULL;
         if (strlist.empty())
         {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to open socket, timeout");
+            LOG(VB_GENERAL, LOG_ERR, loc + "Failed to open socket, timeout");
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to open socket" +
-                    ((strlist.size() >= 2) ?
-                     QString(", error was %1").arg(strlist[1]) :
-                     QString(", remote error")));
+            LOG(VB_GENERAL, LOG_ERR, loc + "Failed to open socket" +
+                ((strlist.size() >= 2) ?
+                QString(", error was %1").arg(strlist[1]) :
+                QString(", remote error")));
         }
     }
 
@@ -307,6 +306,7 @@ QString RemoteFile::GetFileHash(const QString &url)
     QString result;
     QUrl qurl(url);
     QString filename = qurl.path();
+    QString hostname = qurl.host();
     QString sgroup   = qurl.userName();
 
     if (!qurl.fragment().isEmpty() || url.right(1) == "#")
@@ -321,6 +321,7 @@ QString RemoteFile::GetFileHash(const QString &url)
     QStringList strlist("QUERY_FILE_HASH");
     strlist << filename;
     strlist << sgroup;
+    strlist << hostname;
 
     gCoreContext->SendReceiveStringList(strlist);
     result = strlist[0];

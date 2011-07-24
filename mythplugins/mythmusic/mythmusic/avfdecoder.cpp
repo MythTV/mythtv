@@ -147,7 +147,8 @@ bool avfDecoder::initialize()
     if (m_inputIsFile)
     {
         filename = ((QFile *)input())->fileName();
-        VERBOSE(VB_PLAYBACK, QString("avfDecoder: playing file %1").arg(filename));
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("avfDecoder: playing file %1").arg(filename));
     }
     else
     {
@@ -176,7 +177,9 @@ bool avfDecoder::initialize()
             return false;
         }
 
-        VERBOSE(VB_PLAYBACK, QString("avfDecoder: playing stream, format probed is: %1").arg(m_inputFormat->long_name));
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("avfDecoder: playing stream, format probed is: %1")
+                .arg(m_inputFormat->long_name));
     }
 
     if (!m_samples)
@@ -205,8 +208,9 @@ bool avfDecoder::initialize()
 
     if (err < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("Could not open file (%1)").arg(filename));
-        VERBOSE(VB_IMPORTANT, QString("AV decoder. Error: %1").arg(err));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Could not open file (%1)").arg(filename));
+        LOG(VB_GENERAL, LOG_ERR, QString("AV decoder. Error: %1").arg(err));
         error(QString("Could not open file  (%1)").arg(filename) +
               QString("\nAV decoder. Error: %1").arg(err));
         deinit();
@@ -392,12 +396,12 @@ void avfDecoder::run()
         // Look to see if user has requested a seek
         if (seekTime >= 0.0)
         {
-            VERBOSE(VB_GENERAL, QString("avfdecoder.o: seek time %1")
-                                .arg(seekTime));
+            LOG(VB_GENERAL, LOG_INFO, QString("avfdecoder.o: seek time %1")
+                    .arg(seekTime));
 
             if (av_seek_frame(m_inputContext, -1,
                               (int64_t)(seekTime * AV_TIME_BASE), 0) < 0)
-                VERBOSE(VB_IMPORTANT, "Error seeking");
+                LOG(VB_GENERAL, LOG_ERR, "Error seeking");
 
             seekTime = -1.0;
         }
@@ -411,8 +415,8 @@ void avfDecoder::run()
                 // Read a packet from the input context
                 if (av_read_frame(m_inputContext, &pkt) < 0)
                 {
-                    VERBOSE(VB_IMPORTANT, "Read frame failed");
-                    VERBOSE(VB_FILE, ("... for file '" + filename) + "'");
+                    LOG(VB_GENERAL, LOG_ERR, "Read frame failed");
+                    LOG(VB_FILE, LOG_ERR, ("... for file '" + filename) + "'");
                     finish = TRUE;
                     break;
                 }

@@ -75,7 +75,8 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
         // Send NOTIFY message
         // ------------------------------------------------------------------
 
-        if (pSock->WriteBlockDirect( m_pPayload->data(), m_pPayload->size() ) != -1) 
+        if (pSock->WriteBlockDirect( m_pPayload->data(),
+                                     m_pPayload->size() ) != -1) 
         {
             // --------------------------------------------------------------
             // Read first line to determine success/Fail
@@ -85,34 +86,39 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
 
             if ( sResponseLine.length() > 0)
             {
-                //if (sResponseLine.contains("200 OK"))
-                //{
-                    VERBOSE( VB_UPNP, QString( "UPnpEventTask::Execute - NOTIFY to %1:%2 returned %3." )
-                                         .arg( m_PeerAddress.toString() )
-                                         .arg( m_nPeerPort )
-                                         .arg( sResponseLine ));
-
-                //}
+#if 0
+                if (sResponseLine.contains("200 OK"))
+                {
+#endif
+                    LOG(VB_UPNP, LOG_INFO,
+                        QString("UPnpEventTask::Execute - NOTIFY to "
+                                "%1:%2 returned %3.")
+                            .arg(m_PeerAddress.toString()) .arg(m_nPeerPort)
+                            .arg(sResponseLine));
+#if 0
+                }
+#endif
             }
             else
             {
-                VERBOSE( VB_UPNP, QString( "UPnpEventTask::Execute - Timeout reading first line of reply from %1:%2." )
-                                     .arg( m_PeerAddress.toString() )
-                                     .arg( m_nPeerPort ) );
+                LOG(VB_UPNP, LOG_ERR,
+                    QString("UPnpEventTask::Execute - Timeout reading first "
+                            "line of reply from %1:%2.")
+                        .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
             }
         }
         else
-            VERBOSE( VB_UPNP, QString( "UPnpEventTask::Execute - Error sending to %1:%2." )
-                                 .arg( m_PeerAddress.toString() )
-                                 .arg( m_nPeerPort ) );
+            LOG(VB_UPNP, LOG_ERR,
+                QString("UPnpEventTask::Execute - Error sending to %1:%2.")
+                    .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
 
         pSock->Close();
     }
     else
     {
-        VERBOSE( VB_UPNP, QString( "UPnpEventTask::Execute - Error sending to %1:%2." )
-                                 .arg( m_PeerAddress.toString() )
-                                 .arg( m_nPeerPort ) );
+        LOG(VB_UPNP, LOG_ERR,
+            QString("UPnpEventTask::Execute - Error sending to %1:%2.")
+                .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
     }
 
     if ( pSock != NULL )

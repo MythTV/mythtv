@@ -40,8 +40,6 @@
 #include "mythfontproperties.h"
 
 #define LOC      QString("XMLParseBase: ")
-#define LOC_WARN QString("XMLParseBase, Warning: ")
-#define LOC_ERR  QString("XMLParseBase, Error: ")
 
 QString XMLParseBase::getFirstText(QDomElement &element)
 {
@@ -301,7 +299,7 @@ void XMLParseBase::ParseChildren(const QString &filename,
 {
     if (!parent)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Parent is NULL");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Parent is NULL");
         return;
     }
 
@@ -570,9 +568,9 @@ bool XMLParseBase::WindowExists(const QString &xmlfile,
 
         if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("Location: '%1' @ %2 column: %3"
-                            "\n\t\t\tError: %4")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Location: '%1' @ %2 column: %3"
+                        "\n\t\t\tError: %4")
                     .arg(qPrintable(themefile)).arg(errorLine).arg(errorColumn)
                     .arg(qPrintable(errorMsg)));
             f.close();
@@ -614,7 +612,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
     for (; it != searchpath.end(); ++it)
     {
         QString themefile = *it + xmlfile;
-        LOG(VB_GUI, LOG_INFO, "Loading window theme from " + themefile);
+        LOG(VB_GUI, LOG_INFO, LOC + "Loading window theme from " + themefile);
         if (doLoad(windowname, parent, themefile,
                    onlyLoadWindows, showWarnings))
         {
@@ -622,12 +620,12 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
         }
         else
         {
-            LOG(VB_FILE, LOG_ERR, "No theme file " + themefile);
+            LOG(VB_FILE, LOG_ERR, LOC + "No theme file " + themefile);
         }
     }
 
-    LOG(VB_GENERAL, LOG_ERR,
-            QString("Unable to load window '%1' from '%2'")
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        QString("Unable to load window '%1' from '%2'")
             .arg(windowname).arg(xmlfile));
 
     return false;
@@ -651,9 +649,9 @@ bool XMLParseBase::doLoad(const QString &windowname,
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Location: '%1' @ %2 column: %3"
-                        "\n\t\t\tError: %4")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Location: '%1' @ %2 column: %3"
+                    "\n\t\t\tError: %4")
                 .arg(qPrintable(filename)).arg(errorLine).arg(errorColumn)
                 .arg(qPrintable(errorMsg)));
         f.close();
@@ -762,8 +760,8 @@ bool XMLParseBase::LoadBaseTheme(void)
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
                    loadOnlyWindows, showWarnings))
         {
-            LOG(VB_GUI, LOG_INFO,
-                    QString("Loaded base theme from '%1'").arg(themefile));
+            LOG(VB_GUI, LOG_INFO, LOC +
+                QString("Loaded base theme from '%1'").arg(themefile));
             // Don't complain about duplicate definitions after first
             // successful load (set showWarnings to false).
             showWarnings = false;
@@ -771,8 +769,8 @@ bool XMLParseBase::LoadBaseTheme(void)
         }
         else
         {
-            LOG(VB_GUI | VB_FILE, LOG_WARNING,
-                    QString("No theme file '%1'").arg(themefile));
+            LOG(VB_GUI | VB_FILE, LOG_WARNING, LOC +
+                QString("No theme file '%1'").arg(themefile));
         }
     }
 
@@ -781,13 +779,13 @@ bool XMLParseBase::LoadBaseTheme(void)
 
 bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
 {
-    LOG(VB_GUI, LOG_INFO,
-            QString("Asked to load base file from '%1'").arg(baseTheme));
+    LOG(VB_GUI, LOG_INFO, LOC +
+        QString("Asked to load base file from '%1'").arg(baseTheme));
 
     if (loadedBaseFiles.contains(baseTheme))
     {
-        LOG(VB_GUI, LOG_INFO,
-                QString("Base file already loaded '%1'").arg(baseTheme));
+        LOG(VB_GUI, LOG_INFO, LOC +
+            QString("Base file already loaded '%1'").arg(baseTheme));
         return true;
     }
 
@@ -804,8 +802,8 @@ bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
                    loadOnlyWindows, showWarnings))
         {
-            LOG(VB_GUI, LOG_INFO,
-                    QString("Loaded base theme from '%1'").arg(themefile));
+            LOG(VB_GUI, LOG_INFO, LOC +
+                QString("Loaded base theme from '%1'").arg(themefile));
             // Don't complain about duplicate definitions after first
             // successful load (set showWarnings to false).
             showWarnings = false;
@@ -813,8 +811,8 @@ bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
         }
         else
         {
-            LOG(VB_GUI | VB_FILE, LOG_WARNING,
-                    QString("No theme file '%1'").arg(themefile));
+            LOG(VB_GUI | VB_FILE, LOG_WARNING, LOC +
+                QString("No theme file '%1'").arg(themefile));
         }
     }
 
@@ -830,18 +828,16 @@ bool XMLParseBase::CopyWindowFromBase(const QString &windowname,
     MythUIType *ui = GetGlobalObjectStore()->GetChild(windowname);
     if (!ui)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Unable to load window '%1' from base")
-                .arg(windowname));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Unable to load window '%1' from base") .arg(windowname));
         return false;
     }
 
     MythScreenType *st = dynamic_cast<MythScreenType *>(ui);
     if (!st)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("UI Object '%1' is not a ScreenType")
-                .arg(windowname));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("UI Object '%1' is not a ScreenType") .arg(windowname));
         return false;
     }
 

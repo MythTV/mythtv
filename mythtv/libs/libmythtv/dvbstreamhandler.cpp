@@ -21,8 +21,6 @@
 #include "mythlogging.h"
 
 #define LOC      QString("DVBSH(%1): ").arg(_device)
-#define LOC_WARN QString("DVBSH(%1) Warning: ").arg(_device)
-#define LOC_ERR  QString("DVBSH(%1) Error: ").arg(_device)
 
 QMap<QString,bool> DVBStreamHandler::_rec_supports_ts_monitoring;
 QMutex             DVBStreamHandler::_rec_supports_ts_monitoring_lock;
@@ -76,9 +74,8 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("DVBSH Error: Couldn't find handler for %1")
-                .arg(devname));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("DVBSH Error: Couldn't find handler for %1") .arg(devname));
     }
 
     _handlers_refcnt.erase(rit);
@@ -106,14 +103,14 @@ void DVBStreamHandler::SetRunningDesired(bool desired)
 void DVBStreamHandler::run(void)
 {
     threadRegister("DVBRead");
-    VERBOSE(VB_RECORD, LOC + "run(): begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run(): begin");
 
     if (!SupportsTSMonitoring() && _allow_section_reader)
         RunSR();
     else
         RunTS();
 
-    VERBOSE(VB_RECORD, LOC + "run(): end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run(): end");
     threadDeregister();
 }
 
@@ -137,14 +134,14 @@ void DVBStreamHandler::RunTS(void)
         if (dvr_fd >= 0)
             break;
 
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("Opening DVR device %1 failed : %2")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Opening DVR device %1 failed : %2")
                 .arg(_dvr_dev_path).arg(strerror(errno)));
 
         if (tries >= 20 || (errno != EBUSY && errno != EAGAIN))
         {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    QString("Failed to open DVR device %1 : %2")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Failed to open DVR device %1 : %2")
                     .arg(_dvr_dev_path).arg(strerror(errno)));
             _error = true;
             return;
@@ -157,7 +154,7 @@ void DVBStreamHandler::RunTS(void)
     unsigned char *buffer = new unsigned char[buffer_size];
     if (!buffer)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate memory");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate memory");
         close(dvr_fd);
         _error = true;
         return;
@@ -170,7 +167,7 @@ void DVBStreamHandler::RunTS(void)
         drb = new DeviceReadBuffer(this);
         if (!drb->Setup(_device, dvr_fd))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate DRB buffer");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
             delete drb;
             delete[] buffer;
             close(dvr_fd);
@@ -187,7 +184,7 @@ void DVBStreamHandler::RunTS(void)
         _drb = drb;
     }
 
-    VERBOSE(VB_RECORD, LOC + "RunTS(): begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
 
     bool _error = false;
     fd_set fd_select_set;
@@ -208,13 +205,13 @@ void DVBStreamHandler::RunTS(void)
             // Check for DRB errors
             if (drb->IsErrored())
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Device error detected");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Device error detected");
                 _error = true;
             }
 
             if (drb->IsEOF())
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Device EOF detected");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
                 _error = true;
             }
         }
@@ -225,7 +222,7 @@ void DVBStreamHandler::RunTS(void)
             int ret = select(dvr_fd+1, &fd_select_set, NULL, NULL, &timeout);
             if (ret == -1 && errno != EINTR)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "select() failed" + ENO);
+                LOG(VB_GENERAL, LOG_ERR, LOC + "select() failed" + ENO);
             }
             else
             {
@@ -265,7 +262,7 @@ void DVBStreamHandler::RunTS(void)
         if (remainder > 0 && (len > remainder)) // leftover bytes
             memmove(buffer, &(buffer[len - remainder]), remainder);
     }
-    VERBOSE(VB_RECORD, LOC + "RunTS(): " + "shutdown");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "shutdown");
 
     RemoveAllPIDFilters();
 
@@ -284,7 +281,7 @@ void DVBStreamHandler::RunTS(void)
     close(dvr_fd);
     delete[] buffer;
 
-    VERBOSE(VB_RECORD, LOC + "RunTS(): " + "end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "end");
 
     SetRunning(false, _needs_buffering, false);
 }
@@ -307,7 +304,7 @@ void DVBStreamHandler::RunSR(void)
 
     SetRunning(true, _needs_buffering, true);
 
-    VERBOSE(VB_RECORD, LOC + "RunSR(): begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunSR(): begin");
 
     while (_running_desired && !_error)
     {
@@ -342,7 +339,7 @@ void DVBStreamHandler::RunSR(void)
         if (!readSomething)
             usleep(3000);
     }
-    VERBOSE(VB_RECORD, LOC + "RunSR(): " + "shutdown");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunSR(): " + "shutdown");
 
     RemoveAllPIDFilters();
 
@@ -350,7 +347,7 @@ void DVBStreamHandler::RunSR(void)
 
     SetRunning(false, _needs_buffering, true);
 
-    VERBOSE(VB_RECORD, LOC + "RunSR(): " + "end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunSR(): " + "end");
 }
 
 typedef vector<uint> pid_list_t;
@@ -525,7 +522,8 @@ void DVBStreamHandler::RetuneMonitor(void)
             // Retune if move completes normally
             if (was_moving && !is_moving)
             {
-                VERBOSE(VB_CHANNEL, LOC + "Retuning for rotor completion");
+                LOG(VB_CHANNEL, LOG_INFO,
+                    LOC + "Retuning for rotor completion");
                 _dvbchannel->Retune();
 
                 // (optionally) No need to wait for SDT anymore...
@@ -585,12 +583,8 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
 }
 
 #undef LOC
-#undef LOC_WARN
-#undef LOC_ERR
 
 #define LOC      QString("PIDInfo(%1): ").arg(dvb_dev)
-#define LOC_WARN QString("PIDInfo(%1) Warning: ").arg(dvb_dev)
-#define LOC_ERR  QString("PIDInfo(%1) Error: ").arg(dvb_dev)
 
 bool DVBPIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
 {
@@ -603,15 +597,14 @@ bool DVBPIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
     QString demux_fn = CardUtil::GetDeviceName(DVB_DEV_DEMUX, dvb_dev);
     QByteArray demux_ba = demux_fn.toAscii();
 
-    VERBOSE(VB_RECORD, LOC + QString("Opening filter for pid 0x%1")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Opening filter for pid 0x%1")
             .arg(_pid, 0, 16));
 
     int mux_fd = open(demux_ba.constData(), O_RDWR | O_NONBLOCK);
     if (mux_fd == -1)
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("Failed to open demux device %1 "
-                        "for filter on pid 0x%2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open demux device %1 "
+                                               "for filter on pid 0x%2")
                 .arg(demux_fn).arg(_pid, 0, 16));
         return false;
     }
@@ -628,8 +621,8 @@ bool DVBPIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
 
         if (ioctl(mux_fd, DMX_SET_PES_FILTER, &pesFilterParams) < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Failed to set TS filter (pid 0x%1)")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Failed to set TS filter (pid 0x%1)")
                     .arg(_pid, 0, 16));
 
             close(mux_fd);
@@ -682,9 +675,9 @@ bool DVBPIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
 
         if (ioctl(mux_fd, DMX_SET_FILTER, &sctFilterParams) < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to set \"section\" filter " +
-                    QString("(pid 0x%1) (filter %2)").arg(_pid, 0, 16)
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Failed to set \"section\" filter " +
+                QString("(pid 0x%1) (filter %2)").arg(_pid, 0, 16)
                     .arg(sctFilterParams.filter.filter[0]));
             close(mux_fd);
             return false;
@@ -698,8 +691,8 @@ bool DVBPIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
 
 bool DVBPIDInfo::Close(const QString &dvb_dev)
 {
-    VERBOSE(VB_RECORD, LOC +
-            QString("Closing filter for pid 0x%1").arg(_pid, 0, 16));
+    LOG(VB_RECORD, LOG_INFO, LOC +
+        QString("Closing filter for pid 0x%1").arg(_pid, 0, 16));
 
     if (!IsOpen())
         return false;
@@ -710,7 +703,8 @@ bool DVBPIDInfo::Close(const QString &dvb_dev)
     int err = close(tmp);
     if (err < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString("Failed to close mux (pid 0x%1)")
+        LOG(VB_GENERAL, LOG_ERR, 
+            LOC + QString("Failed to close mux (pid 0x%1)")
                 .arg(_pid, 0, 16) + ENO);
 
         return false;
@@ -737,7 +731,7 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     // rounded up to the nearest page
     pid_buffer_size = ((pid_buffer_size + 4095) / 4096) * 4096;
 
-    VERBOSE(VB_RECORD, LOC + QString("Adding pid 0x%1 size(%2)")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Adding pid 0x%1 size(%2)")
             .arg(pid,0,16).arg(pid_buffer_size));
 
     // Open the demux device
@@ -748,7 +742,7 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     int fd_tmp = open(dev.constData(), O_RDWR);
     if (fd_tmp < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open demux device." + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Could not open demux device." + ENO);
         _max_pid_filters = _open_pid_filters;
         return -1;
     }
@@ -759,18 +753,18 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     uint usecs = msec_of_buffering * 1000;
     while (ioctl(fd_tmp, DMX_SET_BUFFER_SIZE, sz) < 0 && sz > 1024*8)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set demux buffer size for "+
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set demux buffer size for "+
                 QString("pid 0x%1 to %2").arg(pid,0,16).arg(sz) + ENO);
 
         sz    /= 2;
         sz     = ((sz+4095)/4096)*4096;
         usecs /= 2;
     }
-    /*
-    VERBOSE(VB_RECORD, LOC + "Set demux buffer size for " +
-            QString("pid 0x%1 to %2,\n\t\t\twhich gives us a %3 msec buffer.")
+#if 0
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "Set demux buffer size for " +
+        QString("pid 0x%1 to %2,\n\t\t\twhich gives us a %3 msec buffer.")
             .arg(pid,0,16).arg(sz).arg(usecs/1000));
-    */
+#endif
 
     // Set the filter type
     struct dmx_pes_filter_params params;
@@ -784,7 +778,7 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     {
         close(fd_tmp);
 
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set demux filter." + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set demux filter." + ENO);
         _max_pid_filters = _open_pid_filters;
         return -1;
     }

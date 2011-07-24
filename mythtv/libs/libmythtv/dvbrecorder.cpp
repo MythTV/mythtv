@@ -31,10 +31,6 @@
 
 #define LOC      QString("DVBRec(%1:%2): ") \
                  .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
-#define LOC_WARN QString("DVBRec(%1:%2) Warning: ") \
-                 .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
-#define LOC_ERR  QString("DVBRec(%1:%2) Error: ") \
-                 .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
 
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel *channel)
     : DTVRecorder(rec), _channel(channel), _stream_handler(NULL)
@@ -46,7 +42,7 @@ bool DVBRecorder::Open(void)
 {
     if (IsOpen())
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Card already open");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Card already open");
         return true;
     }
 
@@ -59,7 +55,7 @@ bool DVBRecorder::Open(void)
 
     _stream_handler = DVBStreamHandler::Get(videodevice);
 
-    VERBOSE(VB_RECORD, LOC + "Card opened successfully");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Card opened successfully");
 
     return true;
 }
@@ -71,11 +67,11 @@ bool DVBRecorder::IsOpen(void) const
 
 void DVBRecorder::Close(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Close() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     DVBStreamHandler::Return(_stream_handler);
 
-    VERBOSE(VB_RECORD, LOC + "Close() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
 void DVBRecorder::StartRecording(void)
@@ -83,7 +79,7 @@ void DVBRecorder::StartRecording(void)
     if (!Open())
     {
         _error = "Failed to open DVB device";
-        VERBOSE(VB_IMPORTANT, LOC_ERR + _error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + _error);
         return;
     }
 
@@ -126,7 +122,7 @@ void DVBRecorder::StartRecording(void)
 
         if (!_input_pmt)
         {
-            VERBOSE(VB_GENERAL, LOC_WARN +
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
             usleep(5000);
             continue;
@@ -135,7 +131,7 @@ void DVBRecorder::StartRecording(void)
         if (!_stream_handler->IsRunning())
         {
             _error = "Stream handler died unexpectedly.";
-            VERBOSE(VB_IMPORTANT, LOC_ERR + _error);
+            LOG(VB_GENERAL, LOG_ERR, LOC + _error);
         }
     }
 

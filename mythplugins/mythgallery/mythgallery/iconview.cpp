@@ -174,7 +174,7 @@ bool IconView::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'gallery'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'gallery'");
         return false;
     }
 
@@ -223,7 +223,7 @@ void IconView::LoadDirectory(const QString &dir)
     QDir d(dir);
     if (!d.exists())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "LoadDirectory called with " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "LoadDirectory called with " +
                 QString("non-existant directory: '%1'").arg(dir));
         return;
     }
@@ -684,15 +684,20 @@ bool IconView::HandleSubDirEscape(const QString &parent)
 
 bool IconView::HandleEscape(void)
 {
-    //VERBOSE(VB_IMPORTANT, LOC + "HandleEscape() " +
-    //        QString("showDevices: %1").arg(m_showDevices));
+#if 0
+    LOG(VB_GENERAL, LOG_INFO, LOC + "HandleEscape() " +
+        QString("showDevices: %1").arg(m_showDevices));
+#endif
 
     bool handled = false;
 
     // If we are showing the attached devices, ESCAPE should always exit..
     if (m_showDevices)
     {
-        //VERBOSE(VB_IMPORTANT, LOC + "HandleEscape() exiting on showDevices");
+#if 0
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            "HandleEscape() exiting on showDevices");
+#endif
         return false;
     }
 
@@ -706,7 +711,10 @@ bool IconView::HandleEscape(void)
     if (!handled)
         handled = HandleSubDirEscape(m_galleryDir);
 
-    //VERBOSE(VB_IMPORTANT, LOC + "HandleEscape() handled: "<<handled<<"\n");
+#if 0
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("HandleEscape() handled: %1")
+            .arg(handled));
+#endif
 
     return handled;
 }
@@ -1061,15 +1069,17 @@ void IconView::HandleImport(void)
     QFileInfo path;
     QDir importdir;
 
-//     DialogBox *importDlg = new DialogBox(
-//         GetMythMainWindow(), tr("Import pictures?"));
-//
-//     importDlg->AddButton(tr("No"));
-//     importDlg->AddButton(tr("Yes"));
-//     DialogCode code = importDlg->exec();
-//     importDlg->deleteLater();
-//     if (kDialogCodeButton1 != code)
-//         return;
+#if 0
+    DialogBox *importDlg = new DialogBox(GetMythMainWindow(),
+                                         tr("Import pictures?"));
+
+    importDlg->AddButton(tr("No"));
+    importDlg->AddButton(tr("Yes"));
+    DialogCode code = importDlg->exec();
+    importDlg->deleteLater();
+    if (kDialogCodeButton1 != code)
+        return;
+#endif
 
     // Makes import directory samba/windows friendly (no colon)
     QString idirname = m_currDir + "/" +
@@ -1086,30 +1096,33 @@ void IconView::HandleImport(void)
         {
             ImportFromDir(*it, importdir.absolutePath());
         }
-//         else if (path.isFile() && path.isExecutable())
-//         {
-//             // TODO this should not be enabled by default!!!
-//             QString cmd = *it + " " + importdir.absolutePath();
-//             VERBOSE(VB_GENERAL, LOC + QString("Executing %1").arg(cmd));
-//             myth_system(cmd);
-//         }
+#if 0
+        else if (path.isFile() && path.isExecutable())
+        {
+            // TODO this should not be enabled by default!!!
+            QString cmd = *it + " " + importdir.absolutePath();
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Executing %1").arg(cmd));
+            myth_system(cmd);
+        }
+#endif
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Could not read or execute %1").arg(*it));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Could not read or execute %1").arg(*it));
         }
     }
-
 
     importdir.refresh();
     if (importdir.count() == 0)
     {
-//         DialogBox *nopicsDlg = new DialogBox(
-//             GetMythMainWindow(), tr("Nothing found to import"));
-//
-//         nopicsDlg->AddButton(tr("OK"));
-//         nopicsDlg->exec();
-//         nopicsDlg->deleteLater();
+#if 0
+        DialogBox *nopicsDlg = new DialogBox(GetMythMainWindow(),
+                                             tr("Nothing found to import"));
+
+        nopicsDlg->AddButton(tr("OK"));
+        nopicsDlg->exec();
+        nopicsDlg->deleteLater();
+#endif
 
         return;
     }
@@ -1372,7 +1385,7 @@ void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
         }
         else
         {
-            VERBOSE(VB_GENERAL, LOC + QString("Copying %1 to %2")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Copying %1 to %2")
                     .arg(fi->absoluteFilePath())
                     .arg(toDir));
 

@@ -29,6 +29,7 @@ using namespace std;
 #include "scheduler.h"
 #include "mythcoreutil.h"
 #include "mythdownloadmanager.h"
+#include "exitcodes.h"
 #include "mythversion.h"
 #include "mythlogging.h"
 
@@ -221,7 +222,7 @@ void HouseKeeper::RunHouseKeeping(void)
     {
         locker.unlock();
 
-        VERBOSE(VB_GENERAL, "Running housekeeping thread");
+        LOG(VB_GENERAL, LOG_INFO, "Running housekeeping thread");
 
         // These tasks are only done from the master backend
         if (isMaster)
@@ -229,7 +230,7 @@ void HouseKeeper::RunHouseKeeping(void)
             // Clean out old database logging entries
             if (wantToRun("LogClean", 1, 0, 24))
             {
-                VERBOSE(VB_GENERAL, "Running LogClean");
+                LOG(VB_GENERAL, LOG_INFO, "Running LogClean");
                 flushDBLogs();
                 updateLastrun("LogClean");
             }
@@ -239,8 +240,8 @@ void HouseKeeper::RunHouseKeeping(void)
             {
                 if (fillDBThread && fillDBThread->isRunning())
                 {
-                    VERBOSE(VB_GENERAL, "mythfilldatabase still running, "
-                                        "skipping checks.");
+                    LOG(VB_GENERAL, LOG_INFO,
+                        "mythfilldatabase still running, skipping checks.");
                 }
                 else
                 {
@@ -295,7 +296,7 @@ void HouseKeeper::RunHouseKeeping(void)
 
                     if (runMythFill)
                     {
-                        VERBOSE(VB_GENERAL, "Running mythfilldatabase");
+                        LOG(VB_GENERAL, LOG_INFO, "Running mythfilldatabase");
                         StartMFD();
                         updateLastrun("MythFillDB");
                     }
@@ -316,6 +317,13 @@ void HouseKeeper::RunHouseKeeping(void)
             {
                 UpdateThemeChooserInfoCache();
                 updateLastrun("ThemeChooserInfoCacheUpdate");
+            }
+
+            if ((gCoreContext->GetNumSetting("DailyArtworkUpdates", 1)) &&
+                (wantToRun("RecordedArtworkUpdate", 1, 0, 24, true)))
+            {
+                UpdateRecordedArtwork();
+                updateLastrun("RecordedArtworkUpdate");
             }
         }
 
@@ -357,8 +365,9 @@ void HouseKeeper::flushDBLogs()
         query.bindValue(":MYTHBACKEND", MYTH_APPNAME_MYTHBACKEND);
         query.bindValue(":MYTHFRONTEND", MYTH_APPNAME_MYTHFRONTEND);
         query.bindValue(":DAYS", days);
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting helper application "
-                "database log entries from before %1.").arg(days.toString()));
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("Deleting helper application database log entries "
+                    "from before %1.") .arg(days.toString()));
         if (!query.exec())
             MythDB::DBError("Delete helper application log entries", query);
 
@@ -368,8 +377,9 @@ void HouseKeeper::flushDBLogs()
         sql = "DELETE FROM logging WHERE msgtime < :DAYS ;";
         query.prepare(sql);
         query.bindValue(":DAYS", days);
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting database log entries "
-                                     "from before %1.").arg(days.toString()));
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("Deleting database log entries from before %1.")
+                .arg(days.toString()));
         if (!query.exec())
             MythDB::DBError("Delete old log entries", query);
 
@@ -381,8 +391,8 @@ void HouseKeeper::flushDBLogs()
             while (query.next())
             {
                 totalrows = query.value(0).toLongLong();
-                VERBOSE(VB_GENERAL|VB_EXTRA, QString("Database has %1 log "
-                                             "entries.").arg(totalrows));
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Database has %1 log entries.").arg(totalrows));
             }
             if (totalrows > maxrows)
             {
@@ -390,8 +400,9 @@ void HouseKeeper::flushDBLogs()
                 query.prepare(sql);
                 quint64 extrarows = totalrows - maxrows;
                 query.bindValue(":ROWS", extrarows);
-                VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting oldest %1 "
-                        "database log entries.").arg(extrarows));
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Deleting oldest %1 database log entries.")
+                        .arg(extrarows));
                 if (!query.exec())
                     MythDB::DBError("Delete excess log entries", query);
             }
@@ -423,6 +434,7 @@ void HouseKeeper::RunMFD(void)
     QString command = QString("%1 %2").arg(mfpath).arg(mfarg);
     command += logPropagateArgs;
 
+    // TODO: remove this mess once we no longer use wget.
     if (mflog.length())
     {
         bool dir_writable = false;
@@ -446,16 +458,16 @@ void HouseKeeper::RunMFD(void)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Invalid mythfilldatabase log path: %1 is not "
-                            "writable.").arg(mflog));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Invalid mythfilldatabase log path: %1 is not "
+                        "writable.").arg(mflog));
         }
     }
 
     {
         QMutexLocker locker(&fillDBLock);
-        fillDBMythSystem = new MythSystem(
-            command, kMSRunShell | kMSAutoCleanup);
+        fillDBMythSystem = new MythSystem(command, kMSRunShell |
+                                                   kMSAutoCleanup);
         fillDBMythSystem->Run(0);
         fillDBWait.wakeAll();
     }
@@ -473,9 +485,9 @@ void HouseKeeper::RunMFD(void)
         fillDBWait.wakeAll();
     }
 
-    if (result)
+    if (result != GENERIC_EXIT_OK)
     {
-        VERBOSE(VB_IMPORTANT, QString("MythFillDatabase command '%1' failed")
+        LOG(VB_GENERAL, LOG_ERR, QString("MythFillDatabase command '%1' failed")
                 .arg(command));
     }
 }
@@ -784,8 +796,9 @@ void HouseKeeper::UpdateThemeChooserInfoCache(void)
     QDir dir(remoteThemesDir);
     if (!dir.exists() && !dir.mkpath(remoteThemesDir))
     {
-        VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error creating %1"
-                "directory for remote themes info cache.")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("HouseKeeper: Error creating %1"
+                    "directory for remote themes info cache.")
                 .arg(remoteThemesDir));
         return;
     }
@@ -801,18 +814,38 @@ void HouseKeeper::UpdateThemeChooserInfoCache(void)
 
     if (!result)
     {
-        VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error downloading %1"
-                "remote themes info package.").arg(url));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("HouseKeeper: Error downloading %1"
+                    "remote themes info package.").arg(url));
         return;
     }
 
     if (!extractZIP(remoteThemesFile, remoteThemesDir))
     {
-        VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error extracting %1"
-                "remote themes info package.").arg(remoteThemesFile));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("HouseKeeper: Error extracting %1"
+                    "remote themes info package.").arg(remoteThemesFile));
         QFile::remove(remoteThemesFile);
         return;
     }
+}
+
+void HouseKeeper::UpdateRecordedArtwork(void)
+{
+    QString command = GetInstallPrefix() + "/bin/mythmetadatalookup";
+    QStringList args;
+    args << "--refresh-all-artwork";
+    args << logPropagateArgs;
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Performing Artwork Refresh: %1 %2")
+        .arg(command).arg(args.join(" ")));
+
+    MythSystem artupd(command, args, kMSRunShell | kMSAutoCleanup);
+
+    artupd.Run();
+    artupd.Wait();
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Artwork Refresh Complete"));
 }
 
 void HouseKeeper::RunStartupTasks(void)

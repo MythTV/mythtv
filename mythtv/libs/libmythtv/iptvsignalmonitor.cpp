@@ -10,11 +10,10 @@
 #include "mythlogging.h"
 
 #undef DBG_SM
-#define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
+#define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
     QString("IPTVSM(%1)::%2: %3").arg(channel->GetDevice()).arg(FUNC).arg(MSG))
 
 #define LOC QString("IPTVSM(%1): ").arg(channel->GetDevice())
-#define LOC_ERR QString("IPTVSM(%1), Error: ").arg(channel->GetDevice())
 
 void IPTVTableMonitorThread::run(void)
 {

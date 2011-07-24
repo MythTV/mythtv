@@ -32,7 +32,6 @@ extern "C" {
 #endif
 
 #define LOC QString("NVD: ")
-#define LOC_ERR QString("NVD Error: ")
 
 NuppelDecoder::NuppelDecoder(MythPlayer *parent,
                              const ProgramInfo &pginfo)
@@ -79,7 +78,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
 
     if (lzo_init() != LZO_E_OK)
     {
-        VERBOSE(VB_IMPORTANT, "NuppelDecoder: lzo_init() failed, aborting");
+        LOG(VB_GENERAL, LOG_ERR, "NuppelDecoder: lzo_init() failed, aborting");
         errored = true;
         return;
     }
@@ -195,7 +194,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (!ReadFileheader(&fileheader))
     {
-        VERBOSE(VB_IMPORTANT, QString( "Error reading file: %1").arg( ringBuffer->GetFilename()));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error reading file: %1").arg(ringBuffer->GetFilename()));
         return -1;
     }
 
@@ -210,13 +210,14 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         if (!ReadFileheader(&fileheader))
         {
-            VERBOSE(VB_IMPORTANT, QString( "Error reading file: %1").arg( ringBuffer->GetFilename()));
+            LOG(VB_GENERAL, LOG_ERR, QString("Error reading file: %1")
+                    .arg(ringBuffer->GetFilename()));
             return -1;
         }
 
         if (startpos > 20000)
         {
-            VERBOSE(VB_IMPORTANT, QString("Bad file: '%1'")
+            LOG(VB_GENERAL, LOG_ERR, QString("Bad file: '%1'")
                     .arg(ringBuffer->GetFilename()));
             return -1;
         }
@@ -238,12 +239,12 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (!ReadFrameheader(&frameheader))
     {
-        VERBOSE(VB_IMPORTANT, "File not big enough for a header");
+        LOG(VB_GENERAL, LOG_ERR, "File not big enough for a header");
         return -1;
     }
     if (frameheader.frametype != 'D')
     {
-        VERBOSE(VB_IMPORTANT,"Illegal file format");
+        LOG(VB_GENERAL, LOG_ERR, "Illegal file format");
         return -1;
     }
 
@@ -258,7 +259,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             if (frameheader.packetlength != ringBuffer->Read(ffmpeg_extradata,
                                                      frameheader.packetlength))
             {
-                VERBOSE(VB_IMPORTANT,"File not big enough for first frame data");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "File not big enough for first frame data");
                 delete [] ffmpeg_extradata;
                 ffmpeg_extradata = NULL;
                 delete [] space;
@@ -271,7 +273,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         if (frameheader.packetlength != ringBuffer->Read(space,
                                                      frameheader.packetlength))
         {
-            VERBOSE(VB_IMPORTANT,"File not big enough for first frame data");
+            LOG(VB_GENERAL, LOG_ERR,
+                "File not big enough for first frame data");
             delete [] space;
             return -1;
         }
@@ -280,7 +283,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if ((video_height & 1) == 1)
     {
         video_height--;
-        VERBOSE(VB_IMPORTANT,QString("Incompatible video height, reducing to %1")
+        LOG(VB_GENERAL, LOG_ERR, 
+            QString("Incompatible video height, reducing to %1")
                 .arg( video_height));
     }
 
@@ -292,7 +296,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     {
         if (frameheader.packetlength != EXTENDEDSIZE)
         {
-            VERBOSE(VB_IMPORTANT,"Corrupt file.  Bad extended frame.");
+            LOG(VB_GENERAL, LOG_ERR, "Corrupt file.  Bad extended frame.");
         }
         else
         {
@@ -330,8 +334,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         int seekret = ringBuffer->Seek(extradata.seektable_offset, SEEK_SET);
         if (seekret == -1)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("NuppelDecoder::OpenFile(): seek error (%1)")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("NuppelDecoder::OpenFile(): seek error (%1)")
                     .arg(strerror(errno)));
         }
 
@@ -339,7 +343,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         if (seek_frameheader.frametype != 'Q')
         {
-            VERBOSE(VB_IMPORTANT, QString( "Invalid seektable (frametype %1)")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Invalid seektable (frametype %1)")
                     .arg((int)seek_frameheader.frametype));
         }
         else
@@ -389,7 +394,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 delete [] seekbuf;
             }
             else
-                VERBOSE(VB_IMPORTANT, "0 length seek table");
+                LOG(VB_GENERAL, LOG_ERR, "0 length seek table");
         }
 
         ringBuffer->Seek(currentpos, SEEK_SET);
@@ -405,8 +410,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                                        SEEK_SET);
         if (kfa_ret == -1)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("NuppelDecoder::OpenFile(): keyframeadjust (%1)")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("NuppelDecoder::OpenFile(): keyframeadjust (%1)")
                     .arg(strerror(errno)));
         }
 
@@ -414,7 +419,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         if (kfa_frameheader.frametype != 'K')
         {
-            VERBOSE(VB_IMPORTANT, QString( "Invalid key frame adjust table (frametype %1)")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Invalid key frame adjust table (frametype %1)")
                     .arg((int)kfa_frameheader.frametype));
         }
         else
@@ -468,7 +474,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 delete [] kfa_buf;
             }
             else
-                VERBOSE(VB_IMPORTANT,"0 length key frame adjust table");
+                LOG(VB_GENERAL, LOG_ERR, "0 length key frame adjust table");
         }
 
         ringBuffer->Seek(currentpos, SEEK_SET);
@@ -566,7 +572,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                frameheader.frametype != 'R' && frameheader.frametype != 'X')
         {
             if (!framesearch)
-                VERBOSE(VB_IMPORTANT, "Searching for frame header.");
+                LOG(VB_GENERAL, LOG_INFO, "Searching for frame header.");
 
             framesearch = true;
 
@@ -675,9 +681,11 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     if (!mpa_vidcodec)
     {
         if (usingextradata)
-            VERBOSE(VB_IMPORTANT, QString("couldn't find video codec (%1)").arg(extradata.video_fourcc));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("couldn't find video codec (%1)")
+                    .arg(extradata.video_fourcc));
         else
-            VERBOSE(VB_IMPORTANT, "couldn't find video codec");
+            LOG(VB_GENERAL, LOG_ERR, "couldn't find video codec");
         return false;
     }
 
@@ -714,7 +722,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     QMutexLocker locker(avcodeclock);
     if (avcodec_open(mpa_vidctx, mpa_vidcodec) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Couldn't find lavc video codec");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't find lavc video codec");
         return false;
     }
 
@@ -756,10 +764,10 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
     if (!mpa_audcodec)
     {
         if (usingextradata)
-            VERBOSE(VB_IMPORTANT, QString("couldn't find audio codec (%1)")
+            LOG(VB_GENERAL, LOG_ERR, QString("couldn't find audio codec (%1)")
                     .arg(extradata.audio_fourcc));
         else
-            VERBOSE(VB_IMPORTANT, "couldn't find audio codec");
+            LOG(VB_GENERAL, LOG_ERR, "couldn't find audio codec");
         return false;
     }
 
@@ -774,7 +782,7 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
     QMutexLocker locker(avcodeclock);
     if (avcodec_open(mpa_audctx, mpa_audcodec) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Couldn't find lavc audio codec");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't find lavc audio codec");
         return false;
     }
 
@@ -864,7 +872,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
                               NULL);
         if (r != LZO_E_OK)
         {
-            VERBOSE(VB_IMPORTANT, "minilzo: can't decompress illegal data");
+            LOG(VB_GENERAL, LOG_ERR, "minilzo: can't decompress illegal data");
         }
     }
 
@@ -908,8 +916,8 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             directframe = NULL;
             if (ret < 0)
             {
-                VERBOSE(VB_PLAYBACK, LOC_ERR +
-                        QString("avcodec_decode_video returned: %1").arg(ret));
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    QString("avcodec_decode_video returned: %1").arg(ret));
                 return false;
             }
             else if (!gotpicture)
@@ -1072,7 +1080,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
         while (!isValidFrametype(frameheader.frametype))
         {
             if (!framesearch)
-                VERBOSE(VB_IMPORTANT, "Searching for frame header.");
+                LOG(VB_GENERAL, LOG_INFO, "Searching for frame header.");
 
             framesearch = true;
 
@@ -1149,7 +1157,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
         {
             if (frameheader.packetlength > 10485760) // arbitrary 10MB limit
             {
-                VERBOSE(VB_IMPORTANT, QString("Broken packet: %1 %2")
+                LOG(VB_GENERAL, LOG_ERR, QString("Broken packet: %1 %2")
                         .arg(frameheader.frametype)
                         .arg(frameheader.packetlength));
                 SetEof(true);
@@ -1235,7 +1243,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                         InitAVCodecAudio(CODEC_ID_AC3);
                     else
                     {
-                        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("GetFrame: "
+                        LOG(VB_GENERAL, LOG_ERR, LOC + QString("GetFrame: "
                                 "Unknown audio comptype of '%1', skipping")
                                 .arg(frameheader.comptype));
                         return false;
@@ -1280,7 +1288,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                     }
                 }
 #endif
-                VERBOSE(VB_PLAYBACK+VB_EXTRA, QString("A audio timecode %1")
+                LOG(VB_PLAYBACK, LOG_DEBUG, QString("A audio timecode %1")
                                               .arg(frameheader.timecode));
                 m_audio->AddAudioData((char *)strm, frameheader.packetlength,
                                       frameheader.timecode, 0);
@@ -1349,8 +1357,8 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
                               bool doFlush, bool discardFrames)
 {
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("SeekReset(%1, %2, %3 flush, %4 discard)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("SeekReset(%1, %2, %3 flush, %4 discard)")
             .arg(newKey).arg(skipFrames)
             .arg((doFlush) ? "do" : "don't")
             .arg((discardFrames) ? "do" : "don't"));

@@ -28,7 +28,6 @@
 #include "tspacket.h"
 
 #define LOC QString("FbFeedFile: ")
-#define LOC_ERR QString("FbFeedFile, Error: ")
 
 
 IPTVFeederFile::IPTVFeederFile() :
@@ -49,20 +48,20 @@ bool IPTVFeederFile::IsFile(const QString &url)
 
 bool IPTVFeederFile::Open(const QString &url)
 {
-    VERBOSE(VB_RECORD, LOC + QString("Open(%1) -- begin").arg(url));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Open(%1) -- begin").arg(url));
 
     QMutexLocker locker(&_lock);
 
     if (_source)
     {
-        VERBOSE(VB_RECORD, LOC + "Open() -- end 1");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- end 1");
         return true;
     }
 
     QUrl parse(url);
     if (parse.path().isEmpty() || (parse.scheme().toLower() != "file"))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Open() -- end 2");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Open() -- end 2");
         return false;
     }
 
@@ -77,7 +76,7 @@ bool IPTVFeederFile::Open(const QString &url)
         *_live_env, path.constData());
     if (!_source)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to create Live File Source.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Live File Source.");
         FreeEnv();
         return false;
     }
@@ -85,8 +84,7 @@ bool IPTVFeederFile::Open(const QString &url)
     _sink = IPTVMediaSink::CreateNew(*_live_env, TSPacket::kSize * 128*1024);
     if (!_sink)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("IPTV # Failed to create sink: %1")
+        LOG(VB_GENERAL, LOG_ERR, QString("IPTV # Failed to create sink: %1")
                 .arg(_live_env->getResultMsg()));
 
         Medium::close(_source);
@@ -101,14 +99,14 @@ bool IPTVFeederFile::Open(const QString &url)
     for (; it != _listeners.end(); ++it)
         _sink->AddListener(*it);
 
-    VERBOSE(VB_RECORD, LOC + "Open() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- end");
 
     return true;
 }
 
 void IPTVFeederFile::Close(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Close() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
     Stop();
 
     QMutexLocker locker(&_lock);
@@ -127,16 +125,16 @@ void IPTVFeederFile::Close(void)
 
     FreeEnv();
 
-    VERBOSE(VB_RECORD, LOC + "Close() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
 void IPTVFeederFile::AddListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- begin")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- begin")
                        .arg((uint64_t)item,0,16));
     if (!item)
     {
-        VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end")
                            .arg((uint64_t)item,0,16));
         return;
     }
@@ -151,13 +149,13 @@ void IPTVFeederFile::AddListener(TSDataListener *item)
     if (_sink)
         _sink->AddListener(item);
 
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end")
                        .arg((uint64_t)item,0,16));
 }
 
 void IPTVFeederFile::RemoveListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- begin")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- begin")
                        .arg((uint64_t)item,0,16));
     QMutexLocker locker(&_lock);
     vector<TSDataListener*>::iterator it =
@@ -165,7 +163,7 @@ void IPTVFeederFile::RemoveListener(TSDataListener *item)
 
     if (it == _listeners.end())
     {
-        VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 1")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end 1")
                            .arg((uint64_t)item,0,16));
         return;
     }
@@ -177,6 +175,6 @@ void IPTVFeederFile::RemoveListener(TSDataListener *item)
     if (_sink)
         _sink->RemoveListener(item);
 
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 2")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end 2")
                        .arg((uint64_t)item,0,16));
 }

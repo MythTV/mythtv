@@ -33,10 +33,6 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool showTV)
              : ScheduleCommon(parent, "ViewScheduled")
 {
-    m_shortdateFormat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-    m_dateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
-    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-    m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
     m_showAll = !gCoreContext->GetNumSetting("ViewSchedShowLevel", 0);
 
     m_player = player;
@@ -81,7 +77,7 @@ bool ViewScheduled::Create()
 
     if (!m_schedulesList)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
@@ -90,7 +86,8 @@ bool ViewScheduled::Create()
     connect(m_schedulesList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(selected(MythUIButtonListItem*)));
 
-    m_schedulesList->SetLCDTitles(tr("Scheduled Recordings"), "shortstarttimedate|channel|titlesubtitle|card");
+    m_schedulesList->SetLCDTitles(tr("Scheduled Recordings"),
+                              "shortstarttimedate|channel|titlesubtitle|card");
     m_schedulesList->SetSearchFields("titlesubtitle");
 
     if (m_groupList)
@@ -153,7 +150,8 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event,
+                                                     actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -202,7 +200,8 @@ void ViewScheduled::ShowMenu(void)
     QString label = tr("Options");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
+                                                 "menuPopup");
 
     if (menuPopup->Create())
     {
@@ -317,7 +316,7 @@ void ViewScheduled::LoadList(bool useExistingData)
             if (dateit.key().isNull())
                 label = tr("All");
             else
-                label = dateit.key().toString(m_dateFormat);
+                label = MythDateToString(dateit.key(), kDateFull | kSimplify);
 
             new MythUIButtonListItem(m_groupList, label,
                                      qVariantFromValue(dateit.key()));
@@ -470,16 +469,11 @@ void ViewScheduled::FillList()
                 }
             }
 
-            // figure out caption based on m_conflictDate
-            QString cstring = tr("Time Conflict");
-            QDate now = QDate::currentDate();
-            int daysToConflict = now.daysTo(m_conflictDate);
-
-            if (daysToConflict == 0)
-                cstring = tr("Conflict Today");
-            else if (daysToConflict > 0)
-                cstring = QString(tr("Conflict %1"))
-                                .arg(m_conflictDate.toString(m_dateFormat));
+            // TODO: This can be templated instead of hardcoding
+            //       Conflict/No Conflict
+            QString cstring = QString(tr("Conflict %1"))
+                                .arg(MythDateToString(m_conflictDate,
+                                                        kDateFull | kSimplify));
 
             statusText->SetText(cstring);
         }
@@ -706,13 +700,15 @@ void ViewScheduled::customEvent(QEvent *event)
 
         if (resultid == "deleterule")
         {
-            RecordingRule *record = qVariantValue<RecordingRule *>(dce->GetData());
+            RecordingRule *record =
+                qVariantValue<RecordingRule *>(dce->GetData());
             if (record)
             {
                 if (buttonnum > 0)
                 {
                     if (!record->Delete())
-                        VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
+                        LOG(VB_GENERAL, LOG_ERR,
+                            "Failed to delete recording rule");
                 }
                 delete record;
             }

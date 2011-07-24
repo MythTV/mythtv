@@ -85,29 +85,27 @@ namespace
     };
 }
 
-int preview_helper(const QString &_chanid, const QString &starttime,
+int preview_helper(uint chanid, QDateTime starttime,
                    long long previewFrameNumber, long long previewSeconds,
                    const QSize &previewSize,
                    const QString &infile, const QString &outfile)
 {
     // Lower scheduling priority, to avoid problems with recordings.
     if (setpriority(PRIO_PROCESS, 0, 9))
-        VERBOSE(VB_GENERAL, "Setting priority failed." + ENO);
+        LOG(VB_GENERAL, LOG_ERR, "Setting priority failed." + ENO);
 
-    uint chanid = _chanid.toUInt();
-    QDateTime recstartts = myth_dt_from_string(starttime);
-    if (!chanid || !recstartts.isValid())
-        ProgramInfo::ExtractKeyFromPathname(infile, chanid, recstartts);
+    if (!chanid || !starttime.isValid())
+        ProgramInfo::QueryKeyFromPathname(infile, chanid, starttime);
 
     ProgramInfo *pginfo = NULL;
-    if (chanid && recstartts.isValid())
+    if (chanid && starttime.isValid())
     {
-        pginfo = new ProgramInfo(chanid, recstartts);
+        pginfo = new ProgramInfo(chanid, starttime);
         if (!pginfo->GetChanID())
         {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "Cannot locate recording made on '%1' at '%2'")
-                    .arg(chanid).arg(starttime));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Cannot locate recording made on '%1' at '%2'")
+                    .arg(chanid).arg(starttime.toString("yyyyMMddhhmmss")));
             delete pginfo;
             return GENERIC_EXIT_NOT_OK;
         }
@@ -117,18 +115,18 @@ int preview_helper(const QString &_chanid, const QString &starttime,
     {
         if (!QFileInfo(infile).isReadable())
         {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "Cannot read this file '%1'").arg(infile));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Cannot read this file '%1'").arg(infile));
             return GENERIC_EXIT_NOT_OK;
         }
         pginfo = new ProgramInfo(
             infile, ""/*plot*/, ""/*title*/, ""/*subtitle*/, ""/*director*/,
-            0/*season*/, 0/*episode*/, 120/*length_in_minutes*/,
+            0/*season*/, 0/*episode*/, ""/*inetref*/, 120/*length_in_minutes*/,
             1895/*year*/);
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Cannot locate recording to preview");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot locate recording to preview");
         return GENERIC_EXIT_NOT_OK;
     }
 
@@ -153,8 +151,6 @@ int preview_helper(const QString &_chanid, const QString &starttime,
 
 int main(int argc, char **argv)
 {
-    int quiet = 0;
-
     MythPreviewGeneratorCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -183,8 +179,11 @@ int main(int argc, char **argv)
     // such as socket notifications :[
     QApplication a(argc, argv);
 #endif
-
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHPREVIEWGEN);
+
+    int retval;
+    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+        return retval;
 
     if ((!cmdline.toBool("chanid") || !cmdline.toBool("starttime")) &&
         !cmdline.toBool("inputfile"))
@@ -195,22 +194,6 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
-
     ///////////////////////////////////////////////////////////////////////
 
     // Don't listen to console input
@@ -218,31 +201,20 @@ int main(int argc, char **argv)
 
     CleanupGuard callCleanup(cleanup);
 
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
-
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
-
-    {
-        QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg(MYTH_APPNAME_MYTHPREVIEWGEN).arg(MYTH_SOURCE_PATH)
-            .arg(MYTH_SOURCE_VERSION);
-        VERBOSE(VB_IMPORTANT, versionStr);
-    }
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Unable to ignore SIGPIPE");
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
     gCoreContext->SetBackend(false); // TODO Required?
 
     int ret = preview_helper(
-        cmdline.toString("chanid"), cmdline.toString("starttime"),
+        cmdline.toUInt("chanid"), cmdline.toDateTime("starttime"),
         cmdline.toLongLong("frame"), cmdline.toLongLong("seconds"),
         cmdline.toSize("size"),
         cmdline.toString("inputfile"), cmdline.toString("outputfile"));

@@ -311,8 +311,9 @@ class FileAssocDialogPrivate
 
         if (!m_fileAssociations.size())
         {
-            VERBOSE(VB_IMPORTANT, QString("%1: Couldn't get any filetypes from "
-                                          "your database.").arg(__FILE__));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("%1: Couldn't get any filetypes from your database.")
+                    .arg(__FILE__));
         }
     }
 
@@ -354,7 +355,7 @@ bool FileAssocDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'file_associations'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'file_associations'");
         return false;
     }
 

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <QString>
+#include <QDate>
 
 #include "parentalcontrols.h"
 #include "mythmetaexp.h"
@@ -19,18 +20,6 @@ const QString VIDEO_SUBTITLE_DEFAULT = "";
 struct SortData;
 
 typedef QHash<QString,QString> MetadataMap;
-
-#ifdef _MSC_VER
-// --------------------------------------------------------------------------
-// -=>NOTE: MSVC requires any referenced class to have an definition.  
-//          VideoList only exists in the MythVideo plugin :(
-//
-//          This is a temp HACK and should be removed once
-//          mythvideo is finished being merged into mythtv proper.
-// --------------------------------------------------------------------------
-class VideoList {};
-
-#endif
 
 class META_PUBLIC VideoMetadata
 {
@@ -235,7 +224,7 @@ class META_PUBLIC VideoMetadata
     bool FillDataFromFilename(const VideoMetadataListManager &cache);
 
     // If you aren't VideoList don't call this
-    bool DeleteFile(class VideoList &dummy);
+    bool DeleteFile();
 
     /// Resets to default metadata
     void Reset();
@@ -245,6 +234,7 @@ class META_PUBLIC VideoMetadata
   private:
     class VideoMetadataImp *m_imp;
 };
+Q_DECLARE_METATYPE(VideoMetadata*)
 
 META_PUBLIC void ClearMap(MetadataMap &metadataMap);
 

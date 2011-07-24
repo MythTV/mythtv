@@ -4,7 +4,7 @@
 
     <window name="watchrecordings">
 
-        <imagetype name="backdrop" from="basebackdrop" />
+<!--         <imagetype name="fanart" from="basebackdrop" /> -->
         <imagetype name="topbar" from="basetopbar" />
 
         <textarea name="heading" from="baseheading">

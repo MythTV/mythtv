@@ -48,12 +48,14 @@
 #endif
 
 VERBOSE_PREAMBLE
-VERBOSE_MAP(VB_ALL,       0xffffffff, false, 
+VERBOSE_MAP(VB_ALL,       0xfffffffffLLU, false,
             "ALL available debug output")
-VERBOSE_MAP(VB_MOST,      0x3ffeffff, false,
+VERBOSE_MAP(VB_MOST,      0xf3ffeffffLLU, false,
             "Most debug (nodatabase,notimestamp,noextra)")
+#if 0
 VERBOSE_MAP(VB_IMPORTANT, 0x00000001, false,
             "Errors or other very important messages")
+#endif
 VERBOSE_MAP(VB_GENERAL,   0x00000002, true,
             "General info")
 VERBOSE_MAP(VB_RECORD,    0x00000004, true,
@@ -108,10 +110,20 @@ VERBOSE_MAP(VB_GUI,       0x04000000, true,
             "GUI related messages")
 VERBOSE_MAP(VB_SYSTEM,    0x08000000, true,
             "External executable related messages")
+#if 0
 VERBOSE_MAP(VB_EXTRA,     0x40000000, true,
             "More detailed messages in selected levels")
+#endif
 VERBOSE_MAP(VB_TIMESTAMP, 0x80000000, true,
             "Conditional data driven messages")
+VERBOSE_MAP(VB_PROCESS,   0x100000000LLU, true,
+            "MPEG2Fix processing messages")
+VERBOSE_MAP(VB_FRAME,     0x200000000LLU, true,
+            "MPEG2Fix frame messages")
+VERBOSE_MAP(VB_RPLXQUEUE, 0x400000000LLU, true,
+            "MPEG2Fix Replex Queue messages")
+VERBOSE_MAP(VB_DECODE,    0x800000000LLU, true,
+            "MPEG2Fix Decode messages")
 VERBOSE_MAP(VB_NONE,      0x00000000, false,
             "NO debug output")
 VERBOSE_POSTAMBLE

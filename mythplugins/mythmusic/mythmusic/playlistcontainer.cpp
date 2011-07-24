@@ -175,7 +175,8 @@ Playlist *PlaylistContainer::getPlaylist(int id)
             return *it;
     }
 
-    VERBOSE(VB_IMPORTANT, "getPlaylistName() called with unknown index number");
+    LOG(VB_GENERAL, LOG_ERR,
+        "getPlaylistName() called with unknown index number");
     return NULL;
 }
 
@@ -304,9 +305,8 @@ void PlaylistContainer::popBackPlaylist()
     Playlist *destination = getPlaylist(pending_writeback_index);
     if (!destination)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "popBackPlaylist() " +
-                QString("Unknown playlist: %1")
-                .arg(pending_writeback_index));
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "popBackPlaylist() " +
+            QString("Unknown playlist: %1") .arg(pending_writeback_index));
         return;
     }
     destination->removeAllTracks();
@@ -338,8 +338,8 @@ void PlaylistContainer::copyToActive(int index)
     Playlist *copy_from = getPlaylist(index);
     if (!copy_from)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "copyToActive() " +
-                QString("Unknown playlist: %1").arg(index));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "copyToActive() " +
+            QString("Unknown playlist: %1").arg(index));
         return;
     }
     copy_from->copyTracks(active_playlist, true);
@@ -370,8 +370,8 @@ void PlaylistContainer::deletePlaylist(int kill_me)
     Playlist *list_to_kill = getPlaylist(kill_me);
     if (!list_to_kill)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "deletePlaylist() " +
-                QString("Unknown playlist: %1").arg(kill_me));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "deletePlaylist() " +
+            QString("Unknown playlist: %1").arg(kill_me));
         return;
     }
     //  First, we need to take out any **track** on any other
@@ -420,8 +420,8 @@ QString PlaylistContainer::getPlaylistName(int index, bool &reference)
         }
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR +
-            "getPlaylistName() called with unknown index number");
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        "getPlaylistName() called with unknown index number");
 
     reference = true;
     return QObject::tr("Something is Wrong");

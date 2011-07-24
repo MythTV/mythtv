@@ -90,7 +90,6 @@ QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 }
 
 #define LOC     (ChannelScanSM::loc(this) + ": ")
-#define LOC_ERR (ChannelScanSM::loc(this) + ", Error: ")
 
 #define kDecryptionTimeout 4250
 
@@ -186,7 +185,7 @@ ChannelScanSM::ChannelScanSM(
     DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
     if (dtvSigMon)
     {
-        VERBOSE(VB_CHANSCAN, LOC + "Connecting up DTVSignalMonitor");
+        LOG(VB_CHANSCAN, LOG_INFO, LOC + "Connecting up DTVSignalMonitor");
         ScanStreamData *data = new ScanStreamData();
 
         dtvSigMon->SetStreamData(data);
@@ -211,7 +210,7 @@ ChannelScanSM::ChannelScanSM(
 ChannelScanSM::~ChannelScanSM(void)
 {
     StopScanner();
-    VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSMner Stopped");
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "ChannelScanSM Stopped");
 
     ScanStreamData *sd = NULL;
     if (GetDTVSignalMonitor())
@@ -320,7 +319,7 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
 
     if (!multiplexes.size())
     {
-        VERBOSE(VB_CHANSCAN, LOC + "Unable to find any transports for " +
+        LOG(VB_CHANSCAN, LOG_ERR, LOC + "Unable to find any transports for " +
                 QString("sourceid %1").arg(sourceid));
 
         return false;
@@ -339,8 +338,9 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
     }
     else
     {
-        VERBOSE(VB_CHANSCAN, LOC + "Unable to find add any transports for " +
-                QString("sourceid %1").arg(sourceid));
+        LOG(VB_CHANSCAN, LOG_ERR, LOC +
+            "Unable to find add any transports for " +
+            QString("sourceid %1").arg(sourceid));
 
         return false;
     }
@@ -351,8 +351,8 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
 
 void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
 {
-    VERBOSE(VB_CHANSCAN, LOC +
-            QString("Got a Program Association Table for %1")
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Got a Program Association Table for %1")
             .arg((*current).FriendlyName) + "\n" + pat->toString());
 
     // Add pmts to list, so we can do MPEG scan properly.
@@ -366,8 +366,7 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
 
 void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
 {
-    VERBOSE(VB_CHANSCAN, LOC +
-            QString("Got a Program Map Table for %1")
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Got a Program Map Table for %1")
             .arg((*current).FriendlyName) + "\n" + pmt->toString());
 
     if (!currentTestingDecryption && pmt->IsEncrypted(GetDTVChannel()->GetSIStandard()))
@@ -376,7 +375,8 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
 
 void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
 {
-    VERBOSE(VB_CHANSCAN, LOC + QString("Got a Virtual Channel Table for %1")
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Got a Virtual Channel Table for %1")
             .arg((*current).FriendlyName) + "\n" + vct->toString());
 
     for (uint i = 0; !currentTestingDecryption && i < vct->ChannelCount(); i++)
@@ -392,7 +392,7 @@ void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
 
 void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
 {
-    VERBOSE(VB_CHANSCAN, LOC + QString("Got the Master Guide for %1")
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Got the Master Guide for %1")
             .arg((*current).FriendlyName) + "\n" + mgt->toString());
 
     UpdateChannelInfo(true);
@@ -400,21 +400,25 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
 
 void ChannelScanSM::HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
 {
-    VERBOSE(VB_CHANSCAN, LOC +
-            QString("Got a Service Description Table for %1")
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Got a Service Description Table for %1")
             .arg((*current).FriendlyName) + "\n" + sdt->toString());
 
     // If this is Astra 28.2 add start listening for Freesat BAT and SDTo
-    if (!setOtherTables && (sdt->OriginalNetworkID() == 2 || sdt->OriginalNetworkID() == 59))
+    if (!setOtherTables && (sdt->OriginalNetworkID() == 2 ||
+        sdt->OriginalNetworkID() == 59))
     {
-        GetDTVSignalMonitor()->GetScanStreamData()->SetFreesatAdditionalSI(true);
+        GetDTVSignalMonitor()->GetScanStreamData()->
+                               SetFreesatAdditionalSI(true);
         setOtherTables = true;
-        otherTableTimeout = 10000; // The whole BAT & SDTo group comes round in 10s
+        // The whole BAT & SDTo group comes round in 10s
+        otherTableTimeout = 10000; 
         // Delay processing the SDT until we've seen BATs and SDTos
         otherTableTime = timer.elapsed() + otherTableTimeout;
 
-        VERBOSE(VB_CHANSCAN, LOC + QString("SDT has OriginalNetworkID %1, look for "
-                                            "additional Freesat SI").arg(sdt->OriginalNetworkID()));
+        LOG(VB_CHANSCAN, LOG_INFO, LOC +
+            QString("SDT has OriginalNetworkID %1, look for "
+                    "additional Freesat SI").arg(sdt->OriginalNetworkID()));
     }
 
     if ((uint)timer.elapsed() < otherTableTime)
@@ -439,8 +443,8 @@ void ChannelScanSM::HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
 
 void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
 {
-    VERBOSE(VB_CHANSCAN, LOC +
-            QString("Got a Network Information Table for %1")
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Got a Network Information Table for %1")
             .arg((*current).FriendlyName) + "\n" + nit->toString());
 
     UpdateChannelInfo(true);
@@ -448,8 +452,8 @@ void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
 
 void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
 {
-    VERBOSE(VB_CHANSCAN, LOC + "Got a Bouquet Association Table\n" +
-            bat->toString());
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Got a Bouquet Association Table\n" +
+        bat->toString());
 
     otherTableTime = timer.elapsed() + otherTableTimeout;
 
@@ -473,13 +477,13 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
 
             for (uint j = 0; j < services.ServiceCount(); j++)
             {
-               // If the default authority is given in the SDT this
-               // overrides any definition in the BAT (or in the NIT)
-                VERBOSE(VB_CHANSCAN, LOC + QString("found default authority(BAT) "
-                                                    "for service %1 %2 %3")
+                // If the default authority is given in the SDT this
+                // overrides any definition in the BAT (or in the NIT)
+                LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                    QString("found default authority(BAT) for service %1 %2 %3")
                         .arg(netid).arg(tsid).arg(services.ServiceID(j)));
-               uint64_t index =
-                   ((uint64_t)netid << 32) | (tsid << 16) | services.ServiceID(j);
+               uint64_t index = ((uint64_t)netid << 32) | (tsid << 16) |
+                                 services.ServiceID(j);
                if (! defAuthorities.contains(index))
                    defAuthorities[index] = authority.DefaultAuthority();
             }
@@ -489,8 +493,8 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
 
 void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
 {
-    VERBOSE(VB_CHANSCAN, LOC + "Got a Service Description Table (other)\n" +
-            sdt->toString());
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        "Got a Service Description Table (other)\n" + sdt->toString());
 
     otherTableTime = timer.elapsed() + otherTableTimeout;
 
@@ -508,8 +512,8 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
         if (def_auth)
         {
             DefaultAuthorityDescriptor authority(def_auth);
-            VERBOSE(VB_CHANSCAN, LOC + QString("found default authority(SDTo) "
-                                                "for service %1 %2 %3")
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("found default authority(SDTo) for service %1 %2 %3")
                     .arg(netid).arg(tsid).arg(serviceId));
             defAuthorities[((uint64_t)netid << 32) | (tsid << 16) | serviceId] =
                 authority.DefaultAuthority();
@@ -531,7 +535,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
 {
     if (!currentInfo || currentInfo->pmts.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Can't monitor decryption -- no pmts");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Can't monitor decryption -- no pmts");
         currentTestingDecryption = false;
         return false;
     }
@@ -541,7 +545,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
         uint pnum = 0;
         QMap<uint, uint>::const_iterator it = currentEncryptionStatus.begin();
 #if 0
-        VERBOSE(VB_GENERAL, QString("%1/%2 checked")
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("%1/%2 checked")
             .arg(currentEncryptionStatusChecked.size())
             .arg(currentEncryptionStatus.size()));
 #endif
@@ -586,7 +590,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
                 .arg(cur_chan).arg(pnum);
 
             scan_monitor->ScanAppendTextToLog(msg_tr);
-            VERBOSE(VB_CHANSCAN, msg);
+            LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
 
 #ifdef USING_DVB
             if (GetDVBChannel())
@@ -600,8 +604,8 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
             return true;
         }
 
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("Can't monitor decryption of program %1 -- no pmt")
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Can't monitor decryption of program %1 -- no pmt")
                 .arg(pnum));
 
     } while (true);
@@ -681,8 +685,8 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     break;
                 }
                 default:
-                    VERBOSE(VB_CHANSCAN, LOC +
-                            "unknown delivery system descriptor");
+                    LOG(VB_CHANSCAN, LOG_ERR, LOC +
+                        "unknown delivery system descriptor");
                     continue;
             }
 
@@ -816,13 +820,13 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         }
         if (transport_tune_complete)
         {
-            VERBOSE(VB_CHANSCAN,
-                    QString("transport_tune_complete: "
-                            "\n\t\t\tcurrentInfo->pmts.empty():     %1"
-                            "\n\t\t\tsd->HasCachedAnyNIT():  %2"
-                            "\n\t\t\tsd->HasCachedAnySDTs(): %3"
-                            "\n\t\t\tcurrentInfo->nits.empty():     %4"
-                            "\n\t\t\tcurrentInfo->sdts.empty():     %5")
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("transport_tune_complete: "
+                        "\n\t\t\tcurrentInfo->pmts.empty():     %1"
+                        "\n\t\t\tsd->HasCachedAnyNIT():         %2"
+                        "\n\t\t\tsd->HasCachedAnySDTs():        %3"
+                        "\n\t\t\tcurrentInfo->nits.empty():     %4"
+                        "\n\t\t\tcurrentInfo->sdts.empty():     %5")
                     .arg(currentInfo->pmts.empty())
                     .arg(sd->HasCachedAnyNIT())
                     .arg(sd->HasCachedAnySDTs())
@@ -833,8 +837,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     transport_tune_complete |= !wait_until_complete;
     if (transport_tune_complete)
     {
-        VERBOSE(VB_CHANSCAN,
-                QString("transport_tune_complete: wait_until_complete %1")
+        LOG(VB_CHANSCAN, LOG_INFO, LOC +
+            QString("transport_tune_complete: wait_until_complete %1")
                 .arg(wait_until_complete));
     }
 
@@ -868,7 +872,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                 msg = msg + " -- Unknown decryption status";
 
             scan_monitor->ScanAppendTextToLog(msg_tr);
-            VERBOSE(VB_CHANSCAN, msg);
+            LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
         }
     }
 
@@ -898,7 +902,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
         if (currentInfo && !currentInfo->IsEmpty())
         {
-            VERBOSE(VB_CHANSCAN, QString("Adding %1, offset %2 to channelList.")
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("Adding %1, offset %2 to channelList.")
                     .arg((*current).tuning.toString()).arg(current.offset()));
             channelList << ChannelListItem(current, currentInfo);
             currentInfo = NULL;
@@ -938,7 +943,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         }
 
         scan_monitor->ScanAppendTextToLog(msg_tr);
-        VERBOSE(VB_CHANSCAN, LOC + msg);
+        LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
 
         currentEncryptionStatus.clear();
         currentEncryptionStatusChecked.clear();
@@ -1066,8 +1071,8 @@ static void update_info(ChannelInsertInfo &info,
     if (def_auth)
     {
         DefaultAuthorityDescriptor authority(def_auth);
-        VERBOSE(VB_CHANSCAN, QString("found default authority(SDT) "
-                                            "for service %1 %2 %3")
+        LOG(VB_CHANSCAN, LOG_INFO, QString("ChannelScanSM: found default "
+                                          "authority(SDT) for service %1 %2 %3")
                 .arg(info.orig_netid).arg(info.sdt_tsid).arg(info.service_id));
         info.default_authority = authority.DefaultAuthority();
     }
@@ -1442,7 +1447,7 @@ void ChannelScanSM::StartScanner(void)
  */
 void ChannelScanSM::RunScanner(void)
 {
-    VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::RunScanner -- begin");
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "RunScanner -- begin");
 
     while (!threadExit)
     {
@@ -1452,7 +1457,7 @@ void ChannelScanSM::RunScanner(void)
         usleep(10 * 1000);
     }
 
-    VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::RunScanner -- end");
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "RunScanner -- end");
 }
 
 // See if we have timed out
@@ -1580,8 +1585,8 @@ void ChannelScanSM::HandleActiveScan(void)
             {
                 QString name = QString("TransportID %1").arg(it.key() & 0xffff);
                 TransportScanItem item(sourceID, name, *it, signalTimeout);
-                VERBOSE(VB_CHANSCAN, LOC + "Adding " + name + " - " +
-                        item.tuning.toString());
+                LOG(VB_CHANSCAN, LOG_INFO, LOC + "Adding " + name + " - " +
+                    item.tuning.toString());
                 scanTransports.push_back(item);
                 ts_scanned.insert(it.key());
             }
@@ -1650,13 +1655,13 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
     }
 
     scan_monitor->ScanUpdateStatusText(cur_chan);
-    VERBOSE(VB_CHANSCAN, LOC + tune_msg_str);
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + tune_msg_str);
 
     if (!Tune(transport))
     {   // If we did not tune successfully, bail with message
         UpdateScanPercentCompleted();
-        VERBOSE(VB_CHANSCAN, LOC +
-                QString("Failed to tune %1 mplexid(%2) at offset %3")
+        LOG(VB_CHANSCAN, LOG_ERR, LOC +
+            QString("Failed to tune %1 mplexid(%2) at offset %3")
                 .arg(item.FriendlyName).arg(item.mplexid)
                 .arg(transport.offset()));
         return;
@@ -1682,7 +1687,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
  */
 void ChannelScanSM::StopScanner(void)
 {
-    VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::StopScanner");
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "StopScanner");
 
     while (scannerThread)
     {
@@ -1726,8 +1731,8 @@ bool ChannelScanSM::ScanTransports(
                       .arg(std).arg(modulation).arg(country);
         scan_monitor->ScanAppendTextToLog(msg);
     }
-    VERBOSE(VB_CHANSCAN, LOC +
-            QString("Looked up freq table (%1, %2, %3) w/%4 entries")
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Looked up freq table (%1, %2, %3) w/%4 entries")
             .arg(std).arg(modulation).arg(country).arg(tables.size()));
 
     QString start = table_start;
@@ -1753,7 +1758,7 @@ bool ChannelScanSM::ScanTransports(
                                        freq, ft, signalTimeout);
                 scanTransports.push_back(item);
 
-                VERBOSE(VB_CHANSCAN, LOC + item.toString());
+                LOG(VB_CHANSCAN, LOG_INFO, LOC + item.toString());
             }
 
             name_num++;
@@ -1804,12 +1809,12 @@ bool ChannelScanSM::ScanForChannels(uint sourceid,
 
         scanTransports.push_back(item);
 
-        VERBOSE(VB_CHANSCAN, LOC + item.toString());
+        LOG(VB_CHANSCAN, LOG_INFO, LOC + item.toString());
     }
 
     if (scanTransports.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "ScanForChannels() no transports");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "ScanForChannels() no transports");
         return false;
     }
 
@@ -1907,7 +1912,7 @@ bool ChannelScanSM::AddToList(uint mplexid)
 
     if (!query.next())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "AddToList() " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "AddToList() " +
                 QString("Failed to locate mplexid(%1) in DB").arg(mplexid));
         return false;
     }
@@ -1944,12 +1949,12 @@ bool ChannelScanSM::AddToList(uint mplexid)
 
     if (item.tuning.FillFromDB(tt, mplexid))
     {
-        VERBOSE(VB_CHANSCAN, LOC + "Adding " + fn);
+        LOG(VB_CHANSCAN, LOG_INFO, LOC + "Adding " + fn);
         scanTransports.push_back(item);
         return true;
     }
 
-    VERBOSE(VB_CHANSCAN, LOC + "Not adding incomplete transport " + fn);
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Not adding incomplete transport " + fn);
     return false;
 }
 
@@ -2010,8 +2015,8 @@ bool ChannelScanSM::CheckImportedList(
     bool found = false;
     for (uint i = 0; i < channels.size(); i++)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("comparing %1 %2 against %3 %4")
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("comparing %1 %2 against %3 %4")
                 .arg(channels[i].serviceid).arg(channels[i].name)
                 .arg(mpeg_program_num).arg(common_status_info));
 

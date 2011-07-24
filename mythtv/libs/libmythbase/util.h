@@ -27,7 +27,23 @@ class QFile;
  MBASE_PUBLIC  QDateTime MythUTCToLocal(const QDateTime &utc);
  MBASE_PUBLIC  int MythSecsTo(const QDateTime &from, const QDateTime &to);
  MBASE_PUBLIC  QDateTime myth_dt_from_string(const QString &dtstr);
-
+ 
+ enum DateTimeFormat { kDateFull = 1,
+                       kDateShort = 2,
+                       kTime = 4,
+                       kDateTimeFull = 5, // KDateFull | KTime
+                       kDateTimeShort = 6, // KDateShort | KTime
+                       // 8 = Placeholder
+                       kAddYear = 16, // Add year to string if not included
+                       kSimplify = 32
+                      } MBASE_PUBLIC;
+ MBASE_PUBLIC  QString MythDateTimeToString(const QDateTime &datetime,
+                                            uint format = kDateTimeFull);
+ MBASE_PUBLIC  QString MythDateToString(const QDate &date,
+                                        uint format = kDateFull);
+ MBASE_PUBLIC  QString MythTimeToString(const QTime &time,
+                                        uint format = kTime);
+ 
  MBASE_PUBLIC  bool getUptime(time_t &uptime);
  MBASE_PUBLIC  bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 

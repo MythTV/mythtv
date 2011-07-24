@@ -60,7 +60,6 @@ namespace
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
     FillData fill_data;
     int fromfile_id = 1;
     int fromfile_offset = 0;
@@ -86,11 +85,6 @@ int main(int argc, char *argv[])
     bool from_dd_file = false;
     int sourceid = -1;
     QString fromddfile_lineupid;
-    int quiet = 0;
-
-    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFILLDATABASE);
-
-    myth_nice(19);
 
     MythFillDatabaseCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -112,10 +106,14 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
+    QCoreApplication a(argc, argv);
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFILLDATABASE);
+
+    myth_nice(19);
+
+    int retval;
+    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+        return retval;
 
     if (cmdline.toBool("manual"))
     {
@@ -161,7 +159,8 @@ int main(int argc, char *argv[])
         fromfile_id = cmdline.toInt("sourceid");
         fromfile_name = cmdline.toString("xmlfile");
 
-        VERBOSE(VB_GENERAL, "Bypassing grabbers, reading directly from file");
+        LOG(VB_GENERAL, LOG_INFO,
+            "Bypassing grabbers, reading directly from file");
         from_file = true;
     }
 
@@ -184,7 +183,8 @@ int main(int argc, char *argv[])
         fromddfile_lineupid = cmdline.toInt("lineupid");
         fromfile_name       = cmdline.toString("xmlfile");
 
-        VERBOSE(VB_GENERAL, "Bypassing grabbers, reading directly from file");
+        LOG(VB_GENERAL, LOG_INFO,
+            "Bypassing grabbers, reading directly from file");
         from_dd_file = true;
     }
 
@@ -194,14 +194,15 @@ int main(int argc, char *argv[])
         if (!cmdline.toBool("sourceid") ||
             !cmdline.toBool("xawtvrcfile"))
         {
-            cerr << "The --xawchannels option must be used in combination" << endl
+            cerr << "The --xawchannels option must be used in combination"
+                 <<  endl
                  << "with both --sourceid and --xawtvrcfile" << endl;
         }
 
         fromxawfile_id = cmdline.toInt("sourceid");
         fromxawfile_name = cmdline.toString("xawtvrcfile");
 
-        VERBOSE(VB_GENERAL, "Reading channels from xawtv configfile");
+        LOG(VB_GENERAL, LOG_INFO, "Reading channels from xawtv configfile");
         from_xawfile = true;
     }
 
@@ -211,8 +212,8 @@ int main(int argc, char *argv[])
         fill_data.chan_data.remove_new_channels = true;
     if (cmdline.toBool("nofilterchannels"))
         fill_data.chan_data.filter_new_channels = false;
-    if (cmdline.toBool("graboptions"))
-        fill_data.graboptions = " " + cmdline.toString("graboptions");
+    if (!cmdline.GetPassthrough().isEmpty())
+        fill_data.graboptions = " " + cmdline.GetPassthrough();
     if (cmdline.toBool("sourceid"))
         sourceid = cmdline.toInt("sourceid");
     if (cmdline.toBool("cardtype"))
@@ -253,22 +254,6 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("onlychannels"))
         fill_data.only_update_channels = true;
 
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
-
     mark_repeats = cmdline.toBool("markrepeats");
     if (cmdline.toBool("exporticonmap"))
         export_icon_data_filename = cmdline.toString("exporticonmap");
@@ -289,14 +274,10 @@ int main(int argc, char *argv[])
 
     CleanupGuard callCleanup(cleanup);
 
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
-
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -304,7 +285,7 @@ int main(int argc, char *argv[])
 
     if (!UpgradeTVDatabaseSchema(false))
     {
-        VERBOSE(VB_IMPORTANT, "Incorrect database schema");
+        LOG(VB_GENERAL, LOG_ERR, "Incorrect database schema");
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
@@ -332,8 +313,9 @@ int main(int argc, char *argv[])
         if (query.exec() && query.next())
         {
             if (!query.isNull(0))
-                GuideDataBefore = QDateTime::fromString(query.value(0).toString(),
-                                                    Qt::ISODate);
+                GuideDataBefore =
+                    QDateTime::fromString(query.value(0).toString(),
+                                          Qt::ISODate);
         }
 
         if (!fill_data.GrabDataFromFile(fromfile_id, fromfile_name))
@@ -351,14 +333,15 @@ int main(int argc, char *argv[])
         if (query.exec() && query.next())
         {
             if (!query.isNull(0))
-                GuideDataAfter = QDateTime::fromString(query.value(0).toString(),
-                                                   Qt::ISODate);
+                GuideDataAfter =
+                    QDateTime::fromString(query.value(0).toString(),
+                                          Qt::ISODate);
         }
 
         if (GuideDataAfter == GuideDataBefore)
             status = QObject::tr("mythfilldatabase ran, but did not insert "
-                     "any new data into the Guide.  This can indicate a "
-                     "potential problem with the XML file used for the update.");
+                    "any new data into the Guide.  This can indicate a "
+                    "potential problem with the XML file used for the update.");
         else
             status = QObject::tr("Successful.");
 
@@ -378,9 +361,9 @@ int main(int argc, char *argv[])
 
         if (sourceid != -1)
         {
-            VERBOSE(VB_GENERAL,
-                    QString("Running for sourceid %1 ONLY because --sourceid "
-                            "was given on command-line").arg(sourceid));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Running for sourceid %1 ONLY because --sourceid "
+                        "was given on command-line").arg(sourceid));
             where = QString("WHERE sourceid = %1").arg(sourceid);
         }
 
@@ -416,9 +399,9 @@ int main(int argc, char *argv[])
              }
              else
              {
-                  VERBOSE(VB_IMPORTANT,
-                          "There are no channel sources defined, did you run "
-                          "the setup program?");
+                  LOG(VB_GENERAL, LOG_ERR,
+                      "There are no channel sources defined, did you run "
+                      "the setup program?");
                   return GENERIC_EXIT_SETUP_ERROR;
              }
         }
@@ -429,9 +412,9 @@ int main(int argc, char *argv[])
         }
 
         if (!fill_data.Run(sourcelist))
-            VERBOSE(VB_IMPORTANT, "Failed to fetch some program info");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to fetch some program info");
         else
-            VERBOSE(VB_IMPORTANT, "Data fetching complete.");
+            LOG(VB_GENERAL, LOG_NOTICE, "Data fetching complete.");
     }
 
     if (fill_data.only_update_channels && !fill_data.need_post_grab_proc)
@@ -470,18 +453,18 @@ int main(int argc, char *argv[])
 
     if (grab_data)
     {
-        VERBOSE(VB_GENERAL, "Adjusting program database end times.");
+        LOG(VB_GENERAL, LOG_INFO, "Adjusting program database end times.");
         int update_count = ProgramData::fix_end_times();
         if (update_count == -1)
-            VERBOSE(VB_IMPORTANT, "fix_end_times failed!");
+            LOG(VB_GENERAL, LOG_ERR, "fix_end_times failed!");
         else
-            VERBOSE(VB_GENERAL,
-                    QString("    %1 replacements made").arg(update_count));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("    %1 replacements made").arg(update_count));
     }
 
     if (grab_data)
     {
-        VERBOSE(VB_GENERAL, "Marking generic episodes.");
+        LOG(VB_GENERAL, LOG_INFO, "Marking generic episodes.");
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("UPDATE program SET generic = 1 WHERE "
@@ -492,14 +475,14 @@ int main(int argc, char *argv[])
         if (!query.exec())
             MythDB::DBError("mark generic", query);
         else
-            VERBOSE(VB_GENERAL,
-                    QString("    Found %1").arg(query.numRowsAffected()));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("    Found %1").arg(query.numRowsAffected()));
     }
 
     if (grab_data)
     {
-        VERBOSE(VB_GENERAL, "Fudging non-unique programids "
-                "with multiple parts.");
+        LOG(VB_GENERAL, LOG_INFO, "Fudging non-unique programids "
+                                  "with multiple parts.");
 
         int found = 0;
         MSqlQuery sel(MSqlQuery::InitCon());
@@ -525,8 +508,8 @@ int main(int argc, char *argv[])
                 part.setNum(partnum);
                 new_programid.append(part.rightJustified(2, '0'));
 
-                VERBOSE(VB_GENERAL,
-                        QString("    %1 -> %2 (part %3 of %4)")
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("    %1 -> %2 (part %3 of %4)")
                         .arg(orig_programid).arg(new_programid)
                         .arg(partnum).arg(parttotal));
 
@@ -540,8 +523,8 @@ int main(int argc, char *argv[])
                 repl.bindValue(":PARTTOTAL", parttotal);
                 if (!repl.exec())
                 {
-                    VERBOSE(VB_GENERAL,
-                            QString("Fudging programid from '%1' to '%2'")
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("Fudging programid from '%1' to '%2'")
                             .arg(orig_programid)
                             .arg(new_programid));
                 }
@@ -550,12 +533,12 @@ int main(int argc, char *argv[])
             }
         }
 
-        VERBOSE(VB_GENERAL, QString("    Found %1").arg(found));
+        LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
     }
 
     if (mark_repeats)
     {
-        VERBOSE(VB_GENERAL, "Marking repeats.");
+        LOG(VB_GENERAL, LOG_INFO, "Marking repeats.");
 
         int newEpiWindow = gCoreContext->GetNumSetting( "NewEpisodeWindow", 14);
 
@@ -568,10 +551,10 @@ int main(int argc, char *argv[])
         query.bindValue(":NEWWINDOW", newEpiWindow);
 
         if (query.exec())
-            VERBOSE(VB_GENERAL,
-                    QString("    Found %1").arg(query.numRowsAffected()));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("    Found %1").arg(query.numRowsAffected()));
 
-        VERBOSE(VB_GENERAL, "Unmarking new episode rebroadcast repeats.");
+        LOG(VB_GENERAL, LOG_INFO, "Unmarking new episode rebroadcast repeats.");
         query.prepare("UPDATE program SET previouslyshown = 0 "
                       "WHERE previouslyshown = 1 "
                       "AND originalairdate is not null "
@@ -580,8 +563,8 @@ int main(int argc, char *argv[])
         query.bindValue(":NEWWINDOW", newEpiWindow);
 
         if (query.exec())
-            VERBOSE(VB_GENERAL,
-                    QString("    Found %1").arg(query.numRowsAffected()));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("    Found %1").arg(query.numRowsAffected()));
     }
 
     // Mark first and last showings
@@ -593,7 +576,7 @@ int main(int argc, char *argv[])
         if (!updt.exec())
             MythDB::DBError("Clearing first and last showings", updt);
 
-        VERBOSE(VB_GENERAL, "Marking episode first showings.");
+        LOG(VB_GENERAL, LOG_INFO, "Marking episode first showings.");
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT MIN(starttime),programid FROM program "
@@ -633,9 +616,9 @@ int main(int argc, char *argv[])
             }
         }
         found += query.size();
-        VERBOSE(VB_GENERAL, QString("    Found %1").arg(found));
+        LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
 
-        VERBOSE(VB_GENERAL, "Marking episode last showings.");
+        LOG(VB_GENERAL, LOG_INFO, "Marking episode last showings.");
         query.prepare("SELECT MAX(starttime),programid FROM program "
                       "WHERE programid > '' GROUP BY programid;");
         if (query.exec())
@@ -673,7 +656,7 @@ int main(int argc, char *argv[])
             }
         }
         found += query.size();
-        VERBOSE(VB_GENERAL, QString("    Found %1").arg(found));
+        LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
     }
 
     if (1) // limit MSqlQuery's lifetime
@@ -696,7 +679,7 @@ int main(int argc, char *argv[])
         fill_data.ddprocessor.GrabNextSuggestedTime();
     }
 
-    VERBOSE(VB_GENERAL, "\n"
+    LOG(VB_GENERAL, LOG_INFO, "\n"
             "===============================================================\n"
             "| Attempting to contact the master backend for rescheduling.  |\n"
             "| If the master is not running, rescheduling will happen when |\n"
@@ -710,7 +693,7 @@ int main(int argc, char *argv[])
 
     SendMythSystemEvent("MYTHFILLDATABASE_RAN");
 
-    VERBOSE(VB_IMPORTANT, "mythfilldatabase run complete.");
+    LOG(VB_GENERAL, LOG_NOTICE, "mythfilldatabase run complete.");
 
     return GENERIC_EXIT_OK;
 }

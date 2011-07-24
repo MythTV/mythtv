@@ -808,7 +808,8 @@ void VisualizationsEditor::fillWidgets(const QString &currentSelection)
             item = new Q3ListViewItem(selectedList, item, visName, pluginName);
         }
         else
-            VERBOSE(VB_IMPORTANT, QString("'%1' is not in the list of supported visualizers")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("'%1' is not in the list of supported visualizers")
                     .arg(currentList[i]));
     }
 

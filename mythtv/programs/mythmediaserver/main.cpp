@@ -22,6 +22,7 @@
 #include "mythsystemevent.h"
 #include "commandlineparser.h"
 
+#include "controlrequesthandler.h"
 #include "requesthandler/basehandler.h"
 #include "requesthandler/fileserverhandler.h"
 
@@ -69,18 +70,6 @@ namespace
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-    QMap<QString, QString> settingsOverride;
-    bool daemonize = false;
-    int quiet = 0;
-
-    QString filename;
-
-    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHMEDIASERVER);
-
-    verboseMask = VB_IMPORTANT;
-    verboseString = "important";
-
     MythMediaServerCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -100,96 +89,33 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
+    QCoreApplication a(argc, argv);
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHMEDIASERVER);
 
-    if (cmdline.toBool("pidfile"))
-        pidfile = cmdline.toUInt("pidfile");
-    daemonize = cmdline.toBool("daemon");
+    int retval = cmdline.Daemonize();
+    if (retval != GENERIC_EXIT_OK)
+        return retval;
 
-    if (verboseArgParse(cmdline.toString("verbose")) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-        return GENERIC_EXIT_INVALID_CMDLINE;
-    if (cmdline.toBool("verboseint"))
-        verboseMask = cmdline.toUInt("verboseint");
-
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
+    bool daemonize = cmdline.toBool("daemon");
+    QString mask("general");
+    if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
+        return retval;
 
     CleanupGuard callCleanup(cleanup);
-
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
-
-    ofstream pidfs;
-    if (pidfile.size())
-    {
-        pidfs.open(pidfile.toAscii().constData());
-        if (!pidfs)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Could not open pid file" + ENO);
-            return GENERIC_EXIT_PERMISSIONS_ERROR;
-        }
-    }
-
-    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
-
-    if (daemonize && (daemon(0, 1) < 0))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
-        return GENERIC_EXIT_DAEMONIZING_ERROR;
-    }
-
-    if (pidfs)
-    {
-        pidfs << getpid() << endl;
-        pidfs.close();
-    }
-
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(MYTH_APPNAME_MYTHMEDIASERVER)
-                            .arg(MYTH_SOURCE_PATH)
-                            .arg(MYTH_SOURCE_VERSION));
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    if (settingsOverride.size())
-    {
-        QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(*it));
-            gCoreContext->OverrideSettingForSession(it.key(), *it);
-        }
-    }
+    cmdline.ApplySettingsOverride();
 
+    gCoreContext->SetBackend(false);
     if (!gCoreContext->ConnectToMasterServer())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to connect to master server");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to connect to master server");
         return GENERIC_EXIT_CONNECT_ERROR;
     }
 
@@ -206,13 +132,18 @@ int main(int argc, char *argv[])
     MythSocketManager *sockmanager = new MythSocketManager();
     if (!sockmanager->Listen(port))
     {
-        VERBOSE(VB_IMPORTANT, "Mediaserver exiting, failed to bind to listen port.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Mediaserver exiting, failed to bind to listen port.");
         delete sockmanager;
         return GENERIC_EXIT_SOCKET_ERROR;
     }
 
     sockmanager->RegisterHandler(new BaseRequestHandler());
     sockmanager->RegisterHandler(new FileServerHandler());
+
+    ControlRequestHandler *controlRequestHandler = new ControlRequestHandler();
+    sockmanager->RegisterHandler(controlRequestHandler);
+    controlRequestHandler->ConnectToMaster();
 
     MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
 

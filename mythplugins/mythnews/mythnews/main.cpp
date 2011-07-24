@@ -65,8 +65,8 @@ int mythplugin_init(const char *libversion)
     gCoreContext->ActivateSettingsCache(false);
     if (!UpgradeNewsDatabaseSchema())
     {
-        VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade database to new schema, exiting.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Couldn't upgrade database to new schema, exiting.");
         return -1;
     }
     gCoreContext->ActivateSettingsCache(true);

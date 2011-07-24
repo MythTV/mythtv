@@ -107,7 +107,7 @@ bool MythControls::Create(void)
     if (!m_description || !m_leftList || !m_rightList ||
             !m_leftDescription || !m_rightDescription)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
@@ -130,8 +130,8 @@ bool MythControls::Create(void)
 
         if (!button)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Unable to load action button action_%1").arg(i));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Unable to load action button action_%1").arg(i));
 
             return false;
         }
@@ -566,7 +566,8 @@ void MythControls::DeleteKey(void)
 
     if (context.isEmpty() || key.isEmpty() || action.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "Unable to delete binding, missing information");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unable to delete binding, missing information");
         return;
     }
 

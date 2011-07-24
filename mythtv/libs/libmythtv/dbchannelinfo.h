@@ -15,6 +15,7 @@ using namespace std;
 
 // MythTV headers
 #include "mythtvexp.h" 
+#include "programtypes.h"
 
 // TODO: Refactor DBChannel, PixmapChannel and ChannelInfo into a single class
 
@@ -31,6 +32,9 @@ class MTV_PUBLIC DBChannel
 
     bool operator == (uint _chanid) const
         { return chanid == _chanid; }
+
+    QString GetFormatted(const QString &format) const;
+    void ToMap(InfoMap &infoMap) const;
 
   public:
     QString channum;
@@ -53,7 +57,8 @@ class MTV_PUBLIC ChannelInfo
  public:
     ChannelInfo() : chanid(-1), sourceid(-1), favid(-1) {}
     QString GetFormatted(const QString &format) const;
-
+    void ToMap(InfoMap &infoMap) const;
+    
     QString callsign;
     QString iconpath;
     QString chanstr;
@@ -76,7 +81,6 @@ class MTV_PUBLIC PixmapChannel : public DBChannel
         DBChannel(other) { }
 
     bool CacheChannelIcon(void);
-    QString GetFormatted(const QString &format) const;
 
   public:
     QString m_localIcon;

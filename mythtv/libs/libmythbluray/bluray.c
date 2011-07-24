@@ -1704,66 +1704,78 @@ void bd_stop_bdj(BLURAY *bd)
  * Navigation mode interface
  */
 
+static void _process_psr_restore_event(BLURAY *bd, BD_PSR_EVENT *ev)
+{
+    /* PSR restore events are handled internally.
+     * Restore stored playback position.
+     */
+
+    BD_DEBUG(DBG_BLURAY, "PSR restore: psr%u = %u (%p)\n", ev->psr_idx, ev->new_val, bd);
+
+    switch (ev->psr_idx) {
+        case PSR_ANGLE_NUMBER:
+            /* can't set angle before playlist is opened */
+            return;
+        case PSR_TITLE_NUMBER:
+            /* pass to the application */
+            _queue_event(bd, (BD_EVENT){BD_EVENT_TITLE, ev->new_val});
+            return;
+        case PSR_CHAPTER:
+            /* will be selected automatically */
+            return;
+        case PSR_PLAYLIST:
+            bd_select_playlist(bd, ev->new_val);
+            nav_set_angle(bd->title, bd->st0.clip, bd_psr_read(bd->regs, PSR_ANGLE_NUMBER) - 1);
+            return;
+        case PSR_PLAYITEM:
+            bd_seek_playitem(bd, ev->new_val);
+            return;
+        case PSR_TIME:
+            bd_seek_time(bd, ((int64_t)ev->new_val) << 1);
+            return;
+
+        case PSR_SELECTED_BUTTON_ID:
+        case PSR_MENU_PAGE_ID:
+            /* handled by graphics controller */
+            return;
+
+        default:
+            /* others: ignore */
+            return;
+    }
+}
+
 /*
  * notification events to APP
  */
-static void _process_psr_event(void *handle, BD_PSR_EVENT *ev)
+
+static void _process_psr_write_event(BLURAY *bd, BD_PSR_EVENT *ev)
 {
-    BLURAY *bd = (BLURAY*)handle;
-
-    if (ev->ev_type == BD_PSR_SAVE) {
-        BD_DEBUG(DBG_BLURAY, "PSR SAVE event (%p)\n", bd);
-        return;
+    if (ev->ev_type == BD_PSR_WRITE) {
+        BD_DEBUG(DBG_BLURAY, "PSR write: psr%u = %u (%p)\n", ev->psr_idx, ev->new_val, bd);
     }
-
-    /* PSR restore events are handled internally */
-
-    if (ev->ev_type == BD_PSR_RESTORE) {
-
-        BD_DEBUG(DBG_BLURAY, "PSR RESTORE event %d %d (%p)\n", ev->psr_idx, ev->new_val, bd);
-
-        /* Restore stored playback position */
-
-        switch (ev->psr_idx) {
-            case PSR_ANGLE_NUMBER:
-                /* can't set angle before playlist is opened */
-                return;
-            case PSR_TITLE_NUMBER:
-                /* pass to the application */
-                break;
-            case PSR_CHAPTER:
-                /* will be selected automatically */
-                return;
-            case PSR_PLAYLIST:
-                bd_select_playlist(bd, ev->new_val);
-                nav_set_angle(bd->title, bd->st0.clip, bd_psr_read(bd->regs, PSR_ANGLE_NUMBER) - 1);
-                return;
-            case PSR_PLAYITEM:
-                bd_seek_playitem(bd, ev->new_val);
-                return;
-            case PSR_TIME:
-                bd_seek_time(bd, ((int64_t)ev->new_val) << 1);
-                return;
-            case PSR_SELECTED_BUTTON_ID:
-            case PSR_MENU_PAGE_ID:
-                /* TODO: need to inform graphics controller ? */
-            default:
-                /* others: ignore */
-                return;
-        }
-    }
-
-    BD_DEBUG(DBG_BLURAY, "PSR event %d %d (%p)\n", ev->psr_idx, ev->new_val, bd);
 
     switch (ev->psr_idx) {
 
         /* current playback position */
 
-        case PSR_ANGLE_NUMBER: _queue_event(bd, (BD_EVENT){BD_EVENT_ANGLE, ev->new_val}); break;
-        case PSR_TITLE_NUMBER: _queue_event(bd, (BD_EVENT){BD_EVENT_TITLE, ev->new_val}); break;
-        case PSR_PLAYLIST: _queue_event(bd, (BD_EVENT){BD_EVENT_PLAYLIST, ev->new_val}); break;
-        case PSR_PLAYITEM: _queue_event(bd, (BD_EVENT){BD_EVENT_PLAYITEM, ev->new_val}); break;
-        case PSR_CHAPTER:  _queue_event(bd, (BD_EVENT){BD_EVENT_CHAPTER,  ev->new_val}); break;
+        case PSR_ANGLE_NUMBER: _queue_event(bd, (BD_EVENT){BD_EVENT_ANGLE,    ev->new_val}); break;
+        case PSR_TITLE_NUMBER: _queue_event(bd, (BD_EVENT){BD_EVENT_TITLE,    ev->new_val}); break;
+        case PSR_PLAYLIST:     _queue_event(bd, (BD_EVENT){BD_EVENT_PLAYLIST, ev->new_val}); break;
+        case PSR_PLAYITEM:     _queue_event(bd, (BD_EVENT){BD_EVENT_PLAYITEM, ev->new_val}); break;
+        case PSR_CHAPTER:      _queue_event(bd, (BD_EVENT){BD_EVENT_CHAPTER,  ev->new_val}); break;
+
+        default:;
+    }
+}
+
+static void _process_psr_change_event(BLURAY *bd, BD_PSR_EVENT *ev)
+{
+    BD_DEBUG(DBG_BLURAY, "PSR change: psr%u = %u (%p)\n", ev->psr_idx, ev->new_val, bd);
+
+    _process_psr_write_event(bd, ev);
+
+    switch (ev->psr_idx) {
 
         /* stream selection */
 
@@ -1800,6 +1812,30 @@ static void _process_psr_event(void *handle, BD_PSR_EVENT *ev)
     }
 }
 
+static void _process_psr_event(void *handle, BD_PSR_EVENT *ev)
+{
+    BLURAY *bd = (BLURAY*)handle;
+
+    switch(ev->ev_type) {
+        case BD_PSR_WRITE:
+            _process_psr_write_event(bd, ev);
+            break;
+        case BD_PSR_CHANGE:
+            _process_psr_change_event(bd, ev);
+            break;
+        case BD_PSR_RESTORE:
+            _process_psr_restore_event(bd, ev);
+            break;
+
+        case BD_PSR_SAVE:
+            BD_DEBUG(DBG_BLURAY, "PSR save event (%p)\n", bd);
+            break;
+        default:
+            BD_DEBUG(DBG_BLURAY, "PSR event %d: psr%u = %u (%p)\n", ev->ev_type, ev->psr_idx, ev->new_val, bd);
+            break;
+    }
+}
+
 static void _queue_initial_psr_events(BLURAY *bd)
 {
     const uint32_t psrs[] = {
@@ -1817,13 +1853,13 @@ static void _queue_initial_psr_events(BLURAY *bd)
 
     for (ii = 0; ii < sizeof(psrs) / sizeof(psrs[0]); ii++) {
         BD_PSR_EVENT ev = {
-            .ev_type = 0,
+            .ev_type = BD_PSR_CHANGE,
             .psr_idx = psrs[ii],
             .old_val = 0,
             .new_val = bd_psr_read(bd->regs, psrs[ii]),
         };
 
-        _process_psr_event(bd, &ev);
+        _process_psr_change_event(bd, &ev);
     }
 }
 
@@ -2027,6 +2063,7 @@ static void _process_hdmv_vm_event(BLURAY *bd, HDMV_EVENT *hev)
 
     switch (hev->event) {
         case HDMV_EVENT_TITLE:
+            _close_playlist(bd);
             _play_title(bd, hev->param);
             break;
 
@@ -2047,12 +2084,8 @@ static void _process_hdmv_vm_event(BLURAY *bd, HDMV_EVENT *hev)
             break;
 
         case HDMV_EVENT_PLAY_STOP:
-            BD_DEBUG(DBG_BLURAY|DBG_CRIT, "HDMV_EVENT_PLAY_STOP: not tested !\n");
             // stop current playlist
-            bd_seek(bd, (uint64_t)bd->title->packets * 192 - 1);
-            bd->st0.clip = NULL;
-            // resume suspended movie object
-            hdmv_vm_resume(bd->hdmv_vm);
+            _close_playlist(bd);
             break;
 
         case HDMV_EVENT_STILL:
@@ -2162,7 +2195,11 @@ int bd_get_event(BLURAY *bd, BD_EVENT *event)
         _queue_initial_psr_events(bd);
     }
 
-    return _get_event(bd, event);
+    if (event) {
+        return _get_event(bd, event);
+    }
+
+    return 0;
 }
 
 /*

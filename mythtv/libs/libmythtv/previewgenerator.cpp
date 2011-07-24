@@ -36,8 +36,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("Preview: ")
-#define LOC_ERR QString("Preview Error: ")
-#define LOC_WARN QString("Preview Warning: ")
 
 /** \class PreviewGenerator
  *  \brief This class creates a preview image of a recording.
@@ -117,15 +115,13 @@ bool PreviewGenerator::RunReal(void)
 
     if (!is_local && !!(mode & kRemote))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Run() file not local: '%1'")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Run() file not local: '%1'")
                 .arg(pathname));
     }
     else if (!(mode & kLocal) && !(mode & kRemote))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Run() Preview of '%1' failed "
-                        "because mode was invalid 0x%2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Run() Preview of '%1' failed "
+                                               "because mode was invalid 0x%2")
                 .arg(pathname).arg((int)mode,0,16));
     }
     else if (is_local && !!(mode & kLocal) && LocalPreviewRun())
@@ -140,7 +136,7 @@ bool PreviewGenerator::RunReal(void)
     {
         if (is_local && (mode & kLocal))
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN + "Failed to save preview."
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to save preview."
                     "\n\t\t\tYou may need to check user and group ownership on"
                     "\n\t\t\tyour frontend and backend for quicker previews.\n"
                     "\n\t\t\tAttempting to regenerate preview on backend.\n");
@@ -214,8 +210,8 @@ bool PreviewGenerator::Run(void)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Run() cannot generate preview locally for: '%1'")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Run() cannot generate preview locally for: '%1'")
                     .arg(pathname));
             msg = "Failed, local preview requested for remote file.";
         }
@@ -249,13 +245,13 @@ bool PreviewGenerator::Run(void)
                                         kMSProcessEvents, 30);
         if (ret != GENERIC_EXIT_OK)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + 
-                              QString("Encountered problems running '%1' (%2)")
-                .arg(command) .arg(ret));
+            LOG(VB_GENERAL, LOG_ERR, LOC + 
+                QString("Encountered problems running '%1' (%2)")
+                    .arg(command) .arg(ret));
         }
         else
         {
-            VERBOSE(VB_PLAYBACK, LOC + "Preview process returned 0.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Preview process returned 0.");
             QString outname = (!outFileName.isEmpty()) ?
                 outFileName : (pathname + ".png");
 
@@ -271,7 +267,7 @@ bool PreviewGenerator::Run(void)
             ok = (fi.exists() && fi.isReadable() && fi.size());
             if (ok)
             {
-                VERBOSE(VB_PLAYBACK, LOC + "Preview process ran ok.");
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Preview process ran ok.");
                 msg = QString("Generated on %1 in %2 seconds, starting at %3")
                     .arg(gCoreContext->GetHostName())
                     .arg(tm.elapsed()*0.001)
@@ -279,13 +275,13 @@ bool PreviewGenerator::Run(void)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Preview process not ok." +
-                        QString("\n\t\t\tfileinfo(%1)").arg(outname) +
-                        QString(" exists: %1").arg(fi.exists()) +
-                        QString(" readable: %1").arg(fi.isReadable()) +
-                        QString(" size: %1").arg(fi.size()));
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        QString("Despite command '%1' returning success")
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Preview process not ok." +
+                    QString("\n\t\t\tfileinfo(%1)").arg(outname) +
+                    QString(" exists: %1").arg(fi.exists()) +
+                    QString(" readable: %1").arg(fi.isReadable()) +
+                    QString(" size: %1").arg(fi.size()));
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("Despite command '%1' returning success")
                         .arg(command));
                 msg = QString("Failed to read preview image despite "
                               "preview process returning success.");
@@ -366,13 +362,13 @@ bool PreviewGenerator::RemotePreviewRun(void)
     {
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Remote Preview failed due to communications error.");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Remote Preview failed due to communications error.");
         }
         else if (strlist.size() > 1)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Remote Preview failed, reason given: " + strlist[1]);
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Remote Preview failed, reason given: " + strlist[1]);
         }
 
         gCoreContext->removeListener(this);
@@ -382,12 +378,13 @@ bool PreviewGenerator::RemotePreviewRun(void)
 
     QMutexLocker locker(&previewLock);
 
-    // wait up to 30 seconds for the preview to complete
+    // wait up to 35 seconds for the preview to complete
+    // The backend waits 30s for creation
     if (!gotReply)
-        previewWaitCondition.wait(&previewLock, 30 * 1000);
+        previewWaitCondition.wait(&previewLock, 35 * 1000);
 
     if (!gotReply)
-        VERBOSE(VB_IMPORTANT, LOC + "RemotePreviewRun() -- no reply..");
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + "RemotePreviewRun() -- no reply..");
 
     gCoreContext->removeListener(this);
 
@@ -418,7 +415,7 @@ bool PreviewGenerator::event(QEvent *e)
     pixmapOk = ok;
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + pginfokey + ": " + me->ExtraData(2));
+        LOG(VB_GENERAL, LOG_ERR, LOC + pginfokey + ": " + me->ExtraData(2));
         previewWaitCondition.wakeAll();
         return true;
     }
@@ -434,7 +431,7 @@ bool PreviewGenerator::event(QEvent *e)
     if (!datetime.isValid())
     {
         pixmapOk = false;
-        VERBOSE(VB_IMPORTANT, LOC_ERR + pginfokey + "Got invalid date");
+        LOG(VB_GENERAL, LOG_ERR, LOC + pginfokey + "Got invalid date");
         previewWaitCondition.wakeAll();
         return false;
     }
@@ -445,8 +442,8 @@ bool PreviewGenerator::event(QEvent *e)
     if ((size_t) data.size() < length)
     {   // (note data.size() may be up to 3
         //  bytes longer after decoding
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Preview size check failed %1 < %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Preview size check failed %1 < %2")
                 .arg(data.size()).arg(length));
         data.clear();
     }
@@ -454,7 +451,7 @@ bool PreviewGenerator::event(QEvent *e)
 
     if (checksum16 != qChecksum(data.constData(), data.size()))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Preview checksum failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Preview checksum failed");
         data.clear();
     }
 
@@ -477,9 +474,9 @@ bool PreviewGenerator::SaveOutFile(const QByteArray &data, const QDateTime &dt)
         {
             if (!remotecachedir.mkdir(remotecachedirname))
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Remote Preview failed because we could not create a "
-                        "remote cache directory");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Remote Preview failed because we could not create a "
+                    "remote cache directory");
                 return false;
             }
         }
@@ -492,7 +489,7 @@ bool PreviewGenerator::SaveOutFile(const QByteArray &data, const QDateTime &dt)
     bool ok = file.open(QIODevice::Unbuffered|QIODevice::WriteOnly);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to open: '%1'")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open: '%1'")
                 .arg(outFileName));
     }
 
@@ -520,7 +517,7 @@ bool PreviewGenerator::SaveOutFile(const QByteArray &data, const QDateTime &dt)
         struct utimbuf times;
         times.actime = times.modtime = dt.toTime_t();
         utime(outFileName.toLocal8Bit().constData(), &times);
-        VERBOSE(VB_FILE, LOC + QString("Saved: '%1'").arg(outFileName));
+        LOG(VB_FILE, LOG_INFO, LOC + QString("Saved: '%1'").arg(outFileName));
     }
     else
     {
@@ -589,8 +586,7 @@ bool PreviewGenerator::SavePreview(QString filename,
         of.remove();
         if (f.rename(filename))
         {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Saved preview '%0' %1x%2")
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Saved preview '%0' %1x%2")
                     .arg(filename).arg((int) ppw).arg((int) pph));
             return true;
         }
@@ -611,7 +607,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
     QDateTime dt = QDateTime::currentDateTime();
 
     if (captime > 0)
-        VERBOSE(VB_IMPORTANT, "Preview from time spec");
+        LOG(VB_GENERAL, LOG_INFO, "Preview from time spec");
 
     if (captime < 0)
     {
@@ -619,14 +615,14 @@ bool PreviewGenerator::LocalPreviewRun(void)
         if (captime > 0)
         {
             timeInSeconds = false;
-            VERBOSE(VB_IMPORTANT,
-                    QString("Preview from bookmark (frame %1)").arg(captime));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Preview from bookmark (frame %1)").arg(captime));
         }
         else
             captime = -1;
     }
 
-    if (captime < 0)
+    if (captime <= 0)
     {
         timeInSeconds = true;
         int startEarly = 0;
@@ -655,8 +651,8 @@ bool PreviewGenerator::LocalPreviewRun(void)
         if (captime < 0)
             captime = 600;
         captime += preroll;
-        VERBOSE(VB_IMPORTANT, QString("Preview at calculated offset "
-                                      "(%1 seconds)").arg(captime));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Preview at calculated offset (%1 seconds)").arg(captime));
     }
 
     width = height = sz = 0;
@@ -712,7 +708,7 @@ QString PreviewGenerator::CreateAccessibleFilename(
             dir = QFileInfo(pathname).path();
         }
         outname = dir  + "/" + fi.fileName();
-        VERBOSE(VB_FILE, LOC + QString("outfile '%1' -> '%2'")
+        LOG(VB_FILE, LOG_INFO, LOC + QString("outfile '%1' -> '%2'")
                 .arg(outFileName).arg(outname));
     }
 
@@ -734,9 +730,8 @@ bool PreviewGenerator::IsLocal(void) const
 
     if (!QFileInfo(pathdir).isWritable())
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("Output path '%1' is not writeable")
-                .arg(pathdir));
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("Output path '%1' is not writeable") .arg(pathdir));
         return false;
     }
 
@@ -776,7 +771,7 @@ char *PreviewGenerator::GetScreenGrab(
 
     if (!MSqlQuery::testDBConnection())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer could not connect to DB.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Previewer could not connect to DB.");
         return NULL;
     }
 
@@ -788,7 +783,7 @@ char *PreviewGenerator::GetScreenGrab(
                         (info.isFile() && (info.size() < 8*1024)));
         if (invalid)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer file " +
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Previewer file " +
                     QString("'%1'").arg(filename) + " is not valid.");
             return NULL;
         }
@@ -797,7 +792,7 @@ char *PreviewGenerator::GetScreenGrab(
     RingBuffer *rbuf = RingBuffer::Create(filename, false, false, 0);
     if (!rbuf->IsOpen())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer could not open file: " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Previewer could not open file: " +
                 QString("'%1'").arg(filename));
         delete rbuf;
         return NULL;
@@ -821,8 +816,8 @@ char *PreviewGenerator::GetScreenGrab(
 
     if (retbuf)
     {
-        VERBOSE(VB_GENERAL, LOC +
-                QString("Grabbed preview '%0' %1x%2@%3%4")
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Grabbed preview '%0' %1x%2@%3%4")
                 .arg(filename).arg(video_width).arg(video_height)
                 .arg(seektime).arg((time_in_secs) ? "s" : "f"));
     }

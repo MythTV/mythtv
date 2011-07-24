@@ -7,6 +7,7 @@
 // libmythbase
 #include "mythdbcon.h"
 #include "mythlogging.h"
+#include "util.h"
 
 // libmyth
 #include "mythcorecontext.h"
@@ -32,9 +33,6 @@ ManualSchedule::ManualSchedule(MythScreenStack *parent)
 {
     m_nowDateTime = QDateTime::currentDateTime();
     m_startDateTime = m_nowDateTime;
-
-    m_dateformat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
-    m_timeformat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
     m_daysahead = 0;
     m_titleEdit = NULL;
@@ -64,8 +62,8 @@ bool ManualSchedule::Create(void)
         !m_startminuteSpin || !m_durationSpin || !m_titleEdit ||
         !m_recordButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "ManualSchedule, theme is missing "
-                              "required elements");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ManualSchedule, theme is missing required elements");
         return false;
     }
 
@@ -77,19 +75,19 @@ bool ManualSchedule::Create(void)
 
     for (uint i = 0; i < channels.size(); i++)
     {
-        QString chantext = longChannelFormat;
-        chantext
-            .replace("<num>",  channels[i].channum)
-            .replace("<sign>", channels[i].callsign)
-            .replace("<name>", channels[i].name);
-        chantext.detach();
-        new MythUIButtonListItem(m_channelList, chantext);
+        QString chantext = channels[i].GetFormatted(longChannelFormat);
+        
+        MythUIButtonListItem *item =
+                            new MythUIButtonListItem(m_channelList, chantext);
+        InfoMap infomap;
+        channels[i].ToMap(infomap);
+        item->SetTextFromMap(infomap);
         m_chanids.push_back(channels[i].chanid);
     }
 
     for (uint index = 0; index <= 60; index++)
     {
-        QString dinfo = m_nowDateTime.addDays(index).toString(m_dateformat);
+        QString dinfo = MythDateTimeToString(m_nowDateTime.addDays(index), kDateFull | kSimplify);
         if (m_nowDateTime.addDays(index).date().dayOfWeek() < 6)
             dinfo += QString(" (%1)").arg(tr("5 weekdays if daily"));
         else
@@ -181,8 +179,8 @@ void ManualSchedule::dateChanged(void)
     int min = m_startminuteSpin->GetIntValue();
     m_startDateTime.setTime(QTime(hr, min));
 
-    VERBOSE(VB_SCHEDULE, QString("Start Date Time: %1")
-                                    .arg(m_startDateTime.toString()));
+    LOG(VB_SCHEDULE, LOG_INFO, QString("Start Date Time: %1")
+                                   .arg(m_startDateTime.toString()));
 
     // Note we allow start times up to one hour in the past so
     // if it is 20:25 the user can start a recording at 20:30

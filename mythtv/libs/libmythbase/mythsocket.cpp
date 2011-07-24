@@ -27,9 +27,8 @@
 #include "mythcorecontext.h"
 
 #define SLOC(a) QString("MythSocket(%1:%2): ")\
-                    .arg((quint64)a, 0, 16).arg(a->socket())
+                    .arg((uint64_t)a, 0, 16).arg(a->socket())
 #define LOC SLOC(this)
-#define LOC_ERR SLOC(this)
 
 const uint MythSocket::kSocketBufferSize = 128000;
 const uint MythSocket::kShortTimeout = kMythSocketShortTimeout;
@@ -44,7 +43,7 @@ MythSocket::MythSocket(int socket, MythSocketCBs *cb)
       m_ref_count(0),        m_notifyread(false),      m_expectingreply(false),
       m_isValidated(false),  m_isAnnounced(false)
 {
-    LOG(VB_SOCKET, LOG_DEBUG, "new socket");
+    LOG(VB_SOCKET, LOG_DEBUG, LOC + "new socket");
     if (socket > -1)
     {
         setSocket(socket);
@@ -62,7 +61,7 @@ MythSocket::MythSocket(int socket, MythSocketCBs *cb)
 MythSocket::~MythSocket()
 {
     close();
-    LOG(VB_SOCKET, LOG_DEBUG, "delete socket");
+    LOG(VB_SOCKET, LOG_DEBUG, LOC + "delete socket");
 }
 
 void MythSocket::setCallbacks(MythSocketCBs *cb)
@@ -85,7 +84,7 @@ void MythSocket::UpRef(void)
 {
     QMutexLocker locker(&m_ref_lock);
     m_ref_count++;
-    LOG(VB_SOCKET, LOG_DEBUG, QString("UpRef: %1").arg(m_ref_count));
+    LOG(VB_SOCKET, LOG_DEBUG, LOC + QString("UpRef: %1").arg(m_ref_count));
 }
 
 bool MythSocket::DownRef(void)
@@ -94,7 +93,7 @@ bool MythSocket::DownRef(void)
     int ref = --m_ref_count;
     m_ref_lock.unlock();
 
-    LOG(VB_SOCKET, LOG_DEBUG, QString("DownRef: %1").arg(ref));
+    LOG(VB_SOCKET, LOG_DEBUG, LOC + QString("DownRef: %1").arg(ref));
 
     if (m_cb && ref == 0)
     {
@@ -121,7 +120,7 @@ void MythSocket::setState(const State state)
 {
     if (state != m_state)
     {
-        LOG(VB_SOCKET, LOG_DEBUG, QString("state change %1 -> %2")
+        LOG(VB_SOCKET, LOG_DEBUG, LOC + QString("state change %1 -> %2")
                 .arg(stateToString(m_state)).arg(stateToString(state)));
 
         m_state = state;
@@ -176,17 +175,17 @@ QString MythSocket::errorToString(const Error error) const
 
 void MythSocket::setSocket(int socket, Type type)
 {
-    LOG(VB_SOCKET, LOG_DEBUG, QString("setSocket: %1").arg(socket));
+    LOG(VB_SOCKET, LOG_DEBUG, LOC + QString("setSocket: %1").arg(socket));
     if (socket < 0)
     {
-        LOG(VB_SOCKET, LOG_DEBUG, "setSocket called with invalid socket");
+        LOG(VB_SOCKET, LOG_DEBUG, LOC + "setSocket called with invalid socket");
         return;
     }
 
     if (state() == Connected)
     {
-        LOG(VB_SOCKET, LOG_DEBUG,
-                "setSocket called while in Connected state, closing");
+        LOG(VB_SOCKET, LOG_DEBUG, LOC +
+            "setSocket called while in Connected state, closing");
         close();
     }
 
@@ -202,7 +201,7 @@ void MythSocket::close(void)
     MSocketDevice::close();
     if (m_cb)
     {
-        LOG(VB_SOCKET, LOG_DEBUG, "calling m_cb->connectionClosed()");
+        LOG(VB_SOCKET, LOG_DEBUG, LOC + "calling m_cb->connectionClosed()");
         m_cb->connectionClosed(this);
     }
 }
@@ -227,13 +226,13 @@ bool MythSocket::closedByRemote(void)
 
 qint64 MythSocket::readBlock(char *data, quint64 len)
 {
-    LOG(VB_SOCKET, LOG_DEBUG, QString("readBlock(0x%1, %2) called")
-            .arg((quint64)data).arg(len));
+    LOG(VB_SOCKET, LOG_DEBUG, LOC + QString("readBlock(0x%1, %2) called")
+            .arg((uint64_t)data,0,16).arg(len));
 
     if (state() != Connected)
     {
-        LOG(VB_SOCKET, LOG_ERR, "readBlock called while not in "
-                "connected state");
+        LOG(VB_SOCKET, LOG_ERR, LOC + "readBlock called while not in "
+                                      "connected state");
         return -1;
     }
 
@@ -252,13 +251,13 @@ qint64 MythSocket::readBlock(char *data, quint64 len)
  */
 qint64 MythSocket::writeBlock(const char *data, quint64 len)
 {
-    LOG(VB_SOCKET, LOG_DEBUG, QString("writeBlock(0x%1, %2)")
-            .arg((quint64)data).arg(len));
+    LOG(VB_SOCKET, LOG_DEBUG, LOC + QString("writeBlock(0x%1, %2)")
+            .arg((uint64_t)data, 0, 16).arg(len));
 
     if (state() != Connected)
     {
-        LOG(VB_SOCKET, LOG_ERR, "writeBlock called while not in "
-                                "connected state");
+        LOG(VB_SOCKET, LOG_ERR, LOC + "writeBlock called while not in "
+                                      "connected state");
         return -1;
     }
 
@@ -289,22 +288,23 @@ bool MythSocket::writeStringList(QStringList &list)
 {
     if (list.size() <= 0)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                "writeStringList: Error, invalid string list.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "writeStringList: Error, invalid string list.");
         return false;
     }
 
     if (state() != Connected)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                "writeStringList: Error, called with unconnected socket.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "writeStringList: Error, called with unconnected socket.");
         return false;
     }
 
     QString str = list.join("[]:[]");
     if (str.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "writeStringList: Error, joined null string.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "writeStringList: Error, joined null string.");
         return false;
     }
 
@@ -320,17 +320,17 @@ bool MythSocket::writeStringList(QStringList &list)
     payload += utf8;
     size = payload.length();
 
-    if (VERBOSE_LEVEL_CHECK(VB_NETWORK))
+    if (VERBOSE_LEVEL_CHECK(VB_NETWORK, LOG_INFO))
     {
         QString msg = QString("write -> %1 %2")
             .arg(socket(), 2).arg(payload.data());
 
-        if (!VERBOSE_LEVEL_CHECK(VB_EXTRA) && msg.length() > 88)
+        if (logLevel < LOG_DEBUG && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
         }
-        LOG(VB_NETWORK, LOG_DEBUG, msg);
+        LOG(VB_NETWORK, LOG_INFO, LOC + msg);
     }
 
     MythTimer timer; timer.start();
@@ -339,9 +339,9 @@ bool MythSocket::writeStringList(QStringList &list)
     {
         if (state() != Connected)
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    "writeStringList: Error, socket went unconnected." +
-                    QString("\n\t\t\tWe wrote %1 of %2 bytes with %3 errors")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "writeStringList: Error, socket went unconnected." +
+                QString("\n\t\t\tWe wrote %1 of %2 bytes with %3 errors")
                     .arg(written).arg(written+size).arg(errorcount) +
                     QString("\n\t\t\tstarts with: %1").arg(toSample(payload)));
             return false;
@@ -361,8 +361,8 @@ bool MythSocket::writeStringList(QStringList &list)
         }
         else if (temp < 0 && error() != MSocketDevice::NoError)
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("writeStringList: Error, writeBlock failed. (%1)")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("writeStringList: Error, writeBlock failed. (%1)")
                     .arg(errorToString()));
             return false;
         }
@@ -371,11 +371,10 @@ bool MythSocket::writeStringList(QStringList &list)
             errorcount++;
             if (timer.elapsed() > 1000)
             {
-                LOG(VB_GENERAL, LOG_ERR, "writeStringList: Error, " +
-                        QString("No data written on writeBlock (%1 errors)")
-                            .arg(errorcount) +
-                        QString("\n\t\t\tstarts with: %1")
-                            .arg(toSample(payload)));
+                LOG(VB_GENERAL, LOG_ERR, LOC + "writeStringList: Error, " +
+                    QString("No data written on writeBlock (%1 errors)")
+                        .arg(errorcount) +
+                    QString("\n\t\t\tstarts with: %1") .arg(toSample(payload)));
                 return false;
             }
             usleep(1000);
@@ -395,8 +394,8 @@ bool MythSocket::readData(char *data, quint64 len)
 {
     if (state() != Connected)
     {
-        LOG(VB_GENERAL, LOG_ERR, 
-                "readData: Error, called with unconnected socket.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "readData: Error, called with unconnected socket.");
         return false;
     }
 
@@ -415,16 +414,16 @@ bool MythSocket::readData(char *data, quint64 len)
         }
         else if (!isValid())
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    "readData: Error, socket went unconnected");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "readData: Error, socket went unconnected");
             close();
             return false;
         }
         else if (sret < 0 && error() != MSocketDevice::NoError)
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("readData: Error, readBlock: %1")
-                        .arg(errorToString()));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("readData: Error, readBlock: %1")
+                    .arg(errorToString()));
             close();
             return false;
         }
@@ -433,7 +432,8 @@ bool MythSocket::readData(char *data, quint64 len)
             zerocnt++;
             if (zerocnt > 5000)
             {
-                LOG(VB_GENERAL, LOG_ERR, "readData: Error, zerocnt timeout");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "readData: Error, zerocnt timeout");
                 return false;
             }
             usleep(1000);
@@ -450,8 +450,8 @@ bool MythSocket::writeData(const char *data, quint64 len)
 {
     if (state() != Connected)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                "writeData: Error, called with unconnected socket.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "writeData: Error, called with unconnected socket.");
         return false;
     }
 
@@ -470,16 +470,16 @@ bool MythSocket::writeData(const char *data, quint64 len)
         }
         else if (!isValid())
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    "writeData: Error, socket went unconnected");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "writeData: Error, socket went unconnected");
             close();
             return false;
         }
         else if (sret < 0 && error() != MSocketDevice::NoError)
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("writeData: Error, writeBlock: %1")
-                        .arg(errorToString()));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("writeData: Error, writeBlock: %1")
+                    .arg(errorToString()));
             close();
             return false;
         }
@@ -488,7 +488,8 @@ bool MythSocket::writeData(const char *data, quint64 len)
             zerocnt++;
             if (zerocnt > 5000)
             {
-                LOG(VB_GENERAL, LOG_ERR, "writeData: Error, zerocnt timeout");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "writeData: Error, zerocnt timeout");
                 return false;
             }
             usleep(1000);
@@ -503,8 +504,8 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
 
     if (state() != Connected)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                "readStringList: Error, called with unconnected socket.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "readStringList: Error, called with unconnected socket.");
         return false;
     }
 
@@ -517,15 +518,15 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
         elapsed = timer.elapsed();
         if (elapsed >= (int)timeoutMS)
         {
-            LOG(VB_GENERAL, LOG_ERR, "readStringList: " +
-                    QString("Error, timed out after %1 ms.").arg(timeoutMS));
+            LOG(VB_GENERAL, LOG_ERR, LOC + "readStringList: " +
+                QString("Error, timed out after %1 ms.").arg(timeoutMS));
             close();
             return false;
         }
 
         if (state() != Connected)
         {
-            LOG(VB_GENERAL, LOG_ERR, "readStringList: Connection died.");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "readStringList: Connection died.");
             return false;
         }
 
@@ -546,8 +547,8 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
             {
                 if (bytesAvailable() == 0)
                 {
-                    LOG(VB_GENERAL, LOG_ERR,
-                            "readStringList: Connection died (select).");
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        "readStringList: Connection died (select).");
                     return false;
                 }
             }
@@ -557,9 +558,9 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
     QByteArray sizestr(8 + 1, '\0');
     if (readBlock(sizestr.data(), 8) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("readStringList: Error, readBlock return error (%1)")
-                    .arg(errorToString()));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("readStringList: Error, readBlock return error (%1)")
+                .arg(errorToString()));
         close();
         return false;
     }
@@ -572,10 +573,10 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
         int pending = bytesAvailable();
         QByteArray dump(pending + 1, 0);
         readBlock(dump.data(), pending);
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Protocol error: '%1' is not a valid size "
-                        "prefix. %2 bytes pending.")
-                        .arg(sizestr.data()).arg(pending));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Protocol error: '%1' is not a valid size "
+                    "prefix. %2 bytes pending.")
+                .arg(sizestr.data()).arg(pending));
         return false;
     }
 
@@ -599,16 +600,16 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
         }
         else if (sret < 0 && error() != MSocketDevice::NoError)
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("readStringList: Error, readBlock %1")
-                        .arg(errorToString()));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("readStringList: Error, readBlock %1")
+                    .arg(errorToString()));
             close();
             return false;
         }
         else if (!isValid())
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    "readStringList: Error, socket went unconnected");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "readStringList: Error, socket went unconnected");
             close();
             return false;
         }
@@ -620,16 +621,16 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
                 if ((elapsed - errmsgtime) > 10000)
                 {
                     errmsgtime = elapsed;
-                    LOG(VB_GENERAL, LOG_ERR,
-                            QString("readStringList: Waiting for data: %1 %2")
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("readStringList: Waiting for data: %1 %2")
                             .arg(read).arg(btr));
                 }
             }
 
             if (elapsed > 100000)
             {
-                LOG(VB_GENERAL, LOG_ERR,
-                        "Error, readStringList timeout (readBlock)");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Error, readStringList timeout (readBlock)");
                 return false;
             }
 
@@ -645,17 +646,17 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
     payload.truncate(8);
     payload += str;
 
-    if (VERBOSE_LEVEL_CHECK(VB_NETWORK))
+    if (VERBOSE_LEVEL_CHECK(VB_NETWORK, LOG_INFO))
     {
         QString msg = QString("read  <- %1 %2").arg(socket(), 2)
             .arg(payload.data());
 
-        if (!VERBOSE_LEVEL_CHECK(VB_EXTRA) && msg.length() > 88)
+        if (logLevel < LOG_DEBUG && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
         }
-        LOG(VB_NETWORK, LOG_ERR, msg);
+        LOG(VB_NETWORK, LOG_INFO, LOC + msg);
     }
 
     list = str.split("[]:[]");
@@ -699,13 +700,13 @@ bool MythSocket::SendReceiveStringList(
 
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "No response.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No response.");
         return false;
     }
 
     if (min_reply_length && ((uint)strlist.size() < min_reply_length))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Response too short.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Response too short.");
         return false;
     }
 
@@ -752,7 +753,7 @@ bool MythSocket::connect(const QString &host, quint16 port)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Unable to lookup: %1")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to lookup: %1")
                     .arg(host));
             return false;
         }
@@ -769,17 +770,17 @@ bool MythSocket::connect(const QHostAddress &addr, quint16 port)
 {
     if (state() == Connected)
     {
-        LOG(VB_SOCKET, LOG_ERR,
-                "connect() called with already open socket, closing");
+        LOG(VB_SOCKET, LOG_ERR, LOC +
+            "connect() called with already open socket, closing");
         close();
     }
 
-    LOG(VB_SOCKET, LOG_INFO, QString("attempting connect() to (%1:%2)")
+    LOG(VB_SOCKET, LOG_INFO, LOC + QString("attempting connect() to (%1:%2)")
             .arg(addr.toString()).arg(port));
 
     if (!MSocketDevice::connect(addr, port))
     {
-        LOG(VB_SOCKET, LOG_ERR, QString("connect() failed (%1)")
+        LOG(VB_SOCKET, LOG_ERR, LOC + QString("connect() failed (%1)")
                 .arg(errorToString()));
         setState(Idle);
         return false;
@@ -793,7 +794,7 @@ bool MythSocket::connect(const QHostAddress &addr, quint16 port)
         setState(Connected);
         if (m_cb)
         {
-            LOG(VB_SOCKET, LOG_DEBUG, "calling m_cb->connected()");
+            LOG(VB_SOCKET, LOG_DEBUG, LOC + "calling m_cb->connected()");
             m_cb->connected(this);
             s_readyread_thread->WakeReadyReadThread();
         }
@@ -860,12 +861,13 @@ bool MythSocket::Announce(QStringList &strlist)
 {
     if (!m_isValidated)
     {
-        LOG(VB_GENERAL, LOG_ERR, "refusing to announce unvalidated socket");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "refusing to announce unvalidated socket");
     }
 
     if (m_isAnnounced)
     {
-        LOG(VB_GENERAL, LOG_ERR, "refusing to re-announce socket");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "refusing to re-announce socket");
         return false;
     }
 
@@ -876,9 +878,9 @@ bool MythSocket::Announce(QStringList &strlist)
 
     if (!readStringList(strlist, true))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                    QString("\n\t\t\tCould not read string list from server "
-                            "%1:%2").arg(m_addr.toString()).arg(m_port));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("\n\t\t\tCould not read string list from server %1:%2")
+                .arg(m_addr.toString()).arg(m_port));
         m_announce.clear();
         return false;
     }

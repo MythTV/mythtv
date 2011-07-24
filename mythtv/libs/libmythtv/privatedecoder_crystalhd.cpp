@@ -12,9 +12,9 @@ void FetcherThread::run(void)
         return;
 
     threadRegister("Fetcher");
-    VERBOSE(VB_PLAYBACK, LOC + QString("Starting Fetcher thread."));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Starting Fetcher thread."));
     m_dec->FetchFrames();
-    VERBOSE(VB_PLAYBACK, LOC + QString("Stopping Fetcher thread."));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Stopping Fetcher thread."));
     threadDeregister();
 }
 
@@ -26,13 +26,13 @@ QString pulldown_to_string(int pulldown);
 QString decoderflags_to_string(int flags);
 QString poutflags_to_string(int flags);
 
-#define INIT_ST BC_STATUS st; bool ok = true;
+#define INIT_ST BC_STATUS st; bool ok = true
 #define CHECK_ST \
     ok &= (st == BC_STS_SUCCESS); \
     if (!ok) \
-        VERBOSE(VB_IMPORTANT, ERR + QString("Error at %1:%2 (#%3, %4)") \
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
               .arg(__FILE__).arg( __LINE__).arg(st) \
-              .arg(bcmerr_to_string(st)));
+              .arg(bcmerr_to_string(st)))
 
 void PrivateDecoderCrystalHD::GetDecoders(render_opts &opts)
 {
@@ -58,12 +58,13 @@ PrivateDecoderCrystalHD::~PrivateDecoderCrystalHD()
         m_fetcher_stop = true;
         int tries = 0;
         while (!m_fetcher_thread->wait(100) && (tries++ < 50))
-            VERBOSE(VB_PLAYBACK, WARN + "Waited 100ms for Fetcher to stop");
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                "Waited 100ms for Fetcher to stop");
 
         if (m_fetcher_thread->isRunning())
-            VERBOSE(VB_IMPORTANT, ERR + "Failed to stop Fetcher.");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to stop Fetcher.");
         else
-            VERBOSE(VB_PLAYBACK, LOC + "Stopped frame Fetcher.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Stopped frame Fetcher.");
         delete m_fetcher_thread;
     }
 
@@ -74,16 +75,16 @@ PrivateDecoderCrystalHD::~PrivateDecoderCrystalHD()
     if (!m_device)
         return;
 
-    INIT_ST
+    INIT_ST;
     if (m_device_type != BC_70015)
     {
         st = DtsFlushRxCapture(m_device, false);
-        CHECK_ST
+        CHECK_ST;
     }
     st = DtsStopDecoder(m_device);
-    CHECK_ST
+    CHECK_ST;
     st = DtsCloseDecoder(m_device);
-    CHECK_ST
+    CHECK_ST;
     DtsDeviceClose(m_device);
 }
 
@@ -102,21 +103,21 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
                                DTS_SKIP_TX_CHK_CPB |
                                DTS_PLAYBACK_DROP_RPT_MODE |
                                DTS_DFLT_RESOLUTION(vdecRESOLUTION_CUSTOM);
-    INIT_ST
+    INIT_ST;
     st = DtsDeviceOpen(&m_device, well_documented);
-    CHECK_ST
+    CHECK_ST;
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to open CrystalHD device");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to open CrystalHD device");
         return false;
     }
 
     _BC_INFO_CRYSTAL_ info;
     st = DtsCrystalHDVersion(m_device, &info);
-    CHECK_ST
+    CHECK_ST;
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to get device info.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get device info.");
         return false;
     }
 
@@ -124,17 +125,17 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
 
     if (!debugged)
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString("Device: %1")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Device: %1")
                 .arg(device_to_string(m_device_type)));
-        VERBOSE(VB_IMPORTANT, LOC + QString("Library : %1.%2.%3")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Library : %1.%2.%3")
                 .arg(info.dilVersion.dilMajor)
                 .arg(info.dilVersion.dilMinor)
                 .arg(info.dilVersion.version));
-        VERBOSE(VB_IMPORTANT, LOC + QString("Driver  : %1.%2.%3")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Driver  : %1.%2.%3")
                 .arg(info.drvVersion.drvMajor)
                 .arg(info.drvVersion.drvMinor)
                 .arg(info.drvVersion.version));
-        VERBOSE(VB_IMPORTANT, LOC + QString("Firmware: %1.%2.%3")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Firmware: %1.%2.%3")
                 .arg(info.fwVersion.fwMajor)
                 .arg(info.fwVersion.fwMinor)
                 .arg(info.fwVersion.version));
@@ -142,17 +143,18 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
 
     if (BC_70012 == m_device_type)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "BCM70012 device is currently unsupported.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "BCM70012 device is currently unsupported.");
         return false;
     }
 
     BC_HW_CAPS hw_caps;
     uint32_t codecs;
     st = DtsGetCapabilities(m_device, &hw_caps);
-    CHECK_ST
+    CHECK_ST;
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to get device capabilities");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get device capabilities");
         return false;
     }
 
@@ -165,29 +167,30 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
             m_pix_fmt = m_desired_fmt;
         if (!debugged)
         {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Supported output format: %1")
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Supported output format: %1")
                     .arg(bcmpixfmt_to_string(hw_caps.ColorCaps.OutFmt[i])));
         }
     }
     if (m_pix_fmt != m_desired_fmt)
     {
-        VERBOSE(VB_PLAYBACK, ERR + "Failed to find correct output format.");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            "Failed to find correct output format.");
         return false;
     }
-    VERBOSE(VB_PLAYBACK, LOC + QString("Using: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using: %1")
             .arg(bcmpixfmt_to_string(m_pix_fmt)));
 
     codecs = hw_caps.DecCaps;
     if (!debugged)
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("H.264 support: %1")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("H.264 support: %1")
                 .arg((bool)(codecs & BC_DEC_FLAGS_H264)));
-        VERBOSE(VB_PLAYBACK, LOC + QString("MPEG2 support: %1")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("MPEG2 support: %1")
                 .arg((bool)(codecs & BC_DEC_FLAGS_MPEG2)));
-        VERBOSE(VB_PLAYBACK, LOC + QString("VC1   support: %1")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VC1   support: %1")
                 .arg((bool)(codecs & BC_DEC_FLAGS_VC1)));
-        VERBOSE(VB_PLAYBACK, LOC + QString("MPEG4 support: %1")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("MPEG4 support: %1")
                 .arg((bool)(codecs & BC_DEC_FLAGS_M4P2)));
         debugged = true;
     }
@@ -228,8 +231,8 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
                 {
                     if (!CreateFilter(avctx))
                     {
-                        VERBOSE(VB_PLAYBACK, ERR +
-                                "Failed to create stream filter");
+                        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                            "Failed to create stream filter");
                         return false;
                     }
                     sub_type = BC_MSUBTYPE_AVC1;
@@ -242,7 +245,7 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
 
     if (sub_type == BC_MSUBTYPE_INVALID)
     {
-        VERBOSE(VB_PLAYBACK, ERR + QString("Codec %1 not supported")
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Codec %1 not supported")
                 .arg(ff_codec_id_string(avctx->codec_id)));
         return false;
     }
@@ -250,14 +253,14 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
     int nalsize = 4;
     if (avctx->codec_id == CODEC_ID_H264)
     {
-        VERBOSE(VB_PLAYBACK, LOC +
-                QString("H.264 Profile: %1 RefFrames: %2 Codec tag: %3")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("H.264 Profile: %1 RefFrames: %2 Codec tag: %3")
                 .arg(avctx->profile).arg(avctx->refs)
                 .arg(fourcc_str(avctx->codec_tag)));
         if (avctx->extradata[0] == 1)
         {
             nalsize = (avctx->extradata[4] & 0x03) + 1;
-            VERBOSE(VB_PLAYBACK, LOC + QString("avcC nal size: %1")
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("avcC nal size: %1")
                     .arg(nalsize));
         }
     }
@@ -276,45 +279,45 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
     fmt.mSubtype       = sub_type;
 
     st = DtsSetInputFormat(m_device, &fmt);
-    CHECK_ST
+    CHECK_ST;
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to set decoder input format");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set decoder input format");
         return false;
     }
 
     st = DtsOpenDecoder(m_device, BC_STREAM_TYPE_ES);
-    CHECK_ST
+    CHECK_ST;
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to open CrystalHD decoder");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to open CrystalHD decoder");
         return false;
     }
 
     st = DtsSetColorSpace(m_device, m_pix_fmt);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to set decoder output format");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set decoder output format");
         return false;
     }
 
     st = DtsStartDecoder(m_device);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to start decoder");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to start decoder");
         return false;
     }
 
     st = DtsStartCapture(m_device);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to start capture");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to start capture");
         return false;
     }
 
     Reset();
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Created decoder %1 %2x%3")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created decoder %1 %2x%3")
         .arg(ff_codec_id_string(avctx->codec_id))
         .arg(avctx->coded_width).arg(avctx->coded_height));
     return true;
@@ -325,7 +328,7 @@ bool PrivateDecoderCrystalHD::CreateFilter(AVCodecContext *avctx)
     int nalsize = (avctx->extradata[4] & 0x3) + 1;
     if (!nalsize || nalsize == 3 || nalsize > 4)
     {
-        VERBOSE(VB_PLAYBACK, ERR + QString("Invalid nal size (%1)")
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Invalid nal size (%1)")
                 .arg(nalsize));
         return false;
     }
@@ -379,7 +382,7 @@ bool PrivateDecoderCrystalHD::Reset(void)
         while (!m_fetcher_paused && (tries++ < 50))
             usleep(10000);
         if (!m_fetcher_paused)
-            VERBOSE(VB_IMPORTANT, LOC + "Failed to pause fetcher thread");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to pause fetcher thread");
     }
 
     QMutexLocker lock(&m_decoded_frames_lock);
@@ -399,9 +402,9 @@ bool PrivateDecoderCrystalHD::Reset(void)
 
     if (m_device_type != BC_70015)
     {
-        INIT_ST
+        INIT_ST;
         st = DtsFlushInput(m_device, 2);
-        CHECK_ST
+        CHECK_ST;
     }
     return true;;
 }
@@ -431,8 +434,8 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
     memcpy(buffer->buf, pkt->data, pkt->size);
 
     m_packet_buffers.insert(0, buffer);
-    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC +
-            QString("%1 packet buffers queued up").arg(m_packet_buffers.size()));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("%1 packet buffers queued up").arg(m_packet_buffers.size()));
 
     while (m_packet_buffers.size() > 0)
     {
@@ -459,8 +462,8 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
             {
                 static int count = 0;
                 if (count == 0)
-                    VERBOSE(VB_IMPORTANT, ERR +
-                            QString("Failed to convert packet (%1)").arg(res));
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("Failed to convert packet (%1)").arg(res));
                 count++;
                 if (count > 200)
                     count = 0;
@@ -477,21 +480,23 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
         usleep(1000);
         uint64_t chd_timestamp = 0; // 100 nsec units
         if (buffer->pts != (int64_t)AV_NOPTS_VALUE) 
-            chd_timestamp = (uint64_t)(av_q2d(stream->time_base) * buffer->pts * 10000000); 
-        VERBOSE(VB_TIMESTAMP|VB_EXTRA, LOC + QString("decoder input timecode %1 ms (pts %2)")
+            chd_timestamp = (uint64_t)(av_q2d(stream->time_base) *
+                                       buffer->pts * 10000000); 
+        LOG(VB_TIMESTAMP, LOG_DEBUG, LOC +
+            QString("decoder input timecode %1 ms (pts %2)")
                 .arg(chd_timestamp / 10000).arg(buffer->pts));
 
         // TODO check for busy state
-        INIT_ST
+        INIT_ST;
         st = DtsProcInput(m_device, buf, size, chd_timestamp, false);
-        CHECK_ST
+        CHECK_ST;
 
         if (free_buf)
             delete buf;
 
         free_buffer(buffer);
         if (!ok)
-            VERBOSE(VB_IMPORTANT, ERR + "Failed to send packet to decoder.");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to send packet to decoder.");
         result = buffer->size;
     }
     return result;
@@ -525,8 +530,8 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
 
     if (avctx->get_buffer(avctx, picture) < 0)
     {
-        VERBOSE(VB_IMPORTANT, ERR +
-                QString("%1 decoded frames available but no video buffers.")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("%1 decoded frames available but no video buffers.")
                 .arg(available));
         return -1;
     }
@@ -536,9 +541,10 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
     m_decoded_frames_lock.unlock();
 
     *got_picture_ptr = 1;
-    picture->reordered_opaque = (int64_t)(frame->timecode / av_q2d(stream->time_base)
-                                                          / 10000000);
-    VERBOSE(VB_TIMESTAMP|VB_EXTRA, LOC + QString("decoder output timecode %1 ms (pts %2)")
+    picture->reordered_opaque = (int64_t)(frame->timecode /
+                                          av_q2d(stream->time_base) / 10000000);
+    LOG(VB_TIMESTAMP, LOG_DEBUG, LOC +
+        QString("decoder output timecode %1 ms (pts %2)")
             .arg(frame->timecode / 10000).arg(picture->reordered_opaque));
     picture->interlaced_frame = frame->interlaced_frame;
     picture->top_field_first  = frame->top_field_first;
@@ -555,7 +561,7 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
 
 void PrivateDecoderCrystalHD::FetchFrames(void)
 {
-    INIT_ST
+    INIT_ST;
     bool valid = false;
     m_fetcher_paused = false;
     while (!m_fetcher_stop)
@@ -570,7 +576,7 @@ void PrivateDecoderCrystalHD::FetchFrames(void)
 
         BC_DTS_STATUS status;
         st = DtsGetDriverStatus(m_device, &status);
-        CHECK_ST
+        CHECK_ST;
 
         if (!status.ReadyListCount)
             continue;
@@ -581,23 +587,23 @@ void PrivateDecoderCrystalHD::FetchFrames(void)
 
         if (BC_STS_FMT_CHANGE == st)
         {
-            VERBOSE(VB_IMPORTANT, LOC + "Decoder reported format change.");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Decoder reported format change.");
             CheckProcOutput(&out);
             valid = true;
             continue;
         }
-        CHECK_ST
+        CHECK_ST;
 
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, ERR + "Failed to fetch decoded frame");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to fetch decoded frame");
             continue;
         }
 
         if (ok && valid && (out.PoutFlags & BC_POUT_FLAGS_PIB_VALID))
             FillFrame(&out);
         st = DtsReleaseOutputBuffs(m_device, NULL, false);
-        CHECK_ST
+        CHECK_ST;
     }
 }
 
@@ -623,7 +629,7 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
     {
         if (out->PicInfo.picture_number != m_frame->frameNumber)
         {
-            VERBOSE(VB_PLAYBACK, WARN + "Missing second field");
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Missing second field");
             AddFrameToQueue();
         }
         else
@@ -700,7 +706,7 @@ void PrivateDecoderCrystalHD::AddFrameToQueue(void)
 {
     m_decoded_frames_lock.lock();
     m_decoded_frames.insert(0, m_frame);
-    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Decoded frame queue size %1")
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Decoded frame queue size %1")
             .arg(m_decoded_frames.size()));
     m_decoded_frames_lock.unlock();
     m_frame = NULL;
@@ -708,66 +714,66 @@ void PrivateDecoderCrystalHD::AddFrameToQueue(void)
 
 void PrivateDecoderCrystalHD::CheckProcOutput(BC_DTS_PROC_OUT *out)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut Ybuf      : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut Ybuf      : %1")
             .arg((uintptr_t)out->Ybuff));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut Ybuffsz   : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut Ybuffsz   : %1")
             .arg(out->YbuffSz));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut Ybuffdnsz : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut Ybuffdnsz : %1")
             .arg(out->YBuffDoneSz));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut Ubuf      : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut Ubuf      : %1")
             .arg((uintptr_t)out->UVbuff));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut Ubuffsz   : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut Ubuffsz   : %1")
             .arg(out->UVbuffSz));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut Ubuffdnsz : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut Ubuffdnsz : %1")
             .arg(out->UVBuffDoneSz));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut StrideSz  : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut StrideSz  : %1")
             .arg(out->StrideSz));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut Flags     : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut Flags     : %1")
             .arg(poutflags_to_string(out->PoutFlags)));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut DiscCnt   : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut DiscCnt   : %1")
             .arg(out->discCnt));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut usrdatasz : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut usrdatasz : %1")
             .arg(out->UserDataSz));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut DropFrames: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut DropFrames: %1")
             .arg(out->DropFrames));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut b422Mode  : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut b422Mode  : %1")
             .arg(bcmpixfmt_to_string((BC_OUTPUT_FORMAT)out->b422Mode)));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut bPIBenc   : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut bPIBenc   : %1")
             .arg(out->bPibEnc));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut revertscra: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut revertscra: %1")
             .arg(out->bRevertScramble));
     CheckPicInfo(out);
 }
 
 void PrivateDecoderCrystalHD::CheckPicInfo(BC_DTS_PROC_OUT *out)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo timestamp: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo timestamp: %1")
             .arg(out->PicInfo.timeStamp));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo picnumber: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo picnumber: %1")
             .arg(out->PicInfo.picture_number));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo width    : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo width    : %1")
             .arg(out->PicInfo.width));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo height   : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo height   : %1")
             .arg(out->PicInfo.height));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo chromafmt: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo chromafmt: %1")
             .arg(out->PicInfo.chroma_format));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo pulldown : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo pulldown : %1")
             .arg(pulldown_to_string(out->PicInfo.pulldown)));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo flags    : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo flags    : %1")
             .arg(decoderflags_to_string(out->PicInfo.flags)));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo framerate: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo framerate: %1")
             .arg(out->PicInfo.frame_rate));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo aspectrat: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo aspectrat: %1")
             .arg(out->PicInfo.colour_primaries));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo metapaylo: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo metapaylo: %1")
             .arg(out->PicInfo.picture_meta_payload));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo sess_num : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo sess_num : %1")
             .arg(out->PicInfo.sess_num));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo ycom     : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo ycom     : %1")
             .arg(out->PicInfo.ycom));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo customasp: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo customasp: %1")
             .arg(out->PicInfo.custom_aspect_ratio_width_height));
-    VERBOSE(VB_PLAYBACK, LOC + QString("ProcOut PicInfo ndrop    : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ProcOut PicInfo ndrop    : %1")
             .arg(out->PicInfo.n_drop));
 }
 
@@ -775,37 +781,37 @@ void PrivateDecoderCrystalHD::CheckStatus(void)
 {
     BC_DTS_STATUS status;
     status.cpbEmptySize = 0x00000000; // set bit 31 for real HW free size
-    INIT_ST
+    INIT_ST;
     st = DtsGetDriverStatus(m_device, &status);
-    CHECK_ST
+    CHECK_ST;
     if (!ok)
         return;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("ReadyListCount  : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ReadyListCount  : %1")
             .arg(status.ReadyListCount));
-    VERBOSE(VB_PLAYBACK, LOC + QString("FreeListCount   : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("FreeListCount   : %1")
             .arg(status.FreeListCount));
-    VERBOSE(VB_PLAYBACK, LOC + QString("PowerStateChange: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PowerStateChange: %1")
             .arg(status.PowerStateChange));
-    VERBOSE(VB_PLAYBACK, LOC + QString("FrameDropped    : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("FrameDropped    : %1")
             .arg(status.FramesDropped));
-    VERBOSE(VB_PLAYBACK, LOC + QString("FramesCaptured  : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("FramesCaptured  : %1")
             .arg(status.FramesCaptured));
-    VERBOSE(VB_PLAYBACK, LOC + QString("FramesRepeated  : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("FramesRepeated  : %1")
             .arg(status.FramesRepeated));
-    VERBOSE(VB_PLAYBACK, LOC + QString("InputCount      : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("InputCount      : %1")
             .arg(status.InputCount));
-    VERBOSE(VB_PLAYBACK, LOC + QString("InputTotalSize  : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("InputTotalSize  : %1")
             .arg(status.InputTotalSize));
-    VERBOSE(VB_PLAYBACK, LOC + QString("InputBusyCount  : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("InputBusyCount  : %1")
             .arg(status.InputBusyCount));
-    VERBOSE(VB_PLAYBACK, LOC + QString("PIBMissCount    : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PIBMissCount    : %1")
             .arg(status.PIBMissCount));
-    VERBOSE(VB_PLAYBACK, LOC + QString("cpbEmptySize    : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("cpbEmptySize    : %1")
             .arg(status.cpbEmptySize));
-    VERBOSE(VB_PLAYBACK, LOC + QString("NextTimeStamp   : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NextTimeStamp   : %1")
             .arg(status.NextTimeStamp));
-    VERBOSE(VB_PLAYBACK, LOC + QString("PicNumFlags     : %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PicNumFlags     : %1")
             .arg(status.picNumFlags));
 }
 
@@ -816,9 +822,9 @@ int PrivateDecoderCrystalHD::GetTxFreeSize(bool hwsel)
         status.cpbEmptySize = 0xC0000000; // set bit 31 for real HW free size
     else
         status.cpbEmptySize = 0x40000000; // set bit 30 for TX only status
-    INIT_ST
+    INIT_ST;
     st = DtsGetDriverStatus(m_device, &status);
-    CHECK_ST
+    CHECK_ST;
     if (!ok)
         return -1;
     

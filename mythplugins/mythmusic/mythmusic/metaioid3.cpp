@@ -353,8 +353,9 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
             // 100 bytes of data (1x1 indexed gif is 35 bytes)
             if (frame->picture().size() < 100)
             {
-                VERBOSE(VB_GENERAL, "Music Scanner - Discarding APIC frame "
-                                    "with size less than 100 bytes");
+                LOG(VB_GENERAL, LOG_NOTICE,
+                    "Music Scanner - Discarding APIC frame "
+                    "with size less than 100 bytes");
                 continue;
             }
 
@@ -392,8 +393,8 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
                     art->filename = QString("unknown") + ext;
                     break;
                 default:
-                    VERBOSE(VB_GENERAL, "Music Scanner - APIC tag found "
-                                        "with unsupported type");
+                    LOG(VB_GENERAL, LOG_ERR, "Music Scanner - APIC tag found "
+                                             "with unsupported type");
                     continue;
             }
 
@@ -415,7 +416,8 @@ QString MetaIOID3::getExtFromMimeType(const QString &mimeType)
     else if (mimeType == "image/bmp")
         return QString(".bmp");
 
-    VERBOSE(VB_GENERAL, QString("Music Scanner - Unknow image mimetype found - %1").arg(mimeType));
+    LOG(VB_GENERAL, LOG_ERR,
+        "Music Scanner - Unknown image mimetype found - " + mimeType);
 
     return QString();
 }
@@ -574,6 +576,81 @@ bool MetaIOID3::removeAlbumArt(const QString &filename, const AlbumArtImage *alb
     }
 
     tag->removeFrame(apic);
+
+    mpegfile->save();
+    delete mpegfile;
+
+    return true;
+}
+
+bool MetaIOID3::changeImageType(const QString &filename, const AlbumArtImage* albumart,
+                                ImageType newType)
+{
+    if (!albumart)
+        return false;
+
+    if (albumart->imageType == newType)
+        return true;
+
+    AttachedPictureFrame::Type type = AttachedPictureFrame::Other;
+    switch (albumart->imageType)
+    {
+        case IT_FRONTCOVER:
+            type = AttachedPictureFrame::FrontCover;
+            break;
+        case IT_BACKCOVER:
+            type = AttachedPictureFrame::BackCover;
+            break;
+        case IT_CD:
+            type = AttachedPictureFrame::Media;
+            break;
+        case IT_INLAY:
+            type = AttachedPictureFrame::LeafletPage;
+            break;
+        default:
+            type = AttachedPictureFrame::Other;
+            break;
+    }
+
+    TagLib::MPEG::File *mpegfile = OpenFile(filename);
+
+    if (!mpegfile)
+        return false;
+
+    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+
+    if (!tag)
+    {
+        delete mpegfile;
+        return false;
+    }
+
+    AttachedPictureFrame *apic = findAPIC(tag, type, QStringToTString(albumart->description));
+    if (!apic)
+    {
+        delete mpegfile;
+        return false;
+    }
+
+    // set the new image type
+    switch (newType)
+    {
+        case IT_FRONTCOVER:
+            apic->setType(AttachedPictureFrame::FrontCover);
+            break;
+        case IT_BACKCOVER:
+            apic->setType(AttachedPictureFrame::BackCover);
+            break;
+        case IT_CD:
+            apic->setType(AttachedPictureFrame::Media);
+            break;
+        case IT_INLAY:
+            apic->setType(AttachedPictureFrame::LeafletPage);
+            break;
+        default:
+            apic->setType(AttachedPictureFrame::Other);
+            break;
+    }
 
     mpegfile->save();
     delete mpegfile;

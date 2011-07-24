@@ -480,8 +480,15 @@ void MythUIType::SetPosition(int x, int y)
     SetPosition(MythPoint(x, y));
 }
 
-void MythUIType::SetPosition(const MythPoint &pos)
+void MythUIType::SetPosition(const MythPoint &point)
 {
+    MythPoint  pos(point);
+
+    if (m_Parent)
+        pos.CalculatePoint(m_Parent->GetArea());
+    else
+        pos.CalculatePoint(GetMythMainWindow()->GetUIScreenRect());
+
     if (m_Area.topLeft() == pos)
         return;
 

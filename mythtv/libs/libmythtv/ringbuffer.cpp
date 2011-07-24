@@ -40,8 +40,6 @@ const int  RingBuffer::kLiveTVOpenTimeout  = 10000;
 #define CHUNK 32768 /* readblocksize increments */
 
 #define LOC      QString("RingBuf(%1): ").arg(filename)
-#define LOC_WARN QString("RingBuf(%1) Warning: ").arg(filename)
-#define LOC_ERR  QString("RingBuf(%1) Error: ").arg(filename)
 
 QMutex      RingBuffer::subExtLock;
 QStringList RingBuffer::subExt;
@@ -148,7 +146,7 @@ RingBuffer *RingBuffer::Create(
             lfilename.remove(0,4);              //             e.g. "dvd:D:\"
 
         if (mythurl || QFile::exists(lfilename))
-            VERBOSE(VB_PLAYBACK, "Trying DVD at " + lfilename);
+            LOG(VB_PLAYBACK, LOG_INFO, "Trying DVD at " + lfilename);
         else
             lfilename = "/dev/dvd";
 
@@ -162,7 +160,7 @@ RingBuffer *RingBuffer::Create(
             lfilename.remove(0,3);             // e.g. "bd:/videos/ET"
 
         if (mythurl || QFile::exists(lfilename))
-            VERBOSE(VB_PLAYBACK, "Trying BD at " + lfilename);
+            LOG(VB_PLAYBACK, LOG_INFO, "Trying BD at " + lfilename);
         else
             lfilename = "/dev/dvd";
 
@@ -244,7 +242,7 @@ RingBuffer::~RingBuffer(void)
  */
 void RingBuffer::Reset(bool full, bool toAdjust, bool resetInternal)
 {
-    VERBOSE(VB_FILE, LOC + QString("Reset(%1,%2,%3)")
+    LOG(VB_FILE, LOG_INFO, LOC + QString("Reset(%1,%2,%3)")
             .arg(full).arg(toAdjust).arg(resetInternal));
 
     rwlock.lockForWrite();
@@ -259,9 +257,10 @@ void RingBuffer::Reset(bool full, bool toAdjust, bool resetInternal)
 
     if (readpos != 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString(
-                "RingBuffer::Reset() nonzero readpos.  toAdjust: %1 readpos: %2"
-                " readAdjust: %3").arg(toAdjust).arg(readpos).arg(readAdjust));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("RingBuffer::Reset() nonzero readpos.  toAdjust: %1 "
+                    "readpos: %2 readAdjust: %3")
+                .arg(toAdjust).arg(readpos).arg(readAdjust));
     }
 
     readAdjust = 0;
@@ -285,11 +284,12 @@ void RingBuffer::Reset(bool full, bool toAdjust, bool resetInternal)
  */
 void RingBuffer::UpdateRawBitrate(uint raw_bitrate)
 {
-    VERBOSE(VB_FILE, LOC + QString("UpdateRawBitrate(%1Kb)").arg(raw_bitrate));
+    LOG(VB_FILE, LOG_INFO, LOC +
+        QString("UpdateRawBitrate(%1Kb)").arg(raw_bitrate));
     if (raw_bitrate < 2500)
     {
-        VERBOSE(VB_FILE, LOC +
-                QString("UpdateRawBitrate(%1Kb) - ignoring bitrate,")
+        LOG(VB_FILE, LOG_INFO, LOC +
+            QString("UpdateRawBitrate(%1Kb) - ignoring bitrate,")
                 .arg(raw_bitrate) +
                 "\n\t\t\tappears to be abnormally low.");
         return;
@@ -366,9 +366,9 @@ void RingBuffer::CalcReadAheadThresh(void)
     // make this a multiple of ffmpeg block size..
     fill_min        = ((fill_min / KB32) + 1) * KB32;
 
-    VERBOSE(VB_FILE, LOC +
-            QString("CalcReadAheadThresh(%1 Kb)\n\t\t\t -> "
-                    "threshhold(%2 KB) min read(%3 KB) blk size(%4 KB)")
+    LOG(VB_FILE, LOG_INFO, LOC +
+        QString("CalcReadAheadThresh(%1 Kb)\n\t\t\t -> "
+                "threshhold(%2 KB) min read(%3 KB) blk size(%4 KB)")
             .arg(estbitrate).arg(fill_threshold/1024)
             .arg(fill_min/1024).arg(readblocksize/1024));
 }
@@ -391,7 +391,7 @@ bool RingBuffer::IsNearEnd(double fps, uint vvf) const
 
     bool near_end = ((vvf + readahead_frames) < 10.0) || (sz < rbs*1.5);
 
-    VERBOSE(VB_PLAYBACK, LOC + "IsReallyNearEnd()" +
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "IsReallyNearEnd()" +
             QString(" br(%1KB)").arg(kbits_per_sec/8) +
             QString(" sz(%1KB)").arg(sz / 1000) +
             QString(" vfl(%1)").arg(vvf) +
@@ -438,7 +438,8 @@ int RingBuffer::ReadBufAvail(void) const
  */
 void RingBuffer::ResetReadAhead(long long newinternal)
 {
-    VERBOSE(VB_FILE, LOC + QString("ResetReadAhead(internalreadpos = %1->%2)")
+    LOG(VB_FILE, LOG_INFO, LOC +
+        QString("ResetReadAhead(internalreadpos = %1->%2)")
             .arg(internalreadpos).arg(newinternal));
 
     rbrlock.lockForWrite();
@@ -482,14 +483,14 @@ void RingBuffer::Start(void)
     }
     else if (writemode)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Not starting read ahead thread, "
-                "this is a write only RingBuffer");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Not starting read ahead thread, "
+                                           "this is a write only RingBuffer");
         do_start = false;
     }
     else if (readaheadrunning)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Not starting read ahead thread, "
-                "already running");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Not starting read ahead thread, "
+                                           "already running");
         do_start = false;
     }
 
@@ -595,8 +596,8 @@ void RingBuffer::WaitForPause(void)
         generalWait.wait(&rwlock, 1000);
         if (readaheadrunning && !paused && request_pause && t.elapsed() > 1000)
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    QString("Waited %1 ms for ringbuffer pause..")
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("Waited %1 ms for ringbuffer pause..")
                     .arg(t.elapsed()));
         }
     }
@@ -690,7 +691,7 @@ void RingBuffer::CreateReadAheadBuffer(void)
     poslock.unlock();
     rwlock.unlock();
 
-    VERBOSE(VB_FILE, LOC + QString("Created readAheadBuffer: %1Mb")
+    LOG(VB_FILE, LOG_INFO, LOC + QString("Created readAheadBuffer: %1Mb")
         .arg(newsize >> 20));
 }
 
@@ -721,7 +722,8 @@ void RingBuffer::run(void)
 
     rwlock.lockForRead();
 
-    VERBOSE(VB_FILE, LOC + QString("Initial readblocksize %1K & fill_min %2K")
+    LOG(VB_FILE, LOG_INFO, LOC +
+        QString("Initial readblocksize %1K & fill_min %2K")
             .arg(readblocksize/1024).arg(fill_min/1024));
 
     while (readaheadrunning)
@@ -772,14 +774,15 @@ void RingBuffer::run(void)
                     (now.tv_usec - lastread.tv_usec) / 1000;
                 readtimeavg = (readtimeavg * 9 + readinterval) / 10;
 
-                if (readtimeavg < 150 && (uint)readblocksize < (BUFFER_SIZE_MINIMUM >>2))
+                if (readtimeavg < 150 && 
+                    (uint)readblocksize < (BUFFER_SIZE_MINIMUM >>2))
                 {
                     int old_block_size = readblocksize;
                     readblocksize = 3 * readblocksize / 2;
                     readblocksize = ((readblocksize+CHUNK-1) / CHUNK) * CHUNK;
-                    VERBOSE(VB_FILE, LOC +
-                            QString("Avg read interval was %1 msec. "
-                                    "%2K -> %3K block size")
+                    LOG(VB_FILE, LOG_INFO, LOC +
+                        QString("Avg read interval was %1 msec. "
+                                "%2K -> %3K block size")
                             .arg(readtimeavg)
                             .arg(old_block_size/1024)
                             .arg(readblocksize/1024));
@@ -788,9 +791,9 @@ void RingBuffer::run(void)
                 else if (readtimeavg > 300 && readblocksize > CHUNK)
                 {
                     readblocksize -= CHUNK;
-                    VERBOSE(VB_FILE, LOC +
-                            QString("Avg read interval was %1 msec. "
-                                    "%2K -> %3K block size")
+                    LOG(VB_FILE, LOG_INFO, LOC +
+                        QString("Avg read interval was %1 msec. "
+                                "%2K -> %3K block size")
                             .arg(readtimeavg)
                             .arg((readblocksize+CHUNK)/1024)
                             .arg(readblocksize/1024));
@@ -804,22 +807,22 @@ void RingBuffer::run(void)
             if (rbwpos + totfree > bufferSize)
             {
                 totfree = bufferSize - rbwpos;
-                VERBOSE(VB_FILE|VB_EXTRA, LOC +
-                        "Shrinking read, near end of buffer");
+                LOG(VB_FILE, LOG_DEBUG, LOC +
+                    "Shrinking read, near end of buffer");
             }
 
             if (internalreadpos == 0)
             {
                 totfree = max(fill_min, readblocksize);
-                VERBOSE(VB_FILE|VB_EXTRA, LOC +
-                        "Reading enough data to start playback");
+                LOG(VB_FILE, LOG_DEBUG, LOC +
+                    "Reading enough data to start playback");
             }
 
             if (remotefile && livetvchain && livetvchain->HasNext())
                 remotefile->SetTimeout(true);
 
-            VERBOSE(VB_FILE|VB_EXTRA,
-                    LOC + QString("safe_read(...@%1, %2) -- begin")
+            LOG(VB_FILE, LOG_DEBUG, LOC +
+                QString("safe_read(...@%1, %2) -- begin")
                     .arg(rbwpos).arg(totfree));
 
             MythTimer sr_timer;
@@ -829,9 +832,10 @@ void RingBuffer::run(void)
 
             int sr_elapsed = sr_timer.elapsed();
             uint64_t bps = !sr_elapsed ? 1000000001 :
-                           (uint64_t)(((double)read_return * 8000.0) / (double)sr_elapsed);
-            VERBOSE(VB_FILE, LOC +
-                    QString("safe_read(...@%1, %2) -> %3, took %4 ms %5")
+                           (uint64_t)(((double)read_return * 8000.0) /
+                                      (double)sr_elapsed);
+            LOG(VB_FILE, LOG_INFO, LOC +
+                QString("safe_read(...@%1, %2) -> %3, took %4 ms %5")
                     .arg(rbwpos).arg(totfree).arg(read_return)
                     .arg(sr_elapsed)
                     .arg(QString("(%1Mbps)").arg((double)bps / 1000000.0)));
@@ -845,8 +849,8 @@ void RingBuffer::run(void)
             rbwlock.lockForWrite();
             internalreadpos += read_return;
             rbwpos = (rbwpos + read_return) % bufferSize;
-            VERBOSE(VB_FILE|VB_EXTRA,
-                    LOC + QString("rbwpos += %1K requested %2K in read")
+            LOG(VB_FILE, LOG_DEBUG,
+                LOC + QString("rbwpos += %1K requested %2K in read")
                     .arg(read_return/1024,3).arg(totfree/1024,3));
             rbwlock.unlock();
             poslock.unlock();
@@ -885,8 +889,8 @@ void RingBuffer::run(void)
                 }
                 else
                 {
-                    VERBOSE(VB_FILE|VB_EXTRA,
-                            LOC + "setting ateof (read_return == 0)");
+                    LOG(VB_FILE, LOG_DEBUG,
+                        LOC + "setting ateof (read_return == 0)");
                     ateof = true;
                 }
             }
@@ -896,7 +900,7 @@ void RingBuffer::run(void)
             used = bufferSize - ReadBufFree();
         }
 
-        VERBOSE(VB_FILE|VB_EXTRA, LOC + "@ end of read ahead loop");
+        LOG(VB_FILE, LOG_DEBUG, LOC + "@ end of read ahead loop");
 
         if (!readsallowed || commserror || ateof || setswitchtonext ||
             (wanttoread <= used && wanttoread > 0))
@@ -963,8 +967,8 @@ int RingBuffer::Peek(void *buf, int count)
     int ret = ReadPriv(buf, count, true);
     if (ret != count)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("Peek() requested %1 bytes, but only returning %2")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Peek() requested %1 bytes, but only returning %2")
                 .arg(count).arg(ret));
     }
     return ret;
@@ -981,13 +985,13 @@ bool RingBuffer::WaitForReadsAllowed(void)
         generalWait.wait(&rwlock, 1000);
         if (!readsallowed && t.elapsed() > 1000)
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Taking too long to be allowed to read..");
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "Taking too long to be allowed to read..");
 
             if (t.elapsed() > 10000)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Took more than "
-                        "10 seconds to be allowed to read, aborting.");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Took more than 10 seconds to "
+                                               "be allowed to read, aborting.");
                 return false;
             }
         }
@@ -1003,8 +1007,8 @@ bool RingBuffer::WaitForAvail(int count)
 
     if (livetvchain && setswitchtonext && avail < count)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Checking to see if there's a "
-                              "new livetv program to switch to..");
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            "Checking to see if there's a new livetv program to switch to..");
         livetvchain->ReloadAll();
         return false;
     }
@@ -1040,18 +1044,17 @@ bool RingBuffer::WaitForAvail(int count)
                  ((elapsed > 8000) && (elapsed < 8250)) ||
                  ((elapsed > 9000)))
             {
-                VERBOSE(VB_IMPORTANT, LOC + "Waited " +
-                        QString("%1").arg((elapsed / 250) * 0.25f, 3, 'f', 1) +
-                        " seconds for data \n\t\t\tto become available..." +
-                        QString(" %2 < %3")
-                        .arg(avail).arg(count));
+                LOG(VB_GENERAL, LOG_INFO, LOC + "Waited " +
+                    QString("%1").arg((elapsed / 250) * 0.25f, 3, 'f', 1) +
+                    " seconds for data \n\t\t\tto become available..." +
+                    QString(" %2 < %3") .arg(avail).arg(count));
             }
 
             if (elapsed > 16000)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Waited " +
-                        QString("%1").arg(elapsed/1000) +
-                        " seconds for data, aborting.");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Waited " +
+                    QString("%1").arg(elapsed/1000) +
+                    " seconds for data, aborting.");
                 return false;
             }
         }
@@ -1088,7 +1091,7 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
             // seek should always succeed since we were at this position
             if (remotefile)
                 remotefile->Seek(old_pos, SEEK_SET);
-            else
+            else if (fd2 >= 0)
                 lseek64(fd2, old_pos, SEEK_SET);
         }
         else
@@ -1104,7 +1107,7 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
     {
         if ((IsDVD() || IsBD()) && old_pos != 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                     "DVD and Blu-Ray do not support arbitrary "
                     "peeks except when read-ahead is enabled."
                     "\n\t\t\tWill seek to beginning of video.");
@@ -1115,10 +1118,10 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
 
         if (new_pos != old_pos)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Peek() Failed to return from new "
-                            "position %1 to old position %2, now "
-                            "at position %3")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Peek() Failed to return from new "
+                        "position %1 to old position %2, now "
+                        "at position %3")
                     .arg(old_pos - ret).arg(old_pos).arg(new_pos));
         }
     }
@@ -1136,17 +1139,16 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
  */
 int RingBuffer::ReadPriv(void *buf, int count, bool peek)
 {
-    QString loc_desc = 
-            QString("ReadPriv(..%1, %2)")
+    QString loc_desc = QString("ReadPriv(..%1, %2)")
         .arg(count).arg(peek?"peek":"normal");
-    VERBOSE(VB_FILE|VB_EXTRA, LOC + loc_desc +
-            QString(" @%1 -- begin").arg(rbrpos));
+    LOG(VB_FILE, LOG_DEBUG, LOC + loc_desc +
+        QString(" @%1 -- begin").arg(rbrpos));
 
     rwlock.lockForRead();
     if (writemode)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + loc_desc +
-                ": Attempt to read from a write only file");
+        LOG(VB_GENERAL, LOG_ERR, LOC + loc_desc +
+            ": Attempt to read from a write only file");
         errno = EBADF;
         rwlock.unlock();
         return -1;
@@ -1154,8 +1156,8 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
 
     if (commserror)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + loc_desc +
-                ": Attempt to read after commserror set");
+        LOG(VB_GENERAL, LOG_ERR, LOC + loc_desc +
+            ": Attempt to read after commserror set");
         errno = EIO;
         rwlock.unlock();
         return -1;
@@ -1174,8 +1176,8 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
             !readaheadrunning || (ignorereadpos >= 0))
         {
             int ret = ReadDirect(buf, count, peek);
-            VERBOSE(VB_FILE|VB_EXTRA, LOC + loc_desc +
-                    QString(": ReadDirect checksum %1")
+            LOG(VB_FILE, LOG_DEBUG, LOC + loc_desc +
+                QString(": ReadDirect checksum %1")
                     .arg(qChecksum((char*)buf,count)));
             rwlock.unlock();
             return ret;
@@ -1186,7 +1188,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
 
     if (!WaitForReadsAllowed())
     {
-        VERBOSE(VB_FILE, LOC + loc_desc + ": !WaitForReadsAllowed()");
+        LOG(VB_FILE, LOG_NOTICE, LOC + loc_desc + ": !WaitForReadsAllowed()");
         rwlock.unlock();
         stopreads = true; // this needs to be outside the lock
         rwlock.lockForWrite();
@@ -1197,7 +1199,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
 
     if (!WaitForAvail(count))
     {
-        VERBOSE(VB_FILE, LOC + loc_desc + ": !WaitForAvail()");
+        LOG(VB_FILE, LOG_NOTICE, LOC + loc_desc + ": !WaitForAvail()");
         rwlock.unlock();
         stopreads = true; // this needs to be outside the lock
         rwlock.lockForWrite();
@@ -1214,7 +1216,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
         // this can happen under a few conditions but the most
         // notable is an exit from the read ahead thread or
         // the end of the file stream has been reached.
-        VERBOSE(VB_FILE, LOC + loc_desc + ": ReadBufAvail() == 0");
+        LOG(VB_FILE, LOG_NOTICE, LOC + loc_desc + ": ReadBufAvail() == 0");
         rwlock.unlock();
         return count;
     }
@@ -1224,7 +1226,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
     else
         rbrlock.lockForWrite();
 
-    VERBOSE(VB_FILE|VB_EXTRA, LOC + loc_desc + " -- copying data");
+    LOG(VB_FILE, LOG_DEBUG, LOC + loc_desc + " -- copying data");
 
     if (rbrpos + count > (int) bufferSize)
     {
@@ -1238,7 +1240,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
     {
         memcpy(buf, readAheadBuffer + rbrpos, count);
     }
-    VERBOSE(VB_FILE|VB_EXTRA, LOC + loc_desc + QString(" -- checksum %1")
+    LOG(VB_FILE, LOG_DEBUG, LOC + loc_desc + QString(" -- checksum %1")
             .arg(qChecksum((char*)buf,count)));
 
     if (!peek)
@@ -1351,7 +1353,7 @@ uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)
     uint64_t average = (uint64_t)((double)total * 8.0);
     decoderReadLock.unlock();
 
-    VERBOSE(VB_FILE, LOC + QString("Decoder read speed: %1 %2")
+    LOG(VB_FILE, LOG_INFO, LOC + QString("Decoder read speed: %1 %2")
             .arg(average).arg(decoderReads.size()));
     return average;
 }
@@ -1387,7 +1389,7 @@ uint64_t RingBuffer::UpdateStorageRate(uint64_t latest)
 
     uint64_t average = size ? (uint64_t)(((double)total) / (double)size) : 0;
 
-    VERBOSE(VB_FILE, LOC + QString("Average storage read speed: %1 %2")
+    LOG(VB_FILE, LOG_INFO, LOC + QString("Average storage read speed: %1 %2")
             .arg(average).arg(storageReads.size()));
     return average;
 }
@@ -1402,7 +1404,7 @@ int RingBuffer::Write(const void *buf, uint count)
 
     if (!writemode)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Tried to write to a read only file.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Tried to write to a read only file.");
         rwlock.unlock();
         return -1;
     }

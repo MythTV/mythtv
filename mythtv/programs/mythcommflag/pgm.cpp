@@ -10,13 +10,12 @@ extern "C" {
 
 // TODO: verify this
 /*
- * N.B.: this is really C code, but VERBOSE, #define'd in mythlogging.h, is in
+ * N.B.: this is really C code, but LOG, #define'd in mythlogging.h, is in
  * a C++ header file, so this has to be compiled with a C++ compiler, which
  * means this has to be a C++ source file.
  */
 
-static enum PixelFormat
-pixelTypeOfVideoFrameType(VideoFrameType codec)
+static enum PixelFormat pixelTypeOfVideoFrameType(VideoFrameType codec)
 {
     /* XXX: how to map VideoFrameType values to PixelFormat values??? */
     switch (codec) {
@@ -26,15 +25,14 @@ pixelTypeOfVideoFrameType(VideoFrameType codec)
     return PIX_FMT_NONE;
 }
 
-int
-pgm_fill(AVPicture *dst, const VideoFrame *frame)
+int pgm_fill(AVPicture *dst, const VideoFrame *frame)
 {
     enum PixelFormat        srcfmt;
     AVPicture               src;
 
     if ((srcfmt = pixelTypeOfVideoFrameType(frame->codec)) == PIX_FMT_NONE)
     {
-        VERBOSE(VB_COMMFLAG, QString("pgm_fill unknown codec: %1")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_fill unknown codec: %1")
                 .arg(frame->codec));
         return -1;
     }
@@ -42,44 +40,43 @@ pgm_fill(AVPicture *dst, const VideoFrame *frame)
     if (avpicture_fill(&src, frame->buf, srcfmt, frame->width,
                 frame->height) < 0)
     {
-        VERBOSE(VB_COMMFLAG, "pgm_fill avpicture_fill failed");
+        LOG(VB_COMMFLAG, LOG_ERR, "pgm_fill avpicture_fill failed");
         return -1;
     }
 
-    if (myth_sws_img_convert(
-            dst, PIX_FMT_GRAY8, &src, srcfmt, frame->width,
-                frame->height))
+    if (myth_sws_img_convert(dst, PIX_FMT_GRAY8, &src, srcfmt, frame->width,
+                             frame->height))
     {
-        VERBOSE(VB_COMMFLAG, "pgm_fill img_convert failed");
+        LOG(VB_COMMFLAG, LOG_ERR, "pgm_fill img_convert failed");
         return -1;
     }
 
     return 0;
 }
 
-int
-pgm_read(unsigned char *buf, int width, int height, const char *filename)
+int pgm_read(unsigned char *buf, int width, int height, const char *filename)
 {
     FILE        *fp;
     int         nn, fwidth, fheight, maxgray, rr;
 
     if (!(fp = fopen(filename, "r")))
     {
-        VERBOSE(VB_COMMFLAG, QString("pgm_read fopen %1 failed: %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_read fopen %1 failed: %2")
                 .arg(filename).arg(strerror(errno)));
         return -1;
     }
 
     if ((nn = fscanf(fp, "P5\n%d %d\n%d\n", &fwidth, &fheight, &maxgray)) != 3)
     {
-        VERBOSE(VB_COMMFLAG, QString("pgm_read fscanf %1 failed: %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_read fscanf %1 failed: %2")
                 .arg(filename).arg(strerror(errno)));
         goto error;
     }
 
     if (fwidth != width || fheight != height || maxgray != UCHAR_MAX)
     {
-        VERBOSE(VB_COMMFLAG, QString("pgm_read header (%1x%2,%3) != (%4x%5,%6)")
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("pgm_read header (%1x%2,%3) != (%4x%5,%6)")
                 .arg(fwidth).arg(fheight).arg(maxgray)
                 .arg(width).arg(height).arg(UCHAR_MAX));
         goto error;
@@ -89,7 +86,7 @@ pgm_read(unsigned char *buf, int width, int height, const char *filename)
     {
         if (fread(buf + rr * width, 1, width, fp) != (size_t)width)
         {
-            VERBOSE(VB_COMMFLAG, QString("pgm_read fread %1 failed: %2")
+            LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_read fread %1 failed: %2")
                     .arg(filename).arg(strerror(errno)));
             goto error;
         }
@@ -103,8 +100,8 @@ error:
     return -1;
 }
 
-int
-pgm_write(const unsigned char *buf, int width, int height, const char *filename)
+int pgm_write(const unsigned char *buf, int width, int height,
+              const char *filename)
 {
     /* Copied from libavcodec/apiexample.c */
     FILE        *fp;
@@ -112,7 +109,7 @@ pgm_write(const unsigned char *buf, int width, int height, const char *filename)
 
     if (!(fp = fopen(filename, "w")))
     {
-        VERBOSE(VB_COMMFLAG, QString("pgm_write fopen %1 failed: %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_write fopen %1 failed: %2")
                 .arg(filename).arg(strerror(errno)));
         return -1;
     }
@@ -122,7 +119,7 @@ pgm_write(const unsigned char *buf, int width, int height, const char *filename)
     {
         if (fwrite(buf + rr * width, 1, width, fp) != (size_t)width)
         {
-            VERBOSE(VB_COMMFLAG, QString("pgm_write fwrite %1 failed: %2")
+            LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_write fwrite %1 failed: %2")
                     .arg(filename).arg(strerror(errno)));
             goto error;
         }
@@ -136,9 +133,9 @@ error:
     return -1;
 }
 
-static int
-pgm_expand(AVPicture *dst, const AVPicture *src, int srcheight,
-        int extratop, int extraright, int extrabottom, int extraleft)
+static int pgm_expand(AVPicture *dst, const AVPicture *src, int srcheight,
+                      int extratop, int extraright, int extrabottom,
+                      int extraleft)
 {
     /* Pad all edges with the edge color. */
     const int           srcwidth = src->linesize[0];
@@ -178,24 +175,22 @@ pgm_expand(AVPicture *dst, const AVPicture *src, int srcheight,
     return 0;
 }
 
-static int
-pgm_expand_uniform(AVPicture *dst, const AVPicture *src, int srcheight,
-        int extramargin)
+static int pgm_expand_uniform(AVPicture *dst, const AVPicture *src,
+                              int srcheight, int extramargin)
 {
     return pgm_expand(dst, src, srcheight,
             extramargin, extramargin, extramargin, extramargin);
 }
 
-int
-pgm_crop(AVPicture *dst, const AVPicture *src, int srcheight,
-        int srcrow, int srccol, int cropwidth, int cropheight)
+int pgm_crop(AVPicture *dst, const AVPicture *src, int srcheight,
+             int srcrow, int srccol, int cropwidth, int cropheight)
 {
     const int   srcwidth = src->linesize[0];
     int         rr;
 
     if (dst->linesize[0] != cropwidth)
     {
-        VERBOSE(VB_COMMFLAG, QString("pgm_crop want width %1, have %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_crop want width %1, have %2")
                 .arg(cropwidth).arg(dst->linesize[0]));
         return -1;
     }
@@ -209,9 +204,8 @@ pgm_crop(AVPicture *dst, const AVPicture *src, int srcheight,
     return 0;
 }
 
-int
-pgm_overlay(AVPicture *dst, const AVPicture *s1, int s1height,
-        int s1row, int s1col, const AVPicture *s2, int s2height)
+int pgm_overlay(AVPicture *dst, const AVPicture *s1, int s1height,
+                int s1row, int s1col, const AVPicture *s2, int s2height)
 {
     const int   dstwidth = dst->linesize[0];
     const int   s1width = s1->linesize[0];
@@ -220,7 +214,7 @@ pgm_overlay(AVPicture *dst, const AVPicture *s1, int s1height,
 
     if (dstwidth != s1width)
     {
-        VERBOSE(VB_COMMFLAG, QString("pgm_overlay want width %1, have %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_overlay want width %1, have %2")
                 .arg(s1width).arg(dst->linesize[0]));
         return -1;
     }
@@ -236,10 +230,9 @@ pgm_overlay(AVPicture *dst, const AVPicture *s1, int s1height,
     return 0;
 }
 
-int
-pgm_convolve_radial(AVPicture *dst, AVPicture *s1, AVPicture *s2,
-        const AVPicture *src, int srcheight,
-        const double *mask, int mask_radius)
+int pgm_convolve_radial(AVPicture *dst, AVPicture *s1, AVPicture *s2,
+                        const AVPicture *src, int srcheight,
+                        const double *mask, int mask_radius)
 {
     /*
      * Pad and convolve an image.

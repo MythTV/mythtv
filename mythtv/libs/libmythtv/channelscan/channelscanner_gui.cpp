@@ -48,7 +48,6 @@ using namespace std;
 #include "mpegstreamdata.h"
 
 #define LOC QString("ChScanGUI: ")
-#define LOC_ERR QString("ChScanGUI, Error: ")
 
 QString ChannelScannerGUI::kTitle = QString::null;
 

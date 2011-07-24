@@ -14,13 +14,13 @@ QMAKE_CLEAN += $(TARGET)
 HEADERS += mythprotoserverexp.h
 HEADERS += mythsocketmanager.h socketrequesthandler.h sockethandler.h
 
-HEADERS += requesthandler/basehandler.h
+HEADERS += requesthandler/basehandler.h requesthandler/outboundhandler.h
 
 HEADERS += requesthandler/fileserverhandler.h requesthandler/deletethread.h
 HEADERS += requesthandler/fileserverutil.h sockethandler/filetransfer.h
 
 SOURCES += mythsocketmanager.cpp sockethandler.cpp
-SOURCES += requesthandler/basehandler.cpp
+SOURCES += requesthandler/basehandler.cpp requesthandler/outboundhandler.cpp
 
 SOURCES += requesthandler/fileserverhandler.cpp requesthandler/deletethread.cpp
 SOURCES += requesthandler/fileserverutil.cpp sockethandler/filetransfer.cpp

@@ -54,7 +54,7 @@ void Track::postLoad(PlaylistContainer *grandparent)
                                              bad_reference);
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Track Number of 0 is invalid!");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Track Number of 0 is invalid!");
     }
 }
 
@@ -116,8 +116,8 @@ void Track::putYourselfOnTheListView(UIListGenericTree *a_listviewitem)
 {
     if (my_widget)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "putYourselfOnTheListView() called when my_widget already exists.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "putYourselfOnTheListView() called when my_widget already exists.");
         return;
     }
 
@@ -139,8 +139,8 @@ void Track::putYourselfOnTheListView(UIListGenericTree *a_listviewitem)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "putYourselfOnTheListView() failed to create a widget");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "putYourselfOnTheListView() failed to create a widget");
     }
 }
 
@@ -287,8 +287,8 @@ void Playlist::moveTrackUpDown(bool flag, int where_its_at)
 
     if (!the_track)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "A playlist was asked to move a "
-                                        "track, but can't find it");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "A playlist was asked to move a track, but can't find it");
         return;
     }
 
@@ -301,8 +301,8 @@ void Playlist::moveTrackUpDown(bool flag, Track *the_track)
     int where_its_at = songs.indexOf(the_track);
     if (where_its_at < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "A playlist was asked to move a "
-                "track, but can'd find it");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "A playlist was asked to move a track, but can'd find it");
         return;
     }
 
@@ -377,17 +377,20 @@ void Playlist::describeYourself(void) const
 {
     //  This is for debugging
 #if 0
-    VERBOSE(VB_GENERAL, QString("Playlist with name of \"%1\"").arg(name));
-    VERBOSE(VB_GENERAL, QString("        playlistid is %1").arg(laylistid));
-    VERBOSE(VB_GENERAL, QString("     songlist(raw) is \"%1\"").arg(raw_songlist));
-    VERBOSE(VB_GENERAL, "     songlist list is ");
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("Playlist with name of \"%1\"").arg(name));
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("        playlistid is %1").arg(laylistid));
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("     songlist(raw) is \"%1\"").arg(raw_songlist));
+    LOG(VB_GENERAL, LOG_DEBUG, "     songlist list is ");
 #endif
     QString msg;
     SongList::const_iterator it = songs.begin();
     for (; it != songs.end(); ++it)
         msg += (*it)->getValue() + ",";
 
-    VERBOSE(VB_IMPORTANT, LOC + msg);
+    LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 }
 
 void Playlist::getStats(int *trackCount, int *totalLength, int currenttrack, int *playedLength) const
@@ -420,7 +423,8 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     QString thequery;
     if (a_host.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "loadPlaylist() - We need a valid hostname");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "loadPlaylist() - We need a valid hostname");
         return;
     }
 
@@ -532,7 +536,7 @@ void Playlist::fillSongsFromSonglist(bool filter)
         {
             changed = true;
 
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Taking a 0 (zero) off a playlist. \n\t\t\t"
                     "If this happens on repeated invocations of "
                     "mythmusic, then something is really wrong");
@@ -689,9 +693,8 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
     int categoryID = SmartPlaylistEditor::lookupCategoryID(category);
     if (categoryID == -1)
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                QString("Cannot find Smartplaylist Category: %1")
-                .arg(category));
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Cannot find Smartplaylist Category: %1") .arg(category));
         return;
     }
 
@@ -719,8 +722,8 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
         }
         else
         {
-            VERBOSE(VB_GENERAL, LOC_WARN +
-                    QString("Cannot find smartplaylist: %1").arg(name));
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("Cannot find smartplaylist: %1").arg(name));
             return;
         }
     }
@@ -774,15 +777,14 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
     name = a_name.simplified();
     if (name.length() < 1)
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                "Not saving unnamed playlist");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Not saving unnamed playlist");
         return;
     }
 
     if (a_host.length() < 1)
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                "Not saving playlist without a host name");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Not saving playlist without a host name");
         return;
     }
     if (name.length() < 1)
@@ -913,7 +915,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
         {
             if ((*it)->getValue() == 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + kID0err);
+                LOG(VB_GENERAL, LOG_ERR, LOC + kID0err);
             }
             if ((*it)->getValue() > 0)
             {
@@ -986,7 +988,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
         {
             if ((*it)->getValue() == 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + kID0err);
+                LOG(VB_GENERAL, LOG_ERR, LOC + kID0err);
             }
             if ((*it)->getValue() > 0)
             {
@@ -1117,9 +1119,8 @@ bool Playlist::containsReference(int to_check, int depth)
 {
     if (depth > 10)
     {
-        VERBOSE(VB_IMPORTANT,
-                LOC_ERR + "Recursively checking playlists, and have "
-                "reached a search depth over 10 ");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Recursively checking playlists, and "
+                                       "have reached a search depth over 10 ");
     }
     bool ref_exists = false;
 
@@ -1179,7 +1180,7 @@ void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
 
         if ((*it)->getValue() == 0)
         {
-            VERBOSE(VB_IMPORTANT, kID0err);
+            LOG(VB_GENERAL, LOG_ERR, kID0err);
         }
         else if ((*it)->getValue() > 0)
         {
@@ -1191,8 +1192,8 @@ void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
                 if (tmpdata->Length() > 0)
                     size_in_sec += tmpdata->Length();
                 else
-                    VERBOSE(VB_GENERAL, "Computing track lengths. "
-                                        "One track <=0");
+                    LOG(VB_GENERAL, LOG_ERR,
+                        "Computing track lengths. One track <=0");
 
                 // Check tmpdata->Filename
                 QFileInfo finfo(tmpdata->Filename());
@@ -1263,7 +1264,7 @@ void Playlist::cdrecordData(int fd)
                 err.contains("Input/output error.") ||
                 err.contains("No disk / Wrong disk!"))
             {
-                VERBOSE(VB_IMPORTANT, err);
+                LOG(VB_GENERAL, LOG_ERR, err);
                 proc->Term();
             }
         }
@@ -1306,14 +1307,14 @@ int Playlist::CreateCDMP3(void)
     // Check & get global settings
     if (!gCoreContext->GetNumSetting("CDWriterEnabled"))
     {
-        VERBOSE(VB_GENERAL, "CD Writer is not enabled.");
+        LOG(VB_GENERAL, LOG_ERR, "CD Writer is not enabled.");
         return 1;
     }
 
     QString scsidev = MediaMonitor::defaultCDWriter();
     if (scsidev.isEmpty())
     {
-        VERBOSE(VB_GENERAL, "No CD Writer device defined.");
+        LOG(VB_GENERAL, LOG_ERR, "No CD Writer device defined.");
         return 1;
     }
 
@@ -1333,7 +1334,7 @@ int Playlist::CreateCDMP3(void)
 
         if ((*it)->getValue() == 0)
         {
-            VERBOSE(VB_IMPORTANT, kID0err);
+            LOG(VB_GENERAL, LOG_ERR, kID0err);
         }
         else if ((*it)->getValue() > 0)
         {
@@ -1376,7 +1377,7 @@ int Playlist::CreateCDMP3(void)
 
     if (size_in_MB >= max_size)
     {
-        VERBOSE(VB_GENERAL, "MP3 CD creation aborted -- cd size too big.");
+        LOG(VB_GENERAL, LOG_ERR, "MP3 CD creation aborted -- cd size too big.");
         return 1;
     }
 
@@ -1386,14 +1387,14 @@ int Playlist::CreateCDMP3(void)
     QString tmprecordlist = createTempFile(tmptemplate);
     if (tmprecordlist == tmptemplate)
     {
-        VERBOSE(VB_IMPORTANT, "Unable to open temporary file");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to open temporary file");
         return 1;
     }
 
     QString tmprecordisofs = createTempFile(tmptemplate);
     if (tmprecordisofs == tmptemplate)
     {
-        VERBOSE(VB_IMPORTANT, "Unable to open temporary file");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to open temporary file");
         return 1;
     }
 
@@ -1401,7 +1402,7 @@ int Playlist::CreateCDMP3(void)
 
     if (!reclistfile.open(QIODevice::WriteOnly))
     {
-        VERBOSE(VB_IMPORTANT, "Unable to open temporary file");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to open temporary file");
         return 1;
     }
 
@@ -1460,7 +1461,7 @@ int Playlist::CreateCDMP3(void)
 
     if (retval)
     {
-        VERBOSE(VB_IMPORTANT, QString("Unable to run mkisofs: returns %1")
+        LOG(VB_GENERAL, LOG_ERR, QString("Unable to run mkisofs: returns %1")
                 .arg(retval));
     }
     else
@@ -1509,8 +1510,8 @@ int Playlist::CreateCDMP3(void)
 
         if (retval)
         {
-            VERBOSE(VB_IMPORTANT, QString("Unable to run cdrecord: returns %1")
-                    .arg(retval));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Unable to run cdrecord: returns %1") .arg(retval));
         }
     }
 

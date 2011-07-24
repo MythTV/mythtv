@@ -76,7 +76,7 @@ bool TreeEditor::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'treeeditor'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'treeeditor'");
         return false;
     }
 
@@ -152,8 +152,9 @@ void TreeEditor::slotLoadedData()
 
         if (type.toLower() == "video" && tree)
         {
-            VERBOSE(VB_GENERAL, QString("Found Browseable Source %1...").arg(title));
-            m_grabberList.append(new GrabberScript(title, image, VIDEO, author,
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Found Browseable Source %1...").arg(title));
+            m_grabberList.append(new GrabberScript(title, image, VIDEO_FILE, author,
                        search, tree, description, commandline, version));
         }
 
@@ -217,7 +218,7 @@ void TreeEditor::fillGrabberButtonList()
         item->setCheckable(true);
         item->setChecked(MythUIButtonListItem::NotChecked);
         QFileInfo fi((*i)->GetCommandline());
-        if (findTreeGrabberInDB(fi.fileName(), VIDEO))
+        if (findTreeGrabberInDB(fi.fileName(), VIDEO_FILE))
             item->setChecked(MythUIButtonListItem::FullChecked);
         }
         else
@@ -241,7 +242,7 @@ void TreeEditor::toggleItem(MythUIButtonListItem *item)
 
     if (!checked)
     {
-        if (insertTreeInDB(script, VIDEO))
+        if (insertTreeInDB(script, VIDEO_FILE))
         {
             m_changed = true;
             item->setChecked(MythUIButtonListItem::FullChecked);

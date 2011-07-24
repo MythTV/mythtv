@@ -56,9 +56,6 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
     DTVTunerType, const dvb_frontend_parameters&);
 
 #define LOC QString("DVBChan(%1:%2): ").arg(GetCardID()).arg(device)
-#define LOC_WARN QString("DVBChan(%1:%2) Warning: ") \
-                 .arg(GetCardID()).arg(device)
-#define LOC_ERR QString("DVBChan(%1:%2) Error: ").arg(GetCardID()).arg(device)
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
@@ -114,7 +111,7 @@ DVBChannel::~DVBChannel()
 
 void DVBChannel::Close(DVBChannel *who)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Closing DVB channel");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Closing DVB channel");
 
     IsOpenMap::iterator it = is_open.find(who);
     if (it == is_open.end())
@@ -150,7 +147,7 @@ void DVBChannel::Close(DVBChannel *who)
 
 bool DVBChannel::Open(DVBChannel *who)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Opening DVB channel");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Opening DVB channel");
 
     QMutexLocker locker(&hw_lock);
 
@@ -194,13 +191,13 @@ bool DVBChannel::Open(DVBChannel *who)
         fd_frontend = open(devn.constData(), O_RDWR | O_NONBLOCK);
         if (fd_frontend >= 0)
             break;
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "Opening DVB frontend device failed." + ENO);
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Opening DVB frontend device failed." + ENO);
         if (tries >= 20 || (errno != EBUSY && errno != EAGAIN))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Failed to open DVB frontend device due to "
-                            "fatal error or too many attempts."));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Failed to open DVB frontend device due to "
+                        "fatal error or too many attempts."));
             return false;
         }
         usleep(50000);
@@ -210,8 +207,8 @@ bool DVBChannel::Open(DVBChannel *who)
     memset(&info, 0, sizeof(info));
     if (ioctl(fd_frontend, FE_GET_INFO, &info) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to get frontend information." + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Failed to get frontend information." + ENO);
 
         close(fd_frontend);
         fd_frontend = -1;
@@ -231,7 +228,8 @@ bool DVBChannel::Open(DVBChannel *who)
     symbol_rate_minimum = info.symbol_rate_min;
     symbol_rate_maximum = info.symbol_rate_max;
 
-    VERBOSE(VB_RECORD, LOC + QString("Using DVB card %1, with frontend '%2'.")
+    LOG(VB_RECORD, LOG_INFO, LOC +
+        QString("Using DVB card %1, with frontend '%2'.")
             .arg(device).arg(frontend_name));
 
     // Turn on the power to the LNB
@@ -284,9 +282,9 @@ bool DVBChannel::SwitchToInput(const QString &inputname, const QString &chan)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("DVBChannel: Could not find input: %1 on card when "
-                        "setting channel %2\n").arg(inputname).arg(chan));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("DVBChannel: Could not find input: %1 on card when "
+                    "setting channel %2\n").arg(inputname).arg(chan));
     }
     return ok;
 }
@@ -311,11 +309,10 @@ void DVBChannel::CheckFrequency(uint64_t frequency) const
         (frequency_minimum <= frequency_maximum) &&
         (frequency < frequency_minimum || frequency > frequency_maximum))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                QString("Your frequency setting (%1) is "
-                        "out of range. (min/max:%2/%3)")
-                .arg(frequency)
-                .arg(frequency_minimum).arg(frequency_maximum));
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Your frequency setting (%1) is out of range. "
+                    "(min/max:%2/%3)")
+                .arg(frequency).arg(frequency_minimum).arg(frequency_maximum));
     }
 }
 
@@ -324,9 +321,9 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
     if ((tuning.inversion == DTVInversion::kInversionAuto) &&
         !(capabilities & FE_CAN_INVERSION_AUTO))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                "'Auto' inversion parameter unsupported by this driver, "
-                "falling back to 'off'.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "'Auto' inversion parameter unsupported by this driver, "
+            "falling back to 'off'.");
         tuning.inversion = DTVInversion::kInversionOff;
     }
 
@@ -340,28 +337,27 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
         (tuning.symbolrate < symbol_rate_minimum ||
          tuning.symbolrate > symbol_rate_maximum))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                QString("Symbol Rate setting (%1) is "
-                        "out of range (min/max:%2/%3)")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Symbol Rate setting (%1) is out of range (min/max:%2/%3)")
                 .arg(tuning.symbolrate)
                 .arg(symbol_rate_minimum).arg(symbol_rate_maximum));
     }
 
     if (tunerType.IsFECVariable() && !CheckCodeRate(tuning.fec))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Selected fec_inner parameter "
-                                       "unsupported by this driver.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Selected fec_inner parameter unsupported by this driver.");
     }
 
     if (tunerType.IsModulationVariable() && !CheckModulation(tuning.modulation))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Selected modulation parameter unsupported "
-                                       "by this driver.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+           "Selected modulation parameter unsupported by this driver.");
     }
 
     if (DTVTunerType::kTunerTypeDVBT != tunerType)
     {
-        VERBOSE(VB_CHANNEL, LOC + tuning.toString());
+        LOG(VB_CHANNEL, LOG_INFO, LOC + tuning.toString());
         return;
     }
 
@@ -369,53 +365,51 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
 
     if (!CheckCodeRate(tuning.hp_code_rate))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Selected code_rate_hp parameter "
-                                       "unsupported by this driver.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Selected code_rate_hp parameter unsupported by this driver.");
     }
 
     if (!CheckCodeRate(tuning.lp_code_rate))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Selected code_rate_lp parameter "
-                                       "unsupported by this driver.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Selected code_rate_lp parameter unsupported by this driver.");
     }
 
     if ((tuning.bandwidth == DTVBandwidth::kBandwidthAuto) &&
         !(capabilities & FE_CAN_BANDWIDTH_AUTO))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "'Auto' bandwidth parameter unsupported "
-                                       "by this driver.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "'Auto' bandwidth parameter unsupported by this driver.");
     }
 
     if ((tuning.trans_mode == DTVTransmitMode::kTransmissionModeAuto) &&
         !(capabilities & FE_CAN_TRANSMISSION_MODE_AUTO))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                "'Auto' transmission_mode parameter unsupported "
-                "by this driver.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "'Auto' transmission_mode parameter unsupported by this driver.");
     }
 
     if ((tuning.guard_interval == DTVGuardInterval::kGuardIntervalAuto) &&
         !(capabilities & FE_CAN_GUARD_INTERVAL_AUTO))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                "'Auto' guard_interval parameter unsupported "
-                "by this driver.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "'Auto' guard_interval parameter unsupported by this driver.");
     }
 
     if ((tuning.hierarchy == DTVHierarchy::kHierarchyAuto) &&
         !(capabilities & FE_CAN_HIERARCHY_AUTO))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                "'Auto' hierarchy parameter unsupported by this driver. ");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "'Auto' hierarchy parameter unsupported by this driver. ");
     }
 
     if (!CheckModulation(tuning.modulation))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Selected modulation parameter unsupported "
-                                       "by this driver.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Selected modulation parameter unsupported by this driver.");
     }
 
-    VERBOSE(VB_CHANNEL, LOC + tuning.toString());
+    LOG(VB_CHANNEL, LOG_INFO, LOC + tuning.toString());
 }
 
 /**
@@ -486,7 +480,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning, QString inputname)
         m_currentInputID : GetInputByName(inputname);
     if (inputid < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Tune(): Invalid input '%1'.")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Tune(): Invalid input '%1'.")
                 .arg(inputname));
         return false;
     }
@@ -506,7 +500,8 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         tuner_type != DTVTunerType::kTunerTypeDVBS1 &&
         tuner_type != DTVTunerType::kTunerTypeDVBS2)
     {
-        VERBOSE(VB_IMPORTANT, "Unsupported tuner type " + tuner_type.toString());
+        LOG(VB_GENERAL, LOG_ERR, "DVBChan: Unsupported tuner type " +
+            tuner_type.toString());
         return NULL;
     }
 
@@ -617,7 +612,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
     if (master)
     {
-        VERBOSE(VB_CHANNEL, LOC + "tuning on slave channel");
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "tuning on slave channel");
         SetSIStandard(tuning.sistandard);
         return master->Tune(tuning, inputid, force_reset, false);
     }
@@ -628,8 +623,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
     if (tunerType.IsDiSEqCSupported() && !diseqc_tree)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "DVB-S needs device tree for LNB handling");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "DVB-S needs device tree for LNB handling");
         return false;
     }
 
@@ -639,7 +634,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
     if (fd_frontend < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): Card not open!");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Tune(): Card not open!");
 
         return false;
     }
@@ -657,8 +652,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         // execute diseqc commands
         if (!diseqc_tree->Execute(diseqc_settings, tuning))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): "
-                    "Failed to setup DiSEqC devices");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Tune(): Failed to setup DiSEqC devices");
             return false;
         }
 
@@ -666,8 +661,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         DiSEqCDevLNB *lnb = diseqc_tree->FindLNB(diseqc_settings);
         if (!lnb)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): "
-                    "No LNB for this configuration");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Tune(): No LNB for this configuration");
             return false;
         }
 
@@ -690,10 +685,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         CheckFrequency(intermediate_freq);
     }
 
-    VERBOSE(VB_CHANNEL, LOC + "Old Params: " +
-            prev_tuning.toString() +
-            "\n\t\t\t" + LOC + "New Params: " +
-            tuning.toString());
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Old Params: " + prev_tuning.toString() +
+            "\n\t\t\t" + LOC + "New Params: " + tuning.toString());
 
     // DVB-S is in kHz, other DVB is in Hz
     bool is_dvbs = ((DTVTunerType::kTunerTypeDVBS1 == tunerType) ||
@@ -703,7 +696,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
     if (reset || !prev_tuning.IsEqual(tunerType, tuning, 500 * freq_mult))
     {
-        VERBOSE(VB_CHANNEL, LOC + QString("Tune(): Tuning to %1%2")
+        LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(): Tuning to %1%2")
                 .arg(intermediate_freq ? intermediate_freq : tuning.frequency)
                 .arg(suffix));
 
@@ -719,8 +712,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
             if ((ioctl(fd_frontend, FE_SET_PROPERTY, &cmdseq_clear)) < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
-                        "Clearing DTV properties cache failed." + ENO);
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Tune(): Clearing DTV properties cache failed." + ENO);
                 return false;
             }
 
@@ -728,16 +721,17 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
                 tunerType, tuning, intermediate_freq, can_fec_auto);
 
             if (!cmds) {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to convert "
-                        "DTVMultiplex to DTV_PROPERTY sequence");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to convert DTVMultiplex to DTV_PROPERTY sequence");
                 return false;
             }
 
-            if (VERBOSE_LEVEL_CHECK(VB_CHANNEL|VB_EXTRA))
+            if (VERBOSE_LEVEL_CHECK(VB_CHANNEL, LOG_DEBUG))
             {
                 for (uint i = 0; i < cmds->num; i++)
                 {
-                    VERBOSE(VB_CHANNEL, QString("prop %1: cmd = %2, data %3")
+                    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+                        QString("prop %1: cmd = %2, data %3")
                             .arg(i).arg(cmds->props[i].cmd)
                             .arg(cmds->props[i].u.data));
                 }
@@ -750,8 +744,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
             if (res < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
-                        "Setting Frontend tuning parameters failed." + ENO);
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Tune(): Setting Frontend tuning parameters failed." + ENO);
                 return false;
             }
         }
@@ -763,8 +757,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
             if (ioctl(fd_frontend, FE_SET_FRONTEND, &params) < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
-                        "Setting Frontend tuning parameters failed." + ENO);
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Tune(): Setting Frontend tuning parameters failed." + ENO);
                 return false;
             }
         }
@@ -781,7 +775,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
     SetSIStandard(tuning.sistandard);
 
-    VERBOSE(VB_CHANNEL, LOC + "Tune(): Frequency tuning successful.");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Tune(): Frequency tuning successful.");
 
     return true;
 }
@@ -807,7 +801,7 @@ bool DVBChannel::IsTuningParamsProbeSupported(void) const
 
     if (fd_frontend < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Card not open!");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Card not open!");
 
         return false;
     }
@@ -840,7 +834,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
 
     if (fd_frontend < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Card not open!");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Card not open!");
 
         return false;
     }
@@ -865,8 +859,8 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
     dvb_frontend_parameters params;
     if (ioctl(fd_frontend, FE_GET_FRONTEND, &params) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Getting Frontend tuning parameters failed." + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Getting Frontend tuning parameters failed." + ENO);
 
         return false;
     }
@@ -1052,8 +1046,8 @@ static bool wait_for_backend(int fd, int timeout_ms)
 
     if (-1 == ret)
     {
-        VERBOSE(VB_IMPORTANT, "dvbchannel.cpp:wait_for_backend: "
-                "Failed to wait on output" + ENO);
+        LOG(VB_GENERAL, LOG_ERR,
+            "DVBChan: wait_for_backend: Failed to wait on output" + ENO);
 
         return false;
     }
@@ -1062,13 +1056,13 @@ static bool wait_for_backend(int fd, int timeout_ms)
     fe_status_t status;
     if (ioctl(fd, FE_READ_STATUS, &status) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "dvbchannel.cpp:wait_for_backend: "
-                "Failed to get status" + ENO);
+        LOG(VB_GENERAL, LOG_ERR,
+            "DVBChan: wait_for_backend: Failed to get status" + ENO);
 
         return false;
     }
 
-    VERBOSE(VB_CHANNEL, QString("dvbchannel.cpp:wait_for_backend: Status: %1")
+    LOG(VB_CHANNEL, LOG_INFO, QString("DVBChan: wait_for_backend: Status: %1")
             .arg(toString(status)));
 
     return true;
@@ -1087,8 +1081,9 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     if (DTVTunerType::kTunerTypeDVBS1 == tuner_type)
     {
         if (tuning.mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
-            VERBOSE(VB_IMPORTANT, "DVBChan Error, Tuning of a DVB-S2 transport "
-                    "with a DVB-S card will fail.");
+            LOG(VB_GENERAL, LOG_ERR,
+                "DVBChan: Error, Tuning of a DVB-S2 transport "
+                "with a DVB-S card will fail.");
 
         params.frequency = intermediate_freq;
         params.u.qpsk.symbol_rate = tuning.symbolrate;
@@ -1098,8 +1093,9 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
 
     if (DTVTunerType::kTunerTypeDVBS2 == tuner_type)
     {
-        VERBOSE(VB_IMPORTANT, "DVBChan Error, MythTV was compiled without "
-                "DVB-S2 headers being present so DVB-S2 tuning will fail.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "DVBChan: Error, MythTV was compiled without "
+            "DVB-S2 headers being present so DVB-S2 tuning will fail.");
     }
 
     if (DTVTunerType::kTunerTypeDVBC == tuner_type)

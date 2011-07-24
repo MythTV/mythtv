@@ -99,17 +99,20 @@ Metadata* MetaIOMP4::read(QString filename)
     if (av_find_stream_info(p_context) < 0)
         return NULL;
 
-//### Debugging, enable to dump a list of all field names/values found
-//
-//     AVMetadataTag *tag = av_metadata_get(p_context->metadata, "\0", NULL, AV_METADATA_IGNORE_SUFFIX);
-//     while (tag != NULL)
-//     {
-//         VERBOSE(VB_IMPORTANT, QString("Tag: %1 Value: %2")
-//                                             .arg(tag->key)
-//                                             .arg(QString::fromUtf8(tag->value)));
-//         tag = av_metadata_get(p_context->metadata, "\0", tag, AV_METADATA_IGNORE_SUFFIX);
-//     }
-//####
+#if 0
+    //### Debugging, enable to dump a list of all field names/values found
+
+    AVMetadataTag *tag = av_metadata_get(p_context->metadata, "\0", NULL,
+                                         AV_METADATA_IGNORE_SUFFIX);
+    while (tag != NULL)
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Tag: %1 Value: %2")
+                .arg(tag->key) .arg(QString::fromUtf8(tag->value)));
+        tag = av_metadata_get(p_context->metadata, "\0", tag,
+                              AV_METADATA_IGNORE_SUFFIX);
+    }
+    //####
+#endif
 
     title = getFieldValue(p_context, "title");
     if (title.isEmpty())

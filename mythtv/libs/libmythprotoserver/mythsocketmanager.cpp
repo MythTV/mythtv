@@ -22,8 +22,6 @@ using namespace std;
 #include "mythlogging.h"
 
 #define LOC      QString("MythSocketManager: ")
-#define LOC_WARN QString("MythSocketManager, Warning: ")
-#define LOC_ERR  QString("MythSocketManager, Error: ")
 
 #define PRT_STARTUP_THREAD_COUNT 2
 #define PRT_TIMEOUT 10
@@ -53,7 +51,7 @@ class ProcessRequestThread : public QThread
 
     virtual void run(void)
     {
-	threadRegister("ProcessRequest");
+        threadRegister("ProcessRequest");
         QMutexLocker locker(&m_lock);
         m_threadlives = true;
         m_waitCond.wakeAll(); // Signal to creating thread
@@ -77,7 +75,7 @@ class ProcessRequestThread : public QThread
             m_socket = NULL;
             m_parent->MarkUnused(this);
         }
-	threadDeregister();
+        threadDeregister();
     }
 
     QMutex m_lock;
@@ -146,8 +144,7 @@ bool MythSocketManager::Listen(int port)
     }
 
     m_server = new MythServer();
-    if (!m_server->listen(QHostAddress(gCoreContext->MythHostAddressAny()),
-                                       port))
+    if (!m_server->listen(gCoreContext->MythHostAddressAny(), port))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1.").arg(port));
         return false;
@@ -165,12 +162,13 @@ void MythSocketManager::RegisterHandler(SocketRequestHandler *handler)
     QString name = handler->GetHandlerName();
     if (m_handlerMap.contains(name))
     {
-        LOG(VB_GENERAL, LOG_WARNING, name + " has already been registered.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + name +
+            " has already been registered.");
         delete handler;
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, 
+        LOG(VB_GENERAL, LOG_INFO, LOC +
             "Registering socket command handler " + name);
         handler->SetParent(this);
         m_handlerMap.insert(name, handler);
@@ -303,8 +301,8 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
         }
         else
         {
-            LOG(VB_SOCKET, LOG_ERR,
-	        "Use of socket attempted before protocol validation.");
+            LOG(VB_SOCKET, LOG_ERR, LOC +
+                "Use of socket attempted before protocol validation.");
             listline.clear();
             listline << "ERROR" << "socket has not been validated";
             sock->writeStringList(listline);
@@ -324,9 +322,9 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
                             = m_handlerMap.constBegin();
             while (!handled && (i != m_handlerMap.constEnd()))
             {
-                LOG(VB_SOCKET, LOG_DEBUG,
-                            QString("Attempting to handle annouce with: %1")
-                                    .arg((*i)->GetHandlerName()));
+                LOG(VB_SOCKET, LOG_DEBUG, LOC +
+                    QString("Attempting to handle annouce with: %1")
+                        .arg((*i)->GetHandlerName()));
                 handled = (*i)->HandleAnnounce(sock, tokens, listline);
                 i++;
             }
@@ -334,16 +332,16 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
             if (handled)
             {
                 i--;
-                LOG(VB_SOCKET, LOG_DEBUG,
-                            QString("Socket announce handled by: %1")
-                                    .arg((*i)->GetHandlerName()));
+                LOG(VB_SOCKET, LOG_DEBUG, LOC +
+                    QString("Socket announce handled by: %1")
+                        .arg((*i)->GetHandlerName()));
                 for (i = m_handlerMap.constBegin(); 
                          i != m_handlerMap.constEnd(); ++i)
                     (*i)->connectionAnnounced(sock, tokens, listline);
             }
             else
             {
-                LOG(VB_SOCKET, LOG_ERR, "Socket announce unhandled.");
+                LOG(VB_SOCKET, LOG_ERR, LOC + "Socket announce unhandled.");
                 listline.clear();
                 listline << "ERROR" << "unhandled announce";
                 sock->writeStringList(listline);
@@ -353,8 +351,8 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
         }
         else
         {
-            LOG(VB_SOCKET, LOG_ERR,
-                            "Use of socket attempted before announcement.");
+            LOG(VB_SOCKET, LOG_ERR, LOC +
+                "Use of socket attempted before announcement.");
             listline.clear();
             listline << "ERROR" << "socket has not been announced";
             sock->writeStringList(listline);
@@ -364,7 +362,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
 
     if (command == "ANN")
     {
-        LOG(VB_SOCKET, LOG_ERR, "ANN sent out of sequence.");
+        LOG(VB_SOCKET, LOG_ERR, LOC + "ANN sent out of sequence.");
         listline.clear();
         listline << "ERROR" << "socket has already been announced";
         sock->writeStringList(listline);
@@ -378,7 +376,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
 
         if (!m_socketMap.contains(sock))
         {
-            LOG(VB_SOCKET, LOG_ERR, "No handler found for socket.");
+            LOG(VB_SOCKET, LOG_ERR, LOC + "No handler found for socket.");
             listline.clear();
             listline << "ERROR" << "socket handler cannot be found";
             sock->writeStringList(listline);
@@ -397,9 +395,8 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
         }
 
         if (handled)
-            LOG(VB_SOCKET, LOG_DEBUG, QString("Query handled by: %1")
+            LOG(VB_SOCKET, LOG_DEBUG, LOC + QString("Query handled by: %1")
                         .arg((*--i)->GetHandlerName()));
-
     }
 
     if (!handled)
@@ -417,8 +414,9 @@ void MythSocketManager::HandleVersion(MythSocket *socket,
     QString version = slist[1];
     if (version != MYTH_PROTO_VERSION)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Client speaks protocol version " + version +
-                                 " but we speak " + MYTH_PROTO_VERSION + '!');
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Client speaks protocol version " + version +
+            " but we speak " + MYTH_PROTO_VERSION + '!');
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->writeStringList(retlist);
         HandleDone(socket);
@@ -427,8 +425,8 @@ void MythSocketManager::HandleVersion(MythSocket *socket,
 
     if (slist.size() < 3)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Client did not pass protocol "
-                                 "token. Refusing connection!");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Client did not pass protocol "
+                                       "token. Refusing connection!");
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->writeStringList(retlist);
         HandleDone(socket);
@@ -438,15 +436,15 @@ void MythSocketManager::HandleVersion(MythSocket *socket,
     QString token = slist[2];
     if (token != MYTH_PROTO_TOKEN)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Client sent incorrect protocol token for "
-                                 "protocol version. Refusing connection!");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Client sent incorrect protocol token "
+                                 "for protocol version. Refusing connection!");
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->writeStringList(retlist);
         HandleDone(socket);
         return;
     }
 
-    LOG(VB_SOCKET, LOG_DEBUG, "Client validated");
+    LOG(VB_SOCKET, LOG_DEBUG, LOC + "Client validated");
     retlist << "ACCEPT" << MYTH_PROTO_VERSION;
     socket->writeStringList(retlist);
     socket->setValidated();

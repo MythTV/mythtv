@@ -37,8 +37,6 @@ using namespace std;
 #include "mythlogging.h"
 
 #define LOC      QString("LFireDev(%1): ").arg(guid_to_string(m_guid))
-#define LOC_WARN QString("LFireDev(%1), Warning: ").arg(guid_to_string(m_guid))
-#define LOC_ERR  QString("LFireDev(%1), Error: ").arg(guid_to_string(m_guid))
 
 #define kNoDataTimeout            50   /* msec */
 #define kResetTimeout             1000 /* msec */
@@ -156,7 +154,7 @@ LinuxFirewireDevice::~LinuxFirewireDevice()
 {
     if (IsPortOpen())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "ctor called with open port");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "ctor called with open port");
         while (IsPortOpen())
             ClosePort();
     }
@@ -173,16 +171,16 @@ void LinuxFirewireDevice::SignalReset(uint generation)
     const QString loc = LOC + QString("SignalReset(%1->%2)")
         .arg(m_priv->generation).arg(generation);
 
-    VERBOSE(VB_IMPORTANT, loc);
+    LOG(VB_GENERAL, LOG_INFO, loc);
 
     if (GetInfoPtr())
         raw1394_update_generation(GetInfoPtr()->fw_handle, generation);
 
     m_priv->generation = generation;
 
-    VERBOSE(VB_IMPORTANT, loc + ": Updating device list -- begin");
+    LOG(VB_GENERAL, LOG_INFO, loc + ": Updating device list -- begin");
     UpdateDeviceList();
-    VERBOSE(VB_IMPORTANT, loc + ": Updating device list -- end");
+    LOG(VB_GENERAL, LOG_INFO, loc + ": Updating device list -- end");
 
     m_priv->reset_timer_on = true;
     m_priv->reset_timer.start();
@@ -197,7 +195,7 @@ void LinuxFirewireDevice::HandleBusReset(void)
 
     if (m_priv->is_p2p_node_open)
     {
-        VERBOSE(VB_IMPORTANT, loc + ": Reconnecting P2P connection");
+        LOG(VB_GENERAL, LOG_INFO, loc + ": Reconnecting P2P connection");
         nodeid_t output = GetInfoPtr()->GetNode() | 0xffc0;
         nodeid_t input  = raw1394_get_local_id(GetInfoPtr()->fw_handle);
 
@@ -209,26 +207,27 @@ void LinuxFirewireDevice::HandleBusReset(void)
 
         if (fwchan < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Bus Reset: Failed to reconnect");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Bus Reset: Failed to reconnect");
         }
         else if (fwchan != m_priv->channel)
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN + QString("FWChan changed %1->%2")
+            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("FWChan changed %1->%2")
                     .arg(m_priv->channel).arg(fwchan));
         }
         m_priv->channel = fwchan;
 
-        VERBOSE(VB_IMPORTANT,
-                loc + QString(": Reconnected fwchan: %1\n\t\t\toutput: 0x%2 "
-                "input: 0x%3").arg(fwchan).arg(output,0,16).arg(input,0,16));
+        LOG(VB_GENERAL, LOG_INFO,
+            loc + QString(": Reconnected fwchan: %1\n\t\t\toutput: 0x%2 "
+                          "input: 0x%3")
+                .arg(fwchan).arg(output,0,16).arg(input,0,16));
     }
 
     if (m_priv->is_bcast_node_open)
     {
         nodeid_t output = GetInfoPtr()->GetNode() | 0xffc0;
 
-        VERBOSE(VB_RECORD, loc + ": Restarting broadcast connection on " +
-                QString("node %1, channel %2")
+        LOG(VB_RECORD, LOG_INFO, loc + ": Restarting broadcast connection on " +
+            QString("node %1, channel %2")
                 .arg(GetInfoPtr()->GetNode()).arg(m_priv->channel));
 
         int err = iec61883_cmp_create_bcast_output(
@@ -238,23 +237,22 @@ void LinuxFirewireDevice::HandleBusReset(void)
 
         if (err < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Bus Reset : Failed to reconnect");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Bus Reset : Failed to reconnect");
         }
     }
 }
 
 bool LinuxFirewireDevice::OpenPort(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Starting Port Handler Thread");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Starting Port Handler Thread");
     QMutexLocker locker(&m_priv->start_stop_port_handler_lock);
-    VERBOSE(VB_RECORD, LOC + "Starting Port Handler Thread -- locked");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Starting Port Handler Thread -- locked");
 
-    VERBOSE(VB_RECORD, LOC + "OpenPort()");
+    LOG(VB_RECORD, LOG_INFO, LOC + "OpenPort()");
 
     QMutexLocker mlocker(&m_lock);
 
-    VERBOSE(VB_RECORD, LOC + "OpenPort() -- got lock");
+    LOG(VB_RECORD, LOG_INFO, LOC + "OpenPort() -- got lock");
 
     if (!GetInfoPtr())
         return false;
@@ -275,12 +273,12 @@ bool LinuxFirewireDevice::OpenPort(void)
         GetInfoPtr()->fw_handle, linux_firewire_device_bus_reset_handler);
 
     GetInfoPtr()->GetSubunitInfo();
-    VERBOSE(VB_RECORD, LOC + GetInfoPtr()->GetSubunitInfoString());
+    LOG(VB_RECORD, LOG_INFO, LOC + GetInfoPtr()->GetSubunitInfoString());
 
     if (!GetInfoPtr()->IsSubunitType(kAVCSubunitTypeTuner) ||
         !GetInfoPtr()->IsSubunitType(kAVCSubunitTypePanel))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Not an STB"));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Not an STB"));
 
         mlocker.unlock();
         ClosePort();
@@ -290,14 +288,14 @@ bool LinuxFirewireDevice::OpenPort(void)
 
     m_priv->run_port_handler = true;
 
-    VERBOSE(VB_RECORD, LOC + "Starting port handler thread");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Starting port handler thread");
     m_priv->port_handler_thread = new LinuxControllerThread(this);
     m_priv->port_handler_thread->start();
 
     while (!m_priv->is_port_handler_running)
         m_priv->port_handler_wait.wait(mlocker.mutex(), 100);
 
-    VERBOSE(VB_RECORD, LOC + "Port handler thread started");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Port handler thread started");
 
     m_open_port_cnt++;
 
@@ -306,13 +304,13 @@ bool LinuxFirewireDevice::OpenPort(void)
 
 bool LinuxFirewireDevice::ClosePort(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Stopping Port Handler Thread");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stopping Port Handler Thread");
     QMutexLocker locker(&m_priv->start_stop_port_handler_lock);
-    VERBOSE(VB_RECORD, LOC + "Stopping Port Handler Thread -- locked");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stopping Port Handler Thread -- locked");
 
     QMutexLocker mlocker(&m_lock);
 
-    VERBOSE(VB_RECORD, LOC + "ClosePort()");
+    LOG(VB_RECORD, LOG_INFO, LOC + "ClosePort()");
 
     if (m_open_port_cnt < 1)
         return false;
@@ -330,7 +328,8 @@ bool LinuxFirewireDevice::ClosePort(void)
         if (IsNodeOpen())
             CloseNode();
 
-        VERBOSE(VB_RECORD, LOC + "Waiting for port handler thread to stop");
+        LOG(VB_RECORD, LOG_INFO,
+            LOC + "Waiting for port handler thread to stop");
         m_priv->run_port_handler = false;
         m_priv->port_handler_wait.wakeAll();
 
@@ -341,7 +340,7 @@ bool LinuxFirewireDevice::ClosePort(void)
         delete m_priv->port_handler_thread;
         m_priv->port_handler_thread = NULL;
 
-        VERBOSE(VB_RECORD, LOC + "Joined port handler thread");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Joined port handler thread");
 
         remove_handle(GetInfoPtr()->fw_handle);
 
@@ -430,7 +429,7 @@ bool LinuxFirewireDevice::OpenP2PNode(void)
     if (m_priv->is_p2p_node_open)
         return true;
 
-    VERBOSE(VB_RECORD, LOC + "Opening P2P connection");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Opening P2P connection");
 
     m_priv->bandwidth   = +1; // +1 == allocate bandwidth
     m_priv->output_plug = -1; // -1 == find first online plug
@@ -444,7 +443,7 @@ bool LinuxFirewireDevice::OpenP2PNode(void)
 
     if (m_priv->channel < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create P2P connection");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create P2P connection");
 
         m_priv->bandwidth = 0;
 
@@ -460,7 +459,7 @@ bool LinuxFirewireDevice::CloseP2PNode(void)
 {
     if (m_priv->is_p2p_node_open && (m_priv->channel >= 0))
     {
-        VERBOSE(VB_RECORD, LOC + "Closing P2P connection");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Closing P2P connection");
 
         if (m_priv->avstream)
             CloseAVStream();
@@ -498,7 +497,7 @@ bool LinuxFirewireDevice::OpenBroadcastNode(void)
     m_priv->input_plug  = 0;
     nodeid_t output     = GetInfoPtr()->GetNode() | 0xffc0;
 
-    VERBOSE(VB_RECORD, LOC + "Opening broadcast connection on " +
+    LOG(VB_RECORD, LOG_INFO, LOC + "Opening broadcast connection on " +
             QString("node %1, channel %2")
             .arg(GetInfoPtr()->GetNode()).arg(m_priv->channel));
 
@@ -509,8 +508,7 @@ bool LinuxFirewireDevice::OpenBroadcastNode(void)
 
     if (err != 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to create Broadcast connection");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Broadcast connection");
 
         m_priv->channel     = -1;
         m_priv->output_plug = -1;
@@ -528,7 +526,7 @@ bool LinuxFirewireDevice::CloseBroadcastNode(void)
 {
     if (m_priv->is_bcast_node_open)
     {
-        VERBOSE(VB_RECORD, LOC + "Closing broadcast connection");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Closing broadcast connection");
 
         m_priv->channel     = -1;
         m_priv->output_plug = -1;
@@ -540,12 +538,12 @@ bool LinuxFirewireDevice::CloseBroadcastNode(void)
 
 bool LinuxFirewireDevice::OpenAVStream(void)
 {
-    VERBOSE(VB_RECORD, LOC + "OpenAVStream");
+    LOG(VB_RECORD, LOG_INFO, LOC + "OpenAVStream");
 
     if (!GetInfoPtr() || !GetInfoPtr()->IsPortOpen())
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                "Cannot open AVStream without open IEEE 1394 port");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Cannot open AVStream without open IEEE 1394 port");
 
         return false;
     }
@@ -556,14 +554,14 @@ bool LinuxFirewireDevice::OpenAVStream(void)
     if (m_priv->avstream)
         return true;
 
-    VERBOSE(VB_RECORD, LOC + "Opening A/V stream object");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Opening A/V stream object");
 
     m_priv->avstream = iec61883_mpeg2_recv_init(
         GetInfoPtr()->fw_handle, linux_firewire_device_tspacket_handler, this);
 
     if (!m_priv->avstream)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Unable to open AVStream" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to open AVStream" + ENO);
 
         return false;
     }
@@ -581,7 +579,7 @@ bool LinuxFirewireDevice::CloseAVStream(void)
     if (!m_priv->avstream)
         return true;
 
-    VERBOSE(VB_RECORD, LOC + "Closing A/V stream object");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Closing A/V stream object");
 
     while (m_listeners.size())
         FirewireDevice::RemoveListener(m_listeners[m_listeners.size() - 1]);
@@ -597,9 +595,9 @@ bool LinuxFirewireDevice::CloseAVStream(void)
 
 void LinuxFirewireDevice::RunPortHandler(void)
 {
-    VERBOSE(VB_RECORD, LOC + "RunPortHandler -- start");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunPortHandler -- start");
     m_lock.lock();
-    VERBOSE(VB_RECORD, LOC + "RunPortHandler -- got first lock");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunPortHandler -- got first lock");
     m_priv->is_port_handler_running = true;
     m_priv->port_handler_wait.wakeAll();
     // we need to unlock & sleep to allow wakeAll to wake other threads.
@@ -651,7 +649,7 @@ void LinuxFirewireDevice::RunPortHandler(void)
         {
             m_priv->no_data_cnt++;
 
-            VERBOSE(VB_IMPORTANT, LOC_WARN + QString("No Input in %1 msec...")
+            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No Input in %1 msec...")
                     .arg(m_priv->no_data_cnt * kNoDataTimeout));
         }
 
@@ -666,7 +664,7 @@ void LinuxFirewireDevice::RunPortHandler(void)
             int ret = raw1394_loop_iterate(GetInfoPtr()->fw_handle);
             if (-1 == ret)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "raw1394_loop_iterate" + ENO);
+                LOG(VB_GENERAL, LOG_ERR, LOC + "raw1394_loop_iterate" + ENO);
             }
         }
     }
@@ -674,7 +672,7 @@ void LinuxFirewireDevice::RunPortHandler(void)
     m_priv->is_port_handler_running = false;
     m_priv->port_handler_wait.wakeAll();
     m_lock.unlock();
-    VERBOSE(VB_RECORD, LOC + "RunPortHandler -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunPortHandler -- end");
 }
 
 bool LinuxFirewireDevice::StartStreaming(void)
@@ -687,11 +685,11 @@ bool LinuxFirewireDevice::StartStreaming(void)
 
     if (m_priv->channel < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Starting A/V streaming, no channel");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Starting A/V streaming, no channel");
         return false;
     }
 
-    VERBOSE(VB_RECORD, LOC + "Starting A/V streaming -- really");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Starting A/V streaming -- really");
 
     if (iec61883_mpeg2_recv_start(m_priv->avstream, m_priv->channel) == 0)
     {
@@ -699,10 +697,10 @@ bool LinuxFirewireDevice::StartStreaming(void)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Starting A/V streaming " + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Starting A/V streaming " + ENO);
     }
 
-    VERBOSE(VB_RECORD, LOC + "Starting A/V streaming -- done");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Starting A/V streaming -- done");
 
     return m_priv->is_streaming;
 }
@@ -711,7 +709,7 @@ bool LinuxFirewireDevice::StopStreaming(void)
 {
     if (m_priv->is_streaming)
     {
-        VERBOSE(VB_RECORD, LOC + "Stopping A/V streaming -- really");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Stopping A/V streaming -- really");
 
         m_priv->is_streaming = false;
 
@@ -720,7 +718,7 @@ bool LinuxFirewireDevice::StopStreaming(void)
         raw1394_iso_recv_flush(GetInfoPtr()->fw_handle);
     }
 
-    VERBOSE(VB_RECORD, LOC + "Stopped A/V streaming");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stopped A/V streaming");
 
     return true;
 }
@@ -736,8 +734,7 @@ bool LinuxFirewireDevice::SetAVStreamBufferSize(uint size_in_bytes)
 
     iec61883_mpeg2_set_buffers(m_priv->avstream, buffered_packets);
 
-    VERBOSE(VB_IMPORTANT, LOC +
-            QString("Buffered packets %1 (%2 KB)")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffered packets %1 (%2 KB)")
             .arg(buffered_packets).arg(buffered_packets * 4));
 
     return true;
@@ -756,8 +753,7 @@ bool LinuxFirewireDevice::SetAVStreamSpeed(uint speed)
         return true;
     }
 
-    VERBOSE(VB_RECORD, LOC +
-            QString("Changing Speed %1 -> %2")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Changing Speed %1 -> %2")
             .arg(speed_to_string(curspeed))
             .arg(speed_to_string(m_speed)));
 
@@ -769,7 +765,7 @@ bool LinuxFirewireDevice::SetAVStreamSpeed(uint speed)
         return true;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to set firewire speed.");
+    LOG(VB_GENERAL, LOG_WARNING, LOC + "Unable to set firewire speed.");
 
     return false;
 }
@@ -786,21 +782,21 @@ bool LinuxFirewireDevice::IsAVStreamOpen(void) const
 
 bool LinuxFirewireDevice::ResetBus(void)
 {
-    VERBOSE(VB_IMPORTANT, LOC + "ResetBus() -- begin");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "ResetBus() -- begin");
 
     if (m_db_reset_disabled)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Bus Reset disabled" + ENO);
-        VERBOSE(VB_IMPORTANT, LOC + "ResetBus() -- end");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Bus Reset disabled" + ENO);
+        LOG(VB_GENERAL, LOG_INFO, LOC + "ResetBus() -- end");
         return true;
     }
 
     bool ok = (raw1394_reset_bus_new(GetInfoPtr()->fw_handle,
                                      RAW1394_LONG_RESET) == 0);
     if (!ok)
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Bus Reset failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Bus Reset failed" + ENO);
 
-    VERBOSE(VB_IMPORTANT, LOC + "ResetBus() -- end");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "ResetBus() -- end");
 
     return ok;
 }
@@ -809,12 +805,12 @@ void LinuxFirewireDevice::PrintDropped(uint dropped_packets)
 {
     if (dropped_packets == 1)
     {
-        VERBOSE(VB_RECORD, LOC_ERR + "Dropped a TS packet");
+        LOG(VB_RECORD, LOG_ERR, LOC + "Dropped a TS packet");
     }
     else if (dropped_packets > 1)
     {
-        VERBOSE(VB_RECORD, LOC_ERR +
-                QString("Dropped %1 TS packets").arg(dropped_packets));
+        LOG(VB_RECORD, LOG_ERR, LOC + QString("Dropped %1 TS packets")
+                .arg(dropped_packets));
     }
 }
 
@@ -832,9 +828,13 @@ vector<AVCInfo> LinuxFirewireDevice::GetSTBList(void)
 
 vector<AVCInfo> LinuxFirewireDevice::GetSTBListPrivate(void)
 {
-    //VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- begin");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- begin");
+#endif
     QMutexLocker locker(&m_lock);
-    //VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- got lock");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- got lock");
+#endif
 
     vector<AVCInfo> list;
 
@@ -848,7 +848,9 @@ vector<AVCInfo> LinuxFirewireDevice::GetSTBListPrivate(void)
         }
     }
 
-    //VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- end");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- end");
+#endif
     return list;
 }
 
@@ -866,7 +868,7 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
     item.handle = raw1394_new_handle();
     if (!item.handle)
     {
-        VERBOSE(VB_IMPORTANT, QString("LinuxFirewireDevice: ") +
+        LOG(VB_GENERAL, LOG_ERR, QString("LinuxFirewireDevice: ") +
                 "Couldn't get handle" + ENO);
         return false;
     }
@@ -884,7 +886,7 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
     {
         if (raw1394_set_port(item.handle, port) < 0)
         {
-            VERBOSE(VB_IMPORTANT, QString("LinuxFirewireDevice: "
+            LOG(VB_GENERAL, LOG_ERR, QString("LinuxFirewireDevice: "
                     "Couldn't set port to %1").arg(port));
             continue;
         }
@@ -905,9 +907,9 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
         item.handle = raw1394_new_handle();
         if (!item.handle)
         {
-            VERBOSE(VB_IMPORTANT, QString("LinuxFirewireDevice: ") +
+            LOG(VB_GENERAL, LOG_ERR, QString("LinuxFirewireDevice: ") +
                     "Couldn't get handle " +
-                    QString("(after setting port %1").arg(port) + ENO);
+                QString("(after setting port %1").arg(port) + ENO);
             item.handle = NULL;
             break;
         }
@@ -941,7 +943,7 @@ void LinuxFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
     {
         LinuxAVCInfo *ptr = new LinuxAVCInfo();
 
-        VERBOSE(VB_RECORD, LOC + QString("Adding   0x%1").arg(guid,0,16));
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Adding   0x%1").arg(guid,0,16));
 
         m_priv->devices[guid] = ptr;
         it = m_priv->devices.find(guid);
@@ -950,7 +952,8 @@ void LinuxFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
     if (it != m_priv->devices.end())
     {
         dev_item &item = *((dev_item*) pitem);
-        VERBOSE(VB_RECORD, LOC + QString("Updating 0x%1 port: %2 node: %3")
+        LOG(VB_RECORD, LOG_INFO,
+            LOC + QString("Updating 0x%1 port: %2 node: %3")
                 .arg(guid,0,16).arg(item.port).arg(item.node));
 
         (*it)->Update(guid, item.handle, item.port, item.node);
@@ -1004,7 +1007,7 @@ static bool has_data(int fd, uint msec)
     int ready = select(fd + 1, &rfds, NULL, NULL, &tv);
 
     if (ready < 0)
-        VERBOSE(VB_IMPORTANT, "LFireDev: Select Error" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, "LFireDev: Select Error" + ENO);
 
     if (ready <= 0)
         return false;

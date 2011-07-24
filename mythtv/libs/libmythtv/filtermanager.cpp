@@ -17,8 +17,6 @@
 #include "mythdirs.h"
 
 #define LOC QString("FilterManager: ")
-#define LOC_WARN QString("FilterManager, Warning: ")
-#define LOC_ERR QString("FilterManager, Error: ")
 
 static const char *FmtToString(VideoFrameType ft)
 {
@@ -80,19 +78,19 @@ FilterManager::FilterManager()
             if (path.length() <= 1)
                 continue;
 
-            VERBOSE(VB_PLAYBACK+VB_FILE, LOC +
-                    QString("Loading filter '%1'").arg(path));
+            LOG(VB_PLAYBACK | VB_FILE, LOG_INFO, LOC +
+                QString("Loading filter '%1'").arg(path));
 
             if (!LoadFilterLib(path))
             {
-                VERBOSE(VB_IMPORTANT, LOC_WARN +
-                        QString("Failed to load filter library: %1").arg(path));
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    QString("Failed to load filter library: %1").arg(path));
             }
         }
     }
     else
-        VERBOSE(VB_IMPORTANT,
-                "Filter dir '" + FiltDir.absolutePath() + "' doesn't exist?");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Filter dir '" + FiltDir.absolutePath() + "' doesn't exist?");
 }
 
 FilterManager::~FilterManager()
@@ -137,8 +135,8 @@ bool FilterManager::LoadFilterLib(const QString &path)
         if (!dlhandle)
         {
             const char *errmsg = dlerror();
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to load filter library: " +
-                    QString("'%1'").arg(path) + "\n\t\t\t" + errmsg);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load filter library: " +
+                QString("'%1'").arg(path) + "\n\t\t\t" + errmsg);
             return false;
         }
         dlhandles[path] = dlhandle;
@@ -150,8 +148,8 @@ bool FilterManager::LoadFilterLib(const QString &path)
     if (!filtInfo)
     {
         const char *errmsg = dlerror();
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to load filter symbol: " +
-                QString("'%1'").arg(path) + "\n\t\t\t" + errmsg);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load filter symbol: " +
+            QString("'%1'").arg(path) + "\n\t\t\t" + errmsg);
         return false;
     }
 
@@ -175,7 +173,7 @@ bool FilterManager::LoadFilterLib(const QString &path)
         QByteArray libname = path.toAscii();
         newFilter->libname = strdup(libname.constData());
         filters[newFilter->name] = newFilter;
-        VERBOSE(VB_PLAYBACK+VB_EXTRA, LOC + QString("filters[%1] = 0x%2")
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("filters[%1] = 0x%2")
                 .arg(newFilter->name).arg((uint64_t)newFilter,0,16));
     }
     return true;
@@ -188,7 +186,7 @@ const FilterInfo *FilterManager::GetFilterInfo(const QString &name) const
     if (it != filters.end())
         finfo = it->second;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("GetFilterInfo(%1)").arg(name) +
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("GetFilterInfo(%1)").arg(name) +
             QString(" returning: 0x%1").arg((uint64_t)finfo,0,16));
 
     return finfo;
@@ -240,8 +238,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC + QString(
-                        "Failed to load filter '%1', "
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Failed to load filter '%1', "
                         "no such filter exists").arg(FiltName));
             FiltInfoChain.clear();
             break;
@@ -303,8 +301,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         {
             if (!Convert)
             {
-                VERBOSE(VB_IMPORTANT, "FilterManager: format conversion "
-                        "needed but convert filter not found");
+                LOG(VB_GENERAL, LOG_ERR, "FilterManager: format conversion "
+                                         "needed but convert filter not found");
                 FiltInfoChain.clear();
                 break;
             }
@@ -319,8 +317,9 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, "FilterManager: memory allocation "
-                        "failure, returning empty filter chain");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "FilterManager: memory allocation "
+                    "failure, returning empty filter chain");
                 FiltInfoChain.clear();
                 break;
             }
@@ -333,8 +332,9 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "FilterManager: memory allocation failure, "
-                    "returning empty filter chain");
+            LOG(VB_GENERAL, LOG_ERR,
+                "FilterManager: memory allocation failure, "
+                "returning empty filter chain");
             FiltInfoChain.clear();
             break;
         }
@@ -346,8 +346,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     {
         if (!Convert)
         {
-            VERBOSE(VB_IMPORTANT, "FilterManager: format conversion "
-                    "needed but convert filter not found");
+            LOG(VB_GENERAL, LOG_ERR, "FilterManager: format conversion "
+                                     "needed but convert filter not found");
             FiltInfoChain.clear();
         }
         else
@@ -362,8 +362,9 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, "FilterManager: memory allocation "
-                        "failure, returning empty filter chain");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "FilterManager: memory allocation "
+                    "failure, returning empty filter chain");
                 FiltInfoChain.clear();
             }
         }
@@ -388,13 +389,12 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         if (!NewFilt)
         {
             delete FiltChain;
-            VERBOSE(VB_IMPORTANT,QString("FilterManager: failed to load "
-                        "filter %1 %2->%3 with args %4")
+            LOG(VB_GENERAL, LOG_ERR, QString("FilterManager: failed to load "
+                                             "filter %1 %2->%3 with args %4")
                     .arg(FiltInfoChain[i]->name)
                     .arg(FmtToString(FmtList[i]->in))
                     .arg(FmtToString(FmtList[i]->out))
-                    .arg(OptsList[i])
-                   );
+                    .arg(OptsList[i]));
             FiltChain = NULL;
             nbufsize = -1;
             break;
@@ -497,15 +497,16 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
 
     if (FiltInfo == NULL)
     {
-        VERBOSE(VB_IMPORTANT, "FilterManager: LoadFilter called with NULL"
-                "FilterInfo");
+        LOG(VB_GENERAL, LOG_ERR, "FilterManager: LoadFilter called with NULL"
+                                 "FilterInfo");
         return NULL;
     }
 
     if (FiltInfo->libname == NULL)
     {
-        VERBOSE(VB_IMPORTANT, "FilterManager: LoadFilter called with invalid "
-                "FilterInfo (libname is NULL)");
+        LOG(VB_GENERAL, LOG_ERR,
+            "FilterManager: LoadFilter called with invalid "
+            "FilterInfo (libname is NULL)");
         return NULL;
     }
 
@@ -513,8 +514,9 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
 
     if (!handle)
     {
-        VERBOSE(VB_IMPORTANT, QString("FilterManager: unable to load "
-                "shared library '%1', dlopen reports error '%2'")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("FilterManager: unable to load "
+                    "shared library '%1', dlopen reports error '%2'")
                 .arg(FiltInfo->libname)
                 .arg(dlerror()));
         return NULL;
@@ -525,8 +527,9 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
 
     if (!filtInfo || !filtInfo->filter_init)
     {
-        VERBOSE(VB_IMPORTANT, QString("FilterManager: unable to load filter "
-                "'%1' from shared library '%2', dlopen reports error '%3'")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("FilterManager: unable to load filter "
+                    "'%1' from shared library '%2', dlopen reports error '%3'")
                 .arg(FiltInfo->name)
                 .arg(FiltInfo->libname)
                 .arg(dlerror()));

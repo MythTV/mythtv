@@ -76,6 +76,95 @@ QDateTime myth_dt_from_string(const QString &dtstr)
     return QDateTime::fromString(dtstr, Qt::ISODate);
 }
 
+/** \fn MythDateTimeToString
+ *  \brief Returns a formatted QString based on the supplied QDateTime
+ * 
+ *  \param datetime The QDateTime object to use
+ *  \param format   The format of the string to return
+ *  \param simplify If true then full dates will be simplified to
+ *                  Today/Yesterday/Tomorrow if applicable otherwise no changes
+ *                  are made
+ */
+QString MythDateTimeToString(const QDateTime& datetime, uint format)
+{
+    QString result;
+
+    if (format & (kDateFull | kDateShort))
+        result += MythDateToString(datetime.date(), format);
+
+    if (format & kTime)
+    {
+        if (!result.isEmpty())
+            result.append(", ");
+        
+        result += MythTimeToString(datetime.time(), format);
+    }
+    
+    return result;
+}
+
+/** \fn MythDateToString
+ *  \brief Returns a formatted QString based on the supplied QDate
+ * 
+ *  \param date     The QDate object to use
+ *  \param format   The format of the string to return
+ */
+QString MythDateToString(const QDate& date, uint format)
+{
+    QString result;
+
+    if (format & (kDateFull | kDateShort))
+    {
+        QDate now = QDate::currentDate();
+
+        QString stringformat;
+        if (format & kDateShort)
+            stringformat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
+        else
+            stringformat = gCoreContext->GetSetting("DateFormat", "ddd d MMMM");
+        
+        if (format & kAddYear)
+        {
+            if (!stringformat.contains("yy")) // Matches both 2 or 4 digit year
+                stringformat.append(" yyyy");
+        }
+        
+        if (format & ~kDateShort)
+        {
+            if ((format & kSimplify) && (now == date))
+                result = QObject::tr("Today");
+            else if ((format & kSimplify) && (now.addDays(-1) == date))
+                result = QObject::tr("Yesterday");
+            else if ((format & kSimplify) && (now.addDays(1) == date))
+                result = QObject::tr("Tomorrow");
+        }
+        
+        if (result.isEmpty())
+            result = date.toString(stringformat);
+    }
+    
+    return result;
+}
+
+/** \fn MythTimeToString
+ *  \brief Returns a formatted QString based on the supplied QTime
+ * 
+ *  \param time     The QTime object to use
+ *  \param format   The format of the string to return
+ */
+QString MythTimeToString(const QTime& time, uint format)
+{
+    QString result;
+
+    if (format & kTime)
+    {
+        QString timeformat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+        result = time.toString(timeformat);
+    }    
+    
+    return result;
+}
+
 int calc_utc_offset(void)
 {
     QDateTime loc = QDateTime::currentDateTime();
@@ -1324,10 +1413,13 @@ bool MythRemoveDirectory(QDir &aDir)
     return(has_err);
 }
 
- MBASE_PUBLIC  QString &ShellEscape(QString &string)
+QString &ShellEscape(QString &string)
 {
     if (string.contains("\""))
         string = string.replace("\"", "\\\"");
+
+    if (string.contains("\'"))
+        string = string.replace("\'", "\\\'");
 
     if (string.contains(" "))
     {
@@ -1349,7 +1441,7 @@ bool MythRemoveDirectory(QDir &aDir)
  * If there is was no env. var, we use Qt to get proxy settings from the OS,
  * and search through them for a proxy server we can connect to.
  */
- MBASE_PUBLIC void setHttpProxy(void)
+void setHttpProxy(void)
 {
     QString       LOC = "setHttpProxy() - ";
     QNetworkProxy p;
@@ -1379,23 +1471,23 @@ bool MythRemoveDirectory(QDir &aDir)
             if (telnet(host, 8080))  // MS ISA
                 port = 8080;
 
-            LOG(VB_NETWORK, LOG_INFO, QString("assuming port %1 on host %2")
-                                .arg(port).arg(host));
+            LOG(VB_NETWORK, LOG_INFO, LOC + 
+                QString("assuming port %1 on host %2") .arg(port).arg(host));
             url.setPort(port);
         }
         else if (!ping(host, 1))
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("cannot locate host %1").arg(host) +
-                    "\n\t\t\tPlease check HTTP_PROXY environment variable!");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("cannot locate host %1").arg(host) +
+                "\n\t\t\tPlease check HTTP_PROXY environment variable!");
         else if (!telnet(host,port))
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("%1:%2 - cannot connect!").arg(host).arg(port) +
-                    "\n\t\t\tPlease check HTTP_PROXY environment variable!");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("%1:%2 - cannot connect!").arg(host).arg(port) +
+                "\n\t\t\tPlease check HTTP_PROXY environment variable!");
 
 #if 0
-        LOG(VB_NETWORK, LOG_DEBUG, QString("using http://%1:%2@%3:%4")
-                            .arg(url.userName()).arg(url.password())
-                            .arg(host).arg(port));
+        LOG(VB_NETWORK, LOG_DEBUG, LOC + QString("using http://%1:%2@%3:%4")
+                .arg(url.userName()).arg(url.password())
+                .arg(host).arg(port));
 #endif
         p = QNetworkProxy(QNetworkProxy::HttpProxy,
                           host, port, url.userName(), url.password());
@@ -1403,7 +1495,7 @@ bool MythRemoveDirectory(QDir &aDir)
         return;
     }
 
-    LOG(VB_NETWORK, LOG_DEBUG, "no HTTP_PROXY environment var.");
+    LOG(VB_NETWORK, LOG_DEBUG, LOC + "no HTTP_PROXY environment var.");
 
     // Use Qt to look for user proxy settings stored by the OS or browser:
 
@@ -1422,11 +1514,12 @@ bool MythRemoveDirectory(QDir &aDir)
 
         if (!telnet(host, port))
         {
-            LOG(VB_NETWORK, LOG_ERR, "failed to contact proxy host " + host);
+            LOG(VB_NETWORK, LOG_ERR, LOC +
+                "failed to contact proxy host " + host);
             continue;
         }
 
-        LOG(VB_NETWORK, LOG_INFO, QString("using proxy host %1:%2")
+        LOG(VB_NETWORK, LOG_INFO, LOC + QString("using proxy host %1:%2")
                             .arg(host).arg(port));
         QNetworkProxy::setApplicationProxy(p);
 
@@ -1447,10 +1540,10 @@ bool MythRemoveDirectory(QDir &aDir)
         return;
     }
 
-    LOG(VB_NETWORK, LOG_ERR, "failed to find a network proxy");
+    LOG(VB_NETWORK, LOG_ERR, LOC + "failed to find a network proxy");
 }
 
-MBASE_PUBLIC void wrapList(QStringList &list, int width)
+void wrapList(QStringList &list, int width)
 {
     int i;
 

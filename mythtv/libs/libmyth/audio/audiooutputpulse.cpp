@@ -22,7 +22,6 @@
 #include "audiooutputpulse.h"
 
 #define LOC     QString("PulseAudio: ")
-#define LOC_ERR QString("PulseAudio Error: ")
 
 #define PULSE_MAX_CHANNELS 8
 
@@ -505,12 +504,11 @@ char *AudioOutputPulseAudio::ChooseHost(void)
 
 bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
 {
-    QString fn_log_tag = "ConnectPlaybackStream, ";
     pstream = pa_stream_new(pcontext, "MythTV playback", &sample_spec,
                             &channel_map);
     if (!pstream)
     {
-        VBERROR(fn_log_tag + QString("failed to create new playback stream"));
+        VBERROR("failed to create new playback stream");
         return false;
     }
     pa_stream_set_state_callback(pstream, StreamStateCallback, this);
@@ -552,10 +550,8 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
         {
             case PA_CONTEXT_FAILED:
             case PA_CONTEXT_TERMINATED:
-                VERBOSE(VB_IMPORTANT, LOC_ERR + fn_log_tag +
-                        QString("context is stuffed, %1")
-                        .arg(pa_strerror(pa_context_errno(
-                                             pcontext))));
+                VBERROR(QString("context is stuffed, %1")
+                            .arg(pa_strerror(pa_context_errno(pcontext))));
                 failed = true;
                 break;
             default:
@@ -566,10 +562,9 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
                         break;
                     case PA_STREAM_FAILED:
                     case PA_STREAM_TERMINATED:
-                        VBERROR(fn_log_tag +
-                                QString("stream failed or was terminated, "
+                        VBERROR(QString("stream failed or was terminated, "
                                         "context state %1, stream state %2")
-                                .arg(cstate).arg(sstate));
+                                    .arg(cstate).arg(sstate));
                         failed = true;
                         break;
                     default:
@@ -583,8 +578,8 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     fragment_size = buf_attr->tlength >> 2;
     soundcard_buffer_size = buf_attr->maxlength;
 
-    VBAUDIO(fn_log_tag + QString("fragment size %1, soundcard buffer size %2")
-                         .arg(fragment_size).arg(soundcard_buffer_size));
+    VBAUDIO(QString("fragment size %1, soundcard buffer size %2")
+                .arg(fragment_size).arg(soundcard_buffer_size));
 
     return (connected && !failed);
 }

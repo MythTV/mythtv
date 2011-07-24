@@ -125,7 +125,7 @@ bool Settings::ReadSettings(QString pszFile)
 
     if (!fin.is_open())
     {
-        LOG(VB_FILE, LOG_ERR, "No such file " + pszFile);
+        LOG(VB_FILE, LOG_ERR, LOC + "No such file " + pszFile);
         return false;
     }
 
@@ -157,7 +157,8 @@ bool Settings::ReadSettings(QString pszFile)
 
                 (*m_pSettings)[strKey] = strVal;
 
-                LOG(VB_FILE, LOG_DEBUG,'\'' + strKey + "' = '" + strVal + "'.");
+                LOG(VB_FILE, LOG_DEBUG, LOC + QString("'%1' = '%2'.")
+                        .arg(strKey) .arg(strVal));
             }
         }
     } // wend

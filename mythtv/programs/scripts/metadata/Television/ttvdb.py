@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="TheTVDB.com";
 __author__="R.D.Vaughan"
-__version__="1.12"
+__version__="1.1.3"
 # Version .1    Initial development
 # Version .2    Add an option to get season and episode numbers from ep name
 # Version .3    Cleaned up the documentation and added a usage display option
@@ -131,7 +131,8 @@ __version__="1.12"
 # Version 1.1.0 Added support for XML output. See:
 #               http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
 # Version 1.1.1 Make XML output the default.
-# Version 1.12  Convert version information to XML
+# Version 1.1.2 Convert version information to XML
+# Version 1.1.3 Implement fuzzy matching for episode name lookup
 
 usage_txt='''
 Usage: ttvdb.py usage: ttvdb -hdruviomMPFBDS [parameters]
@@ -348,6 +349,14 @@ Error:(%s)
     sys.exit(1)
 
 try:
+    from MythTV.utility import levenshtein
+except Exception, e:
+    print """Could not import levenshtein string distance method from MythTV Python Bindings
+Error:(%s)
+""" % e
+    sys.exit(1)
+
+try:
     from StringIO import StringIO
     from lxml import etree as etree
 except Exception, e:
@@ -460,15 +469,85 @@ class OutStreamEncoder(object):
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
-# new Tvdb method to search for a series and return it's sid
-def _series_by_sid(self, sid):
-    "Lookup a series via it's sid"
-    seriesid = 'sid:' + sid
-    if not self.corrections.has_key(seriesid):
-        self._getShowData(sid)
-        self.corrections[seriesid] = sid
-    return self.shows[sid]
-tvdb_api.Tvdb.series_by_sid = _series_by_sid
+# modified Show class implementing a fuzzy search
+class Show( tvdb_api.Show ):
+    def fuzzysearch(self, term = None, key = None):
+        results = []
+        for cur_season in self.values():
+            searchresult = cur_season.fuzzysearch(term = term, key = key)
+            if len(searchresult) != 0:
+                results.extend(searchresult)
+        return results
+# end Show
+
+# modified Season class implementing a fuzzy search
+class Season( tvdb_api.Season ):
+    def fuzzysearch(self, term = None, key = None):
+        results = []
+        for episode in self.values():
+            searchresult = episode.fuzzysearch(term = term, key = key)
+            if searchresult is not None:
+                results.append(searchresult)
+        return results
+# end Season
+
+# modified Episode class implementing a fuzzy search
+class Episode( tvdb_api.Episode ):
+    _re_strippart = re.compile('(.*) \([0-9]+\)')
+    def fuzzysearch(self, term = None, key = None):
+        if term == None:
+            raise TypeError("must supply string to search for (contents)")
+
+        term = unicode(term).lower()
+        for cur_key, cur_value in self.items():
+            cur_key, cur_value = [unicode(a).lower() for a in [cur_key, cur_value]]
+            if key is not None and cur_key != key:
+                continue
+            distance = levenshtein(cur_value, term)
+            if distance <= 3:
+                # handle most matches
+                self.distance = distance
+                return self
+            if distance <= 5:
+                # handle part numbers, 'subtitle (nn)'
+                match = self._re_strippart.match(cur_value)
+                if match:
+                    tmp = match.group(1)
+                    if levenshtein(tmp, term) <= 3:
+                        self.distance = distance
+                        return self
+        return None
+#end Episode
+
+# modified Tvdb API class using modified show classes
+class Tvdb( tvdb_api.Tvdb ):
+    def series_by_sid(self, sid):
+        "Lookup a series via it's sid"
+        seriesid = 'sid:' + sid
+        if not self.corrections.has_key(seriesid):
+            self._getShowData(sid)
+            self.corrections[seriesid] = sid
+        return self.shows[sid]
+    #end series_by_sid
+
+    # override the existing method, using modified show classes
+    def _setItem(self, sid, seas, ep, attrib, value):
+        if sid not in self.shows:
+            self.shows[sid] = Show()
+        if seas not in self.shows[sid]:
+            self.shows[sid][seas] = Season()
+        if ep not in self.shows[sid][seas]:
+            self.shows[sid][seas][ep] = Episode()
+        self.shows[sid][seas][ep][attrib] = value
+    #end _setItem
+
+    # override the existing method, using modified show class
+    def _setShowData(self, sid, key, value):
+        if sid not in self.shows:
+            self.shows[sid] = Show()
+        self.shows[sid].data[key] = value
+    #end _setShowData
+#end Tvdb
 
 # Search for a series by SID or Series name
 def search_for_series(tvdb, sid_or_name):
@@ -782,6 +861,15 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 
 # Get Series Season and Episode numbers
 def Getseries_episode_numbers(t, opts, series_season_ep):
+    def _episode_sort(episode):
+        seasonnumber = 0
+        episodenumber = 0
+        try: seasonnumber = int(episode['seasonnumber'])
+        except: pass
+        try: episodenumber = int(episode['episodenumber'])
+        except: pass
+        return (-episode.distance, seasonnumber, episodenumber)
+
     global xmlFlag
     series_name=''
     ep_name=''
@@ -794,22 +882,22 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
         series_name=series_season_ep[0] # Leave the series name alone
         ep_name=series_season_ep[1] # Leave the episode name alone
 
-    season_ep_num=search_for_series(t, series_name).search(ep_name)
+    season_ep_num=search_for_series(t, series_name).fuzzysearch(ep_name, 'episodename')
     if len(season_ep_num) != 0:
-        for episode in season_ep_num:
-            if (episode['episodename'].lower()).startswith(ep_name.lower()):
-                if len(episode['episodename']) > (len(ep_name)+1):
-                    if episode['episodename'][len(ep_name):len(ep_name)+2] != ' (':
-                        continue # Skip episodes the are not part of a set of (1), (2) ... etc
-                    if xmlFlag:
-                        displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
-                        sys.exit(0)
-                    print season_and_episode_num.replace('\\n', '\n') % (int(episode['seasonnumber']), int(episode['episodenumber']))
-                else: # Exact match
-                    if xmlFlag:
-                        displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
-                        sys.exit(0)
-                    print season_and_episode_num.replace('\\n', '\n') % (int(episode['seasonnumber']), int(episode['episodenumber']))
+        for episode in sorted(season_ep_num, key=lambda ep: _episode_sort(ep), reverse=True):
+#            if episode.distance == 0: # exact match
+                if xmlFlag:
+                    displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
+                    sys.exit(0)
+                print season_and_episode_num.replace('\\n', '\n') % (int(episode['seasonnumber']), int(episode['episodenumber']))
+#            elif (episode['episodename'].lower()).startswith(ep_name.lower()):
+#                if len(episode['episodename']) > (len(ep_name)+1):
+#                    if episode['episodename'][len(ep_name):len(ep_name)+2] != ' (':
+#                        continue # Skip episodes the are not part of a set of (1), (2) ... etc
+#                    if xmlFlag:
+#                        displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
+#                        sys.exit(0)
+#                    print season_and_episode_num.replace('\\n', '\n') % (int(episode['seasonnumber']), int(episode['episodenumber']))
 # end Getseries_episode_numbers
 
 # Set up a custom interface to get all series matching a partial series name
@@ -860,7 +948,7 @@ def initialize_override_dictionary(useroptions):
         if section =='series_name_override':
             for option in cfg.options(section):
                 overrides[option] = cfg.get(section, option)
-            tvdb = tvdb_api.Tvdb(banners=False, debug = False, interactive = False, cache = cache_dir, custom_ui=returnAllSeriesUI, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV
+            tvdb = Tvdb(banners=False, debug = False, interactive = False, cache = cache_dir, custom_ui=returnAllSeriesUI, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV
             for key in overrides.keys():
                 sid = overrides[key]
                 if len(sid) == 0:
@@ -1109,15 +1197,15 @@ def main():
 
     # Access thetvdb.com API with banners (Posters, Fanart, banners, screenshots) data retrieval enabled
     if opts.list ==True:
-        t = tvdb_api.Tvdb(banners=False, debug = opts.debug, cache = cache_dir, custom_ui=returnAllSeriesUI, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
+        t = Tvdb(banners=False, debug = opts.debug, cache = cache_dir, custom_ui=returnAllSeriesUI, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
         if opts.xml:
             t.xml = True
     elif opts.interactive == True:
-        t = tvdb_api.Tvdb(banners=True, debug=opts.debug, interactive=True,  select_first=False, cache=cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
+        t = Tvdb(banners=True, debug=opts.debug, interactive=True,  select_first=False, cache=cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
         if opts.xml:
             t.xml = True
     else:
-        t = tvdb_api.Tvdb(banners=True, debug = opts.debug, cache = cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
+        t = Tvdb(banners=True, debug = opts.debug, cache = cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
         if opts.xml:
             t.xml = True
 

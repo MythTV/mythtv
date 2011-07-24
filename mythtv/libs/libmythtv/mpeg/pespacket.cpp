@@ -23,13 +23,14 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
     broken = true;
     if (!tsheader()->PayloadStart())
     {
-        VERBOSE(VB_RECORD, "Error: We started a PES packet, "
-                "without a payloadStart!");
+        LOG(VB_RECORD, LOG_ERR,
+            "Error: We started a PES packet, without a payloadStart!");
         return true;
     }
     else if (!IsClone())
     {
-        VERBOSE(VB_RECORD, "Error: Must clone initially to use addPackets()");
+        LOG(VB_RECORD, LOG_ERR,
+            "Error: Must clone initially to use addPackets()");
         return false;
     }
 
@@ -72,9 +73,9 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
     }
     else
     {
-        VERBOSE(VB_RECORD, "AddTSPacket: Out of sync!!! "
-                "Need to wait for next payloadStart" +
-                QString(" PID: 0x%1, continuity counter: %2 (expected %3).")
+        LOG(VB_RECORD, LOG_ERR,
+            "AddTSPacket: Out of sync!!! Need to wait for next payloadStart" +
+            QString(" PID: 0x%1, continuity counter: %2 (expected %3).")
                 .arg(packet->PID(),0,16).arg(cc).arg(ccExp));
         return true;
     }
@@ -108,7 +109,7 @@ void PESPacket::GetAsTSPackets(vector<TSPacket> &output, uint cc) const
 
     if (_pesdata == _fullbuffer)
     {
-        VERBOSE(VB_IMPORTANT, "WriteAsTSPackets _pesdata == _fullbuffer");
+        LOG(VB_GENERAL, LOG_ERR, "WriteAsTSPackets _pesdata == _fullbuffer");
         output.resize(0);
         return;
     }
@@ -158,9 +159,9 @@ bool PESPacket::VerifyCRC(void) const
     bool ret = !HasCRC() || (StreamID() == 0x70) || (CalcCRC() == CRC());
     if (!ret)
     {
-        VERBOSE(VB_SIPARSER,
-                QString("PESPacket: Failed CRC check 0x%1 != 0x%2 "
-                        "for StreamID = 0x%3")
+        LOG(VB_SIPARSER, LOG_ERR,
+            QString("PESPacket: Failed CRC check 0x%1 != 0x%2 "
+                    "for StreamID = 0x%3")
                 .arg(CRC(),0,16).arg(CalcCRC(),0,16).arg(StreamID(),0,16));
     }
     return ret;
@@ -259,7 +260,9 @@ static void return_188_block(unsigned char* ptr)
             free(*it);
         mem188.clear();
         free188.clear();
-        //VERBOSE(VB_GENERAL, "freeing all 188 blocks");
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, "freeing all 188 blocks");
+#endif
     }
 }
 
@@ -293,17 +296,17 @@ static void return_4096_block(unsigned char* ptr)
     free4096.push_back(ptr);
 
 #if 0 // enable this to debug memory leaks
-        VERBOSE(VB_GENERAL, QString("%1 4096 blocks remain")
+        LOG(VB_GENERAL, LOG_DEBUG, QString("%1 4096 blocks remain")
             .arg(alloc4096.size()));
         map<unsigned char*, bool>::iterator it;
         for (it = alloc4096.begin(); it != alloc4096.end(); ++it)
         {
             TSPacket *ts = (TSPacket*) it->first;
-            VERBOSE(VB_GENERAL, QString("PES Packet: pid(0x%1)")
+            LGO(VB_GENERAL, LOG_DEBUG, QString("PES Packet: pid(0x%1)")
                 .arg(ts->PID(),0,16));
             if (ts->PID() == 0x1ffb)
             {
-                VERBOSE(VB_GENERAL, QString(" tid(0x%1) ext(0x%2)")
+                LOG(VB_GENERAL, LOG_DEBUG, QString(" tid(0x%1) ext(0x%2)")
                     .arg(PSIPTable::View(*ts).TableID(),0,16)
                     .arg(PSIPTable::View(*ts).TableIDExtension(),0,16));
             }
@@ -318,7 +321,9 @@ static void return_4096_block(unsigned char* ptr)
             free(*it);
         mem4096.clear();
         free4096.clear();
-        //VERBOSE(VB_GENERAL, "freeing all 4096 blocks");
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, "freeing all 4096 blocks");
+#endif
     }
 }
 

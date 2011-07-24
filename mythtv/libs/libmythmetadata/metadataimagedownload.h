@@ -27,6 +27,19 @@ class META_PUBLIC ImageDLEvent : public QEvent
     static Type kEventType;
 };
 
+class META_PUBLIC ImageDLFailureEvent : public QEvent
+{
+  public:
+    ImageDLFailureEvent(MetadataLookup *lookup) :
+                 QEvent(kEventType),
+                 item(lookup) {}
+    ~ImageDLFailureEvent() {}
+
+    MetadataLookup *item;
+
+    static Type kEventType;
+};
+
 class META_PUBLIC ThumbnailDLEvent : public QEvent
 {
   public:
@@ -72,6 +85,7 @@ META_PUBLIC QString getDownloadFilename(VideoArtworkType type, MetadataLookup *l
 
 META_PUBLIC QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type);
 META_PUBLIC QString getStorageGroupURL(VideoArtworkType type, QString host);
+META_PUBLIC QString getLocalStorageGroupPath(VideoArtworkType type, QString host);
 
 META_PUBLIC void cleanThumbnailCacheDir(void);
 

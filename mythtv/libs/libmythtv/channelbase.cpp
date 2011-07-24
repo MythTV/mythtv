@@ -15,7 +15,6 @@ using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
-#include <QProcess>
 
 // MythTV headers
 #include "firewirechannel.h"
@@ -39,13 +38,11 @@ using namespace std;
 #include "compat.h"
 
 #define LOC QString("ChannelBase(%1): ").arg(GetCardID())
-#define LOC_WARN QString("ChannelBase(%1) Warning: ").arg(GetCardID())
-#define LOC_ERR QString("ChannelBase(%1) Error: ").arg(GetCardID())
 
 ChannelBase::ChannelBase(TVRec *parent) :
     m_pParent(parent), m_curchannelname(""),
     m_currentInputID(-1), m_commfree(false), m_cardid(0),
-    m_process_thread(NULL), m_process(NULL), m_process_status(0)
+    m_system(NULL), m_system_status(0)
 {
 }
 
@@ -53,16 +50,9 @@ ChannelBase::~ChannelBase(void)
 {
     ClearInputMap();
 
-    QMutexLocker locker(&m_process_lock);
-    if (m_process_thread)
-    {
-        // better to a risk zombie than risk blocking forever..
-        KillScript(500);
-        m_process_thread->exit(0);
-        if (m_process_thread->wait())
-            delete m_process_thread;
-        m_process_thread = NULL;
-    }
+    QMutexLocker locker(&m_system_lock);
+    if (m_system)
+        KillScript();
 }
 
 bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
@@ -93,9 +83,9 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
 
     if (start != inputs.end())
     {
-        VERBOSE(VB_CHANNEL, LOC +
-                QString("Looking for startchannel '%1' on input '%2'")
-                .arg(startchannel).arg(*start));
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("Looking for startchannel '%1' on input '%2'")
+            .arg(startchannel).arg(*start));
     }
 
     // Attempt to find an input for the requested startchannel
@@ -111,9 +101,9 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
                 IsTunable(*it, startchannel))
             {
                 inputname = *it;
-                VERBOSE(VB_CHANNEL, LOC +
-                        QString("Found startchannel '%1' on input '%2'")
-                        .arg(startchannel).arg(inputname));
+                LOG(VB_CHANNEL, LOG_INFO, LOC +
+                    QString("Found startchannel '%1' on input '%2'")
+                    .arg(startchannel).arg(inputname));
                 return true;
             }
         }
@@ -171,9 +161,8 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             break;
     }
 
-    VERBOSE(((msg_error) ? VB_IMPORTANT : VB_GENERAL),
-            ((msg_error) ? LOC_ERR : LOC_WARN) +
-            msg1 + "\n\t\t\t" + msg2);
+    LOG(VB_GENERAL, ((msg_error) ? LOG_ERR : LOG_WARNING), LOC +
+        msg1 + "\n\t\t\t" + msg2);
 
     return ok;
 }
@@ -189,9 +178,9 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     InputMap::const_iterator it = m_inputs.find(inputid);
     if (it == m_inputs.end())
     {
-        VERBOSE(VB_IMPORTANT, loc + " " + QString(
-                    "Requested non-existant input '%1':'%2' ")
-                .arg(input).arg(inputid));
+        LOG(VB_GENERAL, LOG_ERR, loc + " " +
+            QString("Requested non-existant input '%1':'%2' ")
+            .arg(input).arg(inputid));
 
         return false;
     }
@@ -199,10 +188,10 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     uint mplexid_restriction;
     if (!IsInputAvailable(inputid, mplexid_restriction))
     {
-        VERBOSE(VB_IMPORTANT, loc + " " + QString(
-                    "Requested channel is on input '%1' "
+        LOG(VB_GENERAL, LOG_ERR, loc + " " +
+            QString("Requested channel is on input '%1' "
                     "which is in a busy input group")
-                .arg(inputid));
+            .arg(inputid));
 
         return false;
     }
@@ -215,26 +204,25 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     uint atsc_major, atsc_minor, mplexid, tsid, netid;
     bool commfree;
 
-    if (!ChannelUtil::GetChannelData(
-        (*it)->sourceid, channum,
-        tvformat, modulation, freqtable, freqid,
-        finetune, frequency,
-        dtv_si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
-        mplexid, commfree))
+    if (!ChannelUtil::GetChannelData((*it)->sourceid, channum,
+                                     tvformat, modulation, freqtable, freqid,
+                                     finetune, frequency, dtv_si_std,
+                                     mpeg_prog_num, atsc_major, atsc_minor,
+                                     tsid, netid, mplexid, commfree))
     {
-        VERBOSE(VB_IMPORTANT, loc + " " + QString(
-                    "Failed to find channel in DB on input '%1' ")
-                .arg(inputid));
+        LOG(VB_GENERAL, LOG_ERR, loc + " " +
+            QString("Failed to find channel in DB on input '%1' ")
+            .arg(inputid));
 
         return false;
     }
 
     if (mplexid_restriction && (mplexid != mplexid_restriction))
     {
-        VERBOSE(VB_IMPORTANT, loc + " " + QString(
-                    "Channel is valid, but tuner is busy "
+        LOG(VB_GENERAL, LOG_ERR, loc + " " +
+            QString("Channel is valid, but tuner is busy "
                     "on different multiplex (%1 != %2)")
-                .arg(mplexid).arg(mplexid_restriction));
+            .arg(mplexid).arg(mplexid_restriction));
 
         return false;
     }
@@ -355,15 +343,17 @@ bool ChannelBase::SwitchToInput(const QString &inputname)
     if (input >= 0)
         return SwitchToInput(input, true);
     else
-        VERBOSE(VB_IMPORTANT, QString("ChannelBase: Could not find input: "
-                                      "%1 on card\n").arg(inputname));
-    return false;
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Could not find input: %1 on card").arg(inputname));
+        return false;
+    }
 }
 
 bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
 {
-    VERBOSE(VB_CHANNEL, LOC + QString("SwitchToInput(%1,%2)")
-            .arg(inputname).arg(chan));
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("SwitchToInput(%1,%2)")
+        .arg(inputname).arg(chan));
 
     int input = GetInputByName(inputname);
 
@@ -376,9 +366,9 @@ bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("ChannelBase: Could not find input: %1 on card when "
-                        "setting channel %2\n").arg(inputname).arg(chan));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Could not find input: %1 on card when setting channel %2")
+            .arg(inputname).arg(chan));
     }
     return ok;
 }
@@ -634,81 +624,72 @@ DBChanList ChannelBase::GetChannels(const QString &inputname) const
     return GetChannels(inputid);
 }
 
-/// \note m_process_lock must be held when this is called
-bool ChannelBase::KillScript(uint timeout_ms)
+/// \note m_system_lock must be held when this is called
+bool ChannelBase::KillScript(void)
 {
-    if (!m_process)
+    if (!m_system)
         return true;
 
-    if (m_process->state() != QProcess::NotRunning)
-    {
-        m_process->terminate();
-        if (!m_process->waitForFinished(max(timeout_ms/2,1U)))
-        {
-            m_process->kill();
-            if (!m_process->waitForFinished(max(timeout_ms/2,1U)))
-                return false;
-        }
-    }
+    m_system->Term(true);
 
-    delete m_process;
-    m_process = NULL;
+    delete m_system;
+    m_system = NULL;
     return true;
 }
 
-/// \note m_process_lock must NOT be held when this is called
+/// \note m_system_lock must NOT be held when this is called
 void ChannelBase::HandleScript(const QString &freqid)
 {
-    QMutexLocker locker(&m_process_lock);
+    QMutexLocker locker(&m_system_lock);
 
     bool ok = true;
-    m_process_status = 0; // unknown
+    m_system_status = 0; // unknown
 
     InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     if (it == m_inputs.end())
     {
-        m_process_status = 2; // failed
+        m_system_status = 2; // failed
         HandleScriptEnd(true);
         return;
     }
 
     if ((*it)->externalChanger.isEmpty())
     {
-        m_process_status = 3; // success
+        m_system_status = 3; // success
         HandleScriptEnd(true);
         return;
     }
 
     if (freqid.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "A channel changer is set, but the freqid field is empty."
-                "\n\t\t\tWe will return success to ease setup pains, "
-                "but no script is will actually run.");
-        m_process_status = 3; // success
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "A channel changer is set, but the freqid field is empty."
+            "\n\t\t\tWe will return success to ease setup pains, "
+            "but no script is will actually run.");
+        m_system_status = 3; // success
         HandleScriptEnd(true);
         return;
     }
 
     // It's possible we simply never reaped the process, check status first.
-    if (m_process)
+    if (m_system)
         GetScriptStatus(true);
 
     // If it's still running, try killing it
-    if (m_process)
-        ok = KillScript(50);
+    if (m_system)
+        ok = KillScript();
 
-    // The GetScriptStatus() call above can reset m_process_status with
+    // The GetScriptStatus() call above can reset m_system_status with
     // the exit status of the last channel change script invocation, so
     // we must set it to pending here.
-    m_process_status = 1; // pending
+    m_system_status = 1; // pending
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Can not execute channel changer, previous call to script "
-                "is still running.");
-        m_process_status = 2; // failed
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Can not execute channel changer, previous call to script "
+            "is still running.");
+        m_system_status = 2; // failed
         HandleScriptEnd(ok);
     }
     else
@@ -716,93 +697,85 @@ void ChannelBase::HandleScript(const QString &freqid)
         ok = ChangeExternalChannel((*it)->externalChanger, freqid);
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Can not execute channel changer.");
-            m_process_status = 2; // failed
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Can not execute channel changer.");
+            m_system_status = 2; // failed
             HandleScriptEnd(ok);
         }
     }
 }
 
-bool ChannelBase::ChangeExternalChannel(
-    const QString &changer, const QString &freqid)
+/// \note m_system_lock must be held when this is called
+bool ChannelBase::ChangeExternalChannel(const QString &changer,
+                                        const QString &freqid)
 {
-    if (m_process)
+    if (m_system)
         return false;
 
     if (changer.isEmpty() || freqid.isEmpty())
         return false;
 
-    QString command = QString("/bin/sh -c \"%1 %2\"").arg(changer).arg(freqid);
-    VERBOSE(VB_CHANNEL, LOC + QString("Running command: %1").arg(command));
+    QString command = QString("%1 %2").arg(changer).arg(freqid);
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        QString("Running command: %1").arg(command));
 
-    if (!m_process_thread)
-    {
-        m_process_thread = new ProcessThread();
-        m_process_thread->start();
-    }
-
-    m_process = m_process_thread->CreateProcess(command);
+    m_system = new MythSystem(command, kMSRunShell | kMSRunBackground);
+    m_system->Run();
 
     return true;
 }
 
 uint ChannelBase::GetScriptStatus(bool holding_lock)
 {
-    if (!holding_lock)
-        m_process_lock.lock();
-
-    if (m_process && m_process->state() == QProcess::NotRunning)
-    {
-        if (m_process->exitStatus() != QProcess::CrashExit &&
-            m_process->exitCode() == 0)
-        {
-            m_process_status = 3; // success
-        }
-        else
-        {
-            m_process_status = 2; // failed
-        }
-
-        delete m_process;
-        m_process = NULL;
-
-        VERBOSE(VB_CHANNEL, LOC + QString("GetScriptStatus() %1")
-                .arg(m_process_status));
-
-        HandleScriptEnd(3 == m_process_status);
-    }
-    else
-    {
-        QString ps = "NULL";
-        if (m_process != NULL)
-        {
-            int s = m_process->state();
-            ps = QString::number(s);
-            switch (s)
-            {
-                case QProcess::Running:    ps = "running";     break;
-                case QProcess::NotRunning: ps = "not running"; break;
-                case QProcess::Starting:   ps = "starting";    break;
-            }
-        }
-        VERBOSE(VB_CHANNEL, LOC + QString("GetScriptStatus() %1 (ps %2)")
-                .arg(m_process_status).arg(ps));
-    }
-
-    uint ret = m_process_status;
+    if (!m_system)
+        return m_system_status;
 
     if (!holding_lock)
-        m_process_lock.unlock();
+        m_system_lock.lock();
+
+    m_system_status = m_system->Wait();
+    if (m_system_status != GENERIC_EXIT_RUNNING &&
+        m_system_status != GENERIC_EXIT_START)
+    {
+        delete m_system;
+        m_system = NULL;
+
+        HandleScriptEnd(m_system_status == GENERIC_EXIT_OK);
+    }
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("GetScriptStatus() %1")
+        .arg(m_system_status));
+
+    uint ret;
+    switch(m_system_status)
+    {
+        case GENERIC_EXIT_OK:
+            ret = 3;	// success
+            break;
+        case GENERIC_EXIT_RUNNING:
+        case GENERIC_EXIT_START:
+            ret = 1;	// pending
+            break;
+        default:
+            ret = 2;	// fail
+            break;
+    }
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("GetScriptStatus() %1 -> %2")
+            .arg(m_system_status). arg(ret));
+
+    m_system_status = ret;
+
+    if (!holding_lock)
+        m_system_lock.unlock();
 
     return ret;
 }
 
-/// \note m_process_lock must be held when this is called
+/// \note m_system_lock must be held when this is called
 void ChannelBase::HandleScriptEnd(bool ok)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Channel change script " +
-            ((ok) ? "succeeded" : "failed"));
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Channel change script %1")
+        .arg((ok) ? "succeeded" : "failed"));
 
     if (ok)
     {
@@ -870,8 +843,8 @@ bool ChannelBase::InitializeInputs(void)
     uint cardid = max(GetCardID(), 0);
     if (!cardid)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "InitializeInputs(): "
-                "Programmer error, cardid invalid.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "InitializeInputs(): Programmer error, cardid invalid.");
         return false;
     }
 
@@ -892,10 +865,10 @@ bool ChannelBase::InitializeInputs(void)
     }
     else if (!query.size())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "InitializeInputs(): "
-                "\n\t\t\tCould not get inputs for the capturecard."
-                "\n\t\t\tPerhaps you have forgotten to bind video"
-                "\n\t\t\tsources to your card's inputs?");
+        LOG(VB_GENERAL, LOG_ERR, "InitializeInputs(): "
+            "\n\t\t\tCould not get inputs for the capturecard."
+            "\n\t\t\tPerhaps you have forgotten to bind video"
+            "\n\t\t\tsources to your card's inputs?");
         return false;
     }
 
@@ -918,8 +891,8 @@ bool ChannelBase::InitializeInputs(void)
         if (!IsExternalChannelChangeSupported() &&
             !m_inputs[query.value(0).toUInt()]->externalChanger.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN + "External Channel changer is "
-                    "set, but this device does not support it.");
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "External Channel changer is "
+                "set, but this device does not support it.");
             m_inputs[query.value(0).toUInt()]->externalChanger.clear();
         }
 
@@ -938,13 +911,13 @@ bool ChannelBase::InitializeInputs(void)
     InputMap::const_iterator it;
     for (it = m_inputs.begin(); it != m_inputs.end(); ++it)
     {
-        VERBOSE(VB_CHANNEL, LOC + QString("Input #%1: '%2' schan(%3) "
-                                          "sourceid(%4) ccid(%5)")
-                .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
-                .arg((*it)->sourceid).arg((*it)->cardid));
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("Input #%1: '%2' schan(%3) sourceid(%4) ccid(%5)")
+            .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
+            .arg((*it)->sourceid).arg((*it)->cardid));
     }
-    VERBOSE(VB_CHANNEL, LOC + QString("Current Input #%1: '%2'")
-            .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Current Input #%1: '%2'")
+        .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
 
     return m_inputs.size();
 }
@@ -1066,7 +1039,7 @@ bool ChannelBase::CheckChannel(const QString &channum,
     QString msg = QString(
         "Failed to find channel(%1) on current input (%2) of card (%3).")
         .arg(channum).arg(channelinput).arg(GetCardID());
-    VERBOSE(VB_CHANNEL, LOC + msg);
+    LOG(VB_CHANNEL, LOG_ERR, LOC + msg);
 
     // We didn't find it on the current input let's widen the search
     query.prepare(
@@ -1094,14 +1067,14 @@ bool ChannelBase::CheckChannel(const QString &channum,
 
         msg = QString("Found channel(%1) on another input (%2) of card (%3).")
             .arg(channum).arg(inputName).arg(GetCardID());
-        VERBOSE(VB_CHANNEL, LOC + msg);
+        LOG(VB_CHANNEL, LOG_INFO, LOC + msg);
 
         return true;
     }
 
     msg = QString("Failed to find channel(%1) on any input of card (%2).")
         .arg(channum).arg(GetCardID());
-    VERBOSE(VB_CHANNEL, LOC + msg);
+    LOG(VB_CHANNEL, LOG_ERR, LOC + msg);
 
     query.prepare("SELECT NULL FROM channel");
 
@@ -1189,15 +1162,15 @@ ChannelBase *ChannelBase::CreateChannel(
             "from the configuration and restart MythTV.")
             .arg(genOpt.cardtype).arg(genOpt.videodev)
             .arg(genOpt.cardtype).arg(genOpt.cardtype);
-        VERBOSE(VB_IMPORTANT, "ChannelBase::CreateChannel() Error: \n" +
-                msg + "\n");
+        LOG(VB_GENERAL, LOG_ERR, "ChannelBase: CreateChannel() Error: \n" +
+            msg + "\n");
         return NULL;
     }
 
     if (!channel->Open())
     {
-        VERBOSE(VB_IMPORTANT, "ChannelBase::CreateChannel() Error: " +
-                QString("Failed to open device %1").arg(genOpt.videodev));
+        LOG(VB_GENERAL, LOG_ERR, "ChannelBase: CreateChannel() Error: " +
+            QString("Failed to open device %1").arg(genOpt.videodev));
         delete channel;
         return NULL;
     }
@@ -1224,31 +1197,3 @@ ChannelBase *ChannelBase::CreateChannel(
     return channel;
 }
 
-bool ProcessThread::event(QEvent *e)
-{
-    if (MythEvent::MythEventMessage == e->type())
-    {
-        MythEvent *me = static_cast<MythEvent*>(e);
-        if (me->Message() == "CreateProcess")
-        {
-            QMutexLocker locker(&m_lock);
-            m_proc = new QProcess();
-            m_proc->start(me->ExtraData(0));
-            m_wait.wakeOne();
-            return true;
-        }
-    }
-
-    return QThread::event(e);
-}
-
-QProcess *ProcessThread::CreateProcess(const QString &command)
-{
-    QMutexLocker locker(&m_lock);
-    QStringList cmd(command);
-    QCoreApplication::postEvent(this, new MythEvent("CreateProcess", cmd));
-    m_wait.wait(&m_lock);
-    QProcess *ret = m_proc;
-    m_proc = NULL;
-    return ret;
-}

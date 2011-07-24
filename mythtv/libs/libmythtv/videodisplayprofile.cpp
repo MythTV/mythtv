@@ -198,7 +198,6 @@ QString ProfileItem::toString(void) const
 //////////////////////////////////////////////////////////////////////////////
 
 #define LOC     QString("VDP: ")
-#define LOC_ERR QString("VDP, Error: ")
 
 QMutex      VideoDisplayProfile::safe_lock(QMutex::Recursive);
 bool        VideoDisplayProfile::safe_initialized = false;
@@ -230,12 +229,12 @@ VideoDisplayProfile::VideoDisplayProfile()
         QString err;
         if (!(*it).IsValid(&err))
         {
-            VERBOSE(VB_PLAYBACK, LOC + "Rejecting: " + (*it).toString() +
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Rejecting: " + (*it).toString() +
                     "\n\t\t\t" + err);
 
             continue;
         }
-        VERBOSE(VB_PLAYBACK, LOC + "Accepting: " + (*it).toString());
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Accepting: " + (*it).toString());
         all_pref.push_back(*it);
     }
 
@@ -271,23 +270,23 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &video_renderer)
 {
     QMutexLocker locker(&lock);
 
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("SetVideoRenderer(%1)").arg(video_renderer));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("SetVideoRenderer(%1)").arg(video_renderer));
 
     last_video_renderer = video_renderer;
     last_video_renderer.detach();
 
     if (video_renderer == GetVideoRenderer())
     {
-        VERBOSE(VB_PLAYBACK, LOC +
-                QString("SetVideoRender(%1) == GetVideoRenderer()")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("SetVideoRender(%1) == GetVideoRenderer()")
                 .arg(video_renderer));
         return; // already made preferences safe...
     }
 
     // Make preferences safe...
 
-    VERBOSE(VB_PLAYBACK, LOC + "Old preferences: " + toString());
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Old preferences: " + toString());
 
     SetPreference("pref_videorenderer", video_renderer);
 
@@ -309,7 +308,7 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &video_renderer)
 
     SetPreference("pref_filters", "");
 
-    VERBOSE(VB_PLAYBACK, LOC + "New preferences: " + toString());
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "New preferences: " + toString());
 }
 
 bool VideoDisplayProfile::CheckVideoRendererGroup(const QString renderer)
@@ -318,7 +317,7 @@ bool VideoDisplayProfile::CheckVideoRendererGroup(const QString renderer)
         last_video_renderer == "null")
         return true;
 
-    VERBOSE(VB_PLAYBACK, LOC +
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Preferred video renderer: %1 (current: %2)")
                 .arg(renderer).arg(last_video_renderer));
 
@@ -350,7 +349,8 @@ QString VideoDisplayProfile::GetFilteredDeint(const QString &override)
     if (!override.isEmpty() && GetDeinterlacers(renderer).contains(override))
         deint = override;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("GetFilteredDeint(%1) : %2 -> '%3'")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        LOC + QString("GetFilteredDeint(%1) : %2 -> '%3'")
             .arg(override).arg(renderer).arg(deint));
 
     deint.detach();
@@ -402,7 +402,7 @@ item_list_t::const_iterator VideoDisplayProfile::FindMatch(
 void VideoDisplayProfile::LoadBestPreferences(const QSize &size,
                                               float framerate)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("LoadBestPreferences(%1x%2, %3)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences(%1x%2, %3)")
             .arg(size.width()).arg(size.height()).arg(framerate));
 
     pref.clear();
@@ -445,8 +445,9 @@ item_list_t VideoDisplayProfile::LoadDB(uint groupid)
                 if (valid)
                     list.push_back(tmp);
                 else
-                    VERBOSE(VB_PLAYBACK, LOC + QString("Ignoring profile item %1 (%2)")
-                        .arg(profileid).arg(error));
+                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
+                        QString("Ignoring profile item %1 (%2)")
+                            .arg(profileid).arg(error));
             }
             tmp.Clear();
             profileid = query.value(0).toUInt();
@@ -461,7 +462,8 @@ item_list_t VideoDisplayProfile::LoadDB(uint groupid)
         if (valid)
             list.push_back(tmp);
         else
-            VERBOSE(VB_PLAYBACK, LOC + QString("Ignoring profile item %1 (%2)")
+            LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
+                QString("Ignoring profile item %1 (%2)")
                 .arg(profileid).arg(error));
     }
 
@@ -1454,6 +1456,7 @@ void VideoDisplayProfile::init_statics(void)
     VideoOutput::GetRenderOptions(options);
 
     foreach(QString decoder, safe_decoders)
-        VERBOSE(VB_PLAYBACK, LOC + QString("decoder<->render support: %1%2")
-            .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("decoder<->render support: %1%2")
+                .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
 }

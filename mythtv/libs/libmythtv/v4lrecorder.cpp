@@ -14,7 +14,8 @@
 #include <fcntl.h>          // for IO_NONBLOCK
 
 #include "vbi608extractor.h"
-#include "mythcontext.h"    // for VERBOSE
+#include "mythcontext.h"
+#include "mythlogging.h"
 #include "v4lrecorder.h"
 #include "vbitext/vbi.h"
 #include "tv_rec.h"
@@ -24,10 +25,6 @@
         ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")
 
 #define LOC      QString("V4LRec(%1:%2): ") \
-                 .arg(TVREC_CARDNUM).arg(videodevice)
-#define LOC_WARN QString("V4LRec(%1:%2) Warning: ") \
-                 .arg(TVREC_CARDNUM).arg(videodevice)
-#define LOC_ERR  QString("V4LRec(%1:%2) Error: ") \
                  .arg(TVREC_CARDNUM).arg(videodevice)
 
 V4LRecorder::V4LRecorder(TVRec *tv) :
@@ -121,14 +118,14 @@ int V4LRecorder::OpenVBIDevice(void)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid CC/Teletext mode");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid CC/Teletext mode");
         return -1;
     }
 
     if (fd < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Can't open vbi device: '%1'").arg(vbidevice));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Can't open vbi device: '%1'").arg(vbidevice));
         return -1;
     }
 
@@ -141,14 +138,14 @@ int V4LRecorder::OpenVBIDevice(void)
         if (0 != ioctl(fd, VIDIOC_G_FMT, &fmt))
         {
 #ifdef USING_V4L1
-            VERBOSE(VB_RECORD, "V4L2 VBI setup failed, trying v1 ioctl");
+            LOG(VB_RECORD, LOG_INFO, "V4L2 VBI setup failed, trying v1 ioctl");
             // Try V4L v1 VBI ioctls, iff V4L v2 fails
             struct vbi_format old_fmt;
             memset(&old_fmt, 0, sizeof(vbi_format));
             if (ioctl(fd, VIDIOCGVBIFMT, &old_fmt) < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Failed to query vbi capabilities (V4L1)");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to query vbi capabilities (V4L1)");
                 close(fd);
                 return -1;
             }
@@ -161,17 +158,18 @@ int V4LRecorder::OpenVBIDevice(void)
             fmt.fmt.vbi.count[1]         = old_fmt.count[1];
             fmt.fmt.vbi.flags            = old_fmt.flags;
 #else // if !USING_V4L1
-            VERBOSE(VB_RECORD, "V4L2 VBI setup failed");
+            LOG(VB_RECORD, LOG_ERR, "V4L2 VBI setup failed");
             close(fd);
             return -1;
 #endif // !USING_V4L1
         }
-        VERBOSE(VB_RECORD, LOC + QString("vbi_format  rate: %1"
-                  "\n\t\t\t          offset: %2"
-                  "\n\t\t\tsamples_per_line: %3"
-                  "\n\t\t\t          starts: %4, %5"
-                  "\n\t\t\t          counts: %6, %7"
-                  "\n\t\t\t           flags: 0x%8")
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("vbi_format  rate: %1"
+                    "\n\t\t\t          offset: %2"
+                    "\n\t\t\tsamples_per_line: %3"
+                    "\n\t\t\t          starts: %4, %5"
+                    "\n\t\t\t          counts: %6, %7"
+                    "\n\t\t\t           flags: 0x%8")
                 .arg(fmt.fmt.vbi.sampling_rate)
                 .arg(fmt.fmt.vbi.offset)
                 .arg(fmt.fmt.vbi.samples_per_line)
@@ -186,7 +184,7 @@ int V4LRecorder::OpenVBIDevice(void)
         line_count = fmt.fmt.vbi.count[0];
         if (line_count != fmt.fmt.vbi.count[1])
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                     "VBI must have the same number of "
                     "odd and even fields for our decoder");
             close(fd);
@@ -194,8 +192,7 @@ int V4LRecorder::OpenVBIDevice(void)
         }
         if (start_line > 21 || start_line + line_count < 22)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "VBI does not include line 21");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "VBI does not include line 21");
             // TODO We could try to set the VBI format ourselves..
             close(fd);
             return -1;
@@ -273,12 +270,12 @@ void V4LRecorder::RunVBIDevice(void)
 
         int nr = select(vbi_fd + 1, &rdset, 0, 0, &tv);
         if (nr < 0)
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "vbi select failed" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "vbi select failed" + ENO);
 
         if (nr <= 0)
         {
             if (nr==0)
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "vbi select timed out");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "vbi select timed out");
             continue; // either failed or timed out..
         }
         if (VBIMode::PAL_TT == vbimode)
@@ -316,7 +313,7 @@ void V4LRecorder::RunVBIDevice(void)
             }
             else if (ret < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Reading VBI data" + ENO);
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Reading VBI data" + ENO);
             }
         }
     }

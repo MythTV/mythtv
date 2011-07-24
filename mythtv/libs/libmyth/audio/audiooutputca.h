@@ -31,14 +31,15 @@ public:
     virtual int  GetVolumeChannel(int channel) const;
     virtual void SetVolumeChannel(int channel, int volume);
 
+    // TODO: convert these to macros!
     void Debug(QString msg)
-    {   VERBOSE(VB_AUDIO,     "AudioOutputCA::" + msg);   }
+    {   LOG(VB_AUDIO, LOG_INFO,     "AudioOutputCA::" + msg);   }
 
     void Error(QString msg)
-    {   VERBOSE(VB_IMPORTANT, "AudioOutputCA Error: " + msg);   }
+    {   LOG(VB_GENERAL, LOG_ERR, "AudioOutputCA Error: " + msg);   }
 
     void Warn(QString msg)
-    {   VERBOSE(VB_IMPORTANT, "AudioOutputCA Warning: " + msg);   }
+    {   LOG(VB_GENERAL, LOG_WARNING, "AudioOutputCA Warning: " + msg);   }
 
 protected:
 

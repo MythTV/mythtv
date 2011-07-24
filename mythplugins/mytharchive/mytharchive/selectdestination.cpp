@@ -65,7 +65,7 @@ bool SelectDestination::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'selectdestination'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'selectdestination'");
         return false;
     }
 

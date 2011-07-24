@@ -15,8 +15,6 @@
 #include "netutils.h"
 
 #define LOC      QString("NetContent: ")
-#define LOC_WARN QString("NetContent, Warning: ")
-#define LOC_ERR  QString("NetContent, Error: ")
 
 using namespace std;
 
@@ -56,14 +54,14 @@ void GrabberScript::run()
     uint status = getTree.Wait();
 
     if( status == GENERIC_EXIT_CMD_NOT_FOUND )
-        LOG(VB_GENERAL, LOG_CRIT, 
-                 QString("Internet Content Source %1 cannot run, file missing.")
-                     .arg(m_title));
+        LOG(VB_GENERAL, LOG_CRIT, LOC +
+            QString("Internet Content Source %1 cannot run, file missing.")
+                .arg(m_title));
     else if( status == GENERIC_EXIT_OK )
     {
-        LOG(VB_GENERAL, LOG_INFO,
-                 QString("Internet Content Source %1 completed download, "
-                         "beginning processing...").arg(m_title));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Internet Content Source %1 completed download, "
+                    "beginning processing...").arg(m_title));
 
         QByteArray result = getTree.ReadAll();
 
@@ -80,14 +78,14 @@ void GrabberScript::run()
             channel = channel.nextSiblingElement("channel");
         }
         markTreeUpdated(this, QDateTime::currentDateTime());
-        LOG(VB_GENERAL, LOG_INFO, 
-                 QString("Internet Content Source %1 completed processing, "
-                         "marking as updated.").arg(m_title));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Internet Content Source %1 completed processing, "
+                    "marking as updated.").arg(m_title));
     }
     else
-        LOG(VB_GENERAL, LOG_ERR, 
-                 QString("Internet Content Source %1 crashed while grabbing "
-                         "tree.").arg(m_title));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Internet Content Source %1 crashed while grabbing tree.")
+                .arg(m_title));
 
     emit finished();
     threadDeregister();
@@ -228,9 +226,9 @@ void GrabberDownloadThread::run()
         GrabberScript *script = m_scripts.takeFirst();
         if (script && (needsUpdate(script, updateFreq) || m_refreshAll))
         {
-            LOG(VB_GENERAL, LOG_INFO,
-                     QString("Internet Content Source %1 Updating...")
-                          .arg(script->GetTitle()));
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Internet Content Source %1 Updating...")
+                    .arg(script->GetTitle()));
             script->run();
         }
         delete script;
@@ -283,8 +281,8 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
     QString term = query;
     args.append(ShellEscape(term));
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Internet Search Query: %1 %2")
-                                         .arg(cmd).arg(args.join(" ")));
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+        QString("Internet Search Query: %1 %2") .arg(cmd).arg(args.join(" ")));
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered | kMSRunBackground;
     m_searchProcess->SetCommand(cmd, args, flags);
@@ -358,7 +356,7 @@ void Search::slotProcessSearchExit(uint exitcode)
 {
     if (exitcode == GENERIC_EXIT_TIMEOUT)
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Internet Search Timeout");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Internet Search Timeout");
 
         if (m_searchProcess)
         {
@@ -376,8 +374,8 @@ void Search::slotProcessSearchExit(uint exitcode)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, 
-                 "Internet Search Successfully Completed");
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            "Internet Search Successfully Completed");
 
         m_data = m_searchProcess->ReadAll();
         m_document.setContent(m_data, true);

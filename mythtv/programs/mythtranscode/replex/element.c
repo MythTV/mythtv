@@ -4,6 +4,8 @@
  *
  * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
+ * Changes to use MythTV logging
+ * Copyright (C) 2011 Gavin Hurlbut <ghurlbut@mythtv.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,6 +32,8 @@
 #include "element.h"
 #include "mpg_common.h"
 #include "pes.h"
+
+#include "mythlogging.h"
 
 unsigned int slots [4] = {12, 144, 0, 0};
 unsigned int bitrates[3][16] =
@@ -67,7 +71,7 @@ void fix_audio_count(uint64_t *acount, audio_frame_t *aframe, uint64_t origpts, 
 	di = (samples [3-aframe->layer] * 27000000ULL);
 	diff = ptsdiff(origpts,pts);
 	c=(aframe->frequency * diff+di/2)/di;
-	if (c) fprintf(stderr,"fix audio frames %d\n",c);
+	if (c) LOG(VB_GENERAL, LOG_INFO, "fix audio frames %d", c);
 	*acount += c;
 }
 
@@ -83,7 +87,10 @@ uint64_t next_ptsdts_video(uint64_t *pts, sequence_t *s, uint64_t fcount, uint64
 		newpts = ((fnum ) * SEC_PER + *pts);
 	} else {
 		uint64_t extra_time = 0;
-//		fprintf(stderr,"pulldown %d %d\n",(int) fcount-1, fnum-1);
+#if 0
+		LOG(VB_GENERAL, LOG_INFO, "pulldown %d %d",
+		    (int)fcount-1, fnum-1);
+#endif
 
 		if ( s->pulldown == PULLDOWN32)
 			extra_time = SEC_PER;
@@ -140,8 +147,7 @@ void fix_video_count(sequence_t *s, uint64_t *frame, uint64_t origpts, uint64_t 
 	if (!dsig) fr -= (int)dframe;
 	else fr += (int)dframe;
 	*frame = *frame + fr/2;
-	if (fr/2) fprintf(stderr,"fixed video frame %d\n",
-			  (int)fr/2);
+	if (fr/2) LOG(VB_GENERAL, LOG_INFO, "fixed video frame %d", (int)fr/2);
 }
 
 	
@@ -170,13 +176,14 @@ void pts2time(uint64_t pts, uint8_t *buf, int len)
 			buf[c+6] |= (s & 0x07) << 5;
 
 /* 1hhhhhmm|mmmm1sss|sss */
-/*
+#if 0
 			c+=4;
-			fprintf(stderr,"fixed time\n");
-			fprintf(stderr,"%02d:", (int)((buf[c]>>2)& 0x1F));
-                        fprintf(stderr,"%02d:", (int)(((buf[c]<<4)& 0x30)|((buf[c+1]>>4)& 0x0F)));
-                        fprintf(stderr,"%02d\n",(int)(((buf[c+1]<<3)& 0x38)|((buf[c+2]>>5)& 0x07)));
-*/
+			LOG(VB_GENERAL, LOG_INFO, "fixed time");
+			LOG(VB_GENERAL, LOG_INFO, "%02d:%02d:%02d",
+			    (int)((buf[c]>>2)& 0x1F),
+			    (int)(((buf[c]<<4)& 0x30)|((buf[c+1]>>4)& 0x0F)),
+			    (int)(((buf[c+1]<<3)& 0x38)|((buf[c+2]>>5)& 0x07)));
+#endif
 			c = len;
 
 
@@ -212,24 +219,26 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 	if (DEBUG){
 		switch( sw ){
 		case 1:
-			fprintf(stderr,"Video: aspect ratio: 1:1");
+			LOG(VB_GENERAL, LOG_INFO, "Video: aspect ratio: 1:1");
 			s->aspect_ratio = 100;        
 			break;
 		case 2:
-			fprintf(stderr,"Video: aspect ratio: 4:3");
+			LOG(VB_GENERAL, LOG_INFO, "Video: aspect ratio: 4:3");
 			s->aspect_ratio = 133;        
 			break;
 		case 3:
-			fprintf(stderr,"Video: aspect ratio: 16:9");
+			LOG(VB_GENERAL, LOG_INFO, "Video: aspect ratio: 16:9");
 			s->aspect_ratio = 177;        
 			break;
 		case 4:
-			fprintf(stderr,"Video: aspect ratio: 2.21:1");
+			LOG(VB_GENERAL, LOG_INFO,
+			    "Video: aspect ratio: 2.21:1");
 			s->aspect_ratio = 221;        
 			break;
 			
 		case 5 ... 15:
-			fprintf(stderr,"Video: aspect ratio: reserved");
+			LOG(VB_GENERAL, LOG_INFO,
+			    "Video: aspect ratio: reserved");
 			s->aspect_ratio = 0;        
 			break;
 			
@@ -239,7 +248,9 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 		}
 	}
 
-        if (DEBUG) fprintf(stderr,"  size = %dx%d",s->h_size,s->v_size);
+        if (DEBUG)
+		LOG(VB_GENERAL, LOG_DEBUG, "  size = %dx%d",
+		    s->h_size, s->v_size);
 
         sw = (int)(headr[3]&0x0F);
 
@@ -273,14 +284,17 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 		form = VIDEO_NTSC;
 		break;
 	}
-	if (DEBUG) fprintf(stderr,"  frame rate: %2.3f fps",s->frame_rate/1000.);
+	if (DEBUG)
+		LOG(VB_GENERAL, LOG_DEBUG, "  frame rate: %2.3f fps",
+		    s->frame_rate/1000.0);
 
 	s->bit_rate = (((headr[4] << 10) & 0x0003FC00UL) 
 		       | ((headr[5] << 2) & 0x000003FCUL) | 
 		       (((headr[6] & 0xC0) >> 6) & 0x00000003UL));
 	
-        if (DEBUG) fprintf(stderr,"  bit rate: %.2f Mbit/s",400*(s->bit_rate)/1000000.);
-        if (DEBUG) fprintf(stderr,"\n");
+        if (DEBUG)
+		LOG(VB_GENERAL, LOG_DEBUG, "  bit rate: %.2f Mbit/s",
+		    400*(s->bit_rate)/1000000.0);
 
         s->video_format = form;
 
@@ -288,7 +302,9 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 
 	s->vbv_buffer_size = (( headr[7] & 0xF8) >> 3 ) | (( headr[6] & 0x1F )<< 5);	
 	s->flags	   = ( headr[7] & 0x06);	
-	if (DEBUG) fprintf(stderr, "  vbvbuffer %d\n",16*1024*(s->vbv_buffer_size));
+	if (DEBUG)
+		LOG(VB_GENERAL, LOG_DEBUG, "  vbvbuffer %d",
+		    16*1024*(s->vbv_buffer_size));
 
 	c += 8;
 	if ( !(s->flags & INTRAQ_FLAG) ) 
@@ -423,10 +439,10 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af, int  off, int le,
 	if ( (c = find_audio_sync(rbuf, headr, off, type, le))
 	     != 0 ) {
 		if (c==-2){
-			fprintf(stderr,"Incomplete audio header\n");
+			LOG(VB_GENERAL, LOG_ERR, "Incomplete audio header");
 			return -2;
 		}
-		fprintf(stderr,"Error in audio header\n");
+		LOG(VB_GENERAL, LOG_ERR, "Error in audio header");
 		return -1;
 	}
 	switch (type){
@@ -437,7 +453,7 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af, int  off, int le,
 				return -3;
 			} else {
 #ifdef IN_DEBUG
-				fprintf(stderr,"Wrong audio layer\n");
+				LOG(VB_GENERAL, LOG_ERR, "Wrong audio layer");
 #endif
 				return -1;
 			}
@@ -445,7 +461,7 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af, int  off, int le,
 		if ( af->bit_rate != 
 		     (bitrates[(3-af->layer)][(headr[2] >> 4 )]*1000)){
 #ifdef IN_DEBUG
-			fprintf(stderr,"Wrong audio bit rate\n");
+			LOG(VB_GENERAL, LOG_ERR, "Wrong audio bit rate");
 #endif
 			return -1;
 		}
@@ -455,7 +471,7 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af, int  off, int le,
 		frame = (headr[4]&0x3F);
 		if (af->bit_rate != ac3_bitrates[frame>>1]*1000){
 #ifdef IN_DEBUG
-			fprintf(stderr,"Wrong audio bit rate\n");
+			LOG(VB_GENERAL, LOG_ERR, "Wrong audio bit rate");
 #endif
 			return -1;
 		}
@@ -463,7 +479,7 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af, int  off, int le,
 		fr = (headr[4] & 0xc0) >> 6;
 		if (af->frequency != ((ac3_freq[fr] *100) >> half)){
 #ifdef IN_DEBUG
-			fprintf(stderr,"Wrong audio frequency\n");
+			LOG(VB_GENERAL, LOG_ERR, "Wrong audio frequency");
 #endif
 			return -1;
 		}
@@ -490,18 +506,20 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 	af->layer = (headr[1] & 0x06) >> 1;
 
         if (DEBUG)
-		fprintf(stderr,"Audiostream: layer: %d", 4-af->layer);
+		LOG(VB_GENERAL, LOG_DEBUG, "Audiostream: layer: %d",
+		    4-af->layer);
 
 
 	af->bit_rate = bitrates[(3-af->layer)][(headr[2] >> 4 )]*1000;
 
 	if (DEBUG){
 		if (af->bit_rate == 0)
-			fprintf (stderr,"  Bit rate: free");
+			LOG(VB_GENERAL, LOG_DEBUG, "  Bit rate: free");
 		else if (af->bit_rate == 0xf)
-			fprintf (stderr,"  BRate: reserved");
+			LOG(VB_GENERAL, LOG_DEBUG, "  BRate: reserved");
 		else
-			fprintf (stderr,"  BRate: %d kb/s", af->bit_rate/1000);
+			LOG(VB_GENERAL, LOG_DEBUG, "  BRate: %d kb/s",
+			    af->bit_rate/1000);
 	}
 
 	fr = (headr[2] & 0x0c ) >> 2;
@@ -509,19 +527,18 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 	
 	if (DEBUG){
 		if (af->frequency == 3)
-			fprintf (stderr, "  Freq: reserved");
+			LOG(VB_GENERAL, LOG_DEBUG, "  Freq: reserved");
 		else
-			fprintf (stderr,"  Freq: %2.1f kHz", 
-				 af->frequency/1000.);
+			LOG(VB_GENERAL, LOG_DEBUG, "  Freq: %2.1f kHz",
+			    af->frequency/1000.0);
 	}
 	af->off = c;
 	af->set = 1;
 
 	af->frametime = ((samples [3-af->layer] * 27000000ULL) / af->frequency);
 	af->framesize = af->bit_rate *slots [3-af->layer]/ af->frequency;
-	fprintf(stderr," frame size: %d (", af->framesize);
+	LOG(VB_GENERAL, LOG_INFO, " frame size: %d", af->framesize);
 	printpts(af->frametime);
-	fprintf(stderr,") ");
 
 	return c;
 }
@@ -544,15 +561,19 @@ int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 
 	af->layer = 0;  // 0 for AC3
 
-	if (DEBUG) fprintf (stderr,"AC3 stream:");
+	if (DEBUG)
+		LOG(VB_GENERAL, LOG_DEBUG, "AC3 stream:");
 	frame = (headr[4]&0x3F);
 	af->bit_rate = ac3_bitrates[frame>>1]*1000;
 	half = ac3half[headr[5] >> 3];
-	if (DEBUG) fprintf (stderr,"  bit rate: %d kb/s", af->bit_rate/1000);
+	if (DEBUG)
+		LOG(VB_GENERAL, LOG_DEBUG, "  bit rate: %d kb/s",
+		    af->bit_rate/1000);
 	fr = (headr[4] & 0xc0) >> 6;
 	af->frequency = (ac3_freq[fr] *100) >> half;
 	
-	if (DEBUG) fprintf (stderr,"  freq: %d Hz\n", af->frequency);
+	if (DEBUG)
+		LOG(VB_GENERAL, LOG_DEBUG, "  freq: %d Hz", af->frequency);
 
 	switch (headr[4] & 0xc0) {
 	case 0:
@@ -568,7 +589,8 @@ int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 		break;
 	}
 
-	if (DEBUG) fprintf (stderr,"  frame size %d\n", af->framesize);
+	if (DEBUG)
+		LOG(VB_GENERAL, LOG_DEBUG, "  frame size %d", af->framesize);
 
 	af->off = c;
 	af->set = 1;
@@ -588,7 +610,7 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 	int re=0;
 
         if (( re =ring_find_mpg_header(rbuf, EXTENSION_START_CODE, off, le)) < 0){
-		fprintf(stderr,"Error in find_mpg_header");
+		LOG(VB_GENERAL, LOG_ERR, "Error in find_mpg_header");
 		return re;
 	}
 
@@ -610,7 +632,8 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 		if (ring_peek(rbuf, buf, 10, off) < 0) return -2;
 		headr=buf+4;
 
-		if (DEBUG) fprintf(stderr,"Sequence Extension:");
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_DEBUG, "Sequence Extension:");
 		s->profile = ((headr[0]&0x0F) << 4) | ((headr[1]&0xF0) >> 4);
 		if (headr[1]&0x08) s->progressive = 1;
 		else s->progressive = 0;
@@ -618,16 +641,16 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 		if (DEBUG){
 			switch(s->chroma){
 			case 0:
-				fprintf(stderr," chroma reserved ");
+				LOG(VB_GENERAL, LOG_DEBUG, " chroma reserved ");
 				break;
 			case 1:
-				fprintf(stderr," chroma 4:2:0 ");
+				LOG(VB_GENERAL, LOG_DEBUG, " chroma 4:2:0 ");
 				break;
 			case 2:
-				fprintf(stderr," chroma 4:2:2 ");
+				LOG(VB_GENERAL, LOG_DEBUG, " chroma 4:2:2 ");
 				break;
 			case 3:
-				fprintf(stderr," chroma 4:4:4 ");
+				LOG(VB_GENERAL, LOG_DEBUG, " chroma 4:4:4 ");
 				break;
 			}
 		}
@@ -636,22 +659,30 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 		vsize = ((headr[2]&0x60)<<7);
 		s->h_size	|= hsize;
 		s->v_size	|= vsize;
-		if (DEBUG) fprintf(stderr,"  size = %dx%d",s->h_size,s->v_size);
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_DEBUG, "  size = %dx%d",
+			    s->h_size, s->v_size);
 		
 		bitrate = ((headr[2]& 0x1F) << 25) | (( headr[3] & 0xFE ) << 17);
 		s->bit_rate |= bitrate;
 	
-		if (DEBUG) fprintf(stderr,"  bit rate: %.2f Mbit/s",400.*(s->bit_rate)/1000000.);
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_DEBUG, "  bit rate: %.2f Mbit/s",
+			    400.0*(s->bit_rate)/1000000.0);
 
 
 		vbvb = (headr[4]<<10);
 		s->vbv_buffer_size |= vbvb;
-		if (DEBUG) fprintf(stderr, "  vbvbuffer %d",16*1024*(s->vbv_buffer_size));
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_DEBUG, "  vbvbuffer %d",
+			    16*1024*(s->vbv_buffer_size));
 		fr_n = (headr[5] & 0x60) >> 6;
 		fr_d = (headr[5] & 0x1F);
 	
 		s->frame_rate = s->frame_rate * (fr_n+1) / (fr_d+1);
-		if (DEBUG) fprintf(stderr,"  frame rate: %2.3f\n", s->frame_rate/1000.);
+		if (DEBUG)
+			LOG(VB_GENERAL, LOG_DEBUG, "  frame rate: %2.3f",
+			    s->frame_rate/1000.0);
 		s->ext_set=1;
 		break;
 	}
@@ -679,15 +710,20 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 		if (DEBUG){
 			switch (s->pulldown) {
 			case PULLDOWN32:
-				if (DEBUG) fprintf(stderr,"Picture Coding Extension:");
-				fprintf(stderr," 3:2 pulldown detected \n");
+				LOG(VB_GENERAL, LOG_DEBUG,
+				    "Picture Coding Extension: "
+				    "3:2 pulldown detected");
 				break;
 			case PULLDOWN23:
-				if (DEBUG) fprintf(stderr,"Picture Coding Extension:");
-				fprintf(stderr," 2:3 pulldown detected \n");
+				LOG(VB_GENERAL, LOG_DEBUG,
+				    "Picture Coding Extension: "
+				    "2:3 pulldown detected");
 				break;
-//			default:
-				//fprintf(stderr," no pulldown detected \n");
+#if 0
+			default:
+				LOG(VB_GENERAL, INFO_DEBUG,
+				    " no pulldown detected");
+#endif
 			}
 		}
 		break;

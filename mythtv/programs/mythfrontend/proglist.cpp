@@ -18,6 +18,7 @@ using namespace std;
 #include "channelutil.h"
 #include "proglist.h"
 #include "mythdb.h"
+#include "util.h"
 
 #define LOC      QString("ProgLister: ")
 #define LOC_WARN QString("ProgLister, Warning: ")
@@ -32,11 +33,6 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_addTables(from),
     m_startTime(QDateTime::currentDateTime()),
     m_searchTime(m_startTime),
-    m_dayFormat(gCoreContext->GetSetting("DateFormat")),
-    m_hourFormat(gCoreContext->GetSetting("TimeFormat")),
-    m_timeFormat(),
-    m_fullDateFormat(
-        QString("%1 %2").arg(m_dayFormat).arg(m_hourFormat)),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
     m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
 
@@ -87,14 +83,6 @@ ProgLister::ProgLister(
     m_addTables(),
     m_startTime(QDateTime::currentDateTime()),
     m_searchTime(m_startTime),
-    m_dayFormat(gCoreContext->GetSetting("DateFormat")),
-    m_hourFormat(gCoreContext->GetSetting("TimeFormat")),
-    m_timeFormat(
-        QString("%1 %2")
-        .arg(gCoreContext->GetSetting("ShortDateFormat"))
-        .arg(m_hourFormat)),
-    m_fullDateFormat(
-        QString("%1 %2").arg(m_dayFormat).arg(m_hourFormat)),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
     m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
 
@@ -145,7 +133,7 @@ bool ProgLister::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'programlist'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'programlist'");
         return false;
     }
 
@@ -367,7 +355,8 @@ void ProgLister::SwitchToPreviousView(void)
     {
         m_searchTime = m_searchTime.addSecs(-3600);
         m_curView = 0;
-        m_viewList[m_curView]     = m_searchTime.toString(m_fullDateFormat);
+        m_viewList[m_curView]     = MythDateTimeToString(m_searchTime,
+                                                         kDateTimeFull | kSimplify);
         m_viewTextList[m_curView] = m_viewList[m_curView];
         LoadInBackground();
         return;
@@ -389,7 +378,8 @@ void ProgLister:: SwitchToNextView(void)
     {
         m_searchTime = m_searchTime.addSecs(3600);
         m_curView = 0;
-        m_viewList[m_curView] = m_searchTime.toString(m_fullDateFormat);
+        m_viewList[m_curView] = MythDateTimeToString(m_searchTime,
+                                                     kDateTimeFull | kSimplify);
         m_viewTextList[m_curView] = m_viewList[m_curView];
         LoadInBackground();
 
@@ -534,7 +524,8 @@ void ProgLister::SetViewFromTime(QDateTime searchTime)
 
     m_searchTime = searchTime;
     m_curView = 0;
-    m_viewList[m_curView] = m_searchTime.toString(m_fullDateFormat);
+    m_viewList[m_curView] = MythDateTimeToString(m_searchTime,
+                                                 kDateTimeFull | kSimplify);
     m_viewTextList[m_curView] = m_viewList[m_curView];
 
     LoadInBackground();
@@ -555,10 +546,8 @@ bool ProgLister::PowerStringToSQL(
     QStringList field = qphrase.split(':');
     if (field.size() != 6)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Power search should have 6 fields," +
-                QString("\n\t\t\tnot %1 (%2)")
-                .arg(field.size()).arg(qphrase));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Power search should have 6 fields," +
+            QString("\n\t\t\tnot %1 (%2)") .arg(field.size()).arg(qphrase));
         return false;
     };
 
@@ -798,11 +787,7 @@ void ProgLister::FillViewList(const QString &view)
 
         for (uint i = 0; i < channels.size(); ++i)
         {
-            QString chantext = m_channelFormat;
-            chantext
-                .replace("<num>",  channels[i].channum)
-                .replace("<sign>", channels[i].callsign)
-                .replace("<name>", channels[i].name);
+            QString chantext = channels[i].GetFormatted(m_channelFormat);
 
             m_viewList.push_back(QString::number(channels[i].chanid));
             m_viewTextList.push_back(chantext);
@@ -989,7 +974,8 @@ void ProgLister::FillViewList(const QString &view)
     else if (m_type == plTime)
     {
         m_curView = 0;
-        m_viewList.push_back(m_searchTime.toString(m_fullDateFormat));
+        m_viewList.push_back(MythDateTimeToString(m_searchTime,
+                                                  kDateTimeFull | kSimplify));
         m_viewTextList.push_back(m_viewList[m_curView]);
     }
     else if (m_type == plSQLSearch)
@@ -1666,8 +1652,8 @@ void ProgLister::customEvent(QEvent *event)
                 qVariantValue<RecordingRule *>(dce->GetData());
             if (record && buttonnum > 0 && !record->Delete())
             {
-                VERBOSE(VB_IMPORTANT,
-                        LOC_ERR + "Failed to delete recording rule");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to delete recording rule");
             }
             if (record)
                 delete record;

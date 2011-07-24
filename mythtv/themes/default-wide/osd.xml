@@ -76,45 +76,46 @@
             <font>medium</font>
             <area>260,55,150,25</area>
             <align>right,vcenter</align>
-            <value>Codec :</value>
+            <value>Codec/Dec :</value>
         </textarea>
         <textarea name="videocodec">
             <font>medium</font>
             <area>415,55,150,25</area>
             <align>left,vcenter</align>
+            <template>%VIDEOCODEC% %VIDEODECODER%</template>
         </textarea>
-        <textarea name="viddec">
+        <textarea name="cpuload">
             <font>medium</font>
             <area>260,80,150,25</area>
             <align>right,vcenter</align>
-            <value>Decoder :</value>
+            <value>CPUs :</value>
         </textarea>
-        <textarea name="videodecoder">
+        <textarea name="load">
             <font>medium</font>
-            <area>415,80,150,25</area>
+            <area>415,80,200,25</area>
             <align>left,vcenter</align>
         </textarea>
 
-        <textarea name="sync">
-            <font>medium</font>
-            <area>650,30,150,25</area>
-            <align>right,vcenter</align>
-            <value>A/V Sync :</value>
-        </textarea>
-        <textarea name="avsync">
-            <font>medium</font>
-            <area>805,30,150,25</area>
-            <align>left,vcenter</align>
-        </textarea>
         <textarea name="fps">
             <font>medium</font>
-            <area>600,55,200,25</area>
+            <area>600,30,200,25</area>
             <align>right,vcenter</align>
             <value>FPS :</value>
         </textarea>
         <textarea name="framerate">
             <font>medium</font>
-            <area>805,55,250,25</area>
+            <area>805,30,250,25</area>
+            <align>left,vcenter</align>
+        </textarea>
+        <textarea name="sync">
+            <font>medium</font>
+            <area>650,55,150,25</area>
+            <align>right,vcenter</align>
+            <value>A/V Sync :</value>
+        </textarea>
+        <textarea name="avsync">
+            <font>medium</font>
+            <area>805,55,150,25</area>
             <align>left,vcenter</align>
         </textarea>
         <textarea name="frames">
@@ -245,14 +246,16 @@
             <area>10,42,1060,7</area>
             <layout>horizontal</layout>
             <style>reveal</style>
-            <imagetype name="background">
+            <shape name="background">
                 <area>0,0,100%,100%</area>
-                <filename>progressbar_background.png</filename>
-            </imagetype>
-            <imagetype name="progressimage">
+                <fill color="#000000" />
+                <line color="#FFFFFF" width="1" />
+            </shape>
+            <shape name="progressimage">
                 <area>0,0,100%,100%</area>
-                <filename>progressbar_fill.png</filename>
-            </imagetype>
+                <fill color="#AAAAAA" />
+                <line color="#FFFFFF" width="1" />
+            </shape>
         </progressbar>
     </window>
 

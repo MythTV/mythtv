@@ -50,7 +50,8 @@ static bool checkProcess(const QString &lockFile)
 
     if (!bOK)
     {
-        VERBOSE(VB_GENERAL, QString("Unable to open file %1").arg(lockFile));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Unable to open file %1").arg(lockFile));
 
         return true;
     }
@@ -61,11 +62,13 @@ static bool checkProcess(const QString &lockFile)
 
     if (!bOK)
     {
-        VERBOSE(VB_GENERAL, QString("Got bad PID '%1' from lock file").arg(pid));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Got bad PID '%1' from lock file").arg(pid));
         return true;
     }
 
-    VERBOSE(VB_GENERAL, QString("Checking if PID %1 is still running").arg(pid));
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Checking if PID %1 is still running").arg(pid));
 
     if (kill(pid, 0) == -1)
     {
@@ -90,7 +93,8 @@ static bool checkLockFile(const QString &lockFile)
             showWarningDialog(QObject::tr("Found a lock file but the owning process isn't running!\n"
                                           "Removing stale lock file."));
             if (!file.remove())
-                VERBOSE(VB_IMPORTANT, QString("Failed to remove stale lock file - %1")
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Failed to remove stale lock file - %1")
                         .arg(lockFile));
         }
         else
@@ -283,8 +287,8 @@ static int runMenu(QString which_menu)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
-                              .arg(which_menu).arg(themedir));
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find menu %1 or theme %2")
+                .arg(which_menu).arg(themedir));
         delete diag;
         return -1;
     }
@@ -314,15 +318,15 @@ int mythplugin_init(const char *libversion)
     if (!gContext->TestPopupVersion("mytharchive", libversion,
                                     MYTH_BINARY_VERSION))
     {
-        VERBOSE(VB_IMPORTANT, "Test Popup Version Failed ");
+        LOG(VB_GENERAL, LOG_ERR, "Test Popup Version Failed");
         return -1;
     }
 
     gCoreContext->ActivateSettingsCache(false);
     if (!UpgradeArchiveDatabaseSchema())
     {
-        VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade database to new schema, exiting.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Couldn't upgrade database to new schema, exiting.");
         return -1;
     }
     gCoreContext->ActivateSettingsCache(false);

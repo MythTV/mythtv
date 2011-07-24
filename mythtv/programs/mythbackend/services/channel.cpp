@@ -27,6 +27,7 @@
 
 #include "compat.h"
 #include "mythdbcon.h"
+#include "mythdirs.h"
 #include "mythversion.h"
 #include "mythcorecontext.h"
 #include "channelutil.h"
@@ -433,7 +434,7 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
 
     query.prepare("SELECT mplexid, sourceid, transportid, networkid, "
                   "frequency, inversion, symbolrate, fec, polarity, "
-                  "msystem, modulation, bandwidth, lp_code_rate, transmission_mode, "
+                  "modulation, bandwidth, lp_code_rate, transmission_mode, "
                   "guard_interval, visible, constellation, hierarchy, hp_code_rate, "
                   "mod_sys, rolloff, sistandard, serviceversion, updatetimestamp, "
                   "default_authority FROM dtv_multiplex WHERE sourceid = :SOURCEID "
@@ -474,22 +475,21 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
             pVideoMultiplex->setSymbolRate(         query.value(6).toLongLong()     );
             pVideoMultiplex->setFEC(                query.value(7).toString()       );
             pVideoMultiplex->setPolarity(           query.value(8).toString()       );
-            pVideoMultiplex->setMSystem(            query.value(9).toString()       );
-            pVideoMultiplex->setModulation(         query.value(10).toString()      );
-            pVideoMultiplex->setBandwidth(          query.value(11).toString()      );
-            pVideoMultiplex->setLPCodeRate(         query.value(12).toString()      );
-            pVideoMultiplex->setTransmissionMode(   query.value(13).toString()      );
-            pVideoMultiplex->setGuardInterval(      query.value(14).toString()      );
-            pVideoMultiplex->setVisible(            query.value(15).toBool()        );
-            pVideoMultiplex->setConstellation(      query.value(16).toString()      );
-            pVideoMultiplex->setHierarchy(          query.value(17).toString()      );
-            pVideoMultiplex->setHPCodeRate(         query.value(18).toString()      );
-            pVideoMultiplex->setModulationSystem(   query.value(19).toString()      );
-            pVideoMultiplex->setRollOff(            query.value(20).toString()      );
-            pVideoMultiplex->setSIStandard(         query.value(21).toString()      );
-            pVideoMultiplex->setServiceVersion(     query.value(22).toInt()         );
-            pVideoMultiplex->setUpdateTimeStamp(    query.value(23).toDateTime()    );
-            pVideoMultiplex->setDefaultAuthority(   query.value(24).toString()      );
+            pVideoMultiplex->setModulation(         query.value(9).toString()       );
+            pVideoMultiplex->setBandwidth(          query.value(10).toString()      );
+            pVideoMultiplex->setLPCodeRate(         query.value(11).toString()      );
+            pVideoMultiplex->setTransmissionMode(   query.value(12).toString()      );
+            pVideoMultiplex->setGuardInterval(      query.value(13).toString()      );
+            pVideoMultiplex->setVisible(            query.value(14).toBool()        );
+            pVideoMultiplex->setConstellation(      query.value(15).toString()      );
+            pVideoMultiplex->setHierarchy(          query.value(16).toString()      );
+            pVideoMultiplex->setHPCodeRate(         query.value(17).toString()      );
+            pVideoMultiplex->setModulationSystem(   query.value(18).toString()      );
+            pVideoMultiplex->setRollOff(            query.value(19).toString()      );
+            pVideoMultiplex->setSIStandard(         query.value(20).toString()      );
+            pVideoMultiplex->setServiceVersion(     query.value(21).toInt()         );
+            pVideoMultiplex->setUpdateTimeStamp(    query.value(22).toDateTime()    );
+            pVideoMultiplex->setDefaultAuthority(   query.value(23).toString()      );
         }
     }
 
@@ -528,7 +528,7 @@ DTC::VideoMultiplex* Channel::GetVideoMultiplex( int nMplexID )
 
     query.prepare("SELECT sourceid, transportid, networkid, "
                   "frequency, inversion, symbolrate, fec, polarity, "
-                  "msystem, modulation, bandwidth, lp_code_rate, transmission_mode, "
+                  "modulation, bandwidth, lp_code_rate, transmission_mode, "
                   "guard_interval, visible, constellation, hierarchy, hp_code_rate, "
                   "mod_sys, rolloff, sistandard, serviceversion, updatetimestamp, "
                   "default_authority FROM dtv_multiplex WHERE mplexid = :MPLEXID "
@@ -555,24 +555,77 @@ DTC::VideoMultiplex* Channel::GetVideoMultiplex( int nMplexID )
         pVideoMultiplex->setSymbolRate(         query.value(5).toLongLong()     );
         pVideoMultiplex->setFEC(                query.value(6).toString()       );
         pVideoMultiplex->setPolarity(           query.value(7).toString()       );
-        pVideoMultiplex->setMSystem(            query.value(8).toString()       );
-        pVideoMultiplex->setModulation(         query.value(9).toString()       );
-        pVideoMultiplex->setBandwidth(          query.value(10).toString()      );
-        pVideoMultiplex->setLPCodeRate(         query.value(11).toString()      );
-        pVideoMultiplex->setTransmissionMode(   query.value(12).toString()      );
-        pVideoMultiplex->setGuardInterval(      query.value(13).toString()      );
-        pVideoMultiplex->setVisible(            query.value(14).toBool()        );
-        pVideoMultiplex->setConstellation(      query.value(15).toString()      );
-        pVideoMultiplex->setHierarchy(          query.value(16).toString()      );
-        pVideoMultiplex->setHPCodeRate(         query.value(17).toString()      );
-        pVideoMultiplex->setModulationSystem(   query.value(18).toString()      );
-        pVideoMultiplex->setRollOff(            query.value(19).toString()      );
-        pVideoMultiplex->setSIStandard(         query.value(20).toString()      );
-        pVideoMultiplex->setServiceVersion(     query.value(21).toInt()         );
-        pVideoMultiplex->setUpdateTimeStamp(    query.value(22).toDateTime()    );
-        pVideoMultiplex->setDefaultAuthority(   query.value(23).toString()      );
+        pVideoMultiplex->setModulation(         query.value(8).toString()       );
+        pVideoMultiplex->setBandwidth(          query.value(9).toString()       );
+        pVideoMultiplex->setLPCodeRate(         query.value(10).toString()      );
+        pVideoMultiplex->setTransmissionMode(   query.value(11).toString()      );
+        pVideoMultiplex->setGuardInterval(      query.value(12).toString()      );
+        pVideoMultiplex->setVisible(            query.value(13).toBool()        );
+        pVideoMultiplex->setConstellation(      query.value(14).toString()      );
+        pVideoMultiplex->setHierarchy(          query.value(15).toString()      );
+        pVideoMultiplex->setHPCodeRate(         query.value(16).toString()      );
+        pVideoMultiplex->setModulationSystem(   query.value(17).toString()      );
+        pVideoMultiplex->setRollOff(            query.value(18).toString()      );
+        pVideoMultiplex->setSIStandard(         query.value(19).toString()      );
+        pVideoMultiplex->setServiceVersion(     query.value(20).toInt()         );
+        pVideoMultiplex->setUpdateTimeStamp(    query.value(21).toDateTime()    );
+        pVideoMultiplex->setDefaultAuthority(   query.value(22).toString()      );
     }
 
     return pVideoMultiplex;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList Channel::GetXMLTVIds( int SourceID )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to get source name."));
+
+    query.prepare("SELECT name FROM videosource WHERE sourceid = :SOURCEID ");
+    query.bindValue(":SOURCEID", SourceID);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetXMLTVIds()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    QStringList idList;
+
+    if (query.next())
+    {
+        QString sourceName = query.value(0).toString();
+
+        QString xmltvFile = GetConfDir() + '/' + sourceName + ".xmltv";
+
+        if (QFile::exists(xmltvFile))
+        {
+            QFile file(xmltvFile);
+            if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+                return idList;
+
+            while (!file.atEnd())
+            {
+                QByteArray line = file.readLine();
+
+                if (line.startsWith("channel="))
+                {
+                    QString id = line.mid(8, -1).trimmed();
+                    idList.append(id);
+                }
+            }
+
+            idList.sort();
+        }
+    }
+    else
+        throw(QString("SourceID (%1) not found").arg(SourceID));
+
+    return idList;
+}

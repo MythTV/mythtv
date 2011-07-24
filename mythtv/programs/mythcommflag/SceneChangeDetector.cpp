@@ -73,7 +73,7 @@ writeData(QString filename, const unsigned short *scdiff, long long nframes)
     for (frameno = 0; frameno < nframes; frameno++)
         (void)fprintf(fp, "%5u\n", scdiff[frameno]);
     if (fclose(fp))
-        VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
                 .arg(filename).arg(strerror(errno)));
     return true;
 }
@@ -109,7 +109,7 @@ SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
     , debug_scenechange(false)
     , scenechange_done(false)
 {
-    VERBOSE(VB_COMMFLAG, "SceneChangeDetector");
+    LOG(VB_COMMFLAG, LOG_INFO, "SceneChangeDetector");
 
     /*
      * debugLevel:
@@ -151,8 +151,8 @@ SceneChangeDetector::MythPlayerInited(MythPlayer *player,
 
     QSize video_disp_dim = player->GetVideoSize();
 
-    VERBOSE(VB_COMMFLAG, QString(
-                "SceneChangeDetector::MythPlayerInited %1x%2")
+    LOG(VB_COMMFLAG, LOG_INFO, 
+        QString("SceneChangeDetector::MythPlayerInited %1x%2")
             .arg(video_disp_dim.width())
             .arg(video_disp_dim.height()));
 
@@ -169,8 +169,8 @@ SceneChangeDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
             FrameAnalyzer::ANALYZE_OK)
         return ANALYZE_OK;
 
-    VERBOSE(VB_COMMFLAG,
-            QString("SceneChangeDetector::analyzeFrame error at frame %1")
+    LOG(VB_COMMFLAG, LOG_ERR,
+        QString("SceneChangeDetector::analyzeFrame error at frame %1")
             .arg(frameno));
     return ANALYZE_ERROR;
 }
@@ -181,7 +181,7 @@ SceneChangeDetector::finished(long long nframes, bool final)
     if (histogramAnalyzer->finished(nframes, final))
         return -1;
 
-    VERBOSE(VB_COMMFLAG, QString("SceneChangeDetector::finished(%1)")
+    LOG(VB_COMMFLAG, LOG_INFO, QString("SceneChangeDetector::finished(%1)")
             .arg(nframes));
 
     const HistogramAnalyzer::Histogram *histogram =
@@ -197,8 +197,8 @@ SceneChangeDetector::finished(long long nframes, bool final)
     {
         if (final && writeData(debugdata, scdiff, nframes))
         {
-            VERBOSE(VB_COMMFLAG, QString(
-                        "SceneChangeDetector::finished wrote %1")
+            LOG(VB_COMMFLAG, LOG_INFO, 
+                QString("SceneChangeDetector::finished wrote %1")
                     .arg(debugdata));
             scenechange_done = true;
         }
@@ -208,9 +208,9 @@ SceneChangeDetector::finished(long long nframes, bool final)
     unsigned short *scdiffsort = new unsigned short[nframes];
     memcpy(scdiffsort, scdiff, nframes * sizeof(*scdiff));
     unsigned short mindiff = quick_select_ushort(scdiffsort, nframes,
-            (int)(0.979472 * nframes));
-    VERBOSE(VB_COMMFLAG, QString(
-                "SceneChangeDetector::finished applying threshold value %1")
+                                                 (int)(0.979472 * nframes));
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("SceneChangeDetector::finished applying threshold value %1")
             .arg(mindiff));
     computeChangeMap(&changeMap, nframes, scdiff, mindiff);
     delete []scdiffsort;

@@ -61,7 +61,7 @@ bool ScreenWizard::Create()
     if (!m_topleftarrow || !m_bottomrightarrow || !m_size || !m_offsets ||
         !m_changeamount)
     {
-        VERBOSE(VB_IMPORTANT, "ScreenWizard, Error: "
+        LOG(VB_GENERAL, LOG_ERR, "ScreenWizard, Error: "
                 "Could not instantiate, please check appear-ui.xml for errors");
         return false;
     }
@@ -294,8 +294,8 @@ void ScreenWizard::doMenu()
 
 void ScreenWizard::slotSaveSettings()
 {
-        VERBOSE(VB_IMPORTANT, "Updating screen size settings");
-        updateSettings();
+    LOG(VB_GENERAL, LOG_ERR, "Updating screen size settings");
+    updateSettings();
 }
 
 void ScreenWizard::slotChangeCoarseFine()
@@ -320,7 +320,7 @@ void ScreenWizard::updateSettings()
     gCoreContext->SaveSetting("GuiOffsetY", m_yoffset);
     gCoreContext->SaveSetting("GuiWidth", m_xsize);
     gCoreContext->SaveSetting("GuiHeight", m_ysize);
-    VERBOSE(VB_IMPORTANT, "Updated screen size settings");
+    LOG(VB_GENERAL, LOG_ERR, "Updated screen size settings");
     GetMythMainWindow()->JumpTo("Reload Theme");
 }
 

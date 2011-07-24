@@ -9,6 +9,8 @@ class MythTVRecording {
     public  $title;
     public  $subtitle;
     public  $description;
+    public  $season;
+    public  $episode;
     public  $category;
     public  $hostname;
     public  $bookmark;
@@ -20,6 +22,7 @@ class MythTVRecording {
     public  $recordid;
     public  $seriesid;
     public  $programid;
+    public  $inetref;
     public  $lastmodified;
     public  $filesize;
     public  $stars;

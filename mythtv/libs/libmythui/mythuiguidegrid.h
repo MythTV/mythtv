@@ -50,6 +50,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     void ResetData();
     void ResetRow(int row);
     void SetProgPast(int ppast);
+    void SetMultiLine(bool multiline);
 
   protected:
     virtual void Finalize(void);

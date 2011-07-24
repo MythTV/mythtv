@@ -38,9 +38,8 @@ static bool UpdateDBVersionNumber(const QString &field_name,
         return false;
     }
 
-    VERBOSE(VB_IMPORTANT,
-            QString("Upgraded to MythVideo schema version %1")
-            .arg(newnumber));
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Upgraded to MythVideo schema version %1") .arg(newnumber));
     return true;
 }
 
@@ -50,9 +49,8 @@ static bool performActualUpdate(const QStringList &updates,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT,
-            QString("Upgrading to MythVideo schema version %1")
-            .arg(version));
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Upgrading to MythVideo schema version %1") .arg(version));
 
     for (QStringList::const_iterator p = updates.begin();
          p != updates.end(); ++p)
@@ -142,9 +140,9 @@ static void UpdateHashes(void)
                 MythDB::DBError(QObject::tr("Error: failed to hash file "
                                             "'%1'").arg(filename), updatequery);
             else
-                VERBOSE(VB_GENERAL,
+                LOG(VB_GENERAL, LOG_INFO,
                     QString("Hash (%1) generated for file (%2)")
-                    .arg(hash).arg(filename));
+                        .arg(hash).arg(filename));
         }
     }
 }
@@ -152,7 +150,8 @@ static void UpdateHashes(void)
 static bool InitializeVideoSchema(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    VERBOSE(VB_IMPORTANT, "Inserting initial video database information.");
+    LOG(VB_GENERAL, LOG_NOTICE,
+        "Inserting initial video database information.");
 
     const QString updates[] = {
 "CREATE TABLE dvdinput ("
@@ -365,12 +364,14 @@ bool doUpgradeVideoDatabaseSchema(void)
 
     if (dbver.isEmpty() || dbver.toInt() <  minimumVideoDatabaseVersion.toInt())
     {
-        VERBOSE(VB_IMPORTANT, "Unrecognized video database schema version. "
-                              "Unable to upgrade database.");
-        VERBOSE(VB_IMPORTANT, "Please see mythplugins/mythvideo/README.database"
-                              " for more information.");
-        VERBOSE(VB_IMPORTANT, QString("mythvideo.DBSchemaVer: '%1', "
-                "VideoDBSchemaVer: '%2', DVDDBSchemaVer: '%3'").arg(dbver)
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unrecognized video database schema version. "
+            "Unable to upgrade database.");
+        LOG(VB_GENERAL, LOG_ERR,
+             "Please see mythplugins/mythvideo/README.database"
+             " for more information.");
+        LOG(VB_GENERAL, LOG_ERR, QString("mythvideo.DBSchemaVer: '%1', "
+            "VideoDBSchemaVer: '%2', DVDDBSchemaVer: '%3'").arg(dbver)
                 .arg(olddbver).arg(dvddbver));
         return false;
     }
@@ -507,7 +508,8 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
     if (dbver == "1020")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to MythVideo schema version 1021");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Upgrading to MythVideo schema version 1021");
 
         AddFileType("mkv");
         AddFileType("mp4");
@@ -596,10 +598,12 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
     if (dbver == "1027")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to MythVideo schema version 1028");
-        VERBOSE(VB_IMPORTANT, "Converting filenames in filemarkup table "
-                "from absolute to relative paths.  This may take a long "
-                "time if you have a large number of MythVideo seektables.");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Upgrading to MythVideo schema version 1028");
+        LOG(VB_GENERAL, LOG_INFO,
+            "Converting filenames in filemarkup table "
+            "from absolute to relative paths.  This may take a long "
+            "time if you have a large number of MythVideo seektables.");
 
         bool ok = true;
         MSqlQuery query(MSqlQuery::InitCon());
@@ -626,10 +630,10 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
                     update.bindValue(":FULLPATH", origPath);
                     if (!update.exec())
                     {
-                        VERBOSE(VB_IMPORTANT,
-                                QString("ERROR converting '%1' to '%2' in "
-                                        "filemarkup table.")
-                                        .arg(origPath).arg(relPath));
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("ERROR converting '%1' to '%2' in "
+                                    "filemarkup table.")
+                                .arg(origPath).arg(relPath));
                         ok = false;
                     }
                 }

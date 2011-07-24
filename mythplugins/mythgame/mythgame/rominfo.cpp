@@ -189,7 +189,7 @@ void RomInfo::setField(QString field, QString data)
     else if (field == "romcount")
         romcount = data.toInt();
     else
-        VERBOSE(VB_GENERAL, LOC_ERR + QString("Invalid field %1").arg(field));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid field %1").arg(field));
 
 }
 

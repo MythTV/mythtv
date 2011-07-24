@@ -5,6 +5,7 @@
 
 // ANSI C
 #include <stdint.h> // for [u]int[32,64]_t
+#include <vector> // for GetNextRecordingList
 
 #include <QStringList>
 #include <QDateTime>
@@ -25,7 +26,7 @@
    mythtv/bindings/perl/MythTV/Program.pm
    mythtv/bindings/python/MythTV/MythData.py
 */
-#define NUMPROGRAMLINES 41
+#define NUMPROGRAMLINES 44
 
 class ProgramInfo;
 typedef AutoDeleteDeque<ProgramInfo*> ProgramList;
@@ -78,6 +79,8 @@ class MPUBLIC ProgramInfo
     ProgramInfo(const QString &title,
                 const QString &subtitle,
                 const QString &description,
+                uint season,
+                uint episode,
                 const QString &category,
 
                 uint chanid,
@@ -96,6 +99,7 @@ class MPUBLIC ProgramInfo
 
                 const QString &seriesid,
                 const QString &programid,
+                const QString &inetref,
 
                 int recpriority,
 
@@ -130,6 +134,8 @@ class MPUBLIC ProgramInfo
     ProgramInfo(const QString &title,
                 const QString &subtitle,
                 const QString &description,
+                uint season,
+                uint episode,
                 const QString &category,
 
                 uint chanid,
@@ -139,6 +145,7 @@ class MPUBLIC ProgramInfo
 
                 const QString &seriesid,
                 const QString &programid,
+                const QString &inetref,
 
                 const QDateTime &startts,
                 const QDateTime &endts,
@@ -193,6 +200,8 @@ class MPUBLIC ProgramInfo
     ProgramInfo(const QString &title,
                 const QString &subtitle,
                 const QString &description,
+                uint season,
+                uint episode,
                 const QString &category,
 
                 uint chanid,
@@ -210,16 +219,18 @@ class MPUBLIC ProgramInfo
                 const QDateTime &recendts,
 
                 const QString &seriesid,
-                const QString &programid);
+                const QString &programid,
+                const QString &inetref);
     /// Constructs a ProgramInfo for a pathname.
     ProgramInfo(const QString &pathname);
-    /// Constructs a ProgramInfo for a pathname.
+    /// Constructs a ProgramInfo for a video.
     ProgramInfo(const QString &pathname,
                 const QString &plot,
                 const QString &title,
                 const QString &subtitle,
                 const QString &director,
                 int season, int episode,
+                const QString &inetref,
                 uint length_in_minutes,
                 uint year);
     /// Constructs a manual record ProgramInfo.
@@ -296,6 +307,8 @@ class MPUBLIC ProgramInfo
     QString GetTitle(void)        const { return title; }
     QString GetSubtitle(void)     const { return subtitle; }
     QString GetDescription(void)  const { return description; }
+    uint    GetSeason(void)       const { return season; }
+    uint    GetEpisode(void)      const { return episode; }
     QString GetCategory(void)     const { return category; }
     /// This is the unique key used in the database to locate tuning
     /// information. [1..2^32] are valid keys, 0 is not.
@@ -369,6 +382,7 @@ class MPUBLIC ProgramInfo
     uint64_t GetFilesize(void)            const { return filesize;     }
     QString GetSeriesID(void)             const { return seriesid;     }
     QString GetProgramID(void)            const { return programid;    }
+    QString GetInetRef(void)              const { return inetref;      }
     QString GetCategoryType(void)         const { return catType;      }
     int     GetRecordingPriority(void)    const { return recpriority;  }
     int     GetRecordingPriority2(void)   const { return recpriority2; }
@@ -489,6 +503,7 @@ class MPUBLIC ProgramInfo
     uint        QueryMplexID(void) const;
     QDateTime   QueryBookmarkTimeStamp(void) const;
     uint64_t    QueryBookmark(void) const;
+    QString     QueryCategoryType(void) const;
     QStringList QueryDVDBookmark(const QString &serialid) const;
     bool        QueryIsEditing(void) const;
     bool        QueryIsInUse(QStringList &byWho) const;
@@ -529,6 +544,8 @@ class MPUBLIC ProgramInfo
     void UpdateLastDelete(bool setTime) const;
     void MarkAsInUse(bool inuse, QString usedFor = "");
     void UpdateInUseMark(bool force = false);
+    void SaveSeasonEpisode(uint seas, uint ep);
+    void SaveInetRef(const QString &inet);
 
     // Extremely slow functions that cannot be called from the UI thread.
     QString DiscoverRecordingDirectory(void) const;
@@ -566,13 +583,14 @@ class MPUBLIC ProgramInfo
                            uint &chanid, QDateTime &recstartts);
     static bool ExtractKeyFromPathname(
         const QString &pathname, uint &chanid, QDateTime &recstartts);
+    static bool QueryKeyFromPathname(
+        const QString &pathname, uint &chanid, QDateTime &recstartts);
 
     static QString  QueryRecordingGroupPassword(const QString &group);
     static uint64_t QueryBookmark(uint chanid, const QDateTime &recstartts);
     static QMap<QString,uint32_t> QueryInUseMap(void);
     static QMap<QString,bool> QueryJobsRunning(int type);
-    static QStringList LoadFromScheduler(
-        const QString &altTable, int recordid);
+    static QStringList LoadFromScheduler(const QString &altTable, int recordid);
 
   protected:
     // Flagging map support methods
@@ -605,6 +623,8 @@ class MPUBLIC ProgramInfo
     QString title;
     QString subtitle;
     QString description;
+    uint    season;
+    uint    episode;
     QString category;
 
     int32_t recpriority;
@@ -625,6 +645,7 @@ class MPUBLIC ProgramInfo
 
     QString seriesid;
     QString programid;
+    QString inetref;
     QString catType;
 
     uint64_t filesize;
@@ -745,6 +766,12 @@ bool LoadFromScheduler(AutoDeleteDeque<T> &destination)
     bool dummyConflicts;
     return LoadFromScheduler(destination, dummyConflicts, "", -1);
 }
+
+// Moved from programdetails.cpp/h, used by MythWelcome/MythShutdown
+// could be factored out
+MPUBLIC bool GetNextRecordingList(QDateTime &nextRecordingStart,
+                                  bool *hasConflicts = NULL,
+                                  vector<ProgramInfo> *list = NULL);
 
 class QMutex;
 class MPUBLIC PMapDBReplacement

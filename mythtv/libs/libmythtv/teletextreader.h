@@ -70,7 +70,7 @@ class TeletextReader
 {
   public:
     TeletextReader();
-   ~TeletextReader();
+    virtual ~TeletextReader();
 
     // OSD/Player methods
     void Reset(void);
@@ -97,11 +97,11 @@ class TeletextReader
     void AddTeletextData(int magazine, int row,
                          const uint8_t* buf, int vbimode);
 
-
-  private:
+  protected:
     void NewsFlash(void) {};
-    void PageUpdated(int page, int subpage);
-    void HeaderUpdated(uint8_t *page, int lang);
+    virtual void PageUpdated(int page, int subpage);
+    virtual void HeaderUpdated(
+        int page, int subpage, uint8_t *page_ptr, int lang);
 
     const TeletextSubPage *FindSubPage(int page, int subpage, int dir=0) const
         { return FindSubPageInternal(page, subpage, dir); }

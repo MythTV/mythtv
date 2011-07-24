@@ -44,8 +44,8 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
 
     if (!gMusicData->all_music)
     {
-        VERBOSE(VB_IMPORTANT, "We are not going to get very far with a null "
-                "pointer to metadata");
+        LOG(VB_GENERAL, LOG_ERR, "We are not going to get very far with a null "
+                                 "pointer to metadata");
 	// TODO: is this OK?
         exit(0);
     }
@@ -311,8 +311,8 @@ void DatabaseBox::renamePlaylist()
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Trying to rename something that doesn't "
-                    "seem to be a playlist");
+            LOG(VB_GENERAL, LOG_ERR, "Trying to rename something that doesn't "
+                                     "seem to be a playlist");
         }
     }
 }
@@ -422,14 +422,14 @@ void DatabaseBox::BlankCDRW()
     // Check & get global settings
     if (!gCoreContext->GetNumSetting("CDWriterEnabled"))
     {
-        VERBOSE(VB_GENERAL, "Writer is not enabled. We cannot be here!");
+        LOG(VB_GENERAL, LOG_ERR, "Writer is not enabled. We cannot be here!");
         return;
     }
 
     QString scsidev = MediaMonitor::defaultCDWriter();
     if (scsidev.isEmpty())
     {
-        VERBOSE(VB_GENERAL, "No CD Writer device defined.");
+        LOG(VB_GENERAL, LOG_ERR, "No CD Writer device defined.");
         return;
     }
 
@@ -448,8 +448,8 @@ void DatabaseBox::BlankCDRW()
 
     if (myth_system(cmd, flags) != GENERIC_EXIT_OK)
     {
-        VERBOSE(VB_IMPORTANT, QString("DatabaseBox::BlankCDRW()") +
-                QString(" cmd: '%1' Failed!").arg(cmd));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("DatabaseBox::BlankCDRW() cmd: '%1' Failed!").arg(cmd));
     }
 
     record_progress->Close();
@@ -486,8 +486,8 @@ void DatabaseBox::deletePlaylist()
         }
     }
 
-    VERBOSE(VB_IMPORTANT, "deletePlaylist() - Playlist popup on a "
-                          "non-playlist item");
+    LOG(VB_GENERAL, LOG_ERR, "deletePlaylist() - Playlist popup on a "
+                             "non-playlist item");
 }
 
 
@@ -512,8 +512,8 @@ void DatabaseBox::copyToActive()
             return;
         }
     }
-    VERBOSE(VB_IMPORTANT, "copyToActive() - Playlist popup on a "
-                          "non-playlist item");
+    LOG(VB_GENERAL, LOG_ERR, "copyToActive() - Playlist popup on a "
+                             "non-playlist item");
 }
 
 
@@ -802,8 +802,8 @@ void DatabaseBox::selected(UIListGenericTree *item)
         doActivePopup(item_ptr);
     else
     {
-        VERBOSE(VB_IMPORTANT, "That's odd ... there's something I don't "
-                "recognize on a ListView");
+        LOG(VB_GENERAL, LOG_ERR, "That's odd ... there's something I don't "
+                                 "recognize on a ListView");
     }
 }
 
@@ -969,8 +969,8 @@ void DatabaseBox::dealWithTracks(PlaylistItem *item_ptr)
 
     if (holding_track)
     {
-        VERBOSE(VB_IMPORTANT, "dealWithTracks() - Holding track. This is not "
-                              "supposed to happen");
+        LOG(VB_GENERAL, LOG_ERR, "dealWithTracks() - Holding track. This is "
+                                 "not supposed to happen");
         holding_track = false;
         track_held->beMoving(false);
         releaseKeyboard();
@@ -1100,8 +1100,9 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "deleteTrack() - I don't know how to delete "
-                    "whatever you're trying to get rid of");
+            LOG(VB_GENERAL, LOG_ERR, "deleteTrack() - I don't know how to "
+                                     "delete whatever you're trying to get "
+                                     "rid of");
         }
 
         gMusicData->all_playlists->refreshRelevantPlaylists(alllists);
@@ -1130,8 +1131,9 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "deleteTrack() - I don't know how to delete "
-                    "whatever you're trying to get rid of");
+            LOG(VB_GENERAL, LOG_ERR, "deleteTrack() - I don't know how to "
+                                     "delete whatever you're trying to get "
+                                     "rid of");
         }
         gMusicData->all_playlists->refreshRelevantPlaylists(alllists);
         checkTree();
@@ -1290,7 +1292,7 @@ void ReadCDThread::run()
     if (tracknum != gMusicData->all_music->getCDTrackCount())
     {
         cd_status_changed = true;
-        VERBOSE(VB_IMPORTANT, QString("CD status has changed."));
+        LOG(VB_GENERAL, LOG_INFO, QString("CD status has changed."));
     }
     else
         cd_status_changed = false;
@@ -1321,8 +1323,8 @@ void ReadCDThread::run()
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "The cddecoder said it had audio tracks, "
-                    "but it won't tell me about them");
+            LOG(VB_GENERAL, LOG_ERR, "The cddecoder said it had audio tracks, "
+                                     "but it won't tell me about them");
         }
     }
 
@@ -1352,10 +1354,11 @@ void ReadCDThread::run()
                 else
                 {
                     parenttitle = " " + QObject::tr("Unknown");
-                    VERBOSE(VB_GENERAL, "Couldn't find your "
-                    " CD. It may not be in the freedb database.\n"
-                    "    More likely, however, is that you need to delete\n"
-                    "    ~/.cddb and ~/.cdserverrc and restart mythmusic.");
+                    LOG(VB_GENERAL, LOG_ERR,
+                        "Couldn't find your CD. It may not be in the freedb "
+                        "database.\n"
+                        "    More likely, however, is that you need to delete\n"
+                        "    ~/.cddb and ~/.cdserverrc and restart mythmusic.");
                 }
                 gMusicData->all_music->setCDTitle(parenttitle);
                 setTitle = true;

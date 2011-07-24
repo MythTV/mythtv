@@ -24,20 +24,19 @@
 #include "tspacket.h"
 
 #define LOC QString("IPTVFeedRTP: ")
-#define LOC_ERR QString("IPTVFeedRTP, Error: ")
 
 IPTVFeederRTP::IPTVFeederRTP() :
     _source(NULL),
     _sink(NULL)
 {
-    VERBOSE(VB_RECORD, LOC + "ctor -- success");
+    LOG(VB_RECORD, LOG_INFO, LOC + "ctor -- success");
 }
 
 IPTVFeederRTP::~IPTVFeederRTP()
 {
-    VERBOSE(VB_RECORD, LOC + "dtor -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- begin");
     Close();
-    VERBOSE(VB_RECORD, LOC + "dtor -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- end");
 }
 
 bool IPTVFeederRTP::IsRTP(const QString &url)
@@ -47,20 +46,20 @@ bool IPTVFeederRTP::IsRTP(const QString &url)
 
 bool IPTVFeederRTP::Open(const QString &url)
 {
-    VERBOSE(VB_RECORD, LOC + QString("Open(%1) -- begin").arg(url));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Open(%1) -- begin").arg(url));
 
     QMutexLocker locker(&_lock);
 
     if (_source)
     {
-        VERBOSE(VB_RECORD, LOC + "Open() -- end 1");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- end 1");
         return true;
     }
 
     QUrl parse(url);
     if (!parse.isValid() || parse.host().isEmpty() || (-1 == parse.port()))
     {
-        VERBOSE(VB_RECORD, LOC + "Open() -- end 2");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- end 2");
         return false;
     }
 
@@ -75,7 +74,7 @@ bool IPTVFeederRTP::Open(const QString &url)
     Groupsock *socket = new Groupsock(*_live_env, addr, parse.port(), 0);
     if (!socket)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to create Live RTP Socket.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Live RTP Socket.");
         FreeEnv();
         return false;
     }
@@ -84,7 +83,7 @@ bool IPTVFeederRTP::Open(const QString &url)
                                          "video/MP2T", 0, False);
     if (!_source)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to create Live RTP Source.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Live RTP Source.");
 
         if (socket)
             delete socket;
@@ -96,8 +95,7 @@ bool IPTVFeederRTP::Open(const QString &url)
     _sink = IPTVMediaSink::CreateNew(*_live_env, TSPacket::kSize * 128*1024);
     if (!_sink)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("IPTV # Failed to create sink: %1")
+        LOG(VB_GENERAL, LOG_ERR, QString("IPTV # Failed to create sink: %1")
                 .arg(_live_env->getResultMsg()));
 
         Medium::close(_source);
@@ -114,14 +112,14 @@ bool IPTVFeederRTP::Open(const QString &url)
     for (; it != _listeners.end(); ++it)
         _sink->AddListener(*it);
 
-    VERBOSE(VB_RECORD, LOC + "Open() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- end");
 
     return true;
 }
 
 void IPTVFeederRTP::Close(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Close() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
     Stop();
 
     QMutexLocker locker(&_lock);
@@ -143,16 +141,16 @@ void IPTVFeederRTP::Close(void)
 
     FreeEnv();
 
-    VERBOSE(VB_RECORD, LOC + "Close() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
 void IPTVFeederRTP::AddListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- begin")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- begin")
                        .arg((uint64_t)item,0,16));
     if (!item)
     {
-        VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end")
                            .arg((uint64_t)item,0,16));
         return;
     }
@@ -167,13 +165,13 @@ void IPTVFeederRTP::AddListener(TSDataListener *item)
     if (_sink)
         _sink->AddListener(item);
 
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end")
                        .arg((uint64_t)item,0,16));
 }
 
 void IPTVFeederRTP::RemoveListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- begin")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- begin")
                        .arg((uint64_t)item,0,16));
     QMutexLocker locker(&_lock);
     vector<TSDataListener*>::iterator it =
@@ -181,7 +179,7 @@ void IPTVFeederRTP::RemoveListener(TSDataListener *item)
 
     if (it == _listeners.end())
     {
-        VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 1")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end 1")
                            .arg((uint64_t)item,0,16));
         return;
     }
@@ -193,6 +191,6 @@ void IPTVFeederRTP::RemoveListener(TSDataListener *item)
     if (_sink)
         _sink->RemoveListener(item);
 
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 2")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end 2")
                        .arg((uint64_t)item,0,16));
 }

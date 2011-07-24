@@ -64,7 +64,7 @@ bool ActionSet::Add(const ActionID &id, const QString &key)
 
     if (!a->AddKey(key))
     {
-        VERBOSE(VB_IMPORTANT, "ActionSet::AddKey() failed");
+        LOG(VB_GENERAL, LOG_ERR, "ActionSet::AddKey() failed");
         return false;
     }
 
@@ -333,8 +333,8 @@ Action *ActionSet::GetAction(const ActionID &id)
     ContextMap::iterator cit = m_contexts.find(id.GetContext());
     if (cit == m_contexts.end())
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("GetAction: Did not find context '%1'")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("GetAction: Did not find context '%1'")
                 .arg(id.GetContext()));
 
         return NULL;
@@ -344,9 +344,8 @@ Action *ActionSet::GetAction(const ActionID &id)
 
     if (it == (*cit).end())
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("GetAction: Did not find action '%1' "
-                        "in context '%1'")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("GetAction: Did not find action '%1' in context '%1'")
                 .arg(id.GetAction()).arg(id.GetContext()));
         return NULL;
     }

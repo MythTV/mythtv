@@ -8,6 +8,7 @@
 #include "mythuibutton.h"
 #include "channelutil.h"
 #include "proglist.h"
+#include "util.h"
 
 PhrasePopup::PhrasePopup(MythScreenStack *parentStack,
                          ProgLister *parent,
@@ -37,7 +38,7 @@ bool PhrasePopup::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'phrasepopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'phrasepopup'");
         return false;
     }
 
@@ -179,7 +180,7 @@ void PhrasePopup::recordClicked(void)
 
     if (m_searchType == kNoSearch)
     {
-        VERBOSE(VB_IMPORTANT, "Unknown search in ProgLister");
+        LOG(VB_GENERAL, LOG_ERR, "Unknown search in ProgLister");
         return;
     }
 
@@ -243,16 +244,17 @@ bool TimePopup::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'timepopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'timepopup'");
         return false;
     }
 
     // date
     for (int x = -1; x <= 14; x++)
     {
+        QString text = MythDateTimeToString(m_parent->m_startTime.addDays(x),
+                                            kDateFull | kSimplify);
         new MythUIButtonListItem(
-            m_dateList,
-            m_parent->m_startTime.addDays(x).toString(m_parent->m_dayFormat),
+            m_dateList, text,
             NULL, false);
 
         if (m_parent->m_startTime.addDays(x).toString("MMdd") ==
@@ -265,9 +267,8 @@ bool TimePopup::Create()
     for (int x = 0; x < 24; x++)
     {
         hr.setHMS(x, 0, 0);
-        new MythUIButtonListItem(m_timeList,
-                                 hr.toString(m_parent->m_hourFormat),
-                                 NULL, false);
+        QString text = MythTimeToString(hr, kTime);
+        new MythUIButtonListItem(m_timeList, text, NULL, false);
 
         if (hr.toString("hh") == m_parent->m_searchTime.toString("hh"))
             m_timeList->SetItemCurrent(x);
@@ -327,7 +328,7 @@ bool PowerSearchPopup::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'powersearchpopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'powersearchpopup'");
         return false;
     }
 
@@ -457,7 +458,7 @@ void PowerSearchPopup::recordClicked(void)
 
     if (m_searchType == kNoSearch)
     {
-        VERBOSE(VB_IMPORTANT, "Unknown search in ProgLister");
+        LOG(VB_GENERAL, LOG_ERR, "Unknown search in ProgLister");
         return;
     }
 
@@ -516,7 +517,7 @@ EditPowerSearchPopup::EditPowerSearchPopup(MythScreenStack *parentStack,
     QStringList field = m_currentValue.split(':');
     if (field.count() != 6)
     {
-        VERBOSE(VB_IMPORTANT, QString("Error. PowerSearch %1 has %2 fields")
+        LOG(VB_GENERAL, LOG_ERR, QString("Error. PowerSearch %1 has %2 fields")
                 .arg(m_currentValue).arg(field.count()));
         m_currentValue = ":::::";
     }
@@ -538,7 +539,7 @@ bool EditPowerSearchPopup::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'editpowersearchpopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'editpowersearchpopup'");
         return false;
     }
 
@@ -643,11 +644,7 @@ void EditPowerSearchPopup::initLists(void)
 
     for (uint i = 0; i < channels.size(); ++i)
     {
-        QString chantext = channelFormat;
-        chantext
-            .replace("<num>",  channels[i].channum)
-            .replace("<sign>", channels[i].callsign)
-            .replace("<name>", channels[i].name);
+        QString chantext = channels[i].GetFormatted(channelFormat);
 
         m_parent->m_viewList << QString::number(channels[i].chanid);
         m_parent->m_viewTextList << chantext;

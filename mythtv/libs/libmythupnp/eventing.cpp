@@ -112,11 +112,9 @@ inline short Eventing::HoldEvents()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT,
-                "Eventing::HoldEvents(), Programmer Error: "
-                "Exceeded maximum guarranteed range of "
-                "m_nHoldCount short [-128..127]");
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_ERR, "Exceeded maximum guarranteed range of "
+                                 "m_nHoldCount short [-128..127]");
+        LOG(VB_GENERAL, LOG_ERR,
                 "UPnP may not exhibit strange behavior or crash mythtv");
     }
 
@@ -169,12 +167,13 @@ bool Eventing::ProcessRequest( HttpWorkerThread * /*pThread*/, HTTPRequest *pReq
         if ( pRequest->m_sMethod != m_sEventMethodName )
             return false;
 
-        VERBOSE( VB_UPNP, QString("Eventing::ProcessRequest - Method (%1)").arg(pRequest->m_sMethod ));
+        LOG(VB_UPNP, LOG_INFO, QString("Eventing::ProcessRequest - Method (%1)")
+                                   .arg(pRequest->m_sMethod ));
 
         switch( pRequest->m_eType )
         {
-            case RequestTypeSubscribe   : HandleSubscribe     ( pRequest ); break;
-            case RequestTypeUnsubscribe : HandleUnsubscribe   ( pRequest ); break;
+            case RequestTypeSubscribe   : HandleSubscribe   ( pRequest ); break;
+            case RequestTypeUnsubscribe : HandleUnsubscribe ( pRequest ); break;
             default:
                 UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
                 break;
@@ -413,10 +412,13 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         // Add new EventTask to the TaskQueue to do the actual sending.
         // ------------------------------------------------------------------
 
-        VERBOSE(VB_UPNP, QString("UPnp::Eventing::NotifySubscriber( %1 ) : %2 Variables").arg( sHost ).arg(nCount));
+        LOG(VB_UPNP, LOG_INFO,
+            QString("UPnp::Eventing::NotifySubscriber( %1 ) : %2 Variables")
+                .arg( sHost ).arg(nCount));
 
-        UPnpEventTask    *pEventTask      = new UPnpEventTask( QHostAddress( pInfo->qURL.host() ),
-                                                                             nPort, pBuffer );
+        UPnpEventTask *pEventTask = 
+            new UPnpEventTask(QHostAddress( pInfo->qURL.host() ),
+                              nPort, pBuffer );
 
         TaskQueue::Instance()->AddTask( 250, pEventTask );
 
@@ -428,6 +430,5 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
         gettimeofday( (&pInfo->ttLastNotified), NULL );
     }
-
 }
 

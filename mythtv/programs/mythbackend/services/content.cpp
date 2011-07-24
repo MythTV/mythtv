@@ -40,13 +40,15 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetFile( const QString &sStorageGroup, const QString &sFileName )
+QFileInfo Content::GetFile( const QString &sStorageGroup,
+                            const QString &sFileName )
 {
     QString sGroup = sStorageGroup;
 
     if (sGroup.isEmpty())
     {
-        VERBOSE( VB_UPNP, "GetFile - StorageGroup missing... using 'Default'");
+        LOG(VB_UPNP, LOG_WARNING,
+            "GetFile - StorageGroup missing... using 'Default'");
         sGroup = "Default";
     }
 
@@ -54,7 +56,7 @@ QFileInfo Content::GetFile( const QString &sStorageGroup, const QString &sFileNa
     {
         QString sMsg ( "GetFile - FileName missing." );
 
-        VERBOSE( VB_UPNP, sMsg );
+        LOG(VB_UPNP, LOG_ERR, sMsg);
 
         throw sMsg;
     }
@@ -68,7 +70,8 @@ QFileInfo Content::GetFile( const QString &sStorageGroup, const QString &sFileNa
 
     if (sFullFileName.isEmpty())
     {
-        VERBOSE( VB_UPNP, QString("GetFile - Unable to find %1.").arg(sFileName));
+        LOG(VB_UPNP, LOG_ERR,
+            QString("GetFile - Unable to find %1.").arg(sFileName));
 
         return QFileInfo();
     }
@@ -82,7 +85,8 @@ QFileInfo Content::GetFile( const QString &sStorageGroup, const QString &sFileNa
         return QFileInfo( sFullFileName );
     }
 
-    VERBOSE( VB_UPNP, QString("GetFile - File Does not exist %1.").arg(sFullFileName));
+    LOG(VB_UPNP, LOG_ERR,
+        QString("GetFile - File Does not exist %1.").arg(sFullFileName));
 
     return QFileInfo();
 }
@@ -97,7 +101,7 @@ QStringList Content::GetFileList( const QString &sStorageGroup )
     if (sStorageGroup.isEmpty())
     {
         QString sMsg( "GetFileList - StorageGroup missing.");
-        VERBOSE( VB_UPNP, sMsg );
+        LOG(VB_UPNP, LOG_ERR, sMsg);
 
         throw sMsg;
     }
@@ -113,7 +117,7 @@ QStringList Content::GetFileList( const QString &sStorageGroup )
 
 QFileInfo Content::GetVideoCoverart( int nId )
 {
-    VERBOSE(VB_UPNP, QString("GetVideoCoverart ID = %1").arg(nId));
+    LOG(VB_UPNP, LOG_INFO, QString("GetVideoCoverart ID = %1").arg(nId));
 
     // ----------------------------------------------------------------------
     // Read Video poster file path from database
@@ -152,7 +156,7 @@ QFileInfo Content::GetVideoCoverart( int nId )
 
 QFileInfo Content::GetVideoFanart( int nId )
 {
-    VERBOSE(VB_UPNP, QString("GetVideoFanart ID = %1").arg(nId));
+    LOG(VB_UPNP, LOG_INFO, QString("GetVideoFanart ID = %1").arg(nId));
 
     // ----------------------------------------------------------------------
     // Read Video fanart file path from database
@@ -191,7 +195,7 @@ QFileInfo Content::GetVideoFanart( int nId )
 
 QFileInfo Content::GetVideoBanner( int nId )
 {
-    VERBOSE(VB_UPNP, QString("GetVideoBanner ID = %1").arg(nId));
+    LOG(VB_UPNP, LOG_INFO, QString("GetVideoBanner ID = %1").arg(nId));
 
     // ----------------------------------------------------------------------
     // Read Video Banner file path from database
@@ -230,7 +234,7 @@ QFileInfo Content::GetVideoBanner( int nId )
 
 QFileInfo Content::GetVideoScreenshot( int nId )
 {
-    VERBOSE(VB_UPNP, QString("GetVideoScreenshot ID = %1").arg(nId));
+    LOG(VB_UPNP, LOG_INFO, QString("GetVideoScreenshot ID = %1").arg(nId));
 
     // ----------------------------------------------------------------------
     // Read Video Screenshot file path from database
@@ -361,7 +365,7 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
         QString sMsg = QString("GetPreviewImage: bad start time '%1'")
                           .arg( dtStartTime.toString() );
 
-        VERBOSE(VB_IMPORTANT, sMsg);
+        LOG(VB_GENERAL, LOG_ERR, sMsg);
 
         throw sMsg;
     }
@@ -374,18 +378,20 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
 
     if (!pginfo.GetChanID())
     {
-        VERBOSE(VB_IMPORTANT, QString( "GetPreviewImage: no recording for start time '%1'" )
+        LOG(VB_GENERAL, LOG_ERR,
+            QString( "GetPreviewImage: no recording for start time '%1'" )
                                  .arg( dtStartTime.toString() ));
         return QFileInfo();
     }
 
     if ( pginfo.GetHostname() != gCoreContext->GetHostName())
     {
-        QString sMsg = QString("GetPreviewImage: Wrong Host '%1' request from '%2'")
+        QString sMsg =
+            QString("GetPreviewImage: Wrong Host '%1' request from '%2'")
                           .arg( gCoreContext->GetHostName())
                           .arg( pginfo.GetHostname() );
 
-        VERBOSE(VB_UPNP, sMsg);
+        LOG(VB_UPNP, LOG_ERR, sMsg);
 
         throw HttpRedirectException( pginfo.GetHostname() );
     }
@@ -509,8 +515,7 @@ QFileInfo Content::GetRecording( int              nChanId,
 
     if (!pginfo.GetChanID())
     {
-        VERBOSE( VB_UPNP, QString( "GetRecording - for %1, %2 "
-                                   "failed" )
+        LOG( VB_UPNP, LOG_ERR, QString("GetRecording - for %1, %2 failed")
                                     .arg( nChanId )
                                     .arg( dtStartTime.toString() ));
         return QFileInfo();
@@ -520,16 +525,15 @@ QFileInfo Content::GetRecording( int              nChanId,
     {
         // We only handle requests for local resources
 
-        QString sMsg = QString( "GetRecording: Wrong Host '%1' request from '%2'." )
+        QString sMsg =
+            QString("GetRecording: Wrong Host '%1' request from '%2'.")
                           .arg( gCoreContext->GetHostName())
                           .arg( pginfo.GetHostname() );
 
-        VERBOSE( VB_UPNP, sMsg );
+        LOG(VB_UPNP, LOG_ERR, sMsg);
 
         throw HttpRedirectException( pginfo.GetHostname() );
     }
-
-
 
     QString sFileName( GetPlaybackURL(&pginfo) );
 
@@ -631,14 +635,16 @@ QFileInfo Content::GetVideo( int nId )
     return QFileInfo( sFileName );
 }
 
-QString Content::GetHash( const QString &sStorageGroup, const QString &sFileName )
+QString Content::GetHash( const QString &sStorageGroup,
+                          const QString &sFileName )
 {
     if ((sFileName.isEmpty()) ||
         (sFileName.contains("/../")) ||
         (sFileName.startsWith("../")))
     {
-        VERBOSE(VB_IMPORTANT, QString("ERROR checking for file, filename '%1' "
-                "fails sanity checks").arg(sFileName));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("ERROR checking for file, filename '%1' "
+                    "fails sanity checks").arg(sFileName));
         return QString();
     }
 
@@ -668,17 +674,18 @@ bool Content::DownloadFile( const QString &sURL, const QString &sStorageGroup )
 
     if (outDir.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("Unable to determine directory "
-                "to write to in %1 write command").arg(sURL));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Unable to determine directory "
+                    "to write to in %1 write command").arg(sURL));
         return false;
     }
 
     if ((filename.contains("/../")) ||
         (filename.startsWith("../")))
     {
-        VERBOSE(VB_IMPORTANT, QString("ERROR: %1 write "
-                "filename '%2' does not pass sanity checks.")
-                .arg(sURL).arg(filename));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("ERROR: %1 write filename '%2' does not "
+                    "pass sanity checks.") .arg(sURL).arg(filename));
         return false;
     }
 

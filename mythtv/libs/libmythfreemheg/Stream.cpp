@@ -121,12 +121,11 @@ void MHStream::Deactivation(MHEngine *engine)
 
 // The MHEG corrigendum allows SetData to be targeted to a stream so
 // the content ref could change while the stream is playing.
-// Not currently handled.
 void MHStream::ContentPreparation(MHEngine *engine)
 {
     engine->EventTriggered(this, EventContentAvailable); // Perhaps test for the streams being available?
     for (int i = 0; i < m_Multiplex.Size(); i++)
-        m_Multiplex.GetAt(i)->SetStreamRef(m_ContentRef);
+        m_Multiplex.GetAt(i)->SetStreamRef(engine, m_ContentRef);
 }
 
 // TODO: Generate StreamPlaying and StreamStopped events.  These are supposed
@@ -198,9 +197,10 @@ void MHAudio::Deactivation(MHEngine *engine)
     MHPresentable::Deactivation(engine);
 }
 
-void MHAudio::SetStreamRef(const MHContentRef &cr)
+void MHAudio::SetStreamRef(MHEngine *engine, const MHContentRef &cr)
 {
     m_streamContentRef.Copy(cr);
+    if (m_fStreamPlaying) BeginPlaying(engine);
 }
 
 void MHAudio::BeginPlaying(MHEngine *engine)
@@ -340,9 +340,10 @@ void MHVideo::Deactivation(MHEngine *engine)
     if (m_fStreamPlaying) engine->GetContext()->StopVideo();
 }
 
-void MHVideo::SetStreamRef(const MHContentRef &cr)
+void MHVideo::SetStreamRef(MHEngine *engine, const MHContentRef &cr)
 {
     m_streamContentRef.Copy(cr);
+    if (m_fStreamPlaying) BeginPlaying(engine);
 }
 
 void MHVideo::BeginPlaying(MHEngine *engine)

@@ -7,7 +7,6 @@
 #include "channelgroup.h"
 
 #define LOC QString("Channel Group: ")
-#define LOC_ERR QString("Channel Group, Error: ")
 
 ChannelGroupItem& ChannelGroupItem::operator=(const ChannelGroupItem &other)
 {
@@ -53,7 +52,8 @@ bool ChannelGroup::ToggleChannel(uint chanid, int changrpid, int delete_chan)
         query.bindValue(":CHANID", id);
         if (!query.exec())
             MythDB::DBError("ChannelGroup::ToggleChannel -- delete", query);
-        VERBOSE(VB_IMPORTANT, LOC + QString("Removing channel with id=%1.").arg(id));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Removing channel with id=%1.").arg(id));
     }
     else if (query.size() == 0)
     {
@@ -64,7 +64,9 @@ bool ChannelGroup::ToggleChannel(uint chanid, int changrpid, int delete_chan)
         query.bindValue(":GRPID", changrpid);
         if (!query.exec())
             MythDB::DBError("ChannelGroup::ToggleChannel -- insert", query);
-        VERBOSE(VB_IMPORTANT, LOC + QString("Adding channel %1 to group %2.").arg(chanid).arg(changrpid));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Adding channel %1 to group %2.")
+                 .arg(chanid).arg(changrpid));
     }
 
     return true;
@@ -97,7 +99,9 @@ bool ChannelGroup::AddChannel(uint chanid, int changrpid)
         query.bindValue(":GRPID", changrpid);
         if (!query.exec())
             MythDB::DBError("ChannelGroup::AddChannel -- insert", query);
-        VERBOSE(VB_IMPORTANT, LOC + QString("Adding channel %1 to group %2.").arg(chanid).arg(changrpid));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Adding channel %1 to group %2.")
+                 .arg(chanid).arg(changrpid));
     }
 
     return true;
@@ -129,7 +133,8 @@ bool ChannelGroup::DeleteChannel(uint chanid, int changrpid)
         query.bindValue(":CHANID", id);
         if (!query.exec())
             MythDB::DBError("ChannelGroup::DeleteChannel -- delete", query);
-        VERBOSE(VB_IMPORTANT, LOC + QString("Removing channel with id=%1.").arg(id));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Removing channel with id=%1.").arg(id));
     }
 
     return true;

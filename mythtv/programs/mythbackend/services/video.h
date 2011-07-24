@@ -49,6 +49,13 @@ class Video : public VideoServices
 
         DTC::VideoMetadataInfo*   GetVideoByFilename ( const QString  &Filename  );
 
+        DTC::VideoLookupList*     LookupVideo        ( const QString    &Title,
+                                                       const QString    &Subtitle,
+                                                       const QString    &Inetref,
+                                                       int              Season,
+                                                       int              Episode,
+                                                       const QString    &GrabberType );
+
         bool                      RemoveVideoFromDB  ( int      Id               );
 
         bool                      AddVideo           ( const QString  &Filename,
@@ -108,6 +115,17 @@ class ScriptableVideo : public QObject
         QObject* GetVideoByFilename( const QString    &Filename  )
         {
             return m_obj.GetVideoByFilename( Filename );
+        }
+
+        QObject* LookupVideo( const QString    &Title,
+                              const QString    &Subtitle,
+                              const QString    &Inetref,
+                              int              Season,
+                              int              Episode,
+                              const QString    &GrabberType)
+        {
+            return m_obj.LookupVideo( Title, Subtitle, Inetref,
+                                      Season, Episode, GrabberType );
         }
 
         bool RemoveVideoFromDB(      int              Id         )

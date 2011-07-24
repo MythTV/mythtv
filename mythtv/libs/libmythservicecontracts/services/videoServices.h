@@ -30,6 +30,7 @@
 #include "service.h"
 
 #include "datacontracts/videoMetadataInfoList.h"
+#include "datacontracts/videoLookupInfoList.h"
 #include "datacontracts/blurayInfo.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -63,6 +64,7 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
         VideoServices( QObject *parent = 0 ) : Service( parent )
         {
             DTC::VideoMetadataInfoList::InitializeCustomTypes();
+            DTC::VideoLookupList::InitializeCustomTypes();
             DTC::BlurayInfo::InitializeCustomTypes();
         }
 
@@ -77,6 +79,13 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
         virtual DTC::VideoMetadataInfo*     GetVideoById       ( int              Id         ) = 0;
 
         virtual DTC::VideoMetadataInfo*     GetVideoByFilename ( const QString    &Filename  ) = 0;
+
+        virtual DTC::VideoLookupList*   LookupVideo        ( const QString    &Title,
+                                                                 const QString    &Subtitle,
+                                                                 const QString    &Inetref,
+                                                                 int              Season,
+                                                                 int              Episode,
+                                                                 const QString    &GrabberType) = 0;
 
         virtual bool                        RemoveVideoFromDB  ( int              Id         ) = 0;
 

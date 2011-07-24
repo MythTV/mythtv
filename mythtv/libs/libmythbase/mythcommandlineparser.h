@@ -131,8 +131,6 @@ class MBASE_PUBLIC MythCommandLineParser
     LogLevel_t              GetLogLevel(void);
     QString                 GetPassthrough(void) const { return m_passthrough.join(" "); }
 
-    bool                    SetValue(const QString &key, QVariant value);
-
     bool                    toBool(QString key) const;
     int                     toInt(QString key) const;
     uint                    toUInt(QString key) const;
@@ -144,7 +142,14 @@ class MBASE_PUBLIC MythCommandLineParser
     QMap<QString,QString>   toMap(QString key) const;
     QDateTime               toDateTime(QString key) const;
 
+    bool                    SetValue(const QString &key, QVariant value);
+    int                     ConfigureLogging(QString mask = "general",
+                                             unsigned int quiet = 0);
+    void                    ApplySettingsOverride(void);
+    int                     Daemonize(void);
+
   protected:
+    void allowArgs(bool allow=true) { m_allowArgs = allow; }
     void allowExtras(bool allow=true) { m_allowExtras = allow; }
     void allowPassthrough(bool allow=true) { m_allowPassthrough = allow; }
 
@@ -153,7 +158,6 @@ class MBASE_PUBLIC MythCommandLineParser
     void addWindowed(bool);
     void addDaemon(void);
     void addSettingsOverride(void);
-    void addVerbose(void);
     void addRecording(void);
     void addGeometry(void);
     void addDisplay(void);
@@ -171,6 +175,7 @@ class MBASE_PUBLIC MythCommandLineParser
     QMap<QString,QVariant>          m_defaults;
     QMap<QString,CommandLineArg>    m_registeredArgs;
     bool                            m_allowExtras;
+    bool                            m_allowArgs;
     QStringList                     m_remainingArgs;
     bool                            m_allowPassthrough;
     bool                            m_passthroughActive;

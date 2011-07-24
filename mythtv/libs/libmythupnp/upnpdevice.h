@@ -32,7 +32,6 @@
 #include "upnpexp.h"
 #include "upnputil.h"
 #include "refcounted.h"
-#include "mythversion.h"  // for MYTH_BINARY_VERSION
 
 class UPnpDeviceDesc;
 class UPnpDevice;
@@ -118,7 +117,7 @@ class UPNP_PUBLIC UPnpDevice
         QString         m_sSerialNumber;
         QString         m_sUPC;
         QString         m_sPresentationURL;
-        QString         m_sUDN;
+        mutable QString m_sUDN;
 
         NameValues      m_lstExtra;
 
@@ -131,56 +130,12 @@ class UPNP_PUBLIC UPnpDevice
         UPnpDeviceList  m_listDevices;
 
     public:
+        UPnpDevice();
+        ~UPnpDevice();
 
-        UPnpDevice()
-        {
-            m_sModelNumber  = MYTH_BINARY_VERSION;
-            m_sSerialNumber = MYTH_SOURCE_VERSION;
-            m_securityPin   = false;
-            m_protocolVersion = MYTH_PROTO_VERSION;
-        }
-        ~UPnpDevice()
-        {
-            while (!m_listIcons.empty())
-            {
-                delete m_listIcons.back();
-                m_listIcons.pop_back();
-            }
-            while (!m_listServices.empty())
-            {
-                delete m_listServices.back();
-                m_listServices.pop_back();
-            }
-            while (!m_listDevices.empty())
-            {
-                delete m_listDevices.back();
-                m_listDevices.pop_back();
-            }
-        }
+        QString GetUDN(void) const;
 
-        QString GetUDN()
-        {
-            if (m_sUDN.isEmpty())
-                m_sUDN = "uuid:" + LookupUDN( m_sDeviceType );
-
-            return m_sUDN;
-        }
-
-        void toMap(QHash<QString, QString> &map)
-        {
-            map["name"] = m_sFriendlyName;
-            map["modelname"] = m_sModelName;
-            map["modelnumber"] = m_sModelNumber;
-            map["modelurl"] = m_sModelURL;
-            map["modeldescription"] = m_sModelDescription;
-            map["manufacturer"] = m_sManufacturer;
-            map["manufacturerurl"] = m_sManufacturerURL;
-            map["devicetype"] = m_sDeviceType;
-            map["serialnumber"] = m_sSerialNumber;
-            map["UDN"] = m_sUDN;
-            map["UPC"] = m_sUPC;
-            map["protocolversion"] = m_protocolVersion;
-        }
+        void toMap(QHash<QString, QString> &map);
 
         UPnpService GetService(const QString &urn, bool *found = NULL) const;
 

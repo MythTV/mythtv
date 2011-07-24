@@ -72,20 +72,21 @@ VDALibrary::VDALibrary(void)
         decoderConfigAVCCData && m_lib->isLoaded())
     {
         m_valid = true;
-        VERBOSE(VB_PLAYBACK, LOC + "Loaded VideoDecodeAcceleration library.");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            "Loaded VideoDecodeAcceleration library.");
     }
     else
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to load VideoDecodeAcceleration "
-                                    "library.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Failed to load VideoDecodeAcceleration library.");
 }
 
-#define INIT_ST OSStatus vda_st; bool ok = true;
+#define INIT_ST OSStatus vda_st; bool ok = true
 #define CHECK_ST \
     ok &= (vda_st == kVDADecoderNoErr); \
     if (!ok) \
-        VERBOSE(VB_IMPORTANT, ERR + QString("Error at %1:%2 (#%3, %4)") \
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
               .arg(__FILE__).arg( __LINE__).arg(vda_st) \
-              .arg(vda_err_to_string(vda_st)));
+              .arg(vda_err_to_string(vda_st)))
 
 QString vda_err_to_string(OSStatus err)
 {
@@ -155,7 +156,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     {
         if (!RewriteAvcc(&extradata, extradata_size, avc_cdata))
         {
-            VERBOSE(VB_IMPORTANT, ERR + "Failed to re-write avcc...");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to re-write avcc...");
             valid_extradata = false;
         }
         else
@@ -171,7 +172,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
 
     if (!valid_extradata)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Invalid avcC atom data");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid avcC atom data");
         return false;
     }
 
@@ -186,7 +187,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     if (((mbs == 49)  || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
          (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128)))
     {
-        VERBOSE(VB_PLAYBACK, LOC +
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
             QString("Warning: VDA decoding may not be supported for this "
                     "video stream (width %1)").arg(width));
     }
@@ -246,7 +247,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     //CFRelease(emptyDictionary);
     if (ok)
     {
-        VERBOSE(VB_PLAYBACK, LOC +
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Created VDA decoder: Size %1x%2 Ref Frames %3 "
                     "Slices %4 AnnexB %5")
             .arg(width).arg(height).arg(m_num_ref_frames).arg(m_slice_count)
@@ -330,9 +331,9 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
                                     &kCFTypeDictionaryKeyCallBacks,
                                     &kCFTypeDictionaryValueCallBacks);
 
-        INIT_ST
+        INIT_ST;
         vda_st = m_lib->decoderDecode((VDADecoder)m_decoder, 0, data, params);
-        CHECK_ST
+        CHECK_ST;
         if (vda_st == kVDADecoderNoErr)
             result = pkt->size;
         CFRelease(data);
@@ -381,7 +382,7 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to convert decoded frame.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to convert decoded frame.");
     }
 
     CVPixelBufferRelease(vdaframe.buffer);
@@ -399,27 +400,27 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
 
     if (kVDADecodeInfo_FrameDropped & infoFlags)
     {
-        VERBOSE(VB_IMPORTANT, ERR + QString("Callback: Decoder dropped frame"));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Callback: Decoder dropped frame");
         return;
     }
     
     if (!imageBuffer)
     {
-        VERBOSE(VB_IMPORTANT, ERR +
-            QString("Callback: decoder returned empty buffer."));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Callback: decoder returned empty buffer.");
         return;
     }
 
-    INIT_ST
+    INIT_ST;
     vda_st = status;
     CHECK_ST;
 
     OSType format_type = CVPixelBufferGetPixelFormatType(imageBuffer);
     if ((format_type != '2vuy') && (format_type != 'BGRA'))
     {
-        VERBOSE(VB_IMPORTANT, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Callback: image buffer format unknown (%1)")
-            .arg(format_type));
+                .arg(format_type));
         return;
     }
 
@@ -518,7 +519,7 @@ bool PrivateDecoderVDA::RewriteAvcc(uint8_t **data, int &len,
 
     if (!sps || !spsend)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to find sps.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find sps.");
         return false;
     }
 

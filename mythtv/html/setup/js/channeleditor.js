@@ -4,18 +4,18 @@ function initChannelEditor() {
     $("#channels").jqGrid({
         url:'/Channel/GetChannelInfoList?SourceID=' + sourceid,
         datatype: 'json',
-        colNames:['Channel ID', 'Channel Number', 'Callsign', 'Channel Name', 'Visible', 'XMLTVID', 'Icon Path',
+        colNames:['Channel ID', 'Channel Number', 'Callsign', 'Channel Name', 'XMLTVID', 'Visible', 'Icon Path',
                   'Multiplex ID', 'Transport ID', 'Service ID', 'Network ID', 'ATSC Major Channel',
                   'ATSC Minor Channel', 'Format', 'Modulation', 'Frequency', 'Frequency ID', 'Frequency Table',
                   'Fine Tuning', 'SI Standard', 'Channel Filters', 'Source ID', 'Input ID', 'Commercial Free',
                   'Use On Air Guide', 'Default Authority'],
         colModel:[
-            {name:'ChanId', editable: true, width:120, sorttype:"int", hidden:true, jsonmap: 'ChanId'},
-            {name:'ChanNum', search: true, editable: true, width:120, sorttype:"int", jsonmap: 'ChanNum'},
+            {name:'ChanId', editable: true, width:50, sorttype:"int", hidden:true, jsonmap: 'ChanId'},
+            {name:'ChanNum', search: true, editable: true, width:70, sorttype:"int", jsonmap: 'ChanNum'},
             {name:'CallSign', search: true, editable: true, width:90, sorttype:"text", jsonmap: 'CallSign'},
-            {name:'ChannelName', search: true, editable: true, width:300, align:"right", sorttype:"text", jsonmap: 'ChannelName'},
+            {name:'ChannelName', search: true, editable: true, width:90, sorttype:"text", jsonmap: 'ChannelName'},
+            {name:'XMLTVID', search: true, editable: true, width:120,  sortable:false, jsonmap: 'XMLTVID'},
             {name:'Visible', search: false, editable: true, width:40, align:"center", sorttype:"bool", jsonmap: 'Visible', formatter:'checkbox',edittype:"checkbox"},
-            {name:'XMLTVID', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'XMLTVID'},
             {name:'IconURL', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'IconURL'},
             {name:'MplexId', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'MplexId'},
             {name:'TransportId', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'TransportId'},
@@ -135,6 +135,7 @@ function editSelectedChannel() {
     $("#channelDetailSettingChanNum").val(rowdata.ChanNum);
     $("#channelDetailSettingChannelName").val(rowdata.ChannelName);
     $("#channelDetailSettingCallSign").val(rowdata.CallSign);
+    initXMLTVIdList();
     $("#channelDetailSettingXMLTVID").val(rowdata.XMLTVID);
     $("#channelDetailSettingIconURL").val(rowdata.IconURL);
     var preview = $("#channelDetailSettingIconPreview");
@@ -387,7 +388,7 @@ function deleteSelectedChannel() {
     var rowArray = $('#channels').jqGrid('getGridParam','selarrrow');
     if (rowArray.length > 0) {
         var len = rowArray.length;
-        for (var i=0; i < len; i++) {
+        for (var i = len - 1; i >= 0; i--) {
             var chanid = rowArray[i];
             if ($("#channels").jqGrid('delRowData', chanid)) {
                 $.post("/Channel/DeleteDBChannel",
@@ -451,6 +452,25 @@ function initVideoMultiplexSelect(sourceid) {
 
     return result;
 }
+
+
+function initXMLTVIdList() {
+    var sourceid = $("#sourceList").val();
+    var ids = new Array();
+    var x = 0;
+    $.ajaxSetup({ async: false });
+    $.post("/Channel/GetXMLTVIds", { SourceID : sourceid }, function(data) {
+       $.each(data.QStringList, function(i, value) {
+            ids[x] = value;
+            x++;
+        });
+    }, "json");
+
+    $.ajaxSetup({ async: true });
+
+    $( "#channelDetailSettingXMLTVID" ).autocomplete({ source: ids });
+}
+
 
 function choseNewChanIcon(url) {
     $("#channelDetailSettingIconURL").val(url);

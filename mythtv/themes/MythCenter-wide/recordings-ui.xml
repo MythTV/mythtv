@@ -829,30 +829,63 @@
         </textarea>
 
         <textarea name="titlelabel" from="basetextarea">
-            <area>58,80,300,30</area>
+            <area>8,120,90,30</area>
+            <align>right,vcenter</align>
             <value>Title:</value>
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>58,110</position>
+            <position>105,110</position>
         </textedit>
 
         <textarea name="subtitlelabel" from="basetextarea">
-            <area>58,170,300,30</area>
+            <area>8,180,90,30</area>
+            <align>right,vcenter</align>
             <value>Subtitle:</value>
         </textarea>
 
         <textedit name="subtitle" from="basetextedit">
-            <position>58,200</position>
+            <position>105,170</position>
         </textedit>
 
-        <textarea name="descriptionlabel" from="basetextarea">
-            <area>58,260,300,30</area>
-            <value>Description:</value>
+        <textarea name="inetreflabel" from="basetextarea">
+            <area>8,240,90,30</area>
+            <align>right,vcenter</align>
+            <value>Inetref:</value>
         </textarea>
 
-        <textedit name="description" from="basemultilinetextedit">
-            <position>58,290</position>
+        <textedit name="inetref" from="basetextedit">
+            <position>105,230</position>
+        </textedit>
+
+        <textarea name="seaslabel" from="basetextarea">
+            <area>8,300,90,30</area>
+            <align>right,vcenter</align>
+            <value>Season:</value>
+        </textarea>
+
+        <spinbox name="season" from="basespinbox">
+            <position>105,290</position>
+        </spinbox>
+
+        <textarea name="eplabel" from="basetextarea">
+            <area>208,300,90,30</area>
+            <align>right,vcenter</align>
+            <value>Episode:</value>
+        </textarea>
+
+        <spinbox name="episode" from="basespinbox">
+            <position>305,290</position>
+        </spinbox>
+
+        <textarea name="descriptionlabel" from="basetextarea">
+            <area>8,360,90,30</area>
+            <align>right,vcenter</align>
+            <value>Plot:</value>
+        </textarea>
+
+        <textedit name="description" from="basetextedit">
+            <position>105,350</position>
         </textedit>
 
         <button name="ok" from="basebutton">

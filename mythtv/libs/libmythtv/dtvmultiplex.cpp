@@ -5,8 +5,6 @@
 #include "mpeg/dvbdescriptors.h"
 
 #define LOC      QString("DTVMux: ")
-#define LOC_ERR  QString("DTVMux, Error: ")
-#define LOC_WARN QString("DTVMux, Warning: ")
 
 
 DTVMultiplex &DTVMultiplex::operator=(const DTVMultiplex &other)
@@ -153,16 +151,16 @@ bool DTVMultiplex::ParseATSC(const QString &_frequency,
     frequency = _frequency.toULongLong(&ok);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, QString("Failed to parse ATSC frequency %1")
-                .arg(_frequency));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to parse ATSC frequency %1").arg(_frequency));
         return false;
     }
 
     ok = modulation.Parse(_modulation);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, QString("Failed to parse ATSC modulation %1")
-                .arg(_modulation));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to parse ATSC modulation %1").arg(_modulation));
     }
     return ok;
 }
@@ -177,8 +175,8 @@ bool DTVMultiplex::ParseDVB_T(
     bool ok = inversion.Parse(_inversion);
     if (!ok)
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                "Invalid inversion, falling back to 'auto'.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Invalid inversion, falling back to 'auto'.");
         ok = true;
     }
 
@@ -203,8 +201,8 @@ bool DTVMultiplex::ParseDVB_S_and_C(
     bool ok = inversion.Parse(_inversion);
     if (!ok)
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                "Invalid inversion, falling back to 'auto'");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Invalid inversion, falling back to 'auto'");
 
         ok = true;
     }
@@ -212,8 +210,8 @@ bool DTVMultiplex::ParseDVB_S_and_C(
     symbolrate = _symbol_rate.toInt();
     if (!symbolrate)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid symbol rate " +
-                QString("parameter '%1', aborting.").arg(_symbol_rate));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid symbol rate " +
+            QString("parameter '%1', aborting.").arg(_symbol_rate));
 
         return false;
     }
@@ -241,7 +239,7 @@ bool DTVMultiplex::ParseDVB_S2(
 
     if (!mod_sys.Parse(_mod_sys))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid S2 modulation system " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid S2 modulation system " +
                 QString("parameter '%1', aborting.").arg(_mod_sys));
         return false;
     }
@@ -288,7 +286,7 @@ bool DTVMultiplex::ParseTuningParams(
     if (DTVTunerType::kTunerTypeATSC == type)
         return ParseATSC(_frequency, _modulation);
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR + "ParseTuningParams -- Unknown tuner type");
+    LOG(VB_GENERAL, LOG_ERR, LOC + "ParseTuningParams -- Unknown tuner type");
 
     return false;
 }
@@ -317,8 +315,8 @@ bool DTVMultiplex::FillFromDB(DTVTunerType type, uint mplexid)
 
     if (!query.next())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Could not find tuning parameters for mplex %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Could not find tuning parameters for mplex %1")
                 .arg(mplexid));
 
         return false;
@@ -372,8 +370,8 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
             {
                 if (cd.ModulationSystem())
                 {
-                    VERBOSE(VB_CHANSCAN,
-                            "Ignoring DVB-S2 transponder with DVB-S card");
+                    LOG(VB_CHANSCAN, LOG_NOTICE, LOC +
+                        "Ignoring DVB-S2 transponder with DVB-S card");
                     return false;
                 }
 
@@ -409,11 +407,13 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                     cd.ModulationString(),               QString());
         }
         default:
-            VERBOSE(VB_CHANSCAN, "unknown delivery system descriptor");
+            LOG(VB_CHANSCAN, LOG_ERR, LOC +
+                "unknown delivery system descriptor");
             return false;
     }
 
-    VERBOSE(VB_CHANSCAN, QString("Tuner type %1 does not match delivery system")
+    LOG(VB_CHANSCAN, LOG_ERR, LOC +
+        QString("Tuner type %1 does not match delivery system")
             .arg(type.toString()));
     return false;
 }

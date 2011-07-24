@@ -33,8 +33,6 @@ extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, u
 }
 
 #define LOC      QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())
-#define LOC_WARN QString("DTVRec(%1) Warning: ").arg(tvrec->GetCaptureCardNum())
-#define LOC_ERR  QString("DTVRec(%1) Error: ").arg(tvrec->GetCaptureCardNum())
 
 const uint DTVRecorder::kMaxKeyFrameDistance = 80;
 
@@ -166,7 +164,7 @@ void DTVRecorder::FinishRecording(void)
 
 void DTVRecorder::ResetForNewFile(void)
 {
-    VERBOSE(VB_RECORD, LOC + "ResetForNewFile(void)");
+    LOG(VB_RECORD, LOG_INFO, LOC + "ResetForNewFile(void)");
     QMutexLocker locker(&positionMapLock);
 
     // _first_keyframe, _seen_psp and m_h264_parser should
@@ -207,7 +205,7 @@ void DTVRecorder::ResetForNewFile(void)
 // documented in recorderbase.h
 void DTVRecorder::Reset(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Reset(void)");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Reset(void)");
     ResetForNewFile();
 
     _start_code = 0xffffffff;
@@ -413,8 +411,8 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     if (frameRate && frameRate != m_frameRate)
     {
         m_frameRate = frameRate;
-        VERBOSE(VB_RECORD, QString("FindMPEG2Keyframes: frame rate = %1")
-                .arg(frameRate));
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("FindMPEG2Keyframes: frame rate = %1") .arg(frameRate));
         FrameRateChange(frameRate, _frames_written_count);
     }
 
@@ -467,7 +465,7 @@ bool DTVRecorder::FindOtherKeyframes(const TSPacket *tspacket)
     if (_has_written_other_keyframe)
         return true;
 
-    VERBOSE(VB_RECORD, LOC + "DSMCC - FindOtherKeyframes() - "
+    LOG(VB_RECORD, LOG_INFO, LOC + "DSMCC - FindOtherKeyframes() - "
             "generating initial key-frame");
 
     _frames_seen_count++;
@@ -484,7 +482,7 @@ bool DTVRecorder::FindOtherKeyframes(const TSPacket *tspacket)
 // documented in recorderbase.h
 void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
 {
-    VERBOSE(VB_RECORD, LOC + QString("SetNextRecord(0x%1, 0x%2)")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("SetNextRecord(0x%1, 0x%2)")
             .arg((uint64_t)progInf,0,16).arg((uint64_t)rb,0,16));
     // First we do some of the time consuming stuff we can do now
     SavePositionMap(true);
@@ -553,7 +551,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
 {
     if (!ringBuffer)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "FindH264Keyframes: No ringbuffer");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "FindH264Keyframes: No ringbuffer");
         return false;
     }
 
@@ -587,8 +585,9 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
             // bounds check
             if (i + 2 >= TSPacket::kSize)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "PES packet start code may overflow to next TS packet, aborting keyframe search");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "PES packet start code may overflow to next TS packet, "
+                    "aborting keyframe search");
                 break;
             }
 
@@ -597,7 +596,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
                 tspacket->data()[i++] != 0x00 ||
                 tspacket->data()[i++] != 0x01)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                LOG(VB_GENERAL, LOG_ERR, LOC +
                     "PES start code not found in TS packet with PUSI set");
                 break;
             }
@@ -605,8 +604,9 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
             // bounds check
             if (i + 5 >= TSPacket::kSize)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "PES packet headers overflow to next TS packet, aborting keyframe search");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "PES packet headers overflow to next TS packet, "
+                    "aborting keyframe search");
                 break;
             }
 
@@ -621,17 +621,21 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
             // bounds check
             if ((i + 6 + pes_header_length) >= TSPacket::kSize)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "PES packet headers overflow to next TS packet, aborting keyframe search");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "PES packet headers overflow to next TS packet, "
+                    "aborting keyframe search");
                 break;
             }
 
             // we now know where the PES payload is
-            // normally, we should have used 6, but use 5 because the for loop will bump i
+            // normally, we should have used 6, but use 5 because the for 
+            // loop will bump i
             i += 5 + pes_header_length;
             _pes_synced = true;
 
-            //VERBOSE(VB_RECORD, LOC + "PES synced");
+#if 0
+            LOG(VB_RECORD, LOG_DEBUG, LOC + "PES synced");
+#endif
             continue;
         }
 
@@ -693,7 +697,8 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
     if (frameRate != 0 && frameRate != m_frameRate)
     {
 
-        VERBOSE( VB_RECORD, QString("FindH264Keyframes: timescale: %1, tick: %2, framerate: %3") 
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("FindH264Keyframes: timescale: %1, tick: %2, framerate: %3")
                       .arg( m_h264_parser.GetTimeScale() ) 
                       .arg( m_h264_parser.GetUnitsInTick() )
                       .arg( frameRate ) );
@@ -864,8 +869,8 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
         if (frameRate && frameRate != m_frameRate)
         {
             m_frameRate = frameRate;
-            VERBOSE(VB_RECORD, QString("FindPSKeyFrames: frame rate = %1")
-                    .arg(frameRate));
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                QString("FindPSKeyFrames: frame rate = %1").arg(frameRate));
             FrameRateChange(frameRate, _frames_written_count);
         }
 
@@ -908,7 +913,8 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
     _payload_buffer.resize(idx + rem);
     memcpy(&_payload_buffer[idx], bufstart, rem);
 #if 0
-VERBOSE(VB_GENERAL, QString("idx: %1, rem: %2").arg(idx).arg(rem) );
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+        QString("idx: %1, rem: %2").arg(idx).arg(rem));
 #endif
 }
 
@@ -916,7 +922,7 @@ void DTVRecorder::HandlePAT(const ProgramAssociationTable *_pat)
 {
     if (!_pat)
     {
-        VERBOSE(VB_RECORD, LOC + "SetPAT(NULL)");
+        LOG(VB_RECORD, LOG_ERR, LOC + "SetPAT(NULL)");
         return;
     }
 
@@ -927,12 +933,12 @@ void DTVRecorder::HandlePAT(const ProgramAssociationTable *_pat)
 
     if (!pmtpid)
     {
-        VERBOSE(VB_RECORD, LOC + "SetPAT(): "
-                "Ignoring PAT not containing our desired program...");
+        LOG(VB_RECORD, LOG_ERR, LOC + "SetPAT(): "
+            "Ignoring PAT not containing our desired program...");
         return;
     }
 
-    VERBOSE(VB_RECORD, LOC + QString("SetPAT(%1 on 0x%2)")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("SetPAT(%1 on 0x%2)")
             .arg(progNum).arg(pmtpid,0,16));
 
     ProgramAssociationTable *oldpat = _input_pat;
@@ -954,7 +960,7 @@ void DTVRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
 
     if ((int)progNum == _stream_data->DesiredProgram())
     {
-        VERBOSE(VB_RECORD, LOC + QString("SetPMT(%1)").arg(progNum));
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("SetPMT(%1)").arg(progNum));
         ProgramMapTable *oldpmt = _input_pmt;
         _input_pmt = new ProgramMapTable(*_pmt);
 
@@ -977,7 +983,7 @@ void DTVRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
 {
     if (!pat)
     {
-        VERBOSE(VB_RECORD, LOC + "HandleSingleProgramPAT(NULL)");
+        LOG(VB_RECORD, LOG_ERR, LOC + "HandleSingleProgramPAT(NULL)");
         return;
     }
 
@@ -996,7 +1002,7 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
 {
     if (!pmt)
     {
-        VERBOSE(VB_RECORD, LOC + "HandleSingleProgramPMT(NULL)");
+        LOG(VB_RECORD, LOG_ERR, LOC + "HandleSingleProgramPMT(NULL)");
         return;
     }
 
@@ -1028,8 +1034,8 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
     {
         _continuity_error_count++;
         double erate = _continuity_error_count * 100.0 / _packet_count;
-        VERBOSE(VB_RECORD, LOC_WARN +
-                QString("PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
+        LOG(VB_RECORD, LOG_WARNING, LOC +
+            QString("PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
                 .arg(pid,0,16).arg(old_cnt,2)
                 .arg(tspacket.ContinuityCounter(),2)
                 .arg(erate));
@@ -1100,9 +1106,8 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
     {
         _continuity_error_count++;
         double erate = _continuity_error_count * 100.0 / _packet_count;
-        VERBOSE(VB_RECORD, LOC_WARN +
-                QString("A/V PID 0x%1 discontinuity detected "
-                        "((%2+1)%16!=%3) %4\%")
+        LOG(VB_RECORD, LOG_WARNING, LOC +
+            QString("A/V PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
                 .arg(pid,0,16).arg(old_cnt).arg(tspacket.ContinuityCounter())
                 .arg(erate,5,'f',2));
     }
@@ -1118,8 +1123,8 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
         if (!tspacket.PayloadStart())
             return true; // not payload start - drop packet
 
-        VERBOSE(VB_RECORD,
-                QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
 
         _pid_status[pid] |= kPayloadStartSeen;
     }

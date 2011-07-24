@@ -35,8 +35,6 @@ using namespace std;
 #include "channelimporter.h"
 
 #define LOC      QString("ChScanCLI: ")
-#define LOC_WARN QString("ChScanCLI, Warning: ")
-#define LOC_ERR  QString("ChScanCLI, Error: ")
 
 ChannelScannerCLI::ChannelScannerCLI(bool doScanSaveOnly, bool promptsOk) :
     done(false), onlysavescan(doScanSaveOnly), interactive(promptsOk),
@@ -95,7 +93,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
 
     //cout<<"HERE<"<<verboseMask<<">"<<endl;
     QString msg;
-    if (VERBOSE_LEVEL_NONE || VERBOSE_LEVEL_CHECK(VB_CHANSCAN))
+    if (VERBOSE_LEVEL_NONE || VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))
     {
         msg.sprintf("%3i%% S/N %3.1f %s : %s (%s) %20s",
                     status_complete, status_snr,
@@ -105,12 +103,12 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
     }
     //cout<<msg.toAscii().constData()<<endl;
 
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN))
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))
     {
         static QString old_msg;
         if (msg != old_msg)
         {
-            VERBOSE(VB_CHANSCAN, LOC + msg);
+            LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
             old_msg = msg;
         }
     }
@@ -131,7 +129,7 @@ void ChannelScannerCLI::InformUser(const QString &error)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + error);
     }
     post_event(scanMonitor, ScannerEvent::ScanComplete, 0);
 }

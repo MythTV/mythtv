@@ -87,7 +87,7 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Chain: AppendNewProgram", query);
     else
-        VERBOSE(VB_RECORD, QString("Chain: Appended@%3 '%1_%2'")
+        LOG(VB_RECORD, LOG_INFO, QString("Chain: Appended@%3 '%1_%2'")
                 .arg(newent.chanid)
                 .arg(newent.starttime.toString("yyyyMMddhhmmss"))
                 .arg(m_maxpos));
@@ -110,7 +110,8 @@ void LiveTVChain::FinishedRecording(ProgramInfo *pginfo)
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Chain: FinishedRecording", query);
     else
-        VERBOSE(VB_RECORD, QString("Chain: Updated endtime for '%1_%2' to %3")
+        LOG(VB_RECORD, LOG_INFO,
+            QString("Chain: Updated endtime for '%1_%2' to %3")
                 .arg(pginfo->GetChanID())
                 .arg(pginfo->GetRecordingStartTime(MythDate))
                 .arg(pginfo->GetRecordingEndTime(MythDate)));
@@ -237,8 +238,7 @@ void LiveTVChain::ReloadAll(void)
 
     if (prev_size!=m_chain.size())
     {
-        VERBOSE(VB_PLAYBACK, LOC +
-                "ReloadAll(): Added new recording");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "ReloadAll(): Added new recording");
     }
 }
 
@@ -253,14 +253,14 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
         entry = m_chain[new_at];
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("GetEntryAt(%1) failed.").arg(at));
+        LOG(VB_GENERAL, LOG_ERR, QString("GetEntryAt(%1) failed.").arg(at));
         if (at == -1)
-            VERBOSE(VB_IMPORTANT, QString("It appears that your backend may "
-                    "be misconfigured.  Check your backend logs to determine "
-                    "whether your capture cards, lineups, channels, or storage "
-                    "configuration are reporting errors.  This issue is commonly "
-                    "caused by failing to complete all setup steps properly.  You "
-                    "may wish to review the documentation for mythtv-setup."));
+            LOG(VB_GENERAL, LOG_ERR, "It appears that your backend may "
+                "be misconfigured.  Check your backend logs to determine "
+                "whether your capture cards, lineups, channels, or storage "
+                "configuration are reporting errors.  This issue is commonly "
+                "caused by failing to complete all setup steps properly.  You "
+                "may wish to review the documentation for mythtv-setup.");
         entry.chanid = 0;
         entry.starttime.setTime_t(0);
     }
@@ -276,8 +276,8 @@ ProgramInfo *LiveTVChain::EntryToProgram(const LiveTVChainEntry &entry)
         return pginfo;
     }
 
-    VERBOSE(VB_IMPORTANT,
-            QString("EntryToProgram(%1@%2) failed to get pginfo")
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("EntryToProgram(%1@%2) failed to get pginfo")
             .arg(entry.chanid).arg(entry.starttime.toString()));
     delete pginfo;
     return NULL;
@@ -459,7 +459,7 @@ void LiveTVChain::SwitchTo(int num)
 {
     QMutexLocker lock(&m_lock);
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("SwitchTo(%1)").arg(num));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchTo(%1)").arg(num));
 
     int size = m_chain.count();
     if ((num < 0) || (num >= size))
@@ -471,15 +471,16 @@ void LiveTVChain::SwitchTo(int num)
         GetEntryAt(num, m_switchentry);
     }
     else
-        VERBOSE(VB_IMPORTANT, LOC + "SwitchTo() not switching to current");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "SwitchTo() not switching to current");
 
-    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK))
+    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
     {
         LiveTVChainEntry e;
         GetEntryAt(num, e);
         QString msg = QString("%1_%2")
             .arg(e.chanid).arg(e.starttime.toString("yyyyMMddhhmmss"));
-        VERBOSE(VB_PLAYBACK, LOC + QString("Entry@%1: '%2')").arg(num).arg(msg));
+        LOG(VB_PLAYBACK, LOG_DEBUG,
+            LOC + QString("Entry@%1: '%2')").arg(num).arg(msg));
     }
 }
 
@@ -490,7 +491,9 @@ void LiveTVChain::SwitchTo(int num)
  */
 void LiveTVChain::SwitchToNext(bool up)
 {
-    //VERBOSE(VB_PLAYBACK, LOC + "SwitchToNext("<<(up?"up":"down")<<")");
+#if 0
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "SwitchToNext("<<(up?"up":"down")<<")");
+#endif
     if (up && HasNext())
         SwitchTo(m_curpos + 1);
     else if (!up && HasPrev())

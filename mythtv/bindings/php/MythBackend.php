@@ -11,8 +11,8 @@ class MythBackend {
 
 // MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 // and should be the current MythTV protocol version.
-    static $protocol_version        = '66';
-    static $protocol_token          = '0C0FFEE0';
+    static $protocol_version        = '69';
+    static $protocol_token          = '63835135';
 
 // The character string used by the backend to separate records
     static $backend_separator       = '[]:[]';
@@ -20,7 +20,7 @@ class MythBackend {
 // NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 // the number of items in a ProgramInfo QStringList group used by
 // ProgramInfo::ToSringList and ProgramInfo::FromStringList.
-    static $program_line_number     = 41;
+    static $program_line_number     = 44;
 
     private $fp                     = null;
     private $connected              = false;

@@ -9,7 +9,6 @@
 #include "channelgroupsettings.h"
 
 #define LOC QString("Channel Group Settings: ")
-#define LOC_ERR QString("Channel Group Settings, Error: ")
 
 // Storage class for channel group editor in settings
 class ChannelGroupStorage : public Storage

@@ -6,8 +6,6 @@
 #include "mythdvdplayer.h"
 
 #define LOC      QString("DVDPlayer: ")
-#define LOC_WARN QString("DVDPlayer, Warning: ")
-#define LOC_ERR  QString("DVDPlayer, Error: ")
 
 MythDVDPlayer::MythDVDPlayer(bool muted)
   : MythPlayer(muted), m_buttonVersion(0),
@@ -102,8 +100,11 @@ bool MythDVDPlayer::VideoLoop(void)
     if (videoOutput)
         nbframes = videoOutput->ValidVideoFrames();
 
-    //VERBOSE(VB_PLAYBACK, LOC + QString("Validframes %1, FreeFrames %2, VideoPaused %3")
-    //    .arg(nbframes).arg(videoOutput->FreeVideoFrames()).arg(videoPaused));
+#if 0
+    LOG(VB_PLAYBACK, LOG_DEBUG,
+        LOC + QString("Validframes %1, FreeFrames %2, VideoPaused %3")
+           .arg(nbframes).arg(videoOutput->FreeVideoFrames()).arg(videoPaused));
+#endif
 
     // completely drain the video buffers for certain situations
     bool release_all = player_ctx->buffer->DVD()->DVDWaitingForPlayer() &&
@@ -127,7 +128,7 @@ bool MythDVDPlayer::VideoLoop(void)
     // clear the mythtv imposed wait state
     if (player_ctx->buffer->DVD()->DVDWaitingForPlayer())
     {
-        VERBOSE(VB_PLAYBACK, LOC + "Clearing Mythtv dvd wait state");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Clearing MythTV DVD wait state");
         bool inStillFrame = player_ctx->buffer->DVD()->IsInStillFrame();
         player_ctx->buffer->DVD()->SkipDVDWaitingForPlayer();
         ClearAfterSeek(true);
@@ -142,7 +143,7 @@ bool MythDVDPlayer::VideoLoop(void)
         // clear the DVD wait state
         if (player_ctx->buffer->DVD()->IsWaiting())
         {
-            VERBOSE(VB_PLAYBACK, LOC + "Clearing DVD wait state");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Clearing DVD wait state");
             bool inStillFrame = player_ctx->buffer->DVD()->IsInStillFrame();
             player_ctx->buffer->DVD()->WaitSkip();
             if (!inStillFrame && videoPaused)
@@ -183,7 +184,7 @@ bool MythDVDPlayer::VideoLoop(void)
             // flag if we have no frame
             if (nbframes == 0)
             {
-                VERBOSE(VB_PLAYBACK, LOC_WARN +
+                LOG(VB_PLAYBACK, LOG_WARNING, LOC +
                         "In DVD Menu: No video frames in queue");
                 usleep(10000);
                 return !IsErrored();
@@ -350,8 +351,9 @@ uint64_t MythDVDPlayer::GetBookmark(void)
             frames = (long long)((*++it).toLongLong() & 0xffffffffLL);
             m_initial_audio_track    = (*++it).toInt();
             m_initial_subtitle_track = (*++it).toInt();
-            VERBOSE(VB_PLAYBACK, LOC +
-                QString("Get Bookmark: title %1 audiotrack %2 subtrack %3 frame %4")
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Get Bookmark: title %1 audiotrack %2 subtrack %3 "
+                        "frame %4")
                 .arg(m_initial_title).arg(m_initial_audio_track)
                 .arg(m_initial_subtitle_track).arg(frames));
         }
@@ -550,7 +552,7 @@ bool MythDVDPlayer::GoToMenu(QString str)
     if (!ret)
     {
         SetOSDMessage(QObject::tr("DVD Menu Not Available"), kOSDTimeout_Med);
-        VERBOSE(VB_GENERAL, "No DVD Menu available.");
+        LOG(VB_GENERAL, LOG_ERR, "No DVD Menu available.");
         return false;
     }
 
@@ -582,9 +584,8 @@ void MythDVDPlayer::SetDVDBookmark(uint64_t frame)
     int subtitletrack = -1;
     if (!player_ctx->buffer->DVD()->GetNameAndSerialNum(name, serialid))
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("DVD has no name and serial number. "
-                        "Cannot set bookmark."));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "DVD has no name and serial number. Cannot set bookmark.");
         return;
     }
 
@@ -613,7 +614,7 @@ void MythDVDPlayer::SetDVDBookmark(uint64_t frame)
         fields += QString("%1").arg(subtitletrack);
         fields += QString("%1").arg(framenum);
         player_ctx->playingInfo->SaveDVDBookmark(fields);
-        VERBOSE(VB_PLAYBACK, LOC +
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Set Bookmark: title %1 audiotrack %2 subtrack %3 frame %4")
             .arg(title).arg(audiotrack).arg(subtitletrack).arg(framenum));
     }
@@ -679,9 +680,9 @@ void MythDVDPlayer::StillFrameCheck(void)
         m_stillFrameTimerLock.unlock();
         if (elapsedTime >= m_stillFrameLength)
         {
-            VERBOSE(VB_PLAYBACK, LOC +
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Stillframe timeout after %1 seconds")
-                .arg(m_stillFrameLength));
+                    .arg(m_stillFrameLength));
             player_ctx->buffer->DVD()->SkipStillFrame();
             m_stillFrameLength = 0;
         }

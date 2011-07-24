@@ -15,7 +15,6 @@
 #include "v4lchannel.h"
 
 #define LOC QString("AnalogSM(%1): ").arg(channel->GetDevice())
-#define LOC_ERR QString("AnalogSM(%1), Error: ").arg(channel->GetDevice())
 
 AnalogSignalMonitor::AnalogSignalMonitor(
     int db_cardnum, V4LChannel *_channel, uint64_t _flags) :
@@ -32,7 +31,7 @@ AnalogSignalMonitor::AnalogSignalMonitor(
             return;
         }
         m_usingv4l2 = !!(caps & V4L2_CAP_VIDEO_CAPTURE);
-        VERBOSE(VB_RECORD, LOC + QString("card '%1' driver '%2' version '%3'")
+        LOG(VB_RECORD, LOG_INFO, QString("card '%1' driver '%2' version '%3'")
                 .arg(m_card).arg(m_driver).arg(m_version));
     }
 }
@@ -44,7 +43,7 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
 
     if (m_stage == 0)
     {
-        VERBOSE(VB_RECORD, LOC + "hd-pvr start encoding");
+        LOG(VB_RECORD, LOG_INFO, "hd-pvr start encoding");
         // Tell it to start encoding, then wait for it to actually feed us
         // some data.
         memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
@@ -53,7 +52,7 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
             m_stage = 1;
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Start encoding failed" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, "Start encoding failed" + ENO);
             command.cmd = V4L2_ENC_CMD_STOP;
             ioctl(videofd, VIDIOC_ENCODER_CMD, &command);
         }
@@ -61,7 +60,7 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
 
     if (m_stage == 1)
     {
-        VERBOSE(VB_RECORD, LOC + "hd-pvr wait for data");
+        LOG(VB_RECORD, LOG_INFO, "hd-pvr wait for data");
 
         polls.fd      = videofd;
         polls.events  = POLLIN;
@@ -75,7 +74,7 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
         }
         else
         {
-            VERBOSE(VB_RECORD, LOC + "Poll timed-out.  Resetting");
+            LOG(VB_RECORD, LOG_INFO, "Poll timed-out.  Resetting");
             memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
             command.cmd = V4L2_ENC_CMD_STOP;
             ioctl(videofd, VIDIOC_ENCODER_CMD, &command);
@@ -88,7 +87,7 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
 
     if (m_stage == 2)
     {
-        VERBOSE(VB_RECORD, LOC + "hd-pvr data ready.  Stop encoding");
+        LOG(VB_RECORD, LOG_INFO, "hd-pvr data ready.  Stop encoding");
 
         command.cmd = V4L2_ENC_CMD_STOP;
         if (ioctl(videofd, VIDIOC_ENCODER_CMD, &command) == 0)
@@ -106,10 +105,10 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
         memset(&vfmt, 0, sizeof(vfmt));
         vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-        VERBOSE(VB_RECORD, LOC + "hd-pvr waiting for valid resolution");
+        LOG(VB_RECORD, LOG_INFO, "hd-pvr waiting for valid resolution");
         if ((ioctl(videofd, VIDIOC_G_FMT, &vfmt) == 0) && vfmt.fmt.pix.width)
         {
-            VERBOSE(VB_RECORD, LOC + QString("hd-pvr resolution %1 x %2")
+            LOG(VB_RECORD, LOG_INFO, QString("hd-pvr resolution %1 x %2")
                     .arg(vfmt.fmt.pix.width).arg(vfmt.fmt.pix.height));
             m_stage = 4;
         }
@@ -152,8 +151,7 @@ void AnalogSignalMonitor::UpdateValues(void)
 
             if (ioctl(videofd, VIDIOC_G_TUNER, &tuner, 0) < 0)
             {
-                VERBOSE(VB_IMPORTANT,
-                        LOC_ERR + "Failed to probe signal (v4l2)" + ENO);
+                LOG(VB_GENERAL, LOG_ERR, "Failed to probe signal (v4l2)" + ENO);
             }
             else
             {
@@ -169,8 +167,7 @@ void AnalogSignalMonitor::UpdateValues(void)
 
         if (ioctl(videofd, VIDIOCGTUNER, &tuner, 0) < 0)
         {
-            VERBOSE(VB_IMPORTANT,
-                    LOC_ERR + "Failed to probe signal (v4l1)" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, "Failed to probe signal (v4l1)" + ENO);
         }
         else
         {

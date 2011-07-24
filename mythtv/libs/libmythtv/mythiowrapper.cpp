@@ -58,7 +58,6 @@ QMutex                        m_callbackLock;
 QMultiHash<QString, Callback> m_fileOpenCallbacks;
 
 #define LOC     QString("mythiowrapper: ")
-#define LOC_ERR QString("mythiowrapper: ERROR: ")
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -78,11 +77,11 @@ static int getNextFileID(void)
 
     if (id == maxID)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "getNextFileID(), too "
-                "many files are open.");
+        LOG(VB_GENERAL, LOG_ERR,
+            LOC + "getNextFileID(), too many files are open.");
     }
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("getNextFileID() = %1").arg(id));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("getNextFileID() = %1").arg(id));
 
     return id;
 }
@@ -103,10 +102,11 @@ void mythfile_open_register_callback(const char *pathname, void* object,
             if (object == it.value().m_object)
             {
                 it.remove();
-                VERBOSE(VB_PLAYBACK, LOC +
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("Removing fileopen callback for %1").arg(path));
-                VERBOSE(VB_PLAYBACK, LOC + QString("%1 callbacks remaining")
-                    .arg(m_fileOpenCallbacks.size()));
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    QString("%1 callbacks remaining")
+                        .arg(m_fileOpenCallbacks.size()));
                 m_callbackLock.unlock();
                 return;
             }
@@ -115,9 +115,9 @@ void mythfile_open_register_callback(const char *pathname, void* object,
 
     Callback new_callback(object, func);
     m_fileOpenCallbacks.insert(path, new_callback);
-    VERBOSE(VB_PLAYBACK, LOC +
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Added fileopen callback for %1").arg(path));
-    VERBOSE(VB_PLAYBACK, LOC + QString("%1 callbacks open")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 callbacks open")
         .arg(m_fileOpenCallbacks.size()));
 
     m_callbackLock.unlock();
@@ -125,8 +125,7 @@ void mythfile_open_register_callback(const char *pathname, void* object,
 
 int mythfile_check(int id)
 {
-    VERBOSE(VB_FILE+VB_EXTRA,
-            QString("mythfile_check(%1)").arg(id));
+    LOG(VB_FILE, LOG_DEBUG, QString("mythfile_check(%1)").arg(id));
     int result = 0;
 
     m_fileWrapperLock.lockForWrite();
@@ -143,8 +142,8 @@ int mythfile_check(int id)
 
 int mythfile_open(const char *pathname, int flags)
 {
-    VERBOSE(VB_FILE+VB_EXTRA,
-            QString("mythfile_open('%1', %2)").arg(pathname).arg(flags));
+    LOG(VB_FILE, LOG_DEBUG, QString("mythfile_open('%1', %2)")
+            .arg(pathname).arg(flags));
 
     struct stat fileinfo;
     if (mythfile_stat(pathname, &fileinfo))
@@ -232,7 +231,7 @@ int mythfile_close(int fileID)
 {
     int result = -1;
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("mythfile_close(%1)").arg(fileID));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_close(%1)").arg(fileID));
 
     m_fileWrapperLock.lockForRead();
     if (m_ringbuffers.contains(fileID))
@@ -272,7 +271,7 @@ off_t mythfile_seek(int fileID, off_t offset, int whence)
 {
     off_t result = -1;
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("mythfile_seek(%1, %2, %3)")
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_seek(%1, %2, %3)")
                                       .arg(fileID).arg(offset).arg(whence));
     
     m_fileWrapperLock.lockForRead();
@@ -291,7 +290,7 @@ off_t mythfile_tell(int fileID)
 {
     off_t result = -1;
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("mythfile_tell(%1)").arg(fileID));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_tell(%1)").arg(fileID));
 
     m_fileWrapperLock.lockForRead();
     if (m_ringbuffers.contains(fileID))
@@ -313,8 +312,8 @@ ssize_t mythfile_read(int fileID, void *buf, size_t count)
 {
     ssize_t result = -1;
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("mythfile_read(%1, %2, %3)").arg(fileID)
-                                      .arg((long long)buf).arg(count));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_read(%1, %2, %3)")
+            .arg(fileID) .arg((long long)buf).arg(count));
 
     m_fileWrapperLock.lockForRead();
     if (m_ringbuffers.contains(fileID))
@@ -332,8 +331,8 @@ ssize_t mythfile_write(int fileID, void *buf, size_t count)
 {
     ssize_t result = -1;
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("mythfile_write(%1, %2, %3)").arg(fileID)
-                                      .arg((long long)buf).arg(count));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_write(%1, %2, %3)")
+            .arg(fileID) .arg((long long)buf).arg(count));
 
     m_fileWrapperLock.lockForRead();
     if (m_ringbuffers.contains(fileID))
@@ -349,8 +348,8 @@ ssize_t mythfile_write(int fileID, void *buf, size_t count)
 
 int mythfile_stat(const char *path, struct stat *buf)
 {
-    VERBOSE(VB_FILE+VB_EXTRA,
-            QString("mythfile_stat('%1', %2)").arg(path).arg((long long)buf));
+    LOG(VB_FILE, LOG_DEBUG, QString("mythfile_stat('%1', %2)")
+            .arg(path).arg((long long)buf));
 
     if (!strncmp(path, "myth://", 7))
     {
@@ -364,8 +363,8 @@ int mythfile_stat(const char *path, struct stat *buf)
 
 int mythfile_stat_fd(int fileID, struct stat *buf)
 {
-    VERBOSE(VB_FILE+VB_EXTRA,
-            QString("mythfile_stat_fd(%1, %2)").arg(fileID).arg((long long)buf));
+    LOG(VB_FILE, LOG_DEBUG, QString("mythfile_stat_fd(%1, %2)")
+            .arg(fileID).arg((long long)buf));
 
     m_fileWrapperLock.lockForRead();
     if (!m_filenames.contains(fileID))
@@ -381,8 +380,8 @@ int mythfile_stat_fd(int fileID, struct stat *buf)
 
 int mythfile_exists(const char *path, const char *file)
 {
-    VERBOSE(VB_FILE+VB_EXTRA,
-            QString("mythfile_exists('%1', '%2')").arg(path).arg(file));
+    LOG(VB_FILE, LOG_DEBUG, QString("mythfile_exists('%1', '%2')")
+            .arg(path).arg(file));
 
     if (!strncmp(path, "myth://", 7))
         return RemoteFile::Exists(QString("%1/%2").arg(path).arg(file));
@@ -405,18 +404,17 @@ static int getNextDirID(void)
     }
 
     if (id == maxID)
-        VERBOSE(VB_IMPORTANT, "ERROR: mythiowrapper getNextDirID(), too "
-                "many files are open.");
+        LOG(VB_GENERAL, LOG_ERR, "ERROR: mythiowrapper getNextDirID(), too "
+                                 "many files are open.");
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("getNextDirID() = %1").arg(id));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("getNextDirID() = %1").arg(id));
 
     return id;
 }
 
 int mythdir_check(int id)
 {
-    VERBOSE(VB_FILE+VB_EXTRA,
-            QString("mythdir_check(%1)").arg(id));
+    LOG(VB_FILE, LOG_DEBUG, QString("mythdir_check(%1)").arg(id));
     int result = 0;
 
     m_dirWrapperLock.lockForWrite();
@@ -431,7 +429,7 @@ int mythdir_check(int id)
 
 int mythdir_opendir(const char *dirname)
 {
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("mythdir_opendir(%1)").arg(dirname));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythdir_opendir(%1)").arg(dirname));
 
     int id = 0;
     if (strncmp(dirname, "myth://", 7))
@@ -487,7 +485,7 @@ int mythdir_closedir(int dirID)
 {
     int result = -1;
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("mythdir_closedir(%1)").arg(dirID));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythdir_closedir(%1)").arg(dirID));
 
     m_dirWrapperLock.lockForRead();
     if (m_remotedirs.contains(dirID))
@@ -511,7 +509,7 @@ char *mythdir_readdir(int dirID)
 {
     char *result = NULL;
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("mythdir_readdir(%1)").arg(dirID));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythdir_readdir(%1)").arg(dirID));
 
     m_dirWrapperLock.lockForRead();
     if (m_remotedirs.contains(dirID))

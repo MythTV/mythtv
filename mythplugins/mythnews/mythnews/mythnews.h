@@ -55,8 +55,6 @@ class MythNews : public MythScreenType
     int            m_TimerTimeout;
     unsigned int   m_UpdateFreq;
 
-    QString        m_timeFormat;
-    QString        m_dateFormat;
     QString        m_zoom;
     QString        m_browser;
     MythDialogBox *m_menuPopup;

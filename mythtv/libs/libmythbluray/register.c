@@ -383,14 +383,11 @@ int bd_psr_setting_write(BD_REGISTERS *p, int reg, uint32_t val)
         return -1;
     }
 
-    if (p->psr[reg] == val) {
-        BD_DEBUG(DBG_BLURAY, "bd_psr_write(%d, %d): no change in value\n", reg, val);
-        return 0;
-    }
-
     bd_psr_lock(p);
 
-    if (bd_psr_name[reg]) {
+    if (p->psr[reg] == val) {
+        BD_DEBUG(DBG_BLURAY, "bd_psr_write(%d, %d): no change in value\n", reg, val);
+    } else if (bd_psr_name[reg]) {
         BD_DEBUG(DBG_BLURAY, "bd_psr_write(): PSR%-4d (%s) 0x%x -> 0x%x\n", reg, bd_psr_name[reg], p->psr[reg], val);
     } else {
         BD_DEBUG(DBG_BLURAY, "bd_psr_write(): PSR%-4d 0x%x -> 0x%x\n", reg, p->psr[reg], val);
@@ -400,7 +397,7 @@ int bd_psr_setting_write(BD_REGISTERS *p, int reg, uint32_t val)
         BD_PSR_EVENT ev;
         unsigned i;
 
-        ev.ev_type = BD_PSR_CHANGE;
+        ev.ev_type = p->psr[reg] == val ? BD_PSR_WRITE : BD_PSR_CHANGE;
         ev.psr_idx = reg;
         ev.old_val = p->psr[reg];
         ev.new_val = val;

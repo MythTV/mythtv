@@ -103,7 +103,7 @@ bool NetTree::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen '" + windowName + "'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen '" + windowName + "'");
         return false;
     }
 
@@ -116,7 +116,7 @@ bool NetTree::Create()
         SetFocusWidget(m_siteMap);
 
         connect(m_siteMap, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                SLOT(showWebVideo(void)));
+                SLOT(streamWebVideo(void)));
         connect(m_siteMap, SIGNAL(itemSelected(MythUIButtonListItem *)),
                 SLOT(slotItemChanged(void)));
         connect(m_siteMap, SIGNAL(nodeChanged(MythGenericTree *)),
@@ -137,7 +137,7 @@ bool NetTree::Create()
 
 void NetTree::Load()
 {
-    m_grabberList = findAllDBTreeGrabbersByHost(VIDEO);
+    m_grabberList = findAllDBTreeGrabbersByHost(VIDEO_FILE);
     m_rssList = findAllDBRSS();
 
     fillTree();
@@ -202,7 +202,7 @@ void NetTree::cleanCacheDir()
             i != thumbs.begin() - 1; --i)
     {
         QString filename = QString("%1/%2").arg(cache).arg(*i);
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1").arg(filename));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1").arg(filename));
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
         if (lastmod.addDays(7) < QDateTime::currentDateTime())
@@ -371,7 +371,7 @@ void NetTree::handleSelect(MythUIButtonListItem *item)
             break;
         default:
         {
-            showWebVideo();
+            streamWebVideo();
         }
     };
     slotItemChanged();
@@ -488,6 +488,8 @@ void NetTree::showMenu(void)
 
         if (item)
         {
+            if (item->GetDownloadable())
+                menuPopup->AddButton(tr("Stream Video"), SLOT(streamWebVideo()));
             menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
 
             if (item->GetDownloadable())
@@ -652,7 +654,7 @@ void NetTree::fillTree()
     {
 
         QMultiMap<QPair<QString,QString>, ResultItem*> treePathsNodes =
-                           getTreeArticles((*i)->GetTitle(), VIDEO);
+                           getTreeArticles((*i)->GetTitle(), VIDEO_FILE);
 
         QList< QPair<QString,QString> > paths = treePathsNodes.uniqueKeys();
 
@@ -745,6 +747,37 @@ int NetTree::AddFileNode(MythGenericTree *where_to_add, ResultItem *video)
     return 1;
 }
 
+void NetTree::streamWebVideo()
+{
+    ResultItem *item;
+
+    if (m_type == DLG_TREE)
+        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
+    else
+    {
+        MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
+
+        if (!node)
+            return;
+
+        item = qVariantValue<ResultItem *>(node->GetData());
+    }
+
+    if (!item)
+        return;
+
+    if (!item->GetDownloadable())
+    {
+        showWebVideo();
+        return;
+    }
+
+    GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL(),
+           item->GetDescription(), item->GetTitle(), item->GetSubtitle(), QString(),
+           item->GetSeason(), item->GetEpisode(), QString(), item->GetTime().toInt(),
+           item->GetDate().toString("yyyy"));
+}
+
 void NetTree::showWebVideo()
 {
     ResultItem *item;
@@ -789,7 +822,7 @@ void NetTree::showWebVideo()
     {
         QString url = item->GetURL();
 
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Web URL = %1").arg(url));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Web URL = %1").arg(url));
 
         if (url.isEmpty())
             return;
@@ -922,8 +955,8 @@ void NetTree::doDownloadAndPlay()
                               gCoreContext->GetMasterHostName(),
                               baseFilename);
 
-    VERBOSE(VB_GENERAL, QString("Downloading %1 to %2").arg(item->GetMediaURL())
-                                                       .arg(finalFilename));
+    LOG(VB_GENERAL, LOG_INFO, QString("Downloading %1 to %2")
+            .arg(item->GetMediaURL()) .arg(finalFilename));
 
     // Does the file already exist?
     bool exists = RemoteFile::Exists(finalFilename);

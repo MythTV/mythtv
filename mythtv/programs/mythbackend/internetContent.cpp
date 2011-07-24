@@ -56,7 +56,8 @@ QStringList InternetContent::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool InternetContent::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
+bool InternetContent::ProcessRequest( HttpWorkerThread *pThread,
+                                      HTTPRequest *pRequest )
 {
     try
     {
@@ -65,7 +66,8 @@ bool InternetContent::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pR
             if (pRequest->m_sBaseUrl != "/InternetContent")
                 return false;
 
-            VERBOSE(VB_UPNP, QString("InternetContent::ProcessRequest: %1 : %2")
+            LOG(VB_UPNP, LOG_INFO,
+                QString("InternetContent::ProcessRequest: %1 : %2")
                     .arg(pRequest->m_sMethod)
                     .arg(pRequest->m_sRawRequest));
 
@@ -96,8 +98,8 @@ bool InternetContent::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pR
     }
     catch( ... )
     {
-        VERBOSE( VB_IMPORTANT,
-                 "InternetContent::ProcessRequest() - Unexpected Exception" );
+        LOG(VB_GENERAL, LOG_ERR,
+            "InternetContent::ProcessRequest() - Unexpected Exception" );
     }
 
     return false;
@@ -133,8 +135,10 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
         return;
     }
 
-    VERBOSE(VB_GENERAL, QString("InternetContent::GetInternetSearch Executing "
-            "Command: %1 -p %2 -S '%3'").arg(command).arg(pagenum).arg(query));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("InternetContent::GetInternetSearch Executing "
+                "Command: %1 -p %2 -S '%3'")
+            .arg(command).arg(pagenum).arg(query));
 
     Search *search = new Search();
     QEventLoop loop;

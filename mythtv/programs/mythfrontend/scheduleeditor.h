@@ -14,6 +14,9 @@
 #include "recordingrule.h"
 #include "recordinginfo.h"
 
+// libmythmetadata
+#include "metadatafactory.h"
+
 #ifndef ALLOW_MISSING_FILTERS
 #define ALLOW_MISSING_FILTERS 1
 #endif
@@ -53,6 +56,7 @@ class ScheduleEditor : public ScheduleCommon
     void ShowPostProc(void);
     void ShowSchedInfo(void);
     void ShowPreview(void);
+    void ShowMetadataOptions(void);
     void Save(void);
     void Close(void);
 
@@ -79,6 +83,7 @@ class ScheduleEditor : public ScheduleCommon
     MythUIButton    *m_postProcButton;
     MythUIButton    *m_schedInfoButton;
     MythUIButton    *m_previewButton;
+    MythUIButton    *m_metadataButton;
 
     TV *m_player;
 };
@@ -211,6 +216,88 @@ class PostProcEditor : public MythScreenType
     MythUICheckBox *m_userjob2Check;
     MythUICheckBox *m_userjob3Check;
     MythUICheckBox *m_userjob4Check;
+    MythUICheckBox *m_metadataLookupCheck;
+};
+
+class MetadataOptions : public MythScreenType
+{
+  Q_OBJECT
+  public:
+    MetadataOptions(MythScreenStack *parent, RecordingInfo *recinfo,
+                   RecordingRule *rule);
+   ~MetadataOptions();
+
+    bool Create(void);
+
+  protected slots:
+    void PerformQuery();
+    void SelectLocalFanart();
+    void SelectLocalCoverart();
+    void SelectLocalBanner();
+    void SelectOnlineFanart();
+    void SelectOnlineCoverart();
+    void SelectOnlineBanner();
+    void QueryComplete(MetadataLookup *lookup);
+    void OnSearchListSelection(MetadataLookup *lookup);
+    void OnImageSearchListSelection(ArtworkInfo info,
+                               VideoArtworkType type);
+    void OnArtworkSearchDone(MetadataLookup *lookup);
+    void FindNetArt(VideoArtworkType type);
+
+    void ValuesChanged();
+
+    void Close(void);
+
+  private:
+    void Load(void);
+    void Save(void);
+
+    void CreateBusyDialog(QString title);
+    void FindImagePopup(const QString &prefix,
+                        const QString &prefixAlt,
+                        QObject &inst,
+                        const QString &returnEvent);
+    QStringList GetSupportedImageExtensionFilter();
+
+    void HandleDownloadedImages(MetadataLookup *lookup);
+
+    void customEvent(QEvent *event);
+
+    RecordingInfo   *m_recInfo;
+    RecordingRule   *m_recordingRule;
+
+    // For all metadata downloads
+    MetadataFactory *m_metadataFactory;
+
+    // For image picking
+    MetadataDownload *m_imageLookup;
+    MetadataImageDownload *m_imageDownload;
+
+    MetadataLookup  *m_lookup;
+
+    MythScreenStack  *m_popupStack;
+    MythUIBusyDialog *m_busyPopup;
+
+    MythUIImage     *m_fanart;
+    MythUIImage     *m_coverart;
+    MythUIImage     *m_banner;
+
+    MythUITextEdit  *m_inetrefEdit;
+
+    MythUISpinBox   *m_seasonSpin;
+    MythUISpinBox   *m_episodeSpin;
+
+    MythUIButton    *m_queryButton;
+    MythUIButton    *m_localFanartButton;
+    MythUIButton    *m_localCoverartButton;
+    MythUIButton    *m_localBannerButton;
+    MythUIButton    *m_onlineFanartButton;
+    MythUIButton    *m_onlineCoverartButton;
+    MythUIButton    *m_onlineBannerButton;
+
+    MythUIButton    *m_backButton;
+
+    ArtworkMap       m_artworkMap;
 };
 
 #endif

@@ -1,8 +1,14 @@
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#ifndef _WIN32
+#include <pwd.h>
+#include <grp.h>
+#endif
 
 using namespace std;
 
@@ -16,8 +22,10 @@ using namespace std;
 #include <QString>
 #include <QCoreApplication>
 #include <QTextStream>
+#include <QDateTime>
 
 #include "mythcommandlineparser.h"
+#include "mythcorecontext.h"
 #include "exitcodes.h"
 #include "mythconfig.h"
 #include "mythlogging.h"
@@ -33,6 +41,8 @@ const int kEnd          = 0,
           kInvalid      = 6;
 
 const char* NamedOptType(int type);
+bool openPidfile(ofstream &pidfs, const QString &pidfile);
+bool setUser(const QString &username);
 
 const char* NamedOptType(int type)
 {
@@ -62,8 +72,9 @@ typedef struct helptmp {
 } HelpTmp;
 
 MythCommandLineParser::MythCommandLineParser(QString appname) :
-    m_appname(appname), m_allowExtras(false), m_allowPassthrough(false), 
-    m_passthroughActive(false), m_overridesImported(false), m_verbose(false)
+    m_appname(appname), m_allowExtras(false), m_allowArgs(false),
+    m_allowPassthrough(false), m_passthroughActive(false),
+    m_overridesImported(false), m_verbose(false)
 {
     char *verbose = getenv("VERBOSE_PARSER");
     if (verbose != NULL)
@@ -374,6 +385,15 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         }
         else if (res == kArg)
         {
+            if (!m_allowArgs)
+            {
+                cerr << "Received '"
+                     << val.toAscii().constData()
+                     << "' but unassociated arguments have not been enabled"
+                     << endl;
+                return false;        
+            }
+
             m_remainingArgs << val;
             continue;
         }
@@ -465,6 +485,8 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                 m_parsed[argdef.name] = QVariant(val.toLongLong());
             else if (argdef.type == QVariant::Double)
                 m_parsed[argdef.name] = QVariant(val.toDouble());
+            else if (argdef.type == QVariant::DateTime)
+                m_parsed[argdef.name] = QVariant(myth_dt_from_string(val));
             else if (argdef.type == QVariant::StringList)
             {
                 QStringList slist;
@@ -899,22 +921,11 @@ void MythCommandLineParser::addSettingsOverride(void)
             "loaded for setting overrides.", "");
 }
 
-void MythCommandLineParser::addVerbose(void)
-{
-    add(QStringList( QStringList() << "-v" << "--verbose" ), "verbose",
-            "important,general",
-            "Specify log filtering. Use '-v help' for level info.", "");
-    add("-V", "verboseint", 0U, "",
-            "This option is intended for internal use only.\n"
-            "This option takes an unsigned value corresponding "
-            "to the bitwise log verbosity operator.");
-}
-
 void MythCommandLineParser::addRecording(void)
 {
     add("--chanid", "chanid", 0U,
             "Specify chanid of recording to operate on.", "");
-    add("--starttime", "starttime", "",
+    add("--starttime", "starttime", QDateTime(),
             "Specify start time of recording to operate on.", "");
 }
 
@@ -938,11 +949,18 @@ void MythCommandLineParser::addUPnP(void)
 
 void MythCommandLineParser::addLogging(void)
 {
+    add(QStringList( QStringList() << "-v" << "--verbose" ), "verbose",
+            "general",
+            "Specify log filtering. Use '-v help' for level info.", "");
+    add("-V", "verboseint", 0U, "",
+            "This option is intended for internal use only.\n"
+            "This option takes an unsigned value corresponding "
+            "to the bitwise log verbosity operator.");
     add(QStringList( QStringList() << "-l" << "--logfile" << "--logpath" ), 
             "logpath", "",
             "Writes logging messages to a file at logpath.\n"
             "If a directory is given, a logfile will be created in that "
-            "directory with a filename of applicationName.pid.log.\n"
+            "directory with a filename of applicationName.date.pid.log.\n"
             "If a full filename is given, that file will be used.\n"
             "This is typically used in combination with --daemon, and if used "
             "in combination with --pidfile, this can be used with log "
@@ -995,7 +1013,8 @@ QString MythCommandLineParser::GetLogFilePath(void)
     {
         m_parsed.insert("islogpath", true);
         logdir  = finfo.filePath();
-        logfile = QCoreApplication::applicationName() + 
+        logfile = QCoreApplication::applicationName() + "." +
+                  QDateTime::currentDateTime().toString("yyyyMMddhhmmss") +
                   QString(".%1").arg(pid) + ".log";
     }
     else
@@ -1047,3 +1066,160 @@ bool MythCommandLineParser::SetValue(const QString &key, QVariant value)
     return true;
 }
 
+int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int quiet)
+{
+    int err = 0;
+
+    // Setup the defaults
+    verboseString = "";
+    verboseMask   = 0;
+    verboseArgParse(mask);
+
+    if (toBool("verbose"))
+    {
+        if ((err = verboseArgParse(toString("verbose"))))
+            return err;
+    }
+    else if (toBool("verboseint"))
+        verboseMask = toUInt("verboseint");
+
+    quiet = MAX(quiet, toUInt("quiet"));
+    if (quiet > 1)
+    {
+        verboseMask = VB_NONE;
+        verboseArgParse("none");
+    }
+
+    int facility = GetSyslogFacility();
+    bool dblog = !toBool("nodblog");
+    LogLevel_t level = GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
+
+    LOG(VB_GENERAL, LOG_CRIT, QString("%1 version: %2 [%3] www.mythtv.org")
+            .arg(QCoreApplication::applicationName())
+            .arg(MYTH_SOURCE_PATH) .arg(MYTH_SOURCE_VERSION));
+    LOG(VB_GENERAL, LOG_CRIT, QString("Enabled verbose msgs: %1")
+                                  .arg(verboseString));
+
+    QString logfile = GetLogFilePath();
+    bool propogate = toBool("islogpath");
+    logStart(logfile, quiet, facility, level, dblog, propogate);
+
+    return GENERIC_EXIT_OK;
+}
+
+// WARNING: this must not be called until after MythContext is initialized
+void MythCommandLineParser::ApplySettingsOverride(void)
+{
+    QMap<QString, QString> override = GetSettingsOverride();
+    if (override.size())
+    {
+        QMap<QString, QString>::iterator it;
+        for (it = override.begin(); it != override.end(); ++it)
+        {
+            LOG(VB_GENERAL, LOG_NOTICE,
+                 QString("Setting '%1' being forced to '%2'")
+                     .arg(it.key()).arg(*it));
+            gCoreContext->OverrideSettingForSession(it.key(), *it);
+        }
+    }
+}
+
+bool openPidfile(ofstream &pidfs, const QString &pidfile)
+{
+    if (!pidfile.isEmpty())
+    {
+        pidfs.open(pidfile.toAscii().constData());
+        if (!pidfs)
+        {
+            cerr << "Could not open pid file: " << ENO_STR << endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+bool setUser(const QString &username)
+{
+    if (username.isEmpty())
+        return true;
+
+#ifdef _WIN32
+    cerr << "--user option is not supported on Windows" << endl;
+    return false;
+#else // ! _WIN32
+    struct passwd *user_info = getpwnam(username.toLocal8Bit().constData());
+    const uid_t user_id = geteuid();
+
+    if (user_id && (!user_info || user_id != user_info->pw_uid))
+    {
+        cerr << "You must be running as root to use the --user switch." << endl;
+        return false;
+    }
+    else if (user_info && user_id == user_info->pw_uid)
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            QString("Already running as '%1'").arg(username));
+    }
+    else if (!user_id && user_info)
+    {
+        if (setenv("HOME", user_info->pw_dir,1) == -1)
+        {
+            cerr << "Error setting home directory." << endl;
+            return false;
+        }
+        if (setgid(user_info->pw_gid) == -1)
+        {
+            cerr << "Error setting effective group." << endl;
+            return false;
+        }
+        if (initgroups(user_info->pw_name, user_info->pw_gid) == -1)
+        {
+            cerr << "Error setting groups." << endl;
+            return false;
+        }
+        if (setuid(user_info->pw_uid) == -1)
+        {
+            cerr << "Error setting effective user." << endl;
+            return false;
+        }
+    }
+    else
+    {
+        cerr << QString("Invalid user '%1' specified with --user")
+                    .arg(username).toLocal8Bit().constData() << endl;
+        return false;
+    }
+    return true;
+#endif // ! _WIN32
+}
+
+
+int MythCommandLineParser::Daemonize(void)
+{
+    ofstream pidfs;
+    if (!openPidfile(pidfs, toString("pidfile")))
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
+
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+        LOG(VB_GENERAL, LOG_WARNING, "Unable to ignore SIGPIPE");
+
+    if (toBool("daemon") && (daemon(0, 1) < 0))
+    {
+        cerr << "Failed to daemonize: " << ENO_STR << endl;
+        return GENERIC_EXIT_DAEMONIZING_ERROR;
+    }
+
+    QString username = toString("username");
+    if (!username.isEmpty() && !setUser(username))
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
+
+    if (pidfs)
+    {
+        pidfs << getpid() << endl;
+        pidfs.close();
+    }
+
+    return GENERIC_EXIT_OK;
+}

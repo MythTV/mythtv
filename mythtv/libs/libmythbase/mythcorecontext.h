@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QHostAddress>
 
 #include "mythdb.h"
 #include "mythbaseexp.h"
@@ -17,6 +18,7 @@
 #define MYTH_APPNAME_MYTHTV_SETUP "mythtv-setup"
 #define MYTH_APPNAME_MYTHFILLDATABASE "mythfilldatabase"
 #define MYTH_APPNAME_MYTHCOMMFLAG "mythcommflag"
+#define MYTH_APPNAME_MYTHCCEXTRACTOR "mythccextractor"
 #define MYTH_APPNAME_MYTHPREVIEWGEN "mythpreviewgen"
 #define MYTH_APPNAME_MYTHTRANSCODE "mythtranscode"
 #define MYTH_APPNAME_MYTHWELCOME "mythwelcome"
@@ -69,7 +71,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
                            uint timeout_ms = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
-    QString MythHostAddressAny(void);
+    QHostAddress MythHostAddressAny(void);
 
     QString GenMythURL(QString host = QString(), QString port = QString(),
                        QString path = QString(), QString storageGroup = QString());

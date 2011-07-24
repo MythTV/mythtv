@@ -18,7 +18,6 @@
 #include "mythuitextedit.h"
 
 #define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
-#define LOC_ERR QString("MythUIButtonList(%1), Error: ").arg(objectName())
 
 MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
               : MythUIType(parent, name)

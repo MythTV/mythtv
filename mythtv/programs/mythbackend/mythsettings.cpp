@@ -345,7 +345,7 @@ MythSetting::DataType parse_data_type(const QString &str)
         return MythSetting::kTimeOfDay;
     if (s == "other")
         return MythSetting::kOther;
-    VERBOSE(VB_IMPORTANT, QString("Unknown type: %1").arg(str));
+    LOG(VB_GENERAL, LOG_ERR, QString("Unknown type: %1").arg(str));
     return MythSetting::kInvalidDataType;
 }
 
@@ -562,8 +562,8 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
             MythSetting::DataType dtype = parse_data_type(m["data_type"]);
             if (MythSetting::kInvalidDataType == dtype)
             {
-                VERBOSE(VB_IMPORTANT, LOC +
-                        "Setting has invalid or missing data_type attribute.");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Setting has invalid or missing data_type attribute.");
                 return false;
             }
 
@@ -574,8 +574,8 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
             {
                 if (!e.hasChildNodes())
                 {
-                    VERBOSE(VB_IMPORTANT, LOC +
-                            "Setting missing selection items.");
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        "Setting missing selection items.");
                     return false;
                 }
 
@@ -585,16 +585,16 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
                     const QDomElement e2 = n2.toElement();
                     if (e2.tagName() != "option")
                     {
-                        VERBOSE(VB_IMPORTANT, LOC +
-                                "Setting selection contains invalid tags.");
+                        LOG(VB_GENERAL, LOG_ERR, LOC +
+                            "Setting selection contains invalid tags.");
                         return false;
                     }
                     QString display = e2.attribute("display");
                     QString data    = e2.attribute("data");
                     if (data.isEmpty())
                     {
-                        VERBOSE(VB_IMPORTANT, LOC +
-                                "Setting selection item missing data.");
+                        LOG(VB_GENERAL, LOG_ERR, LOC +
+                            "Setting selection item missing data.");
                         return false;
                     }
                     display = (display.isEmpty()) ? data : display;
@@ -616,9 +616,8 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
             {
                 if ((*it).isEmpty())
                 {
-                    VERBOSE(VB_IMPORTANT, LOC +
-                            QString("Setting has invalid or missing "
-                                    "%1 attribute")
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("Setting has invalid or missing %1 attribute")
                             .arg(it.key()));
                     return false;
                 }
@@ -631,8 +630,8 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
                 parse_setting_type(m["setting_type"]);
             if (MythSetting::kInvalidSettingType == stype)
             {
-                VERBOSE(VB_IMPORTANT, LOC +
-                        "Setting has invalid setting_type attribute.");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Setting has invalid setting_type attribute.");
                 return false;
             }
 
@@ -640,8 +639,8 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
             long long range_max = m["range_max"].toLongLong();
             if (range_max < range_min)
             {
-                VERBOSE(VB_IMPORTANT, LOC +
-                        "Setting has invalid range attributes");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Setting has invalid range attributes");
                 return false;
             }
 
@@ -655,8 +654,8 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
         }
         else if (group.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    QString("Unknown element: %1").arg(e.tagName()));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Unknown element: %1").arg(e.tagName()));
             return false;
         }
         n = n.nextSibling();
@@ -677,7 +676,7 @@ bool parse_settings(MythSettingList &settings, const QString &filename,
 
     if (!f.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("parse_settings: Can't open: '%1'")
+        LOG(VB_GENERAL, LOG_ERR, QString("parse_settings: Can't open: '%1'")
                 .arg(filename));
         return false;
     }
@@ -688,10 +687,10 @@ bool parse_settings(MythSettingList &settings, const QString &filename,
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, QString("parse_settings: ") +
-                QString("Parsing: %1 at line: %2 column: %3")
+        LOG(VB_GENERAL, LOG_ERR, QString("parse_settings: ") +
+            QString("Parsing: %1 at line: %2 column: %3")
                 .arg(filename).arg(errorLine).arg(errorColumn) +
-                QString("\n\t\t\t%1").arg(errorMsg));
+            QString("\n\t\t\t%1").arg(errorMsg));
         f.close();
         return false;
     }

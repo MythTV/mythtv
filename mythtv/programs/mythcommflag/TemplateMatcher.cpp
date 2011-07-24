@@ -33,8 +33,7 @@ using namespace frameAnalyzer;
 
 namespace {
 
-int
-pgm_set(const AVPicture *pict, int height)
+int pgm_set(const AVPicture *pict, int height)
 {
     const int   width = pict->linesize[0];
     const int   size = height * width;
@@ -47,9 +46,8 @@ pgm_set(const AVPicture *pict, int height)
     return score;
 }
 
-int
-pgm_match(const AVPicture *tmpl, const AVPicture *test, int height,
-        int radius, unsigned short *pscore)
+int pgm_match(const AVPicture *tmpl, const AVPicture *test, int height,
+              int radius, unsigned short *pscore)
 {
     /* Return the number of matching "edge" and non-edge pixels. */
     const int       width = tmpl->linesize[0];
@@ -57,7 +55,8 @@ pgm_match(const AVPicture *tmpl, const AVPicture *test, int height,
 
     if (width != test->linesize[0])
     {
-        VERBOSE(VB_COMMFLAG, QString("pgm_match widths don't match: %1 != %2")
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("pgm_match widths don't match: %1 != %2")
                 .arg(width).arg(test->linesize[0]));
         return -1;
     }
@@ -98,8 +97,7 @@ next_pixel:
     return 0;
 }
 
-bool
-readMatches(QString filename, unsigned short *matches, long long nframes)
+bool readMatches(QString filename, unsigned short *matches, long long nframes)
 {
     FILE        *fp;
     long long   frameno;
@@ -113,26 +111,26 @@ readMatches(QString filename, unsigned short *matches, long long nframes)
         int nitems = fscanf(fp, "%hu", &matches[frameno]);
         if (nitems != 1)
         {
-            VERBOSE(VB_COMMFLAG, QString("Not enough data in %1: frame %2")
+            LOG(VB_COMMFLAG, LOG_ERR,
+                QString("Not enough data in %1: frame %2")
                     .arg(filename).arg(frameno));
             goto error;
         }
     }
 
     if (fclose(fp))
-        VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
                 .arg(filename).arg(strerror(errno)));
     return true;
 
 error:
     if (fclose(fp))
-        VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
                 .arg(filename).arg(strerror(errno)));
     return false;
 }
 
-bool
-writeMatches(QString filename, unsigned short *matches, long long nframes)
+bool writeMatches(QString filename, unsigned short *matches, long long nframes)
 {
     FILE        *fp;
     long long   frameno;
@@ -145,14 +143,13 @@ writeMatches(QString filename, unsigned short *matches, long long nframes)
         (void)fprintf(fp, "%hu\n", matches[frameno]);
 
     if (fclose(fp))
-        VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
                 .arg(filename).arg(strerror(errno)));
     return true;
 }
 
-int
-finishedDebug(long long nframes, const unsigned short *matches,
-        const unsigned char *match)
+int finishedDebug(long long nframes, const unsigned short *matches,
+                  const unsigned char *match)
 {
     unsigned short  low, high, score;
     long long       startframe;
@@ -174,7 +171,7 @@ finishedDebug(long long nframes, const unsigned short *matches,
             continue;
         }
 
-        VERBOSE(VB_COMMFLAG, QString("Frame %1-%2: %3 L-H: %4-%5 (%6)")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("Frame %1-%2: %3 L-H: %4-%5 (%6)")
                 .arg(startframe, 6).arg(frameno - 1, 6)
                 .arg(match[frameno - 1] ? "logo        " : "     no-logo")
                 .arg(low, 4).arg(high, 4).arg(frameno - startframe, 5));
@@ -187,15 +184,13 @@ finishedDebug(long long nframes, const unsigned short *matches,
     return 0;
 }
 
-int
-sort_ascending(const void *aa, const void *bb)
+int sort_ascending(const void *aa, const void *bb)
 {
     return *(unsigned short*)aa - *(unsigned short*)bb;
 }
 
-long long
-matchspn(long long nframes, unsigned char *match, long long frameno,
-        unsigned char acceptval)
+long long matchspn(long long nframes, unsigned char *match, long long frameno,
+                  unsigned char acceptval)
 {
     /*
      * strspn(3)-style interface: return the first frame number that does not
@@ -206,8 +201,8 @@ matchspn(long long nframes, unsigned char *match, long long frameno,
     return frameno;
 }
 
-unsigned int
-range_area(const unsigned short *freq, unsigned short start, unsigned short end)
+unsigned int range_area(const unsigned short *freq, unsigned short start,
+                        unsigned short end)
 {
     /* Return the integrated area under the curve of the plotted histogram. */
     const unsigned short    width = end - start;
@@ -229,8 +224,8 @@ range_area(const unsigned short *freq, unsigned short start, unsigned short end)
     return width * sum / nsamples;
 }
 
-unsigned short
-pick_mintmpledges(const unsigned short *matches, long long nframes)
+unsigned short pick_mintmpledges(const unsigned short *matches,
+                                 long long nframes)
 {
     /*
      * Most frames either match the template very well, or don't match
@@ -315,7 +310,8 @@ pick_mintmpledges(const unsigned short *matches, long long nframes)
         }
     }
 
-    VERBOSE(VB_COMMFLAG, QString("pick_mintmpledges minmatch=%1 maxmatch=%2"
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("pick_mintmpledges minmatch=%1 maxmatch=%2"
                 " matchstart=%3 matchend=%4 widths=%5,%6,%7 local_minimum=%8")
             .arg(minmatch).arg(maxmatch).arg(matchstart).arg(matchend)
             .arg(leftwidth).arg(middlewidth).arg(rightwidth)
@@ -387,16 +383,17 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
     if (!(tmpl = templateFinder->getTemplate(&tmplrow, &tmplcol,
                     &tmplwidth, &tmplheight)))
     {
-        VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::MythPlayerInited:"
-                    " no template"));
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("TemplateMatcher::MythPlayerInited: no template"));
         return ANALYZE_FATAL;
     }
 
     if (avpicture_alloc(&cropped, PIX_FMT_GRAY8, tmplwidth, tmplheight))
     {
-        VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::MythPlayerInited "
-                "avpicture_alloc cropped (%1x%2) failed").
-                arg(tmplwidth).arg(tmplheight));
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("TemplateMatcher::MythPlayerInited "
+                    "avpicture_alloc cropped (%1x%2) failed")
+                .arg(tmplwidth).arg(tmplheight));
         return ANALYZE_FATAL;
     }
 
@@ -412,8 +409,8 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
     {
         if (readMatches(debugdata, matches, nframes))
         {
-            VERBOSE(VB_COMMFLAG, QString(
-                        "TemplateMatcher::MythPlayerInited read %1")
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("TemplateMatcher::MythPlayerInited read %1")
                     .arg(debugdata));
             matches_done = true;
         }
@@ -498,8 +495,8 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
     return ANALYZE_OK;
 
 error:
-    VERBOSE(VB_COMMFLAG, QString(
-                "TemplateMatcher::analyzeFrame error at frame %1 of %2")
+    LOG(VB_COMMFLAG, LOG_ERR,
+        QString("TemplateMatcher::analyzeFrame error at frame %1 of %2")
             .arg(frameno));
     return ANALYZE_ERROR;
 }
@@ -528,8 +525,8 @@ TemplateMatcher::finished(long long nframes, bool final)
     {
         if (final && writeMatches(debugdata, matches, nframes))
         {
-            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished wrote %1")
-                    .arg(debugdata));
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("TemplateMatcher::finished wrote %1") .arg(debugdata));
             matches_done = true;
         }
     }
@@ -537,7 +534,8 @@ TemplateMatcher::finished(long long nframes, bool final)
     tmpledges = pgm_set(tmpl, tmplheight);
     mintmpledges = pick_mintmpledges(matches, nframes);
 
-    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished %1x%2@(%3,%4),"
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("TemplateMatcher::finished %1x%2@(%3,%4),"
                 " %5 edge pixels, want %6")
             .arg(tmplwidth).arg(tmplheight).arg(tmplcol).arg(tmplrow)
             .arg(tmpledges).arg(mintmpledges));
@@ -609,7 +607,7 @@ TemplateMatcher::reportTime(void) const
     if (pgmConverter->reportTime())
         return -1;
 
-    VERBOSE(VB_COMMFLAG, QString("TM Time: analyze=%1s")
+    LOG(VB_COMMFLAG, LOG_INFO, QString("TM Time: analyze=%1s")
             .arg(strftimeval(&analyze_time)));
     return 0;
 }
@@ -638,26 +636,26 @@ TemplateMatcher::templateCoverage(long long nframes, bool final) const
     {
         if (!tmpl)
         {
-            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher: no template"
-                        " (wanted %2-%3%)")
+            LOG(VB_COMMFLAG, LOG_ERR,
+                QString("TemplateMatcher: no template (wanted %2-%3%)")
                     .arg(100 * MINBREAKS / nframes)
                     .arg(100 * MAXBREAKS / nframes));
         }
         else if (!final)
         {
-            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks"
-                        " (real-time flagging)")
+            LOG(VB_COMMFLAG, LOG_ERR,
+                QString("TemplateMatcher has %1% breaks (real-time flagging)")
                     .arg(100 * brklen / nframes));
         }
         else if (good)
         {
-            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks")
+            LOG(VB_COMMFLAG, LOG_INFO, QString("TemplateMatcher has %1% breaks")
                     .arg(100 * brklen / nframes));
         }
         else
         {
-            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks"
-                        " (wanted %2-%3%)")
+            LOG(VB_COMMFLAG, LOG_INFO, 
+                QString("TemplateMatcher has %1% breaks (wanted %2-%3%)")
                     .arg(100 * brklen / nframes)
                     .arg(100 * MINBREAKS / nframes)
                     .arg(100 * MAXBREAKS / nframes));
@@ -749,7 +747,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
     const int TEMPLATE_REAPPEARS_LATE = (int)roundf(35 * fps);
     const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(1.5 * fps);
 
-    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher adjusting for blanks"));
+    LOG(VB_COMMFLAG, LOG_INFO, QString("TemplateMatcher adjusting for blanks"));
 
     FrameAnalyzer::FrameMap::Iterator ii = breakMap.begin();
     long long prevbrke = 0;

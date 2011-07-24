@@ -39,7 +39,7 @@ void init_sections(sections_t &sect, uint last_section)
         QString msg = QString("init_sections ls(%1): ").arg(last_section);
         for (uint i = 0 ; i < 32; i++)
             msg += QString("%1 ").arg((int)sect[i], 0, 16);
-        VERBOSE(VB_GENERAL, msg);
+        LOG(VB_GENERAL, LOG_DEBUG, msg);
     }
 #endif
 }
@@ -262,9 +262,9 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         // check if it's safe to read pespacket's Length()
         if ((partial->PSIOffset() + 1 + 3) > partial->TSSizeInBuffer())
         {
-            VERBOSE(VB_RECORD,
-                    QString("Discarding broken PES packet. Packet's length at "
-                            "position %1 isn't in the buffer of %2 bytes.")
+            LOG(VB_RECORD, LOG_ERR,
+                QString("Discarding broken PES packet. Packet's length at "
+                        "position %1 isn't in the buffer of %2 bytes.")
                     .arg(partial->PSIOffset() + 1 + 3)
                     .arg(partial->TSSizeInBuffer()));
             DeletePartialPES(tspacket->PID());
@@ -277,7 +277,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
          (TableID::PAT == partial->StreamID()));
         if (!buggy && !partial->IsGood())
         {
-            VERBOSE(VB_SIPARSER, "Discarding broken PES packet");
+            LOG(VB_SIPARSER, LOG_ERR, "Discarding broken PES packet");
             DeletePartialPES(tspacket->PID());
             return NULL;
         }
@@ -318,9 +318,10 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         // discard incomplete packets
         if (packetStart > partial->TSSizeInBuffer())
         {
-            VERBOSE(VB_RECORD, QString("Discarding broken PES packet. ") +
-                    QString("Packet with %1 bytes doesn't fit "
-                            "into a buffer of %2 bytes.")
+            LOG(VB_RECORD, LOG_ERR,
+                QString("Discarding broken PES packet. ") +
+                QString("Packet with %1 bytes doesn't fit "
+                        "into a buffer of %2 bytes.")
                     .arg(packetStart).arg(partial->TSSizeInBuffer()));
             delete psip;
             psip = NULL;
@@ -350,7 +351,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     const int offset = tspacket->AFCOffset() + tspacket->StartOfFieldPointer();
     if (offset>181)
     {
-        VERBOSE(VB_IMPORTANT, "Error: offset>181, pes length & "
+        LOG(VB_GENERAL, LOG_ERR, "Error: offset>181, pes length & "
                 "current cannot be queried");
         return 0;
     }
@@ -391,16 +392,16 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
 bool MPEGStreamData::CreatePATSingleProgram(
     const ProgramAssociationTable& pat)
 {
-    VERBOSE(VB_RECORD, "CreatePATSingleProgram()");
-    VERBOSE(VB_RECORD, "PAT in input stream");
-    VERBOSE(VB_RECORD, pat.toString());
+    LOG(VB_RECORD, LOG_INFO, "CreatePATSingleProgram()");
+    LOG(VB_RECORD, LOG_INFO, "PAT in input stream");
+    LOG(VB_RECORD, LOG_INFO, pat.toString());
     if (_desired_program < 0)
     {
-        VERBOSE(VB_RECORD, "Desired program not set yet");
+        LOG(VB_RECORD, LOG_ERR, "Desired program not set yet");
         return false;
     }
     _pid_pmt_single_program = pat.FindPID(_desired_program);
-    VERBOSE(VB_RECORD, QString("desired_program(%1) pid(0x%2)").
+    LOG(VB_RECORD, LOG_INFO, QString("desired_program(%1) pid(0x%2)").
             arg(_desired_program).arg(_pid_pmt_single_program, 0, 16));
 
     if (!_pid_pmt_single_program)
@@ -408,13 +409,12 @@ bool MPEGStreamData::CreatePATSingleProgram(
         _pid_pmt_single_program = pat.FindAnyPID();
         if (!_pid_pmt_single_program)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("No program found in PAT."
-                            " This recording will not play in MythTV."));
+            LOG(VB_GENERAL, LOG_ERR, "No program found in PAT. "
+                                     "This recording will not play in MythTV.");
         }
-        VERBOSE(VB_IMPORTANT,
-                QString("Desired program #%1 not found in PAT."
-                        "\n\t\t\tCannot create single program PAT.")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Desired program #%1 not found in PAT."
+                    "\n\t\t\tCannot create single program PAT.")
                 .arg(_desired_program));
         SetPATSingleProgram(NULL);
         return false;
@@ -434,17 +434,18 @@ bool MPEGStreamData::CreatePATSingleProgram(
 
     if (!pat2)
     {
-        VERBOSE(VB_IMPORTANT, "MPEGStreamData::CreatePATSingleProgram: "
-                "Failed to create Program Association Table.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "MPEGStreamData::CreatePATSingleProgram: "
+            "Failed to create Program Association Table.");
         return false;
     }
 
     pat2->tsheader()->SetContinuityCounter(pat.tsheader()->ContinuityCounter());
 
-    VERBOSE(VB_RECORD, QString("pmt_pid(0x%1)")
+    LOG(VB_RECORD, LOG_INFO, QString("pmt_pid(0x%1)")
             .arg(_pid_pmt_single_program, 0, 16));
-    VERBOSE(VB_RECORD, "PAT for output stream");
-    VERBOSE(VB_RECORD, pat2->toString());
+    LOG(VB_RECORD, LOG_INFO, "PAT for output stream");
+    LOG(VB_RECORD, LOG_INFO, pat2->toString());
 
     SetPATSingleProgram(pat2);
 
@@ -498,13 +499,13 @@ static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
 
 bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
 {
-    VERBOSE(VB_RECORD, "CreatePMTSingleProgram()");
-    VERBOSE(VB_RECORD, "PMT in input stream");
-    VERBOSE(VB_RECORD, pmt.toString());
+    LOG(VB_RECORD, LOG_INFO, "CreatePMTSingleProgram()");
+    LOG(VB_RECORD, LOG_INFO, "PMT in input stream");
+    LOG(VB_RECORD, LOG_INFO, pmt.toString());
 
     if (!PATSingleProgram())
     {
-        VERBOSE(VB_RECORD, "no PAT yet...");
+        LOG(VB_RECORD, LOG_ERR, "no PAT yet...");
         return false; // no way to properly rewrite pids without PAT
     }
     pmt.Parse();
@@ -607,15 +608,17 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
 
     if (video_cnt < _pmt_single_program_num_video)
     {
-        VERBOSE(VB_RECORD, QString("Only %1 video streams seen in PMT, "
-                "but %2 are required.").arg(video_cnt).arg(_pmt_single_program_num_video));
+        LOG(VB_RECORD, LOG_ERR,
+            QString("Only %1 video streams seen in PMT, but %2 are required.")
+                .arg(video_cnt).arg(_pmt_single_program_num_video));
         return false;
     }
 
     if (audioPIDs.size() < _pmt_single_program_num_audio)
     {
-        VERBOSE(VB_RECORD, QString("Only %1 audio streams seen in PMT, but %2"
-                " are required.").arg(audioPIDs.size()).arg(_pmt_single_program_num_audio));
+        LOG(VB_RECORD, LOG_ERR,
+            QString("Only %1 audio streams seen in PMT, but %2 are required.")
+                .arg(audioPIDs.size()).arg(_pmt_single_program_num_audio));
         return false;
     }
 
@@ -657,8 +660,8 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     pmt2->tsheader()->SetContinuityCounter(cc_cnt);
     SetPMTSingleProgram(pmt2);
 
-    VERBOSE(VB_RECORD, "PMT for output stream");
-    VERBOSE(VB_RECORD, pmt2->toString());
+    LOG(VB_RECORD, LOG_INFO, "PMT for output stream");
+    LOG(VB_RECORD, LOG_INFO, pmt2->toString());
 
     return true;
 }
@@ -767,23 +770,25 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
         _invalid_pat_seen = true;
         _invalid_pat_warning = false;
         _invalid_pat_timer.start();
-        VERBOSE(VB_RECORD, "ProcessPAT: "
-                "PAT is missing program, setting timeout");
+        LOG(VB_RECORD, LOG_WARNING,
+            "ProcessPAT: PAT is missing program, setting timeout");
     }
     else if (_invalid_pat_seen && !foundProgram &&
              (_invalid_pat_timer.elapsed() > 400) && !_invalid_pat_warning)
     {
         _invalid_pat_warning = true; // only emit one warning...
         // After 400ms emit error if we haven't found correct PAT.
-        VERBOSE(VB_IMPORTANT, "ProcessPAT: Program not found in PAT. "
-                "\n\t\t\tRescan your transports.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ProcessPAT: Program not found in PAT. "
+            "\n\t\t\tRescan your transports.");
 
         send_single_program = CreatePATSingleProgram(*pat);
     }
     else if (foundProgram)
     {
         if (_invalid_pat_seen)
-            VERBOSE(VB_RECORD, "ProcessPAT: Good PAT seen after a bad PAT");
+            LOG(VB_RECORD, LOG_INFO, 
+                "ProcessPAT: Good PAT seen after a bad PAT");
 
         _invalid_pat_seen = false;
 
@@ -883,8 +888,8 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
          (TableID::PAT == psip->TableID()));
     if (!buggy && !psip->IsGood())
     {
-        VERBOSE(VB_RECORD, QString("PSIP packet failed CRC check. "
-                                   "pid(0x%1) type(0x%2)")
+        LOG(VB_RECORD, LOG_ERR,
+            QString("PSIP packet failed CRC check. pid(0x%1) type(0x%2)")
                 .arg(tspacket->PID(),0,16).arg(psip->TableID(),0,16));
         DONE_WITH_PES_PACKET();
     }
@@ -894,14 +899,14 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 
     if (tspacket->Scrambled())
     { // scrambled! ATSC, DVB require tables not to be scrambled
-        VERBOSE(VB_RECORD,
-                "PSIP packet is scrambled, not ATSC/DVB compiant");
+        LOG(VB_RECORD, LOG_ERR,
+            "PSIP packet is scrambled, not ATSC/DVB compiant");
         DONE_WITH_PES_PACKET();
     }
 
     if (!psip->VerifyPSIP(!_have_CRC_bug))
     {
-        VERBOSE(VB_RECORD, "PSIP table is invalid");
+        LOG(VB_RECORD, LOG_ERR, "PSIP table is invalid");
         DONE_WITH_PES_PACKET();
     }
 
@@ -1602,8 +1607,10 @@ void MPEGStreamData::AddEncryptionTestPID(uint pnum, uint pid, bool isvideo)
 {
     QMutexLocker locker(&_encryption_lock);
 
-    //VERBOSE(VB_IMPORTANT, "AddEncryptionTestPID("<<pnum
-    //        <<", 0x"<<hex<<pid<<dec<<")");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("AddEncryptionTestPID(%1, 0x%2)")
+            .arg(pnum) .arg(pid, 0, 16));
+#endif
 
     AddListeningPID(pid);
 
@@ -1618,9 +1625,11 @@ void MPEGStreamData::RemoveEncryptionTestPIDs(uint pnum)
 {
     QMutexLocker locker(&_encryption_lock);
 
-    //VERBOSE(VB_RECORD,
-    //        QString("Tearing down up decryption monitoring "
-    //                "for program %1").arg(pnum));
+#if 0
+    LOG(VB_RECORD, LOG_DEBUG,
+        QString("Tearing down up decryption monitoring for program %1")
+            .arg(pnum));
+#endif
 
     QMap<uint, uint_vec_t>::iterator list;
     uint_vec_t::iterator it;
@@ -1630,8 +1639,10 @@ void MPEGStreamData::RemoveEncryptionTestPIDs(uint pnum)
     {
         uint pid = pids[i];
 
-        //VERBOSE(VB_IMPORTANT, QString("Removing 0x%1 PID Enc monitoring")
-        //        .arg(pid,0,16));
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Removing 0x%1 PID Enc monitoring")
+                .arg(pid,0,16));
+#endif
 
         RemoveListeningPID(pid);
 
@@ -1668,9 +1679,11 @@ void MPEGStreamData::TestDecryption(const ProgramMapTable *pmt)
 {
     QMutexLocker locker(&_encryption_lock);
 
-    //VERBOSE(VB_RECORD,
-    //        QString("Setting up decryption monitoring "
-    //                "for program %1").arg(pmt->ProgramNumber()));
+#if 0
+    LOG(VB_RECORD, LOG_DEBUG,
+        QString("Setting up decryption monitoring for program %1")
+            .arg(pmt->ProgramNumber()));
+#endif
 
     bool encrypted = pmt->IsProgramEncrypted();
     for (uint i = 0; i < pmt->StreamCount(); i++)
@@ -1752,9 +1765,8 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
     info.status = status;
 
-    VERBOSE(status != kEncDecrypted ? VB_IMPORTANT : VB_RECORD,
-            QString("PID 0x%1 status: %2")
-            .arg(pid,0,16).arg(toString(status)));
+    LOG(status != kEncDecrypted ? VB_GENERAL : VB_RECORD, LOG_INFO,
+        QString("PID 0x%1 status: %2") .arg(pid,0,16).arg(toString(status)));
 
     uint_vec_t pnum_del_list;
     const uint_vec_t &pnums = _encryption_pid_to_pnums[pid];
@@ -1771,10 +1783,11 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
                 CryptStatus stat = _encryption_pid_to_info[pids[j]].status;
                 enc_cnt[stat]++;
 
-                //VERBOSE(VB_IMPORTANT,
-                //        QString("\tpnum %1 PID 0x%2 status: %3")
-                //        .arg(pnums[i]).arg(pids[j],0,16)
-                //        .arg(toString(stat)));
+#if 0
+                LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("\tpnum %1 PID 0x%2 status: %3")
+                        .arg(pnums[i]).arg(pids[j],0,16) .arg(toString(stat)));
+#endif
             }
             status = kEncUnknown;
 
@@ -1787,7 +1800,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
         if (status == _encryption_pnum_to_status[pnums[i]])
             continue; // program encryption status unchanged
 
-        VERBOSE(VB_RECORD, QString("Program %1 status: %2")
+        LOG(VB_RECORD, LOG_INFO, QString("Program %1 status: %2")
                 .arg(pnums[i]).arg(toString(status)));
 
         _encryption_pnum_to_status[pnums[i]] = status;

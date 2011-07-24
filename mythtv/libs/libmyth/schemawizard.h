@@ -95,7 +95,7 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
     MythUIBusyDialog *m_busyPopup;          ///< Displayed during long pauses
     bool              m_expertMode;         ///< Also allow newer DB schema
     QString           m_schemaSetting;      ///< To lookup the schema version
-    QString           m_schemaName;         ///< Shown to user in VERBOSE logs
+    QString           m_schemaName;         ///< Shown to user in logs
     QString           m_newSchemaVer;       ///< What we need to upgrade to
 
 };

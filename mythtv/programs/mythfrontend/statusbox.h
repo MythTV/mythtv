@@ -47,11 +47,11 @@ class StatusBox : public MythScreenType
 
   private:
     MythUIButtonListItem* AddLogLine(const QString & line,
-				     const QString & help = "",
-				     const QString & detail = "",
-				     const QString & helpdetail = "",
-				     const QString & state = "",
-				     const QString & data = "");
+                     const QString & help = "",
+                     const QString & detail = "",
+                     const QString & helpdetail = "",
+                     const QString & state = "",
+                     const QString & data = "");
 
     void getActualRecordedBPS(QString hostnames);
 
@@ -60,8 +60,6 @@ class StatusBox : public MythScreenType
     MythUIButtonList *m_categoryList;
     MythUIButtonList *m_logList;
     MythUIStateType *m_iconState;
-
-    QString m_dateFormat, m_timeFormat, m_timeDateFormat;
 
     QMap<int, QString> contentData;
     recprof2bps_t      recordingProfilesBPS;

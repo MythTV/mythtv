@@ -45,8 +45,8 @@ int myth_sws_img_convert(AVPicture *dst, PixelFormat dst_pix_fmt, AVPicture *src
                                        width, height, dst_pix_fmt,
                                        SWS_FAST_BILINEAR, NULL, NULL, NULL);
     if (convert_ctx == NULL) {
-        VERBOSE(VB_IMPORTANT, "myth_sws_img_convert: Cannot initialize "
-                "the image conversion context");
+        LOG(VB_GENERAL, LOG_ERR, "myth_sws_img_convert: Cannot initialize "
+                                 "the image conversion context");
         return -1;
     }
 

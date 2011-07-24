@@ -12,7 +12,6 @@ using namespace std;
 #include <unistd.h>
 
 #define LOC QString("AODX: ")
-#define LOC_ERR QString("AODX, ERROR: ")
 
 #include <initguid.h>
 DEFINE_GUID(IID_IDirectSoundNotify, 0xb0210783, 0x89cd, 0x11d0,
@@ -496,8 +495,8 @@ bool AudioOutputDX::OpenDevice(void)
     dsbdesc.dwBufferBytes = soundcard_buffer_size; // buffer size
     dsbdesc.lpwfxFormat = (WAVEFORMATEX *)&wf;
 
-    if FAILED(IDirectSound_CreateSoundBuffer(m_priv->dsobject, &dsbdesc,
-                                            &m_priv->dsbuffer, NULL))
+    if (FAILED(IDirectSound_CreateSoundBuffer(m_priv->dsobject, &dsbdesc,
+                                            &m_priv->dsbuffer, NULL)))
     {
         /* Vista does not support hardware mixing
            try without DSBCAPS_LOCHARDWARE */
@@ -505,7 +504,7 @@ bool AudioOutputDX::OpenDevice(void)
         HRESULT dsresult =
             IDirectSound_CreateSoundBuffer(m_priv->dsobject, &dsbdesc,
                                            &m_priv->dsbuffer, NULL);
-        if FAILED(dsresult)
+        if (FAILED(dsresult))
         {
             if (dsresult == DSERR_UNSUPPORTED)
                 Error(QString("Unsupported format for device %1:%2")

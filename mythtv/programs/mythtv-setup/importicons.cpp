@@ -31,7 +31,8 @@ ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
     m_skipButton(NULL),            m_statusText(NULL)
 {
     m_strChannelname.detach();
-    VERBOSE(VB_IMPORTANT, QString("Fetch Icons for channel %1").arg(m_strChannelname));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Fetch Icons for channel %1").arg(m_strChannelname));
 
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -80,8 +81,8 @@ bool ImportIconsWizard::Create()
     if (!m_iconsList || !m_manualEdit || !m_nameText || !m_manualButton ||
         !m_skipButton || !m_statusText)
     {
-        VERBOSE(VB_IMPORTANT, "Unable to load window 'iconimport', missing"
-                              " required element(s)");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unable to load window 'iconimport', missing required element(s)");
         return false;
     }
 
@@ -186,10 +187,8 @@ void ImportIconsWizard::menuSelection(MythUIButtonListItem *item)
 
     SearchEntry entry = qVariantValue<SearchEntry>(item->GetData());
 
-    VERBOSE(VB_IMPORTANT, QString("Menu Selection: %1 %2 %3")
-                                            .arg(entry.strID)
-                                            .arg(entry.strName)
-                                            .arg(entry.strLogo));
+    LOG(VB_GENERAL, LOG_INFO, QString("Menu Selection: %1 %2 %3")
+            .arg(entry.strID) .arg(entry.strName) .arg(entry.strLogo));
 
     enableControls(STATE_SEARCHING);
 
@@ -269,7 +268,7 @@ bool ImportIconsWizard::initialLoad(QString name)
     QDir configDir(dirpath);
     if (!configDir.exists() && !configDir.mkdir(dirpath))
     {
-        VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(dirpath));
+        LOG(VB_GENERAL, LOG_ERR, QString("Could not create %1").arg(dirpath));
     }
 
     m_strChannelDir = QString("%1/%2").arg(configDir.absolutePath())
@@ -277,7 +276,8 @@ bool ImportIconsWizard::initialLoad(QString name)
     QDir strChannelDir(m_strChannelDir);
     if (!strChannelDir.exists() && !strChannelDir.mkdir(m_strChannelDir))
     {
-        VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(m_strChannelDir));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Could not create %1").arg(m_strChannelDir));
     }
     m_strChannelDir += "/";
 
@@ -352,7 +352,8 @@ bool ImportIconsWizard::initialLoad(QString name)
                               arg(escape_csv(entry.strNetworkId)).
                               arg(escape_csv(entry.strServiceId));
             entry.strNameCSV=escape_csv(entry.strName);
-            VERBOSE(VB_CHANNEL,QString("chanid %1").arg(entry.strIconCSV));
+            LOG(VB_CHANNEL, LOG_INFO,
+                QString("chanid %1").arg(entry.strIconCSV));
 
             m_listEntries.append(entry);
             m_nMaxCount++;
@@ -422,7 +423,7 @@ bool ImportIconsWizard::initialLoad(QString name)
 
 bool ImportIconsWizard::doLoad()
 {
-    VERBOSE(VB_CHANNEL, QString("Icons: Found %1 / Missing %2")
+    LOG(VB_CHANNEL, LOG_INFO, QString("Icons: Found %1 / Missing %2")
             .arg(m_missingCount).arg(m_missingMaxCount));
 
     // skip over empty entries
@@ -435,7 +436,7 @@ bool ImportIconsWizard::doLoad()
 
     if (m_missingIter == m_missingEntries.end())
     {
-        VERBOSE(VB_CHANNEL, "doLoad Icon search complete");
+        LOG(VB_CHANNEL, LOG_INFO, "doLoad Icon search complete");
         enableControls(STATE_DISABLED);
         return false;
     }
@@ -581,12 +582,14 @@ bool ImportIconsWizard::lookup(const QString& strParam)
     QString str = wget(url,strParam1);
     if (str.isEmpty() || str.startsWith("Error", Qt::CaseInsensitive))
     {
-        VERBOSE(VB_IMPORTANT, QString("Error from icon lookup : %1").arg(str));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error from icon lookup : %1").arg(str));
         return true;
     }
     else
     {
-        VERBOSE(VB_CHANNEL, QString("Icon Import: Working lookup : %1").arg(str));
+        LOG(VB_CHANNEL, LOG_INFO,
+            QString("Icon Import: Working lookup : %1").arg(str));
         return false;
     }
 }
@@ -619,12 +622,13 @@ bool ImportIconsWizard::search(const QString& strParam)
     if (str.isEmpty() || str.startsWith("#") ||
         str.startsWith("Error", Qt::CaseInsensitive))
     {
-        VERBOSE(VB_IMPORTANT, QString("Error from search : %1").arg(str));
+        LOG(VB_GENERAL, LOG_ERR, QString("Error from search : %1").arg(str));
         retVal = false;
     }
     else
     {
-        VERBOSE(VB_CHANNEL, QString("Icon Import: Working search : %1").arg(str));
+        LOG(VB_CHANNEL, LOG_INFO,
+            QString("Icon Import: Working search : %1").arg(str));
         QStringList strSplit = str.split("\n");
 
         // HACK HACK HACK -- begin
@@ -632,9 +636,9 @@ bool ImportIconsWizard::search(const QString& strParam)
         // and the result set may contain thousands of channels.
         if (strSplit.size() > 36*3)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Warning: Result set contains %1 items, "
-                            "truncating to the first %2 results")
+            LOG(VB_GENERAL, LOG_WARNING,
+                QString("Warning: Result set contains %1 items, "
+                        "truncating to the first %2 results")
                     .arg(strSplit.size()).arg(18*3));
             while (strSplit.size() > 18*3) strSplit.removeLast();
         }
@@ -670,8 +674,9 @@ bool ImportIconsWizard::search(const QString& strParam)
             if (row != "#" )
             {
                 QStringList ret = extract_csv(row);
-                VERBOSE(VB_CHANNEL, QString("Icon Import: search : %1 %2 %3")
-                            .arg(ret[0]).arg(ret[1]).arg(ret[2]));
+                LOG(VB_CHANNEL, LOG_INFO,
+                    QString("Icon Import: search : %1 %2 %3")
+                        .arg(ret[0]).arg(ret[1]).arg(ret[2]));
                 SearchEntry entry;
                 entry.strID = ret[0];
                 entry.strName = ret[1];
@@ -731,20 +736,23 @@ bool ImportIconsWizard::findmissing(const QString& strParam)
     QUrl url(m_url+"/findmissing");
 
     QString str = wget(url,"csv="+strParam1);
-    VERBOSE(VB_CHANNEL, QString("Icon Import: findmissing : strParam1 = %1. str = %2").arg(strParam1).arg(str));
+    LOG(VB_CHANNEL, LOG_INFO,
+        QString("Icon Import: findmissing : strParam1 = %1. str = %2")
+            .arg(strParam1).arg(str));
     if (str.isEmpty() || str.startsWith("#"))
     {
         return false;
     }
     else if (str.startsWith("Error", Qt::CaseInsensitive))
     {
-        VERBOSE(VB_IMPORTANT, QString("Error from findmissing : %1").arg(str));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error from findmissing : %1").arg(str));
         return false;
     }
     else
     {
-        VERBOSE(VB_CHANNEL, QString("Icon Import: Working findmissing : %1")
-                .arg(str));
+        LOG(VB_CHANNEL, LOG_INFO,
+            QString("Icon Import: Working findmissing : %1") .arg(str));
         QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
         for (QStringList::const_iterator it = strSplit.begin();
              it != strSplit.end(); ++it)
@@ -752,8 +760,8 @@ bool ImportIconsWizard::findmissing(const QString& strParam)
             if (*it != "#")
             {
                 const QStringList ret = extract_csv(*it);
-                VERBOSE(VB_CHANNEL, QString(
-                            "Icon Import: findmissing : %1 %2 %3 %4 %5")
+                LOG(VB_CHANNEL, LOG_INFO,
+                    QString("Icon Import: findmissing : %1 %2 %3 %4 %5")
                         .arg(ret[0]).arg(ret[1]).arg(ret[2])
                         .arg(ret[3]).arg(ret[4]));
                 checkAndDownload(ret[4], (*m_iter).strChanId);
@@ -788,14 +796,14 @@ bool ImportIconsWizard::submit()
     if (str.isEmpty() || str.startsWith("#") ||
         str.startsWith("Error", Qt::CaseInsensitive))
     {
-        VERBOSE(VB_IMPORTANT, QString("Error from submit : %1").arg(str));
+        LOG(VB_GENERAL, LOG_ERR, QString("Error from submit : %1").arg(str));
         if (m_statusText)
             m_statusText->SetText(tr("Failed to submit icon choices."));
         return false;
     }
     else
     {
-        VERBOSE(VB_CHANNEL, QString("Icon Import: Working submit : %1")
+        LOG(VB_CHANNEL, LOG_INFO, QString("Icon Import: Working submit : %1")
                 .arg(str));
         QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
         unsigned atsc = 0, dvb = 0, callsign = 0, tv = 0, xmltvid = 0;
@@ -821,8 +829,10 @@ bool ImportIconsWizard::submit()
             else if (s == "x")
                 xmltvid = strSplit2[1].toUInt();
         }
-        VERBOSE(VB_CHANNEL, QString("Icon Import: working submit : atsc=%1 callsign=%2 dvb=%3 tv=%4 xmltvid=%5")
-                                              .arg(atsc).arg(callsign).arg(dvb).arg(tv).arg(xmltvid));
+        LOG(VB_CHANNEL, LOG_INFO,
+            QString("Icon Import: working submit : atsc=%1 callsign=%2 "
+                    "dvb=%3 tv=%4 xmltvid=%5")
+                .arg(atsc).arg(callsign).arg(dvb).arg(tv).arg(xmltvid));
         if (m_statusText)
             m_statusText->SetText(tr("Icon choices submitted successfully."));
         return true;

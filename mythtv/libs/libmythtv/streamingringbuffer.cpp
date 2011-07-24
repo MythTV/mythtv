@@ -7,7 +7,7 @@
 StreamingRingBuffer::StreamingRingBuffer(const QString &lfilename)
   : RingBuffer(kRingBuffer_HTTP), m_context(NULL)
 {
-    startreadahead = true;
+    startreadahead = false;
     OpenFile(lfilename);
 }
 
@@ -33,14 +33,14 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     safefilename = lfilename;
     filename = lfilename;
-    VERBOSE(VB_GENERAL, LOC + QString("Trying %1").arg(filename));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying %1").arg(filename));
 
     int res = url_open(&m_context, filename.toAscii(), URL_RDONLY);
 
     if (res < 0 || !m_context)
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString("Failed to open stream (error %1)")
-            .arg(res));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to open stream (error %1)") .arg(res));
         return false;
     }
 

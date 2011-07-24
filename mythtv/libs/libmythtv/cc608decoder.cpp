@@ -156,12 +156,12 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
 
     b1 = data & 0x7f;
     b2 = (data >> 8) & 0x7f;
-/*
-    VERBOSE(VB_VBI, QString("Format CC @%1/%2 = %3 %4")
+#if 0
+    LOG(VB_VBI, LOG_DEBUG, QString("Format CC @%1/%2 = %3 %4")
                     .arg(tc).arg(field)
                     .arg((data&0xff), 2, 16)
                     .arg((data&0xff00)>>8, 2, 16));
-*/
+#endif
     if (ccmode[field] >= 0)
     {
         mode = field << 2 |
@@ -642,15 +642,15 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     else
         len = sizeof(ccsubtitle);
 
-    VERBOSE(VB_VBI, QString("### %1 %2 %3 %4 %5 %6 %7 -")
+    LOG(VB_VBI, LOG_INFO, QString("### %1 %2 %3 %4 %5 %6 %7 -")
                            .arg(timecode[mode], 10)
                            .arg(row[mode], 2).arg(rowcount[mode])
                            .arg(style[mode]).arg(f, 2, 16)
                            .arg(clr).arg(len, 3));
-    if (len && VERBOSE_LEVEL_CHECK(VB_VBI))
+    if (len && VERBOSE_LEVEL_CHECK(VB_VBI, LOG_INFO))
     {
         QString dispbuf = QString::fromUtf8(tmpbuf.constData(), len);
-        VERBOSE(VB_VBI, QString("%1 '").arg(timecode[mode], 10));
+        LOG(VB_VBI, LOG_INFO, QString("%1 '").arg(timecode[mode], 10));
         QString vbuf = "";
         int i = 0;
         while (i < dispbuf.length()) {
@@ -673,7 +673,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
             }
             i++;
         }
-        VERBOSE(VB_VBI, vbuf);
+        LOG(VB_VBI, LOG_INFO, vbuf);
     }
 
     reader->AddTextData(rbuf, len, timecode[mode], 'C');
@@ -820,17 +820,17 @@ static void DumpPIL(int pil)
   (((day) << 15) + ((mon) << 11) + ((hour) << 6) + ((min) << 0))
 
     if (pil == _PIL_(0, 15, 31, 63))
-        VERBOSE(VB_VBI, " PDC: Timer-control (no PDC)");
+        LOG(VB_VBI, LOG_INFO, " PDC: Timer-control (no PDC)");
     else if (pil == _PIL_(0, 15, 30, 63))
-        VERBOSE(VB_VBI, " PDC: Recording inhibit/terminate");
+        LOG(VB_VBI, LOG_INFO, " PDC: Recording inhibit/terminate");
     else if (pil == _PIL_(0, 15, 29, 63))
-        VERBOSE(VB_VBI, " PDC: Interruption");
+        LOG(VB_VBI, LOG_INFO, " PDC: Interruption");
     else if (pil == _PIL_(0, 15, 28, 63))
-        VERBOSE(VB_VBI, " PDC: Continue");
+        LOG(VB_VBI, LOG_INFO, " PDC: Continue");
     else if (pil == _PIL_(31, 15, 31, 63))
-        VERBOSE(VB_VBI, " PDC: No time");
+        LOG(VB_VBI, LOG_INFO, " PDC: No time");
     else
-        VERBOSE(VB_VBI, QString(" PDC: %1, 200X-%2-%3 %4:%5")
+        LOG(VB_VBI, LOG_INFO, QString(" PDC: %1, 200X-%2-%3 %4:%5")
                 .arg(pil).arg(mon).arg(day).arg(hour).arg(min));
 #undef _PIL_
 }
@@ -851,7 +851,7 @@ void CC608Decoder::DecodeVPS(const unsigned char *buf)
     vps_label[vps_l] = Printable(c);
     vps_l = (vps_l + 1) % 16;
 
-    VERBOSE(VB_VBI, QString("VPS: 3-10: %1 %2 %3 %4 %5 %6 %7 %8 (\"%9\")")
+    LOG(VB_VBI, LOG_INFO, QString("VPS: 3-10: %1 %2 %3 %4 %5 %6 %7 %8 (\"%9\")")
             .arg(buf[0]).arg(buf[1]).arg(buf[2]).arg(buf[3]).arg(buf[4])
             .arg(buf[5]).arg(buf[6]).arg(buf[7]).arg(vps_pr_label));
 
@@ -863,7 +863,7 @@ void CC608Decoder::DecodeVPS(const unsigned char *buf)
     pil = ((buf[8] & 0x3F) << 14) + (buf[9] << 6) + (buf[10] >> 2);
     pty = buf[12];
 
-    VERBOSE(VB_VBI, QString("CNI: %1 PCS: %2 PTY: %3 ")
+    LOG(VB_VBI, LOG_INFO, QString("CNI: %1 PCS: %2 PTY: %3 ")
             .arg(cni).arg(pcs).arg(pty));
 
     DumpPIL(pil);
@@ -893,7 +893,7 @@ void CC608Decoder::DecodeWSS(const unsigned char *buf)
     parity ^= parity >> 2;
     parity ^= parity >> 1;
 
-    VERBOSE(VB_VBI,
+    LOG(VB_VBI, LOG_INFO,
             QString("WSS: %1; %2 mode; %3 color coding;\n\t\t\t"
                     "     %4 helper; reserved b7=%5; %6\n\t\t\t"
                     "      open subtitles: %7; %scopyright %8; copying %9")
@@ -921,7 +921,7 @@ QString CC608Decoder::XDSDecodeString(const vector<unsigned char> &buf,
 #if DEBUG_XDS
     for (uint i = start; (i < buf.size()) && (i < end); i++)
     {
-        VERBOSE(VB_VBI, QString("%1: 0x%2 -> 0x%3 %4")
+        LOG(VB_VBI, LOG_INFO, QString("%1: 0x%2 -> 0x%3 %4")
                 .arg(i,2).arg(buf[i],2,16)
                 .arg(CharCC(buf[i]),2,16)
                 .arg(CharCC(buf[i])));
@@ -936,7 +936,7 @@ QString CC608Decoder::XDSDecodeString(const vector<unsigned char> &buf,
     }
 
 #if DEBUG_XDS
-    VERBOSE(VB_VBI, QString("XDSDecodeString: '%1'").arg(tmp));
+    LOG(VB_VBI, LOG_INFO, QString("XDSDecodeString: '%1'").arg(tmp));
 #endif // DEBUG_XDS
 
     return tmp.trimmed();
@@ -1086,8 +1086,8 @@ QString CC608Decoder::GetXDS(const QString &key) const
 void CC608Decoder::XDSDecode(int /*field*/, int b1, int b2)
 {
 #if DEBUG_XDS
-    VERBOSE(VB_VBI, QString("XDSDecode: 0x%1 0x%2 (cp 0x%3) '%4%5' "
-                            "xds[%6]=%7")
+    LOG(VB_VBI, LOG_INFO,
+        QString("XDSDecode: 0x%1 0x%2 (cp 0x%3) '%4%5' xds[%6]=%7")
             .arg(b1,2,16).arg(b2,2,16).arg(xds_current_packet,0,16)
             .arg(((int)CharCC(b1)>0x20) ? CharCC(b1) : QChar(' '))
             .arg(((int)CharCC(b2)>0x20) ? CharCC(b2) : QChar(' '))
@@ -1137,7 +1137,7 @@ void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
 #if DEBUG_XDS
     if (!handled)
     {
-        VERBOSE(VB_VBI, QString("XDS: ") +
+        LOG(VB_VBI, LOG_INFO, QString("XDS: ") +
                 QString("Unhandled packet (0x%1 0x%2) sz(%3) '%4'")
                 .arg(xds_buf[0],0,16).arg(xds_buf[1],0,16)
                 .arg(xds_buf.size())
@@ -1157,7 +1157,7 @@ bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)
     {
         xds_crc_failed++;
 
-        VERBOSE(VB_VBI, QString("XDS: failed CRC %1/%2")
+        LOG(VB_VBI, LOG_ERR, QString("XDS: failed CRC %1/%2")
                 .arg(xds_crc_failed).arg(xds_crc_failed + xds_crc_passed));
 
         return false;
@@ -1183,7 +1183,7 @@ bool CC608Decoder::XDSPacketParseProgram(
         uint month = xds_buf[5] & 0x0f;
         month = (month < 1 || month > 12) ? 0 : month;
 
-        VERBOSE(VB_VBI, loc +
+        LOG(VB_VBI, LOG_INFO, loc +
                 QString("Start Time %1/%2 %3:%4%5")
                 .arg(month).arg(day).arg(hour).arg(min / 10).arg(min % 10));
     }
@@ -1209,7 +1209,7 @@ bool CC608Decoder::XDSPacketParseProgram(
             .arg(length_elapsed_min / 10).arg(length_elapsed_min % 10)
             .arg(length_elapsed_secs / 10).arg(length_elapsed_secs % 10);
 
-        VERBOSE(VB_VBI, loc + msg);
+        LOG(VB_VBI, LOG_INFO, loc + msg);
     }
     else if ((b2 == 0x03) && (xds_buf.size() >= 6))
     {
@@ -1217,7 +1217,7 @@ bool CC608Decoder::XDSPacketParseProgram(
         if (is_better(tmp, xds_program_name[cf]))
         {
             xds_program_name[cf] = tmp;
-            VERBOSE(VB_VBI, loc + QString("Program Name: '%1'")
+            LOG(VB_VBI, LOG_INFO, loc + QString("Program Name: '%1'")
                     .arg(GetProgramName(future)));
         }
     }
@@ -1238,7 +1238,7 @@ bool CC608Decoder::XDSPacketParseProgram(
         if (!unchanged)
         {
             xds_program_type[cf] = program_type;
-            VERBOSE(VB_VBI, loc + QString("Program Type '%1'")
+            LOG(VB_VBI, LOG_INFO, loc + QString("Program Type '%1'")
                     .arg(GetProgramType(future)));
         }
     }
@@ -1256,7 +1256,7 @@ bool CC608Decoder::XDSPacketParseProgram(
             {
                 xds_rating_systems[cf]            |= kHasCanEnglish;
                 xds_rating[cf][kRatingCanEnglish]  = tv_rating;
-                VERBOSE(VB_VBI, loc + QString("VChip %1")
+                LOG(VB_VBI, LOG_INFO, loc + QString("VChip %1")
                         .arg(GetRatingString(kRatingCanEnglish, future)));
             }
         }
@@ -1267,7 +1267,7 @@ bool CC608Decoder::XDSPacketParseProgram(
             {
                 xds_rating_systems[cf]           |= kHasCanFrench;
                 xds_rating[cf][kRatingCanFrench]  = tv_rating;
-                VERBOSE(VB_VBI, loc + QString("VChip %1")
+                LOG(VB_VBI, LOG_INFO, loc + QString("VChip %1")
                         .arg(GetRatingString(kRatingCanFrench, future)));
             }
         }
@@ -1281,7 +1281,7 @@ bool CC608Decoder::XDSPacketParseProgram(
                 uint f = ((xds_buf[0]<<3) & 0x80) | ((xds_buf[1]<<1) & 0x70);
                 xds_rating_systems[cf]     |= kHasTPG;
                 xds_rating[cf][kRatingTPG]  = tv_rating | f;
-                VERBOSE(VB_VBI, loc + QString("VChip %1")
+                LOG(VB_VBI, LOG_INFO, loc + QString("VChip %1")
                         .arg(GetRatingString(kRatingTPG, future)));
             }
         }
@@ -1292,13 +1292,13 @@ bool CC608Decoder::XDSPacketParseProgram(
             {
                 xds_rating_systems[cf]      |= kHasMPAA;
                 xds_rating[cf][kRatingMPAA]  = movie_rating;
-                VERBOSE(VB_VBI, loc + QString("VChip %1")
+                LOG(VB_VBI, LOG_INFO, loc + QString("VChip %1")
                         .arg(GetRatingString(kRatingMPAA, future)));
             }
         }
         else
         {
-            VERBOSE(VB_VBI, loc + 
+            LOG(VB_VBI, LOG_ERR, loc + 
                     QString("VChip Unhandled -- rs(%1) rating(%2:%3)")
 		    .arg(rating_system).arg(tv_rating).arg(movie_rating));
         }
@@ -1338,7 +1338,7 @@ bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
         QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
         if (is_better(tmp, xds_net_name))
         {
-            VERBOSE(VB_VBI, QString("XDS: Network Name '%1'").arg(tmp));
+            LOG(VB_VBI, LOG_INFO, QString("XDS: Network Name '%1'").arg(tmp));
             xds_net_name = tmp;
         }
     }
@@ -1347,7 +1347,7 @@ bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
         QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
         if (is_better(tmp, xds_net_call) && (tmp.indexOf(" ") < 0))
         {
-            VERBOSE(VB_VBI, QString("XDS: Network Call '%1'").arg(tmp));
+            LOG(VB_VBI, LOG_INFO, QString("XDS: Network Call '%1'").arg(tmp));
             xds_net_call = tmp;
         }
     }
@@ -1357,7 +1357,7 @@ bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
                      xds_buf[4] <<  8 | xds_buf[5]);
         if (tsid != xds_tsid)
         {
-            VERBOSE(VB_VBI, QString("XDS: TSID 0x%1").arg(tsid,0,16));
+            LOG(VB_VBI, LOG_INFO, QString("XDS: TSID 0x%1").arg(tsid,0,16));
             xds_tsid = tsid;
         }
     }

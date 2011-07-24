@@ -26,7 +26,7 @@ class MUI_PUBLIC MythRect : public QRect
     bool operator== (const MythRect &other) const;
 
     void Init(void);
-    void CalculateArea(MythRect parentArea);
+    void CalculateArea(const MythRect & parentArea);
 
     void NormRect(void);
 
@@ -57,10 +57,17 @@ class MUI_PUBLIC MythRect : public QRect
     QRect toQRect(void) const;
 
   private:
+    bool parsePosition(float & percent, int & offset, int & absolute,
+		       const QString &value);
+
     float m_percentWidth;
     float m_percentHeight;
     float m_percentX;
     float m_percentY;
+    int   m_offsetWidth;
+    int   m_offsetHeight;
+    int   m_offsetX;
+    int   m_offsetY;
 
     bool m_needsUpdate;
 
@@ -83,7 +90,7 @@ class MUI_PUBLIC MythPoint : public QPoint
 
     void Init(void);
     bool isValid(void) const { return valid; }
-    void CalculatePoint(MythRect parentArea);
+    void CalculatePoint(const MythRect & parentArea);
 
     void NormPoint(void);
 
@@ -98,8 +105,13 @@ class MUI_PUBLIC MythPoint : public QPoint
     QPoint toQPoint(void) const;
 
   private:
+    bool parsePosition(float & percent, int & offset, int & absolute,
+		       const QString &value);
+
     float m_percentX;
     float m_percentY;
+    int   m_offsetX;
+    int   m_offsetY;
 
     bool m_needsUpdate;
 

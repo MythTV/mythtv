@@ -18,8 +18,6 @@
 #include "mythlogging.h"
 
 #define LOC      QString("HDHRSH(%1): ").arg(_device)
-#define LOC_WARN QString("HDHRSH(%1) Warning: ").arg(_device)
-#define LOC_ERR  QString("HDHRSH(%1) Error: ").arg(_device)
 
 QMap<QString,HDHRStreamHandler*> HDHRStreamHandler::_handlers;
 QMap<QString,uint>               HDHRStreamHandler::_handlers_refcnt;
@@ -40,16 +38,16 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname)
         _handlers[devkey] = newhandler;
         _handlers_refcnt[devkey] = 1;
 
-        VERBOSE(VB_RECORD,
-                QString("HDHRSH: Creating new stream handler %1 for %2")
+        LOG(VB_RECORD, LOG_INFO,
+            QString("HDHRSH: Creating new stream handler %1 for %2")
                 .arg(devkey).arg(devname));
     }
     else
     {
         _handlers_refcnt[devkey]++;
         uint rcount = _handlers_refcnt[devkey];
-        VERBOSE(VB_RECORD,
-                QString("HDHRSH: Using existing stream handler %1 for %2")
+        LOG(VB_RECORD, LOG_INFO,
+            QString("HDHRSH: Using existing stream handler %1 for %2")
                 .arg(devkey)
                 .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
@@ -77,7 +75,7 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref)
     QMap<QString,HDHRStreamHandler*>::iterator it = _handlers.find(devname);
     if ((it != _handlers.end()) && (*it == ref))
     {
-        VERBOSE(VB_RECORD, QString("HDHRSH: Closing handler for %1")
+        LOG(VB_RECORD, LOG_INFO, QString("HDHRSH: Closing handler for %1")
                            .arg(devname));
         ref->Close();
         delete *it;
@@ -85,8 +83,8 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("HDHRSH Error: Couldn't find handler for %1")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("HDHRSH Error: Couldn't find handler for %1")
                 .arg(devname));
     }
 
@@ -112,8 +110,8 @@ void HDHRStreamHandler::run(void)
     /* Create TS socket. */
     if (!hdhomerun_device_stream_start(_hdhomerun_device))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Starting recording (set target failed). Aborting.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Starting recording (set target failed). Aborting.");
         _error = true;
 	threadDeregister();
         return;
@@ -129,7 +127,7 @@ void HDHRStreamHandler::run(void)
     buffersize *= VIDEO_DATA_PACKET_SIZE;
     buffersize = max(49 * TSPacket::kSize * 128, buffersize);
 
-    VERBOSE(VB_RECORD, LOC + "RunTS(): begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
 
     int remainder = 0;
     while (_running_desired && !_error)
@@ -168,17 +166,17 @@ void HDHRStreamHandler::run(void)
         _listener_lock.unlock();
         if (remainder != 0)
         {
-            VERBOSE(VB_RECORD, LOC +
-                    QString("RunTS(): data_length = %1 remainder = %2")
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                QString("RunTS(): data_length = %1 remainder = %2")
                     .arg(data_length).arg(remainder));
         }
     }
-    VERBOSE(VB_RECORD, LOC + "RunTS(): " + "shutdown");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "shutdown");
 
     RemoveAllPIDFilters();
 
     hdhomerun_device_stream_stop(_hdhomerun_device);
-    VERBOSE(VB_RECORD, LOC + "RunTS(): " + "end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "end");
 
     SetRunning(false, false, false);
     threadDeregister();
@@ -202,13 +200,13 @@ bool HDHRStreamHandler::UpdateFilters(void)
 
     if (_tune_mode != hdhrTuneModeFrequencyPid)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "UpdateFilters called in wrong tune mode");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "UpdateFilters called in wrong tune mode");
         return false;
     }
 
 #ifdef DEBUG_PID_FILTERS
-    VERBOSE(VB_RECORD, LOC + "UpdateFilters()");
+    LOG(VB_RECORD, LOG_INFO, LOC + "UpdateFilters()");
 #endif // DEBUG_PID_FILTERS
     QMutexLocker locker(&_pid_lock);
 
@@ -252,7 +250,7 @@ bool HDHRStreamHandler::UpdateFilters(void)
     if (filter != new_filter)
         msg += QString("\n\t\t\t\t'%2'").arg(new_filter);
 
-    VERBOSE(VB_RECORD, LOC + msg);
+    LOG(VB_RECORD, LOG_INFO, LOC + msg);
 #endif // DEBUG_PID_FILTERS
 
     return filter == new_filter;
@@ -300,7 +298,7 @@ bool HDHRStreamHandler::Connect(void)
 
     if (!_hdhomerun_device)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to create hdhomerun object");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to create hdhomerun object");
         return false;
     }
 
@@ -308,11 +306,11 @@ bool HDHRStreamHandler::Connect(void)
 
     if (hdhomerun_device_get_local_machine_addr(_hdhomerun_device) == 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to connect to device");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to connect to device");
         return false;
     }
 
-    VERBOSE(VB_RECORD, LOC + "Successfully connected to device");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Successfully connected to device");
     return true;
 }
 
@@ -322,7 +320,8 @@ bool HDHRStreamHandler::EnterPowerSavingMode(void)
 
     if (!_stream_data_list.empty())
     {
-        VERBOSE(VB_RECORD, LOC + "Ignoring request - video streaming active");
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            "Ignoring request - video streaming active");
         return false;
     }
     else
@@ -339,7 +338,7 @@ QString HDHRStreamHandler::TunerGet(
 
     if (!_hdhomerun_device)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed (not connected)");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Get request failed (not connected)");
         return QString::null;
     }
 
@@ -350,7 +349,7 @@ QString HDHRStreamHandler::TunerGet(
             _hdhomerun_device, valname.toLocal8Bit().constData(),
             &value, &error) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Get request failed" + ENO);
         return QString::null;
     }
 
@@ -358,8 +357,8 @@ QString HDHRStreamHandler::TunerGet(
     {
         if (print_error)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("DeviceGet(%1): %2").arg(name).arg(error));
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceGet(%1): %2")
+                    .arg(name).arg(error));
         }
 
         return QString::null;
@@ -376,7 +375,7 @@ QString HDHRStreamHandler::TunerSet(
 
     if (!_hdhomerun_device)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed (not connected)");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Set request failed (not connected)");
         return QString::null;
     }
 
@@ -389,7 +388,7 @@ QString HDHRStreamHandler::TunerSet(
             _hdhomerun_device, valname.toLocal8Bit().constData(),
             val.toLocal8Bit().constData(), &value, &error) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Set request failed" + ENO);
 
         return QString::null;
     }
@@ -398,8 +397,7 @@ QString HDHRStreamHandler::TunerSet(
     {
         if (print_error)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("DeviceSet(%1 %2): %3")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
                     .arg(name).arg(val).arg(error));
         }
 
@@ -426,11 +424,12 @@ bool HDHRStreamHandler::TuneChannel(const QString &chn)
     QString current = TunerGet("channel");
     if (current == chn)
     {
-        VERBOSE(VB_RECORD, QString(LOC + "Not Re-Tuning channel %1").arg(chn));
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Not Re-Tuning channel %1")
+                .arg(chn));
         return true;
     }
 
-    VERBOSE(VB_RECORD, QString(LOC + "Tuning channel %1 (was %2)")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning channel %1 (was %2)")
             .arg(chn).arg(current));
     return !TunerSet("channel", chn).isEmpty();
 }
@@ -442,11 +441,12 @@ bool HDHRStreamHandler::TuneProgram(uint mpeg_prog_num)
 
     if (_tune_mode != hdhrTuneModeFrequencyProgram)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "TuneProgram called in wrong tune mode");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "TuneProgram called in wrong tune mode");
         return false;
     }
 
-    VERBOSE(VB_RECORD, QString(LOC + "Tuning program %1").arg(mpeg_prog_num));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning program %1")
+            .arg(mpeg_prog_num));
     return !TunerSet(
         "program", QString::number(mpeg_prog_num), false).isEmpty();
 }
@@ -455,7 +455,7 @@ bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
 {
     _tune_mode = hdhrTuneModeVChannel;
 
-    VERBOSE(VB_RECORD, QString(LOC + "Tuning vchannel %1").arg(vchn));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning vchannel %1").arg(vchn));
     return !TunerSet(
         "vchannel", vchn).isEmpty();
 }

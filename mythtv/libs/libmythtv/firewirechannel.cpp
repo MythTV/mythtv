@@ -12,8 +12,6 @@
 #include "firewirechannel.h"
 
 #define LOC QString("FireChan(%1): ").arg(GetDevice())
-#define LOC_WARN QString("FireChan(%1), Warning: ").arg(GetDevice())
-#define LOC_ERR QString("FireChan(%1), Error: ").arg(GetDevice())
 
 FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
                                  const FireWireDBOptions &firewire_opts) :
@@ -40,7 +38,7 @@ FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
 
 bool FirewireChannel::Open(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Open()");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Open()");
 
     if (!device)
         return false;
@@ -58,8 +56,8 @@ bool FirewireChannel::Open(void)
     if (!FirewireDevice::IsSTBSupported(fw_opts.model) &&
         (*it)->externalChanger.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Model: '%1' is not supported.").arg(fw_opts.model));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Model: '%1' is not supported.").arg(fw_opts.model));
 
         return false;
     }
@@ -74,7 +72,7 @@ bool FirewireChannel::Open(void)
 
 void FirewireChannel::Close(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Close()");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Close()");
     if (isopen)
     {
         device->ClosePort();
@@ -91,8 +89,8 @@ bool FirewireChannel::SetPowerState(bool on)
 {
     if (!isopen)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "SetPowerState() called on closed FirewireChannel.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "SetPowerState() called on closed FirewireChannel.");
 
         return false;
     }
@@ -104,8 +102,8 @@ FirewireDevice::PowerState FirewireChannel::GetPowerState(void) const
 {
     if (!isopen)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "GetPowerState() called on closed FirewireChannel.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "GetPowerState() called on closed FirewireChannel.");
 
         return FirewireDevice::kAVCPowerQueryFailed;
     }
@@ -115,12 +113,12 @@ FirewireDevice::PowerState FirewireChannel::GetPowerState(void) const
 
 bool FirewireChannel::Retune(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Retune()");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Retune()");
 
     if (FirewireDevice::kAVCPowerOff == GetPowerState())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "STB is turned off, must be on to retune.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "STB is turned off, must be on to retune.");
 
         return false;
     }
@@ -136,7 +134,7 @@ bool FirewireChannel::Retune(void)
 
 bool FirewireChannel::Tune(const QString &freqid, int /*finetune*/)
 {
-    VERBOSE(VB_CHANNEL, QString("Tune(%1)").arg(freqid));
+    LOG(VB_CHANNEL, LOG_INFO, QString("Tune(%1)").arg(freqid));
 
     bool ok;
     uint channel = freqid.toUInt(&ok);
@@ -145,7 +143,7 @@ bool FirewireChannel::Tune(const QString &freqid, int /*finetune*/)
 
     if (FirewireDevice::kAVCPowerOff == GetPowerState())
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "STB is turned off, must be on to set channel.");
 
         return true; // signal monitor will call retune later...

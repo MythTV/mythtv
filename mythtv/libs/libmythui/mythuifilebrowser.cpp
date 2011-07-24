@@ -439,7 +439,9 @@ void MythUIFileBrowser::updateRemoteFileList()
     QStringList sgdirlist;
     QString     sgdir;
     QStringList slist;
-    QString dirURL = QString("%1/%2").arg(m_baseDirectory)
+    if (!m_baseDirectory.endsWith("/"))
+        m_baseDirectory.append("/");
+    QString dirURL = QString("%1%2").arg(m_baseDirectory)
                                      .arg(m_subDirectory);
     if (!GetRemoteFileList(m_baseDirectory, sgdir, sgdirlist))
     {
@@ -528,10 +530,10 @@ void MythUIFileBrowser::updateRemoteFileList()
         if (tokens[0] == "sgdir")
             dataName = m_baseDirectory;
         else if (m_subDirectory.isEmpty())
-            dataName = QString("%1/%2").arg(m_baseDirectory)
+            dataName = QString("%1%2").arg(m_baseDirectory)
                                .arg(displayName);
         else
-            dataName = QString("%1/%2/%3").arg(m_baseDirectory)
+            dataName = QString("%1%2/%3").arg(m_baseDirectory)
                                .arg(m_subDirectory).arg(displayName);
 
         MFileInfo finfo(dataName, m_storageGroupDir);

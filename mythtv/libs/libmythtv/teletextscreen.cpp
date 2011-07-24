@@ -304,7 +304,7 @@ static QString TTColorToString(int ttcolor)
 
 void TeletextScreen::SetForegroundColor(int ttcolor)
 {
-    VERBOSE(VB_VBI|VB_EXTRA, QString("SetForegroundColor(%1)")
+    LOG(VB_VBI, LOG_DEBUG, QString("SetForegroundColor(%1)")
             .arg(TTColorToString(ttcolor)));
 
     gTTFont->SetColor(ttcolortoqcolor(ttcolor));
@@ -312,7 +312,7 @@ void TeletextScreen::SetForegroundColor(int ttcolor)
 
 void TeletextScreen::SetBackgroundColor(int ttcolor)
 {
-    VERBOSE(VB_VBI|VB_EXTRA, QString("SetBackgroundColor(%1)")
+    LOG(VB_VBI, LOG_DEBUG, QString("SetBackgroundColor(%1)")
             .arg(TTColorToString(ttcolor)));
 
     m_bgColor = ttcolortoqcolor(ttcolor);
@@ -694,7 +694,7 @@ bool TeletextScreen::InitialiseFont()
         return false;
 
     initialised = true;
-    VERBOSE(VB_PLAYBACK, LOC + QString("Loaded main subtitle font '%1'")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Loaded main subtitle font '%1'")
         .arg(font));
     return true;
 }

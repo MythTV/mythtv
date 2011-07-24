@@ -12,23 +12,22 @@
 
 #define INIT_ST \
   VAStatus va_status; \
-  bool ok = true;
+  bool ok = true
 
 #define CHECK_ST \
   ok &= (va_status == VA_STATUS_SUCCESS); \
-  if (!ok) { \
-      VERBOSE(VB_IMPORTANT, ERR + QString("Error at %1:%2 (#%3, %4)") \
+  if (!ok) \
+      LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
               .arg(__FILE__).arg( __LINE__).arg(va_status) \
-              .arg(vaErrorStr(va_status))); \
-  }
+              .arg(vaErrorStr(va_status)))
 
 #define CREATE_CHECK(arg1, arg2) \
   if (ok) \
   { \
       ok = arg1; \
       if (!ok) \
-          VERBOSE(VB_IMPORTANT, ERR + arg2); \
-  }
+          LOG(VB_GENERAL, LOG_ERR, LOC + arg2); \
+  } while(0)
 
 QString profileToString(VAProfile profile);
 QString entryToString(VAEntrypoint entry);
@@ -82,9 +81,9 @@ class VAAPIDisplay
     {
         if (m_va_disp)
         {
-            INIT_ST
+            INIT_ST;
             XLOCK(m_x_disp, va_status = vaTerminate(m_va_disp));
-            CHECK_ST
+            CHECK_ST;
         }
         if (m_x_disp)
         {
@@ -99,12 +98,14 @@ class VAAPIDisplay
         if (!mw)
             return false;
 
-        MythRenderOpenGL *gl = static_cast<MythRenderOpenGL*>(mw->GetRenderDevice());
+        MythRenderOpenGL *gl =
+            static_cast<MythRenderOpenGL*>(mw->GetRenderDevice());
+
         if (!gl)
         {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Failed to get OpenGL context - you must use the "
-                            "OpenGL UI painter for VAAPI support."));
+            LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                QString("Failed to get OpenGL context - you must use the "
+                        "OpenGL UI painter for VAAPI support."));
             return false;
         }
         gl->makeCurrent();
@@ -123,27 +124,27 @@ class VAAPIDisplay
 
         if (!m_va_disp)
         {
-            VERBOSE(VB_IMPORTANT, ERR + "Failed to create VADisplay");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VADisplay");
             return false;
         }
 
-        INIT_ST
+        INIT_ST;
         va_status = vaInitialize(m_va_disp, &major_ver, &minor_ver);
-        CHECK_ST
+        CHECK_ST;
 
         static bool debugged = false;
         if (ok && !debugged)
         {
             debugged = true;
-            VERBOSE(VB_IMPORTANT, LOC + QString("Version: %1.%2")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Version: %1.%2")
                                         .arg(major_ver).arg(minor_ver));
-            VERBOSE(VB_IMPORTANT, LOC + QString("Vendor : %1")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Vendor : %1")
                                         .arg(vaQueryVendorString(m_va_disp)));
         }
         if (ok)
         {
             UpRef();
-            VERBOSE(VB_PLAYBACK, LOC + QString("Created VAAPI GLX display"));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created VAAPI GLX display");
         }
         return ok;
     }
@@ -161,7 +162,7 @@ class VAAPIDisplay
         {
             if (gVAAPIDisplay == this)
                 gVAAPIDisplay = NULL;
-            VERBOSE(VB_PLAYBACK, LOC + "Deleting VAAPI display.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting VAAPI display.");
             m_x_disp->Unlock();
             delete this;
             return;
@@ -230,21 +231,21 @@ VAAPIContext::~VAAPIContext()
     {
         m_display->m_x_disp->Lock();
 
-        INIT_ST
+        INIT_ST;
         if (m_ctx.context_id)
         {
             va_status = vaDestroyContext(m_ctx.display, m_ctx.context_id);
-            CHECK_ST
+            CHECK_ST;
         }
         if (m_ctx.config_id)
         {
             va_status = vaDestroyConfig(m_ctx.display, m_ctx.config_id);
-            CHECK_ST
+            CHECK_ST;
         }
         if (m_surfaces)
         {
             va_status = vaDestroySurfaces(m_ctx.display, m_surfaces, m_numSurfaces);
-            CHECK_ST
+            CHECK_ST;
         }
     }
 
@@ -259,7 +260,7 @@ VAAPIContext::~VAAPIContext()
         m_display->DownRef();
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + "Deleted context");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleted context");
 }
 
 bool VAAPIContext::CreateDisplay(QSize size)
@@ -267,12 +268,13 @@ bool VAAPIContext::CreateDisplay(QSize size)
     m_size = size;
     bool ok = true;
     m_display = VAAPIDisplay::GetDisplay();
-    CREATE_CHECK(!m_size.isEmpty(), "Invalid size")
-    CREATE_CHECK(m_display != NULL, "Invalid display")
-    CREATE_CHECK(InitDisplay(),     "Invalid VADisplay")
-    CREATE_CHECK(InitProfiles(),    "No supported profiles")
+    CREATE_CHECK(!m_size.isEmpty(), "Invalid size");
+    CREATE_CHECK(m_display != NULL, "Invalid display");
+    CREATE_CHECK(InitDisplay(),     "Invalid VADisplay");
+    CREATE_CHECK(InitProfiles(),    "No supported profiles");
     if (ok)
-        VERBOSE(VB_PLAYBACK, LOC + QString("Created context (%1x%2->%3x%4)")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Created context (%1x%2->%3x%4)")
             .arg(size.width()).arg(size.height())
             .arg(m_size.width()).arg(m_size.height()));
     return ok;
@@ -293,9 +295,9 @@ void VAAPIContext::InitPictureAttributes(VideoColourSpace &colourspace)
     VADisplayAttribute* attribs = new VADisplayAttribute[num];
 
     int actual = 0;
-    INIT_ST
+    INIT_ST;
     va_status = vaQueryDisplayAttributes(m_display->m_va_disp, attribs, &actual);
-    CHECK_ST
+    CHECK_ST;
 
     for (int i = 0; i < actual; i++)
     {
@@ -385,11 +387,11 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute attribute, int newValue)
 
     if (found)
     {
-        INIT_ST
+        INIT_ST;
         va_status = vaSetDisplayAttributes(m_display->m_va_disp,
                                            m_pictureAttributes,
                                            m_pictureAttributeCount);
-        CHECK_ST
+        CHECK_ST;
         return newValue;
     }
     return -1;
@@ -398,11 +400,12 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute attribute, int newValue)
 bool VAAPIContext::CreateBuffers(void)
 {
     bool ok = true;
-    CREATE_CHECK(!m_size.isEmpty(), "Invalid size")
-    CREATE_CHECK(InitBuffers(),     "Failed to create buffers.")
-    CREATE_CHECK(InitContext(),     "Failed to create context")
+    CREATE_CHECK(!m_size.isEmpty(), "Invalid size");
+    CREATE_CHECK(InitBuffers(),     "Failed to create buffers.");
+    CREATE_CHECK(InitContext(),     "Failed to create context");
     if (ok)
-        VERBOSE(VB_PLAYBACK, LOC + QString("Created %1 buffers").arg(m_numSurfaces));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Created %1 buffers").arg(m_numSurfaces));
     return ok;
 }
 
@@ -433,12 +436,12 @@ bool VAAPIContext::InitProfiles(void)
     static bool debugged = false;
     if (profiles && entries)
     {
-        INIT_ST
+        INIT_ST;
         int act_profiles, act_entries;
         va_status = vaQueryConfigProfiles(m_ctx.display,
                                           profiles,
                                          &act_profiles);
-        CHECK_ST
+        CHECK_ST;
         if (ok && act_profiles > 0)
         {
             for (int i = 0; i < act_profiles; i++)
@@ -462,8 +465,10 @@ bool VAAPIContext::InitProfiles(void)
                         QString entrylist = "Entrypoints: ";
                         for (int j = 0; j < act_entries; j++)
                             entrylist += entryToString(entries[j]);
-                        VERBOSE(VB_IMPORTANT, LOC + QString("Profile: %1 %2")
-                            .arg(profileToString(profiles[i])).arg(entrylist));
+                        LOG(VB_GENERAL, LOG_INFO, LOC +
+                            QString("Profile: %1 %2")
+                                .arg(profileToString(profiles[i]))
+                                .arg(entrylist));
                     }
                 }
             }
@@ -473,20 +478,20 @@ bool VAAPIContext::InitProfiles(void)
     delete [] profiles;
     delete [] entries;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Desired profile for '%1': %2")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Desired profile for '%1': %2")
         .arg(toString(m_codec)).arg(profileToString(profile_wanted)));
-    VERBOSE(VB_PLAYBACK, LOC + QString("Found profile %1 with entry %2")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found profile %1 with entry %2")
         .arg(profileToString(profile_found)).arg(entryToString(entry_found)));
 
     if (profile_wanted != profile_found)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to find supported profile.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find supported profile.");
         return false;
     }
 
     if (entry_found > VAEntrypointVLD)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to find suitable entry point.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find suitable entry point.");
         return false;
     }
 
@@ -512,11 +517,11 @@ bool VAAPIContext::InitBuffers(void)
     memset(m_surfaces, 0, sizeof(m_surfaces));
     memset(m_surfaceData, 0, sizeof(m_surfaceData));
 
-    INIT_ST
+    INIT_ST;
     va_status = vaCreateSurfaces(m_ctx.display, m_size.width(), m_size.height(),
                                  VA_RT_FORMAT_YUV420, m_numSurfaces,
                                  m_surfaces);
-    CHECK_ST
+    CHECK_ST;
 
     for (int i = 0; i < m_numSurfaces; i++)
         m_surfaceData[i].m_id = m_surfaces[i];
@@ -531,23 +536,23 @@ bool VAAPIContext::InitContext(void)
     MythXLocker locker(m_display->m_x_disp);
     VAConfigAttrib attrib;
     attrib.type = VAConfigAttribRTFormat;
-    INIT_ST
+    INIT_ST;
     va_status = vaGetConfigAttributes(m_ctx.display, m_vaProfile,
                                       m_vaEntrypoint, &attrib, 1);
-    CHECK_ST
+    CHECK_ST;
 
     if (!ok || !(attrib.value & VA_RT_FORMAT_YUV420))
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to confirm YUV420 chroma");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to confirm YUV420 chroma");
         return false;
     }
 
     va_status = vaCreateConfig(m_ctx.display, m_vaProfile, m_vaEntrypoint,
                                &attrib, 1, &m_ctx.config_id);
-    CHECK_ST
+    CHECK_ST;
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to create decoder config.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create decoder config.");
         return false;
     }
 
@@ -555,10 +560,10 @@ bool VAAPIContext::InitContext(void)
                                 m_size.width(), m_size.height(), VA_PROGRESSIVE,
                                 m_surfaces, m_numSurfaces,
                                 &m_ctx.context_id);
-    CHECK_ST
+    CHECK_ST;
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to create decoder context.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create decoder context.");
         return false;
     }
     return true;
@@ -580,9 +585,9 @@ uint8_t* VAAPIContext::GetSurfaceIDPointer(void* buf)
     if (!surf->m_id)
         return NULL;
 
-    INIT_ST
+    INIT_ST;
     va_status = vaSyncSurface(m_ctx.display, surf->m_id);
-    CHECK_ST
+    CHECK_ST;
     return (uint8_t*)(uintptr_t)surf->m_id;
 }
 
@@ -603,13 +608,13 @@ bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
     //else if (scan == kScan_Intr2ndField)
     //    field = VA_BOTTOM_FIELD;
 
-    //INIT_ST
+    //INIT_ST;
     //va_status = vaSyncSurface(m_ctx.display, surf->m_id);
-    //CHECK_ST
+    //CHECK_ST;
 
-    INIT_ST
+    INIT_ST;
     va_status = vaCopySurfaceGLX(m_ctx.display, glx_surface, surf->m_id, field);
-    CHECK_ST
+    CHECK_ST;
     return true;
 }
 
@@ -619,19 +624,19 @@ void* VAAPIContext::GetGLXSurface(uint texture, uint texture_type)
         return m_glxSurfaces.value(texture);
 
     void *glx_surface = NULL;
-    INIT_ST
+    INIT_ST;
     va_status = vaCreateSurfaceGLX(m_ctx.display, texture_type,
                                    texture, &glx_surface);
-    CHECK_ST
+    CHECK_ST;
     if (!glx_surface)
     {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to create GLX surface.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create GLX surface.");
         return NULL;
     }
 
     m_glxSurfaces.insert(texture, glx_surface);
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Number of VAAPI GLX surfaces: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of VAAPI GLX surfaces: %1")
         .arg(m_glxSurfaces.size()));
     return glx_surface;
 }
@@ -642,11 +647,11 @@ void VAAPIContext::ClearGLXSurfaces(void)
         return;
 
     m_display->m_x_disp->Lock();
-    INIT_ST
+    INIT_ST;
     foreach (void* surface, m_glxSurfaces)
     {
         va_status = vaDestroySurfaceGLX(m_ctx.display, surface);
-        CHECK_ST
+        CHECK_ST;
     }
     m_glxSurfaces.clear();
     m_display->m_x_disp->Unlock();

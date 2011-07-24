@@ -3,8 +3,6 @@
 #include "avformatdecoderdvd.h"
 
 #define LOC QString("AFD_DVD: ")
-#define LOC_ERR QString("AFD_DVD Error: ")
-#define LOC_WARN QString("AFD_DVD Warning: ")
 
 AvFormatDecoderDVD::AvFormatDecoderDVD(
     MythPlayer *parent, const ProgramInfo &pginfo,
@@ -35,9 +33,8 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
         sinfo_vec_t::iterator it = tracks[kTrackTypeAudio].begin();
         for (; it != tracks[kTrackTypeAudio].end(); ++it)
         {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("DVD Audio Track Map "
-                            "Stream id #%1, MPEG stream %2")
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("DVD Audio Track Map Stream id #%1, MPEG stream %2")
                     .arg(it->stream_id)
                     .arg(ic->streams[it->av_stream_index]->id));
         }
@@ -54,9 +51,8 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
         sinfo_vec_t::iterator it = tracks[kTrackTypeSubtitle].begin();
         for(; it != tracks[kTrackTypeSubtitle].end(); ++it)
         {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("DVD Subtitle Track Map "
-                            "Stream id #%1 ")
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("DVD Subtitle Track Map Stream id #%1 ")
                     .arg(it->stream_id));
         }
         stable_sort(tracks[kTrackTypeSubtitle].begin(),

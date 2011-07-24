@@ -31,13 +31,13 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
 VideoOutputNull::VideoOutputNull() :
     VideoOutput(), global_lock(QMutex::Recursive)
 {
-    VERBOSE(VB_PLAYBACK, "VideoOutputNull()");
+    LOG(VB_PLAYBACK, LOG_INFO, "VideoOutputNull()");
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
 }
 
 VideoOutputNull::~VideoOutputNull()
 {
-    VERBOSE(VB_PLAYBACK, "~VideoOutputNull()");
+    LOG(VB_PLAYBACK, LOG_INFO, "~VideoOutputNull()");
     QMutexLocker locker(&global_lock);
 
     if (av_pause_frame.buf)
@@ -82,15 +82,15 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
                                    void        *codec_private,
                                    bool        &aspect_only)
 {
-    VERBOSE(VB_PLAYBACK,
-            QString("InputChanged(WxH = %1x%2, aspect = %3)")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("InputChanged(WxH = %1x%2, aspect = %3)")
             .arg(input_size.width())
             .arg(input_size.height()).arg(aspect));
 
     if (!codec_is_std(av_codec_id))
     {
-        VERBOSE(VB_IMPORTANT, QString("VideoOutputNull::InputChanged(): "
-                                      "new video codec is not supported."));
+        LOG(VB_GENERAL, LOG_ERR, QString("VideoOutputNull::InputChanged(): "
+                                         "new video codec is not supported."));
         errorState = kError_Unknown;
         return false;
     }
@@ -116,8 +116,8 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
                                      video_dim.height());
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, "VideoOutputNull::InputChanged(): "
-                "Failed to recreate buffers");
+        LOG(VB_GENERAL, LOG_ERR, "VideoOutputNull::InputChanged(): "
+                                 "Failed to recreate buffers");
         errorState = kError_Unknown;
     }
     else

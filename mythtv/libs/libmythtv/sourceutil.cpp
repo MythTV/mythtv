@@ -236,37 +236,40 @@ bool SourceUtil::IsProperlyConnected(uint sourceid, bool strict)
         uint a = counts["ANALOG_TUNERS"];
         uint d = counts["DIGITAL_TUNERS"];
         uint v = counts["VIRTUAL_TUNERS"];
-        VERBOSE(VB_GENERAL, QString("SourceUtil::IsProperlyConnected(): ") +
-                QString("Connected to %1 analog, %2 digital and %3 virtual "
-                        "tuners\n\t\t\t").arg(a).arg(d).arg(v) +
-                QString("Can not mix digital with other tuning information."));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("SourceUtil::IsProperlyConnected(): ") +
+            QString("Connected to %1 analog, %2 digital and %3 virtual "
+                    "tuners\n\t\t\t").arg(a).arg(d).arg(v) +
+            QString("Can not mix digital with other tuning information."));
     }
 
     if (enc_mismatch)
     {
         uint a = counts["ENCODER"];
         uint d = counts["NOT_ENCODER"];
-        VERBOSE(VB_GENERAL, QString("SourceUtil::IsProperlyConnected(): ") +
-                QString("Source ID %1 ").arg(sourceid) +
-                QString("appears to be connected\n\t\t\tto %1 encoder%2, ")
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("SourceUtil::IsProperlyConnected(): ") +
+            QString("Source ID %1 ").arg(sourceid) +
+            QString("appears to be connected\n\t\t\tto %1 encoder%2, ")
                 .arg(a).arg((1 == a) ? "":"s") +
-                QString("and %1 non-encoder%2. ")
+            QString("and %1 non-encoder%2. ")
                 .arg(d).arg((1 == d) ? "":"s") +
-                QString("This is probably a bad idea."));
+            QString("This is probably a bad idea."));
     }
 
     if (scan_mismatch)
     {
         uint a = counts["SCAN"];
         uint d = counts["NO_SCAN"];
-        VERBOSE(VB_GENERAL, QString("SourceUtil::IsProperlyConnected(): ") +
-                QString("Source ID %1 ").arg(sourceid) +
-                QString("appears to be connected\n\t\t\t"
-                        "to %1 scanable input%2, ")
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("SourceUtil::IsProperlyConnected(): ") +
+            QString("Source ID %1 ").arg(sourceid) +
+            QString("appears to be connected\n\t\t\t"
+                    "to %1 scanable input%2, ")
                 .arg(a).arg((1 == a) ? "":"s") +
-                QString("and %1 non-scanable input%2. ")
+            QString("and %1 non-scanable input%2. ")
                 .arg(d).arg((1 == d) ? "":"s") +
-                QString("This may be a problem."));
+            QString("This may be a problem."));
     }
 
     if (!strict)

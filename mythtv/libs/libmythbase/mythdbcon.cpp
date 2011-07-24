@@ -642,26 +642,31 @@ bool MSqlQuery::exec()
     if (!result && QSqlQuery::lastError().number() == 2006 && m_db->Reconnect())
         result = QSqlQuery::exec();
 
-    if (VERBOSE_LEVEL_CHECK(VB_DATABASE))
+    if (VERBOSE_LEVEL_CHECK(VB_DATABASE, LOG_DEBUG))
     {
         QString str = lastQuery();
 
-        // Sadly, neither executedQuery() nor lastQuery() display
-        // the values in bound queries against a MySQL5 database.
-        // So, replace the named placeholders with their values.
-
-        QMapIterator<QString, QVariant> b = boundValues();
-        while (b.hasNext())
+        // Database logging will cause an infinite loop here if not filtered
+        // out
+        if (!str.startsWith("INSERT INTO logging "))
         {
-            b.next();
-            str.replace(b.key(), '\'' + b.value().toString() + '\'');
-        }
+       	    // Sadly, neither executedQuery() nor lastQuery() display
+            // the values in bound queries against a MySQL5 database.
+            // So, replace the named placeholders with their values.
 
-        LOG(VB_DATABASE, LOG_DEBUG,
+            QMapIterator<QString, QVariant> b = boundValues();
+            while (b.hasNext())
+            {
+                b.next();
+                str.replace(b.key(), '\'' + b.value().toString() + '\'');
+            }
+
+            LOG(VB_DATABASE, LOG_DEBUG,
                 QString("MSqlQuery::exec(%1) %2%3")
                         .arg(m_db->MSqlDatabase::GetConnectionName()).arg(str)
                         .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
                                               .arg(size()) : QString()));
+        }
     }
 
     return result;
@@ -698,7 +703,7 @@ bool MSqlQuery::next()
 {
     bool result = QSqlQuery::next();
 
-    if (result && VERBOSE_LEVEL_CHECK(VB_DATABASE|VB_EXTRA))
+    if (result && VERBOSE_LEVEL_CHECK(VB_DATABASE, LOG_DEBUG))
     {
         QString str;
         QSqlRecord record=QSqlQuery::record();

@@ -17,10 +17,8 @@
 
 class FireWireDBOptions;
 class GeneralDBOptions;
-class ProcessThread;
 class DVBDBOptions;
 class ChannelBase;
-class QProcess;
 class TVRec;
 
 /** \class ChannelBase
@@ -149,13 +147,13 @@ class ChannelBase
     static void StoreDefaultInput(uint cardid, const QString &input);
 
   protected:
-    bool KillScript(uint timeout_ms);
+    bool KillScript(void);
     void HandleScript(const QString &freqid);
     virtual void HandleScriptEnd(bool ok);
     uint GetScriptStatus(bool holding_lock = false);
 
-    bool ChangeExternalChannel(
-        const QString &changer, const QString &newchan);
+    bool ChangeExternalChannel(const QString &changer,
+                               const QString &newchan);
 
     TVRec   *m_pParent;
     QString  m_curchannelname;
@@ -165,30 +163,13 @@ class ChannelBase
     InputMap m_inputs;
     DBChanList m_allchannels; ///< channels across all inputs
 
-    QMutex         m_process_lock;
-    ProcessThread *m_process_thread;
-    QProcess      *m_process;
-    /// 0 == unknown, 1 == pending, 2 == failed, 4 == success
-    uint           m_process_status;
+    QMutex         m_system_lock;
+    MythSystem    *m_system;
+    /// These get mapped from the GENERIC_EXIT_* to these values for use
+    /// with the signalmonitor code.
+    /// 0 == unknown, 1 == pending, 2 == failed, 3 == success
+    uint           m_system_status;
 };
 
-/** \brief ChannelBase helper class
- *  This is only needed because ChangeExternalChannel is called
- *  outside of a QThread event thread. If TVRec were converted to
- *  use QThread w/event thread this could be replaced by
- *    m_process = new QProcess();
- *    m_process->start(command);
- */
-class ProcessThread : public QThread
-{
-  public:
-    ProcessThread() { QObject::moveToThread(this); }
-    virtual void run(void) { exec(); }
-    virtual bool event(QEvent*);
-    QProcess *CreateProcess(const QString&);
-    QMutex          m_lock;
-    QWaitCondition  m_wait;
-    QProcess       *m_proc;
-};
 
 #endif

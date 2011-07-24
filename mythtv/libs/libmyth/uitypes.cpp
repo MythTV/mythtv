@@ -2196,7 +2196,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
         GenericTree *parent = current_node->getParent();
         if (parent == NULL)
         {
-            LOG(VB_IMPORTANT, LOG_CRIT,
+            LOG(VB_GENERAL, LOG_CRIT,
                      "LCD sees no parent to current_node" );
         }
         else

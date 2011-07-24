@@ -45,12 +45,13 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythmedia.h"
 
-// Libmythui headers
+// libmythui headers
 #include "myththemebase.h"
 #include "screensaver.h"
 #include "lirc.h"
 #include "lircevent.h"
 #include "mythudplistener.h"
+#include "mythrender_base.h"
 
 #ifdef USING_APPLEREMOTE
 #include "AppleRemoteListener.h"
@@ -78,8 +79,6 @@ using namespace std;
 #define GESTURE_TIMEOUT 1000
 
 #define LOC      QString("MythMainWindow: ")
-#define LOC_WARN QString("MythMainWindow, Warning: ")
-#define LOC_ERR  QString("MythMainWindow, Error: ")
 
 class KeyContext
 {
@@ -977,11 +976,11 @@ void MythMainWindow::Init(void)
                                          "Check your OpenGL installation.");
                 teardown = true;
             }
-            else if (painter == "auto" && !qgl->format().directRendering())
+            else if (painter == "auto" && gl && !gl->IsRecommendedRenderer())
             {
                 LOG(VB_GENERAL, LOG_WARNING,
-                    "OpenGL is using software rendering. "
-                    "Falling back to Qt painter.");
+                    "OpenGL painter not recommended with this system's "
+                    "hardware/drivers. Falling back to Qt painter.");
                 teardown = true;
             }
             if (teardown)
@@ -1171,7 +1170,9 @@ void MythMainWindow::InitKeys()
         "Go forward to previous page"),     "F");
 
     RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
-        "System Exit"),                     "Esc");
+        "System Exit"),                     "");
+    RegisterKey("Main Menu",    "EXITPROMPT", QT_TRANSLATE_NOOP("MythControls",
+        "Display System Exit Prompt"),      "Esc");
 }
 
 void MythMainWindow::ResetKeys()
@@ -1803,8 +1804,8 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
                                  const QString &plot, const QString &title,
                                  const QString &subtitle,
                                  const QString &director, int season,
-                                 int episode, int lenMins,
-                                 const QString &year)
+                                 int episode, const QString &inetref,
+                                 int lenMins, const QString &year)
 {
     QString lhandler(handler);
     if (lhandler.isEmpty())
@@ -1814,8 +1815,8 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
     if (d->mediaPluginMap.count(lhandler))
     {
         d->mediaPluginMap[lhandler].playFn(mrl, plot, title, subtitle,
-                                          director, season, episode, lenMins,
-                                          year);
+                                          director, season, episode,
+                                          inetref, lenMins, year);
         return true;
     }
 

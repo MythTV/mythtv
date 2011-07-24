@@ -47,7 +47,7 @@ bool MiniPlayer::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'miniplayer'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'miniplayer'");
         return false;
     }
 

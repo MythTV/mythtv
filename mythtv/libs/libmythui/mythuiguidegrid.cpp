@@ -23,7 +23,6 @@ using namespace std;
 #include "mythdb.h"
 
 #define LOC QString("MythUIGuideGrid: ")
-#define LOC_ERR QString("MythUIGuideGrid, Error: ")
 
 MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
                : MythUIType(parent, name)
@@ -53,7 +52,7 @@ MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
     m_rowCount = 0;
     m_progPastCol = 0;
 
-    m_drawCategoryColors = GetMythDB()->GetNumSetting("EPGShowCategoryColors", 1);
+    m_drawCategoryColors = true;
     m_drawCategoryText = true;
     m_categoryAlpha = 255;
 
@@ -165,13 +164,17 @@ bool MythUIGuideGrid::ParseElement(
     {
         m_drawCategoryText = parseBool(element);
     }
+    else if (element.tagName() == "showcategorycolors")
+    {
+        m_drawCategoryColors = parseBool(element);
+    }
     else if (element.tagName() == "cutdown")
     {
         m_cutdown = parseBool(element);
     }
     else if (element.tagName() == "multiline")
     {
-        m_multilineText = parseBool(element);
+        SetMultiLine(parseBool(element));
     }
     else if (element.tagName() == "textoffset")
     {
@@ -194,7 +197,7 @@ bool MythUIGuideGrid::ParseElement(
             *m_font = fontcopy;
         }
         else
-            LOG(VB_GENERAL, LOG_ERR, "Unknown font: " + fontname);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown font: " + fontname);
     }
     else if (element.tagName() == "recordstatus")
     {
@@ -246,7 +249,7 @@ void MythUIGuideGrid::CopyFrom(MythUIType *base)
     MythUIGuideGrid *gg = dynamic_cast<MythUIGuideGrid *>(base);
     if (!gg)
     {
-        LOG(VB_GENERAL, LOG_ERR, "bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "bad parsing");
         return;
     }
 
@@ -385,27 +388,31 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
         {
             if (m_verticalLayout)
             {
-                p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[2]->width() / 2),
-                             area.top() , m_arrowImages[2], alphaMod);
+                if (m_arrowImages[2])
+                    p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[2]->width() / 2),
+                                 area.top() , m_arrowImages[2], alphaMod);
             }
             else
             {
-                p->DrawImage(area.left(), area.top() + (area.height() / 2) -
-                            (m_arrowImages[0]->height() / 2), m_arrowImages[0], alphaMod);
+                if (m_arrowImages[0])
+                    p->DrawImage(area.left(), area.top() + (area.height() / 2) -
+                                 (m_arrowImages[0]->height() / 2), m_arrowImages[0], alphaMod);
             }
         }
         if (data->arrow == 2 || data->arrow == 3)
         {
             if (m_verticalLayout)
             {
-                p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[3]->width() / 2),
-                            area.top() + area.height() - m_arrowImages[3]->height(), m_arrowImages[3], alphaMod);
+                if (m_arrowImages[3])
+                    p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[3]->width() / 2),
+                                 area.top() + area.height() - m_arrowImages[3]->height(), m_arrowImages[3], alphaMod);
             }
             else
             {
-                p->DrawImage(area.right() - m_arrowImages[1]->width(),
-                            area.top() + (area.height() / 2) -
-                            (m_arrowImages[1]->height() / 2), m_arrowImages[1], alphaMod);
+                if (m_arrowImages[1])
+                    p->DrawImage(area.right() - m_arrowImages[1]->width(),
+                                 area.top() + (area.height() / 2) -
+                                 (m_arrowImages[1]->height() / 2), m_arrowImages[1], alphaMod);
             }
         }
     }
@@ -523,16 +530,16 @@ void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
 
     if (m_verticalLayout)
     {
-        if (data->arrow == 1 || data->arrow == 3)
+        if ((data->arrow == 1 || data->arrow == 3) && m_arrowImages[2])
             area.setTop(area.top() + m_arrowImages[2]->height());
-        if (data->arrow == 2 || data->arrow == 3)
+        if ((data->arrow == 2 || data->arrow == 3) && m_arrowImages[3])
             area.setBottom(area.bottom() - m_arrowImages[3]->height());
     }
     else
     {
-        if (data->arrow == 1 || data->arrow == 3)
+        if ((data->arrow == 1 || data->arrow == 3) && m_arrowImages[0])
             area.setLeft(area.left() + m_arrowImages[0]->width());
-        if (data->arrow == 2 || data->arrow == 3)
+        if ((data->arrow == 2 || data->arrow == 3) && m_arrowImages[1])
             area.setRight(area.right() - m_arrowImages[1]->width());
     }
 
@@ -575,7 +582,7 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
     }
     if (f.handle() == -1)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unable to open '%1'")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to open '%1'")
                 .arg(f.fileName()));
         return false;
     }
@@ -587,10 +594,10 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Parsing colors: %1 at line: %2 column: %3")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Parsing colors: %1 at line: %2 column: %3")
                 .arg(f.fileName()).arg(errorLine).arg(errorColumn) +
-                QString("\n\t\t\t%1").arg(errorMsg));
+            QString("\n\t\t\t%1").arg(errorMsg));
         f.close();
         return false;
     }
@@ -676,4 +683,13 @@ void MythUIGuideGrid::SetProgPast(int ppast)
         m_progPastCol = m_Area.x() + (m_Area.width() * ppast / 100);
 
     SetRedraw();
+}
+
+void MythUIGuideGrid::SetMultiLine(bool multiline)
+{
+    m_multilineText = multiline;
+    if (m_multilineText)
+        m_justification |= Qt::TextWordWrap;
+    else
+        m_justification &= ~Qt::TextWordWrap;
 }

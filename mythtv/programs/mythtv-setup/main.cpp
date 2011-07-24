@@ -101,14 +101,14 @@ static void SetupMenuCallback(void* data, QString& selection)
         else
             delete msee;
     }
-    else if (sel == "exiting_app")
+    else if (sel.startsWith("exiting_app"))
     {
         if (!exitPrompt)
             exitPrompt = new ExitPrompter();
         exitPrompt->handleExit();
     }
     else
-        VERBOSE(VB_IMPORTANT, "Unknown menu action: " + selection);
+        LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
 }
 
 static bool RunMenu(QString themedir, QString themename)
@@ -125,7 +125,7 @@ static bool RunMenu(QString themedir, QString themename)
         return true;
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Couldn't use theme '%1'").arg(themename));
+    LOG(VB_GENERAL, LOG_ERR, QString("Couldn't use theme '%1'").arg(themename));
     delete menu;
     menu = NULL;
 
@@ -141,8 +141,8 @@ static bool resetTheme(QString themedir, const QString badtheme)
     if (badtheme == DEFAULT_UI_THEME)
         themename = FALLBACK_UI_THEME;
 
-    VERBOSE(VB_IMPORTANT,
-                QString("Overriding broken theme '%1' with '%2'")
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("Overriding broken theme '%1' with '%2'")
                 .arg(badtheme).arg(themename));
 
     gCoreContext->OverrideSettingForSession("Theme", themename);
@@ -163,7 +163,7 @@ static int reloadTheme(void)
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find theme '%1'")
                 .arg(themename));
         return GENERIC_EXIT_NO_THEME;
     }
@@ -203,7 +203,6 @@ int main(int argc, char *argv[])
     QString scanTableName = "atsc-vsb8-us";
     QString scanInputName = "";
     bool    use_display = true;
-    int     quiet = 0;
 
     MythTVSetupCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -224,58 +223,31 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    if (cmdline.toBool("display"))
-        display = cmdline.toString("display");
-    if (cmdline.toBool("geometry"))
-        geometry = cmdline.toString("geometry");
-
-    if (cmdline.toBool("scan"))
-    {
-        quiet = 1;
-        use_display = false;
-        verboseMask = VB_NONE;
-        verboseString = "";
-    }
-
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(FALSE);
 #endif
     QApplication a(argc, argv, use_display);
-
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
 
-    QMap<QString, QString> settingsOverride;
+    if (cmdline.toBool("display"))
+        display = cmdline.toString("display");
+    if (cmdline.toBool("geometry"))
+        geometry = cmdline.toString("geometry");
 
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(MYTH_APPNAME_MYTHTV_SETUP)
-                            .arg(MYTH_SOURCE_PATH)
-                            .arg(MYTH_SOURCE_VERSION));
-
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                    GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
-
-    if (cmdline.toBool("quiet"))
+    bool quiet = false;
+    if (cmdline.toBool("scan"))
     {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
+        quiet = true;
+        use_display = false;
     }
 
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
+    int retval;
+    QString mask("general");
+    if ((retval = cmdline.ConfigureLogging(mask, quiet)) != GENERIC_EXIT_OK)
+        return retval;
 
-    if (cmdline.toBool("overridesettings"))
-        settingsOverride = cmdline.GetSettingsOverride();
     if (cmdline.toBool("expert"))
         expertMode = true;
     if (cmdline.toBool("scanlist"))
@@ -313,10 +285,6 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("inputname"))
         scanInputName = cmdline.toString("inputname");
 
-    logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
-
     if (!display.isEmpty())
     {
         MythUIHelper::SetX11Display(display);
@@ -330,22 +298,12 @@ int main(int argc, char *argv[])
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     std::auto_ptr<MythContext> contextScopeDelete(gContext);
-    // Override settings as early as possible to cover bootstrapped screens
-    // such as the language prompt
-    if (settingsOverride.size())
-    {
-        QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                  .arg(it.key()).arg(*it));
-            gCoreContext->OverrideSettingForSession(it.key(), *it);
-        }
-    }
+
+    cmdline.ApplySettingsOverride();
 
     if (!gContext->Init(use_display)) // No Upnp, Prompt for db
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -498,7 +456,7 @@ int main(int argc, char *argv[])
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find theme '%1'")
                 .arg(themename));
         return GENERIC_EXIT_NO_THEME;
     }
@@ -518,7 +476,7 @@ int main(int argc, char *argv[])
 
     if (!UpgradeTVDatabaseSchema(true))
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema.");
+        LOG(VB_GENERAL, LOG_ERR, "Couldn't upgrade database to new schema.");
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
@@ -546,8 +504,8 @@ int main(int argc, char *argv[])
         {
             delete expertEditor;
             expertEditor = NULL;
-            VERBOSE(VB_IMPORTANT, "Unable to create expert settings editor "
-                    "window");
+            LOG(VB_GENERAL, LOG_ERR,
+                "Unable to create expert settings editor window");
             return GENERIC_EXIT_OK;
         }
     }

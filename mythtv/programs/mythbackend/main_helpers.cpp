@@ -6,10 +6,6 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <signal.h>
-#ifndef _WIN32
-#include <pwd.h>
-#include <grp.h>
-#endif
 
 #include "mythconfig.h"
 #if CONFIG_DARWIN
@@ -140,9 +136,9 @@ bool setupTVs(bool ismaster, bool &error)
 
         if (host.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, cidmsg +
-                    " does not have a hostname defined.\n"
-                    "Please run setup and confirm all of the capture cards.\n");
+            LOG(VB_GENERAL, LOG_ERR, cidmsg +
+                " does not have a hostname defined.\n"
+                "Please run setup and confirm all of the capture cards.\n");
             continue;
         }
 
@@ -174,7 +170,7 @@ bool setupTVs(bool ismaster, bool &error)
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT, "Problem with capture cards. " +
+                    LOG(VB_GENERAL, LOG_ERR, "Problem with capture cards. " +
                             cidmsg + " failed init");
                     delete tv;
                     // The master assumes card comes up so we need to
@@ -195,7 +191,7 @@ bool setupTVs(bool ismaster, bool &error)
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT, "Problem with capture cards" +
+                    LOG(VB_GENERAL, LOG_ERR, "Problem with capture cards" +
                             cidmsg + "failed init");
                     delete tv;
                 }
@@ -210,40 +206,8 @@ bool setupTVs(bool ismaster, bool &error)
 
     if (tvList.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "No valid capture cards are defined in the database.");
-    }
-
-    return true;
-}
-
-bool setup_context(MythBackendCommandLineParser &cmdline)
-{
-    if (!gContext->Init(false))
-    {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext.");
-        return false;
-    }
-
-    if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
-        cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
-        cmdline.toBool("testsched")     || cmdline.toBool("resched") ||
-        cmdline.toBool("scanvideos")    || cmdline.toBool("clearcache") ||
-        cmdline.toBool("printexpire"))
-            gCoreContext->SetBackend(false);
-    else
-        gCoreContext->SetBackend(true);
-
-    QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
-    if (settingsOverride.size())
-    {
-        QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                    .arg(it.key()).arg(*it));
-            gCoreContext->OverrideSettingForSession(it.key(), *it);
-        }
     }
 
     return true;
@@ -270,89 +234,6 @@ void cleanup(void)
         unlink(pidfile.toAscii().constData());
         pidfile.clear();
     }
-}
-
-void showUsage(const MythBackendCommandLineParser &cmdlineparser, const QString &version)
-{
-    QString    help  = cmdlineparser.GetHelpString(false);
-    QByteArray ahelp = help.toLocal8Bit();
-
-    cerr << qPrintable(version) << endl <<
-    "Valid options are: " << endl <<
-    "-h or --help                   List valid command line parameters"
-         << endl << ahelp.constData() << endl;
-}
-
-bool openPidfile(ofstream &pidfs, const QString &pidfile)
-{
-    if (!pidfile.isEmpty())
-    {
-        pidfs.open(pidfile.toAscii().constData());
-        if (!pidfs)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Could not open pid file" + ENO);
-            return false;
-        }
-    }
-    return true;
-}
-
-bool setUser(const QString &username)
-{
-    if (username.isEmpty())
-        return true;
-
-#ifdef _WIN32
-    VERBOSE(VB_IMPORTANT, "--user option is not supported on Windows");
-    return false;
-#else // ! _WIN32
-    struct passwd *user_info = getpwnam(username.toLocal8Bit().constData());
-    const uid_t user_id = geteuid();
-
-    if (user_id && (!user_info || user_id != user_info->pw_uid))
-    {
-        VERBOSE(VB_IMPORTANT,
-                "You must be running as root to use the --user switch.");
-        return false;
-    }
-    else if (user_info && user_id == user_info->pw_uid)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Already running as '%1'").arg(username));
-    }
-    else if (!user_id && user_info)
-    {
-        if (setenv("HOME", user_info->pw_dir,1) == -1)
-        {
-            VERBOSE(VB_IMPORTANT, "Error setting home directory.");
-            return false;
-        }
-        if (setgid(user_info->pw_gid) == -1)
-        {
-            VERBOSE(VB_IMPORTANT, "Error setting effective group.");
-            return false;
-        }
-        if (initgroups(user_info->pw_name, user_info->pw_gid) == -1)
-        {
-            VERBOSE(VB_IMPORTANT, "Error setting groups.");
-            return false;
-        }
-        if (setuid(user_info->pw_uid) == -1)
-        {
-            VERBOSE(VB_IMPORTANT, "Error setting effective user.");
-            return false;
-        }
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Invalid user '%1' specified with --user")
-                .arg(username));
-        return false;
-    }
-    return true;
-#endif // ! _WIN32
 }
 
 int handle_command(const MythBackendCommandLineParser &cmdline)
@@ -384,13 +265,34 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
             message += cmdline.toString("setverbose");
 
             RemoteSendMessage(message);
-            VERBOSE(VB_IMPORTANT, QString("Sent '%1' message").arg(message));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Sent '%1' message").arg(message));
             return GENERIC_EXIT_OK;
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    "Unable to connect to backend, verbose level unchanged ");
+            LOG(VB_GENERAL, LOG_ERR,
+                "Unable to connect to backend, verbose mask unchanged ");
+            return GENERIC_EXIT_CONNECT_ERROR;
+        }
+    }
+
+    if (cmdline.toBool("setloglevel"))
+    {
+        if (gCoreContext->ConnectToMasterServer())
+        {
+            QString message = "SET_LOG_LEVEL ";
+            message += cmdline.toString("setloglevel");
+
+            RemoteSendMessage(message);
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Sent '%1' message").arg(message));
+            return GENERIC_EXIT_OK;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "Unable to connect to backend, log level unchanged ");
             return GENERIC_EXIT_CONNECT_ERROR;
         }
     }
@@ -400,12 +302,12 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         if (gCoreContext->ConnectToMasterServer())
         {
             RemoteSendMessage("CLEAR_SETTINGS_CACHE");
-            VERBOSE(VB_IMPORTANT, "Sent CLEAR_SETTINGS_CACHE message");
+            LOG(VB_GENERAL, LOG_INFO, "Sent CLEAR_SETTINGS_CACHE message");
             return GENERIC_EXIT_OK;
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Unable to connect to backend, settings "
+            LOG(VB_GENERAL, LOG_ERR, "Unable to connect to backend, settings "
                     "cache will not be cleared.");
             return GENERIC_EXIT_CONNECT_ERROR;
         }
@@ -439,12 +341,12 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         bool ok = false;
         if (gCoreContext->ConnectToMasterServer())
         {
-            VERBOSE(VB_IMPORTANT, "Connected to master for reschedule");
+            LOG(VB_GENERAL, LOG_INFO, "Connected to master for reschedule");
             ScheduledRecording::signalChange(-1);
             ok = true;
         }
         else
-            VERBOSE(VB_IMPORTANT, "Cannot connect to master for reschedule");
+            LOG(VB_GENERAL, LOG_ERR, "Cannot connect to master for reschedule");
 
         return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
     }
@@ -455,11 +357,11 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         if (gCoreContext->ConnectToMasterServer())
         {
             gCoreContext->SendReceiveStringList(QStringList() << "SCAN_VIDEOS");
-            VERBOSE(VB_IMPORTANT, "Requested video scan");
+            LOG(VB_GENERAL, LOG_INFO, "Requested video scan");
             ok = true;
         }
         else
-            VERBOSE(VB_IMPORTANT, "Cannot connect to master for video scan");
+            LOG(VB_GENERAL, LOG_ERR, "Cannot connect to master for video scan");
 
         return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
     }
@@ -484,7 +386,7 @@ int connect_to_master(void)
     {
         if (!gCoreContext->CheckProtoVersion(tempMonitorConnection))
         {
-            VERBOSE(VB_IMPORTANT, "Master backend is incompatible with "
+            LOG(VB_GENERAL, LOG_ERR, "Master backend is incompatible with "
                     "this backend.\nCannot become a slave.");
             return GENERIC_EXIT_CONNECT_ERROR;
         }
@@ -501,16 +403,16 @@ int connect_to_master(void)
             tempMonitorConnection = NULL;
             if (tempMonitorAnnounce.empty())
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Failed to open event socket, timeout");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to open event socket, timeout");
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Failed to open event socket" +
-                        ((tempMonitorAnnounce.size() >= 2) ?
-                         QString(", error was %1").arg(tempMonitorAnnounce[1]) :
-                         QString(", remote error")));
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to open event socket" +
+                    ((tempMonitorAnnounce.size() >= 2) ?
+                    QString(", error was %1").arg(tempMonitorAnnounce[1]) :
+                    QString(", remote error")));
             }
         }
 
@@ -524,12 +426,12 @@ int connect_to_master(void)
         {
             // Check for different time zones, different offsets, different
             // times
-            VERBOSE(VB_IMPORTANT, "The time and/or time zone settings on "
+            LOG(VB_GENERAL, LOG_ERR, "The time and/or time zone settings on "
                     "this system do not match those in use on the master "
                     "backend. Please ensure all frontend and backend "
                     "systems are configured to use the same time zone and "
                     "have the current time properly set.");
-            VERBOSE(VB_IMPORTANT,
+            LOG(VB_GENERAL, LOG_ERR,
                     "Unable to run with invalid time settings. Exiting.");
             tempMonitorConnection->writeStringList(tempMonitorDone);
             tempMonitorConnection->DownRef();
@@ -537,8 +439,8 @@ int connect_to_master(void)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Backend is running in %1 time zone.")
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Backend is running in %1 time zone.")
                     .arg(getTimeZoneID()));
         }
         if (tempMonitorConnection)
@@ -550,72 +452,42 @@ int connect_to_master(void)
     return GENERIC_EXIT_OK;
 }
 
-int setup_basics(const MythBackendCommandLineParser &cmdline)
-{
-    ofstream pidfs;
-    if (!openPidfile(pidfs, cmdline.toString("pidfile")))
-        return GENERIC_EXIT_PERMISSIONS_ERROR;
-
-    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
-
-    if (cmdline.toBool("daemon") && (daemon(0, 1) < 0))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
-        return GENERIC_EXIT_DAEMONIZING_ERROR;
-    }
-
-    QString username = cmdline.toString("username");
-    if (!username.isEmpty() && !setUser(username))
-        return GENERIC_EXIT_PERMISSIONS_ERROR;
-
-    if (pidfs)
-    {
-        pidfs << getpid() << endl;
-        pidfs.close();
-    }
-
-    return GENERIC_EXIT_OK;
-}
 
 void print_warnings(const MythBackendCommandLineParser &cmdline)
 {
     if (cmdline.toBool("nohousekeeper"))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "****** The Housekeeper has been DISABLED with "
-                "the --nohousekeeper option ******");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "****** The Housekeeper has been DISABLED with "
+            "the --nohousekeeper option ******");
     }
     if (cmdline.toBool("nosched"))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "********** The Scheduler has been DISABLED with "
-                "the --nosched option **********");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "********** The Scheduler has been DISABLED with "
+            "the --nosched option **********");
     }
     if (cmdline.toBool("noautoexpire"))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "********* Auto-Expire has been DISABLED with "
-                "the --noautoexpire option ********");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "********* Auto-Expire has been DISABLED with "
+            "the --noautoexpire option ********");
     }
     if (cmdline.toBool("nojobqueue"))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "********* The JobQueue has been DISABLED with "
-                "the --nojobqueue option *********");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "********* The JobQueue has been DISABLED with "
+            "the --nojobqueue option *********");
     }
 }
 
 int run_backend(MythBackendCommandLineParser &cmdline)
 {
-    if (!setup_context(cmdline))
-        return GENERIC_EXIT_NO_MYTHCONTEXT;
-
     bool ismaster = gCoreContext->IsMasterHost();
 
     if (!UpgradeTVDatabaseSchema(ismaster, ismaster))
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
+        LOG(VB_GENERAL, LOG_ERR, "Couldn't upgrade database to new schema");
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
@@ -642,11 +514,11 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     if (ismaster)
     {
-        VERBOSE(VB_GENERAL, LOC + "Starting up as the master server.");
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + "Starting up as the master server.");
     }
     else
     {
-        VERBOSE(VB_GENERAL, LOC + "Running as a slave backend.");
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + "Running as a slave backend.");
     }
 
     print_warnings(cmdline);
@@ -710,23 +582,20 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     if (pHS)
     {
-        VERBOSE(VB_IMPORTANT, "Main::Registering HttpStatus Extension");
+        LOG(VB_GENERAL, LOG_INFO, "Main::Registering HttpStatus Extension");
 
         httpStatus = new HttpStatus( &tvList, sched, expirer, ismaster );
         pHS->RegisterExtension( httpStatus );
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1")
-            .arg(verboseString));
-
-    MainServer *mainServer = new MainServer(
-        ismaster, port, &tvList, sched, expirer);
+    MainServer *mainServer = new MainServer(ismaster, port, &tvList, sched,
+                                            expirer);
 
     int exitCode = mainServer->GetExitCode();
     if (exitCode != GENERIC_EXIT_OK)
     {
-        VERBOSE(VB_IMPORTANT, "Backend exiting, MainServer initialization "
-                "error.");
+        LOG(VB_GENERAL, LOG_CRIT,
+            "Backend exiting, MainServer initialization error.");
         delete mainServer;
         return exitCode;
     }
@@ -751,7 +620,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         qApp->processEvents();
     }
 
-    VERBOSE(VB_GENERAL, "MythBackend exiting");
+    LOG(VB_GENERAL, LOG_NOTICE, "MythBackend exiting");
 
     delete sysEventHandler;
     delete mainServer;

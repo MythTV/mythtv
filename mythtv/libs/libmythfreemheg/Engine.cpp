@@ -90,7 +90,10 @@ int MHEngine::RunAll()
         {
              startObj.m_GroupId.Copy(MHOctetString("~//startup"));
              if (! Launch(startObj))
+             {
+                 MHLOG(MHLogWarning, "MHEG engine auto-boot failed");
                  return -1;
+             }
         }
         m_fBooting = false;
     }
@@ -110,10 +113,7 @@ int MHEngine::RunAll()
         CheckContentRequests();
 
         // Check the timers.  This may result in timer events being raised.
-        if (CurrentScene()) {
-            int next = CurrentScene()->CheckTimers(this);
-            if (nNextTime == 0 || nNextTime > next) nNextTime = next;
-        }
+        nNextTime = CurrentScene() ? CurrentScene()->CheckTimers(this) : 0;
         if (CurrentApp()) {
             // The UK MHEG profile allows applications to have timers.
             int nAppTime = CurrentApp()->CheckTimers(this);
@@ -193,7 +193,12 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
     QByteArray text;
     // Check that the file exists before we commit to the transition.
     // This may block if we cannot be sure whether the object is present.
-    if (! m_Context->GetCarouselData(csPath, text)) return false;
+    if (! m_Context->GetCarouselData(csPath, text))
+    {
+        if (CurrentApp())
+            EventTriggered(CurrentApp(), EventEngineEvent, 2); // GroupIDRefError
+        return false;
+    }
 
     // Clear the action queue of anything pending.
     m_ActionStack.clear();
@@ -281,7 +286,11 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     QString csPath = GetPathName(target.m_GroupId);
     QByteArray text;
     // Check that the file exists before we commit to the transition.
-    if (! m_Context->GetCarouselData(csPath, text)) return;
+    if (! m_Context->GetCarouselData(csPath, text))
+    {
+        EventTriggered(CurrentApp(), EventEngineEvent, 2); // GroupIDRefError
+        return;
+    }
 
     // Parse and run the file.
     MHGroup *pProgram = ParseProgram(text);
@@ -651,6 +660,11 @@ void MHEngine::GenerateUserAction(int nCode)
     else EventTriggered(pScene, EventUserInput, nCode);
 }
 
+void MHEngine::EngineEvent(int nCode)
+{
+    EventTriggered(CurrentApp(), EventEngineEvent, nCode);
+}
+
 // Called by an ingredient wanting external content.
 void MHEngine::RequestExternalContent(MHIngredient *pRequester)
 {
@@ -663,7 +677,10 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
     // Is this actually a carousel object?  It could be a stream.  We should deal
     // with that separately.
     if (csPath.isEmpty())
+    {
+        MHLOG(MHLogWarning, "RequestExternalContent empty path");
         return;
+    }
     QByteArray text;
     if (m_Context->CheckCarouselObject(csPath) && m_Context->GetCarouselData(csPath, text)) {
         // Available now - pass it to the ingredient.
@@ -671,9 +688,11 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
     }
     else {
         // Need to record this and check later.
+        MHLOG(MHLogLinks, QString("RequestExternalContent %1 pending").arg(csPath));
         MHExternContent *pContent = new MHExternContent;
         pContent->m_FileName = csPath;
         pContent->m_pRequester = pRequester;
+        pContent->m_time.start();
         m_ExternContentTable.append(pContent);
     }
 }
@@ -710,6 +729,8 @@ void MHEngine::CheckContentRequests()
         {
             // If the content is not recognized catch the exception and continue
             try {
+                MHLOG(MHLogLinks, QString("CheckContentRequests %1 arrived")
+                    .arg(pContent->m_FileName));
                 pContent->m_pRequester->ContentArrived((const unsigned char *)text.data(),
                                                        text.size(), this);
             }
@@ -718,6 +739,14 @@ void MHEngine::CheckContentRequests()
             // Remove from the list.
             delete pContent;
             it = m_ExternContentTable.erase(it);
+        }
+        else if (pContent->m_time.elapsed() > 60000) // TODO Get this from carousel
+        {
+            MHLOG(MHLogWarning, QString("CheckContentRequests %1 timed out")
+                .arg(pContent->m_FileName));
+            delete pContent;
+            it = m_ExternContentTable.erase(it);
+            EventTriggered(CurrentApp(), EventEngineEvent, 3); // ContentRefError
         }
         else
             ++it;
@@ -824,7 +853,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         else return false;
     }
 
-    if (strings[0] == "UKEngineProfile" || strings[0] == "UEP") {
+    if (strings[0] == "UKEngineProfile" || strings[0] == "UniversalEngineProfile" || strings[0] == "UEP") {
         if (strings.count() < 2) return false;
         if (strings[1] == MHEGEngineProviderIdString)
             return true;

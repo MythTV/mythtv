@@ -14,8 +14,8 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addLogging();
+    allowPassthrough();
 
     add("--manual", "manual", false, "Run interactive configuration",
             "Manual mode will interactively ask you questions about "
@@ -87,11 +87,11 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "restores the behavior of adding every channel in "
             "the downloaded channel lineup to MythTV's lineup, "
             "in case MythTV's smarts fail you.");
-    add("--graboptions", "graboptions", "", "",
-            "Manually define options to pass to the data grabber. "
-            "Do NOT use this option unless you know what you are "
-            "doing. Mythfilldatabase will automatically use the "
-            "correct options for xmltv compliant grabbers.");
+//    add("--graboptions", "graboptions", "", "",
+//            "Manually define options to pass to the data grabber. "
+//            "Do NOT use this option unless you know what you are "
+//            "doing. Mythfilldatabase will automatically use the "
+//            "correct options for xmltv compliant grabbers.");
     add("--cardtype", "cardtype", "", "", "No information.");           // need documentation for this one
     add("--max-days", "maxdays", 0, "force number of days to update",
             "Force the maximum number of days, counting today, "

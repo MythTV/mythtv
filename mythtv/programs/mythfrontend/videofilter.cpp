@@ -66,9 +66,6 @@ enum CoverFileFilter {
     kCoverFileFilterNone = 0
 };
 
-const unsigned int VideoFilterSettings::FILTER_MASK;
-const unsigned int VideoFilterSettings::SORT_MASK;
-
 VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
                                          const QString& _prefix) :
     category(kCategoryFilterAll), genre(kGenreFilterAll),
@@ -477,7 +474,7 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
         }
         default:
         {
-            VERBOSE(VB_IMPORTANT, QString("Error: unknown sort type %1")
+            LOG(VB_GENERAL, LOG_ERR, QString("Error: unknown sort type %1")
                     .arg(orderby));
         }
     }
@@ -583,7 +580,7 @@ bool VideoFilterDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'filter'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'filter'");
         return false;
     }
 

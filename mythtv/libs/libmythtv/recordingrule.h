@@ -65,6 +65,8 @@ class MTV_PUBLIC RecordingRule
     QString m_title;
     QString m_subtitle;
     QString m_description;
+    uint m_season;
+    uint m_episode;
     QString m_category;
 
     QTime m_starttime;
@@ -74,6 +76,7 @@ class MTV_PUBLIC RecordingRule
 
     QString m_seriesid;
     QString m_programid;
+    QString m_inetref;
 
     // Associated data for rule types
     int m_channelid;
@@ -112,6 +115,7 @@ class MTV_PUBLIC RecordingRule
     bool m_autoUserJob2;
     bool m_autoUserJob3;
     bool m_autoUserJob4;
+    bool m_autoMetadataLookup;
 
     // Statistic fields - Used to generate statistics about particular rules
     // and influence watch list weighting

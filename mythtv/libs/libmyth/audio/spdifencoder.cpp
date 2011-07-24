@@ -7,7 +7,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("SPDIFEncoder: ")
-#define LOC_ERR QString("SPDIFEncoder, Error: ")
 
 /**
  * SPDIFEncoder constructor
@@ -31,21 +30,21 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     fmt = av_guess_format(dev_ba.constData(), NULL, NULL);
     if (!fmt)
     {
-        VERBOSE(VB_AUDIO, LOC_ERR + "av_guess_format");
+        LOG(VB_AUDIO, LOG_ERR, LOC + "av_guess_format");
         return;
     }
 
     m_oc = avformat_alloc_context();
     if (!m_oc)
     {
-        VERBOSE(VB_AUDIO, LOC_ERR + "avformat_alloc_context");
+        LOG(VB_AUDIO, LOG_ERR, LOC + "avformat_alloc_context");
         return;
     }
     m_oc->oformat = fmt;
 
     if (av_set_parameters(m_oc, NULL) < 0)
     {
-        VERBOSE(VB_AUDIO, LOC_ERR + "av_set_parameters");
+        LOG(VB_AUDIO, LOG_ERR, LOC + "av_set_parameters");
         Destroy();
         return;
     }
@@ -54,7 +53,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
                                  this, NULL, funcIO, NULL);
     if (!m_oc->pb)
     {
-        VERBOSE(VB_AUDIO, LOC_ERR + "av_alloc_put_byte");
+        LOG(VB_AUDIO, LOG_ERR, LOC + "av_alloc_put_byte");
         Destroy();
         return;
     }
@@ -64,7 +63,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
 
     if (av_set_parameters(m_oc, NULL) != 0)
     {
-        VERBOSE(VB_AUDIO, LOC_ERR + "av_set_parameters");
+        LOG(VB_AUDIO, LOG_ERR, LOC + "av_set_parameters");
         Destroy();
         return;
     }
@@ -72,7 +71,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     m_stream = av_new_stream(m_oc, 1);
     if (!m_stream)
     {
-        VERBOSE(VB_AUDIO, LOC_ERR + "av_new_stream");
+        LOG(VB_AUDIO, LOG_ERR, LOC + "av_new_stream");
         Destroy();
         return;
     }
@@ -85,7 +84,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     codec->codec_id       = (CodecID)codec_id;
     av_write_header(m_oc);
 
-    VERBOSE(VB_AUDIO, LOC + QString("Creating %1 encoder (for %2)")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Creating %1 encoder (for %2)")
             .arg(muxer).arg(ff_codec_id_string((CodecID)codec_id)));
 
     m_complete = true;
@@ -111,7 +110,7 @@ void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
 
     if (av_write_frame(m_oc, &packet) < 0)
     {
-        VERBOSE(VB_AUDIO, LOC_ERR + "av_write_frame");
+        LOG(VB_AUDIO, LOG_ERR, LOC + "av_write_frame");
     }
 }
 

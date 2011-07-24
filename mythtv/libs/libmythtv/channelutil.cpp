@@ -18,7 +18,6 @@ using namespace std;
 #include "tv.h" // for CHANNEL_DIRECTION
 
 #define LOC QString("ChanUtil: ")
-#define LOC_ERR QString("ChanUtil, Error: ")
 
 const QString ChannelUtil::kATSCSeparators = "(_|-|#|\\.)";
 
@@ -96,7 +95,7 @@ static uint insert_dtv_multiplex(
         // DVB specific
         transport_id,  network_id, polarity);
 
-    VERBOSE(VB_CHANSCAN, QString(
+    LOG(VB_CHANSCAN, LOG_INFO, QString(
                 "insert_dtv_multiplex(db_source_id: %1, sistandard: '%2', "
                 "frequency: %3, modulation: %4, transport_id: %5, "
                 "network_id: %6, polarity: %7...) mplexid:%8")
@@ -270,7 +269,7 @@ static uint insert_dtv_multiplex(
         // DVB specific
         transport_id,  network_id, polarity);
 
-    VERBOSE(VB_CHANSCAN, QString("insert_dtv_multiplex -- ") +
+    LOG(VB_CHANSCAN, LOG_INFO, QString("insert_dtv_multiplex -- ") +
             QString("inserted %1").arg(mplex));
 
     return mplex;
@@ -610,8 +609,8 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
                                   int transport_id,
                                   int network_id)
 {
-    VERBOSE(VB_CHANSCAN,
-            QString("GetBetterMplexID(mplexId %1, tId %2, netId %3)")
+    LOG(VB_CHANSCAN, LOG_INFO,
+        QString("GetBetterMplexID(mplexId %1, tId %2, netId %3)")
             .arg(current_mplexid).arg(transport_id).arg(network_id));
 
     int q_networkid = 0, q_transportid = 0;
@@ -633,8 +632,8 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     // Got a match, return it.
     if ((q_networkid == network_id) && (q_transportid == transport_id))
     {
-        VERBOSE(VB_CHANSCAN,
-                QString("GetBetterMplexID(): Returning perfect match %1")
+        LOG(VB_CHANSCAN, LOG_INFO,
+            QString("GetBetterMplexID(): Returning perfect match %1")
                 .arg(current_mplexid));
         return current_mplexid;
     }
@@ -651,8 +650,8 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
         if (!query.exec() || !query.isActive())
             MythDB::DBError("Getting mplexid global search", query);
 
-        VERBOSE(VB_CHANSCAN, QString(
-                    "GetBetterMplexID(): net id and transport id "
+        LOG(VB_CHANSCAN, LOG_INFO,
+            QString("GetBetterMplexID(): net id and transport id "
                     "are null, qsize(%1), Returning %2")
                 .arg(qsize).arg(current_mplexid));
         return current_mplexid;
@@ -685,8 +684,8 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
 
         if (query.size() == 1)
         {
-            VERBOSE(VB_CHANSCAN, QString(
-                        "GetBetterMplexID(): query#%1 qsize(%2) "
+            LOG(VB_CHANSCAN, LOG_INFO,
+                QString("GetBetterMplexID(): query#%1 qsize(%2) "
                         "Returning %3")
                     .arg(i).arg(query.size()).arg(current_mplexid));
             query.next();
@@ -697,8 +696,8 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
         {
             query.next();
             int ret = (i==0) ? current_mplexid : query.value(0).toInt();
-            VERBOSE(VB_CHANSCAN, QString(
-                        "GetBetterMplexID(): query#%1 qsize(%2) "
+            LOG(VB_CHANSCAN, LOG_INFO,
+                QString("GetBetterMplexID(): query#%1 qsize(%2) "
                         "Returning %3")
                     .arg(i).arg(query.size()).arg(ret));
             return ret;
@@ -706,7 +705,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     }
 
     // If you still didn't find this combo return -1 (failure)
-    VERBOSE(VB_CHANSCAN, "GetBetterMplexID(): Returning -1");
+    LOG(VB_CHANSCAN, LOG_INFO, "GetBetterMplexID(): Returning -1");
     return -1;
 }
 
@@ -1070,7 +1069,7 @@ bool ChannelUtil::IsOnSameMultiplex(uint srcid,
     if (!new_mplexid)
         return false;
 
-    VERBOSE(VB_CHANNEL, QString("IsOnSameMultiplex? %1==%2 -> %3")
+    LOG(VB_CHANNEL, LOG_INFO, QString("IsOnSameMultiplex? %1==%2 -> %3")
             .arg(old_mplexid).arg(new_mplexid)
             .arg(old_mplexid == new_mplexid));
 
@@ -1465,7 +1464,7 @@ static uint get_max_chanid(uint sourceid)
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Getting chanid for new channel (2)", query);
     else if (!query.next())
-        VERBOSE(VB_IMPORTANT, "Error getting chanid for new channel.");
+        LOG(VB_GENERAL, LOG_ERR, "Error getting chanid for new channel.");
     else
         return query.value(0).toUInt();
 
@@ -1718,8 +1717,9 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
         if (!xmltvid.isEmpty())
         {
             if (useeit)
-                VERBOSE(VB_GENERAL, "Using EIT and xmltv for the same channel "
-                        "is a unsupported configuration.");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Using EIT and xmltv for the same channel "
+                    "is a unsupported configuration.");
             chan.xmltvid = xmltvid;
             chan.use_on_air_guide = useeit;
         }
@@ -1867,8 +1867,8 @@ bool ChannelUtil::GetChannelData(
     }
     else if (!query.next())
     {
-        VERBOSE(VB_IMPORTANT, QString(
-                    "GetChannelData() failed because it could not\n"
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("GetChannelData() failed because it could not\n"
                     "\t\t\tfind channel number '%1' in DB for source '%2'.")
                 .arg(channum).arg(sourceid));
         return false;
@@ -1936,8 +1936,8 @@ bool ChannelUtil::GetExtendedChannelData(
     }
     else if (!query.next())
     {
-        VERBOSE(VB_IMPORTANT, QString(
-                    "GetChannelData() failed because it could not\n"
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("GetChannelData() failed because it could not\n"
                     "\t\t\tfind channel number '%1' in DB for source '%2'.")
                 .arg(channum).arg(sourceid));
         return false;

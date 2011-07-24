@@ -67,7 +67,6 @@ using namespace std;
 #include "videodisplayprofile.h"
 
 #define LOC     QString("VideoOutputQuartz::")
-#define LOC_ERR QString("VideoOutputQuartz Error: ")
 
 /**
  * An abstract class for implementing QuickTime output viewports.
@@ -215,8 +214,8 @@ bool VideoOutputQuartzView::Begin(void)
     viewLock.lock();
     if (!thePort)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("VOQV::Begin(%1) - No graphics port available")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("VOQV::Begin(%1) - No graphics port available")
                 .arg(name));
         viewLock.unlock();
         return false;
@@ -225,7 +224,7 @@ bool VideoOutputQuartzView::Begin(void)
     // Set initial output size
     Rect portBounds;
     GetPortBounds(thePort, &portBounds);
-    VERBOSE(VB_PLAYBACK, QString("%0Viewport currently %1,%2 -> %3,%4")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("%0Viewport currently %1,%2 -> %3,%4")
                          .arg(name).arg(portBounds.left).arg(portBounds.top)
                          .arg(portBounds.right).arg(portBounds.bottom));
     m_desired.setWidth(portBounds.right);
@@ -252,8 +251,8 @@ bool VideoOutputQuartzView::Begin(void)
                                  codecNormalQuality,
                                  bestSpeedCodec))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("VOQV::Begin(%1) - DecompressSequenceBeginS failed")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("VOQV::Begin(%1) - DecompressSequenceBeginS failed")
                 .arg(name));
         viewLock.unlock();
         return false;
@@ -312,9 +311,9 @@ void VideoOutputQuartzView::Transform(QRect newRect)
     one  = Long2Fix(1);
     zero = Long2Fix(0);
 
-    VERBOSE(VB_PLAYBACK, QString("%0Viewport is %1 x %2")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("%0Viewport is %1 x %2")
                                 .arg(name).arg(w).arg(h));
-    VERBOSE(VB_PLAYBACK, QString("%0Image is %1 x %2")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("%0Image is %1 x %2")
                                 .arg(name).arg(sw).arg(sh));
 
     double hscale = (double) w / sw;
@@ -331,7 +330,7 @@ void VideoOutputQuartzView::Transform(QRect newRect)
     if ((hscale < 0.99) || (hscale > 1.01) ||
         (vscale < 0.99) || (vscale > 1.01))
     {
-        VERBOSE(VB_PLAYBACK, QString("%0Scaling to %1 x %2 of original")
+        LOG(VB_PLAYBACK, LOG_INFO, QString("%0Scaling to %1 x %2 of original")
                                     .arg(name).arg(hscale).arg(vscale));
         ScaleMatrix(&matrix,
                     X2Fix(hscale),
@@ -346,7 +345,7 @@ void VideoOutputQuartzView::Transform(QRect newRect)
     // center image in viewport
     if ((h != sh) || (w != sw))
     {
-        VERBOSE(VB_PLAYBACK, QString("%0Centering with %1, %2")
+        LOG(VB_PLAYBACK, LOG_INFO, QString("%0Centering with %1, %2")
                              .arg(name).arg((w - sw)/2.0).arg((h - sh)/2.0));
         TranslateMatrix(&matrix, X2Fix((w - sw) / 2.0), X2Fix((h - sh) / 2.0));
     }
@@ -354,7 +353,7 @@ void VideoOutputQuartzView::Transform(QRect newRect)
     // apply graphics port or embedding offset
     if (x || y)
     {
-        VERBOSE(VB_PLAYBACK, QString("%0Translating to %1, %2")
+        LOG(VB_PLAYBACK, LOG_INFO, QString("%0Translating to %1, %2")
                                     .arg(name).arg(x).arg(y));
         TranslateMatrix(&matrix, Long2Fix(x), Long2Fix(y));
     }
@@ -441,8 +440,8 @@ void VideoOutputQuartzView::Show(void)
                                       NULL,
                                       NULL))
       {
-          VERBOSE(VB_IMPORTANT,
-                  QString("VOQV::Show(%1)- DecompressSequenceFrameWhen failed")
+          LOG(VB_GENERAL, LOG_ERR,
+              QString("VOQV::Show(%1)- DecompressSequenceFrameWhen failed")
                   .arg(name));
       }
     }
@@ -511,8 +510,8 @@ class VoqvMainWindow : public VideoOutputQuartzView
         thePort = GetWindowPort(parentData->window);
         if (!thePort)
         {
-            VERBOSE(VB_IMPORTANT,
-                    "VoqvMainWindow::BeginPort() - GetWindowPort failed");
+            LOG(VB_GENERAL, LOG_ERR,
+                "VoqvMainWindow::BeginPort() - GetWindowPort failed");
             viewLock.unlock();
             return false;
         }
@@ -549,13 +548,13 @@ class VoqvMainWindow : public VideoOutputQuartzView
 
     void HideForGUI(void)
     {
-        VERBOSE(VB_PLAYBACK, "VOQV::HideForGUI() main window");
+        LOG(VB_PLAYBACK, LOG_INFO, "VOQV::HideForGUI() main window");
         End();
     }
 
     void ShowAfterGUI(QRect size)
     {
-        VERBOSE(VB_PLAYBACK, "VOQV::ShowAfterGUI() main window");
+        LOG(VB_PLAYBACK, LOG_INFO, "VOQV::ShowAfterGUI() main window");
         Begin();
         Transform(size);
     }
@@ -587,8 +586,8 @@ class VoqvEmbedded : public VideoOutputQuartzView
         thePort = GetWindowPort(parentData->window);
         if (!thePort)
         {
-            VERBOSE(VB_IMPORTANT,
-                    "VoqvEmbedded::BeginPort() - GetWindowPort failed");
+            LOG(VB_GENERAL, LOG_ERR,
+                "VoqvEmbedded::BeginPort() - GetWindowPort failed");
             viewLock.unlock();
             return false;
         }
@@ -611,8 +610,8 @@ class VoqvEmbedded : public VideoOutputQuartzView
                                      srcCopy, theMask, 0,
                                      codecNormalQuality, bestSpeedCodec))
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("VOQV::Begin(%1) - DecompressSequenceBeginS failed")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("VOQV::Begin(%1) - DecompressSequenceBeginS failed")
                     .arg(name));
             viewLock.unlock();
             return false;
@@ -671,8 +670,8 @@ class VoqvFullscreen : public VideoOutputQuartzView
 
         if (CGDisplayCapture(d) != CGDisplayNoErr)
         {
-            VERBOSE(VB_IMPORTANT,
-                    "VoqvFullScreen::BeginPort() - Could not capture display");
+            LOG(VB_GENERAL, LOG_ERR,
+                "VoqvFullScreen::BeginPort() - Could not capture display");
             viewLock.unlock();
             return false;
         }
@@ -689,8 +688,8 @@ class VoqvFullscreen : public VideoOutputQuartzView
         thePort = CreateNewPortForCGDisplayID((UInt32)d);
         if (!thePort)
         {
-            VERBOSE(VB_IMPORTANT, "VoqvFullScreen::BeginPort() - "
-                                  "CreateNewPortForCGDisplayID failed");
+            LOG(VB_GENERAL, LOG_ERR, "VoqvFullScreen::BeginPort() - "
+                                     "CreateNewPortForCGDisplayID failed");
             viewLock.unlock();
             return false;
         }
@@ -723,14 +722,14 @@ class VoqvFullscreen : public VideoOutputQuartzView
 
     void HideForGUI(void)
     {
-        VERBOSE(VB_PLAYBACK, "VOQV::HideForGUI() full screen");
+        LOG(VB_PLAYBACK, LOG_INFO, "VOQV::HideForGUI() full screen");
         End();
         EndPort();
     }
 
     void ShowAfterGUI(QRect size)
     {
-        VERBOSE(VB_PLAYBACK, "VOQV::ShowAfterGUI() full screen");
+        LOG(VB_PLAYBACK, LOG_INFO, "VOQV::ShowAfterGUI() full screen");
         BeginPort();
         Begin();
         Transform(size);
@@ -761,7 +760,7 @@ class VoqvDock : public VideoOutputQuartzView
         thePort = BeginQDContextForApplicationDockTile();
         if (!thePort)
         {
-            VERBOSE(VB_IMPORTANT, "VoqvDock::BeginPort() - "
+            LOG(VB_GENERAL, LOG_ERR, "VoqvDock::BeginPort() - "
                     "BeginQDContextForApplicationDockTile failed");
             return false;
         }
@@ -875,8 +874,8 @@ class VoqvFloater : public VideoOutputQuartzView
                                &bounds,
                                &window))
         {
-            VERBOSE(VB_IMPORTANT,
-                    "VoqvFloater::BeginPort() - CreateCustomWindow failed");
+            LOG(VB_GENERAL, LOG_ERR,
+                "VoqvFloater::BeginPort() - CreateCustomWindow failed");
             viewLock.unlock();
             return false;
         }
@@ -887,8 +886,8 @@ class VoqvFloater : public VideoOutputQuartzView
         thePort = GetWindowPort(window);
         if (!thePort)
         {
-            VERBOSE(VB_IMPORTANT,
-                    "VoqvFloater::BeginPort() - GetWindowPort failed");
+            LOG(VB_GENERAL, LOG_ERR,
+                "VoqvFloater::BeginPort() - GetWindowPort failed");
             viewLock.unlock();
             return false;
         }
@@ -1039,16 +1038,16 @@ class VoqvDesktop : public VideoOutputQuartzView
                             &bounds,
                             &window))
         {
-            VERBOSE(VB_IMPORTANT,
-                    "VoqvDesktop::BeginPort() - CreateNewWindow failed");
+            LOG(VB_GENERAL, LOG_ERR,
+                "VoqvDesktop::BeginPort() - CreateNewWindow failed");
             viewLock.unlock();
             return false;
         }
         WindowGroupRef winGroup;
         if (CreateWindowGroup(0, &winGroup))
         {
-            VERBOSE(VB_IMPORTANT,
-                    "VoqvDesktop::BeginPort() - CreateWindowGroup failed");
+            LOG(VB_GENERAL, LOG_ERR,
+                "VoqvDesktop::BeginPort() - CreateWindowGroup failed");
             viewLock.unlock();
             return false;
         }
@@ -1060,8 +1059,8 @@ class VoqvDesktop : public VideoOutputQuartzView
         thePort = GetWindowPort(window);
         if (!thePort)
         {
-            VERBOSE(VB_IMPORTANT,
-                    "VoqvDesktop::BeginPort() - GetWindowPort failed");
+            LOG(VB_GENERAL, LOG_ERR,
+                "VoqvDesktop::BeginPort() - GetWindowPort failed");
             viewLock.unlock();
             return false;
         }
@@ -1126,8 +1125,9 @@ VideoOutputQuartz::~VideoOutputQuartz()
 
 void VideoOutputQuartz::VideoAspectRatioChanged(float aspect)
 {
-    VERBOSE(VB_PLAYBACK, (LOC + "VideoAspectRatioChanged(aspect=%1) [was %2]")
-                         .arg(aspect).arg(data->srcAspect));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("VideoAspectRatioChanged(aspect=%1) [was %2]")
+            .arg(aspect).arg(data->srcAspect));
 
     VideoOutput::VideoAspectRatioChanged(aspect);
 
@@ -1138,7 +1138,8 @@ void VideoOutputQuartz::VideoAspectRatioChanged(float aspect)
 // this is documented in videooutbase.cpp
 void VideoOutputQuartz::Zoom(ZoomDirection direction)
 {
-    VERBOSE(VB_PLAYBACK, (LOC + "Zoom(direction=%1)").arg(direction));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Zoom(direction=%1)").arg(direction));
 
     VideoOutput::Zoom(direction);
     MoveResize();
@@ -1181,8 +1182,8 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
                                      void        *codec_private,
                                      bool        &aspect_only)
 {
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("InputChanged(WxH = %1x%2, aspect=%3")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("InputChanged(WxH = %1x%2, aspect=%3")
             .arg(input_size.width())
             .arg(input_size.height()).arg(aspect));
 
@@ -1231,9 +1232,9 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                              WId winid, const QRect &win_rect,
                              MythCodecID codec_id)
 {
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("Init(WxH %1x%2, aspect=%3, winid=%4\n\t\t\t"
-                    "win_bounds(x %5, y%6, WxH %7x%8))")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Init(WxH %1x%2, aspect=%3, winid=%4\n\t\t\t"
+                "win_bounds(x %5, y%6, WxH %7x%8))")
             .arg(width).arg(height).arg(aspect).arg(winid)
             .arg(win_rect.x()).arg(win_rect.y())
             .arg(win_rect.width()).arg(win_rect.height()));
@@ -1252,7 +1253,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     // Initialize QuickTime
     if (EnterMovies())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Init() - EnterMovies failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Init() - EnterMovies failed");
         return false;
     }
 
@@ -1260,7 +1261,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->window = FrontNonFloatingWindow();
     if (!data->window)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Init() - Find window failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Init() - Find window failed");
         return false;
     }
 
@@ -1271,7 +1272,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     if (GetWindowBounds(data->window,
                         kWindowStructureRgn, &(data->windowBounds)))
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Init() - GetWindowBounds failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Init() - GetWindowBounds failed");
         return false;
     }
     CGPoint pt;
@@ -1300,7 +1301,8 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
         window.SetDisplayDim(QSize((uint) size_in_mm.width,
                                        (uint) size_in_mm.height));
         window.SetDisplayAspect(size_in_mm.width / size_in_mm.height);
-        VERBOSE(VB_PLAYBACK, QString("Screen size is %1 x %2 (mm), aspect %3")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("Screen size is %1 x %2 (mm), aspect %3")
                              .arg(size_in_mm.width).arg(size_in_mm.height)
                              .arg(size_in_mm.width / size_in_mm.height));
     }
@@ -1323,14 +1325,15 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                           / get_int_CF(m, kCGDisplayHeight);
         window.SetDisplayDim(QSize(winWidth, winHeight));
         window.SetDisplayAspect(winWidth / winHeight);
-        VERBOSE(VB_PLAYBACK, QString("Main window is %1 x %2 (mm), aspect %3")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("Main window is %1 x %2 (mm), aspect %3")
                              .arg((int)winWidth).arg((int)winHeight)
                              .arg(winWidth / winHeight));
     }
 
     if (!CreateQuartzBuffers())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Init() - CreateQuartzBuffers failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Init() - CreateQuartzBuffers failed");
         return false;
     }
 
@@ -1366,7 +1369,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
         {
             // If video in the main window is not enabled,
             // hide (shrink) it so it is not in the way
-            VERBOSE(VB_PLAYBACK, QString("Shrinking Main Window to 1x1"));
+            LOG(VB_PLAYBACK, LOG_INFO, "Shrinking Main Window to 1x1");
             SizeWindow(data->window, 1, 1, true);
         }
         if (gCoreContext->GetNumSetting("MacFloatEnabled", 0))
@@ -1396,7 +1399,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     {
         if (!(*it)->Init())
         {
-            VERBOSE(VB_IMPORTANT, LOC + "Init() - QuartzView Init() failed");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Init() - QuartzView Init() failed");
         }
     }
 
@@ -1408,7 +1411,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
 
 void VideoOutputQuartz::SetVideoFrameRate(float playback_fps)
 {
-    VERBOSE(VB_PLAYBACK, QString("SetVideoFrameRate(%1) - unimplemented?")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("SetVideoFrameRate(%1) - unimplemented?")
                          .arg(playback_fps));
 }
 
@@ -1432,8 +1435,8 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     QString     renderer  = QString::null;
 
     QString tmp = db_vdisp_profile->GetVideoRenderer();
-    VERBOSE(VB_PLAYBACK,
-            (LOC + "CreateQuartzBuffers() render: %1, allowed: %2")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + 
+        QString("CreateQuartzBuffers() render: %1, allowed: %2")
             .arg(tmp).arg(toCommaList(renderers)));
 
     if (renderers.contains(tmp))
@@ -1442,13 +1445,13 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
         renderer = renderers[0];
     else
     {
-        VERBOSE(VB_IMPORTANT, "Failed to find a video renderer");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to find a video renderer");
         return false;
     }
 
     // reset this so that all the prefs are reinitialized
     db_vdisp_profile->SetVideoRenderer(renderer);
-    VERBOSE(VB_IMPORTANT, LOC + "VProf: " + db_vdisp_profile->toString());
+    LOG(VB_GENERAL, LOG_INFO, LOC + "VProf: " + db_vdisp_profile->toString());
 
     vbuffers.CreateBuffers(FMT_YV12, video_dim.width(), video_dim.height());
 
@@ -1515,8 +1518,8 @@ void VideoOutputQuartz::Exit(void)
         // (assuming it was shrunk i.e. we were not in full screen mode)
         if (data->windowedMode)
         {
-            VERBOSE(VB_PLAYBACK,
-                    QString("Restoring Main Window to %1x%2")
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("Restoring Main Window to %1x%2")
                     .arg(data->windowBounds.right - data->windowBounds.left)
                     .arg(data->windowBounds.bottom - data->windowBounds.top));
             SetWindowBounds(data->window, kWindowStructureRgn,
@@ -1555,7 +1558,8 @@ void VideoOutputQuartz::DeleteQuartzBuffers()
 
 void VideoOutputQuartz::EmbedInWidget(const QRect &rect)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("EmbedInWidget(x=%1, y=%2, w=%3, h=%4)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("EmbedInWidget(x=%1, y=%2, w=%3, h=%4)")
                          .arg(rect.left()).arg(rect.top())
                          .arg(rect.width()).arg(rect.height()));
 
@@ -1566,7 +1570,8 @@ void VideoOutputQuartz::EmbedInWidget(const QRect &rect)
     // Base class has now calculated Aspect/Fill,
     // so copy for precision sizing of new widget:
     QRect newArea = window.GetDisplayVideoRect();
-    VERBOSE(VB_PLAYBACK, LOC + QString("now - EmbedInWidget(x=%1, y=%2, w=%3, h=%4)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("now - EmbedInWidget(x=%1, y=%2, w=%3, h=%4)")
                          .arg(newArea.left()).arg(newArea.top())
                          .arg(newArea.width()).arg(newArea.height()));
 
@@ -1586,7 +1591,7 @@ void VideoOutputQuartz::EmbedInWidget(const QRect &rect)
 
 void VideoOutputQuartz::StopEmbedding(void)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "StopEmbedding()");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "StopEmbedding()");
 
     if (!window.IsEmbedding())
         return;
@@ -1647,7 +1652,7 @@ void VideoOutputQuartz::UpdatePauseFrame(void)
 {
     if (!pauseFrame.buf)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "UpdatePauseFrame() - no buffers?");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "UpdatePauseFrame() - no buffers?");
         return;
     }
 
@@ -1698,7 +1703,7 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
     QMutexLocker locker(&data->pixelLock);
     if (!data->pixelData)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "ProcessFrame(): NULL pixelData!");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "ProcessFrame(): NULL pixelData!");
         return;
     }
 

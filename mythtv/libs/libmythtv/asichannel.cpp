@@ -8,7 +8,6 @@
 #include "asichannel.h"
 
 #define LOC     QString("ASIChan(%1): ").arg(GetDevice())
-#define LOC_ERR QString("ASIChan(%1), Error: ").arg(GetDevice())
 
 ASIChannel::ASIChannel(TVRec *parent, const QString &device) :
     DTVChannel(parent), m_device(device), m_isopen(false)
@@ -24,7 +23,7 @@ ASIChannel::~ASIChannel(void)
 
 bool ASIChannel::Open(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Open()");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Open()");
 
     if (m_device.isEmpty())
         return false;
@@ -45,6 +44,6 @@ bool ASIChannel::Open(void)
 
 void ASIChannel::Close()
 {
-    VERBOSE(VB_CHANNEL, LOC + "Close()");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Close()");
     m_isopen = false;
 }

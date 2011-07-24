@@ -69,6 +69,7 @@ class PlaybackSock
                               QString &directory, bool fileNamesOnly);
     QStringList GetSGFileQuery(QString &host, QString &groupname,
                                QString &filename);
+    QString GetFileHash(QString filename, QString storageGroup);
 
     QStringList GenPreviewPixmap(const QString     &token,
                                  const ProgramInfo *pginfo);

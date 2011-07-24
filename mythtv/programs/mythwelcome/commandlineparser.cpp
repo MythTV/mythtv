@@ -21,7 +21,6 @@ void MythWelcomeCommandLineParser::LoadArguments(void)
     addHelp();
     addSettingsOverride();
     addVersion();
-    addVerbose();
     addLogging();
 
     add(QStringList( QStringList() << "-s" << "--setup" ), "setup", false,

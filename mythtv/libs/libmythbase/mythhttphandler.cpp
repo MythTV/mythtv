@@ -11,8 +11,6 @@
 #include "mythlogging.h"
 
 #define LOC      QString("MythHttpHandler: ")
-#define LOC_WARN QString("MythHttpHandler, Warning: ")
-#define LOC_ERR  QString("MythHttpHandler, Error: ")
 
 const uint MythHttpHandler::kMaxRedirectCount = 32;
 
@@ -57,8 +55,8 @@ void MythHttpHandler::AddUrlRequest(const QUrl &url)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_NETWORK, LOG_DEBUG,
-            QString("AddUrlRequest(%1)").arg(url.toString()));
+    LOG(VB_NETWORK, LOG_DEBUG, LOC +
+        QString("AddUrlRequest(%1)").arg(url.toString()));
 
     if (!m_qhttp->hasPendingRequests() && !m_qhttp->currentRequest().isValid())
         Get(url);
@@ -68,7 +66,7 @@ void MythHttpHandler::AddUrlRequest(const QUrl &url)
 
 void MythHttpHandler::Get(const QUrl &url)
 {
-    LOG(VB_NETWORK, LOG_DEBUG, QString("Get(%1)").arg(url.toString()));
+    LOG(VB_NETWORK, LOG_DEBUG, LOC + QString("Get(%1)").arg(url.toString()));
 
     m_cur_url          = url;
     m_cur_status_id    = 0;
@@ -123,7 +121,7 @@ void MythHttpHandler::Done(bool error)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_NETWORK, LOG_DEBUG, QString("Done(%1) url: %2")
+    LOG(VB_NETWORK, LOG_DEBUG, LOC + QString("Done(%1) url: %2")
             .arg(error).arg(m_cur_url.toString()));
 
     if (m_pool)
@@ -134,7 +132,8 @@ void MythHttpHandler::ResponseHeaderReceived(const QHttpResponseHeader &resp)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_NETWORK, LOG_DEBUG, QString("ResponseHeaderReceived(%1,%2) url: %3")
+    LOG(VB_NETWORK, LOG_DEBUG, LOC +
+        QString("ResponseHeaderReceived(%1,%2) url: %3")
             .arg(resp.statusCode()).arg(resp.reasonPhrase())
             .arg(m_cur_url.toString()));
     m_cur_status_id  = resp.statusCode();
@@ -189,7 +188,7 @@ void MythHttpHandler::RequestFinished(int id, bool error)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_NETWORK, LOG_DEBUG, QString("RequestFinished(%1,%2) url: %3")
+    LOG(VB_NETWORK, LOG_DEBUG, LOC + QString("RequestFinished(%1,%2) url: %3")
             .arg(id).arg(error).arg(m_cur_url.toString()));
     if (error && m_pool)
     {
@@ -236,7 +235,7 @@ void MythHttpHandler::RequestStarted(int id)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_NETWORK, LOG_DEBUG, QString("RequestStarted(%1) url: %2")
+    LOG(VB_NETWORK, LOG_DEBUG, LOC + QString("RequestStarted(%1) url: %2")
             .arg(id).arg(m_cur_url.toString()));
 }
 
@@ -244,7 +243,7 @@ void MythHttpHandler::StateChanged(int state)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_NETWORK, LOG_DEBUG, QString("StateChanged(%1) url: %2")
+    LOG(VB_NETWORK, LOG_DEBUG, LOC + QString("StateChanged(%1) url: %2")
             .arg(state).arg(m_cur_url.toString()));
 }
 

@@ -33,6 +33,7 @@
 #include <iostream>
 
 #include <mythcontext.h>
+#include <mythlogging.h>
 
 using namespace std;
 
@@ -115,8 +116,9 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
     int lameret = init_encoder(gf, qualitylevel, vbr);
     if (lameret < 0)
     {
-        VERBOSE(VB_GENERAL, QString("Error initializing LAME encoder. "
-                                    "Got return code: %1").arg(lameret));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error initializing LAME encoder. Got return code: %1")
+                .arg(lameret));
         return;
     }
 }
@@ -172,14 +174,13 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
 
     if (lameret < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("LAME encoder error."));
+        LOG(VB_GENERAL, LOG_ERR, QString("LAME encoder error."));
     } 
     else if (lameret > 0 && m_out)
     {
         if (write_buffer(mp3buf, lameret, m_out) != lameret)
         {
-            VERBOSE(VB_GENERAL, QString("Failed to write mp3 data."
-                                        " Aborting."));
+            LOG(VB_GENERAL, LOG_ERR, "Failed to write mp3 data. Aborting.");
             return EENCODEERROR;
         }
     }

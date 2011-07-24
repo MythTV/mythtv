@@ -39,6 +39,7 @@
 #include "exitcodes.h"
 #include "jobqueue.h"
 #include "upnp.h"
+#include <util.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -123,8 +124,8 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */,
     }
     catch( ... )
     {
-        VERBOSE(VB_GENERAL, "HttpStatus::ProcessRequest() - Unexpected "
-                            "Exception");
+        LOG(VB_GENERAL, LOG_ERR,
+            "HttpStatus::ProcessRequest() - Unexpected Exception");
     }
 
     return( false );
@@ -166,13 +167,6 @@ void HttpStatus::GetStatusHTML( HTTPRequest *pRequest )
 
 void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 {
-    QString   dateFormat   = gCoreContext->GetSetting("DateFormat", "M/d/yyyy");
-
-    if (dateFormat.indexOf(QRegExp("yyyy")) < 0)
-        dateFormat += " yyyy";
-
-    QString   shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-    QString   timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
     QDateTime qdtNow          = QDateTime::currentDateTime();
 
     // Add Root Node.
@@ -180,8 +174,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     QDomElement root = pDoc->createElement("Status");
     pDoc->appendChild(root);
 
-    root.setAttribute("date"    , qdtNow.toString(dateFormat));
-    root.setAttribute("time"    , qdtNow.toString(timeformat)   );
+    root.setAttribute("date"    , MythDateTimeToString(qdtNow,
+                                                       kDateFull | kAddYear));
+    root.setAttribute("time"    , MythDateTimeToString(qdtNow, kTime));
     root.setAttribute("ISODate" , qdtNow.toString(Qt::ISODate)  );
     root.setAttribute("version" , MYTH_BINARY_VERSION           );
     root.setAttribute("protoVer", MYTH_PROTO_VERSION            );
@@ -540,9 +535,12 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                                                      Qt::ISODate);
     }
 
-    guide.setAttribute("start", gCoreContext->GetSetting("mythfilldatabaseLastRunStart"));
-    guide.setAttribute("end", gCoreContext->GetSetting("mythfilldatabaseLastRunEnd"));
-    guide.setAttribute("status", gCoreContext->GetSetting("mythfilldatabaseLastRunStatus"));
+    guide.setAttribute("start",
+        gCoreContext->GetSetting("mythfilldatabaseLastRunStart"));
+    guide.setAttribute("end",
+        gCoreContext->GetSetting("mythfilldatabaseLastRunEnd"));
+    guide.setAttribute("status",
+        gCoreContext->GetSetting("mythfilldatabaseLastRunStatus"));
     if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 0))
     {
         guide.setAttribute("next",
@@ -551,11 +549,13 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     if (!GuideDataThrough.isNull())
     {
-        guide.setAttribute("guideThru", QDateTime(GuideDataThrough).toString(Qt::ISODate));
+        guide.setAttribute("guideThru",
+            QDateTime(GuideDataThrough).toString(Qt::ISODate));
         guide.setAttribute("guideDays", qdtNow.daysTo(GuideDataThrough));
     }
 
-    QDomText dataDirectMessage = pDoc->createTextNode(gCoreContext->GetSetting("DataDirectMessage"));
+    QDomText dataDirectMessage =
+        pDoc->createTextNode(gCoreContext->GetSetting("DataDirectMessage"));
     guide.appendChild(dataDirectMessage);
 
     // Add Miscellaneous information
@@ -571,8 +571,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         ms.Run(10);
         if (ms.Wait() != GENERIC_EXIT_OK)
         {
-            VERBOSE(VB_IMPORTANT, QString("Error running miscellaneous "
-                    "status information script: %1").arg(info_script));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Error running miscellaneous "
+                        "status information script: %1").arg(info_script));
             return;
         }
     
@@ -854,6 +855,7 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 {
     QDateTime qdtNow          = QDateTime::currentDateTime();
     QString   shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    QString   longdateformat  = gCoreContext->GetSetting("DateFormat", "M/d/yyyy");
     QString   timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
     if (scheduled.isNull())
@@ -897,6 +899,7 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 
                 QString   sTitle       = e.attribute( "title"   , "" );
                 QString   sSubTitle    = e.attribute( "subTitle", "" );
+                QDateTime airDate      = QDateTime::fromString( e.attribute( "airdate" ,"" ), Qt::ISODate );
                 QDateTime startTs      = QDateTime::fromString( e.attribute( "startTime" ,"" ), Qt::ISODate );
                 QDateTime endTs        = QDateTime::fromString( e.attribute( "endTime"   ,"" ), Qt::ISODate );
                 QDateTime recStartTs   = QDateTime::fromString( r.attribute( "recStartTs","" ), Qt::ISODate );
@@ -957,6 +960,11 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 
                 if ( !sSubTitle.isEmpty())
                     os << "<em>" << sSubTitle << "</em><br /><br />";
+
+                if ( airDate.isValid())
+                    os << "Orig. Airdate: "
+                       << airDate.toString(longdateformat + " " +timeformat)
+                       << "<br /><br />";
 
                 os << sDesc << "<br /><br />"
                    << "This recording will start "  << sTimeToStart
@@ -1145,7 +1153,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                     if (!text.isNull())
                         sComment = text.nodeValue();
 
-                    os << "<a href=\"#\">"
+                    os << "<a href=\"javascript:void(0)\">"
                        << recStartTs.toString("ddd") << " "
                        << recStartTs.toString(shortdateformat) << " "
                        << recStartTs.toString(timeformat) << " - "

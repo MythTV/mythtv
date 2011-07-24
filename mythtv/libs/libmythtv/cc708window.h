@@ -11,6 +11,8 @@ using namespace std;
 #include <QMutex>
 #include <QColor>
 
+#include "mythtvexp.h"
+
 class CC708CharacterAttribute
 {
   public:
@@ -113,7 +115,7 @@ class CC708String
     CC708CharacterAttribute attr;
 };
 
-class CC708Window
+class MTV_PUBLIC CC708Window
 {
   public:
     CC708Window();

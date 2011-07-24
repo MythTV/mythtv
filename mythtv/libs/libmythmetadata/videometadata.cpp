@@ -199,7 +199,8 @@ class VideoMetadataImp
     const QString &getTitle() const { return m_title; }
     void SetTitle(const QString& title)
     {
-        m_sort_key.Clear();
+        if (gCoreContext->HasGUI())
+            m_sort_key.Clear();
         m_title = title;
     }
 
@@ -326,7 +327,7 @@ class VideoMetadataImp
     void UpdateDatabase();
     bool DeleteFromDatabase();
 
-    bool DeleteFile(class VideoList &dummy);
+    bool DeleteFile();
 
     void Reset();
 
@@ -423,9 +424,8 @@ bool VideoMetadataImp::removeDir(const QString &dirName)
 }
 
 /// Deletes the file associated with a metadata entry
-bool VideoMetadataImp::DeleteFile(class VideoList &dummy)
+bool VideoMetadataImp::DeleteFile()
 {
-    (void) dummy;
     bool isremoved = false;
 
     if (!m_host.isEmpty())
@@ -448,8 +448,8 @@ bool VideoMetadataImp::DeleteFile(class VideoList &dummy)
 
     if (!isremoved)
     {
-        VERBOSE(VB_IMPORTANT, QString("Could not delete file: %1")
-                                                            .arg(m_filename));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Could not delete file: %1")
+                                       .arg(m_filename));
     }
 
     return isremoved;
@@ -710,9 +710,9 @@ void VideoMetadataImp::saveToDatabase()
 
         if (0 == m_id)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("%1: The id of the last inserted row to "
-                            "videometadata seems to be 0. This is odd.")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("%1: The id of the last inserted row to "
+                        "videometadata seems to be 0. This is odd.")
                     .arg(__FILE__));
             return;
         }
@@ -776,7 +776,7 @@ void VideoMetadataImp::SetCategoryID(int id)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("Unknown category id"));
+                LOG(VB_GENERAL, LOG_ERR, "Unknown category id");
             }
         }
     }
@@ -1196,8 +1196,7 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
     metadataMap["length"] = GetDisplayLength(GetLength());
     metadataMap["year"] = GetDisplayYear(GetYear());
 
-    QString formatLongDate = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
-    metadataMap["releasedate"] = GetReleaseDate().toString(formatLongDate);
+    metadataMap["releasedate"] = MythDateToString(GetReleaseDate(), kDateFull);
 
     metadataMap["userrating"] = GetDisplayUserRating(GetUserRating());
     metadataMap["season"] = GetDisplaySeasonEpisode(GetSeason(), 1);
@@ -1222,8 +1221,7 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
 
     metadataMap["videolevel"] = ParentalLevelToState(GetShowLevel());
 
-    metadataMap["insertdate"] = GetInsertdate()
-                             .toString(gCoreContext->GetSetting("DateFormat"));
+    metadataMap["insertdate"] = MythDateToString(GetInsertdate(), kDateFull);
     metadataMap["inetref"] = GetInetRef();
     metadataMap["homepage"] = GetHomepage();
     metadataMap["child_id"] = QString::number(GetChildID());
@@ -1705,9 +1703,9 @@ bool VideoMetadata::FillDataFromFilename(const VideoMetadataListManager &cache)
     return false;
 }
 
-bool VideoMetadata::DeleteFile(class VideoList &dummy)
+bool VideoMetadata::DeleteFile()
 {
-    return m_imp->DeleteFile(dummy);
+    return m_imp->DeleteFile();
 }
 
 void VideoMetadata::Reset()
@@ -1740,8 +1738,8 @@ bool operator<(const VideoMetadata::SortKey &lhs, const VideoMetadata::SortKey &
         return *lhs.m_sd < *rhs.m_sd;
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Error: Bug, Metadata item with empty "
-                                      "sort key compared"));
+        LOG(VB_GENERAL, LOG_ERR,
+            "Error: Bug, Metadata item with empty sort key compared");
         return lhs.m_sd < rhs.m_sd;
     }
 }

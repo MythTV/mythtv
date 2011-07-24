@@ -14,8 +14,8 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
 {
     if (!gCoreContext->SaveSettingOnHost("WeatherDBSchemaVer",newnumber,NULL))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("DB Error (Setting new DB version number): %1\n")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("DB Error (Setting new DB version number): %1\n")
                 .arg(newnumber));
 
         return false;
@@ -27,7 +27,8 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
 static bool performActualUpdate(const QStringList updates, QString version,
                                 QString &dbver)
 {
-    VERBOSE(VB_IMPORTANT, "Upgrading to MythWeather schema version " + version);
+    LOG(VB_GENERAL, LOG_NOTICE,
+        "Upgrading to MythWeather schema version " + version);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -44,7 +45,7 @@ static bool performActualUpdate(const QStringList updates, QString version,
                 .arg(thequery)
                 .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
-            VERBOSE(VB_IMPORTANT, msg);
+            LOG(VB_GENERAL, LOG_ERR, msg);
             return false;
         }
         ++it;
@@ -72,8 +73,8 @@ bool InitializeDatabase()
 
     if (dbver == "")
     {
-        VERBOSE(VB_IMPORTANT,
-                "Inserting MythWeather initial database information.");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Inserting MythWeather initial database information.");
         QStringList updates;
         updates << "CREATE TABLE IF NOT EXISTS weathersourcesettings ("
                         "sourceid INT UNSIGNED NOT NULL AUTO_INCREMENT,"

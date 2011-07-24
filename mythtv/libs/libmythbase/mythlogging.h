@@ -7,6 +7,7 @@
 #include <QQueue>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QRegExp>
 #endif
 #include <stdint.h>
 #include <time.h>
@@ -20,6 +21,7 @@
 
 typedef enum
 {
+    LOG_ANY = -1,       // For use with masking, not actual logging
     LOG_EMERG = 0,
     LOG_ALERT,
     LOG_CRIT,
@@ -30,6 +32,11 @@ typedef enum
     LOG_DEBUG,
     LOG_UNKNOWN
 } LogLevel_t;
+
+extern MBASE_PUBLIC const char *LogLevelNames[];
+extern MBASE_PUBLIC int LogLevelNameCount;
+extern MBASE_PUBLIC const char LogLevelShortNames[];
+extern MBASE_PUBLIC int LogLevelShortNameCount;
 
 #ifdef _LogLevelNames_
 const char *LogLevelNames[] =
@@ -60,11 +67,6 @@ const char LogLevelShortNames[] =
 };
 int LogLevelShortNameCount = sizeof(LogLevelShortNames) / 
                              sizeof(LogLevelShortNames[0]);
-#else
-extern MBASE_PUBLIC char *LogLevelNames[];
-extern MBASE_PUBLIC int LogLevelNameCount;
-extern MBASE_PUBLIC char *LogLevelShortNames[];
-extern MBASE_PUBLIC int LogLevelShortNameCount;
 #endif
 extern MBASE_PUBLIC LogLevel_t logLevel;
 
@@ -90,20 +92,26 @@ typedef struct
 extern "C" {
 #endif
 
+// There are two LOG macros now.  One for use with Qt/C++, one for use
+// without Qt.
+//
+// Neither of them will lock the calling thread other than momentarily to put
+// the log message onto a queue.
 #ifdef __cplusplus
 #define LOG(mask, level, string) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
-                 QString(string).toLocal8Bit().constData())
+                 1, QString(string).toLocal8Bit().constData())
 #else
 #define LOG(mask, level, format, ...) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
-                 (const char *)format, ##__VA_ARGS__)
+                 0, (const char *)format, ##__VA_ARGS__)
 #endif
 
 /* Define the external prototype */
-MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level, 
+MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level, 
                                 const char *file, int line, 
-                                const char *function, const char *format, ... );
+                                const char *function, int fromQString,
+                                const char *format, ... );
 
 #ifdef __cplusplus
 }
@@ -143,13 +151,14 @@ class LoggerBase : public QObject {
 
 class FileLogger : public LoggerBase {
     public:
-        FileLogger(char *filename);
+        FileLogger(char *filename, bool quiet);
         ~FileLogger();
         bool logmsg(LoggingItem_t *item);
         void reopen(void);
     private:
         bool m_opened;
         int  m_fd;
+        bool m_quiet;
 };
 
 #ifndef _WIN32
@@ -187,8 +196,10 @@ class DatabaseLogger : public LoggerBase {
         pid_t m_pid;
         bool m_opened;
         bool m_loggingTableExists;
+        bool m_disabled;
 };
 
+class QWaitCondition;
 class LoggerThread : public QThread {
     Q_OBJECT
 
@@ -196,31 +207,39 @@ class LoggerThread : public QThread {
         LoggerThread();
         ~LoggerThread();
         void run(void);
-        void stop(void) { aborted = true; };
+        void stop(void);
     private:
-        bool aborted;
+        QWaitCondition *m_wait; // protected by logQueueMutex
+        bool aborted; // protected by logQueueMutex
 };
+
+#define MAX_QUEUE_LEN 1000
 
 class DBLoggerThread : public QThread {
     Q_OBJECT
 
     public:
-        DBLoggerThread(DatabaseLogger *logger) : m_logger(logger), 
-            m_queue(new QQueue<LoggingItem_t *>) {}
-        ~DBLoggerThread() { delete m_queue; }
+        DBLoggerThread(DatabaseLogger *logger);
+        ~DBLoggerThread();
         void run(void);
-        void stop(void) { aborted = true; }
+        void stop(void);
         bool enqueue(LoggingItem_t *item) 
         { 
             QMutexLocker qLock(&m_queueMutex); 
             m_queue->enqueue(item); 
             return true; 
         }
+        bool queueFull(void)
+        {
+            QMutexLocker qLock(&m_queueMutex); 
+            return (m_queue->size() >= MAX_QUEUE_LEN);
+        }
     private:
         DatabaseLogger *m_logger;
         QMutex m_queueMutex;
         QQueue<LoggingItem_t *> *m_queue;
-        bool aborted;
+        QWaitCondition *m_wait; // protected by m_queueMutex
+        bool aborted; // protected by m_queueMutex
 };
 #endif
 
@@ -228,24 +247,13 @@ class DBLoggerThread : public QThread {
 /// of the verbose messages we want to see.
 extern MBASE_PUBLIC uint64_t verboseMask;
 
-// Helper for checking verbose flags outside of VERBOSE macro
+// Helper for checking verbose mask & level outside of LOG macro
 #define VERBOSE_LEVEL_NONE        (verboseMask == 0)
-#define VERBOSE_LEVEL_CHECK(mask) ((verboseMask & (mask)) == (mask))
+#define VERBOSE_LEVEL_CHECK(mask, level) \
+   (((verboseMask & (mask)) == (mask)) && logLevel >= (level))
 
-// There are two VERBOSE macros now.  One for use with Qt/C++, one for use
-// without Qt.
-//
-// Neither of them will lock the calling thread, but rather put the log message
-// onto a queue.
-
-#ifdef __cplusplus
-#define VERBOSE(mask, ...) \
-    LOG((uint64_t)(mask), LOG_INFO, QString(__VA_ARGS__))
-#else
-#define VERBOSE(mask, ...) \
-    LOG((uint64_t)(mask), LOG_INFO, __VA_ARGS__)
-#endif
-
+MBASE_PUBLIC void VERBOSE(uint64_t mask, ...)
+    MERROR("VERBOSE is gone, use LOG");
 
 #ifdef  __cplusplus
 /// Verbose helper function for ENO macro
@@ -260,7 +268,8 @@ MBASE_PUBLIC int verboseArgParse(QString arg);
 /// a thread safe version of strerror to produce the
 /// string representation of errno and puts it on the
 /// next line in the verbose output.
-#define ENO QString("\n\t\t\teno: ") + logStrerror(errno)
+#define ENO (QString("\n\t\t\teno: ") + logStrerror(errno))
+#define ENO_STR ENO.toLocal8Bit().constData()
 #endif // __cplusplus
 
 #endif

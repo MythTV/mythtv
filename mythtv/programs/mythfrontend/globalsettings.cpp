@@ -206,6 +206,17 @@ static HostComboBox *AutoCommercialSkip()
     return gc;
 }
 
+static GlobalCheckBox *AutoMetadataLookup()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoMetadataLookup");
+    bc->setLabel(QObject::tr("Run metadata lookup"));
+    bc->setValue(true);
+    bc->setHelpText(QObject::tr("This is the default value used for the "
+                    "automatic metadata lookup setting when a new "
+                    "scheduled recording is created."));
+    return bc;
+}
+
 static GlobalCheckBox *AutoCommercialFlag()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoCommercialFlag");
@@ -983,16 +994,16 @@ void PlaybackProfileConfig::Save(void)
     bool ok = VideoDisplayProfile::DeleteDB(groupid, del_items);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT,
-                "PlaybackProfileConfig::Save() -- failed to delete items");
+        LOG(VB_GENERAL, LOG_ERR,
+            "PlaybackProfileConfig::Save() -- failed to delete items");
         return;
     }
 
     ok = VideoDisplayProfile::SaveDB(groupid, items);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT,
-                "PlaybackProfileConfig::Save() -- failed to save items");
+        LOG(VB_GENERAL, LOG_ERR,
+            "PlaybackProfileConfig::Save() -- failed to save items");
         return;
     }
 }
@@ -1005,7 +1016,7 @@ void PlaybackProfileConfig::pressed(QString cmd)
         PlaybackProfileItemConfig itemcfg(items[i]);
 
         if (itemcfg.exec() != kDialogCodeAccepted)
-            VERBOSE(VB_IMPORTANT, QString("edit #%1").arg(i) + " rejected");
+            LOG(VB_GENERAL, LOG_ERR, QString("edit #%1").arg(i) + " rejected");
 
         InitLabel(i);
         needs_save = true;
@@ -1025,7 +1036,7 @@ void PlaybackProfileConfig::pressed(QString cmd)
         PlaybackProfileItemConfig itemcfg(item);
 
         if (itemcfg.exec() != kDialogCodeAccepted)
-            VERBOSE(VB_IMPORTANT, "addentry rejected");
+            LOG(VB_GENERAL, LOG_ERR, "addentry rejected");
 
         items.push_back(item);
         InitUI();
@@ -1170,7 +1181,9 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
 
 PlaybackProfileConfigs::~PlaybackProfileConfigs()
 {
-    //VERBOSE(VB_IMPORTANT, "~PlaybackProfileConfigs()");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, "~PlaybackProfileConfigs()");
+#endif
 }
 
 void PlaybackProfileConfigs::btnPress(QString cmd)
@@ -1654,17 +1667,6 @@ static HostComboBox *OverrideExitMenu()
     gc->setHelpText(QObject::tr("By default, only remote frontends are shown "
                     "the shutdown option on the exit menu. Here you can force "
                     "specific shutdown and reboot options to be displayed."));
-    return gc;
-}
-
-static HostCheckBox *NoPromptOnExit()
-{
-    HostCheckBox *gc = new HostCheckBox("NoPromptOnExit");
-    gc->setLabel(QObject::tr("Confirm exit"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, MythTV will prompt "
-                    "for confirmation when you press the System Exit "
-                    "key."));
     return gc;
 }
 
@@ -2276,17 +2278,6 @@ static GlobalCheckBox *LiveTVPriority()
                     "be moved to other cards (where possible), so that "
                     "Live TV will not be interrupted."));
     return bc;
-}
-
-// EPG settings
-static HostCheckBox *EPGShowCategoryColors()
-{
-    HostCheckBox *gc = new HostCheckBox("EPGShowCategoryColors");
-    gc->setLabel(QObject::tr("Display genre colors"));
-    gc->setHelpText(QObject::tr("Colorize program guide using "
-                    "genre colors (not available for all grabbers)."));
-    gc->setValue(true);
-    return gc;
 }
 
 static HostCheckBox *ChannelGroupRememberLast()
@@ -3312,21 +3303,13 @@ MainGeneralSettings::MainGeneralSettings()
     media->addChild(mediaMon);
     addChild(media);
 
-    VerticalConfigurationGroup *exit =
-        new VerticalConfigurationGroup(false, true, false, false);
-    exit->setLabel(QObject::tr("Program Exit"));
-    HorizontalConfigurationGroup *ehor0 =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    ehor0->addChild(NoPromptOnExit());
     VerticalConfigurationGroup *shutdownSettings =
         new VerticalConfigurationGroup(true, true, false, false);
     shutdownSettings->setLabel(QObject::tr("Shutdown/Reboot Settings"));
     shutdownSettings->addChild(OverrideExitMenu());
     shutdownSettings->addChild(HaltCommand());
     shutdownSettings->addChild(RebootCommand());
-    exit->addChild(ehor0);
-    exit->addChild(shutdownSettings);
-    addChild(exit);
+    addChild(shutdownSettings);
 
     VerticalConfigurationGroup *remotecontrol =
         new VerticalConfigurationGroup(false, true, false, false);
@@ -3552,12 +3535,13 @@ GeneralSettings::GeneralSettings()
 
     VerticalConfigurationGroup* autogrp0 =
         new VerticalConfigurationGroup(false, false, true, true);
+    autogrp0->addChild(AutoMetadataLookup());
     autogrp0->addChild(AutoCommercialFlag());
     autogrp0->addChild(AutoTranscode());
-    autogrp0->addChild(AutoRunUserJob(1));
 
     VerticalConfigurationGroup* autogrp1 =
         new VerticalConfigurationGroup(false, false, true, true);
+    autogrp0->addChild(AutoRunUserJob(1));
     autogrp1->addChild(AutoRunUserJob(2));
     autogrp1->addChild(AutoRunUserJob(3));
     autogrp1->addChild(AutoRunUserJob(4));
@@ -3591,7 +3575,6 @@ EPGSettings::EPGSettings()
 {
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
     epg->setLabel(QObject::tr("Program Guide") + " 1/1");
-    epg->addChild(EPGShowCategoryColors());
     epg->addChild(WatchTVGuide());
     epg->addChild(DefaultTVChannel());
     epg->addChild(EPGRecThreshold());

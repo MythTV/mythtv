@@ -15,11 +15,11 @@ __all_data__        = ['Record', 'Recorded', 'RecordedProgram', 'OldRecorded', \
                        'Job', 'Channel', 'Guide', 'Video', 'VideoGrabber', \
                        'InternetContent', 'InternetContentArticles', \
                        'InternetSource', 'Song', 'Album', 'Artist', \
-                       'MusicPlaylist', 'MusicDirectory']
+                       'MusicPlaylist', 'MusicDirectory', 'RecordedArtwork']
 
 __all_method__      = ['MythBE', 'BEEventMonitor', 'MythSystemEvent', \
-                       'Frontend', 'MythDB', 'MythVideo', \
-                       'MythXML', 'MythMusic']
+                       'Frontend', 'MythDB', 'MythXML', 'MythMusic', \
+                       'MythVideo']
 
 __all__             = ['static', 'MSearch', 'MythLog', 'StorageGroup']\
                         +__all_exceptions__\

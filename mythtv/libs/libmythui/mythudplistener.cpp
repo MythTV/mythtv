@@ -8,7 +8,6 @@
 #include "mythudplistener.h"
 
 #define LOC QString("UDPListener: ")
-#define ERR QString("UPDListener Error: ")
 
 MythUDPListener::MythUDPListener()
 {
@@ -16,14 +15,14 @@ MythUDPListener::MythUDPListener()
     m_socket = new QUdpSocket(this);
     connect(m_socket, SIGNAL(readyRead()),
             this,     SLOT(ReadPending()));
-    if (m_socket->bind(QHostAddress(gCoreContext->MythHostAddressAny()),
-                                    udp_port))
+    if (m_socket->bind(gCoreContext->MythHostAddressAny(), udp_port))
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("bound to port %1").arg(udp_port));
+        LOG(VB_GENERAL, LOG_INFO, LOC + 
+            QString("bound to port %1").arg(udp_port));
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO,
+        LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("failed to bind to port %1").arg(udp_port));
     }
 }
@@ -40,7 +39,7 @@ void MythUDPListener::TeardownAll(void)
     if (!m_socket)
         return;
 
-    LOG(VB_GENERAL, LOG_INFO, "Disconnecting");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Disconnecting");
 
     m_socket->disconnect();
     m_socket->close();
@@ -72,9 +71,9 @@ void MythUDPListener::Process(const QByteArray &buf)
     QDomDocument doc;
     if (!doc.setContent(buf, false, &errorMsg, &errorLine, &errorColumn))
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Parsing xml:\n\t\t\t at line: %1  column: %2\n\t\t\t%3")
-            .arg(errorLine).arg(errorColumn).arg(errorMsg));
+                .arg(errorLine).arg(errorColumn).arg(errorMsg));
 
         return;
     }
@@ -84,7 +83,7 @@ void MythUDPListener::Process(const QByteArray &buf)
     {
         if (docElem.tagName() != "mythmessage")
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Unknown UDP packet (not <mythmessage> XML)");
             return;
         }
@@ -92,7 +91,7 @@ void MythUDPListener::Process(const QByteArray &buf)
         QString version = docElem.attribute("version", "");
         if (version.isEmpty())
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                 "<mythmessage> missing 'version' attribute");
             return;
         }
@@ -114,7 +113,7 @@ void MythUDPListener::Process(const QByteArray &buf)
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Unknown element: %1")
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unknown element: %1")
                     .arg(e.tagName()));
                 return;
             }

@@ -15,26 +15,26 @@ using namespace frameAnalyzer;
 using namespace commDetector2;
 
 BorderDetector::BorderDetector(void)
-    : logoFinder(NULL)
-    , logo(NULL)
-    , logorow(-1)
-    , logocol(-1)
-    , logowidth(-1)
-    , logoheight(-1)
-    , frameno(-1)
-    , row(-1)
-    , col(-1)
-    , width(-1)
-    , height(-1)
-    , ismonochromatic(false)
-    , debugLevel(0)
-    , time_reported(false)
+    : logoFinder(NULL),
+      logo(NULL),
+      logorow(-1),
+      logocol(-1),
+      logowidth(-1),
+      logoheight(-1),
+      frameno(-1),
+      row(-1),
+      col(-1),
+      width(-1),
+      height(-1),
+      ismonochromatic(false),
+      debugLevel(0),
+      time_reported(false)
 {
     memset(&analyze_time, 0, sizeof(analyze_time));
     debugLevel = gCoreContext->GetNumSetting("BorderDetectorDebugLevel", 0);
 
     if (debugLevel >= 1)
-        VERBOSE(VB_COMMFLAG,
+        LOG(VB_COMMFLAG, LOG_INFO,
             QString("BorderDetector debugLevel %1").arg(debugLevel));
 }
 
@@ -53,9 +53,9 @@ BorderDetector::setLogoState(TemplateFinder *finder)
     if ((logoFinder = finder) && (logo = logoFinder->getTemplate(
                     &logorow, &logocol, &logowidth, &logoheight)))
     {
-        VERBOSE(VB_COMMFLAG, QString(
-                    "BorderDetector::setLogoState: %1x%2@(%3,%4)")
-            .arg(logowidth).arg(logoheight).arg(logocol).arg(logorow));
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("BorderDetector::setLogoState: %1x%2@(%3,%4)")
+                .arg(logowidth).arg(logoheight).arg(logocol).arg(logorow));
     }
 }
 
@@ -399,7 +399,7 @@ BorderDetector::reportTime(void)
 {
     if (!time_reported)
     {
-        VERBOSE(VB_COMMFLAG, QString("BD Time: analyze=%1s")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("BD Time: analyze=%1s")
                 .arg(strftimeval(&analyze_time)));
         time_reported = true;
     }

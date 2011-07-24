@@ -37,6 +37,27 @@
     </button>
 
     <button>
+        <type>SETTINGS_SETUPWIZARD</type>
+        <text>Setup Wizard</text>
+        <description>Perform basic configuration tasks</description>
+        <action>SETTINGS SETUPWIZARD</action>
+    </button>
+
+    <button>
+        <type>SETTINGS_SYSTEM_EVENTS</type>
+        <text>System Event Handlers</text>
+        <description>Configure System Event handler commands</description>
+        <action>SYSTEM_EVENTS</action>
+    </button>
+
+    <button>
+        <type>SETTINGS_GRABBERS</type>
+        <text>Artwork and Data Sources</text>
+        <description>Configure sources of artwork and metadata</description>
+        <action>SETTINGS GRABBERS</action>
+    </button>
+
+    <button>
         <type>SETTINGS_TV</type>
         <text>TV Settings</text>
         <description>Settings for TV recording and playback</description>

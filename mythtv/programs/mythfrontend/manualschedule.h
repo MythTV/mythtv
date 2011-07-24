@@ -60,9 +60,6 @@ class ManualSchedule : public MythScreenType
     QString m_startString;
     QString m_chanidString;
 
-    QString m_dateformat;
-    QString m_timeformat;
-    QString m_shortdateformat;
 };
 
 #endif

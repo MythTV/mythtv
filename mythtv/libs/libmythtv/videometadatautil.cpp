@@ -7,21 +7,20 @@
 #include "mythdb.h"
 
 #define LOC      QString("VideoMetaDataUtil: ")
-#define LOC_WARN QString("VideoMetaDataUtil, Warning: ")
-#define LOC_ERR  QString("VideoMetaDataUtil, Error: ")
 
 static QReadWriteLock art_path_map_lock;
 typedef QPair< QString, QString > ArtPair;
 static QMultiHash<QString, ArtPair> art_path_map;
 typedef QList< ArtPair > ArtList;
 
-QString VideoMetaDataUtil::GetArtPath(const QString &pathname, const QString &type)
+QString VideoMetaDataUtil::GetArtPath(const QString &pathname,
+                                      const QString &type)
 {
     QString basename = pathname.section('/', -1);
 
     if (basename == pathname)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Programmer Error: Cannot determine art path\n\t\t\t"
                 "until the ProgramInfo pathname has been fully resolved.");
         return QString();

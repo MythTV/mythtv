@@ -4,8 +4,6 @@
 #include "mythcontext.h"
 
 #define LOC      QString("LAVCInfo(): ")
-#define LOC_WARN QString("LAVCInfo(), Warning: ")
-#define LOC_ERR  QString("LAVCInfo(), Error: ")
 
 bool LinuxAVCInfo::Update(uint64_t _guid, raw1394handle_t handle,
                           uint _port, uint _node)
@@ -38,12 +36,13 @@ bool LinuxAVCInfo::Update(uint64_t _guid, raw1394handle_t handle,
 
 bool LinuxAVCInfo::OpenPort(void)
 {
-    VERBOSE(VB_RECORD, LOC + QString("Getting raw1394 handle for port %1").arg(port));
+    LOG(VB_RECORD, LOG_INFO,
+        LOC + QString("Getting raw1394 handle for port %1").arg(port));
     fw_handle = raw1394_new_handle_on_port(port);
 
     if (!fw_handle)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to get handle for " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to get handle for " +
                 QString("port: %1").arg(port) + ENO);
 
         return false;
@@ -56,7 +55,7 @@ bool LinuxAVCInfo::ClosePort(void)
 {
     if (fw_handle)
     {
-        VERBOSE(VB_RECORD, LOC + "Releasing raw1394 handle");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Releasing raw1394 handle");
         raw1394_destroy_handle(fw_handle);
         fw_handle = NULL;
     }

@@ -68,8 +68,8 @@
                           used to carry Teletext or Closed Captioning data."
                data_type="select">
         <option display="None" data="none" />
-        <option display="PAL Teletext" data="pal" />
-        <option display="NTSC Closed Caption" data="ntsc" />
+        <option display="PAL teletext" data="pal" />
+        <option display="NTSC closed caption" data="ntsc" />
       </setting>
       <setting value="FreqTable" default_data="us-cable"
                setting_type="global" label="Channel frequency table"
@@ -185,10 +185,10 @@
                       directories. 'Balanced Free Space' is the recommended
                       method for most users."
            data_type="select">
-          <option display="Balanced Free Space" data="BalancedFreeSpace" />
-          <option display="Balanced Disk I/O" data="BalancedDiskIO" />
+          <option display="Balanced free space" data="BalancedFreeSpace" />
           <option display="Balanced percent free space"
                   data="BalancedPercFreeSpace" />
+          <option display="Balanced disk I/O" data="BalancedDiskIO" />
           <option display="Combination" data="Combination" />
         </setting>
       </group>
@@ -272,7 +272,7 @@
                setting_type="global"
                help_text="The amount of time the master backend idles
                          before it shuts down all other backends. Set
-                         to 0 to disable automatic shutdown.">
+                         to 'Disabled' to disable automatic shutdown.">
         <option display="Disabled" data="0" />
         <option display="5" data="5" />
         <option display="15" data="15" />
@@ -288,8 +288,8 @@
                default_data="15"
                setting_type="global"
                help_text="The number of minutes the master backend waits
-                          for a recording. If it's idle but a recording
-                          starts within this time period, the backends
+                          for a recording. If the backend is idle but a
+                          recording starts within this time period, it
                           won't shut down.">
         <option display="5" data="5" />
         <option display="15" data="15" />
@@ -357,7 +357,7 @@
                  help_text="Length of time the frontend waits between
                             tries to wake up the master backend. This should
                             be the time your master backend needs to startup.
-                            Set to 0 to disable.">
+                            Set to 'Disabled' to disable.">
           <option display="Disabled" data="0" />
           <option display="1" data="1" />
           <option display="2" data="2" />
@@ -492,6 +492,14 @@
         <option display="Medium" data="1" />
         <option display="High"   data="2" />
       </setting>
+      <setting data_type="checkbox" value="JobAllowMetadata"
+               label="Allow metadata lookup jobs"
+               default_data="true"
+               setting_type="host"
+               help_text="If enabled, allow metadata lookup jobs to
+                          run on this backend. Metadata lookup jobs
+                          add information like season and episode to
+                          completed recordings." />
       <setting data_type="checkbox" value="JobAllowCommFlag"
                label="Allow commercial-detection jobs"
                default_data="true"
@@ -637,40 +645,21 @@
            unique_label="upnp_server_settings">
 <!--
       <setting data_type="checkbox" value="UPnP/RecordingsUnderVideos"
-               label="Include Recordings in Video List" default_data="0"
+               label="Include recordings in video list" default_data="0"
                setting_type="global"
                help_text="If enabled, the master backend will include the
-                          list of recorded shows in the list of videos
-                          This is mainly to accommodate UPnP players which do not
-                          allow more than 1 video section."  />
+                          list of recorded shows in the list of videos.
+                          This is mainly to accommodate UPnP players which
+                          do not allow more than 1 video section."  />
 -->
       <setting data_type="select" value="UPnP/WMPSource"
-               label="Video content to show a WMP Client"
+               label="Video content to show a WMP client"
                default_data="0"
                setting_type="global"
-               help_text="This forces us to show WMP clients
-                          either the Recordings tree or the Video tree
-                          when they request a list of videos ">
+               help_text="Which tree to show a Windows Media Player
+                          client when it requests a list of videos.">
         <option display="Recordings" data="0" />
         <option display="Videos" data="1" />
-      </setting>
-      <setting data_type="select" value="UPnP/RebuildDelay"
-               label="UPnP Media Update Time"
-               setting_type="host"
-               help_text="The number of minutes between mythbackend checking
-                          for new videos to serve via upnp. 0 = Off. "
-               default_data="30">
-                <option display="30" data="30" />
-        <option display="Off" data="0" />
-        <option display="1" data="1" />
-        <option display="5" data="5" />
-        <option display="15" data="15" />
-        <option display="30" data="30" />
-        <option display="60" data="60" />
-        <option display="120" data="120" />
-        <option display="300" data="300" />
-        <option display="600" data="600" />
-        <option display="1440" data="1440" />
       </setting>
     </group>
     <group human_label="Program Schedule Downloading Options"
@@ -679,11 +668,11 @@
                label="Automatically update program listings"
                default_data="1"
                setting_type="global"
-               help_text="This enables the automatic execution of
-                          mythfilldatabase." />
+               help_text="If enabled, the guide data program will be
+                          run automatically." />
       <setting data_type="string" value="MythFillDatabasePath"
                setting_type="global"
-               label="Guide Data Program"
+               label="Guide data program"
                default_data="mythfilldatabase"
                placeholder_text="Enter guide data command"
                help_text="Use 'mythfilldatabase' or the name of a custom
@@ -691,27 +680,29 @@
                           for all your video sources." />
       <setting data_type="string" value="MythFillDatabaseArgs"
                setting_type="global"
-               label="Guide Data Arguments"
+               label="Guide data arguments"
                default_data=""
                placeholder_text="Enter guide data program arguments"
                help_text="Any arguments you want passed to the
                           guide data program." />
       <setting data_type="string" value="MythFillDatabaseLog"
                setting_type="global"
-               label="Guide Data Program Log Path"
+               label="Guide data program log path"
                default_data=""
                placeholder_text="Enter guide data program log path"
                help_text="File or directory to use for logging
-                          output from the mythfilldatabase program.
+                          output from the guide data  program.
                           Leave blank to disable logging." />
 
       <setting data_type="select" value="MythFillMinHour"
-               label="mythfilldatabase Execution Start"
-               default_data="2"
+               label="Guide data program execution start"
+               default_data="0"
                setting_type="global"
                help_text="This setting and the following one define a
-                          time period when the mythfilldatabase process is
-                          allowed to run.">
+                          time period when the guide data program is allowed
+                          to run. For example, setting start to 11 and
+                          end to 13 would mean that the program would only
+                          run between 11:00 AM and 1:59 PM.">
         <option display="12 AM" data="0" />
         <option display="1 AM"  data="1" />
         <option display="2 AM"  data="2" />
@@ -739,12 +730,14 @@
       </setting>
 
       <setting data_type="select" value="MythFillMaxHour"
-               label="mythfilldatabase Execution End"
-               default_data="5"
+               label="Guide data program execution end"
+               default_data="23"
                setting_type="global"
                help_text="This setting and the preceding one define a
-                          time period when the mythfilldatabase process is
-                          allowed to run.">
+                          time period when the guide data program is allowed
+                          to run. For example, setting start to 11 and
+                          end to 13 would mean that the program would only
+                          run between 11:00 AM and 1:59 PM.">
         <option display="12 AM" data="0" />
         <option display="1 AM"  data="1" />
         <option display="2 AM"  data="2" />
@@ -771,14 +764,13 @@
         <option display="11 PM" data="23" />
       </setting>
       <setting data_type="checkbox" value="MythFillGrabberSuggestsTime"
-               label="Run mythfilldatabase at time suggested by the grabber."
+               label="Run guide data program at time suggested by the grabber."
                default_data="1"
                setting_type="global"
-               help_text="This setting allows a DataDirect guide data provider
+               help_text="If enabled, allow a DataDirect guide data provider
                           to specify the next download time in order to
-                          distribute load on their servers. If this setting is
-                          enabled, mythfilldatabase Execution Start/End times
-                          are ignored." />
+                          distribute load on their servers. Guide data program
+                          execution start/end times are also ignored." />
     </group>
     <group human_label="System Events"
            unique_label="system_events">

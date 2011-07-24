@@ -84,7 +84,7 @@ HttpServer::HttpServer() : QTcpServer(), ThreadPool("HTTP")
     // ----------------------------------------------------------------------
 
     m_sSharePath = GetShareDir();
-    VERBOSE(VB_UPNP, QString( "HttpServer() - SharePath = %1")
+    LOG(VB_UPNP, LOG_INFO, QString("HttpServer() - SharePath = %1")
             .arg(m_sSharePath));
 
     // ----------------------------------------------------------------------
@@ -211,13 +211,13 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
         }
         catch(...)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("HttpServer::DelegateRequest - "
-                            "Unexpected Exception - "
-                            "pExtension->ProcessRequest()."));
+            LOG(VB_GENERAL, LOG_ERR, QString("HttpServer::DelegateRequest - "
+                                             "Unexpected Exception - "
+                                             "pExtension->ProcessRequest()."));
         }
     }
-/*
+
+#if 0
     HttpServerExtensionList::iterator it = m_extensions.begin();
 
     for (; (it != m_extensions.end()) && !bProcessed; ++it)
@@ -228,13 +228,12 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
         }
         catch(...)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("HttpServer::DelegateRequest - "
-                            "Unexpected Exception - "
-                            "pExtension->ProcessRequest()."));
+            LOG(VB_GENERAL, LOG_ERR, QString("HttpServer::DelegateRequest - "
+                                             "Unexpected Exception - "
+                                             "pExtension->ProcessRequest()."));
         }
     }
-*/
+#endif
     m_rwlock.unlock();
 
     if (!bProcessed)
@@ -264,7 +263,8 @@ HttpWorkerThread::HttpWorkerThread( HttpServer *pParent, const QString &sName ) 
 {
     m_pHttpServer    = pParent;
     m_nSocket        = 0;                                                  
-    m_nSocketTimeout = UPnp::GetConfiguration()->GetValue( "HTTP/KeepAliveTimeoutSecs", 10 ) * 1000;
+    m_nSocketTimeout = 1000 *
+        UPnp::GetConfiguration()->GetValue("HTTP/KeepAliveTimeoutSecs", 10);
 
     m_pData          = NULL;
 }                  
@@ -311,9 +311,11 @@ void HttpWorkerThread::StartWork( int nSocket )
 
 void  HttpWorkerThread::ProcessWork()
 {
-//    VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork:Begin( %1 ) socket=%2" )
-//                                    .arg( (long)QThread::currentThread() )
-//                                    .arg( m_nSocket ));
+#if 0
+    LOG(VB_UPNP, LOG_DEBUG,
+        QString("HttpWorkerThread::ProcessWork:Begin( %1 ) socket=%2")
+            .arg((long)QThread::currentThread()) .arg(m_nSocket));
+#endif
 
     bool                    bTimeout   = false;
     bool                    bKeepAlive = true;
@@ -324,7 +326,7 @@ void  HttpWorkerThread::ProcessWork()
     {
         if ((pSocket = new BufferedSocketDevice( m_nSocket )) == NULL)
         {
-            VERBOSE( VB_IMPORTANT, QString( "HttpWorkerThread::ProcessWork - Error Creating BufferedSocketDevice" ));
+            LOG(VB_GENERAL, LOG_ERR, "Error Creating BufferedSocketDevice");
             return;
         }
 
@@ -342,7 +344,8 @@ void  HttpWorkerThread::ProcessWork()
                 // See if this is a valid request
                 // ----------------------------------------------------------
 
-                if ((pRequest = new BufferedSocketDeviceRequest( pSocket )) != NULL)
+                pRequest = new BufferedSocketDeviceRequest( pSocket );
+                if (pRequest != NULL)
                 {
                     if ( pRequest->ParseRequest() )
                     {
@@ -358,7 +361,7 @@ void  HttpWorkerThread::ProcessWork()
                     }
                     else
                     {
-                        VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork - ParseRequest Failed." ));
+                        LOG(VB_UPNP, LOG_ERR, "ParseRequest Failed.");
 
                         pRequest->m_nResponseStatus = 501;
                         bKeepAlive = false;
@@ -372,7 +375,7 @@ void  HttpWorkerThread::ProcessWork()
                                                    it != pRequest->m_mapHeaders.end(); 
                                                  ++it ) 
                         {  
-                            VERBOSE(VB_IMPORTANT, QString("%1: %2") 
+                            LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2") 
                                 .arg(it.key()) .arg(it.data()));
                         }
                     }
@@ -385,25 +388,26 @@ void  HttpWorkerThread::ProcessWork()
                     if (pRequest->SendResponse() < 0)
                     {
                         bKeepAlive = false;
-                        VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork socket(%1) - Error returned from SendResponse... Closing connection" )
-                                             .arg( m_nSocket ));
+                        LOG(VB_UPNP, LOG_ERR,
+                            QString("socket(%1) - Error returned from "
+                                    "SendResponse... Closing connection")
+                                .arg(m_nSocket));
                     }
 
-                    // ----------------------------------------------------------
+                    // -------------------------------------------------------
                     // Check to see if a PostProcess was registered
-                    // ----------------------------------------------------------
+                    // -------------------------------------------------------
 
                     if ( pRequest->m_pPostProcess != NULL )
                         pRequest->m_pPostProcess->ExecutePostProcess();
 
                     delete pRequest;
                     pRequest = NULL;
-
-
                 }
                 else
                 {
-                    VERBOSE( VB_IMPORTANT, QString( "HttpWorkerThread::ProcessWork - Error Creating BufferedSocketDeviceRequest" ));
+                    LOG(VB_GENERAL, LOG_ERR,
+                        "Error Creating BufferedSocketDeviceRequest");
                     bKeepAlive = false;
                 }
             }
@@ -413,9 +417,10 @@ void  HttpWorkerThread::ProcessWork()
             }
         }
     }
-    catch( ... )
+    catch(...)
     {
-        VERBOSE( VB_IMPORTANT, QString( "HttpWorkerThread::ProcessWork - Unexpected Exception." ));
+        LOG(VB_GENERAL, LOG_ERR, 
+            "HttpWorkerThread::ProcessWork - Unexpected Exception.");
     }
 
     if (pRequest != NULL)
@@ -426,8 +431,11 @@ void  HttpWorkerThread::ProcessWork()
     delete pSocket;
     m_nSocket = 0;
 
-//    VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork:End( %1 )")
-//                                    .arg( (long)QThread::currentThread() ));
+#if 0
+    LOG(VB_UPNP, LOG_DEBUG,
+        QString( "HttpWorkerThread::ProcessWork:End( %1 )")
+            .arg((long)QThread::currentThread()));
+#endif
 }
 
 

@@ -95,7 +95,7 @@ bool ChannelRecPriority::Create()
 
     if (!m_channelList)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 

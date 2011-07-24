@@ -291,9 +291,12 @@ int get_closest_freqid(
         if ((min_freqid <= freqid) && (freqid <= max_freqid))
             return freqid;
     }
-    //VERBOSE(VB_IMPORTANT, "get_closest_freqid("<<format<<", "
-    //        <<modulation<<", "<<country<<", "<<centerfreq
-    //        <<") Failed sz("<<list.size()<<")");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("get_closest_freqid(%1, %2, %3, %4) Failed sz(%5)")
+            .arg(format) .arg(modulation) .arg(country) .arg(centerfreq)
+            .arg(list.size()));
+#endif
     return -1;
 }
 

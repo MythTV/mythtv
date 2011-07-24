@@ -20,7 +20,6 @@ using namespace std;
 #include "channelutil.h"
 
 #define LOC QString("ChanImport: ")
-#define LOC_ERR QString("ChanImport, Error: ")
 
 static QString map_str(QString str)
 {
@@ -36,9 +35,9 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     {
         if (use_gui)
         {
-            VERBOSE(VB_IMPORTANT, LOC + (ChannelUtil::GetChannelCount()
-                                         ? "No new channels to process"
-                                         : "No channels to process.."));
+            LOG(VB_GENERAL, LOG_INFO, LOC + (ChannelUtil::GetChannelCount() ?
+                                             "No new channels to process" :
+                                             "No channels to process.."));
             MythPopupBox::showOkPopup(
                 GetMythMainWindow(), QObject::tr("Channel Importer"),
                 ChannelUtil::GetChannelCount()
@@ -58,7 +57,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     ScanDTVTransportList transports = _transports;
 
     // Print out each channel
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN))
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
     {
         cout << "Before processing: " << endl;
         ChannelImporterBasicStats infoA = CollectStats(transports);
@@ -244,7 +243,7 @@ uint ChannelImporter::DeleteUnusedTransports(uint sourceid)
 
     QString msg = QObject::tr("Found %n unused transport(s).", "", query.size());
 
-    VERBOSE(VB_IMPORTANT, msg);
+    LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 
     if (query.size() == 0)
         return 0;

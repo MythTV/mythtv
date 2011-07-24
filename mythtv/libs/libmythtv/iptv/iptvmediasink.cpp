@@ -11,7 +11,6 @@
 #include "streamlisteners.h"
 
 #define LOC QString("IPTVSink:")
-#define LOC_ERR QString("IPTVSink, Error:")
 
 IPTVMediaSink::IPTVMediaSink(UsageEnvironment &env,
                              unsigned int      bufferSize) :
@@ -74,7 +73,7 @@ void IPTVMediaSink::afterGettingFrame1(unsigned int   frameSize,
 
 void IPTVMediaSink::AddListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- begin")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- begin")
                        .arg((uint64_t)item,0,16));
     if (item)
     {
@@ -82,13 +81,13 @@ void IPTVMediaSink::AddListener(TSDataListener *item)
         QMutexLocker locker(&_lock);
         _listeners.push_back(item);
     }
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end")
                        .arg((uint64_t)item,0,16));
 }
 
 void IPTVMediaSink::RemoveListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- begin 1")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- begin 1")
                        .arg((uint64_t)item,0,16));
     QMutexLocker locker(&_lock);
     vector<TSDataListener*>::iterator it =
@@ -98,7 +97,7 @@ void IPTVMediaSink::RemoveListener(TSDataListener *item)
         *it = *_listeners.rbegin();
         _listeners.resize(_listeners.size() - 1);
     }
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 6")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end 6")
                        .arg((uint64_t)item,0,16));
 }
 

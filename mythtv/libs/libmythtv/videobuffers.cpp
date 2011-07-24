@@ -246,9 +246,8 @@ VideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType enqueue_to)
 
     while (frame && used.contains(frame))
     {
-        VERBOSE(VB_PLAYBACK,
-                QString("GetNextFreeFrame() served a busy frame %1. "
-                        "Dropping. %2")
+        LOG(VB_PLAYBACK, LOG_NOTICE,
+            QString("GetNextFreeFrame() served a busy frame %1. Dropping. %2")
                 .arg(DebugString(frame, true)).arg(GetStatus()));
         frame = available.dequeue();
     }
@@ -276,9 +275,9 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(BufferType enqueue_to)
 
         if (tries >= TRY_LOCK_SPINS)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("GetNextFreeFrame() unable to "
-                            "lock frame %1 times. Discarding Frames.")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("GetNextFreeFrame() unable to "
+                        "lock frame %1 times. Discarding Frames.")
                     .arg(TRY_LOCK_SPINS));
             DiscardFrames(true);
             continue;
@@ -286,9 +285,9 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(BufferType enqueue_to)
 
         if (tries && !(tries % TRY_LOCK_SPINS_BEFORE_WARNING))
         {
-            VERBOSE(VB_PLAYBACK,
-                    QString("GetNextFreeFrame() TryLock has "
-                            "spun %1 times, this is a lot.").arg(tries));
+            LOG(VB_PLAYBACK, LOG_NOTICE,
+                QString("GetNextFreeFrame() TryLock has "
+                        "spun %1 times, this is a lot.").arg(tries));
         }
         usleep(TRY_LOCK_SPIN_WAIT);
     }
@@ -584,8 +583,7 @@ VideoFrame *VideoBuffers::GetScratchFrame(void)
 {
     if (!createdpauseframe || !head(kVideoBuffer_pause))
     {
-        VERBOSE(VB_IMPORTANT,
-                "GetScratchFrame() called, but not allocated");
+        LOG(VB_GENERAL, LOG_ERR, "GetScratchFrame() called, but not allocated");
     }
 
     QMutexLocker locker(&global_lock);
@@ -596,8 +594,8 @@ void VideoBuffers::SetLastShownFrameToScratch(void)
 {
     if (!createdpauseframe || !head(kVideoBuffer_pause))
     {
-        VERBOSE(VB_IMPORTANT,
-                "SetLastShownFrameToScratch() called but no pause frame");
+        LOG(VB_GENERAL, LOG_ERR,
+            "SetLastShownFrameToScratch() called but no pause frame");
         return;
     }
 
@@ -612,7 +610,7 @@ void VideoBuffers::SetLastShownFrameToScratch(void)
 void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
 {
     QMutexLocker locker(&global_lock);
-    VERBOSE(VB_PLAYBACK, QString("VideoBuffers::DiscardFrames(%1): %2")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("VideoBuffers::DiscardFrames(%1): %2")
             .arg(next_frame_keyframe).arg(GetStatus()));
 
     if (!next_frame_keyframe)
@@ -621,8 +619,8 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
         frame_queue_t::iterator it = ula.begin();
         for (; it != ula.end(); ++it)
             DiscardFrame(*it);
-        VERBOSE(VB_PLAYBACK,
-                QString("VideoBuffers::DiscardFrames(%1): %2 -- done")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("VideoBuffers::DiscardFrames(%1): %2 -- done")
                 .arg(next_frame_keyframe).arg(GetStatus()));
         return;
     }
@@ -650,9 +648,9 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
                 !pause.contains(at(i)) &&
                 !displayed.contains(at(i)))
             {
-                VERBOSE(VB_IMPORTANT,
-                        QString("VideoBuffers::DiscardFrames(): ERROR, %1 (%2) not "
-                                "in available, pause, or displayed %3")
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("VideoBuffers::DiscardFrames(): ERROR, %1 (%2) not "
+                            "in available, pause, or displayed %3")
                         .arg(DebugString(at(i), true)).arg((long long)at(i))
                         .arg(GetStatus()));
                 DiscardFrame(at(i));
@@ -668,11 +666,8 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
         available.enqueue(*it);
     decode.clear();
 
-    VERBOSE(VB_PLAYBACK, QString("VideoBuffers::DiscardFrames(): %1 -- done()")
-            .arg(GetStatus()));
-
-    VERBOSE(VB_PLAYBACK,
-            QString("VideoBuffers::DiscardFrames(%1): %2 -- done")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("VideoBuffers::DiscardFrames(%1): %2 -- done")
             .arg(next_frame_keyframe).arg(GetStatus()));
 }
 
@@ -726,7 +721,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height,
         unsigned char *data = (unsigned char*)av_malloc(buf_size + 64);
         if (!data)
         {
-            VERBOSE(VB_IMPORTANT, "Failed to allocate memory for frame.");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to allocate memory for frame.");
             return false;
         }
 

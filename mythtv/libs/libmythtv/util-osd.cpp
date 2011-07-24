@@ -25,7 +25,7 @@ void yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
 
     if (misaligned)
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_ERR,
             QString("OSD image size is odd. This shouldn't happen."));
     }
     else if (mmx_aligned)
@@ -35,8 +35,8 @@ void yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
     else if (c_aligned)
     {
 #ifdef MMX
-        VERBOSE(VB_IMPORTANT, "MMX available but image not MMX aligned. "
-                              "This shouldn't happen.");
+        LOG(VB_GENERAL, LOG_WARNING, "MMX available but image not MMX aligned. "
+                                     "This shouldn't happen.");
 #endif
         c_yuv888_to_yv12(frame, osd_image, left, top, right, bottom);
     }

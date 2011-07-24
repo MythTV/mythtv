@@ -80,7 +80,8 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         if (!warned && IsPulseAudioRunning())
         {
             warned = true;
-            VERBOSE(VB_IMPORTANT, "WARNING: ***Pulse Audio is running***");
+            LOG(VB_GENERAL, LOG_WARNING,
+                "WARNING: ***Pulse Audio is running***");
         }
     }
 #endif
@@ -92,8 +93,8 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 #ifdef USING_PULSEOUTPUT
         return new AudioOutputPulseAudio(settings);
 #else
-        VERBOSE(VB_IMPORTANT, "Audio output device is set to PulseAudio "
-                              "but PulseAudio support is not compiled in!");
+        LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to PulseAudio "
+                                 "but PulseAudio support is not compiled in!");
         return NULL;
 #endif
     }
@@ -144,8 +145,8 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         settings.TrimDeviceType();
         ret = new AudioOutputALSA(settings);
 #else
-        VERBOSE(VB_IMPORTANT, "Audio output device is set to an ALSA device "
-                              "but ALSA support is not compiled in!");
+        LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to an ALSA device "
+                                 "but ALSA support is not compiled in!");
 #endif
     }
     else if (main_device.startsWith("JACK:"))
@@ -154,8 +155,8 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         settings.TrimDeviceType();
         ret = new AudioOutputJACK(settings);
 #else
-        VERBOSE(VB_IMPORTANT, "Audio output device is set to a JACK device "
-                              "but JACK support is not compiled in!");
+        LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to a JACK device "
+                                 "but JACK support is not compiled in!");
 #endif
     }
     else if (main_device.startsWith("DirectX:"))
@@ -163,8 +164,8 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 #ifdef USING_MINGW
         ret = new AudioOutputDX(settings);
 #else
-        VERBOSE(VB_IMPORTANT, "Audio output device is set to DirectX device "
-                              "but DirectX support is not compiled in!");
+        LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to DirectX device "
+                                 "but DirectX support is not compiled in!");
 #endif
     }
     else if (main_device.startsWith("Windows:"))
@@ -172,8 +173,9 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 #ifdef USING_MINGW
         ret = new AudioOutputWin(settings);
 #else
-        VERBOSE(VB_IMPORTANT, "Audio output device is set to a Windows device "
-                              "but Windows support is not compiled in!");
+        LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to a Windows "
+                                 "device but Windows support is not compiled "
+                                 "in!");
 #endif
     }
 #if defined(USING_OSS)
@@ -186,9 +188,9 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 
     if (!ret)
     {
-        VERBOSE(VB_IMPORTANT, "No useable audio output driver found.");
-        VERBOSE(VB_IMPORTANT, "Don't disable OSS support unless you're "
-                              "not running on Linux.");
+        LOG(VB_GENERAL, LOG_CRIT, "No useable audio output driver found.");
+        LOG(VB_GENERAL, LOG_ERR, "Don't disable OSS support unless you're "
+                                 "not running on Linux.");
 #ifdef USING_PULSE
         if (pulsestatus)
             PulseHandler::Suspend(PulseHandler::kPulseResume);
@@ -231,11 +233,13 @@ bool AudioOutput::CanPassthrough(int /*samplerate*/,
     return false;
 }
 
+// TODO: get rid of this if possible...  need to see what uses GetError() and
+//       GetWarning() and why.  These would give more useful logs as macros
 void AudioOutput::Error(const QString &msg)
 {
     lastError = msg;
     lastError.detach();
-    VERBOSE(VB_IMPORTANT, "AudioOutput Error: " + lastError);
+    LOG(VB_GENERAL, LOG_ERR, "AudioOutput Error: " + lastError);
 }
 
 void AudioOutput::SilentError(const QString &msg)
@@ -248,7 +252,7 @@ void AudioOutput::Warn(const QString &msg)
 {
     lastWarn = msg;
     lastWarn.detach();
-    VERBOSE(VB_IMPORTANT, "AudioOutput Warning: " + lastWarn);
+    LOG(VB_GENERAL, LOG_WARNING, "AudioOutput Warning: " + lastWarn);
 }
 
 void AudioOutput::ClearError(void)
@@ -311,7 +315,8 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
             capabilities += QString("multi-channels LPCM");
         capabilities += QString(")");
     }
-    VERBOSE(VB_AUDIO,QString("Found %1 (%2)").arg(name).arg(capabilities));
+    LOG(VB_AUDIO, LOG_INFO, QString("Found %1 (%2)")
+                                .arg(name).arg(capabilities));
     adc = new AudioOutput::AudioDeviceConfig(name, capabilities);
     adc->settings = aosettings;
     return adc;

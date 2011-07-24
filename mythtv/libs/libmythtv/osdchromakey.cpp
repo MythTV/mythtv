@@ -22,7 +22,6 @@ extern "C" {
 #endif
 
 #define LOC QString("OSDChroma: ")
-#define LOC_ERR QString("OSDChroma Error: ")
 
 ChromaKeyOSD::~ChromaKeyOSD(void)
 {
@@ -107,13 +106,13 @@ bool ChromaKeyOSD::Init(QSize new_size)
     {
         current_size = new_size;
         image->fill(0);
-        VERBOSE(VB_PLAYBACK, LOC + QString("Created ChromaOSD size %1x%2")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created ChromaOSD size %1x%2")
                                    .arg(current_size.width())
                                    .arg(current_size.height()));
         return true;
     }
 
-    VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Failed to create ChromaOSD."));
+    LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Failed to create ChromaOSD."));
     return false;
 }
 

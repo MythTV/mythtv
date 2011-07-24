@@ -13,8 +13,6 @@
 #include "mythlogging.h"
 
 #define LOC      QString("MythSystemEventHandler: ")
-#define LOC_ERR  QString("MythSystemEventHandler ERROR: ")
-#define LOC_WARN QString("MythSystemEventHandler WARNING: ")
 
 /** \class SystemEventThread
  *  \brief QRunnable class for running MythSystemEvent handler commands
@@ -57,7 +55,8 @@ class SystemEventThread : public QRunnable
         QThreadPool::globalInstance()->reserveThread();
 
         if (result != GENERIC_EXIT_OK)
-            VERBOSE(VB_IMPORTANT, LOC_WARN + QString("Command '%1' returned %2")
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("Command '%1' returned %2")
                     .arg(m_command).arg(result));
 
        if (m_event.isEmpty()) 
@@ -118,7 +117,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
     if (command.isEmpty())
         return;
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("SubstituteMatches: BEFORE: %1")
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("SubstituteMatches: BEFORE: %1")
                                             .arg(command));
     QString args;
     uint chanid = 0;
@@ -214,10 +213,9 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
                         recstartts.toString(Qt::ISODate));
     }
 
-    command.replace(QString("%VERBOSELEVEL%"),
-                    QString("%1").arg(verboseMask));
+    command.replace(QString("%VERBOSELEVEL%"), QString("%1").arg(verboseMask));
 
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("SubstituteMatches: AFTER : %1")
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("SubstituteMatches: AFTER : %1")
                                             .arg(command));
 }
 
@@ -344,8 +342,8 @@ void SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
                             .arg(pginfo->GetChanID())
                             .arg(pginfo->GetRecordingStartTime(ISODate)));
     else
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "SendMythSystemRecEvent() called with "
-                "empty RecordingInfo");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "SendMythSystemRecEvent() called with "
+                                       "empty RecordingInfo");
 }
 
 /** \fn SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
@@ -363,8 +361,8 @@ void SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
                     .arg(pginfo->GetChanID())
                     .arg(pginfo->GetRecordingStartTime(ISODate)));
     else
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "SendMythSystemPlayEvent() called with "
-                "empty ProgramInfo");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "SendMythSystemPlayEvent() called with "
+                                       "empty ProgramInfo");
 }
 
 /** \fn SendMythSystemHostEvent(const QString msg, const QString &hostname,

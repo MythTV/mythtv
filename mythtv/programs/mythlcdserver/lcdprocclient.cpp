@@ -47,7 +47,8 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) : QObject(NULL)
     // communications with the LDCd daemon.
 
     if (debug_level > 0)
-        VERBOSE(VB_GENERAL, "LCDProcClient: An LCDProcClient object now exists");
+        LOG(VB_GENERAL, LOG_INFO,
+            "LCDProcClient: An LCDProcClient object now exists");
 
     socket = new QTcpSocket(this);
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
@@ -199,7 +200,8 @@ void LCDProcClient::sendToServer(const QString &someText)
 
         // Ack, connection to server has been severed try to re-establish the
         // connection
-        VERBOSE(VB_IMPORTANT, "LCDProcClient: Connection to LCDd died unexpectedly.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "LCDProcClient: Connection to LCDd died unexpectedly.");
         return;
     }
 
@@ -211,7 +213,8 @@ void LCDProcClient::sendToServer(const QString &someText)
     if (connected)
     {
         if (debug_level > 9)
-            VERBOSE(VB_NETWORK, "LCDProcClient: Sending to Server: " + someText);
+            LOG(VB_NETWORK, LOG_INFO,
+                "LCDProcClient: Sending to Server: " + someText);
 
         // Just stream the text out the socket
 
@@ -292,23 +295,25 @@ void LCDProcClient::setHeartbeat (const QString &screen, bool onoff)
 void LCDProcClient::checkConnections()
 {
     if (debug_level > 0)
-        VERBOSE(VB_GENERAL, "LCDProcClient: checking connections");
+        LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: checking connections");
 
     // check connection to mythbackend
     if (!gCoreContext->IsConnectedToMaster())
     {
         if (debug_level > 0)
-           VERBOSE(VB_GENERAL, "LCDProcClient: connecting to master server");
+            LOG(VB_GENERAL, LOG_INFO,
+                "LCDProcClient: connecting to master server");
         if (!gCoreContext->ConnectToMasterServer(false))
-            VERBOSE(VB_IMPORTANT, "LCDProcClient: connecting to master server "
-                                  "failed");
+            LOG(VB_GENERAL, LOG_ERR,
+                "LCDProcClient: connecting to master server failed");
     }
 
     //check connection to LCDProc server
     if (socket->state() != QAbstractSocket::ConnectedState)
     {
         if (debug_level > 0)
-           VERBOSE(VB_GENERAL, "LCDProcClient: connecting to LCDProc server");
+            LOG(VB_GENERAL, LOG_INFO,
+                "LCDProcClient: connecting to LCDProc server");
 
         lcd_ready = false;
         connected = false;
@@ -343,8 +348,8 @@ void LCDProcClient::serverSendingData()
         if (debug_level > 0)
         // Make debugging be less noisy
             if (lineFromServer != "success")
-                VERBOSE(VB_NETWORK, "LCDProcClient: Received from server: " +
-                       lineFromServer);
+                LOG(VB_NETWORK, LOG_INFO,
+                    "LCDProcClient: Received from server: " + lineFromServer);
 
         aList = lineFromServer.split(" ");
         if (aList.first() == "connect")
@@ -357,8 +362,9 @@ void LCDProcClient::serverSendingData()
             it++;
             if ((*it) != "LCDproc")
             {
-                VERBOSE(VB_IMPORTANT, "LCDProcClient: WARNING: Second parameter "
-                                      "returned from LCDd was not \"LCDproc\"");
+                LOG(VB_GENERAL, LOG_WARNING,
+                    "LCDProcClient: WARNING: Second parameter "
+                    "returned from LCDd was not \"LCDproc\"");
             }
 
             // Skip through some stuff
@@ -399,9 +405,10 @@ void LCDProcClient::serverSendingData()
 
         if (aList.first() == "huh?")
         {
-            VERBOSE(VB_IMPORTANT, "LCDProcClient: WARNING: Something is getting"
-                                  "passed to LCDd that it doesn't understand");
-            VERBOSE(VB_IMPORTANT, "last command: " + last_command);
+            LOG(VB_GENERAL, LOG_WARNING,
+                "LCDProcClient: WARNING: Something is getting"
+                "passed to LCDd that it doesn't understand");
+            LOG(VB_GENERAL, LOG_WARNING, "last command: " + last_command);
         }
         else if (aList.first() == "key")
         {
@@ -707,46 +714,59 @@ void LCDProcClient::describeServer()
 {
     if (debug_level > 0)
     {
-        VERBOSE(VB_GENERAL,
-            QString("LCDProcClient: The server is %1x%2 with each cell being %3x%4." )
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: The server is %1x%2 with each cell "
+                    "being %3x%4.")
             .arg(lcdWidth).arg(lcdHeight).arg(cellWidth).arg(cellHeight));
-        VERBOSE(VB_GENERAL,
+        LOG(VB_GENERAL, LOG_INFO,
             QString("LCDProcClient: LCDd version %1, protocol version %2.")
             .arg(serverVersion).arg(protocolVersion));
     }
 
     if (debug_level > 1)
     {
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: MythTV LCD settings:"));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - showmusic      : %1")
-            .arg(lcd_showmusic));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - showmusicitems : %1")
-            .arg(lcd_showmusic_items));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - showtime       : %1")
-            .arg(lcd_showtime));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - showchannel    : %1")
-            .arg(lcd_showchannel));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - showrecstatus  : %1")
-            .arg(lcd_showrecstatus));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - showgeneric    : %1")
-            .arg(lcd_showgeneric));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - showvolume     : %1")
-            .arg(lcd_showvolume));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - showmenu       : %1")
-            .arg(lcd_showmenu));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - backlighton    : %1")
-            .arg(lcd_backlighton));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - heartbeaton    : %1")
-            .arg(lcd_heartbeaton));
-        VERBOSE(VB_GENERAL, QString("LCDProcClient: - popuptime      : %1")
-            .arg(lcd_popuptime));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: MythTV LCD settings:"));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - showmusic      : %1")
+                .arg(lcd_showmusic));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - showmusicitems : %1")
+                .arg(lcd_showmusic_items));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - showtime       : %1")
+                .arg(lcd_showtime));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - showchannel    : %1")
+                .arg(lcd_showchannel));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - showrecstatus  : %1")
+                .arg(lcd_showrecstatus));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - showgeneric    : %1")
+                .arg(lcd_showgeneric));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - showvolume     : %1")
+                .arg(lcd_showvolume));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - showmenu       : %1")
+                .arg(lcd_showmenu));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - backlighton    : %1")
+                .arg(lcd_backlighton));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - heartbeaton    : %1")
+                .arg(lcd_heartbeaton));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("LCDProcClient: - popuptime      : %1")
+                    .arg(lcd_popuptime));
     }
 }
 
 void LCDProcClient::veryBadThings(QAbstractSocket::SocketError error)
 {
     // Deal with failures to connect and inabilities to communicate
-    VERBOSE(VB_IMPORTANT, QString("Could not connect to LCDd: %1")
+    LOG(VB_GENERAL, LOG_ERR, QString("Could not connect to LCDd: %1")
             .arg(socket->errorString()));
     socket->close();
 }
@@ -773,7 +793,7 @@ void LCDProcClient::stopAll()
     // false is the connection died and we're trying to re-establish the
     // connection
     if (debug_level > 1)
-        VERBOSE(VB_GENERAL, "LCDProcClient: stopAll");
+        LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: stopAll");
 
     if (lcd_ready)
     {
@@ -1032,7 +1052,8 @@ void LCDProcClient::scrollWidgets()
     if (len == 0)
     {
         // Shouldn't happen, but....
-        VERBOSE(VB_IMPORTANT, "LCDProcClient::scrollWidgets called without scrollable items");
+        LOG(VB_GENERAL, LOG_ERR,
+            "LCDProcClient::scrollWidgets called without scrollable items");
         scrollWTimer->stop();
         return;
     }
@@ -2251,7 +2272,7 @@ void LCDProcClient::switchToTime()
     stopAll();
 
     if (debug_level > 1)
-        VERBOSE(VB_GENERAL, "LCDProcClient: switchToTime");
+        LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToTime");
 
     startTime();
 }
@@ -2264,7 +2285,7 @@ void LCDProcClient::switchToMusic(const QString &artist, const QString &album, c
     stopAll();
 
     if (debug_level > 1)
-        VERBOSE(VB_GENERAL, "LCDProcClient: switchToMusic") ;
+        LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToMusic") ;
 
     startMusic(artist, album, track);
 }
@@ -2277,7 +2298,7 @@ void LCDProcClient::switchToChannel(QString channum, QString title, QString subt
     stopAll();
 
     if (debug_level > 1)
-        VERBOSE(VB_GENERAL, "LCDProcClient: switchToChannel");
+        LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToChannel");
 
     startChannel(channum, title, subtitle);
 }
@@ -2289,7 +2310,7 @@ void LCDProcClient::switchToMenu(QList<LCDMenuItem> *menuItems, QString app_name
         return;
 
     if (debug_level > 1)
-        VERBOSE(VB_GENERAL, "LCDProcClient: switchToMenu");
+        LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToMenu");
 
     startMenu(menuItems, app_name, popMenu);
 }
@@ -2301,7 +2322,7 @@ void LCDProcClient::switchToGeneric(QList<LCDTextItem> *textItems)
     stopAll();
 
     if (debug_level > 1)
-        VERBOSE(VB_GENERAL, "LCDProcClient: switchToGeneric");
+        LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToGeneric");
 
     startGeneric(textItems);
 }
@@ -2314,7 +2335,7 @@ void LCDProcClient::switchToVolume(QString app_name)
     stopAll();
 
     if (debug_level > 1)
-        VERBOSE(VB_GENERAL, "LCDProcClient: switchToVolume");
+        LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToVolume");
 
     startVolume(app_name);
 }
@@ -2327,13 +2348,13 @@ void LCDProcClient::switchToNothing()
     stopAll();
 
     if (debug_level > 1)
-        VERBOSE(VB_GENERAL, "LCDProcClient: switchToNothing");
+        LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToNothing");
 }
 
 void LCDProcClient::shutdown()
 {
     if (debug_level > 1)
-        VERBOSE(VB_GENERAL, "LCDProcClient: shutdown");
+        LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: shutdown");
 
     stopAll();
 
@@ -2409,8 +2430,9 @@ void LCDProcClient::removeWidgets()
 LCDProcClient::~LCDProcClient()
 {
     if (debug_level > 1)
-        VERBOSE(VB_GENERAL, "LCDProcClient: An LCD device is being snuffed out"
-                            "of existence (~LCDProcClient() was called)");
+        LOG(VB_GENERAL, LOG_INFO,
+            "LCDProcClient: An LCD device is being snuffed out"
+            "of existence (~LCDProcClient() was called)");
 
     if (socket)
     {
@@ -2436,7 +2458,8 @@ void LCDProcClient::customEvent(QEvent *e)
             if (lcd_showrecstatus && !updateRecInfoTimer->isActive())
             {
                if (debug_level > 1)
-                   VERBOSE(VB_GENERAL, "LCDProcClient: Received recording list change");
+                   LOG(VB_GENERAL, LOG_INFO,
+                       "LCDProcClient: Received recording list change");
 
                 // we can't query the backend from inside the customEvent
                 // so fire the recording list update from a timer
@@ -2455,9 +2478,10 @@ void LCDProcClient::updateRecordingList(void)
     {
         if (!gCoreContext->ConnectToMasterServer(false))
         {
-            VERBOSE(VB_IMPORTANT, "LCDProcClient: Cannot get recording status "
-                                  "- is the master server running?\n\t\t\t"
-                                  "Will retry in 30 seconds");
+            LOG(VB_GENERAL, LOG_ERR,
+                "LCDProcClient: Cannot get recording status "
+                "- is the master server running?\n\t\t\t"
+                "Will retry in 30 seconds");
             QTimer::singleShot(30 * 1000, this, SLOT(updateRecordingList()));
 
             // If we can't get the recording status and we're showing

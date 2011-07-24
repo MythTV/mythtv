@@ -4,8 +4,6 @@
 #include "streamhandler.h"
 
 #define LOC      QString("SH(%1): ").arg(_device)
-#define LOC_WARN QString("SH(%1) Warning: ").arg(_device)
-#define LOC_ERR  QString("SH(%1) Error: ").arg(_device)
 
 StreamHandler::StreamHandler(const QString &device) :
     _device(device),
@@ -29,7 +27,7 @@ StreamHandler::~StreamHandler()
 {
     if (!_stream_data_list.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "dtor & _stream_data_list not empty");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "dtor & _stream_data_list not empty");
     }
 
     // This should never be triggered.. just to be safe..
@@ -42,20 +40,20 @@ void StreamHandler::AddListener(MPEGStreamData *data,
                                 bool needs_buffering,
                                 QString output_file)
 {
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- begin")
-		.arg((uint64_t)data,0,16));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- begin")
+                .arg((uint64_t)data,0,16));
     if (!data)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + 
-		QString("AddListener(0x%1) -- null data")
-		.arg((uint64_t)data,0,16));
+        LOG(VB_GENERAL, LOG_ERR, LOC + 
+            QString("AddListener(0x%1) -- null data")
+                .arg((uint64_t)data,0,16));
         return;
     }
 
     _listener_lock.lock();
 
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- locked")
-		.arg((uint64_t)data,0,16));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- locked")
+                .arg((uint64_t)data,0,16));
 
     if (_stream_data_list.empty())
     {
@@ -73,7 +71,7 @@ void StreamHandler::AddListener(MPEGStreamData *data,
     StreamDataList::iterator it = _stream_data_list.find(data);
     if (it != _stream_data_list.end())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Programmer Error, attempted "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Programmer Error, attempted "
                 "to add a listener which is already being listened to.");
     }
     else
@@ -88,26 +86,26 @@ void StreamHandler::AddListener(MPEGStreamData *data,
 
     Start();
 
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end")
-		.arg((uint64_t)data,0,16));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end")
+                .arg((uint64_t)data,0,16));
 }
 
 void StreamHandler::RemoveListener(MPEGStreamData *data)
 {
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- begin")
-		.arg((uint64_t)data,0,16));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- begin")
+                .arg((uint64_t)data,0,16));
     if (!data)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("RemoveListener(0x%1) -- null data")
-		.arg((uint64_t)data,0,16));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("RemoveListener(0x%1) -- null data")
+                .arg((uint64_t)data,0,16));
         return;
     }
 
     _listener_lock.lock();
 
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- locked")
-		.arg((uint64_t)data,0,16));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- locked")
+                .arg((uint64_t)data,0,16));
 
     StreamDataList::iterator it = _stream_data_list.find(data);
 
@@ -128,8 +126,8 @@ void StreamHandler::RemoveListener(MPEGStreamData *data)
         _listener_lock.unlock();
     }
 
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end")
-		.arg((uint64_t)data,0,16));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end")
+                .arg((uint64_t)data,0,16));
 }
 
 void StreamHandler::Start(void)
@@ -161,13 +159,13 @@ void StreamHandler::Start(void)
 
     if (!_running_desired)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "Programmer Error: Stop called before Start finished");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Programmer Error: Stop called before Start finished");
     }
 
     if (_error)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Start failed");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Start failed");
         SetRunningDesired(false);
     }
 }
@@ -183,8 +181,8 @@ void StreamHandler::Stop(void)
             _running_state_changed.wait(&_start_stop_lock, 100);
         if (_running_desired)
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Programmer Error: Start called before Stop finished");
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "Programmer Error: Start called before Stop finished");
         }
     } while (_running_desired);
 
@@ -211,7 +209,7 @@ void StreamHandler::SetRunning(bool is_running,
 bool StreamHandler::AddPIDFilter(PIDInfo *info)
 {
 #ifdef DEBUG_PID_FILTERS
-    VERBOSE(VB_RECORD, LOC + QString("AddPIDFilter(0x%1)")
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("AddPIDFilter(0x%1)")
             .arg(info->_pid, 0, 16));
 #endif // DEBUG_PID_FILTERS
 
@@ -226,8 +224,8 @@ bool StreamHandler::AddPIDFilter(PIDInfo *info)
 bool StreamHandler::RemovePIDFilter(uint pid)
 {
 #ifdef DEBUG_PID_FILTERS
-    VERBOSE(VB_RECORD, LOC +
-            QString("RemovePIDFilter(0x%1)").arg(pid, 0, 16));
+    LOG(VB_RECORD, LOG_DEBUG, LOC +
+        QString("RemovePIDFilter(0x%1)").arg(pid, 0, 16));
 #endif // DEBUG_PID_FILTERS
 
     QMutexLocker write_locker(&_pid_lock);
@@ -258,7 +256,7 @@ bool StreamHandler::RemoveAllPIDFilters(void)
     QMutexLocker write_locker(&_pid_lock);
 
 #ifdef DEBUG_PID_FILTERS
-    VERBOSE(VB_RECORD, LOC + "RemoveAllPIDFilters()");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "RemoveAllPIDFilters()");
 #endif // DEBUG_PID_FILTERS
 
     vector<int> del_pids;

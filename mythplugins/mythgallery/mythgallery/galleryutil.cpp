@@ -144,7 +144,9 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
                 if (entry)
                 {
                     ExifShort v_short = exif_get_short (entry->data, byteorder);
-                    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Exif entry=%1").arg(v_short));
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Exif entry=%1").arg(v_short));
+
                     /* See http://sylvana.net/jpegcrop/exif_orientation.html*/
                     if (v_short == 8)
                     {
@@ -161,9 +163,8 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
         }
         else
         {
-            VERBOSE(VB_FILE, LOC_ERR +
-                    QString("Could not load exif data from '%1'")
-                    .arg(filePath));
+            LOG(VB_FILE, LOG_ERR, LOC +
+                QString("Could not load exif data from '%1'") .arg(filePath));
         }
         
         delete [] exifvalue;
@@ -196,8 +197,8 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
     }
     catch (...)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to extract EXIF headers from '%1'")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to extract EXIF headers from '%1'")
                 .arg(filePathString));
     }
 
@@ -328,9 +329,8 @@ QString GalleryUtil::GetCaption(const QString &filePath)
         }
         else
         {
-           VERBOSE(VB_FILE, LOC_ERR +
-                   QString("Could not load exif data from '%1'")
-                   .arg(filePath));
+           LOG(VB_FILE, LOG_ERR, LOC +
+               QString("Could not load exif data from '%1'") .arg(filePath));
         }
 
         delete [] exifvalue;
@@ -338,9 +338,8 @@ QString GalleryUtil::GetCaption(const QString &filePath)
     }
     catch (...)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to extract EXIF headers from '%1'")
-                .arg(filePath));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to extract EXIF headers from '%1'") .arg(filePath));
     }
 
     return caption;
@@ -671,8 +670,8 @@ static QFileInfo MakeUnique(const QFileInfo &dest)
 
         newDest.setFile(dest.dir(), basename);
 
-        VERBOSE(VB_GENERAL, LOC_ERR +
-                QString("Need to find a new name for '%1' trying '%2'")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Need to find a new name for '%1' trying '%2'")
                 .arg(dest.absoluteFilePath()).arg(newDest.absoluteFilePath()));
     }
 
@@ -688,8 +687,8 @@ static QFileInfo MakeUniqueDirectory(const QFileInfo &dest)
         QString fullname = QString("%1_%2").arg(dest.absoluteFilePath()).arg(i);
         newDest.setFile(fullname);
 
-        VERBOSE(VB_GENERAL, LOC_ERR +
-                QString("Need to find a new name for '%1' trying '%2'")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Need to find a new name for '%1' trying '%2'")
                 .arg(dest.absoluteFilePath()).arg(newDest.absoluteFilePath()));
     }
 

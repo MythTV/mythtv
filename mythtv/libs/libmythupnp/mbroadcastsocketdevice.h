@@ -51,8 +51,7 @@ class MBroadcastSocketDevice : public MSocketDevice
         if (setsockopt(socket(), SOL_SOCKET, SO_BROADCAST,
                        &one, sizeof(one)) < 0) 
         {
-            VERBOSE(VB_IMPORTANT, "MBroadcastSocketDevice: setsockopt - "
-                    "SO_BROADCAST Error" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, "setsockopt - SO_BROADCAST Error" + ENO);
         }
 
         setAddressReusable(true);

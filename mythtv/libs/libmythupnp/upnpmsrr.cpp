@@ -16,19 +16,23 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpMSRR::UPnpMSRR( UPnpDevice *pDevice, 
-		const QString &sSharePath ) 
+UPnpMSRR::UPnpMSRR( UPnpDevice *pDevice, const QString &sSharePath ) 
                : Eventing( "UPnpMSRR", "MSRR_Event", sSharePath)
 {
-    AddVariable( new StateVariable< unsigned short >( "AuthorizationGrantedUpdateID", true ) );
-    AddVariable( new StateVariable< unsigned short >( "AuthorizationDeniedUpdateID" , true ) );
-    AddVariable( new StateVariable< unsigned short >( "ValidationSucceededUpdateID" , true ) );
-    AddVariable( new StateVariable< unsigned short >( "ValidationRevokedUpdateID"   , true ) );
+    AddVariable(
+        new StateVariable<unsigned short>("AuthorizationGrantedUpdateID",
+                                          true));
+    AddVariable(
+        new StateVariable<unsigned short>("AuthorizationDeniedUpdateID", true));
+    AddVariable(
+        new StateVariable<unsigned short>("ValidationSucceededUpdateID", true));
+    AddVariable(
+        new StateVariable<unsigned short>("ValidationRevokedUpdateID", true));
 
-    SetValue< unsigned short >( "AuthorizationGrantedUpdateID", 0 );
-    SetValue< unsigned short >( "AuthorizationDeniedUpdateID" , 0 );
-    SetValue< unsigned short >( "ValidationSucceededUpdateID" , 0 );
-    SetValue< unsigned short >( "ValidationRevokedUpdateID"   , 0 );
+    SetValue<unsigned short>("AuthorizationGrantedUpdateID", 0);
+    SetValue<unsigned short>("AuthorizationDeniedUpdateID" , 0);
+    SetValue<unsigned short>("ValidationSucceededUpdateID" , 0);
+    SetValue<unsigned short>("ValidationRevokedUpdateID"   , 0);
 
     QString sUPnpDescPath =
         UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", m_sSharePath );
@@ -37,7 +41,6 @@ UPnpMSRR::UPnpMSRR( UPnpDevice *pDevice,
     m_sControlUrl          = "/MSRR_Control";
 
     // Add our Service Definition to the device.
-
     RegisterService( pDevice );
 }
 
@@ -55,12 +58,16 @@ UPnpMSRR::~UPnpMSRR()
 
 UPnpMSRRMethod UPnpMSRR::GetMethod( const QString &sURI )
 {
-    if (sURI == "GetServDesc"           ) return MSRR_GetServiceDescription;
-    if (sURI == "IsAuthorized"          ) return MSRR_IsAuthorized         ;
-    if (sURI == "RegisterDevice"        ) return MSRR_RegisterDevice       ;
-    if (sURI == "IsValidated"           ) return MSRR_IsValidated          ;
+    if (sURI == "GetServDesc" )
+        return MSRR_GetServiceDescription;
+    if (sURI == "IsAuthorized" )
+        return MSRR_IsAuthorized;
+    if (sURI == "RegisterDevice" )
+        return MSRR_RegisterDevice;
+    if (sURI == "IsValidated" )
+        return MSRR_IsValidated;
 
-    return(  MSRR_Unknown );
+    return MSRR_Unknown;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -76,7 +83,8 @@ QStringList UPnpMSRR::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool UPnpMSRR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
+bool UPnpMSRR::ProcessRequest( HttpWorkerThread *pThread,
+                               HTTPRequest *pRequest )
 {
     if (pRequest)
     {
@@ -86,17 +94,24 @@ bool UPnpMSRR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest 
         if ( pRequest->m_sBaseUrl != m_sControlUrl )
             return false;
 
-        VERBOSE(VB_UPNP, QString("UPnpMSRR::ProcessRequest : %1 : %2 :")
-                            .arg( pRequest->m_sBaseUrl )
-                            .arg( pRequest->m_sMethod  ));
+        LOG(VB_UPNP, LOG_INFO,
+            QString("UPnpMSRR::ProcessRequest : %1 : %2 :")
+                .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
 
-        switch( GetMethod( pRequest->m_sMethod ) )
+        switch(GetMethod(pRequest->m_sMethod))
         {
-            case MSRR_GetServiceDescription : pRequest->FormatFileResponse( m_sServiceDescFileName ); break;
-            case MSRR_IsAuthorized          : HandleIsAuthorized          ( pRequest ); break;
-            case MSRR_RegisterDevice        : HandleRegisterDevice        ( pRequest ); break;
-            case MSRR_IsValidated           : HandleIsValidated           ( pRequest ); break;
-
+            case MSRR_GetServiceDescription :
+                pRequest->FormatFileResponse( m_sServiceDescFileName );
+                break;
+            case MSRR_IsAuthorized :
+                HandleIsAuthorized( pRequest );
+                break;
+            case MSRR_RegisterDevice :
+                HandleRegisterDevice( pRequest );
+                break;
+            case MSRR_IsValidated :
+                HandleIsValidated( pRequest );
+                break;
             default:
                 UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
                 break;
@@ -104,7 +119,6 @@ bool UPnpMSRR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest 
     }
 
     return( true );
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -114,7 +128,7 @@ bool UPnpMSRR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest 
 void UPnpMSRR::HandleIsAuthorized( HTTPRequest *pRequest )
 {
     /* Always tell the user they are authorized to access this data */
-    VERBOSE(VB_UPNP, QString("UPnpMSRR::HandleIsAuthorized"));
+    LOG(VB_UPNP, LOG_DEBUG, "UPnpMSRR::HandleIsAuthorized");
     NameValues list;
 
     list.push_back(NameValue("Result", "1"));
@@ -132,7 +146,7 @@ void UPnpMSRR::HandleIsAuthorized( HTTPRequest *pRequest )
 void UPnpMSRR::HandleRegisterDevice( HTTPRequest *pRequest )
 {
     /* Sure, register, we don't really care */
-    VERBOSE(VB_UPNP, QString("UPnpMSRR::HandleRegisterDevice"));
+    LOG(VB_UPNP, LOG_DEBUG, "UPnpMSRR::HandleRegisterDevice");
     NameValues list;
 
     list.push_back(NameValue("Result", "1"));
@@ -143,8 +157,7 @@ void UPnpMSRR::HandleRegisterDevice( HTTPRequest *pRequest )
 void UPnpMSRR::HandleIsValidated( HTTPRequest *pRequest )
 {
     /* You are valid sir */
-
-    VERBOSE(VB_UPNP, QString("UPnpMSRR::HandleIsValidated"));
+    LOG(VB_UPNP, LOG_DEBUG, "UPnpMSRR::HandleIsValidated");
     NameValues list;
 
     list.push_back(NameValue("Result", "1"));

@@ -1,5 +1,6 @@
 #include <fcntl.h>
 #include <math.h>
+#include <iostream>
 
 #include <QStringList>
 #include <QMap>
@@ -226,8 +227,9 @@ class AudioReencodeBuffer : public AudioOutput
     int audiobuffer_len, audiobuffer_frames;
     int channels, bits, bytes_per_frame, eff_audiorate;
     long long last_audiotime;
+    bool                m_passthru;
 private:
-    bool                m_passthru, m_initpassthru;
+    bool                m_initpassthru;
 };
 
 Transcode::Transcode(ProgramInfo *pginfo) :
@@ -289,9 +291,9 @@ bool Transcode::GetProfile(QString profileName, QString encodingType,
             autoProfileName += "p";
 
         bool result = false;
-        VERBOSE(VB_IMPORTANT,
-                QString("Transcode: Looking for autodetect profile: %1").
-                arg(autoProfileName));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Transcode: Looking for autodetect profile: %1")
+                .arg(autoProfileName));
         result = profile.loadByGroup(autoProfileName, "Transcoders");
 
         if (!result && encodingType == "MPEG-2")
@@ -307,16 +309,16 @@ bool Transcode::GetProfile(QString profileName, QString encodingType,
         }
         if (!result)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Transcode: Couldn't find profile for : %1").
-                    arg(encodingType));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Transcode: Couldn't find profile for : %1")
+                    .arg(encodingType));
 
             return false;
         }
 
-        VERBOSE(VB_IMPORTANT,
-                QString("Transcode: Using autodetect profile: %1").
-                arg(autoProfileName));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Transcode: Using autodetect profile: %1")
+                .arg(autoProfileName));
     }
     else
     {
@@ -328,8 +330,8 @@ bool Transcode::GetProfile(QString profileName, QString encodingType,
             profile.loadByID(profileID);
         else if (!profile.loadByGroup(profileName, "Transcoders"))
         {
-            VERBOSE(VB_IMPORTANT, QString("Couldn't find profile #: %1").
-                    arg(profileName));
+            LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find profile #: %1")
+                    .arg(profileName));
             return false;
         }
     }
@@ -342,8 +344,8 @@ static QString get_str_option(RecordingProfile &profile, const QString &name)
     if (setting)
         return setting->getValue();
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
-                "get_str_option(...%1): Option not in profile.").arg(name));
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        QString("get_str_option(...%1): Option not in profile.").arg(name));
 
     return QString::null;
 }
@@ -359,28 +361,29 @@ static int get_int_option(RecordingProfile &profile, const QString &name)
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
-                    "get_int_option(...%1): Option is not an int.").arg(name));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("get_int_option(...%1): Option is not an int.").arg(name));
     }
 
     return ret_int;
 }
 
-static void TranscodeWriteText(void *ptr, unsigned char *buf, int len, int timecode, int pagenr)
+static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
+                               int timecode, int pagenr)
 {
   NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)ptr;
   nvr->WriteText(buf, len, timecode, pagenr);
 }
 
-int Transcode::TranscodeFile(
-    const QString &inputname,
-    const QString &outputname,
-    const QString &profileName,
-    bool honorCutList, bool framecontrol,
-    int jobID, QString fifodir,
-    frm_dir_map_t &deleteMap,
-    int AudioTrackNo,
-    bool passthru)
+int Transcode::TranscodeFile(const QString &inputname,
+                             const QString &outputname,
+                             const QString &profileName,
+                             bool honorCutList, bool framecontrol,
+                             int jobID, QString fifodir,
+                             bool fifo_info,
+                             frm_dir_map_t &deleteMap,
+                             int AudioTrackNo,
+                             bool passthru)
 {
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
@@ -416,7 +419,7 @@ int Transcode::TranscodeFile(
 
     if (player->OpenFile(false) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "Transcoding aborted, error opening file.");
+        LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, error opening file.");
         if (player_ctx)
             delete player_ctx;
         return REENCODE_ERROR;
@@ -424,7 +427,8 @@ int Transcode::TranscodeFile(
 
     if (AudioTrackNo > -1)
     {
-        VERBOSE(VB_GENERAL, QString("Set audiotrack number to %1").arg(AudioTrackNo));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Set audiotrack number to %1").arg(AudioTrackNo));
         player->GetDecoder()->SetTrack(kTrackTypeAudio, AudioTrackNo);
     }
 
@@ -432,7 +436,7 @@ int Transcode::TranscodeFile(
     long long new_frame_count = total_frame_count;
     if (honorCutList && m_proginfo)
     {
-        VERBOSE(VB_GENERAL, "Honoring the cutlist while transcoding");
+        LOG(VB_GENERAL, LOG_INFO, "Honoring the cutlist while transcoding");
 
         frm_dir_map_t::const_iterator it;
         QString cutStr;
@@ -465,16 +469,16 @@ int Transcode::TranscodeFile(
             new_frame_count -= (total_frame_count - lastStart);
             cutStr += QString("%1").arg(total_frame_count);
         }
-        VERBOSE(VB_GENERAL, QString("Cutlist        : %1").arg(cutStr));
-        VERBOSE(VB_GENERAL, QString("Original Length: %1 frames")
-                                    .arg((long)total_frame_count));
-        VERBOSE(VB_GENERAL, QString("New Length     : %1 frames")
-                                    .arg((long)new_frame_count));
+        LOG(VB_GENERAL, LOG_INFO, QString("Cutlist        : %1").arg(cutStr));
+        LOG(VB_GENERAL, LOG_INFO, QString("Original Length: %1 frames")
+                .arg((long)total_frame_count));
+        LOG(VB_GENERAL, LOG_INFO, QString("New Length     : %1 frames")
+                .arg((long)new_frame_count));
 
         if ((m_proginfo->QueryIsEditing()) ||
             (JobQueue::IsJobRunning(JOB_COMMFLAG, *m_proginfo)))
         {
-            VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist changed");
+            LOG(VB_GENERAL, LOG_INFO, "Transcoding aborted, cutlist changed");
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_CUTLIST_CHANGE;
@@ -494,9 +498,10 @@ int Transcode::TranscodeFile(
     int video_height = buf_size.height();
 
     if (video_height == 1088) {
-       VERBOSE(VB_IMPORTANT, "Found video height of 1088.  This is unusual and "
-               "more than likely the video is actually 1080 so mythtranscode "
-               "will treat it as such.");
+       LOG(VB_GENERAL, LOG_NOTICE,
+           "Found video height of 1088.  This is unusual and "
+           "more than likely the video is actually 1080 so mythtranscode "
+           "will treat it as such.");
     }
 
     float video_aspect = player->GetVideoAspect();
@@ -510,7 +515,7 @@ int Transcode::TranscodeFile(
     {
         if (!GetProfile(profileName, encodingType, video_height,
                         (int)round(video_frame_rate))) {
-            VERBOSE(VB_IMPORTANT, "Transcoding aborted, no profile found.");
+            LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, no profile found.");
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_ERROR;
@@ -539,7 +544,7 @@ int Transcode::TranscodeFile(
         if (encodingType == "MPEG-2" &&
             get_int_option(profile, "transcodelossless"))
         {
-            VERBOSE(VB_IMPORTANT, "Switching to MPEG-2 transcoder.");
+            LOG(VB_GENERAL, LOG_NOTICE, "Switching to MPEG-2 transcoder.");
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_MPEG2TRANS;
@@ -582,7 +587,7 @@ int Transcode::TranscodeFile(
                 newWidth  = (newWidth  + 15) & ~0xF;
             }
 
-            VERBOSE(VB_IMPORTANT, QString("Resizing from %1x%2 to %3x%4")
+            LOG(VB_GENERAL, LOG_INFO, QString("Resizing from %1x%2 to %3x%4")
                     .arg(video_width).arg(video_height)
                     .arg(newWidth).arg(newHeight));
         }
@@ -639,16 +644,17 @@ int Transcode::TranscodeFile(
         }
         else if (vidsetting.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, "No video information found!");
-            VERBOSE(VB_IMPORTANT, "Please ensure that recording profiles "
-                                  "for the transcoder are set");
+            LOG(VB_GENERAL, LOG_ERR, "No video information found!");
+            LOG(VB_GENERAL, LOG_ERR, "Please ensure that recording profiles "
+                                     "for the transcoder are set");
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_ERROR;
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, QString("Unknown video codec: %1").arg(vidsetting));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Unknown video codec: %1").arg(vidsetting));
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_ERROR;
@@ -667,7 +673,8 @@ int Transcode::TranscodeFile(
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, QString("Unknown audio codec: %1").arg(audsetting));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Unknown audio codec: %1").arg(audsetting));
         }
 
         nvr->AudioInit(true);
@@ -683,8 +690,8 @@ int Transcode::TranscodeFile(
                 key   = it.key();
                 value = *it;
 
-                VERBOSE(VB_IMPORTANT,
-                        QString("Forcing Recorder option '%1' to '%2'")
+                LOG(VB_GENERAL, LOG_NOTICE,
+                    QString("Forcing Recorder option '%1' to '%2'")
                         .arg(key).arg(value));
 
                 if (value.contains(QRegExp("[^0-9]")))
@@ -725,7 +732,7 @@ int Transcode::TranscodeFile(
         video_width == newWidth && video_height == newHeight)
     {
         copyvideo = true;
-        VERBOSE(VB_GENERAL, "Reencoding video in 'raw' mode");
+        LOG(VB_GENERAL, LOG_INFO, "Reencoding video in 'raw' mode");
     }
 
     if (deleteMap.size() > 0)
@@ -735,8 +742,8 @@ int Transcode::TranscodeFile(
     player->InitForTranscode(copyaudio, copyvideo);
     if (player->IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, "Unable to initialize MythPlayer "
-                "for Transcode");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unable to initialize MythPlayer for Transcode");
         if (player_ctx)
             delete player_ctx;
         return REENCODE_ERROR;
@@ -760,28 +767,84 @@ int Transcode::TranscodeFile(
 
     if (!fifodir.isEmpty())
     {
+        AudioPlayer *aplayer = player->GetAudio();
+        const char  *audio_codec_name;
+
+        switch(aplayer->GetCodec())
+        {
+            case CODEC_ID_AC3:
+                audio_codec_name = "ac3";
+                break;
+            case CODEC_ID_EAC3:
+                audio_codec_name = "eac3";
+                break;
+            case CODEC_ID_DTS:
+                audio_codec_name = "dts";
+                break;
+            case CODEC_ID_TRUEHD:
+                audio_codec_name = "truehd";
+                break;
+            case CODEC_ID_MP3:
+                audio_codec_name = "mp3";
+                break;
+            case CODEC_ID_MP2:
+                audio_codec_name = "mp2";
+                break;
+            default:
+                audio_codec_name = "unknown";
+        }
+
+        if (!arb->m_passthru)
+            audio_codec_name = "raw";
+
+        // Display details of the format of the fifo data.
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoVideoWidth %1").arg(video_width));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoVideoHeight %1").arg(video_height));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoVideoAspectRatio %1").arg(player->GetVideoAspect()));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoVideoFrameRate %1").arg(video_frame_rate));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoAudioFormat %1").arg(audio_codec_name));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoAudioChannels %1").arg(arb->channels));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FifoAudioSampleRate %1").arg(arb->eff_audiorate));
+
+        if(fifo_info)
+        {
+            // Request was for just the format of fifo data, not for
+            // the actual transcode, so stop here.
+            unlink(outputname.toLocal8Bit().constData());
+            return REENCODE_OK;
+        }
+
         QString audfifo = fifodir + QString("/audout");
         QString vidfifo = fifodir + QString("/vidout");
         int audio_size = arb->eff_audiorate * arb->bytes_per_frame;
         // framecontrol is true if we want to enforce fifo sync.
         if (framecontrol)
-            VERBOSE(VB_GENERAL, "Enforcing sync on fifos");
+            LOG(VB_GENERAL, LOG_INFO, "Enforcing sync on fifos");
         fifow = new FIFOWriter(2, framecontrol);
 
         if (!fifow->FIFOInit(0, QString("video"), vidfifo, vidSize, 50) ||
             !fifow->FIFOInit(1, QString("audio"), audfifo, audio_size, 25))
         {
-            VERBOSE(VB_IMPORTANT, "Error initializing fifo writer.  Aborting");
+            LOG(VB_GENERAL, LOG_ERR,
+                "Error initializing fifo writer.  Aborting");
             unlink(outputname.toLocal8Bit().constData());
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_ERROR;
         }
-        VERBOSE(VB_GENERAL, QString("Video %1x%2@%3fps Audio rate: %4")
-                                   .arg(video_width).arg(video_height)
-                                   .arg(video_frame_rate)
-                                   .arg(arb->eff_audiorate));
-        VERBOSE(VB_GENERAL, "Created fifos. Waiting for connection.");
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Video %1x%2@%3fps Audio rate: %4")
+                .arg(video_width).arg(video_height)
+                .arg(video_frame_rate)
+                .arg(arb->eff_audiorate));
+        LOG(VB_GENERAL, LOG_INFO, "Created fifos. Waiting for connection.");
     }
 
     bool forceKeyFrames = (fifow == NULL) ? framecontrol : false;
@@ -814,11 +877,11 @@ int Transcode::TranscodeFile(
     struct SwsContext  *scontext = NULL;
 
     if (fifow)
-        VERBOSE(VB_GENERAL, "Dumping Video and Audio data to fifos");
+        LOG(VB_GENERAL, LOG_INFO, "Dumping Video and Audio data to fifos");
     else if (copyaudio)
-        VERBOSE(VB_GENERAL, "Copying Audio while transcoding Video");
+        LOG(VB_GENERAL, LOG_INFO, "Copying Audio while transcoding Video");
     else
-        VERBOSE(VB_GENERAL, "Transcoding Video and Audio");
+        LOG(VB_GENERAL, LOG_INFO, "Transcoding Video and Audio");
 
     QTime flagTime;
     flagTime.start();
@@ -831,6 +894,7 @@ int Transcode::TranscodeFile(
             first_loop = false;
         }
         VideoFrame *lastDecode = videoOutput->GetLastDecodedFrame();
+        float new_aspect = lastDecode->aspect;
 
         frame.timecode = lastDecode->timecode;
 
@@ -855,7 +919,7 @@ int Transcode::TranscodeFile(
                    .arg((int)curFrameNum)
                    .arg(auddelta)
                    .arg(viddelta);
-                VERBOSE(VB_GENERAL, msg);
+                LOG(VB_GENERAL, LOG_INFO, msg);
                 dropvideo = (delta > 0) ? 1 : -1;
                 wait_recover = 0;
             }
@@ -893,11 +957,12 @@ int Transcode::TranscodeFile(
 
 #if 0
             int buflen = (int)(arb->audiobuffer_len / rateTimeConv);
-            VERBOSE(VB_GENERAL, QString("%1: video time: %2 audio time: %3 " 
-                                        "buf: %4 exp: %5 delta: %6")
-                .arg(curFrameNum) .arg(frame.timecode) 
-                .arg(arb->last_audiotime) .arg(buflen) .arg(audbufTime)
-                .arg(delta));
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("%1: video time: %2 audio time: %3 "
+                        "buf: %4 exp: %5 delta: %6")
+                    .arg(curFrameNum) .arg(frame.timecode)
+                    .arg(arb->last_audiotime) .arg(buflen) .arg(audbufTime)
+                    .arg(delta));
 #endif
             if (arb->audiobuffer_len)
                 fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
@@ -928,8 +993,8 @@ int Transcode::TranscodeFile(
             if (!player->GetRawAudioState())
             {
                 // The Raw state changed during decode.  This is not good
-                VERBOSE(VB_IMPORTANT, "Transcoding aborted, MythPlayer "
-                        "is not in raw audio mode.");
+                LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, MythPlayer "
+                                         "is not in raw audio mode.");
 
                 unlink(outputname.toLocal8Bit().constData());
                 delete [] newFrame;
@@ -974,9 +1039,9 @@ int Transcode::TranscodeFile(
             if (! player->WriteStoredData(outRingBuffer, (did_ff == 0),
                                        timecodeOffset))
             {
-                if (video_aspect != player->GetVideoAspect())
+                if (video_aspect != new_aspect)
                 {
-                    video_aspect = player->GetVideoAspect();
+                    video_aspect = new_aspect;
                     nvr->SetNewVideoParams(video_aspect);
                 }
 
@@ -988,9 +1053,10 @@ int Transcode::TranscodeFile(
                     video_width = buf_size.width();
                     video_height = buf_size.height();
 
-                    VERBOSE(VB_IMPORTANT, QString("Resizing from %1x%2 to %3x%4")
-                        .arg(video_width).arg(video_height)
-                        .arg(newWidth).arg(newHeight));
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("Resizing from %1x%2 to %3x%4")
+                            .arg(video_width).arg(video_height)
+                            .arg(newWidth).arg(newHeight));
 
                 }
 
@@ -1038,9 +1104,9 @@ int Transcode::TranscodeFile(
                     (frame.timecode - lasttimecode - (int)vidFrameTime);
             }
 
-            if (video_aspect != player->GetVideoAspect())
+            if (video_aspect != new_aspect)
             {
-                video_aspect = player->GetVideoAspect();
+                video_aspect = new_aspect;
                 nvr->SetNewVideoParams(video_aspect);
             }
 
@@ -1053,7 +1119,8 @@ int Transcode::TranscodeFile(
                 video_width = buf_size.width();
                 video_height = buf_size.height();
 
-                VERBOSE(VB_IMPORTANT, QString("Resizing from %1x%2 to %3x%4")
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Resizing from %1x%2 to %3x%4")
                         .arg(video_width).arg(video_height)
                         .arg(newWidth).arg(newHeight));
             }
@@ -1093,8 +1160,9 @@ int Transcode::TranscodeFile(
                                     arb->ab_time[loop] - timecodeOffset);
                     if (nvr->IsErrored())
                     {
-                        VERBOSE(VB_IMPORTANT, "Transcode: Encountered "
-                                "irrecoverable error in NVR::WriteAudio");
+                        LOG(VB_GENERAL, LOG_ERR,
+                            "Transcode: Encountered irrecoverable error in "
+                            "NVR::WriteAudio");
 
                         delete [] newFrame;
                         if (player_ctx)
@@ -1119,7 +1187,8 @@ int Transcode::TranscodeFile(
         }
         if (showprogress && QDateTime::currentDateTime() > statustime)
         {
-            VERBOSE(VB_IMPORTANT, QString("Processed: %1 of %2 frames(%3 seconds)").
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Processed: %1 of %2 frames(%3 seconds)").
                     arg((long)curFrameNum).arg((long)total_frame_count).
                     arg((long)(curFrameNum / video_frame_rate)));
             statustime = QDateTime::currentDateTime();
@@ -1130,7 +1199,8 @@ int Transcode::TranscodeFile(
             if (honorCutList && m_proginfo &&
                 m_proginfo->QueryMarkupFlag(MARK_UPDATED_CUT))
             {
-                VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist updated");
+                LOG(VB_GENERAL, LOG_NOTICE,
+                    "Transcoding aborted, cutlist updated");
 
                 unlink(outputname.toLocal8Bit().constData());
                 delete [] newFrame;
@@ -1139,11 +1209,12 @@ int Transcode::TranscodeFile(
                 return REENCODE_CUTLIST_CHANGE;
             }
 
-            if ((jobID >= 0) || (VERBOSE_LEVEL_CHECK(VB_IMPORTANT)))
+            if ((jobID >= 0) || (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_INFO)))
             {
                 if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
                 {
-                    VERBOSE(VB_IMPORTANT, "Transcoding STOPped by JobQueue");
+                    LOG(VB_GENERAL, LOG_NOTICE,
+                        "Transcoding STOPped by JobQueue");
 
                     unlink(outputname.toLocal8Bit().constData());
                     delete [] newFrame;
@@ -1164,8 +1235,8 @@ int Transcode::TranscodeFile(
                               QObject::tr("%1% Completed @ %2 fps.")
                                           .arg(percentage).arg(flagFPS));
                 else
-                    VERBOSE(VB_IMPORTANT, QString(
-                            "mythtranscode: %1% Completed @ %2 fps.")
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("mythtranscode: %1% Completed @ %2 fps.")
                             .arg(percentage).arg(flagFPS));
 
             }

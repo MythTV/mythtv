@@ -22,7 +22,7 @@
 AppleRemote*      AppleRemote::_instance = 0;
 const int         AppleRemote::REMOTE_SWITCH_COOKIE = 19;
 
-const QString     LOC = "AppleRemote::";
+#define LOC QString("AppleRemote::")
 
 static io_object_t _findAppleRemoteDevice(const char *devName);
 
@@ -67,7 +67,7 @@ void AppleRemote::startListening()
         !_createDeviceInterface(hidDevice) ||
         !_initCookies() || !_openDevice())
     {
-        LOG(VB_GENERAL, LOG_ERR, "startListening() failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "startListening() failed");
         stopListening();
         return;
     }
@@ -220,8 +220,8 @@ static io_object_t _findAppleRemoteDevice(const char *devName)
     if ((ioReturnValue == kIOReturnSuccess) && (hidObjectIterator != 0))
         hidDevice = IOIteratorNext(hidObjectIterator);
     else
-        LOG(VB_GENERAL, LOG_ERR, QString("_findAppleRemoteDevice(%1) failed")
-                              .arg(devName));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("_findAppleRemoteDevice(%1) failed").arg(devName));
 
     // IOServiceGetMatchingServices consumes a reference to the dictionary,
     // so we don't need to release the dictionary ref.
@@ -290,7 +290,7 @@ bool AppleRemote::_createDeviceInterface(io_object_t hidDevice)
                                  (LPVOID*) (&hidDeviceInterface));
 
         if (plugInResult != S_OK)
-            LOG(VB_GENERAL, LOG_ERR, "_createDeviceInterface() failed");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "_createDeviceInterface() failed");
 
         // Release
         if (plugInInterface)
@@ -315,19 +315,20 @@ bool AppleRemote::_openDevice()
 
     if (ioReturnValue != KERN_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, "_openDevice() failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "_openDevice() failed");
         return false;
     }
     queue = (*hidDeviceInterface)->allocQueue(hidDeviceInterface);
     if (!queue)
     {
-        LOG(VB_GENERAL, LOG_ERR, "_openDevice() - error allocating queue");
+        LOG(VB_GENERAL, LOG_ERR, LOC + 
+            "_openDevice() - error allocating queue");
         return false;
     }
 
     HRESULT result = (*queue)->create(queue, 0, 12);
     if (result != S_OK || !queue)
-        LOG(VB_GENERAL, LOG_ERR, "_openDevice() - error creating queue");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "_openDevice() - error creating queue");
 
     for (std::vector<int>::iterator iter = cookies.begin();
          iter != cookies.end();
@@ -340,7 +341,7 @@ bool AppleRemote::_openDevice()
     ioReturnValue = (*queue)->createAsyncEventSource(queue, &eventSource);
     if (ioReturnValue != KERN_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
                 "_openDevice() - failed to create async event source");
         return false;
     }
@@ -349,7 +350,8 @@ bool AppleRemote::_openDevice()
                                               this, NULL);
     if (ioReturnValue != KERN_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, "_openDevice() - error registering callback");
+        LOG(VB_GENERAL, LOG_ERR, LOC + 
+            "_openDevice() - error registering callback");
         return false;
     }
 

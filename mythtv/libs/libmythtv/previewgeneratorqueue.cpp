@@ -11,8 +11,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("PreviewQueue: ")
-#define LOC_ERR QString("PreviewQueue Error: ")
-#define LOC_WARN QString("PreviewQueue Warning: ")
 
 PreviewGeneratorQueue *PreviewGeneratorQueue::s_pgq = NULL;
 
@@ -161,15 +159,15 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             QMap<QString,QString>::iterator kit = m_tokenToKeyMap.find(token);
             if (kit == m_tokenToKeyMap.end())
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        QString("Failed to find token %1 in map.").arg(token));
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("Failed to find token %1 in map.").arg(token));
                 return true;
             }
             PreviewMap::iterator it = m_previewMap.find(*kit);
             if (it == m_previewMap.end())
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        QString("Failed to find key %1 in map.").arg(*kit));
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("Failed to find key %1 in map.").arg(*kit));
                 return true;
             }
 
@@ -333,21 +331,20 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
             QString alttext = (bookmark_ts.isValid()) ? QString() :
                 QString("\n\t\t\tcmp_ts:               %1")
                 .arg(cmp_ts.toString(Qt::ISODate));
-            VERBOSE(VB_IMPORTANT, QString(
-                        "previewLastModified:  %1\n\t\t\t"
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("previewLastModified:  %1\n\t\t\t"
                         "bookmark_ts:          %2%3\n\t\t\t"
                         "pginfo.lastmodified:  %4")
                     .arg(previewLastModified.toString(Qt::ISODate))
                     .arg(bookmark_ts.toString(Qt::ISODate))
                     .arg(alttext)
                     .arg(pginfo.GetLastModifiedTime(ISODate)) +
-                    QString("Title: %1\n\t\t\t")
+                QString("Title: %1\n\t\t\t")
                     .arg(pginfo.toString(ProgramInfo::kTitleSubtitle)) +
-                    QString("File  '%1' \n\t\t\tCache '%2'")
+                QString("File  '%1' \n\t\t\tCache '%2'")
                     .arg(filename).arg(ret_file) +
-                    QString("\n\t\t\tPreview Exists: %1, "
-                            "Bookmark Updated: %2, "
-                            "Need Preview: %3")
+                QString("\n\t\t\tPreview Exists: %1, Bookmark Updated: %2, "
+                        "Need Preview: %3")
                     .arg(preview_exists).arg(bookmark_updated)
                     .arg((bookmark_updated || !preview_exists)));
         }
@@ -368,11 +365,9 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
         uint attempts = IncPreviewGeneratorAttempts(key);
         if (attempts < m_maxAttempts)
         {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Requesting preview for '%1'")
-                    .arg(key));
-            PreviewGenerator *pg = new PreviewGenerator(
-                &pginfo, token, m_mode);
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Requesting preview for '%1'") .arg(key));
+            PreviewGenerator *pg = new PreviewGenerator(&pginfo, token, m_mode);
             if (!outputfile.isEmpty() || time >= 0 ||
                 size.width() || size.height())
             {
@@ -383,22 +378,22 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
 
             SetPreviewGenerator(key, pg);
 
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Requested preview for '%1'").arg(key));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Requested preview for '%1'").arg(key));
         }
         else if (attempts >= m_maxAttempts)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Attempted to generate preview for '%1' "
-                            "%2 times; >= max(%3)")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Attempted to generate preview for '%1' "
+                        "%2 times; >= max(%3)")
                     .arg(key).arg(attempts).arg(m_maxAttempts));
         }
     }
     else if (needs_gen)
     {
-        VERBOSE(VB_PLAYBACK, LOC +
-                QString("Not requesting preview for %1,"
-                        "as it is already being generated")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Not requesting preview for %1,"
+                    "as it is already being generated")
                 .arg(pginfo.toString(ProgramInfo::kTitleSubtitle)));
         IncPreviewGeneratorPriority(key, token);
     }

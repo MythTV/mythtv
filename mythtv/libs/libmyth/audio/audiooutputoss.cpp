@@ -21,10 +21,6 @@
 using namespace std;
 
 #define LOC      QString("AOOSS: ")
-#define LOC_WARN QString("AOOSS, Warning: ")
-#define LOC_ERR  QString("AOOSS, Error: ")
-
-#define OERROR(str) Error(str + QString(": %1").arg(strerror(errno)))
 
 #include "mythcorecontext.h"
 #include "audiooutputoss.h"
@@ -58,7 +54,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
 
     if (audiofd < 0)
     {
-        OERROR(QString("Error opening audio device (%1)").arg(main_device));
+        VBERRENO(QString("Error opening audio device (%1)").arg(main_device));
         delete settings;
         return NULL;
     }
@@ -72,7 +68,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
     }
 
     if(ioctl(audiofd, SNDCTL_DSP_GETFMTS, &formats) < 0)
-        OERROR("Error retrieving formats");
+        VBERRENO("Error retrieving formats");
     else
     {
         int ofmt;
@@ -130,11 +126,12 @@ bool AudioOutputOSS::OpenDevice()
         {
             if (errno == EBUSY)
             {
-                Error(QString("WARNING: something is currently using: %1.")
+                VBWARN(QString("Something is currently using: %1.")
                       .arg(main_device));
                 return false;
             }
-            OERROR(QString("Error opening audio device (%1)").arg(main_device));
+            VBERRENO(QString("Error opening audio device (%1)")
+                         .arg(main_device));
         }
         if (audiofd < 0)
             usleep(50);
@@ -142,7 +139,7 @@ bool AudioOutputOSS::OpenDevice()
 
     if (audiofd == -1)
     {
-        OERROR(QString("Error opening audio device (%1)").arg(main_device));
+        VBERRENO(QString("Error opening audio device (%1)").arg(main_device));
         return false;
     }
 
@@ -156,7 +153,7 @@ bool AudioOutputOSS::OpenDevice()
         case FORMAT_U8:  format = AFMT_U8;      break;
         case FORMAT_S16: format = AFMT_S16_NE;  break;
         default:
-            Error(QString("Unknown sample format: %1").arg(output_format));
+            VBERROR(QString("Unknown sample format: %1").arg(output_format));
             close(audiofd);
             audiofd = -1;
             return false;
@@ -192,11 +189,11 @@ bool AudioOutputOSS::OpenDevice()
 
     if (err)
     {
-        OERROR(QString("Unable to set audio device (%1) to %2 kHz, %3 bits"
-                       ", %4 channels")
-               .arg(main_device).arg(samplerate)
-               .arg(AudioOutputSettings::FormatToBits(output_format))
-               .arg(channels));
+        VBERRENO(QString("Unable to set audio device (%1) to %2 kHz, %3 bits, "
+                         "%4 channels")
+                     .arg(main_device).arg(samplerate)
+                     .arg(AudioOutputSettings::FormatToBits(output_format))
+                     .arg(channels));
 
         close(audiofd);
         audiofd = -1;
@@ -215,12 +212,11 @@ bool AudioOutputOSS::OpenDevice()
     if (ioctl(audiofd, SNDCTL_DSP_GETCAPS, &caps) == 0)
     {
         if (!(caps & DSP_CAP_REALTIME))
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "The audio device cannot report buffer state"
-                    " accurately! audio/video sync will be bad, continuing...");
+            VBWARN("The audio device cannot report buffer state "
+                   "accurately! audio/video sync will be bad, continuing...");
     }
     else
-        OERROR("Unable to get audio card capabilities");
+        VBERRENO("Unable to get audio card capabilities");
 
     // Setup volume control
     if (internal_vol)
@@ -260,8 +256,8 @@ void AudioOutputOSS::WriteAudio(uchar *aubuf, int size)
 
     if (lw < 0)
     {
-        OERROR(QString("Error writing to audio device (%1)")
-               .arg(main_device));
+        VBERRENO(QString("Error writing to audio device (%1)")
+                     .arg(main_device));
         return;
     }
 }

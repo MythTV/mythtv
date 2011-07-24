@@ -1651,6 +1651,12 @@
             <helptext></helptext>
         </button>
 
+        <button name="metadata" from="baseverywidebutton">
+            <position>215,480</position>
+            <value>Metadata Options</value>
+            <helptext></helptext>
+        </button>
+
         <button name="cancel" from="basebutton">
             <position>40,525</position>
             <value>Cancel</value>
@@ -2072,6 +2078,79 @@
             <multiline>yes</multiline>
         </textarea>
 
+    </window>
+
+    <window name="metadataoptions">
+
+        <textarea name="inet" from="basetextarea">
+            <area>20,110,180,40</area>
+            <align>right,vcenter</align>
+            <value>TMDB/TVDB #:</value>
+        </textarea>
+
+        <textedit name="inetref_edit" from="basetextedit">
+            <position>215,110</position>
+        </textedit>
+
+        <textarea name="seas" from="basetextarea">
+            <area>20,165,180,40</area>
+            <align>right,vcenter</align>
+            <value>Season:</value>
+        </textarea>
+
+        <spinbox name="season_spinbox" from="basespinbox">
+            <position>215,165</position>
+        </spinbox>
+
+        <textarea name="ep" from="basetextarea">
+            <area>310,165,180,40</area>
+            <align>right,vcenter</align>
+            <value>Episode:</value>
+        </textarea>
+
+        <spinbox name="episode_spinbox" from="basespinbox">
+            <position>505,165</position>
+        </spinbox>
+
+        <button name="query_button" from="basewidebutton">
+            <position>265,220</position>
+            <value>Perform Query</value>
+        </button>
+
+        <button name="online_coverart_button" from="basewidebutton">
+            <position>115,275</position>
+            <value>Find Online Coverart</value>
+        </button>
+
+        <button name="online_fanart_button" from="basewidebutton">
+            <position>115,330</position>
+            <value>Find Online Fanart</value>
+        </button>
+
+        <button name="online_banner_button" from="basewidebutton">
+            <position>115,385</position>
+            <value>Find Online Banners</value>
+        </button>
+
+        <button name="local_coverart_button" from="basewidebutton">
+            <position>415,275</position>
+            <value>Find Local Coverart</value>
+        </button>
+
+        <button name="local_fanart_button" from="basewidebutton">
+            <position>415,330</position>
+            <value>Find Local Fanart</value>
+        </button>
+
+        <button name="local_banner_button" from="basewidebutton">
+            <position>415,385</position>
+            <value>Find Local Banners</value>
+        </button>
+
+        <button name="back" from="basebutton">
+            <position>335,500</position>
+            <value>Back</value>
+        </button>
     </window>
 
 </mythuitheme>

@@ -17,8 +17,6 @@
 #include "pespacket.h"
 
 #define LOC      QString("FireDev(%1): ").arg(guid_to_string(m_guid))
-#define LOC_WARN QString("FireDev(%1), Warning: ").arg(guid_to_string(m_guid))
-#define LOC_ERR  QString("FireDev(%1), Error: ").arg(guid_to_string(m_guid))
 
 static void fw_init(QMap<uint64_t,QString> &id_to_model);
 
@@ -45,7 +43,8 @@ void FirewireDevice::AddListener(TSDataListener *listener)
             m_listeners.push_back(listener);
     }
 
-    VERBOSE(VB_RECORD, LOC + QString("AddListener() %1").arg(m_listeners.size()));
+    LOG(VB_RECORD, LOG_INFO, LOC +
+        QString("AddListener() %1").arg(m_listeners.size()));
 }
 
 void FirewireDevice::RemoveListener(TSDataListener *listener)
@@ -63,7 +62,8 @@ void FirewireDevice::RemoveListener(TSDataListener *listener)
     }
     while (it != m_listeners.end());
 
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener() %1").arg(m_listeners.size()));
+    LOG(VB_RECORD, LOG_INFO, LOC +
+        QString("RemoveListener() %1").arg(m_listeners.size()));
 }
 
 bool FirewireDevice::SetPowerState(bool on)
@@ -79,24 +79,23 @@ bool FirewireDevice::SetPowerState(bool on)
     cmd.push_back((on) ? kAVCPowerStateOn : kAVCPowerStateOff);
 
     QString cmdStr = (on) ? "on" : "off";
-    VERBOSE(VB_RECORD, LOC + QString("Powering %1").arg(cmdStr));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Powering %1").arg(cmdStr));
 
     if (!SendAVCCommand(cmd, ret, -1))
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Power on cmd failed (no response)");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Power on cmd failed (no response)");
         return false;
     }
 
     if (kAVCAcceptedStatus != ret[0])
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Power %1 failed").arg(cmdStr));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Power %1 failed").arg(cmdStr));
 
         return false;
     }
 
-    VERBOSE(VB_RECORD, LOC +
-            QString("Power %1 cmd sent successfully").arg(cmdStr));
+    LOG(VB_RECORD, LOG_INFO, LOC +
+        QString("Power %1 cmd sent successfully").arg(cmdStr));
 
     return true;
 }
@@ -113,11 +112,11 @@ FirewireDevice::PowerState FirewireDevice::GetPowerState(void)
     cmd.push_back(kAVCUnitPowerOpcode);
     cmd.push_back(kAVCPowerStateQuery);
 
-    VERBOSE(VB_CHANNEL, LOC + "Requesting STB Power State");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Requesting STB Power State");
 
     if (!SendAVCCommand(cmd, ret, -1))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Power cmd failed (no response)");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Power cmd failed (no response)");
         return kAVCPowerQueryFailed;
     }
 
@@ -125,24 +124,24 @@ FirewireDevice::PowerState FirewireDevice::GetPowerState(void)
 
     if (ret[0] != kAVCResponseImplemented)
     {
-        VERBOSE(VB_CHANNEL, loc + "Query not implemented");
+        LOG(VB_CHANNEL, LOG_INFO, loc + "Query not implemented");
         return kAVCPowerUnknown;
     }
 
     // check 1st operand..
     if (ret[3] == kAVCPowerStateOn)
     {
-        VERBOSE(VB_CHANNEL, loc + "On");
+        LOG(VB_CHANNEL, LOG_INFO, loc + "On");
         return kAVCPowerOn;
     }
 
     if (ret[3] == kAVCPowerStateOff)
     {
-        VERBOSE(VB_CHANNEL, loc + "Off");
+        LOG(VB_CHANNEL, LOG_INFO, loc + "Off");
         return kAVCPowerOff;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR + "STB Power State: Unknown Response");
+    LOG(VB_GENERAL, LOG_ERR, LOC + "STB Power State: Unknown Response");
 
     return kAVCPowerUnknown;
 }
@@ -150,17 +149,17 @@ FirewireDevice::PowerState FirewireDevice::GetPowerState(void)
 bool FirewireDevice::SetChannel(const QString &panel_model,
                                 uint alt_method, uint channel)
 {
-    VERBOSE(VB_CHANNEL, QString("SetChannel(model %1, alt %2, chan %3)")
+    LOG(VB_CHANNEL, LOG_INFO, QString("SetChannel(model %1, alt %2, chan %3)")
             .arg(panel_model).arg(alt_method).arg(channel));
 
     QMutexLocker locker(&m_lock);
-    VERBOSE(VB_CHANNEL, "SetChannel() -- locked");
+    LOG(VB_CHANNEL, LOG_INFO, "SetChannel() -- locked");
 
     if (!IsSTBSupported(panel_model))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Model: '%1' ").arg(panel_model) +
-                "is not supported by internal channel changer.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Model: '%1' ").arg(panel_model) +
+            "is not supported by internal channel changer.");
         return false;
     }
 
@@ -171,8 +170,8 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
 
     if (m_subunitid >= kAVCSubunitIdExtended)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "SetChannel: Extended subunits are not supported.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "SetChannel: Extended subunits are not supported.");
 
         return false;
     }
@@ -186,10 +185,10 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
     {
         if (panel_model.toUpper() == "SA4250HDC")
         {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    "The Scientific Atlanta 4250 HDC is not supported "
-                    "\n\t\t\tby any MythTV Firewire channel changer."
-                    "At the moment you must use an IR blaster.");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "The Scientific Atlanta 4250 HDC is not supported "
+                "\n\t\t\tby any MythTV Firewire channel changer."
+                "At the moment you must use an IR blaster.");
         }
 
         cmd.push_back(kAVCControlCommand);
@@ -216,7 +215,7 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
 
         if (!press_ok && !release_ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Tuning failed");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Tuning failed");
             return false;
         }
 
@@ -326,7 +325,7 @@ void FirewireDevice::SetLastChannel(const uint channel)
     m_buffer_cleared = (channel == m_last_channel);
     m_last_channel   = channel;
 
-    VERBOSE(VB_IMPORTANT, QString("SetLastChannel(%1): cleared: %2")
+    LOG(VB_GENERAL, LOG_INFO, QString("SetLastChannel(%1): cleared: %2")
             .arg(channel).arg(m_buffer_cleared ? "yes" : "no"));
 }
 
@@ -340,14 +339,14 @@ void FirewireDevice::ProcessPATPacket(const TSPacket &tspacket)
         m_buffer_cleared |= (crc != m_last_crc);
         m_last_crc = crc;
 #if 0
-        VERBOSE(VB_RECORD, LOC +
-                QString("ProcessPATPacket: CRC 0x%1 cleared: %2")
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("ProcessPATPacket: CRC 0x%1 cleared: %2")
                 .arg(crc,0,16).arg(m_buffer_cleared ? "yes" : "no"));
 #endif
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't handle large PAT's");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Can't handle large PAT's");
     }
 }
 

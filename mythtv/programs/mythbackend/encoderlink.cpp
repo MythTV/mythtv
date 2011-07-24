@@ -176,7 +176,7 @@ TVState EncoderLink::GetState(void)
     else if (sock)
         retval = (TVState)sock->GetEncoderState(m_capturecardnum);
     else
-        VERBOSE(VB_GENERAL, QString("Broken for card: %1")
+        LOG(VB_GENERAL, LOG_ERR, QString("Broken for card: %1")
             .arg(m_capturecardnum));
 
     return retval;
@@ -198,7 +198,7 @@ uint EncoderLink::GetFlags(void) const
     else if (sock)
         retval = sock->GetEncoderState(m_capturecardnum);
     else
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetFlags failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GetFlags failed");
 
     return retval;
 }
@@ -389,9 +389,9 @@ RecStatusType EncoderLink::StartRecording(const ProgramInfo *rec)
     else if (sock)
         retval = sock->StartRecording(m_capturecardnum, rec);
     else
-        VERBOSE(VB_IMPORTANT,
-                QString("Wanted to start recording on recorder %1,\n\t\t\t"
-                        "but the backend is not there anymore\n")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Wanted to start recording on recorder %1,\n\t\t\t"
+                    "but the backend is not there anymore\n")
                 .arg(m_capturecardnum));
 
     if (retval != rsRecording && retval != rsTuning)
@@ -413,9 +413,9 @@ RecStatusType EncoderLink::GetRecordingStatus(void)
     else if (sock)
         retval = sock->GetRecordingStatus(m_capturecardnum);
     else
-        VERBOSE(VB_IMPORTANT,
-                QString("Wanted to get status on recorder %1,\n\t\t\t"
-                        "but the backend is not there anymore\n")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Wanted to get status on recorder %1,\n\t\t\t"
+                    "but the backend is not there anymore\n")
                 .arg(m_capturecardnum));
 
     if (retval != rsRecording && retval != rsTuning)
@@ -492,7 +492,7 @@ bool EncoderLink::IsReallyRecording(void)
     if (local)
         return tv->IsReallyRecording();
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: IsReallyRecording");
+    LOG(VB_GENERAL, LOG_ERR, "Should be local only query: IsReallyRecording");
     return false;
 }
 
@@ -508,7 +508,7 @@ float EncoderLink::GetFramerate(void)
     if (local)
         return tv->GetFramerate();
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: GetFramerate");
+    LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetFramerate");
     return -1;
 }
 
@@ -524,7 +524,7 @@ long long EncoderLink::GetFramesWritten(void)
     if (local)
         return tv->GetFramesWritten();
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: GetFramesWritten");
+    LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetFramesWritten");
     return -1;
 }
 
@@ -539,7 +539,7 @@ long long EncoderLink::GetFilePosition(void)
     if (local)
         return tv->GetFilePosition();
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: GetFilePosition");
+    LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetFilePosition");
     return -1;
 }
 
@@ -554,7 +554,7 @@ int64_t EncoderLink::GetKeyframePosition(uint64_t desired)
     if (local)
         return tv->GetKeyframePosition(desired);
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: GetKeyframePosition");
+    LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetKeyframePosition");
     return -1;
 }
 
@@ -563,8 +563,8 @@ bool EncoderLink::GetKeyframePositions(
 {
     if (!local)
     {
-        VERBOSE(VB_IMPORTANT,
-                "Should be local only query: GetKeyframePositions");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Should be local only query: GetKeyframePositions");
         return false;
     }
 
@@ -581,7 +581,7 @@ void EncoderLink::FrontendReady(void)
     if (local)
         tv->FrontendReady();
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: FrontendReady");
+        LOG(VB_GENERAL, LOG_ERR, "Should be local only query: FrontendReady");
 }
 
 /** \fn EncoderLink::CancelNextRecording(bool)
@@ -616,7 +616,7 @@ void EncoderLink::SpawnLiveTV(LiveTVChain *chain, bool pip, QString startchan)
     if (local)
         tv->SpawnLiveTV(chain, pip, startchan);
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: SpawnLiveTV");
+        LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SpawnLiveTV");
 }
 
 /** \fn EncoderLink::GetChainID()
@@ -627,7 +627,7 @@ QString EncoderLink::GetChainID(void)
     if (local)
         return tv->GetChainID();
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: SpawnLiveTV");
+    LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SpawnLiveTV");
     return "";
 }
 
@@ -641,7 +641,7 @@ void EncoderLink::StopLiveTV(void)
     if (local)
         tv->StopLiveTV();
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: StopLiveTV");
+        LOG(VB_GENERAL, LOG_ERR, "Should be local only query: StopLiveTV");
 }
 
 /** \fn EncoderLink::PauseRecorder()
@@ -655,7 +655,7 @@ void EncoderLink::PauseRecorder(void)
     if (local)
         tv->PauseRecorder();
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: PauseRecorder");
+        LOG(VB_GENERAL, LOG_ERR, "Should be local only query: PauseRecorder");
 }
 
 /** \fn EncoderLink::SetLiveRecording(int recording)
@@ -668,7 +668,8 @@ void EncoderLink::SetLiveRecording(int recording)
     if (local)
         tv->SetLiveRecording(recording);
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: SetLiveRecording");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Should be local only query: SetLiveRecording");
 }
 
 /**
@@ -711,7 +712,7 @@ QString EncoderLink::GetInput(void) const
     if (local)
         return tv->GetInput();
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: GetInput");
+    LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetInput");
     return QString();
 }
 
@@ -730,7 +731,7 @@ QString EncoderLink::SetInput(QString input)
     if (local)
         return tv->SetInput(input);
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: SetInput");
+    LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SetInput");
     return QString();
 }
 
@@ -744,7 +745,8 @@ void EncoderLink::ToggleChannelFavorite(QString changroup)
     if (local)
         tv->ToggleChannelFavorite(changroup);
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: ToggleChannelFavorite");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Should be local only query: ToggleChannelFavorite");
 }
 
 /** \brief Changes to the next or previous channel.
@@ -758,7 +760,7 @@ void EncoderLink::ChangeChannel(ChannelChangeDirection channeldirection)
     if (local)
         tv->ChangeChannel(channeldirection);
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: ChangeChannel");
+        LOG(VB_GENERAL, LOG_ERR, "Should be local only query: ChangeChannel");
 }
 
 /** \fn EncoderLink::SetChannel(const QString&)
@@ -773,7 +775,7 @@ void EncoderLink::SetChannel(const QString &name)
     if (local)
         tv->SetChannel(name);
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: SetChannel");
+        LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SetChannel");
 }
 
 /** \fn EncoderLink::GetPictureAttribute(PictureAttribute)
@@ -788,8 +790,8 @@ int EncoderLink::GetPictureAttribute(PictureAttribute attr)
 {
     if (!local)
     {
-        VERBOSE(VB_IMPORTANT, "Should be local only query: "
-                "GetPictureAttribute");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Should be local only query: GetPictureAttribute");
         return -1;
     }
 
@@ -810,8 +812,8 @@ int EncoderLink::ChangePictureAttribute(PictureAdjustType type,
 {
     if (!local)
     {
-        VERBOSE(VB_IMPORTANT, "Should be local only query: "
-                "ChangePictureAttribute");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Should be local only query: ChangePictureAttribute");
         return -1;
     }
 
@@ -832,7 +834,7 @@ bool EncoderLink::CheckChannel(const QString &name)
     if (local)
         return tv->CheckChannel(name);
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: CheckChannel");
+    LOG(VB_GENERAL, LOG_ERR, "Should be local only query: CheckChannel");
     return false;
 }
 
@@ -850,7 +852,8 @@ bool EncoderLink::ShouldSwitchToAnotherCard(const QString &channelid)
     if (local)
         return tv->ShouldSwitchToAnotherCard(channelid);
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: ShouldSwitchToAnotherCard");
+    LOG(VB_GENERAL, LOG_ERR,
+        "Should be local only query: ShouldSwitchToAnotherCard");
     return false;
 }
 
@@ -874,7 +877,7 @@ bool EncoderLink::CheckChannelPrefix(
             is_extra_char_useful, needed_spacer);
     }
 
-    VERBOSE(VB_IMPORTANT, "Should be local only query: CheckChannelPrefix");
+    LOG(VB_GENERAL, LOG_ERR, "Should be local only query: CheckChannelPrefix");
     is_complete_valid_channel_on_rec = false;
     is_extra_char_useful             = false;
     needed_spacer                    = "";
@@ -902,7 +905,7 @@ void EncoderLink::GetNextProgram(BrowseDirection direction,
                            _chanid, seriesid, programid);
     }
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: GetNextProgram");
+        LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetNextProgram");
 }
 
 bool EncoderLink::GetChannelInfo(uint &chanid, uint &sourceid,
@@ -911,7 +914,7 @@ bool EncoderLink::GetChannelInfo(uint &chanid, uint &sourceid,
 {
     if (!local)
     {
-        VERBOSE(VB_IMPORTANT, "Should be local only query: GetChannelInfo");
+        LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetChannelInfo");
         return false;
     }
 
@@ -926,7 +929,7 @@ bool EncoderLink::SetChannelInfo(uint chanid, uint sourceid,
 {
     if (!local)
     {
-        VERBOSE(VB_IMPORTANT, "Should be local only query: SetChannelInfo");
+        LOG(VB_GENERAL, LOG_ERR, "Should be local only query: SetChannelInfo");
         return false;
     }
 

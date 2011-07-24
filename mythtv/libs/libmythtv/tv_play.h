@@ -334,7 +334,7 @@ class MTV_PUBLIC TV : public QObject
     void ChangeChannel(PlayerContext*, int direction);
     void ChangeChannel(PlayerContext*, uint chanid, const QString &channum);
     void PauseLiveTV(PlayerContext*);
-    void UnpauseLiveTV(PlayerContext*);
+    void UnpauseLiveTV(PlayerContext*, bool bQuietly = false);
 
     void ShowPreviousChannel(PlayerContext*);
     void PopPreviousChannel(PlayerContext*, bool immediate_change);

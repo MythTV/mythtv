@@ -13,7 +13,6 @@
 #include "iptvfeederwrapper.h"
 
 #define LOC QString("IPTVChan(%1): ").arg(GetCardID())
-#define LOC_ERR QString("IPTVChan(%1), Error: ").arg(GetCardID())
 
 IPTVChannel::IPTVChannel(TVRec         *parent,
                          const QString &videodev)
@@ -23,29 +22,29 @@ IPTVChannel::IPTVChannel(TVRec         *parent,
       m_lock(QMutex::Recursive)
 {
     m_videodev.detach();
-    VERBOSE(VB_CHANNEL, LOC + "ctor");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 }
 
 IPTVChannel::~IPTVChannel()
 {
-    VERBOSE(VB_CHANNEL, LOC + "dtor -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor -- begin");
     if (m_feeder)
     {
         delete m_feeder;
         m_feeder = NULL;
     }
-    VERBOSE(VB_CHANNEL, LOC + "dtor -- end");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor -- end");
 }
 
 bool IPTVChannel::Open(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Open() -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Open() -- begin");
     QMutexLocker locker(&m_lock);
-    VERBOSE(VB_CHANNEL, LOC + "Open() -- locked");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Open() -- locked");
 
     if (!InitializeInputs())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "InitializeInputs() failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "InitializeInputs() failed");
         return false;
     }
 
@@ -54,38 +53,37 @@ bool IPTVChannel::Open(void)
         QString content = IPTVChannelFetcher::DownloadPlaylist(
             m_videodev, true);
         m_freeboxchannels = IPTVChannelFetcher::ParsePlaylist(content);
-        VERBOSE(VB_IMPORTANT, LOC + QString("Loaded %1 channels from %2")
-            .arg(m_freeboxchannels.size())
-            .arg(m_videodev));
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Loaded %1 channels from %2")
+            .arg(m_freeboxchannels.size()) .arg(m_videodev));
     }
 
-    VERBOSE(VB_CHANNEL, LOC + "Open() -- end");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Open() -- end");
     return !m_freeboxchannels.empty();
 }
 
 void IPTVChannel::Close(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Close() -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Close() -- begin");
     QMutexLocker locker(&m_lock);
-    VERBOSE(VB_CHANNEL, LOC + "Close() -- locked");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Close() -- locked");
     //m_freeboxchannels.clear();
-    VERBOSE(VB_CHANNEL, LOC + "Close() -- end");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Close() -- end");
 }
 
 bool IPTVChannel::IsOpen(void) const
 {
-    VERBOSE(VB_CHANNEL, LOC + "IsOpen() -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "IsOpen() -- begin");
     QMutexLocker locker(&m_lock);
-    VERBOSE(VB_CHANNEL, LOC + "IsOpen() -- locked");
-    VERBOSE(VB_CHANNEL, LOC + "IsOpen() -- end");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "IsOpen() -- locked");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "IsOpen() -- end");
     return !m_freeboxchannels.empty();
 }
 
 bool IPTVChannel::SetChannelByString(const QString &channum)
 {
-    VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "SetChannelByString() -- begin");
     QMutexLocker locker(&m_lock);
-    VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- locked");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "SetChannelByString() -- locked");
 
     InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     if (it == m_inputs.end())
@@ -98,7 +96,7 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
     // Verify that channel exists
     if (!GetChanInfo(channum).isValid())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("SetChannelByString(%1)").arg(channum) +
                 " Invalid channel");
         return false;
@@ -115,23 +113,23 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
 
     HandleScript(channum /* HACK treat channum as freqid */);
 
-    VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- end");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "SetChannelByString() -- end");
     return true;
 }
 
 IPTVChannelInfo IPTVChannel::GetChanInfo(
     const QString &channum, uint sourceid) const
 {
-    VERBOSE(VB_CHANNEL, LOC + "GetChanInfo() -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "GetChanInfo() -- begin");
     QMutexLocker locker(&m_lock);
-    VERBOSE(VB_CHANNEL, LOC + "GetChanInfo() -- locked");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "GetChanInfo() -- locked");
 
     IPTVChannelInfo dummy;
-    QString msg = LOC_ERR + QString("GetChanInfo(%1) failed").arg(channum);
+    QString msg = LOC + QString("GetChanInfo(%1) failed").arg(channum);
 
     if (channum.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return dummy;
     }
 
@@ -140,7 +138,7 @@ IPTVChannelInfo IPTVChannel::GetChanInfo(
         InputMap::const_iterator it = m_inputs.find(m_currentInputID);
         if (it == m_inputs.end())
         {
-            VERBOSE(VB_IMPORTANT, msg);
+            LOG(VB_GENERAL, LOG_ERR, msg);
             return dummy;
         }
         sourceid = (*it)->sourceid;
@@ -159,7 +157,7 @@ IPTVChannelInfo IPTVChannel::GetChanInfo(
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("fetching chaninfo", query);
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return dummy;
     }
 
@@ -185,7 +183,7 @@ IPTVChannelInfo IPTVChannel::GetChanInfo(
         }
     }
 
-    VERBOSE(VB_IMPORTANT, msg);
+    LOG(VB_GENERAL, LOG_ERR, msg);
     return dummy;
 }
 

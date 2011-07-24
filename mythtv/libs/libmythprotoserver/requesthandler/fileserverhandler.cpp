@@ -635,32 +635,83 @@ bool FileServerHandler::HandleQueryFileHash(SocketHandler *socket,
                                             QStringList &slist)
 {
     QString storageGroup = "Default";
+    QString hostname     = gCoreContext->GetHostName();
+    QString filename     = "";
     QStringList res;
 
-    if (slist.size() == 3)
-    {
+    switch (slist.size()) {
+      case 4:
+        if (!slist[3].isEmpty())
+            hostname = slist[3];
+      case 3:
         if (!slist[2].isEmpty())
             storageGroup = slist[2];
-    }
-    else if (slist.size() != 2)
+      case 2:
+        filename = slist[1];
+        if (filename.isEmpty() ||
+            filename.contains("/../") ||
+            filename.startsWith("../"))
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("ERROR checking for file, filename '%1' "
+                        "fails sanity checks").arg(filename));
+            res << "";
+            socket->SendStringList(res);
+            return true;
+        }
+        break;
+      default:
         return false;
-
-    QString filename = slist[1];
-    if ((filename.isEmpty()) || 
-        (filename.contains("/../")) || 
-        (filename.startsWith("../")))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("ERROR checking for file, filename '%1' "
-                    "fails sanity checks").arg(filename));
-        res << "";
-        socket->SendStringList(res);
-        return true;
     }
 
-    StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
-    QString fullname = sgroup.FindFile(filename);
-    QString hash = FileHash(fullname);
+    QString hash = "";
+
+    if (hostname == gCoreContext->GetHostName())
+    {
+        // looking for file on me, return directly
+        StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
+        QString fullname = sgroup.FindFile(filename);
+        hash = FileHash(fullname);
+    }
+    else
+    {
+        QReadLocker rlock(&m_fsLock);
+        if (m_fsMap.contains(hostname))
+        {
+            // looking for file on connected host, query from it
+            if (m_fsMap[hostname]->SendReceiveStringList(slist))
+                hash = slist[0];
+        }
+        else
+        {
+            // looking for file on unknown host
+            // assume host is an IP address, and look for matching
+            // entry in database
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT hostname FROM settings "
+                           "WHERE value='BackendServerIP' "
+                             "AND data=:HOSTNAME;");
+            query.bindValue(":HOSTNAME", hostname);
+
+            if (query.exec() && query.next())
+            {
+                // address matches an entry
+                hostname = query.value(0).toString();
+                if (m_fsMap.contains(hostname))
+                {
+                    // entry matches a connection
+                    slist.clear();
+                    slist << "QUERY_FILE_HASH"
+                          << filename
+                          << storageGroup;
+
+                    if (m_fsMap[hostname]->SendReceiveStringList(slist))
+                        hash = slist[0];
+                }
+            }
+        }
+    }
+
 
     res << hash;
     socket->SendStringList(res);

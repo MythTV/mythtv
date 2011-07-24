@@ -7,8 +7,6 @@
 
 #include "metadatacommon.h"
 
-typedef QList<MetadataLookup*> MetadataLookupList;
-
 class META_PUBLIC MetadataLookupEvent : public QEvent
 {
   public:
@@ -48,11 +46,15 @@ class META_PUBLIC MetadataDownload : public QThread
 
     void run();
 
+    QString getMXMLPath(QString filename);
+    QString getNFOPath(QString filename);
+
   private:
     // Video handling
     MetadataLookupList  handleMovie(MetadataLookup* lookup);
     MetadataLookupList  handleTelevision(MetadataLookup* lookup);
     MetadataLookupList  handleVideoUndetermined(MetadataLookup* lookup);
+    MetadataLookupList  handleRecordingGeneric(MetadataLookup* lookup);
 
     MetadataLookupList  handleGame(MetadataLookup* lookup);
 
@@ -61,6 +63,10 @@ class META_PUBLIC MetadataDownload : public QThread
     MetadataLookupList  runGrabber(QString cmd, QStringList args,
                                    MetadataLookup* lookup,
                                    bool passseas = true);
+    MetadataLookupList  readMXML(QString MXMLpath,
+                                 MetadataLookup* lookup,
+                                 bool passseas = true);
+    MetadataLookupList  readNFO(QString NFOpath, MetadataLookup* lookup);
     MetadataLookup*     moreWork();
 
     QObject            *m_parent;

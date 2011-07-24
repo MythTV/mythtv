@@ -225,8 +225,9 @@ void WorkerThread::WakeForWork()
     }
     catch(...)
     {
-        VERBOSE( VB_IMPORTANT, QString( "WorkerThread::Run( %1 ) - Unexpected Exception." )
-                 .arg( m_sName ));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("WorkerThread::Run( %1 ) - Unexpected Exception.")
+                 .arg(m_sName));
     }
 
     if (!m_bTermRequested)
@@ -278,7 +279,8 @@ void WorkerThread::run( void )
     delete m_wakeup;
     delete m_timer;
 
-    VERBOSE( VB_UPNP, QString( "WorkerThread:Run - Exiting: %1" ).arg( m_sName ));
+    LOG(VB_UPNP, LOG_INFO, QString("WorkerThread:Run - Exiting: %1")
+                               .arg( m_sName ));
     threadDeregister();
 }
 
@@ -300,15 +302,19 @@ ThreadPool::ThreadPool( const QString &sName )
 
     Configuration *pConfig = UPnp::GetConfiguration();
 
-    m_nInitialThreadCount = pConfig->GetValue( "ThreadPool/" + m_sName + "/Initial", 1 );
-    m_nMaxThreadCount     = pConfig->GetValue( "ThreadPool/" + m_sName + "/Max"    , 25 );
-    m_nIdleTimeout        = pConfig->GetValue( "ThreadPool/" + m_sName + "/Timeout", 60000 );
+    m_nInitialThreadCount =
+        pConfig->GetValue("ThreadPool/" + m_sName + "/Initial", 1);
+    m_nMaxThreadCount     =
+        pConfig->GetValue("ThreadPool/" + m_sName + "/Max"    , 25);
+    m_nIdleTimeout        =
+        pConfig->GetValue("ThreadPool/" + m_sName + "/Timeout", 60000);
 
     m_nInitialThreadCount = min( m_nInitialThreadCount, m_nMaxThreadCount );
 
-    VERBOSE(VB_IMPORTANT, QString("ThreadPool:%1: Initial %2, Max %3, Timeout %4")
-        .arg(sName) .arg(m_nInitialThreadCount) .arg(m_nMaxThreadCount)
-        .arg(m_nIdleTimeout) );
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("ThreadPool:%1: Initial %2, Max %3, Timeout %4")
+            .arg(sName) .arg(m_nInitialThreadCount) .arg(m_nMaxThreadCount)
+            .arg(m_nIdleTimeout));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -395,14 +401,17 @@ WorkerThread *ThreadPool::GetWorkerThread()
 
                 if (m_threadAvail.wait( &mutex, 5000 ) == false )
                 {
-                    VERBOSE(VB_IMPORTANT, QString("ThreadPool:%1: thread pool exhausted (max %2 threads)") .arg(m_sName) .arg(m_nMaxThreadCount));
-                    return( NULL );     // timeout exceeded.
+                    LOG(VB_GENERAL, LOG_CRIT,
+                        QString("ThreadPool:%1: thread pool exhausted "
+                                "(max %2 threads)")
+                             .arg(m_sName) .arg(m_nMaxThreadCount));
+                    return NULL;     // timeout exceeded.
                 }
             }
         }
     }
 
-    return( pThread );
+    return pThread;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -414,7 +423,8 @@ WorkerThread *ThreadPool::AddWorkerThread( bool bMakeAvailable, long nTimeout )
     QString sName = QString(m_sName + "_WorkerThread"); 
     long nThreadCount;
 
-    VERBOSE( VB_UPNP, QString( "ThreadPool:AddWorkerThread - %1" ).arg( sName ));
+    LOG(VB_UPNP, LOG_INFO, QString( "ThreadPool:AddWorkerThread - %1" )
+                               .arg(sName));
 
     WorkerThread *pThread = CreateWorkerThread( this, sName );
 
@@ -433,7 +443,9 @@ WorkerThread *ThreadPool::AddWorkerThread( bool bMakeAvailable, long nTimeout )
             m_lstThreads.push_back( pThread );
             nThreadCount = m_lstThreads.size();
 
-            VERBOSE(VB_IMPORTANT|VB_EXTRA, QString("ThreadPool:%1: thread pool size %2") .arg(m_sName) .arg(nThreadCount));
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("ThreadPool:%1: thread pool size %2")
+                    .arg(m_sName) .arg(nThreadCount));
                 
             if (bMakeAvailable)
             {
@@ -456,7 +468,7 @@ WorkerThread *ThreadPool::AddWorkerThread( bool bMakeAvailable, long nTimeout )
         }
     }
 
-    return( pThread );
+    return pThread;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -489,7 +501,9 @@ void ThreadPool::ThreadTerminating ( WorkerThread *pThread )
     m_lstThreads.erase(it);
 
     nThreadCount = m_lstThreads.size();
-    VERBOSE(VB_IMPORTANT|VB_EXTRA, QString("ThreadPool:%1: thread pool size %2") .arg(m_sName) .arg(nThreadCount));
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("ThreadPool:%1: thread pool size %2")
+            .arg(m_sName) .arg(nThreadCount));
 
     pThread->deleteLater();
 

@@ -47,8 +47,7 @@ static void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
         FILE *mapfh = fopen(mapfile.toLocal8Bit().constData(), "w");
         if (!mapfh)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Could not open map file '%1'")
+            LOG(VB_GENERAL, LOG_ERR, QString("Could not open map file '%1'")
                     .arg(mapfile) + ENO);
             return;
         }
@@ -90,7 +89,7 @@ static int CheckJobQueue()
 {
     if (JobQueue::GetJobCmd(glbl_jobID) == JOB_STOP)
     {
-        VERBOSE(VB_IMPORTANT, "Transcoding stopped by JobQueue");
+        LOG(VB_GENERAL, LOG_NOTICE, "Transcoding stopped by JobQueue");
         return 1;
     }
     return 0;
@@ -103,49 +102,71 @@ static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
     if (!profile.isEmpty())
         recinfo.ApplyTranscoderProfileChange(profile);
 
-    if (JobQueue::QueueJob(JOB_TRANSCODE,
-            pginfo->GetChanID(),
-            pginfo->GetRecordingStartTime(),
-            hostname, "", "", 
-            usecutlist ? JOB_USE_CUTLIST : 0))
+    if (JobQueue::QueueJob(JOB_TRANSCODE, pginfo->GetChanID(),
+                           pginfo->GetRecordingStartTime(),
+                           hostname, "", "",
+                           usecutlist ? JOB_USE_CUTLIST : 0))
     {
-        VERBOSE(VB_IMPORTANT, QString("Queued transcode job for chanid %1 @ %2")
-                    .arg(pginfo->GetChanID())
-                    .arg(pginfo->GetRecordingStartTime().toString("yyyyMMddhhmmss")));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Queued transcode job for chanid %1 @ %2")
+              .arg(pginfo->GetChanID())
+              .arg(pginfo->GetRecordingStartTime().toString("yyyyMMddhhmmss")));
         return GENERIC_EXIT_OK;
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Error queuing job for chanid %1 @ %2")
-                .arg(pginfo->GetChanID())
-                .arg(pginfo->GetRecordingStartTime().toString("yyyyMMddhhmmss")));
+    LOG(VB_GENERAL, LOG_ERR, QString("Error queuing job for chanid %1 @ %2")
+            .arg(pginfo->GetChanID())
+            .arg(pginfo->GetRecordingStartTime().toString("yyyyMMddhhmmss")));
     return GENERIC_EXIT_DB_ERROR;
+}
+
+namespace
+{
+    void cleanup()
+    {
+        delete gContext;
+        gContext = NULL;
+
+    }
+
+    class CleanupGuard
+    {
+      public:
+        typedef void (*CleanupFunc)();
+
+      public:
+        CleanupGuard(CleanupFunc cleanFunction) :
+            m_cleanFunction(cleanFunction) {}
+
+        ~CleanupGuard()
+        {
+            m_cleanFunction();
+        }
+
+      private:
+        CleanupFunc m_cleanFunction;
+    };
 }
 
 int main(int argc, char *argv[])
 {
     uint chanid;
-    QString starttime, infile, outfile;
+    QDateTime starttime;
+    QString infile, outfile;
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
     int jobID = -1;
-    QDateTime startts;
     int jobType = JOB_NONE;
     int otype = REPLEX_MPEG2;
     bool useCutlist = false, keyframesonly = false;
-    bool build_index = false, fifosync = false, showprogress = false;
+    bool build_index = false, fifosync = false;
     bool mpeg2 = false;
+    bool fifo_info = false;
     QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap;
     srand(time(NULL));
     int AudioTrackNo = -1;
-
-    QCoreApplication a(argc, argv);
-
-    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTRANSCODE);
-
-    verboseMask = VB_IMPORTANT;
-    verboseString = "important";
 
     int found_starttime = 0;
     int found_chanid = 0;
@@ -153,7 +174,6 @@ int main(int argc, char *argv[])
     int update_index = 1;
     int isVideo = 0;
     bool passthru = false;
-    int quiet = 0;
 
     MythTranscodeCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -174,16 +194,26 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) == 
-                GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
-    if (cmdline.toBool("verboseint"))
-        verboseMask = cmdline.toUInt("verboseint");
+    QCoreApplication a(argc, argv);
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTRANSCODE);
+
+    if (cmdline.toBool("outputfile"))
+    {
+        outfile = cmdline.toString("outputfile");
+        update_index = 0;
+    }
+
+    bool showprogress = cmdline.toBool("showprogress");
+
+    int retval;
+    QString mask("general");
+    bool quiet = (outfile == "-") || showprogress;
+    if ((retval = cmdline.ConfigureLogging(mask, quiet)) != GENERIC_EXIT_OK)
+        return retval;
 
     if (cmdline.toBool("starttime"))
     {
-        starttime = cmdline.toString("starttime");
+        starttime = cmdline.toDateTime("starttime");
         found_starttime = 1;
     }
     if (cmdline.toBool("chanid"))
@@ -197,11 +227,6 @@ int main(int argc, char *argv[])
     {
         infile = cmdline.toString("inputfile");
         found_infile = 1;
-    }
-    if (cmdline.toBool("outputfile"))
-    {
-        outfile = cmdline.toString("outputfile");
-        update_index = 0;
     }
     if (cmdline.toBool("video"))
         isVideo = true;
@@ -224,7 +249,8 @@ int main(int argc, char *argv[])
             QStringList::iterator it;
             for (it = cutlist.begin(); it != cutlist.end(); ++it)
             {
-                QStringList startend = (*it).split("-", QString::SkipEmptyParts);
+                QStringList startend =
+                    (*it).split("-", QString::SkipEmptyParts);
                 if (startend.size() == 2)
                 {
                     cerr << "Cutting from: " << startend.first().toULongLong()
@@ -276,6 +302,8 @@ int main(int argc, char *argv[])
         build_index = true;
     if (cmdline.toBool("fifodir"))
         fifodir = cmdline.toString("fifodir");
+    if (cmdline.toBool("fifoinfo"))
+        fifo_info = true;
     if (cmdline.toBool("fifosync"))
         fifosync = true;
     if (cmdline.toBool("recopt"))
@@ -296,68 +324,28 @@ int main(int argc, char *argv[])
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
-    if (cmdline.toBool("overridesettings"))
-        settingsOverride = cmdline.GetSettingsOverride();
     if (cmdline.toBool("audiotrack"))
         AudioTrackNo = cmdline.toInt("audiotrack");
     if (cmdline.toBool("passthru"))
         passthru = true;
 
-    if (outfile == "-")
-        verboseMask = VB_NONE;
-
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    showprogress = cmdline.toBool("showprogress");
-    if (showprogress)
-        quiet++;
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
-
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
-
+    CleanupGuard callCleanup(cleanup);
     //  Load the context
-    MythContext context(MYTH_BINARY_VERSION);
-    gContext = &context;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     MythTranslation::load("mythfrontend");
 
-    if (settingsOverride.size())
-    {
-        QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(*it));
-            gCoreContext->OverrideSettingForSession(it.key(), *it);
-        }
-    }
+    cmdline.ApplySettingsOverride();
 
     if (jobID != -1)
     {
-        if (JobQueue::GetJobInfoFromID(
-                jobID, jobType, chanid, startts))
+        if (JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
         {
-            starttime = startts.toString(Qt::ISODate);
             found_starttime = 1;
             found_chanid = 1;
         }
@@ -369,43 +357,54 @@ int main(int argc, char *argv[])
         }
     }
 
-    if ((! found_infile && !(found_chanid && found_starttime)) ||
+    if ((!found_infile && !(found_chanid && found_starttime)) ||
         (found_infile && (found_chanid || found_starttime)) )
     {
-         cerr << "Must specify -i OR -c AND -s options!\n";
+         cerr << "Must specify -i OR -c AND -s options!" << endl;
          return GENERIC_EXIT_INVALID_CMDLINE;
     }
     if (isVideo && !found_infile)
     {
-         cerr << "Must specify --infile to use --video\n";
+         cerr << "Must specify --infile to use --video" << endl;
          return GENERIC_EXIT_INVALID_CMDLINE;
     }
     if (jobID >= 0 && (found_infile || build_index))
     {
-         cerr << "Can't specify -j with --buildindex, --video or --infile\n";
+         cerr << "Can't specify -j with --buildindex, --video or --infile"
+              << endl;
          return GENERIC_EXIT_INVALID_CMDLINE;
     }
     if ((jobID >= 0) && build_index)
     {
-         cerr << "Can't specify both -j and --buildindex\n";
+         cerr << "Can't specify both -j and --buildindex" << endl;
          return GENERIC_EXIT_INVALID_CMDLINE;
     }
     if (keyframesonly && !fifodir.isEmpty())
     {
-         cerr << "Cannot specify both --fifodir and --allkeys\n";
+         cerr << "Cannot specify both --fifodir and --allkeys" << endl;
          return GENERIC_EXIT_INVALID_CMDLINE;
     }
     if (fifosync && fifodir.isEmpty())
     {
-         cerr << "Must specify --fifodir to use --fifosync\n";
+         cerr << "Must specify --fifodir to use --fifosync" << endl;
          return GENERIC_EXIT_INVALID_CMDLINE;
     }
+    if (fifo_info && !fifodir.isEmpty())
+    {
+        cerr << "Cannot specify both --fifodir and --fifoinfo" << endl;
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
 
-    VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
+    if (fifo_info)
+    {
+        // Setup a dummy fifodir path, so that the "fifodir" code path
+        // is taken. The path wont actually be used.
+        fifodir = "DummyFifoPath";
+    }
 
     if (!MSqlQuery::testDBConnection())
     {
-        printf("couldn't open db\n");
+        LOG(VB_GENERAL, LOG_ERR, "couldn't open db");
         return GENERIC_EXIT_DB_ERROR;
     }
 
@@ -419,14 +418,13 @@ int main(int argc, char *argv[])
     }
     else if (!found_infile)
     {
-        QDateTime recstartts = myth_dt_from_string(starttime);
-        pginfo = new ProgramInfo(chanid, recstartts);
+        pginfo = new ProgramInfo(chanid, starttime);
 
         if (!pginfo->GetChanID())
         {
-            QString msg = QString("Couldn't find recording for chanid %1 @ %2")
-                .arg(chanid).arg(starttime);
-            cerr << msg.toLocal8Bit().constData() << endl;
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Couldn't find recording for chanid %1 @ %2")
+                    .arg(chanid).arg(starttime.toString("yyyyMMddhhmmss")));
             delete pginfo;
             return GENERIC_EXIT_NO_RECORDING_DATA;
         }
@@ -438,8 +436,8 @@ int main(int argc, char *argv[])
         pginfo = new ProgramInfo(infile);
         if (!pginfo->GetChanID())
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Couldn't find a recording for filename '%1'")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Couldn't find a recording for filename '%1'")
                     .arg(infile));
             delete pginfo;
             return GENERIC_EXIT_NO_RECORDING_DATA;
@@ -448,7 +446,7 @@ int main(int argc, char *argv[])
 
     if (!pginfo)
     {
-        VERBOSE(VB_IMPORTANT, "No program info found!");
+        LOG(VB_GENERAL, LOG_ERR, "No program info found!");
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
@@ -458,16 +456,16 @@ int main(int argc, char *argv[])
         return QueueTranscodeJob(pginfo, profilename, hostname, useCutlist);
     }
 
-    if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-"))
+    if (infile.left(7) == "myth://" && (outfile.isEmpty() || outfile != "-") &&
+        fifodir.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("Attempted to transcode %1. "
-               "Mythtranscode is currently unable to transcode remote "
-               "files.")
-               .arg(infile));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Attempted to transcode %1. Mythtranscode is currently "
+                    "unable to transcode remote files.") .arg(infile));
         return GENERIC_EXIT_REMOTE_FILE;
     }
 
-    if (outfile.isNull() && !build_index)
+    if (outfile.isEmpty() && !build_index && fifodir.isEmpty())
         outfile = infile + ".tmp";
 
     if (jobID >= 0)
@@ -476,8 +474,14 @@ int main(int argc, char *argv[])
     Transcode *transcode = new Transcode(pginfo);
 
     if (!build_index)
-        VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
-                            .arg(infile).arg(outfile));
+    {
+        if (fifodir.isEmpty())
+            LOG(VB_GENERAL, LOG_NOTICE, QString("Transcoding from %1 to %2")
+                    .arg(infile).arg(outfile));
+        else
+            LOG(VB_GENERAL, LOG_NOTICE, QString("Transcoding from %1 to FIFO")
+                    .arg(infile));
+    }
 
     if (showprogress)
         transcode->ShowProgress(true);
@@ -489,10 +493,16 @@ int main(int argc, char *argv[])
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,
                                           (fifosync || keyframesonly), jobID,
-                                          fifodir, deleteMap, AudioTrackNo,
-                                          passthru);
+                                          fifodir, fifo_info, deleteMap,
+                                          AudioTrackNo, passthru);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
+    }
+
+    if (fifo_info)
+    {
+        delete transcode;
+        return GENERIC_EXIT_OK;
     }
 
     int exitcode = GENERIC_EXIT_OK;
@@ -509,11 +519,10 @@ int main(int argc, char *argv[])
            check_func = &CheckJobQueue;
         }
 
-        MPEG2fixup *m2f = new MPEG2fixup(
-            infile, outfile,
-            &deleteMap, NULL, false, false, 20,
-            showprogress, otype, update_func,
-            check_func);
+        MPEG2fixup *m2f = new MPEG2fixup(infile, outfile,
+                                         &deleteMap, NULL, false, false, 20,
+                                         showprogress, otype, update_func,
+                                         check_func);
 
         if (build_index)
         {
@@ -548,7 +557,7 @@ int main(int argc, char *argv[])
     {
         if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_STOPPING);
-        VERBOSE(VB_GENERAL, QString("%1 %2 done")
+        LOG(VB_GENERAL, LOG_NOTICE, QString("%1 %2 done")
                 .arg(build_index ? "Building Index for" : "Transcoding")
                 .arg(infile));
     }
@@ -556,23 +565,25 @@ int main(int argc, char *argv[])
     {
         if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_RETRY);
-        VERBOSE(VB_GENERAL, QString("Transcoding %1 aborted because of "
-                                    "cutlist update").arg(infile));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Transcoding %1 aborted because of cutlist update")
+                .arg(infile));
         exitcode = GENERIC_EXIT_RESTART;
     }
     else if (result == REENCODE_STOPPED)
     {
         if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_ABORTING);
-        VERBOSE(VB_GENERAL, QString("Transcoding %1 stopped because of "
-                                    "stop command").arg(infile));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Transcoding %1 stopped because of stop command")
+                .arg(infile));
         exitcode = GENERIC_EXIT_KILLED;
     }
     else
     {
         if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_ERRORING);
-        VERBOSE(VB_GENERAL, QString("Transcoding %1 failed").arg(infile));
+        LOG(VB_GENERAL, LOG_ERR, QString("Transcoding %1 failed").arg(infile));
         exitcode = result;
     }
 
@@ -590,28 +601,30 @@ static int transUnlink(QString filename, ProgramInfo *pginfo)
         !pginfo->GetHostname().isEmpty())
     {
         QString ip = gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                pginfo->GetHostname());
+                                                    pginfo->GetHostname());
         QString port = gCoreContext->GetSettingOnHost("BackendServerPort",
-                                                  pginfo->GetHostname());
+                                                      pginfo->GetHostname());
         QString basename = filename.section('/', -1);
-        QString uri = gCoreContext->GenMythURL(ip,port,basename,pginfo->GetStorageGroup());
+        QString uri = gCoreContext->GenMythURL(ip, port, basename,
+                                               pginfo->GetStorageGroup());
 
-        VERBOSE(VB_IMPORTANT, QString("Requesting delete for file '%1'.")
-                                      .arg(uri));
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Requesting delete for file '%1'.")
+                .arg(uri));
         bool ok = RemoteFile::DeleteFile(uri);
         if (ok)
             return 0;
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Deleting file '%1'.").arg(filename));
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Deleting file '%1'.").arg(filename));
     return unlink(filename.toLocal8Bit().constData());
 }
 
 static uint64_t ComputeNewBookmark(uint64_t oldBookmark,
-                            frm_dir_map_t *deleteMap)
+                                   frm_dir_map_t *deleteMap)
 {
     if (deleteMap == NULL)
         return oldBookmark;
+
     uint64_t subtraction = 0;
     uint64_t startOfCutRegion = 0;
     frm_dir_map_t delMap = *deleteMap;
@@ -661,9 +674,9 @@ static uint64_t ReloadBookmark(ProgramInfo *pginfo)
 
 static void WaitToDelete(ProgramInfo *pginfo)
 {
-    VERBOSE(VB_GENERAL,
-            "Transcode: delete old file: "
-            "waiting while program is in use.");
+    LOG(VB_GENERAL, LOG_NOTICE,
+        "Transcode: delete old file: waiting while program is in use.");
+
     bool inUse = true;
     MSqlQuery query(MSqlQuery::InitCon());
     while (inUse)
@@ -676,8 +689,8 @@ static void WaitToDelete(ProgramInfo *pginfo)
         query.bindValue(":STARTTIME", pginfo->GetRecordingStartTime());
         if (!query.exec() || !query.next())
         {
-            VERBOSE(VB_GENERAL,
-                    "Transcode: delete old file: in-use query failed;");
+            LOG(VB_GENERAL, LOG_ERR,
+                "Transcode: delete old file: in-use query failed;");
             inUse = false;
         }
         else
@@ -688,13 +701,13 @@ static void WaitToDelete(ProgramInfo *pginfo)
         if (inUse)
         {
             const unsigned kSecondsToWait = 10;
-            VERBOSE(VB_GENERAL,
-                    QString("Transcode: program in use, "
-                            "rechecking in %1 seconds.").arg(kSecondsToWait));
+            LOG(VB_GENERAL, LOG_NOTICE,
+                QString("Transcode: program in use, rechecking in %1 seconds.")
+                    .arg(kSecondsToWait));
             sleep(kSecondsToWait);
         }
     }
-    VERBOSE(VB_GENERAL, "Transcode: program is no longer in use.");
+    LOG(VB_GENERAL, LOG_NOTICE, "Transcode: program is no longer in use.");
 }
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
@@ -752,25 +765,28 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
 
         if (rename(fname.constData(), aoldfile.constData()) == -1)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("mythtranscode: Error Renaming '%1' to '%2'")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("mythtranscode: Error Renaming '%1' to '%2'")
                     .arg(filename).arg(oldfile) + ENO);
         }
 
         if (rename(atmpfile.constData(), anewfile.constData()) == -1)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("mythtranscode: Error Renaming '%1' to '%2'")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("mythtranscode: Error Renaming '%1' to '%2'")
                     .arg(tmpfile).arg(newfile) + ENO);
         }
 
         if (!gCoreContext->GetNumSetting("SaveTranscoding", 0))
         {
             int err;
-            bool followLinks = gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
+            bool followLinks =
+                gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
 
-            VERBOSE(VB_FILE, QString("mythtranscode: About to unlink/delete "
-                                     "file: %1").arg(oldfile));
+            LOG(VB_FILE, LOG_INFO,
+                QString("mythtranscode: About to unlink/delete file: %1")
+                    .arg(oldfile));
+
             QFileInfo finfo(oldfile);
             if (followLinks && finfo.isSymLink())
             {
@@ -780,8 +796,8 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
 
                 if (err)
                 {
-                    VERBOSE(VB_IMPORTANT, QString(
-                                "mythtranscode: Error deleting '%1' "
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("mythtranscode: Error deleting '%1' "
                                 "pointed to by '%2'")
                             .arg(alink.constData())
                             .arg(aoldfile.constData()) + ENO);
@@ -790,8 +806,8 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                 err = unlink(aoldfile.constData());
                 if (err)
                 {
-                    VERBOSE(VB_IMPORTANT, QString(
-                                "mythtranscode: Error deleting '%1', "
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("mythtranscode: Error deleting '%1', "
                                 "a link pointing to '%2'")
                             .arg(aoldfile.constData())
                             .arg(alink.constData()) + ENO);
@@ -800,9 +816,9 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             else
             {
                 if ((err = transUnlink(aoldfile.constData(), pginfo)))
-                    VERBOSE(VB_IMPORTANT, QString(
-                            "mythtranscode: Error deleting '%1', %2")
-                            .arg(oldfile).arg(strerror(errno)));
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("mythtranscode: Error deleting '%1': ")
+                            .arg(oldfile) + ENO);
             }
         }
 
@@ -923,7 +939,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         // Not a successful run, so remove the files we created
         QString filename_tmp = filename + ".tmp";
         QByteArray fname_tmp = filename_tmp.toLocal8Bit();
-        VERBOSE(VB_IMPORTANT, QString("Deleting %1").arg(filename_tmp));
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Deleting %1").arg(filename_tmp));
         transUnlink(fname_tmp.constData(), pginfo);
 
         QString filename_map = filename + ".tmp.map";

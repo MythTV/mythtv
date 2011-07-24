@@ -41,7 +41,6 @@ void MythFillNVCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addLogging();
 
     add("--refresh-all", "refresh-all", false,
@@ -63,60 +62,33 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (cmdline.toBool("showversion"))
-    {
-        cmdline.PrintVersion();
-        return GENERIC_EXIT_OK;
-    }
-
     if (cmdline.toBool("showhelp"))
     {
         cmdline.PrintHelp();
         return GENERIC_EXIT_OK;
     }
 
-    QCoreApplication a(argc, argv);
-
-    QCoreApplication::setApplicationName("mythfillnetvision");
-
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                    GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
-
-    int quiet = 0;
-    if (cmdline.toBool("quiet"))
+    if (cmdline.toBool("showversion"))
     {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
     }
 
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
+    QCoreApplication a(argc, argv);
+    QCoreApplication::setApplicationName("mythfillnetvision");
 
+    int retval;
+    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+        return retval;
+    
     ///////////////////////////////////////////////////////////////////////
     // Don't listen to console input
     close(0);
 
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg("mythfillnetvision").arg(MYTH_SOURCE_PATH)
-            .arg(MYTH_SOURCE_VERSION));
-
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
-
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         delete gContext;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
@@ -127,15 +99,15 @@ int main(int argc, char *argv[])
 
     if (refreshall && (refreshrss || refreshtree))
     {
-        VERBOSE(VB_IMPORTANT, "--refresh-all must not be accompanied by "
-                              "--refresh-rss or --refresh-tree");
+        LOG(VB_GENERAL, LOG_ERR, "--refresh-all must not be accompanied by "
+                                 "--refresh-rss or --refresh-tree");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     if (refreshrss && refreshtree)
     {
-        VERBOSE(VB_IMPORTANT, "--refresh-rss and --refresh-tree are mutually "
-                              "exclusive options");
+        LOG(VB_GENERAL, LOG_ERR, "--refresh-rss and --refresh-tree are "
+                                 "mutually exclusive options");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
@@ -178,7 +150,7 @@ int main(int argc, char *argv[])
     delete rssMan;
     delete gContext;
 
-    VERBOSE(VB_IMPORTANT, "MythFillNetvision run complete.");
+    LOG(VB_GENERAL, LOG_INFO, "MythFillNetvision run complete.");
 
     return GENERIC_EXIT_OK;
 }

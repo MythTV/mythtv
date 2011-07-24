@@ -13,8 +13,6 @@
 #include "mythdownloadmanager.h"
 
 #define LOC      QString("ThemeInfo: ")
-#define LOC_ERR  QString("ThemeInfo, Error: ")
-#define LOC_WARN QString("ThemeInfo, Warning: ")
 
 ThemeInfo::ThemeInfo(QString theme)
           :XMLParseBase()
@@ -31,8 +29,8 @@ ThemeInfo::ThemeInfo(QString theme)
 
     if (!parseThemeInfo())
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("The theme (%1) is missing a themeinfo.xml file.")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("The theme (%1) is missing a themeinfo.xml file.")
                 .arg(m_themeurl));
     }
 }
@@ -59,8 +57,8 @@ bool ThemeInfo::parseThemeInfo()
 
         if (!doc.setContent(data))
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("Unable to parse themeinfo.xml for %1")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Unable to parse themeinfo.xml for %1")
                         .arg(m_themeurl));
             return false;
         }
@@ -71,16 +69,16 @@ bool ThemeInfo::parseThemeInfo()
 
         if (!f.open(QIODevice::ReadOnly))
         {
-            LOG(VB_GENERAL, LOG_WARNING,
-                    QString("Unable to open themeinfo.xml for %1")
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("Unable to open themeinfo.xml for %1")
                         .arg(f.fileName()));
             return false;
         }
 
         if (!doc.setContent(&f))
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("Unable to parse themeinfo.xml for %1")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Unable to parse themeinfo.xml for %1")
                         .arg(f.fileName()));
 
             f.close();
@@ -137,7 +135,7 @@ bool ThemeInfo::parseThemeInfo()
                             }
                             else
                             {
-                                VERBOSE_XML(VB_IMPORTANT, LOG_ERR,
+                                VERBOSE_XML(VB_GENERAL, LOG_ERR,
                                             m_theme.fileName(), ce, 
                                             "Invalid theme type");
                             }

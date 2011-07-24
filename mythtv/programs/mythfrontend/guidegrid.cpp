@@ -189,7 +189,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
                          .arg(ChannelGroup::GetChannelGroupName(changrpid));
         }
 
-        VERBOSE(VB_IMPORTANT, LOC_WARN + message);
+        LOG(VB_GENERAL, LOG_WARNING, LOC + message);
 
         if (!player)
             ShowOkPopup(message);
@@ -242,9 +242,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_sortReverse = gCoreContext->GetNumSetting("EPGSortReverse", 0);
     m_selectRecThreshold = gCoreContext->GetNumSetting("SelChangeRecThreshold", 16);
 
-    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-    m_dateFormat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
-
     m_channelOrdering = gCoreContext->GetSetting("ChannelOrdering", "channum");
     m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
     m_channelFormat.replace(' ', "\n");
@@ -282,13 +279,15 @@ bool GuideGrid::Create()
     UIUtilE::Assign(this, m_channelList, "channellist", &err);
     UIUtilE::Assign(this, m_guideGrid, "guidegrid", &err);
     UIUtilW::Assign(this, m_dateText, "datetext");
+    UIUtilW::Assign(this, m_longdateText, "longdatetext");
     UIUtilW::Assign(this, m_changroupname, "channelgroup");
     UIUtilW::Assign(this, m_channelImage, "channelicon");
     UIUtilW::Assign(this, m_jumpToText, "jumptotext");
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, QString("Cannot load screen '%1'").arg(windowName));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Cannot load screen '%1'").arg(windowName));
         return false;
     }
 
@@ -351,8 +350,7 @@ void GuideGrid::Init(void)
     connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimeout()) );
     m_updateTimer->start(60 * 1000);
 
-    if (m_dateText)
-        m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
+    updateDateText();
 
     QString changrpname = ChannelGroup::GetChannelGroupName(m_changrpid);
 
@@ -480,35 +478,35 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == "PAGEUP")
         {
             if (m_verticalLayout)
-                pageLeft();
+                moveLeftRight(kPageLeft);
             else
-                pageUp();
+                moveUpDown(kPageUp);
         }
         else if (action == "PAGEDOWN")
         {
             if (m_verticalLayout)
-                pageRight();
+                moveLeftRight(kPageRight);
             else
-                pageDown();
+                moveUpDown(kPageDown);
         }
         else if (action == ACTION_PAGELEFT)
         {
             if (m_verticalLayout)
-                pageUp();
+                moveUpDown(kPageUp);
             else
-                pageLeft();
+                moveLeftRight(kPageLeft);
         }
         else if (action == ACTION_PAGERIGHT)
         {
             if (m_verticalLayout)
-                pageDown();
+                moveUpDown(kPageDown);
             else
-                pageRight();
+                moveLeftRight(kPageRight);
         }
         else if (action == ACTION_DAYLEFT)
-            dayLeft();
+            moveLeftRight(kDayLeft);
         else if (action == ACTION_DAYRIGHT)
-            dayRight();
+            moveLeftRight(kDayRight);
         else if (action == "NEXTFAV")
             toggleGuideListing();
         else if (action == ACTION_FINDER)
@@ -893,7 +891,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
 
     if (m_channelInfos.empty())
     {
-        VERBOSE(VB_IMPORTANT, "GuideGrid: "
+        LOG(VB_GENERAL, LOG_ERR, "GuideGrid: "
                 "\n\t\t\tYou don't have any channels defined in the database."
                 "\n\t\t\tGuide grid will have nothing to show you.");
     }
@@ -998,25 +996,34 @@ void GuideGrid::fillTimeInfos()
 {
     m_timeList->Reset();
 
-    QDateTime t = m_currentStartTime;
+    QDateTime starttime = m_currentStartTime;
 
     m_firstTime = m_currentStartTime;
     m_lastTime = m_firstTime.addSecs(m_timeCount * 60 * 4);
 
     for (int x = 0; x < m_timeCount; ++x)
     {
-        int mins = t.time().minute();
+        int mins = starttime.time().minute();
         mins = 5 * (mins / 5);
         if (mins % 30 == 0)
         {
-            int hour = t.time().hour();
-            QString timeStr = QTime(hour, mins).toString(m_timeFormat);
-            new MythUIButtonListItem(m_timeList, timeStr);
+            QString timeStr = MythDateTimeToString(starttime, kTime);
+            
+            InfoMap infomap;
+            infomap["starttime"] = timeStr;
+            
+            QTime endtime = starttime.time().addSecs(60 * 30);
+            
+            infomap["endtime"] = MythTimeToString(endtime, kTime);
+
+            MythUIButtonListItem *item = 
+                                new MythUIButtonListItem(m_timeList, timeStr);
+            item->SetTextFromMap(infomap);
         }
 
-        t = t.addSecs(5 * 60);
+        starttime = starttime.addSecs(5 * 60);
     }
-    m_currentEndTime = t;
+    m_currentEndTime = starttime;
 }
 
 void GuideGrid::fillProgramInfos(bool useExistingData)
@@ -1346,7 +1353,7 @@ void GuideGrid::customEvent(QEvent *event)
             if (record)
             {
                 if ((buttonnum > 0) && !record->Delete())
-                    VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
+                    LOG(VB_GENERAL, LOG_ERR, "Failed to delete recording rule");
                 delete record;
             }
         }
@@ -1436,14 +1443,6 @@ void GuideGrid::customEvent(QEvent *event)
 
                 if (m_changroupname)
                     m_changroupname->SetText(changrpname);
-                else
-                {
-                    if (m_dateText)
-                    {
-                        m_dateText->SetText(changrpname);
-                        QTimer::singleShot(5000, this, SLOT(infoTimeout()));
-                    }
-                }
             }
         }
         else
@@ -1451,10 +1450,13 @@ void GuideGrid::customEvent(QEvent *event)
     }
 }
 
-void GuideGrid::infoTimeout(void)
+void GuideGrid::updateDateText(void)
 {
     if (m_dateText)
-        m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
+        m_dateText->SetText(MythDateTimeToString(m_currentStartTime, kDateShort));
+    if (m_longdateText)
+        m_longdateText->SetText(MythDateTimeToString(m_currentStartTime,
+                                                 (kDateFull | kSimplify)));
 }
 
 void GuideGrid::updateChannels(void)
@@ -1520,6 +1522,10 @@ void GuideGrid::updateChannels(void)
 
         item->SetText(chinfo->GetFormatted(m_channelFormat), "buttontext", state);
 
+        InfoMap infomap;
+        chinfo->ToMap(infomap);
+        item->SetTextFromMap(infomap);
+        
         if (chinfo && !chinfo->icon.isEmpty())
         {
             if (chinfo->CacheChannelIcon())
@@ -1566,6 +1572,7 @@ void GuideGrid::updateInfo(void)
         }
     }
 
+    chinfo->ToMap(infoMap);
     pginfo->ToMap(infoMap);
     SetTextFromMap(infoMap);
 
@@ -1594,14 +1601,6 @@ void GuideGrid::toggleGuideListing()
 
     if (m_changroupname)
         m_changroupname->SetText(changrpname);
-    else
-    {
-        if (m_dateText)
-        {
-            m_dateText->SetText(changrpname);
-            QTimer::singleShot(5000, this, SLOT(infoTimeout()));
-        }
-    }
 }
 
 void GuideGrid::generateListings()
@@ -1716,7 +1715,7 @@ void GuideGrid::cursorLeft()
 
     if (!test)
     {
-        scrollLeft();
+        moveLeftRight(kScrollLeft);
         return;
     }
 
@@ -1726,7 +1725,7 @@ void GuideGrid::cursorLeft()
     if (m_currentCol < 0)
     {
         m_currentCol = 0;
-        scrollLeft();
+        moveLeftRight(kScrollLeft);
     }
     else
     {
@@ -1742,7 +1741,7 @@ void GuideGrid::cursorRight()
 
     if (!test)
     {
-        scrollRight();
+        moveLeftRight(kScrollRight);
         return;
     }
 
@@ -1754,7 +1753,7 @@ void GuideGrid::cursorRight()
     if (m_currentCol > m_timeCount - 1)
     {
         m_currentCol = m_timeCount - 1;
-        scrollRight();
+        moveLeftRight(kScrollRight);
     }
     else
     {
@@ -1771,7 +1770,7 @@ void GuideGrid::cursorDown()
     if (m_currentRow > m_channelCount - 1)
     {
         m_currentRow = m_channelCount - 1;
-        scrollDown();
+        moveUpDown(kScrollDown);
     }
     else
     {
@@ -1789,7 +1788,7 @@ void GuideGrid::cursorUp()
     if (m_currentRow < 0)
     {
         m_currentRow = 0;
-        scrollUp();
+        moveUpDown(kScrollUp);
     }
     else
     {
@@ -1800,37 +1799,63 @@ void GuideGrid::cursorUp()
     }
 }
 
-void GuideGrid::scrollLeft()
+void GuideGrid::moveLeftRight(MoveVector movement)
 {
-    QDateTime t = m_currentStartTime;
-
-    t = m_currentStartTime.addSecs(-30 * 60);
-
-    m_currentStartTime = t;
+    switch (movement)
+    {
+        case kScrollLeft :
+            m_currentStartTime = m_currentStartTime.addSecs(-30 * 60);
+            break;
+        case kScrollRight :
+            m_currentStartTime = m_currentStartTime.addSecs(30 * 60);
+            break;
+        case kPageLeft :
+            m_currentStartTime = m_currentStartTime.addSecs(-5 * 60 * m_timeCount);
+            break;
+        case kPageRight :
+            m_currentStartTime = m_currentStartTime.addSecs(5 * 60 * m_timeCount);
+            break;
+        case kDayLeft :
+            m_currentStartTime = m_currentStartTime.addSecs(-24 * 60 * 60);
+            break;
+        case kDayRight :
+            m_currentStartTime = m_currentStartTime.addSecs(24 * 60 * 60);
+            break;
+        default :
+            break;
+    }
 
     fillTimeInfos();
     fillProgramInfos();
     m_guideGrid->SetRedraw();
     updateInfo();
-
-    if (m_dateText)
-        m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
+    updateDateText();
 }
 
-void GuideGrid::scrollRight()
+void GuideGrid::moveUpDown(MoveVector movement)
 {
-    QDateTime t = m_currentStartTime;
-    t = m_currentStartTime.addSecs(30 * 60);
-
-    m_currentStartTime = t;
-
-    fillTimeInfos();
+    switch (movement)
+    {
+        case kScrollDown :
+            setStartChannel(m_currentStartChannel + 1);
+            break;
+        case kScrollUp :
+            setStartChannel((int)(m_currentStartChannel) - 1);
+            break;
+        case kPageDown :
+            setStartChannel(m_currentStartChannel + m_channelCount);
+            break;
+        case kPageUp :
+            setStartChannel((int)(m_currentStartChannel) - m_channelCount);
+            break;
+        default :
+            break;
+    }
+    
     fillProgramInfos();
     m_guideGrid->SetRedraw();
     updateInfo();
-
-    if (m_dateText)
-        m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
+    updateChannels();
 }
 
 void GuideGrid::setStartChannel(int newStartChannel)
@@ -1841,104 +1866,6 @@ void GuideGrid::setStartChannel(int newStartChannel)
         m_currentStartChannel = newStartChannel - GetChannelCount();
     else
         m_currentStartChannel = newStartChannel;
-}
-
-void GuideGrid::scrollDown()
-{
-    setStartChannel(m_currentStartChannel + 1);
-
-    fillProgramInfos();
-    m_guideGrid->SetRedraw();
-    updateInfo();
-    updateChannels();
-}
-
-void GuideGrid::scrollUp()
-{
-    setStartChannel((int)(m_currentStartChannel) - 1);
-
-    fillProgramInfos();
-    m_guideGrid->SetRedraw();
-    updateInfo();
-    updateChannels();
-}
-
-void GuideGrid::dayLeft()
-{
-    m_currentStartTime = m_currentStartTime.addSecs(-24 * 60 * 60);
-
-    fillTimeInfos();
-    fillProgramInfos();
-
-    m_guideGrid->SetRedraw();
-    updateInfo();
-
-    if (m_dateText)
-        m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
-}
-
-void GuideGrid::dayRight()
-{
-    m_currentStartTime = m_currentStartTime.addSecs(24 * 60 * 60);
-
-    fillTimeInfos();
-    fillProgramInfos();
-
-    m_guideGrid->SetRedraw();
-    updateInfo();
-
-    if (m_dateText)
-        m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
-}
-
-void GuideGrid::pageLeft()
-{
-    m_currentStartTime = m_currentStartTime.addSecs(-5 * 60 * m_timeCount);
-
-    fillTimeInfos();
-    fillProgramInfos();
-
-    m_guideGrid->SetRedraw();
-    updateInfo();
-
-    if (m_dateText)
-        m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
-}
-
-void GuideGrid::pageRight()
-{
-    m_currentStartTime = m_currentStartTime.addSecs(5 * 60 * m_timeCount);
-
-    fillTimeInfos();
-    fillProgramInfos();
-
-    m_guideGrid->SetRedraw();
-    updateInfo();
-
-    if (m_dateText)
-        m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
-}
-
-void GuideGrid::pageDown()
-{
-    setStartChannel(m_currentStartChannel + m_channelCount);
-
-    fillProgramInfos();
-
-    m_guideGrid->SetRedraw();
-    updateInfo();
-    updateChannels();
-}
-
-void GuideGrid::pageUp()
-{
-    setStartChannel((int)(m_currentStartChannel) - m_channelCount);
-
-    fillProgramInfos();
-
-    m_guideGrid->SetRedraw();
-    updateInfo();
-    updateChannels();
 }
 
 void GuideGrid::showProgFinder()
@@ -2150,8 +2077,6 @@ void GuideGrid::updateJumpToChannel(void)
 
     if (m_jumpToText)
         m_jumpToText->SetText(txt);
-    else if (m_dateText)
-        m_dateText->SetText(txt);
 }
 
 void GuideGrid::SetJumpToChannel(JumpToChannel *ptr)
@@ -2164,8 +2089,7 @@ void GuideGrid::SetJumpToChannel(JumpToChannel *ptr)
         if (m_jumpToText)
             m_jumpToText->Reset();
 
-        if (m_dateText)
-            m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
+        updateDateText();
     }
 }
 

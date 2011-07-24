@@ -33,8 +33,6 @@ const int kKeepPrebuffer = 2;
 #define NUM_DXVA2_BUFS 30
 
 #define LOC      QString("VideoOutputD3D: ")
-#define LOC_WARN QString("VideoOutputD3D Warning: ")
-#define LOC_ERR  QString("VideoOutputD3D Error: ")
 
 void VideoOutputD3D::GetRenderOptions(render_opts &opts,
                                       QStringList &cpudeints)
@@ -143,7 +141,7 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
 
     QSize cursize = window.GetActualVideoDim();
 
-    VERBOSE(VB_PLAYBACK, LOC +
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("InputChanged from %1: %2x%3 aspect %4 to %5: %6x%7 aspect %9")
             .arg(toString(video_codec_id)).arg(cursize.width())
             .arg(cursize.height()).arg(window.GetVideoAspect())
@@ -175,8 +173,7 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
         return true;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR +
-        QString("Failed to re-initialise video output."));
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to re-initialise video output.");
     errorState = kError_Unknown;
 
     return false;
@@ -196,8 +193,8 @@ bool VideoOutputD3D::SetupContext()
     if (!(m_video && m_video->IsValid()))
         return false;
 
-    VERBOSE(VB_PLAYBACK, LOC +
-            "Direct3D device successfully initialized.");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        "Direct3D device successfully initialized.");
     m_render_valid = true;
     return true;
 }
@@ -215,7 +212,7 @@ bool VideoOutputD3D::Init(int width, int height, float aspect, WId winid,
 
     VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Init with codec: %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Init with codec: %1")
                          .arg(toString(codec_id)));
     SetProfile();
 
@@ -243,10 +240,11 @@ bool VideoOutputD3D::Init(int width, int height, float aspect, WId winid,
         if (m_osd_painter)
         {
             m_osd_painter->SetSwapControl(false);
-            VERBOSE(VB_PLAYBACK, LOC + "Created D3D9 osd painter.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created D3D9 osd painter.");
         }
         else
-            VERBOSE(VB_IMPORTANT, LOC + "Failed to create D3D9 osd painter.");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Failed to create D3D9 osd painter.");
     }
     return success;
 }
@@ -262,8 +260,8 @@ bool VideoOutputD3D::CreateBuffers(void)
     if (codec_is_dxva2(video_codec_id))
     {
         vbuffers.Init(NUM_DXVA2_BUFS, false, 2, 1, 4, 1);
-        VERBOSE(VB_PLAYBACK, LOC + QString("Created %1 empty DXVA2 buffers.")
-                                           .arg(NUM_DXVA2_BUFS));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Created %1 empty DXVA2 buffers.") .arg(NUM_DXVA2_BUFS));
         return true;
     }
 
@@ -289,7 +287,7 @@ bool VideoOutputD3D::InitBuffers(void)
                                         m_decoder->GetSurface(i), FMT_DXVA2);
         }
         if (ok)
-            VERBOSE(VB_PLAYBACK, LOC + "Initialised DXVA2 buffers.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialised DXVA2 buffers.");
         return ok;
     }
 #endif
@@ -319,8 +317,8 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     (void)osd;
     if (IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "PrepareFrame() called while IsErrored is true.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "PrepareFrame() called while IsErrored is true.");
         return;
     }
 
@@ -384,8 +382,8 @@ void VideoOutputD3D::Show(FrameScanType )
 {
     if (IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Show() called while IsErrored is true.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Show() called while IsErrored is true.");
         return;
     }
 
@@ -505,8 +503,8 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
     QMutexLocker locker(&m_lock);
     if (IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "ProcessFrame() called while IsErrored is true.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "ProcessFrame() called while IsErrored is true.");
         return;
     }
 
@@ -514,7 +512,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     if (gpu && frame && frame->codec != FMT_DXVA2)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Wrong frame format");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Wrong frame format");
         return;
     }
 
@@ -607,8 +605,9 @@ void VideoOutputD3D::ShowPIP(VideoFrame        *frame,
     D3D9Image *m_pip = m_pips[pipplayer];
     if (!m_pip)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "Initialise PiP.");
-        m_pip = new D3D9Image(m_render, QSize(pipVideoWidth, pipVideoHeight), true);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP.");
+        m_pip = new D3D9Image(m_render, QSize(pipVideoWidth, pipVideoHeight),
+                              true);
         m_pips[pipplayer] = m_pip;
         if (!m_pip->IsValid())
         {
@@ -621,9 +620,10 @@ void VideoOutputD3D::ShowPIP(VideoFrame        *frame,
     if ((uint)current.width()  != pipVideoWidth ||
         (uint)current.height() != pipVideoHeight)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "Re-initialise PiP.");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
         delete m_pip;
-        m_pip = new D3D9Image(m_render, QSize(pipVideoWidth, pipVideoHeight), true);
+        m_pip = new D3D9Image(m_render, QSize(pipVideoWidth, pipVideoHeight),
+                              true);
         m_pips[pipplayer] = m_pip;
         if (!m_pip->IsValid())
         {

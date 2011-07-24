@@ -20,11 +20,11 @@
 using namespace std;
 
 static int handleMedia(const QString &url, const QString &directory, const QString &filename,
-                       const QString &, const QString &, int, int, int, const QString &)
+                       const QString &, const QString &, int, int, const QString &, int, const QString &)
 {
     if (url.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "MythBrowser: handleMedia got empty url!");
+        LOG(VB_GENERAL, LOG_ERR, "MythBrowser: handleMedia got empty url!");
         return 1;
     }
 

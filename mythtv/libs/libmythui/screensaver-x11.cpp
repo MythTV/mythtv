@@ -1,4 +1,3 @@
-
 // Own header
 #include "screensaver-x11.h"
 
@@ -23,8 +22,6 @@ extern "C" {
 }
 
 #define LOC      QString("ScreenSaverX11Private: ")
-#define LOC_WARN QString("ScreenSaverX11Private, Warning: ")
-#define LOC_ERR  QString("ScreenSaverX11Private, Error: ")
 
 class ScreenSaverX11Private
 {
@@ -54,9 +51,10 @@ class ScreenSaverX11Private
             QObject::connect(m_resetTimer, SIGNAL(timeout()),
                              outer, SLOT(resetSlot()));
             if (m_xscreensaverRunning)
-                LOG(VB_GENERAL, LOG_INFO, "XScreenSaver support enabled");
+                LOG(VB_GENERAL, LOG_INFO, LOC + "XScreenSaver support enabled");
             if (m_gscreensaverRunning)
-                LOG(VB_GENERAL, LOG_INFO, "Gnome screen saver support enabled");
+                LOG(VB_GENERAL, LOG_INFO, LOC +
+                    "Gnome screen saver support enabled");
         }
 
         m_display = OpenMythXDisplay();
@@ -68,7 +66,8 @@ class ScreenSaverX11Private
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to open connection to X11 server");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Failed to open connection to X11 server");
         }
 
         if (m_dpmsaware)
@@ -84,13 +83,13 @@ class ScreenSaverX11Private
             DPMSInfo(m_display->GetDisplay(), &power_level, &m_dpmsenabled);
 
             if (m_dpmsenabled)
-                LOG(VB_GENERAL, LOG_INFO, "DPMS is active.");
+                LOG(VB_GENERAL, LOG_INFO, LOC + "DPMS is active.");
             else
-                LOG(VB_GENERAL, LOG_INFO, "DPMS is disabled.");
+                LOG(VB_GENERAL, LOG_INFO, LOC + "DPMS is disabled.");
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, "DPMS is not supported.");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "DPMS is not supported.");
         }
     }
 
@@ -109,21 +108,21 @@ class ScreenSaverX11Private
 
     void StopTimer(void)
     {
-        LOG(VB_PLAYBACK, LOG_DEBUG, "StopTimer");
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "StopTimer");
         if (m_resetTimer)
             m_resetTimer->stop();
     }
 
     void StartTimer(void)
     {
-        LOG(VB_PLAYBACK, LOG_DEBUG, "StartTimer");
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "StartTimer");
         if (m_resetTimer)
             m_resetTimer->start(m_timeoutInterval);
     }
 
     void ResetTimer(void)
     {
-        LOG(VB_PLAYBACK, LOG_DEBUG, "ResetTimer -- begin");
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "ResetTimer -- begin");
 
         StopTimer();
 
@@ -136,7 +135,7 @@ class ScreenSaverX11Private
         if (m_timeoutInterval > 0)
             StartTimer();
 
-        LOG(VB_PLAYBACK, LOG_DEBUG, "ResetTimer -- end");
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "ResetTimer -- end");
     }
 
     // DPMS
@@ -152,7 +151,7 @@ class ScreenSaverX11Private
             m_dpmsdeactivated = true;
             Status status = DPMSDisable(m_display->GetDisplay());
             m_display->Sync();
-            LOG(VB_GENERAL, LOG_INFO,
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("DPMS Deactivated %1").arg(status));
         }
     }
@@ -164,7 +163,7 @@ class ScreenSaverX11Private
             m_dpmsdeactivated = false;
             Status status = DPMSEnable(m_display->GetDisplay());
             m_display->Sync();
-            LOG(VB_GENERAL, LOG_INFO,
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("DPMS Reactivated %1").arg(status));
         }
     }
@@ -203,7 +202,7 @@ class ScreenSaverX11Private
         {
             if (m_xscreensaverRunning)
             {
-                LOG(VB_PLAYBACK, LOG_INFO,
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     "Calling xscreensaver-command -deactivate");
                 myth_system("xscreensaver-command -deactivate >&- 2>&- &",
                             kMSDontBlockInputDevs |
@@ -212,7 +211,7 @@ class ScreenSaverX11Private
             }
             if (m_gscreensaverRunning)
             {
-                LOG(VB_PLAYBACK, LOG_INFO,
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     "Calling gnome-screensaver-command --poke");
                 myth_system("gnome-screensaver-command --poke >&- 2>&- &",
                             kMSDontBlockInputDevs |

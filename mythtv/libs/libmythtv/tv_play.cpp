@@ -66,8 +66,6 @@ using namespace std;
 #define DEBUG_ACTIONS        0 /**< set to 1 to debug actions           */
 
 #define LOC      QString("TV: ")
-#define LOC_WARN QString("TV Warning: ")
-#define LOC_ERR  QString("TV Error: ")
 
 #define GetPlayer(X,Y) GetPlayerHaveLock(X, Y, __FILE__ , __LINE__)
 #define GetOSDLock(X) GetOSDL(X, __FILE__, __LINE__)
@@ -163,7 +161,8 @@ int TV::ConfiguredTunerCards(void)
     if (query.exec() && query.isActive() && query.size() && query.next())
         count = query.value(0).toInt();
 
-    VERBOSE(VB_RECORD, "ConfiguredTunerCards() = " + QString::number(count));
+    LOG(VB_RECORD, LOG_INFO, 
+        "ConfiguredTunerCards() = " + QString::number(count));
 
     return count;
 }
@@ -203,7 +202,7 @@ static void multi_lock(QMutex *mutex0, ...)
  */
 bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "StartTV() -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV() -- begin");
     bool startInGuide = flags & kStartTVInGuide;
     bool inPlaylist = flags & kStartTVInPlayList;
     bool initByNetworkCommand = flags & kStartTVByNetworkCommand;
@@ -224,7 +223,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     // Initialize TV
     if (!tv->Init())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed initializing TV");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed initializing TV");
         delete tv;
         delete curProgram;
         return false;
@@ -250,7 +249,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     {
         if (curProgram)
         {
-            VERBOSE(VB_PLAYBACK, LOC + "tv->Playback() -- begin");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "tv->Playback() -- begin");
             if (!tv->Playback(*curProgram))
             {
                 quitAll = true;
@@ -261,11 +260,11 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
                 SendMythSystemPlayEvent("PLAY_STARTED", curProgram);
             }
 
-            VERBOSE(VB_PLAYBACK, LOC + "tv->Playback() -- end");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "tv->Playback() -- end");
         }
         else if (RemoteGetFreeRecorderCount())
         {
-            VERBOSE(VB_PLAYBACK, LOC + "tv->LiveTV() -- begin");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "tv->LiveTV() -- begin");
             if (!tv->LiveTV(showDialogs))
             {
                 tv->SetExitPlayer(true, true);
@@ -280,14 +279,14 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
             if (!quitAll && (startInGuide || tv->StartLiveTVInGuide()))
                 tv->DoEditSchedule();
 
-            VERBOSE(VB_PLAYBACK, LOC + "tv->LiveTV() -- end");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "tv->LiveTV() -- end");
         }
         else
         {
             if (!ConfiguredTunerCards())
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "No tuners configured");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "No tuners configured");
             else
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "No tuners free for live tv");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "No tuners free for live tv");
             quitAll = true;
             continue;
         }
@@ -296,9 +295,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         tv->setUnderNetworkControl(initByNetworkCommand);
 
         // Process Events
-        VERBOSE(VB_GENERAL, LOC + "Entering main playback loop.");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Entering main playback loop.");
         tv->PlaybackLoop();
-        VERBOSE(VB_GENERAL, LOC + "Exiting main playback loop.");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Exiting main playback loop.");
 
         if (tv->getJumpToProgram())
         {
@@ -327,9 +326,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         tv->ReturnPlayerLock(mctx);
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + "StartTV -- process events 2 begin");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV -- process events 2 begin");
     qApp->processEvents();
-    VERBOSE(VB_PLAYBACK, LOC + "StartTV -- process events 2 end");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV -- process events 2 end");
 
     // check if the show has reached the end.
     if (tvrec && tv->getEndOfRecording())
@@ -378,7 +377,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
     sendPlaybackEnd();
 
-    VERBOSE(VB_PLAYBACK, LOC + "StartTV -- end");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV -- end");
 
     return playCompleted;
 }
@@ -859,7 +858,7 @@ TV::TV(void)
       errorRecoveryTimerId(0),      exitPlayerTimerId(0)
 {
     memset(&ddMapLoader, 0, sizeof(pthread_t));
-    VERBOSE(VB_GENERAL, LOC + "Creating TV object");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Creating TV object");
     ctorTime.start();
 
     setObjectName("TV");
@@ -878,7 +877,7 @@ TV::TV(void)
 
     InitFromDB();
 
-    VERBOSE(VB_PLAYBACK, LOC + "Finished creating TV object");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Finished creating TV object");
 }
 
 void TV::InitFromDB(void)
@@ -1006,7 +1005,7 @@ void TV::InitFromDB(void)
  */
 bool TV::Init(bool createWindow)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "Init -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Init -- begin");
 
     if (createWindow)
     {
@@ -1080,7 +1079,7 @@ bool TV::Init(bool createWindow)
         if (myWindow->Create())
         {
             mainStack->AddScreen(myWindow, false);
-            VERBOSE(VB_GENERAL, LOC + "Created TvPlayWindow.");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Created TvPlayWindow.");
         }
         else
         {
@@ -1126,13 +1125,13 @@ bool TV::Init(bool createWindow)
     lcdTimerId           = StartTimer(1, __LINE__);
     speedChangeTimerId   = StartTimer(kSpeedChangeCheckFrequency, __LINE__);
 
-    VERBOSE(VB_PLAYBACK, LOC + "Init -- end");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Init -- end");
     return true;
 }
 
 TV::~TV(void)
 {
-    VERBOSE(VB_PLAYBACK, "TV::~TV() -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, "TV::~TV() -- begin");
 
     if (browsehelper)
         browsehelper->Stop();
@@ -1148,7 +1147,7 @@ TV::~TV(void)
         myWindow = NULL;
     }
 
-    VERBOSE(VB_PLAYBACK, "TV::~TV() -- lock");
+    LOG(VB_PLAYBACK, LOG_INFO, "TV::~TV() -- lock");
 
     // restore window to gui size and position
     MythMainWindow* mwnd = GetMythMainWindow();
@@ -1197,7 +1196,7 @@ TV::~TV(void)
     }
     ReturnPlayerLock(mctx);
 
-    VERBOSE(VB_PLAYBACK, "TV::~TV() -- end");
+    LOG(VB_PLAYBACK, LOG_INFO, "TV::~TV() -- end");
 }
 
 /**
@@ -1307,7 +1306,7 @@ bool TV::LiveTV(bool showDialogs)
         if (db_idle_timeout > 0)
         {
             idleTimerId = StartTimer(db_idle_timeout, __LINE__);
-            VERBOSE(VB_GENERAL, QString("Using Idle Timer. %1 minutes")
+            LOG(VB_GENERAL, LOG_INFO, QString("Using Idle Timer. %1 minutes")
                     .arg(db_idle_timeout*(1.0f/60000.0f)));
         }
 
@@ -1376,7 +1375,9 @@ void TV::AskAllowRecording(PlayerContext *ctx,
                            const QStringList &msg, int timeuntil,
                            bool hasrec, bool haslater)
 {
-    //VERBOSE(VB_IMPORTANT, LOC + "AskAllowRecording");
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "AskAllowRecording");
+#endif
     if (!StateIsLiveTV(GetState(ctx)))
        return;
 
@@ -1392,16 +1393,18 @@ void TV::AskAllowRecording(PlayerContext *ctx,
     if (timeuntil > 0)
     {
         // add program to list
-        //VERBOSE(VB_IMPORTANT, LOC + "AskAllowRecording -- " +
-        //        QString("adding '%1'").arg(info->title));
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "AskAllowRecording -- " +
+            QString("adding '%1'").arg(info->title));
+#endif
         QDateTime expiry = QDateTime::currentDateTime().addSecs(timeuntil);
         askAllowPrograms[key] = AskProgramInfo(expiry, hasrec, haslater, info);
     }
     else
     {
         // remove program from list
-        VERBOSE(VB_IMPORTANT, LOC + "AskAllowRecording -- " +
-                QString("removing '%1'").arg(info->GetTitle()));
+        LOG(VB_GENERAL, LOG_INFO, LOC + "AskAllowRecording -- " +
+            QString("removing '%1'").arg(info->GetTitle()));
         QMap<QString,AskProgramInfo>::iterator it = askAllowPrograms.find(key);
         if (it != askAllowPrograms.end())
         {
@@ -1443,8 +1446,10 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         next = it; next++;
         if ((*it).expiry <= timeNow)
         {
-            //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- " +
-            //        QString("removing '%1'").arg((*it).info->title));
+#if 0
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + "UpdateOSDAskAllowDialog -- " +
+                QString("removing '%1'").arg((*it).info->title));
+#endif
             delete (*it).info;
             askAllowPrograms.erase(it);
         }
@@ -1524,15 +1529,17 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
 
     if (conflict_count == 0)
     {
-        VERBOSE(VB_GENERAL, LOC + "The scheduler wants to make "
-                "a non-conflicting recording.");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "The scheduler wants to make "
+                                        "a non-conflicting recording.");
         // TODO take down mplexid and inform user of problem
         // on channel changes.
     }
     else if (conflict_count == 1 && ((*it).info->GetCardID() == cardid))
     {
-        //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- " +
-        //        "kAskAllowOneRec");
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "UpdateOSDAskAllowDialog -- " +
+            "kAskAllowOneRec");
+#endif
 
         it = askAllowPrograms.begin();
 
@@ -1651,7 +1658,7 @@ void TV::HandleOSDAskAllow(PlayerContext *ctx, QString action)
 
     if (!askAllowLock.tryLock())
     {
-        VERBOSE(VB_IMPORTANT, "allowrecordingbox : askAllowLock is locked");
+        LOG(VB_GENERAL, LOG_ERR, "allowrecordingbox : askAllowLock is locked");
         return;
     }
 
@@ -1769,14 +1776,13 @@ static QString tv_i18n(const QString &msg)
  */
 void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 {
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("HandleStateChange(%1) -- begin")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HandleStateChange(%1) -- begin")
             .arg(find_player_index(ctx)));
 
     if (ctx->IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleStateChange(): "
-                "Called after fatal error detected.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "HandleStateChange(): Called after fatal error detected.");
         return;
     }
 
@@ -1786,8 +1792,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     TVState nextState = ctx->GetState();
     if (ctx->nextState.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "HandleStateChange() Warning, "
-                "called with no state to change to.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "HandleStateChange() Warning, called with no state to change to.");
         ctx->UnlockState();
         return;
     }
@@ -1795,13 +1801,14 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     TVState ctxState = ctx->GetState();
     TVState desiredNextState = ctx->DequeueNextState();
 
-    VERBOSE(VB_GENERAL, LOC + QString("Attempting to change from %1 to %2")
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Attempting to change from %1 to %2")
             .arg(StateToString(nextState))
             .arg(StateToString(desiredNextState)));
 
     if (desiredNextState == kState_Error)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleStateChange(): "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "HandleStateChange(): "
                 "Attempting to set to an error state!");
         SetErrored(ctx);
         ctx->UnlockState();
@@ -1862,18 +1869,18 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                 chanid = 0;
         }
 
-        VERBOSE(VB_IMPORTANT, LOC + "Spawning LiveTV Recorder -- begin");
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + "Spawning LiveTV Recorder -- begin");
 
         if (chanid && !channum.isEmpty())
             ctx->recorder->SpawnLiveTV(ctx->tvchain->GetID(), false, channum);
         else
             ctx->recorder->SpawnLiveTV(ctx->tvchain->GetID(), false, "");
 
-        VERBOSE(VB_IMPORTANT, LOC + "Spawning LiveTV Recorder -- end");
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + "Spawning LiveTV Recorder -- end");
 
         if (!ctx->ReloadTVChain())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                     "HandleStateChange(): LiveTV not successfully started");
             RestoreScreenSaver(ctx);
             ctx->SetRecorder(NULL);
@@ -1888,7 +1895,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
             bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
 
-            VERBOSE(VB_IMPORTANT, LOC + QString("playbackURL(%1) cardtype(%2)")
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("playbackURL(%1) cardtype(%2)")
                     .arg(playbackURL).arg(ctx->tvchain->GetCardType(-1)));
 
             ctx->SetRingBuffer(
@@ -1906,8 +1914,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         }
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "LiveTV not successfully started");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "LiveTV not successfully started");
             RestoreScreenSaver(ctx);
             ctx->SetRecorder(NULL);
             SetErrored(ctx);
@@ -1965,8 +1972,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                 if (!ctx->recorder ||
                     !ctx->recorder->IsValidRecorder())
                 {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't find "
-                            "recorder for in-progress recording");
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        "Couldn't find recorder for in-progress recording");
                     desiredNextState = kState_WatchingPreRecorded;
                     ctx->SetRecorder(NULL);
                 }
@@ -2025,14 +2032,14 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     // Print state changed message...
     if (!changed)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Unknown state transition: %1 to %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Unknown state transition: %1 to %2")
                 .arg(StateToString(ctx->GetState()))
                 .arg(StateToString(desiredNextState)));
     }
     else if (ctx->GetState() != nextState)
     {
-        VERBOSE(VB_GENERAL, LOC + QString("Changing from %1 to %2")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Changing from %1 to %2")
                 .arg(StateToString(ctx->GetState()))
                 .arg(StateToString(nextState)));
     }
@@ -2046,13 +2053,13 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     {
         if (StateIsLiveTV(ctx->GetState()))
         {
-            VERBOSE(VB_IMPORTANT, LOC + "State is LiveTV & mctx == ctx");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "State is LiveTV & mctx == ctx");
             UpdateOSDInput(ctx);
-            VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDInput done");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "UpdateOSDInput done");
             UpdateLCD();
-            VERBOSE(VB_IMPORTANT, LOC + "UpdateLCD done");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "UpdateLCD done");
             ITVRestart(ctx, true);
-            VERBOSE(VB_IMPORTANT, LOC + "ITVRestart done");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "ITVRestart done");
         }
         else if (StateIsPlaying(ctx->GetState()) && lastState == kState_None)
         {
@@ -2125,11 +2132,11 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         if (myWindow)
             myWindow->DeleteAllChildren();
 
-        VERBOSE(VB_GENERAL, LOC + "Main UI disabled.");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Main UI disabled.");
     }
 
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("HandleStateChange(%1) -- end")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("HandleStateChange(%1) -- end")
             .arg(find_player_index(ctx)));
 }
 #undef TRANSITION
@@ -2149,7 +2156,7 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
     t.start();
     bool recording = false, ok = true;
     if (!rec) {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid Remote Encoder");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid Remote Encoder");
         SetErrored(ctx);
         return false;
     }
@@ -2158,7 +2165,7 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
     {
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "StartRecorder() -- "
+            LOG(VB_GENERAL, LOG_ERR, LOC + "StartRecorder() -- "
                     "lost contact with backend");
             SetErrored(ctx);
             return false;
@@ -2169,13 +2176,14 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
     if (!recording || exitPlayerTimerId)
     {
         if (!exitPlayerTimerId)
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "StartRecorder() -- "
+            LOG(VB_GENERAL, LOG_ERR, LOC + "StartRecorder() -- "
                     "timed out waiting for recorder to start");
         return false;
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("StartRecorder(): took %1"
-            " ms to start recorder.").arg(t.elapsed()));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("StartRecorder(): took %1 ms to start recorder.")
+            .arg(t.elapsed()));
 
     return true;
 }
@@ -2196,8 +2204,8 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
 void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
                    bool stopRingBuffer, bool stopPlayer, bool stopRecorder)
 {
-    VERBOSE(VB_PLAYBACK,
-            LOC + QString("StopStuff() for player ctx %1 -- begin")
+    LOG(VB_PLAYBACK, LOG_INFO,
+        LOC + QString("StopStuff() for player ctx %1 -- begin")
             .arg(find_player_index(ctx)));
 
     SetActive(mctx, 0, false);
@@ -2212,7 +2220,7 @@ void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
 
     if (stopRingBuffer)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "StopStuff(): stopping ring buffer");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "StopStuff(): stopping ring buffer");
         if (ctx->buffer)
         {
             ctx->buffer->StopReads();
@@ -2223,7 +2231,7 @@ void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
 
     if (stopPlayer)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "StopStuff(): stopping player");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "StopStuff(): stopping player");
         if (ctx == mctx)
         {
             for (uint i = 1; mctx && (i < player.size()); i++)
@@ -2233,12 +2241,12 @@ void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
 
     if (stopRecorder)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "StopStuff(): stopping recorder");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "StopStuff(): stopping recorder");
         if (ctx->recorder)
             ctx->recorder->StopLiveTV();
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + "StopStuff() -- end");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "StopStuff() -- end");
 }
 
 void TV::TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx)
@@ -2250,11 +2258,11 @@ void TV::TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx)
 
     if (!mctx || !ctx || ctx_index < 0)
     {
-        VERBOSE(VB_IMPORTANT, loc + "-- error");
+        LOG(VB_GENERAL, LOG_ERR, loc + "-- error");
         return;
     }
 
-    VERBOSE(VB_PLAYBACK, loc);
+    LOG(VB_PLAYBACK, LOG_INFO, loc);
 
     if (mctx != ctx)
     {
@@ -2476,8 +2484,8 @@ void TV::timerEvent(QTimerEvent *te)
                                         .arg(lastProgram->GetTitle()));
                 lastProgramStringList.clear();
                 SetLastProgram(NULL);
-                VERBOSE(VB_PLAYBACK, LOC_ERR +
-                            "Last Program File does not exist");
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    "Last Program File does not exist");
                 jumpToProgram = false;
             }
             else
@@ -2672,7 +2680,7 @@ void TV::timerEvent(QTimerEvent *te)
 
             if (mctx->IsPlayerDecoderErrored())
             {
-                VERBOSE(VB_IMPORTANT, LOC +
+                LOG(VB_GENERAL, LOG_EMERG, LOC +
                     QString("Serious hardware decoder error detected. "
                             "Disabling hardware decoders."));
                 noHardwareDecoders = true;
@@ -2821,8 +2829,8 @@ int  TV::StartTimer(int interval, int line)
     int x = QObject::startTimer(interval);
     if (!x)
     {
-        VERBOSE(VB_IMPORTANT,
-                LOC_ERR + QString("Failed to start timer on line %1 of %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to start timer on line %1 of %2")
                 .arg(line).arg(__FILE__));
     }
     return x;
@@ -2860,7 +2868,7 @@ void TV::SetErrored(PlayerContext *ctx)
 void TV::PrepToSwitchToRecordedProgram(PlayerContext *ctx,
                                        const ProgramInfo &p)
 {
-    VERBOSE(VB_GENERAL, LOC + QString("Switching to program: %1")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Switching to program: %1")
             .arg(p.toString(ProgramInfo::kTitleSubtitle)));
     SetLastProgram(&p);
     PrepareToExitPlayer(ctx,__LINE__);
@@ -3061,7 +3069,8 @@ void TV::HandlePseudoLiveTVTimerEvent(void)
             continue;
         }
 
-        VERBOSE(VB_PLAYBACK, QString("REC_PROGRAM -- channel change %1").arg(i));
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("REC_PROGRAM -- channel change %1").arg(i));
 
         uint        chanid  = ctx->pseudoLiveTVRec->GetChanID();
         QString     channum = ctx->pseudoLiveTVRec->GetChanNum();
@@ -3313,7 +3322,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 {
     bool ignoreKeys = actx->IsPlayerChangingBuffers();
 #if DEBUG_ACTIONS
-    VERBOSE(VB_IMPORTANT, LOC + QString("ProcessKeypress() ignoreKeys: %1")
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("ProcessKeypress() ignoreKeys: %1")
             .arg(ignoreKeys));
 #endif // DEBUG_ACTIONS
 
@@ -3482,7 +3491,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 
 #if DEBUG_ACTIONS
     for (uint i = 0; i < actions.size(); ++i)
-        VERBOSE(VB_IMPORTANT, LOC + QString("handled(%1) actions[%2](%3)")
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("handled(%1) actions[%2](%3)")
                 .arg(handled).arg(i).arg(actions[i]));
 #endif // DEBUG_ACTIONS
 
@@ -4259,13 +4268,13 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
 {
     bool ignoreKeys = ctx->IsPlayerChangingBuffers();
 #ifdef DEBUG_ACTIONS
-    VERBOSE(VB_IMPORTANT, LOC + "ProcessNetworkControlCommand(" +
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "ProcessNetworkControlCommand(" +
             QString("%1) ignoreKeys: %2").arg(command).arg(ignoreKeys));
 #endif
 
     if (ignoreKeys)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Ignoring network control command"
                 "\n\t\t\tbecause ignoreKeys is set");
         return;
@@ -4274,7 +4283,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     QStringList tokens = command.split(" ", QString::SkipEmptyParts);
     if (tokens.size() < 2)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Not enough tokens"
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Not enough tokens"
                 "in network control command" + "\n\t\t\t" +
                 QString("'%1'").arg(command));
         return;
@@ -4288,9 +4297,9 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
 
     if (dlg)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Ignoring network "
-                "control command\n\t\t\t" +
-                QString("because dialog is waiting for a response"));
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Ignoring network control command\n\t\t\t" +
+            QString("because dialog is waiting for a response"));
         return;
     }
 
@@ -4413,9 +4422,9 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT, QString("Couldn't find %1 speed"
-                                                  "Setting Speed to"
-                                                  "1x").arg(searchSpeed));
+                    LOG(VB_GENERAL, LOG_WARNING,
+                        QString("Couldn't find %1 speed. Setting Speed to 1x")
+                            .arg(searchSpeed));
 
                     ctx->ff_rew_state = 0;
                     SetFFRew(ctx, kInitFFRWSpeed);
@@ -4423,8 +4432,8 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             }
             else
             {
-                VERBOSE(VB_IMPORTANT,
-                        QString("Found an unknown speed of %1").arg(tokens[2]));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Found an unknown speed of %1").arg(tokens[2]));
             }
         }
     }
@@ -4472,7 +4481,8 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         {
             QStringList matches = re.capturedTexts();
 
-            VERBOSE(VB_IMPORTANT, QString("Set Volume to %1%").arg(matches[1]));
+            LOG(VB_GENERAL, LOG_INFO, QString("Set Volume to %1%")
+                    .arg(matches[1]));
 
             bool ok = false;
 
@@ -4616,11 +4626,11 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
  */
 bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "CreatePBP() -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "CreatePBP() -- begin");
 
     if (player.size() > 1)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "CreatePBP() -- end : "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "CreatePBP() -- end : "
                 "only allowed when player.size() == 1");
         return false;
     }
@@ -4628,7 +4638,7 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
     PlayerContext *mctx = GetPlayer(ctx, 0);
     if (!IsPBPSupported(mctx))
     {
-        VERBOSE(VB_IMPORTANT, LOC + "CreatePBP() -- end : "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "CreatePBP() -- end : "
                 "PBP not supported by video method.");
         return false;
     }
@@ -4685,7 +4695,7 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to restart new main context");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to restart new main context");
         // Make putative PBP context the main context
         swap(player[0],player[1]);
         player[0]->SetPIPState(kPIPOff);
@@ -4693,7 +4703,8 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
         ForceNextStateNone(mctx);
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("CreatePBP() -- end : %1").arg(ok));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("CreatePBP() -- end : %1").arg(ok));
     return ok;
 }
 
@@ -4707,18 +4718,18 @@ bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
     if (!mctx)
         return false;
 
-    VERBOSE(VB_PLAYBACK, LOC + "CreatePIP -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "CreatePIP -- begin");
 
     if (mctx->IsPBP())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "CreatePIP called, but we're in PBP mode already, ignoring.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "CreatePIP called, but we're in PBP mode already, ignoring.");
         return false;
     }
 
     if (!IsPIPSupported(mctx))
     {
-        VERBOSE(VB_IMPORTANT, LOC + "PiP not supported by video method.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "PiP not supported by video method.");
         return false;
     }
 
@@ -4763,11 +4774,11 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
 {
     bool wantPiP = ctx->IsPIP();
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("StartPlayer(%1, %2, %3) -- begin")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("StartPlayer(%1, %2, %3) -- begin")
             .arg(find_player_index(ctx)).arg(StateToString(desiredState))
             .arg((wantPiP) ? "PiP" : "main"));
 
-    VERBOSE(VB_PLAYBACK, LOC +
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Elapsed time since TV constructor was called: %1 ms")
             .arg(ctorTime.elapsed()));
 
@@ -4777,12 +4788,12 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
             ctx->HasPlayer() && PIPAddPlayer(mctx, ctx))
         {
             ScheduleStateChange(ctx);
-            VERBOSE(VB_IMPORTANT, "StartPlayer PiP -- end : ok");
+            LOG(VB_GENERAL, LOG_INFO, "StartPlayer PiP -- end : ok");
             return true;
         }
 
         ForceNextStateNone(ctx);
-        VERBOSE(VB_IMPORTANT, "StartPlayer PiP -- end : !ok");
+        LOG(VB_GENERAL, LOG_INFO, "StartPlayer PiP -- end : !ok");
         return false;
     }
 
@@ -4802,11 +4813,12 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
 
     if (ok)
     {
-        VERBOSE(VB_GENERAL, LOC + QString("Created player."));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Created player."));
         SetSpeedChangeTimer(25, __LINE__);
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("StartPlayer(%1, %2, %3) -- end %4")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("StartPlayer(%1, %2, %3) -- end %4")
             .arg(find_player_index(ctx)).arg(StateToString(desiredState))
             .arg((wantPiP) ? "PiP" : "main").arg((ok) ? "ok" : "error"));
 
@@ -4850,8 +4862,8 @@ bool TV::PIPAddPlayer(PlayerContext *mctx, PlayerContext *pipctx)
     else
         pipctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
-    VERBOSE(VB_IMPORTANT,
-            QString("AddPIPPlayer null: %1 IsPIP: %2 addCond: %3 ok: %4")
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("AddPIPPlayer null: %1 IsPIP: %2 addCond: %3 ok: %4")
             .arg(pipctx->player->UsingNullVideo())
             .arg(pipctx->IsPIP()).arg(addCondition).arg(ok));
 
@@ -4871,7 +4883,7 @@ bool TV::PIPRemovePlayer(PlayerContext *mctx, PlayerContext *pipctx)
     mctx->deletePlayerLock.unlock();
     pipctx->deletePlayerLock.unlock();
 
-    VERBOSE(VB_IMPORTANT, QString("PIPRemovePlayer ok: %1").arg(ok));
+    LOG(VB_GENERAL, LOG_INFO, QString("PIPRemovePlayer ok: %1").arg(ok));
 
     return ok;
 }
@@ -4881,8 +4893,8 @@ void TV::PxPToggleView(PlayerContext *actx, bool wantPBP)
 {
     if (wantPBP && !IsPBPSupported(actx))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "PxPToggleView() -- end: PBP not supported by video method.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "PxPToggleView() -- end: PBP not supported by video method.");
         return;
     }
 
@@ -4917,7 +4929,7 @@ void TV::PxPCreateView(PlayerContext *actx, bool wantPBP)
 
     if (!err_msg.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + err_msg);
+        LOG(VB_GENERAL, LOG_ERR, LOC + err_msg);
         SetOSDMessage(actx, err_msg);
         return;
     }
@@ -4939,7 +4951,7 @@ void TV::PxPCreateView(PlayerContext *actx, bool wantPBP)
 /// \brief stop PIP/PBP
 void TV::PxPTeardownView(PlayerContext *actx)
 {
-    VERBOSE(VB_IMPORTANT, "PxPTeardownView()");
+    LOG(VB_GENERAL, LOG_INFO, "PxPTeardownView()");
 
     QString msg;
     PlayerContext *mctx = GetPlayer(actx, 0);
@@ -4982,30 +4994,29 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
     //      check for support in new renderer
     if (wantPBP && !IsPBPSupported(mctx))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "PxPToggleType() -- end: PBP not supported by video method.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "PxPToggleType() -- end: PBP not supported by video method.");
         return;
     }
 
 
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("PxPToggleType() converting from %1 to %2 -- begin")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("PxPToggleType() converting from %1 to %2 -- begin")
             .arg(before).arg(after));
 
     if (mctx->IsPBP() == wantPBP)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "PxPToggleType() -- end: already in desired mode");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "PxPToggleType() -- end: already in desired mode");
         return;
     }
 
     uint max_cnt = min(kMaxPBPCount, kMaxPIPCount+1);
     if (player.size() > max_cnt)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("PxPToggleType() -- end: "
-                        "# player contexts must be %1 or less, "
-                        "but it is currently %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("PxPToggleType() -- end: # player contexts must be %1 or "
+                    "less, but it is currently %1")
                 .arg(max_cnt).arg(player.size()));
 
         QString err_msg = tr("Too many views to switch");
@@ -5020,7 +5031,7 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
         PlayerContext *ctx = GetPlayer(mctx, i);
         if (!ctx->IsPlayerPlaying())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "PxPToggleType() -- end: " +
+            LOG(VB_GENERAL, LOG_ERR, LOC + "PxPToggleType() -- end: " +
                     QString("player #%1 is not active, exiting without "
                             "doing anything to avoid danger").arg(i));
             return;
@@ -5052,8 +5063,8 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
 
     RestartAllPlayers(mctx, pos, mctx_mute);
 
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("PxPToggleType() converting from %1 to %2 -- end")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("PxPToggleType() converting from %1 to %2 -- end")
             .arg(before).arg(after));
 }
 
@@ -5062,7 +5073,7 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
  */
 bool TV::ResizePIPWindow(PlayerContext *ctx)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "ResizePIPWindow -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "ResizePIPWindow -- begin");
     PlayerContext *mctx = GetPlayer(ctx, 0);
     if (mctx->HasPlayer() && ctx->HasPlayer())
     {
@@ -5072,7 +5083,7 @@ bool TV::ResizePIPWindow(PlayerContext *ctx)
         if (mctx->player && ctx->player)
         {
             PIPLocation loc = mctx->player->GetNextPIPLocation();
-            VERBOSE(VB_PLAYBACK, LOC + QString("ResizePIPWindow -- loc %1")
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ResizePIPWindow -- loc %1")
                     .arg(loc));
             if (loc != kPIP_END)
             {
@@ -5086,11 +5097,11 @@ bool TV::ResizePIPWindow(PlayerContext *ctx)
         if (rect.isValid())
         {
             ctx->ResizePIPWindow(rect);
-            VERBOSE(VB_PLAYBACK, LOC + "ResizePIPWindow -- end : ok");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "ResizePIPWindow -- end : ok");
             return true;
         }
     }
-    VERBOSE(VB_PLAYBACK, LOC + "ResizePIPWindow -- end : !ok");
+    LOG(VB_PLAYBACK, LOG_ERR, LOC + "ResizePIPWindow -- end : !ok");
     return false;
 }
 
@@ -5155,12 +5166,13 @@ vector<long long> TV::TeardownAllPlayers(PlayerContext *lctx)
  */
 void TV::PBPRestartMainPlayer(PlayerContext *mctx)
 {
-    VERBOSE(VB_PLAYBACK, LOC  + "PBPRestartMainPlayer -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC  + "PBPRestartMainPlayer -- begin");
 
     if (!mctx->IsPlayerPlaying() ||
         mctx->GetPIPState() != kPBPLeft || exitPlayerTimerId)
     {
-        VERBOSE(VB_PLAYBACK, LOC  + "PBPRestartMainPlayer -- end !ok !valid");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            "PBPRestartMainPlayer -- end !ok !valid");
         return;
     }
 
@@ -5180,12 +5192,12 @@ void TV::PBPRestartMainPlayer(PlayerContext *mctx)
             mctx->player->JumpToFrame(mctx_frame);
         mctx->UnlockDeletePlayer(__FILE__, __LINE__);
         SetSpeedChangeTimer(25, __LINE__);
-        VERBOSE(VB_PLAYBACK, LOC + "PBPRestartMainPlayer -- end ok");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "PBPRestartMainPlayer -- end ok");
         return;
     }
 
     ForceNextStateNone(mctx);
-    VERBOSE(VB_PLAYBACK, LOC +
+    LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "PBPRestartMainPlayer -- end !ok Player did not restart");
 }
 
@@ -5219,7 +5231,7 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, loc +
+        LOG(VB_GENERAL, LOG_ERR, loc +
                 "Failed to restart new main context (was pip context)");
         ForceNextStateNone(mctx);
         return;
@@ -5248,8 +5260,8 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
         }
         else
         { // TODO print OSD informing user of Swap failure ?
-            VERBOSE(VB_IMPORTANT, loc +
-                    "Failed to restart new pip context (was main context)");
+            LOG(VB_GENERAL, LOG_ERR, loc +
+                "Failed to restart new pip context (was main context)");
             ForceNextStateNone(pipctx);
         }
     }
@@ -5267,10 +5279,10 @@ void TV::PxPSwap(PlayerContext *mctx, PlayerContext *pipctx)
     if (!mctx || !pipctx)
         return;
 
-    VERBOSE(VB_PLAYBACK, LOC + "PxPSwap -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "PxPSwap -- begin");
     if (mctx == pipctx)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "PxPSwap -- need two contexts");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "PxPSwap -- need two contexts");
         return;
     }
 
@@ -5282,8 +5294,7 @@ void TV::PxPSwap(PlayerContext *mctx, PlayerContext *pipctx)
     {
         mctx->deletePlayerLock.unlock();
         pipctx->deletePlayerLock.unlock();
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "PxPSwap -- a player] is not playing");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "PxPSwap -- a player is not playing");
         return;
     }
 
@@ -5305,7 +5316,7 @@ void TV::PxPSwap(PlayerContext *mctx, PlayerContext *pipctx)
 
     SetActive(mctx, playerActive, false);
 
-    VERBOSE(VB_PLAYBACK, LOC + "PxPSwap -- end");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "PxPSwap -- end");
 }
 
 void TV::RestartMainPlayer(PlayerContext *mctx)
@@ -5313,7 +5324,7 @@ void TV::RestartMainPlayer(PlayerContext *mctx)
     if (!mctx)
         return;
 
-    VERBOSE(VB_PLAYBACK, LOC + "Restart main player -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Restart main player -- begin");
     lockTimerOn = false;
 
     mctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -5335,7 +5346,7 @@ void TV::RestartMainPlayer(PlayerContext *mctx)
     RestartAllPlayers(mctx, pos, mctx_mute);
     SetActive(mctx, playerActive, false);
 
-    VERBOSE(VB_PLAYBACK, LOC + "Restart main player -- end");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Restart main player -- end");
 }
 
 void TV::DoPlay(PlayerContext *ctx)
@@ -5460,7 +5471,8 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
     if (time > -0.001f && time < +0.001f)
         return false;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("DoPlayerSeek (%1 seconds)").arg(time));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("DoPlayerSeek (%1 seconds)").arg(time));
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (!ctx->player)
@@ -6089,7 +6101,7 @@ void TV::SwitchInputs(PlayerContext *ctx, uint inputid)
         return;
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("SwitchInputd(%1)").arg(inputid));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchInputd(%1)").arg(inputid));
 
     if ((uint)ctx->GetCardID() == CardUtil::GetCardID(inputid))
     {
@@ -6104,8 +6116,7 @@ void TV::SwitchInputs(PlayerContext *ctx, uint inputid)
 void TV::SwitchCards(PlayerContext *ctx,
                      uint chanid, QString channum, uint inputid)
 {
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("SwitchCards(%1,'%2',%3)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchCards(%1,'%2',%3)")
             .arg(chanid).arg(channum).arg(inputid));
 
     RemoteEncoder *testrec = NULL;
@@ -6159,11 +6170,11 @@ void TV::SwitchCards(PlayerContext *ctx,
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    QString("SwitchCards(%1,'%2',%3)")
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("SwitchCards(%1,'%2',%3)")
                     .arg(chanid).arg(channum).arg(inputid) +
-                    "\n\t\t\tWe should have been able to set a start "
-                    "channel or input but failed to do so.");
+                "\n\t\t\tWe should have been able to set a start "
+                "channel or input but failed to do so.");
         }
     }
 
@@ -6208,8 +6219,7 @@ void TV::SwitchCards(PlayerContext *ctx,
 
         if (!ctx->ReloadTVChain())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "LiveTV not successfully restarted");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "LiveTV not successfully restarted");
             RestoreScreenSaver(ctx);
             ctx->SetRecorder(NULL);
             SetErrored(ctx);
@@ -6253,8 +6263,7 @@ void TV::SwitchCards(PlayerContext *ctx,
 
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "LiveTV not successfully started");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "LiveTV not successfully started");
             RestoreScreenSaver(ctx);
             ctx->SetRecorder(NULL);
             SetErrored(ctx);
@@ -6268,7 +6277,7 @@ void TV::SwitchCards(PlayerContext *ctx,
     }
     else
     {
-        VERBOSE(VB_GENERAL, LOC + "No recorder to switch to...");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No recorder to switch to...");
         delete testrec;
     }
 
@@ -6336,7 +6345,8 @@ void TV::ToggleChannelFavorite(PlayerContext *ctx)
 {
     // TOGGLEFAV was broken in [20523], this just prints something
     // out so as not to cause further confusion. See #8948.
-    VERBOSE(VB_IMPORTANT, "TV::ToggleChannelFavorite() -- currently disabled");
+    LOG(VB_GENERAL, LOG_ERR,
+        "TV::ToggleChannelFavorite() -- currently disabled");
 }
 
 void TV::ToggleChannelFavorite(PlayerContext *ctx, QString changroup_name)
@@ -6486,8 +6496,8 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
     }
 
 #if DEBUG_CHANNEL_PREFIX
-    VERBOSE(VB_IMPORTANT, QString("valid_pref(%1) cardid(%2) chan(%3) "
-                                  "pref_cardid(%4) complete(%5) sp(%6)")
+    LOG(VB_GENERAL, LOG_DEBUG, QString("valid_pref(%1) cardid(%2) chan(%3) "
+                                       "pref_cardid(%4) complete(%5) sp(%6)")
             .arg(valid_prefix).arg(0).arg(chan)
             .arg(pref_cardid).arg(is_not_complete).arg(needed_spacer));
 #endif
@@ -6506,8 +6516,8 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
     }
 
 #if DEBUG_CHANNEL_PREFIX
-    VERBOSE(VB_IMPORTANT, QString(" ValidPref(%1) CardId(%2) Chan(%3) "
-                                  " PrefCardId(%4) Complete(%5) Sp(%6)")
+    LOG(VB_GENERAL, LOG_DEBUG, QString(" ValidPref(%1) CardId(%2) Chan(%3) "
+                                       " PrefCardId(%4) Complete(%5) Sp(%6)")
             .arg(valid_prefix).arg(0).arg(GetQueuedChanNum())
             .arg(pref_cardid).arg(is_not_complete).arg(needed_spacer));
 #endif
@@ -6525,8 +6535,8 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
 {
     bool commited = false;
 
-    VERBOSE(VB_PLAYBACK, LOC + "CommitQueuedInput() " +
-            QString("livetv(%1) qchannum(%2) qchanid(%3)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "CommitQueuedInput() " +
+        QString("livetv(%1) qchannum(%2) qchanid(%3)")
             .arg(StateIsLiveTV(GetState(ctx)))
             .arg(GetQueuedChanNum())
             .arg(GetQueuedChanID()));
@@ -6586,9 +6596,8 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
             ctx->LockPlayingInfo(__FILE__, __LINE__);
             if (!ctx->playingInfo)
             {
-                VERBOSE(VB_IMPORTANT,
-                        LOC_ERR + "ChangeChannel(): "
-                        "no active ctx playingInfo.");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "ChangeChannel(): no active ctx playingInfo.");
                 ctx->UnlockPlayingInfo(__FILE__, __LINE__);
                 ReturnPlayerLock(ctx);
                 return;
@@ -6652,7 +6661,7 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
 
 void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("ChangeChannel(%1, '%2') ")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ChangeChannel(%1, '%2') ")
             .arg(chanid).arg(chan));
 
     if ((!chanid && chan.isEmpty()) || !ctx || !ctx->recorder)
@@ -6755,7 +6764,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (ctx->player)
         ctx->player->GetAudio()->Reset();
 
-    UnpauseLiveTV(ctx);
+    UnpauseLiveTV(ctx, chanid && GetQueuedChanID());
 
     if (oldinputname != ctx->recorder->GetInput())
         UpdateOSDInput(ctx);
@@ -6788,7 +6797,7 @@ void TV::ShowPreviousChannel(PlayerContext *ctx)
 {
     QString channum = ctx->GetPreviousChannel();
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("ShowPreviousChannel: '%1'")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ShowPreviousChannel: '%1'")
             .arg(channum));
 
     if (channum.isEmpty())
@@ -6808,7 +6817,7 @@ void TV::PopPreviousChannel(PlayerContext *ctx, bool immediate_change)
     QString prev_channum = ctx->PopPreviousChannel();
     QString cur_channum  = ctx->tvchain->GetChannelName(-1);
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("PopPreviousChannel: '%1'->'%2'")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PopPreviousChannel: '%1'->'%2'")
             .arg(cur_channum).arg(prev_channum));
 
     // Only change channel if previous channel != current channel
@@ -7018,7 +7027,7 @@ void TV::UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
 void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
                               const QString &mesg, enum OSDTimeout timeout)
 {
-    VERBOSE(VB_PLAYBACK, QString("UpdateOSDSeekMessage(%1, %2)")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("UpdateOSDSeekMessage(%1, %2)")
             .arg(mesg).arg(timeout));
 
     osdInfo info;
@@ -7112,7 +7121,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
         if ("message" == it->GetShortName())
         {
             msg = it->GetName();
-            VERBOSE(VB_IMPORTANT, "msg: " + msg);
+            LOG(VB_GENERAL, LOG_INFO, "msg: " + msg);
             continue;
         }
 
@@ -7227,8 +7236,8 @@ void TV::UpdateOSDTimeoutMessage(PlayerContext *ctx)
     {
         if (timed_out)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "You have no OSD, "
-                    "but tuning has already taken too long.");
+            LOG(VB_GENERAL, LOG_ERR, LOC + 
+                "You have no OSD, but tuning has already taken too long.");
         }
         ReturnOSDLock(ctx, osd);
         return;
@@ -7367,7 +7376,7 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 
 bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
 {
-    VERBOSE(VB_PLAYBACK, QString("IsTunable(%1)").arg(chanid));
+    LOG(VB_PLAYBACK, LOG_INFO, QString("IsTunable(%1)").arg(chanid));
 
     if (!chanid)
         return false;
@@ -7402,7 +7411,7 @@ bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
         QString msg = QString("cardids[%1]: ").arg(sourceid);
         for (uint i = 0; i < cardids.size(); i++)
             msg += QString("%1, ").arg(cardids[i]);
-        VERBOSE(VB_GENERAL, msg);
+        LOG(VB_GENERAL, LOG_DEBUG,  msg);
     }
 #endif
 
@@ -7433,7 +7442,7 @@ bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
         QString msg = QString("inputs[%1]: ").arg(cardids[i]);
         for (uint j = 0; j < inputs.size(); j++)
             msg += QString("%1, ").arg(inputs[j].inputid);
-        VERBOSE(VB_GENERAL, msg);
+        LOG(VB_GENERAL, LOG_DEBUG, msg);
     }
 #endif
 
@@ -7446,14 +7455,14 @@ bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
                 inputs[j].mplexid != mplexid)
                 continue;
 
-            VERBOSE(VB_PLAYBACK, QString("IsTunable(%1) -> true\n")
+            LOG(VB_PLAYBACK, LOG_INFO, QString("IsTunable(%1) -> true\n")
                     .arg(chanid));
 
             return true;
         }
     }
 
-    VERBOSE(VB_PLAYBACK, QString("IsTunable(%1) -> false\n").arg(chanid));
+    LOG(VB_PLAYBACK, LOG_INFO, QString("IsTunable(%1) -> false\n").arg(chanid));
 
     return false;
 }
@@ -7476,8 +7485,8 @@ bool TV::StartEmbedding(const QRect &embedRect)
         ctx->StartEmbedding(wid, embedRect);
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("StartEmbedding called with null video context #%1")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("StartEmbedding called with null video context #%1")
                 .arg(find_player_index(ctx)));
         ctx->ResizePIPWindow(embedRect);
     }
@@ -7536,7 +7545,7 @@ void TV::DrawUnusedRects(void)
     if (disableDrawUnusedRects)
         return;
 
-    VERBOSE(VB_PLAYBACK, LOC + "DrawUnusedRects() -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "DrawUnusedRects() -- begin");
 
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     for (uint i = 0; mctx && (i < player.size()); i++)
@@ -7549,7 +7558,7 @@ void TV::DrawUnusedRects(void)
     }
     ReturnPlayerLock(mctx);
 
-    VERBOSE(VB_PLAYBACK, LOC + "DrawUnusedRects() -- end");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "DrawUnusedRects() -- end");
 }
 
 vector<bool> TV::DoSetPauseState(PlayerContext *lctx, const vector<bool> &pause)
@@ -7591,8 +7600,8 @@ void TV::DoEditSchedule(int editType)
     actx->LockPlayingInfo(__FILE__, __LINE__);
     if (!actx->playingInfo)
     {
-        VERBOSE(VB_IMPORTANT,
-                LOC_ERR + "doEditSchedule(): no active ctx playingInfo.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "doEditSchedule(): no active ctx playingInfo.");
         actx->UnlockPlayingInfo(__FILE__, __LINE__);
         ReturnPlayerLock(actx);
         return;
@@ -7620,7 +7629,8 @@ void TV::DoEditSchedule(int editType)
         {
             paused = actx->player->IsPaused();
             if (actx->player->GetVideoOutput())
-                allowEmbedding = actx->player->GetVideoOutput()->AllowPreviewEPG();
+                allowEmbedding =
+                    actx->player->GetVideoOutput()->AllowPreviewEPG();
             if (!pause_active)
                 isNearEnd = actx->player->IsNearEnd();
         }
@@ -7630,13 +7640,13 @@ void TV::DoEditSchedule(int editType)
     pause_active |= kScheduledRecording == editType;
     pause_active |= kViewSchedule == editType;
     pause_active |= kScheduleProgramFinder == editType;
-    pause_active |=
-        !isLiveTV && (!db_continue_embedded || isNearEnd);
+    pause_active |= !isLiveTV && (!db_continue_embedded || isNearEnd);
     pause_active |= paused;
     vector<bool> do_pause;
     do_pause.insert(do_pause.begin(), true, player.size());
     do_pause[find_player_index(actx)] = pause_active;
-    VERBOSE(VB_PLAYBACK, LOC + QString("Pausing player: %1").arg(pause_active));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Pausing player: %1").arg(pause_active));
 
     saved_pause = DoSetPauseState(actx, do_pause);
 
@@ -7964,8 +7974,7 @@ void TV::HandleOSDSleep(PlayerContext *ctx, QString action)
     }
     else
     {
-        VERBOSE(VB_GENERAL, LOC +
-                "No longer watching TV, exiting");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "No longer watching TV, exiting");
         SetExitPlayer(true, true);
     }
 }
@@ -7975,8 +7984,7 @@ void TV::SleepDialogTimeout(void)
     KillTimer(sleepDialogTimerId);
     sleepDialogTimerId = 0;
 
-    VERBOSE(VB_GENERAL, LOC +
-            "Sleep timeout reached, exiting player.");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Sleep timeout reached, exiting player.");
 
     SetExitPlayer(true, true);
 }
@@ -8031,8 +8039,7 @@ void TV::HandleOSDIdle(PlayerContext *ctx, QString action)
     }
     else
     {
-        VERBOSE(VB_GENERAL, LOC +
-                "No longer watching LiveTV, exiting");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "No longer watching LiveTV, exiting");
         SetExitPlayer(true, true);
     }
 }
@@ -8045,8 +8052,7 @@ void TV::IdleDialogTimeout(void)
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     if (StateIsLiveTV(mctx->GetState()))
     {
-        VERBOSE(VB_GENERAL, LOC +
-                "Idle timeout reached, leaving LiveTV");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Idle timeout reached, leaving LiveTV");
         SetExitPlayer(true, true);
     }
     ReturnPlayerLock(mctx);
@@ -8228,7 +8234,8 @@ void TV::customEvent(QEvent *e)
                     if (ctx->player)
                     {
                         ctx->player->SetWatchingRecording(false);
-                        ctx->player->SetLength((int)(frames / ctx->player->GetFrameRate()));
+                        ctx->player->SetLength((int)(frames /
+                                                  ctx->player->GetFrameRate()));
                     }
                     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
                 }
@@ -8247,7 +8254,8 @@ void TV::customEvent(QEvent *e)
             hasrec    = tokens[3].toInt();
             haslater  = tokens[4].toInt();
         }
-        VERBOSE(VB_GENERAL, LOC + message + QString(" hasrec: %1 haslater: %2")
+        LOG(VB_GENERAL, LOG_INFO,
+            LOC + message + QString(" hasrec: %1 haslater: %2")
                 .arg(hasrec).arg(haslater));
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
@@ -8262,7 +8270,7 @@ void TV::customEvent(QEvent *e)
             PlayerContext *ctx = GetPlayer(mctx, i);
             if (ctx->recorder && ctx->GetCardID() == cardnum)
             {
-                VERBOSE(VB_GENERAL, LOC + "Disabling PxP for recording");
+                LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling PxP for recording");
                 QString type = ctx->IsPIP() ?
                     tr("PiP", "Picture-in-Picture") :
                     tr("PbP", "Picture-by-Picture");
@@ -8294,8 +8302,8 @@ void TV::customEvent(QEvent *e)
                     PlayerContext *ctx = GetPlayer(mctx, i);
                     if (ctx->recorder && (ctx->GetCardID() == cardnum))
                     {
-                        VERBOSE(VB_GENERAL, LOC +
-                                "Disabling PiP for QUIT_LIVETV");
+                        LOG(VB_GENERAL, LOG_INFO, LOC +
+                            "Disabling PiP for QUIT_LIVETV");
                         StopStuff(mctx, ctx, true, true, true);
                     }
                 }
@@ -8393,16 +8401,21 @@ void TV::customEvent(QEvent *e)
         QStringList signalList = me->ExtraDataList();
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        for (uint i = 0; mctx && (i < player.size()); i++)
+        OSD *osd = GetOSDLock(mctx);
+        if (osd && osd->IsWindowVisible("program_info"))
         {
-            PlayerContext *ctx = GetPlayer(mctx, i);
-            bool tc = ctx->recorder && (ctx->GetCardID() == cardnum);
-            if (tc && !signalList.empty())
+            for (uint i = 0; mctx && (i < player.size()); i++)
             {
-                UpdateOSDSignal(ctx, signalList);
-                UpdateOSDTimeoutMessage(ctx);
+                PlayerContext *ctx = GetPlayer(mctx, i);
+                bool tc = ctx->recorder && (ctx->GetCardID() == cardnum);
+                if (tc && !signalList.empty())
+                {
+                    UpdateOSDSignal(ctx, signalList);
+                    UpdateOSDTimeoutMessage(ctx);
+                }
             }
         }
+        ReturnOSDLock(mctx, osd);
         ReturnPlayerLock(mctx);
     }
 
@@ -8599,7 +8612,7 @@ void TV::ToggleRecord(PlayerContext *ctx)
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (!ctx->playingInfo)
     {
-        VERBOSE(VB_GENERAL, LOC + "Unknown recording during live tv.");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Unknown recording during live tv.");
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         return;
     }
@@ -8615,7 +8628,7 @@ void TV::ToggleRecord(PlayerContext *ctx)
         cmdmsg = tr("Record");
         ctx->SetPseudoLiveTV(ctx->playingInfo, kPseudoRecording);
         ctx->recorder->SetLiveRecording(true);
-        VERBOSE(VB_RECORD, LOC + "Toggling Record on");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Toggling Record on");
     }
     else
     {
@@ -8627,7 +8640,7 @@ void TV::ToggleRecord(PlayerContext *ctx)
         cmdmsg = tr("Cancel Record");
         ctx->SetPseudoLiveTV(ctx->playingInfo, kPseudoNormalLiveTV);
         ctx->recorder->SetLiveRecording(false);
-        VERBOSE(VB_RECORD, LOC + "Toggling Record off");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Toggling Record off");
     }
 
     QString msg = cmdmsg + " \"" + ctx->playingInfo->GetTitle() + "\"";
@@ -8796,7 +8809,7 @@ void TV::SetActive(PlayerContext *lctx, int index, bool osd_msg)
         .arg(index).arg((osd_msg) ? "with OSD" : "w/o OSD")
         .arg(playerActive).arg(new_index);
 
-    VERBOSE(VB_PLAYBACK, loc + " -- begin");
+    LOG(VB_PLAYBACK, LOG_INFO, loc + " -- begin");
 
     for (uint i = 0; i < player.size(); i++)
         ClearOSD(GetPlayer(lctx,i));
@@ -8818,7 +8831,7 @@ void TV::SetActive(PlayerContext *lctx, int index, bool osd_msg)
         SetOSDMessage(actx, tr("Active Changed"));
     }
 
-    VERBOSE(VB_PLAYBACK, loc + " -- end");
+    LOG(VB_PLAYBACK, LOG_INFO, loc + " -- end");
 }
 
 void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
@@ -8970,7 +8983,7 @@ bool TV::HandleOSDCutpoint(PlayerContext *ctx, QString action, long long frame)
     {
         QStringList actions(action);
         if (!ctx->player->HandleProgramEditorActions(actions, frame))
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Unrecognised cutpoint action");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Unrecognised cutpoint action");
         else
             editmode = ctx->player->GetEditMode();
     }
@@ -9303,7 +9316,7 @@ void TV::ChannelEditDDFill(InfoMap &infoMap,
     if (!infoMap[key].isEmpty())
     {
         dd_xmltv = GetDataDirect(key, infoMap[key], "XMLTV", true);
-        VERBOSE(VB_IMPORTANT, QString("xmltv: %1 for key %2")
+        LOG(VB_GENERAL, LOG_INFO, QString("xmltv: %1 for key %2")
                 .arg(dd_xmltv).arg(key));
         if (!dd_xmltv.isEmpty())
             infoMap[key] = GetDataDirect("XMLTV", dd_xmltv, key);
@@ -9313,7 +9326,7 @@ void TV::ChannelEditDDFill(InfoMap &infoMap,
     if (!infoMap[key].isEmpty())
     {
         dd_xmltv = GetDataDirect(key, infoMap[key], "XMLTV", true);
-        VERBOSE(VB_IMPORTANT, QString("xmltv: %1 for key %2")
+        LOG(VB_GENERAL, LOG_INFO, QString("xmltv: %1 for key %2")
                 .arg(dd_xmltv).arg(key));
         if (!dd_xmltv.isEmpty())
             infoMap[key] = GetDataDirect("XMLTV", dd_xmltv, key);
@@ -9401,8 +9414,8 @@ void TV::RunLoadDDMap(uint sourceid)
         if (osd->DialogVisible(OSD_DLG_EDITOR))
             osd->SetText(OSD_DLG_EDITOR, chanEditMap, kOSDTimeout_None);
         else
-            VERBOSE(VB_IMPORTANT, LOC + "No channel editor visible. Failed "
-                                        "to update data direct channel info.");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "No channel editor visible. Failed "
+                                         "to update data direct channel info.");
     }
     ReturnOSDLock(actx, osd);
     ReturnPlayerLock(actx);
@@ -9421,7 +9434,8 @@ bool TV::LoadDDMap(uint sourceid)
                                                passwd, lineupid);
     if (!ok || (grabber != "datadirect"))
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("LoadDDMap() g(%1)").arg(grabber));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            QString("LoadDDMap() g(%1)").arg(grabber));
         return false;
     }
 
@@ -9445,7 +9459,8 @@ bool TV::LoadDDMap(uint sourceid)
         }
 
 #if 0
-        VERBOSE(VB_GENERAL, QString("Adding channel: %1 -- %2 -- %3 -- %4")
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("Adding channel: %1 -- %2 -- %3 -- %4")
                 .arg(tmp["channum"],4).arg(tmp["callsign"],7)
                 .arg(tmp["XMLTV"]).arg(tmp["channame"]));
 #endif
@@ -9465,8 +9480,9 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
 {
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
 
-    VERBOSE(VB_IMPORTANT, LOC + QString("OSDDialogEvent: result %1 text %2 action %3")
-        .arg(result).arg(text).arg(action));
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("OSDDialogEvent: result %1 text %2 action %3")
+            .arg(result).arg(text).arg(action));
 
     bool hide = true;
 
@@ -9529,7 +9545,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Unrecognised dialog event.");
+            LOG(VB_GENERAL, LOG_ERR, "Unrecognised dialog event.");
         }
     }
     else if (result < 0)
@@ -9659,8 +9675,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                         new_channum = (*it).channum;
                 }
 
-                VERBOSE(VB_IMPORTANT, LOC +
-                        QString("Channel Group: '%1'->'%2'")
+                LOG(VB_GENERAL, LOG_INFO, LOC +
+                    QString("Channel Group: '%1'->'%2'")
                         .arg(cur_channum).arg(new_channum));
             }
 
@@ -9718,8 +9734,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Unknown menu action selected: " + action);
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Unknown menu action selected: " + action);
             hide = false;
         }
     }
@@ -9779,8 +9795,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             DoQueueTranscode(actx, "Low Quality");
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Unknown menu action selected: " + action);
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Unknown menu action selected: " + action);
             hide = false;
         }
     }
@@ -11046,8 +11062,8 @@ bool TV::HandleJumpToProgramAction(
 
         if (!p)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Failed to locate jump to program '%1' @ %2")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Failed to locate jump to program '%1' @ %2")
                     .arg(progKey).arg(action.section(" ",-1,-1)));
             return true;
         }
@@ -11072,7 +11088,8 @@ bool TV::HandleJumpToProgramAction(
         else
         {
             QString type = (kPIPonTV == jumpToProgramPIPState) ? "PIP" : "PBP";
-            VERBOSE(VB_GENERAL, LOC + QString("Creating %1 with program: %2")
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Creating %1 with program: %2")
                     .arg(type).arg(p->toString(ProgramInfo::kTitleSubtitle)));
 
             if (jumpToProgramPIPState == kPIPonTV)
@@ -11111,14 +11128,15 @@ bool TV::HandleJumpToProgramAction(
     else if (RunPlaybackBoxPtr)
         EditSchedule(ctx, kPlaybackBox);
     else
-        VERBOSE(VB_IMPORTANT, "Failed to open jump to program GUI");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to open jump to program GUI");
 
     return true;
 }
 
+#define MINUTE 60*1000
+
 void TV::ToggleSleepTimer(const PlayerContext *ctx, const QString &time)
 {
-    const int minute = 60*1000; /* milliseconds in a minute */
     int mins = 0;
 
     if (time == ACTION_TOGGLESLEEP + "ON")
@@ -11131,7 +11149,7 @@ void TV::ToggleSleepTimer(const PlayerContext *ctx, const QString &time)
         else
         {
             mins = 60;
-            sleepTimerTimeout = mins * minute;
+            sleepTimerTimeout = mins * MINUTE;
             sleepTimerId = StartTimer(sleepTimerTimeout, __LINE__);
         }
     }
@@ -11159,17 +11177,17 @@ void TV::ToggleSleepTimer(const PlayerContext *ctx, const QString &time)
             else
             {
                 mins = 0;
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid time " + time);
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid time " + time);
             }
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid time string " + time);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid time string " + time);
         }
 
         if (mins)
         {
-            sleepTimerTimeout = mins * minute;
+            sleepTimerTimeout = mins * MINUTE;
             sleepTimerId = StartTimer(sleepTimerTimeout, __LINE__);
         }
     }
@@ -11226,7 +11244,7 @@ void TV::ShowNoRecorderDialog(const PlayerContext *ctx, NoRecorderMsg msgType)
  */
 void TV::PauseLiveTV(PlayerContext *ctx)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("PauseLiveTV() player ctx %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PauseLiveTV() player ctx %1")
             .arg(find_player_index(ctx)));
 
     lockTimerOn = false;
@@ -11265,9 +11283,9 @@ void TV::PauseLiveTV(PlayerContext *ctx)
  *  \brief Used in ChangeChannel(), ChangeChannel(),
  *         and ToggleInputs() to restart video output.
  */
-void TV::UnpauseLiveTV(PlayerContext *ctx)
+void TV::UnpauseLiveTV(PlayerContext *ctx, bool bQuietly /*=false*/)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("UnpauseLiveTV() player ctx %1")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("UnpauseLiveTV() player ctx %1")
             .arg(find_player_index(ctx)));
 
     if (ctx->HasPlayer() && ctx->tvchain)
@@ -11285,7 +11303,7 @@ void TV::UnpauseLiveTV(PlayerContext *ctx)
 
     ITVRestart(ctx, true);
 
-    if (ctx->HasPlayer())
+    if (ctx->HasPlayer() && !bQuietly)
     {
         UpdateOSDProgInfo(ctx, "program_info");
         UpdateLCD();
@@ -11531,7 +11549,7 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
         exitPlayerTimerId)
     {
         // this should only occur when the cat walks on the keyboard.
-        VERBOSE(VB_IMPORTANT, "It is unsafe to delete at the moment");
+        LOG(VB_GENERAL, LOG_ERR, "It is unsafe to delete at the moment");
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         return;
     }
@@ -11539,14 +11557,15 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
     if ((ctx != GetPlayer(ctx, 0)))
     {
         // just to avoid confusion...
-        VERBOSE(VB_IMPORTANT, "Only the main program may be deleted");
+        LOG(VB_GENERAL, LOG_ERR, "Only the main program may be deleted");
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         return;
     }
 
     if (!ctx->playingInfo->QueryIsDeleteCandidate(true))
     {
-        VERBOSE(VB_IMPORTANT, "This program cannot be deleted at this time.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "This program cannot be deleted at this time.");
         ProgramInfo pginfo(*ctx->playingInfo);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
@@ -11819,8 +11838,8 @@ PlayerContext *TV::GetPlayerWriteLock(int which, const char *file, int location)
 
     if ((which >= (int)player.size()))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("GetPlayerWriteLock(%1,%2,%3) returning NULL size(%4)")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("GetPlayerWriteLock(%1,%2,%3) returning NULL size(%4)")
                 .arg(which).arg(file).arg(location).arg(player.size()));
         return NULL;
     }
@@ -11834,8 +11853,8 @@ PlayerContext *TV::GetPlayerReadLock(int which, const char *file, int location)
 
     if ((which >= (int)player.size()))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("GetPlayerReadLock(%1,%2,%3) returning NULL size(%4)")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("GetPlayerReadLock(%1,%2,%3) returning NULL size(%4)")
                 .arg(which).arg(file).arg(location).arg(player.size()));
         return NULL;
     }
@@ -11850,8 +11869,8 @@ const PlayerContext *TV::GetPlayerReadLock(
 
     if ((which >= (int)player.size()))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("GetPlayerReadLock(%1,%2,%3) returning NULL size(%4)")
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("GetPlayerReadLock(%1,%2,%3) returning NULL size(%4)")
                 .arg(which).arg(file).arg(location).arg(player.size()));
         return NULL;
     }
@@ -11865,10 +11884,9 @@ PlayerContext *TV::GetPlayerHaveLock(
 {
     if (!locked_context || (which >= (int)player.size()))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("GetPlayerHaveLock(0x%1,%2,%3,%4) "
-                        "returning NULL size(%5)")
-                .arg((long long)locked_context, 0, 16)
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("GetPlayerHaveLock(0x%1,%2,%3,%4) returning NULL size(%5)")
+                .arg((uint64_t)locked_context, 0, 16)
                 .arg(which).arg(file).arg(location).arg(player.size()));
         return NULL;
     }
@@ -11882,10 +11900,9 @@ const PlayerContext *TV::GetPlayerHaveLock(
 {
     if (!locked_context || (which >= (int)player.size()))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("GetPlayerHaveLock(0x%1,%2,%3,%4) "
-                        "returning NULL size(%5)")
-                .arg((long long)locked_context, 0, 16)
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("GetPlayerHaveLock(0x%1,%2,%3,%4) returning NULL size(%5)")
+                .arg((uint64_t)locked_context, 0, 16)
                 .arg(which).arg(file).arg(location).arg(player.size()));
         return NULL;
     }

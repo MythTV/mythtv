@@ -165,3 +165,234 @@ bool VideoMetadataListManager::purgeByID(unsigned int db_id)
 {
     return m_imp->purgeByID(db_id);
 }
+
+const QString meta_node::m_empty_path;
+
+const QString& meta_node::getPath() const
+{
+    return m_empty_path;
+}
+
+const QString& meta_node::getFQPath()
+{
+    if (m_fq_path.length())
+        return m_fq_path;
+
+    if (m_parent && !m_path_root)
+        m_fq_path = m_parent->getFQPath() + "/" + getPath();
+    else
+    {
+        QString p = getPath();
+        if (p.startsWith("myth://"))
+            m_fq_path = p;
+        else
+            m_fq_path = ((p.length() && p[0] != '/') ? "/" : "") + p;
+    }
+
+    return m_fq_path;
+}
+
+void meta_node::setParent(meta_node *parent)
+{
+    m_parent = parent;
+}
+
+void meta_node::setPathRoot(bool is_root)
+{
+    m_path_root = is_root;
+}
+
+const QString meta_data_node::m_meta_bug = "Bug";
+
+const QString& meta_data_node::getName() const
+{
+    if (m_data)
+    {
+        return m_data->GetTitle();
+    }
+
+    return m_meta_bug;
+}
+
+const VideoMetadata* meta_data_node::getData() const
+{
+    return m_data;
+}
+
+VideoMetadata* meta_data_node::getData()
+{
+    return m_data;
+}
+
+meta_dir_node::meta_dir_node(const QString &path, const QString &name,
+                            meta_dir_node *parent, bool is_path_root,
+                            const QString &host, const QString &prefix)
+  : meta_node(parent, is_path_root), m_path(path), m_name(name)
+{
+    if (!name.length())
+    {
+        m_name = path;
+    }
+
+    m_host = host;
+    m_prefix = prefix;
+}
+
+void meta_dir_node::setName(const QString &name)
+{
+    m_name = name;
+}
+
+const QString &meta_dir_node::getName() const
+{
+    return m_name;
+}
+
+void meta_dir_node::SetHost(const QString &host)
+{
+    m_host = host;
+}
+
+const QString &meta_dir_node::GetHost() const
+{
+    return m_host;
+}
+
+void meta_dir_node::SetPrefix(const QString &prefix)
+{
+    m_prefix = prefix;
+}
+
+const QString &meta_dir_node::GetPrefix() const
+{
+    return m_prefix;
+}
+
+const QString &meta_dir_node::getPath() const
+{
+    return m_path;
+}
+
+void meta_dir_node::setPath(const QString &path)
+{
+    m_path = path;
+}
+
+smart_dir_node meta_dir_node::addSubDir(const QString &subdir,
+                                        const QString &name,
+                                        const QString &host,
+                                        const QString &prefix)
+{
+    return getSubDir(subdir, name, true, host, prefix);
+}
+
+void meta_dir_node::addSubDir(const smart_dir_node &subdir)
+{
+    m_subdirs.push_back(subdir);
+}
+
+smart_dir_node meta_dir_node::getSubDir(const QString &subdir,
+                                        const QString &name,
+                                        bool create,
+                                        const QString &host,
+                                        const QString &prefix)
+{
+    for (meta_dir_list::const_iterator p = m_subdirs.begin();
+    p != m_subdirs.end(); ++p)
+    {
+        if (subdir == (*p)->getPath())
+        {
+            return *p;
+        }
+    }
+
+    if (create)
+    {
+        smart_dir_node node(new meta_dir_node(subdir, name, this, false ,host, prefix));
+        m_subdirs.push_back(node);
+        return node;
+    }
+
+    return smart_dir_node();
+}
+
+void meta_dir_node::addEntry(const smart_meta_node &entry)
+{
+    entry->setParent(this);
+    m_entries.push_back(entry);
+}
+
+void meta_dir_node::clear()
+{
+    m_subdirs.clear();
+    m_entries.clear();
+}
+
+bool meta_dir_node::empty() const
+{
+    return m_subdirs.empty() && m_entries.empty();
+}
+
+int meta_dir_node::subdir_count() const
+{
+    return m_subdirs.size();
+}
+
+meta_dir_list::iterator meta_dir_node::dirs_begin()
+{
+    return m_subdirs.begin();
+}
+
+meta_dir_list::iterator meta_dir_node::dirs_end()
+{
+    return m_subdirs.end();
+}
+
+meta_dir_list::const_iterator meta_dir_node::dirs_begin() const
+{
+    return m_subdirs.begin();
+}
+
+meta_dir_list::const_iterator meta_dir_node::dirs_end() const
+{
+    return m_subdirs.end();
+}
+
+meta_data_list::iterator meta_dir_node::entries_begin()
+{
+    return m_entries.begin();
+}
+
+meta_data_list::iterator meta_dir_node::entries_end()
+{
+    return m_entries.end();
+}
+
+meta_data_list::const_iterator meta_dir_node::entries_begin() const
+{
+    return m_entries.begin();
+}
+
+meta_data_list::const_iterator meta_dir_node::entries_end() const
+{
+    return m_entries.end();
+}
+
+// Returns true if this directory or any of its subdirectories
+// have entries. TODO: cache this value
+bool meta_dir_node::has_entries() const
+{
+    bool ret = m_entries.size();
+
+    if (!ret)
+    {
+        for (meta_dir_list::const_iterator p = m_subdirs.begin();
+        p != m_subdirs.end(); ++p)
+        {
+            ret = (*p)->has_entries();
+            if (ret) break;
+        }
+    }
+
+    return ret;
+}

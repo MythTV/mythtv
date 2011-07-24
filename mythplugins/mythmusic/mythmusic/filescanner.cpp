@@ -123,8 +123,8 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT,
-                            QString("Failed to get directory id for path %1")
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Failed to get directory id for path %1")
                             .arg(dir));
                 }
             }
@@ -216,8 +216,8 @@ bool FileScanner::HasFileChanged(const QString &filename, const QString &date_mo
         }
     }
     else {
-        VERBOSE(VB_IMPORTANT, QString("Failed to stat file: %1")
-            .arg(filename));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to stat file: %1")
+                .arg(filename));
     }
     return false;
 }
@@ -267,7 +267,8 @@ void FileScanner::AddFileToDB(const QString &filename)
 
     if (decoder)
     {
-        VERBOSE(VB_FILE, QString("Reading metadata from %1").arg(filename));
+        LOG(VB_FILE, LOG_INFO,
+            QString("Reading metadata from %1").arg(filename));
         Metadata *data = decoder->readMetadata();
         if (data) 
         {

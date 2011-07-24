@@ -17,7 +17,6 @@ using namespace std;
 #define REPORT_RING_STATS 0
 
 #define LOC QString("DevRdB(%1): ").arg(videodevice)
-#define LOC_ERR QString("DevRdB(%1) Error: ").arg(videodevice)
 
 DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
     : videodevice(QString::null),   _stream_fd(-1),
@@ -46,12 +45,12 @@ DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
         wake_pipe_flags[i] = 0;
     }
 
-#ifdef USING_MINGW
+#if defined( USING_MINGW ) && !defined( _MSC_VER )
 #warning mingw DeviceReadBuffer::Poll
     if (using_poll)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "mingw DeviceReadBuffer::Poll is not implemented");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "mingw DeviceReadBuffer::Poll is not implemented");
         using_poll = false;
     }
 #endif
@@ -61,6 +60,8 @@ DeviceReadBuffer::~DeviceReadBuffer()
 {
     if (buffer)
         delete[] buffer;
+    if (isRunning())
+        Stop();
 }
 
 bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
@@ -101,8 +102,8 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
     // Initialize buffer, if it exists
     if (!buffer)
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("Failed to allocate buffer of size %1 = %2 + %3")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to allocate buffer of size %1 = %2 + %3")
                 .arg(size+dev_read_size).arg(size).arg(dev_read_size));
         return false;
     }
@@ -114,14 +115,14 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
     avg_cnt       = 0;
     lastReport.start();
 
-    VERBOSE(VB_RECORD, LOC + QString("buffer size %1 KB").arg(size/1024));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("buffer size %1 KB").arg(size/1024));
 
     return true;
 }
 
 void DeviceReadBuffer::Start(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Start() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- begin");
 
     if (isRunning())
     {
@@ -129,6 +130,7 @@ void DeviceReadBuffer::Start(void)
             QMutexLocker locker(&lock);
             dorun = false;
         }
+        WakePoll();
         wait();
     }
 
@@ -140,12 +142,12 @@ void DeviceReadBuffer::Start(void)
 
     start();
 
-    VERBOSE(VB_RECORD, LOC + "Start() -- middle");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- middle");
 
     while (!IsRunning())
         usleep(5000);
 
-    VERBOSE(VB_RECORD, LOC + "Start() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- end");
 }
 
 void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
@@ -164,17 +166,17 @@ void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
 
 void DeviceReadBuffer::Stop(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Stop() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- begin");
     {
         QMutexLocker locker(&lock);
         dorun = false;
     }
 
     WakePoll();
-    VERBOSE(VB_RECORD, LOC + "Stop() -- middle");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- middle");
 
     wait();
-    VERBOSE(VB_RECORD, LOC + "Stop() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- end");
 }
 
 void DeviceReadBuffer::SetRequestPause(bool req)
@@ -205,7 +207,7 @@ void DeviceReadBuffer::WakePoll(void) const
         wret = ::write(wake_pipe[1], &buf, 1);
         if ((wret < 0) && (EAGAIN != errno) && (EINTR != errno))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "WakePoll failed.");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "WakePoll failed.");
             ClosePipes();
             break;
         }
@@ -344,7 +346,7 @@ void DeviceReadBuffer::run(void)
             QMutexLocker locker(&lock);
             if (error)
             {
-                VERBOSE(VB_RECORD, LOC + "fill_ringbuffer: error state");
+                LOG(VB_RECORD, LOG_ERR, LOC + "fill_ringbuffer: error state");
                 break;
             }
         }
@@ -410,8 +412,8 @@ bool DeviceReadBuffer::Poll(void) const
 # else
 #  warning mingw DeviceReadBuffer::Poll
 # endif
-    VERBOSE(VB_IMPORTANT, LOC_ERR +
-            "mingw DeviceReadBuffer::Poll is not implemented");
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        "mingw DeviceReadBuffer::Poll is not implemented");
     return false;
 #else
     bool retval = true;
@@ -446,7 +448,7 @@ bool DeviceReadBuffer::Poll(void) const
 
         if (polls[0].revents & (POLLHUP | POLLNVAL))
         {
-            VERBOSE(VB_IMPORTANT, LOC + "poll error");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "poll error");
             error = true;
             return true;
         }
@@ -480,7 +482,7 @@ bool DeviceReadBuffer::Poll(void) const
             {
                 if ((uint)timer.elapsed() >= max_poll_wait)
                 {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Poll giving up 1");
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "Poll giving up 1");
                     QMutexLocker locker(&lock);
                     error = true;
                     return true;
@@ -498,7 +500,7 @@ bool DeviceReadBuffer::Poll(void) const
 
         if ((uint)timer.elapsed() >= max_poll_wait)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Poll giving up 2");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Poll giving up 2");
             QMutexLocker locker(&lock);
             error = true;
             return true;
@@ -513,11 +515,11 @@ bool DeviceReadBuffer::CheckForErrors(
 {
     if (len > (ssize_t)requested_len)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Driver is retruning bogus values on read");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Driver is returning bogus values on read");
         if (++errcnt > 5)
         {
-            VERBOSE(VB_RECORD, LOC + "Too many errors.");
+            LOG(VB_RECORD, LOG_ERR, LOC + "Too many errors.");
             QMutexLocker locker(&lock);
             error = true;
         }
@@ -530,8 +532,8 @@ bool DeviceReadBuffer::CheckForErrors(
 # else
 #  warning mingw DeviceReadBuffer::CheckForErrors
 # endif
-    VERBOSE(VB_IMPORTANT, LOC_ERR +
-            "mingw DeviceReadBuffer::CheckForErrors is not implemented");
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        "mingw DeviceReadBuffer::CheckForErrors is not implemented");
     return false;
 #else
     if (len < 0)
@@ -545,16 +547,16 @@ bool DeviceReadBuffer::CheckForErrors(
         }
         if (EOVERFLOW == errno)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Driver buffers overflowed");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Driver buffers overflowed");
             return false;
         }
 
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Problem reading fd(%1)").arg(_stream_fd) + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Problem reading fd(%1)").arg(_stream_fd) + ENO);
 
         if (++errcnt > 5)
         {
-            VERBOSE(VB_RECORD, LOC + "Too many errors.");
+            LOG(VB_RECORD, LOG_ERR, LOC + "Too many errors.");
             QMutexLocker locker(&lock);
             error = true;
             return false;
@@ -567,8 +569,8 @@ bool DeviceReadBuffer::CheckForErrors(
     {
         if (++errcnt > 5)
         {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    QString("End-Of-File? fd(%1)").arg(_stream_fd));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("End-Of-File? fd(%1)").arg(_stream_fd));
 
             lock.lock();
             eof = true;
@@ -692,7 +694,7 @@ void DeviceReadBuffer::ReportStats(void)
         max_used    = 0;
         lastReport.start();
 
-        VERBOSE(VB_IMPORTANT, LOC + msg);
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + msg);
     }
 #endif
 }

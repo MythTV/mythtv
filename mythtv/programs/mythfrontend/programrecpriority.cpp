@@ -387,11 +387,10 @@ class programAvgDelaySort
 ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
                                        const QString &name)
                    : ScheduleCommon(parent, name),
-                     m_programList(NULL), m_categoryText(NULL),
-                     m_descriptionText(NULL), m_schedInfoText(NULL),
+                     m_programList(NULL), m_schedInfoText(NULL),
                      m_rectypePriorityText(NULL), m_recPriorityText(NULL),
                      m_recPriorityBText(NULL), m_finalPriorityText(NULL),
-                     m_recGroupText(NULL), m_storageGroupText(NULL),
+                     m_storageGroupText(NULL),
                      m_lastRecordedText(NULL), m_lastRecordedDateText(NULL),
                      m_lastRecordedTimeText(NULL), m_channameText(NULL),
                      m_channumText(NULL), m_callsignText(NULL),
@@ -400,9 +399,6 @@ ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
     m_sortType = (SortType)gCoreContext->GetNumSetting("ProgramRecPrioritySorting",
                                                  (int)byTitle);
     m_reverseSort = gCoreContext->GetNumSetting("ProgramRecPriorityReverse", 0);
-    m_formatShortDate = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-    m_formatLongDate  = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
-    m_formatTime      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 }
 
 ProgramRecPriority::~ProgramRecPriority()
@@ -420,15 +416,12 @@ bool ProgramRecPriority::Create()
 
     m_programList = dynamic_cast<MythUIButtonList *> (GetChild("programs"));
 
-    m_descriptionText = dynamic_cast<MythUIText *> (GetChild("description"));
-    m_categoryText = dynamic_cast<MythUIText *> (GetChild("category"));
     m_schedInfoText = dynamic_cast<MythUIText *> (GetChild("scheduleinfo"));
     m_rectypePriorityText = dynamic_cast<MythUIText *>
                                                  (GetChild("rectypepriority"));
     m_recPriorityText = dynamic_cast<MythUIText *> (GetChild("recpriority"));
     m_recPriorityBText = dynamic_cast<MythUIText *> (GetChild("recpriorityB"));
     m_finalPriorityText = dynamic_cast<MythUIText *> (GetChild("finalpriority"));
-    m_recGroupText = dynamic_cast<MythUIText *> (GetChild("recordinggroup"));
     m_storageGroupText = dynamic_cast<MythUIText *> (GetChild("storagegroup"));
     m_lastRecordedText = dynamic_cast<MythUIText *> (GetChild("lastrecorded"));
     m_lastRecordedDateText = dynamic_cast<MythUIText *> (GetChild("lastrecordeddate"));
@@ -440,7 +433,7 @@ bool ProgramRecPriority::Create()
 
     if (!m_programList)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
@@ -449,7 +442,8 @@ bool ProgramRecPriority::Create()
     connect(m_programList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(edit(MythUIButtonListItem*)));
 
-    m_programList->SetLCDTitles(tr("Schedule Priorities"), "rec_type|titlesubtitle|progpriority|finalpriority");
+    m_programList->SetLCDTitles(tr("Schedule Priorities"),
+                          "rec_type|titlesubtitle|progpriority|finalpriority");
     m_programList->SetSearchFields("titlesubtitle");
 
     BuildFocusList();
@@ -811,16 +805,20 @@ void ProgramRecPriority::customEvent(QEvent *event)
         }
         else if (resultid == "deleterule")
         {
-            RecordingRule *record = qVariantValue<RecordingRule *>(dce->GetData());
+            RecordingRule *record =
+                qVariantValue<RecordingRule *>(dce->GetData());
             if (record)
             {
                 if (buttonnum > 0)
                 {
-                    MythUIButtonListItem *item = m_programList->GetItemCurrent();
+                    MythUIButtonListItem *item =
+                        m_programList->GetItemCurrent();
+
                     if (record->Delete() && item)
                         RemoveItemFromList(item);
                     else
-                        VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
+                        LOG(VB_GENERAL, LOG_ERR,
+                            "Failed to delete recording rule");
                 }
                 delete record;
             }
@@ -1462,27 +1460,16 @@ void ProgramRecPriority::UpdateList()
         progInfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 
-        item->SetText(progInfo->description, "description", state);
-        item->SetText(progInfo->category, "category", state);
         item->SetText(QString::number(progRecPriority), "progpriority", state);
         item->SetText(QString::number(finalRecPriority), "finalpriority", state);
 
-        QString recgroup = progInfo->recgroup;
-        if (recgroup == "Default")
-            recgroup = tr("Default");
-        item->SetText(recgroup, "recordinggroup", state);
-        QString storagegroup = progInfo->storagegroup;
-        if (storagegroup == "Default")
-            storagegroup = tr("Default");
-        else if (StorageGroup::kSpecialGroups.contains(storagegroup))
-            storagegroup = tr(storagegroup.toLatin1().constData());
-        item->SetText(storagegroup, "storagegroup", state);
-
-        QString tempDateTime = (progInfo->last_record).toString(m_formatLongDate + ' ' + m_formatTime);
+        QString tempDateTime = MythDateTimeToString(progInfo->last_record,
+                                                    kDateFull | kSimplify);
         item->SetText(tempDateTime, "lastrecorded", state);
-        QString tempDate = (progInfo->last_record).toString(m_formatShortDate);
+        QString tempDate = MythDateTimeToString(progInfo->last_record,
+                                                kDateShort);
         item->SetText(tempDate, "lastrecordeddate", state);
-        QString tempTime = (progInfo->last_record).toString(m_formatTime);
+        QString tempTime = MythDateTimeToString(progInfo->last_record, kTime);
         item->SetText(tempTime, "lastrecordedtime", state);
 
         QString channame = progInfo->channame;
@@ -1510,7 +1497,7 @@ void ProgramRecPriority::UpdateList()
         QString profile = progInfo->profile;
         if ((profile == "Default") || (profile == "Live TV") ||
             (profile == "High Quality") || (profile == "Low Quality"))
-            profile = tr(profile.toLatin1().constData());
+            profile = tr(profile.toUtf8().constData());
         item->SetText(profile, "recordingprofile", state);
         item->DisplayState(state, "status");
 
@@ -1573,12 +1560,6 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     pgRecInfo->ToMap(infoMap);
     SetTextFromMap(infoMap);
 
-    if (m_descriptionText)
-        m_descriptionText->SetText(pgRecInfo->description);
-
-    if (m_categoryText)
-        m_categoryText->SetText(pgRecInfo->category);
-
     if (m_schedInfoText)
         m_schedInfoText->SetText(subtitle);
 
@@ -1602,14 +1583,6 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     if (m_finalPriorityText)
         m_finalPriorityText->SetText(QString::number(finalRecPriority));
 
-    if (m_recGroupText)
-    {
-        QString recgroup = pgRecInfo->recgroup;
-        if (recgroup == "Default")
-            recgroup = tr("Default");
-        m_recGroupText->SetText(recgroup);
-    }
-
     if (m_storageGroupText)
     {
         QString storagegroup = pgRecInfo->storagegroup;
@@ -1622,19 +1595,19 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     if (m_lastRecordedText)
     {
-        QString tempDateTime = (pgRecInfo->last_record).toString(m_formatLongDate + ' ' + m_formatTime);
+        QString tempDateTime = MythDateTimeToString(pgRecInfo->last_record, kDateTimeFull);
         m_lastRecordedText->SetText(tempDateTime);
     }
 
     if (m_lastRecordedDateText)
     {
-        QString tempDate = (pgRecInfo->last_record).toString(m_formatShortDate);
+        QString tempDate = MythDateTimeToString(pgRecInfo->last_record, kDateShort);
         m_lastRecordedDateText->SetText(tempDate);
     }
 
     if (m_lastRecordedTimeText)
     {
-        QString tempTime = (pgRecInfo->last_record).toString(m_formatTime);
+        QString tempTime = MythDateTimeToString(pgRecInfo->last_record, kTime);
         m_lastRecordedTimeText->SetText(tempTime);
     }
 
@@ -1676,7 +1649,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
         QString profile = pgRecInfo->profile;
         if ((profile == "Default") || (profile == "Live TV") ||
             (profile == "High Quality") || (profile == "Low Quality"))
-            profile = tr(profile.toLatin1().constData());
+            profile = tr(profile.toUtf8().constData());
         m_recProfileText->SetText(profile);
     }
 

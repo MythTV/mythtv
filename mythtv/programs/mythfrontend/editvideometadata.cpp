@@ -15,6 +15,7 @@
 #include "mythuicheckbox.h"
 #include "mythuispinbox.h"
 #include "mythuifilebrowser.h"
+#include "mythuiimageresults.h"
 #include "mythuihelper.h"
 #include "mythprogressdialog.h"
 #include "remoteutil.h"
@@ -91,7 +92,7 @@ bool EditMetadataDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'edit_metadata'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'edit_metadata'");
         return false;
     }
 
@@ -283,160 +284,6 @@ namespace
     const QString CEID_SCREENSHOTFILE = "screenshotfile";
     const QString CEID_TRAILERFILE = "trailerfile";
     const QString CEID_NEWCATEGORY = "newcategory";
-
-    class ImageSearchResultsDialog : public MythScreenType
-    {
-        Q_OBJECT
-
-      public:
-        ImageSearchResultsDialog(MythScreenStack *lparent,
-                const ArtworkList list, const VideoArtworkType type) :
-            MythScreenType(lparent, "videosearchresultspopup"),
-            m_list(list), m_type(type), m_resultsList(0)
-        {
-            m_imageDownload = new MetadataImageDownload(this);
-        }
-
-        ~ImageSearchResultsDialog()
-        {
-            cleanCacheDir();
-
-            if (m_imageDownload)
-            {
-                delete m_imageDownload;
-                m_imageDownload = NULL;
-            }
-        }
-
-        bool Create()
-        {
-            if (!LoadWindowFromXML("video-ui.xml", "artworksel", this))
-                return false;
-
-            bool err = false;
-            UIUtilE::Assign(this, m_resultsList, "results", &err);
-            if (err)
-            {
-                VERBOSE(VB_IMPORTANT, "Cannot load screen 'moviesel'");
-                return false;
-            }
-
-            for (ArtworkList::const_iterator i = m_list.begin();
-                    i != m_list.end(); ++i)
-            {
-                    ArtworkInfo info = (*i);
-                    MythUIButtonListItem *button =
-                        new MythUIButtonListItem(m_resultsList,
-                        QString());
-                    button->SetText(info.label, "label");
-                    button->SetText(info.thumbnail, "thumbnail");
-                    button->SetText(info.url, "url");
-                    QString width = QString::number(info.width);
-                    QString height = QString::number(info.height);
-                    button->SetText(width, "width");
-                    button->SetText(height, "height");
-                    if (info.width > 0 && info.height > 0)
-                        button->SetText(QString("%1x%2").arg(width).arg(height),
-                            "resolution");
-
-                    QString artfile = info.thumbnail;
-
-                    if (artfile.isEmpty())
-                        artfile = info.url;
-
-                    QString dlfile = getDownloadFilename(info.label,
-                        artfile);
-
-                    if (!artfile.isEmpty())
-                    {
-                        int pos = m_resultsList->GetItemPos(button);
-
-                        if (QFile::exists(dlfile))
-                            button->SetImage(dlfile);
-                        else
-                            m_imageDownload->addThumb(info.label,
-                                             artfile,
-                                             qVariantFromValue<uint>(pos));
-                    }
-
-                    button->SetData(qVariantFromValue<ArtworkInfo>(*i));
-                }
-
-            connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                    SLOT(sendResult(MythUIButtonListItem *)));
-
-            BuildFocusList();
-
-            return true;
-        }
-
-        void cleanCacheDir()
-        {
-            QString cache = QString("%1/thumbcache")
-                       .arg(GetConfDir());
-            QDir cacheDir(cache);
-            QStringList thumbs = cacheDir.entryList(QDir::Files);
-
-            for (QStringList::const_iterator i = thumbs.end() - 1;
-                    i != thumbs.begin() - 1; --i)
-            {
-                QString filename = QString("%1/%2").arg(cache).arg(*i);
-                QFileInfo fi(filename);
-                QDateTime lastmod = fi.lastModified();
-                if (lastmod.addDays(2) < QDateTime::currentDateTime())
-                {
-                    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1")
-                          .arg(filename));
-                    QFile::remove(filename);
-                }
-            }
-        }
-
-        void customEvent(QEvent *event)
-        {
-            if (event->type() == ThumbnailDLEvent::kEventType)
-            {
-                ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
-
-                ThumbnailData *data = tde->thumb;
-
-                QString file = data->url;
-                uint pos = qVariantValue<uint>(data->data);
-
-                if (file.isEmpty())
-                    return;
-
-                if (!((uint)m_resultsList->GetCount() >= pos))
-                    return;
-
-                MythUIButtonListItem *item =
-                          m_resultsList->GetItemAt(pos);
-
-                if (item)
-                {
-                    item->SetImage(file);
-                }
-                delete data;
-            }
-        }
-
-     signals:
-        void haveResult(ArtworkInfo, VideoArtworkType);
-
-      private:
-        ArtworkList            m_list;
-        VideoArtworkType            m_type;
-        MythUIButtonList      *m_resultsList;
-        MetadataImageDownload *m_imageDownload;
-
-      private slots:
-        void sendResult(MythUIButtonListItem* item)
-        {
-            emit haveResult(qVariantValue<ArtworkInfo>(item->GetData()),
-                            m_type);
-            Close();
-        }
-    };
 }
 
 void EditMetadataDialog::createBusyDialog(QString title)
@@ -504,10 +351,6 @@ void EditMetadataDialog::fillWidgets()
     //  with all available videos.
     //
 
-    bool trip_catch = false;
-    QString caught_name = "";
-    int possible_starting_point = 0;
-
     button = new MythUIButtonListItem(m_childList,tr("None"));
 
     // TODO: maybe make the title list have the same sort order
@@ -519,61 +362,23 @@ void EditMetadataDialog::fillWidgets()
     for (VideoMetadataListManager::metadata_list::const_iterator p = mdl.begin();
             p != mdl.end(); ++p)
     {
-        tc.push_back(std::make_pair((*p)->GetID(), (*p)->GetTitle()));
+        QString title;
+        if ((*p)->GetSeason() > 0 || (*p)->GetEpisode() > 0)
+            title = QString("%1 %2x%3").arg((*p)->GetTitle())
+                                       .arg(QString::number((*p)->GetSeason()))
+                                       .arg(QString::number((*p)->GetEpisode()));
+        else
+            title = (*p)->GetTitle();
+        tc.push_back(std::make_pair((*p)->GetID(), title));
     }
     std::sort(tc.begin(), tc.end(), title_sort<title_list::value_type>());
 
     for (title_list::const_iterator p = tc.begin(); p != tc.end(); ++p)
     {
-        if (trip_catch)
-        {
-            //
-            //  Previous loop told us to check if the two
-            //  movie names are close enough to try and
-            //  set a default starting point.
-            //
-
-            QString target_name = p->second;
-            int length_compare = 0;
-            if (target_name.length() < caught_name.length())
-            {
-                length_compare = target_name.length();
-            }
-            else
-            {
-                length_compare = caught_name.length();
-            }
-
-            QString caught_name_three_quarters =
-                    caught_name.left((int)(length_compare * 0.75));
-            QString target_name_three_quarters =
-                    target_name.left((int)(length_compare * 0.75));
-
-            if (caught_name_three_quarters == target_name_three_quarters &&
-                m_workingMetadata->GetChildID() == -1 &&
-                !(m_workingMetadata->GetSeason() > 0) &&
-                !(m_workingMetadata->GetEpisode() > 0))
-            {
-                possible_starting_point = p->first;
-                m_workingMetadata->SetChildID(possible_starting_point);
-            }
-            trip_catch = false;
-        }
-
         if (p->first != m_workingMetadata->GetID())
         {
             button = new MythUIButtonListItem(m_childList,p->second);
             button->SetData(p->first);
-        }
-        else
-        {
-            //
-            //  This is the current file. Set a flag so the default
-            //  selected child will be set next loop
-            //
-
-            trip_catch = true;
-            caught_name = p->second;
         }
     }
 
@@ -581,11 +386,6 @@ void EditMetadataDialog::fillWidgets()
     {
         m_childList->SetValueByData(m_workingMetadata->GetChildID());
         cachedChildSelection = m_workingMetadata->GetChildID();
-    }
-    else
-    {
-        m_childList->SetValueByData(possible_starting_point);
-        cachedChildSelection = possible_starting_point;
     }
 
     if (m_workingMetadata->GetBrowse())
@@ -862,7 +662,14 @@ void EditMetadataDialog::OnSearchListSelection(ArtworkInfo info, VideoArtworkTyp
     createBusyDialog(msg);
 
     MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetType(VID);
+    lookup->SetType(kMetadataVideo);
+    if (m_workingMetadata->GetSeason() > 0 ||
+            m_workingMetadata->GetEpisode() > 0)
+        lookup->SetSubtype(kProbableTelevision);
+    else if (m_workingMetadata->GetSubtitle().isEmpty())
+        lookup->SetSubtype(kProbableMovie);
+    else
+        lookup->SetSubtype(kUnknownVideo);
     lookup->SetHost(m_workingMetadata->GetHost());
     lookup->SetAutomatic(true);
     lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
@@ -899,13 +706,13 @@ void EditMetadataDialog::handleDownloadedImages(MetadataLookup *lookup)
         ArtworkInfo info = map.value(type);
         QString filename = info.url;
 
-        if (type == COVERART)
+        if (type == kArtworkCoverart)
             SetCoverArt(filename);
-        else if (type == FANART)
+        else if (type == kArtworkFanart)
             SetFanart(filename);
-        else if (type == BANNER)
+        else if (type == kArtworkBanner)
             SetBanner(filename);
-        else if (type == SCREENSHOT)
+        else if (type == kArtworkScreenshot)
             SetScreenshot(filename);
     }
 }
@@ -916,9 +723,16 @@ void EditMetadataDialog::FindNetArt(VideoArtworkType type)
     createBusyDialog(msg);
 
     MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetStep(SEARCH);
-    lookup->SetType(VID);
+    lookup->SetStep(kLookupSearch);
+    lookup->SetType(kMetadataVideo);
     lookup->SetAutomatic(true);
+    if (m_workingMetadata->GetSeason() > 0 ||
+            m_workingMetadata->GetEpisode() > 0)
+        lookup->SetSubtype(kProbableTelevision);
+    else if (m_workingMetadata->GetSubtitle().isEmpty())
+        lookup->SetSubtype(kProbableMovie);
+    else
+        lookup->SetSubtype(kUnknownVideo);
     lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
 
     lookup->SetTitle(m_workingMetadata->GetTitle());
@@ -932,22 +746,22 @@ void EditMetadataDialog::FindNetArt(VideoArtworkType type)
 
 void EditMetadataDialog::FindNetCoverArt()
 {
-    FindNetArt(COVERART);
+    FindNetArt(kArtworkCoverart);
 }
 
 void EditMetadataDialog::FindNetFanart()
 {
-    FindNetArt(FANART);
+    FindNetArt(kArtworkFanart);
 }
 
 void EditMetadataDialog::FindNetBanner()
 {
-    FindNetArt(BANNER);
+    FindNetArt(kArtworkBanner);
 }
 
 void EditMetadataDialog::FindNetScreenshot()
 {
-    FindNetArt(SCREENSHOT);
+    FindNetArt(kArtworkScreenshot);
 }
 
 void EditMetadataDialog::SetCoverArt(QString file)
@@ -1210,7 +1024,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
         if (lul.size())
         {
             MetadataLookup *lookup = lul.takeFirst();
-            VERBOSE(VB_GENERAL,
+            LOG(VB_GENERAL, LOG_INFO,
                 QString("No results found for %1 %2 %3").arg(lookup->GetTitle())
                     .arg(lookup->GetSeason()).arg(lookup->GetEpisode()));
         }
@@ -1227,5 +1041,3 @@ void EditMetadataDialog::customEvent(QEvent *levent)
         handleDownloadedImages(lookup);
     }
 }
-
-#include "editvideometadata.moc"

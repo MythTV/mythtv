@@ -85,11 +85,11 @@ TaskQueue* TaskQueue::Instance()
 
 TaskQueue::TaskQueue() : m_bTermRequested( false )
 {
-    VERBOSE(VB_UPNP, "TaskQueue::ctor - Starting TaskQueue Thread...");
+    LOG(VB_UPNP, LOG_INFO, "Starting TaskQueue Thread...");
 
     start();
 
-    VERBOSE(VB_UPNP, "TaskQueue::ctor - TaskQueue Thread Started.");
+    LOG(VB_UPNP, LOG_INFO, "TaskQueue Thread Started.");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ void TaskQueue::run( )
     Task *pTask;
 
     threadRegister("TaskQueue");
-    VERBOSE(VB_UPNP, "TaskQueue::run - TaskQueue Thread Running.");
+    LOG(VB_UPNP, LOG_INFO, "TaskQueue Thread Running.");
 
     while ( !m_bTermRequested )
     {
@@ -134,8 +134,7 @@ void TaskQueue::run( )
             }
             catch( ... )
             {
-                VERBOSE(VB_GENERAL, "TaskQueue::run - Call to Execute threw "
-                                    "an exception.");
+                LOG(VB_GENERAL, LOG_ERR, "Call to Execute threw an exception.");
             }
 
         }

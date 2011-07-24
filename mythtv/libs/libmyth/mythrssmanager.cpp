@@ -14,8 +14,6 @@
 using namespace std;
 
 #define LOC      QString("RSSSite: ")
-#define LOC_WARN QString("RSSSite, Warning: ")
-#define LOC_ERR  QString("RSSSite, Error: ")
 
 // ---------------------------------------------------
 
@@ -52,8 +50,8 @@ void RSSManager::doUpdate()
     for (RSSSite::rssList::iterator i = m_sites.begin();
             i != m_sites.end(); ++i)
     {
-        LOG(VB_GENERAL, LOG_INFO,
-                 QString("Updating RSS Feed %1") .arg((*i)->GetTitle()));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Updating RSS Feed %1") .arg((*i)->GetTitle()));
 
         connect(*i, SIGNAL(finished(RSSSite*)),
                 this, SLOT(slotRSSRetrieved(RSSSite*)));
@@ -220,8 +218,8 @@ void RSSSite::process(void)
 
     if (!domDoc.setContent(m_data, true))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                 "Failed to set content from downloaded XML");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Failed to set content from downloaded XML");
         return;
     }
 
@@ -257,7 +255,7 @@ void RSSSite::process(void)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "Data is not valid RSS-feed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Data is not valid RSS-feed");
         emit finished(this);
     }
 }

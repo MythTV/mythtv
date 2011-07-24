@@ -29,10 +29,7 @@
 
 class ImageLoadThread;
 
-#define LOC      QString("MythUIImage(0x%1): ").arg((uintptr_t)this,0,16)
-#define LOC_ERR  QString("MythUIImage(0x%1) Error: ").arg((uintptr_t)this,0,16)
-#define LOC_WARN QString("MythUIImage(0x%1) Warning: ") \
-                     .arg((uintptr_t)this,0,16)
+#define LOC      QString("MythUIImage(0x%1): ").arg((uint64_t)this,0,16) 
 
 /*!
  * \class ImageLoadEvent
@@ -615,7 +612,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
              (!GetMythUI()->LoadCacheImage(filename, imagelabel,
                                            GetPainter(), cacheMode))))
         {
-            LOG(VB_GUI | VB_FILE, LOG_DEBUG, 
+            LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
                 QString("Load(), spawning thread to load '%1'").arg(filename));
             ImageLoadThread *bImgThread = new ImageLoadThread(
                 this, bFilename, filename, i, bForceSize, cacheMode2);
@@ -624,7 +621,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         else
         {
             // Perform a blocking load
-            LOG(VB_GUI | VB_FILE, LOG_DEBUG,
+            LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
                 QString("Load(), loading '%1' in foreground").arg(filename));
             QString tmpFilename;
             if (!(filename.startsWith("myth://")))
@@ -684,7 +681,7 @@ MythImage *MythUIImage::LoadImage(
     if ((m_loadingImages.contains(filename)) &&
         (m_loadingImages[filename] == this))
     {
-        LOG(VB_GUI | VB_FILE, LOG_DEBUG,
+        LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
             QString("MythUIImage::LoadImage(%1), this "
                     "file is already being loaded by this same MythUIImage in "
                     "another thread.").arg(filename));
@@ -699,7 +696,7 @@ MythImage *MythUIImage::LoadImage(
     m_loadingImages[filename] = this;
     m_loadingImagesLock.unlock();
 
-    LOG(VB_GUI | VB_FILE, LOG_DEBUG, QString("LoadImage(%2) Object %3")
+    LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC + QString("LoadImage(%2) Object %3")
             .arg(filename).arg(objectName()));
 
     MythImage *image = NULL;
@@ -735,8 +732,8 @@ MythImage *MythUIImage::LoadImage(
     {
         image->UpRef();
 
-        LOG(VB_GUI | VB_FILE, LOG_INFO,
-                QString("LoadImage found in cache :%1: RefCount = %2")
+        LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
+            QString("LoadImage found in cache :%1: RefCount = %2")
                 .arg(imagelabel).arg(image->RefCount()));
 
         if (m_isReflected)
@@ -746,9 +743,9 @@ MythImage *MythUIImage::LoadImage(
     }
     else
     {
-        LOG(VB_GUI | VB_FILE, LOG_INFO,
-                QString("LoadImage Not Found in cache. "
-                        "Loading Directly :%1:").arg(filename));
+        LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
+            QString("LoadImage Not Found in cache. Loading Directly :%1:")
+                .arg(filename));
 
         image = GetPainter()->GetFormatImage();
         image->UpRef();
@@ -810,8 +807,8 @@ MythImage *MythUIImage::LoadImage(
 
     if (image->isNull())
     {
-        LOG(VB_GUI | VB_FILE, LOG_INFO, QString("LoadImage Image is NULL :%1:")
-                .arg(filename));
+        LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
+            QString("LoadImage Image is NULL :%1:") .arg(filename));
 
         image->DownRef();
         Reset();
@@ -848,7 +845,7 @@ bool MythUIImage::LoadAnimatedImage(
     if ((m_loadingImages.contains(imFile)) &&
         (m_loadingImages[imFile] == this))
     {
-        LOG(VB_GUI | VB_FILE, LOG_DEBUG,
+        LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
             QString("MythUIImage::LoadAnimatedImage(%1), this "
                     "file is already being loaded by this same MythUIImage in "
                     "another thread.").arg(imFile));
@@ -1205,7 +1202,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
     MythUIImage *im = dynamic_cast<MythUIImage *>(base);
     if (!im)
     {
-        LOG(VB_GENERAL, LOG_ERR, "bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "bad parsing");
         d->m_UpdateLock.unlock();
         return;
     }
@@ -1329,8 +1326,8 @@ void MythUIImage::customEvent(QEvent *event)
         {
             d->m_UpdateLock.unlock();
 #if 0
-            LOG(VB_GUI | VB_FILE, LOG_DEBUG,
-                    QString("customEvent(): Expecting '%2', got '%3'")
+            LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
+                QString("customEvent(): Expecting '%2', got '%3'")
                     .arg(m_Filename).arg(le->GetBasefile()));
 #endif
             image->DownRef();

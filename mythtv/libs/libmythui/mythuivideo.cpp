@@ -16,9 +16,7 @@
 #include "mythuivideo.h"
 #include "mythimage.h"
 
-#define LOC      QString("MythUIVideo(%1): ").arg((long long)this)
-#define LOC_ERR  QString("MythUIVideo(%1) ERROR: ").arg((long long)this)
-#define LOC_WARN QString("MythUIVideo(%1) WARNING: ").arg((long long)this)
+#define LOC      QString("MythUIVideo(0x%1): ").arg((uint64_t)this, 0, 16)
 
 MythUIVideo::MythUIVideo(MythUIType *parent, const QString &name)
            : MythUIType(parent, name)

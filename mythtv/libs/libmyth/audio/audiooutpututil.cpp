@@ -17,7 +17,6 @@
 #endif
 
 #define LOC QString("AOUtil: ")
-#define LOC_ERR QString("AOUtil, ERROR: ")
 
 #if ARCH_X86
 static int has_sse2 = -1;

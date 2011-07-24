@@ -106,10 +106,6 @@ class ProgLister : public ScheduleCommon
     QString           m_addTables;
     QDateTime         m_startTime;
     QDateTime         m_searchTime;
-    QString           m_dayFormat;
-    QString           m_hourFormat;
-    QString           m_timeFormat;
-    QString           m_fullDateFormat;
     QString           m_channelOrdering;
     QString           m_channelFormat;
 

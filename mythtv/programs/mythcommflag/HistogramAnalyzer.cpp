@@ -46,8 +46,8 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
                 &widthval, &heightval, &colval, &rowval);
         if (nitems != 8)
         {
-            VERBOSE(VB_COMMFLAG, QString(
-                        "Not enough data in %1: frame %2")
+            LOG(VB_COMMFLAG, LOG_ERR,
+                QString("Not enough data in %1: frame %2")
                     .arg(filename).arg(frameno));
             goto error;
         }
@@ -55,8 +55,8 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
                 medianval < 0 || (uint)medianval > UCHAR_MAX ||
                 widthval < 0 || heightval < 0 || colval < 0 || rowval < 0)
         {
-            VERBOSE(VB_COMMFLAG, QString(
-                        "Data out of range in %1: frame %2")
+            LOG(VB_COMMFLAG, LOG_ERR,
+                QString("Data out of range in %1: frame %2")
                     .arg(filename).arg(frameno));
             goto error;
         }
@@ -64,14 +64,15 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
         {
             if ((nitems = fscanf(fp, "%x", &counter[ii])) != 1)
             {
-                VERBOSE(VB_COMMFLAG, QString("Not enough data in %1: frame %2")
+                LOG(VB_COMMFLAG, LOG_ERR,
+                    QString("Not enough data in %1: frame %2")
                         .arg(filename).arg(frameno));
                 goto error;
             }
             if (counter[ii] < 0 || (uint)(counter[ii]) > UCHAR_MAX)
             {
-                VERBOSE(VB_COMMFLAG, QString(
-                            "Data out of range in %1: frame %2")
+                LOG(VB_COMMFLAG, LOG_ERR,
+                    QString("Data out of range in %1: frame %2")
                         .arg(filename).arg(frameno));
                 goto error;
             }
@@ -92,13 +93,13 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
          */
     }
     if (fclose(fp))
-        VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
                 .arg(filename).arg(strerror(errno)));
     return true;
 
 error:
     if (fclose(fp))
-        VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
                 .arg(filename).arg(strerror(errno)));
     return false;
 }
@@ -127,7 +128,7 @@ writeData(QString filename, float *mean, unsigned char *median, float *stddev,
         (void)fprintf(fp, "\n");
     }
     if (fclose(fp))
-        VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
+        LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
                 .arg(filename).arg(strerror(errno)));
     return true;
 }
@@ -231,8 +232,8 @@ HistogramAnalyzer::MythPlayerInited(MythPlayer *player, long long nframes)
         .arg(logowidth).arg(logoheight).arg(logocc1).arg(logorr1) :
             QString("no logo");
 
-    VERBOSE(VB_COMMFLAG, QString(
-                "HistogramAnalyzer::MythPlayerInited %1x%2: %3")
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("HistogramAnalyzer::MythPlayerInited %1x%2: %3")
             .arg(width).arg(height).arg(details));
 
     if (pgmConverter->MythPlayerInited(player))
@@ -269,8 +270,8 @@ HistogramAnalyzer::MythPlayerInited(MythPlayer *player, long long nframes)
         if (readData(debugdata, mean, median, stddev, frow, fcol,
                     fwidth, fheight, histogram, monochromatic, nframes))
         {
-            VERBOSE(VB_COMMFLAG, QString(
-                        "HistogramAnalyzer::MythPlayerInited read %1")
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("HistogramAnalyzer::MythPlayerInited read %1")
                     .arg(debugdata));
             histval_done = true;
             return FrameAnalyzer::ANALYZE_FINISHED;
@@ -415,8 +416,8 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
     return FrameAnalyzer::ANALYZE_OK;
 
 error:
-    VERBOSE(VB_COMMFLAG,
-            QString("HistogramAnalyzer::analyzeFrame error at frame %1")
+    LOG(VB_COMMFLAG, LOG_ERR,
+        QString("HistogramAnalyzer::analyzeFrame error at frame %1")
             .arg(frameno));
 
     return FrameAnalyzer::ANALYZE_ERROR;
@@ -430,7 +431,8 @@ HistogramAnalyzer::finished(long long nframes, bool final)
         if (final && writeData(debugdata, mean, median, stddev, frow, fcol,
                     fwidth, fheight, histogram, monochromatic, nframes))
         {
-            VERBOSE(VB_COMMFLAG, QString("HistogramAnalyzer::finished wrote %1")
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("HistogramAnalyzer::finished wrote %1")
                     .arg(debugdata));
             histval_done = true;
         }
@@ -448,7 +450,7 @@ HistogramAnalyzer::reportTime(void) const
     if (borderDetector->reportTime())
         return -1;
 
-    VERBOSE(VB_COMMFLAG, QString("HA Time: analyze=%1s")
+    LOG(VB_COMMFLAG, LOG_INFO, QString("HA Time: analyze=%1s")
             .arg(strftimeval(&analyze_time)));
     return 0;
 }

@@ -112,6 +112,7 @@ class Ripper : public MythScreenType
     void showEditMetadataDialog(MythUIButtonListItem *);
     void EjectFinished(void);
     void ScanFinished(void);
+    void metadataChanged(void);
 
   signals:
     void ripFinished(void);

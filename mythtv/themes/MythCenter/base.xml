@@ -695,6 +695,35 @@
         <cornerradius>12</cornerradius>
     </shape>
 
+    <!-- a program information group used on a few schedule editor screens -->
+    <group name="baseprogramdetailsgroup" >
+        <area>0,0,750,145</area>
+
+        <shape name="details_background" from="basebackground">
+            <area>0,0,750,175</area>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>25,5,700,45</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>25,145,440,27</area>
+        </textarea>
+
+        <textarea name="channel" from="basetextarea">
+            <area>525,145,200,35</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>25,40,700,100</area>
+            <multiline>yes</multiline>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
+        </textarea>
+    </group>
+
     <!-- Popup Dialogue Box -->
     <window name="MythPopupBox">
         <area>-1,-1,500,500</area>
@@ -1063,6 +1092,19 @@
              <pixelsize>25</pixelsize>
              <weight>bold</weight>
         </fontdef>
+    </window>
+
+    <window name="MythMetadataResults">
+        <area>193,87,413,426</area>
+
+        <imagetype name="box">
+            <filename>mv_results_popup.png</filename>
+        </imagetype>
+
+        <buttonlist name="results" from="basebuttonlist">
+            <area>20,22,357,378</area>
+            <showarrow>no</showarrow>
+        </buttonlist>
     </window>
 
 </mythuitheme>

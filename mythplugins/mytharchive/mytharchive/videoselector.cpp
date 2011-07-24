@@ -72,7 +72,7 @@ bool VideoSelector::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'video_selector'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'video_selector'");
         return false;
     }
 
@@ -244,9 +244,9 @@ void VideoSelector::titleChanged(MythUIButtonListItem *item)
             if (file.exists())
                 v->size = (unsigned long long)file.size();
             else
-                VERBOSE(VB_IMPORTANT,
-                        QString("VideoSelector: Cannot find file: %1")
-                                .arg(v->filename.toLocal8Bit().constData()));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("VideoSelector: Cannot find file: %1")
+                        .arg(v->filename));
         }
 
         m_filesizeText->SetText(formatSize(v->size / 1024));
@@ -451,7 +451,7 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "VideoSelector: Failed to get any video's");
+        LOG(VB_GENERAL, LOG_ERR, "VideoSelector: Failed to get any video's");
         return NULL;
     }
 

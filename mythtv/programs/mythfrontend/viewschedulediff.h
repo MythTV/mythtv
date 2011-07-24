@@ -45,10 +45,6 @@ class ViewScheduleDiff : public MythScreenType
 
     ProgramInfo *CurrentProgram(void);
 
-    QString m_dateformat;
-    QString m_timeformat;
-    QString m_channelFormat;
-
     bool m_inEvent;
     bool m_inFill;
 

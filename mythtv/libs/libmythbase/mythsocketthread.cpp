@@ -28,8 +28,9 @@
 #include "mythlogging.h"
 #include "mythsocket.h"
 
-#define SLOC(a) QString("(sock 0x%1:%2): ")\
-    .arg((quint64)a, 0, 16).arg(a->socket())
+#define SLOC(a) QString("MythSocketThread(sock 0x%1:%2): ")\
+                    .arg((uint64_t)a, 0, 16).arg(a->socket())
+#define LOC	QString("MythSocketThread: ")
 
 const uint MythSocketThread::kShortWait = 100;
 
@@ -136,8 +137,8 @@ void MythSocketThread::WakeReadyReadThread(void) const
         wret = ::write(m_readyread_pipe[1], &buf, 1);
         if ((wret < 0) && (EAGAIN != errno) && (EINTR != errno))
         {
-            LOG(VB_GENERAL, LOG_ERR, 
-                    "Failed to write to readyread pipe, closing pipe.");
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Failed to write to readyread pipe, closing pipe.");
 
             // Closing the pipe will cause the run loop's select to exit.
             // Then the next time through the loop we should fallback to
@@ -188,17 +189,17 @@ void MythSocketThread::ProcessAddRemoveQueues(void)
 void MythSocketThread::run(void)
 {
     threadRegister("Socket");
-    LOG(VB_SOCKET, LOG_DEBUG, "readyread thread start");
+    LOG(VB_SOCKET, LOG_DEBUG, LOC + "readyread thread start");
 
     QMutexLocker locker(&m_readyread_lock);
     m_readyread_started_wait.wakeAll();
     while (m_readyread_run)
     {
-        LOG(VB_SOCKET, LOG_DEBUG, "ProcessAddRemoveQueues");
+        LOG(VB_SOCKET, LOG_DEBUG, LOC + "ProcessAddRemoveQueues");
 
         ProcessAddRemoveQueues();
 
-        LOG(VB_SOCKET, LOG_DEBUG, "Construct FD_SET");
+        LOG(VB_SOCKET, LOG_DEBUG, LOC + "Construct FD_SET");
 
         // construct FD_SET for all connected and unlocked sockets...
         int maxfd = -1;
@@ -223,11 +224,11 @@ void MythSocketThread::run(void)
         // There are no unlocked sockets, wait for event before we continue..
         if (maxfd < 0)
         {
-            LOG(VB_SOCKET, LOG_DEBUG, "Empty FD_SET, sleeping");
+            LOG(VB_SOCKET, LOG_DEBUG, LOC + "Empty FD_SET, sleeping");
             if (m_readyread_wait.wait(&m_readyread_lock))
-                LOG(VB_SOCKET, LOG_DEBUG, "Empty FD_SET, woken up");
+                LOG(VB_SOCKET, LOG_DEBUG, LOC + "Empty FD_SET, woken up");
             else
-                LOG(VB_SOCKET, LOG_DEBUG, "Empty FD_SET, timed out");
+                LOG(VB_SOCKET, LOG_DEBUG, LOC + "Empty FD_SET, timed out");
             continue;
         }
 
@@ -254,9 +255,9 @@ void MythSocketThread::run(void)
             // We unlock the ready read lock, because we don't need it
             // and this will allow WakeReadyReadThread() to run..
             m_readyread_lock.unlock();
-            LOG(VB_SOCKET, LOG_DEBUG, "Waiting on select..");
+            LOG(VB_SOCKET, LOG_DEBUG, LOC + "Waiting on select..");
             rval = select(maxfd + 1, &rfds, NULL, &efds, NULL);
-            LOG(VB_SOCKET, LOG_DEBUG, "Got data on select");
+            LOG(VB_SOCKET, LOG_DEBUG, LOC + "Got data on select");
             m_readyread_lock.lock();
 
             if (rval > 0 && FD_ISSET(m_readyread_pipe[0], &rfds))
@@ -264,14 +265,14 @@ void MythSocketThread::run(void)
                 int ret = ::read(m_readyread_pipe[0], dummy, 128);
                 if (ret < 0)
                 {
-                    LOG(VB_SOCKET, LOG_ERR,
-                            "Strange.. failed to read event pipe");
+                    LOG(VB_SOCKET, LOG_ERR, LOC +
+                        "Strange.. failed to read event pipe");
                 }
             }
         }
         else
         {
-            LOG(VB_SOCKET, LOG_DEBUG, "Waiting on select.. (no pipe)");
+            LOG(VB_SOCKET, LOG_DEBUG, LOC + "Waiting on select.. (no pipe)");
 
             // also exit select on exceptions on same descriptors
             fd_set efds;
@@ -290,7 +291,7 @@ void MythSocketThread::run(void)
                     m_readyread_wait.wait(&m_readyread_lock, kShortWait);
             }
 
-            LOG(VB_SOCKET, LOG_DEBUG, "Got data on select (no pipe)");
+            LOG(VB_SOCKET, LOG_DEBUG, LOC + "Got data on select (no pipe)");
         }
 
         if (rval <= 0)
@@ -299,10 +300,10 @@ void MythSocketThread::run(void)
             {
                 // Note: This should never occur when using pipes. When there
                 // is no error there should be data in at least one fd..
-                LOG(VB_SOCKET, LOG_DEBUG, "select timeout");
+                LOG(VB_SOCKET, LOG_DEBUG, LOC + "select timeout");
             }
             else
-                LOG(VB_SOCKET, LOG_ERR, "select returned error" + ENO);
+                LOG(VB_SOCKET, LOG_ERR, LOC + "select returned error" + ENO);
 
             m_readyread_wait.wait(&m_readyread_lock, kShortWait);
             continue;
@@ -319,7 +320,7 @@ void MythSocketThread::run(void)
         uint downref_tm = 0;
         if (!m_readyread_downref_list.empty())
         {
-            LOG(VB_SOCKET, LOG_DEBUG, "Deleting stale sockets");
+            LOG(VB_SOCKET, LOG_DEBUG, LOC + "Deleting stale sockets");
 
             QTime tm = QTime::currentTime();
             for (it = m_readyread_downref_list.begin();
@@ -331,7 +332,7 @@ void MythSocketThread::run(void)
             downref_tm = tm.elapsed();
         }
 
-        LOG(VB_SOCKET, LOG_DEBUG, "Processing ready reads");
+        LOG(VB_SOCKET, LOG_DEBUG, LOC + "Processing ready reads");
 
         QMap<uint,uint> timers;
         QTime tm = QTime::currentTime();
@@ -355,7 +356,7 @@ void MythSocketThread::run(void)
             (*it)->Unlock(false);
         }
 
-        if (VERBOSE_LEVEL_CHECK(VB_SOCKET) && logLevel <= LOG_DEBUG )
+        if (VERBOSE_LEVEL_CHECK(VB_SOCKET, LOG_DEBUG))
         {
             QString rep = QString("Total read time: %1ms, on sockets")
                 .arg(tm.elapsed());
@@ -365,13 +366,13 @@ void MythSocketThread::run(void)
             if (downref_tm)
                 rep += QString(" {downref, %1ms}").arg(downref_tm);
 
-            LOG(VB_SOCKET, LOG_DEBUG, rep);
+            LOG(VB_SOCKET, LOG_DEBUG, LOC + rep);
         }
 
         m_readyread_lock.lock();
-        LOG(VB_SOCKET, LOG_DEBUG, "Reacquired ready read lock");
+        LOG(VB_SOCKET, LOG_DEBUG, LOC + "Reacquired ready read lock");
     }
 
-    LOG(VB_SOCKET, LOG_DEBUG, "readyread thread exit");
+    LOG(VB_SOCKET, LOG_DEBUG, LOC + "readyread thread exit");
     threadDeregister();
 }

@@ -18,11 +18,11 @@ QString MythAVTestCommandLineParser::GetHelpHeader(void) const
 
 void MythAVTestCommandLineParser::LoadArguments(void)
 {
+    allowArgs();
     addHelp();
     addSettingsOverride();
     addVersion();
     addWindowed(false);
-    addVerbose();
     addGeometry();
     addDisplay();
     addLogging();

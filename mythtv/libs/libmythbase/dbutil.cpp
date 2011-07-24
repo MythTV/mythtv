@@ -23,7 +23,6 @@
 #include "exitcodes.h"
 
 #define LOC QString("DBUtil: ")
-#define LOC_ERR QString("DBUtil Error: ")
 
 const int DBUtil::kUnknownVersionNumber = INT_MIN;
 
@@ -529,9 +528,9 @@ bool DBUtil::CreateTemporaryDBConf(
     FILE *fp = fopen(tmpfile.constData(), "w");
     if (!fp)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Unable to create temporary "
-                        "configuration file for creating DB backup: %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Unable to create temporary "
+                    "configuration file for creating DB backup: %1")
                 .arg(tmpfile.constData()));
         filename = "";
         ok = false;
@@ -545,7 +544,7 @@ bool DBUtil::CreateTemporaryDBConf(
 
         if (fclose(fp))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error closing '%1'")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error closing '%1'")
                     .arg(tmpfile.constData()) + ENO);
         }
     }
@@ -588,7 +587,7 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
     QString tempDatabaseConfFile = QString::null;
     bool hastemp = CreateTemporaryDBConf(privateinfo, tempDatabaseConfFile);
     if (!hastemp)
-        LOG(VB_GENERAL, LOG_ERR, "Attempting backup, anyway.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Attempting backup, anyway.");
 
     LOG(VB_GENERAL, LOG_ERR, QString("Backing up database with script: '%1'")
             .arg(backupScript));
@@ -604,8 +603,8 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
 
     if (status != GENERIC_EXIT_OK)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Error backing up database: %1 (%2)")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Error backing up database: %1 (%2)")
                 .arg(command).arg(status));
         filename = "__FAILED__";
         return false;
@@ -621,7 +620,7 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
         // filename in the GUI message -- the script probably used some other
         // filename
         filename = "";
-        LOG(VB_FILE, LOG_ERR,
+        LOG(VB_FILE, LOG_ERR, LOC +
             QString("No files beginning with the suggested database backup "
                     "filename '%1' were found in '%2'.")
                 .arg(backupFilename).arg(backupDirectory));
@@ -631,7 +630,7 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
         filename = dir.path() + "/" + dir[0];;
         if (numfiles > 1)
         {
-            LOG(VB_FILE, LOG_ERR,
+            LOG(VB_FILE, LOG_ERR, LOC +
                 QString("Multiple files beginning with the suggested database "
                         "backup filename '%1' were found in '%2'. "
                         "Assuming the first is the backup.")
@@ -706,8 +705,8 @@ bool DBUtil::DoBackup(QString &filename)
 
     if (status != GENERIC_EXIT_OK)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("Error backing up database: '%1' (%2)")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Error backing up database: '%1' (%2)")
                 .arg(command).arg(status));
         filename = "__FAILED__";
         return false;
@@ -756,7 +755,8 @@ bool DBUtil::QueryDBMSVersion(void)
         query.prepare("SELECT VERSION();");
         if (!query.exec() || !query.next())
         {
-            LOG(VB_GENERAL, LOG_ERR, "Unable to determine MySQL version.");
+            LOG(VB_GENERAL, LOG_ERR, LOC + 
+                "Unable to determine MySQL version.");
             MythDB::DBError("DBUtil Querying DBMS version", query);
             dbmsVersion = QString::null;
         }

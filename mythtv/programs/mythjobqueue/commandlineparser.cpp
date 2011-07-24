@@ -21,7 +21,6 @@ void MythJobQueueCommandLineParser::LoadArguments(void)
     addHelp();
     addSettingsOverride();
     addVersion();
-    addVerbose();
     addLogging();
     addPIDFile();
     addDaemon();

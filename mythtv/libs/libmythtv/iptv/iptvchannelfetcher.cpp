@@ -18,7 +18,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("IPTVChanFetch: ")
-#define LOC_ERR QString("IPTVChanFetch, Error: ")
 
 static bool parse_chan_info(const QString   &rawdata,
                             IPTVChannelInfo &info,
@@ -117,7 +116,7 @@ void IPTVChannelFetcher::RunScan(void)
         return;
     }
 
-    VERBOSE(VB_CHANNEL, QString("Playlist URL: %1").arg(url));
+    LOG(VB_CHANNEL, LOG_INFO, QString("Playlist URL: %1").arg(url));
 
     // Step 2/4 : Download
     if (_scan_monitor)
@@ -228,7 +227,7 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
         QFile file(qurl.toLocalFile());
         if (!file.open(QIODevice::ReadOnly))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Opening '%1'")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Opening '%1'")
                     .arg(qurl.toLocalFile()) + ENO);
             return ret;
         }
@@ -252,7 +251,7 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
 
     if (redirected_url != url)
     {
-        VERBOSE(VB_CHANNEL, QString("Channel URL redirected to %1")
+        LOG(VB_CHANNEL, LOG_INFO, QString("Channel URL redirected to %1")
                 .arg(redirected_url));
     }
 
@@ -287,8 +286,8 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
     QString header = rawdata.section("\n", 0, 0);
     if (header != "#EXTM3U")
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Invalid channel list header (%1)").arg(header));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Invalid channel list header (%1)").arg(header));
 
         if (fetcher)
         {
@@ -305,8 +304,9 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
         uint num_channels = estimate_number_of_channels(rawdata);
         fetcher->SetTotalNumChannels(num_channels);
 
-        VERBOSE(VB_CHANNEL, QString("Estimating there are %1"
-                " channels in playlist").arg(num_channels));
+        LOG(VB_CHANNEL, LOG_INFO,
+            QString("Estimating there are %1 channels in playlist")
+                .arg(num_channels));
     }
 
     // Parse each channel
@@ -326,7 +326,7 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
 
             msg = QObject::tr("Parsing Channel #%1 : %2 : %3")
                 .arg(channum).arg(info.m_name).arg(info.m_url);
-            VERBOSE(VB_CHANNEL, msg);
+            LOG(VB_CHANNEL, LOG_INFO, msg);
 
             msg = QString::null; // don't tell fetcher
         }
@@ -396,7 +396,7 @@ static bool parse_extinf(const QString &line1,
                          QString       &name)
 {
     // data is supposed to contain the "0,2 - France 2" part
-    QString msg = LOC_ERR +
+    QString msg = LOC +
         QString("Invalid header in channel list line \n\t\t\tEXTINF:%1")
         .arg(line1);
 
@@ -404,7 +404,7 @@ static bool parse_extinf(const QString &line1,
     int pos = line1.indexOf(",");
     if (pos < 0)
     {
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return false;
     }
 
@@ -413,7 +413,7 @@ static bool parse_extinf(const QString &line1,
     pos = line1.indexOf(" ", pos + 1);
     if (pos < 0)
     {
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return false;
     }
     channum = line1.mid(oldpos, pos - oldpos);
@@ -422,7 +422,7 @@ static bool parse_extinf(const QString &line1,
     pos = line1.indexOf("- ", pos + 1);
     if (pos < 0)
     {
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return false;
     }
     name = line1.mid(pos + 2, line1.length());

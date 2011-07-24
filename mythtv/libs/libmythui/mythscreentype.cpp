@@ -505,10 +505,10 @@ bool MythScreenType::ParseElement(
         QRect screenArea = GetMythMainWindow()->GetUIScreenRect();
 
         if (rect.x() == -1)
-            rectN.setX((screenArea.width() - rectN.width()) / 2);
+            rectN.moveLeft((screenArea.width() - rectN.width()) / 2);
 
         if (rect.y() == -1)
-            rectN.setY((screenArea.height() - rectN.height()) / 2);
+            rectN.moveTop((screenArea.height() - rectN.height()) / 2);
 
         SetArea(rectN);
 

@@ -255,7 +255,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
     QString LOC  = QString("SaveSettingOnHost('%1') ").arg(key);
     if (key.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Illegal null key");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "- Illegal null key");
         return false;
     }
 
@@ -271,7 +271,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         if (host.toLower() == d->m_localhostname)
             OverrideSettingForSession(key, newValue);
         if (!d->suppressDBMessages)
-            LOG(VB_GENERAL, LOG_ERR, "No database yet");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "- No database yet");
         SingleSetting setting;
         setting.host = host;
         setting.key = key;
@@ -319,7 +319,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "database not open");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "- database not open");
     }
 
     ClearSettingsCache(host + ' ' + key);

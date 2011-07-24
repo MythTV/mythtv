@@ -27,8 +27,6 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    int quiet = 0;
-
     MythAVTestCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -49,35 +47,11 @@ int main(int argc, char *argv[])
     }
 
     QApplication a(argc, argv);
-
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);
 
-    QString filename = "";
-
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
-
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
-
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
+    int retval;
+    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+        return retval;
 
     if (!cmdline.toString("display").isEmpty())
     {
@@ -89,27 +63,18 @@ int main(int argc, char *argv[])
         MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
     }
 
+    QString filename = "";
     if (cmdline.GetArgs().size() >= 1)
         filename = cmdline.GetArgs()[0];
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    QMap<QString, QString> settingsOverride = cmdline.GetSettingsOverride();
-    if (settingsOverride.size())
-    {
-        QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(*it));
-            gCoreContext->OverrideSettingForSession(it.key(), *it);
-        }
-    }
+    cmdline.ApplySettingsOverride();
 
     setuid(getuid());
 
@@ -119,7 +84,7 @@ int main(int argc, char *argv[])
     {
         QString msg = QString("Fatal Error: Couldn't find theme '%1'.")
             .arg(themename);
-        VERBOSE(VB_IMPORTANT, msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         return GENERIC_EXIT_NO_THEME;
     }
 
@@ -131,8 +96,8 @@ int main(int argc, char *argv[])
     QString auddevice = gCoreContext->GetSetting("AudioOutputDevice");
     if (auddevice.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "Fatal Error: Audio not configured, you need "
-                "to run 'mythfrontend', not 'mythtv'.");
+        LOG(VB_GENERAL, LOG_ERR, "Fatal Error: Audio not configured, you need "
+                                 "to run 'mythfrontend', not 'mythtv'.");
         return GENERIC_EXIT_SETUP_ERROR;
     }
 #endif
@@ -144,7 +109,7 @@ int main(int argc, char *argv[])
 
     if (!UpgradeTVDatabaseSchema(false))
     {
-        VERBOSE(VB_IMPORTANT, "Fatal Error: Incorrect database schema.");
+        LOG(VB_GENERAL, LOG_ERR, "Fatal Error: Incorrect database schema.");
         delete gContext;
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
@@ -152,7 +117,7 @@ int main(int argc, char *argv[])
     TV *tv = new TV();
     if (!tv->Init())
     {
-        VERBOSE(VB_IMPORTANT, "Fatal Error: Could not initialize TV class.");
+        LOG(VB_GENERAL, LOG_ERR, "Fatal Error: Could not initialize TV class.");
         return GENERIC_EXIT_NOT_OK;
     }
 

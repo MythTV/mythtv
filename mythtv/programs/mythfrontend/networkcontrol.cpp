@@ -27,6 +27,9 @@
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
 
+#define FE_SHORT_TO 2000
+#define FE_LONG_TO  10000
+
 static QEvent::Type kNetworkControlDataReadyEvent =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type NetworkControlCloseEvent::kEventType =
@@ -262,7 +265,7 @@ bool NetworkControl::listen(const QHostAddress & address, quint16 port)
 {
     if (QTcpServer::listen(address,port))
     {
-        VERBOSE(VB_GENERAL, LOC +
+        LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Listening for remote connections on port %1").arg(port));
         return true;
     }
@@ -317,19 +320,16 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
         result = QString("INVALID command '%1', try 'help' for more info")
                          .arg(nc->getArg(0));
 
-    if (!result.isEmpty())
-    {
-        nrLock.lock();
-        networkControlReplies.push_back(new NetworkCommand(nc->getClient(),result));
-        nrLock.unlock();
+    nrLock.lock();
+    networkControlReplies.push_back(new NetworkCommand(nc->getClient(),result));
+    nrLock.unlock();
 
-        notifyDataAvailable();
-    }
+    notifyDataAvailable();
 }
 
 void NetworkControl::deleteClient(void)
 {
-    VERBOSE(VB_GENERAL, LOC + "Client Socket disconnected");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Client Socket disconnected");
     QMutexLocker locker(&clientLock);
 
     SendMythSystemEvent("NET_CTRL_DISCONNECTED");
@@ -356,7 +356,7 @@ void NetworkControl::deleteClient(NetworkControlClient *ncc)
         delete ncc;
     }
     else
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("deleteClient(%1), unable to "
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("deleteClient(%1), unable to "
                 "locate specified NetworkControlClient").arg((long long)ncc));
 }
 
@@ -364,8 +364,7 @@ void NetworkControl::newConnection()
 {
     QString welcomeStr;
 
-    VERBOSE(VB_GENERAL, LOC +
-            QString("New connection established."));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection established."));
 
     SendMythSystemEvent("NET_CTRL_CONNECTED");
 
@@ -415,14 +414,19 @@ void NetworkControlClient::readClient(void)
     while (socket->canReadLine())
     {
         lineIn = socket->readLine();
-//        lineIn.replace(QRegExp("[^-a-zA-Z0-9\\s\\.:_#/$%&()*+,;<=>?\\[\\]\\|]"), "");
+#if 0
+        lineIn.replace(QRegExp("[^-a-zA-Z0-9\\s\\.:_#/$%&()*+,;<=>?\\[\\]\\|]"),
+                       "");
+#endif
+
+        // TODO: can this be replaced with lineIn.simplify()?
         lineIn.replace(QRegExp("[\r\n]"), "");
         lineIn.replace(QRegExp("^\\s"), "");
 
         if (lineIn.isEmpty())
             continue;
 
-        VERBOSE(VB_NETWORK, LOC +
+        LOG(VB_NETWORK, LOG_INFO, LOC +
             QString("emit commandReceived(%1)").arg(lineIn));
         emit commandReceived(lineIn);
     }
@@ -430,8 +434,8 @@ void NetworkControlClient::readClient(void)
 
 void NetworkControl::receiveCommand(QString &command)
 {
-    VERBOSE(VB_NETWORK, LOC +
-            QString("NetworkControl::receiveCommand(%1)").arg(command));
+    LOG(VB_NETWORK, LOG_INFO, LOC +
+        QString("NetworkControl::receiveCommand(%1)").arg(command));
     NetworkControlClient *ncc = static_cast<NetworkControlClient *>(sender());
     if (!ncc)
          return;
@@ -456,7 +460,7 @@ QString NetworkControl::processJump(NetworkCommand *nc)
     // depend on all Locations matching their jumppoints
     QTime timer;
     timer.start();
-    while ((timer.elapsed() < 2000) &&
+    while ((timer.elapsed() < FE_SHORT_TO) &&
            (GetMythUI()->GetCurrentLocation().toLower() != nc->getArg(1)))
         usleep(10000);
 
@@ -583,7 +587,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
             QTime timer;
             timer.start();
-            while ((timer.elapsed() < 10000) &&
+            while ((timer.elapsed() < FE_LONG_TO) &&
                    (GetMythUI()->GetCurrentLocation().toLower() != "mainmenu"))
                 usleep(10000);
         }
@@ -612,7 +616,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
             QTime timer;
             timer.start();
-            while ((timer.elapsed() < 10000) &&
+            while ((timer.elapsed() < FE_LONG_TO) &&
                    (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
                 usleep(10000);
         }
@@ -642,10 +646,23 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             QString message = QString("NETWORK_CONTROL %1 PROGRAM %2 %3 %4")
                                       .arg(action).arg(nc->getArg(2))
                                       .arg(nc->getArg(3).toUpper()).arg(clientID);
+
+            result.clear();
+            gotAnswer = false;
+            QTime timer;
+            timer.start();
+
             MythEvent me(message);
             gCoreContext->dispatch(me);
 
-            result.clear();
+            while (timer.elapsed() < FE_LONG_TO && !gotAnswer)
+                usleep(10000);
+
+            if (gotAnswer)
+                result += answer;
+            else
+                result = "ERROR: Timed out waiting for reply from player";
+
         }
         else
         {
@@ -684,7 +701,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
                 QTime timer;
                 timer.start();
-                while (timer.elapsed() < 2000 && !gotAnswer)
+                while (timer.elapsed() < FE_SHORT_TO && !gotAnswer)
                 {
                     qApp->processEvents();
                     usleep(10000);
@@ -704,7 +721,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
                 QTime timer;
                 timer.start();
-                while (timer.elapsed() < 2000 && !gotAnswer)
+                while (timer.elapsed() < FE_SHORT_TO && !gotAnswer)
                 {
                     qApp->processEvents();
                     usleep(10000);
@@ -881,7 +898,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
 
             QTime timer;
             timer.start();
-            while (timer.elapsed() < 2000  && !gotAnswer)
+            while (timer.elapsed() < FE_SHORT_TO  && !gotAnswer)
                 usleep(10000);
 
             if (gotAnswer)
@@ -966,7 +983,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
 
         QTime timer;
         timer.start();
-        while (timer.elapsed() < 2000  && !gotAnswer)
+        while (timer.elapsed() < FE_SHORT_TO  && !gotAnswer)
             usleep(10000);
 
         if (gotAnswer)
@@ -1027,8 +1044,9 @@ QString NetworkControl::processSet(NetworkCommand *nc)
         result += " Previous filter: " + oldVerboseString + "\r\n";
         result += "      New Filter: " + verboseString + "\r\n";
 
-        VERBOSE(VB_IMPORTANT, QString("Verbose mask changed, new level is: %1")
-                                      .arg(verboseString));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Verbose mask changed, new level is: %1")
+                .arg(verboseString));
 
         return result;
     }
@@ -1147,7 +1165,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "query memstats        - List free and total, physical and swap memory\r\n"
             "query time            - Query current time on frontend\r\n"
             "query uptime          - Query machine uptime\r\n"
-            "query verbose         - Get current VERBOSE filter\r\n"
+            "query verbose         - Get current VERBOSE mask\r\n"
             "query version         - Query Frontend version details\r\n"
             "query channels        - Query available channels\r\n"
             "query channels START LIMIT - Query available channels from START and limit results to LIMIT lines\r\n";
@@ -1155,10 +1173,11 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
     else if (is_abbrev("set", command))
     {
         helpText +=
-            "set verbose debug-level - Change the VERBOSE filter to 'debug-level'\r\n"
-            "                          (i.e. 'set verbose playback,audio')\r\n"
-            "                          use 'set verbose default' to revert\r\n"
-            "                          back to the default level of\r\n";
+            "set verbose debug-mask - "
+            "Change the VERBOSE mask to 'debug-mask'\r\n"
+            "                         (i.e. 'set verbose playback,audio')\r\n"
+            "                         use 'set verbose default' to revert\r\n"
+            "                         back to the default level of\r\n";
     }
     else if (is_abbrev("screenshot", command))
     {
@@ -1276,20 +1295,11 @@ void NetworkControl::customEvent(QEvent *e)
             else if ((tokens.size() >= 4) &&
                      (tokens[1] == "RESPONSE"))
             {
-                int clientID = tokens[2].toInt();
-                QString response = tokens[3];
+//                int clientID = tokens[2].toInt();
+                answer = tokens[3];
                 for (int i = 4; i < tokens.size(); i++)
-                    response += QString(" ") + tokens[i];
-
-                clientLock.lock();
-                NetworkControlClient *ncc = clients.at(clientID);
-                clientLock.unlock();
-
-                nrLock.lock();
-                networkControlReplies.push_back(new NetworkCommand(ncc, response));
-                nrLock.unlock();
-
-                notifyDataAvailable();
+                    answer += QString(" ") + tokens[i];
+                gotAnswer = true;
             }
         }
     }

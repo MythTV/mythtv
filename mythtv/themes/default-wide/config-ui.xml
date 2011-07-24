@@ -376,4 +376,271 @@
 
     </window>
 
+    <window name="grabbersettings">
+
+        <textarea name="title" from="basetextarea">
+            <area>260,40,760,40</area>
+            <value>Artwork and Metadata Sources</value>
+            <align>hcenter,vcenter</align>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>270,350,740,280</area>
+            <multiline>yes</multiline>
+            <font>basesmall</font>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="moviegrabber_text" from="basetextarea">
+            <area>75,173,350,30</area>
+            <font>basesmall</font>
+            <value>Movie Metadata Source:</value>
+        </textarea>
+
+        <textarea name="tvgrabber_text" from="basetextarea">
+            <area>75,238,350,30</area>
+            <font>basesmall</font>
+            <value>Television Metadata Source:</value>
+        </textarea>
+
+        <textarea name="gamegrabber_text" from="basetextarea">
+            <area>75,303,350,30</area>
+            <font>basesmall</font>
+            <value>Game Metadata Source:</value>
+        </textarea>
+
+        <textarea name="dailyupdates_text" from="basetextarea">
+            <area>430,365,600,40</area>
+            <value>Perform daily updates of recording artwork</value>
+            <align>left,vcenter</align>
+        </textarea>
+
+    <!--Widgets-->
+
+        <buttonlist name="moviegrabber" from="basewideselector">
+            <position>465,167</position>
+        </buttonlist>
+
+        <buttonlist name="tvgrabber" from="basewideselector">
+            <position>465,232</position>
+        </buttonlist>
+
+        <buttonlist name="gamegrabber" from="basewideselector">
+            <position>465,297</position>
+        </buttonlist>
+
+        <checkbox name="dailyupdates" from="basecheckbox">
+            <position>390,370</position>
+        </checkbox>
+
+        <button name="cancel" from="basebutton">
+            <position>418,630</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>665,630</position>
+            <value>OK</value>
+        </button>
+
+    </window>
+
+    <window name="generalwizard">
+
+        <textarea name="title" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
+            <value>MythTV Configuration Wizard</value>
+        </textarea>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>100,500,1080,100</area>
+            <multiline>yes</multiline>
+            <font>basesmall</font>
+            <align>top,hcenter</align>
+        </textarea>
+
+    <!--Widgets-->
+
+        <button name="submit" from="baseverywidebutton">
+            <position>250,167</position>
+            <value>Submit your hardware profile</value>
+        </button>
+
+        <button name="view" from="baseverywidebutton">
+            <position>250,232</position>
+            <value>View your hardware profile</value>
+        </button>
+
+        <button name="delete" from="baseverywidebutton">
+            <position>250,297</position>
+            <value>Delete your hardware profile</value>
+        </button>
+
+        <button name="cancel" from="basebutton">
+            <position>250,644</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="next" from="basebutton">
+            <position>880,644</position>
+            <value>Next</value>
+        </button>
+
+    </window>
+
+    <window name="audiowizard">
+
+        <textarea name="title" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
+            <value>Audio Configuration</value>
+        </textarea>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>100,500,1080,100</area>
+            <multiline>yes</multiline>
+            <font>basesmall</font>
+            <align>top,hcenter</align>
+        </textarea>
+
+        <textarea name="auddev_text" from="basetextarea">
+            <area>40,103,300,30</area>
+            <font>basesmall</font>
+            <align>right</align>
+            <value>Audio Device:</value>
+        </textarea>
+
+        <textarea name="speaktext_text" from="auddev_text">
+            <position>40,148</position>
+            <value>Number of Speakers:</value>
+        </textarea>
+
+        <textarea name="ac3_text" from="basetextarea">
+            <area>410,200,375,30</area>
+            <font>basesmall</font>
+            <value>My speaker supports Dolby Digital</value>
+        </textarea>
+
+        <textarea name="dts_text" from="basetextarea">
+            <area>410,245,375,30</area>
+            <font>basesmall</font>
+            <value>My speaker supports DTS</value>
+        </textarea>
+
+        <textarea name="eac3_text" from="basetextarea">
+            <area>410,290,375,30</area>
+            <font>basesmall</font>
+            <value>My speaker supports E-AC-3</value>
+        </textarea>
+
+        <textarea name="truehd_text" from="basetextarea">
+            <area>410,335,375,30</area>
+            <font>basesmall</font>
+            <value>My speaker supports TrueHD</value>
+        </textarea>
+
+        <textarea name="dtshd_text" from="basetextarea">
+            <area>410,380,375,30</area>
+            <font>basesmall</font>
+            <value>My speaker supports DTS-HD</value>
+        </textarea>
+
+    <!--Widgets-->
+
+        <buttonlist name="audiodevices" from="basewideselector">
+            <position>360,97</position>
+        </buttonlist>
+
+        <buttonlist name="speakers" from="basewideselector">
+            <position>360,142</position>
+        </buttonlist>
+
+        <checkbox name="ac3check" from="basecheckbox">
+            <position>360,197</position>
+        </checkbox>
+
+        <checkbox name="dtscheck" from="basecheckbox">
+            <position>360,242</position>
+        </checkbox>
+
+        <checkbox name="eac3check" from="basecheckbox">
+            <position>360,287</position>
+        </checkbox>
+
+        <checkbox name="truehdcheck" from="basecheckbox">
+            <position>360,332</position>
+        </checkbox>
+
+        <checkbox name="dtshdcheck" from="basecheckbox">
+            <position>360,377</position>
+        </checkbox>
+
+        <button name="testspeakers" from="basewidebutton">
+            <position>360,422</position>
+        </button>
+
+        <button name="previous" from="basebutton">
+            <position>360,644</position>
+            <value>Previous</value>
+        </button>
+
+        <button name="next" from="basebutton">
+            <position>880,644</position>
+            <value>Next</value>
+        </button>
+
+    </window>
+
+    <window name="videowizard">
+
+        <textarea name="title" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
+            <value>Video Configurationn</value>
+        </textarea>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>100,500,1080,100</area>
+            <multiline>yes</multiline>
+            <font>basesmall</font>
+            <align>top,hcenter</align>
+        </textarea>
+
+        <textarea name="prof_text" from="basetextarea">
+            <area>40,173,300,30</area>
+            <font>basesmall</font>
+            <align>right</align>
+            <value>Video Playback Profile:</value>
+        </textarea>
+
+    <!--Widgets-->
+
+        <buttonlist name="playbackprofiles" from="basewideselector">
+            <position>360,167</position>
+        </buttonlist>
+
+        <button name="testsd" from="baseverywidebutton">
+            <position>360,232</position>
+            <value>Test Standard Definition</value>
+        </button>
+
+        <button name="testhd" from="baseverywidebutton">
+            <position>360,297</position>
+            <value>Test High Definition</value>
+        </button>
+
+        <button name="previous" from="basebutton">
+            <position>250,644</position>
+            <value>Previous</value>
+        </button>
+
+        <button name="next" from="basebutton">
+            <position>880,644</position>
+            <value>Finish</value>
+        </button>
+
+    </window>
+
 </mythuitheme>

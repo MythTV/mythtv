@@ -10,7 +10,6 @@
 #include "mythpainter_vdpau.h"
 
 #define LOC      QString("VidOutVDPAU: ")
-#define LOC_ERR  QString("VidOutVDPAU Error: ")
 
 #define MIN_REFERENCE_FRAMES 2
 #define MAX_REFERENCE_FRAMES 16
@@ -23,9 +22,9 @@
       errorState = kError_Unknown; \
   if (IsErrored()) \
   { \
-      VERBOSE(VB_IMPORTANT, LOC_ERR + QString("IsErrored() in %1").arg(Loc)); \
+      LOG(VB_GENERAL, LOG_ERR, LOC + QString("IsErrored() in %1").arg(Loc)); \
       return; \
-  }
+  } while(0)
 
 void VideoOutputVDPAU::GetRenderOptions(render_opts &opts)
 {
@@ -115,8 +114,8 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect,
 
     InitPictureAttributes();
     MoveResize();
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("Created VDPAU context (%1 decode)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Created VDPAU context (%1 decode)")
             .arg(codec_is_std(video_codec_id) ? "software" : "GPU"));
 
     return ok;
@@ -136,16 +135,16 @@ bool VideoOutputVDPAU::InitRender(void)
         if (m_osd_painter)
         {
             m_osd_painter->SetSwapControl(false);
-            VERBOSE(VB_PLAYBACK, LOC + QString("Created VDPAU osd (%1x%2)")
-                .arg(size.width()).arg(size.height()));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Created VDPAU osd (%1x%2)")
+                    .arg(size.width()).arg(size.height()));
         }
         else
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to create VDPAU osd."));
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VDPAU osd.");
         return true;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to initialise VDPAU"));
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VDPAU");
 
     return false;
 }
@@ -207,8 +206,7 @@ bool VideoOutputVDPAU::InitBuffers(void)
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Unable to create VDPAU buffers"));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to create VDPAU buffers");
     }
     else
     {
@@ -236,8 +234,7 @@ bool VideoOutputVDPAU::InitBuffers(void)
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Unable to create VDPAU mixer"));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to create VDPAU mixer");
         DeleteBuffers();
     }
 
@@ -346,13 +343,13 @@ bool VideoOutputVDPAU::SetupDeinterlace(bool interlaced,
             if (enable)
             {
                 m_deinterlacing = true;
-                VERBOSE(VB_PLAYBACK, LOC + QString("Enabled deinterlacing."));
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabled deinterlacing.");
             }
             else
             {
                 enable = false;
-                VERBOSE(VB_PLAYBACK, LOC +
-                                    QString("Failed to enable deinterlacing."));
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    "Failed to enable deinterlacing.");
             }
         }
         else
@@ -384,7 +381,7 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD *osd,
                                     FrameScanType scan)
 {
     QMutexLocker locker(&m_lock);
-    CHECK_ERROR("ProcessFrame")
+    CHECK_ERROR("ProcessFrame");
 
     if (!m_checked_surface_ownership && codec_is_std(video_codec_id))
         ClaimVideoSurfaces();
@@ -398,7 +395,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
 {
     QMutexLocker locker(&m_lock);
     (void)osd;
-    CHECK_ERROR("PrepareFrame")
+    CHECK_ERROR("PrepareFrame");
 
     if (!m_render)
         return;
@@ -490,7 +487,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
 
     QSize size = window.GetDisplayVisibleRect().size();
     if (size != m_render->GetSize())
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Unexpected display size."));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unexpected display size.");
 
     if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
                               deint ? &m_reference_frames : NULL,
@@ -500,7 +497,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
                               vsz_enabled ? vsz_desired_display_rect :
                                             window.GetDisplayVideoRect(),
                               m_pip_ready ? m_pip_layer : 0, 0))
-        VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Prepare frame failed."));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Prepare frame failed.");
 
     if (m_visual)
         m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, NULL);
@@ -534,7 +531,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     (void)w;
     (void)h;
 
-    CHECK_ERROR("DrawSlice")
+    CHECK_ERROR("DrawSlice");
 
     if (codec_is_std(video_codec_id) || !m_render)
         return;
@@ -545,8 +542,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
     if (!render)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-            QString("No video surface to decode to."));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No video surface to decode to.");
         errorState = kError_Unknown;
         return;
     }
@@ -555,8 +551,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     {
         if (m_decoder)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Picture format has changed."));
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Picture format has changed.");
             errorState = kError_Unknown;
             return;
         }
@@ -598,9 +593,9 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
                     }
                 }
                 m_decoder_buffer_size += created;
-                VERBOSE(VB_IMPORTANT, LOC +
-                        QString("Added %1 new buffers. New buffer size %2 "
-                                "(%3 decode and %4 process)")
+                LOG(VB_GENERAL, LOG_INFO, LOC +
+                    QString("Added %1 new buffers. New buffer size %2 "
+                            "(%3 decode and %4 process)")
                                 .arg(created).arg(vbuffers.Size())
                                 .arg(m_decoder_buffer_size)
                                 .arg(m_process_buffer_size));
@@ -629,8 +624,8 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
                 vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_ADVANCED;
                 break;
             default:
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Picture format is not supported."));
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Picture format is not supported.");
                 errorState = kError_Unknown;
                 return;
         }
@@ -640,22 +635,21 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         if (m_decoder)
         {
             m_pix_fmt = frame->pix_fmt;
-            VERBOSE(VB_PLAYBACK, LOC +
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Created VDPAU decoder (%1 ref frames)")
-                .arg(max_refs));
+                    .arg(max_refs));
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to create decoder."));
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create decoder.");
             errorState = kError_Unknown;
             return;
         }
     }
     else if (!m_decoder)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-            QString("Pix format already set but no VDPAU decoder."));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Pix format already set but no VDPAU decoder.");
         errorState = kError_Unknown;
         return;
     }
@@ -666,7 +660,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 void VideoOutputVDPAU::Show(FrameScanType scan)
 {
     QMutexLocker locker(&m_lock);
-    CHECK_ERROR("Show")
+    CHECK_ERROR("Show");
 
     if (window.IsRepaintNeeded())
         DrawUnusedRects(false);
@@ -679,7 +673,7 @@ void VideoOutputVDPAU::Show(FrameScanType scan)
 void VideoOutputVDPAU::ClearAfterSeek(void)
 {
     m_lock.lock();
-    VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek()");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "ClearAfterSeek()");
     DiscardFrames(false);
     m_lock.unlock();
 }
@@ -690,7 +684,8 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
                                     void        *codec_private,
                                     bool        &aspect_only)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) '%4'->'%5'")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("InputChanged(%1,%2,%3) '%4'->'%5'")
             .arg(input_size.width()).arg(input_size.height()).arg(aspect)
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
@@ -735,8 +730,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
         return true;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR +
-        QString("Failed to re-initialise video output."));
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to re-initialise video output.");
     errorState = kError_Unknown;
 
     return false;
@@ -801,7 +795,8 @@ void VideoOutputVDPAU::UpdatePauseFrame(void)
 {
     QMutexLocker locker(&m_lock);
 
-    VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame() " + vbuffers.GetStatus());
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "UpdatePauseFrame() " +
+            vbuffers.GetStatus());
 
     vbuffers.begin_lock(kVideoBuffer_used);
 
@@ -828,8 +823,8 @@ void VideoOutputVDPAU::UpdatePauseFrame(void)
         }
     }
     else
-        VERBOSE(VB_PLAYBACK,LOC +
-            QString("WARNING: Could not update pause frame - no used frames."));
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            "Could not update pause frame - no used frames.");
 
     vbuffers.end_lock();
 }
@@ -837,11 +832,11 @@ void VideoOutputVDPAU::UpdatePauseFrame(void)
 void VideoOutputVDPAU::InitPictureAttributes(void)
 {
     videoColourSpace.SetSupportedAttributes((PictureAttributeSupported)
-                                       (kPictureAttributeSupported_Brightness |
-                                        kPictureAttributeSupported_Contrast |
-                                        kPictureAttributeSupported_Colour |
-                                        kPictureAttributeSupported_Hue |
-                                        kPictureAttributeSupported_StudioLevels));
+                                     (kPictureAttributeSupported_Brightness |
+                                      kPictureAttributeSupported_Contrast |
+                                      kPictureAttributeSupported_Colour |
+                                      kPictureAttributeSupported_Hue |
+                                      kPictureAttributeSupported_StudioLevels));
 
     m_lock.lock();
     if (m_render && m_video_mixer)
@@ -852,7 +847,7 @@ void VideoOutputVDPAU::InitPictureAttributes(void)
             m_colorspace = (size.width() > 720 || size.height() > 576) ?
                             VDP_COLOR_STANDARD_ITUR_BT_709 :
                             VDP_COLOR_STANDARD_ITUR_BT_601;
-            VERBOSE(VB_PLAYBACK, LOC + QString("Using ITU %1 colorspace")
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using ITU %1 colorspace")
                         .arg((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ?
                         "BT.601" : "BT.709"));
         }
@@ -970,11 +965,12 @@ void VideoOutputVDPAU::DiscardFrame(VideoFrame *frame)
 void VideoOutputVDPAU::DiscardFrames(bool next_frame_keyframe)
 {
     m_lock.lock();
-    VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames(%1)").arg(next_frame_keyframe));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("DiscardFrames(%1)")
+            .arg(next_frame_keyframe));
     CheckFrameStates();
     ClearReferenceFrames();
     vbuffers.DiscardFrames(next_frame_keyframe);
-    VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 3: %1 -- done()")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("DiscardFrames() 3: %1 -- done()")
             .arg(vbuffers.GetStatus()));
     m_lock.unlock();
 }
@@ -1000,8 +996,8 @@ void VideoOutputVDPAU::CheckFrameStates(void)
         {
             if (vbuffers.contains(kVideoBuffer_decode, frame))
             {
-                VERBOSE(VB_PLAYBACK, LOC + QString(
-                            "Frame %1 is in use by avlib and so is "
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    QString("Frame %1 is in use by avlib and so is "
                             "being held for later discarding.")
                             .arg(DebugString(frame, true)));
             }
@@ -1100,7 +1096,7 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
             if (!mixer || !surf)
                 RemovePIP(pipplayer);
             else
-                VERBOSE(VB_IMPORTANT, LOC + QString("Created pip %1x%2")
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("Created pip %1x%2")
                     .arg(pipVideoDim.width()).arg(pipVideoDim.height()));
         }
 
@@ -1167,7 +1163,7 @@ void VideoOutputVDPAU::RemovePIP(MythPlayer *pipplayer)
         m_render->DestroyVideoMixer(m_pips[pipplayer].videoMixer);
 
     m_pips.remove(pipplayer);
-    VERBOSE(VB_PLAYBACK, LOC + "Removed 1 PIP");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Removed 1 PIP");
 
     if (m_pips.empty())
         DeinitPIPLayer();
@@ -1203,23 +1199,22 @@ void VideoOutputVDPAU::ParseOptions(void)
             uint num = opts.toUInt();
             if (MIN_PROCESS_BUFFER <= num && num <= MAX_PROCESS_BUFFER)
             {
-                VERBOSE(VB_PLAYBACK, LOC +
-                            QString("VDPAU process buffer size set to %1 (was %2)")
-                            .arg(num).arg(m_process_buffer_size));
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    QString("VDPAU process buffer size set to %1 (was %2)")
+                        .arg(num).arg(m_process_buffer_size));
                 m_process_buffer_size = num;
             }
         }
         else if (name.contains("vdpauivtc"))
         {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Enabling VDPAU inverse telecine "
-                            "(requires Basic or Advanced deinterlacer)"));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                "Enabling VDPAU inverse telecine "
+                "(requires Basic or Advanced deinterlacer)");
             m_mixer_features |= kVDPFeatIVTC;
         }
         else if (name.contains("vdpauskipchroma"))
         {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Enabling SkipChromaDeinterlace."));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabling SkipChromaDeinterlace.");
             m_skip_chroma = true;
         }
         else if (name.contains("vdpaudenoise"))
@@ -1227,7 +1222,7 @@ void VideoOutputVDPAU::ParseOptions(void)
             float tmp = std::max(0.0f, std::min(1.0f, opts.toFloat()));
             if (tmp != 0.0)
             {
-                VERBOSE(VB_PLAYBACK, LOC +
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("VDPAU Denoise %1").arg(tmp,4,'f',2,'0'));
                 m_denoise = tmp;
                 m_mixer_features |= kVDPFeatDenoise;
@@ -1238,7 +1233,7 @@ void VideoOutputVDPAU::ParseOptions(void)
             float tmp = std::max(-1.0f, std::min(1.0f, opts.toFloat()));
             if (tmp != 0.0)
             {
-                VERBOSE(VB_PLAYBACK, LOC +
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("VDPAU Sharpen %1").arg(tmp,4,'f',2,'0'));
                 m_sharpen = tmp;
                 m_mixer_features |= kVDPFeatSharpness;
@@ -1255,17 +1250,17 @@ void VideoOutputVDPAU::ParseOptions(void)
 
             if (m_colorspace > -1)
             {
-                VERBOSE(VB_PLAYBACK, LOC +
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("Forcing ITU BT.%1 colorspace")
-                    .arg((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ?
-                    "BT.601" : "BT.709"));
+                        .arg((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ?
+                             "BT.601" : "BT.709"));
             }
         }
         else if (name.contains("vdpauhqscaling"))
         {
             m_mixer_features |= kVDPFeatHQScaling;
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Requesting high quality scaling."));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                "Requesting high quality scaling.");
         }
     }
 }

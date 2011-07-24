@@ -24,6 +24,17 @@ static FT_Library ft_library;
 #define SCALED_X(arg1) (int)(((float)arg1 * m_xScale) + 0.5f)
 #define SCALED_Y(arg1) (int)(((float)arg1 * m_yScale) + 0.5f)
 
+// LifecycleExtension tuneinfo:
+const unsigned kTuneQuietly   = 1U<<0; // b0 tune quietly
+const unsigned kTuneKeepApp   = 1U<<1; // b1 keep app running
+const unsigned kTuneCarId     = 1U<<2; // b2 carousel id in bits 8..16
+const unsigned kTuneCarReset  = 1U<<3; // b3 get carousel id from gateway info
+const unsigned kTuneBcastDisa = 1U<<4; // b4 broadcaster_interrupt disable
+// b5..7 reserverd
+// b8..15 carousel id
+// b16..31 reserved
+const unsigned kTuneKeepChnl  = 1U<<16; // Keep current channel
+
 /** \class MHIImageData
  *  \brief Data for items in the interactive television display stack.
  */
@@ -52,9 +63,9 @@ MHIContext::MHIContext(InteractiveTV *parent)
       m_updated(false),
       m_displayWidth(StdDisplayWidth), m_displayHeight(StdDisplayHeight),
       m_face_loaded(false), m_engineThread(NULL), m_currentChannel(-1),
-      m_isLive(false),      m_currentCard(0),
+      m_currentStream(-1),  m_isLive(false),      m_currentCard(0),
       m_audioTag(-1),       m_videoTag(-1),
-      m_tuningTo(-1),       m_lastNbiVersion(NBI_VERSION_UNSET),
+      m_lastNbiVersion(NBI_VERSION_UNSET),
       m_videoRect(0, 0, StdDisplayWidth, StdDisplayHeight),
       m_displayRect(0, 0, StdDisplayWidth, StdDisplayHeight)
 {
@@ -103,7 +114,7 @@ bool MHIContext::LoadFont(QString name)
     if (!errorD)
         return true;
 
-    VERBOSE(VB_IMPORTANT, QString("Unable to find font: %1").arg(name));
+    LOG(VB_GENERAL, LOG_ERR, QString("Unable to find font: %1").arg(name));
     return false;
 }
 
@@ -154,10 +165,17 @@ void MHIContext::StopEngine(void)
 // Start or restart the MHEG engine.
 void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
 {
-    m_currentChannel = (chanid) ? (int)chanid : -1;
-    m_currentCard = cardid;
+    int tuneinfo = m_tuneinfo.isEmpty() ? 0 : m_tuneinfo.takeFirst();
 
-    if (m_currentChannel == m_tuningTo && m_currentChannel != -1)
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] Restart ch=%1 card=%2 live=%3 tuneinfo=0x%4")
+        .arg((int)chanid).arg((int)cardid).arg(isLive).arg(tuneinfo,0,16));
+
+    m_currentCard = cardid;
+    m_currentStream = (chanid) ? (int)chanid : -1;
+    if (!(tuneinfo & kTuneKeepChnl))
+        m_currentChannel = m_currentStream;
+
+    if (tuneinfo & kTuneKeepApp)
     {
         // We have tuned to the channel in order to find the streams.
         // Leave the MHEG engine running but restart the DSMCC carousel.
@@ -167,13 +185,20 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
             m_dsmcc = new Dsmcc();
         {
             QMutexLocker locker(&m_dsmccLock);
-            m_dsmcc->Reset();
+            if (tuneinfo & kTuneCarReset)
+                m_dsmcc->Reset();
             ClearQueue();
         }
+
+        if (tuneinfo & (kTuneCarReset|kTuneCarId))
+            m_engine->EngineEvent(10); // NonDestructiveTuneOK
     }
     else
     {
         StopEngine();
+
+        m_audioTag = -1;
+        m_videoTag = -1;
 
         if (!m_dsmcc)
             m_dsmcc = new Dsmcc();
@@ -201,10 +226,6 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
         // after the PMT is processed.
         m_engineThread = new MHEGEngineThread(this);
         m_engineThread->start();
-
-        m_audioTag = -1;
-        m_videoTag = -1;
-        m_tuningTo = -1;
     }
 }
 
@@ -212,6 +233,7 @@ void MHIContext::RunMHEGEngine(void)
 {
     QMutexLocker locker(&m_runLock);
 
+    QTime t; t.start();
     while (!m_stop)
     {
         locker.unlock();
@@ -294,6 +316,10 @@ void MHIContext::SetNetBootInfo(const unsigned char *data, uint length)
 {
     if (length < 2) // A valid descriptor should always have at least 2 bytes.
         return;
+
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] SetNetBootInfo version %1 mode %2 len %3")
+        .arg(data[0]).arg(data[1]).arg(length));
+
     QMutexLocker locker(&m_dsmccLock);
     // Save the data from the descriptor.
     m_nbiData.resize(0);
@@ -317,14 +343,22 @@ void MHIContext::NetworkBootRequested(void)
     if (m_nbiData.size() >= 2 && m_nbiData[0] != m_lastNbiVersion)
     {
         m_lastNbiVersion = m_nbiData[0]; // Update the saved version
-        if (m_nbiData[1] == 1)
+        switch (m_nbiData[1])
         {
+        case 1:
             m_dsmcc->Reset();
             m_engine->SetBooting();
             ClearDisplay();
             m_updated = true;
+            break;
+        case 2:
+            m_engine->EngineEvent(9); // NetworkBootInfo EngineEvent
+            break;
+        default:
+            LOG(VB_MHEG, LOG_INFO, QString("[mhi] Unknown NetworkBoot type %1")
+                .arg(m_nbiData[1]));
+            break;
         }
-        // TODO: else if it is 2 generate an EngineEvent.
     }
 }
 
@@ -348,6 +382,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
     // the result.
 
     QMutexLocker locker(&m_runLock);
+    QTime t; t.start();
     while (!m_stop)
     {
         locker.unlock();
@@ -356,6 +391,8 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
         if (res == 0)
             return true; // Found it
         else if (res < 0)
+            return false; // Not there.
+        else if (t.elapsed() > 60000) // TODO get this from carousel info
             return false; // Not there.
         // Otherwise we block.
         // Process DSMCC packets then block for a second or until we receive
@@ -438,7 +475,7 @@ bool MHIContext::OfferKey(QString key)
     if (action != 0)
     {
         m_keyQueue.enqueue(action);
-        VERBOSE(VB_IMPORTANT, QString("Adding MHEG key %1:%2:%3").arg(key)
+        LOG(VB_GENERAL, LOG_INFO, QString("Adding MHEG key %1:%2:%3").arg(key)
                 .arg(action).arg(m_keyQueue.size()));
         locker.unlock();
         QMutexLocker locker2(&m_runLock);
@@ -603,20 +640,23 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
 // Returns -1 if it cannot find it.
 int MHIContext::GetChannelIndex(const QString &str)
 {
-    if (str.startsWith("dvb://"))
+    int nResult = -1;
+
+    do if (str.startsWith("dvb://"))
     {
         QStringList list = str.mid(6).split('.');
         MSqlQuery query(MSqlQuery::InitCon());
-        if (list.size() != 3) return -1; // Malformed.
+        if (list.size() != 3)
+            break; // Malformed.
         // The various fields are expressed in hexadecimal.
         // Convert them to decimal for the DB.
         bool ok;
         int netID = list[0].toInt(&ok, 16);
         if (!ok)
-            return -1;
+            break;
         int serviceID = list[2].toInt(&ok, 16);
         if (!ok)
-            return -1;
+            break;
         // We only return channels that match the current capture card.
         if (list[1].isEmpty()) // TransportID is not specified
         {
@@ -634,7 +674,7 @@ int MHIContext::GetChannelIndex(const QString &str)
         {
             int transportID = list[1].toInt(&ok, 16);
             if (!ok)
-                return -1;
+                break;
             query.prepare(
                 "SELECT chanid "
                 "FROM channel, dtv_multiplex, cardinput, capturecard "
@@ -651,17 +691,15 @@ int MHIContext::GetChannelIndex(const QString &str)
         query.bindValue(":SERVICEID", serviceID);
         query.bindValue(":CARDID", m_currentCard);
         if (query.exec() && query.isActive() && query.next())
-        {
-            int nResult = query.value(0).toInt();
-            return nResult;
-        }
+            nResult = query.value(0).toInt();
     }
     else if (str.startsWith("rec://svc/lcn/"))
     {
         // I haven't seen this yet so this is untested.
         bool ok;
         int channelNo = str.mid(14).toInt(&ok); // Decimal integer
-        if (!ok) return -1;
+        if (!ok)
+            break;
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT chanid "
                       "FROM channel, cardinput, capturecard "
@@ -672,20 +710,26 @@ int MHIContext::GetChannelIndex(const QString &str)
         query.bindValue(":CHAN", channelNo);
         query.bindValue(":CARDID", m_currentCard);
         if (query.exec() && query.isActive() && query.next())
-            return query.value(0).toInt();
+            nResult = query.value(0).toInt();
     }
-    else if (str == "rec://svc/cur" || str == "rec://svc/def")
-        return m_currentChannel;
+    else if (str == "rec://svc/cur")
+        nResult = m_currentStream;
+    else if (str == "rec://svc/def")
+        nResult = m_currentChannel;
     else if (str.startsWith("rec://"))
-    {
-    }
-    return -1;
+        ;
+    while(0);
+
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] GetChannelIndex %1 => %2")
+        .arg(str).arg(nResult));
+    return nResult;
 }
 
 // Get netId etc from the channel index.  This is the inverse of GetChannelIndex.
 bool MHIContext::GetServiceInfo(int channelId, int &netId, int &origNetId,
                                 int &transportId, int &serviceId)
 {
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] GetServiceInfo %1").arg(channelId));
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT networkid, transportid, serviceid "
                   "FROM channel, dtv_multiplex "
@@ -703,10 +747,15 @@ bool MHIContext::GetServiceInfo(int channelId, int &netId, int &origNetId,
     else return false;
 }
 
-bool MHIContext::TuneTo(int channel)
+bool MHIContext::TuneTo(int channel, int tuneinfo)
 {
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] TuneTo %1 0x%2")
+        .arg(channel).arg(tuneinfo,0,16));
+
     if (!m_isLive)
         return false; // Can't tune if this is a recording.
+
+    m_tuneinfo.append(tuneinfo);
 
     // Post an event requesting a channel change.
     MythEvent me(QString("NETWORK_CONTROL CHANID %1").arg(channel));
@@ -721,16 +770,20 @@ bool MHIContext::TuneTo(int channel)
 // Begin playing audio from the specified stream
 bool MHIContext::BeginAudio(const QString &stream, int tag)
 {
-    int chan = GetChannelIndex(stream);
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] BeginAudio %1 %2").arg(stream).arg(tag));
 
-    if (chan != m_currentChannel)
+    int chan = GetChannelIndex(stream);
+    if (chan < 0)
+        return false;
+
+    if (chan != m_currentStream)
     {
         // We have to tune to the channel where the audio is to be found.
         // Because the audio and video are both components of an MHEG stream
         // they will both be on the same channel.
-        m_tuningTo = chan;
+        m_currentStream = chan;
         m_audioTag = tag;
-        return TuneTo(chan);
+        return TuneTo(chan, kTuneKeepChnl|kTuneQuietly|kTuneKeepApp);
     }
 
     if (tag < 0)
@@ -750,13 +803,17 @@ void MHIContext::StopAudio(void)
 // Begin displaying video from the specified stream
 bool MHIContext::BeginVideo(const QString &stream, int tag)
 {
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] BeginVideo %1 %2").arg(stream).arg(tag));
+
     int chan = GetChannelIndex(stream);
-    if (chan != m_currentChannel)
+    if (chan < 0)
+        return false;
+    if (chan != m_currentStream)
     {
         // We have to tune to the channel where the video is to be found.
-        m_tuningTo = chan;
+        m_currentStream = chan;
         m_videoTag = tag;
-        return TuneTo(chan);
+        return TuneTo(chan, kTuneKeepChnl|kTuneQuietly|kTuneKeepApp);
     }
     if (tag < 0)
         return true; // Leave it at the default.

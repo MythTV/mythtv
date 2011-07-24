@@ -147,14 +147,14 @@ QString AudioPlayer::ReinitAudio(void)
     {
         if (!firstinit)
         {
-            VERBOSE(VB_IMPORTANT, LOC + "Disabling Audio" +
+            LOG(VB_GENERAL, LOG_NOTICE, LOC + "Disabling Audio" +
                     QString(", reason is: %1").arg(errMsg));
         }
         m_no_audio_out = true;
     }
     else if (m_no_audio_out && m_audioOutput)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + "Enabling Audio");
         m_no_audio_out = false;
     }
 
@@ -275,17 +275,18 @@ bool AudioPlayer::SetMuted(bool mute)
     if (m_audioOutput && !m_no_audio_out && !is_muted && mute &&
         (kMuteAll == SetMuteState(kMuteAll)))
     {
-        VERBOSE(VB_AUDIO, QString("muting sound %1").arg(IsMuted()));
+        LOG(VB_AUDIO, LOG_INFO, QString("muting sound %1").arg(IsMuted()));
         return true;
     }
     else if (m_audioOutput && !m_no_audio_out && is_muted && !mute &&
              (kMuteOff == SetMuteState(kMuteOff)))
     {
-        VERBOSE(VB_AUDIO, QString("unmuting sound %1").arg(IsMuted()));
+        LOG(VB_AUDIO, LOG_INFO, QString("unmuting sound %1").arg(IsMuted()));
         return true;
     }
 
-    VERBOSE(VB_AUDIO, QString("not changing sound mute state %1").arg(IsMuted()));
+    LOG(VB_AUDIO, LOG_ERR, 
+        QString("not changing sound mute state %1").arg(IsMuted()));
 
     return false;
 }
@@ -435,7 +436,7 @@ void AudioPlayer::AddAudioData(char *buffer, int len,
         frames = len / samplesize;
 
     if (!m_audioOutput->AddData(buffer, len, timecode, frames))
-        VERBOSE(VB_PLAYBACK, LOC + "AddAudioData(): "
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "AddAudioData(): "
                 "Audio buffer overflow, audio data lost!");
 }
 

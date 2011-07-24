@@ -153,7 +153,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 class SERVICE_PUBLIC Program : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.1" );
     Q_CLASSINFO( "defaultProp", "Description" );
 
     Q_PROPERTY( QDateTime   StartTime    READ StartTime    WRITE setStartTime )
@@ -173,6 +173,9 @@ class SERVICE_PUBLIC Program : public QObject
     Q_PROPERTY( QString     Hostname     READ Hostname     WRITE setHostname     DESIGNABLE SerializeDetails )
     Q_PROPERTY( QDate       Airdate      READ Airdate      WRITE setAirdate      DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     Description  READ Description  WRITE setDescription  DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     Inetref      READ Inetref      WRITE setInetref      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int         Season       READ Season       WRITE setSeason       DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int         Episode      READ Episode      WRITE setEpisode      DESIGNABLE SerializeDetails )
 
     Q_PROPERTY( QObject*    Channel      READ Channel   DESIGNABLE SerializeChannel )
     Q_PROPERTY( QObject*    Recording    READ Recording DESIGNABLE SerializeRecording )
@@ -194,6 +197,9 @@ class SERVICE_PUBLIC Program : public QObject
     PROPERTYIMP    ( QString     , Hostname     )
     PROPERTYIMP    ( QDate       , Airdate      )
     PROPERTYIMP    ( QString     , Description  )
+    PROPERTYIMP    ( QString     , Inetref      )
+    PROPERTYIMP    ( int         , Season       )
+    PROPERTYIMP    ( int         , Episode      )
 
     PROPERTYIMP_PTR( ChannelInfo  , Channel     )
     PROPERTYIMP_PTR( RecordingInfo, Recording   )
@@ -256,6 +262,9 @@ class SERVICE_PUBLIC Program : public QObject
             m_Hostname          = src.m_Hostname;
             m_Airdate           = src.m_Airdate;
             m_Description       = src.m_Description;
+            m_Inetref           = src.m_Inetref;
+            m_Season            = src.m_Season;
+            m_Episode           = src.m_Episode;
             m_SerializeDetails  = src.m_SerializeDetails;
             m_SerializeChannel  = src.m_SerializeChannel;    
             m_SerializeRecording= src.m_SerializeRecording;  

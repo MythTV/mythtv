@@ -44,8 +44,6 @@
 #endif
 
 #define LOC      QString("CardUtil: ")
-#define LOC_WARN QString("CardUtil, Warning: ")
-#define LOC_ERR  QString("CardUtil, Error: ")
 
 QString CardUtil::GetScanableCardTypes(void)
 {
@@ -90,7 +88,7 @@ QString CardUtil::GetScanableCardTypes(void)
 
 bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
 {
-    VERBOSE(VB_IMPORTANT, QString("IsTunerShared(%1,%2)")
+    LOG(VB_GENERAL, LOG_DEBUG, QString("IsTunerShared(%1,%2)")
             .arg(cardidA).arg(cardidB));
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -124,7 +122,7 @@ bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
                 (hostname == query.value(1).toString()) &&
                 (cardtype == query.value(2).toString()));
 
-    VERBOSE(VB_RECORD, QString("IsTunerShared(%1,%2) -> %3")
+    LOG(VB_RECORD, LOG_DEBUG, QString("IsTunerShared(%1,%2) -> %3")
             .arg(cardidA).arg(cardidB).arg(ret));
 
     return ret;
@@ -296,15 +294,14 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
 
         if (result == -1)
         {
-            VERBOSE(VB_IMPORTANT, "CardUtil::ProbeVideoDevices: "
-                    "Error finding HDHomerun devices");
+            LOG(VB_GENERAL, LOG_ERR, "Error finding HDHomerun devices");
             return devs;
         }
 
         if (result >= max_count)
         {
-            VERBOSE(VB_IMPORTANT, "CardUtil::ProbeVideoDevices: "
-                    "Warning: may be > 50 HDHomerun devices");
+            LOG(VB_GENERAL, LOG_WARNING, 
+                "Warning: may be > 50 HDHomerun devices");
         }
 
         // Return "deviceid ipaddress" pairs
@@ -319,7 +316,8 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
 
             for (int tuner = 0; tuner < result_list[i].tuner_count; tuner++)
             {
-                QString hdhrdev = id.toUpper() + " " + ip + " " + QString("%1").arg(tuner);
+                QString hdhrdev = id.toUpper() + " " + ip + " " +
+                                  QString("%1").arg(tuner);
                 devs.push_back(hdhrdev);
             }
         }
@@ -327,8 +325,8 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
 #endif // USING_HDHOMERUN
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("CardUtil::ProbeVideoDevices: ") +
-                QString("Raw Type: '%1' is not supported").arg(rawtype));
+        LOG(VB_GENERAL, LOG_ERR, QString("Raw Type: '%1' is not supported")
+                                     .arg(rawtype));
     }
 
     return devs;
@@ -347,7 +345,7 @@ QString CardUtil::ProbeDVBType(const QString &device)
     int fd_frontend = open(dev.constData(), O_RDONLY | O_NONBLOCK);
     if (fd_frontend < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("Can't open DVB frontend (%1) for %2.")
+        LOG(VB_GENERAL, LOG_ERR, QString("Can't open DVB frontend (%1) for %2.")
                 .arg(dvbdev).arg(device));
         return ret;
     }
@@ -357,7 +355,7 @@ QString CardUtil::ProbeDVBType(const QString &device)
     if (err < 0)
     {
         close(fd_frontend);
-        VERBOSE(VB_IMPORTANT, "FE_GET_INFO ioctl failed (" + dvbdev + ").");
+        LOG(VB_GENERAL, LOG_ERR, "FE_GET_INFO ioctl failed (" + dvbdev + ").");
         return ret;
     }
     close(fd_frontend);
@@ -602,7 +600,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
 
         if (!query.next())
         {
-            VERBOSE(VB_IMPORTANT, "clone_capturecard -- get temp id");
+            LOG(VB_GENERAL, LOG_ERR, "clone_capturecard -- get temp id");
             return 0;
         }
 
@@ -625,7 +623,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
     }
     if (!query.next())
     {
-        VERBOSE(VB_IMPORTANT, "clone_cardinput -- get data 2");
+        LOG(VB_GENERAL, LOG_ERR, "clone_cardinput -- get data 2");
         return 0;
     }
 
@@ -696,7 +694,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
         }
         if (!query.next())
         {
-            VERBOSE(VB_IMPORTANT, "clone_cardinput -- get data 2");
+            LOG(VB_GENERAL, LOG_ERR, "clone_cardinput -- get data 2");
             ok = false;
             break;
         }
@@ -793,7 +791,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
             }
             if (!query2.next())
             {
-                VERBOSE(VB_IMPORTANT, "clone_cardinput -- insert failed");
+                LOG(VB_GENERAL, LOG_ERR, "clone_cardinput -- insert failed");
                 ok = false;
                 break;
             }
@@ -1224,15 +1222,14 @@ bool CardUtil::DeleteOrphanInputs(void)
         uint inputid = query.value(0).toUInt();
         if (DeleteInput(inputid))
         {
-            VERBOSE(VB_IMPORTANT, QString("DeleteOrphanInputs -- ") +
-                    QString("Removed orphan input %1").arg(inputid));
+            LOG(VB_GENERAL, LOG_NOTICE, QString("Removed orphan input %1")
+                     .arg(inputid));
         }
         else
         {
             ok = false;
-            VERBOSE(VB_IMPORTANT, QString("DeleteOrphanInputs -- ") +
-                    QString("Failed to remove orphan input %1")
-                    .arg(inputid));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to remove orphan input %1")
+                     .arg(inputid));
         }
     }
 
@@ -1288,7 +1285,7 @@ bool CardUtil::CreateInputGroupIfNeeded(uint cardid)
         }
         if (!id)
         {
-            VERBOSE(VB_IMPORTANT, "Failed to create input group");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to create input group");
             return false;
         }
 
@@ -1297,7 +1294,7 @@ bool CardUtil::CreateInputGroupIfNeeded(uint cardid)
             ok &= CardUtil::LinkInputGroup(inputs[i], id);
 
         if (!ok)
-            VERBOSE(VB_IMPORTANT, "Failed to link to new input group");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to link to new input group");
 
         return ok;
     }
@@ -1458,8 +1455,8 @@ vector<uint> CardUtil::GetConflictingCards(uint inputid, uint exclude_cardid)
 
     for (uint i = 0; i < inputgroupids.size(); i++)
     {
-        VERBOSE(VB_RECORD, LOC +
-                QString("  Group ID %1").arg(inputgroupids[i]));
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("  Group ID %1")
+                                     .arg(inputgroupids[i]));
     }
 
     vector<uint> cardids;
@@ -1479,7 +1476,7 @@ vector<uint> CardUtil::GetConflictingCards(uint inputid, uint exclude_cardid)
     }
 
     for (uint i = 0; i < cardids.size(); i++)
-        VERBOSE(VB_RECORD, LOC + QString("  Card ID %1").arg(cardids[i]));
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("  Card ID %1").arg(cardids[i]));
 
     return cardids;
 }
@@ -1623,7 +1620,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
     if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0)
     {
         QString msg = QObject::tr("Could not query inputs.");
-        VERBOSE(VB_IMPORTANT, "ProbeV4LVideoInputs(): Error, " + msg + ENO);
+        LOG(VB_GENERAL, LOG_ERR, "ProbeV4LVideoInputs(): Error, " + msg + ENO);
         list[-1] = msg;
         vidcap.channels = 0;
     }
@@ -1636,7 +1633,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
 
         if (ioctl(videofd, VIDIOCGCHAN, &test) != 0)
         {
-            VERBOSE(VB_IMPORTANT, "ProbeV4LVideoInputs(): Error, " + 
+            LOG(VB_GENERAL, LOG_ERR, "ProbeV4LVideoInputs(): Error, " + 
                     QString("Could determine name of input #%1"
                             "\n\t\t\tNot adding it to the list.")
                     .arg(test.channel) + ENO);
@@ -1727,7 +1724,8 @@ QStringList CardUtil::ProbeVideoInputs(QString device, QString cardtype)
 
 QStringList CardUtil::ProbeAudioInputs(QString device, QString cardtype)
 {
-    VERBOSE(VB_IMPORTANT, QString("ProbeAudioInputs(%1,%2)").arg(device).arg(cardtype));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("ProbeAudioInputs(%1,%2)")
+                                   .arg(device).arg(cardtype));
     QStringList ret;
 
     if ("HDPVR" == cardtype)
@@ -1769,16 +1767,16 @@ QStringList CardUtil::ProbeV4LVideoInputs(QString device)
 
 QStringList CardUtil::ProbeV4LAudioInputs(QString device)
 {
-    VERBOSE(VB_IMPORTANT, QString("ProbeV4LAudioInputs(%1)").arg(device));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("ProbeV4LAudioInputs(%1)").arg(device));
 
     bool ok;
     QStringList ret;
     int videofd = open(device.toAscii().constData(), O_RDWR);
     if (videofd < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("ProbeAudioInputs() -> couldn't open device"));
-        ret += QObject::tr("Could not open '%1' "
-                           "to probe its inputs.").arg(device);
+        LOG(VB_GENERAL, LOG_ERR, "ProbeAudioInputs() -> couldn't open device");
+        ret += QObject::tr("Could not open '%1' to probe its inputs.")
+                   .arg(device);
         return ret;
     }
     InputNames list = CardUtil::ProbeV4LAudioInputs(videofd, ok);
@@ -2081,8 +2079,8 @@ QString CardUtil::GetHDHRdesc(const QString &device)
     }
 
 
-    VERBOSE(VB_GENERAL, "CardUtil::GetHDHRdescription("
-                        + device + ") - trying to locate device");
+    LOG(VB_GENERAL, LOG_INFO, "CardUtil::GetHDHRdescription(" + device +
+                              ") - trying to locate device");
 
     hdhomerun_device_t  *hdhr;
     hdhr = hdhomerun_device_create_from_str(device.toAscii(), NULL);

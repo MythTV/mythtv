@@ -22,7 +22,6 @@ extern "C" {
 #endif // USING_X11
 
 #define LOC QString("GLVid: ")
-#define LOC_ERR QString("GLVid, Error: ")
 
 #define COLOUR_UNIFORM "m_colourMatrix"
 
@@ -198,8 +197,8 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
         if (shaders && (gl_features & kGLExtFBufObj))
             defaultUpsize = kGLFilterBicubic;
         else
-            VERBOSE(VB_PLAYBACK, LOC_ERR +
-                QString("No OpenGL feature support for Bicubic filter."));
+            LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                "No OpenGL feature support for Bicubic filter.");
     }
 
     // decide on best input texture type
@@ -221,14 +220,17 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     if (ok)
     {
         if (GL_RGBA == videoTextureType)
-            VERBOSE(VB_PLAYBACK, LOC + "Using raw RGBA input textures.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using raw RGBA input textures.");
         else if ((GL_YCBCR_MESA == videoTextureType) ||
                  (GL_YCBCR_422_APPLE == videoTextureType))
-            VERBOSE(VB_PLAYBACK, LOC + "Using YCbCr->BGRA input textures.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                "Using YCbCr->BGRA input textures.");
         else if (GL_RGB_422_APPLE == videoTextureType)
-            VERBOSE(VB_PLAYBACK, LOC + "Using Apple YCbCr input textures.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                "Using Apple YCbCr input textures.");
         else
-            VERBOSE(VB_PLAYBACK, LOC + "Using plain BGRA input textures.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                "Using plain BGRA input textures.");
         inputTextures.push_back(tex);
     }
     else
@@ -236,7 +238,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     if (filters.empty())
     {
-        VERBOSE(VB_PLAYBACK, LOC +
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 "Failed to setup colourspace conversion.\n\t\t\t"
                 "Falling back to software conversion.\n\t\t\t"
                 "Any opengl filters will also be disabled.");
@@ -251,7 +253,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Fatal error");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
             Teardown();
             return false;
         }
@@ -264,7 +266,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     CheckResize(false);
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("MMX: %1 PBO: %2")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("MMX: %1 PBO: %2")
             .arg(mmx).arg((gl_features & kGLExtPBufObj) > 0));
 
     return true;
@@ -420,31 +422,31 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
     if (!(gl_features & kGLExtFBufObj) && (filter == kGLFilterResize) &&
         filters.size())
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("GL_EXT_framebuffer_object not available"
-                    " for scaling/resizing filter."));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            "GL_EXT_framebuffer_object not available "
+            "for scaling/resizing filter.");
         return false;
     }
 
     if (!((gl_features & kGLExtFragProg) && (gl_features & kGLExtFBufObj)) &&
         filter == kGLFilterBicubic)
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("Features not available for bicubic filter."));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            "Features not available for bicubic filter.");
         return false;
     }
 
     if (!(gl_features & kGLExtFragProg) && !(gl_features & kGLSL) &&
         (filter == kGLFilterYUV2RGB))
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("No shader support for OpenGL deinterlacing."));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            "No shader support for OpenGL deinterlacing.");
         return false;
     }
 
     bool success = true;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Creating %1 filter.")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Creating %1 filter.")
             .arg(FilterToString(filter)));
 
     OpenGLFilter *temp = new OpenGLFilter();
@@ -496,7 +498,7 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
     if (!filters.count(filter))
         return true;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Removing %1 filter")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Removing %1 filter")
             .arg(FilterToString(filter)));
 
     vector<GLuint> temp;
@@ -555,8 +557,8 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 {
     if (!(gl_features & kGLExtFragProg) && !(gl_features & kGLSL))
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("No shader support for OpenGL deinterlacing."));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            "No shader support for OpenGL deinterlacing.");
         return false;
     }
 
@@ -564,8 +566,8 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 
     if (!filters.count(kGLFilterYUV2RGB))
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("No YUV2RGB filter stage for OpenGL deinterlacing%1."));
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            "No YUV2RGB filter stage for OpenGL deinterlacing%1.");
         return false;
     }
 
@@ -655,7 +657,7 @@ uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
     }
     else
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR + "No OpenGL shader/program support");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "No OpenGL shader/program support");
         return 0;
     }
 
@@ -673,7 +675,7 @@ bool OpenGLVideo::AddFrameBuffer(uint &framebuffer,
 {
     if (!(gl_features & kGLExtFBufObj))
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR + "Framebuffer binding not supported.");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Framebuffer binding not supported.");
         return false;
     }
 
@@ -697,8 +699,7 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
     if (!viewportControl)
         return;
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Viewport: %1x%2")
-            .arg(w).arg(h));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Viewport: %1x%2") .arg(w).arg(h));
     gl_context->SetViewPort(QRect(QPoint(),viewportSize));
 }
 
@@ -1499,7 +1500,7 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
                 }
                 else
                 {
-                    VERBOSE(VB_PLAYBACK, LOC +
+                    LOG(VB_PLAYBACK, LOG_ERR, LOC +
                         "Unrecognised OpenGL deinterlacer");
                 }
             }
@@ -1522,14 +1523,14 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
             break;
 
         default:
-            VERBOSE(VB_PLAYBACK, LOC_ERR + "Unknown fragment program.");
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Unknown fragment program.");
             break;
     }
 
     CustomiseProgramString(ret);
     ret += "END";
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("Created %1 fragment program %2")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 fragment program %2")
                 .arg(FilterToString(name)).arg(deint));
 
     return ret;
@@ -1773,7 +1774,7 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
             fragment = BicubicShader;
             break;
         default:
-            VERBOSE(VB_PLAYBACK, LOC_ERR + "Unknown filter");
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Unknown filter");
             break;
     }
     CustomiseProgramString(vertex);

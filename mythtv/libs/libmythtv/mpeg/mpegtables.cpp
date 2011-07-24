@@ -166,9 +166,9 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
 {
     if (verify_crc && (CalcCRC() != CRC()))
     {
-        VERBOSE(VB_SIPARSER,
-                QString("PSIPTable: Failed CRC check 0x%1 != 0x%2 "
-                        "for StreamID = 0x%3")
+        LOG(VB_SIPARSER, LOG_ERR,
+            QString("PSIPTable: Failed CRC check 0x%1 != 0x%2 "
+                    "for StreamID = 0x%3")
                 .arg(CRC(),0,16).arg(CalcCRC(),0,16).arg(StreamID(),0,16));
         return false;
     }
@@ -187,15 +187,15 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
         bool ok = (psipdata() + (pcnt << 2) + 3 < bufend);
         if (!ok)
         {
-            VERBOSE(VB_SIPARSER, "PSIPTable: PAT: program "
-                    "list extends past end of buffer");
+            LOG(VB_SIPARSER, LOG_ERR,
+                "PSIPTable: PAT: program list extends past end of buffer");
             return false;
         }
 
         if ((Length() == 0xfff) && (TableIDExtension() == 0xffff) &&
             (Section() == 0xff) && (LastSection() == 0xff))
         {
-            VERBOSE(VB_SIPARSER, "PSIPTable: PAT: All values at maximums");
+            LOG(VB_SIPARSER, LOG_ERR, "PSIPTable: PAT: All values at maximums");
             return false;
         }
 
@@ -206,14 +206,15 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
     {
         if (psipdata() + 3 >= bufend)
         {
-            VERBOSE(VB_SIPARSER, "PSIPTable: PMT: "
-                    "can't query program info length");
+            LOG(VB_SIPARSER, LOG_ERR,
+                "PSIPTable: PMT: can't query program info length");
             return false;
         }
 
         if (psipdata() + Length() - 9 > bufend)
         {
-            VERBOSE(VB_SIPARSER, "PSIPTable: PMT: reported length too large");
+            LOG(VB_SIPARSER, LOG_ERR,
+                "PSIPTable: PMT: reported length too large");
             return false;
         }
 
@@ -222,8 +223,8 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
         const unsigned char *cpos = proginfo + proginfolen;
         if (cpos > bufend)
         {
-            VERBOSE(VB_SIPARSER, "PSIPTable: PMT: "
-                    "program info extends past end of buffer");
+            LOG(VB_SIPARSER, LOG_ERR,
+                "PSIPTable: PMT: program info extends past end of buffer");
             return false;
         }
 
@@ -235,8 +236,8 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
             const unsigned char *ptr = pos;
             if (pos + 4 > bufend)
             {
-                VERBOSE(VB_SIPARSER, QString(
-                            "PSIPTable: PMT: stream info %1 extends "
+                LOG(VB_SIPARSER, LOG_ERR,
+                    QString("PSIPTable: PMT: stream info %1 extends "
                             "past end of buffer").arg(i));
                 return false;
             }
@@ -244,9 +245,9 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
         }
         if (pos > bufend)
         {
-            VERBOSE(VB_SIPARSER,
-                    QString("PSIPTable: PMT: last stream info %1 extends "
-                            "past end of buffer").arg(i));
+            LOG(VB_SIPARSER, LOG_ERR,
+                QString("PSIPTable: PMT: last stream info %1 extends "
+                        "past end of buffer").arg(i));
             return false;
         }
 
@@ -285,8 +286,8 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
     // create PAT data
     if ((count * 4) >= (184 - (PSIP_OFFSET+1)))
     { // old PAT must be in single TS for this create function
-        VERBOSE(VB_IMPORTANT, "PAT::Create: Error, old "
-                "PAT size exceeds maximum PAT size.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "PAT::Create: Error, old PAT size exceeds maximum PAT size.");
         delete pat;
         return 0;
     }
@@ -390,7 +391,7 @@ ProgramMapTable* ProgramMapTable::Create(
     }
     pmt->Finalize();
 
-    VERBOSE(VB_SIPARSER, "Created PMT \n" + pmt->toString());
+    LOG(VB_SIPARSER, LOG_INFO, "Created PMT \n" + pmt->toString());
 
     return pmt;
 }
@@ -404,11 +405,16 @@ void ProgramMapTable::Parse() const
     {
         _ptrs.push_back(pos);
         pos += 5 + StreamInfoLength(i);
-        //VERBOSE(VB_SIPARSER, "Parsing PMT("<<this<<") i("<<i<<") "
-        //        <<"len("<<StreamInfoLength(i)<<")");
+#if 0
+        LOG(VB_SIPARSER, LOG_DEBUG, QString("Parsing PMT(0x%1) i(%2) len(%3)")
+                .arg((uint64_t)this, 0, 16) .arg(i) .arg(StreamInfoLength(i)));
+#endif
     }
     _ptrs.push_back(pos);
-    //VERBOSE(VB_SIPARSER, "Parsed PMT("<<this<<")\n"<<this->toString());
+#if 0
+    LOG(VB_SIPARSER, LOG_DEBUG, QString("Parsed PMT(0x%1)\n%2")
+            .arg((uint64_t)this, 0, 16) .arg(toString()));
+#endif
 }
 
 void ProgramMapTable::AppendStream(
@@ -499,7 +505,9 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
         encryption_system[cad.PID()] = cad.SystemID();
         encrypted |= cad.SystemID();
 
-        //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
+#if 0
+        LOG(VB_GENERAL, LOG_INFO, "DTVsm: " + cad.toString());
+#endif
     }
 
     return encrypted != 0;
@@ -523,7 +531,9 @@ bool ProgramMapTable::IsStreamEncrypted(uint i) const
         encryption_system[cad.PID()] = cad.SystemID();
         encrypted |= cad.SystemID();
 
-        //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
+#if 0
+        LOG(VB_GENERAL, LOG_INFO, "DTVsm: " + cad.toString());
+#endif
     }
 
     return encrypted != 0;

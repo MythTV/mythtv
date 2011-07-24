@@ -453,8 +453,8 @@ void VideoOutWindow::ApplySnapToVideoRect(void)
 
         display_video_rect.setHeight(video_rect.height());
 
-        VERBOSE(VB_PLAYBACK, QString("Snapping height to avoid scaling: "
-                                     "height: %1, top: %2")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("Snapping height to avoid scaling: height: %1, top: %2")
                 .arg(display_video_rect.height())
                 .arg(display_video_rect.top()));
     }
@@ -468,8 +468,8 @@ void VideoOutWindow::ApplySnapToVideoRect(void)
 
         display_video_rect.setWidth(video_rect.width());
 
-        VERBOSE(VB_PLAYBACK, QString("Snapping width to avoid scaling: "
-                                     "width: %1, left: %2")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("Snapping width to avoid scaling: width: %1, left: %2")
                 .arg(display_video_rect.width())
                 .arg(display_video_rect.left()));
     }
@@ -517,25 +517,32 @@ bool VideoOutWindow::Init(const QSize &new_video_dim, float new_video_aspect,
 void VideoOutWindow::PrintMoveResizeDebug(void)
 {
 #if 0
-    printf("VideoOutWindow::MoveResize:\n");
-    printf("Img(%d,%d %d,%d)\n",
-           video_rect.left(), video_rect.top(),
-           video_rect.width(), video_rect.height());
-    printf("Disp(%d,%d %d,%d)\n",
-           display_video_rect.left(), display_video_rect.top(),
-           display_video_rect.width(), display_video_rect.height());
-    printf("Offset(%d,%d)\n", xoff, yoff);
-    printf("Vscan(%f, %f)\n", db_scale_vert, db_scale_vert);
-    printf("DisplayAspect: %f\n", GetDisplayAspect());
-    printf("VideoAspect(%f)\n", video_aspect);
-    printf("overriden_video_aspect(%f)\n", overriden_video_aspect);
-    printf("CDisplayAspect: %f\n", fix_aspect(GetDisplayAspect()));
-    printf("AspectOverride: %d\n", aspectoverride);
-    printf("AdjustFill: %d\n", adjustfill);
+    LOG(VB_PLAYBACK, LOG_DEBUG, "VideoOutWindow::MoveResize:");
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("Img(%1,%2 %3,%4)")
+           .arg(video_rect.left()).arg(video_rect.top())
+           .arg(video_rect.width()).arg(video_rect.height()));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("Disp(%1,%1 %2,%4)")
+           .arg(display_video_rect.left()).arg(display_video_rect.top())
+           .arg(display_video_rect.width()).arg(display_video_rect.height()));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("Offset(%1,%2)")
+           .arg(xoff).arg(yoff));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("Vscan(%1, %2)")
+           .arg(db_scale_vert).arg(db_scale_vert));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("DisplayAspect: %1")
+           .arg(GetDisplayAspect()));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("VideoAspect(%1)")
+           .arg(video_aspect));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overriden_video_aspect(%1)")
+           .arg(overriden_video_aspect));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("CDisplayAspect: %1")
+           .arg(fix_aspect(GetDisplayAspect())));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("AspectOverride: %1")
+           .arg(aspectoverride));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("AdjustFill: %d") .arg(adjustfill));
 #endif
 
-    VERBOSE(VB_PLAYBACK, QString(
-                "Display Rect  left: %1, top: %2, width: %3, "
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("Display Rect  left: %1, top: %2, width: %3, "
                 "height: %4, aspect: %5")
             .arg(display_video_rect.left())
             .arg(display_video_rect.top())
@@ -543,16 +550,14 @@ void VideoOutWindow::PrintMoveResizeDebug(void)
             .arg(display_video_rect.height())
             .arg(fix_aspect(GetDisplayAspect())));
 
-    VERBOSE(VB_PLAYBACK,
-            QString(
-                "Video Rect    left: %1, top: %2, width: %3, "
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("Video Rect    left: %1, top: %2, width: %3, "
                 "height: %4, aspect: %5")
             .arg(video_rect.left())
             .arg(video_rect.top())
             .arg(video_rect.width())
             .arg(video_rect.height())
             .arg(overriden_video_aspect));
-
 }
 
 /**
@@ -653,7 +658,7 @@ void VideoOutWindow::SetVideoScalingAllowed(bool change)
         db_scaling_allowed = false;
     }
 
-    VERBOSE(VB_PLAYBACK, QString("Over/underscan. V: %1, H: %2")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Over/underscan. V: %1, H: %2")
             .arg(db_scale_vert).arg(db_scale_horiz));
 
     MoveResize();
@@ -950,9 +955,8 @@ static float fix_aspect(float raw)
 
 void VideoOutWindow::SetPIPState(PIPState setting)
 {
-    VERBOSE(VB_PLAYBACK,
-            QString("VideoOutWindow::SetPIPState. pip_state: %1]")
-            .arg(setting));
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("VideoOutWindow::SetPIPState. pip_state: %1]") .arg(setting));
 
     pip_state = setting;
 }

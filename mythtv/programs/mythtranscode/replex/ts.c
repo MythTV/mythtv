@@ -4,6 +4,8 @@
  *
  * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
+ * Changes to use MythTV logging
+ * Copyright (C) 2011 Gavin Hurlbut <ghurlbut@mythtv.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,6 +40,8 @@
 #include "ts.h"
 #include "element.h"
 #include "pes.h"
+
+#include "mythlogging.h"
 
 uint16_t get_pid(uint8_t *pid)
 {
@@ -259,7 +263,10 @@ int write_video_ts(uint64_t vpts, uint64_t vdts, uint64_t SCR, uint8_t *buf,
 		length = TS_SIZE;
 	}
 	if(ptsdts) {
-//printf("SCR: %f PTS: %f DTS: %f\n", SCR/27000000.0, vpts / 27000000.0, vdts / 27000000.0);
+#if 0
+	LOG(VB_GENERAL, LOG_INFO, "SCR: %f PTS: %f DTS: %f",
+		 SCR/27000000.0, vpts / 27000000.0, vdts / 27000000.0);
+#endif
 		pos = write_ts_header(TS_VIDPID, 1, count, SCR, buf, stuff);
 		// always use length == 0 for video streams
 		pos += write_pes_header( 0xE0, 6, vpts, vdts, buf+pos, 
@@ -270,7 +277,7 @@ int write_video_ts(uint64_t vpts, uint64_t vdts, uint64_t SCR, uint8_t *buf,
 	count = (count+1) & 0x0f;
 
 	if (length-pos > *vlength){
-		fprintf(stderr,"WHAT THE HELL  %d > %d\n", length-pos,
+		LOG(VB_GENERAL, LOG_ERR, "WHAT THE HELL  %d > %d\n", length-pos,
 			*vlength);
 	}
 
@@ -320,7 +327,7 @@ int write_audio_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 	pos += add;
 
 	if (pos != TS_SIZE) {
-		fprintf(stderr,"apos: %d\n",pos);
+		LOG(VB_GENERAL, LOG_ERR, "apos: %d", pos);
 		exit(1);
 	}
 
@@ -372,7 +379,7 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 	pos += add;
 
 	if (pos != TS_SIZE) {
-		fprintf(stderr,"apos: %d\n",pos);
+		LOG(VB_GENERAL, LOG_ERR, "apos: %d", pos);
 		exit(1);
 	}
 

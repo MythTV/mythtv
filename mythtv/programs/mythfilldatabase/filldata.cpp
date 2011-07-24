@@ -129,18 +129,20 @@ void FillData::DataDirectStationUpdate(Source source, bool update_icons)
         bool ok1 = (raw_lineup == source.id);
         if (!ok0)
         {
-            VERBOSE(VB_GENERAL, "Grabbing login cookies for listing update");
+            LOG(VB_GENERAL, LOG_INFO,
+                "Grabbing login cookies for listing update");
             ok0 = ddprocessor.GrabLoginCookiesAndLineups();
         }
         if (ok0 && !ok1)
         {
-            VERBOSE(VB_GENERAL, "Grabbing listing for listing update");
+            LOG(VB_GENERAL, LOG_INFO, "Grabbing listing for listing update");
             ok1 = ddprocessor.GrabLineupForModify(source.lineupid);
         }
         if (ok1)
         {
             ddprocessor.UpdateListings(source.id);
-            VERBOSE(VB_GENERAL, QString("Removed %1 channel(s) from lineup.")
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Removed %1 channel(s) from lineup.")
                     .arg(new_channels));
         }
     }
@@ -155,9 +157,9 @@ bool FillData::DataDirectUpdateChannels(Source source)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "We only support DataDirectUpdateChannels with "
-                "TMS Labs and Schedules Direct.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "We only support DataDirectUpdateChannels with "
+            "TMS Labs and Schedules Direct.");
         return false;
     }
 
@@ -190,17 +192,19 @@ bool FillData::GrabDDData(Source source, int poffset,
         ddprocessor.SetCacheData(false);
     else
     {
-        VERBOSE(VB_GENERAL, QString(
-                    "This DataDirect listings source is "
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("This DataDirect listings source is "
                     "shared by %1 MythTV lineups")
                 .arg(source.dd_dups.size()+1));
         if (source.id > source.dd_dups[0])
         {
-            VERBOSE(VB_IMPORTANT, "We should use cached data for this one");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "We should use cached data for this one");
         }
         else if (source.id < source.dd_dups[0])
         {
-            VERBOSE(VB_IMPORTANT, "We should keep data around after this one");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "We should keep data around after this one");
         }
         ddprocessor.SetCacheData(true);
     }
@@ -224,13 +228,13 @@ bool FillData::GrabDDData(Source source, int poffset,
 
     if (needtoretrieve)
     {
-        VERBOSE(VB_GENERAL, "Retrieving datadirect data.");
+        LOG(VB_GENERAL, LOG_INFO, "Retrieving datadirect data.");
         if (dd_grab_all)
         {
-            VERBOSE(VB_GENERAL, "Grabbing ALL available data.");
+            LOG(VB_GENERAL, LOG_INFO, "Grabbing ALL available data.");
             if (!ddprocessor.GrabAllData())
             {
-                VERBOSE(VB_IMPORTANT, "Encountered error in grabbing data.");
+                LOG(VB_GENERAL, LOG_ERR, "Encountered error in grabbing data.");
                 return false;
             }
         }
@@ -239,16 +243,16 @@ bool FillData::GrabDDData(Source source, int poffset,
             QDateTime fromdatetime = QDateTime(pdate).toUTC().addDays(poffset);
             QDateTime todatetime = fromdatetime.addDays(1);
 
-            VERBOSE(VB_GENERAL, QString("Grabbing data for %1 offset %2")
+            LOG(VB_GENERAL, LOG_INFO, QString("Grabbing data for %1 offset %2")
                                           .arg(pdate.toString())
                                           .arg(poffset));
-            VERBOSE(VB_GENERAL, QString("From %1 to %2 (UTC)")
+            LOG(VB_GENERAL, LOG_INFO, QString("From %1 to %2 (UTC)")
                                           .arg(fromdatetime.toString())
                                           .arg(todatetime.toString()));
 
             if (!ddprocessor.GrabData(fromdatetime, todatetime))
             {
-                VERBOSE(VB_IMPORTANT, "Encountered error in grabbing data.");
+                LOG(VB_GENERAL, LOG_ERR, "Encountered error in grabbing data.");
                 return false;
             }
         }
@@ -258,28 +262,33 @@ bool FillData::GrabDDData(Source source, int poffset,
     }
     else
     {
-        VERBOSE(VB_GENERAL, "Using existing grabbed data in temp tables.");
+        LOG(VB_GENERAL, LOG_INFO,
+            "Using existing grabbed data in temp tables.");
     }
 
-    VERBOSE(VB_GENERAL,
-            QString("Grab complete.  Actual data from %1 to %2 (UTC)")
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Grab complete.  Actual data from %1 to %2 (UTC)")
             .arg(ddprocessor.GetDDProgramsStartAt().toString())
             .arg(ddprocessor.GetDDProgramsEndAt().toString()));
 
     updateLastRunEnd(query);
 
-    VERBOSE(VB_GENERAL, "Main temp tables populated.");
+    LOG(VB_GENERAL, LOG_INFO, "Main temp tables populated.");
     if (!channel_update_run)
     {
-        VERBOSE(VB_GENERAL, "Updating MythTV channels.");
+        LOG(VB_GENERAL, LOG_INFO, "Updating MythTV channels.");
         DataDirectStationUpdate(source);
-        VERBOSE(VB_GENERAL, "Channels updated.");
+        LOG(VB_GENERAL, LOG_INFO, "Channels updated.");
         channel_update_run = true;
     }
 
-    //VERBOSE(VB_GENERAL, "Creating program view table...");
+#if 0
+    LOG(VB_GENERAL, LOG_INFO, "Creating program view table...");
+#endif
     DataDirectProcessor::UpdateProgramViewTable(source.id);
-    //VERBOSE(VB_GENERAL, "Finished creating program view table...");
+#if 0
+    LOG(VB_GENERAL, LOG_INFO, "Finished creating program view table...");
+#endif
 
     query.prepare("SELECT count(*) from dd_v_program;");
     if (query.exec() && query.size() > 0)
@@ -287,29 +296,29 @@ bool FillData::GrabDDData(Source source, int poffset,
         query.next();
         if (query.value(0).toInt() < 1)
         {
-            VERBOSE(VB_GENERAL, "Did not find any new program data.");
+            LOG(VB_GENERAL, LOG_INFO, "Did not find any new program data.");
             return false;
         }
     }
     else
     {
-        VERBOSE(VB_GENERAL, "Failed testing program view table.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed testing program view table.");
         return false;
     }
 
-    VERBOSE(VB_GENERAL, "Clearing data for source.");
+    LOG(VB_GENERAL, LOG_INFO, "Clearing data for source.");
     QDateTime fromlocaldt = ddprocessor.GetDDProgramsStartAt(true);
     QDateTime tolocaldt = ddprocessor.GetDDProgramsEndAt(true);
 
-    VERBOSE(VB_GENERAL, QString("Clearing from %1 to %2 (localtime)")
+    LOG(VB_GENERAL, LOG_INFO, QString("Clearing from %1 to %2 (localtime)")
                                   .arg(fromlocaldt.toString())
                                   .arg(tolocaldt.toString()));
     ProgramData::ClearDataBySource(source.id, fromlocaldt, tolocaldt, true);
-    VERBOSE(VB_GENERAL, "Data for source cleared.");
+    LOG(VB_GENERAL, LOG_INFO, "Data for source cleared.");
 
-    VERBOSE(VB_GENERAL, "Updating programs.");
+    LOG(VB_GENERAL, LOG_INFO, "Updating programs.");
     DataDirectProcessor::DataDirectProgramUpdate();
-    VERBOSE(VB_GENERAL, "Program table update complete.");
+    LOG(VB_GENERAL, LOG_INFO, "Program table update complete.");
 
     return true;
 }
@@ -327,8 +336,7 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
     icon_data.UpdateSourceIcons(id);
     if (proglist.count() == 0)
     {
-        VERBOSE(VB_GENERAL,
-                QString("No programs found in data."));
+        LOG(VB_GENERAL, LOG_INFO, "No programs found in data.");
         endofdata = true;
     }
     else
@@ -385,7 +393,8 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         configfile = QString("%1/%2.xmltv").arg(GetConfDir())
                                            .arg(source.name);
 
-    VERBOSE(VB_GENERAL, QString("XMLTV config file is: %1").arg(configfile));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("XMLTV config file is: %1").arg(configfile));
 
     QString command = QString("nice %1 --config-file '%2' --output %3")
         .arg(xmltv_grabber).arg(configfile).arg(filename);
@@ -406,7 +415,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         command += QString(" --days 1 --offset %1").arg(offset);
     }
 
-    if (!VERBOSE_LEVEL_CHECK(VB_XMLTV))
+    if (!VERBOSE_LEVEL_CHECK(VB_XMLTV, LOG_ANY))
         command += " --quiet";
 
     // Append additional arguments passed to mythfilldatabase
@@ -414,7 +423,8 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     if (!graboptions.isEmpty())
     {
         command += graboptions;
-        VERBOSE(VB_XMLTV, QString("Using graboptions: %1").arg(graboptions));
+        LOG(VB_XMLTV, LOG_INFO,
+            QString("Using graboptions: %1").arg(graboptions));
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -423,9 +433,9 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     updateLastRunStart(query);
     updateLastRunStatus(query, status);
 
-    VERBOSE(VB_XMLTV, QString("Grabber Command: %1").arg(command));
+    LOG(VB_XMLTV, LOG_INFO, QString("Grabber Command: %1").arg(command));
 
-    VERBOSE(VB_XMLTV,
+    LOG(VB_XMLTV, LOG_INFO,
             "----------------- Start of XMLTV output -----------------");
 
     unsigned int systemcall_status;
@@ -433,7 +443,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     systemcall_status = myth_system(command, kMSRunShell);
     bool succeeded = (systemcall_status == GENERIC_EXIT_OK);
 
-    VERBOSE(VB_XMLTV,
+    LOG(VB_XMLTV, LOG_INFO,
             "------------------ End of XMLTV output ------------------");
 
     updateLastRunEnd(query);
@@ -445,14 +455,16 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         if (systemcall_status == GENERIC_EXIT_KILLED)
         {
             interrupted = true;
-            status = QString(QObject::tr("FAILED: xmltv ran but was interrupted."));
+            status =
+                QString(QObject::tr("FAILED: xmltv ran but was interrupted."));
         }
         else
         {
-            status = QString(QObject::tr("FAILED: xmltv returned error code %1."))
+            status =
+                QString(QObject::tr("FAILED: xmltv returned error code %1."))
                             .arg(systemcall_status);
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("xmltv returned error code %1")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("xmltv returned error code %1")
                     .arg(systemcall_status));
         }
     }
@@ -548,8 +560,9 @@ bool FillData::Run(SourceList &sourcelist)
             query.next();
 
             if (!query.isNull(0))
-                GuideDataBefore = QDateTime::fromString(query.value(0).toString(),
-                                                        Qt::ISODate);
+                GuideDataBefore = 
+                    QDateTime::fromString(query.value(0).toString(),
+                                          Qt::ISODate);
         }
 
         channel_update_run = false;
@@ -559,10 +572,9 @@ bool FillData::Run(SourceList &sourcelist)
 
         if (xmltv_grabber == "eitonly")
         {
-            VERBOSE(VB_GENERAL,
-                    QString("Source %1 configured to use only the "
-                            "broadcasted guide data. Skipping.")
-                    .arg((*it).id));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Source %1 configured to use only the "
+                        "broadcasted guide data. Skipping.") .arg((*it).id));
 
             externally_handled++;
             updateLastRunStart(query);
@@ -573,9 +585,9 @@ bool FillData::Run(SourceList &sourcelist)
                  xmltv_grabber == "/bin/true" ||
                  xmltv_grabber == "none")
         {
-            VERBOSE(VB_GENERAL,
-                    QString("Source %1 configured with no grabber. "
-                            "Nothing to do.").arg((*it).id));
+            LOG(VB_GENERAL, LOG_INFO, 
+                QString("Source %1 configured with no grabber. Nothing to do.")
+                    .arg((*it).id));
 
             externally_handled++;
             updateLastRunStart(query);
@@ -583,7 +595,7 @@ bool FillData::Run(SourceList &sourcelist)
             continue;
         }
 
-        VERBOSE(VB_GENERAL, sidStr.arg((*it).id)
+        LOG(VB_GENERAL, LOG_INFO, sidStr.arg((*it).id)
                                   .arg((*it).name)
                                   .arg(xmltv_grabber));
 
@@ -598,22 +610,22 @@ bool FillData::Run(SourceList &sourcelist)
             source_channels = query.value(0).toInt();
             if (source_channels > 0)
             {
-                VERBOSE(VB_GENERAL, QString("Found %1 channels for "
-                                "source %2 which use grabber")
-                                .arg(source_channels).arg((*it).id));
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Found %1 channels for source %2 which use grabber")
+                        .arg(source_channels).arg((*it).id));
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("No channels are "
-                    "configured to use grabber."));
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("No channels are configured to use grabber."));
             }
         }
         else
         {
             source_channels = 0;
-            VERBOSE(VB_GENERAL,
-                    QString("Can't get a channel count for source id %1")
-                            .arg((*it).id));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Can't get a channel count for source id %1")
+                    .arg((*it).id));
         }
 
         bool hasprefmethod = false;
@@ -626,9 +638,9 @@ bool FillData::Run(SourceList &sourcelist)
                                                  flags);
             grabber_capabilities_proc.Run(25);
             if (grabber_capabilities_proc.Wait() != GENERIC_EXIT_OK)
-                VERBOSE(VB_IMPORTANT, QString("%1  --capabilities failed "
-                        "or we timed out waiting. You may need to upgrade "
-                        "your xmltv grabber").arg(xmltv_grabber));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("%1  --capabilities failed or we timed out waiting."                            " You may need to upgrade your xmltv grabber")
+                        .arg(xmltv_grabber));
             else
             {
                 QByteArray result = grabber_capabilities_proc.ReadAll();
@@ -656,8 +668,8 @@ bool FillData::Run(SourceList &sourcelist)
                     if (capability == "preferredmethod")
                         hasprefmethod = true;
                 }
-                VERBOSE(VB_GENERAL, QString("Grabber has capabilities: %1")
-                        .arg(capabilities));
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Grabber has capabilities: %1") .arg(capabilities));
             }
         }
 
@@ -669,16 +681,17 @@ bool FillData::Run(SourceList &sourcelist)
                                            flags);
             grabber_method_proc.Run(15);
             if (grabber_method_proc.Wait() != GENERIC_EXIT_OK)
-                VERBOSE(VB_IMPORTANT, QString("%1 --preferredmethod failed"
-                    " or we timed out waiting. You may need to upgrade your"
-                    " xmltv grabber").arg(xmltv_grabber));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("%1 --preferredmethod failed or we timed out "
+                            "waiting. You may need to upgrade your xmltv "
+                            "grabber").arg(xmltv_grabber));
             else
             {
                 QTextStream ostream(grabber_method_proc.ReadAll());
                 (*it).xmltvgrabber_prefmethod =
                                 ostream.readLine().simplified();
 
-                VERBOSE(VB_GENERAL, QString("Grabber prefers method: %1")
+                LOG(VB_GENERAL, LOG_INFO, QString("Grabber prefers method: %1")
                                     .arg((*it).xmltvgrabber_prefmethod));
             }
         }
@@ -746,9 +759,9 @@ bool FillData::Run(SourceList &sourcelist)
                 QString prevDate(qCurrentDate.addDays(i-1).toString());
                 QString currDate(qCurrentDate.addDays(i).toString());
 
-                VERBOSE(VB_GENERAL, ""); // add a space between days
-                VERBOSE(VB_GENERAL, "Checking day @ " +
-                        QString("offset %1, date: %2").arg(i).arg(currDate));
+                LOG(VB_GENERAL, LOG_INFO, ""); // add a space between days
+                LOG(VB_GENERAL, LOG_INFO, "Checking day @ " +
+                    QString("offset %1, date: %2").arg(i).arg(currDate));
 
                 bool download_needed = false;
 
@@ -756,12 +769,12 @@ bool FillData::Run(SourceList &sourcelist)
                 {
                     if ( i == 1 )
                     {
-                        VERBOSE(VB_GENERAL,
+                        LOG(VB_GENERAL, LOG_INFO,
                             "Data Refresh always needed for tomorrow");
                     }
                     else
                     {
-                        VERBOSE(VB_GENERAL,
+                        LOG(VB_GENERAL, LOG_INFO,
                             "Data Refresh needed because of user request");
                     }
                     download_needed = true;
@@ -789,8 +802,9 @@ bool FillData::Run(SourceList &sourcelist)
                         int previousDayCount = 0;
                         int currentDayCount = 0;
 
-                        VERBOSE(VB_CHANNEL, QString(
-                                "Checking program counts for day %1").arg(i-1));
+                        LOG(VB_CHANNEL, LOG_INFO,
+                            QString("Checking program counts for day %1")
+                                .arg(i-1));
 
                         while (query.next())
                         {
@@ -798,90 +812,94 @@ bool FillData::Run(SourceList &sourcelist)
                                 prevChanCount++;
                             previousDayCount += query.value(1).toInt();
 
-                            VERBOSE(VB_CHANNEL,
-                                    QString("    chanid %1 -> %2 programs")
-                                            .arg(query.value(0).toString())
-                                            .arg(query.value(1).toInt()));
+                            LOG(VB_CHANNEL, LOG_INFO,
+                                QString("    chanid %1 -> %2 programs")
+                                    .arg(query.value(0).toString())
+                                    .arg(query.value(1).toInt()));
                         }
 
                         if (query.exec(querystr.arg(i).arg(i+1).arg((*it).id))
                                 && query.isActive())
                         {
-                            VERBOSE(VB_CHANNEL, QString("Checking program "
-                                                "counts for day %1").arg(i));
+                            LOG(VB_CHANNEL, LOG_INFO,
+                                QString("Checking program counts for day %1")
+                                    .arg(i));
                             while (query.next())
                             {
                                 if (query.value(1).toInt() > 0)
                                     currentChanCount++;
                                 currentDayCount += query.value(1).toInt();
 
-                                VERBOSE(VB_CHANNEL,
-                                        QString("    chanid %1 -> %2 programs")
+                                LOG(VB_CHANNEL, LOG_INFO,
+                                    QString("    chanid %1 -> %2 programs")
                                                 .arg(query.value(0).toString())
                                                 .arg(query.value(1).toInt()));
                             }
                         }
                         else
                         {
-                            VERBOSE(VB_GENERAL, QString(
-                                    "Data Refresh because we are unable to "
-                                    "query the data for day %1 to "
-                                    "determine if we have enough").arg(i));
+                            LOG(VB_GENERAL, LOG_INFO,
+                                QString("Data Refresh because we are unable to "
+                                        "query the data for day %1 to "
+                                        "determine if we have enough").arg(i));
                             download_needed = true;
                         }
 
                         if (currentChanCount < (prevChanCount * 0.90))
                         {
-                            VERBOSE(VB_GENERAL, QString(
-                                    "Data refresh needed because only %1 out "
-                                    "of %2 channels have at least one "
-                                    "program listed for day @ offset %3 from "
-                                    "8PM - midnight.  Previous day had %4 "
-                                    "channels with data in that time period.")
+                            LOG(VB_GENERAL, LOG_INFO,
+                                QString("Data refresh needed because only %1 "
+                                        "out of %2 channels have at least one "
+                                        "program listed for day @ offset %3 "
+                                        "from 8PM - midnight.  Previous day "
+                                        "had %4 channels with data in that "
+                                        "time period.")
                                     .arg(currentChanCount).arg(source_channels)
                                     .arg(i).arg(prevChanCount));
                             download_needed = true;
                         }
                         else if (currentDayCount == 0)
                         {
-                            VERBOSE(VB_GENERAL, QString(
-                                    "Data refresh needed because no data "
-                                    "exists for day @ offset %1 from 8PM - "
-                                    "midnight.").arg(i));
+                            LOG(VB_GENERAL, LOG_INFO,
+                                QString("Data refresh needed because no data "
+                                        "exists for day @ offset %1 from 8PM - "
+                                        "midnight.").arg(i));
                             download_needed = true;
                         }
                         else if (previousDayCount == 0)
                         {
-                            VERBOSE(VB_GENERAL, QString(
-                                    "Data refresh needed because no data "
-                                    "exists for day @ offset %1 from 8PM - "
-                                    "midnight.  Unable to calculate how much "
-                                    "we should have for the current day so "
-                                    "a refresh is being forced.").arg(i-1));
+                            LOG(VB_GENERAL, LOG_INFO,
+                                QString("Data refresh needed because no data "
+                                        "exists for day @ offset %1 from 8PM - "
+                                        "midnight.  Unable to calculate how "
+                                        "much we should have for the current "
+                                        "day so a refresh is being forced.")
+                                    .arg(i-1));
                             download_needed = true;
                         }
                         else if (currentDayCount < (currentChanCount * 3))
                         {
-                            VERBOSE(VB_GENERAL, QString(
-                                    "Data Refresh needed because offset day %1 "
-                                    "has less than 3 programs "
-                                    "per channel for the 8PM - midnight "
-                                    "time window for channels that "
-                                    "normally have data. "
-                                    "We want at least %2 programs, but only "
-                                    "found %3").arg(i).arg(currentChanCount * 3)
+                            LOG(VB_GENERAL, LOG_INFO,
+                                QString("Data Refresh needed because offset "
+                                        "day %1 has less than 3 programs "
+                                        "per channel for the 8PM - midnight "
+                                        "time window for channels that "
+                                        "normally have data. "
+                                        "We want at least %2 programs, but "
+                                        "only found %3")
+                                    .arg(i).arg(currentChanCount * 3)
                                     .arg(currentDayCount));
                             download_needed = true;
                         }
                         else if (currentDayCount < (previousDayCount / 2))
                         {
-                            VERBOSE(VB_GENERAL, QString(
-                                    "Data Refresh needed because offset day %1 "
-                                    "has less than half the number of programs "
-                                    "as the previous day for the 8PM - "
-                                    "midnight time window. "
-                                    "We want at least %2 programs, but only "
-                                    "found %3").arg(i)
+                            LOG(VB_GENERAL, LOG_INFO,
+                                QString("Data Refresh needed because offset "
+                                        "day %1 has less than half the number "
+                                        "of programs as the previous day for "
+                                        "the 8PM - midnight time window. "
+                                        "We want at least %2 programs, but "
+                                        "only found %3").arg(i)
                                     .arg(previousDayCount / 2)
                                     .arg(currentDayCount));
                             download_needed = true;
@@ -889,19 +907,19 @@ bool FillData::Run(SourceList &sourcelist)
                     }
                     else
                     {
-                        VERBOSE(VB_GENERAL, QString(
-                                "Data Refresh needed because we are unable to "
-                                "query the data for day @ offset %1 to "
-                                "determine how much we should have for "
-                                "offset day %2.").arg(i-1).arg(i));
+                        LOG(VB_GENERAL, LOG_INFO,
+                            QString("Data Refresh needed because we are unable "
+                                    "to query the data for day @ offset %1 to "
+                                    "determine how much we should have for "
+                                    "offset day %2.").arg(i-1).arg(i));
                         download_needed = true;
                     }
                 }
 
                 if (download_needed)
                 {
-                    VERBOSE(VB_IMPORTANT,
-                            QString("Refreshing data for ") + currDate);
+                    LOG(VB_GENERAL, LOG_NOTICE,
+                        QString("Refreshing data for ") + currDate);
                     if (!GrabData(*it, i, &qCurrentDate))
                     {
                         ++failures;
@@ -913,16 +931,17 @@ bool FillData::Run(SourceList &sourcelist)
 
                     if (endofdata)
                     {
-                        VERBOSE(VB_GENERAL, "Grabber is no longer returning "
-                                            "program data, finishing");
+                        LOG(VB_GENERAL, LOG_INFO,
+                            "Grabber is no longer returning program data, "
+                            "finishing");
                         break;
                     }
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT,
-                            QString("Data is already present for ") + currDate +
-                                    ", skipping");
+                    LOG(VB_GENERAL, LOG_NOTICE,
+                        QString("Data is already present for ") + currDate +
+                        ", skipping");
                 }
             }
             if (!fatalErrors.empty())
@@ -930,10 +949,10 @@ bool FillData::Run(SourceList &sourcelist)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Grabbing XMLTV data using ") + xmltv_grabber +
-                            " is not supported. You may need to upgrade to"
-                            " the latest version of XMLTV.");
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Grabbing XMLTV data using ") + xmltv_grabber +
+                " is not supported. You may need to upgrade to"
+                " the latest version of XMLTV.");
         }
 
         if (interrupted)
@@ -965,7 +984,7 @@ bool FillData::Run(SourceList &sourcelist)
     {
         for (int i = 0; i < fatalErrors.size(); i++)
         {
-            VERBOSE(VB_IMPORTANT, LOC + "Encountered Fatal Error: " +
+            LOG(VB_GENERAL, LOG_CRIT, LOC + "Encountered Fatal Error: " +
                     fatalErrors[i]);
         }
         return false;

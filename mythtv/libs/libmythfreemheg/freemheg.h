@@ -50,6 +50,7 @@ public:
     virtual int RunAll(void) = 0;
     // Generate a UserAction event i.e. a key press.
     virtual void GenerateUserAction(int nCode) = 0;
+    virtual void EngineEvent(int) = 0;
 };
 
 // Logging control
@@ -121,7 +122,7 @@ public:
     virtual bool GetServiceInfo(int channelId, int &netId, int &origNetId,
                                 int &transportId, int &serviceId) = 0;
     // Tune to an index returned by GetChannelIndex
-    virtual bool TuneTo(int channel) = 0;
+    virtual bool TuneTo(int channel, int tuneinfo) = 0;
 
     // Check whether we have requested a stop.  Returns true and signals
     // the m_stopped condition if we have.

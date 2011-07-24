@@ -28,7 +28,7 @@ bool CastDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'castpopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'castpopup'");
         return false;
     }
 
@@ -69,7 +69,7 @@ bool PlotDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'descriptionpopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'descriptionpopup'");
         return false;
     }
 

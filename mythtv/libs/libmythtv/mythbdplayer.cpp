@@ -3,7 +3,6 @@
 #include "mythbdplayer.h"
 
 #define LOC     QString("BDPlayer: ")
-#define LOC_ERR QString("BDPlayer error: ")
 
 MythBDPlayer::MythBDPlayer(bool muted)
   : MythPlayer(muted), m_stillFrameShowing(false)
@@ -79,7 +78,7 @@ bool MythBDPlayer::VideoLoop(void)
     // clear the mythtv imposed wait state
     if (player_ctx->buffer->BD()->BDWaitingForPlayer())
     {
-        VERBOSE(VB_PLAYBACK, LOC + "Clearing Mythtv BD wait state");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Clearing Mythtv BD wait state");
         player_ctx->buffer->BD()->SkipBDWaitingForPlayer();
         return !IsErrored();
     }
@@ -106,14 +105,14 @@ bool MythBDPlayer::VideoLoop(void)
         // flag if we have no frame
         if (nbframes == 0)
         {
-            VERBOSE(VB_PLAYBACK, LOC +
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
                     "Warning: In BD Still but no video frames in queue");
             usleep(10000);
             return !IsErrored();
         }
 
         if (!m_stillFrameShowing)
-            VERBOSE(VB_PLAYBACK, LOC + "Entering still frame.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Entering still frame.");
         m_stillFrameShowing = true;
     }
     else
@@ -121,7 +120,7 @@ bool MythBDPlayer::VideoLoop(void)
         if (videoPaused && m_stillFrameShowing)
         {
             UnpauseVideo();
-            VERBOSE(VB_PLAYBACK, LOC + "Exiting still frame.");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Exiting still frame.");
         }
         m_stillFrameShowing = false;
     }

@@ -526,7 +526,9 @@ void MusicPlayer::customEvent(QEvent *event)
                         playFile(mdata);
                     }
                     else
-                        VERBOSE(VB_IMPORTANT, QString("MusicPlayer: got invalid MUSIC_COMMAND PLAY_FILE - %1").arg(me->Message()));
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("MusicPlayer: got invalid MUSIC_COMMAND "
+                                    "PLAY_FILE - %1").arg(me->Message()));
                 }
                 else if (list[2] == "PLAY_URL")
                 {
@@ -538,7 +540,9 @@ void MusicPlayer::customEvent(QEvent *event)
                         playFile(mdata);
                     }
                     else
-                        VERBOSE(VB_IMPORTANT, QString("MusicPlayer: got invalid MUSIC_COMMAND PLAY_URL - %1").arg(me->Message()));
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("MusicPlayer: got invalid MUSIC_COMMAND "
+                                    "PLAY_URL - %1").arg(me->Message()));
                 }
                 else if (list[2] == "PLAY_TRACK")
                 {
@@ -550,7 +554,9 @@ void MusicPlayer::customEvent(QEvent *event)
                             playFile(*mdata);
                     }
                     else
-                        VERBOSE(VB_IMPORTANT, QString("MusicPlayer: got invalid MUSIC_COMMAND PLAY_TRACK - %1").arg(me->Message()));
+                        LOG(VB_GENERAL, LOG_ERR,
+                             QString("MusicPlayer: got invalid MUSIC_COMMAND "
+                                     "PLAY_TRACK - %1").arg(me->Message()));
                 }
                 else if (list[2] == "GET_METADATA")
                 {
@@ -568,7 +574,18 @@ void MusicPlayer::customEvent(QEvent *event)
                 }
             }
             else
-                VERBOSE(VB_IMPORTANT, QString("MusicPlayer: got unknown/invalid MUSIC_COMMAND - %1").arg(me->Message()));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("MusicPlayer: got unknown/invalid MUSIC_COMMAND "
+                            "- %1").arg(me->Message()));
+        }
+        else if (me->Message().startsWith("MUSIC_SETTINGS_CHANGED"))
+        {
+            QString startdir = gCoreContext->GetSetting("MusicLocation");
+            startdir = QDir::cleanPath(startdir);
+            if (!startdir.endsWith("/"))
+                startdir += "/";
+
+            Metadata::SetStartdir(startdir);
         }
     }
 
@@ -578,7 +595,7 @@ void MusicPlayer::customEvent(QEvent *event)
         {
             OutputEvent *aoe = (OutputEvent *) event;
 
-            VERBOSE(VB_IMPORTANT, QString("Output Error - %1")
+            LOG(VB_GENERAL, LOG_ERR, QString("Output Error - %1")
                     .arg(*aoe->errorMessage()));
             MythPopupBox::showOkPopup(
                 GetMythMainWindow(),
@@ -600,7 +617,7 @@ void MusicPlayer::customEvent(QEvent *event)
 
             DecoderEvent *dxe = (DecoderEvent *) event;
 
-            VERBOSE(VB_IMPORTANT, QString("Decoder Error - %1")
+            LOG(VB_GENERAL, LOG_ERR, QString("Decoder Error - %1")
                     .arg(*dxe->errorMessage()));
             MythPopupBox::showOkPopup(
                 GetMythMainWindow(), "Decoder Error",
@@ -1081,8 +1098,8 @@ void MusicPlayer::setupDecoderHandler()
 
 void MusicPlayer::decoderHandlerReady(void)
 {
-    VERBOSE(VB_PLAYBACK, QString ("decoder handler is ready, decoding %1").
-            arg(getDecoder()->getFilename()));
+    LOG(VB_PLAYBACK, LOG_INFO, QString ("decoder handler is ready, decoding %1")
+            .arg(getDecoder()->getFilename()));
 
     CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(getDecoder());
     if (cddecoder)
@@ -1131,7 +1148,7 @@ void MusicPlayer::decoderHandlerReady(void)
     }
     else
     {
-        VERBOSE(VB_PLAYBACK, QString("Cannot initialise decoder for %1")
+        LOG(VB_PLAYBACK, LOG_ERR, QString("Cannot initialise decoder for %1")
                 .arg(getDecoder()->getFilename()));
         return;
     }

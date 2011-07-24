@@ -21,6 +21,7 @@
 #include "mythuibuttontree.h"
 #include "mythuiimage.h"
 #include "mythuistatetype.h"
+#include "mythuimetadataresults.h"
 #include "mythdialogbox.h"
 #include "mythgenerictree.h"
 #include "mythsystem.h"
@@ -35,8 +36,7 @@
 #include "videoutils.h"
 #include "dbaccess.h"
 #include "dirscan.h"
-#include "metadatadownload.h"
-#include "metadataimagedownload.h"
+#include "metadatafactory.h"
 #include "videofilter.h"
 #include "editvideometadata.h"
 #include "videopopups.h"
@@ -120,165 +120,17 @@ namespace
         return 0;
     }
 
-    class SearchResultsDialog : public MythScreenType
-    {
-        Q_OBJECT
-
-      public:
-        SearchResultsDialog(MythScreenStack *lparent,
-                const MetadataLookupList results) :
-            MythScreenType(lparent, "videosearchresultspopup"),
-            m_results(results), m_resultsList(0)
-        {
-            m_imageDownload = new MetadataImageDownload(this);
-        }
-
-        ~SearchResultsDialog()
-        {
-            cleanCacheDir();
-
-            if (m_imageDownload)
-            {
-                delete m_imageDownload;
-                m_imageDownload = NULL;
-            }
-        }
-
-        bool Create()
-        {
-            if (!LoadWindowFromXML("video-ui.xml", "moviesel", this))
-                return false;
-
-            bool err = false;
-            UIUtilE::Assign(this, m_resultsList, "results", &err);
-            if (err)
-            {
-                VERBOSE(VB_IMPORTANT, "Cannot load screen 'moviesel'");
-                return false;
-            }
-
-            for (MetadataLookupList::const_iterator i = m_results.begin();
-                    i != m_results.end(); ++i)
-            {
-                MythUIButtonListItem *button =
-                    new MythUIButtonListItem(m_resultsList,
-                    (*i)->GetTitle());
-                MetadataMap metadataMap;
-                (*i)->toMap(metadataMap);
-
-                QString coverartfile;
-                ArtworkList art = (*i)->GetArtwork(COVERART);
-                if (art.count() > 0)
-                    coverartfile = art.takeFirst().thumbnail;
-                else
-                {
-                    art = (*i)->GetArtwork(BANNER);
-                    if (art.count() > 0)
-                        coverartfile = art.takeFirst().thumbnail;
-                }
-
-                QString dlfile = getDownloadFilename((*i)->GetTitle(),
-                    coverartfile);
-
-                if (!coverartfile.isEmpty())
-                {
-                    int pos = m_resultsList->GetItemPos(button);
-
-                    if (QFile::exists(dlfile))
-                        button->SetImage(dlfile);
-                    else
-                        m_imageDownload->addThumb((*i)->GetTitle(),
-                                         coverartfile,
-                                         qVariantFromValue<uint>(pos));
-                }
-
-                button->SetTextFromMap(metadataMap);
-                button->SetData(qVariantFromValue<MetadataLookup*>(*i));
-            }
-
-            connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                    SLOT(sendResult(MythUIButtonListItem *)));
-
-            BuildFocusList();
-
-            return true;
-        }
-
-        void cleanCacheDir()
-        {
-            QString cache = QString("%1/thumbcache")
-                       .arg(GetConfDir());
-            QDir cacheDir(cache);
-            QStringList thumbs = cacheDir.entryList(QDir::Files);
-
-            for (QStringList::const_iterator i = thumbs.end() - 1;
-                    i != thumbs.begin() - 1; --i)
-            {
-                QString filename = QString("%1/%2").arg(cache).arg(*i);
-                QFileInfo fi(filename);
-                QDateTime lastmod = fi.lastModified();
-                if (lastmod.addDays(2) < QDateTime::currentDateTime())
-                {
-                    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1")
-                          .arg(filename));
-                    QFile::remove(filename);
-                }
-            }
-        }
-
-        void customEvent(QEvent *event)
-        {
-            if (event->type() == ThumbnailDLEvent::kEventType)
-            {
-                ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
-
-                ThumbnailData *data = tde->thumb;
-
-                QString file = data->url;
-                uint pos = qVariantValue<uint>(data->data);
-
-                if (file.isEmpty())
-                    return;
-
-                if (!((uint)m_resultsList->GetCount() >= pos))
-                    return;
-
-                MythUIButtonListItem *item =
-                          m_resultsList->GetItemAt(pos);
-
-                if (item)
-                {
-                    item->SetImage(file);
-                }
-                delete data;
-            }
-        }
-
-     signals:
-        void haveResult(MetadataLookup*);
-
-      private:
-        MetadataLookupList m_results;
-        MythUIButtonList  *m_resultsList;
-        MetadataImageDownload *m_imageDownload;
-
-      private slots:
-        void sendResult(MythUIButtonListItem* item)
-        {
-            emit haveResult(qVariantValue<MetadataLookup *>(item->GetData()));
-            Close();
-        }
-    };
-
     bool GetLocalVideoImage(const QString &video_uid, const QString &filename,
                              const QStringList &in_dirs, QString &image,
-                             const QString &title, int season,
+                             QString title, int season,
                              const QString host, QString sgroup,
                              int episode = 0, bool isScreenshot = false)
     {
         QStringList search_dirs(in_dirs);
         QFileInfo qfi(filename);
         search_dirs += qfi.absolutePath();
+        if (title.contains("/"))
+            title.replace("/", "-");
 
         const QString base_name = qfi.completeBaseName();
         QList<QByteArray> image_types = QImageReader::supportedImageFormats();
@@ -991,8 +843,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     m_screenshot(0), m_banner(0), m_fanart(0), m_trailerState(0),
     m_parentalLevelState(0), m_watchedState(0), m_studioState(0)
 {
-    m_query = new MetadataDownload(this);
-    m_imageDownload = new MetadataImageDownload(this);
+    m_metadataFactory = new MetadataFactory(this);
 
     m_d = new VideoDialogPrivate(video_list, type, browse);
 
@@ -1009,20 +860,6 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
 
 VideoDialog::~VideoDialog()
 {
-    if (m_query)
-    {
-        m_query->cancel();
-        delete m_query;
-        m_query = NULL;
-    }
-
-    if (m_imageDownload)
-    {
-        m_imageDownload->cancel();
-        delete m_imageDownload;
-        m_imageDownload = NULL;
-    }
-
     if (!m_d->m_switchingLayout)
         m_d->DelayVideoListDestruction(m_d->m_videoList);
 
@@ -1161,7 +998,7 @@ bool VideoDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen '" + windowName + "'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen '" + windowName + "'");
         return false;
     }
 
@@ -1172,7 +1009,8 @@ bool VideoDialog::Create()
 
     BuildFocusList();
 
-    CheckedSet(m_novideoText, tr("Video dialog loading, or no videos available..."));
+    CheckedSet(m_novideoText,
+               tr("Video dialog loading, or no videos available..."));
 
     if (m_d->m_type == DLG_TREE)
     {
@@ -1501,7 +1339,9 @@ void VideoDialog::fetchVideos()
 QString VideoDialog::RemoteImageCheck(QString host, QString filename)
 {
     QString result = "";
-    //VERBOSE(VB_GENERAL, QString("RemoteImageCheck(%1)").arg(filename));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("RemoteImageCheck(%1)").arg(filename));
+#endif
 
     QStringList dirs = GetVideoDirsByHost(host);
 
@@ -1524,8 +1364,9 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
 
             if (!ok || list.at(0).startsWith("SLAVE UNREACHABLE"))
             {
-                VERBOSE(VB_GENERAL, QString("Backend : %1 currently Unreachable. Skipping this one.")
-                                    .arg(host));
+                LOG(VB_GENERAL, LOG_WARNING,
+                    QString("Backend : %1 currently Unreachable. Skipping "
+                            "this one.") .arg(host));
                 break;
             }
 
@@ -1534,8 +1375,11 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
 
             if (!result.isEmpty())
             {
-            //    VERBOSE(VB_GENERAL, QString("RemoteImageCheck(%1) res :%2: :%3:")
-            //                        .arg(fname).arg(result).arg(*iter));
+#if 0
+                LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("RemoteImageCheck(%1) res :%2: :%3:")
+                        .arg(fname).arg(result).arg(*iter));
+#endif
                 break;
             }
 
@@ -1668,12 +1512,11 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
     }
 
     if (!icon_file.isEmpty())
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Found Image : %1 :")
-                                    .arg(icon_file));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Found Image : %1 :")
+                .arg(icon_file));
     else
-        VERBOSE(VB_GENERAL|VB_EXTRA,
-                QString("Could not find cover Image : %1 ")
-                    .arg(prefix));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Could not find cover Image : %1 ")
+                .arg(prefix));
 
     if (IsDefaultCoverFile(icon_file))
         icon_file.clear();
@@ -1704,8 +1547,11 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
         QString filename = QString("%1/folder").arg(folder_path);
 
-        // VERBOSE(VB_GENERAL, QString("GetCoverImage host : %1  prefix : %2 file : %3")
-        //                            .arg(host).arg(prefix).arg(filename));
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("GetCoverImage host : %1  prefix : %2 file : %3")
+                .arg(host).arg(prefix).arg(filename));
+#endif
 
         QStringList test_files;
         test_files.append(filename + ".png");
@@ -1717,7 +1563,9 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                 tfp != test_files.end(); ++tfp)
         {
             QString imagePath = *tfp;
-            //VERBOSE(VB_GENERAL, QString("Cover check :%1 : ").arg(*tfp));
+#if 0
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Cover check :%1 : ").arg(*tfp));
+#endif
 
             foundCover = false;
             if (!host.isEmpty())
@@ -1858,11 +1706,11 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
         }
 
         if (!icon_file.isEmpty())
-            VERBOSE(VB_GENERAL|VB_EXTRA, QString("Found Image : %1 :")
-                                        .arg(icon_file));
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Found Image : %1 :")
+                    .arg(icon_file));
         else
-            VERBOSE(VB_GENERAL|VB_EXTRA,
-                    QString("Could not find folder cover Image : %1 ")
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("Could not find folder cover Image : %1 ")
                     .arg(folder_path));
     }
     else
@@ -2268,8 +2116,7 @@ void VideoDialog::createOkDialog(QString title)
  */
 void VideoDialog::searchComplete(QString string)
 {
-    VERBOSE(VB_GENERAL | VB_EXTRA,
-            QString("Jumping to: %1").arg(string));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Jumping to: %1").arg(string));
 
     MythGenericTree *parent = m_d->m_currentNode->getParent();
     QStringList childList;
@@ -3266,8 +3113,8 @@ void VideoDialog::playVideoWithTrailers()
         ++i;
         QString trailer = trailers.takeAt(rand() % trailers.size());
 
-        VERBOSE(VB_GENERAL | VB_EXTRA,
-                QString("Random trailer to play will be: %1").arg(trailer));
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("Random trailer to play will be: %1").arg(trailer));
 
         VideoPlayerCommand::PlayerFor(trailer).Play();
     }
@@ -3355,11 +3202,14 @@ VideoMetadata *VideoDialog::GetMetadata(MythUIButtonListItem *item)
 
 void VideoDialog::customEvent(QEvent *levent)
 {
-    if (levent->type() == MetadataLookupEvent::kEventType)
+    if (levent->type() == MetadataFactoryMultiResult::kEventType)
     {
-        MetadataLookupEvent *lue = (MetadataLookupEvent *)levent;
+        MetadataFactoryMultiResult *mfmr = dynamic_cast<MetadataFactoryMultiResult*>(levent);
 
-        MetadataLookupList lul = lue->lookupList;
+        if (!mfmr)
+            return;
+
+        MetadataLookupList list = mfmr->results;
 
         if (m_busyPopup)
         {
@@ -3367,17 +3217,10 @@ void VideoDialog::customEvent(QEvent *levent)
             m_busyPopup = NULL;
         }
 
-        if (lul.isEmpty())
-            return;
-
-        if (lul.count() == 1)
+        if (list.count() > 1)
         {
-            OnVideoSearchDone(lul.takeFirst());
-        }
-        else
-        {
-            SearchResultsDialog *resultsdialog =
-                  new SearchResultsDialog(m_popupStack, lul);
+            MetadataResultsDialog *resultsdialog =
+                  new MetadataResultsDialog(m_popupStack, list);
 
             connect(resultsdialog, SIGNAL(haveResult(MetadataLookup*)),
                     SLOT(OnVideoSearchListSelection(MetadataLookup*)),
@@ -3387,11 +3230,31 @@ void VideoDialog::customEvent(QEvent *levent)
                 m_popupStack->AddScreen(resultsdialog);
         }
     }
-    else if (levent->type() == MetadataLookupFailure::kEventType)
+    else if (levent->type() == MetadataFactorySingleResult::kEventType)
     {
-        MetadataLookupFailure *luf = (MetadataLookupFailure *)levent;
+        MetadataFactorySingleResult *mfsr = dynamic_cast<MetadataFactorySingleResult*>(levent);
 
-        MetadataLookupList lul = luf->lookupList;
+        if (!mfsr)
+            return;
+
+        MetadataLookup *lookup = mfsr->result;
+
+        if (!lookup)
+            return;
+
+        OnVideoSearchDone(lookup);
+    }
+    else if (levent->type() == MetadataFactoryNoResult::kEventType)
+    {
+        MetadataFactoryNoResult *mfnr = dynamic_cast<MetadataFactoryNoResult*>(levent);
+
+        if (!mfnr)
+            return;
+
+        MetadataLookup *lookup = mfnr->result;
+
+        if (!lookup)
+            return;
 
         if (m_busyPopup)
         {
@@ -3399,37 +3262,16 @@ void VideoDialog::customEvent(QEvent *levent)
             m_busyPopup = NULL;
         }
 
-        if (lul.size())
+        VideoMetadata *metadata =
+            qVariantValue<VideoMetadata *>(lookup->GetData());
+        if (metadata)
         {
-            MetadataLookup *lookup = lul.takeFirst();
-            MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
-            if (node)
-            {
-                VideoMetadata *metadata = GetMetadataPtrFromNode(node);
-                if (metadata)
-                {
-                    metadata->SetProcessed(true);
-                    metadata->UpdateDatabase();
-                    MythUIButtonListItem *item = GetItemByMetadata(metadata);
-                    if (item)
-                        UpdateItem(item);
-                }
-            }
-            VERBOSE(VB_GENERAL,
-                QString("No results found for %1 %2 %3").arg(lookup->GetTitle())
-                    .arg(lookup->GetSeason()).arg(lookup->GetEpisode()));
+            metadata->SetProcessed(true);
+            metadata->UpdateDatabase();
         }
-    }
-    else if (levent->type() == ImageDLEvent::kEventType)
-    {
-        ImageDLEvent *ide = (ImageDLEvent *)levent;
-
-        MetadataLookup *lookup = ide->item;
-
-        if (!lookup)
-            return;
-
-        handleDownloadedImages(lookup);
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("No results found for %1 %2 %3").arg(lookup->GetTitle())
+                .arg(lookup->GetSeason()).arg(lookup->GetEpisode()));
     }
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {
@@ -3437,58 +3279,6 @@ void VideoDialog::customEvent(QEvent *levent)
     }
 }
 
-void VideoDialog::handleDownloadedImages(MetadataLookup *lookup)
-{
-    if (!lookup)
-        return;
-
-    MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
-
-    if (!node)
-        return;
-
-    VideoMetadata *metadata = GetMetadataPtrFromNode(node);
-
-    if (!metadata)
-        return;
-
-    DownloadMap downloads = lookup->GetDownloads();
-
-    if (downloads.isEmpty())
-        return;
-
-    for (DownloadMap::iterator i = downloads.begin();
-            i != downloads.end(); ++i)
-    {
-        VideoArtworkType type = i.key();
-        ArtworkInfo info = i.value();
-        QString filename;
-        if (info.url.startsWith("myth://"))
-        {
-            QFileInfo fi(info.url);
-            filename = fi.fileName();
-        }
-        else
-            filename = info.url;
-
-        if (type == COVERART)
-            metadata->SetCoverFile(filename);
-        else if (type == FANART)
-            metadata->SetFanart(filename);
-        else if (type == BANNER)
-            metadata->SetBanner(filename);
-        else if (type == SCREENSHOT)
-            metadata->SetScreenshot(filename);
-    }
-
-    metadata->UpdateDatabase();
-
-    MythUIButtonListItem *item = GetItemByMetadata(metadata);
-    if (item)
-        UpdateItem(item);
-}
-
-// This is the final call as part of a StartVideoImageSet
 void VideoDialog::OnVideoImageSetDone(VideoMetadata *metadata)
 {
     // The metadata has some cover file set
@@ -3563,25 +3353,7 @@ void VideoDialog::VideoSearch(MythGenericTree *node,
     if (!metadata)
         return;
 
-    MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetStep(SEARCH);
-    lookup->SetType(VID);
-    lookup->SetData(qVariantFromValue(node));
-
-    if (automode)
-    {
-        lookup->SetAutomatic(true);
-    }
-
-    lookup->SetTitle(metadata->GetTitle());
-    lookup->SetSubtitle(metadata->GetSubtitle());
-    lookup->SetSeason(metadata->GetSeason());
-    lookup->SetEpisode(metadata->GetEpisode());
-    lookup->SetInetref(metadata->GetInetRef());
-    if (m_query->isRunning())
-        m_query->prependLookup(lookup);
-    else
-        m_query->addLookup(lookup);
+    m_metadataFactory->Lookup(metadata, automode, true);
 
     if (!automode)
     {
@@ -3603,8 +3375,8 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
     typedef QList<MythGenericTree *> MGTreeChildList;
     MGTreeChildList *lchildren = node->getAllChildren();
 
-    VERBOSE(VB_GENERAL|VB_EXTRA,
-            QString("Fetching details in %1").arg(node->getString()));
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("Fetching details in %1").arg(node->getString()));
 
     for (MGTreeChildList::const_iterator p = lchildren->begin();
             p != lchildren->end(); ++p)
@@ -3642,8 +3414,8 @@ void VideoDialog::OnVideoSearchListSelection(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    lookup->SetStep(GETDATA);
-    m_query->prependLookup(lookup);
+    lookup->SetStep(kLookupData);
+    m_metadataFactory->Lookup(lookup);
 }
 
 void VideoDialog::OnParentalChange(int amount)
@@ -3750,22 +3522,13 @@ void VideoDialog::ResetMetadata()
     }
 }
 
-void VideoDialog::StartVideoImageSet(MythGenericTree *node, QStringList coverart,
-                                     QStringList fanart, QStringList banner,
-                                     QStringList screenshot)
+void VideoDialog::StartVideoImageSet(VideoMetadata *metadata)
 {
-    if (!node)
-        return;
-
-    VideoMetadata *metadata = GetMetadataPtrFromNode(node);
-
     if (!metadata)
         return;
 
     QStringList cover_dirs;
     cover_dirs += m_d->m_artDir;
-
-    ArtworkMap map;
 
     QString cover_file;
     QString inetref = metadata->GetInetRef();
@@ -3785,14 +3548,6 @@ void VideoDialog::StartVideoImageSet(MythGenericTree *node, QStringList coverart
             metadata->SetCoverFile(cover_file);
             OnVideoImageSetDone(metadata);
         }
-
-        if (!coverart.isEmpty() && (cover_file.isEmpty() ||
-            IsDefaultCoverFile(cover_file)))
-        {
-            ArtworkInfo info;
-            info.url = coverart.takeAt(0).trimmed();
-            map.insert(COVERART, info);
-        }
     }
 
     QStringList fanart_dirs;
@@ -3809,23 +3564,6 @@ void VideoDialog::StartVideoImageSet(MythGenericTree *node, QStringList coverart
             metadata->SetFanart(fanart_file);
             OnVideoImageSetDone(metadata);
         }
-
-        if (!fanart.isEmpty() && metadata->GetFanart().isEmpty())
-        {
-            if (metadata->GetSeason() >= 1 && fanart.count() >= metadata->GetSeason())
-            {
-                ArtworkInfo info;
-                uint count = metadata->GetSeason() - 1;
-                info.url = fanart.takeAt(count).trimmed();
-                map.insert(FANART, info);
-            }
-           else
-            {
-                ArtworkInfo info;
-                info.url = fanart.takeAt(0).trimmed();
-                map.insert(FANART, info);
-            }
-        }
     }
 
     QStringList banner_dirs;
@@ -3841,13 +3579,6 @@ void VideoDialog::StartVideoImageSet(MythGenericTree *node, QStringList coverart
         {
             metadata->SetBanner(banner_file);
             OnVideoImageSetDone(metadata);
-        }
-
-        if (!banner.isEmpty() && metadata->GetBanner().isEmpty())
-        {
-            ArtworkInfo info;
-            info.url = banner.takeAt(banner.count() - 1).trimmed();
-            map.insert(BANNER, info);
         }
     }
 
@@ -3866,27 +3597,7 @@ void VideoDialog::StartVideoImageSet(MythGenericTree *node, QStringList coverart
             metadata->SetScreenshot(screenshot_file);
             OnVideoImageSetDone(metadata);
         }
-
-        if (!screenshot.isEmpty() && metadata->GetScreenshot().isEmpty())
-        {
-            ArtworkInfo info;
-            info.url = screenshot.takeAt(screenshot.count() - 1).trimmed();
-            map.insert(SCREENSHOT, info);
-        }
     }
-
-    MetadataLookup *lookup = new MetadataLookup();
-    lookup->SetTitle(metadata->GetTitle());
-    lookup->SetSubtitle(metadata->GetSubtitle());
-    lookup->SetSeason(metadata->GetSeason());
-    lookup->SetEpisode(metadata->GetEpisode());
-    lookup->SetInetref(metadata->GetInetRef());
-    lookup->SetType(VID);
-    lookup->SetHost(host);
-    lookup->SetDownloads(map);
-    lookup->SetData(qVariantFromValue(node));
-
-    m_imageDownload->addDownloads(lookup);
 }
 
 void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
@@ -3900,17 +3611,10 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     if (!lookup)
        return;
 
-    MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
-
-    if (!node)
-        return;
-
-    VideoMetadata *metadata = GetMetadataPtrFromNode(node);
+    VideoMetadata *metadata = qVariantValue<VideoMetadata *>(lookup->GetData());
 
     if (!metadata)
         return;
-
-    QStringList coverart, fanart, banner, screenshot;
 
     metadata->SetTitle(lookup->GetTitle());
     metadata->SetSubtitle(lookup->GetSubtitle());
@@ -3924,7 +3628,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     if (metadata->GetDirector() == VIDEO_DIRECTOR_UNKNOWN ||
         metadata->GetDirector().isEmpty())
     {
-        QList<PersonInfo> director = lookup->GetPeople(DIRECTOR);
+        QList<PersonInfo> director = lookup->GetPeople(kPersonDirector);
         if (director.count() > 0)
             metadata->SetDirector(director.takeFirst().name);
     }
@@ -3954,35 +3658,9 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
 
     m_d->AutomaticParentalAdjustment(metadata);
 
-    // Imagery
-    ArtworkList coverartlist = lookup->GetArtwork(COVERART);
-    for (ArtworkList::const_iterator p = coverartlist.begin();
-        p != coverartlist.end(); ++p)
-    {
-        coverart.prepend((*p).url);
-    }
-    ArtworkList fanartlist = lookup->GetArtwork(FANART);
-    for (ArtworkList::const_iterator p = fanartlist.begin();
-        p != fanartlist.end(); ++p)
-    {
-        fanart.prepend((*p).url);
-    }
-    ArtworkList bannerlist = lookup->GetArtwork(BANNER);
-    for (ArtworkList::const_iterator p = bannerlist.begin();
-        p != bannerlist.end(); ++p)
-    {
-        banner.prepend((*p).url);
-    }
-    ArtworkList screenshotlist = lookup->GetArtwork(SCREENSHOT);
-    for (ArtworkList::const_iterator p = screenshotlist.begin();
-        p != screenshotlist.end(); ++p)
-    {
-        screenshot.prepend((*p).url);
-    }
-
     // Cast
-    QList<PersonInfo> actors = lookup->GetPeople(ACTOR);
-    QList<PersonInfo> gueststars = lookup->GetPeople(GUESTSTAR);
+    QList<PersonInfo> actors = lookup->GetPeople(kPersonActor);
+    QList<PersonInfo> gueststars = lookup->GetPeople(kPersonGuestStar);
 
     for (QList<PersonInfo>::const_iterator p = gueststars.begin();
         p != gueststars.end(); ++p)
@@ -4054,7 +3732,10 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     if (item != NULL)
         UpdateItem(item);
 
-    StartVideoImageSet(node, coverart, fanart, banner, screenshot);
+    delete lookup;
+    lookup = NULL;
+
+    StartVideoImageSet(metadata);
 }
 
 void VideoDialog::doVideoScan()

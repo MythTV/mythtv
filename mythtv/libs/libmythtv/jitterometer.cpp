@@ -5,18 +5,46 @@
 #include "mythlogging.h"
 #include "jitterometer.h"
 
+#define UNIX_PROC_STAT "/proc/stat"
+#define MAX_CORES 8
+
 Jitterometer::Jitterometer(QString nname, int ncycles)
-  : count(0), num_cycles(ncycles), starttime_valid(0), last_fps(0), name(nname)
+  : count(0), num_cycles(ncycles), starttime_valid(0), last_fps(0),
+    last_sd(0), name(nname), cpustat(NULL), laststats(NULL)
 {
     times = (unsigned*) malloc(num_cycles * sizeof(unsigned));
     memset(&starttime, 0, sizeof(struct timeval));
 
     if (name.isEmpty())
         name = "Jitterometer";
+
+#ifdef __linux__
+    if (QFile::exists(UNIX_PROC_STAT))
+    {
+        cpustat = new QFile(UNIX_PROC_STAT);
+        if (cpustat)
+        {
+            if (!cpustat->open(QIODevice::ReadOnly))
+            {
+                delete cpustat;
+                cpustat = NULL;
+            }
+            else
+            {
+                laststats = new unsigned long long[MAX_CORES * 9];
+            }
+        }
+    }
+#endif
 }
 
 Jitterometer::~Jitterometer()
 {
+    if (cpustat)
+        cpustat->close();
+    delete cpustat;
+    delete [] laststats;
+
     free(times);
 }
 
@@ -68,7 +96,8 @@ bool Jitterometer::RecordEndTime()
         tottime = mean;
         mean /= cycles;
 
-        last_fps = cycles / tottime * 1000000;
+        if (tottime > 0)
+            last_fps = cycles / tottime * 1000000;
 
         /* compute the sum of the squares of each deviation from the mean */
         for(i = 0; i < cycles; i++)
@@ -76,9 +105,19 @@ bool Jitterometer::RecordEndTime()
 
         /* compute standard deviation */
         standard_deviation = sqrt(sum_of_squared_deviations / (cycles - 1));
+        if (mean > 0)
+            last_sd = standard_deviation / mean;
 
-        VERBOSE(VB_PLAYBACK, name + QString("Mean: %1 Std.Dev: %2 fps: %3")
-            .arg((int)mean).arg((int)standard_deviation).arg(last_fps, 0, 'f', 2));
+        /* retrieve load if available */
+        QString extra;
+        lastcpustats = GetCPUStat();
+        if (!lastcpustats.isEmpty())
+            extra = QString("CPUs: ") + lastcpustats;
+
+        LOG(VB_PLAYBACK, LOG_INFO, 
+            name + QString("Mean: %1 Std.Dev: %2 fps: %3 ")
+                .arg((int)mean).arg((int)standard_deviation)
+                .arg(last_fps, 0, 'f', 2) + extra);
 
         count = 0;
         return true;
@@ -92,4 +131,51 @@ void Jitterometer::RecordStartTime()
         return;
     gettimeofday(&starttime, NULL);
     starttime_valid = 1;
+}
+
+QString Jitterometer::GetCPUStat(void)
+{
+    if (!cpustat)
+        return "N/A";
+
+#ifdef __linux__
+    QString res;
+    cpustat->seek(0);
+    cpustat->flush();
+
+    QByteArray line = cpustat->readLine(256);
+    if (line.isEmpty())
+        return res;
+
+    int cores = 0;
+    int ptr   = 0;
+    line = cpustat->readLine(256);
+    while (!line.isEmpty() && cores < MAX_CORES)
+    {
+        static const int size = sizeof(unsigned long long) * 9;
+        unsigned long long stats[9];
+        memset(stats, 0, size);
+        int num = 0;
+        if (sscanf(line.constData(),
+                   "cpu%d %llu %llu %llu %llu %llu %llu %llu %llu %llu %*s\n",
+                   &num, &stats[0], &stats[1], &stats[2], &stats[3],
+                   &stats[4], &stats[5], &stats[6], &stats[7], &stats[8]) >= 4)
+        {
+            float load  = stats[0] + stats[1] + stats[2] + stats[4] +
+                          stats[5] + stats[6] + stats[7] + stats[8] -
+                          laststats[ptr + 0] - laststats[ptr + 1] -
+                          laststats[ptr + 2] - laststats[ptr + 4] -
+                          laststats[ptr + 5] - laststats[ptr + 6] -
+                          laststats[ptr + 7] - laststats[ptr + 8];
+            float total = load + stats[3] - laststats[ptr + 3];
+            if (total > 0)
+                res += QString("%1% ").arg(load / total * 100, 0, 'f', 0);
+            memcpy(&laststats[ptr], stats, size);
+        }
+        line = cpustat->readLine(256);
+        cores++;
+        ptr += 9;
+    }
+    return res;
+#endif
 }

@@ -58,7 +58,8 @@ enum JobFlags {
     JOB_NO_FLAGS     = 0x0000,
     JOB_USE_CUTLIST  = 0x0001,
     JOB_LIVE_REC     = 0x0002,
-    JOB_EXTERNAL     = 0x0004
+    JOB_EXTERNAL     = 0x0004,
+    JOB_REBUILD      = 0x0008
 };
 
 enum JobLists {
@@ -75,6 +76,7 @@ enum JobTypes {
     JOB_SYSTEMJOB    = 0x00ff,
     JOB_TRANSCODE    = 0x0001,
     JOB_COMMFLAG     = 0x0002,
+    JOB_METADATA     = 0x0004,
 
     JOB_USERJOB      = 0xff00,
     JOB_USERJOB1     = 0x0100,
@@ -232,6 +234,9 @@ class MTV_PUBLIC JobQueue : public QObject
 
     static void *TranscodeThread(void *param);
     void DoTranscodeThread(int jobID);
+
+    static void *MetadataLookupThread(void *param);
+    void DoMetadataLookupThread(int jobID);
 
     static void *FlagCommercialsThread(void *param);
     void DoFlagCommercialsThread(int jobID);

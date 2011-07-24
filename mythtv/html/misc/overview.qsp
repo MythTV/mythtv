@@ -19,6 +19,8 @@
                 var title = '';
                 if (program.SubTitle == '')
                     title = program.Title;
+                else if (program.Episode > 0)
+                    title = program.Title + " " + program.Season + "x" + pad(program.Episode) + " (" + program.SubTitle + ")";
                 else
                     title = program.Title + " (" + program.SubTitle + ")";
 

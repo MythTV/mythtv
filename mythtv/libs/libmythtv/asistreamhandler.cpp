@@ -26,8 +26,6 @@
 #include <dveo/master.h>
 
 #define LOC      QString("ASISH(%1): ").arg(_device)
-#define LOC_WARN QString("ASISH(%1) Warning: ").arg(_device)
-#define LOC_ERR  QString("ASISH(%1) Error: ").arg(_device)
 
 QMap<QString,ASIStreamHandler*> ASIStreamHandler::_handlers;
 QMap<QString,uint>              ASIStreamHandler::_handlers_refcnt;
@@ -48,16 +46,16 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname)
         _handlers[devkey] = newhandler;
         _handlers_refcnt[devkey] = 1;
 
-        VERBOSE(VB_RECORD,
-                QString("ASISH: Creating new stream handler %1 for %2")
+        LOG(VB_RECORD, LOG_INFO,
+            QString("ASISH: Creating new stream handler %1 for %2")
                 .arg(devkey).arg(devname));
     }
     else
     {
         _handlers_refcnt[devkey]++;
         uint rcount = _handlers_refcnt[devkey];
-        VERBOSE(VB_RECORD,
-                QString("ASISH: Using existing stream handler %1 for %2")
+        LOG(VB_RECORD, LOG_INFO,
+            QString("ASISH: Using existing stream handler %1 for %2")
                 .arg(devkey)
                 .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
@@ -85,7 +83,7 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref)
     QMap<QString,ASIStreamHandler*>::iterator it = _handlers.find(devname);
     if ((it != _handlers.end()) && (*it == ref))
     {
-        VERBOSE(VB_RECORD, QString("ASISH: Closing handler for %1")
+        LOG(VB_RECORD, LOG_INFO, QString("ASISH: Closing handler for %1")
                            .arg(devname));
         ref->Close();
         delete *it;
@@ -93,8 +91,8 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("ASISH Error: Couldn't find handler for %1")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("ASISH Error: Couldn't find handler for %1")
                 .arg(devname));
     }
 
@@ -133,12 +131,11 @@ void ASIStreamHandler::SetRunningDesired(bool desired)
 
 void ASIStreamHandler::run(void)
 {
-    VERBOSE(VB_RECORD, LOC + "run(): begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run(): begin");
 
     if (!Open())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to open device %1 : %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open device %1 : %2")
                 .arg(_device).arg(strerror(errno)));
         _error = true;
         return;
@@ -148,7 +145,7 @@ void ASIStreamHandler::run(void)
     bool ok = drb->Setup(_device, _fd, _packet_size, _buf_size);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate DRB buffer");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
         delete drb;
         drb = NULL;
         Close();
@@ -160,7 +157,7 @@ void ASIStreamHandler::run(void)
     unsigned char *buffer = new unsigned char[buffer_size];
     if (!buffer)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate buffer");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate buffer");
         delete drb;
         drb = NULL;
         Close();
@@ -194,13 +191,13 @@ void ASIStreamHandler::run(void)
         // Check for DRB errors
         if (drb->IsErrored())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Device error detected");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Device error detected");
             _error = true;
         }
 
         if (drb->IsEOF())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Device EOF detected");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
             _error = true;
         }
 
@@ -242,7 +239,7 @@ void ASIStreamHandler::run(void)
         if (remainder > 0 && (len > remainder)) // leftover bytes
             memmove(buffer, &(buffer[len - remainder]), remainder);
     }
-    VERBOSE(VB_RECORD, LOC + "run(): " + "shutdown");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run(): " + "shutdown");
 
     RemoveAllPIDFilters();
 
@@ -258,7 +255,7 @@ void ASIStreamHandler::run(void)
     delete[] buffer;
     Close();
 
-    VERBOSE(VB_RECORD, LOC + "run(): " + "end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run(): " + "end");
 
     SetRunning(false, true, false);
 }
@@ -272,20 +269,20 @@ bool ASIStreamHandler::Open(void)
     _device_num = CardUtil::GetASIDeviceNumber(_device, &error);
     if (_device_num < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
     }
 
     _buf_size = CardUtil::GetASIBufferSize(_device_num, &error);
     if (_buf_size <= 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
     }
 
     if (!CardUtil::SetASIMode(_device_num, (uint)_rx_mode, &error))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set RX Mode: " + error);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set RX Mode: " + error);
         return false;
     }
 
@@ -293,8 +290,8 @@ bool ASIStreamHandler::Open(void)
     _fd = open(_device.toLocal8Bit().constData(), O_RDONLY, 0);
     if (_fd < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to open '%1'").arg(_device) + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to open '%1'").arg(_device) + ENO);
         return false;
     }
 
@@ -302,9 +299,8 @@ bool ASIStreamHandler::Open(void)
     unsigned int cap;
     if (ioctl(_fd, ASI_IOC_RXGETCAP, &cap) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to query capabilities '%1'")
-                .arg(_device) + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to query capabilities '%1'").arg(_device) + ENO);
         Close();
         return false;
     }
@@ -377,9 +373,9 @@ static bool named_output_file_common(
         int ret = link(ba.constData(), it.key().toLocal8Bit().constData());
         if (ret < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Failed to link '%1' to '%2'")
-                    .arg(it.key()).arg(fn) + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Failed to link '%1' to '%2'").arg(it.key()).arg(fn) +
+                ENO);
         }
         ok &= ret >= 0;
     }

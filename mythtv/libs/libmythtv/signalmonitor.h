@@ -21,8 +21,8 @@ using namespace std;
 #include "cardutil.h"
 #include "mythtimer.h"
 
-#define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
-    "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
+#define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
+    QString("SM(%1)::%2: %3") .arg(channel->GetDevice()).arg(FUNC).arg(<MSG));
 
 inline QString sm_flags_to_string(uint64_t);
 

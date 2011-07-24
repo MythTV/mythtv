@@ -17,13 +17,16 @@
 #include "setupwizard_video.h"
 
 const QString VIDEO_SAMPLE_HD_LOCATION =
-                  QString("http://services.mythtv.org/samples/video/?sample=HD");
+                QString("http://services.mythtv.org/samples/video/?sample=HD");
 const QString VIDEO_SAMPLE_SD_LOCATION =
-                  QString("http://services.mythtv.org/samples/video/?sample=SD");
-const QString VIDEO_SAMPLE_HD_FILENAME = QString("mythtv_video_test_HD_19000Kbps_H264.mkv");
-const QString VIDEO_SAMPLE_SD_FILENAME = QString("mythtv_video_test_SD_6000Kbps_H264.mkv");
+                QString("http://services.mythtv.org/samples/video/?sample=SD");
+const QString VIDEO_SAMPLE_HD_FILENAME =
+                QString("mythtv_video_test_HD_19000Kbps_H264.mkv");
+const QString VIDEO_SAMPLE_SD_FILENAME =
+                QString("mythtv_video_test_SD_6000Kbps_H264.mkv");
 
-VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent, MythScreenType *general,
+VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent,
+                                   MythScreenType *general,
                                    MythScreenType *audio, const char *name)
     : MythScreenType(parent, name),      m_downloadFile(QString()),
       m_testType(ttNone),
@@ -48,7 +51,8 @@ bool VideoSetupWizard::Create()
     if (!foundtheme)
         return false;
 
-    m_playbackProfileButtonList = dynamic_cast<MythUIButtonList *> (GetChild("playbackprofiles"));
+    m_playbackProfileButtonList =
+        dynamic_cast<MythUIButtonList *> (GetChild("playbackprofiles"));
 
     m_testSDButton = dynamic_cast<MythUIButton *> (GetChild("testsd"));
     m_testHDButton = dynamic_cast<MythUIButton *> (GetChild("testhd"));
@@ -59,22 +63,22 @@ bool VideoSetupWizard::Create()
     if (!m_playbackProfileButtonList || !m_testSDButton ||
         !m_testHDButton ||!m_nextButton || !m_prevButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
     m_playbackProfileButtonList->SetHelpText( tr("Select from one of the "
-                                    "preconfigured playback profiles.  When "
-                                    "satisfied, you can test Standard Definition "
-                                    "and High Definition playback with your choice "
-                                    "before moving on.") );
+                                "preconfigured playback profiles.  When "
+                                "satisfied, you can test Standard Definition "
+                                "and High Definition playback with your choice "
+                                "before moving on.") );
     m_testSDButton->SetHelpText( tr("Test your playback settings with Standard "
                                     "definition content. (480p)") );
     m_testHDButton->SetHelpText( tr("Test your playback settings with High "
                                     "definition content (1080p).") );
     m_nextButton->SetHelpText( tr("Save these changes and move on to the "
                                   "next configuration step.") );
-    m_prevButton->SetHelpText( tr("Return to the previous configuration step.") );
+    m_prevButton->SetHelpText(tr("Return to the previous configuration step."));
 
     connect(m_testSDButton, SIGNAL(Clicked()), this, SLOT(testSDVideo()));
     connect(m_testHDButton, SIGNAL(Clicked()), this, SLOT(testHDVideo()));

@@ -16,6 +16,7 @@ using namespace std;
 #include <audiooutput.h>
 #include <mythcontext.h>
 #include <mythmediamonitor.h>
+#include <util.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -431,8 +432,9 @@ Metadata *CdDecoder::getMetadata()
     if (ret < 0)
     {
         cd_finish(cd);
-        VERBOSE(VB_IMPORTANT, QString("Error during CD lookup: %1").arg(ret));
-        VERBOSE(VB_MEDIA, QString("cddb_read_disc_data() said: %1")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error during CD lookup: %1").arg(ret));
+        LOG(VB_MEDIA, LOG_ERR, QString("cddb_read_disc_data() said: %1")
                 .arg(cddb_message));
         return NULL;
     }
@@ -527,7 +529,8 @@ void CdDecoder::commitMetadata(Metadata *mdata)
     if (ret < 0)
     {
         cd_finish(cd);
-        VERBOSE(VB_IMPORTANT, QString("Error during CD lookup: %1").arg(ret));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error during CD lookup: %1").arg(ret));
         return;
     }
 

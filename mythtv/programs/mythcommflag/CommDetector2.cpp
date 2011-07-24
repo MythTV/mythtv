@@ -112,8 +112,8 @@ bool MythPlayerInited(FrameAnalyzerItem &pass,
             continue;
         }
 
-        VERBOSE(VB_IMPORTANT, QString("Unexpected return value from"
-                    " %1::MythPlayerInited: %2")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Unexpected return value from %1::MythPlayerInited: %2")
                 .arg(fa->name()).arg(ares));
         return false;
     }
@@ -162,8 +162,8 @@ long long processFrame(FrameAnalyzerItem &pass,
             continue;
         }
 
-        VERBOSE(VB_IMPORTANT, QString("Unexpected return value from"
-                    " %1::analyzeFrame: %2")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Unexpected return value from %1::analyzeFrame: %2")
                 .arg(fa->name()).arg(ares));
 
         jjfa = pass.erase(iifa);
@@ -251,19 +251,20 @@ void createDebugDirectory(QString dirname, QString comment)
     QDir qdir(dirname);
     if (qdir.exists())
     {
-        VERBOSE(VB_COMMFLAG, QString("%1 using debug directory \"%2\"")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("%1 using debug directory \"%2\"")
                 .arg(comment).arg(dirname));
     }
     else
     {
         if (qdir.mkdir(dirname))
         {
-            VERBOSE(VB_COMMFLAG, QString("%1 created debug directory \"%1\"")
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("%1 created debug directory \"%1\"")
                     .arg(comment).arg(dirname));
         }
         else
         {
-            VERBOSE(VB_COMMFLAG, QString("%1 failed to create \"%2\": %3")
+            LOG(VB_COMMFLAG, LOG_INFO, QString("%1 failed to create \"%2\": %3")
                     .arg(comment).arg(dirname).arg(strerror(errno)));
         }
     }
@@ -481,7 +482,7 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
     if (percentage % 10 == 0 && prevpercent != percentage)
     {
         prevpercent = percentage;
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("%1%% Completed @ %2 fps.")
+        LOG(VB_GENERAL, LOG_INFO, QString("%1%% Completed @ %2 fps.")
             .arg(percentage) .arg(fps));
     }
 }
@@ -545,8 +546,8 @@ bool CommDetector2::go(void)
 
     if (!player->InitVideo())
     {
-        VERBOSE(VB_IMPORTANT,
-                "NVP: Unable to initialize video for FlagCommercials.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "NVP: Unable to initialize video for FlagCommercials.");
         return false;
     }
 
@@ -580,8 +581,8 @@ bool CommDetector2::go(void)
     {
         FrameAnalyzerItem deadAnalyzers;
 
-        VERBOSE(VB_COMMFLAG, QString(
-                    "CommDetector2::go pass %1 of %2 (%3 frames, %4 fps)")
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("CommDetector2::go pass %1 of %2 (%3 frames, %4 fps)")
                 .arg(passno + 1).arg(npasses)
                 .arg(player->GetTotalFrameCount())
                 .arg(player->GetFrameRate(), 0, 'f', 2));
@@ -626,7 +627,8 @@ bool CommDetector2::go(void)
                  * Don't log "Jumped" when we know we're skipping frames (e.g.,
                  * logo detection).
                  */
-                VERBOSE(VB_COMMFLAG, QString("Jumped from frame %1 to frame %2")
+                LOG(VB_COMMFLAG, LOG_INFO,
+                    QString("Jumped from frame %1 to frame %2")
                         .arg(lastFrameNumber).arg(currentFrameNumber));
             }
 
@@ -665,8 +667,8 @@ bool CommDetector2::go(void)
             {
                 /* Log something every 10%. */
                 int elapsed = clock.restart();
-                VERBOSE(VB_COMMFLAG, QString(
-                            "processFrame %1 of %2 (%3%) - %4 fps")
+                LOG(VB_COMMFLAG, LOG_INFO,
+                    QString("processFrame %1 of %2 (%3%) - %4 fps")
                         .arg(currentFrameNumber)
                         .arg(nframes)
                         .arg((int)roundf(currentFrameNumber * 100.0 / nframes))
@@ -733,7 +735,7 @@ bool CommDetector2::go(void)
         if (passFinished(*currentPass, currentFrameNumber + 1, true))
             return false;
 
-        VERBOSE(VB_COMMFLAG, QString("NVP Time: GetRawVideoFrame=%1s")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("NVP Time: GetRawVideoFrame=%1s")
                 .arg(strftimeval(&getframetime)));
         if (passReportTime(*currentPass))
             return false;
@@ -808,7 +810,7 @@ void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
         ++iimark;                       /* MARK_COMM_END */
         markend = iimark.key() + 1;
 
-        VERBOSE(VB_COMMFLAG, QString("Break: frame %1-%2 (%3-%4, %5)")
+        LOG(VB_COMMFLAG, LOG_INFO, QString("Break: frame %1-%2 (%3-%4, %5)")
                 .arg(markstart, 6).arg(markend, 6)
                 .arg(frameToTimestamp(markstart, fps))
                 .arg(frameToTimestamp(markend, fps))
@@ -816,8 +818,8 @@ void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
     }
 
     const long long nframes = player->GetTotalFrameCount();
-    VERBOSE(VB_COMMFLAG, QString("Flagged %1 of %2 frames (%3 of %4),"
-                " %5% commercials (%6)")
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("Flagged %1 of %2 frames (%3 of %4), %5% commercials (%6)")
             .arg(currentFrameNumber + 1).arg(nframes)
             .arg(frameToTimestamp(currentFrameNumber + 1, fps))
             .arg(frameToTimestamp(nframes, fps))
@@ -829,7 +831,8 @@ void CommDetector2::recordingFinished(long long totalFileSize)
 {
     CommDetectorBase::recordingFinished(totalFileSize);
     isRecording = false;
-    VERBOSE(VB_COMMFLAG, QString("CommDetector2::recordingFinished: %1 bytes")
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("CommDetector2::recordingFinished: %1 bytes")
             .arg(totalFileSize));
 }
 
@@ -837,12 +840,13 @@ void CommDetector2::requestCommBreakMapUpdate(void)
 {
     if (searchingForLogo(logoFinder, *currentPass))
     {
-        VERBOSE(VB_COMMFLAG, "Ignoring request for commBreakMapUpdate;"
-                " still doing logo detection");
+        LOG(VB_COMMFLAG, LOG_INFO, "Ignoring request for commBreakMapUpdate; "
+                                   "still doing logo detection");
         return;
     }
 
-    VERBOSE(VB_COMMFLAG, QString("commBreakMapUpdate requested at frame %1")
+    LOG(VB_COMMFLAG, LOG_INFO, 
+        QString("commBreakMapUpdate requested at frame %1")
             .arg(currentFrameNumber + 1));
     sendBreakMapUpdates = true;
     breakMapUpdateRequested = true;

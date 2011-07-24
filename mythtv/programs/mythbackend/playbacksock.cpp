@@ -127,15 +127,15 @@ bool PlaybackSock::SendReceiveStringList(
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT,
-                "PlaybackSock::SendReceiveStringList(): No response.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "PlaybackSock::SendReceiveStringList(): No response.");
         return false;
     }
 
     if (min_reply_length && ((uint)strlist.size() < min_reply_length))
     {
-        VERBOSE(VB_IMPORTANT,
-                "PlaybackSock::SendReceiveStringList(): Response too short");
+        LOG(VB_GENERAL, LOG_ERR,
+            "PlaybackSock::SendReceiveStringList(): Response too short");
         return false;
     }
 
@@ -146,7 +146,7 @@ bool PlaybackSock::SendReceiveStringList(
  */
 bool PlaybackSock::GoToSleep(void)
 {
-    QStringList strlist( QString("GO_TO_SLEEP") );
+    QStringList strlist(QString("GO_TO_SLEEP"));
 
     return SendReceiveStringList(strlist, 1) && (strlist[0] == "OK");
 }
@@ -156,7 +156,7 @@ bool PlaybackSock::GoToSleep(void)
  */
 void PlaybackSock::GetDiskSpace(QStringList &o_strlist)
 {
-    QStringList strlist( QString("QUERY_FREE_SPACE") );
+    QStringList strlist(QString("QUERY_FREE_SPACE"));
 
     SendReceiveStringList(strlist);
 
@@ -166,7 +166,7 @@ void PlaybackSock::GetDiskSpace(QStringList &o_strlist)
 
 int PlaybackSock::CheckRecordingActive(const ProgramInfo *pginfo)
 {
-    QStringList strlist( QString("CHECK_RECORDING") );
+    QStringList strlist(QString("CHECK_RECORDING"));
     pginfo->ToStringList(strlist);
 
     if (SendReceiveStringList(strlist, 1))
@@ -189,7 +189,7 @@ int PlaybackSock::DeleteFile(const QString &filename, const QString &sgroup)
 
 int PlaybackSock::StopRecording(const ProgramInfo *pginfo)
 {
-    QStringList strlist( QString("STOP_RECORDING"));
+    QStringList strlist(QString("STOP_RECORDING"));
     pginfo->ToStringList(strlist);
 
     if (SendReceiveStringList(strlist, 1))
@@ -198,7 +198,8 @@ int PlaybackSock::StopRecording(const ProgramInfo *pginfo)
     return 0;
 }
 
-int PlaybackSock::DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete)
+int PlaybackSock::DeleteRecording(const ProgramInfo *pginfo,
+                                  bool forceMetadataDelete)
 {
     QStringList strlist;
 
@@ -218,7 +219,7 @@ int PlaybackSock::DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataD
 bool PlaybackSock::FillProgramInfo(ProgramInfo &pginfo,
                                    const QString &playbackhost)
 {
-    QStringList strlist( QString("FILL_PROGRAM_INFO") );
+    QStringList strlist(QString("FILL_PROGRAM_INFO"));
     strlist << playbackhost;
     pginfo.ToStringList(strlist);
 
@@ -236,9 +237,9 @@ bool PlaybackSock::FillProgramInfo(ProgramInfo &pginfo,
 }
 
 QStringList PlaybackSock::GetSGFileList(QString &host, QString &groupname,
-                                      QString &directory, bool fileNamesOnly)
+                                        QString &directory, bool fileNamesOnly)
 {
-    QStringList strlist( QString("QUERY_SG_GETFILELIST") );
+    QStringList strlist(QString("QUERY_SG_GETFILELIST"));
     strlist << host;
     strlist << groupname;
     strlist << directory;
@@ -250,9 +251,9 @@ QStringList PlaybackSock::GetSGFileList(QString &host, QString &groupname,
 }
 
 QStringList PlaybackSock::GetSGFileQuery(QString &host, QString &groupname,
-                                      QString &filename)
+                                         QString &filename)
 {
-    QStringList strlist( QString("QUERY_SG_FILEQUERY") );
+    QStringList strlist(QString("QUERY_SG_FILEQUERY"));
     strlist << host;
     strlist << groupname;
     strlist << filename;
@@ -262,10 +263,20 @@ QStringList PlaybackSock::GetSGFileQuery(QString &host, QString &groupname,
     return strlist;
 }
 
-QStringList PlaybackSock::GenPreviewPixmap(
-    const QString &token, const ProgramInfo *pginfo)
+QString PlaybackSock::GetFileHash(QString filename, QString storageGroup)
 {
-    QStringList strlist( QString("QUERY_GENPIXMAP2") );
+    QStringList strlist(QString("QUERY_FILE_HASH"));
+    strlist << filename
+            << storageGroup;
+
+    SendReceiveStringList(strlist);
+    return strlist[0];
+}
+
+QStringList PlaybackSock::GenPreviewPixmap(const QString &token,
+                                           const ProgramInfo *pginfo)
+{
+    QStringList strlist(QString("QUERY_GENPIXMAP2"));
     strlist += token;
     pginfo->ToStringList(strlist);
 
@@ -297,7 +308,7 @@ QStringList PlaybackSock::GenPreviewPixmap(const QString &token,
 
 QDateTime PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)
 {
-    QStringList strlist( QString("QUERY_PIXMAP_LASTMODIFIED") );
+    QStringList strlist(QString("QUERY_PIXMAP_LASTMODIFIED"));
     pginfo->ToStringList(strlist);
 
     SendReceiveStringList(strlist);
@@ -313,7 +324,7 @@ QDateTime PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)
 
 bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
 {
-    QStringList strlist( "QUERY_CHECKFILE" );
+    QStringList strlist("QUERY_CHECKFILE");
     strlist << QString::number(0); // don't check slaves
     pginfo->ToStringList(strlist);
 
@@ -326,19 +337,19 @@ bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
     return false;
 }
 
-bool PlaybackSock::IsBusy(
-    int capturecardnum, InputInfo *busy_input, int time_buffer)
+bool PlaybackSock::IsBusy(int capturecardnum, InputInfo *busy_input,
+                          int time_buffer)
 {
-    QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
 
     strlist << "IS_BUSY";
     strlist << QString::number(time_buffer);
 
     if (!SendReceiveStringList(strlist, 1))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsBusy: " +
-                QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) +
-                " gave us no response.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "IsBusy: " +
+            QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) +
+            " gave us no response.");
     }
 
     bool state = false;
@@ -353,10 +364,11 @@ bool PlaybackSock::IsBusy(
             it++;
             if (!busy_input->FromStringList(it, strlist.end()))
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "IsBusy: "
-                        "Failed to parse response to " +
-                        QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
-                state = false; // pretend it's not busy if we can't parse response
+                LOG(VB_GENERAL, LOG_ERR, LOC + "IsBusy: "
+                    "Failed to parse response to " +
+                    QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
+                state = false;
+                // pretend it's not busy if we can't parse response
             }
         }
     }
@@ -370,14 +382,14 @@ bool PlaybackSock::IsBusy(
  */
 int PlaybackSock::GetEncoderState(int capturecardnum)
 {
-    QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "GET_STATE";
 
     if (!SendReceiveStringList(strlist, 1))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetEncoderState: " +
-                QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) +
-                " gave us no response.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GetEncoderState: " +
+            QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) +
+            " gave us no response.");
 
         return kState_Error;
     }
@@ -387,7 +399,7 @@ int PlaybackSock::GetEncoderState(int capturecardnum)
 
 long long PlaybackSock::GetMaxBitrate(int capturecardnum)
 {
-    QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "GET_MAX_BITRATE";
 
     if (SendReceiveStringList(strlist, 2))
@@ -418,9 +430,10 @@ ProgramInfo *PlaybackSock::GetRecording(uint cardid)
     return pginfo;
 }
 
-bool PlaybackSock::EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo)
+bool PlaybackSock::EncoderIsRecording(int capturecardnum,
+                                      const ProgramInfo *pginfo)
 {
-    QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "MATCHES_RECORDING";
     pginfo->ToStringList(strlist);
 
@@ -433,7 +446,7 @@ bool PlaybackSock::EncoderIsRecording(int capturecardnum, const ProgramInfo *pgi
 RecStatusType PlaybackSock::StartRecording(int capturecardnum,
                                            const ProgramInfo *pginfo)
 {
-    QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "START_RECORDING";
     pginfo->ToStringList(strlist);
 
@@ -445,14 +458,14 @@ RecStatusType PlaybackSock::StartRecording(int capturecardnum,
 
 RecStatusType PlaybackSock::GetRecordingStatus(int capturecardnum)
 {
-    QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "GET_RECORDING_STATUS";
 
     if (!SendReceiveStringList(strlist, 1))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetRecordingStatus: " +
-                QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) +
-                " did not respond.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GetRecordingStatus: " +
+            QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) +
+            " did not respond.");
 
         return rsUnknown;
     }
@@ -463,7 +476,7 @@ RecStatusType PlaybackSock::GetRecordingStatus(int capturecardnum)
 void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,
                                  int secsleft, bool hasLater)
 {
-    QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "RECORD_PENDING";
     strlist << QString::number(secsleft);
     strlist << QString::number(hasLater);
@@ -475,7 +488,7 @@ void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,
 int PlaybackSock::SetSignalMonitoringRate(int capturecardnum,
                                           int rate, int notifyFrontend)
 {
-    QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "SET_SIGNAL_MONITORING_RATE";
     strlist << QString::number(rate);
     strlist << QString::number(notifyFrontend);
@@ -488,15 +501,15 @@ int PlaybackSock::SetSignalMonitoringRate(int capturecardnum,
 
 void PlaybackSock::SetNextLiveTVDir(int capturecardnum, QString dir)
 {
-    QStringList strlist( QString("SET_NEXT_LIVETV_DIR %1 %2")
+    QStringList strlist(QString("SET_NEXT_LIVETV_DIR %1 %2")
                             .arg(capturecardnum)
-                            .arg(dir) );
+                            .arg(dir));
 
     SendReceiveStringList(strlist);
 }
 
 vector<InputInfo> PlaybackSock::GetFreeInputs(int capturecardnum,
-                                        const vector<uint> &excluded_cardids)
+                                           const vector<uint> &excluded_cardids)
 {
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "GET_FREE_INPUTS";

@@ -17,7 +17,7 @@ InteractiveTV::InteractiveTV(MythPlayer *nvp)
 {
     Restart(0, 0, false);
 
-    if (VERBOSE_LEVEL_CHECK(VB_MHEG))
+    if (VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_ANY))
     {
         MHSetLogging(stdout, MHLogAll);
     }

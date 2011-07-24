@@ -31,7 +31,6 @@ using namespace std;
 #define DEBUG_PID_FILTERS
 
 #define LOC     QString("HDHRChan(%1): ").arg(GetDevice())
-#define LOC_ERR QString("HDHRChan(%1), Error: ").arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
     : DTVChannel(parent),
@@ -49,7 +48,7 @@ HDHRChannel::~HDHRChannel(void)
 
 bool HDHRChannel::Open(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Opening HDHR channel");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Opening HDHR channel");
 
     if (IsOpen())
         return true;
@@ -71,7 +70,7 @@ bool HDHRChannel::Open(void)
 
 void HDHRChannel::Close(void)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Closing HDHR channel");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Closing HDHR channel");
 
     if (!IsOpen())
         return; // this caller didn't have it open in the first place..
@@ -162,7 +161,7 @@ bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
     QString spec = get_tune_spec(tunerType, tuning);
     QString chan = QString("%1:%2").arg(spec).arg(tuning.frequency);
 
-    VERBOSE(VB_CHANNEL, LOC + "Tuning to " + chan);
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning to " + chan);
 
     if (_stream_handler->TuneChannel(chan))
     {

@@ -79,7 +79,7 @@ bool ProgFinder::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'programfind'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'programfind'");
         return false;
     }
 
@@ -99,9 +99,6 @@ bool ProgFinder::Create()
 void ProgFinder::Init(void)
 {
     m_allowKeypress = true;
-
-    m_timeFormat = gCoreContext->GetSetting("TimeFormat");
-    m_dateFormat = gCoreContext->GetSetting("DateFormat");
 
     initAlphabetList();
 
@@ -501,12 +498,12 @@ void ProgFinder::updateTimesList()
     if (m_showData.size() > 0)
     {
         QString itemText;
+        QDateTime starttime;
         for (uint i = 0; i < m_showData.size(); ++i)
         {
-            itemText =
-                m_showData[i]->GetScheduledStartTime().toString(m_dateFormat)
-                + ' ' +
-                m_showData[i]->GetScheduledStartTime().toString(m_timeFormat);
+            starttime = m_showData[i]->GetScheduledStartTime();
+            itemText = MythDateTimeToString(starttime,
+                                            kDateTimeFull | kSimplify);
 
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_timesList, "");
@@ -1093,7 +1090,7 @@ bool SearchInputDialog::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'searchpopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'searchpopup'");
         return false;
     }
 

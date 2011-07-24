@@ -19,7 +19,6 @@
 #include "tspacket.h"
 
 #define LOC QString("IPTVFeedRTSP:")
-#define LOC_ERR QString("IPTVFeedRTSP, Error:")
 
 /** \class RTSPData
  *  \brief Helper class use for static Callback handler
@@ -67,14 +66,14 @@ IPTVFeederRTSP::IPTVFeederRTSP() :
     _rtsp_client(NULL),
     _session(NULL)
 {
-    VERBOSE(VB_RECORD, LOC + "ctor -- success");
+    LOG(VB_RECORD, LOG_INFO, LOC + "ctor -- success");
 }
 
 IPTVFeederRTSP::~IPTVFeederRTSP()
 {
-    VERBOSE(VB_RECORD, LOC + "dtor -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- begin");
     Close();
-    VERBOSE(VB_RECORD, LOC + "dtor -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- end");
 }
 
 bool IPTVFeederRTSP::IsRTSP(const QString &url)
@@ -84,13 +83,13 @@ bool IPTVFeederRTSP::IsRTSP(const QString &url)
 
 bool IPTVFeederRTSP::Open(const QString &url)
 {
-    VERBOSE(VB_RECORD, LOC + QString("Open(%1) -- begin").arg(url));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Open(%1) -- begin").arg(url));
 
     QMutexLocker locker(&_lock);
 
     if (_rtsp_client)
     {
-        VERBOSE(VB_RECORD, LOC + "Open() -- end 1");
+        LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- end 1");
 
         return true;
     }
@@ -103,8 +102,8 @@ bool IPTVFeederRTSP::Open(const QString &url)
     _rtsp_client = RTSPClient::createNew(*_live_env, 0, "myRTSP", 0);
     if (!_rtsp_client)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to create RTSP client: %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to create RTSP client: %1")
                 .arg(_live_env->getResultMsg()));
         FreeEnv();
         return false;
@@ -118,9 +117,8 @@ bool IPTVFeederRTSP::Open(const QString &url)
 
     if (!sdpDescription)
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString(
-                    "Failed to get a SDP "
-                    "description from URL: %1 %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to get a SDP description from URL: %1 %2")
                 .arg(url).arg(_live_env->getResultMsg()));
         return false;
     }
@@ -132,15 +130,14 @@ bool IPTVFeederRTSP::Open(const QString &url)
 
     if (!_session)
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("Failed to create MediaSession: %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to create MediaSession: %1")
                 .arg(_live_env->getResultMsg()));
         return false;
     }
     else if (!_session->hasSubsessions())
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                "This session has no media subsessions");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "This session has no media subsessions");
         Close();
         return false;
     }
@@ -154,9 +151,8 @@ bool IPTVFeederRTSP::Open(const QString &url)
     {
         if (!subsession->initiate(-1))
         {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    QString("Can't create receiver for: "
-                            "%1 / %2 subsession: %3")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Can't create receiver for: %1 / %2 subsession: %3")
                     .arg(subsession->mediumName())
                     .arg(subsession->codecName())
                     .arg(_live_env->getResultMsg()));
@@ -191,8 +187,8 @@ bool IPTVFeederRTSP::Open(const QString &url)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    QString("Failed to setup: %1 %2 : %3")
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Failed to setup: %1 %2 : %3")
                     .arg(subsession->mediumName())
                     .arg(subsession->codecName())
                     .arg(_live_env->getResultMsg()));
@@ -218,8 +214,7 @@ bool IPTVFeederRTSP::Open(const QString &url)
         subsession->sink = iptvMediaSink;
         if (!subsession->sink)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("IPTV # Failed to create sink: %1")
+            LOG(VB_GENERAL, LOG_ERR, QString("IPTV # Failed to create sink: %1")
                     .arg(_live_env->getResultMsg()));
         }
 
@@ -246,22 +241,22 @@ bool IPTVFeederRTSP::Open(const QString &url)
     // Setup player
     if (!(_rtsp_client->playMediaSession(*_session)))
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("Failed to start playing session: %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to start playing session: %1")
                 .arg(_live_env->getResultMsg()));
         return false;
     }
 
-    VERBOSE(VB_RECORD, LOC + "Open() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- end");
     return true;
 }
 
 void IPTVFeederRTSP::Close(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Close() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
     Stop();
 
-    VERBOSE(VB_RECORD, LOC + "Close() -- middle 1");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- middle 1");
 
     _lock.lock();
     if (_session)
@@ -291,16 +286,16 @@ void IPTVFeederRTSP::Close(void)
 
     FreeEnv();
 
-    VERBOSE(VB_RECORD, LOC + "Close() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
 void IPTVFeederRTSP::AddListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- begin")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- begin")
                        .arg((uint64_t)item,0,16));
     if (!item)
     {
-        VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end 0")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end 0")
                            .arg((uint64_t)item,0,16));
         return;
     }
@@ -315,7 +310,7 @@ void IPTVFeederRTSP::AddListener(TSDataListener *item)
     // if there is a session, add to each subsession->sink
     if (!_session)
     {
-        VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end 1")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end 1")
                            .arg((uint64_t)item,0,16));
         return;
     }
@@ -328,13 +323,13 @@ void IPTVFeederRTSP::AddListener(TSDataListener *item)
         if ((sink = dynamic_cast<IPTVMediaSink*>(subsession->sink)))
             sink->AddListener(item);
     }
-    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end 2")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end 2")
                        .arg((uint64_t)item,0,16));
 }
 
 void IPTVFeederRTSP::RemoveListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- begin")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- begin")
                        .arg((uint64_t)item,0,16));;
     QMutexLocker locker(&_lock);
     vector<TSDataListener*>::iterator it =
@@ -342,7 +337,7 @@ void IPTVFeederRTSP::RemoveListener(TSDataListener *item)
 
     if (it == _listeners.end())
     {
-        VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 1")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end 1")
                            .arg((uint64_t)item,0,16));
         return;
     }
@@ -354,7 +349,7 @@ void IPTVFeederRTSP::RemoveListener(TSDataListener *item)
     // if there is a session, remove from each subsession->sink
     if (!_session)
     {
-        VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 2")
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end 2")
                            .arg((uint64_t)item,0,16));
         return;
     }
@@ -367,6 +362,6 @@ void IPTVFeederRTSP::RemoveListener(TSDataListener *item)
         if ((sink = dynamic_cast<IPTVMediaSink*>(subsession->sink)))
             sink->RemoveListener(item);
     }
-    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 3")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end 3")
                        .arg((uint64_t)item,0,16));
 }

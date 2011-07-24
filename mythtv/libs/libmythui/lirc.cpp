@@ -37,8 +37,6 @@ using namespace std;
 #include "mythlogging.h"
 
 #define LOC      QString("LIRC: ")
-#define LOC_WARN QString("LIRC, Warning: ")
-#define LOC_ERR  QString("LIRC, Error: ")
 
 class LIRCPriv
 {
@@ -170,7 +168,7 @@ bool LIRC::Init(void)
     if (d->lircState)
         return true;
 
-    uint64_t vtype = (0 == retryCount) ? VB_IMPORTANT : VB_FILE;
+    uint64_t vtype = (0 == retryCount) ? VB_GENERAL : VB_FILE;
 
     int lircd_socket = -1;
     if (lircdDevice.startsWith('/'))
@@ -179,8 +177,9 @@ bool LIRC::Init(void)
         QByteArray dev = lircdDevice.toLocal8Bit();
         if (dev.size() > 107)
         {
-            LOG(vtype, LOG_ERR, QString("lircdDevice '%1'").arg(lircdDevice) +
-                    " is too long for the 'unix' socket API");
+            LOG(vtype, LOG_ERR, LOC +
+                QString("lircdDevice '%1'").arg(lircdDevice) +
+                " is too long for the 'unix' socket API");
   
             return false;
         }
@@ -188,7 +187,7 @@ bool LIRC::Init(void)
         lircd_socket = socket(AF_UNIX, SOCK_STREAM, 0);
         if (lircd_socket < 0)
         {
-            LOG(vtype, LOG_ERR, QString("Failed to open Unix socket '%1'")
+            LOG(vtype, LOG_ERR, LOC + QString("Failed to open Unix socket '%1'")
                     .arg(lircdDevice) + ENO);
   
             return false;
@@ -204,7 +203,8 @@ bool LIRC::Init(void)
 
         if (ret < 0)
         {
-            LOG(vtype, LOG_ERR, QString("Failed to connect to Unix socket '%1'")
+            LOG(vtype, LOG_ERR, LOC +
+                QString("Failed to connect to Unix socket '%1'")
                     .arg(lircdDevice) + ENO);
 
             close(lircd_socket);
@@ -216,7 +216,7 @@ bool LIRC::Init(void)
         lircd_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (lircd_socket < 0)
         {
-            LOG(vtype, LOG_ERR, QString("Failed to open TCP socket '%1'")
+            LOG(vtype, LOG_ERR, LOC + QString("Failed to open TCP socket '%1'")
                     .arg(lircdDevice) + ENO);
   
             return false;
@@ -238,7 +238,7 @@ bool LIRC::Init(void)
   
         if (!inet_aton(device.constData(), &addr.sin_addr))
         {
-            LOG(vtype, LOG_ERR, QString("Failed to parse IP address '%1'")
+            LOG(vtype, LOG_ERR, LOC + QString("Failed to parse IP address '%1'")
                     .arg(dev));
 
             close(lircd_socket);
@@ -249,7 +249,8 @@ bool LIRC::Init(void)
                             sizeof(addr));
         if (ret < 0)
         {
-            LOG(vtype, LOG_ERR, QString("Failed to connect TCP socket '%1'")
+            LOG(vtype, LOG_ERR, LOC +
+                QString("Failed to connect TCP socket '%1'")
                     .arg(lircdDevice) + ENO);
 
             close(lircd_socket);
@@ -265,8 +266,8 @@ bool LIRC::Init(void)
             ret = fcntl(lircd_socket, F_SETFD, flags | O_NONBLOCK);
             if (ret < 0)
             {
-                LOG(VB_GENERAL, LOG_WARNING,
-                        QString("Failed set flags for socket '%1'")
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    QString("Failed set flags for socket '%1'")
                         .arg(lircdDevice) + ENO);
             }
         }
@@ -293,8 +294,8 @@ bool LIRC::Init(void)
         QByteArray cfg = configFile.toLocal8Bit();
         if (lirc_readconfig(d->lircState, cfg.constData(), &d->lircConfig, NULL))
         {
-            LOG(vtype, LOG_ERR,
-                    QString("Failed to read config file '%1'").arg(configFile));
+            LOG(vtype, LOG_ERR, LOC +
+                QString("Failed to read config file '%1'").arg(configFile));
 
             lirc_deinit(d->lircState);
             d->lircState = NULL;
@@ -302,8 +303,8 @@ bool LIRC::Init(void)
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO,
-            QString("Successfully initialized '%1' using '%2' config")
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Successfully initialized '%1' using '%2' config")
             .arg(lircdDevice).arg(configFile));
     
     return true;
@@ -398,7 +399,7 @@ void LIRC::run(void)
 {
     threadRegister("LIRC");
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "run -- start");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "run -- start");
 #endif
     /* Process all events read */
     while (IsDoRunSet())
@@ -412,12 +413,12 @@ void LIRC::run(void)
             eofCount = 0;
             if (++retryCount > 1000)
             {
-                LOG(VB_GENERAL, LOG_ERR,
-                        "Failed to reconnect, exiting LIRC thread.");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to reconnect, exiting LIRC thread.");
                 doRun = false;
                 continue;
             }
-            LOG(VB_FILE, LOG_WARNING, "EOF -- reconnecting");
+            LOG(VB_FILE, LOG_WARNING, LOC + "EOF -- reconnecting");
   
             lirc_deinit(d->lircState);
             d->lircState = NULL;
@@ -444,7 +445,7 @@ void LIRC::run(void)
 
         if (ret < 0 && errno != EINTR)
         {
-            LOG(VB_GENERAL, LOG_ERR, "select() failed" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "select() failed" + ENO);
             continue;
         }
 
@@ -458,7 +459,7 @@ void LIRC::run(void)
             Process(codes[i]);
     }
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "run -- end");
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "run -- end");
 #endif
     threadDeregister();
 }
@@ -484,13 +485,13 @@ QList<QByteArray> LIRC::GetCodes(void)
         else if (107 == errno)
         {
             if (!eofCount)
-                LOG(VB_GENERAL, LOG_NOTICE, "GetCodes -- EOF?");
+                LOG(VB_GENERAL, LOG_NOTICE, LOC + "GetCodes -- EOF?");
             eofCount++;
             return ret;
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Could not read socket" + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Could not read socket" + ENO);
             return ret;
         }
 
@@ -500,7 +501,7 @@ QList<QByteArray> LIRC::GetCodes(void)
     if (0 == len)
     {
         if (!eofCount)
-            LOG(VB_GENERAL, LOG_NOTICE, "GetCodes -- eof?");
+            LOG(VB_GENERAL, LOG_NOTICE, LOC + "GetCodes -- eof?");
         eofCount++;
         return ret;
     }

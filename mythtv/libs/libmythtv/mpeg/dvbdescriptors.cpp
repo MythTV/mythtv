@@ -78,17 +78,19 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     if (src[0] == 0x1f)
         return freesat_huffman_to_string(src, raw_length);
 
-    if (((0x10 < src[0]) && (src[0] < 0x15)) || ((0x15 < src[0]) && (src[0] < 0x20)))
+    if (((0x10 < src[0]) && (src[0] < 0x15)) ||
+        ((0x15 < src[0]) && (src[0] < 0x20)))
     {
         // TODO: Handle multi-byte encodings
-        VERBOSE(VB_SIPARSER, "dvb_decode_text: "
-                "Multi-byte coded text is not yet supported.");
+        LOG(VB_SIPARSER, LOG_ERR, 
+            "dvb_decode_text: Multi-byte coded text is not yet supported.");
         return "";
     }
 
     // if a override encoding is specified and the default ISO 6937 encoding
     // would be used copy the override encoding in front of the text
-    unsigned char *dst = new unsigned char[ raw_length + encoding_override_length ];
+    unsigned char *dst =
+        new unsigned char[raw_length + encoding_override_length];
 
     uint length = 0;
     if (encoding_override && src[0] >= 0x20) {
@@ -156,17 +158,19 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
 {
     if (raw_length > 50)
     {
-        VERBOSE(VB_SIPARSER, QString("dvb_decode_short_name: name is %1 chars "
-                                     "long. Unlikely to be a short name.")
+        LOG(VB_SIPARSER, LOG_WARNING,
+            QString("dvb_decode_short_name: name is %1 chars "
+                    "long. Unlikely to be a short name.")
                 .arg(raw_length));
         return "";
     }
 
-    if (((0x10 < src[0]) && (src[0] < 0x15)) || ((0x15 < src[0]) && (src[0] < 0x20)))
+    if (((0x10 < src[0]) && (src[0] < 0x15)) ||
+        ((0x15 < src[0]) && (src[0] < 0x20)))
     {
         // TODO: Handle multi-byte encodings
-        VERBOSE(VB_SIPARSER, "dvb_decode_short_name: "
-                "Multi-byte coded text is not yet supported.");
+        LOG(VB_SIPARSER, LOG_ERR, "dvb_decode_short_name: "
+                         "Multi-byte coded text is not yet supported.");
         return "";
     }
 

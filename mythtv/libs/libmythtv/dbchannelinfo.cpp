@@ -14,6 +14,8 @@
 #include "mythdirs.h"
 #include "mpegstreamdata.h" // for CryptStatus
 #include "remotefile.h"
+#include "channelgroup.h"
+#include "sourceutil.h"
 
 DBChannel::DBChannel(const DBChannel &other)
 {
@@ -55,6 +57,36 @@ DBChannel &DBChannel::operator=(const DBChannel &other)
     return *this;
 }
 
+void DBChannel::ToMap(InfoMap& infoMap) const
+{
+    infoMap["channelnumber"] = channum;
+    infoMap["callsign"] = callsign;
+    infoMap["channelname"] = name;
+    infoMap["channeliconpath"] = icon;
+    infoMap["channelid"] = QString().setNum(chanid);
+    infoMap["majorchan"] = QString().setNum(major_chan);
+    infoMap["minorchan"] = QString().setNum(minor_chan);
+    infoMap["mplexid"] = QString().setNum(mplexid);
+    infoMap["channelvisible"] = visible ? QObject::tr("Yes") : QObject::tr("No");
+    
+    infoMap["channelgroupname"] = ChannelGroup::GetChannelGroupName(grpid);
+    infoMap["channelsourcename"] = SourceUtil::GetSourceName(sourceid);
+}
+
+QString DBChannel::GetFormatted(const QString &format) const
+{
+    QString tmp = format;
+
+    if (tmp.isEmpty())
+        return QString();
+
+    tmp.replace("<num>",  channum);
+    tmp.replace("<sign>", callsign);
+    tmp.replace("<name>", name);
+
+    return tmp;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
@@ -70,6 +102,17 @@ QString ChannelInfo::GetFormatted(const QString &format) const
     tmp.replace("<name>", channame);
 
     return tmp;
+}
+
+void ChannelInfo::ToMap(InfoMap& infoMap) const
+{
+    infoMap["callsign"] = callsign;
+    infoMap["channeliconpath"] = iconpath;
+    infoMap["chanstr"] = chanstr;
+    infoMap["channelname"] = channame;
+    infoMap["channelid"] = QString().setNum(chanid);
+    infoMap["channelsourcename"] = sourcename;
+    infoMap["channelrecpriority"] = recpriority;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -91,8 +134,9 @@ bool PixmapChannel::CacheChannelIcon(void)
 
     if (!localDir.exists() && !localDir.mkdir(localDirStr))
     {
-        VERBOSE(VB_IMPORTANT, QString("Icons directory is missing and could "
-                                      "not be created: %1").arg(localDirStr));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Icons directory is missing and could not be created: %1")
+                .arg(localDirStr));
         icon.clear();
         return false;
     }
@@ -137,11 +181,13 @@ bool PixmapChannel::CacheChannelIcon(void)
 
         if (image.save(m_localIcon))
         {
-            VERBOSE(VB_GENERAL, QString("Caching channel icon %1").arg(m_localIcon));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Caching channel icon %1").arg(m_localIcon));
             return true;
         }
         else
-            VERBOSE(VB_GENERAL, QString("Failed to save to %1").arg(m_localIcon));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Failed to save to %1").arg(m_localIcon));
     }
 
     // if we get here then the icon is set in the db but couldn't be found
@@ -149,20 +195,6 @@ bool PixmapChannel::CacheChannelIcon(void)
     icon.clear();
 
     return false;
-}
-
-QString PixmapChannel::GetFormatted(const QString &format) const
-{
-    QString tmp = format;
-
-    if (tmp.isEmpty())
-        return "";
-
-    tmp.replace("<num>",  channum);
-    tmp.replace("<sign>", callsign);
-    tmp.replace("<name>", name);
-
-    return tmp;
 }
 
 ////////////////////////////////////////////////////////////////////////////

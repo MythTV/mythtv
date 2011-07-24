@@ -11,8 +11,6 @@ using namespace std;
 #include "audiooutputalsa.h"
 
 #define LOC QString("ALSA: ")
-#define LOC_WARN QString("ALSA, Warning: ")
-#define LOC_ERR QString("ALSA, Error: ")
 
 // redefine assert as no-op to quiet some compiler warnings
 // about assert always evaluating true in alsa headers.
@@ -519,7 +517,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
         ReorderSmpteToAlsa(aubuf, frames, output_format, channels - 6);
     }
 
-    VERBOSE(VB_AUDIO+VB_TIMESTAMP,
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO,
             QString("WriteAudio: Preparing %1 bytes (%2 frames)")
             .arg(size).arg(frames));
 
@@ -730,7 +728,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     /* set member variables */
     soundcard_buffer_size = buffer_size * output_bytes_per_frame;
-    fragment_size = (period_size * output_bytes_per_frame) >> 1;
+    fragment_size = (period_size >> 1) * output_bytes_per_frame;
 
     /* get the current swparams */
     err = snd_pcm_sw_params_current(handle, swparams);

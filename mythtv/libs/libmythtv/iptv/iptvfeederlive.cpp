@@ -11,7 +11,6 @@
 #include "timeoutedtaskscheduler.h"
 
 #define LOC QString("FbFeedLive:")
-#define LOC_ERR QString("FbFeedLive, Error:")
 
 
 IPTVFeederLive::IPTVFeederLive() :
@@ -28,21 +27,21 @@ bool IPTVFeederLive::InitEnv(void)
 {
     if (_live_env)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "InitEnv, live env. already exits.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "InitEnv, live env. already exits.");
         return false;
     }
 
     TaskScheduler *scheduler = new TimeoutedTaskScheduler(500);
     if (!scheduler)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create Live Scheduler.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Live Scheduler.");
         return false;
     }
 
     _live_env = BasicUsageEnvironment::createNew(*scheduler);
     if (!_live_env)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create Live Environment.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Live Environment.");
         delete scheduler;
         return false;
     }
@@ -64,31 +63,31 @@ void IPTVFeederLive::FreeEnv(void)
 
 void IPTVFeederLive::Run(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Run() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Run() -- begin");
     _lock.lock();
     _running = true;
     _abort   = 0;
     _lock.unlock();
 
-    VERBOSE(VB_RECORD, LOC + "Run() -- loop begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Run() -- loop begin");
     if (_live_env)
         _live_env->taskScheduler().doEventLoop(&_abort);
-    VERBOSE(VB_RECORD, LOC + "Run() -- loop end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Run() -- loop end");
 
     _lock.lock();
     _running = false;
     _cond.wakeAll();
     _lock.unlock();
-    VERBOSE(VB_RECORD, LOC + "Run() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Run() -- end");
 }
 
 void IPTVFeederLive::Stop(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Stop() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- begin");
     QMutexLocker locker(&_lock);
     _abort = 0xFF;
 
     while (_running)
         _cond.wait(&_lock, 500);
-    VERBOSE(VB_RECORD, LOC + "Stop() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- end");
 }

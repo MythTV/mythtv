@@ -4,6 +4,7 @@ using namespace std;
 
 #include <mythcontext.h>
 #include <compat.h>
+#include <mythlogging.h>
 
 #include "libvisualplugin.h"
 
@@ -28,7 +29,7 @@ LibVisualPlugin::LibVisualPlugin(
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "Unable to init SDL");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to init SDL");
         return;
     }
     SDL_ShowCursor(0);
@@ -113,7 +114,8 @@ void LibVisualPlugin::switchToPlugin(const QString &pluginName)
     m_pVisBin = visual_bin_new();
     if (!m_pVisBin)
     {
-        VERBOSE(VB_IMPORTANT, "Error allocating LibVisualPlugin 'Bin' object");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Error allocating LibVisualPlugin 'Bin' object");
         return;
     }
 
@@ -122,15 +124,15 @@ void LibVisualPlugin::switchToPlugin(const QString &pluginName)
     m_pVisVideo = visual_video_new();
     if (!m_pVisVideo)
     {
-        VERBOSE(VB_IMPORTANT,
-                "Error allocating LibVisualPlugin 'Video' object");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Error allocating LibVisualPlugin 'Video' object");
         return;
     }
 
     if (visual_bin_set_video(m_pVisBin, m_pVisVideo) != VISUAL_OK)
     {
-        VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
-                " 'Video' object to 'Bin' object");
+        LOG(VB_GENERAL, LOG_ERR, "Error connecting LibVisualPlugin"
+                                 " 'Video' object to 'Bin' object");
         return;
     }
 
@@ -138,8 +140,8 @@ void LibVisualPlugin::switchToPlugin(const QString &pluginName)
     if (visual_bin_connect_by_names(
             m_pVisBin, const_cast<char*>(plugin.constData()), 0) != VISUAL_OK)
     {
-        VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
-                " 'Plugin' object to 'Bin' object");
+        LOG(VB_GENERAL, LOG_ERR, "Error connecting LibVisualPlugin"
+                                 " 'Plugin' object to 'Bin' object");
         return;
     }
 
@@ -158,8 +160,8 @@ void LibVisualPlugin::switchToPlugin(const QString &pluginName)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
-                " 'Input' object to our data source object");
+        LOG(VB_GENERAL, LOG_ERR, "Error connecting LibVisualPlugin"
+                                 " 'Input' object to our data source object");
     }
 }
 
@@ -241,7 +243,7 @@ bool LibVisualPlugin::createScreen(int width, int height)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Error obtaining SDL video information");
+            LOG(VB_GENERAL, LOG_ERR, "Error obtaining SDL video information");
         }
     }
     else

@@ -90,7 +90,7 @@ bool NetSearch::Create()
 
     if (!m_siteList || !m_searchResultList || !m_search)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
@@ -100,7 +100,7 @@ bool NetSearch::Create()
     connect(m_siteList, SIGNAL(itemClicked(MythUIButtonListItem *)),
                        SLOT(doSearch(void)));
     connect(m_searchResultList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                       SLOT(showWebVideo(void)));
+                       SLOT(streamWebVideo(void)));
     connect(m_searchResultList, SIGNAL(itemSelected(MythUIButtonListItem *)),
                        SLOT(slotItemChanged()));
 
@@ -113,7 +113,7 @@ bool NetSearch::Create()
 
 void NetSearch::Load()
 {
-    m_grabberList = findAllDBSearchGrabbers(VIDEO);
+    m_grabberList = findAllDBSearchGrabbers(VIDEO_FILE);
 }
 
 void NetSearch::Init()
@@ -235,6 +235,8 @@ void NetSearch::showMenu(void)
 
             if (item)
             {
+                if (item && item->GetDownloadable())
+                    menuPopup->AddButton(tr("Stream Video"), SLOT(streamWebVideo()));
                 menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
 
                 filename = GetDownloadFilename(item->GetTitle(),
@@ -310,7 +312,7 @@ void NetSearch::cleanCacheDir()
             i != thumbs.begin() - 1; --i)
     {
         QString filename = QString("%1/%2").arg(cache).arg(*i);
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1").arg(filename));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1").arg(filename));
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
         if (lastmod.addDays(7) < QDateTime::currentDateTime())
@@ -355,7 +357,8 @@ void NetSearch::doSearch()
     QUrl init = GetMythXMLSearch(m_mythXML, m_currentSearch,
                                 m_currentCmd, m_pagenum);
     QUrl req(init.toEncoded(), QUrl::TolerantMode);
-    VERBOSE(VB_GENERAL, QString("Using Search URL %1").arg(req.toString()));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Using Search URL %1").arg(req.toString()));
     m_reply = m_netSearch->get(QNetworkRequest(req));
 }
 
@@ -504,6 +507,26 @@ void NetSearch::populateResultList(ResultItem::resultList list)
     }
 }
 
+void NetSearch::streamWebVideo()
+{
+    ResultItem *item =
+        qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
+
+    if (!item)
+        return;
+
+    if (!item->GetDownloadable())
+    {
+        showWebVideo();
+        return;
+    }
+
+    GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL(),
+           item->GetDescription(), item->GetTitle(), item->GetSubtitle(), QString(),
+           item->GetSeason(), item->GetEpisode(), QString(), item->GetTime().toInt(),
+           item->GetDate().toString("yyyy"));
+}
+
 void NetSearch::showWebVideo()
 {
     ResultItem *item =
@@ -537,7 +560,7 @@ void NetSearch::showWebVideo()
     {
         QString url = item->GetURL();
 
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Web URL = %1").arg(url));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Web URL = %1").arg(url));
 
         if (url.isEmpty())
             return;
@@ -646,7 +669,7 @@ void NetSearch::runSearchEditor()
 
 void NetSearch::doListRefresh()
 {
-    m_grabberList = findAllDBSearchGrabbers(VIDEO);
+    m_grabberList = findAllDBSearchGrabbers(VIDEO_FILE);
     if (m_grabberList.isEmpty())
         runSearchEditor();
 
@@ -668,8 +691,8 @@ void NetSearch::doDownloadAndPlay()
                               gCoreContext->GetMasterHostName(),
                               baseFilename);
 
-    VERBOSE(VB_GENERAL, QString("Downloading %1 to %2").arg(item->GetMediaURL())
-                                                       .arg(finalFilename));
+    LOG(VB_GENERAL, LOG_INFO, QString("Downloading %1 to %2")
+            .arg(item->GetMediaURL()) .arg(finalFilename));
 
     // Does the file already exist?
     bool exists = RemoteFile::Exists(finalFilename);
@@ -777,7 +800,7 @@ void NetSearch::slotDoProgress(qint64 bytesReceived, qint64 bytesTotal)
         int received = bytesReceived/100;
         m_progress->SetTotal(total);
         m_progress->SetUsed(received);
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Progress event received: %1/%2")
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Progress event received: %1/%2")
                                .arg(received).arg(total));
     }
 }

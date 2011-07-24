@@ -1,4 +1,5 @@
 #include "teletextreader.h"
+#include "mythlogging.h"
 
 #include <string.h>
 #include "vbilut.h"
@@ -300,6 +301,9 @@ void TeletextReader::Reset(void)
 void TeletextReader::AddPageHeader(int page, int subpage, const uint8_t *buf,
                                    int vbimode, int lang, int flags)
 {
+    //LOG(VB_GENERAL, LOG_ERR, QString("AddPageHeader(p %1, sp %2, lang %3)")
+    //    .arg(page).arg(subpage).arg(lang));
+
     int magazine = MAGAZINE(page);
     if (magazine < 1 || magazine > 8)
         return;
@@ -366,13 +370,16 @@ void TeletextReader::AddPageHeader(int page, int subpage, const uint8_t *buf,
     if ( !(ttpage->flags & TP_INTERRUPTED_SEQ))
     {
         memcpy(m_header, ttpage->data[0], 40);
-        HeaderUpdated(ttpage->data[0],ttpage->lang);
+        HeaderUpdated(page, subpage, ttpage->data[0],ttpage->lang);
     }
 }
 
 void TeletextReader::AddTeletextData(int magazine, int row,
                                      const uint8_t* buf, int vbimode)
 {
+    //LOG(VB_GENERAL, LOG_ERR, QString("AddTeletextData(%1, %2)")
+    //    .arg(magazine).arg(row));
+
     int b1, b2, b3, err = 0;
 
     if (magazine < 1 || magazine > 8)
@@ -483,11 +490,14 @@ void TeletextReader::PageUpdated(int page, int subpage)
     m_page_changed = true;
 }
 
-void TeletextReader::HeaderUpdated(uint8_t * page, int lang)
+void TeletextReader::HeaderUpdated(
+    int page, int subpage, uint8_t *page_ptr, int lang)
 {
+    (void)page;
+    (void)subpage;
     (void)lang;
 
-    if (page == NULL)
+    if (page_ptr == NULL)
         return;
 
     if (m_curpage_showheader == false)

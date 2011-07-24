@@ -154,7 +154,7 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffs
 {
     if (timestr.isEmpty())
     {
-        VERBOSE(VB_XMLTV, "Found empty Date/Time in XMLTV data, ignoring");
+        LOG(VB_XMLTV, LOG_ERR, "Found empty Date/Time in XMLTV data, ignoring");
         return;
     }
 
@@ -183,7 +183,8 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffs
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Ignoring unknown timestamp format: %1")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Ignoring unknown timestamp format: %1")
                 .arg(ts));
         return;
     }
@@ -585,8 +586,8 @@ bool XMLTVParser::parseFile(
 
     if (!dash_open(f, filename, QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("Error unable to open '%1' for reading.")
-                .arg(filename));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error unable to open '%1' for reading.") .arg(filename));
         return false;
     }
 
@@ -596,7 +597,7 @@ bool XMLTVParser::parseFile(
 
     if (!doc.setContent(&f, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, QString("Error in %1:%2: %3")
+        LOG(VB_GENERAL, LOG_ERR, QString("Error in %1:%2: %3")
             .arg(errorLine).arg(errorColumn).arg(errorMsg));
 
         f.close();
@@ -621,7 +622,7 @@ bool XMLTVParser::parseFile(
         localTimezoneOffset = TimezoneToInt(config_offset);
         if (abs(localTimezoneOffset) > 840)
         {
-            VERBOSE(VB_XMLTV, QString("Ignoring invalid TimeOffset %1")
+            LOG(VB_XMLTV, LOG_ERR, QString("Ignoring invalid TimeOffset %1")
                 .arg(config_offset));
             localTimezoneOffset = 841;
         }
@@ -634,8 +635,8 @@ bool XMLTVParser::parseFile(
     QUrl sourceUrl(docElem.attribute("source-info-url", ""));
     if (sourceUrl.toString() == "http://labs.zap2it.com/")
     {
-        VERBOSE(VB_IMPORTANT, "Don't use tv_grab_na_dd, use the"
-            "internal datadirect grabber.");
+        LOG(VB_GENERAL, LOG_ERR, "Don't use tv_grab_na_dd, use the"
+                                 "internal datadirect grabber.");
         exit(GENERIC_EXIT_SETUP_ERROR);
     }
 

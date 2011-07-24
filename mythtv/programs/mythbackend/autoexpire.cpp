@@ -146,7 +146,7 @@ size_t AutoExpire::GetDesiredSpace(int fsID) const
  */
 void AutoExpire::CalcParams()
 {
-    VERBOSE(VB_FILE, LOC + "CalcParams()");
+    LOG(VB_FILE, LOG_INFO, LOC + "CalcParams()");
 
     QList<FileSystemInfo> fsInfos;
 
@@ -157,14 +157,14 @@ void AutoExpire::CalcParams()
 
     if (fsInfos.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "ERROR: Filesystem Info cache is empty, "
-                "unable to calculate necessary parameters.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Filesystem Info cache is empty, unable "                                       "to calculate necessary parameters.");
 
         return;
     }
 
     size_t maxKBperMin = 0;
-    size_t extraKB = gCoreContext->GetNumSetting("AutoExpireExtraSpace", 0) << 20;
+    size_t extraKB = gCoreContext->GetNumSetting("AutoExpireExtraSpace", 0) <<
+                     20;
 
     QMap<int, uint64_t> fsMap;
     QMap<int, vector<int> > fsEncoderMap;
@@ -197,25 +197,26 @@ void AutoExpire::CalcParams()
 
         if (fsEncoderMap.contains(fsit->getFSysID()))
         {
-            VERBOSE(VB_FILE, QString(
-                "fsID #%1: Total: %2 GB   Used: %3 GB   Free: %4 GB")
-                .arg(fsit->getFSysID())
+            LOG(VB_FILE, LOG_INFO,
+                QString("fsID #%1: Total: %2 GB   Used: %3 GB   Free: %4 GB")
+                    .arg(fsit->getFSysID())
                 .arg(fsit->getTotalSpace() / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->getUsedSpace() / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->getFreeSpace() / 1024.0 / 1024.0, 7, 'f', 1));
 
 
-            vector<int>::iterator encit = fsEncoderMap[fsit->getFSysID()].begin();
+            vector<int>::iterator encit =
+                fsEncoderMap[fsit->getFSysID()].begin();
             for (; encit != fsEncoderMap[fsit->getFSysID()].end(); ++encit)
             {
                 EncoderLink *enc = *(encoderList->find(*encit));
 
                 if (!enc->IsConnected() || !enc->IsBusy())
                 {
-                    // remove the encoder since it can't write to any file system
-                    VERBOSE(VB_FILE, LOC
-                            + QString("Cardid %1: is not recoding, removing it "
-                                      "from used list.").arg(*encit));
+                    // remove encoder since it can't write to any file system
+                    LOG(VB_FILE, LOG_INFO, LOC +
+                        QString("Cardid %1: is not recoding, removing it "
+                                "from used list.").arg(*encit));
                     instance_lock.lock();
                     used_encoders.remove(*encit);
                     instance_lock.unlock();
@@ -226,7 +227,7 @@ void AutoExpire::CalcParams()
                 if (maxBitrate<=0)
                     maxBitrate = 19500000LL;
                 thisKBperMin += (((size_t)maxBitrate)*((size_t)15))>>11;
-                VERBOSE(VB_FILE, QString("    Cardid %1: max bitrate "
+                LOG(VB_FILE, LOG_INFO, QString("    Cardid %1: max bitrate "
                         "%2 Kb/sec, fsID %3 max is now %4 KB/min")
                         .arg(enc->GetCardID())
                         .arg(enc->GetMaxBitrate() >> 10)
@@ -238,8 +239,8 @@ void AutoExpire::CalcParams()
 
         if (thisKBperMin > maxKBperMin)
         {
-            VERBOSE(VB_FILE,
-                    QString("  Max of %1 KB/min for fsID %2 is higher "
+            LOG(VB_FILE, LOG_INFO,
+                QString("  Max of %1 KB/min for fsID %2 is higher "
                     "than the existing Max of %3 so we'll use this Max instead")
                     .arg(thisKBperMin).arg(fsit->getFSysID()).arg(maxKBperMin));
             maxKBperMin = thisKBperMin;
@@ -257,9 +258,9 @@ void AutoExpire::CalcParams()
 
     double expireMinGB = ((maxKBperMin + maxKBperMin/3)
                           * expireFreq + extraKB) >> 20;
-    VERBOSE(VB_IMPORTANT, LOC +
-            QString("CalcParams(): Max required Free Space: %1 GB w/freq: "
-                    "%2 min").arg(expireMinGB, 0, 'f', 1).arg(expireFreq));
+    LOG(VB_GENERAL, LOG_NOTICE, LOC +
+        QString("CalcParams(): Max required Free Space: %1 GB w/freq: %2 min")
+            .arg(expireMinGB, 0, 'f', 1).arg(expireFreq));
 
     // lock class and save these parameters.
     instance_lock.lock();
@@ -318,7 +319,7 @@ void AutoExpire::RunExpirer(void)
         // Expire normal recordings depending on frequency calculated
         if (curTime >= next_expire)
         {
-            VERBOSE(VB_FILE, LOC + "Running now!");
+            LOG(VB_FILE, LOG_INFO, LOC + "Running now!");
             next_expire =
                 QDateTime::currentDateTime().addSecs(desired_freq * 60);
 
@@ -363,7 +364,7 @@ void AutoExpire::ExpireLiveTV(int type)
 {
     pginfolist_t expireList;
 
-    VERBOSE(VB_FILE, LOC + QString("ExpireLiveTV(%1)").arg(type));
+    LOG(VB_FILE, LOG_INFO, LOC + QString("ExpireLiveTV(%1)").arg(type));
     FillDBOrdered(expireList, type);
     SendDeleteMessages(expireList);
     ClearExpireList(expireList);
@@ -376,7 +377,7 @@ void AutoExpire::ExpireOldDeleted(void)
 {
     pginfolist_t expireList;
 
-    VERBOSE(VB_FILE, LOC + QString("ExpireOldDeleted()"));
+    LOG(VB_FILE, LOG_INFO, LOC + QString("ExpireOldDeleted()"));
     FillDBOrdered(expireList, emOldDeletedPrograms);
     SendDeleteMessages(expireList);
     ClearExpireList(expireList);
@@ -393,15 +394,15 @@ void AutoExpire::ExpireRecordings(void)
     QList<FileSystemInfo> fsInfos;
     QList<FileSystemInfo>::iterator fsit;
 
-    VERBOSE(VB_FILE, LOC + "ExpireRecordings()");
+    LOG(VB_FILE, LOG_INFO, LOC + "ExpireRecordings()");
 
     if (main_server)
         main_server->GetFilesystemInfos(fsInfos);
 
     if (fsInfos.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "ERROR: Filesystem Info cache is empty, "
-                "unable to determine what Recordings to expire");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Filesystem Info cache is empty, unable "
+                                      "to determine what Recordings to expire");
 
         return;
     }
@@ -426,8 +427,8 @@ void AutoExpire::ExpireRecordings(void)
             QString rechost = query.value(0).toString();
             QString recdir  = query.value(1).toString();
 
-            VERBOSE(VB_FILE, LOC + QString(
-                    "%1:%2 has an in-progress truncating delete.")
+            LOG(VB_FILE, LOG_INFO, LOC +
+                QString("%1:%2 has an in-progress truncating delete.")
                     .arg(rechost).arg(recdir));
 
             for (fsit = fsInfos.begin(); fsit != fsInfos.end(); ++fsit)
@@ -450,8 +451,8 @@ void AutoExpire::ExpireRecordings(void)
 
         fsMap[fsit->getFSysID()] = true;
 
-        VERBOSE(VB_FILE, QString(
-                "fsID #%1: Total: %2 GB   Used: %3 GB   Free: %4 GB")
+        LOG(VB_FILE, LOG_INFO,
+            QString("fsID #%1: Total: %2 GB   Used: %3 GB   Free: %4 GB")
                 .arg(fsit->getFSysID())
                 .arg(fsit->getTotalSpace() / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->getUsedSpace() / 1024.0 / 1024.0, 7, 'f', 1)
@@ -459,17 +460,18 @@ void AutoExpire::ExpireRecordings(void)
 
         if ((fsit->getTotalSpace() == -1) || (fsit->getUsedSpace() == -1))
         {
-            VERBOSE(VB_FILE, LOC_ERR + QString("fsID #%1 has invalid info, "
-                    "AutoExpire cannot run for this filesystem.  "
-                    "Continuing on to next...").arg(fsit->getFSysID()));
-            VERBOSE(VB_FILE, QString("Directories on filesystem ID %1:")
+            LOG(VB_FILE, LOG_ERR, LOC +
+                QString("fsID #%1 has invalid info, AutoExpire cannot run for "
+                        "this filesystem.  Continuing on to next...")
+                    .arg(fsit->getFSysID()));
+            LOG(VB_FILE, LOG_INFO, QString("Directories on filesystem ID %1:")
                     .arg(fsit->getFSysID()));
             QList<FileSystemInfo>::iterator fsit2;
             for (fsit2 = fsInfos.begin(); fsit2 != fsInfos.end(); ++fsit2)
             {
                 if (fsit2->getFSysID() == fsit->getFSysID())
                 {
-                    VERBOSE(VB_FILE, QString("    %1:%2")
+                    LOG(VB_FILE, LOG_INFO, QString("    %1:%2")
                             .arg(fsit2->getHostname()).arg(fsit2->getPath()));
                 }
             }
@@ -479,46 +481,50 @@ void AutoExpire::ExpireRecordings(void)
 
         if (truncateMap.contains(fsit->getFSysID()))
         {
-            VERBOSE(VB_FILE, QString(
-                "    fsid %1 has a truncating delete in progress,  AutoExpire "
-                "cannot run for this filesystem until the delete has "
-                "finished.  Continuing on to next...").arg(fsit->getFSysID()));
+            LOG(VB_FILE, LOG_INFO,
+                QString("    fsid %1 has a truncating delete in progress,  "
+                        "AutoExpire cannot run for this filesystem until the "
+                        "delete has finished.  Continuing on to next...")
+                    .arg(fsit->getFSysID()));
             continue;
         }
 
-        if ((size_t)max(0LL, fsit->getFreeSpace()) < desired_space[fsit->getFSysID()])
+        if ((size_t)max(0LL, fsit->getFreeSpace()) <
+            desired_space[fsit->getFSysID()])
         {
-            VERBOSE(VB_FILE,
-                    QString("    Not Enough Free Space!  We want %1 MB")
-                            .arg(desired_space[fsit->getFSysID()] / 1024));
+            LOG(VB_FILE, LOG_INFO,
+                QString("    Not Enough Free Space!  We want %1 MB")
+                    .arg(desired_space[fsit->getFSysID()] / 1024));
 
             QMap<QString, int> dirList;
             QList<FileSystemInfo>::iterator fsit2;
 
-            VERBOSE(VB_FILE, QString("    Directories on filesystem ID %1:")
+            LOG(VB_FILE, LOG_INFO, 
+                QString("    Directories on filesystem ID %1:")
                     .arg(fsit->getFSysID()));
 
             for (fsit2 = fsInfos.begin(); fsit2 != fsInfos.end(); ++fsit2)
             {
                 if (fsit2->getFSysID() == fsit->getFSysID())
                 {
-                    VERBOSE(VB_FILE, QString("        %1:%2")
+                    LOG(VB_FILE, LOG_INFO, QString("        %1:%2")
                             .arg(fsit2->getHostname()).arg(fsit2->getPath()));
                     dirList[fsit2->getHostname() + ":" + fsit2->getPath()] = 1;
                 }
             }
 
-            VERBOSE(VB_FILE,
-                    "    Searching for files expirable in these directories");
+            LOG(VB_FILE, LOG_INFO,
+                "    Searching for files expirable in these directories");
             QString myHostName = gCoreContext->GetHostName();
             pginfolist_t::iterator it = expireList.begin();
             while ((it != expireList.end()) &&
-                   ((size_t)max(0LL, fsit->getFreeSpace()) < desired_space[fsit->getFSysID()]))
+                   ((size_t)max(0LL, fsit->getFreeSpace()) <
+                    desired_space[fsit->getFSysID()]))
             {
                 ProgramInfo *p = *it;
                 ++it;
 
-                VERBOSE(VB_FILE, QString("        Checking %1 => %2")
+                LOG(VB_FILE, LOG_INFO, QString("        Checking %1 => %2")
                         .arg(p->toString(ProgramInfo::kRecordingKey))
                         .arg(p->GetTitle()));
 
@@ -558,8 +564,8 @@ void AutoExpire::ExpireRecordings(void)
 
                     if (!foundFile)
                     {
-                        VERBOSE(VB_FILE, LOC_ERR + QString(
-                                    "        ERROR: Can't find file for %1")
+                        LOG(VB_FILE, LOG_ERR, LOC +
+                            QString("        ERROR: Can't find file for %1")
                                 .arg(p->toString(ProgramInfo::kRecordingKey)));
                         continue;
                     }
@@ -572,10 +578,11 @@ void AutoExpire::ExpireRecordings(void)
                                                 - (p->GetFilesize() / 1024));
                     deleteList.push_back(p);
 
-                    VERBOSE(VB_FILE, QString("        FOUND file expirable. "
-                            "%1 is located at %2 which is on fsID #%3. "
-                            "Adding to deleteList.  After deleting we should "
-                            "have %4 MB free on this filesystem.")
+                    LOG(VB_FILE, LOG_INFO,
+                        QString("        FOUND file expirable. "
+                                "%1 is located at %2 which is on fsID #%3. "
+                                "Adding to deleteList.  After deleting we "
+                                "should have %4 MB free on this filesystem.")
                             .arg(p->toString(ProgramInfo::kRecordingKey))
                             .arg(p->GetPathname()).arg(fsit->getFSysID())
                             .arg(fsit->getFreeSpace() / 1024));
@@ -599,23 +606,22 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
 
     if (deleteList.empty())
     {
-        VERBOSE(VB_FILE, LOC + "SendDeleteMessages. Nothing to expire.");
+        LOG(VB_FILE, LOG_INFO, LOC + "SendDeleteMessages. Nothing to expire.");
         return;
     }
 
-    VERBOSE(VB_FILE, LOC + "SendDeleteMessages, cycling through deleteList.");
+    LOG(VB_FILE, LOG_INFO, LOC +
+        "SendDeleteMessages, cycling through deleteList.");
     pginfolist_t::iterator it = deleteList.begin();
     while (it != deleteList.end())
     {
-        msg = QString("Expiring %1 MB for %2 => %3")
+        msg = QString("%1Expiring %2 MB for %3 => %4")
+            .arg(VERBOSE_LEVEL_CHECK(VB_FILE, LOG_ANY) ? "    " : "")
             .arg(((*it)->GetFilesize() >> 20))
             .arg((*it)->toString(ProgramInfo::kRecordingKey))
             .arg((*it)->toString(ProgramInfo::kTitleSubtitle));
 
-        if (VERBOSE_LEVEL_CHECK(VB_IMPORTANT))
-            VERBOSE(VB_IMPORTANT, msg);
-        else
-            VERBOSE(VB_FILE, QString("    ") +  msg);
+        LOG(VB_GENERAL, LOG_NOTICE, msg);
 
         // send auto expire message to backend's event thread.
         MythEvent me(QString("AUTO_EXPIRE %1 %2").arg((*it)->GetChanID())
@@ -649,12 +655,12 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
-        VERBOSE(VB_FILE, LOC + QString("Found %1 record profiles using max "
-                                 "episode expiration")
-                                 .arg(query.size()));
+        LOG(VB_FILE, LOG_INFO, LOC +
+            QString("Found %1 record profiles using max episode expiration")
+                .arg(query.size()));
         while (query.next())
         {
-            VERBOSE(VB_FILE, QString("    %1 (%2 for rec id %3)")
+            LOG(VB_FILE, LOG_INFO, QString("    %1 (%2 for rec id %3)")
                                      .arg(query.value(2).toString())
                                      .arg(query.value(1).toInt())
                                      .arg(query.value(0).toInt()));
@@ -662,8 +668,8 @@ void AutoExpire::ExpireEpisodesOverMax(void)
         }
     }
 
-    VERBOSE(VB_FILE, LOC + "Checking episode count for each recording "
-                           "profile using max episodes");
+    LOG(VB_FILE, LOG_INFO, LOC +
+        "Checking episode count for each recording profile using max episodes");
     for (maxIter = maxEpisodes.begin(); maxIter != maxEpisodes.end(); ++maxIter)
     {
         query.prepare("SELECT chanid, starttime, title, progstart, progend, "
@@ -680,7 +686,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
             continue;
         }
 
-        VERBOSE(VB_FILE, QString("    Recordid %1 has %2 recordings.")
+        LOG(VB_FILE, LOG_INFO, QString("    Recordid %1 has %2 recordings.")
                                  .arg(maxIter.key())
                                  .arg(query.size()));
         if (query.size() > 0)
@@ -706,16 +712,15 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                 {
                     long long spaceFreed = query.value(5).toLongLong() >> 20;
                     QString msg =
-                        QString("Expiring %1 MBytes for %2 at %3 => %4.  Too "
-                                "many episodes, we only want to keep %5.")
+                        QString("%1Expiring %2 MBytes for %3 at %4 => %5.  "
+                                "Too many episodes, we only want to keep %6.")
+                            .arg(VERBOSE_LEVEL_CHECK(VB_FILE, LOG_ANY) ?
+                                 "    " : "")
                             .arg(spaceFreed)
                             .arg(chanid).arg(startts.toString())
                             .arg(title).arg(*maxIter);
 
-                    if (VERBOSE_LEVEL_CHECK(VB_IMPORTANT))
-                        VERBOSE(VB_IMPORTANT, msg);
-                    else
-                        VERBOSE(VB_FILE, QString("    ") +  msg);
+                    LOG(VB_GENERAL, LOG_NOTICE, msg);
 
                     msg = QString("AUTO_EXPIRE %1 %2")
                                   .arg(chanid)
@@ -946,7 +951,7 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
             break;
     }
 
-    VERBOSE(VB_FILE, LOC + "FillDBOrdered: " + msg);
+    LOG(VB_FILE, LOG_INFO, LOC + "FillDBOrdered: " + msg);
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString querystr = QString(
@@ -968,16 +973,16 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
 
         if (IsInDontExpireSet(chanid, recstartts))
         {
-            VERBOSE(VB_FILE, LOC + QString(
-                        "    Skipping %1 at %2 "
-                        "because it is in Don't Expire List")
+            LOG(VB_FILE, LOG_INFO, LOC +
+                QString("    Skipping %1 at %2 because it is in Don't Expire "
+                        "List")
                     .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
         }
         else if (IsInExpireList(expireList, chanid, recstartts))
         {
-            VERBOSE(VB_FILE, LOC + QString(
-                        "    Skipping %1 at %2 "
-                        "because it is already in Expire List")
+            LOG(VB_FILE, LOG_INFO, LOC +
+                QString("    Skipping %1 at %2 because it is already in Expire "
+                        "List")
                     .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
         }
         else
@@ -985,15 +990,14 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
             ProgramInfo *pginfo = new ProgramInfo(chanid, recstartts);
             if (pginfo->GetChanID())
             {
-                VERBOSE(VB_FILE, LOC +
-                        QString("    Adding   %1 at %2")
+                LOG(VB_FILE, LOG_INFO, LOC + QString("    Adding   %1 at %2")
                         .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
                 expireList.push_back(pginfo);
             }
             else
             {
-                VERBOSE(VB_FILE, LOC + QString(
-                            "    Skipping %1 at %2 "
+                LOG(VB_FILE, LOG_INFO, LOC +
+                    QString("    Skipping %1 at %2 "
                             "because it could not be loaded from the DB")
                         .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
                 delete pginfo;
@@ -1051,7 +1055,7 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
         else
             msg.append(QString(" fsID %2 soon.").arg(fsID));
 
-        VERBOSE(VB_FILE, LOC + msg);
+        LOG(VB_FILE, LOG_INFO, LOC + msg);
         expirer->used_encoders[encoder] = fsID;
     }
 
@@ -1087,7 +1091,7 @@ void AutoExpire::UpdateDontExpireSet(void)
     if (!query.exec() || !query.next())
         return;
 
-    VERBOSE(VB_FILE, LOC + "Adding Programs to 'Do Not Expire' List");
+    LOG(VB_FILE, LOG_INFO, LOC + "Adding Programs to 'Do Not Expire' List");
     QDateTime curTime = QDateTime::currentDateTime();
 
     do
@@ -1101,7 +1105,7 @@ void AutoExpire::UpdateDontExpireSet(void)
             QString key = QString("%1_%2")
                 .arg(chanid).arg(recstartts.toString(Qt::ISODate));
             dont_expire_set.insert(key);
-            VERBOSE(VB_FILE, QString("    %1 at %2 in use by %3 on %4")
+            LOG(VB_FILE, LOG_INFO, QString("    %1 at %2 in use by %3 on %4")
                     .arg(chanid)
                     .arg(recstartts.toString(Qt::ISODate))
                     .arg(query.value(3).toString())

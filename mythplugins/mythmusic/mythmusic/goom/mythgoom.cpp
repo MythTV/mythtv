@@ -12,6 +12,7 @@ using namespace std;
 
 #include <compat.h>
 #include <mythcontext.h>
+#include <mythlogging.h>
 
 extern "C" {
 #include "goom_tools.h"
@@ -32,7 +33,7 @@ Goom::Goom(long int winid)
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "Unable to init SDL");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to init SDL");
         return;
     }
 
@@ -112,7 +113,7 @@ bool Goom::draw(QPainter *p, const QColor &back)
 
     if (!surface)
     {
-        VERBOSE(VB_IMPORTANT, "No sdl surface");
+        LOG(VB_GENERAL, LOG_ERR, "No sdl surface");
         return false;
     }
 

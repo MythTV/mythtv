@@ -40,7 +40,6 @@
 #include "mythlogging.h"
 
 #define LOC QString("SWiz: ")
-#define LOC_ERR QString("SWiz, Error: ")
 
 ScanWizard::ScanWizard(uint    default_sourceid,
                        uint    default_cardid,
@@ -68,7 +67,7 @@ MythDialog *ScanWizard::dialogWidget(MythMainWindow *parent, const char*)
 
 void ScanWizard::SetPage(const QString &pageTitle)
 {
-    VERBOSE(VB_CHANSCAN, QString("SetPage(%1)").arg(pageTitle));
+    LOG(VB_CHANSCAN, LOG_INFO, QString("SetPage(%1)").arg(pageTitle));
     if (pageTitle != ChannelScannerGUI::kTitle)
     {
         scannerPane->quitScanning();
@@ -84,8 +83,8 @@ void ScanWizard::SetPage(const QString &pageTitle)
     int     scantype  = configPane->GetScanType();
     bool    do_scan   = true;
 
-    VERBOSE(VB_CHANSCAN, LOC + "SetPage(): " +
-            QString("type(%1) cardid(%2) inputname(%3)")
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "SetPage(): " +
+        QString("type(%1) cardid(%2) inputname(%3)")
             .arg(scantype).arg(cardid).arg(inputname));
 
     if (scantype == ScanTypeSetting::DVBUtilsImport)
@@ -141,8 +140,8 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else
     {
         do_scan = false;
-        VERBOSE(VB_CHANSCAN, LOC_ERR + "SetPage(): " +
-                QString("type(%1) src(%2) cardid(%3) not handled")
+        LOG(VB_CHANSCAN, LOG_ERR, LOC + "SetPage(): " +
+            QString("type(%1) src(%2) cardid(%3) not handled")
                 .arg(scantype).arg(sourceid).arg(cardid));
 
         MythPopupBox::showOkPopup(

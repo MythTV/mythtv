@@ -55,7 +55,7 @@ MythBurn::MythBurn(MythScreenStack   *parent,
     QString thumbDir = getTempDirectory() + "/config/thumbs";
     QDir dir(thumbDir);
     if (dir.exists() && !MythRemoveDirectory(dir))
-        VERBOSE(VB_IMPORTANT, "MythBurn: Failed to clear thumb directory");
+        LOG(VB_GENERAL, LOG_ERR, "MythBurn: Failed to clear thumb directory");
 
     m_bCreateISO = false;
     m_bDoBurn = false;
@@ -105,7 +105,7 @@ bool MythBurn::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'mythburn'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'mythburn'");
         return false;
     }
 
@@ -264,8 +264,8 @@ void MythBurn::loadEncoderProfiles()
                 .toLower() == "ntsc") ? "ntsc" : "pal") + ".xml";
     }
 
-    VERBOSE(VB_IMPORTANT,
-            "MythArchive: Loading encoding profiles from " + filename);
+    LOG(VB_GENERAL, LOG_NOTICE,
+        "MythArchive: Loading encoding profiles from " + filename);
 
     QDomDocument doc("mydocument");
     QFile file(filename);
@@ -492,8 +492,8 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
             return true;
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("MythArchive: Recording not found (%1)")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("MythArchive: Recording not found (%1)")
                     .arg(filename));
         }
     }
@@ -507,8 +507,8 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
             return true;
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("MythArchive: Video not found (%1)").arg(filename));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("MythArchive: Video not found (%1)").arg(filename));
         }
     }
     else if (type == "File")
@@ -517,12 +517,12 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
             return true;
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("MythArchive: File not found (%1)").arg(filename));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("MythArchive: File not found (%1)").arg(filename));
         }
     }
 
-    VERBOSE(VB_IMPORTANT, "MythArchive: Archive item removed from list");
+    LOG(VB_GENERAL, LOG_NOTICE, "MythArchive: Archive item removed from list");
 
     return false;
 }
@@ -654,9 +654,9 @@ void MythBurn::createConfigFile(const QString &filename)
     QFile f(filename);
     if (!f.open(QIODevice::WriteOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("MythBurn::createConfigFile: "
-                "Failed to open file for writing - %1")
-                .arg(filename.toLocal8Bit().constData()));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythBurn::createConfigFile: "
+                    "Failed to open file for writing - %1") .arg(filename));
         return;
     }
 
@@ -1058,7 +1058,7 @@ bool ProfileDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'profilepopup'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'profilepopup'");
         return false;
     }
 

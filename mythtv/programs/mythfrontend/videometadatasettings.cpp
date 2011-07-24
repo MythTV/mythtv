@@ -34,12 +34,17 @@ bool MetadataSettings::Create()
     if (!foundtheme)
         return false;
 
-    m_trailerSpin = dynamic_cast<MythUISpinBox *> (GetChild("trailernum"));
+    m_trailerSpin =
+        dynamic_cast<MythUISpinBox *> (GetChild("trailernum"));
 
-    m_unknownFileCheck = dynamic_cast<MythUICheckBox *> (GetChild("unknownfilecheck"));
-    m_autoMetaUpdateCheck = dynamic_cast<MythUICheckBox *> (GetChild("autometaupdatecheck"));
-    m_treeLoadsMetaCheck = dynamic_cast<MythUICheckBox *> (GetChild("treeloadsmetacheck"));
-    m_randomTrailerCheck = dynamic_cast<MythUICheckBox *> (GetChild("randomtrailercheck"));
+    m_unknownFileCheck =
+        dynamic_cast<MythUICheckBox *> (GetChild("unknownfilecheck"));
+    m_autoMetaUpdateCheck =
+        dynamic_cast<MythUICheckBox *> (GetChild("autometaupdatecheck"));
+    m_treeLoadsMetaCheck =
+        dynamic_cast<MythUICheckBox *> (GetChild("treeloadsmetacheck"));
+    m_randomTrailerCheck =
+        dynamic_cast<MythUICheckBox *> (GetChild("randomtrailercheck"));
 
     m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
@@ -48,20 +53,27 @@ bool MetadataSettings::Create()
         !m_unknownFileCheck || !m_treeLoadsMetaCheck ||
         !m_randomTrailerCheck ||!m_okButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
-    int unknownSetting = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
+    int unknownSetting =
+        gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
     if (unknownSetting == 1)
         m_unknownFileCheck->SetCheckState(MythUIStateType::Full);
-    int autoMetaSetting = gCoreContext->GetNumSetting("mythvideo.AutoMetaDataScan", 1);
+
+    int autoMetaSetting =
+        gCoreContext->GetNumSetting("mythvideo.AutoMetaDataScan", 1);
     if (autoMetaSetting == 1)
         m_autoMetaUpdateCheck->SetCheckState(MythUIStateType::Full);
-    int loadMetaSetting = gCoreContext->GetNumSetting("VideoTreeLoadMetaData", 1);
+
+    int loadMetaSetting =
+        gCoreContext->GetNumSetting("VideoTreeLoadMetaData", 1);
     if (loadMetaSetting == 1)
         m_treeLoadsMetaCheck->SetCheckState(MythUIStateType::Full);
-    int trailerSetting = gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0);
+
+    int trailerSetting =
+        gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0);
     if (trailerSetting == 1)
         m_randomTrailerCheck->SetCheckState(MythUIStateType::Full);
 
@@ -77,7 +89,8 @@ bool MetadataSettings::Create()
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
 
-    connect(m_randomTrailerCheck, SIGNAL(valueChanged()), SLOT(toggleTrailers()));
+    connect(m_randomTrailerCheck, SIGNAL(valueChanged()),
+            SLOT(toggleTrailers()));
 
     m_randomTrailerCheck->SetHelpText(
                                 tr("If set, this will enable a button "
@@ -112,7 +125,8 @@ MetadataSettings::~MetadataSettings()
 
 void MetadataSettings::slotSave(void)
 {
-    gCoreContext->SaveSetting("mythvideo.TrailersRandomCount", m_trailerSpin->GetValue());
+    gCoreContext->SaveSetting("mythvideo.TrailersRandomCount",
+                              m_trailerSpin->GetValue());
 
     int listUnknownState = 0;
     if (m_unknownFileCheck->GetCheckState() == MythUIStateType::Full)

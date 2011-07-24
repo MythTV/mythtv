@@ -76,15 +76,15 @@ bool CdDecoder::initialize()
 
     if (!TOCfile.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_GENERAL,
-                "Unable to open Audio CD TOC file: " + TOCfile.fileName());
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unable to open Audio CD TOC file: " + TOCfile.fileName());
         return false;
     }
 
     if (!TOC.setContent(&TOCfile))
     {
-        VERBOSE(VB_GENERAL,
-                "Unable to parse Audio CD TOC file: " + TOCfile.fileName());
+        LOG(VB_GENERAL, LOG_ERR,
+            "Unable to parse Audio CD TOC file: " + TOCfile.fileName());
         TOCfile.close();
         return false;
     }
@@ -148,7 +148,7 @@ bool CdDecoder::initialize()
 
     QString hexID;
     hexID.setNum(m_diskID, 16);
-    VERBOSE(VB_MEDIA, QString("CD %1, ID=%2").arg(devicename).arg(hexID));
+    LOG(VB_MEDIA, LOG_INFO, QString("CD %1, ID=%2").arg(devicename).arg(hexID));
 
 
     // First erase any existing metadata:
@@ -205,8 +205,10 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
     QString URL2 = URL + queryID + "&hello=" + helloID + "&proto=5";
     QString cddb = HttpComms::getHttp(URL2);
 
-    //VERBOSE(VB_MEDIA, "CDDB lookup: " + URL);
-    //VERBOSE(VB_MEDIA, "...returned: " + cddb);
+#if 0
+    LOG(VB_MEDIA, LOG_INFO, "CDDB lookup: " + URL);
+    LOG(VB_MEDIA, LOG_INFO, "...returned: " + cddb);
+#endif
     //
     // e.g. "200 rock 960b5e0c Nichole Nordeman / Woven & Spun"
 
@@ -219,8 +221,10 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
 
     if (stat == 211)  // Multiple matches
     {
+        // TODO
         // Parse disks, put up dialog box, select disk, prune cddb to selected
-        VERBOSE(VB_MEDIA, "Multiple CDDB matches. Please implement this code");
+        LOG(VB_MEDIA, LOG_INFO,
+            "Multiple CDDB matches. Please implement this code");
     }
 
     if (stat == 200)  // One unique match
@@ -235,8 +239,10 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
         URL2 = URL + "cddb+read+" + genre + "+"
                + hexID + "&hello=" + helloID + "&proto=5";
         cddb = HttpComms::getHttp(URL2);
-        //VERBOSE(VB_MEDIA, "CDDB detail: " + URL2);
-        //VERBOSE(VB_MEDIA, "...returned: " + cddb);
+#if 0
+        LOG(VB_MEDIA, LOG_INFO, "CDDB detail: " + URL2);
+        LOG(VB_MEDIA, LOG_INFO, "...returned: " + cddb);
+#endif
 
         // Successful lookup.
         // Clear current titles (filenames), because we append to them
@@ -289,8 +295,8 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
                     }
                 }
                 else
-                    VERBOSE(VB_GENERAL,
-                            QString("CDDB returned %1 on a %2 track disk!")
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("CDDB returned %1 on a %2 track disk!")
                             .arg(trk+1).arg(totalTracks));
             }
 
@@ -375,8 +381,8 @@ Metadata* CdDecoder::getMetadata(int track)
 
     if (track < 1 || (uint)track > m_mData.size())
     {
-        VERBOSE(VB_GENERAL,
-                QString("CdDecoder::getMetadata(%1) - track out of range")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("CdDecoder::getMetadata(%1) - track out of range")
                 .arg(track));
         return NULL;
     }

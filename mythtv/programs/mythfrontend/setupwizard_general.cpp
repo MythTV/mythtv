@@ -49,7 +49,7 @@ bool GeneralSetupWizard::Create()
     if (!m_submitButton || !m_viewButton || !m_deleteButton ||
         !m_nextButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
@@ -185,7 +185,7 @@ void GeneralSetupWizard::slotView(void)
 
     QString url = m_hardwareProfile->GetProfileURL();
 
-    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Profile URL = %1").arg(url));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Profile URL = %1").arg(url));
 
     if (url.isEmpty())
         return;

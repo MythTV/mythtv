@@ -58,7 +58,7 @@ void MythNewsConfig::populateSites(void)
 
     if (!xmlFile.exists() || !xmlFile.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot open news-sites.xml");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot open news-sites.xml");
         return;
     }
 
@@ -71,8 +71,8 @@ void MythNewsConfig::populateSites(void)
     if (!domDoc.setContent(&xmlFile, false, &errorMsg,
                            &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Could not read content of news-sites.xml" +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Could not read content of news-sites.xml" +
                 QString("\n\t\t\tError parsing %1").arg(filename) +
                 QString("\n\t\t\tat line: %1  column: %2 msg: %3")
                 .arg(errorLine).arg(errorColumn).arg(errorMsg));
@@ -133,7 +133,7 @@ bool MythNewsConfig::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'config'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'config'");
         return false;
     }
 

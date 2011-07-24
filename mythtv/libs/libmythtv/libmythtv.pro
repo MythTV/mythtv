@@ -159,12 +159,12 @@ HEADERS += previewgenerator.h       previewgeneratorqueue.h
 HEADERS += transporteditor.h        listingsources.h
 HEADERS += myth_imgconvert.h
 HEADERS += channelgroup.h           channelgroupsettings.h
-HEADERS += recordingrule.h          programdetail.h
+HEADERS += recordingrule.h
 HEADERS += mythsystemevent.h
 HEADERS += avfringbuffer.h          ThreadedFileWriter.h
 HEADERS += ringbuffer.h             fileringbuffer.h
 HEADERS += dvdringbuffer.h          bdringbuffer.h
-HEADERS += streamingringbuffer.h
+HEADERS += streamingringbuffer.h    metadataimagehelper.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
@@ -187,12 +187,12 @@ SOURCES += previewgenerator.cpp     previewgeneratorqueue.cpp
 SOURCES += transporteditor.cpp
 SOURCES += channelgroup.cpp         channelgroupsettings.cpp
 SOURCES += myth_imgconvert.cpp
-SOURCES += recordingrule.cpp        programdetail.cpp
+SOURCES += recordingrule.cpp
 SOURCES += mythsystemevent.cpp
 SOURCES += avfringbuffer.cpp        ThreadedFileWriter.cpp
 SOURCES += ringbuffer.cpp           fileringBuffer.cpp
 SOURCES += dvdringbuffer.cpp        bdringbuffer.cpp
-SOURCES += streamingringbuffer.cpp
+SOURCES += streamingringbuffer.cpp  metadataimagehelper.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
@@ -251,7 +251,7 @@ SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
-inc.files += mythtvexp.h
+inc.files += mythtvexp.h            metadataimagehelper.h
 
 INSTALLS += inc
 
@@ -263,6 +263,7 @@ using_frontend {
     # Video playback
     HEADERS += tv_play.h                mythplayer.h
     HEADERS += mythdvdplayer.h          audioplayer.h
+    HEADERS += mythccextractorplayer.h  teletextextractorreader.h
     HEADERS += playercontext.h
     HEADERS += tv_play_win.h            deletemap.h
     HEADERS += mythcommflagplayer.h     commbreakmap.h
@@ -270,6 +271,7 @@ using_frontend {
     HEADERS += mythiowrapper.h          tvbrowsehelper.h
     SOURCES += tv_play.cpp              mythplayer.cpp
     SOURCES += mythdvdplayer.cpp        audioplayer.cpp
+    SOURCES += mythccextractorplayer.cpp teletextextractorreader.cpp
     SOURCES += playercontext.cpp
     SOURCES += tv_play_win.cpp          deletemap.cpp
     SOURCES += mythcommflagplayer.cpp   commbreakmap.cpp

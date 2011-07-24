@@ -12,11 +12,11 @@ MythFrontendCommandLineParser::MythFrontendCommandLineParser() :
 
 void MythFrontendCommandLineParser::LoadArguments(void)
 {
+    allowArgs();
     addHelp();
     addVersion();
     addWindowed(false);
     addSettingsOverride();
-    addVerbose();
     addGeometry();
     addDisplay();
     addUPnP();

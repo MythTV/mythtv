@@ -22,6 +22,14 @@
         <action>SETTINGS THEMECHOOSER</action>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/util_menu.xml -->
+    <button>
+        <type>SETUP_KEYS</type>
+        <text>Edit Keys</text>
+        <description>Change MythTV key bindings.</description>
+        <action>SETUP_KEYS</action>
+    </button>
+
     <button>
         <type>SETTINGS_AUDIOGENERAL</type>
         <text>Audio</text>
@@ -36,12 +44,25 @@
         <action>SCREENSETUPWIZARD</action>
     </button>
 
-    <!-- Keep this in synch with mythtv/themes/defaultmenu/util_menu.xml -->
     <button>
-        <type>SETUP_KEYS</type>
-        <text>Edit Keys</text>
-        <description>Change MythTV key bindings.</description>
-        <action>SETUP_KEYS</action>
+        <type>SETTINGS_SETUPWIZARD</type>
+        <text>Setup Wizard</text>
+        <description>Perform basic configuration tasks</description>
+        <action>SETTINGS SETUPWIZARD</action>
+    </button>
+
+    <button>
+        <type>SETTINGS_SYSTEM_EVENTS</type>
+        <text>System Event Handlers</text>
+        <description>Configure System Event handler commands</description>
+        <action>SYSTEM_EVENTS</action>
+    </button>
+
+    <button>
+        <type>SETTINGS_GRABBERS</type>
+        <text>Artwork and Data Sources</text>
+        <description>Configure sources of artwork and metadata</description>
+        <action>SETTINGS GRABBERS</action>
     </button>
 
     <button>

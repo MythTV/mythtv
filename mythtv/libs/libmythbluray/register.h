@@ -209,9 +209,10 @@ void bd_psr_reset_backup_registers(BD_REGISTERS *);
  */
 
 /* event types */
-#define BD_PSR_CHANGE  1
-#define BD_PSR_RESTORE 2
-#define BD_PSR_SAVE    3 /* single event, psr_idx and values undefined */
+#define BD_PSR_SAVE    1 /* backup player state. Single event, psr_idx and values undefined */
+#define BD_PSR_WRITE   2 /* write, value unchanged */
+#define BD_PSR_CHANGE  3 /* write, value changed */
+#define BD_PSR_RESTORE 4 /* restore backup values */
 
 /* event data */
 typedef struct {

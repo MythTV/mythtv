@@ -69,9 +69,6 @@ MythNews::MythNews(MythScreenStack *parent, QString name) :
     m_TimerTimeout = 10*60*1000;
     m_httpGrabber = NULL;
 
-    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-    m_dateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
-
     // Now do the actual work
     m_RetrieveTimer = new QTimer(this);
     connect(m_RetrieveTimer, SIGNAL(timeout()),
@@ -116,7 +113,7 @@ bool MythNews::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'news'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'news'");
         return false;
     }
 
@@ -150,11 +147,11 @@ void MythNews::clearSites(void)
     m_articles.clear();
     m_articlesList->Reset();
 
-    m_titleText->SetText("");
-    m_descText->SetText("");
+    m_titleText->Reset();
+    m_descText->Reset();
 
     if (m_updatedText)
-        m_updatedText->SetText("");
+        m_updatedText->Reset();
 
     if (m_downloadImage)
         m_downloadImage->Hide();
@@ -455,8 +452,8 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             QString text(tr("Updated") + " - ");
             QDateTime updated(site->lastUpdated());
             if (updated.toTime_t() != 0) {
-                text += site->lastUpdated().toString(m_dateFormat) + " ";
-                text += site->lastUpdated().toString(m_timeFormat);
+                text += MythDateTimeToString(site->lastUpdated(),
+                                             kDateTimeFull | kSimplify);
             }
             else
                 text += tr("Unknown");
@@ -859,7 +856,8 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
             cmdURL = QString("http://youtube.com/get_video.php"
                              "?video_id=%2&t=%1")
                 .arg(tArgString).arg(vidString);
-            VERBOSE(VB_GENERAL, LOC + QString("VideoURL '%1'").arg(cmdURL));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("VideoURL '%1'")
+                    .arg(cmdURL));
         }
     }
 

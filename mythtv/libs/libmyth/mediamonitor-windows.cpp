@@ -68,8 +68,7 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
 {
     if (!pDevice)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
-                 "Error - MediaMonitorWindows::AddDevice(null)");
+        LOG(VB_GENERAL, LOG_ERR, "MediaMonitorWindows::AddDevice(null)");
         return false;
     }
 

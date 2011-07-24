@@ -10,7 +10,6 @@
 #include "cc708decoder.h"
 
 #define LOC QString("CC708: ")
-#define LOC_ERR QString("CC708, Error: ")
 
 #define DEBUG_CAPTIONS         0
 #define DEBUG_CC_SERVICE       0
@@ -42,8 +41,10 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
 {
     if (DTVCC_PACKET_START == cc_type)
     {
-        //VERBOSE(VB_IMPORTANT, LOC + QString("CC ST data(0x%1 0x%2)")
-        //        .arg(data1,0,16).arg(data2,0,16));
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("CC ST data(0x%1 0x%2)")
+                .arg(data1,0,16).arg(data2,0,16));
+#endif
 
         if (partialPacket.size && reader)
             parse_cc_packet(reader, &partialPacket, last_seen);
@@ -54,8 +55,10 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
     }
     else if (DTVCC_PACKET_DATA == cc_type)
     {
-        //VERBOSE(VB_IMPORTANT, LOC + QString("CC Ex data(0x%1 0x%2)")
-        //        .arg(data1,0,16).arg(data2,0,16));
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("CC Ex data(0x%1 0x%2)")
+                .arg(data1,0,16).arg(data2,0,16));
+#endif
 
         partialPacket.data[partialPacket.size + 0] = data1;
         partialPacket.data[partialPacket.size + 1] = data2;

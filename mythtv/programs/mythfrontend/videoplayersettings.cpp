@@ -32,13 +32,16 @@ bool PlayerSettings::Create()
     if (!foundtheme)
         return false;
 
-    m_defaultPlayerEdit = dynamic_cast<MythUITextEdit *> (GetChild("defaultplayer"));
+    m_defaultPlayerEdit =
+        dynamic_cast<MythUITextEdit *> (GetChild("defaultplayer"));
     m_dvdPlayerEdit = dynamic_cast<MythUITextEdit *> (GetChild("dvdplayer"));
     m_dvdDriveEdit = dynamic_cast<MythUITextEdit *> (GetChild("dvddrive"));
-    m_blurayMountEdit = dynamic_cast<MythUITextEdit *> (GetChild("bluraymount"));
+    m_blurayMountEdit =
+        dynamic_cast<MythUITextEdit *> (GetChild("bluraymount"));
     m_altPlayerEdit = dynamic_cast<MythUITextEdit *> (GetChild("altplayer"));
 
-    m_blurayRegionList = dynamic_cast<MythUIButtonList *> (GetChild("blurayregionlist"));
+    m_blurayRegionList =
+        dynamic_cast<MythUIButtonList *> (GetChild("blurayregionlist"));
 
     m_altCheck = dynamic_cast<MythUICheckBox *> (GetChild("altcheck"));
 
@@ -46,21 +49,22 @@ bool PlayerSettings::Create()
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
     if (!m_defaultPlayerEdit || !m_dvdPlayerEdit || !m_blurayRegionList ||
-        !m_altCheck || !m_altPlayerEdit || !m_dvdDriveEdit || !m_blurayMountEdit ||
-        !m_okButton || !m_cancelButton)
+        !m_altCheck || !m_altPlayerEdit || !m_dvdDriveEdit ||
+        !m_blurayMountEdit || !m_okButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
 
-    int setting = gCoreContext->GetNumSetting("mythvideo.EnableAlternatePlayer", 0);
+    int setting =
+        gCoreContext->GetNumSetting("mythvideo.EnableAlternatePlayer", 0);
     if (setting == 1)
         m_altCheck->SetCheckState(MythUIStateType::Full);
 
     m_defaultPlayerEdit->SetText(gCoreContext->GetSetting("VideoDefaultPlayer",
                            "Internal"));
-    m_dvdPlayerEdit->SetText(gCoreContext->GetSetting("mythdvd.DVDPlayerCommand",
-                           "Internal"));
+    m_dvdPlayerEdit->SetText(gCoreContext->
+                           GetSetting("mythdvd.DVDPlayerCommand", "Internal"));
     m_dvdDriveEdit->SetText(gCoreContext->GetSetting("DVDDeviceLocation",
                            "default"));
     m_blurayMountEdit->SetText(gCoreContext->GetSetting("BluRayMountpoint",

@@ -14,7 +14,6 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addJob();
     addRecording();
     addSettingsOverride();
@@ -37,6 +36,8 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "Specifies the outputfile should be entirely keyframes.", "");
     add(QStringList( QStringList() << "-f" << "--fifodir" ), "fifodir", "",
             "Directory in which to write fifos to.", "");
+    add("--fifoinfo", "fifoinfo", false,
+            "Run in fifodir mode, but stop after displaying the fifo data format.", "");
     add("--fifosync", "fifosync", false, "Enforce fifo sync.", "");
     add("--passthrough", "passthru", false, "Pass through raw, unprocessed audio.", "");
     add(QStringList( QStringList() << "-b" << "--buildindex" ), "reindex", false,

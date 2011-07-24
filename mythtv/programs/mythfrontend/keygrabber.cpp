@@ -41,7 +41,7 @@ bool KeyGrabPopupBox::Create(void)
 
     if (!m_messageText || !m_okButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical elements.");
         return false;
     }
 

@@ -12,6 +12,7 @@
 #include "netutils.h"
 #include "mythcontext.h"
 #include "mythdirs.h"
+#include "util.h"
 
 using namespace std;
 
@@ -78,8 +79,7 @@ void ResultItem::toMap(MetadataMap &metadataMap)
     if (m_date.isNull())
         metadataMap["date"] = QString();
     else
-        metadataMap["date"] = m_date.toString(gCoreContext->
-           GetSetting("DateFormat", "yyyy-MM-dd hh:mm"));
+        metadataMap["date"] = MythDateTimeToString(m_date, kDateFull);
 
     if (m_time.toInt() == 0)
         metadataMap["length"] = QString();

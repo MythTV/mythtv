@@ -12,6 +12,7 @@
 #include "mythdialogbox.h"
 #include "util.h"
 #include "mythmainwindow.h"
+#include "mythlogging.h"
 
 //zoneminder
 #include "zmclient.h"
@@ -85,9 +86,9 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
     {
         ++count;
 
-        VERBOSE(VB_GENERAL, QString("Connecting to zm server: " 
-                "%1:%2 (try %3 of 10)").arg(m_hostname).arg(m_port)
-                                       .arg(count));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Connecting to zm server: %1:%2 (try %3 of 10)")
+                .arg(m_hostname).arg(m_port).arg(count));
         if (m_socket)
         {
             m_socket->DownRef();
@@ -141,11 +142,11 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, "Connection to mythzmserver lost");
+        LOG(VB_GENERAL, LOG_NOTICE, "Connection to mythzmserver lost");
 
         if (!connectToHost(m_hostname, m_port))
         {
-            VERBOSE(VB_IMPORTANT, "Re connection to mythzmserver failed");
+            LOG(VB_GENERAL, LOG_ERR, "Re connection to mythzmserver failed");
             return false;
         }
 
@@ -162,15 +163,17 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
     // the server sends "UNKNOWN_COMMAND" if it did not recognise the command
     if (strList[0] == "UNKNOWN_COMMAND")
     {
-        VERBOSE(VB_IMPORTANT, "Somethings is getting passed to the server that it doesn't understand");
+        LOG(VB_GENERAL, LOG_ERR, "Somethings is getting passed to the server "
+                                 "that it doesn't understand");
         return false;
     }
 
     // the server sends "ERROR" if it failed to process the command
     if (strList[0].startsWith("ERROR"))
     {
-        VERBOSE(VB_IMPORTANT, QString("The server failed to process the command. "
-                                      "The error was:- \n\t\t\t%1").arg(strList[0]));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("The server failed to process the command. "
+                    "The error was:- \n\t\t\t%1").arg(strList[0]));
         return false;
     }
 
@@ -186,7 +189,7 @@ bool ZMClient::checkProtoVersion(void)
     QStringList strList("HELLO");
     if (!sendReceiveStringList(strList))
     {
-        VERBOSE(VB_IMPORTANT, QString("Server didn't respond to 'HELLO'!!"));
+        LOG(VB_GENERAL, LOG_ERR, QString("Server didn't respond to 'HELLO'!!"));
 
         ShowOkPopup(tr("The mythzmserver didn't respond to our request "
                        "to get the protocol version!!"));
@@ -195,8 +198,9 @@ bool ZMClient::checkProtoVersion(void)
 
     if (strList[1] != ZM_PROTOCOL_VERSION)
     {
-        VERBOSE(VB_IMPORTANT, QString("Protocol version mismatch (plugin=%1, "
-                "mythzmserver=%2)").arg(ZM_PROTOCOL_VERSION).arg(strList[1]));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Protocol version mismatch (plugin=%1, mythzmserver=%2)")
+                .arg(ZM_PROTOCOL_VERSION).arg(strList[1]));
 
         ShowOkPopup(QString("The mythzmserver uses protocol version %1, "
                             "but this client only understands version %2. "
@@ -206,7 +210,8 @@ bool ZMClient::checkProtoVersion(void)
         return false;
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Using protocol version %1").arg(ZM_PROTOCOL_VERSION));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Using protocol version %1").arg(ZM_PROTOCOL_VERSION));
     return true;
 }
 
@@ -269,7 +274,8 @@ void ZMClient::getMonitorStatus(vector<Monitor*> *monitorList)
     int monitorCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "ZMClient received bad int in getMonitorStatus()");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient received bad int in getMonitorStatus()");
         return;
     }
 
@@ -303,15 +309,16 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
     int eventCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "ZMClient received bad int in getEventList()");
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient received bad int in getEventList()");
         return;
     }
 
     // sanity check 
     if ((int)(strList.size() - 2) / 6 != eventCount)
     {
-        VERBOSE(VB_IMPORTANT, "ZMClient got a mismatch between the number of events and "
-                "the expected number of stringlist items in getEventList()");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient got a mismatch between the number of events and "
+            "the expected number of stringlist items in getEventList()");
         return;
     }
 
@@ -350,15 +357,17 @@ void ZMClient::getEventDates(const QString &monitorName, bool oldestFirst,
     int dateCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "ZMClient received bad int in getEventDates()");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient received bad int in getEventDates()");
         return;
     }
 
     // sanity check 
     if ((int)(strList.size() - 3) != dateCount)
     {
-        VERBOSE(VB_IMPORTANT, "ZMClient got a mismatch between the number of dates and "
-                "the expected number of stringlist items in getEventDates()");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient got a mismatch between the number of dates and "
+            "the expected number of stringlist items in getEventDates()");
         return;
     }
 
@@ -383,15 +392,16 @@ void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
     int frameCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "ZMClient received bad int in getFrameList()");
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient received bad int in getFrameList()");
         return;
     }
 
     // sanity check
     if ((int)(strList.size() - 2) / 2 != frameCount)
     {
-        VERBOSE(VB_IMPORTANT, "ZMClient got a mismatch between the number of frames and "
-                "the expected number of stringlist items in getFrameList()");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient got a mismatch between the number of frames and "
+            "the expected number of stringlist items in getFrameList()");
         return;
     }
 
@@ -461,14 +471,15 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
         }
         else if (sret < 0 && m_socket->error() != MSocketDevice::NoError)
         {
-            VERBOSE(VB_GENERAL, QString("readData: Error, readBlock %1")
-                            .arg(m_socket->errorToString()));
+            LOG(VB_GENERAL, LOG_ERR, QString("readData: Error, readBlock %1")
+                    .arg(m_socket->errorToString()));
             m_socket->close();
             return false;
         }
         else if (!m_socket->isValid())
         {
-            VERBOSE(VB_IMPORTANT, "readData: Error, socket went unconnected");
+            LOG(VB_GENERAL, LOG_ERR,
+                "readData: Error, socket went unconnected");
             m_socket->close();
             return false;
         }
@@ -480,14 +491,15 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
                 if ((elapsed - errmsgtime) > 10000)
                 {
                     errmsgtime = elapsed;
-                    VERBOSE(VB_GENERAL, QString("m_socket->: Waiting for data: %1 %2")
-                                    .arg(read).arg(dataSize));
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("m_socket->: Waiting for data: %1 %2")
+                            .arg(read).arg(dataSize));
                 }
             }
 
             if (elapsed > 100000)
             {
-                VERBOSE(VB_GENERAL, "Error, readData timeout (readBlock)");
+                LOG(VB_GENERAL, LOG_ERR, "Error, readData timeout (readBlock)");
                 return false;
             }
 
@@ -520,7 +532,8 @@ void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, MythImage 
     unsigned char *data = new unsigned char[imageSize];
     if (!readData(data, imageSize))
     {
-        VERBOSE(VB_GENERAL, "ZMClient::getEventFrame(): Failed to get image data");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient::getEventFrame(): Failed to get image data");
         delete [] data;
         return;
     }
@@ -532,7 +545,8 @@ void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, MythImage 
     // extract the image data and create a MythImage from it
     if (!(*image)->loadFromData(data, imageSize, "JPEG"))
     {
-        VERBOSE(VB_GENERAL, "ZMClient::getEventFrame(): Failed to load image from data");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient::getEventFrame(): Failed to load image from data");
     }
 
     delete [] data;
@@ -557,7 +571,8 @@ void ZMClient::getAnalyseFrame(int monitorID, int eventID, int frameNo, QImage &
     unsigned char *data = new unsigned char[imageSize];
     if (!readData(data, imageSize))
     {
-        VERBOSE(VB_GENERAL, "ZMClient::getAnalyseFrame(): Failed to get image data");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient::getAnalyseFrame(): Failed to get image data");
         image = QImage();
     }
     else
@@ -565,7 +580,8 @@ void ZMClient::getAnalyseFrame(int monitorID, int eventID, int frameNo, QImage &
         // extract the image data and create a QImage from it
         if (!image.loadFromData(data, imageSize, "JPEG"))
         {
-            VERBOSE(VB_GENERAL, "ZMClient::getAnalyseFrame(): Failed to load image from data");
+            LOG(VB_GENERAL, LOG_ERR,
+                "ZMClient::getAnalyseFrame(): Failed to load image from data");
             image = QImage();
         }
     }
@@ -598,7 +614,8 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
 
     if (bufferSize < imageSize)
     {
-        VERBOSE(VB_GENERAL, "ZMClient::getLiveFrame(): Live frame buffer is too small!");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient::getLiveFrame(): Live frame buffer is too small!");
         return 0;
     }
 
@@ -608,7 +625,8 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
 
     if (!readData(buffer, imageSize))
     {
-        VERBOSE(VB_GENERAL, "ZMClient::getLiveFrame(): Failed to get image data");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient::getLiveFrame(): Failed to get image data");
         return 0;
     }
 
@@ -627,7 +645,8 @@ void ZMClient::getCameraList(QStringList &cameraList)
     int cameraCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "ZMClient received bad int in getCameraList()");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient received bad int in getCameraList()");
         return;
     }
 
@@ -649,7 +668,8 @@ void ZMClient::getMonitorList(vector<Monitor*> *monitorList)
     int monitorCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "ZMClient received bad int in getMonitorList()");
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient received bad int in getMonitorList()");
         return;
     }
 
@@ -674,11 +694,14 @@ void ZMClient::getMonitorList(vector<Monitor*> *monitorList)
             pallete += (char) ((item->palette >> 8) & 0xff);
             pallete += (char) ((item->palette >> 16) & 0xff);
             pallete += (char) ((item->palette >> 24) & 0xff);
-            VERBOSE(VB_IMPORTANT, QString("Monitor: %1 (%2) is using palette: %3 (%4)")
-                    .arg(item->name).arg(item->id).arg(item->palette).arg(pallete));
+            LOG(VB_GENERAL, LOG_NOTICE,
+                QString("Monitor: %1 (%2) is using palette: %3 (%4)")
+                    .arg(item->name).arg(item->id).arg(item->palette)
+                    .arg(pallete));
         }
         else
-            VERBOSE(VB_IMPORTANT, QString("Monitor: %1 (%2) is using palette: %3")
+            LOG(VB_GENERAL, LOG_NOTICE,
+                QString("Monitor: %1 (%2) is using palette: %3")
                     .arg(item->name).arg(item->id).arg(item->palette));
     }
 }

@@ -1,22 +1,16 @@
+// -*- Mode: c++ -*-
 
-#include "backendselect.h"
+#include <QCoreApplication>
 
-// libmyth
-#include "mythcontext.h"
-
-// libmythupnp
-#include "mythxmlclient.h"
-#include "configuration.h"
-
-// libmythui
+#include "mythuistatetype.h"
 #include "mythmainwindow.h"
 #include "mythdialogbox.h"
+#include "backendselect.h"
+#include "configuration.h"
+#include "mythxmlclient.h"
 #include "mythuibutton.h"
-#include "mythuistatetype.h"
-
-// qt
-#include <QApplication>
-#include <QHash>
+#include "mythlogging.h"
+#include "mythversion.h"
 
 BackendSelection::BackendSelection(MythScreenStack *parent, DatabaseParams *params,
                                    Configuration *conf, bool exitOnFinish)

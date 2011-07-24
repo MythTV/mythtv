@@ -9,7 +9,6 @@ using namespace std;
 #include <mmsystem.h>
 
 #define LOC QString("AOWin: ")
-#define LOC_ERR QString("AOWin, error: ")
 
 #ifndef WAVE_FORMAT_IEEE_FLOAT
 #define WAVE_FORMAT_IEEE_FLOAT 0x0003
@@ -289,8 +288,8 @@ int AudioOutputWin::GetVolumeChannel(int channel) const
             (HIWORD(dwVolume) / (0xffff / 100));
     }
 
-    VERBOSE(VB_AUDIO, QString("GetVolume(%1) %2 (%3)")
-                      .arg(channel).arg(Volume).arg(dwVolume));
+    LOG(VB_AUDIO, LOG_INFO, QString("GetVolume(%1) %2 (%3)")
+                                .arg(channel).arg(Volume).arg(dwVolume));
 
     return Volume;
 }

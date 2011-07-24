@@ -60,13 +60,10 @@ class MPUBLIC MusicCommon : public MythScreenType
     void playlistItemClicked(MythUIButtonListItem *item);
     void playlistItemSelected(MythUIButtonListItem *item);
 
-    void metadataChanged(void);
-
   protected:
 
     QString getTimeString(int exTime, int maxTime);
     void    updateProgressBar(void);
-    void    updateAlbumArtImage(Metadata *mdata);
     void    setTrackOnLCD(Metadata *mdata);
     void    editTrackInfo(Metadata *mdata);
     void    updateTrackInfo(Metadata *mdata);

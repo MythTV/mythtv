@@ -2,103 +2,191 @@
 #define EDITMETADATA_H_
 
 #include <iostream>
-//Added by qt3to4:
-#include <QPixmap>
-#include <QKeyEvent>
 using namespace std;
 
-#include <mythdialogs.h>
+#include <mythscreentype.h>
+#include "metadata.h"
 
 class Metadata;
-class ImageGridItem;
 class AlbumArtImages;
+class AlbumArtImage;
+class MythUIStateType;
+class MythUIImage;
+class MythUIButton;
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUICheckBox;
+class MythUISearchDialog;
 
-class EditMetadataDialog : public MythThemedDialog
+class EditMetadataCommon : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    EditMetadataDialog(Metadata       *source_metadata,
-                       MythMainWindow *parent,
-                       const QString  &window_name,
-                       const QString  &theme_filename,
-                       const char     *name = "EditMetadataDialog");
-    ~EditMetadataDialog();
+    EditMetadataCommon(MythScreenStack *parent, Metadata *source_metadata, const QString &name);
+    EditMetadataCommon(MythScreenStack *parent, const QString &name);
 
-    void keyPressEvent(QKeyEvent *e);
-    void wireUpTheme();
-    void fillWidgets();
-    void setSaveMetadataOnly();
+    ~EditMetadataCommon(void);
 
-  public slots:
+    bool CreateCommon(void);
 
-    void closeDialog();
-    void searchArtist();
-    void searchCompilationArtist();
-    void searchAlbum();
-    void searchGenre();
-    void incRating(bool up_or_down);
-    void showSaveMenu();
-    void saveToDatabase();
-    void saveToMetadata();
-    void saveAll();
-    void cancelPopup();
-    void editLostFocus();
+    bool keyPressEvent(QKeyEvent *event);
+
+    void setSaveMetadataOnly(void);
+
+  signals:
+    void metadataChanged(void);
+
+  protected slots:
+    void showSaveMenu(void);
+    void saveToDatabase(void);
+    void saveToMetadata(void);
+    void saveAll(void);
+    void cleanupAndClose(void);
+
+  protected:
+    bool hasMetadataChanged(void);
+    void updateMetadata(void);
+    void searchForAlbumImages(void);
+    void scanForImages(void);
+
+    static bool            metadataOnly;
+    static Metadata       *m_metadata, *m_sourceMetadata;
+
+    MythUIButton   *m_doneButton;
+};
+
+class EditMetadataDialog : public EditMetadataCommon
+{
+    Q_OBJECT
+
+  public:
+    EditMetadataDialog(MythScreenStack *parent, Metadata *source_metadata);
+    EditMetadataDialog(MythScreenStack *parent);
+    ~EditMetadataDialog(void);
+
+    bool Create(void);
+
+    bool keyPressEvent(QKeyEvent *event);
+    void customEvent(QEvent *event);
+
+  protected slots:
+    void searchArtist(void);
+    void searchCompilationArtist(void);
+    void searchAlbum(void);
+    void searchGenre(void);
+
+    void setArtist(QString artist);
+    void setCompArtist(QString compArtist);
+    void setAlbum(QString album);
+    void setGenre(QString genre);
+    void ratingSpinChanged(MythUIButtonListItem *item);
+
+    void artistLostFocus(void);
+    void albumLostFocus(void);
+    void genreLostFocus(void);
+
+    void incRating(void);
+    void decRating(void);
+
     void checkClicked(bool state);
-    void switchToMetadata(void);
+
     void switchToAlbumArt(void);
-    void switchToDBStats(void);
-    void gridItemChanged(ImageGridItem *item);
 
   private:
-
-    bool showList(QString caption, QString &value);
     void showMenu(void);
-    void updateImageGrid(void);
-    QPixmap *createScaledPixmap(QString filename, int width, int height,
-                                Qt::AspectRatioMode mode);
+    void fillWidgets(void);
+    QString findIcon(const QString &type, const QString &name);
 
-    bool                   metadataOnly;
-    Metadata *m_metadata, *m_sourceMetadata ;
-    MythPopupBox *popup;
+    void updateArtistImage(void);
+    void updateAlbumImage(void);
+    void updateGenreImage(void);
+
+    void updateRating(void);
+
+    void searchForArtistImages(void);
+    void searchForGenreImages(void);
 
     //
     //  GUI stuff
     //
-    UIRemoteEditType    *artist_edit;
-    UIRemoteEditType    *compilation_artist_edit;
-    UIRemoteEditType    *album_edit;
-    UIRemoteEditType    *title_edit;
-    UIRemoteEditType    *genre_edit;
-    UIRemoteEditType    *year_edit;
-    UIRemoteEditType    *track_edit;
+    MythUITextEdit    *m_artistEdit;
+    MythUITextEdit    *m_compArtistEdit;
+    MythUITextEdit    *m_albumEdit;
+    MythUITextEdit    *m_titleEdit;
+    MythUITextEdit    *m_genreEdit;
 
-    UITextType          *lastplay_text;
-    UITextType          *playcount_text;
-    UITextType          *filename_text;
+    MythUISpinBox     *m_yearSpin;
+    MythUISpinBox     *m_trackSpin;
+    MythUISpinBox     *m_ratingSpin;
 
-    UIRepeatedImageType *rating_image;
+    MythUIStateType   *m_ratingState;
+    MythUIButton      *m_incRatingButton;
+    MythUIButton      *m_decRatingButton;
 
-    UIPushButtonType    *searchartist_button;
-    UIPushButtonType    *searchcompilation_artist_button;
-    UIPushButtonType    *searchalbum_button;
-    UIPushButtonType    *searchgenre_button;
-    UIPushButtonType    *rating_button;
+    MythUIButton      *m_searchArtistButton;
+    MythUIButton      *m_searchCompArtistButton;
+    MythUIButton      *m_searchAlbumButton;
+    MythUIButton      *m_searchGenreButton;
 
-    UICheckBoxType      *compilation_check;
+    MythUIImage       *m_artistIcon;
+    MythUIImage       *m_albumIcon;
+    MythUIImage       *m_genreIcon;
 
-    UITextButtonType    *metadata_button;
-    UITextButtonType    *albumart_button;
-    UITextButtonType    *dbstatistics_button;
-    UITextButtonType    *done_button;
+    MythUICheckBox    *m_compilationCheck;
 
-    UIImageType         *coverart_image;
-    UIImageGridType     *coverart_grid;
-    UITextType          *imagetype_text;
-    UITextType          *imagefilename_text;
+    MythUIButton      *m_albumartButton;
+};
 
-    QStringList          searchList;
-    AlbumArtImages      *albumArt;
+class EditAlbumartDialog : public EditMetadataCommon
+{
+    Q_OBJECT
+
+  public:
+    EditAlbumartDialog(MythScreenStack *parent);
+    ~EditAlbumartDialog();
+
+    bool Create(void);
+
+    bool keyPressEvent(QKeyEvent *event);
+    void customEvent(QEvent *event);
+
+  signals:
+    void metadataChanged(void);
+
+  protected slots:
+    void switchToMetadata(void);
+    void showMenu(void);
+    void showTypeMenu(bool changeType = true);
+    void gridItemChanged(MythUIButtonListItem *item);
+
+    void rescanForImages(void);
+
+    void doRemoveImageFromTag(bool doIt);
+
+  private:
+    void updateImageGrid(void);
+    void copySelectedImageToTag(void);
+    void removeSelectedImageFromTag(void);
+    void startCopyImageToTag(void);
+    void copyImageToTag(ImageType imageType);
+    void doCopyImageToTag(const AlbumArtImage *image);
+    void removeCachedImage(const AlbumArtImage *image);
+
+    QString         m_imageFilename;
+    AlbumArtImages *m_albumArt;
+    bool            m_albumArtChanged;
+
+    //
+    //  GUI stuff
+    //
+    MythUIButton      *m_metadataButton;
+    MythUIButton      *m_doneButton;
+
+    MythUIImage       *m_coverartImage;
+    MythUIButtonList  *m_coverartList;
+    MythUIText        *m_imagetypeText;
+    MythUIText        *m_imagefilenameText;
 };
 
 #endif

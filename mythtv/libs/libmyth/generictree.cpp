@@ -6,8 +6,6 @@ using namespace std;
 #include "mythlogging.h"
 
 #define LOC      QString("*TreeList: ")
-#define LOC_WARN QString("*TreeList, Warning: ")
-#define LOC_ERR  QString("*TreeList, Error: ")
 
 class SortableGenericTreeList : public vector<GenericTree*>
 {
