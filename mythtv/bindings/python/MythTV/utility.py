@@ -473,12 +473,12 @@ class datetime( _pydatetime ):
                        '(:(?P<sec>[0-9]{2}))?'
                         '(?P<tz>Z|'
                             '(?P<tzdirec>[-+])'
-                            '(?P<tzhour>[0-9]{1,2}?)'
+                            '(?P<tzhour>[0-9]{1,2})'
                             '(:)?'
                             '(?P<tzmin>[0-9]{2})?'
                         ')?')
 
-    class tzinfo( _pytzinfo):
+    class _tzinfo( _pytzinfo):
         def __init__(self, direc='+', hr=0, min=0):
             if direc == '-':
                 hr = -1*int(hr)
@@ -509,11 +509,11 @@ class datetime( _pydatetime ):
             dt.append(0)
         if match.group('tz'):
             if match.group('tz') == 'Z':
-                tz = cls.tzinfo()
+                tz = cls._tzinfo()
             elif match.group('tzmin'):
-                tz = cls.tzinfo(*match.group('tzdirec','tzhour','tzmin'))
+                tz = cls._tzinfo(*match.group('tzdirec','tzhour','tzmin'))
             else:
-                tz = cls.tzinfo(*match.group('tzdirec','tzhour'))
+                tz = cls._tzinfo(*match.group('tzdirec','tzhour'))
             dt.append(0)
             dt.append(tz)
         return cls(*dt)
