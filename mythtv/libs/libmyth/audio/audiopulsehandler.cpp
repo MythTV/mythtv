@@ -1,3 +1,4 @@
+#include <QMutex>
 #include "mythlogging.h"
 #include "util.h"
 #include "audiopulsehandler.h"
