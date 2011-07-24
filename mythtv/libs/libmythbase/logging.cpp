@@ -16,6 +16,7 @@ using namespace std;
 
 #define _LogLevelNames_
 #include "mythlogging.h"
+#include "logging.h"
 #include "mythconfig.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
