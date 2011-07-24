@@ -161,8 +161,8 @@ LoggerBase::~LoggerBase()
 }
 
 
-FileLogger::FileLogger(char *filename) : LoggerBase(filename, 0),
-                                         m_opened(false), m_fd(-1)
+FileLogger::FileLogger(char *filename, bool quiet) : 
+        LoggerBase(filename, 0), m_opened(false), m_fd(-1), m_quiet(quiet)
 {
     if( !strcmp(filename, "-") )
     {
@@ -220,7 +220,7 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     pid_t               pid = getpid();
     pid_t               tid = 0;
 
-    if (!m_opened)
+    if (!m_opened || (m_quiet && item->level > LOG_ERR))
         return false;
 
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
@@ -919,12 +919,12 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
     logPropagateCalc();
 
     /* log to the console */
-    if( !quiet )
-        logger = new FileLogger((char *)"-");
+    logger = new FileLogger((char *)"-", quiet);
 
     /* Debug logfile */
     if( !logfile.isEmpty() )
-        logger = new FileLogger((char *)logfile.toLocal8Bit().constData());
+        logger = new FileLogger((char *)logfile.toLocal8Bit().constData(),
+                                false);
 
 #ifndef _WIN32
     /* Syslog */

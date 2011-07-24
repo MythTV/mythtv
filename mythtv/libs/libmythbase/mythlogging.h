@@ -151,13 +151,14 @@ class LoggerBase : public QObject {
 
 class FileLogger : public LoggerBase {
     public:
-        FileLogger(char *filename);
+        FileLogger(char *filename, bool quiet);
         ~FileLogger();
         bool logmsg(LoggingItem_t *item);
         void reopen(void);
     private:
         bool m_opened;
         int  m_fd;
+        bool m_quiet;
 };
 
 #ifndef _WIN32
