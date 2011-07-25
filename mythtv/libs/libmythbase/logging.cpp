@@ -1071,8 +1071,6 @@ int syslogGetFacility(QString facility)
 
 LogLevel_t logLevelGet(QString level)
 {
-    int i;
-
     QMutexLocker locker(&loglevelMapMutex);
 
     for( LoglevelMap::iterator it = loglevelMap.begin();
