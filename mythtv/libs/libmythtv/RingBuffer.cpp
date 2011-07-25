@@ -1270,6 +1270,8 @@ void RingBuffer::run(void)
 
         int used = kBufferSize - ReadBufFree();
 
+        bool reads_were_allowed = readsallowed;
+
         if ((0 == read_return) || (numfailures > 5) ||
             (readsallowed != (used >= fill_min || ateof ||
                               setswitchtonext || commserror)))
@@ -1312,7 +1314,7 @@ void RingBuffer::run(void)
 
         VERBOSE(VB_FILE|VB_EXTRA, LOC + "@ end of read ahead loop");
 
-        if (readsallowed || commserror || ateof || setswitchtonext ||
+        if (!readsallowed || commserror || ateof || setswitchtonext ||
             (wanttoread <= used && wanttoread > 0))
         {
             // To give other threads a good chance to handle these
@@ -1326,10 +1328,18 @@ void RingBuffer::run(void)
         else
         {
             // yield if we have nothing to do...
-            if (!request_pause &&
+            if (!request_pause && reads_were_allowed &&
                 (used >= fill_threshold || ateof || setswitchtonext))
             {
-                generalWait.wait(&rwlock, 1000);
+                generalWait.wait(&rwlock, 100);
+            }
+            else if (readsallowed)
+            { // if reads are allowed release the lock and yield so the
+              // reader gets a chance to read before the buffer is full.
+                generalWait.wakeAll();
+                rwlock.unlock();
+                usleep(5 * 1000);
+                rwlock.lockForRead();            
             }
         }
     }
