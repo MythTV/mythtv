@@ -19,7 +19,7 @@ using namespace std;
 
 DeviceReadBuffer::DeviceReadBuffer(ReaderPausedCB *cb, bool use_poll)
     : videodevice(""),              _stream_fd(-1),
-      readerPausedCB(cb),
+      readerPausedCB(cb),           thread_exists(false),
 
       // Data for managing the device ringbuffer
       run(false),                   running(false),
@@ -41,6 +41,8 @@ DeviceReadBuffer::DeviceReadBuffer(ReaderPausedCB *cb, bool use_poll)
 
 DeviceReadBuffer::~DeviceReadBuffer()
 {
+    if (thread_exists)
+        Stop();
     if (buffer)
         delete[] buffer;
 }
@@ -95,15 +97,14 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd)
 
 void DeviceReadBuffer::Start(void)
 {
-    bool was_running;
+    QMutexLocker locker(&thread_lock);
 
     {
         QMutexLocker locker(&lock);
-        was_running = running;
         error = false;
     }
 
-    if (was_running)
+    if (thread_exists)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Start(): Already running.");
         SetRequestPause(false);
@@ -117,7 +118,10 @@ void DeviceReadBuffer::Start(void)
 
         QMutexLocker locker(&lock);
         error = true;
+        return;
     }
+
+    thread_exists = true;
 }
 
 void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
@@ -137,9 +141,9 @@ void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
 
 void DeviceReadBuffer::Stop(void)
 {
-    bool was_running = IsRunning();
+    QMutexLocker locker(&thread_lock);
 
-    if (!was_running)
+    if (!thread_exists)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Stop(): Not running.");
         return;
@@ -151,6 +155,7 @@ void DeviceReadBuffer::Stop(void)
     }
 
     pthread_join(thread, NULL);
+    thread_exists = false;
 }
 
 void DeviceReadBuffer::SetRequestPause(bool req)
