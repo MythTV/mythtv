@@ -20,7 +20,7 @@ static inline void setup_pipe(int mypipe[2], long myflags[2])
     int pipe_ret = pipe(mypipe);
     if (pipe_ret < 0)
     {
-        LOG(VB_GENERAL, LOG_CRIT, "Failed to open pipes" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, "Failed to open pipes" + ENO);
         mypipe[0] = mypipe[1] = -1;
     }
     else
@@ -31,12 +31,12 @@ static inline void setup_pipe(int mypipe[2], long myflags[2])
         {
             int ret = fcntl(mypipe[0], F_SETFL, flags|O_NONBLOCK);
             if (ret < 0)
-                LOG(VB_GENERAL, LOG_CRIT,
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("Set pipe flags error") + ENO);
         }
         else
         {
-            LOG(VB_GENERAL, LOG_CRIT, QString("Get pipe flags error") + ENO);
+            LOG(VB_GENERAL, LOG_ERR, QString("Get pipe flags error") + ENO);
         }
 
         for (uint i = 0; i < 2; i++)
