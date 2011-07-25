@@ -149,7 +149,7 @@
                         <area>16,242,92,25</area>
                         <align>left</align>
                     </textarea>
-                    <textarea name="startdate" from="starttime">
+                    <textarea name="shortstartdate" from="starttime">
                         <area>108,242,132,25</area>
                         <align>right</align>
                     </textarea>
@@ -176,7 +176,7 @@
                     <textarea name="starttime">
                         <area>20,274,100,25</area>
                     </textarea>
-                    <textarea name="startdate">
+                    <textarea name="shortstartdate">
                         <area>130,274,138,25</area>
                     </textarea>
                     <statetype name="jobstate">
