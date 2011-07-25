@@ -284,7 +284,7 @@ bool MetadataDownload::TelevisionGrabberWorks()
 
     if (!ret)
         LOG(VB_GENERAL, LOG_INFO,
-            QString("Movie grabber not functional.  Aborting this run."));
+            QString("Television grabber not functional.  Aborting this run."));
 
     return ret;
 }
