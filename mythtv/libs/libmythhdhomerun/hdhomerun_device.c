@@ -129,7 +129,7 @@ struct hdhomerun_device_t *hdhomerun_device_create(uint32_t device_id, uint32_t 
 {
 	struct hdhomerun_device_t *hd = (struct hdhomerun_device_t *)calloc(1, sizeof(struct hdhomerun_device_t));
 	if (!hd) {
-		hdhomerun_debug_printf(hd->dbg, "hdhomerun_device_create: failed to allocate device object\n");
+		hdhomerun_debug_printf(dbg, "hdhomerun_device_create: failed to allocate device object\n");
 		return NULL;
 	}
 
