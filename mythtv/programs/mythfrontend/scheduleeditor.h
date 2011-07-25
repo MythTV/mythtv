@@ -261,6 +261,8 @@ class MetadataOptions : public MythScreenType
 
     void HandleDownloadedImages(MetadataLookup *lookup);
 
+    bool CanSetArtwork(void);
+
     void customEvent(QEvent *event);
 
     RecordingInfo   *m_recInfo;

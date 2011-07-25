@@ -1532,6 +1532,9 @@ void MetadataOptions::OnImageSearchListSelection(ArtworkInfo info,
 
 void MetadataOptions::SelectLocalFanart()
 {
+    if (!CanSetArtwork())
+        return;
+
     QString url = generate_file_url("Fanart",
                   gCoreContext->GetMasterHostName(),
                   "");
@@ -1540,6 +1543,9 @@ void MetadataOptions::SelectLocalFanart()
 
 void MetadataOptions::SelectLocalCoverart()
 {
+    if (!CanSetArtwork())
+        return;
+
     QString url = generate_file_url("Coverart",
                   gCoreContext->GetMasterHostName(),
                   "");
@@ -1548,6 +1554,9 @@ void MetadataOptions::SelectLocalCoverart()
 
 void MetadataOptions::SelectLocalBanner()
 {
+    if (!CanSetArtwork())
+        return;
+
     QString url = generate_file_url("Banners",
                   gCoreContext->GetMasterHostName(),
                   "");
@@ -1650,8 +1659,25 @@ QStringList MetadataOptions::GetSupportedImageExtensionFilter()
     return ret;
 }
 
+bool MetadataOptions::CanSetArtwork()
+{
+    if (m_inetrefEdit->GetText().isEmpty())
+    {
+        ShowOkPopup(tr("You must set a reference number "
+               "on this rule to set artwork.  For items "
+               "without a metadata source, you can set "
+               "any unique value."));
+        return false;
+    }
+
+    return true;
+}
+
 void MetadataOptions::FindNetArt(VideoArtworkType type)
 {
+    if (!CanSetArtwork())
+        return;
+
     m_lookup = new MetadataLookup();
 
     QString msg = tr("Searching for available artwork...");
