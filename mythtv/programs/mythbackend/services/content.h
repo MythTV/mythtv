@@ -50,13 +50,8 @@ class Content : public ContentServices
                                                   int Season, int Width,
                                                   int Height);
 
-        QFileInfo           GetVideoCoverart    ( int Id, int Width, int Height );
-
-        QFileInfo           GetVideoFanart      ( int Id, int Width, int Height );
-
-        QFileInfo           GetVideoBanner      ( int Id, int Width, int Height );
-
-        QFileInfo           GetVideoScreenshot  ( int Id, int Width, int Height );
+        QFileInfo           GetVideoArtwork     ( const QString   &Type,
+                                                  int Id, int Width, int Height );
 
         QFileInfo           GetAlbumArt         ( int Id, int Width, int Height );
 

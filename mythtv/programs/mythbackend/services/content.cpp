@@ -255,156 +255,56 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetVideoCoverart( int nId, int nWidth, int nHeight )
+QFileInfo Content::GetVideoArtwork( const QString &sType,
+                                    int nId, int nWidth, int nHeight )
 {
-    LOG(VB_UPNP, LOG_INFO, QString("GetVideoCoverart ID = %1").arg(nId));
+    LOG(VB_UPNP, LOG_INFO, QString("GetVideoArtwork ID = %1").arg(nId));
+
+    QString sgroup = "Coverart";
+    QString column = "coverfile";
+
+    if (sType.toLower() == "coverart")
+    {
+        sgroup = "Coverart";
+        column = "coverfile";
+    }
+    else if (sType.toLower() == "fanart")
+    {
+        sgroup = "Fanart";
+        column = "fanart";
+    }
+    else if (sType.toLower() == "banner")
+    {
+        sgroup = "Banners";
+        column = "banner";
+    }
+    else if (sType.toLower() == "screenshot")
+    {
+        sgroup = "Screenshots";
+        column = "screenshot";
+    }
 
     // ----------------------------------------------------------------------
-    // Read Video poster file path from database
+    // Read Video artwork file path from database
     // ----------------------------------------------------------------------
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT coverfile FROM videometadata WHERE intid = :ITEMID");
+    QString querystr = QString("SELECT %1 FROM videometadata WHERE "
+                               "intid = :ITEMID").arg(column);
+
+    query.prepare(querystr);
     query.bindValue(":ITEMID", nId);
 
     if (!query.exec())
-        MythDB::DBError("GetVideoCoverart ", query);
+        MythDB::DBError("GetVideoArtwork ", query);
 
     if (!query.next())
         return QFileInfo();
 
     QString sFileName = query.value(0).toString();
 
-    // ----------------------------------------------------------------------
-    // check to see if albumart image is already created.
-    // ----------------------------------------------------------------------
-
-    if (QFile::exists( sFileName ))
-        return QFileInfo( sFileName );
-
-    // ----------------------------------------------------------------------
-    // Not there? Perhaps we need to look in a storage group?
-    // ----------------------------------------------------------------------
-
-    return GetImageFile( "Coverart", sFileName, nWidth, nHeight );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QFileInfo Content::GetVideoFanart( int nId, int nWidth, int nHeight )
-{
-    LOG(VB_UPNP, LOG_INFO, QString("GetVideoFanart ID = %1").arg(nId));
-
-    // ----------------------------------------------------------------------
-    // Read Video fanart file path from database
-    // ----------------------------------------------------------------------
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT fanart FROM videometadata WHERE intid = :ITEMID");
-    query.bindValue(":ITEMID", nId);
-
-    if (!query.exec())
-        MythDB::DBError("GetVideoFanart ", query);
-
-    if (!query.next())
-        return QFileInfo();
-
-    QString sFileName = query.value(0).toString();
-
-    // ----------------------------------------------------------------------
-    // check to see if albumart image is already created.
-    // ----------------------------------------------------------------------
-
-    if (QFile::exists( sFileName ))
-        return QFileInfo( sFileName );
-
-    // ----------------------------------------------------------------------
-    // Not there? Perhaps we need to look in a storage group?
-    // ----------------------------------------------------------------------
-
-    return GetImageFile( "Fanart", sFileName, nWidth, nHeight );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QFileInfo Content::GetVideoBanner( int nId, int nWidth, int nHeight )
-{
-    LOG(VB_UPNP, LOG_INFO, QString("GetVideoBanner ID = %1").arg(nId));
-
-    // ----------------------------------------------------------------------
-    // Read Video Banner file path from database
-    // ----------------------------------------------------------------------
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT banner FROM videometadata WHERE intid = :ITEMID");
-    query.bindValue(":ITEMID", nId);
-
-    if (!query.exec())
-        MythDB::DBError("GetVideoBanner ", query);
-
-    if (!query.next())
-        return QFileInfo();
-
-    QString sFileName = query.value(0).toString();
-
-    // ----------------------------------------------------------------------
-    // check to see if albumart image is already created.
-    // ----------------------------------------------------------------------
-
-    if (QFile::exists( sFileName ))
-        return QFileInfo( sFileName );
-
-    // ----------------------------------------------------------------------
-    // Not there? Perhaps we need to look in a storage group?
-    // ----------------------------------------------------------------------
-
-    return GetImageFile( "Banner", sFileName, nWidth, nHeight );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QFileInfo Content::GetVideoScreenshot( int nId, int nWidth, int nHeight )
-{
-    LOG(VB_UPNP, LOG_INFO, QString("GetVideoScreenshot ID = %1").arg(nId));
-
-    // ----------------------------------------------------------------------
-    // Read Video Screenshot file path from database
-    // ----------------------------------------------------------------------
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT screenshot FROM videometadata WHERE intid = :ITEMID");
-    query.bindValue(":ITEMID", nId);
-
-    if (!query.exec())
-        MythDB::DBError("GetVideoScreenshot ", query);
-
-    if (!query.next())
-        return QFileInfo();
-
-    QString sFileName = query.value(0).toString();
-
-    // ----------------------------------------------------------------------
-    // check to see if albumart image is already created.
-    // ----------------------------------------------------------------------
-
-    if (QFile::exists( sFileName ))
-        return QFileInfo( sFileName );
-
-    // ----------------------------------------------------------------------
-    // Not there? Perhaps we need to look in a storage group?
-    // ----------------------------------------------------------------------
-
-    return GetImageFile( "Screenshot", sFileName, nWidth, nHeight );
+    return GetImageFile( sgroup, sFileName, nWidth, nHeight );
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -48,7 +48,7 @@
 class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.2" );
+    Q_CLASSINFO( "version"    , "1.3" );
     Q_CLASSINFO( "DownloadFile_Method",            "POST" )
 
     public:
@@ -76,13 +76,9 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
                                                           int Season, int Width,
                                                           int Height ) = 0;
 
-        virtual QFileInfo           GetVideoCoverart    ( int Id, int Width, int Height ) = 0;
-
-        virtual QFileInfo           GetVideoFanart      ( int Id, int Width, int Height ) = 0;
-
-        virtual QFileInfo           GetVideoBanner      ( int Id, int Width, int Height ) = 0;
-
-        virtual QFileInfo           GetVideoScreenshot  ( int Id, int Width, int Height ) = 0;
+        virtual QFileInfo           GetVideoArtwork     ( const QString   &Type,
+                                                          int Id, int Width,
+                                                          int Height ) = 0;
 
         virtual QFileInfo           GetAlbumArt         ( int Id, int Width, int Height ) = 0;
 
