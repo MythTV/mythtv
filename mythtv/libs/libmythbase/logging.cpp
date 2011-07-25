@@ -1072,6 +1072,12 @@ int syslogGetFacility(QString facility)
 LogLevel_t logLevelGet(QString level)
 {
     QMutexLocker locker(&loglevelMapMutex);
+    if (!verboseInitialized)
+    {
+        locker.unlock();
+        verboseInit();
+        locker.relock();
+    }
 
     for( LoglevelMap::iterator it = loglevelMap.begin();
          it != loglevelMap.end(); it++)
@@ -1087,6 +1093,12 @@ LogLevel_t logLevelGet(QString level)
 QString logLevelGetName(LogLevel_t level)
 {
     QMutexLocker locker(&loglevelMapMutex);
+    if (!verboseInitialized)
+    {
+        locker.unlock();
+        verboseInit();
+        locker.relock();
+    }
     LoglevelMap::iterator it = loglevelMap.find((int)level);
 
     if ( it == loglevelMap.end() )
