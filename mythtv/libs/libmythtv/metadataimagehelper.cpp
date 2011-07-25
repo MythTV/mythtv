@@ -105,6 +105,9 @@ bool SetArtwork(const QString &inetref,
                        const QString &host,
                        const ArtworkMap map)
 {
+    if (inetref.isEmpty())
+        return false;
+
     QString coverart, fanart, banner;
 
     QUrl coverurl(map.value(kArtworkCoverart).url);
