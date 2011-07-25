@@ -391,6 +391,14 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
         sMimeType = "video/x-ms-dvr";
     }
 
+    // If we are dealing with a Sony Blu-ray player then we fake the
+    // MIME type to force the video to appear
+    if ( pRequest->m_eClient == CDS_ClientSonyDB )
+    {
+        sMimeType = "video/avi";
+    }
+
+
     // DLNA string below is temp fix for ps3 seeking.
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
     QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
