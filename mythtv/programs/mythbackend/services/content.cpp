@@ -151,7 +151,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
         return QFileInfo();
     }
 
-    QString sNewFileName = QString( "%1.%2x%3.png" )
+    QString sNewFileName = QString( "%1.%2x%3.jpg" )
                               .arg( sFullFileName )
                               .arg( nWidth    )
                               .arg( nHeight   );
@@ -187,7 +187,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
                                 Qt::SmoothTransformation);
 
     QByteArray fname = sNewFileName.toAscii();
-    img.save( fname.constData(), "PNG" );
+    img.save( fname.constData(), "JPG", 60 );
 
     delete pImage;
 
