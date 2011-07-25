@@ -39,19 +39,24 @@ class Content : public ContentServices
         QFileInfo           GetFile             ( const QString   &StorageGroup,
                                                   const QString   &FileName );
 
+        QFileInfo           GetImageFile        ( const QString   &StorageGroup,
+                                                  const QString   &FileName,
+                                                  int Width, int Height );
+
         QStringList         GetFileList         ( const QString   &StorageGroup );
 
         QFileInfo           GetRecordingArtwork ( const QString   &Type,
                                                   const QString   &Inetref,
-                                                  int Season );
+                                                  int Season, int Width,
+                                                  int Height);
 
-        QFileInfo           GetVideoCoverart    ( int Id );
+        QFileInfo           GetVideoCoverart    ( int Id, int Width, int Height );
 
-        QFileInfo           GetVideoFanart      ( int Id );
+        QFileInfo           GetVideoFanart      ( int Id, int Width, int Height );
 
-        QFileInfo           GetVideoBanner      ( int Id );
+        QFileInfo           GetVideoBanner      ( int Id, int Width, int Height );
 
-        QFileInfo           GetVideoScreenshot  ( int Id );
+        QFileInfo           GetVideoScreenshot  ( int Id, int Width, int Height );
 
         QFileInfo           GetAlbumArt         ( int Id, int Width, int Height );
 

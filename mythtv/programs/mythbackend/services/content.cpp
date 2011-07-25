@@ -96,6 +96,108 @@ QFileInfo Content::GetFile( const QString &sStorageGroup,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QFileInfo Content::GetImageFile( const QString &sStorageGroup,
+                            const QString &sFileName,
+                            int nWidth,
+                            int nHeight)
+{
+    QString sGroup = sStorageGroup;
+
+    if (sGroup.isEmpty())
+    {
+        LOG(VB_UPNP, LOG_WARNING,
+            "GetFile - StorageGroup missing... using 'Default'");
+        sGroup = "Default";
+    }
+
+    if (sFileName.isEmpty())
+    {
+        QString sMsg ( "GetFile - FileName missing." );
+
+        LOG(VB_UPNP, LOG_ERR, sMsg);
+
+        throw sMsg;
+    }
+
+    // ------------------------------------------------------------------
+    // Search for the filename
+    // ------------------------------------------------------------------
+
+    StorageGroup storage( sGroup );
+    QString sFullFileName = storage.FindFile( sFileName );
+
+    if (sFullFileName.isEmpty())
+    {
+        LOG(VB_UPNP, LOG_ERR,
+            QString("GetImageFile - Unable to find %1.").arg(sFileName));
+
+        return QFileInfo();
+    }
+
+    // ----------------------------------------------------------------------
+    // check to see if the file (still) exists
+    // ----------------------------------------------------------------------
+
+    if ((nWidth == 0) && (nHeight == 0))
+    {
+        if (QFile::exists( sFullFileName ))
+        {
+            return QFileInfo( sFullFileName );
+        }
+
+        LOG(VB_UPNP, LOG_ERR,
+            QString("GetImageFile - File Does not exist %1.").arg(sFullFileName));
+
+        return QFileInfo();
+    }
+
+    QString sNewFileName = QString( "%1.%2x%3.png" )
+                              .arg( sFullFileName )
+                              .arg( nWidth    )
+                              .arg( nHeight   );
+
+    // ----------------------------------------------------------------------
+    // check to see if image is already created.
+    // ----------------------------------------------------------------------
+
+    if (QFile::exists( sNewFileName ))
+        return QFileInfo( sNewFileName );
+
+    // ----------------------------------------------------------------------
+    // Must generate Generate Image and save.
+    // ----------------------------------------------------------------------
+
+    float fAspect = 0.0;
+
+    QImage *pImage = new QImage( sFullFileName);
+
+    if (!pImage)
+        return QFileInfo();
+
+    if (fAspect <= 0)
+           fAspect = (float)(pImage->width()) / pImage->height();
+
+    if ( nWidth == 0 )
+        nWidth = (int)rint(nHeight * fAspect);
+
+    if ( nHeight == 0 )
+        nHeight = (int)rint(nWidth / fAspect);
+
+    QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
+                                Qt::SmoothTransformation);
+
+    QByteArray fname = sNewFileName.toAscii();
+    img.save( fname.constData(), "PNG" );
+
+    delete pImage;
+
+    return QFileInfo( sNewFileName );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QStringList Content::GetFileList( const QString &sStorageGroup )
 {
 
@@ -118,7 +220,9 @@ QStringList Content::GetFileList( const QString &sStorageGroup )
 
 QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
                                          const QString   &sInetref,
-                                         int nSeason )
+                                         int nSeason,
+                                         int nWidth,
+                                         int nHeight)
 {
     ArtworkMap map = GetArtwork(sInetref, nSeason);
 
@@ -144,14 +248,14 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
     QUrl url(map.value(type).url);
     QString sFileName = url.path();
 
-    return GetFile( sgroup, sFileName );
+    return GetImageFile( sgroup, sFileName, nWidth, nHeight);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetVideoCoverart( int nId )
+QFileInfo Content::GetVideoCoverart( int nId, int nWidth, int nHeight )
 {
     LOG(VB_UPNP, LOG_INFO, QString("GetVideoCoverart ID = %1").arg(nId));
 
@@ -183,14 +287,14 @@ QFileInfo Content::GetVideoCoverart( int nId )
     // Not there? Perhaps we need to look in a storage group?
     // ----------------------------------------------------------------------
 
-    return GetFile( "Coverart", sFileName );
+    return GetImageFile( "Coverart", sFileName, nWidth, nHeight );
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetVideoFanart( int nId )
+QFileInfo Content::GetVideoFanart( int nId, int nWidth, int nHeight )
 {
     LOG(VB_UPNP, LOG_INFO, QString("GetVideoFanart ID = %1").arg(nId));
 
@@ -222,14 +326,14 @@ QFileInfo Content::GetVideoFanart( int nId )
     // Not there? Perhaps we need to look in a storage group?
     // ----------------------------------------------------------------------
 
-    return GetFile( "Fanart", sFileName );
+    return GetImageFile( "Fanart", sFileName, nWidth, nHeight );
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetVideoBanner( int nId )
+QFileInfo Content::GetVideoBanner( int nId, int nWidth, int nHeight )
 {
     LOG(VB_UPNP, LOG_INFO, QString("GetVideoBanner ID = %1").arg(nId));
 
@@ -261,14 +365,14 @@ QFileInfo Content::GetVideoBanner( int nId )
     // Not there? Perhaps we need to look in a storage group?
     // ----------------------------------------------------------------------
 
-    return GetFile( "Banner", sFileName );
+    return GetImageFile( "Banner", sFileName, nWidth, nHeight );
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetVideoScreenshot( int nId )
+QFileInfo Content::GetVideoScreenshot( int nId, int nWidth, int nHeight )
 {
     LOG(VB_UPNP, LOG_INFO, QString("GetVideoScreenshot ID = %1").arg(nId));
 
@@ -300,7 +404,7 @@ QFileInfo Content::GetVideoScreenshot( int nId )
     // Not there? Perhaps we need to look in a storage group?
     // ----------------------------------------------------------------------
 
-    return GetFile( "Screenshot", sFileName );
+    return GetImageFile( "Screenshot", sFileName, nWidth, nHeight );
 }
 
 /////////////////////////////////////////////////////////////////////////////
