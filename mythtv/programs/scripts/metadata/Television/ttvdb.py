@@ -133,6 +133,7 @@ __version__="1.1.3"
 # Version 1.1.1 Make XML output the default.
 # Version 1.1.2 Convert version information to XML
 # Version 1.1.3 Implement fuzzy matching for episode name lookup
+# Version 1.1.4 Add test mode (replaces --toprated)
 
 usage_txt='''
 Usage: ttvdb.py usage: ttvdb -hdruviomMPFBDS [parameters]
@@ -147,6 +148,7 @@ Options:
   -r, --raw             Dump raw data only
   -u, --usage           Display examples for executing the ttvdb script
   -v, --version         Display version and author
+  -t                    Test mode, to check for installed dependencies
   -i, --interactive     Interaction mode (allows selection of a specific
                         Series)
   -c FILE, --configure=FILE
@@ -156,7 +158,6 @@ Options:
                         back to english if nothing found (e.g. 'es' Español,
                         'de' Deutsch ... etc)
   -n, --num_seasons     Return the season numbers for a series
-  -t, --toprated        Only return the top rated graphics for a TV Series
   -m, --mythvideo       Conform to mythvideo standards when processing -M, -P,
                         -F and -D
   -M, --list            Get matching TV Series list
@@ -1084,8 +1085,8 @@ def main():
                         help=u"Select data that matches the specified language fall back to english if nothing found (e.g. 'es' Español, 'de' Deutsch ... etc)")
     parser.add_option(  "-n", "--num_seasons", action="store_true", default=False, dest="num_seasons",
                         help=u"Return the season numbers for a series")
-    parser.add_option(  "-t", "--toprated", action="store_true", default=False, dest="toprated",
-                        help=u"Only return the top rated graphics for a TV Series")
+    parser.add_option(  "-t", action="store_true", default=False, dest="test",
+                        help=u"Test for the availability of runtime dependencies")
     parser.add_option(  "-m", "--mythvideo", action="store_true", default=False, dest="mythvideo",
                         help=u"Conform to mythvideo standards when processing -M, -P, -F and -D")
     parser.add_option(  "-M", "--list", action="store_true", default=False, dest="list",
@@ -1105,6 +1106,11 @@ def main():
 
     opts, series_season_ep = parser.parse_args()
 
+
+    # Test mode, if we've made it here, everything is ok
+    if opts.test:
+        print "Everything appears to be in order"
+        sys.exit(0)
 
     # Make everything unicode utf8
     for index in range(len(series_season_ep)):
@@ -1382,7 +1388,6 @@ def main():
         opts.fanart = True
         opts.banner = True
         single_option = True
-        opts.toprated = False
         fanart, banner, poster = (True, True, True)
     else:
         y=0
@@ -1393,33 +1398,6 @@ def main():
             y+=1
         if opts.banner==True:
             y+=1
-
-    # Determine if only top rated by thetvdb.com graphics has been requested:
-    if opts.toprated == True:
-        series_name=''
-        if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
-            series_name=override[series_season_ep[0].lower()][0] # Override series name
-        else:
-            series_name=series_season_ep[0] # Leave the series name alone
-        if opts.poster==True:
-            if search_for_series(t, series_name)['poster'] != None:
-                if single_option==True:
-                    print (search_for_series(t, series_name)['poster']).replace(http_find, http_replace)
-                else:
-                    print u"Coverart:%s" % (search_for_series(t, series_name)['poster']).replace(http_find, http_replace)
-        if opts.fanart==True:
-            if search_for_series(t, series_name)['fanart'] != None:
-                if single_option==True:
-                    print (search_for_series(t, series_name)['fanart']).replace(http_find, http_replace)
-                else:
-                    print u"Fanart:%s" % (search_for_series(t, series_name)['fanart']).replace(http_find, http_replace)
-        if opts.banner==True:
-            if search_for_series(t, series_name)['banner'] != None:
-                if single_option==True:
-                    print (search_for_series(t, series_name)['banner']).replace(http_find, http_replace)
-                else:
-                    print u"Banner:%s" % (search_for_series(t, series_name)['banner']).replace(http_find, http_replace)
-        sys.exit(0) # Only the top rated for a TV Series is returned
 
     if (poster==True and opts.poster==True and opts.raw!=True): # Get posters and send to stdout
         season_poster_found = False
