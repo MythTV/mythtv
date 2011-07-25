@@ -35,6 +35,7 @@
 #include "httprequest.h"
 #include "util.h"
 #include "mythdownloadmanager.h"
+#include "metadataimagehelper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -109,6 +110,41 @@ QStringList Content::GetFileList( const QString &sStorageGroup )
     StorageGroup sgroup(sStorageGroup);
 
     return sgroup.GetFileList("", true);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
+                                         const QString   &sInetref,
+                                         int nSeason )
+{
+    ArtworkMap map = GetArtwork(sInetref, nSeason);
+
+    VideoArtworkType type = kArtworkCoverart;
+    QString sgroup;
+
+    if (sType.toLower() == "coverart")
+    {
+        sgroup = "Coverart";
+        type = kArtworkCoverart;
+    }
+    else if (sType.toLower() == "fanart")
+    {
+        sgroup = "Fanart";
+        type = kArtworkFanart;
+    }
+    else if (sType.toLower() == "banner")
+    {
+        sgroup = "Banners";
+        type = kArtworkBanner;
+    }
+
+    QUrl url(map.value(type).url);
+    QString sFileName = url.path();
+
+    return GetFile( sgroup, sFileName );
 }
 
 /////////////////////////////////////////////////////////////////////////////

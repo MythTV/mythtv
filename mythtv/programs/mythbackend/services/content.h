@@ -41,6 +41,10 @@ class Content : public ContentServices
 
         QStringList         GetFileList         ( const QString   &StorageGroup );
 
+        QFileInfo           GetRecordingArtwork ( const QString   &Type,
+                                                  const QString   &Inetref,
+                                                  int Season );
+
         QFileInfo           GetVideoCoverart    ( int Id );
 
         QFileInfo           GetVideoFanart      ( int Id );
