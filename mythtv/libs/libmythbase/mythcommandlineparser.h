@@ -162,7 +162,8 @@ class MBASE_PUBLIC MythCommandLineParser
     void addGeometry(void);
     void addDisplay(void);
     void addUPnP(void);
-    void addLogging(void);
+    void addLogging(const QString &defaultVerbosity = "general",
+                    LogLevel_t defaultLogLevel = LOG_INFO);
     void addPIDFile(void);
     void addJob(void);
 
