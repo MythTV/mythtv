@@ -13,6 +13,8 @@ class LookerUpper : public QObject
     LookerUpper();
     ~LookerUpper();
 
+    bool AllOK() { return m_metadataFactory->VideoGrabbersFunctional(); };
+
     bool StillWorking();
 
     void HandleSingleRecording(const uint chanid,

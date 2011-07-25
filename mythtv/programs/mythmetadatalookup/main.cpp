@@ -192,6 +192,17 @@ int main(int argc, char *argv[])
         JobQueue::GetJobInfoFromID(jobid, type, chanid, starttime);
     }
 
+    LOG(VB_GENERAL, LOG_INFO,
+            "Testing grabbers and metadata sites for functionality...");
+    if (!lookup->AllOK())
+    {
+        delete lookup;
+        delete gContext;
+        return GENERIC_EXIT_NOT_OK;
+    }
+    LOG(VB_GENERAL, LOG_INFO,
+            "All grabbers tested and working.  Continuing...");
+
     if (refreshall)
     {
         lookup->CopyRuleInetrefsToRecordings();
