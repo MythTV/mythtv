@@ -60,7 +60,7 @@ DeviceReadBuffer::~DeviceReadBuffer()
 {
     if (buffer)
         delete[] buffer;
-    if (isRunning())
+    if (isRunning() || dorun)
         Stop();
 }
 
@@ -124,7 +124,7 @@ void DeviceReadBuffer::Start(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- begin");
 
-    if (isRunning())
+    if (isRunning() || dorun)
     {
         {
             QMutexLocker locker(&lock);
@@ -144,8 +144,9 @@ void DeviceReadBuffer::Start(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- middle");
 
-    while (!IsRunning())
-        usleep(5000);
+    QMutexLocker locker(&lock);
+    while (dorun && !running)
+        runWait.wait(locker.mutex(), 100);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- end");
 }
@@ -305,6 +306,7 @@ void DeviceReadBuffer::IncrWritePointer(uint len)
     max_used = max(used, max_used);
     avg_used = ((avg_used * avg_cnt) + used) / ++avg_cnt;
 #endif
+    dataWait.wakeAll();
 }
 
 void DeviceReadBuffer::IncrReadPointer(uint len)
@@ -323,6 +325,7 @@ void DeviceReadBuffer::run(void)
     lock.lock();
     dorun   = true;
     running = true;
+    runWait.wakeAll();
     lock.unlock();
 
     if (using_poll)
@@ -379,6 +382,10 @@ void DeviceReadBuffer::run(void)
     lock.lock();
     running = false;
     eof     = true;
+    runWait.wakeAll();
+    dataWait.wakeAll();
+    pauseWait.wakeAll();
+    unpauseWait.wakeAll();
     lock.unlock();
 
     threadDeregister();
@@ -661,8 +668,6 @@ uint DeviceReadBuffer::WaitForUnused(uint needed) const
  */
 uint DeviceReadBuffer::WaitForUsed(uint needed, uint max_wait) const
 {
-    QWaitCondition dataWait;
-
     MythTimer timer;
     timer.start();
 
