@@ -1,3 +1,28 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# smolt - Fedora hardware profiler
+#
+# Copyright (C) 2008 James Meyer <james.meyer@operamail.com>
+# Copyright (C) 2008 Yaakov M. Nemoy <loupgaroublond@gmail.com>
+# Copyright (C) 2009 Carlos Gonçalves <mail@cgoncalves.info>
+# Copyright (C) 2009 François Cami <fcami@fedoraproject.org>
+# Copyright (C) 2010 Mike McGrath <mmcgrath@redhat.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
+
 import os
 import re
 from UserDict import UserDict
@@ -112,10 +137,20 @@ def get_os_info():
           text = text
         elif path_to_file.endswith('version'):
           text = distro_name + ' ' + text
+          #check /etc/issue for signs of ubuntu
+          if distro_name == "Debian GNU/Linux":
+                fd = open('/etc/issue.net')
+                text_u = fd.read().strip()
+                fd.close()
+                if text.find("Ubuntu"):
+                        text = text_u
+
         elif path_to_file.endswith('aurox-release'):
           text = distro_name
         elif path_to_file.endswith('lfs-release'):
           text = distro_name + ' ' + text
+        elif path_to_file.endswith('arch-release'):
+          text = "Arch Linux"
         elif path_to_file.endswith('SuSE-release'):
           text = file(path_to_file).read().split('\n')[0].strip()
           retext = re.compile('\(\w*\)$')

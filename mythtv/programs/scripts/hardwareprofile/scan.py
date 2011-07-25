@@ -1,6 +1,7 @@
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2007 Mike McGrath
+# Copyright (C) 2011 Sebastian Pipping <sebastian@pipping.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,36 +18,16 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import smolt
-from request import ConnSetup, Request
-
-import json
-import urllib
-import urllib2
+import simplejson, urllib
 from i18n import _
-import config
+from smolt_config import get_config_attr
 
-h = None
-
-def hardware():
-    # Singleton pattern
-    global h
-    if h == None:
-        h = smolt.Hardware()
-    return h
-
-def get_config_attr(attr, default=""):
-    if hasattr(config, attr):
-        return getattr(config, attr)
-    else:
-        return default
-
-def rating(profile, smoonURL):
+def rating(profile, smoonURL, gate):
     print ""
     print _("Current rating for vendor/model.")
     print ""
-    req = Request('/client/host_rating?vendor=%s&system=%s' % (urllib.quote(hardware().host.systemVendor),
-                                                               urllib.quote(hardware().host.systemModel)))
-    r = json.load(req.open())['ratings']
+    scanURL='%s/client/host_rating?vendor=%s&system=%s' % (smoonURL, urllib.quote(profile.host.systemVendor), urllib.quote(profile.host.systemModel))
+    r = simplejson.load(urllib.urlopen(scanURL))['ratings']
     rating_system = { '0' : _('Unrated/Unknown'),
                       '1' : _('Non-working'),
                       '2' : _('Partially-working'),
@@ -59,10 +40,10 @@ def rating(profile, smoonURL):
     for rate in r:
         print "\t%s\t%s" % (r[rate], rating_system[rate])
 
-def scan(profile, smoonURL):
+def scan(profile, smoonURL, gate):
     print _("Scanning %s for known errata.\n" % smoonURL)
     devices = []
-    for VendorID, DeviceID, SubsysVendorID, SubsysDeviceID, Bus, Driver, Type, Description in hardware().deviceIter():
+    for VendorID, DeviceID, SubsysVendorID, SubsysDeviceID, Bus, Driver, Type, Description in profile.deviceIter():
         if VendorID:
             devices.append('%s/%04x/%04x/%04x/%04x' % (Bus,
                                              int(VendorID or 0),
@@ -70,14 +51,14 @@ def scan(profile, smoonURL):
                                              int(SubsysVendorID or 0),
                                              int(SubsysDeviceID or 0)) )
     searchDevices = 'NULLPAGE'
-    devices.append('System/%s/%s' % ( urllib.quote(hardware().host.systemVendor), urllib.quote(hardware().host.systemModel) ))
+    devices.append('System/%s/%s' % ( urllib.quote(profile.host.systemVendor), urllib.quote(profile.host.systemModel) ))
     for dev in devices:
         searchDevices = "%s|%s" % (searchDevices, dev)
+    scanURL='%s/smolt-w/api.php' % smoonURL
+    scanData = 'action=query&titles=%s&format=json' % searchDevices
     try:
-        req = Request('/smolt-w/api.php')
-        req.add_data('action=query&titles=%s&format=json' % searchDevices)
-        r = json.load(req.open())
-    except urllib2.HTTPError:
+         r = simplejson.load(urllib.urlopen(scanURL, scanData))
+    except ValueError:
         print "Could not wiki for errata!"
         return
     found = []
@@ -98,16 +79,9 @@ def scan(profile, smoonURL):
         print _("\tbenefit")
       
 if __name__ == "__main__":  
-    # read the profile
+    from gate import create_passing_gate
+    gate = create_passing_gate()
     smoonURL = get_config_attr("SMOON_URL", "http://smolts.org/")
-    ConnSetup(smoonURL)
-    try:
-        profile = smolt.Hardware()
-    except smolt.SystemBusError, e:
-        error(_('Error:') + ' ' + e.msg)
-        if e.hint is not None:
-            error('\t' + _('Hint:') + ' ' + e.hint)
-        sys.exit(8)
-    scan(profile, smoonURL)
-    rating(profile, smoonURL)
-
+    profile = smolt.create_profile(gate, smolt.read_uuid())
+    scan(profile, smoonURL, gate)
+    rating(profile, smoonURL, gate)

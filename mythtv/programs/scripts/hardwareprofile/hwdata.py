@@ -1,3 +1,25 @@
+# -*- coding: utf-8 -*-
+
+# smolt - Fedora hardware profiler
+#
+# Copyright (C) 2010 Mike McGrath <mmcgrath@redhat.com>
+# Copyright (C) 2011 Alexandre Rostovtsev <tetromino@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
+
+from smolt_config import get_config_attr
 
 class myVendor(object):
     def __init__(self):
@@ -20,19 +42,28 @@ class DeviceMap:
         self.vendors['usb'] = self.device_map('usb')
 
     def device_map(self, bus='pci'):
-        fns = ['/usr/share/%s.ids' % bus,
-               '/usr/share/hwdata/%s.ids' % bus,
-               '/usr/share/misc/%s.ids' % bus]
-        for fn in fns:
-            try:
-                fo = open(fn, 'r')
-                break
-            except IOError:
-                pass
+        import os
+        HWDATA_DIRS = [ get_config_attr("HWDATA_DIR"), '/usr/share/hwdata','/usr/share/misc' ]
+        for hwd_file in HWDATA_DIRS:
+            fn = "%s/%s.ids" % (hwd_file, bus)
+            if os.path.isfile(fn + ".gz"):
+                import gzip
+                try:
+                    fo = gzip.open(fn + ".gz", 'r')
+                    break
+                except IOError:
+                    pass
+            else:
+                try:
+                    fo = open(fn, 'r')
+                    break
+                except IOError:
+                    pass
         else:
-            raise Exception('Hardware data not found')
-	
-        fo = open(fn, 'r')
+            raise Exception('Hardware data file not found.  Please set the location HWDATA_DIR in config.py')
+         
+            
+            
         vendors = {}
         curvendor = None
         curdevice = None

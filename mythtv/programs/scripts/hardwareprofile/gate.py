@@ -21,12 +21,22 @@ import ConfigParser
 import os
 import logging
 
-class _Gate:
-    def __init__(self, the_only_config_file):
-        config_files = (the_only_config_file == None) and \
-                ['/etc/smolt/client.cfg',
-                    os.path.expanduser('~/.smolt/client.cfg')] or \
-                [the_only_config_file]
+
+class _GateBase:
+    def process(self, data_set, value_if_granted, value_else):
+        if self.grants(data_set):
+            return value_if_granted
+        else:
+            return value_else
+
+
+class _Gate(_GateBase):
+    def __init__(self, config_files=None):
+        if config_files is None:
+            config_files = [
+                '/etc/smolt/client.cfg',
+                os.path.expanduser('~/.smolt/client.cfg'),
+            ]
         self.config = ConfigParser.ConfigParser()
         self.config.read(config_files)
 
@@ -51,24 +61,42 @@ class _Gate:
             # Allow if in doubt - backwards compat
             return True
 
-    def process(self, data_set, value_if_granted, value_else):
-        if self.grants(data_set):
-            return value_if_granted
-        else:
-            return value_else
 
-_gate = None
+class _FakeGate(_GateBase):
+    def __init__(self, grant):
+        """
+        >>> gate = _FakeGate(grant=True)
+        >>> gate.grants("whatever")
+        True
+        >>> gate = _FakeGate(grant=False)
+        >>> gate.grants("whatever")
+        False
+        """
+        self._granted = grant
 
-def Gate():
-    """Simple singleton wrapper with lazy initialization"""
-    global _gate
-    if _gate == None:
-        _gate = _Gate(None)
-    return _gate
+    def grants(self, *args):
+        return self._granted
 
-def GateFromConfig(the_only_config_file):
-    """Simple singleton wrapper with lazy initialization"""
-    global _gate
-    if _gate == None:
-        _gate = _Gate(the_only_config_file)
-    return _gate
+
+def create_default_gate():
+    return _Gate()
+
+
+def create_gate_from_file(filename):
+    return _Gate([filename, ])
+
+
+def create_passing_gate():
+    """
+    >>> create_passing_gate().grants("whatever")
+    True
+    """
+    return _FakeGate(grant=True)
+
+
+def create_blocking_gate():
+    """
+    >>> create_blocking_gate().grants("whatever")
+    False
+    """
+    return _FakeGate(grant=False)

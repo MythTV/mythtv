@@ -63,12 +63,7 @@ class _UuidDb:
         self._flush()
 
 
-_uuid_db_instance = None
-def UuidDb():
-    """Simple singleton wrapper with lazy initialization"""
-    global _uuid_db_instance
-    if _uuid_db_instance == None:
-        import config
-        from smolt import get_config_attr
-        _uuid_db_instance =  _UuidDb(get_config_attr("UUID_DB", os.path.expanduser('~/.smolt/uuiddb.cfg')))
-    return _uuid_db_instance
+def create_default_uuiddb():
+    from smolt_config import get_config_attr
+    _database_filename = get_config_attr("UUID_DB", os.path.expanduser('~/.smolt/uuiddb.cfg'))
+    return _UuidDb(_database_filename)
