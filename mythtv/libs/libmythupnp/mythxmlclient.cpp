@@ -21,6 +21,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include "mythversion.h"
 #include "mythxmlclient.h"
 #include "mythlogging.h"
 
@@ -89,6 +90,19 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
         pParams->wolReconnect = GetNodeValue( wolNode, "Reconnect", 0        );
         pParams->wolRetry     = GetNodeValue( wolNode, "Retry"    , 0        );
         pParams->wolCommand   = GetNodeValue( wolNode, "Command"  , QString());
+
+        QDomNode verNode = oNode.namedItem( "Version" );
+
+        pParams->verVersion   = GetNodeValue( verNode, "Version"  , ""       );
+        pParams->verBranch    = GetNodeValue( verNode, "Branch"   , ""       );
+        pParams->verProtocol  = GetNodeValue( verNode, "Protocol" , ""       );
+        pParams->verBinary    = GetNodeValue( verNode, "Binary"   , ""       );
+        pParams->verSchema    = GetNodeValue( verNode, "Schema"   , ""       );
+
+        if ((pParams->verProtocol != MYTH_PROTO_VERSION) ||
+            (pParams->verSchema   != MYTH_DATABASE_VERSION))
+            // incompatible version, we cannot use this backend
+            return UPnPResult_ActionFailed;
 
         return UPnPResult_Success;
     }

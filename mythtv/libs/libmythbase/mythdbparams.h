@@ -21,6 +21,12 @@ struct MBASE_PUBLIC DatabaseParams
     int     wolReconnect;       ///< seconds to wait for reconnect
     int     wolRetry;           ///< times to retry to reconnect
     QString wolCommand;         ///< command to use for wake-on-lan
+
+    QString verVersion;         ///< git version string
+    QString verBranch;          ///< git branch
+    QString verProtocol;        ///< backend protocol
+    QString verBinary;          ///< binary library version
+    QString verSchema;          ///< core schema version
 };
 
 #endif
