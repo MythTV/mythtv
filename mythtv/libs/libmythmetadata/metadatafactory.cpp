@@ -608,9 +608,7 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
         // weird combination of both, we've got to try everything.
         RecordingRule *rule = new RecordingRule();
         rule->LoadByProgram(pginfo);
-        int ruleepisode = 0;
-        if (rule && rule->Load())
-            ruleepisode = rule->m_episode;
+        int ruleepisode = rule->m_episode;
         delete rule;
 
         if (ruleepisode == 0 && pginfo->GetEpisode() == 0 &&
