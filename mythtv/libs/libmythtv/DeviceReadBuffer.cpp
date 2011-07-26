@@ -18,7 +18,7 @@ using namespace std;
 #define LOC_ERR QString("DevRdB(%1) Error: ").arg(videodevice)
 
 DeviceReadBuffer::DeviceReadBuffer(ReaderPausedCB *cb, bool use_poll)
-    : videodevice(QString::null),   _stream_fd(-1),
+    : videodevice(""),              _stream_fd(-1),
       readerPausedCB(cb),
 
       // Data for managing the device ringbuffer
@@ -53,6 +53,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd)
         delete[] buffer;
 
     videodevice   = streamName;
+    videodevice   = (videodevice == QString::null) ? "" : videodevice;
     _stream_fd    = streamfd;
 
     // BEGIN HACK -- see #6897
@@ -124,6 +125,7 @@ void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
     QMutexLocker locker(&lock);
 
     videodevice   = streamName;
+    videodevice   = (videodevice == QString::null) ? "" : videodevice;
     _stream_fd    = streamfd;
 
     used          = 0;
