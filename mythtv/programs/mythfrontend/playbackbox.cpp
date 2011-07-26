@@ -770,15 +770,9 @@ void PlaybackBox::UpdateUIListItem(
             m_groupList->GetItemCurrent()->GetData().toString();
 
         QString tempSubTitle  = extract_subtitle(*pginfo, groupname);
-        QString tempShortDate = MythDateTimeToString(pginfo->GetRecordingStartTime(),
-                                                     kDateShort);
-        QString tempLongDate  = MythDateTimeToString(pginfo->GetRecordingStartTime(),
-                                                     kDateFull | kSimplify);
 
         if (groupname == pginfo->GetTitle().toLower())
             item->SetText(tempSubTitle, "titlesubtitle");
-        item->SetText(tempLongDate, "longdate");
-        item->SetText(tempShortDate, "shortdate");
     }
 
     // Recording and availability status
