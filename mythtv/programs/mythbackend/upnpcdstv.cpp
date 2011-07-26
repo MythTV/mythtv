@@ -160,7 +160,7 @@ void UPnpCDSTv::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams )
     int     nChanId    = mapParams[ "ChanId"    ].toInt();
     QString sStartTime = mapParams[ "StartTime" ];
 
-    QString sSQL = QString( "%1 WHERE chanid=:CHANID and starttime=:STARTTIME " )
+    QString sSQL = QString("%1 WHERE chanid=:CHANID AND starttime=:STARTTIME ")
                       .arg( GetItemListSQL() );
 
     query.prepare( sSQL );
@@ -386,7 +386,8 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     // If we are dealing with Window Media Player 12 (i.e. Windows 7)
     // then fake the Mime type to place the recorded TV in the
     // recorded TV section.
-    if (pRequest->m_eClient == CDS_ClientWMP && pRequest->m_nClientVersion >= 12.0)
+    if (pRequest->m_eClient == CDS_ClientWMP &&
+        pRequest->m_nClientVersion >= 12.0)
     {
         sMimeType = "video/x-ms-dvr";
     }
@@ -409,6 +410,15 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     uint uiStart = dtProgStart.toTime_t();
     uint uiEnd   = dtProgEnd.toTime_t();
     uint uiDur   = uiEnd - uiStart;
+    
+    MSqlQuery query2(MSqlQuery::InitCon());
+    query2.prepare( "SELECT data FROM recordedmarkup WHERE chanid=:CHANID AND "
+                    "starttime=:STARTTIME AND type = 33" );
+    query2.bindValue(":CHANID", (int)nChanid);
+    query2.bindValue(":STARTTIME", dtProgStart.toString("yyyy/MM/dd hh:mm:ss"));
+    query2.exec();
+    if (query2.next())
+        uiDur = query2.value(0).toUInt() / 1000;
 
     QString sDur;
 
@@ -417,6 +427,7 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
                   (uiDur / 60) % 60,
                    uiDur % 60);
 
+    LOG(VB_UPNP, LOG_DEBUG, "Duration: " + sDur );
 
     pRes->AddAttribute( "duration"  , sDur      );
     pRes->AddAttribute( "size"      , QString::number( nFileSize) );
