@@ -93,6 +93,7 @@ static MediaRenderer  *g_pUPnp   = NULL;
 static MythPluginManager *pmanager = NULL;
 
 static void handleExit(bool prompt);
+static void resetAllKeys(void);
 
 namespace
 {
@@ -1266,7 +1267,8 @@ static void InitJumpPoints(void)
          "", "", startGuide, "GUIDE");
      REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "Program Finder"),
          "", "", startFinder, "FINDER");
-     //REG_JUMP("Search Listings", "", "", startSearch);
+     //REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Search Listings"),
+     //    "", "", startSearch);
      REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "Manage Recordings / "
          "Fix Conflicts"), "", "", startManaged, "VIEWSCHEDULED");
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Program Recording "
@@ -1303,6 +1305,46 @@ static void InitJumpPoints(void)
      REG_JUMP("Play Disc", QT_TRANSLATE_NOOP("MythControls",
          "Play an Optical Disc"), "", playDisc);
 
+     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Borders"),
+         "", "", setDebugShowBorders, false);
+     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Names"),
+         "", "", setDebugShowNames, false);
+     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Reset All Keys"),
+         QT_TRANSLATE_NOOP("MythControls", "Reset all keys to defaults"),
+         "", resetAllKeys, false);
+}
+
+static void ReloadJumpPoints(void)
+{
+    MythMainWindow *mainWindow = GetMythMainWindow();
+    mainWindow->ClearJump("Reload Theme");
+    mainWindow->ClearJump("Main Menu");
+    mainWindow->ClearJump("Program Guide");
+    mainWindow->ClearJump("Program Finder");
+    //mainWindow->ClearJump("Search Listings");
+    mainWindow->ClearJump("Manage Recordings / Fix Conflicts");
+    mainWindow->ClearJump("Program Recording Priorities");
+    mainWindow->ClearJump("Manage Recording Rules");
+    mainWindow->ClearJump("Channel Recording Priorities");
+    mainWindow->ClearJump("TV Recording Playback");
+    mainWindow->ClearJump("TV Recording Deletion");
+    mainWindow->ClearJump("Live TV");
+    mainWindow->ClearJump("Live TV In Guide");
+    mainWindow->ClearJump("Status Screen");
+    mainWindow->ClearJump("Previously Recorded");
+    mainWindow->ClearJump("Video Default");
+    mainWindow->ClearJump("Video Manager");
+    mainWindow->ClearJump("Video Browser");
+    mainWindow->ClearJump("Video Listings");
+    mainWindow->ClearJump("Video Gallery");
+    mainWindow->ClearJump("Play Disc");
+    mainWindow->ClearJump("Toggle Show Widget Borders");
+    mainWindow->ClearJump("Toggle Show Widget Names");
+    InitJumpPoints();
+}
+
+static void InitKeys(void)
+{
      REG_KEY("Video","PLAYALT", QT_TRANSLATE_NOOP("MythControls",
          "Play selected item in alternate player"), "ALT+P");
      REG_KEY("Video","FILTER", QT_TRANSLATE_NOOP("MythControls",
@@ -1323,22 +1365,56 @@ static void InitJumpPoints(void)
          "Go to the first video"), "Home");
      REG_KEY("Video","END", QT_TRANSLATE_NOOP("MythControls",
          "Go to the last video"), "End");
-     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-         "MythDVD DVD Media Handler"), "", "", handleDVDMedia,
-         MEDIATYPE_DVD, QString::null);
+}
 
-     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Borders"),
-         "", "", setDebugShowBorders, false);
-     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Names"),
-         "", "", setDebugShowNames, false);
+static void ReloadKeys(void)
+{
+    GetMythMainWindow()->ClearKeyContext("Video");
+    InitKeys();
 
-    TV::InitKeys();
+    TV::ReloadKeys();
+}
 
+static void SetFuncPtrs(void)
+{
     TV::SetFuncPtr("playbackbox", (void *)PlaybackBox::RunPlaybackBox);
     TV::SetFuncPtr("viewscheduled", (void *)ViewScheduled::RunViewScheduled);
     TV::SetFuncPtr("programguide", (void *)GuideGrid::RunProgramGuide);
     TV::SetFuncPtr("programfinder", (void *)RunProgramFinder);
     TV::SetFuncPtr("scheduleeditor", (void *)ScheduleEditor::RunScheduleEditor);
+}
+
+/**
+ *  \brief Deletes all key bindings and jump points for this host
+ */
+static void clearAllKeys(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM keybindings "
+                  "WHERE hostname = :HOSTNAME;");
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+    if (!query.exec())
+        MythDB::DBError("Deleting keybindings", query);
+    query.prepare("DELETE FROM jumppoints "
+                  "WHERE hostname = :HOSTNAME;");
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+    if (!query.exec())
+        MythDB::DBError("Deleting jumppoints", query);
+}
+
+/**
+ *  \brief Reset this host's key bindings and jump points to default values
+ */
+static void resetAllKeys(void)
+{
+    clearAllKeys();
+    // Reload MythMainWindow bindings
+    GetMythMainWindow()->ReloadKeys();
+    // Reload Jump Points
+    ReloadJumpPoints();
+    // Reload mythfrontend and TV bindings
+    ReloadKeys();
 }
 
 
@@ -1361,6 +1437,9 @@ static int internal_media_init()
 {
     REG_MEDIAPLAYER("Internal", QT_TRANSLATE_NOOP("MythControls",
         "MythTV's native media player."), internal_play_media);
+    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+        "MythDVD DVD Media Handler"), "", "", handleDVDMedia,
+        MEDIATYPE_DVD, QString::null);
     return 0;
 }
 
@@ -1544,9 +1623,12 @@ int main(int argc, char **argv)
 
     // Refresh Global/Main Menu keys after DB update in case there was no DB
     // when they were written originally
-    mainWindow->ResetKeys();
+    mainWindow->ReloadKeys();
 
     InitJumpPoints();
+    InitKeys();
+    TV::InitKeys();
+    SetFuncPtrs();
 
     internal_media_init();
 

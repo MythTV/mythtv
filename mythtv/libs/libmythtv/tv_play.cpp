@@ -763,7 +763,7 @@ void TV::InitKeys(void)
 */
 }
 
-void TV::ResetKeys(void)
+void TV::ReloadKeys(void)
 {
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->ClearKeyContext("TV Frontend");

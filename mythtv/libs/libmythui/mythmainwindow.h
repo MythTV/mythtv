@@ -52,7 +52,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
                            QStringList &actions, bool allowJumps = true)
                            MUNUSED_RESULT;
 
-    void ResetKeys(void);
+    void ReloadKeys(void);
     void ClearKey(const QString &context, const QString &action);
     void ClearKeyContext(const QString &context);
     void BindKey(const QString &context, const QString &action,
