@@ -73,8 +73,14 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
 
     // Ignore the other stuff at the moment.
     MHParseNode *pItems = p->GetNamedArg(C_ITEMS);
-    if (pItems == NULL) p->Failure("Missing :Items block");
-    for (int i = 0; i < pItems->GetArgCount(); i++) {
+    if (pItems == NULL)
+    {
+        p->Failure("Missing :Items block");
+        return;
+    }
+
+    for (int i = 0; i < pItems->GetArgCount(); i++)
+    {
         MHParseNode *pItem = pItems->GetArgN(i);
         MHIngredient *pIngredient = NULL;
         try {
