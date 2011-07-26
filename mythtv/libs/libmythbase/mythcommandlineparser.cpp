@@ -1093,7 +1093,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
         verboseMask = toUInt("verboseint");
 
     int quiet = toUInt("quiet");
-    if (MAX(quiet, progress) > 1)
+    if (MAX(quiet, (int)progress) > 1)
     {
         verboseMask = VB_NONE;
         verboseArgParse("none");
