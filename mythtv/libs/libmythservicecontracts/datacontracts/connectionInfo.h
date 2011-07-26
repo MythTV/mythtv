@@ -25,6 +25,7 @@
 #include "serviceexp.h" 
 #include "datacontracthelper.h"
 
+#include "versionInfo.h"
 #include "databaseInfo.h"
 #include "wolInfo.h"
 
@@ -35,11 +36,13 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
 {
     Q_OBJECT
 
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.1" );
 
+    Q_PROPERTY( QObject*    Version     READ Version    )
     Q_PROPERTY( QObject*    Database    READ Database   )
     Q_PROPERTY( QObject*    WOL         READ WOL        )
 
+    PROPERTYIMP_PTR( VersionInfo , Version    )
     PROPERTYIMP_PTR( DatabaseInfo, Database   )
     PROPERTYIMP_PTR( WOLInfo     , WOL        )
 
@@ -50,6 +53,7 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
             qRegisterMetaType< ConnectionInfo   >();
             qRegisterMetaType< ConnectionInfo*  >();
 
+            VersionInfo ::InitializeCustomTypes();
             DatabaseInfo::InitializeCustomTypes();
             WOLInfo     ::InitializeCustomTypes();
         }
@@ -58,13 +62,15 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
 
         ConnectionInfo(QObject *parent = 0) 
             : QObject        ( parent ),
+              m_Version      ( NULL   ),
               m_Database     ( NULL   ),
               m_WOL          ( NULL   )             
         {
         }
         
         ConnectionInfo( const ConnectionInfo &src ) 
-            : m_Database  ( NULL ),
+            : m_Version   ( NULL ),
+              m_Database  ( NULL ),
               m_WOL       ( NULL )                  
         {
             Copy( src );
@@ -74,6 +80,9 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
         {
             // We always need to make sure the child object is
             // created with the correct parent *
+
+            if (src.m_Version)
+                Version()->Copy( src.m_Version );
 
             if (src.m_Database)
                 Database()->Copy( src.m_Database );
