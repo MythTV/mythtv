@@ -171,9 +171,9 @@ LoggerBase::~LoggerBase()
 }
 
 
-FileLogger::FileLogger(char *filename, bool quiet, bool daemon) : 
-        LoggerBase(filename, 0), m_opened(false), m_fd(-1), m_quiet(quiet),
-        m_daemon(daemon)
+FileLogger::FileLogger(char *filename, bool progress, int quiet) :
+        LoggerBase(filename, 0), m_opened(false), m_fd(-1),
+        m_progress(progress), m_quiet(quiet)
 {
     if( !strcmp(filename, "-") )
     {
@@ -183,8 +183,8 @@ FileLogger::FileLogger(char *filename, bool quiet, bool daemon) :
     }
     else
     {
-        m_quiet = false;
-        m_daemon = false;
+        m_progress = false;
+        m_quiet = 0;
         m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
         m_opened = (m_fd != -1);
         LOG(VB_GENERAL, LOG_INFO, QString("Added logging to %1")
@@ -233,7 +233,7 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     pid_t               pid = getpid();
     pid_t               tid = 0;
 
-    if (!m_opened || m_daemon || (m_quiet && item->level > LOG_ERR))
+    if (!m_opened || m_quiet || (m_progress && item->level > LOG_ERR))
         return false;
 
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
@@ -886,10 +886,9 @@ void logPropagateCalc(void)
         logPropagateArgs += " --logpath " + logPropagateOpts.path;
 
     QString name = logLevelGetName(logLevel);
-    name.remove(0, 4);
     logPropagateArgs += " --loglevel " + name;
 
-    if (logPropagateOpts.quiet)
+    for (int i = 0; i < logPropagateOpts.quiet; i++)
         logPropagateArgs += " --quiet";
 
     if (!logPropagateOpts.dblog)
@@ -914,7 +913,7 @@ bool logPropagateQuiet(void)
     return logPropagateOpts.quiet;
 }
 
-void logStart(QString logfile, int quiet, bool daemon, int facility,
+void logStart(QString logfile, int progress, int quiet, int facility,
               LogLevel_t level, bool dblog, bool propagate)
 {
     LoggerBase *logger;
@@ -941,7 +940,7 @@ void logStart(QString logfile, int quiet, bool daemon, int facility,
     logPropagateCalc();
 
     /* log to the console */
-    logger = new FileLogger((char *)"-", quiet, daemon);
+    logger = new FileLogger((char *)"-", progress, quiet);
 
     /* Debug logfile */
     if( !logfile.isEmpty() )

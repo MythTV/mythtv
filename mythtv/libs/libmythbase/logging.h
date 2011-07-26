@@ -55,15 +55,15 @@ class LoggerBase : public QObject {
 
 class FileLogger : public LoggerBase {
     public:
-        FileLogger(char *filename, bool quiet, bool daemon);
+        FileLogger(char *filename, bool progress, int quiet);
         ~FileLogger();
         bool logmsg(LoggingItem_t *item);
         void reopen(void);
     private:
         bool m_opened;
         int  m_fd;
-        bool m_quiet;
-        bool m_daemon;
+        bool m_progress;
+        int  m_quiet;
 };
 
 #ifndef _WIN32

@@ -52,7 +52,7 @@ extern MBASE_PUBLIC uint64_t   verboseMask;
 extern MBASE_PUBLIC QString    logPropagateArgs;
 extern MBASE_PUBLIC QString    verboseString;
 
-MBASE_PUBLIC void logStart(QString logfile, int quiet = 0, bool daemon = false,
+MBASE_PUBLIC void logStart(QString logfile, int progress = 0, int quiet = 0,
                            int facility = 0, LogLevel_t level = LOG_INFO,
                            bool dblog = true, bool propagate = false);
 MBASE_PUBLIC void logStop(void);

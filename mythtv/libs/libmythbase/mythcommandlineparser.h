@@ -144,7 +144,7 @@ class MBASE_PUBLIC MythCommandLineParser
 
     bool                    SetValue(const QString &key, QVariant value);
     int                     ConfigureLogging(QString mask = "general",
-                                             unsigned int quiet = 0);
+                                             unsigned int progress = 0);
     void                    ApplySettingsOverride(void);
     int                     Daemonize(void);
 

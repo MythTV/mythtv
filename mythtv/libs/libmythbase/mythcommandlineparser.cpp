@@ -1075,7 +1075,7 @@ bool MythCommandLineParser::SetValue(const QString &key, QVariant value)
     return true;
 }
 
-int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int quiet)
+int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
 {
     int err = 0;
 
@@ -1092,8 +1092,8 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int quiet)
     else if (toBool("verboseint"))
         verboseMask = toUInt("verboseint");
 
-    quiet = MAX(quiet, toUInt("quiet"));
-    if (quiet > 1)
+    int quiet = toUInt("quiet");
+    if (MAX(quiet, progress) > 1)
     {
         verboseMask = VB_NONE;
         verboseArgParse("none");
@@ -1112,9 +1112,12 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int quiet)
                                   .arg(verboseString));
 
     QString logfile = GetLogFilePath();
-    bool propogate = toBool("islogpath");
-    bool daemon = toBool("daemon");
-    logStart(logfile, quiet, daemon, facility, level, dblog, propogate);
+    bool propagate = toBool("islogpath");
+
+    if (toBool("daemon"))
+        quiet = MAX(quiet, 1);
+
+    logStart(logfile, progress, quiet, facility, level, dblog, propagate);
 
     return GENERIC_EXIT_OK;
 }
