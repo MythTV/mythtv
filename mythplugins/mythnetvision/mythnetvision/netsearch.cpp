@@ -235,7 +235,7 @@ void NetSearch::showMenu(void)
 
             if (item)
             {
-                if (item && item->GetDownloadable())
+                if (item->GetDownloadable())
                     menuPopup->AddButton(tr("Stream Video"), SLOT(streamWebVideo()));
                 menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
 
