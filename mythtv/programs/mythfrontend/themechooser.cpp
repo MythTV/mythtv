@@ -617,7 +617,7 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
     else
     {
         gCoreContext->SaveSetting("Theme", info->GetDirectoryName());
-        GetMythMainWindow()->JumpTo("Reload Theme", false);
+        GetMythMainWindow()->JumpTo("Reload Theme");
     }
 }
 
@@ -797,7 +797,7 @@ void ThemeChooser::customEvent(QEvent *e)
             SendMythSystemEvent(event);
 
             gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
-            GetMythMainWindow()->JumpTo("Reload Theme", false);
+            GetMythMainWindow()->JumpTo("Reload Theme");
         }
     }
 }
