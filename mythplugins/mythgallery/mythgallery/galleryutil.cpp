@@ -210,12 +210,13 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
 }
 
 bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
-                                int sortorder, bool recurse,
+                                const GalleryFilter& flt, bool recurse,
                                 ThumbHash *itemHash, ThumbGenerator* thumbGen)
 {
     QString blah = dir;
     QDir d(blah);
     QString currDir = d.absolutePath();
+    QStringList splitFD;
 
     bool isGallery;
     QFileInfoList gList = d.entryInfoList(QStringList("serial*.dat"),
@@ -228,7 +229,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
 
     QFileInfoList list = d.entryInfoList(GetMediaFilter(),
                                          QDir::Files | QDir::AllDirs,
-                                         (QDir::SortFlag)sortorder);
+                                         (QDir::SortFlag)flt.getSort());
 
     if (list.isEmpty())
         return false;
@@ -240,6 +241,11 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
     {
         thumbGen->cancel();
         thumbGen->setDirectory(currDir, isGallery);
+    }
+
+    if (!flt.getDirFilter().isEmpty())
+    {
+        splitFD = flt.getDirFilter().split(":");
     }
 
     while (it != list.end())
@@ -256,14 +262,26 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
                 (fi->fileName().indexOf(".highlight.") > 0)))
             continue;
 
+        // skip filtered directory
+        if (fi->isDir() && !splitFD.filter(fi->fileName(), Qt::CaseInsensitive).isEmpty())
+        {
+            continue;
+        }
+
         if (fi->isDir() && recurse) 
         {
-            GalleryUtil::LoadDirectory(
+            LoadDirectory(
                 itemList, QDir::cleanPath(fi->absoluteFilePath()),
-                sortorder, true, itemHash, thumbGen);
+                flt, true, itemHash, thumbGen);
         }
         else 
         {
+            if ((GalleryUtil::IsImage(fi->absoluteFilePath())
+                    && flt.getTypeFilter() == kTypeFilterMoviesOnly)
+             || (GalleryUtil::IsMovie(fi->absoluteFilePath())
+                    && flt.getTypeFilter() == kTypeFilterImagesOnly))
+                continue;
+
             ThumbItem *item = new ThumbItem(
                 fi->fileName(),
                 QDir::cleanPath(fi->absoluteFilePath()), fi->isDir());

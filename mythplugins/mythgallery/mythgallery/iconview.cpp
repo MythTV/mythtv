@@ -47,6 +47,7 @@ using namespace std;
 // MythGallery headers
 #include "galleryutil.h"
 #include "gallerysettings.h"
+#include "galleryfilter.h"
 #include "thumbgenerator.h"
 #include "iconview.h"
 #include "singleview.h"
@@ -107,6 +108,7 @@ IconView::IconView(MythScreenStack *parent, const char *name,
         : MythScreenType(parent, name)
 {
     m_galleryDir = galleryDir;
+    m_galleryFilter = new GalleryFilter();
 
     m_isGallery = false;
     m_showDevices = false;
@@ -146,7 +148,11 @@ IconView::~IconView()
         delete m_thumbGen;
         m_thumbGen = NULL;
     }
-
+    if (m_galleryFilter)
+    {
+        delete m_galleryFilter;
+        m_galleryFilter = NULL;
+    }
     if (m_childCountThread)
     {
         delete m_childCountThread;
@@ -238,7 +244,7 @@ void IconView::LoadDirectory(const QString &dir)
     m_itemHash.clear();
     m_imageList->Reset();
 
-    m_isGallery = GalleryUtil::LoadDirectory(m_itemList, dir, m_sortorder,
+    m_isGallery = GalleryUtil::LoadDirectory(m_itemList, dir, *m_galleryFilter,
                                              false, &m_itemHash, m_thumbGen);
 
     if (m_thumbGen && !m_thumbGen->isRunning())
@@ -797,9 +803,12 @@ void IconView::customEvent(QEvent *event)
                     HandleSubMenuMark();
                     break;
                 case 4:
-                    HandleSubMenuFile();
+                    HandleSubMenuFilter();
                     break;
                 case 5:
+                    HandleSubMenuFile();
+                    break;
+                case 6:
                     HandleSettings();
                     break;
             }
@@ -871,6 +880,11 @@ void IconView::customEvent(QEvent *event)
 
 }
 
+void IconView::reloadData()
+{
+    LoadDirectory(m_galleryDir);
+}
+
 void IconView::HandleMainMenu(void)
 {
     QString label = tr("Gallery Options");
@@ -890,6 +904,7 @@ void IconView::HandleMainMenu(void)
     m_menuPopup->AddButton(tr("Random"));
     m_menuPopup->AddButton(tr("Meta Data Menu"));
     m_menuPopup->AddButton(tr("Marking Menu"));
+    m_menuPopup->AddButton(tr("Filter / Sort Menu"));
     m_menuPopup->AddButton(tr("File Menu"));
     m_menuPopup->AddButton(tr("Settings"));
 //     if (m_showDevices)
@@ -935,6 +950,19 @@ void IconView::HandleSubMenuMark(void)
     m_menuPopup->AddButton(tr("Clear One Marked"));
     m_menuPopup->AddButton(tr("Select All"));
     m_menuPopup->AddButton(tr("Clear Marked"));
+}
+
+void IconView::HandleSubMenuFilter(void)
+{
+    MythScreenStack *mainStack = GetScreenStack();
+
+    GalleryFilterDialog *filterdialog = new GalleryFilterDialog(mainStack,
+                                                                "galleryfilter", m_galleryFilter);
+
+    if (filterdialog->Create())
+        mainStack->AddScreen(filterdialog);
+
+    connect(filterdialog, SIGNAL(filterChanged()), SLOT(reloadData()));
 }
 
 void IconView::HandleSubMenuFile(void)
