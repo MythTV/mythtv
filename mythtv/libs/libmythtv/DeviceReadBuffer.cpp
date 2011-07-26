@@ -19,7 +19,7 @@ using namespace std;
 #define LOC QString("DevRdB(%1): ").arg(videodevice)
 
 DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
-    : videodevice(QString::null),   _stream_fd(-1),
+    : videodevice(""),              _stream_fd(-1),
       readerCB(cb),
 
       // Data for managing the device ringbuffer
@@ -73,6 +73,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
         delete[] buffer;
 
     videodevice   = streamName;
+    videodevice   = (videodevice == QString::null) ? "" : videodevice;
     _stream_fd    = streamfd;
 
     // BEGIN HACK -- see #6897, remove after August 2009
@@ -156,6 +157,7 @@ void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
     QMutexLocker locker(&lock);
 
     videodevice   = streamName;
+    videodevice   = (videodevice == QString::null) ? "" : videodevice;
     _stream_fd    = streamfd;
 
     used          = 0;
