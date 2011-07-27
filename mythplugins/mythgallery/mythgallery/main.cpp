@@ -20,6 +20,7 @@
 #ifdef DCRAW_SUPPORT
 Q_IMPORT_PLUGIN(dcrawplugin)
 #endif // DCRAW_SUPPORT
+void runRandomSlideshow(void);
 
 static int run(MythMediaDevice *dev = NULL, bool startRandomShow = false)
 {
