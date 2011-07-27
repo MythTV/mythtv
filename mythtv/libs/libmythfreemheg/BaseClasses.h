@@ -184,8 +184,8 @@ class MHGenericBase
 {
   public:
     MHObjectRef *GetReference(); // Return the indirect reference or fail if it's direct
-protected:
     bool    m_fIsDirect;
+protected:
     MHObjectRef m_Indirect;
 };
 

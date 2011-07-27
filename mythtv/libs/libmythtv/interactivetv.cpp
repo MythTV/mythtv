@@ -17,14 +17,11 @@ InteractiveTV::InteractiveTV(MythPlayer *nvp)
 {
     Restart(0, 0, false);
 
-    if (VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_ANY))
-    {
-        MHSetLogging(stdout, MHLogAll);
-    }
-    else
-    {
-        MHSetLogging(stdout, MHLogError);
-    }
+    MHSetLogging(stdout,
+        VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_DEBUG) ? MHLogAll :
+        VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_ANY) ?
+            MHLogError | MHLogWarning | MHLogNotifications /*| MHLogLinks | MHLogActions | MHLogDetail*/ :
+        MHLogError | MHLogWarning );
 }
 
 InteractiveTV::~InteractiveTV()
@@ -78,4 +75,9 @@ void InteractiveTV::GetInitialStreams(int &audioTag, int &videoTag)
 void InteractiveTV::SetNetBootInfo(const unsigned char *data, uint length)
 {
     m_context->SetNetBootInfo(data, length);
+}
+
+bool InteractiveTV::StreamStarted(bool bStarted)
+{
+    return m_context->StreamStarted(bStarted);
 }

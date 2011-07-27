@@ -65,8 +65,12 @@ void MHStream::Initialise(MHParseNode *p, MHEngine *engine)
                 m_Multiplex.Append(pRtGraph);
                 pRtGraph->Initialise(pItem, engine);
             }
-
-            // Ignore unknown items
+            else
+            {
+                // Ignore unknown items
+                MHLOG(MHLogWarning, QString("WARN unknown stream type %1")
+                    .arg(pItem->GetTagNo()));
+            }
         }
     }
 
@@ -158,11 +162,8 @@ void MHStream::Activation(MHEngine *engine)
     MHPresentable::Activation(engine);
 
     // Start playing all active stream components.
-    for (int i = 0; i < m_Multiplex.Size(); i++)
-    {
-        m_Multiplex.GetAt(i)->BeginPlaying(engine);
-    }
-
+    BeginPlaying(engine);
+    // subclasses are responsible for setting m_fRunning and generating IsRunning.
     m_fRunning = true;
     engine->EventTriggered(this, EventIsRunning);
 }
@@ -174,13 +175,8 @@ void MHStream::Deactivation(MHEngine *engine)
         return;
     }
 
-    // Stop playing all active Stream components
-    for (int i = 0; i < m_Multiplex.Size(); i++)
-    {
-        m_Multiplex.GetAt(i)->StopPlaying(engine);
-    }
-
     MHPresentable::Deactivation(engine);
+    StopPlaying(engine);
 }
 
 // The MHEG corrigendum allows SetData to be targeted to a stream so
@@ -188,15 +184,9 @@ void MHStream::Deactivation(MHEngine *engine)
 void MHStream::ContentPreparation(MHEngine *engine)
 {
     engine->EventTriggered(this, EventContentAvailable); // Perhaps test for the streams being available?
-
-    for (int i = 0; i < m_Multiplex.Size(); i++)
-    {
-        m_Multiplex.GetAt(i)->SetStreamRef(engine, m_ContentRef);
-    }
+    if (m_fRunning)
+        BeginPlaying(engine);
 }
-
-// TODO: Generate StreamPlaying and StreamStopped events.  These are supposed
-// to be generated as the first and last frames are displayed.
 
 // Return an object if there is a matching component.
 MHRoot *MHStream::FindByObjectNo(int n)
@@ -217,6 +207,53 @@ MHRoot *MHStream::FindByObjectNo(int n)
     }
 
     return NULL;
+}
+
+void MHStream::BeginPlaying(MHEngine *engine)
+{
+    QString stream;
+    MHOctetString &str = m_ContentRef.m_ContentRef;
+    if (str.Size() != 0) stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
+    if ( !engine->GetContext()->BeginStream(stream, this))
+        engine->EventTriggered(this, EventEngineEvent, 204); // StreamRefError
+
+    // Start playing all active stream components.
+    for (int i = 0; i < m_Multiplex.Size(); i++)
+        m_Multiplex.GetAt(i)->BeginPlaying(engine);
+
+    //engine->EventTriggered(this, EventStreamPlaying);
+}
+
+void MHStream::StopPlaying(MHEngine *engine)
+{
+    // Stop playing all active Stream components
+    for (int i = 0; i < m_Multiplex.Size(); i++)
+        m_Multiplex.GetAt(i)->StopPlaying(engine);
+    engine->GetContext()->EndStream();
+    engine->EventTriggered(this, EventStreamStopped);
+}
+
+void MHStream::GetCounterPosition(MHRoot *pResult, MHEngine *engine)
+{
+    // StreamCounterUnits (mS)
+    pResult->SetVariableValue((int)engine->GetContext()->GetStreamPos());
+}
+
+void MHStream::GetCounterMaxPosition(MHRoot *pResult, MHEngine *engine)
+{
+    // StreamCounterUnits (mS)
+    pResult->SetVariableValue((int)engine->GetContext()->GetStreamMaxPos());
+}
+
+void MHStream::SetCounterPosition(int pos, MHEngine *engine)
+{
+    // StreamCounterUnits (mS)
+    engine->GetContext()->SetStreamPos(pos);
+}
+
+void MHStream::SetSpeed(int speed, MHEngine *engine)
+{
+    engine->GetContext()->StreamPlay(speed);
 }
 
 MHAudio::MHAudio()
@@ -275,18 +312,8 @@ void MHAudio::Activation(MHEngine *engine)
     m_fRunning = true;
     engine->EventTriggered(this, EventIsRunning);
 
-    if (m_fStreamPlaying && m_streamContentRef.IsSet())
-    {
-        QString stream;
-        MHOctetString &str = m_streamContentRef.m_ContentRef;
-
-        if (str.Size() != 0)
-        {
-            stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
-        }
-
-        engine->GetContext()->BeginAudio(stream, m_nComponentTag);
-    }
+    if (m_fStreamPlaying)
+        engine->GetContext()->BeginAudio(m_nComponentTag);
 }
 
 // Deactivation for Audio is defined in the corrigendum
@@ -308,32 +335,11 @@ void MHAudio::Deactivation(MHEngine *engine)
     MHPresentable::Deactivation(engine);
 }
 
-void MHAudio::SetStreamRef(MHEngine *engine, const MHContentRef &cr)
-{
-    m_streamContentRef.Copy(cr);
-
-    if (m_fStreamPlaying)
-    {
-        BeginPlaying(engine);
-    }
-}
-
 void MHAudio::BeginPlaying(MHEngine *engine)
 {
     m_fStreamPlaying = true;
-
-    if (m_fRunning && m_streamContentRef.IsSet())
-    {
-        QString stream;
-        MHOctetString &str = m_streamContentRef.m_ContentRef;
-
-        if (str.Size() != 0)
-        {
-            stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
-        }
-
-        engine->GetContext()->BeginAudio(stream, m_nComponentTag);
-    }
+    if (m_fRunning)
+        engine->GetContext()->BeginAudio(m_nComponentTag);
 }
 
 void MHAudio::StopPlaying(MHEngine *engine)
@@ -491,19 +497,8 @@ void MHVideo::Activation(MHEngine *engine)
     }
 
     MHVisible::Activation(engine);
-
-    if (m_fStreamPlaying && m_streamContentRef.IsSet())
-    {
-        QString stream;
-        MHOctetString &str = m_streamContentRef.m_ContentRef;
-
-        if (str.Size() != 0)
-        {
-            stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
-        }
-
-        engine->GetContext()->BeginVideo(stream, m_nComponentTag);
-    }
+    if (m_fStreamPlaying)
+        engine->GetContext()->BeginVideo(m_nComponentTag);
 }
 
 void MHVideo::Deactivation(MHEngine *engine)
@@ -521,32 +516,11 @@ void MHVideo::Deactivation(MHEngine *engine)
     }
 }
 
-void MHVideo::SetStreamRef(MHEngine *engine, const MHContentRef &cr)
-{
-    m_streamContentRef.Copy(cr);
-
-    if (m_fStreamPlaying)
-    {
-        BeginPlaying(engine);
-    }
-}
-
 void MHVideo::BeginPlaying(MHEngine *engine)
 {
     m_fStreamPlaying = true;
-
-    if (m_fRunning && m_streamContentRef.IsSet())
-    {
-        QString stream;
-        MHOctetString &str = m_streamContentRef.m_ContentRef;
-
-        if (str.Size() != 0)
-        {
-            stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
-        }
-
-        engine->GetContext()->BeginVideo(stream, m_nComponentTag);
-    }
+    if (m_fRunning)
+        engine->GetContext()->BeginVideo(m_nComponentTag);
 }
 
 void MHVideo::StopPlaying(MHEngine *engine)
@@ -580,4 +554,15 @@ void MHRTGraphics::PrintMe(FILE *fd, int nTabs) const
 {
     MHVisible::PrintMe(fd, nTabs);
     //
+}
+
+// Fix for MHActionGenericObjectRef
+void MHActionGenericObjectRefFix::Perform(MHEngine *engine)
+{
+    MHObjectRef ref;
+    if (m_RefObject.m_fIsDirect)
+        m_RefObject.GetValue(ref, engine);
+    else
+        ref.Copy(*m_RefObject.GetReference());
+    CallAction(engine, Target(engine), engine->FindObject(ref));
 }

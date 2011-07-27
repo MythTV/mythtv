@@ -43,7 +43,6 @@ class MHPresentable : public MHIngredient
     virtual void Stop(MHEngine *engine);
 
     // Additional actions for stream components.
-    virtual void SetStreamRef(MHEngine *, const MHContentRef &) {}
     virtual void BeginPlaying(MHEngine *) {}
     virtual void StopPlaying(MHEngine *) {}
 };

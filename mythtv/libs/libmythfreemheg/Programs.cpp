@@ -29,6 +29,7 @@
 #include "Logging.h"
 #include "freemheg.h"
 
+#include <QStringList>
 #include <sys/timeb.h>
 #ifdef __FreeBSD__
 #include <sys/time.h>
@@ -136,6 +137,15 @@ static int GetInt(MHParameter *parm, MHEngine *engine)
     un.GetValueFrom(*parm, engine);
     un.CheckType(MHUnion::U_Int);
     return un.m_nIntVal;
+}
+
+// Return a bool value.  May throw an exception if it isn't the correct type.
+static bool GetBool(MHParameter *parm, MHEngine *engine)
+{
+    MHUnion un;
+    un.GetValueFrom(*parm, engine);
+    un.CheckType(MHUnion::U_Bool);
+    return un.m_fBoolVal;
 }
 
 // Extract a string value.
@@ -738,7 +748,14 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         else if (m_Name.Equal("SSM"))   // SetSubtitleMode
         {
             // Enable or disable subtitles in addition to MHEG.
-            MHERROR("SetSubtitleMode ResidentProgram is not implemented");
+            if (args.Size() == 1) {
+                bool status = GetBool(args.GetAt(0), engine);
+                MHLOG(MHLogNotifications, QString("NOTE SetSubtitleMode %1")
+                    .arg(status ? "enabled" : "disabled"));
+                // TODO Notify player
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
         }
 
         else if (m_Name.Equal("WAI"))   // WhoAmI
@@ -798,15 +815,98 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
         else if (m_Name.Equal("SBI"))   // SetBroadcastInterrupt
         {
-            // Required for InteractionChannelExtension
+            // Required for NativeApplicationExtension
             // En/dis/able program interruptions e.g. green button
-            MHERROR("SetBroadcastInterrupt ResidentProgram is not implemented");
+            if (args.Size() == 1) {
+                bool status = GetBool(args.GetAt(0), engine);
+                MHLOG(MHLogNotifications, QString("NOTE SetBroadcastInterrupt %1")
+                    .arg(status ? "enabled" : "disabled"));
+                // Nothing todo at present
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
         }
 
-        else if (m_Name.Equal("GIS"))   // GetICStatus
-        {
-            // Required for NativeApplicationExtension
-            MHERROR("GetICStatus ResidentProgram is not implemented");
+        // InteractionChannelExtension
+        else if (m_Name.Equal("GIS")) { // GetICStatus
+            if (args.Size() == 1)
+            {
+                int ICstatus = engine->GetContext()->GetICStatus();
+                MHLOG(MHLogNotifications, "NOTE InteractionChannel " + QString(
+                    ICstatus == 0 ? "active" : ICstatus == 1 ? "inactive" :
+                    ICstatus == 2 ? "disabled" : "undefined"));
+                engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(ICstatus);
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
+        }
+        else if (m_Name.Equal("RDa")) { // ReturnData
+            if (args.Size() >= 3)
+            {
+                MHOctetString string;
+                GetString(args.GetAt(0), string, engine);
+                QString url = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+
+                // Variable name/value pairs
+                QStringList params;
+                int i = 1;
+                for (; i + 2 < args.Size(); i += 2)
+                {
+                    GetString(args.GetAt(i), string, engine);
+                    QString name = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                    QString val;
+                    MHUnion un;
+                    un.GetValueFrom(*(args.GetAt(i+1)), engine);
+                    switch (un.m_Type) {
+                    case MHUnion::U_Int:
+                        val = QString::number(un.m_nIntVal);
+                        break;
+                    case MHParameter::P_Bool:
+                        val = un.m_fBoolVal ? "true" : "false";
+                        break;
+                    case MHParameter::P_String:
+                        val = QString::fromUtf8((const char*)un.m_StrVal.Bytes(), un.m_StrVal.Size());
+                        break;
+                    case MHParameter::P_ObjRef:
+                        val = un.m_ObjRefVal.Printable();
+                        break;
+                    case MHParameter::P_ContentRef:
+                        val = un.m_ContentRefVal.Printable();
+                        break;
+                    case MHParameter::P_Null:
+                        val = "<NULL>";
+                        break;
+                    default:
+                        val = QString("<type %1>").arg(un.m_Type);
+                        break;
+                    }
+                    params += name + "=" + val;
+                }
+                // TODO
+                MHLOG(MHLogNotifications, "NOTE ReturnData '" + url + "' { " + params.join(" ") + " }");
+                // HTTP response code, 0= none
+                engine->FindObject(*(args.GetAt(i)->GetReference()))->SetVariableValue(0);
+                // HTTP response data
+                string = "";
+                engine->FindObject(*(args.GetAt(i+1)->GetReference()))->SetVariableValue(string);
+                SetSuccessFlag(success, false, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
+        }
+        else if (m_Name.Equal("SHF")) { // SetHybridFileSystem
+            if (args.Size() == 2)
+            {
+                MHOctetString string;
+                GetString(args.GetAt(0), string, engine);
+                QString str = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                GetString(args.GetAt(1), string, engine);
+                QString str2 = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                // TODO
+                MHLOG(MHLogNotifications, QString("NOTE SetHybridFileSystem %1=%2")
+                    .arg(str).arg(str2));
+                SetSuccessFlag(success, false, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
         }
 
         else
@@ -908,7 +1008,7 @@ void MHCall::PrintArgs(FILE *fd, int nTabs) const
         m_Parameters.GetAt(i)->PrintMe(fd, 0);
     }
 
-    fprintf(fd, " )\n");
+    fprintf(fd, " )");
 }
 
 void MHCall::Perform(MHEngine *engine)

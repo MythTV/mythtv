@@ -423,8 +423,8 @@ using_frontend {
         SOURCES += dsmccbiop.cpp            dsmccobjcarousel.cpp
 
          # MHEG interaction channel
-        HEADERS += netstream.h
-        SOURCES += netstream.cpp
+        HEADERS += mhegic.h                 netstream.h
+        SOURCES += mhegic.cpp               netstream.cpp
 
         # MHEG/MHI stuff
         HEADERS += interactivetv.h          mhi.h

@@ -1,10 +1,12 @@
+#include "mhi.h"
+
 #include <unistd.h>
 
 #include <QRegion>
 #include <QBitArray>
 #include <QVector>
+#include <QUrl>
 
-#include "mhi.h"
 #include "interactivescreen.h"
 #include "mythpainter.h"
 #include "mythimage.h"
@@ -360,6 +362,13 @@ void MHIContext::NetworkBootRequested(void)
 // Called by the engine to check for the presence of an object in the carousel.
 bool MHIContext::CheckCarouselObject(QString objectPath)
 {
+    if (objectPath.startsWith("http:") || objectPath.startsWith("https:"))
+    {
+        // TODO verify access to server in carousel file auth.servers
+        // TODO use TLS cert from carousel auth.tls.<x>
+        return m_ic.CheckFile(objectPath);
+    }
+
     QStringList path = objectPath.split(QChar('/'), QString::SkipEmptyParts);
     QByteArray result; // Unused
     int res = m_dsmcc->GetDSMCCObject(path, result);
@@ -369,6 +378,8 @@ bool MHIContext::CheckCarouselObject(QString objectPath)
 // Called by the engine to request data from the carousel.
 bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
 {
+    bool const isIC = objectPath.startsWith("http:") || objectPath.startsWith("https:");
+
     // Get the path components.  The string will normally begin with "//"
     // since this is an absolute path but that will be removed by split.
     QStringList path = objectPath.split(QChar('/'), QString::SkipEmptyParts);
@@ -377,29 +388,152 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
     // the result.
 
     QMutexLocker locker(&m_runLock);
+    bool bReported = false;
     QTime t; t.start();
     while (!m_stop)
     {
         locker.unlock();
 
-        int res = m_dsmcc->GetDSMCCObject(path, result);
-        if (res == 0)
-            return true; // Found it
-        else if (res < 0)
-            return false; // Not there.
-        else if (t.elapsed() > 60000) // TODO get this from carousel info
-            return false; // Not there.
+        if (isIC)
+        {
+            // TODO verify access to server in carousel file auth.servers
+            // TODO use TLS cert from carousel file auth.tls.<x>
+            switch (m_ic.GetFile(objectPath, result))
+            {
+            case MHInteractionChannel::kSuccess:
+                if (bReported)
+                    LOG(VB_MHEG, LOG_INFO, QString("[mhi] Received %1").arg(objectPath));
+                return true;
+            case MHInteractionChannel::kError:
+                if (bReported)
+                    LOG(VB_MHEG, LOG_INFO, QString("[mhi] Not found %1").arg(objectPath));
+                return false;
+            case MHInteractionChannel::kPending:
+                break;
+            }
+        }
+        else
+        {
+            int res = m_dsmcc->GetDSMCCObject(path, result);
+            if (res == 0)
+            {
+                if (bReported)
+                    LOG(VB_MHEG, LOG_INFO, QString("[mhi] Received %1").arg(objectPath));
+                return true; // Found it
+            }
+            else if (res < 0)
+            {
+                if (bReported)
+                    LOG(VB_MHEG, LOG_INFO, QString("[mhi] Not found %1").arg(objectPath));
+                return false; // Not there.
+            }
+        }
+
+        if (t.elapsed() > 60000) // TODO get this from carousel info
+             return false; // Not there.
         // Otherwise we block.
-        // Process DSMCC packets then block for a second or until we receive
+        if (!bReported)
+        {
+            bReported = true;
+            LOG(VB_MHEG, LOG_INFO, QString("[mhi] Waiting for %1").arg(objectPath));
+        }
+        // Process DSMCC packets then block for a while or until we receive
         // some more packets.  We should eventually find out if this item is
         // present.
         ProcessDSMCCQueue();
 
         locker.relock();
-        if (!m_stop)
-            m_engine_wait.wait(locker.mutex(), 1000);
+        m_engine_wait.wait(locker.mutex(), 300);
     }
     return false; // Stop has been set.  Say the object isn't present.
+}
+
+// Mapping from key name & UserInput register to UserInput EventData
+class MHKeyLookup
+{
+    typedef QPair< QString, int /*UserInput register*/ > key_t;
+
+public:
+    MHKeyLookup();
+
+    int Find(const QString &name, int reg) const
+        { return m_map.value(key_t(name,reg), 0); }
+
+private:
+    void key(const QString &name, int code, int r1,
+        int r2=0, int r3=0, int r4=0, int r5=0, int r6=0, int r7=0, int r8=0, int r9=0);
+
+    QHash<key_t,int /*EventData*/ > m_map;
+};
+
+void MHKeyLookup::key(const QString &name, int code, int r1,
+    int r2, int r3, int r4, int r5, int r6, int r7, int r8, int r9)
+{
+    m_map.insert(key_t(name,r1), code);
+    if (r2 > 0) 
+        m_map.insert(key_t(name,r2), code);
+    if (r3 > 0) 
+        m_map.insert(key_t(name,r3), code);
+    if (r4 > 0) 
+        m_map.insert(key_t(name,r4), code);
+    if (r5 > 0) 
+        m_map.insert(key_t(name,r5), code);
+    if (r6 > 0) 
+        m_map.insert(key_t(name,r6), code);
+    if (r7 > 0) 
+        m_map.insert(key_t(name,r7), code);
+    if (r8 > 0) 
+        m_map.insert(key_t(name,r8), code);
+    if (r9 > 0) 
+        m_map.insert(key_t(name,r9), code);
+}
+
+MHKeyLookup::MHKeyLookup()
+{
+    // This supports the UK and NZ key profile registers.
+    // The UK uses 3, 4 and 5 and NZ 13, 14 and 15.  These are
+    // similar but the NZ profile also provides an EPG key.
+    // ETSI ES 202 184 V2.2.1 (2011-03) adds group 6 for ICE.
+    // The BBC use group 7 for ICE
+    key(ACTION_UP,           1, 4,5,6,7,14,15);
+    key(ACTION_DOWN,         2, 4,5,6,7,14,15);
+    key(ACTION_LEFT,         3, 4,5,6,7,14,15);
+    key(ACTION_RIGHT,        4, 4,5,6,7,14,15);
+    key(ACTION_0,            5, 4,6,7,14);
+    key(ACTION_1,            6, 4,6,7,14);
+    key(ACTION_2,            7, 4,6,7,14);
+    key(ACTION_3,            8, 4,6,7,14);
+    key(ACTION_4,            9, 4,6,7,14);
+    key(ACTION_5,           10, 4,6,7,14);
+    key(ACTION_6,           11, 4,6,7,14);
+    key(ACTION_7,           12, 4,6,7,14);
+    key(ACTION_8,           13, 4,6,7,14);
+    key(ACTION_9,           14, 4,6,7,14);
+    key(ACTION_SELECT,      15, 4,5,6,7,14,15);
+    key(ACTION_TEXTEXIT,    16, 3,4,5,6,7,13,14,15); // 16= Cancel
+    // 17= help
+    // 18..99 reserved by DAVIC
+    key(ACTION_MENURED,    100, 3,4,5,6,7,13,14,15);
+    key(ACTION_MENUGREEN,  101, 3,4,5,6,7,13,14,15);
+    key(ACTION_MENUYELLOW, 102, 3,4,5,6,7,13,14,15);
+    key(ACTION_MENUBLUE,   103, 3,4,5,6,7,13,14,15);
+    key(ACTION_MENUTEXT,   104, 3,4,5,6,7);
+    key(ACTION_MENUTEXT,   105, 13,14,15); // NB from original Myth code
+    // 105..119 reserved for future spec
+    key(ACTION_STOP,       120, 6,7);
+    key(ACTION_PLAY,       121, 6,7);
+    key(ACTION_PAUSE,      122, 6,7);
+    key(ACTION_JUMPFFWD,   123, 6,7); // 123= Skip Forward
+    key(ACTION_JUMPRWND,   124, 6,7); // 124= Skip Back
+#if 0 // These conflict with left & right
+    key(ACTION_SEEKFFWD,   125, 6,7); // 125= Fast Forward
+    key(ACTION_SEEKRWND,   126, 6,7); // 126= Rewind
+#endif
+    key(ACTION_PLAYBACK,   127, 6,7);
+    // 128..256 reserved for future spec
+    // 257..299 vendor specific
+    key(ACTION_MENUEPG,    300, 13,14,15);
+    // 301.. Vendor specific
 }
 
 // Called from tv_play when a key is pressed.
@@ -407,78 +541,18 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
 // and return true otherwise we return false.
 bool MHIContext::OfferKey(QString key)
 {
-    int action = 0;
-    QMutexLocker locker(&m_keyLock);
-
-    // This supports the UK and NZ key profile registers.
-    // The UK uses 3, 4 and 5 and NZ 13, 14 and 15.  These are
-    // similar but the NZ profile also provides an EPG key.
-
-    if (key == ACTION_UP)
-    {
-        if (m_keyProfile == 4 || m_keyProfile == 5 ||
-            m_keyProfile == 14 || m_keyProfile == 15)
-            action = 1;
-    }
-    else if (key == ACTION_DOWN)
-    {
-        if (m_keyProfile == 4 || m_keyProfile == 5 ||
-            m_keyProfile == 14 || m_keyProfile == 15)
-            action = 2;
-    }
-    else if (key == ACTION_LEFT)
-    {
-        if (m_keyProfile == 4 || m_keyProfile == 5 ||
-            m_keyProfile == 14 || m_keyProfile == 15)
-            action = 3;
-    }
-    else if (key == ACTION_RIGHT)
-    {
-        if (m_keyProfile == 4 || m_keyProfile == 5 ||
-            m_keyProfile == 14 || m_keyProfile == 15)
-            action = 4;
-    }
-    else if (key == ACTION_0 || key == ACTION_1 || key == ACTION_2 ||
-             key == ACTION_3 || key == ACTION_4 || key == ACTION_5 ||
-             key == ACTION_6 || key == ACTION_7 || key == ACTION_8 ||
-             key == ACTION_9)
-    {
-        if (m_keyProfile == 4 || m_keyProfile == 14)
-            action = key.toInt() + 5;
-    }
-    else if (key == ACTION_SELECT)
-    {
-        if (m_keyProfile == 4 || m_keyProfile == 5 ||
-            m_keyProfile == 14 || m_keyProfile == 15)
-            action = 15;
-    }
-    else if (key == ACTION_TEXTEXIT)
-        action = 16;
-    else if (key == ACTION_MENURED)
-        action = 100;
-    else if (key == ACTION_MENUGREEN)
-        action = 101;
-    else if (key == ACTION_MENUYELLOW)
-        action = 102;
-    else if (key == ACTION_MENUBLUE)
-        action = 103;
-    else if (key == ACTION_MENUTEXT)
-        action = m_keyProfile > 12 ? 105 : 104;
-    else if (key == ACTION_MENUEPG)
-        action = m_keyProfile > 12 ? 300 : 0;
-
-    if (action != 0)
-    {
-        m_keyQueue.enqueue(action);
-        LOG(VB_GENERAL, LOG_INFO, QString("Adding MHEG key %1:%2:%3").arg(key)
-                .arg(action).arg(m_keyQueue.size()));
-        locker.unlock();
-        QMutexLocker locker2(&m_runLock);
-        m_engine_wait.wakeAll();
-        return true;
-    }
-
-    return false;
+    static const MHKeyLookup s_keymap;
+    int action = s_keymap.Find(key, m_keyProfile);
+    if (action == 0)
+        return false;
+ 
+    LOG(VB_GENERAL, LOG_INFO, QString("[mhi] Adding MHEG key %1:%2:%3")
+        .arg(key).arg(action).arg(m_keyQueue.size()) );
+    { QMutexLocker locker(&m_keyLock);
+    m_keyQueue.enqueue(action);}
+    QMutexLocker locker2(&m_runLock);
+    m_engine_wait.wakeAll();
+    return true;
 }
 
 void MHIContext::Reinit(const QRect &display)
@@ -493,11 +567,17 @@ void MHIContext::Reinit(const QRect &display)
 
 void MHIContext::SetInputRegister(int num)
 {
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] SetInputRegister %1").arg(num));
     QMutexLocker locker(&m_keyLock);
     m_keyQueue.clear();
     m_keyProfile = num;
 }
 
+int MHIContext::GetICStatus()
+{
+   // 0= Active, 1= Inactive, 2= Disabled
+    return m_ic.status();
+}
 
 // Called by the video player to redraw the image.
 void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
@@ -703,7 +783,7 @@ int MHIContext::GetChannelIndex(const QString &str)
             nResult = query.value(0).toInt();
     }
     else if (str == "rec://svc/cur")
-        nResult = m_currentStream;
+        nResult = m_currentStream > 0 ? m_currentStream : m_currentChannel;
     else if (str == "rec://svc/def")
         nResult = m_currentChannel;
     else if (str.startsWith("rec://"))
@@ -719,7 +799,6 @@ int MHIContext::GetChannelIndex(const QString &str)
 bool MHIContext::GetServiceInfo(int channelId, int &netId, int &origNetId,
                                 int &transportId, int &serviceId)
 {
-    LOG(VB_MHEG, LOG_INFO, QString("[mhi] GetServiceInfo %1").arg(channelId));
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT networkid, transportid, serviceid "
                   "FROM channel, dtv_multiplex "
@@ -732,19 +811,26 @@ bool MHIContext::GetServiceInfo(int channelId, int &netId, int &origNetId,
         origNetId = netId; // We don't have this in the database.
         transportId = query.value(1).toInt();
         serviceId = query.value(2).toInt();
+        LOG(VB_MHEG, LOG_INFO, QString("[mhi] GetServiceInfo %1 => NID=%2 TID=%3 SID=%4")
+            .arg(channelId).arg(netId).arg(transportId).arg(serviceId));
         return true;
     }
-    else return false;
+
+    LOG(VB_MHEG, LOG_WARNING, QString("[mhi] GetServiceInfo %1 failed").arg(channelId));
+    return false;
 }
 
 bool MHIContext::TuneTo(int channel, int tuneinfo)
 {
-    LOG(VB_MHEG, LOG_INFO, QString("[mhi] TuneTo %1 0x%2")
-        .arg(channel).arg(tuneinfo,0,16));
-
     if (!m_isLive)
+    {
+        LOG(VB_MHEG, LOG_WARNING, QString("[mhi] Can't TuneTo %1 0x%2 while not live")
+            .arg(channel).arg(tuneinfo,0,16));
         return false; // Can't tune if this is a recording.
+    }
 
+    LOG(VB_GENERAL, LOG_INFO, QString("[mhi] TuneTo %1 0x%2")
+        .arg(channel).arg(tuneinfo,0,16));
     m_tuneinfo.append(tuneinfo);
 
     // Post an event requesting a channel change.
@@ -757,66 +843,136 @@ bool MHIContext::TuneTo(int channel, int tuneinfo)
     return true;
 }
 
-// Begin playing audio from the specified stream
-bool MHIContext::BeginAudio(const QString &stream, int tag)
+
+// Begin playing the specified stream
+bool MHIContext::BeginStream(const QString &stream, MHStream *notify)
 {
-    LOG(VB_MHEG, LOG_INFO, QString("[mhi] BeginAudio %1 %2").arg(stream).arg(tag));
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] BeginStream %1 0x%2")
+        .arg(stream).arg((quintptr)notify,0,16));
+
+    m_audioTag = -1;
+    m_videoTag = -1;
+    m_notify = notify;
+
+    if (stream.startsWith("http://") || stream.startsWith("https://"))
+    {
+        m_currentStream = -1;
+
+        // The url is sometimes only http:// during stream startup
+        if (QUrl(stream).authority().isEmpty())
+            return false;
+
+        return m_parent->GetNVP()->SetStream(stream);
+    }
 
     int chan = GetChannelIndex(stream);
     if (chan < 0)
         return false;
-
+    if (VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_ANY))
+    {
+        int netId, origNetId, transportId, serviceId;
+        GetServiceInfo(chan, netId, origNetId, transportId, serviceId);
+    }
+ 
     if (chan != m_currentStream)
     {
-        // We have to tune to the channel where the audio is to be found.
+        // We have to tune to the channel where the stream is to be found.
         // Because the audio and video are both components of an MHEG stream
         // they will both be on the same channel.
         m_currentStream = chan;
-        m_audioTag = tag;
         return TuneTo(chan, kTuneKeepChnl|kTuneQuietly|kTuneKeepApp);
     }
+ 
+    return true;
+}
+
+void MHIContext::EndStream()
+{
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] EndStream 0x%1")
+        .arg((quintptr)m_notify,0,16) );
+
+    m_notify = 0;
+    (void)m_parent->GetNVP()->SetStream(QString());
+}
+
+// Callback from MythPlayer when a stream starts or stops
+bool MHIContext::StreamStarted(bool bStarted)
+{
+    if (!m_engine || !m_notify)
+        return false;
+
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] Stream 0x%1 %2")
+        .arg((quintptr)m_notify,0,16).arg(bStarted ? "started" : "stopped"));
+
+    m_engine->StreamStarted(m_notify, bStarted);
+    if (!bStarted)
+        m_notify = 0;
+    return m_currentStream == -1; // Return true if it's an http stream
+}
+
+// Begin playing audio
+bool MHIContext::BeginAudio(int tag)
+{
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] BeginAudio %1").arg(tag));
 
     if (tag < 0)
         return true; // Leave it at the default.
-    else if (m_parent->GetNVP())
-        return m_parent->GetNVP()->SetAudioByComponentTag(tag);
-    else
-        return false;
-}
 
+    m_audioTag = tag;
+    if (m_parent->GetNVP())
+        return m_parent->GetNVP()->SetAudioByComponentTag(tag);
+    return false;
+ }
+ 
 // Stop playing audio
-void MHIContext::StopAudio(void)
+void MHIContext::StopAudio()
 {
     // Do nothing at the moment.
 }
-
+ 
 // Begin displaying video from the specified stream
-bool MHIContext::BeginVideo(const QString &stream, int tag)
+bool MHIContext::BeginVideo(int tag)
 {
-    LOG(VB_MHEG, LOG_INFO, QString("[mhi] BeginVideo %1 %2").arg(stream).arg(tag));
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] BeginVideo %1").arg(tag));
 
-    int chan = GetChannelIndex(stream);
-    if (chan < 0)
-        return false;
-    if (chan != m_currentStream)
-    {
-        // We have to tune to the channel where the video is to be found.
-        m_currentStream = chan;
-        m_videoTag = tag;
-        return TuneTo(chan, kTuneKeepChnl|kTuneQuietly|kTuneKeepApp);
-    }
     if (tag < 0)
         return true; // Leave it at the default.
-    else if (m_parent->GetNVP())
+ 
+    m_videoTag = tag;
+    if (m_parent->GetNVP())
         return m_parent->GetNVP()->SetVideoByComponentTag(tag);
-
     return false;
 }
-
-// Stop displaying video
-void MHIContext::StopVideo(void)
+ 
+ // Stop displaying video
+void MHIContext::StopVideo()
 {
     // Do nothing at the moment.
+}
+ 
+// Get current stream position, -1 if unknown
+long MHIContext::GetStreamPos()
+{
+    return m_parent->GetNVP() ? m_parent->GetNVP()->GetStreamPos() : -1;
+}
+
+// Get current stream size, -1 if unknown
+long MHIContext::GetStreamMaxPos()
+{
+    return m_parent->GetNVP() ? m_parent->GetNVP()->GetStreamMaxPos() : -1;
+}
+
+// Set current stream position
+long MHIContext::SetStreamPos(long pos)
+{
+    return m_parent->GetNVP() ? m_parent->GetNVP()->SetStreamPos(pos) : -1;
+}
+
+// Play or pause a stream
+void MHIContext::StreamPlay(bool play)
+{
+    if (m_parent->GetNVP())
+        m_parent->GetNVP()->StreamPlay(play);
 }
 
 // Create a new object to draw dynamic line art.
@@ -869,16 +1025,15 @@ void MHIContext::DrawRect(int xPos, int yPos, int width, int height,
 // and usually that will be the same as the origin of the bounding
 // box (clipRect).
 void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
-                           const QImage &qImage)
+                           const QImage &qImage, bool bScaled /* = false */)
 {
     if (qImage.isNull())
         return;
 
     QRect imageRect(x, y, qImage.width(), qImage.height());
-    QRect displayRect = QRect(clipRect.x(), clipRect.y(),
-                              clipRect.width(), clipRect.height()) & imageRect;
+    QRect displayRect = clipRect & imageRect;
 
-    if (displayRect == imageRect) // No clipping required
+    if (bScaled || displayRect == imageRect) // No clipping required
     {
         QImage q_scaled =
             qImage.scaled(
@@ -892,8 +1047,7 @@ void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
     else if (!displayRect.isEmpty())
     { // We must clip the image.
         QImage clipped = qImage.convertToFormat(QImage::Format_ARGB32)
-            .copy(displayRect.x() - x, displayRect.y() - y,
-                  displayRect.width(), displayRect.height());
+            .copy(displayRect.translated(-x, -y));
         QImage q_scaled =
             clipped.scaled(
                 SCALED_X(displayRect.width()),
@@ -1497,11 +1651,12 @@ void MHIBitmap::Draw(int x, int y, QRect rect, bool tiled)
                 tiledImage.setPixel(i, j, m_image.pixel(i % m_image.width(), j % m_image.height()));
             }
         }
-        m_parent->DrawImage(rect.x(), rect.y(), rect, tiledImage);
+        m_parent->DrawImage(rect.x(), rect.y(), rect, tiledImage, true);
     }
     else
     {
-        m_parent->DrawImage(x, y, rect, m_image);
+        // NB THe BBC expects bitmaps to be scaled, not clipped
+        m_parent->DrawImage(x, y, rect, m_image, true);
     }
 }
 

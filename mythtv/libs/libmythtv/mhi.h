@@ -21,6 +21,7 @@ using namespace std;
 #include "../libmythfreemheg/freemheg.h"
 #include "interactivetv.h"
 #include "dsmcc.h"
+#include "mhegic.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythdeque.h"
@@ -99,7 +100,7 @@ class MHIContext : public MHContext, public QRunnable
     virtual void DrawBackground(const QRegion &reg);
     virtual void DrawVideo(const QRect &videoRect, const QRect &displayRect);
 
-    void DrawImage(int x, int y, const QRect &rect, const QImage &image);
+    void DrawImage(int x, int y, const QRect &rect, const QImage &image, bool bScaled = false);
 
     virtual int GetChannelIndex(const QString &str);
     /// Get netId etc from the channel index.
@@ -107,14 +108,27 @@ class MHIContext : public MHContext, public QRunnable
                                 int &transportId, int &serviceId);
     virtual bool TuneTo(int channel, int tuneinfo);
 
-    /// Begin playing audio from the specified stream
-    virtual bool BeginAudio(const QString &stream, int tag);
+    /// Begin playing the specified stream
+    virtual bool BeginStream(const QString &str, MHStream* notify);
+    virtual void EndStream();
+    // Called when the stream starts or stops
+    bool StreamStarted(bool bStarted = true);
+    /// Begin playing audio
+    virtual bool BeginAudio(int tag);
     /// Stop playing audio
-    virtual void StopAudio(void);
-    /// Begin displaying video from the specified stream
-    virtual bool BeginVideo(const QString &stream, int tag);
+    virtual void StopAudio();
+    /// Begin displaying video
+    virtual bool BeginVideo(int tag);
     /// Stop displaying video
-    virtual void StopVideo(void);
+    virtual void StopVideo();
+    // Get current stream position, -1 if unknown
+    virtual long GetStreamPos();
+    // Get current stream size, -1 if unknown
+    virtual long GetStreamMaxPos();
+    // Set current stream position
+    virtual long SetStreamPos(long);
+    // Play or pause a stream
+    virtual void StreamPlay(bool);
 
     // Get the context id strings.  The format of these strings is specified
     // by the UK MHEG profile.
@@ -122,6 +136,9 @@ class MHIContext : public MHContext, public QRunnable
         { return "MYT001001"; } // Version number?
     virtual const char *GetDSMCCId(void)
         { return "DSMMYT001"; } // DSMCC version.
+
+    // InteractionChannel
+    virtual int GetICStatus(); // 0= Active, 1= Inactive, 2= Disabled
 
     // Operations used by the display classes
     // Add an item to the display vector
@@ -149,6 +166,9 @@ class MHIContext : public MHContext, public QRunnable
     Dsmcc           *m_dsmcc;  // Pointer to the DSMCC object carousel.
     QMutex           m_dsmccLock;
     MythDeque<DSMCCPacket*> m_dsmccQueue;
+
+    MHInteractionChannel m_ic;  // Interaction channel
+    MHStream        *m_notify;
 
     QMutex           m_keyLock;
     MythDeque<int>   m_keyQueue;

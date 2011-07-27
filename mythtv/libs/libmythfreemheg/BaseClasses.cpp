@@ -588,6 +588,8 @@ void MHGenericObjectRef::GetValue(MHObjectRef &ref, MHEngine *engine) const
     }
     else
     {
+        // LVR - Hmm I don't think this is right. Should be: ref.Copy(m_Indirect);
+        // But it's used in several places so workaround in Stream::MHActionGenericObjectRefFix
         MHUnion result;
         MHRoot *pBase = engine->FindObject(m_Indirect);
         pBase->GetVariableValue(result, engine);

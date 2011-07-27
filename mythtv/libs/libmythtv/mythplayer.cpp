@@ -2862,14 +2862,13 @@ void MythPlayer::EventLoop(void)
     // Handle end of file
     if (GetEof() && !allpaused)
     {
-#if 0 && defined USING_MHEG
+#ifdef USING_MHEG
         if (interactiveTV && interactiveTV->StreamStarted(false))
         {
             Pause();
             return;
         }
 #endif
-
         if (player_ctx->tvchain && player_ctx->tvchain->HasNext())
         {
             LOG(VB_GENERAL, LOG_NOTICE, LOC + "LiveTV forcing JumpTo 1");
@@ -4999,7 +4998,7 @@ void MythPlayer::JumpToStream(const QString &stream)
     ChangeSpeed();
 
     player_ctx->SetPlayerChangingBuffers(false);
-#if 0 && defined USING_MHEG
+#ifdef USING_MHEG
     if (interactiveTV) interactiveTV->StreamStarted();
 #endif
 

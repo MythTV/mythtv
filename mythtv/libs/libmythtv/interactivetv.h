@@ -39,6 +39,8 @@ class InteractiveTV
 
     // Get the initial component tags.
     void GetInitialStreams(int &audioTag, int &videoTag);
+    // Called when a stream starts or stops. Returns true if event is handled
+    bool StreamStarted(bool bStarted = true);
 
     MythPlayer *GetNVP(void) { return m_nvp; }
 
