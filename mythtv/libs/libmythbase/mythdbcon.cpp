@@ -72,7 +72,8 @@ MSqlDatabase::MSqlDatabase(const QString &name)
         return;
     }
     QString connectOptions("MYSQL_OPT_RECONNECT=1");
-    LOG(VB_GENERAL, LOG_DEBUG, "Setting connect options: " + connectOptions);
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Setting connect options: %1")
+                                       .arg(connectOptions));
     m_db.setConnectOptions(connectOptions);
     m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
 }
