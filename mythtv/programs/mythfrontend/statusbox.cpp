@@ -463,16 +463,23 @@ void StatusBox::customEvent(QEvent *event)
         else if (resultid == "AutoExpireManage")
         {
             ProgramInfo* rec = qVariantValue<ProgramInfo*>(dce->GetData());
-            if (!rec)
+
+            // button 2 is "No Change"
+            if (!rec || buttonnum == 2)
                 return;
 
+            // button 1 is "Delete Now"
             if ((buttonnum == 0) && rec->QueryIsDeleteCandidate())
             {
-                RemoteDeleteRecording(
+                if (!RemoteDeleteRecording(
                     rec->GetChanID(), rec->GetRecordingStartTime(),
-                    false, false);
-                m_logList->RemoveItem(m_logList->GetItemCurrent());
+                    false, false))
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to delete recording: %1").arg(rec->GetTitle()));
+                    return;
+                }
             }
+            // button 1 is "Move To Default Group" or "UnDelete" or "Disable AutoExpire"
             else if (buttonnum == 1)
             {
                 if ((rec)->GetRecordingGroup() == "Deleted")
@@ -491,8 +498,16 @@ void StatusBox::customEvent(QEvent *event)
                         *rec = ri;
                     }
                 }
-                doAutoExpireList();
             }
+
+            // remove the changed recording from the expire list
+            delete m_expList[m_logList->GetCurrentPos()];
+            m_expList.erase(m_expList.begin() + m_logList->GetCurrentPos());
+
+            int pos = m_logList->GetCurrentPos();
+            int topPos = m_logList->GetTopItemPos();
+            doAutoExpireList(false);
+            m_logList->SetItemCurrent(pos, topPos);
         }
 
     }
@@ -1336,7 +1351,7 @@ void StatusBox::doMachineStatus()
 /** \fn StatusBox::doAutoExpireList()
  *  \brief Show list of recordings which may AutoExpire
  */
-void StatusBox::doAutoExpireList()
+void StatusBox::doAutoExpireList(bool updateExpList)
 {
     if (m_iconState)
         m_iconState->DisplayState("autoexpire");
@@ -1362,11 +1377,15 @@ void StatusBox::doAutoExpireList()
     int                   deletedGroupCount(0);
 
     vector<ProgramInfo *>::iterator it;
-    for (it = m_expList.begin(); it != m_expList.end(); ++it)
-        delete *it;
-    m_expList.clear();
 
-    RemoteGetAllExpiringRecordings(m_expList);
+    if (updateExpList)
+    {
+        for (it = m_expList.begin(); it != m_expList.end(); ++it)
+            delete *it;
+        m_expList.clear();
+
+        RemoteGetAllExpiringRecordings(m_expList);
+    }
 
     for (it = m_expList.begin(); it != m_expList.end(); ++it)
     {
@@ -1424,7 +1443,6 @@ void StatusBox::doAutoExpireList()
         AddLogLine(contentLine, staticInfo, detailInfo,
                    staticInfo + detailInfo);
     }
-
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
