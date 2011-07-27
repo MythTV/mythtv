@@ -167,7 +167,7 @@ class MusicPlayer : public QObject, public MythObservable
 
   private:
     void stopDecoder(void);
-    void openOutputDevice(void);
+    bool openOutputDevice(void);
     QString getFilenameFromID(int id);
     void updateLastplay(void);
     void sendVolumeChangedEvent(void);
