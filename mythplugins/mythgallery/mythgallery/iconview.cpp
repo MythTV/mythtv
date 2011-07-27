@@ -654,8 +654,8 @@ bool IconView::HandleMediaEscape(MediaMonitor *mon)
 
 static bool is_subdir(const QDir &parent, const QDir &subdir)
 {
-    QString pstr = parent.canonicalPath();
-    QString cstr = subdir.canonicalPath();
+    QString pstr = QDir::cleanPath(parent.path());
+    QString cstr = QDir::cleanPath(subdir.path());
     bool ret = !cstr.indexOf(pstr);
 
     return ret;
