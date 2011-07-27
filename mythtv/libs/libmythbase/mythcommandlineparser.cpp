@@ -892,11 +892,12 @@ void MythCommandLineParser::addVersion(void)
 void MythCommandLineParser::addWindowed(bool def)
 {
     if (def)
-        add(QStringList( QStringList() << "-nw" << "--no-windowed" ), false,
-            "notwindowed", "Prevent application from running in window.", "");
+        add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
+            "notwindowed", false, 
+            "Prevent application from running in window.", "");
     else
-        add(QStringList( QStringList() << "-w" << "--windowed" ), false,
-            "windowed", "Force application to run in a window.", "");
+        add(QStringList( QStringList() << "-w" << "--windowed" ), "windowed", 
+        false, "Force application to run in a window.", "");
 }
 
 void MythCommandLineParser::addDaemon(void)

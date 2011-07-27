@@ -228,7 +228,6 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     char                line[MAX_STRING_LENGTH];
     char                usPart[9];
     char                timestamp[TIMESTAMP_MAX];
-    int                 length;
     char               *threadName = NULL;
     pid_t               pid = getpid();
     pid_t               tid = 0;
@@ -240,8 +239,6 @@ bool FileLogger::logmsg(LoggingItem_t *item)
               (const struct tm *)&item->tm );
     snprintf( usPart, 9, ".%06d", (int)(item->usec) );
     strcat( timestamp, usPart );
-    length = strlen( timestamp );
-
     char shortname;
 
     {
@@ -969,6 +966,8 @@ void logStart(QString logfile, int progress, int quiet, int facility,
     sa.sa_flags = SA_RESTART | SA_SIGINFO;
     sigaction( SIGHUP, &sa, NULL );
 #endif
+
+    (void)logger;
 
     logThread.start();
 }
