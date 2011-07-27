@@ -19,17 +19,14 @@
 #ifndef GALLERYFILTERDLG_H
 #define GALLERYFILTERDLG_H
 
-// Qt headers
-#include <QThread>
-
 // MythTV headers
-#include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuiimage.h>
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/mythmedia.h>
+#include <mythscreentype.h>
+#include <mythuitext.h>
+#include <mythuibutton.h>
+#include <mythuibuttonlist.h>
+#include <mythuiimage.h>
+#include <mythdialogbox.h>
+#include <mythmedia.h>
 
 #include "galleryfilter.h"
 
@@ -38,11 +35,11 @@ using namespace std;
 class GalleryFilter;
 class GalleryFilterDialog : public MythScreenType
 {
-
   Q_OBJECT
 
   public:
-    GalleryFilterDialog(MythScreenStack *parent, QString name, GalleryFilter *filter);
+    GalleryFilterDialog(MythScreenStack *parent, QString name,
+                        GalleryFilter *filter);
     ~GalleryFilterDialog();
 
     bool Create();
@@ -76,3 +73,7 @@ class GalleryFilterDialog : public MythScreenType
 };
 
 #endif /* GALLERYFILTERDLG_H */
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

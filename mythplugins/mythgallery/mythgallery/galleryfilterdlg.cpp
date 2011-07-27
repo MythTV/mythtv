@@ -15,41 +15,25 @@
  *
  * ============================================================ */
 
-#include "galleryfilter.h"
-
 using namespace std;
 
 // Qt headers
 #include <QApplication>
 #include <QEvent>
-//#include <QDir>
-//#include <QMatrix>
 #include <QList>
-//#include <QFileInfo>
 
 // MythTV headers
-#include <mythtv/util.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-//#include <mythtv/httpcomms.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythdb/mythverbose.h>
-//#include <mythtv/libmythui/mythmainwindow.h>
-//#include <mythtv/libmythui/mythprogressdialog.h>
-//#include <mythtv/mythmediamonitor.h>
+#include <util.h>
+#include <mythdbcon.h>
+#include <mythuibuttonlist.h>
+#include <mythcontext.h>
+#include <mythlogging.h>
 
 // MythGallery headers
-//#include "galleryutil.h"
-//#include "gallerysettings.h"
 #include "galleryfilterdlg.h"
 #include "galleryfilter.h"
-//#include "thumbgenerator.h"
-//#include "iconview.h"
-//#include "singleview.h"
-//#include "glsingleview.h"
 
 #define LOC QString("GalleryFilterDlg:")
-#define LOC_ERR QString("GalleryFilterDlg, Error:")
 
 class FilterScanThread : public QThread
 {
@@ -67,7 +51,8 @@ class FilterScanThread : public QThread
 };
 
 FilterScanThread::FilterScanThread(const QString& dir, const GalleryFilter& flt,
-                                   int *dirCount, int *imageCount, int *movieCount)
+                                   int *dirCount, int *imageCount,
+                                   int *movieCount)
 {
     m_dir = dir;
     m_filter = flt;
@@ -78,10 +63,14 @@ FilterScanThread::FilterScanThread(const QString& dir, const GalleryFilter& flt,
 
 void FilterScanThread::run()
 {
-    GalleryFilter::TestFilter(m_dir, m_filter, m_dirCount, m_imgCount, m_movCount);
+    threadRegister("FilterScan");
+    GalleryFilter::TestFilter(m_dir, m_filter, m_dirCount, m_imgCount,
+                              m_movCount);
+    threadDeregister();
 }
 
-GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, QString name, GalleryFilter *filter)
+GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, QString name,
+                                         GalleryFilter *filter)
             : MythScreenType(parent, name)
 {
     m_settingsOriginal = filter;
@@ -115,7 +104,7 @@ bool GalleryFilterDialog::Create()
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'filter'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'filter'");
         return false;
     }
 
@@ -157,19 +146,24 @@ void GalleryFilterDialog::fillWidgets()
                              kSortOrderUnsorted);
     new MythUIButtonListItem(m_sortList, QObject::tr("Name (A-Z alpha)"),
                              kSortOrderNameAsc);
-    new MythUIButtonListItem(m_sortList, QObject::tr("Reverse Name (Z-A alpha)"),
+    new MythUIButtonListItem(m_sortList,
+                             QObject::tr("Reverse Name (Z-A alpha)"),
                              kSortOrderNameDesc);
     new MythUIButtonListItem(m_sortList, QObject::tr("Mod Time (oldest first)"),
                              kSortOrderModTimeAsc);
-    new MythUIButtonListItem(m_sortList, QObject::tr("Reverse Mod Time (most recent first)"),
+    new MythUIButtonListItem(m_sortList,
+                             QObject::tr("Reverse Mod Time (newest first)"),
                              kSortOrderModTimeDesc);
     new MythUIButtonListItem(m_sortList, QObject::tr("Extension (A-Z alpha)"),
                              kSortOrderExtAsc);
-    new MythUIButtonListItem(m_sortList, QObject::tr("Reverse Extension (Z-A alpha)"),
+    new MythUIButtonListItem(m_sortList,
+                             QObject::tr("Reverse Extension (Z-A alpha)"),
                              kSortOrderExtDesc);
-    new MythUIButtonListItem(m_sortList, QObject::tr("Filesize (smallest first)"),
+    new MythUIButtonListItem(m_sortList,
+                             QObject::tr("Filesize (smallest first)"),
                              kSortOrderSizeAsc);
-    new MythUIButtonListItem(m_sortList, QObject::tr("Reverse Filesize (largest first)"),
+    new MythUIButtonListItem(m_sortList,
+                             QObject::tr("Reverse Filesize (largest first)"),
                              kSortOrderSizeDesc);
     m_sortList->SetValueByData(m_settingsTemp->getSort());
 }
@@ -192,59 +186,49 @@ void GalleryFilterDialog::updateFilter()
 
     m_numImagesText->SetText("-- scanning current filter --");
 
-    FilterScanThread *fltScan = new FilterScanThread(m_photoDir, *m_settingsTemp, &dir_count, &img_count, &mov_count);
-    fltScan->start();
+    FilterScanThread fltScan(m_photoDir, *m_settingsTemp, &dir_count,
+                             &img_count, &mov_count);
+    fltScan.start();
 
-    while (!fltScan->isFinished())
+    while (!fltScan.isFinished())
     {
         usleep(500);
         qApp->processEvents();
     }
 
-    if (dir_count + img_count + mov_count == 0)
-    {
-        m_numImagesText->SetText(QString(tr("No files / directories found")));
-    }
-    else
-    {
-        if (dir_count > 0)
-        {
-            if (img_count + mov_count == 0)
-                m_numImagesText->SetText(QString(tr("Filter result : %1 directories found but no files"))
-                                         .arg(dir_count));
-            else {
-                if (img_count == 0)
-                    m_numImagesText->SetText(QString(tr("Filter result : %1 directories, %2 movie(s) found"))
-                                             .arg(dir_count)
-                                             .arg(mov_count));
-                else if (mov_count == 0)
-                    m_numImagesText->SetText(QString(tr("Filter result : %1 directories, %2 image(s) found"))
-                                             .arg(dir_count)
-                                             .arg(img_count));
-                else
-                    m_numImagesText->SetText(QString(tr("Filter result : %1 directories, %2 image(s) and %3 movie(s) found"))
-                                             .arg(dir_count)
-                                             .arg(img_count)
-                                             .arg(mov_count));
-            }
-
-        }
-        else
-        {
-            if (img_count > 0 && mov_count > 0)
-                m_numImagesText->SetText(QString(tr("Filter result : %1 image(s) and %2 movie(s) found"))
-                                         .arg(img_count)
-                                         .arg(mov_count));
-            else if (mov_count == 0)
-                m_numImagesText->SetText(QString(tr("Filter result : %1 image(s) found"))
-                                         .arg(img_count));
-            else
-                m_numImagesText->SetText(QString(tr("Filter result : %1 movie(s) found"))
-                                         .arg(mov_count));
-        }
-    }
-
     m_scanning = false;
+
+    if (dir_count + img_count + mov_count == 0)
+        m_numImagesText->SetText(QString(tr("No files / directories found")));
+    else if (dir_count > 0)
+    {
+        if (img_count + mov_count == 0)
+            m_numImagesText->SetText(QString(tr(
+                "Filter result : %1 directories found but no files"))
+                     .arg(dir_count));
+        else if (img_count == 0)
+            m_numImagesText->SetText(QString(tr(
+                "Filter result : %1 directories, %2 movie(s) found"))
+                     .arg(dir_count) .arg(mov_count));
+        else if (mov_count == 0)
+            m_numImagesText->SetText(QString(tr(
+                "Filter result : %1 directories, %2 image(s) found"))
+                     .arg(dir_count) .arg(img_count));
+        else
+            m_numImagesText->SetText(QString(tr(
+                "Filter result : %1 directories, %2 image(s) and %3 movie(s) "
+                "found")) .arg(dir_count) .arg(img_count) .arg(mov_count));
+    }
+    else if (img_count > 0 && mov_count > 0)
+        m_numImagesText->SetText(QString(tr(
+            "Filter result : %1 image(s) and %2 movie(s) found"))
+                 .arg(img_count) .arg(mov_count));
+    else if (mov_count == 0)
+        m_numImagesText->SetText(QString(tr(
+            "Filter result : %1 image(s) found")) .arg(img_count));
+    else
+        m_numImagesText->SetText(QString(tr(
+            "Filter result : %1 movie(s) found")) .arg(mov_count));
 }
 
 void GalleryFilterDialog::setDirFilter(void)
@@ -276,9 +260,11 @@ void GalleryFilterDialog::saveAndExit()
     m_settingsOriginal->dumpFilter("GalleryFilterDialog::saveAndExit()");
 
     if (m_settingsOriginal->getChangedState() > 0)
-    {
         emit filterChanged();
-    }
 
     Close();
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

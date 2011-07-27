@@ -45,7 +45,6 @@ using namespace std;
 #include "galleryutil.h"
 
 #define LOC QString("GLView: ")
-#define LOC_ERR QString("GLView, Error: ")
 
 GLSDialog::GLSDialog(const ThumbList& itemList,
                      int *pos, int slideShow, int sortOrder,

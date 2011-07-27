@@ -43,7 +43,6 @@
 #endif // EXIF_SUPPORT
 
 #define LOC QString("GalleryUtil:")
-#define LOC_ERR QString("GalleryUtil, Error:")
 
 static QFileInfo MakeUnique(const QFileInfo &dest);
 static QFileInfo MakeUniqueDirectory(const QFileInfo &dest);
@@ -263,28 +262,25 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
             continue;
 
         // skip filtered directory
-        if (fi->isDir() && !splitFD.filter(fi->fileName(), Qt::CaseInsensitive).isEmpty())
-        {
+        if (fi->isDir() &&
+             !splitFD.filter(fi->fileName(), Qt::CaseInsensitive).isEmpty())
             continue;
-        }
 
         if (fi->isDir() && recurse) 
         {
-            LoadDirectory(
-                itemList, QDir::cleanPath(fi->absoluteFilePath()),
-                flt, true, itemHash, thumbGen);
+            LoadDirectory(itemList, QDir::cleanPath(fi->absoluteFilePath()),
+                          flt, true, itemHash, thumbGen);
         }
         else 
         {
-            if ((GalleryUtil::IsImage(fi->absoluteFilePath())
-                    && flt.getTypeFilter() == kTypeFilterMoviesOnly)
-             || (GalleryUtil::IsMovie(fi->absoluteFilePath())
-                    && flt.getTypeFilter() == kTypeFilterImagesOnly))
+            if ((GalleryUtil::IsImage(fi->absoluteFilePath()) &&
+                 flt.getTypeFilter() == kTypeFilterMoviesOnly) ||
+                (GalleryUtil::IsMovie(fi->absoluteFilePath()) &&
+                 flt.getTypeFilter() == kTypeFilterImagesOnly))
                 continue;
 
-            ThumbItem *item = new ThumbItem(
-                fi->fileName(),
-                QDir::cleanPath(fi->absoluteFilePath()), fi->isDir());
+            ThumbItem *item = new ThumbItem(fi->fileName(),
+            	QDir::cleanPath(fi->absoluteFilePath()), fi->isDir());
 
             itemList.append(item);
 

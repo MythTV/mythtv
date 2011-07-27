@@ -54,7 +54,6 @@ using namespace std;
 #include "glsingleview.h"
 
 #define LOC QString("IconView: ")
-#define LOC_ERR QString("IconView, Error: ")
 
 QEvent::Type ChildCountEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
@@ -939,7 +938,8 @@ void IconView::HandleSubMenuMark(void)
 {
     QString label = tr("Marking Options");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
+    m_menuPopup = new MythDialogBox(label, m_popupStack,
+                                    "mythgallerymenupopup");
 
     if (m_menuPopup->Create())
         m_popupStack->AddScreen(m_menuPopup);
@@ -956,8 +956,8 @@ void IconView::HandleSubMenuFilter(void)
 {
     MythScreenStack *mainStack = GetScreenStack();
 
-    GalleryFilterDialog *filterdialog = new GalleryFilterDialog(mainStack,
-                                                                "galleryfilter", m_galleryFilter);
+    GalleryFilterDialog *filterdialog =
+        new GalleryFilterDialog(mainStack, "galleryfilter", m_galleryFilter);
 
     if (filterdialog->Create())
         mainStack->AddScreen(filterdialog);
@@ -969,7 +969,8 @@ void IconView::HandleSubMenuFile(void)
 {
     QString label = tr("File Options");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
+    m_menuPopup = new MythDialogBox(label, m_popupStack,
+                                    "mythgallerymenupopup");
 
     if (m_menuPopup->Create())
         m_popupStack->AddScreen(m_menuPopup);

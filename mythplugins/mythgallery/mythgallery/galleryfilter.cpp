@@ -1,22 +1,16 @@
-
 #include <set>
-#include <mythtv/libmythui/mythuitextedit.h>
+#include <mythuitextedit.h>
 
-#include "galleryfilter.h"
-
-#include <mythtv/mythcontext.h>
-
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuitextedit.h>
+#include <mythcontext.h>
+#include <mythuibuttonlist.h>
+#include <mythuibutton.h>
+#include <mythuitext.h>
+#include <mythuitextedit.h>
+#include <mythlogging.h>
 
 #include "config.h"
 #include "galleryfilter.h"
 #include "galleryutil.h"
-
-#define LOC QString("GalleryFilter:")
-#define LOC_ERR QString("GalleryFilter, Error:")
 
 GalleryFilter::GalleryFilter(bool loaddefaultsettings) :
     m_dirFilter(""), m_typeFilter(kTypeFilterAll),
@@ -27,8 +21,10 @@ GalleryFilter::GalleryFilter(bool loaddefaultsettings) :
     if (loaddefaultsettings)
     {
         m_dirFilter = gCoreContext->GetSetting("GalleryFilterDirectory", "");
-        m_typeFilter = gCoreContext->GetNumSetting("GalleryFilterType", kTypeFilterAll);
-        m_sort = gCoreContext->GetNumSetting("GallerySortOrder", kSortOrderUnsorted);
+        m_typeFilter = gCoreContext->GetNumSetting("GalleryFilterType",
+                                                   kTypeFilterAll);
+        m_sort = gCoreContext->GetNumSetting("GallerySortOrder",
+                                             kSortOrderUnsorted);
     }
 }
 
@@ -38,8 +34,7 @@ GalleryFilter::GalleryFilter(const GalleryFilter &gfs) :
     *this = gfs;
 }
 
-GalleryFilter &
-GalleryFilter::operator=(const GalleryFilter &gfs)
+GalleryFilter & GalleryFilter::operator=(const GalleryFilter &gfs)
 {
     if (m_dirFilter != gfs.m_dirFilter)
     {
@@ -85,50 +80,59 @@ bool GalleryFilter::TestFilter(const QString& dir, const GalleryFilter& flt,
         return false;
 
     if (!flt.getDirFilter().isEmpty())
-    {
         splitFD = flt.getDirFilter().split(":");
-    }
 
-
-    for (QFileInfoList::const_iterator it = list.begin(); it != list.end(); it++)
+    for (QFileInfoList::const_iterator it = list.begin();
+         it != list.end(); it++)
     {
         fi = &(*it);
-        if (fi->fileName() == "."
-            || fi->fileName() == "..")
-        {
+        if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
-        }
 
         // remove these already-resized pictures.
         if ((fi->fileName().indexOf(".thumb.") > 0) ||
             (fi->fileName().indexOf(".sized.") > 0) ||
             (fi->fileName().indexOf(".highlight.") > 0))
-        {
             continue;
-        }
 
         // skip filtered directory
         if (fi->isDir())
         {
             if (!splitFD.filter(fi->fileName(), Qt::CaseInsensitive).isEmpty())
-            {
                 continue;
-            }
+
             // add directory
             (*dirCount)++;
-            GalleryFilter::TestFilter(QDir::cleanPath(fi->absoluteFilePath()), flt,
-                                      dirCount, imageCount, movieCount);
+            GalleryFilter::TestFilter(QDir::cleanPath(fi->absoluteFilePath()),
+                                      flt, dirCount, imageCount, movieCount);
         }
         else
         {
-            if (GalleryUtil::IsImage(fi->absoluteFilePath())
-                && flt.getTypeFilter() != kTypeFilterMoviesOnly)
+            if (GalleryUtil::IsImage(fi->absoluteFilePath()) &&
+                flt.getTypeFilter() != kTypeFilterMoviesOnly)
                 (*imageCount)++;
-            else if (GalleryUtil::IsMovie(fi->absoluteFilePath())
-                && flt.getTypeFilter() != kTypeFilterImagesOnly)
+            else if (GalleryUtil::IsMovie(fi->absoluteFilePath()) &&
+                     flt.getTypeFilter() != kTypeFilterImagesOnly)
                 (*movieCount)++;
         }
     }
 
     return true;
 }
+
+
+void GalleryFilter::dumpFilter(QString src)
+{
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Dumping GalleryFilter from: %1")
+                      .arg(src));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("directory fiter: %1")
+                      .arg(m_dirFilter));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("type filter: %1")
+                      .arg(m_typeFilter));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("sort options: %1")
+                      .arg(m_sort));
+}
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

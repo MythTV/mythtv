@@ -17,8 +17,9 @@ static HostLineEdit *MythGalleryFilter()
     HostLineEdit *gc = new HostLineEdit("GalleryFilterDirectory");
     gc->setLabel(QObject::tr("Directory filter"));
     gc->setValue("");
-    gc->setHelpText(QObject::tr("Enter direcory names to be excluded in browser. "
-                                "(multiple entries delimited with ':')"));
+    gc->setHelpText(QObject::tr("Enter direcory names to be excluded in "
+                                "browser. (multiple entries delimited with "
+                                "':')"));
     return gc;
 };
 
@@ -33,6 +34,7 @@ static HostComboBox *MythGalleryFilterType()
                     "thumbnails."));
     return gc;
 };
+
 static HostLineEdit *MythGalleryDir()
 {
     HostLineEdit *gc = new HostLineEdit("GalleryDir");
@@ -60,15 +62,22 @@ static HostComboBox *MythGallerySortOrder()
 {
     HostComboBox *gc = new HostComboBox("GallerySortOrder");
     gc->setLabel(QObject::tr("Sort order when browsing"));
-    gc->addSelection("Unsorted", QString::number(QDir::Unsorted));
-    gc->addSelection("Name (A-Z alpha)", QString::number(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase));
-    gc->addSelection("Reverse Name (Z-A alpha)", QString::number(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase | QDir::Reversed));
-    gc->addSelection("Mod Time (earliest first)", QString::number(QDir::Time | QDir::DirsFirst | QDir::IgnoreCase | QDir::Reversed));
-    gc->addSelection("Reverse Mod Time (most recent first)", QString::number(QDir::Time | QDir::DirsFirst | QDir::IgnoreCase));
-    gc->addSelection("Extension (A-Z alpha)", QString::number(QDir::Size | QDir::DirsFirst | QDir::IgnoreCase));
-    gc->addSelection("Reverse Extension (Z-A alpha", QString::number(QDir::Size | QDir::Reversed | QDir::DirsFirst | QDir::IgnoreCase));
-    gc->addSelection("Filesize (smallest first)", QString::number(QDir::Type | QDir::DirsFirst | QDir::IgnoreCase));
-    gc->addSelection("Reverse Filesize (largest first)", QString::number(QDir::Type | QDir::Reversed | QDir::DirsFirst | QDir::IgnoreCase));
+    gc->addSelection("Unsorted", QString::number(kSortOrderUnsorted));
+    gc->addSelection("Name (A-Z alpha)", QString::number(kSortOrderNameAsc));
+    gc->addSelection("Reverse Name (Z-A alpha)",
+                     QString::number(kSortOrderNameDesc));
+    gc->addSelection("Mod Time (oldest first)",
+                     QString::number(kSortOrderModTimeAsc));
+    gc->addSelection("Reverse Mod Time (newest first)",
+                     QString::number(kSortOrderModTimeDesc));
+    gc->addSelection("Extension (A-Z alpha)",
+                     QString::number(kSortOrderExtAsc));
+    gc->addSelection("Reverse Extension (Z-A alpha)",
+                     QString::number(kSortOrderExtDesc));
+    gc->addSelection("Filesize (smallest first)",
+		     QString::number(kSortOrderSizeAsc));
+    gc->addSelection("Reverse Filesize (largest first)",
+                     QString::number(kSortOrderSizeDesc));
     gc->setHelpText(QObject::tr("This is the sort order for the displayed "
                     "picture thumbnails."));
     return gc;
