@@ -71,6 +71,8 @@ class MythCoreContextPrivate : public QObject
 
     MythLocale *m_locale;
     QString language;
+
+    MythScheduler *m_scheduler;
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -87,7 +89,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_backend(false),
       m_database(GetMythDB()),
       m_UIThread(QThread::currentThread()),
-      m_locale(NULL)
+      m_locale(NULL),
+      m_scheduler(NULL)
 {
     threadRegister("CoreContext");
 }
@@ -1100,6 +1103,16 @@ void MythCoreContext::SaveLocaleDefaults(void)
 
     LOG(VB_GENERAL, LOG_ERR,
         "No locale defined! We weren't able to set locale defaults.");
+}
+
+void MythCoreContext::SetScheduler(MythScheduler *sched)
+{
+    d->m_scheduler = sched;
+}
+
+MythScheduler *MythCoreContext::GetScheduler(void)
+{
+    return d->m_scheduler;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

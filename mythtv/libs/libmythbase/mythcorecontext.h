@@ -31,6 +31,7 @@
 class MDBManager;
 class MythCoreContextPrivate;
 class MythSocket;
+class MythScheduler;
 
 /** \class MythCoreContext
  *  \brief This class contains the runtime context for MythTV.
@@ -53,6 +54,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void SetLocalHostname(const QString &hostname);
     void SetServerSocket(MythSocket *serverSock);
     void SetEventSocket(MythSocket *eventSock);
+    void SetScheduler(MythScheduler *sched);
 
     bool ConnectToMasterServer(bool blockingClient = true);
 
@@ -106,6 +108,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 
     MythDB *GetDB(void);
     MDBManager *GetDBManager(void);
+    MythScheduler *GetScheduler(void);
 
     bool IsDatabaseIgnored(void) const;
     DatabaseParams GetDatabaseParams(void)

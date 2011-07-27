@@ -104,21 +104,8 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
     // Get all Pending Scheduled Programs
     // ----------------------------------------------------------------------
 
-    RecList      recList;
-
-    if (sched)
-        sched->getAllPending( &recList);
-
-    // ----------------------------------------------------------------------
-    // We need to convert from a RecList to a ProgramList
-    // (ProgramList will autodelete ProgramInfo pointers)
-    // ----------------------------------------------------------------------
-
-    for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end();   itRecList++)
-    {
-        schedList.push_back( *itRecList );
-    }
+    bool hasConflicts;
+    LoadFromScheduler(schedList, hasConflicts);
 
     // ----------------------------------------------------------------------
 
@@ -199,22 +186,9 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
 
     // Get all Pending Scheduled Programs
 
-    RecList      recList;
     ProgramList  schedList;
-
-    if (sched)
-        sched->getAllPending( &recList);
-
-    // ----------------------------------------------------------------------
-    // We need to convert from a RecList to a ProgramList
-    // (ProgramList will autodelete ProgramInfo pointers)
-    // ----------------------------------------------------------------------
-
-    for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end();   itRecList++)
-    {
-        schedList.push_back( *itRecList );
-    }
+    bool hasConflicts;
+    LoadFromScheduler(schedList, hasConflicts);
 
     // ----------------------------------------------------------------------
 

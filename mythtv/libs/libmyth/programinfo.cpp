@@ -31,6 +31,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "storagegroup.h"
 #include "programinfoupdater.h"
+#include "mythscheduler.h"
 #include "remotefile.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
@@ -4285,10 +4286,19 @@ QStringList ProgramInfo::LoadFromScheduler(
     const QString &tmptable, int recordid)
 {
     QStringList slist;
-    if (gCoreContext->IsBackend())
+
+    MythScheduler *sched = gCoreContext->GetScheduler();
+    if (sched && tmptable.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ALERT,
-                 "LoadFromScheduler(): Error, called from backend.");
+        sched->GetAllPending(slist);
+        return slist;
+    }
+
+    if (sched)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "Called from master backend\n\t\t\t"
+            "with recordid or tmptable, this is not currently supported");
         return slist;
     }
 
