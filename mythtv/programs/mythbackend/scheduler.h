@@ -37,6 +37,9 @@ class Scheduler : public QThread, public MythScheduler
               QString recordTbl = "record", Scheduler *master_sched = NULL);
     ~Scheduler();
 
+    void Stop(void);
+    void Wait(void) { QThread::wait(); }
+
     void SetExpirer(AutoExpire *autoExpirer) { m_expirer = autoExpirer; }
 
     void Reschedule(int recordid);

@@ -139,6 +139,13 @@ Scheduler::~Scheduler()
     wait();
 }
 
+void Scheduler::Stop(void)
+{
+    QMutexLocker locker(&schedLock);
+    doRun = false;
+    reschedWait.wakeAll();
+}
+
 void Scheduler::SetMainServer(MainServer *ms)
 {
     m_mainServer = ms;
