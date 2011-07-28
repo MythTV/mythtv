@@ -230,7 +230,7 @@ void cleanup(void)
     }
 
     delete expirer;
-    expirer;
+    expirer = NULL;
 
     delete jobqueue;
     jobqueue = NULL;
