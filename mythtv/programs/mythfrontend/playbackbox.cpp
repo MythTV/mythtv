@@ -122,6 +122,26 @@ static int comp_recordDate_rev(const ProgramInfo *a, const ProgramInfo *b)
                 b->GetScheduledStartTime().date() ? 1 : -1);
 }
 
+static int comp_season(const ProgramInfo *a, const ProgramInfo *b)
+{
+    if (a->GetSeason() == b->GetSeason())
+        return (a->GetEpisode() <
+                b->GetEpisode() ? 1 : -1);
+    else
+        return (a->GetSeason() <
+                b->GetSeason() ? 1 : -1);
+}
+
+static int comp_season_rev(const ProgramInfo *a, const ProgramInfo *b)
+{
+    if (a->GetSeason() == b->GetSeason())
+        return (a->GetEpisode() >
+                b->GetEpisode() ? 1 : -1);
+    else
+        return (a->GetSeason() >
+                b->GetSeason() ? 1 : -1);
+}
+
 static bool comp_programid_less_than(
     const ProgramInfo *a, const ProgramInfo *b)
 {
@@ -162,6 +182,18 @@ static bool comp_recordDate_rev_less_than(
     const ProgramInfo *a, const ProgramInfo *b)
 {
     return comp_recordDate_rev(a, b) < 0;
+}
+
+static bool comp_season_less_than(
+    const ProgramInfo *a, const ProgramInfo *b)
+{
+    return comp_season(a, b) < 0;
+}
+
+static bool comp_season_rev_less_than(
+    const ProgramInfo *a, const ProgramInfo *b)
+{
+    return comp_season_rev(a, b) < 0;
 }
 
 static const uint s_artDelay[] =
@@ -1731,6 +1763,20 @@ bool PlaybackBox::UpdateUILists(void)
                                  (!m_listOrder || m_type == kDeleteBox) ?
                                  comp_recordDate_rev_less_than :
                                  comp_recordDate_less_than);
+            }
+        }
+    }
+    else if (episodeSort == "Season")
+    {
+        QMap<QString, ProgramList>::iterator it;
+        for (it = m_progLists.begin(); it != m_progLists.end(); ++it)
+        {
+            if (!it.key().isEmpty())
+            {
+                std::stable_sort((*it).begin(), (*it).end(),
+                                 (!m_listOrder || m_type == kDeleteBox) ?
+                                 comp_season_rev_less_than :
+                                 comp_season_less_than);
             }
         }
     }
