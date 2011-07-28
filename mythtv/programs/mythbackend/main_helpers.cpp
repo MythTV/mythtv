@@ -628,7 +628,5 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     delete sysEventHandler;
     delete mainServer;
 
-    cleanup();
-
     return exitCode;
 }
