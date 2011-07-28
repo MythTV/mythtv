@@ -365,6 +365,14 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     // ----------------------------------------------------------------------
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.suffix() );
+
+    // If we are dealing with a Sony Blu-ray player then we fake the
+    // MIME type to force the video to appear
+    if ( pRequest->m_eClient == CDS_ClientSonyDB )
+    {   
+        sMimeType = "video/avi";
+    }
+
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;"
                                  "DLNA.ORG_FLAGS=0150000000000000000000000000"
                                  "0000" ).arg( sMimeType  );

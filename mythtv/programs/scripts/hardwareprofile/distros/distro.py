@@ -26,7 +26,7 @@ class Distro:
     def detected(self, debug=False):
         return False
 
-    def gather(self, debug=False):
+    def gather(self, gate, debug=False):
         pass
 
     def data(self):

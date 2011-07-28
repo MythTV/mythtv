@@ -220,8 +220,8 @@ void cleanup(void)
     signal(SIGUSR1, SIG_DFL);
 #endif
 
-    delete sched;
-    sched = NULL;
+    delete gCoreContext->GetScheduler();
+    gCoreContext->SetScheduler(NULL);
 
     delete g_pUPnp;
     g_pUPnp = NULL;
@@ -316,7 +316,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
     if (cmdline.toBool("printsched") ||
         cmdline.toBool("testsched"))
     {
-        sched = new Scheduler(false, &tvList);
+        Scheduler *sched = new Scheduler(false, &tvList);
         if (!cmdline.toBool("testsched") &&
             gCoreContext->ConnectToMasterServer())
         {
@@ -333,6 +333,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
 
         verboseMask |= VB_SCHEDULE;
         sched->PrintList(true);
+        delete sched;
         return GENERIC_EXIT_OK;
     }
 
@@ -531,6 +532,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_SETUP_ERROR;
     }
 
+    Scheduler *sched = NULL;
     if (ismaster)
     {
         if (runsched)
@@ -553,6 +555,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
             if (sched)
                 sched->SetExpirer(expirer);
         }
+        gCoreContext->SetScheduler(sched);
     }
     else if (!cmdline.toBool("nohousekeeper"))
     {

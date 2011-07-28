@@ -50,6 +50,7 @@ __version__="0.21"
 # 0.1.9 Added support for XML output
 # 0.2.0 Make XML output the default
 # Version 1.12  Convert version information to XML
+#         1.13  Add test mode
 
 
 __usage_examples__='''
@@ -562,8 +563,15 @@ def main():
                         help=u"Get matching People list")
     parser.add_option(  "-I", "--peopleinfo", action="store_true", default=False, dest="peopleinfo",
                         help=u"Get A Person's metadata including graphic URLs")
+    parser.add_option(  "-t", action="store_true", default=False, dest="test",
+                        help=u"Test for the availability of runtime dependencies")
 
     opts, args = parser.parse_args()
+
+    # Test mode, if we've made it here, everything is ok
+    if opts.test:
+        print "Everything appears to be in order"
+        sys.exit(0)
 
     # Make all command line arguments unicode utf8
     for index in range(len(args)):

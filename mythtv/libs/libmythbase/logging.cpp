@@ -14,8 +14,8 @@
 
 using namespace std;
 
-#define _LogLevelNames_
 #include "mythlogging.h"
+#include "logging.h"
 #include "mythconfig.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
@@ -94,12 +94,21 @@ typedef struct {
     bool        additive;
     QString     helpText;
 } VerboseDef;
-
 typedef QMap<QString, VerboseDef *> VerboseMap;
+
+typedef struct {
+    int         value;
+    QString     name;
+    char        shortname;
+} LoglevelDef;
+typedef QMap<int, LoglevelDef *> LoglevelMap;
 
 bool verboseInitialized = false;
 VerboseMap verboseMap;
 QMutex verboseMapMutex;
+
+LoglevelMap loglevelMap;
+QMutex loglevelMapMutex;
 
 const uint64_t verboseDefaultInt = VB_GENERAL;
 const char    *verboseDefaultStr = " general";
@@ -112,6 +121,7 @@ QString      userDefaultValueStr = QString(verboseDefaultStr);
 bool         haveUserDefaultValues = false;
 
 void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext);
+void loglevelAdd(int value, QString name, char shortname);
 void verboseInit(void);
 void verboseHelp();
 
@@ -161,8 +171,9 @@ LoggerBase::~LoggerBase()
 }
 
 
-FileLogger::FileLogger(char *filename, bool quiet) : 
-        LoggerBase(filename, 0), m_opened(false), m_fd(-1), m_quiet(quiet)
+FileLogger::FileLogger(char *filename, bool progress, int quiet) :
+        LoggerBase(filename, 0), m_opened(false), m_fd(-1),
+        m_progress(progress), m_quiet(quiet)
 {
     if( !strcmp(filename, "-") )
     {
@@ -172,6 +183,8 @@ FileLogger::FileLogger(char *filename, bool quiet) :
     }
     else
     {
+        m_progress = false;
+        m_quiet = 0;
         m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
         m_opened = (m_fd != -1);
         LOG(VB_GENERAL, LOG_INFO, QString("Added logging to %1")
@@ -215,25 +228,33 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     char                line[MAX_STRING_LENGTH];
     char                usPart[9];
     char                timestamp[TIMESTAMP_MAX];
-    int                 length;
     char               *threadName = NULL;
     pid_t               pid = getpid();
     pid_t               tid = 0;
 
-    if (!m_opened || (m_quiet && item->level > LOG_ERR))
+    if (!m_opened || m_quiet || (m_progress && item->level > LOG_ERR))
         return false;
 
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
               (const struct tm *)&item->tm );
     snprintf( usPart, 9, ".%06d", (int)(item->usec) );
     strcat( timestamp, usPart );
-    length = strlen( timestamp );
+    char shortname;
+
+    {
+        QMutexLocker locker(&loglevelMapMutex);
+        LoglevelMap::iterator it = loglevelMap.find(item->level);
+        if (it == loglevelMap.end())
+            shortname = '-';
+        else
+            shortname = (*it)->shortname;
+    }
 
     if (m_fd == 1)
     {
         // Stdout
         snprintf( line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp,
-                  LogLevelShortNames[item->level], item->message );
+                  shortname, item->message );
     }
     else
     {
@@ -243,15 +264,13 @@ bool FileLogger::logmsg(LoggingItem_t *item)
         if( tid )
             snprintf( line, MAX_STRING_LENGTH, 
                       "%s %c [%d/%d] %s %s:%d (%s) - %s\n",
-                      timestamp, LogLevelShortNames[item->level], pid, tid,
-                      threadName, item->file, item->line, item->function,
-                      item->message );
+                      timestamp, shortname, pid, tid, threadName, item->file,
+                      item->line, item->function, item->message );
         else
             snprintf( line, MAX_STRING_LENGTH,
                       "%s %c [%d] %s %s:%d (%s) - %s\n",
-                      timestamp, LogLevelShortNames[item->level], pid,
-                      threadName, item->file, item->line, item->function,
-                      item->message );
+                      timestamp, shortname, pid, threadName, item->file,
+                      item->line, item->function, item->message );
     }
 
     int result = write( m_fd, line, strlen(line) );
@@ -863,11 +882,10 @@ void logPropagateCalc(void)
     if (logPropagateOpts.propagate)
         logPropagateArgs += " --logpath " + logPropagateOpts.path;
 
-    QString name = QString(LogLevelNames[logLevel]).toLower();
-    name.remove(0, 4);
+    QString name = logLevelGetName(logLevel);
     logPropagateArgs += " --loglevel " + name;
 
-    if (logPropagateOpts.quiet)
+    for (int i = 0; i < logPropagateOpts.quiet; i++)
         logPropagateArgs += " --quiet";
 
     if (!logPropagateOpts.dblog)
@@ -892,8 +910,8 @@ bool logPropagateQuiet(void)
     return logPropagateOpts.quiet;
 }
 
-void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
-              bool dblog, bool propagate)
+void logStart(QString logfile, int progress, int quiet, int facility,
+              LogLevel_t level, bool dblog, bool propagate)
 {
     LoggerBase *logger;
 
@@ -901,8 +919,8 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
         return;
  
     logLevel = level;
-    LOG(VB_GENERAL, LOG_CRIT, QString("Setting Log Level to %1")
-             .arg(LogLevelNames[logLevel]));
+    LOG(VB_GENERAL, LOG_CRIT, QString("Setting Log Level to LOG_%1")
+             .arg(logLevelGetName(logLevel).toUpper()));
 
     logPropagateOpts.propagate = propagate;
     logPropagateOpts.quiet = quiet;
@@ -919,12 +937,12 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
     logPropagateCalc();
 
     /* log to the console */
-    logger = new FileLogger((char *)"-", quiet);
+    logger = new FileLogger((char *)"-", progress, quiet);
 
     /* Debug logfile */
     if( !logfile.isEmpty() )
         logger = new FileLogger((char *)logfile.toLocal8Bit().constData(),
-                                false);
+                                false, false);
 
 #ifndef _WIN32
     /* Syslog */
@@ -948,6 +966,8 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
     sa.sa_flags = SA_RESTART | SA_SIGINFO;
     sigaction( SIGHUP, &sa, NULL );
 #endif
+
+    (void)logger;
 
     logThread.start();
 }
@@ -1049,18 +1069,41 @@ int syslogGetFacility(QString facility)
 
 LogLevel_t logLevelGet(QString level)
 {
-    int i;
-
-    level = "LOG_" + level.toUpper();
-    for( i = LOG_EMERG; i < LOG_UNKNOWN; i++ )
+    QMutexLocker locker(&loglevelMapMutex);
+    if (!verboseInitialized)
     {
-        if( level == LogLevelNames[i] )
-            return (LogLevel_t)i;
+        locker.unlock();
+        verboseInit();
+        locker.relock();
+    }
+
+    for( LoglevelMap::iterator it = loglevelMap.begin();
+         it != loglevelMap.end(); it++)
+    {
+        LoglevelDef *item = (*it);
+        if ( item->name == level.toLower() )
+            return (LogLevel_t)item->value;
     }
 
     return LOG_UNKNOWN;
 }
 
+QString logLevelGetName(LogLevel_t level)
+{
+    QMutexLocker locker(&loglevelMapMutex);
+    if (!verboseInitialized)
+    {
+        locker.unlock();
+        verboseInit();
+        locker.relock();
+    }
+    LoglevelMap::iterator it = loglevelMap.find((int)level);
+
+    if ( it == loglevelMap.end() )
+        return QString("unknown");
+
+    return (*it)->name;
+}
 
 void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext)
 {
@@ -1079,10 +1122,27 @@ void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext)
     verboseMap.insert(name, item);
 }
 
+void loglevelAdd(int value, QString name, char shortname)
+{
+    LoglevelDef *item = new LoglevelDef;
+
+    item->value = value;
+    name.detach();
+    // LOG_CRIT -> crit
+    name.remove(0, 4);
+    name = name.toLower();
+    item->name = name;
+    item->shortname = shortname;
+
+    loglevelMap.insert(value, item);
+}
+
 void verboseInit(void)
 {
     QMutexLocker locker(&verboseMapMutex);
+    QMutexLocker locker2(&loglevelMapMutex);
     verboseMap.clear();
+    loglevelMap.clear();
 
     // This looks funky, so I'll put some explanation here.  The verbosedefs.h
     // file gets included as part of the mythlogging.h include, and at that

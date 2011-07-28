@@ -1,6 +1,7 @@
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2007 Mike McGrath
+# Copyright (C) 2009 Sebastian Pipping <sebastian@pipping.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +22,7 @@ import commands
 import re
 import sys
 import smolt_config
-from gate import Gate
+
 
 def read_lsb_release():
     if os.access('/usr/bin/lsb_release', os.X_OK):

@@ -26,6 +26,8 @@
 #include <QHostAddress>
 #include <QUdpSocket>
 
+#include "version.h"
+#include "mythversion.h"
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "storagegroup.h"
@@ -72,6 +74,7 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
     DTC::ConnectionInfo *pInfo     = new DTC::ConnectionInfo();
     DTC::DatabaseInfo   *pDatabase = pInfo->Database();
     DTC::WOLInfo        *pWOL      = pInfo->WOL();
+    DTC::VersionInfo    *pVersion  = pInfo->Version();
 
     pDatabase->setHost         ( params.dbHostName    );
     pDatabase->setPing         ( params.dbHostPing    );
@@ -87,6 +90,12 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
     pWOL->setReconnect         ( params.wolReconnect );
     pWOL->setRetry             ( params.wolRetry     );
     pWOL->setCommand           ( params.wolCommand   );
+
+    pVersion->setVersion       ( MYTH_SOURCE_VERSION   );
+    pVersion->setBranch        ( MYTH_SOURCE_PATH      );
+    pVersion->setProtocol      ( MYTH_PROTO_VERSION    );
+    pVersion->setBinary        ( MYTH_BINARY_VERSION   );
+    pVersion->setSchema        ( MYTH_DATABASE_VERSION );
 
     // ----------------------------------------------------------------------
     // Return the pointer... caller is responsible to delete it!!!

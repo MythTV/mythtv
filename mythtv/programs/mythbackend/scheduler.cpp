@@ -75,7 +75,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     debugConflicts = (debug != NULL);
 
     if (master_sched)
-        master_sched->getAllPending(&reclist);
+        master_sched->GetAllPending(reclist);
 
     // Only the master scheduler should use SchedCon()
     if (doRun)
@@ -1532,7 +1532,7 @@ void Scheduler::getConflicting(RecordingInfo *pginfo, RecList *retlist)
     }
 }
 
-bool Scheduler::getAllPending(RecList *retList)
+bool Scheduler::GetAllPending(RecList &retList) const
 {
     QMutexLocker lockit(&schedLock);
 
@@ -1543,15 +1543,15 @@ bool Scheduler::getAllPending(RecList *retList)
     {
         if ((*it)->GetRecordingStatus() == rsConflict)
             hasconflicts = true;
-        retList->push_back(new RecordingInfo(**it));
+        retList.push_back(new RecordingInfo(**it));
     }
 
-    SORT_RECLIST(*retList, comp_timechannel);
+    SORT_RECLIST(retList, comp_timechannel);
 
     return hasconflicts;
 }
 
-QMap<QString,ProgramInfo*> Scheduler::GetRecording(void)
+QMap<QString,ProgramInfo*> Scheduler::GetRecording(void) const
 {
     QMutexLocker lockit(&schedLock);
 
@@ -1584,10 +1584,10 @@ RecStatusType Scheduler::GetRecStatus(const ProgramInfo &pginfo)
     return pginfo.GetRecordingStatus();
 }
 
-void Scheduler::getAllPending(QStringList &strList)
+void Scheduler::GetAllPending(QStringList &strList) const
 {
     RecList retlist;
-    bool hasconflicts = getAllPending(&retlist);
+    bool hasconflicts = GetAllPending(retlist);
 
     strList << QString::number(hasconflicts);
     strList << QString::number(retlist.size());
@@ -1914,7 +1914,8 @@ void Scheduler::run(void)
         if ((idleTimeoutSecs > 0) && (m_mainServer != NULL))
         {
             HandleIdleShutdown(blockShutdown, idleSince, prerollseconds,
-                               idleTimeoutSecs, idleWaitForRecordingTime);
+                               idleTimeoutSecs, idleWaitForRecordingTime,
+                               statuschanged);
         }
     }
 
@@ -2511,7 +2512,8 @@ void Scheduler::HandleTuning(RecordingInfo &ri, bool &statuschanged)
 
 void Scheduler::HandleIdleShutdown(
     bool &blockShutdown, QDateTime &idleSince,
-    int prerollseconds, int idleTimeoutSecs, int idleWaitForRecordingTime)
+    int prerollseconds, int idleTimeoutSecs, int idleWaitForRecordingTime,
+    bool &statuschanged)
 {
     if ((idleTimeoutSecs <= 0) || (m_mainServer == NULL))
         return;
@@ -2545,8 +2547,11 @@ void Scheduler::HandleIdleShutdown(
             }
             resetIdleTime_lock.unlock();
 
-            if (!idleSince.isValid())
+            if (statuschanged || !idleSince.isValid())
             {
+                if (!idleSince.isValid()) 
+                    idleSince = curtime;
+    
                 RecIter idleIter = reclist.begin();
                 for ( ; idleIter != reclist.end(); ++idleIter)
                     if ((*idleIter)->GetRecordingStatus() ==
@@ -2557,17 +2562,16 @@ void Scheduler::HandleIdleShutdown(
                 {
                     if (curtime.secsTo
                         ((*idleIter)->GetRecordingStartTime()) -
-                        prerollseconds >
+                        prerollseconds <
                         (idleWaitForRecordingTime * 60) +
                         idleTimeoutSecs)
                     {
-                        idleSince = curtime;
+                        idleSince = QDateTime();
                     }
                 }
-                else
-                    idleSince = curtime;
             }
-            else
+            
+            if (idleSince.isValid())
             {
                 // is the machine already idling the timeout time?
                 if (idleSince.addSecs(idleTimeoutSecs) < curtime)

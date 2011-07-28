@@ -100,12 +100,12 @@
                         <area>15,1,370,24</area>
                         <font>basesmallboldblue</font>
                     </textarea>
-                    <textarea name="shortdate" from="titlesubtitle">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>340,1,100,24</area>
                         <align>right</align>
                         <font>basesmallboldblue</font>
                     </textarea>
-                    <textarea name="starttime" from="shortdate">
+                    <textarea name="starttime" from="shortstartdate">
                         <area>450,1,95,24</area>
                         <align>right</align>
                         <font>basesmallboldblue</font>
@@ -131,12 +131,12 @@
                         <font>basesmallbold</font>
                         <font state="normal">basesmalllightgrey</font>
                     </textarea>
-                    <textarea name="shortdate" from="titlesubtitle">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>340,1,100,24</area>
                         <align>right</align>
                         <font>basesmallbold</font>
                     </textarea>
-                    <textarea name="starttime" from="shortdate">
+                    <textarea name="starttime" from="shortstartdate">
                         <area>450,1,95,24</area>
                         <align>right</align>
                         <font>basesmallbold</font>

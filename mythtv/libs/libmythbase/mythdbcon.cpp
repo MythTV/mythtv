@@ -71,6 +71,10 @@ MSqlDatabase::MSqlDatabase(const QString &name)
         LOG(VB_GENERAL, LOG_ERR, "Unable to init db connection.");
         return;
     }
+    QString connectOptions("MYSQL_OPT_RECONNECT=1");
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Setting connect options: %1")
+                                       .arg(connectOptions));
+    m_db.setConnectOptions(connectOptions);
     m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
 }
 

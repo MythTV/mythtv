@@ -3,6 +3,7 @@
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2007 Mike McGrath
+# Copyright (C) 2009 Sebastian Pipping <sebastian@pipping.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,15 +37,15 @@ from i18n import _
 import platform
 import software
 import commands
+import urlgrabber.grabber
 import sys
 import os
 from urlparse import urljoin
 from urlparse import urlparse
 from urllib import urlencode
 import urllib
-import urllib2
-import json
-from json import JSONEncoder
+import simplejson
+from simplejson import JSONEncoder, JSONDecodeError
 import datetime
 import logging
 
@@ -52,11 +53,8 @@ import config
 from smolt_config import get_config_attr
 from fs_util import get_fslist
 from devicelist import cat
-from request import Request
 
-from gate import Gate
 from devicelist import get_device_list
-from uuiddb import UuidDb
 import logging
 from logging.handlers import RotatingFileHandler
 import codecs
@@ -92,10 +90,6 @@ user_agent = 'smolt/%s' % smoltProtocol
 timeout = 120.0
 proxies = None
 DEBUG = False
-
-#note this is located here so that smoltProtocol, can be imported into smolt_mythtv
-if Gate().grants("MythTV"):
-    import smolt_mythtv
 
 
 PCI_BASE_CLASS_STORAGE =        1
@@ -205,86 +199,28 @@ def to_ascii(o, current_encoding='utf-8'):
         s = unicode(o, current_encoding)
     return s
 
-class Device:
-    def __init__(self, props, hardware):
-        self.UUID = getUUID()
-        self.type = classify_hal(props)
-        try:
-            self.description = props['info.product'].strip()
-        except KeyError:
-            self.description = 'No Description'
-        if self.type == "PRINTER":
-            try:
-                vendor = props['printer.vendor'].strip()
-                product = props['printer.product'].strip()
-                if product.startswith (vendor + ' '):
-                    product = product[len (vendor) + 1:]
-                self.description = "%s %s" % (vendor, product)
-            except KeyError:
-                pass
-
-            try:
-                # The USB vendor and product IDs are in the device UDI,
-                # whereas we are looking at the interface UDI.  Fetch the
-                # parent device UDI and use that for the remaining fields.
-                parent_udi = props['info.parent']
-                parent_props = hardware.get_properties_for_udi (parent_udi)
-                props = parent_props
-            except KeyError:
-                pass
-
-        try:
-            self.bus = props['linux.subsystem'].strip()
-        except KeyError:
-            try:
-                self.bus = props['info.bus'].strip()
-            except KeyError:
-                self.bus = 'Unknown'
-        try:
-            self.vendorid = props['%s.vendor_id' % self.bus]
-        except KeyError:
-            self.vendorid = None
-        try:
-            self.deviceid = props['%s.product_id' % self.bus]
-        except KeyError:
-            self.deviceid = None
-        try:
-            self.subsysvendorid = props['%s.subsys_vendor_id' % self.bus]
-        except KeyError:
-            self.subsysvendorid = None
-        try:
-            self.subsysdeviceid = props['%s.subsys_product_id' % self.bus]
-        except KeyError:
-            self.subsysdeviceid = None
-        try:
-            self.driver = props['info.linux.driver'].strip()
-        except KeyError:
-            try:
-                self.driver = props['net.linux.driver'].strip()
-            except KeyError:
-                self.driver = 'Unknown'
 
 class Host:
-    def __init__(self):
+    def __init__(self, gate, uuid):
         cpuInfo = read_cpuinfo()
         memory = read_memory()
-        self.UUID = getUUID()
-        self.os = Gate().process('distro', software.read_os(), WITHHELD_MAGIC_STRING)
-        self.defaultRunlevel = Gate().process('run_level', software.read_runlevel(), -1)
+        self.UUID = uuid
+        self.os = gate.process('distro', software.read_os(), WITHHELD_MAGIC_STRING)
+        self.defaultRunlevel = gate.process('run_level', software.read_runlevel(), -1)
 
-        self.bogomips = Gate().process('cpu', cpuInfo.get('bogomips', 0), 0)
-        self.cpuVendor = Gate().process('cpu', cpuInfo.get('type', ''), WITHHELD_MAGIC_STRING)
-        self.cpuModel = Gate().process('cpu', cpuInfo.get('model', ''), WITHHELD_MAGIC_STRING)
-        self.cpu_stepping = Gate().process('cpu', cpuInfo.get('cpu_stepping', 0), 0)
-        self.cpu_family = Gate().process('cpu', cpuInfo.get('cpu_family', ''), '')
-        self.cpu_model_num = Gate().process('cpu', cpuInfo.get('cpu_model_num', 0), 0)
-        self.numCpus = Gate().process('cpu', cpuInfo.get('count', 0), 0)
-        self.cpuSpeed = Gate().process('cpu', cpuInfo.get('speed', 0), 0)
+        self.bogomips = gate.process('cpu', cpuInfo.get('bogomips', 0), 0)
+        self.cpuVendor = gate.process('cpu', cpuInfo.get('type', ''), WITHHELD_MAGIC_STRING)
+        self.cpuModel = gate.process('cpu', cpuInfo.get('model', ''), WITHHELD_MAGIC_STRING)
+        self.cpu_stepping = gate.process('cpu', cpuInfo.get('cpu_stepping', 0), 0)
+        self.cpu_family = gate.process('cpu', cpuInfo.get('cpu_family', ''), '')
+        self.cpu_model_num = gate.process('cpu', cpuInfo.get('cpu_model_num', 0), 0)
+        self.numCpus = gate.process('cpu', cpuInfo.get('count', 0), 0)
+        self.cpuSpeed = gate.process('cpu', cpuInfo.get('speed', 0), 0)
 
-        self.systemMemory = Gate().process('ram_size', memory['ram'], 0)
-        self.systemSwap = Gate().process('swap_size', memory['swap'], 0)
-        self.kernelVersion = Gate().process('kernel', os.uname()[2], WITHHELD_MAGIC_STRING)
-        if Gate().grants('language'):
+        self.systemMemory = gate.process('ram_size', memory['ram'], 0)
+        self.systemSwap = gate.process('swap_size', memory['swap'], 0)
+        self.kernelVersion = gate.process('kernel', os.uname()[2], WITHHELD_MAGIC_STRING)
+        if gate.grants('language'):
             try:
                 self.language = os.environ['LANG']
             except KeyError:
@@ -300,28 +236,33 @@ class Host:
             self.language = WITHHELD_MAGIC_STRING
 
         tempform = platform.machine()
-        self.platform = Gate().process('arch', tempform, WITHHELD_MAGIC_STRING)
+        self.platform = gate.process('arch', tempform, WITHHELD_MAGIC_STRING)
 
-        if Gate().grants('vendor'):
+        if gate.grants('vendor'):
             #self.systemVendor = hostInfo.get('system.vendor'
-            self.systemVendor = cat('/sys/devices/virtual/dmi/id/sys_vendor')[0].strip()
-            if not self.systemVendor:
+            try:
+                self.systemVendor = cat('/sys/devices/virtual/dmi/id/sys_vendor')[0].strip()
+            except:
                 self.systemVendor = 'Unknown'
         else:
             self.systemVendor = WITHHELD_MAGIC_STRING
 
-        if Gate().grants('model'):
-            self.systemModel = cat('/sys/devices/virtual/dmi/id/product_name')[0].strip() + ' ' + cat('/sys/devices/virtual/dmi/id/product_version')[0].strip()
-            if not self.systemModel:
-                self.systemModel = hostInfo.get('system.hardware.product')
-                if hostInfo.get('system.hardware.version'):
-                    self.systemModel += ' ' + hostInfo.get('system.hardware.version')
-            if not self.systemModel:
+        if gate.grants('model'):
+            try:
+                self.systemModel = cat('/sys/devices/virtual/dmi/id/product_name')[0].strip() + ' ' + cat('/sys/devices/virtual/dmi/id/product_version')[0].strip()
+            except:
                 self.systemModel = 'Unknown'
+            #hostInfo was removed with the hal restructure
+            #if not self.systemModel:
+                #self.systemModel = hostInfo.get('system.hardware.product')
+                #if hostInfo.get('system.hardware.version'):
+                    #self.systemModel += ' ' + hostInfo.get('system.hardware.version')
+            #if not self.systemModel:
+                #self.systemModel = 'Unknown'
         else:
             self.systemModel = WITHHELD_MAGIC_STRING
 
-        if Gate().grants('form_factor'):
+        if gate.grants('form_factor'):
             try:
                 formfactor_id = int(cat('/sys/devices/virtual/dmi/id/chassis_type')[0].strip())
                 self.formfactor = FORMFACTOR_LIST[formfactor_id]
@@ -347,12 +288,12 @@ class Host:
                 }
                 try:
                     model_name = model_map[model]
-                    self.systemModel = Gate().process('model', model_name)
-                    self.formfactor = Gate().process('form_factor', 'Blade')
+                    self.systemModel = gate.process('model', model_name)
+                    self.formfactor = gate.process('form_factor', 'Blade')
                 except KeyError:
                     pass
 
-        if Gate().grants('selinux'):
+        if gate.grants('selinux'):
             try:
                 import selinux
                 try:
@@ -387,29 +328,9 @@ class Host:
             self.selinux_policy = WITHHELD_MAGIC_STRING
             self.selinux_enforce = WITHHELD_MAGIC_STRING
 
-    #MYTHTV STUFF
-        if Gate().grants("MythTV"):
-            self.mythRemote = "Not Installed"
-            self.mythTheme = "Not Installed"
-            self.mythPlugins = "Not Installed"
-            self.mythRole = "Not Installed"
-            self.mythTuner = "Not Installed"
 
-            if Gate().grants('MythRemote'):
-                self.mythRemote = smolt_mythtv.runMythRemote()
-            if Gate().grants('MythTheme'):
-                self.mythTheme = smolt_mythtv.runMythTheme()
-            if Gate().grants('MythPlugins'):
-                self.mythPlugins = smolt_mythtv.runMythPlugins()
-            if Gate().grants('MythRole'):
-                self.mythRole = smolt_mythtv.runMythRole()
-            if Gate().grants('MythTuner'):
-                self.mythTuner = smolt_mythtv.runMythTuner()
-
-
-
-def get_file_systems():
-    if not Gate().grants('file_systems'):
+def get_file_systems(gate):
+    if not gate.grants('file_systems'):
         return []
 
     if fs_t_filter:
@@ -511,9 +432,9 @@ class PubUUIDError(Exception):
     def __str__(self):
         return str(self.msg)
 
-class _Hardware:
+class _HardwareProfile:
     devices = {}
-    def __init__(self):
+    def __init__(self, gate, uuid):
 #        try:
 #            systemBus = dbus.SystemBus()
 #        except:
@@ -527,7 +448,7 @@ class _Hardware:
 #
 #        self.systemBus = systemBus
 
-        if Gate().grants('devices'):
+        if gate.grants('devices'):
                 self.devices = get_device_list()
 #        for udi in all_dev_lst:
 #            props = self.get_properties_for_udi (udi)
@@ -589,20 +510,24 @@ class _Hardware:
 #                        elif boardproduct is not None and boardproduct is not None:
 #                            props['system.vendor'] = boardvendor
 #                            props['system.product'] = boardproduct
-                self.host = Host()
+                self.host = Host(gate, uuid)
 
-        self.fss = get_file_systems()
+        self.fss = get_file_systems(gate)
 
-        self.distro_specific = self.get_distro_specific_data()
+        self.distro_specific = self.get_distro_specific_data(gate)
 
-    def get_distro_specific_data(self):
+    def get_distro_specific_data(self, gate):
         dist_dict = {}
-        import distros.all
+        try:
+            import distros.all
+        except:
+            return dist_dict
+            
         for d in distros.all.get():
             key = d.key()
             if d.detected():
                 logging.info('Distro "%s" detected' % (key))
-                d.gather(debug=True)
+                d.gather(gate, debug=True)
                 dist_dict[key] = {
                     'data':d.data(),
                     'html':d.html(),
@@ -684,13 +609,13 @@ class _Hardware:
     def get_sendable_fss(self, protocol_version=smoltProtocol):
         return [fs.to_dict() for fs in self.fss]
 
-    def write_pub_uuid(self,smoonURL,pub_uuid):
+    def write_pub_uuid(self, uuiddb, smoonURL, pub_uuid, uuid):
         smoonURLparsed=urlparse(smoonURL)
         if pub_uuid is None:
             return
 
         try:
-            UuidDb().set_pub_uuid(getUUID(), smoonURLparsed[1], pub_uuid)
+            uuiddb.set_pub_uuid(uuid, smoonURLparsed[1], pub_uuid)
         except Exception, e:
             sys.stderr.write(_('\tYour pub_uuid could not be written.\n\n'))
         return
@@ -726,7 +651,7 @@ class _Hardware:
                 lines.append(v['html'])
         return '\n'.join(lines)
 
-    def send(self, smoonURL=smoonURL, batch=False):
+    def send(self, uuiddb, uuid, user_agent=user_agent, smoonURL=smoonURL, timeout=timeout, proxies=proxies, batch=False):
         def serialize(object, human=False):
             if human:
                 indent = 2
@@ -737,17 +662,17 @@ class _Hardware:
             return JSONEncoder(indent=indent, sort_keys=sort_keys).encode(object)
 
         reset_resolver()
+        grabber = urlgrabber.grabber.URLGrabber(user_agent=user_agent, timeout=timeout, proxies=proxies)
         #first find out the server desired protocol
         try:
-            req = Request('/tokens/token_json?uuid=%s' % self.host.UUID)
-            token = req.open()
-        except urllib2.URLError, e:
+            token = grabber.urlopen(urljoin(smoonURL + "/", '/tokens/token_json?uuid=%s' % self.host.UUID, False))
+        except urlgrabber.grabber.URLGrabError, e:
             error(_('Error contacting Server: %s') % e)
             return (1, None, None)
         tok_str = token.read()
         try:
             try:
-                tok_obj = json.loads(tok_str)
+                tok_obj = simplejson.loads(tok_str)
                 if tok_obj['prefered_protocol'] in supported_protocols:
                     prefered_protocol = tok_obj['prefered_protocol']
                 else:
@@ -827,16 +752,15 @@ class _Hardware:
                 pub_uuid = None
             else:
                 pub_uuid = server_response
-            self.write_pub_uuid(smoonURL, pub_uuid)
+            self.write_pub_uuid(uuiddb, smoonURL, pub_uuid, uuid)
 
             try:
-                req = Request('/tokens/admin_token_json?uuid=%s' % self.host.UUID)
-                admin_token = req.open()
-            except urllib2.URLError, e:
+                admin_token = grabber.urlopen(urljoin(smoonURL + "/", '/tokens/admin_token_json?uuid=%s' % self.host.UUID, False))
+            except urlgrabber.grabber.URLGrabError, e:
                 error(_('An error has occured while contacting the server: %s' % e))
                 sys.exit(1)
             admin_str = admin_token.read()
-            admin_obj = json.loads(admin_str)
+            admin_obj = simplejson.loads(admin_str)
             if admin_obj['prefered_protocol'] in supported_protocols:
                 prefered_protocol = admin_obj['prefered_protocol']
             else:
@@ -848,17 +772,17 @@ class _Hardware:
                 self.write_admin_token(smoonURL,admin,admin_token_file)
         return (0, pub_uuid, admin)
 
-    def regenerate_pub_uuid(self, smoonURL=smoonURL):
+    def regenerate_pub_uuid(self, uuiddb, uuid, user_agent=user_agent, smoonURL=smoonURL, timeout=timeout):
+        grabber = urlgrabber.grabber.URLGrabber(user_agent=user_agent, timeout=timeout)
         try:
-            req = Request('/client/regenerate_pub_uuid?uuid=%s' % self.host.UUID)
-            new_uuid = req.open()
-        except urllib2.URLError, e:
+            new_uuid = grabber.urlopen(urljoin(smoonURL + "/", '/client/regenerate_pub_uuid?uuid=%s' % self.host.UUID))
+        except urlgrabber.grabber.URLGrabError, e:
             raise ServerError, str(e)
 
         response = new_uuid.read()  # Either JSON or an error page in (X)HTML
         try:
-            response_dict = json.loads(response)
-        except Exception, e:
+            response_dict = simplejson.loads(response)
+        except JSONDecodeError, e:
             serverMessage(response)
             raise ServerError, _('Reply from server could not be interpreted')
         else:
@@ -866,7 +790,7 @@ class _Hardware:
                 pub_uuid = response_dict['pub_uuid']
             except KeyError:
                 raise ServerError, _('Reply from server could not be interpreted')
-            self.write_pub_uuid(smoonURL,pub_uuid)
+            self.write_pub_uuid(uuiddb, smoonURL, pub_uuid, uuid)
             return pub_uuid
 
 
@@ -997,103 +921,6 @@ class _Hardware:
             if not ignoreDevice(self.devices[device]):
                 yield VendorID, DeviceID, SubsysVendorID, SubsysDeviceID, Bus, Driver, Type, Description
 
-
-_hardware_instance = None
-def Hardware():
-    """Simple singleton wrapper with lazy initialization"""
-    global _hardware_instance
-    if _hardware_instance == None:
-        _hardware_instance = _Hardware()
-        #if enabled then insert the myth specific items into hardware
-        if Gate().grants("MythTV"):
-            _Hardware.get_sendable_host = smolt_mythtv.hardware_get_sendable_host
-            _Hardware.hostIter = smolt_mythtv.hardware_hostIter
-
-    return _hardware_instance
-
-
-# From RHN Client Tools
-
-def classify_hal(node):
-    # NETWORK
-    if node.has_key('net.interface'):
-        return 'NETWORK'
-
-    if node.has_key('pci.device_class'):
-        if node['pci.device_class'] == PCI_BASE_CLASS_NETWORK:
-            return 'NETWORK'
-
-
-    if node.has_key('info.product') and node.has_key('info.category'):
-        if node['info.category'] == 'input':
-            # KEYBOARD <-- do this before mouse, some keyboards have built-in mice
-            if 'keyboard' in node['info.product'].lower():
-                return 'KEYBOARD'
-            # MOUSE
-            if 'mouse' in node['info.product'].lower():
-                return 'MOUSE'
-
-    if node.has_key('pci.device_class'):
-        #VIDEO
-        if node['pci.device_class'] == PCI_BASE_CLASS_DISPLAY:
-            return 'VIDEO'
-        #USB
-        if (node['pci.device_class'] ==  PCI_BASE_CLASS_SERIAL
-                and node['pci.device_subclass'] == PCI_CLASS_SERIAL_USB):
-            return 'USB'
-
-        if node['pci.device_class'] == PCI_BASE_CLASS_STORAGE:
-            #IDE
-            if node['pci.device_subclass'] == PCI_CLASS_STORAGE_IDE:
-                return 'IDE'
-            #SCSI
-            if node['pci.device_subclass'] == PCI_CLASS_STORAGE_SCSI:
-                return 'SCSI'
-            #RAID
-            if node['pci.device_subclass'] == PCI_CLASS_STORAGE_RAID:
-                return 'RAID'
-        #MODEM
-        if (node['pci.device_class'] == PCI_BASE_CLASS_COMMUNICATION
-                and node['pci.device_subclass'] == PCI_CLASS_COMMUNICATION_MODEM):
-            return 'MODEM'
-        #SCANNER
-        if (node['pci.device_class'] == PCI_BASE_CLASS_INPUT
-                and node['pci.device_subclass'] == PCI_CLASS_INPUT_SCANNER):
-            return 'SCANNER'
-
-        if node['pci.device_class'] == PCI_BASE_CLASS_MULTIMEDIA:
-            #CAPTURE -- video capture card
-            if node['pci.device_subclass'] == PCI_CLASS_MULTIMEDIA_VIDEO:
-                return 'CAPTURE'
-            #AUDIO
-            if (node['pci.device_subclass'] == PCI_CLASS_MULTIMEDIA_AUDIO
-                    or node['pci.device_subclass'] == PCI_CLASS_MULTIMEDIA_HD_AUDIO):
-                return 'AUDIO'
-
-        #FIREWIRE
-        if (node['pci.device_class'] == PCI_BASE_CLASS_SERIAL
-                and node['pci.device_subclass'] == PCI_CLASS_SERIAL_FIREWIRE):
-            return 'FIREWIRE'
-        #SOCKET -- PCMCIA yenta socket stuff
-        if (node['pci.device_class'] == PCI_BASE_CLASS_BRIDGE
-                and (node['pci.device_subclass'] == PCI_CLASS_BRIDGE_PCMCIA
-                or node['pci.device_subclass'] == PCI_CLASS_BRIDGE_CARDBUS)):
-            return 'SOCKET'
-
-    if node.has_key('storage.drive_type'):
-        return node['storage.drive_type'].upper()
-
-    #PRINTER
-    if node.has_key('printer.product'):
-        return 'PRINTER'
-
-    #Catchall for specific devices, only do this after all the others
-    if (node.has_key('pci.product_id') or
-            node.has_key('usb.product_id')):
-        return 'OTHER'
-
-    # No class found
-    return None
 
 # This has got to be one of the ugliest fucntions alive
 def read_cpuinfo():
@@ -1409,12 +1236,17 @@ def read_memory_2_6():
     memdict['swap'] = str(swap_megs)
     return memdict
 
+
+def create_profile_nocatch(gate, uuid):
+    return _HardwareProfile(gate, uuid)
+
+
 ## For refactoring, I'll probably want to make a library
 ## Of command line tool functions
 ## This is one of them
-def get_profile():
+def create_profile(gate, uuid):
     try:
-        return Hardware()
+        return create_profile_nocatch(gate, uuid)
     except SystemBusError, e:
         error(_('Error:') + ' ' + e.msg)
         if e.hint is not None:
@@ -1425,12 +1257,7 @@ def get_profile():
 def get_profile_link(smoonURL, pub_uuid):
     return urljoin(smoonURL, '/client/show/%s' % pub_uuid)
 
-hw_uuid = None
-def getUUID():
-    global hw_uuid
-    if hw_uuid != None:
-        return hw_uuid
-
+def read_uuid():
     try:
         UUID = file(hw_uuid_file).read().strip()
     except IOError:
@@ -1443,24 +1270,24 @@ def getUUID():
         except IOError:
             sys.stderr.write(_('Unable to determine UUID of system!\n'))
             raise UUIDError, 'Could not determine UUID of system!\n'
-    hw_uuid = UUID
     return UUID
 
-def getPubUUID(smoonURL=smoonURL):
-    smoonURLparsed=urlparse(smoonURL)
-    res = UuidDb().get_pub_uuid(getUUID(), smoonURLparsed[1])
-    if res:
-        return res
+def read_pub_uuid(uuiddb, uuid, user_agent=user_agent, smoonURL=smoonURL, timeout=timeout, silent=False):
+	smoonURLparsed=urlparse(smoonURL)
+	res = uuiddb.get_pub_uuid(uuid, smoonURLparsed[1])
+	if res:
+		return res
 
-    try:
-        req = Request('/client/pub_uuid/%s' % getUUID())
-        o = req.open()
-        pudict = json.loads(o.read())
-        o.close()
-        UuidDb().set_pub_uuid(getUUID(), smoonURLparsed[1], pudict["pub_uuid"])
-        return pudict["pub_uuid"]
-    except Exception, e:
-        error(_('Error determining public UUID: %s') % e)
-        sys.stderr.write(_("Unable to determine Public UUID!  This could be a network error or you've\n"))
-        sys.stderr.write(_("not submitted your profile yet.\n"))
-        raise PubUUIDError, 'Could not determine Public UUID!\n'
+	grabber = urlgrabber.grabber.URLGrabber(user_agent=user_agent, timeout=timeout, proxies=proxies)
+	try:
+		o = grabber.urlopen(urljoin(smoonURL + "/", '/client/pub_uuid/%s' % uuid))
+		pudict = simplejson.loads(o.read())
+		o.close()
+		uuiddb.set_pub_uuid(uuid, smoonURLparsed[1], pudict["pub_uuid"])
+		return pudict["pub_uuid"]
+	except Exception, e:
+		if not silent:
+			error(_('Error determining public UUID: %s') % e)
+			sys.stderr.write(_("Unable to determine Public UUID!  This could be a network error or you've\n"))
+			sys.stderr.write(_("not submitted your profile yet.\n"))
+		raise PubUUIDError, 'Could not determine Public UUID!\n'

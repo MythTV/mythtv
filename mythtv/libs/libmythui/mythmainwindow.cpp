@@ -1175,7 +1175,7 @@ void MythMainWindow::InitKeys()
         "Display System Exit Prompt"),      "Esc");
 }
 
-void MythMainWindow::ResetKeys()
+void MythMainWindow::ReloadKeys()
 {
     ClearKeyContext("Global");
     ClearKeyContext("Browser");

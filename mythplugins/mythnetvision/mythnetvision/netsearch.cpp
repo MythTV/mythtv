@@ -235,7 +235,7 @@ void NetSearch::showMenu(void)
 
             if (item)
             {
-                if (item && item->GetDownloadable())
+                if (item->GetDownloadable())
                     menuPopup->AddButton(tr("Stream Video"), SLOT(streamWebVideo()));
                 menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
 
@@ -246,24 +246,23 @@ void NetSearch::showMenu(void)
                     exists = RemoteFile::Exists(filename);
                 else
                     exists = QFile::exists(filename);
-            }
 
-            if (item && item->GetDownloadable() &&
-                GetFocusWidget() == m_searchResultList)
-            {
-                if (exists)
-                    menuPopup->AddButton(tr("Play"), SLOT(doPlayVideo(filename)));
-                else
-                    menuPopup->AddButton(tr("Save This Video"), SLOT(doDownloadAndPlay()));
-            }
+                if (item->GetDownloadable() &&
+                    GetFocusWidget() == m_searchResultList)
+                {
+                    if (exists)
+                        menuPopup->AddButton(tr("Play"), SLOT(doPlayVideo(filename)));
+                    else
+                        menuPopup->AddButton(tr("Save This Video"), SLOT(doDownloadAndPlay()));
+                }
 
-            if (item && item->GetDownloadable() &&
-                GetFocusWidget() == m_searchResultList &&
-                exists)
-            {
-                menuPopup->AddButton(tr("Delete"), SLOT(slotDeleteVideo()));
+                if (item->GetDownloadable() &&
+                    GetFocusWidget() == m_searchResultList &&
+                    exists)
+                {
+                    menuPopup->AddButton(tr("Delete"), SLOT(slotDeleteVideo()));
+                }
             }
-
 
             if (m_pagenum > 1)
                 menuPopup->AddButton(tr("Previous Page"), SLOT(getLastResults()));

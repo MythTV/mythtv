@@ -16,8 +16,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-from gentoo.main import Gentoo
+#from gentoo.main import create_gentoo
+from mythtv_data.main import create_mythtv
 
 def get():
-    res = [Gentoo(),]
+    #res = [create_gentoo(),create_mythtv()]
+    res = [create_mythtv()]
     return res

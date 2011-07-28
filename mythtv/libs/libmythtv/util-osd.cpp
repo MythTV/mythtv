@@ -243,10 +243,10 @@ void inline c_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
 
     src1 = osd_image->scanLine(top) + (left << 2);
     src2 = osd_image->scanLine(top + 1) + (left << 2);
-    b1 = src1 + B_OI; b2 = b1 + 4; b3 = src2 + 0; b4 = b3 + 4;
-    g1 = src1 + G_OI; g2 = g1 + 4; g3 = src2 + 1; g4 = g3 + 4;
-    r1 = src1 + R_OI; r2 = r1 + 4; r3 = src2 + 2; r4 = r3 + 4;
-    a1 = src1 + A_OI; a2 = a1 + 4; a3 = src2 + 3; a4 = a3 + 4;
+    b1 = src1 + B_OI; b2 = b1 + 4; b3 = src2 + B_OI; b4 = b3 + 4;
+    g1 = src1 + G_OI; g2 = g1 + 4; g3 = src2 + G_OI; g4 = g3 + 4;
+    r1 = src1 + R_OI; r2 = r1 + 4; r3 = src2 + R_OI; r4 = r3 + 4;
+    a1 = src1 + A_OI; a2 = a1 + 4; a3 = src2 + A_OI; a4 = a3 + 4;
     src_wrap = (osd_image->bytesPerLine() << 1) - (width << 2);
     y_wrap = (frame->pitches[0] << 1) - width;
 

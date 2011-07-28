@@ -30,6 +30,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythlogging.h"
 #include "mythversion.h"
+#include "logging.h"
 #include "util.h"
 
 const int kEnd          = 0,
@@ -891,11 +892,12 @@ void MythCommandLineParser::addVersion(void)
 void MythCommandLineParser::addWindowed(bool def)
 {
     if (def)
-        add(QStringList( QStringList() << "-nw" << "--no-windowed" ), false,
-            "notwindowed", "Prevent application from running in window.", "");
+        add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
+            "notwindowed", false, 
+            "Prevent application from running in window.", "");
     else
-        add(QStringList( QStringList() << "-w" << "--windowed" ), false,
-            "windowed", "Force application to run in a window.", "");
+        add(QStringList( QStringList() << "-w" << "--windowed" ), "windowed", 
+        false, "Force application to run in a window.", "");
 }
 
 void MythCommandLineParser::addDaemon(void)
@@ -947,35 +949,43 @@ void MythCommandLineParser::addUPnP(void)
     add("--noupnp", "noupnp", false, "Disable use of UPnP.", "");
 }
 
-void MythCommandLineParser::addLogging(void)
+void MythCommandLineParser::addLogging(
+    const QString &defaultVerbosity, LogLevel_t defaultLogLevel)
 {
+    defaultLogLevel =
+        ((defaultLogLevel >= LOG_UNKNOWN) || (defaultLogLevel <= LOG_ANY)) ?
+        LOG_INFO : defaultLogLevel;
+
+    QString logLevelStr = logLevelGetName(defaultLogLevel);
+
     add(QStringList( QStringList() << "-v" << "--verbose" ), "verbose",
-            "general",
-            "Specify log filtering. Use '-v help' for level info.", "");
+        defaultVerbosity,
+        "Specify log filtering. Use '-v help' for level info.", "");
     add("-V", "verboseint", 0U, "",
-            "This option is intended for internal use only.\n"
-            "This option takes an unsigned value corresponding "
-            "to the bitwise log verbosity operator.");
+        "This option is intended for internal use only.\n"
+        "This option takes an unsigned value corresponding "
+        "to the bitwise log verbosity operator.");
     add(QStringList( QStringList() << "-l" << "--logfile" << "--logpath" ), 
-            "logpath", "",
-            "Writes logging messages to a file at logpath.\n"
-            "If a directory is given, a logfile will be created in that "
-            "directory with a filename of applicationName.date.pid.log.\n"
-            "If a full filename is given, that file will be used.\n"
-            "This is typically used in combination with --daemon, and if used "
-            "in combination with --pidfile, this can be used with log "
-            "rotaters, using the HUP call to inform MythTV to reload the "
-            "file (currently disabled).", "");
+        "logpath", "",
+        "Writes logging messages to a file at logpath.\n"
+        "If a directory is given, a logfile will be created in that "
+        "directory with a filename of applicationName.date.pid.log.\n"
+        "If a full filename is given, that file will be used.\n"
+        "This is typically used in combination with --daemon, and if used "
+        "in combination with --pidfile, this can be used with log "
+        "rotaters, using the HUP call to inform MythTV to reload the "
+        "file (currently disabled).", "");
     add(QStringList( QStringList() << "-q" << "--quiet"), "quiet", 0,
-            "Don't log to the console (-q).  Don't log anywhere (-q -q)", "");
-    add("--loglevel", "loglevel", "info", 
+        "Don't log to the console (-q).  Don't log anywhere (-q -q)", "");
+    add("--loglevel", "loglevel", logLevelStr, 
+        QString(
             "Set the logging level.  All log messages at lower levels will be "
             "discarded.\n"
             "In descending order: emerg, alert, crit, err, warning, notice, "
-            "info, debug\ndefaults to info", "");
+            "info, debug\ndefaults to ") + logLevelStr, "");
     add("--syslog", "syslog", "none", 
-            "Set the syslog logging facility.\nSet to \"none\" to disable, "
-            "defaults to none", "");
+        "Set the syslog logging facility.\nSet to \"none\" to disable, "
+        "defaults to none", "");
     add("--nodblog", "nodblog", false, "Disable database logging.", "");
 }
 
@@ -1066,7 +1076,7 @@ bool MythCommandLineParser::SetValue(const QString &key, QVariant value)
     return true;
 }
 
-int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int quiet)
+int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
 {
     int err = 0;
 
@@ -1083,8 +1093,8 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int quiet)
     else if (toBool("verboseint"))
         verboseMask = toUInt("verboseint");
 
-    quiet = MAX(quiet, toUInt("quiet"));
-    if (quiet > 1)
+    int quiet = toUInt("quiet");
+    if (MAX(quiet, (int)progress) > 1)
     {
         verboseMask = VB_NONE;
         verboseArgParse("none");
@@ -1103,8 +1113,12 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int quiet)
                                   .arg(verboseString));
 
     QString logfile = GetLogFilePath();
-    bool propogate = toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propogate);
+    bool propagate = toBool("islogpath");
+
+    if (toBool("daemon"))
+        quiet = MAX(quiet, 1);
+
+    logStart(logfile, progress, quiet, facility, level, dblog, propagate);
 
     return GENERIC_EXIT_OK;
 }

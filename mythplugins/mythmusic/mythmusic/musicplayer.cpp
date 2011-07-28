@@ -271,7 +271,10 @@ void MusicPlayer::play(void)
 
 
     if (!m_output)
-        openOutputDevice();
+    {
+        if (!openOutputDevice())
+            return;
+    }
 
     if (!getDecoderHandler())
         setupDecoderHandler();
@@ -297,7 +300,7 @@ void MusicPlayer::stopDecoder(void)
     m_currentMetadata = NULL;
 }
 
-void MusicPlayer::openOutputDevice(void)
+bool MusicPlayer::openOutputDevice(void)
 {
     QString adevice, pdevice;
 
@@ -309,11 +312,31 @@ void MusicPlayer::openOutputDevice(void)
     pdevice = gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
               gCoreContext->GetSetting("PassThruOutputDevice") : "auto";
 
-    // TODO: Error checking that device is opened correctly!
     m_output = AudioOutput::OpenAudio(
                    adevice, pdevice, FORMAT_S16, 2, 0, 44100,
                    AUDIOOUTPUT_MUSIC, true, false,
                    gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
+
+    if (!m_output)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MusicPlayer: Cannot open audio output device: %1").arg(adevice));
+
+        return false;
+    }
+
+    if (!m_output->GetError().isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MusicPlayer: Cannot open audio output device: %1").arg(adevice));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error was: %1").arg(m_output->GetError()));
+
+        delete m_output;
+        m_output = NULL;
+
+        return false;
+    }
 
     m_output->setBufferSize(256 * 1024);
 
@@ -333,6 +356,8 @@ void MusicPlayer::openOutputDevice(void)
     {
         m_output->addListener(*it);
     }
+
+    return true;
 }
 
 void MusicPlayer::next(void)

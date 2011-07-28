@@ -16,6 +16,8 @@
 RecordingRule::RecordingRule()
   : m_recordID(-1), m_parentRecID(0),
     m_isInactive(false),
+    m_season(0),
+    m_episode(0),
     m_starttime(QTime::currentTime()),
     m_startdate(QDate::currentDate()),
     m_endtime(QTime::currentTime()),

@@ -1,4 +1,24 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# smolt - Fedora hardware profiler
+#
+# Copyright (C) 2010 Mike McGrath <mmcgrath@redhat.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
+
 import os
 from hwdata import DeviceMap
 
@@ -89,18 +109,7 @@ def get_class(class_id):
 pci = DeviceMap('pci')
 usb = DeviceMap('usb')
 
-class Device():
-    def __init__(self, id):
-        self.id = id
-        self.bus = 'Unknown'
-        self.vendorid = 'None'
-        self.type = 'Unknown'
-        self.description = 'Unknown'
-        self.vendorid = 'Unknown'
-        self.deviceid = 'Unknown'
-        self.subsysvendorid = 'Unknown'
-        self.subsysdeviceid = 'Unknown'
-        self.driver = 'None'
+
 
 def device_factory(cls, id):
     cls = eval(cls.upper() + 'Device')
@@ -147,7 +156,11 @@ class USBDevice( Device ):
         PATH = '/sys/bus/usb/devices/' + self.id + '/'
         self.vendorid       = int(cat(PATH +         'idVendor')[0].strip(), 16)
         self.deviceid       = int(cat(PATH +        'idProduct')[0].strip(), 16)
-        desc                =     cat(PATH +          'product')[0].strip()
+        try:
+            desc                =     cat(PATH +          'product')[0].strip().decode('ASCII',  errors='ignore')
+        except:
+            #The fedora python pkg is broken and doesn't like decode with options, so this is a fallback
+            desc                =     cat(PATH +          'product')[0].strip().decode()
         self.description    = usb.device(self.vendorid,
                                          self.deviceid,
                                          alt=desc)
@@ -156,7 +169,8 @@ def get_device_list():
     devices = {}
     for bus in BUS_LIST:
         PATH = '/sys/bus/' + bus + '/devices/'
-        for device in os.listdir(PATH):
-            devices[device] = device_factory(bus, device)
+        if os.path.exists(PATH):
+            for device in os.listdir(PATH):
+                devices[device] = device_factory(bus, device)
     return devices
 

@@ -245,7 +245,6 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
     {
         f = &(*it);
         QImageReader testread(f->absoluteFilePath());
-        testread.setAutoDetectImageFormat(false);
         if (testread.canRead())
         {
             found = true;

@@ -319,12 +319,14 @@ void HouseKeeper::RunHouseKeeping(void)
                 updateLastrun("ThemeChooserInfoCacheUpdate");
             }
 
+#if CONFIG_BINDINGS_PYTHON
             if ((gCoreContext->GetNumSetting("DailyArtworkUpdates", 1)) &&
                 (wantToRun("RecordedArtworkUpdate", 1, 0, 24, true)))
             {
                 UpdateRecordedArtwork();
                 updateLastrun("RecordedArtworkUpdate");
             }
+#endif
         }
 
         dbTag = QString("JobQueueRecover-%1").arg(gCoreContext->GetHostName());

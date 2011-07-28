@@ -1503,7 +1503,8 @@ void GuideGrid::updateChannels(void)
             }
 
             // Try alternates with different channum if applicable
-            if (unavailable && !GetProgramList(chinfo->chanid).empty())
+            if (unavailable && chinfo &&
+                !GetProgramList(chinfo->chanid).empty())
             {
                 alt = GetAlternateChannelIndex(chanNumber, false);
                 unavailable = (alt == m_channelInfoIdx[chanNumber]);
@@ -1520,15 +1521,16 @@ void GuideGrid::updateChannels(void)
         else if (m_changrpid != -1)
             state = "favourite";
 
-        item->SetText(chinfo->GetFormatted(m_channelFormat), "buttontext", state);
+        item->SetFontState(state);
 
-        InfoMap infomap;
-        chinfo->ToMap(infomap);
-        item->SetTextFromMap(infomap);
-        
-        if (chinfo && !chinfo->icon.isEmpty())
+        if (chinfo)
         {
-            if (chinfo->CacheChannelIcon())
+            InfoMap infomap;
+            chinfo->ToMap(infomap);
+            item->SetTextFromMap(infomap);
+
+            if (!chinfo->icon.isEmpty() &&
+                chinfo->CacheChannelIcon())
             {
                 QString localpath = chinfo->m_localIcon;
                 item->SetImage(localpath, "channelicon");

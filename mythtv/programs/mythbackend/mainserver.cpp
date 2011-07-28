@@ -3065,13 +3065,13 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs,
     if (m_sched)
     {
         if (tmptable.isEmpty())
-            m_sched->getAllPending(strList);
+            m_sched->GetAllPending(strList);
         else
         {
             Scheduler *sched = new Scheduler(false, encoderList,
                                              tmptable, m_sched);
             sched->FillRecordListFromDB(recordid);
-            sched->getAllPending(strList);
+            sched->GetAllPending(strList);
             delete sched;
 
             if (recordid > 0)
@@ -5151,7 +5151,7 @@ void MainServer::HandleSetLogLevel(QStringList &slist, PlaybackSock *pbs)
             logPropagateCalc();
             LOG(VB_GENERAL, LOG_NOTICE,
                 QString("Log level changed, new level is: %1")
-                    .arg(LogLevelNames[logLevel]));
+                    .arg(logLevelGetName(logLevel)));
 
             retlist << "OK";
         }

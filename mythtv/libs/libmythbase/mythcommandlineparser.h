@@ -144,7 +144,7 @@ class MBASE_PUBLIC MythCommandLineParser
 
     bool                    SetValue(const QString &key, QVariant value);
     int                     ConfigureLogging(QString mask = "general",
-                                             unsigned int quiet = 0);
+                                             unsigned int progress = 0);
     void                    ApplySettingsOverride(void);
     int                     Daemonize(void);
 
@@ -162,7 +162,8 @@ class MBASE_PUBLIC MythCommandLineParser
     void addGeometry(void);
     void addDisplay(void);
     void addUPnP(void);
-    void addLogging(void);
+    void addLogging(const QString &defaultVerbosity = "general",
+                    LogLevel_t defaultLogLevel = LOG_INFO);
     void addPIDFile(void);
     void addJob(void);
 

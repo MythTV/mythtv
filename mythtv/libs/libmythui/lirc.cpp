@@ -88,7 +88,7 @@ LIRC::LIRC(QObject *main_window,
     lircdDevice.detach();
     program.detach();
     configFile.detach();
-    buf.resize(128);
+    buf.resize(0);
 }
   
 LIRC::~LIRC()
@@ -469,36 +469,36 @@ QList<QByteArray> LIRC::GetCodes(void)
     QList<QByteArray> ret;
     ssize_t len = -1;
 
+    uint buf_size = buf.size() + 128;
+    buf.resize(buf_size);
+
     while (true)
     {
-        len = read(d->lircState->lirc_lircd,
-                   buf.data() + buf_offset,
-                   buf.size() - buf_offset - 1);
-
+        len = read(d->lircState->lirc_lircd, buf.data() + buf_offset, 128);
         if (len >= 0)
             break;
 
-        if (EINTR == errno)
-            continue;
-        else if (EAGAIN == errno)
-            return ret;
-        else if (107 == errno)
+	switch (errno)
         {
-            if (!eofCount)
-                LOG(VB_GENERAL, LOG_NOTICE, LOC + "GetCodes -- EOF?");
-            eofCount++;
-            return ret;
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Could not read socket" + ENO);
-            return ret;
-        }
+            case EINTR:
+                continue;
 
-        break;
+            case EAGAIN:
+                return ret;
+
+            case ENOTCONN:   // 107 (according to asm-generic/errno.h)
+                if (!eofCount)
+                    LOG(VB_GENERAL, LOG_NOTICE, LOC + "GetCodes -- EOF?");
+                eofCount++;
+                return ret;
+
+            default:
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Could not read socket" + ENO);
+                return ret;
+        }
     }
 
-    if (0 == len)
+    if (!len)
     {
         if (!eofCount)
             LOG(VB_GENERAL, LOG_NOTICE, LOC + "GetCodes -- eof?");
@@ -510,24 +510,16 @@ QList<QByteArray> LIRC::GetCodes(void)
     retryCount = 0;
 
     buf_offset += len;
-    if ((uint)buf.size() < buf_offset + 128)
-        buf.reserve(buf.size() * 2);
-    uint tmpc = std::max(buf.capacity() - 1,128);
-
-    buf.resize(buf_offset);
+    buf.truncate(buf_offset);
     ret = buf.split('\n');
-    buf.resize(tmpc);
     if (buf.endsWith('\n'))
     {
         buf_offset = 0;
         return ret;
     }
 
-    buf = ret.back();
-    ret.pop_back();
-    buf_offset = std::max(buf.size() - 1, 0);
-    buf.resize(tmpc);
-
+    buf = ret.takeLast();
+    buf_offset = buf.size();
     return ret;
 }
 

@@ -129,11 +129,11 @@
                         <area>32,2,656,28</area>
                         <align>vcenter</align>
                     </textarea>
-                    <textarea name="shortdate" from="titlesubtitle">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>634,2,120,28</area>
                         <align>right,vcenter</align>
                     </textarea>
-                    <textarea name="starttime" from="shortdate">
+                    <textarea name="starttime" from="shortstartdate">
                         <area>760,2,114,28</area>
                         <align>right,vcenter</align>
                     </textarea>
@@ -171,11 +171,11 @@
                         <font state="running">basesmall_running_selected</font>
                         <align>vcenter</align>
                     </textarea>
-                    <textarea name="shortdate" from="titlesubtitle">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>634,2,120,28</area>
                         <align>right,vcenter</align>
                     </textarea>
-                    <textarea name="starttime" from="shortdate">
+                    <textarea name="starttime" from="shortstartdate">
                         <area>760,2,114,28</area>
                         <align>right,vcenter</align>
                     </textarea>
@@ -452,11 +452,11 @@
                         <area>32,2,656,28</area>
                         <align>vcenter</align>
                     </textarea>
-                    <textarea name="shortdate" from="titlesubtitle">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>634,2,120,28</area>
                         <align>right,vcenter</align>
                     </textarea>
-                    <textarea name="filesize_str" from="shortdate">
+                    <textarea name="filesize_str" from="shortstartdate">
                         <area>760,2,114,28</area>
                         <align>right,vcenter</align>
                     </textarea>
@@ -494,11 +494,11 @@
                         <font state="running">basesmall_running_selected</font>
                         <align>vcenter</align>
                     </textarea>
-                    <textarea name="shortdate" from="titlesubtitle">
+                    <textarea name="shortstartdate" from="titlesubtitle">
                         <area>634,2,120,28</area>
                         <align>right,vcenter</align>
                     </textarea>
-                    <textarea name="filesize_str" from="shortdate">
+                    <textarea name="filesize_str" from="shortstartdate">
                         <area>760,2,114,28</area>
                         <align>right,vcenter</align>
                     </textarea>

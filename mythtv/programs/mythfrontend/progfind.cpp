@@ -138,7 +138,7 @@ ProgFinder::~ProgFinder()
 
 void ProgFinder::alphabetListItemSelected(MythUIButtonListItem *item)
 {
-    if (item && m_currentLetter == item->GetText())
+    if (!item || (m_currentLetter == item->GetText()))
         return;
 
     m_currentLetter = item->GetText();

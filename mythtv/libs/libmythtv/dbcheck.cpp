@@ -7,6 +7,7 @@ using namespace std;
 #include "dbcheck.h"
 #include "videodisplayprofile.h" // for "1214"
 
+#include "mythversion.h"
 #include "dbutil.h"
 #include "mythcorecontext.h"
 #include "schemawizard.h"
@@ -17,12 +18,7 @@ using namespace std;
 
 #define MINIMUM_DBMS_VERSION 5,0,15
 
-/* If currentDatabaseVersion gets updated, the following files need updating:
-   mythtv/bindings/python/MythTV/static.py
-   mythtv/bindings/perl/MythTV.pm
-*/
-/// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1280";
+const QString currentDatabaseVersion = MYTH_DATABASE_VERSION;
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(

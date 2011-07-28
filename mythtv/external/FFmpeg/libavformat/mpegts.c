@@ -90,6 +90,12 @@ struct MpegTSFilter {
     int pid;
     int last_cc; /* last cc code (-1 if first packet) */
     enum MpegTSFilterType type;
+    /** if set, chop off PMT at the end of the TS packet, regardless of the
+     *  data length given in the packet.  This is for use by BBC iPlayer IPTV
+     *  recordings which seem to only want to send the first packet of the PMT
+     *  but give a length that requires 3 packets.  Without this, those
+     *  recordings are unplayable */
+    int pmt_chop_at_ts;
     union {
         MpegTSPESFilter pes_filter;
         MpegTSSectionFilter section_filter;
@@ -330,16 +336,30 @@ static void write_section_data(AVFormatContext *s, MpegTSFilter *tss1,
         sect->new_packet = 1;
     }
     while (!tss->end_of_section_reached) {
-    /* compute section length if possible */
-    if (tss->section_h_size == -1 && tss->section_index >= 3) {
-        len = (AV_RB16(tss->section_buf + 1) & 0xfff) + 3;
-        if (len > 4096)
-            return;
-        tss->section_h_size = len;
-    }
+        /* compute section length if possible */
+        if (tss->section_h_size == -1 && tss->section_index >= 3) {
+            len = (AV_RB16(tss->section_buf + 1) & 0xfff) + 3;
+            if (len > 4096)
+                return;
+            tss->section_h_size = len;
+        }
 
-    if (tss->section_h_size == -1 || tss->section_index < tss->section_h_size)
-            break;
+        if (tss->section_h_size == -1 ||
+            tss->section_index < tss->section_h_size)
+        {
+            if (tss1->pmt_chop_at_ts && tss->section_buf[0] == PMT_TID)
+            {
+                /* HACK!  To allow BBC IPTV streams with incomplete PMTs (they
+                 * advertise a length of 383, but only send 182 bytes!), we
+                 * will not wait for the remainder of the PMT, but accept just
+                 * what is in the first TS payload, as this is enough to get
+                 * playback, although some PIDs may be filtered out as a result
+                 */
+                tss->section_h_size = tss->section_index;
+            }
+            else
+                break;
+        }
 
         if (!tss->check_crc ||
             av_crc(av_crc_get_table(AV_CRC_32_IEEE), -1,
@@ -348,7 +368,8 @@ static void write_section_data(AVFormatContext *s, MpegTSFilter *tss1,
 
         if (tss->section_index > tss->section_h_size) {
             int left = tss->section_index - tss->section_h_size;
-            memmove(tss->section_buf, tss->section_buf+tss->section_h_size, left);
+            memmove(tss->section_buf, tss->section_buf+tss->section_h_size,
+                    left);
             tss->section_index = left;
             tss->section_h_size = -1;
         } else {
@@ -383,6 +404,7 @@ static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts, unsigned int 
     filter->type = MPEGTS_SECTION;
     filter->pid = pid;
     filter->last_cc = -1;
+    filter->pmt_chop_at_ts = 0;
     sec = &filter->u.section_filter;
     sec->section_cb = section_cb;
     sec->opaque = opaque;
@@ -2292,7 +2314,8 @@ static int mpegts_read_header(AVFormatContext *s,
         goto fail;
     }
     ts->raw_packet_size = get_packet_size(buf, sizeof(buf));
-    av_log(NULL, AV_LOG_DEBUG, "mpegts_read_header: TS packet size = %d\n", ts->raw_packet_size);
+    av_log(NULL, AV_LOG_DEBUG, "mpegts_read_header: TS packet size = %d\n",
+           ts->raw_packet_size);
     if (ts->raw_packet_size <= 0)
     {
         av_log(NULL, AV_LOG_ERROR, "mpegts_read_header: "
@@ -2331,14 +2354,13 @@ static int mpegts_read_header(AVFormatContext *s,
             s->ctx_flags |= AVFMTCTX_NOHEADER;
                goto do_pcr;
         }
-           
+
         ts->scanning = 1;
         ts->pmt_scan_state = PMT_NOT_YET_FOUND;
         /* tune to first service found */
         for (i = 0; ((i < ts->nb_prg) &&
                      (ts->pmt_scan_state == PMT_NOT_YET_FOUND)); i++)
         {
-
 #ifdef DEBUG
             av_log(ts->stream, AV_LOG_DEBUG, "Tuning to pnum: 0x%x\n",
                    ts->prg[i].id);
@@ -2357,11 +2379,25 @@ static int mpegts_read_header(AVFormatContext *s,
                 (ts->pmt_scan_state == PMT_NOT_YET_FOUND))
             {
                 av_log(NULL, AV_LOG_ERROR,
-                       "Tuning to pnum: 0x%x "
-                       "without CRC check on PMT\n",
+                       "Tuning to pnum: 0x%x without CRC check on PMT\n",
                        ts->prg[i].id);
                 /* turn off crc checking */
                 ts->pmt_filter->u.section_filter.check_crc = 0;
+                /* try again */
+                url_fseek(pb, pos, SEEK_SET);
+                ts->req_sid = sid = ts->prg[i].id;
+                handle_packets(ts, s->probesize / ts->raw_packet_size);
+            }
+
+            /* fallback code to deal with streams that are not complete PMT
+             * streams (BBC iPlayer IPTV as an example) */
+            if (ts->pmt_filter &&
+                (ts->pmt_scan_state == PMT_NOT_YET_FOUND))
+            {
+                av_log(NULL, AV_LOG_ERROR,
+                       "Overriding PMT data length, using "
+                       "contents of first TS packet only!\n");
+                ts->pmt_filter->pmt_chop_at_ts = 1;
                 /* try again */
                 url_fseek(pb, pos, SEEK_SET);
                 ts->req_sid = sid = ts->prg[i].id;

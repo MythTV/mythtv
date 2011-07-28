@@ -42,6 +42,10 @@ class META_PUBLIC MetadataDownload : public QThread
     void prependLookup(MetadataLookup *lookup);
     void cancel();
 
+    bool runGrabberTest(const QString &grabberpath);
+    bool MovieGrabberWorks();
+    bool TelevisionGrabberWorks();
+
   protected:
 
     void run();

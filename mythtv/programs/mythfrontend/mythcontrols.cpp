@@ -257,6 +257,7 @@ void MythControls::ShowMenu()
 
     m_menuPopup->AddButton(tr("Save"));
     m_menuPopup->AddButton(tr("Change View"));
+    m_menuPopup->AddButton(tr("Reset All Keys to Defaults"));
     m_menuPopup->AddButton(tr("Cancel"));
 }
 
@@ -718,6 +719,8 @@ void MythControls::customEvent(QEvent *event)
                 Save();
             else if (buttonnum == 1)
                 ChangeView();
+            else if (buttonnum == 2)
+                GetMythMainWindow()->JumpTo("Reset All Keys");
         }
         else if (resultid == "exit")
         {

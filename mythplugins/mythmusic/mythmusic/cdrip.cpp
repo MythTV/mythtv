@@ -953,7 +953,7 @@ QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
         musicdir += "/" + directoryList[i];
         if (createDir)
         {
-            umask(022);
+            umask(002);
             directoryQD.mkdir(musicdir);
             directoryQD.cd(musicdir);
         }

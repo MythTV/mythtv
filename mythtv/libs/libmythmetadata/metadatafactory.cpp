@@ -218,6 +218,12 @@ MetadataLookupList MetadataFactory::SynchronousLookup(MetadataLookup *lookup)
     return m_returnList;
 }
 
+bool MetadataFactory::VideoGrabbersFunctional()
+{
+    return (m_lookupthread->MovieGrabberWorks() &&
+            m_lookupthread->TelevisionGrabberWorks());
+}
+
 void MetadataFactory::VideoScan()
 {
     if (IsRunning())
@@ -602,9 +608,7 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
         // weird combination of both, we've got to try everything.
         RecordingRule *rule = new RecordingRule();
         rule->LoadByProgram(pginfo);
-        int ruleepisode = 0;
-        if (rule && rule->Load())
-            ruleepisode = rule->m_episode;
+        int ruleepisode = rule->m_episode;
         delete rule;
 
         if (ruleepisode == 0 && pginfo->GetEpisode() == 0 &&

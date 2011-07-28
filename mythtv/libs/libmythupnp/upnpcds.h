@@ -62,12 +62,14 @@ typedef enum
     CDS_ClientXBMC            = 2,      // XBMC
     CDS_ClientMP101           = 3,      // Netgear MP101
     CDS_ClientXBox            = 4,      // XBox 360
+    CDS_ClientSonyDB          = 5,      // Sony Blu-ray players
 } UPnpCDSClient;
 
 typedef struct
 {
     UPnpCDSClient   nClientType;
-    QString         sClientId;
+    QString         sHeaderKey;
+    QString         sHeaderValue;
 } UPnpCDSClientException;
 
 //////////////////////////////////////////////////////////////////////////////

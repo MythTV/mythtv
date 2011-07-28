@@ -108,6 +108,8 @@ class DeviceReadBuffer : protected QThread
     unsigned char   *writePtr;
     unsigned char   *endPtr;
 
+    mutable QWaitCondition dataWait;
+    QWaitCondition   runWait;
     QWaitCondition   pauseWait;
     QWaitCondition   unpauseWait;
 

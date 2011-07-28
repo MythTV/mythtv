@@ -254,7 +254,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     RecList recordingList;
 
     if (m_pSched)
-        m_pSched->getAllPending(&recordingList);
+        m_pSched->GetAllPending(recordingList);
 
     unsigned int iNum = 10;
     unsigned int iNumRecordings = 0;

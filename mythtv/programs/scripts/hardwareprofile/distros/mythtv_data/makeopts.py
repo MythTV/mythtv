@@ -24,8 +24,15 @@ LONG_PARA_PATTERN = '--\\S+|--\\S+=\\S+'
 PARA_PATTERN = re.compile('(%s|%s)\\b' % (SHORT_PARA_PATTERN, LONG_PARA_PATTERN))
 
 class MakeOpts:
-    def __init__(self):
-        self._makeopts = self._parse(portage.settings['MAKEOPTS'])
+    def __init__(self, value=None):
+        """
+        >>> m = MakeOpts("-C dir -f file -I dir -o file -W file -j 3 -l 4 -j -j3 -l --always-make")
+        >>> m.get()
+        ['-C dir', '-f file', '-I dir', '-W file', '-j 3', '-l 4', '-j', '-j3', '-l', '--always-make']
+        """
+        if value is None:
+            value = portage.settings['MAKEOPTS']
+        self._makeopts = self._parse(value)
 
     def _parse(self, flags):
         list = []
@@ -44,11 +51,7 @@ class MakeOpts:
         print 'MAKEOPTS: ' + str(self.get())
         print
 
-if __name__ == '__main__':
-    MakeOpts = MakeOpts()
-    MakeOpts.dump()
 
-"""
-Samples
--C dir -f file -I dir -o file -W file -j 3 -l 4 -j -l --always-make
-"""
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod(verbose=True)

@@ -17,10 +17,6 @@
 // libmythmetadata
 #include "metadatafactory.h"
 
-#ifndef ALLOW_MISSING_FILTERS
-#define ALLOW_MISSING_FILTERS 1
-#endif
-
 class ProgramInfo;
 class MythUIText;
 class MythUIButton;
@@ -121,10 +117,6 @@ class SchedOptEditor : public MythScreenType
     MythUIButton  *m_filtersButton;
 
     MythUICheckBox *m_ruleactiveCheck;
-
-#if (ALLOW_MISSING_FILTERS)
-    bool m_missing_filters;
-#endif
 };
 
 class SchedFilterEditor : public MythScreenType
@@ -260,6 +252,8 @@ class MetadataOptions : public MythScreenType
     QStringList GetSupportedImageExtensionFilter();
 
     void HandleDownloadedImages(MetadataLookup *lookup);
+
+    bool CanSetArtwork(void);
 
     void customEvent(QEvent *event);
 

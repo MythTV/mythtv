@@ -35,7 +35,6 @@
 
 extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire  *expirer;
-extern Scheduler   *sched;
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -47,8 +46,8 @@ DTC::ProgramList* Dvr::GetRecorded( bool bDescending,
 {
     QMap< QString, ProgramInfo* > recMap;
 
-    if (sched)
-        recMap = sched->GetRecording();
+    if (gCoreContext->GetScheduler())
+        recMap = gCoreContext->GetScheduler()->GetRecording();
 
     QMap< QString, uint32_t > inUseMap    = ProgramInfo::QueryInUseMap();
     QMap< QString, bool >     isJobRunning= ProgramInfo::QueryJobsRunning(JOB_COMMFLAG);

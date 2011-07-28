@@ -58,11 +58,16 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
     }
     else { // Only in text.
         MHParseNode *pEventSource = p->GetNamedArg(P_EVENT_SOURCE); // Event source
-        if (! pEventSource) p->Failure("Missing :EventSource");
-        m_EventSource.Initialise(pEventSource->GetArgN(0), engine);
+        if (! pEventSource)
+            p->Failure("Missing :EventSource");
+        else
+            m_EventSource.Initialise(pEventSource->GetArgN(0), engine);
+        
         MHParseNode *pEventType = p->GetNamedArg(P_EVENT_TYPE); // Event type
-        if (! pEventType) p->Failure("Missing :EventType");
-        m_nEventType = (enum EventType)pEventType->GetArgN(0)->GetEnumValue();
+        if (! pEventType)
+            p->Failure("Missing :EventType");
+        else
+            m_nEventType = (enum EventType)pEventType->GetArgN(0)->GetEnumValue();
         MHParseNode *pEventData = p->GetNamedArg(P_EVENT_DATA); // Event data - optional
         if (pEventData) {
             MHParseNode *pEventDataArg = pEventData->GetArgN(0);

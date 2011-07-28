@@ -43,7 +43,7 @@ class StatusBox : public MythScreenType
     void doLogEntries();
     void doJobQueueStatus();
     void doMachineStatus();
-    void doAutoExpireList();
+    void doAutoExpireList(bool updateExpList = true);
 
   private:
     MythUIButtonListItem* AddLogLine(const QString & line,

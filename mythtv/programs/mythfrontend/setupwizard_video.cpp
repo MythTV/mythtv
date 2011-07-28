@@ -96,10 +96,15 @@ VideoSetupWizard::~VideoSetupWizard()
     if (m_vdp)
         delete m_vdp;
 
+    gCoreContext->removeListener(this);
+}
+
+void VideoSetupWizard::Close()
+{
     if (m_audioScreen)
         m_audioScreen->Show();
 
-    gCoreContext->removeListener(this);
+    MythScreenType::Close();
 }
 
 void VideoSetupWizard::loadData(void)

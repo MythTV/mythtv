@@ -19,7 +19,7 @@ using namespace std;
 #define LOC QString("DevRdB(%1): ").arg(videodevice)
 
 DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
-    : videodevice(QString::null),   _stream_fd(-1),
+    : videodevice(""),              _stream_fd(-1),
       readerCB(cb),
 
       // Data for managing the device ringbuffer
@@ -60,7 +60,7 @@ DeviceReadBuffer::~DeviceReadBuffer()
 {
     if (buffer)
         delete[] buffer;
-    if (isRunning())
+    if (isRunning() || dorun)
         Stop();
 }
 
@@ -73,6 +73,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
         delete[] buffer;
 
     videodevice   = streamName;
+    videodevice   = (videodevice == QString::null) ? "" : videodevice;
     _stream_fd    = streamfd;
 
     // BEGIN HACK -- see #6897, remove after August 2009
@@ -124,7 +125,7 @@ void DeviceReadBuffer::Start(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- begin");
 
-    if (isRunning())
+    if (isRunning() || dorun)
     {
         {
             QMutexLocker locker(&lock);
@@ -144,8 +145,9 @@ void DeviceReadBuffer::Start(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- middle");
 
-    while (!IsRunning())
-        usleep(5000);
+    QMutexLocker locker(&lock);
+    while (dorun && !running)
+        runWait.wait(locker.mutex(), 100);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- end");
 }
@@ -155,6 +157,7 @@ void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
     QMutexLocker locker(&lock);
 
     videodevice   = streamName;
+    videodevice   = (videodevice == QString::null) ? "" : videodevice;
     _stream_fd    = streamfd;
 
     used          = 0;
@@ -305,6 +308,7 @@ void DeviceReadBuffer::IncrWritePointer(uint len)
     max_used = max(used, max_used);
     avg_used = ((avg_used * avg_cnt) + used) / ++avg_cnt;
 #endif
+    dataWait.wakeAll();
 }
 
 void DeviceReadBuffer::IncrReadPointer(uint len)
@@ -323,6 +327,7 @@ void DeviceReadBuffer::run(void)
     lock.lock();
     dorun   = true;
     running = true;
+    runWait.wakeAll();
     lock.unlock();
 
     if (using_poll)
@@ -379,6 +384,10 @@ void DeviceReadBuffer::run(void)
     lock.lock();
     running = false;
     eof     = true;
+    runWait.wakeAll();
+    dataWait.wakeAll();
+    pauseWait.wakeAll();
+    unpauseWait.wakeAll();
     lock.unlock();
 
     threadDeregister();
@@ -661,8 +670,6 @@ uint DeviceReadBuffer::WaitForUnused(uint needed) const
  */
 uint DeviceReadBuffer::WaitForUsed(uint needed, uint max_wait) const
 {
-    QWaitCondition dataWait;
-
     MythTimer timer;
     timer.start();
 

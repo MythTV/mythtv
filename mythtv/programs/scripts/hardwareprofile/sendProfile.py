@@ -4,6 +4,7 @@
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2007 Mike McGrath
+# Copyright (C) 2009 Sebastian Pipping <sebastian@pipping.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,164 +21,123 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
-from optparse import OptionParser
 import time
-from urlparse import urljoin
 import os
-import random
 import getpass
-from tempfile import NamedTemporaryFile
-
-try:
-    import subprocess
-except ImportError, e:
-    pass
-
-sys.path.append('/usr/share/smolt/client')
-
-from i18n import _
-import smolt
-from smolt import debug
-from smolt import error, ServerError
-from smolt import get_config_attr
-from smolt import to_ascii
-from scan import scan, rating
-from gate import GateFromConfig
-from request import ConnSetup
-
-parser = OptionParser(version = smolt.clientVersion)
-
-parser.add_option('-d', '--debug',
-                  dest = 'DEBUG',
-                  default = False,
-                  action = 'store_true',
-                  help = _('enable debug information'))
-parser.add_option('--config',
-                  dest = 'the_only_config_file',
-                  default = None,
-                  metavar = 'file.cfg',
-                  help = _('specify the location of the (only) config file to use'))
-parser.add_option('-s', '--server',
-                  dest = 'smoonURL',
-                  default = smolt.smoonURL,
-                  metavar = 'smoonURL',
-                  help = _('specify the URL of the server (default "%default")'))
-parser.add_option('--username',
-                  dest = 'userName',
-                  default = None,
-                  metavar = 'userName',
-                  help = _('(optional) Fedora Account System registration'))
-parser.add_option('--password',
-                  dest = 'password',
-                  default = None,
-                  metavar = 'password',
-                  help = _('password, will prompt if not specified'))
-parser.add_option('-p', '--printOnly',
-                  dest = 'printOnly',
-                  default = False,
-                  action = 'store_true',
-                  help = _('print information only, do not send'))
-parser.add_option('-a', '--autoSend',
-                  dest = 'autoSend',
-                  default = False,
-                  action = 'store_true',
-                  help = _('don\'t prompt to send, just send'))
-parser.add_option('-r', '--retry',
-                  dest = 'retry',
-                  default = False,
-                  action = 'store_true',
-                  help = _('continue to send until success'))
-parser.add_option('-u', '--useragent', '--user_agent',
-                  dest = 'user_agent',
-                  default = smolt.user_agent,
-                  metavar = 'USERAGENT',
-                  help = _('specify HTTP user agent (default "%default")'))
-parser.add_option('-t', '--timeout',
-                  dest = 'timeout',
-                  type = 'float',
-                  default = smolt.timeout,
-                  help = _('specify HTTP timeout in seconds (default %default seconds)'))
-parser.add_option('-c', '--checkin',
-                  dest = 'checkin',
-                  default = False,
-                  action = 'store_true',
-                  help = _('do an automated checkin as when run from cron (implies --autoSend)'))
-parser.add_option('-S', '--scanOnly',
-                  dest = 'scanOnly',
-                  default = False,
-                  action = 'store_true',
-                  help = _('only scan this machine for known hardware errata, do not send profile.'))
-parser.add_option('--submitOnly',
-                  dest = 'submitOnly',
-                  default = False,
-                  action = 'store_true',
-                  help = _('do not scan this machine for know hardware errata, only submit profile.'))
-parser.add_option('--uuidFile',
-                  dest = 'uuidFile',
-                  default = smolt.hw_uuid_file,
-                  help = _('specify which uuid to use, useful for debugging and testing mostly.'))
-#parser.add_option('-b', '--bodhi',
-#                  dest = 'bodhi',
-#                  default = False,
-#                  action = 'store_true',
-#                  help = _('Submit this profile to Bodhi as well, for Fedora Developmnent'))
-parser.add_option('-n', '--newPublicUUID',
-                  dest = 'new_pub',
-                  default = False,
-                  action = 'store_true',
-                  help = _('Request a new public UUID'))
-parser.add_option('--http-proxy',
-                  dest = 'httpproxy',
-                  default = None,
-                  help = _('HTTP proxy'))
 
 
-(opts, args) = parser.parse_args()
+def ensure_code_reachability():
+    _code_location = '/usr/share/smolt/client'
+    if sys.path[-1] == _code_location:
+        return
+    sys.path.append(_code_location)
 
-if opts.the_only_config_file != None:
-    GateFromConfig(opts.the_only_config_file)
 
-smolt.DEBUG = opts.DEBUG
-smolt.hw_uuid_file = opts.uuidFile
-if opts.httpproxy == None:
-    proxies = None
-else:
-    proxies = {'http':opts.httpproxy}
+def command_line():
+    ensure_code_reachability()
+    from i18n import _
+    import smolt
 
-ConnSetup(opts.smoonURL, opts.user_agent, opts.timeout, opts.httpproxy)
+    from optparse import OptionParser
+    parser = OptionParser(version = smolt.clientVersion)
 
-if opts.checkin:
-    # Smolt is set to run
-    opts.autoSend = True
+    parser.add_option('-d', '--debug',
+                    dest = 'DEBUG',
+                    default = False,
+                    action = 'store_true',
+                    help = _('enable debug information'))
+    parser.add_option('--config',
+                    dest = 'the_only_config_file',
+                    default = None,
+                    metavar = 'file.cfg',
+                    help = _('specify the location of the (only) config file to use'))
+    parser.add_option('-s', '--server',
+                    dest = 'smoonURL',
+                    default = smolt.smoonURL,
+                    metavar = 'smoonURL',
+                    help = _('specify the URL of the server (default "%default")'))
+    parser.add_option('--username',
+                    dest = 'userName',
+                    default = None,
+                    metavar = 'userName',
+                    help = _('(optional) Fedora Account System registration'))
+    parser.add_option('--password',
+                    dest = 'password',
+                    default = None,
+                    metavar = 'password',
+                    help = _('password, will prompt if not specified'))
+    parser.add_option('-p', '--printOnly',
+                    dest = 'printOnly',
+                    default = False,
+                    action = 'store_true',
+                    help = _('print information only, do not send'))
+    parser.add_option('-a', '--autoSend',
+                    dest = 'autoSend',
+                    default = False,
+                    action = 'store_true',
+                    help = _('don\'t prompt to send, just send'))
+    parser.add_option('-r', '--retry',
+                    dest = 'retry',
+                    default = False,
+                    action = 'store_true',
+                    help = _('continue to send until success'))
+    parser.add_option('-u', '--useragent', '--user_agent',
+                    dest = 'user_agent',
+                    default = smolt.user_agent,
+                    metavar = 'USERAGENT',
+                    help = _('specify HTTP user agent (default "%default")'))
+    parser.add_option('-t', '--timeout',
+                    dest = 'timeout',
+                    type = 'float',
+                    default = smolt.timeout,
+                    help = _('specify HTTP timeout in seconds (default %default seconds)'))
+    parser.add_option('-c', '--checkin',
+                    dest = 'cron_mode',
+                    default = False,
+                    action = 'store_true',
+                    help = _('do an automated checkin as when run from cron (implies --autoSend)'))
+    parser.add_option('-S', '--scanOnly',
+                    dest = 'send_profile',
+                    default = True,
+                    action = 'store_false',
+                    help = _('only scan this machine for known hardware errata, do not send profile.'))
+    parser.add_option('--submitOnly',
+                    dest = 'scan_remote',
+                    default = True,
+                    action = 'store_false',
+                    help = _('do not scan this machine for know hardware errata, only submit profile.'))
+    parser.add_option('--uuidFile',
+                    dest = 'uuidFile',
+                    default = smolt.hw_uuid_file,
+                    help = _('specify which uuid to use, useful for debugging and testing mostly.'))
+    #parser.add_option('-b', '--bodhi',
+    #                  dest = 'bodhi',
+    #                  default = False,
+    #                  action = 'store_true',
+    #                  help = _('Submit this profile to Bodhi as well, for Fedora Developmnent'))
+    parser.add_option('-n', '--newPublicUUID',
+                    dest = 'new_pub',
+                    default = False,
+                    action = 'store_true',
+                    help = _('Request a new public UUID'))
+    parser.add_option('--http-proxy',
+                    dest = 'httpproxy',
+                    default = None,
+                    help = _('HTTP proxy'))
 
-# read the profile
-try:
-    profile = smolt.get_profile()
-except smolt.UUIDError, e:
-    sys.stderr.write(_('%s\n' % e))
-    sys.exit(9)
+    (opts, args) = parser.parse_args()
 
-if opts.new_pub:
-    try:
-        pub_uuid = profile.regenerate_pub_uuid(smoonURL=opts.smoonURL)
-    except ServerError, e:
-        error(_('Error contacting server: %s') % str(e))
-        sys.exit(1)
+    if opts.cron_mode:
+        # Smolt is set to run
+        opts.autoSend = True
 
-    print _('Success!  Your new public UUID is: %s' % pub_uuid)
-    sys.exit(0)
+    return opts, args
 
-if opts.scanOnly:
-    scan(profile, opts.smoonURL)
-    rating(profile, opts.smoonURL)
-    sys.exit(0)
 
-if not opts.autoSend:
-    if opts.printOnly:
-        for line in profile.getProfile():
-            if not line.startswith('#'):
-                print line.encode('utf-8')
-        sys.exit(0)
+def make_display_excerpts(profile):
+    ensure_code_reachability()
+    from i18n import _
+    from smolt import to_ascii
 
     def inner_indent(text):
         return ('\n' + 5 * ' ').join(text.split('\n'))
@@ -198,31 +158,48 @@ if not opts.autoSend:
         'file_system':inner_indent(to_ascii(profile.get_file_system_info_excerpt())),
         'distro':inner_indent(to_ascii(profile.get_distro_info_excerpt())),
     }
+    return excerpts
 
-    submit = False
-    while not submit:
-        print """\
+
+def dump_excerpts(excerpts):
+    print """\
 =====================================================
 %(label_intro)s
 
-  %(label_general)s
+%(label_general)s
      %(general)s
 
-  %(label_devices)s
+%(label_devices)s
      %(devices)s
 
-  %(label_fs_related)s
+%(label_fs_related)s
      %(file_system)s
 
-  %(label_distro_specific)s
+%(label_distro_specific)s
      %(distro)s
 
 =====================================================
 %(label_question)s
-  %(label_question_view)s
-  %(label_question_send)s
-  %(label_question_quit)s
+%(label_question_view)s
+%(label_question_send)s
+%(label_question_quit)s
 """ % excerpts
+
+
+def present_and_require_confirmation(profile):
+    import subprocess
+    from tempfile import NamedTemporaryFile
+
+    ensure_code_reachability()
+    from i18n import _
+    from smolt import error
+
+    excerpts = make_display_excerpts(profile)
+
+    submit = False
+    while not submit:
+        dump_excerpts(excerpts)
+
         try:
             choice = raw_input(_('Your choice (s)end (v)iew (q)uit: ')).strip()
         except KeyboardInterrupt:
@@ -263,46 +240,181 @@ if not opts.autoSend:
             sys.exit(4)
 
 
-if opts.retry:
-    while 1:
-        result, pub_uuid, admin = profile.send(smoonURL=opts.smoonURL,
-                              batch=opts.checkin)
-        if not result:
-            sys.exit(0)
-        error(_('Retry Enabled - Retrying'))
-        time.sleep(30)
-else:
-    result, pub_uuid, admin = profile.send(smoonURL=opts.smoonURL,
-                                    batch=opts.checkin)
+def do_send_profile(uuiddb, uuid, profile, opts, proxies):
+    (error_code, pub_uuid, admin) = profile.send(uuiddb, uuid, user_agent=opts.user_agent,
+                        smoonURL=opts.smoonURL,
+                        timeout=opts.timeout,
+                        proxies=proxies,
+                        batch=opts.cron_mode)
+    return (error_code, pub_uuid, admin)
 
-    if result:
-        print _('Could not send - Exiting')
-        sys.exit(1)
 
-if opts.userName:
+def send_profile(uuiddb, uuid, profile, opts, proxies):
+    ensure_code_reachability()
+    from i18n import _
+    from smolt import error
+
+    if opts.retry:
+        while 1:
+            (error_code, pub_uuid, admin) = do_send_profile(uuiddb, uuid, profile, opts, proxies)
+            if not error_code:
+                break
+            error(_('Retry Enabled - Retrying'))
+            time.sleep(30)
+    else:
+        (error_code, pub_uuid, admin) = do_send_profile(uuiddb, uuid, profile, opts, proxies)
+        if error_code:
+            print _('Could not send - Exiting')
+            sys.exit(1)
+
+    return (error_code, pub_uuid, admin)
+
+
+def mention_profile_web_view(opts, pub_uuid, admin):
+    ensure_code_reachability()
+    import smolt
+    from i18n import _
+
+    pubUrl = smolt.get_profile_link(opts.smoonURL, pub_uuid)
+    print
+    print _('To share your profile: \n\t%s (public)') % pubUrl
+    if not smolt.secure:
+        print _('\tAdmin Password: %s') % admin
+
+
+def get_proxies(opts):
+    if opts.httpproxy == None:
+        proxies = None
+    else:
+        proxies = {'http':opts.httpproxy}
+    return proxies
+
+
+def read_profile(gate, uuid):
+    ensure_code_reachability()
+    from i18n import _
+    import smolt
+
+    try:
+        profile = smolt.create_profile(gate, uuid)
+    except smolt.UUIDError, e:
+        sys.stderr.write(_('%s\n' % e))
+        sys.exit(9)
+    return profile
+
+
+def register_with_fedora_account_system(opts):
+    ensure_code_reachability()
+    from i18n import _
+
     if not opts.password:
         password = getpass.getpass('\n' + _('Password:') + ' ')
     else:
         password = opts.password
 
-    if profile.register(userName=opts.userName, password=password, smoonURL=opts.smoonURL):
+    if profile.register(userName=opts.userName, password=password, user_agent=opts.user_agent, smoonURL=opts.smoonURL, timeout=opts.timeout):
         print _('Registration Failed, Try again')
-if not opts.submitOnly and not opts.checkin:
-    scan(profile, opts.smoonURL)
+
+
+def do_scan_remote(profile, opts, gate):
+    ensure_code_reachability()
+    from scan import scan, rating
+
+    scan(profile, opts.smoonURL, gate)
     try:
-        rating(profile, opts.smoonURL)
+        rating(profile, opts.smoonURL, gate)
     except ValueError:
         print "Could not get rating!"
-print
 
-if pub_uuid:
-    pubUrl = smolt.get_profile_link(opts.smoonURL, pub_uuid)
-    print _('To share your profile: \n\t%s (public)') % pubUrl
-    hw_uuid_file = get_config_attr("HW_PUBID", "/etc/smolt/hw-uuid.pub")
-    hw_uuid_pub = os.path.basename(pubUrl)
-    if not smolt.secure:
-        print _('\tAdmin Password: %s') % admin
 
-elif not opts.checkin:
+def mention_missing_uuid():
+    ensure_code_reachability()
+    from i18n import _
+    print
     print _('No Public UUID found!  Please re-run with -n to generate a new public uuid')
 
+
+def main_request_new_public_uuid(uuiddb, uuid, profile, opts):
+    ensure_code_reachability()
+    from i18n import _
+    from smolt import error, ServerError
+
+    try:
+        pub_uuid = profile.regenerate_pub_uuid(uuiddb, uuid, user_agent=opts.user_agent,
+                            smoonURL=opts.smoonURL,
+                            timeout=opts.timeout)
+    except ServerError, e:
+        error(_('Error contacting server: %s') % str(e))
+        sys.exit(1)
+
+    print _('Success!  Your new public UUID is: %s' % pub_uuid)
+    sys.exit(0)
+
+
+def main_scan_only(profile, opts, gate):
+    do_scan_remote(profile, opts, gate)
+    sys.exit(0)
+
+
+def main_print_only(profile):
+    for line in profile.getProfile():
+        if not line.startswith('#'):
+            print line.encode('utf-8')
+    sys.exit(0)
+
+
+def main_send_profile(uuiddb, uuid, profile, opts, gate):
+    proxies = get_proxies(opts)
+
+    if not opts.autoSend:
+        present_and_require_confirmation(profile)
+
+    (error_code, pub_uuid, admin) = send_profile(uuiddb, uuid, profile, opts, proxies)
+
+    if opts.userName:
+        register_with_fedora_account_system(opts)
+
+    if opts.scan_remote and not opts.cron_mode:
+        do_scan_remote(profile, opts, gate)
+
+    if pub_uuid:
+        mention_profile_web_view(opts, pub_uuid, admin)
+    elif not opts.cron_mode:
+        mention_missing_uuid()
+
+
+def main():
+    ensure_code_reachability()
+    from i18n import _
+    import smolt
+    from gate import create_default_gate, create_gate_from_file
+    from uuiddb import create_default_uuiddb
+
+    (opts, args) = command_line()
+
+    if opts.the_only_config_file is None:
+        gate = create_default_gate()
+    else:
+        gate = create_gate_from_file(opts.the_only_config_file)
+
+    smolt.DEBUG = opts.DEBUG
+    smolt.hw_uuid_file = opts.uuidFile
+
+    profile = read_profile(gate, smolt.read_uuid())
+
+    if opts.new_pub:
+        uuiddb = create_default_uuiddb()
+        uuid = smolt.read_uuid()
+        main_request_new_public_uuid(uuiddb, uuid, profile, opts)
+    elif not opts.send_profile:
+        main_scan_only(profile, opts)
+    elif opts.printOnly and not opts.autoSend:
+        main_print_only(profile)
+    else:
+        uuiddb = create_default_uuiddb()
+        uuid = smolt.read_uuid()
+        main_send_profile(uuiddb, uuid, profile, opts, gate)
+
+
+if __name__ == '__main__':
+    main()

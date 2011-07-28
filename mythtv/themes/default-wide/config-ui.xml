@@ -582,7 +582,7 @@
         </button>
 
         <button name="previous" from="basebutton">
-            <position>360,644</position>
+            <position>250,644</position>
             <value>Previous</value>
         </button>
 
@@ -598,7 +598,7 @@
         <textarea name="title" from="basetextarea">
             <area>30,10,570,40</area>
             <font>baselarge</font>
-            <value>Video Configurationn</value>
+            <value>Video Configuration</value>
         </textarea>
 
         <textarea name="helptext" from="basetextarea">

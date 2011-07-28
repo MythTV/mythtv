@@ -1277,15 +1277,16 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
               .arg(needs_upmix));
 
     // Mythmusic doesn't give us timestamps
+    if (timecode < 0)
+    {
+        timecode = (frames_buffered * 1000) / source_samplerate;
+        frames_buffered += frames;
+        music = true;
+    }
+
     if (hasVisual())
     {
-        if (timecode < 0)
-        {
-            // Send original samples to mythmusic visualisation
-            timecode = (frames_buffered * 1000) / source_samplerate;
-            frames_buffered += frames;
-            music = true;
-        }
+        // Send original samples to any attached visualisations
         dispatchVisual((uchar *)in_buffer, len, timecode, source_channels,
                        output_settings->FormatToBits(format));
     }

@@ -763,7 +763,7 @@ void TV::InitKeys(void)
 */
 }
 
-void TV::ResetKeys(void)
+void TV::ReloadKeys(void)
 {
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->ClearKeyContext("TV Frontend");
@@ -5360,14 +5360,14 @@ void TV::DoPlay(PlayerContext *ctx)
 
     float time = 0.0;
 
-    if (ctx->ff_rew_state)
+    if (ctx->ff_rew_state || (ctx->ff_rew_speed != 0) ||
+        ctx->player->IsPaused())
     {
-        time = StopFFRew(ctx);
-        ctx->player->Play(ctx->ts_normal, true);
-        ctx->ff_rew_speed = 0;
-    }
-    else if (ctx->player->IsPaused() || (ctx->ff_rew_speed != 0))
-    {
+        if (ctx->ff_rew_state)
+            time = StopFFRew(ctx);
+        else if (ctx->player->IsPaused())
+            SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo); 
+        
         ctx->player->Play(ctx->ts_normal, true);
         ctx->ff_rew_speed = 0;
     }
@@ -8402,7 +8402,7 @@ void TV::customEvent(QEvent *e)
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         OSD *osd = GetOSDLock(mctx);
-        if (osd && osd->IsWindowVisible("program_info"))
+        if (osd && !osd->IsWindowVisible(OSD_WIN_INTERACT))
         {
             for (uint i = 0; mctx && (i < player.size()); i++)
             {

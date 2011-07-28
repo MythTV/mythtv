@@ -58,6 +58,7 @@ class IconView : public MythScreenType
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent*);
+    void HandleRandomShow(void);
 
     QString GetError(void) { return m_errorStr; }
 
@@ -83,7 +84,6 @@ class IconView : public MythScreenType
     void HandleRotateCCW(void);
     void HandleDeleteCurrent(void);
     void HandleSlideShow(void);
-    void HandleRandomShow(void);
     void HandleSettings(void);
     void HandleEject(void);
     void HandleImport(void);

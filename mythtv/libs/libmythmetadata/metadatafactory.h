@@ -97,6 +97,8 @@ class META_PUBLIC MetadataFactory : public QObject
                               m_imagedownload->isRunning() ||
                               m_videoscanner->isRunning(); };
 
+    bool VideoGrabbersFunctional();
+
   private:
 
     void customEvent(QEvent *levent);

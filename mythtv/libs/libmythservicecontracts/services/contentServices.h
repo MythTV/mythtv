@@ -48,8 +48,8 @@
 class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.02" );
-    Q_CLASSINFO( "DownloadFile_Method",            "POST" ) 
+    Q_CLASSINFO( "version"    , "1.3" );
+    Q_CLASSINFO( "DownloadFile_Method",            "POST" )
 
     public:
 
@@ -65,15 +65,20 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
         virtual QFileInfo           GetFile             ( const QString   &StorageGroup,
                                                           const QString   &FileName ) = 0;
 
+        virtual QFileInfo           GetImageFile        ( const QString   &StorageGroup,
+                                                          const QString   &FileName,
+                                                          int Width, int Height ) = 0;
+
         virtual QStringList         GetFileList         ( const QString   &StorageGroup ) = 0;
 
-        virtual QFileInfo           GetVideoCoverart    ( int Id ) = 0;
+        virtual QFileInfo           GetRecordingArtwork ( const QString   &Type,
+                                                          const QString   &Inetref,
+                                                          int Season, int Width,
+                                                          int Height ) = 0;
 
-        virtual QFileInfo           GetVideoFanart      ( int Id ) = 0;
-
-        virtual QFileInfo           GetVideoBanner      ( int Id ) = 0;
-
-        virtual QFileInfo           GetVideoScreenshot  ( int Id ) = 0;
+        virtual QFileInfo           GetVideoArtwork     ( const QString   &Type,
+                                                          int Id, int Width,
+                                                          int Height ) = 0;
 
         virtual QFileInfo           GetAlbumArt         ( int Id, int Width, int Height ) = 0;
 

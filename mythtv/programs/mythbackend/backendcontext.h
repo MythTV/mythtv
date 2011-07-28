@@ -13,7 +13,6 @@ class MediaServer;
 
 extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire  *expirer;
-extern Scheduler   *sched;
 extern JobQueue    *jobqueue;
 extern HouseKeeper *housekeeping;
 extern MediaServer *g_pUPnp;
