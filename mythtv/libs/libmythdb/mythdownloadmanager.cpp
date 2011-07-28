@@ -651,6 +651,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
 
     if (!dlInfo->m_done)
     {
+        dlInfo->m_data = NULL;      // Prevent downloadFinished() from updating
         dlInfo->m_syncMode = false; // Let downloadFinished() cleanup for us
         if (dlInfo->m_reply)
             dlInfo->m_reply->abort();
