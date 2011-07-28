@@ -600,12 +600,16 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     CC608Buffer* textlist = m_608reader->GetOutputText(changed);
     if (!changed)
         return;
+
     if (textlist)
         textlist->lock.lock();
+    
     DeleteAllChildren();
+    
     if (!textlist)
         return;
-    if (textlist && textlist->buffers.empty())
+
+    if (textlist->buffers.empty())
     {
         SetRedraw();
         textlist->lock.unlock();
