@@ -24,6 +24,7 @@ class MonitorThread : public QThread
 {
   public:
     MonitorThread(MediaMonitor* pMon,  unsigned long interval);
+    ~MonitorThread() { wait(); m_Monitor = NULL; }
     void setMonitor(MediaMonitor* pMon) { m_Monitor = pMon; }
     virtual void run(void);
 

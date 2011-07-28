@@ -235,6 +235,8 @@ RingBuffer::~RingBuffer(void)
     }
 
     rwlock.unlock();
+
+    wait();
 }
 
 /** \fn RingBuffer::Reset(bool, bool, bool)

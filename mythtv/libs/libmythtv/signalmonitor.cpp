@@ -200,6 +200,7 @@ SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
 SignalMonitor::~SignalMonitor()
 {
     Stop();
+    wait();
 }
 
 void SignalMonitor::AddFlags(uint64_t _flags)

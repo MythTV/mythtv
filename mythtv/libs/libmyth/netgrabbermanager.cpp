@@ -40,6 +40,7 @@ GrabberScript::GrabberScript(const QString& title, const QString& image,
 
 GrabberScript::~GrabberScript()
 {
+    wait();
 }
 
 void GrabberScript::run()

@@ -134,6 +134,9 @@ Scheduler::~Scheduler()
         delete worklist.back();
         worklist.pop_back();
     }
+
+    locker.unlock();
+    wait();
 }
 
 void Scheduler::SetMainServer(MainServer *ms)

@@ -24,6 +24,7 @@ class MythSystemIOHandler: public QThread
 {
     public:
         MythSystemIOHandler(bool read);
+        ~MythSystemIOHandler() { wait(); }
         void   run(void);
 
         void   insert(int fd, QBuffer *buff);
@@ -49,6 +50,7 @@ class MythSystemManager : public QThread
 {
     public:
         MythSystemManager();
+        ~MythSystemManager() { wait(); }
         void run(void);
         void append(MythSystemUnix *);
         void jumpAbort(void);
@@ -63,6 +65,7 @@ class MythSystemSignalManager : public QThread
 {
     public:
         MythSystemSignalManager();
+        ~MythSystemSignalManager() { wait(); }
         void run(void);
     private:
 };

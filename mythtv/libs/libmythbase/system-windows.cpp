@@ -215,6 +215,7 @@ MythSystemManager::~MythSystemManager()
 {
     if (m_children)
         free( m_children );
+    wait();
 }
 
 void MythSystemManager::run(void)

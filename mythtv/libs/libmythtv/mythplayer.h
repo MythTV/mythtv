@@ -87,6 +87,7 @@ class DecoderThread : public QThread
   public:
     DecoderThread(MythPlayer *mp, bool start_paused)
       : QThread(NULL), m_mp(mp), m_start_paused(start_paused) { }
+    ~DecoderThread() { wait(); }
 
   protected:
     virtual void run(void);
