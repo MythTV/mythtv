@@ -1202,7 +1202,6 @@ static int reloadTheme(void)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find theme '%1'")
                 .arg(themename));
-        cleanup();
         return GENERIC_EXIT_NO_THEME;
     }
 
