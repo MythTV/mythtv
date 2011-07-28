@@ -2836,10 +2836,8 @@ int  TV::StartTimer(int interval, int line)
     return x;
 }
 
-#include <cassert>
 void TV::KillTimer(int id)
 {
-    assert(id);
     QObject::killTimer(id);
 }
 
