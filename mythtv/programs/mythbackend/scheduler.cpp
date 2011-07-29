@@ -4043,9 +4043,9 @@ void Scheduler::AddNotListed(void) {
 
     while (result.next())
     {
-        RecordingType rectype = RecordingType(result.value(18).toInt());
-        QDateTime startts(result.value(13).toDate(), result.value(14).toTime());
-        QDateTime endts(  result.value(15).toDate(), result.value(16).toTime());
+        RecordingType rectype = RecordingType(result.value(21).toInt());
+        QDateTime startts(result.value(16).toDate(), result.value(17).toTime());
+        QDateTime endts(  result.value(18).toDate(), result.value(19).toTime());
 
         if (rectype == kTimeslotRecord)
         {
@@ -4074,8 +4074,8 @@ void Scheduler::AddNotListed(void) {
             }
         }
 
-        QDateTime recstartts = startts.addSecs(result.value(22).toInt() * -60);
-        QDateTime recendts   = endts.addSecs(  result.value(23).toInt() * +60);
+        QDateTime recstartts = startts.addSecs(result.value(25).toInt() * -60);
+        QDateTime recendts   = endts.addSecs(  result.value(26).toInt() * +60);
 
         if (recstartts >= recendts)
         {
@@ -4091,38 +4091,41 @@ void Scheduler::AddNotListed(void) {
         bool sor = (kSingleRecord == rectype) || (kOverrideRecord == rectype);
 
         RecordingInfo *p = new RecordingInfo(
-            result.value(0).toString(),
-            (sor) ? result.value(1).toString() : QString(),
-            (sor) ? result.value(2).toString() : QString(),
-            result.value(3).toUInt(),
-            result.value(4).toUInt(),
-            QString(),
+            result.value(0).toString(), // Title
+            (sor) ? result.value(1).toString() : QString(), // Subtitle
+            (sor) ? result.value(2).toString() : QString(), // Description
+            result.value(3).toUInt(), // Season
+            result.value(4).toUInt(), // Episode
+            QString(), // Category
 
-            result.value(6).toUInt(),
-            result.value(7).toString(),
-            result.value(8).toString(),
-            result.value(9).toString(),
+            result.value(6).toUInt(), // Chanid
+            result.value(7).toString(), // Channel number
+            result.value(8).toString(), // Call Sign
+            result.value(9).toString(), // Channel name
 
-            result.value(10).toString(),  result.value(11).toString(),
+            result.value(10).toString(), // Recgroup
+            result.value(11).toString(), // Playgroup
 
-            result.value(12).toString(), result.value(13).toString(),
-            result.value(14).toString(),
+            result.value(12).toString(), // Series ID
+            result.value(13).toString(), // Program ID
+            result.value(14).toString(), // Inetref
 
-            result.value(15).toInt(),
+            result.value(15).toInt(), // Rec priority
 
             startts,                     endts,
             recstartts,                  recendts,
 
-            rsNotListed,
+            rsNotListed, // Recording Status
 
-            result.value(20).toUInt(),   RecordingType(result.value(21).toInt()),
+            result.value(20).toUInt(), // Recording ID
+            RecordingType(result.value(21).toInt()), // Recording type
 
-            RecordingDupInType(result.value(22).toInt()),
-            RecordingDupMethodType(result.value(23).toInt()),
+            RecordingDupInType(result.value(22).toInt()), // DupIn type
+            RecordingDupMethodType(result.value(23).toInt()), // Dup method
 
-            result.value(24).toUInt(),
+            result.value(24).toUInt(), // Find ID
 
-            result.value(25).toInt() == COMM_DETECT_COMMFREE);
+            result.value(27).toInt() == COMM_DETECT_COMMFREE); // Comm Free
 
         tmpList.push_back(p);
     }
