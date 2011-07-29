@@ -4166,7 +4166,7 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
 
     while (result.next())
     {
-        RecordingType rectype = RecordingType(result.value(18).toInt());
+        RecordingType rectype = RecordingType(result.value(21).toInt());
         QDateTime startts;
         QDateTime endts;
         if (rectype == kSingleRecord   ||
