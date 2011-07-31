@@ -1,5 +1,5 @@
 
-#include <sstream>
+#include <QTextStream>
 
 #include "mythrect.h"
 #include "mythmainwindow.h"
@@ -120,7 +120,7 @@ void MythRect::setRect(const QString &sX, const QString &sY,
  * \return true of position is absolute
  */
 bool MythRect::parsePosition(float & percent, int & offset, int & absolute,
-                             const QString &value)
+                             const QString &value, bool is_size)
 {
     /*
       Position can be either an absolute, or a percentage with an
@@ -140,24 +140,26 @@ bool MythRect::parsePosition(float & percent, int & offset, int & absolute,
         return true;
 
     int  number;
-    bool is_offset;
-    std::istringstream  is(value.trimmed().toStdString().c_str());
+    char ch;
+    QString tmp(value); // QTextStream won't accept a const!
+    QTextStream is(&tmp);
 
-    is_offset = (is.peek() == '+' || is.peek() == '-');
     is >> number;
-    if (!is)
+    if (is.status() != QTextStream::Ok)
         return true;
 
-    is >> std::ws;
-    if (is.peek() != '%')
+    is.skipWhiteSpace();
+    is >> ch;
+    if (ch != '%')
     {
-        if (is_offset)
+        if (is_size && number < 0)
+        {
             offset = number;
-        else
-            absolute = number;
-        return !is_offset;
+            return false;
+        }
+        absolute = number;
+        return true;
     }
-    is.ignore(1);
 
     percent = static_cast<float>(number) / 100.0;
     is >> offset;
@@ -168,13 +170,8 @@ void MythRect::setX(const QString &sX)
 {
     int absoluteX;
 
-    if (parsePosition(m_percentX, m_offsetX, absoluteX, sX))
+    if (parsePosition(m_percentX, m_offsetX, absoluteX, sX, false))
         QRect::setX(absoluteX);
-    else if (m_percentX == 0.0)
-    {
-        QRect::setX(m_offsetX);
-        m_offsetX = 0;
-    }
     else
         m_needsUpdate = true;
 }
@@ -183,13 +180,8 @@ void MythRect::setY(const QString &sY)
 {
     int absoluteY;
 
-    if (parsePosition(m_percentY, m_offsetY, absoluteY, sY))
+    if (parsePosition(m_percentY, m_offsetY, absoluteY, sY, false))
         QRect::setY(absoluteY);
-    else if (m_percentY == 0.0)
-    {
-        QRect::setY(m_offsetY);
-        m_offsetY = 0;
-    }
     else
         m_needsUpdate = true;
 }
@@ -198,7 +190,8 @@ void MythRect::setWidth(const QString &sWidth)
 {
     int absoluteWidth;
 
-    if (parsePosition(m_percentWidth, m_offsetWidth, absoluteWidth, sWidth))
+    if (parsePosition(m_percentWidth, m_offsetWidth, absoluteWidth,
+                      sWidth, true))
         QRect::setWidth(absoluteWidth);
     else
         m_needsUpdate = true;
@@ -208,7 +201,8 @@ void MythRect::setHeight(const QString &sHeight)
 {
     int absoluteHeight;
 
-    if (parsePosition(m_percentHeight, m_offsetHeight, absoluteHeight, sHeight))
+    if (parsePosition(m_percentHeight, m_offsetHeight, absoluteHeight,
+                      sHeight, true))
         QRect::setHeight(absoluteHeight);
     else
         m_needsUpdate = true;
@@ -232,13 +226,8 @@ void MythRect::moveLeft(const QString &sX)
 {
     int absoluteX;
 
-    if (parsePosition(m_percentX, m_offsetX, absoluteX, sX))
+    if (parsePosition(m_percentX, m_offsetX, absoluteX, sX, false))
         QRect::moveLeft(absoluteX);
-    else if (m_percentX == 0.0)
-    {
-        QRect::moveLeft(m_offsetX);
-        m_offsetX = 0;
-    }
     else // Move left to the absolute pos specified by the percentage/offset
         m_needsUpdate = true;
 }
@@ -247,13 +236,8 @@ void MythRect::moveTop(const QString &sY)
 {
     int absoluteY;
 
-    if (parsePosition(m_percentY, m_offsetY, absoluteY, sY))
+    if (parsePosition(m_percentY, m_offsetY, absoluteY, sY, false))
         QRect::moveTop(absoluteY);
-    else if (m_percentY == 0.0)
-    {
-        QRect::moveTop(m_offsetY);
-        m_offsetY = 0;
-    }
     else  // Move top to the absolute pos specified by the percentage/offset
         m_needsUpdate = true;
 }
@@ -422,19 +406,21 @@ bool MythPoint::parsePosition(float & percent, int & offset, int & absolute,
         return true;
 
     int  number;
-    std::istringstream  is(value.trimmed().toStdString().c_str());
+    char ch;
+    QString tmp(value); // QTextStream won't accept a const!
+    QTextStream is(&tmp);
 
     is >> number;
-    if (!is)
+    if (is.status() != QTextStream::Ok)
         return true;
 
-    is >> std::ws;
-    if (is.peek() != '%')
+    is.skipWhiteSpace();
+    is >> ch;
+    if (ch != '%')
     {
         absolute = number;
         return true;
     }
-    is.ignore(1);
 
     percent = static_cast<float>(number) / 100.0;
     is >> offset;

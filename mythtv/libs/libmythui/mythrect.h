@@ -58,7 +58,7 @@ class MUI_PUBLIC MythRect : public QRect
 
   private:
     bool parsePosition(float & percent, int & offset, int & absolute,
-		       const QString &value);
+		       const QString &value, bool is_size);
 
     float m_percentWidth;
     float m_percentHeight;
