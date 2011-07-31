@@ -41,6 +41,7 @@
 // MythTV headers
 #include "upnputil.h"
 #include "refcounted.h"
+#include "upnpexp.h"
 
 class Task;
 class TaskQueue;
@@ -88,7 +89,7 @@ class Task : public RefCounted
 // TaskQueue Singleton
 /////////////////////////////////////////////////////////////////////////////
 
-class TaskQueue : public QThread
+class UPNP_PUBLIC TaskQueue : public QThread
 {
     private: 
 
