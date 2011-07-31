@@ -1260,12 +1260,12 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     QString groupname = sel_item->GetData().toString();
     QString grouplabel = sel_item->GetText();
 
+    updateGroupInfo(groupname, grouplabel);
+
     if (((m_currentGroup == groupname) && !m_needUpdate) ||
         m_playingSomething)
         return;
 
-    updateGroupInfo(groupname, grouplabel);
-    
     m_needUpdate = false;
 
     if (!m_isFilling)
