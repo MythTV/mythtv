@@ -36,6 +36,7 @@ class MythSystemIOHandler: public QThread
         void   HandleWrite(int fd, QBuffer *buff);
         void   BuildFDs();
 
+        QMutex          m_pWaitLock;
         QWaitCondition  m_pWait;
         QMutex          m_pLock;
         PMap_t          m_pMap;
