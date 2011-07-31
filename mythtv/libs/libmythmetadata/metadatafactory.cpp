@@ -5,6 +5,7 @@
 #include "mythcontext.h"
 #include "videoutils.h"
 #include "mythlogging.h"
+#include "compat.h"
 
 // Needed to perform a lookup
 #include "metadatadownload.h"
