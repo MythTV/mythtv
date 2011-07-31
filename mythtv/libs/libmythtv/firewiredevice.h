@@ -19,6 +19,7 @@ using namespace std;
 #include "streamlisteners.h"
 #include "avcinfo.h"
 
+class PSIPGenerator;
 class TSPacket;
 
 class FirewireDevice
@@ -190,7 +191,7 @@ class FirewireDevice
 
     } IEEE1394PanelPassThroughParam0;
 
-    virtual ~FirewireDevice() { }
+    virtual ~FirewireDevice();
 
     // Commands
     virtual bool OpenPort(void) = 0;
@@ -218,7 +219,7 @@ class FirewireDevice
     static vector<AVCInfo> GetSTBList(void);
 
   protected:
-    FirewireDevice(uint64_t guid, uint subunitid, uint speed);
+    FirewireDevice(uint64_t guid, uint subunitid, uint speed, bool gen_psip);
 
     virtual bool SendAVCCommand(const vector<uint8_t> &cmd,
                                 vector<uint8_t> &result,
@@ -229,6 +230,7 @@ class FirewireDevice
     void ProcessPATPacket(const TSPacket&);
     virtual void BroadcastToListeners(
         const unsigned char *data, uint dataSize);
+    void SendDataToListeners(const unsigned char *data, uint dataSize);
 
     uint64_t                 m_guid;
     uint                     m_subunitid;
@@ -240,6 +242,8 @@ class FirewireDevice
     uint                     m_open_port_cnt;
     vector<TSDataListener*>  m_listeners;
     mutable QMutex           m_lock;
+
+    PSIPGenerator*           m_psip_generator;
 
     /// Vendor ID + Model ID to FirewireDevice STB model string
     static QMap<uint64_t,QString> s_id_to_model;

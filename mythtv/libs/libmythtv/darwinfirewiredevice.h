@@ -20,7 +20,8 @@ class DarwinFirewireDevice : public FirewireDevice
 
 
   public:
-    DarwinFirewireDevice(uint64_t guid, uint subunitid, uint speed);
+    DarwinFirewireDevice(uint64_t guid, uint subunitid, uint speed,
+                         bool gen_psip = false);
     ~DarwinFirewireDevice();
 
     virtual bool OpenPort(void);

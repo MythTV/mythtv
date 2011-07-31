@@ -114,8 +114,8 @@ class DFDPriv
 };
 
 DarwinFirewireDevice::DarwinFirewireDevice(
-    uint64_t guid, uint subunitid, uint speed) :
-    FirewireDevice(guid, subunitid, speed),
+    uint64_t guid, uint subunitid, uint speed, bool gen_psip) :
+    FirewireDevice(guid, subunitid, speed, gen_psip),
     m_local_node(-1), m_remote_node(-1), m_priv(new DFDPriv())
 {
 

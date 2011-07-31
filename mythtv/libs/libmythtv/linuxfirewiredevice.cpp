@@ -129,8 +129,8 @@ static int linux_firewire_device_bus_reset_handler(
 
 LinuxFirewireDevice::LinuxFirewireDevice(
     uint64_t guid, uint subunitid,
-    uint speed, bool use_p2p, uint av_buffer_size_in_bytes) :
-    FirewireDevice(guid, subunitid, speed),
+    uint speed, bool use_p2p, bool gen_psip, uint av_buffer_size_in_bytes) :
+    FirewireDevice(guid, subunitid, speed, gen_psip),
     m_bufsz(av_buffer_size_in_bytes),
     m_db_reset_disabled(false),
     m_use_p2p(use_p2p), m_priv(new LFDPriv())

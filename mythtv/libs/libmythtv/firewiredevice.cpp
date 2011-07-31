@@ -15,6 +15,7 @@
 #include "darwinfirewiredevice.h"
 #include "mythlogging.h"
 #include "pespacket.h"
+#include "psipgenerator.h"
 
 #define LOC      QString("FireDev(%1): ").arg(guid_to_string(m_guid))
 
@@ -23,13 +24,28 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model);
 QMap<uint64_t,QString> FirewireDevice::s_id_to_model;
 QMutex                 FirewireDevice::s_static_lock;
 
-FirewireDevice::FirewireDevice(uint64_t guid, uint subunitid, uint speed) :
+FirewireDevice::FirewireDevice(uint64_t guid, uint subunitid, uint speed,
+                               bool gen_psip) :
     m_guid(guid),           m_subunitid(subunitid),
     m_speed(speed),
     m_last_channel(0),      m_last_crc(0),
     m_buffer_cleared(true), m_open_port_cnt(0),
-    m_lock()
+    m_lock(), m_psip_generator(NULL)
 {
+    if (gen_psip)
+    {
+        m_psip_generator = new PSIPGenerator;
+        if (!m_psip_generator->Initialize())
+        {
+            delete m_psip_generator;
+            m_psip_generator = NULL;
+        }
+    }
+}
+
+FirewireDevice::~FirewireDevice()
+{
+    delete m_psip_generator;
 }
 
 void FirewireDevice::AddListener(TSDataListener *listener)
@@ -151,6 +167,9 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
 {
     LOG(VB_CHANNEL, LOG_INFO, QString("SetChannel(model %1, alt %2, chan %3)")
             .arg(panel_model).arg(alt_method).arg(channel));
+
+    if (m_psip_generator)
+        m_psip_generator->Reset();
 
     QMutexLocker locker(&m_lock);
     LOG(VB_CHANNEL, LOG_INFO, "SetChannel() -- locked");
@@ -308,6 +327,35 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
 
 void FirewireDevice::BroadcastToListeners(
     const unsigned char *data, uint dataSize)
+{
+    if (m_psip_generator)
+    {
+        if (!m_psip_generator->IsPSIAvailable()) {
+            m_psip_generator->AddData(data, dataSize);
+            m_psip_generator->CheckPSIAvailable();
+        }
+
+        if (m_psip_generator->IsPSIAvailable())
+        {
+            const vector<TSPacket> pat_pkts = m_psip_generator->PATPackets();
+            for (vector<TSPacket>::const_iterator it = pat_pkts.begin();
+                 it != pat_pkts.end();
+                 ++it)
+                SendDataToListeners(it->data(), TSPacket::kSize);
+
+            const vector<TSPacket> pmt_pkts = m_psip_generator->PMTPackets();
+            for (vector<TSPacket>::const_iterator it = pmt_pkts.begin();
+                 it != pmt_pkts.end();
+                 ++it)
+                SendDataToListeners(it->data(), TSPacket::kSize);
+        }
+    }
+
+    SendDataToListeners(data, dataSize);
+}
+
+void FirewireDevice::SendDataToListeners(const unsigned char *data,
+                                         uint dataSize)
 {
     if ((dataSize >= TSPacket::kSize) && (data[0] == SYNC_BYTE) &&
         ((data[1] & 0x1f) == 0) && (data[2] == 0))

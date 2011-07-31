@@ -23,7 +23,7 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
 
   public:
     LinuxFirewireDevice(uint64_t guid, uint subunitid,
-                        uint speed, bool use_p2p,
+                        uint speed, bool use_p2p, bool gen_psip = false,
                         uint av_buffer_size_in_bytes = 0);
     ~LinuxFirewireDevice();
 

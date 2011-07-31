@@ -28,11 +28,13 @@ FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
 #ifdef USING_LINUX_FIREWIRE
     device = new LinuxFirewireDevice(
         guid, subunitid, fw_opts.speed,
-        LinuxFirewireDevice::kConnectionP2P == (uint) fw_opts.connection);
+        LinuxFirewireDevice::kConnectionP2P == (uint) fw_opts.connection,
+        fw_opts.gen_psip);
 #endif // USING_LINUX_FIREWIRE
 
 #ifdef USING_OSX_FIREWIRE
-    device = new DarwinFirewireDevice(guid, subunitid, fw_opts.speed);
+    device = new DarwinFirewireDevice(guid, subunitid, fw_opts.speed,
+        fw_opts.gen_psip);
 #endif // USING_OSX_FIREWIRE
 }
 
