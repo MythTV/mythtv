@@ -400,6 +400,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener
     RingBuffer  *ringBuffer;
     QString      rbFileExt;
 
+  public:
     static QMutex            cardsLock;
     static QMap<uint,TVRec*> cards;
 

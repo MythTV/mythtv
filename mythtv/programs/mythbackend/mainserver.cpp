@@ -184,7 +184,8 @@ MainServer::MainServer(bool master, int port,
     encoderList(tvList), mythserver(NULL), masterServerReconnect(NULL),
     masterServer(NULL), ismaster(master), masterBackendOverride(false),
     m_sched(sched), m_expirer(expirer), deferredDeleteTimer(NULL),
-    autoexpireUpdateTimer(NULL), m_exitCode(GENERIC_EXIT_OK)
+    autoexpireUpdateTimer(NULL), m_exitCode(GENERIC_EXIT_OK),
+    m_stopped(false)
 {
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kLocalAndRemote, ~0, 0);
@@ -198,6 +199,7 @@ MainServer::MainServer(bool master, int port,
         prt->waitCond.wait(&prt->lock);
         prt->lock.unlock();
         threadPool.push_back(prt);
+        threadPoolAll.push_back(prt);
     }
 
     masterBackendOverride =
@@ -248,6 +250,12 @@ MainServer::MainServer(bool master, int port,
 
 MainServer::~MainServer()
 {
+}
+
+void MainServer::Stop()
+{
+    m_stopped = true;
+
     // since Scheduler::SetMainServer() isn't thread-safe
     // we need to shut down the scheduler thread before we
     // can call SetMainServer(NULL)
@@ -274,12 +282,19 @@ MainServer::~MainServer()
         m_expirer->SetMainServer(NULL);
 
     QMutexLocker locker(&threadPoolLock);
-    MythDeque<ProcessRequestThread*>::iterator it;
-    for (it = threadPool.begin(); it != threadPool.end(); ++it)
-        (*it)->killit();
-    for (it = threadPool.begin(); it != threadPool.end(); ++it)
-        delete (*it);
     threadPool.clear();
+
+    MythDeque<ProcessRequestThread*>::iterator it, it2;
+    for (it = threadPoolAll.begin(); it != threadPoolAll.end(); ++it)
+        (*it)->killit();
+    for (it = threadPoolAll.begin(); it != threadPoolAll.end(); ++it)
+    {
+        locker.unlock();
+        (*it)->wait();
+        delete (*it);
+        locker.relock();
+    }
+    threadPoolAll.clear();
 }
 
 void MainServer::autoexpireUpdate(void)
@@ -304,6 +319,8 @@ void MainServer::readyRead(MythSocket *sock)
     ProcessRequestThread *prt = NULL;
     {
         QMutexLocker locker(&threadPoolLock);
+        if (m_stopped)
+            return;
 
         if (threadPool.empty())
         {
@@ -325,6 +342,7 @@ void MainServer::readyRead(MythSocket *sock)
             prt->start();
             prt->waitCond.wait(&prt->lock);
             prt->lock.unlock();
+            threadPoolAll.push_back(prt);
         }
     }
 
