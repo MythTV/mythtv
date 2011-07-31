@@ -25,7 +25,7 @@ using namespace std;
 
 bool inJobQueue = false;
 
-class MPUBLIC MythMetadataLookupCommandLineParser : public MythCommandLineParser
+class MythMetadataLookupCommandLineParser : public MythCommandLineParser
 {
   public:
     MythMetadataLookupCommandLineParser();
