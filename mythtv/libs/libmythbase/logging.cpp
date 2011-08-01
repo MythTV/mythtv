@@ -491,13 +491,15 @@ void DBLoggerThread::run(void)
                 qLock.relock();
                 m_queue->prepend(item);
                 m_wait->wait(qLock.mutex(), 100);
+                continue;
             }
         }
         else
         {
             deleteItem(item);
-            qLock.relock();
         }
+
+        qLock.relock();
     }
 
     MSqlQuery::CloseLogCon();
