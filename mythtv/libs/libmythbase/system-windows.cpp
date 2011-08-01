@@ -65,7 +65,7 @@ static QMutex                   fdLock;
 
 
 MythSystemIOHandler::MythSystemIOHandler(bool read) :
-    QThread(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
+    QThread(), m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
     m_read(read)
 {
 }
@@ -76,13 +76,12 @@ void MythSystemIOHandler::run(void)
     LOG(VB_GENERAL, LOG_INFO, QString("Starting IO manager (%1)")
         .arg(m_read ? "read" : "write"));
 
-    QMutex mutex;
-
     while( gCoreContext )
     {
-        mutex.lock();
-        m_pWait.wait(&mutex);
-        mutex.unlock();
+        {
+            QMutexLocker locker(&m_pWaitLock);
+            m_pWait.wait(&m_pWaitLock);
+        }
 
         while( gCoreContext )
         {
@@ -200,6 +199,7 @@ void MythSystemIOHandler::remove(HANDLE h)
 
 void MythSystemIOHandler::wake()
 {
+    QMutexLocker locker(&m_pWaitLock);
     m_pWait.wakeAll();
 }
 
