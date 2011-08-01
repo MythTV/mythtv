@@ -93,7 +93,9 @@ class MainServer : public QObject, public MythSocketCBs
                QMap<int, EncoderLink *> *tvList,
                Scheduler *sched, AutoExpire *expirer);
 
-   ~MainServer();
+    ~MainServer();
+
+    void Stop(void);
 
     void customEvent(QEvent *e);
 
@@ -270,6 +272,7 @@ class MainServer : public QObject, public MythSocketCBs
     QMutex threadPoolLock;
     QWaitCondition threadPoolCond;
     MythDeque<ProcessRequestThread *> threadPool;
+    MythDeque<ProcessRequestThread *> threadPoolAll;
 
     bool masterBackendOverride;
 
@@ -299,6 +302,8 @@ class MainServer : public QObject, public MythSocketCBs
 
     typedef QHash<QString,QString> RequestedBy;
     RequestedBy                m_previewRequestedBy;
+
+    bool m_stopped;
 
     static const uint kMasterServerReconnectTimeout;
 };

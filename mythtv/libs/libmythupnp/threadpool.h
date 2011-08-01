@@ -135,6 +135,8 @@ class UPNP_PUBLIC WorkerThread : public QThread
         bool     WaitForInitialized( unsigned long msecs );
         void     SetTimeout        ( long nIdleTimeout );
 
+        void     RequestTerminate  ( void );
+
     public slots:
         void     SignalWork();
 

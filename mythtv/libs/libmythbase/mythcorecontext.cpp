@@ -281,7 +281,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
     const QString &hostname, int port, const QString &announce,
     bool *p_proto_mismatch, bool gui, int maxConnTry, int setup_timeout)
 {
-    MythSocket *m_serverSock = NULL;
+    MythSocket *serverSock = NULL;
 
     {
         QMutexLocker locker(&d->m_WOLInProgressLock);
@@ -313,13 +313,13 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
             QString("Connecting to backend server: %1:%2 (try %3 of %4)")
                 .arg(hostname).arg(port).arg(cnt).arg(maxConnTry));
 
-        m_serverSock = new MythSocket();
+        serverSock = new MythSocket();
 
         int sleepms = 0;
-        if (m_serverSock->connect(hostname, port))
+        if (serverSock->connect(hostname, port))
         {
             if (SetupCommandSocket(
-                    m_serverSock, announce, setup_timeout, proto_mismatch))
+                    serverSock, announce, setup_timeout, proto_mismatch))
             {
                 break;
             }
@@ -329,8 +329,8 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
                 if (p_proto_mismatch)
                     *p_proto_mismatch = true;
 
-                m_serverSock->DownRef();
-                m_serverSock = NULL;
+                serverSock->DownRef();
+                serverSock = NULL;
                 break;
             }
 
@@ -355,10 +355,10 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
             sleepms = WOLsleepTime * 1000;
         }
 
-        m_serverSock->DownRef();
-        m_serverSock = NULL;
+        serverSock->DownRef();
+        serverSock = NULL;
 
-        if (!m_serverSock && (cnt == 1))
+        if (!serverSock && (cnt == 1))
         {
             QCoreApplication::postEvent(
                 d->m_GUIcontext, new MythEvent("CONNECTION_FAILURE"));
@@ -375,7 +375,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
         d->m_WOLInProgressWaitCondition.wakeAll();
     }
 
-    if (!m_serverSock && !proto_mismatch)
+    if (!serverSock && !proto_mismatch)
     {
         LOG(VB_GENERAL, LOG_ERR,
                 "Connection to master server timed out.\n\t\t\t"
@@ -389,7 +389,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
             d->m_GUIcontext, new MythEvent("CONNECTION_RESTABLISHED"));
     }
 
-    return m_serverSock;
+    return serverSock;
 }
 
 MythSocket *MythCoreContext::ConnectEventSocket(const QString &hostname,

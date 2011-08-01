@@ -257,7 +257,7 @@ void GrabberSettings::Init(void)
     m_gameGrabberButtonList->SetValueByData(qVariantFromValue(currentGameGrabber));
 
     int updates =
-        gCoreContext->GetNumSetting("DailyArtworkUpdates", 1);
+        gCoreContext->GetNumSetting("DailyArtworkUpdates", 0);
     if (updates == 1)
         m_dailyUpdatesCheck->SetCheckState(MythUIStateType::Full);
 }

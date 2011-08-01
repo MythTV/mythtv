@@ -275,10 +275,7 @@ bool FileLogger::logmsg(LoggingItem_t *item)
 
     int result = write( m_fd, line, strlen(line) );
 
-    {
-        QMutexLocker locker((QMutex *)item->refmutex);
-        item->refcount--;
-    }
+    deleteItem(item);
 
     if( result == -1 )
     {
@@ -289,7 +286,6 @@ bool FileLogger::logmsg(LoggingItem_t *item)
             close( m_fd );
         return false;
     }
-    deleteItem(item);
     return true;
 }
 
@@ -327,12 +323,8 @@ bool SyslogLogger::logmsg(LoggingItem_t *item)
 
     syslog( item->level, "%s", item->message );
 
-    {
-        QMutexLocker locker((QMutex *)item->refmutex);
-        item->refcount--;
-    }
-
     deleteItem(item);
+
     return true;
 }
 #endif
@@ -441,16 +433,14 @@ bool DatabaseLogger::logqmsg(LoggingItem_t *item)
     query.bindValue(":LEVEL",       item->level);
     query.bindValue(":MESSAGE",     item->message);
 
-    {
-        QMutexLocker locker((QMutex *)item->refmutex);
-        item->refcount--;
-    }
-
     if (!query.exec())
     {
         MythDB::DBError("DBLogging", query);
+        deleteItem(item);
         return false;
     }
+
+    deleteItem(item);
 
     return true;
 }
@@ -466,8 +456,11 @@ DBLoggerThread::~DBLoggerThread()
     stop();
     wait();
 
+    QMutexLocker qLock(&m_queueMutex);
     delete m_queue;
     delete m_wait;
+    m_queue = NULL;
+    m_wait = NULL;
 }
 
 void DBLoggerThread::run(void)
@@ -491,12 +484,17 @@ void DBLoggerThread::run(void)
 
         qLock.unlock();
 
-        if( item->message && !aborted && !m_logger->logqmsg(item) )
+        if (item->message && !aborted)
         {
-            qLock.relock();
-            m_queue->prepend(item);
-            m_wait->wait(qLock.mutex(), 100);
-        } else {
+            if (!m_logger->logqmsg(item) )
+            {
+                qLock.relock();
+                m_queue->prepend(item);
+                m_wait->wait(qLock.mutex(), 100);
+            }
+        }
+        else
+        {
             deleteItem(item);
             qLock.relock();
         }
@@ -741,6 +739,10 @@ void LoggerThread::run(void)
                     deleteItem(item);
             }
         }
+        else
+        {
+            delete item;
+        }
 
         qLock.relock();
     }
@@ -761,7 +763,8 @@ void deleteItem( LoggingItem_t *item )
         return;
 
     {
-        QMutexLocker locker((QMutex *)item->refmutex);
+        QMutexLocker locker((QMutex*)item->refmutex);
+        item->refcount--;
         if( item->refcount != 0 )
             return;
 
@@ -772,7 +775,8 @@ void deleteItem( LoggingItem_t *item )
             free( item->threadName );
     }
 
-    delete (QMutex *)item->refmutex;
+    delete (QMutex*)item->refmutex;
+    item->refmutex = NULL;
     delete item;
 }
 
@@ -830,7 +834,10 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
 
     message = (char *)malloc(LOGLINE_MAX+1);
     if( !message )
+    {
+        delete item;
         return;
+    }
 
     QMutexLocker qLock(&logQueueMutex);
 
@@ -986,27 +993,25 @@ void logStop(void)
     sigaction( SIGHUP, &sa, NULL );
 #endif
 
-    QMutexLocker locker(&loggerListMutex);
-    QList<LoggerBase *>::iterator it;
+    loggerListMutex.lock();
+    QList<LoggerBase *> list = loggerList;
+    loggerList.clear();
+    loggerListMutex.unlock();
 
-    for(it = loggerList.begin(); it != loggerList.end(); )
-    {
-        locker.unlock();
+    QList<LoggerBase *>::iterator it;
+    for (it = list.begin(); it != list.end(); ++it)
         delete *it;
-        locker.relock();
-        it = loggerList.begin();
-    }
 }
 
 void threadRegister(QString name)
 {
     uint64_t id = (uint64_t)QThread::currentThreadId();
 
-    LoggingItem_t *item = new LoggingItem_t;
-    if (!item)
+    if (logThreadFinished)
         return;
 
-    if (logThreadFinished)
+    LoggingItem_t *item = new LoggingItem_t;
+    if (!item)
         return;
 
     memset( item, 0, sizeof(LoggingItem_t) );
@@ -1029,11 +1034,11 @@ void threadDeregister(void)
     uint64_t id = (uint64_t)QThread::currentThreadId();
     LoggingItem_t  *item;
 
-    item = new LoggingItem_t;
-    if (!item)
+    if (logThreadFinished)
         return;
 
-    if (logThreadFinished)
+    item = new LoggingItem_t;
+    if (!item)
         return;
 
     memset( item, 0, sizeof(LoggingItem_t) );

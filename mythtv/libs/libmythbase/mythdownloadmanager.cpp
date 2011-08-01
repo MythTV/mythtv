@@ -665,6 +665,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
 
     if (!dlInfo->m_done)
     {
+        dlInfo->m_data = NULL;      // Prevent downloadFinished() from updating
         dlInfo->m_syncMode = false; // Let downloadFinished() cleanup for us
         if ((dlInfo->m_reply) &&
             (dlInfo->m_errorCode == QNetworkReply::NoError))
@@ -713,8 +714,8 @@ void MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
 {
     QNetworkReply *reply = (QNetworkReply*)sender();
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("downloadError(%1) (for reply %2)")
-                    .arg(errorCode).arg((long long)reply));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("downloadError %1 ")
+                    .arg(errorCode) + reply->errorString() );
 
     QMutexLocker locker(m_infoLock);
     if (!m_downloadReplies.contains(reply))
@@ -891,8 +892,8 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
                 args << dlInfo->m_url;
                 args << dlInfo->m_outFile;
                 args << QString::number(dlInfo->m_bytesTotal);
-                args << QString();  // placeholder for error string
-                args << QString::number((int)dlInfo->m_errorCode);
+                args << (reply ? reply->errorString() : QString());  // placeholder for error string
+                args << QString::number((int)(reply ? reply->error() : dlInfo->m_errorCode));
 
                 QCoreApplication::postEvent(dlInfo->m_caller,
                     new MythEvent("DOWNLOAD_FILE FINISHED", args));

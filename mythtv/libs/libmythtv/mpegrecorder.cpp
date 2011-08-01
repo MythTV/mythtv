@@ -1139,6 +1139,7 @@ void MpegRecorder::StartRecording(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording finishing up");
 
+    pauseLock.lock();
     if (_device_read_buffer)
     {
         if (_device_read_buffer->IsRunning())
@@ -1147,6 +1148,7 @@ void MpegRecorder::StartRecording(void)
         delete _device_read_buffer;
         _device_read_buffer = NULL;
     }
+    pauseLock.unlock();
 
     StopEncoding(readfd);
 
@@ -1168,8 +1170,10 @@ void MpegRecorder::StartRecording(void)
 
 void MpegRecorder::StopRecording(void)
 {
+    pauseLock.lock();
     if (_device_read_buffer && _device_read_buffer->IsRunning())
         _device_read_buffer->Stop();
+    pauseLock.unlock();
     V4LRecorder::StopRecording();
 }
 

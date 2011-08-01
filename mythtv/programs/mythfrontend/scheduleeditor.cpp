@@ -126,7 +126,7 @@ bool ScheduleEditor::Create()
     UIUtilE::Assign(this, m_postProcButton, "postprocessing", &err);
     UIUtilE::Assign(this, m_schedInfoButton, "schedinfo", &err);
     UIUtilE::Assign(this, m_previewButton, "preview", &err);
-    UIUtilW::Assign(this, m_metadataButton, "metadata");
+    UIUtilE::Assign(this, m_metadataButton, "metadata", &err);
 
     UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
     UIUtilE::Assign(this, m_saveButton, "save", &err);
@@ -146,8 +146,7 @@ bool ScheduleEditor::Create()
     connect(m_postProcButton, SIGNAL(Clicked()), SLOT(ShowPostProc()));
     connect(m_schedInfoButton, SIGNAL(Clicked()), SLOT(ShowSchedInfo()));
     connect(m_previewButton, SIGNAL(Clicked()), SLOT(ShowPreview()));
-    if (m_metadataButton)
-        connect(m_metadataButton, SIGNAL(Clicked()), SLOT(ShowMetadataOptions()));
+    connect(m_metadataButton, SIGNAL(Clicked()), SLOT(ShowMetadataOptions()));
 
     connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
     connect(m_saveButton, SIGNAL(Clicked()), SLOT(Save()));

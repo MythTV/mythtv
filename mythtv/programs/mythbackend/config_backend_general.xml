@@ -296,6 +296,9 @@
         <option display="30" data="30" />
         <option display="60" data="60" />
         <option display="120" data="120" />
+        <option display="180" data="180" />
+        <option display="240" data="240" />
+        <option display="300" data="300" />
       </setting>
       <setting data_type="select" value="StartupSecsBeforeRecording"
                label="Startup before recording (seconds)"

@@ -44,7 +44,6 @@ void ProgramInfoUpdater::insert(
 void ProgramInfoUpdater::run(void)
 {
     bool workDone;
-    QMutex mutex;
 
     threadRegister("ProgramInfoUpdater");
 
@@ -56,7 +55,7 @@ void ProgramInfoUpdater::run(void)
         // updates to be consolidated into one update...
         usleep(50 * 1000);
 
-        QMutexLocker locker(&lock);
+        lock.lock();
 
         // send adds and deletes in the order they were queued
         vector<PIKeyAction>::iterator ita = needsAddDelete.begin();
@@ -102,10 +101,9 @@ void ProgramInfoUpdater::run(void)
         needsUpdate.clear();
 
         if ( workDone )
-        {
-            QMutexLocker mlock(&mutex);
-            moreWork.wait(&mutex, 1000);
-        }
+            moreWork.wait(&lock, 1000);
+
+        lock.unlock();
     } while( workDone );
 
     threadDeregister();

@@ -81,14 +81,6 @@ bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
     if (m_ctx)
         return m_ctx == ctx;
 
-    bool paused = false;
-    ctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (ctx->player)
-        paused = ctx->player->IsPaused();
-    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-    if (paused)
-        return false;
-
     m_tv->ClearOSD(ctx);
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);

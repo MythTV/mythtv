@@ -78,6 +78,7 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
 PreviewGenerator::~PreviewGenerator()
 {
     TeardownAll();
+    wait();
 }
 
 void PreviewGenerator::SetOutputFilename(const QString &fileName)

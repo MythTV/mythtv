@@ -1261,6 +1261,10 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
 
             if (ret < 0)
             {
+                // If it is EAGAIN, obey it, dangit!
+                if (ret == -EAGAIN)
+                    continue;
+
                 //insert a bogus frame (this won't be written out)
                 if(vFrame.isEmpty())
                 {

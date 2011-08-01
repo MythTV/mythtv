@@ -15,6 +15,7 @@ class MythSocketThread : public QThread
 {
   public:
     MythSocketThread();
+    virtual ~MythSocketThread() { wait(); }
 
     virtual void run(void);
 

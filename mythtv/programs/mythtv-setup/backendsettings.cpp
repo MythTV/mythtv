@@ -429,7 +429,7 @@ static GlobalSpinBox *idleTimeoutSecs()
 
 static GlobalSpinBox *idleWaitForRecordingTime()
 {
-    GlobalSpinBox *gc = new GlobalSpinBox("idleWaitForRecordingTime", 0, 120, 1);
+    GlobalSpinBox *gc = new GlobalSpinBox("idleWaitForRecordingTime", 0, 300, 1);
     gc->setLabel(QObject::tr("Maximum wait for recording (mins)"));
     gc->setValue(15);
     gc->setHelpText(QObject::tr("The number of minutes the master backend "

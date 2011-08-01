@@ -25,6 +25,7 @@
 
 #include "tv_rec.h"
 #include "scheduledrecording.h"
+#include "mythsocketthread.h"
 #include "autoexpire.h"
 #include "scheduler.h"
 #include "mainserver.h"
@@ -55,6 +56,8 @@
 #define LOC      QString("MythBackend: ")
 #define LOC_WARN QString("MythBackend, Warning: ")
 #define LOC_ERR  QString("MythBackend, Error: ")
+
+static MainServer *mainServer = NULL;
 
 bool setupTVs(bool ismaster, bool &error)
 {
@@ -220,14 +223,50 @@ void cleanup(void)
     signal(SIGUSR1, SIG_DFL);
 #endif
 
-    delete gCoreContext->GetScheduler();
-    gCoreContext->SetScheduler(NULL);
+    if (mainServer)
+        mainServer->Stop();
+
+    delete housekeeping;
+    housekeeping = NULL;
+
+    if (gCoreContext)
+    {
+        delete gCoreContext->GetScheduler();
+        gCoreContext->SetScheduler(NULL);
+    }
+
+    delete expirer;
+    expirer = NULL;
+
+    delete jobqueue;
+    jobqueue = NULL;
 
     delete g_pUPnp;
     g_pUPnp = NULL;
 
+    if (SSDP::Instance())
+    {
+        SSDP::Instance()->RequestTerminate();
+        SSDP::Instance()->wait();
+    }
+
+    if (TaskQueue::Instance())
+    {
+        TaskQueue::Instance()->RequestTerminate();
+        TaskQueue::Instance()->wait();
+    }
+
+    while (!TVRec::cards.empty())
+    {
+        TVRec *rec = *TVRec::cards.begin();
+        delete rec;
+    }
+
     delete gContext;
     gContext = NULL;
+
+    delete mainServer;
+    mainServer = NULL;
 
     if (pidfile.size())
     {
@@ -591,8 +630,8 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         pHS->RegisterExtension( httpStatus );
     }
 
-    MainServer *mainServer = new MainServer(ismaster, port, &tvList, sched,
-                                            expirer);
+    mainServer = new MainServer(
+        ismaster, port, &tvList, sched, expirer);
 
     int exitCode = mainServer->GetExitCode();
     if (exitCode != GENERIC_EXIT_OK)
@@ -626,9 +665,6 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     LOG(VB_GENERAL, LOG_NOTICE, "MythBackend exiting");
 
     delete sysEventHandler;
-    delete mainServer;
-
-    cleanup();
 
     return exitCode;
 }

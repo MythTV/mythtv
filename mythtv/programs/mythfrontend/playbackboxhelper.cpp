@@ -61,7 +61,10 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
         if (it != m_checkAvailability.end())
             m_checkAvailability.erase(it);
         if (m_checkAvailability.empty() && m_checkAvailabilityTimerId)
+        {
             killTimer(m_checkAvailabilityTimerId);
+            m_checkAvailabilityTimerId = 0;
+        }
     }
 
     if (cats.empty())

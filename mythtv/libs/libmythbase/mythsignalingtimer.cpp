@@ -31,6 +31,7 @@ MythSignalingTimer::MythSignalingTimer(
 MythSignalingTimer::~MythSignalingTimer()
 {
     stop();
+    wait();
 }
 
 void MythSignalingTimer::start(int msec)
