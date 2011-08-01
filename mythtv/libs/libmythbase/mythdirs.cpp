@@ -48,20 +48,20 @@ void InitializeMythDirs(void)
         installprefix = prefixDir.canonicalPath();
     }
 
-    LOG(VB_GENERAL, LOG_CRIT, "Using runtime prefix = " + installprefix);
+    LOG(VB_GENERAL, LOG_NOTICE, "Using runtime prefix = " + installprefix);
 
     char *tmp_confdir = std::getenv("MYTHCONFDIR");
     if (tmp_confdir)
     {
         confdir = QString(tmp_confdir);
-        LOG(VB_GENERAL, LOG_CRIT, QString("Read conf dir = %1").arg(confdir));
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Read conf dir = %1").arg(confdir));
         confdir.replace("$HOME", QDir::homePath());
     }
     else
         confdir = QDir::homePath() + "/.mythtv";
 
-    LOG(VB_GENERAL, LOG_CRIT, QString("Using configuration directory = %1")
-                                 .arg(confdir));
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Using configuration directory = %1").arg(confdir));
 
     sharedir = installprefix + "/share/mythtv/";
     libdir = installprefix + '/' + QString(LIBDIRNAME) + "/mythtv/";

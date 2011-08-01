@@ -55,7 +55,7 @@ void GrabberScript::run()
     uint status = getTree.Wait();
 
     if( status == GENERIC_EXIT_CMD_NOT_FOUND )
-        LOG(VB_GENERAL, LOG_CRIT, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Internet Content Source %1 cannot run, file missing.")
                 .arg(m_title));
     else if( status == GENERIC_EXIT_OK )

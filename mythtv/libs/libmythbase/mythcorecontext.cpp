@@ -823,7 +823,7 @@ bool MythCoreContext::SendReceiveStringList(QStringList &strlist,
 
         if (!ok)
         {
-            LOG(VB_GENERAL, LOG_CRIT,
+            LOG(VB_GENERAL, LOG_NOTICE,
                 QString("Connection to backend server lost"));
             d->m_serverSock->DownRef();
             d->m_serverSock = NULL;
@@ -938,8 +938,8 @@ void MythCoreContext::connectionClosed(MythSocket *sock)
 {
     (void)sock;
 
-    LOG(VB_GENERAL, LOG_CRIT, "Event socket closed.  No connection to the "
-                              "backend.");
+    LOG(VB_GENERAL, LOG_NOTICE,
+        "Event socket closed.  No connection to the backend.");
 
     QMutexLocker locker(&d->m_sockLock);
     if (d->m_serverSock)

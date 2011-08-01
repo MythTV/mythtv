@@ -142,7 +142,7 @@ long GetIPAddressList(QStringList &sStrList)
 long GetIPAddressList( QStringList &sStrList )
 {
 #ifdef USING_MINGW
-    LOG(VB_UPNP, LOG_CRIT, "GetIPAddressList() not implemented in MinGW");
+    LOG(VB_UPNP, LOG_NOTICE, "GetIPAddressList() not implemented in MinGW");
     return 0;
 #else
     sStrList.clear();

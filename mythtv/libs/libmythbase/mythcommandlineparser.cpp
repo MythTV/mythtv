@@ -1106,11 +1106,12 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     if (level == LOG_UNKNOWN)
         return GENERIC_EXIT_INVALID_CMDLINE;
 
-    LOG(VB_GENERAL, LOG_CRIT, QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg(QCoreApplication::applicationName())
-            .arg(MYTH_SOURCE_PATH) .arg(MYTH_SOURCE_VERSION));
-    LOG(VB_GENERAL, LOG_CRIT, QString("Enabled verbose msgs: %1")
-                                  .arg(verboseString));
+    LOG(VB_GENERAL, LOG_CRIT,
+        QString("%1 version: %2 [%3] www.mythtv.org")
+        .arg(QCoreApplication::applicationName())
+        .arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION));
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Enabled verbose msgs: %1").arg(verboseString));
 
     QString logfile = GetLogFilePath();
     bool propagate = toBool("islogpath");

@@ -1222,7 +1222,7 @@ void NuppelVideoRecorder::DoV4L1(void)
 
     if (vm.frames < 2)
     {
-        LOG(VB_GENERAL, LOG_CRIT, LOC + "need a minimum of 2 capture buffers");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "need a minimum of 2 capture buffers");
         KillChildren();
         errored = true;
         return;

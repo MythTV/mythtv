@@ -767,7 +767,7 @@ void UIImageType::LoadImage()
 
     if (!GetMythUI()->FindThemeFile(file))
     {
-        LOG(VB_GENERAL, LOG_CRIT,
+        LOG(VB_GENERAL, LOG_ERR,
                  "UIImageType::LoadImage() - Cannot find image: " + m_filename);
         m_show = false;
         return;
@@ -1017,7 +1017,7 @@ void UIRepeatedImageType::setOrientation(int x)
 {
     if (x < 0 || x > 3)
     {
-        LOG(VB_GENERAL, LOG_CRIT,
+        LOG(VB_GENERAL, LOG_ERR,
                  QString("UIRepeatedImageType received an invalid "
                          "request to set orientation to %1") .arg(x));
         return;
@@ -1603,7 +1603,7 @@ QPixmap *UIImageGridType::createScaledPixmap(QString filename,
         QImage *img = GetMythUI()->LoadScaleImage(filename);
         if (!img)
         {
-            LOG(VB_GENERAL, LOG_CRIT, "Failed to load image" + filename);
+            LOG(VB_GENERAL, LOG_ERR, "Failed to load image" + filename);
             return NULL;
         }
         else
@@ -2196,7 +2196,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
         GenericTree *parent = current_node->getParent();
         if (parent == NULL)
         {
-            LOG(VB_GENERAL, LOG_CRIT,
+            LOG(VB_GENERAL, LOG_ERR,
                      "LCD sees no parent to current_node" );
         }
         else
@@ -4321,7 +4321,7 @@ QString UIKeyType::decodeChar(QString c)
                 res += QString(uc);
             }
             else
-                LOG(VB_GENERAL, LOG_CRIT,
+                LOG(VB_GENERAL, LOG_ERR,
                          QString("UIKeyType::decodeChar - bad char code (%1)")
                              .arg(sCode));
         }

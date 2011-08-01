@@ -845,7 +845,7 @@ bool MythSocket::Validate(uint timeout_ms, bool error_dialog_desired)
     }
     else if (strlist[0] == "ACCEPT")
     {
-        LOG(VB_GENERAL, LOG_CRIT, QString("Using protocol version %1")
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Using protocol version %1")
                                .arg(MYTH_PROTO_VERSION));
         setValidated();
         return true;

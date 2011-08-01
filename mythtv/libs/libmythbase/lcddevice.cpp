@@ -144,11 +144,11 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     if (myth_system("ps ch -C mythlcdserver -o pid > /dev/null", flags) == 1)
     {
         // we need to start the mythlcdserver
-        LOG(VB_GENERAL, LOG_CRIT, "Starting mythlcdserver");
+        LOG(VB_GENERAL, LOG_NOTICE, "Starting mythlcdserver");
 
         if (!startLCDServer())
         {
-            LOG(VB_GENERAL, LOG_CRIT, "Failed start MythTV LCD Server");
+            LOG(VB_GENERAL, LOG_ERR, "Failed start MythTV LCD Server");
             return bConnected;
         }
 
@@ -214,8 +214,9 @@ void LCD::sendToServer(const QString &someText)
         // connection
         retryTimer->setSingleShot(false);
         retryTimer->start(10000);
-        LOG(VB_GENERAL, LOG_CRIT, "Connection to LCDServer died unexpectedly. "
-                                  "Trying to reconnect every 10 seconds...");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Connection to LCDServer died unexpectedly. "
+            "Trying to reconnect every 10 seconds...");
 
         bConnected = false;
         return;

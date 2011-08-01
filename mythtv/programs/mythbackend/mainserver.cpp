@@ -324,7 +324,7 @@ void MainServer::readyRead(MythSocket *sock)
 
         if (threadPool.empty())
         {
-            LOG(VB_GENERAL, LOG_CRIT, 
+            LOG(VB_GENERAL, LOG_NOTICE, 
                 "ThreadPool exhausted. Waiting for a process request thread..");
             threadPoolCond.wait(&threadPoolLock, PRT_TIMEOUT);
         }
@@ -336,7 +336,7 @@ void MainServer::readyRead(MythSocket *sock)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_CRIT, "Adding a new process request thread");
+            LOG(VB_GENERAL, LOG_NOTICE, "Adding a new process request thread");
             prt = new ProcessRequestThread(this);
             prt->lock.lock();
             prt->start();

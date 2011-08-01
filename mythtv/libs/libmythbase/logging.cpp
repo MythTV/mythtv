@@ -627,8 +627,8 @@ LoggerThread::LoggerThread() :
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
     {
-        LOG(VB_GENERAL, LOG_CRIT, "Logging thread registration/deregistration "
-                                  "enabled!");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Logging thread registration/deregistration enabled!");
         debugRegistration = true;
     }
 }
@@ -928,7 +928,7 @@ void logStart(QString logfile, int progress, int quiet, int facility,
         return;
  
     logLevel = level;
-    LOG(VB_GENERAL, LOG_CRIT, QString("Setting Log Level to LOG_%1")
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Setting Log Level to LOG_%1")
              .arg(logLevelGetName(logLevel).toUpper()));
 
     logPropagateOpts.propagate = propagate;
@@ -968,7 +968,7 @@ void logStart(QString logfile, int progress, int quiet, int facility,
 
 #ifndef _WIN32
     /* Setup SIGHUP */
-    LOG(VB_GENERAL, LOG_CRIT, "Setting up SIGHUP handler");
+    LOG(VB_GENERAL, LOG_NOTICE, "Setting up SIGHUP handler");
     struct sigaction sa;
     sa.sa_sigaction = logSighup;
     sigemptyset( &sa.sa_mask );
@@ -1059,8 +1059,8 @@ void threadDeregister(void)
 int syslogGetFacility(QString facility)
 {
 #ifdef _WIN32
-    LOG(VB_GENERAL, LOG_CRIT, "Windows does not support syslog,"
-                                   " disabling" );
+    LOG(VB_GENERAL, LOG_NOTICE,
+        "Windows does not support syslog, disabling" );
     return( -2 );
 #else
     CODE *name;
