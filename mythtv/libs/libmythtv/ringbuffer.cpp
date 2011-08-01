@@ -830,7 +830,13 @@ void RingBuffer::run(void)
             MythTimer sr_timer;
             sr_timer.start();
 
-            read_return = safe_read(readAheadBuffer + rbwpos, totfree);
+            int rbwposcopy = rbwpos;
+
+            // FileRingBuffer::safe_read(RemoteFile*...) acquires poslock;
+            // so we need to unlock this here to preserve locking order.
+            rbwlock.unlock();
+
+            read_return = safe_read(readAheadBuffer + rbwposcopy, totfree);
 
             int sr_elapsed = sr_timer.elapsed();
             uint64_t bps = !sr_elapsed ? 1000000001 :
@@ -838,24 +844,26 @@ void RingBuffer::run(void)
                                       (double)sr_elapsed);
             LOG(VB_FILE, LOG_INFO, LOC +
                 QString("safe_read(...@%1, %2) -> %3, took %4 ms %5")
-                    .arg(rbwpos).arg(totfree).arg(read_return)
+                    .arg(rbwposcopy).arg(totfree).arg(read_return)
                     .arg(sr_elapsed)
                     .arg(QString("(%1Mbps)").arg((double)bps / 1000000.0)));
             UpdateStorageRate(bps);
-            rbwlock.unlock();
-        }
 
-        if (read_return >= 0)
-        {
-            poslock.lockForWrite();
-            rbwlock.lockForWrite();
-            internalreadpos += read_return;
-            rbwpos = (rbwpos + read_return) % bufferSize;
-            LOG(VB_FILE, LOG_DEBUG,
-                LOC + QString("rbwpos += %1K requested %2K in read")
-                    .arg(read_return/1024,3).arg(totfree/1024,3));
-            rbwlock.unlock();
-            poslock.unlock();
+            if (read_return >= 0)
+            {
+                poslock.lockForWrite();
+                rbwlock.lockForWrite();
+                if (rbwposcopy == rbwpos)
+                {
+                    internalreadpos += read_return;
+                    rbwpos = (rbwpos + read_return) % bufferSize;
+                    LOG(VB_FILE, LOG_DEBUG,
+                        LOC + QString("rbwpos += %1K requested %2K in read")
+                        .arg(read_return/1024,3).arg(totfree/1024,3));
+                }
+                rbwlock.unlock();
+                poslock.unlock();
+            }
         }
 
         int used = bufferSize - ReadBufFree();
