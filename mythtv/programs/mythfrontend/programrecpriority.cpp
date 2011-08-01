@@ -1597,13 +1597,17 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     if (m_lastRecordedText)
     {
-        QString tempDateTime = MythDateTimeToString(pgRecInfo->last_record, kDateTimeFull);
+        QString tempDateTime = MythDateTimeToString(pgRecInfo->last_record,
+                                                    kDateTimeFull | kSimplify |
+                                                    kAddYear);
         m_lastRecordedText->SetText(tempDateTime);
     }
 
     if (m_lastRecordedDateText)
     {
-        QString tempDate = MythDateTimeToString(pgRecInfo->last_record, kDateShort);
+        QString tempDate = MythDateTimeToString(pgRecInfo->last_record,
+                                                kDateFull | kSimplify |
+                                                kAddYear);
         m_lastRecordedDateText->SetText(tempDate);
     }
 
