@@ -1464,10 +1464,12 @@ void ProgramRecPriority::UpdateList()
         item->SetText(QString::number(finalRecPriority), "finalpriority", state);
 
         QString tempDateTime = MythDateTimeToString(progInfo->last_record,
-                                                    kDateFull | kSimplify);
+                                                    kDateTimeFull | kSimplify |
+                                                    kAddYear);
         item->SetText(tempDateTime, "lastrecorded", state);
         QString tempDate = MythDateTimeToString(progInfo->last_record,
-                                                kDateShort);
+                                                kDateFull | kSimplify |
+                                                kAddYear);
         item->SetText(tempDate, "lastrecordeddate", state);
         QString tempTime = MythDateTimeToString(progInfo->last_record, kTime);
         item->SetText(tempTime, "lastrecordedtime", state);
