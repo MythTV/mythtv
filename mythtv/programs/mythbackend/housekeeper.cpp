@@ -320,7 +320,7 @@ void HouseKeeper::RunHouseKeeping(void)
             }
 
 #if CONFIG_BINDINGS_PYTHON
-            if ((gCoreContext->GetNumSetting("DailyArtworkUpdates", 1)) &&
+            if ((gCoreContext->GetNumSetting("DailyArtworkUpdates", 0)) &&
                 (wantToRun("RecordedArtworkUpdate", 1, 0, 24, true)))
             {
                 UpdateRecordedArtwork();
