@@ -116,6 +116,7 @@ extern LIBTYPE uint32_t hdhomerun_device_get_local_machine_addr(struct hdhomerun
 extern LIBTYPE int hdhomerun_device_get_tuner_status(struct hdhomerun_device_t *hd, char **pstatus_str, struct hdhomerun_tuner_status_t *status);
 extern LIBTYPE int hdhomerun_device_get_tuner_streaminfo(struct hdhomerun_device_t *hd, char **pstreaminfo);
 extern LIBTYPE int hdhomerun_device_get_tuner_channel(struct hdhomerun_device_t *hd, char **pchannel);
+extern LIBTYPE int hdhomerun_device_get_tuner_vchannel(struct hdhomerun_device_t *hd, char **pvchannel);
 extern LIBTYPE int hdhomerun_device_get_tuner_channelmap(struct hdhomerun_device_t *hd, char **pchannelmap);
 extern LIBTYPE int hdhomerun_device_get_tuner_filter(struct hdhomerun_device_t *hd, char **pfilter);
 extern LIBTYPE int hdhomerun_device_get_tuner_program(struct hdhomerun_device_t *hd, char **pprogram);
@@ -143,6 +144,7 @@ extern LIBTYPE const char *hdhomerun_device_get_model_str(struct hdhomerun_devic
  * Returns -1 if a communication error occurred.
  */
 extern LIBTYPE int hdhomerun_device_set_tuner_channel(struct hdhomerun_device_t *hd, const char *channel);
+extern LIBTYPE int hdhomerun_device_set_tuner_vchannel(struct hdhomerun_device_t *hd, const char *vchannel);
 extern LIBTYPE int hdhomerun_device_set_tuner_channelmap(struct hdhomerun_device_t *hd, const char *channelmap);
 extern LIBTYPE int hdhomerun_device_set_tuner_filter(struct hdhomerun_device_t *hd, const char *filter);
 extern LIBTYPE int hdhomerun_device_set_tuner_filter_by_array(struct hdhomerun_device_t *hd, unsigned char filter_array[0x2000]);
