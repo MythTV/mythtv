@@ -51,7 +51,7 @@ class MUI_PUBLIC MythScreenStack : public QObject
     void RecalculateDrawOrder(void);
     void DoNewFadeTransition();
     void CheckNewFadeTransition();
-    void CheckDeletes();
+    void CheckDeletes(bool force = false);
 
     QVector<MythScreenType *> m_Children;
     QVector<MythScreenType *> m_DrawOrder;
