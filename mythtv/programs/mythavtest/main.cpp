@@ -123,6 +123,9 @@ int main(int argc, char *argv[])
         ProgramInfo pginfo(filename);
         TV::StartTV(&pginfo, kStartTVNoFlags);
     }
+
+    DestroyMythMainWindow();
+
     delete gContext;
 
     return GENERIC_EXIT_OK;
