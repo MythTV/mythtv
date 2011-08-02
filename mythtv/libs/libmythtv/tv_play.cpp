@@ -1196,6 +1196,12 @@ TV::~TV(void)
     }
     ReturnPlayerLock(mctx);
 
+    if (browsehelper)
+    {
+        delete browsehelper;
+        browsehelper = NULL;
+    }
+
     LOG(VB_PLAYBACK, LOG_INFO, "TV::~TV() -- end");
 }
 
