@@ -1318,30 +1318,7 @@ static void InitJumpPoints(void)
 static void ReloadJumpPoints(void)
 {
     MythMainWindow *mainWindow = GetMythMainWindow();
-    mainWindow->ClearJump("Reload Theme");
-    mainWindow->ClearJump("Main Menu");
-    mainWindow->ClearJump("Program Guide");
-    mainWindow->ClearJump("Program Finder");
-    //mainWindow->ClearJump("Search Listings");
-    mainWindow->ClearJump("Manage Recordings / Fix Conflicts");
-    mainWindow->ClearJump("Program Recording Priorities");
-    mainWindow->ClearJump("Manage Recording Rules");
-    mainWindow->ClearJump("Channel Recording Priorities");
-    mainWindow->ClearJump("TV Recording Playback");
-    mainWindow->ClearJump("TV Recording Deletion");
-    mainWindow->ClearJump("Live TV");
-    mainWindow->ClearJump("Live TV In Guide");
-    mainWindow->ClearJump("Status Screen");
-    mainWindow->ClearJump("Previously Recorded");
-    mainWindow->ClearJump("Video Default");
-    mainWindow->ClearJump("Video Manager");
-    mainWindow->ClearJump("Video Browser");
-    mainWindow->ClearJump("Video Listings");
-    mainWindow->ClearJump("Video Gallery");
-    mainWindow->ClearJump("Play Disc");
-    mainWindow->ClearJump("Toggle Show Widget Borders");
-    mainWindow->ClearJump("Toggle Show Widget Names");
-    mainWindow->ClearJump("Reset All Keys");
+    mainWindow->ClearAllJumps();
     InitJumpPoints();
 }
 
