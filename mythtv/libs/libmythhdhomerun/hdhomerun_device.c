@@ -543,6 +543,18 @@ int hdhomerun_device_get_tuner_channel(struct hdhomerun_device_t *hd, char **pch
 	return hdhomerun_control_get(hd->cs, name, pchannel, NULL);
 }
 
+int hdhomerun_device_get_tuner_vchannel(struct hdhomerun_device_t *hd, char **pvchannel)
+{
+	if (!hd->cs) {
+		hdhomerun_debug_printf(hd->dbg, "hdhomerun_device_get_tuner_vchannel: device not set\n");
+		return -1;
+	}
+
+	char name[32];
+	sprintf(name, "/tuner%u/vchannel", hd->tuner);
+	return hdhomerun_control_get(hd->cs, name, pvchannel, NULL);
+}
+
 int hdhomerun_device_get_tuner_channelmap(struct hdhomerun_device_t *hd, char **pchannelmap)
 {
 	if (!hd->cs) {
@@ -750,6 +762,18 @@ int hdhomerun_device_set_tuner_channel(struct hdhomerun_device_t *hd, const char
 	char name[32];
 	sprintf(name, "/tuner%u/channel", hd->tuner);
 	return hdhomerun_control_set_with_lockkey(hd->cs, name, channel, hd->lockkey, NULL, NULL);
+}
+
+int hdhomerun_device_set_tuner_vchannel(struct hdhomerun_device_t *hd, const char *vchannel)
+{
+	if (!hd->cs) {
+		hdhomerun_debug_printf(hd->dbg, "hdhomerun_device_set_tuner_vchannel: device not set\n");
+		return -1;
+	}
+
+	char name[32];
+	sprintf(name, "/tuner%u/vchannel", hd->tuner);
+	return hdhomerun_control_set_with_lockkey(hd->cs, name, vchannel, hd->lockkey, NULL, NULL);
 }
 
 int hdhomerun_device_set_tuner_channelmap(struct hdhomerun_device_t *hd, const char *channelmap)
