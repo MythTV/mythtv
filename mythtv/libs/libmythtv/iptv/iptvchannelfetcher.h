@@ -2,27 +2,19 @@
 #define _IPTVCHANNELFETCHER_H_
 
 // Qt headers
+#include <QRunnable>
 #include <QObject>
 #include <QMutex>
-#include <QThread>
 
 // MythTV headers
 #include "iptvchannelinfo.h"
+#include "mthread.h"
 
 class ScanMonitor;
 class IPTVChannelFetcher;
 
-class IPTVChannelFetcherThread : public QThread
+class IPTVChannelFetcher : public QRunnable
 {
-  public:
-    virtual void run();
-    IPTVChannelFetcher *iptvfetcher;
-};
-
-class IPTVChannelFetcher
-{
-    friend class IPTVChannelFetcherThread;
-
   public:
     IPTVChannelFetcher(uint cardid, const QString &inputname, uint sourceid,
                        ScanMonitor *monitor = NULL);
@@ -42,7 +34,7 @@ class IPTVChannelFetcher
     void SetMessage(const QString &status);
 
   protected:
-    void RunScan(void);
+    virtual void run(void); // QRunnable
 
   private:
     ScanMonitor *_scan_monitor;
@@ -52,7 +44,7 @@ class IPTVChannelFetcher
     uint      _chan_cnt;
     bool      _thread_running;
     bool      _stop_now;
-    IPTVChannelFetcherThread _thread;
+    MThread  *_thread;
     QMutex    _lock;
 };
 

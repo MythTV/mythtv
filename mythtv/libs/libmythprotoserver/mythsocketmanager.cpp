@@ -7,7 +7,6 @@ using namespace std;
 #include <QWriteLocker>
 #include <QMutexLocker>
 #include <QWaitCondition>
-#include <QThread>
 #include <QEvent>
 #include <QCoreApplication>
 #include <QNetworkProxy>
@@ -21,6 +20,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythversion.h"
 #include "mythlogging.h"
+#include "mthread.h"
 
 #define LOC      QString("MythSocketManager: ")
 
@@ -29,10 +29,11 @@ using namespace std;
 
 uint socket_id = 1;
 
-class ProcessRequestThread : public QThread
+class ProcessRequestThread : public MThread
 {
   public:
     ProcessRequestThread(MythSocketManager *ms):
+        MThread("ProcessRequestThread"),
         m_parent(ms), m_socket(NULL), m_threadlives(false) {}
 
     void setup(MythSocket *sock)
@@ -52,7 +53,8 @@ class ProcessRequestThread : public QThread
 
     virtual void run(void)
     {
-        threadRegister("ProcessRequest");
+        RunProlog();
+
         QMutexLocker locker(&m_lock);
         m_threadlives = true;
         m_waitCond.wakeAll(); // Signal to creating thread
@@ -76,7 +78,8 @@ class ProcessRequestThread : public QThread
             m_socket = NULL;
             m_parent->MarkUnused(this);
         }
-        threadDeregister();
+
+        RunEpilog();
     }
 
     QMutex m_lock;

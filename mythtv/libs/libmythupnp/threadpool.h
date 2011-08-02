@@ -30,11 +30,11 @@ using namespace std;
 #include <QString> 
 #include <QMutex> 
 #include <QWaitCondition>
-#include <QThread>
 #include <QTimer>
 #include <QObject>
 #include <QPointer>
 
+#include "mthread.h"
 #include "upnpexp.h"
 
 class ThreadPool;
@@ -99,7 +99,7 @@ class UPNP_PUBLIC WorkerEvent : public QObject
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC WorkerThread : public QThread
+class UPNP_PUBLIC WorkerThread : public QObject, public MThread
 {
     Q_OBJECT
 

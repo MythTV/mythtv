@@ -67,7 +67,7 @@ class ASIStreamHandler : public StreamHandler
     bool Open(void);
     void Close(void);
 
-    virtual void run(void); // QThread
+    virtual void run(void); // MThread
 
     virtual void PriorityEvent(int fd); // DeviceReaderCB
 

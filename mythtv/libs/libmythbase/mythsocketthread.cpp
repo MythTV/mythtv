@@ -35,7 +35,7 @@
 const uint MythSocketThread::kShortWait = 100;
 
 MythSocketThread::MythSocketThread()
-    : QThread(), m_readyread_run(false)
+    : MThread("Socket"), m_readyread_run(false)
 {
     for (int i = 0; i < 2; i++)
     {
@@ -188,7 +188,7 @@ void MythSocketThread::ProcessAddRemoveQueues(void)
 
 void MythSocketThread::run(void)
 {
-    threadRegister("Socket");
+    RunProlog();
     LOG(VB_SOCKET, LOG_DEBUG, LOC + "readyread thread start");
 
     QMutexLocker locker(&m_readyread_lock);
@@ -374,5 +374,5 @@ void MythSocketThread::run(void)
     }
 
     LOG(VB_SOCKET, LOG_DEBUG, LOC + "readyread thread exit");
-    threadDeregister();
+    RunEpilog();
 }

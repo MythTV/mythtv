@@ -17,9 +17,9 @@
 
 void FirewireTableMonitorThread::run(void)
 {
-    threadRegister("FirewireTableMonitor");
+    RunProlog();
     m_parent->RunTableMonitor();
-    threadDeregister();
+    RunEpilog();
 }
 
 const uint FirewireSignalMonitor::kPowerTimeout  = 3000; /* ms */
@@ -185,7 +185,7 @@ void FirewireSignalMonitor::AddData(const unsigned char *data, uint len)
  *   FE_READ_BER, FE_READ_UNCORRECTED_BLOCKS, and FE_READ_STATUS to obtain
  *   statistics from the frontend.
  *
- *   This is automatically called by MonitorLoop(), after Start()
+ *   This is automatically called by run(), after Start()
  *   has been used to start the signal monitoring thread.
  */
 void FirewireSignalMonitor::UpdateValues(void)

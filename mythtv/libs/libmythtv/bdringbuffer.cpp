@@ -262,7 +262,7 @@ void BDRingBuffer::ProgressUpdate(void)
 {
     // This thread check is probably unnecessary as processEvents should
     // only handle events in the calling thread - and not all threads
-    if (QThread::currentThread() != m_mainThread)
+    if (!is_current_thread(m_mainThread))
         return;
 
     qApp->postEvent(GetMythMainWindow(),

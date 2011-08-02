@@ -28,6 +28,7 @@ using namespace std;
 #include <mythuibuttonlist.h>
 #include <mythcontext.h>
 #include <mythlogging.h>
+#include <mthread.h>
 
 // MythGallery headers
 #include "galleryfilterdlg.h"
@@ -35,7 +36,7 @@ using namespace std;
 
 #define LOC QString("GalleryFilterDlg:")
 
-class FilterScanThread : public QThread
+class FilterScanThread : public MThread
 {
   public:
     FilterScanThread(const QString& dir, const GalleryFilter& flt,
@@ -52,21 +53,20 @@ class FilterScanThread : public QThread
 
 FilterScanThread::FilterScanThread(const QString& dir, const GalleryFilter& flt,
                                    int *dirCount, int *imageCount,
-                                   int *movieCount)
+                                   int *movieCount) :
+    MThread("FilterScan"), m_filter(flt), m_dir(dir), m_dirCount(dirCount),
+    m_imgCount(imageCount), m_movCount(movieCount)
 {
-    m_dir = dir;
-    m_filter = flt;
-    m_dirCount = dirCount;
-    m_imgCount = imageCount;
-    m_movCount = movieCount;
 }
 
 void FilterScanThread::run()
 {
-    threadRegister("FilterScan");
+    RunProlog();
+
     GalleryFilter::TestFilter(m_dir, m_filter, m_dirCount, m_imgCount,
                               m_movCount);
-    threadDeregister();
+
+    RunEpilog();
 }
 
 GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, QString name,

@@ -53,6 +53,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     start(0),        end(0),
     curpos(0)
 {
+    setObjectName("CdDecoder");
     setFilename(file);
 }
 
@@ -188,10 +189,13 @@ static void paranoia_cb(long inpos, int function)
 
 void CdDecoder::run()
 {
+    RunProlog();
     if (!inited)
+    {
+        RunEpilog();
         return;
+    }
 
-    threadRegister("CdDecoder");
     stat = DecoderEvent::Decoding;
     {
         DecoderEvent e((DecoderEvent::Type) stat);
@@ -284,7 +288,7 @@ void CdDecoder::run()
     }
 
     deinit();
-    threadDeregister();
+    RunEpilog();
 }
 
 void CdDecoder::setCDSpeed(int speed)

@@ -83,30 +83,30 @@ QEvent::Type RipStatusEvent::kFinishedEvent =
 QEvent::Type RipStatusEvent::kEncoderErrorEvent =
     (QEvent::Type) QEvent::registerEventType();
 
-CDScannerThread::CDScannerThread(Ripper *ripper)
+CDScannerThread::CDScannerThread(Ripper *ripper) :
+    MThread("CDScanner"), m_parent(ripper)
 {
-    m_parent = ripper;
 }
 
 void CDScannerThread::run()
 {
-    threadRegister("CDScanner");
+    RunProlog();
     m_parent->scanCD();
-    threadDeregister();
+    RunEpilog();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CDEjectorThread::CDEjectorThread(Ripper *ripper)
+CDEjectorThread::CDEjectorThread(Ripper *ripper) :
+    MThread("CDEjector"), m_parent(ripper)
 {
-    m_parent = ripper;
 }
 
 void CDEjectorThread::run()
 {
-    threadRegister("CDEjector");
+    RunProlog();
     m_parent->ejectCD();
-    threadDeregister();
+    RunEpilog();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -150,6 +150,7 @@ static void paranoia_cb(long inpos, int function)
 
 CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
                                QVector<RipTrack*> *tracks, int quality) :
+    MThread("CDRipper"),
     m_parent(parent),   m_quit(false),
     m_CDdevice(device), m_quality(quality),
     m_tracks(tracks), m_totalSectors(0),
@@ -176,10 +177,13 @@ bool CDRipperThread::isCancelled(void)
 
 void CDRipperThread::run(void)
 {
+    RunProlog();
     if (!m_tracks->size() > 0)
+    {
+        RunEpilog();
         return;
+    }
 
-    threadRegister("CDRipper");
     Metadata *track = m_tracks->at(0)->metadata;
     QString tots;
 
@@ -301,6 +305,7 @@ void CDRipperThread::run(void)
                     LOG(VB_GENERAL, LOG_ERR, "MythMusic: Encoder failed"
                                              " to open file for writing");
 
+                    RunEpilog();
                     return;
                 }
             }
@@ -313,12 +318,16 @@ void CDRipperThread::run(void)
                     new RipStatusEvent(RipStatusEvent::kEncoderErrorEvent,
                                        "Failed to create encoder"));
                 LOG(VB_GENERAL, LOG_ERR, "MythMusic: No encoder, failing");
+                RunEpilog();
                 return;
             }
             ripTrack(m_CDdevice, encoder.get(), trackno + 1);
 
             if (isCancelled())
+            {
+                RunEpilog();
                 return;
+            }
 
             // save the metadata to the DB
             if (m_tracks->at(trackno)->active)
@@ -337,7 +346,7 @@ void CDRipperThread::run(void)
     QApplication::postEvent(
         m_parent, new RipStatusEvent(RipStatusEvent::kFinishedEvent, ""));
 
-    threadDeregister();
+    RunEpilog();
 }
 
 int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
@@ -600,7 +609,7 @@ void Ripper::startScanCD(void)
     OpenBusyPopup(message);
 
     m_scanThread = new CDScannerThread(this);
-    connect(m_scanThread, SIGNAL(finished()), SLOT(ScanFinished()));
+    connect(m_scanThread->qthread(), SIGNAL(finished()), SLOT(ScanFinished()));
     m_scanThread->start();
 }
 
@@ -1200,7 +1209,8 @@ void Ripper::startEjectCD()
     OpenBusyPopup(message);
 
     m_ejectThread = new CDEjectorThread(this);
-    connect(m_ejectThread, SIGNAL(finished()), SLOT(EjectFinished()));
+    connect(m_ejectThread->qthread(),
+            SIGNAL(finished()), SLOT(EjectFinished()));
     m_ejectThread->start();
 }
 

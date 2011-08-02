@@ -1,16 +1,16 @@
 #ifndef UPNPSCANNER_H
 #define UPNPSCANNER_H
 
-#include <QThread>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QDomDocument>
 #include <QMutex>
 #include <QTimer>
-#include <QDomDocument>
 
-#include "upnpexp.h"
 #include "upnpsubscription.h"
+#include "mthread.h"
+#include "upnpexp.h"
 
 #include "videometadatalistmanager.h"
 
@@ -97,7 +97,7 @@ class UPNPScanner : public QObject
   private:
     static  UPNPScanner* gUPNPScanner;
     static  bool         gUPNPScannerEnabled;
-    static  QThread*     gUPNPScannerThread;
+    static  MThread*     gUPNPScannerThread;
     static  QMutex*      gUPNPScannerLock;
 
     UPNPSubscription *m_subscription;

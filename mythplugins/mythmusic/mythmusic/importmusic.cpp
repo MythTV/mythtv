@@ -62,16 +62,16 @@ static bool copyFile(const QString &src, const QString &dst)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FileScannerThread::FileScannerThread(ImportMusicDialog *parent)
+FileScannerThread::FileScannerThread(ImportMusicDialog *parent) :
+    MThread("FileScanner"), m_parent(parent)
 {
-    m_parent = parent;
 }
 
 void FileScannerThread::run()
 {
-    threadRegister("FileScanner");
+    RunProlog();
     m_parent->doScan();
-    threadDeregister();
+    RunEpilog();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

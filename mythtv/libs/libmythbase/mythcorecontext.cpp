@@ -4,7 +4,6 @@
 #include <QFileInfo>
 #include <QDebug>
 #include <QMutex>
-#include <QThread>
 #include <QWaitCondition>
 #include <QNetworkInterface>
 #include <QHostAddress>
@@ -26,10 +25,11 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythsocket.h"
 #include "mythsystem.h"
+#include "mthreadpool.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
-
 #include "mythversion.h"
+#include "mthread.h"
 
 #define LOC      QString("MythCoreContext: ")
 
@@ -97,6 +97,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
 
 MythCoreContextPrivate::~MythCoreContextPrivate()
 {
+    MThreadPool::StopAllPools();
     ShutdownRRT();
 
     QMutexLocker locker(&m_sockLock);
@@ -113,7 +114,15 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
 
     delete m_locale;
 
+    MThreadPool::ShutdownAllPools();
+
+    ShutdownMythSystem();
+
     logStop(); // need to shutdown db logger before we kill db
+
+    MThread::Cleanup();
+
+    GetMythDB()->GetDBManager()->CloseDatabases();
 
     if (m_database) {
         DestroyMythDB();
@@ -787,7 +796,7 @@ void MythCoreContext::OverrideSettingForSession(const QString &key,
 
 bool MythCoreContext::IsUIThread(void)
 {
-    return (QThread::currentThread() == d->m_UIThread);
+    return is_current_thread(d->m_UIThread);
 }
 
 bool MythCoreContext::SendReceiveStringList(QStringList &strlist,

@@ -5,8 +5,8 @@
 #include <QString>
 #include <QFont>
 #include <QMutex>
-#include <QThreadPool>
 
+#include "mthreadpool.h"
 #include "mythuiexp.h"
 #include "themeinfo.h"
 
@@ -129,7 +129,7 @@ class MUI_PUBLIC MythUIHelper
     QString RemoveCurrentLocation(void);
     QString GetCurrentLocation(bool fullPath = false, bool mainStackOnly = true);
 
-    QThreadPool *GetImageThreadPool(void);
+    MThreadPool *GetImageThreadPool(void);
 
     double GetPixelAspectRatio(void) const;
     QSize GetBaseSize(void) const;

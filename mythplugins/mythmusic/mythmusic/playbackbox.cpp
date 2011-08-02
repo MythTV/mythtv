@@ -1006,7 +1006,7 @@ void PlaybackBoxMusic::occasionallyCheckCD()
         postUpdate();
     }
 
-    if (scan_for_cd && !cd_reader_thread->running())
+    if (scan_for_cd && !cd_reader_thread->isRunning())
         cd_reader_thread->start();
 }
 

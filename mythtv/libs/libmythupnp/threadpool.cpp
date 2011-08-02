@@ -158,7 +158,8 @@ void WorkerEvent::TimeOut()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-WorkerThread::WorkerThread( ThreadPool *pThreadPool, const QString &sName )
+WorkerThread::WorkerThread( ThreadPool *pThreadPool, const QString &sName ) :
+    MThread("WorkerThread")
 {
     m_bInitialized   = false;
     m_bTermRequested = false;
@@ -261,7 +262,7 @@ void WorkerThread::RequestTerminate( void )
 
 void WorkerThread::run( void )
 {
-    threadRegister("WorkerThread");
+    RunProlog();
 
     m_timer = new QTimer();
     m_timer->setSingleShot(true);
@@ -291,7 +292,7 @@ void WorkerThread::run( void )
 
     LOG(VB_UPNP, LOG_INFO, QString("WorkerThread:Run - Exiting: %1")
                                .arg( m_sName ));
-    threadDeregister();
+    RunEpilog();
 }
 
 /////////////////////////////////////////////////////////////////////////////

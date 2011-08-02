@@ -88,6 +88,7 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     m_byteIOContext(NULL),      errcode(0),
     m_samples(NULL)
 {
+    setObjectName("avfDecoder");
     setFilename(file);
     memset(&m_params, 0, sizeof(AVFormatParameters));
 }
@@ -372,10 +373,13 @@ void avfDecoder::deinit()
 
 void avfDecoder::run()
 {
+    RunProlog();
     if (!inited)
+    {
+        RunEpilog();
         return;
+    }
 
-    threadRegister("avfDecoder");
     AVPacket pkt, tmp_pkt;
     char *s;
     int data_size, dec_len;
@@ -496,7 +500,7 @@ void avfDecoder::run()
     }
 
     deinit();
-    threadDeregister();
+    RunEpilog();
 }
 
 MetaIO* avfDecoder::doCreateTagger(void)

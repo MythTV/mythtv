@@ -4,13 +4,15 @@
 #include <deque>
 using namespace std;
 
-#include <QEvent>
 #include <QWaitCondition>
+#include <QStringList>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QRunnable>
 #include <QMutex>
-#include <QStringList>
-#include <QThread>
+#include <QEvent>
+
+#include "mthread.h"
 
 class MainServer;
 class QTextStream;
@@ -87,22 +89,10 @@ class NetworkControlCloseEvent : public QEvent
 
 class NetworkControl;
 
-class NetworkCommandThread : public QThread
-{
-    Q_OBJECT
-  public:
-    NetworkCommandThread(NetworkControl *parent) : m_parent(parent) {}
-    virtual ~NetworkCommandThread() { wait(); m_parent = NULL; }
-    virtual void run(void);
-  private:
-    NetworkControl *m_parent;
-};
-
-class NetworkControl : public QTcpServer
+class NetworkControl : public QTcpServer, public QRunnable
 {
     Q_OBJECT
 
-    friend class NetworkCommandThread;
   public:
     NetworkControl();
     ~NetworkControl();
@@ -115,7 +105,7 @@ class NetworkControl : public QTcpServer
     void deleteClient(void);
 
   protected:
-    void RunCommandThread(void);
+    void run(void); // QRunnable
 
   private:
     QString processJump(NetworkCommand *nc);
@@ -157,7 +147,7 @@ class NetworkControl : public QTcpServer
     QList<NetworkCommand*> networkControlReplies;
     QMutex nrLock;
 
-    NetworkCommandThread *commandThread;
+    MThread *commandThread;
     bool stopCommandThread; // protected by ncLock
 };
 

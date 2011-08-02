@@ -502,6 +502,7 @@ void *MPEG2fixup::ReplexStart(void *data)
     threadRegister("MPEG2Replex");
     MPEG2fixup *m2f = (MPEG2fixup *) data;
     m2f->rx.Start();
+    GetMythDB()->GetDBManager()->CloseDatabases();
     threadDeregister();
     return NULL;
 }

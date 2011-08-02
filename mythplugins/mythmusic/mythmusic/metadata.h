@@ -8,10 +8,10 @@ using namespace std;
 // qt
 #include <QStringList>
 #include <QMap>
-#include <QThread>
 
 // mythtv
 #include <uitypes.h>
+#include <mthread.h>
 
 // mythmusic
 #include "treecheckitem.h"
@@ -348,7 +348,7 @@ class MusicNode
 
 //---------------------------------------------------------------------------
 
-class MetadataLoadingThread : public QThread
+class MetadataLoadingThread : public MThread
 {
 
   public:

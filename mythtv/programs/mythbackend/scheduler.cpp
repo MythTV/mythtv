@@ -53,6 +53,7 @@ bool debugConflicts = false;
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
                      QString tmptable, Scheduler *master_sched) :
+    MThread("Scheduler"),
     recordTable(tmptable),
     priorityTable("powerpriority"),
     schedLock(),
@@ -77,10 +78,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     if (master_sched)
         master_sched->GetAllPending(reclist);
 
-    // Only the master scheduler should use SchedCon()
-    if (doRun)
-        dbConn = MSqlQuery::SchedCon();
-    else
+    if (!doRun)
         dbConn = MSqlQuery::DDCon();
 
     if (tmptable == "powerpriority_tmp")
@@ -160,7 +158,7 @@ void Scheduler::ResetIdleTime(void)
 
 bool Scheduler::VerifyCards(void)
 {
-    MSqlQuery query(dbConn);
+    MSqlQuery query(MSqlQuery::InitCon());
     if (!query.exec("SELECT count(*) FROM capturecard") || !query.next())
     {
         MythDB::DBError("verifyCards() -- main query 1", query);
@@ -188,7 +186,7 @@ bool Scheduler::VerifyCards(void)
     }
 
     uint numsources = 0;
-    MSqlQuery subquery(dbConn);
+    MSqlQuery subquery(MSqlQuery::InitCon());
     while (query.next())
     {
         subquery.prepare(
@@ -1765,7 +1763,10 @@ void Scheduler::OldRecordedFixups(void)
 
 void Scheduler::run(void)
 {
-    threadRegister("Scheduler");
+    RunProlog();
+
+    dbConn = MSqlQuery::SchedCon();
+
     // Notify constructor that we're actually running
     {
         QMutexLocker lockit(&schedLock);
@@ -1929,8 +1930,7 @@ void Scheduler::run(void)
         }
     }
 
-    MSqlQuery::CloseSchedCon();
-    threadDeregister();
+    RunEpilog();
 }
 
 int Scheduler::CalcTimeToNextHandleRecordingEvent(

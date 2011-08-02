@@ -5,13 +5,14 @@
 // (or at your option a later version)
 
 #include <QCoreApplication>
-#include <QThreadPool>
+#include <QRunnable>
 
 #include "programinfocache.h"
+#include "mthreadpool.h"
+#include "mythlogging.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "mythevent.h"
-#include "mythlogging.h"
 
 typedef vector<ProgramInfo*> *VPI_ptr;
 static void free_vec(VPI_ptr &v)
@@ -34,9 +35,7 @@ class ProgramInfoLoader : public QRunnable
 
     void run(void) 
     { 
-        threadRegister("ProgramInfoLoader");
         m_cache.Load(m_updateUI); 
-        threadDeregister();
     }
 
     ProgramInfoCache &m_cache;
@@ -67,8 +66,8 @@ void ProgramInfoCache::ScheduleLoad(const bool updateUI)
     {
         m_load_is_queued = true;
         m_loads_in_progress++;
-        QThreadPool::globalInstance()->start(
-            new ProgramInfoLoader(*this, updateUI));
+        MThreadPool::globalInstance()->start(
+            new ProgramInfoLoader(*this, updateUI), "ProgramInfoLoader");
     }
 }
 

@@ -3,10 +3,10 @@
 
 #include <QStringList>
 #include <QPointer>
-#include <QThread>
 #include <QMutex>
 #include <QList>
 
+#include "mthread.h"
 #include "mythexp.h"
 #include "mythmedia.h"
 
@@ -20,7 +20,7 @@ struct MHData
 };
 
 class MediaMonitor;
-class MonitorThread : public QThread
+class MonitorThread : public MThread
 {
   public:
     MonitorThread(MediaMonitor* pMon,  unsigned long interval);

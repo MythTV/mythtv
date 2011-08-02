@@ -1,10 +1,10 @@
 #ifndef METADATAIMAGEDOWNLOAD_H
 #define METADATAIMAGEDOWNLOAD_H
 
-#include <QThread>
 #include <QString>
 #include <QStringList>
 
+#include "mthread.h"
 #include "mythmetaexp.h"
 #include "metadatacommon.h"
 
@@ -53,7 +53,7 @@ class META_PUBLIC ThumbnailDLEvent : public QEvent
     static Type kEventType;
 };
 
-class META_PUBLIC MetadataImageDownload : public QThread
+class META_PUBLIC MetadataImageDownload : public MThread
 {
   public:
 

@@ -37,6 +37,7 @@ TVBrowseHelper::TVBrowseHelper(
     bool     browse_all_tuners,
     bool     use_channel_groups,
     QString  db_channel_ordering) :
+    MThread("TVBrowseHelper"),
     m_tv(tv),
     db_time_format(time_format),
     db_short_date_format(short_date_format),
@@ -417,7 +418,7 @@ inline static QString toString(const InfoMap &infoMap, const QString sep="\n")
 
 void TVBrowseHelper::run()
 {
-    threadRegister("TVBrowseHelper");
+    RunProlog();
     QMutexLocker locker(&m_lock);
     while (true)
     {
@@ -587,5 +588,5 @@ void TVBrowseHelper::run()
                 m_tv, new UpdateBrowseInfoEvent(infoMap));
         }
     }
-    threadDeregister();
+    RunEpilog();
 }

@@ -28,10 +28,11 @@
 #include <QImageReader>
 
 // myth
-#include "mythtv/mythcontext.h"
-#include "mythtv/util.h"
 #include <mythuihelper.h>
+#include <mythcontext.h>
 #include <mythdirs.h>
+#include <mthread.h>
+#include <util.h>
 
 // mythgallery
 #include "config.h"
@@ -49,12 +50,10 @@
 QEvent::Type ThumbGenEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-ThumbGenerator::ThumbGenerator(QObject *parent, int w, int h)
+ThumbGenerator::ThumbGenerator(QObject *parent, int w, int h) :
+    MThread("ThumbGenerator"), m_parent(parent),
+    m_isGallery(false), m_width(w), m_height(h)
 {
-    m_parent = parent;
-    m_width  = w;
-    m_height = h;
-    m_isGallery = false;
 }
 
 ThumbGenerator::~ThumbGenerator()
@@ -95,7 +94,8 @@ void ThumbGenerator::cancel()
 
 void ThumbGenerator::run()
 {
-    threadRegister("ThumbGenerator");
+    RunProlog();
+
     while (moreWork())
     {
 
@@ -180,7 +180,8 @@ void ThumbGenerator::run()
             }
         }
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 bool ThumbGenerator::moreWork()

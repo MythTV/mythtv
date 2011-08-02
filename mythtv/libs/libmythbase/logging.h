@@ -3,7 +3,6 @@
 
 #ifdef __cplusplus
 #include <QString>
-#include <QThread>
 #include <QQueue>
 #include <QMutex>
 #include <QMutexLocker>
@@ -15,6 +14,7 @@
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
+#include "mthread.h"
 
 #define LOGLINE_MAX 2048
 
@@ -105,9 +105,8 @@ class DatabaseLogger : public LoggerBase {
 };
 
 class QWaitCondition;
-class LoggerThread : public QThread {
-    Q_OBJECT
-
+class LoggerThread : public MThread
+{
     public:
         LoggerThread();
         ~LoggerThread();
@@ -120,9 +119,8 @@ class LoggerThread : public QThread {
 
 #define MAX_QUEUE_LEN 1000
 
-class DBLoggerThread : public QThread {
-    Q_OBJECT
-
+class DBLoggerThread : public MThread
+{
     public:
         DBLoggerThread(DatabaseLogger *logger);
         ~DBLoggerThread();

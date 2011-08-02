@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QEvent>
 #include <QDomElement>
-#include <QThread>
+#include "mthread.h"
 #include <QMetaType>
 #include <QMutex>
 #include <QTimer>
@@ -13,7 +13,7 @@
 #include "mythexp.h"
 #include "mythsystem.h"
 
-class MPUBLIC GrabberScript : public QThread
+class MPUBLIC GrabberScript : public QObject, public MThread
 {
 
     Q_OBJECT
@@ -106,8 +106,10 @@ class MPUBLIC GrabberUpdateEvent : public QEvent
     ~GrabberUpdateEvent() {}
 };
 
-class MPUBLIC GrabberDownloadThread : public QThread
+class MPUBLIC GrabberDownloadThread : public QObject, public MThread
 {
+    Q_OBJECT
+
   public:
 
     GrabberDownloadThread(QObject *parent);
@@ -115,6 +117,9 @@ class MPUBLIC GrabberDownloadThread : public QThread
     
     void refreshAll();
     void cancel();
+
+  signals:
+    void finished();
 
   protected:
 

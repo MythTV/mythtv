@@ -27,7 +27,7 @@ using namespace std;
 */
 
 DeleteThread::DeleteThread(void) :
-        m_increment(9961472), m_run(true), m_timeout(20000)
+    MThread("Delete"), m_increment(9961472), m_run(true), m_timeout(20000)
 {
     m_slow = (bool) gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0);
     m_link = (bool) gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
@@ -38,7 +38,7 @@ DeleteThread::DeleteThread(void) :
 
 void DeleteThread::run(void)
 {
-    threadRegister("Delete");
+    RunProlog();
 
     LOG(VB_FILE, LOG_DEBUG, "Spawning new delete thread.");
 
@@ -64,7 +64,7 @@ void DeleteThread::run(void)
     else
         LOG(VB_FILE, LOG_DEBUG, "Delete thread self-terminating due to idle.");
 
-    threadDeregister();
+    RunEpilog();
 }
 
 bool DeleteThread::AddFile(QString path)

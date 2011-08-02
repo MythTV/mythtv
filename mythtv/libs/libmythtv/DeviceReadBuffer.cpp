@@ -1,13 +1,13 @@
 #include <algorithm>
 using namespace std;
 
-#include <QThread>
 #include "DeviceReadBuffer.h"
 #include "mythcorecontext.h"
 #include "mythbaseutil.h"
-#include "tspacket.h"
-#include "compat.h"
 #include "mythlogging.h"
+#include "tspacket.h"
+#include "mthread.h"
+#include "compat.h"
 
 #ifndef USING_MINGW
 #include <sys/poll.h>
@@ -19,7 +19,8 @@ using namespace std;
 #define LOC QString("DevRdB(%1): ").arg(videodevice)
 
 DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
-    : videodevice(""),              _stream_fd(-1),
+    : MThread("DeviceReadBuffer"),
+      videodevice(""),              _stream_fd(-1),
       readerCB(cb),
 
       // Data for managing the device ringbuffer
@@ -319,9 +320,10 @@ void DeviceReadBuffer::IncrReadPointer(uint len)
 
 void DeviceReadBuffer::run(void)
 {
+    RunProlog();
+
     uint      errcnt = 0;
 
-    threadRegister("DeviceReadBuffer");
     lock.lock();
     runWait.wakeAll();
     lock.unlock();
@@ -385,7 +387,7 @@ void DeviceReadBuffer::run(void)
     unpauseWait.wakeAll();
     lock.unlock();
 
-    threadDeregister();
+    RunEpilog();
 }
 
 bool DeviceReadBuffer::HandlePausing(void)

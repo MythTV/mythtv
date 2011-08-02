@@ -174,7 +174,8 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
  */
 SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
                              uint64_t wait_for_mask)
-    : channel(_channel),
+    : MThread("SignalMonitor"),
+      channel(_channel),
       capturecardnum(_capturecardnum), flags(wait_for_mask),
       update_rate(25),                 minimum_update_rate(5),
       update_done(false),              notify_frontend(true),
@@ -282,9 +283,9 @@ QStringList SignalMonitor::GetStatusList(void) const
 }
 
 /// \brief Basic signal monitoring loop
-void SignalMonitor::MonitorLoop(void)
+void SignalMonitor::run(void)
 {
-    threadRegister("SignalMonitor");
+    RunProlog();
 
     QMutexLocker locker(&startStopLock);
     running = true;
@@ -322,7 +323,7 @@ void SignalMonitor::MonitorLoop(void)
     running = false;
     startStopWait.wakeAll();
 
-    threadDeregister();
+    RunEpilog();
 }
 
 void SignalMonitor::AddListener(SignalMonitorListener *listener)

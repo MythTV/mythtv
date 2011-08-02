@@ -1,8 +1,8 @@
 #include "math.h"
 
 #include <QSize>
-#include <QThread>
 
+#include "mthread.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythrender_vdpau.h"

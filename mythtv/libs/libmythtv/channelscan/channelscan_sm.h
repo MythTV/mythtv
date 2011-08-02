@@ -31,8 +31,8 @@
 #define SISCAN_H
 
 // Qt includes
+#include <QRunnable>
 #include <QString>
-#include <QThread>
 #include <QList>
 #include <QPair>
 #include <QMap>
@@ -45,6 +45,7 @@
 #include "signalmonitorlistener.h"
 #include "dtvconfparserhelpers.h" // for DTVTunerType
 
+class MThread;
 class MSqlQuery;
 
 class ChannelBase;
@@ -79,24 +80,13 @@ class AnalogSignalHandler : public SignalMonitorListener
     ChannelScanSM *siscan;
 };
 
-class ScannerThread : public QThread
-{
-    Q_OBJECT
-  public:
-    ScannerThread(ChannelScanSM *parent) : m_parent(parent) {}
-    ~ScannerThread() { wait(); m_parent = NULL; }
-    void run(void);
-  private:
-    ChannelScanSM *m_parent;
-};
-
 class ChannelScanSM : public MPEGStreamListener,
                       public ATSCMainStreamListener,
                       public DVBMainStreamListener,
-                      public DVBOtherStreamListener
+                      public DVBOtherStreamListener,
+                      public QRunnable
 {
     friend class AnalogSignalHandler;
-    friend class ScannerThread;
 
   public:
     ChannelScanSM(
@@ -172,8 +162,7 @@ class ChannelScanSM : public MPEGStreamListener,
     DVBChannel       *GetDVBChannel(void);
     const DVBChannel *GetDVBChannel(void) const;
 
-    /// \brief Called by SpawnScanner to run scanning thread
-    void RunScanner(void);
+    void run(void); // QRunnable
 
     bool HasTimedOut(void);
     void HandleActiveScan(void);
@@ -254,8 +243,8 @@ class ChannelScanSM : public MPEGStreamListener,
     // Analog Info
     AnalogSignalHandler *analogSignalHandler;
 
-    /// Scanner thread, runs ChannelScanSM::StartScanner()
-    ScannerThread       *scannerThread;
+    /// Scanner thread, runs ChannelScanSM::run()
+    MThread          *scannerThread;
 };
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)

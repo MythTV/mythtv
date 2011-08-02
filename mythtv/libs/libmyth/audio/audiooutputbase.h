@@ -12,12 +12,12 @@ using namespace std;
 #include <QString>
 #include <QMutex>
 #include <QWaitCondition>
-#include <QThread>
 
 // MythTV headers
 #include "audiooutput.h"
 #include "samplerate.h"
 #include "mythlogging.h"
+#include "mthread.h"
 
 #define VBAUDIO(str)   LOG(VB_AUDIO, LOG_INFO, LOC + str)
 #define VBAUDIOTS(str) LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + str)
@@ -48,7 +48,7 @@ private:
 // Forward declaration of SPDIF encoder
 class SPDIFEncoder;
 
-class AudioOutputBase : public AudioOutput, public QThread
+class AudioOutputBase : public AudioOutput, public MThread
 {
  public:
     AudioOutputBase(const AudioSettings &settings);

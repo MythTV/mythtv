@@ -11,15 +11,15 @@ using namespace std;
 
 // Qt headers
 #include <QWaitCondition>
-#include <QThread>
 #include <QMutex>
 
 // MythTV headers
-#include "signalmonitorvalue.h"
 #include "signalmonitorlistener.h"
+#include "signalmonitorvalue.h"
 #include "channelbase.h"
-#include "cardutil.h"
 #include "mythtimer.h"
+#include "cardutil.h"
+#include "mthread.h"
 
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
     QString("SM(%1)::%2: %3") .arg(channel->GetDevice()).arg(FUNC).arg(<MSG));
@@ -28,7 +28,7 @@ inline QString sm_flags_to_string(uint64_t);
 
 class TVRec;
 
-class SignalMonitor : protected QThread
+class SignalMonitor : protected MThread
 {
   public:
     /// Returns true iff the card type supports signal monitoring.
@@ -113,8 +113,7 @@ class SignalMonitor : protected QThread
     SignalMonitor(int db_cardnum, ChannelBase *_channel,
                   uint64_t wait_for_mask);
 
-    virtual void run(void) { MonitorLoop(); } // QThread
-    virtual void MonitorLoop(void);
+    virtual void run(void);
 
     /// \brief This should be overridden to actually do signal monitoring.
     virtual void UpdateValues(void);

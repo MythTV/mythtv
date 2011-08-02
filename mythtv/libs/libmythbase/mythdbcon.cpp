@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 // ANSI C
 #include <cstdlib>
 
@@ -16,7 +18,7 @@
 #include "mythlogging.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
-#include <unistd.h>
+#include "mthread.h"
 
 #define DEBUG_RECONNECT 0
 #if DEBUG_RECONNECT
@@ -245,34 +247,36 @@ MDBManager::MDBManager()
     m_nextConnID = 0;
     m_connCount = 0;
 
-    m_sem = new QSemaphore(20);
-
     m_schedCon = NULL;
     m_DDCon = NULL;
-    m_LogCon = NULL;
 }
 
 MDBManager::~MDBManager()
 {
-    while (!m_pool.isEmpty())
-        delete m_pool.takeFirst();
-    delete m_sem;
+    CloseDatabases();
 
-    closeStaticCon(&m_schedCon);
-    closeStaticCon(&m_DDCon);
-    closeStaticCon(&m_LogCon);
+    if (m_connCount != 0 || m_schedCon || m_DDCon)
+    {
+        LOG(VB_GENERAL, LOG_CRIT,
+            "MDBManager exiting with connections still open");
+    }
+#if 0 /* some post logStop() debugging... */
+    cout<<"m_connCount: "<<m_connCount<<endl;
+    cout<<"m_schedCon: "<<m_schedCon<<endl;
+    cout<<"m_DDCon: "<<m_DDCon<<endl;
+#endif
 }
 
 MSqlDatabase *MDBManager::popConnection()
 {
     PurgeIdleConnections();
 
-    m_sem->acquire();
     m_lock.lock();
 
     MSqlDatabase *db;
 
-    if (m_pool.isEmpty())
+    DBList &list = m_pool[QThread::currentThread()];
+    if (list.isEmpty())
     {
         db = new MSqlDatabase("DBManager" + QString::number(m_nextConnID++));
         ++m_connCount;
@@ -280,7 +284,10 @@ MSqlDatabase *MDBManager::popConnection()
                 QString("New DB connection, total: %1").arg(m_connCount));
     }
     else
-        db = m_pool.takeLast();
+    {
+        db = list.back();
+        list.pop_back();
+    }
 
     m_lock.unlock();
 
@@ -296,11 +303,10 @@ void MDBManager::pushConnection(MSqlDatabase *db)
     if (db)
     {
         db->m_lastDBKick = QDateTime::currentDateTime();
-        m_pool.prepend(db);
+        m_pool[QThread::currentThread()].push_front(db);
     }
 
     m_lock.unlock();
-    m_sem->release();
 
     PurgeIdleConnections();
 }
@@ -310,11 +316,12 @@ void MDBManager::PurgeIdleConnections(void)
     QMutexLocker locker(&m_lock);
 
     QDateTime now = QDateTime::currentDateTime();
-    QList<MSqlDatabase*>::iterator it = m_pool.begin();
+    DBList &list = m_pool[QThread::currentThread()];
+    DBList::iterator it = list.begin();
 
     uint purgedConnections = 0, totalConnections = 0;
     MSqlDatabase *newDb = NULL;
-    while (it != m_pool.end())
+    while (it != list.end())
     {
         totalConnections++;
         if ((*it)->m_lastDBKick.secsTo(now) <= (int)kPurgeTimeout)
@@ -326,7 +333,7 @@ void MDBManager::PurgeIdleConnections(void)
         // This connection has not been used in the kPurgeTimeout
         // seconds close it.
         MSqlDatabase *entry = *it;
-        it = m_pool.erase(it);
+        it = list.erase(it);
         --m_connCount;
         purgedConnections++;
 
@@ -340,7 +347,7 @@ void MDBManager::PurgeIdleConnections(void)
         // threads didn't exit".  This workaround simply creates an
         // extra DB connection before all pooled connections are
         // purged so that my_thread_global_end() won't be called.
-        if (it == m_pool.end() &&
+        if (it == list.end() &&
             purgedConnections > 0 &&
             totalConnections == purgedConnections)
         {
@@ -357,7 +364,7 @@ void MDBManager::PurgeIdleConnections(void)
         LOG(VB_DATABASE, LOG_INFO, "Done deleting idle DB connection.");
     }
     if (newDb)
-        m_pool.push_front(newDb);
+        list.push_front(newDb);
 
     if (purgedConnections)
     {
@@ -380,6 +387,9 @@ MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, QString name)
 
     (*dbcon)->OpenDatabase();
 
+    if (!m_static_pool[QThread::currentThread()].contains(*dbcon))
+        m_static_pool[QThread::currentThread()].push_back(*dbcon);
+
     return *dbcon;
 }
 
@@ -393,17 +403,19 @@ MSqlDatabase *MDBManager::getDDCon()
     return getStaticCon(&m_DDCon, "DataDirectCon");
 }
 
-MSqlDatabase *MDBManager::getLogCon()
-{
-    return getStaticCon(&m_LogCon, "LogCon");
-}
-
 void MDBManager::closeStaticCon(MSqlDatabase **dbcon)
 {
-    if (dbcon && *dbcon)
+    DBList &list = m_static_pool[QThread::currentThread()];
+    if (dbcon && *dbcon && list.contains(*dbcon))
     {
+        list.removeAll(*dbcon);
         delete *dbcon;
         *dbcon = NULL;
+    }
+    else if (dbcon && *dbcon)
+    {
+        LOG(VB_GENERAL, LOG_CRIT,
+            "Attempted to close static connection in wrong thread.");
     }
 }
 
@@ -417,29 +429,37 @@ void MDBManager::closeDDCon()
     closeStaticCon(&m_DDCon);
 }
 
-void MDBManager::closeLogCon()
-{
-    closeStaticCon(&m_LogCon);
-}
-
-// Dangerous. Should only be used when the database connection has errored?
-
 void MDBManager::CloseDatabases()
 {
     m_lock.lock();
+    DBList list = m_pool[QThread::currentThread()];
+    m_pool[QThread::currentThread()].clear();
+    m_lock.unlock();
 
-    QList<MSqlDatabase*>::const_iterator it = m_pool.begin();
-    MSqlDatabase *db;
-
-    while (it != m_pool.end())
+    for (DBList::iterator it = list.begin(); it != list.end(); ++it)
     {
-        db = *it;
         LOG(VB_GENERAL, LOG_INFO,
-                "Closing DB connection named '" + db->m_name + "'");
-        db->m_db.close();
-        ++it;
+            "Closing DB connection named '" + (*it)->m_name + "'");
+        (*it)->m_db.close();
+        delete (*it);
+        m_connCount--;
     }
 
+    m_lock.lock();
+    DBList &slist = m_static_pool[QThread::currentThread()];
+    while (!slist.isEmpty())
+    {
+        MSqlDatabase *db = slist.takeFirst();
+        LOG(VB_GENERAL, LOG_INFO,
+            "Closing DB connection named '" + db->m_name + "'");
+        db->m_db.close();
+        delete db;
+
+        if (db == m_schedCon)
+            m_schedCon = NULL;
+        if (db == m_DDCon)
+            m_DDCon = NULL;
+    }
     m_lock.unlock();
 }
 
@@ -551,25 +571,6 @@ MSqlQueryInfo MSqlQuery::DDCon()
     return qi;
 }
 
-MSqlQueryInfo MSqlQuery::LogCon()
-{
-    MSqlDatabase *db = GetMythDB()->GetDBManager()->getLogCon();
-    MSqlQueryInfo qi;
-
-    InitMSqlQueryInfo(qi);
-    qi.returnConnection = false;
-
-    if (db)
-    {
-        qi.db = db;
-        qi.qsqldb = db->db();
-
-        db->KickDatabase();
-    }
-
-    return qi;
-}
-
 void MSqlQuery::CloseSchedCon()
 {
     GetMythDB()->GetDBManager()->closeSchedCon();
@@ -579,12 +580,6 @@ void MSqlQuery::CloseDDCon()
 {
     GetMythDB()->GetDBManager()->closeDDCon();
 }
-
-void MSqlQuery::CloseLogCon()
-{
-    GetMythDB()->GetDBManager()->closeLogCon();
-}
-
 
 bool MSqlQuery::exec()
 {

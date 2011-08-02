@@ -1107,10 +1107,10 @@ bool MythContext::Init(const bool gui,
 
 MythContext::~MythContext()
 {
-    if (QThreadPool::globalInstance()->activeThreadCount())
+    if (MThreadPool::globalInstance()->activeThreadCount())
         LOG(VB_GENERAL, LOG_INFO, "Waiting for threads to exit.");
 
-    QThreadPool::globalInstance()->waitForDone();
+    MThreadPool::globalInstance()->waitForDone();
     logStop();
 
     delete gCoreContext;

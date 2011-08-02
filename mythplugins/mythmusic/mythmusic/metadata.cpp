@@ -928,18 +928,18 @@ MetaIO* Metadata::getTagger(void)
 
 //--------------------------------------------------------------------------
 
-MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)
+MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr) :
+    MThread("MetadataLoading"), parent(parent_ptr)
 {
-    parent = parent_ptr;
 }
 
 void MetadataLoadingThread::run()
 {
-    threadRegister("MetadataLoading");
+    RunProlog();
     //if you want to simulate a big music collection load
     //sleep(3);
     parent->resync();
-    threadDeregister();
+    RunEpilog();
 }
 
 AllMusic::AllMusic(QString path_assignment, QString a_startdir)

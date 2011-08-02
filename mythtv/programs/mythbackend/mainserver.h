@@ -3,7 +3,6 @@
 
 #include <QReadWriteLock>
 #include <QStringList>
-#include <QThreadPool>
 #include <QRunnable>
 #include <QEvent>
 #include <QMutex>
@@ -15,6 +14,7 @@ using namespace std;
 
 #include "tv.h"
 #include "playbacksock.h"
+#include "mthreadpool.h"
 #include "encoderlink.h"
 #include "filetransfer.h"
 #include "scheduler.h"
@@ -69,7 +69,8 @@ class DeleteThread : public QRunnable, public DeleteStruct
                  bool forceMetadataDelete) :
                      DeleteStruct(ms, filename, title, chanid, recstartts,
                                   recendts, forceMetadataDelete)  {}
-    void start(void) { QThreadPool::globalInstance()->start(this); }
+    void start(void)
+        { MThreadPool::globalInstance()->startReserved(this, "DeleteThread"); }
     void run(void);
 };
 
@@ -78,7 +79,8 @@ class TruncateThread : public QRunnable, public DeleteStruct
   public:
     TruncateThread(MainServer *ms, QString filename, int fd, off_t size) :
                 DeleteStruct(ms, filename, fd, size)  {}
-    void start(void) { QThreadPool::globalInstance()->start(this); }
+    void start(void)
+        { MThreadPool::globalInstance()->start(this, "Truncate"); }
     void run(void);
 };
 

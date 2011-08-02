@@ -9,11 +9,11 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include <QApplication>
-#include <QThread>
 
 // mythtv
 #include <mythcontext.h>
 #include <mythdb.h>
+#include <mthread.h>
 #include <programinfo.h>
 #include <remoteutil.h>
 #include <mythtimer.h>
@@ -24,26 +24,26 @@
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
 #include <mythdialogbox.h>
-#include "mythlogging.h"
+#include <mythlogging.h>
 
 // mytharchive
 #include "recordingselector.h"
 #include "archiveutil.h"
 
-class GetRecordingListThread : public QThread
+class GetRecordingListThread : public MThread
 {
   public:
-    GetRecordingListThread(RecordingSelector *parent)
+    GetRecordingListThread(RecordingSelector *parent) :
+        MThread("GetRecordingList"), m_parent(parent)
     {
-        m_parent = parent;
         start();
     }
 
     virtual void run(void)
     {
-        threadRegister("GetRecordingList");
+        RunProlog();
         m_parent->getRecordingList();
-        threadDeregister();
+        RunEpilog();
     }
 
     RecordingSelector *m_parent;
@@ -138,7 +138,7 @@ void RecordingSelector::Init(void)
     while (thread->isRunning())
     {
         qApp->processEvents();
-        usleep(100);
+        usleep(2000);
     }
 
     if (!m_recordingList || m_recordingList->size() == 0)

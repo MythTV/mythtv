@@ -5,8 +5,8 @@
 using namespace std;
 
 #include <QWaitCondition>
+#include <QRunnable>
 #include <QString>
-#include <QThread>
 #include <QMutex>
 
 #include "mpegtables.h"
@@ -15,25 +15,13 @@ using namespace std;
 
 class ChannelBase;
 class cCiHandler;
+class MThread;
 class DVBCam;
 
 typedef QMap<const ChannelBase*, ProgramMapTable*> pmt_list_t;
 
-class DVBCamThread : public QThread
+class DVBCam : public QRunnable
 {
-    Q_OBJECT
-  public:
-    DVBCamThread(DVBCam *p) : m_parent(p) {}
-    virtual ~DVBCamThread() { wait(); m_parent = NULL; }
-    virtual void run(void);
-  private:
-    DVBCam *m_parent;
-};
-
-class DVBCam
-{
-    friend class DVBCamThread;
-
   public:
     DVBCam(const QString &device);
     ~DVBCam();
@@ -50,7 +38,7 @@ class DVBCam
     void SetTimeOffset(double offset_in_seconds);
 
   private:
-    void CiHandlerLoop(void);
+    void run(void); // QRunnable
     void HandleUserIO(void);
     void HandlePMT(void);
 
@@ -64,7 +52,7 @@ class DVBCam
     bool            ciHandlerDoRun;
     bool            ciHandlerRunning;
     cCiHandler     *ciHandler;
-    DVBCamThread   *ciHandlerThread;
+    MThread        *ciHandlerThread;
 
     QMutex          pmt_lock;
     pmt_list_t      PMTList;

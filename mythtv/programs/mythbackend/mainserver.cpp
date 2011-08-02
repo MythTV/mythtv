@@ -29,7 +29,6 @@ using namespace std;
 #include <QDateTime>
 #include <QFile>
 #include <QDir>
-#include <QThread>
 #include <QWaitCondition>
 #include <QRegExp>
 #include <QEvent>
@@ -46,6 +45,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mainserver.h"
 #include "server.h"
+#include "mthread.h"
 #include "scheduler.h"
 #include "backendutil.h"
 #include "programinfo.h"
@@ -121,10 +121,11 @@ int delete_file_immediately(const QString &filename,
 QMutex MainServer::truncate_and_close_lock;
 const uint MainServer::kMasterServerReconnectTimeout = 1000; //ms
 
-class ProcessRequestThread : public QThread
+class ProcessRequestThread : public MThread
 {
   public:
     ProcessRequestThread(MainServer *ms) :
+        MThread("ProcessRequestThread"),
         parent(ms), socket(NULL), threadlives(false) {}
     ~ProcessRequestThread() { killit(); wait(); }
 
@@ -145,7 +146,7 @@ class ProcessRequestThread : public QThread
 
     virtual void run(void)
     {
-        threadRegister("ProcessRequest");
+        RunProlog();
         QMutexLocker locker(&lock);
         threadlives = true;
         waitCond.wakeAll(); // Signal to creating thread
@@ -165,7 +166,7 @@ class ProcessRequestThread : public QThread
             socket = NULL;
             parent->MarkUnused(this);
         }
-        threadDeregister();
+        RunEpilog();
     }
 
     QMutex lock;
@@ -1858,12 +1859,8 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
 
 void DeleteThread::run(void)
 {
-    if (!m_ms)
-        return;
-
-    threadRegister("Delete");
-    m_ms->DoDeleteThread(this);
-    threadDeregister();
+    if (m_ms)
+        m_ms->DoDeleteThread(this);
 }
 
 void MainServer::DoDeleteThread(DeleteStruct *ds)
@@ -4560,21 +4557,15 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos)
 
 void TruncateThread::run(void)
 {
-    if (!m_ms)
-        return;
-
-    threadRegister("Truncate");
-    m_ms->DoTruncateThread(this);
-    threadDeregister();
+    if (m_ms)
+        m_ms->DoTruncateThread(this);
 }
 
 void MainServer::DoTruncateThread(DeleteStruct *ds)
 {
     if (gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0)) 
     {
-        QThreadPool::globalInstance()->releaseThread();
         TruncateAndClose(NULL, ds->m_fd, ds->m_filename, ds->m_size);
-        QThreadPool::globalInstance()->reserveThread();
     }
     else
     {

@@ -2,21 +2,17 @@
 #define MYTHAUDIOSETTINGS_H
 
 #include <QStringList>
-
 #include <QObject>
 #include <QMutex>
-#include <QThread>
 
-#include "settings.h"
-#include "mythcontext.h"
-
-// libmythui
-#include <mythuibutton.h>
-#include <mythuistatetype.h>
-#include <mythscreentype.h>
-#include <mythdialogbox.h>
-
+#include "mythuistatetype.h"
+#include "mythscreentype.h"
+#include "mythdialogbox.h"
+#include "mythuibutton.h"
 #include "audiooutput.h"
+#include "mythcontext.h"
+#include "settings.h"
+#include "mthread.h"
 
 class AudioDeviceComboBox;
 
@@ -146,7 +142,7 @@ class ChannelChangedEvent : public QEvent
     static Type kEventType;
 };
 
-class AudioTestThread : public QThread
+class AudioTestThread : public MThread
 {
   public:
 

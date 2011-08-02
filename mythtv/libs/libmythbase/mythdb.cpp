@@ -2,13 +2,12 @@
 using namespace std;
 
 #include <QReadWriteLock>
+#include <QTextStream>
 #include <QSqlError>
 #include <QMutex>
 #include <QFile>
 #include <QHash>
 #include <QDir>
-#include <QThread>
-#include <QTextStream>
 
 #include "mythdb.h"
 #include "mythdbcon.h"
