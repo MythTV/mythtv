@@ -73,6 +73,7 @@ using namespace std;
 #include "backendconnectionmanager.h"
 #include "themechooser.h"
 #include "mythversion.h"
+#include "taskqueue.h"
 
 // Video
 #include "cleanup.h"
@@ -228,6 +229,18 @@ namespace
             g_pUPnp = NULL;
         }
 
+        if (SSDP::Instance())
+        {
+            SSDP::Instance()->RequestTerminate();
+            SSDP::Instance()->wait();
+        }
+
+        if (TaskQueue::Instance())
+        {
+            TaskQueue::Instance()->RequestTerminate();
+            TaskQueue::Instance()->wait();
+        }
+
         if (pmanager)
         {
             delete pmanager;
@@ -236,6 +249,8 @@ namespace
 
         delete gContext;
         gContext = NULL;
+
+        delete qApp;
 
 #ifndef _MSC_VER
         signal(SIGUSR1, SIG_DFL);
@@ -1457,17 +1472,19 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
+    CleanupGuard callCleanup(cleanup);
+
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);
 #endif
-    QApplication a(argc, argv);
+    new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
 
     QString pluginname;
 
-    QFileInfo finfo(a.argv()[0]);
+    QFileInfo finfo(qApp->argv()[0]);
     QString binname = finfo.baseName();
 
     int retval;
@@ -1496,8 +1513,6 @@ int main(int argc, char **argv)
     {
         MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
     }
-
-    CleanupGuard callCleanup(cleanup);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
