@@ -51,43 +51,33 @@
 
 int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int max_count)
 {
-	PIP_ADAPTER_INFO AdapterInfo;
-	ULONG AdapterInfoLength = sizeof(IP_ADAPTER_INFO) * 16;
+	PIP_ADAPTER_INFO pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof(IP_ADAPTER_INFO));
+	ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 
-	while (1) {
-		AdapterInfo = (IP_ADAPTER_INFO *)malloc(AdapterInfoLength);
-		if (!AdapterInfo) {
-			return -1;
-		}
-
-		ULONG LengthNeeded = AdapterInfoLength;
-		DWORD Ret = GetAdaptersInfo(AdapterInfo, &LengthNeeded);
-		if (Ret == NO_ERROR) {
-			break;
-		}
-
-		free(AdapterInfo);
-
+	DWORD Ret = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
+	if (Ret != NO_ERROR) {
+		free(pAdapterInfo);
 		if (Ret != ERROR_BUFFER_OVERFLOW) {
 			return -1;
 		}
-		if (AdapterInfoLength >= LengthNeeded) {
+		pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen); 
+		Ret = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
+		if (Ret != NO_ERROR) {
+			free(pAdapterInfo);
 			return -1;
 		}
-
-		AdapterInfoLength = LengthNeeded;
 	}
 
 	int count = 0;
-	PIP_ADAPTER_INFO Adapter = AdapterInfo;
-	while (Adapter) {
-		IP_ADDR_STRING *IPAddr = &Adapter->IpAddressList;
-		while (IPAddr) {
-			uint32_t ip_addr = ntohl(inet_addr(IPAddr->IpAddress.String));
-			uint32_t subnet_mask = ntohl(inet_addr(IPAddr->IpMask.String));
+	PIP_ADAPTER_INFO pAdapter = pAdapterInfo;
+	while (pAdapter) {
+		IP_ADDR_STRING *pIPAddr = &pAdapter->IpAddressList;
+		while (pIPAddr) {
+			uint32_t ip_addr = ntohl(inet_addr(pIPAddr->IpAddress.String));
+			uint32_t subnet_mask = ntohl(inet_addr(pIPAddr->IpMask.String));
 
 			if (ip_addr == 0) {
-				IPAddr = IPAddr->Next;
+				pIPAddr = pIPAddr->Next;
 				continue;
 			}
 
@@ -99,17 +89,17 @@ int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int
 				break;
 			}
 
-			IPAddr = IPAddr->Next;
+			pIPAddr = pIPAddr->Next;
 		}
 
 		if (count >= max_count) {
 			break;
 		}
 
-		Adapter = Adapter->Next;
+		pAdapter = pAdapter->Next;
 	}
 
-	free(AdapterInfo);
+	free(pAdapterInfo);
 	return count;
 }
 
