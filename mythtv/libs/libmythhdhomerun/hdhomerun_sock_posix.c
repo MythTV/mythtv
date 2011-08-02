@@ -65,9 +65,7 @@ int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int
 	}
 
 	struct ifconf ifc;
-	struct ifreq ifreq_dummy;
-	size_t ifreq_size = _SIZEOF_ADDR_IFREQ(ifreq_dummy);
-	size_t ifreq_buffer_size = ifreq_size * 16;
+	size_t ifreq_buffer_size = 1024;
 
 	while (1) {
 		ifc.ifc_len = ifreq_buffer_size;
@@ -85,13 +83,12 @@ int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int
 			return -1;
 		}
 
-		if (ifc.ifc_len >= ifreq_buffer_size) {
-			free(ifc.ifc_buf);
-			ifreq_buffer_size += ifreq_size * 16;
-			continue;
+		if (ifc.ifc_len < ifreq_buffer_size) {
+			break;
 		}
 
-		break;
+		free(ifc.ifc_buf);
+		ifreq_buffer_size += 1024;
 	}
 
 	char *ptr = ifc.ifc_buf;
@@ -100,7 +97,7 @@ int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int
 	int count = 0;
 	while (ptr <= end) {
 		struct ifreq *ifr = (struct ifreq *)ptr;
-		ptr += ifreq_size;
+		ptr += _SIZEOF_ADDR_IFREQ(*ifr);
 
 		if (ioctl(sock, SIOCGIFADDR, ifr) != 0) {
 			continue;
