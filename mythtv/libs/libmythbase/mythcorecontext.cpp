@@ -113,6 +113,8 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
 
     delete m_locale;
 
+    logStop(); // need to shutdown db logger before we kill db
+
     if (m_database) {
         DestroyMythDB();
         m_database = NULL;
