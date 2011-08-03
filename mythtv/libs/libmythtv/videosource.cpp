@@ -1255,6 +1255,22 @@ class FirewireSpeed : public ComboBoxSetting, public CaptureCardDBStorage
     }
 };
 
+class FirewireGenPSIP : public CheckBoxSetting, public CaptureCardDBStorage
+{
+  public:
+    FirewireGenPSIP(const CaptureCard &parent) :
+        CheckBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "firewire_gen_psip")
+    {
+        setLabel(QObject::tr("Generate PSI Packets"));
+        setValue(false);
+        setHelpText(
+            QObject::tr(
+                "Some cable boxes do not emit PSI packets, resulting in signal "
+                "lock failure. MythTV can attempt to generate these packets."));
+    };
+};
+
 class FirewireConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
@@ -1279,6 +1295,7 @@ class FirewireConfigurationGroup : public VerticalConfigurationGroup
         addChild(new SignalTimeout(parent, 2000, 1000));
         addChild(new ChannelTimeout(parent, 9000, 1750));
         addChild(new SingleCardInput(parent));
+        addChild(new FirewireGenPSIP(parent));
 
         model->SetGUID(dev->getValue());
         desc->SetGUID(dev->getValue());
