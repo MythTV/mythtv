@@ -51,7 +51,7 @@
  *  MythTV Python Bindings
  *      mythtv/bindings/python/MythTV/static.py
  */
-#define MYTH_DATABASE_VERSION "1280"
+#define MYTH_DATABASE_VERSION "1281"
 
 
  MBASE_PUBLIC  const char *GetMythSourceVersion();

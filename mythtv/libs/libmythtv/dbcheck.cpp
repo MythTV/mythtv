@@ -151,15 +151,16 @@ are all "DVB" specific configuration parameters.
 Both 'dvb_recordts' and 'dvb_hw_decoder' are unused, and
 will be dropped in future versions of MythTV.
 
-The 'firewire_port', 'firewire_node', 'firewire_speed',
-'firewire_model', 'firewire_connection' are all "FIREWIRE" specific
-configuration parameters. The first three define the connection,
-and function much like 'videodevice' does for other capture "cards".
-The 'firewire_model' describes the cable box model, for example
-"DCT-6000" describes a box that communicates using the same protocol
-as the Motorola DCT-6000. The 'firewire_connection' field describes
-the overall communication protocol, i.e. are we using "Broadcast"
-or "Point-to-Point" communication.
+The 'firewire_speed', 'firewire_model', 'firewire_connection',
+and 'firewire_gen_psip' are all "FIREWIRE" specific configuration
+parameters. The 'firewire_speed' describes the speed of the firewire
+link. The 'firewire_model' describes the cable box model, for
+example "DCT-6000" describes a box that communicates using the same
+protocol as the Motorola DCT-6000. The 'firewire_connection' field
+describes the overall communication protocol, i.e. are we using
+"Broadcast" or "Point-to-Point" communication. The
+'firewire_gen_psip' field specifies whether MythTV should generate
+MPEG2-TS PAT and PMT packets for broken cable boxes that do not.
 
 \section dtv_multiplex_table Digital Television Multiplex Table (dtv_multiplex)
 This table contains the information needed to tune to a particular
@@ -5848,6 +5849,16 @@ NULL
             return false;
     }
 
+    if (dbver == "1280")
+    {
+        const char *updates[] = {
+"ALTER TABLE capturecard ADD COLUMN firewire_gen_psip tinyint(1) default '0';",
+NULL
+};
+        if (!performActualUpdate(updates, "1281", dbver))
+            return false;
+    }
+
     return true;
 }
 
@@ -5930,6 +5941,7 @@ tmp.constData(),
 "  firewire_speed int(10) unsigned NOT NULL default '0',"
 "  firewire_model varchar(32) default NULL,"
 "  firewire_connection int(10) unsigned NOT NULL default '0',"
+"  firewire_gen_psip tinyint(1) default '0',"
 "  dbox2_port int(10) unsigned NOT NULL default '31338',"
 "  dbox2_httpport int(10) unsigned NOT NULL default '80',"
 "  dbox2_host varchar(32) default NULL,"
