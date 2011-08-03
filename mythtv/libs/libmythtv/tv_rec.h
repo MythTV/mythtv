@@ -83,11 +83,12 @@ class DVBDBOptions
 class FireWireDBOptions
 {
   public:
-    FireWireDBOptions() : speed(-1), connection(-1), model("") {;}
+    FireWireDBOptions() : speed(-1), connection(-1), model(""), gen_psip(false) {;}
 
     int speed;
     int connection;
     QString model;
+    bool gen_psip;
 };
 
 class TuningRequest

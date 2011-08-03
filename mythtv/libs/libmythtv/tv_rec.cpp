@@ -1519,7 +1519,8 @@ bool TVRec::GetDevices(uint cardid,
         ""
         "       dvb_on_demand,    dvb_tuning_delay,    dvb_eitscan,"
         ""
-        "       firewire_speed,   firewire_model,      firewire_connection "
+        "       firewire_speed,   firewire_model,      firewire_connection, "
+        "       firewire_gen_psip "
         ""
         "FROM capturecard "
         "WHERE cardid = :CARDID");
@@ -1585,6 +1586,7 @@ bool TVRec::GetDevices(uint cardid,
         firewire_opts.model = test;
 
     firewire_opts.connection  = query.value(fireoff + 2).toUInt();
+    firewire_opts.gen_psip = query.value(fireoff + 3).toBool();
 
     return true;
 }
