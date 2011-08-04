@@ -189,7 +189,8 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     int numRowsAffected() const { return QSqlQuery::numRowsAffected(); }
     void setForwardOnly(bool f) { QSqlQuery::setForwardOnly(f); }
     bool isNull(int field) const { return QSqlQuery::isNull(field); }
-
+    const QSqlDriver *driver(void) const { return QSqlQuery::driver(); }
+    int at(void) const { return QSqlQuery::at(); }
 
     /// \brief Checks DB connection + login (login info via Mythcontext)
     static bool testDBConnection();

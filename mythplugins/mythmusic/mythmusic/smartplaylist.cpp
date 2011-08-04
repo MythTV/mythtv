@@ -1741,7 +1741,7 @@ void SmartPLResultViewer::setSQL(QString sql)
                 query.value(4).toString(),
                 query.value(5).toString(),
                 query.value(6).toString());
-        } while (query.prev());
+        } while (query.previous());
     }
 
     // set selection to first item
