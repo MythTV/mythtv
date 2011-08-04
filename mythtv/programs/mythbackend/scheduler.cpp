@@ -3978,12 +3978,12 @@ void Scheduler::AddNewRecords(void)
     {
         result.prepare("DROP TABLE IF EXISTS sched_temp_record;");
         if (!result.exec())
-            MythDB::DBError("AddNewRecords sched_temp_record", query);
+            MythDB::DBError("AddNewRecords sched_temp_record", result);
     }
 
     result.prepare("DROP TABLE IF EXISTS sched_temp_recorded;");
     if (!result.exec())
-        MythDB::DBError("AddNewRecords drop table", query);
+        MythDB::DBError("AddNewRecords drop table", result);
 }
 
 void Scheduler::AddNotListed(void) {

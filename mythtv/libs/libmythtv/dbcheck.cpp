@@ -3666,7 +3666,7 @@ NULL
             {
                 MythDB::DBError(QString("Unable to perform test for database "
                                 "corruption before character set conversion."),
-                                thequery);
+                                query);
                 return false;
             }
             // If the conversion to utf8 resulted in warnings, the data in the
@@ -3696,7 +3696,7 @@ NULL
             {
                 MythDB::DBError(QString("Error getting database warnings for "
                                 "database corruption test."),
-                                thequery);
+                                query);
                 return false;
             }
             // Test creating an index to see if we had partial corruption that
@@ -3710,7 +3710,7 @@ NULL
                 if (!ok)
                 {
                     MythDB::DBError(QString("Index creation failed."),
-                                    thequery);
+                                    query);
                     LOG(VB_GENERAL, LOG_ERR, "DB charset pre-conversion test "
                             "failed! Your database seems to be partially "
                             "corrupted. Please move the backup to a safe "
@@ -3724,7 +3724,7 @@ NULL
             thequery = QString("DROP TEMPORARY TABLE temp_%1;").arg(table);
             if (!query.exec(thequery))
                 MythDB::DBError(QString("Error dropping temporary table %1.")
-                                .arg(table), thequery);
+                                .arg(table), query);
 
             tableIndex++;
         }

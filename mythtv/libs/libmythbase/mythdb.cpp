@@ -162,7 +162,7 @@ QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
     return str;
 }
 
-void MythDB::DBError(const QString &where, const QSqlQuery& query)
+void MythDB::DBError(const QString &where, const MSqlQuery& query)
 {
     QString str = QString("DB Error (%1):\n").arg(where);
 

@@ -526,13 +526,10 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT MAX(endtime) FROM program WHERE manualid = 0;");
 
-    if (query.exec() && query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.next();
-
-        if (query.isValid())
-            GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
-                                                     Qt::ISODate);
+        GuideDataThrough = QDateTime::fromString(
+            query.value(0).toString(), Qt::ISODate);
     }
 
     guide.setAttribute("start",

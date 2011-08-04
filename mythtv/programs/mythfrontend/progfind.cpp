@@ -532,7 +532,7 @@ void ProgFinder::getShowNames()
     query.bindValues(bindings);
     if (!query.exec())
     {
-        MythDB::DBError("getShowNames", thequery);
+        MythDB::DBError("getShowNames", query);
         return;
     }
 
