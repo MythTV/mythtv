@@ -890,7 +890,7 @@ ThemeUpdateChecker::ThemeUpdateChecker() :
                                              "remotethemes/themes.zip",
                                              "Temp");
 
-    gCoreContext->SaveSetting("ThemeUpdateStatus", QString());
+    gCoreContext->SaveSetting("ThemeUpdateStatus", "");
                                  
     connect(m_updateTimer, SIGNAL(timeout()), SLOT(checkForUpdate()));
     m_updateTimer->start(60 * 60 * 1000); // Run once an hour
