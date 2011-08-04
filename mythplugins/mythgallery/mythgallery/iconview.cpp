@@ -212,7 +212,8 @@ bool IconView::Create(void)
         m_thumbGen->setSize(thumbWidth, thumbHeight);
 
     SetupMediaMonitor();
-    LoadDirectory(m_galleryDir);
+    if (!m_currDevice)
+        LoadDirectory(m_galleryDir);
 
     return true;
 }
@@ -347,7 +348,10 @@ void IconView::LoadThumbnail(ThumbItem *item)
 
 void IconView::SetupMediaMonitor(void)
 {
-#ifndef _WIN32
+#ifdef _WIN32
+    if (m_currDevice)
+        LoadDirectory(m_currDevice->getDevicePath());
+#else
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
     {
@@ -378,7 +382,6 @@ void IconView::SetupMediaMonitor(void)
             mon->Unlock(m_currDevice);
         }
     }
-    m_currDevice = NULL;
 #endif // _WIN32
 }
 
@@ -538,6 +541,9 @@ bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
     {
         m_currDevice = item->GetMediaDevice();
 
+#ifdef _WIN32
+        LoadDirectory(m_currDevice->getDevicePath());
+#else
         if (!m_currDevice->isMounted(false))
             m_currDevice->mount();
 
@@ -550,6 +556,7 @@ bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
                                         MythMediaDevice*)));
 
         LoadDirectory(m_currDevice->getMountPath());
+#endif
 
         mon->Unlock(m_currDevice);
     }
@@ -1076,7 +1083,11 @@ void IconView::HandleSettings(void)
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
     {
+#ifdef _WIN32
+        LoadDirectory(m_currDevice->getDevicePath());
+#else
         LoadDirectory(m_currDevice->getMountPath());
+#endif
         mon->Unlock(m_currDevice);
     }
     else
@@ -1161,8 +1172,8 @@ void IconView::HandleImport(void)
 
 void IconView::HandleShowDevices(void)
 {
-#ifndef _WIN32
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+#ifndef _WIN32
     if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
     {
         m_currDevice->disconnect(this);
@@ -1190,10 +1201,10 @@ void IconView::HandleShowDevices(void)
     m_itemList.append(item);
     m_itemHash.insert(item->GetName(), item);
 
-#ifndef _WIN32
     if (mon)
     {
-        QList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
+        MythMediaType type = MythMediaType(MEDIATYPE_DATA | MEDIATYPE_MGALLERY);
+        QList<MythMediaDevice*> removables = mon->GetMedias(type);
         QList<MythMediaDevice*>::Iterator it = removables.begin();
         for (; it != removables.end(); it++)
         {
@@ -1211,7 +1222,6 @@ void IconView::HandleShowDevices(void)
             }
         }
     }
-#endif
 
     ThumbItem *thumbitem;
     for (int x = 0; x < m_itemList.size(); x++)
