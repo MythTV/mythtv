@@ -21,7 +21,7 @@ class HDHRRecorder : public DTVRecorder
   public:
     HDHRRecorder(TVRec *rec, HDHRChannel *channel);
 
-    void StartRecording(void);
+    void run(void);
 
     bool Open(void);
     bool IsOpen(void) const { return _stream_handler; }

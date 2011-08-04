@@ -86,7 +86,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
                                const QString &vbidev);
  
     void Initialize(void);
-    void StartRecording(void);
+    void run(void);
     void StopRecording(void); 
     
     virtual void Pause(bool clear = true);

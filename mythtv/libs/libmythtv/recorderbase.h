@@ -116,16 +116,15 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     virtual void SetNextRecording(const ProgramInfo*, RingBuffer*) = 0;
 
     /** \brief This is called between SetOptionsFromProfile() and
-     *         StartRecording() to initialize any devices, etc.
+     *         run() to initialize any devices, etc.
      */
     virtual void Initialize(void) = 0;
 
-    /** \brief StartRecording() starts the recording process, and does not
+    /** \brief run() starts the recording process, and does not
      *         exit until the recording is complete.
      *  \sa StopRecording()
      */
-    virtual void StartRecording(void) = 0;
-    virtual void run(void) { StartRecording(); } // QRunnable
+    virtual void run(void) = 0;
 
     /** \brief Reset the recorder to the startup state.
      *

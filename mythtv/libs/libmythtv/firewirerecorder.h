@@ -39,7 +39,7 @@ class FirewireRecorder :
     void StartStreaming(void);
     void StopStreaming(void);
 
-    void StartRecording(void);
+    void run(void);
     bool PauseAndWait(int timeout = 100);
 
     // Implements TSDataListener

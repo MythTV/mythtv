@@ -159,10 +159,10 @@ void RecorderBase::SetStrOption(RecordingProfile *profile, const QString &name)
             QString("SetStrOption(...%1): Option not in profile.").arg(name));
 }
 
-/** \brief StopRecording() signals to the StartRecording() function that
+/** \brief StopRecording() signals to the recorder that
  *         it should stop recording and exit cleanly.
  *
- *   This function should block until StartRecording() has finished up.
+ *   This function should block until recorder has finished up.
  */
 void RecorderBase::StopRecording(void)
 {
@@ -175,7 +175,7 @@ void RecorderBase::StopRecording(void)
         if (request_recording)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Programmer Error: StartRecording called while we were in "
+                "Programmer Error: Recorder started while we were in "
                 "StopRecording");
             request_recording = false;
         }
@@ -196,7 +196,7 @@ bool RecorderBase::IsRecordingRequested(void)
     return request_recording;
 }
 
-/** \brief Pause tells StartRecording() to pause, it should not block.
+/** \brief Pause tells recorder to pause, it should not block.
  *
  *   Once paused the recorder calls tvrec->RecorderPaused().
  *
@@ -210,7 +210,7 @@ void RecorderBase::Pause(bool clear)
     request_pause = true;
 }
 
-/** \brief Unpause tells StartRecording() to unpause.
+/** \brief Unpause tells recorder to unpause.
  *  This is an asynchronous call it should not wait block waiting
  *  for the command to be processed.
  */
@@ -233,7 +233,7 @@ bool RecorderBase::IsPaused(bool holding_lock) const
 }
 
 /** \fn RecorderBase::WaitForPause(int)
- *  \brief WaitForPause blocks until StartRecording() is actually paused,
+ *  \brief WaitForPause blocks until recorder is actually paused,
  *         or timeout milliseconds elapse.
  *  \param timeout number of milliseconds to wait defaults to 1000.
  *  \return true iff pause happened within timeout period.
