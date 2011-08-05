@@ -285,6 +285,23 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
         return false;
     }
 
+    MHApplication *pProgram = (MHApplication*)ParseProgram(text);
+    if (! pProgram)
+    {
+        MHLOG(MHLogWarning, "Empty application");
+        return false;
+    }
+    if (! pProgram->m_fIsApp)
+    {
+        MHLOG(MHLogWarning, "Expected an application");
+        delete pProgram;
+        return false;
+    }
+    if ((__mhlogoptions & MHLogScenes) && __mhlogStream != 0)   // Print it so we know what's going on.
+    {
+        pProgram->PrintMe(__mhlogStream, 0);
+    }
+
     // Clear the action queue of anything pending.
     m_ActionStack.clear();
 
@@ -311,18 +328,6 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
             {
                 delete m_ApplicationStack.pop();    // Pop and delete the current app.
             }
-        }
-
-        MHApplication *pProgram = (MHApplication *)ParseProgram(text);
-
-        if ((__mhlogoptions & MHLogScenes) && __mhlogStream != 0)   // Print it so we know what's going on.
-        {
-            pProgram->PrintMe(__mhlogStream, 0);
-        }
-
-        if (! pProgram->m_fIsApp)
-        {
-            MHERROR("Expected an application");
         }
 
         // Save the path we use for this app.
@@ -430,8 +435,12 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     // Parse and run the file.
     MHGroup *pProgram = ParseProgram(text);
 
+    if (!pProgram )
+        MHERROR("Empty scene");
+
     if (pProgram->m_fIsApp)
     {
+        delete pProgram;
         MHERROR("Expected a scene");
     }
 
@@ -990,7 +999,9 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
             // If the content is not recognized catch the exception and continue
             try
             {
-                pRequester->ContentArrived((const unsigned char *)text.data(), text.size(), this);
+                pRequester->ContentArrived(
+                    reinterpret_cast< const unsigned char * >(text.constData()),
+                    text.size(), this);
             }
             catch (char const *)
             {}
@@ -1064,7 +1075,8 @@ void MHEngine::CheckContentRequests()
                 try
                 {
                     pContent->m_pRequester->ContentArrived(
-                        (const unsigned char *)text.data(), text.size(), this);
+                        reinterpret_cast< const unsigned char * >(text.constData()),
+                        text.size(), this);
                 }
                 catch (char const *)
                 {}
