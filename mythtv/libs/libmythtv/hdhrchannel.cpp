@@ -34,16 +34,24 @@ using namespace std;
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
     : DTVChannel(parent),
-      _device_id(device),           _master(NULL),
+      _device_id(device),
       _stream_handler(NULL)
 {
-    _master = dynamic_cast<HDHRChannel*>(GetMaster(device));
-    _master = (_master == this) ? NULL : _master;
+    RegisterForMaster(_device_id);
 }
 
 HDHRChannel::~HDHRChannel(void)
 {
     Close();
+    DeregisterForMaster(_device_id);
+}
+
+bool HDHRChannel::IsMaster(void) const
+{
+    DTVChannel *master = DTVChannel::GetMasterLock(_device_id);
+    bool is_master = (master == static_cast<const DTVChannel*>(this));
+    DTVChannel::ReturnMasterLock(master);
+    return is_master;
 }
 
 bool HDHRChannel::Open(void)
