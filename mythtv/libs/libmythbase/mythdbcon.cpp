@@ -626,6 +626,35 @@ bool MSqlQuery::exec()
     if (!result && QSqlQuery::lastError().number() == 2006 && Reconnect())
         result = QSqlQuery::exec();
 
+    if (!result)
+    {
+        QString err = MythDB::GetError("MSqlQuery", *this);
+        MSqlBindings tmp = QSqlQuery::boundValues();
+        bool has_null_strings = false;
+        for (MSqlBindings::iterator it = tmp.begin(); it != tmp.end(); ++it)
+        {
+            if (it->type() != QVariant::String)
+                continue;
+            if (it->isNull() || it->toString().isNull())
+            {
+                has_null_strings = true;
+                *it = QVariant(QString(""));
+            }
+        }
+        if (has_null_strings)
+        {
+            bindValues(tmp);
+            result = QSqlQuery::exec();
+        }
+        if (result)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Original query failed, but resend with empty "
+                        "strings in place of NULL strings worked. ") +
+                "\n" + err);
+        }
+    }
+
     if (VERBOSE_LEVEL_CHECK(VB_DATABASE, LOG_DEBUG))
     {
         QString str = lastQuery();
@@ -856,7 +885,7 @@ bool MSqlQuery::Reconnect(void)
     if (!m_last_prepared_query.isEmpty())
     {
         MSqlBindings tmp = QSqlQuery::boundValues();
-        if (!prepare(m_last_prepared_query))
+        if (!QSqlQuery::prepare(m_last_prepared_query))
             return false;
         bindValues(tmp);
     }

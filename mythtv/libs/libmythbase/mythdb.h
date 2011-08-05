@@ -19,6 +19,7 @@ class MBASE_PUBLIC MythDB
     MDBManager *GetDBManager(void);
     Settings *GetOldSettings(void);
 
+    static QString GetError(const QString &where, const MSqlQuery &query);
     static void DBError(const QString &where, const MSqlQuery &query);
     static QString DBErrorMessage(const QSqlError &err);
 

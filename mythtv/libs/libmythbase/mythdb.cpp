@@ -140,7 +140,17 @@ QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
     QString str = QString("%1").arg("", indent);
     for (; it != bindings.end(); ++it)
     {
-        const QString curBinding = it.key() + '=' + (*it).toString() + ',';
+        QString val = (*it).toString();
+        if ((*it).isNull())
+        {
+            val = "NULL";
+        }
+        else if (it->type() == QVariant::String)
+        {
+            val = (it->toString().isNull()) ?
+                "NULL" : QString("\"%1\"").arg(val);
+        }
+        const QString curBinding = it.key() + '=' + val + ',';
         if ((curColumn > indent) &&
             ((curBinding.length() + curColumn) > maxColumn))
         {
@@ -162,7 +172,7 @@ QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
     return str;
 }
 
-void MythDB::DBError(const QString &where, const MSqlQuery& query)
+QString MythDB::GetError(const QString &where, const MSqlQuery &query)
 {
     QString str = QString("DB Error (%1):\n").arg(where);
 
@@ -175,7 +185,12 @@ void MythDB::DBError(const QString &where, const MSqlQuery& query)
         str += tmp;
     }
     str += DBErrorMessage(query.lastError());
-    LOG(VB_GENERAL, LOG_ERR, str);
+    return str;
+}
+
+void MythDB::DBError(const QString &where, const MSqlQuery &query)
+{
+    LOG(VB_GENERAL, LOG_ERR, GetError(where, query));
 }
 
 QString MythDB::DBErrorMessage(const QSqlError& err)
