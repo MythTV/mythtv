@@ -89,8 +89,7 @@ class DeviceReadBuffer : protected QThread
 
     // Data for managing the device ringbuffer
     mutable QMutex   lock;
-    bool             dorun;
-    bool             running;
+    volatile bool    dorun;
     bool             eof;
     mutable bool     error;
     bool             request_pause;
