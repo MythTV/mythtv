@@ -3812,7 +3812,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
     if (!IsLocal())
     {
         if (!gCoreContext->IsBackend())
-            return QString();
+            return "";
 
         QString path = GetPlaybackURL(false, true);
         if (path.left(1) == "/")
@@ -3821,7 +3821,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
             return testFile.path();
         }
 
-        return QString();
+        return "";
     }
 
     QFileInfo testFile(pathname);
@@ -3853,7 +3853,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
         }
     }
 
-    return QString();
+    return "";
 }
 
 #include <cassert>
