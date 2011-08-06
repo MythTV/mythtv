@@ -15,6 +15,7 @@
 #include "compat.h"
 #include "mythdbcon.h"
 #include "mythdb.h"
+#include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
@@ -269,11 +270,21 @@ MDBManager::~MDBManager()
 
 MSqlDatabase *MDBManager::popConnection()
 {
-    PurgeIdleConnections();
+    PurgeIdleConnections(true);
 
     m_lock.lock();
 
     MSqlDatabase *db;
+
+#if REUSE_CONNECTION
+    db = m_inuse[QThread::currentThread()];
+    if (db != NULL)
+    {
+        m_inuse_count[QThread::currentThread()]++;
+        m_lock.unlock();
+        return db;
+    }
+#endif
 
     DBList &list = m_pool[QThread::currentThread()];
     if (list.isEmpty())
@@ -289,6 +300,11 @@ MSqlDatabase *MDBManager::popConnection()
         list.pop_back();
     }
 
+#if REUSE_CONNECTION
+    m_inuse_count[QThread::currentThread()]=1;
+    m_inuse[QThread::currentThread()] = db;
+#endif
+
     m_lock.unlock();
 
     db->OpenDatabase();
@@ -300,6 +316,19 @@ void MDBManager::pushConnection(MSqlDatabase *db)
 {
     m_lock.lock();
 
+#if REUSE_CONNECTION
+    if (db == m_inuse[QThread::currentThread()])
+    {
+        int cnt = --m_inuse_count[QThread::currentThread()];
+        if (cnt > 0)
+        {
+            m_lock.unlock();
+            return;
+        }
+        m_inuse[QThread::currentThread()] = NULL;
+    }
+#endif
+
     if (db)
     {
         db->m_lastDBKick = QDateTime::currentDateTime();
@@ -308,12 +337,14 @@ void MDBManager::pushConnection(MSqlDatabase *db)
 
     m_lock.unlock();
 
-    PurgeIdleConnections();
+    PurgeIdleConnections(true);
 }
 
-void MDBManager::PurgeIdleConnections(void)
+void MDBManager::PurgeIdleConnections(bool leaveOne)
 {
     QMutexLocker locker(&m_lock);
+
+    leaveOne = leaveOne || (gCoreContext && gCoreContext->IsUIThread());
 
     QDateTime now = QDateTime::currentDateTime();
     DBList &list = m_pool[QThread::currentThread()];
@@ -347,7 +378,7 @@ void MDBManager::PurgeIdleConnections(void)
         // threads didn't exit".  This workaround simply creates an
         // extra DB connection before all pooled connections are
         // purged so that my_thread_global_end() won't be called.
-        if (it == list.end() &&
+        if (leaveOne && it == list.end() &&
             purgedConnections > 0 &&
             totalConnections == purgedConnections)
         {

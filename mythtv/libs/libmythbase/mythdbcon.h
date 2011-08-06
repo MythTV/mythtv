@@ -14,7 +14,7 @@
 #include "mythbaseexp.h"
 #include "mythdbparams.h"
 
-class QSemaphore;
+#define REUSE_CONNECTION 1
 
 MBASE_PUBLIC bool TestDatabase(QString dbHostName,
                                QString dbUserName,
@@ -57,7 +57,7 @@ class MBASE_PUBLIC MDBManager
     ~MDBManager(void);
 
     void CloseDatabases(void);
-    void PurgeIdleConnections(void);
+    void PurgeIdleConnections(bool leaveOne = false);
 
   protected:
     MSqlDatabase *popConnection(void);
@@ -75,6 +75,10 @@ class MBASE_PUBLIC MDBManager
     QMutex m_lock;
     typedef QList<MSqlDatabase*> DBList;
     QHash<QThread*, DBList> m_pool; // protected by m_lock
+#if REUSE_CONNECTION 
+    QHash<QThread*, MSqlDatabase*> m_inuse; // protected by m_lock
+    QHash<QThread*, int> m_inuse_count; // protected by m_lock
+#endif
 
     int m_nextConnID;
     int m_connCount;

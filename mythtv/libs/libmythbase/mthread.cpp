@@ -24,6 +24,7 @@ using namespace std;
 
 // Qt headers
 #include <QStringList>
+#include <QTimerEvent>
 #include <QRunnable>
 #include <QSet>
 
@@ -53,6 +54,21 @@ bool is_current_thread(MThread &thread)
     return QThread::currentThread() == thread.qthread();
 }
 
+class DBPurgeHandler : public QObject
+{
+  public:
+    DBPurgeHandler()
+    {
+        purgeTimer = startTimer(5 * 60000);
+    }
+    void timerEvent(QTimerEvent *event)
+    {
+        if (event->timerId() == purgeTimer)
+            GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
+    }
+    int purgeTimer;
+};
+
 class MThreadInternal : public QThread
 {
   public:
@@ -60,7 +76,11 @@ class MThreadInternal : public QThread
     virtual void run(void) { m_parent.run(); }
 
     void QThreadRun(void) { QThread::run(); }
-    int QThreadExec(void) { return QThread::exec(); }
+    int exec(void)
+    {
+        DBPurgeHandler ph();
+        return QThread::exec();
+    }
 
     static void SetTerminationEnabled(bool enabled = true)
     { QThread::setTerminationEnabled(enabled); }
@@ -289,7 +309,7 @@ void MThread::run(void)
 
 int MThread::exec(void)
 {
-    return m_thread->QThreadExec();
+    return m_thread->exec();
 }
 
 void MThread::setTerminationEnabled(bool enabled)
