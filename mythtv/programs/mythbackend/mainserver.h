@@ -28,7 +28,6 @@ using namespace std;
 #undef DeleteFile
 #endif
 
-class ProcessRequestThread;
 class QUrl;
 class MythServer;
 class QTimer;
@@ -105,7 +104,6 @@ class MainServer : public QObject, public MythSocketCBs
     void ShutSlaveBackendsDown(QString &haltcmd);
 
     void ProcessRequest(MythSocket *sock);
-    void MarkUnused(ProcessRequestThread *prt);
 
     void readyRead(MythSocket *socket);
     void connectionClosed(MythSocket *socket);
@@ -271,10 +269,7 @@ class MainServer : public QObject, public MythSocketCBs
     bool ismaster;
 
     QMutex deletelock;
-    QMutex threadPoolLock;
-    QWaitCondition threadPoolCond;
-    MythDeque<ProcessRequestThread *> threadPool;
-    MythDeque<ProcessRequestThread *> threadPoolAll;
+    MThreadPool threadPool;
 
     bool masterBackendOverride;
 
