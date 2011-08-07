@@ -533,7 +533,7 @@ void GameUI::customEvent(QEvent *event)
             node->SetData(qVariantFromValue(romInfo));
             node->setString(romInfo->Gamename());
 
-            romInfo->UpdateDatabase();
+            romInfo->SaveToDatabase();
             updateChangedNode(node, romInfo);
         }
         else if (resultid == "detailsPopup")
@@ -977,7 +977,7 @@ void GameUI::OnGameSearchDone(MetadataLookup *lookup)
 
     StartGameImageSet(node, coverart, fanart, screenshot);
 
-    metadata->UpdateDatabase();
+    metadata->SaveToDatabase();
     updateChangedNode(node, metadata);
 }
 
@@ -1065,6 +1065,6 @@ void GameUI::handleDownloadedImages(MetadataLookup *lookup)
             metadata->setScreenshot(filename);
     }
 
-    metadata->UpdateDatabase();
+    metadata->SaveToDatabase();
     updateChangedNode(node, metadata);
 }
