@@ -31,7 +31,7 @@ class MBASE_PUBLIC MThreadPool
     bool tryStart(QRunnable *runnable, QString debugName);
 
     void startReserved(QRunnable *runnable, QString debugName,
-                       int priority = 0);
+                       int waitForAvailMS = 0);
 
     int expiryTimeout(void) const;
     void setExpiryTimeout(int expiryTimeout);

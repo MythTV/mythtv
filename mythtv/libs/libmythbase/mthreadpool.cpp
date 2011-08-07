@@ -310,9 +310,22 @@ void MThreadPool::start(QRunnable *runnable, QString debugName, int priority)
 }
 
 void MThreadPool::startReserved(
-    QRunnable *runnable, QString debugName, int priority)
+    QRunnable *runnable, QString debugName, int waitForAvailMS)
 {
     QMutexLocker locker(&m_priv->m_lock);
+    if (waitForAvailMS > 0 && m_priv->m_avail_threads.empty() &&
+        m_priv->m_running_threads.size() >= m_priv->m_max_thread_count)
+    {
+        MythTimer t;
+        t.start();
+        int left = waitForAvailMS - t.elapsed();
+        while (left > 0 && m_priv->m_avail_threads.empty() &&
+               m_priv->m_running_threads.size() >= m_priv->m_max_thread_count)
+        {
+            m_priv->m_wait.wait(locker.mutex(), left);
+            left = waitForAvailMS - t.elapsed();
+        }
+    }
     TryStartInternal(runnable, debugName, true);
 }
 
