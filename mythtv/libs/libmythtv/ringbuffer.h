@@ -47,7 +47,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
                               bool usereadahead = true,
                               int timeout_ms = kDefaultOpenTimeout,
                               bool stream_only = false);
-    ~RingBuffer();
+    virtual ~RingBuffer();
 
     // Sets
     void SetWriteBufferSize(int newSize);
