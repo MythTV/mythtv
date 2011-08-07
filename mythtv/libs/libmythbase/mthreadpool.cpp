@@ -24,6 +24,7 @@
 using namespace std;
 
 // Qt headers
+#include <QCoreApplication>
 #include <QWaitCondition>
 #include <QMutexLocker>
 #include <QRunnable>
@@ -38,6 +39,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythtimer.h"
 #include "mthread.h"
+#include "mythdb.h"
 
 typedef QPair<QRunnable*,QString> MPoolEntry;
 typedef QList<MPoolEntry> MPoolQueue;
@@ -90,6 +92,10 @@ class MPoolThread : public MThread
 
             threadDeregister();
             threadRegister(objectName());
+
+            GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
+            QCoreApplication::processEvents();
+
             t.start();
 
             if (m_do_run)
