@@ -504,10 +504,10 @@ using_backend {
     using_firewire {
         HEADERS += firewirechannel.h           firewirerecorder.h
         HEADERS += firewiresignalmonitor.h     firewiredevice.h
-        HEADERS += avcinfo.h
+        HEADERS += avcinfo.h                   psipgenerator.h
         SOURCES += firewirechannel.cpp         firewirerecorder.cpp
         SOURCES += firewiresignalmonitor.cpp   firewiredevice.cpp
-        SOURCES += avcinfo.cpp
+        SOURCES += avcinfo.cpp                 psipgenerator.cpp
 
         macx {
             HEADERS += darwinfirewiredevice.h   darwinavcinfo.h
