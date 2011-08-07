@@ -131,7 +131,7 @@ void RecordingSelector::Init(void)
     else
     {
         delete busyPopup;
-        busyPopup = false;
+        busyPopup = NULL;
     }
 
     GetRecordingListThread *thread = new GetRecordingListThread(this);
