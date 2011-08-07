@@ -678,7 +678,7 @@ QStringList SSDPExtension::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool SSDPExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequest )
+bool SSDPExtension::ProcessRequest( HTTPRequest *pRequest )
 {
     if (pRequest)
     {

@@ -26,11 +26,8 @@ class MythFrontendStatus : public HttpServerExtension
 
     virtual QStringList GetBasePaths() { return QStringList( "/" ); }
 
-    virtual bool ProcessRequest(HttpWorkerThread *pThread,
-                                HTTPRequest *pRequest)
+    virtual bool ProcessRequest(HTTPRequest *pRequest)
     {
-        (void)pThread;
-
         if (!pRequest)
             return false;
 
@@ -253,7 +250,7 @@ MediaRenderer::MediaRenderer()
         LOG(VB_UPNP, LOG_INFO,
             "MediaRenderer::Registering MythFrontendStatus service.");
         m_pHttpServer->RegisterExtension(
-            new MythFrontendStatus(m_pHttpServer->m_sSharePath));
+            new MythFrontendStatus(m_pHttpServer->GetSharePath()));
 
         QString sSinkProtocols = "http-get:*:image/gif:*,"
                                  "http-get:*:image/jpeg:*,"
@@ -268,8 +265,8 @@ MediaRenderer::MediaRenderer()
         // Register the MythFEXML protocol...
         // ------------------------------------------------------------------
         LOG(VB_UPNP, LOG_INFO, "MediaRenderer::Registering MythFEXML Service.");
-        m_pHttpServer->RegisterExtension( new MythFEXML( RootDevice(),
-                                          m_pHttpServer->m_sSharePath));
+        m_pHttpServer->RegisterExtension(
+            new MythFEXML(RootDevice(), m_pHttpServer->GetSharePath()));
 
 #if 0
         LOG(VB_UPNP, LOG_INFO,
@@ -280,8 +277,8 @@ MediaRenderer::MediaRenderer()
 
         LOG(VB_UPNP, LOG_INFO, "MediaRenderer::Registering CMGR Service.");
         // HttpServer will be responsible for deleting UPnpCMGR
-        m_pUPnpCMGR = new UPnpCMGR(RootDevice(), m_pHttpServer->m_sSharePath,
-                                   "", sSinkProtocols );
+        m_pUPnpCMGR = new UPnpCMGR(
+            RootDevice(), m_pHttpServer->GetSharePath(), "", sSinkProtocols);
         m_pHttpServer->RegisterExtension( m_pUPnpCMGR );
 
 #if 0
@@ -297,8 +294,8 @@ MediaRenderer::MediaRenderer()
             LOG(VB_UPNP, LOG_INFO,
                 "MediaRenderer: Registering subscription service.");
 
-            subscription = new UPNPSubscription(m_pHttpServer->m_sSharePath,
-                                                nPort);
+            subscription = new UPNPSubscription(
+                m_pHttpServer->GetSharePath(), nPort);
             m_pHttpServer->RegisterExtension(subscription);
         }
 

@@ -56,8 +56,7 @@ QStringList InternetContent::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool InternetContent::ProcessRequest( HttpWorkerThread *pThread,
-                                      HTTPRequest *pRequest )
+bool InternetContent::ProcessRequest( HTTPRequest *pRequest )
 {
     try
     {

@@ -85,7 +85,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                               "USN: %5\r\n"
                               "CACHE-CONTROL: max-age=%6\r\n"
                               "Content-Length: 0\r\n\r\n" )
-                            .arg( HttpServer::g_sPlatform )
+                            .arg( HttpServer::GetPlatform() )
                             .arg( MYTH_BINARY_VERSION )
                             .arg( GetNTSString()    )
                             .arg( sNT          )

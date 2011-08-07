@@ -165,11 +165,11 @@ QStringList UPnpCDS::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool UPnpCDS::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
+bool UPnpCDS::ProcessRequest( HTTPRequest *pRequest )
 {
     if (pRequest)
     {
-        if (Eventing::ProcessRequest( pThread, pRequest ))
+        if (Eventing::ProcessRequest( pRequest ))
             return true;
 
         if ( pRequest->m_sBaseUrl != m_sControlUrl )

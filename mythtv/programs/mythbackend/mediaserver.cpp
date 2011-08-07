@@ -67,7 +67,6 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
     if (!m_pHttpServer)
     {
         m_pHttpServer = new HttpServer();
-        m_pHttpServer->m_sSharePath = m_sSharePath;
         m_pHttpServer->RegisterExtension(new HttpConfig());
     }
 

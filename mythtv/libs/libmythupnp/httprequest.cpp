@@ -180,9 +180,9 @@ QString HTTPRequest::BuildHeader( long long nSize )
     sHeader = QString( "HTTP/%1.%2 %3\r\n"
                        "Date: %4\r\n"
                        "Server: %5, UPnP/1.0, MythTV %6\r\n" )
-             .arg(m_nMajor) .arg(m_nMinor) .arg(GetResponseStatus())
-             .arg(QDateTime::currentDateTime().toString("d MMM yyyy hh:mm:ss"))
-             .arg(HttpServer::g_sPlatform) .arg(MYTH_BINARY_VERSION);
+        .arg(m_nMajor).arg(m_nMinor).arg(GetResponseStatus())
+        .arg(QDateTime::currentDateTime().toString("d MMM yyyy hh:mm:ss"))
+        .arg(HttpServer::GetPlatform()).arg(MYTH_BINARY_VERSION);
 
     sHeader += GetAdditionalHeaders();
 

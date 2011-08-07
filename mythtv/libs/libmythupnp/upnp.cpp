@@ -132,7 +132,7 @@ bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *p
     // ----------------------------------------------------------------------
 
     m_pHttpServer->RegisterExtension(
-            new SSDPExtension( m_nServicePort, m_pHttpServer->m_sSharePath));
+        new SSDPExtension(m_nServicePort, m_pHttpServer->GetSharePath()));
 
     LOG(VB_UPNP, LOG_DEBUG, "UPnp::Initialize - End");
 
