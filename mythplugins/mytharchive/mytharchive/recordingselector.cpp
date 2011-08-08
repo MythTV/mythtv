@@ -141,7 +141,7 @@ void RecordingSelector::Init(void)
         usleep(2000);
     }
 
-    if (!m_recordingList || m_recordingList->size() == 0)
+    if (!m_recordingList || m_recordingList->empty())
     {
         ShowOkPopup(tr("Either you don't have any recordings or "
                        "no recordings are available locally!"));
@@ -391,7 +391,7 @@ void RecordingSelector::cancelPressed()
 
 void RecordingSelector::updateRecordingList(void)
 {
-    if (!m_recordingList || m_recordingList->size() == 0)
+    if (!m_recordingList || m_recordingList->empty())
         return;
 
     m_recordingButtonList->Reset();
@@ -437,7 +437,7 @@ void RecordingSelector::getRecordingList(void)
     m_recordingList = RemoteGetRecordedList(-1);
     m_categories.clear();
 
-    if (m_recordingList && m_recordingList->size() > 0)
+    if (m_recordingList && !m_recordingList->empty())
     {
         vector<ProgramInfo *>::iterator i = m_recordingList->begin();
         for ( ; i != m_recordingList->end(); i++)
