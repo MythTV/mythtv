@@ -508,7 +508,13 @@ MetaIO* avfDecoder::doCreateTagger(void)
     else if (extension == "ogg" || extension == "oga")
         return new MetaIOOggVorbis();
     else if (extension == "flac")
-        return new MetaIOFLACVorbis();
+    {
+        MetaIOID3 *file = new MetaIOID3();
+        if (file->TagExists(filename))
+            return file;
+        else
+            return new MetaIOFLACVorbis();  
+    }
     else if (extension == "m4a")
         return new MetaIOMP4();
     else if (extension == "wv")

@@ -134,13 +134,7 @@ Metadata* MetaIOOggVorbis::read(QString filename)
     metadata->setCompilation(compilation);
 
     if (metadata->Length() <= 0)
-    {
-        TagLib::FileRef *fileref = new TagLib::FileRef(oggfile);
-        metadata->setLength(getTrackLength(fileref));
-        // FileRef takes ownership of oggfile, and is responsible for it's
-        // deletion. Messy.
-        delete fileref;
-    }
+        metadata->setLength(getTrackLength(oggfile));
     else
         delete oggfile;
     

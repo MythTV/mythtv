@@ -27,6 +27,8 @@ public:
     bool write(Metadata* mdata);
     Metadata* read(QString filename);
 
+    virtual bool TagExists(const QString &filename);
+    
 private:
     TagLib::FLAC::File *OpenFile(const QString &filename);
 };

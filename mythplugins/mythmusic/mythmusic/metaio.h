@@ -101,6 +101,12 @@ class MetaIO
 
     void readFromFilename(Metadata *metadata);
 
+    virtual bool TagExists(const QString &filename)
+    { 
+        (void)filename;
+        return false;
+    }
+    
   protected:
 
   private:

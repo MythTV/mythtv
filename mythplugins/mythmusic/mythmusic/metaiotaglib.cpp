@@ -13,6 +13,7 @@
 #include <audioproperties.h>
 #include <tag.h>
 #include <tstring.h>
+#include <fileref.h>
 
 /* Redefine the TString conversion macros */
 #undef QStringToTString
@@ -98,7 +99,7 @@ void MetaIOTagLib::ReadGenericMetadata(Tag *tag, Metadata *metadata)
 * \param file Pointer to file object
 * \returns An integer (signed!) to represent the length in milliseconds.
 */
-int MetaIOTagLib::getTrackLength(TagLib::FileRef *file)
+int MetaIOTagLib::getTrackLength(TagLib::File *file)
 {
     int milliseconds = 0;
 
@@ -119,8 +120,9 @@ int MetaIOTagLib::getTrackLength(QString filename)
     int milliseconds = 0;
     QByteArray fname = filename.toLocal8Bit();
     TagLib::FileRef *file = new TagLib::FileRef(fname.constData());
-    
-    milliseconds = getTrackLength(file);
+
+    if (file && file->audioProperties())
+        milliseconds = file->audioProperties()->length() * 1000;
 
     // If we didn't get a valid length, add the metadata but show warning.
     if (milliseconds <= 1000)

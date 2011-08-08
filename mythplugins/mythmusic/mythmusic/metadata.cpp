@@ -917,7 +917,12 @@ MetaIO* Metadata::getTagger(void)
     else if (extension == "ogg" || extension == "oga")
         return &metaIOOggVorbis;
     else if (extension == "flac")
-        return &metaIOFLACVorbis;
+    {
+        if (metaIOID3.TagExists(m_filename))
+            return &metaIOID3;
+        else
+            return &metaIOFLACVorbis;
+    }
     else if (extension == "m4a")
         return &metaIOMP4;
     else if (extension == "wv")
