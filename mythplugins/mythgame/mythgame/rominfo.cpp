@@ -27,6 +27,9 @@ void RomInfo::SaveToDatabase()
 
     if (inserting)
     {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Adding %1 - %2").arg(Rompath())
+            .arg(Romname()));
+
         query.prepare("INSERT INTO gamemetadata "
                       "(system, romname, gamename, genre, year, gametype, "
                       "rompath, country, crc_value, diskcount, display, plot, "
@@ -88,6 +91,25 @@ void RomInfo::SaveToDatabase()
         MythDB::DBError("RomInfo::SaveToDatabase", query);
         return;
     }
+}
+
+void RomInfo::DeleteFromDatabase()
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Removing %1 - %2").arg(Rompath())
+            .arg(Romname()));
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM gamemetadata WHERE "
+                  "romname = :ROMNAME AND "
+                  "rompath = :ROMPATH ");
+
+    query.bindValue(":ROMNAME",Romname());
+    query.bindValue(":ROMPATH",Rompath());
+
+    if (!query.exec())
+        MythDB::DBError("purgeGameDB", query);
+
 }
 
 // Return the count of how many times this appears in the db already
@@ -340,6 +362,54 @@ QList<RomInfo*> RomInfo::GetAllRomInfo()
                            query.value(12).toString(),
                            query.value(17).toString());
         ret.append(add);
+    }
+
+    return ret;
+}
+
+RomInfo *RomInfo::GetRomInfoById(int id)
+{
+    RomInfo *ret = new RomInfo();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = "SELECT intid,system,romname,gamename,genre,year,publisher,"
+                       "favorite,rompath,screenshot,fanart,plot,boxart,"
+                       "gametype,diskcount,country,crc_value,inetref,display,"
+                       "version FROM gamemetadata WHERE intid = :INTID";
+
+    query.prepare(querystr);
+    query.bindValue(":INTID", id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetRomInfoById", query);
+        return ret;
+    }
+
+    if (query.next())
+    {
+        ret = new RomInfo(
+                           query.value(0).toInt(),
+                           query.value(2).toString(),
+                           query.value(1).toString(),
+                           query.value(3).toString(),
+                           query.value(4).toString(),
+                           query.value(5).toString(),
+                           query.value(7).toBool(),
+                           query.value(8).toString(),
+                           query.value(15).toString(),
+                           query.value(16).toString(),
+                           query.value(14).toInt(),
+                           query.value(13).toString(),
+                           0, QString(),
+                           query.value(11).toString(),
+                           query.value(6).toString(),
+                           query.value(19).toString(),
+                           query.value(9).toString(),
+                           query.value(10).toString(),
+                           query.value(12).toString(),
+                           query.value(17).toString());
     }
 
     return ret;
