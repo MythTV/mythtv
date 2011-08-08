@@ -37,6 +37,7 @@ using namespace std;
 #include <QTcpServer>
 #include <QTimer>
 #include <QNetworkInterface>
+#include <QNetworkProxy>
 
 #include "previewgeneratorqueue.h"
 #include "exitcodes.h"
@@ -206,6 +207,7 @@ MainServer::MainServer(bool master, int port,
         gCoreContext->GetNumSetting("MasterBackendOverride", 0);
 
     mythserver = new MythServer();
+    mythserver->setProxy(QNetworkProxy::NoProxy);
     if (!mythserver->listen(gCoreContext->MythHostAddressAny(), port))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1. Exiting.")

@@ -10,6 +10,7 @@ using namespace std;
 #include <QThread>
 #include <QEvent>
 #include <QCoreApplication>
+#include <QNetworkProxy>
 
 // MythTV
 #include "mythsocketmanager.h"
@@ -144,6 +145,7 @@ bool MythSocketManager::Listen(int port)
     }
 
     m_server = new MythServer();
+    m_server->setProxy(QNetworkProxy::NoProxy);
     if (!m_server->listen(gCoreContext->MythHostAddressAny(), port))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1.").arg(port));

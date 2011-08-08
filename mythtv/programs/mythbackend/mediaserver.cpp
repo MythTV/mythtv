@@ -18,6 +18,7 @@
 #include "upnpcdsvideo.h"
 
 #include <QScriptEngine>
+#include <QNetworkProxy>
 
 #include "serviceHosts/mythServiceHost.h"
 #include "serviceHosts/guideServiceHost.h"
@@ -72,6 +73,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
 
     if (!m_pHttpServer->isListening())
     {
+        m_pHttpServer->setProxy(QNetworkProxy::NoProxy);
         if (!m_pHttpServer->listen(gCoreContext->MythHostAddressAny(), nPort))
         {
             LOG(VB_GENERAL, LOG_ERR, "MediaServer::HttpServer Create Error");
