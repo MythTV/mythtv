@@ -489,7 +489,7 @@ bool JobQueue::QueueRecordingJobs(const RecordingInfo &recinfo, int jobTypes)
 
     if (jobTypes != JOB_NONE)
     {
-        QString jobHost;
+        QString jobHost = QString("");
 
         if (gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0))
             jobHost = recinfo.GetHostname();
