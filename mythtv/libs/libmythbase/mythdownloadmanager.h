@@ -15,6 +15,8 @@
 class MythDownloadInfo;
 class RemoteFileDownloadThread;
 
+void ShutdownMythDownloadManager(void);
+
 class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 {
     Q_OBJECT

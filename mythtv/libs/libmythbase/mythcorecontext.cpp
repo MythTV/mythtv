@@ -21,6 +21,7 @@ using namespace std;
 
 #include "compat.h"
 #include "mythconfig.h"       // for CONFIG_DARWIN
+#include "mythdownloadmanager.h"
 #include "mythsocketthread.h"
 #include "mythcorecontext.h"
 #include "mythsocket.h"
@@ -117,6 +118,8 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
     MThreadPool::ShutdownAllPools();
 
     ShutdownMythSystem();
+
+    ShutdownMythDownloadManager();
 
     logStop(); // need to shutdown db logger before we kill db
 

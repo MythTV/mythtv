@@ -119,7 +119,7 @@ class RemoteFileDownloadThread : public QRunnable
 /** \fn ShutdownMythDownloadManager(void)
  *  \brief Deletes the running MythDownloadManager at program exit.
  */
-static void ShutdownMythDownloadManager(void)
+void ShutdownMythDownloadManager(void)
 {
     if (downloadManager)
     {
