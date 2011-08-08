@@ -177,5 +177,7 @@ QString Jitterometer::GetCPUStat(void)
         ptr += 9;
     }
     return res;
+#else
+    return "N/A";
 #endif
 }
