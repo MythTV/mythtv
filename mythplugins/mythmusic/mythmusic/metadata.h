@@ -47,7 +47,6 @@ class AlbumArtImage
      QString   description;
      bool      embedded;
 };
-typedef QList<AlbumArtImage*> AlbumArtList;
 
 typedef QList<AlbumArtImage*> AlbumArtList;
 
