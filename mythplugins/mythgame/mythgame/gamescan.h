@@ -6,8 +6,9 @@
 
 #include <QObject> // for moc
 #include <QStringList>
-#include <QThread>
 #include <QMap>
+
+#include "mthread.h"
 
 class QStringList;
 
@@ -27,15 +28,13 @@ struct RomFileInfo
 
 typedef QList< RomFileInfo > RomFileInfoList;
 
-class GameScannerThread : public QThread
+class GameScannerThread : public MThread
 {
-    Q_OBJECT
-
   public:
     GameScannerThread(QObject *parent);
     ~GameScannerThread();
 
-    void run();
+    virtual void run(void); // MThread
 
     void SetHandlers(QList<GameHandler*> handlers) { m_handlers = handlers; };
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };

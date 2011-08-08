@@ -19,19 +19,19 @@
 class MythUIProgressDialog;
 
 GameScannerThread::GameScannerThread(QObject *parent) :
-        m_DBDataChanged(false)
+    MThread("GameScanner"), m_parent(parent),
+    m_HasGUI(gCoreContext->HasGUI()),
+    m_dialog(NULL), m_DBDataChanged(false)
 {
-    m_parent = parent;
-    m_HasGUI = gCoreContext->HasGUI();
 }
 
 GameScannerThread::~GameScannerThread()
 {
 }
 
-void GameScannerThread::run()
+void GameScannerThread::run(void)
 {
-    threadRegister("GameScanner");
+    RunProlog();
 
     LOG(VB_GENERAL, LOG_INFO, QString("Beginning Game Scan."));
 
@@ -43,7 +43,7 @@ void GameScannerThread::run()
     verifyFiles();
     updateDB();
 
-    threadDeregister();
+    RunEpilog();
 }
 
 
@@ -64,7 +64,7 @@ void GameScannerThread::verifyFiles()
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_dbgames.count(),
-                          tr("Verifying game files"));
+                          GameScanner::tr("Verifying game files"));
 
     // For every file we know about, check to see if it still exists.
     for (QList<RomInfo*>::iterator p = m_dbgames.begin();
@@ -107,7 +107,7 @@ void GameScannerThread::updateDB()
     uint counter = 0;
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)(m_files.size() + m_remove.size()),
-                          tr("Updating game database"));
+                          GameScanner::tr("Updating game database"));
 
     for (QList<RomFileInfo>::iterator p = m_files.begin();
                                  p != m_files.end(); ++p)
@@ -142,7 +142,7 @@ bool GameScannerThread::buildFileList()
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_handlers.size(),
-                          tr("Searching for games..."));
+                          GameScanner::tr("Searching for games..."));
 
     for (QList<GameHandler*>::const_iterator iter = m_handlers.begin();
          iter != m_handlers.end(); ++iter)
@@ -217,9 +217,9 @@ void GameScanner::doScan(QList<GameHandler*> handlers)
         if (progressDlg->Create())
         {
             popupStack->AddScreen(progressDlg, false);
-            connect(m_scanThread, SIGNAL(finished()),
+            connect(m_scanThread->qthread(), SIGNAL(finished()),
                     progressDlg, SLOT(Close()));
-            connect(m_scanThread, SIGNAL(finished()),
+            connect(m_scanThread->qthread(), SIGNAL(finished()),
                     SLOT(finishedScan()));
         }
         else
