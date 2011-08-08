@@ -37,7 +37,7 @@ MetaIOTagLib::~MetaIOTagLib(void)
 * \param tag A pointer to the tag
 * \param metadata Pointer to the metadata
 */
-void MetaIOTagLib::WriteGenericMetadata(Tag *tag, Metadata *metadata)
+void MetaIOTagLib::WriteGenericMetadata(Tag *tag,  const Metadata *metadata)
 {
     if (!tag || !metadata)
         return;
@@ -115,7 +115,7 @@ int MetaIOTagLib::getTrackLength(TagLib::File *file)
 * \param filename The filename for which we want to find the length.
 * \returns An integer (signed!) to represent the length in milliseconds.
 */
-int MetaIOTagLib::getTrackLength(QString filename)
+int MetaIOTagLib::getTrackLength(const QString &filename)
 {
     int milliseconds = 0;
     QByteArray fname = filename.toLocal8Bit();

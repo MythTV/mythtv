@@ -724,11 +724,6 @@ void Metadata::incRating()
     m_changed = true;
 }
 
-QDateTime Metadata::LastPlay()
-{
-    return m_lastplay;
-}
-
 void Metadata::setLastPlay()
 {
     m_lastplay = QDateTime::currentDateTime();

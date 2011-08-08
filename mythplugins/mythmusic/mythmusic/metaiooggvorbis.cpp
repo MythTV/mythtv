@@ -40,7 +40,7 @@ TagLib::Ogg::Vorbis::File *MetaIOOggVorbis::OpenFile(const QString &filename)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOOggVorbis::write(Metadata* mdata)
+bool MetaIOOggVorbis::write(const Metadata* mdata)
 {
     if (!mdata)
         return false;
@@ -91,7 +91,7 @@ bool MetaIOOggVorbis::write(Metadata* mdata)
 /*!
 * \copydoc MetaIO::read()
 */
-Metadata* MetaIOOggVorbis::read(QString filename)
+Metadata* MetaIOOggVorbis::read(const QString &filename)
 {
     TagLib::Ogg::Vorbis::File *oggfile = OpenFile(filename);
     

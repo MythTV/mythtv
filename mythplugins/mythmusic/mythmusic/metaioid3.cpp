@@ -153,7 +153,7 @@ TagLib::ID3v1::Tag* MetaIOID3::GetID3v1Tag(bool create)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOID3::write(Metadata* mdata)
+bool MetaIOID3::write(const Metadata* mdata)
 {
     if (!OpenFile(mdata->Filename()), true)
         return false;
@@ -228,7 +228,7 @@ bool MetaIOID3::write(Metadata* mdata)
 /*!
  * \copydoc MetaIO::read()
  */
-Metadata *MetaIOID3::read(QString filename)
+Metadata *MetaIOID3::read(const QString &filename)
 {
     if (!OpenFile(filename))
         return NULL;
@@ -328,7 +328,7 @@ Metadata *MetaIOID3::read(QString filename)
  * \param type The type of image we want - front/back etc
  * \returns A pointer to a QImage owned by the caller or NULL if not found.
  */
-QImage* MetaIOID3::getAlbumArt(QString filename, ImageType type)
+QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
 {
     QImage *picture = new QImage();
 

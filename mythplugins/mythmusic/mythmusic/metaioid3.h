@@ -36,15 +36,15 @@ class MetaIOID3 : public MetaIOTagLib
     MetaIOID3(void);
     virtual ~MetaIOID3(void);
 
-    virtual bool write(Metadata* mdata);
+    virtual bool write(const Metadata* mdata);
     bool writeVolatileMetadata(const Metadata* mdata);
 
     bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
     bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
 
-    Metadata* read(QString filename);
+    Metadata* read(const QString &filename);
     AlbumArtList getAlbumArtList(const QString &filename);
-    QImage *getAlbumArt(QString filename, ImageType type);
+    QImage *getAlbumArt(const QString &filename, ImageType type);
 
     bool supportsEmbeddedImages(void) { return true; }
 

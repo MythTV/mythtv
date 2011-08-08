@@ -42,7 +42,7 @@ TagLib::FLAC::File *MetaIOFLACVorbis::OpenFile(const QString &filename)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOFLACVorbis::write(Metadata* mdata)
+bool MetaIOFLACVorbis::write(const Metadata* mdata)
 {
     if (!mdata)
         return false;
@@ -93,7 +93,7 @@ bool MetaIOFLACVorbis::write(Metadata* mdata)
 /*!
  * \copydoc MetaIO::read()
  */
-Metadata* MetaIOFLACVorbis::read(QString filename)
+Metadata* MetaIOFLACVorbis::read(const QString &filename)
 {
     TagLib::FLAC::File *flacfile = OpenFile(filename);
     

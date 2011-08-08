@@ -27,10 +27,11 @@ MetaIO::~MetaIO()
  * \param filename The filename to try and determine metadata for.
  * \returns Metadata Pointer, or NULL on error.
  */
-void MetaIO::readFromFilename(QString filename,
+void MetaIO::readFromFilename(const QString &filename,
                               QString &artist, QString &album, QString &title,
                               QString &genre, int &tracknum)
 {
+    QString lfilename = filename;
     // Clear
     artist.clear();
     album.clear();
@@ -40,8 +41,8 @@ void MetaIO::readFromFilename(QString filename,
     
     int part_num = 0;
     // Replace 
-    filename.replace('_', ' ');
-    filename.section('.', 0, -2);
+    lfilename.replace('_', ' ');
+    lfilename.section('.', 0, -2);
     QStringList fmt_list = mFilenameFormat.split("/");
     QStringList::iterator fmt_it = fmt_list.begin();
 
@@ -52,7 +53,7 @@ void MetaIO::readFromFilename(QString filename,
     fmt_it = fmt_list.begin();
     for(; fmt_it != fmt_list.end(); fmt_it++, part_num++)
     {
-        QString part_str = filename.section( "/", part_num, part_num);
+        QString part_str = lfilename.section( "/", part_num, part_num);
 
         if ( *fmt_it == "GENRE" )
             genre = part_str;
@@ -100,7 +101,7 @@ void MetaIO::readFromFilename(QString filename,
  * \param filename The filename to try and determine metadata for.
  * \returns Metadata Pointer, or NULL on error.
  */
-Metadata* MetaIO::readFromFilename(QString filename, bool blnLength)
+Metadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
 {
     QString artist, album, title, genre;
     int tracknum = 0, length = 0;

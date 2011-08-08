@@ -25,17 +25,17 @@ MetaIOAVFComment::~MetaIOAVFComment(void)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOAVFComment::write(Metadata* mdata)
+bool MetaIOAVFComment::write(const Metadata* mdata)
 {
     // Wont implement....
-    mdata = mdata; // -Wall annoyance
+    (void)mdata; // -Wall annoyance
     return false;
 }
 
 /*!
 * \copydoc MetaIO::read()
 */
-Metadata* MetaIOAVFComment::read(QString filename)
+Metadata* MetaIOAVFComment::read(const QString &filename)
 {
     QString artist, compilation_artist, album, title, genre;
     int year = 0, tracknum = 0, length = 0;
@@ -103,7 +103,7 @@ Metadata* MetaIOAVFComment::read(QString filename)
  * \param filename The filename for which we want to find the length.
  * \returns An integer (signed!) to represent the length in seconds.
  */
-int MetaIOAVFComment::getTrackLength(QString filename)
+int MetaIOAVFComment::getTrackLength(const QString &filename)
 {
     AVFormatContext* p_context = NULL;
     AVFormatParameters* p_params = NULL;
