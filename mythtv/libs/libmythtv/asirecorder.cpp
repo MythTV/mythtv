@@ -61,7 +61,7 @@ void ASIRecorder::SetOption(const QString &name, int value)
         DTVRecorder::SetOption(name, value);
 }
 
-void ASIRecorder::StartRecording(void)
+void ASIRecorder::run(void)
 {
     if (!Open())
     {

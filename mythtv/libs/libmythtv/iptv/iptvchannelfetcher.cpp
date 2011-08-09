@@ -28,17 +28,6 @@ static bool parse_extinf(const QString &data,
                          QString       &channum,
                          QString       &name);
 
-/** \fn IPTVChannelFetcherThread::run(void)
-*   \brief Thunk that allows iptvfetcher Qthread to
-*         call IPTVChannelFetcher::RunScan().
-*/
-void IPTVChannelFetcherThread::run(void)
-{
-    threadRegister("IPTVChannelFetcher");
-    iptvfetcher->RunScan();
-    threadDeregister();
-}
-
 IPTVChannelFetcher::IPTVChannelFetcher(
     uint cardid, const QString &inputname, uint sourceid,
     ScanMonitor *monitor) :
@@ -46,19 +35,17 @@ IPTVChannelFetcher::IPTVChannelFetcher(
     _cardid(cardid),       _inputname(inputname),
     _sourceid(sourceid),
     _chan_cnt(1),          _thread_running(false),
-    _stop_now(false),      _lock()
+    _stop_now(false),      _thread(new MThread("IPTVChannelFetcher", this)),
+    _lock()
 {
     _inputname.detach();
 }
 
 IPTVChannelFetcher::~IPTVChannelFetcher()
 {
-    do
-    {
-        Stop();
-        usleep(5000);
-    }
-    while (_thread_running);
+    Stop();
+    delete _thread;
+    _thread = NULL;
 }
 
 /** \fn IPTVChannelFetcher::Stop(void)
@@ -68,16 +55,17 @@ void IPTVChannelFetcher::Stop(void)
 {
     _lock.lock();
 
-    if (_thread_running)
+    while (_thread_running)
     {
         _stop_now = true;
         _lock.unlock();
-
-        _thread.wait();
-        return;
+        _thread->wait(5);
+        _lock.lock();
     }
 
     _lock.unlock();
+
+    _thread->wait();
 }
 
 /** \fn IPTVChannelFetcher::Scan(void)
@@ -92,8 +80,7 @@ bool IPTVChannelFetcher::Scan(void)
 
     _stop_now = false;
 
-    _thread.iptvfetcher = this;
-    _thread.start(QThread::NormalPriority);
+    _thread->start();
 
     while (!_thread_running && !_stop_now)
         usleep(5000);
@@ -103,7 +90,7 @@ bool IPTVChannelFetcher::Scan(void)
     return _thread_running;
 }
 
-void IPTVChannelFetcher::RunScan(void)
+void IPTVChannelFetcher::run(void)
 {
     _thread_running = true;
 
@@ -113,6 +100,7 @@ void IPTVChannelFetcher::RunScan(void)
     if (_stop_now || url.isEmpty())
     {
         _thread_running = false;
+        _stop_now = true;
         return;
     }
 
@@ -130,6 +118,7 @@ void IPTVChannelFetcher::RunScan(void)
     if (_stop_now || playlist.isEmpty())
     {
         _thread_running = false;
+        _stop_now = true;
         return;
     }
 
@@ -193,6 +182,7 @@ void IPTVChannelFetcher::RunScan(void)
     }
 
     _thread_running = false;
+    _stop_now = true;
 }
 
 void IPTVChannelFetcher::SetNumChannelsParsed(uint val)

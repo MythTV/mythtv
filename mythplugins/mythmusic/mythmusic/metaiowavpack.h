@@ -26,8 +26,8 @@ public:
     MetaIOWavPack(void);
     virtual ~MetaIOWavPack(void);
 
-    bool write(Metadata* mdata);
-    Metadata* read(QString filename);
+    bool write(const Metadata* mdata);
+    Metadata* read(const QString &filename);
 
 private:
     TagLib::WavPack::File *OpenFile(const QString &filename);

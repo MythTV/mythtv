@@ -4,14 +4,13 @@
 
 #include <QStringList>
 #include <QDateTime>
-#include <QThread>
 #include <QMutex>
 #include <QMap>
 #include <QSet>
 
-#include "mythtvexp.h"
 #include "previewgenerator.h"
 #include "mythtvexp.h"
+#include "mthread.h"
 
 class ProgramInfo;
 class QSize;
@@ -31,7 +30,7 @@ class PreviewGenState
 };
 typedef QMap<QString,PreviewGenState> PreviewMap;
 
-class MTV_PUBLIC PreviewGeneratorQueue : public QThread
+class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
 {
     Q_OBJECT
 
@@ -56,7 +55,6 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QThread
     PreviewGeneratorQueue(PreviewGenerator::Mode mode,
                           uint maxAttempts, uint minBlockSeconds);
     ~PreviewGeneratorQueue();
-    void run(void);
 
     QString GeneratePreviewImage(ProgramInfo &pginfo, const QSize&,
                                  const QString &outputfile,

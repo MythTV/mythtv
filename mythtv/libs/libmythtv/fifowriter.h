@@ -3,22 +3,21 @@
 
 // Qt headers
 #include <QWaitCondition>
-#include <QThread>
 #include <QString>
 #include <QMutex>
 
 // MythTV headers
 #include "mythtvexp.h"
+#include "mthread.h"
 
 using namespace std;
 
 class FIFOWriter;
 
-class FIFOThread : public QThread
+class FIFOThread : public MThread
 {
-    Q_OBJECT
   public:
-    FIFOThread() : m_parent(NULL), m_id(-1) {}
+    FIFOThread() : MThread("FIFOThread"), m_parent(NULL), m_id(-1) {}
     virtual ~FIFOThread() { wait(); m_parent = NULL; m_id = -1; }
     void SetId(int id) { m_id = id; }
     void SetParent(FIFOWriter *parent) { m_parent = parent; }

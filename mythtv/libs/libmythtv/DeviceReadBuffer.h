@@ -9,9 +9,9 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QString>
-#include <QThread>
 
 #include "tspacket.h"
+#include "mthread.h"
 #include "util.h"
 
 class DeviceReaderCB
@@ -30,7 +30,7 @@ class DeviceReaderCB
  *  of long blocking conditions on writing to disk or accessing the
  *  database.
  */
-class DeviceReadBuffer : protected QThread
+class DeviceReadBuffer : protected MThread
 {
   public:
     DeviceReadBuffer(DeviceReaderCB *callback,
@@ -58,7 +58,7 @@ class DeviceReadBuffer : protected QThread
     uint Read(unsigned char *buf, uint count);
 
   private:
-    virtual void run(void); // QThread
+    virtual void run(void); // MThread
 
     void SetPaused(bool);
     void IncrWritePointer(uint len);

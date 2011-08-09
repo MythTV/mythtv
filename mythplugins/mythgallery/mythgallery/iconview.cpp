@@ -39,10 +39,10 @@ using namespace std;
 #include <mythdbcon.h>
 #include <httpcomms.h>
 #include <mythcontext.h>
+#include <mythlogging.h>
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
 #include <mythmediamonitor.h>
-#include "mythlogging.h"
 
 // MythGallery headers
 #include "galleryutil.h"
@@ -58,7 +58,7 @@ using namespace std;
 QEvent::Type ChildCountEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-class FileCopyThread: public QThread
+class FileCopyThread : public MThread
 {
   public:
     FileCopyThread(IconView *parent, bool move);
@@ -71,20 +71,19 @@ class FileCopyThread: public QThread
     volatile int m_progress;
 };
 
-FileCopyThread::FileCopyThread(IconView *parent, bool move)
+FileCopyThread::FileCopyThread(IconView *parent, bool move) :
+    MThread("FileCopy"), m_move(move), m_parent(parent), m_progress(0)
 {
-    m_move = move;
-    m_parent = parent;
-    m_progress = 0;
 }
 
 void FileCopyThread::run()
 {
+    RunProlog();
+
     QStringList::iterator it;
     QFileInfo fi;
     QFileInfo dest;
 
-    threadRegister("FileCopy");
     m_progress = 0;
 
     for (it = m_parent->m_itemMarked.begin(); it != m_parent->m_itemMarked.end(); it++)
@@ -97,7 +96,8 @@ void FileCopyThread::run()
 
         m_progress++;
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1509,9 +1509,9 @@ ThumbItem *IconView::GetCurrentThumb(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ChildCountThread::ChildCountThread(QObject *parent)
+ChildCountThread::ChildCountThread(QObject *parent) :
+    MThread("ChildCountThread"), m_parent(parent)
 {
-    m_parent = parent;
 }
 
 ChildCountThread::~ChildCountThread()
@@ -1536,7 +1536,8 @@ void ChildCountThread::cancel()
 
 void ChildCountThread::run()
 {
-    threadRegister("ChildCount");
+    RunProlog();
+
     while (moreWork())
     {
         QString file;
@@ -1558,7 +1559,8 @@ void ChildCountThread::run()
         // inform parent we have got a count ready for it
         QApplication::postEvent(m_parent, new ChildCountEvent(ccd));
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 bool ChildCountThread::moreWork()

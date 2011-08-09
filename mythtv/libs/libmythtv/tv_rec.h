@@ -5,11 +5,12 @@
 #include <QWaitCondition>
 #include <QStringList>
 #include <QDateTime>
+#include <QRunnable>
 #include <QString>
 #include <QMap>
-#include <QThread>
 
 // MythTV headers
+#include "mthread.h"
 #include "inputinfo.h"
 #include "inputgroupmap.h"
 #include "mythdeque.h"
@@ -28,7 +29,6 @@ class EITScanner;
 class RecordingProfile;
 class LiveTVChain;
 
-class RecorderThread;
 class RecorderBase;
 class DTVRecorder;
 class DVBRecorder;
@@ -134,22 +134,9 @@ class PendingInfo
 };
 typedef QMap<uint,PendingInfo> PendingMap;
 
-class TVRec;
-class TVRecEventThread : public QThread
-{
-    Q_OBJECT
-  public:
-    TVRecEventThread(TVRec *p) : m_parent(p) {}
-    virtual ~TVRecEventThread() { wait(); m_parent = NULL; }
-    virtual void run(void);
-  private:
-    TVRec *m_parent;
-};
-
-class MTV_PUBLIC TVRec : public SignalMonitorListener
+class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 {
     friend class TuningRequest;
-    friend class TVRecEventThread;
     friend class TVRecRecordThread;
 
   public:
@@ -251,7 +238,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener
     virtual void StatusSignalStrength(const SignalMonitorValue&) { }
 
   protected:
-    void RunTV(void);
+    virtual void run(void); // QRunnable
     bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
 
   private:
@@ -331,10 +318,10 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener
     EITScanner       *scanner;
 
     // Various threads
-    /// Event processing thread, runs RunTV().
-    TVRecEventThread *eventThread;
-    /// Recorder thread, runs RecorderBase::StartRecording()
-    RecorderThread   *recorderThread;
+    /// Event processing thread, runs TVRec::run().
+    MThread          *eventThread;
+    /// Recorder thread, runs RecorderBase::run().
+    MThread          *recorderThread;
 
     // Configuration variables from database
     bool    transcodeFirst;

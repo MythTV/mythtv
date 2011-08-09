@@ -12,7 +12,6 @@
 #include <QTemporaryFile>
 #include <QFileInfo>
 #include <QMetaType>
-#include <QThread>
 #include <QImage>
 #include <QDir>
 #include <QUrl>
@@ -68,7 +67,8 @@
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
                                    const QString     &_token,
                                    PreviewGenerator::Mode _mode)
-    : programInfo(*pginfo), mode(_mode), listener(NULL),
+    : MThread("PreviewGenerator"),
+      programInfo(*pginfo), mode(_mode), listener(NULL),
       pathname(pginfo->GetPathname()),
       timeInSeconds(true),  captureTime(-1),  outFileName(QString::null),
       outSize(0,0), token(_token), gotReply(false), pixmapOk(false)
@@ -116,14 +116,16 @@ bool PreviewGenerator::RunReal(void)
 
     if (!is_local && !!(mode & kRemote))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Run() file not local: '%1'")
-                .arg(pathname));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("RunReal() file not local: '%1'")
+            .arg(pathname));
     }
     else if (!(mode & kLocal) && !(mode & kRemote))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Run() Preview of '%1' failed "
-                                               "because mode was invalid 0x%2")
-                .arg(pathname).arg((int)mode,0,16));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("RunReal() Preview of '%1' failed "
+                    "because mode was invalid 0x%2")
+            .arg(pathname).arg((int)mode,0,16));
     }
     else if (is_local && !!(mode & kLocal) && LocalPreviewRun())
     {
@@ -323,12 +325,11 @@ bool PreviewGenerator::Run(void)
 
 void PreviewGenerator::run(void)
 {
-    threadRegister("PreviewGenerator");
-    setPriority(QThread::LowPriority);
+    RunProlog();
     Run();
-    connect(this, SIGNAL(finished()),
+    connect(qthread(), SIGNAL(finished()),
             this, SLOT(deleteLater()));
-    threadDeregister();
+    RunEpilog();
 }
 
 bool PreviewGenerator::RemotePreviewRun(void)

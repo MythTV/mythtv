@@ -22,13 +22,11 @@ using namespace std;
 #include <QObject>
 #include <QRegExp>
 #include <QString>
-#include <QThread>
 #include <QEvent>
 #include <QMutex>
 #include <QHash>
 #include <QTime>
 #include <QMap>
-#include <QPointer>
 
 // MythTV
 #include "mythdeque.h"

@@ -22,11 +22,11 @@ public:
     MetaIOAVFComment(void);
     virtual ~MetaIOAVFComment(void);
 
-    bool write(Metadata* mdata);
-    Metadata* read(QString filename);
+    bool write(const Metadata* mdata);
+    Metadata* read(const QString &filename);
 
 private:
-    int getTrackLength(QString filename);
+    int getTrackLength(const QString &filename);
     int getTrackLength(AVFormatContext* p_context);
 };
 

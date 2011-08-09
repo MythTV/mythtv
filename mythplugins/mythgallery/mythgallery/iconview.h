@@ -25,7 +25,6 @@
 #include <QStringList>
 #include <QList>
 #include <QHash>
-#include <QThread>
 
 // MythTV headers
 #include <mythscreentype.h>
@@ -34,6 +33,7 @@
 #include <mythuiimage.h>
 #include <mythdialogbox.h>
 #include <mythmedia.h>
+#include <mthread.h>
 
 // MythGallery headers
 #include "galleryfilter.h"
@@ -176,7 +176,7 @@ class ChildCountEvent : public QEvent
     static Type kEventType;
 };
 
-class ChildCountThread : public QThread
+class ChildCountThread : public MThread
 {
 public:
 

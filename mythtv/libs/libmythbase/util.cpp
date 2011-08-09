@@ -1489,7 +1489,7 @@ void setHttpProxy(void)
                 .arg(url.userName()).arg(url.password())
                 .arg(host).arg(port));
 #endif
-        p = QNetworkProxy(QNetworkProxy::HttpProxy,
+        p = QNetworkProxy(QNetworkProxy::HttpCachingProxy,
                           host, port, url.userName(), url.password());
         QNetworkProxy::setApplicationProxy(p);
         return;

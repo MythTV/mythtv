@@ -52,18 +52,12 @@ using namespace std;
 #include "cardutil.h"
 
 #include "dvbcam.h"
+#include "mthread.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 #include "mythlogging.h"
 
 #define LOC QString("DVB#%1 CA: ").arg(device)
-
-void DVBCamThread::run(void)
-{
-    threadRegister("DVBCam");
-    m_parent->CiHandlerLoop();
-    threadDeregister();
-}
 
 DVBCam::DVBCam(const QString &aDevice)
     : device(aDevice),        numslots(0),
@@ -110,7 +104,7 @@ bool DVBCam::Start(void)
 
     QMutexLocker locker(&ciHandlerLock);
     ciHandlerDoRun = true;
-    ciHandlerThread = new DVBCamThread(this);
+    ciHandlerThread = new MThread("DVBCam", this);
     ciHandlerThread->start();
     while (ciHandlerDoRun && !ciHandlerRunning)
         ciHandlerWait.wait(locker.mutex(), 1000);
@@ -257,7 +251,7 @@ void DVBCam::HandlePMT(void)
     pmt_added   = false;
 }
 
-void DVBCam::CiHandlerLoop()
+void DVBCam::run(void)
 {
     LOG(VB_DVBCAM, LOG_INFO, LOC + "CI handler thread running");
 

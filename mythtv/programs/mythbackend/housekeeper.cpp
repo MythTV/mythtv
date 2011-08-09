@@ -35,16 +35,16 @@ using namespace std;
 
 void HouseKeepingThread::run(void)
 {
-    threadRegister("HouseKeeping");
+    RunProlog();
     m_parent->RunHouseKeeping();
-    threadDeregister();
+    RunEpilog();
 }
 
 void MythFillDatabaseThread::run(void)
 {
-    threadRegister("MythFillDB");
+    RunProlog();
     m_parent->RunMFD();
-    threadDeregister();
+    RunEpilog();
 }
 
 HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched) :
@@ -416,8 +416,6 @@ void HouseKeeper::flushDBLogs()
 
 void HouseKeeper::RunMFD(void)
 {
-    fillDBThread->setTerminationEnabled(false);
-
     {
         QMutexLocker locker(&fillDBLock);
         fillDBStarted = true;
@@ -474,11 +472,11 @@ void HouseKeeper::RunMFD(void)
         fillDBWait.wakeAll();
     }
 
-    fillDBThread->setTerminationEnabled(true);
+    MythFillDatabaseThread::setTerminationEnabled(true);
 
     uint result = fillDBMythSystem->Wait(0);
 
-    fillDBThread->setTerminationEnabled(false);
+    MythFillDatabaseThread::setTerminationEnabled(false);
 
     {
         QMutexLocker locker(&fillDBLock);

@@ -105,7 +105,7 @@ class MediaServer : public MediaServerItem
 
 UPNPScanner* UPNPScanner::gUPNPScanner        = NULL;
 bool         UPNPScanner::gUPNPScannerEnabled = false;
-QThread*     UPNPScanner::gUPNPScannerThread  = NULL;
+MThread*     UPNPScanner::gUPNPScannerThread  = NULL;
 QMutex*      UPNPScanner::gUPNPScannerLock    = new QMutex(QMutex::Recursive);
 
 /**
@@ -164,15 +164,16 @@ UPNPScanner* UPNPScanner::Instance(UPNPSubscription *sub)
     }
 
     if (!gUPNPScannerThread)
-        gUPNPScannerThread = new QThread();
+        gUPNPScannerThread = new MThread("UPnPScanner");
     if (!gUPNPScanner)
         gUPNPScanner = new UPNPScanner(sub);
 
     if (!gUPNPScannerThread->isRunning())
     {
-        gUPNPScanner->moveToThread(gUPNPScannerThread);
-        gUPNPScannerThread->connect(gUPNPScannerThread, SIGNAL(started()),
-                                    gUPNPScanner,       SLOT(Start()));
+        gUPNPScanner->moveToThread(gUPNPScannerThread->qthread());
+        QObject::connect(
+            gUPNPScannerThread->qthread(), SIGNAL(started()),
+            gUPNPScanner,                  SLOT(Start()));
         gUPNPScannerThread->start(QThread::LowestPriority);
     }
 

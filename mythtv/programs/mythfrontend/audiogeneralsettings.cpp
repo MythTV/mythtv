@@ -529,6 +529,7 @@ AudioTestThread::AudioTestThread(QObject *parent,
                                  int channels,
                                  AudioOutputSettings settings,
                                  bool hd) :
+    MThread("AudioTest"),
     m_parent(parent), m_channels(channels), m_device(main),
     m_passthrough(passthrough), m_interrupted(false), m_channel(-1), m_hd(hd)
 {
@@ -579,7 +580,7 @@ void AudioTestThread::setChannel(int channel)
 
 void AudioTestThread::run()
 {
-    threadRegister("AudioTest");
+    RunProlog();
     m_interrupted = false;
     int smptelayout[7][8] = { 
         { 0, 1 },                       //stereo
@@ -682,7 +683,7 @@ void AudioTestThread::run()
 
         delete[] frames_in;
     }
-    threadDeregister();
+    RunEpilog();
 }
 
 AudioTest::AudioTest(QString main, QString passthrough,

@@ -6,7 +6,6 @@
 // Qt headers
 #include <QWaitCondition>
 #include <QStringList>
-#include <QThread>
 #include <QMutex>
 
 // MythTV headers

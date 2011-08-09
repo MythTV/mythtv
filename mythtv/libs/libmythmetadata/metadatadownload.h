@@ -1,11 +1,12 @@
 #ifndef METADATADOWNLOAD_H
 #define METADATADOWNLOAD_H
 
-#include <QThread>
-#include <QString>
 #include <QStringList>
+#include <QMutex>
+#include <QEvent>
 
 #include "metadatacommon.h"
+#include "mthread.h"
 
 class META_PUBLIC MetadataLookupEvent : public QEvent
 {
@@ -31,7 +32,7 @@ class META_PUBLIC MetadataLookupFailure : public QEvent
     static Type kEventType;
 };
 
-class META_PUBLIC MetadataDownload : public QThread
+class META_PUBLIC MetadataDownload : public MThread
 {
   public:
 

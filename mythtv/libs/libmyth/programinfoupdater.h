@@ -9,11 +9,11 @@
 using namespace std;
 
 // Qt headers
-#include <QThreadPool>
+#include <QWaitCondition>
 #include <QDateTime>
+#include <QRunnable>
 #include <QMutex>
 #include <QHash>
-#include <QWaitCondition>
 
 typedef enum PIAction {
     kPIAdd,

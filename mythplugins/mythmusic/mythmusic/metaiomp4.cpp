@@ -27,7 +27,7 @@ MetaIOMP4::~MetaIOMP4(void)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOMP4::write(Metadata* mdata)
+bool MetaIOMP4::write(const Metadata* mdata)
 {
     if (!mdata)
         return false;
@@ -79,7 +79,7 @@ bool MetaIOMP4::write(Metadata* mdata)
 /*!
  * \copydoc MetaIO::read()
  */
-Metadata* MetaIOMP4::read(QString filename)
+Metadata* MetaIOMP4::read(const QString &filename)
 {
     QString title, artist, album, genre;
     int year = 0, tracknum = 0, length = 0;
@@ -179,7 +179,7 @@ QString MetaIOMP4::getFieldValue(AVFormatContext* context, const char* tagname)
  * \param filename The filename for which we want to find the length.
  * \returns An integer (signed!) to represent the length in seconds.
  */
-int MetaIOMP4::getTrackLength(QString filename)
+int MetaIOMP4::getTrackLength(const QString &filename)
 {
     AVFormatContext* p_context = NULL;
     AVFormatParameters* p_params = NULL;
@@ -227,7 +227,8 @@ int MetaIOMP4::getTrackLength(AVFormatContext* pContext)
  * \param title Title
  * \param genre Genre
  */
-void MetaIOMP4::metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre)
+void MetaIOMP4::metadataSanityCheck(QString *artist, QString *album,
+                                    QString *title, QString *genre)
 {
     if (artist->isEmpty())
         artist->append("Unknown Artist");

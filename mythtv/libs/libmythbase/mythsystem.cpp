@@ -16,11 +16,6 @@
 
 // QT headers
 #include <QCoreApplication>
-#include <QThread>
-#include <QMutex>
-#include <QMap>
-#include <QString>
-#include <QStringList>
 
 // libmythbase headers
 #include "mythcorecontext.h"

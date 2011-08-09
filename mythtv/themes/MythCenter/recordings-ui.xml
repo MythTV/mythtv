@@ -4,11 +4,51 @@
 
     <window name="watchrecordings">
 
+        <fontdef name="menufont" face="Trebuchet MS">
+            <color>#FFFFFF</color>
+            <size>16</size>
+            <weight>bold</weight>
+            <shadowcolor>#000000</shadowcolor>
+            <shadowoffset>2,2</shadowoffset>
+            <shadowalpha>50</shadowalpha>
+        </fontdef>
+
+        <fontdef name="clock" from="menufont">
+            <size>20</size>
+        </fontdef>
+
+        <clock name="clock">
+            <area>40,538,150,40</area>
+            <font>clock</font>
+            <template>%TIME%</template>
+            <align>center</align>
+            <alpha>85</alpha>
+        </clock>
+
+        <shape name="iconbackground">
+            <area>235,532,326,54</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="55" />
+            <line color="#000000" alpha="100" width="2" />
+        </shape>
+
+        <shape name="previewbackground">
+            <area>634,520,136,78</area>
+            <type>box</type>
+            <fill color="#000000" alpha="115" />
+            <line color="#EEEEEE" alpha="200" width="3" />
+        </shape>
+
         <textarea name="pagetitle" from="basetextarea">
             <area>20,5,570,40</area>
             <font>baselarge</font>
             <value>Watch Recordings</value>
         </textarea>
+
+        <imagetype name="coverart">
+            <area>633,337,113,167</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
 
         <imagetype name="listbackground">
             <filename>reclist_background.png</filename>
@@ -156,26 +196,26 @@
 
         <imagetype name="autoexpire">
             <filename>autoexpire.png</filename>
-            <position>648,500</position>
+            <position>245,544</position>
         </imagetype>
 
         <imagetype name="commflagged">
             <filename>commflagged.png</filename>
-            <position>682,500</position>
+            <position>279,544</position>
         </imagetype>
 
         <imagetype name="bookmark">
             <filename>bookmark.png</filename>
-            <position>716,500</position>
+            <position>313,544</position>
         </imagetype>
 
         <imagetype name="cutlist">
             <filename>cutlist.png</filename>
-            <position>750,500</position>
+            <position>347,544</position>
         </imagetype>
 
         <statetype name="audioprops">
-            <position>648,540</position>
+            <position>381,544</position>
             <showempty>yes</showempty>
             <state name="stereo">
                 <imagetype name="stereo">
@@ -200,7 +240,7 @@
         </statetype>
 
         <statetype name="subtitletypes">
-            <position>682,540</position>
+            <position>415,544</position>
             <showempty>yes</showempty>
             <state name="cc">
                 <imagetype name="cc">
@@ -220,7 +260,7 @@
         </statetype>
 
         <statetype name="videoprops">
-            <position>716,540</position>
+            <position>449,544</position>
             <showempty>yes</showempty>
             <state name="hd1080">
                 <imagetype name="hd1080">
@@ -244,40 +284,40 @@
             </state>
         </statetype>
 
-<!--        <imagetype name="watched">
+        <imagetype name="watched">
             <filename>watched.png</filename>
-            <position>716,500</position>
-        </imagetype>-->
+            <position>493,544</position>
+        </imagetype>
 
         <imagetype name="processing">
             <filename>processing.png</filename>
-            <position>750,540</position>
+            <position>527,544</position>
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>25,345,700,40</area>
+            <area>25,335,700,40</area>
             <font>baselarge</font>
             <cutdown>yes</cutdown>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>25,390,160,30</area>
+            <area>25,380,160,30</area>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>195,390,480,30</area>
+            <area>195,380,480,30</area>
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>25,420,590,175</area>
+            <area>25,410,590,110</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
             <value>%"|SUBTITLE|" %%(|STARS|) %%DESCRIPTION%</value>
         </textarea>
 
         <imagetype name="preview">
-            <area>620,375,160,120</area>
+            <area>635,522,133,74</area>
             <preserveaspect>true</preserveaspect>
         </imagetype>
 

@@ -2,13 +2,12 @@
 using namespace std;
 
 #include <QReadWriteLock>
+#include <QTextStream>
 #include <QSqlError>
 #include <QMutex>
 #include <QFile>
 #include <QHash>
 #include <QDir>
-#include <QThread>
-#include <QTextStream>
 
 #include "mythdb.h"
 #include "mythdbcon.h"
@@ -264,7 +263,7 @@ void MythDB::SaveSetting(const QString &key, const QString &newValue)
 }
 
 bool MythDB::SaveSettingOnHost(const QString &key,
-                               const QString &newValue,
+                               const QString &newValueRaw,
                                const QString &host)
 {
     QString LOC  = QString("SaveSettingOnHost('%1') ").arg(key);
@@ -273,6 +272,8 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         LOG(VB_GENERAL, LOG_ERR, LOC + "- Illegal null key");
         return false;
     }
+
+    QString newValue = (newValueRaw.isNull()) ? "" : newValueRaw;
 
     if (d->ignoreDatabase)
     {
@@ -696,8 +697,9 @@ double MythDB::GetFloatSettingOnHost(const QString &key, const QString &host)
     return (retval == sentinel) ? 0.0 : retval.toDouble();
 }
 
-void MythDB::SetSetting(const QString &key, const QString &newValue)
+void MythDB::SetSetting(const QString &key, const QString &newValueRaw)
 {
+    QString newValue = (newValueRaw.isNull()) ? "" : newValueRaw;
     d->m_settings->SetSetting(key, newValue);
     ClearSettingsCache(key);
 }

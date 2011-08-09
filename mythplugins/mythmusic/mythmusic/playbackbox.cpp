@@ -1006,7 +1006,7 @@ void PlaybackBoxMusic::occasionallyCheckCD()
         postUpdate();
     }
 
-    if (scan_for_cd && !cd_reader_thread->running())
+    if (scan_for_cd && !cd_reader_thread->isRunning())
         cd_reader_thread->start();
 }
 
@@ -1850,13 +1850,15 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
                         {
                             curMeta = gMusicData->all_music->getMetadata(node->getInt());
                             if (curMeta)
+                            {
                                 updateTrackInfo(curMeta);
 
-                            maxTime = curMeta->Length() / 1000;
+                                maxTime = curMeta->Length() / 1000;
 
-                            QString time_string = getTimeString(maxTime, 0);
+                                QString time_string = getTimeString(maxTime, 0);
 
-                            bannerEnable(curMeta, show_album_art);
+                                bannerEnable(curMeta, show_album_art);
+                            }
                         }
                     }
                     else
@@ -1877,13 +1879,15 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
                     {
                         curMeta = gMusicData->all_music->getMetadata(node->getInt());
                         if (curMeta)
+                        {
                             updateTrackInfo(curMeta);
 
-                        maxTime = curMeta->Length() / 1000;
+                            maxTime = curMeta->Length() / 1000;
 
-                        QString time_string = getTimeString(maxTime, 0);
+                            QString time_string = getTimeString(maxTime, 0);
 
-                        bannerEnable(curMeta, show_album_art);
+                            bannerEnable(curMeta, show_album_art);
+                        }
                     }
                 }
                 else
@@ -2281,11 +2285,13 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
 
         curMeta = gMusicData->all_music->getMetadata(node_int);
         if (curMeta)
+        {
             updateTrackInfo(curMeta);
 
-        maxTime = curMeta->Length() / 1000;
+            maxTime = curMeta->Length() / 1000;
 
-        QString time_string = getTimeString(maxTime, 0);
+            QString time_string = getTimeString(maxTime, 0);
+        }
 
         if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
         {

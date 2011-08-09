@@ -274,7 +274,7 @@ void ZMEvents::eventChanged(MythUIButtonListItem *item)
 
 void ZMEvents::playPressed(void)
 {
-    if (!m_eventList || m_eventList->size() == 0)
+    if (!m_eventList || m_eventList->empty())
         return;
 
     m_savedPosition = m_eventGrid->GetCurrentPos();
@@ -306,7 +306,7 @@ void ZMEvents::playerExited(void)
 
 void ZMEvents::deletePressed(void)
 {
-    if (!m_eventList || m_eventList->size() == 0)
+    if (!m_eventList || m_eventList->empty())
         return;
 
     m_savedPosition = m_eventGrid->GetCurrentPos();

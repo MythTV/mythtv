@@ -14,7 +14,7 @@
 #include "mythbaseexp.h"
 #include "mythdbparams.h"
 
-class QSemaphore;
+#define REUSE_CONNECTION 1
 
 MBASE_PUBLIC bool TestDatabase(QString dbHostName,
                                QString dbUserName,
@@ -57,7 +57,7 @@ class MBASE_PUBLIC MDBManager
     ~MDBManager(void);
 
     void CloseDatabases(void);
-    void PurgeIdleConnections(void);
+    void PurgeIdleConnections(bool leaveOne = false);
 
   protected:
     MSqlDatabase *popConnection(void);
@@ -65,24 +65,27 @@ class MBASE_PUBLIC MDBManager
 
     MSqlDatabase *getSchedCon(void);
     MSqlDatabase *getDDCon(void);
-    MSqlDatabase *getLogCon(void);
     void closeSchedCon(void);
     void closeDDCon(void);
-    void closeLogCon(void);
 
   private:
     MSqlDatabase *getStaticCon(MSqlDatabase **dbcon, QString name);
     void closeStaticCon(MSqlDatabase **dbcon);
 
-    QList<MSqlDatabase*> m_pool;
     QMutex m_lock;
-    QSemaphore *m_sem;
+    typedef QList<MSqlDatabase*> DBList;
+    QHash<QThread*, DBList> m_pool; // protected by m_lock
+#if REUSE_CONNECTION 
+    QHash<QThread*, MSqlDatabase*> m_inuse; // protected by m_lock
+    QHash<QThread*, int> m_inuse_count; // protected by m_lock
+#endif
+
     int m_nextConnID;
     int m_connCount;
 
     MSqlDatabase *m_schedCon;
     MSqlDatabase *m_DDCon;
-    MSqlDatabase *m_LogCon;
+    QHash<QThread*, DBList> m_static_pool;
 };
 
 /// \brief MSqlDatabase Info, used by MSqlQuery. Do not use directly.
@@ -204,12 +207,8 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
     static MSqlQueryInfo DDCon();
 
-    /// \brief Returns dedicated connection.
-    static MSqlQueryInfo LogCon();
-    
     static void CloseSchedCon();
     static void CloseDDCon();
-    static void CloseLogCon();
 
   private:
     // Only QSql::In is supported as a param type and only named params...

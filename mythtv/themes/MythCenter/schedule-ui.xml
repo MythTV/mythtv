@@ -463,7 +463,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>15,44,770,270</area>
+            <area>15,44,770,275</area>
         </shape>
 
         <textarea name="status" from="basetextarea">
@@ -490,13 +490,13 @@
                 <area>0,0,760,25</area>
                 <state name="active">
                     <textarea name="shortstarttimedate" from="buttontext">
-                        <area>15,1,155,24</area>
+                        <area>15,1,215,24</area>
                     </textarea>
                     <textarea name="channel" from="shortstarttimedate">
-                        <area>180,1,155,24</area>
+                        <area>240,1,130,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>345,1,365,24</area>
+                        <area>375,1,345,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
                         <area>720,1,30,24</area>
@@ -505,14 +505,14 @@
                 </state>
                 <state name="selectedactive" from="active">
                     <textarea name="shortstarttimedate" from="buttontext">
-                        <area>15,1,155,24</area>
+                        <area>15,1,215,24</area>
                         <font state="disabled">basesmallboldgreyhighlight</font>
                     </textarea>
                     <textarea name="channel" from="shortstarttimedate">
-                        <area>180,1,155,24</area>
+                        <area>240,1,130,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>345,1,365,24</area>
+                        <area>375,1,345,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
                         <area>720,1,30,24</area>

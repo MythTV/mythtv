@@ -5,20 +5,21 @@
 using namespace std;
 
 #include <QStringList>
-#include <QThread>
 #include <QPixmap>
 
 #include "metadata.h"
 #include "playlist.h"
+
 #include <mythwidgets.h>
 #include <lcddevice.h>
 #include <uilistbtntype.h>
+#include <mthread.h>
 
 class TreeCheckItem;
 class QTimer;
 class QKeyEvent;
 
-class ReadCDThread : public QThread
+class ReadCDThread : public MThread
 {
   public:
 

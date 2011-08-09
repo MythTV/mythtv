@@ -80,13 +80,11 @@ enum
     kDisplayTeletextMenu        = 0x200,
 };
 
-class DecoderThread : public QThread
+class DecoderThread : public MThread
 {
-    Q_OBJECT
-
   public:
     DecoderThread(MythPlayer *mp, bool start_paused)
-      : QThread(NULL), m_mp(mp), m_start_paused(start_paused) { }
+      : MThread("Decoder"), m_mp(mp), m_start_paused(start_paused) { }
     ~DecoderThread() { wait(); }
 
   protected:

@@ -3,13 +3,17 @@
 
 #include <QMetaType>
 #include <QString>
+#include <QList>
 
 int romInDB(QString rom, QString gametype);
 
 class RomInfo
 {
   public:
-    RomInfo(QString lromname = "", QString lsystem = "", QString lgamename ="",
+    static QList<RomInfo*> GetAllRomInfo();
+    static RomInfo *GetRomInfoById(int id);
+
+    RomInfo(int lid = 0, QString lromname = "", QString lsystem = "", QString lgamename ="",
             QString lgenre = "", QString lyear = "", bool lfavorite = FALSE,
             QString lrompath = "", QString lcountry ="", QString lcrc_value = "",
             int ldiskcount = 0, QString lgametype = "", int lromcount = 0,
@@ -17,6 +21,7 @@ class RomInfo
             QString lversion = "", QString lscreenshot = "", QString lfanart = "",
             QString lboxart = "", QString linetref = "")
             {
+                id = lid;
                 romname = lromname;
                 system = lsystem;
                 gamename = lgamename;
@@ -41,6 +46,7 @@ class RomInfo
 
     RomInfo(const RomInfo &lhs)
             {
+                id = lhs.id;
                 romname = lhs.romname;
                 system = lhs.system;
                 gamename = lhs.gamename;
@@ -66,6 +72,9 @@ class RomInfo
     ~RomInfo() {}
 
     bool FindImage(QString BaseFileName, QString *result);
+
+    int Id() const { return id; }
+    void setId(const int &lid) { id = lid; }
 
     QString Rompath() const { return rompath; }
     void setRompath(const QString &lrompath) { rompath = lrompath; }
@@ -128,12 +137,16 @@ class RomInfo
     void setFavorite(bool updateDatabase = false);
 
     QString getExtension();
+    QString toString();
 
     void setField(QString field, QString data);
     void fillData();
-    void UpdateDatabase();
+
+    void SaveToDatabase();
+    void DeleteFromDatabase();
 
   protected:
+    int id;
     QString romname;
     QString system;
     QString gamename;

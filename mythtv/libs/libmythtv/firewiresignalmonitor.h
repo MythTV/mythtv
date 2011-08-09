@@ -8,26 +8,25 @@
 using namespace std;
 
 // Qt headers
-#include <QThread>
 #include <QMutex>
 #include <QMap>
 
 // MythTV headers
 #include "dtvsignalmonitor.h"
 #include "firewiredevice.h"
+#include "mthread.h"
 #include "util.h"
 
 class FirewireChannel;
 
 class FirewireSignalMonitor;
 
-class FirewireTableMonitorThread : public QThread
+class FirewireTableMonitorThread : public MThread
 {
-    Q_OBJECT
   public:
     FirewireTableMonitorThread(FirewireSignalMonitor *p) :
-        m_parent(p) { start(); }
-    virtual ~FirewireTableMonitorThread() { wait(); }
+        MThread("FirewireTableMonitor"), m_parent(p) { start(); }
+    virtual ~FirewireTableMonitorThread() { wait(); m_parent = NULL; }
     virtual void run(void);
   private:
     FirewireSignalMonitor *m_parent;

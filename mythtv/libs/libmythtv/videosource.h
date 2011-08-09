@@ -4,8 +4,7 @@
 #include <vector>
 using namespace std;
 
-#include <QThread>
-
+#include "mthread.h"
 #include "settings.h"
 #include "datadirect.h"
 

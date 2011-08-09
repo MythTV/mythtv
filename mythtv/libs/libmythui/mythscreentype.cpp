@@ -4,9 +4,9 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QRunnable>
-#include <QThreadPool>
 
 #include "mythobservable.h"
+#include "mthreadpool.h"
 
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
@@ -27,11 +27,7 @@ class ScreenLoadTask : public QRunnable
     void run()
     {
         if (m_parent)
-        {
-            threadRegister("ScreenLoad");
             m_parent->LoadInForeground();
-            threadDeregister();
-        }
     }
 
     MythScreenType *m_parent;
@@ -278,7 +274,7 @@ void MythScreenType::LoadInBackground(QString message)
     OpenBusyPopup(message);
 
     ScreenLoadTask *loadTask = new ScreenLoadTask(this);
-    QThreadPool::globalInstance()->start(loadTask);
+    MThreadPool::globalInstance()->start(loadTask, "ScreenLoad");
 }
 
 void MythScreenType::LoadInForeground(void)

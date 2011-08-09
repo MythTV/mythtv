@@ -25,8 +25,9 @@
 
 
 // MythTV plugin headers
-#include <util.h>
 #include <mythdialogs.h>
+#include <mthread.h>
+#include <util.h>
 
 // MythGallery headers
 #include "imageview.h"
@@ -155,7 +156,7 @@ class GLSingleView : public QGLWidget, public ImageView
     
 };
 
-class KenBurnsImageLoader : public QThread
+class KenBurnsImageLoader : public MThread
 {
 public:
     KenBurnsImageLoader(GLSingleView *singleView, ThumbList &itemList, QSize m_texSize, QSize m_screenSize);

@@ -1270,16 +1270,15 @@ void DatabaseBox::setCDTitle(const QString& title)
         cditem->setText(title);
 }
 
-ReadCDThread::ReadCDThread(const QString &dev)
+ReadCDThread::ReadCDThread(const QString &dev) :
+    MThread("ReadCD"), m_CDdevice(dev), cd_status_changed(false)
 {
-    m_CDdevice = dev;
-    cd_status_changed = false;
 }
 
 void ReadCDThread::run()
 {
+    RunProlog();
 #ifndef USING_MINGW
-    threadRegister("ReadCD");
     // lock all_music and cd_status_changed while running thread
     QMutexLocker locker(getLock());
 
@@ -1368,7 +1367,7 @@ void ReadCDThread::run()
     }
 
     delete decoder;
-    threadDeregister();
 #endif // USING_MINGW
+    RunEpilog();
 }
 

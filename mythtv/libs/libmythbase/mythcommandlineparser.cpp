@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <algorithm>
-using std::max;
 #include <sys/types.h>
 #include <unistd.h>
 

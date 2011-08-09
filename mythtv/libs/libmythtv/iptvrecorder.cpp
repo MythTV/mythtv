@@ -98,9 +98,9 @@ bool IPTVRecorder::PauseAndWait(int timeout)
     return IsPaused(true);
 }
 
-void IPTVRecorder::StartRecording(void)
+void IPTVRecorder::run(void)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording() -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run() -- begin");
     if (!Open())
     {
         _error = "Failed to open IPTV stream";
@@ -141,7 +141,7 @@ void IPTVRecorder::StartRecording(void)
     recording = false;
     recordingWait.wakeAll();
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording() -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run() -- end");
 }
 
 // ===================================================

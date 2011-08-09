@@ -34,8 +34,8 @@ using namespace std;
 MediaMonitor *MediaMonitor::c_monitor = NULL;
 
 // MonitorThread
-MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval)
-             : QThread()
+MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) :
+    MThread("Monitor")
 {
     m_Monitor = pMon;
     m_Interval = interval;
@@ -45,13 +45,13 @@ MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval)
 // loop and check it's devices.
 void MonitorThread::run(void)
 {
-    threadRegister("Monitor");
+    RunProlog();
     while (m_Monitor && m_Monitor->IsActive())
     {
         m_Monitor->CheckDevices();
         msleep(m_Interval);
     }
-    threadDeregister();
+    RunEpilog();
 }
 
 ////////////////////////////////////////////////////////////////////////

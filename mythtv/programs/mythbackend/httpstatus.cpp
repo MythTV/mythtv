@@ -94,8 +94,7 @@ QStringList HttpStatus::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */,
-                                 HTTPRequest *pRequest )
+bool HttpStatus::ProcessRequest( HTTPRequest *pRequest )
 {
     try
     {

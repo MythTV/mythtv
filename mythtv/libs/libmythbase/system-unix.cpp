@@ -20,7 +20,6 @@
 
 // QT headers
 #include <QCoreApplication>
-#include <QThread>
 #include <QMutex>
 #include <QMap>
 #include <QString>
@@ -52,6 +51,7 @@ typedef QMap<int, FDType_t*> FDMap_t;
 /**********************************
  * MythSystemManager method defines
  *********************************/
+static bool                     run_system = true;
 static MythSystemManager       *manager = NULL;
 static MythSystemSignalManager *smanager = NULL;
 static MythSystemIOHandler     *readThread = NULL;
@@ -61,16 +61,29 @@ static QMutex                   listLock;
 static FDMap_t                  fdMap;
 static QMutex                   fdLock;
 
+void ShutdownMythSystem(void)
+{
+    run_system = false;
+    if (manager)
+        manager->wait();
+    if (smanager)
+        smanager->wait();
+    if (readThread)
+        readThread->wait();
+    if (writeThread)
+        writeThread->wait();
+}
 
 MythSystemIOHandler::MythSystemIOHandler(bool read) :
-    QThread(), m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
+    MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
+    m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
     m_read(read)
 {
 }
 
 void MythSystemIOHandler::run(void)
 {
-    threadRegister(QString("SystemIOHandler%1").arg(m_read ? "R" : "W"));
+    RunProlog();
     LOG(VB_GENERAL, LOG_INFO, QString("Starting IO manager (%1)")
                 .arg(m_read ? "read" : "write"));
 
@@ -78,14 +91,14 @@ void MythSystemIOHandler::run(void)
     BuildFDs();
     m_pLock.unlock();
 
-    while( gCoreContext )
+    while( run_system )
     {
         {
             QMutexLocker locker(&m_pWaitLock);
             m_pWait.wait(&m_pWaitLock);
         }
 
-        while( gCoreContext )
+        while( run_system )
         {
             usleep(10000); // ~100x per second, for ~3MBps throughput
             m_pLock.lock();
@@ -130,7 +143,8 @@ void MythSystemIOHandler::run(void)
             m_pLock.unlock();
         }
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 void MythSystemIOHandler::HandleRead(int fd, QBuffer *buff)
@@ -233,19 +247,19 @@ void MythSystemIOHandler::BuildFDs()
     }
 }
 
-MythSystemManager::MythSystemManager() : QThread()
+MythSystemManager::MythSystemManager() : MThread("SystemManager")
 {
     m_jumpAbort = false;
 }
 
 void MythSystemManager::run(void)
 {
-    threadRegister("SystemManager");
+    RunProlog();
     LOG(VB_GENERAL, LOG_INFO, "Starting process manager");
 
-    // gCoreContext is set to NULL during shutdown, and we need this thread to
+    // run_system is set to NULL during shutdown, and we need this thread to
     // exit during shutdown.
-    while( gCoreContext )
+    while( run_system )
     {
         usleep(100000); // sleep 100ms
 
@@ -382,7 +396,8 @@ void MythSystemManager::run(void)
         readThread->wake();
     if (writeThread)
         writeThread->wake();
-    threadDeregister();
+
+    RunEpilog();
 }
 
 void MythSystemManager::append(MythSystemUnix *ms)
@@ -424,18 +439,19 @@ void MythSystemManager::jumpAbort(void)
 
 // spawn separate thread for signals to prevent manager
 // thread from blocking in some slot
-MythSystemSignalManager::MythSystemSignalManager() : QThread()
+MythSystemSignalManager::MythSystemSignalManager() :
+    MThread("SystemSignalManager")
 {
 }
 
 void MythSystemSignalManager::run(void)
 {
-    threadRegister("SystemSignalManager");
+    RunProlog();
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
-    while( gCoreContext )
+    while( run_system )
     {
         usleep(50000); // sleep 50ms
-        while( gCoreContext )
+        while( run_system )
         {
             // handle cleanup and signalling for closed processes
             listLock.lock();
@@ -480,7 +496,7 @@ void MythSystemSignalManager::run(void)
                 ms->deleteLater();
         }
     }
-    threadDeregister();
+    RunEpilog();
 }
 
 /*******************************

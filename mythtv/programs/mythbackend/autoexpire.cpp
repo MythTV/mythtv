@@ -53,17 +53,17 @@ extern AutoExpire *expirer;
 /// \brief This calls AutoExpire::RunExpirer() from within a new thread.
 void ExpireThread::run(void)
 {
-    threadRegister("Expire");
+    RunProlog();
     m_parent->RunExpirer();
-    threadDeregister();
+    RunEpilog();
 }
 
 /// \brief This calls AutoExpire::RunUpdate() from within a new thread.
 void UpdateThread::run(void)
 {
-    threadRegister("Update");
+    RunProlog();
     m_parent->RunUpdate();
-    threadDeregister();
+    RunEpilog();
 }
 
 /** \class AutoExpire

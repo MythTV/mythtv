@@ -410,7 +410,7 @@ void MythBurn::updateArchiveList(void)
     else
     {
         delete busyPopup;
-        busyPopup = false;
+        busyPopup = NULL;
     }
 
     qApp->processEvents();

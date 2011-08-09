@@ -11,11 +11,11 @@
 using namespace std;
 
 // Qt headers
-#include <QMutex>
-#include <QString>
 #include <QWaitCondition>
+#include <QRunnable>
+#include <QString>
+#include <QMutex>
 #include <QImage>
-#include <QThread>
 
 // MythTV headers
 #include "../libmythfreemheg/freemheg.h"
@@ -24,6 +24,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythdeque.h"
+#include "mthread.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h" // to decode single MPEG I-frames
@@ -35,23 +36,11 @@ class DSMCCPacket;
 class MHIImageData;
 class MHIContext;
 
-class MHEGEngineThread : public QThread
-{
-    Q_OBJECT
-  public:
-    MHEGEngineThread(MHIContext *parent) : m_parent(parent) {}
-    virtual ~MHEGEngineThread() { wait();  m_parent = NULL; }
-    virtual void run(void);
-  private:
-    MHIContext *m_parent;
-};
-
 /** \class MHIContext
  *  \brief Contains various utility functions for interactive television.
  */
-class MHIContext : public MHContext
+class MHIContext : public MHContext, public QRunnable
 {
-    friend class MHEGEngineThread;
   public:
     MHIContext(InteractiveTV *parent);
     virtual ~MHIContext();
@@ -149,8 +138,7 @@ class MHIContext : public MHContext
     int GetHeight(void) { return m_displayHeight; }
 
   protected:
-    static void *StartMHEGEngine(void *param);
-    void RunMHEGEngine(void);
+    void run(void); // QRunnable
     void ProcessDSMCCQueue(void);
     void NetworkBootRequested(void);
     void ClearDisplay(void);
@@ -183,7 +171,7 @@ class MHIContext : public MHContext
     FT_Face          m_face;
     bool             m_face_loaded;
 
-    MHEGEngineThread *m_engineThread;
+    MThread         *m_engineThread;
 
     int              m_currentChannel;
     int              m_currentStream;

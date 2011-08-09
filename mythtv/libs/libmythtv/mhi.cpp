@@ -49,13 +49,6 @@ class MHIImageData
 // Special value for the NetworkBootInfo version.  Real values are a byte.
 #define NBI_VERSION_UNSET       257
 
-void MHEGEngineThread::run(void)
-{
-    threadRegister("MHEGEngine");
-    m_parent->RunMHEGEngine();
-    threadDeregister();
-}
-
 MHIContext::MHIContext(InteractiveTV *parent)
     : m_parent(parent),     m_dsmcc(NULL),
       m_keyProfile(0),
@@ -224,12 +217,12 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
         m_isLive = isLive;
         // Don't set the NBI version here.  Restart is called
         // after the PMT is processed.
-        m_engineThread = new MHEGEngineThread(this);
+        m_engineThread = new MThread("MHEG", this);
         m_engineThread->start();
     }
 }
 
-void MHIContext::RunMHEGEngine(void)
+void MHIContext::run(void)
 {
     QMutexLocker locker(&m_runLock);
 

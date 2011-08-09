@@ -6,21 +6,20 @@
 #include "mythlogging.h"
 
 PlaylistLoadingThread::PlaylistLoadingThread(PlaylistContainer *parent_ptr,
-                                             AllMusic *all_music_ptr)
+                                             AllMusic *all_music_ptr) :
+    MThread("PlaylistLoading"), parent(parent_ptr), all_music(all_music_ptr)
 {
-    parent = parent_ptr;
-    all_music = all_music_ptr;
 }
 
 void PlaylistLoadingThread::run()
 {
-    threadRegister("PlaylistLoading");
-    while(!all_music->doneLoading())
+    RunProlog();
+    while (!all_music->doneLoading())
     {
-        sleep(1);
+        msleep(250);
     }
     parent->load();
-    threadDeregister();
+    RunEpilog();
 }
 
 #define LOC      QString("PlaylistContainer: ")
@@ -68,7 +67,8 @@ PlaylistContainer::PlaylistContainer(AllMusic *all_music, const QString &host_na
 PlaylistContainer::~PlaylistContainer()
 {
     playlists_loader->wait();
-    playlists_loader->deleteLater();
+    delete playlists_loader;
+    playlists_loader = NULL;
 
     if (active_playlist)
         delete active_playlist;

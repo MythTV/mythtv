@@ -51,7 +51,7 @@
 #define LOC QString("JoystickMenuThread: ")
 
 JoystickMenuThread::JoystickMenuThread(QObject *main_window)
-    : QThread(),
+    : MThread("JoystickMenu"),
       m_mainWindow(main_window), m_devicename(""),
       m_fd(-1),                  m_buttonCount(0),
       m_axesCount(0),            m_buttons(NULL),
@@ -196,13 +196,14 @@ int JoystickMenuThread::ReadConfig(QString config_file)
  */
 void JoystickMenuThread::run(void)
 {
+    RunProlog();
+
     int rc;
 
     fd_set readfds;
     struct js_event js;
     struct timeval timeout;
 
-    threadRegister("JoystickMenu");
     while (!m_bStop)
     {
 
@@ -286,7 +287,7 @@ void JoystickMenuThread::run(void)
 
     }
 
-    threadDeregister();
+    RunEpilog();
 }
 
 /**

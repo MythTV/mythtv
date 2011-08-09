@@ -25,12 +25,10 @@ extern "C"
 
 //Qt
 #include <QMap>
+#include <QList>
+#include <QQueue>
 #include <QStringList>
 #include <QDateTime>
-
-#include <Q3PtrList>
-#include <Q3PtrQueue>
-#include <Q3ValueList>
 
 // MythTV
 #include "transcodedefs.h"
@@ -131,6 +129,10 @@ class MPEG2replex
     multiplex_t *mplex;
 };
 
+typedef QList<MPEG2frame *> FrameList;
+typedef QQueue<MPEG2frame *> FrameQueue;
+typedef QMap<int, FrameList *> FrameMap;
+
 class MPEG2fixup
 {
   public:
@@ -161,13 +163,13 @@ class MPEG2fixup
     void InitReplex();
     void FrameInfo(MPEG2frame *f);
     int AddFrame(MPEG2frame *f);
-    int InitAV(const char *inputfile, const char *type, int64_t offset);
+    bool InitAV(QString inputfile, const char *type, int64_t offset);
     void ScanAudio();
     int ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
-    void WriteFrame(const char *filename, MPEG2frame *f);
-    void WriteFrame(const char *filename, AVPacket *pkt);
-    void WriteYUV(const char *filename, const mpeg2_info_t *info);
-    void WriteData(const char *filename, uint8_t *data, int size);
+    void WriteFrame(QString filename, MPEG2frame *f);
+    void WriteFrame(QString filename, AVPacket *pkt);
+    void WriteYUV(QString filename, const mpeg2_info_t *info);
+    void WriteData(QString filename, uint8_t *data, int size);
     int BuildFrame(AVPacket *pkt, QString fname);
     MPEG2frame *GetPoolFrame(AVPacket *pkt);
     MPEG2frame *GetPoolFrame(MPEG2frame *f);
@@ -180,11 +182,11 @@ class MPEG2fixup
     void StoreSecondary();
     int  PlaybackSecondary();
     MPEG2frame *DecodeToFrame(int frameNum, int skip_reset);
-    int ConvertToI(Q3PtrList<MPEG2frame> *orderedFrames, int headPos);
+    int ConvertToI(FrameList *orderedFrames, int headPos);
     int InsertFrame(int frameNum, int64_t deltaPTS,
                      int64_t ptsIncrement, int64_t initPTS);
     void AddSequence(MPEG2frame *frame1, MPEG2frame *frame2);
-    Q3PtrList<MPEG2frame> ReorderDTStoPTS(Q3PtrList<MPEG2frame> *dtsOrder);
+    FrameList ReorderDTStoPTS(FrameList *dtsOrder, int pos);
     void InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
                          int64_t &PTSdiscrep, int numframes, bool fix);
     void SetFrameNum(uint8_t *ptr, int num);
@@ -216,17 +218,19 @@ class MPEG2fixup
         return inputFC->streams[id]->codec;
     }
 
+    void dumpList(FrameList *list);
+
     int (*check_abort)();
     void (*update_status)(float percent_done);
 
-    Q3PtrList<MPEG2frame> vSecondary;
+    FrameList vSecondary;
     bool use_secondary;
 
-    Q3PtrList<MPEG2frame> vFrame;
-    QMap<int, Q3PtrList<MPEG2frame> > aFrame;
-    Q3PtrQueue<MPEG2frame> framePool;
-    Q3PtrQueue<MPEG2frame> unreadFrames;
-    Q3PtrListIterator<MPEG2frame> *displayFrame;
+    FrameList vFrame;
+    FrameMap  aFrame;
+    FrameQueue framePool;
+    FrameQueue unreadFrames;
+    int displayFrame;
     mpeg2dec_t *header_decoder;
     mpeg2dec_t *img_decoder;
 
@@ -289,3 +293,7 @@ class MPEG2fixup
    #include "exitcodes.h"
    #include "mythcontext.h"
 #endif
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */
