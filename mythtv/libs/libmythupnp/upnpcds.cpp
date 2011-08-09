@@ -23,7 +23,7 @@
 
 #include <cmath>
 #include <algorithm>
-using std::max;
+using namespace std;
 
 #include "upnp.h"
 #include "upnpcds.h"
@@ -896,7 +896,7 @@ UPnpCDSExtensionResults *
 
             short nStart = max(pRequest->m_nStartingIndex, short(0));
             short nEnd   = min(nRootCount,
-                               short( nStart + pRequest->m_nRequestedCount));
+                               short(nStart + pRequest->m_nRequestedCount));
 
             if (nStart < nRootCount)
             {
