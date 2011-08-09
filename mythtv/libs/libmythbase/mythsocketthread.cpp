@@ -46,8 +46,12 @@ MythSocketThread::MythSocketThread()
 
 void ShutdownRRT(void)
 {
-    MythSocket::s_readyread_thread->ShutdownReadyReadThread();
-    MythSocket::s_readyread_thread->wait();
+    QMutexLocker locker(&MythSocket::s_readyread_thread_lock);
+    if (MythSocket::s_readyread_thread)
+    {
+        MythSocket::s_readyread_thread->ShutdownReadyReadThread();
+        MythSocket::s_readyread_thread->wait();
+    }
 }
 
 void MythSocketThread::ShutdownReadyReadThread(void)

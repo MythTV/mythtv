@@ -63,7 +63,7 @@ QHash<uint64_t, char *> logThreadHash;
 QMutex                   logThreadTidMutex;
 QHash<uint64_t, int64_t> logThreadTidHash;
 
-LoggerThread            logThread;
+LoggerThread           *logThread = NULL;
 bool                    logThreadFinished = false;
 bool                    debugRegistration = false;
 
@@ -926,7 +926,10 @@ void logStart(QString logfile, int progress, int quiet, int facility,
 {
     LoggerBase *logger;
 
-    if (logThread.isRunning())
+    if (!logThread)
+        logThread = new LoggerThread();
+
+    if (logThread->isRunning())
         return;
  
     logLevel = level;
@@ -980,13 +983,16 @@ void logStart(QString logfile, int progress, int quiet, int facility,
 
     (void)logger;
 
-    logThread.start();
+    logThread->start();
 }
 
 void logStop(void)
 {
-    logThread.stop();
-    logThread.wait();
+    if (logThread)
+    {
+        logThread->stop();
+        logThread->wait();
+    }
 
 #ifndef _WIN32
     /* Tear down SIGHUP */

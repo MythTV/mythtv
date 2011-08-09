@@ -36,6 +36,10 @@ bool MBASE_PUBLIC is_current_thread(MThread &thread);
  *  responsible for stopping the thread, MThread::exit() will not
  *  work.
  *
+ *  Warning: Do not statically initialize MThreads. C++ itself
+ *  doesn't allow you to specify the order of static initializations.
+ *  See: http://www.parashift.com/c++-faq-lite/ctors.html#faq-10.15
+ *
  */
 class MBASE_PUBLIC MThread
 {

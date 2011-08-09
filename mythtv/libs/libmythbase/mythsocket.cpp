@@ -34,7 +34,8 @@ const uint MythSocket::kSocketBufferSize = 128000;
 const uint MythSocket::kShortTimeout = kMythSocketShortTimeout;
 const uint MythSocket::kLongTimeout  = kMythSocketLongTimeout;
 
-MythSocketThread *MythSocket::s_readyread_thread = new MythSocketThread();
+QMutex MythSocket::s_readyread_thread_lock;
+MythSocketThread *MythSocket::s_readyread_thread = NULL;
 
 MythSocket::MythSocket(int socket, MythSocketCBs *cb)
     : MSocketDevice(MSocketDevice::Stream),            m_cb(cb),
@@ -52,6 +53,13 @@ MythSocket::MythSocket(int socket, MythSocketCBs *cb)
         // Could this apply to other platforms, too?
         setSendBufferSize(kSocketBufferSize);
 #endif
+    }
+
+    if (!s_readyread_thread)
+    {
+        QMutexLocker locker(&s_readyread_thread_lock);
+        if (!s_readyread_thread)
+            s_readyread_thread = new MythSocketThread();
     }
 
     if (m_cb)
