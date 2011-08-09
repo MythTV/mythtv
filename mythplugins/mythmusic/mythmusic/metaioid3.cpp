@@ -105,7 +105,7 @@ bool MetaIOID3::SaveFile()
 void MetaIOID3::CloseFile()
 {
     LOG(VB_FILE, LOG_DEBUG, QString("MetaIO Close file: %1")
-                                                        .arg(m_file->name()));
+                                                        .arg(m_filename));
     delete m_file;
     m_file = NULL;
     m_fileType = kMPEG;
