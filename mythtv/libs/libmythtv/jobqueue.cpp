@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <fcntl.h>
+#include <pthread.h>
 using namespace std;
 
 #include <QDateTime>
