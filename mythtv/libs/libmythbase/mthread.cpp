@@ -93,16 +93,22 @@ class MThreadInternal : public QThread
     MThread &m_parent;
 };
 
-static QMutex s_all_threads_lock;
-static QSet<MThread*> s_all_threads;
+static QMutex *s_all_threads_lock = NULL;
+static QSet<MThread*> *s_all_threads = NULL;
 
 MThread::MThread(const QString &objectName) :
     m_thread(new MThreadInternal(*this)), m_runnable(NULL),
     m_prolog_executed(true), m_epilog_executed(true)
 {
     m_thread->setObjectName(objectName);
-    QMutexLocker locker(&s_all_threads_lock);
-    s_all_threads.insert(this);
+    if (!s_all_threads_lock)
+        s_all_threads_lock = new QMutex;
+
+    QMutexLocker locker(s_all_threads_lock);
+    if (!s_all_threads)
+        s_all_threads = new QSet<MThread*>;
+
+    s_all_threads->insert(this);
 }
 
 MThread::MThread(const QString &objectName, QRunnable *runnable) :
@@ -110,8 +116,14 @@ MThread::MThread(const QString &objectName, QRunnable *runnable) :
     m_prolog_executed(false), m_epilog_executed(false)
 {
     m_thread->setObjectName(objectName);
-    QMutexLocker locker(&s_all_threads_lock);
-    s_all_threads.insert(this);
+    if (!s_all_threads_lock)
+        s_all_threads_lock = new QMutex;
+
+    QMutexLocker locker(s_all_threads_lock);
+    if (!s_all_threads)
+        s_all_threads = new QSet<MThread*>;
+
+    s_all_threads->insert(this);
 }
 
 MThread::~MThread()
@@ -132,8 +144,8 @@ MThread::~MThread()
     }
 
     {
-        QMutexLocker locker(&s_all_threads_lock);
-        s_all_threads.remove(this);
+        QMutexLocker locker(s_all_threads_lock);
+        s_all_threads->remove(this);
     }
 
     delete m_thread;
@@ -142,55 +154,63 @@ MThread::~MThread()
 
 void MThread::Cleanup(void)
 {
-    QMutexLocker locker(&s_all_threads_lock);
-    QSet<MThread*> badGuys;
-    QSet<MThread*>::const_iterator it;
-    for (it = s_all_threads.begin(); it != s_all_threads.end(); ++it)
     {
-        if ((*it)->isRunning())
+        QMutexLocker locker(s_all_threads_lock);
+        QSet<MThread*> badGuys;
+        QSet<MThread*>::const_iterator it;
+        for (it = s_all_threads->begin(); it != s_all_threads->end(); ++it)
         {
-            badGuys.insert(*it);
-            (*it)->exit(1);
+            if ((*it)->isRunning())
+            {
+                badGuys.insert(*it);
+                (*it)->exit(1);
+            }
+        }
+
+        if (!badGuys.empty())
+        {
+            // logging has been stopped so we need to use iostream...
+            cerr<<"Error: Not all threads were shut down properly: "<<endl;
+            for (it = badGuys.begin(); it != badGuys.end(); ++it)
+            {
+                cerr<<"Thread "<<qPrintable((*it)->objectName())
+                    <<" is still running"<<endl;
+            }
+            cerr<<endl;
+
+            static const int kTimeout = 5000;
+            MythTimer t;
+            t.start();
+            for (it = badGuys.begin();
+                 it != badGuys.end() && t.elapsed() < kTimeout; ++it)
+            {
+                int left = kTimeout - t.elapsed();
+                if (left > 0)
+                    (*it)->wait(left);
+            }
         }
     }
 
-    if (badGuys.empty())
-        return;
+    delete s_all_threads;
+    s_all_threads = NULL;
 
-    // logging has been stopped so we need to use iostream...
-    cerr<<"Error: Not all threads were shut down properly: "<<endl;
-    for (it = badGuys.begin(); it != badGuys.end(); ++it)
-    {
-        cerr<<"Thread "<<qPrintable((*it)->objectName())
-            <<" is still running"<<endl;
-    }
-    cerr<<endl;
-
-    static const int kTimeout = 5000;
-    MythTimer t;
-    t.start();
-    for (it = badGuys.begin();
-         it != badGuys.end() && t.elapsed() < kTimeout; ++it)
-    {
-        int left = kTimeout - t.elapsed();
-        if (left > 0)
-            (*it)->wait(left);
-    }
+    delete s_all_threads_lock;
+    s_all_threads_lock = NULL;
 }
 
 void MThread::GetAllThreadNames(QStringList &list)
 {
-    QMutexLocker locker(&s_all_threads_lock);
+    QMutexLocker locker(s_all_threads_lock);
     QSet<MThread*>::const_iterator it;
-    for (it = s_all_threads.begin(); it != s_all_threads.end(); ++it)
+    for (it = s_all_threads->begin(); it != s_all_threads->end(); ++it)
         list.push_back((*it)->objectName());
 }
 
 void MThread::GetAllRunningThreadNames(QStringList &list)
 {
-    QMutexLocker locker(&s_all_threads_lock);
+    QMutexLocker locker(s_all_threads_lock);
     QSet<MThread*>::const_iterator it;
-    for (it = s_all_threads.begin(); it != s_all_threads.end(); ++it)
+    for (it = s_all_threads->begin(); it != s_all_threads->end(); ++it)
     {
         if ((*it)->isRunning())
             list.push_back((*it)->objectName());
