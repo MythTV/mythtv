@@ -105,6 +105,7 @@ class MBASE_PUBLIC MythSocket : public MSocketDevice
     QStringList     m_announce;
 
     static const uint kSocketBufferSize;
+    static QMutex s_readyread_thread_lock;
     static MythSocketThread *s_readyread_thread;
 };
 
