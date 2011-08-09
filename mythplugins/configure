@@ -125,6 +125,7 @@ enable $PLUGIN_LIST $CONFIG_LIST
 prefix="/usr/local"
 libdir_name="lib"
 sysroot=""
+ln_s="ln -sf"
 
 logfile="config.ep"
 
@@ -586,7 +587,7 @@ rm -f $TMPC $TMPE
 # bring in mythtv config
 if [ -e $prefix/include/mythtv/mythconfig.mak ] ; then
   rm mythconfig.mak 2> /dev/null
-  ln -s $prefix/include/mythtv/mythconfig.mak mythconfig.mak
+  ${ln_s} $prefix/include/mythtv/mythconfig.mak mythconfig.mak
 else
   echo "ERROR: mythconfig.mak not found at $prefix/include/mythtv/mythconfig.mak"
   echo "Did you make AND install MythTV first?"
