@@ -2,6 +2,8 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
+using std::max;
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -1094,7 +1096,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
         verboseMask = toUInt("verboseint");
 
     int quiet = toUInt("quiet");
-    if (MAX(quiet, (int)progress) > 1)
+    if (max(quiet, (int)progress) > 1)
     {
         verboseMask = VB_NONE;
         verboseArgParse("none");
@@ -1117,7 +1119,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     bool propagate = toBool("islogpath");
 
     if (toBool("daemon"))
-        quiet = MAX(quiet, 1);
+        quiet = max(quiet, 1);
 
     logStart(logfile, progress, quiet, facility, level, dblog, propagate);
 

@@ -4860,21 +4860,21 @@ EOF
 cp_if_changed $TMPH $MYTH_CONFIG_H
 
 if ! test -L config.h ; then
-  ln -s $MYTH_CONFIG_H config.h
+  ${ln_s} $MYTH_CONFIG_H config.h
 fi
 
 if [ ! -e config.h ] ; then
-  ln -s $MYTH_CONFIG_H config.h
+  ${ln_s} $MYTH_CONFIG_H config.h
 fi
 
 cp_if_changed $TMPMAK $MYTH_CONFIG_MAK
 
 if ! test -L config.mak ; then
-  ln -s $MYTH_CONFIG_MAK config.mak
+  ${ln_s} $MYTH_CONFIG_MAK config.mak
 fi
 
 if [ ! -e config.mak ] ; then
-  ln -s $MYTH_CONFIG_MAK config.mak
+  ${ln_s} $MYTH_CONFIG_MAK config.mak
 fi
 
 
@@ -4904,7 +4904,7 @@ EOF
 
 # link config.h into external/FFmpeg
 rm -f external/FFmpeg/config.h
-(cd external/FFmpeg/ && ln -s ../../$MYTH_CONFIG_H config.h)
+(cd external/FFmpeg/ && ${ln_s} ../../$MYTH_CONFIG_H config.h)
 touch external/FFmpeg/.config
 
 enabled yasm && cp_if_changed $TMPASM external/FFmpeg/config.asm
