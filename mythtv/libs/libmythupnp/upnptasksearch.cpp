@@ -94,7 +94,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                               "Content-Length: 0\r\n\r\n" )
                               .arg( m_nMaxAge    )
                               .arg( sDate )
-                              .arg( HttpServer::g_sPlatform )
+                              .arg( HttpServer::GetPlatform() )
                               .arg( MYTH_BINARY_VERSION )
                               .arg( sST )
                               .arg( sUSN );

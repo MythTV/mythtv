@@ -12,8 +12,9 @@ using namespace std;
 
 #define LOC QString("DTVChan(%1): ").arg(GetDevice())
 
-QMutex                    DTVChannel::master_map_lock;
-QMap<QString,DTVChannel*> DTVChannel::master_map;
+QReadWriteLock DTVChannel::master_map_lock(QReadWriteLock::Recursive);
+typedef QMap<QString,QList<DTVChannel*> > MasterMap;
+MasterMap DTVChannel::master_map;
 
 DTVChannel::DTVChannel(TVRec *parent)
     : ChannelBase(parent),
@@ -38,17 +39,6 @@ DTVChannel::~DTVChannel()
     {
         delete genPMT;
         genPMT = NULL;
-    }
-
-    QMutexLocker locker(&master_map_lock);
-    QMap<QString,DTVChannel*>::iterator it = master_map.begin();
-    for (; it != master_map.end(); ++it)
-    {
-        if (*it == this)
-        {
-            master_map.erase(it);
-            break;
-        }
     }
 }
 
@@ -142,32 +132,47 @@ void DTVChannel::SaveCachedPids(const pid_cache_t &pid_cache) const
         ChannelUtil::SaveCachedPids(chanid, pid_cache);
 }
 
-DTVChannel *DTVChannel::GetMaster(const QString &videodevice)
+void DTVChannel::RegisterForMaster(const QString &key)
 {
-    QMutexLocker locker(&master_map_lock);
-
-    QMap<QString,DTVChannel*>::iterator it = master_map.find(videodevice);
-    if (it != master_map.end())
-        return *it;
-
-    QString tmp = videodevice; tmp.detach();
-    master_map[tmp] = this;
-
-    return this;
+    master_map_lock.lockForWrite();
+    master_map[key].push_back(this);
+    master_map_lock.unlock();
 }
 
-const DTVChannel *DTVChannel::GetMaster(const QString &videodevice) const
+void DTVChannel::DeregisterForMaster(const QString &key)
 {
-    QMutexLocker locker(&master_map_lock);
+    master_map_lock.lockForWrite();
+    MasterMap::iterator mit = master_map.find(key);
+    if (mit == master_map.end())
+        mit = master_map.begin();
+    for (; mit != master_map.end(); ++mit)
+    {
+        (*mit).removeAll(this);
+        if (mit.key() == key)
+            break;
+    }
+    master_map_lock.unlock();
+}
 
-    QMap<QString,DTVChannel*>::iterator it = master_map.find(videodevice);
-    if (it != master_map.end())
-        return *it;
+DTVChannel *DTVChannel::GetMasterLock(const QString &key)
+{
+    master_map_lock.lockForRead();
+    MasterMap::iterator mit = master_map.find(key);
+    if (mit == master_map.end() || (*mit).empty())
+    {
+        master_map_lock.unlock();
+        return NULL;
+    }
+    return (*mit).front();
+}
 
-    QString tmp = videodevice; tmp.detach();
-    master_map[tmp] = (DTVChannel*) this;
-
-    return this;
+void DTVChannel::ReturnMasterLock(DTVChannelP &chan)
+{
+    if (chan != NULL)
+    {
+        chan = NULL;
+        master_map_lock.unlock();
+    }
 }
 
 bool DTVChannel::SetChannelByString(const QString &channum)

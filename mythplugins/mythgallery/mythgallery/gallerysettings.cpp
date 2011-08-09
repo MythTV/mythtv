@@ -8,8 +8,32 @@
 // mythgallery
 #include "config.h"
 #include "gallerysettings.h"
+#include "galleryfilter.h"
 
 // General Settings
+
+static HostLineEdit *MythGalleryFilter()
+{
+    HostLineEdit *gc = new HostLineEdit("GalleryFilterDirectory");
+    gc->setLabel(QObject::tr("Directory filter"));
+    gc->setValue("");
+    gc->setHelpText(QObject::tr("Enter direcory names to be excluded in "
+                                "browser. (multiple entries delimited with "
+                                "':')"));
+    return gc;
+};
+
+static HostComboBox *MythGalleryFilterType()
+{
+    HostComboBox *gc = new HostComboBox("GalleryFilterType");
+    gc->setLabel(QObject::tr("Type filter"));
+    gc->addSelection("All", QString::number(kTypeFilterAll));
+    gc->addSelection("Images only", QString::number(kTypeFilterImagesOnly));
+    gc->addSelection("Movies only", QString::number(kTypeFilterMoviesOnly));
+    gc->setHelpText(QObject::tr("This is the type filter for the displayed "
+                    "thumbnails."));
+    return gc;
+};
 
 static HostLineEdit *MythGalleryDir()
 {
@@ -38,10 +62,22 @@ static HostComboBox *MythGallerySortOrder()
 {
     HostComboBox *gc = new HostComboBox("GallerySortOrder");
     gc->setLabel(QObject::tr("Sort order when browsing"));
-    gc->addSelection("Name (A-Z alpha)", QString::number(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase));
-    gc->addSelection("Reverse Name (Z-A alpha)", QString::number(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase | QDir::Reversed));
-    gc->addSelection("Mod Time (earliest first)", QString::number(QDir::Time | QDir::DirsFirst | QDir::IgnoreCase | QDir::Reversed));
-    gc->addSelection("Reverse Mod Time (most recent first)", QString::number(QDir::Time | QDir::DirsFirst | QDir::IgnoreCase));
+    gc->addSelection("Unsorted", QString::number(kSortOrderUnsorted));
+    gc->addSelection("Name (A-Z alpha)", QString::number(kSortOrderNameAsc));
+    gc->addSelection("Reverse Name (Z-A alpha)",
+                     QString::number(kSortOrderNameDesc));
+    gc->addSelection("Mod Time (oldest first)",
+                     QString::number(kSortOrderModTimeAsc));
+    gc->addSelection("Reverse Mod Time (newest first)",
+                     QString::number(kSortOrderModTimeDesc));
+    gc->addSelection("Extension (A-Z alpha)",
+                     QString::number(kSortOrderExtAsc));
+    gc->addSelection("Reverse Extension (Z-A alpha)",
+                     QString::number(kSortOrderExtDesc));
+    gc->addSelection("Filesize (smallest first)",
+		     QString::number(kSortOrderSizeAsc));
+    gc->addSelection("Reverse Filesize (largest first)",
+                     QString::number(kSortOrderSizeDesc));
     gc->setHelpText(QObject::tr("This is the sort order for the displayed "
                     "picture thumbnails."));
     return gc;
@@ -229,6 +265,8 @@ GallerySettings::GallerySettings()
     general->addChild(MythGalleryImportDirs());
     general->addChild(MythGalleryAutoLoad());
     general->addChild(MythGalleryMoviePlayerCmd());
+    general->addChild(MythGalleryFilter());
+    general->addChild(MythGalleryFilterType());
     addChild(general);
 
     GalleryConfigurationGroup* config = new GalleryConfigurationGroup();

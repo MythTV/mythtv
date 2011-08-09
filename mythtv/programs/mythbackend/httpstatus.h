@@ -90,8 +90,7 @@ class HttpStatus : public HttpServerExtension
 
         virtual QStringList GetBasePaths();
         
-        bool     ProcessRequest( HttpWorkerThread *pThread,
-                                 HTTPRequest *pRequest );
+        bool     ProcessRequest( HTTPRequest *pRequest );
 };
 
 #endif

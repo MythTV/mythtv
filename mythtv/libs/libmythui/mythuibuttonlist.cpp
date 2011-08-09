@@ -2411,7 +2411,8 @@ bool MythUIButtonList::ParseElement(
     else if (element.tagName() == "drawfrombottom")
     {
         m_drawFromBottom = parseBool(element);
-        m_alignment |= Qt::AlignBottom;
+        if (m_drawFromBottom)
+            m_alignment |= Qt::AlignBottom;
     }
     else if (element.tagName() == "searchposition")
     {

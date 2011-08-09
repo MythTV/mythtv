@@ -7,9 +7,10 @@ using namespace std;
 #include <QWriteLocker>
 #include <QMutexLocker>
 #include <QWaitCondition>
-#include <QThread>
 #include <QEvent>
 #include <QCoreApplication>
+#include <QNetworkProxy>
+#include <QRunnable>
 
 // MythTV
 #include "mythsocketmanager.h"
@@ -20,81 +21,40 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythversion.h"
 #include "mythlogging.h"
+#include "mthread.h"
 
 #define LOC      QString("MythSocketManager: ")
 
-#define PRT_STARTUP_THREAD_COUNT 2
 #define PRT_TIMEOUT 10
 
-uint socket_id = 1;
-
-class ProcessRequestThread : public QThread
+class ProcessRequestRunnable : public QRunnable
 {
   public:
-    ProcessRequestThread(MythSocketManager *ms):
-        m_parent(ms), m_socket(NULL), m_threadlives(false) {}
-
-    void setup(MythSocket *sock)
+    ProcessRequestRunnable(MythSocketManager &parent, MythSocket *sock) :
+        m_parent(parent), m_sock(sock)
     {
-        QMutexLocker locker(&m_lock);
-        m_socket = sock;
-        m_socket->UpRef();
-        m_waitCond.wakeAll();
-    }
-
-    void killit(void)
-    {
-        QMutexLocker locker(&m_lock);
-        m_threadlives = false;
-        m_waitCond.wakeAll();
+        m_sock->UpRef();
     }
 
     virtual void run(void)
     {
-        threadRegister("ProcessRequest");
-        QMutexLocker locker(&m_lock);
-        m_threadlives = true;
-        m_waitCond.wakeAll(); // Signal to creating thread
-
-        while (true)
-        {
-            m_waitCond.wait(locker.mutex());
-            LOG(VB_SOCKET, LOG_DEBUG, "ProcessRequestThread running.");
-
-            if (!m_threadlives)
-                break;
-
-            if (!m_socket)
-            {
-                LOG(VB_SOCKET, LOG_ERR, "ProcessRequestThread has no target.");
-                continue;
-            }
-
-            m_parent->ProcessRequest(m_socket);
-            m_socket->DownRef();
-            m_socket = NULL;
-            m_parent->MarkUnused(this);
-        }
-        threadDeregister();
+        m_parent.ProcessRequest(m_sock);
+        m_sock->DownRef();
     }
 
-    QMutex m_lock;
-    QWaitCondition m_waitCond;
-
-  private:
-    MythSocketManager  *m_parent;
-    MythSocket         *m_socket;
-    bool                m_threadlives;
+    MythSocketManager &m_parent;
+    MythSocket        *m_sock;
 };
 
 MythSocketManager::MythSocketManager() :
-    m_server(NULL)
+    m_server(NULL), m_threadPool("MythSocketManager")
 {
-    SetThreadCount(PRT_STARTUP_THREAD_COUNT);
 }
 
 MythSocketManager::~MythSocketManager()
 {
+    m_threadPool.Stop();
+
     QWriteLocker wlock(&m_handlerLock);
 
     QMap<QString, SocketRequestHandler*>::iterator i;
@@ -102,36 +62,6 @@ MythSocketManager::~MythSocketManager()
         delete *i;
 
     m_handlerMap.clear();
-}
-
-void MythSocketManager::SetThreadCount(uint count)
-{
-    if (m_threadPool.size() >= count)
-        return;
-
-    LOG(VB_GENERAL, LOG_ERR, QString("Increasing thread count to %2")
-               .arg(count));
-    while (count > m_threadPool.size())
-    {
-        ProcessRequestThread *prt = new ProcessRequestThread(this);
-        prt->m_lock.lock();
-        prt->start();
-        prt->m_waitCond.wait(&prt->m_lock);
-        prt->m_lock.unlock();
-        m_threadPool.push_back(prt);
-    }
-}
-
-void MythSocketManager::MarkUnused(ProcessRequestThread *prt)
-{
-    LOG(VB_SOCKET, LOG_DEBUG, "Releasing ProcessRequestThread.");
-
-    QMutexLocker locker(&m_threadPoolLock);
-    m_threadPool.push_back(prt);
-    m_threadPoolCond.wakeAll();
-
-    LOG(VB_SOCKET, LOG_INFO, QString("ProcessRequestThread pool size: %1")
-                                        .arg(m_threadPool.size()));
 }
 
 bool MythSocketManager::Listen(int port)
@@ -144,6 +74,7 @@ bool MythSocketManager::Listen(int port)
     }
 
     m_server = new MythServer();
+    m_server->setProxy(QNetworkProxy::NoProxy);
     if (!m_server->listen(gCoreContext->MythHostAddressAny(), port))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1.").arg(port));
@@ -204,34 +135,9 @@ void MythSocketManager::readyRead(MythSocket *sock)
         return;
     }
 
-    ProcessRequestThread *prt = NULL;
-    {
-        QMutexLocker locker(&m_threadPoolLock);
-
-        if (m_threadPool.empty())
-        {
-            LOG(VB_GENERAL, LOG_INFO,
-                "Waiting for a process request thread.. ");
-            m_threadPoolCond.wait(&m_threadPoolLock, PRT_TIMEOUT);
-        }
-
-        if (!m_threadPool.empty())
-        {
-            prt = m_threadPool.front();
-            m_threadPool.pop_front();
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, "Adding a new process request thread");
-            prt = new ProcessRequestThread(this);
-            prt->m_lock.lock();
-            prt->start();
-            prt->m_waitCond.wait(&prt->m_lock);
-            prt->m_lock.unlock();
-        }
-    }
-
-    prt->setup(sock);
+    m_threadPool.startReserved(
+        new ProcessRequestRunnable(*this, sock),
+        "ServiceRequest", PRT_TIMEOUT);
 }
 
 void MythSocketManager::connectionClosed(MythSocket *sock)

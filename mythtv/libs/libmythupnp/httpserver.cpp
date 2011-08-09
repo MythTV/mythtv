@@ -51,50 +51,39 @@
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-QString  HttpServer::g_sPlatform;
+QMutex   HttpServer::s_platformLock;
+QString  HttpServer::s_platform;
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HttpServer::HttpServer() : QTcpServer(), ThreadPool("HTTP")
+HttpServer::HttpServer() :
+    QTcpServer(), m_sSharePath(GetShareDir()),
+    m_pHtmlServer(new HtmlServerExtension(m_sSharePath)),
+    m_threadPool("HttpServerPool"), m_running(true)
 {
     setMaxPendingConnections(20);
-    InitializeThreads();
 
     // ----------------------------------------------------------------------
     // Build Platform String
     // ----------------------------------------------------------------------
-
+    {
+        QMutexLocker locker(&s_platformLock);
 #ifdef USING_MINGW
-    g_sPlatform = QString( "Windows %1.%2" )
-        .arg(LOBYTE(LOWORD(GetVersion())))
-        .arg(HIBYTE(LOWORD(GetVersion())));
+        s_platform = QString("Windows %1.%2")
+            .arg(LOBYTE(LOWORD(GetVersion())))
+            .arg(HIBYTE(LOWORD(GetVersion())));
 #else
-    struct utsname uname_info;
-
-    uname( &uname_info );
-
-    g_sPlatform = QString( "%1 %2" ).arg( uname_info.sysname )
-                                    .arg( uname_info.release );
+        struct utsname uname_info;
+        uname( &uname_info );
+        s_platform = QString("%1 %2")
+            .arg(uname_info.sysname).arg(uname_info.release);
 #endif
+    }
 
-    // ----------------------------------------------------------------------
-    // Initialize Share Path
-    // ----------------------------------------------------------------------
-
-    m_sSharePath = GetShareDir();
     LOG(VB_UPNP, LOG_INFO, QString("HttpServer() - SharePath = %1")
             .arg(m_sSharePath));
-
-    // ----------------------------------------------------------------------
-    // The HtmlServer Extension is our fall back if a request isn't processed
-    // by any other extension.  (This is needed here since it listens for
-    // '/' as it's base url ).
-    // ----------------------------------------------------------------------
-
-    m_pHtmlServer = new HtmlServerExtension( m_sSharePath );
-
 
     // -=>TODO: Load Config XML
     // -=>TODO: Load & initialize - HttpServerExtensions
@@ -106,6 +95,12 @@ HttpServer::HttpServer() : QTcpServer(), ThreadPool("HTTP")
 
 HttpServer::~HttpServer()
 {
+    m_rwlock.lockForWrite();
+    m_running = false;
+    m_rwlock.unlock();
+
+    m_threadPool.Stop();
+
     while (!m_extensions.empty())
     {
         delete m_extensions.takeFirst();
@@ -113,6 +108,16 @@ HttpServer::~HttpServer()
 
     if (m_pHtmlServer != NULL)
         delete m_pHtmlServer;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString HttpServer::GetPlatform(void)
+{
+    QMutexLocker locker(&s_platformLock);
+    return s_platform;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -128,22 +133,11 @@ QScriptEngine* HttpServer::ScriptEngine()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-WorkerThread *HttpServer::CreateWorkerThread( ThreadPool * /*pThreadPool */, 
-                                              const QString &sName )
-{
-    return( new HttpWorkerThread( this, sName ));
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 void HttpServer::incomingConnection(int nSocket)
 {
-    HttpWorkerThread *pThread = (HttpWorkerThread *)GetWorkerThread();
-
-    if (pThread != NULL)
-        pThread->StartWork( nSocket );
+    m_threadPool.startReserved(
+        new HttpWorker(*this, nSocket),
+        QString("HttpServer%1").arg(nSocket));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -195,7 +189,7 @@ void HttpServer::UnregisterExtension( HttpServerExtension *pExtension )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
+void HttpServer::DelegateRequest(HTTPRequest *pRequest)
 {
     bool bProcessed = false;
 
@@ -207,7 +201,7 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
     {
         try
         {
-            bProcessed = list[ nIdx ]->ProcessRequest(pThread, pRequest);
+            bProcessed = list[ nIdx ]->ProcessRequest(pRequest);
         }
         catch(...)
         {
@@ -224,7 +218,7 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
     {
         try
         {
-            bProcessed = (*it)->ProcessRequest(pThread, pRequest);
+            bProcessed = (*it)->ProcessRequest(pRequest);
         }
         catch(...)
         {
@@ -237,7 +231,7 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
     m_rwlock.unlock();
 
     if (!bProcessed)
-        bProcessed = m_pHtmlServer->ProcessRequest( pThread, pRequest );
+        bProcessed = m_pHtmlServer->ProcessRequest(pRequest);
 
     if (!bProcessed)
     {
@@ -254,67 +248,22 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-HttpWorkerThread::HttpWorkerThread( HttpServer *pParent, const QString &sName ) :
-                  WorkerThread( (ThreadPool *)pParent, sName )
+HttpWorker::HttpWorker(HttpServer &httpServer, int sock) :
+    m_httpServer(httpServer), m_socket(sock), m_socketTimeout(10000)
 {
-    m_pHttpServer    = pParent;
-    m_nSocket        = 0;                                                  
-    m_nSocketTimeout = 1000 *
+    m_socketTimeout = 1000 *
         UPnp::GetConfiguration()->GetValue("HTTP/KeepAliveTimeoutSecs", 10);
-
-    m_pData          = NULL;
 }                  
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HttpWorkerThread::~HttpWorkerThread()
-{
-    if (m_pData != NULL)
-        delete m_pData;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpWorkerThread::SetWorkerData( HttpWorkerData *pData )
-{
-    // WorkerThread takes ownership of pData pointer.
-    //  (Must be allocated on heap)
-
-    if (m_pData != NULL)
-        delete m_pData;
-
-    m_pData = pData;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void HttpWorkerThread::StartWork( int nSocket )
-{
-    m_nSocket = nSocket;
-
-    SignalWork();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void  HttpWorkerThread::ProcessWork()
+void HttpWorker::run(void)
 {
 #if 0
     LOG(VB_UPNP, LOG_DEBUG,
-        QString("HttpWorkerThread::ProcessWork:Begin( %1 ) socket=%2")
-            .arg((long)QThread::currentThread()) .arg(m_nSocket));
+        QString("HttpWorker::run() socket=%1 -- begin").arg(m_socket));
 #endif
 
     bool                    bTimeout   = false;
@@ -324,7 +273,7 @@ void  HttpWorkerThread::ProcessWork()
 
     try
     {
-        if ((pSocket = new BufferedSocketDevice( m_nSocket )) == NULL)
+        if ((pSocket = new BufferedSocketDevice( m_socket )) == NULL)
         {
             LOG(VB_GENERAL, LOG_ERR, "Error Creating BufferedSocketDevice");
             return;
@@ -332,11 +281,13 @@ void  HttpWorkerThread::ProcessWork()
 
         pSocket->SocketDevice()->setBlocking( true );
 
-        while( !m_bTermRequested && bKeepAlive && pSocket->IsValid())
+        while (m_httpServer.IsRunning() && bKeepAlive && pSocket->IsValid())
         {
-            bTimeout = 0;
+            bTimeout = false;
 
-            int64_t nBytes = pSocket->WaitForMore(m_nSocketTimeout, &bTimeout);
+            int64_t nBytes = pSocket->WaitForMore(m_socketTimeout, &bTimeout);
+            if (!m_httpServer.IsRunning())
+                break;
 
             if ( nBytes > 0)
             {
@@ -357,7 +308,7 @@ void  HttpWorkerThread::ProcessWork()
                         // ------------------------------------------------------
 
                         if (pRequest->m_nResponseStatus != 401)
-                            m_pHttpServer->DelegateRequest( this, pRequest );
+                            m_httpServer.DelegateRequest(pRequest);
                     }
                     else
                     {
@@ -391,7 +342,7 @@ void  HttpWorkerThread::ProcessWork()
                         LOG(VB_UPNP, LOG_ERR,
                             QString("socket(%1) - Error returned from "
                                     "SendResponse... Closing connection")
-                                .arg(m_nSocket));
+                                .arg(m_socket));
                     }
 
                     // -------------------------------------------------------
@@ -429,12 +380,10 @@ void  HttpWorkerThread::ProcessWork()
     pSocket->Close();
 
     delete pSocket;
-    m_nSocket = 0;
+    m_socket = 0;
 
 #if 0
-    LOG(VB_UPNP, LOG_DEBUG,
-        QString( "HttpWorkerThread::ProcessWork:End( %1 )")
-            .arg((long)QThread::currentThread()));
+    LOG(VB_UPNP, LOG_DEBUG, "HttpWorkerThread::run() -- end");
 #endif
 }
 

@@ -3,7 +3,6 @@
 
 #include <QReadWriteLock>
 #include <QStringList>
-#include <QThreadPool>
 #include <QRunnable>
 #include <QEvent>
 #include <QMutex>
@@ -15,6 +14,7 @@ using namespace std;
 
 #include "tv.h"
 #include "playbacksock.h"
+#include "mthreadpool.h"
 #include "encoderlink.h"
 #include "filetransfer.h"
 #include "scheduler.h"
@@ -28,7 +28,6 @@ using namespace std;
 #undef DeleteFile
 #endif
 
-class ProcessRequestThread;
 class QUrl;
 class MythServer;
 class QTimer;
@@ -69,7 +68,8 @@ class DeleteThread : public QRunnable, public DeleteStruct
                  bool forceMetadataDelete) :
                      DeleteStruct(ms, filename, title, chanid, recstartts,
                                   recendts, forceMetadataDelete)  {}
-    void start(void) { QThreadPool::globalInstance()->start(this); }
+    void start(void)
+        { MThreadPool::globalInstance()->startReserved(this, "DeleteThread"); }
     void run(void);
 };
 
@@ -78,7 +78,8 @@ class TruncateThread : public QRunnable, public DeleteStruct
   public:
     TruncateThread(MainServer *ms, QString filename, int fd, off_t size) :
                 DeleteStruct(ms, filename, fd, size)  {}
-    void start(void) { QThreadPool::globalInstance()->start(this); }
+    void start(void)
+        { MThreadPool::globalInstance()->start(this, "Truncate"); }
     void run(void);
 };
 
@@ -103,7 +104,6 @@ class MainServer : public QObject, public MythSocketCBs
     void ShutSlaveBackendsDown(QString &haltcmd);
 
     void ProcessRequest(MythSocket *sock);
-    void MarkUnused(ProcessRequestThread *prt);
 
     void readyRead(MythSocket *socket);
     void connectionClosed(MythSocket *socket);
@@ -269,10 +269,7 @@ class MainServer : public QObject, public MythSocketCBs
     bool ismaster;
 
     QMutex deletelock;
-    QMutex threadPoolLock;
-    QWaitCondition threadPoolCond;
-    MythDeque<ProcessRequestThread *> threadPool;
-    MythDeque<ProcessRequestThread *> threadPoolAll;
+    MThreadPool threadPool;
 
     bool masterBackendOverride;
 

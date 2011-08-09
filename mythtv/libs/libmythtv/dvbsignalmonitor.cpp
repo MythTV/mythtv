@@ -203,7 +203,7 @@ DVBChannel *DVBSignalMonitor::GetDVBChannel(void)
 /** \fn DVBSignalMonitor::UpdateValues()
  *  \brief Fills in frontend stats and emits status Qt signals.
  *
- *   This is automatically called by MonitorLoop(), after Start()
+ *   This is automatically called by run(), after Start()
  *   has been used to start the signal monitoring thread.
  */
 void DVBSignalMonitor::UpdateValues(void)

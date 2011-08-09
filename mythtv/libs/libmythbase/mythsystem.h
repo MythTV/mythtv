@@ -30,10 +30,10 @@ typedef enum MythSystemMask {
 #include <QBuffer>
 #include <QSemaphore>
 #include <QMap>
-#include <QThread>
-#include <QWaitCondition>
 
 typedef QMap<QString, bool> Setting_t;
+
+void ShutdownMythSystem(void);
 
 class MythSystemPrivate;
 class MBASE_PUBLIC MythSystem : public QObject

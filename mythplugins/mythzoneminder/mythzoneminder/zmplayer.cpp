@@ -241,7 +241,7 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "TOGGLEASPECT" || action == "TOGGLEFILL")
         {
-            if (m_eventList->size() > 0)
+            if (!m_eventList->empty())
             {
                 stopPlayer();
 
@@ -277,7 +277,7 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
 
 void ZMPlayer::playPressed()
 {
-    if (m_eventList->size() == 0)
+    if (m_eventList->empty())
         return;
 
     if (m_paused)
@@ -298,7 +298,7 @@ void ZMPlayer::playPressed()
 
 void ZMPlayer::deletePressed()
 {
-    if (m_eventList->size() == 0 || *m_currentEvent > (int) m_eventList->size() - 1)
+    if (m_eventList->empty() || *m_currentEvent > (int) m_eventList->size() - 1)
         return;
 
     Event *event = m_eventList->at(*m_currentEvent);
@@ -315,7 +315,7 @@ void ZMPlayer::deletePressed()
 
         getEventInfo();
 
-        if (m_eventList->size() > 0)
+        if (!m_eventList->empty())
         {
             m_frameTimer->start(1000 / 25);
             m_paused = false;
@@ -325,7 +325,7 @@ void ZMPlayer::deletePressed()
 
 void ZMPlayer::nextPressed()
 {
-    if (m_eventList->size() == 0)
+    if (m_eventList->empty())
         return;
 
     if (*m_currentEvent >= (int) m_eventList->size() - 1)
@@ -341,7 +341,7 @@ void ZMPlayer::nextPressed()
 
 void ZMPlayer::prevPressed()
 {
-    if (m_eventList->size() == 0)
+    if (m_eventList->empty())
         return;
 
     if (*m_currentEvent <= 0)
@@ -380,7 +380,7 @@ void ZMPlayer::updateFrame(void)
 
 void ZMPlayer::getFrame(void)
 {
-    if (m_eventList->size() == 0)
+    if (m_eventList->empty())
         return;
 
     Event *event = m_eventList->at(*m_currentEvent);

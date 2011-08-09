@@ -40,7 +40,7 @@ TagLib::WavPack::File *MetaIOWavPack::OpenFile(const QString &filename)
 /*!
 * \copydoc MetaIO::write()
 */
-bool MetaIOWavPack::write(Metadata* mdata)
+bool MetaIOWavPack::write(const Metadata* mdata)
 {
     if (!mdata)
         return false;
@@ -82,7 +82,7 @@ bool MetaIOWavPack::write(Metadata* mdata)
 /*!
 * \copydoc MetaIO::read()
 */
-Metadata* MetaIOWavPack::read(QString filename)
+Metadata* MetaIOWavPack::read(const QString &filename)
 {
     TagLib::WavPack::File *wpfile = OpenFile(filename);
     
@@ -115,13 +115,7 @@ Metadata* MetaIOWavPack::read(QString filename)
     metadata->setCompilation(compilation);
 
     if (metadata->Length() <= 0)
-    {
-        TagLib::FileRef *fileref = new TagLib::FileRef(wpfile);
-        metadata->setLength(getTrackLength(fileref));
-        // FileRef takes ownership of wpfile, and is responsible for it's
-        // deletion. Messy.
-        delete fileref;
-    }
+        metadata->setLength(getTrackLength(wpfile));
     else
         delete wpfile;
     

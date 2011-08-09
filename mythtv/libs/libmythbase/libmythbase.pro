@@ -10,6 +10,7 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
+HEADERS += mthread.h mthreadpool.h
 HEADERS += mythsocket.h mythsocket_cb.h mythsocketthread.h msocketdevice.h
 HEADERS += mythbaseexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
 HEADERS += verbosedefs.h mythversion.h compat.h mythconfig.h
@@ -24,6 +25,7 @@ HEADERS += mythhttppool.h mythhttphandler.h mythdeque.h mythlogging.h
 HEADERS += mythbaseutil.h referencecounter.h version.h mythcommandlineparser.h
 HEADERS += mythscheduler.h
 
+SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp
 SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp
 SOURCES += mythobservable.cpp mythevent.cpp httpcomms.cpp mcodecs.cpp
@@ -59,7 +61,7 @@ inc.files += mythcorecontext.h mythsystem.h storagegroup.h
 inc.files += mythcoreutil.h mythlocale.h mythdownloadmanager.h
 inc.files += mythtranslation.h iso639.h iso3166.h mythmedia.h util.h
 inc.files += mythcdrom.h autodeletedeque.h dbutil.h mythhttppool.h mythdeque.h
-inc.files += referencecounter.h mythcommandlineparser.h
+inc.files += referencecounter.h mythcommandlineparser.h mthread.h mthreadpool.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth

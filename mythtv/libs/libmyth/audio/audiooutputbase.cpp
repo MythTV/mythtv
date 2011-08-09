@@ -45,6 +45,7 @@ static const char *quality_string(int q)
 }
 
 AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
+    MThread("AudioOutputBase"),
     // protected
     channels(-1),               codec(CODEC_ID_NONE),
     bytes_per_frame(0),         output_bytes_per_frame(0),
@@ -1692,11 +1693,11 @@ void AudioOutputBase::Drain()
  */
 void AudioOutputBase::run(void)
 {
-    threadRegister("AudioOutputBase");
+    RunProlog();
     VBAUDIO(QString("kickoffOutputAudioLoop: pid = %1").arg(getpid()));
     OutputAudioLoop();
     VBAUDIO("kickoffOutputAudioLoop exiting");
-    threadDeregister();
+    RunEpilog();
 }
 
 int AudioOutputBase::readOutputData(unsigned char*, int)

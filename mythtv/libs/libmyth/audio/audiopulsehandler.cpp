@@ -1,7 +1,11 @@
+#include <QMutexLocker>
+#include <QString>
 #include <QMutex>
-#include "mythlogging.h"
-#include "util.h"
+
 #include "audiopulsehandler.h"
+#include "mythlogging.h"
+#include "mthread.h"
+#include "util.h"
 
 #define LOC QString("Pulse: ")
 
@@ -269,7 +273,7 @@ bool PulseHandler::SuspendInternal(bool suspend)
         return false;
 
     // just in case it all goes pete tong
-    if (QThread::currentThread() != m_thread)
+    if (!is_current_thread(m_thread))
         LOG(VB_AUDIO, LOG_WARNING, LOC +
             "PulseHandler called from a different thread");
 

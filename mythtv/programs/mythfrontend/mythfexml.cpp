@@ -83,7 +83,7 @@ QStringList MythFEXML::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool MythFEXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
+bool MythFEXML::ProcessRequest( HTTPRequest *pRequest )
 {
     if (!pRequest)
         return false;

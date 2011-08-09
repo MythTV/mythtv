@@ -92,7 +92,7 @@ class UPNP_PUBLIC UPnpCMGR : public Eventing
 
         virtual QStringList GetBasePaths();
 
-        virtual bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
+        virtual bool     ProcessRequest( HTTPRequest *pRequest );
 };
 
 #endif

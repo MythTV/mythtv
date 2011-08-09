@@ -69,16 +69,16 @@ extern "C" {
 
 void NVRWriteThread::run(void)
 {
-    threadRegister("NVRWrite");
+    RunProlog();
     m_parent->doWriteThread();
-    threadDeregister();
+    RunEpilog();
 }
 
 void NVRAudioThread::run(void)
 {
-    threadRegister("NVRAudio");
+    RunProlog();
     m_parent->doAudioThread();
-    threadDeregister();
+    RunEpilog();
 }
 
 NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
@@ -1062,7 +1062,7 @@ void NuppelVideoRecorder::ProbeV4L2(void)
 #endif // USING_V4L2
 }
 
-void NuppelVideoRecorder::StartRecording(void)
+void NuppelVideoRecorder::run(void)
 {
     if (lzo_init() != LZO_E_OK)
     {

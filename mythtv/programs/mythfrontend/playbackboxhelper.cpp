@@ -316,11 +316,15 @@ void PBHEventHandler::UpdateFreeSpaceEvent(void)
 //////////////////////////////////////////////////////////////////////
 
 PlaybackBoxHelper::PlaybackBoxHelper(QObject *listener) :
-    m_listener(listener), m_eventHandler(NULL),
+    MThread("PlaybackBoxHelper"),
+    m_listener(listener), m_eventHandler(new PBHEventHandler(*this)),
     // Free Space Tracking Variables
     m_freeSpaceTotalMB(0ULL), m_freeSpaceUsedMB(0ULL)
 {
     start();
+    m_eventHandler->moveToThread(qthread());
+    // Prime the pump so the disk free display starts updating
+    ForceFreeSpaceUpdate();
 }
 
 PlaybackBoxHelper::~PlaybackBoxHelper()
@@ -373,16 +377,6 @@ void PlaybackBoxHelper::UndeleteRecording(
     list.push_back(recstartts.toString(Qt::ISODate));
     MythEvent *e = new MythEvent("UNDELETE_RECORDINGS", list);
     QCoreApplication::postEvent(m_eventHandler, e);
-}
-
-void PlaybackBoxHelper::run(void)
-{
-    threadRegister("PlaybackBoxHelper");
-    m_eventHandler = new PBHEventHandler(*this);
-    // Prime the pump so the disk free display starts updating
-    ForceFreeSpaceUpdate();
-    exec();
-    threadDeregister();
 }
 
 void PlaybackBoxHelper::UpdateFreeSpace(void)

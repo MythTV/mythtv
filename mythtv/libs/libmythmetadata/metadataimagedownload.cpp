@@ -25,7 +25,8 @@ QEvent::Type ImageDLFailureEvent::kEventType =
 QEvent::Type ThumbnailDLEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-MetadataImageDownload::MetadataImageDownload(QObject *parent)
+MetadataImageDownload::MetadataImageDownload(QObject *parent) :
+    MThread("MetadataImageDownload")
 {
     m_parent = parent;
 }
@@ -71,9 +72,10 @@ void MetadataImageDownload::cancel()
 
 void MetadataImageDownload::run()
 {
+    RunProlog();
+
     // Always handle thumbnails first, they're higher priority.
     ThumbnailData *thumb;
-    threadRegister("MetadataImageDownload");
     while ((thumb = moreThumbs()) != NULL)
     {
         QString sFilename = getDownloadFilename(thumb->title, thumb->url);
@@ -300,7 +302,8 @@ void MetadataImageDownload::run()
         lookup->SetDownloads(downloaded);
         QCoreApplication::postEvent(m_parent, new ImageDLEvent(lookup));
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 ThumbnailData* MetadataImageDownload::moreThumbs()

@@ -14,10 +14,12 @@ using namespace std;
 // Qt headers
 #include <QMutex>
 #include <QTimer>
-#include <QThread>
 #include <QDateTime>
 #include <QStringList>
 #include <QWaitCondition>
+
+// MythTV headers
+#include "mthread.h"
 
 typedef struct deletestruct
 {
@@ -27,7 +29,7 @@ typedef struct deletestruct
     QDateTime wait;
 } DeleteStruct;
 
-class DeleteThread : public QThread
+class DeleteThread : public QObject, public MThread
 {
     Q_OBJECT
   public:

@@ -2,6 +2,8 @@
 #define MYTHDBCON_H_
 
 #include <QSqlDatabase>
+#include <QSqlRecord>
+#include <QSqlError>
 #include <QVariant>
 #include <QSqlQuery>
 #include <QRegExp>
@@ -12,7 +14,7 @@
 #include "mythbaseexp.h"
 #include "mythdbparams.h"
 
-class QSemaphore;
+#define REUSE_CONNECTION 1
 
 MBASE_PUBLIC bool TestDatabase(QString dbHostName,
                                QString dbUserName,
@@ -21,7 +23,7 @@ MBASE_PUBLIC bool TestDatabase(QString dbHostName,
                                int     dbPort = 3306);
 
 /// \brief QSqlDatabase wrapper, used by MSqlQuery. Do not use directly.
-class MBASE_PUBLIC MSqlDatabase
+class MSqlDatabase
 {
   friend class MDBManager;
   friend class MSqlQuery;
@@ -55,7 +57,7 @@ class MBASE_PUBLIC MDBManager
     ~MDBManager(void);
 
     void CloseDatabases(void);
-    void PurgeIdleConnections(void);
+    void PurgeIdleConnections(bool leaveOne = false);
 
   protected:
     MSqlDatabase *popConnection(void);
@@ -63,24 +65,27 @@ class MBASE_PUBLIC MDBManager
 
     MSqlDatabase *getSchedCon(void);
     MSqlDatabase *getDDCon(void);
-    MSqlDatabase *getLogCon(void);
     void closeSchedCon(void);
     void closeDDCon(void);
-    void closeLogCon(void);
 
   private:
     MSqlDatabase *getStaticCon(MSqlDatabase **dbcon, QString name);
     void closeStaticCon(MSqlDatabase **dbcon);
 
-    QList<MSqlDatabase*> m_pool;
     QMutex m_lock;
-    QSemaphore *m_sem;
+    typedef QList<MSqlDatabase*> DBList;
+    QHash<QThread*, DBList> m_pool; // protected by m_lock
+#if REUSE_CONNECTION 
+    QHash<QThread*, MSqlDatabase*> m_inuse; // protected by m_lock
+    QHash<QThread*, int> m_inuse_count; // protected by m_lock
+#endif
+
     int m_nextConnID;
     int m_connCount;
 
     MSqlDatabase *m_schedCon;
     MSqlDatabase *m_DDCon;
-    MSqlDatabase *m_LogCon;
+    QHash<QThread*, DBList> m_static_pool;
 };
 
 /// \brief MSqlDatabase Info, used by MSqlQuery. Do not use directly.
@@ -119,8 +124,9 @@ typedef QMap<QString, QVariant> MSqlBindings;
  *   will crash if closed and reopend - so we never close them and keep them in
  *   a pool.
  */
-class MBASE_PUBLIC MSqlQuery : public QSqlQuery
+class MBASE_PUBLIC MSqlQuery : private QSqlQuery
 {
+    friend void MSqlEscapeAsAQuery(QString&, MSqlBindings&);
   public:
     /// \brief Get DB connection from pool
     MSqlQuery(const MSqlQueryInfo &qi);
@@ -136,19 +142,29 @@ class MBASE_PUBLIC MSqlQuery : public QSqlQuery
     /// \brief Wrap QSqlQuery::next() so we can display the query results
     bool next(void);
 
+    /// \brief Wrap QSqlQuery::previous() so we can display the query results
+    bool previous(void);
+
+    /// \brief Wrap QSqlQuery::first() so we can display the query results
+    bool first(void);
+
+    /// \brief Wrap QSqlQuery::last() so we can display the query results
+    bool last(void);
+
+    /// \brief Wrap QSqlQuery::seek(int,bool)
+    //         so we can display the query results
+    bool seek(int, bool relative = false);
+
     /// \brief Wrap QSqlQuery::exec(const QString &query) so we can display SQL
     bool exec(const QString &query);
 
     /// \brief QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
     bool prepare(const QString &query);
 
-    /// \brief Wrap QSqlQuery::bindValue so we can convert null QStrings to empty QStrings
-    void bindValue ( const QString & placeholder, const QVariant & val, QSql::ParamType paramType = QSql::In );
-    /// \brief Wrap QSqlQuery::bindValue so we can convert null QStrings to empty QStrings
-    void bindValue ( int pos, const QVariant & val, QSql::ParamType paramType = QSql::In );
+    void bindValue(const QString &placeholder, const QVariant &val);
 
     /// \brief Add all the bindings in the passed in bindings
-    void bindValues(MSqlBindings &bindings);
+    void bindValues(const MSqlBindings &bindings);
 
     /** \brief Return the id of the last inserted row
      *
@@ -159,6 +175,25 @@ class MBASE_PUBLIC MSqlQuery : public QSqlQuery
      * in SQLite.
      */
     QVariant lastInsertId();
+
+    /// Reconnects server and re-prepares and re-binds the last prepared
+    /// query.
+    bool Reconnect(void);
+
+    // Thunks that allow us to make QSqlQuery private
+    QVariant value(int i) const { return QSqlQuery::value(i); }
+    QString executedQuery(void) const { return QSqlQuery::executedQuery(); }
+    QMap<QString, QVariant> boundValues(void) const
+        { return QSqlQuery::boundValues(); }
+    QSqlError lastError(void) const { return QSqlQuery::lastError(); }
+    int size(void) const { return QSqlQuery::size();}
+    bool isActive(void) const { return  QSqlQuery::isActive(); }
+    QSqlRecord record(void) const { return QSqlQuery::record(); }
+    int numRowsAffected() const { return QSqlQuery::numRowsAffected(); }
+    void setForwardOnly(bool f) { QSqlQuery::setForwardOnly(f); }
+    bool isNull(int field) const { return QSqlQuery::isNull(field); }
+    const QSqlDriver *driver(void) const { return QSqlQuery::driver(); }
+    int at(void) const { return QSqlQuery::at(); }
 
     /// \brief Checks DB connection + login (login info via Mythcontext)
     static bool testDBConnection();
@@ -172,14 +207,18 @@ class MBASE_PUBLIC MSqlQuery : public QSqlQuery
     /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
     static MSqlQueryInfo DDCon();
 
-    /// \brief Returns dedicated connection.
-    static MSqlQueryInfo LogCon();
-    
     static void CloseSchedCon();
     static void CloseDDCon();
-    static void CloseLogCon();
 
   private:
+    // Only QSql::In is supported as a param type and only named params...
+    void bindValue(const QString&, const QVariant&, QSql::ParamType);
+    void bindValue(int, const QVariant&, QSql::ParamType);
+    void addBindValue(const QVariant&, QSql::ParamType = QSql::In);
+
+    bool seekDebug(const char *type, bool result,
+                   int where, bool relative) const;
+
     MSqlDatabase *m_db;
     bool m_isConnected;
     bool m_returnConnection;

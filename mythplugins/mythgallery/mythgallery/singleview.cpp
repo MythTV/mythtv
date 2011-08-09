@@ -43,7 +43,6 @@ using namespace std;
 #include "galleryutil.h"
 
 #define LOC QString("QtView: ")
-#define LOC_ERR QString("QtView, Error: ")
 
 template<typename T> T sq(T val) { return val * val; }
 

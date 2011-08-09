@@ -91,6 +91,7 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
     _dvbchannel(NULL),
     _drb(NULL)
 {
+    setObjectName("DVBRead");
 }
 
 void DVBStreamHandler::SetRunningDesired(bool desired)
@@ -102,7 +103,7 @@ void DVBStreamHandler::SetRunningDesired(bool desired)
 
 void DVBStreamHandler::run(void)
 {
-    threadRegister("DVBRead");
+    RunProlog();
     LOG(VB_RECORD, LOG_INFO, LOC + "run(): begin");
 
     if (!SupportsTSMonitoring() && _allow_section_reader)
@@ -111,7 +112,7 @@ void DVBStreamHandler::run(void)
         RunTS();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run(): end");
-    threadDeregister();
+    RunEpilog();
 }
 
 /** \fn DVBStreamHandler::RunTS(void)

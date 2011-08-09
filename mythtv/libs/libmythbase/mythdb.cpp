@@ -2,13 +2,12 @@
 using namespace std;
 
 #include <QReadWriteLock>
+#include <QTextStream>
 #include <QSqlError>
 #include <QMutex>
 #include <QFile>
 #include <QHash>
 #include <QDir>
-#include <QThread>
-#include <QTextStream>
 
 #include "mythdb.h"
 #include "mythdbcon.h"
@@ -140,7 +139,17 @@ QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
     QString str = QString("%1").arg("", indent);
     for (; it != bindings.end(); ++it)
     {
-        const QString curBinding = it.key() + '=' + (*it).toString() + ',';
+        QString val = (*it).toString();
+        if ((*it).isNull())
+        {
+            val = "NULL";
+        }
+        else if (it->type() == QVariant::String)
+        {
+            val = (it->toString().isNull()) ?
+                "NULL" : QString("\"%1\"").arg(val);
+        }
+        const QString curBinding = it.key() + '=' + val + ',';
         if ((curColumn > indent) &&
             ((curBinding.length() + curColumn) > maxColumn))
         {
@@ -162,7 +171,7 @@ QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
     return str;
 }
 
-void MythDB::DBError(const QString &where, const QSqlQuery& query)
+QString MythDB::GetError(const QString &where, const MSqlQuery &query)
 {
     QString str = QString("DB Error (%1):\n").arg(where);
 
@@ -175,7 +184,12 @@ void MythDB::DBError(const QString &where, const QSqlQuery& query)
         str += tmp;
     }
     str += DBErrorMessage(query.lastError());
-    LOG(VB_GENERAL, LOG_ERR, str);
+    return str;
+}
+
+void MythDB::DBError(const QString &where, const MSqlQuery &query)
+{
+    LOG(VB_GENERAL, LOG_ERR, GetError(where, query));
 }
 
 QString MythDB::DBErrorMessage(const QSqlError& err)
@@ -249,7 +263,7 @@ void MythDB::SaveSetting(const QString &key, const QString &newValue)
 }
 
 bool MythDB::SaveSettingOnHost(const QString &key,
-                               const QString &newValue,
+                               const QString &newValueRaw,
                                const QString &host)
 {
     QString LOC  = QString("SaveSettingOnHost('%1') ").arg(key);
@@ -258,6 +272,8 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         LOG(VB_GENERAL, LOG_ERR, LOC + "- Illegal null key");
         return false;
     }
+
+    QString newValue = (newValueRaw.isNull()) ? "" : newValueRaw;
 
     if (d->ignoreDatabase)
     {
@@ -681,8 +697,9 @@ double MythDB::GetFloatSettingOnHost(const QString &key, const QString &host)
     return (retval == sentinel) ? 0.0 : retval.toDouble();
 }
 
-void MythDB::SetSetting(const QString &key, const QString &newValue)
+void MythDB::SetSetting(const QString &key, const QString &newValueRaw)
 {
+    QString newValue = (newValueRaw.isNull()) ? "" : newValueRaw;
     d->m_settings->SetSetting(key, newValue);
     ClearSettingsCache(key);
 }

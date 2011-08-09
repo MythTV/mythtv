@@ -822,8 +822,7 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(
 
         if (!chan_update_q.exec())
         {
-            MythDB::DBError("Updating channel table",
-                            chan_update_q.lastQuery());
+            MythDB::DBError("Updating channel table", chan_update_q);
         }
     }
 

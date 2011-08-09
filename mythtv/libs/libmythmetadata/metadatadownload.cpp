@@ -21,7 +21,8 @@ QEvent::Type MetadataLookupEvent::kEventType =
 QEvent::Type MetadataLookupFailure::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-MetadataDownload::MetadataDownload(QObject *parent)
+MetadataDownload::MetadataDownload(QObject *parent) :
+    MThread("MetadataDownload")
 {
     m_parent = parent;
 }
@@ -63,8 +64,9 @@ void MetadataDownload::cancel()
 
 void MetadataDownload::run()
 {
+    RunProlog();
+
     MetadataLookup* lookup;
-    threadRegister("MetadataDownload");
     while ((lookup = moreWork()) != NULL)
     {
         MetadataLookupList list;
@@ -146,7 +148,8 @@ void MetadataDownload::run()
                 new MetadataLookupFailure(list));
         }
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 MetadataLookup* MetadataDownload::moreWork()

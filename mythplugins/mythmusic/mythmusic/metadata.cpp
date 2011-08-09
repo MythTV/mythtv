@@ -724,11 +724,6 @@ void Metadata::incRating()
     m_changed = true;
 }
 
-QDateTime Metadata::LastPlay()
-{
-    return m_lastplay;
-}
-
 void Metadata::setLastPlay()
 {
     m_lastplay = QDateTime::currentDateTime();
@@ -917,7 +912,12 @@ MetaIO* Metadata::getTagger(void)
     else if (extension == "ogg" || extension == "oga")
         return &metaIOOggVorbis;
     else if (extension == "flac")
-        return &metaIOFLACVorbis;
+    {
+        if (metaIOID3.TagExists(m_filename))
+            return &metaIOID3;
+        else
+            return &metaIOFLACVorbis;
+    }
     else if (extension == "m4a")
         return &metaIOMP4;
     else if (extension == "wv")
@@ -928,18 +928,18 @@ MetaIO* Metadata::getTagger(void)
 
 //--------------------------------------------------------------------------
 
-MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)
+MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr) :
+    MThread("MetadataLoading"), parent(parent_ptr)
 {
-    parent = parent_ptr;
 }
 
 void MetadataLoadingThread::run()
 {
-    threadRegister("MetadataLoading");
+    RunProlog();
     //if you want to simulate a big music collection load
     //sleep(3);
     parent->resync();
-    threadDeregister();
+    RunEpilog();
 }
 
 AllMusic::AllMusic(QString path_assignment, QString a_startdir)

@@ -2372,8 +2372,8 @@ QStringList ProgramInfo::QueryDVDBookmark(
     {
         query.prepare(" SELECT title, framenum, audionum, subtitlenum "
                         " FROM dvdbookmark "
-                        " WHERE serialid = ? ");
-        query.addBindValue(serialid);
+                        " WHERE serialid = :SERIALID ");
+        query.bindValue(":SERIALID", serialid);
 
         if (query.exec() && query.next())
         {
@@ -2407,17 +2407,17 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
         MythDB::DBError("SetDVDBookmark inserting", query);
 
     query.prepare(" UPDATE dvdbookmark "
-                    " SET title       = ? , "
-                    "     audionum    = ? , "
-                    "     subtitlenum = ? , "
-                    "     framenum    = ? , "
+                    " SET title       = :TITLE , "
+                    "     audionum    = :AUDIONUM , "
+                    "     subtitlenum = :SUBTITLENUM , "
+                    "     framenum    = :FRAMENUM , "
                     "     timestamp   = NOW() "
-                    " WHERE serialid = ? ;");
-    query.addBindValue(title);
-    query.addBindValue(audionum);
-    query.addBindValue(subtitlenum);
-    query.addBindValue(frame);
-    query.addBindValue(serialid);
+                    " WHERE serialid = :SERIALID");
+    query.bindValue(":TITLE",title);
+    query.bindValue(":AUDIONUM",audionum);
+    query.bindValue(":SUBTITLENUM",subtitlenum);
+    query.bindValue(":FRAMENUM",frame);
+    query.bindValue(":SERIALID",serialid);
 
     if (!query.exec())
         MythDB::DBError("SetDVDBookmark updating", query);
@@ -3812,7 +3812,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
     if (!IsLocal())
     {
         if (!gCoreContext->IsBackend())
-            return QString();
+            return "";
 
         QString path = GetPlaybackURL(false, true);
         if (path.left(1) == "/")
@@ -3821,7 +3821,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
             return testFile.path();
         }
 
-        return QString();
+        return "";
     }
 
     QFileInfo testFile(pathname);
@@ -3853,7 +3853,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
         }
     }
 
-    return QString();
+    return "";
 }
 
 #include <cassert>

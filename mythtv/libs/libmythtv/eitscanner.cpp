@@ -16,21 +16,10 @@
 #include "util.h"
 #include "mythdb.h"
 #include "mythlogging.h"
+#include "mthread.h"
 
 #define LOC QString("EITScanner: ")
 #define LOC_ID QString("EITScanner (%1): ").arg(cardnum)
-
-
-/** \fn EITThread::run(void)
- *  \brief Thunk that allows scanner Qthread to
- *         call EITScanner::RunEventLoop().
- */
-void EITThread::run(void)
-{
-    threadRegister("EIT");
-    scanner->RunEventLoop();
-    threadDeregister();
-}
 
 /** \class EITScanner
  *  \brief Acts as glue between ChannelBase, EITSource, and EITHelper.
@@ -45,16 +34,15 @@ const uint EITScanner::kMinRescheduleInterval = 150;
 
 EITScanner::EITScanner(uint _cardnum)
     : channel(NULL),              eitSource(NULL),
-      eitHelper(new EITHelper()), exitThread(false),
+      eitHelper(new EITHelper()), eventThread(new MThread("EIT", this)),
+      exitThread(false),
       rec(NULL),                  activeScan(false),
       activeScanTrigTime(0),      cardnum(_cardnum)
 {
     QStringList langPref = iso639_get_language_list();
     eitHelper->SetLanguagePreferences(langPref);
 
-    // Start scanner with Idle scheduling priority, to avoid problems with recordings.
-    eventThread.scanner = this;
-    eventThread.start(QThread::IdlePriority);
+    eventThread->start(QThread::IdlePriority);
 }
 
 void EITScanner::TeardownAll(void)
@@ -66,8 +54,10 @@ void EITScanner::TeardownAll(void)
         exitThread = true;
         exitThreadCond.wakeAll();
         lock.unlock();
-        eventThread.wait();
     }
+    eventThread->wait();
+    delete eventThread;
+    eventThread = NULL;
 
     if (eitHelper)
     {
@@ -76,10 +66,10 @@ void EITScanner::TeardownAll(void)
     }
 }
 
-/** \fn EITScanner::RunEventLoop(void)
+/**
  *  \brief This runs the event loop for EITScanner until 'exitThread' is true.
  */
-void EITScanner::RunEventLoop(void)
+void EITScanner::run(void)
 {
     static const uint  sz[] = { 2000, 1800, 1600, 1400, 1200, };
     static const float rt[] = { 0.0f, 0.2f, 0.4f, 0.6f, 0.8f, };

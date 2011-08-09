@@ -13,7 +13,6 @@
 #include <QPainter>
 #include <QDesktopWidget>
 #include <QStyleFactory>
-#include <QThreadPool>
 #include <QSize>
 #include <QFile>
 
@@ -32,6 +31,7 @@
 #include "mythimage.h"
 #include "remotefile.h"
 #include "mythcorecontext.h"
+#include "mthreadpool.h"
 
 #define LOC      QString("MythUIHelper: ")
 
@@ -130,7 +130,7 @@ class MythUIHelperPrivate
     DisplayRes *display_res;
     bool screenSetup;
 
-    QThreadPool *m_imageThreadPool;
+    MThreadPool *m_imageThreadPool;
 
     MythUIMenuCallbacks callbacks;
 
@@ -154,8 +154,8 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       m_cacheSizeLock(new QMutex(QMutex::Recursive)),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
-      screenSetup(false), m_imageThreadPool(new QThreadPool()), parent(p),
-      m_fontStretch(100)
+      screenSetup(false), m_imageThreadPool(new MThreadPool("MythUIHelper")),
+      parent(p), m_fontStretch(100)
 {
 }
 
@@ -1691,7 +1691,7 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
     return result;
 }
 
-QThreadPool *MythUIHelper::GetImageThreadPool(void)
+MThreadPool *MythUIHelper::GetImageThreadPool(void)
 {
     return d->m_imageThreadPool;
 }

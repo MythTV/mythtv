@@ -30,7 +30,7 @@ QStringList HttpConfig::GetBasePaths()
     return paths;
 }
 
-bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
+bool HttpConfig::ProcessRequest(HTTPRequest *request)
 {
     if (!request)
         return false;

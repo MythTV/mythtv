@@ -35,12 +35,10 @@
 // C++ headers
 #include <map>
 
-// Qt headers
-#include <QThread>
-
 // MythTV headers
-#include "upnputil.h"
 #include "refcounted.h"
+#include "upnputil.h"
+#include "mthread.h"
 #include "upnpexp.h"
 
 class Task;
@@ -89,7 +87,7 @@ class Task : public RefCounted
 // TaskQueue Singleton
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC TaskQueue : public QThread
+class UPNP_PUBLIC TaskQueue : public MThread
 {
     private: 
 

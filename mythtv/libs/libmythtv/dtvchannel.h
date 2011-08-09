@@ -15,8 +15,9 @@
 using namespace std;
 
 // Qt headers
-#include <QMutex>
+#include <QReadWriteLock>
 #include <QString>
+#include <QMutex>
 
 // MythTV headers
 #include "dtvconfparserhelpers.h" // for DTVTunerType
@@ -107,8 +108,11 @@ class DTVChannel : public ChannelBase
 
     void GetCachedPids(pid_cache_t &pid_cache) const;
 
-    DTVChannel *GetMaster(const QString &videodevice);
-    const DTVChannel *GetMaster(const QString &videodevice) const;
+    void RegisterForMaster(const QString &key);
+    void DeregisterForMaster(const QString &key);
+    static DTVChannel *GetMasterLock(const QString &key);
+    typedef DTVChannel* DTVChannelP;
+    static void ReturnMasterLock(DTVChannelP&);
 
     /// \brief Returns true if this is the first of a number of multi-rec devs
     virtual bool IsMaster(void) const { return false; }
@@ -155,8 +159,9 @@ class DTVChannel : public ChannelBase
     /// This is a generated PMT for RAW pid tuning
     ProgramMapTable         *genPMT;
 
-    static QMutex                    master_map_lock;
-    static QMap<QString,DTVChannel*> master_map;
+    typedef QMap<QString,QList<DTVChannel*> > MasterMap;
+    static QReadWriteLock    master_map_lock;
+    static MasterMap         master_map;
 };
 
 #endif // _DTVCHANNEL_H_

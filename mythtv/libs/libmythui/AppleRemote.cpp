@@ -98,15 +98,16 @@ void AppleRemote::stopListening()
 
 void AppleRemote::run()
 {
-    threadRegister("AppleRemote");
+    RunProlog();
     CFRunLoopRun();
     exec();  // prevent QThread exiting, by entering its run loop
     CFRunLoopStop(CFRunLoopGetCurrent());
-    threadDeregister();
+    RunEpilog();
 }
 
 // protected
-AppleRemote::AppleRemote() : openInExclusiveMode(true),
+AppleRemote::AppleRemote() : MThread("AppleRemote"),
+                             openInExclusiveMode(true),
                              hidDeviceInterface(0),
                              queue(0),
                              remoteId(0),

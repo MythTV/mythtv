@@ -29,7 +29,7 @@ class MpegRecorder : public V4LRecorder,
                                const QString &vbidev);
 
     void Initialize(void) {}
-    void StartRecording(void);
+    void run(void);
     void StopRecording(void);
     void Reset(void);
 

@@ -49,9 +49,9 @@ void HDHRRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
-void HDHRRecorder::StartRecording(void)
+void HDHRRecorder::run(void)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run -- begin");
 
     /* Create video socket. */
     if (!Open())
@@ -112,7 +112,7 @@ void HDHRRecorder::StartRecording(void)
         }
     }
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- ending...");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run -- ending...");
 
     _stream_handler->RemoveListener(_stream_data);
     _stream_data->RemoveWritingListener(this);
@@ -126,7 +126,7 @@ void HDHRRecorder::StartRecording(void)
     recording = false;
     recordingWait.wakeAll();
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run -- end");
 }
 
 bool HDHRRecorder::PauseAndWait(int timeout)

@@ -172,6 +172,7 @@ RingBuffer *RingBuffer::Create(
 }
 
 RingBuffer::RingBuffer(RingBufferType rbtype) :
+    MThread("RingBuffer"),
     type(rbtype),
     readpos(0),               writepos(0),
     internalreadpos(0),       ignorereadpos(-1),
@@ -504,7 +505,7 @@ void RingBuffer::Start(void)
 
     StartReads();
 
-    QThread::start();
+    MThread::start();
 
     while (readaheadrunning && !reallyrunning)
         generalWait.wait(&rwlock);
@@ -524,7 +525,7 @@ void RingBuffer::KillReadAheadThread(void)
         StopReads();
         generalWait.wakeAll();
         rwlock.unlock();
-        QThread::wait(5000);
+        MThread::wait(5000);
     }
 }
 
@@ -699,7 +700,8 @@ void RingBuffer::CreateReadAheadBuffer(void)
 
 void RingBuffer::run(void)
 {
-    threadRegister("RingBuffer");
+    RunProlog();
+
     // These variables are used to adjust the read block size
     struct timeval lastread, now;
     int readtimeavg = 300;
@@ -958,7 +960,8 @@ void RingBuffer::run(void)
     rbwlock.unlock();
     rbrlock.unlock();
     rwlock.unlock();
-    threadDeregister();
+
+    RunEpilog();
 }
 
 long long RingBuffer::SetAdjustFilesize(void)

@@ -62,16 +62,16 @@ static bool copyFile(const QString &src, const QString &dst)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FileScannerThread::FileScannerThread(ImportMusicDialog *parent)
+FileScannerThread::FileScannerThread(ImportMusicDialog *parent) :
+    MThread("FileScanner"), m_parent(parent)
 {
-    m_parent = parent;
 }
 
 void FileScannerThread::run()
 {
-    threadRegister("FileScanner");
+    RunProlog();
     m_parent->doScan();
-    threadDeregister();
+    RunEpilog();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ ImportMusicDialog::~ImportMusicDialog()
 
 void ImportMusicDialog::fillWidgets()
 {
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         // update current
         m_currentText->SetText(QString("%1 of %2")
@@ -312,7 +312,7 @@ void ImportMusicDialog::coverArtPressed()
 
 void ImportMusicDialog::playPressed()
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     m_playingMetaData = m_tracks->at(m_currentTrack)->metadata;
@@ -340,7 +340,7 @@ void ImportMusicDialog::nextPressed()
 
 void ImportMusicDialog::addPressed()
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     Metadata *meta = m_tracks->at(m_currentTrack)->metadata;
@@ -402,7 +402,7 @@ void ImportMusicDialog::addPressed()
 
 void ImportMusicDialog::addAllNewPressed()
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     m_currentTrack = 0;
@@ -431,7 +431,7 @@ void ImportMusicDialog::addAllNewPressed()
 
 void ImportMusicDialog::nextNewPressed()
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     uint track = m_currentTrack + 1;
@@ -538,7 +538,7 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
 
 void ImportMusicDialog::showEditMetadataDialog()
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     Metadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
@@ -573,7 +573,7 @@ void ImportMusicDialog::showMenu()
     if (m_popupMenu)
         return;
 
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -774,7 +774,7 @@ void ImportMusicDialog::setTitleWordCaps(void)
 
 void ImportMusicDialog::showImportCoverArtDialog(void)
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     QFileInfo fi(m_sourceFiles.at(m_currentTrack));

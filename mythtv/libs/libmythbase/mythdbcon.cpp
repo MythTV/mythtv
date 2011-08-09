@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 // ANSI C
 #include <cstdlib>
 
@@ -13,10 +15,16 @@
 #include "compat.h"
 #include "mythdbcon.h"
 #include "mythdb.h"
+#include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
-#include <unistd.h>
+#include "mthread.h"
+
+#define DEBUG_RECONNECT 0
+#if DEBUG_RECONNECT
+#include <stdlib.h>
+#endif
 
 static const uint kPurgeTimeout = 60 * 60;
 
@@ -71,10 +79,6 @@ MSqlDatabase::MSqlDatabase(const QString &name)
         LOG(VB_GENERAL, LOG_ERR, "Unable to init db connection.");
         return;
     }
-    QString connectOptions("MYSQL_OPT_RECONNECT=1");
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Setting connect options: %1")
-                                       .arg(connectOptions));
-    m_db.setConnectOptions(connectOptions);
     m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
 }
 
@@ -213,51 +217,14 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
     return connected;
 }
 
-bool MSqlDatabase::KickDatabase()
+bool MSqlDatabase::KickDatabase(void)
 {
-    // Some explanation is called for.  This exists because the mysql
-    // driver does not gracefully handle the situation where a TCP
-    // socketconnection is dropped (for example due to a timeout).  If
-    // a Unix domain socket connection is lost, the driver
-    // transparently reestablishes the connection and we don't even
-    // notice.  However, when this happens with a TCP connection, the
-    // driver returns an error for the next query to be executed, and
-    // THEN reestablishes the connection (so the second query succeeds
-    // with no intervention).
-    // mdz, 2003/08/11
-
-
-    if (m_lastDBKick.secsTo(QDateTime::currentDateTime()) < 30 &&
-        m_db.isOpen())
-    {
-        return true;
-    }
-
-    QString query("SELECT NULL;");
-    for (unsigned int i = 0 ; i < 2 ; ++i, usleep(50000))
-    {
-        if (m_db.isOpen())
-        {
-            QSqlQuery result = m_db.exec(query); // don't convert to MSqlQuery
-            if (result.isActive())
-            {
-                m_lastDBKick = QDateTime::currentDateTime();
-                return true;
-            }
-        }
-
-        if (i == 0)
-        {
-            m_db.close();
-            m_db.open();
-        }
-        else
-            LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(m_db.lastError()));
-    }
-
     m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
 
-    return false;
+    if (!m_db.isOpen())
+        m_db.open();
+
+    return m_db.isOpen();
 }
 
 bool MSqlDatabase::Reconnect()
@@ -281,34 +248,46 @@ MDBManager::MDBManager()
     m_nextConnID = 0;
     m_connCount = 0;
 
-    m_sem = new QSemaphore(20);
-
     m_schedCon = NULL;
     m_DDCon = NULL;
-    m_LogCon = NULL;
 }
 
 MDBManager::~MDBManager()
 {
-    while (!m_pool.isEmpty())
-        delete m_pool.takeFirst();
-    delete m_sem;
+    CloseDatabases();
 
-    closeStaticCon(&m_schedCon);
-    closeStaticCon(&m_DDCon);
-    closeStaticCon(&m_LogCon);
+    if (m_connCount != 0 || m_schedCon || m_DDCon)
+    {
+        LOG(VB_GENERAL, LOG_CRIT,
+            "MDBManager exiting with connections still open");
+    }
+#if 0 /* some post logStop() debugging... */
+    cout<<"m_connCount: "<<m_connCount<<endl;
+    cout<<"m_schedCon: "<<m_schedCon<<endl;
+    cout<<"m_DDCon: "<<m_DDCon<<endl;
+#endif
 }
 
 MSqlDatabase *MDBManager::popConnection()
 {
-    PurgeIdleConnections();
+    PurgeIdleConnections(true);
 
-    m_sem->acquire();
     m_lock.lock();
 
     MSqlDatabase *db;
 
-    if (m_pool.isEmpty())
+#if REUSE_CONNECTION
+    db = m_inuse[QThread::currentThread()];
+    if (db != NULL)
+    {
+        m_inuse_count[QThread::currentThread()]++;
+        m_lock.unlock();
+        return db;
+    }
+#endif
+
+    DBList &list = m_pool[QThread::currentThread()];
+    if (list.isEmpty())
     {
         db = new MSqlDatabase("DBManager" + QString::number(m_nextConnID++));
         ++m_connCount;
@@ -316,7 +295,15 @@ MSqlDatabase *MDBManager::popConnection()
                 QString("New DB connection, total: %1").arg(m_connCount));
     }
     else
-        db = m_pool.takeLast();
+    {
+        db = list.back();
+        list.pop_back();
+    }
+
+#if REUSE_CONNECTION
+    m_inuse_count[QThread::currentThread()]=1;
+    m_inuse[QThread::currentThread()] = db;
+#endif
 
     m_lock.unlock();
 
@@ -329,28 +316,43 @@ void MDBManager::pushConnection(MSqlDatabase *db)
 {
     m_lock.lock();
 
+#if REUSE_CONNECTION
+    if (db == m_inuse[QThread::currentThread()])
+    {
+        int cnt = --m_inuse_count[QThread::currentThread()];
+        if (cnt > 0)
+        {
+            m_lock.unlock();
+            return;
+        }
+        m_inuse[QThread::currentThread()] = NULL;
+    }
+#endif
+
     if (db)
     {
         db->m_lastDBKick = QDateTime::currentDateTime();
-        m_pool.prepend(db);
+        m_pool[QThread::currentThread()].push_front(db);
     }
 
     m_lock.unlock();
-    m_sem->release();
 
-    PurgeIdleConnections();
+    PurgeIdleConnections(true);
 }
 
-void MDBManager::PurgeIdleConnections(void)
+void MDBManager::PurgeIdleConnections(bool leaveOne)
 {
     QMutexLocker locker(&m_lock);
 
+    leaveOne = leaveOne || (gCoreContext && gCoreContext->IsUIThread());
+
     QDateTime now = QDateTime::currentDateTime();
-    QList<MSqlDatabase*>::iterator it = m_pool.begin();
+    DBList &list = m_pool[QThread::currentThread()];
+    DBList::iterator it = list.begin();
 
     uint purgedConnections = 0, totalConnections = 0;
     MSqlDatabase *newDb = NULL;
-    while (it != m_pool.end())
+    while (it != list.end())
     {
         totalConnections++;
         if ((*it)->m_lastDBKick.secsTo(now) <= (int)kPurgeTimeout)
@@ -362,7 +364,7 @@ void MDBManager::PurgeIdleConnections(void)
         // This connection has not been used in the kPurgeTimeout
         // seconds close it.
         MSqlDatabase *entry = *it;
-        it = m_pool.erase(it);
+        it = list.erase(it);
         --m_connCount;
         purgedConnections++;
 
@@ -376,7 +378,7 @@ void MDBManager::PurgeIdleConnections(void)
         // threads didn't exit".  This workaround simply creates an
         // extra DB connection before all pooled connections are
         // purged so that my_thread_global_end() won't be called.
-        if (it == m_pool.end() &&
+        if (leaveOne && it == list.end() &&
             purgedConnections > 0 &&
             totalConnections == purgedConnections)
         {
@@ -393,7 +395,7 @@ void MDBManager::PurgeIdleConnections(void)
         LOG(VB_DATABASE, LOG_INFO, "Done deleting idle DB connection.");
     }
     if (newDb)
-        m_pool.push_front(newDb);
+        list.push_front(newDb);
 
     if (purgedConnections)
     {
@@ -416,6 +418,9 @@ MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, QString name)
 
     (*dbcon)->OpenDatabase();
 
+    if (!m_static_pool[QThread::currentThread()].contains(*dbcon))
+        m_static_pool[QThread::currentThread()].push_back(*dbcon);
+
     return *dbcon;
 }
 
@@ -429,17 +434,19 @@ MSqlDatabase *MDBManager::getDDCon()
     return getStaticCon(&m_DDCon, "DataDirectCon");
 }
 
-MSqlDatabase *MDBManager::getLogCon()
-{
-    return getStaticCon(&m_LogCon, "LogCon");
-}
-
 void MDBManager::closeStaticCon(MSqlDatabase **dbcon)
 {
-    if (dbcon && *dbcon)
+    DBList &list = m_static_pool[QThread::currentThread()];
+    if (dbcon && *dbcon && list.contains(*dbcon))
     {
+        list.removeAll(*dbcon);
         delete *dbcon;
         *dbcon = NULL;
+    }
+    else if (dbcon && *dbcon)
+    {
+        LOG(VB_GENERAL, LOG_CRIT,
+            "Attempted to close static connection in wrong thread.");
     }
 }
 
@@ -453,29 +460,37 @@ void MDBManager::closeDDCon()
     closeStaticCon(&m_DDCon);
 }
 
-void MDBManager::closeLogCon()
-{
-    closeStaticCon(&m_LogCon);
-}
-
-// Dangerous. Should only be used when the database connection has errored?
-
 void MDBManager::CloseDatabases()
 {
     m_lock.lock();
+    DBList list = m_pool[QThread::currentThread()];
+    m_pool[QThread::currentThread()].clear();
+    m_lock.unlock();
 
-    QList<MSqlDatabase*>::const_iterator it = m_pool.begin();
-    MSqlDatabase *db;
-
-    while (it != m_pool.end())
+    for (DBList::iterator it = list.begin(); it != list.end(); ++it)
     {
-        db = *it;
         LOG(VB_GENERAL, LOG_INFO,
-                "Closing DB connection named '" + db->m_name + "'");
-        db->m_db.close();
-        ++it;
+            "Closing DB connection named '" + (*it)->m_name + "'");
+        (*it)->m_db.close();
+        delete (*it);
+        m_connCount--;
     }
 
+    m_lock.lock();
+    DBList &slist = m_static_pool[QThread::currentThread()];
+    while (!slist.isEmpty())
+    {
+        MSqlDatabase *db = slist.takeFirst();
+        LOG(VB_GENERAL, LOG_INFO,
+            "Closing DB connection named '" + db->m_name + "'");
+        db->m_db.close();
+        delete db;
+
+        if (db == m_schedCon)
+            m_schedCon = NULL;
+        if (db == m_DDCon)
+            m_DDCon = NULL;
+    }
     m_lock.unlock();
 }
 
@@ -587,25 +602,6 @@ MSqlQueryInfo MSqlQuery::DDCon()
     return qi;
 }
 
-MSqlQueryInfo MSqlQuery::LogCon()
-{
-    MSqlDatabase *db = GetMythDB()->GetDBManager()->getLogCon();
-    MSqlQueryInfo qi;
-
-    InitMSqlQueryInfo(qi);
-    qi.returnConnection = false;
-
-    if (db)
-    {
-        qi.db = db;
-        qi.qsqldb = db->db();
-
-        db->KickDatabase();
-    }
-
-    return qi;
-}
-
 void MSqlQuery::CloseSchedCon()
 {
     GetMythDB()->GetDBManager()->closeSchedCon();
@@ -616,23 +612,33 @@ void MSqlQuery::CloseDDCon()
     GetMythDB()->GetDBManager()->closeDDCon();
 }
 
-void MSqlQuery::CloseLogCon()
-{
-    GetMythDB()->GetDBManager()->closeLogCon();
-}
-
-
 bool MSqlQuery::exec()
 {
-    // Database connection down.  Try to restart it, give up if it's still
-    // down
     if (!m_db)
     {
         // Database structure's been deleted
         return false;
     }
 
-    if (!m_db->isOpen() && !m_db->Reconnect())
+    if (m_last_prepared_query.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "MSqlQuery::exec(void) called without a prepared query.");
+        return false;
+    }
+
+#if DEBUG_RECONNECT
+    if (random() < RAND_MAX / 50)
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            "MSqlQuery disconnecting DB to test reconnection logic");
+        m_db->m_db.close();
+    }
+#endif
+
+    // Database connection down.  Try to restart it, give up if it's still
+    // down
+    if (!m_db->isOpen() && !Reconnect())
     {
         LOG(VB_GENERAL, LOG_INFO, "MySQL server disconnected");
         return false;
@@ -643,8 +649,37 @@ bool MSqlQuery::exec()
     // if the query failed with "MySQL server has gone away"
     // Close and reopen the database connection and retry the query if it
     // connects again
-    if (!result && QSqlQuery::lastError().number() == 2006 && m_db->Reconnect())
+    if (!result && QSqlQuery::lastError().number() == 2006 && Reconnect())
         result = QSqlQuery::exec();
+
+    if (!result)
+    {
+        QString err = MythDB::GetError("MSqlQuery", *this);
+        MSqlBindings tmp = QSqlQuery::boundValues();
+        bool has_null_strings = false;
+        for (MSqlBindings::iterator it = tmp.begin(); it != tmp.end(); ++it)
+        {
+            if (it->type() != QVariant::String)
+                continue;
+            if (it->isNull() || it->toString().isNull())
+            {
+                has_null_strings = true;
+                *it = QVariant(QString(""));
+            }
+        }
+        if (has_null_strings)
+        {
+            bindValues(tmp);
+            result = QSqlQuery::exec();
+        }
+        if (result)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Original query failed, but resend with empty "
+                        "strings in place of NULL strings worked. ") +
+                "\n" + err);
+        }
+    }
 
     if (VERBOSE_LEVEL_CHECK(VB_DATABASE, LOG_DEBUG))
     {
@@ -678,9 +713,15 @@ bool MSqlQuery::exec()
 
 bool MSqlQuery::exec(const QString &query)
 {
+    if (!m_db)
+    {
+        // Database structure's been deleted
+        return false;
+    }
+
     // Database connection down.  Try to restart it, give up if it's still
     // down
-    if (!m_db->isOpen() && !m_db->Reconnect())
+    if (!m_db->isOpen() && !Reconnect())
     {
         LOG(VB_GENERAL, LOG_INFO, "MySQL server disconnected");
         return false;
@@ -691,7 +732,7 @@ bool MSqlQuery::exec(const QString &query)
     // if the query failed with "MySQL server has gone away"
     // Close and reopen the database connection and retry the query if it
     // connects again
-    if (!result && QSqlQuery::lastError().number() == 2006 && m_db->Reconnect())
+    if (!result && QSqlQuery::lastError().number() == 2006 && Reconnect())
         result = QSqlQuery::exec(query);
 
     LOG(VB_DATABASE, LOG_DEBUG,
@@ -703,35 +744,77 @@ bool MSqlQuery::exec(const QString &query)
     return result;
 }
 
-bool MSqlQuery::next()
+bool MSqlQuery::seekDebug(const char *type, bool result,
+                          int where, bool relative) const
 {
-    bool result = QSqlQuery::next();
-
     if (result && VERBOSE_LEVEL_CHECK(VB_DATABASE, LOG_DEBUG))
     {
         QString str;
-        QSqlRecord record=QSqlQuery::record();
+        QSqlRecord rec = record();
 
-        for ( long int i = 0; i<record.count(); i++ )
+        for (long int i = 0; i < rec.count(); i++)
         {
             if (!str.isEmpty())
                 str.append(", ");
 
-            str.append(record.fieldName(i) + " = " + value(i).toString());
+            str.append(rec.fieldName(i) + " = " +
+                       value(i).toString());
         }
 
-        LOG(VB_DATABASE, LOG_DEBUG,
-                QString("MSqlQuery::next(%1) Result: \"%2\"")
-                        .arg(m_db->MSqlDatabase::GetConnectionName())
-                        .arg(str));
+        if (QString("seek")==type)
+        {
+            LOG(VB_DATABASE, LOG_DEBUG,
+                QString("MSqlQuery::seek(%1,%2,%3) Result: \"%4\"")
+                .arg(m_db->MSqlDatabase::GetConnectionName())
+                .arg(where).arg(relative)
+                .arg(str));
+        }
+        else
+        {
+            LOG(VB_DATABASE, LOG_DEBUG,
+                QString("MSqlQuery::%1(%2) Result: \"%3\"")
+                .arg(type).arg(m_db->MSqlDatabase::GetConnectionName())
+                .arg(str));
+        }
     }
-
     return result;
+}
+
+bool MSqlQuery::next(void)
+{
+    return seekDebug("next", QSqlQuery::next(), 0, false);
+}
+
+bool MSqlQuery::previous(void)
+{
+    return seekDebug("previous", QSqlQuery::previous(), 0, false);
+}
+
+bool MSqlQuery::first(void)
+{
+    return seekDebug("first", QSqlQuery::first(), 0, false);
+}
+
+bool MSqlQuery::last(void)
+{
+    return seekDebug("last", QSqlQuery::last(), 0, false);
+}
+
+bool MSqlQuery::seek(int where, bool relative)
+{
+    return seekDebug("seek", QSqlQuery::seek(where, relative), where, relative);
 }
 
 bool MSqlQuery::prepare(const QString& query)
 {
+    if (!m_db)
+    {
+        // Database structure's been deleted
+        return false;
+    }
+
     m_last_prepared_query = query;
+
 #ifdef DEBUG_QT4_PORT
     if (query.contains(m_testbindings))
     {
@@ -752,7 +835,7 @@ bool MSqlQuery::prepare(const QString& query)
         return false;
     }
 
-    if (!m_db->isOpen() && !m_db->Reconnect())
+    if (!m_db->isOpen() && !Reconnect())
     {
         LOG(VB_GENERAL, LOG_INFO, "MySQL server disconnected");
         return false;
@@ -763,7 +846,7 @@ bool MSqlQuery::prepare(const QString& query)
     // if the prepare failed with "MySQL server has gone away"
     // Close and reopen the database connection and retry the query if it
     // connects again
-    if (!ok && QSqlQuery::lastError().number() == 2006 && m_db->Reconnect())
+    if (!ok && QSqlQuery::lastError().number() == 2006 && Reconnect())
         ok = QSqlQuery::prepare(query);
 
     if (!ok && !(GetMythDB()->SuppressDBMessages()))
@@ -789,8 +872,7 @@ bool MSqlQuery::testDBConnection()
     return isOpen;
 }
 
-void MSqlQuery::bindValue (const QString  & placeholder,
-                           const QVariant & val, QSql::ParamType paramType)
+void MSqlQuery::bindValue(const QString &placeholder, const QVariant &val)
 {
 #ifdef DEBUG_QT4_PORT
     // XXX - HACK BEGIN
@@ -805,28 +887,12 @@ void MSqlQuery::bindValue (const QString  & placeholder,
     // XXX - HACK END
 #endif
 
-    if (val.type() == QVariant::String && val.isNull())
-    {
-        QSqlQuery::bindValue(placeholder, QString(""), paramType);
-        return;
-    }
-    QSqlQuery::bindValue(placeholder, val, paramType);
+    QSqlQuery::bindValue(placeholder, val, QSql::In);
 }
 
-void MSqlQuery::bindValue(int pos, const QVariant & val,
-                                   QSql::ParamType  paramType)
+void MSqlQuery::bindValues(const MSqlBindings &bindings)
 {
-    if (val.type() == QVariant::String && val.isNull())
-    {
-        QSqlQuery::bindValue(pos, QString(""), paramType);
-        return;
-    }
-    QSqlQuery::bindValue(pos, val, paramType);
-}
-
-void MSqlQuery::bindValues(MSqlBindings &bindings)
-{
-    MSqlBindings::Iterator it;
+    MSqlBindings::const_iterator it;
     for (it = bindings.begin(); it != bindings.end(); ++it)
     {
         bindValue(it.key(), it.value());
@@ -836,6 +902,20 @@ void MSqlQuery::bindValues(MSqlBindings &bindings)
 QVariant MSqlQuery::lastInsertId()
 {
     return QSqlQuery::lastInsertId();
+}
+
+bool MSqlQuery::Reconnect(void)
+{
+    if (!m_db->Reconnect())
+        return false;
+    if (!m_last_prepared_query.isEmpty())
+    {
+        MSqlBindings tmp = QSqlQuery::boundValues();
+        if (!QSqlQuery::prepare(m_last_prepared_query))
+            return false;
+        bindValues(tmp);
+    }
+    return true;
 }
 
 void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom)

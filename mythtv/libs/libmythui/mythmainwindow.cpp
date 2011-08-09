@@ -1763,6 +1763,14 @@ void MythMainWindow::RegisterJump(const QString &destination,
     BindJump(destination, keybind);
 }
 
+void MythMainWindow::ClearAllJumps()
+{
+    QList<QString> destinations = d->destinationMap.keys();
+    QList<QString>::Iterator it;
+    for (it = destinations.begin(); it != destinations.end(); ++it)
+        ClearJump(*it);
+}
+
 void MythMainWindow::JumpTo(const QString& destination, bool pop)
 {
     if (d->destinationMap.count(destination) > 0 && d->exitmenucallback == NULL)

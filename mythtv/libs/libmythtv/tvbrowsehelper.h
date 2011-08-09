@@ -5,12 +5,12 @@
 
 #include <QWaitCondition>
 #include <QMultiMap>
-#include <QThread>
 #include <QString>
 #include <QHash>
 
 #include "dbchannelinfo.h" // for DBChanList
 #include "programtypes.h"  // for InfoMap
+#include "mthread.h"
 #include "tv.h"            // for BrowseDirection
 
 class PlayerContext;
@@ -61,7 +61,7 @@ class BrowseInfo
 };
 
 
-class TVBrowseHelper : public QThread
+class TVBrowseHelper : public MThread
 {
   public:
     TVBrowseHelper(TV      *tv,
@@ -78,12 +78,6 @@ class TVBrowseHelper : public QThread
         Wait();
     }
 
-    virtual void deleteLater()
-    {
-        Stop();
-        QThread::deleteLater();
-    }
-
     void Stop()
     {
         QMutexLocker locker(&m_lock);
@@ -92,7 +86,7 @@ class TVBrowseHelper : public QThread
         m_wait.wakeAll();
     }
 
-    void Wait() { QThread::wait(); }
+    void Wait() { MThread::wait(); }
 
     bool BrowseStart(PlayerContext *ctx, bool skip_browse = false);
     void BrowseEnd(PlayerContext *ctx, bool change_channel);

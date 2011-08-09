@@ -512,6 +512,8 @@ int main(int argc, char *argv[])
 
     qApp->exec();
     // Main menu callback to ExitPrompter does CheckSetup(), cleanup and exit.
+
+    DestroyMythMainWindow();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

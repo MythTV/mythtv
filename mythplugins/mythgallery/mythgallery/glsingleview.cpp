@@ -45,7 +45,6 @@ using namespace std;
 #include "galleryutil.h"
 
 #define LOC QString("GLView: ")
-#define LOC_ERR QString("GLView, Error: ")
 
 GLSDialog::GLSDialog(const ThumbList& itemList,
                      int *pos, int slideShow, int sortOrder,
@@ -1518,12 +1517,16 @@ void GLSingleView::FindRandXY(float &x_loc, float &y_loc)
         y_loc = -1 * y_loc;   
 }
 
-KenBurnsImageLoader::KenBurnsImageLoader(GLSingleView *singleView, ThumbList &itemList, QSize texSize, QSize screenSize)
+KenBurnsImageLoader::KenBurnsImageLoader(
+    GLSingleView *singleView, ThumbList &itemList,
+    QSize texSize, QSize screenSize) :
+    MThread("KenBurnsImageLoader"),
+    m_singleView(singleView),
+    m_itemList(itemList),
+    m_pos(0),
+    m_screenSize(screenSize),
+    m_texSize(texSize)
 {
-    m_singleView = singleView;
-    m_itemList = itemList;
-    m_texSize = texSize;
-    m_screenSize = screenSize;
 }
 
 void KenBurnsImageLoader::Initialize(int pos)
@@ -1533,18 +1536,23 @@ void KenBurnsImageLoader::Initialize(int pos)
 
 void KenBurnsImageLoader::run() 
 {
-    threadRegister("KenBurnsImageLoader");
+    RunProlog();
     ThumbItem *item = m_itemList.at(m_pos);
     if (!item)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("No item at %1").arg(m_pos));
+        RunEpilog();
         return;
     }
     QImage image(item->GetPath());
     if (image.isNull())
+    {
+        RunEpilog();
         return;
-    
+    }
+
     m_singleView->LoadImage(QGLWidget::convertToGLFormat(image.scaled(m_texSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)), image.size());   
     m_singleView->Ready();
-    threadDeregister();
+
+    RunEpilog();
 }

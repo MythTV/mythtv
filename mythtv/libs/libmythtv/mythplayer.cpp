@@ -24,11 +24,11 @@ using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
-#include <QThread>
 #include <QKeyEvent>
 #include <QDir>
 
 // MythTV headers
+#include "mthread.h"
 #include "mythconfig.h"
 #include "mythdbcon.h"
 #include "dialogbox.h"
@@ -88,14 +88,12 @@ static unsigned dbg_ident(const MythPlayer*);
 
 void DecoderThread::run(void)
 {
-    if (!m_mp)
-        return;
-
-    threadRegister("Decoder");
-    LOG(VB_PLAYBACK, LOG_INFO, LOC_DEC + QString("Decoder thread starting."));
-    m_mp->DecoderLoop(m_start_paused);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC_DEC + QString("Decoder thread exiting."));
-    threadDeregister();
+    RunProlog();
+    LOG(VB_PLAYBACK, LOG_INFO, LOC_DEC + "Decoder thread starting.");
+    if (m_mp)
+        m_mp->DecoderLoop(m_start_paused);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC_DEC + "Decoder thread exiting.");
+    RunEpilog();
 }
 
 static const int toCaptionType(int type)
@@ -550,7 +548,7 @@ void MythPlayer::ReinitOSD(void)
     if (videoOutput && !using_null_videoout)
     {
         osdLock.lock();
-        if (QThread::currentThread() != (QThread*)playerThread)
+        if (!is_current_thread(playerThread))
         {
             reinit_osd = true;
             osdLock.unlock();
@@ -746,7 +744,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
 {
     QMutexLocker locker(&videofiltersLock);
 
-    if (QThread::currentThread() != (QThread*)playerThread)
+    if (!is_current_thread(playerThread))
     {
         resetScan = scan;
         return;
@@ -2773,7 +2771,7 @@ void MythPlayer::AudioEnd(void)
 bool MythPlayer::PauseDecoder(void)
 {
     decoderPauseLock.lock();
-    if (QThread::currentThread() == (QThread*)decoderThread)
+    if (is_current_thread(decoderThread))
     {
         decoderPaused = true;
         decoderThreadPause.wakeAll();
@@ -2797,7 +2795,7 @@ void MythPlayer::UnpauseDecoder(void)
 {
     decoderPauseLock.lock();
 
-    if (QThread::currentThread() == (QThread*)decoderThread)
+    if (is_current_thread(decoderThread))
     {
         decoderPaused = false;
         decoderThreadUnpause.wakeAll();
@@ -2851,18 +2849,19 @@ void MythPlayer::DecoderEnd(void)
 
 void MythPlayer::DecoderPauseCheck(void)
 {
-    if (QThread::currentThread() != (QThread*)decoderThread)
-        return;
-    if (pauseDecoder)
-        PauseDecoder();
-    if (unpauseDecoder)
-        UnpauseDecoder();
+    if (is_current_thread(decoderThread))
+    {
+        if (pauseDecoder)
+            PauseDecoder();
+        if (unpauseDecoder)
+            UnpauseDecoder();
+    }
 }
 
 //// FIXME - move the eof ownership back into MythPlayer
 bool MythPlayer::GetEof(void)
 {
-    if (QThread::currentThread() == (QThread*)playerThread)
+    if (is_current_thread(playerThread))
         return decoder ? decoder->GetEof() : true;
 
     decoder_change_lock.lock();
@@ -2873,7 +2872,7 @@ bool MythPlayer::GetEof(void)
 
 void MythPlayer::SetEof(bool eof)
 {
-    if (QThread::currentThread() == (QThread*)playerThread)
+    if (is_current_thread(playerThread))
     {
         if (decoder)
             decoder->SetEof(eof);
@@ -3037,7 +3036,7 @@ void MythPlayer::SetTranscoding(bool value)
 
 bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
 {
-    if (QThread::currentThread() != playerThread)
+    if (!is_current_thread(playerThread))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot add PiP from another thread");
         return false;
@@ -3062,7 +3061,7 @@ bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
 
 bool MythPlayer::RemovePIPPlayer(MythPlayer *pip, uint timeout)
 {
-    if (QThread::currentThread() != playerThread)
+    if (!is_current_thread(playerThread))
         return false;
 
     if (!pip_players.contains(pip))
@@ -3076,7 +3075,7 @@ bool MythPlayer::RemovePIPPlayer(MythPlayer *pip, uint timeout)
 
 PIPLocation MythPlayer::GetNextPIPLocation(void) const
 {
-    if (QThread::currentThread() != playerThread)
+    if (!is_current_thread(playerThread))
         return kPIP_END;
 
     if (pip_players.isEmpty())

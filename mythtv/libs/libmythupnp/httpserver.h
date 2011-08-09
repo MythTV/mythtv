@@ -36,12 +36,16 @@
 #include <QReadWriteLock>
 #include <QTcpServer>
 #include <QMultiMap>
+#include <QRunnable>
+#include <QPointer>
+#include <QMutex>
+#include <QList>
 
 // MythTV headers
-#include "upnputil.h"
 #include "httprequest.h"
-#include "threadpool.h"
+#include "mthreadpool.h"
 #include "refcounted.h"
+#include "upnputil.h"
 #include "compat.h"
 
 typedef struct timeval  TaskTime;
@@ -74,8 +78,7 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
 
         virtual ~HttpServerExtension() {};
 
-        virtual bool  ProcessRequest( HttpWorkerThread *pThread,
-                                      HTTPRequest      *pRequest ) = 0;
+        virtual bool ProcessRequest(HTTPRequest *pRequest) = 0;
 
         virtual QStringList GetBasePaths() = 0;
 };
@@ -90,58 +93,47 @@ typedef QList<QPointer<HttpServerExtension> > HttpServerExtensionList;
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC HttpServer : public QTcpServer,
-                               public ThreadPool
+class UPNP_PUBLIC HttpServer : public QTcpServer
 {
+  protected:
+    mutable QReadWriteLock  m_rwlock;
+    HttpServerExtensionList m_extensions;
+    // This multimap does NOT take ownership of the HttpServerExtension*
+    QMultiMap< QString, HttpServerExtension* >  m_basePaths;
+    QString                 m_sSharePath;
+    HttpServerExtension    *m_pHtmlServer;
+    MThreadPool             m_threadPool;
+    bool                    m_running; // protected by m_rwlock
 
-    protected:
+    static QMutex           s_platformLock;
+    static QString          s_platform;
 
-        QReadWriteLock          m_rwlock;
-        HttpServerExtensionList m_extensions;
+  public:
+    HttpServer();
+    virtual ~HttpServer();
 
-        // This multimap does NOT take ownership of the HttpServerExtension*
-        QMultiMap< QString, HttpServerExtension* >  m_basePaths;
+    void RegisterExtension(HttpServerExtension*);
+    void UnregisterExtension(HttpServerExtension*);
+    void DelegateRequest(HTTPRequest*);
 
-        HttpServerExtension*    m_pHtmlServer;
+    QScriptEngine *ScriptEngine(void);
 
-        virtual WorkerThread *CreateWorkerThread( ThreadPool *,
-                                                  const QString &sName );
-        virtual void          incomingConnection     ( int socket );
+    virtual void incomingConnection(int socket); // QTcpServer
 
-    public:
+    QString GetSharePath(void) const
+    { // never modified after creation, so no need to lock
+        return m_sSharePath;
+    }
 
-        static QString      g_sPlatform;
-               QString      m_sSharePath;
+    bool IsRunning(void) const
+    {
+        m_rwlock.lockForRead();
+        bool tmp = m_running;
+        m_rwlock.unlock();
+        return tmp;
+    }
 
-    public:
-
-                 HttpServer();
-        virtual ~HttpServer();
-
-        void     RegisterExtension  ( HttpServerExtension *pExtension );
-        void     UnregisterExtension( HttpServerExtension *pExtension );
-
-        void     DelegateRequest    ( HttpWorkerThread *pThread,
-                                      HTTPRequest      *pRequest );
-
-        QScriptEngine* ScriptEngine();
-
-};
-
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// Base class for WorkerThread Specific data
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-class UPNP_PUBLIC HttpWorkerData 
-{
-    public:
-
-                 HttpWorkerData() {};
-        virtual ~HttpWorkerData() {};
+    static QString GetPlatform(void);
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -152,29 +144,17 @@ class UPNP_PUBLIC HttpWorkerData
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC HttpWorkerThread : public WorkerThread
+class HttpWorker : public QRunnable
 {
-    protected:
+  public:
+    HttpWorker(HttpServer &httpServer, int sock);
 
-        HttpServer      *m_pHttpServer; 
-        int              m_nSocket;
-        int              m_nSocketTimeout;
+    virtual void run(void);
 
-        HttpWorkerData  *m_pData;
-
-    protected:
-
-        virtual void  ProcessWork();
-
-    public:
-
-                 HttpWorkerThread( HttpServer *pParent, const QString &sName );
-        virtual ~HttpWorkerThread();
-
-        void            StartWork( int nSocket );
-
-        void            SetWorkerData( HttpWorkerData *pData );
-        HttpWorkerData *GetWorkerData( ) { return( m_pData ); }
+  protected:
+    HttpServer &m_httpServer; 
+    int         m_socket;
+    int         m_socketTimeout;
 };
 
 

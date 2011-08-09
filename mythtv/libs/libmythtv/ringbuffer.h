@@ -6,11 +6,11 @@
 #include <QReadWriteLock>
 #include <QWaitCondition>
 #include <QString>
-#include <QThread>
 #include <QMutex>
 #include <QMap>
 
 #include "mythconfig.h"
+#include "mthread.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -40,14 +40,14 @@ enum RingBufferType
     kRingBuffer_HTTP,
 };
 
-class MTV_PUBLIC RingBuffer : protected QThread
+class MTV_PUBLIC RingBuffer : protected MThread
 {
   public:
     static RingBuffer *Create(const QString &lfilename, bool write,
                               bool usereadahead = true,
                               int timeout_ms = kDefaultOpenTimeout,
                               bool stream_only = false);
-    ~RingBuffer();
+    virtual ~RingBuffer();
 
     // Sets
     void SetWriteBufferSize(int newSize);
@@ -153,7 +153,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
   protected:
     RingBuffer(RingBufferType rbtype);
 
-    void run(void); // QThread
+    void run(void); // MThread
     void CreateReadAheadBuffer(void);
     void CalcReadAheadThresh(void);
     bool PauseAndWait(void);

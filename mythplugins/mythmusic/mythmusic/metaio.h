@@ -21,7 +21,7 @@ class MetaIO
     * \param mdata A pointer to a Metadata object
     * \returns Boolean to indicate success/failure.
     */
-    virtual bool write(Metadata* mdata) = 0;
+    virtual bool write(const Metadata* mdata) = 0;
 
     /*!
     * \brief Writes rating and playcount back to a file
@@ -41,7 +41,7 @@ class MetaIO
     * \param filename The filename to read metadata from.
     * \returns Metadata pointer or NULL on error
     */
-    virtual Metadata* read(QString filename) = 0;
+    virtual Metadata* read(const QString &filename) = 0;
 
     /*!
     * \brief Does the tag support embedded cover art.
@@ -65,21 +65,25 @@ class MetaIO
         return AlbumArtList();
     }
 
-    virtual bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart)
+    virtual bool writeAlbumArt(const QString &filename,
+                               const AlbumArtImage *albumart)
     {
         (void)filename;
         (void)albumart;
         return false;
     }
 
-    virtual bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart)
+    virtual bool removeAlbumArt(const QString &filename,
+                                const AlbumArtImage *albumart)
     {
         (void)filename;
         (void)albumart;
         return false;
     }
 
-    virtual bool changeImageType(const QString &filename, const AlbumArtImage *albumart, ImageType newType)
+    virtual bool changeImageType(const QString &filename,
+                                 const AlbumArtImage *albumart,
+                                 ImageType newType)
     {
         (void)filename;
         (void)albumart;
@@ -87,24 +91,31 @@ class MetaIO
         return false;
     }
 
-    virtual QImage *getAlbumArt(QString filename, ImageType type)
+    virtual QImage *getAlbumArt(const QString &filename, ImageType type)
     {
         (void)filename;
         (void)type;
         return false;
     }
 
-    void readFromFilename(QString filename, QString &artist, QString &album,
-                          QString &title, QString &genre, int &tracknum);
+    void readFromFilename(const QString &filename, QString &artist,
+                          QString &album, QString &title, QString &genre,
+                          int &tracknum);
 
-    Metadata* readFromFilename(QString filename, bool blnLength = false);
+    Metadata* readFromFilename(const QString &filename, bool blnLength = false);
 
     void readFromFilename(Metadata *metadata);
 
+    virtual bool TagExists(const QString &filename)
+    { 
+        (void)filename;
+        return false;
+    }
+    
   protected:
 
   private:
-    virtual int getTrackLength(QString filename) = 0;
+    virtual int getTrackLength(const QString &filename) = 0;
 
     QString mFilename;
     QString mFilenameFormat;

@@ -19,6 +19,7 @@ class RomInfo;
 class QTimer;
 class QKeyEvent;
 class QEvent;
+class GameScanner;
 
 class GameUI : public MythScreenType
 {
@@ -29,6 +30,7 @@ class GameUI : public MythScreenType
     ~GameUI();
 
     bool Create();
+    void Load();
     bool keyPressEvent(QKeyEvent *event);
 
   public slots:
@@ -42,6 +44,8 @@ class GameUI : public MythScreenType
     void OnGameSearchDone(MetadataLookup *lookup);
     void StartGameImageSet(MythGenericTree *node, QStringList coverart,
                            QStringList fanart, QStringList screenshot);
+    void doScan(void);
+    void reloadAllData(bool dbchanged);
 
   private:
     void updateRomInfo(RomInfo *rom);
@@ -88,6 +92,8 @@ class GameUI : public MythScreenType
 
     MetadataDownload      *m_query;
     MetadataImageDownload *m_imageDownload;
+
+    GameScanner      *m_scanner;
 };
 
 #endif

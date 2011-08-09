@@ -12,13 +12,10 @@ using namespace std;
 #include <QTcpServer>
 
 // MythTV
-#include "mythsocket.h"
-#include "mythdeque.h"
 #include "socketrequesthandler.h"
 #include "sockethandler.h"
-
-class ProcessRequestThread;
-class MythSocketManager;
+#include "mthreadpool.h"
+#include "mythsocket.h"
 
 class MythServer : public QTcpServer
 {
@@ -44,7 +41,6 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     void connected(MythSocket *socket) { (void)socket; }
 
     void SetThreadCount(uint count);
-    void MarkUnused(ProcessRequestThread *prt);
 
     void AddSocketHandler(SocketHandler *socket);
     SocketHandler *GetConnectionBySocket(MythSocket *socket);
@@ -62,10 +58,6 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     void HandleVersion(MythSocket *socket, const QStringList slist);
     void HandleDone(MythSocket *socket);
 
-    MythDeque<ProcessRequestThread *>   m_threadPool;
-    QMutex                              m_threadPoolLock;
-    QWaitCondition                      m_threadPoolCond;
-
     QMap<MythSocket*, SocketHandler*>   m_socketMap;
     QReadWriteLock                      m_socketLock;
 
@@ -73,5 +65,7 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     QReadWriteLock                          m_handlerLock;
 
     MythServer     *m_server;
+    MThreadPool     m_threadPool;
+
 };
 #endif

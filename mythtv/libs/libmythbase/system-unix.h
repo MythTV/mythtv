@@ -1,18 +1,20 @@
 #ifndef SYSTEM_UNIX_H_
 #define SYSTEM_UNIX_H_
 
-#include "mythbaseexp.h"
+#include <sys/select.h>
 #include <signal.h>
+
 #include <QObject>
 #include <QMap>
 #include <QList>
 #include <QBuffer>
-#include <QThread>
 #include <QWaitCondition>
 #include <QMutex>
 #include <QPointer>
-#include <sys/select.h>
+
+#include "mythbaseexp.h"
 #include "mythsystem.h"
+#include "mthread.h"
 
 class MythSystemUnix;
 
@@ -20,7 +22,7 @@ typedef QMap<pid_t, QPointer<MythSystemUnix> > MSMap_t;
 typedef QMap<int, QBuffer *> PMap_t;
 typedef QList<QPointer<MythSystemUnix> > MSList_t;
 
-class MythSystemIOHandler: public QThread
+class MythSystemIOHandler: public MThread
 {
     public:
         MythSystemIOHandler(bool read);
@@ -47,7 +49,7 @@ class MythSystemIOHandler: public QThread
         char   m_readbuf[65536];
 };
 
-class MythSystemManager : public QThread
+class MythSystemManager : public MThread
 {
     public:
         MythSystemManager();
@@ -62,7 +64,7 @@ class MythSystemManager : public QThread
         QMutex     m_jumpLock;
 };
 
-class MythSystemSignalManager : public QThread
+class MythSystemSignalManager : public MThread
 {
     public:
         MythSystemSignalManager();

@@ -7,10 +7,10 @@
 
 #include <QObject> // for moc
 #include <QStringList>
-#include <QThread>
 #include <QEvent>
 
 #include "mythmetaexp.h"
+#include "mthread.h"
 
 class QStringList;
 
@@ -56,10 +56,8 @@ class META_PUBLIC VideoScanChanges : public QEvent
     static Type kEventType;
 };
 
-class META_PUBLIC VideoScannerThread : public QThread
+class META_PUBLIC VideoScannerThread : public MThread
 {
-    Q_OBJECT
-
   public:
     VideoScannerThread(QObject *parent);
     ~VideoScannerThread();

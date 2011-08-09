@@ -1,10 +1,13 @@
 #ifndef APPLEREMOTE
 #define APPLEREMOTE
 
+// C++ headers
 #include <string>
 #include <vector>
 #include <map>
-#include <QThread>
+
+// MythTV headers
+#include "mthread.h"
 
 #include <IOKit/IOKitLib.h>
 #include <IOKit/IOCFPlugIn.h>
@@ -12,7 +15,7 @@
 #include <IOKit/hid/IOHIDKeys.h>
 #include <CoreFoundation/CoreFoundation.h>
 
-class AppleRemote : public QThread
+class AppleRemote : public MThread
 {
 public:
     enum Event

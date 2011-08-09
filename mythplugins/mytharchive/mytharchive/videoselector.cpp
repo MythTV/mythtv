@@ -464,7 +464,7 @@ void VideoSelector::getVideoList(void)
     m_videoList = getVideoListFromDB();
     QStringList categories;
 
-    if (m_videoList && m_videoList->size() > 0)
+    if (m_videoList && !m_videoList->empty())
     {
         vector<VideoInfo *>::iterator i = m_videoList->begin();
         for ( ; i != m_videoList->end(); i++)

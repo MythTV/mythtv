@@ -31,7 +31,7 @@ class ImportRecorder : public DTVRecorder
                                const QString &audiodev,
                                const QString &vbidev);
 
-    void StartRecording(void);
+    void run(void);
 
     bool Open(void);
     void Close(void);

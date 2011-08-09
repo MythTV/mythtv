@@ -1,11 +1,11 @@
 #ifndef _PLAYLIST_CONTAINER_H_
 #define _PLAYLIST_CONTAINER_H_
 
-#include <QThread>
+#include "mthread.h"
 
 #include "playlist.h"
 
-class PlaylistLoadingThread : public QThread
+class PlaylistLoadingThread : public MThread
 {
   public:
     PlaylistLoadingThread(PlaylistContainer *parent_ptr,

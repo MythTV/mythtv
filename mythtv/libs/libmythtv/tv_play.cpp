@@ -1196,6 +1196,12 @@ TV::~TV(void)
     }
     ReturnPlayerLock(mctx);
 
+    if (browsehelper)
+    {
+        delete browsehelper;
+        browsehelper = NULL;
+    }
+
     LOG(VB_PLAYBACK, LOG_INFO, "TV::~TV() -- end");
 }
 
@@ -9083,6 +9089,7 @@ void *TV::load_dd_map_thunk(void *param)
     load_dd_map *x = (load_dd_map*) param;
     threadRegister("LoadDDMap");
     x->tv->RunLoadDDMap(x->sourceid);
+    GetMythDB()->GetDBManager()->CloseDatabases();
     threadDeregister();
     delete x;
     return NULL;
@@ -9093,6 +9100,7 @@ void *TV::load_dd_map_post_thunk(void *param)
     uint *sourceid = (uint*) param;
     threadRegister("LoadDDMapPost");
     SourceUtil::UpdateChannelsFromListings(*sourceid);
+    GetMythDB()->GetDBManager()->CloseDatabases();
     threadDeregister();
     delete sourceid;
     return NULL;

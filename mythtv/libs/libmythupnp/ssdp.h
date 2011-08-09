@@ -24,10 +24,10 @@
 #ifndef __SSDP_H__
 #define __SSDP_H__
 
-#include <QThread>
 #include <QFile>
 
 #include "upnpexp.h"
+#include "mthread.h"
 #include "httpserver.h"
 #include "taskqueue.h"
 #include "msocketdevice.h"
@@ -69,7 +69,7 @@ typedef enum
 
 #define NumberOfSockets     (sizeof( m_Sockets ) / sizeof( MSocketDevice * ))
 
-class UPNP_PUBLIC SSDP : public QThread
+class UPNP_PUBLIC SSDP : public MThread
 {
     private:
         // Singleton instance used by all.
@@ -172,7 +172,7 @@ class SSDPExtension : public HttpServerExtension
 
         virtual QStringList GetBasePaths();
         
-        bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
+        bool     ProcessRequest( HTTPRequest *pRequest );
 };
 
 #endif

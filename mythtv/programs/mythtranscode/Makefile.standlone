@@ -4,7 +4,7 @@ CFLAGS   ?= -g -O0 -fno-inline -fno-default-inline -DNO_MYTH -D_FILE_OFFSET_BITS
 TOOL = mpeg2fix
 
 
-INCLUDES = -I./libavformat -I./libavcodec -I./libavutil -I./libmpeg2 -I./replex -I/usr/include/qt3
+INCLUDES = -I./libavformat -I./libavcodec -I./libavutil -I./libmpeg2 -I./replex
 #INCLUDES += -I/usr/src/DVB/include
 
 OBJS = $(TOOL).o helper.o replex/libreplex.a
