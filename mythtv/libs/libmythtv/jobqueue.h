@@ -2,6 +2,7 @@
 #define JOBQUEUE_H_
 
 #include <sys/types.h>
+#include <pthread.h>
 
 #include <QWaitCondition>
 #include <QDateTime>
