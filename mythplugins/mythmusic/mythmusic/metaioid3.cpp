@@ -355,9 +355,7 @@ QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
             return picture;
     }
 
-    QByteArray fname = filename.toLocal8Bit();
-
-    if (OpenFile(fname.constData()))
+    if (OpenFile(filename))
     {
         TagLib::ID3v2::Tag *tag = GetID3v2Tag();
         if (tag && !tag->frameListMap()["APIC"].isEmpty())
@@ -393,9 +391,7 @@ QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
 AlbumArtList MetaIOID3::getAlbumArtList(const QString &filename)
 {
     AlbumArtList imageList;
-    QByteArray fname = filename.toLocal8Bit();
-
-    if (OpenFile(fname.constData()))
+    if (OpenFile(filename))
     {
         TagLib::ID3v2::Tag *tag = GetID3v2Tag();
 
@@ -569,8 +565,7 @@ bool MetaIOID3::writeAlbumArt(const QString &filename,
             break;
     }
 
-    QByteArray fname = filename.toLocal8Bit();
-    if (!OpenFile(fname.constData(), true))
+    if (!OpenFile(filename, true))
         return false;
 
     TagLib::ID3v2::Tag *tag = GetID3v2Tag();
@@ -636,8 +631,7 @@ bool MetaIOID3::removeAlbumArt(const QString &filename,
             break;
     }
 
-    QByteArray fname = filename.toLocal8Bit();
-    if (!OpenFile(fname.constData(), true))
+    if (!OpenFile(filename, true))
         return false;
 
     TagLib::ID3v2::Tag *tag = GetID3v2Tag();
@@ -688,8 +682,7 @@ bool MetaIOID3::changeImageType(const QString &filename,
             break;
     }
 
-    QByteArray fname = filename.toLocal8Bit();
-    if (!OpenFile(fname.constData(), true))
+    if (!OpenFile(filename, true))
         return false;
 
     TagLib::ID3v2::Tag *tag = GetID3v2Tag();
@@ -797,8 +790,7 @@ bool MetaIOID3::writeVolatileMetadata(const Metadata* mdata)
     int rating = mdata->Rating();
     int playcount = mdata->PlayCount();
 
-    QByteArray fname = filename.toLocal8Bit();
-    if (!OpenFile(fname.constData(), true))
+    if (!OpenFile(filename, true))
         return false;
 
     TagLib::ID3v2::Tag *tag = GetID3v2Tag();
