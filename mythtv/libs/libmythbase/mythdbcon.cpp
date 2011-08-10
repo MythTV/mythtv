@@ -847,7 +847,7 @@ bool MSqlQuery::prepare(const QString& query)
     // Close and reopen the database connection and retry the query if it
     // connects again
     if (!ok && QSqlQuery::lastError().number() == 2006 && Reconnect())
-        ok = QSqlQuery::prepare(query);
+        ok = true;
 
     if (!ok && !(GetMythDB()->SuppressDBMessages()))
     {
