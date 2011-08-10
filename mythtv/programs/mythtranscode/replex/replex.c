@@ -104,8 +104,9 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 	c->bit_rate = aframe->bit_rate;
 	c->sample_rate = aframe->frequency;
 	c->channels = 2;
-	 
-	/* open it */
+	c->sample_fmt = AV_SAMPLE_FMT_S16;
+
+    /* open it */
 	if (avcodec_open(c, codec) < 0) {
 		LOG(VB_GENERAL, LOG_ERR, "could not open codec");
 		av_free(c);
