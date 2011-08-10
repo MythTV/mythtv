@@ -126,7 +126,7 @@ typedef QMap<QString, QVariant> MSqlBindings;
  */
 class MBASE_PUBLIC MSqlQuery : private QSqlQuery
 {
-    friend void MSqlEscapeAsAQuery(QString&, MSqlBindings&);
+    MBASE_PUBLIC friend void MSqlEscapeAsAQuery(QString&, MSqlBindings&);
   public:
     /// \brief Get DB connection from pool
     MSqlQuery(const MSqlQueryInfo &qi);
