@@ -295,6 +295,11 @@ bool MythWebPage::extension(Extension extension, const ExtensionOption *option, 
     return false;
 }
 
+QString MythWebPage::userAgentForUrl(const QUrl &url) const
+{
+    return QWebPage::userAgentForUrl(url).replace("Safari", "MythBrowser");
+}
+
 /**
  * @class MythWebView
  * @brief Subclass of QWebView
