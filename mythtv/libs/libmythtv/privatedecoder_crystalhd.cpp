@@ -8,7 +8,7 @@
 
 void FetcherThread::run(void)
 {
-    RunProlog()
+    RunProlog();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Starting Fetcher thread."));
     if (m_dec)
         m_dec->FetchFrames();
