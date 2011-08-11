@@ -961,6 +961,9 @@ int MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
         memcpy(pic->atsc_cc_buf, s->tmp_atsc_cc_buf, s->tmp_atsc_cc_len);
         pic->atsc_cc_len = s->tmp_atsc_cc_len;
         s->tmp_atsc_cc_len = 0;
+        memcpy(pic->scte_cc_buf, s->tmp_scte_cc_buf, s->tmp_scte_cc_len);
+        pic->scte_cc_len = s->tmp_scte_cc_len;
+        s->tmp_scte_cc_len = 0;
 
         pic->coded_picture_number= s->coded_picture_number++;
 

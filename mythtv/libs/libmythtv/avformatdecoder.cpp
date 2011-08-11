@@ -289,6 +289,9 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       special_decode(special_decoding),
       maxkeyframedist(-1),
       // Closed Caption & Teletext decoders
+      ignore_scte(false),
+      invert_scte_field(0),
+      last_scte_field(0),
       ccd608(new CC608Decoder(parent->GetCC608Reader())),
       ccd708(new CC708Decoder(parent->GetCC708Reader())),
       ttd(new TeletextDecoder(parent->GetTeletextReader())),
@@ -2483,7 +2486,7 @@ int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic)
     return 0;
 }
 
-void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len)
+void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len, bool scte)
 {
     if (!len)
         return;
@@ -2517,13 +2520,36 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len)
         uint data2    = buf[4+(cur*3)];
         uint data     = (data2 << 8) | data1;
         uint cc_type  = cc_code & 0x03;
+        uint field;
 
-        if (cc_type <= 0x1) // EIA-608 field-1/2
+        if (scte || cc_type <= 0x1) // EIA-608 field-1/2
         {
+            if (cc_type == 0x2)
+            {
+                // SCTE repeated field
+                field = !last_scte_field;
+                invert_scte_field = !invert_scte_field;
+            }
+            else
+            {
+                field = cc_type ^ invert_scte_field;
+            }
+
+            // in film mode, we may start at the wrong field;
+            // correct if XDS is detected (must be field 2)
+            if (scte && field == 0 && data1 == 0x01)
+            {
+                if (cc_type == 1)
+                    invert_scte_field = 0;
+                field = 1;
+            }
+
+            last_scte_field = field;
+
             if (cc608_good_parity(cc608_parity_table, data))
             {
                 had_608 = true;
-                ccd608->FormatCCField(lastccptsu / 1000, cc_type, data);
+                ccd608->FormatCCField(lastccptsu / 1000, field, data);
             }
         }
         else
@@ -3034,13 +3060,22 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
     AVCodecContext *context = stream->codec;
 
-    // Decode CEA-608 and CEA-708 captions
-    for (uint i = 0; i < (uint)mpa_pic->atsc_cc_len;
-    i += ((mpa_pic->atsc_cc_buf[i] & 0x1f) * 3) + 2)
+    uint cc_len = (uint) max(mpa_pic->scte_cc_len,0);
+    uint8_t *cc_buf = mpa_pic->scte_cc_buf;
+    bool scte = true;
+
+    // If both ATSC and SCTE caption data are available, prefer ATSC
+    if ((mpa_pic->atsc_cc_len > 0) || ignore_scte)
     {
-        DecodeDTVCC(mpa_pic->atsc_cc_buf + i,
-                    mpa_pic->atsc_cc_len - i);
+        ignore_scte = true;
+        cc_len = (uint) max(mpa_pic->atsc_cc_len, 0);
+        cc_buf = mpa_pic->atsc_cc_buf;
+        scte = false;
     }
+
+    // Decode CEA-608 and CEA-708 captions
+    for (uint i = 0; i < cc_len; i += ((cc_buf[i] & 0x1f) * 3) + 2)
+        DecodeDTVCC(cc_buf + i, cc_len - i, scte);
 
     VideoFrame *picframe = (VideoFrame *)(mpa_pic->opaque);
 
