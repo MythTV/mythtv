@@ -15,12 +15,11 @@
 class CC608Text
 {
   public:
-    CC608Text(QString T, int X, int Y, int C, int TT)
-      : text(T), x(X), y(Y), color(C), teletextmode(TT) {}
+    CC608Text(QString T, int X, int Y, int TT) :
+        text(T), x(X), y(Y), teletextmode(TT) {}
     QString text;
     int x;
     int y;
-    int color;
     bool teletextmode;
 };
 

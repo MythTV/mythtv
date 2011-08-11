@@ -97,8 +97,8 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
                     memcpy(&st, inpos, sizeof(st));
                     inpos += sizeof(st);
 
-                    CC608Text *cc = new CC608Text(QString((const char*) inpos),
-                                        st.row, st.col, st.fg, true);
+                    CC608Text *cc = new CC608Text(
+                        QString((const char*) inpos), st.row, st.col, true);
 
                     m_state[streamIdx].m_output.lock.lock();
                     m_state[streamIdx].m_output.buffers.push_back(cc);
@@ -234,7 +234,7 @@ int CC608Reader::Update(unsigned char *inpos)
                 tmpcc = new CC608Text(
                     m_state[streamIdx].m_outputText,
                     m_state[streamIdx].m_outputCol,
-                    m_state[streamIdx].m_outputRow, 0, false);
+                    m_state[streamIdx].m_outputRow, false);
                 ccbuf->push_back(tmpcc);
 #if 0
                 if (ccbuf->size() > 4)
