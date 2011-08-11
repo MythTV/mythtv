@@ -75,7 +75,7 @@ static HostComboBox *MythGallerySortOrder()
     gc->addSelection("Reverse Extension (Z-A alpha)",
                      QString::number(kSortOrderExtDesc));
     gc->addSelection("Filesize (smallest first)",
-		     QString::number(kSortOrderSizeAsc));
+                     QString::number(kSortOrderSizeAsc));
     gc->addSelection("Reverse Filesize (largest first)",
                      QString::number(kSortOrderSizeDesc));
     gc->setHelpText(QObject::tr("This is the sort order for the displayed "

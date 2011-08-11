@@ -32,116 +32,134 @@
 class SequenceBase  
 {
 public:
-	SequenceBase(int _len, bool _reset = true) 
-	: len(_len), idx(0) { 
-		if(_reset) { reset(_len); }
-	};
+    SequenceBase(int _len, bool _reset = true) 
+    : len(_len), idx(0) 
+    { 
+        if (_reset)
+        {
+            reset(_len); 
+        }
+    };
 
-	virtual ~SequenceBase() {
-	};
+    virtual ~SequenceBase() { };
 
-	virtual void reset(int _len) {
-		len = _len; 
+    virtual void reset(int _len) 
+    {
+        len = _len; 
         idx = 0;
-	};
+    };
 
-	virtual void extend(int _len) {
-		len = _len; 
-	};
+    virtual void extend(int _len)
+    {
+        len = _len; 
+    };
 
-	int index(int _idx) { idx = _idx; return index(); };
-	int next(void)      { idx++; return index(); };
-	int prev(void)      { idx--; return index(); };
-	
-	
+    int index(int _idx) { idx = _idx; return index(); };
+    int next(void)      { idx++; return index(); };
+    int prev(void)      { idx--; return index(); };
+    
+    
 protected:
-	int index(void)     {
-        if( idx < 0 ) {
+    int index(void)
+    {
+        if( idx < 0 )
+        {
             idx += len; 
-    	} 
+        } 
         idx %= len; 
         int retval = get(); 
         return retval;
     };
 
-	virtual int get(void) = 0;
+    virtual int get(void) = 0;
 
-	int  len;
-	int  idx;
+    int  len;
+    int  idx;
 };
 
 class SequenceInc : public SequenceBase
 {
 public: 
-	SequenceInc(int _len) 
-	: SequenceBase(_len) {
-	};
+    SequenceInc(int _len) 
+    : SequenceBase(_len) { };
 
 protected:
-	virtual int get(void) { return idx; };
+    virtual int get(void) { return idx; };
 };
 
 class SequenceDec : public SequenceBase
 {
 public: 
-	SequenceDec(int _len) 
-	: SequenceBase(_len) {
-	};
+    SequenceDec(int _len) 
+    : SequenceBase(_len) { };
 
 protected:
-	virtual int get(void) { 
-		return len - idx - 1; 
-	};
+    virtual int get(void)
+    { 
+        return len - idx - 1; 
+    };
 };
 
 class SequenceRandomBase : public SequenceBase
 {
-public:
-	SequenceRandomBase(int _len, bool _reset = true)
-	: SequenceBase(_len, _reset), seq(0) { 
-		if( _reset ) { reset(_len); } 
-	};
+  public:
+    SequenceRandomBase(int _len, bool _reset = true)
+    : SequenceBase(_len, _reset), seq(0)
+    { 
+        if( _reset )
+        {
+            reset(_len);
+        } 
+    };
 
-	virtual ~SequenceRandomBase() { 
-		if( seq ) { 
-			delete seq; 
-		}
-	};
+    virtual ~SequenceRandomBase()
+    { 
+        if(seq)
+        { 
+            delete seq; 
+        }
+    };
 
-	virtual void reset(int _len) { 
-		SequenceBase::reset(_len); 
-		if( seq ) { 
-			delete seq; 
-		} 
-		seq = new(int[len]); 
-		for( int i = 0 ; i < len ; i++ ) { 
-			seq[i] = -1; 
-		} 
-	};
+    virtual void reset(int _len)
+    { 
+        SequenceBase::reset(_len); 
+        if(seq)
+        { 
+            delete seq; 
+        } 
+        seq = new(int[len]); 
+        for( int i = 0 ; i < len ; i++ )
+        { 
+            seq[i] = -1; 
+        } 
+    };
 
 protected:
-	virtual int get(void) { 
-		if( seq[idx] == -1 ) { 
-			seq[idx] = create(); 
-		} 
-		return seq[idx]; 
-	};
+    virtual int get(void)
+    { 
+        if( seq[idx] == -1 )
+        { 
+            seq[idx] = create(); 
+        } 
+        return seq[idx]; 
+    };
 
-	virtual int create(void) = 0;
+    virtual int create(void) = 0;
 
-	int *seq;
+    int *seq;
 };
 
 class SequenceRandom : public SequenceRandomBase
 {
 public:
-	SequenceRandom(int _len) 
-	: SequenceRandomBase(_len) {};
+    SequenceRandom(int _len) 
+    : SequenceRandomBase(_len) {};
 
 protected:
-	virtual int create(void) { 
-		return (int)(((double)rand()) * len / RAND_MAX); 
-	};
+    virtual int create(void)
+    { 
+        return (int)(((double)rand()) * len / RAND_MAX); 
+    };
 };
 
 #define MAP_IDX(idx)     map[((idx) / sizeof(int))]
@@ -153,42 +171,53 @@ protected:
 class SequenceShuffle : public SequenceRandomBase
 {
 public:
-	SequenceShuffle(int _len)
-	  : SequenceRandomBase(_len, false), map(0), used(0)
-	{ 
-		reset(_len); 
-	};
+    SequenceShuffle(int _len)
+      : SequenceRandomBase(_len, false), map(0), used(0)
+    { 
+        reset(_len); 
+    };
 
-	virtual ~SequenceShuffle() { 
-		if( map ) { 
-			delete map; 
-		} 
-	};
+    virtual ~SequenceShuffle()
+    { 
+        if (map)
+        { 
+            delete map; 
+        } 
+    };
 
-	virtual void reset(int _len) { 
-		SequenceRandomBase::reset(_len); 
-		if( map ) { 
-		   delete map; 
-		} 
-		map = new(int[(len / sizeof(int)) + 1]); 
-		for( int i = 0 ; i < len ; i++ ) { 
-		   MAP_CLR(map,i); 
-		} 
-	}; 
+    virtual void reset(int _len)
+    { 
+        SequenceRandomBase::reset(_len); 
+
+        if(map)
+        { 
+           delete map; 
+        } 
+
+        map = new(int[(len / sizeof(int)) + 1]); 
+
+        for( int i = 0 ; i < len ; i++ )
+        { 
+           MAP_CLR(map,i); 
+        } 
+    }; 
 
 protected:
-	virtual int create(void) { 
-		while(1) { 
-			int i = (int)(((double)rand()) * len / RAND_MAX); 
-			if( !MAP(map,i) ) { 
-				MAP_SET(map,i); 
-				return i; 
-			} 
-		} 
-	};
+    virtual int create(void)
+    { 
+        while(1)
+        { 
+            int i = (int)(((double)rand()) * len / RAND_MAX); 
+            if( !MAP(map,i) )
+            { 
+                MAP_SET(map,i); 
+                return i; 
+            } 
+        } 
+    };
 
-	int *map;
-	int used;
+    int *map;
+    int used;
 };
 
 #endif // ndef SEQUENCE_H

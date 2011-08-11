@@ -108,8 +108,8 @@ class GLSingleView : public QGLWidget, public ImageView
     void EffectKenBurns(void);
   
   private:
-	float FindMaxScale(float x_loc, float y_loc);
-	void FindRandXY(float &x_loc, float &y_loc);
+    float FindMaxScale(float x_loc, float y_loc);
+    void FindRandXY(float &x_loc, float &y_loc);
     
   private slots:
     void SlideTimeout(void);
@@ -132,7 +132,7 @@ class GLSingleView : public QGLWidget, public ImageView
     
     // Common effect state variables
     int           m_effect_rotate_direction;
-    MythTimer 	  m_effect_frame_time;
+    MythTimer     m_effect_frame_time;
     int           m_effect_transition_timeout;
     float         m_effect_transition_timeout_inv;
 
@@ -144,7 +144,7 @@ class GLSingleView : public QGLWidget, public ImageView
     float         m_effect_kenBurns_location_x[2];
     float         m_effect_kenBurns_location_y[2];
     int           m_effect_kenBurns_projection[2];
-    MythTimer 	  m_effect_kenBurns_image_time[2];
+    MythTimer     m_effect_kenBurns_image_time[2];
     float         m_effect_kenBurns_image_timeout;
     KenBurnsImageLoader *m_effect_kenBurns_imageLoadThread;
     bool          m_effect_kenBurns_image_ready;
@@ -163,7 +163,7 @@ public:
     void Initialize(int pos);
     void run();
 private:
-	GLSingleView *m_singleView;
+    GLSingleView *m_singleView;
     ThumbList     m_itemList;
     int           m_pos;
     bool          m_tex1First;

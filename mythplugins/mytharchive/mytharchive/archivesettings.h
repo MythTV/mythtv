@@ -1,5 +1,5 @@
 /*
-	archivesettings.
+    archivesettings.
 */
 
 #ifndef ARCHIVESETTINGS_H

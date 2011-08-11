@@ -1,5 +1,5 @@
 /*
-	zomeminder settings.cpp
+    zomeminder settings.cpp
 */
 
 #include <unistd.h>

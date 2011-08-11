@@ -425,11 +425,11 @@ void avfDecoder::run()
                     break;
                 }
 
-		tmp_pkt.data = pkt.data;
-		tmp_pkt.size = pkt.size;
+                tmp_pkt.data = pkt.data;
+                tmp_pkt.size = pkt.size;
 
                 while (tmp_pkt.size > 0 && !finish &&
-		       !user_stop && seekTime <= 0.0)
+                       !user_stop && seekTime <= 0.0)
                 {
                     // Decode the stream to the output codec
                     // m_samples is the output buffer

@@ -1,12 +1,12 @@
 /*
-	visualize.h 
+    visualize.h 
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Closely based on code from mq3 by Brad Hughes
-	
-	Part of the mythTV project
-	
-	music visualizers
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Closely based on code from mq3 by Brad Hughes
+    
+    Part of the mythTV project
+    
+    music visualizers
 */
 
 #ifndef VISUALIZE_H
@@ -36,10 +36,10 @@ extern "C" {
 #elif (myth_fftw_float == float)
 #define myth_fftw_complex_cast fftwf_complex
 #endif
-#elif	FFTW2_SUPPORT
+#elif    FFTW2_SUPPORT
 #include <rfftw.h>
 #include <fftw.h>
-#endif		
+#endif        
 }
 
 #ifdef OPENGL_SUPPORT
@@ -51,7 +51,7 @@ class Spectrum : public VisualBase
     // This class draws bars (up and down)
     // based on the magnitudes at various
     // frequencies in the audio data.
-	
+    
   public:
     Spectrum();
     virtual ~Spectrum();
@@ -105,7 +105,7 @@ class AlbumArt : public VisualBase
 
 class Blank : public VisualBase
 {
-    // This draws ... well ... nothing	
+    // This draws ... well ... nothing    
   public:
     Blank();
     virtual ~Blank();
@@ -157,7 +157,7 @@ class Gears : public QGLWidget, public VisualBase
     void resizeGL( int, int );
     void paintGL();
     void drawTheGears();
-		
+        
   private:
     QColor startColor, targetColor;
     QVector<QRect> rects;
@@ -179,6 +179,6 @@ class Gears : public QGLWidget, public VisualBase
 };
 
 
-#endif // opengl_support	
+#endif // opengl_support    
 
 #endif // __visualize_h

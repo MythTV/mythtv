@@ -33,7 +33,7 @@ Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *sr
     if (!srcMan)
     {
         m_srcMan = new SourceManager();
-	// No point in doing this as the very first thing we are going to do
+        // No point in doing this as the very first thing we are going to do
         // is destroy the sources and reload them.
 #if 0
         m_srcMan->startTimers();
@@ -353,7 +353,7 @@ void Weather::setupPage()
     }
     else
     {
-    	delete ssetup;
+        delete ssetup;
     }
 
     m_firstRun = true;

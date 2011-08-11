@@ -341,7 +341,7 @@ void CDRipperThread::run(void)
     QString PostRipCDScript = gCoreContext->GetSetting("PostCDRipScript");
 
     if (!PostRipCDScript.isEmpty())
-	myth_system(PostRipCDScript);
+        myth_system(PostRipCDScript);
 
     QApplication::postEvent(
         m_parent, new RipStatusEvent(RipStatusEvent::kFinishedEvent, ""));

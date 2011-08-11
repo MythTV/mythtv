@@ -2500,7 +2500,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
 
     add(QStringList( QStringList() << "-t" << "--createthumbnail" ),
             "createthumbnail", false,
-	    "Create one or more thumbnails\n"
+            "Create one or more thumbnails\n"
             "Requires: --infile, --thumblist, --outfile\n"
             "Optional: --framecount", "");
     add("--infile", "infile", "",

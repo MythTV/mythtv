@@ -1302,7 +1302,7 @@ void GLSingleView::EffectKenBurns(void)
     if (effect_pct > single_image_pct && m_effect_kenBurns_image_ready) 
     {
         if (!m_effect_kenBurns_new_image_started)
-        { 			
+        {             
             if (m_effect_kenBurns_item) //Do not create textures for first two images, since they are preloaded
             {
                 m_texItem[!m_tex1First].SetItem(m_effect_kenBurns_item, m_effect_kenBurns_orig_image_size);
@@ -1329,9 +1329,9 @@ void GLSingleView::EffectKenBurns(void)
         {
             // Start in center and pan out
             x_loc = m_effect_kenBurns_location_x[m_texCur] * t[m_texCur]; 
-            y_loc = m_effect_kenBurns_location_y[m_texCur] * t[m_texCur]; 		
+            y_loc = m_effect_kenBurns_location_y[m_texCur] * t[m_texCur];         
             scale_max = FindMaxScale(x_loc,y_loc);
-            scale_factor = 	1.0f + (scale_max * s[m_texCur]); 
+            scale_factor =     1.0f + (scale_max * s[m_texCur]); 
         }
         else // Zoom out image
         {
@@ -1339,7 +1339,7 @@ void GLSingleView::EffectKenBurns(void)
             x_loc = m_effect_kenBurns_location_x[m_texCur] -  m_effect_kenBurns_location_x[m_texCur] * t[m_texCur]; 
             y_loc = m_effect_kenBurns_location_y[m_texCur] -  m_effect_kenBurns_location_y[m_texCur] * t[m_texCur];
             scale_max = FindMaxScale(x_loc,y_loc);
-            scale_factor = 	1.0f + scale_max -  (scale_max * t[m_texCur]);
+            scale_factor =     1.0f + scale_max -  (scale_max * t[m_texCur]);
         } 
 
         glMatrixMode(GL_MODELVIEW);
@@ -1355,7 +1355,7 @@ void GLSingleView::EffectKenBurns(void)
         x_loc = m_effect_kenBurns_location_x[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1]; 
         y_loc = m_effect_kenBurns_location_y[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
         scale_max = FindMaxScale(x_loc,y_loc);
-        scale_factor = 	1.0f + (scale_max * s[m_texCur ? 0 : 1]);
+        scale_factor =     1.0f + (scale_max * s[m_texCur ? 0 : 1]);
     }
     else // Zoom out image
     {
@@ -1364,7 +1364,7 @@ void GLSingleView::EffectKenBurns(void)
         y_loc = m_effect_kenBurns_location_y[m_texCur ? 0 : 1] -  
             m_effect_kenBurns_location_y[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
         scale_max = FindMaxScale(x_loc,y_loc);
-        scale_factor = 	1.0f + scale_max -  (scale_max * t[m_texCur ? 0 : 1]);
+        scale_factor =     1.0f + scale_max -  (scale_max * t[m_texCur ? 0 : 1]);
     } 
 
     glMatrixMode(GL_MODELVIEW);

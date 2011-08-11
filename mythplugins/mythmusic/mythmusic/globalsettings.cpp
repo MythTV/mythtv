@@ -200,7 +200,7 @@ static HostComboBox *EncoderType()
     gc->addSelection(QObject::tr("Lame (MP3)"), "mp3");
     gc->setHelpText(QObject::tr("Audio encoder to use for CD ripping. "
                     "Note that the quality level 'Perfect' will use the "
-		                "FLAC encoder."));
+                        "FLAC encoder."));
     return gc;
 };
 

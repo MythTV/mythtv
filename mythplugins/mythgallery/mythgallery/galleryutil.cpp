@@ -280,7 +280,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
                 continue;
 
             ThumbItem *item = new ThumbItem(fi->fileName(),
-            	QDir::cleanPath(fi->absoluteFilePath()), fi->isDir());
+                QDir::cleanPath(fi->absoluteFilePath()), fi->isDir());
 
             itemList.append(item);
 

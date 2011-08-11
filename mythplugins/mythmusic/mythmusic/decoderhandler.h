@@ -131,7 +131,7 @@ class DecoderHandler : public QObject, public MythObservable
 };
 
 /** \brief The glue between the DecoderHandler and the Decoder
-	
+    
     The DecoderIOFactory is responsible for opening the QIODevice that
     is given to the Decoder....
  */

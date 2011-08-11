@@ -197,7 +197,7 @@ int Synaesthesia::bitReverser(int i)
         sum = (i & 1) + sum * 2;
         i >>= 1;
     }
-	
+    
     return sum;
 }
 
@@ -294,7 +294,7 @@ unsigned char Synaesthesia::getPixel(int x, int y, int where)
 {
     if (x < 0 || y < 0 || x >= outWidth || y >= outHeight)
         return 0;
-	
+    
     return lastOutput[where];
 }
 
@@ -626,11 +626,11 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
     register uint32_t *ptrOutput = (uint32_t *)output;
 
     for (int j = 0; j < outHeight * 2; j += 2) 
-    {		
+    {        
         uint32_t *ptrTop = (uint32_t *)(surface->pixels) + outWidth / 4 * j;
-	uint32_t *ptrBot = (uint32_t *)(surface->pixels) + 
+        uint32_t *ptrBot = (uint32_t *)(surface->pixels) + 
                                                          outWidth / 4 * (j + 1);
-		
+        
         int i = outWidth / 4;
 
         do {

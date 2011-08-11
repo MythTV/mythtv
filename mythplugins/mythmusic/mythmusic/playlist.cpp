@@ -1287,12 +1287,12 @@ void Playlist::mkisofsData(int fd)
 
         while (!text.atEnd())
         {
-	    QString line = text.readLine();
-	    if (line[6] == '%')
-	    {
-	        line = line.mid(0, 3);
-	        progress->setProgress(line.trimmed().toInt());
-	    }
+            QString line = text.readLine();
+            if (line[6] == '%')
+            {
+                line = line.mid(0, 3);
+                progress->setProgress(line.trimmed().toInt());
+            }
         }
     }
 }
