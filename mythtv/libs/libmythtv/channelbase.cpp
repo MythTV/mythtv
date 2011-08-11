@@ -749,14 +749,14 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
     switch(m_system_status)
     {
         case GENERIC_EXIT_OK:
-            ret = 3;	// success
+            ret = 3;    // success
             break;
         case GENERIC_EXIT_RUNNING:
         case GENERIC_EXIT_START:
-            ret = 1;	// pending
+            ret = 1;    // pending
             break;
         default:
-            ret = 2;	// fail
+            ret = 2;    // fail
             break;
     }
 

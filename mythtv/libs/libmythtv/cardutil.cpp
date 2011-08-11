@@ -1833,16 +1833,16 @@ QString CardUtil::GetDeviceLabel(uint cardid)
     QString devlabel;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardtype, videodevice "
-		  "FROM capturecard WHERE cardid = :CARDID ");
+                  "FROM capturecard WHERE cardid = :CARDID ");
     query.bindValue(":CARDID", cardid);
 
     if (query.exec() && query.next())
     {
-	return( GetDeviceLabel( query.value(0).toString(),
-	 	                query.value(1).toString()) );
+        return GetDeviceLabel(query.value(0).toString(),
+                              query.value(1).toString());
     }
 
-    return( "[ UNKNOWN ]" );
+    return "[ UNKNOWN ]";
 }
 
 void CardUtil::GetCardInputs(

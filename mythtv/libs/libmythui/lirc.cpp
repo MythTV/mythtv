@@ -478,7 +478,7 @@ QList<QByteArray> LIRC::GetCodes(void)
         if (len >= 0)
             break;
 
-	switch (errno)
+        switch (errno)
         {
             case EINTR:
                 continue;

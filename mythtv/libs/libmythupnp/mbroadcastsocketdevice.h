@@ -66,7 +66,7 @@ class MBroadcastSocketDevice : public MSocketDevice
     }
 
     virtual QHostAddress address() const { return m_address; }
-    virtual quint16	 port() const { return m_port; }
+    virtual quint16 port() const { return m_port; }
 
   private:
     QHostAddress    m_address;

@@ -1349,7 +1349,7 @@ bool CC608Decoder::XDSPacketParseProgram(
         {
             LOG(VB_VBI, LOG_ERR, loc + 
                     QString("VChip Unhandled -- rs(%1) rating(%2:%3)")
-		    .arg(rating_system).arg(tv_rating).arg(movie_rating));
+                .arg(rating_system).arg(tv_rating).arg(movie_rating));
         }
     }
 #if 0

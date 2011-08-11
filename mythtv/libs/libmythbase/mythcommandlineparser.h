@@ -126,7 +126,7 @@ class MBASE_PUBLIC MythCommandLineParser
     QVariant                operator[](const QString &name);
     QStringList             GetArgs(void) const { return m_remainingArgs; }
     QMap<QString,QString>   GetSettingsOverride(void);
-    QString	                GetLogFilePath(void);
+    QString                 GetLogFilePath(void);
     int                     GetSyslogFacility(void);
     LogLevel_t              GetLogLevel(void);
     QString                 GetPassthrough(void) const { return m_passthrough.join(" "); }

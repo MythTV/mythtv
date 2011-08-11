@@ -1046,7 +1046,7 @@ void MythDB::WriteDelayedSettings(void)
         return;
 
     if (!gCoreContext->IsUIThread())
-	return;
+        return;
 
     while (!d->delayedSettings.isEmpty())
     {

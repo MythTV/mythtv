@@ -2264,7 +2264,7 @@ void MythMainWindow::customEvent(QEvent *ce)
                 if (me->ExtraDataCount() == 3)
                     filename = me->ExtraData(2);
             }
-	    ScreenShot(width, height, filename);
+            ScreenShot(width, height, filename);
         }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)

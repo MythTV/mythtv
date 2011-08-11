@@ -137,7 +137,7 @@ void HttpComms::done(bool error)
     {
        LOG(VB_GENERAL, LOG_ERR, 
            QString("NetworkOperation Error on Finish: %1 (%2): url: '%3'")
-	       .arg(http->errorString()) .arg(error) .arg(m_url.toString()));
+           .arg(http->errorString()) .arg(error) .arg(m_url.toString()));
     }
     else if (m_authNeeded)
     {

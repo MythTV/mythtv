@@ -149,7 +149,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
             delete d;
             return -1;
         }
-		
+
         pModeLines[nDisplayDevice] = str;
         ModeLineLen[nDisplayDevice] = len;
 

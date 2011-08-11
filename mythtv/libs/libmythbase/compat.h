@@ -241,24 +241,24 @@ inline const char *dlerror(void)
 #endif // USING_MINGW
 
 #ifdef USING_MINGW
-#define	timeradd(a, b, result)						      \
-  do {									      \
-    (result)->tv_sec = (a)->tv_sec + (b)->tv_sec;			      \
-    (result)->tv_usec = (a)->tv_usec + (b)->tv_usec;			      \
-    if ((result)->tv_usec >= 1000000)					      \
-      {									      \
-        ++(result)->tv_sec;						      \
-        (result)->tv_usec -= 1000000;					      \
-      }									      \
+#define    timeradd(a, b, result)                       \
+  do {                                                  \
+      (result)->tv_sec = (a)->tv_sec + (b)->tv_sec;     \
+      (result)->tv_usec = (a)->tv_usec + (b)->tv_usec;  \
+      if ((result)->tv_usec >= 1000000)                 \
+      {                                                 \
+          ++(result)->tv_sec;                           \
+          (result)->tv_usec -= 1000000;                 \
+      }                                                 \
   } while (0)
-#define	timersub(a, b, result)						      \
-  do {									      \
-    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;			      \
-    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;			      \
-    if ((result)->tv_usec < 0) {					      \
-      --(result)->tv_sec;						      \
-      (result)->tv_usec += 1000000;					      \
-    }									      \
+#define    timersub(a, b, result)                       \
+  do {                                                  \
+      (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;     \
+      (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;  \
+      if ((result)->tv_usec < 0) {                      \
+          --(result)->tv_sec;                           \
+         (result)->tv_usec += 1000000;                  \
+      }                                                 \
   } while (0)
 #endif // USING_MINGW
 
@@ -270,11 +270,11 @@ inline const char *dlerror(void)
 
 #ifdef USING_MINGW
 // this stuff is untested
-#define WIFEXITED(w)	(((w) & 0xff) == 0)
-#define WIFSIGNALED(w)	(((w) & 0x7f) > 0 && (((w) & 0x7f) < 0x7f))
-#define WIFSTOPPED(w)	(((w) & 0xff) == 0x7f)
-#define WEXITSTATUS(w)	(((w) >> 8) & 0xff)
-#define WTERMSIG(w)	((w) & 0x7f)
+#define WIFEXITED(w)   (((w) & 0xff) == 0)
+#define WIFSIGNALED(w) (((w) & 0x7f) > 0 && (((w) & 0x7f) < 0x7f))
+#define WIFSTOPPED(w)  (((w) & 0xff) == 0x7f)
+#define WEXITSTATUS(w) (((w) >> 8) & 0xff)
+#define WTERMSIG(w)    ((w) & 0x7f)
 #endif // USING_MINGW
 
 

@@ -1447,12 +1447,12 @@ void VideoMetadata::SetEpisode(int episode)
 
 QDate VideoMetadata::GetInsertdate() const
 {
-	return m_imp->GetInsertdate();
+    return m_imp->GetInsertdate();
 }
 
 void VideoMetadata::SetInsertdate(QDate date)
 {
-	m_imp->SetInsertdate(date);
+    m_imp->SetInsertdate(date);
 }
 
 unsigned int VideoMetadata::GetID() const

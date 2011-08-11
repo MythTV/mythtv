@@ -16,7 +16,7 @@ enum
 
 enum
 {
-    kVDADecoderFlush_EmitFrames = 1 << 0		
+    kVDADecoderFlush_EmitFrames = 1 << 0
 };
 
 enum

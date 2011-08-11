@@ -51,7 +51,7 @@ class UPNP_PUBLIC  UPnpMSRR : public Eventing
 
     public:
                  UPnpMSRR( UPnpDevice *pDevice,
-			   const QString &sSharePath ); 
+                           const QString &sSharePath ); 
 
         virtual ~UPnpMSRR();
 

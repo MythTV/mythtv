@@ -30,7 +30,7 @@
 
 #define SLOC(a) QString("MythSocketThread(sock 0x%1:%2): ")\
                     .arg((uint64_t)a, 0, 16).arg(a->socket())
-#define LOC	QString("MythSocketThread: ")
+#define LOC     QString("MythSocketThread: ")
 
 const uint MythSocketThread::kShortWait = 100;
 
