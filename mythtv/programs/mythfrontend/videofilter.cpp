@@ -207,19 +207,19 @@ VideoFilterSettings::operator=(const VideoFilterSettings &rhs)
 
     if (textfilter != rhs.textfilter)
     {
-    	textfilter = rhs.textfilter;
-    	m_changed_state |= kFilterTextFilterChanged;
+        textfilter = rhs.textfilter;
+        m_changed_state |= kFilterTextFilterChanged;
     }
     if (season != rhs.season || episode != rhs.episode)
     {
-    	season = rhs.season;
-    	episode = rhs.episode;
-    	m_changed_state |= kFilterTextFilterChanged;
+        season = rhs.season;
+        episode = rhs.episode;
+        m_changed_state |= kFilterTextFilterChanged;
     }
     if (insertdate != rhs.insertdate)
     {
-    	insertdate = rhs.insertdate;
-    	m_changed_state |= kFilterTextFilterChanged;
+        insertdate = rhs.insertdate;
+        m_changed_state |= kFilterTextFilterChanged;
     }
 
     return *this;
@@ -249,18 +249,18 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
     //textfilter
     if (!textfilter.isEmpty())
     {
-    	matches = false;
-    	matches = matches || mdata.GetTitle().contains(textfilter, Qt::CaseInsensitive);
-    	matches = matches || mdata.GetSubtitle().contains(textfilter, Qt::CaseInsensitive);
-    	matches = matches || mdata.GetPlot().contains(textfilter, Qt::CaseInsensitive);
+        matches = false;
+        matches = matches || mdata.GetTitle().contains(textfilter, Qt::CaseInsensitive);
+        matches = matches || mdata.GetSubtitle().contains(textfilter, Qt::CaseInsensitive);
+        matches = matches || mdata.GetPlot().contains(textfilter, Qt::CaseInsensitive);
     }
     //search for season with optionally episode nr.
     if (matches && season != -1) {
-    	matches = season == mdata.GetSeason();
-    	matches = matches && (episode == -1 || episode == mdata.GetEpisode());
+        matches = season == mdata.GetSeason();
+        matches = matches && (episode == -1 || episode == mdata.GetEpisode());
     }
     if (matches && insertdate.isValid()) {
-    	matches = mdata.GetInsertdate().isValid() && mdata.GetInsertdate() >= insertdate;
+        matches = mdata.GetInsertdate().isValid() && mdata.GetInsertdate() >= insertdate;
     }
     if (matches && genre != kGenreFilterAll)
     {
@@ -484,53 +484,53 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
 
 void VideoFilterSettings::setTextFilter(QString val)
 {
-	m_changed_state |= kFilterTextFilterChanged;
-	if (re_season.indexIn(val) != -1)
-	{
-		bool res;
-		QStringList list = re_season.capturedTexts();
-		season = list[1].toInt(&res);
-		if (!res)
-			season = -1;
-		if (list.size() > 2) {
-			episode = list[2].toInt(&res);
-			if (!res)
-				episode = -1;
-		}
-		else {
-			episode = -1;
-		}
-		//clear \dX\d from string for string-search in plot/title/subtitle
-		textfilter = val;
-		textfilter.replace(re_season, "");
-		textfilter = textfilter.simplified ();
-	}
-	else
-	{
-		textfilter = val;
-		season = -1;
-		episode = -1;
-	}
-	if (re_date.indexIn(textfilter) != -1)
-	{
-		QStringList list = re_date.capturedTexts();
-		int modnr = list[1].toInt();
-		QDate testdate = QDate::currentDate();
-		switch(list[2].at(0).toAscii())
-		{
-			case 'm': testdate = testdate.addMonths(-modnr);break;
-			case 'd': testdate = testdate.addDays(-modnr);break;
-			case 'w': testdate = testdate.addDays(-modnr * 7);break;
-		}
-		insertdate = testdate;
-		textfilter.replace(re_date, "");
-		textfilter = textfilter.simplified ();
-	}
-	else
-	{
-		//reset testdate
-		insertdate = QDate();
-	}
+    m_changed_state |= kFilterTextFilterChanged;
+    if (re_season.indexIn(val) != -1)
+    {
+        bool res;
+        QStringList list = re_season.capturedTexts();
+        season = list[1].toInt(&res);
+        if (!res)
+            season = -1;
+        if (list.size() > 2) {
+            episode = list[2].toInt(&res);
+            if (!res)
+                episode = -1;
+        }
+        else {
+            episode = -1;
+        }
+        //clear \dX\d from string for string-search in plot/title/subtitle
+        textfilter = val;
+        textfilter.replace(re_season, "");
+        textfilter = textfilter.simplified ();
+    }
+    else
+    {
+        textfilter = val;
+        season = -1;
+        episode = -1;
+    }
+    if (re_date.indexIn(textfilter) != -1)
+    {
+        QStringList list = re_date.capturedTexts();
+        int modnr = list[1].toInt();
+        QDate testdate = QDate::currentDate();
+        switch(list[2].at(0).toAscii())
+        {
+            case 'm': testdate = testdate.addMonths(-modnr);break;
+            case 'd': testdate = testdate.addDays(-modnr);break;
+            case 'w': testdate = testdate.addDays(-modnr * 7);break;
+        }
+        insertdate = testdate;
+        textfilter.replace(re_date, "");
+        textfilter = textfilter.simplified ();
+    }
+    else
+    {
+        //reset testdate
+        insertdate = QDate();
+    }
 }
 
 /////////////////////////////////
@@ -614,7 +614,7 @@ bool VideoFilterDialog::Create()
     connect(m_orderbyList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(setOrderby(MythUIButtonListItem*)));
     connect(m_textfilter, SIGNAL(valueChanged()),
-    		SLOT(setTextFilter()));
+            SLOT(setTextFilter()));
 
     connect(m_saveButton, SIGNAL(Clicked()), SLOT(saveAsDefault()));
     connect(m_doneButton, SIGNAL(Clicked()), SLOT(saveAndExit()));
@@ -914,6 +914,6 @@ void VideoFilterDialog::setOrderby(MythUIButtonListItem *item)
 
 void VideoFilterDialog::setTextFilter()
 {
-	m_settings.setTextFilter(m_textfilter->GetText());
-	update_numvideo();
+    m_settings.setTextFilter(m_textfilter->GetText());
+    update_numvideo();
 }

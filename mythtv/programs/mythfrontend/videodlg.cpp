@@ -3041,10 +3041,10 @@ void VideoDialog::playFolder()
                     playing_time.start();
                     video_started = true;
                     PlayVideo(metadata->GetFilename(),
-                                       m_d->m_videoList->getListCache());
+                              m_d->m_videoList->getListCache());
                 }
             }
-	    i++;
+            i++;
         }
     }
 }

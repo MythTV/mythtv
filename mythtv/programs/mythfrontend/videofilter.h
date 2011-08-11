@@ -266,7 +266,7 @@ class VideoFilterDialog : public MythScreenType
     MythUIButton    *m_saveButton;
     MythUIButton    *m_doneButton;
     MythUIText      *m_numvideosText;
-    MythUITextEdit	*m_textfilter;
+    MythUITextEdit    *m_textfilter;
 
     const VideoList &m_videoList;
     FilterSettingsProxy *m_fsp;
