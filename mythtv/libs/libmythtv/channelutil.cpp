@@ -1785,7 +1785,7 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, i
         qstr += QString(",channelgroup ");
 
     if (sourceid)
-        qstr += QString("WHERE sourceid='%1' ").arg(sourceid);
+        qstr += QString("WHERE channel.sourceid='%1' ").arg(sourceid);
     else
         qstr += ",cardinput,capturecard "
             "WHERE cardinput.sourceid = channel.sourceid   AND "
