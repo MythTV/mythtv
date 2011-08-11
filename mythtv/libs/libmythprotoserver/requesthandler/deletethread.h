@@ -1,9 +1,6 @@
 #ifndef DELETETHREAD_H_
 #define DELETETHREAD_H_
 
-// POSIX headers
-#include <pthread.h>
-
 // ANSI C headers
 #include <stdint.h>
 #include <unistd.h>
