@@ -2535,21 +2535,26 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len, bool scte)
                 field = cc_type ^ invert_scte_field;
             }
 
-            // in film mode, we may start at the wrong field;
-            // correct if XDS is detected (must be field 2)
-            if (scte && field == 0 && data1 == 0x01)
-            {
-                if (cc_type == 1)
-                    invert_scte_field = 0;
-                field = 1;
-            }
-
-            last_scte_field = field;
-
             if (cc608_good_parity(cc608_parity_table, data))
             {
+                // in film mode, we may start at the wrong field;
+                // correct if XDS start/cont/end code is detected
+                // (must be field 2)
+                if (scte && field == 0 &&
+                    (data1 & 0x7f) <= 0x0f && (data1 & 0x7f) != 0x00)
+                {
+                    if (cc_type == 1)
+                        invert_scte_field = 0;
+                    field = 1;
+
+                    // flush decoder
+                    ccd608->FormatCC(0, -1, -1);
+                }
+
                 had_608 = true;
                 ccd608->FormatCCField(lastccptsu / 1000, field, data);
+
+                last_scte_field = field;
             }
         }
         else
