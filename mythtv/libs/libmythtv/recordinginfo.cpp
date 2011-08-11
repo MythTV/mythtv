@@ -628,14 +628,14 @@ void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle,
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString sql = "UPDATE recorded SET title = :TITLE, subtitle = :SUBTITLE ";
-    if (newDescription != NULL)
+    if (!newDescription.isNull())
         sql += ", description = :DESCRIPTION ";
     sql += " WHERE chanid = :CHANID AND starttime = :START ;";
 
     query.prepare(sql);
     query.bindValue(":TITLE", newTitle);
-    query.bindValue(":SUBTITLE", newSubtitle);
-    if (newDescription != NULL)
+    query.bindValue(":SUBTITLE", newSubtitle.isNull() ? "" : newSubtitle);
+    if (!newDescription.isNull())
         query.bindValue(":DESCRIPTION", newDescription);
     query.bindValue(":CHANID", chanid);
     query.bindValue(":START", recstartts);
@@ -645,7 +645,7 @@ void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle,
 
     title = newTitle;
     subtitle = newSubtitle;
-    if (newDescription != NULL)
+    if (!newDescription.isNull())
         description = newDescription;
 
     SendUpdateEvent();
@@ -1002,8 +1002,9 @@ bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
     query.bindValue(":STARTS",      pg->recstartts);
     query.bindValue(":ENDS",        pg->recendts);
     query.bindValue(":TITLE",       pg->title);
-    query.bindValue(":SUBTITLE",    pg->subtitle);
-    query.bindValue(":DESC",        pg->description);
+    query.bindValue(":SUBTITLE",    pg->subtitle.isNull() ? "" : pg->subtitle);
+    query.bindValue(":DESC",
+                    pg->description.isNull() ? "" : pg->description);
     query.bindValue(":SEASON",      pg->season);
     query.bindValue(":EPISODE",     pg->episode);
     query.bindValue(":HOSTNAME",    pg->hostname);
@@ -1179,8 +1180,8 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     result.bindValue(":START", startts);
     result.bindValue(":END", endts);
     result.bindValue(":TITLE", title);
-    result.bindValue(":SUBTITLE", subtitle);
-    result.bindValue(":DESC", description);
+    result.bindValue(":SUBTITLE", subtitle.isNull() ? "" : subtitle);
+    result.bindValue(":DESC", description.isNull() ? "" : description);
     result.bindValue(":SEASON", season);
     result.bindValue(":EPISODE", episode);
     result.bindValue(":CATEGORY", category);
@@ -1283,8 +1284,8 @@ void RecordingInfo::ForgetHistory(void)
                    " (programid <> '' AND programid = :PROGRAMID) OR "
                    " (findid <> 0 AND findid = :FINDID))");
     result.bindValue(":TITLE", title);
-    result.bindValue(":SUBTITLE", subtitle);
-    result.bindValue(":DESC", description);
+    result.bindValue(":SUBTITLE", subtitle.isNull() ? "" : subtitle);
+    result.bindValue(":DESC", description.isNull() ? "" : description);
     result.bindValue(":PROGRAMID", programid);
     result.bindValue(":FINDID", findid);
 
@@ -1329,8 +1330,8 @@ void RecordingInfo::SetDupHistory(void)
                    " (programid <> '' AND programid = :PROGRAMID) OR "
                    " (findid <> 0 AND findid = :FINDID))");
     result.bindValue(":TITLE", title);
-    result.bindValue(":SUBTITLE", subtitle);
-    result.bindValue(":DESC", description);
+    result.bindValue(":SUBTITLE", subtitle.isNull() ? "" : subtitle);
+    result.bindValue(":DESC", description.isNull() ? "" : description);
     result.bindValue(":PROGRAMID", programid);
     result.bindValue(":FINDID", findid);
 
