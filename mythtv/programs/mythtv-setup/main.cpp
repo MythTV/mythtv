@@ -47,6 +47,34 @@ StartPrompter  *startPrompt = NULL;
 static MythThemedMenu *menu;
 static QString  logfile;
 
+class CleanupGuard
+{
+  public:
+    typedef void (*CleanupFunc)();
+
+  public:
+    CleanupGuard(CleanupFunc cleanFunction) :
+        m_cleanFunction(cleanFunction) {}
+
+    ~CleanupGuard()
+    {
+        m_cleanFunction();
+    }
+
+  private:
+    CleanupFunc m_cleanFunction;
+};
+
+static void cleanup()
+{
+    DestroyMythMainWindow();
+
+    delete gContext;
+    gContext = NULL;
+
+    delete qApp;
+}
+
 static void SetupMenuCallback(void* data, QString& selection)
 {
     (void)data;
@@ -223,12 +251,14 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
+    CleanupGuard callCleanup(cleanup);
+
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(FALSE);
 #endif
-    QApplication a(argc, argv, use_display);
+    new QApplication(argc, argv, use_display);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
 
     if (cmdline.toBool("display"))
@@ -296,8 +326,6 @@ int main(int argc, char *argv[])
     }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
-
-    std::auto_ptr<MythContext> contextScopeDelete(gContext);
 
     cmdline.ApplySettingsOverride();
 
@@ -414,7 +442,7 @@ int main(int argc, char *argv[])
                 // stuff needed for particular scans
                 /* mplexid   */ 0,
                 startChan, freq_std, mod, tbl);
-            ret = a.exec();
+            ret = qApp->exec();
         }
         return (ret) ? GENERIC_EXIT_NOT_OK : GENERIC_EXIT_OK;
     }
@@ -511,9 +539,6 @@ int main(int argc, char *argv[])
     }
 
     qApp->exec();
-    // Main menu callback to ExitPrompter does CheckSetup(), cleanup and exit.
-
-    DestroyMythMainWindow();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
