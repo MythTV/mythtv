@@ -662,7 +662,7 @@ void VideoMetadataImp::saveToDatabase()
     }
 
     query.bindValue(":TITLE", m_title);
-    query.bindValue(":SUBTITLE", m_subtitle);
+    query.bindValue(":SUBTITLE", m_subtitle.isNull() ? "" : m_subtitle);
     query.bindValue(":TAGLINE", m_tagline);
     query.bindValue(":DIRECTOR", m_director);
     query.bindValue(":STUDIO", m_studio);
