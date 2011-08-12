@@ -560,13 +560,10 @@ MSqlQueryInfo MSqlQuery::InitCon(ConnectionReuse _reuse)
         return qi;
     }
 
-    if (db)
-    {
-        qi.db = db;
-        qi.qsqldb = db->db();
+    qi.db = db;
+    qi.qsqldb = db->db();
 
-        db->KickDatabase();
-    }
+    db->KickDatabase();
 
     return qi;
 }
