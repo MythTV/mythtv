@@ -20,7 +20,7 @@
 #define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
 
 MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
-              : MythUIType(parent, name)
+    : MythUIType(parent, name)
 {
     m_showArrow = true;
 
@@ -28,9 +28,9 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
 }
 
 MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
-                               const QRect& area, bool showArrow,
-                               bool showScrollArrows)
-              : MythUIType(parent, name)
+                                   const QRect &area, bool showArrow,
+                                   bool showScrollArrows)
+    : MythUIType(parent, name)
 {
     m_Area      = area;
     m_showArrow = showArrow;
@@ -40,7 +40,7 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
 
 void MythUIButtonList::Const(void)
 {
-    m_contentsRect = MythRect(0,0,0,0);
+    m_contentsRect = MythRect(0, 0, 0, 0);
 
     m_layout      = LayoutVertical;
     m_arrange     = ArrangeFixed;
@@ -91,6 +91,7 @@ MythUIButtonList::~MythUIButtonList()
 {
     m_ButtonToItem.clear();
     m_clearing = true;
+
     while (!m_itemList.isEmpty())
         delete m_itemList.takeFirst();
 }
@@ -98,8 +99,10 @@ MythUIButtonList::~MythUIButtonList()
 void MythUIButtonList::Select()
 {
     MythUIButtonListItem *item = GetItemCurrent();
+
     if (item)
         emit itemSelected(item);
+
     SetActive(true);
 }
 
@@ -119,6 +122,7 @@ void MythUIButtonList::SetActive(bool active)
         return;
 
     m_active = active;
+
     if (m_initialized)
         Update();
 }
@@ -161,7 +165,7 @@ void MythUIButtonList::Update()
  * If a button has a negative offset, that offset needs accounted for
  * to position the button in proper releation to the surrounding buttons.
  */
-int MythUIButtonList::minButtonWidth(const MythRect & area)
+int MythUIButtonList::minButtonWidth(const MythRect &area)
 {
     int width = area.width();
 
@@ -187,7 +191,7 @@ int MythUIButtonList::minButtonWidth(const MythRect & area)
  * If a button has a negative offset, that offset needs accounted for
  * to position the button in proper releation to the surrounding buttons.
  */
-int MythUIButtonList::minButtonHeight(const MythRect & area)
+int MythUIButtonList::minButtonHeight(const MythRect &area)
 {
     int height = area.height();
 
@@ -211,19 +215,21 @@ int MythUIButtonList::minButtonHeight(const MythRect & area)
  * being redrawn, re-use any previously allocated buttons.
  */
 MythUIGroup *MythUIButtonList::PrepareButton(int buttonIdx, int itemIdx,
-                                             int & selectedIdx,
-                                             int & button_shift)
+                                             int &selectedIdx,
+                                             int &button_shift)
 {
     MythUIStateType *realButton;
     MythUIGroup *buttonstate;
-    MythUIButtonListItem* buttonItem = m_itemList[itemIdx];
+    MythUIButtonListItem *buttonItem = m_itemList[itemIdx];
 
     buttonIdx += button_shift;
+
     if (buttonIdx < 0 || buttonIdx + 1 > m_maxVisible)
     {
         QString name = QString("buttonlist button %1").arg(m_maxVisible);
         MythUIStateType *button = new MythUIStateType(this, name);
         button->CopyFrom(m_buttontemplate);
+
         if (buttonIdx < 0)
         {
             /*
@@ -233,11 +239,13 @@ MythUIGroup *MythUIButtonList::PrepareButton(int buttonIdx, int itemIdx,
             m_ButtonList.prepend(button);
             buttonIdx = 0;
             ++button_shift;
+
             if (selectedIdx >= 0)
                 ++selectedIdx;
         }
         else
             m_ButtonList.append(button);
+
         ++m_maxVisible;
     }
 
@@ -255,13 +263,13 @@ MythUIGroup *MythUIButtonList::PrepareButton(int buttonIdx, int itemIdx,
 /*
  * Dynamically layout the buttons on a row.
  */
-bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
-                                     int & first_item, int & last_item,
-                                     int & selected_column,
+bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
+                                     int &first_item, int &last_item,
+                                     int &selected_column,
                                      bool grow_left, bool grow_right,
-                                     int ** col_widths, int & row_height,
+                                     int **col_widths, int &row_height,
                                      int total_height, int split_height,
-                                     int & col_cnt, bool & wrapped)
+                                     int &col_cnt, bool &wrapped)
 {
     MythUIGroup *buttonstate;
     int  initial_first_button, initial_last_button;
@@ -298,7 +306,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
     if (buttonstate == NULL)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to query buttonlist state: %1")
-                .arg(last_button));
+            .arg(last_button));
         return false;
     }
 
@@ -314,6 +322,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
      */
     vsplit = (m_scrollStyle == ScrollCenter);
     hsplit = vsplit && grow_left && grow_right;
+
     if (hsplit)
     {
         max_width /= 2;
@@ -332,6 +341,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
             right_width = 0;
         }
     }
+
     if (vsplit)
         max_height /= 2;
 
@@ -345,19 +355,19 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
          m_itemVertSpacing + row_height > max_height))
     {
         LOG(VB_GUI, LOG_DEBUG,
-                QString("%1 Height exceeded %2 + (%3) + %4 = %5 which is > %6")
-                .arg(vsplit ? "Centering" : "Total")
-                .arg(split_height).arg(m_itemVertSpacing).arg(row_height)
-                .arg(split_height + m_itemVertSpacing + row_height)
-                .arg(max_height));
+            QString("%1 Height exceeded %2 + (%3) + %4 = %5 which is > %6")
+            .arg(vsplit ? "Centering" : "Total")
+            .arg(split_height).arg(m_itemVertSpacing).arg(row_height)
+            .arg(split_height + m_itemVertSpacing + row_height)
+            .arg(max_height));
         first_button += button_shift;
         last_button += button_shift;
         return false;
     }
 
     LOG(VB_GUI, LOG_DEBUG, QString("Added button item %1 width %2 height %3")
-            .arg(grow_right ? last_item : first_item)
-            .arg(width).arg(row_height));
+        .arg(grow_right ? last_item : first_item)
+        .arg(width).arg(row_height));
 
     initial_first_button = first_button;
     initial_last_button  = last_button;
@@ -376,6 +386,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
 
     // Add butons until no more fit.
     added = (m_layout != LayoutVertical);
+
     while (added)
     {
         added = false;
@@ -405,8 +416,10 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
                 // Allocate next button to the right.
                 buttonstate = PrepareButton(last_button + 1, last_item + 1,
                                             selectedIdx, button_shift);
+
                 if (buttonstate == NULL)
                     continue;
+
                 width = minButtonWidth(buttonstate->GetArea());
 
                 // For grids, use the widest button in a column
@@ -419,11 +432,11 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
                 {
                     int total = hsplit ? right_width : left_width + right_width;
                     LOG(VB_GUI, LOG_DEBUG,
-                            QString("button on right would exceed width: "
-                                    "%1+(%2)+%3 == %4 which is > %5")
-                            .arg(total).arg(m_itemHorizSpacing).arg(width)
-                            .arg(total + m_itemHorizSpacing + width)
-                            .arg(max_width));
+                        QString("button on right would exceed width: "
+                                "%1+(%2)+%3 == %4 which is > %5")
+                        .arg(total).arg(m_itemHorizSpacing).arg(width)
+                        .arg(total + m_itemHorizSpacing + width)
+                        .arg(max_width));
                 }
                 else
                 {
@@ -434,13 +447,15 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
                     ++col_idx;
                     right_width += m_itemHorizSpacing + width;
                     height = minButtonHeight(buttonstate->GetArea());
+
                     if (row_height < height)
                         row_height = height;
+
                     LOG(VB_GUI, LOG_DEBUG,
-                            QString("Added button item %1 "
-                                    "r.width %2 height %3 total width %4+%5")
-                            .arg(last_item).arg(width).arg(height)
-                            .arg(left_width).arg(right_width));
+                        QString("Added button item %1 "
+                                "r.width %2 height %3 total width %4+%5")
+                        .arg(last_item).arg(width).arg(height)
+                        .arg(left_width).arg(right_width));
                 }
             }
             else
@@ -471,8 +486,10 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
             {
                 buttonstate = PrepareButton(first_button - 1, first_item - 1,
                                             selectedIdx, button_shift);
+
                 if (buttonstate == NULL)
                     continue;
+
                 width = minButtonWidth(buttonstate->GetArea());
 
                 // For grids, use the widest button in a column
@@ -485,11 +502,11 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
                 {
                     int total = hsplit ? left_width : left_width + right_width;
                     LOG(VB_GUI, LOG_DEBUG,
-                            QString("button on left would exceed width: "
-                                    "%1+(%2)+%3 == %4 which is > %5")
-                            .arg(total).arg(m_itemHorizSpacing).arg(width)
-                            .arg(total + m_itemHorizSpacing + width)
-                            .arg(max_width));
+                        QString("button on left would exceed width: "
+                                "%1+(%2)+%3 == %4 which is > %5")
+                        .arg(total).arg(m_itemHorizSpacing).arg(width)
+                        .arg(total + m_itemHorizSpacing + width)
+                        .arg(max_width));
                 }
                 else
                 {
@@ -501,13 +518,15 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
                     ++left_cnt;
                     left_width += m_itemHorizSpacing + width;
                     height = minButtonHeight(buttonstate->GetArea());
+
                     if (row_height < height)
                         row_height = height;
+
                     LOG(VB_GUI, LOG_DEBUG,
-                            QString("Added button item %1 "
-                                    "l.width %2 height %3 total width %4+%5")
-                            .arg(first_item).arg(width).arg(height)
-                            .arg(left_width).arg(right_width));
+                        QString("Added button item %1 "
+                                "l.width %2 height %3 total width %4+%5")
+                        .arg(first_item).arg(width).arg(height)
+                        .arg(left_width).arg(right_width));
                 }
             }
             else
@@ -525,11 +544,11 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
          m_itemVertSpacing + row_height > max_height))
     {
         LOG(VB_GUI, LOG_DEBUG,
-                QString("%1 Height exceeded %2 + (%3) + %4 = %5 which is > %6")
-                .arg(vsplit ? "Centering" : "Total")
-                .arg(split_height).arg(m_itemVertSpacing).arg(row_height)
-                .arg(split_height + m_itemVertSpacing + row_height)
-                .arg(max_height));
+            QString("%1 Height exceeded %2 + (%3) + %4 = %5 which is > %6")
+            .arg(vsplit ? "Centering" : "Total")
+            .arg(split_height).arg(m_itemVertSpacing).arg(row_height)
+            .arg(split_height + m_itemVertSpacing + row_height)
+            .arg(max_height));
         first_button = initial_first_button + button_shift;
         last_button  = initial_last_button + button_shift;
         first_item   = initial_first_item;
@@ -544,6 +563,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
          * how many columns there are.
          */
         *col_widths = new int[col_cnt];
+
         for (col_idx = 0; col_idx < col_cnt; ++col_idx)
             (*col_widths)[col_idx] = 0;
 
@@ -575,6 +595,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
         width = minButtonWidth(buttonstate->GetArea());
+
         if ((*col_widths)[col_idx] < width)
             (*col_widths)[col_idx] = width;
 
@@ -596,13 +617,13 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
 /*
  * Dynamically layout columns
  */
-bool MythUIButtonList::DistributeCols(int & first_button, int & last_button,
-                                      int & first_item, int & last_item,
-                                      int & selected_column, int & selected_row,
-                                      int ** col_widths,
+bool MythUIButtonList::DistributeCols(int &first_button, int &last_button,
+                                      int &first_item, int &last_item,
+                                      int &selected_column, int &selected_row,
+                                      int **col_widths,
                                       QList<int> & row_heights,
-                                      int & top_height, int & bottom_height,
-                                      bool & wrapped)
+                                      int &top_height, int &bottom_height,
+                                      bool &wrapped)
 {
     int  col_cnt;
     int  height;
@@ -646,6 +667,7 @@ bool MythUIButtonList::DistributeCols(int & first_button, int & last_button,
 
                 if (selected_row == -1 && selected_column != -1)
                     selected_row = row_heights.size();
+
                 ++row_cnt;
                 row_heights.push_back(height);
                 bottom_height += (height + m_itemVertSpacing);
@@ -692,6 +714,7 @@ bool MythUIButtonList::DistributeCols(int & first_button, int & last_button,
                     selected_row = row_heights.size();
                 else if (selected_row != -1)
                     ++selected_row;
+
                 ++row_cnt;
                 row_heights.push_front(height);
                 top_height += (height + m_itemVertSpacing);
@@ -703,7 +726,8 @@ bool MythUIButtonList::DistributeCols(int & first_button, int & last_button,
                 ++first_item;
             }
         }
-    } while (added);
+    }
+    while (added);
 
     return true;
 }
@@ -732,14 +756,14 @@ bool MythUIButtonList::DistributeButtons(void)
     first_button = last_button = start_button = 0;
 
     LOG(VB_GUI, LOG_DEBUG, QString("DistributeButtons: "
-                            "selected item %1 total items %2")
-            .arg(start_item).arg(m_itemCount));
+                                   "selected item %1 total items %2")
+        .arg(start_item).arg(m_itemCount));
 
     /*
      * Try fewer and fewer columns until each row can fit the same
      * number of columns.
      */
-    for (m_columns = m_itemCount; m_columns > 0; )
+    for (m_columns = m_itemCount; m_columns > 0;)
     {
         first_item = last_item = start_item;
 
@@ -750,32 +774,34 @@ bool MythUIButtonList::DistributeButtons(void)
          */
         switch (m_scrollStyle)
         {
-          case ScrollCenter:
-          case ScrollGroupCenter:
-            start_button = qMax((m_maxVisible / 2) - 1, 0);
-            break;
-          case ScrollFree:
-            if (m_layout == LayoutGrid)
-            {
-                start_button = 0;
-                first_item = last_item = 0;
-                grow_left = false;
-            }
-            else if (!m_ButtonList.empty())
-            {
-                if (m_itemCount - m_selPosition - 1 <
-                    static_cast<int>(m_ButtonList.size()) / 2)
-                    start_button = m_ButtonList.size() -
-                                   (m_itemCount - m_selPosition) + 1;
-                else if (m_selPosition >
-                         static_cast<int>(m_ButtonList.size()) / 2)
-                    start_button = (m_ButtonList.size() / 2);
+            case ScrollCenter:
+            case ScrollGroupCenter:
+                start_button = qMax((m_maxVisible / 2) - 1, 0);
+                break;
+            case ScrollFree:
+
+                if (m_layout == LayoutGrid)
+                {
+                    start_button = 0;
+                    first_item = last_item = 0;
+                    grow_left = false;
+                }
+                else if (!m_ButtonList.empty())
+                {
+                    if (m_itemCount - m_selPosition - 1 <
+                        static_cast<int>(m_ButtonList.size()) / 2)
+                        start_button = m_ButtonList.size() -
+                                       (m_itemCount - m_selPosition) + 1;
+                    else if (m_selPosition >
+                             static_cast<int>(m_ButtonList.size()) / 2)
+                        start_button = (m_ButtonList.size() / 2);
+                    else
+                        start_button = m_selPosition;
+                }
                 else
-                    start_button = m_selPosition;
-            }
-            else
-                start_button = 0;
-            break;
+                    start_button = 0;
+
+                break;
         }
 
         first_button = last_button = start_button;
@@ -787,6 +813,7 @@ bool MythUIButtonList::DistributeButtons(void)
                            grow_left, true, &col_widths,
                            height, 0, 0, col_cnt, wrapped))
             return false;
+
         m_columns = col_cnt;
 
         if (m_layout == LayoutGrid && m_scrollStyle == ScrollFree)
@@ -804,13 +831,16 @@ bool MythUIButtonList::DistributeButtons(void)
              */
             start_button = qMax((int)m_ButtonList.size() / 2, 0);
             start_button = (start_button / qMax(m_columns, 1)) * m_columns;
+
             if (start_button < m_itemCount / 2 &&
                 m_itemCount - m_selPosition - 1 < (int)m_ButtonList.size() / 2)
                 start_button += m_columns;
+
             first_button = last_button = start_button;
 
             // Now do initial row layout again with our new knowledge
             selected_column = selected_row = -1;
+
             if (!DistributeRow(first_button, last_button,
                                first_item, last_item, selected_column,
                                grow_left, true, &col_widths,
@@ -820,7 +850,9 @@ bool MythUIButtonList::DistributeButtons(void)
 
         if (selected_column != -1)
             selected_row = 0;
+
         row_heights.push_back(height);
+
         if (m_scrollStyle == ScrollCenter)
             top_height = bottom_height = (height / 2);
         else
@@ -847,9 +879,9 @@ bool MythUIButtonList::DistributeButtons(void)
     m_rows = row_heights.size();
 
     LOG(VB_GUI, LOG_DEBUG,
-            QString("%1 rows, %2 columns fit inside parent area %3x%4")
-            .arg(m_rows).arg(m_columns).arg(m_contentsRect.width())
-            .arg(m_contentsRect.height()));
+        QString("%1 rows, %2 columns fit inside parent area %3x%4")
+        .arg(m_rows).arg(m_columns).arg(m_contentsRect.width())
+        .arg(m_contentsRect.height()));
 
     if (col_widths == 0)
         return false;
@@ -865,9 +897,10 @@ bool MythUIButtonList::DistributeButtons(void)
     top_height = bottom_height = m_topRows = m_bottomRows = 0;
 
     status_msg = "Row heights: ";
+
     for (row = 0; row < m_rows; ++row)
     {
-        if ( row != 0)
+        if (row != 0)
             status_msg += ", ";
 
         if (row == selected_row)
@@ -891,6 +924,7 @@ bool MythUIButtonList::DistributeButtons(void)
         }
 
         status_msg += QString("%1").arg(row_heights[row]);
+
         if (row == selected_row)
             status_msg += ']';
     }
@@ -909,7 +943,7 @@ bool MythUIButtonList::DistributeButtons(void)
         {
             // Equal space on both sides of single row
             top_spacing = bottom_spacing =
-                          (m_contentsRect.height() - top_height) / 2;
+                              (m_contentsRect.height() - top_height) / 2;
         }
         else
         {
@@ -917,9 +951,10 @@ bool MythUIButtonList::DistributeButtons(void)
             {
                 // Selected button needs to end up in the middle of area
                 top_spacing = m_topRows ? (m_contentsRect.height() / 2 -
-                                 top_height) / m_topRows : 0;
+                                           top_height) / m_topRows : 0;
                 bottom_spacing = m_bottomRows ? (m_contentsRect.height() / 2 -
-                                 bottom_height) / m_bottomRows : 0;
+                                                 bottom_height) / m_bottomRows : 0;
+
                 if (m_arrange == ArrangeSpread)
                 {
                     // Use same spacing on both sides of selected button
@@ -933,10 +968,11 @@ bool MythUIButtonList::DistributeButtons(void)
             {
                 // Buttons will be evenly spread out to fill entire area
                 top_spacing = bottom_spacing = (m_contentsRect.height() -
-                                (top_height + bottom_height)) /
-                               (m_topRows + m_bottomRows);
+                                                (top_height + bottom_height)) /
+                                               (m_topRows + m_bottomRows);
             }
         }
+
         // Add in intra-button space size
         top_height += (top_spacing * m_topRows);
         bottom_height += (bottom_spacing * m_bottomRows);
@@ -946,7 +982,8 @@ bool MythUIButtonList::DistributeButtons(void)
      * Calculate top margin
      */
     y = m_contentsRect.y();
-    if (m_alignment & Qt::AlignVCenter && m_arrange != ArrangeFill)
+
+    if ((m_alignment & Qt::AlignVCenter) && m_arrange != ArrangeFill)
     {
         if (m_scrollStyle == ScrollCenter)
         {
@@ -960,7 +997,7 @@ bool MythUIButtonList::DistributeButtons(void)
         // Adjust top margin so selected button ends up in the middle
         y += (qMax(m_contentsRect.height() - total, 2) / 2);
     }
-    else if (m_alignment & Qt::AlignBottom && m_arrange == ArrangeStack)
+    else if ((m_alignment & Qt::AlignBottom) && m_arrange == ArrangeStack)
     {
         // Adjust top margin so buttons are bottom justified
         y += qMax(m_contentsRect.height() -
@@ -981,6 +1018,7 @@ bool MythUIButtonList::DistributeButtons(void)
     left_width = right_width = m_leftColumns = m_rightColumns = 0;
 
     status_msg = "Col widths: ";
+
     for (col = 0; col < m_columns; ++col)
     {
         if (col != 0)
@@ -1007,6 +1045,7 @@ bool MythUIButtonList::DistributeButtons(void)
         }
 
         status_msg += QString("%1").arg(col_widths[col]);
+
         if (col == selected_column)
             status_msg += ']';
     }
@@ -1025,7 +1064,7 @@ bool MythUIButtonList::DistributeButtons(void)
         {
             // Equal space on both sides of single column
             left_spacing = right_spacing =
-                           (m_contentsRect.width() - left_width) / 2;
+                               (m_contentsRect.width() - left_width) / 2;
         }
         else
         {
@@ -1033,9 +1072,9 @@ bool MythUIButtonList::DistributeButtons(void)
             {
                 // Selected button needs to end up in the middle
                 left_spacing = m_leftColumns ? (m_contentsRect.width() / 2 -
-                                             left_width) / m_leftColumns : 0;
+                                                left_width) / m_leftColumns : 0;
                 right_spacing = m_rightColumns ? (m_contentsRect.width() / 2 -
-                                             right_width) / m_rightColumns : 0;
+                                                  right_width) / m_rightColumns : 0;
 
                 if (m_arrange == ArrangeSpread)
                 {
@@ -1050,10 +1089,11 @@ bool MythUIButtonList::DistributeButtons(void)
             {
                 // Buttons will be evenly spread out to fill entire area
                 left_spacing = right_spacing = (m_contentsRect.width() -
-                                      (left_width + right_width)) /
-                                     (m_leftColumns + m_rightColumns);
+                                                (left_width + right_width)) /
+                                               (m_leftColumns + m_rightColumns);
             }
         }
+
         // Add in intra-button space size
         left_width += (left_spacing * m_leftColumns);
         right_width += (right_spacing * m_rightColumns);
@@ -1063,7 +1103,8 @@ bool MythUIButtonList::DistributeButtons(void)
      * Calculate left margin
      */
     x_init = m_contentsRect.x();
-    if (m_alignment & Qt::AlignHCenter && m_arrange != ArrangeFill)
+
+    if ((m_alignment & Qt::AlignHCenter) && m_arrange != ArrangeFill)
     {
         if (m_scrollStyle == ScrollCenter)
         {
@@ -1077,7 +1118,7 @@ bool MythUIButtonList::DistributeButtons(void)
         // Adjust left margin so selected button ends up in the middle
         x_init += (qMax(m_contentsRect.width() - total, 2) / 2);
     }
-    else if (m_alignment & Qt::AlignRight && m_arrange == ArrangeStack)
+    else if ((m_alignment & Qt::AlignRight) && m_arrange == ArrangeStack)
     {
         // Adjust left margin, so buttons are right justified
         x_init += qMax(m_contentsRect.width() -
@@ -1102,10 +1143,12 @@ bool MythUIButtonList::DistributeButtons(void)
     int buttonIdx = first_button;
 
     vertical_spacing = top_spacing;
+
     for (row = 0; row < m_rows; ++row)
     {
         x = x_init;
         horizontal_spacing = left_spacing;
+
         for (col = 0; col < m_columns && buttonIdx <= last_button; ++col)
         {
             realButton = m_ButtonList[buttonIdx];
@@ -1142,6 +1185,7 @@ bool MythUIButtonList::DistributeButtons(void)
             x += col_widths[col] + horizontal_spacing;
             ++buttonIdx;
         }
+
         if (row == selected_row)
             vertical_spacing = bottom_spacing;
 
@@ -1153,6 +1197,7 @@ bool MythUIButtonList::DistributeButtons(void)
     // Hide buttons before first active button
     for (buttonIdx = 0; buttonIdx < first_button; ++buttonIdx)
         m_ButtonList[buttonIdx]->SetVisible(false);
+
     // Hide buttons after last active buttons.
     for (buttonIdx = m_maxVisible - 1; buttonIdx > last_button; --buttonIdx)
         m_ButtonList[buttonIdx]->SetVisible(false);
@@ -1176,46 +1221,50 @@ void MythUIButtonList::SetPosition(void)
 
     switch (m_scrollStyle)
     {
-      case ScrollCenter:
-      case ScrollGroupCenter:
-        m_topPosition = qMax(m_selPosition - (int)((float)m_itemsVisible / 2), 0);
-        break;
-      case ScrollFree:
-      {
-          int adjust = 0;
-          if (m_topPosition == -1 || m_keepSelAtBottom)
-          {
-              if (m_topPosition == -1)
-                  m_topPosition = 0;
-              if (m_layout == LayoutHorizontal)
-                  adjust = 1 - m_itemsVisible;
-              else
-                  adjust = m_columns - m_itemsVisible;
-              m_keepSelAtBottom = false;
-          }
+        case ScrollCenter:
+        case ScrollGroupCenter:
+            m_topPosition = qMax(m_selPosition - (int)((float)m_itemsVisible / 2), 0);
+            break;
+        case ScrollFree:
+        {
+            int adjust = 0;
 
-          if (m_selPosition < m_topPosition ||
-              m_topPosition + (int)m_itemsVisible <= m_selPosition)
-          {
-              if (m_layout == LayoutHorizontal)
-                  m_topPosition = m_selPosition + adjust;
-              else
-                  m_topPosition = (m_selPosition + adjust) /
-                                  m_columns * m_columns;
-          }
+            if (m_topPosition == -1 || m_keepSelAtBottom)
+            {
+                if (m_topPosition == -1)
+                    m_topPosition = 0;
 
-          m_topPosition = qMax(m_topPosition, 0);
-          break;
-      }
+                if (m_layout == LayoutHorizontal)
+                    adjust = 1 - m_itemsVisible;
+                else
+                    adjust = m_columns - m_itemsVisible;
+
+                m_keepSelAtBottom = false;
+            }
+
+            if (m_selPosition < m_topPosition ||
+                m_topPosition + (int)m_itemsVisible <= m_selPosition)
+            {
+                if (m_layout == LayoutHorizontal)
+                    m_topPosition = m_selPosition + adjust;
+                else
+                    m_topPosition = (m_selPosition + adjust) /
+                                    m_columns * m_columns;
+            }
+
+            m_topPosition = qMax(m_topPosition, 0);
+            break;
+        }
     }
 
-    QList<MythUIButtonListItem*>::iterator it = m_itemList.begin() + m_topPosition;
+    QList<MythUIButtonListItem *>::iterator it = m_itemList.begin() + m_topPosition;
 
     if (m_scrollStyle == ScrollCenter || m_scrollStyle == ScrollGroupCenter)
     {
-        if (m_selPosition <= (int)(m_itemsVisible/2))
+        if (m_selPosition <= (int)(m_itemsVisible / 2))
         {
             button = (m_itemsVisible / 2) - m_selPosition;
+
             if (m_wrapStyle == WrapItems && button > 0 &&
                 m_itemCount >= (int)m_itemsVisible)
             {
@@ -1223,9 +1272,9 @@ void MythUIButtonList::SetPosition(void)
                 button = 0;
             }
         }
-        else if ((m_itemCount - m_selPosition) < (int)(m_itemsVisible/2))
+        else if ((m_itemCount - m_selPosition) < (int)(m_itemsVisible / 2))
         {
-            it = m_itemList.begin() + m_selPosition - (m_itemsVisible/2);
+            it = m_itemList.begin() + m_selPosition - (m_itemsVisible / 2);
         }
     }
     else if (m_drawFromBottom && m_itemCount < (int)m_itemsVisible)
@@ -1243,6 +1292,7 @@ void MythUIButtonList::SetPosition(void)
         it = m_itemList.begin();
 
     int curItem = GetItemPos(*it);
+
     while (it < m_itemList.end() && button < (int)m_itemsVisible)
     {
         realButton = m_ButtonList[button];
@@ -1252,6 +1302,7 @@ void MythUIButtonList::SetPosition(void)
             break;
 
         bool selected = false;
+
         if (!seenSelected && (curItem == m_selPosition))
         {
             seenSelected = true;
@@ -1262,7 +1313,7 @@ void MythUIButtonList::SetPosition(void)
         buttonItem->SetToRealButton(realButton, selected);
         realButton->SetVisible(true);
 
-        if (m_wrapStyle == WrapItems && it == (m_itemList.end()-1) &&
+        if (m_wrapStyle == WrapItems && it == (m_itemList.end() - 1) &&
             m_itemCount >= (int)m_itemsVisible)
         {
             it = m_itemList.begin();
@@ -1336,7 +1387,7 @@ void MythUIButtonList::SetPositionArrowStates()
     }
 }
 
-void MythUIButtonList::ItemVisible(MythUIButtonListItem* item)
+void MythUIButtonList::ItemVisible(MythUIButtonListItem *item)
 {
     if (item)
         emit itemVisible(item);
@@ -1345,6 +1396,7 @@ void MythUIButtonList::ItemVisible(MythUIButtonListItem* item)
 void MythUIButtonList::InsertItem(MythUIButtonListItem *item, int listPosition)
 {
     bool wasEmpty = m_itemList.isEmpty();
+
     if (listPosition >= 0 && listPosition <= m_itemList.count())
     {
         m_itemList.insert(listPosition, item);
@@ -1375,6 +1427,7 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
         return;
 
     int curIndex = m_itemList.indexOf(item);
+
     if (curIndex == -1)
         return;
 
@@ -1411,6 +1464,7 @@ void MythUIButtonList::SetValueByData(QVariant data)
     for (int i = 0; i < m_itemList.size(); ++i)
     {
         MythUIButtonListItem *item = m_itemList.at(i);
+
         if (item->GetData() == data)
         {
             SetItemCurrent(item);
@@ -1419,7 +1473,7 @@ void MythUIButtonList::SetValueByData(QVariant data)
     }
 }
 
-void MythUIButtonList::SetItemCurrent(MythUIButtonListItem* item)
+void MythUIButtonList::SetItemCurrent(MythUIButtonListItem *item)
 {
     int newIndex = m_itemList.indexOf(item);
     SetItemCurrent(newIndex);
@@ -1438,6 +1492,7 @@ void MythUIButtonList::SetItemCurrent(int current, int topPosition)
         return;
 
     m_topPosition = topPosition;
+
     if (topPosition > 0 && m_layout == LayoutGrid)
         m_topPosition -= (topPosition % m_columns);
 
@@ -1448,7 +1503,7 @@ void MythUIButtonList::SetItemCurrent(int current, int topPosition)
     emit itemSelected(GetItemCurrent());
 }
 
-MythUIButtonListItem* MythUIButtonList::GetItemCurrent() const
+MythUIButtonListItem *MythUIButtonList::GetItemCurrent() const
 {
     if (m_itemList.isEmpty() || m_selPosition > m_itemList.size() ||
         m_selPosition < 0)
@@ -1460,6 +1515,7 @@ MythUIButtonListItem* MythUIButtonList::GetItemCurrent() const
 int MythUIButtonList::GetIntValue() const
 {
     MythUIButtonListItem *item = GetItemCurrent();
+
     if (item)
         return item->GetText().toInt();
 
@@ -1469,6 +1525,7 @@ int MythUIButtonList::GetIntValue() const
 QString MythUIButtonList::GetValue() const
 {
     MythUIButtonListItem *item = GetItemCurrent();
+
     if (item)
         return item->GetText();
 
@@ -1478,23 +1535,26 @@ QString MythUIButtonList::GetValue() const
 QVariant MythUIButtonList::GetDataValue() const
 {
     MythUIButtonListItem *item = GetItemCurrent();
+
     if (item)
         return item->GetData();
 
     return QVariant();
 }
 
-MythUIButtonListItem* MythUIButtonList::GetItemFirst() const
+MythUIButtonListItem *MythUIButtonList::GetItemFirst() const
 {
     if (!m_itemList.empty())
         return m_itemList[0];
+
     return NULL;
 }
 
-MythUIButtonListItem* MythUIButtonList::GetItemNext(MythUIButtonListItem *item)
+MythUIButtonListItem *MythUIButtonList::GetItemNext(MythUIButtonListItem *item)
 const
 {
-    QListIterator<MythUIButtonListItem*> it(m_itemList);
+    QListIterator<MythUIButtonListItem *> it(m_itemList);
+
     if (!it.findNext(item))
         return 0;
 
@@ -1522,7 +1582,7 @@ bool MythUIButtonList::IsEmpty() const
         return true;
 }
 
-MythUIButtonListItem* MythUIButtonList::GetItemAt(int pos) const
+MythUIButtonListItem *MythUIButtonList::GetItemAt(int pos) const
 {
     if (pos < 0 || pos >= m_itemList.size())
         return NULL;
@@ -1530,7 +1590,7 @@ MythUIButtonListItem* MythUIButtonList::GetItemAt(int pos) const
     return m_itemList.at(pos);
 }
 
-MythUIButtonListItem* MythUIButtonList::GetItemByData(QVariant data)
+MythUIButtonListItem *MythUIButtonList::GetItemByData(QVariant data)
 {
     if (!m_initialized)
         Init();
@@ -1538,6 +1598,7 @@ MythUIButtonListItem* MythUIButtonList::GetItemByData(QVariant data)
     for (int i = 0; i < m_itemList.size(); ++i)
     {
         MythUIButtonListItem *item = m_itemList.at(i);
+
         if (item->GetData() == data)
             return item;
     }
@@ -1545,10 +1606,11 @@ MythUIButtonListItem* MythUIButtonList::GetItemByData(QVariant data)
     return NULL;
 }
 
-int MythUIButtonList::GetItemPos(MythUIButtonListItem* item) const
+int MythUIButtonList::GetItemPos(MythUIButtonListItem *item) const
 {
     if (!item)
         return -1;
+
     return m_itemList.indexOf(item);
 }
 
@@ -1583,9 +1645,9 @@ int MythUIButtonList::PageUp(void)
 {
     int pos        = m_selPosition;
     int total      = 0;
-    MythUIGroup*     buttonstate;
-    MythUIStateType* realButton;
-    MythUIButtonListItem* buttonItem;
+    MythUIGroup     *buttonstate;
+    MythUIStateType *realButton;
+    MythUIButtonListItem *buttonItem;
 
     /*
      * /On the new page/
@@ -1603,27 +1665,31 @@ int MythUIButtonList::PageUp(void)
         pos -= (m_leftColumns + 1);
 
         int max_width = m_contentsRect.width() / 2;
-        for ( ; pos >= 0; --pos)
+
+        for (; pos >= 0; --pos)
         {
             InitButton(pos, realButton, buttonItem);
             buttonItem->SetToRealButton(realButton, true);
             buttonstate = dynamic_cast<MythUIGroup *>
-                         (realButton->GetCurrentState());
+                          (realButton->GetCurrentState());
+
             if (buttonstate == NULL)
             {
-                LOG(VB_GENERAL, LOG_ERR, 
+                LOG(VB_GENERAL, LOG_ERR,
                     "PageUp: Failed to query buttonlist state");
                 return pos;
             }
+
             if (total + m_itemHorizSpacing +
                 buttonstate->GetArea().width() / 2 >= max_width)
                 return pos + 1;
 
             buttonItem->SetToRealButton(realButton, false);
             buttonstate = dynamic_cast<MythUIGroup *>
-                         (realButton->GetCurrentState());
+                          (realButton->GetCurrentState());
             total += m_itemHorizSpacing + buttonstate->GetArea().width();
         }
+
         return 0;
     }
 
@@ -1649,18 +1715,21 @@ int MythUIButtonList::PageUp(void)
     }
 
     int max_height = m_contentsRect.height() / 2;
-    for ( ; pos >= 0; pos -= dec)
+
+    for (; pos >= 0; pos -= dec)
     {
         InitButton(pos, realButton, buttonItem);
         buttonItem->SetToRealButton(realButton, true);
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
+
         if (buttonstate == NULL)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "PageUp: Failed to query buttonlist state");
             return pos;
         }
+
         if (total + m_itemHorizSpacing +
             buttonstate->GetArea().height() / 2 >= max_height)
             return pos + dec;
@@ -1670,6 +1739,7 @@ int MythUIButtonList::PageUp(void)
                       (realButton->GetCurrentState());
         total += m_itemHorizSpacing + buttonstate->GetArea().height();
     }
+
     return 0;
 }
 
@@ -1678,9 +1748,9 @@ int MythUIButtonList::PageDown(void)
     int pos        = m_selPosition;
     int num_items  = m_itemList.size();
     int total      = 0;
-    MythUIGroup*     buttonstate;
-    MythUIStateType* realButton;
-    MythUIButtonListItem* buttonItem;
+    MythUIGroup     *buttonstate;
+    MythUIStateType *realButton;
+    MythUIButtonListItem *buttonItem;
 
     /*
      * /On the new page/
@@ -1698,27 +1768,31 @@ int MythUIButtonList::PageDown(void)
         pos += (m_rightColumns + 1);
 
         int max_width = m_contentsRect.width() / 2;
-        for ( ; pos < num_items; ++pos)
+
+        for (; pos < num_items; ++pos)
         {
             InitButton(pos, realButton, buttonItem);
             buttonItem->SetToRealButton(realButton, true);
             buttonstate = dynamic_cast<MythUIGroup *>
-                         (realButton->GetCurrentState());
+                          (realButton->GetCurrentState());
+
             if (buttonstate == NULL)
             {
                 LOG(VB_GENERAL, LOG_ERR,
                     "PageDown: Failed to query buttonlist state");
                 return pos;
             }
+
             if (total + m_itemHorizSpacing +
                 buttonstate->GetArea().width() / 2 >= max_width)
                 return pos - 1;
 
             buttonItem->SetToRealButton(realButton, false);
             buttonstate = dynamic_cast<MythUIGroup *>
-                         (realButton->GetCurrentState());
+                          (realButton->GetCurrentState());
             total += m_itemHorizSpacing + buttonstate->GetArea().width();
         }
+
         return num_items - 1;
     }
 
@@ -1744,18 +1818,21 @@ int MythUIButtonList::PageDown(void)
     }
 
     int max_height = m_contentsRect.height() / 2;
-    for ( ; pos < num_items; pos += inc)
+
+    for (; pos < num_items; pos += inc)
     {
         InitButton(pos, realButton, buttonItem);
         buttonItem->SetToRealButton(realButton, true);
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
+
         if (buttonstate == NULL)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "PageDown: Failed to query buttonlist state");
             return pos;
         }
+
         if (total + m_itemHorizSpacing +
             buttonstate->GetArea().height() / 2 >= max_height)
             return pos - inc;
@@ -1765,26 +1842,31 @@ int MythUIButtonList::PageDown(void)
                       (realButton->GetCurrentState());
         total += m_itemHorizSpacing + buttonstate->GetArea().height();
     }
+
     return num_items - 1;
 }
 
 bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
 {
     int pos = m_selPosition;
+
     if (pos == -1 || m_itemList.isEmpty() || !m_initialized)
         return false;
 
     switch (unit)
     {
         case MoveItem:
+
             if (m_selPosition > 0)
                 --m_selPosition;
             else if (m_wrapStyle > WrapNone)
                 m_selPosition = m_itemList.size() - 1;
             else if (m_wrapStyle == WrapCaptive)
                 return true;
+
             break;
         case MoveColumn:
+
             if (pos % m_columns > 0)
                 --m_selPosition;
             else if (m_wrapStyle == WrapFlowing)
@@ -1793,11 +1875,13 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
                 else
                     --m_selPosition;
             else if (m_wrapStyle > WrapNone)
-                m_selPosition = pos + (m_columns-1);
+                m_selPosition = pos + (m_columns - 1);
             else if (m_wrapStyle == WrapCaptive)
                 return true;
+
             break;
         case MoveRow:
+
             if ((pos - m_columns) >= 0)
             {
                 for (int i = 0; i < m_columns; ++i)
@@ -1807,10 +1891,11 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
             }
             else if (m_wrapStyle > WrapNone)
             {
-                m_selPosition = ((m_itemList.size()-1) / m_columns) *
-                                    m_columns + pos;
+                m_selPosition = ((m_itemList.size() - 1) / m_columns) *
+                                m_columns + pos;
+
                 if ((m_selPosition / m_columns)
-                        < ((m_itemList.size()-1)/ m_columns))
+                    < ((m_itemList.size() - 1) / m_columns))
                     m_selPosition = m_itemList.size() - 1;
 
                 if (m_layout == LayoutVertical)
@@ -1818,12 +1903,15 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
             }
             else if (m_wrapStyle == WrapCaptive)
                 return true;
+
             break;
         case MovePage:
+
             if (m_arrange == ArrangeFixed)
                 m_selPosition = qMax(0, m_selPosition - (int)m_itemsVisible);
             else
                 m_selPosition = PageUp();
+
             break;
         case MoveMid:
             m_selPosition = (int)(m_itemList.size() / 2);
@@ -1832,6 +1920,7 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
             m_selPosition = 0;
             break;
         case MoveByAmount:
+
             for (uint i = 0; i < amount; ++i)
             {
                 if (m_selPosition > 0)
@@ -1839,6 +1928,7 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
                 else if (m_wrapStyle > WrapNone)
                     m_selPosition = m_itemList.size() - 1;
             }
+
             break;
     }
 
@@ -1858,21 +1948,25 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
 bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
 {
     int pos = m_selPosition;
+
     if (pos == -1 || m_itemList.isEmpty() || !m_initialized)
         return false;
 
     switch (unit)
     {
         case MoveItem:
+
             if (m_selPosition < m_itemList.size() - 1)
                 ++m_selPosition;
             else if (m_wrapStyle > WrapNone)
                 m_selPosition = 0;
             else if (m_wrapStyle == WrapCaptive)
                 return true;
+
             break;
         case MoveColumn:
-            if ((pos+1) % m_columns > 0)
+
+            if ((pos + 1) % m_columns > 0)
                 ++m_selPosition;
             else if (m_wrapStyle == WrapFlowing)
                 if (m_selPosition < m_itemList.size() - 1)
@@ -1880,17 +1974,20 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
                 else
                     m_selPosition = 0;
             else if (m_wrapStyle > WrapNone)
-                m_selPosition = pos - (m_columns-1);
+                m_selPosition = pos - (m_columns - 1);
             else if (m_wrapStyle == WrapCaptive)
                 return true;
+
             break;
         case MoveRow:
-            if (((m_itemList.size()-1) / qMax(m_columns, 0) ) > (pos / m_columns))
+
+            if (((m_itemList.size() - 1) / qMax(m_columns, 0)) > (pos / m_columns))
             {
                 for (int i = 0; i < m_columns; ++i)
                 {
-                    if (m_selPosition == m_itemList.size()-1)
+                    if (m_selPosition == m_itemList.size() - 1)
                         break;
+
                     ++m_selPosition;
                 }
             }
@@ -1898,18 +1995,22 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
                 m_selPosition = (pos % m_columns);
             else if (m_wrapStyle == WrapCaptive)
                 return true;
+
             break;
         case MovePage:
+
             if (m_arrange == ArrangeFixed)
                 m_selPosition = qMin(m_itemCount - 1,
                                      m_selPosition + (int)m_itemsVisible);
             else
                 m_selPosition = PageDown();
+
             break;
         case MoveMax:
             m_selPosition = m_itemCount - 1;
             break;
         case MoveByAmount:
+
             for (uint i = 0; i < amount; ++i)
             {
                 if (m_selPosition < m_itemList.size() - 1)
@@ -1917,6 +2018,7 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
                 else if (m_wrapStyle > WrapNone)
                     m_selPosition = 0;
             }
+
             break;
     }
 
@@ -1944,14 +2046,16 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
 
     bool found_it = false;
     int selectedPosition = 0;
-    QList<MythUIButtonListItem*>::iterator it = m_itemList.begin();
-    while(it != m_itemList.end())
+    QList<MythUIButtonListItem *>::iterator it = m_itemList.begin();
+
+    while (it != m_itemList.end())
     {
         if ((*it)->GetText() == position_name)
         {
             found_it = true;
             break;
         }
+
         ++it;
         ++selectedPosition;
     }
@@ -1967,8 +2071,10 @@ bool MythUIButtonList::MoveItemUpDown(MythUIButtonListItem *item, bool up)
 {
     if (GetItemCurrent() != item)
         return false;
+
     if (item == m_itemList.first() && up)
         return false;
+
     if (item == m_itemList.last() && !up)
         return false;
 
@@ -1979,6 +2085,7 @@ bool MythUIButtonList::MoveItemUpDown(MythUIButtonListItem *item, bool up)
     if (up)
     {
         insertat = m_selPosition - 1;
+
         if (item == m_itemList.last())
             dolast = true;
         else
@@ -1996,6 +2103,7 @@ bool MythUIButtonList::MoveItemUpDown(MythUIButtonListItem *item, bool up)
     if (up)
     {
         MoveUp();
+
         if (!dolast)
             MoveUp();
     }
@@ -2007,7 +2115,8 @@ bool MythUIButtonList::MoveItemUpDown(MythUIButtonListItem *item, bool up)
 
 void MythUIButtonList::SetAllChecked(MythUIButtonListItem::CheckState state)
 {
-    QMutableListIterator<MythUIButtonListItem*> it(m_itemList);
+    QMutableListIterator<MythUIButtonListItem *> it(m_itemList);
+
     while (it.hasNext())
         it.next()->setChecked(state);
 }
@@ -2034,7 +2143,7 @@ void MythUIButtonList::Init()
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Statetype buttonitem is required in "
                                          "mythuibuttonlist: %1")
-                .arg(objectName()));
+            .arg(objectName()));
         return;
     }
 
@@ -2051,6 +2160,7 @@ void MythUIButtonList::Init()
 
         MythUIGroup *buttonActiveState = dynamic_cast<MythUIGroup *>
                                          (m_buttontemplate->GetState("active"));
+
         if (buttonActiveState)
             buttonItemArea = buttonActiveState->GetArea();
         else
@@ -2090,7 +2200,7 @@ void MythUIButtonList::Init()
         // This can be removed once the disk based image caching is added to
         // mythui, since the mythgallery thumbnail generator can be ditched.
         MythUIGroup *buttonSelectedState = dynamic_cast<MythUIGroup *>
-                                   (m_buttontemplate->GetState("selected"));
+                                           (m_buttontemplate->GetState("selected"));
 
         if (buttonSelectedState)
         {
@@ -2099,9 +2209,11 @@ void MythUIButtonList::Init()
 
             if (m_itemHeight < itemArea.height())
                 m_itemHeight = itemArea.height();
+
             if (m_itemWidth < itemArea.width())
                 m_itemWidth = itemArea.width();
         }
+
         // End Hack
     }
 
@@ -2112,6 +2224,7 @@ uint MythUIButtonList::ItemWidth(void)
 {
     if (!m_initialized)
         Init();
+
     return m_itemWidth;
 }
 
@@ -2119,6 +2232,7 @@ uint MythUIButtonList::ItemHeight(void)
 {
     if (!m_initialized)
         Init();
+
     return m_itemHeight;
 }
 
@@ -2201,6 +2315,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
         else if (action == "SELECT")
         {
             MythUIButtonListItem *item = GetItemCurrent();
+
             if (item)
                 emit itemClicked(item);
         }
@@ -2253,12 +2368,13 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
         // We want the relative position of the click
         QPoint position = event->GetPosition() - m_Parent->GetArea().topLeft();
 
-        MythUIType *type = GetChildAt(position,false,false);
+        MythUIType *type = GetChildAt(position, false, false);
 
         if (!type)
             return false;
 
         MythUIStateType *object = dynamic_cast<MythUIStateType *>(type);
+
         if (object)
         {
             handled = true;
@@ -2274,8 +2390,9 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
             }
             else if (name.startsWith("buttonlist button"))
             {
-                int pos = name.section(' ',2,2).toInt();
+                int pos = name.section(' ', 2, 2).toInt();
                 MythUIButtonListItem *item = m_ButtonToItem[pos];
+
                 if (item)
                 {
                     if (item == GetItemCurrent())
@@ -2295,11 +2412,11 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 QPoint MythUIButtonList::GetButtonPosition(int column, int row) const
 {
     int x = m_contentsRect.x() +
-                            ((column - 1) * (m_itemWidth + m_itemHorizSpacing));
+            ((column - 1) * (m_itemWidth + m_itemHorizSpacing));
     int y = m_contentsRect.y() +
-                            ((row - 1) * (m_itemHeight + m_itemVertSpacing));
+            ((row - 1) * (m_itemHeight + m_itemVertSpacing));
 
-    return QPoint(x,y);
+    return QPoint(x, y);
 }
 
 void MythUIButtonList::CalculateVisibleItems(void)
@@ -2311,6 +2428,7 @@ void MythUIButtonList::CalculateVisibleItems(void)
     if ((m_layout == LayoutHorizontal) || (m_layout == LayoutGrid))
     {
         int x = 0;
+
         while (x <= m_contentsRect.width() - m_itemWidth)
         {
             x += m_itemWidth + m_itemHorizSpacing;
@@ -2321,6 +2439,7 @@ void MythUIButtonList::CalculateVisibleItems(void)
     if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
     {
         int y = 0;
+
         while (y <= m_contentsRect.height() - m_itemHeight)
         {
             y += m_itemHeight + m_itemVertSpacing;
@@ -2411,6 +2530,7 @@ bool MythUIButtonList::ParseElement(
     else if (element.tagName() == "drawfrombottom")
     {
         m_drawFromBottom = parseBool(element);
+
         if (m_drawFromBottom)
             m_alignment |= Qt::AlignBottom;
     }
@@ -2450,6 +2570,7 @@ void MythUIButtonList::CreateCopy(MythUIType *parent)
 void MythUIButtonList::CopyFrom(MythUIType *base)
 {
     MythUIButtonList *lb = dynamic_cast<MythUIButtonList *>(base);
+
     if (!lb)
         return;
 
@@ -2518,6 +2639,7 @@ void MythUIButtonList::updateLCD(void)
         return;
 
     LCD *lcddev = LCD::Get();
+
     if (lcddev == NULL)
         return;
 
@@ -2537,16 +2659,19 @@ void MythUIButtonList::updateLCD(void)
 
         MythUIButtonListItem *item = GetItemAt(r);
         CHECKED_STATE state = NOTCHECKABLE;
+
         if (item->checkable())
             state = (item->state() == MythUIButtonListItem::NotChecked) ? UNCHECKED : CHECKED;
 
         QString text;
+
         for (int x = 0; x < m_lcdColumns.count(); x++)
         {
             if (!m_lcdColumns[x].isEmpty() && item->m_strings.contains(m_lcdColumns[x]))
             {
                 // named text column
                 TextProperties props = item->m_strings[m_lcdColumns[x]];
+
                 if (text.isEmpty())
                     text = props.text;
                 else
@@ -2650,10 +2775,10 @@ bool MythUIButtonList::DoFind(bool doMove, bool searchForward)
 
 //////////////////////////////////////////////////////////////////////////////
 
-MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
-                                      const QString& text, const QString& image,
-                                      bool checkable, CheckState state,
-                                      bool showArrow, int listPosition)
+MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
+                                           const QString &text, const QString &image,
+                                           bool checkable, CheckState state,
+                                           bool showArrow, int listPosition)
 {
     if (!lbtype)
         LOG(VB_GENERAL, LOG_ERR, "Cannot add a button to a non-existent list!");
@@ -2674,9 +2799,9 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
         m_parent->InsertItem(this, listPosition);
 }
 
-MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
-                                       const QString& text,
-                                       QVariant data, int listPosition)
+MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
+                                           const QString &text,
+                                           QVariant data, int listPosition)
 {
     if (!lbtype)
         LOG(VB_GENERAL, LOG_ERR, "Cannot add a button to a non-existent list!");
@@ -2703,7 +2828,8 @@ MythUIButtonListItem::~MythUIButtonListItem()
     if (m_image)
         m_image->DownRef();
 
-    QMapIterator<QString, MythImage*> it(m_images);
+    QMapIterator<QString, MythImage *> it(m_images);
+
     while (it.hasNext())
     {
         it.next();
@@ -2729,9 +2855,10 @@ void MythUIButtonListItem::SetText(const QString &text, const QString &name,
 }
 
 void MythUIButtonListItem::SetTextFromMap(QHash<QString, QString> &infoMap,
-                                   const QString &state)
+                                          const QString &state)
 {
     QHash<QString, QString>::iterator map_it = infoMap.begin();
+
     while (map_it != infoMap.end())
     {
         TextProperties textprop;
@@ -2745,7 +2872,7 @@ void MythUIButtonListItem::SetTextFromMap(QHash<QString, QString> &infoMap,
         m_parent->Update();
 }
 
-void MythUIButtonListItem::SetTextFromMap(QMap<QString,TextProperties> &stringMap)
+void MythUIButtonListItem::SetTextFromMap(QMap<QString, TextProperties> &stringMap)
 {
     m_strings.clear();
     m_strings = stringMap;
@@ -2785,6 +2912,7 @@ bool MythUIButtonListItem::FindText(const QString &searchStr, const QString &fie
         }
 
         QMap<QString, TextProperties>::const_iterator i = m_strings.constBegin();
+
         while (i != m_strings.constEnd())
         {
             if (startsWith)
@@ -2804,6 +2932,7 @@ bool MythUIButtonListItem::FindText(const QString &searchStr, const QString &fie
     else
     {
         QStringList fields = fieldList.split(',', QString::SkipEmptyParts);
+
         for (int x = 0; x < fields.count(); x++)
         {
             if (m_strings.contains(fields.at(x).trimmed()))
@@ -2865,7 +2994,9 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
 
         if (m_image)
             m_image->DownRef();
+
         m_image = image;
+
         if (image)
             image->UpRef();
     }
@@ -2874,13 +3005,13 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
         m_parent->Update();
 }
 
-void MythUIButtonListItem::SetImageFromMap(const QMap<QString,QString> &imageMap)
+void MythUIButtonListItem::SetImageFromMap(const QMap<QString, QString> &imageMap)
 {
     m_imageFilenames.clear();
     m_imageFilenames = imageMap;
 }
 
-MythImage* MythUIButtonListItem::getImage(const QString &name)
+MythImage *MythUIButtonListItem::getImage(const QString &name)
 {
     if (!name.isEmpty())
     {
@@ -2899,9 +3030,11 @@ void MythUIButtonListItem::SetImage(
     const QString &filename, const QString &name, bool force_reload)
 {
     bool do_update = force_reload;
+
     if (!name.isEmpty())
     {
         QMap<QString, QString>::iterator it = m_imageFilenames.find(name);
+
         if (it == m_imageFilenames.end())
         {
             m_imageFilenames.insert(name, filename);
@@ -2929,6 +3062,7 @@ QString MythUIButtonListItem::GetImage(const QString &name) const
         return m_imageFilename;
 
     QMap<QString, QString>::const_iterator it = m_imageFilenames.find(name);
+
     if (it != m_imageFilenames.end())
         return *it;
 
@@ -2943,6 +3077,7 @@ void MythUIButtonListItem::DisplayState(const QString &state,
 
     bool do_update = false;
     QMap<QString, QString>::iterator it = m_states.find(name);
+
     if (it == m_states.end())
     {
         m_states.insert(name, state);
@@ -2968,7 +3103,7 @@ MythUIButtonListItem::CheckState MythUIButtonListItem::state() const
     return m_state;
 }
 
-MythUIButtonList* MythUIButtonListItem::parent() const
+MythUIButtonList *MythUIButtonListItem::parent() const
 {
     return m_parent;
 }
@@ -2977,7 +3112,9 @@ void MythUIButtonListItem::setChecked(MythUIButtonListItem::CheckState state)
 {
     if (!m_checkable || m_state == state)
         return;
+
     m_state = state;
+
     if (m_parent)
         m_parent->Update();
 }
@@ -3016,6 +3153,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         return;
 
     QString state;
+
     if (selected)
     {
         button->MoveToTop();
@@ -3031,12 +3169,12 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     }
 
     MythUIGroup *buttonstate = dynamic_cast<MythUIGroup *>
-                                            (button->GetCurrentState());
+                               (button->GetCurrentState());
 
     if (!buttonstate)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to query buttonlist state: %1")
-                .arg(state));
+            .arg(state));
         return;
     }
 
@@ -3044,7 +3182,8 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     buttonstate->Reset();
 
     MythUIText *buttontext = dynamic_cast<MythUIText *>
-                                        (buttonstate->GetChild("buttontext"));
+                             (buttonstate->GetChild("buttontext"));
+
     if (buttontext)
     {
         buttontext->SetText(m_text);
@@ -3052,7 +3191,8 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     }
 
     MythUIImage *buttonimage = dynamic_cast<MythUIImage *>
-                                        (buttonstate->GetChild("buttonimage"));
+                               (buttonstate->GetChild("buttonimage"));
+
     if (buttonimage)
     {
         if (!m_imageFilename.isEmpty())
@@ -3065,12 +3205,14 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     }
 
     MythUIImage *buttonarrow = dynamic_cast<MythUIImage *>
-                                        (buttonstate->GetChild("buttonarrow"));
+                               (buttonstate->GetChild("buttonarrow"));
+
     if (buttonarrow)
         buttonarrow->SetVisible(m_showArrow);
 
     MythUIStateType *buttoncheck = dynamic_cast<MythUIStateType *>
-                                        (buttonstate->GetChild("buttoncheck"));
+                                   (buttonstate->GetChild("buttoncheck"));
+
     if (buttoncheck)
     {
         buttoncheck->SetVisible(m_checkable);
@@ -3088,10 +3230,12 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
     MythUIText *text;
     QMap<QString, TextProperties>::iterator string_it = m_strings.begin();
+
     while (string_it != m_strings.end())
     {
         text = dynamic_cast<MythUIText *>
-                                    (buttonstate->GetChild(string_it.key()));
+               (buttonstate->GetChild(string_it.key()));
+
         if (text)
         {
             TextProperties textprop = string_it.value();
@@ -3100,26 +3244,31 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
             QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\w+)(\\|(.+))?%");
             regexp.setMinimal(true);
+
             if (!newText.isEmpty() && newText.contains(regexp))
             {
                 int pos = 0;
                 QString tempString = newText;
+
                 while ((pos = regexp.indexIn(newText, pos)) != -1)
                 {
                     QString key = regexp.cap(4).toLower().trimmed();
                     QString replacement;
                     QString value = m_strings.value(key).text;
+
                     if (!value.isEmpty())
                     {
                         replacement = QString("%1%2%3%4")
-                                                .arg(regexp.cap(2))
-                                                .arg(regexp.cap(3))
-                                                .arg(m_strings.value(key).text)
-                                                .arg(regexp.cap(6));
+                                      .arg(regexp.cap(2))
+                                      .arg(regexp.cap(3))
+                                      .arg(m_strings.value(key).text)
+                                      .arg(regexp.cap(6));
                     }
+
                     tempString.replace(regexp.cap(0), replacement);
                     pos += regexp.matchedLength();
                 }
+
                 newText = tempString;
             }
             else
@@ -3129,46 +3278,57 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
                 text->Reset();
             else
                 text->SetText(newText);
+
             text->SetFontState(textprop.state.isEmpty() ? m_fontState : textprop.state);
         }
+
         ++string_it;
     }
 
     MythUIImage *image;
     QMap<QString, QString>::iterator imagefile_it = m_imageFilenames.begin();
+
     while (imagefile_it != m_imageFilenames.end())
     {
         image = dynamic_cast<MythUIImage *>
-                                    (buttonstate->GetChild(imagefile_it.key()));
+                (buttonstate->GetChild(imagefile_it.key()));
+
         if (image)
         {
             image->SetFilename(imagefile_it.value());
             image->Load();
         }
+
         ++imagefile_it;
     }
 
-    QMap<QString, MythImage*>::iterator image_it = m_images.begin();
+    QMap<QString, MythImage *>::iterator image_it = m_images.begin();
+
     while (image_it != m_images.end())
     {
         image = dynamic_cast<MythUIImage *>
-                                    (buttonstate->GetChild(image_it.key()));
+                (buttonstate->GetChild(image_it.key()));
+
         if (image)
             image->SetImage(image_it.value());
+
         ++image_it;
     }
 
     MythUIStateType *statetype;
     QMap<QString, QString>::iterator state_it = m_states.begin();
+
     while (state_it != m_states.end())
     {
         statetype = dynamic_cast<MythUIStateType *>
-                                    (buttonstate->GetChild(state_it.key()));
+                    (buttonstate->GetChild(state_it.key()));
+
         if (statetype)
         {
             if (!statetype->DisplayState(state_it.value()))
                 statetype->Reset();
         }
+
         ++state_it;
     }
 
@@ -3179,8 +3339,8 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 // SearchButtonListDialog
 //---------------------------------------------------------
 SearchButtonListDialog::SearchButtonListDialog(MythScreenStack *parent, const char *name,
-                                   MythUIButtonList *parentList, QString searchText)
-         : MythScreenType(parent, name, false)
+                                               MythUIButtonList *parentList, QString searchText)
+    : MythScreenType(parent, name, false)
 {
     m_parentList = parentList;
     m_searchText = searchText;

@@ -49,9 +49,11 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_deferload = false;
 
     m_Parent = NULL;
+
     if (parent)
     {
         m_Parent = dynamic_cast<MythUIType *>(parent);
+
         if (m_Parent)
             m_Parent->AddChild(this);
     }
@@ -78,6 +80,7 @@ void MythUIType::Reset()
 {
     // Reset all children
     QMutableListIterator<MythUIType *> it(m_ChildrenList);
+
     while (it.hasNext())
     {
         it.next();
@@ -106,6 +109,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
     bool onlyWidgets = (inheritsClass
                         && qstrcmp(inheritsClass, "QWidget") == 0);
     const QLatin1String oName(objName);
+
     for (int i = 0; i < children.size(); ++i)
     {
         QObject *obj = children.at(i);
@@ -116,14 +120,16 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
                 return obj;
         }
         else if ((!inheritsClass || obj->inherits(inheritsClass))
-                   && (!objName || obj->objectName() == oName))
+                 && (!objName || obj->objectName() == oName))
             return obj;
+
         if (recursiveSearch && (dynamic_cast<MythUIGroup *>(obj) != NULL)
-                            && (obj = qChildHelper(objName, inheritsClass,
-                                                   recursiveSearch,
-                                                   obj->children())))
+            && (obj = qChildHelper(objName, inheritsClass,
+                                   recursiveSearch,
+                                   obj->children())))
             return obj;
     }
+
     return 0;
 }
 
@@ -136,6 +142,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
 MythUIType *MythUIType::GetChild(const QString &name) const
 {
     QObject *ret = qChildHelper(name.toAscii().constData(), NULL, true, children());
+
     if (ret)
         return dynamic_cast<MythUIType *>(ret);
 
@@ -150,10 +157,12 @@ MythUIType *MythUIType::GetChild(const QString &name) const
 void MythUIType::DeleteChild(const QString &name)
 {
     QMutableListIterator<MythUIType *> it(m_ChildrenList);
+
     while (it.hasNext())
     {
         it.next();
         MythUIType *type = it.value();
+
         if (type->objectName() == name)
         {
             delete type;
@@ -172,10 +181,12 @@ void MythUIType::DeleteChild(const QString &name)
 void MythUIType::DeleteChild(MythUIType *child)
 {
     QMutableListIterator<MythUIType *> it(m_ChildrenList);
+
     while (it.hasNext())
     {
         it.next();
         MythUIType *type = it.value();
+
         if (type == child)
         {
             delete type;
@@ -199,7 +210,8 @@ QList<MythUIType *> *MythUIType::GetAllChildren(void)
  */
 void MythUIType::DeleteAllChildren(void)
 {
-    QList<MythUIType*>::iterator it;
+    QList<MythUIType *>::iterator it;
+
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         if (*it)
             delete *it;
@@ -228,7 +240,8 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
 
         /* check all children */
         QList<MythUIType *>::const_iterator it;
-        for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; --it)
+
+        for (it = m_ChildrenList.end() - 1; it != m_ChildrenList.begin() - 1; --it)
         {
             if (!(*it))
                 continue;
@@ -254,6 +267,7 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
             }
         }
     }
+
     return NULL;
 }
 
@@ -267,6 +281,7 @@ void MythUIType::ResetNeedsRedraw(void)
     m_NeedsRedraw = false;
 
     QList<MythUIType *>::Iterator it;
+
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         (*it)->ResetNeedsRedraw();
 }
@@ -290,6 +305,7 @@ void MythUIType::SetRedraw(void)
 void MythUIType::SetChildNeedsRedraw(MythUIType *child)
 {
     QRegion childRegion = child->GetDirtyArea();
+
     if (childRegion.isEmpty())
         return;
 
@@ -389,6 +405,7 @@ void MythUIType::HandleAlphaPulse(void)
 
     if (m_Alpha > m_AlphaMax)
         m_Alpha = m_AlphaMax;
+
     if (m_Alpha < m_AlphaMin)
         m_Alpha = m_AlphaMin;
 
@@ -424,6 +441,7 @@ void MythUIType::Pulse(void)
     HandleAlphaPulse();
 
     QList<MythUIType *>::Iterator it;
+
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         (*it)->Pulse();
 }
@@ -440,7 +458,7 @@ void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
 void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
                       QRect clipRect)
 {
-    m_DirtyRegion = QRegion(QRect(0,0,0,0));
+    m_DirtyRegion = QRegion(QRect(0, 0, 0, 0));
 
     if (!m_Visible || m_Vanished)
         return;
@@ -454,6 +472,7 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
     DrawSelf(p, xoffset, yoffset, alphaMod, clipRect);
 
     QList<MythUIType *>::Iterator it;
+
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
         (*it)->Draw(p, xoffset + m_Area.x(), yoffset + m_Area.y(),
@@ -557,6 +576,7 @@ void MythUIType::SetArea(const MythRect &rect)
 
     if (m_Area.width() > m_NormalSize.width())
         m_NormalSize.setWidth(m_Area.width());
+
     if (m_Area.height() > m_NormalSize.height())
         m_NormalSize.setHeight(m_Area.height());
 
@@ -579,12 +599,13 @@ void MythUIType::AdjustMinArea(int delta_x, int delta_y)
 
     if (m_Area.width() < m_NormalSize.width())
         m_Area.setWidth(m_NormalSize.width());
+
     if (m_Area.height() < m_NormalSize.height())
         m_Area.setHeight(m_NormalSize.height());
 
     QSize size(m_Area.size());
 
-    size.setWidth( size.width()  + delta_x);
+    size.setWidth(size.width()  + delta_x);
     size.setHeight(size.height() + delta_y);
     m_MinArea.setSize(size);
     m_MinArea.moveLeft(m_Area.x());
@@ -597,7 +618,7 @@ void MythUIType::AdjustMinArea(int delta_x, int delta_y)
     m_MinArea.setHeight(bound.height());
     m_Vanished = false;
 
-    QList<MythUIType*>::iterator it;
+    QList<MythUIType *>::iterator it;
 
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
@@ -617,7 +638,7 @@ void MythUIType::VanishSibling(void)
     m_MinArea.setHeight(0);
     m_Vanished = true;
 
-    QList<MythUIType*>::iterator it;
+    QList<MythUIType *>::iterator it;
 
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
@@ -643,6 +664,7 @@ void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
 
     if (m_Area.width() < m_NormalSize.width())
         m_Area.setWidth(m_NormalSize.width());
+
     if (m_Area.height() < m_NormalSize.height())
         m_Area.setHeight(m_NormalSize.height());
 
@@ -657,7 +679,7 @@ void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
     actual_area.translate(m_Area.topLeft());
     allowed_area.translate(m_Area.topLeft());
 
-    QList<MythUIType*>::iterator it;
+    QList<MythUIType *>::iterator it;
 
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
@@ -698,6 +720,7 @@ void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
             delta_y = (actual_area.y() + actual_area.height()) -
                       (allowed_area.y() + allowed_area.height());
         }
+
         m_Vanished = false;
     }
 
@@ -720,6 +743,7 @@ void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
     }
 
     QSize bound(actual_area.width(), actual_area.height());
+
     if (m_Vanished)
     {
         m_MinArea.moveLeft(0);
@@ -745,8 +769,10 @@ void MythUIType::SetMinArea(const QSize &size)
         return;
 
     m_MinArea.setWidth(0);
+
     if (m_Area.width() < m_NormalSize.width())
         m_Area.setWidth(m_NormalSize.width());
+
     if (m_Area.height() < m_NormalSize.height())
         m_Area.setHeight(m_NormalSize.height());
 
@@ -808,6 +834,7 @@ MythRect MythUIType::GetArea(void) const
 {
     if (m_Vanished || m_MinArea.isValid())
         return m_MinArea;
+
     return m_Area;
 }
 
@@ -854,6 +881,7 @@ void MythUIType::AdjustAlpha(int mode, int alphachange, int minalpha,
 
     if (m_Alpha > m_AlphaMax)
         m_Alpha = m_AlphaMax;
+
     if (m_Alpha < m_AlphaMin)
         m_Alpha = m_AlphaMin;
 }
@@ -862,6 +890,7 @@ void MythUIType::SetAlpha(int newalpha)
 {
     if (m_Alpha == newalpha)
         return;
+
     m_Alpha = newalpha;
     SetRedraw();
 }
@@ -900,7 +929,7 @@ bool MythUIType::gestureEvent(MythGestureEvent *)
  *
  *  \param event Media event
  */
-void MythUIType::mediaEvent (MythMediaEvent*)
+void MythUIType::mediaEvent(MythMediaEvent *)
 {
     return;
 }
@@ -976,7 +1005,8 @@ void MythUIType::AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList)
         focusList.insertMulti(m_focusOrder, this);
 
     QList<MythUIType *>::Iterator it;
-    for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; --it)
+
+    for (it = m_ChildrenList.end() - 1; it != m_ChildrenList.begin() - 1; --it)
         (*it)->AddFocusableChildrenToList(focusList);
 }
 
@@ -1019,10 +1049,12 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_deferload = base->m_deferload;
 
     QList<MythUIType *>::Iterator it;
+
     for (it = base->m_ChildrenList.begin(); it != base->m_ChildrenList.end();
          ++it)
     {
         MythUIType *child = GetChild((*it)->objectName());
+
         if (child)
             child->CopyFrom(*it);
         else
@@ -1059,8 +1091,10 @@ bool MythUIType::ParseElement(
         // Use parsePoint so percentages can be used
         if (element.hasAttribute("initiator"))
             m_Initiator = parseBool(element.attribute("initiator"));
+
         if (element.hasAttribute("vanish"))
             m_Vanish = parseBool(element.attribute("vanish"));
+
         SetMinSize(parsePoint(element));
     }
     else if (element.tagName() == "alpha")
@@ -1073,10 +1107,13 @@ bool MythUIType::ParseElement(
         m_AlphaChangeMode = 2;
         m_AlphaMin = element.attribute("min", "0").toInt();
         m_Alpha = m_AlphaMax = element.attribute("max", "255").toInt();
+
         if (m_AlphaMax > 255)
             m_Alpha = m_AlphaMax = 255;
+
         if (m_AlphaMin < 0)
             m_AlphaMin = 0;
+
         m_AlphaChange = element.attribute("change", "5").toInt();
     }
     else if (element.tagName() == "focusorder")
@@ -1112,6 +1149,7 @@ void MythUIType::Finalize(void)
 MythFontProperties *MythUIType::GetFont(const QString &text) const
 {
     MythFontProperties *ret = m_Fonts->GetFont(text);
+
     if (!ret && m_Parent)
         return m_Parent->GetFont(text);
 
@@ -1132,12 +1170,14 @@ void MythUIType::RecalculateArea(bool recurse)
 
     if (m_Area.width() > m_NormalSize.width())
         m_NormalSize.setWidth(m_Area.width());
+
     if (m_Area.height() > m_NormalSize.height())
         m_NormalSize.setHeight(m_Area.height());
 
     if (recurse)
     {
         QList<MythUIType *>::iterator it;
+
         for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         {
             (*it)->RecalculateArea(recurse);
@@ -1156,7 +1196,8 @@ bool MythUIType::MoveChildToTop(MythUIType *child)
         return false;
 
     int i = m_ChildrenList.indexOf(child);
-    if (i != -1 || i != m_ChildrenList.size()-1)
+
+    if (i != -1 || i != m_ChildrenList.size() - 1)
     {
         m_ChildrenList.removeAt(i);
         m_ChildrenList.append(child);
@@ -1180,13 +1221,13 @@ bool MythUIType::MoveToTop(void)
 
 bool MythUIType::IsDeferredLoading(bool recurse) const
 {
-     if (m_deferload)
-         return true;
+    if (m_deferload)
+        return true;
 
-     if (recurse && m_Parent)
-         return m_Parent->IsDeferredLoading(recurse);
+    if (recurse && m_Parent)
+        return m_Parent->IsDeferredLoading(recurse);
 
-     return false;
+    return false;
 }
 
 /**
@@ -1197,6 +1238,7 @@ bool MythUIType::IsDeferredLoading(bool recurse) const
 void MythUIType::LoadNow(void)
 {
     QList<MythUIType *>::Iterator it;
+
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         (*it)->LoadNow();
 }
@@ -1214,11 +1256,13 @@ bool MythUIType::ContainsPoint(const QPoint &point) const
     return false;
 }
 
-MythPainter* MythUIType::GetPainter(void)
+MythPainter *MythUIType::GetPainter(void)
 {
     if (m_Painter)
         return m_Painter;
+
     if (m_Parent)
         return m_Parent->GetPainter();
+
     return GetMythPainter();
 }

@@ -45,8 +45,10 @@ MythUIHelper *MythUIHelper::getMythUI(void)
         return mythui;
 
     uiLock.lock();
+
     if (!mythui)
         mythui = new MythUIHelper();
+
     uiLock.unlock();
 
     return mythui;
@@ -72,9 +74,9 @@ void DestroyMythUI()
 
 class MythUIHelperPrivate
 {
-  public:
+public:
     MythUIHelperPrivate(MythUIHelper *p);
-   ~MythUIHelperPrivate();
+    ~MythUIHelperPrivate();
 
     void Init();
 
@@ -103,7 +105,7 @@ class MythUIHelperPrivate
     int m_baseWidth, m_baseHeight;
     bool m_isWide;
 
-    QMap<QString, MythImage*> imageCache;
+    QMap<QString, MythImage *> imageCache;
     QMap<QString, uint> CacheTrack;
     QMutex *m_cacheLock;
     size_t m_cacheSize;
@@ -161,7 +163,8 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
 
 MythUIHelperPrivate::~MythUIHelperPrivate()
 {
-    QMutableMapIterator<QString, MythImage*> i(imageCache);
+    QMutableMapIterator<QString, MythImage *> i(imageCache);
+
     while (i.hasNext())
     {
         i.next();
@@ -177,7 +180,8 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
     delete m_imageThreadPool;
     delete m_qtThemeSettings;
     delete screensaver;
-    if(display_res)
+
+    if (display_res)
         DisplayRes::SwitchToDesktop();
 }
 
@@ -198,7 +202,7 @@ void MythUIHelperPrivate::Init(void)
  */
 void MythUIHelperPrivate::GetScreenBounds()
 {
-    QDesktopWidget * desktop = QApplication::desktop();
+    QDesktopWidget *desktop = QApplication::desktop();
     bool             hasXinerama = MythDisplay::GetNumberXineramaScreens() > 1;
     int              numScreens  = desktop->numScreens();
     int              screen;
@@ -207,7 +211,7 @@ void MythUIHelperPrivate::GetScreenBounds()
     {
         LOG(VB_GUI, LOG_INFO, LOC +
             QString("Total desktop dim: %1x%2, over %3 screen[s].")
-                .arg(desktop->width()).arg(desktop->height()).arg(numScreens));
+            .arg(desktop->width()).arg(desktop->height()).arg(numScreens));
     }
 
     if (numScreens > 1)
@@ -216,7 +220,7 @@ void MythUIHelperPrivate::GetScreenBounds()
         {
             QRect dim = desktop->screenGeometry(screen);
             LOG(VB_GUI, LOG_INFO, LOC + QString("Screen %1 dim: %2x%3.")
-                    .arg(screen).arg(dim.width()).arg(dim.height()));
+                .arg(screen).arg(dim.width()).arg(dim.height()));
         }
     }
 
@@ -247,7 +251,7 @@ void MythUIHelperPrivate::GetScreenBounds()
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Xinerama screen %1 was specified,"
                         " but only %2 available, so using screen 0.")
-                    .arg(screen).arg(numScreens));
+                .arg(screen).arg(numScreens));
             screen = 0;
         }
     }
@@ -274,8 +278,8 @@ void MythUIHelperPrivate::GetScreenBounds()
         m_height = bounds.height();
 
         LOG(VB_GUI, LOG_INFO, LOC + QString("Using screen %1, %2x%3 at %4,%5")
-                .arg(screen).arg(m_width).arg(m_height)
-                .arg(m_xbase).arg(m_ybase));
+            .arg(screen).arg(m_width).arg(m_height)
+            .arg(m_xbase).arg(m_ybase));
     }
 }
 
@@ -289,6 +293,7 @@ void MythUIHelperPrivate::StoreGUIsettings()
         GetMythDB()->OverrideSettingForSession("GuiOffsetX", QString::number(x_override));
         GetMythDB()->OverrideSettingForSession("GuiOffsetY", QString::number(y_override));
     }
+
     if (w_override > 0 && h_override > 0)
     {
         GetMythDB()->OverrideSettingForSession("GuiWidth", QString::number(w_override));
@@ -306,10 +311,13 @@ void MythUIHelperPrivate::StoreGUIsettings()
 
     if (!m_screenxbase)
         m_screenxbase = m_xbase;
+
     if (!m_screenybase)
         m_screenybase = m_ybase;
+
     if (!m_screenwidth)
         m_screenwidth = m_width;
+
     if (!m_screenheight)
         m_screenheight = m_height;
 
@@ -318,11 +326,11 @@ void MythUIHelperPrivate::StoreGUIsettings()
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Somehow, your screen size settings are bad.\n\t\t\t" +
             QString("GuiResolution: %1\n\t\t\t")
-                .arg(GetMythDB()->GetSetting("GuiResolution")) +
+            .arg(GetMythDB()->GetSetting("GuiResolution")) +
             QString("  old GuiWidth: %1\n\t\t\t")
-                .arg(GetMythDB()->GetNumSetting("GuiWidth")) +
+            .arg(GetMythDB()->GetNumSetting("GuiWidth")) +
             QString("  old GuiHeight: %1\n\t\t\t")
-                .arg(GetMythDB()->GetNumSetting("GuiHeight")) +
+            .arg(GetMythDB()->GetNumSetting("GuiHeight")) +
             QString("m_width: %1").arg(m_width) +
             QString("m_height: %1\n\t\t\t").arg(m_height) +
             "Falling back to 640x480");
@@ -337,8 +345,10 @@ void MythUIHelperPrivate::StoreGUIsettings()
     // Default font, _ALL_ fonts inherit from this!
     // e.g All fonts will be 19 pixels unless a new size is explicitly defined.
     QFont font = QFont("Arial");
+
     if (!font.exactMatch())
         font = QFont();
+
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
     font.setPixelSize((int)((19.0f * m_hmult) + 0.5f));
     int stretch = (int)(100 / GetPixelAspectRatio());
@@ -355,6 +365,7 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
         if (!display_res)
         {
             DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
+
             if (dispRes)
                 m_pixelAspectRatio = dispRes->GetPixelAspectRatio();
             else
@@ -384,12 +395,12 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
 
     d->m_cacheSizeLock->lock();
     d->maxImageCacheSize = GetMythDB()->GetNumSetting("UIImageCacheSize", 20)
-                                * 1024 * 1024;
+                           * 1024 * 1024;
     d->m_cacheSizeLock->unlock();
 
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("MythUI Image Cache size set to %1 bytes")
-            .arg(d->maxImageCacheSize));
+        .arg(d->maxImageCacheSize));
 }
 
 MythUIMenuCallbacks *MythUIHelper::GetMenuCBs(void)
@@ -415,6 +426,7 @@ void MythUIHelper::LoadQtConfig(void)
     if (GetMythDB()->GetNumSetting("UseVideoModes", 0))
     {
         DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
+
         if (dispRes)
         {
             d->display_res = dispRes;
@@ -447,7 +459,7 @@ void MythUIHelper::LoadQtConfig(void)
         d->m_themename = themeinfo->GetName();
         LOG(VB_GUI, LOG_INFO, LOC +
             QString("Using theme base resolution of %1x%2")
-                .arg(d->m_baseWidth).arg(d->m_baseHeight));
+            .arg(d->m_baseWidth).arg(d->m_baseHeight));
         delete themeinfo;
     }
 
@@ -461,8 +473,10 @@ void MythUIHelper::LoadQtConfig(void)
     d->m_themeloaded = false;
 
     themename = GetMythDB()->GetSetting("MenuTheme", "defaultmenu");
+
     if (themename == "default")
         themename = "defaultmenu";
+
     d->m_menuthemepathname = FindMenuThemeDir(themename) + '/';
 }
 
@@ -475,7 +489,8 @@ void MythUIHelper::UpdateImageCache(void)
 {
     QMutexLocker locker(d->m_cacheLock);
 
-    QMutableMapIterator<QString, MythImage*> i(d->imageCache);
+    QMutableMapIterator<QString, MythImage *> i(d->imageCache);
+
     while (i.hasNext())
     {
         i.next();
@@ -496,20 +511,21 @@ void MythUIHelper::UpdateImageCache(void)
 MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 {
     QMutexLocker locker(d->m_cacheLock);
+
     if (d->imageCache.contains(url))
     {
         d->CacheTrack[url] = QDateTime::currentDateTime().toTime_t();
         return d->imageCache[url];
     }
 
-/*
-    if (QFileInfo(url).exists())
-    {
-        MythImage *im = GetMythPainter()->GetFormatImage();
-        im->Load(url,false);
-        return im;
-    }
-*/
+    /*
+        if (QFileInfo(url).exists())
+        {
+            MythImage *im = GetMythPainter()->GetFormatImage();
+            im->Load(url,false);
+            return im;
+        }
+    */
 
     return NULL;
 }
@@ -550,26 +566,29 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         // This would probably be better off somewhere else before any
         // Load() calls at all.
         QDir themedir(GetMythUI()->GetThemeCacheDir());
+
         if (!themedir.exists())
             themedir.mkdir(GetMythUI()->GetThemeCacheDir());
 
         // Save to disk cache
-        im->save(dstfile,"PNG");
+        im->save(dstfile, "PNG");
     }
 
     // delete the oldest cached images until we fall below threshold.
     QMutexLocker locker(d->m_cacheLock);
     d->m_cacheSizeLock->lock();
+
     while (d->m_cacheSize + im->numBytes() >= d->maxImageCacheSize &&
            d->imageCache.size())
     {
         d->m_cacheSizeLock->unlock();
-        QMap<QString, MythImage*>::iterator it = d->imageCache.begin();
+        QMap<QString, MythImage *>::iterator it = d->imageCache.begin();
         uint oldestTime = QDateTime::currentDateTime().toTime_t();
         QString oldestKey = it.key();
 
         int count = 0;
-        for ( ; it != d->imageCache.end(); ++it)
+
+        for (; it != d->imageCache.end(); ++it)
         {
             if (d->CacheTrack[it.key()] < oldestTime &&
                 (it.value()->RefCount() == 1))
@@ -587,7 +606,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         {
             LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
                 QString("Cache too big (%1), removing :%2:")
-                    .arg(d->m_cacheSize + im->numBytes()).arg(oldestKey));
+                .arg(d->m_cacheSize + im->numBytes()).arg(oldestKey));
 
             d->imageCache[oldestKey]->DownRef();
             d->imageCache.remove(oldestKey);
@@ -601,9 +620,11 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
             break;
         }
     }
+
     d->m_cacheSizeLock->unlock();
 
-    QMap<QString, MythImage*>::iterator it = d->imageCache.find(url);
+    QMap<QString, MythImage *>::iterator it = d->imageCache.find(url);
+
     if (it == d->imageCache.end())
     {
         im->UpRef();
@@ -613,12 +634,12 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         im->SetIsInCache(true);
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
             QString("NOT IN RAM CACHE, Adding, and adding to size :%1: :%2:")
-                .arg(url).arg(im->numBytes()));
+            .arg(url).arg(im->numBytes()));
     }
 
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("MythUIHelper::CacheImage : Cache Count = :%1: size :%2:")
-            .arg(d->imageCache.count()).arg(d->m_cacheSize));
+        .arg(d->imageCache.count()).arg(d->m_cacheSize));
 
     return d->imageCache[url];
 }
@@ -626,7 +647,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 void MythUIHelper::RemoveFromCacheByURL(const QString &url)
 {
     QMutexLocker locker(d->m_cacheLock);
-    QMap<QString, MythImage*>::iterator it = d->imageCache.find(url);
+    QMap<QString, MythImage *>::iterator it = d->imageCache.find(url);
 
     if (it != d->imageCache.end())
     {
@@ -654,6 +675,7 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
     d->m_cacheLock->lock();
     QList<QString> imageCacheKeys = d->imageCache.keys();
     d->m_cacheLock->unlock();
+
     for (it = imageCacheKeys.begin(); it != imageCacheKeys.end(); ++it)
     {
         if ((*it).contains(partialKey))
@@ -664,20 +686,23 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
     // RemoveFromCacheByURL
     QDir dir(GetThemeCacheDir());
     QFileInfoList list = dir.entryInfoList();
+
     for (int i = 0; i < list.size(); ++i)
     {
         QFileInfo fileInfo = list.at(i);
+
         if (fileInfo.fileName().contains(partialKey))
         {
             LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
                 QString("RemoveFromCacheByFile removed: %1: from cache")
-                    .arg(fileInfo.fileName()));
+                .arg(fileInfo.fileName()));
+
             if (!dir.remove(fileInfo.fileName()))
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("Failed to delete %1 from the theme cache")
-                        .arg(fileInfo.fileName()));
+                    .arg(fileInfo.fileName()));
         }
-     }
+    }
 }
 
 bool MythUIHelper::IsImageInCache(const QString &url)
@@ -721,6 +746,7 @@ void MythUIHelper::ClearOldImageCache(void)
     d->themecachedir += '/';
 
     dir.setPath(themecachedir);
+
     if (!dir.exists())
         dir.mkdir(themecachedir);
 
@@ -735,12 +761,15 @@ void MythUIHelper::ClearOldImageCache(void)
     while (it != list.end())
     {
         fi = &(*it++);
+
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
+
         if (fi->isDir() && !fi->isSymLink())
         {
             if (fi->absoluteFilePath() == themecachedir)
                 continue;
+
             dirtimes[fi->lastModified()] = fi->absoluteFilePath();
         }
     }
@@ -752,13 +781,14 @@ void MythUIHelper::ClearOldImageCache(void)
     while ((size_t)dirtimes.size() >= 2)
     {
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC + QString("Removing cache dir: %1")
-                .arg(dirtimes.begin().value()));
+            .arg(dirtimes.begin().value()));
 
         RemoveCacheDir(dirtimes.begin().value());
         dirtimes.erase(dirtimes.begin());
     }
 
     QMap<QDateTime, QString>::const_iterator dit = dirtimes.begin();
+
     for (; dit != dirtimes.end(); ++dit)
     {
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
@@ -788,8 +818,10 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
     while (it != list.end())
     {
         fi = &(*it++);
+
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
+
         if (fi->isFile() && !fi->isSymLink())
         {
             QFile file(fi->absoluteFilePath());
@@ -805,7 +837,7 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
 }
 
 void MythUIHelper::GetScreenBounds(int &xbase, int &ybase,
-                                  int &width, int &height)
+                                   int &width, int &height)
 {
     xbase  = d->m_xbase;
     ybase  = d->m_ybase;
@@ -821,7 +853,7 @@ void MythUIHelper::GetScreenSettings(float &wmult, float &hmult)
 }
 
 void MythUIHelper::GetScreenSettings(int &width, float &wmult,
-                                    int &height, float &hmult)
+                                     int &height, float &hmult)
 {
     height = d->m_screenheight;
     width = d->m_screenwidth;
@@ -831,7 +863,7 @@ void MythUIHelper::GetScreenSettings(int &width, float &wmult,
 }
 
 void MythUIHelper::GetScreenSettings(int &xbase, int &width, float &wmult,
-                                    int &ybase, int &height, float &hmult)
+                                     int &ybase, int &height, float &hmult)
 {
     xbase  = d->m_screenxbase;
     ybase  = d->m_screenybase;
@@ -882,6 +914,7 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
     int tmp_w, tmp_h;
 
     tmp_w = geo[1].toInt(&parsed);
+
     if (!parsed)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -891,6 +924,7 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
     if (parsed)
     {
         tmp_h = geo[2].toInt(&parsed);
+
         if (!parsed)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -904,7 +938,7 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
         MythUIHelperPrivate::h_override = tmp_h;
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Overriding GUI size: width=%1 height=%2")
-                .arg(tmp_w).arg(tmp_h));
+            .arg(tmp_w).arg(tmp_h));
     }
     else
     {
@@ -915,6 +949,7 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
     {
         int tmp_x, tmp_y;
         tmp_x = geo[3].toInt(&parsed);
+
         if (!parsed)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -924,10 +959,11 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
         if (parsed)
         {
             tmp_y = geo[4].toInt(&parsed);
+
             if (!parsed)
             {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Could not parse vertical offset of geometry override");
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Could not parse vertical offset of geometry override");
             }
         }
 
@@ -937,7 +973,7 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
             MythUIHelperPrivate::y_override = tmp_y;
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Overriding GUI offset: x=%1 y=%2")
-                    .arg(tmp_x).arg(tmp_y));
+                .arg(tmp_x).arg(tmp_y));
         }
         else
         {
@@ -972,45 +1008,49 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
         testdir = GetConfDir() + "/themes/" + themename;
 
         dir.setPath(testdir);
+
         if (dir.exists())
             return testdir;
 
         testdir = GetThemesParentDir() + themename;
         dir.setPath(testdir);
+
         if (dir.exists())
             return testdir;
 
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No theme dir: '%1'")
-                .arg(dir.absolutePath()));
+            .arg(dir.absolutePath()));
     }
 
     testdir = GetThemesParentDir() + DEFAULT_UI_THEME;
     dir.setPath(testdir);
+
     if (dir.exists())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Could not find theme: %1 - Switching to %2")
-                .arg(themename).arg(DEFAULT_UI_THEME));
+            .arg(themename).arg(DEFAULT_UI_THEME));
         GetMythDB()->OverrideSettingForSession("Theme", DEFAULT_UI_THEME);
         return testdir;
     }
 
     LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No default theme dir: '%1'")
-            .arg(dir.absolutePath()));
+        .arg(dir.absolutePath()));
 
     testdir = GetThemesParentDir() + FALLBACK_UI_THEME;
     dir.setPath(testdir);
+
     if (dir.exists())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Could not find theme: %1 - Switching to %2")
-                .arg(themename).arg(FALLBACK_UI_THEME));
+            .arg(themename).arg(FALLBACK_UI_THEME));
         GetMythDB()->OverrideSettingForSession("Theme", FALLBACK_UI_THEME);
         return testdir;
     }
 
     LOG(VB_GENERAL, LOG_ERR, LOC + QString("No fallback GUI theme dir: '%1'")
-            .arg(dir.absolutePath()));
+        .arg(dir.absolutePath()));
 
     return QString();
 }
@@ -1031,21 +1071,24 @@ QString MythUIHelper::FindMenuThemeDir(const QString &menuname)
     testdir = GetConfDir() + "/themes/" + menuname;
 
     dir.setPath(testdir);
+
     if (dir.exists())
         return testdir;
 
     testdir = GetThemesParentDir() + menuname;
     dir.setPath(testdir);
+
     if (dir.exists())
         return testdir;
 
     testdir = GetShareDir();
     dir.setPath(testdir);
+
     if (dir.exists())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Could not find menu theme: %1 - Switching to default")
-                .arg(menuname));
+            .arg(menuname));
 
         GetMythDB()->SaveSetting("MenuTheme", "default");
         return testdir;
@@ -1053,7 +1096,7 @@ QString MythUIHelper::FindMenuThemeDir(const QString &menuname)
 
     LOG(VB_GENERAL, LOG_ERR, LOC +
         QString("Could not find menu theme: %1 - Fallback to default failed.")
-            .arg(menuname));
+        .arg(menuname));
 
     return QString();
 }
@@ -1078,8 +1121,10 @@ QStringList MythUIHelper::GetThemeSearchPath(void)
     QStringList searchpath;
 
     searchpath.append(GetThemeDir());
+
     if (d->m_isWide)
         searchpath.append(GetThemesParentDir() + "default-wide/");
+
     searchpath.append(GetThemesParentDir() + "default/");
     searchpath.append("/tmp/");
     return searchpath;
@@ -1125,30 +1170,37 @@ void MythUIHelper::SetPalette(QWidget *widget)
     const QString names[] = { "Foreground", "Button", "Light", "Midlight",
                               "Dark", "Mid", "Text", "BrightText", "ButtonText",
                               "Base", "Background", "Shadow", "Highlight",
-                              "HighlightedText" };
+                              "HighlightedText"
+                            };
 
     QString type = "Active";
+
     for (int i = 0; i < 13; i++)
     {
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
+
         if (!color.isEmpty())
             pal.setColor(QPalette::Active, (QPalette::ColorRole) i,
                          createColor(color));
     }
 
     type = "Disabled";
+
     for (int i = 0; i < 13; i++)
     {
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
+
         if (!color.isEmpty())
             pal.setColor(QPalette::Disabled, (QPalette::ColorRole) i,
                          createColor(color));
     }
 
     type = "Inactive";
+
     for (int i = 0; i < 13; i++)
     {
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
+
         if (!color.isEmpty())
             pal.setColor(QPalette::Inactive, (QPalette::ColorRole) i,
                          createColor(color));
@@ -1176,6 +1228,7 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
                            d->m_qtThemeSettings->GetSetting("BackgroundPixmap");
 
         bgpixmap = LoadScalePixmap(pmapname);
+
         if (bgpixmap)
         {
             d->m_palette.setBrush(widget->backgroundRole(), QBrush(*bgpixmap));
@@ -1183,10 +1236,10 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
         }
     }
     else if (!d->m_qtThemeSettings
-                 ->GetSetting("TiledBackgroundPixmap").isEmpty())
+             ->GetSetting("TiledBackgroundPixmap").isEmpty())
     {
         QString pmapname = d->m_themepathname +
-                      d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
+                           d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
 
         int width, height;
         float wmult, hmult;
@@ -1194,6 +1247,7 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
         GetScreenSettings(width, wmult, height, hmult);
 
         bgpixmap = LoadScalePixmap(pmapname);
+
         if (bgpixmap)
         {
             QPixmap background(width, height);
@@ -1215,14 +1269,16 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
 bool MythUIHelper::FindThemeFile(QString &path)
 {
     QFileInfo fi(path);
+
     if (fi.isAbsolute() && fi.exists())
         return true;
 
     QString file;
     bool foundit = false;
     const QStringList searchpath = GetThemeSearchPath();
+
     for (QStringList::const_iterator ii = searchpath.begin();
-        ii != searchpath.end(); ++ii)
+         ii != searchpath.end(); ++ii)
     {
         if (fi.isRelative())
         {
@@ -1259,7 +1315,7 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         (!filename.startsWith("myth://")))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("LoadScaleImage(%1)")
-                .arg(filename) + "Unable to find image file");
+            .arg(filename) + "Unable to find image file");
 
         return NULL;
     }
@@ -1285,7 +1341,7 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("LoadScaleImage(%1) failed to load remote image")
-                    .arg(filename));
+                .arg(filename));
         }
     }
     else if ((filename.startsWith("http://")) ||
@@ -1293,13 +1349,14 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
              (filename.startsWith("ftp://")))
     {
         QByteArray data;
+
         if (GetMythDownloadManager()->download(filename, &data))
             tmpimage.loadFromData(data);
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("LoadScaleImage(%1) failed to load remote image")
-                    .arg(filename));
+                .arg(filename));
         }
     }
     else
@@ -1313,26 +1370,27 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("LoadScaleImage(%1) failed to load image")
-                    .arg(filename));
+                .arg(filename));
 
             return NULL;
         }
 
         QImage tmp2 = tmpimage.scaled(
-            (int)(tmpimage.width() * wmult),
-            (int)(tmpimage.height() * hmult),
-            Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                          (int)(tmpimage.width() * wmult),
+                          (int)(tmpimage.height() * hmult),
+                          Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
         ret = new QImage(tmp2);
     }
     else
     {
         ret = new QImage(tmpimage);
+
         if (!ret->width() || !ret->height())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("LoadScaleImage(%1) invalid image dimensions")
-                    .arg(filename));
+                .arg(filename));
 
             delete ret;
             return NULL;
@@ -1353,7 +1411,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     if (!FindThemeFile(filename) && (!filename.startsWith("myth:")))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("LoadScalePixmap(%1)")
-                .arg(filename) + "Unable to find image file");
+            .arg(filename) + "Unable to find image file");
 
         return NULL;
     }
@@ -1364,6 +1422,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     float wmult, hmult;
 
     GetScreenSettings(width, wmult, height, hmult);
+
     if (filename.startsWith("myth://"))
     {
         RemoteFile *rf = new RemoteFile(filename, false, false, 0);
@@ -1380,7 +1439,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("LoadScalePixmap(%1): failed to load remote image")
-                    .arg(filename));
+                .arg(filename));
         }
     }
     else
@@ -1394,24 +1453,26 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("LoadScalePixmap(%1) failed to load image")
-                    .arg(filename));
+                .arg(filename));
 
             return NULL;
         }
+
         QImage tmp2 = tmpimage.scaled((int)(tmpimage.width() * wmult),
-                                           (int)(tmpimage.height() * hmult),
-                                           Qt::IgnoreAspectRatio,
-                                           Qt::SmoothTransformation);
+                                      (int)(tmpimage.height() * hmult),
+                                      Qt::IgnoreAspectRatio,
+                                      Qt::SmoothTransformation);
         ret = new QPixmap(QPixmap::fromImage(tmp2));
     }
     else
     {
         ret = new QPixmap(QPixmap::fromImage(tmpimage));
+
         if (!ret->width() || !ret->height())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("LoadScalePixmap(%1) invalid image dimensions")
-                    .arg(filename));
+                .arg(filename));
 
             delete ret;
             return NULL;
@@ -1441,6 +1502,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         // seconds.
         const uint kImageCacheTimeout = 5;
         uint now = QDateTime::currentDateTime().toTime_t();
+
         if (d->imageCache.contains(label) &&
             d->CacheTrack[label] + kImageCacheTimeout > now)
         {
@@ -1484,11 +1546,12 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
             {
                 // Load file from disk cache to memory cache
                 ret = painter->GetFormatImage();
+
                 if (!ret->Load(cachefilepath, false))
                 {
                     LOG(VB_GUI | VB_FILE, LOG_WARNING, LOC +
                         QString("LoadCacheImage: Could not load :%1")
-                            .arg(cachefilepath));
+                        .arg(cachefilepath));
 
                     ret->DownRef();
                     ret = NULL;
@@ -1605,6 +1668,7 @@ bool MythUIHelper::GetScreenIsAsleep(void)
 {
     if (!d->screensaver)
         return false;
+
     return d->screensaver->Asleep();
 }
 
@@ -1626,6 +1690,7 @@ QString MythUIHelper::GetX11Display(void)
 void MythUIHelper::AddCurrentLocation(QString location)
 {
     QMutexLocker locker(&m_locationLock);
+
     if (m_currentLocation.isEmpty() || m_currentLocation.last() != location)
         m_currentLocation.push_back(location);
 }
@@ -1655,6 +1720,7 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
         {
             // get popup stack main screen
             stack = GetMythMainWindow()->GetStack("popup stack");
+
             if (!stack->GetLocation(true).isEmpty())
                 result += '/' + stack->GetLocation(false);
         }
@@ -1676,6 +1742,7 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
         {
             // get popup stack top screen
             stack = GetMythMainWindow()->GetStack("popup stack");
+
             if (!stack->GetLocation(false).isEmpty())
                 result = stack->GetLocation(false);
         }

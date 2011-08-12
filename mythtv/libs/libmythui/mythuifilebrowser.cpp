@@ -44,6 +44,7 @@ void MFileInfo::init(QString fileName, QString sgDir, bool isDir,
         m_storageGroup = qurl.userName();
         m_storageGroupDir = sgDir;
         m_subDir = qurl.path();
+
         if (!qurl.fragment().isEmpty())
             m_subDir += "#" + qurl.fragment();
 
@@ -146,7 +147,7 @@ qint64 MFileInfo::size(void) const
 
 MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
                                      const QString &startPath)
-                :MythScreenType(parent, "mythuifilebrowser")
+    : MythScreenType(parent, "mythuifilebrowser")
 {
     m_retObject = NULL;
 
@@ -173,6 +174,7 @@ void MythUIFileBrowser::Init(const QString &startPath)
         m_isRemote = true;
 
         QUrl qurl(startPath);
+
         if (!qurl.path().isEmpty())
         {
             // Force browing of remote SG's to start at their root
@@ -187,7 +189,7 @@ void MythUIFileBrowser::Init(const QString &startPath)
             m_baseDirectory = startPath;
 
             if (m_baseDirectory.endsWith("/"))
-                m_baseDirectory.remove(m_baseDirectory.length()-1, 1);
+                m_baseDirectory.remove(m_baseDirectory.length() - 1, 1);
         }
 
         m_subDirectory = "";
@@ -220,7 +222,7 @@ bool MythUIFileBrowser::Create()
     if (!m_fileList || !m_locationEdit || !m_okButton || !m_cancelButton)
     {
         LOG(VB_GENERAL, LOG_ERR, "MythUIFileBrowser: Your theme is missing"
-                                 " some UI elements! Bailing out.");
+            " some UI elements! Bailing out.");
         return false;
     }
 
@@ -231,8 +233,10 @@ bool MythUIFileBrowser::Create()
     connect(m_locationEdit, SIGNAL(LosingFocus()), SLOT(editLostFocus()));
     connect(m_okButton, SIGNAL(Clicked()), SLOT(OKPressed()));
     connect(m_cancelButton, SIGNAL(Clicked()), SLOT(cancelPressed()));
+
     if (m_backButton)
         connect(m_backButton, SIGNAL(Clicked()), SLOT(backPressed()));
+
     if (m_homeButton)
         connect(m_homeButton, SIGNAL(Clicked()), SLOT(homePressed()));
 
@@ -243,7 +247,7 @@ bool MythUIFileBrowser::Create()
 }
 
 void MythUIFileBrowser::SetReturnEvent(QObject *retobject,
-                                        const QString &resultid)
+                                       const QString &resultid)
 {
     m_retObject = retobject;
     m_id = resultid;
@@ -269,8 +273,10 @@ void MythUIFileBrowser::PathSelected(MythUIButtonListItem *item)
     {
         if (m_infoText)
             m_infoText->Reset();
+
         if (m_filenameText)
             m_filenameText->Reset();
+
         if (m_fullpathText)
             m_fullpathText->Reset();
     }
@@ -309,6 +315,7 @@ void MythUIFileBrowser::PathClicked(MythUIButtonListItem *item)
                                           item->GetData());
             QCoreApplication::postEvent(m_retObject, dce);
         }
+
         Close();
         return;
     }
@@ -345,6 +352,7 @@ bool MythUIFileBrowser::IsImage(QString extension)
     extension = extension.toLower();
 
     QList<QByteArray> formats = QImageReader::supportedImageFormats();
+
     if (formats.contains(extension.toAscii()))
         return true;
 
@@ -365,18 +373,22 @@ void MythUIFileBrowser::backPressed()
     if (m_isRemote)
     {
         m_subDirectory = m_parentDir;
+
         if (m_subDirectory.startsWith(m_baseDirectory))
         {
             m_subDirectory.remove(0, m_baseDirectory.length());
+
             if (m_subDirectory.startsWith("/"))
                 m_subDirectory.remove(0, 1);
         }
+
         m_storageGroupDir = m_parentSGDir;
     }
     else
     {
         // move up one directory
         int pos = m_subDirectory.lastIndexOf('/');
+
         if (pos > 0)
             m_subDirectory = m_subDirectory.left(pos);
         else
@@ -411,8 +423,8 @@ void MythUIFileBrowser::OKPressed()
     {
         QString selectedPath = m_locationEdit->GetText();
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
-                                                            selectedPath,
-                                                            item->GetData());
+                                                               selectedPath,
+                                                               item->GetData());
         QCoreApplication::postEvent(m_retObject, dce);
     }
 
@@ -439,14 +451,17 @@ void MythUIFileBrowser::updateRemoteFileList()
     QStringList sgdirlist;
     QString     sgdir;
     QStringList slist;
+
     if (!m_baseDirectory.endsWith("/"))
         m_baseDirectory.append("/");
+
     QString dirURL = QString("%1%2").arg(m_baseDirectory)
-                                     .arg(m_subDirectory);
+                     .arg(m_subDirectory);
+
     if (!GetRemoteFileList(m_baseDirectory, sgdir, sgdirlist))
     {
         LOG(VB_GENERAL, LOG_ERR, "GetRemoteFileList failed to get "
-                                 "Storage Group dirs");
+            "Storage Group dirs");
         return;
     }
 
@@ -462,7 +477,7 @@ void MythUIFileBrowser::updateRemoteFileList()
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("GetRemoteFileList failed for '%1' in '%2' SG dir")
-                .arg(dirURL).arg(m_storageGroupDir));
+            .arg(dirURL).arg(m_storageGroupDir));
         return;
     }
 
@@ -479,11 +494,13 @@ void MythUIFileBrowser::updateRemoteFileList()
         type = "upfolder";
 
         m_parentDir = m_baseDirectory;
+
         if (!m_subDirectory.isEmpty())
         {
             m_parentDir += "/" + m_subDirectory;
 
             int pos = m_parentDir.lastIndexOf('/');
+
             if (pos > 0)
                 m_parentDir = m_parentDir.left(pos);
         }
@@ -498,13 +515,14 @@ void MythUIFileBrowser::updateRemoteFileList()
             m_parentSGDir = "";
         }
 
-        MythUIButtonListItem* item = new MythUIButtonListItem(
-                                                m_fileList, displayName,
-                                                qVariantFromValue(finfo));
+        MythUIButtonListItem *item = new MythUIButtonListItem(
+            m_fileList, displayName,
+            qVariantFromValue(finfo));
 
         item->SetText(QString("0"), "filesize");
         item->SetText(m_parentDir, "fullpath");
         item->DisplayState(type, "nodetype");
+
         if (m_backButton)
             m_backButton->SetEnabled(true);
     }
@@ -515,9 +533,11 @@ void MythUIFileBrowser::updateRemoteFileList()
     }
 
     QStringList::const_iterator it = slist.begin();
+
     while (it != slist.end())
     {
         QStringList tokens = (*it).split("::");
+
         if (tokens.size() < 2)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("failed to parse '%1'.").arg(*it));
@@ -531,10 +551,10 @@ void MythUIFileBrowser::updateRemoteFileList()
             dataName = m_baseDirectory;
         else if (m_subDirectory.isEmpty())
             dataName = QString("%1%2").arg(m_baseDirectory)
-                               .arg(displayName);
+                       .arg(displayName);
         else
             dataName = QString("%1%2/%3").arg(m_baseDirectory)
-                               .arg(m_subDirectory).arg(displayName);
+                       .arg(m_subDirectory).arg(displayName);
 
         MFileInfo finfo(dataName, m_storageGroupDir);
 
@@ -572,7 +592,7 @@ void MythUIFileBrowser::updateRemoteFileList()
             continue;
         }
 
-        MythUIButtonListItem* item =
+        MythUIButtonListItem *item =
             new MythUIButtonListItem(m_fileList, displayName,
                                      qVariantFromValue(finfo));
 
@@ -601,7 +621,7 @@ void MythUIFileBrowser::updateLocalFileList()
     if (!d.exists())
     {
         LOG(VB_GENERAL, LOG_ERR,
-                "MythUIFileBrowser: current directory does not exist!");
+            "MythUIFileBrowser: current directory does not exist!");
         m_locationEdit->SetText("/");
         m_subDirectory = "/";
         d.setPath("/");
@@ -612,18 +632,20 @@ void MythUIFileBrowser::updateLocalFileList()
 
     if (list.isEmpty())
     {
-        MythUIButtonListItem* item = new MythUIButtonListItem(m_fileList,
-                                                        tr("Parent Directory"));
+        MythUIButtonListItem *item = new MythUIButtonListItem(m_fileList,
+                                                              tr("Parent Directory"));
         item->DisplayState("upfolder", "nodetype");
     }
     else
     {
         QFileInfoList::const_iterator it = list.begin();
         const QFileInfo *fi;
+
         while (it != list.end())
         {
             fi = &(*it);
             MFileInfo finfo(fi->filePath());
+
             if (finfo.fileName() == ".")
             {
                 ++it;
@@ -632,6 +654,7 @@ void MythUIFileBrowser::updateLocalFileList()
 
             QString displayName = finfo.fileName();
             QString type;
+
             if (displayName == "..")
             {
                 if (m_subDirectory.endsWith("/"))
@@ -657,7 +680,7 @@ void MythUIFileBrowser::updateLocalFileList()
                 type = "file";
             }
 
-            MythUIButtonListItem* item =
+            MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_fileList, displayName,
                                          qVariantFromValue(finfo));
 
@@ -712,6 +735,7 @@ bool MythUIFileBrowser::GetRemoteFileList(const QString &url,
     list << storageGroup;
 
     QString path = sgDir + qurl.path();
+
     if (!qurl.fragment().isEmpty())
         path += "#" + qurl.fragment();
 
