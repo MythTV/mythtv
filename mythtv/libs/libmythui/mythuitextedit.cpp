@@ -409,8 +409,7 @@ void MythUITextEdit::CopyTextToClipboard()
 {
     QClipboard *clipboard = QApplication::clipboard();
 
-    if (clipboard)
-        clipboard->setText(m_Message);
+    clipboard->setText(m_Message);
 }
 
 void MythUITextEdit::PasteTextFromClipboard(QClipboard::Mode mode)
@@ -420,8 +419,7 @@ void MythUITextEdit::PasteTextFromClipboard(QClipboard::Mode mode)
     if (!clipboard->supportsSelection())
         mode = QClipboard::Clipboard;
 
-    if (clipboard)
-        InsertText(clipboard->text(mode));
+    InsertText(clipboard->text(mode));
 }
 
 bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
