@@ -474,7 +474,7 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     else
         infoMap["lentime"] = minstring;
 
-    
+
     infoMap["timedate"] = MythDateTimeToString(startts,
                                             kDateTimeFull | kSimplify) + " - " +
                           MythDateTimeToString(endts, kTime);
@@ -602,6 +602,7 @@ void RecordingRule::AssignProgramInfo()
         }
     }
     m_category = m_progInfo->GetCategory();
+    m_inetref = "";
 }
 
 unsigned RecordingRule::GetDefaultFilter(void)
