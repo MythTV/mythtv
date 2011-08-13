@@ -261,7 +261,6 @@ class DBDataWrite( DBData ):
                         db.tablefields[cls._table][cls._key[0]].extra:
                     create = cls._create_autoincrement
                     cls._defaults[cls._key[0]] = None
-                    return
         if not hasattr(cls, 'create'):
             cls.create = create
 
