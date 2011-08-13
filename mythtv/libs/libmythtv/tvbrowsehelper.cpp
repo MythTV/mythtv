@@ -79,15 +79,15 @@ bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (ctx->playingInfo)
     {
-        m_ctx = ctx;
-        BrowseInfo bi(BROWSE_SAME,
-                      ctx->playingInfo->GetChanNum(),
-                      ctx->playingInfo->GetChanID(),
-                      ctx->playingInfo->GetScheduledStartTime(ISODate));
+        m_ctx       = ctx;
+        m_channum   = ctx->playingInfo->GetChanNum();
+        m_chanid    = ctx->playingInfo->GetChanID();
+        m_starttime = ctx->playingInfo->GetScheduledStartTime(ISODate);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
         if (!skip_browse)
         {
+            BrowseInfo bi(BROWSE_SAME, m_channum, m_chanid, m_starttime);
             locker.unlock();
             BrowseDispInfo(ctx, bi);
         }
