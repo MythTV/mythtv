@@ -2918,7 +2918,7 @@ void PlaybackBox::showRecordingPopup()
     m_popupMenu->AddButton(tr("Allow this episode to re-record"),
                             SLOT(doAllowRerecord()));
 
-    m_popupMenu->AddButton(tr("Show Program Details"),
+    m_popupMenu->AddButton(tr("Show Recording Details"),
                             SLOT(showProgramDetails()));
 
     m_popupMenu->AddButton(tr("Change Recording Metadata"),
@@ -3078,7 +3078,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         (asZeroByte      == pginfo.GetAvailableStatus()))
     {
         m_popupMenu->AddButton(
-            tr("Show Program Details"), SLOT(showProgramDetails()));
+            tr("Show Recording Details"), SLOT(showProgramDetails()));
         m_popupMenu->AddButton(
             tr("Delete"),               SLOT(askDelete()));
 
