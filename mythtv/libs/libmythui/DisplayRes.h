@@ -71,7 +71,7 @@ class MUI_PUBLIC DisplayRes
     /** \brief Switches to the GUI resolution specified.
      *
      *   If which_gui is GUI then this switches to the resolution
-     *   and refresh rate set in the database for the GUI. If 
+     *   and refresh rate set in the database for the GUI. If
      *   which_gui is set to CUSTOM_GUI then we switch to the
      *   resolution and refresh rate specified in the last
      *   call to SwitchToCustomGUI(int, int, short).
@@ -84,8 +84,8 @@ class MUI_PUBLIC DisplayRes
      *
      *   This switches to the specified resolution, and refresh
      *   rate if specified. It also makes saves this resolution
-     *   as the CUSTOM_GUI resolution, so that it can be 
-     *   recalled with SwitchToGUI(CUSTOM_GUI) in later 
+     *   as the CUSTOM_GUI resolution, so that it can be
+     *   recalled with SwitchToGUI(CUSTOM_GUI) in later
      *   DisplayRes calls.
      *  \sa SwitchToGUI(tmode)
      */
@@ -98,25 +98,25 @@ class MUI_PUBLIC DisplayRes
      */
 
     /** \brief Returns current screen width in pixels. */
-    int GetWidth(void)          const { return last.Width(); }
+    int GetWidth(void)          const { return m_last.Width(); }
 
     /** \brief Returns current screen width in pixels. */
-    int GetHeight(void)         const { return last.Height(); }
+    int GetHeight(void)         const { return m_last.Height(); }
 
     /** \brief Returns current screen width in millimeters. */
-    int GetPhysicalWidth(void)  const { return last.Width_mm(); }
+    int GetPhysicalWidth(void)  const { return m_last.Width_mm(); }
 
     /** \brief Returns current screen height in millimeters. */
-    int GetPhysicalHeight(void) const { return last.Height_mm(); }
+    int GetPhysicalHeight(void) const { return m_last.Height_mm(); }
 
     /** \brief Returns current screen refresh rate. */
-    double GetRefreshRate(void)    const { return last.RefreshRate(); }
+    double GetRefreshRate(void)    const { return m_last.RefreshRate(); }
     /** \brief Returns current screen aspect ratio.
      *
      *  If there is an aspect overide in the database that aspect
      *  ratio is returned instead of the actual screen aspect ratio.
      */
-    double GetAspectRatio(void) const { return last.AspectRatio(); }
+    double GetAspectRatio(void) const { return m_last.AspectRatio(); }
     /** @} */
 
 
@@ -125,11 +125,11 @@ class MUI_PUBLIC DisplayRes
      */
 
     /// \brief Returns maximum width in pixels supported by display.
-    int GetMaxWidth(void)    const { return max_width; }
+    int GetMaxWidth(void)    const { return m_maxWidth; }
     /// \brief Returns maximum height in pixels supported by display.
-    int GetMaxHeight(void)   const { return max_height; }
+    int GetMaxHeight(void)   const { return m_maxHeight; }
     /// \brief Returns the pixel aspect ratio of the display.
-    double GetPixelAspectRatio(void) const { return pixelAspectRatio; }
+    double GetPixelAspectRatio(void) const { return m_pixelAspectRatio; }
     /// \brief Returns all video modes supported by the display.
     virtual const DisplayResVector& GetVideoModes() const = 0;
     /// \brief Returns refresh rates available at a specific screen resolution.
@@ -138,9 +138,9 @@ class MUI_PUBLIC DisplayRes
 
   protected:
     /// \brief DisplayRes is an abstract class, instanciate with GetDisplayRes(void)
-    DisplayRes(void) : cur_mode(GUI), max_width(0), max_height(0) {;}
+    DisplayRes(void) : m_curMode(GUI), m_maxWidth(0), m_maxHeight(0) {;}
     virtual ~DisplayRes(void) {;}
-    
+
     // These methods are implemented by the subclasses
     virtual bool GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
                                 int &h_mm, double &rate, double &par) const = 0;
@@ -149,25 +149,25 @@ class MUI_PUBLIC DisplayRes
   private:
     DisplayRes(const DisplayRes & rhs); // disable copy constructor;
 
-    tmode cur_mode;           // current mode
-    DisplayResScreen mode[MAX_MODES];
-    DisplayResScreen last;    // mirror of mode[current_mode]
+    tmode m_curMode;           // current mode
+    DisplayResScreen m_mode[MAX_MODES];
+    DisplayResScreen m_last;    // mirror of mode[current_mode]
 
     /// maps input video parameters to output video modes
-    DisplayResMap in_size_to_output_mode;
+    DisplayResMap m_inSizeToOutputMode;
 
-    int max_width, max_height;
+    int m_maxWidth, m_maxHeight;
 
-    double pixelAspectRatio;
+    double m_pixelAspectRatio;
 
-    static DisplayRes *instance;
-    static bool        locked;
+    static DisplayRes *m_instance;
+    static bool        m_locked;
 };
 
 /** \fn GetVideoModes(void)
  *  \relates DisplayRes
  *  \brief Returns all video modes available.
- * 
+ *
  *   This is a conveniance class that instanciates a DisplayRes
  *   class if needed, and returns a copy of vector returned by
  *   GetVideoModes(void).
