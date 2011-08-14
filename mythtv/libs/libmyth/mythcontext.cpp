@@ -554,7 +554,6 @@ QString MythContextPrivate::TestDBconnection(void)
     bool    doPing = m_DBparams.dbHostPing;
     QString err    = QString::null;
     QString host   = m_DBparams.dbHostName;
-    int     port   = m_DBparams.dbPort;
 
 
     // 1. Check the supplied host or IP address, to prevent the app
@@ -602,17 +601,7 @@ QString MythContextPrivate::TestDBconnection(void)
     }
 
 
-    // 2. Check that the supplied DBport is listening:
-
-    if (host != "localhost" && port && !telnet(host, port))
-    {
-        SilenceDBerrors();
-        err = QObject::tr("Cannot connect to port %1 on database host %2");
-        return err.arg(port).arg(host);
-    }
-
-
-    // 3. Finally, try to login, et c:
+    // 2. Try to login, et c:
 
     // Current DB connection may have been silenced (invalid):
     ResetDatabase();
