@@ -2915,7 +2915,7 @@ void PlaybackBox::showRecordingPopup()
     m_popupMenu->AddButton(tr("Edit Recording Schedule"),
                             SLOT(doEditScheduled()));
 
-    m_popupMenu->AddButton(tr("Allow this program to re-record"),
+    m_popupMenu->AddButton(tr("Allow this episode to re-record"),
                             SLOT(doAllowRerecord()));
 
     m_popupMenu->AddButton(tr("Show Program Details"),
