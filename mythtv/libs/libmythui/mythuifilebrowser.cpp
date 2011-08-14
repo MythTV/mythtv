@@ -588,7 +588,7 @@ void MythUIFileBrowser::updateRemoteFileList()
         else
         {
             // unknown type or filtered out
-            it++;
+            ++it;
             continue;
         }
 
@@ -605,7 +605,7 @@ void MythUIFileBrowser::updateRemoteFileList()
         item->SetText(dataName, "fullpath");
         item->DisplayState(type, "nodetype");
 
-        it++;
+        ++it;
     }
 }
 
