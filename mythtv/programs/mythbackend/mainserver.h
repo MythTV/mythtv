@@ -33,6 +33,8 @@ class MythServer;
 class QTimer;
 class FileSystemInfo;
 class MetadataFactory;
+class FreeSpaceUpdater;
+
 class DeleteStruct 
 {
     friend class MainServer;
@@ -89,6 +91,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     friend class DeleteThread;
     friend class TruncateThread;
+    friend class FreeSpaceUpdater;
   public:
     MainServer(bool master, int port,
                QMap<int, EncoderLink *> *tvList,
@@ -262,6 +265,11 @@ class MainServer : public QObject, public MythSocketCBs
     QReadWriteLock sockListLock;
     vector<PlaybackSock *> playbackList;
     vector<FileTransfer *> fileTransferList;
+
+    QMutex masterFreeSpaceListLock;
+    FreeSpaceUpdater *masterFreeSpaceListUpdater;
+    QWaitCondition masterFreeSpaceListWait;
+    QStringList masterFreeSpaceList;
 
     QTimer *masterServerReconnect; // audited ref #5318
     PlaybackSock *masterServer;

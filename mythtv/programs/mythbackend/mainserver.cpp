@@ -140,10 +140,81 @@ class ProcessRequestRunnable : public QRunnable
     MythSocket *m_sock;
 };
 
+class FreeSpaceUpdater : public QRunnable
+{
+  public:
+    FreeSpaceUpdater(MainServer &parent) :
+        m_parent(parent), m_dorun(true), m_running(true)
+    {
+        m_lastRequest.start();
+    }
+    ~FreeSpaceUpdater()
+    {
+        QMutexLocker locker(&m_parent.masterFreeSpaceListLock);
+        m_parent.masterFreeSpaceListUpdater = NULL;
+        m_parent.masterFreeSpaceListWait.wakeAll();
+    }
+
+    virtual void run(void)
+    {
+        while (true)
+        {
+            MythTimer t;
+            t.start();
+            QStringList list;
+            m_parent.BackendQueryDiskSpace(list, true, true);
+            {
+                QMutexLocker locker(&m_parent.masterFreeSpaceListLock);
+                m_parent.masterFreeSpaceList = list;
+            }
+            QMutexLocker locker(&m_lock);
+            int left = kRequeryTimeout - t.elapsed();
+            if (m_lastRequest.elapsed() + left > kExitTimeout)
+                m_dorun = false;
+            if (!m_dorun)
+            {
+                m_running = false;
+                break;
+            }
+            if (left > 50)
+                m_wait.wait(locker.mutex(), left);
+        }
+    }
+
+    bool KeepRunning(bool dorun)
+    {
+        QMutexLocker locker(&m_lock);
+        if (dorun && m_running)
+        {
+            m_dorun = true;
+            m_lastRequest.restart();
+        }
+        else
+        {
+            m_dorun = false;
+            m_wait.wakeAll();
+        }
+        return m_running;
+    }
+
+    MainServer &m_parent;
+    QMutex m_lock;
+    bool m_dorun;
+    bool m_running;
+    MythTimer m_lastRequest;
+    QWaitCondition m_wait;
+    const static int kRequeryTimeout;
+    const static int kExitTimeout;
+};
+const int FreeSpaceUpdater::kRequeryTimeout = 15000;
+const int FreeSpaceUpdater::kExitTimeout = 61000;
+
 MainServer::MainServer(bool master, int port,
                        QMap<int, EncoderLink *> *tvList,
                        Scheduler *sched, AutoExpire *expirer) :
-    encoderList(tvList), mythserver(NULL), masterServerReconnect(NULL),
+    encoderList(tvList), mythserver(NULL),
+    masterFreeSpaceListUpdater((master) ? new FreeSpaceUpdater(*this) : NULL),
+    masterServerReconnect(NULL),
     masterServer(NULL), ismaster(master), threadPool("ProcessRequestPool"),
     masterBackendOverride(false),
     m_sched(sched), m_expirer(expirer), deferredDeleteTimer(NULL),
@@ -201,6 +272,20 @@ MainServer::MainServer(bool master, int port,
     autoexpireUpdateTimer->setSingleShot(true);
 
     AutoExpire::Update(true);
+
+    masterFreeSpaceList << gCoreContext->GetHostName();
+    masterFreeSpaceList << "TotalDiskSpace";
+    masterFreeSpaceList << "0";
+    masterFreeSpaceList << "-2";
+    masterFreeSpaceList << "-2";
+    masterFreeSpaceList << "0";
+    masterFreeSpaceList << "0";
+    masterFreeSpaceList << "0";
+    if (masterFreeSpaceListUpdater)
+    {
+        MThreadPool::globalInstance()->startReserved(
+            masterFreeSpaceListUpdater, "FreeSpaceUpdater");
+    }
 }
 
 MainServer::~MainServer()
@@ -212,6 +297,12 @@ MainServer::~MainServer()
 void MainServer::Stop()
 {
     m_stopped = true;
+
+    {
+        QMutexLocker locker(&masterFreeSpaceListLock);
+        if (masterFreeSpaceListUpdater)
+            masterFreeSpaceListUpdater->KeepRunning(false);
+    }
 
     threadPool.Stop();
 
@@ -239,6 +330,15 @@ void MainServer::Stop()
 
     if (m_expirer)
         m_expirer->SetMainServer(NULL);
+
+    {
+        QMutexLocker locker(&masterFreeSpaceListLock);
+        while (masterFreeSpaceListUpdater)
+        {
+            masterFreeSpaceListUpdater->KeepRunning(false);
+            masterFreeSpaceListWait.wait(locker.mutex());
+        }
+    }
 }
 
 void MainServer::autoexpireUpdate(void)
@@ -2645,11 +2745,25 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
 {
     QStringList strlist;
 
-    BackendQueryDiskSpace(strlist, allHosts, allHosts);
-    if (strlist.isEmpty())
-        LOG(VB_GENERAL, LOG_ERR,
-            "No directories found for file storage. Please "
-            "check the Storage Groups setting for this backend.");
+    if (allHosts)
+    {
+        QMutexLocker locker(&masterFreeSpaceListLock);
+        strlist = masterFreeSpaceList;
+        if (!masterFreeSpaceListUpdater ||
+            !masterFreeSpaceListUpdater->KeepRunning(true))
+        {
+            while (masterFreeSpaceListUpdater)
+            {
+                masterFreeSpaceListUpdater->KeepRunning(false);
+                masterFreeSpaceListWait.wait(locker.mutex());
+            }
+            masterFreeSpaceListUpdater = new FreeSpaceUpdater(*this);
+            MThreadPool::globalInstance()->startReserved(
+                masterFreeSpaceListUpdater, "FreeSpaceUpdater");
+        }
+    }
+    else
+        BackendQueryDiskSpace(strlist, allHosts, allHosts);
 
     SendResponse(pbs->getSocket(), strlist);
 }
@@ -2661,17 +2775,39 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
  */
 void MainServer::HandleQueryFreeSpaceSummary(PlaybackSock *pbs)
 {
-    QStringList fullStrList;
-    QStringList strList;
-
-    BackendQueryDiskSpace(fullStrList, true, true);
+    QStringList strlist;
+    {
+        QMutexLocker locker(&masterFreeSpaceListLock);
+        strlist = masterFreeSpaceList;
+        if (!masterFreeSpaceListUpdater ||
+            !masterFreeSpaceListUpdater->KeepRunning(true))
+        {
+            while (masterFreeSpaceListUpdater)
+            {
+                masterFreeSpaceListUpdater->KeepRunning(false);
+                masterFreeSpaceListWait.wait(locker.mutex());
+            }
+            masterFreeSpaceListUpdater = new FreeSpaceUpdater(*this);
+            MThreadPool::globalInstance()->startReserved(
+                masterFreeSpaceListUpdater, "FreeSpaceUpdater");
+        }
+    }
 
     // The TotalKB and UsedKB are the last two numbers encoded in the list
-    unsigned int index = fullStrList.size() - 2;
-    strList << fullStrList[index++];
-    strList << fullStrList[index++];
+    QStringList shortlist;
+    if (strlist.size() < 4)
+    {
+        shortlist << QString("0");
+        shortlist << QString("0");
+    }
+    else
+    {
+        unsigned int index = strlist.size() - 2;
+        shortlist << strlist[index++];
+        shortlist << strlist[index++];
+    }
 
-    SendResponse(pbs->getSocket(), strList);
+    SendResponse(pbs->getSocket(), shortlist);
 }
 
 /**
