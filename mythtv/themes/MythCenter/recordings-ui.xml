@@ -146,7 +146,7 @@
                         <font>basesmallboldblue</font>
                     </textarea>
                     <textarea name="starttime" from="shortstartdate">
-                        <area>450,1,95,24</area>
+                        <area>440,1,105,24</area>
                         <align>right</align>
                         <font>basesmallboldblue</font>
                     </textarea>
@@ -177,7 +177,7 @@
                         <font>basesmallbold</font>
                     </textarea>
                     <textarea name="starttime" from="shortstartdate">
-                        <area>450,1,95,24</area>
+                        <area>440,1,105,24</area>
                         <align>right</align>
                         <font>basesmallbold</font>
                     </textarea>
