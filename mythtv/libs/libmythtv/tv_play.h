@@ -10,9 +10,6 @@
 #include <vector>
 using namespace std;
 
-// POSIX
-#include <pthread.h>
-
 // Qt
 #include <QReadWriteLock>
 #include <QWaitCondition>
@@ -56,6 +53,7 @@ class TV;
 class OSDListTreeItemEnteredEvent;
 class OSDListTreeItemSelectedEvent;
 class TVBrowseHelper;
+class DDLoader;
 struct osdInfo;
 
 typedef QMap<QString,InfoMap>    DDValueMap;
@@ -149,6 +147,7 @@ class MTV_PUBLIC TV : public QObject
     friend class ViewScheduled;
     friend class TvPlayWindow;
     friend class TVBrowseHelper;
+    friend class DDLoader;
 
     Q_OBJECT
   public:
@@ -511,8 +510,6 @@ class MTV_PUBLIC TV : public QObject
                           QString field, bool    allow_partial = false) const;
     bool LoadDDMap(uint sourceid);
     void RunLoadDDMap(uint sourceid);
-    static void *load_dd_map_thunk(void*);
-    static void *load_dd_map_post_thunk(void*);
 
     // General dialog handling
     bool DialogIsVisible(PlayerContext *ctx, const QString &dialog);
@@ -690,8 +687,7 @@ class MTV_PUBLIC TV : public QObject
 
     DDKeyMap  ddMap;                ///< DataDirect channel map
     uint      ddMapSourceId;        ///< DataDirect channel map sourceid
-    bool      ddMapLoaderRunning;   ///< Is DataDirect loader thread running
-    pthread_t ddMapLoader;          ///< DataDirect map loader thread
+    DDLoader *ddMapLoader;          ///< DataDirect map loader runnable
 
     /// Vector or sleep timer sleep times in seconds,
     /// with the appropriate UI message.

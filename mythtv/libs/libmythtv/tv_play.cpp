@@ -4,18 +4,18 @@
 #include <cmath>
 #include <unistd.h>
 #include <stdint.h>
-#include <pthread.h>
 
 #include <algorithm>
 using namespace std;
 
 #include <QCoreApplication>
-#include <QRegExp>
-#include <QFile>
-#include <QTimer>
-#include <QDir>
 #include <QKeyEvent>
+#include <QRunnable>
+#include <QRegExp>
+#include <QTimer>
 #include <QEvent>
+#include <QFile>
+#include <QDir>
 
 #include "mythdb.h"
 #include "tv_play.h"
@@ -148,6 +148,43 @@ EMBEDRETURNVOIDEPG TV::RunProgramGuidePtr = NULL;
  */
 EMBEDRETURNVOIDFINDER TV::RunProgramFinderPtr = NULL;
 
+/// Helper class to load channel info for channel editor
+class DDLoader : public QRunnable
+{
+  public:
+    DDLoader(TV *parent) : m_parent(parent), m_sourceid(0)
+    {
+        setAutoDelete(false);
+    }
+
+    void SetParent(TV *parent) { m_parent = parent; }
+    void SetSourceID(uint sourceid) { m_sourceid = sourceid; }
+
+    virtual void run(void)
+    {
+        if (m_parent)
+            m_parent->RunLoadDDMap(m_sourceid);
+        else
+            SourceUtil::UpdateChannelsFromListings(m_sourceid);
+
+        QMutexLocker locker(&m_lock);
+        m_sourceid = 0;
+        m_wait.wakeAll();
+    }
+
+    void wait(void)
+    {
+        QMutexLocker locker(&m_lock);
+        while (m_sourceid)
+            m_wait.wait(locker.mutex());
+    }
+
+  private:
+    TV *m_parent;
+    uint m_sourceid;
+    QMutex m_lock;
+    QWaitCondition m_wait;
+};
 
 /**
  * \brief If any cards are configured, return the number.
@@ -813,7 +850,7 @@ TV::TV(void)
       askAllowLock(QMutex::Recursive),
       // Channel Editing
       chanEditMapLock(QMutex::Recursive),
-      ddMapSourceId(0), ddMapLoaderRunning(false),
+      ddMapSourceId(0), ddMapLoader(new DDLoader(this)),
       // Sleep Timer
       sleep_index(0), sleepTimerId(0), sleepDialogTimerId(0),
       // Idle Timer
@@ -857,7 +894,6 @@ TV::TV(void)
       pseudoChangeChanTimerId(0),   speedChangeTimerId(0),
       errorRecoveryTimerId(0),      exitPlayerTimerId(0)
 {
-    memset(&ddMapLoader, 0, sizeof(pthread_t));
     LOG(VB_GENERAL, LOG_INFO, LOC + "Creating TV object");
     ctorTime.start();
 
@@ -1168,18 +1204,24 @@ TV::~TV(void)
         lcd->switchToTime();
     }
 
-    if (ddMapLoaderRunning)
+    if (ddMapLoader)
     {
-        pthread_join(ddMapLoader, NULL);
-        ddMapLoaderRunning = false;
+        ddMapLoader->wait();
 
         if (ddMapSourceId)
         {
-            int *src = new int;
-            *src = ddMapSourceId;
-            pthread_create(&ddMapLoader, NULL, load_dd_map_post_thunk, src);
-            pthread_detach(ddMapLoader);
+            ddMapLoader->SetParent(NULL);
+            ddMapLoader->SetSourceID(ddMapSourceId);
+            ddMapLoader->setAutoDelete(true);
+            MThreadPool::globalInstance()->start(ddMapLoader, "DDLoadMapPost");
         }
+        else
+        {
+            delete ddMapLoader;
+        }
+
+        ddMapSourceId = 0;
+        ddMapLoader = NULL;
     }
 
     if (browsehelper)
@@ -9076,36 +9118,6 @@ static void insert_map(InfoMap &infoMap, const InfoMap &newMap)
         infoMap.insert(it.key(), *it);
 }
 
-class load_dd_map
-{
-  public:
-    load_dd_map(TV *t, uint s) : tv(t), sourceid(s) {}
-    TV   *tv;
-    uint  sourceid;
-};
-
-void *TV::load_dd_map_thunk(void *param)
-{
-    load_dd_map *x = (load_dd_map*) param;
-    threadRegister("LoadDDMap");
-    x->tv->RunLoadDDMap(x->sourceid);
-    GetMythDB()->GetDBManager()->CloseDatabases();
-    threadDeregister();
-    delete x;
-    return NULL;
-}
-
-void *TV::load_dd_map_post_thunk(void *param)
-{
-    uint *sourceid = (uint*) param;
-    threadRegister("LoadDDMapPost");
-    SourceUtil::UpdateChannelsFromListings(*sourceid);
-    GetMythDB()->GetDBManager()->CloseDatabases();
-    threadDeregister();
-    delete sourceid;
-    return NULL;
-}
-
 /** \fn TV::StartChannelEditMode(PlayerContext*)
  *  \brief Starts channel editing mode.
  */
@@ -9120,11 +9132,7 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
     ReturnOSDLock(ctx, osd);
 
     QMutexLocker locker(&chanEditMapLock);
-    if (ddMapLoaderRunning)
-    {
-        pthread_join(ddMapLoader, NULL);
-        ddMapLoaderRunning = false;
-    }
+    ddMapLoader->wait();
 
     // Get the info available from the backend
     chanEditMap.clear();
@@ -9148,12 +9156,8 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
 
     if (sourceid && (sourceid != ddMapSourceId))
     {
-        ddMapLoaderRunning = true;
-        if (!pthread_create(&ddMapLoader, NULL, load_dd_map_thunk,
-                            new load_dd_map(this, sourceid)))
-        {
-            ddMapLoaderRunning = false;
-        }
+        ddMapLoader->SetSourceID(sourceid);
+        MThreadPool::globalInstance()->start(ddMapLoader, "DDMapLoader");
     }
 }
 
