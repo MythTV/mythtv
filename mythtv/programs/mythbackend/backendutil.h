@@ -15,9 +15,6 @@ void BackendQueryDiskSpace(QStringList &strlist,
                            QMap <int, EncoderLink *> *encoderList,
                            bool consolidated = false, bool allHosts = false);
 
-void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
-                        vector <FileSystemInfo> &fsInfos);
-
 QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath = true);
 
 #endif
