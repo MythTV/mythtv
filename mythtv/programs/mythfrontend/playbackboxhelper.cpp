@@ -11,13 +11,14 @@ using namespace std;
 #include "metadataimagehelper.h"
 #include "playbackboxhelper.h"
 #include "mythcorecontext.h"
+#include "filesysteminfo.h"
 #include "tvremoteutil.h"
 #include "storagegroup.h"
+#include "mythlogging.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "mythevent.h"
 #include "mythdirs.h"
-#include "mythlogging.h"
 
 #define LOC      QString("PlaybackBoxHelper: ")
 #define LOC_WARN QString("PlaybackBoxHelper Warning: ")
@@ -381,7 +382,7 @@ void PlaybackBoxHelper::UndeleteRecording(
 
 void PlaybackBoxHelper::UpdateFreeSpace(void)
 {
-    QVector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
+    QList<FileSystemInfo> fsInfos = FileSystemInfo::RemoteGetInfo();
 
     QMutexLocker locker(&m_lock);
     for (int i = 0; i < fsInfos.size(); i++)

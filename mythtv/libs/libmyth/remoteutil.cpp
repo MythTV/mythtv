@@ -11,7 +11,6 @@
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 #include "mythevent.h"
-#include "filesysteminfo.h"
 
 vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
 {
@@ -34,15 +33,6 @@ vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
     }
  
     return info;
-}
-
-/** \fn RemoteGetFreeSpace(void)
- *  \brief Returns total and used space in kilobytes for each backend.
- */
-QVector<FileSystemInfo> RemoteGetFreeSpace(void)
-{
-    QList<FileSystemInfo> fsInfos = FileSystemInfo::RemoteGetInfo();
-    return fsInfos.toVector();
 }
 
 bool RemoteGetLoad(float load[3])

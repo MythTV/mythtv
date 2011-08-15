@@ -7,7 +7,7 @@ using namespace std;
 #include <QHostAddress>
 
 #include "mythcorecontext.h"
-
+#include "filesysteminfo.h"
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mythversion.h"
@@ -1289,7 +1289,7 @@ void StatusBox::doMachineStatus()
     // get free disk space
     QString hostnames;
 
-    QVector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
+    QList<FileSystemInfo> fsInfos = FileSystemInfo::RemoteGetInfo();
     for (int i = 0; i < fsInfos.size(); ++i)
     {
         // For a single-directory installation just display the totals

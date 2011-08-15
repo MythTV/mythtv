@@ -26,6 +26,7 @@ using namespace std;
 #include <QList>
 
 // MythTV headers
+#include "filesysteminfo.h"
 #include "autoexpire.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"

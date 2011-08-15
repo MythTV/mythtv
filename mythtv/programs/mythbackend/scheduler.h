@@ -15,6 +15,7 @@ using namespace std;
 #include <QSet>
 
 // MythTV headers
+#include "filesysteminfo.h"
 #include "recordinginfo.h"
 #include "remoteutil.h"
 #include "inputgroupmap.h"
