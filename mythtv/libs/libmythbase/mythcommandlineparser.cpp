@@ -974,7 +974,7 @@ void MythCommandLineParser::addLogging(
         "If a full filename is given, that file will be used.\n"
         "This is typically used in combination with --daemon, and if used "
         "in combination with --pidfile, this can be used with log "
-        "rotaters, using the HUP call to inform MythTV to reload the "
+        "rotators, using the HUP call to inform MythTV to reload the "
         "file (currently disabled).", "");
     add(QStringList( QStringList() << "-q" << "--quiet"), "quiet", 0,
         "Don't log to the console (-q).  Don't log anywhere (-q -q)", "");
@@ -996,7 +996,7 @@ void MythCommandLineParser::addPIDFile(void)
             "Write PID of application to filename.",
             "Write the PID of the currently running process as a single "
             "line to this file. Used for init scripts to know what "
-            "process to terminate, and with --logfile and log rotaters "
+            "process to terminate, and with --logfile and log rotators "
             "to send a HUP signal to process to have it re-open files.");
 }
 
