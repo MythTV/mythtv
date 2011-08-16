@@ -82,8 +82,9 @@ class MPoolThread : public MThread
             if (!m_runnable_name.isEmpty())
                 threadRegister(m_runnable_name);
 
+            bool autodelete = m_runnable->autoDelete();
             m_runnable->run();
-            if (m_runnable->autoDelete())
+            if (autodelete)
                 delete m_runnable;
             if (m_reserved)
                 m_pool.ReleaseThread();
