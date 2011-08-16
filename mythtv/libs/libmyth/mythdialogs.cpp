@@ -1608,11 +1608,6 @@ UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(
     return GetUIType<UIRepeatedImageType>(this, name);
 }
 
-UICheckBoxType* MythThemedDialog::getUICheckBoxType(const QString &name)
-{
-    return GetUIType<UICheckBoxType>(this, name);
-}
-
 UIBlackHoleType* MythThemedDialog::getUIBlackHoleType(const QString &name)
 {
     return GetUIType<UIBlackHoleType>(this, name);

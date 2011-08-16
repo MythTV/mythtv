@@ -637,49 +637,6 @@ class MPUBLIC UITextButtonType : public UIType
 
 };
 
-class MPUBLIC UICheckBoxType : public UIType
-{
-    Q_OBJECT
-
-    //
-    //  A simple, theme-able check box
-    //
-
-  public:
-
-    UICheckBoxType(const QString &name,
-                   QPixmap checkedp,
-                   QPixmap uncheckedp,
-                   QPixmap checked_highp,
-                   QPixmap unchecked_highp);
-
-    void    Draw(QPainter *, int drawlayer, int context);
-    void    setPosition(QPoint pos){m_displaypos = pos;}
-    void    calculateScreenArea();
-    bool    getState(){return checked;}
-
-  public slots:
-
-    void    push();
-    void    setState(bool checked_or_not);
-    void    toggle(){push();}
-    void    activate(){push();}
-
-  signals:
-
-    void    pushed(bool state);
-
-  private:
-
-    QPoint  m_displaypos;
-    QPixmap checked_pixmap;
-    QPixmap unchecked_pixmap;
-    QPixmap checked_pixmap_high;
-    QPixmap unchecked_pixmap_high;
-    bool    checked;
-    QString label;
-};
-
 class MPUBLIC UIBlackHoleType : public UIType
 {
     Q_OBJECT

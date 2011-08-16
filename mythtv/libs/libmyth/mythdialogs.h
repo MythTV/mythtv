@@ -22,7 +22,6 @@ class UITextType;
 class UIPushButtonType;
 class UITextButtonType;
 class UIRepeatedImageType;
-class UICheckBoxType;
 class UIBlackHoleType;
 class UIImageType;
 class UIStatusBarType;
@@ -369,7 +368,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     UIPushButtonType *getUIPushButtonType(const QString &name);
     UITextButtonType *getUITextButtonType(const QString &name);
     UIRepeatedImageType *getUIRepeatedImageType(const QString &name);
-    UICheckBoxType *getUICheckBoxType(const QString &name);
     UIBlackHoleType *getUIBlackHoleType(const QString &name);
     UIImageType *getUIImageType(const QString &name);
     UIStatusBarType *getUIStatusBarType(const QString &name);
