@@ -341,17 +341,6 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
     return a->GetRecordingRuleID() < b->GetRecordingRuleID();
 }
 
-static bool comp_timechannel(RecordingInfo *a, RecordingInfo *b)
-{
-    if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
-        return a->GetRecordingStartTime() < b->GetRecordingStartTime();
-    if (a->GetChanNum() == b->GetChanNum())
-        return a->GetChanID() < b->GetChanID();
-    if (a->GetChanNum().toInt() > 0 && b->GetChanNum().toInt() > 0)
-        return a->GetChanNum().toInt() < b->GetChanNum().toInt();
-    return a->GetChanNum() < b->GetChanNum();
-}
-
 bool Scheduler::FillRecordList(void)
 {
     schedMoveHigher = (bool)gCoreContext->GetNumSetting("SchedMoveHigher");
@@ -1553,8 +1542,6 @@ bool Scheduler::GetAllPending(RecList &retList) const
             hasconflicts = true;
         retList.push_back(new RecordingInfo(**it));
     }
-
-    SORT_RECLIST(retList, comp_timechannel);
 
     return hasconflicts;
 }
