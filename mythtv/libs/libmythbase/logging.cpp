@@ -435,7 +435,6 @@ bool DatabaseLogger::logqmsg(LoggingItem_t *item)
     if (!query.exec())
     {
         MythDB::DBError("DBLogging", query);
-        deleteItem(item);
         return false;
     }
 
