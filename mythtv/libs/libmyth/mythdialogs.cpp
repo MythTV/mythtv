@@ -9,7 +9,6 @@ using namespace std;
 #include <QDir>
 #include <QLayout>
 #include <QRegExp>
-#include <QImageReader>
 #include <QLabel>
 #include <QPixmap>
 #include <QKeyEvent>
@@ -1591,11 +1590,6 @@ UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(
 UITextType* MythThemedDialog::getUITextType(const QString &name)
 {
     return GetUIType<UITextType>(this, name);
-}
-
-UIRemoteEditType* MythThemedDialog::getUIRemoteEditType(const QString &name)
-{
-    return GetUIType<UIRemoteEditType>(this, name);
 }
 
 UIPushButtonType* MythThemedDialog::getUIPushButtonType(const QString &name)

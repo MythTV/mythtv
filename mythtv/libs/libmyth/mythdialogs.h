@@ -21,7 +21,6 @@ class UIManagedTreeListType;
 class UITextType;
 class UIPushButtonType;
 class UITextButtonType;
-class UIRemoteEditType;
 class UIRepeatedImageType;
 class UICheckBoxType;
 class UISelectorType;
@@ -370,7 +369,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     UITextType *getUITextType(const QString &name);
     UIPushButtonType *getUIPushButtonType(const QString &name);
     UITextButtonType *getUITextButtonType(const QString &name);
-    UIRemoteEditType *getUIRemoteEditType(const QString &name);
     UIRepeatedImageType *getUIRepeatedImageType(const QString &name);
     UICheckBoxType *getUICheckBoxType(const QString &name);
     UISelectorType *getUISelectorType(const QString &name);

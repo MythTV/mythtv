@@ -742,10 +742,6 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parseTextArea(container, info);
             }
-            else if (info.tagName() == "remoteedit")
-            {
-                parseRemoteEdit(container, info);
-            }
             else if (info.tagName() == "statusbar")
             {
                 parseStatusBar(container, info);
@@ -952,125 +948,6 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     text->SetParent(container);
     text->calculateScreenArea();
     container->AddType(text);
-}
-
-void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
-{
-    int context = -1;
-    QRect area = QRect(0, 0, 0, 0);
-    QString font = "";
-    QString value = "";
-    int draworder = 0;
-    QColor selectedColor = QColor(0, 255, 255);
-    QColor unselectedColor = QColor(100, 100, 100);
-    QColor specialColor = QColor(255, 0, 0);
-
-    QString name = element.attribute("name", "");
-    if (name.isNull() || name.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "RemoteEdit needs a name");
-        return;
-    }
-
-    QString layerNum = element.attribute("draworder", "");
-    if (layerNum.isNull() || layerNum.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "RemoteEdit needs a draworder");
-        return;
-    }
-    draworder = layerNum.toInt();
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "context")
-            {
-                context = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "area")
-            {
-                area = parseRect(getFirstText(info));
-                normalizeRect(area);
-            }
-            else if (info.tagName() == "font")
-            {
-                font = getFirstText(info);
-            }
-            else if (info.tagName() == "value")
-            {
-                if ((value.isNull() || value.isEmpty()) &&
-                    info.attribute("lang","").isEmpty())
-                {
-                    value = qApp->translate("ThemeUI",
-                                            getFirstText(info).toUtf8(),
-                                            NULL,
-                                            QCoreApplication::UnicodeUTF8);
-                }
-                else if (info.attribute("lang","").toLower() ==
-                         gCoreContext->GetLanguageAndVariant())
-                {
-                    value = getFirstText(info);
-                }
-                else if (info.attribute("lang","").toLower() ==
-                         gCoreContext->GetLanguage())
-                {
-                    value = getFirstText(info);
-                }
-            }
-            else if (info.tagName() == "charcolors")
-            {
-                QString selected = "";
-                QString unselected = "";
-                QString special = "";
-                selected = info.attribute("selected");
-                unselected = info.attribute("unselected");
-                special = info.attribute("special");
-
-                if (!selected.isEmpty())
-                    selectedColor = createColor(selected);
-
-                if (!unselected.isEmpty())
-                    unselectedColor = createColor(unselected);
-
-                if (!special.isEmpty())
-                    specialColor = createColor(special);
-            }
-
-            else
-            {
-                LOG(VB_GENERAL, LOG_WARNING, LOC +
-                    QString("Unknown tag '%1' in RemoteEdit")
-                        .arg(info.tagName()));
-                return;
-            }
-        }
-    }
-
-    fontProp *testfont = GetFont(font);
-    if (!testfont)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("Unknown font '%1' in RemoteEdit '%2'")
-                .arg(font).arg(name));
-        return;
-    }
-
-    UIRemoteEditType *edit = new UIRemoteEditType(name, testfont, value, draworder, area);
-    edit->SetScreen(wmult, hmult);
-    if (context != -1)
-    {
-        edit->SetContext(context);
-    }
-    if (value.size())
-        edit->setText(value);
-
-    edit->SetParent(container);
-    edit->setCharacterColors(unselectedColor, selectedColor, specialColor);
-    edit->calculateScreenArea();
-    container->AddType(edit);
 }
 
 void XMLParse::parseListArea(LayerSet *container, QDomElement &element)

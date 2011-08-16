@@ -388,49 +388,6 @@ class MPUBLIC UITextType : public UIType
 
 };
 
-class MPUBLIC UIRemoteEditType : public UIType
-{
-    Q_OBJECT
-
-  public:
-
-    UIRemoteEditType(const QString &name, fontProp *font, const QString &text,
-                     int dorder, QRect displayrect);
-    ~UIRemoteEditType();
-
-    void    createEdit(MythThemedDialog* parent);
-    QWidget *getEdit(void) { return (QWidget*) edit; };
-    void    Draw(QPainter *, int drawlayer, int context);
-    void    setArea(QRect area){m_displaysize = area;}
-    void    setText(const QString some_text);
-    QString getText();
-    void    setFont(fontProp *font);
-    void    setCharacterColors(QColor unselected, QColor selected, QColor special);
-    void    calculateScreenArea();
-
-  public slots:
-    void takeFocusAwayFromEditor(bool up_or_down);
-    void editorChanged(QString value);
-    virtual bool takeFocus();
-    virtual void looseFocus();
-    virtual void show();
-    virtual void hide();
-
-  signals:
-    void    textChanged(QString value);
-
-  private:
-    MythRemoteLineEdit *edit;
-    QRect    m_displaysize;
-    QString  m_text;
-    fontProp *m_font;
-    QColor   m_unselected;
-    QColor   m_selected;
-    QColor   m_special;
-
-    MythThemedDialog* m_parentDialog;
-};
-
 class MPUBLIC UIStatusBarType : public UIType
 {
   public:
