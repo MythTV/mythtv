@@ -25,7 +25,6 @@ INCLUDEPATH += replex
 INCLUDEPATH += ../../libs/libavcodec
 INCLUDEPATH += ../../libs/libavformat
 INCLUDEPATH += ../../libs/libavutil
-INCLUDEPATH += ../../libs/
 
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes) {
         DEPENDPATH  += ../../libs/libmythmpeg2
