@@ -296,7 +296,11 @@ static bool comp_recstart(RecordingInfo *a, RecordingInfo *b)
         return a->GetRecordingEndTime() < b->GetRecordingEndTime();
     if (a->GetChannelSchedulingID() != b->GetChannelSchedulingID())
         return a->GetChannelSchedulingID() < b->GetChannelSchedulingID();
-    return a->GetRecordingStatus() < b->GetRecordingStatus();
+    if (a->GetRecordingStatus() != b->GetRecordingStatus())
+        return a->GetRecordingStatus() < b->GetRecordingStatus();
+    if (a->GetChanNum() != b->GetChanNum())
+        return a->GetChanNum() < b->GetChanNum();
+    return a->GetChanID() < b->GetChanID();
 }
 
 static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
