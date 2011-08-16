@@ -29,9 +29,10 @@ class LoggerBase : public QObject {
 
     public:
         LoggerBase(char *string, int number);
-        ~LoggerBase();
+        virtual ~LoggerBase();
         virtual bool logmsg(LoggingItem *item) = 0;
         virtual void reopen(void) = 0;
+        virtual void stopDatabaseAccess(void) { }
     protected:
         LoggerHandle_t m_handle;
         bool m_string;
@@ -72,6 +73,7 @@ class DatabaseLogger : public LoggerBase {
         ~DatabaseLogger();
         bool logmsg(LoggingItem *item);
         void reopen(void) { };
+        virtual void stopDatabaseAccess(void);
     protected:
         bool logqmsg(LoggingItem *item);
     private:
@@ -99,6 +101,7 @@ class LoggerThread : public MThread
         void run(void);
         void stop(void);
         bool flush(int timeoutMS = 200000);
+        void handleItem(LoggingItem *item);
     private:
         QWaitCondition *m_waitNotEmpty; // protected by logQueueMutex
         QWaitCondition *m_waitEmpty; // protected by logQueueMutex

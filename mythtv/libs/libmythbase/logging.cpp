@@ -426,8 +426,20 @@ DatabaseLogger::~DatabaseLogger()
         free(m_host);
 }
 
+void DatabaseLogger::stopDatabaseAccess(void)
+{
+    m_thread->stop();
+    m_thread->wait();
+}
+
 bool DatabaseLogger::logmsg(LoggingItem *item)
 {
+    if (!m_thread->isRunning())
+    {
+        m_disabled = true;
+        m_disabledTime.start();
+    }
+
     if (!m_disabled && m_thread->queueFull())
     {
         m_disabled = true;
@@ -503,6 +515,8 @@ DBLoggerThread::~DBLoggerThread()
     wait();
 
     QMutexLocker qLock(&m_queueMutex);
+    while (!m_queue->empty())
+        deleteItem(m_queue->dequeue());
     delete m_queue;
     delete m_wait;
     m_queue = NULL;
@@ -548,6 +562,8 @@ void DBLoggerThread::run(void)
 
         qLock.relock();
     }
+
+    qLock.unlock();
 
     RunEpilog();
 }
@@ -702,13 +718,12 @@ LoggerThread::~LoggerThread()
 void LoggerThread::run(void)
 {
     RunProlog();
-    LoggingItem *item;
 
     logThreadFinished = false;
 
     QMutexLocker qLock(&logQueueMutex);
 
-    while(!aborted || !logQueue.isEmpty())
+    while (!aborted || !logQueue.isEmpty())
     {
         if (logQueue.isEmpty())
         {
@@ -717,72 +732,77 @@ void LoggerThread::run(void)
             continue;
         }
 
-        item = logQueue.dequeue();
-        if (!item)
-            continue;
-
+        LoggingItem *item = logQueue.dequeue();
         qLock.unlock();
 
-        if (item->type & kRegistering)
-        {
-            int64_t tid = getThreadTid(item);
-
-            QMutexLocker locker(&logThreadMutex);
-            logThreadHash[item->threadId] = strdup(item->threadName);
-
-            if (debugRegistration)
-            {
-                snprintf(item->message, LOGLINE_MAX,
-                         "Thread 0x%llX (%lld) registered as \'%s\'",
-                         (long long unsigned int)item->threadId,
-                         (long long int)tid,
-                         logThreadHash[item->threadId]);
-            }
-        }
-        else if (item->type & kDeregistering)
-        {
-            int64_t tid = 0;
-
-            {
-                QMutexLocker locker(&logThreadTidMutex);
-                if( logThreadTidHash.contains(item->threadId) )
-                {
-                    tid = logThreadTidHash[item->threadId];
-                    logThreadTidHash.remove(item->threadId);
-                }
-            }
-
-            QMutexLocker locker(&logThreadMutex);
-            if (logThreadHash.contains(item->threadId))
-            {
-                if (debugRegistration)
-                {
-                    snprintf(item->message, LOGLINE_MAX,
-                             "Thread 0x%llX (%lld) deregistered as \'%s\'",
-                             (long long unsigned int)item->threadId,
-                             (long long int)tid,
-                             logThreadHash[item->threadId]);
-                }
-                item->threadName = logThreadHash[item->threadId];
-                logThreadHash.remove(item->threadId);
-            }
-        }
-
-        if (item->message[0]!='\0')
-        {
-            QMutexLocker locker(&loggerListMutex);
-
-            QList<LoggerBase *>::iterator it;
-            for (it = loggerList.begin(); it != loggerList.end(); ++it)
-                (*it)->logmsg(item);
-        }
+        handleItem(item);
         deleteItem(item);
 
         qLock.relock();
     }
 
     logThreadFinished = true;
+
+    qLock.unlock();
+
     RunEpilog();
+}
+
+void LoggerThread::handleItem(LoggingItem *item)
+{
+    if (item->type & kRegistering)
+    {
+        int64_t tid = getThreadTid(item);
+
+        QMutexLocker locker(&logThreadMutex);
+        logThreadHash[item->threadId] = strdup(item->threadName);
+
+        if (debugRegistration)
+        {
+            snprintf(item->message, LOGLINE_MAX,
+                     "Thread 0x%llX (%lld) registered as \'%s\'",
+                     (long long unsigned int)item->threadId,
+                     (long long int)tid,
+                     logThreadHash[item->threadId]);
+        }
+    }
+    else if (item->type & kDeregistering)
+    {
+        int64_t tid = 0;
+
+        {
+            QMutexLocker locker(&logThreadTidMutex);
+            if( logThreadTidHash.contains(item->threadId) )
+            {
+                tid = logThreadTidHash[item->threadId];
+                logThreadTidHash.remove(item->threadId);
+            }
+        }
+
+        QMutexLocker locker(&logThreadMutex);
+        if (logThreadHash.contains(item->threadId))
+        {
+            if (debugRegistration)
+            {
+                snprintf(item->message, LOGLINE_MAX,
+                         "Thread 0x%llX (%lld) deregistered as \'%s\'",
+                         (long long unsigned int)item->threadId,
+                         (long long int)tid,
+                         logThreadHash[item->threadId]);
+            }
+            item->threadName = logThreadHash[item->threadId];
+            logThreadHash.remove(item->threadId);
+        }
+    }
+
+    if (item->message[0] != '\0')
+    {
+        QMutexLocker locker(&loggerListMutex);
+
+        QList<LoggerBase *>::iterator it;
+        for (it = loggerList.begin(); it != loggerList.end(); ++it)
+            (*it)->logmsg(item);
+    }
 }
 
 void LoggerThread::stop(void)
@@ -918,8 +938,22 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     va_end(arguments);
 
     logQueue.enqueue(item);
-    if (logThread && (type & kFlush))
+
+    if (logThread && logThreadFinished && !logThread->isRunning())
+    {
+        while (!logQueue.isEmpty())
+        {
+            item = logQueue.dequeue();
+            qLock.unlock();
+            logThread->handleItem(item);
+            deleteItem(item);
+            qLock.relock();
+        }
+    }
+    else if (logThread && !logThreadFinished && (type & kFlush))
+    {
         logThread->flush();
+    }
 }
 
 #ifndef _WIN32
@@ -981,12 +1015,15 @@ void logStart(QString logfile, int progress, int quiet, int facility,
 {
     LoggerBase *logger;
 
-    if (!logThread)
-        logThread = new LoggerThread();
+    {
+        QMutexLocker qLock(&logQueueMutex);
+        if (!logThread)
+            logThread = new LoggerThread();
+    }
 
     if (logThread->isRunning())
         return;
- 
+
     logLevel = level;
     LOG(VB_GENERAL, LOG_NOTICE, QString("Setting Log Level to LOG_%1")
              .arg(logLevelGetName(logLevel).toUpper()));
@@ -1058,14 +1095,11 @@ void logStop(void)
     sigaction( SIGHUP, &sa, NULL );
 #endif
 
-    loggerListMutex.lock();
-    QList<LoggerBase *> list = loggerList;
-    loggerList.clear();
-    loggerListMutex.unlock();
-
     QList<LoggerBase *>::iterator it;
-    for (it = list.begin(); it != list.end(); ++it)
-        delete *it;
+    for (it = loggerList.begin(); it != loggerList.end(); ++it)
+    {
+        (*it)->stopDatabaseAccess();
+    }
 }
 
 void threadRegister(QString name)
