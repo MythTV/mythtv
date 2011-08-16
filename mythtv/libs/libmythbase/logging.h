@@ -1,14 +1,10 @@
 #ifndef LOGGING_H_
 #define LOGGING_H_
 
-#ifdef __cplusplus
-#include <QAtomicInt>
-#include <QString>
-#include <QQueue>
-#include <QMutex>
 #include <QMutexLocker>
-#include <QRegExp>
-#endif
+#include <QMutex>
+#include <QQueue>
+
 #include <stdint.h>
 #include <time.h>
 #include <unistd.h>
@@ -19,22 +15,8 @@
 
 #define LOGLINE_MAX 2048
 
-class LoggingItem_t
-{
-  public:
-    QAtomicInt          refcount;
-    uint64_t            threadId;
-    uint32_t            usec;
-    int                 line;
-    int                 registering;
-    int                 deregistering;
-    LogLevel_t          level;
-    struct tm           tm;
-    const char         *file;
-    const char         *function;
-    char               *threadName;
-    char                message[LOGLINE_MAX+1];
-};
+class QString;
+class LoggingItem;
 
 typedef union {
     char   *string;
@@ -47,7 +29,7 @@ class LoggerBase : public QObject {
     public:
         LoggerBase(char *string, int number);
         ~LoggerBase();
-        virtual bool logmsg(LoggingItem_t *item) = 0;
+        virtual bool logmsg(LoggingItem *item) = 0;
         virtual void reopen(void) = 0;
     protected:
         LoggerHandle_t m_handle;
@@ -58,7 +40,7 @@ class FileLogger : public LoggerBase {
     public:
         FileLogger(char *filename, bool progress, int quiet);
         ~FileLogger();
-        bool logmsg(LoggingItem_t *item);
+        bool logmsg(LoggingItem *item);
         void reopen(void);
     private:
         bool m_opened;
@@ -72,7 +54,7 @@ class SyslogLogger : public LoggerBase {
     public:
         SyslogLogger(int facility);
         ~SyslogLogger();
-        bool logmsg(LoggingItem_t *item);
+        bool logmsg(LoggingItem *item);
         void reopen(void) { };
     private:
         char *m_application;
@@ -87,10 +69,10 @@ class DatabaseLogger : public LoggerBase {
     public:
         DatabaseLogger(char *table);
         ~DatabaseLogger();
-        bool logmsg(LoggingItem_t *item);
+        bool logmsg(LoggingItem *item);
         void reopen(void) { };
     protected:
-        bool logqmsg(LoggingItem_t *item);
+        bool logqmsg(LoggingItem *item);
     private:
         bool isDatabaseReady();
         bool tableExists(const QString &table);
@@ -127,7 +109,7 @@ class DBLoggerThread : public MThread
         ~DBLoggerThread();
         void run(void);
         void stop(void);
-        bool enqueue(LoggingItem_t *item) 
+        bool enqueue(LoggingItem *item) 
         { 
             QMutexLocker qLock(&m_queueMutex); 
             m_queue->enqueue(item); 
@@ -141,7 +123,7 @@ class DBLoggerThread : public MThread
     private:
         DatabaseLogger *m_logger;
         QMutex m_queueMutex;
-        QQueue<LoggingItem_t *> *m_queue;
+        QQueue<LoggingItem *> *m_queue;
         QWaitCondition *m_wait; // protected by m_queueMutex
         bool aborted; // protected by m_queueMutex
 };
