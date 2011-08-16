@@ -128,7 +128,8 @@ void LogTimeStamp( struct tm *tm, uint32_t *usec );
 char *getThreadName( LoggingItem_t *item );
 int64_t getThreadTid( LoggingItem_t *item );
 void setThreadTid( LoggingItem_t *item );
-void deleteItem( LoggingItem_t *item );
+static LoggingItem_t *createItem(void);
+static void deleteItem(LoggingItem_t *item);
 #ifndef _WIN32
 void logSighup( int signum, siginfo_t *info, void *secret );
 #endif
@@ -234,6 +235,8 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     if (!m_opened || m_quiet || (m_progress && item->level > LOG_ERR))
         return false;
 
+    item->refcount.ref();
+
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
               (const struct tm *)&item->tm );
     snprintf( usPart, 9, ".%06d", (int)(item->usec) );
@@ -322,8 +325,6 @@ bool SyslogLogger::logmsg(LoggingItem_t *item)
 
     syslog( item->level, "%s", item->message );
 
-    deleteItem(item);
-
     return true;
 }
 #endif
@@ -383,6 +384,8 @@ bool DatabaseLogger::logmsg(LoggingItem_t *item)
 {
     if( m_thread )
     {
+        item->refcount.ref();
+
         if( !m_disabled && m_thread->queueFull() )
         {
             m_disabled = true;
@@ -484,7 +487,7 @@ void DBLoggerThread::run(void)
 
         qLock.unlock();
 
-        if (item->message && !aborted)
+        if (item->message[0]!='\0' && !aborted)
         {
             if (!m_logger->logqmsg(item) )
             {
@@ -680,17 +683,13 @@ void LoggerThread::run(void)
             QMutexLocker locker(&logThreadMutex);
             logThreadHash[item->threadId] = strdup(item->threadName);
 
-            if( debugRegistration )
+            if (debugRegistration)
             {
-                item->message   = (char *)malloc(LOGLINE_MAX+1);
-                if( item->message )
-                {
-                    snprintf( item->message, LOGLINE_MAX,
-                              "Thread 0x%llX (%lld) registered as \'%s\'",
-                              (long long unsigned int)item->threadId,
-                              (long long int)tid, 
-                              logThreadHash[item->threadId] );
-                }
+                snprintf(item->message, LOGLINE_MAX,
+                         "Thread 0x%llX (%lld) registered as \'%s\'",
+                         (long long unsigned int)item->threadId,
+                         (long long int)tid,
+                         logThreadHash[item->threadId]);
             }
         }
         else if (item->deregistering)
@@ -707,44 +706,30 @@ void LoggerThread::run(void)
             }
 
             QMutexLocker locker(&logThreadMutex);
-            if( logThreadHash.contains(item->threadId) )
+            if (logThreadHash.contains(item->threadId))
             {
-                if( debugRegistration )
+                if (debugRegistration)
                 {
-                    item->message   = (char *)malloc(LOGLINE_MAX+1);
-                    if( item->message )
-                    {
-                        snprintf( item->message, LOGLINE_MAX,
-                                  "Thread 0x%llX (%lld) deregistered as \'%s\'",
-                                  (long long unsigned int)item->threadId,
-                                  (long long int)tid, 
-                                  logThreadHash[item->threadId] );
-                    }
+                    snprintf(item->message, LOGLINE_MAX,
+                             "Thread 0x%llX (%lld) deregistered as \'%s\'",
+                             (long long unsigned int)item->threadId,
+                             (long long int)tid,
+                             logThreadHash[item->threadId]);
                 }
                 item->threadName = logThreadHash[item->threadId];
                 logThreadHash.remove(item->threadId);
             }
         }
 
-        if( item->message )
+        if (item->message[0]!='\0')
         {
             QMutexLocker locker(&loggerListMutex);
 
             QList<LoggerBase *>::iterator it;
-
-            item->refcount = loggerList.size();
-            item->refmutex = new QMutex;
-
-            for(it = loggerList.begin(); it != loggerList.end(); it++)
-            {
-                if( !(*it)->logmsg(item) )
-                    deleteItem(item);
-            }
+            for (it = loggerList.begin(); it != loggerList.end(); ++it)
+                (*it)->logmsg(item);
         }
-        else
-        {
-            delete item;
-        }
+        deleteItem(item);
 
         qLock.relock();
     }
@@ -760,27 +745,57 @@ void LoggerThread::stop(void)
     m_wait->wakeAll();
 }
 
-void deleteItem( LoggingItem_t *item )
+static QList<LoggingItem_t*> item_recycler;
+static QAtomicInt item_count;
+static QAtomicInt malloc_count;
+
+#define DEBUG_MEMORY 0
+#if DEBUG_MEMORY
+static int max_count = 0;
+static QTime memory_time;
+#endif
+
+static LoggingItem_t *createItem(void)
 {
-    if( !item )
+    LoggingItem_t *item = new LoggingItem_t;
+    memset(&item->threadId, 0,
+           sizeof(LoggingItem_t)-sizeof(QAtomicInt));
+    item->refcount.ref();
+    malloc_count.ref();
+
+#if DEBUG_MEMORY
+    int val = item_count.fetchAndAddRelaxed(1) + 1;
+    if (val == 0)
+        memory_time.start();
+    max_count = (val > max_count) ? val : max_count;
+    if (memory_time.elapsed() > 1000)
+    {
+        cout<<"current memory usage: "
+            <<val<<" * "<<sizeof(LoggingItem_t)<<endl;
+        cout<<"max memory usage: "
+            <<max_count<<" * "<<sizeof(LoggingItem_t)<<endl;
+        cout<<"malloc count: "<<(int)malloc_count<<endl;
+        memory_time.start();
+    }
+#else
+    item_count.ref();
+#endif
+
+    return item;
+}
+
+static void deleteItem(LoggingItem_t *item)
+{
+    if (!item)
         return;
 
+    if (!item->refcount.deref())
     {
-        QMutexLocker locker((QMutex*)item->refmutex);
-        item->refcount--;
-        if( item->refcount != 0 )
-            return;
-
-        if( item->message )
-            free(item->message);
-
-        if( item->threadName )
-            free( item->threadName );
+        if (item->threadName)
+            free(item->threadName);
+        item_count.deref();
+        delete item;
     }
-
-    delete (QMutex*)item->refmutex;
-    item->refmutex = NULL;
-    delete item;
 }
 
 void LogTimeStamp( struct tm *tm, uint32_t *usec )
@@ -819,23 +834,12 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
                    const char *format, ... )
 {
     va_list         arguments;
-    char           *message;
-    LoggingItem_t  *item;
-
-    item = new LoggingItem_t;
-    if (!item)
-        return;
-
-    memset( item, 0, sizeof(LoggingItem_t) );
-
-    message = (char *)malloc(LOGLINE_MAX+1);
-    if( !message )
-    {
-        delete item;
-        return;
-    }
 
     QMutexLocker qLock(&logQueueMutex);
+
+    LoggingItem_t *item = createItem();
+    if (!item)
+        return;
 
     if( fromQString && strchr(format, '%') )
     {
@@ -844,7 +848,7 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     }
 
     va_start(arguments, format);
-    vsnprintf(message, LOGLINE_MAX, format, arguments);
+    vsnprintf(item->message, LOGLINE_MAX, format, arguments);
     va_end(arguments);
 
     LogTimeStamp( &item->tm, &item->usec );
@@ -853,7 +857,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     item->line     = line;
     item->function = function;
     item->threadId = (uint64_t)QThread::currentThreadId();
-    item->message  = message;
     setThreadTid(item);
 
     logQueue.enqueue(item);
@@ -1012,11 +1015,12 @@ void threadRegister(QString name)
     if (logThreadFinished)
         return;
 
-    LoggingItem_t *item = new LoggingItem_t;
+    QMutexLocker qLock(&logQueueMutex);
+
+    LoggingItem_t *item = createItem();
     if (!item)
         return;
 
-    memset( item, 0, sizeof(LoggingItem_t) );
     LogTimeStamp( &item->tm, &item->usec );
     item->level = (LogLevel_t)LOG_DEBUG;
     item->threadId = id;
@@ -1027,7 +1031,6 @@ void threadRegister(QString name)
     item->registering = true;
     setThreadTid(item);
 
-    QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
 }
 
@@ -1039,11 +1042,12 @@ void threadDeregister(void)
     if (logThreadFinished)
         return;
 
-    item = new LoggingItem_t;
+    QMutexLocker qLock(&logQueueMutex);
+
+    item = createItem();
     if (!item)
         return;
 
-    memset( item, 0, sizeof(LoggingItem_t) );
     LogTimeStamp( &item->tm, &item->usec );
     item->level = (LogLevel_t)LOG_DEBUG;
     item->threadId = id;
@@ -1052,7 +1056,6 @@ void threadDeregister(void)
     item->function = (char *)__FUNCTION__;
     item->deregistering = true;
 
-    QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
 }
 

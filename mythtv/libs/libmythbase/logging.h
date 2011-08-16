@@ -2,6 +2,7 @@
 #define LOGGING_H_
 
 #ifdef __cplusplus
+#include <QAtomicInt>
 #include <QString>
 #include <QQueue>
 #include <QMutex>
@@ -18,22 +19,22 @@
 
 #define LOGLINE_MAX 2048
 
-typedef struct
+class LoggingItem_t
 {
-    LogLevel_t          level;
+  public:
+    QAtomicInt          refcount;
     uint64_t            threadId;
-    const char         *file;
-    int                 line;
-    const char         *function;
-    struct tm           tm;
     uint32_t            usec;
-    char               *message;
-    char               *threadName;
+    int                 line;
     int                 registering;
     int                 deregistering;
-    int                 refcount;
-    void               *refmutex;
-} LoggingItem_t;
+    LogLevel_t          level;
+    struct tm           tm;
+    const char         *file;
+    const char         *function;
+    char               *threadName;
+    char                message[LOGLINE_MAX+1];
+};
 
 typedef union {
     char   *string;
