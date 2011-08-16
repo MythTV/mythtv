@@ -72,7 +72,7 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
     if (!f.open(QIODevice::ReadOnly))
     {
 #if 0
-        LOG(VB_GENERAL, LOG_ERR, "XMLParse::LoadTheme(): Can't open: " + 
+        LOG(VB_GENERAL, LOG_ERR, "XMLParse::LoadTheme(): Can't open: " +
                                       themeFile);
 #endif
         return false;
@@ -634,251 +634,6 @@ bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
     return true;
 }
 
-void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
-{
-    int context = -1;
-    QString align = "";
-    QString activeFont = "";
-    QString inactiveFont = "";
-    QString selectedFont = "";
-    QString color = "";
-    QString textposition = "bottom";
-    QRect area;
-    int textheight = 0;
-    int rowcount = 3;
-    int columncount = 3;
-    int padding = 10;
-    bool cutdown = true;
-    bool multiline = false;
-    bool showChecks = false;
-    bool showSelected = false;
-    bool showScrollArrows = false;
-    QString defaultImage = "";
-    QString normalImage = "";
-    QString selectedImage = "";
-    QString highlightedImage = "";
-
-    QString name = element.attribute("name", "");
-    if (name.isNull() || name.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Image Grid needs a name");
-        return;
-    }
-
-    QString order = element.attribute("draworder", "");
-    if (order.isNull() || order.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Image Grid needs an order");
-        return;
-    }
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "context")
-            {
-                context = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "activefont")
-            {
-                activeFont = getFirstText(info);
-            }
-            else if (info.tagName() == "inactivefont")
-            {
-                inactiveFont = getFirstText(info);
-            }
-
-            else if (info.tagName() == "selectedfont")
-            {
-                selectedFont = getFirstText(info);
-            }
-            else if (info.tagName() == "area")
-            {
-                area = parseRect(getFirstText(info));
-                normalizeRect(area);
-            }
-            else if (info.tagName() == "columncount")
-            {
-                columncount = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "rowcount")
-            {
-                rowcount = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "padding")
-            {
-                padding = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "align")
-            {
-                align = getFirstText(info);
-            }
-            else if (info.tagName() == "cutdown")
-            {
-                if (getFirstText(info).toLower() == "no")
-                    cutdown = false;
-            }
-            else if (info.tagName() == "showchecks")
-            {
-                if (getFirstText(info).toLower() == "yes")
-                    showChecks = true;
-            }
-            else if (info.tagName() == "showselected")
-            {
-                if (getFirstText(info).toLower() == "yes")
-                    showSelected = true;
-            }
-            else if (info.tagName() == "showscrollarrows")
-            {
-                if (getFirstText(info).toLower() == "yes")
-                    showScrollArrows = true;
-            }
-            else if (info.tagName() == "textheight")
-            {
-                textheight = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "textposition")
-            {
-                textposition = getFirstText(info);
-            }
-            else if (info.tagName() == "multiline")
-            {
-                if (getFirstText(info).toLower() == "yes")
-                    multiline = true;
-            }
-            else if (info.tagName() == "image")
-            {
-                QString imgname = "";
-                QString file = "";
-
-                imgname = info.attribute("function", "");
-                if (imgname.isNull() || imgname.isEmpty())
-                {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC +
-                        "Image in a image grid needs a function");
-                    return;
-                }
-
-                file = info.attribute("filename", "");
-                if (file.isNull() || file.isEmpty())
-                {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC +
-                        "Image in a image grid needs a filename");
-                    return;
-                }
-
-                if (imgname.toLower() == "normal")
-                {
-                    normalImage = file;
-                }
-
-                if (imgname.toLower() == "selected")
-                {
-                    selectedImage = file;
-                }
-
-                if (imgname.toLower() == "highlighted")
-                {
-                    highlightedImage = file;
-                }
-
-                if (imgname.toLower() == "default")
-                {
-                    defaultImage = file;
-                }
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_WARNING, LOC +
-                    QString("Unknown tag '%1' in image grid")
-                        .arg(info.tagName()));
-                return;
-            }
-        }
-    }
-    fontProp *activeProp = GetFont(activeFont);
-    if (!activeProp)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("Unknown active font: '%1' in image grid: '%2'")
-                .arg(activeFont).arg(name));
-        return;
-    }
-
-    fontProp *selectedProp = GetFont(selectedFont);
-    if (!selectedProp)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("Unknown selected font: '%1' in image grid: '%2'")
-                .arg(selectedFont).arg(name));
-        return;
-    }
-
-    fontProp *inactiveProp = GetFont(inactiveFont);
-    if (!inactiveProp)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("Unknown inactive font: '%1' in image grid: '%2'")
-                .arg(inactiveFont).arg(name));
-        return;
-    }
-
-    UIImageGridType *grid = new UIImageGridType(name, order.toInt());
-    grid->SetScreen(wmult, hmult);
-    grid->setActiveFont(activeProp);
-    grid->setSelectedFont(selectedProp);
-    grid->setInactiveFont(inactiveProp);
-    grid->setCutDown(cutdown);
-    grid->setShowChecks(showChecks);
-    grid->setShowSelected(showSelected);
-    grid->setShowScrollArrows(showScrollArrows);
-    grid->setArea(area);
-    grid->setTextHeight(textheight);
-    grid->setPadding(padding);
-    grid->setRowCount(rowcount);
-    grid->setColumnCount(columncount);
-    grid->setDefaultImage(defaultImage);
-    grid->setNormalImage(normalImage);
-    grid->setSelectedImage(selectedImage);
-    grid->setHighlightedImage(highlightedImage);
-
-    int jst = Qt::AlignLeft | Qt::AlignTop;
-    if (multiline == true)
-        jst = Qt::TextWordWrap;
-
-    if (align.size())
-    {
-        if (align.toLower() == "center")
-            grid->setJustification(Qt::AlignCenter | jst);
-        else if (align.toLower() == "right")
-            grid->setJustification(Qt::AlignRight | jst);
-        else if (align.toLower() == "allcenter")
-            grid->setJustification(Qt::AlignHCenter | Qt::AlignVCenter | jst);
-        else if (align.toLower() == "vcenter")
-            grid->setJustification(Qt::AlignVCenter | jst);
-        else if (align.toLower() == "hcenter")
-            grid->setJustification(Qt::AlignHCenter | jst);
-    }
-    else
-        grid->setJustification(jst);
-
-    if (textposition == "top")
-        grid->setTextPosition(UIImageGridType::textPosTop);
-    else
-        grid->setTextPosition(UIImageGridType::textPosBottom);
-
-    if (context != -1)
-    {
-        grid->SetContext(context);
-    }
-    container->AddType(grid);
-    grid->calculateScreenArea();
-    grid->recalculateLayout();
-}
-
 fontProp *XMLParse::GetFont(const QString &text, bool checkGlobal)
 {
     fontProp *ret;
@@ -1028,10 +783,6 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             else if (info.tagName() == "keyboard")
             {
                 parseKeyboard(container, info);
-            }
-            else if (info.tagName() == "imagegrid")
-            {
-                parseImageGrid(container, info);
             }
             else
             {
@@ -1478,7 +1229,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                 imgfile = info.attribute("filename", "");
                 if (imgfile.isNull() || imgfile.isEmpty())
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC + 
+                    LOG(VB_GENERAL, LOG_WARNING, LOC +
                         "Image needs a filename");
                     return;
                 }

@@ -47,7 +47,7 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
     setObjectName(name);
     if (!parent)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  "Trying to create a dialog without a parent.");
         return;
     }
@@ -119,7 +119,7 @@ void MythDialog::setResult(DialogCode r)
     if ((r < kDialogCodeRejected) ||
         ((kDialogCodeAccepted < r) && (r < kDialogCodeListStart)))
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  QString("MythDialog::setResult(%1) "
                          "called with invalid DialogCode").arg(r));
     }
@@ -167,7 +167,7 @@ DialogCode MythDialog::exec(void)
 {
     if (in_loop)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  "MythDialog::exec: Recursive call detected.");
         return kDialogCodeRejected;
     }
@@ -1213,7 +1213,7 @@ void MythThemedDialog::parseContainer(QDomElement &element)
     theme->parseContainer(element, name, a_context, area);
     if (name.length() < 1)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  "Failed to parse a container. Ignoring.");
         return;
     }
@@ -1369,7 +1369,7 @@ void MythThemedDialog::UpdateForegroundRect(const QRect &inv_rect)
             //  Debugging
             //
 #if 0
-            LOG(VB_GENERAL, LOG_DEBUG, 
+            LOG(VB_GENERAL, LOG_DEBUG,
                      QString("A container called \"%1\" said its "
                              "area is %2,%3 to %4,%5")
                 .arg(looper->GetName())
@@ -1652,11 +1652,6 @@ UIListTreeType* MythThemedDialog::getUIListTreeType(const QString &name)
 UIKeyboardType *MythThemedDialog::getUIKeyboardType(const QString &name)
 {
     return GetUIType<UIKeyboardType>(this, name);
-}
-
-UIImageGridType* MythThemedDialog::getUIImageGridType(const QString &name)
-{
-    return GetUIType<UIImageGridType>(this, name);
 }
 
 LayerSet *MythThemedDialog::getContainer(const QString &name)
