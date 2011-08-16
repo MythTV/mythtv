@@ -129,7 +129,7 @@ void LogTimeStamp( struct tm *tm, uint32_t *usec );
 char *getThreadName( LoggingItem *item );
 int64_t getThreadTid( LoggingItem *item );
 void setThreadTid( LoggingItem *item );
-static LoggingItem *createItem(void);
+static LoggingItem *createItem(const char *, const char *, int, LogLevel_t);
 static void deleteItem(LoggingItem *item);
 #ifndef _WIN32
 void logSighup( int signum, siginfo_t *info, void *secret );
@@ -138,6 +138,21 @@ void logSighup( int signum, siginfo_t *info, void *secret );
 class LoggingItem
 {
   public:
+    LoggingItem(const char *_file, const char *_function,
+                int _line, LogLevel_t _level) :
+        threadId(static_cast<uint64_t>(QThread::currentThreadId())),
+        line(_line),
+        registering(0), deregistering(0),
+        level(_level), file(_file),
+        function(_function), threadName(NULL)
+    {
+        LogTimeStamp(&tm, &usec);
+        message[0]='\0';
+        message[LOGLINE_MAX]='\0';
+        setThreadTid(this);
+        refcount.ref();
+    }
+
     QAtomicInt          refcount;
     uint64_t            threadId;
     uint32_t            usec;
@@ -772,12 +787,10 @@ static int max_count = 0;
 static QTime memory_time;
 #endif
 
-static LoggingItem *createItem(void)
+static LoggingItem *createItem(const char *_file, const char *_function,
+                               int _line, LogLevel_t _level)
 {
-    LoggingItem *item = new LoggingItem;
-    memset(&item->threadId, 0,
-           sizeof(LoggingItem)-sizeof(QAtomicInt));
-    item->refcount.ref();
+    LoggingItem *item = new LoggingItem(_file, _function, _line, _level);
     malloc_count.ref();
 
 #if DEBUG_MEMORY
@@ -854,7 +867,7 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
 
     QMutexLocker qLock(&logQueueMutex);
 
-    LoggingItem *item = createItem();
+    LoggingItem *item = createItem(file, function, line, level);
     if (!item)
         return;
 
@@ -867,14 +880,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     va_start(arguments, format);
     vsnprintf(item->message, LOGLINE_MAX, format, arguments);
     va_end(arguments);
-
-    LogTimeStamp( &item->tm, &item->usec );
-    item->level    = level;
-    item->file     = file;
-    item->line     = line;
-    item->function = function;
-    item->threadId = (uint64_t)QThread::currentThreadId();
-    setThreadTid(item);
 
     logQueue.enqueue(item);
 }
@@ -1027,50 +1032,34 @@ void logStop(void)
 
 void threadRegister(QString name)
 {
-    uint64_t id = (uint64_t)QThread::currentThreadId();
-
     if (logThreadFinished)
         return;
 
     QMutexLocker qLock(&logQueueMutex);
 
-    LoggingItem *item = createItem();
+    LoggingItem *item =
+        createItem(__FILE__, __FUNCTION__, __LINE__, (LogLevel_t)LOG_DEBUG);
     if (!item)
         return;
 
-    LogTimeStamp( &item->tm, &item->usec );
-    item->level = (LogLevel_t)LOG_DEBUG;
-    item->threadId = id;
-    item->line = __LINE__;
-    item->file = (char *)__FILE__;
-    item->function = (char *)__FUNCTION__;
     item->threadName = strdup((char *)name.toLocal8Bit().constData());
     item->registering = true;
-    setThreadTid(item);
 
     logQueue.enqueue(item);
 }
 
 void threadDeregister(void)
 {
-    uint64_t id = (uint64_t)QThread::currentThreadId();
-    LoggingItem *item;
-
     if (logThreadFinished)
         return;
 
     QMutexLocker qLock(&logQueueMutex);
 
-    item = createItem();
+    LoggingItem *item =
+        createItem(__FILE__, __FUNCTION__, __LINE__, (LogLevel_t)LOG_DEBUG);
     if (!item)
         return;
 
-    LogTimeStamp( &item->tm, &item->usec );
-    item->level = (LogLevel_t)LOG_DEBUG;
-    item->threadId = id;
-    item->line = __LINE__;
-    item->file = (char *)__FILE__;
-    item->function = (char *)__FUNCTION__;
     item->deregistering = true;
 
     logQueue.enqueue(item);
