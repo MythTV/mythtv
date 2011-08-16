@@ -17,6 +17,7 @@
 #define LOGLINE_MAX (2048-120)
 
 class QString;
+class MSqlQuery;
 class LoggingItem;
 
 typedef union {
@@ -75,16 +76,13 @@ class DatabaseLogger : public LoggerBase {
         void reopen(void) { };
         virtual void stopDatabaseAccess(void);
     protected:
-        bool logqmsg(LoggingItem *item);
+        bool logqmsg(MSqlQuery &query, LoggingItem *item);
     private:
         bool isDatabaseReady();
         bool tableExists(const QString &table);
 
         DBLoggerThread *m_thread;
-        char *m_host;
-        char *m_application;
-        char *m_query;
-        pid_t m_pid;
+        QString m_query;
         bool m_opened;
         bool m_loggingTableExists;
         bool m_disabled; // only accessed from logmsg

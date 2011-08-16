@@ -377,28 +377,18 @@ bool SyslogLogger::logmsg(LoggingItem *item)
 const int DatabaseLogger::kMinDisabledTime = 1000;
 
 DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
-                                              m_host(NULL), m_opened(false),
+                                              m_opened(false),
                                               m_loggingTableExists(false)
 {
-    static const char *queryFmt =
-        "INSERT INTO %s (host, application, pid, thread, "
-        "msgtime, level, message) VALUES (:HOST, :APPLICATION, "
-        ":PID, :THREAD, :MSGTIME, :LEVEL, :MESSAGE)";
+    m_query = QString(
+        "INSERT INTO %1 "
+        "    (host, application, pid, thread, msgtime, level, message) "
+        "VALUES (:HOST, :APP, :PID, :THREAD, :MSGTIME, :LEVEL, :MESSAGE)")
+        .arg(m_handle.string);
 
     LOG(VB_GENERAL, LOG_INFO, 
              QString("Added database logging to table %1")
              .arg(m_handle.string));
-
-    if (gCoreContext && !gCoreContext->GetHostName().isEmpty())
-        m_host = strdup((char *)gCoreContext->GetHostName()
-                        .toLocal8Bit().constData());
-
-    m_application = strdup((char *)QCoreApplication::applicationName()
-                           .toLocal8Bit().constData());
-    m_pid = getpid();
-
-    m_query = (char *)malloc(strlen(queryFmt) + strlen(m_handle.string));
-    sprintf(m_query, queryFmt, m_handle.string);
 
     m_thread = new DBLoggerThread(this);
     m_thread->start();
@@ -417,13 +407,6 @@ DatabaseLogger::~DatabaseLogger()
         m_thread->wait();
         delete m_thread;
     }
-
-    if( m_query )
-        free(m_query);
-    if( m_application )
-        free(m_application);
-    if( m_host )
-        free(m_host);
 }
 
 void DatabaseLogger::stopDatabaseAccess(void)
@@ -466,26 +449,14 @@ bool DatabaseLogger::logmsg(LoggingItem *item)
     return true;
 }
 
-bool DatabaseLogger::logqmsg(LoggingItem *item)
+bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
 {
     char        timestamp[TIMESTAMP_MAX];
     char       *threadName = getThreadName(item);
 
-    if( !isDatabaseReady() )
-        return false;
-
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
               (const struct tm *)&item->tm );
 
-    if( gCoreContext && !m_host )
-        m_host = strdup((char *)gCoreContext->GetHostName()
-                        .toLocal8Bit().constData());
-
-    MSqlQuery   query(MSqlQuery::InitCon());
-    query.prepare( m_query );
-    query.bindValue(":HOST",        m_host);
-    query.bindValue(":APPLICATION", m_application);
-    query.bindValue(":PID",         m_pid);
     query.bindValue(":THREAD",      threadName);
     query.bindValue(":MSGTIME",     timestamp);
     query.bindValue(":LEVEL",       item->level);
@@ -504,7 +475,8 @@ bool DatabaseLogger::logqmsg(LoggingItem *item)
 
 DBLoggerThread::DBLoggerThread(DatabaseLogger *logger) :
     MThread("DBLogger"),
-    m_logger(logger), m_queue(new QQueue<LoggingItem *>),
+    m_logger(logger),
+    m_queue(new QQueue<LoggingItem *>),
     m_wait(new QWaitCondition()), aborted(false)
 {
 }
@@ -527,11 +499,29 @@ void DBLoggerThread::run(void)
 {
     RunProlog();
 
-    LoggingItem *item;
-
     QMutexLocker qLock(&m_queueMutex);
 
-    while(!aborted || !m_queue->isEmpty())
+    // wait a bit before we start logging to the DB..
+    while (!m_logger->isDatabaseReady() && !gCoreContext && !aborted)
+        m_wait->wait(qLock.mutex(), 100);
+    QTime t; t.start();
+    while (!aborted && t.elapsed() < 2000)
+        m_wait->wait(qLock.mutex(), 100);
+
+    if (aborted)
+    {
+        qLock.unlock();
+        RunEpilog();
+        return;
+    }
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(m_logger->m_query);
+    query.bindValue(":HOST", gCoreContext->GetHostName());
+    query.bindValue(":APP", QCoreApplication::applicationName());
+    query.bindValue(":PID", getpid());
+
+    while (!aborted || !m_queue->isEmpty())
     {
         if (m_queue->isEmpty())
         {
@@ -539,7 +529,7 @@ void DBLoggerThread::run(void)
             continue;
         }
 
-        item = m_queue->dequeue();
+        LoggingItem *item = m_queue->dequeue();
         if (!item)
             continue;
 
@@ -547,11 +537,15 @@ void DBLoggerThread::run(void)
 
         if (item->message[0]!='\0' && !aborted)
         {
-            if (!m_logger->logqmsg(item) )
+            if (!m_logger->logqmsg(query, item))
             {
                 qLock.relock();
                 m_queue->prepend(item);
                 m_wait->wait(qLock.mutex(), 100);
+                query.prepare(m_logger->m_query);
+                query.bindValue(":HOST", gCoreContext->GetHostName());
+                query.bindValue(":APP", QCoreApplication::applicationName());
+                query.bindValue(":PID", getpid());
                 continue;
             }
         }
