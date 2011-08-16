@@ -116,7 +116,7 @@ const char    *verboseDefaultStr = " general";
 uint64_t verboseMask = verboseDefaultInt;
 QString verboseString = QString(verboseDefaultStr);
 
-unsigned int userDefaultValueInt = verboseDefaultInt;
+uint64_t     userDefaultValueInt = verboseDefaultInt;
 QString      userDefaultValueStr = QString(verboseDefaultStr);
 bool         haveUserDefaultValues = false;
 
@@ -129,21 +129,28 @@ void LogTimeStamp( struct tm *tm, uint32_t *usec );
 char *getThreadName( LoggingItem *item );
 int64_t getThreadTid( LoggingItem *item );
 void setThreadTid( LoggingItem *item );
-static LoggingItem *createItem(const char *, const char *, int, LogLevel_t);
+static LoggingItem *createItem(
+    const char *, const char *, int, LogLevel_t, int);
 static void deleteItem(LoggingItem *item);
 #ifndef _WIN32
 void logSighup( int signum, siginfo_t *info, void *secret );
 #endif
 
+typedef enum {
+    kMessage       = 0x01,
+    kRegistering   = 0x02,
+    kDeregistering = 0x04,
+    kFlush         = 0x08,
+    kStandardIO    = 0x10,
+} LoggingType;
+
 class LoggingItem
 {
   public:
     LoggingItem(const char *_file, const char *_function,
-                int _line, LogLevel_t _level) :
+                int _line, LogLevel_t _level, int _type) :
         threadId(static_cast<uint64_t>(QThread::currentThreadId())),
-        line(_line),
-        registering(0), deregistering(0),
-        level(_level), file(_file),
+        line(_line), type(_type), level(_level), file(_file),
         function(_function), threadName(NULL)
     {
         LogTimeStamp(&tm, &usec);
@@ -157,8 +164,7 @@ class LoggingItem
     uint64_t            threadId;
     uint32_t            usec;
     int                 line;
-    int                 registering;
-    int                 deregistering;
+    int                 type;
     LogLevel_t          level;
     struct tm           tm;
     const char         *file;
@@ -284,7 +290,11 @@ bool FileLogger::logmsg(LoggingItem *item)
             shortname = (*it)->shortname;
     }
 
-    if (m_fd == 1)
+    if (item->type & kStandardIO)
+    {
+        snprintf( line, MAX_STRING_LENGTH, "%s", item->message );
+    }
+    else if (m_fd == 1)
     {
         // Stdout
         snprintf( line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp,
@@ -307,7 +317,10 @@ bool FileLogger::logmsg(LoggingItem *item)
                       item->line, item->function, item->message );
     }
 
-    int result = write( m_fd, line, strlen(line) );
+    int fd = (item->type & kStandardIO) ? 1 : m_fd;
+    int result = write( fd, line, strlen(line) );
+    if (item->type & kFlush)
+        fsync(fd);
 
     deleteItem(item);
 
@@ -361,6 +374,7 @@ bool SyslogLogger::logmsg(LoggingItem *item)
 }
 #endif
 
+const int DatabaseLogger::kMinDisabledTime = 1000;
 
 DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
                                               m_host(NULL), m_opened(false),
@@ -414,32 +428,30 @@ DatabaseLogger::~DatabaseLogger()
 
 bool DatabaseLogger::logmsg(LoggingItem *item)
 {
-    if( m_thread )
+    if (!m_disabled && m_thread->queueFull())
     {
-        item->refcount.ref();
+        m_disabled = true;
+        m_disabledTime.start();
+        LOG(VB_GENERAL, LOG_CRIT,
+            "Disabling DB Logging: too many messages queued");
+        return false;
+    }
 
-        if( !m_disabled && m_thread->queueFull() )
-        {
-            m_disabled = true;
-            LOG(VB_GENERAL, LOG_CRIT,
-                "Disabling DB Logging: too many messages queued");
-            return false;
-        }
-
-        if( m_disabled && isDatabaseReady() )
+    if (m_disabled && m_disabledTime.elapsed() > kMinDisabledTime)
+    {
+        if (isDatabaseReady() && !m_thread->queueFull())
         {
             m_disabled = false;
             LOG(VB_GENERAL, LOG_CRIT, "Reenabling DB Logging");
-            usleep(150000);  // Let the queue drain a touch so this won't flap
-        }
-
-        if( !m_disabled )
-        {
-            m_thread->enqueue(item);
-            return true;
         }
     }
-    return false;
+
+    if (m_disabled)
+        return false;
+
+    item->refcount.ref();
+    m_thread->enqueue(item);
+    return true;
 }
 
 bool DatabaseLogger::logqmsg(LoggingItem *item)
@@ -654,10 +666,11 @@ void setThreadTid( LoggingItem *item )
     }
 }
 
-
 LoggerThread::LoggerThread() :
     MThread("Logger"),
-    m_wait(new QWaitCondition()), aborted(false)
+    m_waitNotEmpty(new QWaitCondition()),
+    m_waitEmpty(new QWaitCondition()),
+    aborted(false)
 {
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
@@ -682,7 +695,8 @@ LoggerThread::~LoggerThread()
         (*it)->deleteLater();
     }
 
-    delete m_wait;
+    delete m_waitNotEmpty;
+    delete m_waitEmpty;
 }
 
 void LoggerThread::run(void)
@@ -698,7 +712,8 @@ void LoggerThread::run(void)
     {
         if (logQueue.isEmpty())
         {
-            m_wait->wait(qLock.mutex(), 100);
+            m_waitEmpty->wakeAll();
+            m_waitNotEmpty->wait(qLock.mutex(), 100);
             continue;
         }
 
@@ -708,7 +723,7 @@ void LoggerThread::run(void)
 
         qLock.unlock();
 
-        if (item->registering)
+        if (item->type & kRegistering)
         {
             int64_t tid = getThreadTid(item);
 
@@ -724,7 +739,7 @@ void LoggerThread::run(void)
                          logThreadHash[item->threadId]);
             }
         }
-        else if (item->deregistering)
+        else if (item->type & kDeregistering)
         {
             int64_t tid = 0;
 
@@ -773,8 +788,23 @@ void LoggerThread::run(void)
 void LoggerThread::stop(void)
 {
     QMutexLocker qLock(&logQueueMutex);
+    flush(1000);
     aborted = true;
-    m_wait->wakeAll();
+    m_waitNotEmpty->wakeAll();
+}
+
+bool LoggerThread::flush(int timeoutMS)
+{
+    QTime t;
+    t.start();
+    while (!aborted && logQueue.isEmpty() && t.elapsed() < timeoutMS)
+    {
+        m_waitNotEmpty->wakeAll();
+        int left = timeoutMS - t.elapsed();
+        if (left > 0)
+            m_waitEmpty->wait(&logQueueMutex, left);
+    }
+    return logQueue.isEmpty();
 }
 
 static QList<LoggingItem*> item_recycler;
@@ -787,10 +817,13 @@ static int max_count = 0;
 static QTime memory_time;
 #endif
 
-static LoggingItem *createItem(const char *_file, const char *_function,
-                               int _line, LogLevel_t _level)
+static LoggingItem *createItem(
+    const char *_file, const char *_function,
+    int _line, LogLevel_t _level, int _type)
 {
-    LoggingItem *item = new LoggingItem(_file, _function, _line, _level);
+    LoggingItem *item = new LoggingItem(
+        _file, _function, _line, _level, _type);
+
     malloc_count.ref();
 
 #if DEBUG_MEMORY
@@ -867,7 +900,10 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
 
     QMutexLocker qLock(&logQueueMutex);
 
-    LoggingItem *item = createItem(file, function, line, level);
+    int type = kMessage;
+    type |= (mask & VB_FLUSH) ? kFlush : 0;
+    type |= (mask & VB_STDIO) ? kStandardIO : 0;
+    LoggingItem *item = createItem(file, function, line, level, type);
     if (!item)
         return;
 
@@ -882,6 +918,8 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     va_end(arguments);
 
     logQueue.enqueue(item);
+    if (logThread && (type & kFlush))
+        logThread->flush();
 }
 
 #ifndef _WIN32
@@ -1037,15 +1075,13 @@ void threadRegister(QString name)
 
     QMutexLocker qLock(&logQueueMutex);
 
-    LoggingItem *item =
-        createItem(__FILE__, __FUNCTION__, __LINE__, (LogLevel_t)LOG_DEBUG);
-    if (!item)
-        return;
-
-    item->threadName = strdup((char *)name.toLocal8Bit().constData());
-    item->registering = true;
-
-    logQueue.enqueue(item);
+    LoggingItem *item = createItem(__FILE__, __FUNCTION__, __LINE__,
+                                   (LogLevel_t)LOG_DEBUG, kRegistering);
+    if (item)
+    {
+        item->threadName = strdup((char *)name.toLocal8Bit().constData());
+        logQueue.enqueue(item);
+    }
 }
 
 void threadDeregister(void)
@@ -1055,14 +1091,10 @@ void threadDeregister(void)
 
     QMutexLocker qLock(&logQueueMutex);
 
-    LoggingItem *item =
-        createItem(__FILE__, __FUNCTION__, __LINE__, (LogLevel_t)LOG_DEBUG);
-    if (!item)
-        return;
-
-    item->deregistering = true;
-
-    logQueue.enqueue(item);
+    LoggingItem *item = createItem(__FILE__, __FUNCTION__, __LINE__,
+                                   (LogLevel_t)LOG_DEBUG, kDeregistering);
+    if (item)
+        logQueue.enqueue(item);
 }
 
 int syslogGetFacility(QString facility)

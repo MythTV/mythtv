@@ -4,6 +4,7 @@
 #include <QMutexLocker>
 #include <QMutex>
 #include <QQueue>
+#include <QTime>
 
 #include <stdint.h>
 #include <time.h>
@@ -13,7 +14,7 @@
 #include "verbosedefs.h"
 #include "mthread.h"
 
-#define LOGLINE_MAX 2048
+#define LOGLINE_MAX (2048-120)
 
 class QString;
 class LoggingItem;
@@ -84,7 +85,9 @@ class DatabaseLogger : public LoggerBase {
         pid_t m_pid;
         bool m_opened;
         bool m_loggingTableExists;
-        bool m_disabled;
+        bool m_disabled; // only accessed from logmsg
+        QTime m_disabledTime; // only accessed from logmsg
+        static const int kMinDisabledTime;
 };
 
 class QWaitCondition;
@@ -95,8 +98,10 @@ class LoggerThread : public MThread
         ~LoggerThread();
         void run(void);
         void stop(void);
+        bool flush(int timeoutMS = 200000);
     private:
-        QWaitCondition *m_wait; // protected by logQueueMutex
+        QWaitCondition *m_waitNotEmpty; // protected by logQueueMutex
+        QWaitCondition *m_waitEmpty; // protected by logQueueMutex
         bool aborted; // protected by logQueueMutex
 };
 
