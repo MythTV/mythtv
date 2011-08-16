@@ -1893,10 +1893,16 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
         return false;
 
     if ((dupmethod & kDupCheckSubThenDesc) &&
-        ((subtitle.isEmpty() && other.subtitle.isEmpty() &&
-          description.toLower() != other.description.toLower()) ||
-         (subtitle.toLower() != other.subtitle.toLower()) ||
-         (description.isEmpty() && subtitle.isEmpty())))
+        ((subtitle.isEmpty() &&
+          ((!other.subtitle.isEmpty() &&
+            description.toLower() != other.subtitle.toLower()) ||
+           (other.subtitle.isEmpty() &&
+            description.toLower() != other.description.toLower()))) ||
+         (!subtitle.isEmpty() &&
+          ((other.subtitle.isEmpty() &&
+            subtitle.toLower() != other.description.toLower()) ||
+           (!other.subtitle.isEmpty() &&
+            subtitle.toLower() != other.subtitle.toLower())))))
         return false;
 
     return true;
