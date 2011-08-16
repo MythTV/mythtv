@@ -38,7 +38,6 @@ class MPUBLIC XMLParse
     void parsePushButton(LayerSet *, QDomElement &);
     void parseTextButton(LayerSet *, QDomElement &);
     void parseCheckBox(LayerSet *, QDomElement &);
-    void parseSelector(LayerSet *, QDomElement &);
     void parseBlackHole(LayerSet *, QDomElement &);
     void parseListBtnArea(LayerSet *, QDomElement &);
     void parseListTreeArea(LayerSet *, QDomElement &);

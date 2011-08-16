@@ -1613,11 +1613,6 @@ UICheckBoxType* MythThemedDialog::getUICheckBoxType(const QString &name)
     return GetUIType<UICheckBoxType>(this, name);
 }
 
-UISelectorType* MythThemedDialog::getUISelectorType(const QString &name)
-{
-    return GetUIType<UISelectorType>(this, name);
-}
-
 UIBlackHoleType* MythThemedDialog::getUIBlackHoleType(const QString &name)
 {
     return GetUIType<UIBlackHoleType>(this, name);
