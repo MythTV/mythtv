@@ -740,9 +740,11 @@ void RingBuffer::run(void)
 
         long long totfree = ReadBufFree();
 
+        const uint KB32 = 32*1024;
         // These are conditions where we don't want to go through
         // the loop if they are true.
-        if ((ignorereadpos >= 0) || commserror || stopreads)
+        if (((totfree < KB32) && readsallowed) ||
+            (ignorereadpos >= 0) || commserror || stopreads)
         {
             ignore_for_read_timing |=
                 (ignorereadpos >= 0) || commserror || stopreads;
@@ -759,7 +761,6 @@ void RingBuffer::run(void)
             totfree = ReadBufFree();
         }
 
-        const uint KB32 = 32*1024;
         int read_return = -1;
         if (totfree >= KB32 && !commserror &&
             !ateof && !setswitchtonext)
