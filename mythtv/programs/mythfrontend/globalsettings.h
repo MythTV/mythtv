@@ -12,15 +12,6 @@
 
 class QFileInfo;
 
-class ThemeSelector : public HostImageSelect
-{
-  public:
-    ThemeSelector(QString label);
-
-  private:
-    bool parseThemeInfo(QFileInfo *theme, QString &name, QFileInfo &preview);
-};
-
 class PlaybackSettings : public ConfigurationWizard
 {
   public:
