@@ -1,6 +1,6 @@
 #include <mythtv/mythconfig.h>
 
-#if defined(MMX) && !defined(ARCH_X86_64)
+#if defined(MMX)
 /* a definir pour avoir exactement le meme resultat que la fonction C
  * (un chouillat plus lent)
  */
@@ -17,6 +17,13 @@
 // faire : a / sqrtperte <=> a >> PERTEDEC
 #define PERTEDEC 4
 
+#if defined(ARCH_X86_64)
+#define REG_c "rcx"
+#define REG_a "rax"
+#elif defined(ARCH_X86_32)
+#define REG_c "ecx"
+#define REG_a "eax"
+#endif
 
 //#define MMX_TRACE
 #include "mmx.h"
@@ -115,18 +122,18 @@ void zoom_filter_xmmx (int prevX, int prevY,
 				"movd %%mm0,%%ecx\n"
 				"movq %%mm0,%%mm1\n"
 
-				"andl $15,%%ecx\n"
+				"and $15,%%"REG_c"\n"
 				"psrlq $32,%%mm1\n"
 
-				"shll $6,%%ecx\n"
+				"shl $6,%%"REG_c"\n"
 				"movd %%mm1,%%eax\n"
 
-				"addl %0,%%ecx\n"
-				"andl $15,%%eax\n"
+				"add %0,%%"REG_c"\n"
+				"and $15,%%"REG_a"\n"
 
-				"movd (%%ecx,%%eax,4),%%mm3\n"
+				"movd (%%"REG_c",%%"REG_a",4),%%mm3\n"
 				/* ::"X"(precalCoef):"eax","ecx"); */
-				::"m"(precalCoef):"eax","ecx");
+				::"m"(precalCoef):REG_a,REG_c);
 				
 
 			/*
@@ -171,14 +178,14 @@ void zoom_filter_xmmx (int prevX, int prevY,
 				/*^*/ "movq %%mm3,%%mm4\n"       /*^*/
 				/*^*/ "movq %%mm3,%%mm5\n"       /*^*/
 
-				"movl %0,%%ecx\n"
+				"mov %0,%%"REG_c"\n"
 				/*^*/ "punpcklbw %%mm5,%%mm3\n"  /*^*/
 
-				"movq (%%ecx,%%eax,4),%%mm0\n"
+				"movq (%%"REG_c",%%"REG_a",4),%%mm0\n"
 				/*^*/ "punpckhbw %%mm5,%%mm4\n"  /*^*/
 
 				"addl %1,%%eax\n"
-				"movq (%%ecx,%%eax,4),%%mm2\n"
+				"movq (%%"REG_c",%%"REG_a",4),%%mm2\n"
 				
 				: : "X"(expix1), "X"(prevX):"eax","ecx"
 				);

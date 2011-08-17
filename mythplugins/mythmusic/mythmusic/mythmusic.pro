@@ -57,6 +57,7 @@ SOURCES += metaiowavpack.cpp metaioid3.cpp metaiooggvorbis.cpp
 SOURCES += goom/filters.c goom/goom_core.c goom/graphic.c goom/tentacle3d.c
 SOURCES += goom/ifs.c goom/ifs_display.c goom/lines.c goom/surf3d.c
 SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c goom/mythgoom.cpp
+SOURCES += goom/zoom_filter_sse2.c
 SOURCES += avfdecoder.cpp editmetadata.cpp smartplaylist.cpp search.cpp
 SOURCES += treebuilders.cpp importmusic.cpp
 SOURCES += filescanner.cpp libvisualplugin.cpp musicplayer.cpp miniplayer.cpp
