@@ -17,6 +17,17 @@
 
 class MythUIWebBrowser;
 
+class MythWebPage : public QWebPage
+{
+  Q_OBJECT
+
+  public:
+    MythWebPage(QObject *parent = 0);
+
+  protected:
+    virtual QString userAgentForUrl(const QUrl &url) const;
+};
+
 class MythWebView : public QWebView
 {
   Q_OBJECT

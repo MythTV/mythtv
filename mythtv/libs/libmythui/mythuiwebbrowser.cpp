@@ -31,6 +31,17 @@
 #include "mythuihelper.h"
 #include "mythcorecontext.h"
 
+
+MythWebPage::MythWebPage(QObject *parent)
+            : QWebPage(parent)
+{
+}
+
+QString MythWebPage::userAgentForUrl(const QUrl &url) const
+{
+    return QWebPage::userAgentForUrl(url).replace("Safari", "MythBrowser");
+}
+
 /**
  * @class MythWebView
  * @brief Subclass of QWebView
@@ -39,6 +50,7 @@
 MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
            : QWebView(parent)
 {
+    setPage(new MythWebPage(this));
     m_parentBrowser = parentBrowser;
 
     connect(this->page(), SIGNAL(unsupportedContent(QNetworkReply *)),
