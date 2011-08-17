@@ -327,13 +327,13 @@ int main(int argc, char *argv[])
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    cmdline.ApplySettingsOverride();
-
     if (!gContext->Init(use_display)) // No Upnp, Prompt for db
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
+
+    cmdline.ApplySettingsOverride();
 
     if (!GetMythDB()->HaveSchema())
     {
