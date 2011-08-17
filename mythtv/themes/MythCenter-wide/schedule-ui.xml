@@ -1501,7 +1501,7 @@
             <searchposition>-1,450</searchposition>
             <statetype name="buttonitem">
                 <state name="active">
-                    <textarea name="rectype" from="buttontext">
+                    <textarea name="rectypechar" from="buttontext">
                         <area>20,2,20,24</area>
                     </textarea>
                     <textarea name="title" from="buttontext">

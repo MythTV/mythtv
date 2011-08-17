@@ -818,7 +818,7 @@
             <buttonarea>0,0,760,320</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <textarea name="rectype" from="buttontext">
+                    <textarea name="rectypechar" from="buttontext">
                         <area>20,1,20,20</area>
                         <align>hcenter</align>
                     </textarea>
