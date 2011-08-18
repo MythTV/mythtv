@@ -17,10 +17,10 @@
 // faire : a / sqrtperte <=> a >> PERTEDEC
 #define PERTEDEC 4
 
-#if ARCH_X86_64
+#if defined(ARCH_X86_64)
 #define REG_c "rcx"
 #define REG_a "rax"
-#elif ARCH_X86_32
+#elif defined(ARCH_X86_32)
 #define REG_c "ecx"
 #define REG_a "eax"
 #endif
