@@ -193,6 +193,7 @@ __version__=u"v0.6.3"
 #       Fixed aborts caused by bad metadata in Miro (videoFilename)
 #       Added support for Miro 4.0.2
 #       Fixed display of command line help (-h or --help)
+#       Sometimes Miro metadata has no video filename. Skip these invalid videos.
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -1930,8 +1931,12 @@ def updateMythRecorded(items):
 
     # Add new Miro unwatched videos to MythTV'd data base
     for item in items_copy:
+        # Do not create records for Miro video files when Miro has a corrupt or missing file name
+        if item[u'videoFilename'] == None:
+            continue
+        # Do not create records for Miro video files that do not exist
         if not os.path.isfile(os.path.realpath(item[u'videoFilename'])):
-            continue # Do not create records for Miro video files that do not exist
+            continue
         records = createRecordedRecords(item)
         if records:
             if simulation:
