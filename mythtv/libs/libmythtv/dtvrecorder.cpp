@@ -335,13 +335,19 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     //   00 00 01 00: picture_start_code
     //   00 00 01 B8: group_start_code
     //   00 00 01 B3: seq_start_code
+    //   00 00 01 B5: ext_start_code
     //   (there are others that we don't care about)
     const uint8_t *bufptr = tspacket->data() + tspacket->AFCOffset();
     const uint8_t *bufend = tspacket->data() + TSPacket::kSize;
+    int progressive_sequence = 0;
+    int ext_type, bytes_left;
+    int picture_structure, top_field_first, repeat_first_field, progressive_frame;
+    int repeat_pict = 0;
 
     while (bufptr < bufend)
     {
         bufptr = ff_find_start_code(bufptr, bufend, &_start_code);
+        bytes_left = bufend - bufptr;
         if ((_start_code & 0xffffff00) == 0x00000100)
         {
             // At this point we have seen the start code 0 0 1
@@ -367,6 +373,48 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
                 width = (bufptr[0] <<4) | (bufptr[1]>>4);
 
                 frameRate = frameRateMap[(bufptr[3] & 0x0000000f)];
+            }
+            else if (PESStreamID::MPEG2ExtensionStartCode == stream_id)
+            {
+                if (bytes_left >= 1) 
+                {
+                    ext_type = (bufptr[0] >> 4);
+                    switch(ext_type)
+                    {
+                    case 0x1: /* sequence extension */
+                        if (bytes_left >= 6)
+                        {
+                            progressive_sequence = bufptr[1] & (1 << 3);
+                        }
+                        break;
+                    case 0x8: /* picture coding extension */
+                        if (bytes_left >= 5)
+                        {
+                            picture_structure = bufptr[2]&3;
+                            top_field_first = bufptr[3] & (1 << 7);
+                            repeat_first_field = bufptr[3] & (1 << 1);
+                            progressive_frame = bufptr[4] & (1 << 7);
+
+                            /* check if we must repeat the frame */
+                            repeat_pict = 1;
+                            if (repeat_first_field) 
+                            {
+                                if (progressive_sequence)
+                                {
+                                    if (top_field_first)
+                                        repeat_pict = 5;
+                                    else
+                                        repeat_pict = 3;
+                                }
+                                else if (progressive_frame) 
+                                {
+                                    repeat_pict = 2;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
             }
         }
     }
