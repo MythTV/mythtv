@@ -1806,7 +1806,8 @@ void MetadataOptions::customEvent(QEvent *levent)
                     qDeleteAll(list);
                     return;
                 }
-                else if (m_recInfo->GetYearOfInitialRelease() != 0 &&
+                else if (m_recInfo &&
+                         m_recInfo->GetYearOfInitialRelease() != 0 &&
                          (list[p])->GetYear() != 0 &&
                          m_recInfo->GetYearOfInitialRelease() == (list[p])->GetYear())
                 {
