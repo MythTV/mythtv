@@ -310,6 +310,7 @@ __version__=u"v0.7.8"
  #       Replace 'xml' module version check with generic Python version, to correct failure in Python 2.7
  # 0.7.8 Fixed a bug which caused jamu to crash due to an extra unicode conversion introduced in 0.7.7.
  #       See also #9637.
+ #       Removed unnecessary unicode character conversions when data comes from a jamu.conf file
 
 
 usage_txt=u'''
@@ -1765,7 +1766,7 @@ http://www.pythonware.com/products/pil/\nError:(%s)\n""" % e)
             else:
                 if self.config['series_name_override']:
                     if self.config['series_name_override'].has_key(args[0].lower()):
-                        self.config['sid'] = unicode((self.config['series_name_override'][args[0].lower()]).strip(), 'utf8')
+                        self.config['sid'] = self.config['series_name_override'][args[0].lower()].strip()
                     else:
                         self.config['series_name'] = unicode(args[0].strip(), 'utf8')
                 else:
@@ -1786,11 +1787,11 @@ http://www.pythonware.com/products/pil/\nError:(%s)\n""" % e)
                 else:
                     if self.config['ep_name_massage']:
                         if self.config['ep_name_massage'].has_key(self.config['series_name']):
-                            tmp_ep_name=args[1].strip()
+                            tmp_ep_name=unicode(args[1].strip(), 'utf8')
                             tmp_array=self.config['ep_name_massage'][self.config['series_name']]
                             for pair in tmp_array:
                                 tmp_ep_name = tmp_ep_name.replace(pair[0],pair[1])
-                            self.config['episode_name'] = unicode(tmp_ep_name, 'utf8')
+                            self.config['episode_name'] = tmp_ep_name
                         else:
                             self.config['episode_name'] = unicode(args[1].strip(), 'utf8')
                     else:
