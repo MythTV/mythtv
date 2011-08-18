@@ -302,7 +302,8 @@ __version__=u"v0.7.3"
  # 0.7.2 Fixed a bug where an inetref field was not properly initialized and caused an abort. Ticket #8243
  # 0.7.3 Fixed a bug where a user selected TMDB# was not being used.
  #       Minor change to fuzzy matching of a file named parsed title with those from TMDB and TVDB.
- # Added support for unicode characters in a jamu.conf file
+ #       Added support for unicode characters in a jamu.conf file
+ #       Removed unnecessary unicode character conversions when data comes from a jamu.conf file
 
 usage_txt=u'''
 JAMU - Just.Another.Metadata.Utility is a versatile utility for downloading graphics and meta data
@@ -1290,12 +1291,12 @@ class Configuration(object):
             if section == 'regex':
                 # Change variables per user config file
                 for option in cfg.options(section):
-                    self.config['name_parse'].append(re.compile(unicode(cfg.get(section, option), 'utf8'), re.UNICODE))
+                    self.config['name_parse'].append(re.compile(cfg.get(section, option), re.UNICODE))
                 continue
             if section == 'ignore-directory':
                 # Video directories to be excluded from Jamu processing
                 for option in cfg.options(section):
-                    self.config['ignore-directory'].append(unicode(cfg.get(section, option), 'utf8'))
+                    self.config['ignore-directory'].append(cfg.get(section, option))
                 continue
             if section =='series_name_override':
                 overrides = {}
@@ -1775,7 +1776,7 @@ http://www.pythonware.com/products/pil/\nError:(%s)\n""" % e)
             else:
                 if self.config['series_name_override']:
                     if self.config['series_name_override'].has_key(args[0].lower()):
-                        self.config['sid'] = unicode((self.config['series_name_override'][args[0].lower()]).strip(), 'utf8')
+                        self.config['sid'] = self.config['series_name_override'][args[0].lower()].strip()
                     else:
                         self.config['series_name'] = unicode(args[0].strip(), 'utf8')
                 else:
@@ -1796,11 +1797,11 @@ http://www.pythonware.com/products/pil/\nError:(%s)\n""" % e)
                 else:
                     if self.config['ep_name_massage']:
                         if self.config['ep_name_massage'].has_key(self.config['series_name']):
-                            tmp_ep_name=args[1].strip()
+                            tmp_ep_name=unicode(args[1].strip(), 'utf8')
                             tmp_array=self.config['ep_name_massage'][self.config['series_name']]
                             for pair in tmp_array:
                                 tmp_ep_name = tmp_ep_name.replace(pair[0],pair[1])
-                            self.config['episode_name'] = unicode(tmp_ep_name, 'utf8')
+                            self.config['episode_name'] = tmp_ep_name
                         else:
                             self.config['episode_name'] = unicode(args[1].strip(), 'utf8')
                     else:
