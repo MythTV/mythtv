@@ -490,29 +490,101 @@ int hdhomerun_device_get_tuner_status(struct hdhomerun_device_t *hd, char **psta
 		*pstatus_str = status_str;
 	}
 
-	char *channel = strstr(status_str, "ch=");
-	if (channel) {
-		sscanf(channel + 3, "%31s", status->channel);
+	if (status) {
+		char *channel = strstr(status_str, "ch=");
+		if (channel) {
+			sscanf(channel + 3, "%31s", status->channel);
+		}
+
+		char *lock = strstr(status_str, "lock=");
+		if (lock) {
+			sscanf(lock + 5, "%31s", status->lock_str);
+		}
+
+		status->signal_strength = (unsigned int)hdhomerun_device_get_status_parse(status_str, "ss=");
+		status->signal_to_noise_quality = (unsigned int)hdhomerun_device_get_status_parse(status_str, "snq=");
+		status->symbol_error_quality = (unsigned int)hdhomerun_device_get_status_parse(status_str, "seq=");
+		status->raw_bits_per_second = hdhomerun_device_get_status_parse(status_str, "bps=");
+		status->packets_per_second = hdhomerun_device_get_status_parse(status_str, "pps=");
+
+		status->signal_present = status->signal_strength >= 45;
+
+		if (strcmp(status->lock_str, "none") != 0) {
+			if (status->lock_str[0] == '(') {
+				status->lock_unsupported = TRUE;
+			} else {
+				status->lock_supported = TRUE;
+			}
+		}
 	}
 
-	char *lock = strstr(status_str, "lock=");
-	if (lock) {
-		sscanf(lock + 5, "%31s", status->lock_str);
+	return 1;
+}
+
+int hdhomerun_device_get_tuner_vstatus(struct hdhomerun_device_t *hd, char **pvstatus_str, struct hdhomerun_tuner_vstatus_t *vstatus)
+{
+	if (!hd->cs) {
+		hdhomerun_debug_printf(hd->dbg, "hdhomerun_device_get_tuner_vstatus: device not set\n");
+		return -1;
 	}
 
-	status->signal_strength = (unsigned int)hdhomerun_device_get_status_parse(status_str, "ss=");
-	status->signal_to_noise_quality = (unsigned int)hdhomerun_device_get_status_parse(status_str, "snq=");
-	status->symbol_error_quality = (unsigned int)hdhomerun_device_get_status_parse(status_str, "seq=");
-	status->raw_bits_per_second = hdhomerun_device_get_status_parse(status_str, "bps=");
-	status->packets_per_second = hdhomerun_device_get_status_parse(status_str, "pps=");
+	memset(vstatus, 0, sizeof(struct hdhomerun_tuner_vstatus_t));
 
-	status->signal_present = status->signal_strength >= 45;
+	char var_name[32];
+	sprintf(var_name, "/tuner%u/vstatus", hd->tuner);
 
-	if (strcmp(status->lock_str, "none") != 0) {
-		if (status->lock_str[0] == '(') {
-			status->lock_unsupported = TRUE;
-		} else {
-			status->lock_supported = TRUE;
+	char *vstatus_str;
+	int ret = hdhomerun_control_get(hd->cs, var_name, &vstatus_str, NULL);
+	if (ret <= 0) {
+		return ret;
+	}
+
+	if (pvstatus_str) {
+		*pvstatus_str = vstatus_str;
+	}
+
+	if (vstatus) {
+		char *vch = strstr(vstatus_str, "vch=");
+		if (vch) {
+			sscanf(vch + 4, "%31s", vstatus->vchannel);
+		}
+
+		char *name = strstr(vstatus_str, "name=");
+		if (name) {
+			sscanf(name + 5, "%31s", vstatus->name);
+		}
+
+		char *auth = strstr(vstatus_str, "auth=");
+		if (auth) {
+			sscanf(auth + 5, "%31s", vstatus->auth);
+		}
+
+		char *cci = strstr(vstatus_str, "cci=");
+		if (cci) {
+			sscanf(cci + 4, "%31s", vstatus->cci);
+		}
+
+		char *cgms = strstr(vstatus_str, "cgms=");
+		if (cgms) {
+			sscanf(cgms + 5, "%31s", vstatus->cgms);
+		}
+
+		if (strncmp(vstatus->auth, "not-subscribed", 14) == 0) {
+			vstatus->not_subscribed = TRUE;
+		}
+
+		if (strncmp(vstatus->auth, "error", 5) == 0) {
+			vstatus->not_available = TRUE;
+		}
+		if (strncmp(vstatus->auth, "dialog", 6) == 0) {
+			vstatus->not_available = TRUE;
+		}
+
+		if (strncmp(vstatus->cci, "protected", 9) == 0) {
+			vstatus->copy_protected = TRUE;
+		}
+		if (strncmp(vstatus->cgms, "protected", 9) == 0) {
+			vstatus->copy_protected = TRUE;
 		}
 	}
 
