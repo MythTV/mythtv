@@ -88,6 +88,7 @@ class DatabaseLogger : public LoggerBase {
         bool m_loggingTableExists;
         bool m_disabled; // only accessed from logmsg
         QTime m_disabledTime; // only accessed from logmsg
+        QTime m_errorLoggingTime; // only accessed from logqmsg
         static const int kMinDisabledTime;
 };
 

@@ -465,7 +465,17 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
 
     if (!query.exec())
     {
-        MythDB::DBError("DBLogging", query);
+        // Suppress Driver not loaded errors that occur at startup.
+        // and suppress additional errors for one second after the
+        // previous error (to avoid spamming the log).
+        QSqlError err = query.lastError();
+        if ((err.type() != 1 || err.number() != -1) &&
+            (!m_errorLoggingTime.isValid() ||
+             (m_errorLoggingTime.elapsed() > 1000)))
+        {
+            MythDB::DBError("DBLogging", query);
+            m_errorLoggingTime.start();
+        }
         return false;
     }
 
@@ -519,44 +529,45 @@ void DBLoggerThread::run(void)
     // We want the query to be out of scope before the RunEpilog() so shutdown
     // occurs correctly as otherwise the connection appears still in use, and
     // we get a qWarning on shutdown.
-    if (!aborted)
+    MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
+    m_logger->prepare(*query);
+
+    while (!aborted || !m_queue->isEmpty())
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        m_logger->prepare(query);
-
-        while (!aborted || !m_queue->isEmpty())
+        if (m_queue->isEmpty())
         {
-            if (m_queue->isEmpty())
-            {
-                m_wait->wait(qLock.mutex(), 100);
-                continue;
-            }
-
-            LoggingItem *item = m_queue->dequeue();
-            if (!item)
-                continue;
-
-            qLock.unlock();
-
-            if (item->message[0] != '\0')
-            {
-                if (!m_logger->logqmsg(query, item))
-                {
-                    qLock.relock();
-                    m_queue->prepend(item);
-                    m_wait->wait(qLock.mutex(), 100);
-                    m_logger->prepare(query);
-                    continue;
-                }
-            }
-            else
-            {
-                deleteItem(item);
-            }
-
-            qLock.relock();
+            m_wait->wait(qLock.mutex(), 100);
+            continue;
         }
+
+        LoggingItem *item = m_queue->dequeue();
+        if (!item)
+            continue;
+
+        qLock.unlock();
+
+        if (item->message[0] != '\0')
+        {
+            if (!m_logger->logqmsg(*query, item))
+            {
+                qLock.relock();
+                m_queue->prepend(item);
+                m_wait->wait(qLock.mutex(), 100);
+                delete query;
+                query = new MSqlQuery(MSqlQuery::InitCon());
+                m_logger->prepare(*query);
+                continue;
+            }
+        }
+        else
+        {
+            deleteItem(item);
+        }
+
+        qLock.relock();
     }
+
+    delete query;
 
     qLock.unlock();
 
