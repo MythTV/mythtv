@@ -319,8 +319,6 @@ bool FileLogger::logmsg(LoggingItem *item)
 
     int fd = (item->type & kStandardIO) ? 1 : m_fd;
     int result = write( fd, line, strlen(line) );
-    if (item->type & kFlush)
-        fsync(fd);
 
     deleteItem(item);
 
