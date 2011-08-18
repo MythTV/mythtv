@@ -229,18 +229,6 @@ namespace
             g_pUPnp = NULL;
         }
 
-        if (SSDP::Instance())
-        {
-            SSDP::Instance()->RequestTerminate();
-            SSDP::Instance()->wait();
-        }
-
-        if (TaskQueue::Instance())
-        {
-            TaskQueue::Instance()->RequestTerminate();
-            TaskQueue::Instance()->wait();
-        }
-
         if (pmanager)
         {
             delete pmanager;

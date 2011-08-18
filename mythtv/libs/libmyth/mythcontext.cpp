@@ -1104,6 +1104,9 @@ MythContext::~MythContext()
     MThreadPool::globalInstance()->waitForDone();
     logStop();
 
+    SSDP::Shutdown();
+    TaskQueue::Shutdown();
+
     delete gCoreContext;
     gCoreContext = NULL;
 

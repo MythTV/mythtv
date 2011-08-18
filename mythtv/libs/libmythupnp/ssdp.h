@@ -119,6 +119,7 @@ class UPNP_PUBLIC SSDP : public MThread
     public:
 
         static SSDP* Instance();
+        static void Shutdown();
 
             ~SSDP();
 

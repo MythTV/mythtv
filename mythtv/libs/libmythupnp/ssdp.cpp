@@ -59,6 +59,17 @@ SSDP* SSDP::Instance()
     QMutexLocker locker(&g_pSSDPCreationLock);
     return g_pSSDP ? g_pSSDP : (g_pSSDP = new SSDP());
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void SSDP::Shutdown()
+{
+    QMutexLocker locker(&g_pSSDPCreationLock);
+    delete g_pSSDP;
+    g_pSSDP = NULL;
+}
  
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -132,11 +143,7 @@ SSDP::~SSDP()
         }
     }
 
-    QMutexLocker locker(&g_pSSDPCreationLock);
-    g_pSSDP = NULL;
-
     LOG(VB_UPNP, LOG_INFO, "SSDP Thread Terminated." );
-
 }
 
 void SSDP::RequestTerminate(void)
