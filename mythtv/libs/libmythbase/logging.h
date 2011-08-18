@@ -77,6 +77,7 @@ class DatabaseLogger : public LoggerBase {
         virtual void stopDatabaseAccess(void);
     protected:
         bool logqmsg(MSqlQuery &query, LoggingItem *item);
+        void prepare(MSqlQuery &query);
     private:
         bool isDatabaseReady();
         bool tableExists(const QString &table);
@@ -118,7 +119,8 @@ class DBLoggerThread : public MThread
         bool enqueue(LoggingItem *item) 
         { 
             QMutexLocker qLock(&m_queueMutex); 
-            m_queue->enqueue(item); 
+            if (!aborted)
+                m_queue->enqueue(item); 
             return true; 
         }
         bool queueFull(void)

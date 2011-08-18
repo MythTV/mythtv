@@ -399,22 +399,25 @@ DatabaseLogger::~DatabaseLogger()
 {
     LOG(VB_GENERAL, LOG_INFO, "Removing database logging");
 
+    stopDatabaseAccess();
+}
+
+void DatabaseLogger::stopDatabaseAccess(void)
+{
     if( m_thread )
     {
         m_thread->stop();
         m_thread->wait();
         delete m_thread;
+        m_thread = NULL;
     }
-}
-
-void DatabaseLogger::stopDatabaseAccess(void)
-{
-    m_thread->stop();
-    m_thread->wait();
 }
 
 bool DatabaseLogger::logmsg(LoggingItem *item)
 {
+    if (!m_thread)
+        return false;
+
     if (!m_thread->isRunning())
     {
         m_disabled = true;
@@ -471,6 +474,14 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
     return true;
 }
 
+void DatabaseLogger::prepare(MSqlQuery &query)
+{
+    query.prepare(m_query);
+    query.bindValue(":HOST", gCoreContext->GetHostName());
+    query.bindValue(":APP", QCoreApplication::applicationName());
+    query.bindValue(":PID", getpid());
+}
+
 DBLoggerThread::DBLoggerThread(DatabaseLogger *logger) :
     MThread("DBLogger"),
     m_logger(logger),
@@ -499,60 +510,52 @@ void DBLoggerThread::run(void)
 
     QMutexLocker qLock(&m_queueMutex);
 
-    // wait a bit before we start logging to the DB..
+    // Wait a bit before we start logging to the DB..  If we wait too long,
+    // then short-running tasks (like mythpreviewgen) will not log to the db
+    // at all, and that's undesirable.
     while (!m_logger->isDatabaseReady() && !gCoreContext && !aborted)
         m_wait->wait(qLock.mutex(), 100);
-    QTime t; t.start();
-    while (!aborted && t.elapsed() < 2000)
-        m_wait->wait(qLock.mutex(), 100);
 
-    if (aborted)
+    // We want the query to be out of scope before the RunEpilog() so shutdown
+    // occurs correctly as otherwise the connection appears still in use, and
+    // we get a qWarning on shutdown.
+    if (!aborted)
     {
-        qLock.unlock();
-        RunEpilog();
-        return;
-    }
+        MSqlQuery query(MSqlQuery::InitCon());
+        m_logger->prepare(query);
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(m_logger->m_query);
-    query.bindValue(":HOST", gCoreContext->GetHostName());
-    query.bindValue(":APP", QCoreApplication::applicationName());
-    query.bindValue(":PID", getpid());
-
-    while (!aborted || !m_queue->isEmpty())
-    {
-        if (m_queue->isEmpty())
+        while (!aborted || !m_queue->isEmpty())
         {
-            m_wait->wait(qLock.mutex(), 100);
-            continue;
-        }
-
-        LoggingItem *item = m_queue->dequeue();
-        if (!item)
-            continue;
-
-        qLock.unlock();
-
-        if (item->message[0]!='\0' && !aborted)
-        {
-            if (!m_logger->logqmsg(query, item))
+            if (m_queue->isEmpty())
             {
-                qLock.relock();
-                m_queue->prepend(item);
                 m_wait->wait(qLock.mutex(), 100);
-                query.prepare(m_logger->m_query);
-                query.bindValue(":HOST", gCoreContext->GetHostName());
-                query.bindValue(":APP", QCoreApplication::applicationName());
-                query.bindValue(":PID", getpid());
                 continue;
             }
-        }
-        else
-        {
-            deleteItem(item);
-        }
 
-        qLock.relock();
+            LoggingItem *item = m_queue->dequeue();
+            if (!item)
+                continue;
+
+            qLock.unlock();
+
+            if (item->message[0] != '\0')
+            {
+                if (!m_logger->logqmsg(query, item))
+                {
+                    qLock.relock();
+                    m_queue->prepend(item);
+                    m_wait->wait(qLock.mutex(), 100);
+                    m_logger->prepare(query);
+                    continue;
+                }
+            }
+            else
+            {
+                deleteItem(item);
+            }
+
+            qLock.relock();
+        }
     }
 
     qLock.unlock();
