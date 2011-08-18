@@ -36,29 +36,23 @@ extern volatile guint32 c_resoly;
 void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, signed int *brutS, signed int *brutD);
 
 #ifdef MMX
-void    zoom_filter_sse2 (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
-int 	zoom_filter_sse2_supported ();
+
 void    zoom_filter_xmmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
 int 	zoom_filter_xmmx_supported ();
 void    zoom_filter_mmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
 int 	zoom_filter_mmx_supported ();
 
-static int zf_use_sse2 = 0;
 static int zf_use_xmmx = 0;
 static int zf_use_mmx = 0;
 
 static void select_zoom_filter () {
 	static int firsttime = 1;
 	if (firsttime){
-                if (zoom_filter_sse2_supported()) {
-                        zf_use_sse2 = 1;
-                        printf("SSE2 detected. Using fastest method !\n");
-                }
-                else if (zoom_filter_xmmx_supported()) {
+		if (zoom_filter_xmmx_supported()) {
 			zf_use_xmmx = 1;
-			printf ("Extended MMX detected. Using a faster method !\n");
+			printf ("Extended MMX detected. Using the fastest method !\n");
 		}
-                else if (zoom_filter_mmx_supported()) {
+		else if (zoom_filter_mmx_supported()) {
 			zf_use_mmx = 1;
 			printf ("MMX detected. Using fast method !\n");
 		}
@@ -702,30 +696,26 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 #ifdef USE_ASM
 #ifdef MMX
-	if (zf_use_sse2)
-		zoom_filter_sse2(prevX, prevY, expix1, expix2, brutS, brutD, 
-                                 buffratio, precalCoef);
-        else if (zf_use_xmmx)
-		zoom_filter_xmmx(prevX, prevY,expix1, expix2, brutS, brutD, 
-                                 buffratio, precalCoef);
+	if (zf_use_xmmx)
+		zoom_filter_xmmx (prevX, prevY,expix1, expix2,
+											brutS, brutD, buffratio, precalCoef);
 	else if (zf_use_mmx)
-		zoom_filter_mmx(prevX, prevY,expix1, expix2, brutS, brutD, 
-                                buffratio, precalCoef);
+		zoom_filter_mmx (prevX, prevY,expix1, expix2,
+										 brutS, brutD, buffratio, precalCoef);
 	else c_zoom (expix1, expix2, prevX, prevY, brutS, brutD);
 #endif
 
 #ifdef POWERPC
 	if (useAltivec)
-            ppc_zoom (expix1, expix2, prevX, prevY, brutS, brutD, 
-                      buffratio, precalCoef);
+{
+            ppc_zoom (expix1, expix2, prevX, prevY, brutS, brutD, buffratio,precalCoef);
+}
 	else
-            ppc_zoom (expix1, expix2, prevX, prevY, brutS, brutD, 
-                      buffratio, precalCoef);
+            ppc_zoom (expix1, expix2, prevX, prevY, brutS, brutD, buffratio,precalCoef);
 #endif
 #else
 	c_zoom (expix1, expix2, prevX, prevY, brutS, brutD);
 #endif
-
 }
 
 void

@@ -21,7 +21,7 @@ extern "C" {
 
 Goom::Goom(long int winid)
 {
-    fps = 16;
+    fps = 20;
 
     surface = NULL;
     buffer = NULL;
