@@ -1503,6 +1503,8 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         const uint kImageCacheTimeout = 5;
         uint now = QDateTime::currentDateTime().toTime_t();
 
+        QMutexLocker locker(d->m_cacheLock);
+
         if (d->imageCache.contains(label) &&
             d->CacheTrack[label] + kImageCacheTimeout > now)
         {
