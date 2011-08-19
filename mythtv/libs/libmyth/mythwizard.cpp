@@ -1,5 +1,5 @@
 /****************************************************************************
-** 
+**
 **
 ** Implementation of MythWizard class.
 **
@@ -524,7 +524,7 @@ void MythWizard::layOut()
         d->help->setMinimumWidth(screenwidth - (int)(40 * wmult));
         d->help->setMaximumHeight((int)(80 * hmult));
         d->help->setMinimumHeight((int)(80 * hmult));
-    
+
         QVBoxLayout *helplayout = new QVBoxLayout(d->helpgroup);
         helplayout->setMargin(10);
         helplayout->addWidget(d->help);
@@ -538,7 +538,7 @@ void MythWizard::layOut()
 
     if ( ! d->hbar2 ) {
         d->hbar2 = new QFrame( this, 0 );
-        d->hbar2->setObjectName("MythWizard - hbar2"); 
+        d->hbar2->setObjectName("MythWizard - hbar2");
         d->hbar2->setFrameStyle(QFrame::Sunken | QFrame::HLine);
         d->hbar2->setFixedHeight( 12 );
     }
@@ -561,7 +561,7 @@ bool MythWizard::eventFilter( QObject * o, QEvent * e )
     return QWidget::eventFilter( o, e );
 }
 
-void MythWizard::keyPressEvent(QKeyEvent* e) 
+void MythWizard::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
@@ -587,7 +587,7 @@ void MythWizard::keyPressEvent(QKeyEvent* e)
             {
                 back();
                 QCoreApplication::postEvent(
-                    GetMythMainWindow(), 
+                    GetMythMainWindow(),
                     new QEvent(MythEvent::kExitToMainMenuEventType));
             }
         }
@@ -642,13 +642,3 @@ void MythWizard::setHelpText(QString helptext)
     d->help->setMinimumWidth(screenwidth - (int)(40 * wmult));
     d->help->setMaximumHeight((int)(80 * hmult));
 }
-
-MythJumpWizard::MythJumpWizard(MythMainWindow *parent, const char *name) :
-    MythWizard(parent, name)
-{
-}
-
-MythJumpWizard::~MythJumpWizard()
-{
-}
-

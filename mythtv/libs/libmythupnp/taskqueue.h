@@ -117,6 +117,7 @@ class UPNP_PUBLIC TaskQueue : public MThread
     public:
 
         static TaskQueue* Instance();
+        static void Shutdown();
 
         virtual ~TaskQueue();
 

@@ -94,17 +94,21 @@ void MetadataDownload::run()
                     list = handleTelevision(lookup);
                 else if (!lookup->GetSubtitle().isEmpty())
                     list = handleVideoUndetermined(lookup);
+
+                if (!list.size())
+                    list = handleRecordingGeneric(lookup);
             }
             else if (lookup->GetSubtype() == kProbableMovie)
+            {
                 list = handleMovie(lookup);
+                if (lookup->GetInetref().isEmpty())
+                    list.append(handleRecordingGeneric(lookup));
+            }
             else
-                list = handleRecordingGeneric(lookup);
-
-            if (!list.size() &&
-                (lookup->GetSubtype() == kProbableMovie ||
-                lookup->GetSubtype() == kProbableTelevision))
             {
                 list = handleRecordingGeneric(lookup);
+                if (lookup->GetInetref().isEmpty())
+                    list.append(handleMovie(lookup));
             }
         }
         else if (lookup->GetType() == kMetadataGame)

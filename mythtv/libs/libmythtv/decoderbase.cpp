@@ -1168,4 +1168,13 @@ void DecoderBase::SaveTotalDuration(void)
     m_playbackinfo->SaveTotalDuration(totalDuration);
 }
 
+void DecoderBase::SaveTotalFrames(void)
+{
+    if (!m_playbackinfo || !framesRead)
+        return;
+
+    m_playbackinfo->SaveTotalFrames(framesRead);
+}
+
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

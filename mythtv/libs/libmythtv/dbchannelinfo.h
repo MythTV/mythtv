@@ -14,7 +14,7 @@ using namespace std;
 #include <QVariant>
 
 // MythTV headers
-#include "mythtvexp.h" 
+#include "mythtvexp.h"
 #include "programtypes.h"
 
 // TODO: Refactor DBChannel, PixmapChannel and ChannelInfo into a single class
@@ -58,7 +58,7 @@ class MTV_PUBLIC ChannelInfo
     ChannelInfo() : chanid(-1), sourceid(-1), favid(-1) {}
     QString GetFormatted(const QString &format) const;
     void ToMap(InfoMap &infoMap) const;
-    
+
     QString callsign;
     QString iconpath;
     QString chanstr;
@@ -91,17 +91,17 @@ class MTV_PUBLIC ChannelInsertInfo
   public:
     ChannelInsertInfo(void) :
         db_mplexid(0), source_id(0), channel_id(0),
-        callsign(QString::null), service_name(QString::null),
-        chan_num(QString::null), service_id(0),
+        callsign(""), service_name(""),
+        chan_num(""), service_id(0),
         atsc_major_channel(0), atsc_minor_channel(0),
         use_on_air_guide(false),
         hidden(false), hidden_in_guide(false),
-        freqid(QString::null), icon(QString::null),
-        format(QString::null), xmltvid(QString::null),
-        default_authority(QString::null),
+        freqid(""), icon(""),
+        format(""), xmltvid(""),
+        default_authority(""),
         pat_tsid(0), vct_tsid(0), vct_chan_tsid(0), sdt_tsid(0),
         orig_netid(0), netid(0),
-        si_standard(QString::null),
+        si_standard(""),
         in_channels_conf(false),
         in_pat(false), in_pmt(false),
         in_vct(false),

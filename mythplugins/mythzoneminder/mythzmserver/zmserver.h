@@ -116,6 +116,7 @@ typedef struct
     string function;
     int enabled;
     string device;
+    string host;
     int image_buffer_count;
     int width;
     int height;
@@ -165,7 +166,7 @@ class ZMServer
     void tokenize(const string &command, vector<string> &tokens);
     void handleHello(void);
     string runCommand(string command);
-    void getMonitorStatus(string id, string type, string device, string channel,
+    void getMonitorStatus(string id, string type, string device, string host, string channel,
                           string function, string &zmcStatus, string &zmaStatus,
                           string enabled);
     void handleGetServerStatus(void);

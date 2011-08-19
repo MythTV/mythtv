@@ -51,6 +51,17 @@ struct hdhomerun_tuner_status_t {
 	uint32_t packets_per_second;
 };
 
+struct hdhomerun_tuner_vstatus_t {
+	char vchannel[32];
+	char name[32];
+	char auth[32];
+	char cci[32];
+	char cgms[32];
+	bool_t not_subscribed;
+	bool_t not_available;
+	bool_t copy_protected;
+};
+
 struct hdhomerun_channelscan_program_t {
 	char program_str[64];
 	uint16_t program_number;

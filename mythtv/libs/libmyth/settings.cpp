@@ -37,19 +37,19 @@ using namespace std;
  *  \brief Configurable is the root of all the database aware widgets.
  *
  *   This is an abstract class and some methods must be implemented
- *   in children. byName(const &QString) is abstract. While 
+ *   in children. byName(const &QString) is abstract. While
  *   configWidget(ConfigurationGroup *, QWidget*, const char*)
  *   has an implementation, all it does is print an error message
  *   and return a NULL pointer.
  */
 
 QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                    const char* widgetName) 
+                                    const char* widgetName)
 {
     (void)cg;
     (void)parent;
     (void)widgetName;
-    LOG(VB_GENERAL, LOG_ALERT, 
+    LOG(VB_GENERAL, LOG_ALERT,
              "BUG: Configurable is visible, but has no configWidget");
     return NULL;
 }
@@ -117,7 +117,7 @@ void SelectSetting::addSelection(const QString &label, QString value,
                                  bool select)
 {
     value = (value.isEmpty()) ? label : value;
-    
+
     int found = findSelection(label, value);
     if (found < 0)
     {
@@ -286,7 +286,7 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred,
                                           QSizePolicy::Maximum));
     }
     else
@@ -320,7 +320,7 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
             this, SLOT(setValue(const QString&)));
 
     if (cg)
-        connect(edit, SIGNAL(changeHelpText(QString)), cg, 
+        connect(edit, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
 
     setRW(rw);
@@ -390,7 +390,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred,
                                           QSizePolicy::Maximum));
     }
     else
@@ -439,7 +439,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 }
 
 SpinBoxSetting::SpinBoxSetting(
-    Storage *_storage, int _min, int _max, int _step, 
+    Storage *_storage, int _min, int _max, int _step,
     bool _allow_single_step, QString _special_value_text) :
     BoundedIntegerSetting(_storage, _min, _max, _step),
     spinbox(NULL), relayEnabled(true),
@@ -463,7 +463,7 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred,
                                           QSizePolicy::Maximum));
     }
     else
@@ -579,7 +579,7 @@ QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred,
                                           QSizePolicy::Maximum));
     }
     else
@@ -618,7 +618,7 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred,
                                           QSizePolicy::Maximum));
     }
     else
@@ -801,24 +801,24 @@ void ComboBoxSetting::setHelpText(const QString &str)
 void HostRefreshRateComboBox::ChangeResolution(const QString& resolution)
 {
     clearSelections();
-    
+
     const vector<double> list = GetRefreshRates(resolution);
     addSelection(QObject::tr("Any"), "0");
     int hz50 = -1, hz60 = -1;
     for (uint i=0; i<list.size(); ++i)
-    {        
+    {
         QString sel = QString::number((double) list[i],'f', 3);
         addSelection(sel+" Hz", sel);
         hz50 = (fabs(50.0 - list[i]) < 0.01) ? i : hz50;
         hz60 = (fabs(60.0 - list[i]) < 0.01) ? i : hz60;
     }
-    
+
     setValue(0);
     if ("640x480" == resolution || "720x480" == resolution)
         setValue(hz60+1);
     if ("640x576" == resolution || "720x576" == resolution)
         setValue(hz50+1);
-    
+
     setEnabled(list.size());
 }
 
@@ -835,7 +835,7 @@ const vector<double> HostRefreshRateComboBox::GetRefreshRates(const QString &res
 
     DisplayRes *display_res = DisplayRes::GetDisplayRes();
     if (display_res && ok0 && ok1)
-        return display_res->GetRefreshRates(w, h);    
+        return display_res->GetRefreshRates(w, h);
 
     vector<double> list;
     return list;
@@ -873,27 +873,6 @@ QDate DateSetting::dateValue(void) const {
 
 void DateSetting::setValue(const QDate& newValue) {
     Setting::setValue(newValue.toString(Qt::ISODate));
-}
-
-QWidget *RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                    const char* widgetName)
-{
-    QGroupBox* widget = new QGroupBox(parent);
-    widget->setObjectName(widgetName);
-    widget->setTitle(getLabel());
-
-    for( unsigned i = 0 ; i < labels.size() ; ++i ) {
-        QRadioButton *button = new QRadioButton(widget);
-        button->setObjectName(
-            (QString(widgetName) + QString::number(i)).toAscii().constData());
-        button->setText(labels[i]);
-        if (isSet && i == current)
-            button->setDown(true);
-    }
-
-    cg = cg;
-
-    return widget;
 }
 
 QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
@@ -958,10 +937,10 @@ void CheckBoxSetting::setHelpText(const QString &str)
 
 void AutoIncrementDBSetting::Save(QString table)
 {
-    if (intValue() == 0) 
+    if (intValue() == 0)
     {
         // Generate a new, unique ID
-        QString querystr = QString("INSERT INTO " + table + " (" 
+        QString querystr = QString("INSERT INTO " + table + " ("
                 + GetColumnName() + ") VALUES (0);");
 
         MSqlQuery query(MSqlQuery::InitCon());
@@ -1045,7 +1024,7 @@ bool ListBoxSetting::ReplaceLabel(
     return false;
 }
 
-QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent, 
+QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                       const char* widgetName)
 {
     QWidget *widget = new QWidget(parent);
@@ -1137,163 +1116,10 @@ void ListBoxSetting::setHelpText(const QString &str)
     SelectSetting::setHelpText(str);
 }
 
-void ImageSelectSetting::addImageSelection(const QString& label,
-                                           QImage* image,
-                                           QString value,
-                                           bool select) {
-    images.push_back(image);
-    addSelection(label, value, select);
-}
-
-ImageSelectSetting::~ImageSelectSetting()
-{
-    Teardown();
-}
-
-void ImageSelectSetting::deleteLater(void)
-{
-    Teardown();
-    SelectSetting::deleteLater();
-}
-
-void ImageSelectSetting::Teardown(void)
-{
-    while (images.size())
-    {
-        QImage *tmp = images.back();
-        images.pop_back();
-        delete tmp;
-    }
-    bxwidget   = NULL;
-    imagelabel = NULL;
-    combo      = NULL;
-}
-
-void ImageSelectSetting::imageSet(int num)
-{
-    if (num >= (int)images.size())
-        return;
-
-    if (!images[current])
-        return;
-
-    QImage temp = *(images[current]);
-    temp = temp.scaled((int)(184 * m_hmult), (int)(138 * m_hmult),
-                        Qt::KeepAspectRatio);
-
-    QPixmap tmppix = QPixmap::fromImage(temp);
-    imagelabel->setPixmap(tmppix);
-}
-
-QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg, 
-                                          QWidget* parent,
-                                          const char* widgetName) 
-{
-    int width = 0, height = 0;
-
-    GetMythUI()->GetScreenSettings(width, m_wmult, height, m_hmult);
-
-    bxwidget = new QWidget(parent);
-    bxwidget->setObjectName(widgetName);
-
-    QBoxLayout *layout = NULL;
-    if (labelAboveWidget)
-    {
-        layout = new QVBoxLayout();
-        bxwidget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
-                                            QSizePolicy::Maximum));
-    }
-    else
-        layout = new QHBoxLayout();
-
-    layout->setContentsMargins(0,0,0,0);
-    layout->setSpacing(0);
-
-    if (getLabel() != "")
-    {
-        QLabel *label = new QLabel();
-        label->setText(getLabel() + ":");
-        layout->addWidget(label);
-    }
-
-    combo = new MythComboBox(false);
-    layout->addWidget(combo);
-
-    QLabel *testlabel = new QLabel();
-    testlabel->setText("  ");
-    layout->addWidget(testlabel);
-
-    connect(bxwidget, SIGNAL(destroyed(QObject*)),
-            this,     SLOT(widgetDeleted(QObject*)));
-
-    imagelabel = new QLabel();
-    layout->addWidget(imagelabel);
-
-    for (unsigned int i = 0 ; i < images.size() ; ++i)
-        combo->insertItem(labels[i]);
-
-    if (isSet)
-        combo->setCurrentIndex(current);
-    else
-        current = 0;
-
-    if (images.size() != 0 && current < images.size() && images[current])
-    { 
-        QImage temp = *(images[current]);
-        temp = temp.scaled((int)(184 * m_hmult), (int)(138 * m_hmult),
-                            Qt::KeepAspectRatio);
- 
-        QPixmap tmppix = QPixmap::fromImage(temp);
-        imagelabel->setPixmap(tmppix);
-        imagelabel->setMinimumHeight(tmppix.height());
-    }
-    else
-    {
-        QPixmap tmppix((int)(184 * m_hmult), (int)(138 * m_hmult));
-        tmppix.fill(Qt::black);
-
-        imagelabel->setPixmap(tmppix);
-        imagelabel->setMinimumHeight(tmppix.height());
-    }
-
-    connect(combo, SIGNAL(highlighted(int)), this, SLOT(setValue(int)));
-    connect(combo, SIGNAL(highlighted(int)), this, SLOT(imageSet(int)));
-    connect(combo, SIGNAL(activated(int)), this, SLOT(setValue(int)));
-    connect(combo, SIGNAL(activated(int)), this, SLOT(imageSet(int)));
-
-    connect(this, SIGNAL(selectionsCleared()),
-            combo, SLOT(clear()));
-
-    if (cg)
-        connect(combo, SIGNAL(changeHelpText(QString)), cg, 
-                SIGNAL(changeHelpText(QString)));
-
-    bxwidget->setLayout(layout);
-
-    return bxwidget;
-}
-
-void ImageSelectSetting::widgetInvalid(QObject *obj)
-{
-    if (bxwidget == obj)
-    {
-        bxwidget   = NULL;
-        imagelabel = NULL;
-        combo      = NULL;
-    }
-}
-
-void ImageSelectSetting::setHelpText(const QString &str)
-{
-    if (combo)
-        combo->setHelpText(str);
-    SelectSetting::setHelpText(str);
-}
-
 HostnameSetting::HostnameSetting(Storage *storage) : Setting(storage)
 {
     setVisible(false);
-    
+
     setValue(gCoreContext->GetHostName());
 }
 
@@ -1303,7 +1129,7 @@ void ChannelSetting::fillSelections(SelectSetting* setting) {
     // channels and how they're stored in the database.  We're just a
     // selector.
 
-    MSqlQuery query(MSqlQuery::InitCon()); 
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name, chanid FROM channel;");
     if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next())

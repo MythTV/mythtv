@@ -14,28 +14,39 @@
 extern "C" {
 #endif
 
+// Helper for checking verbose mask & level outside of LOG macro
+#define VERBOSE_LEVEL_NONE        (verboseMask == 0)
+#define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \
+    (((verboseMask & (_MASK_)) == (_MASK_)) && logLevel >= (_LEVEL_))
+
+#define VERBOSE please_use_LOG_instead_of_VERBOSE
+
 // There are two LOG macros now.  One for use with Qt/C++, one for use
 // without Qt.
 //
 // Neither of them will lock the calling thread other than momentarily to put
 // the log message onto a queue.
 #ifdef __cplusplus
-#define LOG(mask, level, string) \
-    LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
-                 1, QString(string).toLocal8Bit().constData())
+#define LOG(_MASK_, _LEVEL_, _STRING_)                                  \
+    do {                                                                \
+        if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
+        {                                                               \
+            LogPrintLine(_MASK_, (LogLevel_t)_LEVEL_,                   \
+                         __FILE__, __LINE__, __FUNCTION__, 1,           \
+                         QString(_STRING_).toLocal8Bit().constData());  \
+        }                                                               \
+    } while (false)
 #else
-#define LOG(mask, level, format, ...) \
-    LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
-                 0, (const char *)format, ##__VA_ARGS__)
+#define LOG(_MASK_, _LEVEL_, _FORMAT_, ...)                             \
+    do {                                                                \
+        if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
+        {                                                               \
+            LogPrintLine(_MASK_, (LogLevel_t)_LEVEL_,                   \
+                         __FILE__, __LINE__, __FUNCTION__, 0,           \
+                         (const char *)_FORMAT_, ##__VA_ARGS__);        \
+        }                                                               \
+    } while (0)
 #endif
-
-// Helper for checking verbose mask & level outside of LOG macro
-#define VERBOSE_LEVEL_NONE        (verboseMask == 0)
-#define VERBOSE_LEVEL_CHECK(mask, level) \
-   (((verboseMask & (mask)) == (mask)) && logLevel >= (level))
-
-MBASE_PUBLIC void VERBOSE(uint64_t mask, ...)
-    MERROR("VERBOSE is gone, use LOG");
 
 /* Define the external prototype */
 MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level, 

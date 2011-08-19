@@ -21,6 +21,7 @@ using namespace std;
 #include <QCursor>
 #include <QPixmap>
 #include <QEvent>
+#include <QMutexLocker>
 
 // mythtv
 #include <audiooutput.h>
@@ -40,7 +41,7 @@ using namespace std;
 VisFactory* VisFactory::g_pVisFactories = 0;
 
 VisualBase::VisualBase(bool screensaverenable)
-    : xscreensaverenable(screensaverenable)
+    : fps(20), xscreensaverenable(screensaverenable)
 {
     if (!xscreensaverenable)
         GetMythUI()->DoDisableScreensaver();
@@ -77,7 +78,7 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 }
 
 MainVisual::MainVisual(QWidget *parent, const char *name)
-    : QWidget(parent), vis(0), playing(FALSE), fps(20),
+    : QWidget(parent), vis(0), playing(false), fps(20),
       timer (0), bannerTimer(0), info_widget(0)
 {
     setObjectName(name);
@@ -103,26 +104,13 @@ MainVisual::MainVisual(QWidget *parent, const char *name)
 
 MainVisual::~MainVisual()
 {
-    if (vis)
-    {
-        delete vis;
-        vis = 0;
-    }
-
+    delete vis;
     delete info_widget;
-    info_widget = 0;
-
     delete timer;
-    timer = 0;
-
     delete bannerTimer;
-    bannerTimer = 0;
 
     while (!nodes.empty())
-    {
-        delete nodes.back();
-        nodes.pop_back();
-    }
+        delete nodes.takeLast();
 }
 
 void MainVisual::setVisual(const QString &name)
@@ -165,6 +153,7 @@ void MainVisual::setVisual(const QString &name)
     timer->start( 1000 / fps );
 }
 
+// Caller holds mutex() lock
 void MainVisual::prepare()
 {
     while (!nodes.empty())
@@ -174,6 +163,7 @@ void MainVisual::prepare()
     }
 }
 
+// Caller holds mutex() lock
 void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int p)
 {
     long len = b_len, cnt;
@@ -182,8 +172,9 @@ void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int 
     len /= c;
     len /= (p / 8);
 
-    if (len > 512)
-        len = 512;
+#define SAMPLES 512
+    if (len > SAMPLES)
+        len = SAMPLES;
 
     cnt = len;
 
@@ -214,42 +205,32 @@ void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int 
 
 void MainVisual::timeout()
 {
-    bool process = true;
     if (parent() != GetMythMainWindow()->currentWidget())
-    {
-        process = false;
         return;
-    }
 
-    VisualNode *node = NULL;
+    VisualNode *node = 0;
     if (playing && gPlayer->getOutput())
     {
-        long synctime = gPlayer->getOutput()->GetAudiotime();
-        mutex()->lock();
-        VisualNode *prev = NULL;
+        int64_t synctime = gPlayer->getOutput()->GetAudiotime();
+        QMutexLocker locker(mutex());
         while (!nodes.empty())
         {
-            node = nodes.front();
-            if (node->offset > synctime)
+            VisualNode *n = nodes.front();
+            if ((int64_t)n->offset > synctime)
                 break;
             nodes.pop_front();
 
-            if (prev)
-                delete prev;
-            prev = node;
+            delete node;
+            node = n;
         }
-        mutex()->unlock();
-        node = prev;
+        if (node)
+            nodes.push_front(node);
     }
 
-    bool stop = TRUE;
-    if (vis && process)
-        stop = vis->process(node);
-    if (node)
-        delete node;
-
-    if (vis && process)
+    bool stop = true;
+    if (vis)
     {
+        stop = vis->process(node);
         QPainter p(&pixmap);
         if (vis->draw(&p, Qt::black))
             update();
@@ -509,14 +490,13 @@ void InfoWidget::paintEvent( QPaintEvent * )
     bitBlt(this, 0, 0, &info_pixmap);
 }
 
-StereoScope::StereoScope()
+#define RUBBERBAND 0
+#define TWOCOLOUR 0
+StereoScope::StereoScope() :
+    startColor(Qt::green), targetColor(Qt::red),
+    rubberband(RUBBERBAND), falloff(1.0)
 {
     fps = 45;
-    rubberband = false;
-    falloff = 1.0;
-
-    startColor = Qt::green;
-    targetColor = Qt::red;
 }
 
 StereoScope::~StereoScope()
@@ -535,101 +515,101 @@ void StereoScope::resize( const QSize &newsize )
 
 bool StereoScope::process( VisualNode *node )
 {
-    bool allZero = TRUE;
-    int i;
-    long s, indexTo;
-    double valL, valR, tmpL, tmpR;
-    double index, step = 512.0 / size.width();
+    bool allZero = true;
 
     if (node) {
-    index = 0;
-    for ( i = 0; i < size.width(); i++) {
-        indexTo = (int)(index + step);
-            if (indexTo == (int)(index))
-                indexTo = (int)(index + 1);
+        double index = 0;
+        double const step = (double)SAMPLES / size.width();
+        for ( int i = 0; i < size.width(); i++) {
+            unsigned long indexTo = (unsigned long)(index + step);
+            if (indexTo == (unsigned long)(index))
+                indexTo = (unsigned long)(index + 1);
 
-        if ( rubberband ) {
-        valL = magnitudes[ i ];
-        valR = magnitudes[ i + size.width() ];
-        if (valL < 0.) {
-            valL += falloff;
-            if ( valL > 0. )
-            valL = 0.;
-        } else {
-            valL -= falloff;
-            if ( valL < 0. )
-            valL = 0.;
+            double valL = 0, valR = 0;
+#if RUBBERBAND
+            if ( rubberband ) {
+                valL = magnitudes[ i ];
+                valR = magnitudes[ i + size.width() ];
+                if (valL < 0.) {
+                    valL += falloff;
+                    if ( valL > 0. )
+                        valL = 0.;
+                } else {
+                    valL -= falloff;
+                    if ( valL < 0. )
+                        valL = 0.;
+                }
+                if (valR < 0.) {
+                    valR += falloff;
+                    if ( valR > 0. )
+                        valR = 0.;
+                } else {
+                    valR -= falloff;
+                    if ( valR < 0. )
+                        valR = 0.;
+                }
+            }
+#endif
+            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->length; s++) {
+                double tmpL = ( ( node->left ?
+                       double( node->left[s] ) : 0.) *
+                     double( size.height() / 4 ) ) / 32768.;
+                double tmpR = ( ( node->right ?
+                       double( node->right[s]) : 0.) *
+                     double( size.height() / 4 ) ) / 32768.;
+                if (tmpL > 0)
+                    valL = (tmpL > valL) ? tmpL : valL;
+                else
+                    valL = (tmpL < valL) ? tmpL : valL;
+                if (tmpR > 0)
+                    valR = (tmpR > valR) ? tmpR : valR;
+                else
+                    valR = (tmpR < valR) ? tmpR : valR;
+            }
+
+            if (valL != 0. || valR != 0.)
+                allZero = false;
+
+            magnitudes[ i ] = valL;
+            magnitudes[ i + size.width() ] = valR;
+
+            index = index + step;
         }
-        if (valR < 0.) {
-            valR += falloff;
-            if ( valR > 0. )
-            valR = 0.;
-        } else {
-            valR -= falloff;
-            if ( valR < 0. )
-            valR = 0.;
-        }
-        } else
-        valL = valR = 0.;
-
-        for (s = (int)index; s < indexTo && s < node->length; s++) {
-        tmpL = ( ( node->left ?
-               double( node->left[s] ) : 0.) *
-             double( size.height() / 4 ) ) / 32768.;
-        tmpR = ( ( node->right ?
-               double( node->right[s]) : 0.) *
-             double( size.height() / 4 ) ) / 32768.;
-        if (tmpL > 0)
-            valL = (tmpL > valL) ? tmpL : valL;
-        else
-            valL = (tmpL < valL) ? tmpL : valL;
-        if (tmpR > 0)
-            valR = (tmpR > valR) ? tmpR : valR;
-        else
-            valR = (tmpR < valR) ? tmpR : valR;
-        }
-
-        if (valL != 0. || valR != 0.)
-        allZero = FALSE;
-
-        magnitudes[ i ] = valL;
-        magnitudes[ i + size.width() ] = valR;
-
-        index = index + step;
-    }
+#if RUBBERBAND
     } else if (rubberband) {
-    for ( i = 0; i < size.width(); i++) {
-        valL = magnitudes[ i ];
-        if (valL < 0) {
-        valL += 2;
-        if (valL > 0.)
-            valL = 0.;
-        } else {
-        valL -= 2;
-        if (valL < 0.)
-            valL = 0.;
+        for ( int i = 0; i < size.width(); i++) {
+            double valL = magnitudes[ i ];
+            if (valL < 0) {
+                valL += 2;
+                if (valL > 0.)
+                    valL = 0.;
+            } else {
+                valL -= 2;
+                if (valL < 0.)
+                    valL = 0.;
+            }
+
+            double valR = magnitudes[ i + size.width() ];
+            if (valR < 0.) {
+                valR += falloff;
+                if (valR > 0.)
+                    valR = 0.;
+            } else {
+                valR -= falloff;
+                if (valR < 0.)
+                    valR = 0.;
+            }
+
+            if (valL != 0. || valR != 0.)
+                allZero = false;
+
+            magnitudes[ i ] = valL;
+            magnitudes[ i + size.width() ] = valR;
         }
-
-        valR = magnitudes[ i + size.width() ];
-        if (valR < 0.) {
-        valR += falloff;
-        if (valR > 0.)
-            valR = 0.;
-        } else {
-        valR -= falloff;
-        if (valR < 0.)
-            valR = 0.;
-        }
-
-        if (valL != 0. || valR != 0.)
-        allZero = FALSE;
-
-        magnitudes[ i ] = valL;
-        magnitudes[ i + size.width() ] = valR;
-    }
+#endif
     } else {
-    for ( i = 0; (unsigned) i < magnitudes.size(); i++ )
-        magnitudes[ i ] = 0.;
+        for ( int i = 0; (unsigned) i < magnitudes.size(); i++ )
+            magnitudes[ i ] = 0.;
     }
 
     return allZero;
@@ -637,10 +617,11 @@ bool StereoScope::process( VisualNode *node )
 
 bool StereoScope::draw( QPainter *p, const QColor &back )
 {
-    double r, g, b, per;
-
     p->fillRect(0, 0, size.width(), size.height(), back);
     for ( int i = 1; i < size.width(); i++ ) {
+#if TWOCOLOUR
+    double r, g, b, per;
+
     // left
     per = double( magnitudes[ i ] * 2 ) /
           double( size.height() / 4 );
@@ -674,10 +655,13 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
         b = 0;
 
     p->setPen( QColor( int(r), int(g), int(b) ) );
-        p->setPen(Qt::red);
+#else
+    p->setPen(Qt::red);
+#endif
     p->drawLine( i - 1, (int)((size.height() / 4) + magnitudes[i - 1]),
              i, (int)((size.height() / 4) + magnitudes[i]));
 
+#if TWOCOLOUR
     // right
     per = double( magnitudes[ i + size.width() ] * 2 ) /
           double( size.height() / 4 );
@@ -711,7 +695,9 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
         b = 0;
 
     p->setPen( QColor( int(r), int(g), int(b) ) );
-        p->setPen(Qt::red);
+#else
+    p->setPen(Qt::red);
+#endif
     p->drawLine( i - 1, (int)((size.height() * 3 / 4) +
              magnitudes[i + size.width() - 1]),
              i, (int)((size.height() * 3 / 4) +
@@ -731,22 +717,20 @@ MonoScope::~MonoScope()
 
 bool MonoScope::process( VisualNode *node )
 {
-    bool allZero = TRUE;
-    int i;
-    long s, indexTo;
-    double val, tmp;
-
-    double index, step = 512.0 / size.width();
+    bool allZero = true;
 
     if (node)
     {
-        index = 0;
-        for ( i = 0; i < size.width(); i++)
+        double index = 0;
+        double const step = (double)SAMPLES / size.width();
+        for (int i = 0; i < size.width(); i++)
         {
-            indexTo = (int)(index + step);
-            if (indexTo == (int)index)
-                indexTo = (int)(index + 1);
+            unsigned long indexTo = (unsigned long)(index + step);
+            if (indexTo == (unsigned long)index)
+                indexTo = (unsigned long)(index + 1);
 
+            double val = 0;
+#if RUBBERBAND
             if ( rubberband )
             {
                 val = magnitudes[ i ];
@@ -767,14 +751,10 @@ bool MonoScope::process( VisualNode *node )
                     }
                 }
             }
-            else
+#endif
+            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->length; s++)
             {
-                val = 0.;
-            }
-
-            for (s = (int)index; s < indexTo && s < node->length; s++)
-            {
-                tmp = ( double( node->left[s] ) +
+                double tmp = ( double( node->left[s] ) +
                         (node->right ? double( node->right[s] ) : 0) *
                         double( size.height() / 2 ) ) / 65536.;
                 if (tmp > 0)
@@ -789,16 +769,17 @@ bool MonoScope::process( VisualNode *node )
 
             if ( val != 0. )
             {
-                allZero = FALSE;
+                allZero = false;
             }
             magnitudes[ i ] = val;
             index = index + step;
         }
     }
+#if RUBBERBAND
     else if (rubberband)
     {
-        for ( i = 0; i < size.width(); i++) {
-            val = magnitudes[ i ];
+        for (int i = 0; i < size.width(); i++) {
+            double val = magnitudes[ i ];
             if (val < 0) {
                 val += 2;
                 if (val > 0.)
@@ -810,13 +791,14 @@ bool MonoScope::process( VisualNode *node )
             }
 
             if ( val != 0. )
-                allZero = FALSE;
+                allZero = false;
             magnitudes[ i ] = val;
         }
     }
+#endif
     else
     {
-        for ( i = 0; i < size.width(); i++ )
+        for (int i = 0; i < size.width(); i++ )
             magnitudes[ i ] = 0.;
     }
 
@@ -825,10 +807,11 @@ bool MonoScope::process( VisualNode *node )
 
 bool MonoScope::draw( QPainter *p, const QColor &back )
 {
-    double r, g, b, per;
-
     p->fillRect( 0, 0, size.width(), size.height(), back );
     for ( int i = 1; i < size.width(); i++ ) {
+#if TWOCOLOUR
+        double r, g, b, per;
+
         per = double( magnitudes[ i ] ) /
               double( size.height() / 4 );
         if (per < 0.0)
@@ -860,8 +843,10 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
         else if (b < 0.0)
             b = 0;
 
+        p->setPen(QColor(int(r), int(g), int(b)));
+#else
         p->setPen(Qt::red);
-        //p->setPen(QColor(int(r), int(g), int(b)));
+#endif
         p->drawLine( i - 1, (int)(size.height() / 2 + magnitudes[ i - 1 ]),
                      i, (int)(size.height() / 2 + magnitudes[ i ] ));
     }

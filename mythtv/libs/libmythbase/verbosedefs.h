@@ -140,6 +140,10 @@ VERBOSE_MAP(VB_RPLXQUEUE, 0x400000000LLU, true,
             "MPEG2Fix Replex Queue messages")
 VERBOSE_MAP(VB_DECODE,    0x800000000LLU, true,
             "MPEG2Fix Decode messages")
+VERBOSE_MAP(VB_FLUSH,     0x1000000000LLU, true,
+            "")
+VERBOSE_MAP(VB_STDIO,     0x2000000000LLU, true,
+            "")
 VERBOSE_MAP(VB_NONE,      0x00000000, false,
             "NO debug output")
 VERBOSE_POSTAMBLE

@@ -205,6 +205,7 @@ class DecoderBase
 
     void SaveTotalDuration(void);
     void ResetTotalDuration(void) { totalDuration = 0; }
+    void SaveTotalFrames(void);
 
   protected:
     virtual int  AutoSelectTrack(uint type);
