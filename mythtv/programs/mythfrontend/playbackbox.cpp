@@ -4098,7 +4098,7 @@ void PlaybackBox::customEvent(QEvent *event)
             {
                 if (asAvailable != availableStatus)
                 {
-                    if (kCheckForPlayAction == cat)
+                    if (kCheckForPlayAction == cat && pginfo)
                         ShowAvailabilityPopup(*pginfo);
                 }
                 else if (pginfo)
