@@ -169,11 +169,13 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
             break;
         case AV_LOG_ERROR:
             verbose_level = LOG_ERR;
+            verbose_mask |= VB_LIBAV;
             break;
         case AV_LOG_DEBUG:
         case AV_LOG_VERBOSE:
         case AV_LOG_INFO:
             verbose_level = LOG_DEBUG;
+            verbose_mask |= VB_LIBAV;
         case AV_LOG_WARNING:
             verbose_mask |= VB_LIBAV;
             break;
