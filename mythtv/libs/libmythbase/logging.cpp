@@ -51,6 +51,12 @@ extern "C" {
 #include <mach/mach.h>
 #endif
 
+#ifdef _WIN32
+#define PREFIX64 "I64"
+#else
+#define PREFIX64 "ll"
+#endif
+
 QMutex                  loggerListMutex;
 QList<LoggerBase *>     loggerList;
 
@@ -149,7 +155,7 @@ class LoggingItem
   public:
     LoggingItem(const char *_file, const char *_function,
                 int _line, LogLevel_t _level, int _type) :
-        threadId(static_cast<uint64_t>(QThread::currentThreadId())),
+        threadId((uint64_t)(QThread::currentThreadId())),
         line(_line), type(_type), level(_level), file(_file),
         function(_function), threadName(NULL)
     {
@@ -766,7 +772,8 @@ void LoggerThread::handleItem(LoggingItem *item)
         if (debugRegistration)
         {
             snprintf(item->message, LOGLINE_MAX,
-                     "Thread 0x%llX (%lld) registered as \'%s\'",
+                     "Thread 0x%" PREFIX64 "X (%" PREFIX64 
+                     "d) registered as \'%s\'",
                      (long long unsigned int)item->threadId,
                      (long long int)tid,
                      logThreadHash[item->threadId]);
@@ -791,7 +798,8 @@ void LoggerThread::handleItem(LoggingItem *item)
             if (debugRegistration)
             {
                 snprintf(item->message, LOGLINE_MAX,
-                         "Thread 0x%llX (%lld) deregistered as \'%s\'",
+                         "Thread 0x%" PREFIX64 "X (%" PREFIX64 
+                         "d) deregistered as \'%s\'",
                          (long long unsigned int)item->threadId,
                          (long long int)tid,
                          logThreadHash[item->threadId]);
