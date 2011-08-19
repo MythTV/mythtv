@@ -21,7 +21,7 @@ MYTHTHEMES_CORE=$(ls ../mythtv/themes/ --file-type |grep "/$")
 MYTHTHEMES_DL="http://themes.mythtv.org/themes/repository/trunk/themes.zip"
 REAL_XMLPLUGINS="browser-ui.xml gallery-ui.xml game-ui.xml music-ui.xml \
     mytharchive-ui.xml mythburn-ui.xml netvision-ui.xml \
-    news-ui.xml video-ui.xml zoneminder-ui.xml weather-ui.xml \
+    news-ui.xml zoneminder-ui.xml weather-ui.xml \
     mythnative-ui.xml"
 
 BOGUS_XMLPLUGINS="dvd-ui.xml gallery2-ui.xml" # dvd-ui.xml (DVD ripper) needs
@@ -181,7 +181,6 @@ updateplugin mythgame game-ui.xml
 updateplugin mythmusic music-ui.xml
 updateplugin mythnetvision netvision-ui.xml
 updateplugin mythnews news-ui.xml
-updateplugin mythvideo video-ui.xml
 updateplugin mythweather weather-ui.xml
 updateplugin mythzoneminder zoneminder-ui.xml
 
