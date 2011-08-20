@@ -265,7 +265,7 @@ void RecordingSelector::titleChanged(MythUIButtonListItem *item)
 
     if (m_datetimeText)
         m_datetimeText->SetText(p->GetScheduledStartTime().toLocalTime()
-                                .ToString("dd MMM yy (hh:mm)"));
+                                .toString("dd MMM yy (hh:mm)"));
 
     if (m_descriptionText)
     {
@@ -363,9 +363,9 @@ void RecordingSelector::OKPressed()
         a->subtitle = p->GetSubtitle();
         a->description = p->GetDescription();
         a->startDate = p->GetScheduledStartTime()
-            .toLocalTime().ToString("dd MMM yy");
+            .toLocalTime().toString("dd MMM yy");
         a->startTime = p->GetScheduledStartTime()
-            .toLocalTime().ToString("(hh:mm)");
+            .toLocalTime().toString("(hh:mm)");
         a->size = p->GetFilesize();
         a->filename = p->GetPlaybackURL(false, true);
         a->hasCutlist = p->HasCutlist();
@@ -413,7 +413,7 @@ void RecordingSelector::updateRecordingList(void)
                     m_recordingButtonList,
                     p->GetTitle() + " ~ " +
                     p->GetScheduledStartTime().toLocalTime()
-                    .ToString("dd MMM yy (hh:mm)"));
+                    .toString("dd MMM yy (hh:mm)"));
                 item->setCheckable(true);
                 if (m_selectedList.indexOf((ProgramInfo *) p) != -1)
                 {

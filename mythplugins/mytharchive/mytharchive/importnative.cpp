@@ -250,7 +250,7 @@ void ArchiveFileSelector::itemSelected(MythUIButtonListItem *item)
         m_progTitle->SetText(m_details.title);
         m_progSubtitle->SetText(m_details.subtitle);
         m_progStartTime->SetText(m_details.startTime.toLocalTime()
-                                 .ToString("dd MMM yy (hh:mm)"));
+                                 .toString("dd MMM yy (hh:mm)"));
     }
     else
     {
@@ -355,7 +355,7 @@ bool ImportNative::Create(void)
     m_progTitle_text->SetText(m_details.title);
 
     m_progDateTime_text->SetText(m_details.startTime.toLocalTime()
-                                 .ToString("dd MMM yy (hh:mm)"));
+                                 .toString("dd MMM yy (hh:mm)"));
     m_progDescription_text->SetText(
         (m_details.subtitle == "" ? m_details.subtitle + "\n" : "") + m_details.description);
 

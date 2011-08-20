@@ -7,6 +7,7 @@
 // mythtv
 #include <mythcontext.h>
 #include <mythwidgets.h>
+#include <util.h>
 #include <mythdb.h>
 #include <mythdirs.h>
 #include <mythprogressdialog.h>

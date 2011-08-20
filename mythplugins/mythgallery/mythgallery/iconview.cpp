@@ -1123,7 +1123,7 @@ void IconView::HandleImport(void)
 
     // Makes import directory samba/windows friendly (no colon)
     QString idirname = m_currDir + "/" +
-        MythDate::current().ToString("yyyy-MM-dd_hh-mm-ss");
+        MythDate::current().toString("yyyy-MM-dd_hh-mm-ss");
 
     importdir.mkdir(idirname);
     importdir.setPath(idirname);
