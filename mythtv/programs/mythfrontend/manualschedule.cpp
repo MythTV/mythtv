@@ -100,7 +100,7 @@ bool ManualSchedule::Create(void)
             m_startdateList->SetItemCurrent(m_startdateList->GetCount() - 1);
     }
 
-    QTime thisTime = m_nowDateTime.time();
+    QTime thisTime = m_nowDateTime.toLocalTime().time();
     thisTime = thisTime.addSecs((30 - (thisTime.minute() % 30)) * 60);
 
     if (thisTime < QTime(0,30))
@@ -188,9 +188,10 @@ void ManualSchedule::dateChanged(void)
     // Note we allow start times up to one hour in the past so
     // if it is 20:25 the user can start a recording at 20:30
     // by first setting the hour and then the minute.
-    QDateTime tmp = QDateTime(m_startDateTime.date(),
-                              QTime(m_startDateTime.time().hour(),59,59),
-                              Qt::UTC);
+    QDateTime tmp = QDateTime(
+        m_startDateTime.toLocalTime().date(),
+        QTime(m_startDateTime.toLocalTime().time().hour(),59,59),
+        Qt::LocalTime).toUTC();
     if (tmp < m_nowDateTime)
     {
         hr = m_nowDateTime.toLocalTime().time().hour();
