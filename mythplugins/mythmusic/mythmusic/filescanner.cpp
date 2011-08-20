@@ -6,8 +6,9 @@
 #include <QDir>
 
 // MythTV headers
-#include <mythcontext.h>
+#include <util.h>
 #include <mythdb.h>
+#include <mythcontext.h>
 #include <mythdialogs.h>
 #include <mythscreenstack.h>
 #include <mythprogressdialog.h>
@@ -141,7 +142,7 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
                 update_interval = 0;
             }
 
-            music_files[filename] = kFileSystem;
+            music_files[filename] = FileScanner::kFileSystem;
         }
     }
 }
@@ -611,11 +612,11 @@ void FileScanner::SearchDir(QString &directory)
     uint counter = 0;
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
-        if (*iter == kFileSystem)
+        if (*iter == FileScanner::kFileSystem)
             AddFileToDB(iter.key());
-        else if (*iter == MythDate::kDatabase)
+        else if (*iter == FileScanner::kDatabase)
             RemoveFileFromDB(iter.key ());
-        else if (*iter == kNeedUpdate)
+        else if (*iter == FileScanner::kNeedUpdate)
             UpdateFileInDB(iter.key());
 
         if (file_checking)
@@ -681,7 +682,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
-                    if (music_files[name] == MythDate::kDatabase)
+                    if (music_files[name] == FileScanner::kDatabase)
                     {
                         if (file_checking)
                         {
@@ -691,13 +692,13 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                         continue;
                     }
                     else if (HasFileChanged(name, query.value(1).toString()))
-                        music_files[name] = kNeedUpdate;
+                        music_files[name] = FileScanner::kNeedUpdate;
                     else
                         music_files.erase(iter);
                 }
                 else
                 {
-                    music_files[name] = kDatabase;
+                    music_files[name] = FileScanner::kDatabase;
                 }
             }
 
@@ -763,7 +764,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
-                    if (music_files[name] == MythDate::kDatabase)
+                    if (music_files[name] == FileScanner::kDatabase)
                     {
                         if (file_checking)
                         {
@@ -777,7 +778,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                 }
                 else
                 {
-                    music_files[name] = kDatabase;
+                    music_files[name] = FileScanner::kDatabase;
                 }
             }
             if (file_checking)

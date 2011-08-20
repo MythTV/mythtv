@@ -4,19 +4,19 @@
 class Metadata;
 class Decoder;
 
-enum MusicFileLocation
-{
-    kFileSystem,
-    kDatabase,
-    kNeedUpdate,
-    kBoth
-};
-
-typedef QMap <QString, MusicFileLocation> MusicLoadedMap;
 typedef QMap<QString, int> IdCache;
 
 class FileScanner
 {
+    enum MusicFileLocation
+    {
+        kFileSystem,
+        kDatabase,
+        kNeedUpdate,
+        kBoth
+    };
+
+    typedef QMap <QString, MusicFileLocation> MusicLoadedMap;
     public:
         FileScanner ();
         ~FileScanner ();
