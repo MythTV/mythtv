@@ -365,10 +365,10 @@ void TVBrowseHelper::GetNextProgramDB(
 
     MSqlBindings bindings;
     bindings[":CHANID"] = chanid;
-    bindings[":NOWTS"] = nowtime.toString(Qt::ISODate);
-    bindings[":LATESTTS"] = latesttime.toString(Qt::ISODate);
-    bindings[":BROWSETS"] = browsetime.toString(Qt::ISODate);
-    bindings[":BROWSETS2"] = browsetime.toString(Qt::ISODate);
+    bindings[":NOWTS"] = nowtime;
+    bindings[":LATESTTS"] = latesttime;
+    bindings[":BROWSETS"] = browsetime;
+    bindings[":BROWSETS2"] = browsetime;
 
     QString querystr = " WHERE program.chanid = :CHANID ";
     switch (direction)

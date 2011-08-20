@@ -7,6 +7,7 @@ using namespace std;
 #include <QCoreApplication>
 #include <QFile>
 
+#include "util.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"
@@ -395,7 +396,7 @@ static int setWakeupTime(QString sWakeupTime)
     }
 
     setGlobalSetting("MythShutdownNextScheduled",
-                     dtWakeupTime.toString(Qt::ISODate));
+                     MythDate::toString(dtWakeupTime, MythDate::kDatabase));
 
     return 0;
 }
@@ -602,7 +603,7 @@ static int shutdown()
 
     // save the next wakuptime in the db
     setGlobalSetting("MythShutdownWakeupTime",
-                     dtWakeupTime.toString(Qt::ISODate));
+                     MythDate::toString(dtWakeupTime, MythDate::kDatabase));
 
     // stop here to debug
     //return 0;
