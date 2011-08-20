@@ -2301,8 +2301,6 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
     int     leveloffset = 0;
     QString fontActive;
     QString fontInactive;
-    bool    showArrow = true;
-    bool    showScrollArrows = false;
     int     draworder = 0;
     QColor  grUnselectedBeg(Qt::black);
     QColor  grUnselectedEnd(80,80,80);
@@ -2368,16 +2366,6 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
                             .arg(fontFcn));
                     return;
                 }
-            }
-            else if (info.tagName() == "showarrow")
-            {
-                if (getFirstText(info).toLower() == "no")
-                    showArrow = false;
-            }
-            else if (info.tagName() == "showscrollarrows")
-            {
-                if (getFirstText(info).toLower() == "yes")
-                    showScrollArrows = true;
             }
             else if (info.tagName() == "gradient")
             {
