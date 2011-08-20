@@ -1294,8 +1294,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plTime) // list by time
     {
-        bindings[":PGILSEARCHTIME1"] =
-            MythDate::toString(m_searchTime, MythDate::kDatabase);
+        bindings[":PGILSEARCHTIME1"] = m_searchTime;
         where = "WHERE channel.visible = 1 "
             "  AND program.starttime >= :PGILSEARCHTIME1 ";
         if (m_titleSort)
