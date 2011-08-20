@@ -249,7 +249,7 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
     int size = m_chain.count();
     int new_at = (size && (at < 0 || at >= size)) ? size - 1 : at;
 
-    if (size && new_at >= 0 && new_at <= size)
+    if (size && new_at >= 0 && new_at < size)
         entry = m_chain[new_at];
     else
     {
