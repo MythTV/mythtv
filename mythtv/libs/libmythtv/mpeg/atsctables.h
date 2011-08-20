@@ -704,7 +704,7 @@ class SystemTimeTable : public PSIPTable
     }
     QDateTime SystemTimeGPS(void) const
     {
-        MythDate::fromTime_t(secs_Between_1Jan1970_6Jan1980 + GPSRaw());
+        return MythDate::fromTime_t(secs_Between_1Jan1970_6Jan1980 + GPSRaw());
     }
     time_t GPSUnix(void) const
         { return secs_Between_1Jan1970_6Jan1980 + GPSRaw(); }
