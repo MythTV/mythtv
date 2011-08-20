@@ -214,7 +214,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             else
                 encoder.setAttribute("hostname", elink->GetHostName());
 
-            encoder.setAttribute("devlabel", 
+            encoder.setAttribute("devlabel",
                           CardUtil::GetDeviceLabel(elink->GetCardID()) );
 
             if (elink->IsConnected())
@@ -572,10 +572,10 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                         "status information script: %1").arg(info_script));
             return;
         }
-    
+
         QByteArray input = ms.ReadAll();
 
-        QStringList output = QString(input).split('\n', 
+        QStringList output = QString(input).split('\n',
                                                   QString::SkipEmptyParts);
 
         QStringList::iterator iter;
@@ -643,14 +643,12 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
        << "<div class=\"status\">\r\n"
        << "  <h1 class=\"status\">MythTV Status</h1>\r\n";
 
-    int nNumEncoders = 0;
-
     // encoder information ---------------------
 
     QDomNode node = docElem.namedItem( "Encoders" );
 
     if (!node.isNull())
-        nNumEncoders = PrintEncoderStatus( os, node.toElement() );
+        PrintEncoderStatus( os, node.toElement() );
 
     // upcoming shows --------------------------
 
@@ -733,7 +731,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 
                 QString sDevlabel = e.attribute( "devlabel", "[ UNKNOWN ]");
 
-                os << "    Encoder " << sCardId << " " << sDevlabel 
+                os << "    Encoder " << sCardId << " " << sDevlabel
                    << " is " << sIsLocal << " on " << sHostName;
 
                 if ((sIsLocal == "remote") && !bConnected)

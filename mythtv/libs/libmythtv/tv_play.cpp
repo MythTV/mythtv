@@ -198,7 +198,7 @@ int TV::ConfiguredTunerCards(void)
     if (query.exec() && query.isActive() && query.size() && query.next())
         count = query.value(0).toInt();
 
-    LOG(VB_RECORD, LOG_INFO, 
+    LOG(VB_RECORD, LOG_INFO,
         "ConfiguredTunerCards() = " + QString::number(count));
 
     return count;
@@ -5412,8 +5412,8 @@ void TV::DoPlay(PlayerContext *ctx)
         if (ctx->ff_rew_state)
             time = StopFFRew(ctx);
         else if (ctx->player->IsPaused())
-            SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo); 
-        
+            SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
+
         ctx->player->Play(ctx->ts_normal, true);
         ctx->ff_rew_speed = 0;
     }
@@ -7282,7 +7282,7 @@ void TV::UpdateOSDTimeoutMessage(PlayerContext *ctx)
     {
         if (timed_out)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + 
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                 "You have no OSD, but tuning has already taken too long.");
         }
         ReturnOSDLock(ctx, osd);
@@ -7797,7 +7797,7 @@ void TV::ChangeVolume(PlayerContext *ctx, bool up)
 
             if (ctx->buffer && ctx->buffer->IsDVD())
                 appName = tr("DVD");
-            
+
             lcd->switchToVolume(appName);
             lcd->setVolumeLevel((float)curvol / 100);
 
@@ -8230,7 +8230,7 @@ void TV::customEvent(QEvent *e)
             if (me->ExtraDataCount() == 3)
                 filename = me->ExtraData(2);
         }
-        if (mctx && mctx->player && 
+        if (mctx && mctx->player &&
             mctx->player->GetScreenShot(width, height, filename))
         {
         }
@@ -8242,12 +8242,12 @@ void TV::customEvent(QEvent *e)
     }
     else if (message.left(14) == "DONE_RECORDING")
     {
-        int seconds = 0;
+        // int seconds = 0;
         long long frames = 0;
         if (tokens.size() >= 4)
         {
             cardnum = tokens[1].toUInt();
-            seconds = tokens[2].toInt();
+            // seconds = tokens[2].toInt();
             frames = tokens[3].toLongLong();
         }
 
@@ -9490,7 +9490,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
 {
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
 
-    LOG(VB_GENERAL, LOG_INFO, LOC +
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("OSDDialogEvent: result %1 text %2 action %3")
             .arg(result).arg(text).arg(action));
 
@@ -9685,7 +9685,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                         new_channum = (*it).channum;
                 }
 
-                LOG(VB_GENERAL, LOG_INFO, LOC +
+                LOG(VB_GENERAL, LOG_DEBUG, LOC +
                     QString("Channel Group: '%1'->'%2'")
                         .arg(cur_channum).arg(new_channum));
             }
@@ -9938,7 +9938,7 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
                           QString &currenttext, QString &backaction)
 {
     QStringList tracks;
-    uint curtrack                     = ~0;
+    //uint curtrack                     = ~0;
     uint sup                          = kPictureAttributeSupported_None;
     bool studio_levels                = false;
     bool autodetect                   = false;
@@ -9955,8 +9955,8 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
         adjustfill       = ctx->player->GetAdjustFill();
         scan_type        = ctx->player->GetScanType();
         scan_type_locked = ctx->player->IsScanTypeLocked();
-        if (!tracks.empty())
-            curtrack = (uint) ctx->player->GetTrack(kTrackTypeVideo);
+        //if (!tracks.empty())
+        //    curtrack = (uint) ctx->player->GetTrack(kTrackTypeVideo);
         VideoOutput *vo = ctx->player->GetVideoOutput();
         if (vo)
         {
@@ -10133,7 +10133,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
                               QString category, const QString selected,
                               QString &currenttext, QString &backaction)
 {
-    uint capmode  = 0;
+    // uint capmode  = 0;
     QStringList av_tracks;
     QStringList cc708_tracks;
     QStringList cc608_tracks;
@@ -10149,7 +10149,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
-        capmode      = ctx->player->GetCaptionMode();
+        // capmode      = ctx->player->GetCaptionMode();
         havetext     = ctx->player->HasTextSubtitles();
         av_tracks    = ctx->player->GetTracks(kTrackTypeSubtitle);
         cc708_tracks = ctx->player->GetTracks(kTrackTypeCC708);
@@ -10845,11 +10845,11 @@ void TV::FillOSDMenuSchedule(const PlayerContext *ctx, OSD *osd,
 void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString category,
                             int level, const QString selected)
 {
-    bool in_recgroup = !category.isEmpty() && level > 0;
+    // bool in_recgroup = !category.isEmpty() && level > 0;
     if (level < 0 || level > 1)
     {
         level = 0;
-        in_recgroup = false;
+        // in_recgroup = false;
     }
 
     OSD *osd = GetOSDLock(ctx);
