@@ -90,7 +90,7 @@ bool ManualSchedule::Create(void)
         QString dinfo = MythDate::toString(
             m_nowDateTime.addDays(index),
             MythDate::kDateFull | MythDate::kSimplify);
-        if (m_nowDateTime.addDays(index).date().dayOfWeek() < 6)
+        if (m_nowDateTime.addDays(index).toLocalTime().date().dayOfWeek() < 6)
             dinfo += QString(" (%1)").arg(tr("5 weekdays if daily"));
         else
             dinfo += QString(" (%1)").arg(tr("7 days per week if daily"));

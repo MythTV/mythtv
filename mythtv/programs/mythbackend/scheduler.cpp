@@ -3076,10 +3076,7 @@ void Scheduler::UpdateManuals(int recordid)
     case kTimeslotRecord:
         progcount = 13;
         skipdays = 1;
-        if (startdt.date().dayOfWeek() < 6)
-            weekday = true;
-        else
-            weekday = false;
+        weekday = (startdt.toLocalTime().date().dayOfWeek() < 6);
         startdt = QDateTime(
             MythDate::current().date(), startdt.time(), Qt::UTC);
         break;
@@ -3101,7 +3098,7 @@ void Scheduler::UpdateManuals(int recordid)
     {
         for (int i = 0; i < (int)chanidlist.size(); i++)
         {
-            if (weekday && startdt.date().dayOfWeek() >= 6)
+            if (weekday && startdt.toLocalTime().date().dayOfWeek() >= 6)
                 continue;
 
             query.prepare("REPLACE INTO program (chanid,starttime,endtime,"
