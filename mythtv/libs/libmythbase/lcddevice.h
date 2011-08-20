@@ -19,14 +19,14 @@ class MBASE_PUBLIC LCDMenuItem
 {
   public:
     LCDMenuItem(bool item_selected, CHECKED_STATE item_checked,
-                QString item_name, unsigned int item_indent  = 0)
+                QString item_name, unsigned int item_indent  = 0,
+                bool item_scroll = false)
     {
         selected = item_selected;
         checked = item_checked;
         name = item_name;
-        scroll = false;
+        scroll = item_scroll;
         indent = item_indent;
-        scroll = false;
         scrollPosition = indent;
     }
 
