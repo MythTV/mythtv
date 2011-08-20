@@ -288,7 +288,7 @@ void AutoExpire::RunExpirer(void)
 {
     QTime timer;
     QDateTime curTime;
-    QDateTime next_expire = QDateTime::currentDateTime().addSecs(60);
+    QDateTime next_expire = MythDate::current().addSecs(60);
 
     QMutexLocker locker(&instance_lock);
 
@@ -299,7 +299,7 @@ void AutoExpire::RunExpirer(void)
 
     while (expire_thread_run)
     {
-        curTime = QDateTime::currentDateTime();
+        curTime = MythDate::current();
         // recalculate auto expire parameters
         if (curTime >= next_expire)
         {
@@ -322,7 +322,7 @@ void AutoExpire::RunExpirer(void)
         {
             LOG(VB_FILE, LOG_INFO, LOC + "Running now!");
             next_expire =
-                QDateTime::currentDateTime().addSecs(desired_freq * 60);
+                MythDate::current().addSecs(desired_freq * 60);
 
             ExpireLiveTV(emNormalLiveTVPrograms);
 
@@ -349,12 +349,12 @@ void AutoExpire::Sleep(int sleepTime)
     if (sleepTime <= 0)
         return;
 
-    QDateTime little_tm = QDateTime::currentDateTime().addMSecs(sleepTime);
+    QDateTime little_tm = MythDate::current().addMSecs(sleepTime);
     int timeleft = sleepTime;
     while (expire_thread_run && (timeleft > 0))
     {
         instance_cond.wait(&instance_lock, timeleft);
-        timeleft = QDateTime::currentDateTime().secsTo(little_tm) * 1000;
+        timeleft = MythDate::current().secsTo(little_tm) * 1000;
     }
 }
 
@@ -626,7 +626,7 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
 
         // send auto expire message to backend's event thread.
         MythEvent me(QString("AUTO_EXPIRE %1 %2").arg((*it)->GetChanID())
-                     .arg((*it)->GetRecordingStartTime(ISODate)));
+                     .arg((*it)->GetRecordingStartTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
 
         deleted_set.insert((*it)->MakeUniqueKey());
@@ -696,10 +696,10 @@ void AutoExpire::ExpireEpisodesOverMax(void)
             while (query.next())
             {
                 uint chanid = query.value(0).toUInt();
-                QDateTime startts = query.value(1).toDateTime();
+                QDateTime startts = MythDate::as_utc(query.value(1).toDateTime());
                 QString title = query.value(2).toString();
-                QDateTime progstart = query.value(3).toDateTime();
-                QDateTime progend = query.value(4).toDateTime();
+                QDateTime progstart = MythDate::as_utc(query.value(3).toDateTime());
+                QDateTime progend = MythDate::as_utc(query.value(4).toDateTime());
                 int duplicate = query.value(6).toInt();
 
                 episodeKey = QString("%1_%2_%3")
@@ -715,11 +715,11 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                     QString msg =
                         QString("%1Expiring %2 MBytes for %3 at %4 => %5.  "
                                 "Too many episodes, we only want to keep %6.")
-                            .arg(VERBOSE_LEVEL_CHECK(VB_FILE, LOG_ANY) ?
-                                 "    " : "")
-                            .arg(spaceFreed)
-                            .arg(chanid).arg(startts.toString())
-                            .arg(title).arg(*maxIter);
+                        .arg(VERBOSE_LEVEL_CHECK(VB_FILE, LOG_ANY) ?
+                             "    " : "")
+                        .arg(spaceFreed)
+                        .arg(chanid).arg(startts.toString(Qt::ISODate))
+                        .arg(title).arg(*maxIter);
 
                     LOG(VB_GENERAL, LOG_NOTICE, msg);
 
@@ -804,7 +804,7 @@ void AutoExpire::PrintExpireList(QString expHost)
             .arg(title)
             .arg(QString::number(first->GetFilesize() >> 20)
                  .rightJustified(5, ' ', true))
-            .arg(first->GetRecordingStartTime(ISODate)
+            .arg(first->GetRecordingStartTime(MythDate::ISODate)
                  .leftJustified(24, ' ', true))
             .arg(QString::number(first->GetRecordingPriority())
                  .rightJustified(3, ' ', true));
@@ -970,7 +970,7 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
     while (query.next())
     {
         uint chanid = query.value(0).toUInt();
-        QDateTime recstartts = query.value(1).toDateTime();
+        QDateTime recstartts = MythDate::as_utc(query.value(1).toDateTime());
 
         if (IsInDontExpireSet(chanid, recstartts))
         {
@@ -1093,13 +1093,13 @@ void AutoExpire::UpdateDontExpireSet(void)
         return;
 
     LOG(VB_FILE, LOG_INFO, LOC + "Adding Programs to 'Do Not Expire' List");
-    QDateTime curTime = QDateTime::currentDateTime();
+    QDateTime curTime = MythDate::current();
 
     do
     {
         uint chanid = query.value(0).toUInt();
-        QDateTime recstartts = query.value(1).toDateTime();
-        QDateTime lastupdate = query.value(2).toDateTime();
+        QDateTime recstartts = MythDate::as_utc(query.value(1).toDateTime());
+        QDateTime lastupdate = MythDate::as_utc(query.value(2).toDateTime());
 
         if (lastupdate.secsTo(curTime) < 2 * 60 * 60)
         {

@@ -31,7 +31,7 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_recid(0),
     m_title(),
     m_addTables(from),
-    m_startTime(QDateTime::currentDateTime()),
+    m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
     m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
@@ -81,7 +81,7 @@ ProgLister::ProgLister(
     m_recid(recid),
     m_title(title),
     m_addTables(),
-    m_startTime(QDateTime::currentDateTime()),
+    m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
     m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
@@ -355,8 +355,8 @@ void ProgLister::SwitchToPreviousView(void)
     {
         m_searchTime = m_searchTime.addSecs(-3600);
         m_curView = 0;
-        m_viewList[m_curView]     = MythDateTimeToString(m_searchTime,
-                                                         kDateTimeFull | kSimplify);
+        m_viewList[m_curView]     = MythDate::toString(m_searchTime,
+                                                         MythDate::kDateTimeFull | MythDate::kSimplify);
         m_viewTextList[m_curView] = m_viewList[m_curView];
         LoadInBackground();
         return;
@@ -378,8 +378,8 @@ void ProgLister:: SwitchToNextView(void)
     {
         m_searchTime = m_searchTime.addSecs(3600);
         m_curView = 0;
-        m_viewList[m_curView] = MythDateTimeToString(m_searchTime,
-                                                     kDateTimeFull | kSimplify);
+        m_viewList[m_curView] = MythDate::toString(m_searchTime,
+                                                     MythDate::kDateTimeFull | MythDate::kSimplify);
         m_viewTextList[m_curView] = m_viewList[m_curView];
         LoadInBackground();
 
@@ -524,8 +524,8 @@ void ProgLister::SetViewFromTime(QDateTime searchTime)
 
     m_searchTime = searchTime;
     m_curView = 0;
-    m_viewList[m_curView] = MythDateTimeToString(m_searchTime,
-                                                 kDateTimeFull | kSimplify);
+    m_viewList[m_curView] = MythDate::toString(m_searchTime,
+                                                 MythDate::kDateTimeFull | MythDate::kSimplify);
     m_viewTextList[m_curView] = m_viewList[m_curView];
 
     LoadInBackground();
@@ -690,7 +690,7 @@ void ProgLister::DeleteOldEpisode(bool ok)
         "WHERE chanid    = :CHANID AND "
         "      starttime = :STARTTIME");
     query.bindValue(":CHANID",    pi->GetChanID());
-    query.bindValue(":STARTTIME", pi->GetScheduledStartTime(ISODate));
+    query.bindValue(":STARTTIME", pi->GetScheduledStartTime(MythDate::ISODate));
 
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldEpisode", query);
@@ -974,8 +974,8 @@ void ProgLister::FillViewList(const QString &view)
     else if (m_type == plTime)
     {
         m_curView = 0;
-        m_viewList.push_back(MythDateTimeToString(m_searchTime,
-                                                  kDateTimeFull | kSimplify));
+        m_viewList.push_back(MythDate::toString(m_searchTime,
+                                                  MythDate::kDateTimeFull | MythDate::kSimplify));
         m_viewTextList.push_back(m_viewList[m_curView]);
     }
     else if (m_type == plSQLSearch)
@@ -1295,7 +1295,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     else if (m_type == plTime) // list by time
     {
         bindings[":PGILSEARCHTIME1"] =
-            m_searchTime.toString("yyyy-MM-dd hh:00:00");
+            MythDate::toString(m_searchTime, MythDate::kDatabase);
         where = "WHERE channel.visible = 1 "
             "  AND program.starttime >= :PGILSEARCHTIME1 ";
         if (m_titleSort)

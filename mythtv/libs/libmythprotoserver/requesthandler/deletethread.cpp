@@ -85,7 +85,7 @@ void DeleteThread::ProcessNew(void)
     // until none are left
     // TODO: add support for symlinks
 
-    QDateTime ctime = QDateTime::currentDateTime();
+    QDateTime ctime = MythDate::current();
 
     while (true)
     {
@@ -202,7 +202,7 @@ void DeleteThread::ProcessOld(void)
     // files exist for deletion, reset the timer
     m_timer.start(m_timeout);
 
-    QDateTime ctime = QDateTime::currentDateTime();
+    QDateTime ctime = MythDate::current();
 
     // only operate on one file at a time
     // delete that file completely before moving onto the next

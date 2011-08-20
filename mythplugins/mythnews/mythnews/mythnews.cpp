@@ -189,7 +189,7 @@ void MythNews::loadSites(void)
         QString name = query.value(0).toString();
         QString url  = query.value(1).toString();
         QString icon = query.value(2).toString();
-        QDateTime time; time.setTime_t(query.value(3).toUInt());
+        QDateTime time = MythDate::fromTime_t(query.value(3).toUInt());
         bool podcast = query.value(4).toInt();
         m_NewsSites.push_back(new NewsSite(name, url, time, podcast));
     }
@@ -452,8 +452,8 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             QString text(tr("Updated") + " - ");
             QDateTime updated(site->lastUpdated());
             if (updated.toTime_t() != 0) {
-                text += MythDateTimeToString(site->lastUpdated(),
-                                             kDateTimeFull | kSimplify);
+                text += MythDate::toString(site->lastUpdated(),
+                                             MythDate::kDateTimeFull | MythDate::kSimplify);
             }
             else
                 text += tr("Unknown");

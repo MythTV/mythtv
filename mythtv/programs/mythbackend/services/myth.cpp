@@ -366,7 +366,7 @@ DTC::TimeZoneInfo *Myth::GetTimeZone(  )
 
     pResults->setTimeZoneID( getTimeZoneID() );
     pResults->setUTCOffset( calc_utc_offset() );
-    pResults->setCurrentDateTime( mythCurrentDateTime() );
+    pResults->setCurrentDateTime( MythDate::current(true) );
 
     return pResults;
 }
@@ -765,7 +765,7 @@ QString Myth::ProfileUpdated()
         QDateTime tUpdated;
         tUpdated = profile->GetLastUpdate();
         sProfileUpdate = tUpdated.toString(
-                             gCoreContext->GetSetting( "DateFormat", "MM.dd.yyyy"));
+            gCoreContext->GetSetting( "DateFormat", "MM.dd.yyyy"));
     }
     delete profile;
 

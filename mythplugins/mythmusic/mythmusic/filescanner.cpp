@@ -200,26 +200,22 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
  *
  * \returns True if file has been modified, otherwise false
  */
-bool FileScanner::HasFileChanged(const QString &filename, const QString &date_modified)
+bool FileScanner::HasFileChanged(
+    const QString &filename, const QString &date_modified)
 {
-    struct stat stbuf;
-
-    QByteArray fname = filename.toLocal8Bit();
-    if (stat(fname.constData(), &stbuf) == 0)
+    QFileInfo fi(filename);
+    QDateTime dt = fi.lastModified();
+    if (dt.isValid())
     {
-        if (date_modified.isEmpty() ||
-            stbuf.st_mtime >
-            (time_t)QDateTime::fromString(date_modified,
-                                          Qt::ISODate).toTime_t())
-        {
-            return true;
-        }
+        QDateTime old_dt = MythDate::fromString(date_modified);
+        return !old_dt.isValid() || (dt > old_dt);
     }
-    else {
+    else
+    {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to stat file: %1")
                 .arg(filename));
+        return false;
     }
-    return false;
 }
 
 /*!
@@ -617,7 +613,7 @@ void FileScanner::SearchDir(QString &directory)
     {
         if (*iter == kFileSystem)
             AddFileToDB(iter.key());
-        else if (*iter == kDatabase)
+        else if (*iter == MythDate::kDatabase)
             RemoveFileFromDB(iter.key ());
         else if (*iter == kNeedUpdate)
             UpdateFileInDB(iter.key());
@@ -685,7 +681,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
-                    if (music_files[name] == kDatabase)
+                    if (music_files[name] == MythDate::kDatabase)
                     {
                         if (file_checking)
                         {
@@ -767,7 +763,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
-                    if (music_files[name] == kDatabase)
+                    if (music_files[name] == MythDate::kDatabase)
                     {
                         if (file_checking)
                         {

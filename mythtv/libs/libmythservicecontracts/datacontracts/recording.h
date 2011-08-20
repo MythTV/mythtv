@@ -25,6 +25,7 @@
 #include <QDateTime>
 #include <QString>
 
+#include "util.h"
 #include "serviceexp.h" 
 #include "datacontracthelper.h"   
 #include "programtypes.h"

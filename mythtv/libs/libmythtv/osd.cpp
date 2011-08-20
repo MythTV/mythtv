@@ -692,7 +692,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
 
 void OSD::CheckExpiry(void)
 {
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
     QMutableHashIterator<MythScreenType*, QDateTime> it(m_ExpireTimes);
     while (it.hasNext())
     {
@@ -730,7 +730,7 @@ void OSD::SetExpiry(const QString &window, enum OSDTimeout timeout,
     int time = custom_timeout ? custom_timeout : m_Timeouts[timeout];
     if ((time > 0) && win)
     {
-        QDateTime expires = QDateTime::currentDateTime().addMSecs(time);
+        QDateTime expires = MythDate::current().addMSecs(time);
         m_ExpireTimes.insert(win, expires);
     }
     else if ((time < 0) && win)
@@ -954,7 +954,7 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
 
     if (updatefor)
     {
-        m_NextPulseUpdate  = QDateTime::currentDateTime();
+        m_NextPulseUpdate  = MythDate::current();
         m_PulsedDialogText = text;
         SetExpiry(window, kOSDTimeout_None, updatefor);
     }

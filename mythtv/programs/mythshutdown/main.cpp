@@ -203,7 +203,9 @@ static QDateTime getDailyWakeupTime(QString sPeriod)
 {
     QString sTime = getGlobalSetting(sPeriod, "00:00");
     QTime tTime = QTime::fromString(sTime, "hh:mm");
-    QDateTime dtDateTime = QDateTime(QDate::currentDate(), tTime);
+    QDateTime dtDateTime = QDateTime(
+        MythDate::current().toLocalTime().date(),
+        tTime, Qt::LocalTime).toUTC();
 
     return dtDateTime;
 }
@@ -271,7 +273,7 @@ static int getStatus(bool bWantRecStatus)
     QDateTime dtPeriod1End = getDailyWakeupTime("DailyWakeupEndPeriod1");
     QDateTime dtPeriod2Start = getDailyWakeupTime("DailyWakeupStartPeriod2");
     QDateTime dtPeriod2End = getDailyWakeupTime("DailyWakeupEndPeriod2");
-    QDateTime dtCurrent = QDateTime::currentDateTime();
+    QDateTime dtCurrent = MythDate::current();
 
     // Check for time periods that cross midnight
     if (dtPeriod1End < dtPeriod1Start)
@@ -380,7 +382,7 @@ static int setWakeupTime(QString sWakeupTime)
 
     // check time given is valid
     QDateTime dtWakeupTime;
-    dtWakeupTime = QDateTime::fromString(sWakeupTime, Qt::ISODate);
+    dtWakeupTime = MythDate::fromString(sWakeupTime);
 
     if (!dtWakeupTime.isValid())
     {
@@ -444,7 +446,7 @@ static int shutdown()
     QDateTime dtPeriod1End = getDailyWakeupTime("DailyWakeupEndPeriod1");
     QDateTime dtPeriod2Start = getDailyWakeupTime("DailyWakeupStartPeriod2");
     QDateTime dtPeriod2End = getDailyWakeupTime("DailyWakeupEndPeriod2");
-    QDateTime dtCurrent = QDateTime::currentDateTime();
+    QDateTime dtCurrent = MythDate::current();
     QDateTime dtNextDailyWakeup = QDateTime();
 
     // Make sure Period1 is before Period2
@@ -481,7 +483,8 @@ static int shutdown()
         if (dtCurrent < dtPeriod1Start)
         {
             LOG(VB_GENERAL, LOG_NOTICE,
-                "daily wakeup today at " + dtPeriod1Start.toString("hh:mm:ss"));
+                "daily wakeup today at " +
+                dtPeriod1Start.toLocalTime().toString("hh:mm:ss"));
             dtNextDailyWakeup = dtPeriod1Start;
         }
     }
@@ -492,7 +495,8 @@ static int shutdown()
         if (dtCurrent < dtPeriod2Start)
         {
             LOG(VB_GENERAL, LOG_NOTICE,
-                "daily wakeup today at " + dtPeriod2Start.toString("hh:mm:ss"));
+                "daily wakeup today at " +
+                dtPeriod2Start.toLocalTime().toString("hh:mm:ss"));
             dtNextDailyWakeup = dtPeriod2Start;
         }
     }
@@ -512,7 +516,7 @@ static int shutdown()
             dtNextDailyWakeup = dtNextDailyWakeup.addDays(1);
 
             LOG(VB_GENERAL, LOG_NOTICE, "next daily wakeup is tomorrow at " +
-                dtNextDailyWakeup.toString("hh:mm:ss"));
+                dtNextDailyWakeup.toLocalTime().toString("hh:mm:ss"));
         }
     }
 
@@ -524,7 +528,7 @@ static int shutdown()
     QDateTime dtNextRecordingStart = QDateTime();
     QString s = getGlobalSetting("MythShutdownNextScheduled", "");
     if (!s.isEmpty())
-        dtNextRecordingStart = QDateTime::fromString(s, Qt::ISODate);
+        dtNextRecordingStart = MythDate::fromString(s);
 
     if (!dtNextRecordingStart.isValid())
         LOG(VB_GENERAL, LOG_ERR, "no recording time is set");
@@ -627,7 +631,8 @@ static int shutdown()
             }
             else
                 nvramCommand.replace(
-                    "$time", dtWakeupTime.toString(wakeup_timeformat));
+                    "$time", dtWakeupTime.toLocalTime()
+                    .toString(wakeup_timeformat));
 
             LOG(VB_GENERAL, LOG_NOTICE, "sending command to set time in bios" +
                 nvramCommand);
@@ -714,7 +719,7 @@ static int startup()
     QDateTime startupTime = QDateTime();
     QString s = getGlobalSetting("MythshutdownWakeupTime", "");
     if (!s.isEmpty())
-        startupTime = QDateTime::fromString(s, Qt::ISODate);
+        startupTime = MythDate::fromString(s);
 
     // if we don't have a valid startup time assume we were started manually
     if (!startupTime.isValid())
@@ -724,7 +729,7 @@ static int startup()
         // if we started within 15mins of the saved wakeup time assume we started
         // automatically to record or for a daily wakeup/shutdown period
 
-        int delta = startupTime.secsTo(QDateTime::currentDateTime());
+        int delta = startupTime.secsTo(MythDate::current());
         if (delta < 0)
             delta = -delta;
 

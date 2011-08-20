@@ -112,7 +112,7 @@ static QString evaluateDateValue(QString sDate)
 {
     if (sDate.startsWith("$DATE"))
     {
-        QDate date = QDate::currentDate();
+        QDate date = MythDate::current().toLocalTime().date();
 
         if (sDate.length() > 9)
         {
@@ -2437,7 +2437,7 @@ SmartPLDateDialog::SmartPLDateDialog(MythMainWindow *parent, const char *name)
     hbox->addWidget(caption);
 
     // fixed date widgets
-    QDate date = QDate::currentDate();
+    QDate date = MythDate::current().toLocalTime().date();
     hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     fixedRadio = new MythRadioButton(this, "nopopsize");
     fixedRadio->setText(tr("Fixed Date"));

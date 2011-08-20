@@ -4,6 +4,7 @@
 // MythTV headers
 #include <mythlogging.h>
 #include <mythdirs.h>
+#include <util.h>
 
 // MythNews headers
 #include "newssite.h"
@@ -134,7 +135,7 @@ unsigned int NewsSite::timeSinceLastUpdate(void) const
 {
     QMutexLocker locker(&m_lock);
 
-    QDateTime curTime(QDateTime::currentDateTime());
+    QDateTime curTime(MythDate::current());
     unsigned int min = m_updated.secsTo(curTime)/60;
     return min;
 }
@@ -192,7 +193,7 @@ void NewsSite::Update(QHttp::Error      error,
         {
             xmlFile.write(m_data);
             xmlFile.close();
-            m_updated = QDateTime::currentDateTime();
+            m_updated = MythDate::current();
             m_state = NewsSite::Success;
         }
         else

@@ -197,7 +197,8 @@ void ThemeChooser::Load(void)
     if (QFile::exists(remoteThemesFile))
     {
         QFileInfo finfo(remoteThemesFile);
-        if (finfo.lastModified() < mythCurrentDateTime().addSecs(-600))
+        if (finfo.lastModified().toUTC() <
+            MythDate::current().addSecs(-600))
         {
             LOG(VB_GUI, LOG_INFO, LOC +
                 QString("%1 is over 10 minutes old, forcing "

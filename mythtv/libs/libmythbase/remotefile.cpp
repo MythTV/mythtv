@@ -10,6 +10,7 @@ using namespace std;
 #include "mythsocket.h"
 #include "compat.h"
 #include "mythtimer.h"
+#include "util.h"
 
 RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
                        int _timeout_ms,
@@ -648,7 +649,7 @@ QDateTime RemoteFile::LastModified(const QString &url)
     gCoreContext->SendReceiveStringList(strlist);
 
     if (strlist.size() > 1)
-        result = QDateTime::fromTime_t(strlist[1].toUInt());
+        result = MythDate::fromTime_t(strlist[1].toUInt());
 
     return result;
 }

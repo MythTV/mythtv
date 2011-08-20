@@ -384,7 +384,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         {
             QStringList list;
             list.push_back(QString::number(curProgram->GetChanID()));
-            list.push_back(curProgram->GetRecordingStartTime(ISODate));
+            list.push_back(curProgram->GetRecordingStartTime(MythDate::ISODate));
             list.push_back("0"); // do not force delete
             list.push_back(allowrerecord ? "1" : "0");
             MythEvent me("LOCAL_PBB_DELETE_RECORDINGS", list);
@@ -938,8 +938,6 @@ void TV::InitFromDB(void)
 
     kv["CustomFilters"]            = "";
     kv["ChannelFormat"]            = "<num> <sign>";
-    kv["TimeFormat"]               = "h:mm AP";
-    kv["ShortDateFormat"]          = "M/d";
 
     kv["UseArrowAccels"]           = "1";
     kv["TryUnflaggedSkip"]         = "0";
@@ -963,8 +961,6 @@ void TV::InitFromDB(void)
 
     MythDB::getMythDB()->GetSettings(kv);
 
-    QString db_time_format;
-    QString db_short_date_format;
     QString db_channel_ordering;
     uint    db_browse_max_forward;
 
@@ -987,8 +983,6 @@ void TV::InitFromDB(void)
     db_channel_ordering    = kv["ChannelOrdering"];
     baseFilters           += kv["CustomFilters"];
     db_channel_format      = kv["ChannelFormat"];
-    db_time_format         = kv["TimeFormat"];
-    db_short_date_format   = kv["ShortDateFormat"];
     arrowAccel             = kv["UseArrowAccels"].toInt();
     tryUnflaggedSkip       = kv["TryUnflaggedSkip"].toInt();
     smartForward           = kv["SmartForward"].toInt();
@@ -1020,7 +1014,6 @@ void TV::InitFromDB(void)
     // process it..
     browsehelper = new TVBrowseHelper(
         this,
-        db_time_format,          db_short_date_format,
         db_browse_max_forward,   db_browse_all_tuners,
         db_use_channel_groups,   db_channel_ordering);
 
@@ -1445,7 +1438,7 @@ void TV::AskAllowRecording(PlayerContext *ctx,
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "AskAllowRecording -- " +
             QString("adding '%1'").arg(info->title));
 #endif
-        QDateTime expiry = QDateTime::currentDateTime().addSecs(timeuntil);
+        QDateTime expiry = MythDate::current().addSecs(timeuntil);
         askAllowPrograms[key] = AskProgramInfo(expiry, hasrec, haslater, info);
     }
     else
@@ -1486,7 +1479,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
     QString do_not_recordm= tr("Don't let them record, I want to watch TV");
 
     // eliminate timed out programs
-    QDateTime timeNow = QDateTime::currentDateTime();
+    QDateTime timeNow = MythDate::current();
     QMap<QString,AskProgramInfo>::iterator it = askAllowPrograms.begin();
     QMap<QString,AskProgramInfo>::iterator next = it;
     while (it != askAllowPrograms.end())
@@ -1603,7 +1596,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         if (osd)
         {
             browsehelper->BrowseEnd(ctx, false);
-            timeuntil = QDateTime::currentDateTime().secsTo((*it).expiry) * 1000;
+            timeuntil = MythDate::current().secsTo((*it).expiry) * 1000;
             osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
             osd->DialogAddButton(record_watch, "DIALOG_ASKALLOW_WATCH_0",
                                  false, !((*it).has_rec));
@@ -1668,7 +1661,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             if ((*it).is_conflicting)
             {
                 all_have_later &= (*it).has_later;
-                int tmp = QDateTime::currentDateTime().secsTo((*it).expiry);
+                int tmp = MythDate::current().secsTo((*it).expiry);
                 tmp *= 1000;
                 timeuntil = min(timeuntil, max(tmp, 0));
             }
@@ -1872,7 +1865,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
         ctx->recorder->Setup();
 
-        QDateTime timerOffTime = QDateTime::currentDateTime();
+        QDateTime timerOffTime = MythDate::current();
         lockTimerOn = false;
 
         SET_NEXT();
@@ -4591,7 +4584,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             osdInfo info;
             ctx->CalcPlayerSliderPosition(info, true);
 
-            QDateTime respDate = mythCurrentDateTime();
+            QDateTime respDate = MythDate::current(true);
             QString infoStr = "";
 
             ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -7261,7 +7254,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     if (allGood || (pmt == "M"))
     {
         lockTimerOn = false;
-        lastLockSeenTime = QDateTime::currentDateTime();
+        lastLockSeenTime = MythDate::current();
     }
 }
 
@@ -8621,8 +8614,7 @@ void TV::ToggleRecord(PlayerContext *ctx)
     if (bi.m_chanid)
     {
         InfoMap infoMap;
-        QDateTime startts = QDateTime::fromString(
-            bi.m_starttime, Qt::ISODate);
+        QDateTime startts = MythDate::fromString(bi.m_starttime);
 
         RecordingInfo::LoadStatus status;
         RecordingInfo recinfo(bi.m_chanid, startts, false, 0, &status);

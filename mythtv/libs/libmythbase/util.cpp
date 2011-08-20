@@ -51,71 +51,109 @@ using namespace std;
 
 #include "mythconfig.h" // for CONFIG_DARWIN
 
-/** \fn mythCurrentDateTime()
- *  \brief Returns the current QDateTime object, stripped of its msec component
- */
-QDateTime mythCurrentDateTime()
+namespace MythDate
 {
-    QDateTime rettime = QDateTime::currentDateTime();
-    QTime orig = rettime.time();
-    rettime.setTime(orig.addMSecs(-orig.msec()));
+
+QDateTime current(bool stripped)
+{
+    QDateTime rettime = QDateTime::currentDateTime().toUTC();
+    if (stripped)
+        rettime = rettime.addMSecs(-rettime.time().msec());
     return rettime;
 }
 
-QDateTime myth_dt_from_string(const QString &dtstr)
+QString current_iso_string(bool stripped)
 {
+    return MythDate::current(stripped).toString(Qt::ISODate);
+}
+
+QDateTime as_utc(const QDateTime &old_dt)
+{
+    QDateTime dt(old_dt);
+    dt.setTimeSpec(Qt::UTC);
+    return dt;
+}
+
+QDateTime fromString(const QString &dtstr)
+{
+    QDateTime dt;
     if (dtstr.isEmpty())
-        return QDateTime();
+        return dt;
 
     if (!dtstr.contains("-") && dtstr.length() == 14)
     {
         // must be in yyyyMMddhhmmss format
-        return QDateTime::fromString(dtstr, "yyyyMMddhhmmss");
+        dt = QDateTime::fromString(dtstr, "yyyyMMddhhmmss");
+    }
+    else
+    {
+        dt = QDateTime::fromString(dtstr, Qt::ISODate);
     }
 
-    return QDateTime::fromString(dtstr, Qt::ISODate);
+    return dt;
 }
 
-/** \fn MythDateTimeToString
- *  \brief Returns a formatted QString based on the supplied QDateTime
- * 
- *  \param datetime The QDateTime object to use
- *  \param format   The format of the string to return
- *  \param simplify If true then full dates will be simplified to
- *                  Today/Yesterday/Tomorrow if applicable otherwise no changes
- *                  are made
- */
-QString MythDateTimeToString(const QDateTime& datetime, uint format)
+MBASE_PUBLIC QDateTime fromString(const QString &str, const QString &format)
+{
+    QDateTime dt = QDateTime::fromString(str, format);
+    dt.setTimeSpec(Qt::UTC);
+    return dt;
+}
+
+MBASE_PUBLIC QDateTime fromTime_t(uint seconds)
+{
+    QDateTime dt = QDateTime::fromTime_t(seconds);
+    return dt.toUTC();
+}
+
+QString toString(const QDateTime &raw_dt, uint format)
 {
     QString result;
 
+    // if no format is set default to UTC for ISO/file/DB dates.
+    if (!((format & kOverrideUTC) || (format & kOverrideLocal)))
+    {
+        format |= ((ISODate|kFilename|kDatabase) & format) ?
+            kOverrideUTC : kOverrideLocal;
+    }
+
+    QDateTime datetime =
+        (format & kOverrideUTC) ? raw_dt.toUTC() : raw_dt.toLocalTime();
+
+    if (format & kDatabase)
+        return datetime.toString("yyyy-MM-dd hh:mm:ss");
+
+    if (format & MythDate::ISODate)
+        return datetime.toString(Qt::ISODate);
+
+    if (format & kFilename)
+        return datetime.toString("yyyyMMddhhmmss");
+
+    if (format & kScreenShotFilename)
+        return datetime.toString("yyyy-MM-ddThh-mm-ss.zzz");
+
     if (format & (kDateFull | kDateShort))
-        result += MythDateToString(datetime.date(), format);
+        result += toString(datetime.date(), format);
 
     if (format & kTime)
     {
         if (!result.isEmpty())
             result.append(", ");
-        
-        result += MythTimeToString(datetime.time(), format);
+
+        QString timeformat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+        result += datetime.time().toString(timeformat);
     }
-    
+
     return result;
 }
 
-/** \fn MythDateToString
- *  \brief Returns a formatted QString based on the supplied QDate
- * 
- *  \param date     The QDate object to use
- *  \param format   The format of the string to return
- */
-QString MythDateToString(const QDate& date, uint format)
+QString toString(const QDate &date, uint format)
 {
     QString result;
 
     if (format & (kDateFull | kDateShort))
     {
-        QDate now = QDate::currentDate();
+        QDate now = current().date();
 
         QString stringformat;
         if (format & kDateShort)
@@ -142,35 +180,19 @@ QString MythDateToString(const QDate& date, uint format)
         if (result.isEmpty())
             result = date.toString(stringformat);
     }
-    
+
     return result;
 }
 
-/** \fn MythTimeToString
- *  \brief Returns a formatted QString based on the supplied QTime
- * 
- *  \param time     The QTime object to use
- *  \param format   The format of the string to return
- */
-QString MythTimeToString(const QTime& time, uint format)
-{
-    QString result;
-
-    if (format & kTime)
-    {
-        QString timeformat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-        result = time.toString(timeformat);
-    }    
-    
-    return result;
-}
+}; // namespace MythDate
 
 int calc_utc_offset(void)
 {
     QDateTime loc = QDateTime::currentDateTime();
     QDateTime utc = QDateTime::currentDateTime().toUTC();
 
-    int utc_offset = MythSecsTo(utc, loc);
+    int utc_offset = (utc.time().secsTo(loc.time()) +
+                      utc.date().daysTo(loc.date()) * 60 * 60 * 24);
 
     // clamp to nearest minute if within 10 seconds
     int off = utc_offset % 60;
@@ -503,6 +525,8 @@ static void print_timezone_info(QString master_zone_id, QString local_zone_id,
  */
 bool checkTimeZone(void)
 {
+    return true;
+
     if (gCoreContext->IsMasterBackend())
         return true;
 
@@ -523,7 +547,9 @@ bool checkTimeZone(void)
 /// MythContext) connection to the backend.
 bool checkTimeZone(const QStringList &master_settings)
 {
-    QDateTime local_time = mythCurrentDateTime();
+    return true;
+
+    QDateTime local_time = QDateTime::currentDateTime();
     QString local_time_string = local_time.toString(Qt::ISODate);
 
     bool have_zone_IDs = true;
@@ -586,8 +612,7 @@ bool checkTimeZone(const QStringList &master_settings)
     }
     else
     {
-        QDateTime master_time = QDateTime::fromString(master_time_string,
-                                                      Qt::ISODate);
+        QDateTime master_time = MythDate::fromString(master_time_string);
         uint timediff = abs(master_time.secsTo(local_time));
         if (timediff > 300)
         {
@@ -608,29 +633,6 @@ bool checkTimeZone(const QStringList &master_settings)
     }
 
     return true;
-}
-
-/** \fn MythSecsTo(const QDateTime&, const QDateTime&)
- *  \brief Returns "'to' - 'from'" for two QDateTime's in seconds.
- */
-int MythSecsTo(const QDateTime &from, const QDateTime &to)
-{
-   return (from.time().secsTo(to.time()) +
-           from.date().daysTo(to.date()) * 60 * 60 * 24);
-}
-
-/** \fn MythUTCToLocal(const QDateTime&)
- *  \brief Converts a QDateTime in UTC to local time.
- */
-QDateTime MythUTCToLocal(const QDateTime &utc)
-{
-    QDateTime local = QDateTime(QDate(1970, 1, 1));
-
-    int timesecs = MythSecsTo(local, utc);
-    QDateTime localdt;
-    localdt.setTime_t(timesecs);
-
-    return localdt;
 }
 
 /** \fn getUptime(time_t&)

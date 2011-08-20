@@ -18,6 +18,7 @@
 #include "mythevent.h"
 #include "mythversion.h"
 #include "remotefile.h"
+#include "util.h"
 
 #include "mythdownloadmanager.h"
 #include "mythlogging.h"
@@ -39,7 +40,7 @@ class MythDownloadInfo
         m_caller(NULL),          m_post(false),       m_reload(false),
         m_preferCache(false),    m_syncMode(false),   m_processReply(true),
         m_done(false),           m_bytesReceived(0),  m_bytesTotal(0),
-        m_lastStat(QDateTime::currentDateTime()),
+        m_lastStat(MythDate::current()),
         m_errorCode(QNetworkReply::NoError)
     {
         qRegisterMetaType<QNetworkReply::NetworkError>("QNetworkReply::NetworkError");
@@ -579,11 +580,11 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     {
         // Prefer the in-cache item if one exists and it is less than 60
         // seconds old and has not expired in the last 10 seconds.
-        QDateTime now = QDateTime::currentDateTime();
+        QDateTime now = MythDate::current();
         QNetworkCacheMetaData urlData = m_manager->cache()->metaData(qurl);
         if ((urlData.isValid()) &&
             ((!urlData.expirationDate().isValid()) ||
-             (urlData.expirationDate().secsTo(now) < 10)))
+             (QDateTime(urlData.expirationDate().toUTC()).secsTo(now) < 10)))
         {
             QNetworkCacheMetaData::RawHeaderList headers =
                 urlData.rawHeaders();
@@ -596,7 +597,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
                 {
                     found = true;
                     QDateTime loadDate =
-                       QDateTime::fromString((*it).second, dateFormat);
+                        MythDate::fromString((*it).second, dateFormat);
                     loadDate.setTimeSpec(Qt::UTC);
                     if (loadDate.secsTo(now) < 60)
                         dlInfo->m_preferCache = true;
@@ -645,14 +646,14 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     // timeout myth:// RemoteFile transfers 20 seconds from now
     // timeout non-myth:// QNetworkAccessManager transfers 10 seconds after
     //    their last progress update
-    QDateTime startedAt = QDateTime::currentDateTime();
+    QDateTime startedAt = MythDate::current();
     m_infoLock->lock();
     while ((!dlInfo->m_done) &&
            (dlInfo->m_errorCode == QNetworkReply::NoError) &&
            (((!dlInfo->m_url.startsWith("myth://")) &&
-             (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 10)) ||
+             (dlInfo->m_lastStat.secsTo(MythDate::current()) < 10)) ||
             ((dlInfo->m_url.startsWith("myth://")) &&
-             (startedAt.secsTo(QDateTime::currentDateTime()) < 20))))
+             (startedAt.secsTo(MythDate::current()) < 20))))
     {
         m_infoLock->unlock();
         m_queueWaitLock.lock();
@@ -930,7 +931,7 @@ void MythDownloadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTot
     if (!dlInfo)
         return;
 
-    dlInfo->m_lastStat = QDateTime::currentDateTime();
+    dlInfo->m_lastStat = MythDate::current();
 
     LOG(VB_FILE, LOG_DEBUG, LOC + 
         QString("downloadProgress: %1 to %2 is at %3 of %4 bytes downloaded")
@@ -1038,14 +1039,14 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1')").arg(url));
     QDateTime result;
 
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
     QNetworkCacheMetaData urlData = m_manager->cache()->metaData(QUrl(url));
 
     if (urlData.isValid())
     {
-        if (urlData.lastModified().secsTo(now) <= 60)
+        if (QDateTime(urlData.lastModified().toUTC()).secsTo(now) <= 60)
         {
-            result = urlData.lastModified();
+            result = urlData.lastModified().toUTC();
         }
         else
         {
@@ -1063,10 +1064,10 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
                 {
                     found = true;
                     QDateTime loadDate =
-                       QDateTime::fromString((*it).second, dateFormat);
+                        MythDate::fromString((*it).second, dateFormat);
                     loadDate.setTimeSpec(Qt::UTC);
                     if (loadDate.secsTo(now) <= 60)
-                        result = urlData.lastModified();
+                        result = urlData.lastModified().toUTC();
                 }
             }
         }
@@ -1083,7 +1084,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
             QVariant lastMod =
                 dlInfo->m_reply->header(QNetworkRequest::LastModifiedHeader);
             if (lastMod.isValid())
-                result = lastMod.toDateTime();
+                result = lastMod.toDateTime().toUTC();
         }
 
         delete dlInfo;

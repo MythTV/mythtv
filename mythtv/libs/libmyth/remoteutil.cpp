@@ -255,21 +255,19 @@ void RemoteSendEvent(const MythEvent &event)
 
 QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
 {
-    QDateTime retdatetime;
-
     QStringList strlist( "QUERY_PIXMAP_LASTMODIFIED" );
     pginfo->ToStringList(strlist);
     
     if (!gCoreContext->SendReceiveStringList(strlist))
-        return retdatetime;
+        return QDateTime();
 
     if (!strlist.empty() && strlist[0] != "BAD")
     {
         uint timet = strlist[0].toUInt();
-        retdatetime.setTime_t(timet);
+        return MythDate::fromTime_t(timet);
     }
-        
-    return retdatetime;
+
+    return QDateTime();
 }
 
 /// Download preview & get timestamp if newer than cachefile's
@@ -309,7 +307,7 @@ QDateTime RemoteGetPreviewIfModified(
     QDateTime retdatetime;
     qlonglong timet = strlist[0].toLongLong();
     if (timet >= 0)
-        retdatetime.setTime_t(timet);
+        retdatetime = MythDate::fromTime_t(timet);
 
     if (strlist.size() < 4)
     {
@@ -532,7 +530,7 @@ int RemoteCheckForRecording(const ProgramInfo *pginfo)
 int RemoteGetRecordingStatus(
     const ProgramInfo *pginfo, int overrecsecs, int underrecsecs)
 {
-    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime curtime = MythDate::current();
 
     int retval = 0;
 

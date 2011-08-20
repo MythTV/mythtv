@@ -164,7 +164,7 @@ void RSSEditPopup::parseAndSave(void)
         removeFromDB(m_urlText, VIDEO_PODCAST);
 
         if (insertInDB(new RSSSite(title, filename, VIDEO_PODCAST,
-                desc, link, author, download, QDateTime::currentDateTime())))
+                desc, link, author, download, MythDate::current())))
             emit saving();
         Close();
     }
@@ -271,7 +271,7 @@ void RSSEditPopup::slotSave(QNetworkReply* reply)
         else
             download = false;
 
-        QDateTime updated = QDateTime::currentDateTime();
+        QDateTime updated = MythDate::current();
         QString filename("");
 
         if (file.isEmpty())
@@ -309,7 +309,7 @@ void RSSEditPopup::slotSave(QNetworkReply* reply)
                 HttpComms::getHttpFile(filename, thumbnailURL, 20000, 1, 2);
         }
         if (insertInDB(new RSSSite(title, filename, VIDEO_PODCAST, description, link,
-                author, download, QDateTime::currentDateTime())))
+                author, download, MythDate::current())))
             emit saving();
     }
     Close();

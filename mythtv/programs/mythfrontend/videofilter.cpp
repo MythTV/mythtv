@@ -10,6 +10,7 @@
 #include "dbaccess.h"
 #include "videometadatalistmanager.h"
 #include "videoutils.h"
+#include "util.h"
 
 #include "videolist.h"
 #include "videofilter.h"
@@ -515,7 +516,7 @@ void VideoFilterSettings::setTextFilter(QString val)
     {
         QStringList list = re_date.capturedTexts();
         int modnr = list[1].toInt();
-        QDate testdate = QDate::currentDate();
+        QDate testdate = MythDate::current().date();
         switch(list[2].at(0).toAscii())
         {
             case 'm': testdate = testdate.addMonths(-modnr);break;

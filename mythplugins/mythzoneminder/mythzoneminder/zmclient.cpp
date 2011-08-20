@@ -335,8 +335,8 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
         item->monitorID = (*it++).toInt();
         item->monitorName = *it++;
         QString sDate = *it++;
-        QDateTime dt = QDateTime::fromString(sDate, Qt::ISODate);
-        item->startTime = dt.toString(dateFormat + " " + timeFormat);
+        QDateTime dt = MythDate::fromString(sDate);
+        item->startTime = dt.ToString(dateFormat + " " + timeFormat);
         item->length = *it++;
         eventList->push_back(item);
     }

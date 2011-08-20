@@ -925,7 +925,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
 
     }
     else if(is_abbrev("time", nc->getArg(1)))
-        return QDateTime::currentDateTime().toString(Qt::ISODate);
+        return MythDate::current_iso_string();
     else if (is_abbrev("uptime", nc->getArg(1)))
     {
         QString str;
@@ -1356,8 +1356,8 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     queryStr += " ORDER BY starttime, endtime, chanid";
 
     query.prepare(queryStr);
-    query.bindValue(":START", QDateTime::currentDateTime());
-    query.bindValue(":END", QDateTime::currentDateTime());
+    query.bindValue(":START", MythDate::current());
+    query.bindValue(":END", MythDate::current());
     if (!chanID.isEmpty())
     {
         query.bindValue(":CHANID", chanID);
@@ -1376,11 +1376,11 @@ QString NetworkControl::listSchedule(const QString& chanID) const
 
             result +=
                 QString("%1 %2 %3 %4")
-                        .arg(QString::number(query.value(0).toInt())
-                             .rightJustified(5, ' '))
-                        .arg(query.value(1).toDateTime().toString(Qt::ISODate))
-                        .arg(query.value(2).toDateTime().toString(Qt::ISODate))
-                        .arg(atitle.constData());
+                .arg(QString::number(query.value(0).toInt())
+                     .rightJustified(5, ' '))
+                .arg(MythDate::as_utc(query.value(1).toDateTime()).toString(Qt::ISODate))
+                .arg(MythDate::as_utc(query.value(2).toDateTime()).toString(Qt::ISODate))
+                .arg(atitle.constData());
 
             if (appendCRLF)
                 result += "\r\n";
@@ -1430,8 +1430,8 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
 
             result +=
                 QString("%1 %2 %3").arg(query.value(0).toInt())
-                        .arg(query.value(1).toDateTime().toString(Qt::ISODate))
-                        .arg(episode);
+                .arg(MythDate::as_utc(query.value(1).toDateTime()).toString(Qt::ISODate))
+                .arg(episode);
 
             if (appendCRLF)
                 result += "\r\n";

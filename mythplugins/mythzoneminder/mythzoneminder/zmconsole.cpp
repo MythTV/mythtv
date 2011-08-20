@@ -20,9 +20,10 @@
 #include <QTimer>
 
 // myth
+#include <mythmainwindow.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
-#include <mythmainwindow.h>
+#include <util.h>
 
 // zoneminder
 #include "zmconsole.h"
@@ -183,7 +184,7 @@ void ZMConsole::updateTime(void)
     if (s != m_time_text->GetText())
         m_time_text->SetText(s);
 
-    s = QDateTime::currentDateTime().toString("dddd\ndd MMM yyyy");
+    s = MythDate::current().ToString("dddd\ndd MMM yyyy");
 
     if (s != m_date_text->GetText())
         m_date_text->SetText(s);

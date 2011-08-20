@@ -4,6 +4,7 @@
 #include <QMutex>
 
 #include "programtypes.h"
+#include "util.h"
 
 const char *kPlayerInUseID           = "player";
 const char *kPIPPlayerInUseID        = "pipplayer";
@@ -218,7 +219,7 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
 QString toDescription(RecStatusType recstatus, const QDateTime &recstartts)
 {
     QString message;
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
 
     if (recstatus <= rsWillRecord)
     {

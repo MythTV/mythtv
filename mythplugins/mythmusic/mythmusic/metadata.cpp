@@ -144,7 +144,7 @@ void Metadata::UpdateModTime() const
     query.prepare("UPDATE music_songs SET date_modified = :DATE_MOD "
                   "WHERE song_id= :ID ;");
 
-    query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
+    query.bindValue(":DATE_MOD", MythDate::current());
     query.bindValue(":ID", m_id);
 
     if (!query.exec())
@@ -456,11 +456,11 @@ void Metadata::dumpToDatabase()
     query.bindValue(":FILENAME", sqlfilename);
     query.bindValue(":RATING", m_rating);
     query.bindValue(":FORMAT", m_format);
-    query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
+    query.bindValue(":DATE_MOD", MythDate::current());
     query.bindValue(":PLAYCOUNT", m_playcount);
 
     if (m_id < 1)
-        query.bindValue(":DATE_ADD",  QDateTime::currentDateTime());
+        query.bindValue(":DATE_ADD",  MythDate::current());
     else
         query.bindValue(":ID", m_id);
 
@@ -699,8 +699,8 @@ void Metadata::toMap(MetadataMap &metadataMap)
     else
         metadataMap["length"] = QString().sprintf("%02d:%02d", em, es);
 
-    metadataMap["lastplayed"] = MythDateTimeToString(m_lastplay,
-                                              kDateFull | kSimplify | kAddYear);
+    metadataMap["lastplayed"] = MythDate::toString(m_lastplay,
+                                              MythDate::kDateFull | MythDate::kSimplify | MythDate::kAddYear);
 
     metadataMap["playcount"] = QString::number(m_playcount);
     metadataMap["filename"] = m_filename;
@@ -726,7 +726,7 @@ void Metadata::incRating()
 
 void Metadata::setLastPlay()
 {
-    m_lastplay = QDateTime::currentDateTime();
+    m_lastplay = MythDate::current();
     m_changed = true;
 }
 

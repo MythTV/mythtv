@@ -8,6 +8,7 @@
 #include "mpegtables.h"
 #include "atscdescriptors.h"
 #include "mythlogging.h"
+#include "util.h"
 
 // Some sample code is in pcHDTV's dtvscan.c,
 // accum_sect/dequeue_buf/atsc_tables.  We should stuff
@@ -560,9 +561,8 @@ class EventInformationTable : public PSIPTable
     QDateTime StartTimeGPS(uint i) const
     {
         // Time in GPS seconds since 00:00:00 on January 6th, 1980 UTC
-        QDateTime dt;
-        dt.setTime_t(secs_Between_1Jan1970_6Jan1980 + StartTimeRaw(i));
-        return dt;
+        return MythDate::fromTime_t(
+            secs_Between_1Jan1970_6Jan1980 + StartTimeRaw(i));
     }
     //   reserved               2   6.0    3
     //   ETM_location           2   6.2
@@ -704,9 +704,7 @@ class SystemTimeTable : public PSIPTable
     }
     QDateTime SystemTimeGPS(void) const
     {
-        QDateTime dt;
-        dt.setTime_t(secs_Between_1Jan1970_6Jan1980 + GPSRaw());
-        return dt;
+        MythDate::fromTime_t(secs_Between_1Jan1970_6Jan1980 + GPSRaw());
     }
     time_t GPSUnix(void) const
         { return secs_Between_1Jan1970_6Jan1980 + GPSRaw(); }
@@ -730,7 +728,7 @@ class SystemTimeTable : public PSIPTable
     {
         QString str =
             QString("    SystemTimeTable  GPSTime(%1) GPS2UTC_Offset(%2) ")
-            .arg(SystemTimeGPS().toString(Qt::LocalDate)).arg(GPSOffset());
+            .arg(SystemTimeGPS().toString(Qt::ISODate)).arg(GPSOffset());
         str.append(QString("DS(%3) Day(%4) Hour(%5)")
                    .arg(InDaylightSavingsTime())
                    .arg(DayDaylightSavingsStarts())

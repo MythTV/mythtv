@@ -88,7 +88,7 @@ void PlayerContext::SetInitialTVState(bool islivetv)
     else if (playingInfo)
     {
         int overrecordseconds = gCoreContext->GetNumSetting("RecordOverTime");
-        QDateTime curtime = QDateTime::currentDateTime();
+        QDateTime curtime = MythDate::current();
         QDateTime recendts = playingInfo->GetRecordingEndTime()
             .addSecs(overrecordseconds);
 
@@ -903,8 +903,8 @@ void PlayerContext::SetPseudoLiveTV(
         new_rec = new ProgramInfo(*pi);
         QString msg = QString("Wants to record: %1 %2 %3 %4")
             .arg(new_rec->GetTitle()).arg(new_rec->GetChanNum())
-            .arg(new_rec->GetRecordingStartTime(ISODate))
-            .arg(new_rec->GetRecordingEndTime(ISODate));
+            .arg(new_rec->GetRecordingStartTime(MythDate::ISODate))
+            .arg(new_rec->GetRecordingEndTime(MythDate::ISODate));
         LOG(VB_PLAYBACK, LOG_INFO, LOC + msg);
     }
 
@@ -915,8 +915,8 @@ void PlayerContext::SetPseudoLiveTV(
     {
         QString msg = QString("Done recording: %1 %2 %3 %4")
             .arg(old_rec->GetTitle()).arg(old_rec->GetChanNum())
-            .arg(old_rec->GetRecordingStartTime(ISODate))
-            .arg(old_rec->GetRecordingEndTime(ISODate));
+            .arg(old_rec->GetRecordingStartTime(MythDate::ISODate))
+            .arg(old_rec->GetRecordingEndTime(MythDate::ISODate));
         LOG(VB_PLAYBACK, LOG_INFO, LOC + msg);
         delete old_rec;
     }

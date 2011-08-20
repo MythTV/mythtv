@@ -4,6 +4,7 @@
 #include "mythmainwindow.h"
 #include "mythdialogbox.h"
 #include "mythdirs.h"
+#include "util.h"
 
 #include "mythuimetadataresults.h"
 
@@ -110,7 +111,7 @@ void MetadataResultsDialog::cleanCacheDir()
         QString filename = QString("%1/%2").arg(cache).arg(*i);
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
-        if (lastmod.addDays(2) < QDateTime::currentDateTime())
+        if (lastmod.addDays(2) < MythDate::current())
         {
             LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting old cache file %1")
                   .arg(filename));

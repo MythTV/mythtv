@@ -4,6 +4,7 @@
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "mythcontext.h"
+#include "util.h"
 
 #include "netutils.h"
 
@@ -334,7 +335,7 @@ bool markTreeUpdated(GrabberScript* script, QDateTime curTime)
 
 bool needsUpdate(GrabberScript* script, uint updateFreq)
 {
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
     QDateTime then = lastUpdate(script);
 
     return then.addSecs(updateFreq * 60 * 60) < now;
@@ -355,7 +356,7 @@ QDateTime lastUpdate(GrabberScript* script)
 
     query.next();
 
-    QDateTime updated = query.value(0).toDateTime();
+    QDateTime updated = MythDate::as_utc(query.value(0).toDateTime());
     return updated;
 }
 
@@ -487,7 +488,7 @@ QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &fe
         QString     thumbnail = query.value(5).toString();
         QString     mediaURL = query.value(6).toString();
         QString     author = query.value(7).toString();
-        QDateTime   date = query.value(8).toDateTime();
+        QDateTime   date = MythDate::as_utc(query.value(8).toDateTime());
         QString     time = query.value(9).toString();
         QString     rating = query.value(10).toString();
         off_t       filesize = query.value(11).toULongLong();
@@ -694,7 +695,7 @@ bool removeFromDB(const QString &url, ArticleType type)
 
 void markUpdated(RSSSite *site)
 {
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE internetcontent SET updated = :UPDATED "
@@ -807,7 +808,7 @@ ResultItem::resultList getRSSArticles(const QString &feedtitle,
         QString     thumbnail = query.value(3).toString();
         QString     mediaURL = query.value(4).toString();
         QString     author = query.value(5).toString();
-        QDateTime   date = query.value(6).toDateTime();
+        QDateTime   date = MythDate::as_utc(query.value(6).toDateTime());
         QString     time = query.value(7).toString();
         QString     rating = query.value(8).toString();
         off_t       filesize = query.value(9).toULongLong();

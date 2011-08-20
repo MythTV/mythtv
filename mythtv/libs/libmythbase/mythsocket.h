@@ -66,10 +66,10 @@ class MBASE_PUBLIC MythSocket : public MSocketDevice
     qint64 writeBlock(const char *data, quint64 len);
 
     bool readStringList(QStringList &list, uint timeoutMS = kLongTimeout);
-    bool readStringList(QStringList &list, bool quickTimeout)
+    bool readStringList(QStringList &list, bool quicTimeout)
     {
         return readStringList(
-            list, quickTimeout ? kShortTimeout : kLongTimeout);
+            list, quicTimeout ? kShortTimeout : kLongTimeout);
     }
     bool writeStringList(QStringList &list);
     bool SendReceiveStringList(QStringList &list, uint min_reply_length = 0);

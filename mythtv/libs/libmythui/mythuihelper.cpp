@@ -32,6 +32,7 @@
 #include "remotefile.h"
 #include "mythcorecontext.h"
 #include "mthreadpool.h"
+#include "util.h"
 
 #define LOC      QString("MythUIHelper: ")
 
@@ -514,7 +515,7 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 
     if (d->imageCache.contains(url))
     {
-        d->CacheTrack[url] = QDateTime::currentDateTime().toTime_t();
+        d->CacheTrack[url] = MythDate::current().toTime_t();
         return d->imageCache[url];
     }
 
@@ -583,7 +584,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
     {
         d->m_cacheSizeLock->unlock();
         QMap<QString, MythImage *>::iterator it = d->imageCache.begin();
-        uint oldestTime = QDateTime::currentDateTime().toTime_t();
+        uint oldestTime = MythDate::current().toTime_t();
         QString oldestKey = it.key();
 
         int count = 0;
@@ -629,7 +630,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
     {
         im->UpRef();
         d->imageCache[url] = im;
-        d->CacheTrack[url] = QDateTime::currentDateTime().toTime_t();
+        d->CacheTrack[url] = MythDate::current().toTime_t();
 
         im->SetIsInCache(true);
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
@@ -1501,7 +1502,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         // isn't repeated if it was already done within kImageCacheTimeout
         // seconds.
         const uint kImageCacheTimeout = 5;
-        uint now = QDateTime::currentDateTime().toTime_t();
+        uint now = MythDate::current().toTime_t();
 
         QMutexLocker locker(d->m_cacheLock);
 

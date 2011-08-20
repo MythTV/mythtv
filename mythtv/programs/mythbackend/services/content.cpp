@@ -403,7 +403,7 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
     if (!dtStartTime.isValid())
     {
         QString sMsg = QString("GetPreviewImage: bad start time '%1'")
-                          .arg( dtStartTime.toString() );
+            .arg( dtStartTime.toString(Qt::ISODate) );
 
         LOG(VB_GENERAL, LOG_ERR, sMsg);
 
@@ -420,7 +420,7 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString( "GetPreviewImage: no recording for start time '%1'" )
-                                 .arg( dtStartTime.toString() ));
+            .arg( dtStartTime.toString(Qt::ISODate) ));
         return QFileInfo();
     }
 
@@ -556,8 +556,8 @@ QFileInfo Content::GetRecording( int              nChanId,
     if (!pginfo.GetChanID())
     {
         LOG( VB_UPNP, LOG_ERR, QString("GetRecording - for %1, %2 failed")
-                                    .arg( nChanId )
-                                    .arg( dtStartTime.toString() ));
+             .arg( nChanId )
+             .arg( dtStartTime.toString(Qt::ISODate) ));
         return QFileInfo();
     }
 

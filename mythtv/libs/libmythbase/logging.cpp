@@ -502,7 +502,9 @@ DBLoggerThread::DBLoggerThread(DatabaseLogger *logger) :
     MThread("DBLogger"),
     m_logger(logger),
     m_queue(new QQueue<LoggingItem *>),
-    m_wait(new QWaitCondition()), aborted(false)
+    m_waitNotEmpty(new QWaitCondition()),
+    m_waitEmpty(new QWaitCondition()),
+    aborted(false)
 {
 }
 
@@ -515,9 +517,11 @@ DBLoggerThread::~DBLoggerThread()
     while (!m_queue->empty())
         deleteItem(m_queue->dequeue());
     delete m_queue;
-    delete m_wait;
+    delete m_waitNotEmpty;
+    delete m_waitEmpty;
     m_queue = NULL;
-    m_wait = NULL;
+    m_waitNotEmpty = NULL;
+    m_waitEmpty = NULL;
 }
 
 void DBLoggerThread::run(void)
@@ -530,7 +534,7 @@ void DBLoggerThread::run(void)
     // then short-running tasks (like mythpreviewgen) will not log to the db
     // at all, and that's undesirable.
     while (!m_logger->isDatabaseReady() && !gCoreContext && !aborted)
-        m_wait->wait(qLock.mutex(), 100);
+        m_waitNotEmpty->wait(qLock.mutex(), 100);
 
     // We want the query to be out of scope before the RunEpilog() so shutdown
     // occurs correctly as otherwise the connection appears still in use, and
@@ -542,7 +546,8 @@ void DBLoggerThread::run(void)
     {
         if (m_queue->isEmpty())
         {
-            m_wait->wait(qLock.mutex(), 100);
+            m_waitEmpty->wakeAll();
+            m_waitNotEmpty->wait(qLock.mutex(), 100);
             continue;
         }
 
@@ -558,7 +563,7 @@ void DBLoggerThread::run(void)
             {
                 qLock.relock();
                 m_queue->prepend(item);
-                m_wait->wait(qLock.mutex(), 100);
+                m_waitNotEmpty->wait(qLock.mutex(), 100);
                 delete query;
                 query = new MSqlQuery(MSqlQuery::InitCon());
                 m_logger->prepare(*query);
@@ -575,6 +580,11 @@ void DBLoggerThread::run(void)
 
     delete query;
 
+    while (!m_queue->empty())
+        deleteItem(m_queue->dequeue());
+
+    m_waitEmpty->wakeAll();
+
     qLock.unlock();
 
     RunEpilog();
@@ -583,8 +593,23 @@ void DBLoggerThread::run(void)
 void DBLoggerThread::stop(void)
 {
     QMutexLocker qLock(&m_queueMutex);
+    flush(1000);
     aborted = true;
-    m_wait->wakeAll();
+    m_waitNotEmpty->wakeAll();
+}
+
+bool DBLoggerThread::flush(int timeoutMS)
+{
+    QTime t;
+    t.start();
+    while (!aborted && m_queue->isEmpty() && t.elapsed() < timeoutMS)
+    {
+        m_waitNotEmpty->wakeAll();
+        int left = timeoutMS - t.elapsed();
+        if (left > 0)
+            m_waitEmpty->wait(&m_queueMutex, left);
+    }
+    return m_queue->isEmpty();
 }
 
 bool DatabaseLogger::isDatabaseReady()
@@ -755,6 +780,8 @@ void LoggerThread::run(void)
 
     logThreadFinished = true;
 
+    m_waitEmpty->wakeAll();
+
     qLock.unlock();
 
     RunEpilog();
@@ -909,7 +936,7 @@ void LogTimeStamp( struct tm *tm, uint32_t *usec )
     *usec  = tv.tv_usec;
 #else
     /* Stupid system has no gettimeofday, use less precise QDateTime */
-    QDateTime date = QDateTime::currentDateTime();
+    QDateTime date = MythDate::current();
     QTime     time = date.time();
     epoch = date.toTime_t();
     *usec = time.msec() * 1000;

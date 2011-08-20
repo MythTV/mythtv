@@ -271,8 +271,8 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             case 0:
             {
                 QFileInfo fi(filename);
-                oldfile = fi.lastModified()
-                    .secsTo(QDateTime::currentDateTime()) > 60;
+                oldfile = QDateTime(fi.lastModified().toUTC())
+                    .secsTo(MythDate::current()) > 60;
                 QString extension = fi.completeSuffix().toLower();
                 if (is_subtitle_possible(extension))
                     subtitlefilename = local_sub_filename(fi);

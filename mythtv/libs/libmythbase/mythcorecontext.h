@@ -98,7 +98,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void BlockShutdown(void);
     void AllowShutdown(void);
 
-    bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false,
+    bool SendReceiveStringList(QStringList &strlist, bool quicTimeout = false,
                                bool block = true);
 
     void SetGUIObject(QObject *gui);

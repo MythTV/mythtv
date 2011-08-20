@@ -488,7 +488,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             else if (argdef.type == QVariant::Double)
                 m_parsed[argdef.name] = QVariant(val.toDouble());
             else if (argdef.type == QVariant::DateTime)
-                m_parsed[argdef.name] = QVariant(myth_dt_from_string(val));
+                m_parsed[argdef.name] = QVariant(MythDate::fromString(val));
             else if (argdef.type == QVariant::StringList)
             {
                 QStringList slist;
@@ -1028,8 +1028,8 @@ QString MythCommandLineParser::GetLogFilePath(void)
         m_parsed.insert("islogpath", true);
         logdir  = finfo.filePath();
         logfile = QCoreApplication::applicationName() + "." +
-                  QDateTime::currentDateTime().toString("yyyyMMddhhmmss") +
-                  QString(".%1").arg(pid) + ".log";
+            MythDate::toString(MythDate::current(), MythDate::kFilename) +
+            QString(".%1").arg(pid) + ".log";
     }
     else
     {

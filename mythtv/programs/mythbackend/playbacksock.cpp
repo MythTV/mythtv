@@ -313,13 +313,10 @@ QDateTime PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)
 
     SendReceiveStringList(strlist);
 
-    QDateTime datetime;
     if (!strlist.empty() && strlist[0] != "BAD")
-    {
-        uint timet = strlist[0].toUInt();
-        datetime.setTime_t(timet);
-    }
-    return datetime;
+        return MythDate::fromTime_t(strlist[0].toUInt());
+
+    return QDateTime();
 }
 
 bool PlaybackSock::CheckFile(ProgramInfo *pginfo)

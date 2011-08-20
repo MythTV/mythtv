@@ -298,8 +298,10 @@ class MTV_PUBLIC DataDirectProcessor
     QString   GetListingsProviderName(void) const
         { return providers[listings_provider % DD_PROVIDER_COUNT].name; }
 
-    QDateTime GetDDProgramsStartAt(bool localtime = false) const;
-    QDateTime GetDDProgramsEndAt(bool localtime = false) const;
+    QDateTime GetDDProgramsStartAt(void) const
+        { return actuallistingsfrom; }
+    QDateTime GetDDProgramsEndAt(void) const
+        { return actuallistingsto; }
     DDLineupChannels GetDDLineup(const QString &lineupid) const
         { return lineupmaps[lineupid]; }
     DDStation GetDDStation( const QString &xmltvid ) const

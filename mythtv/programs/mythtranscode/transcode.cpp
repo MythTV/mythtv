@@ -385,7 +385,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                              int AudioTrackNo,
                              bool passthru)
 {
-    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime curtime = MythDate::current();
     QDateTime statustime = curtime;
     int audioframesize;
     int audioFrame = 0;
@@ -1185,16 +1185,16 @@ int Transcode::TranscodeFile(const QString &inputname,
             else
                 nvr->WriteVideo(&frame);
         }
-        if (showprogress && QDateTime::currentDateTime() > statustime)
+        if (showprogress && MythDate::current() > statustime)
         {
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Processed: %1 of %2 frames(%3 seconds)").
                     arg((long)curFrameNum).arg((long)total_frame_count).
                     arg((long)(curFrameNum / video_frame_rate)));
-            statustime = QDateTime::currentDateTime();
+            statustime = MythDate::current();
             statustime = statustime.addSecs(5);
         }
-        if (QDateTime::currentDateTime() > curtime)
+        if (MythDate::current() > curtime)
         {
             if (honorCutList && m_proginfo &&
                 m_proginfo->QueryMarkupFlag(MARK_UPDATED_CUT))
@@ -1240,7 +1240,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                             .arg(percentage).arg(flagFPS));
 
             }
-            curtime = QDateTime::currentDateTime();
+            curtime = MythDate::current();
             curtime = curtime.addSecs(20);
         }
 

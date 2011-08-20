@@ -18,32 +18,54 @@ using namespace std;
 
 class QFile;
 
- MBASE_PUBLIC  QDateTime mythCurrentDateTime();
+namespace MythDate
+{
+typedef enum Formats
+{
+    ISODate        = Qt::ISODate,   // Default UTC
+    kFilename      = 0x000100,      // Default UTC, "yyyyMMddhhmmss"
+    kDateFull      = 0x000200,      // Default local time
+    kDateShort     = 0x000400,      // Default local time
+    kTime          = 0x000800,      // Default local time
+    kDateTimeFull  = kDateFull  | kTime, // Default local time
+    kDateTimeShort = kDateShort | kTime, // Default local time
+    kAddYear       = 0x001000,      // Add year to string if not included
+    kSimplify      = 0x002000,      // Do Today/Yesterday/Tomorrow transform
+    kDatabase      = 0x004000,      // Default UTC, database format
+    kScreenShotFilename = 0x8000,   // "yyyy-MM-ddThh-mm-ss.zzz"
+    kOverrideUTC   = 0x100000,      // Present date/time in UTC
+    kOverrideLocal = 0x200000,      // Present date/time in localtime
+} Format;
+
+/// Returns current Date and Time in UTC.
+/// \param stripped if true milliseconds are stripped
+MBASE_PUBLIC QDateTime current(bool stripped = false);
+/// Returns current Date and Time in UTC as a string.
+/// \param stripped if true milliseconds are stripped
+MBASE_PUBLIC QString current_iso_string(bool stripped = false);
+/// Returns copy of QDateTime with TimeSpec set to UTC.
+MBASE_PUBLIC QDateTime as_utc(const QDateTime &dt);
+
+/// Converts kFilename && kISODate formats to QDateTime
+MBASE_PUBLIC QDateTime fromString(const QString&);
+/// Converts dy in format to QDateTime
+MBASE_PUBLIC QDateTime fromString(const QString &dt, const QString &format);
+MBASE_PUBLIC QDateTime fromTime_t(uint seconds);
+/// Returns formatted string representing the time.
+MBASE_PUBLIC QString toString(
+    const QDateTime &datetime, uint format = MythDate::kDateTimeFull);
+/// Warning: this function can not convert to and from UTC
+MBASE_PUBLIC QString toString(
+    const QDate &date, uint format = MythDate::kDateFull);
+
+};
+
  MBASE_PUBLIC  int calc_utc_offset(void);
+
  MBASE_PUBLIC  QString getTimeZoneID(void);
  MBASE_PUBLIC  bool checkTimeZone(void);
  MBASE_PUBLIC  bool checkTimeZone(const QStringList &master_settings);
 
- MBASE_PUBLIC  QDateTime MythUTCToLocal(const QDateTime &utc);
- MBASE_PUBLIC  int MythSecsTo(const QDateTime &from, const QDateTime &to);
- MBASE_PUBLIC  QDateTime myth_dt_from_string(const QString &dtstr);
- 
- enum DateTimeFormat { kDateFull = 1,
-                       kDateShort = 2,
-                       kTime = 4,
-                       kDateTimeFull = 5, // KDateFull | KTime
-                       kDateTimeShort = 6, // KDateShort | KTime
-                       // 8 = Placeholder
-                       kAddYear = 16, // Add year to string if not included
-                       kSimplify = 32
-                      } MBASE_PUBLIC;
- MBASE_PUBLIC  QString MythDateTimeToString(const QDateTime &datetime,
-                                            uint format = kDateTimeFull);
- MBASE_PUBLIC  QString MythDateToString(const QDate &date,
-                                        uint format = kDateFull);
- MBASE_PUBLIC  QString MythTimeToString(const QTime &time,
-                                        uint format = kTime);
- 
  MBASE_PUBLIC  bool getUptime(time_t &uptime);
  MBASE_PUBLIC  bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 

@@ -65,7 +65,7 @@ DataDirectLineupMap::DataDirectLineupMap() :
 
 DataDirectSchedule::DataDirectSchedule() :
     programid(""),              stationid(""),
-    time(QDateTime()),          duration(QTime()),
+    time()           ,          duration(),
     repeat(false),              isnew(false),
     stereo(false),              dolby(false),
     subtitled(false),
@@ -78,8 +78,8 @@ DataDirectSchedule::DataDirectSchedule() :
 DataDirectProgram::DataDirectProgram() :
     programid(""),  seriesid(""),      title(""),
     subtitle(""),   description(""),   mpaaRating(""),
-    starRating(""), duration(QTime()), year(""),
-    showtype(""),   colorcode(""),     originalAirDate(QDate()),
+    starRating(""), duration(),        year(""),
+    showtype(""),   colorcode(""),     originalAirDate(),
     syndicatedEpisodeNumber("")
 {
 }
@@ -109,11 +109,11 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
     if (currtagname == "xtvd")
     {
         QString   beg   = pxmlatts.value("from");
-        QDateTime begts = QDateTime::fromString(beg, Qt::ISODate);
+        QDateTime begts = MythDate::fromString(beg);
         parent.SetDDProgramsStartAt(begts);
 
         QString   end   = pxmlatts.value("to");
-        QDateTime endts = QDateTime::fromString(end, Qt::ISODate);
+        QDateTime endts = MythDate::fromString(end);
         parent.SetDDProgramsEndAt(endts);
     }
     else if (currtagname == "station")
@@ -157,13 +157,8 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         curr_schedule.programid = pxmlatts.value("program");
         curr_schedule.stationid = pxmlatts.value("station");
 
-        QString timestr = pxmlatts.value("time");
-        QDateTime UTCdt = QDateTime::fromString(timestr, Qt::ISODate);
-
-        curr_schedule.time = MythUTCToLocal(UTCdt);
-        QString durstr;
-
-        durstr = pxmlatts.value("duration");
+        curr_schedule.time = MythDate::fromString(pxmlatts.value("time"));
+        QString durstr = pxmlatts.value("duration");
         curr_schedule.duration = QTime(durstr.mid(2, 2).toInt(),
                                        durstr.mid(5, 2).toInt(), 0, 0);
 
@@ -432,14 +427,13 @@ bool DDStructureParser::characters(const QString& pchars)
         if (pchars.contains("expire"))
         {
             QString ExtractDateFromMessage = pchars.right(20);
-            QDateTime EDFM = QDateTime::fromString(ExtractDateFromMessage,
-                                                   Qt::ISODate);
+            QDateTime EDFM = MythDate::fromString(ExtractDateFromMessage);
             QString SDDateFormat = GetMythDB()->GetSetting("DateFormat",
                                                            "ddd d MMMM");
             // Ensure we show the year when it's important, regardless of
             // specified DateFormat
             if ((!SDDateFormat.contains('y')) &&
-                (EDFM.date().year() != QDate::currentDate().year()))
+                (EDFM.date().year() != MythDate::current().date().year()))
             {
                 SDDateFormat.append(" (yyyy)");
             }
@@ -451,7 +445,7 @@ bool DDStructureParser::characters(const QString& pchars)
             QString ExpirationDateMessage = "Your subscription expires on " +
                 ExpirationDate;
 
-            QDateTime curTime = QDateTime::currentDateTime();
+            QDateTime curTime = MythDate::current();
             if (curTime.daysTo(EDFM) <= 5)
             {
                 LOG(VB_GENERAL, LOG_WARNING, LOC + QString("WARNING: ") +
@@ -1122,13 +1116,10 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
 
     myth_system(command, kMSAnonLog);
 
-    QDateTime NextSuggestedTime;
-    QDateTime BlockedTime;
+    QDateTime nextSuggestedTime;
+    QDateTime blockedTime;
 
     QFile file(resultFilename);
-
-    bool GotNextSuggestedTime = false;
-    bool GotBlockedTime = false;
 
     if (file.open(QIODevice::ReadOnly))
     {
@@ -1144,12 +1135,11 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
                     QRegExp(".*<suggestedTime>([^<]*)</suggestedTime>.*"),
                     "\\1");
 
-                GotNextSuggestedTime = TRUE;
-                QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
-                NextSuggestedTime = MythUTCToLocal(UTCdt);
+                nextSuggestedTime = MythDate::fromString(tmpStr);
+
                 LOG(VB_GENERAL, LOG_INFO, LOC +
-                    QString("NextSuggestedTime is: ") +
-                    NextSuggestedTime.toString(Qt::ISODate));
+                    QString("nextSuggestedTime is: ") +
+                    nextSuggestedTime.toString(Qt::ISODate));
             }
 
             if (line.contains("<blockedTime>", Qt::CaseInsensitive))
@@ -1158,21 +1148,22 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
                 tmpStr.replace(
                     QRegExp(".*<blockedTime>([^<]*)</blockedTime>.*"), "\\1");
 
-                GotBlockedTime = TRUE;
-                QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
-                BlockedTime = MythUTCToLocal(UTCdt);
-                LOG(VB_GENERAL, LOG_INFO, LOC + QString("BlockedTime is: ")
-                        + BlockedTime.toString(Qt::ISODate));
+                blockedTime = MythDate::fromString(tmpStr);
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("BlockedTime is: ") +
+                    blockedTime.toString(Qt::ISODate));
             }
         }
         file.close();
     }
 
-    if (GotNextSuggestedTime)
-        gCoreContext->SaveSettingOnHost("MythFillSuggestedRunTime",
-            NextSuggestedTime.toString(Qt::ISODate), NULL);
+    if (nextSuggestedTime.isValid())
+    {
+        gCoreContext->SaveSettingOnHost(
+            "MythFillSuggestedRunTime",
+            nextSuggestedTime.toString(Qt::ISODate), NULL);
+    }
 
-    return GotNextSuggestedTime;
+    return nextSuggestedTime.isValid();
 }
 
 bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
@@ -1192,8 +1183,8 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
         cache_dd_data = tmpDir + QString("/mythtv_dd_cache_%1_%2_UTC_%3_to_%4")
             .arg(GetListingsProvider())
             .arg(userid.constData())
-            .arg(pstartDate.toString("yyyyMMddhhmmss"))
-            .arg(pendDate.toString("yyyyMMddhhmmss"));
+            .arg(MythDate::toString(pstartDate, MythDate::kFilename))
+            .arg(MythDate::toString(pendDate, MythDate::kFilename));
 
         if (QFile(cache_dd_data).exists() && inputfilename.isEmpty())
         {
@@ -1252,8 +1243,8 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
 bool DataDirectProcessor::GrabLineupsOnly(void)
 {
-    const QDateTime start = QDateTime(QDate::currentDate().addDays(2),
-                                      QTime(23, 59, 0));
+    const QDateTime start = QDateTime(MythDate::current().date().addDays(2),
+                                      QTime(23, 59, 0), Qt::UTC);
     const QDateTime end   = start.addSecs(1);
 
     return GrabData(start, end);
@@ -1261,8 +1252,8 @@ bool DataDirectProcessor::GrabLineupsOnly(void)
 
 bool DataDirectProcessor::GrabAllData(void)
 {
-    return GrabData(QDateTime(QDate::currentDate()).addDays(-2),
-                    QDateTime(QDate::currentDate()).addDays(15));
+    return GrabData(QDateTime(MythDate::current()).addDays(-2),
+                    QDateTime(MythDate::current()).addDays(15));
 }
 
 void DataDirectProcessor::CreateATempTable(const QString &ptablename,
@@ -1398,7 +1389,7 @@ bool DataDirectProcessor::GrabLoginCookiesAndLineups(bool parse_lineups)
 
     ok &= got_cookie && (!parse_lineups || ParseLineups(resultFilename));
     if (ok)
-        cookieFileDT = QDateTime::currentDateTime();
+        cookieFileDT = MythDate::current();
 
     return ok;
 }
@@ -1462,7 +1453,7 @@ static QString get_cache_filename(const QString &lineupid)
 
 QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
 {
-    QDateTime cache_dt(QDate(1971, 1, 1));
+    QDateTime cache_dt(QDate(1971, 1, 1), QTime(0,0,0), Qt::UTC);
     QFile lfile(get_cache_filename(lineupid));
     if (!lfile.exists())
     {
@@ -1492,7 +1483,7 @@ QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
     QString tmp;
     QTextStream io(&lfile);
     io >> tmp;
-    cache_dt = QDateTime::fromString(tmp, Qt::ISODate);
+    cache_dt = MythDate::fromString(tmp);
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "GrabLineupCacheAge("+lineupid+") -> " +
             cache_dt.toString(Qt::ISODate));
@@ -1575,7 +1566,7 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
     }
 
     QTextStream io(&lfile);
-    io << QDateTime::currentDateTime().toString(Qt::ISODate) << endl;
+    io << MythDate::current_iso_string() << endl;
 
     const DDLineupChannels channels = GetDDLineup(lineupid);
     io << channels.size() << endl;
@@ -1629,7 +1620,7 @@ bool DataDirectProcessor::GrabFullLineup(const QString &lineupid,
     {
         QDateTime exp_time = GetLineupCacheAge(lineupid)
             .addSecs(cache_age_allowed_in_seconds);
-        bool valid = exp_time > QDateTime::currentDateTime();
+        bool valid = exp_time > MythDate::current();
         if (valid && GrabLineupsFromCache(lineupid))
             return true;
     }
@@ -1677,7 +1668,7 @@ bool DataDirectProcessor::SaveLineup(const QString &lineupid,
 
     // Grab login cookies if they are more than 5 minutes old
     if ((!cookieFileDT.isValid() ||
-         cookieFileDT.addSecs(5*60) < QDateTime::currentDateTime()) &&
+         cookieFileDT.addSecs(5*60) < MythDate::current()) &&
         !GrabLoginCookiesAndLineups(false))
     {
         return false;
@@ -1773,20 +1764,6 @@ bool DataDirectProcessor::UpdateListings(uint sourceid)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to update DataDirect listings.");
 
     return ok;
-}
-
-QDateTime  DataDirectProcessor::GetDDProgramsStartAt(bool localtime) const
-{
-    if (localtime)
-        return MythUTCToLocal(actuallistingsfrom);
-    return actuallistingsfrom;
-}
-
-QDateTime  DataDirectProcessor::GetDDProgramsEndAt(bool localtime) const
-{
-    if (localtime)
-        return MythUTCToLocal(actuallistingsto);
-    return actuallistingsto;
 }
 
 QString DataDirectProcessor::GetRawUDLID(const QString &lineupid) const

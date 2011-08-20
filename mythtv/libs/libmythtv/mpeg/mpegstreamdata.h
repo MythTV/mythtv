@@ -317,8 +317,6 @@ class MPEGStreamData : public EITSource
 
     bool                      _have_CRC_bug;
 
-    int                       _local_utc_offset;
-
     mutable QMutex            _si_time_lock;
     uint                      _si_time_offset_cnt;
     uint                      _si_time_offset_indx;

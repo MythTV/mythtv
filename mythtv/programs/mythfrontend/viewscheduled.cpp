@@ -252,7 +252,7 @@ void ViewScheduled::LoadList(bool useExistingData)
         }
     }
 
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
 
     QMap<int, int> toomanycounts;
 
@@ -292,7 +292,7 @@ void ViewScheduled::LoadList(bool useExistingData)
             if (pginfo->GetInputID() > m_maxinput)
                 m_maxinput = pginfo->GetInputID();
 
-            QDate date = (pginfo->GetRecordingStartTime()).date();
+            QDate date = pginfo->GetRecordingStartTime().toLocalTime().date();
             m_recgroupList[date].push_back(pginfo);
             m_recgroupList[date].setAutoDelete(false);
 
@@ -316,7 +316,8 @@ void ViewScheduled::LoadList(bool useExistingData)
             if (dateit.key().isNull())
                 label = tr("All");
             else
-                label = MythDateToString(dateit.key(), kDateFull | kSimplify);
+                label = MythDate::toString(
+                    dateit.key(), MythDate::kDateFull | MythDate::kSimplify);
 
             new MythUIButtonListItem(m_groupList, label,
                                      qVariantFromValue(dateit.key()));
@@ -472,8 +473,9 @@ void ViewScheduled::FillList()
             // TODO: This can be templated instead of hardcoding
             //       Conflict/No Conflict
             QString cstring = QString(tr("Conflict %1"))
-                                .arg(MythDateToString(m_conflictDate,
-                                                        kDateFull | kSimplify));
+                .arg(MythDate::toString(
+                         m_conflictDate,
+                         MythDate::kDateFull | MythDate::kSimplify));
 
             statusText->SetText(cstring);
         }

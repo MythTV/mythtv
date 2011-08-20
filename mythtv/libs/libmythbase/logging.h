@@ -117,6 +117,7 @@ class DBLoggerThread : public MThread
         ~DBLoggerThread();
         void run(void);
         void stop(void);
+        bool flush(int timeoutMS = 200000);
         bool enqueue(LoggingItem *item) 
         { 
             QMutexLocker qLock(&m_queueMutex); 
@@ -133,7 +134,8 @@ class DBLoggerThread : public MThread
         DatabaseLogger *m_logger;
         QMutex m_queueMutex;
         QQueue<LoggingItem *> *m_queue;
-        QWaitCondition *m_wait; // protected by m_queueMutex
+        QWaitCondition *m_waitNotEmpty; // protected by m_queueMutex
+        QWaitCondition *m_waitEmpty; // protected by m_queueMutex
         bool aborted; // protected by m_queueMutex
 };
 

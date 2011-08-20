@@ -38,6 +38,7 @@ INCLUDEPATH += ./services
 
 # needed only for enums
 INCLUDEPATH += ../libmyth
+INCLUDEPATH += ../libmythbase
 
 LIBS += $$EXTRA_LIBS
 

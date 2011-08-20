@@ -81,8 +81,12 @@ DTC::VideoMetadataInfoList* Video::GetVideos( bool bDescending,
             pVideoMetadataInfo->setCertification(metadata->GetRating());
             pVideoMetadataInfo->setInetRef(metadata->GetInetRef());
             pVideoMetadataInfo->setHomePage(metadata->GetHomepage());
-            pVideoMetadataInfo->setReleaseDate(QDateTime(metadata->GetReleaseDate()));
-            pVideoMetadataInfo->setAddDate(QDateTime(metadata->GetInsertdate()));
+            pVideoMetadataInfo->setReleaseDate(
+                QDateTime(metadata->GetReleaseDate(),
+                          QTime(0,0),Qt::LocalTime).toUTC());
+            pVideoMetadataInfo->setAddDate(
+                QDateTime(metadata->GetInsertdate(),
+                          QTime(0,0),Qt::LocalTime).toUTC());
             pVideoMetadataInfo->setUserRating(metadata->GetUserRating());
             pVideoMetadataInfo->setLength(metadata->GetLength());
             pVideoMetadataInfo->setSeason(metadata->GetSeason());
@@ -120,7 +124,7 @@ DTC::VideoMetadataInfoList* Video::GetVideos( bool bDescending,
     pVideoMetadataInfos->setCurrentPage   ( curPage         );
     pVideoMetadataInfos->setTotalPages    ( totalPages      );
     pVideoMetadataInfos->setTotalAvailable( videos.size()   );
-    pVideoMetadataInfos->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoMetadataInfos->setAsOf          ( MythDate::current() );
     pVideoMetadataInfos->setVersion       ( MYTH_BINARY_VERSION );
     pVideoMetadataInfos->setProtoVer      ( MYTH_PROTO_VERSION  );
 
@@ -213,7 +217,9 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
             pVideoLookup->setCertification(lookup->GetCertification());
             pVideoLookup->setInetRef(lookup->GetInetref());
             pVideoLookup->setHomePage(lookup->GetHomepage());
-            pVideoLookup->setReleaseDate(QDateTime(lookup->GetReleaseDate()));
+            pVideoLookup->setReleaseDate(
+                QDateTime(lookup->GetReleaseDate(),
+                          QTime(0,0),Qt::LocalTime).toUTC());
             pVideoLookup->setUserRating(lookup->GetUserRating());
             pVideoLookup->setLength(lookup->GetRuntime());
             pVideoLookup->setLanguage(lookup->GetLanguage());
@@ -274,7 +280,7 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
     }
 
     pVideoLookups->setCount         ( list.count()                 );
-    pVideoLookups->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoLookups->setAsOf          ( MythDate::current() );
     pVideoLookups->setVersion       ( MYTH_BINARY_VERSION          );
     pVideoLookups->setProtoVer      ( MYTH_PROTO_VERSION           );
 
@@ -354,7 +360,8 @@ bool Video::AddVideo( const QString &sFilename,
                           0.0, VIDEO_RATING_DEFAULT, 0,
                           VideoMetadata::FilenameToMeta(sFilename, 2).toInt(),
                           VideoMetadata::FilenameToMeta(sFilename, 3).toInt(),
-                          QDate::currentDate(), 0, ParentalLevel::plLowest);
+                          MythDate::current().date(), 0,
+                          ParentalLevel::plLowest);
     newFile.SetHost(sHost);
     newFile.SaveToDatabase();
 
@@ -382,8 +389,12 @@ DTC::VideoMetadataInfo* Video::GetInfoFromMetadata(
         pVideoMetadataInfo->setCertification(metadata->GetRating());
         pVideoMetadataInfo->setInetRef(metadata->GetInetRef());
         pVideoMetadataInfo->setHomePage(metadata->GetHomepage());
-        pVideoMetadataInfo->setReleaseDate(QDateTime(metadata->GetReleaseDate()));
-        pVideoMetadataInfo->setAddDate(QDateTime(metadata->GetInsertdate()));
+        pVideoMetadataInfo->setReleaseDate(
+            QDateTime(metadata->GetReleaseDate(),
+                      QTime(0,0),Qt::LocalTime).toUTC());
+        pVideoMetadataInfo->setAddDate(
+            QDateTime(metadata->GetInsertdate(),
+                      QTime(0,0),Qt::LocalTime).toUTC());
         pVideoMetadataInfo->setUserRating(metadata->GetUserRating());
         pVideoMetadataInfo->setLength(metadata->GetLength());
         pVideoMetadataInfo->setSeason(metadata->GetSeason());

@@ -314,8 +314,7 @@ int main(int argc, char *argv[])
         {
             if (!query.isNull(0))
                 GuideDataBefore =
-                    QDateTime::fromString(query.value(0).toString(),
-                                          Qt::ISODate);
+                    MythDate::fromString(query.value(0).toString());
         }
 
         if (!fill_data.GrabDataFromFile(fromfile_id, fromfile_name))
@@ -334,8 +333,7 @@ int main(int argc, char *argv[])
         {
             if (!query.isNull(0))
                 GuideDataAfter =
-                    QDateTime::fromString(query.value(0).toString(),
-                                          Qt::ISODate);
+                    MythDate::fromString(query.value(0).toString());
         }
 
         if (GuideDataAfter == GuideDataBefore)
@@ -588,8 +586,8 @@ int main(int argc, char *argv[])
                 updt.prepare("UPDATE program set first = 1 "
                              "WHERE starttime = :STARTTIME "
                              "  AND programid = :PROGRAMID;");
-                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
-                updt.bindValue(":PROGRAMID", query.value(1).toString());
+                updt.bindValue(":STARTTIME", query.value(0));
+                updt.bindValue(":PROGRAMID", query.value(1));
                 if (!updt.exec())
                     MythDB::DBError("Marking first showings by id", updt);
             }
@@ -607,10 +605,10 @@ int main(int argc, char *argv[])
                              "  AND title = :TITLE "
                              "  AND subtitle = :SUBTITLE "
                              "  AND description = :DESCRIPTION");
-                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
-                updt.bindValue(":TITLE", query.value(1).toString());
-                updt.bindValue(":SUBTITLE", query.value(2).toString());
-                updt.bindValue(":DESCRIPTION", query.value(3).toString());
+                updt.bindValue(":STARTTIME", query.value(0));
+                updt.bindValue(":TITLE", query.value(1));
+                updt.bindValue(":SUBTITLE", query.value(2));
+                updt.bindValue(":DESCRIPTION", query.value(3));
                 if (!updt.exec())
                     MythDB::DBError("Marking first showings", updt);
             }
@@ -628,8 +626,8 @@ int main(int argc, char *argv[])
                 updt.prepare("UPDATE program set last = 1 "
                              "WHERE starttime = :STARTTIME "
                              "  AND programid = :PROGRAMID;");
-                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
-                updt.bindValue(":PROGRAMID", query.value(1).toString());
+                updt.bindValue(":STARTTIME", query.value(0));
+                updt.bindValue(":PROGRAMID", query.value(1));
                 if (!updt.exec())
                     MythDB::DBError("Marking last showings by id", updt);
             }
@@ -647,10 +645,10 @@ int main(int argc, char *argv[])
                              "  AND title = :TITLE "
                              "  AND subtitle = :SUBTITLE "
                              "  AND description = :DESCRIPTION");
-                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
-                updt.bindValue(":TITLE", query.value(1).toString());
-                updt.bindValue(":SUBTITLE", query.value(2).toString());
-                updt.bindValue(":DESCRIPTION", query.value(3).toString());
+                updt.bindValue(":STARTTIME", query.value(0));
+                updt.bindValue(":TITLE", query.value(1));
+                updt.bindValue(":SUBTITLE", query.value(2));
+                updt.bindValue(":DESCRIPTION", query.value(3));
                 if (!updt.exec())
                     MythDB::DBError("Marking last showings", updt);
             }

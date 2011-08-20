@@ -41,7 +41,7 @@ VideoVisual* VideoVisual::Create(AudioPlayer *audio, MythRender *render)
 VideoVisual::VideoVisual(AudioPlayer *audio, MythRender *render)
   : m_audio(audio), m_disabled(false), m_area(QRect()), m_render(render)
 {
-    m_lastUpdate = QDateTime::currentDateTime();
+    m_lastUpdate = MythDate::current();
     mutex()->lock();
     if (m_audio)
         m_audio->addVisual(this);
@@ -59,7 +59,7 @@ VideoVisual::~VideoVisual()
 
 int64_t VideoVisual::SetLastUpdate(void)
 {
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
     int64_t result = m_lastUpdate.time().msecsTo(now.time());
     m_lastUpdate = now;
     return result;

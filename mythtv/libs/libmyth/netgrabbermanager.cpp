@@ -78,7 +78,7 @@ void GrabberScript::run()
             parseDBTree(m_title, QString(), QString(), channel, GetType());
             channel = channel.nextSiblingElement("channel");
         }
-        markTreeUpdated(this, QDateTime::currentDateTime());
+        markTreeUpdated(this, MythDate::current());
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Internet Content Source %1 completed processing, "
                     "marking as updated.").arg(m_title));

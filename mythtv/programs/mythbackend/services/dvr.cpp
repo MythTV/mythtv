@@ -89,7 +89,7 @@ DTC::ProgramList* Dvr::GetRecorded( bool bDescending,
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );
     pPrograms->setTotalAvailable( progList.size() );
-    pPrograms->setAsOf          ( QDateTime::currentDateTime() );
+    pPrograms->setAsOf          ( MythDate::current() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
 
@@ -137,7 +137,7 @@ DTC::ProgramList* Dvr::GetExpiring( int nStartIndex,
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );
     pPrograms->setTotalAvailable( infoList.size() );
-    pPrograms->setAsOf          ( QDateTime::currentDateTime() );
+    pPrograms->setAsOf          ( MythDate::current() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
 

@@ -145,7 +145,7 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
     startedAt(startedAt_in),                   stopsAt(stopsAt_in),
     recordingStartedAt(recordingStartedAt_in),
     recordingStopsAt(recordingStopsAt_in),     aggressiveDetection(false),
-    stillRecording(recordingStopsAt > QDateTime::currentDateTime()),
+    stillRecording(recordingStopsAt > MythDate::current()),
     fullSpeed(fullSpeed_in),                   showProgress(showProgress_in),
     fps(0.0),                                  framesProcessed(0),
     preRoll(0),                                postRoll(0)
@@ -297,7 +297,7 @@ bool ClassicCommDetector::go()
     bool wereRecording = stillRecording;
 
     emit statusUpdate(QObject::tr("Building Head Start Buffer"));
-    secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
+    secsSince = recordingStartedAt.secsTo(MythDate::current());
     while (stillRecording && (secsSince < requiredHeadStart))
     {
         emit breathe();
@@ -305,7 +305,7 @@ bool ClassicCommDetector::go()
             return false;
 
         sleep(2);
-        secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
+        secsSince = recordingStartedAt.secsTo(MythDate::current());
     }
 
     if (player->OpenFile() < 0)
@@ -322,7 +322,7 @@ bool ClassicCommDetector::go()
         requiredHeadStart += logoDetector->getRequiredAvailableBufferForSearch();
 
         emit statusUpdate(QObject::tr("Building Logo Detection Buffer"));
-        secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
+        secsSince = recordingStartedAt.secsTo(MythDate::current());
         while (stillRecording && (secsSince < requiredHeadStart))
         {
             emit breathe();
@@ -330,7 +330,7 @@ bool ClassicCommDetector::go()
                 return false;
 
             sleep(2);
-            secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
+            secsSince = recordingStartedAt.secsTo(MythDate::current());
         }
     }
 
@@ -378,7 +378,7 @@ bool ClassicCommDetector::go()
     flagTime.start();
 
     long long myTotalFrames;
-    if (recordingStopsAt < QDateTime::currentDateTime() )
+    if (recordingStopsAt < MythDate::current() )
         myTotalFrames = player->GetTotalFrameCount();
     else
         myTotalFrames = (long long)(player->GetFrameRate() *
@@ -543,7 +543,7 @@ bool ClassicCommDetector::go()
         if (stillRecording)
         {
             int secondsRecorded =
-                recordingStartedAt.secsTo(QDateTime::currentDateTime());
+                recordingStartedAt.secsTo(MythDate::current());
             int secondsFlagged = (int)(framesProcessed / fps);
             int secondsBehind = secondsRecorded - secondsFlagged;
             long usecPerFrame = (long)(1.0 / player->GetFrameRate() * 1000000);

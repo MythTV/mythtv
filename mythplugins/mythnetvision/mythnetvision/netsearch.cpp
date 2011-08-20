@@ -23,6 +23,7 @@
 #include <metadata/videoutils.h>
 #include <rssparse.h>
 #include <mythcoreutil.h>
+#include <util.h>
 
 #include "netsearch.h"
 #include "netcommon.h"
@@ -314,7 +315,7 @@ void NetSearch::cleanCacheDir()
         LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1").arg(filename));
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
-        if (lastmod.addDays(7) < QDateTime::currentDateTime())
+        if (lastmod.addDays(7) < MythDate::current())
             QFile::remove(filename);
     }
 }
@@ -520,10 +521,11 @@ void NetSearch::streamWebVideo()
         return;
     }
 
-    GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL(),
-           item->GetDescription(), item->GetTitle(), item->GetSubtitle(), QString(),
-           item->GetSeason(), item->GetEpisode(), QString(), item->GetTime().toInt(),
-           item->GetDate().toString("yyyy"));
+    GetMythMainWindow()->HandleMedia(
+        "Internal", item->GetMediaURL(),
+        item->GetDescription(), item->GetTitle(), item->GetSubtitle(),
+        QString(), item->GetSeason(), item->GetEpisode(), QString(),
+        item->GetTime().toInt(), item->GetDate().ToString("yyyy"));
 }
 
 void NetSearch::showWebVideo()

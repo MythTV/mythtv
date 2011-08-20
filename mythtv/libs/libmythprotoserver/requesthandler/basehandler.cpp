@@ -175,7 +175,7 @@ bool BaseRequestHandler::HandleQueryTimeZone(SocketHandler *sock)
 {
     QStringList strlist;
     strlist << getTimeZoneID() << QString::number(calc_utc_offset())
-            << mythCurrentDateTime().toString(Qt::ISODate);
+            << MythDate::current_iso_string(true);
 
     sock->SendStringList(strlist);
     return true;

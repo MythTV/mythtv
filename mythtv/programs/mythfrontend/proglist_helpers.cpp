@@ -251,23 +251,23 @@ bool TimePopup::Create()
     // date
     for (int x = -1; x <= 14; x++)
     {
-        QString text = MythDateTimeToString(m_parent->m_startTime.addDays(x),
-                                            kDateFull | kSimplify);
+        QString text = MythDate::toString(m_parent->m_startTime.addDays(x),
+                                            MythDate::kDateFull | MythDate::kSimplify);
         new MythUIButtonListItem(
             m_dateList, text,
             NULL, false);
 
-        if (m_parent->m_startTime.addDays(x).toString("MMdd") ==
-            m_parent->m_searchTime.toString("MMdd"))
+        if (m_parent->m_startTime.addDays(x).toLocalTime().toString("MMdd") ==
+            m_parent->m_searchTime.toLocalTime().toString("MMdd"))
             m_dateList->SetItemCurrent(m_dateList->GetCount() - 1);
     }
 
     // time
-    QTime hr;
+    QDateTime hr = QDateTime::currentDateTime();
     for (int x = 0; x < 24; x++)
     {
-        hr.setHMS(x, 0, 0);
-        QString text = MythTimeToString(hr, kTime);
+        hr.setTime(QTime(x, 0, 0));
+        QString text = MythDate::toString(hr, MythDate::kTime);
         new MythUIButtonListItem(m_timeList, text, NULL, false);
 
         if (hr.toString("hh") == m_parent->m_searchTime.toString("hh"))
@@ -288,11 +288,12 @@ void TimePopup::okClicked(void)
     QDateTime startTime = m_parent->m_startTime;
     int dayOffset = m_dateList->GetCurrentPos() -1;
 
-    startTime.setDate(startTime.addDays(dayOffset).date());
-
     QTime hr;
     hr.setHMS(m_timeList->GetCurrentPos(), 0, 0);
-    startTime.setTime(hr);
+
+    startTime = QDateTime(
+        startTime.toLocalTime().addDays(dayOffset).date(), hr,
+        Qt::LocalTime).toUTC();
 
     emit haveResult(startTime);
 

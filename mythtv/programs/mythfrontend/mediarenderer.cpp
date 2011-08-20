@@ -47,7 +47,7 @@ class MythFrontendStatus : public HttpServerExtension
             ipaddress = UPnp::g_IPAddrList.at(0);
 
         QString hostname   = gCoreContext->GetHostName();
-        QDateTime qdtNow   = QDateTime::currentDateTime();
+        QDateTime qdtNow   = MythDate::current();
         QString masterhost = gCoreContext->GetMasterHostName();
         QString masterip   = gCoreContext->GetSetting("MasterServerIP");
         QString masterport = gCoreContext->GetSettingOnHost("BackendStatusPort",
@@ -65,7 +65,7 @@ class MythFrontendStatus : public HttpServerExtension
            << "  <meta http-equiv=\"Content-Type\""
            << "content=\"text/html; charset=UTF-8\" />\r\n"
            << "  <title>MythFrontend Status - "
-           << MythDateTimeToString(qdtNow, kDateTimeShort) << " - "
+           << MythDate::toString(qdtNow, MythDate::kDateTimeShort) << " - "
            << MYTH_BINARY_VERSION << "</title>\r\n"
            << "  <link rel=\"stylesheet\" href=\"/css/site.css\"   type=\"text/css\">\r\n"
            << "  <link rel=\"stylesheet\" href=\"/css/Status.css\" type=\"text/css\">\r\n"

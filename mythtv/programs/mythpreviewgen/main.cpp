@@ -105,7 +105,7 @@ int preview_helper(uint chanid, QDateTime starttime,
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Cannot locate recording made on '%1' at '%2'")
-                    .arg(chanid).arg(starttime.toString("yyyyMMddhhmmss")));
+                .arg(chanid).arg(starttime.toString(Qt::ISODate)));
             delete pginfo;
             return GENERIC_EXIT_NOT_OK;
         }

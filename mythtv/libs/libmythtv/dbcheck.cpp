@@ -16,6 +16,8 @@ using namespace std;
 #include "diseqcsettings.h" // for convert_diseqc_db()
 #include "videodbcheck.h"
 
+// TODO convert all dates to UTC
+
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 const QString currentDatabaseVersion = MYTH_DATABASE_VERSION;
@@ -2153,9 +2155,8 @@ NULL
                                "INSERT INTO recordedmarkup (chanid, starttime,"
                                " type, mark) "
                                "VALUES (:CHANID, :STARTTIME, :TYPE, :MARK);");
-                        insert.bindValue(":CHANID", query.value(0).toString());
-                        insert.bindValue(":STARTTIME",
-                                         query.value(1).toDateTime());
+                        insert.bindValue(":CHANID", query.value(0));
+                        insert.bindValue(":STARTTIME", query.value(1));
 
                         insert.bindValue(":TYPE", 1);
                         insert.bindValue(":MARK", start);
@@ -2603,8 +2604,8 @@ NULL
                 fixup.prepare(
                        "UPDATE recorded SET cutlist = 1 "
                        "WHERE chanid = :CHANID AND starttime =  :STARTTIME;");
-                fixup.bindValue(":CHANID", query.value(0).toString());
-                fixup.bindValue(":STARTTIME", query.value(1).toDateTime());
+                fixup.bindValue(":CHANID", query.value(0));
+                fixup.bindValue(":STARTTIME", query.value(1));
 
                 if (!fixup.exec())
                     MythDB::DBError("dbcheck -- cutlist", fixup);
@@ -3023,8 +3024,8 @@ NULL
                                "WHERE chanid = :CHANID "
                                "AND starttime = :STARTTIME;");
 
-                update.bindValue(":CHANID", airdates.value(0).toString());
-                update.bindValue(":STARTTIME", airdates.value(1).toDateTime());
+                update.bindValue(":CHANID", airdates.value(0));
+                update.bindValue(":STARTTIME", airdates.value(1));
                 if (!update.exec())
                     MythDB::DBError("dbcheck -- DisplayGroupDefaultViewMask",
                                     update);
