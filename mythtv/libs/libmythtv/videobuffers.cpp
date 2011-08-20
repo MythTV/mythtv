@@ -234,14 +234,16 @@ void VideoBuffers::SetPrebuffering(bool normal)
 VideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType enqueue_to)
 {
     QMutexLocker locker(&global_lock);
-    VideoFrame *frame = available.dequeue();
+    VideoFrame *frame = NULL;
 
     // Try to get a frame not being used by the decoder
-    for (uint i = 0; i <= available.size() && decode.contains(frame); i++)
+    for (uint i = 0; i < available.size(); i++)
     {
-        if (!available.contains(frame))
-            available.enqueue(frame);
         frame = available.dequeue();
+        if (decode.contains(frame))
+            available.enqueue(frame);
+        else
+            break;
     }
 
     while (frame && used.contains(frame))
@@ -326,7 +328,7 @@ void VideoBuffers::DeLimboFrame(VideoFrame *frame)
     // the decoder assume that the frame is lost and return to available
     if (!decode.contains(frame))
         safeEnqueue(kVideoBuffer_avail, frame);
-       
+
     // remove from decode queue since the decoder is finished
     while (decode.contains(frame))
         decode.remove(frame);
