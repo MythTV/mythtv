@@ -1144,7 +1144,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
                     QRegExp(".*<suggestedTime>([^<]*)</suggestedTime>.*"),
                     "\\1");
 
-                GotNextSuggestedTime = TRUE;
+                GotNextSuggestedTime = true;
                 QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
                 NextSuggestedTime = MythUTCToLocal(UTCdt);
                 LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -1158,7 +1158,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
                 tmpStr.replace(
                     QRegExp(".*<blockedTime>([^<]*)</blockedTime>.*"), "\\1");
 
-                GotBlockedTime = TRUE;
+                GotBlockedTime = true;
                 QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
                 BlockedTime = MythUTCToLocal(UTCdt);
                 LOG(VB_GENERAL, LOG_INFO, LOC + QString("BlockedTime is: ")
