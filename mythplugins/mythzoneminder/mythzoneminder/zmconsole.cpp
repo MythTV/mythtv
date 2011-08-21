@@ -179,12 +179,12 @@ bool ZMConsole::Create(void)
 
 void ZMConsole::updateTime(void)
 {
-    QString s = QTime::currentTime().toString(m_timeFormat);
+    QString s = MythDate::current().toLocalTime().toString(m_timeFormat);
 
     if (s != m_time_text->GetText())
         m_time_text->SetText(s);
 
-    s = MythDate::current().ToString("dddd\ndd MMM yyyy");
+    s = MythDate::current().toLocalTime().toString("dddd\ndd MMM yyyy");
 
     if (s != m_date_text->GetText())
         m_date_text->SetText(s);

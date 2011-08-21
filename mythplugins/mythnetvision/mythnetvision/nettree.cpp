@@ -777,7 +777,7 @@ void NetTree::streamWebVideo()
         "Internal", item->GetMediaURL(),
         item->GetDescription(), item->GetTitle(), item->GetSubtitle(),
         QString(), item->GetSeason(), item->GetEpisode(), QString(),
-        item->GetTime().toInt(), item->GetDate().ToString("yyyy"));
+        item->GetTime().toInt(), item->GetDate().toString("yyyy"));
 }
 
 void NetTree::showWebVideo()
