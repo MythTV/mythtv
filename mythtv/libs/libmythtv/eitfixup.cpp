@@ -332,7 +332,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
 
     // See if a year is present as (xxxx)
     position = event.description.indexOf(m_bellYear);
-    if (position != -1 && event.category != "")
+    if (position != -1 && !event.category.isEmpty())
     {
         tmp = "";
         // Parse out the year
@@ -1107,12 +1107,12 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
         QStringList datelist = tmpRerun2.capturedTexts();
         int day   = datelist[1].toInt();
         int month = datelist[2].toInt();
-        int year;
+        //int year;
 
-        if (datelist[3].length() > 0)
-            year = datelist[3].toInt();
-        else
-            year = event.starttime.date().year();
+        //if (datelist[3].length() > 0)
+        //    year = datelist[3].toInt();
+        //else
+        //    year = event.starttime.date().year();
 
         if (day > 0 && month > 0)
         {
@@ -1149,7 +1149,6 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
 {
     const uint SUBTITLE_PCT     = 60; // % of description to allow subtitle to
     const uint SUBTITLE_MAX_LEN = 128;// max length of subtitle field in db.
-    bool       dd               = false;
     int        position;
     QRegExp    tmpExp1;
 
@@ -1215,7 +1214,6 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
     if ((position > 0) && (position > (int) (event.description.length() - 7)))
     {
         event.audioProps |= AUD_DOLBY;
-        dd = true;
         event.description.replace(m_mcaDD, "");
     }
 

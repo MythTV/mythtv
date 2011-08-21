@@ -1662,7 +1662,7 @@ int64_t MythPlayer::AVSyncGetAudiotime(void)
     }
     return currentaudiotime;
 }
- 
+
 #define MAXDIVERGE  3.0f
 #define DIVERGELIMIT 30.0f
 void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
@@ -1680,7 +1680,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     float diverge = 0.0f;
     int frameDelay = m_double_framerate ? frame_interval / 2 : frame_interval;
     int vsync_delay_clock = 0;
-    int64_t currentaudiotime = 0;
+    //int64_t currentaudiotime = 0;
 
     if (videoOutput->IsErrored())
     {
@@ -1701,7 +1701,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
         ps = kScan_Progressive;
 
-    bool max_video_behind = diverge < -MAXDIVERGE; 
+    bool max_video_behind = diverge < -MAXDIVERGE;
     bool dropframe = false;
     QString dbg;
 
@@ -1738,7 +1738,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     {
         // Reset A/V Sync
         lastsync = true;
-        currentaudiotime = AVSyncGetAudiotime();
+        //currentaudiotime = AVSyncGetAudiotime();
         LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg + "dropping frame to catch up.");
         if (!audio.IsPaused() && max_video_behind)
         {
@@ -1757,7 +1757,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
                 .arg(avsync_adjustment).arg(m_double_framerate));
         vsync_delay_clock = videosync->WaitForFrame
                             (frameDelay + avsync_adjustment + repeat_delay);
-        currentaudiotime = AVSyncGetAudiotime();
+        //currentaudiotime = AVSyncGetAudiotime();
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "AVSync show");
         videoOutput->Show(ps);
 
@@ -1801,7 +1801,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     else
     {
         vsync_delay_clock = videosync->WaitForFrame(frameDelay);
-        currentaudiotime = AVSyncGetAudiotime();
+        //currentaudiotime = AVSyncGetAudiotime();
     }
 
     if (output_jmeter && output_jmeter->RecordCycleTime())
