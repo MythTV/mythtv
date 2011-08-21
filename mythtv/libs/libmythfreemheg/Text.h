@@ -36,7 +36,7 @@ class MHTextDisplay;
 
 class MHText : public MHVisible  
 {
-public:
+  public:
     MHText();
     MHText(const MHText &ref);
     ~MHText();
@@ -65,7 +65,7 @@ public:
     virtual void Display(MHEngine *d);
     virtual QRegion GetOpaqueArea();
 
-protected:
+  protected:
     void Redraw();
 
     MHFontBody      m_OrigFont;
@@ -92,7 +92,7 @@ protected:
 
 class MHHyperText : public MHText, public MHInteractible
 {
-public:
+  public:
     MHHyperText();
     virtual const char *ClassName() { return "HyperText"; }
     virtual ~MHHyperText();
@@ -112,33 +112,33 @@ public:
 // Get Text Data - get the data out of a text object.
 class MHGetTextData: public MHActionObjectRef
 {
-public:
+  public:
     MHGetTextData(): MHActionObjectRef(":GetTextData")  {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg) { pTarget->GetTextData(pArg, engine); }
 };
 
 // Actions added in UK MHEG profile.
 class MHSetBackgroundColour: public MHSetColour {
-public:
+  public:
     MHSetBackgroundColour(): MHSetColour(":SetBackgroundColour") { }
-protected:
+  protected:
     virtual void SetColour(const MHColour &colour, MHEngine *engine) { Target(engine)->SetBackgroundColour(colour, engine); }
 };
 
 class MHSetTextColour: public MHSetColour {
-public:
+  public:
     MHSetTextColour(): MHSetColour(":SetTextColour") { }
-protected:
+  protected:
     virtual void SetColour(const MHColour &colour, MHEngine *engine) { Target(engine)->SetTextColour(colour, engine); }
 };
 
 class MHSetFontAttributes: public MHElemAction
 {
-public:
+  public:
     MHSetFontAttributes(): MHElemAction(":SetFontAttributes") {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int /*nTabs*/) const { m_FontAttrs.PrintMe(fd, 0); }
     MHGenericOctetString m_FontAttrs; // New font attributes.
 };

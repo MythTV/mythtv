@@ -26,10 +26,16 @@
 
 void MHPresentable::Run(MHEngine *engine)
 {
-    if (! m_fRunning) Activation(engine);
+    if (! m_fRunning)
+    {
+        Activation(engine);
+    }
 }
 
 void MHPresentable::Stop(MHEngine *engine)
 {
-    if (m_fRunning) Deactivation(engine);
+    if (m_fRunning)
+    {
+        Deactivation(engine);
+    }
 }

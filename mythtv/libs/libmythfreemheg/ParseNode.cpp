@@ -39,7 +39,10 @@ void MHPTagged::AddArg(MHParseNode *pArg)
 // General utility function for display.
 void PrintTabs(FILE *fd, int n)
 {
-    for (int i = 0; i < n; i++) fprintf(fd, "    ");
+    for (int i = 0; i < n; i++)
+    {
+        fprintf(fd, "    ");
+    }
 }
 
 // Report a failure.  This can be called when we use the parse tree to set up object tree.
@@ -51,39 +54,65 @@ void MHParseNode::Failure(const char *p)
 
 int MHParseNode::GetTagNo()
 {
-    if (m_nNodeType != PNTagged) Failure("Expected tagged value");
-    return ((MHPTagged*)this)->m_TagNo;
+    if (m_nNodeType != PNTagged)
+    {
+        Failure("Expected tagged value");
+    }
+
+    return ((MHPTagged *)this)->m_TagNo;
 }
 
 // Return the number of items in the sequence.
 int MHParseNode::GetArgCount()
 {
-    if (m_nNodeType == PNTagged) {
-        MHPTagged *pTag = (MHPTagged*)this;
+    if (m_nNodeType == PNTagged)
+    {
+        MHPTagged *pTag = (MHPTagged *)this;
         return pTag->m_Args.Size();
     }
-    else if (m_nNodeType == PNSeq) {
-        MHParseSequence *pSeq = (MHParseSequence*)this;
+    else if (m_nNodeType == PNSeq)
+    {
+        MHParseSequence *pSeq = (MHParseSequence *)this;
         return pSeq->Size();
     }
-    else Failure("Expected tagged value");
+    else
+    {
+        Failure("Expected tagged value");
+    }
+
     return 0; // To keep the compiler happy
 }
 
 // Get the Nth entry.
 MHParseNode *MHParseNode::GetArgN(int n)
 {
-    if (m_nNodeType == PNTagged) {
-        MHPTagged *pTag = (MHPTagged*)this;
-        if (n < 0 || n >= pTag->m_Args.Size()) Failure("Argument not found");
+    if (m_nNodeType == PNTagged)
+    {
+        MHPTagged *pTag = (MHPTagged *)this;
+
+        if (n < 0 || n >= pTag->m_Args.Size())
+        {
+            Failure("Argument not found");
+        }
+
         return pTag->m_Args.GetAt(n);
     }
-    else if (m_nNodeType == PNSeq) {
-        MHParseSequence *pSeq = (MHParseSequence*)this;
-        if (n < 0 || n >= pSeq->Size()) Failure("Argument not found");
+    else if (m_nNodeType == PNSeq)
+    {
+        MHParseSequence *pSeq = (MHParseSequence *)this;
+
+        if (n < 0 || n >= pSeq->Size())
+        {
+            Failure("Argument not found");
+        }
+
         return pSeq->GetAt(n);
     }
-    else Failure("Expected tagged value");
+    else
+    {
+        Failure("Expected tagged value");
+    }
+
     return 0; // To keep the compiler happy
 }
 
@@ -93,57 +122,103 @@ MHParseNode *MHParseNode::GetArgN(int n)
 MHParseNode *MHParseNode::GetNamedArg(int nTag)
 {
     MHParseSequence *pArgs = NULL;
-    if (m_nNodeType == PNTagged) pArgs = &((MHPTagged*)this)->m_Args;
-    else if (m_nNodeType == PNSeq) pArgs = (MHParseSequence*)this;
-    else Failure("Expected tagged value or sequence");
-    for (int i = 0; i < pArgs->Size(); i++) {
-        MHParseNode *p = pArgs->GetAt(i);
-        if (p && p->m_nNodeType == PNTagged && ((MHPTagged*)p)->m_TagNo == nTag) return p;
+
+    if (m_nNodeType == PNTagged)
+    {
+        pArgs = &((MHPTagged *)this)->m_Args;
     }
+    else if (m_nNodeType == PNSeq)
+    {
+        pArgs = (MHParseSequence *)this;
+    }
+    else
+    {
+        Failure("Expected tagged value or sequence");
+    }
+
+    for (int i = 0; i < pArgs->Size(); i++)
+    {
+        MHParseNode *p = pArgs->GetAt(i);
+
+        if (p && p->m_nNodeType == PNTagged && ((MHPTagged *)p)->m_TagNo == nTag)
+        {
+            return p;
+        }
+    }
+
     return NULL;
 }
 
 // Sequence.
 int MHParseNode::GetSeqCount()
 {
-    if (m_nNodeType != PNSeq) Failure("Expected sequence");
-    MHParseSequence *pSeq = (MHParseSequence*)this;
+    if (m_nNodeType != PNSeq)
+    {
+        Failure("Expected sequence");
+    }
+
+    MHParseSequence *pSeq = (MHParseSequence *)this;
     return pSeq->Size();
 }
 
 MHParseNode *MHParseNode::GetSeqN(int n)
 {
-    if (m_nNodeType != PNSeq) Failure("Expected sequence");
-    MHParseSequence *pSeq = (MHParseSequence*)this;
-    if (n < 0 || n >= pSeq->Size()) Failure("Argument not found");
+    if (m_nNodeType != PNSeq)
+    {
+        Failure("Expected sequence");
+    }
+
+    MHParseSequence *pSeq = (MHParseSequence *)this;
+
+    if (n < 0 || n >= pSeq->Size())
+    {
+        Failure("Argument not found");
+    }
+
     return pSeq->GetAt(n);
 }
 
 // Int
 int MHParseNode::GetIntValue()
 {
-    if (m_nNodeType != PNInt) Failure("Expected integer");
-    return ((MHPInt*)this)->m_Value;
+    if (m_nNodeType != PNInt)
+    {
+        Failure("Expected integer");
+    }
+
+    return ((MHPInt *)this)->m_Value;
 }
 
 // Enum
 int MHParseNode::GetEnumValue()
 {
-    if (m_nNodeType != PNEnum) Failure("Expected enumerated type");
-    return ((MHPEnum*)this)->m_Value;
+    if (m_nNodeType != PNEnum)
+    {
+        Failure("Expected enumerated type");
+    }
+
+    return ((MHPEnum *)this)->m_Value;
 }
 
 // Bool
 bool MHParseNode::GetBoolValue()
 {
-    if (m_nNodeType != PNBool) Failure("Expected boolean");
-    return ((MHPBool*)this)->m_Value;
+    if (m_nNodeType != PNBool)
+    {
+        Failure("Expected boolean");
+    }
+
+    return ((MHPBool *)this)->m_Value;
 }
 
 // String
 void MHParseNode::GetStringValue(MHOctetString &str)
 {
-    if (m_nNodeType != PNString) Failure("Expected string");
-    str.Copy(((MHPString*)this)->m_Value);
+    if (m_nNodeType != PNString)
+    {
+        Failure("Expected string");
+    }
+
+    str.Copy(((MHPString *)this)->m_Value);
 }
 

@@ -41,7 +41,7 @@ extern void MHSetLogging(FILE *logStream, unsigned int logLevel);
 // This abstract class is implemented by the MHEG Engine.
 class MHEG
 {
-public:
+  public:
     virtual ~MHEG() {}
     virtual void SetBooting() = 0;
     virtual void DrawDisplay(QRegion toDraw) = 0;
@@ -68,7 +68,7 @@ enum {
 
 class MHRgba
 {
-public:
+  public:
     MHRgba(int red, int green, int blue, int alpha):
       m_red(red), m_green(green), m_blue(blue), m_alpha(alpha) {};
     MHRgba(): m_red(0), m_green(0), m_blue(0), m_alpha(0) {};
@@ -76,7 +76,7 @@ public:
     int green() const { return m_green; }
     int blue() const { return m_blue; }
     int alpha() const { return m_alpha; }
-private:
+  private:
     unsigned char m_red, m_green, m_blue, m_alpha;
 };
 
@@ -84,7 +84,7 @@ private:
 // for the MHEG engine.
 class MHContext
 {
-public:
+  public:
     virtual ~MHContext() {} // Declared to avoid warnings
     // Interface to MHEG engine.
 
@@ -143,8 +143,9 @@ public:
 };
 
 // Dynamic Line Art objects record a sequence of drawing actions.
-class MHDLADisplay {
-public:
+class MHDLADisplay
+{
+  public:
     virtual ~MHDLADisplay() {}
     // Draw the completed drawing onto the display.
     virtual void Draw(int x, int y) = 0;
@@ -164,7 +165,7 @@ public:
 };
 
 class MHTextDisplay {
-public:
+  public:
     virtual ~MHTextDisplay() {}
     // Draw the completed drawing onto the display.  x and y give the position of the image
     // relative to the screen.  rect gives the bounding box for the image, again relative to
@@ -179,8 +180,9 @@ public:
     virtual void AddText(int x, int y, const QString &, MHRgba colour) = 0;
 };
 
-class MHBitmapDisplay {
-public:
+class MHBitmapDisplay
+{
+  public:
     virtual ~MHBitmapDisplay() {}
     // Draw the completed drawing onto the display.  x and y give the position of the image
     // relative to the screen.  rect gives the bounding box for the image, again relative to
