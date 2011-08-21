@@ -423,7 +423,7 @@ void LCDProcClient::init()
     QString aString;
     lcd_keystring = "";
 
-    connected = TRUE;
+    connected = true;
 
     // This gets called when we receive the "connect" string from the server
     // indicating that "hello" was succesful

@@ -273,7 +273,7 @@ void DXVA2Decoder::InitFormat(void)
     m_format.InputSampleFreq.Numerator   = 0;
     m_format.InputSampleFreq.Denominator = 0;
     m_format.OutputFrameFreq             = m_format.InputSampleFreq;
-    m_format.UABProtectionLevel          = FALSE;
+    m_format.UABProtectionLevel          = false;
     m_format.Reserved                    = 0;
 }
 

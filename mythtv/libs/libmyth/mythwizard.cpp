@@ -178,7 +178,7 @@ void MythWizard::addPage( QWidget * page, const QString & title )
     int i = d->pages.size();
 
     if ( i > 0 )
-        d->pages[i - 1]->nextEnabled = TRUE;
+        d->pages[i - 1]->nextEnabled = true;
 
     MythWizardPrivate::Page * p = new MythWizardPrivate::Page( page, title );
     p->backEnabled = ( i > 0 );
@@ -201,7 +201,7 @@ void MythWizard::insertPage( QWidget * page, const QString & title, int index )
         index = d->pages.size();
 
     if ( index > 0 && ( index == (int)d->pages.size() ) )
-        d->pages[index - 1]->nextEnabled = TRUE;
+        d->pages[index - 1]->nextEnabled = true;
 
     MythWizardPrivate::Page * p = new MythWizardPrivate::Page( page, title );
     p->backEnabled = ( index > 0 );
@@ -424,7 +424,7 @@ MythPushButton * MythWizard::cancelButton() const
 
 void MythWizard::layOutButtonRow( QHBoxLayout * layout )
 {
-    bool hasEarlyFinish = FALSE;
+    bool hasEarlyFinish = false;
 
     int i = d->pages.size() - 2;
     while ( !hasEarlyFinish && i >= 0 )

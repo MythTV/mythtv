@@ -562,7 +562,7 @@ void MythSystemWindows::Fork(time_t timeout)
         
     // Set the bInheritHandle flag so pipe handles are inherited. 
     saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
-    saAttr.bInheritHandle = TRUE; 
+    saAttr.bInheritHandle = true; 
     saAttr.lpSecurityDescriptor = NULL; 
 
     /* set up pipes */

@@ -212,7 +212,7 @@ bool Spectrum::process(VisualNode *node)
 
         if (magR != 1 || magL != 1)
         {
-            allZero = FALSE;
+            allZero = false;
         }
 
         magnitudesp[i] = magL;
@@ -912,7 +912,7 @@ bool Gears::process(VisualNode *node)
 
         if (magR != 1 || magL != 1)
         {
-            allZero = FALSE;
+            allZero = false;
         }
 
         magnitudesp[i] = magL;

@@ -58,7 +58,7 @@ MediaServer::MediaServer(void) :
     LOG(VB_UPNP, LOG_INFO, "MediaServer:ctor:End");
 }
 
-void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
+void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 {
     LOG(VB_UPNP, LOG_INFO, "MediaServer:Init:Begin");
 

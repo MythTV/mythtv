@@ -65,7 +65,7 @@ CdDecoder::~CdDecoder(void)
 
 void CdDecoder::stop()
 {
-    user_stop = TRUE;
+    user_stop = true;
 }
 
 void CdDecoder::writeBlock()
@@ -86,7 +86,7 @@ void CdDecoder::writeBlock()
 
 bool CdDecoder::initialize()
 {
-    inited = user_stop = finish = FALSE;
+    inited = user_stop = finish = false;
     freq = bitrate = 0;
     stat = chan = 0;
     seekTime = -1.0;
@@ -149,7 +149,7 @@ bool CdDecoder::initialize()
     output_at = 0;
 
     setCDSpeed(2);
-    inited = TRUE;
+    inited = true;
     return TRUE;
 }
 
@@ -175,7 +175,7 @@ void CdDecoder::deinit()
     device = NULL;
     paranoia = NULL;
 
-    inited = user_stop = finish = FALSE;
+    inited = user_stop = finish = false;
     freq = bitrate = 0;
     stat = chan = 0;
     setInput(0);
@@ -239,7 +239,7 @@ void CdDecoder::run()
                         finish = true;
                 }
                 else
-                    finish = TRUE;
+                    finish = true;
             }
         }
 
@@ -266,7 +266,7 @@ void CdDecoder::run()
     }
 
     if (user_stop)
-        inited = FALSE;
+        inited = false;
 
     else if (output())
     {

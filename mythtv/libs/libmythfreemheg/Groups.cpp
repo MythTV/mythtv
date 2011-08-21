@@ -574,7 +574,7 @@ void MHTransitionTo::Initialise(MHParseNode *p, MHEngine *engine)
     if (p->GetArgCount() > 1) {
         MHParseNode *pCtag = p->GetArgN(1);
         if (pCtag->m_nNodeType == MHParseNode::PNInt) {
-            m_fIsTagged = TRUE;
+            m_fIsTagged = true;
             m_nConnectionTag = pCtag->GetIntValue();
         }
     }

@@ -103,7 +103,7 @@ avfDecoder::~avfDecoder(void)
 
 void avfDecoder::stop()
 {
-    user_stop = TRUE;
+    user_stop = true;
 }
 
 void avfDecoder::writeBlock()
@@ -332,7 +332,7 @@ void avfDecoder::seek(double pos)
 
 void avfDecoder::deinit()
 {
-    inited = user_stop = finish = FALSE;
+    inited = user_stop = finish = false;
     freq = bitrate = 0;
     stat = m_channels = 0;
     m_sampleFmt = FORMAT_NONE;
@@ -421,7 +421,7 @@ void avfDecoder::run()
                 {
                     LOG(VB_GENERAL, LOG_ERR, "Read frame failed");
                     LOG(VB_FILE, LOG_ERR, ("... for file '" + filename) + "'");
-                    finish = TRUE;
+                    finish = true;
                     break;
                 }
 
@@ -477,7 +477,7 @@ void avfDecoder::run()
     }
 
     if (user_stop)
-        inited = FALSE;
+        inited = false;
 
     else if (output())
     {

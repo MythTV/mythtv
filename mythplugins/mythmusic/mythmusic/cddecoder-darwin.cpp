@@ -25,7 +25,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
          : Decoder(d, i, o)
 {
     filename = file;
-    inited = FALSE;
+    inited = false;
 }
 
 CdDecoder::~CdDecoder(void)
