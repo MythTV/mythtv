@@ -64,9 +64,9 @@
 #endif
 
 VERBOSE_PREAMBLE
-VERBOSE_MAP(VB_ALL,       0xfffffffffLLU, false,
+VERBOSE_MAP(VB_ALL,       ~0LLU, false,
             "ALL available debug output")
-VERBOSE_MAP(VB_MOST,      0xf3ffeffffLLU, false,
+VERBOSE_MAP(VB_MOST,      0xffffffff3ffeffffLLU, false,
             "Most debug (nodatabase,notimestamp,noextra)")
 #if 0
 VERBOSE_MAP(VB_IMPORTANT, 0x00000001, false,
