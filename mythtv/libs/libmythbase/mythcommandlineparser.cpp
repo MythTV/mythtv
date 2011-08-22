@@ -534,7 +534,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
     {
         cerr << "Processed option list:" << endl;
         QMap<QString, QVariant>::const_iterator it = m_parsed.begin();
-        for (; it != m_parsed.end(); it++)
+        for (; it != m_parsed.end(); ++it)
         {
             cerr << "  " << it.key().leftJustified(30)
                               .toLocal8Bit().constData();
@@ -567,7 +567,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                 QMap<QString, QVariant> tmpmap = (*it).toMap();
                 bool first = true;
                 QMap<QString, QVariant>::const_iterator it2 = tmpmap.begin();
-                for (; it2 != tmpmap.end(); it2++)
+                for (; it2 != tmpmap.end(); ++it2)
                 {
                     if (first)
                         first = false;
@@ -589,7 +589,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 
         cerr << endl << "Extra argument list:" << endl;
         QStringList::const_iterator it3 = m_remainingArgs.begin();
-        for (; it3 != m_remainingArgs.end(); it3++)
+        for (; it3 != m_remainingArgs.end(); ++it3)
             cerr << "  " << (*it3).toLocal8Bit().constData() << endl;
 
         if (m_allowPassthrough)

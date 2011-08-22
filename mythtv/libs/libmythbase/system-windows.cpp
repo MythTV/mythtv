@@ -294,7 +294,7 @@ void MythSystemManager::run(void)
 
         m_mapLock.lock();
         m_jumpLock.lock();
-        for( i = m_pMap.begin(); i != m_pMap.end(); i++ )
+        for (i = m_pMap.begin(); i != m_pMap.end(); ++i)
         {
             child = i.key();
             ms    = i.value();
@@ -363,10 +363,10 @@ void MythSystemManager::ChildListRebuild()
         m_children = (HANDLE *)realloc(m_children, 
                                        m_childCount * sizeof(HANDLE));
 
-    for( i = m_pMap.begin(), j = 0; i != m_pMap.end(); i++, j++ )
+    for (i = m_pMap.begin(), j = 0; i != m_pMap.end(); ++i++)
     {
         child = i.key();
-        m_children[j] = child;
+        m_children[j++] = child;
     }
 }
 

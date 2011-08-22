@@ -76,7 +76,7 @@ void ShutdownMythSystem(void)
 
 MythSystemIOHandler::MythSystemIOHandler(bool read) :
     MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
-    m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
+    m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()), m_maxfd(-1),
     m_read(read)
 {
 }
@@ -652,9 +652,9 @@ void MythSystemUnix::Fork(time_t timeout)
     int i;
     QStringList::const_iterator it;
 
-    for( i = 0, it = args.constBegin(); it != args.constEnd(); it++, i++ )
+    for (i = 0, it = args.constBegin(); it != args.constEnd(); ++it)
     {
-        cmdargs[i] = strdup( it->toUtf8().constData() );
+        cmdargs[i++] = strdup(it->toUtf8().constData());
     }
     cmdargs[i] = NULL;
 

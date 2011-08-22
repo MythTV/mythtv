@@ -201,7 +201,7 @@ LoggerBase::~LoggerBase()
 
     QList<LoggerBase *>::iterator it;
 
-    for(it = loggerList.begin(); it != loggerList.end(); it++)
+    for (it = loggerList.begin(); it != loggerList.end(); ++it)
     {
         if( *it == this )
         {
@@ -274,7 +274,6 @@ bool FileLogger::logmsg(LoggingItem *item)
     char                timestamp[TIMESTAMP_MAX];
     char               *threadName = NULL;
     pid_t               pid = getpid();
-    pid_t               tid = 0;
 
     if (!m_opened || m_quiet || (m_progress && item->level > LOG_ERR))
         return false;
@@ -309,7 +308,7 @@ bool FileLogger::logmsg(LoggingItem *item)
     else
     {
         threadName = getThreadName(item);
-        tid = getThreadTid(item);
+        pid_t tid = getThreadTid(item);
 
         if( tid )
             snprintf( line, MAX_STRING_LENGTH, 
@@ -353,8 +352,8 @@ SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility),
     openlog( m_application, LOG_NDELAY | LOG_PID, facility );
     m_opened = true;
 
-    for( name = &facilitynames[0];
-         name->c_name && name->c_val != facility; name++ );
+    for (name = &facilitynames[0];
+         name->c_name && name->c_val != facility; name++);
 
     LOG(VB_GENERAL, LOG_INFO, QString("Added syslogging to facility %1")
              .arg(name->c_name));
@@ -674,12 +673,12 @@ int64_t getThreadTid( LoggingItem *item )
 
 void setThreadTid( LoggingItem *item )
 {
-    int64_t tid = 0;
-
     QMutexLocker locker(&logThreadTidMutex);
 
     if( ! logThreadTidHash.contains(item->threadId) )
     {
+        int64_t tid = 0;
+
 #if defined(linux)
         tid = (int64_t)syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
@@ -718,7 +717,7 @@ LoggerThread::~LoggerThread()
 
     QList<LoggerBase *>::iterator it;
 
-    for(it = loggerList.begin(); it != loggerList.end(); it++)
+    for (it = loggerList.begin(); it != loggerList.end(); ++it)
     {
         (*it)->deleteLater();
     }
@@ -979,7 +978,7 @@ void logSighup( int signum, siginfo_t *info, void *secret )
     QMutexLocker locker(&loggerListMutex);
 
     QList<LoggerBase *>::iterator it;
-    for(it = loggerList.begin(); it != loggerList.end(); it++)
+    for (it = loggerList.begin(); it != loggerList.end(); ++it)
     {
         (*it)->reopen();
     }
@@ -1010,9 +1009,9 @@ void logPropagateCalc(void)
     {
         CODE *syslogname;
 
-        for( syslogname = &facilitynames[0];
+        for (syslogname = &facilitynames[0];
              (syslogname->c_name &&
-              syslogname->c_val != logPropagateOpts.facility); syslogname++ );
+              syslogname->c_val != logPropagateOpts.facility); syslogname++);
 
         logPropagateArgs += QString(" --syslog %1").arg(syslogname->c_name);
     }
@@ -1156,8 +1155,8 @@ int syslogGetFacility(QString facility)
     int i;
     char *string = (char *)facility.toLocal8Bit().constData();
 
-    for( i = 0, name = &facilitynames[0];
-         name->c_name && strcmp(name->c_name, string); i++, name++ );
+    for (i = 0, name = &facilitynames[0];
+         name->c_name && strcmp(name->c_name, string); i++, name++);
 
     return( name->c_val );
 #endif
@@ -1173,8 +1172,8 @@ LogLevel_t logLevelGet(QString level)
         locker.relock();
     }
 
-    for( LoglevelMap::iterator it = loglevelMap.begin();
-         it != loglevelMap.end(); it++)
+    for (LoglevelMap::iterator it = loglevelMap.begin();
+         it != loglevelMap.end(); ++it)
     {
         LoglevelDef *item = (*it);
         if ( item->name == level.toLower() )

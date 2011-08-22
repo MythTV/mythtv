@@ -248,7 +248,7 @@ static QString findZoneinfoFile(QString zoneinfo_file_path,
     QFileInfo zoneinfo_file_info(zoneinfo_file_path);
 
     for (QFileInfoList::const_iterator it = dirlist.begin();
-         it != dirlist.end(); it++)
+         it != dirlist.end(); ++it)
     {
         info = *it;
          // Skip '.' and '..' and other files starting with "." and
