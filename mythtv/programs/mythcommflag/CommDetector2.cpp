@@ -699,7 +699,7 @@ bool CommDetector2::go(void)
                 frm_dir_map_t::const_iterator ii, jj;
                 ii = breakMap.begin();
                 jj = lastBreakMap.begin();
-                while (ii != breakMap.end() && jj != breakMap.end())
+                while (ii != breakMap.end() && jj != lastBreakMap.end())
                 {
                     if (ii.key() != jj.key())
                         break;
