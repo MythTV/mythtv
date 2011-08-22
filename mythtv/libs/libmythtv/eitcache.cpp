@@ -283,7 +283,7 @@ void EITCache::WriteChannelToDB(uint chanid)
             updated++;
             *it &= ~(uint64_t)0 >> 1; // mark as synced
         }
-        it++;
+        ++it;
     }
     unlock_channel(chanid, updated);
 

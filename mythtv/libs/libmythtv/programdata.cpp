@@ -308,12 +308,12 @@ static int score_words(const QStringList &al, const QStringList &bl)
     QStringList::const_iterator ait = al.begin();
     QStringList::const_iterator bit = bl.begin();
     int score = 0;
-    for (; (ait != al.end()) && (bit != bl.end()); ait++)
+    for (; (ait != al.end()) && (bit != bl.end()); ++ait)
     {
         QStringList::const_iterator bit2 = bit;
         int dist = 0;
         int bscore = 0;
-        for (; bit2 != bl.end(); bit2++)
+        for (; bit2 != bl.end(); ++bit2)
         {
             if (*ait == *bit)
             {
@@ -328,7 +328,7 @@ static int score_words(const QStringList &al, const QStringList &bl)
         if (bscore && dist < 3)
         {
             for (int i = 0; (i < dist) && bit != bl.end(); i++)
-                bit++;
+                ++bit;
         }
         score += bscore;
     }

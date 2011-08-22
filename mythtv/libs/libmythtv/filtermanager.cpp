@@ -72,7 +72,7 @@ FilterManager::FilterManager()
     {
         QStringList LibList = FiltDir.entryList();
         for (QStringList::iterator i = LibList.begin(); i != LibList.end();
-             i++)
+             ++i)
         {
             QString path = FiltDir.filePath(*i);
             if (path.length() <= 1)

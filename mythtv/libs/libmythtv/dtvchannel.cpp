@@ -360,7 +360,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         vector<uint> pids;
         vector<uint> types;
         pid_cache_t::iterator pit = pid_cache.begin(); 
-        for (; pit != pid_cache.end(); pit++)
+        for (; pit != pid_cache.end(); ++pit)
         {
             if (!pit->GetStreamID())
                 continue;

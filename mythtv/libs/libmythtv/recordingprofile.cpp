@@ -1669,7 +1669,7 @@ void RecordingProfile::fillSelections(SelectManagedListItem *setting,
     if (!group)
     {
         QMap<int, QString>::iterator it;
-        for (it = profiles.begin(); it != profiles.end(); it++)
+        for (it = profiles.begin(); it != profiles.end(); ++it)
         {
             QString lbl = QObject::tr("Record using the \"%1\" profile")
                 .arg(it.value());
@@ -1679,7 +1679,7 @@ void RecordingProfile::fillSelections(SelectManagedListItem *setting,
     }
 
     QMap<int, QString>::iterator it;
-    for (it = profiles.begin(); it != profiles.end(); it++)
+    for (it = profiles.begin(); it != profiles.end(); ++it)
     {
         setting->addSelection(it.value(), QString::number(it.key()), false);
     }

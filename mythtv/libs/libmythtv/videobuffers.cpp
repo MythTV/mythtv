@@ -201,7 +201,7 @@ void VideoBuffers::Reset()
     // Delete ffmpeg VideoFrames so we can create
     // a different number of buffers below
     frame_vector_t::iterator it = buffers.begin();
-    for (;it != buffers.end(); it++)
+    for (;it != buffers.end(); ++it)
     {
         if (it->qscale_table)
         {

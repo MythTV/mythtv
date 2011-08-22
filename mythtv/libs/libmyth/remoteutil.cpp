@@ -578,7 +578,7 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
     vector<ProgramInfo *>::iterator it = info->begin();
     // make sure whatever RemoteGetRecordingList() returned
     // only has rsRecording shows
-    for ( ; it != info->end(); it++)
+    for ( ; it != info->end(); ++it)
     {
         p = *it;
         if (p->GetRecordingStatus() == rsRecording ||

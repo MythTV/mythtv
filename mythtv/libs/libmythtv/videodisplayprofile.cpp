@@ -224,7 +224,7 @@ VideoDisplayProfile::VideoDisplayProfile()
 
     item_list_t items = LoadDB(groupid);
     item_list_t::const_iterator it;
-    for (it = items.begin(); it != items.end(); it++)
+    for (it = items.begin(); it != items.end(); ++it)
     {
         QString err;
         if (!(*it).IsValid(&err))
@@ -322,7 +322,7 @@ bool VideoDisplayProfile::CheckVideoRendererGroup(const QString renderer)
                 .arg(renderer).arg(last_video_renderer));
 
     safe_map_t::const_iterator it = safe_renderer_group.begin();
-    for (; it != safe_renderer_group.end(); it++)
+    for (; it != safe_renderer_group.end(); ++it)
         if (it->contains(last_video_renderer) &&
             it->contains(renderer))
             return true;

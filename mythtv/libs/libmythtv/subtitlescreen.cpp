@@ -701,7 +701,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     gTextSubFont->GetFace()->setPixelSize(m_safeArea.height() / (yscale * 1.2));
     QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
 
-    for (; i != textlist->buffers.end(); i++)
+    for (; i != textlist->buffers.end(); ++i)
     {
         CC608Text *cc = (*i);
         int color = 0;

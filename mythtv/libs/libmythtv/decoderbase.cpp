@@ -195,7 +195,7 @@ bool DecoderBase::PosMapFromDb(void)
     m_positionMap.reserve(posMap.size());
 
     for (frm_pos_map_t::const_iterator it = posMap.begin();
-         it != posMap.end(); it++)
+         it != posMap.end(); ++it)
     {
         PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
         m_positionMap.push_back(e);
@@ -244,7 +244,7 @@ bool DecoderBase::PosMapFromEnc(void)
     m_positionMap.reserve(m_positionMap.size() + posMap.size());
     long long last_index = m_positionMap.back().index;
     for (QMap<long long,long long>::const_iterator it = posMap.begin();
-         it != posMap.end(); it++)
+         it != posMap.end(); ++it)
     {
         if (it.key() <= last_index)
             continue; // we released the m_positionMapLock for a few ms...

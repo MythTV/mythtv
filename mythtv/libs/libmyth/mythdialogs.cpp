@@ -1092,7 +1092,7 @@ bool MythThemedDialog::loadThemedWindow(QString window_name,
         //  Loop over UITypes within each container
         vector<UIType *> *all_ui_type_objects = looper->getAllTypes();
         vector<UIType *>::iterator i = all_ui_type_objects->begin();
-        for (; i != all_ui_type_objects->end(); i++)
+        for (; i != all_ui_type_objects->end(); ++i)
         {
             UIType *type = (*i);
             connect(type, SIGNAL(requestUpdate()), this,
@@ -1129,7 +1129,7 @@ bool MythThemedDialog::buildFocusList()
         //  Loop over UITypes within each container
         vector<UIType *> *all_ui_type_objects = looper->getAllTypes();
         vector<UIType *>::iterator i = all_ui_type_objects->begin();
-        for (; i != all_ui_type_objects->end(); i++)
+        for (; i != all_ui_type_objects->end(); ++i)
         {
             UIType *type = (*i);
             if (type->canTakeFocus() && !type->isHidden() &&

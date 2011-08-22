@@ -199,10 +199,13 @@ void ProfileGroupEditor::open(int id) {
             for(int i = 0; availProfiles[i] != ""; i++)
             {
                 bool skip = false;
+
                 for (vector<int>::iterator j = found.begin();
-                     j != found.end(); j++)
+                     j != found.end(); ++j)
+                {
                     if (i == *j)
                         skip = true;
+                }
                 if (! skip)
                 {
                     result.prepare("INSERT INTO recordingprofiles "

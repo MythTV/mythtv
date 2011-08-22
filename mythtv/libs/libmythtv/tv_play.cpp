@@ -6108,7 +6108,7 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
 
     if (kNextSource == source_direction)
     {
-        sit++;
+        ++sit;
         if (sit == sources.end())
             sit = sources.begin();
     }
@@ -6116,14 +6116,14 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
     if (kPreviousSource == source_direction)
     {
         if (sit != sources.begin())
-            sit--;
+            --sit;
         else
         {
             QMap<uint,InputInfo>::const_iterator tmp = sources.begin();
             while (tmp != sources.end())
             {
                 sit = tmp;
-                tmp++;
+                ++tmp;
             }
         }
     }
@@ -6366,7 +6366,7 @@ void TV::ToggleInputs(PlayerContext *ctx, uint inputid)
     {
         it = find(inputs.begin(), inputs.end(), inputname);
         if (it != inputs.end())
-            it++;
+            ++it;
     }
 
     if (it == inputs.end())
@@ -10871,7 +10871,7 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString category,
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
             vector<ProgramInfo *>::const_iterator it = infoList->begin();
-            for ( ; it != infoList->end(); it++)
+            for ( ; it != infoList->end(); ++it)
             {
                 if ((*it)->GetRecordingGroup() != "LiveTV" || LiveTVInAllPrograms ||
                      (*it)->GetRecordingGroup() == currecgroup)
@@ -10883,7 +10883,7 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString category,
 
             ProgramInfo *lastprog = GetLastProgram();
             QMap<QString,ProgramList>::const_iterator Iprog;
-            for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++)
+            for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
             {
                 const ProgramList &plist = *Iprog;
                 uint progIndex = (uint) plist.size();

@@ -443,7 +443,7 @@ void TVBrowseHelper::run()
                 QMultiMap<QString,uint>::iterator it;
                 it = db_channum_to_chanids.lowerBound(bi.m_channum);
                 for ( ; (it != db_channum_to_chanids.end()) &&
-                          (it.key() == bi.m_channum); it++)
+                          (it.key() == bi.m_channum); ++it)
                 {
                     if (db_chanid_to_sourceid[*it] == sourceid)
                         chanids.push_back(*it);
