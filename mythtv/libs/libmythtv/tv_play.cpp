@@ -11326,22 +11326,23 @@ void TV::UnpauseLiveTV(PlayerContext *ctx, bool bQuietly /*=false*/)
  */
 void TV::ITVRestart(PlayerContext *ctx, bool isLive)
 {
-    uint chanid = 0;
-    uint cardid = 0;
+    uint chanid = -1;
+    uint sourceid = -1;
 
     if (ContextIsPaused(ctx, __FILE__, __LINE__))
         return;
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (ctx->playingInfo)
+    {
         chanid = ctx->playingInfo->GetChanID();
+        sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
+    }
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-
-    cardid = ctx->GetCardID();
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
-        ctx->player->ITVRestart(chanid, cardid, isLive);
+        ctx->player->ITVRestart(chanid, sourceid, isLive);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
