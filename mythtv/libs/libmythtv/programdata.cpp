@@ -27,13 +27,13 @@ static const char *roles[] =
 DBPerson::DBPerson(const DBPerson &other) :
     role(other.role), name(other.name)
 {
-    name.detach();
+    name.squeeze();
 }
 
 DBPerson::DBPerson(Role _role, const QString &_name) :
     role(_role), name(_name)
 {
-    name.detach();
+    name.squeeze();
 }
 
 DBPerson::DBPerson(const QString &_role, const QString &_name) :
@@ -47,7 +47,7 @@ DBPerson::DBPerson(const QString &_role, const QString &_name) :
                 role = (Role) i;
         }
     }
-    name.detach();
+    name.squeeze();
 }
 
 QString DBPerson::GetRole(void) const
@@ -169,26 +169,15 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
     return *this;
 }
 
-static void squeeze_str(QString &str)
-{
-    if (str.isEmpty())
-        str.squeeze();
-    else
-    {
-        str.detach();
-        str.squeeze();
-    }
-}
-
 void DBEvent::Squeeze(void)
 {
-    squeeze_str(title);
-    squeeze_str(subtitle);
-    squeeze_str(description);
-    squeeze_str(category);
-    squeeze_str(syndicatedepisodenumber);
-    squeeze_str(seriesId);
-    squeeze_str(programId);
+    title.squeeze();
+    subtitle.squeeze();
+    description.squeeze();
+    category.squeeze();
+    syndicatedepisodenumber.squeeze();
+    seriesId.squeeze();
+    programId.squeeze();
 }
 
 void DBEvent::AddPerson(DBPerson::Role role, const QString &name)
@@ -778,15 +767,15 @@ ProgInfo &ProgInfo::operator=(const ProgInfo &other)
     clumpidx        = other.clumpidx;
     clumpmax        = other.clumpmax;
 
-    squeeze_str(channel);
-    squeeze_str(startts);
-    squeeze_str(endts);
-    squeeze_str(stars);
-    squeeze_str(title_pronounce);
-    squeeze_str(showtype);
-    squeeze_str(colorcode);
-    squeeze_str(clumpidx);
-    squeeze_str(clumpmax);
+    channel.squeeze();
+    startts.squeeze();
+    endts.squeeze();
+    stars.squeeze();
+    title_pronounce.squeeze();
+    showtype.squeeze();
+    colorcode.squeeze();
+    clumpidx.squeeze();
+    clumpmax.squeeze();
 
     return *this;
 }
@@ -794,15 +783,15 @@ ProgInfo &ProgInfo::operator=(const ProgInfo &other)
 void ProgInfo::Squeeze(void)
 {
     DBEvent::Squeeze();
-    squeeze_str(channel);
-    squeeze_str(startts);
-    squeeze_str(endts);
-    squeeze_str(stars);
-    squeeze_str(title_pronounce);
-    squeeze_str(showtype);
-    squeeze_str(colorcode);
-    squeeze_str(clumpidx);
-    squeeze_str(clumpmax);
+    channel.squeeze();
+    startts.squeeze();
+    endts.squeeze();
+    stars.squeeze();
+    title_pronounce.squeeze();
+    showtype.squeeze();
+    colorcode.squeeze();
+    clumpidx.squeeze();
+    clumpmax.squeeze();
 }
 
 uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
