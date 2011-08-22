@@ -17,9 +17,15 @@
 #include "channelgroup.h"
 #include "sourceutil.h"
 
-DBChannel::DBChannel(const DBChannel &other)
+DBChannel::DBChannel(const DBChannel &other) :
+    channum(other.channum),       callsign(other.callsign),
+    name(other.name),             icon(other.icon),
+    chanid(other.chanid),
+    major_chan(other.major_chan), minor_chan(other.minor_chan),
+    mplexid((other.mplexid == 32767) ? 0 : other.mplexid),
+    sourceid(other.sourceid),     cardid (other.cardid),
+    grpid(other.grpid),           visible(other.visible)
 {
-    (*this) = other;
 }
 
 DBChannel::DBChannel(

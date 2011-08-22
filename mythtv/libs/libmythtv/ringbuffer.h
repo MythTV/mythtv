@@ -214,7 +214,6 @@ class MTV_PUBLIC RingBuffer : protected MThread
     bool      ateof;              // protected by rwlock
     bool      readsallowed;       // protected by rwlock
     bool      setswitchtonext;    // protected by rwlock
-    bool      ignorereadahead;    // protected by rwlock
     uint      rawbitrate;         // protected by rwlock
     float     playspeed;          // protected by rwlock
     int       fill_threshold;     // protected by rwlock
