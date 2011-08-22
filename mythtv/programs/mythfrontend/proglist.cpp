@@ -1399,7 +1399,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
                 if ((*it)->sortTitle != curtitle)
                 {
                     curtitle = (*it)->sortTitle;
-                    it++;
+                    ++it;
                 }
                 else
                 {

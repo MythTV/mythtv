@@ -1166,7 +1166,7 @@ void ProgramRecPriority::FillList(void)
 
     vector<ProgramInfo *>::reverse_iterator pgiter = recordinglist.rbegin();
 
-    for (; pgiter != recordinglist.rend(); pgiter++)
+    for (; pgiter != recordinglist.rend(); ++pgiter)
     {
         m_programData[QString::number(cnt)] = *(*pgiter);
 

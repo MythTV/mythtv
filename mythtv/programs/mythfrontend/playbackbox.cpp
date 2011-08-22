@@ -4225,7 +4225,7 @@ void PlaybackBox::HandleRecordingRemoveEvent(
             }
             else
             {
-                pit++;
+                ++pit;
             }
         }
 
@@ -4248,7 +4248,9 @@ void PlaybackBox::HandleRecordingRemoveEvent(
             git = m_progLists.erase(git);
         }
         else
-            git++;
+        {
+            ++git;
+        }
     }
 
     m_helper.ForceFreeSpaceUpdate();

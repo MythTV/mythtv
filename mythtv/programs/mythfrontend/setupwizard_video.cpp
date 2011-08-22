@@ -112,10 +112,10 @@ void VideoSetupWizard::loadData(void)
     QStringList profiles = m_vdp->GetProfiles(gCoreContext->GetHostName());
 
     for (QStringList::const_iterator i = profiles.begin();
-            i != profiles.end(); i++)
+         i != profiles.end(); ++i)
     {
         MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_playbackProfileButtonList, *i);
+            new MythUIButtonListItem(m_playbackProfileButtonList, *i);
         item->SetData(*i);
     }
 

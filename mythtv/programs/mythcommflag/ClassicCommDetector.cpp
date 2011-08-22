@@ -1103,9 +1103,9 @@ frm_dir_map_t ClassicCommDetector::Combine2Maps(const frm_dir_map_t &a,
         frm_dir_map_t::const_iterator it_b;
 
         it_a = a.begin();
-        it_a++;
+        ++it_a;
         it_b = it_a;
-        it_b++;
+        ++it_b;
         while (it_b != a.end())
         {
             uint64_t fdiff = it_b.key() - it_a.key();
@@ -1127,10 +1127,10 @@ frm_dir_map_t ClassicCommDetector::Combine2Maps(const frm_dir_map_t &a,
                 newMap.remove(it_b.key());
             }
 
-            it_a++; it_a++;
-            it_b++;
+            ++it_a; ++it_a;
+            ++it_b;
             if (it_b != a.end())
-                it_b++;
+                ++it_b;
         }
     }
 
@@ -2106,7 +2106,7 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
     frm_dir_map_t::iterator prev = it;
     if (it != sceneCommBreakMap.end())
     {
-        it++;
+        ++it;
         while (it != sceneCommBreakMap.end())
         {
             if ((*it == MARK_COMM_END) &&
@@ -2115,9 +2115,9 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
                 deleteMap[it.key()] = MARK_CUT_START;
                 deleteMap[prev.key()] = MARK_CUT_START;
             }
-            prev++;
+            ++prev;
             if (it != sceneCommBreakMap.end())
-                it++;
+                ++it;
         }
 
         frm_dir_map_t::iterator dit;
@@ -2169,7 +2169,7 @@ void ClassicCommDetector::MergeBlankCommList(void)
 
     it = blankCommMap.begin();
     prev = it;
-    it++;
+    ++it;
     for(; it != blankCommMap.end(); ++it, ++prev)
     {
         // if next commercial starts less than 15*fps frames away then merge
@@ -2187,7 +2187,7 @@ void ClassicCommDetector::MergeBlankCommList(void)
     // make temp copy of commercial break list
     it = blankCommBreakMap.begin();
     prev = it;
-    it++;
+    ++it;
     tmpMap[prev.key()] = it.key();
     for(; it != blankCommBreakMap.end(); ++it, ++prev)
     {
@@ -2281,7 +2281,7 @@ void ClassicCommDetector::CondenseMarkMap(show_map_t &map, int spacing,
 
     // merge any segments less than 'spacing' frames apart from each other
     LOG(VB_COMMFLAG, LOG_INFO, "Commercial Map Before condense:" );
-    for (it = map.begin(); it != map.end(); it++)
+    for (it = map.begin(); it != map.end(); ++it)
     {
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
                 .arg(it.key()).arg(*it));
@@ -2290,7 +2290,7 @@ void ClassicCommDetector::CondenseMarkMap(show_map_t &map, int spacing,
 
     prev = tmpMap.begin();
     it = prev;
-    it++;
+    ++it;
     while (it != tmpMap.end())
     {
         if ((*it == MARK_START) &&
@@ -2300,8 +2300,8 @@ void ClassicCommDetector::CondenseMarkMap(show_map_t &map, int spacing,
             map.remove(prev.key());
             map.remove(it.key());
         }
-        prev++;
-        it++;
+        ++prev;
+        ++it;
     }
 
     if (map.size() == 0)
@@ -2309,12 +2309,12 @@ void ClassicCommDetector::CondenseMarkMap(show_map_t &map, int spacing,
 
     // delete any segments less than 'length' frames in length
     tmpMap.clear();
-    for (it = map.begin(); it != map.end(); it++)
+    for (it = map.begin(); it != map.end(); ++it)
         tmpMap[it.key()] = *it;
 
     prev = tmpMap.begin();
     it = prev;
-    it++;
+    ++it;
     while (it != tmpMap.end())
     {
         if ((*prev == MARK_START) &&
@@ -2324,12 +2324,12 @@ void ClassicCommDetector::CondenseMarkMap(show_map_t &map, int spacing,
             map.remove(prev.key());
             map.remove(it.key());
         }
-        prev++;
-        it++;
+        ++prev;
+        ++it;
     }
 
     LOG(VB_COMMFLAG, LOG_INFO, "Commercial Map After condense:" );
-    for (it = map.begin(); it != map.end(); it++)
+    for (it = map.begin(); it != map.end(); ++it)
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
                 .arg(it.key()).arg(*it));
 }
@@ -2342,7 +2342,7 @@ void ClassicCommDetector::ConvertShowMapToCommMap(
         return;
 
     show_map_t::const_iterator sit;
-    for (sit = in.begin(); sit != in.end(); sit++)
+    for (sit = in.begin(); sit != in.end(); ++sit)
     {
         if (*sit == MARK_START)
             out[sit.key()] = MARK_COMM_END;

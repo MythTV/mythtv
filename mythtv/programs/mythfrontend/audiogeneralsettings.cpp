@@ -83,7 +83,7 @@ void AudioDeviceComboBox::AudioRescan()
     resetMaxCount(vect.size());
 
     bool found = false;
-    for (it = vect.begin(); it != vect.end(); it++)
+    for (it = vect.begin(); it != vect.end(); ++it)
         addSelection(it->name, it->name,
                      value == it->name ? (found = true) : false);
     if (!found)
@@ -208,7 +208,7 @@ void AudioConfigSettings::AudioRescan()
     QVector<AudioOutput::AudioDeviceConfig>::const_iterator it;
 
     audiodevs.clear();
-    for (it = list->begin(); it != list->end(); it++)
+    for (it = list->begin(); it != list->end(); ++it)
         audiodevs.insert(it->name, *it);
 
     devices = *list;

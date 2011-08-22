@@ -4456,7 +4456,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         fsInfo.setPath(*(it++));
         fsInfo.setLocal((*(it++)).toInt() > 0);
         fsInfo.setFSysID(-1);
-        it++;   // Without this, the strlist gets out of whack
+        ++it;   // Without this, the strlist gets out of whack
         fsInfo.setGroupID((*(it++)).toInt());
         fsInfo.setBlockSize((*(it++)).toInt());
         fsInfo.setTotalSpace((*(it++)).toLongLong());
@@ -4551,7 +4551,7 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos)
         fsInfo.setPath(*(it++));
         fsInfo.setLocal((*(it++)).toInt() > 0);
         fsInfo.setFSysID(-1);
-        it++;
+        ++it;
         fsInfo.setGroupID((*(it++)).toInt());
         fsInfo.setBlockSize((*(it++)).toInt());
         fsInfo.setTotalSpace((*(it++)).toLongLong());
@@ -5322,20 +5322,20 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
             .arg(pginfo.MakeUniqueKey()).arg(rand());
     }
     if (it != slist.end())
-        (time_fmt_sec = ((*it).toLower() == "s")), it++;
+        (time_fmt_sec = ((*it).toLower() == "s")), ++it;
     if (it != slist.end())
-        (time = (*it).toLongLong()), it++;
+        (time = (*it).toLongLong()), ++it;
     if (it != slist.end())
-        (outputfile = *it), it++;
+        (outputfile = *it), ++it;
     outputfile = (outputfile == "<EMPTY>") ? QString::null : outputfile;
     if (it != slist.end())
     {
-        width = (*it).toInt(&ok); it++;
+        width = (*it).toInt(&ok); ++it;
         width = (ok) ? width : -1;
     }
     if (it != slist.end())
     {
-        height = (*it).toInt(&ok); it++;
+        height = (*it).toInt(&ok); ++it;
         height = (ok) ? height : -1;
         has_extra_data = true;
     }

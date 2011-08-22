@@ -792,10 +792,11 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
         {
             case ltDBGenreGroup: 
             { 
-                std::vector <std::pair <int, QString> > genres = data->GetGenres(); 
+                std::vector <std::pair <int, QString> > genres =
+                    data->GetGenres(); 
 
                 for (std::vector <std::pair <int, QString> >::iterator i =  
-                                         genres.begin(); i != genres.end(); i++) 
+                         genres.begin(); i != genres.end(); ++i) 
                 { 
                     std::pair <int, QString> item = *i; 
                     groups.push_back(item.second); 
@@ -827,7 +828,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
                 std::vector <std::pair <int, QString> > cast = data->GetCast();
 
                 for (std::vector <std::pair <int, QString> >::iterator i =
-                                         cast.begin(); i != cast.end(); i++)
+                         cast.begin(); i != cast.end(); ++i)
                 {
                     std::pair <int, QString> item = *i;
                     groups.push_back(item.second);
@@ -868,7 +869,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
         } 
  
         for (std::vector <QString>::iterator i = groups.begin();  
-                                                         i != groups.end(); i++) 
+             i != groups.end(); ++i)
         { 
             QString item = *i; 
  

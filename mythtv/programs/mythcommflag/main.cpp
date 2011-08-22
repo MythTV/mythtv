@@ -349,7 +349,7 @@ static void streamOutCommercialBreakList(
     else
     {
         frm_dir_map_t::const_iterator it = commercialBreakList.begin();
-        for (; it != commercialBreakList.end(); it++)
+        for (; it != commercialBreakList.end(); ++it)
         {
             output << "framenum: " << it.key() << "\tmarktype: " << *it
                    << endl;
