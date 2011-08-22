@@ -2101,12 +2101,9 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
     if (section_start >= 0)
         sceneCommBreakMap[framesProcessed] = MARK_COMM_END;
 
-    frm_dir_map_t::iterator it;
-    frm_dir_map_t::iterator prev;
     frm_dir_map_t deleteMap;
-
-    it = sceneCommBreakMap.begin();
-    prev = it;
+    frm_dir_map_t::iterator it = sceneCommBreakMap.begin();
+    frm_dir_map_t::iterator prev = it;
     if (it != sceneCommBreakMap.end())
     {
         it++;
@@ -2123,14 +2120,17 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
                 it++;
         }
 
-        for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
-            sceneCommBreakMap.remove(it.key());
+        frm_dir_map_t::iterator dit;
+        for (dit = deleteMap.begin(); dit != deleteMap.end(); ++dit)
+            sceneCommBreakMap.remove(dit.key());
     }
 
     LOG(VB_COMMFLAG, LOG_INFO, "Scene-Change Commercial Break Map" );
-    for(it = sceneCommBreakMap.begin(); it != sceneCommBreakMap.end(); ++it)
+    for (it = sceneCommBreakMap.begin(); it != sceneCommBreakMap.end(); ++it)
+    {
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
-                .arg(it.key()).arg(*it));
+            .arg(it.key()).arg(*it));
+    }
 }
 
 
