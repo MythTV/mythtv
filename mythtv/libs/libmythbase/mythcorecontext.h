@@ -155,8 +155,6 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
   private:
     MythCoreContextPrivate *d;
 
-    bool has_ipv6;
-
     void connected(MythSocket *sock)         { (void)sock; }
     void connectionFailed(MythSocket *sock)  { (void)sock; }
     void connectionClosed(MythSocket *sock);

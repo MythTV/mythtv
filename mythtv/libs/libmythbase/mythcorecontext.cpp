@@ -65,6 +65,7 @@ class MythCoreContextPrivate : public QObject
     bool           m_WOLInProgress;
 
     bool m_backend;
+    bool m_hasIPv6;
 
     MythDB *m_database;
 
@@ -88,6 +89,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_serverSock(NULL), m_eventSock(NULL),
       m_WOLInProgress(false),
       m_backend(false),
+      m_hasIPv6(false),
       m_database(GetMythDB()),
       m_UIThread(QThread::currentThread()),
       m_locale(NULL),
@@ -197,8 +199,6 @@ bool MythCoreContext::Init(void)
                 "set to 'C'.  Please consider correcting this.");
 #endif
 
-    has_ipv6 = false;
-
     // If any of the IPs on any interfaces look like IPv6 addresses, assume IPv6
     // is available
     QNetworkInterface qtinterface;
@@ -206,9 +206,11 @@ bool MythCoreContext::Init(void)
     for (int i = 0; i < IpList.size(); i++)
     {
         if (IpList.at(i).toString().contains(":"))
-            has_ipv6 = true;
-    };
-
+        {
+            d->m_hasIPv6 = true;
+            break;
+        }
+    }
 
     return true;
 }
@@ -587,12 +589,8 @@ bool MythCoreContext::IsFrontendOnly(void)
 
 QHostAddress MythCoreContext::MythHostAddressAny(void)
 {
-
-    if (has_ipv6)
-        return QHostAddress(QHostAddress::AnyIPv6);
-    else
-        return QHostAddress(QHostAddress::Any);
-
+    return QHostAddress(
+        (d->m_hasIPv6) ? QHostAddress::AnyIPv6 : QHostAddress::Any);
 }
 
 QString MythCoreContext::GenMythURL(QString host, QString port, QString path, QString storageGroup)
