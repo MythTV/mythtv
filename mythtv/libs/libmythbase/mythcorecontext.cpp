@@ -188,6 +188,15 @@ bool MythCoreContext::Init(void)
         return false;
     }
 
+#ifndef _WIN32
+    char *lang = getenv("LANG");
+    if (!strcmp(lang, "C") || (strlen(lang) == 0))
+        LOG(VB_GENERAL, LOG_WARNING,
+                "This application expects to be running a UTF locale, and "
+                "many features may behave improperly with your current LANG "
+                "set to 'C'.  Please consider correcting this.");
+#endif
+
     has_ipv6 = false;
 
     // If any of the IPs on any interfaces look like IPv6 addresses, assume IPv6
