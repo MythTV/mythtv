@@ -270,6 +270,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       frame_decoded(0),             decoded_video_frame(NULL),
       avfRingBuffer(NULL),          sws_ctx(NULL),
       directrendering(false),
+      no_dts_hack(false),           dorewind(false),
       gopset(false),                seen_gop(false),
       seq_count(0),
       prevgoppos(0),                gotvideo(false),
@@ -308,6 +309,9 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 {
     memset(&params, 0, sizeof(AVFormatParameters));
     memset(&readcontext, 0, sizeof(readcontext));
+    memset(ccX08_in_pmt, 0, sizeof(ccX08_in_pmt));
+    memset(ccX08_in_tracks, 0, sizeof(ccX08_in_tracks));
+
     // using preallocated AVFormatContext for our own ByteIOContext
     params.prealloced_context = 1;
     audioSamples = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
@@ -325,8 +329,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 
     if (gCoreContext->GetNumSetting("CCBackground", 0))
         CC708Window::forceWhiteOnBlackText = true;
-
-    no_dts_hack = false;
 
     int x = gCoreContext->GetNumSetting("CommFlagFast", 0);
     LOG(VB_COMMFLAG, LOG_INFO, LOC + QString("CommFlagFast: %1").arg(x));

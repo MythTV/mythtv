@@ -156,11 +156,13 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
     subtitleType    = other.subtitleType;
     audioProps      = other.audioProps;
     videoProps      = other.videoProps;
+    stars           = other.stars;
     categoryType    = other.categoryType;
     seriesId        = other.seriesId;
     programId       = other.programId;
     previouslyshown = other.previouslyshown;
     ratings         = other.ratings;
+    listingsource   = other.listingsource;
 
     Squeeze();
 

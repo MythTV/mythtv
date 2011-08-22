@@ -76,9 +76,9 @@ class MTV_PUBLIC PixmapChannel : public DBChannel
 {
   public:
     PixmapChannel(const PixmapChannel &other) :
-        DBChannel(other) { }
+        DBChannel(other), m_localIcon() { }
     PixmapChannel(const DBChannel &other) :
-        DBChannel(other) { }
+        DBChannel(other), m_localIcon() { }
 
     bool CacheChannelIcon(void);
 

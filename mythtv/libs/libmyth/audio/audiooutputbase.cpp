@@ -68,6 +68,10 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     set_initial_vol(settings.set_initial_vol),
     buffer_output_data_for_use(false),
 
+    configured_channels(0),
+    max_channels(0),
+    src_quality(QUALITY_MEDIUM),
+
     // private
     output_settingsraw(NULL),   output_settings(NULL),
     output_settingsdigitalraw(NULL),   output_settingsdigital(NULL),
@@ -106,9 +110,6 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memset(&src_data,          0, sizeof(SRC_DATA));
     memset(src_in,             0, sizeof(float) * kAudioSRCInputSize);
     memset(audiobuffer,        0, sizeof(char)  * kAudioRingBufferSize);
-
-    // Default SRC quality - QUALITY_HIGH is quite expensive
-    src_quality  = QUALITY_MEDIUM;
 
     // Handle override of SRC quality settings
     if (gCoreContext->GetNumSetting("SRCQualityOverride", false))
