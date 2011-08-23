@@ -195,8 +195,8 @@ GenericTree* PlaylistContainer::writeTree(GenericTree *tree_to_write_to)
         = sub_node->addNode(QObject::tr("Active Play Queue"), 0);
     subsub_node->setAttribute(0, 0);
     subsub_node->setAttribute(1, 0);
-    subsub_node->setAttribute(2, rand());
-    subsub_node->setAttribute(3, rand());
+    subsub_node->setAttribute(2, random());
+    subsub_node->setAttribute(3, random());
 
     active_playlist->writeTree(subsub_node, 0);
 
@@ -215,8 +215,8 @@ GenericTree* PlaylistContainer::writeTree(GenericTree *tree_to_write_to)
         GenericTree *cd_node = sub_node->addNode(a_string, 0);
         cd_node->setAttribute(0, 0);
         cd_node->setAttribute(1, a_counter);
-        cd_node->setAttribute(2, rand());
-        cd_node->setAttribute(3, rand());
+        cd_node->setAttribute(2, random());
+        cd_node->setAttribute(3, random());
     }
 */
 
@@ -231,8 +231,8 @@ GenericTree* PlaylistContainer::writeTree(GenericTree *tree_to_write_to)
         GenericTree *new_node = sub_node->addNode((*it)->getName(), (*it)->getID());
         new_node->setAttribute(0, 0);
         new_node->setAttribute(1, a_counter);
-        new_node->setAttribute(2, rand());
-        new_node->setAttribute(3, rand());
+        new_node->setAttribute(2, random());
+        new_node->setAttribute(3, random());
         (*it)->writeTree(new_node, 0);
     }
 

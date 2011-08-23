@@ -180,7 +180,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     if (!visual_modes.count())
         visual_modes.push_front("Blank");
 
-    current_visual = random_visualizer ? rand() % visual_modes.count() : 0;
+    current_visual = random_visualizer ? random() % visual_modes.count() : 0;
 
     QString visual_delay = gCoreContext->GetSetting("VisualModeDelay");
     bool delayOK;
@@ -1457,7 +1457,7 @@ void PlaybackBoxMusic::CycleVisualizer()
 
             //Find a visual thats not like the previous visual
             do
-                next_visualizer = rand() % visual_modes.count();
+                next_visualizer = random() % visual_modes.count();
             while (next_visualizer == current_visual);
             current_visual = next_visualizer;
         }

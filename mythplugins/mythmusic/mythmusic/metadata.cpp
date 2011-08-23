@@ -1452,7 +1452,7 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
         GenericTree *subsub_node = sub_node->addNode(title_temp, (*it)->ID(), true);
         subsub_node->setAttribute(0, 1);
         subsub_node->setAttribute(1, track_counter);    // regular order
-        subsub_node->setAttribute(2, rand());           // random order
+        subsub_node->setAttribute(2, random());           // random order
 
         //
         //  "Intelligent" ordering
@@ -1487,7 +1487,7 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
             m_RatingWeight * ratingValue +
             m_PlayCountWeight * playcountValue +
             m_LastPlayWeight * lastplayValue +
-            m_RandomWeight * (double)rand() / (RAND_MAX + 1.0);
+            m_RandomWeight * (double)random() / (RAND_MAX + 1.0);
 
         int integer_rating = (int) (4000001 - rating_value * 10000);
         subsub_node->setAttribute(3, integer_rating);   //  "intelligent" order

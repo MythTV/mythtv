@@ -853,8 +853,6 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     m_d->m_videoList->setCurrentVideoFilter(VideoFilterSettings(true,
                     lname));
 
-    srand(time(NULL));
-
     StorageGroup::ClearGroupToUseCache();
 }
 
@@ -3111,7 +3109,7 @@ void VideoDialog::playVideoWithTrailers()
     while (trailers.size() && i < trailersToPlay)
     {
         ++i;
-        QString trailer = trailers.takeAt(rand() % trailers.size());
+        QString trailer = trailers.takeAt(random() % trailers.size());
 
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("Random trailer to play will be: %1").arg(trailer));

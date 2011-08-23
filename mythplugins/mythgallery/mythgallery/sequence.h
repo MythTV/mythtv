@@ -158,7 +158,7 @@ public:
 protected:
     virtual int create(void)
     { 
-        return (int)(((double)rand()) * len / RAND_MAX); 
+        return (int)(((double)random()) * len / RAND_MAX); 
     };
 };
 
@@ -207,7 +207,7 @@ protected:
     { 
         while(1)
         { 
-            int i = (int)(((double)rand()) * len / RAND_MAX); 
+            int i = (int)(((double)random()) * len / RAND_MAX); 
             if( !MAP(map,i) )
             { 
                 MAP_SET(map,i); 

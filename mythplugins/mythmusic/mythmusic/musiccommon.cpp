@@ -652,7 +652,7 @@ void MusicCommon::cycleVisualizer(void)
 
             //Find a visual thats not like the previous visual
             do
-                next_visualizer = rand() % m_visualModes.count();
+                next_visualizer = random() % m_visualModes.count();
             while (next_visualizer == m_currentVisual);
             m_currentVisual = next_visualizer;
         }

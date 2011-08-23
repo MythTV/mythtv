@@ -165,7 +165,6 @@ int main(int argc, char *argv[])
     QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap;
-    srand(time(NULL));
     int AudioTrackNo = -1;
 
     int found_starttime = 0;

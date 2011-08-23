@@ -64,7 +64,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_focusOrder = 0;
     m_Painter = NULL;
 
-    m_BorderColor = QColor(rand() % 255, rand()  % 255, rand()  % 255);
+    m_BorderColor = QColor(random() % 255, random()  % 255, random()  % 255);
 }
 
 MythUIType::~MythUIType()

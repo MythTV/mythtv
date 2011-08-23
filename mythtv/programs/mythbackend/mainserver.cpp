@@ -1874,7 +1874,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     // sleep a little to let frontends reload the recordings list
     // after deleting a recording, then we can hammer the DB and filesystem
     sleep(3);
-    usleep(rand()%2000);
+    usleep(random()%2000);
 
     deletelock.lock();
 
@@ -1882,7 +1882,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                               .arg(ds->m_chanid)
                               .arg(ds->m_recstartts.toString());
 
-    QString name = QString("deleteThread%1%2").arg(getpid()).arg(rand());
+    QString name = QString("deleteThread%1%2").arg(getpid()).arg(random());
     QFile checkFile(ds->m_filename);
 
     if (!MSqlQuery::testDBConnection())
@@ -5319,7 +5319,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (token.toLower() == "do_not_care")
     {
         token = QString("%1:%2")
-            .arg(pginfo.MakeUniqueKey()).arg(rand());
+            .arg(pginfo.MakeUniqueKey()).arg(random());
     }
     if (it != slist.end())
         (time_fmt_sec = ((*it).toLower() == "s")), ++it;

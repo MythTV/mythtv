@@ -365,8 +365,9 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             {
                 int nLimit = GetInt(args.GetAt(0), engine);
                 MHParameter *pResInt = args.GetAt(1);
-                srand((unsigned)time(NULL));
-                engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(rand() % nLimit + 1);
+                int r = random() % nLimit + 1;
+                engine->FindObject(
+                    *(pResInt->GetReference()))->SetVariableValue(r);
                 SetSuccessFlag(success, true, engine);
             }
             else

@@ -811,7 +811,7 @@ void GLSingleView::EffectRotate(void)
     }
 
     if (m_effect_current_frame == 0)
-        m_effect_rotate_direction = (int)((2.0*rand()/(RAND_MAX+1.0)));
+        m_effect_rotate_direction = (int)((2.0*random()/(RAND_MAX+1.0)));
 
     float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
@@ -841,7 +841,7 @@ void GLSingleView::EffectBend(void)
     }
 
     if (m_effect_current_frame == 0)
-        m_effect_rotate_direction = (int)((2.0f*rand()/(RAND_MAX+1.0f)));
+        m_effect_rotate_direction = (int)((2.0f*random()/(RAND_MAX+1.0f)));
 
     float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
@@ -891,7 +891,7 @@ void GLSingleView::EffectInOut(void)
 
     if (m_effect_current_frame == 0)
     {
-        m_effect_rotate_direction = 1 + (int)((4.0f*rand()/(RAND_MAX+1.0f)));
+        m_effect_rotate_direction = 1 + (int)((4.0f*random()/(RAND_MAX+1.0f)));
     }
 
     int  texnum  = m_texCur;
@@ -930,7 +930,7 @@ void GLSingleView::EffectSlide(void)
     }
 
     if (m_effect_current_frame == 0)
-        m_effect_rotate_direction = 1 + (int)((4.0f * rand() / (RAND_MAX + 1.0f)));
+        m_effect_rotate_direction = 1 + (int)((4.0f * random() / (RAND_MAX + 1.0f)));
 
     m_texItem[m_texCur].MakeQuad();
 
@@ -1312,9 +1312,10 @@ void GLSingleView::EffectKenBurns(void)
                 UpdateLCD(m_effect_kenBurns_item);
 
                 //choose the location and projection (zoom in or out) randomly
-                FindRandXY(m_effect_kenBurns_location_x[m_texCur], m_effect_kenBurns_location_y[m_texCur]);
-                m_effect_kenBurns_projection[m_texCur] = 1 + (int)((2.0f * rand() / (RAND_MAX + 1.0f)));
-
+                FindRandXY(m_effect_kenBurns_location_x[m_texCur],
+                           m_effect_kenBurns_location_y[m_texCur]);
+                m_effect_kenBurns_projection[m_texCur] =
+                    1 + (int)((2.0f * random() / (RAND_MAX + 1.0f))); 
             }
             else  //No item, must be 1 of the first two preloaded items
             {
@@ -1510,11 +1511,13 @@ float GLSingleView::FindMaxScale(float x_loc, float y_loc)
 
 void GLSingleView::FindRandXY(float &x_loc, float &y_loc)
 {
-    x_loc = (0.5 * rand() / (RAND_MAX + 1.0f)) + 0.25;  //Random number between .25 and .75
-    if ((int)(2.0 * rand() / (RAND_MAX + 1.0f)) == 0)
+    // Random number between .25 and .75
+    x_loc = (0.5 * random() / (RAND_MAX + 1.0f)) + 0.25;
+    if ((int)(2.0 * random() / (RAND_MAX + 1.0f)) == 0)
         x_loc = -1 * x_loc;
-    y_loc = (0.5 * rand() / (RAND_MAX + 1.0f)) + 0.25;  //Random number between .25 and .75
-    if ((int)(2.0 * rand() / (RAND_MAX + 1.0f)) == 0)
+    // Random number between .25 and .75
+    y_loc = (0.5 * random() / (RAND_MAX + 1.0f)) + 0.25;
+    if ((int)(2.0 * random() / (RAND_MAX + 1.0f)) == 0)
         y_loc = -1 * y_loc;
 }
 

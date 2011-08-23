@@ -1123,12 +1123,11 @@ bool MythUIImage::ParseElement(
             imageDir.setNameFilters(imageTypes);
 
             QStringList imageList = imageDir.entryList();
-            srand(time(NULL));
             QString randFile;
 
             if (imageList.size())
                 randFile = QString("%1%2").arg(m_Filename)
-                           .arg(imageList.takeAt(rand() % imageList.size()));
+                           .arg(imageList.takeAt(random() % imageList.size()));
 
             m_OrigFilename = m_Filename = randFile;
         }

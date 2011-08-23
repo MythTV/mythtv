@@ -469,7 +469,7 @@ QString PlaybackBoxHelper::GetPreviewImage(
         return QString();
 
     QString token = QString("%1:%2")
-        .arg(pginfo.MakeUniqueKey()).arg(rand());
+        .arg(pginfo.MakeUniqueKey()).arg(random());
 
     QStringList extra(token);
     extra.push_back(check_availability?"1":"0");

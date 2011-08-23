@@ -249,7 +249,7 @@ void SSDP::PerformSearch(const QString &sST, uint timeout_secs)
         LOG(VB_GENERAL, LOG_INFO,
             "SSDP::PerformSearch - did not write entire buffer.");
 
-    usleep( rand() % 250000 );
+    usleep( random() % 250000 );
 
     if ( pSocket->writeBlock( sRequest.data(),
                               sRequest.size(), address, SSDP_PORT ) != nSize)
@@ -496,7 +496,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     nMX = (nMX > 120) ? 120 : nMX;
 
-    int nNewMX = (int)(0 + ((unsigned short)rand() % nMX)) * 1000;
+    int nNewMX = (int)(0 + ((unsigned short)random() % nMX)) * 1000;
 
     // ----------------------------------------------------------------------
     // See what they are looking for...

@@ -133,7 +133,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
 
         pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress,
                              m_nPeerPort );
-        usleep( rand() % 250000 );
+        usleep( random() % 250000 );
         pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress,
                              m_nPeerPort );
     }

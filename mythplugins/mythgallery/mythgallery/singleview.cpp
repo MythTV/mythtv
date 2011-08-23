@@ -868,7 +868,7 @@ void SingleView::EffectSweep(void)
 {
     if (m_effect_current_frame == 0)
     {
-        m_effect_subtype = rand() % 4;
+        m_effect_subtype = random() % 4;
         m_effect_delta0 = QPoint(
             (kSweepLeftToRight == m_effect_subtype) ? 16 : -16,
             (kSweepTopToBottom == m_effect_subtype) ? 16 : -16);
@@ -1076,7 +1076,7 @@ void SingleView::EffectMeltdown(void)
             continue;
 
         done = false;
-        if ((rand() & 0xF) < 6)
+        if ((random() & 0xF) < 6)
             continue;
 
         p.drawPixmap(QPoint(x, y), *m_effect_pixmap,
@@ -1107,7 +1107,7 @@ void SingleView::EffectIncomingEdges(void)
         m_effect_delta2_x = m_effect_delta1.x() * 0.01f;
         m_effect_delta2_y = m_effect_delta1.y() * 0.01f;
         m_effect_i = 0;
-        m_effect_subtype = rand() & 1;
+        m_effect_subtype = random() & 1;
     }
 
     m_effect_bounds.moveTopLeft(QPoint((int)(m_effect_delta2_x * m_effect_i),
@@ -1183,7 +1183,7 @@ void SingleView::EffectMultiCircleOut(void)
 
         m_effect_delta2_y = sqrtf(sq(m_effect_bounds.width())  * 1.0f +
                            sq(m_effect_bounds.height()) * 0.5f);
-        m_effect_i = (rand() & 0xf) + 2;
+        m_effect_i = (random() & 0xf) + 2;
         m_effect_multi_circle_out_delta_alpha = M_PI * 2 / m_effect_i;
         m_effect_alpha = m_effect_multi_circle_out_delta_alpha;
         m_effect_framerate = 10 * m_effect_i;
@@ -1360,10 +1360,10 @@ void SingleView::EffectBlobs(void)
         return;
     }
 
-    m_effect_bounds.setTopLeft(QPoint(rand() % m_effect_bounds.width(),
-                               rand() % m_effect_bounds.height()));
+    m_effect_bounds.setTopLeft(QPoint(random() % m_effect_bounds.width(),
+                               random() % m_effect_bounds.height()));
 
-    r = (rand() % 200) + 50;
+    r = (random() % 200) + 50;
 
     m_effect_painter->drawEllipse(m_effect_bounds.x() - r,
                            m_effect_bounds.y() - r, r, r);
@@ -1377,7 +1377,7 @@ void SingleView::EffectNoise(void)
 {
     int x, y, i, w, h, fact, sz;
 
-    fact = (rand() % 3) + 1;
+    fact = (random() % 3) + 1;
 
     w = width() >> fact;
     h = height() >> fact;
@@ -1386,8 +1386,8 @@ void SingleView::EffectNoise(void)
     QPainter p(this);
     for (i = (w * h) << 1; i > 0; i--)
     {
-        x = (rand() % w) << fact;
-        y = (rand() % h) << fact;
+        x = (random() % w) << fact;
+        y = (random() % h) << fact;
         p.drawPixmap(QPoint(x, y), *m_effect_pixmap, QRect(x, y, sz, sz));
     }
     p.end();

@@ -1005,7 +1005,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                     ++a_counter;
                     added_node->setAttribute(0, 1);
                     added_node->setAttribute(1, a_counter); //  regular order
-                    added_node->setAttribute(2, rand()); //  random order
+                    added_node->setAttribute(2, random()); //  random order
 
                     //
                     //  Compute "intelligent" weighting
@@ -1032,7 +1032,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                     double rating_value =  (RatingWeight * ratingValue +
                                             PlayCountWeight * playcountValue +
                                             LastPlayWeight * lastplayValue +
-                                            RandomWeight * (double)rand() /
+                                            RandomWeight * (double)random() /
                                             (RAND_MAX + 1.0));
                     uint32_t integer_rating = (int) (4000001 -
                                                      rating_value * 10000);
@@ -1107,8 +1107,8 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                 ++a_counter;
                 added_node->setAttribute(0, 1);
                 added_node->setAttribute(1, a_counter); //  regular order
-                added_node->setAttribute(2, rand()); //  random order
-                added_node->setAttribute(3, rand()); //  "intelligent" order
+                added_node->setAttribute(2, random()); //  random order
+                added_node->setAttribute(3, random()); //  "intelligent" order
             }
         }
     }
