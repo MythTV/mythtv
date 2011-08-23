@@ -3699,13 +3699,8 @@ void UIKeyboardType::insertChar(QString c)
         }
         else
         {
-#ifdef QT3_SUPPORT
-            QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, 0, 0, c, false,
-                                           c.length());
-#else // if !QT3_SUPPORT
             QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier,
                                            c, false, c.length());
-#endif //!QT3_SUPPORT
             QCoreApplication::postEvent(m_parentEdit, key);
         }
     }
@@ -3732,16 +3727,10 @@ void UIKeyboardType::insertChar(QString c)
                     }
                     else
                     {
-#ifdef QT3_SUPPORT
-                        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, 0,
-                                                       0, comps[i][2], false,
-                                                       comps[i][2].length());
-#else // if !QT3_SUPPORT
                         QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0,
                                                        Qt::NoModifier,
                                                        comps[i][2], false,
                                                        comps[i][2].length());
-#endif // !QT3_SUPPORT
                         QCoreApplication::postEvent(m_parentEdit, key);
                     }
 
