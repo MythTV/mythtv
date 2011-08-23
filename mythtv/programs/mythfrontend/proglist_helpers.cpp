@@ -309,7 +309,7 @@ PowerSearchPopup::PowerSearchPopup(MythScreenStack *parentStack,
     : MythScreenType(parentStack, "phrasepopup"),
       m_parent(parent), m_searchType(searchType), m_list(list),
       m_currentValue(currentValue),
-      m_titleText(NULL), m_phraseList(NULL),
+      m_titleText(NULL), m_phraseList(NULL), m_phraseEdit(NULL),
       m_editButton(NULL), m_deleteButton(NULL), m_recordButton(NULL)
 {
 }
@@ -508,7 +508,10 @@ void PowerSearchPopup::recordClicked(void)
 EditPowerSearchPopup::EditPowerSearchPopup(MythScreenStack *parentStack,
                                            ProgLister *parent,
                                            const QString &currentValue)
-    : MythScreenType(parentStack, "phrasepopup")
+    : MythScreenType(parentStack, "phrasepopup"),
+        m_titleEdit(NULL), m_subtitleEdit(NULL), m_descEdit(NULL),
+        m_categoryList(NULL), m_genreList(NULL), m_channelList(NULL),
+        m_okButton(NULL)
 {
     m_parent = parent;
 

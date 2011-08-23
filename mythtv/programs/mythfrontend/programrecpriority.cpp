@@ -38,6 +38,7 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
     RecordingInfo(),
     recTypeRecPriority(0), recType(kNotRecording),
     matchCount(0),         recCount(0),
+    last_record(QDateTime()),
     avg_delay(0),          autoRecPriority(0),
     profile("")
 {

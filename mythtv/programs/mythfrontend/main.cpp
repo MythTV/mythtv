@@ -904,11 +904,6 @@ static void TVMenuCallback(void *data, QString &selection)
         QStringList strlist( QString("REFRESH_BACKEND") );
         gCoreContext->SendReceiveStringList(strlist);
     }
-    else if (sel == "settings audiogeneral")
-    {
-        AudioGeneralSettings audiosettings;
-        audiosettings.exec();
-    }
     else if (sel == "settings playback")
     {
         PlaybackSettings settings;
