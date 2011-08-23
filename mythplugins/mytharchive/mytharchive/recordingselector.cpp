@@ -49,12 +49,22 @@ class GetRecordingListThread : public MThread
     RecordingSelector *m_parent;
 };
 
-RecordingSelector::RecordingSelector(MythScreenStack *parent,
-                                     QList<ArchiveItem *> *archiveList)
-                  : MythScreenType(parent, "RecordingSelector")
+RecordingSelector::RecordingSelector(
+    MythScreenStack *parent, QList<ArchiveItem *> *archiveList) :
+    MythScreenType(parent, "RecordingSelector"),
+    m_archiveList(archiveList),
+    m_recordingList(NULL),
+    m_recordingButtonList(NULL),
+    m_okButton(NULL),
+    m_cancelButton(NULL),
+    m_categorySelector(NULL),
+    m_titleText(NULL),
+    m_datetimeText(NULL),
+    m_filesizeText(NULL),
+    m_descriptionText(NULL),
+    m_previewImage(NULL),
+    m_cutlistImage(NULL)
 {
-    m_archiveList = archiveList;
-    m_recordingList = NULL;
 }
 
 RecordingSelector::~RecordingSelector(void)
@@ -63,8 +73,7 @@ RecordingSelector::~RecordingSelector(void)
         delete m_recordingList;
 
     while (!m_selectedList.isEmpty())
-         delete m_selectedList.takeFirst();
-    m_selectedList.clear();
+        delete m_selectedList.takeFirst();
 }
 
 bool RecordingSelector::Create(void)
