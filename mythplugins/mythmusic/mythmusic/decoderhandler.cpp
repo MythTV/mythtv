@@ -328,7 +328,7 @@ bool DecoderHandler::next(void)
 
     if (m_meta && m_meta->Format() == "cast")
     {
-        m_playlist_pos = rand () % m_playlist.size ();
+        m_playlist_pos = random() % m_playlist.size();
     }
     else
     {
