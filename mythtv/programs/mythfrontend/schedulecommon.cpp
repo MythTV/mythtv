@@ -322,9 +322,12 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
     {
         vector<ProgramInfo *> *confList = RemoteGetConflictList(&recinfo);
 
-        if (confList->size())
-            message += tr(" The following programs will be recorded "
-            "instead:\n");
+        if (!confList->empty())
+        {
+            message += " ";
+            message += tr("The following programs will be recorded instead:");
+            message += "\n";
+        }
 
         uint maxi = 0;
         for (; confList->begin() != confList->end() && maxi < 4; maxi++)
