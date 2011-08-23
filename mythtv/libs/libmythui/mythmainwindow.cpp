@@ -899,7 +899,7 @@ void MythMainWindow::Init(void)
     }
 
     // Workaround Qt/Windows playback bug?
-#ifdef WIN32
+#ifdef _WIN32
     flags |= Qt::MSWindowsOwnDC;
 #endif
 
@@ -1684,7 +1684,7 @@ void MythMainWindow::BindJump(const QString &destination, const QString &key)
     /* make sure the jump point exists */
     if (d->destinationMap.find(destination) == d->destinationMap.end())
     {
-       LOG(VB_GENERAL, LOG_ERR, 
+       LOG(VB_GENERAL, LOG_ERR,
            "Cannot bind to ficticious jump point" + destination);
        return;
     }

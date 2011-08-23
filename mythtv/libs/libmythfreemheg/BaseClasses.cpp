@@ -536,7 +536,7 @@ void MHGenericOctetString::GetValue(MHOctetString &str, MHEngine *engine) const
         {
             // Implicit conversion of int to string.
             char buff[30]; // 30 chars is more than enough.
-#ifdef WIN32
+#ifdef _WIN32
             _snprintf(buff, sizeof(buff), "%0d", result.m_nIntVal);
 #else
             snprintf(buff, sizeof(buff), "%0d", result.m_nIntVal);

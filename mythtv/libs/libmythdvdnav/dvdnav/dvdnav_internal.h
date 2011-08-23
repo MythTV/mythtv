@@ -25,7 +25,7 @@
 #include "config.h"
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 
 /* pthread_mutex_* wrapper for win32 */
 #include <windows.h>
