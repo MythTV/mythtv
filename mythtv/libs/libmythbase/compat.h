@@ -119,19 +119,15 @@ typedef unsigned int uint;
 #endif
 
 #if defined(__cplusplus) && defined(USING_MINGW)
-#include <QMutex>
-inline int posix_rand_r(unsigned int &seed)
+#define _CRT_RAND_S
+#include <stdlib.h>
+#undef RAND_MAX
+#define RAND_MAX 2147483647
+static inline long int random(void)
 {
-    seed = seed * 1103515245 + 12345;
-    return static_cast<int>(static_cast<unsigned int>(seed/65536) % 32768);
-}
-inline long int random(void)
-{
-    static QMutex lock;
-    QMutexLocker locker(&lock);
-    static unsigned int seed = GetTickCount();
-    return (posix_rand_r(seed) << 40) ^ (posix_rand_r(seed) << 20) ^
-        (posix_rand_r(seed) << 10) ^ (posix_rand_r(seed) >> 5);
+    unsigned int tmp;
+    (void) rand_s(&tmp);
+    return tmp & 0xfffffff;
 }
 #endif // USING_MINGW
 
