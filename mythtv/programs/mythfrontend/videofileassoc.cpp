@@ -309,7 +309,7 @@ class FileAssocDialogPrivate
                             p->m_file_assoc));
         }
 
-        if (!m_fileAssociations.size())
+        if (m_fileAssociations.empty())
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("%1: Couldn't get any filetypes from your database.")
@@ -475,7 +475,7 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
     FileAssocDialogPrivate::UIReadyList_type tmp_list =
             m_private->GetUIReadyList();
 
-    if (!tmp_list.size())
+    if (tmp_list.empty())
     {
         m_extensionList->SetVisible(false);
         m_commandEdit->SetVisible(false);

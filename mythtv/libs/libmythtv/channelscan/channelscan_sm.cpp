@@ -307,10 +307,10 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
 
     vector<uint> multiplexes = SourceUtil::GetMplexIDs(sourceid);
 
-    if (!multiplexes.size())
+    if (multiplexes.empty())
     {
         LOG(VB_CHANSCAN, LOG_ERR, LOC + "Unable to find any transports for " +
-                QString("sourceid %1").arg(sourceid));
+            QString("sourceid %1").arg(sourceid));
 
         return false;
     }
@@ -622,7 +622,7 @@ DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
             return type;
     }
 
-    if (tts.size() > 0)
+    if (!tts.empty())
         return tts[0];
 
     return type;
@@ -738,7 +738,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         if (!wait_until_complete || sd->HasCachedAllPAT(tsid))
         {
             currentInfo->pats[tsid] = sd->GetCachedPATs(tsid);
-            if (currentInfo->pmts.size())
+            if (!currentInfo->pmts.empty())
             {
                 sd->ReturnCachedPMTTables(currentInfo->pmts);
                 currentInfo->pmts.clear();

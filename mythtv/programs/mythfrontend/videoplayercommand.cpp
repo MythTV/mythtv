@@ -329,7 +329,7 @@ class VideoPlayerCommandPrivate
 
     QString GetCommandDisplayName() const
     {
-        if (m_player_procs.size())
+        if (!m_player_procs.empty())
             return m_player_procs.front()->GetCommandDisplayName();
         return QString();
     }

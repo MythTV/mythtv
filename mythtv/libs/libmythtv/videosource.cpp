@@ -2608,7 +2608,7 @@ void InputGroup::Load(void)
     LOG(VB_GENERAL, LOG_DEBUG, QString("Group index: %1").arg(index));
 #endif
 
-    if (names.size())
+    if (!names.empty())
         setValue(index);
 }
 
@@ -3348,7 +3348,7 @@ DialogCode CardInputEditor::exec(void)
         if (!listbox)
             return kDialogCodeRejected;
 
-        if (cardinputs.size() == 0)
+        if (cardinputs.empty())
             return kDialogCodeRejected;
 
         int val = listbox->getValue().toInt();

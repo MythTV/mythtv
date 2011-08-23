@@ -818,7 +818,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
 
         QMutexLocker locker(&win.lock);
         vector<CC708String*> list = win.GetStrings();
-        if (list.size())
+        if (!list.empty())
             Display708Strings(win, i, video_aspect, list);
         for (uint j = 0; j < list.size(); j++)
             delete list[j];

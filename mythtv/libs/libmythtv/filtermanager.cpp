@@ -372,7 +372,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 
     nbufsize = -1;
 
-    if (!FiltInfoChain.size())
+    if (FiltInfoChain.empty())
     {
         delete FiltChain;
         FiltChain = NULL;

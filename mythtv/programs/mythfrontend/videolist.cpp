@@ -854,7 +854,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             } 
         } 
 
-        if (groups.size() == 0) 
+        if (groups.empty())
         { 
             meta_dir_node *group_node = gtnm["Unknown"]; 
 

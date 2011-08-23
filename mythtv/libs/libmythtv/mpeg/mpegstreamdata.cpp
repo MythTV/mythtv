@@ -477,7 +477,7 @@ static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
                     vct[i]->Descriptors(j), vct[i]->DescriptorsLength(j),
                     DescriptorID::caption_service);
 
-                if (ldesc.size())
+                if (!ldesc.empty())
                     desc.insert(desc.end(), ldesc.begin(), ldesc.end());
             }
         }
@@ -489,7 +489,7 @@ static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
                 vct[i]->GlobalDescriptorsLength(),
                 DescriptorID::caption_service);
 
-            if (vdesc.size())
+            if (!vdesc.empty())
                 desc.insert(desc.end(), vdesc.begin(), vdesc.end());
         }
     }
@@ -535,7 +535,7 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
             desc_list_t vdesc = extract_atsc_desc(
                 tvct, cvct, pmt.ProgramNumber());
 
-            if (vdesc.size())
+            if (!vdesc.empty())
                 gdesc.insert(gdesc.end(), vdesc.begin(), vdesc.end());
         }
     }
