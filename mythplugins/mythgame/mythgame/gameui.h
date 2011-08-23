@@ -71,7 +71,6 @@ class GameUI : public MythScreenType
   private:
     bool m_showHashed;
     int m_gameShowFileName;
-    QTimer *timer;
 
     MythGenericTree  *m_gameTree;
     MythGenericTree  *m_favouriteNode;
