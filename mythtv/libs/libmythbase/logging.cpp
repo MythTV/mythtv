@@ -74,10 +74,6 @@ LoggerThread           *logThread = NULL;
 bool                    logThreadFinished = false;
 bool                    debugRegistration = false;
 
-#ifdef _WIN32
-QMutex                  localtimeMutex;
-#endif
-
 typedef struct {
     bool    propagate;
     int     quiet;
@@ -917,11 +913,9 @@ void LogTimeStamp( struct tm *tm, uint32_t *usec )
 #ifndef _WIN32
     localtime_r(&epoch, tm);
 #else
-    {
-        QMutexLocker timeLock(&localtimeMutex);
-        struct tm *tmp = localtime(&epoch);
-        memcpy(tm, tmp, sizeof(struct tm));
-    }
+    // this is safe, windows uses a thread local variable for localtime().
+    struct tm *win_tmp = localtime(&epoch);
+    memcpy(tm, win_tmp, sizeof(struct tm));
 #endif
 }
 
