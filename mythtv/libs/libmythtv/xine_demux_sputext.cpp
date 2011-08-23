@@ -1179,7 +1179,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
       first[demuxstr->num-1].end = first[demuxstr->num-1].start + timeout;
     }
 
-#ifdef DEBUX_XINE_DEMUX_SPUTEXT
+#ifdef DEBUG_XINE_DEMUX_SPUTEXT
   {
     char buffer[1024];
 
