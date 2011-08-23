@@ -127,258 +127,262 @@ typedef struct RecPriorityInfo
     int cnt;
 } RecPriorityInfo;
 
-class titleSort
+class TitleSort
 {
-    public:
-        titleSort(bool m_reverseSort = false) {m_reverse = m_reverseSort;}
+  public:
+    TitleSort(bool reverse) : m_reverse(reverse) {}
 
-        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
+    bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b) const
+    {
+        if (a.prog->sortTitle != b.prog->sortTitle)
         {
-            if (a.prog->sortTitle != b.prog->sortTitle)
-            {
-                if (m_reverse)
-                    return (a.prog->sortTitle < b.prog->sortTitle);
-                else
-                    return (a.prog->sortTitle > b.prog->sortTitle);
-            }
-
-            int finalA = a.prog->GetRecordingPriority() +
-                a.prog->recTypeRecPriority;
-            int finalB = b.prog->GetRecordingPriority() +
-                b.prog->recTypeRecPriority;
-            if (finalA != finalB)
-            {
-                if (m_reverse)
-                    return finalA > finalB;
-                else
-                    return finalA < finalB;
-            }
-
-            int typeA = RecTypePriority(a.prog->recType);
-            int typeB = RecTypePriority(b.prog->recType);
-            if (typeA != typeB)
-            {
-                if (m_reverse)
-                    return typeA < typeB;
-                else
-                    return typeA > typeB;
-            }
-
             if (m_reverse)
-                return (a.prog->GetRecordingRuleID() <
-                        b.prog->GetRecordingRuleID());
+                return (a.prog->sortTitle < b.prog->sortTitle);
             else
-                return (a.prog->GetRecordingRuleID() >
-                        b.prog->GetRecordingRuleID());
+                return (a.prog->sortTitle > b.prog->sortTitle);
         }
 
-    private:
-        bool m_reverse;
-};
-
-class programRecPrioritySort
-{
-    public:
-        programRecPrioritySort(bool m_reverseSort = false)
-                               {m_reverse = m_reverseSort;}
-
-        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
+        int finalA = a.prog->GetRecordingPriority() +
+            a.prog->recTypeRecPriority;
+        int finalB = b.prog->GetRecordingPriority() +
+            b.prog->recTypeRecPriority;
+        if (finalA != finalB)
         {
-            int finalA = (a.prog->GetRecordingPriority() +
-                          a.prog->autoRecPriority +
-                          a.prog->recTypeRecPriority);
-            int finalB = (b.prog->GetRecordingPriority() +
-                          b.prog->autoRecPriority +
-                          b.prog->recTypeRecPriority);
-            if (finalA != finalB)
-            {
-                if (m_reverse)
-                    return finalA > finalB;
-                else
-                    return finalA < finalB;
-            }
-
-            int typeA = RecTypePriority(a.prog->recType);
-            int typeB = RecTypePriority(b.prog->recType);
-            if (typeA != typeB)
-            {
-                if (m_reverse)
-                    return typeA < typeB;
-                else
-                    return typeA > typeB;
-            }
-
             if (m_reverse)
-                return (a.prog->GetRecordingRuleID() <
-                        b.prog->GetRecordingRuleID());
+                return finalA > finalB;
             else
-                return (a.prog->GetRecordingRuleID() >
-                        b.prog->GetRecordingRuleID());
+                return finalA < finalB;
         }
 
-    private:
-        bool m_reverse;
-};
+        int typeA = RecTypePriority(a.prog->recType);
+        int typeB = RecTypePriority(b.prog->recType);
 
-class programRecTypeSort
-{
-    public:
-        programRecTypeSort(bool m_reverseSort = false)
-                               {m_reverse = m_reverseSort;}
-
-        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
+        if (typeA != typeB)
         {
-            int typeA = RecTypePriority(a.prog->recType);
-            int typeB = RecTypePriority(b.prog->recType);
-            if (typeA != typeB)
-            {
-                if (m_reverse)
-                    return (typeA < typeB);
-                else
-                    return (typeA > typeB);
-            }
-
-            int finalA = (a.prog->GetRecordingPriority() +
-                          a.prog->recTypeRecPriority);
-            int finalB = (b.prog->GetRecordingPriority() +
-                          b.prog->recTypeRecPriority);
-            if (finalA != finalB)
-            {
-                if (m_reverse)
-                    return finalA > finalB;
-                else
-                    return finalA < finalB;
-            }
-
             if (m_reverse)
-                return (a.prog->GetRecordingRuleID() <
-                        b.prog->GetRecordingRuleID());
+                return typeA < typeB;
             else
-                return (a.prog->GetRecordingRuleID() >
-                        b.prog->GetRecordingRuleID());
+                return typeA > typeB;
         }
 
-    private:
-        bool m_reverse;
+        if (m_reverse)
+            return (a.prog->GetRecordingRuleID() <
+                    b.prog->GetRecordingRuleID());
+        else
+            return (a.prog->GetRecordingRuleID() >
+                    b.prog->GetRecordingRuleID());
+    }
+
+  private:
+    bool m_reverse;
 };
 
-class programCountSort
+class ProgramRecPrioritySort
 {
-    public:
-        programCountSort(bool m_reverseSort = false) {m_reverse = m_reverseSort;}
+  public:
+    ProgramRecPrioritySort(bool reverse) : m_reverse(reverse) {}
 
-        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
+    bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b) const
+    {
+        int finalA = (a.prog->GetRecordingPriority() +
+                      a.prog->autoRecPriority +
+                      a.prog->recTypeRecPriority);
+        int finalB = (b.prog->GetRecordingPriority() +
+                      b.prog->autoRecPriority +
+                      b.prog->recTypeRecPriority);
+
+        if (finalA != finalB)
         {
-            int countA = a.prog->matchCount;
-            int countB = b.prog->matchCount;
-            int recCountA = a.prog->recCount;
-            int recCountB = b.prog->recCount;
-
-            if (countA != countB)
-            {
-                if (m_reverse)
-                    return countA > countB;
-                else
-                    return countA < countB;
-            }
-            if (recCountA != recCountB)
-            {
-                if (m_reverse)
-                    return recCountA > recCountB;
-                else
-                    return recCountA < recCountB;
-            }
-            return (a.prog->sortTitle > b.prog->sortTitle);
+            if (m_reverse)
+                return finalA > finalB;
+            else
+                return finalA < finalB;
         }
 
-    private:
-        bool m_reverse;
+        int typeA = RecTypePriority(a.prog->recType);
+        int typeB = RecTypePriority(b.prog->recType);
+
+        if (typeA != typeB)
+        {
+            if (m_reverse)
+                return typeA < typeB;
+            else
+                return typeA > typeB;
+        }
+
+        if (m_reverse)
+            return (a.prog->GetRecordingRuleID() <
+                    b.prog->GetRecordingRuleID());
+        else
+            return (a.prog->GetRecordingRuleID() >
+                    b.prog->GetRecordingRuleID());
+    }
+
+  private:
+    bool m_reverse;
 };
 
-class programRecCountSort
+class ProgramRecTypeSort
 {
-    public:
-        programRecCountSort(bool m_reverseSort=false)
+  public:
+    ProgramRecTypeSort(bool reverse) : m_reverse(reverse) {}
+
+    bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b) const
+    {
+        int typeA = RecTypePriority(a.prog->recType);
+        int typeB = RecTypePriority(b.prog->recType);
+
+        if (typeA != typeB)
         {
-            m_reverse = m_reverseSort;
+            if (m_reverse)
+                return (typeA < typeB);
+            else
+                return (typeA > typeB);
         }
 
-        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
-        {
-            int countA = a.prog->matchCount;
-            int countB = b.prog->matchCount;
-            int recCountA = a.prog->recCount;
-            int recCountB = b.prog->recCount;
+        int finalA = (a.prog->GetRecordingPriority() +
+                      a.prog->recTypeRecPriority);
+        int finalB = (b.prog->GetRecordingPriority() +
+                      b.prog->recTypeRecPriority);
 
-            if (recCountA != recCountB)
-            {
-                if (m_reverse)
-                    return recCountA > recCountB;
-                else
-                    return recCountA < recCountB;
-            }
-            if (countA != countB)
-            {
-                if (m_reverse)
-                    return countA > countB;
-                else
-                    return countA < countB;
-            }
-            return (a.prog->sortTitle > b.prog->sortTitle);
+        if (finalA != finalB)
+        {
+            if (m_reverse)
+                return finalA > finalB;
+            else
+                return finalA < finalB;
         }
 
-    private:
-        bool m_reverse;
+        if (m_reverse)
+            return (a.prog->GetRecordingRuleID() <
+                    b.prog->GetRecordingRuleID());
+        else
+            return (a.prog->GetRecordingRuleID() >
+                    b.prog->GetRecordingRuleID());
+    }
+
+  private:
+    bool m_reverse;
 };
 
-class programLastRecordSort
+class ProgramCountSort
 {
-    public:
-        programLastRecordSort(bool m_reverseSort=false)
-            {m_reverse = m_reverseSort;}
+  public:
+    ProgramCountSort(bool reverse) : m_reverse(reverse) {}
 
-        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
+    bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b) const
+    {
+        int countA = a.prog->matchCount;
+        int countB = b.prog->matchCount;
+        int recCountA = a.prog->recCount;
+        int recCountB = b.prog->recCount;
+
+        if (countA != countB)
         {
-            QDateTime lastRecA = a.prog->last_record;
-            QDateTime lastRecB = b.prog->last_record;
-
-            if (lastRecA != lastRecB)
-            {
-                if (m_reverse)
-                    return lastRecA > lastRecB;
-                else
-                    return lastRecA < lastRecB;
-            }
-            return (a.prog->sortTitle > b.prog->sortTitle);
+            if (m_reverse)
+                return countA > countB;
+            else
+                return countA < countB;
         }
 
-    private:
-        bool m_reverse;
+        if (recCountA != recCountB)
+        {
+            if (m_reverse)
+                return recCountA > recCountB;
+            else
+                return recCountA < recCountB;
+        }
+
+        return (a.prog->sortTitle > b.prog->sortTitle);
+    }
+
+  private:
+    bool m_reverse;
 };
 
-class programAvgDelaySort
+class ProgramRecCountSort
 {
-    public:
-        programAvgDelaySort(bool m_reverseSort=false)
-            {m_reverse = m_reverseSort;}
+  public:
+    ProgramRecCountSort(bool reverse) : m_reverse(reverse) {}
 
-        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
+    bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b) const
+    {
+        int countA = a.prog->matchCount;
+        int countB = b.prog->matchCount;
+        int recCountA = a.prog->recCount;
+        int recCountB = b.prog->recCount;
+
+        if (recCountA != recCountB)
         {
-            int avgA = a.prog->avg_delay;
-            int avgB = b.prog->avg_delay;
-
-            if (avgA != avgB)
-            {
-                if (m_reverse)
-                    return avgA < avgB;
-                else
-                    return avgA > avgB;
-            }
-            return (a.prog->sortTitle > b.prog->sortTitle);
+            if (m_reverse)
+                return recCountA > recCountB;
+            else
+                return recCountA < recCountB;
         }
 
-    private:
-        bool m_reverse;
+        if (countA != countB)
+        {
+            if (m_reverse)
+                return countA > countB;
+            else
+                return countA < countB;
+        }
+
+        return (a.prog->sortTitle > b.prog->sortTitle);
+    }
+
+  private:
+    bool m_reverse;
+};
+
+class ProgramLastRecordSort
+{
+  public:
+    ProgramLastRecordSort(bool reverse) : m_reverse(reverse) {}
+
+    bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b) const
+    {
+        QDateTime lastRecA = a.prog->last_record;
+        QDateTime lastRecB = b.prog->last_record;
+
+        if (lastRecA != lastRecB)
+        {
+            if (m_reverse)
+                return lastRecA > lastRecB;
+            else
+                return lastRecA < lastRecB;
+        }
+
+        return (a.prog->sortTitle > b.prog->sortTitle);
+    }
+
+  private:
+    bool m_reverse;
+};
+
+class ProgramAvgDelaySort
+{
+  public:
+    ProgramAvgDelaySort(bool reverse) : m_reverse(reverse) {}
+
+    bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b) const
+    {
+        int avgA = a.prog->avg_delay;
+        int avgB = b.prog->avg_delay;
+
+        if (avgA != avgB)
+        {
+            if (m_reverse)
+                return avgA < avgB;
+            else
+                return avgA > avgB;
+        }
+
+        return (a.prog->sortTitle > b.prog->sortTitle);
+    }
+
+  private:
+    bool m_reverse;
 };
 
 ////////////////////////////////////////////////////////
@@ -1333,63 +1337,36 @@ void ProgramRecPriority::SortList()
     }
 
     // sort sortingList
-    switch(m_sortType)
+    switch (m_sortType)
     {
         case byTitle :
-                 if (m_reverseSort)
-                     sort(sortingList.begin(), sortingList.end(),
-                          titleSort(true));
-                 else
-                     sort(sortingList.begin(), sortingList.end(), titleSort());
-                 break;
+            sort(sortingList.begin(), sortingList.end(),
+                 TitleSort(m_reverseSort));
+            break;
         case byRecPriority :
-                 if (m_reverseSort)
-                     sort(sortingList.begin(), sortingList.end(),
-                          programRecPrioritySort(true));
-                 else
-                     sort(sortingList.begin(), sortingList.end(),
-                          programRecPrioritySort());
-                 break;
+            sort(sortingList.begin(), sortingList.end(),
+                 ProgramRecPrioritySort(m_reverseSort));
+            break;
         case byRecType :
-                 if (m_reverseSort)
-                     sort(sortingList.begin(), sortingList.end(),
-                          programRecTypeSort(true));
-                 else
-                     sort(sortingList.begin(), sortingList.end(),
-                          programRecTypeSort());
-                 break;
+            sort(sortingList.begin(), sortingList.end(),
+                 ProgramRecTypeSort(m_reverseSort));
+            break;
         case byCount :
-                 if (m_reverseSort)
-                     sort(sortingList.begin(), sortingList.end(),
-                          programCountSort(true));
-                 else
-                     sort(sortingList.begin(), sortingList.end(),
-                          programCountSort());
-                 break;
+            sort(sortingList.begin(), sortingList.end(),
+                 ProgramCountSort(m_reverseSort));
+            break;
         case byRecCount :
-                 if (m_reverseSort)
-                     sort(sortingList.begin(), sortingList.end(),
-                          programRecCountSort(true));
-                 else
-                     sort(sortingList.begin(), sortingList.end(),
-                          programRecCountSort());
-                 break;
+            sort(sortingList.begin(), sortingList.end(),
+                 ProgramRecCountSort(m_reverseSort));
+            break;
         case byLastRecord :
-                 if (m_reverseSort)
-                     sort(sortingList.begin(), sortingList.end(),
-                          programLastRecordSort(true));
-                 else
-                     sort(sortingList.begin(), sortingList.end(),
-                          programLastRecordSort());
-                 break;
+            sort(sortingList.begin(), sortingList.end(),
+                 ProgramLastRecordSort(m_reverseSort));
+            break;
         case byAvgDelay :
-                 if (m_reverseSort)
-                     sort(sortingList.begin(), sortingList.end(),
-                          programAvgDelaySort(true));
-                 else
-                     sort(sortingList.begin(), sortingList.end(),
-                          programAvgDelaySort());
-                 break;
+            sort(sortingList.begin(), sortingList.end(),
+                 ProgramAvgDelaySort(m_reverseSort));
+            break;
     }
 
     m_sortedProgram.clear();
