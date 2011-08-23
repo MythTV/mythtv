@@ -48,10 +48,11 @@ bool PlaylistContainer::checkCDTrack(int track)
     return it != cd_playlist.end();
 }
 
-PlaylistContainer::PlaylistContainer(AllMusic *all_music, const QString &host_name) :
+PlaylistContainer::PlaylistContainer(
+    AllMusic *all_music, const QString &host_name) :
     active_playlist(NULL),      backup_playlist(NULL),
     all_other_playlists(NULL),  all_available_music(all_music),
-    active_widget(NULL),
+    active_widget(NULL),        pending_writeback_index(-1),
 
     playlists_loader(new PlaylistLoadingThread(this, all_music)),
     done_loading(false),        my_host(host_name),

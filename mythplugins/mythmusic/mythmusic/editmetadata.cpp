@@ -39,8 +39,8 @@ Metadata *EditMetadataCommon::m_sourceMetadata = NULL;
 
 EditMetadataCommon::EditMetadataCommon(MythScreenStack *parent,
                                        Metadata *source_metadata,
-                                       const QString &name)
-                  : MythScreenType(parent, name)
+                                       const QString &name) :
+    MythScreenType(parent, name), m_doneButton(NULL)
 {
     // make a copy so we can abandon changes
     m_metadata = new Metadata(*source_metadata);
@@ -50,8 +50,8 @@ EditMetadataCommon::EditMetadataCommon(MythScreenStack *parent,
 }
 
 EditMetadataCommon::EditMetadataCommon(MythScreenStack *parent,
-                                       const QString &name)
-                  : MythScreenType(parent, name)
+                                       const QString &name) :
+    MythScreenType(parent, name), m_doneButton(NULL)
 {
 }
 

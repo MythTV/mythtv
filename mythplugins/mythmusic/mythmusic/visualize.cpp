@@ -509,9 +509,9 @@ static class BlankFactory : public VisFactory
     }
 }BlankFactory;
 
-Squares::Squares()
+Squares::Squares() :
+    size(0,0), pParent(NULL), fake_height(0), number_of_squares(16)
 {
-    number_of_squares = 16;
     fake_height = number_of_squares * analyzerBarWidth;
 }
 

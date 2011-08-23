@@ -252,12 +252,14 @@ void DecoderIOFactoryUrl::doClose(void)
 
 /**********************************************************************/
 
-DecoderHandler::DecoderHandler(void)
-    : m_state(STOPPED),
-      m_io_factory(NULL),
-      m_decoder(NULL),
-      m_op(false),
-      m_redirects(0)
+DecoderHandler::DecoderHandler(void) :
+    m_state(STOPPED),
+    m_playlist_pos(0),
+    m_io_factory(NULL),
+    m_decoder(NULL),
+    m_meta(NULL),
+    m_op(false),
+    m_redirects(0)
 {
 }
 

@@ -30,28 +30,37 @@ using namespace std;
 #include "mainvisual.h"
 #include "synaesthesia.h"
 
-Synaesthesia::Synaesthesia(long int winid)
+Synaesthesia::Synaesthesia(long int winid) :
+    size(0,0),
+
+    maxStarRadius(1),
+    fadeMode(Stars),
+    pointsAreDiamonds(true),
+    brightnessTwiddler(0.3),
+    starSize(0.5),
+
+    outWidth(0),
+    outHeight(0),
+
+    outputImage(NULL),
+
+    fgRedSlider(0.0),  fgGreenSlider(0.5),
+    bgRedSlider(0.75), bgGreenSlider(0.4),
+
+    energy_avg(80.0)
+#ifdef SDL_SUPPORT
+    , surface(NULL)
+#endif
 {
     (void) winid;
 
     fps = 29;
-    fadeMode = Stars;
-    pointsAreDiamonds = true;
-    energy_avg = 80.0;
 
-    coreInit();
-    starSize = 0.5;
-    setStarSize(starSize);
-    brightnessTwiddler = 0.3;
-    outputImage = NULL;
-    fgRedSlider = 0.0;
-    fgGreenSlider = 0.5;
-    bgRedSlider = 0.75;
-    bgGreenSlider = 0.4;
+    coreInit();            // init cosTable, negSinTable, bitReverse
+    setStarSize(starSize); // init scaleDown, maxStarRadius
+    setupPalette();        // init palette
 
 #ifdef SDL_SUPPORT
-    surface = NULL;
-
     char SDL_windowhack[32];
     sprintf(SDL_windowhack, "%ld", winid);
     setenv("SDL_WINDOWID", SDL_windowhack, 1);
@@ -64,8 +73,6 @@ Synaesthesia::Synaesthesia(long int winid)
 
     SDL_ShowCursor(0);
 #endif
-
-    setupPalette();
 }
 
 Synaesthesia::~Synaesthesia()

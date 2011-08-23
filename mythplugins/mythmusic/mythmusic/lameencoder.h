@@ -55,7 +55,6 @@ class LameEncoder : public Encoder
     int init_encoder(lame_global_flags *gf, int quality, bool vbr);
     void init_id3tags(lame_global_flags *gf);
 
-    int quality;
     int bits;
     int channels;
     int samplerate;

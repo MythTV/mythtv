@@ -942,28 +942,29 @@ void MetadataLoadingThread::run()
     RunEpilog();
 }
 
-AllMusic::AllMusic(QString path_assignment, QString a_startdir)
+AllMusic::AllMusic(QString path_assignment, QString a_startdir) :
+    m_root_node(NULL),
+
+    m_numPcs(0),
+    m_numLoaded(0),
+    m_cd_title(QObject::tr("CD -- none")),
+    m_startdir(a_startdir),
+    m_metadata_loader(NULL),
+    m_done_loading(false),
+    m_last_listed(-1),
+
+    m_playcountMin(0),
+    m_playcountMax(0),
+    m_lastplayMin(0.0),
+    m_lastplayMax(0.0)
 {
-    m_startdir = a_startdir;
-    m_done_loading = false;
-    m_numPcs = m_numLoaded = 0;
-
-    m_cd_title = QObject::tr("CD -- none");
-
     //  How should we sort?
     setSorting(path_assignment);
 
     m_root_node = new MusicNode(QObject::tr("All My Music"), m_paths);
 
-    //
-    //  Start a thread to do data
-    //  loading and sorting
-    //
-
-    m_metadata_loader = NULL;
+    //  Start a thread to do data loading and sorting
     startLoading();
-
-    m_last_listed = -1;
 }
 
 AllMusic::~AllMusic()

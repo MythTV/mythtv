@@ -187,7 +187,7 @@ class CfgReader
 
 /****************************************************************************/
 
-PlayListFile::PlayListFile(void)
+PlayListFile::PlayListFile(void) : m_version(0)
 {
 }
 

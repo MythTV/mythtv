@@ -317,13 +317,16 @@ void Playlist::moveTrackUpDown(bool flag, Track *the_track)
     changed = true; //  This playlist is now different than Database
 }
 
-Playlist::Playlist(AllMusic *all_music_ptr)
+Playlist::Playlist(AllMusic *all_music_ptr) :
+    playlistid(0),
+    name(QObject::tr("oops")),
+    all_available_music(all_music_ptr),
+    parent(NULL),
+    changed(false),
+    progress(NULL),
+    proc(NULL),
+    procExitVal(0)
 {
-    //  fallback values
-    playlistid = 0;
-    name = QObject::tr("oops");
-    all_available_music = all_music_ptr;
-    changed = false;
 }
 
 void Playlist::putYourselfOnTheListView(UIListGenericTree *a_listviewitem)

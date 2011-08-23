@@ -10,7 +10,6 @@
 #include <vector>
 using namespace std;
 
-#include "polygon.h"
 #include "constants.h"
 
 #include <QResizeEvent>

@@ -34,11 +34,6 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     Decoder(d, i, o),
     inited(false),   user_stop(false),
     devicename(""),
-#if CONFIG_DARWIN
-    m_diskID(0),     m_firstTrack(0),
-    m_lastTrack(0),  m_leadout(0),
-    m_lengthInSecs(0.0)
-#endif
     stat(0),         output_buf(NULL),
     output_at(0),    bks(0),
     bksFrames(0),    decodeBytes(0),
@@ -47,9 +42,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     chan(0),
     totalTime(0.0),  seekTime(-1.0),
     settracknum(-1), tracknum(0),
-#if defined(__linux__) || defined(__FreeBSD__)
     device(NULL),    paranoia(NULL),
-#endif
     start(0),        end(0),
     curpos(0)
 {
@@ -182,9 +175,8 @@ void CdDecoder::deinit()
     setOutput(0);
 }
 
-static void paranoia_cb(long inpos, int function)
+static void paranoia_cb(long /*inpos*/, int /*function*/)
 {
-    inpos = inpos; function = function;
 }
 
 void CdDecoder::run()

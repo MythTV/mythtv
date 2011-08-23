@@ -77,19 +77,42 @@ void FileScannerThread::run()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent)
-                :MythScreenType(parent, "musicimportfiles")
-{
-    m_popupMenu = NULL;
-    m_playingMetaData = NULL;
-    
-    m_defaultCompilation = false;
-    m_defaultYear = 0;
-    m_defaultRating = 0;
-    m_haveDefaults = false;
+ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent) :
+    MythScreenType(parent, "musicimportfiles"),
 
-    m_somethingWasImported = false;
-    m_tracks = new vector<TrackInfo*>;
+    m_somethingWasImported(false),
+    m_tracks(new vector<TrackInfo*>),
+    m_currentTrack(0),
+    m_playingMetaData(NULL),
+    // GUI stuff
+    m_locationEdit(NULL),
+    m_locationButton(NULL),
+    m_scanButton(NULL),
+    m_coverartButton(NULL),
+    m_filenameText(NULL),
+    m_compartistText(NULL),
+    m_artistText(NULL),
+    m_albumText(NULL),
+    m_titleText(NULL),
+    m_genreText(NULL),
+    m_yearText(NULL),
+    m_trackText(NULL),
+    m_nextButton(NULL),
+    m_prevButton(NULL),
+    m_currentText(NULL),
+    m_statusText(NULL),
+    m_playButton(NULL),
+    m_addButton(NULL),
+    m_addallnewButton(NULL),
+    m_nextnewButton(NULL),
+    m_compilationCheck(NULL),
+    m_popupMenu(NULL),
+    // default metadata values
+    m_defaultCompilation(false),
+    m_defaultYear(0),
+    m_defaultRating(0),
+    m_haveDefaults(false)
+{
 }
 
 ImportMusicDialog::~ImportMusicDialog()
@@ -808,11 +831,23 @@ void ImportMusicDialog::customEvent(QEvent *event)
 
 ImportCoverArtDialog::ImportCoverArtDialog(MythScreenStack *parent,
                                            const QString &sourceDir,
-                                           Metadata *metadata)
-    :MythScreenType(parent, "import_coverart")
+                                           Metadata *metadata) :
+    MythScreenType(parent, "import_coverart"),
+    m_sourceDir(sourceDir),
+    m_metadata(metadata),
+    m_currentFile(0),
+    //  GUI stuff
+    m_filenameText(NULL),
+    m_currentText(NULL),
+    m_statusText(NULL),
+    m_destinationText(NULL),
+    m_coverartImage(NULL),
+    m_typeList(NULL),
+    m_nextButton(NULL),
+    m_prevButton(NULL),
+    m_copyButton(NULL),
+    m_exitButton(NULL)
 {
-    m_sourceDir = sourceDir;
-    m_metadata = metadata;
 }
 
 ImportCoverArtDialog::~ImportCoverArtDialog()
