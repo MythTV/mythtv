@@ -245,6 +245,21 @@ inline const char *dlerror(void)
 #define setuid(x)
 #endif // USING_MINGW
 
+#if defined(USING_MINGW)
+static inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
+{
+    // this is safe on windows, where gmtime uses a thread local variable.
+    // using _gmtime_s() would be better, but needs to be tested on windows.
+    struct tm *tmp = gmtime(timep);
+    if (tmp)
+    {
+        *result = *tmp;
+        return result;
+    }
+    return NULL;
+}
+#endif 
+
 #ifdef USING_MINGW
 #define    timeradd(a, b, result)                       \
   do {                                                  \
