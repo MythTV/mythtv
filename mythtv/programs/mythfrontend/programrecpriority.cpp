@@ -51,6 +51,7 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(
     recType(other.recType),
     matchCount(other.matchCount),
     recCount(other.recCount),
+    last_record(other.last_record),
     avg_delay(other.avg_delay),
     autoRecPriority(other.autoRecPriority),
     profile(other.profile)
