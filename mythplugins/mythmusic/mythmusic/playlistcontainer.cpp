@@ -414,7 +414,7 @@ QString PlaylistContainer::getPlaylistName(int index, bool &reference)
         }
 
         list<Playlist*>::reverse_iterator it = all_other_playlists->rbegin();
-        for (; it != all_other_playlists->rend(); it++)
+        for (; it != all_other_playlists->rend(); ++it)
         {
             if ((*it)->getID() == index)
                 return (*it)->getName();

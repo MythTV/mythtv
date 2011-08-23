@@ -517,9 +517,9 @@ void Playlist::fillSongsFromSonglist(bool filter)
 
     QStringList list = raw_songlist.split(",", QString::SkipEmptyParts);
     QStringList::iterator it = list.begin();
-    for (; it != list.end(); it++)
+    for (; it != list.end(); ++it)
     {
-        an_int = QString(*it).toInt();
+        an_int = (*it).toInt();
         if (an_int != 0)
         {
             if (filter)
@@ -637,10 +637,10 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
             raw_songlist.clear();
             bool bFound = false;
 
-            for (; it != list.end(); it++)
+            for (; it != list.end(); ++it)
             {
-                int an_int = QString(*it).toInt();
-                raw_songlist += "," + QString(*it);
+                int an_int = (*it).toInt();
+                raw_songlist += "," + *it;
                 if (!bFound && an_int == currentTrackID)
                 {
                     bFound = true;
@@ -799,9 +799,9 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
     int length = 0, songcount = 0, playtime = 0, an_int;
     QStringList list = raw_songlist.split(",", QString::SkipEmptyParts);
     QStringList::iterator it = list.begin();
-    for (; it != list.end(); it++)
+    for (; it != list.end(); ++it)
     {
-        an_int = QString(*it).toInt();
+        an_int = (*it).toInt();
         if (an_int != 0)
         {
             songcount++;
@@ -883,10 +883,10 @@ QString Playlist::removeDuplicateTracks(const QString &new_songlist)
     QStringList::iterator it = newList.begin();
     QString songlist;
 
-    for (; it != newList.end(); it++)
+    for (; it != newList.end(); ++it)
     {
-        if (curList.find(QString(*it)) == curList.end())
-            songlist += "," + QString(*it);
+        if (curList.find(*it) == curList.end())
+            songlist += "," + *it;
     }
     songlist.remove(0, 1);
     return songlist;
@@ -963,7 +963,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
     }
     // populate the sort id into the album map
     uint32_t album_count = 1;
-    for (Ialbum = album_map.begin(); Ialbum != album_map.end(); Ialbum++)
+    for (Ialbum = album_map.begin(); Ialbum != album_map.end(); ++Ialbum)
     {
         Ialbum->second = album_count;
         album_count++;
@@ -971,7 +971,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
 
     // populate the sort id into the artist map
     uint32_t count = 1;
-    for (Iartist = artist_map.begin(); Iartist != artist_map.end(); Iartist++)
+    for (Iartist = artist_map.begin(); Iartist != artist_map.end(); ++Iartist)
     {
         Iartist->second = count;
         count++;

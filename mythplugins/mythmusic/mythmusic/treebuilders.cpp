@@ -129,7 +129,7 @@ void MusicTreeBuilder::makeTree(MusicNode *root, const MetadataPtrList &metas)
         }
     }
 
-    for(BranchMap::iterator it = branches.begin(); it != branches.end(); it++) 
+    for (BranchMap::iterator it = branches.begin(); it != branches.end(); ++it) 
     {
         Branch *branch = *it;
         MusicNode *sub_node = createNode(branch->field);
@@ -288,7 +288,7 @@ class MusicDirectoryTreeBuilder : public MusicTreeBuilder
 
     ~MusicDirectoryTreeBuilder() 
     {
-        for(MetaMap::iterator it = m_map.begin(); it != m_map.end(); it++)
+        for (MetaMap::iterator it = m_map.begin(); it != m_map.end(); ++it)
             delete *it;
     }
 
