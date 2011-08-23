@@ -86,7 +86,8 @@ void FileCopyThread::run()
 
     m_progress = 0;
 
-    for (it = m_parent->m_itemMarked.begin(); it != m_parent->m_itemMarked.end(); it++)
+    for (it = m_parent->m_itemMarked.begin();
+         it != m_parent->m_itemMarked.end(); ++it)
     {
         fi.setFile(*it);
         dest.setFile(QDir(m_parent->m_currDir), fi.fileName());
@@ -629,7 +630,7 @@ bool IconView::HandleMediaEscape(MediaMonitor *mon)
     QDir curdir(m_currDir);
     QList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
     QList<MythMediaDevice*>::iterator it = removables.begin();
-    for (; !handled && (it != removables.end()); it++)
+    for (; !handled && (it != removables.end()); ++it)
     {
         if (!mon->ValidateAndLock(*it))
             continue;
@@ -735,7 +736,10 @@ void IconView::customEvent(QEvent *event)
 {
     if (event->type() == ThumbGenEvent::kEventType)
     {
-        ThumbGenEvent *tge = (ThumbGenEvent *)event;
+        ThumbGenEvent *tge = dynamic_cast<ThumbGenEvent *>(event);
+
+        if (!tge)
+            return;
 
         ThumbData *td = tge->thumbData;
         if (!td)
@@ -769,7 +773,10 @@ void IconView::customEvent(QEvent *event)
     }
     else if (event->type() == ChildCountEvent::kEventType)
     {
-        ChildCountEvent *cce = (ChildCountEvent *)event;
+        ChildCountEvent *cce = dynamic_cast<ChildCountEvent *>(event);
+
+        if (!cce)
+            return;
 
         ChildCountData *ccd = cce->childCountData;
         if (!ccd)
@@ -1206,7 +1213,7 @@ void IconView::HandleShowDevices(void)
         MythMediaType type = MythMediaType(MEDIATYPE_DATA | MEDIATYPE_MGALLERY);
         QList<MythMediaDevice*> removables = mon->GetMedias(type);
         QList<MythMediaDevice*>::Iterator it = removables.begin();
-        for (; it != removables.end(); it++)
+        for (; it != removables.end(); ++it)
         {
             if (mon->ValidateAndLock(*it))
             {
@@ -1274,7 +1281,7 @@ void IconView::DoDeleteMarked(bool doDelete)
         QStringList::iterator it;
         QFileInfo fi;
 
-        for (it = m_itemMarked.begin(); it != m_itemMarked.end(); it++)
+        for (it = m_itemMarked.begin(); it != m_itemMarked.end(); ++it)
         {
             fi.setFile(*it);
 

@@ -1,19 +1,19 @@
 /* ============================================================
  * File  : exifutil.cpp
- * Description : 
- * 
+ * Description :
+ *
 
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published bythe Free Software Foundation;
  * either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * ============================================================ */
 
 // qt
@@ -130,7 +130,6 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
 
     try
     {
-        char *exifvalue = new char[1024];
         ExifData *data = exif_data_new_from_file (filePath);
         if (data)
         {
@@ -165,9 +164,7 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
             LOG(VB_FILE, LOG_ERR, LOC +
                 QString("Could not load exif data from '%1'") .arg(filePath));
         }
-        
-        delete [] exifvalue;
-        
+
 #if 0
         Exiv2::ExifData exifData;
         int rc = exifData.read(filePath);
@@ -236,7 +233,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
     QFileInfoList::const_iterator it = list.begin();
     const QFileInfo *fi;
 
-    if (thumbGen) 
+    if (thumbGen)
     {
         thumbGen->cancel();
         thumbGen->setDirectory(currDir, isGallery);
@@ -266,12 +263,12 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
              !splitFD.filter(fi->fileName(), Qt::CaseInsensitive).isEmpty())
             continue;
 
-        if (fi->isDir() && recurse) 
+        if (fi->isDir() && recurse)
         {
             LoadDirectory(itemList, QDir::cleanPath(fi->absoluteFilePath()),
                           flt, true, itemHash, thumbGen);
         }
-        else 
+        else
         {
             if ((GalleryUtil::IsImage(fi->absoluteFilePath()) &&
                  flt.getTypeFilter() == kTypeFilterMoviesOnly) ||
@@ -302,7 +299,9 @@ QString GalleryUtil::GetCaption(const QString &filePath)
     try
     {
 #ifdef EXIF_SUPPORT
+#if NEW_LIB_EXIF
         char *exifvalue = new char[1024];
+#endif
         ExifData *data = exif_data_new_from_file(
             filePath.toLocal8Bit().constData());
         if (data)
@@ -346,8 +345,9 @@ QString GalleryUtil::GetCaption(const QString &filePath)
            LOG(VB_FILE, LOG_ERR, LOC +
                QString("Could not load exif data from '%1'") .arg(filePath));
         }
-
+#if NEW_LIB_EXIF
         delete [] exifvalue;
+#endif
 #endif // EXIF_SUPPORT
     }
     catch (...)
@@ -611,7 +611,7 @@ bool GalleryUtil::DeleteDirectory(const QFileInfo &dir)
     return FileDelete(dir);
 }
 
-bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName, 
+bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName,
                                 const QString &newName)
 {
     // rename the directory
