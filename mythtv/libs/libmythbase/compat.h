@@ -119,16 +119,9 @@ typedef unsigned int uint;
 #endif
 
 #if defined(__cplusplus) && defined(USING_MINGW)
-#define _CRT_RAND_S
-#include <stdlib.h>
-#undef RAND_MAX
-#define RAND_MAX 2147483647
-static inline long int random(void)
-{
-    unsigned int tmp;
-    (void) rand_s(&tmp);
-    return tmp & 0xfffffff;
-}
+#include <QtGlobal>
+static inline void srandom(unsigned int seed) { qsrand(seed); }
+static inline long int random(void) { return qrand(); }
 #endif // USING_MINGW
 
 #if defined(__cplusplus) && defined(USING_MINGW)
