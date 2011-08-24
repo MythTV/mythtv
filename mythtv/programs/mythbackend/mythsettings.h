@@ -62,7 +62,8 @@ class MythSetting : public MythSettingBase
     MythSetting(QString _value, QString _default_data, SettingType _stype,
                 QString _label, QString _help_text, DataType _dtype) :
         value(_value), data(_default_data), default_data(_default_data),
-        stype(_stype), label(_label), help_text(_help_text), dtype(_dtype)
+        stype(_stype), label(_label), help_text(_help_text), dtype(_dtype),
+        range_min(-1), range_max(-1)
     {
     }
 
@@ -71,7 +72,8 @@ class MythSetting : public MythSettingBase
             QStringList _data_list, QStringList _display_list) :
         value(_value), data(_default_data), default_data(_default_data),
         stype(_stype), label(_label), help_text(_help_text), dtype(_dtype),
-        data_list(_data_list), display_list(_display_list)
+        data_list(_data_list), display_list(_display_list),
+        range_min(-1), range_max(-1)
     {
     }
 

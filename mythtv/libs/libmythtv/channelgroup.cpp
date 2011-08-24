@@ -16,11 +16,6 @@ ChannelGroupItem& ChannelGroupItem::operator=(const ChannelGroupItem &other)
     return *this;
 }
 
-ChannelGroupItem::ChannelGroupItem(const ChannelGroupItem &other)
-{
-    (*this) = other;
-}
-
 inline bool lt_group(const ChannelGroupItem &a, const ChannelGroupItem &b)
 {
     return QString::localeAwareCompare(a.name, b.name) < 0;

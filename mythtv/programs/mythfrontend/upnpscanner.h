@@ -21,7 +21,7 @@ class meta_dir_node;
 class MediaServerItem
 {
   public:
-    MediaServerItem() { }
+    MediaServerItem() : m_scanned(false) { }
     MediaServerItem(QString id, QString parent, QString name, QString url)
       : m_id(id), m_parentid(parent), m_name(name), m_url(url),
         m_scanned(false) { }

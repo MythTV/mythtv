@@ -70,7 +70,14 @@ void MediaServerItem::Reset(void)
 class MediaServer : public MediaServerItem
 {
   public:
-    MediaServer() { }
+    MediaServer()
+     : MediaServerItem(QString("0"), QString(), QString(), QString()),
+       m_URL(), m_connectionAttempts(0), m_controlURL(QUrl()),
+       m_eventSubURL(QUrl()), m_eventSubPath(QString()),
+       m_friendlyName(QString("Unknown")), m_subscribed(false),
+       m_renewalTimerId(0), m_systemUpdateID(-1)
+    {
+    }
     MediaServer(QUrl URL)
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
        m_URL(URL), m_connectionAttempts(0), m_controlURL(QUrl()),

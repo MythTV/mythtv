@@ -40,15 +40,20 @@ class DeleteStruct
     friend class MainServer;
   public:
     DeleteStruct(MainServer *ms, QString filename, QString title,
-             uint chanid, QDateTime recstartts, QDateTime recendts, 
-             bool forceMetadataDelete) : 
-                 m_ms(ms), m_filename(filename), m_title(title), 
-                 m_chanid(chanid), m_recstartts(recstartts), 
-                 m_recendts(recendts),
-                 m_forceMetadataDelete(forceMetadataDelete)  {}
+                 uint chanid, QDateTime recstartts, QDateTime recendts, 
+                 bool forceMetadataDelete) : 
+        m_ms(ms), m_filename(filename), m_title(title), 
+        m_chanid(chanid), m_recstartts(recstartts), 
+        m_recendts(recendts),
+        m_forceMetadataDelete(forceMetadataDelete), m_fd(-1), m_size(0)
+    {
+    }
 
     DeleteStruct(MainServer *ms, QString filename, int fd, off_t size) : 
-             m_ms(ms), m_filename(filename), m_fd(fd), m_size(size)  {}
+        m_ms(ms), m_filename(filename), m_chanid(0),
+        m_forceMetadataDelete(false), m_fd(fd), m_size(size)
+    {
+    }
 
   protected:
     MainServer *m_ms;
