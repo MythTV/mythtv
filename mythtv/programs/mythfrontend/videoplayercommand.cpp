@@ -392,8 +392,11 @@ VideoPlayerCommand::VideoPlayerCommand(const VideoPlayerCommand &other)
 
 VideoPlayerCommand &VideoPlayerCommand::operator=(const VideoPlayerCommand &rhs)
 {
-    delete m_d;
-    m_d = new VideoPlayerCommandPrivate(*rhs.m_d);
+    if (this != &rhs)
+    {
+        delete m_d;
+        m_d = new VideoPlayerCommandPrivate(*rhs.m_d);
+    }
     return *this;
 }
 
