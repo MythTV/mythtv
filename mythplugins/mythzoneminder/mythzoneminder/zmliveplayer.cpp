@@ -118,10 +118,11 @@ bool ZMLivePlayer::hideAll(void)
 bool ZMLivePlayer::initMonitorLayout()
 {
     // if we haven't got any monitors there's not much we can do so bail out!
-    if (m_monitors->size() == 0)
+    if (m_monitors->empty())
     {
         LOG(VB_GENERAL, LOG_ERR, "Cannot find any monitors. Bailing out!");
-        ShowOkPopup(tr("Can't show live view.\nYou don't have any monitors defined!"));
+        ShowOkPopup(tr("Can't show live view.") + "\n" +
+                    tr("You don't have any monitors defined!"));
         return false;
     }
 
