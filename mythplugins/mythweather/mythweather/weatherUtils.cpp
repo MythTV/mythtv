@@ -32,14 +32,14 @@ static QString getScreenTitle(const QString &screenName)
 ScreenListMap loadScreens()
 {
     ScreenListMap screens;
-    QList<QString> searchpath = GetMythUI()->GetThemeSearchPath();
-    
+    QStringList searchpath = GetMythUI()->GetThemeSearchPath();
+
     // Check the theme first if it has its own weather-screens.xml
-    
-    QList<QString>::iterator i;
-    for (i = searchpath.begin(); i != searchpath.end(); i++)
+
+    QStringList::iterator it;
+    for (it = searchpath.begin(); it != searchpath.end(); ++it)
     {
-        QString filename = *i + "weather-screens.xml";
+        QString filename = (*it) + "weather-screens.xml";
         if (doLoadScreens(filename, screens))
         {
             LOG(VB_GENERAL, LOG_INFO,
@@ -50,9 +50,9 @@ ScreenListMap loadScreens()
 
     //  Also load from the default file in case the theme file doesn't
     //  exist or the theme file doesn't define all the screens
-    
+
     QString filename = GetShareDir() + "mythweather/weather-screens.xml";
-    
+
     if (!doLoadScreens(filename, screens))
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -66,7 +66,7 @@ bool doLoadScreens(const QString &filename, ScreenListMap &screens)
 {
     QFile f(filename);
     QDomDocument doc;
-        
+
     if (!f.open(QIODevice::ReadOnly))
     {
         return false;
