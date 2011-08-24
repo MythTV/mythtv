@@ -96,8 +96,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_scheduler(NULL)
 {
     threadRegister("CoreContext");
-    // start our pseudo-random generator in one of 1000 states.
-    srandom(QTime::currentTime().msec());
+    srandom(QDateTime::currentDateTime().toTime_t() ^
+            QTime::currentTime().msec());
 }
 
 MythCoreContextPrivate::~MythCoreContextPrivate()
