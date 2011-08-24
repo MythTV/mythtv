@@ -278,7 +278,7 @@ void ZMServer::processRequest(char* buf, int nbytes)
     vector<string> tokens;
     tokenize(s, tokens);
 
-    if (tokens.size() == 0)
+    if (tokens.empty())
         return;
 
     if (m_debug)
