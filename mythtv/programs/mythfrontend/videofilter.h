@@ -180,8 +180,8 @@ class VideoFilterSettings
     int season;
     int episode;
     QDate insertdate;
-    QRegExp re_season;
-    QRegExp re_date;
+    const QRegExp re_season;
+    const QRegExp re_date;
 
 
     unsigned int m_changed_state;
