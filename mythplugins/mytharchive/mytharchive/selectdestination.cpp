@@ -46,6 +46,10 @@ SelectDestination::SelectDestination(
     m_doBurnText(NULL),
     m_eraseDvdRwText(NULL)
 {
+    m_archiveDestination.type = AD_FILE;
+    m_archiveDestination.name = NULL;
+    m_archiveDestination.description = NULL;
+    m_archiveDestination.freeSpace = 0LL;
 }
 
 SelectDestination::~SelectDestination(void)

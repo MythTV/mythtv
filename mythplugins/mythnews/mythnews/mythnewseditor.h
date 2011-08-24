@@ -23,7 +23,7 @@ class MythNewsEditor : public MythScreenType
 
   public:
     MythNewsEditor(NewsSite *site, bool edit, MythScreenStack *parent,
-                   const QString name = "MythNewsEditor");
+                   const QString &name = "MythNewsEditor");
    ~MythNewsEditor();
 
     bool Create(void);

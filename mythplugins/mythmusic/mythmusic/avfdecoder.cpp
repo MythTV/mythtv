@@ -84,9 +84,9 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     devicename(""),
     m_inputFormat(NULL),        m_inputContext(NULL),
     m_decStream(NULL),          m_codec(NULL),
-    m_audioDec(NULL),           m_buffer(NULL),
-    m_byteIOContext(NULL),      errcode(0),
-    m_samples(NULL)
+    m_audioDec(NULL),           m_inputIsFile(false),
+    m_buffer(NULL),             m_byteIOContext(NULL),
+    errcode(0),                 m_samples(NULL)
 {
     setObjectName("avfDecoder");
     setFilename(file);

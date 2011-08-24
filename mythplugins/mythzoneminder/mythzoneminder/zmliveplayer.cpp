@@ -388,13 +388,10 @@ void ZMLivePlayer::getMonitorList(void)
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-Player::Player()
+Player::Player() :
+    m_frameImage(NULL), m_statusText(NULL), m_cameraText(NULL),
+    m_image(NULL), m_rgba(NULL)
 {
-    m_frameImage = NULL;
-    m_statusText = NULL;
-    m_cameraText = NULL;
-    m_image = NULL;
-    m_rgba = NULL;
 }
 
 Player::~Player()
