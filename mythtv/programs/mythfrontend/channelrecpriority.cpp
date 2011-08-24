@@ -60,9 +60,6 @@ ChannelRecPriority::ChannelRecPriority(MythScreenStack *parent)
     m_sortType = (SortType)gCoreContext->GetNumSetting("ChannelRecPrioritySorting",
                                                  (int)byChannel);
 
-    m_longchannelformat =
-        gCoreContext->GetSetting("m_longchannelformat", "<num> <name>");
-
     m_currentItem = NULL;
 
     gCoreContext->addListener(this);
@@ -83,12 +80,7 @@ bool ChannelRecPriority::Create()
 
     m_channelList = dynamic_cast<MythUIButtonList *> (GetChild("channels"));
 
-    m_chanstringText = dynamic_cast<MythUIText *> (GetChild("chanstring"));
-    m_channameText = dynamic_cast<MythUIText *> (GetChild("channame"));
-    m_channumText = dynamic_cast<MythUIText *> (GetChild("chanstring"));
-    m_callsignText = dynamic_cast<MythUIText *> (GetChild("callsign"));
-    m_sourcenameText = dynamic_cast<MythUIText *> (GetChild("sourcename"));
-    m_sourceidText = dynamic_cast<MythUIText *> (GetChild("sourceid"));
+    m_chanstringText = dynamic_cast<MythUIText *> (GetChild("chanstring")); // Deprecated, use mapped text
     m_priorityText = dynamic_cast<MythUIText *> (GetChild("priority"));
 
     m_iconImage = dynamic_cast<MythUIImage *> (GetChild("icon"));
@@ -320,17 +312,13 @@ void ChannelRecPriority::updateList()
         if (!m_visMap[chanInfo->chanid])
             fontState = "disabled";
 
-        QString stringFormat = item->GetText();
-        if (stringFormat.isEmpty())
-            stringFormat = "<num>  <sign>  \"<name>\"";
-        item->SetText(chanInfo->GetFormatted(stringFormat), fontState);
+        item->SetText(chanInfo->GetFormatted(ChannelInfo::kChannelLong),
+                                             fontState);
 
-        item->SetText(chanInfo->chanstr, "channum", fontState);
-        item->SetText(chanInfo->callsign, "callsign", fontState);
-        item->SetText(chanInfo->channame, "name", fontState);
-        item->SetText(QString().setNum(chanInfo->sourceid), "sourceid",
-                        fontState);
-        item->SetText(chanInfo->sourcename, "sourcename", fontState);
+        InfoMap infomap;
+        chanInfo->ToMap(infomap);
+        item->SetTextFromMap(infomap, fontState);
+
         if (m_visMap[chanInfo->chanid])
             item->DisplayState("normal", "status");
         else
@@ -423,20 +411,12 @@ void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
             m_iconImage->Load();
         }
 
+        InfoMap chanmap;
+        channelItem->ToMap(chanmap);
+        SetTextFromMap(chanmap);
+
         if (m_chanstringText)
-            m_chanstringText->SetText(channelItem->GetFormatted(m_longchannelformat));
-        if (m_callsignText)
-            m_callsignText->SetText(channelItem->callsign);
-        if (m_channumText)
-            m_channumText->SetText(channelItem->chanstr);
-        if (m_channameText)
-            m_channameText->SetText(channelItem->channame);
-        if (m_sourcenameText)
-            m_sourcenameText->SetText(channelItem->sourcename);
-        if (m_sourceidText)
-            m_sourceidText->SetText(QString().setNum(channelItem->sourceid));
-        if (m_priorityText)
-            m_priorityText->SetText(channelItem->recpriority);
+            m_chanstringText->SetText(channelItem->GetFormatted(ChannelInfo::kChannelLong));
     }
 
     MythUIText *norecordingText = dynamic_cast<MythUIText*>

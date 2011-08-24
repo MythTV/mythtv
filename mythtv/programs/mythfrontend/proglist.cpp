@@ -34,7 +34,6 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_startTime(QDateTime::currentDateTime()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-    m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
 
     m_searchType(kNoSearch),
 
@@ -84,7 +83,6 @@ ProgLister::ProgLister(
     m_startTime(QDateTime::currentDateTime()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-    m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
 
     m_searchType(kNoSearch),
 
@@ -787,7 +785,7 @@ void ProgLister::FillViewList(const QString &view)
 
         for (uint i = 0; i < channels.size(); ++i)
         {
-            QString chantext = channels[i].GetFormatted(m_channelFormat);
+            QString chantext = channels[i].GetFormatted(DBChannel::kChannelShort);
 
             m_viewList.push_back(QString::number(channels[i].chanid));
             m_viewTextList.push_back(chantext);
@@ -1360,7 +1358,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         selected = *selectedP;
         selectedP = &selected;
     }
-    int selectedOffset = 
+    int selectedOffset =
         m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
 
     m_progList->Reset();

@@ -33,7 +33,8 @@ class MTV_PUBLIC DBChannel
     bool operator == (uint _chanid) const
         { return chanid == _chanid; }
 
-    QString GetFormatted(const QString &format) const;
+    enum ChannelFormat { kChannelShort, kChannelLong };
+    QString GetFormatted(const ChannelFormat &format) const;
     void ToMap(InfoMap &infoMap) const;
 
   public:
@@ -56,7 +57,8 @@ class MTV_PUBLIC ChannelInfo
 {
  public:
     ChannelInfo() : chanid(-1), sourceid(-1), favid(-1) {}
-    QString GetFormatted(const QString &format) const;
+    enum ChannelFormat { kChannelShort, kChannelLong };
+    QString GetFormatted(const ChannelFormat &format) const;
     void ToMap(InfoMap &infoMap) const;
 
     QString callsign;

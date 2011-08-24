@@ -69,8 +69,6 @@ class ChannelRecPriority : public MythScreenType
 
     SortType m_sortType;
 
-    QString m_longchannelformat;
-
     ChannelInfo *m_currentItem;
 };
 
