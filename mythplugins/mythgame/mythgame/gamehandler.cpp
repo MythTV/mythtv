@@ -719,7 +719,10 @@ void GameHandler::processGames(GameHandler *handler)
         if (busyDialog->Create())
             popupStack->AddScreen(busyDialog, false);
         else
+        {
             delete busyDialog;
+            busyDialog = NULL;
+        }
 
         m_GameMap[handler->SystemCmdLine()] =
                 GameScan(handler->SystemCmdLine(),
