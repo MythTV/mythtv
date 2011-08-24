@@ -328,7 +328,7 @@ void ZMEvents::deletePressed(void)
             delete item;
 
         vector<Event*>::iterator it;
-        for (it = m_eventList->begin(); it != m_eventList->end(); it++)
+        for (it = m_eventList->begin(); it != m_eventList->end(); ++it)
         {
             if (*it == event)
             {

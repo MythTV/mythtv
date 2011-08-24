@@ -399,7 +399,7 @@ void MediaMonitor::CheckDevices(void)
         pDev = *itr;
         if (pDev)
             pDev->checkMedia();
-        itr++;
+        ++itr;
     }
 }
 

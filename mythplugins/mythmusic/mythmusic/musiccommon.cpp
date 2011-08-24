@@ -1321,7 +1321,7 @@ void MusicCommon::updateUIPlaylist(void)
 
     QList<Track*> songlist = playlist->getSongs();
     QList<Track*>::iterator it = songlist.begin();
-    for (; it != songlist.end(); it++)
+    for (; it != songlist.end(); ++it)
     {
         int trackid = (*it)->getValue();
         Metadata *mdata = gMusicData->all_music->getMetadata(trackid);
