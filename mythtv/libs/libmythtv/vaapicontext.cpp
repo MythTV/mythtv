@@ -212,6 +212,7 @@ bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
 
 VAAPIContext::VAAPIContext(MythCodecID codec)
   : m_codec(codec),
+    m_display(NULL),
     m_vaProfile(VAProfileMPEG2Main)/* ?? */,
     m_vaEntrypoint(VAEntrypointEncSlice),
     m_pix_fmt(PIX_FMT_YUV420P), m_numSurfaces(NUM_VAAPI_BUFFERS),

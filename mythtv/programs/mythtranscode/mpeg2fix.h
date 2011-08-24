@@ -42,10 +42,11 @@ enum MPFListType {
 class MPEG2frame
 {
   public:
-    MPEG2frame(int size)
+    MPEG2frame(int size) :
+        pkt_memsize(size), isSequence(false), isGop(false),
+        framePos(NULL), gopPos(NULL)
     {
         pkt.data = (uint8_t *)malloc(size);
-        pkt_memsize = size;
     }
     ~MPEG2frame()
     {
