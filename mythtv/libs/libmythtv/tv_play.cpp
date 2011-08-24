@@ -1491,7 +1491,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
     QMap<QString,AskProgramInfo>::iterator next = it;
     while (it != askAllowPrograms.end())
     {
-        next = it; next++;
+        next = it; ++next;
         if ((*it).expiry <= timeNow)
         {
 #if 0

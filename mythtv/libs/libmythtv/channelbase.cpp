@@ -95,7 +95,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
         DBChanList channels = GetChannels(*it);
 
         DBChanList::const_iterator cit = channels.begin();
-        for (; cit != channels.end(); cit++)
+        for (; cit != channels.end(); ++cit)
         {
             if ((*cit).channum == startchannel &&
                 IsTunable(*it, startchannel))
@@ -108,7 +108,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             }
         }
 
-        it++;
+        ++it;
         it = (it == inputs.end()) ? inputs.begin() : it;
         if (it == start)
             break;
@@ -155,7 +155,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             }
         }
 
-        it++;
+        ++it;
         it = (it == inputs.end()) ? inputs.begin() : it;
         if (it == start)
             break;

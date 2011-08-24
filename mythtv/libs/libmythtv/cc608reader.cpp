@@ -269,7 +269,7 @@ int CC608Reader::Update(unsigned char *inpos)
             if (m_state[streamIdx].m_outputRow > 15)
             {
                 ccp = ccbuf->begin();
-                for (; ccp != ccbuf->end(); ccp++)
+                for (; ccp != ccbuf->end(); ++ccp)
                 {
                     tmpcc = *ccp;
                     tmpcc->y -= (m_state[streamIdx].m_outputRow - 15);
@@ -391,7 +391,7 @@ void CC608Reader::Update608Text(
                 {
                     // scroll up
                     cc->y -= (scroll + ymove);
-                    i++;
+                    ++i;
                 }
                 else
                 {
@@ -401,7 +401,9 @@ void CC608Reader::Update608Text(
                 }
             }
             else
-                i++;
+            {
+                ++i;
+            }
         }
     }
 
@@ -410,15 +412,13 @@ void CC608Reader::Update608Text(
     if (ccbuf)
     {
         // add new text
-        i = ccbuf->begin();
-        while (i < ccbuf->end())
+        for (i = ccbuf->begin(); i != ccbuf->end(); ++i)
         {
             if (*i)
             {
                 visible++;
                 m_state[streamIdx].m_output.buffers.push_back(*i);
             }
-            i++;
         }
     }
     m_state[streamIdx].m_changed = visible;

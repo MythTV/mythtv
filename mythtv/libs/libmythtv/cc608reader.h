@@ -39,7 +39,7 @@ class CC608Buffer
     {
         lock.lock();
         vector<CC608Text*>::iterator i = buffers.begin();
-        for (; i != buffers.end(); i++)
+        for (; i != buffers.end(); ++i)
         {
             CC608Text *cc = (*i);
             if (cc)

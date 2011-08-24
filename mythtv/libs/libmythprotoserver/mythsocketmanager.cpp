@@ -232,12 +232,12 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
                     QString("Attempting to handle annouce with: %1")
                         .arg((*i)->GetHandlerName()));
                 handled = (*i)->HandleAnnounce(sock, tokens, listline);
-                i++;
+                ++i;
             }
 
             if (handled)
             {
-                i--;
+                --i;
                 LOG(VB_SOCKET, LOG_DEBUG, LOC +
                     QString("Socket announce handled by: %1")
                         .arg((*i)->GetHandlerName()));
@@ -297,7 +297,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
         while (!handled && (i != m_handlerMap.constEnd()))
         {
             handled = (*i)->HandleQuery(handler, tokens, listline);
-            i++;
+            ++i;
         }
 
         if (handled)

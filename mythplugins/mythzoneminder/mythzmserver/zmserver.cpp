@@ -1196,7 +1196,8 @@ void ZMServer::handleDeleteEventList(vector<string> tokens)
     string outStr("");
 
     vector<string>::iterator it = tokens.begin();
-    it++;
+    if (it != tokens.end())
+        ++it;
     while (it != tokens.end())
     {
         if (eventList == "")
@@ -1204,7 +1205,7 @@ void ZMServer::handleDeleteEventList(vector<string> tokens)
         else
             eventList += "," + (*it);
 
-       it++;
+        ++it;
     }
 
     if (m_debug)
