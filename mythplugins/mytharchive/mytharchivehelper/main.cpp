@@ -968,7 +968,7 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
         category.setAttribute("intid", query.value(0).toString());
         category.setAttribute("category", query.value(1).toString());
         root.appendChild(category);
-        LOG(VB_JOBQUEUE, LOG_INFO, 
+        LOG(VB_JOBQUEUE, LOG_INFO,
             "Created videocategory element for " + title);
     }
 
@@ -1185,7 +1185,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     }
     else
     {
-        LOG(VB_JOBQUEUE, LOG_ERR, 
+        LOG(VB_JOBQUEUE, LOG_ERR,
             "Failed to get 'Default' storage directory for this host");
         return 1;
     }
@@ -1264,7 +1264,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     nodeList = itemNode.elementsByTagName("recordedmarkup");
     if (nodeList.count() < 1)
     {
-        LOG(VB_JOBQUEUE, LOG_WARNING, 
+        LOG(VB_JOBQUEUE, LOG_WARNING,
             "Couldn't find a 'recordedmarkup' element in XML file");
     }
     else
@@ -1275,7 +1275,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
         nodeList = markupNode.elementsByTagName("mark");
         if (nodeList.count() < 1)
         {
-            LOG(VB_JOBQUEUE, LOG_WARNING, 
+            LOG(VB_JOBQUEUE, LOG_WARNING,
                 "Couldn't find any 'mark' elements in XML file");
         }
         else
@@ -1309,7 +1309,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     nodeList = itemNode.elementsByTagName("recordedseek");
     if (nodeList.count() < 1)
     {
-        LOG(VB_JOBQUEUE, LOG_WARNING, 
+        LOG(VB_JOBQUEUE, LOG_WARNING,
             "Couldn't find a 'recordedseek' element in XML file");
     }
     else
@@ -1492,7 +1492,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
         nodeList = genresNode.elementsByTagName("genre");
         if (nodeList.count() < 1)
         {
-            LOG(VB_JOBQUEUE, LOG_WARNING, 
+            LOG(VB_JOBQUEUE, LOG_WARNING,
                 "Couldn't find any 'genre' elements in XML file");
         }
         else
@@ -1565,7 +1565,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
         nodeList = countriesNode.elementsByTagName("country");
         if (nodeList.count() < 1)
         {
-            LOG(VB_JOBQUEUE, LOG_WARNING, 
+            LOG(VB_JOBQUEUE, LOG_WARNING,
                 "Couldn't find any 'country' elements in XML file");
         }
         else
@@ -2063,11 +2063,11 @@ static long long getCutFrames(const QString &filename, long long lastFrame)
         if (it.value() == MARK_CUT_START)
         {
             start = it.key();
-            it++;
+            ++it;
             if (it != cutlist.end())
             {
                 end = it.key();
-                it++;
+                ++it;
             }
             else
                 end = lastFrame;
@@ -2076,11 +2076,11 @@ static long long getCutFrames(const QString &filename, long long lastFrame)
         {
             start = 0;
             end = it.key();
-            it++;
+            ++it;
         }
         else
         {
-            it++;
+            ++it;
             continue;
         }
 
@@ -2136,7 +2136,7 @@ static long long getFrameCount(const QString &filename, float fps)
         return 0; // no position map in recording
 
     frm_pos_map_t::const_iterator it = posMap.end();
-    it--;
+    --it;
     uint64_t totframes = it.key() * keyframedist;
     return totframes;
 }
@@ -2340,7 +2340,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 stream.setAttribute("channels", st->codec->channels);
 
-                AVMetadataTag *metatag = 
+                AVMetadataTag *metatag =
                     av_metadata_get(st->metadata, "language", NULL, 0);
                 if (metatag)
                     stream.setAttribute("language", metatag->value);
@@ -2378,7 +2378,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 stream.setAttribute("ffmpegindex", ffmpegIndex++);
                 stream.setAttribute("codec", codec.trimmed());
 
-                AVMetadataTag *metatag = 
+                AVMetadataTag *metatag =
                     av_metadata_get(st->metadata, "language", NULL, 0);
                 if (metatag)
                     stream.setAttribute("language", metatag->value);
@@ -2484,7 +2484,7 @@ static int isRemote(QString filename)
 class MPUBLIC MythArchiveHelperCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythArchiveHelperCommandLineParser(); 
+    MythArchiveHelperCommandLineParser();
     void LoadArguments(void);
 };
 
@@ -2514,19 +2514,19 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "When used with --createthumbnail: eg 'thumb%1-%2.jpg'\n"
             "  %1 will be replaced with the no. of the thumb\n"
             "  %2 will be replaced with the frame no.", "");
-    add("--thumblist", "thumblist", "", 
-            "Comma-separated list of required thumbs (in seconds)\n" 
+    add("--thumblist", "thumblist", "",
+            "Comma-separated list of required thumbs (in seconds)\n"
             "Used with: --createthumbnail","");
     add("--framecount", "framecount", 1,
             "Number of frames to grab (default 1)\n"
             "Used with: --createthumbnail", "");
 
     add(QStringList( QStringList() << "-i" << "--getfileinfo" ),
-            "getfileinfo", false, 
+            "getfileinfo", false,
             "Write file info about infile to outfile\n"
             "Requires: --infile, --outfile, --method", "");
-    add("--method", "method", 0, 
-            "Method of file duration calculation\n" 
+    add("--method", "method", 0,
+            "Method of file duration calculation\n"
             "Used with: --getfileinfo\n"
             "  0 = use av_estimate_timings() (quick but not very accurate - "
             "default)\n"
@@ -2548,8 +2548,8 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "importarchive", false,
             "Import an archived file\n"
             "Requires: --infile, --chanid", "");
-    add("--chanid", "chanid", -1, 
-            "Channel ID to use when inserting records in DB\n" 
+    add("--chanid", "chanid", -1,
+            "Channel ID to use when inserting records in DB\n"
             "Used with: --importarchive", "");
 
     add(QStringList( QStringList() << "-r" << "--isremote" ),
@@ -2564,17 +2564,17 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "burndvd", false,
             "Burn a created DVD to a blank disc\n"
             "Optional: --mediatype, --erasedvdrw, --nativeformat", "");
-    add("--mediatype", "mediatype", 0, 
-            "Type of media to burn\n" 
+    add("--mediatype", "mediatype", 0,
+            "Type of media to burn\n"
             "Used with: --burndvd\n"
             "  0 = single layer DVD (default)\n"
             "  1 = dual layer DVD\n"
             "  2 = rewritable DVD", "");
     add("--erasedvdrw", "erasedvdrw", false,
-            "Force an erase of DVD-R/W Media\n" 
+            "Force an erase of DVD-R/W Media\n"
             "Used with: --burndvd (optional)", "");
     add("--nativeformat", "nativeformat", false,
-            "Archive is a native archive format\n" 
+            "Archive is a native archive format\n"
             "Used with: --burndvd (optional)", "");
 
     add(QStringList( QStringList() << "-s" << "--sup2dast" ),
@@ -2584,8 +2584,8 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
     add("--ifofile", "ifofile", "",
             "Filename of ifo file\n"
             "Used with: --sup2dast", "");
-    add("--delay", "delay", 0, 
-            "Delay in ms to add to subtitles (default 0)\n" 
+    add("--delay", "delay", 0,
+            "Delay in ms to add to subtitles (default 0)\n"
             "Used with: --sup2dast", "");
 }
 
@@ -2614,7 +2614,7 @@ int main(int argc, char **argv)
 
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName("mytharchivehelper");
-    
+
     // by default we only output our messages
     int retval;
     QString mask("jobqueue");
