@@ -99,11 +99,7 @@ void MythSystemIOHandler::run(void)
 
         while( run_system )
         {
-            struct timespec ts;
-            ts.tv_sec = 0;
-            ts.tv_nsec = 10 * 1000 * 1000; // 10ms
-            nanosleep(&ts, NULL); // ~100x per second, for ~3MBps throughput
-
+            usleep(10000); // ~100x per second, for ~3MBps throughput
             m_pLock.lock();
             if( m_pMap.isEmpty() )
             {
@@ -253,10 +249,7 @@ void MythSystemManager::run(void)
         if( m_childCount == 0 )
         {
             m_mapLock.unlock();
-            struct timespec ts;
-            ts.tv_sec = 0;
-            ts.tv_nsec = 100 * 1000 * 1000; // 100ms
-            nanosleep(&ts, NULL);
+            usleep( 100000 );
             continue;
         }
 
@@ -429,11 +422,7 @@ void MythSystemSignalManager::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
     while( run_system )
     {
-        struct timespec ts;
-        ts.tv_sec = 0;
-        ts.tv_nsec = 50 * 1000 * 1000; // 50ms
-        nanosleep(&ts, NULL); // sleep 50ms
-
+        usleep(50000); // sleep 50ms
         while( run_system )
         {
             // handle cleanup and signalling for closed processes
