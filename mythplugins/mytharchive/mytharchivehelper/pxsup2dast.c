@@ -1,6 +1,6 @@
 /*
  #
- # $Id$
+ # pxsup2dast.c version YYYY-MM-DD (take from most recent change below).
  #
  # Project X sup to dvdauthor subtitle xml file.
  # too ät iki piste fi
@@ -11,12 +11,19 @@
  # Update: 2005/07/02 Not so picky anymore, but control sequence parsing is
  # not perfect (yet!?)
  #
- # Update: 2008/01/26 PDH - worked around a problem with overlapping subtitles
- # and incorrect end times after a cut point.
- # 
- # This program is released under GNU GPL. Check
+ # Change 2010-08-29: Initial handling of 0x07 control code (from
+ # Simon Liddicott). Currently just ignores contents but doesn't choke on
+ # it anymore...
+ #
+ # Change 2009-08-09: Renamed getline() as getpixelline() (to avoid function
+ # name collision. Fixed GPL version to 2 (only). Thanks Ville Skyttä.
+ #
+ # Change 2009-01-10: Added subtitle indexing change (fix) from patch
+ # sent by Ian Stewart.
+ #
+ # This program is released under GNU GPL version 2. Check
  # http://www.fsf.org/licenses/licenses.html
- # to get your own copy of the GPL license.
+ # to get your own copy of the GPL v2 license.
  #
  */
 
@@ -75,7 +82,7 @@ typedef int_fast32_t fi32;	typedef uint_fast32_t fu32;
 #define cast2signed(t, v) \
   __builtin_choose_expr (__builtin_types_compatible_p \
 			 (typeof (v), unsigned t), /**/ ((t)(v)), (void)0)
-#define cast2unsigned_array(t, v) ( __builtin_choose_expr ( __builtin_types_compatible_p ( __typeof (v), t []), (unsigned t *)(v), (void)0 ) )
+#define cast2unsigned_array(t, v) ( __builtin_choose_expr ( __builtin_types_compatible_p ( typeof (v), t []), (unsigned t *)(v), (void)0 ) )
 #define cast2signed_array(t, v) \
   __builtin_choose_expr (__builtin_types_compatible_p \
 			 (typeof (v), unsigned t []), /**/ ((t *)(v)), (void)0)
@@ -289,7 +296,7 @@ static bool fexists(const char * filename)
     return false; 
 }
 
-static bool dexists(char * filename) 
+static bool dexists(const char * filename)
 {
     struct stat st;
 
@@ -422,7 +429,7 @@ struct _Png4File
     eu8 buffer[65536]; 
 };
 
-static void png4file_init(Png4File * self, eu8 palette[16][3]) 
+static void png4file_init(Png4File * self, eu8 palette[4][3])
 {
     memcpy(self->palettechunk, "\0\0\0\x0c" "PLTE", 8);
     memcpy(self->palettechunk + 8, palette, 12);
@@ -541,7 +548,7 @@ static eu8 getnibble(eu8 ** data, int * nibble)
 }
 
 
-static void _getline(eu8 ** data, int width, Png4File * picfile) 
+static void getpixelline(eu8 ** data, int width, Png4File * picfile)
 {
     int nibble = -1;
     int col = 0;
@@ -600,7 +607,7 @@ static void _getline(eu8 ** data, int width, Png4File * picfile)
 }
 
 static void makebitmap(eu8 * data, int w, int h, int top, int bot,
-                       char * filename, eu8 palette[16][3])
+                       char * filename, eu8 palette[4][3])
 {
     eu8 * top_ibuf = data + top;
     eu8 * bot_ibuf = data + bot;
@@ -611,8 +618,8 @@ static void makebitmap(eu8 * data, int w, int h, int top, int bot,
     png4file_open(&picfile, filename, h, w);
     for (i = 0; i < h / 2; i++) 
     {
-        _getline(&top_ibuf, w, &picfile);
-        _getline(&bot_ibuf, w, &picfile);
+        getpixelline(&top_ibuf, w, &picfile);
+        getpixelline(&bot_ibuf, w, &picfile);
     }
 
     png4file_close(&picfile); 
@@ -716,6 +723,8 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                 int x1 = -1, x2 = -1, y1 = -1, y2 = -1;
                 int top_field = -1, bot_field = -1;
                 int start = 0, end = 0;
+                int colcon_length;
+                eu8 this_palette[4][3];
                 boundstr_init(&bs, ctrl, size - pack);
 
                 prev = 0;
@@ -728,6 +737,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                     {
                         eu8 * p;
                         eu8 cmd = boundstr_read(&bs, 1)[0];
+                        int xpalette, i, n;
                         switch (cmd) 
                         {
                             case 0x00:      /* force display: */
@@ -738,8 +748,14 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                             case 0x02:      /* stop date (read above) */
                                 end = date;
                                 continue;
-                            case 0x03:      /* palette */
-                                /*xpalette =*/ boundstr_read(&bs, 2);
+                            case 0x03:                /* palette */
+                                xpalette = get_uint16_be(boundstr_read(&bs, 2));
+                                for (n = 0; n < 4; n++) {
+                                    i = (xpalette >> (n * 4) & 0x0f);
+                                    this_palette[n][0] = palette[i][0];
+                                    this_palette[n][1] = palette[i][1];
+                                    this_palette[n][2] = palette[i][2];
+                                }
                                 continue;
                             case 0x04:      /* alpha channel */
                                 /*alpha =*/ boundstr_read(&bs, 2);
@@ -754,7 +770,11 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                             case 0x06:		/* rle offsets */
                                 top_field = get_uint16_be(boundstr_read(&bs, 2));
                                 bot_field = get_uint16_be(boundstr_read(&bs, 2));
-                                continue; 
+                                continue;
+                            case 0x07:                /* */
+                                colcon_length = get_uint16_be(boundstr_read(&bs, 2)-2);
+                                boundstr_read(&bs, colcon_length);
+                                continue;
                         }
                         if (cmd == 0xff)	/* end command */
                             break;
@@ -815,7 +835,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
 
                 if (createpics)
                     makebitmap(data, x2 - x1 + 1, y2 - y1 + 1, top_field - 4,
-                               bot_field - 4, fnbuf, palette);
+                               bot_field - 4, fnbuf, this_palette);
                 if (last)
                     exc_throw(EOFIndicator, NULL); 
             }
@@ -831,7 +851,34 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
     exc_end;
 }
 
-static bool samepalette(char * filename, eu8 palette[16][3]) 
+#if 0
+static void usage(const char * pn) /* protoadd GCCATTR_NORETURN */
+{
+    exc_throw(MiscError, "\n"
+              "Usage: %s [--delay ms] <supfile> <ifofile>|<palette>" "\n"
+              "\n"
+              "\tExamples:" "\n"
+              "\n"
+              "\t ProjectX decoded recording.sup and recording.sup.IFO" "\n"
+              "\n"
+              "\t\t$ pxsup2dast recording.sup*" "\n"
+              "\n"
+              "\t Having test.sup and map.ifo" "\n"
+              "\n"
+              "\t\t$ pxsup2dast test.sup map.ifo" "\n"
+              "\n"
+              "\t No .IFO, so giving 3 colors (rgb components in hex)" "\n"
+              "\n"
+              "\t\t$ pxsup2dast titles.sup ff0000,00ff00,0000ff" "\n"
+              "\n"
+              "\t Trying to fix sync in recording" "\n"
+              "\n"
+              "\t\t$ pxsup2dast --delay 750 recording.sup*" "\n"
+              , pn);
+}
+#endif
+
+static bool samepalette(char * filename, eu8 palette[16][3])
 {
     FILE * fh;
     int i;
@@ -963,7 +1010,7 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
         if (write(2, "\n", 1) != 1)
             printf("ERROR: write failed");
 
-        exit(1);
+        return 1;
     }
     exc_endall;
 
