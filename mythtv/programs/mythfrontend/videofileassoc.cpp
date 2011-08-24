@@ -52,7 +52,7 @@ namespace
         bool GetDefault() const { return m_fa.use_default; }
         bool GetIgnore() const { return m_fa.ignore; }
 
-        FA_State GetState() { return m_state; }
+        FA_State GetState() const { return m_state; }
 
         void CommitChanges()
         {
@@ -254,7 +254,7 @@ class FileAssocDialogPrivate
         m_selectionOverride = new_sel;
     }
 
-    UIDToFAPair::UID_type GetSelectionOverride()
+    UIDToFAPair::UID_type GetSelectionOverride() const
     {
         return m_selectionOverride;
     }

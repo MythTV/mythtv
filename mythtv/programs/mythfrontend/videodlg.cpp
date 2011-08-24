@@ -558,7 +558,7 @@ class ItemDetailPopup : public MythScreenType
     ItemDetailPopup(MythScreenStack *lparent, VideoMetadata *metadata,
             const VideoMetadataListManager &listManager) :
         MythScreenType(lparent, WINDOW_NAME), m_metadata(metadata),
-        m_listManager(listManager)
+        m_listManager(listManager), m_playButton(NULL), m_doneButton(NULL)
     {
     }
 
@@ -768,7 +768,6 @@ class VideoDialogPrivate
     bool m_treeLoaded;
 
     bool m_isFileBrowser;
-    bool m_isGroupList;
     int  m_groupType;
     bool m_isFlatList;
     bool m_altPlayerEnabled;
