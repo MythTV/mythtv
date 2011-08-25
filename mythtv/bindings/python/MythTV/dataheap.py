@@ -218,7 +218,7 @@ class Recorded( DBDataWrite, CMPRecord ):
         """
         try:
             return self.getProgram().delete(force, rerecord)
-        except NoneType:
+        except AttributeError:
             raise MythError("Program could not be found")
 
     def open(self, type='r'):
