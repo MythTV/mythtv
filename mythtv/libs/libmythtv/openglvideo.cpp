@@ -761,12 +761,12 @@ QSize OpenGLVideo::GetTextureSize(const QSize &size)
     return QSize(w, h);
 }
 
-uint OpenGLVideo::GetInputTexture(void)
+uint OpenGLVideo::GetInputTexture(void) const
 {
     return inputTextures[0];
 }
 
-uint OpenGLVideo::GetTextureType(void)
+uint OpenGLVideo::GetTextureType(void) const
 {
     return textureType;
 }

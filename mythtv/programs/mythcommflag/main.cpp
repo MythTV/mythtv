@@ -982,8 +982,8 @@ static int FlagCommercials( uint chanid, const QDateTime &starttime,
 }
 
 static int FlagCommercials(QString filename, int jobid,
-                const QString outputfilename, bool useDB,
-                bool fullSpeed)
+                            const QString &outputfilename, bool useDB,
+                            bool fullSpeed)
 {
 
     if (progress)

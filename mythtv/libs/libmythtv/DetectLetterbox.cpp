@@ -334,7 +334,7 @@ void DetectLetterbox::SetDetectLetterbox(bool detect)
     firstFrameChecked = 0;
 }
 
-bool DetectLetterbox::GetDetectLetterbox()
+bool DetectLetterbox::GetDetectLetterbox() const
 {
     return isDetectLetterbox;
 }
