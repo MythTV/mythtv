@@ -48,6 +48,7 @@
 
 #ifdef USING_MINGW
 #include <unistd.h>       // for usleep()
+#include <time.h>
 #include <sys/time.h>
 #endif
 
@@ -238,7 +239,9 @@ inline const char *dlerror(void)
 #define setuid(x)
 #endif // USING_MINGW
 
-#if defined(USING_MINGW)
+#if defined(USING_MINGW) && !defined(gmtime_r)
+// FFmpeg libs already have a workaround, use it if the headers are included,
+// use this otherwise.
 static inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
 {
     // this is safe on windows, where gmtime uses a thread local variable.

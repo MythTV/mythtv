@@ -37,6 +37,7 @@
 #endif
 
 #include "config.h"
+#include "compat.h"
 
 /*
  * Resident programs are subroutines to provide various string and date functions
