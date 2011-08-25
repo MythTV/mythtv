@@ -27,7 +27,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     devicename(""),
     m_diskID(0),     m_firstTrack(0),
     m_lastTrack(0),  m_leadout(0),
-    m_lengthInSecs(0.0)
+    m_lengthInSecs(0.0),
     stat(0),         output_buf(NULL),
     output_at(0),    bks(0),
     bksFrames(0),    decodeBytes(0),
