@@ -19,6 +19,7 @@
 #include "dbutil.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include "mythtvexp.h"
 
 #define SHOW_WGET_OUTPUT 0
 
@@ -1128,7 +1129,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     QFile file(resultFilename);
 
     bool GotNextSuggestedTime = false;
-    bool GotBlockedTime = false;
+    MUNUSED bool GotBlockedTime = false;
 
     if (file.open(QIODevice::ReadOnly))
     {
