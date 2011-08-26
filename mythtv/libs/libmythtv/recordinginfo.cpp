@@ -243,7 +243,7 @@ RecordingInfo::RecordingInfo(
                        "      program.starttime < :STARTTS1 AND "
                        "      program.endtime   > :STARTTS2 ";
     bindings[":CHANID"] = QString::number(_chanid);
-    QString str_startts = desiredts.toString("yyyy-MM-ddThh:mm:50");
+    QString str_startts = desiredts.toString("yyyy-MM-dd hh:mm:50");
     bindings[":STARTTS1"] = str_startts;
     bindings[":STARTTS2"] = str_startts;
 
@@ -339,7 +339,7 @@ RecordingInfo::RecordingInfo(
                "      program.starttime > :STARTTS "
                "GROUP BY program.starttime ORDER BY program.starttime LIMIT 1 ";
     bindings[":CHANID"]  = QString::number(_chanid);
-    bindings[":STARTTS"] = desiredts.toString("yyyy-MM-ddThh:mm:50");
+    bindings[":STARTTS"] = desiredts.toString("yyyy-MM-dd hh:mm:50");
 
     LoadFromProgram(progList, querystr, bindings, schedList, false);
 

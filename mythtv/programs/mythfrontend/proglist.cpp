@@ -796,7 +796,7 @@ void ProgLister::FillViewList(const QString &view)
     }
     else if (m_type == plCategory) // list by category
     {
-        QString startstr = m_startTime.toString("yyyy-MM-ddThh:mm:50");
+        QString startstr = m_startTime.toString("yyyy-MM-dd hh:mm:50");
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT g1.genre, g2.genre "
                       "FROM program "
@@ -1130,7 +1130,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
 
     bool oneChanid = false;
     QString where;
-    QString startstr = m_startTime.toString("yyyy-MM-ddThh:mm:50");
+    QString startstr = m_startTime.toString("yyyy-MM-dd hh:mm:50");
     QString qphrase = m_viewList[m_curView];
 
     MSqlBindings bindings;
