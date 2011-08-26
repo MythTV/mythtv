@@ -67,38 +67,11 @@ typedef int_fast32_t fi32;	typedef uint_fast32_t fu32;
 #define GCCATTR_UNUSED	 __attribute ((unused))
 #define GCCATTR_NORETURN __attribute ((noreturn))
 #define GCCATTR_CONST	 __attribute ((const))
-
-#define from_type(ft, v) \
-  __builtin_choose_expr (__builtin_types_compatible_p (typeof (v), ft),	\
-		       (v), (void)0)
-
-#define checked_cast(tf, ft, v) \
-  __builtin_choose_expr (__builtin_types_compatible_p (typeof (v), ft), \
-			 ((tt)(v)), (void)0)
-
-#define cast2unsigned(t, v) \
-  __builtin_choose_expr (__builtin_types_compatible_p (typeof (v), t), \
-			 ((unsigned t)(v)), (void)0)
-#define cast2signed(t, v) \
-  __builtin_choose_expr (__builtin_types_compatible_p \
-			 (typeof (v), unsigned t), /**/ ((t)(v)), (void)0)
-#define cast2unsigned_array(t, v) ( __builtin_choose_expr ( __builtin_types_compatible_p ( typeof (v), t []), (unsigned t *)(v), (void)0 ) )
-#define cast2signed_array(t, v) \
-  __builtin_choose_expr (__builtin_types_compatible_p \
-			 (typeof (v), unsigned t []), /**/ ((t *)(v)), (void)0)
 #else
 #define GCCATTR_PRINTF(m, n)
 #define GCCATTR_UNUSED
 #define GCCATTR_NORETURN
 #define GCCATTR_CONST
-
-#define from_type(ft, v) (v)
-#define checked_cast(tt, ft, v) ((tt)(v))
-
-#define cast2unsigned(t, v) ((unsigned t)(v))
-#define cast2unsigned_array(t, v) ((unsigned t)(v))
-#define cast2signed(t, v) ((t)(v))
-#define cast2signed_array(t, v) ((t)(v))
 #endif
 
 /* use this only to cast quoted strings in function calls */
@@ -110,6 +83,7 @@ typedef struct _BoundStr BoundStr;
 
 enum { MiscError = 1, EOFIndicator, IndexError };
 
+int sup2dast(const char *supfile, const char *ifofile, int delay_ms);
 
 /****** Poor man's exception code ... (heavily inspired by cexcept). ******/
 
@@ -176,7 +150,7 @@ static void exc_throw(int type, const char * format, ...)
             {
                 int l = snprintf(&EXC.msgbuf[len], sizeof EXC.msgbuf - len,
                       " %s.", strerror(err));
-                if (l + len >= sizeof sizeof EXC.msgbuf) 
+                if (l + len >= sizeof EXC.msgbuf) 
                 {
                     len = sizeof EXC.msgbuf - 1;
                     EXC.msgbuf[len] = '\0'; 
@@ -710,8 +684,8 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
 
             exc_try 
             {
-                if (memcmp(xxfread(sfh, cast2unsigned_array(char, junk), 2),
-                      "SP", 2) != 0)
+                if (memcmp(xxfread(sfh, (unsigned char *)junk, 2),
+                           "SP", 2) != 0)
                 exc_throw(MiscError, "Syncword missing. XXX bailing out."); 
             }
             exc_catch (EOFIndicator)
