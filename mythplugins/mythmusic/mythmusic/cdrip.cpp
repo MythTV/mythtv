@@ -1546,7 +1546,10 @@ bool RipStatus::keyPressEvent(QKeyEvent *event)
 
 void RipStatus::customEvent(QEvent *event)
 {
-    RipStatusEvent *rse = (RipStatusEvent *)event;
+    RipStatusEvent *rse = dynamic_cast<RipStatusEvent *> (event);
+
+    if (!rse)
+        return;
 
     if (event->type() == RipStatusEvent::kTrackTextEvent)
     {
