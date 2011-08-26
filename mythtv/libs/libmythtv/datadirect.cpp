@@ -1839,48 +1839,56 @@ QString DataDirectProcessor::CreateTempDirectory(bool *pok)
 {
     bool ok;
     pok = (pok) ? pok : &ok;
-    if (tmpDir == "/tmp")
+    QString tmp = tmpDir;
+    if (tmp == "/tmp")
     {
         CreateTemp("/tmp/mythtv_ddp_XXXXXX",
                    "Failed to create temp directory",
-                   true, tmpDir, *pok);
+                   true, tmp, *pok);
     }
+    tmpDir = tmp;
     return tmpDir;
 }
 
-QString DataDirectProcessor::GetPostFilename(bool &ok) const
+QString DataDirectProcessor::GetPostFilename(bool &ok)
 {
     ok = true;
-    if (tmpPostFile.isEmpty())
+    QString tmp = tmpPostFile;
+    if (tmp.isEmpty())
     {
         CreateTemp(tmpDir + "/mythtv_post_XXXXXX",
                    "Failed to create temp post file",
-                   false, tmpPostFile, ok);
+                   false, tmp, ok);
     }
+    tmpPostFile = tmp;
     return tmpPostFile;
 }
 
-QString DataDirectProcessor::GetResultFilename(bool &ok) const
+QString DataDirectProcessor::GetResultFilename(bool &ok)
 {
     ok = true;
-    if (tmpResultFile.isEmpty())
+    QString tmp = tmpResultFile;
+    if (tmp.isEmpty())
     {
         CreateTemp(tmpDir + "/mythtv_result_XXXXXX",
                    "Failed to create temp result file",
-                   false, tmpResultFile, ok);
+                   false, tmp, ok);
     }
+    tmpResultFile = tmp;
     return tmpResultFile;
 }
 
-QString DataDirectProcessor::GetCookieFilename(bool &ok) const
+QString DataDirectProcessor::GetCookieFilename(bool &ok)
 {
     ok = true;
-    if (cookieFile.isEmpty())
+    QString tmp = cookieFile;
+    if (tmp.isEmpty())
     {
         CreateTemp(tmpDir + "/mythtv_cookies_XXXXXX",
                    "Failed to create temp cookie file",
-                   false, cookieFile, ok);
+                   false, tmp, ok);
     }
+    cookieFile = tmp;
     return cookieFile;
 }
 

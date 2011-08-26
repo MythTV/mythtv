@@ -342,9 +342,9 @@ class MTV_PUBLIC DataDirectProcessor
     void CreateTemp(const QString &templatefilename, const QString &errmsg,
                     bool directory, QString &filename, bool &ok) const;
 
-    QString GetPostFilename  (bool &ok) const;
-    QString GetResultFilename(bool &ok) const;
-    QString GetCookieFilename(bool &ok) const;
+    QString GetPostFilename  (bool &ok);
+    QString GetResultFilename(bool &ok);
+    QString GetCookieFilename(bool &ok);
 
     void SetAll(const QString &lineupid, bool val);
     void SetDDProgramsStartAt(QDateTime begts)  { actuallistingsfrom = begts; }
