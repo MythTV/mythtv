@@ -1835,60 +1835,52 @@ void DataDirectProcessor::CreateTemp(
     }
 }
 
-QString DataDirectProcessor::CreateTempDirectory(bool *pok)
+QString DataDirectProcessor::CreateTempDirectory(bool *pok) const
 {
     bool ok;
     pok = (pok) ? pok : &ok;
-    QString tmp = m_tmpDir;
-    if (tmp == "/tmp")
+    if (m_tmpDir == "/tmp")
     {
         CreateTemp("/tmp/mythtv_ddp_XXXXXX",
                    "Failed to create temp directory",
-                   true, tmp, *pok);
+                   true, m_tmpDir, *pok);
     }
-    m_tmpDir = tmp;
     return m_tmpDir;
 }
 
-QString DataDirectProcessor::GetPostFilename(bool &ok)
+QString DataDirectProcessor::GetPostFilename(bool &ok) const
 {
     ok = true;
-    QString tmp = m_tmpPostFile;
-    if (tmp.isEmpty())
+    if (m_tmpPostFile.isEmpty())
     {
         CreateTemp(m_tmpDir + "/mythtv_post_XXXXXX",
                    "Failed to create temp post file",
-                   false, tmp, ok);
+                   false, m_tmpPostFile, ok);
     }
-    m_tmpPostFile = tmp;
     return m_tmpPostFile;
 }
 
-QString DataDirectProcessor::GetResultFilename(bool &ok)
+QString DataDirectProcessor::GetResultFilename(bool &ok) const
 {
     ok = true;
-    QString tmp = m_tmpResultFile;
-    if (tmp.isEmpty())
+    if (m_tmpResultFile.isEmpty())
     {
         CreateTemp(m_tmpDir + "/mythtv_result_XXXXXX",
                    "Failed to create temp result file",
-                   false, tmp, ok);
+                   false, m_tmpResultFile, ok);
     }
-    m_tmpResultFile = tmp;
     return m_tmpResultFile;
 }
 
-QString DataDirectProcessor::GetCookieFilename(bool &ok)
+QString DataDirectProcessor::GetCookieFilename(bool &ok) const
 {
     ok = true;
-    QString tmp = m_cookieFile;
-    if (tmp.isEmpty())
+    if (m_cookieFile.isEmpty())
     {
         CreateTemp(m_tmpDir + "/mythtv_cookies_XXXXXX",
                    "Failed to create temp cookie file",
-                   false, tmp, ok);
+                   false, m_cookieFile, ok);
     }
-    m_cookieFile = tmp;
     return m_cookieFile;
 }
 

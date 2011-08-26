@@ -308,7 +308,7 @@ class MTV_PUBLIC DataDirectProcessor
                         QString userid = "", QString password = "");
     ~DataDirectProcessor();
 
-    QString CreateTempDirectory(bool *ok = NULL);
+    QString CreateTempDirectory(bool *ok = NULL) const;
 
     // web service commands
     bool GrabData(const QDateTime pstartdate, const QDateTime penddate);
@@ -401,9 +401,9 @@ class MTV_PUBLIC DataDirectProcessor
     void CreateTemp(const QString &templatefilename, const QString &errmsg,
                     bool directory, QString &filename, bool &ok) const;
 
-    QString GetPostFilename(bool &ok);
-    QString GetResultFilename(bool &ok);
-    QString GetCookieFilename(bool &ok);
+    QString GetPostFilename(bool &ok) const;
+    QString GetResultFilename(bool &ok) const;
+    QString GetCookieFilename(bool &ok) const;
 
     void SetAll(const QString &lineupid, bool val);
     void SetDDProgramsStartAt(QDateTime begts) { m_actualListingsFrom = begts; }
@@ -423,10 +423,10 @@ class MTV_PUBLIC DataDirectProcessor
     uint          m_listingsProvider;
     DDProviders   m_providers;
 
-    QString       m_userid;
-    QString       m_password;
-    QString       m_tmpDir;
-    bool          m_cacheData;
+    QString         m_userid;
+    QString         m_password;
+    mutable QString m_tmpDir;
+    bool            m_cacheData;
 
     QDateTime     m_actualListingsFrom;
     QDateTime     m_actualListingsTo;
