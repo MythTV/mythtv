@@ -131,17 +131,17 @@ class MusicPlayer : public QObject, public MythObservable
 
     enum RepeatMode
     { REPEAT_OFF = 0,
-      REPEAT_TRACK, 
-      REPEAT_ALL, 
-      MAX_REPEAT_MODES 
+      REPEAT_TRACK,
+      REPEAT_ALL,
+      MAX_REPEAT_MODES
     };
     enum ShuffleMode
-    { SHUFFLE_OFF = 0, 
-      SHUFFLE_RANDOM, 
+    { SHUFFLE_OFF = 0,
+      SHUFFLE_RANDOM,
       SHUFFLE_INTELLIGENT,
       SHUFFLE_ALBUM,
       SHUFFLE_ARTIST,
-      MAX_SHUFFLE_MODES 
+      MAX_SHUFFLE_MODES
     };
 
     enum ResumeMode
@@ -185,6 +185,7 @@ class MusicPlayer : public QObject, public MythObservable
 
     GenericTree *m_currentNode;
     Metadata    *m_currentMetadata;
+    Metadata    *m_arbitraryFileMetadata; // Used when playing a file directly via network protocol
     int          m_currentTime;
 
     Metadata     m_displayMetadata;
