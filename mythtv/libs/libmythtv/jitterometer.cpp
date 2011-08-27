@@ -8,7 +8,7 @@
 #define UNIX_PROC_STAT "/proc/stat"
 #define MAX_CORES 8
 
-Jitterometer::Jitterometer(QString nname, int ncycles)
+Jitterometer::Jitterometer(const QString &nname, int ncycles)
   : count(0), num_cycles(ncycles), starttime_valid(0), last_fps(0),
     last_sd(0), name(nname), cpustat(NULL), laststats(NULL)
 {
@@ -114,7 +114,7 @@ bool Jitterometer::RecordEndTime()
         if (!lastcpustats.isEmpty())
             extra = QString("CPUs: ") + lastcpustats;
 
-        LOG(VB_PLAYBACK, LOG_INFO, 
+        LOG(VB_PLAYBACK, LOG_INFO,
             name + QString("Mean: %1 Std.Dev: %2 fps: %3 ")
                 .arg((int)mean).arg((int)standard_deviation)
                 .arg(last_fps, 0, 'f', 2) + extra);

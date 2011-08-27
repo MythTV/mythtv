@@ -78,15 +78,15 @@ class TeletextReader
     QString GetPage(void);
     void SetPage(int page, int subpage);
     void SetSubPage(int subpage)        { m_cursubpage = subpage;      }
-    bool PageChanged(void)              { return m_page_changed;       }
+    bool PageChanged(void) const        { return m_page_changed;       }
     void SetPageChanged(bool changed)   { m_page_changed = changed;    }
     void SetShowHeader(bool show)       { m_curpage_showheader = show; }
     void SetHeaderChanged(bool changed) { m_header_changed = changed;  }
-    bool IsSubtitle(void)               { return m_curpage_issubtitle; }
+    bool IsSubtitle(void) const         { return m_curpage_issubtitle; }
     void SetIsSubtitle(bool sub)        { m_curpage_issubtitle = sub;  }
-    bool IsTransparent(void)            { return m_transparent;        }
-    bool RevealHidden(void)             { return m_revealHidden;       }
-    int  GetPageInput(uint num)         { return m_pageinput[num];     }
+    bool IsTransparent(void) const      { return m_transparent;        }
+    bool RevealHidden(void) const       { return m_revealHidden;       }
+    int  GetPageInput(uint num) const   { return m_pageinput[num];     }
     TeletextSubPage* FindSubPage(void)
         { return FindSubPage(m_curpage, m_cursubpage); }
     uint8_t* GetHeader(void)            { return m_header;             }

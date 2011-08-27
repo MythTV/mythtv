@@ -175,7 +175,7 @@ class MTV_PUBLIC MythPlayer
     PIPLocation GetNextPIPLocation(void) const;
 
     // Bool Gets
-    bool    IsPaused(void)                    { return allpaused;      }
+    bool    IsPaused(void) const              { return allpaused;      }
     bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
     bool    GetEof(void);

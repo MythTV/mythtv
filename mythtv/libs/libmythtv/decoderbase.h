@@ -96,7 +96,7 @@ class DecoderBase
                          int testbufsize = kDecoderProbeBufferSize) = 0;
 
     virtual void SetEof(bool eof)  { ateof = eof;  }
-    bool         GetEof(void)      { return ateof; }
+    bool         GetEof(void) const { return ateof; }
 
     void setExactSeeks(bool exact) { exactseeks = exact; }
     bool getExactSeeks(void) const { return exactseeks;  }

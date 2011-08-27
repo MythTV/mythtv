@@ -152,7 +152,7 @@ class VideoOutput
     virtual long long GetFramesPlayed(void) { return framesPlayed; };
 
     /// \brief Returns true if a fatal error has been encountered.
-    bool IsErrored() { return errorState != kError_None; }
+    bool IsErrored() const { return errorState != kError_None; }
     /// \brief Returns error type
     VideoErrorState GetError(void) const { return errorState; }
     // Video Buffer Management
