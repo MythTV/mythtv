@@ -885,9 +885,10 @@ int main(int argc, char *argv[])
             }
         }
         int found = query.size();
-        query.prepare("SELECT MIN(starttime),title,subtitle,description "
+        query.prepare("SELECT MIN(starttime),title,subtitle,"
+                      "       LEFT(description, 1024) AS partdesc "
                       "FROM program WHERE programid = '' "
-                      "GROUP BY title,subtitle,description;");
+                      "GROUP BY title,subtitle,partdesc;");
         if (query.exec())
         {
             while(query.next())
@@ -896,11 +897,11 @@ int main(int argc, char *argv[])
                              "WHERE starttime = :STARTTIME "
                              "  AND title = :TITLE "
                              "  AND subtitle = :SUBTITLE "
-                             "  AND description = :DESCRIPTION");
+                             "  AND LEFT(description, 1024) = :PARTDESC");
                 updt.bindValue(":STARTTIME", query.value(0).toDateTime());
                 updt.bindValue(":TITLE", query.value(1).toString());
                 updt.bindValue(":SUBTITLE", query.value(2).toString());
-                updt.bindValue(":DESCRIPTION", query.value(3).toString());
+                updt.bindValue(":PARTDESC", query.value(3).toString());
                 if (!updt.exec())
                     MythDB::DBError("Marking first showings", updt);
             }
@@ -925,9 +926,10 @@ int main(int argc, char *argv[])
             }
         }
         found = query.size();
-        query.prepare("SELECT MAX(starttime),title,subtitle,description "
+        query.prepare("SELECT MAX(starttime),title,subtitle,"
+                      "       LEFT(description, 1024) AS partdesc "
                       "FROM program WHERE programid = '' "
-                      "GROUP BY title,subtitle,description;");
+                      "GROUP BY title,subtitle,partdesc;");
         if (query.exec())
         {
             while(query.next())
@@ -936,11 +938,11 @@ int main(int argc, char *argv[])
                              "WHERE starttime = :STARTTIME "
                              "  AND title = :TITLE "
                              "  AND subtitle = :SUBTITLE "
-                             "  AND description = :DESCRIPTION");
+                             "  AND LEFT(description, 1024) = :PARTDESC");
                 updt.bindValue(":STARTTIME", query.value(0).toDateTime());
                 updt.bindValue(":TITLE", query.value(1).toString());
                 updt.bindValue(":SUBTITLE", query.value(2).toString());
-                updt.bindValue(":DESCRIPTION", query.value(3).toString());
+                updt.bindValue(":PARTDESC", query.value(3).toString());
                 if (!updt.exec())
                     MythDB::DBError("Marking last showings", updt);
             }
