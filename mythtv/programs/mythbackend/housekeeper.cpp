@@ -393,7 +393,7 @@ void HouseKeeper::flushDBLogs()
             while (query.next())
             {
                 totalrows = query.value(0).toLongLong();
-                LOG(VB_GENERAL, LOG_INFO,
+                LOG(VB_GENERAL, LOG_DEBUG,
                     QString("Database has %1 log entries.").arg(totalrows));
             }
             if (totalrows > maxrows)
@@ -402,7 +402,7 @@ void HouseKeeper::flushDBLogs()
                 query.prepare(sql);
                 quint64 extrarows = totalrows - maxrows;
                 query.bindValue(":ROWS", extrarows);
-                LOG(VB_GENERAL, LOG_INFO,
+                LOG(VB_GENERAL, LOG_DEBUG,
                     QString("Deleting oldest %1 database log entries.")
                         .arg(extrarows));
                 if (!query.exec())
@@ -822,7 +822,7 @@ void HouseKeeper::UpdateThemeChooserInfoCache(void)
 
     if (!extractZIP(remoteThemesFile, remoteThemesDir))
     {
-        LOG(VB_GENERAL, LOG_INFO,
+        LOG(VB_GENERAL, LOG_ERR,
             QString("HouseKeeper: Error extracting %1"
                     "remote themes info package.").arg(remoteThemesFile));
         QFile::remove(remoteThemesFile);
