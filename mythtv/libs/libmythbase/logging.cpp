@@ -21,6 +21,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "dbutil.h"
 #include "exitcodes.h"
+#include "compat.h"
 
 #include <stdlib.h>
 #define SYSLOG_NAMES
@@ -49,12 +50,6 @@ extern "C" {
 }
 #elif CONFIG_DARWIN
 #include <mach/mach.h>
-#endif
-
-#ifdef _WIN32
-#define PREFIX64 "I64"
-#else
-#define PREFIX64 "ll"
 #endif
 
 QMutex                  loggerListMutex;
@@ -910,13 +905,7 @@ void LogTimeStamp( struct tm *tm, uint32_t *usec )
     *usec = time.msec() * 1000;
 #endif
 
-#ifndef _WIN32
     localtime_r(&epoch, tm);
-#else
-    // this is safe, windows uses a thread local variable for localtime().
-    struct tm *win_tmp = localtime(&epoch);
-    memcpy(tm, win_tmp, sizeof(struct tm));
-#endif
 }
 
 void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,

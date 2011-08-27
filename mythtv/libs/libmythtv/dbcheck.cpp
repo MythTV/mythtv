@@ -15,6 +15,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "diseqcsettings.h" // for convert_diseqc_db()
 #include "videodbcheck.h"
+#include "compat.h"
 
 #define MINIMUM_DBMS_VERSION 5,0,15
 
@@ -2146,8 +2147,10 @@ NULL
                 {
                     long long start = 0, end = 0;
                     QByteArray tmp = (*i).toAscii();
+                    // %lld - %lld in Linux, %I64d - %I64d in Windows
                     if (sscanf(tmp.constData(),
-                               "%lld - %lld", &start, &end) == 2)
+                               "%" PREFIX64 "d - %" PREFIX64 "d",
+                               &start, &end) == 2)
                     {
                         insert.prepare(
                                "INSERT INTO recordedmarkup (chanid, starttime,"
