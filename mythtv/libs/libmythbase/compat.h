@@ -260,11 +260,11 @@ static inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
 static inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 {
     // this is safe, windows uses a thread local variable for localtime().
-    if (timep && tm)
+    if (timep && result)
     {
         struct tm *win_tmp = localtime(timep);
-        memcpy(tm, win_tmp, sizeof(struct tm));
-        return tm;
+        memcpy(result, win_tmp, sizeof(struct tm));
+        return result;
     }
     return NULL;
 }
