@@ -257,6 +257,7 @@ static inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
 #endif 
 
 #if defined(USING_MINGW)
+#include <time.h>
 static inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 {
     // this is safe, windows uses a thread local variable for localtime().
