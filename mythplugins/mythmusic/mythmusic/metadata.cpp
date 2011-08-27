@@ -102,8 +102,8 @@ Metadata& Metadata::operator=(const Metadata &rhs)
     m_genreid = rhs.m_genreid;
     m_albumArt = NULL;
     m_format = rhs.m_format;
-
     m_changed = rhs.m_changed;
+    m_show = rhs.m_show;
 
     return *this;
 }
@@ -689,7 +689,7 @@ void Metadata::toMap(MetadataMap &metadataMap)
     metadataMap["tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
     metadataMap["genre"] = m_genre;
     metadataMap["year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
-    
+
     int len = m_length / 1000;
     int eh = len / 3600;
     int em = (len / 60) % 60;
@@ -1753,7 +1753,7 @@ void AlbumArtImages::addImage(const AlbumArtImage &newImage)
     }
 }
 
-/// saves or updates the image details in the DB 
+/// saves or updates the image details in the DB
 void AlbumArtImages::dumpToDatabase(void)
 {
     Metadata::IdType trackID = ID_TO_ID(m_parent->ID());
