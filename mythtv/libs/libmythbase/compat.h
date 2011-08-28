@@ -256,8 +256,9 @@ static inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
 }
 #endif 
 
-#if defined(USING_MINGW)
-#include <time.h>
+#if defined(USING_MINGW) && !defined(localtime_r)
+// FFmpeg libs already have a workaround, use it if the headers are included,
+// use this otherwise.
 static inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 {
     // this is safe, windows uses a thread local variable for localtime().
