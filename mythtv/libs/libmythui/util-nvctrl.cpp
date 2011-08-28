@@ -187,9 +187,10 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
             /* split the MetaMode string by comma */
 
-            for (modeString = strtok(tmp, ",");
+            char *strtok_state = NULL;
+            for (modeString = strtok_r(tmp, ",", &strtok_state);
                  modeString;
-                 modeString = strtok(NULL, ","))
+                 modeString = strtok_r(NULL, ",", &strtok_state))
             {
                 /*
                  * retrieve the modeName and display device mask
@@ -227,9 +228,9 @@ int GetNvidiaRates(t_screenrate& screenmap)
                     while (*tmp == ' ')
                         tmp++;
                     i = 0;
-                    for (modeString = strtok(tmp, " ");
+                    for (modeString = strtok_r(tmp, " ", &strtok_state);
                          modeString;
-                         modeString = strtok(NULL, " "))
+                         modeString = strtok_r(NULL, " ", &strtok_state))
                     {
                         buf[i++] = modeString;
                     }
