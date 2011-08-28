@@ -32,7 +32,7 @@ QMAKE_CXXFLAGS += $$CONFIG_DIRECTFB_CXXFLAGS
 QMAKE_CXXFLAGS_SHLIB = -DPIC -fPIC
 QMAKE_CXXFLAGS += $$ECXXFLAGS
 
-profile:CONFIG += release
+profile:CONFIG += debug
 
 QMAKE_CXXFLAGS_RELEASE = $$OPTFLAGS -fomit-frame-pointer
 release:contains( TARGET_ARCH_POWERPC, yes ) {
