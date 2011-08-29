@@ -49,7 +49,7 @@ void HardwareProfile::GenerateUUIDs(void)
 
     if (fileUUID.isEmpty() && m_uuid.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_INFO, 
+        LOG(VB_GENERAL, LOG_INFO,
                  "No UUID in DB or File, generating new UUID...");
 
         QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
@@ -64,7 +64,7 @@ void HardwareProfile::GenerateUUIDs(void)
     }
     else if (fileUUID.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_INFO, 
+        LOG(VB_GENERAL, LOG_INFO,
                  QString("Writing Database UUID to local file: %1")
                          .arg(m_uuid));
         WritePrivateUUIDToFile(m_uuid);
@@ -82,7 +82,7 @@ void HardwareProfile::GenerateUUIDs(void)
     m_publicuuid = GetPublicUUIDFromFile();
 }
 
-QString HardwareProfile::GetPrivateUUIDFromFile()
+QString HardwareProfile::GetPrivateUUIDFromFile() const
 {
     QString ret;
 
@@ -98,7 +98,7 @@ QString HardwareProfile::GetPrivateUUIDFromFile()
     return ret;
 }
 
-QString HardwareProfile::GetPublicUUIDFromFile()
+QString HardwareProfile::GetPublicUUIDFromFile() const
 {
     QString ret;
 
@@ -124,7 +124,7 @@ QString HardwareProfile::GetPublicUUIDFromFile()
     return ret;
 }
 
-QString HardwareProfile::GetAdminPasswordFromFile()
+QString HardwareProfile::GetAdminPasswordFromFile() const
 {
     QString ret;
 
@@ -158,7 +158,7 @@ bool HardwareProfile::WritePrivateUUIDToFile(QString uuid)
         return false;
 }
 
-bool HardwareProfile::NeedsUpdate(void)
+bool HardwareProfile::NeedsUpdate(void) const
 {
     if (!m_lastUpdate.isNull() &&
         (m_lastUpdate.addMonths(1) < QDateTime::currentDateTime()) &&
@@ -179,7 +179,7 @@ bool HardwareProfile::SubmitProfile(void)
         return false;
 
     if (!m_hardwareProfile.isEmpty())
-        LOG(VB_GENERAL, LOG_INFO, 
+        LOG(VB_GENERAL, LOG_INFO,
                  QString("Submitting the following hardware profile:  %1")
                          .arg(m_hardwareProfile));
 
@@ -233,7 +233,7 @@ bool HardwareProfile::DeleteProfile(void)
     return false;
 }
 
-QString HardwareProfile::GetProfileURL()
+QString HardwareProfile::GetProfileURL() const
 {
     QString ret;
 
@@ -245,7 +245,7 @@ QString HardwareProfile::GetProfileURL()
     return ret;
 }
 
-QString HardwareProfile::GetHardwareProfile()
+QString HardwareProfile::GetHardwareProfile() const
 {
     QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
     QStringList args;
