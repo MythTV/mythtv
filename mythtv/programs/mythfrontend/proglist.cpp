@@ -700,7 +700,7 @@ void ProgLister::DeleteOldEpisode(bool ok)
         "WHERE chanid    = :CHANID AND "
         "      starttime = :STARTTIME");
     query.bindValue(":CHANID",    pi->GetChanID());
-    query.bindValue(":STARTTIME", pi->GetScheduledStartTime(ISODate));
+    query.bindValue(":STARTTIME", pi->GetScheduledStartTime());
 
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldEpisode", query);
