@@ -12,11 +12,6 @@
 #include "mythsystem.h"
 #include "exitcodes.h"
 
-// libmythui
-#include "mythmainwindow.h"
-#include "mythdialogbox.h"
-#include "mythprogressdialog.h"
-
 const QString SMOLT_SERVER_LOCATION =
                   QString("http://smolt.mythtv.org/");
 const QString SMOLT_TOKEN =

@@ -7,12 +7,12 @@
 #include <QDateTime>
 
 // MythDB headers
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 extern const QString SMOLT_SERVER_LOCATION;
 extern const QString SMOLT_TOKEN;
 
-class MPUBLIC HardwareProfile : public QObject
+class MBASE_PUBLIC HardwareProfile : public QObject
 {
     Q_OBJECT
 

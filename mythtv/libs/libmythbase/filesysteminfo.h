@@ -8,11 +8,11 @@ using namespace std;
 #include <QString>
 #include <QStringList>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 #include "mythsocket.h"
 #include "mythcorecontext.h"
 
-class MPUBLIC FileSystemInfo : public QObject
+class MBASE_PUBLIC FileSystemInfo : public QObject
 {
     Q_OBJECT
   public:
