@@ -1699,9 +1699,9 @@ void ChannelScanSM::StopScanner(void)
  */
 bool ChannelScanSM::ScanTransports(
     int SourceID,
-    const QString std,
-    const QString modulation,
-    const QString country,
+    const QString &std,
+    const QString &modulation,
+    const QString &country,
     const QString &table_start,
     const QString &table_end)
 {

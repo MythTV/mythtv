@@ -311,7 +311,7 @@ class MTV_PUBLIC DataDirectProcessor
     QString CreateTempDirectory(bool *ok = NULL) const;
 
     // web service commands
-    bool GrabData(const QDateTime pstartdate, const QDateTime penddate);
+    bool GrabData(const QDateTime &startdate, const QDateTime &enddate);
     bool GrabNextSuggestedTime(void);
 
     // utility wrappers

@@ -1176,8 +1176,8 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     return GotNextSuggestedTime;
 }
 
-bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
-                                   const QDateTime pendDate)
+bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
+                                   const QDateTime &pendDate)
 {
     QString msg = (pstartDate.addSecs(1) == pendDate) ? "channel" : "listing";
     LOG(VB_GENERAL, LOG_INFO, LOC + "Grabbing " + msg + " data");
