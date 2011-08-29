@@ -66,8 +66,8 @@ inc.files += referencecounter.h mythcommandlineparser.h mthread.h mthreadpool.h
 inc.files += filesysteminfo.h hardwareprofile.h
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>
-inc3.path  = $${PREFIX}/include/mythtv/libmythbase
-inc3.files = $${inc.files}
+inc2.path  = $${PREFIX}/include/mythtv/libmythbase
+inc2.files = $${inc.files}
 
 INSTALLS += inc inc2
 
