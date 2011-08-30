@@ -576,7 +576,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "    myth_pkts INT UNSIGNED NOT NULL,"
 "    FOREIGN KEY(cardid) REFERENCES capturecard(id),"
 "    INDEX (sampletime,cardid)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "ALTER TABLE capturecard ADD skipbtaudio TINYINT(1) DEFAULT 0;",
 NULL
 };
@@ -599,7 +599,7 @@ NULL
 "  recgroup VARCHAR(32) NOT NULL PRIMARY KEY, "
 "  password VARCHAR(10) NOT NULL, "
 "  UNIQUE(recgroup)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1029", dbver))
@@ -670,11 +670,11 @@ NULL
 "  host varchar(128),"
 "  message varchar(255) NOT NULL,"
 "  details text"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "CREATE TABLE housekeeping ("
 "  tag varchar(64) PRIMARY KEY NOT NULL,"
 "  lastrun datetime"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1035", dbver))
@@ -735,7 +735,7 @@ NULL
 "    relevance char(1) NOT NULL, "
 "    genre char(30), "
 "    PRIMARY KEY (chanid, starttime, relevance) "
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1038", dbver))
@@ -751,7 +751,7 @@ NULL
 "    relevance char(1) NOT NULL, "
 "    genre char(30), "
 "    PRIMARY KEY (chanid, starttime, relevance) "
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1039", dbver))
@@ -907,13 +907,13 @@ NULL
 "    network VARCHAR(20) NOT NULL UNIQUE,"
 "    url VARCHAR(255) NOT NULL,"
 "    PRIMARY KEY(id)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "CREATE TABLE callsignnetworkmap ("
 "    id INTEGER NOT NULL AUTO_INCREMENT,"
 "    callsign VARCHAR(20) NOT NULL UNIQUE,"
 "    network VARCHAR(20) NOT NULL,"
 "    PRIMARY KEY(id)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1048", dbver))
@@ -1045,7 +1045,7 @@ NULL
 "    comment VARCHAR(128) NOT NULL DEFAULT '',"
 "    PRIMARY KEY(id),"
 "    UNIQUE(chanid, starttime, type, inserttime)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "ALTER TABLE record ADD COLUMN autotranscode TINYINT(1) NOT NULL DEFAULT 0;",
 "ALTER TABLE record ADD COLUMN autocommflag TINYINT(1) NOT NULL DEFAULT 0;",
 "ALTER TABLE record ADD COLUMN autouserjob1 TINYINT(1) NOT NULL DEFAULT 0;",
@@ -1158,7 +1158,7 @@ NULL
 "  updatetimestamp timestamp(14) NOT NULL DEFAULT CURRENT_TIMESTAMP "
 "                                ON UPDATE CURRENT_TIMESTAMP,"
 "  PRIMARY KEY  (mplexid)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 // These should be included in an update after the 0.17 release.
 // "DROP TABLE IF EXISTS dvb_channel;",
 // "DROP TABLE IF EXISTS dvb_pids;",
@@ -1168,7 +1168,7 @@ NULL
 "  networkid int(11) NOT NULL, "
 "  private_type varchar(20) NOT NULL, "
 "  private_value varchar(100) NOT NULL "
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 //# UK DVB-T
 "INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',9018,'channel_numbers','131');",
 "INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',9018,'guide_fixup','2');",
@@ -1225,7 +1225,8 @@ NULL
     {
         const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS recordmatch (recordid int unsigned, "
-"chanid int unsigned, starttime datetime, INDEX (recordid));",
+"chanid int unsigned, starttime datetime, INDEX (recordid)"
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1064", dbver))
@@ -1406,7 +1407,7 @@ NULL
 "  KEY seriesid (seriesid),"
 "  KEY programid (programid),"
 "  KEY id_start_end (chanid,starttime,endtime)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "CREATE TABLE IF NOT EXISTS recordedcredits ("
 "  person mediumint(8) unsigned NOT NULL default '0',"
 "  chanid int(10) unsigned NOT NULL default '0',"
@@ -1414,7 +1415,7 @@ NULL
 "  role set('actor','director','producer','executive_producer','writer','guest_star','host','adapter','presenter','commentator','guest') NOT NULL default '',"
 "  UNIQUE KEY chanid (chanid,starttime,person,role),"
 "  KEY person (person,role)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "CREATE TABLE IF NOT EXISTS recordedrating ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
@@ -1422,7 +1423,7 @@ NULL
 "  rating char(8) NOT NULL default '',"
 "  UNIQUE KEY chanid (chanid,starttime,system,rating),"
 "  KEY starttime (starttime,system)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
 
@@ -1491,7 +1492,7 @@ NULL
 "recordid INT NOT NULL DEFAULT 0,"
 "findid INT NOT NULL DEFAULT 0,"
 "PRIMARY KEY (recordid, findid)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "ALTER TABLE record ADD COLUMN parentid INT NOT NULL DEFAULT 0;",
 NULL
 };
@@ -1506,7 +1507,7 @@ NULL
 "  filename varchar(255) NOT NULL,"
 "  bookmark varchar(128) default NULL,"
 "  PRIMARY KEY (filename)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1083", dbver))
@@ -1569,7 +1570,7 @@ NULL
 "  pid int(11) NOT NULL default '-1',"
 "  tableid int(11) NOT NULL default '-1',"
 "  INDEX(chanid)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1086", dbver))
@@ -1588,7 +1589,7 @@ NULL
 "  max_surf int(11) NOT NULL default '0',"
 "  decode_num int(11) NOT NULL default '0',"
 "  agressive int(11) NOT NULL default '1',"
-"  PRIMARY KEY  (id) );",
+"  PRIMARY KEY  (id) ) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "INSERT INTO xvmc_buffer_settings VALUES (1,'Default / nVidia',2,2,8,16,8,1);",
 "INSERT INTO xvmc_buffer_settings VALUES (2,'VLD (More decode buffers)',2,2,8,16,16,1);",
 NULL
@@ -1794,7 +1795,7 @@ NULL
 "  discontinuity tinyint(1) NOT NULL default '0',"
 "  watching int(10) NOT NULL default '0',"
 "  PRIMARY KEY  (chanid,starttime)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
 
@@ -1832,7 +1833,7 @@ NULL
 "  playid varchar(128) NOT NULL default '',"
 "  lastupdatetime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  INDEX (chanid,starttime)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
 
@@ -1886,7 +1887,7 @@ NULL
 "  skipahead INT NOT NULL DEFAULT 0, "
 "  skipback INT NOT NULL DEFAULT 0, "
 "  timestretch INT NOT NULL DEFAULT 0 "
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "INSERT INTO playgroup (name,skipahead,skipback,timestretch) "
 "            VALUES ('Default',30,5,100);",
 NULL
@@ -2332,7 +2333,7 @@ NULL
 "  rulename VARCHAR(64) NOT NULL PRIMARY KEY, "
 "  fromclause text NOT NULL, "
 "  whereclause text NOT NULL "
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1142", dbver))
@@ -2371,7 +2372,7 @@ NULL
 "  version TINYINT UNSIGNED NOT NULL, "
 "  endtime INT UNSIGNED NOT NULL, "
 "  PRIMARY KEY (chanid, eventid) "
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
 
@@ -2491,7 +2492,8 @@ NULL
 "  mark bigint(20) NOT NULL default '0',"
 "  offset varchar(32) default NULL,"
 "  type int(11) NOT NULL default '0',"
-"  PRIMARY KEY  (chanid,starttime,type,mark));",
+"  PRIMARY KEY  (chanid,starttime,type,mark)"
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "INSERT IGNORE INTO recordedseek (chanid, starttime, mark, offset, type) SELECT"
 " chanid, starttime, mark, offset, type FROM recordedmarkup WHERE type in (6, 7, 9);",
 "DELETE FROM recordedmarkup WHERE type in (6, 7, 9);",
@@ -2509,7 +2511,7 @@ NULL
 " ( cardinputid INT(10) UNSIGNED NOT NULL, "
 "   diseqcid    INT(10) UNSIGNED NOT NULL, "
 "   value       VARCHAR(16) NOT NULL default '', "
-"   KEY id (cardinputid) );",
+"   KEY id (cardinputid) ) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "CREATE TABLE IF NOT EXISTS diseqc_tree "
 " ( diseqcid        INT(10) UNSIGNED NOT NULL auto_increment, "
 "   parentid        INT(10) UNSIGNED default NULL, "
@@ -2524,7 +2526,8 @@ NULL
 "   lnb_lof_switch  INT(10) NOT NULL default 0, "
 "   lnb_lof_hi      INT(10) NOT NULL default 0, "
 "   lnb_lof_lo      INT(10) NOT NULL default 0, "
-"   PRIMARY KEY (diseqcid), KEY parentid (parentid) );",
+"   PRIMARY KEY (diseqcid), KEY parentid (parentid)"
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "ALTER TABLE capturecard ADD diseqcid INT(10) UNSIGNED default NULL;",
 NULL
 };
@@ -2738,7 +2741,7 @@ NULL
 "   framenum bigint(20) NOT NULL default 0,"
 "   timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP "
 "                                ON UPDATE CURRENT_TIMESTAMP, "
-"   PRIMARY KEY (serialid));",
+"   PRIMARY KEY (serialid)) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
 
@@ -2816,7 +2819,7 @@ NULL
 "    dirname      VARCHAR(235) NOT NULL DEFAULT '', "
 "    PRIMARY KEY (id), "
 "    UNIQUE KEY grouphostdir (groupname, hostname, dirname)"
-"    );",
+"    ) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "INSERT storagegroup (groupname, hostname, dirname) "
 "    SELECT DISTINCT 'Default', hostname, data "
 "    FROM settings "
@@ -3066,7 +3069,7 @@ NULL
 "  priorityname VARCHAR(64) NOT NULL PRIMARY KEY, "
 "  recpriority int(10) NOT NULL default '0',"
 "  selectclause text NOT NULL "
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1185", dbver))
@@ -3180,7 +3183,7 @@ NULL
 "    comment                 VARCHAR(255)      NOT NULL DEFAULT '',"
 "    PRIMARY KEY (chanid, starttime, basename),"
 "    INDEX       (basename)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1191", dbver))
@@ -3198,7 +3201,7 @@ NULL
 "  profilegroupid int(10) unsigned NOT NULL auto_increment,"
 "  PRIMARY KEY nameid (name,hostname),"
 "  UNIQUE KEY (profilegroupid)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 "CREATE TABLE IF NOT EXISTS displayprofiles ("
 "  profilegroupid int(10) unsigned NOT NULL,"
 "  profileid int(10) unsigned NOT NULL auto_increment,"
@@ -3208,7 +3211,7 @@ NULL
 "    REFERENCES displayprofilegroups(profilegroupid),"
 "  KEY (profileid,value),"
 "  INDEX (profileid)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
        if (!performActualUpdate(updates, "1192", dbver))
@@ -3232,7 +3235,7 @@ NULL
 "  cardinputid int(10) unsigned NOT NULL, "
 "  inputgroupid int(10) unsigned NOT NULL, "
 "  inputgroupname varchar(32) NOT NULL "
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
         if (!performActualUpdate(updates, "1194", dbver))
@@ -3394,7 +3397,7 @@ NULL
 "KEY class (class),"
 "KEY filepath (filepath),"
 "KEY parentid (parentid)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 NULL
 };
        if (!performActualUpdate(updates, "1203", dbver))
@@ -4335,7 +4338,7 @@ NULL
 "  processed    tinyint(1)       UNSIGNED NOT NULL,"
 "  scandate     datetime                  NOT NULL,"
 "  PRIMARY KEY (scanid)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE IF NOT EXISTS channelscan_dtv_multiplex ("
 "  transportid  int(6)           UNSIGNED NOT NULL AUTO_INCREMENT,"
 "  scanid       int(3)           UNSIGNED NOT NULL,"
@@ -4355,7 +4358,7 @@ NULL
 "  sistandard   varchar(10)               NOT NULL,"
 "  tuner_type   smallint(2)      UNSIGNED NOT NULL,"
 "  PRIMARY KEY (transportid)"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE IF NOT EXISTS channelscan_channel ("
 "  transportid  int(6)           UNSIGNED NOT NULL,"
 "  scanid       int(3)           UNSIGNED NOT NULL,"
@@ -4394,7 +4397,7 @@ NULL
 "  is_opencable tinyint(1)       UNSIGNED NOT NULL default '0',"
 "  could_be_opencable tinyint(1) UNSIGNED NOT NULL default '0',"
 "  decryption_status smallint(2) UNSIGNED NOT NULL default '0'"
-");",
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 NULL
 };
         if (!performActualUpdate(updates, "1220", dbver))
@@ -4598,7 +4601,7 @@ NULL
 "recorded tinyint(4) NOT NULL default '0',"
 "video tinyint(4) NOT NULL default '0',"
 "dvd tinyint(4) NOT NULL default '0',"
-"description varchar(32) NOT NULL);",
+"description varchar(32) NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 NULL
 };
         if (!performActualUpdate(updates, "1230", dbver))
@@ -4662,11 +4665,13 @@ NULL
 "CREATE TABLE IF NOT EXISTS channelgroup ("
 "  id int(10) unsigned NOT NULL auto_increment,"
 "  chanid int(11) unsigned NOT NULL default '0',"
-"  grpid int(11) NOT NULL default '1', PRIMARY KEY (id));",
+"  grpid int(11) NOT NULL default '1', PRIMARY KEY (id)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE IF NOT EXISTS channelgroupnames ("
 "  grpid int(10) unsigned NOT NULL auto_increment,"
 "  name varchar(64) NOT NULL default '0',"
-"  PRIMARY KEY (grpid));",
+"  PRIMARY KEY (grpid)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "INSERT INTO channelgroupnames (grpid, name) VALUES (1, 'Favorites');",
 NULL
         };
@@ -5227,7 +5232,7 @@ NULL
 "  tree BOOL NOT NULL,"
 "  podcast BOOL NOT NULL,"
 "  download BOOL NOT NULL,"
-"  host  VARCHAR(128));",
+"  host  VARCHAR(128)) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE internetcontentarticles "
 "( feedtitle VARCHAR(255) NOT NULL,"
 "  path TEXT NOT NULL,"
@@ -5256,7 +5261,7 @@ NULL
 "  podcast BOOL NOT NULL,"
 "  downloadable BOOL NOT NULL,"
 "  customhtml BOOL NOT NULL,"
-"  countries VARCHAR(255) NOT NULL);",
+"  countries VARCHAR(255) NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 NULL
 };
         if (!performActualUpdate(updates, "1258", dbver))
@@ -5729,7 +5734,7 @@ NULL
 "    filterid INT UNSIGNED NOT NULL PRIMARY KEY,"
 "    description VARCHAR(64) DEFAULT NULL,"
 "    clause VARCHAR(256) DEFAULT NULL,"
-"    newruledefault TINYINT(1) DEFAULT 0);",
+"    newruledefault TINYINT(1) DEFAULT 0) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
 "    VALUES (0, 'New episode', 'program.previouslyshown = 0', 0);",
 "INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
@@ -5778,7 +5783,7 @@ NULL
 "    host TEXT NOT NULL, "
 "    coverart TEXT NOT NULL, "
 "    fanart TEXT NOT NULL, "
-"    banner TEXT NOT NULL);",
+"    banner TEXT NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 NULL
 };
         if (!performActualUpdate(updates, "1279", dbver))
