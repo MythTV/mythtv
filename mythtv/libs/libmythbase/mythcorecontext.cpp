@@ -193,12 +193,29 @@ bool MythCoreContext::Init(void)
     }
 
 #ifndef _WIN32
-    char *lang = getenv("LANG");
-    if (!lang || !strcmp(lang, "C") || (strlen(lang) == 0))
-        LOG(VB_GENERAL, LOG_WARNING,
-                "This application expects to be running a UTF locale, and "
-                "many features may behave improperly with your current LANG "
-                "set to 'C' (or unset).  Please consider correcting this.");
+    QString lang_variables("");
+    QString lc_value = getenv("LC_ALL");
+    if (lc_value.isEmpty())
+    {
+        // LC_ALL is undefined or empty, so check "sub-variable"
+        lc_value = getenv("LC_CTYPE");
+    }
+    if (!lc_value.contains("UTF-8", Qt::CaseInsensitive))
+        lang_variables.append("LC_ALL or LC_CTYPE");
+    lc_value = getenv("LANG");
+    if (!lc_value.contains("UTF-8", Qt::CaseInsensitive))
+    {
+        if (!lang_variables.isEmpty())
+            lang_variables.append(", and ");
+        lang_variables.append("LANG");
+    }
+    if (!lang_variables.isEmpty())
+        LOG(VB_GENERAL, LOG_WARNING, QString("This application expects to "
+            "be running a locale that specifies a UTF-8 codeset, and many "
+            "features may behave improperly with your current language "
+            "settings. Please set the %1 variable(s) in the environment "
+            "in which this program is executed to include a UTF-8 codeset "
+            "(such as 'en_US.UTF-8').").arg(lang_variables));
 #endif
 
     // If any of the IPs on any interfaces look like IPv6 addresses, assume IPv6
