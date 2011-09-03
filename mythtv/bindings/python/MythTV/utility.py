@@ -291,26 +291,219 @@ class databaseSearch( object ):
 class CMPVideo( object ):
     """
     Utility class providing comparison operators between data objects
-        with 'title' and 'subtitle' attributes.
+        containing video metadata.  
     """
-    def __cmp__(self, other):
-        res = cmp(self.title, other.title)
-        if res:
-            return res
-        return cmp(self.subtitle, other.subtitle)
+    def __le__(self, other): return (self<other) or (self==other)
+    def __ge__(self, other): return (self>other) or (self==other)
+    def __ne__(self, other): return not self==other
+
+    def __lt__(self, other):
+        """
+        If season and episode are defined for both and inetref matches, use
+            those. Otherwise, use title and subtitle
+        """
+        try:
+            # if inetref is not defined, fall through
+            if (self.inetref not in ('00000000', '0','')) and \
+                    (other.inetref not in ('00000000', '0','')):
+                if self.inetref != other.inetref:
+                    # series mismatch
+                    return False
+                if (self.season != 0) or (self.episode != 0):
+                    # if season and episode are not defined, fall through
+                    if self.season > other.season:
+                        return False
+                    if self.season < other.season:
+                        return True
+                    if self.episode < other.episode:
+                        return True
+                    return False
+        except AttributeError:
+            # inetref, season, and episode number are not supported for
+            # one or the other object. fall through to title/subtitle
+            pass
+
+        try:
+            if self.title < other.title:
+                return True
+            if self.title > other.title:
+                return False
+            if self.subtitle < other.subtitle:
+                return True
+            return False
+        except AttributeError:
+            # objects cannot be compared, return as such
+            return NotImplemented
+
+    def __eq__(self, other):
+        """
+        If inetref is defined, following through to season and episode, use
+            those.  Otherwise, fall back to title and subtitle.
+        """
+        try:
+            # if inetref is not defined, fall through
+            if (self.inetref not in ('00000000', '0','')) and \
+                    (other.inetref not in ('00000000', '0','')):
+                if (self.inetref == other.inetref) and \
+                        (self.season == other.season) and \
+                        (self.episode == other.episode):
+                    return True
+                return False
+        except AttributeError:
+            # inetref, season, and episode number are not supported for
+            # one or the other object. fall through to title/subtitle
+            pass
+
+        try:
+            if (self.title == other.title) and \
+                    (self.subtitle == other.subtitle):
+                return True
+            return False
+        except AttributeError:
+            # objects cannot be compared, return as such
+            return NotImplemented
+
+    def __gt__(self, other):
+        """
+        If season and episode are defined for both and inetref matches, use
+            those. Otherwise, use title and subtitle
+        """
+        try:
+            # if inetref is not defined, fall through
+            if (self.inetref not in ('00000000', '0','')) and \
+                    (other.inetref not in ('00000000', '0','')):
+                if self.inetref != other.inetref:
+                    # series mismatch
+                    return False
+                if (self.season != 0) or (self.episode != 0):
+                    # if season and episode are not defined, fall through
+                    if self.season < other.season:
+                        return False
+                    if self.season > other.season:
+                        return True
+                    if self.episode > other.episode:
+                        return True
+                    return False
+        except AttributeError:
+            # inetref, season, and episode number are not supported for
+            # one or the other object. fall through to title/subtitle
+            pass
+
+        try:
+            if self.title > other.title:
+                return True
+            if self.title < other.title:
+                return False
+            if self.subtitle > other.subtitle:
+                return True
+            return False
+        except AttributeError:
+            # objects cannot be compared, return as such
+            return NotImplemented
 
 class CMPRecord( CMPVideo ):
     """
     Utility class providing comparison operators between data objects
-        with 'chanid' and 'starttime', falling back to 'title' and 'subtitle'.
+        containing video metadata.
     """
-    def __cmp__(self, other):
-        if ('starttime' not in other) or ('chanid' not in other):
-            return CMPVideo.__cmd__(self, other)
-        res = cmp(self.starttime, other.starttime)
-        if res:
-            return res
-        return cmp(self.chanid, other.chanid)
+    @staticmethod
+    def __get_rec_start(obj):
+        # find the start of the recording, or return an attribute error
+        if hasattr(obj, 'recstartts'):
+            return obj.recstartts
+        if hasattr(obj, 'progstart'):
+            return obj.starttime
+        raise AttributeError
+
+    @staticmethod
+    def __get_prog_start(obj):
+        # find the start of the program
+        if hasattr(obj, 'progstart'):
+            return obj.progstart
+        return obj.starttime
+
+    def __lt__(self, other):
+        # test for chanid first
+        try:
+            if self.chanid > other.chanid:
+                return False
+            if self.chanid < other.chanid:
+                return True
+        except AttributeError:
+            # either object is not a recording-related object
+            # fall through to video matching
+            return super(CMPRecord, self).__lt__(other)
+
+        try:
+            # try matching on recording start
+            if self.__get_rec_start(self) < self.__get_rec_start(other):
+                return True
+            return False
+        except AttributeError:
+            pass
+
+        try:
+            # try matching on program start
+            if self.__get_prog_start(self) < self.__get_prog_start(other):
+                return True
+            return False
+        except AttributeError:
+            return super(CMPRecord, self).__lt__(other)
+
+    def __eq__(self, other):
+        # test for chanid first
+        try:
+            if self.chanid != other.chanid:
+                return False
+        except AttributeError:
+            # either object is not a recording-related object
+            # fall through to video matching
+            return super(CMPRecord, self).__eq__(other)
+
+        try:
+            # try matching on recording start
+            if self.__get_rec_start(self) == self.__get_rec_start(other):
+                return True
+            return False
+        except AttributeError:
+            pass
+
+        try:
+            # try matching on program start
+            if self.__get_prog_start(self) == self.__get_prog_start(other):
+                return True
+            return False
+        except AttributeError:
+            return super(CMPRecord, self).__eq__(other)
+
+
+    def __gt__(self, other):
+        # test for chanid first
+        try:
+            if self.chanid < other.chanid:
+                return False
+            if self.chanid > other.chanid:
+                return True
+        except AttributeError:
+            # either object is not a recording-related object
+            # fall through to video matching
+            return super(CMPRecord, self).__gt__(other)
+
+        try:
+            # try matching on recording start
+            if self.__get_rec_start(self) > self.__get_rec_start(other):
+                return True
+            return False
+        except AttributeError:
+            pass
+
+        try:
+            # try matching on program start
+            if self.__get_prog_start(self) > self.__get_prog_start(other):
+                return True
+            return False
+        except AttributeError:
+            return super(CMPRecord, self).__gt__(other)
 
 class deadlinesocket( socket.socket ):
     """
