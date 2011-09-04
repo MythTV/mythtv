@@ -123,6 +123,7 @@ class NetworkControl : public QTcpServer, public QRunnable
 
     QString listRecordings(QString chanid = "", QString starttime = "");
     QString listSchedule(const QString& chanID = "") const;
+    QString listVideos();
     QString listChannels(const uint start, const uint limit) const;
     QString saveScreenshot(NetworkCommand *nc);
 

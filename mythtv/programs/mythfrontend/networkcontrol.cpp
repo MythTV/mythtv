@@ -1005,6 +1005,10 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
             return QString("ERROR: See 'help %1' for usage information "
                            "(parameters mismatch)").arg(nc->getArg(0));
     }
+    else if (is_abbrev("videos", nc->getArg(1)))
+    {
+        return listVideos();
+    }
     else
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(nc->getArg(0));
@@ -1161,7 +1165,9 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "query verbose         - Get current VERBOSE mask\r\n"
             "query version         - Query Frontend version details\r\n"
             "query channels        - Query available channels\r\n"
-            "query channels START LIMIT - Query available channels from START and limit results to LIMIT lines\r\n";
+            "query channels START LIMIT\r\n"
+            "                      - Query available channels from START and limit results to LIMIT lines\r\n"
+            "query videos          - Query available videos\r\n";
     }
     else if (is_abbrev("set", command))
     {
@@ -1439,6 +1445,35 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
     }
     else
         result = "ERROR: Unable to retrieve recordings list.";
+
+    return result;
+}
+
+QString NetworkControl::listVideos()
+{
+    QString result;
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString queryStr;
+
+    queryStr = "SELECT title, subtitle, season, episode, filename "
+               "FROM videometadata ORDER BY title, season, episode, filename;";
+
+    query.prepare(queryStr);
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            result +=
+                QString("\"%1\" \"%2\" %3 %4 \"%5\"\r\n")
+                        .arg(query.value(0).toString()) // title
+                        .arg(query.value(1).toString()) // subtitle
+                        .arg(query.value(2).toInt()) // season
+                        .arg(query.value(3).toInt()) // episode
+                        .arg(query.value(4).toString()); // filename
+        }
+    }
+    else
+        result = "ERROR: Unable to retrieve videos list.";
 
     return result;
 }
