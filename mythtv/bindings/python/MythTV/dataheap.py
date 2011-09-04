@@ -17,7 +17,7 @@ import locale
 import xml.etree.cElementTree as etree
 from datetime import date, time
 
-class Record( DBDataWrite, RECTYPE, CMPRecord ):
+class Record( CMPRecord, DBDataWrite, RECTYPE ):
     """
     Record(id=None, db=None) -> Record object
     """
@@ -129,7 +129,7 @@ class Record( DBDataWrite, RECTYPE, CMPRecord ):
         rec.search = searchtype
         return rec.create(wait=wait)
 
-class Recorded( DBDataWrite, CMPRecord ):
+class Recorded( CMPRecord, DBDataWrite ):
     """
     Recorded(data=None, db=None) -> Recorded object
             'data' is a tuple containing (chanid, storagegroup)
@@ -372,7 +372,7 @@ class Recorded( DBDataWrite, CMPRecord ):
         return fe.send('play','program %d %s' % \
                     (self.chanid, self.starttime.isoformat()))
 
-class RecordedProgram( DBDataWrite, CMPRecord ):
+class RecordedProgram( CMPRecord, DBDataWrite ):
 
     """
     RecordedProgram(data=None, db=None) -> RecordedProgram object
@@ -415,7 +415,7 @@ class RecordedProgram( DBDataWrite, CMPRecord ):
     def fromRecorded(cls, recorded):
         return cls((recorded.chanid, recorded.progstart), recorded._db)
 
-class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
+class OldRecorded( CMPRecord, DBDataWrite, RECSTATUS ):
     """
     OldRecorded(data=None, db=None) -> OldRecorded object
             'data' is a tuple containing (chanid, starttime)
@@ -568,7 +568,7 @@ class Channel( DBDataWrite ):
     def __repr__(self):
         return str(self).encode('utf-8')
 
-class Guide( DBData, CMPRecord ):
+class Guide( CMPRecord, DBData ):
     """
     Guide(data=None, db=None) -> Guide object
             Data is a tuple of (chanid, starttime).
@@ -643,7 +643,7 @@ class Guide( DBData, CMPRecord ):
 
 #### MYTHVIDEO ####
 
-class Video( VideoSchema, DBDataWrite, CMPVideo ):
+class Video( CMPVideo, VideoSchema, DBDataWrite ):
     """Video(id=None, db=None, raw=None) -> Video object"""
     _table = 'videometadata'
     _defaults = {'subtitle':u'',             'director':u'Unknown',
