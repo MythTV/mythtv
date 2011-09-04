@@ -1009,6 +1009,10 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     {
         return listVideos();
     }
+    else if (is_abbrev("storagegroups", nc->getArg(1)))
+    {
+        return listStorageGroups();
+    }
     else
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(nc->getArg(0));
@@ -1160,6 +1164,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "query liveTV CHANID   - Query current program for specified channel\r\n"
             "query load            - List 1/5/15 load averages\r\n"
             "query memstats        - List free and total, physical and swap memory\r\n"
+            "query storagegroups   - Query storage group directories\r\n"
             "query time            - Query current time on frontend\r\n"
             "query uptime          - Query machine uptime\r\n"
             "query verbose         - Get current VERBOSE mask\r\n"
@@ -1525,6 +1530,32 @@ QString NetworkControl::listChannels(const uint start, const uint limit) const
                           .arg(query.value(1).toString())
                           .arg(query.value(2).toString());
     }
+
+    return result;
+}
+
+QString NetworkControl::listStorageGroups()
+{
+    QString result;
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString queryStr;
+
+    queryStr = "SELECT groupName, dirName "
+               "FROM storagegroup ORDER BY groupName;";
+
+    query.prepare(queryStr);
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            result +=
+                QString("\"%1\" \"%2\"\r\n")
+                        .arg(query.value(0).toString()) // groupName
+                        .arg(query.value(1).toString()); // dirName
+        }
+    }
+    else
+        result = "ERROR: Unable to retrieve storage groups.";
 
     return result;
 }

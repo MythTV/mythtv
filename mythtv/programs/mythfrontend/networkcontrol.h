@@ -125,6 +125,7 @@ class NetworkControl : public QTcpServer, public QRunnable
     QString listSchedule(const QString& chanID = "") const;
     QString listVideos();
     QString listChannels(const uint start, const uint limit) const;
+    QString listStorageGroups();
     QString saveScreenshot(NetworkCommand *nc);
 
     void processNetworkControlCommand(NetworkCommand *nc);
