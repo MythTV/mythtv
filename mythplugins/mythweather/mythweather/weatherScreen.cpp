@@ -18,6 +18,7 @@ WeatherScreen *WeatherScreen::loadScreen(MythScreenStack *parent,
 WeatherScreen::WeatherScreen(MythScreenStack *parent,
                              ScreenListInfo *screenDefn, int id) :
                MythScreenType (parent, screenDefn->title),
+    m_units(SI_UNITS),
     m_screenDefn(screenDefn),
     m_name(m_screenDefn->name),
     m_inuse(false),

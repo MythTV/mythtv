@@ -98,6 +98,7 @@ class CC608Decoder
     int lastrow[8];
     int newrow[8];
     int newcol[8];
+    int newattr[8]; // color+italic+underline
     int timecode[8];
     int row[8];
     int col[8];

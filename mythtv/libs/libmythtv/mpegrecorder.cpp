@@ -900,7 +900,7 @@ bool MpegRecorder::Open(void)
     return (deviceIsMpegFile) ? OpenMpegFileAsInput() : OpenV4L2DeviceAsInput();
 }
 
-void MpegRecorder::StartRecording(void)
+void MpegRecorder::run(void)
 {
     if (!Open())
     {
@@ -1137,7 +1137,7 @@ void MpegRecorder::StartRecording(void)
         }
     }
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording finishing up");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run finishing up");
 
     pauseLock.lock();
     if (_device_read_buffer)

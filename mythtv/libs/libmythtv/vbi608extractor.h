@@ -38,7 +38,7 @@ class VBI608Extractor
     bool ExtractCC12(const unsigned char *buf, uint width);
     bool ExtractCC34(const unsigned char *buf, uint width);
 
-    uint FillCCData(uint8_t cc_data[8]);
+    uint FillCCData(uint8_t cc_data[8]) const;
 
   private:
     float    GetClockStart(void) const { return start; }

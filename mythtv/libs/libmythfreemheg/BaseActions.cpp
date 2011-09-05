@@ -38,8 +38,8 @@ void MHElemAction::PrintMe(FILE *fd, int nTabs) const
 {
     PrintTabs(fd, nTabs);
     fprintf(fd, "%s (", m_ActionName);
-    m_Target.PrintMe(fd, nTabs+1);
-    PrintArgs(fd, nTabs+1); // Any other arguments must be handled by the subclass.
+    m_Target.PrintMe(fd, nTabs + 1);
+    PrintArgs(fd, nTabs + 1); // Any other arguments must be handled by the subclass.
     fprintf(fd, ")\n");
 }
 
@@ -152,8 +152,8 @@ void MHActionInt6::PrintArgs(FILE *fd, int /*nTabs*/) const
 
 void MHActionInt6::Perform(MHEngine *engine)
 {
-     CallAction(engine, Target(engine), m_Argument1.GetValue(engine), m_Argument2.GetValue(engine), m_Argument3.GetValue(engine),
-         m_Argument4.GetValue(engine), m_Argument5.GetValue(engine), m_Argument6.GetValue(engine));
+    CallAction(engine, Target(engine), m_Argument1.GetValue(engine), m_Argument2.GetValue(engine), m_Argument3.GetValue(engine),
+               m_Argument4.GetValue(engine), m_Argument5.GetValue(engine), m_Argument6.GetValue(engine));
 }
 
 

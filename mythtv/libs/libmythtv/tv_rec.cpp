@@ -83,7 +83,7 @@ TVRec::TVRec(int capturecardnum)
     : recorder(NULL), channel(NULL), signalMonitor(NULL),
       scanner(NULL),
       // Various threads
-      eventThread(new TVRecEventThread(this)),
+      eventThread(new MThread("TVRecEvent", this)),
       recorderThread(NULL),
       // Configuration variables from database
       transcodeFirst(false),
@@ -1102,16 +1102,6 @@ V4LChannel *TVRec::GetV4LChannel(void)
 #endif // USING_V4L2
 }
 
-/** \fn TVRecEventThread::run(void)
- *  \brief Thunk that allows event thread to call RunTV().
- */
-void TVRecEventThread::run(void)
-{
-    threadRegister("TVRecEvent");
-    m_parent->RunTV();
-    threadDeregister();
-}
-
 static bool get_use_eit(uint cardid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1178,10 +1168,8 @@ static int no_capturecards(uint cardid)
     return -1;
 }
 
-/** \fn TVRec::RunTV(void)
- *  \brief Event handling method, contains event loop.
- */
-void TVRec::RunTV(void)
+/// \brief Event handling method, contains event loop.
+void TVRec::run(void)
 {
     QMutexLocker lock(&stateChangeLock);
     SetFlags(kFlagRunMainLoop);
@@ -1984,7 +1972,7 @@ void TVRec::TeardownSignalMonitor()
     {
         pid_cache_t pid_cache;
         GetPidsToCache(dtvMon, pid_cache);
-        if (pid_cache.size())
+        if (!pid_cache.empty())
             dtvChan->SaveCachedPids(pid_cache);
     }
 
@@ -2269,7 +2257,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     is_complete_valid_channel_on_rec = 0;
     needed_spacer = "";
 
-    if (fchanid.size() == 0)
+    if (fchanid.empty())
         return false;
 
     if (fchanid.size() == 1) // Unique channel...
@@ -4050,7 +4038,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     }
 #endif
 
-    recorderThread = new RecorderThread(recorder);
+    recorderThread = new MThread("RecThread", recorder);
     recorderThread->start();
 
     // Wait for recorder to start.

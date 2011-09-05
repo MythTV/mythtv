@@ -33,6 +33,11 @@ using namespace std;
 
 #define LOC      QString("RecordingInfo(%1): ").arg(GetBasename())
 
+static inline QString null_to_empty(const QString &str)
+{
+    return str.isEmpty() ? "" : str;
+}
+
 QString RecordingInfo::unknownTitle;
 // works only for integer divisors of 60
 static const uint kUnknownProgramLength = 30;
@@ -238,7 +243,7 @@ RecordingInfo::RecordingInfo(
                        "      program.starttime < :STARTTS1 AND "
                        "      program.endtime   > :STARTTS2 ";
     bindings[":CHANID"] = QString::number(_chanid);
-    QString str_startts = desiredts.toString("yyyy-MM-ddThh:mm:50");
+    QString str_startts = desiredts.toString("yyyy-MM-dd hh:mm:50");
     bindings[":STARTTS1"] = str_startts;
     bindings[":STARTTS2"] = str_startts;
 
@@ -334,7 +339,7 @@ RecordingInfo::RecordingInfo(
                "      program.starttime > :STARTTS "
                "GROUP BY program.starttime ORDER BY program.starttime LIMIT 1 ";
     bindings[":CHANID"]  = QString::number(_chanid);
-    bindings[":STARTTS"] = desiredts.toString("yyyy-MM-ddThh:mm:50");
+    bindings[":STARTTS"] = desiredts.toString("yyyy-MM-dd hh:mm:50");
 
     LoadFromProgram(progList, querystr, bindings, schedList, false);
 
@@ -554,7 +559,7 @@ void RecordingInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
                   " SET recgroup = :RECGROUP"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
-    query.bindValue(":RECGROUP", newrecgroup);
+    query.bindValue(":RECGROUP", null_to_empty(newrecgroup));
     query.bindValue(":START", recstartts);
     query.bindValue(":CHANID", chanid);
 
@@ -579,7 +584,7 @@ void RecordingInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
                   " SET playgroup = :PLAYGROUP"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
-    query.bindValue(":PLAYGROUP", newplaygroup);
+    query.bindValue(":PLAYGROUP", null_to_empty(newplaygroup));
     query.bindValue(":START", recstartts);
     query.bindValue(":CHANID", chanid);
 
@@ -604,7 +609,7 @@ void RecordingInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
                   " SET storagegroup = :STORAGEGROUP"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
-    query.bindValue(":STORAGEGROUP", newstoragegroup);
+    query.bindValue(":STORAGEGROUP", null_to_empty(newstoragegroup));
     query.bindValue(":START", recstartts);
     query.bindValue(":CHANID", chanid);
 
@@ -628,14 +633,14 @@ void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle,
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString sql = "UPDATE recorded SET title = :TITLE, subtitle = :SUBTITLE ";
-    if (newDescription != NULL)
+    if (!newDescription.isNull())
         sql += ", description = :DESCRIPTION ";
     sql += " WHERE chanid = :CHANID AND starttime = :START ;";
 
     query.prepare(sql);
     query.bindValue(":TITLE", newTitle);
-    query.bindValue(":SUBTITLE", newSubtitle);
-    if (newDescription != NULL)
+    query.bindValue(":SUBTITLE", null_to_empty(newSubtitle));
+    if (!newDescription.isNull())
         query.bindValue(":DESCRIPTION", newDescription);
     query.bindValue(":CHANID", chanid);
     query.bindValue(":START", recstartts);
@@ -645,7 +650,7 @@ void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle,
 
     title = newTitle;
     subtitle = newSubtitle;
-    if (newDescription != NULL)
+    if (!newDescription.isNull())
         description = newDescription;
 
     SendUpdateEvent();
@@ -1002,17 +1007,17 @@ bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
     query.bindValue(":STARTS",      pg->recstartts);
     query.bindValue(":ENDS",        pg->recendts);
     query.bindValue(":TITLE",       pg->title);
-    query.bindValue(":SUBTITLE",    pg->subtitle);
-    query.bindValue(":DESC",        pg->description);
+    query.bindValue(":SUBTITLE",    null_to_empty(pg->subtitle));
+    query.bindValue(":DESC",        null_to_empty(pg->description));
     query.bindValue(":SEASON",      pg->season);
     query.bindValue(":EPISODE",     pg->episode);
     query.bindValue(":HOSTNAME",    pg->hostname);
-    query.bindValue(":CATEGORY",    pg->category);
-    query.bindValue(":RECGROUP",    pg->recgroup);
+    query.bindValue(":CATEGORY",    null_to_empty(pg->category));
+    query.bindValue(":RECGROUP",    null_to_empty(pg->recgroup));
     query.bindValue(":AUTOEXP",     rule->m_autoExpire);
-    query.bindValue(":SERIESID",    pg->seriesid);
-    query.bindValue(":PROGRAMID",   pg->programid);
-    query.bindValue(":INETREF",     pg->inetref);
+    query.bindValue(":SERIESID",    null_to_empty(pg->seriesid));
+    query.bindValue(":PROGRAMID",   null_to_empty(pg->programid));
+    query.bindValue(":INETREF",     null_to_empty(pg->inetref));
     query.bindValue(":FINDID",      pg->findid);
     query.bindValue(":STARS",       pg->stars);
     query.bindValue(":REPEAT",      pg->IsRepeat());
@@ -1020,10 +1025,10 @@ bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
     query.bindValue(":PLAYGROUP",   pg->playgroup);
     query.bindValue(":RECPRIORITY", rule->m_recPriority);
     query.bindValue(":BASENAME",    pg->pathname);
-    query.bindValue(":STORGROUP",   pg->storagegroup);
+    query.bindValue(":STORGROUP",   null_to_empty(pg->storagegroup));
     query.bindValue(":PROGSTART",   pg->startts);
     query.bindValue(":PROGEND",     pg->endts);
-    query.bindValue(":PROFILE",     rule->m_recProfile);
+    query.bindValue(":PROFILE",     null_to_empty(rule->m_recProfile));
 
     bool ok = query.exec() && (query.numRowsAffected() > 0);
     bool active = query.isActive();
@@ -1179,17 +1184,17 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     result.bindValue(":START", startts);
     result.bindValue(":END", endts);
     result.bindValue(":TITLE", title);
-    result.bindValue(":SUBTITLE", subtitle);
-    result.bindValue(":DESC", description);
+    result.bindValue(":SUBTITLE", null_to_empty(subtitle));
+    result.bindValue(":DESC", null_to_empty(description));
     result.bindValue(":SEASON", season);
     result.bindValue(":EPISODE", episode);
-    result.bindValue(":CATEGORY", category);
-    result.bindValue(":SERIESID", seriesid);
-    result.bindValue(":PROGRAMID", programid);
-    result.bindValue(":INETREF", inetref);
+    result.bindValue(":CATEGORY", null_to_empty(category));
+    result.bindValue(":SERIESID", null_to_empty(seriesid));
+    result.bindValue(":PROGRAMID", null_to_empty(programid));
+    result.bindValue(":INETREF", null_to_empty(inetref));
     result.bindValue(":FINDID", findid);
     result.bindValue(":RECORDID", erecid);
-    result.bindValue(":STATION", chansign);
+    result.bindValue(":STATION", null_to_empty(chansign));
     result.bindValue(":RECTYPE", rectype);
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
@@ -1283,9 +1288,9 @@ void RecordingInfo::ForgetHistory(void)
                    " (programid <> '' AND programid = :PROGRAMID) OR "
                    " (findid <> 0 AND findid = :FINDID))");
     result.bindValue(":TITLE", title);
-    result.bindValue(":SUBTITLE", subtitle);
-    result.bindValue(":DESC", description);
-    result.bindValue(":PROGRAMID", programid);
+    result.bindValue(":SUBTITLE", null_to_empty(subtitle));
+    result.bindValue(":DESC", null_to_empty(description));
+    result.bindValue(":PROGRAMID", null_to_empty(programid));
     result.bindValue(":FINDID", findid);
 
     if (!result.exec())
@@ -1329,9 +1334,9 @@ void RecordingInfo::SetDupHistory(void)
                    " (programid <> '' AND programid = :PROGRAMID) OR "
                    " (findid <> 0 AND findid = :FINDID))");
     result.bindValue(":TITLE", title);
-    result.bindValue(":SUBTITLE", subtitle);
-    result.bindValue(":DESC", description);
-    result.bindValue(":PROGRAMID", programid);
+    result.bindValue(":SUBTITLE", null_to_empty(subtitle));
+    result.bindValue(":DESC", null_to_empty(description));
+    result.bindValue(":PROGRAMID", null_to_empty(programid));
     result.bindValue(":FINDID", findid);
 
     if (!result.exec())

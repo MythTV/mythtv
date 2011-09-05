@@ -168,7 +168,7 @@ void VideoSelector::selectAll()
 
     VideoInfo *v;
     vector<VideoInfo *>::iterator i = m_videoList->begin();
-    for ( ; i != m_videoList->end(); i++)
+    for ( ; i != m_videoList->end(); ++i)
     {
         v = *i;
         m_selectedList.append(v);
@@ -350,7 +350,7 @@ void VideoSelector::updateVideoList(void)
     {
         VideoInfo *v;
         vector<VideoInfo *>::iterator i = m_videoList->begin();
-        for ( ; i != m_videoList->end(); i++)
+        for ( ; i != m_videoList->end(); ++i)
         {
             v = *i;
 
@@ -426,25 +426,27 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
             VideoInfo *info = new VideoInfo;
 
             info->id = query.value(0).toInt();
-	    if (query.value(9).toInt() > 0)
-	    {
-	        episode = query.value(10).toString();
-	        if (episode.size() < 2)
-                    episode.prepend("0");
-                info->title = QString("%1 %2x%3 - %4").arg(query.value(1).toString())
-						      .arg(query.value(9).toString())
-						      .arg(episode)
-						      .arg(query.value(8).toString());
-	    }
-	    else
-		info->title = query.value(1).toString();
+            if (query.value(9).toInt() > 0)
+            {
+                episode = query.value(10).toString();
+                if (episode.size() < 2)
+                        episode.prepend("0");
+                    info->title = QString("%1 %2x%3 - %4")
+                                .arg(query.value(1).toString())
+                                .arg(query.value(9).toString())
+                                .arg(episode)
+                                .arg(query.value(8).toString());
+            }
+            else
+                info->title = query.value(1).toString();
+
             info->plot = query.value(2).toString();
             info->size = 0; //query.value(3).toInt();
             info->filename = query.value(4).toString();
             info->coverfile = query.value(5).toString();
             info->category = categoryMap[query.value(6).toInt()];
             info->parentalLevel = query.value(7).toInt();
-            if (info->category == "")
+            if (info->category.isEmpty())
                 info->category = "(None)";
             videoList->push_back(info);
         }
@@ -464,10 +466,10 @@ void VideoSelector::getVideoList(void)
     m_videoList = getVideoListFromDB();
     QStringList categories;
 
-    if (m_videoList && m_videoList->size() > 0)
+    if (m_videoList && !m_videoList->empty())
     {
         vector<VideoInfo *>::iterator i = m_videoList->begin();
-        for ( ; i != m_videoList->end(); i++)
+        for ( ; i != m_videoList->end(); ++i)
         {
             v = *i;
 

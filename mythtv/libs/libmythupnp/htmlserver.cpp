@@ -66,7 +66,7 @@ HtmlServerExtension::~HtmlServerExtension( )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequest )
+bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
 {
     if (pRequest)
     {

@@ -95,7 +95,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
         DBChanList channels = GetChannels(*it);
 
         DBChanList::const_iterator cit = channels.begin();
-        for (; cit != channels.end(); cit++)
+        for (; cit != channels.end(); ++cit)
         {
             if ((*cit).channum == startchannel &&
                 IsTunable(*it, startchannel))
@@ -108,7 +108,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             }
         }
 
-        it++;
+        ++it;
         it = (it == inputs.end()) ? inputs.begin() : it;
         if (it == start)
             break;
@@ -155,7 +155,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             }
         }
 
-        it++;
+        ++it;
         it = (it == inputs.end()) ? inputs.begin() : it;
         if (it == start)
             break;
@@ -749,14 +749,14 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
     switch(m_system_status)
     {
         case GENERIC_EXIT_OK:
-            ret = 3;	// success
+            ret = 3;    // success
             break;
         case GENERIC_EXIT_RUNNING:
         case GENERIC_EXIT_START:
-            ret = 1;	// pending
+            ret = 1;    // pending
             break;
         default:
-            ret = 2;	// fail
+            ret = 2;    // fail
             break;
     }
 

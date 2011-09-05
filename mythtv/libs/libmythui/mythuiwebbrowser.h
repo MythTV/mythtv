@@ -65,6 +65,7 @@ class MythWebPage : public QWebPage
     virtual bool supportsExtension (Extension extension) const;
 
   protected:
+    virtual QString userAgentForUrl(const QUrl &url) const;
 
   private:
     friend class MythWebView;

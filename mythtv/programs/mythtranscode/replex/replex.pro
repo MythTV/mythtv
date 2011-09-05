@@ -16,7 +16,6 @@ HEADERS += ts.h replex.h pes.h
 
 INCLUDEPATH += replex
 INCLUDEPATH += ../../../external/FFmpeg
-INCLUDEPATH += ../../../libs
 INCLUDEPATH += ../../../libs/libmythbase
 
 QMAKE_CFLAGS += -w
@@ -24,9 +23,11 @@ QMAKE_CFLAGS += -w
 LIBS += -L../../../external/FFmpeg/libavutil
 LIBS += -L../../../external/FFmpeg/libavcodec
 LIBS += -L../../../external/FFmpeg/libavformat
+LIBS += -L../../../libs/libmythbase
 LIBS += -lmythavformat
 LIBS += -lmythavcodec
 LIBS += -lmythavutil
+LIBS += -lmythbase-$$LIBVERSION
 LIBS += $$EXTRA_LIBS
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
@@ -38,5 +39,6 @@ POST_TARGETDEPS += ../../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
 POST_TARGETDEPS += ../../../external/FFmpeg/libavformat/$$avLibName(avformat)
 
 DEPENDPATH += ../../../external/FFmpeg
+DEPENDPATH += ../../../libs/libmythbase
 
 CONFIG  -= qt

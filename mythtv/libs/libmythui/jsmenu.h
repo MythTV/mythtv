@@ -11,7 +11,9 @@
 
 // QT headers
 #include <QString>
-#include <QThread>
+
+// MythTV headers
+#include "mthread.h"
 
 typedef struct
 {
@@ -76,7 +78,7 @@ class JoystickMap
  *
  * \ingroup MythUI_Input
  */
-class JoystickMenuThread : public QThread
+class JoystickMenuThread : public MThread
 {
   public:
     JoystickMenuThread(QObject *main_window);

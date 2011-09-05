@@ -51,7 +51,7 @@ class DVBStreamHandler : public StreamHandler
   private:
     DVBStreamHandler(const QString &);
 
-    virtual void run(void); // QThread
+    virtual void run(void); // MThread
     void RunTS(void);
     void RunSR(void);
 

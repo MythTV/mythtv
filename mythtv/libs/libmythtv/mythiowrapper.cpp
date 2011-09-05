@@ -273,7 +273,7 @@ off_t mythfile_seek(int fileID, off_t offset, int whence)
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_seek(%1, %2, %3)")
                                       .arg(fileID).arg(offset).arg(whence));
-    
+
     m_fileWrapperLock.lockForRead();
     if (m_ringbuffers.contains(fileID))
         result = m_ringbuffers[fileID]->Seek(offset, whence);
@@ -496,13 +496,14 @@ int mythdir_closedir(int dirID)
     }
     else if (m_localdirs.contains(dirID))
     {
-        closedir(m_localdirs[dirID]);
-        m_localdirs.remove(dirID);
-        result = 0;
+        result = closedir(m_localdirs[dirID]);
+
+        if (result == 0)
+            m_localdirs.remove(dirID);
     }
     m_dirWrapperLock.unlock();
 
-    return -1;
+    return result;
 }
 
 char *mythdir_readdir(int dirID)

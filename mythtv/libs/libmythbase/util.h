@@ -36,7 +36,8 @@ class QFile;
                        // 8 = Placeholder
                        kAddYear = 16, // Add year to string if not included
                        kSimplify = 32
-                      } MBASE_PUBLIC;
+                      };
+
  MBASE_PUBLIC  QString MythDateTimeToString(const QDateTime &datetime,
                                             uint format = kDateTimeFull);
  MBASE_PUBLIC  QString MythDateToString(const QDate &date,

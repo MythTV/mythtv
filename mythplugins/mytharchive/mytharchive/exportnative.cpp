@@ -33,12 +33,35 @@
 #include "videoselector.h"
 #include "logviewer.h"
 
-ExportNative::ExportNative(MythScreenStack *parent, MythScreenType *previousScreen,
-                           ArchiveDestination archiveDestination, QString name)
-             : MythScreenType(parent, name)
+ExportNative::ExportNative(
+    MythScreenStack *parent, MythScreenType *previousScreen,
+    ArchiveDestination archiveDestination, QString name) :
+    MythScreenType(parent, name),
+    m_previousScreen(previousScreen),
+    m_archiveDestination(archiveDestination),
+    m_usedSpace(0),
+    m_bCreateISO(false),
+    m_bDoBurn(false),
+    m_bEraseDvdRw(false),
+    m_saveFilename(),
+    m_archiveButtonList(NULL),
+    m_nextButton(NULL),
+    m_prevButton(NULL),
+    m_cancelButton(NULL),
+    m_addrecordingButton(NULL),
+    m_addvideoButton(NULL),
+    m_freespaceText(NULL),
+    m_titleText(NULL),
+    m_datetimeText(NULL),
+    m_descriptionText(NULL),
+    m_filesizeText(NULL),
+    m_nofilesText(NULL),
+    m_maxsizeText(NULL),
+    m_minsizeText(NULL),
+    m_currsizeText(NULL),
+    m_currsizeErrText(NULL),
+    m_sizeBar(NULL)
 {
-    m_previousScreen = previousScreen;
-    m_archiveDestination = archiveDestination;
 }
 
 ExportNative::~ExportNative(void)

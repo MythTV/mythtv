@@ -17,8 +17,8 @@
  * 
  * ============================================================ */
 
-#ifndef EXIFUTIL_H
-#define EXIFUTIL_H
+#ifndef GALLERYUTIL_H
+#define GALLERYUTIL_H
 
 #include <QFileInfo>
 
@@ -45,7 +45,7 @@ class GalleryUtil
     static QString GetCaption(const QString &filePath);
 
     static bool LoadDirectory(ThumbList &itemList, const QString &dir,
-                              int sortorder, bool recurse,
+                              const GalleryFilter& flt, bool recurse,
                               ThumbHash *itemHash, ThumbGenerator *thumbGen);
 
     static QSize ScaleToDest(const QSize &sz, const QSize &dest, ScaleMax scaleMax);
@@ -67,4 +67,4 @@ class GalleryUtil
                                 const QString &newName);
 };
 
-#endif /* EXIFUTIL_H */
+#endif /* GALLERYUTIL_H */

@@ -104,7 +104,7 @@ class MHParseNode;
 // strings from 1.  We use 0 indexing in calls to these functions.
 class MHOctetString  
 {
-public:
+  public:
     MHOctetString();
     MHOctetString(const char *str, int nLen = -1); // From character string
     MHOctetString(const unsigned char *str, int nLen); // From byte vector
@@ -132,7 +132,7 @@ protected:
 // A colour is encoded as a string or the index into a palette.
 // Palettes aren't defined in UK MHEG so the palette index isn't really relevant.
 class MHColour {
-public:
+  public:
     MHColour(): m_nColIndex(-1) {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
@@ -147,7 +147,7 @@ public:
 // Internal objects have the m_pGroupId field empty.
 class MHObjectRef
 {
-public:
+  public:
     MHObjectRef() { m_nObjectNo = 0; }
     void Initialise(MHParseNode *p, MHEngine *engine);
     void Copy(const MHObjectRef &objr);
@@ -166,7 +166,7 @@ public:
 // A content reference gives the location (e.g. file name) to find the content.
 class MHContentRef
 {
-public:
+  public:
     MHContentRef() {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const { m_ContentRef.PrintMe(fd, nTabs); }
@@ -182,7 +182,7 @@ public:
 // "Generic" versions of int, bool etc can be either the value or an indirect reference.
 class MHGenericBase
 {
-public:
+  public:
     MHObjectRef *GetReference(); // Return the indirect reference or fail if it's direct
 protected:
     bool    m_fIsDirect;
@@ -191,7 +191,7 @@ protected:
 
 class MHGenericBoolean: public MHGenericBase
 {
-public:
+  public:
     MHGenericBoolean() : m_fDirect(false) {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
@@ -202,7 +202,7 @@ protected:
 
 class MHGenericInteger: public MHGenericBase
 {
-public:
+  public:
     MHGenericInteger() : m_nDirect(-1) {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
@@ -213,7 +213,7 @@ protected:
 
 class MHGenericOctetString: public MHGenericBase
 {
-public:
+  public:
     MHGenericOctetString() {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
@@ -224,7 +224,7 @@ protected:
 
 class MHGenericObjectRef: public MHGenericBase
 {
-public:
+  public:
     MHGenericObjectRef() {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
@@ -235,7 +235,7 @@ protected:
 
 class MHGenericContentRef: public MHGenericBase
 {
-public:
+  public:
     MHGenericContentRef() {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
@@ -247,7 +247,7 @@ protected:
 // In certain cases (e.g. parameters to Call) we have values which are the union of the base types.
 class MHParameter
 {
-public:
+  public:
     MHParameter(): m_Type(P_Null) {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
@@ -265,7 +265,7 @@ public:
 // A union type.  Returned when a parameter is evaluated.
 class MHUnion
 {
-public:
+  public:
     MHUnion() { m_Type = U_None; }
     MHUnion(int nVal) { m_Type = U_Int; m_nIntVal = nVal; }
     MHUnion(bool fVal)  { m_Type = U_Bool; m_fBoolVal = fVal; }
@@ -288,7 +288,7 @@ public:
 
 class MHFontBody {
     // A font body can either be a string or an object reference
-public:
+  public:
     MHFontBody() {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
@@ -301,7 +301,7 @@ protected:
 
 // This is used only in DynamicLineArt
 class MHPointArg {
-public:
+  public:
     MHPointArg() {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;

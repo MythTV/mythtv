@@ -329,7 +329,7 @@ class VideoPlayerCommandPrivate
 
     QString GetCommandDisplayName() const
     {
-        if (m_player_procs.size())
+        if (!m_player_procs.empty())
             return m_player_procs.front()->GetCommandDisplayName();
         return QString();
     }
@@ -392,8 +392,11 @@ VideoPlayerCommand::VideoPlayerCommand(const VideoPlayerCommand &other)
 
 VideoPlayerCommand &VideoPlayerCommand::operator=(const VideoPlayerCommand &rhs)
 {
-    delete m_d;
-    m_d = new VideoPlayerCommandPrivate(*rhs.m_d);
+    if (this != &rhs)
+    {
+        delete m_d;
+        m_d = new VideoPlayerCommandPrivate(*rhs.m_d);
+    }
     return *this;
 }
 

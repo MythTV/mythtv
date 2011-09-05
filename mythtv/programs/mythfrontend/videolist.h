@@ -35,7 +35,7 @@ class VideoList
 
     unsigned int count() const;
 
-    const VideoFilterSettings &getCurrentVideoFilter();
+    const VideoFilterSettings &getCurrentVideoFilter() const;
     void setCurrentVideoFilter(const VideoFilterSettings &filter);
 
     // returns the number of videos matched by this filter

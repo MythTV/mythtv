@@ -16,22 +16,24 @@ Recycler::Recycler(unsigned int sz)
 {
     buffer_count = (sz / Buffer::size());
     if (buffer_count < 1) {
-	buffer_count = 1;
+    buffer_count = 1;
     }
 
     buffers = new Buffer*[buffer_count];
 
-    for (unsigned int i = 0; i < buffer_count; i ++) {
-	buffers[i] = new Buffer;
+    for (unsigned int i = 0; i < buffer_count; i ++)
+    {
+        buffers[i] = new Buffer;
     }
 }
 
 
 Recycler::~Recycler()
 {
-    for (unsigned int i = 0; i < buffer_count; i++) {
-	delete buffers[i];
-	buffers[i] = 0;
+    for (unsigned int i = 0; i < buffer_count; i++)
+    {
+        delete buffers[i];
+        buffers[i] = 0;
     }
 
     delete [] buffers;
@@ -65,7 +67,7 @@ int Recycler::used() const
 Buffer *Recycler::get()
 {
     if (full())
-	return 0;
+        return 0;
     return buffers[add_index];
 }
 

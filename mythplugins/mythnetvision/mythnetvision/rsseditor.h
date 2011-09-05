@@ -27,8 +27,8 @@ class RSSEditPopup : public MythScreenType
     Q_OBJECT
 
   public:
-    RSSEditPopup(QString url, bool edit, MythScreenStack *parent,
-                   const QString name = "RSSEditor");
+    RSSEditPopup(const QString &url, bool edit, MythScreenStack *parent,
+                 const QString &name = "RSSEditPopup");
    ~RSSEditPopup();
 
     bool Create(void);
@@ -77,7 +77,7 @@ class RSSEditor : public MythScreenType
 
   public:
     RSSEditor(MythScreenStack *parent,
-               const QString name = "RSSEditor");
+              const QString &name = "RSSEditor");
    ~RSSEditor();
 
     bool Create(void);

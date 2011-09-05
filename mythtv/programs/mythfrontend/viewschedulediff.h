@@ -61,8 +61,6 @@ class ViewScheduleDiff : public MythScreenType
     vector<class ProgramStruct> m_recList;
 
     int m_recordid; ///< recordid that differs from master (-1 = assume all)
-
-    int m_programCnt;
 };
 
 #endif

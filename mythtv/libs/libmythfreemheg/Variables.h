@@ -30,7 +30,7 @@
 
 class MHVariable : public MHIngredient  
 {
-public:
+  public:
     MHVariable() {}
     virtual ~MHVariable() {}
 
@@ -40,7 +40,7 @@ public:
 
 class MHBooleanVar : public MHVariable  
 {
-public:
+  public:
     MHBooleanVar(): m_fOriginalValue(false), m_fValue(false) {}
     virtual const char *ClassName() { return "BooleanVariable"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
@@ -55,13 +55,13 @@ public:
     virtual void GetVariableValue(MHUnion &value, MHEngine *);
     virtual void SetVariableValue(const MHUnion &value);
 
-protected:
+  protected:
     bool m_fOriginalValue, m_fValue;
 };
 
 class MHIntegerVar : public MHVariable  
 {
-public:
+  public:
     MHIntegerVar(): m_nOriginalValue(0), m_nValue(0) {}
     virtual const char *ClassName() { return "IntegerVariable"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
@@ -75,13 +75,13 @@ public:
     virtual void TestVariable(int nOp, const MHUnion &parmm, MHEngine *engine);
     virtual void GetVariableValue(MHUnion &value, MHEngine *);
     virtual void SetVariableValue(const MHUnion &value);
-protected:
+  protected:
     int m_nOriginalValue, m_nValue;
 };
 
 class MHOctetStrVar : public MHVariable  
 {
-public:
+  public:
     MHOctetStrVar() {}
     virtual const char *ClassName() { return "OctetStringVariable"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
@@ -95,13 +95,13 @@ public:
     virtual void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine);
     virtual void GetVariableValue(MHUnion &value, MHEngine *);
     virtual void SetVariableValue(const MHUnion &value);
-protected:
+  protected:
     MHOctetString m_OriginalValue, m_Value;
 };
 
 class MHObjectRefVar : public MHVariable  
 {
-public:
+  public:
     MHObjectRefVar() {}
     virtual const char *ClassName() { return "ObjectRefVariable"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
@@ -115,13 +115,13 @@ public:
     virtual void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine);
     virtual void GetVariableValue(MHUnion &value, MHEngine *);
     virtual void SetVariableValue(const MHUnion &value);
-protected:
+  protected:
     MHObjectRef m_OriginalValue, m_Value;
 };
 
 class MHContentRefVar : public MHVariable  
 {
-public:
+  public:
     MHContentRefVar() {}
     virtual const char *ClassName() { return "ContentRefVariable"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
@@ -135,7 +135,7 @@ public:
     virtual void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine);
     virtual void GetVariableValue(MHUnion &value, MHEngine *);
     virtual void SetVariableValue(const MHUnion &value);
-protected:
+  protected:
     MHContentRef m_OriginalValue, m_Value;
 };
 
@@ -143,11 +143,11 @@ protected:
 // Set a variable to a value.
 class MHSetVariable: public MHElemAction
 {
-public:
+  public:
     MHSetVariable():MHElemAction(":SetVariable") {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int /*nTabs*/) const { m_NewValue.PrintMe(fd, 0); }
     MHParameter m_NewValue; // New value to store.
 };
@@ -155,11 +155,11 @@ protected:
 // Compare a variable with a value and generate a TestEvent event on the result.
 class MHTestVariable: public MHElemAction
 {
-public:
+  public:
     MHTestVariable(): MHElemAction(":TestVariable"), m_nOperator(0) {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int nTabs) const;
     int m_nOperator;
     MHParameter m_Comparison; // Value to compare with.
@@ -170,59 +170,59 @@ protected:
 // Integer operations.
 class MHIntegerAction: public MHElemAction
 {
-public:
+  public:
     MHIntegerAction(const char *name): MHElemAction(name) {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int /*nTabs*/) const { m_Operand.PrintMe(fd, 0); }
     virtual int DoOp(int arg1, int arg2) = 0; // Do the operation.
     MHGenericInteger m_Operand; // Value to add, subtract etc.
 };
 
 class MHAdd: public MHIntegerAction {
-public:
+  public:
     MHAdd(): MHIntegerAction(":Add") {}
-protected:
+  protected:
     virtual int DoOp(int arg1, int arg2) { return arg1+arg2; }
 };
 
 class MHSubtract: public MHIntegerAction {
-public:
+  public:
     MHSubtract(): MHIntegerAction(":Subtract") {}
-protected:
+  protected:
     virtual int DoOp(int arg1, int arg2) { return arg1-arg2; }
 };
 
 class MHMultiply: public MHIntegerAction {
-public:
+  public:
     MHMultiply(): MHIntegerAction(":Multiply") {}
-protected:
+  protected:
     virtual int DoOp(int arg1, int arg2) { return arg1*arg2; }
 };
 
 class MHDivide: public MHIntegerAction {
-public:
+  public:
     MHDivide(): MHIntegerAction(":Divide") {}
-protected:
+  protected:
     virtual int DoOp(int arg1, int arg2) { return arg1/arg2; } // What about divide by zero?
 };
 
 class MHModulo: public MHIntegerAction {
-public:
+  public:
     MHModulo(): MHIntegerAction(":Modulo") {}
-protected:
+  protected:
     virtual int DoOp(int arg1, int arg2) { return arg1%arg2; } // What about divide by zero?
 };
 
 // Append - 
 class MHAppend: public MHElemAction
 {
-public:
+  public:
     MHAppend(): MHElemAction(":Append") {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int /*nTabs*/) const { m_Operand.PrintMe(fd, 0); }
     MHGenericOctetString m_Operand; // Value to append.
 };

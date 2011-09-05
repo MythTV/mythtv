@@ -9,7 +9,6 @@ using namespace std;
 #include <QDir>
 #include <QLayout>
 #include <QRegExp>
-#include <QImageReader>
 #include <QLabel>
 #include <QPixmap>
 #include <QKeyEvent>
@@ -47,7 +46,7 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
     setObjectName(name);
     if (!parent)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  "Trying to create a dialog without a parent.");
         return;
     }
@@ -119,7 +118,7 @@ void MythDialog::setResult(DialogCode r)
     if ((r < kDialogCodeRejected) ||
         ((kDialogCodeAccepted < r) && (r < kDialogCodeListStart)))
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  QString("MythDialog::setResult(%1) "
                          "called with invalid DialogCode").arg(r));
     }
@@ -167,7 +166,7 @@ DialogCode MythDialog::exec(void)
 {
     if (in_loop)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  "MythDialog::exec: Recursive call detected.");
         return kDialogCodeRejected;
     }
@@ -1093,7 +1092,7 @@ bool MythThemedDialog::loadThemedWindow(QString window_name,
         //  Loop over UITypes within each container
         vector<UIType *> *all_ui_type_objects = looper->getAllTypes();
         vector<UIType *>::iterator i = all_ui_type_objects->begin();
-        for (; i != all_ui_type_objects->end(); i++)
+        for (; i != all_ui_type_objects->end(); ++i)
         {
             UIType *type = (*i);
             connect(type, SIGNAL(requestUpdate()), this,
@@ -1130,7 +1129,7 @@ bool MythThemedDialog::buildFocusList()
         //  Loop over UITypes within each container
         vector<UIType *> *all_ui_type_objects = looper->getAllTypes();
         vector<UIType *>::iterator i = all_ui_type_objects->begin();
-        for (; i != all_ui_type_objects->end(); i++)
+        for (; i != all_ui_type_objects->end(); ++i)
         {
             UIType *type = (*i);
             if (type->canTakeFocus() && !type->isHidden() &&
@@ -1213,7 +1212,7 @@ void MythThemedDialog::parseContainer(QDomElement &element)
     theme->parseContainer(element, name, a_context, area);
     if (name.length() < 1)
     {
-        LOG(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT,
                  "Failed to parse a container. Ignoring.");
         return;
     }
@@ -1369,7 +1368,7 @@ void MythThemedDialog::UpdateForegroundRect(const QRect &inv_rect)
             //  Debugging
             //
 #if 0
-            LOG(VB_GENERAL, LOG_DEBUG, 
+            LOG(VB_GENERAL, LOG_DEBUG,
                      QString("A container called \"%1\" said its "
                              "area is %2,%3 to %4,%5")
                 .arg(looper->GetName())
@@ -1593,11 +1592,6 @@ UITextType* MythThemedDialog::getUITextType(const QString &name)
     return GetUIType<UITextType>(this, name);
 }
 
-UIRemoteEditType* MythThemedDialog::getUIRemoteEditType(const QString &name)
-{
-    return GetUIType<UIRemoteEditType>(this, name);
-}
-
 UIPushButtonType* MythThemedDialog::getUIPushButtonType(const QString &name)
 {
     return GetUIType<UIPushButtonType>(this, name);
@@ -1612,16 +1606,6 @@ UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(
     const QString &name)
 {
     return GetUIType<UIRepeatedImageType>(this, name);
-}
-
-UICheckBoxType* MythThemedDialog::getUICheckBoxType(const QString &name)
-{
-    return GetUIType<UICheckBoxType>(this, name);
-}
-
-UISelectorType* MythThemedDialog::getUISelectorType(const QString &name)
-{
-    return GetUIType<UISelectorType>(this, name);
 }
 
 UIBlackHoleType* MythThemedDialog::getUIBlackHoleType(const QString &name)
@@ -1652,11 +1636,6 @@ UIListTreeType* MythThemedDialog::getUIListTreeType(const QString &name)
 UIKeyboardType *MythThemedDialog::getUIKeyboardType(const QString &name)
 {
     return GetUIType<UIKeyboardType>(this, name);
-}
-
-UIImageGridType* MythThemedDialog::getUIImageGridType(const QString &name)
-{
-    return GetUIType<UIImageGridType>(this, name);
 }
 
 LayerSet *MythThemedDialog::getContainer(const QString &name)

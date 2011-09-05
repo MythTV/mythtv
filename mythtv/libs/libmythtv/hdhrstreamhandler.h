@@ -83,7 +83,7 @@ class HDHRStreamHandler : public StreamHandler
     bool Open(void);
     void Close(void);
 
-    virtual void run(void); // QThread
+    virtual void run(void); // MThread
 
     virtual bool UpdateFilters(void);
 

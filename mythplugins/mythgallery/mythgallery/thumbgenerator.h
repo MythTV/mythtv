@@ -22,10 +22,10 @@
 #ifndef THUMBGENERATOR_H
 #define THUMBGENERATOR_H
 
-#include <QThread>
-#include <QString>
 #include <QStringList>
 #include <QImage>
+
+#include <mthread.h>
 
 class QObject;
 class QImage;
@@ -47,7 +47,7 @@ class ThumbGenEvent : public QEvent
     static Type kEventType;
 };
 
-class ThumbGenerator : public QThread
+class ThumbGenerator : public MThread
 {
 public:
 

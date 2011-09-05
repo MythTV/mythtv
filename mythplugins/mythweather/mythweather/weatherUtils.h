@@ -23,14 +23,14 @@ typedef QMap<QString, QString> DataMap;
 class TypeListInfo
 {
   public:
-  
+
     TypeListInfo(const TypeListInfo& info)
         : name(info.name), location(info.location), src(info.src)
     {
         name.detach();
         location.detach();
     }
-  
+
     TypeListInfo(const QString &_name)
         : name(_name), location(QString::null), src(NULL)
     {
@@ -60,18 +60,25 @@ typedef QMultiHash<QString, TypeListInfo> TypeListMap;
 class ScreenListInfo
 {
   public:
-    ScreenListInfo() {updating = false;}
+    ScreenListInfo() :
+        units(SI_UNITS),
+        hasUnits(false),
+        multiLoc(false)
+    {
+        updating = false;
+    }
 
     ScreenListInfo(const ScreenListInfo& info) :
-    name(info.name),
-    title(info.title),
-    types(info.types),
-    helptxt(info.helptxt),
-    sources(info.sources),
-    units(info.units),
-    hasUnits(info.hasUnits),
-    multiLoc(info.multiLoc),
-    updating(info.updating)
+        name(info.name),
+        title(info.title),
+        types(info.types),
+        dataTypes(info.dataTypes),
+        helptxt(info.helptxt),
+        sources(info.sources),
+        units(info.units),
+        hasUnits(info.hasUnits),
+        multiLoc(info.multiLoc),
+        updating(info.updating)
     {
       types.detach();
     }
@@ -91,7 +98,7 @@ class ScreenListInfo
     bool updating;
 };
 
-Q_DECLARE_METATYPE(ScreenListInfo *); 
+Q_DECLARE_METATYPE(ScreenListInfo *);
 
 typedef QMap<QString, ScreenListInfo> ScreenListMap;
 

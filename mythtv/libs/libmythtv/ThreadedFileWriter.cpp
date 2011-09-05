@@ -13,7 +13,6 @@
 
 // Qt headers
 #include <QString>
-#include <QThread>
 
 // MythTV headers
 #include "ThreadedFileWriter.h"
@@ -27,21 +26,17 @@
 /// \brief Runs ThreadedFileWriter::DiskLoop(void)
 void TFWWriteThread::run(void)
 {
-    threadRegister("TFWWrite");
-#ifndef USING_MINGW
-    // don't exit program if file gets larger than quota limit..
-    signal(SIGXFSZ, SIG_IGN);
-#endif
+    RunProlog();
     m_parent->DiskLoop();
-    threadDeregister();
+    RunEpilog();
 }
 
 /// \brief Runs ThreadedFileWriter::SyncLoop(void)
 void TFWSyncThread::run(void)
 {
-    threadRegister("TFWSync");
+    RunProlog();
     m_parent->SyncLoop();
-    threadDeregister();
+    RunEpilog();
 }
 
 const uint ThreadedFileWriter::kMaxBufferSize = 128 * 1024 * 1024;
@@ -345,6 +340,11 @@ void ThreadedFileWriter::SyncLoop(void)
  */
 void ThreadedFileWriter::DiskLoop(void)
 {
+#ifndef USING_MINGW
+    // don't exit program if file gets larger than quota limit..
+    signal(SIGXFSZ, SIG_IGN);
+#endif
+
     QMutexLocker locker(&buflock);
 
     // Even if the bytes buffered is less than the minimum write

@@ -73,7 +73,7 @@ LIRC::LIRC(QObject *main_window,
            const QString &lircd_device,
            const QString &our_program,
            const QString &config_file)
-    : QThread(),
+    : MThread("LIRC"),
       lock(QMutex::Recursive),
       m_mainWindow(main_window),
       lircdDevice(lircd_device),
@@ -99,7 +99,7 @@ LIRC::~LIRC()
 void LIRC::deleteLater(void)
 {
     TeardownAll();
-    QThread::deleteLater();
+    QObject::deleteLater();
 }
 
 void LIRC::TeardownAll(void)
@@ -321,7 +321,7 @@ void LIRC::start(void)
     }
 
     doRun = true;
-    QThread::start();
+    MThread::start();
 }
 
 bool LIRC::IsDoRunSet(void) const
@@ -397,7 +397,7 @@ void LIRC::Process(const QByteArray &data)
 
 void LIRC::run(void)
 {
-    threadRegister("LIRC");
+    RunProlog();
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "run -- start");
 #endif
@@ -461,7 +461,7 @@ void LIRC::run(void)
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "run -- end");
 #endif
-    threadDeregister();
+    RunEpilog();
 }
   
 QList<QByteArray> LIRC::GetCodes(void)
@@ -478,7 +478,7 @@ QList<QByteArray> LIRC::GetCodes(void)
         if (len >= 0)
             break;
 
-	switch (errno)
+        switch (errno)
         {
             case EINTR:
                 continue;

@@ -135,7 +135,7 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
 
         LOG(VB_GENERAL, LOG_CRIT, message);
 
-        MSqlQuery query(MSqlQuery::InitCon());
+        MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
         bool      backupRunning  = false;
         bool      upgradeRunning = false;
 

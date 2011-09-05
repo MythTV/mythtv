@@ -2,9 +2,9 @@
 #include <QApplication>
 #include <QFileInfo>
 #include <QRunnable>
-#include <QThreadPool>
 
 #include "mythcorecontext.h"
+#include "mthreadpool.h"
 #include "mythsystem.h"
 #include "mythsystemevent.h"
 #include "programinfo.h"
@@ -18,10 +18,10 @@
  *  \brief QRunnable class for running MythSystemEvent handler commands
  *
  *  The SystemEventThread class runs a system event handler command in
- *  non-blocking mode.  The commands are run in the QThreadPool::globalInstance,
+ *  non-blocking mode.  The commands are run in the MThreadPool::globalInstance,
  *  but we release and reserve the thread inside ::run() so that long-running
  *  commands to not block other short-running commands from executing if we
- *  hit QThreadPool::maxThreadCount().
+ *  hit MThreadPool::maxThreadCount().
  */
 class SystemEventThread : public QRunnable
 {
@@ -40,35 +40,26 @@ class SystemEventThread : public QRunnable
      *
      *  Overrides QRunnable::run()
      */
-    void run()
+    void run(void)
     {
-        threadRegister("SystemEvent");
         uint flags = kMSDontBlockInputDevs;
 
         m_event.detach();
         m_command.detach();
 
-        QThreadPool::globalInstance()->releaseThread();
-
         uint result = myth_system(m_command, flags);
-
-        QThreadPool::globalInstance()->reserveThread();
 
         if (result != GENERIC_EXIT_OK)
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Command '%1' returned %2")
                     .arg(m_command).arg(result));
 
-       if (m_event.isEmpty()) 
-       {
-            threadDeregister();
+        if (m_event.isEmpty()) 
             return;
-       }
 
         RemoteSendMessage(QString("SYSTEM_EVENT_RESULT %1 SENDER %2 RESULT %3")
                                   .arg(m_event).arg(gCoreContext->GetHostName())
                                   .arg(result));
-        threadDeregister();
     }
 
   private:
@@ -300,7 +291,8 @@ void MythSystemEventHandler::customEvent(QEvent *e)
             SubstituteMatches(tokens, cmd);
 
             SystemEventThread *eventThread = new SystemEventThread(cmd);
-            QThreadPool::globalInstance()->start(eventThread);
+            MThreadPool::globalInstance()->startReserved(
+                eventThread, "SystemEvent");
         }
 
         // Check for an EventCmd for this particular event
@@ -311,7 +303,8 @@ void MythSystemEventHandler::customEvent(QEvent *e)
 
             SystemEventThread *eventThread =
                 new SystemEventThread(cmd, tokens[1]);
-            QThreadPool::globalInstance()->start(eventThread);
+            MThreadPool::globalInstance()->startReserved(
+                eventThread, "SystemEvent");
         }
     }
 }

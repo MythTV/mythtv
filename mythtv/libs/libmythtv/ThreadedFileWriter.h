@@ -9,29 +9,28 @@ using namespace std;
 #include <QDateTime>
 #include <QString>
 #include <QMutex>
-#include <QThread>
 
 #include <fcntl.h>
 #include <stdint.h>
 
+#include "mthread.h"
+
 class ThreadedFileWriter;
 
-class TFWWriteThread : public QThread
+class TFWWriteThread : public MThread
 {
-    Q_OBJECT
   public:
-    TFWWriteThread(ThreadedFileWriter *p) : m_parent(p) {}
+    TFWWriteThread(ThreadedFileWriter *p) : MThread("TFWWrite"), m_parent(p) {}
     virtual ~TFWWriteThread() { wait(); m_parent = NULL; }
     virtual void run(void);
   private:
     ThreadedFileWriter *m_parent;
 };
 
-class TFWSyncThread : public QThread
+class TFWSyncThread : public MThread
 {
-    Q_OBJECT
   public:
-    TFWSyncThread(ThreadedFileWriter *p) : m_parent(p) {}
+    TFWSyncThread(ThreadedFileWriter *p) : MThread("TFWSync"), m_parent(p) {}
     virtual ~TFWSyncThread() { wait(); m_parent = NULL; }
     virtual void run(void);
   private:

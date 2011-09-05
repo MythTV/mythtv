@@ -1461,7 +1461,7 @@ void HDHomeRunDeviceIDList::fillSelections(const QString &cur)
 #endif
 
     HDHomeRunDeviceList::iterator it = _devicelist->begin();
-    for (; it != _devicelist->end(); it++)
+    for (; it != _devicelist->end(); ++it)
     {
         if ((*it).discovered)
         {
@@ -1890,7 +1890,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
             if ((*it).toUpper() == "FFFFFFFF-1" && 2 == found_device_count)
             {
                 dit = devicelist.begin();
-                dit++;
+                ++dit;
             }
         }
 
@@ -1912,7 +1912,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
 #if 0
     // Debug dump of cards
     QMap<QString, HDHomeRunDevice>::iterator debugit;
-    for (debugit = devicelist.begin(); debugit != devicelist.end(); debugit++)
+    for (debugit = devicelist.begin(); debugit != devicelist.end(); ++debugit)
     {
         LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2 %3 %4 %5 %6 %7")
                 .arg(debugit.key())
@@ -2608,7 +2608,7 @@ void InputGroup::Load(void)
     LOG(VB_GENERAL, LOG_DEBUG, QString("Group index: %1").arg(index));
 #endif
 
-    if (names.size())
+    if (!names.empty())
         setValue(index);
 }
 
@@ -3348,7 +3348,7 @@ DialogCode CardInputEditor::exec(void)
         if (!listbox)
             return kDialogCodeRejected;
 
-        if (cardinputs.size() == 0)
+        if (cardinputs.empty())
             return kDialogCodeRejected;
 
         int val = listbox->getValue().toInt();

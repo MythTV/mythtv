@@ -768,7 +768,7 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
         bool found_partitions = false;
         QStringList parts = sysfs.entryList();
         for (QStringList::iterator pit = parts.begin();
-             pit != parts.end(); pit++)
+             pit != parts.end(); ++pit)
         {
             if (*pit == "." || *pit == "..")
                 continue;
@@ -843,7 +843,7 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
     const QStringList list = qBuffer.split('\n', QString::SkipEmptyParts);
 
     QStringList::const_iterator it = list.begin();
-    for (; it != list.end(); it++)
+    for (; it != list.end(); ++it)
     {
         if ((*it).startsWith("add"))
         {

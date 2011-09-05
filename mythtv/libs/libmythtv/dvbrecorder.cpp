@@ -74,7 +74,7 @@ void DVBRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
-void DVBRecorder::StartRecording(void)
+void DVBRecorder::run(void)
 {
     if (!Open())
     {

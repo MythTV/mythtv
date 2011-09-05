@@ -37,14 +37,14 @@ class MHVisible;
 
 // 
 class MHTimer {
-public:
+  public:
     int m_nTimerId;
     QTime m_Time;
 };
 
 class MHGroup : public MHRoot  
 {
-public:
+  public:
     MHGroup();
     virtual ~MHGroup();
     virtual void PrintMe(FILE *fd, int nTabs) const;
@@ -61,7 +61,7 @@ public:
     // This isn't an MHEG action as such but is used as part of the implementation of "Clone"
     virtual void MakeClone(MHRoot *pTarget, MHRoot *pRef, MHEngine *engine);
 
-protected:
+  protected:
     void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
     // Standard ID, Standard version, Object information aren't recorded.
     int m_nOrigGCPriority;
@@ -84,7 +84,7 @@ protected:
 
 class MHScene : public MHGroup  
 {
-public:
+  public:
     MHScene();
     void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
     virtual const char *ClassName() { return "Scene"; }
@@ -93,7 +93,7 @@ public:
 
     // Actions.
     virtual void SetInputRegister(int nReg, MHEngine *engine);
-protected:
+  protected:
     int m_nEventReg;
     int m_nSceneCoordX, m_nSceneCoordY;
     int m_nAspectRatioW, m_nAspectRatioH;
@@ -106,7 +106,7 @@ protected:
 
 class MHApplication : public MHGroup  
 {
-public:
+  public:
     MHApplication();
     virtual ~MHApplication();
     virtual const char *ClassName() { return "Application"; }
@@ -114,7 +114,7 @@ public:
     virtual void PrintMe(FILE *fd, int nTabs) const;
     virtual bool IsShared() { return true; } // The application is "shared".
     virtual void Activation(MHEngine *engine);
-protected:
+  protected:
     MHActionSequence m_OnSpawnCloseDown, m_OnRestart;
     // Default attributes.
     int         m_nCharSet;
@@ -141,7 +141,7 @@ protected:
 
 class MHLaunch: public MHElemAction
 {
-public:
+  public:
     MHLaunch(): MHElemAction(":Launch") {}
     virtual void Perform(MHEngine *engine);
 };
@@ -149,7 +149,7 @@ public:
 // Quit the application.
 class MHQuit: public MHElemAction
 {
-public:
+  public:
     MHQuit(): MHElemAction(":Quit") {}
     virtual void Perform(MHEngine *engine);
 };
@@ -157,12 +157,12 @@ public:
 // SendEvent - generate an event
 class MHSendEvent: public MHElemAction
 {
-public:
+  public:
     MHSendEvent(): MHElemAction(":SendEvent"), m_EventType(EventIsAvailable) {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
     virtual void PrintArgs(FILE *fd, int nTabs) const;
-protected:
+  protected:
     MHGenericObjectRef m_EventSource; // Event source
     enum EventType m_EventType; // Event type
     MHParameter m_EventData; // Optional - Null means not specified.  Can only be bool, int or string.
@@ -170,11 +170,11 @@ protected:
 
 class MHSetTimer: public MHElemAction
 {
-public:
+  public:
     MHSetTimer(): MHElemAction(":SetTimer"), m_TimerType(ST_NoNewTimer) {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int nTabs) const;
     MHGenericInteger m_TimerId;
     // A new timer may not be specified in which case this cancels the timer.
@@ -186,7 +186,7 @@ protected:
 
 class MHSpawn: public MHElemAction
 {
-public:
+  public:
     MHSpawn(): MHElemAction(":Spawn") {}
     virtual void Perform(MHEngine *engine);
 };
@@ -194,11 +194,11 @@ public:
 // Read and Store persistent - read and save data to persistent store.
 class MHPersistent: public MHElemAction
 {
-public:
+  public:
     MHPersistent(const char *name, bool fIsLoad): MHElemAction(name), m_fIsLoad(fIsLoad) {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int nTabs) const;
     bool m_fIsLoad;
     MHObjectRef     m_Succeeded;
@@ -210,11 +210,11 @@ protected:
 // TransitionTo - move to a new scene.
 class MHTransitionTo: public MHElemAction
 {
-public:
+  public:
     MHTransitionTo();
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int nTabs) const;
     bool    m_fIsTagged;
     int     m_nConnectionTag;
@@ -224,25 +224,25 @@ protected:
 // Lock and unlock functions.
 class MHLockScreen: public MHElemAction
 {
-public:
+  public:
     MHLockScreen(): MHElemAction(":LockScreen") {}
     virtual void Perform(MHEngine *engine);
 };
 
 class MHUnlockScreen: public MHElemAction
 {
-public:
+  public:
     MHUnlockScreen(): MHElemAction(":UnlockScreen") {}
     virtual void Perform(MHEngine *engine);
 };
 
 class MHGetEngineSupport: public MHElemAction
 {
-public:
+  public:
     MHGetEngineSupport(): MHElemAction(":GetEngineSupport")  {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int /*nTabs*/) const { m_Feature.PrintMe(fd, 0);  m_Answer.PrintMe(fd, 0); }
     MHGenericOctetString m_Feature;
     MHObjectRef m_Answer;
@@ -251,7 +251,7 @@ protected:
 // Actions added in UK MHEG profile.
 class MHSetInputRegister: public MHActionInt
 {
-public:
+  public:
     MHSetInputRegister(): MHActionInt(":SetInputRegister") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetInputRegister(nArg, engine); };
 };

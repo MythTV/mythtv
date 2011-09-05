@@ -98,22 +98,22 @@ QString StateToString(TVState state);
 /** \brief SleepStatus is an enumeration of the awake/sleep status of a slave.
  */
 typedef enum SleepStatus {
-	/** \brief A slave is awake when it is connected to the master
+    /** \brief A slave is awake when it is connected to the master
       */
     sStatus_Awake         = 0x0,
-	/** \brief A slave is considered asleep when it is not awake and not
+    /** \brief A slave is considered asleep when it is not awake and not
       *        undefined.
       */
     sStatus_Asleep        = 0x1,
-	/** \brief A slave is marked as falling asleep when told to shutdown by
+    /** \brief A slave is marked as falling asleep when told to shutdown by
       *        the master.
       */
     sStatus_FallingAsleep = 0x3,
-	/** \brief A slave is marked as waking when the master runs the slave's
+    /** \brief A slave is marked as waking when the master runs the slave's
       *        wakeup command.
       */
     sStatus_Waking        = 0x5,
-	/** \brief A slave's sleep status is undefined when it has never connected
+    /** \brief A slave's sleep status is undefined when it has never connected
       *        to the master backend or is not able to be put to sleep and
       *        awakened.
       */

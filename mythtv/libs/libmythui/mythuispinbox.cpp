@@ -6,8 +6,8 @@
 #include <QCoreApplication>
 
 MythUISpinBox::MythUISpinBox(MythUIType *parent, const QString &name)
-              : MythUIButtonList(parent, name), m_hasTemplate(false),
-                m_moveAmount(0)
+    : MythUIButtonList(parent, name), m_hasTemplate(false),
+      m_moveAmount(0)
 {
 }
 
@@ -45,9 +45,11 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
            (!reverse && (value <= high)))
     {
         QString text;
+
         if (m_hasTemplate)
         {
             QString temp;
+
             if (value < 0 && !m_negativeTemplate.isEmpty())
                 temp = m_negativeTemplate;
             else if (value == 0 && !m_zeroTemplate.isEmpty())
@@ -71,6 +73,7 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
             text = QString::number(value);
 
         new MythUIButtonListItem(this, text, qVariantFromValue(value));
+
         if (reverse)
             value = value - step;
         else
@@ -89,6 +92,7 @@ bool MythUISpinBox::ParseElement(
     if (element.tagName() == "template")
     {
         QString format = parseText(element);
+
         if (element.attribute("type") == "negative")
             m_negativeTemplate = format;
         else if (element.attribute("type") == "zero")
@@ -112,6 +116,7 @@ bool MythUISpinBox::ParseElement(
 bool MythUISpinBox::MoveDown(MovementUnit unit, uint amount)
 {
     bool handled = false;
+
     if ((unit == MovePage) && m_moveAmount)
         handled = MythUIButtonList::MoveDown(MoveByAmount, m_moveAmount);
     else
@@ -126,6 +131,7 @@ bool MythUISpinBox::MoveDown(MovementUnit unit, uint amount)
 bool MythUISpinBox::MoveUp(MovementUnit unit, uint amount)
 {
     bool handled = false;
+
     if ((unit == MovePage) && m_moveAmount)
         handled = MythUIButtonList::MoveUp(MoveByAmount, m_moveAmount);
     else
@@ -149,6 +155,7 @@ void MythUISpinBox::CreateCopy(MythUIType *parent)
 void MythUISpinBox::CopyFrom(MythUIType *base)
 {
     MythUISpinBox *spinbox = dynamic_cast<MythUISpinBox *>(base);
+
     if (!spinbox)
         return;
 

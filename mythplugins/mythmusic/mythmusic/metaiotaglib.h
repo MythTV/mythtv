@@ -7,7 +7,6 @@
 
 // Taglib
 #include <tfile.h>
-#include <fileref.h>
 
 using TagLib::File;
 using TagLib::Tag;
@@ -24,14 +23,14 @@ class MetaIOTagLib : public MetaIO
     MetaIOTagLib(void);
     virtual ~MetaIOTagLib(void);
 
-    virtual bool write(Metadata* mdata) = 0;
-    virtual Metadata* read(QString filename) = 0;
-
+    virtual bool write(const Metadata* mdata) = 0;
+    virtual Metadata* read(const QString &filename) = 0;
+    
   protected:
-    int getTrackLength(TagLib::FileRef *file);
-    int getTrackLength(QString filename);
+    int getTrackLength(TagLib::File *file);
+    int getTrackLength(const QString &filename);
     void ReadGenericMetadata(TagLib::Tag *tag, Metadata *metadata);
-    void WriteGenericMetadata(TagLib::Tag *tag, Metadata *metadata);
+    void WriteGenericMetadata(TagLib::Tag *tag, const Metadata *metadata);
 };
 
 #endif

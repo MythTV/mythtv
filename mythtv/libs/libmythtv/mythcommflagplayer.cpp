@@ -1,9 +1,10 @@
 #include <iostream>
 using namespace std;
 
-#include <QThreadPool>
+#include <QRunnable>
 
 #include "mythcommflagplayer.h"
+#include "mthreadpool.h"
 #include "mythlogging.h"
 
 class RebuildSaver : public QRunnable
@@ -18,14 +19,12 @@ class RebuildSaver : public QRunnable
 
     virtual void run(void)
     {
-        threadRegister("RebuildSaver");
         m_decoder->SavePositionMapDelta(m_first, m_last);
 
         QMutexLocker locker(&s_lock);
         s_cnt[m_decoder]--;
         if (!s_cnt[m_decoder])
             s_wait.wakeAll();
-        threadDeregister();
     }
 
     static uint GetCount(DecoderBase *d)
@@ -128,8 +127,9 @@ bool MythCommFlagPlayer::RebuildSeekTable(
             if (RebuildSaver::GetCount(decoder) < 1)
             {
                 pmap_last = myFramesPlayed;
-                QThreadPool::globalInstance()->start(
-                    new RebuildSaver(decoder, pmap_first, pmap_last));
+                MThreadPool::globalInstance()->start(
+                    new RebuildSaver(decoder, pmap_first, pmap_last),
+                    "RebuildSaver");
                 pmap_first = pmap_last + 1;
             }
 
@@ -190,8 +190,9 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     SetPlaying(false);
     killdecoder = true;
 
-    QThreadPool::globalInstance()->start(
-        new RebuildSaver(decoder, pmap_first, myFramesPlayed));
+    MThreadPool::globalInstance()->start(
+        new RebuildSaver(decoder, pmap_first, myFramesPlayed),
+        "RebuildSaver");
     RebuildSaver::Wait(decoder);
 
     return true;

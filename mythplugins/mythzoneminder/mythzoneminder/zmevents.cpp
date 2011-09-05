@@ -28,15 +28,22 @@
 #include "zmplayer.h"
 #include "zmclient.h"
 
-ZMEvents::ZMEvents(MythScreenStack *parent)
-         :MythScreenType(parent, "zmevents")
+ZMEvents::ZMEvents(MythScreenStack *parent) :
+    MythScreenType(parent, "zmevents"),
+    m_oldestFirst(false),
+    m_layout(-1),
+    m_eventList(new vector<Event*>),
+    m_savedPosition(0),
+    m_currentCamera(-1),
+    m_currentDate(-1),
+    m_eventNoText(NULL),
+    m_eventGrid(NULL),
+    m_playButton(NULL),
+    m_deleteButton(NULL),
+    m_cameraSelector(NULL),
+    m_dateSelector(NULL),
+    m_menuPopup(NULL)
 {
-    m_eventList = new vector<Event*>;
-    m_eventGrid = NULL;
-
-    m_layout = -1;
-    m_currentDate = -1;
-    m_currentCamera = -1;
 }
 
 ZMEvents::~ZMEvents()
@@ -274,7 +281,7 @@ void ZMEvents::eventChanged(MythUIButtonListItem *item)
 
 void ZMEvents::playPressed(void)
 {
-    if (!m_eventList || m_eventList->size() == 0)
+    if (!m_eventList || m_eventList->empty())
         return;
 
     m_savedPosition = m_eventGrid->GetCurrentPos();
@@ -306,7 +313,7 @@ void ZMEvents::playerExited(void)
 
 void ZMEvents::deletePressed(void)
 {
-    if (!m_eventList || m_eventList->size() == 0)
+    if (!m_eventList || m_eventList->empty())
         return;
 
     m_savedPosition = m_eventGrid->GetCurrentPos();
@@ -321,7 +328,7 @@ void ZMEvents::deletePressed(void)
             delete item;
 
         vector<Event*>::iterator it;
-        for (it = m_eventList->begin(); it != m_eventList->end(); it++)
+        for (it = m_eventList->begin(); it != m_eventList->end(); ++it)
         {
             if (*it == event)
             {

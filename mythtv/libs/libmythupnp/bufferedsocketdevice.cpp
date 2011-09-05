@@ -341,7 +341,7 @@ qlonglong BufferedSocketDevice::Size()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-qlonglong BufferedSocketDevice::At()
+qlonglong BufferedSocketDevice::At() const
 {
     return( 0 );
 }
@@ -382,7 +382,7 @@ bool BufferedSocketDevice::AtEnd()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-qulonglong BufferedSocketDevice::BytesAvailable(void)  
+qulonglong BufferedSocketDevice::BytesAvailable(void)
 {
     if ( !m_pSocket->isValid() )
         return 0;

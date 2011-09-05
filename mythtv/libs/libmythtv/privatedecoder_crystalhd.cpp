@@ -8,14 +8,12 @@
 
 void FetcherThread::run(void)
 {
-    if (!m_dec)
-        return;
-
-    threadRegister("Fetcher");
+    RunProlog();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Starting Fetcher thread."));
-    m_dec->FetchFrames();
+    if (m_dec)
+        m_dec->FetchFrames();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Stopping Fetcher thread."));
-    threadDeregister();
+    RunEpilog();
 }
 
 PixelFormat bcmpixfmt_to_pixfmt(BC_OUTPUT_FORMAT fmt);

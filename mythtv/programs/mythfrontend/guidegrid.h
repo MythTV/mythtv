@@ -138,7 +138,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
               bool allowFinder = true,
               int changrpid = -1);
    ~GuideGrid();
-   
+
   private slots:
     void updateTimeout(void);
     void refreshVideo(void);
@@ -163,7 +163,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void moveLeftRight(MoveVector movement);
     void moveUpDown(MoveVector movement);
-    
+
     void showMenu(void);
 
     int  FindChannel(uint chanid, const QString &channum,
@@ -209,7 +209,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     int m_currentCol;
 
     bool    m_sortReverse;
-    QString m_channelFormat;
 
     int  m_channelCount;
     int  m_timeCount;

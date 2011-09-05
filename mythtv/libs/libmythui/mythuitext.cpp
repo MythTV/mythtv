@@ -19,17 +19,17 @@
 #include "compat.h"
 
 MythUIText::MythUIText(MythUIType *parent, const QString &name)
-           : MythUIType(parent, name),
-            m_Justification(Qt::AlignLeft | Qt::AlignTop), m_OrigDisplayRect(),
-            m_AltDisplayRect(),                            m_drawRect(),
-            m_Message(""),                                 m_CutMessage(""),
-            m_DefaultMessage(""),                          m_TemplateText(""),
-            m_Cutdown(true),
-            m_Font(new MythFontProperties()),              m_colorCycling(false),
-            m_startColor(),                                m_endColor(),
-            m_numSteps(0),                                 m_curStep(0),
-            curR(0.0),              curG(0.0),             curB(0.0),
-            incR(0.0),              incG(0.0),             incB(0.0)
+    : MythUIType(parent, name),
+      m_Justification(Qt::AlignLeft | Qt::AlignTop), m_OrigDisplayRect(),
+      m_AltDisplayRect(),                            m_drawRect(),
+      m_Message(""),                                 m_CutMessage(""),
+      m_DefaultMessage(""),                          m_TemplateText(""),
+      m_Cutdown(true),
+      m_Font(new MythFontProperties()),              m_colorCycling(false),
+      m_startColor(),                                m_endColor(),
+      m_numSteps(0),                                 m_curStep(0),
+      curR(0.0),              curG(0.0),             curB(0.0),
+      incR(0.0),              incG(0.0),             incB(0.0)
 {
     m_Initiator = true;
     m_usingAltArea = false;
@@ -46,17 +46,17 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
 MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
                        QRect displayRect, QRect altDisplayRect,
                        MythUIType *parent, const QString &name)
-           : MythUIType(parent, name),
-             m_Justification(Qt::AlignLeft | Qt::AlignTop),
-             m_OrigDisplayRect(displayRect), m_AltDisplayRect(altDisplayRect),
-             m_drawRect(displayRect),        m_Message(text.trimmed()),
-             m_CutMessage(""),               m_DefaultMessage(text),
-             m_Cutdown(true),                m_Font(new MythFontProperties()),
-             m_colorCycling(false),          m_startColor(),
-             m_endColor(),                   m_numSteps(0),
-             m_curStep(0),
-             curR(0.0),      curG(0.0),      curB(0.0),
-             incR(0.0),      incG(0.0),      incB(0.0)
+    : MythUIType(parent, name),
+      m_Justification(Qt::AlignLeft | Qt::AlignTop),
+      m_OrigDisplayRect(displayRect), m_AltDisplayRect(altDisplayRect),
+      m_drawRect(displayRect),        m_Message(text.trimmed()),
+      m_CutMessage(""),               m_DefaultMessage(text),
+      m_Cutdown(true),                m_Font(new MythFontProperties()),
+      m_colorCycling(false),          m_startColor(),
+      m_endColor(),                   m_numSteps(0),
+      m_curStep(0),
+      curR(0.0),      curG(0.0),      curB(0.0),
+      incR(0.0),      incG(0.0),      incB(0.0)
 {
     m_Initiator = true;
     m_usingAltArea = false;
@@ -122,30 +122,36 @@ void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
     if (map.contains(objectName()))
     {
         QString newText = GetTemplateText();
+
         if (newText.isEmpty())
             newText = GetDefaultText();
 
         QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\w+)(\\|(.+))?%");
         regexp.setMinimal(true);
+
         if (!newText.isEmpty() && newText.contains(regexp))
         {
             int pos = 0;
             QString tempString = newText;
+
             while ((pos = regexp.indexIn(newText, pos)) != -1)
             {
                 QString key = regexp.cap(4).toLower().trimmed();
                 QString replacement;
+
                 if (!map.value(key).isEmpty())
                 {
                     replacement = QString("%1%2%3%4")
-                                            .arg(regexp.cap(2))
-                                            .arg(regexp.cap(3))
-                                            .arg(map.value(key))
-                                            .arg(regexp.cap(6));
+                                  .arg(regexp.cap(2))
+                                  .arg(regexp.cap(3))
+                                  .arg(map.value(key))
+                                  .arg(regexp.cap(6));
                 }
+
                 tempString.replace(regexp.cap(0), replacement);
                 pos += regexp.matchedLength();
             }
+
             newText = tempString;
         }
         else
@@ -227,10 +233,12 @@ void MythUIText::SetCutDown(bool cut)
 void MythUIText::SetMultiLine(bool multiline)
 {
     m_MultiLine = multiline;
+
     if (m_MultiLine)
         m_Justification |= Qt::TextWordWrap;
     else
         m_Justification &= ~Qt::TextWordWrap;
+
     FillCutMessage(false);
     SetRedraw();
 }
@@ -241,12 +249,14 @@ void MythUIText::SetArea(const MythRect &rect)
     m_CutMessage.clear();
 
     m_drawRect = m_Area;
+
     if (m_scrolling)
     {
         QFontMetrics fm(GetFontProperties()->face());
         QSize stringSize = fm.size(Qt::TextSingleLine, m_Message);
         SetDrawRectSize(stringSize.width(), m_Area.height());
     }
+
     FillCutMessage(false);
 }
 
@@ -258,7 +268,7 @@ void MythUIText::SetPosition(const MythPoint &pos)
 
 void MythUIText::SetDrawRectSize(const int width, const int height)
 {
-    QSize newsize(width,height);
+    QSize newsize(width, height);
 
     if (newsize == m_drawRect.size())
         return;
@@ -272,11 +282,12 @@ void MythUIText::SetDrawRectPosition(const int x, const int y)
     int startx = m_Area.x() + x;
     int starty = m_Area.y() + y;
 
-    QPoint newpoint(startx,starty);
+    QPoint newpoint(startx, starty);
+
     if (newpoint == m_drawRect.topLeft())
         return;
 
-    m_drawRect.moveTopLeft(QPoint(startx,starty));
+    m_drawRect.moveTopLeft(QPoint(startx, starty));
     SetRedraw();
 }
 
@@ -285,11 +296,12 @@ void MythUIText::MoveDrawRect(const int x, const int y)
     int newx = m_drawRect.x() + x;
     int newy = m_drawRect.y() + y;
 
-    QPoint newpoint(newx,newy);
+    QPoint newpoint(newx, newy);
+
     if (newpoint == m_drawRect.topLeft())
         return;
 
-    m_drawRect.moveTopLeft(QPoint(newx,newy));
+    m_drawRect.moveTopLeft(QPoint(newx, newy));
     SetRedraw();
 }
 
@@ -354,6 +366,7 @@ bool MythUIText::MakeNarrow(QRect &min_rect)
         if (min_rect.width() < m_Area.width())
         {
             rect = fm.boundingRect(min_rect, m_Justification, m_CutMessage);
+
             if (rect.height() <= m_Area.height() && rect.width() < min_width)
                 min_width = rect.width();
         }
@@ -366,6 +379,7 @@ bool MythUIText::MakeNarrow(QRect &min_rect)
         if (min_rect.width() < m_Area.width())
         {
             rect = fm.boundingRect(min_rect, m_Justification, m_CutMessage);
+
             if (rect.height() <= m_Area.height() && rect.width() < min_width)
                 min_width = rect.width();
         }
@@ -415,6 +429,7 @@ void MythUIText::FillCutMessage(bool reset_size)
     {
         bool isNumber;
         int value = m_Message.toInt(&isNumber);
+
         if (isNumber && m_TemplateText.contains("%n"))
         {
             m_CutMessage = qApp->translate("ThemeUI",
@@ -441,28 +456,33 @@ void MythUIText::FillCutMessage(bool reset_size)
 
         QStringList templist;
         QStringList::iterator it;
+
         switch (m_textCase)
         {
-          case CaseUpper :
-            m_CutMessage = m_CutMessage.toUpper();
-            break;
-          case CaseLower :
-            m_CutMessage = m_CutMessage.toLower();
-            break;
-          case CaseCapitaliseFirst :
-            //m_CutMessage = m_CutMessage.toLower();
-            templist = m_CutMessage.split(". ");
-            for (it = templist.begin(); it != templist.end(); ++it)
-                (*it).replace(0,1,(*it).left(1).toUpper());
-            m_CutMessage = templist.join(". ");
-            break;
-          case CaseCapitaliseAll :
-            //m_CutMessage = m_CutMessage.toLower();
-            templist = m_CutMessage.split(" ");
-            for (it = templist.begin(); it != templist.end(); ++it)
-                (*it).replace(0,1,(*it).left(1).toUpper());
-            m_CutMessage = templist.join(" ");
-            break;
+            case CaseUpper :
+                m_CutMessage = m_CutMessage.toUpper();
+                break;
+            case CaseLower :
+                m_CutMessage = m_CutMessage.toLower();
+                break;
+            case CaseCapitaliseFirst :
+                //m_CutMessage = m_CutMessage.toLower();
+                templist = m_CutMessage.split(". ");
+
+                for (it = templist.begin(); it != templist.end(); ++it)
+                    (*it).replace(0, 1, (*it).left(1).toUpper());
+
+                m_CutMessage = templist.join(". ");
+                break;
+            case CaseCapitaliseAll :
+                //m_CutMessage = m_CutMessage.toLower();
+                templist = m_CutMessage.split(" ");
+
+                for (it = templist.begin(); it != templist.end(); ++it)
+                    (*it).replace(0, 1, (*it).left(1).toUpper());
+
+                m_CutMessage = templist.join(" ");
+                break;
         }
     }
 
@@ -505,6 +525,7 @@ void MythUIText::Pulse(void)
         curB += incB;
 
         m_curStep++;
+
         if (m_curStep >= m_numSteps)
         {
             m_curStep = 0;
@@ -514,6 +535,7 @@ void MythUIText::Pulse(void)
         }
 
         QColor newColor = QColor((int)curR, (int)curG, (int)curB);
+
         if (newColor != m_Font->color())
         {
             m_Font->SetColor(newColor);
@@ -527,23 +549,31 @@ void MythUIText::Pulse(void)
         {
             case ScrollLeft :
                 MoveDrawRect(-1, 0);
+
                 if ((m_drawRect.x() + m_drawRect.width()) < 0)
-                    SetDrawRectPosition(GetArea().width(),0);
+                    SetDrawRectPosition(GetArea().width(), 0);
+
                 break;
             case ScrollRight :
                 MoveDrawRect(1, 0);
+
                 if (m_drawRect.x() > m_Area.width())
-                    SetDrawRectPosition(-GetArea().width(),0);
+                    SetDrawRectPosition(-GetArea().width(), 0);
+
                 break;
             case ScrollUp :
                 MoveDrawRect(0, -1);
+
                 if (m_drawRect.y() > m_Area.height())
-                    SetDrawRectPosition(0,-(GetArea().height()));
+                    SetDrawRectPosition(0, -(GetArea().height()));
+
                 break;
             case ScrollDown :
                 MoveDrawRect(0, 1);
+
                 if ((m_drawRect.y() + m_Area.height()) < 0)
-                    SetDrawRectPosition(0,GetArea().height()-1);
+                    SetDrawRectPosition(0, GetArea().height() - 1);
+
                 break;
         }
     }
@@ -584,6 +614,7 @@ QString MythUIText::cutDown(const QString &data, MythFontProperties *font,
                             bool multiline)
 {
     int length = data.length();
+
     if (length == 0)
         return data;
 
@@ -602,9 +633,10 @@ QString MythUIText::cutDown(const QString &data, MythFontProperties *font,
             diff = maxheight - fm.boundingRect(0, 0, maxwidth, maxheight,
                                                justification,
                                                data.left(index + margin + 1)
-                                               ).height();
+                                              ).height();
         else
             diff = maxwidth - fm.width(data, index + margin + 1);
+
         if (diff >= 0)
             index += margin;
 
@@ -618,8 +650,10 @@ QString MythUIText::cutDown(const QString &data, MythFontProperties *font,
     {
         QString tmpStr(data);
         tmpStr.truncate(index);
+
         if (index >= 3)
             tmpStr.replace(index - 3, 3, "...");
+
         return tmpStr;
     }
 
@@ -635,14 +669,16 @@ bool MythUIText::ParseElement(
         SetArea(parseRect(element));
         m_OrigDisplayRect = m_Area;
     }
-//    else if (element.tagName() == "altarea") // Unused, but maybe in future?
-//        m_AltDisplayRect = parseRect(element);
+    //    else if (element.tagName() == "altarea") // Unused, but maybe in future?
+    //        m_AltDisplayRect = parseRect(element);
     else if (element.tagName() == "font")
     {
         QString fontname = getFirstText(element);
         MythFontProperties *fp = GetFont(fontname);
+
         if (!fp)
             fp = GetGlobalFontMap()->GetFont(fontname);
+
         if (fp)
         {
             MythFontProperties font = *fp;
@@ -650,7 +686,8 @@ bool MythUIText::ParseElement(
             font.Rescale(screenHeight);
             int fontStretch = GetMythUI()->GetFontStretch();
             font.AdjustStretch(fontStretch);
-            QString state = element.attribute("state","");
+            QString state = element.attribute("state", "");
+
             if (!state.isEmpty())
             {
                 m_FontStates.insert(state, font);
@@ -664,18 +701,18 @@ bool MythUIText::ParseElement(
     }
     else if (element.tagName() == "value")
     {
-        if (element.attribute("lang","").isEmpty())
+        if (element.attribute("lang", "").isEmpty())
         {
             m_Message = qApp->translate("ThemeUI",
                                         parseText(element).toUtf8(), NULL,
                                         QCoreApplication::UnicodeUTF8);
         }
-        else if (element.attribute("lang","").toLower() ==
+        else if (element.attribute("lang", "").toLower() ==
                  gCoreContext->GetLanguageAndVariant())
         {
             m_Message = parseText(element);
         }
-        else if (element.attribute("lang","").toLower() ==
+        else if (element.attribute("lang", "").toLower() ==
                  gCoreContext->GetLanguage())
         {
             m_Message = parseText(element);
@@ -706,12 +743,17 @@ bool MythUIText::ParseElement(
         if (GetPainter()->SupportsAnimation())
         {
             QString tmp = element.attribute("start");
+
             if (!tmp.isEmpty())
                 m_startColor = QColor(tmp);
+
             tmp = element.attribute("end");
+
             if (!tmp.isEmpty())
                 m_endColor = QColor(tmp);
+
             tmp = element.attribute("steps");
+
             if (!tmp.isEmpty())
                 m_numSteps = tmp.toInt();
 
@@ -728,9 +770,11 @@ bool MythUIText::ParseElement(
         if (GetPainter()->SupportsAnimation())
         {
             QString tmp = element.attribute("direction");
+
             if (!tmp.isEmpty())
             {
                 tmp = tmp.toLower();
+
                 if (tmp == "left")
                     m_scrollDirection = ScrollLeft;
                 else if (tmp == "right")
@@ -749,6 +793,7 @@ bool MythUIText::ParseElement(
     else if (element.tagName() == "case")
     {
         QString stringCase = getFirstText(element).toLower();
+
         if (stringCase == "lower")
             m_textCase = CaseLower;
         else if (stringCase == "upper")
@@ -759,6 +804,7 @@ bool MythUIText::ParseElement(
             m_textCase = CaseCapitaliseAll;
         else
             m_textCase = CaseNormal;
+
         FillCutMessage(true);
     }
     else
@@ -768,6 +814,7 @@ bool MythUIText::ParseElement(
             m_ShrinkNarrow = (element.attribute("shrink")
                               .toLower() != "short");
         }
+
         return MythUIType::ParseElement(filename, element, showWarnings);
     }
 
@@ -777,6 +824,7 @@ bool MythUIText::ParseElement(
 void MythUIText::CopyFrom(MythUIType *base)
 {
     MythUIText *text = dynamic_cast<MythUIText *>(base);
+
     if (!text)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");
@@ -798,6 +846,7 @@ void MythUIText::CopyFrom(MythUIType *base)
     m_MultiLine = text->m_MultiLine;
 
     QMutableMapIterator<QString, MythFontProperties> it(text->m_FontStates);
+
     while (it.hasNext())
     {
         it.next();

@@ -2,7 +2,6 @@
 #define MYTHDOWNLOADMANAGER_H
 
 #include <QDateTime>
-#include <QThread>
 #include <QTimer>
 #include <QMutex>
 #include <QNetworkAccessManager>
@@ -11,11 +10,14 @@
 #include <QWaitCondition>
 
 #include "mythbaseexp.h"
+#include "mthread.h"
 
 class MythDownloadInfo;
 class RemoteFileDownloadThread;
 
-class MBASE_PUBLIC MythDownloadManager : public QThread
+void ShutdownMythDownloadManager(void);
+
+class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 {
     Q_OBJECT
 

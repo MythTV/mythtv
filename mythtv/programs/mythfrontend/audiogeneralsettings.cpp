@@ -83,7 +83,7 @@ void AudioDeviceComboBox::AudioRescan()
     resetMaxCount(vect.size());
 
     bool found = false;
-    for (it = vect.begin(); it != vect.end(); it++)
+    for (it = vect.begin(); it != vect.end(); ++it)
         addSelection(it->name, it->name,
                      value == it->name ? (found = true) : false);
     if (!found)
@@ -208,7 +208,7 @@ void AudioConfigSettings::AudioRescan()
     QVector<AudioOutput::AudioDeviceConfig>::const_iterator it;
 
     audiodevs.clear();
-    for (it = list->begin(); it != list->end(); it++)
+    for (it = list->begin(); it != list->end(); ++it)
         audiodevs.insert(it->name, *it);
 
     devices = *list;
@@ -529,6 +529,7 @@ AudioTestThread::AudioTestThread(QObject *parent,
                                  int channels,
                                  AudioOutputSettings settings,
                                  bool hd) :
+    MThread("AudioTest"),
     m_parent(parent), m_channels(channels), m_device(main),
     m_passthrough(passthrough), m_interrupted(false), m_channel(-1), m_hd(hd)
 {
@@ -579,7 +580,7 @@ void AudioTestThread::setChannel(int channel)
 
 void AudioTestThread::run()
 {
-    threadRegister("AudioTest");
+    RunProlog();
     m_interrupted = false;
     int smptelayout[7][8] = { 
         { 0, 1 },                       //stereo
@@ -682,7 +683,7 @@ void AudioTestThread::run()
 
         delete[] frames_in;
     }
-    threadDeregister();
+    RunEpilog();
 }
 
 AudioTest::AudioTest(QString main, QString passthrough,

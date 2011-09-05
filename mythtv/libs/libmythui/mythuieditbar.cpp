@@ -2,7 +2,7 @@
 #include "mythuieditbar.h"
 
 MythUIEditBar::MythUIEditBar(MythUIType *parent, const QString &name)
-  : MythUIType(parent, name), m_position(0.0), m_total(1.0)
+    : MythUIType(parent, name), m_position(0.0), m_total(1.0)
 {
 }
 
@@ -20,8 +20,10 @@ void MythUIEditBar::SetTotal(double total)
 {
     if (total < 1.0)
         return;
+
     bool changed = m_total != total;
     m_total = total;
+
     if (changed)
         Display();
 }
@@ -29,11 +31,13 @@ void MythUIEditBar::SetTotal(double total)
 void MythUIEditBar::SetPosition(double position)
 {
     float newpos = position / m_total;
+
     if (newpos < 0.0f || newpos > 1.0f)
         return;
 
     bool changed = m_position != newpos;
     m_position = newpos;
+
     if (changed)
         Display();
 }
@@ -91,12 +95,16 @@ void MythUIEditBar::Display(void)
         cut->SetVisible(false);
         cutarea = cut->GetArea();
     }
+
     if (cuttoleft)
         cuttoleft->SetVisible(false);
+
     if (cuttoright)
         cuttoright->SetVisible(false);
+
     if (keeptoleft)
         keeptoleft->SetVisible(false);
+
     if (keeptoright)
         keeptoright->SetVisible(false);
 
@@ -110,28 +118,33 @@ void MythUIEditBar::Display(void)
     }
 
     ClearImages();
+
     if (!m_regions.size())
     {
         if (keep)
             keep->SetVisible(true);
+
         return;
     }
 
-    MythUIShape *barshape   = dynamic_cast<MythUIShape*>(cut);
-    MythUIImage *barimage   = dynamic_cast<MythUIImage*>(cut);
-    MythUIShape *leftshape  = dynamic_cast<MythUIShape*>(cuttoleft);
-    MythUIImage *leftimage  = dynamic_cast<MythUIImage*>(cuttoleft);
-    MythUIShape *rightshape = dynamic_cast<MythUIShape*>(cuttoright);
-    MythUIImage *rightimage = dynamic_cast<MythUIImage*>(cuttoright);
+    MythUIShape *barshape   = dynamic_cast<MythUIShape *>(cut);
+    MythUIImage *barimage   = dynamic_cast<MythUIImage *>(cut);
+    MythUIShape *leftshape  = dynamic_cast<MythUIShape *>(cuttoleft);
+    MythUIImage *leftimage  = dynamic_cast<MythUIImage *>(cuttoleft);
+    MythUIShape *rightshape = dynamic_cast<MythUIShape *>(cuttoright);
+    MythUIImage *rightimage = dynamic_cast<MythUIImage *>(cuttoright);
 
-    QListIterator<QPair<float,float> > regions(m_regions);
+    QListIterator<QPair<float, float> > regions(m_regions);
+
     while (regions.hasNext() && cutarea.isValid())
     {
-        QPair<float,float> region = regions.next();
+        QPair<float, float> region = regions.next();
         int left  = (int)((region.first * cutarea.width()) + 0.5f);
         int right = (int)((region.second * cutarea.width()) + 0.5f);
+
         if (left >= right)
             right = left + 1;
+
         if (cut)
         {
             AddBar(barshape, barimage, QRect(left, cutarea.top(), right - left,
@@ -147,21 +160,24 @@ void MythUIEditBar::Display(void)
 
     CalcInverseRegions();
 
-    barshape   = dynamic_cast<MythUIShape*>(keep);
-    barimage   = dynamic_cast<MythUIImage*>(keep);
-    leftshape  = dynamic_cast<MythUIShape*>(keeptoleft);
-    leftimage  = dynamic_cast<MythUIImage*>(keeptoleft);
-    rightshape = dynamic_cast<MythUIShape*>(keeptoright);
-    rightimage = dynamic_cast<MythUIImage*>(keeptoright);
+    barshape   = dynamic_cast<MythUIShape *>(keep);
+    barimage   = dynamic_cast<MythUIImage *>(keep);
+    leftshape  = dynamic_cast<MythUIShape *>(keeptoleft);
+    leftimage  = dynamic_cast<MythUIImage *>(keeptoleft);
+    rightshape = dynamic_cast<MythUIShape *>(keeptoright);
+    rightimage = dynamic_cast<MythUIImage *>(keeptoright);
 
-    QListIterator<QPair<float,float> > regions2(m_invregions);
+    QListIterator<QPair<float, float> > regions2(m_invregions);
+
     while (regions2.hasNext() && keeparea.isValid())
     {
-        QPair<float,float> region = regions2.next();
+        QPair<float, float> region = regions2.next();
         int left  = (int)((region.first * keeparea.width()) + 0.5f);
         int right = (int)((region.second * keeparea.width()) + 0.5f);
+
         if (left >= right)
             right = left + 1;
+
         if (keep)
         {
             AddBar(barshape, barimage, QRect(left, keeparea.top(), right - left,
@@ -183,14 +199,18 @@ void MythUIEditBar::AddBar(MythUIShape *shape, MythUIImage *image,
                            const QRect &area)
 {
     MythUIType *add = GetNew(shape, image);
+
     if (add)
     {
-        MythUIShape *shape = dynamic_cast<MythUIShape*>(add);
-        MythUIImage *image = dynamic_cast<MythUIImage*>(add);
+        MythUIShape *shape = dynamic_cast<MythUIShape *>(add);
+        MythUIImage *image = dynamic_cast<MythUIImage *>(add);
+
         if (shape)
             shape->SetCropRect(area.left(), area.top(), area.width(), area.height());
+
         if (image)
             image->SetCropRect(area.left(), area.top(), area.width(), area.height());
+
         add->SetPosition(area.left(), area.top());
     }
 }
@@ -199,20 +219,24 @@ void MythUIEditBar::AddMark(MythUIShape *shape, MythUIImage *image,
                             int start, bool left)
 {
     MythUIType *add = GetNew(shape, image);
+
     if (add)
     {
         if (left)
             start -= add->GetArea().width();
+
         add->SetPosition(start, add->GetArea().top());
     }
 }
 
-MythUIType* MythUIEditBar::GetNew(MythUIShape *shape, MythUIImage *image)
+MythUIType *MythUIEditBar::GetNew(MythUIShape *shape, MythUIImage *image)
 {
     QString name = QString("editbarimage_%1").arg(m_images.size());
+
     if (shape)
     {
         MythUIShape *newshape = new MythUIShape(this, name);
+
         if (newshape)
         {
             newshape->CopyFrom(shape);
@@ -224,6 +248,7 @@ MythUIType* MythUIEditBar::GetNew(MythUIShape *shape, MythUIImage *image)
     else if (image)
     {
         MythUIImage *newimage = new MythUIImage(this, name);
+
         if (newimage)
         {
             newimage->CopyFrom(image);
@@ -232,6 +257,7 @@ MythUIType* MythUIEditBar::GetNew(MythUIShape *shape, MythUIImage *image)
             return newimage;
         }
     }
+
     return NULL;
 }
 
@@ -241,14 +267,17 @@ void MythUIEditBar::CalcInverseRegions(void)
 
     bool first = true;
     float start = 0.0f;
-    QListIterator<QPair<float,float> > regions(m_regions);
+    QListIterator<QPair<float, float> > regions(m_regions);
+
     while (regions.hasNext())
     {
-        QPair<float,float> region = regions.next();
+        QPair<float, float> region = regions.next();
+
         if (first)
         {
             if (region.first > 0.0f)
                 m_invregions.append(qMakePair(start, region.first));
+
             start = region.second;
             first = false;
         }
@@ -275,12 +304,14 @@ void MythUIEditBar::ClearImages(void)
 void MythUIEditBar::CopyFrom(MythUIType *base)
 {
     MythUIEditBar *editbar = dynamic_cast<MythUIEditBar *>(base);
+
     if (!editbar)
         return;
 
     m_position = editbar->m_position;
 
-    QListIterator<QPair<float,float> > it(m_regions);
+    QListIterator<QPair<float, float> > it(m_regions);
+
     while (it.hasNext())
         editbar->m_regions.append(it.next());
 
@@ -302,6 +333,7 @@ void MythUIEditBar::CreateCopy(MythUIType *parent)
 void MythUIEditBar::Finalize(void)
 {
     MythUIType *position = GetChild("position");
+
     if (position)
         position->MoveToTop();
 }

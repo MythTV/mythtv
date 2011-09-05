@@ -151,11 +151,11 @@ class MPUBLIC MythLineEdit : public QLineEdit
     void setRW(bool readwrite = true) { rw = readwrite; };
     void setRO() { rw = false; };
     void setAllowVirtualKeyboard(bool allowKbd = true)
-	       { allowVirtualKeyboard = allowKbd; }
+        { allowVirtualKeyboard = allowKbd; }
     // muthui's MythUITextEdit m_Filter & FilterNumeric
     // may be a better way to do it
     //void setSmartVirtualKeyboard(bool allowKbd = true)
-	//       { allowSmartKeyboard   = allowKbd; }
+    //       { allowSmartKeyboard   = allowKbd; }
     void setPopupPosition(PopupPositionQt pos) { popupPosition = pos; }
     PopupPositionQt getPopupPosition(void) { return popupPosition; }
 

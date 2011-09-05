@@ -83,12 +83,11 @@ QStringList UPnpMSRR::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool UPnpMSRR::ProcessRequest( HttpWorkerThread *pThread,
-                               HTTPRequest *pRequest )
+bool UPnpMSRR::ProcessRequest( HTTPRequest *pRequest )
 {
     if (pRequest)
     {
-        if (Eventing::ProcessRequest( pThread, pRequest ))
+        if (Eventing::ProcessRequest( pRequest ))
             return true;
 
         if ( pRequest->m_sBaseUrl != m_sControlUrl )

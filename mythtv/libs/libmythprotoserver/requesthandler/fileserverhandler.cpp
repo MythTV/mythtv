@@ -163,7 +163,7 @@ void FileServerHandler::RunDeleteThread(void)
                 this, SIGNAL(unlinkFailed(QString)));
         connect(deletethread, SIGNAL(fileUnlinked(QString)),
                 this, SIGNAL(fileUnlinked(QString)));
-        connect(deletethread, SIGNAL(finished()),
+        connect(deletethread->qthread(), SIGNAL(finished()),
                 this, SLOT(deleteThreadTerminated()));
         deletethread->start();
     }

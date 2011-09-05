@@ -1,3 +1,4 @@
+
 #ifndef UPnpMSRR_H_
 #define UPnpMSRR_H_
 
@@ -50,13 +51,13 @@ class UPNP_PUBLIC  UPnpMSRR : public Eventing
 
     public:
                  UPnpMSRR( UPnpDevice *pDevice,
-			   const QString &sSharePath ); 
+                           const QString &sSharePath ); 
 
         virtual ~UPnpMSRR();
 
         virtual QStringList GetBasePaths();
 
-        bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
+        bool     ProcessRequest( HTTPRequest *pRequest );
 };
 
 #endif

@@ -94,7 +94,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                               "Content-Length: 0\r\n\r\n" )
                               .arg( m_nMaxAge    )
                               .arg( sDate )
-                              .arg( HttpServer::g_sPlatform )
+                              .arg( HttpServer::GetPlatform() )
                               .arg( MYTH_BINARY_VERSION )
                               .arg( sST )
                               .arg( sUSN );
@@ -133,7 +133,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
 
         pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress,
                              m_nPeerPort );
-        usleep( rand() % 250000 );
+        usleep( random() % 250000 );
         pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress,
                              m_nPeerPort );
     }

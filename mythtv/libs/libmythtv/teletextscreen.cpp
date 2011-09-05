@@ -323,10 +323,10 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
 {
     bool mosaic;
     bool conceal;
-    bool seperation;
-    bool flash;
+    MUNUSED bool seperation;
+    MUNUSED bool flash;
     bool doubleheight;
-    bool blink;
+    MUNUSED bool blink;
     bool hold;
     bool endbox;
     bool startbox;
@@ -402,7 +402,7 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
         ch = page[x] & 0x7F;
         switch (ch)
         {
-            case 0x00: case 0x01: case 0x02: case 0x03: 
+            case 0x00: case 0x01: case 0x02: case 0x03:
             case 0x04: case 0x05: case 0x06: case 0x07: // alpha + foreground color
                 fgcolor = ch & 7;
                 mosaic = false;
@@ -430,7 +430,7 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
                 doubleheight = (row < (kTeletextRows-1)) && (x < (kTeletextColumns - 1));
                 goto ctrl;
 
-            case 0x10: case 0x11: case 0x12: case 0x13: 
+            case 0x10: case 0x11: case 0x12: case 0x13:
             case 0x14: case 0x15: case 0x16: case 0x17: // graphics + foreground color
                 fgcolor = ch & 7;
                 mosaic = true;

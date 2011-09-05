@@ -14,9 +14,9 @@ using namespace std;
 class MTV_PUBLIC ChannelGroupItem
 {
   public:
-    ChannelGroupItem(const ChannelGroupItem&);
-    ChannelGroupItem(const uint _grpid, 
-                  const QString &_name) :
+    ChannelGroupItem(const ChannelGroupItem &other) :
+        grpid(other.grpid), name(other.name) {}
+    ChannelGroupItem(const uint _grpid, const QString &_name) :
         grpid(_grpid), name(_name) {}
 
     bool operator == (uint _grpid) const

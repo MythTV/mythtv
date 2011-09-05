@@ -10,7 +10,6 @@
 #include <vector>
 using namespace std;
 
-#include "polygon.h"
 #include "constants.h"
 
 #include <QResizeEvent>
@@ -50,8 +49,7 @@ public:
     }
 
     short *left, *right;
-    long length, offset;
-
+    unsigned long length, offset;
 };
 
 class VisualBase
@@ -174,8 +172,8 @@ protected:
     QColor startColor, targetColor;
     vector<double> magnitudes;
     QSize size;
-    bool rubberband;
-    double falloff;
+    bool const rubberband;
+    double const falloff;
 };
 
 class MonoScope : public StereoScope

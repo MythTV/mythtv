@@ -17,9 +17,15 @@
 #include "channelgroup.h"
 #include "sourceutil.h"
 
-DBChannel::DBChannel(const DBChannel &other)
+DBChannel::DBChannel(const DBChannel &other) :
+    channum(other.channum),       callsign(other.callsign),
+    name(other.name),             icon(other.icon),
+    chanid(other.chanid),
+    major_chan(other.major_chan), minor_chan(other.minor_chan),
+    mplexid((other.mplexid == 32767) ? 0 : other.mplexid),
+    sourceid(other.sourceid),     cardid (other.cardid),
+    grpid(other.grpid),           visible(other.visible)
 {
-    (*this) = other;
 }
 
 DBChannel::DBChannel(
@@ -68,14 +74,20 @@ void DBChannel::ToMap(InfoMap& infoMap) const
     infoMap["minorchan"] = QString().setNum(minor_chan);
     infoMap["mplexid"] = QString().setNum(mplexid);
     infoMap["channelvisible"] = visible ? QObject::tr("Yes") : QObject::tr("No");
-    
+
     infoMap["channelgroupname"] = ChannelGroup::GetChannelGroupName(grpid);
     infoMap["channelsourcename"] = SourceUtil::GetSourceName(sourceid);
 }
 
-QString DBChannel::GetFormatted(const QString &format) const
+QString DBChannel::GetFormatted(const ChannelFormat &format) const
 {
-    QString tmp = format;
+    QString tmp;
+
+    if (format & kChannelLong)
+        tmp = gCoreContext->GetSetting("LongChannelFormat", "<num> <name>");
+    else // kChannelShort
+        tmp = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
+
 
     if (tmp.isEmpty())
         return QString();
@@ -90,12 +102,18 @@ QString DBChannel::GetFormatted(const QString &format) const
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
-QString ChannelInfo::GetFormatted(const QString &format) const
+QString ChannelInfo::GetFormatted(const ChannelFormat &format) const
 {
-    QString tmp = format;
+    QString tmp;
+
+    if (format & kChannelLong)
+        tmp = gCoreContext->GetSetting("LongChannelFormat", "<num> <name>");
+    else // kChannelShort
+        tmp = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
+
 
     if (tmp.isEmpty())
-        return "";
+        return QString();
 
     tmp.replace("<num>",  chanstr);
     tmp.replace("<sign>", callsign);

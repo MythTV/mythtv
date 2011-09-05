@@ -1,8 +1,9 @@
 #ifndef AUDIOPULSEHANDLER_H
 #define AUDIOPULSEHANDLER_H
 
-#include <QThread>
 #include <pulse/pulseaudio.h>
+
+class QThread;
 
 class PulseHandler
 {

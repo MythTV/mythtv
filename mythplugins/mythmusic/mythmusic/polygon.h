@@ -3,24 +3,28 @@
 
 #include <string.h>
 
-template<class Pixel>
-struct Bitmap {
-  int width, height, extra;
-  Pixel *data;
+template<typename Pixel>
+class Bitmap
+{
+  public:
+    int width, height, extra;
+    Pixel *data;
 
-  Bitmap(int e=0) : extra(e), data(0) { };
-  ~Bitmap() { delete[] data; };
+    Bitmap(int e = 0) : width(0), height(0), extra(e), data(NULL) { }
+    ~Bitmap() { delete[] data; }
 
-  void size(int w,int h) {
-    delete[] data;
-    width = w;
-    height = h;
-    data = new Pixel[w*h+extra];
-    clear();
-  }
+    void size(int w,int h)
+    {
+        delete[] data;
+        width = w;
+        height = h;
+        data = new Pixel[w*h+extra];
+        clear();
+    }
   
-  void clear() {
-    memset(data,0,sizeof(Pixel)*(width*height+extra));
-  }
+    void clear()
+    {
+        memset(data,0,sizeof(Pixel)*(width*height+extra));
+    }
 };
 #endif

@@ -86,7 +86,7 @@ class BufferedSocketDevice
         void                Close               ();
         void                Flush               ();
         qint64              Size                ();
-        qint64              At                  (); 
+        qint64              At                  () const; 
         bool                At                  ( qlonglong );
         bool                AtEnd               ();
 

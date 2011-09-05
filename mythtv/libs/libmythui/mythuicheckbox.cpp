@@ -10,7 +10,7 @@
 #include "mythgesture.h"
 
 MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name)
-            : MythUIType(parent, name)
+    : MythUIType(parent, name)
 {
     m_currentCheckState = MythUIStateType::Off;
     m_state = "active";
@@ -31,13 +31,13 @@ MythUICheckBox::~MythUICheckBox()
 
 void MythUICheckBox::SetInitialStates()
 {
-    m_BackgroundState = dynamic_cast<MythUIStateType*>(GetChild("background"));
-    m_CheckState = dynamic_cast<MythUIStateType*>(GetChild("checkstate"));
+    m_BackgroundState = dynamic_cast<MythUIStateType *>(GetChild("background"));
+    m_CheckState = dynamic_cast<MythUIStateType *>(GetChild("checkstate"));
 
     if (!m_CheckState || !m_BackgroundState)
         LOG(VB_GENERAL, LOG_ERR,
             QString("Checkbox %1 is missing required elements")
-                .arg(objectName()));
+            .arg(objectName()));
 
     if (m_CheckState)
         m_CheckState->DisplayState(m_currentCheckState);
@@ -120,6 +120,7 @@ void MythUICheckBox::Deselect()
         m_state = "active";
     else
         m_state = "disabled";
+
     m_BackgroundState->DisplayState(m_state);
 }
 
@@ -194,6 +195,7 @@ void MythUICheckBox::CreateCopy(MythUIType *parent)
 void MythUICheckBox::CopyFrom(MythUIType *base)
 {
     MythUICheckBox *button = dynamic_cast<MythUICheckBox *>(base);
+
     if (!button)
     {
         LOG(VB_GENERAL, LOG_ERR, "Dynamic cast of base failed");

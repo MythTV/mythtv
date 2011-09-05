@@ -424,11 +424,11 @@ bool Wsdl::CreateType( QObject *pParent, QString &sTypeName )
         // Add all properties for this type
         // ------------------------------------------------------------------
     
-		int nCount = pMetaObject->propertyCount();
+        int nCount = pMetaObject->propertyCount();
 
-		for (int nIdx=0; nIdx < nCount; ++nIdx ) 
-		{
-			QMetaProperty metaProperty = pMetaObject->property( nIdx );
+        for (int nIdx=0; nIdx < nCount; ++nIdx ) 
+        {
+            QMetaProperty metaProperty = pMetaObject->property( nIdx );
 
             if (metaProperty.isDesignable( pClass ))
             {
@@ -466,7 +466,7 @@ bool Wsdl::CreateType( QObject *pParent, QString &sTypeName )
 
                 oSeqNode.appendChild( oNode );
             }
-		}
+        }
 
         QDomElement oElementNode = createElement( "xs:element" );
 
@@ -495,13 +495,13 @@ bool Wsdl::CreateType( QObject *pParent, QString &sTypeName )
 // <element name="<typename>" nillable="true" type="tns:ArrayOf<contained_typename>" />
 //
 /*
-<xs:complexType name="ArrayOfstring">
-		<xs:sequence>
-			<xs:element name="String" type="xs:string" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:element name="StringList" type="ArrayOfstring"/>
-    */
+    <xs:complexType name="ArrayOfstring">
+        <xs:sequence>
+            <xs:element name="String" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="StringList" type="ArrayOfstring"/>
+ */
 /////////////////////////////////////////////////////////////////////////////
 
 bool Wsdl::CreateArrayType( QObject      *pParent,

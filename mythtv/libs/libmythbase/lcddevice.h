@@ -19,14 +19,14 @@ class MBASE_PUBLIC LCDMenuItem
 {
   public:
     LCDMenuItem(bool item_selected, CHECKED_STATE item_checked,
-                QString item_name, unsigned int item_indent  = 0)
+                QString item_name, unsigned int item_indent  = 0,
+                bool item_scroll = false)
     {
         selected = item_selected;
         checked = item_checked;
         name = item_name;
-        scroll = false;
+        scroll = item_scroll;
         indent = item_indent;
-        scroll = false;
         scrollPosition = indent;
     }
 
@@ -96,77 +96,77 @@ class MBASE_PUBLIC LCDTextItem
 
 //only one active at a time
 enum LCDSpeakerSet {
-	SPEAKER_MASK = 0x00000030,
-	SPEAKER_LR = 1 << 4,
-	SPEAKER_51 = 2 << 4,
-	SPEAKER_71 = 3 << 4,
+    SPEAKER_MASK = 0x00000030,
+    SPEAKER_LR = 1 << 4,
+    SPEAKER_51 = 2 << 4,
+    SPEAKER_71 = 3 << 4,
 };
 
 //only one active at a time
 enum LCDAudioFormatSet {
-	AUDIO_MASK = 0x0000E000 | 0x00070000,
+    AUDIO_MASK = 0x0000E000 | 0x00070000,
 
-	AUDIO_MP3  = 1 << 13,
-	AUDIO_OGG  = 2 << 13,
-	AUDIO_WMA2 = 3 << 13,
-	AUDIO_WAV  = 4 << 13,
+    AUDIO_MP3  = 1 << 13,
+    AUDIO_OGG  = 2 << 13,
+    AUDIO_WMA2 = 3 << 13,
+    AUDIO_WAV  = 4 << 13,
 
-	AUDIO_MPEG2 = 1 << 16,
-	AUDIO_AC3   = 2 << 16,
-	AUDIO_DTS   = 3 << 16,
-	AUDIO_WMA   = 4 << 16,
+    AUDIO_MPEG2 = 1 << 16,
+    AUDIO_AC3   = 2 << 16,
+    AUDIO_DTS   = 3 << 16,
+    AUDIO_WMA   = 4 << 16,
 };
 
 //only one active at a time
 enum LCDVideoFormatSet {
-	VIDEO_MASK = 0x00380000,
-	VIDEO_MPG  = 1 << 19,
-	VIDEO_DIVX = 2 << 19,
-	VIDEO_XVID = 3 << 19,
-	VIDEO_WMV  = 4 << 19,
+    VIDEO_MASK = 0x00380000,
+    VIDEO_MPG  = 1 << 19,
+    VIDEO_DIVX = 2 << 19,
+    VIDEO_XVID = 3 << 19,
+    VIDEO_WMV  = 4 << 19,
 };
 
 //only one active at a time
 enum LCDTunerSet {
-	TUNER_MASK = 0x00000080 | 0x00000800 | 0x00001000,
-	TUNER_SRC  = 0x00000080,
-	TUNER_SRC1 = 0x00000800,
-	TUNER_SRC2 = 0x00001000,
+    TUNER_MASK = 0x00000080 | 0x00000800 | 0x00001000,
+    TUNER_SRC  = 0x00000080,
+    TUNER_SRC1 = 0x00000800,
+    TUNER_SRC2 = 0x00001000,
 };
 
 //only one active at a time
 enum LCDVideoSourceSet {
-	VSRC_MASK = 0x00000100 | 0x00000200,
-	VSRC_FIT  = 0x00000100,
-	VSRC_TV   = 0x00000200,
+    VSRC_MASK = 0x00000100 | 0x00000200,
+    VSRC_FIT  = 0x00000100,
+    VSRC_TV   = 0x00000200,
 };
 
 //can be enabled/disabled separately
 enum LCDVariousFlags {
-	VARIOUS_VOL = 0x00400000,
-	VARIOUS_TIME = 0x00800000,
-	VARIOUS_ALARM = 0x01000000,
-	VARIOUS_RECORD = 0x02000000,
-	VARIOUS_REPEAT = 0x04000000,
-	VARIOUS_SHUFFLE = 0x08000000,
-	VARIOUS_DISC_IN = 0x20000000,
-	VARIOUS_HDTV = 0x00000400,
-	VARIOUS_SPDIF = 0x1 << 9,
-	SPDIF_MASK = 0x00000040,
+    VARIOUS_VOL = 0x00400000,
+    VARIOUS_TIME = 0x00800000,
+    VARIOUS_ALARM = 0x01000000,
+    VARIOUS_RECORD = 0x02000000,
+    VARIOUS_REPEAT = 0x04000000,
+    VARIOUS_SHUFFLE = 0x08000000,
+    VARIOUS_DISC_IN = 0x20000000,
+    VARIOUS_HDTV = 0x00000400,
+    VARIOUS_SPDIF = 0x1 << 9,
+    SPDIF_MASK = 0x00000040,
 };
 
 
 //only one active at a time
 enum LCDFunctionSet {
-	//0=none, 1=music, 2=movie, 3=photo, 4=CD/DVD, 5=TV, 6=Web, 7=News/Weather  * 2
-	FUNC_MASK = 0xE,
-	FUNC_MUSIC = 1 << 1,
-	FUNC_MOVIE = 2 << 1,
-	FUNC_PHOTO = 3 << 1,
-	FUNC_DVD = 4 << 1,
-	FUNC_TV = 5 << 1,
-	FUNC_WEB = 6 << 1,
-	FUNC_NEWS = 7 << 1,
+    //0=none, 1=music, 2=movie, 3=photo, 4=CD/DVD, 5=TV, 6=Web, 7=News/Weather  * 2
+    FUNC_MASK = 0xE,
+    FUNC_MUSIC = 1 << 1,
+    FUNC_MOVIE = 2 << 1,
+    FUNC_PHOTO = 3 << 1,
+    FUNC_DVD = 4 << 1,
+    FUNC_TV = 5 << 1,
+    FUNC_WEB = 6 << 1,
+    FUNC_NEWS = 7 << 1,
 };
 
 class MBASE_PUBLIC LCD : public QObject, public MythSocketCBs
@@ -217,13 +217,11 @@ class MBASE_PUBLIC LCD : public QObject, public MythSocketCBs
 
     // When playing music, switch to this and give artist and track name
     //
-    // Note: the use of switchToMusic and setLevels is discouraged, because it
+    // Note: the use of switchToMusic is discouraged, because it
     // has become obvious that most LCD devices cannot handle communications
     // fast enough to make them useful.
-    void switchToMusic(const QString &artist, const QString &album, const QString &track);
-
-    // You can set 10 (or less) equalizer values here (between 0.0 and 1.0)
-    void setLevels(int numbLevels, float *values);
+    void switchToMusic(const QString &artist, const QString &album,
+                       const QString &track);
 
     // For Live TV, supply the channel number, program title and subtitle
     //

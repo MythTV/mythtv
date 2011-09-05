@@ -87,7 +87,7 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
             break;
     }
     format = choice;
-    if ((chk = ioctl(dsp_fd, SNDCTL_DSP_SETFMT, &format) < 0))
+    if ((chk = ioctl(dsp_fd, SNDCTL_DSP_SETFMT, &format)) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("failed to set audio format %1: ").arg(tag) + ENO);

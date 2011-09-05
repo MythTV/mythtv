@@ -28,7 +28,8 @@ ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
     m_url("http://services.mythtv.org/channel-icon/"), m_progressDialog(NULL),
     m_iconsList(NULL),             m_manualEdit(NULL),
     m_nameText(NULL),              m_manualButton(NULL),
-    m_skipButton(NULL),            m_statusText(NULL)
+    m_skipButton(NULL),            m_statusText(NULL),
+    m_preview(NULL),               m_previewtitle(NULL)
 {
     m_strChannelname.detach();
     LOG(VB_GENERAL, LOG_INFO,
@@ -60,7 +61,7 @@ bool ImportIconsWizard::Create()
     if (!initialLoad(m_strChannelname))
         return false;
 
-    
+
     bool foundtheme = false;
 
     // Load the theme for this screen
@@ -100,7 +101,7 @@ bool ImportIconsWizard::Create()
             SLOT(menuSelection(MythUIButtonListItem *)));
     connect(m_iconsList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             SLOT(itemChanged(MythUIButtonListItem *)));
-            
+
     BuildFocusList();
 
     enableControls(STATE_NORMAL);
@@ -547,7 +548,7 @@ bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& loca
     QFileInfo file(m_strChannelDir+filename);
 
     bool fRet;
-    // Since DNS for lyngsat-logos.com times out, set a 20s timeout 
+    // Since DNS for lyngsat-logos.com times out, set a 20s timeout
     if (!file.exists())
         fRet = HttpComms::getHttpFile(file.absoluteFilePath(),iconUrl,20000);
     else
@@ -703,9 +704,9 @@ bool ImportIconsWizard::search(const QString& strParam)
                 iconfile = m_tmpDir.absoluteFilePath(iconfile);
                 QString iconname = entry.strName;
                 bool haveIcon = true;
-                // Since DNS for lyngsat-logos.com times out, set a 20s timeout 
+                // Since DNS for lyngsat-logos.com times out, set a 20s timeout
                 if (!QFile(iconfile).exists())
-                    haveIcon = HttpComms::getHttpFile(iconfile, entry.strLogo, 
+                    haveIcon = HttpComms::getHttpFile(iconfile, entry.strLogo,
                                                       20000);
 
                 if (haveIcon)

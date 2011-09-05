@@ -30,12 +30,12 @@
 
 #define SLOC(a) QString("MythSocketThread(sock 0x%1:%2): ")\
                     .arg((uint64_t)a, 0, 16).arg(a->socket())
-#define LOC	QString("MythSocketThread: ")
+#define LOC     QString("MythSocketThread: ")
 
 const uint MythSocketThread::kShortWait = 100;
 
 MythSocketThread::MythSocketThread()
-    : QThread(), m_readyread_run(false)
+    : MThread("Socket"), m_readyread_run(false)
 {
     for (int i = 0; i < 2; i++)
     {
@@ -46,8 +46,12 @@ MythSocketThread::MythSocketThread()
 
 void ShutdownRRT(void)
 {
-    MythSocket::s_readyread_thread->ShutdownReadyReadThread();
-    MythSocket::s_readyread_thread->wait();
+    QMutexLocker locker(&MythSocket::s_readyread_thread_lock);
+    if (MythSocket::s_readyread_thread)
+    {
+        MythSocket::s_readyread_thread->ShutdownReadyReadThread();
+        MythSocket::s_readyread_thread->wait();
+    }
 }
 
 void MythSocketThread::ShutdownReadyReadThread(void)
@@ -188,7 +192,7 @@ void MythSocketThread::ProcessAddRemoveQueues(void)
 
 void MythSocketThread::run(void)
 {
-    threadRegister("Socket");
+    RunProlog();
     LOG(VB_SOCKET, LOG_DEBUG, LOC + "readyread thread start");
 
     QMutexLocker locker(&m_readyread_lock);
@@ -374,5 +378,5 @@ void MythSocketThread::run(void)
     }
 
     LOG(VB_SOCKET, LOG_DEBUG, LOC + "readyread thread exit");
-    threadDeregister();
+    RunEpilog();
 }

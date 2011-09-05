@@ -44,37 +44,38 @@ struct MimeType
 
 static MimeType SupportedMimeTypes[] =
 {
-    { "audio/mpeg3",                "mp3",   false },
-    { "audio/x-mpeg-3",             "mp3",   false },
-    { "audio/mpeg",                 "mp2",   false },
-    { "audio/x-mpeg",               "mp2",   false },
-    { "audio/ogg",                  "ogg",   false },
-    { "audio/ogg",                  "oga",   false },
-    { "audio/flac",                 "flac",  false },
-    { "audio/x-ms-wma",             "wma",   false },
-    { "audio/wav",                  "wav",   false },
-    { "audio/x-wav",                "wav",   false },
-    { "audio/ac3",                  "ac3",   false },
-    { "audio/x-ac3",                "ac3",   false },
-    { "audio/x-oma",                "oma",   false },
-    { "audio/x-realaudio",          "ra",    false },
-    { "audio/dts",                  "dts",   false },
-    { "audio/x-dts",                "dts",   false },
-    { "audio/aac",                  "aac",   false },
-    { "audio/x-aac",                "aac",   false },
-    { "audio/m4a",                  "m4a",   false },
-    { "audio/x-m4a",                "m4a",   false },
-    { "video/mpeg",                 "mpg",   true },
-    { "video/mpeg",                 "mpeg",  true },
-    { "video/x-ms-wmv",             "wmv",   true },
-    { "video/x-ms-wmv",             "avi",   true },
-    { "application/x-troff-msvideo","avi",   true },
-    { "video/avi",                  "avi",   true },
-    { "video/msvideo",              "avi",   true },
-    { "video/x-msvideo",            "avi",   true }
+    { "audio/mpeg3",                 "mp3",   false },
+    { "audio/x-mpeg-3",              "mp3",   false },
+    { "audio/mpeg",                  "mp2",   false },
+    { "audio/x-mpeg",                "mp2",   false },
+    { "audio/ogg",                   "ogg",   false },
+    { "audio/ogg",                   "oga",   false },
+    { "audio/flac",                  "flac",  false },
+    { "audio/x-ms-wma",              "wma",   false },
+    { "audio/wav",                   "wav",   false },
+    { "audio/x-wav",                 "wav",   false },
+    { "audio/ac3",                   "ac3",   false },
+    { "audio/x-ac3",                 "ac3",   false },
+    { "audio/x-oma",                 "oma",   false },
+    { "audio/x-realaudio",           "ra",    false },
+    { "audio/dts",                   "dts",   false },
+    { "audio/x-dts",                 "dts",   false },
+    { "audio/aac",                   "aac",   false },
+    { "audio/x-aac",                 "aac",   false },
+    { "audio/m4a",                   "m4a",   false },
+    { "audio/x-m4a",                 "m4a",   false },
+    { "video/mpeg",                  "mpg",   true },
+    { "video/mpeg",                  "mpeg",  true },
+    { "video/x-ms-wmv",              "wmv",   true },
+    { "video/x-ms-wmv",              "avi",   true },
+    { "application/x-troff-msvideo", "avi",   true },
+    { "video/avi",                   "avi",   true },
+    { "video/msvideo",               "avi",   true },
+    { "video/x-msvideo",             "avi",   true }
 };
 
-static int SupportedMimeTypesCount = sizeof(SupportedMimeTypes) / sizeof(SupportedMimeTypes[0]);
+static int SupportedMimeTypesCount = sizeof(SupportedMimeTypes) /
+                                        sizeof(SupportedMimeTypes[0]);
 
 static QNetworkAccessManager *networkManager = NULL;
 
@@ -99,7 +100,7 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
 
 /**
  * @class BrowserApi
- * @brief Adds a JavaScript object 
+ * @brief Adds a JavaScript object
  * \note allows the browser to control the music player
  */
 BrowserApi::BrowserApi(QObject *parent) : QObject(parent)
@@ -118,7 +119,8 @@ void BrowserApi::setWebView(QWebView *view)
     m_frame = page->mainFrame();
 
     attachObject();
-    connect(m_frame, SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(attachObject()));
+    connect(m_frame, SIGNAL(javaScriptWindowObjectCleared()), this,
+            SLOT(attachObject()));
 }
 
 void BrowserApi::attachObject(void)
@@ -147,7 +149,7 @@ void BrowserApi::Pause(void)
 void BrowserApi::SetVolume(int volumn)
 {
     MythEvent me(QString("MUSIC_COMMAND %1 SET_VOLUME %2")
-                .arg(gCoreContext->GetHostName()).arg(volumn));
+                 .arg(gCoreContext->GetHostName()).arg(volumn));
     gCoreContext->dispatch(me);
 }
 
@@ -156,11 +158,12 @@ int BrowserApi::GetVolume(void)
     m_gotAnswer = false;
 
     MythEvent me(QString("MUSIC_COMMAND %1 GET_VOLUME")
-                .arg(gCoreContext->GetHostName()));
+                 .arg(gCoreContext->GetHostName()));
     gCoreContext->dispatch(me);
 
     QTime timer;
     timer.start();
+
     while (timer.elapsed() < 2000  && !m_gotAnswer)
     {
         qApp->processEvents();
@@ -176,21 +179,21 @@ int BrowserApi::GetVolume(void)
 void BrowserApi::PlayFile(QString filename)
 {
     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_FILE '%2'")
-                .arg(gCoreContext->GetHostName()).arg(filename));
+                 .arg(gCoreContext->GetHostName()).arg(filename));
     gCoreContext->dispatch(me);
 }
 
 void BrowserApi::PlayTrack(int trackID)
 {
     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_TRACK %2")
-                .arg(gCoreContext->GetHostName()).arg(trackID));
+                 .arg(gCoreContext->GetHostName()).arg(trackID));
     gCoreContext->dispatch(me);
 }
 
 void BrowserApi::PlayURL(QString url)
 {
     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_URL %2")
-                .arg(gCoreContext->GetHostName()).arg(url));
+                 .arg(gCoreContext->GetHostName()).arg(url));
     gCoreContext->dispatch(me);
 }
 
@@ -199,11 +202,12 @@ QString BrowserApi::GetMetadata(void)
     m_gotAnswer = false;
 
     MythEvent me(QString("MUSIC_COMMAND %1 GET_METADATA")
-                .arg(gCoreContext->GetHostName()));
+                 .arg(gCoreContext->GetHostName()));
     gCoreContext->dispatch(me);
 
     QTime timer;
     timer.start();
+
     while (timer.elapsed() < 2000  && !m_gotAnswer)
     {
         qApp->processEvents();
@@ -227,19 +231,22 @@ void BrowserApi::customEvent(QEvent *e)
             return;
 
         QStringList tokens = message.simplified().split(" ");
-        if ((tokens.size() >= 4) && (tokens[1] == "ANSWER") 
+
+        if ((tokens.size() >= 4) && (tokens[1] == "ANSWER")
             && (tokens[2] == gCoreContext->GetHostName()))
         {
             m_answer = tokens[3];
+
             for (int i = 4; i < tokens.size(); i++)
                 m_answer += QString(" ") + tokens[i];
+
             m_gotAnswer = true;
         }
     }
 }
 
 MythWebPage::MythWebPage(QObject *parent)
-    : QWebPage(parent)
+            : QWebPage(parent)
 {
     setNetworkAccessManager(GetNetworkAccessManager());
 }
@@ -252,39 +259,46 @@ bool MythWebPage::supportsExtension(Extension extension) const
     return false;
 }
 
-bool MythWebPage::extension(Extension extension, const ExtensionOption *option, ExtensionReturn *output)
+bool MythWebPage::extension(Extension extension, const ExtensionOption *option,
+                            ExtensionReturn *output)
 {
     if (extension == QWebPage::ErrorPageExtension)
     {
-        ErrorPageExtensionOption *erroroption = (ErrorPageExtensionOption*) option;
-        ErrorPageExtensionReturn *erroroutput = (ErrorPageExtensionReturn*) output;
+        ErrorPageExtensionOption *erroroption;
+        erroroption = (ErrorPageExtensionOption *) option;
+        ErrorPageExtensionReturn *erroroutput;
+        erroroutput = (ErrorPageExtensionReturn *) output;
 
         if (!option || !output)
             return false;
 
         QString filename = "htmls/notfound.html";
+
         if (!GetMythUI()->FindThemeFile(filename))
             return false;
 
         QFile file(QLatin1String(qPrintable(filename)));
         bool isOpened = file.open(QIODevice::ReadOnly);
+
         if (!isOpened)
             return false;
 
         QString title = tr("Error loading page: %1").arg(erroroption->url.toString());
         QString html = QString(QLatin1String(file.readAll()))
-                            .arg(title)
-                            .arg(erroroption->errorString)
-                            .arg(erroroption->url.toString());
+                       .arg(title)
+                       .arg(erroroption->errorString)
+                       .arg(erroroption->url.toString());
 
         QBuffer imageBuffer;
         imageBuffer.open(QBuffer::ReadWrite);
-        QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning, 0, 0);
-        QPixmap pixmap = icon.pixmap(QSize(32,32));
+        QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning,
+                                                 0, 0);
+        QPixmap pixmap = icon.pixmap(QSize(32, 32));
+
         if (pixmap.save(&imageBuffer, "PNG"))
         {
             html.replace(QLatin1String("IMAGE_BINARY_DATA_HERE"),
-                            QString(QLatin1String(imageBuffer.buffer().toBase64())));
+                         QString(QLatin1String(imageBuffer.buffer().toBase64())));
         }
 
         erroroutput->content = html.toUtf8();
@@ -295,14 +309,19 @@ bool MythWebPage::extension(Extension extension, const ExtensionOption *option, 
     return false;
 }
 
+QString MythWebPage::userAgentForUrl(const QUrl &url) const
+{
+    return QWebPage::userAgentForUrl(url).replace("Safari", "MythBrowser");
+}
+
 /**
  * @class MythWebView
  * @brief Subclass of QWebView
  * \note allows us to intercept keypresses
  */
 MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
-           : QWebView(parent),
-           m_webpage(new MythWebPage(this))
+            : QWebView(parent),
+      m_webpage(new MythWebPage(this))
 {
     setPage(m_webpage);
 
@@ -333,7 +352,7 @@ MythWebView::~MythWebView(void)
  *  \copydoc MythUIType::keyPressEvent()
  */
 
-const char *kgetType="\
+const char *kgetType = "\
 function activeElement()\
 {\
     var type;\
@@ -345,11 +364,13 @@ activeElement();";
 void MythWebView::keyPressEvent(QKeyEvent *event)
 {
     // does an edit have focus?
-    QString type = m_parentBrowser->evaluateJavaScript(QString(kgetType)).toString().toLower();
-    bool editHasFocus = (type == "text" || type == "textarea" || type == "password");
+    QString type = m_parentBrowser->evaluateJavaScript(QString(kgetType))
+                                                    .toString().toLower();
+    bool editHasFocus = (type == "text" || type == "textarea" ||
+                         type == "password");
 
-    // if the QWebView widget has focus then all keypresses from a regular keyboard
-    // get sent here first
+    // if the QWebView widget has focus then all keypresses from a regular
+    // keyboard get sent here first
     if (editHasFocus || (m_parentBrowser && m_parentBrowser->IsInputToggled()))
     {
         // input is toggled so pass all keypresses to the QWebView's handler
@@ -357,15 +378,18 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
     }
     else
     {
-        // we need to convert a few keypress events so the QWebView does the right thing
+        // we need to convert a few keypress events so the QWebView does the
+        // right thing
         QStringList actions;
         bool handled = false;
-        handled = GetMythMainWindow()->TranslateKeyPress("Browser", event, actions);
+        handled = GetMythMainWindow()->TranslateKeyPress("Browser", event,
+                                                         actions);
 
         for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
+
             if (action == "NEXTLINK")
             {
                 QKeyEvent tabKey(event->type(), Qt::Key_Tab,
@@ -378,7 +402,8 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
             else if (action == "PREVIOUSLINK")
             {
                 QKeyEvent shiftTabKey(event->type(), Qt::Key_Tab,
-                                      event->modifiers() | Qt::ShiftModifier,QString(),
+                                      event->modifiers() | Qt::ShiftModifier,
+                                      QString(),
                                       event->isAutoRepeat(), event->count());
                 *event = shiftTabKey;
                 QWebView::keyPressEvent(event);
@@ -395,8 +420,8 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
             }
         }
 
-        // pass the keyPress event to our main window handler so they get handled properly
-        // by the various mythui handlers
+        // pass the keyPress event to our main window handler so they get
+        // handled properly by the various mythui handlers
         QCoreApplication::postEvent(GetMythMainWindow(), new QKeyEvent(*event));
     }
 }
@@ -412,7 +437,7 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
         if (header != QVariant())
             LOG(VB_GENERAL, LOG_ERR,
                 QString("MythWebView::handleUnsupportedContent - %1")
-                                          .arg(header.toString()));
+                .arg(header.toString()));
 
         m_downloadReply = reply;
         m_downloadRequest = reply->request();
@@ -441,6 +466,7 @@ void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
 
     // if we have a default filename use that
     QString saveBaseName = basename;
+
     if (!m_parentBrowser->GetDefaultSaveFilename().isEmpty())
     {
         QFileInfo savefi(m_parentBrowser->GetDefaultSaveFilename());
@@ -458,17 +484,25 @@ void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
     if (!extension.isEmpty())
         extension = '.' + extension;
 
-    QString saveFilename = m_parentBrowser->GetDefaultSaveDirectory() + saveBaseName + extension;
+    QString saveFilename = QString("%1%2%3%")
+                                .arg(m_parentBrowser->GetDefaultSaveDirectory())
+                                .arg(saveBaseName)
+                                .arg(extension);
 
     // dont overwrite an existing file
     if (QFile::exists(saveFilename))
     {
         int i = 1;
+
         do
         {
-            saveFilename = m_parentBrowser->GetDefaultSaveDirectory() + saveBaseName
-                    + '-' + QString::number(i++) + extension;
-        } while (QFile::exists(saveFilename));
+            saveFilename = QString("%1%2-%3%4")
+                                .arg(m_parentBrowser->GetDefaultSaveDirectory())
+                                .arg(saveBaseName)
+                                .arg(QString::number(i++))
+                                .arg(extension);
+        }
+        while (QFile::exists(saveFilename));
     }
 
     // if we are downloading and then playing the file don't ask for the file name
@@ -481,7 +515,9 @@ void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
         QString msg = tr("Enter filename to save file");
-        MythTextInputDialog *input = new MythTextInputDialog(popupStack, msg, FilterNone, false, saveFilename);
+        MythTextInputDialog *input = new MythTextInputDialog(popupStack, msg,
+                                                             FilterNone, false,
+                                                             saveFilename);
 
         if (input->Create())
         {
@@ -500,8 +536,10 @@ void MythWebView::doDownload(const QString &saveFilename)
 
     openBusyPopup(QObject::tr("Downloading file. Please wait..."));
 
-    // No need to make sure the path to saveFilename exists because MythDownloadManage takes care of that
-    GetMythDownloadManager()->queueDownload(m_downloadRequest.url().toString(), saveFilename, this);
+    // No need to make sure the path to saveFilename exists because
+    // MythDownloadManage takes care of that
+    GetMythDownloadManager()->queueDownload(m_downloadRequest.url().toString(),
+                                            saveFilename, this);
 }
 
 void MythWebView::openBusyPopup(const QString &message)
@@ -510,6 +548,7 @@ void MythWebView::openBusyPopup(const QString &message)
         return;
 
     QString msg(tr("Downloading..."));
+
     if (!message.isEmpty())
         msg = message;
 
@@ -524,6 +563,7 @@ void MythWebView::closeBusyPopup(void)
 {
     if (m_busyPopup)
         m_busyPopup->Close();
+
     m_busyPopup = NULL;
 }
 
@@ -531,7 +571,7 @@ void MythWebView::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        DialogCompletionEvent *dce = (DialogCompletionEvent *)(event);
 
         // make sure the user didn't ESCAPE out of the dialog
         if (dce->GetResult() < 0)
@@ -554,16 +594,18 @@ void MythWebView::customEvent(QEvent *event)
                 if (isMusicFile(extension, mimeType))
                 {
                     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_URL %2")
-                        .arg(gCoreContext->GetHostName()).arg(m_downloadRequest.url().toString()));
+                                 .arg(gCoreContext->GetHostName())
+                                 .arg(m_downloadRequest.url().toString()));
                     gCoreContext->dispatch(me);
                 }
                 else if (isVideoFile(extension, mimeType))
-                    GetMythMainWindow()->HandleMedia("Internal", m_downloadRequest.url().toString());
+                    GetMythMainWindow()->HandleMedia("Internal",
+                                            m_downloadRequest.url().toString());
                 else
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("MythWebView: Asked to play a file with "
                                 "extension '%1' but don't know how")
-                                                  .arg(extension));
+                        .arg(extension));
             }
             else if (resulttext == tr("Download the file"))
             {
@@ -587,6 +629,7 @@ void MythWebView::customEvent(QEvent *event)
         if (tokens[0] == "DOWNLOAD_FILE")
         {
             QStringList args = me->ExtraDataList();
+
             if (tokens[1] == "UPDATE")
             {
                 // could update a progressbar here
@@ -602,7 +645,7 @@ void MythWebView::customEvent(QEvent *event)
                 if ((errorCode != 0) || (fileSize == 0))
                     ShowOkPopup(tr("ERROR downloading file."));
                 else if (m_downloadAndPlay)
-                   GetMythMainWindow()->HandleMedia("Internal", filename);
+                    GetMythMainWindow()->HandleMedia("Internal", filename);
 
                 MythEvent me(QString("BROWSER_DOWNLOAD_FINISHED"), args);
                 gCoreContext->dispatch(me);
@@ -661,10 +704,12 @@ bool MythWebView::isMusicFile(const QString &extension, const QString &mimetype)
     {
         if (!SupportedMimeTypes[x].isVideo)
         {
-            if (!mimetype.isEmpty() && mimetype == SupportedMimeTypes[x].mimeType)
+            if (!mimetype.isEmpty() &&
+                mimetype == SupportedMimeTypes[x].mimeType)
                 return true;
 
-            if (!extension.isEmpty() && extension.toLower() == SupportedMimeTypes[x].extension)
+            if (!extension.isEmpty() &&
+                extension.toLower() == SupportedMimeTypes[x].extension)
                 return true;
         }
     }
@@ -678,10 +723,12 @@ bool MythWebView::isVideoFile(const QString &extension, const QString &mimetype)
     {
         if (SupportedMimeTypes[x].isVideo)
         {
-            if (!mimetype.isEmpty() && mimetype == SupportedMimeTypes[x].mimeType)
+            if (!mimetype.isEmpty() &&
+                mimetype == SupportedMimeTypes[x].mimeType)
                 return true;
 
-            if (!extension.isEmpty() && extension.toLower() == SupportedMimeTypes[x].extension)
+            if (!extension.isEmpty() &&
+                extension.toLower() == SupportedMimeTypes[x].extension)
                 return true;
         }
     }
@@ -696,6 +743,7 @@ QString MythWebView::getReplyMimetype(void)
 
     QString mimeType;
     QVariant header = m_downloadReply->header(QNetworkRequest::ContentTypeHeader);
+
     if (header != QVariant())
         mimeType = header.toString();
 
@@ -705,7 +753,7 @@ QString MythWebView::getReplyMimetype(void)
 QWebView *MythWebView::createWindow(QWebPage::WebWindowType type)
 {
     (void) type;
-    return (QWebView*) this;
+    return (QWebView *) this;
 }
 
 
@@ -751,8 +799,9 @@ QWebView *MythWebView::createWindow(QWebPage::WebWindowType type)
  *  \param name the name of this widget
  */
 MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name), m_browser(NULL),
-      m_image(NULL),         m_active(false), m_wasActive(false),
+                 : MythUIType(parent, name),
+      m_browser(NULL),       m_image(NULL),
+      m_active(false),       m_wasActive(false),
       m_initialized(false),  m_lastUpdateTime(QTime()),
       m_updateInterval(0),   m_zoom(1.0),
       m_bgColor("White"),    m_widgetUrl(QUrl()), m_userCssFile(""),
@@ -796,6 +845,7 @@ void MythUIWebBrowser::Init(void)
     if (!m_userCssFile.isEmpty())
     {
         QString filename = m_userCssFile;
+
         if (GetMythUI()->FindThemeFile(filename))
             LoadUserStyleSheet(QUrl("file://" + filename));
     }
@@ -803,6 +853,7 @@ void MythUIWebBrowser::Init(void)
     {
         // ...otherwise use the default one
         QString filename = "htmls/mythbrowser.css";
+
         if (GetMythUI()->FindThemeFile(filename))
             LoadUserStyleSheet(QUrl("file://" + filename));
     }
@@ -817,23 +868,27 @@ void MythUIWebBrowser::Init(void)
             this, SLOT(slotLoadFinished(bool)));
     connect(m_browser, SIGNAL(loadProgress(int)),
             this, SLOT(slotLoadProgress(int)));
-    connect(m_browser, SIGNAL(titleChanged(const QString&)),
-            this, SLOT(slotTitleChanged(const QString&)));
+    connect(m_browser, SIGNAL(titleChanged(const QString &)),
+            this, SLOT(slotTitleChanged(const QString &)));
     connect(m_browser, SIGNAL(iconChanged(void)),
             this, SLOT(slotIconChanged(void)));
-    connect(m_browser, SIGNAL(statusBarMessage(const QString&)),
-            this, SLOT(slotStatusBarMessage(const QString&)));
-    connect(m_browser->page(), SIGNAL(linkHovered(const QString&, const QString&, const QString&)),
-            this, SLOT(slotStatusBarMessage(const QString&)));
-    connect(m_browser, SIGNAL(linkClicked(const QUrl&)),
-            this, SLOT(slotLinkClicked(const QUrl&)));
+    connect(m_browser, SIGNAL(statusBarMessage(const QString &)),
+            this, SLOT(slotStatusBarMessage(const QString &)));
+    connect(m_browser->page(), SIGNAL(linkHovered(const QString &,
+                                                  const QString &,
+                                                  const QString &)),
+            this, SLOT(slotStatusBarMessage(const QString &)));
+    connect(m_browser, SIGNAL(linkClicked(const QUrl &)),
+            this, SLOT(slotLinkClicked(const QUrl &)));
 
     // find what screen we are on
     m_parentScreen = NULL;
     QObject *parentObject = parent();
-    while(parentObject)
+
+    while (parentObject)
     {
         m_parentScreen = dynamic_cast<MythScreenType *>(parentObject);
+
         if (m_parentScreen)
             break;
 
@@ -848,6 +903,7 @@ void MythUIWebBrowser::Init(void)
     for (int x = 0; x < GetMythMainWindow()->GetStackCount(); x++)
     {
         MythScreenStack *stack = GetMythMainWindow()->GetStackAt(x);
+
         if (stack)
             connect(stack, SIGNAL(topScreenChanged(MythScreenType *)),
                     this, SLOT(slotTopScreenChanged(MythScreenType *)));
@@ -856,12 +912,16 @@ void MythUIWebBrowser::Init(void)
     // set up the icon cache directory
     QString path = GetConfDir();
     QDir dir(path);
+
     if (!dir.exists())
         dir.mkdir(path);
+
     path += "/MythBrowser";
     dir.setPath(path);
+
     if (!dir.exists())
         dir.mkdir(path);
+
     QWebSettings::setIconDatabasePath(path);
 
     if (gCoreContext->GetNumSetting("WebBrowserEnablePlugins", 1) == 1)
@@ -1048,7 +1108,7 @@ void MythUIWebBrowser::SetDefaultSaveFilename(const QString &filename)
     if (!filename.isEmpty())
         m_defaultSaveFilename = filename;
     else
-        m_defaultSaveFilename = "";
+        m_defaultSaveFilename.clear();
 }
 
 /** \fn MythUIWebBrowser::GetZoom()
@@ -1152,10 +1212,13 @@ QString MythUIWebBrowser::GetTitle(void)
  *  \brief Evaluates the JavaScript code in \a scriptSource.
  *  \return QVariant
  */
-QVariant MythUIWebBrowser::evaluateJavaScript(const QString& scriptSource)
+QVariant MythUIWebBrowser::evaluateJavaScript(const QString &scriptSource)
 {
     if (m_browser)
-        return m_browser->page()->currentFrame()->evaluateJavaScript(scriptSource);
+    {
+        QWebFrame *frame = m_browser->page()->currentFrame();
+        return frame->evaluateJavaScript(scriptSource);
+    }
     else
         return QVariant();
 }
@@ -1176,7 +1239,7 @@ void MythUIWebBrowser::slotLoadProgress(int progress)
     emit loadProgress(progress);
 }
 
-void MythUIWebBrowser::slotTitleChanged( const QString &title)
+void MythUIWebBrowser::slotTitleChanged(const QString &title)
 {
     emit titleChanged(title);
 }
@@ -1196,7 +1259,7 @@ void MythUIWebBrowser::slotIconChanged(void)
     emit iconChanged();
 }
 
-void MythUIWebBrowser::slotTopScreenChanged(MythScreenType* screen)
+void MythUIWebBrowser::slotTopScreenChanged(MythScreenType *screen)
 {
     (void) screen;
 
@@ -1258,7 +1321,7 @@ void MythUIWebBrowser::Pulse(void)
  *  \copydoc MythUIType::DrawSelf()
  */
 void MythUIWebBrowser::DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                       int alphaMod, QRect clipRegion)
+                                int alphaMod, QRect clipRegion)
 {
     if (!m_image || m_image->isNull() || !m_browser || m_browser->hasFocus())
         return;
@@ -1296,12 +1359,15 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
             return true;
         }
 
+        QWebFrame *frame = m_browser->page()->currentFrame();
         if (action == "UP")
         {
-            int pos = m_browser->page()->currentFrame()->scrollBarValue(Qt::Vertical);
+            int pos = frame->scrollBarValue(Qt::Vertical);
+
             if (pos > 0)
             {
-                m_browser->page()->currentFrame()->setScrollBarValue(Qt::Vertical, pos - m_Area.height() / 10);
+                frame->setScrollBarValue(Qt::Vertical,
+                                         pos - m_Area.height() / 10);
                 UpdateBuffer();
             }
             else
@@ -1309,10 +1375,12 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "DOWN")
         {
-            int pos = m_browser->page()->currentFrame()->scrollBarValue(Qt::Vertical);
-            if (pos != m_browser->page()->currentFrame()->scrollBarMaximum(Qt::Vertical))
+            int pos = frame->scrollBarValue(Qt::Vertical);
+
+            if (pos != frame->scrollBarMaximum(Qt::Vertical))
             {
-                m_browser->page()->currentFrame()->setScrollBarValue(Qt::Vertical, pos + m_Area.height() / 10);
+                frame->setScrollBarValue(Qt::Vertical,
+                                         pos + m_Area.height() / 10);
                 UpdateBuffer();
             }
             else
@@ -1320,10 +1388,13 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "LEFT")
         {
-            int pos = m_browser->page()->currentFrame()->scrollBarValue(Qt::Horizontal);
+
+            int pos = frame->scrollBarValue(Qt::Horizontal);
+
             if (pos > 0)
             {
-                m_browser->page()->currentFrame()->setScrollBarValue(Qt::Horizontal, pos - m_Area.width() / 10);
+                frame->setScrollBarValue(Qt::Horizontal,
+                                         pos - m_Area.width() / 10);
                 UpdateBuffer();
             }
             else
@@ -1331,10 +1402,12 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "RIGHT")
         {
-            int pos = m_browser->page()->currentFrame()->scrollBarValue(Qt::Horizontal);
-            if (pos != m_browser->page()->currentFrame()->scrollBarMaximum(Qt::Horizontal))
+            int pos = frame->scrollBarValue(Qt::Horizontal);
+
+            if (pos != frame->scrollBarMaximum(Qt::Horizontal))
             {
-                m_browser->page()->currentFrame()->setScrollBarValue(Qt::Horizontal, pos + m_Area.width() / 10);
+                frame->setScrollBarValue(Qt::Horizontal,
+                                         pos + m_Area.width() / 10);
                 UpdateBuffer();
             }
             else
@@ -1342,14 +1415,14 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "PAGEUP")
         {
-            int pos = m_browser->page()->currentFrame()->scrollBarValue(Qt::Vertical);
-            m_browser->page()->currentFrame()->setScrollBarValue(Qt::Vertical, pos - m_Area.height());
+            int pos = frame->scrollBarValue(Qt::Vertical);
+            frame->setScrollBarValue(Qt::Vertical, pos - m_Area.height());
             UpdateBuffer();
         }
         else if (action == "PAGEDOWN")
         {
-            int pos = m_browser->page()->currentFrame()->scrollBarValue(Qt::Vertical);
-            m_browser->page()->currentFrame()->setScrollBarValue(Qt::Vertical, pos + m_Area.height());
+            int pos = frame->scrollBarValue(Qt::Vertical);
+            frame->setScrollBarValue(Qt::Vertical, pos + m_Area.height());
             UpdateBuffer();
         }
         else if (action == "ZOOMIN")
@@ -1368,14 +1441,14 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "PAGELEFT")
         {
-            int pos = m_browser->page()->currentFrame()->scrollBarValue(Qt::Horizontal);
-            m_browser->page()->currentFrame()->setScrollBarValue(Qt::Horizontal, pos - m_Area.width());
+            int pos = frame->scrollBarValue(Qt::Horizontal);
+            frame->setScrollBarValue(Qt::Horizontal, pos - m_Area.width());
             UpdateBuffer();
         }
         else if (action == "PAGERIGHT")
         {
-            int pos = m_browser->page()->currentFrame()->scrollBarValue(Qt::Horizontal);
-            m_browser->page()->currentFrame()->setScrollBarValue(Qt::Horizontal, pos + m_Area.width());
+            int pos = frame->scrollBarValue(Qt::Horizontal);
+            frame->setScrollBarValue(Qt::Horizontal, pos + m_Area.width());
             UpdateBuffer();
         }
         else if (action == "NEXTLINK")
@@ -1411,10 +1484,11 @@ void MythUIWebBrowser::HandleMouseAction(const QString &action)
 
     // speed up mouse movement if the same key is held down
     if (action == m_lastMouseAction &&
-           m_lastMouseActionTime.msecsTo(QTime::currentTime()) < 500)
+        m_lastMouseActionTime.msecsTo(QTime::currentTime()) < 500)
     {
         m_lastMouseActionTime = QTime::currentTime();
         m_mouseKeyCount++;
+
         if (m_mouseKeyCount > 5)
             step = 25;
     }
@@ -1455,11 +1529,12 @@ void MythUIWebBrowser::HandleMouseAction(const QString &action)
             curPos = widget->mapFromGlobal(curPos);
 
             QMouseEvent *me = new QMouseEvent(QEvent::MouseButtonPress, curPos,
-                                Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                                              Qt::LeftButton, Qt::LeftButton,
+                                              Qt::NoModifier);
             QCoreApplication::postEvent(widget, me);
 
             me = new QMouseEvent(QEvent::MouseButtonRelease, curPos,
-                                Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                                 Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
             QCoreApplication::postEvent(widget, me);
         }
     }
@@ -1509,6 +1584,7 @@ bool MythUIWebBrowser::ParseElement(
 void MythUIWebBrowser::CopyFrom(MythUIType *base)
 {
     MythUIWebBrowser *browser = dynamic_cast<MythUIWebBrowser *>(base);
+
     if (!browser)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");

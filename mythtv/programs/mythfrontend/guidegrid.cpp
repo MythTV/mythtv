@@ -243,8 +243,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_selectRecThreshold = gCoreContext->GetNumSetting("SelChangeRecThreshold", 16);
 
     m_channelOrdering = gCoreContext->GetSetting("ChannelOrdering", "channum");
-    m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
-    m_channelFormat.replace(' ', "\n");
 
     for (uint i = 0; i < MAX_DISPLAY_CHANS; i++)
         m_programs.push_back(NULL);
@@ -672,8 +670,8 @@ ProgramList GuideGrid::GetProgramList(uint chanid) const
         "      program.endtime   >= :STARTTS AND "
         "      program.starttime <= :ENDTS   AND "
         "      program.manualid   = 0 ";
-    bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-ddThh:mm:00");
-    bindings[":ENDTS"]   = m_currentEndTime.toString("yyyy-MM-ddThh:mm:00");
+    bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-dd hh:mm:00");
+    bindings[":ENDTS"]   = m_currentEndTime.toString("yyyy-MM-dd hh:mm:00");
     bindings[":CHANID"]  = chanid;
 
     ProgramList dummy;
@@ -1008,15 +1006,15 @@ void GuideGrid::fillTimeInfos()
         if (mins % 30 == 0)
         {
             QString timeStr = MythDateTimeToString(starttime, kTime);
-            
+
             InfoMap infomap;
             infomap["starttime"] = timeStr;
-            
+
             QTime endtime = starttime.time().addSecs(60 * 30);
-            
+
             infomap["endtime"] = MythTimeToString(endtime, kTime);
 
-            MythUIButtonListItem *item = 
+            MythUIButtonListItem *item =
                                 new MythUIButtonListItem(m_timeList, timeStr);
             item->SetTextFromMap(infomap);
         }
@@ -1048,8 +1046,8 @@ ProgramList *GuideGrid::getProgramListFromProgram(int chanNum)
                            "  AND program.starttime <= :ENDTS "
                            "  AND program.manualid = 0 ";
         bindings[":CHANID"]  = GetChannelInfo(chanNum)->chanid;
-        bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-ddThh:mm:00");
-        bindings[":ENDTS"] = m_currentEndTime.toString("yyyy-MM-ddThh:mm:00");
+        bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-dd hh:mm:00");
+        bindings[":ENDTS"] = m_currentEndTime.toString("yyyy-MM-dd hh:mm:00");
 
         LoadFromProgram(*proglist, querystr, bindings, m_recList, false);
     }
@@ -1513,7 +1511,7 @@ void GuideGrid::updateChannels(void)
 
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_channelList,
-                                     chinfo ? chinfo->GetFormatted(m_channelFormat) : QString());
+                                     chinfo ? chinfo->GetFormatted(DBChannel::kChannelShort) : QString());
 
         QString state;
         if (unavailable)
@@ -1853,7 +1851,7 @@ void GuideGrid::moveUpDown(MoveVector movement)
         default :
             break;
     }
-    
+
     fillProgramInfos();
     m_guideGrid->SetRedraw();
     updateInfo();

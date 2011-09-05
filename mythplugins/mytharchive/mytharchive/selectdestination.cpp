@@ -26,10 +26,30 @@
 #include "exportnative.h"
 #include "themeselector.h"
 
-SelectDestination::SelectDestination(MythScreenStack *parent, bool nativeMode, QString name)
-                  : MythScreenType(parent, name)
+SelectDestination::SelectDestination(
+    MythScreenStack *parent, bool nativeMode, QString name) :
+    MythScreenType(parent, name),
+    m_nativeMode(nativeMode),
+    m_freeSpace(0),
+    m_nextButton(NULL),
+    m_prevButton(NULL),
+    m_cancelButton(NULL),
+    m_destinationSelector(NULL),
+    m_destinationText(NULL),
+    m_freespaceText(NULL),
+    m_filenameEdit(NULL),
+    m_findButton(NULL),
+    m_createISOCheck(NULL),
+    m_doBurnCheck(NULL),
+    m_eraseDvdRwCheck(NULL),
+    m_createISOText(NULL),
+    m_doBurnText(NULL),
+    m_eraseDvdRwText(NULL)
 {
-    m_nativeMode = nativeMode;
+    m_archiveDestination.type = AD_FILE;
+    m_archiveDestination.name = NULL;
+    m_archiveDestination.description = NULL;
+    m_archiveDestination.freeSpace = 0LL;
 }
 
 SelectDestination::~SelectDestination(void)

@@ -18,7 +18,7 @@
 #include "metadata.h"
 #include "metaio.h"
 
-FileScanner::FileScanner ()
+FileScanner::FileScanner() : m_decoder(NULL)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 

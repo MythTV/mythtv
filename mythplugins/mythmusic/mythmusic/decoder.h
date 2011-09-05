@@ -5,13 +5,13 @@
 
 #include <QWaitCondition>
 #include <QStringList>
-#include <QThread>
 #include <QEvent>
 #include <QMutex>
 
 #include "config.h"
 
 #include <mythobservable.h>
+#include <mthread.h>
 
 class Metadata;
 class MetaIO;
@@ -63,7 +63,7 @@ class DecoderEvent : public MythEvent
     QString *error_msg;
 };
 
-class Decoder : public QThread, public MythObservable
+class Decoder : public MThread, public MythObservable
 {
   public:
     virtual ~Decoder();
@@ -100,7 +100,7 @@ class Decoder : public QThread, public MythObservable
     static bool supports(const QString &);
     static void registerFactory(DecoderFactory *);
     static Decoder *create(const QString &, QIODevice *, AudioOutput *,
-                           bool = FALSE);
+                           bool = false);
     static void SetLocationFormatUseTags(void);
 
   protected:

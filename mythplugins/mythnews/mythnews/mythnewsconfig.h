@@ -18,7 +18,7 @@ class MythNewsConfig : public MythScreenType
 
   public:
     MythNewsConfig(MythScreenStack *parent,
-                   const QString name = "MythNewsConfig");
+                   const QString &name);
     ~MythNewsConfig();
 
     bool Create(void);

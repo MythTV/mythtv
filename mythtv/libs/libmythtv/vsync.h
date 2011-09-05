@@ -58,7 +58,7 @@ class VideoSync
      *
      *   Start(void), WaitForFrame(void), and Stop(void) should 
      *   always be called from same thread, to prevent bad 
-     *   interactions with pthreads.
+     *   interactions with threads.
      */
     virtual void Start(void);
 
@@ -67,7 +67,7 @@ class VideoSync
      *
      *   Start(void), WaitForFrame(void), and Stop(void) should
      *   always be called from same thread, to prevent bad
-     *   interactions with pthreads.
+     *   interactions with threads.
      *
      *  \param sync_delay time until the desired frame or field
      *  \sa CalcDelay(void), KeepPhase(void)
@@ -83,7 +83,7 @@ class VideoSync
      *
      *   Start(void), WaitForFrame(void), and Stop(void) should
      *   always be called from same thread, to prevent bad
-     *   interactions with pthreads.
+     *   interactions with threads.
      */
     virtual void Stop(void) {}
 

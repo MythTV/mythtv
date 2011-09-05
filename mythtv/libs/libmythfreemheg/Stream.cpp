@@ -40,54 +40,100 @@ void MHStream::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHPresentable::Initialise(p, engine);
     MHParseNode *pMultiplex = p->GetNamedArg(C_MULTIPLEX);
-    if (pMultiplex) {
-        for (int i = 0; i < pMultiplex->GetArgCount(); i++) {
+
+    if (pMultiplex)
+    {
+        for (int i = 0; i < pMultiplex->GetArgCount(); i++)
+        {
             MHParseNode *pItem = pMultiplex->GetArgN(i);
-            if (pItem->GetTagNo() == C_AUDIO) {
+
+            if (pItem->GetTagNo() == C_AUDIO)
+            {
                 MHAudio *pAudio = new MHAudio;
                 m_Multiplex.Append(pAudio);
                 pAudio->Initialise(pItem, engine);
             }
-            else if (pItem->GetTagNo() == C_VIDEO) {
+            else if (pItem->GetTagNo() == C_VIDEO)
+            {
                 MHVideo *pVideo = new MHVideo;
                 m_Multiplex.Append(pVideo);
                 pVideo->Initialise(pItem, engine);
             }
-            else if (pItem->GetTagNo() == C_RTGRAPHICS) {
+            else if (pItem->GetTagNo() == C_RTGRAPHICS)
+            {
                 MHRTGraphics *pRtGraph = new MHRTGraphics;
                 m_Multiplex.Append(pRtGraph);
                 pRtGraph->Initialise(pItem, engine);
             }
+
             // Ignore unknown items
         }
     }
+
     MHParseNode *pStorage = p->GetNamedArg(C_STORAGE);
-    if (pStorage) m_nStorage = (enum Storage) pStorage->GetArgN(0)->GetEnumValue();
+
+    if (pStorage)
+    {
+        m_nStorage = (enum Storage) pStorage->GetArgN(0)->GetEnumValue();
+    }
+
     MHParseNode *pLooping = p->GetNamedArg(C_LOOPING);
-    if (pLooping) m_nLooping = pLooping->GetArgN(0)->GetIntValue();
+
+    if (pLooping)
+    {
+        m_nLooping = pLooping->GetArgN(0)->GetIntValue();
+    }
 }
 
 void MHStream::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:Stream ");
-    MHPresentable::PrintMe(fd, nTabs+1);
-    PrintTabs(fd, nTabs+1); fprintf(fd, ":Multiplex (\n");
-    for (int i = 0; i < m_Multiplex.Size(); i++) m_Multiplex.GetAt(i)->PrintMe(fd, nTabs+2);
-    PrintTabs(fd, nTabs+1); fprintf(fd, " )\n");
-    if (m_nStorage != ST_Stream) { PrintTabs(fd, nTabs+1); fprintf(fd, ":Storage memory\n"); }
-    if (m_nLooping != 0) { PrintTabs(fd, nTabs+1); fprintf(fd, ":Looping %d\n", m_nLooping); }
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:Stream ");
+    MHPresentable::PrintMe(fd, nTabs + 1);
+    PrintTabs(fd, nTabs + 1);
+    fprintf(fd, ":Multiplex (\n");
+
+    for (int i = 0; i < m_Multiplex.Size(); i++)
+    {
+        m_Multiplex.GetAt(i)->PrintMe(fd, nTabs + 2);
+    }
+
+    PrintTabs(fd, nTabs + 1);
+    fprintf(fd, " )\n");
+
+    if (m_nStorage != ST_Stream)
+    {
+        PrintTabs(fd, nTabs + 1);
+        fprintf(fd, ":Storage memory\n");
+    }
+
+    if (m_nLooping != 0)
+    {
+        PrintTabs(fd, nTabs + 1);
+        fprintf(fd, ":Looping %d\n", m_nLooping);
+    }
+
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 void MHStream::Preparation(MHEngine *engine)
 {
-    if (m_fAvailable) return; // Already prepared
-    for (int i = 0; i < m_Multiplex.Size(); i++) {
+    if (m_fAvailable)
+    {
+        return;    // Already prepared
+    }
+
+    for (int i = 0; i < m_Multiplex.Size(); i++)
+    {
         MHPresentable *pItem = m_Multiplex.GetAt(i);
-        if (pItem->InitiallyActive()) {
+
+        if (pItem->InitiallyActive())
+        {
             pItem->Activation(engine); // N.B.  This will also call Preparation for the components.
         }
     }
+
     MHPresentable::Preparation(engine);
 }
 
@@ -95,27 +141,45 @@ void MHStream::Destruction(MHEngine *engine)
 {
     // Apply Destruction in reverse order.
     for (int j = m_Multiplex.Size(); j > 0; j--)
-        m_Multiplex.GetAt(j-1)->Destruction(engine);
+    {
+        m_Multiplex.GetAt(j - 1)->Destruction(engine);
+    }
+
     MHPresentable::Destruction(engine);
 }
 
 void MHStream::Activation(MHEngine *engine)
 {
-    if (m_fRunning) return;
+    if (m_fRunning)
+    {
+        return;
+    }
+
     MHPresentable::Activation(engine);
+
     // Start playing all active stream components.
     for (int i = 0; i < m_Multiplex.Size(); i++)
+    {
         m_Multiplex.GetAt(i)->BeginPlaying(engine);
+    }
+
     m_fRunning = true;
     engine->EventTriggered(this, EventIsRunning);
 }
 
 void MHStream::Deactivation(MHEngine *engine)
 {
-    if (! m_fRunning) return;
+    if (! m_fRunning)
+    {
+        return;
+    }
+
     // Stop playing all active Stream components
     for (int i = 0; i < m_Multiplex.Size(); i++)
+    {
         m_Multiplex.GetAt(i)->StopPlaying(engine);
+    }
+
     MHPresentable::Deactivation(engine);
 }
 
@@ -124,8 +188,11 @@ void MHStream::Deactivation(MHEngine *engine)
 void MHStream::ContentPreparation(MHEngine *engine)
 {
     engine->EventTriggered(this, EventContentAvailable); // Perhaps test for the streams being available?
+
     for (int i = 0; i < m_Multiplex.Size(); i++)
+    {
         m_Multiplex.GetAt(i)->SetStreamRef(engine, m_ContentRef);
+    }
 }
 
 // TODO: Generate StreamPlaying and StreamStopped events.  These are supposed
@@ -134,11 +201,21 @@ void MHStream::ContentPreparation(MHEngine *engine)
 // Return an object if there is a matching component.
 MHRoot *MHStream::FindByObjectNo(int n)
 {
-    if (n == m_ObjectReference.m_nObjectNo) return this;
-    for (int i = m_Multiplex.Size(); i > 0; i--) {
-        MHRoot *pResult = m_Multiplex.GetAt(i-1)->FindByObjectNo(n);
-        if (pResult) return pResult;
+    if (n == m_ObjectReference.m_nObjectNo)
+    {
+        return this;
     }
+
+    for (int i = m_Multiplex.Size(); i > 0; i--)
+    {
+        MHRoot *pResult = m_Multiplex.GetAt(i - 1)->FindByObjectNo(n);
+
+        if (pResult)
+        {
+            return pResult;
+        }
+    }
+
     return NULL;
 }
 
@@ -153,24 +230,46 @@ void MHAudio::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHPresentable::Initialise(p, engine);
     MHParseNode *pComponentTagNode =  p->GetNamedArg(C_COMPONENT_TAG);
-    if (pComponentTagNode) m_nComponentTag = pComponentTagNode->GetArgN(0)->GetIntValue();
+
+    if (pComponentTagNode)
+    {
+        m_nComponentTag = pComponentTagNode->GetArgN(0)->GetIntValue();
+    }
+
     MHParseNode *pOrigVol = p->GetNamedArg(C_ORIGINAL_VOLUME);
-    if (pOrigVol) m_nOriginalVol = pOrigVol->GetIntValue();
+
+    if (pOrigVol)
+    {
+        m_nOriginalVol = pOrigVol->GetIntValue();
+    }
 }
 
 void MHAudio::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:Audio ");
-    MHPresentable::PrintMe(fd, nTabs+1);
-    PrintTabs(fd, nTabs+1); fprintf(fd, ":ComponentTag %d\n", m_nComponentTag);
-    if (m_nOriginalVol != 0) { PrintTabs(fd, nTabs+1); fprintf(fd, "OriginalVolume %d ", m_nOriginalVol); }
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:Audio ");
+    MHPresentable::PrintMe(fd, nTabs + 1);
+    PrintTabs(fd, nTabs + 1);
+    fprintf(fd, ":ComponentTag %d\n", m_nComponentTag);
+
+    if (m_nOriginalVol != 0)
+    {
+        PrintTabs(fd, nTabs + 1);
+        fprintf(fd, "OriginalVolume %d ", m_nOriginalVol);
+    }
+
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 // Activation for Audio is defined in the corrigendum
 void MHAudio::Activation(MHEngine *engine)
 {
-    if (m_fRunning) return;
+    if (m_fRunning)
+    {
+        return;
+    }
+
     MHPresentable::Activation(engine);
     // Beginning presentation is started by the Stream object.
     m_fRunning = true;
@@ -180,7 +279,12 @@ void MHAudio::Activation(MHEngine *engine)
     {
         QString stream;
         MHOctetString &str = m_streamContentRef.m_ContentRef;
-        if (str.Size() != 0) stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
+
+        if (str.Size() != 0)
+        {
+            stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
+        }
+
         engine->GetContext()->BeginAudio(stream, m_nComponentTag);
     }
 }
@@ -188,11 +292,18 @@ void MHAudio::Activation(MHEngine *engine)
 // Deactivation for Audio is defined in the corrigendum
 void MHAudio::Deactivation(MHEngine *engine)
 {
-    if (! m_fRunning) return;
+    if (! m_fRunning)
+    {
+        return;
+    }
+
     m_fRunning = false;
 
     // Stop presenting the audio
-    if (m_fStreamPlaying) engine->GetContext()->StopAudio();
+    if (m_fStreamPlaying)
+    {
+        engine->GetContext()->StopAudio();
+    }
 
     MHPresentable::Deactivation(engine);
 }
@@ -200,17 +311,27 @@ void MHAudio::Deactivation(MHEngine *engine)
 void MHAudio::SetStreamRef(MHEngine *engine, const MHContentRef &cr)
 {
     m_streamContentRef.Copy(cr);
-    if (m_fStreamPlaying) BeginPlaying(engine);
+
+    if (m_fStreamPlaying)
+    {
+        BeginPlaying(engine);
+    }
 }
 
 void MHAudio::BeginPlaying(MHEngine *engine)
 {
     m_fStreamPlaying = true;
+
     if (m_fRunning && m_streamContentRef.IsSet())
     {
         QString stream;
         MHOctetString &str = m_streamContentRef.m_ContentRef;
-        if (str.Size() != 0) stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
+
+        if (str.Size() != 0)
+        {
+            stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
+        }
+
         engine->GetContext()->BeginAudio(stream, m_nComponentTag);
     }
 }
@@ -218,7 +339,11 @@ void MHAudio::BeginPlaying(MHEngine *engine)
 void MHAudio::StopPlaying(MHEngine *engine)
 {
     m_fStreamPlaying = false;
-    if (m_fRunning) engine->GetContext()->StopAudio();
+
+    if (m_fRunning)
+    {
+        engine->GetContext()->StopAudio();
+    }
 }
 
 
@@ -238,23 +363,45 @@ void MHVideo::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHVisible::Initialise(p, engine);
     MHParseNode *pComponentTagNode = p->GetNamedArg(C_COMPONENT_TAG);
-    if (pComponentTagNode) m_nComponentTag = pComponentTagNode->GetArgN(0)->GetIntValue();
+
+    if (pComponentTagNode)
+    {
+        m_nComponentTag = pComponentTagNode->GetArgN(0)->GetIntValue();
+    }
+
     MHParseNode *pTerm = p->GetNamedArg(C_TERMINATION);
-    if (pTerm) m_Termination = (enum Termination)pTerm->GetEnumValue();
+
+    if (pTerm)
+    {
+        m_Termination = (enum Termination)pTerm->GetEnumValue();
+    }
 }
 
 void MHVideo::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:Video ");
-    MHVisible::PrintMe(fd, nTabs+1);
-    PrintTabs(fd, nTabs+1); fprintf(fd, ":ComponentTag %d\n", m_nComponentTag);
-    if (m_Termination != VI_Disappear) { PrintTabs(fd, nTabs+1); fprintf(fd, "Termination freeze "); }
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:Video ");
+    MHVisible::PrintMe(fd, nTabs + 1);
+    PrintTabs(fd, nTabs + 1);
+    fprintf(fd, ":ComponentTag %d\n", m_nComponentTag);
+
+    if (m_Termination != VI_Disappear)
+    {
+        PrintTabs(fd, nTabs + 1);
+        fprintf(fd, "Termination freeze ");
+    }
+
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 void MHVideo::Preparation(MHEngine *engine)
 {
-    if (m_fAvailable) return; // Already prepared
+    if (m_fAvailable)
+    {
+        return;    // Already prepared
+    }
+
     MHVisible::Preparation(engine); // Prepare the base class.
     // Set up the internal attributes after MHVisible::Preparation.
     m_nDecodeWidth = m_nBoxWidth;
@@ -270,20 +417,32 @@ void MHVideo::ContentPreparation(MHEngine *engine)
 // Display the video.
 void MHVideo::Display(MHEngine *engine)
 {
-    if (! m_fRunning) return;
-    if (m_nBoxWidth == 0 || m_nBoxHeight == 0) return; // Can't draw zero sized boxes.
+    if (! m_fRunning)
+    {
+        return;
+    }
+
+    if (m_nBoxWidth == 0 || m_nBoxHeight == 0)
+    {
+        return;    // Can't draw zero sized boxes.
+    }
+
     // The bounding box is assumed always to be True.
     // The full screen video is displayed in this rectangle.  It is therefore scaled to
     // m_nDecodeWidth/720 by m_nDecodeHeight/576.
-    QRect videoRect = QRect(m_nPosX+m_nXDecodeOffset, m_nPosY+m_nYDecodeOffset,
-                                m_nDecodeWidth, m_nDecodeHeight);        
+    QRect videoRect = QRect(m_nPosX + m_nXDecodeOffset, m_nPosY + m_nYDecodeOffset,
+                            m_nDecodeWidth, m_nDecodeHeight);
     QRect displayRect = videoRect.intersect(QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight));
     engine->GetContext()->DrawVideo(videoRect, displayRect);
 }
 
 void MHVideo::ScaleVideo(int xScale, int yScale, MHEngine *engine)
 {
-    if (xScale == m_nDecodeWidth && yScale == m_nDecodeHeight) return;
+    if (xScale == m_nDecodeWidth && yScale == m_nDecodeHeight)
+    {
+        return;
+    }
+
     QRegion updateArea = GetVisibleArea(); // Redraw the area before the offset
     m_nDecodeWidth = xScale;
     m_nDecodeHeight = yScale;
@@ -311,49 +470,81 @@ void MHVideo::GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine 
 // Return the region drawn by the bitmap.
 QRegion MHVideo::GetVisibleArea()
 {
-    if (! m_fRunning) return QRegion();
+    if (! m_fRunning)
+    {
+        return QRegion();
+    }
+
     // The visible area is the intersection of the containing box with the, possibly offset,
     // video.
     QRegion boxRegion = QRegion(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight);
-    QRegion videoRegion = QRegion(m_nPosX+m_nXDecodeOffset, m_nPosY+m_nYDecodeOffset,
-                                m_nDecodeWidth, m_nDecodeHeight);
+    QRegion videoRegion = QRegion(m_nPosX + m_nXDecodeOffset, m_nPosY + m_nYDecodeOffset,
+                                  m_nDecodeWidth, m_nDecodeHeight);
     return boxRegion & videoRegion;
 }
 
 void MHVideo::Activation(MHEngine *engine)
 {
-    if (m_fRunning) return;
+    if (m_fRunning)
+    {
+        return;
+    }
+
     MHVisible::Activation(engine);
+
     if (m_fStreamPlaying && m_streamContentRef.IsSet())
     {
         QString stream;
         MHOctetString &str = m_streamContentRef.m_ContentRef;
-        if (str.Size() != 0) stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
+
+        if (str.Size() != 0)
+        {
+            stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
+        }
+
         engine->GetContext()->BeginVideo(stream, m_nComponentTag);
     }
 }
 
 void MHVideo::Deactivation(MHEngine *engine)
 {
-    if (! m_fRunning) return;
+    if (! m_fRunning)
+    {
+        return;
+    }
+
     MHVisible::Deactivation(engine);
-    if (m_fStreamPlaying) engine->GetContext()->StopVideo();
+
+    if (m_fStreamPlaying)
+    {
+        engine->GetContext()->StopVideo();
+    }
 }
 
 void MHVideo::SetStreamRef(MHEngine *engine, const MHContentRef &cr)
 {
     m_streamContentRef.Copy(cr);
-    if (m_fStreamPlaying) BeginPlaying(engine);
+
+    if (m_fStreamPlaying)
+    {
+        BeginPlaying(engine);
+    }
 }
 
 void MHVideo::BeginPlaying(MHEngine *engine)
 {
     m_fStreamPlaying = true;
+
     if (m_fRunning && m_streamContentRef.IsSet())
     {
         QString stream;
         MHOctetString &str = m_streamContentRef.m_ContentRef;
-        if (str.Size() != 0) stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
+
+        if (str.Size() != 0)
+        {
+            stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
+        }
+
         engine->GetContext()->BeginVideo(stream, m_nComponentTag);
     }
 }
@@ -361,7 +552,11 @@ void MHVideo::BeginPlaying(MHEngine *engine)
 void MHVideo::StopPlaying(MHEngine *engine)
 {
     m_fStreamPlaying = false;
-    if (m_fRunning) engine->GetContext()->StopVideo();
+
+    if (m_fRunning)
+    {
+        engine->GetContext()->StopVideo();
+    }
 }
 
 

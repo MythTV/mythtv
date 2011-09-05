@@ -7,27 +7,17 @@
 #ifndef _LINUX_FIREWIRE_DEVICE_H_
 #define _LINUX_FIREWIRE_DEVICE_H_
 
+#include <QRunnable>
+
 #include "firewiredevice.h"
-#include <QThread>
+#include "mthread.h"
 
 class LFDPriv;
 class LinuxAVCInfo;
 class LinuxFirewireDevice;
 
-class LinuxControllerThread : public QThread
+class LinuxFirewireDevice : public FirewireDevice, public QRunnable
 {
-    Q_OBJECT
-  public:
-    LinuxControllerThread(LinuxFirewireDevice *parent) : m_parent(parent) {}
-    virtual ~LinuxControllerThread() { wait(); m_parent = NULL; }
-    virtual void run(void);
-  private:
-    LinuxFirewireDevice *m_parent;
-};
-
-class LinuxFirewireDevice : public FirewireDevice
-{
-    friend class LinuxControllerThread;
     friend int linux_firewire_device_tspacket_handler(
         unsigned char *tspacket, int len, uint dropped, void *callback_data);
 
@@ -76,7 +66,7 @@ class LinuxFirewireDevice : public FirewireDevice
     bool StartStreaming(void);
     bool StopStreaming(void);
 
-    void RunPortHandler(void);
+    void run(void); // QRunnable
     void PrintDropped(uint dropped_packets);
 
     bool SetAVStreamBufferSize(uint size_in_bytes);

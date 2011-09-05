@@ -50,7 +50,8 @@ class CdDecoder : public Decoder
     void writeBlock(void);
     void deinit();
 
-    bool inited, user_stop;
+    volatile bool inited;
+    volatile bool user_stop;
 
     QString devicename;
 

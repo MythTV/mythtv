@@ -47,10 +47,11 @@ namespace
  *  \param parent Pointer to the screen stack
  *  \param name The name of the window
  */
-RSSEditPopup::RSSEditPopup(QString url, bool edit,
-                               MythScreenStack *parent,
-                               const QString name) :
+RSSEditPopup::RSSEditPopup(
+    const QString &url, bool edit,
+    MythScreenStack *parent, const QString &name) :
     MythScreenType(parent, name),
+    m_site(NULL),
     m_urlText(url),        m_editing(edit),
     m_thumbImage(NULL),    m_thumbButton(NULL),
     m_urlEdit(NULL),       m_titleEdit(NULL),
@@ -351,14 +352,11 @@ void RSSEditPopup::customEvent(QEvent *levent)
     }
 }
 
-RSSEditor::RSSEditor(MythScreenStack *parent,
-                          const QString name) :
-    MythScreenType(parent, name),
-    m_lock(QMutex::Recursive),
-    m_sites(NULL), m_new(NULL),
-    m_delete(NULL), m_edit(NULL)
+RSSEditor::RSSEditor(MythScreenStack *parent, const QString &name) :
+    MythScreenType(parent, name), m_lock(QMutex::Recursive),
+    m_changed(false), m_sites(NULL), m_new(NULL), m_delete(NULL), m_edit(NULL),
+    m_image(NULL), m_title(NULL), m_url(NULL), m_desc(NULL), m_author(NULL)
 {
-    m_changed = false;
 }
 
 RSSEditor::~RSSEditor()

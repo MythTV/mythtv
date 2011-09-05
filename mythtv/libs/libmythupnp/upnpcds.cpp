@@ -22,6 +22,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
+#include <algorithm>
+using namespace std;
 
 #include "upnp.h"
 #include "upnpcds.h"
@@ -165,11 +167,11 @@ QStringList UPnpCDS::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool UPnpCDS::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
+bool UPnpCDS::ProcessRequest( HTTPRequest *pRequest )
 {
     if (pRequest)
     {
-        if (Eventing::ProcessRequest( pThread, pRequest ))
+        if (Eventing::ProcessRequest( pRequest ))
             return true;
 
         if ( pRequest->m_sBaseUrl != m_sControlUrl )
@@ -892,9 +894,9 @@ UPnpCDSExtensionResults *
             if ( pRequest->m_nRequestedCount == 0)
                 pRequest->m_nRequestedCount = nRootCount ;
 
-            short nStart = MAX(pRequest->m_nStartingIndex, short(0));
-            short nEnd   = MIN(nRootCount,
-                               short( nStart + pRequest->m_nRequestedCount));
+            short nStart = max(pRequest->m_nStartingIndex, short(0));
+            short nEnd   = min(nRootCount,
+                               short(nStart + pRequest->m_nRequestedCount));
 
             if (nStart < nRootCount)
             {

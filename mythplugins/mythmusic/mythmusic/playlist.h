@@ -171,7 +171,7 @@ class Playlist : public QObject
     bool                changed;
     MythProgressDialog *progress;
     MythSystem         *proc;
-    uint		procExitVal;
+    uint        procExitVal;
 };
 
 #endif

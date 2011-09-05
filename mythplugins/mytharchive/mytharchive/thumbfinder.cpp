@@ -280,6 +280,21 @@ void ThumbFinder::loadCutList()
         progInfo->QueryCutList(m_deleteMap);
         delete progInfo;
     }
+
+    // if the first mark is a end mark then add the start mark at the beginning
+    frm_dir_map_t::const_iterator it = m_deleteMap.begin();
+    if (it.value() == MARK_CUT_END)
+        m_deleteMap.insert(0, MARK_CUT_START);
+
+
+    // if the last mark is a start mark then add the end mark at the end
+    it = m_deleteMap.end();
+    --it;
+    if (it != m_deleteMap.end())
+    {
+        if (it.value() == MARK_CUT_START)
+            m_deleteMap.insert(m_archiveItem->duration * m_fps, MARK_CUT_END);
+    }
 }
 
 void ThumbFinder::savePressed()
@@ -430,11 +445,11 @@ bool ThumbFinder::getThumbImages()
         return false;
     }
 
-    if (m_archiveItem->type == "Recording")
-        loadCutList();
-
     if (!initAVCodec(m_archiveItem->filename))
         return false;
+
+    if (m_archiveItem->type == "Recording")
+        loadCutList();
 
     // calculate the file duration taking the cut list into account
     m_finalDuration = calcFinalDuration();
@@ -658,7 +673,14 @@ int ThumbFinder::checkFramePosition(int frameNumber)
     for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
     {
         int start = it.key();
+
         ++it;
+        if (it == m_deleteMap.end())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: found a start cut but no cut end");
+            break;
+        }
+
         int end = it.key();
 
         if (start <= frameNumber + diff)
@@ -947,6 +969,12 @@ void ThumbFinder::updatePositionBar(int64_t frame)
             startdelta = size.width();
 
         ++it;
+        if (it == m_deleteMap.end())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: found a start cut but no cut end");
+            break;
+        }
+
         if (it.key() != 0)
             enddelta = (m_archiveItem->duration * m_fps) / it.key();
         else
@@ -983,7 +1011,14 @@ int ThumbFinder::calcFinalDuration()
             for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
             {
                 start = it.key();
+
                 ++it;
+                if (it == m_deleteMap.end())
+                {
+                    LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: found a start cut but no cut end");
+                    break;
+                }
+
                 end = it.key();
                 cutLen += end - start;
             }

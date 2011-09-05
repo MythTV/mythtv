@@ -162,10 +162,15 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
 
 ////////////////////////////////////////////////////////////////
 
-ArchiveFileSelector::ArchiveFileSelector(MythScreenStack *parent)
-             :FileSelector(parent, NULL, FSTYPE_FILE, "", "*.xml")
+ArchiveFileSelector::ArchiveFileSelector(MythScreenStack *parent) :
+    FileSelector(parent, NULL, FSTYPE_FILE, "", "*.xml"),
+    m_nextButton(NULL),
+    m_prevButton(NULL),
+    m_progTitle(NULL),
+    m_progSubtitle(NULL),
+    m_progStartTime(NULL)
 {
-    m_curDirectory = gCoreContext->GetSetting("MythNativeLoadFilename", "/");;
+    m_curDirectory = gCoreContext->GetSetting("MythNativeLoadFilename", "/");
 }
 
 ArchiveFileSelector::~ArchiveFileSelector(void)
@@ -287,14 +292,33 @@ void ArchiveFileSelector::cancelPressed()
 
 ////////////////////////////////////////////////////////////////
 
-ImportNative::ImportNative(MythScreenStack *parent, MythScreenType *previousScreen,
-                           const QString &xmlFile, FileDetails details)
-             :MythScreenType(parent, "ImportNative")
+ImportNative::ImportNative(
+    MythScreenStack *parent, MythScreenType *previousScreen,
+    const QString &xmlFile, FileDetails details) :
+    MythScreenType(parent, "ImportNative"),
+    m_xmlFile(xmlFile),
+    m_details(details),
+    m_previousScreen(previousScreen),
+    m_progTitle_text(NULL),
+    m_progDateTime_text(NULL),
+    m_progDescription_text(NULL),
+    m_chanID_text(NULL),
+    m_chanNo_text(NULL),
+    m_chanName_text(NULL),
+    m_callsign_text(NULL),
+    m_localChanID_text(NULL),
+    m_localChanNo_text(NULL),
+    m_localChanName_text(NULL),
+    m_localCallsign_text(NULL),
+    m_searchChanID_button(NULL),
+    m_searchChanNo_button(NULL),
+    m_searchChanName_button(NULL),
+    m_searchCallsign_button(NULL),
+    m_finishButton(NULL),
+    m_prevButton(NULL),
+    m_cancelButton(NULL),
+    m_isValidXMLSelected(false)
 {
-    m_previousScreen = previousScreen;
-    m_xmlFile = xmlFile;
-    m_details = details;
-    m_isValidXMLSelected = false;
 }
 
 ImportNative::~ImportNative()

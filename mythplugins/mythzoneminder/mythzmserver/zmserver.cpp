@@ -278,7 +278,7 @@ void ZMServer::processRequest(char* buf, int nbytes)
     vector<string> tokens;
     tokenize(s, tokens);
 
-    if (tokens.size() == 0)
+    if (tokens.empty())
         return;
 
     if (m_debug)
@@ -604,7 +604,7 @@ void ZMServer::handleGetMonitorStatus(void)
     MYSQL_RES *res;
     MYSQL_ROW row;
 
-    string sql("SELECT id, name, type, device, channel, function, enabled "
+    string sql("SELECT Id, Name, Type, Device, Host, Channel, Function, Enabled "
                "FROM Monitors;");
     if (mysql_query(&g_dbConn, sql.c_str()))
     {
@@ -633,14 +633,15 @@ void ZMServer::handleGetMonitorStatus(void)
             string id = row[0];
             string type = row[2];
             string device = row[3];
-            string channel = row[4];
-            string function = row[5];
-            string enabled = row[6];
+            string host = row[4];
+            string channel = row[5];
+            string function = row[6];
+            string enabled = row[7];
             string name = row[1];
             string events = "";
             string zmcStatus = "";
             string zmaStatus = "";
-            getMonitorStatus(id, type, device, channel, function,
+            getMonitorStatus(id, type, device, host, channel, function,
                              zmcStatus, zmaStatus, enabled);
             MYSQL_RES *res2;
             MYSQL_ROW row2;
@@ -707,7 +708,7 @@ string ZMServer::runCommand(string command)
     return outStr;
 }
 
-void ZMServer::getMonitorStatus(string id, string type, string device, string channel,
+void ZMServer::getMonitorStatus(string id, string type, string device, string host, string channel,
                                 string function, string &zmcStatus, string &zmaStatus,
                                 string enabled)
 {
@@ -717,12 +718,24 @@ void ZMServer::getMonitorStatus(string id, string type, string device, string ch
     string command(g_binPath + "/zmdc.pl status");
     string status = runCommand(command);
 
-    if (enabled == "0")
-        zmaStatus = device + "(" + channel + ") [-]";
-    else if (status.find("'zma -m " + id + "' running") != string::npos)
-        zmaStatus = device + "(" + channel + ") [R]";
+    if (type == "Local")
+    {
+        if (enabled == "0")
+            zmaStatus = device + "(" + channel + ") [-]";
+        else if (status.find("'zma -m " + id + "' running") != string::npos)
+            zmaStatus = device + "(" + channel + ") [R]";
+        else
+            zmaStatus = device + "(" + channel + ") [S]";
+    }
     else
-        zmaStatus = device + "(" + channel + ") [S]";
+    {
+        if (enabled == "0")
+            zmaStatus = host + " [-]";
+        else if (status.find("'zma -m " + id + "' running") != string::npos)
+            zmaStatus = host + " [R]";
+        else
+            zmaStatus = host + " [S]";
+    }
 
     if (type == "Local")
     {
@@ -1183,7 +1196,8 @@ void ZMServer::handleDeleteEventList(vector<string> tokens)
     string outStr("");
 
     vector<string>::iterator it = tokens.begin();
-    it++;
+    if (it != tokens.end())
+        ++it;
     while (it != tokens.end())
     {
         if (eventList == "")
@@ -1191,7 +1205,7 @@ void ZMServer::handleDeleteEventList(vector<string> tokens)
         else
             eventList += "," + (*it);
 
-       it++;
+        ++it;
     }
 
     if (m_debug)
@@ -1234,7 +1248,7 @@ void ZMServer::getMonitorList(void)
     m_monitors.clear();
 
     string sql("SELECT Id, Name, Width, Height, ImageBufferCount, MaxFPS, Palette, ");
-    sql += " Type, Function, Enabled, Device, Controllable, TrackMotion ";
+    sql += " Type, Function, Enabled, Device, Host, Controllable, TrackMotion ";
     sql += "FROM Monitors";
 
     MYSQL_RES *res;
@@ -1268,8 +1282,9 @@ void ZMServer::getMonitorList(void)
             m->function = row[8];
             m->enabled = atoi(row[9]);
             m->device = row[10];
-            m->controllable = atoi(row[11]);
-            m->trackMotion = atoi(row[12]);
+            m->host = row[11];
+            m->controllable = atoi(row[12]);
+            m->trackMotion = atoi(row[13]);
             m_monitors[m->mon_id] = m;
 
             initMonitor(m);

@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.6.7"
+__version__=u"v0.6.8"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -208,6 +208,7 @@ __version__=u"v0.6.7"
 #       Removed creation of "folder.png" graphics when creating directories as that is no longer used
 #           by MythVideo
 #       Fixed the options "-h, --help" command line display
+# 0.6.8 Sometimes Miro metadata has no video filename. Skip these invalid videos.
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -1765,6 +1766,12 @@ def updateMythRecorded(items):
 
     # Add new Miro unwatched videos to MythTV'd data base
     for item in items_copy:
+        # Do not create records for Miro video files when Miro has a corrupt or missing file name
+        if item[u'videoFilename'] == None:
+            continue
+        # Do not create records for Miro video files that do not exist
+        if not os.path.isfile(os.path.realpath(item[u'videoFilename'])):
+            continue
         if not os.path.isfile(os.path.realpath(item[u'videoFilename'])):
             continue # Do not create records for Miro video files that do not exist
         records = createRecordedRecords(item)

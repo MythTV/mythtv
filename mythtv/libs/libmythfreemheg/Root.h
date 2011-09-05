@@ -42,7 +42,7 @@ enum EventType { EventIsAvailable = 1, EventContentAvailable, EventIsDeleted, Ev
 
 class MHRoot  
 {
-public:
+  public:
     MHRoot(): m_fAvailable(false), m_fRunning(false) {}
     MHRoot(const MHRoot &/*ref*/): m_fAvailable(false), m_fRunning(false) {}
     virtual ~MHRoot() {}
@@ -192,14 +192,14 @@ public:
     virtual void SetSliderParameters(int /*newMin*/, int /*newMax*/, int /*newStep*/, MHEngine * /*engine*/)
          { InvalidAction("SetSliderParameters"); }
 
-protected:
+  protected:
 
     void InvalidAction(const char *actionName);
-public: 
+  public: 
     MHObjectRef m_ObjectReference; // Identifier of this object.
 
     virtual const char *ClassName() = 0; // For debugging messages.
-protected:
+  protected:
     bool m_fAvailable; // Set once Preparation has completed.
     bool m_fRunning; // Set once Activation has completed.
 
@@ -209,11 +209,11 @@ protected:
 // Get Availability Status - Does the object exist and is it available?.
 class MHGetAvailabilityStatus: public MHElemAction
 {
-public:
+  public:
     MHGetAvailabilityStatus(): MHElemAction(":GetAvailabilityStatus")  {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int /*nTabs*/) const { m_ResultVar.PrintMe(fd, 0); }
     MHObjectRef m_ResultVar;
 };
@@ -221,7 +221,7 @@ protected:
 // Get Running Status - Is the object running?.
 class MHGetRunningStatus: public MHActionObjectRef
 {
-public:
+  public:
     MHGetRunningStatus(): MHActionObjectRef(":GetRunningStatus")  {}
     virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) { pResult->SetVariableValue(pTarget->GetRunningStatus());}
 };

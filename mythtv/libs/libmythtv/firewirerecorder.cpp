@@ -52,9 +52,9 @@ void FirewireRecorder::StopStreaming(void)
     channel->GetFirewireDevice()->RemoveListener(this);
 }
 
-void FirewireRecorder::StartRecording(void)
+void FirewireRecorder::run(void)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run");
 
     if (!Open())
     {

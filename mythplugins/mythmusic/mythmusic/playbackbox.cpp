@@ -180,7 +180,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     if (!visual_modes.count())
         visual_modes.push_front("Blank");
 
-    current_visual = random_visualizer ? rand() % visual_modes.count() : 0;
+    current_visual = random_visualizer ? random() % visual_modes.count() : 0;
 
     QString visual_delay = gCoreContext->GetSetting("VisualModeDelay");
     bool delayOK;
@@ -1006,7 +1006,7 @@ void PlaybackBoxMusic::occasionallyCheckCD()
         postUpdate();
     }
 
-    if (scan_for_cd && !cd_reader_thread->running())
+    if (scan_for_cd && !cd_reader_thread->isRunning())
         cd_reader_thread->start();
 }
 
@@ -1457,7 +1457,7 @@ void PlaybackBoxMusic::CycleVisualizer()
 
             //Find a visual thats not like the previous visual
             do
-                next_visualizer = rand() % visual_modes.count();
+                next_visualizer = random() % visual_modes.count();
             while (next_visualizer == current_visual);
             current_visual = next_visualizer;
         }
@@ -1850,13 +1850,15 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
                         {
                             curMeta = gMusicData->all_music->getMetadata(node->getInt());
                             if (curMeta)
+                            {
                                 updateTrackInfo(curMeta);
 
-                            maxTime = curMeta->Length() / 1000;
+                                maxTime = curMeta->Length() / 1000;
 
-                            QString time_string = getTimeString(maxTime, 0);
+                                QString time_string = getTimeString(maxTime, 0);
 
-                            bannerEnable(curMeta, show_album_art);
+                                bannerEnable(curMeta, show_album_art);
+                            }
                         }
                     }
                     else
@@ -1877,13 +1879,15 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
                     {
                         curMeta = gMusicData->all_music->getMetadata(node->getInt());
                         if (curMeta)
+                        {
                             updateTrackInfo(curMeta);
 
-                        maxTime = curMeta->Length() / 1000;
+                            maxTime = curMeta->Length() / 1000;
 
-                        QString time_string = getTimeString(maxTime, 0);
+                            QString time_string = getTimeString(maxTime, 0);
 
-                        bannerEnable(curMeta, show_album_art);
+                            bannerEnable(curMeta, show_album_art);
+                        }
                     }
                 }
                 else
@@ -2281,11 +2285,13 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
 
         curMeta = gMusicData->all_music->getMetadata(node_int);
         if (curMeta)
+        {
             updateTrackInfo(curMeta);
 
-        maxTime = curMeta->Length() / 1000;
+            maxTime = curMeta->Length() / 1000;
 
-        QString time_string = getTimeString(maxTime, 0);
+            QString time_string = getTimeString(maxTime, 0);
+        }
 
         if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
         {

@@ -361,7 +361,7 @@ bool PlaybackSock::IsBusy(int capturecardnum, InputInfo *busy_input,
 
         if (busy_input)
         {
-            it++;
+            ++it;
             if (!busy_input->FromStringList(it, strlist.end()))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "IsBusy: "

@@ -16,45 +16,45 @@ bool operator==(const RomInfo& a, const RomInfo& b)
     return false;
 }
 
-void RomInfo::UpdateDatabase()
+void RomInfo::SaveToDatabase()
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT gamename,genre,year,country,plot,publisher, "
-                  "favorite,screenshot,fanart,boxart,inetref "
-                  "FROM gamemetadata "
-                  "WHERE gametype = :GAMETYPE "
-                  "AND romname = :ROMNAME");
 
-    query.bindValue(":GAMETYPE", GameType());
-    query.bindValue(":ROMNAME", Romname());
+    bool inserting = false;
 
-    if (!query.exec())
+    if (id == 0)
+        inserting = true;
+
+    if (inserting)
     {
-        MythDB::DBError("RomInfo::UpdateDatabase", query);
-        return;
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Adding %1 - %2").arg(Rompath())
+            .arg(Romname()));
+
+        query.prepare("INSERT INTO gamemetadata "
+                      "(system, romname, gamename, genre, year, gametype, "
+                      "rompath, country, crc_value, diskcount, display, plot, "
+                      "publisher, version, fanart, boxart, screenshot) "
+                      "VALUES (:SYSTEM, :ROMNAME, :GAMENAME, :GENRE, :YEAR, "
+                      ":GAMETYPE, :ROMPATH, :COUNTRY, :CRC32, '1', '1', :PLOT, "
+                      ":PUBLISHER, :VERSION, :FANART, :BOXART, :SCREENSHOT)");
+
+        query.bindValue(":SYSTEM",System());
+        query.bindValue(":ROMNAME",Romname());
+        query.bindValue(":GAMENAME",Gamename());
+        query.bindValue(":GENRE",Genre());
+        query.bindValue(":YEAR",Year());
+        query.bindValue(":GAMETYPE",GameType());
+        query.bindValue(":ROMPATH",Rompath());
+        query.bindValue(":COUNTRY",Country());
+        query.bindValue(":CRC32", QString());
+        query.bindValue(":PLOT", Plot());
+        query.bindValue(":PUBLISHER", Publisher());
+        query.bindValue(":VERSION", Version());
+        query.bindValue(":FANART", Fanart());
+        query.bindValue(":BOXART", Boxart());
+        query.bindValue(":SCREENSHOT", Screenshot());
     }
-
-    if (!query.next())
-        return;
-
-    QString t_gamename  = query.value(0).toString();
-    QString t_genre     = query.value(1).toString();
-    QString t_year      = query.value(2).toString();
-    QString t_country   = query.value(3).toString();
-    QString t_plot      = query.value(4).toString();
-    QString t_publisher = query.value(5).toString();
-    bool    t_favourite = query.value(6).toBool();
-    QString t_screenshot = query.value(7).toString();
-    QString t_fanart = query.value(8).toString();
-    QString t_boxart = query.value(9).toString();
-    QString t_inetref = query.value(10).toString();
-
-    if ((t_gamename  != Gamename())  || (t_genre     != Genre())   ||
-        (t_year      != Year())      || (t_country   != Country()) ||
-        (t_plot      != Plot())      || (t_publisher != Publisher()) ||
-        (t_favourite != Favorite())  || (t_screenshot != Screenshot()) ||
-        (t_fanart    != Fanart())    || (t_boxart    != Boxart()) ||
-        (t_inetref   != Inetref()))
+    else
     {
         query.prepare("UPDATE gamemetadata "
                       "SET version = 'CUSTOM', "
@@ -84,13 +84,32 @@ void RomInfo::UpdateDatabase()
         query.bindValue(":INETREF", Inetref());
         query.bindValue(":GAMETYPE", GameType());
         query.bindValue(":ROMNAME", Romname());
-
-        if (!query.exec())
-        {
-            MythDB::DBError("RomInfo::UpdateDatabase", query);
-            return;
-        }
     }
+
+    if (!query.exec())
+    {
+        MythDB::DBError("RomInfo::SaveToDatabase", query);
+        return;
+    }
+}
+
+void RomInfo::DeleteFromDatabase()
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Removing %1 - %2").arg(Rompath())
+            .arg(Romname()));
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM gamemetadata WHERE "
+                  "romname = :ROMNAME AND "
+                  "rompath = :ROMPATH ");
+
+    query.bindValue(":ROMNAME",Romname());
+    query.bindValue(":ROMPATH",Rompath());
+
+    if (!query.exec())
+        MythDB::DBError("purgeGameDB", query);
+
 }
 
 // Return the count of how many times this appears in the db already
@@ -243,7 +262,7 @@ void RomInfo::fillData()
 
     QString thequery = "SELECT system,gamename,genre,year,romname,favorite,"
                        "rompath,country,crc_value,diskcount,gametype,plot,publisher,"
-                       "version,screenshot,fanart,boxart,inetref FROM gamemetadata "
+                       "version,screenshot,fanart,boxart,inetref,intid FROM gamemetadata "
                        "WHERE gamename = :GAMENAME "
                        + systemtype + " ORDER BY diskcount DESC";
 
@@ -271,6 +290,7 @@ void RomInfo::fillData()
         setFanart(query.value(15).toString());
         setBoxart(query.value(16).toString());
         setInetref(query.value(17).toString());
+        setId(query.value(18).toInt());
     }
 
     setRomCount(romInDB(romname,gametype));
@@ -299,3 +319,109 @@ void RomInfo::fillData()
     }
 }
 
+QList<RomInfo*> RomInfo::GetAllRomInfo()
+{
+    QList<RomInfo*> ret;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = "SELECT intid,system,romname,gamename,genre,year,publisher,"
+                       "favorite,rompath,screenshot,fanart,plot,boxart,"
+                       "gametype,diskcount,country,crc_value,inetref,display,"
+                       "version FROM gamemetadata ORDER BY diskcount DESC";
+
+    query.prepare(querystr);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetAllRomInfo", query);
+        return ret;
+    }
+
+    while (query.next())
+    {
+        RomInfo *add = new RomInfo(
+                           query.value(0).toInt(),
+                           query.value(2).toString(),
+                           query.value(1).toString(),
+                           query.value(3).toString(),
+                           query.value(4).toString(),
+                           query.value(5).toString(),
+                           query.value(7).toBool(),
+                           query.value(8).toString(),
+                           query.value(15).toString(),
+                           query.value(16).toString(),
+                           query.value(14).toInt(),
+                           query.value(13).toString(),
+                           0, QString(),
+                           query.value(11).toString(),
+                           query.value(6).toString(),
+                           query.value(19).toString(),
+                           query.value(9).toString(),
+                           query.value(10).toString(),
+                           query.value(12).toString(),
+                           query.value(17).toString());
+        ret.append(add);
+    }
+
+    return ret;
+}
+
+RomInfo *RomInfo::GetRomInfoById(int id)
+{
+    RomInfo *ret = new RomInfo();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = "SELECT intid,system,romname,gamename,genre,year,publisher,"
+                       "favorite,rompath,screenshot,fanart,plot,boxart,"
+                       "gametype,diskcount,country,crc_value,inetref,display,"
+                       "version FROM gamemetadata WHERE intid = :INTID";
+
+    query.prepare(querystr);
+    query.bindValue(":INTID", id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetRomInfoById", query);
+        return ret;
+    }
+
+    if (query.next())
+    {
+        ret = new RomInfo(
+                           query.value(0).toInt(),
+                           query.value(2).toString(),
+                           query.value(1).toString(),
+                           query.value(3).toString(),
+                           query.value(4).toString(),
+                           query.value(5).toString(),
+                           query.value(7).toBool(),
+                           query.value(8).toString(),
+                           query.value(15).toString(),
+                           query.value(16).toString(),
+                           query.value(14).toInt(),
+                           query.value(13).toString(),
+                           0, QString(),
+                           query.value(11).toString(),
+                           query.value(6).toString(),
+                           query.value(19).toString(),
+                           query.value(9).toString(),
+                           query.value(10).toString(),
+                           query.value(12).toString(),
+                           query.value(17).toString());
+    }
+
+    return ret;
+}
+
+QString RomInfo::toString()
+{
+    return QString ("Rom Info:\n"
+               "ID: %1\n"
+               "Game Name: %2\n"
+               "Rom Name: %3\n"
+               "Rom Path: %4")
+               .arg(Id()).arg(Gamename())
+               .arg(Romname()).arg(Rompath());
+}

@@ -34,7 +34,6 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_startTime(QDateTime::currentDateTime()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-    m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
 
     m_searchType(kNoSearch),
 
@@ -84,7 +83,6 @@ ProgLister::ProgLister(
     m_startTime(QDateTime::currentDateTime()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-    m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
 
     m_searchType(kNoSearch),
 
@@ -690,7 +688,7 @@ void ProgLister::DeleteOldEpisode(bool ok)
         "WHERE chanid    = :CHANID AND "
         "      starttime = :STARTTIME");
     query.bindValue(":CHANID",    pi->GetChanID());
-    query.bindValue(":STARTTIME", pi->GetScheduledStartTime(ISODate));
+    query.bindValue(":STARTTIME", pi->GetScheduledStartTime());
 
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldEpisode", query);
@@ -787,7 +785,7 @@ void ProgLister::FillViewList(const QString &view)
 
         for (uint i = 0; i < channels.size(); ++i)
         {
-            QString chantext = channels[i].GetFormatted(m_channelFormat);
+            QString chantext = channels[i].GetFormatted(DBChannel::kChannelShort);
 
             m_viewList.push_back(QString::number(channels[i].chanid));
             m_viewTextList.push_back(chantext);
@@ -798,7 +796,7 @@ void ProgLister::FillViewList(const QString &view)
     }
     else if (m_type == plCategory) // list by category
     {
-        QString startstr = m_startTime.toString("yyyy-MM-ddThh:mm:50");
+        QString startstr = m_startTime.toString("yyyy-MM-dd hh:mm:50");
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT g1.genre, g2.genre "
                       "FROM program "
@@ -1132,7 +1130,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
 
     bool oneChanid = false;
     QString where;
-    QString startstr = m_startTime.toString("yyyy-MM-ddThh:mm:50");
+    QString startstr = m_startTime.toString("yyyy-MM-dd hh:mm:50");
     QString qphrase = m_viewList[m_curView];
 
     MSqlBindings bindings;
@@ -1360,7 +1358,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         selected = *selectedP;
         selectedP = &selected;
     }
-    int selectedOffset = 
+    int selectedOffset =
         m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
 
     m_progList->Reset();
@@ -1399,7 +1397,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
                 if ((*it)->sortTitle != curtitle)
                 {
                     curtitle = (*it)->sortTitle;
-                    it++;
+                    ++it;
                 }
                 else
                 {

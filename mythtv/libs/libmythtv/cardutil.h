@@ -292,7 +292,7 @@ class MTV_PUBLIC CardUtil
     /// \brief Returns true if the card is a DVB card
     static bool         IsDVB(uint cardid)
         { return "DVB" == GetRawCardType(cardid); }
-    static bool         IsDVBCardType(const QString card_type);
+    static bool         IsDVBCardType(const QString &card_type);
     static QString      ProbeDVBFrontendName(const QString &device);
     static QString      ProbeDVBType(const QString &device);
     static bool         HasDVBCRCBug(const QString &device);

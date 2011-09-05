@@ -54,7 +54,7 @@ enum BrowseFilter {
 
 enum WatchedFilter {
     kWatchedFilterAll = -1
-};       
+};
 
 enum InetRefFilter {
     kInetRefFilterAll = -1,
@@ -72,8 +72,8 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
     country(kCountryFilterAll), cast(kCastFilterAll),
     year(kYearFilterAll), runtime(kRuntimeFilterAll),
     userrating(kUserRatingFilterAll), browse(kBrowseFilterAll),
-    watched(kWatchedFilterAll), m_inetref(kInetRefFilterAll), 
-    m_coverfile(kCoverFileFilterAll), orderby(kOrderByTitle), 
+    watched(kWatchedFilterAll), m_inetref(kInetRefFilterAll),
+    m_coverfile(kCoverFileFilterAll), orderby(kOrderByTitle),
     m_parental_level(ParentalLevel::plNone), textfilter(""),
     season(-1), episode(-1), insertdate(QDate()),
     re_season("(\\d+)[xX](\\d*)"), re_date("-(\\d+)([dmw])"),
@@ -207,19 +207,19 @@ VideoFilterSettings::operator=(const VideoFilterSettings &rhs)
 
     if (textfilter != rhs.textfilter)
     {
-    	textfilter = rhs.textfilter;
-    	m_changed_state |= kFilterTextFilterChanged;
+        textfilter = rhs.textfilter;
+        m_changed_state |= kFilterTextFilterChanged;
     }
     if (season != rhs.season || episode != rhs.episode)
     {
-    	season = rhs.season;
-    	episode = rhs.episode;
-    	m_changed_state |= kFilterTextFilterChanged;
+        season = rhs.season;
+        episode = rhs.episode;
+        m_changed_state |= kFilterTextFilterChanged;
     }
     if (insertdate != rhs.insertdate)
     {
-    	insertdate = rhs.insertdate;
-    	m_changed_state |= kFilterTextFilterChanged;
+        insertdate = rhs.insertdate;
+        m_changed_state |= kFilterTextFilterChanged;
     }
 
     return *this;
@@ -249,20 +249,26 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
     //textfilter
     if (!textfilter.isEmpty())
     {
-    	matches = false;
-    	matches = matches || mdata.GetTitle().contains(textfilter, Qt::CaseInsensitive);
-    	matches = matches || mdata.GetSubtitle().contains(textfilter, Qt::CaseInsensitive);
-    	matches = matches || mdata.GetPlot().contains(textfilter, Qt::CaseInsensitive);
+        matches = false;
+        matches = (matches ||
+                   mdata.GetTitle().contains(textfilter, Qt::CaseInsensitive));
+        matches = (matches ||
+                   mdata.GetSubtitle().contains(textfilter, Qt::CaseInsensitive));
+        matches = (matches ||
+                   mdata.GetPlot().contains(textfilter, Qt::CaseInsensitive));
     }
     //search for season with optionally episode nr.
-    if (matches && season != -1) {
-    	matches = season == mdata.GetSeason();
-    	matches = matches && (episode == -1 || episode == mdata.GetEpisode());
+    if (matches && (season != -1))
+    {
+        matches = (season == mdata.GetSeason());
+        matches = (matches && (episode == -1 || episode == mdata.GetEpisode()));
     }
-    if (matches && insertdate.isValid()) {
-    	matches = mdata.GetInsertdate().isValid() && mdata.GetInsertdate() >= insertdate;
+    if (matches && insertdate.isValid())
+    {
+        matches = (mdata.GetInsertdate().isValid() &&
+                   mdata.GetInsertdate() >= insertdate);
     }
-    if (matches && genre != kGenreFilterAll)
+    if (matches && (genre != kGenreFilterAll))
     {
         matches = false;
 
@@ -270,7 +276,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         for (VideoMetadata::genre_list::const_iterator p = gl.begin();
              p != gl.end(); ++p)
         {
-            if ((matches = p->first == genre))
+            if ((matches = (p->first == genre)))
             {
                 break;
             }
@@ -285,7 +291,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         for (VideoMetadata::country_list::const_iterator p = cl.begin();
              p != cl.end(); ++p)
         {
-            if ((matches = p->first == country))
+            if ((matches = (p->first == country)))
             {
                 break;
             }
@@ -296,7 +302,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
     {
         const VideoMetadata::cast_list &cl = mdata.GetCast();
 
-        if (cast == kCastFilterUnknown && cl.size() == 0)
+        if ((cast == kCastFilterUnknown) && (cl.size() == 0))
         {
             matches = true;
         }
@@ -307,7 +313,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
             for (VideoMetadata::cast_list::const_iterator p = cl.begin();
                  p != cl.end(); ++p)
             {
-                if ((matches = p->first == cast))
+                if ((matches = (p->first == cast)))
                 {
                     break;
                 }
@@ -317,19 +323,19 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
 
     if (matches && category != kCategoryFilterAll)
     {
-        matches = category == mdata.GetCategoryID();
+        matches = (category == mdata.GetCategoryID());
     }
 
     if (matches && year != kYearFilterAll)
     {
         if (year == kYearFilterUnknown)
         {
-            matches = (mdata.GetYear() == 0) ||
-                    (mdata.GetYear() == VIDEO_YEAR_DEFAULT);
+            matches = ((mdata.GetYear() == 0) ||
+                       (mdata.GetYear() == VIDEO_YEAR_DEFAULT));
         }
         else
         {
-            matches = year == mdata.GetYear();
+            matches = (year == mdata.GetYear());
         }
     }
 
@@ -337,43 +343,43 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
     {
         if (runtime == kRuntimeFilterUnknown)
         {
-            matches = mdata.GetLength() == 0;
+            matches = (mdata.GetLength() == 0);
         }
         else
         {
-            matches = runtime == (mdata.GetLength() / 30);
+            matches = (runtime == (mdata.GetLength() / 30));
         }
     }
 
     if (matches && userrating != kUserRatingFilterAll)
     {
-        matches = mdata.GetUserRating() >= userrating;
+        matches = (mdata.GetUserRating() >= userrating);
     }
 
     if (matches && browse != kBrowseFilterAll)
     {
-        matches = mdata.GetBrowse() == browse;
+        matches = (mdata.GetBrowse() == browse);
     }
 
     if (matches && watched != kWatchedFilterAll)
     {
-        matches = mdata.GetWatched() == watched;
+        matches = (mdata.GetWatched() == watched);
     }
 
     if (matches && m_inetref != kInetRefFilterAll)
     {
-        matches = mdata.GetInetRef() == VIDEO_INETREF_DEFAULT;
+        matches = (mdata.GetInetRef() == VIDEO_INETREF_DEFAULT);
     }
 
     if (matches && m_coverfile != kCoverFileFilterAll)
     {
-        matches = IsDefaultCoverFile(mdata.GetCoverFile());
+        matches = (IsDefaultCoverFile(mdata.GetCoverFile()));
     }
 
     if (matches && m_parental_level)
     {
-        matches = (mdata.GetShowLevel() != ParentalLevel::plNone) &&
-                (mdata.GetShowLevel() <= m_parental_level);
+        matches = ((mdata.GetShowLevel() != ParentalLevel::plNone) &&
+                (mdata.GetShowLevel() <= m_parental_level));
     }
 
     return matches;
@@ -431,26 +437,26 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
                 }
                 ret = lhs_key < rhs_key;
             }
-            else if (lhs.GetSeason() == rhs.GetSeason()
-                     && lhs.GetTitle() == rhs.GetTitle())
-                ret = lhs.GetEpisode() < rhs.GetEpisode();
+            else if ((lhs.GetSeason() == rhs.GetSeason())
+                     && (lhs.GetTitle() == rhs.GetTitle()))
+                ret = (lhs.GetEpisode() < rhs.GetEpisode());
             else
-                ret = lhs.GetSeason() < rhs.GetSeason();
+                ret = (lhs.GetSeason() < rhs.GetSeason());
             break;
         }
         case kOrderByYearDescending:
         {
-            ret = lhs.GetYear() > rhs.GetYear();
+            ret = (lhs.GetYear() > rhs.GetYear());
             break;
         }
         case kOrderByUserRatingDescending:
         {
-            ret = lhs.GetUserRating() > rhs.GetUserRating();
+            ret = (lhs.GetUserRating() > rhs.GetUserRating());
             break;
         }
         case kOrderByLength:
         {
-            ret = lhs.GetLength() < rhs.GetLength();
+            ret = (lhs.GetLength() < rhs.GetLength());
             break;
         }
         case kOrderByFilename:
@@ -464,12 +470,12 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
         }
         case kOrderByID:
         {
-            ret = lhs.GetID() < rhs.GetID();
+            ret = (lhs.GetID() < rhs.GetID());
             break;
         }
         case kOrderByDateAddedDescending:
         {
-            ret = lhs.GetInsertdate() > rhs.GetInsertdate();
+            ret = (lhs.GetInsertdate() > rhs.GetInsertdate());
             break;
         }
         default:
@@ -484,53 +490,53 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
 
 void VideoFilterSettings::setTextFilter(QString val)
 {
-	m_changed_state |= kFilterTextFilterChanged;
-	if (re_season.indexIn(val) != -1)
-	{
-		bool res;
-		QStringList list = re_season.capturedTexts();
-		season = list[1].toInt(&res);
-		if (!res)
-			season = -1;
-		if (list.size() > 2) {
-			episode = list[2].toInt(&res);
-			if (!res)
-				episode = -1;
-		}
-		else {
-			episode = -1;
-		}
-		//clear \dX\d from string for string-search in plot/title/subtitle
-		textfilter = val;
-		textfilter.replace(re_season, "");
-		textfilter = textfilter.simplified ();
-	}
-	else
-	{
-		textfilter = val;
-		season = -1;
-		episode = -1;
-	}
-	if (re_date.indexIn(textfilter) != -1)
-	{
-		QStringList list = re_date.capturedTexts();
-		int modnr = list[1].toInt();
-		QDate testdate = QDate::currentDate();
-		switch(list[2].at(0).toAscii())
-		{
-			case 'm': testdate = testdate.addMonths(-modnr);break;
-			case 'd': testdate = testdate.addDays(-modnr);break;
-			case 'w': testdate = testdate.addDays(-modnr * 7);break;
-		}
-		insertdate = testdate;
-		textfilter.replace(re_date, "");
-		textfilter = textfilter.simplified ();
-	}
-	else
-	{
-		//reset testdate
-		insertdate = QDate();
-	}
+    m_changed_state |= kFilterTextFilterChanged;
+    if (re_season.indexIn(val) != -1)
+    {
+        bool res;
+        QStringList list = re_season.capturedTexts();
+        season = list[1].toInt(&res);
+        if (!res)
+            season = -1;
+        if (list.size() > 2) {
+            episode = list[2].toInt(&res);
+            if (!res)
+                episode = -1;
+        }
+        else {
+            episode = -1;
+        }
+        //clear \dX\d from string for string-search in plot/title/subtitle
+        textfilter = val;
+        textfilter.replace(re_season, "");
+        textfilter = textfilter.simplified ();
+    }
+    else
+    {
+        textfilter = val;
+        season = -1;
+        episode = -1;
+    }
+    if (re_date.indexIn(textfilter) != -1)
+    {
+        QStringList list = re_date.capturedTexts();
+        int modnr = list[1].toInt();
+        QDate testdate = QDate::currentDate();
+        switch(list[2].at(0).toAscii())
+        {
+            case 'm': testdate = testdate.addMonths(-modnr);break;
+            case 'd': testdate = testdate.addDays(-modnr);break;
+            case 'w': testdate = testdate.addDays(-modnr * 7);break;
+        }
+        insertdate = testdate;
+        textfilter.replace(re_date, "");
+        textfilter = textfilter.simplified ();
+    }
+    else
+    {
+        //reset testdate
+        insertdate = QDate();
+    }
 }
 
 /////////////////////////////////
@@ -614,7 +620,7 @@ bool VideoFilterDialog::Create()
     connect(m_orderbyList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(setOrderby(MythUIButtonListItem*)));
     connect(m_textfilter, SIGNAL(valueChanged()),
-    		SLOT(setTextFilter()));
+            SLOT(setTextFilter()));
 
     connect(m_saveButton, SIGNAL(Clicked()), SLOT(saveAsDefault()));
     connect(m_doneButton, SIGNAL(Clicked()), SLOT(saveAndExit()));
@@ -914,6 +920,6 @@ void VideoFilterDialog::setOrderby(MythUIButtonListItem *item)
 
 void VideoFilterDialog::setTextFilter()
 {
-	m_settings.setTextFilter(m_textfilter->GetText());
-	update_numvideo();
+    m_settings.setTextFilter(m_textfilter->GetText());
+    update_numvideo();
 }

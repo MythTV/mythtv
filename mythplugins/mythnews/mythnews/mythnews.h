@@ -25,7 +25,7 @@ class MythNews : public MythScreenType
     Q_OBJECT
 
   public:
-    MythNews(MythScreenStack *parent, QString name);
+    MythNews(MythScreenStack *parent, const QString &name);
     ~MythNews();
 
     bool Create(void);
@@ -38,8 +38,8 @@ class MythNews : public MythScreenType
     void cancelRetrieve(void);
     void processAndShowNews(NewsSite *site);
 
-    bool getHttpFile(QString sFilename, QString cmdURL);
-    void createProgress(QString title);
+    bool getHttpFile(const QString &sFilename, const QString &cmdURL);
+    void createProgress(const QString &title);
     QString formatSize(long long bytes, int prec);
     void playVideo(const QString &filename);
 

@@ -23,7 +23,8 @@ void MythTVSetupCommandLineParser::LoadArguments(void)
     addHelp();
     addSettingsOverride();
     addVersion();
-    addWindowed(false);
+    addWindowed();
+    addMouse();
     addGeometry();
     addDisplay();
     addLogging();

@@ -53,7 +53,7 @@ class DVBChannel : public DTVChannel
     QString GetCardNum(void)            const { return device; };
     /// Returns frontend name as reported by driver
     QString GetFrontendName(void)       const;
-    bool IsMaster(void)                 const { return master == NULL; }
+    bool IsMaster(void)                 const;
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return has_crc_bug; }
     uint GetMinSignalMonitorDelay(void) const { return sigmon_delay; }
@@ -98,8 +98,15 @@ class DVBChannel : public DTVChannel
     bool CheckModulation(DTVModulation modulation) const;
     bool CheckCodeRate(DTVCodeRate rate) const;
 
+    typedef DVBChannel* DVBChannelP;
+    DVBChannel *GetMasterLock(void);
+    static void ReturnMasterLock(DVBChannelP &dvbm);
+
+    typedef const DVBChannel* DVBChannelCP;
+    const DVBChannel *GetMasterLock(void) const;
+    static void ReturnMasterLock(DVBChannelCP &dvbm);
+
   private:
-    DVBChannel       *master;
     IsOpenMap         is_open;
 
     // Data

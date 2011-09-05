@@ -18,11 +18,37 @@ using namespace std;
 
 #include <QPainter>
 
-BumpScope::BumpScope(long int winid)
+BumpScope::BumpScope(long int winid) :
+    size(0,0),
+
+    surface(NULL),
+
+    m_color(0x7ACCFF),
+    m_x(0), m_y(0), m_width(800), m_height(600),
+    m_phongrad(800),
+
+    color_cycle(true),
+    moving_light(true),
+    diamond(false),
+
+    bpl(0),
+
+    rgb_buf(NULL),
+
+    iangle(0), ixo(0), iyo(0), ixd(0), iyd(0), ilx(0), ily(0),
+    was_moving(0), was_color(0),
+    ih(0.0), is(0.0), iv(0.0), isd(0.0), ihd(0),
+    icolor(0)
 {
     fps = 15;
 
-    surface = NULL;
+    for (unsigned int i = 255; i > 0; i--)
+    {
+        intense1[i] = cos(((double)(255 - i) * M_PI) / 512.0);
+        intense2[i] = pow(intense1[i], 250) * 150;
+    }
+    intense1[0] = intense1[1];
+    intense2[0] = intense2[1];
 
     static char SDL_windowhack[32];
     sprintf(SDL_windowhack, "SDL_WINDOWID=%ld", winid);
@@ -35,22 +61,6 @@ BumpScope::BumpScope(long int winid)
     }
 
     SDL_ShowCursor(0);
-
-    rgb_buf = NULL;
-    bpl = 0;
-
-    color_cycle = true;
-    moving_light = true;
-    diamond = false;
-    m_color = 0x7ACCFF;
-    m_phongrad = 800;
-    m_width = 800;
-    m_height = 600;
-
-    was_moving = 0;
-    was_color = 0;
-    isd = 0;
-    ihd = 0;
 }
 
 BumpScope::~BumpScope()
@@ -101,7 +111,6 @@ void BumpScope::resize(const QSize &newsize)
         phongdat[i].resize(m_phongrad * 2);
 
     generate_phongdat();
-    generate_intense();
     generate_cmap(m_color);
 }
 
@@ -122,19 +131,6 @@ void BumpScope::blur_8(unsigned char *ptr, int w, int h, int bpl)
             sum -= 2;
         *(iptr++) = sum;
     }
-}
-
-void BumpScope::generate_intense(void)
-{
-    unsigned int i;
-
-    for (i = 255; i > 0; i--)
-    {
-        intense1[i] = cos(((double)(255 - i) * M_PI) / 512.0);
-        intense2[i] = pow(intense1[i], 250) * 150;
-    }
-    intense1[0] = intense1[1];
-    intense2[0] = intense2[1];
 }
 
 void BumpScope::generate_cmap(unsigned int color)

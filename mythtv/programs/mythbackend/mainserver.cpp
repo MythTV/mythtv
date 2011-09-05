@@ -29,7 +29,6 @@ using namespace std;
 #include <QDateTime>
 #include <QFile>
 #include <QDir>
-#include <QThread>
 #include <QWaitCondition>
 #include <QRegExp>
 #include <QEvent>
@@ -37,6 +36,7 @@ using namespace std;
 #include <QTcpServer>
 #include <QTimer>
 #include <QNetworkInterface>
+#include <QNetworkProxy>
 
 #include "previewgeneratorqueue.h"
 #include "exitcodes.h"
@@ -45,6 +45,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mainserver.h"
 #include "server.h"
+#include "mthread.h"
 #include "scheduler.h"
 #include "backendutil.h"
 #include "programinfo.h"
@@ -120,90 +121,117 @@ int delete_file_immediately(const QString &filename,
 QMutex MainServer::truncate_and_close_lock;
 const uint MainServer::kMasterServerReconnectTimeout = 1000; //ms
 
-class ProcessRequestThread : public QThread
+class ProcessRequestRunnable : public QRunnable
 {
   public:
-    ProcessRequestThread(MainServer *ms) :
-        parent(ms), socket(NULL), threadlives(false) {}
-    ~ProcessRequestThread() { killit(); wait(); }
-
-    void setup(MythSocket *sock)
+    ProcessRequestRunnable(MainServer &parent, MythSocket *sock) :
+        m_parent(parent), m_sock(sock)
     {
-        QMutexLocker locker(&lock);
-        socket = sock;
-        socket->UpRef();
-        waitCond.wakeAll();
-    }
-
-    void killit(void)
-    {
-        QMutexLocker locker(&lock);
-        threadlives = false;
-        waitCond.wakeAll();
+        m_sock->UpRef();
     }
 
     virtual void run(void)
     {
-        threadRegister("ProcessRequest");
-        QMutexLocker locker(&lock);
-        threadlives = true;
-        waitCond.wakeAll(); // Signal to creating thread
-
-        while (true)
-        {
-            waitCond.wait(locker.mutex());
-
-            if (!threadlives)
-                break;
-
-            if (!socket)
-                continue;
-
-            parent->ProcessRequest(socket);
-            socket->DownRef();
-            socket = NULL;
-            parent->MarkUnused(this);
-        }
-        threadDeregister();
+        m_parent.ProcessRequest(m_sock);
+        m_sock->DownRef();
     }
 
-    QMutex lock;
-    QWaitCondition waitCond;
-
-  private:
-    MainServer *parent;
-
-    MythSocket *socket;
-
-    bool threadlives;
+    MainServer &m_parent;
+    MythSocket *m_sock;
 };
+
+class FreeSpaceUpdater : public QRunnable
+{
+  public:
+    FreeSpaceUpdater(MainServer &parent) :
+        m_parent(parent), m_dorun(true), m_running(true)
+    {
+        m_lastRequest.start();
+    }
+    ~FreeSpaceUpdater()
+    {
+        QMutexLocker locker(&m_parent.masterFreeSpaceListLock);
+        m_parent.masterFreeSpaceListUpdater = NULL;
+        m_parent.masterFreeSpaceListWait.wakeAll();
+    }
+
+    virtual void run(void)
+    {
+        while (true)
+        {
+            MythTimer t;
+            t.start();
+            QStringList list;
+            m_parent.BackendQueryDiskSpace(list, true, true);
+            {
+                QMutexLocker locker(&m_parent.masterFreeSpaceListLock);
+                m_parent.masterFreeSpaceList = list;
+            }
+            QMutexLocker locker(&m_lock);
+            int left = kRequeryTimeout - t.elapsed();
+            if (m_lastRequest.elapsed() + left > kExitTimeout)
+                m_dorun = false;
+            if (!m_dorun)
+            {
+                m_running = false;
+                break;
+            }
+            if (left > 50)
+                m_wait.wait(locker.mutex(), left);
+        }
+    }
+
+    bool KeepRunning(bool dorun)
+    {
+        QMutexLocker locker(&m_lock);
+        if (dorun && m_running)
+        {
+            m_dorun = true;
+            m_lastRequest.restart();
+        }
+        else
+        {
+            m_dorun = false;
+            m_wait.wakeAll();
+        }
+        return m_running;
+    }
+
+    MainServer &m_parent;
+    QMutex m_lock;
+    bool m_dorun;
+    bool m_running;
+    MythTimer m_lastRequest;
+    QWaitCondition m_wait;
+    const static int kRequeryTimeout;
+    const static int kExitTimeout;
+};
+const int FreeSpaceUpdater::kRequeryTimeout = 15000;
+const int FreeSpaceUpdater::kExitTimeout = 61000;
 
 MainServer::MainServer(bool master, int port,
                        QMap<int, EncoderLink *> *tvList,
                        Scheduler *sched, AutoExpire *expirer) :
-    encoderList(tvList), mythserver(NULL), masterServerReconnect(NULL),
-    masterServer(NULL), ismaster(master), masterBackendOverride(false),
+    encoderList(tvList), mythserver(NULL),
+    masterFreeSpaceListUpdater((master) ? new FreeSpaceUpdater(*this) : NULL),
+    masterServerReconnect(NULL),
+    masterServer(NULL), ismaster(master), threadPool("ProcessRequestPool"),
+    masterBackendOverride(false),
     m_sched(sched), m_expirer(expirer), deferredDeleteTimer(NULL),
-    autoexpireUpdateTimer(NULL), m_exitCode(GENERIC_EXIT_OK)
+    autoexpireUpdateTimer(NULL), m_exitCode(GENERIC_EXIT_OK),
+    m_stopped(false)
 {
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kLocalAndRemote, ~0, 0);
     PreviewGeneratorQueue::AddListener(this);
 
-    for (int i = 0; i < PRT_STARTUP_THREAD_COUNT; i++)
-    {
-        ProcessRequestThread *prt = new ProcessRequestThread(this);
-        prt->lock.lock();
-        prt->start();
-        prt->waitCond.wait(&prt->lock);
-        prt->lock.unlock();
-        threadPool.push_back(prt);
-    }
+    threadPool.setMaxThreadCount(PRT_STARTUP_THREAD_COUNT);
 
     masterBackendOverride =
         gCoreContext->GetNumSetting("MasterBackendOverride", 0);
 
     mythserver = new MythServer();
+    mythserver->setProxy(QNetworkProxy::NoProxy);
     if (!mythserver->listen(gCoreContext->MythHostAddressAny(), port))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1. Exiting.")
@@ -244,10 +272,40 @@ MainServer::MainServer(bool master, int port,
     autoexpireUpdateTimer->setSingleShot(true);
 
     AutoExpire::Update(true);
+
+    masterFreeSpaceList << gCoreContext->GetHostName();
+    masterFreeSpaceList << "TotalDiskSpace";
+    masterFreeSpaceList << "0";
+    masterFreeSpaceList << "-2";
+    masterFreeSpaceList << "-2";
+    masterFreeSpaceList << "0";
+    masterFreeSpaceList << "0";
+    masterFreeSpaceList << "0";
+    if (masterFreeSpaceListUpdater)
+    {
+        MThreadPool::globalInstance()->startReserved(
+            masterFreeSpaceListUpdater, "FreeSpaceUpdater");
+    }
 }
 
 MainServer::~MainServer()
 {
+    if (!m_stopped)
+        Stop();
+}
+
+void MainServer::Stop()
+{
+    m_stopped = true;
+
+    {
+        QMutexLocker locker(&masterFreeSpaceListLock);
+        if (masterFreeSpaceListUpdater)
+            masterFreeSpaceListUpdater->KeepRunning(false);
+    }
+
+    threadPool.Stop();
+
     // since Scheduler::SetMainServer() isn't thread-safe
     // we need to shut down the scheduler thread before we
     // can call SetMainServer(NULL)
@@ -273,13 +331,14 @@ MainServer::~MainServer()
     if (m_expirer)
         m_expirer->SetMainServer(NULL);
 
-    QMutexLocker locker(&threadPoolLock);
-    MythDeque<ProcessRequestThread*>::iterator it;
-    for (it = threadPool.begin(); it != threadPool.end(); ++it)
-        (*it)->killit();
-    for (it = threadPool.begin(); it != threadPool.end(); ++it)
-        delete (*it);
-    threadPool.clear();
+    {
+        QMutexLocker locker(&masterFreeSpaceListLock);
+        while (masterFreeSpaceListUpdater)
+        {
+            masterFreeSpaceListUpdater->KeepRunning(false);
+            masterFreeSpaceListWait.wait(locker.mutex());
+        }
+    }
 }
 
 void MainServer::autoexpireUpdate(void)
@@ -301,34 +360,9 @@ void MainServer::readyRead(MythSocket *sock)
     if (expecting_reply)
         return;
 
-    ProcessRequestThread *prt = NULL;
-    {
-        QMutexLocker locker(&threadPoolLock);
-
-        if (threadPool.empty())
-        {
-            LOG(VB_GENERAL, LOG_CRIT, 
-                "ThreadPool exhausted. Waiting for a process request thread..");
-            threadPoolCond.wait(&threadPoolLock, PRT_TIMEOUT);
-        }
-
-        if (!threadPool.empty())
-        {
-            prt = threadPool.front();
-            threadPool.pop_front();
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_CRIT, "Adding a new process request thread");
-            prt = new ProcessRequestThread(this);
-            prt->lock.lock();
-            prt->start();
-            prt->waitCond.wait(&prt->lock);
-            prt->lock.unlock();
-        }
-    }
-
-    prt->setup(sock);
+    threadPool.startReserved(
+        new ProcessRequestRunnable(*this, sock),
+        "ProcessRequest", PRT_TIMEOUT);
 }
 
 void MainServer::ProcessRequest(MythSocket *sock)
@@ -772,13 +806,6 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
 
     // Decrease refcount..
     pbs->DownRef();
-}
-
-void MainServer::MarkUnused(ProcessRequestThread *prt)
-{
-    QMutexLocker locker(&threadPoolLock);
-    threadPool.push_back(prt);
-    threadPoolCond.wakeAll();
 }
 
 void MainServer::customEvent(QEvent *e)
@@ -1838,12 +1865,8 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
 
 void DeleteThread::run(void)
 {
-    if (!m_ms)
-        return;
-
-    threadRegister("Delete");
-    m_ms->DoDeleteThread(this);
-    threadDeregister();
+    if (m_ms)
+        m_ms->DoDeleteThread(this);
 }
 
 void MainServer::DoDeleteThread(DeleteStruct *ds)
@@ -1851,7 +1874,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     // sleep a little to let frontends reload the recordings list
     // after deleting a recording, then we can hammer the DB and filesystem
     sleep(3);
-    usleep(rand()%2000);
+    usleep(random()%2000);
 
     deletelock.lock();
 
@@ -1859,7 +1882,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                               .arg(ds->m_chanid)
                               .arg(ds->m_recstartts.toString());
 
-    QString name = QString("deleteThread%1%2").arg(getpid()).arg(rand());
+    QString name = QString("deleteThread%1%2").arg(getpid()).arg(random());
     QFile checkFile(ds->m_filename);
 
     if (!MSqlQuery::testDBConnection())
@@ -2722,11 +2745,25 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
 {
     QStringList strlist;
 
-    BackendQueryDiskSpace(strlist, allHosts, allHosts);
-    if (strlist.isEmpty())
-        LOG(VB_GENERAL, LOG_ERR,
-            "No directories found for file storage. Please "
-            "check the Storage Groups setting for this backend.");
+    if (allHosts)
+    {
+        QMutexLocker locker(&masterFreeSpaceListLock);
+        strlist = masterFreeSpaceList;
+        if (!masterFreeSpaceListUpdater ||
+            !masterFreeSpaceListUpdater->KeepRunning(true))
+        {
+            while (masterFreeSpaceListUpdater)
+            {
+                masterFreeSpaceListUpdater->KeepRunning(false);
+                masterFreeSpaceListWait.wait(locker.mutex());
+            }
+            masterFreeSpaceListUpdater = new FreeSpaceUpdater(*this);
+            MThreadPool::globalInstance()->startReserved(
+                masterFreeSpaceListUpdater, "FreeSpaceUpdater");
+        }
+    }
+    else
+        BackendQueryDiskSpace(strlist, allHosts, allHosts);
 
     SendResponse(pbs->getSocket(), strlist);
 }
@@ -2738,17 +2775,39 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
  */
 void MainServer::HandleQueryFreeSpaceSummary(PlaybackSock *pbs)
 {
-    QStringList fullStrList;
-    QStringList strList;
-
-    BackendQueryDiskSpace(fullStrList, true, true);
+    QStringList strlist;
+    {
+        QMutexLocker locker(&masterFreeSpaceListLock);
+        strlist = masterFreeSpaceList;
+        if (!masterFreeSpaceListUpdater ||
+            !masterFreeSpaceListUpdater->KeepRunning(true))
+        {
+            while (masterFreeSpaceListUpdater)
+            {
+                masterFreeSpaceListUpdater->KeepRunning(false);
+                masterFreeSpaceListWait.wait(locker.mutex());
+            }
+            masterFreeSpaceListUpdater = new FreeSpaceUpdater(*this);
+            MThreadPool::globalInstance()->startReserved(
+                masterFreeSpaceListUpdater, "FreeSpaceUpdater");
+        }
+    }
 
     // The TotalKB and UsedKB are the last two numbers encoded in the list
-    unsigned int index = fullStrList.size() - 2;
-    strList << fullStrList[index++];
-    strList << fullStrList[index++];
+    QStringList shortlist;
+    if (strlist.size() < 4)
+    {
+        shortlist << QString("0");
+        shortlist << QString("0");
+    }
+    else
+    {
+        unsigned int index = strlist.size() - 2;
+        shortlist << strlist[index++];
+        shortlist << strlist[index++];
+    }
 
-    SendResponse(pbs->getSocket(), strList);
+    SendResponse(pbs->getSocket(), shortlist);
 }
 
 /**
@@ -3054,12 +3113,10 @@ void MainServer::getGuideDataThrough(QDateTime &GuideDataThrough)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT MAX(endtime) FROM program WHERE manualid = 0;");
 
-    if (query.exec() && query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.next();
-        if (query.isValid())
-            GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
-                                                     Qt::ISODate);
+        GuideDataThrough = QDateTime::fromString(
+            query.value(0).toString(), Qt::ISODate);
     }
 }
 
@@ -4399,7 +4456,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         fsInfo.setPath(*(it++));
         fsInfo.setLocal((*(it++)).toInt() > 0);
         fsInfo.setFSysID(-1);
-        it++;   // Without this, the strlist gets out of whack
+        ++it;   // Without this, the strlist gets out of whack
         fsInfo.setGroupID((*(it++)).toInt());
         fsInfo.setBlockSize((*(it++)).toInt());
         fsInfo.setTotalSpace((*(it++)).toLongLong());
@@ -4494,7 +4551,7 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos)
         fsInfo.setPath(*(it++));
         fsInfo.setLocal((*(it++)).toInt() > 0);
         fsInfo.setFSysID(-1);
-        it++;
+        ++it;
         fsInfo.setGroupID((*(it++)).toInt());
         fsInfo.setBlockSize((*(it++)).toInt());
         fsInfo.setTotalSpace((*(it++)).toLongLong());
@@ -4542,21 +4599,15 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos)
 
 void TruncateThread::run(void)
 {
-    if (!m_ms)
-        return;
-
-    threadRegister("Truncate");
-    m_ms->DoTruncateThread(this);
-    threadDeregister();
+    if (m_ms)
+        m_ms->DoTruncateThread(this);
 }
 
 void MainServer::DoTruncateThread(DeleteStruct *ds)
 {
     if (gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0)) 
     {
-        QThreadPool::globalInstance()->releaseThread();
         TruncateAndClose(NULL, ds->m_fd, ds->m_filename, ds->m_size);
-        QThreadPool::globalInstance()->reserveThread();
     }
     else
     {
@@ -5268,23 +5319,23 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (token.toLower() == "do_not_care")
     {
         token = QString("%1:%2")
-            .arg(pginfo.MakeUniqueKey()).arg(rand());
+            .arg(pginfo.MakeUniqueKey()).arg(random());
     }
     if (it != slist.end())
-        (time_fmt_sec = ((*it).toLower() == "s")), it++;
+        (time_fmt_sec = ((*it).toLower() == "s")), ++it;
     if (it != slist.end())
-        (time = (*it).toLongLong()), it++;
+        (time = (*it).toLongLong()), ++it;
     if (it != slist.end())
-        (outputfile = *it), it++;
+        (outputfile = *it), ++it;
     outputfile = (outputfile == "<EMPTY>") ? QString::null : outputfile;
     if (it != slist.end())
     {
-        width = (*it).toInt(&ok); it++;
+        width = (*it).toInt(&ok); ++it;
         width = (ok) ? width : -1;
     }
     if (it != slist.end())
     {
-        height = (*it).toInt(&ok); it++;
+        height = (*it).toInt(&ok); ++it;
         height = (ok) ? height : -1;
         has_extra_data = true;
     }
