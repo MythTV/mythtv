@@ -360,37 +360,42 @@ bool CommandLineArg::Set(QString opt, QString val)
     return true;
 }
 
-void CommandLineArg::SetParentOf(QString opt)
+CommandLineArg* CommandLineArg::SetParentOf(QString opt)
 {
     m_children << new CommandLineArg(opt);
+    return this;
 }
 
-void CommandLineArg::SetParentOf(QStringList opts)
+CommandLineArg* CommandLineArg::SetParentOf(QStringList opts)
 {
     QStringList::const_iterator i = opts.begin();
     for (; i != opts.end(); ++i)
         m_children << new CommandLineArg(*i);
+    return this;
 }
 
-void CommandLineArg::SetChildOf(QString opt)
+CommandLineArg* CommandLineArg::SetChildOf(QString opt)
 {
     m_parents << new CommandLineArg(opt);
+    return this;
 }
 
-void CommandLineArg::SetChildOf(QStringList opts)
+CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
 {
     QStringList::const_iterator i = opts.begin();
     for (; i != opts.end(); ++i)
         m_parents << new CommandLineArg(*i);
+    return this;
 }
 
-void CommandLineArg::SetRequiredChildOf(QString opt)
+CommandLineArg* CommandLineArg::SetRequiredChildOf(QString opt)
 {
     m_parents << new CommandLineArg(opt);
     m_requires << new CommandLineArg(opt);
+    return this;
 }
 
-void CommandLineArg::SetRequiredChildOf(QStringList opts)
+CommandLineArg* CommandLineArg::SetRequiredChildOf(QStringList opts)
 {
     QStringList::const_iterator i = opts.begin();
     for (; i != opts.end(); ++i)
@@ -398,30 +403,35 @@ void CommandLineArg::SetRequiredChildOf(QStringList opts)
         m_parents << new CommandLineArg(*i);
         m_requires << new CommandLineArg(*i);
     }
+    return this;
 }
 
-void CommandLineArg::SetRequires(QString opt)
+CommandLineArg* CommandLineArg::SetRequires(QString opt)
 {
     m_requires << new CommandLineArg(opt);
+    return this;
 }
 
-void CommandLineArg::SetRequires(QStringList opts)
+CommandLineArg* CommandLineArg::SetRequires(QStringList opts)
 {
     QStringList::const_iterator i = opts.begin();
     for (; i != opts.end(); ++i)
         m_requires << new CommandLineArg(*i);
+    return this;
 }
 
-void CommandLineArg::SetBlocks(QString opt)
+CommandLineArg* CommandLineArg::SetBlocks(QString opt)
 {
     m_blocks << new CommandLineArg(opt);
+    return this;
 }
 
-void CommandLineArg::SetBlocks(QStringList opts)
+CommandLineArg* CommandLineArg::SetBlocks(QStringList opts)
 {
     QStringList::const_iterator i = opts.begin();
     for (; i != opts.end(); ++i)
         m_blocks << new CommandLineArg(*i);
+    return this;
 }
 
 void CommandLineArg::SetParentOf(CommandLineArg *other, bool forward)
@@ -1531,29 +1541,27 @@ void MythCommandLineParser::addVersion(void)
 
 void MythCommandLineParser::addWindowed(void)
 {
-    CommandLineArg *arg = 
-        add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
+    add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
             "notwindowed", false, 
-            "Prevent application from running in window.", "");
-    arg->SetBlocks("windowed");
-    arg->SetGroup("User Interface");
+            "Prevent application from running in window.", "")
+        ->SetBlocks("windowed")
+        ->SetGroup("User Interface");
 
     add(QStringList( QStringList() << "-w" << "--windowed" ), "windowed", 
-        false, "Force application to run in a window.", "")
-            ->SetGroup("User Interface");
+            false, "Force application to run in a window.", "")
+        ->SetGroup("User Interface");
 }
 
 void MythCommandLineParser::addMouse(void)
 {
-    CommandLineArg *arg =
-        add("--mouse-cursor", "mousecursor", false,
-            "Force visibility of the mouse cursor.", "");
-    arg->SetBlocks("nomousecursor");
-    arg->SetGroup("User Interface");
+    add("--mouse-cursor", "mousecursor", false,
+            "Force visibility of the mouse cursor.", "")
+        ->SetBlocks("nomousecursor")
+        ->SetGroup("User Interface");
 
     add("--no-mouse-cursor", "nomousecursor", false,
             "Force the mouse cursor to be hidden.", "")
-                ->SetGroup("User Interface");
+        ->SetGroup("User Interface");
 }
 
 void MythCommandLineParser::addDaemon(void)
@@ -1581,9 +1589,9 @@ void MythCommandLineParser::addSettingsOverride(void)
 
 void MythCommandLineParser::addRecording(void)
 {
-    CommandLineArg *arg = add("--chanid", "chanid", 0U,
-            "Specify chanid of recording to operate on.", "");
-    arg ->SetRequires("starttime");
+    add("--chanid", "chanid", 0U,
+            "Specify chanid of recording to operate on.", "")
+        ->SetRequires("starttime");
 
     add("--starttime", "starttime", QDateTime(),
             "Specify start time of recording to operate on.", "");
@@ -1593,7 +1601,7 @@ void MythCommandLineParser::addGeometry(void)
 {
     add(QStringList( QStringList() << "-geometry" << "--geometry" ), "geometry",
             "", "Specify window size and position (WxH[+X+Y])", "")
-                ->SetGroup("User Interface");
+        ->SetGroup("User Interface");
 }
 
 void MythCommandLineParser::addDisplay(void)

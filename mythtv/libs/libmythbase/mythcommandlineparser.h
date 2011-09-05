@@ -24,7 +24,8 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     CommandLineArg(QString name);
    ~CommandLineArg() {};
 
-    void            SetGroup(QString group)         { m_group = group; }
+    CommandLineArg* SetGroup(QString group)         { m_group = group;
+                                                      return this; }
     void            AddKeyword(QString keyword)     { m_keywords << keyword; }
 
     QString         GetName(void) const             { return m_name; }
@@ -37,16 +38,16 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     bool            Set(QString opt, QString val);
     void            Set(QVariant val)               { m_stored = val; }
 
-    void            SetParentOf(QString opt);
-    void            SetParentOf(QStringList opts);
-    void            SetChildOf(QString opt);
-    void            SetChildOf(QStringList opts);
-    void            SetRequiredChildOf(QString opt);
-    void            SetRequiredChildOf(QStringList opt);
-    void            SetRequires(QString opt);
-    void            SetRequires(QStringList opts);
-    void            SetBlocks(QString opt);
-    void            SetBlocks(QStringList opts);
+    CommandLineArg* SetParentOf(QString opt);
+    CommandLineArg* SetParentOf(QStringList opts);
+    CommandLineArg* SetChildOf(QString opt);
+    CommandLineArg* SetChildOf(QStringList opts);
+    CommandLineArg* SetRequiredChildOf(QString opt);
+    CommandLineArg* SetRequiredChildOf(QStringList opt);
+    CommandLineArg* SetRequires(QString opt);
+    CommandLineArg* SetRequires(QStringList opts);
+    CommandLineArg* SetBlocks(QString opt);
+    CommandLineArg* SetBlocks(QStringList opts);
 
     void            PrintVerbose(void) const;
 
