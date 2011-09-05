@@ -943,7 +943,7 @@ void MythCommandLineParser::addGeometry(void)
 
 void MythCommandLineParser::addDisplay(void)
 {
-#ifdef USING_X11
+#ifdef CONFIG_X11
     add("-display", "display", "", "Specify X server to use.", "");
 #endif
 }
