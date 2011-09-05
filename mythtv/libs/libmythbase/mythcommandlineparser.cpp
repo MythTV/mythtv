@@ -61,22 +61,32 @@ int GetTermWidth(void)
 
 const char* NamedOptType(int type)
 {
-    if (type == kEnd)
+    switch (type)
+    {
+      case kEnd:
         return "kEnd";
-    else if (type == kEmpty)
+
+      case kEmpty:
         return "kEmpty";
-    else if (type == kOptOnly)
+
+      case kOptOnly:
         return "kOptOnly";
-    else if (type == kOptVal)
+
+      case kOptVal:
         return "kOptVal";
-    else if (type == kArg)
+
+      case kArg:
         return "kArg";
-    else if (type == kPassthrough)
+
+      case kPassthrough:
         return "kPassthrough";
-    else if (type == kInvalid)
+
+      case kInvalid:
         return "kInvalid";
 
-    return "kUnknown";
+      default:
+        return "kUnknown";
+    }
 }
 
 typedef struct helptmp {
@@ -677,6 +687,11 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
         else if (toBool("notwindowed"))
             smap["RunFrontendInWindow"] = "0";
 
+        if (toBool("mousecursor"))
+            smap["HideMouseCursor"] = "0";
+        else if (toBool("nomousecursor"))
+            smap["HideMouseCursor"] = "1";
+
         m_overridesImported = true;
 
         if (!smap.isEmpty())
@@ -909,13 +924,21 @@ void MythCommandLineParser::addVersion(void)
             "and compiled options.");
 }
 
-void MythCommandLineParser::addWindowed(bool def)
+void MythCommandLineParser::addWindowed(void)
 {
     add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
         "notwindowed", false, 
         "Prevent application from running in window.", "");
     add(QStringList( QStringList() << "-w" << "--windowed" ), "windowed", 
         false, "Force application to run in a window.", "");
+}
+
+void MythCommandLineParser::addMouse(void)
+{
+    add("--mouse-cursor", "mousecursor", false,
+        "Force visibility of the mouse cursor.", "");
+    add("--no-mouse-cursor", "nomousecursor", false,
+        "Force the mouse cursor to be hidden.", "");
 }
 
 void MythCommandLineParser::addDaemon(void)
