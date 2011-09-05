@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <sys/types.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 
 #ifndef _WIN32
@@ -34,6 +35,8 @@ using namespace std;
 #include "logging.h"
 #include "util.h"
 
+#define TERMWIDTH 79
+
 const int kEnd          = 0,
           kEmpty        = 1,
           kOptOnly      = 2,
@@ -45,6 +48,16 @@ const int kEnd          = 0,
 const char* NamedOptType(int type);
 bool openPidfile(ofstream &pidfs, const QString &pidfile);
 bool setUser(const QString &username);
+
+int GetTermWidth(void)
+{
+    struct winsize ws;
+
+    if (ioctl(0, TIOCGWINSZ, &ws) != 0)
+        return TERMWIDTH;
+
+    return (int)ws.ws_col;
+}
 
 const char* NamedOptType(int type)
 {
@@ -195,13 +208,14 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
         pad.fill(' ', maxlen);
         QStringList rlist;
         QStringList::const_iterator i3;
+        int termwidth = GetTermWidth();
 
         for (i2 = argmap.begin(); i2 != argmap.end(); ++i2)
         {
             msg << (*i2).left.leftJustified(maxlen, ' ');
 
             rlist = (*i2).right.split('\n');
-            wrapList(rlist, 79-maxlen);
+            wrapList(rlist, termwidth-maxlen);
             msg << rlist[0] << endl;
 
             for (i3 = rlist.begin() + 1; i3 != rlist.end(); ++i3)
