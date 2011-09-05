@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <sys/types.h>
-#include <sys/ioctl.h>
 #include <unistd.h>
 
 #ifndef _WIN32
+#include <sys/ioctl.h>
 #include <pwd.h>
 #include <grp.h>
 #endif
@@ -51,12 +51,16 @@ bool setUser(const QString &username);
 
 int GetTermWidth(void)
 {
+#ifdef _WIN32
+    return TERMWIDTH;
+#else
     struct winsize ws;
 
     if (ioctl(0, TIOCGWINSZ, &ws) != 0)
         return TERMWIDTH;
 
     return (int)ws.ws_col;
+#endif
 }
 
 const char* NamedOptType(int type)
