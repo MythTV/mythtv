@@ -1055,6 +1055,9 @@ bool MythCommandLineParser::ReconcileLinks(void)
     QMap<QString,CommandLineArg*>::iterator i1;
     QList<CommandLineArg*>::iterator i2;
 
+    if (m_verbose)
+        cerr << "Reconciling links for option interdependencies." << endl;
+
     for (i1 = m_namedArgs.begin(); i1 != m_namedArgs.end(); ++i1)
     {
         links = (*i1)->m_parents;
@@ -1075,6 +1078,11 @@ bool MythCommandLineParser::ReconcileLinks(void)
             }
 
             // replace linked argument
+            if (m_verbose)
+                cerr << QString("  Setting %1 as child of %2")
+                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .toLocal8Bit().constData()
+                     << endl;
             (*i1)->SetChildOf(m_namedArgs[(*i2)->m_name]);
         }
 
@@ -1096,6 +1104,11 @@ bool MythCommandLineParser::ReconcileLinks(void)
             }
 
             // replace linked argument
+            if (m_verbose)
+                cerr << QString("  Setting %1 as parent of %2")
+                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .toLocal8Bit().constData()
+                     << endl;
             (*i1)->SetParentOf(m_namedArgs[(*i2)->m_name]);
         }
 
@@ -1117,6 +1130,11 @@ bool MythCommandLineParser::ReconcileLinks(void)
             }
 
             // replace linked argument
+            if (m_verbose)
+                cerr << QString("  Setting %1 as requiring %2")
+                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .toLocal8Bit().constData()
+                     << endl;
             (*i1)->SetRequires(m_namedArgs[(*i2)->m_name]);
         }
 
@@ -1137,6 +1155,11 @@ bool MythCommandLineParser::ReconcileLinks(void)
             }
 
             // replace linked argument
+            if (m_verbose)
+                cerr << QString("  Setting %1 as blocking %2")
+                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .toLocal8Bit().constData()
+                     << endl;
             (*i1)->SetBlocks(m_namedArgs[(*i2)->m_name]);
             i2++;
         }
