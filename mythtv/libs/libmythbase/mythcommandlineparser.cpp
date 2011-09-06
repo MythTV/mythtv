@@ -10,6 +10,9 @@
 #include <sys/ioctl.h>
 #include <pwd.h>
 #include <grp.h>
+#if defined(__linux__) || defined(__LINUX__)
+#include <sys/prctl.h>
+#endif
 #endif
 
 using namespace std;
@@ -1877,6 +1880,11 @@ bool setUser(const QString &username)
     cerr << "--user option is not supported on Windows" << endl;
     return false;
 #else // ! _WIN32
+#if defined(__linux__) || defined(__LINUX__)
+    // Check the current dumpability of core dumps, which will be disabled
+    // by setuid, so we can re-enable, if appropriate
+    int dumpability = prctl(PR_GET_DUMPABLE);
+#endif
     struct passwd *user_info = getpwnam(username.toLocal8Bit().constData());
     const uid_t user_id = geteuid();
 
@@ -1912,6 +1920,12 @@ bool setUser(const QString &username)
             cerr << "Error setting effective user." << endl;
             return false;
         }
+#if defined(__linux__) || defined(__LINUX__)
+        if (dumpability && (prctl(PR_SET_DUMPABLE, dumpability) == -1))
+            LOG(VB_GENERAL, LOG_WARNING, "Unable to re-enable core file "
+                    "creation. Run without the --user argument to use "
+                    "shell-specified limits.");
+#endif
     }
     else
     {
