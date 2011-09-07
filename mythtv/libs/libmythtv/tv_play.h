@@ -636,8 +636,6 @@ class MTV_PUBLIC TV : public QObject
     bool    db_remember_last_channel_group;
     ChannelGroupList db_channel_groups;
 
-    bool    arrowAccel;
-
     CommSkipMode autoCommercialSkip;
     bool    tryUnflaggedSkip;
 

@@ -205,7 +205,6 @@ class MPUBLIC MythPopupBox : public MythDialog
     QVBoxLayout *vbox;
     QColor       popupForegroundColor;
     int          hpadding, wpadding;
-    bool         arrowAccel;
 };
 
 /*!

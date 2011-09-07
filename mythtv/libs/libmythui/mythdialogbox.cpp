@@ -189,22 +189,10 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
             if (m_exitdata == 0 && m_exittext.isEmpty())
                 Close();
         }
-        else if (action == "LEFT")
-        {
-            SendEvent(-1, m_backtext, m_backdata);
-            if (m_backdata == 0 && m_backtext.isEmpty())
-                Close();
-        }
         else if (action == "MENU")
         {
             SendEvent(-2);
             Close();
-        }
-        else if (action == "RIGHT")
-        {
-            MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
-            if (item)
-                Select(item);
         }
         else
             handled = false;
