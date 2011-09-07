@@ -4040,14 +4040,12 @@ else
     qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
 fi
 
-if $(pkg-config --atleast-version 4.6.0 QtWebKit) ; then
+if $(pkg-config --exists QtWebKit) ; then
     enable qtwebkit
 else
     check_cxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
-#if QT_VERSION < 0x040600
-die
-#endif
+int main(void){ return 0; }
 EOF
 fi
 
@@ -4056,12 +4054,9 @@ enabled qtwebkit || die "Error! QtWebkit headers not found"
 if $(pkg-config --exists QtScript) ; then
     enable qtscript
 else
-    check_cxx ${qt_inc} ${qt_inc}/QtScript <<EOF && enable qtscript
+    check_cxx ${qt_inc} <<EOF && enable qtscript
 #include <QtScript/QtScript>
-int main(void){
-    QScriptEngine myEngine;
-    return myEngine.evaluate("0").toNumber();
-}
+int main(void){ return 0; }
 EOF
 fi
 
@@ -4071,11 +4066,9 @@ enabled qtscript || die "Error! QtScript headers not found"
 if $(pkg-config --exists QtDBus) ; then
     enable qtdbus
 else
-    check_ld_cxx ${qt_inc} ${qt_inc}/QtDBus ${qt_libs} -lQtDBus <<EOF && enable qtdbus
-#include <QtDBus>
-int main(void){
-    return (long) QDBusConnection::disconnectFromBus;
-}
+    check_cxx ${qt_inc} <<EOF && enable qtdbus
+#include <QtDBus/QtDBus>
+int main(void){ return 0; }
 EOF
 fi
 
