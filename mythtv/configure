@@ -1353,9 +1353,9 @@ MYTHTV_CONFIG_LIST='
     lirc
     mheg
     opengl_video
-    qtdbus
     qtwebkit
     qtscript
+    qtdbus
     quartz_video
     v4l2
     v4l1
@@ -4063,12 +4063,16 @@ fi
 enabled qtscript || die "Error! QtScript headers not found"
 
 # Check if Qt was built with DBus support:
-check_ld_cxx ${qt_inc} ${qt_inc}/QtDBus ${qt_libs} -lQtDBus <<EOF && enable qtdbus
+if $(pkg-config --exists QtDBus) ; then
+    enable qtdbus
+else
+    check_ld_cxx ${qt_inc} ${qt_inc}/QtDBus ${qt_libs} -lQtDBus <<EOF && enable qtdbus
 #include <QtDBus>
 int main(void){
     return (long) QDBusConnection::disconnectFromBus;
 }
 EOF
+fi
 
 if enabled firewire; then
     fwlibs=""
