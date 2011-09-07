@@ -33,7 +33,7 @@ class MythMetadataLookupCommandLineParser : public MythCommandLineParser
 };
 
 MythMetadataLookupCommandLineParser::MythMetadataLookupCommandLineParser() :
-    MythCommandLineParser("mythmetadatalookup")
+    MythCommandLineParser(MYTH_APPNAME_MYTHMETADATALOOKUP)
 { LoadArguments(); }
 
 void MythMetadataLookupCommandLineParser::LoadArguments(void)
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     }
 
     QCoreApplication a(argc, argv);
-    QCoreApplication::setApplicationName("mythmetadatalookup");
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHMETADATALOOKUP);
 
     int retval;
     if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)

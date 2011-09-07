@@ -27,6 +27,7 @@
 #define MYTH_APPNAME_MYTHLCDSERVER "mythlcdserver"
 #define MYTH_APPNAME_MYTHAVTEST "mythavtest"
 #define MYTH_APPNAME_MYTHMEDIASERVER "mythmediaserver"
+#define MYTH_APPNAME_MYTHMETADATALOOKUP "mythmetadatalookup"
 
 class MDBManager;
 class MythCoreContextPrivate;
