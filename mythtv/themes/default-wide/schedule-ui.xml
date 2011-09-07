@@ -1196,7 +1196,7 @@
         <textarea name="msg" from="basetextarea">
             <area>0,210,1280,70</area>
             <align>allcenter</align>
-            <value>No listings found for this program.</value>
+            <value>No results found for this search</value>
             <multiline>yes</multiline>
         </textarea>
 
