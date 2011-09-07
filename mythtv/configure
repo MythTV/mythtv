@@ -4032,8 +4032,13 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
 
 # Qt dependency checks
-qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
-qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
+if test $target_os = mingw32 ; then
+    qt_inc="-I$(${qmake} -query QT_INSTALL_HEADERS)"
+    qt_libs="-I$(${qmake} -query QT_INSTALL_LIBS)"
+else
+    qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
+    qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
+fi
 
 if $(pkg-config --atleast-version 4.6.0 QtWebKit) ; then
     enable qtwebkit
