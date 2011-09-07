@@ -4056,7 +4056,7 @@ enabled qtwebkit || die "Error! QtWebkit headers not found"
 if $(pkg-config --exists QtScript) ; then
     enable qtscript
 else
-    check_ld_cxx ${qt_inc} ${qt_inc}/QtScript ${qt_libs} -lQtScript <<EOF && enable qtscript
+    check_cxx ${qt_inc} ${qt_inc}/QtScript <<EOF && enable qtscript
 #include <QtScript/QtScript>
 int main(void){
     QScriptEngine myEngine;
