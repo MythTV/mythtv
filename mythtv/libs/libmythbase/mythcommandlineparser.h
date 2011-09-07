@@ -63,6 +63,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 
     QString         GetPreferredKeyword(void) const;
     bool            TestLinks(void) const;
+    void            CleanupLinks(void);
 
     bool                    m_given;
     QString                 m_name;
@@ -87,6 +88,7 @@ class MBASE_PUBLIC MythCommandLineParser
 {
   public:
     MythCommandLineParser(QString);
+   ~MythCommandLineParser();
 
     virtual void LoadArguments(void) {};
     void PrintVersion(void);

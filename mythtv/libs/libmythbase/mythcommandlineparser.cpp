@@ -223,7 +223,8 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     {
         msg << endl << "Can be used in combination with:" << endl;
         for (i2 = m_parents.constBegin(); i2 != m_parents.constEnd(); ++i2)
-            msg << " " << (*i2)->m_name.toLocal8Bit().constData();
+            msg << " " << (*i2)->GetPreferredKeyword()
+                                    .toLocal8Bit().constData();
         msg << endl;
     }
 
@@ -231,7 +232,8 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     {
         msg << endl << "Allows the use of:" << endl;
         for (i2 = m_children.constBegin(); i2 != m_children.constEnd(); ++i2)
-            msg << " " << (*i2)->m_name.toLocal8Bit().constData();
+            msg << " " << (*i2)->GetPreferredKeyword()
+                                    .toLocal8Bit().constData();
         msg << endl;
     }
 
@@ -239,7 +241,8 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     {
         msg << endl << "Requires the use of:" << endl;
         for (i2 = m_requires.constBegin(); i2 != m_requires.constEnd(); ++i2)
-            msg << " " << (*i2)->m_name.toLocal8Bit().constData();
+            msg << " " << (*i2)->GetPreferredKeyword()
+                                    .toLocal8Bit().constData();
         msg << endl;
     }
 
@@ -247,7 +250,8 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     {
         msg << endl << "Prevents the use of:" << endl;
         for (i2 = m_blocks.constBegin(); i2 != m_blocks.constEnd(); ++i2)
-            msg << " " << (*i2)->m_name.toLocal8Bit().constData();
+            msg << " " << (*i2)->GetPreferredKeyword()
+                                    .toLocal8Bit().constData();
         msg << endl;
     }
 
@@ -623,6 +627,22 @@ bool CommandLineArg::TestLinks(void) const
     return true;
 }
 
+void CommandLineArg::CleanupLinks(void)
+{
+    // clear out interdependent pointers in preparation for deletion
+    while (!m_parents.isEmpty())
+        m_parents.takeFirst()->DownRef();
+
+    while (!m_children.isEmpty())
+        m_children.takeFirst()->DownRef();
+
+    while (!m_blocks.isEmpty())
+        m_blocks.takeFirst()->DownRef();
+
+    while (!m_requires.isEmpty())
+        m_requires.takeFirst()->DownRef();
+}
+
 void CommandLineArg::PrintVerbose(void) const
 {
     if (!m_given)
@@ -720,6 +740,26 @@ MythCommandLineParser::MythCommandLineParser(QString appname) :
     LoadArguments();
 }
 
+MythCommandLineParser::~MythCommandLineParser()
+{
+    QMap<QString, CommandLineArg*>::iterator i;
+
+    i = m_namedArgs.begin();
+    while (i != m_namedArgs.end())
+    {
+        (*i)->DownRef();
+        (*i)->CleanupLinks();
+        i = m_namedArgs.erase(i);
+    }
+
+    i = m_optionedArgs.begin();
+    while (i != m_optionedArgs.end())
+    {
+        (*i)->DownRef();
+        i = m_optionedArgs.erase(i);
+    }
+}
+
 CommandLineArg* MythCommandLineParser::add(QStringList arglist,
         QString name, QVariant::Type type, QVariant def,
         QString help, QString longhelp)
@@ -744,6 +784,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
                 cerr << "Adding " << (*i).toLocal8Bit().constData()
                      << " as taking type '" << QVariant::typeToName(type)
                      << "'" << endl;
+            arg->UpRef();
             m_optionedArgs.insert(*i, arg);
         }
     }
