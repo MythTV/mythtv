@@ -4033,8 +4033,8 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
 
 # Qt dependency checks
 if test $target_os = mingw32 ; then
-    qt_inc="-I$(${qmake} -query QT_INSTALL_HEADERS)"
-    qt_libs="-L$(${qmake} -query QT_INSTALL_LIBS)"
+    qt_inc="-I`cd $(${qmake} -query QT_INSTALL_HEADERS); pwd`"
+    qt_libs="-L`cd $(${qmake} -query QT_INSTALL_LIBS) ; pwd`"
 else
     qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
     qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
