@@ -219,12 +219,12 @@ RecordingInfo::RecordingInfo(
     programflags |= _commfree ? FL_CHANCOMMFREE : 0;
 }
 
-/** \brief Fills RecordingInfo for the program that air at
- *         "dtime" on "channel".
+/** \brief Fills RecordingInfo for the program that airs at
+ *         "desiredts" on "chanid".
  *  \param chanid  %Channel ID on which to search for program.
- *  \param dtime   Date and Time for which we desire the program.
+ *  \param desiredts Date and Time for which we desire the program.
  *  \param genUnknown Generate a full entry for live-tv if unknown
- *  \param clampHoursMax Clamp the maximum time to X hours from dtime.
+ *  \param maxHours Clamp the maximum time to X hours from dtime.
  *  \return LoadStatus describing what happened.
  */
 RecordingInfo::RecordingInfo(
@@ -243,9 +243,9 @@ RecordingInfo::RecordingInfo(
                        "      program.starttime < :STARTTS1 AND "
                        "      program.endtime   > :STARTTS2 ";
     bindings[":CHANID"] = QString::number(_chanid);
-    QString str_startts = desiredts.toString("yyyy-MM-dd hh:mm:50");
-    bindings[":STARTTS1"] = str_startts;
-    bindings[":STARTTS2"] = str_startts;
+    QDateTime query_startts = desiredts.addSecs(50 - desiredts.time().second());
+    bindings[":STARTTS1"] = query_startts;
+    bindings[":STARTTS2"] = query_startts;
 
     ::LoadFromScheduler(schedList);
     LoadFromProgram(progList, querystr, bindings, schedList, false);
@@ -339,7 +339,7 @@ RecordingInfo::RecordingInfo(
                "      program.starttime > :STARTTS "
                "GROUP BY program.starttime ORDER BY program.starttime LIMIT 1 ";
     bindings[":CHANID"]  = QString::number(_chanid);
-    bindings[":STARTTS"] = desiredts.toString("yyyy-MM-dd hh:mm:50");
+    bindings[":STARTTS"] = desiredts.addSecs(50 - desiredts.time().second());
 
     LoadFromProgram(progList, querystr, bindings, schedList, false);
 

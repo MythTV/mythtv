@@ -575,7 +575,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
                        "  AND program.endtime > :ENDTIME "
                        "  AND channel.visible = 1 ";
     bindings[":TITLE"] = progTitle;
-    bindings[":ENDTIME"] = progStart.toString("yyyy-MM-dd hh:mm:50");
+    bindings[":ENDTIME"] = progStart.addSecs(50 - progStart.time().second());
 
     LoadFromScheduler(m_schedList);
     LoadFromProgram(m_showData, querystr, bindings, m_schedList, false);
@@ -624,7 +624,8 @@ void ProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindings
 
         where += "ORDER BY title;";
 
-        bindings[":STARTTIME"] = progStart.toString("yyyy-MM-dd hh:mm:50");
+        bindings[":STARTTIME"] =
+            progStart.addSecs(50 - progStart.time().second());
     }
     else
     {
@@ -649,7 +650,8 @@ void ProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindings
         bindings[":TWO"] = two;
         bindings[":THREE"] = three;
         bindings[":FOUR"] = four;
-        bindings[":STARTTIME"] = progStart.toString("yyyy-MM-dd hh:mm:50");
+        bindings[":STARTTIME"] =
+            progStart.addSecs(50 - progStart.time().second());
 
         if (!m_searchStr.isEmpty())
             bindings[":SEARCH"] = '%' + m_searchStr + '%';
@@ -844,7 +846,7 @@ void JaProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
 
     where += "ORDER BY title_pronounce;";
 
-    bindings[":STARTTIME"] = progStart.toString("yyyy-MM-dd hh:mm:50");
+    bindings[":STARTTIME"] = progStart.addSecs(50 - progStart.time().second());
 }
 
 
@@ -930,7 +932,7 @@ void HeProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
 
     where += "ORDER BY title;";
 
-    bindings[":STARTTIME"] = progStart.toString("yyyy-MM-dd hh:mm:50");
+    bindings[":STARTTIME"] = progStart.addSecs(50 - progStart.time().second());
 }
 
 bool HeProgFinder::formatSelectedData(QString& data)
@@ -1012,7 +1014,8 @@ void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
 
        where += "ORDER BY title;";
 
-       bindings[":STARTTIME"] = progStart.toString("yyyy-MM-dd hh:mm:50");
+       bindings[":STARTTIME"] =
+           progStart.addSecs(50 - progStart.time().second());
    }
    else
    {
@@ -1040,7 +1043,8 @@ void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
        bindings[":THREE"] = three;
        bindings[":FOUR"] = four;
        bindings[":FIVE"] = five;
-       bindings[":STARTTIME"] = progStart.toString("yyyy-MM-dd hh:mm:50");
+       bindings[":STARTTIME"] =
+           progStart.addSecs(50 - progStart.time().second());
 
        if (!m_searchStr.isEmpty())
            bindings[":SEARCH"] = '%' + m_searchStr + '%';

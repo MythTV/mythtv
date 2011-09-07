@@ -796,7 +796,8 @@ void ProgLister::FillViewList(const QString &view)
     }
     else if (m_type == plCategory) // list by category
     {
-        QString startstr = m_startTime.toString("yyyy-MM-dd hh:mm:50");
+        QDateTime query_starttime = m_startTime.addSecs(50 -
+                m_startTime.time().second());
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT g1.genre, g2.genre "
                       "FROM program "
@@ -808,7 +809,7 @@ void ProgLister::FillViewList(const QString &view)
                       "  g1.starttime = g2.starttime "
                       "WHERE program.endtime > :PGILSTART "
                       "GROUP BY g1.genre, g2.genre;");
-        query.bindValue(":PGILSTART", startstr);
+        query.bindValue(":PGILSTART", query_starttime);
 
         m_useGenres = false;
 
@@ -846,7 +847,7 @@ void ProgLister::FillViewList(const QString &view)
                           "FROM program "
                           "WHERE program.endtime > :PGILSTART "
                           "GROUP BY category");
-            query.bindValue(":PGILSTART", startstr);
+            query.bindValue(":PGILSTART", query_starttime);
 
             if (query.exec())
             {
@@ -1130,13 +1131,13 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
 
     bool oneChanid = false;
     QString where;
-    QString startstr = m_startTime.toString("yyyy-MM-dd hh:mm:50");
     QString qphrase = m_viewList[m_curView];
 
     MSqlBindings bindings;
 
     if (m_type != plPreviouslyRecorded)
-        bindings[":PGILSTART"] = startstr;
+        bindings[":PGILSTART"] =
+            m_startTime.addSecs(50 - m_startTime.time().second());
 
     if (m_type == plTitle) // per title listings
     {
@@ -1292,8 +1293,9 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plTime) // list by time
     {
-        bindings[":PGILSEARCHTIME1"] =
-            m_searchTime.toString("yyyy-MM-dd hh:00:00");
+        QDateTime searchTime(m_searchTime);
+        searchTime.setTime(QTime(searchTime.time().hour(), 0, 0));
+        bindings[":PGILSEARCHTIME1"] = searchTime;
         where = "WHERE channel.visible = 1 "
             "  AND program.starttime >= :PGILSEARCHTIME1 ";
         if (m_titleSort)
