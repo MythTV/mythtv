@@ -12,9 +12,9 @@ using namespace std;
 #include <QStringList>
 #include <QMutexLocker>
 
+#include "requesthandler/deletethread.h"
 #include "util.h"
 #include "mythdb.h"
-#include "requesthandler/deletethread.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 
@@ -23,17 +23,14 @@ using namespace std;
  that may be completely irrelevent to a machine that does not record, just 
  choose a reasonable value.
 
- 38 Mbps (full QAM-256 multiplex) * 8 tuners = 9961472B/0.5s
+ 38 Mbps (full QAM-256 multiplex) * 4 tuners = 9961472B/0.5s
 */
 
 DeleteThread::DeleteThread(void) :
-    MThread("Delete"), m_increment(9961472), m_run(true), m_timeout(20000)
+    MThread("Delete"), m_increment(9961472), m_run(true)
 {
     m_slow = (bool) gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0);
     m_link = (bool) gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
-
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
-    m_timer.start(m_timeout);
 }
 
 void DeleteThread::run(void)
@@ -54,12 +51,8 @@ void DeleteThread::run(void)
     {
         // this will only happen if the program is closing, so fast
         // deletion is not a problem
-        QList<deletestruct *>::iterator i;
-        for (i = m_files.begin(); i != m_files.end(); ++i)
-        {
-            close((*i)->fd);
-            delete (*i);
-        }
+        QList<DeleteHandler*>::iterator i;
+        (*i)->DownRef();
     }
     else
         LOG(VB_FILE, LOG_DEBUG, "Delete thread self-terminating due to idle.");
@@ -75,7 +68,16 @@ bool DeleteThread::AddFile(QString path)
         return false;
 
     QMutexLocker lock(&m_newlock);
-    m_newfiles << path;
+    DeleteHandler *handler = new DeleteHandler(path);
+    m_newfiles << handler;
+    return true;
+}
+
+bool DeleteThread::AddFile(DeleteHandler *handler)
+{
+    handler->UpRef();
+    QMutexLocker lock(&m_newlock);
+    m_newfiles << handler;
     return true;
 }
 
@@ -83,29 +85,29 @@ void DeleteThread::ProcessNew(void)
 {
     // loop through new files, unlinking and adding for deletion
     // until none are left
-    // TODO: add support for symlinks
 
     QDateTime ctime = QDateTime::currentDateTime();
 
     while (true)
     {
         // pull a new path from the stack
-        QString path;
+        DeleteHandler *handler;
         {
             QMutexLocker lock(&m_newlock);
-            if (!m_newfiles.isEmpty())
-                path = m_newfiles.takeFirst();
+            if (m_newfiles.isEmpty())
+                break;
+            else
+                handler = m_newfiles.takeFirst();
         }
 
         // empty path given to delete thread, this should not happen
-        if (path.isEmpty())
-            continue;
+        //if (path.isEmpty())
+        //    continue;
 
-        m_timer.start(m_timeout);
+        QString path = handler->m_path;
+        const char *cpath = handler->m_path.toLocal8Bit().constData();
 
-        const char *cpath = path.toLocal8Bit().constData();
-
-        QFileInfo finfo(path);
+        QFileInfo finfo(handler->m_path);
         if (finfo.isSymLink())
         {
             if (m_link)
@@ -113,14 +115,15 @@ void DeleteThread::ProcessNew(void)
                 // if file is a symlink and symlinks are processed,
                 // grab the target of the link, and attempt to unlink
                 // the link itself
-                QString tmppath = getSymlinkTarget(path);
+                QString tmppath = getSymlinkTarget(handler->m_path);
 
                 if (unlink(cpath))
                 {
                     LOG(VB_GENERAL, LOG_ERR, 
                         QString("Error deleting '%1' -> '%2': ")
-                            .arg(path).arg(tmppath) + ENO);
-                    emit unlinkFailed(path);
+                            .arg(handler->m_path).arg(tmppath) + ENO);
+                    handler->DeleteFailed();
+                    handler->DownRef();
                     continue;
                 }
 
@@ -132,9 +135,9 @@ void DeleteThread::ProcessNew(void)
                 // signalling the matching metadata for removal, but the
                 // target itself fails, resulting in a spurious file in
                 // an external directory with no link into mythtv
-                emit fileUnlinked(path);
-                path = tmppath;
-                cpath = path.toLocal8Bit().constData();
+                handler->DeleteSucceeded();
+                handler->m_path = tmppath;
+                cpath = handler->m_path.toLocal8Bit().constData();
             }
             else
             {
@@ -145,25 +148,27 @@ void DeleteThread::ProcessNew(void)
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Error deleting '%1': count not unlink ")
                             .arg(path) + ENO);
-                    emit unlinkFailed(path);
+                    handler->DeleteFailed();
                 }
                 else
-                    emit fileUnlinked(path);
+                    handler->DeleteFailed();
 
+                handler->DownRef();
                 continue;
             }
         }
 
         // open the file so it can be unlinked without immediate deletion
         LOG(VB_FILE, LOG_INFO, QString("About to unlink/delete file: '%1'")
-                                .arg(path));
+                                .arg(handler->m_path));
         int fd = open(cpath, O_WRONLY);
         if (fd == -1)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Error deleting '%1': could not open ")
-                    .arg(path) + ENO);
-            emit unlinkFailed(path);
+                    .arg(handler->m_path) + ENO);
+            handler->DeleteFailed();
+            handler->DownRef();
             continue;
         }
 
@@ -174,22 +179,21 @@ void DeleteThread::ProcessNew(void)
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Error deleting '%1': could not unlink ")
                     .arg(path) + ENO);
-            emit unlinkFailed(path);
+            handler->DeleteFailed();
             close(fd);
+            handler->DownRef();
             continue;
         }
 
-        emit fileUnlinked(path);
+        handler->DeleteSucceeded();
 
         // insert the file into a queue of opened references to be deleted
-        deletestruct *ds = new deletestruct;
-        ds->path = path;
-        ds->fd = fd;
-        ds->size = finfo.size();
-        ds->wait = ctime.addSecs(3); // delay deletion a bit to allow
-                                     // UI to get any needed IO time
+        handler->m_fd = fd;
+        handler->m_size = finfo.size();
+        handler->m_wait = ctime.addSecs(3); // delay deletion a bit to allow
+                                          // UI to get any needed IO time
 
-        m_files << ds;
+        m_files << handler;
     }
 }
 
@@ -199,41 +203,38 @@ void DeleteThread::ProcessOld(void)
     if (m_files.empty())
         return;
 
-    // files exist for deletion, reset the timer
-    m_timer.start(m_timeout);
-
     QDateTime ctime = QDateTime::currentDateTime();
 
     // only operate on one file at a time
     // delete that file completely before moving onto the next
     while (true)
     {
-        deletestruct *ds = m_files.first();
+        DeleteHandler *handler = m_files.first();
 
         // first file in the list has been delayed for deletion
-        if (ds->wait > ctime)
+        if (handler->m_wait > ctime)
             break;
-        
+
         if (m_slow)
         {
-            ds->size -= m_increment;
-            int err = ftruncate(ds->fd, ds->size);
+            handler->m_size -= m_increment;
+            int err = ftruncate(handler->m_fd, handler->m_size);
 
             if (err)
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Error truncating '%1'")
-                            .arg(ds->path) + ENO);
-                ds->size = 0;
+                            .arg(handler->m_path) + ENO);
+                handler->m_size = 0;
             }
         }
         else
-            ds->size = 0;
+            handler->m_size = 0;
 
-        if (ds->size == 0)
+        if (handler->m_size == 0)
         {
-            close(ds->fd);
+            handler->Close();
             m_files.removeFirst();
-            delete ds;
+            handler->DownRef();
         }
 
         // fast delete can close out all, but slow delete needs
