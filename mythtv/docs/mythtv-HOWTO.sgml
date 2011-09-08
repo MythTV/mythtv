@@ -2400,7 +2400,7 @@ ESC	        | quits									     @
 I	        | puts the On-screen Display up again. During playback, 'I' toggles&nbsp;
                   between position and show description info. If a jump amount is&nbsp;
                   entered, jump to that position. 					     @
-M	        | brings up the electronic program guide (Grid) -- see the EPG section	     @
+M	        | menu (allows access to the EPG and many other useful features)	     @
 Page Up	        | jump back the configured number of minutes  (default is 10)		     @
 Page Down	| jump ahead the configured number of minutes  (default is 10)		     @
 End or Z	| skip to next commercial break marker					     @
@@ -2418,11 +2418,12 @@ F	        | rotate between the various Picture Adjustments (Colour, Hue, etc.)&n
 ?       	| mark/unmark the current channel as a "favorite"			     @
 U       	| increase the play speed						     @
 J       	| decrease the play speed						     @
-A		| Adjust time stretch (speed up or slow down normal play of audio and video  @
-W       	| cycle through zoom and fill modes: 4:3 aspect ratio, 16:9, 4:3 Zoom &nbsp;
-                  (like Pan and Scan), 16:9 Zoom, and 16:9 Stretch (eliminates black &nbsp;
-                  sidebars in TV signal)                                                     @
+A		| adjust time stretch (speed up or slow down normal play of audio and video) @
+W       	| cycle through zoom modes: Half, Full, Stretch                              @
+Ctrl-W		| force aspect ratio of video to be treated as either 4:3 or 16:9            @
+S		| toggle display of the Program Guide (EPG).                                 @
 F8		| toggle the sleep timer 30m->1hr->1hr30m->2hr->Off @
+#		| display the Program Finder.                                                @
 CTRL-B		| Jump to the beginning of the recording / ringbuffer @
 +		| Switch between audio streams @
 Left    	| skip back the configured number of seconds (default is 5).&nbsp;
