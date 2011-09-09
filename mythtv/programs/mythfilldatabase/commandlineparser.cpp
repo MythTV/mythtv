@@ -148,7 +148,6 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "with fourteen downloads of one day each.\n"
             "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.")
-        ->SetBlocks("refreshtoday")
         ->SetBlocks("dontrefreshtomorrow")
         ->SetBlocks("refreshsecond")
         ->SetBlocks("refreshday")
