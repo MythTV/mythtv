@@ -542,6 +542,26 @@ void CommandLineArg::SetBlocks(CommandLineArg *other, bool forward)
         other->SetBlocks(this, false);
 }
 
+void CommandLineArg::AllowOneOf(QList<CommandLineArg*> args)
+{
+    // TODO: blocks do not get set properly if multiple dummy arguments
+    //       are provided. since this method will not have access to the
+    //       argument list, this issue will have to be resolved later in
+    //       ReconcileLinks().
+    QList<CommandLineArg*>::const_iterator i1,i2;
+
+    // loop through all but the last entry
+    for (i1 = args.begin(); i1 != args.end()-1; ++i1)
+    {
+        // loop through the next to the last entry
+        // and block use with the current
+        for (i2 = i1+1; i2 != args.end(); ++i2)
+        {
+            (*i1)->SetBlocks(*i2);
+        }
+    }
+}
+
 QString CommandLineArg::GetPreferredKeyword(void) const
 {
     QStringList::const_iterator it;

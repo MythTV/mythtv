@@ -19,12 +19,31 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     addRecording();
     addLogging();
 
-    add(QStringList( QStringList() << "-f" << "--file" ), "file", "",
-            "Specify file to operate on.", "")
-            ->SetGroup("Input");
-    add("--video", "video", "", 
-        "Rebuild the seek table for a video (non-recording) file.", "")
-            ->SetGroup("Input");
+    CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
+         << new CommandLineArg("chanid")
+         << new CommandLineArg("jobid")
+         << add(QStringList( QStringList() << "-f" << "--file" ),
+                "file", "",
+                "Specify file to operate on.", "")
+                    ->SetGroup("Input")
+         << add("--video", "video", "", 
+                "Rebuild the seek table for a video (non-recording) file.", "")
+                    ->SetGroup("Input")
+         << add("--gencutlist", "gencutlist", false,
+                "Copy the commercial skip list to the cutlist.", "")
+         << add("--clearcutlist", "clearcutlist", false,
+                "Clear the cutlist.", "")
+         << add("--clearskiplist", "clearskiplist", false,
+                "Clear the commercial skip list.", "")
+         << add("--getcutlist", "getcutlist", false,
+                "Display the current cutlist.", "")
+         << add("--getskiplist", "getskiplist", false,
+                "Display the current commercial skip list.", "")
+         << add("--setcutlist", "setcutlist", "",
+                "Set a new cutlist in the form:\n"
+                "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "") );
+
+
     add("--method", "commmethod", "",
         "Commercial flagging method[s] to employ:\n"
         "off, blank, scene, blankscene, logo, all, "
@@ -33,19 +52,6 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     add("--outputmethod", "outputmethod", "",
         "Format of output written to outputfile, essentials, full.", "")
             ->SetGroup("Commflagging");
-    add("--gencutlist", "gencutlist", false,
-        "Copy the commercial skip list to the cutlist.", "");
-    add("--clearcutlist", "clearcutlist", false,
-        "Clear the cutlist.", "");
-    add("--clearskiplist", "clearskiplist", false,
-        "Clear the commercial skip list.", "");
-    add("--getcutlist", "getcutlist", false,
-        "Display the current cutlist.", "");
-    add("--getskiplist", "getskiplist", false,
-        "Display the current commercial skip list.", "");
-    add("--setcutlist", "setcutlist", "",
-        "Set a new cutlist in the form:\n"
-        "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "");
     add("--skipdb", "skipdb", false, "",
         "Intended for external 3rd party use.")
             ->SetGroup("Advanced")
@@ -58,7 +64,8 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
             ->SetGroup("Logging");
     add("--rebuild", "rebuild", false,
         "Do not flag commercials, just rebuild the seektable.", "")
-            ->SetGroup("Commflagging");
+            ->SetGroup("Commflagging")
+            ->SetBlocks("commmethod");
     add("--force", "force", false,
         "Force operation, even if program appears to be in use.", "")
             ->SetGroup("Advanced");

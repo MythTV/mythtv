@@ -49,6 +49,8 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     CommandLineArg* SetBlocks(QString opt);
     CommandLineArg* SetBlocks(QStringList opts);
 
+    static void     AllowOneOf(QList<CommandLineArg*> args);
+
     void            PrintVerbose(void) const;
 
     friend class MythCommandLineParser;
