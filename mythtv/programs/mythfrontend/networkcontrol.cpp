@@ -1234,6 +1234,11 @@ void NetworkControl::notifyDataAvailable(void)
 void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
                                        QString &reply)
 {
+    if (!clients.contains(ncc))
+        // NetworkControl instance is unaware of control client
+        // assume connection to client has been terminated and bail
+        return;
+
     QRegExp crlfRegEx("\r\n$");
     QRegExp crlfcrlfRegEx("\r\n.*\r\n");
 
