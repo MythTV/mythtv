@@ -3175,6 +3175,7 @@ EOF
         disable v4l2
         enable  windows
         disable x11
+        disable qtdbus
         ###### Standard ffmpeg configure stuff follows:
         disable ffserver
         SLIBPREF="libmyth"
@@ -4068,7 +4069,12 @@ if $(pkg-config --exists QtDBus) ; then
 else
     check_cxx ${qt_inc} <<EOF && enable qtdbus
 #include <QtDBus/QtDBus>
-int main(void){ return 0; }
+#include <QtDBus/QDBusInterface>
+int main(void)
+{
+    QDBusInterface test("org.kde.test", "/test", "org.kde.blah");
+    return 0;
+}
 EOF
 fi
 
