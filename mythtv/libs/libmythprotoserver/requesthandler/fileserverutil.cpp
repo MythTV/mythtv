@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <cstdlib> // for llabs
 
 #include "mythconfig.h"
