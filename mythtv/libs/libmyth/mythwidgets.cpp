@@ -1168,7 +1168,7 @@ void MythRemoteLineEdit::backspace()
 }
 
 MythPushButton::MythPushButton(const QString &ontext, const QString &offtext,
-                               QWidget *parent, bool isOn, bool aa)
+                               QWidget *parent, bool isOn)
                                : QPushButton(ontext, parent)
 {
     onText = ontext;
