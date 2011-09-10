@@ -80,6 +80,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     QList<CommandLineArg*>  m_parents;
     QList<CommandLineArg*>  m_children;
     QList<CommandLineArg*>  m_requires;
+    QList<CommandLineArg*>  m_requiredby;
     QList<CommandLineArg*>  m_blocks;
 
     QString                 m_help;

@@ -402,7 +402,7 @@ CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
 CommandLineArg* CommandLineArg::SetRequiredChildOf(QString opt)
 {
     m_parents << new CommandLineArg(opt);
-    m_requires << new CommandLineArg(opt);
+    m_requiredby << new CommandLineArg(opt);
     return this;
 }
 
@@ -412,7 +412,7 @@ CommandLineArg* CommandLineArg::SetRequiredChildOf(QStringList opts)
     for (; i != opts.end(); ++i)
     {
         m_parents << new CommandLineArg(*i);
-        m_requires << new CommandLineArg(*i);
+        m_requiredby << new CommandLineArg(*i);
     }
     return this;
 }
@@ -559,6 +559,9 @@ void CommandLineArg::AllowOneOf(QList<CommandLineArg*> args)
         {
             (*i1)->SetBlocks(*i2);
         }
+
+        if ((*i1)->m_type == QVariant::Invalid)
+            (*i1)->DownRef();
     }
 }
 
@@ -661,6 +664,9 @@ void CommandLineArg::CleanupLinks(void)
 
     while (!m_requires.isEmpty())
         m_requires.takeFirst()->DownRef();
+
+    while (!m_requiredby.isEmpty())
+        m_requiredby.takeFirst()->DownRef();
 }
 
 void CommandLineArg::PrintVerbose(void) const
@@ -1200,6 +1206,27 @@ bool MythCommandLineParser::ReconcileLinks(void)
                             .toLocal8Bit().constData()
                      << endl;
             (*i1)->SetRequires(m_namedArgs[(*i2)->m_name]);
+        }
+
+        i2 = (*i1)->m_requiredby.begin();
+        while (i2 != (*i1)->m_requiredby.end())
+        {
+            if ((*i2)->m_type == QVariant::Invalid)
+            {
+                // if its not an invalid, it shouldnt be here anyway
+                if (m_namedArgs.contains((*i2)->m_name))
+                {
+                    m_namedArgs[(*i2)->m_name]->SetRequires(*i1);
+                    if (m_verbose)
+                        cerr << QString("  Setting %1 as blocking %2")
+                                    .arg((*i1)->m_name).arg((*i2)->m_name)
+                                    .toLocal8Bit().constData()
+                             << endl;
+                }
+            }
+
+            (*i2)->DownRef();
+            i2 = (*i1)->m_requiredby.erase(i2);
         }
 
         i2 = (*i1)->m_blocks.begin();
