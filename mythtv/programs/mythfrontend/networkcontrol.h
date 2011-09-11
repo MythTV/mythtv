@@ -121,7 +121,7 @@ class NetworkControl : public QTcpServer, public QRunnable
     void sendReplyToClient(NetworkControlClient *ncc, QString &reply);
     void customEvent(QEvent *e);
 
-    QString listRecordings(QString chanid = "", QString starttime = "");
+    QString listRecordings(QString chanid = "", QString starttime = "", QString storageGroup = "");
     QString listSchedule(const QString& chanID = "") const;
     QString listVideos();
     QString listChannels(const uint start, const uint limit) const;

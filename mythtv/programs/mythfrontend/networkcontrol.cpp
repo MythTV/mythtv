@@ -992,8 +992,10 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
              (nc->getArg(3).contains(QRegExp(
                          "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
         return listRecordings(nc->getArg(2), nc->getArg(3).toUpper());
-    else if (is_abbrev("recordings", nc->getArg(1)))
+    else if ((nc->getArgCount() == 2) && is_abbrev("recordings", nc->getArg(1)))
         return listRecordings();
+    else if ((nc->getArgCount() == 3) && is_abbrev("recordings", nc->getArg(1)))
+        return listRecordings("", "", nc->getArg(2));
     else if (is_abbrev("channels", nc->getArg(1)))
     {
         if (nc->getArgCount() == 2)
@@ -1158,6 +1160,8 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "query location        - Query current screen or location\r\n"
             "query volume          - Query the current playback volume\r\n"
             "query recordings      - List currently available recordings\r\n"
+            "query recordings STORAGEGROUP\r\n"
+            "                      - List currently available recordings for the specified storage group\r\n"
             "query recording CHANID STARTTIME\r\n"
             "                      - List info about the specified program\r\n"
             "query liveTV          - List current TV schedule\r\n"
@@ -1404,7 +1408,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     return result;
 }
 
-QString NetworkControl::listRecordings(QString chanid, QString starttime)
+QString NetworkControl::listRecordings(QString chanid, QString starttime, QString storageGroup)
 {
     QString result;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1419,6 +1423,10 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
         queryStr += "AND chanid = " + chanid + " "
                     "AND starttime = '" + starttime + "' ";
         appendCRLF = false;
+    }
+
+    if (!storageGroup.isEmpty()) {
+        queryStr += "AND storageGroup = '" + storageGroup + "' ";
     }
 
     queryStr += "ORDER BY starttime, title;";
