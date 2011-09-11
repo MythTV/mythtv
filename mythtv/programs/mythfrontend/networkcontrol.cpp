@@ -1354,17 +1354,17 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     QString result("");
     MSqlQuery query(MSqlQuery::InitCon());
     bool appendCRLF = true;
-    QString queryStr("SELECT chanid, starttime, endtime, title, subtitle "
-                         "FROM program "
-                         "WHERE starttime < :START AND endtime > :END ");
+    QString queryStr("SELECT program.chanid, starttime, endtime, title, subtitle "
+                         "FROM program, channel "
+                         "WHERE program.chanid = channel.chanid and starttime < :START AND endtime > :END ");
 
     if (!chanID.isEmpty())
     {
-        queryStr += " AND chanid = :CHANID";
+        queryStr += " AND program.chanid = :CHANID";
         appendCRLF = false;
     }
 
-    queryStr += " ORDER BY starttime, endtime, chanid";
+    queryStr += " ORDER BY starttime, endtime, program.chanid";
 
     query.prepare(queryStr);
     query.bindValue(":START", QDateTime::currentDateTime());
