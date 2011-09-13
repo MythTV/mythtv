@@ -115,15 +115,15 @@ class System( DBCache ):
     def _runshell(self, cmd):
         self.log(MythLog.SYSTEM, 'Running external command', cmd)
         fd = Popen(cmd, stdout=-1, stderr=-1, shell=True)
-        return self._runshared(fd)
+        return self._runshared(fd, cmd)
 
     def _runnative(self, cmd):
         self.log(MythLog.SYSTEM, 'Running external command', cmd)
         args = shlex.split(cmd)
         fd = Popen(args, stdout=-1, stderr=-1)
-        return self._runshared(fd)
+        return self._runshared(fd, cmd)
 
-    def _runshared(self, fd):
+    def _runshared(self, fd, cmd):
         pmap = {fd.stdout:'', fd.stderr:''}
         while fd.poll() is None:
             socks = select([fd.stdout, fd.stderr],[],[])
