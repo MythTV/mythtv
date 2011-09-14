@@ -450,7 +450,7 @@ void ImportNative::finishedPressed()
     if (QFile::exists(logDir + "/progress.log"))
         QFile::remove(logDir + "/progress.log");
 
-    commandline = "mytharchivehelper --importnative --infile \"" + m_xmlFile + 
+    commandline = "mytharchivehelper --importarchive --infile \"" + m_xmlFile + 
                   "\" --chanid " + chanID;
     commandline += logPropagateArgs;
     if (!logPropagateQuiet())
