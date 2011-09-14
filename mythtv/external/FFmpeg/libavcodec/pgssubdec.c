@@ -367,7 +367,7 @@ static int display_end_segment(AVCodecContext *avctx, void *data,
     // Note that this may be wrong for more complex subtitles.
     if (!ctx->presentation.object_number)
         return 1;
-    sub->forced = ctx->presentation.object_forced;
+    sub->forced             = ctx->presentation.object_forced;
     sub->start_display_time = 0;
     sub->end_display_time   = 20000;
     sub->format             = 0;
