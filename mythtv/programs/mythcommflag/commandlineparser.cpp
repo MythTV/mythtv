@@ -28,7 +28,9 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
                     ->SetGroup("Input")
          << add("--video", "video", "", 
                 "Rebuild the seek table for a video (non-recording) file.", "")
-                    ->SetGroup("Input")
+                    ->SetGroup("Input") );
+
+    CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
          << add("--gencutlist", "gencutlist", false,
                 "Copy the commercial skip list to the cutlist.", "")
          << add("--clearcutlist", "clearcutlist", false,
@@ -41,8 +43,15 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
                 "Display the current commercial skip list.", "")
          << add("--setcutlist", "setcutlist", "",
                 "Set a new cutlist in the form:\n"
-                "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "") );
-
+                "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "")
+         << add("--skipdb", "skipdb", false, "",
+                "Intended for external 3rd party use.")
+                    ->SetGroup("Advanced")
+                    ->SetRequires("file")
+         << add("--rebuild", "rebuild", false,
+                "Do not flag commercials, just rebuild the seektable.", "")
+                    ->SetGroup("Commflagging")
+                    ->SetBlocks("commmethod") );
 
     add("--method", "commmethod", "",
         "Commercial flagging method[s] to employ:\n"
@@ -52,20 +61,12 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     add("--outputmethod", "outputmethod", "",
         "Format of output written to outputfile, essentials, full.", "")
             ->SetGroup("Commflagging");
-    add("--skipdb", "skipdb", false, "",
-        "Intended for external 3rd party use.")
-            ->SetGroup("Advanced")
-            ->SetRequires("file");
     add("--queue", "queue", false,
         "Insert flagging job into the JobQueue, rather than "
         "running flagging in the foreground.", "");
     add("--noprogress", "noprogress", false,
         "Don't print progress on stdout.", "")
             ->SetGroup("Logging");
-    add("--rebuild", "rebuild", false,
-        "Do not flag commercials, just rebuild the seektable.", "")
-            ->SetGroup("Commflagging")
-            ->SetBlocks("commmethod");
     add("--force", "force", false,
         "Force operation, even if program appears to be in use.", "")
             ->SetGroup("Advanced");
