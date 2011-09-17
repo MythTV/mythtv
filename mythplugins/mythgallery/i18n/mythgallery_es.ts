@@ -54,7 +54,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="398"/>
         <source>Gallery Home</source>
-        <translation>Inicio de Galería</translation>
+        <translation>Principal de Galería</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="876"/>
@@ -99,7 +99,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="935"/>
         <source>Clear One Marked</source>
-        <translation>Eliminar Marca</translation>
+        <translation>Borrar Marcado</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="942"/>
@@ -293,7 +293,7 @@
     <message>
         <location filename="../mythgallery/main.cpp" line="100"/>
         <source>Full-size (un-zoom) image</source>
-        <translation>Imagen a tamaño completo (sin acercarla ni alejarla)</translation>
+        <translation>Imagen a tamaño completo (sin acercar/alejar)</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="102"/>
@@ -366,12 +366,12 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="142"/>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation>Tipo de transición usada entre imágenes en el modo de presentación.</translation>
+        <translation>Tipo de transición a emplear entre imágenes en el modo de presentación.</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="155"/>
         <source>This is the type of background for each picture in single view mode.</source>
-        <translation>Tipo de fondo a usar para cada imagen en el modo de vista individual.</translation>
+        <translation>Tipo de fondo a usar para cada imagen en modo de vista individual.</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="163"/>
@@ -401,12 +401,12 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="53"/>
         <source>Command run to display movie files</source>
-        <translation>Comando a ejecutar para mostrar películas</translation>
+        <translation>Orden a ejecutar para mostrar películas</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="55"/>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation>Este comando se ejecuta al seleccionar una película</translation>
+        <translation>Esta orden se ejecuta al seleccionar una película</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="31"/>
@@ -431,7 +431,7 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="63"/>
         <source>Overlay caption</source>
-        <translation>Leyenda sobrepuesta</translation>
+        <translation>Leyenda sobreescrita</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="65"/>
@@ -469,8 +469,8 @@
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
         <translation>MythGallery no puede encontrar el directorio de inicio
-%1
-Compruebe que el directorio exista, sea legible y la configuración de MythGallery sea correcta.</translation>
+ %1
+ Compruebe que el directorio exista, sea legible y la configuración de MythGallery sea correcta.</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="127"/>

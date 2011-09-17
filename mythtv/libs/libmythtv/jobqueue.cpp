@@ -558,6 +558,9 @@ bool JobQueue::QueueJob(int jobType, uint chanid, const QDateTime &recstartts,
         chanidInt = chanid;
     }
 
+    if (host.isNull())
+        host = QString("");
+
     query.prepare("INSERT INTO jobqueue (chanid, starttime, inserttime, type, "
                   "status, statustime, schedruntime, hostname, args, comment, "
                   "flags) "

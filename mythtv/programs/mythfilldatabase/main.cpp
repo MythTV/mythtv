@@ -95,7 +95,6 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showhelp"))
     {
-        cerr << "displaying help" << endl;
         cmdline.PrintHelp();
         return GENERIC_EXIT_OK;
     }

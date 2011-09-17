@@ -890,6 +890,40 @@ vector<uint> CardUtil::GetCloneCardIDs(uint cardid)
     return list;
 }
 
+QString CardUtil::GetFirewireChangerNode(uint inputid)
+{
+    QString fwnode;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT changer_device "
+                  "FROM cardinput WHERE cardinputid = :INPUTID ");
+    query.bindValue(":CARDID", inputid);
+
+    if (query.exec() && query.next())
+    {
+        fwnode = query.value(0).toString();
+    }
+
+    return fwnode;
+}
+
+QString CardUtil::GetFirewireChangerModel(uint inputid)
+{
+    QString fwnode;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT changer_model "
+                  "FROM cardinput WHERE cardinputid = :INPUTID ");
+    query.bindValue(":CARDID", inputid);
+
+    if (query.exec() && query.next())
+    {
+        fwnode = query.value(0).toString();
+    }
+
+    return fwnode;
+}
+
 vector<uint> CardUtil::GetCardIDs(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());

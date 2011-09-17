@@ -49,6 +49,8 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     CommandLineArg* SetBlocks(QString opt);
     CommandLineArg* SetBlocks(QStringList opts);
 
+    static void     AllowOneOf(QList<CommandLineArg*> args);
+
     void            PrintVerbose(void) const;
 
     friend class MythCommandLineParser;
@@ -63,6 +65,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 
     QString         GetPreferredKeyword(void) const;
     bool            TestLinks(void) const;
+    void            CleanupLinks(void);
 
     bool                    m_given;
     QString                 m_name;
@@ -77,6 +80,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     QList<CommandLineArg*>  m_parents;
     QList<CommandLineArg*>  m_children;
     QList<CommandLineArg*>  m_requires;
+    QList<CommandLineArg*>  m_requiredby;
     QList<CommandLineArg*>  m_blocks;
 
     QString                 m_help;
@@ -87,6 +91,7 @@ class MBASE_PUBLIC MythCommandLineParser
 {
   public:
     MythCommandLineParser(QString);
+   ~MythCommandLineParser();
 
     virtual void LoadArguments(void) {};
     void PrintVersion(void);

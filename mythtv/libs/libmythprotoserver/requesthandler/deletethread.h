@@ -17,14 +17,7 @@ using namespace std;
 
 // MythTV headers
 #include "mthread.h"
-
-typedef struct deletestruct
-{
-    QString path;
-    int fd;
-    off_t size;
-    QDateTime wait;
-} DeleteStruct;
+#include "requesthandler/fileserverutil.h"
 
 class DeleteThread : public QObject, public MThread
 {
@@ -33,13 +26,8 @@ class DeleteThread : public QObject, public MThread
     DeleteThread(void);
     void run(void);
     bool AddFile(QString path);
-
-  signals:
-    void fileUnlinked(QString path);
-    void unlinkFailed(QString path);
-
-  private slots:
-    void timeout(void) { m_run = false; }
+    bool AddFile(DeleteHandler *handler);
+    void Stop(void)         { m_run = false; }
 
   private:
     void ProcessNew(void);
@@ -49,13 +37,11 @@ class DeleteThread : public QObject, public MThread
     bool                 m_slow;
     bool                 m_link;
     bool                 m_run;
-    QTimer               m_timer;
-    int                  m_timeout;
 
-    QStringList          m_newfiles;
-    QMutex               m_newlock;
+    QList<DeleteHandler*> m_newfiles;
+    QMutex                m_newlock;
 
-    QList<deletestruct*> m_files;
+    QList<DeleteHandler*> m_files;
 };
 
 #endif

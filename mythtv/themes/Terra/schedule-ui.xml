@@ -1186,7 +1186,7 @@
         <textarea name="msg" from="description">
             <font>basemedium</font>
             <align>allcenter</align>
-            <value>No listings found for this program.</value>
+            <value>No results found for this search</value>
         </textarea>
 
     </window>

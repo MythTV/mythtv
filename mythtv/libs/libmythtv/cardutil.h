@@ -278,6 +278,8 @@ class MTV_PUBLIC CardUtil
     // Other
     static bool         CloneCard(uint src_cardid, uint dst_cardid);
     static vector<uint> GetCloneCardIDs(uint cardid);
+    static QString      GetFirewireChangerNode(uint inputid);
+    static QString      GetFirewireChangerModel(uint inputid);
 
     // DTV info
     static bool         GetTimeouts(uint cardid,

@@ -551,10 +551,6 @@ able to get any content.  Many users have resorted to using Firewire to
 change channels on their set-top-box and capture the High Def video using
 the Component output fed into a Hauppauge HD PVR.
 
-<sect3>DBoxII or other devices running Neutrino
-<p>You may use the Ethernet port of an DBoxII or a similar device to capture
-MPEG-2. Your set top box has to be running the Neutrino GUI.
-
 <sect3>USB Capture Devices.
 <p>The Plextor ConvertX PVR devices are supported through Linux drivers
 available from <url url="http://go7007.imploder.org/"
@@ -2382,18 +2378,12 @@ ALT-F4	        | exit out of the application	                                @
 Space/Enter	| take action on the item under the highlight point	        @
 P       	| play in both "Watch a Recording" and "Delete a Recording"	@
 D       	| delete in both "Watch a Recording" and "Delete a Recording"	@
-U		| to view details for the currently selected show on the Watch&nbsp;
-		  or Delete screens, EPG, "Program Finder", "Fix Scheduling&nbsp;
-                  Conflicts" and search results screens                          @
 O		| to list the upcoming episodes for the currently selected show&nbsp;
                   on the EPG, "Program Finder", "Program Recording Priorities",&nbsp;
                   "Fix Scheduling Conflicts" or search results screens          @
-I       	| edit recording options from the EPG, "Program Finder",&nbsp;
-                 "Program Recording Priorities", or "Fix Scheduling Conflicts"&nbsp;
-                 screens. From the Playback and Delete screens, 'I' presents&nbsp;
-                 options for recorded shows such as Auto Expire or Stop Recording.&nbsp;
-                 Pressing 'I' while on the Recording Options screen will take you&nbsp;
-                 to the Advanced Recording Options screen.
+I       	| to get additional information about the currently selected item.&nbsp;
+                  Pressing 'I' while on the Recording Options screen will take you&nbsp;
+                  to the Advanced Recording Options screen.
 </tabular>
 </table>
 <sect2>Watching TV or a recording
@@ -2410,7 +2400,7 @@ ESC	        | quits									     @
 I	        | puts the On-screen Display up again. During playback, 'I' toggles&nbsp;
                   between position and show description info. If a jump amount is&nbsp;
                   entered, jump to that position. 					     @
-M	        | brings up the electronic program guide (Grid) -- see the EPG section	     @
+M	        | menu (allows access to the EPG and many other useful features)	     @
 Page Up	        | jump back the configured number of minutes  (default is 10)		     @
 Page Down	| jump ahead the configured number of minutes  (default is 10)		     @
 End or Z	| skip to next commercial break marker					     @
@@ -2428,30 +2418,25 @@ F	        | rotate between the various Picture Adjustments (Colour, Hue, etc.)&n
 ?       	| mark/unmark the current channel as a "favorite"			     @
 U       	| increase the play speed						     @
 J       	| decrease the play speed						     @
-A		| Adjust time stretch (speed up or slow down normal play of audio and video  @
-W       	| cycle through zoom and fill modes: 4:3 aspect ratio, 16:9, 4:3 Zoom &nbsp;
-                  (like Pan and Scan), 16:9 Zoom, and 16:9 Stretch (eliminates black &nbsp;
-                  sidebars in TV signal)                                                     @
+A		| adjust time stretch (speed up or slow down normal play of audio and video) @
+W       	| cycle through zoom modes: Half, Full, Stretch                              @
+Ctrl-W		| force aspect ratio of video to be treated as either 4:3 or 16:9            @
+S		| toggle display of the Program Guide (EPG).                                 @
 F8		| toggle the sleep timer 30m->1hr->1hr30m->2hr->Off @
+#		| display the Program Finder.                                                @
 CTRL-B		| Jump to the beginning of the recording / ringbuffer @
 +		| Switch between audio streams @
-Left    	| (if a jump amount is entered) to jump back that amount		     @
-Right   	| (if a jump amount is entered) to jump ahead that amount		     @
+Left    	| skip back the configured number of seconds (default is 5).&nbsp;
+                  If a jump amount is entered, jump back that amount (HHMM format).		     @
+Right   	| skip forward the configured number of seconds (default is 30).&nbsp;
+                  If a jump amount is entered, jump ahead that amount (HHMM format).		     @
+&lt;            | starts sticky rewind mode&nbsp;
+                  If a jump amount is entered, jump to that position (HHMM format).		             @
+&gt;            | starts sticky fast forward mode&nbsp;.
+                  If a jump amount is entered, jump that amount from the end (HHMM format).	             @
                 | @
                 | @
-                | <bf>Without the stickykeys option selected</bf>                            @
-Left            | rewind the configured number of seconds  (default is 5)	             @
-Right           | fast forward the configured number of seconds (default is 30)             @
-<               | starts rewind mode as if stickykeys are selected		             @
->               | starts fast forward mode as if stickykeys are selected	             @
-                | @
-                | @
-                | <BF>With Stickykeys option selected</BF>                                   @
-Right           | starts fast forward mode	                                             @
-Left            | starts rewind mode		                                             @
-                | @
-                | @
-                | <bf>In fast forward or rewind mode:</bf>                                   @
+                | <bf>In sticky fast forward or rewind mode:</bf>                                   @
 Left/Right	| increases the ff/rew speed					             @
 0       	| plays at normal speed, but leaves the time indicator on screen            @
 1 or 2	        | plays back more slowly than normal ff/rew speed (1 is slowest)            @
@@ -2565,15 +2550,14 @@ Ctrl+Left or &lt;  | move the highlight left by one page 				@
 Ctrl+Right or &gt; | move the highlight right by one page 				@
 9, 3, 7, 1         | (like a numeric keypad) perform the same as PageUp, PageDown,&nbsp;
                      Home and End 							@
-U                  | bring up more information about a show				@
-I                  | allow you to schedule a recording.  If you select "Record&nbsp;
+E                  | allow you to schedule a recording.  If you select "Record&nbsp;
                      this showing" while watching Live TV you can "Instant&nbsp;
                      Record" a program.							@
 Space/Enter        | when watching LiveTV will change to that channel and exit the&nbsp;
                      EPG if the selected show is in progress or starts within 15&nbsp;
                      minutes; or otherwise will allow you to resolve conflicts&nbsp;
                      or change overrides. If the program is not already scheduled&nbsp;
-                     to record, it will instead act like pressing I			@
+                     to record, it will instead act like pressing E			@
 X                  | change the channel to the currently selected channel without&nbsp;
                      leaving the EPG (Most useful in the alternate EPG)			@
 ESC or C           | exits without changing the channel				@
@@ -2594,7 +2578,7 @@ Left	        | decreases priority value	@
 1	        | sorts by title		@
 2	        | sorts by priority		@
 Home/End	| toggle sort priority		@
-I	        | edit recording options	@
+E	        | edit recording options	@
 ESC	        | commits changes and exits
 </tabular>
 </table>
@@ -2605,7 +2589,7 @@ ESC	        | commits changes and exits
 1	        | show all recordings		      @
 2	        | show only important recordings     @
 Home/End	| toggle show showing all/important  @
-I	        | edit recording options	      @
+E	        | edit recording options	      @
 Space/Enter	| resolve conflict or override
 </tabular>
 </table>
@@ -2634,8 +2618,8 @@ This can be used to reduce clutter, or to segregate content if you use the
 PIN function.
 <table loc=p>
 <tabular ca="rll">
-M	| change the view or to set a group password		@
-I	| move a program from one Recording Group to another
+M	| to change the view or to set a group password or change recording and&nbsp;
+          storage options.  Press M again to toggle between menus.		@
 </tabular>
 </table>
 <sect2>Watch Recordings Screen
@@ -6352,30 +6336,6 @@ impact the viewing experience on the frontend.
 
 <sect1>How can I burn shows that I have recorded to a DVD?
 <p>Use the mytharchive plugin.
-
-<sect1>Using the DBoxII within MythTV
-<p>The configuration of the DBoxII for use within MythTV is tricky (as of
-May 16 2005), that's why it's covered here. Your DBoxII has to be running
-linux and the Neutrino GUI instead of the stock BetaNova firmware.  For
-further information, please refer to <url url="http://www.tuxbox.org"
-name="http://www.tuxbox.org">. Additionally, you need to enable the SPTS
-mode in Neutrino.
-
-<itemize>
-<item>Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input",
-the other values have to be adjusted according to your setup.
-The default values, except for the "DBOX2 host ip", should work fine.
-<item>Define a new video source. It doesn't need to be configured,
-you just need to define it. MythTV grabs the EPG from the DBoxII.
-<item>Connect the DBoxII to the newly defined input source in "input connections".
-<item>Since channel scanning is not implemented yet, you need to define channels
-in the "Channel Editor". Make sure that you use the same value for
-"Channel Name" as on the DBoxII. You can get a list of available
-channels from the web interface of Neutrino at http://ip-of-your-box:80/.
-Associate the channel with your new video source and repeat when needed.
-</itemize>
-
-You may leave the Setup now and proceed as usual.
 
 <sect1>What do the icons on the Watch Recordings screen mean?
 <p>Press "1" or F1 to get a popup.

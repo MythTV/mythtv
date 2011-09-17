@@ -1353,8 +1353,9 @@ MYTHTV_CONFIG_LIST='
     lirc
     mheg
     opengl_video
-    qtdbus
     qtwebkit
+    qtscript
+    qtdbus
     quartz_video
     v4l2
     v4l1
@@ -3174,6 +3175,7 @@ EOF
         disable v4l2
         enable  windows
         disable x11
+        disable qtdbus
         ###### Standard ffmpeg configure stuff follows:
         disable ffserver
         SLIBPREF="libmyth"
@@ -4031,29 +4033,50 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
 
 # Qt dependency checks
-qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
-qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
+if test $target_os = mingw32 ; then
+    qt_inc="-I`cd $(${qmake} -query QT_INSTALL_HEADERS); pwd`"
+    qt_libs="-L`cd $(${qmake} -query QT_INSTALL_LIBS) ; pwd`"
+else
+    qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
+    qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
+fi
 
-if $(pkg-config --atleast-version 4.6.0 QtWebKit) ; then
+if $(pkg-config --exists QtWebKit) ; then
     enable qtwebkit
 else
     check_cxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
-#if QT_VERSION < 0x040600
-die
-#endif
+int main(void){ return 0; }
 EOF
 fi
 
 enabled qtwebkit || die "Error! QtWebkit headers not found"
 
+if $(pkg-config --exists QtScript) ; then
+    enable qtscript
+else
+    check_cxx ${qt_inc} <<EOF && enable qtscript
+#include <QtScript/QtScript>
+int main(void){ return 0; }
+EOF
+fi
+
+enabled qtscript || die "Error! QtScript headers not found"
+
 # Check if Qt was built with DBus support:
-check_ld_cxx ${qt_inc} ${qt_inc}/QtDBus ${qt_libs} -lQtDBus <<EOF && enable qtdbus
-#include <QtDBus>
-int main(void){
-    return (long) QDBusConnection::disconnectFromBus;
+if $(pkg-config --exists QtDBus) ; then
+    enable qtdbus
+else
+    check_cxx ${qt_inc} <<EOF && enable qtdbus
+#include <QtDBus/QtDBus>
+#include <QtDBus/QDBusInterface>
+int main(void)
+{
+    QDBusInterface test("org.kde.test", "/test", "org.kde.blah");
+    return 0;
 }
 EOF
+fi
 
 if enabled firewire; then
     fwlibs=""

@@ -10,6 +10,9 @@
 #include <sys/ioctl.h>
 #include <pwd.h>
 #include <grp.h>
+#if defined(__linux__) || defined(__LINUX__)
+#include <sys/prctl.h>
+#endif
 #endif
 
 using namespace std;
@@ -220,7 +223,8 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     {
         msg << endl << "Can be used in combination with:" << endl;
         for (i2 = m_parents.constBegin(); i2 != m_parents.constEnd(); ++i2)
-            msg << " " << (*i2)->m_name.toLocal8Bit().constData();
+            msg << " " << (*i2)->GetPreferredKeyword()
+                                    .toLocal8Bit().constData();
         msg << endl;
     }
 
@@ -228,7 +232,8 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     {
         msg << endl << "Allows the use of:" << endl;
         for (i2 = m_children.constBegin(); i2 != m_children.constEnd(); ++i2)
-            msg << " " << (*i2)->m_name.toLocal8Bit().constData();
+            msg << " " << (*i2)->GetPreferredKeyword()
+                                    .toLocal8Bit().constData();
         msg << endl;
     }
 
@@ -236,7 +241,8 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     {
         msg << endl << "Requires the use of:" << endl;
         for (i2 = m_requires.constBegin(); i2 != m_requires.constEnd(); ++i2)
-            msg << " " << (*i2)->m_name.toLocal8Bit().constData();
+            msg << " " << (*i2)->GetPreferredKeyword()
+                                    .toLocal8Bit().constData();
         msg << endl;
     }
 
@@ -244,7 +250,8 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     {
         msg << endl << "Prevents the use of:" << endl;
         for (i2 = m_blocks.constBegin(); i2 != m_blocks.constEnd(); ++i2)
-            msg << " " << (*i2)->m_name.toLocal8Bit().constData();
+            msg << " " << (*i2)->GetPreferredKeyword()
+                                    .toLocal8Bit().constData();
         msg << endl;
     }
 
@@ -395,7 +402,7 @@ CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
 CommandLineArg* CommandLineArg::SetRequiredChildOf(QString opt)
 {
     m_parents << new CommandLineArg(opt);
-    m_requires << new CommandLineArg(opt);
+    m_requiredby << new CommandLineArg(opt);
     return this;
 }
 
@@ -405,7 +412,7 @@ CommandLineArg* CommandLineArg::SetRequiredChildOf(QStringList opts)
     for (; i != opts.end(); ++i)
     {
         m_parents << new CommandLineArg(*i);
-        m_requires << new CommandLineArg(*i);
+        m_requiredby << new CommandLineArg(*i);
     }
     return this;
 }
@@ -535,6 +542,29 @@ void CommandLineArg::SetBlocks(CommandLineArg *other, bool forward)
         other->SetBlocks(this, false);
 }
 
+void CommandLineArg::AllowOneOf(QList<CommandLineArg*> args)
+{
+    // TODO: blocks do not get set properly if multiple dummy arguments
+    //       are provided. since this method will not have access to the
+    //       argument list, this issue will have to be resolved later in
+    //       ReconcileLinks().
+    QList<CommandLineArg*>::const_iterator i1,i2;
+
+    // loop through all but the last entry
+    for (i1 = args.begin(); i1 != args.end()-1; ++i1)
+    {
+        // loop through the next to the last entry
+        // and block use with the current
+        for (i2 = i1+1; i2 != args.end(); ++i2)
+        {
+            (*i1)->SetBlocks(*i2);
+        }
+
+        if ((*i1)->m_type == QVariant::Invalid)
+            (*i1)->DownRef();
+    }
+}
+
 QString CommandLineArg::GetPreferredKeyword(void) const
 {
     QStringList::const_iterator it;
@@ -618,6 +648,25 @@ bool CommandLineArg::TestLinks(void) const
     }
 
     return true;
+}
+
+void CommandLineArg::CleanupLinks(void)
+{
+    // clear out interdependent pointers in preparation for deletion
+    while (!m_parents.isEmpty())
+        m_parents.takeFirst()->DownRef();
+
+    while (!m_children.isEmpty())
+        m_children.takeFirst()->DownRef();
+
+    while (!m_blocks.isEmpty())
+        m_blocks.takeFirst()->DownRef();
+
+    while (!m_requires.isEmpty())
+        m_requires.takeFirst()->DownRef();
+
+    while (!m_requiredby.isEmpty())
+        m_requiredby.takeFirst()->DownRef();
 }
 
 void CommandLineArg::PrintVerbose(void) const
@@ -717,6 +766,26 @@ MythCommandLineParser::MythCommandLineParser(QString appname) :
     LoadArguments();
 }
 
+MythCommandLineParser::~MythCommandLineParser()
+{
+    QMap<QString, CommandLineArg*>::iterator i;
+
+    i = m_namedArgs.begin();
+    while (i != m_namedArgs.end())
+    {
+        (*i)->DownRef();
+        (*i)->CleanupLinks();
+        i = m_namedArgs.erase(i);
+    }
+
+    i = m_optionedArgs.begin();
+    while (i != m_optionedArgs.end())
+    {
+        (*i)->DownRef();
+        i = m_optionedArgs.erase(i);
+    }
+}
+
 CommandLineArg* MythCommandLineParser::add(QStringList arglist,
         QString name, QVariant::Type type, QVariant def,
         QString help, QString longhelp)
@@ -741,6 +810,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
                 cerr << "Adding " << (*i).toLocal8Bit().constData()
                      << " as taking type '" << QVariant::typeToName(type)
                      << "'" << endl;
+            arg->UpRef();
             m_optionedArgs.insert(*i, arg);
         }
     }
@@ -1055,6 +1125,9 @@ bool MythCommandLineParser::ReconcileLinks(void)
     QMap<QString,CommandLineArg*>::iterator i1;
     QList<CommandLineArg*>::iterator i2;
 
+    if (m_verbose)
+        cerr << "Reconciling links for option interdependencies." << endl;
+
     for (i1 = m_namedArgs.begin(); i1 != m_namedArgs.end(); ++i1)
     {
         links = (*i1)->m_parents;
@@ -1075,6 +1148,11 @@ bool MythCommandLineParser::ReconcileLinks(void)
             }
 
             // replace linked argument
+            if (m_verbose)
+                cerr << QString("  Setting %1 as child of %2")
+                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .toLocal8Bit().constData()
+                     << endl;
             (*i1)->SetChildOf(m_namedArgs[(*i2)->m_name]);
         }
 
@@ -1096,6 +1174,11 @@ bool MythCommandLineParser::ReconcileLinks(void)
             }
 
             // replace linked argument
+            if (m_verbose)
+                cerr << QString("  Setting %1 as parent of %2")
+                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .toLocal8Bit().constData()
+                     << endl;
             (*i1)->SetParentOf(m_namedArgs[(*i2)->m_name]);
         }
 
@@ -1117,7 +1200,33 @@ bool MythCommandLineParser::ReconcileLinks(void)
             }
 
             // replace linked argument
+            if (m_verbose)
+                cerr << QString("  Setting %1 as requiring %2")
+                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .toLocal8Bit().constData()
+                     << endl;
             (*i1)->SetRequires(m_namedArgs[(*i2)->m_name]);
+        }
+
+        i2 = (*i1)->m_requiredby.begin();
+        while (i2 != (*i1)->m_requiredby.end())
+        {
+            if ((*i2)->m_type == QVariant::Invalid)
+            {
+                // if its not an invalid, it shouldnt be here anyway
+                if (m_namedArgs.contains((*i2)->m_name))
+                {
+                    m_namedArgs[(*i2)->m_name]->SetRequires(*i1);
+                    if (m_verbose)
+                        cerr << QString("  Setting %1 as blocking %2")
+                                    .arg((*i1)->m_name).arg((*i2)->m_name)
+                                    .toLocal8Bit().constData()
+                             << endl;
+                }
+            }
+
+            (*i2)->DownRef();
+            i2 = (*i1)->m_requiredby.erase(i2);
         }
 
         i2 = (*i1)->m_blocks.begin();
@@ -1137,6 +1246,11 @@ bool MythCommandLineParser::ReconcileLinks(void)
             }
 
             // replace linked argument
+            if (m_verbose)
+                cerr << QString("  Setting %1 as blocking %2")
+                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .toLocal8Bit().constData()
+                     << endl;
             (*i1)->SetBlocks(m_namedArgs[(*i2)->m_name]);
             i2++;
         }
@@ -1854,6 +1968,11 @@ bool setUser(const QString &username)
     cerr << "--user option is not supported on Windows" << endl;
     return false;
 #else // ! _WIN32
+#if defined(__linux__) || defined(__LINUX__)
+    // Check the current dumpability of core dumps, which will be disabled
+    // by setuid, so we can re-enable, if appropriate
+    int dumpability = prctl(PR_GET_DUMPABLE);
+#endif
     struct passwd *user_info = getpwnam(username.toLocal8Bit().constData());
     const uid_t user_id = geteuid();
 
@@ -1889,6 +2008,12 @@ bool setUser(const QString &username)
             cerr << "Error setting effective user." << endl;
             return false;
         }
+#if defined(__linux__) || defined(__LINUX__)
+        if (dumpability && (prctl(PR_SET_DUMPABLE, dumpability) == -1))
+            LOG(VB_GENERAL, LOG_WARNING, "Unable to re-enable core file "
+                    "creation. Run without the --user argument to use "
+                    "shell-specified limits.");
+#endif
     }
     else
     {

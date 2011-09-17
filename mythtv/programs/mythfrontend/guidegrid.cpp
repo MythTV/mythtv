@@ -670,8 +670,10 @@ ProgramList GuideGrid::GetProgramList(uint chanid) const
         "      program.endtime   >= :STARTTS AND "
         "      program.starttime <= :ENDTS   AND "
         "      program.manualid   = 0 ";
-    bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-dd hh:mm:00");
-    bindings[":ENDTS"]   = m_currentEndTime.toString("yyyy-MM-dd hh:mm:00");
+    bindings[":STARTTS"] =
+        m_currentStartTime.addSecs(0 - m_currentStartTime.time().second());
+    bindings[":ENDTS"] =
+        m_currentEndTime.addSecs(0 - m_currentEndTime.time().second());
     bindings[":CHANID"]  = chanid;
 
     ProgramList dummy;
@@ -1046,8 +1048,10 @@ ProgramList *GuideGrid::getProgramListFromProgram(int chanNum)
                            "  AND program.starttime <= :ENDTS "
                            "  AND program.manualid = 0 ";
         bindings[":CHANID"]  = GetChannelInfo(chanNum)->chanid;
-        bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-dd hh:mm:00");
-        bindings[":ENDTS"] = m_currentEndTime.toString("yyyy-MM-dd hh:mm:00");
+        bindings[":STARTTS"] =
+            m_currentStartTime.addSecs(0 - m_currentStartTime.time().second());
+        bindings[":ENDTS"] =
+            m_currentEndTime.addSecs(0 - m_currentEndTime.time().second());
 
         LoadFromProgram(*proglist, querystr, bindings, m_recList, false);
     }

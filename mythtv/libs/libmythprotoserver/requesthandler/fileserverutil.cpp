@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <cstdlib> // for llabs
 
 #include "mythconfig.h"
@@ -14,6 +15,28 @@
 
 #include "requesthandler/fileserverutil.h"
 #include "programinfo.h"
+
+DeleteHandler::DeleteHandler(void) :
+    ReferenceCounter(), m_fd(-1), m_size(0)
+{
+}
+
+DeleteHandler::DeleteHandler(QString filename) :
+    ReferenceCounter(), m_path(filename), m_fd(-1), m_size(0)
+{
+}
+
+DeleteHandler::~DeleteHandler()
+{
+    Close();
+}
+
+void DeleteHandler::Close(void)
+{
+    if (m_fd >= 0)
+        close(m_fd);
+    m_fd = -1;
+}
 
 QMap <QString, QString> recordingPathCache;
 

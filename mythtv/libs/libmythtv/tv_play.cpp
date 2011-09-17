@@ -828,7 +828,6 @@ TV::TV(void)
       db_browse_all_tuners(false),
       db_use_channel_groups(false), db_remember_last_channel_group(false),
 
-      arrowAccel(false),
       tryUnflaggedSkip(false),
       smartForward(false),
       ff_rew_repos(1.0f), ff_rew_reverse(false),
@@ -941,7 +940,6 @@ void TV::InitFromDB(void)
     kv["TimeFormat"]               = "h:mm AP";
     kv["ShortDateFormat"]          = "M/d";
 
-    kv["UseArrowAccels"]           = "1";
     kv["TryUnflaggedSkip"]         = "0";
 
     kv["ChannelGroupDefault"]      = "-1";
@@ -989,7 +987,6 @@ void TV::InitFromDB(void)
     db_channel_format      = kv["ChannelFormat"];
     db_time_format         = kv["TimeFormat"];
     db_short_date_format   = kv["ShortDateFormat"];
-    arrowAccel             = kv["UseArrowAccels"].toInt();
     tryUnflaggedSkip       = kv["TryUnflaggedSkip"].toInt();
     smartForward           = kv["SmartForward"].toInt();
     ff_rew_repos           = kv["FFRewReposTime"].toFloat() * 0.01f;

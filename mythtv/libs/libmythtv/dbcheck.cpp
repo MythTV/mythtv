@@ -5853,6 +5853,32 @@ NULL
             return false;
     }
 
+    if (dbver == "1280")
+    {
+        const char *updates[] = {
+"ALTER TABLE program ADD INDEX (subtitle);",
+"ALTER TABLE program ADD INDEX (description(255));",
+"ALTER TABLE oldrecorded ADD INDEX (subtitle);",
+"ALTER TABLE oldrecorded ADD INDEX (description(255));",
+NULL
+};
+        if (!performActualUpdate(updates, "1281", dbver))
+            return false;
+    }
+
+    if (dbver == "1281")
+    {
+        const char *updates[] = {
+"ALTER TABLE cardinput ADD changer_device VARCHAR(128) "
+"AFTER externalcommand;",
+"ALTER TABLE cardinput ADD changer_model VARCHAR(128) "
+"AFTER changer_device;",
+NULL
+};
+        if (!performActualUpdate(updates, "1282", dbver))
+            return false;
+    }
+
     return true;
 }
 

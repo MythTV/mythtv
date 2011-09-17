@@ -1721,17 +1721,6 @@ static HostLineEdit *ScreenShotPath()
     return ge;
 }
 
-static HostCheckBox *UseArrowAccels()
-{
-    HostCheckBox *gc = new HostCheckBox("UseArrowAccels");
-    gc->setLabel(QObject::tr("Use arrow key accelerators"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, arrow key accelerators will "
-                    "be used, with LEFT performing an exit action and "
-                    "RIGHT selecting the current item."));
-    return gc;
-}
-
 static HostLineEdit *SetupPinCode()
 {
     HostLineEdit *ge = new HostLineEdit("SetupPinCode");
@@ -3292,7 +3281,6 @@ MainGeneralSettings::MainGeneralSettings()
     VerticalConfigurationGroup *general =
         new VerticalConfigurationGroup(false, true, false, false);
     general->setLabel(QObject::tr("General"));
-    general->addChild(UseArrowAccels());
     general->addChild(UseVirtualKeyboard());
     general->addChild(ScreenShotPath());
     addChild(general);

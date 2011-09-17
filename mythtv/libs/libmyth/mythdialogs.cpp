@@ -260,11 +260,6 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
 {
     float wmult, hmult;
 
-    if (gCoreContext->GetNumSetting("UseArrowAccels", 1))
-        arrowAccel = true;
-    else
-        arrowAccel = false;
-
     GetMythUI()->GetScreenSettings(wmult, hmult);
 
     setLineWidth(3);
@@ -291,11 +286,6 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
             : MythDialog(parent, name, false)
 {
     float wmult, hmult;
-
-    if (gCoreContext->GetNumSetting("UseArrowAccels", 1))
-        arrowAccel = true;
-    else
-        arrowAccel = false;
 
     GetMythUI()->GetScreenSettings(wmult, hmult);
 
@@ -474,7 +464,7 @@ QAbstractButton *MythPopupBox::addButton(QString caption, QObject *target,
         slot = SLOT(defaultButtonPressedHandler());
     }
 
-    MythPushButton *button = new MythPushButton(caption, this, arrowAccel);
+    MythPushButton *button = new MythPushButton(caption, this);
     m_parent->connect(button, SIGNAL(pressed()), target, slot);
     addWidget(button, false);
     return button;
@@ -584,7 +574,7 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
     {
         QString action = actions[i];
 
-        if ((action == "ESCAPE") || (arrowAccel && action == "LEFT"))
+        if (action == "ESCAPE")
         {
             reject();
             handled = true;

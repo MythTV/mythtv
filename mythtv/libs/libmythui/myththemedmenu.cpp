@@ -212,13 +212,7 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "RIGHT")
-        {
-            MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
-            buttonAction(item);
-        }
-        else if (action == "LEFT" || action == "ESCAPE" ||
-                 action == "EXIT" || action == "EXITPROMPT" )
+        if (action == "ESCAPE" || action == "EXIT" || action == "EXITPROMPT")
         {
             bool    callbacks  = m_state->m_callback;
             bool    lastScreen = (GetMythMainWindow()->GetMainStack()
