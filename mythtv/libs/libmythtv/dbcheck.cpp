@@ -5866,6 +5866,19 @@ NULL
             return false;
     }
 
+    if (dbver == "1281")
+    {
+        const char *updates[] = {
+"ALTER TABLE cardinput ADD changer_device VARCHAR(128) "
+"AFTER externalcommand;",
+"ALTER TABLE cardinput ADD changer_model VARCHAR(128) "
+"AFTER changer_device;",
+NULL
+};
+        if (!performActualUpdate(updates, "1282", dbver))
+            return false;
+    }
+
     return true;
 }
 

@@ -153,6 +153,8 @@ class ChannelBase
 
     bool ChangeExternalChannel(const QString &changer,
                                const QString &newchan);
+    bool ChangeInternalChannel(const QString &newchan,
+                               uint cardinputid);
 
     TVRec   *m_pParent;
     QString  m_curchannelname;
