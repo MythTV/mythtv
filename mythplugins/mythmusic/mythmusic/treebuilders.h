@@ -95,7 +95,7 @@ class MusicTreeBuilder
          during tree creation and may get called multiple times at the
          same depth for the same \p Metadata.
      */
-    virtual QString getField(Metadata *m) = 0;	
+    virtual QString getField(Metadata *m) = 0;    
 
     /** \brief Get the current depth during tree building.
         

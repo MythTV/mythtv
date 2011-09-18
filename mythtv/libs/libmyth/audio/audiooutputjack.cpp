@@ -25,6 +25,11 @@ AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     client(NULL), stale_client(NULL),
     jack_latency(0), jack_underrun(false), jack_xruns(0), aubuf(NULL)
 {
+    for (int i = 0; i < JACK_CHANNELS_MAX; i++)
+        ports[i] = NULL;
+    for (int i = 0; i < JACK_CHANNELS_MAX; i++)
+        chan_volumes[i] = 100;
+
     // Set everything up
     InitSettings(settings);
     if (settings.init)

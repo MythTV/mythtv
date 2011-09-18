@@ -34,7 +34,7 @@ class MHEngine;
 // Abstract base class for programs.
 class MHProgram : public MHIngredient  
 {
-public:
+  public:
     MHProgram();
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
@@ -44,7 +44,7 @@ public:
 
     // Action - Stop can be used to stop the code.
     virtual void Stop(MHEngine *engine) { Deactivation(engine); }
-protected:
+  protected:
     MHOctetString m_Name; // Name of the program
     bool    m_fInitiallyAvailable;
 };
@@ -52,7 +52,7 @@ protected:
 // Resident program
 class MHResidentProgram : public MHProgram  
 {
-public:
+  public:
     MHResidentProgram() {}
     virtual const char *ClassName() { return "ResidentProgram"; }
     virtual void PrintMe(FILE *fd, int nTabs) const;
@@ -63,7 +63,7 @@ public:
 // Remote program - not needed for UK MHEG
 class MHRemoteProgram : public MHProgram  
 {
-public:
+  public:
     MHRemoteProgram();
     virtual const char *ClassName() { return "RemoteProgram"; }
     virtual ~MHRemoteProgram();
@@ -74,7 +74,7 @@ public:
 // Interchange program - not needed for UK MHEG
 class MHInterChgProgram : public MHProgram  
 {
-public:
+  public:
     MHInterChgProgram();
     virtual const char *ClassName() { return "InterChgProgram"; }
     virtual ~MHInterChgProgram();
@@ -85,11 +85,11 @@ public:
 // Call and Fork - call a "program".
 class MHCall: public MHElemAction
 {
-public:
+  public:
     MHCall(const char *name, bool fIsFork): MHElemAction(name), m_fIsFork(fIsFork) {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int nTabs) const;
     bool m_fIsFork;
     MHObjectRef m_Succeeded; // Boolean variable set to call result

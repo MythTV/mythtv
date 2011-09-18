@@ -75,7 +75,8 @@ VAProfile preferredProfile(MythCodecID codec)
 class VAAPIDisplay
 {
   protected:
-    VAAPIDisplay() : m_va_disp(NULL), m_x_disp(NULL), m_ref_count(0) { }
+    VAAPIDisplay() : m_va_disp(NULL), m_x_disp(NULL), m_display(NULL),
+                     m_ref_count(0) { }
   public:
    ~VAAPIDisplay()
     {
@@ -109,7 +110,7 @@ class VAAPIDisplay
             return false;
         }
         gl->makeCurrent();
-        display = glXGetCurrentDisplay();
+        m_display = glXGetCurrentDisplay();
         gl->doneCurrent();
 
         m_x_disp = OpenMythXDisplay();
@@ -120,7 +121,7 @@ class VAAPIDisplay
         int major_ver, minor_ver;
 
         //m_va_disp = vaGetDisplayGLX(m_x_disp->GetDisplay());
-        m_va_disp = vaGetDisplayGLX(display);
+        m_va_disp = vaGetDisplayGLX(m_display);
 
         if (!m_va_disp)
         {
@@ -190,7 +191,7 @@ class VAAPIDisplay
     static VAAPIDisplay *gVAAPIDisplay;
     void                *m_va_disp;
     MythXDisplay        *m_x_disp;
-    Display             *display;
+    Display             *m_display;
     int                  m_ref_count;
 };
 
@@ -212,6 +213,7 @@ bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
 
 VAAPIContext::VAAPIContext(MythCodecID codec)
   : m_codec(codec),
+    m_display(NULL),
     m_vaProfile(VAProfileMPEG2Main)/* ?? */,
     m_vaEntrypoint(VAEntrypointEncSlice),
     m_pix_fmt(PIX_FMT_YUV420P), m_numSurfaces(NUM_VAAPI_BUFFERS),
@@ -506,7 +508,7 @@ bool VAAPIContext::InitBuffers(void)
 {
     if (!m_ctx.display)
         return false;
-        
+
     MythXLocker locker(m_display->m_x_disp);
     m_surfaces    = new VASurfaceID[m_numSurfaces];
     m_surfaceData = new vaapi_surface[m_numSurfaces];

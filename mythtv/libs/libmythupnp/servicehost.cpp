@@ -274,7 +274,7 @@ QStringList ServiceHost::GetBasePaths()
 //
 //////////////////////////////////////////////////////////////////////////////
 
-bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
+bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
 {
     bool     bHandled = false;
     Service *pService = NULL;

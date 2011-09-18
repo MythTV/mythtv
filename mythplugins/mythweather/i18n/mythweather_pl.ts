@@ -12,27 +12,27 @@
 <context>
     <name>LocationDialog</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="964"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="967"/>
         <source>Search</source>
         <translation>Wyszukuj</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="975"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="978"/>
         <source>Searching ...</source>
         <translation>Wyszukuję ...</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="997"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1000"/>
         <source>Searching ... Results: %1</source>
         <translation>Wyszukiwanie ... znaleziono %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1045"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1048"/>
         <source>Search Complete. Results: %1</source>
         <translation>Wyszukiwanie zakończone. Znaleziono: %1 </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1066"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1069"/>
         <source>Source: %1</source>
         <translation>Źródło: %1</translation>
     </message>
@@ -115,7 +115,7 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="233"/>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
-        <translation>Dodaj ekran do listy aktywnych ekranów poprzez naciśnięcie SELECT</translation>
+        <translation>Dodaj ekran do listy aktywnych ekranów poprzez naciśnięcie SELECT.</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="236"/>
@@ -129,13 +129,13 @@
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="600"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="601"/>
         <source>English Units</source>
-        <translation>System Ang.</translation>
+        <translation>System GB</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="601"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="602"/>
         <source>SI Units</source>
         <translation>System Europejski</translation>
     </message>
@@ -173,41 +173,41 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="272"/>
         <source>move screen up or down; or remove screen.</source>
-        <translation>Ekran wyżej, niżej lub usuń</translation>
+        <translation>Ekran wyżej, niżej lub usuń.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="507"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="508"/>
         <source>Manipulate Screen</source>
         <translation>Modyfikuj ekran</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="521"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="522"/>
         <source>Move Up</source>
         <translation>Przesuń wyżej</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="522"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="523"/>
         <source>Move Down</source>
         <translation>Przesuń niżej</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="523"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="524"/>
         <source>Remove</source>
         <translation>Usuń</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="524"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="525"/>
         <source>Change Location</source>
         <translation>Zmień lokalizację</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="526"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="587"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="527"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="588"/>
         <source>Change Units</source>
         <translation>Zmień jednostkę</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="527"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="528"/>
         <source>Cancel</source>
         <translation>Rezygnuj</translation>
     </message>
@@ -215,35 +215,34 @@
 <context>
     <name>SourceManager</name>
     <message>
-        <location filename="../mythweather/sourceManager.cpp" line="91"/>
+        <location filename="../mythweather/sourceManager.cpp" line="92"/>
         <source>Searching for scripts</source>
         <translation>Wyszukuj skrypty</translation>
     </message>
     <message>
-        <location filename="../mythweather/sourceManager.cpp" line="301"/>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation>Podczas aktualizacji napotkano skrypt %1 jako aktywny. Upewnij się czy skryp się nie zawiesił ew. czy ma ustawiony sensowy timeout.</translation>
+        <translation type="obsolete">Podczas aktualizacji napotkano skrypt %1 jako aktywny. Upewnij się czy skryp się nie zawiesił ew. czy ma ustawiony sensowy timeout.</translation>
     </message>
 </context>
 <context>
     <name>SourceSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="790"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="793"/>
         <source>Finish</source>
         <translation>Zakończono</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="904"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="907"/>
         <source>Author: </source>
         <translation>Autor:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="906"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="909"/>
         <source>Email: </source>
         <translation>E-mail:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="907"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="910"/>
         <source>Version: </source>
         <translation>Wersja:</translation>
     </message>
@@ -848,7 +847,7 @@
     <message>
         <location filename="strings.h" line="18"/>
         <source>NE</source>
-        <translation>Półn-półn-wsch.</translation>
+        <translation>Półn-półn-wsch</translation>
     </message>
     <message>
         <location filename="strings.h" line="19"/>
@@ -858,62 +857,62 @@
     <message>
         <location filename="strings.h" line="20"/>
         <source>E</source>
-        <translation>Wsch.</translation>
+        <translation>Wsch</translation>
     </message>
     <message>
         <location filename="strings.h" line="21"/>
         <source>ESE</source>
-        <translation>Wsch-wsch-połud.</translation>
+        <translation>Wsch-wsch-połud</translation>
     </message>
     <message>
         <location filename="strings.h" line="22"/>
         <source>SE</source>
-        <translation>Połud-wsch.</translation>
+        <translation>Połud-wsch</translation>
     </message>
     <message>
         <location filename="strings.h" line="23"/>
         <source>SSE</source>
-        <translation>Połud-połud-wsch.</translation>
+        <translation>Połud-połud-wsch</translation>
     </message>
     <message>
         <location filename="strings.h" line="24"/>
         <source>S</source>
-        <translation>Połud.</translation>
+        <translation>Połud</translation>
     </message>
     <message>
         <location filename="strings.h" line="25"/>
         <source>SSW</source>
-        <translation>Połud-połud-zach.</translation>
+        <translation>Połud-połud-zach</translation>
     </message>
     <message>
         <location filename="strings.h" line="26"/>
         <source>SW</source>
-        <translation>Połud-zach.</translation>
+        <translation>Połud-zach</translation>
     </message>
     <message>
         <location filename="strings.h" line="27"/>
         <source>WSW</source>
-        <translation>Zach-zach-połud.</translation>
+        <translation>Zach-zach-połud</translation>
     </message>
     <message>
         <location filename="strings.h" line="28"/>
         <source>W</source>
-        <translation>Zach.</translation>
+        <translation>Zach</translation>
     </message>
     <message>
         <location filename="strings.h" line="29"/>
         <source>WNW</source>
-        <translation>Zach-zach-półn.</translation>
+        <translation>Zach-zach-półn</translation>
     </message>
     <message>
         <location filename="strings.h" line="30"/>
         <source>NW</source>
-        <translation>Półn-zach.</translation>
+        <translation>Półn-zach</translation>
     </message>
     <message>
         <location filename="strings.h" line="31"/>
         <source>NNW</source>
-        <translation>Półn-półn-zach.</translation>
+        <translation>Półn-półn-zach</translation>
     </message>
 </context>
 <context>
@@ -987,13 +986,16 @@
         <location filename="themestrings.h" line="15"/>
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
-When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
+When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
+        <oldsource>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
+
+When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</oldsource>
         <translation>Tutaj możesz ustawić jak informacje o pogodzie będą prezentowane. Możesz ustawić aktualizacje pogodowe w tle, które będą się odbywały niezależnie do tego co aktualnie oglądasz. Możesz także ustawić jakie informacje o pgodzie będą prezentowane.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Retrieve data in background:</source>
-        <translation>Ładuj informacje o pogodzie w tle</translation>
+        <translation>Ładuj informacje o pogodzie w tle:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
@@ -1110,7 +1112,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation>Wprowadź Twoją obecna lokalizację lub najbliższe duże miasto. W niektórych karajach możesz podać kod pocztowy</translation>
+        <translation>Wprowadź Twoją obecna lokalizację lub najbliższe duże miasto. W niektórych karajach możesz podać kod pocztowy.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
@@ -1179,7 +1181,8 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
-        <source>General weather plugin options</source>
+        <source>General weather options</source>
+        <oldsource>General weather plugin options</oldsource>
         <translation>Ogólne ustawienia pogody</translation>
     </message>
     <message>
@@ -1206,50 +1209,50 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
 <context>
     <name>Weather</name>
     <message>
-        <location filename="../mythweather/weather.cpp" line="97"/>
+        <location filename="../mythweather/weather.cpp" line="98"/>
         <source>Paused</source>
         <translation>Wstrzymany</translation>
     </message>
     <message>
-        <location filename="../mythweather/weather.cpp" line="210"/>
+        <location filename="../mythweather/weather.cpp" line="211"/>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
-        <translation>Żaden ze sposobów prezentacji pogody nie jest kompletny (brakuje info o prawach autorskich)</translation>
+        <translation>Żaden ze sposobów prezentacji pogody nie jest kompletny (brakuje info o prawach autorskich).</translation>
     </message>
 </context>
 <context>
     <name>WeatherScreen</name>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="207"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="208"/>
         <source>Sunday</source>
         <translation>Niedziela</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="210"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="211"/>
         <source>Monday</source>
         <translation>Poniedziałek</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="213"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="214"/>
         <source>Tuesday</source>
         <translation>Wtorek</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="216"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="217"/>
         <source>Wednesday</source>
         <translation>Środa</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="219"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="220"/>
         <source>Thursday</source>
         <translation>Czwartek</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="222"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="223"/>
         <source>Friday</source>
         <translation>Piątek</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="225"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="226"/>
         <source>Saturday</source>
         <translation>Sobota</translation>
     </message>

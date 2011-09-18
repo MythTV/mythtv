@@ -65,6 +65,8 @@ class BiopTap
 class BiopConnbinder
 {
   public:
+    BiopConnbinder() :
+        component_tag(0), component_data_len(0), taps_count(0) { }
     int Process(const unsigned char*); 
 
     unsigned long component_tag;

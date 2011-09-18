@@ -19,7 +19,7 @@ QMAKE_CLEAN += version.cpp
 
 HEADERS += mmulticastsocketdevice.h     mbroadcastsocketdevice.h
 HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h upnpsubscription.h
-HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputil.h
+HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h upnputil.h
 HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpmsrr.h
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
 HEADERS += configuration.h
@@ -32,7 +32,7 @@ HEADERS += serializers/jsonSerializer.h serializers/soapSerializer.h
 
 SOURCES += mmulticastsocketdevice.cpp
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
-SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp threadpool.cpp
+SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp
 SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cpp
 SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cpp
 SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp mmembuf.cpp
@@ -60,7 +60,7 @@ mingw {
 inc.path = $${PREFIX}/include/mythtv/upnp/
 
 inc.files  = httprequest.h upnp.h ssdp.h taskqueue.h bufferedsocketdevice.h
-inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputil.h
+inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h upnputil.h
 inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 inc.files += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
 inc.files += upnpimpl.h configuration.h

@@ -30,7 +30,7 @@
 void MHRoot::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHParseNode *pArg = p->GetArgN(0); // The first argument should be present.
-    // Extract the field. 
+    // Extract the field.
     m_ObjectReference.Initialise(pArg, engine);
 }
 
@@ -51,7 +51,11 @@ void MHRoot::InvalidAction(const char *actionName)
 // Preparation - sets up the run-time representation.  Sets m_fAvailable and generates IsAvailable event.
 void MHRoot::Preparation(MHEngine *engine)
 {
-    if (m_fAvailable) return; // Already prepared
+    if (m_fAvailable)
+    {
+        return;    // Already prepared
+    }
+
     // Retrieve object
     // Set the internal attributes.
     m_fAvailable = true;
@@ -64,15 +68,27 @@ void MHRoot::Preparation(MHEngine *engine)
 // Activation - starts running the object.  Sets m_fRunning and generates IsRunning event.
 void MHRoot::Activation(MHEngine *engine)
 {
-    if (m_fRunning) return; // Already running.
-    if (! m_fAvailable) Preparation(engine); // Prepare it if that hasn't already been done.
+    if (m_fRunning)
+    {
+        return;    // Already running.
+    }
+
+    if (! m_fAvailable)
+    {
+        Preparation(engine);    // Prepare it if that hasn't already been done.
+    }
+
     // The subclasses are responsible for setting m_fRunning and generating IsRunning.
 }
 
 // Deactivation - stops running the object.  Clears m_fRunning
 void MHRoot::Deactivation(MHEngine *engine)
 {
-    if (! m_fRunning) return; // Already stopped.
+    if (! m_fRunning)
+    {
+        return;    // Already stopped.
+    }
+
     m_fRunning = false;
     engine->EventTriggered(this, EventIsStopped);
 }
@@ -80,8 +96,16 @@ void MHRoot::Deactivation(MHEngine *engine)
 // Destruction - deletes the run-time representation.  Clears m_fAvailable.
 void MHRoot::Destruction(MHEngine *engine)
 {
-    if (! m_fAvailable) return; // Already destroyed or never prepared.
-    if (m_fRunning) Deactivation(engine); // Deactivate it if it's still running.
+    if (! m_fAvailable)
+    {
+        return;    // Already destroyed or never prepared.
+    }
+
+    if (m_fRunning)
+    {
+        Deactivation(engine);    // Deactivate it if it's still running.
+    }
+
     // We're supposed to wait until it's stopped here.
     m_fAvailable = false;
     engine->EventTriggered(this, EventIsDeleted);
@@ -90,8 +114,14 @@ void MHRoot::Destruction(MHEngine *engine)
 // Return this object if it matches.
 MHRoot *MHRoot::FindByObjectNo(int n)
 {
-    if (n == m_ObjectReference.m_nObjectNo) return this;
-    else return NULL;
+    if (n == m_ObjectReference.m_nObjectNo)
+    {
+        return this;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 void MHGetAvailabilityStatus::Initialise(MHParseNode *p, MHEngine *engine)
@@ -107,6 +137,11 @@ void MHGetAvailabilityStatus::Perform(MHEngine *engine)
     m_Target.GetValue(target, engine); // Get the target
     MHRoot *pObject = engine->FindObject(target, false);
     bool fResult = false; // Default result.
-    if (pObject) fResult = pObject->GetAvailabilityStatus();
+
+    if (pObject)
+    {
+        fResult = pObject->GetAvailabilityStatus();
+    }
+
     engine->FindObject(m_ResultVar)->SetVariableValue(fResult);
 }

@@ -30,13 +30,14 @@
 #include "freemheg.h"
 
 #include <sys/timeb.h>
-#ifdef __FreeBSD__ 
-#include <sys/time.h> 
+#ifdef __FreeBSD__
+#include <sys/time.h>
 #else
 #include <time.h>
 #endif
 
 #include "config.h"
+#include "compat.h"
 
 /*
  * Resident programs are subroutines to provide various string and date functions
@@ -55,10 +56,19 @@ void MHProgram::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHIngredient::Initialise(p, engine);
     MHParseNode *pCmdNode = p->GetNamedArg(C_NAME);
-    if (pCmdNode) pCmdNode->GetArgN(0)->GetStringValue(m_Name); // Program name
+
+    if (pCmdNode)
+    {
+        pCmdNode->GetArgN(0)->GetStringValue(m_Name);    // Program name
+    }
 
     MHParseNode *pAvail = p->GetNamedArg(C_INITIALLY_AVAILABLE);
-    if (pAvail) m_fInitiallyAvailable = pAvail->GetArgN(0)->GetBoolValue();
+
+    if (pAvail)
+    {
+        m_fInitiallyAvailable = pAvail->GetArgN(0)->GetBoolValue();
+    }
+
     // The MHEG Standard says that InitiallyAvailable is mandatory and should be false.
     // That doesn't seem to be the case in some MHEG programs so we force it here.
     m_fInitiallyActive = false;
@@ -67,14 +77,27 @@ void MHProgram::Initialise(MHParseNode *p, MHEngine *engine)
 void MHProgram::PrintMe(FILE *fd, int nTabs) const
 {
     MHIngredient::PrintMe(fd, nTabs);
-    PrintTabs(fd, nTabs); fprintf(fd, ":Name "); m_Name.PrintMe(fd, 0); fprintf(fd, "\n");
-    if (! m_fInitiallyAvailable) { PrintTabs(fd, nTabs); fprintf(fd, ":InitiallyAvailable false"); fprintf(fd, "\n"); }
+    PrintTabs(fd, nTabs);
+    fprintf(fd, ":Name ");
+    m_Name.PrintMe(fd, 0);
+    fprintf(fd, "\n");
+
+    if (! m_fInitiallyAvailable)
+    {
+        PrintTabs(fd, nTabs);
+        fprintf(fd, ":InitiallyAvailable false");
+        fprintf(fd, "\n");
+    }
 }
 
 // Set "running" and generate an IsRunning event.
 void MHProgram::Activation(MHEngine *engine)
 {
-    if (m_fRunning) return;
+    if (m_fRunning)
+    {
+        return;
+    }
+
     MHIngredient::Activation(engine);
     m_fRunning = true;
     engine->EventTriggered(this, EventIsRunning);
@@ -83,16 +106,22 @@ void MHProgram::Activation(MHEngine *engine)
 // This can be called if we change scene while a forked program is running
 void MHProgram::Deactivation(MHEngine *engine)
 {
-    if (! m_fRunning) return;
+    if (! m_fRunning)
+    {
+        return;
+    }
+
     // TODO: Stop the forked program.
     MHIngredient::Deactivation(engine);
 }
 
 void MHResidentProgram::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:ResidentPrg ");
-    MHProgram::PrintMe(fd, nTabs+1);
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:ResidentPrg ");
+    MHProgram::PrintMe(fd, nTabs + 1);
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 static void SetSuccessFlag(const MHObjectRef &success, bool result, MHEngine *engine)
@@ -120,28 +149,39 @@ static void GetString(MHParameter *parm, MHOctetString &str, MHEngine *engine)
 
 void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, const MHSequence<MHParameter *> &args, MHEngine *engine)
 {
-    if (! m_fAvailable) Preparation(engine);
-//  if (m_fRunning) return; // Strictly speaking there should be only one instance of a program running at a time. 
+    if (! m_fAvailable)
+    {
+        Preparation(engine);
+    }
+
+    //  if (m_fRunning) return; // Strictly speaking there should be only one instance of a program running at a time.
     Activation(engine);
     MHLOG(MHLogDetail, QString("Calling program %1").arg(m_Name.Printable()));
-    try {
+
+    try
+    {
         // Run the code.
-        if (m_Name.Equal("GCD")) { // GetCurrentDate - returns local time.
-            if (args.Size() == 2) {
+        if (m_Name.Equal("GCD"))   // GetCurrentDate - returns local time.
+        {
+            if (args.Size() == 2)
+            {
                 struct timeb timebuffer;
 #if HAVE_FTIME
                 ftime(&timebuffer);
 #elif HAVE_GETTIMEOFDAY
-		struct timeval   time;
+                struct timeval   time;
                 struct timezone  zone;
 
-                if (gettimeofday(&time,&zone) == -1)
+                if (gettimeofday(&time, &zone) == -1)
+                {
                     MHLOG(MHLogDetail, QString("gettimeofday() failed"));
+                }
+
                 timebuffer.time     = time.tv_sec;
                 timebuffer.timezone = zone.tz_minuteswest;
                 timebuffer.dstflag  = zone.tz_dsttime;
 #else
-        #error Configuration error? No ftime() or gettimeofday()?
+#error Configuration error? No ftime() or gettimeofday()?
 #endif
                 // Adjust the time to local.  TODO: Check this.
                 timebuffer.time -= timebuffer.timezone * 60;
@@ -155,11 +195,16 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(nTimeAsSecs);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("FDa")) { // FormatDate
-            if (args.Size() == 4) {
+        else if (m_Name.Equal("FDa"))   // FormatDate
+        {
+            if (args.Size() == 4)
+            {
                 // This is a bit like strftime but not quite.
                 MHOctetString format;
                 GetString(args.GetAt(0), format, engine);
@@ -169,54 +214,138 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 time_t timet = (date - 40587) * (24 * 60 * 60) + time;
                 struct tm *timeStr = gmtime(&timet);
                 MHOctetString result;
-                for (int i = 0; i < format.Size(); i++) {
+
+                for (int i = 0; i < format.Size(); i++)
+                {
                     unsigned char ch = format.GetAt(i);
                     char buffer[5]; // Largest text is 4 chars for a year + null terminator
-                    if (ch == '%') {
+
+                    if (ch == '%')
+                    {
                         i++;
-                        if (i == format.Size()) break;
+
+                        if (i == format.Size())
+                        {
+                            break;
+                        }
+
                         ch = format.GetAt(i);
                         buffer[0] = 0;
+
                         switch (ch)
                         {
-                        case 'Y': sprintf(buffer, "%04d", timeStr->tm_year + 1900); break;
-                        case 'y': sprintf(buffer, "%02d", timeStr->tm_year % 100); break;
-                        case 'X': sprintf(buffer, "%02d", timeStr->tm_mon+1); break;
-                        case 'x': sprintf(buffer, "%1d", timeStr->tm_mon+1); break;
-                        case 'D': sprintf(buffer, "%02d", timeStr->tm_mday); break;
-                        case 'd': sprintf(buffer, "%1d", timeStr->tm_mday); break;
-                        case 'H': sprintf(buffer, "%02d", timeStr->tm_hour); break;
-                        case 'h': sprintf(buffer, "%1d", timeStr->tm_hour); break;
-                        case 'I':
-                            if (timeStr->tm_hour == 12 || timeStr->tm_hour == 0) strcpy(buffer, "12");
-                            else sprintf(buffer, "%02d", timeStr->tm_hour % 12);
-                            break;
-                        case 'i':
-                            if (timeStr->tm_hour == 12 || timeStr->tm_hour == 0) strcpy(buffer, "12");
-                            else sprintf(buffer, "%1d", timeStr->tm_hour % 12);
-                            break;
-                        case 'M': sprintf(buffer, "%02d", timeStr->tm_min); break;
-                        case 'm': sprintf(buffer, "%1d", timeStr->tm_min); break;
-                        case 'S': sprintf(buffer, "%02d", timeStr->tm_sec); break;
-                        case 's': sprintf(buffer, "%1d", timeStr->tm_sec); break;
-                            // TODO: These really should be localised.
-                        case 'A': if (timeStr->tm_hour < 12) strcpy(buffer, "AM"); else strcpy(buffer, "PM"); break;
-                        case 'a': if (timeStr->tm_hour < 12) strcpy(buffer, "am"); else strcpy(buffer, "pm"); break;
-                        default: buffer[0] = ch; buffer[1] = 0;
+                            case 'Y':
+                                sprintf(buffer, "%04d", timeStr->tm_year + 1900);
+                                break;
+                            case 'y':
+                                sprintf(buffer, "%02d", timeStr->tm_year % 100);
+                                break;
+                            case 'X':
+                                sprintf(buffer, "%02d", timeStr->tm_mon + 1);
+                                break;
+                            case 'x':
+                                sprintf(buffer, "%1d", timeStr->tm_mon + 1);
+                                break;
+                            case 'D':
+                                sprintf(buffer, "%02d", timeStr->tm_mday);
+                                break;
+                            case 'd':
+                                sprintf(buffer, "%1d", timeStr->tm_mday);
+                                break;
+                            case 'H':
+                                sprintf(buffer, "%02d", timeStr->tm_hour);
+                                break;
+                            case 'h':
+                                sprintf(buffer, "%1d", timeStr->tm_hour);
+                                break;
+                            case 'I':
+
+                                if (timeStr->tm_hour == 12 || timeStr->tm_hour == 0)
+                                {
+                                    strcpy(buffer, "12");
+                                }
+                                else
+                                {
+                                    sprintf(buffer, "%02d", timeStr->tm_hour % 12);
+                                }
+
+                                break;
+                            case 'i':
+
+                                if (timeStr->tm_hour == 12 || timeStr->tm_hour == 0)
+                                {
+                                    strcpy(buffer, "12");
+                                }
+                                else
+                                {
+                                    sprintf(buffer, "%1d", timeStr->tm_hour % 12);
+                                }
+
+                                break;
+                            case 'M':
+                                sprintf(buffer, "%02d", timeStr->tm_min);
+                                break;
+                            case 'm':
+                                sprintf(buffer, "%1d", timeStr->tm_min);
+                                break;
+                            case 'S':
+                                sprintf(buffer, "%02d", timeStr->tm_sec);
+                                break;
+                            case 's':
+                                sprintf(buffer, "%1d", timeStr->tm_sec);
+                                break;
+                                // TODO: These really should be localised.
+                            case 'A':
+
+                                if (timeStr->tm_hour < 12)
+                                {
+                                    strcpy(buffer, "AM");
+                                }
+                                else
+                                {
+                                    strcpy(buffer, "PM");
+                                }
+
+                                break;
+                            case 'a':
+
+                                if (timeStr->tm_hour < 12)
+                                {
+                                    strcpy(buffer, "am");
+                                }
+                                else
+                                {
+                                    strcpy(buffer, "pm");
+                                }
+
+                                break;
+                            default:
+                                buffer[0] = ch;
+                                buffer[1] = 0;
                         }
+
                         result.Append(buffer);
                     }
-                    else result.Append(MHOctetString(&ch, 1));
+                    else
+                    {
+                        result.Append(MHOctetString(&ch, 1));
+                    }
                 }
+
                 MHParameter *pResString = args.GetAt(3);
                 engine->FindObject(*(pResString->GetReference()))->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("GDW")) { // GetDayOfWeek - returns the day of week that the date occurred on.
-            if (args.Size() == 2) {
+        else if (m_Name.Equal("GDW"))   // GetDayOfWeek - returns the day of week that the date occurred on.
+        {
+            if (args.Size() == 2)
+            {
                 int date = GetInt(args.GetAt(0), engine); // Date as produced in GCD
                 // Convert to a Unix date (secs since 1st Jan 1970) but adjusted for time zone.
                 time_t timet = (date - 40587) * (24 * 60 * 60);
@@ -224,23 +353,35 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 // 0 => Sunday, 1 => Monday etc.
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(timeStr->tm_wday);
                 SetSuccessFlag(success, true, engine);
-            } else SetSuccessFlag(success, false, engine);
+            }
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("Rnd")) { // Random
-            if (args.Size() == 2) {
+        else if (m_Name.Equal("Rnd"))   // Random
+        {
+            if (args.Size() == 2)
+            {
                 int nLimit = GetInt(args.GetAt(0), engine);
                 MHParameter *pResInt = args.GetAt(1);
-                srand((unsigned)time( NULL ));
-                engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(rand() % nLimit +1);
+                int r = random() % nLimit + 1;
+                engine->FindObject(
+                    *(pResInt->GetReference()))->SetVariableValue(r);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("CTC")) { // CastToContentRef
+        else if (m_Name.Equal("CTC"))   // CastToContentRef
+        {
             // Converts a string to a ContentRef.
-            if (args.Size() == 2) {
+            if (args.Size() == 2)
+            {
                 MHOctetString string;
                 GetString(args.GetAt(0), string, engine);
                 MHContentRef result;
@@ -248,23 +389,33 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("CTO")) { // CastToObjectRef
+        else if (m_Name.Equal("CTO"))   // CastToObjectRef
+        {
             // Converts a string and an integer to an ObjectRef.
-            if (args.Size() == 3) {
+            if (args.Size() == 3)
+            {
                 MHObjectRef result;
                 GetString(args.GetAt(0), result.m_GroupId, engine);
                 result.m_nObjectNo = GetInt(args.GetAt(1), engine);
                 engine->FindObject(*(args.GetAt(2)->GetReference()))->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("GSL")) { // GetStringLength
-            if (args.Size() == 2) {
+        else if (m_Name.Equal("GSL"))   // GetStringLength
+        {
+            if (args.Size() == 2)
+            {
                 // Find a substring within a string and return an index to the position.
                 MHOctetString string;
                 GetString(args.GetAt(0), string, engine);
@@ -272,99 +423,176 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 SetSuccessFlag(success, true, engine);
                 engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(string.Size());
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("GSS")) { // GetSubString
-            if (args.Size() == 4) { // Extract a sub-string from a string.
+        else if (m_Name.Equal("GSS"))   // GetSubString
+        {
+            if (args.Size() == 4)   // Extract a sub-string from a string.
+            {
                 MHOctetString string;
                 GetString(args.GetAt(0), string, engine);
                 int nBeginExtract = GetInt(args.GetAt(1), engine);
                 int nEndExtract = GetInt(args.GetAt(2), engine);
-                if (nBeginExtract < 1) nBeginExtract = 1;
-                if (nBeginExtract > string.Size()) nBeginExtract = string.Size();
-                if (nEndExtract < 1) nEndExtract = 1;
-                if (nEndExtract > string.Size()) nEndExtract = string.Size();
+
+                if (nBeginExtract < 1)
+                {
+                    nBeginExtract = 1;
+                }
+
+                if (nBeginExtract > string.Size())
+                {
+                    nBeginExtract = string.Size();
+                }
+
+                if (nEndExtract < 1)
+                {
+                    nEndExtract = 1;
+                }
+
+                if (nEndExtract > string.Size())
+                {
+                    nEndExtract = string.Size();
+                }
+
                 MHParameter *pResString = args.GetAt(3);
                 // Returns beginExtract to endExtract inclusive.
                 engine->FindObject(*(pResString->GetReference()))->SetVariableValue(
-                    MHOctetString(string, nBeginExtract-1, nEndExtract-nBeginExtract+1));
+                    MHOctetString(string, nBeginExtract - 1, nEndExtract - nBeginExtract + 1));
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("SSS")) { // SearchSubString
-            if (args.Size() == 4) {
+        else if (m_Name.Equal("SSS"))   // SearchSubString
+        {
+            if (args.Size() == 4)
+            {
                 // Find a substring within a string and return an index to the position.
                 MHOctetString string, searchString;
                 GetString(args.GetAt(0), string, engine);
                 int nStart = GetInt(args.GetAt(1), engine);
-                if (nStart < 1) nStart = 1;
+
+                if (nStart < 1)
+                {
+                    nStart = 1;
+                }
+
                 GetString(args.GetAt(2), searchString, engine);
                 // Strings are indexed from one.
                 int nPos;
-                for (nPos = nStart-1; nPos <= string.Size() - searchString.Size(); nPos++) {
+
+                for (nPos = nStart - 1; nPos <= string.Size() - searchString.Size(); nPos++)
+                {
                     int i;
-                    for (i = 0; i < searchString.Size(); i++) {
-                        if (searchString.GetAt(i) != string.GetAt(i+nPos)) break;
+
+                    for (i = 0; i < searchString.Size(); i++)
+                    {
+                        if (searchString.GetAt(i) != string.GetAt(i + nPos))
+                        {
+                            break;
+                        }
                     }
-                    if (i == searchString.Size()) break; // Found a match.
+
+                    if (i == searchString.Size())
+                    {
+                        break;    // Found a match.
+                    }
                 }
+
                 // Set the result.
                 MHParameter *pResInt = args.GetAt(3);
                 SetSuccessFlag(success, true, engine); // Set this first.
-                if (nPos <= string.Size() - searchString.Size()) { // Found
+
+                if (nPos <= string.Size() - searchString.Size())   // Found
+                {
                     // Set the index to the position of the string, counting from 1.
-                    engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(nPos+1);
+                    engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(nPos + 1);
                 }
-                else { // Not found.  Set the result index to -1
+                else   // Not found.  Set the result index to -1
+                {
                     engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(-1);
                 }
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("SES")) { // SearchAndExtractSubString
-            if (args.Size() == 5) {
+        else if (m_Name.Equal("SES"))   // SearchAndExtractSubString
+        {
+            if (args.Size() == 5)
+            {
                 // Find a substring within a string and return an index to the position
                 // and the prefix to the substring.
                 MHOctetString string, searchString;
                 GetString(args.GetAt(0), string, engine);
                 int nStart = GetInt(args.GetAt(1), engine);
-                if (nStart < 1) nStart = 1;
+
+                if (nStart < 1)
+                {
+                    nStart = 1;
+                }
+
                 GetString(args.GetAt(2), searchString, engine);
                 // Strings are indexed from one.
                 int nPos;
-                for (nPos = nStart-1; nPos <= string.Size() - searchString.Size(); nPos++) {
+
+                for (nPos = nStart - 1; nPos <= string.Size() - searchString.Size(); nPos++)
+                {
                     int i;
-                    for (i = 0; i < searchString.Size(); i++) {
-                        if (searchString.GetAt(i) != string.GetAt(i+nPos)) break; // Doesn't match
+
+                    for (i = 0; i < searchString.Size(); i++)
+                    {
+                        if (searchString.GetAt(i) != string.GetAt(i + nPos))
+                        {
+                            break;    // Doesn't match
+                        }
                     }
-                    if (i == searchString.Size()) break; // Found a match.
+
+                    if (i == searchString.Size())
+                    {
+                        break;    // Found a match.
+                    }
                 }
+
                 // Set the results.
                 MHParameter *pResString = args.GetAt(3);
                 MHParameter *pResInt = args.GetAt(4);
                 SetSuccessFlag(success, true, engine); // Set this first.
-                if (nPos <= string.Size() - searchString.Size()) { // Found
+
+                if (nPos <= string.Size() - searchString.Size())   // Found
+                {
                     // Set the index to the position AFTER the string, counting from 1.
-                    engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(nPos+1+searchString.Size());
+                    engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(nPos + 1 + searchString.Size());
                     // Return the sequence from nStart-1 of length nPos-nStart+1
-                    MHOctetString resultString(string, nStart-1, nPos-nStart+1);
+                    MHOctetString resultString(string, nStart - 1, nPos - nStart + 1);
                     engine->FindObject(*(pResString->GetReference()))->SetVariableValue(resultString);
                 }
-                else { // Not found.  Set the result string to empty and the result index to -1
+                else   // Not found.  Set the result string to empty and the result index to -1
+                {
                     engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(-1);
                     engine->FindObject(*(pResString->GetReference()))->SetVariableValue(MHOctetString(""));
                 }
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("GSI")) { // SI_GetServiceIndex
+        else if (m_Name.Equal("GSI"))   // SI_GetServiceIndex
+        {
             // Returns an index indicating the service
-            if (args.Size() == 2) {
+            if (args.Size() == 2)
+            {
                 MHOctetString string;
                 GetString(args.GetAt(0), string, engine);
                 MHParameter *pResInt = args.GetAt(1);
@@ -376,38 +604,54 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(nResult);
                 SetSuccessFlag(success, nResult >= 0, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("TIn")) { // SI_TuneIndex - Fork not allowed
+        else if (m_Name.Equal("TIn"))   // SI_TuneIndex - Fork not allowed
+        {
             // Tunes to an index returned by GSI
-            if (args.Size() == 1) {
+            if (args.Size() == 1)
+            {
                 int nChannel = GetInt(args.GetAt(0), engine);
                 bool res = nChannel >= 0 ? engine->GetContext()->TuneTo(
-                    nChannel, engine->GetTuneInfo()) : false;
+                               nChannel, engine->GetTuneInfo()) : false;
                 SetSuccessFlag(success, res, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
-        else if (m_Name.Equal("TII")) { // SI_TuneIndexInfo
-            // Indicates whether to perform a subsequent TIn quietly or normally. 
-            if (args.Size() == 1) {
+        else if (m_Name.Equal("TII"))   // SI_TuneIndexInfo
+        {
+            // Indicates whether to perform a subsequent TIn quietly or normally.
+            if (args.Size() == 1)
+            {
                 int tuneinfo = GetInt(args.GetAt(0), engine);
                 engine->SetTuneInfo(tuneinfo);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
-        else if (m_Name.Equal("BSI")) { // SI_GetBasicSI
+        else if (m_Name.Equal("BSI"))   // SI_GetBasicSI
+        {
             // Returns basic SI information about the service indicated by an index
             // returned by GSI.
             // Returns networkID, origNetworkID, transportStreamID, serviceID
-            if (args.Size() == 5) {
+            if (args.Size() == 5)
+            {
                 int channelId = GetInt(args.GetAt(0), engine);
                 int netId, origNetId, transportId, serviceId;
                 // Look the information up in the database.
                 bool res = engine->GetContext()->GetServiceInfo(channelId, netId, origNetId,
-                                transportId, serviceId);
+                                                                transportId, serviceId);
+
                 if (res)
                 {
                     engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(netId);
@@ -415,20 +659,27 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                     engine->FindObject(*(args.GetAt(3)->GetReference()))->SetVariableValue(transportId);
                     engine->FindObject(*(args.GetAt(4)->GetReference()))->SetVariableValue(serviceId);
                 }
+
                 SetSuccessFlag(success, res, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
-        else if (m_Name.Equal("GBI")) { // GetBootInfo
+        else if (m_Name.Equal("GBI"))   // GetBootInfo
+        {
             // Gets the NB_info field.
             MHERROR("GetBootInfo ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("CCR")) { // CheckContentRef
+        else if (m_Name.Equal("CCR"))   // CheckContentRef
+        {
             // Sees if an item with a particular content reference is available
             // in the carousel.  This looks like it should block until the file
             // is available.  The profile recommends that this should be forked
             // rather than called.
-            if (args.Size() == 3) {
+            if (args.Size() == 3)
+            {
                 MHUnion un;
                 un.GetValueFrom(*(args.GetAt(0)), engine);
                 un.CheckType(MHUnion::U_ContentRef);
@@ -437,9 +688,13 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 QString csPath = engine->GetPathName(fileName.m_ContentRef);
                 bool result = false;
                 QByteArray text;
+
                 // Try to load the object.
                 if (! csPath.isEmpty())
+                {
                     result = engine->GetContext()->GetCarouselData(csPath, text);
+                }
+
                 // Set the result variable.
                 MHParameter *pResFlag = args.GetAt(1);
                 engine->FindObject(*(pResFlag->GetReference()))->SetVariableValue(result);
@@ -448,36 +703,46 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(pResCR->GetReference()))->SetVariableValue(fileName);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
-        else if (m_Name.Equal("CGR")) { // CheckGroupIDRef
+        else if (m_Name.Equal("CGR"))   // CheckGroupIDRef
+        {
             // Sees if an application or scene with a particular group id
             // is available in the carousel.
             MHERROR("CheckGroupIDRef ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("VTG")) { // VideoToGraphics
+        else if (m_Name.Equal("VTG"))   // VideoToGraphics
+        {
             // Video to graphics transformation.
             MHERROR("VideoToGraphics ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("SWA")) { // SetWidescreenAlignment
+        else if (m_Name.Equal("SWA"))   // SetWidescreenAlignment
+        {
             // Sets either LetterBox or Centre-cut-out mode.
             // Seems to be concerned with aligning a 4:3 scene with an underlying 16:9 video
             MHERROR("SetWidescreenAlignment ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("GDA")) { // GetDisplayAspectRatio
+        else if (m_Name.Equal("GDA"))   // GetDisplayAspectRatio
+        {
             // Returns the aspcet ratio.  4:3 => 1, 16:9 => 2
             MHERROR("GetDisplayAspectRatio ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("CIS")) { // CI_SendMessage
+        else if (m_Name.Equal("CIS"))   // CI_SendMessage
+        {
             // Sends a message to a DVB CI application
             MHERROR("CI_SendMessage ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("SSM")) { // SetSubtitleMode
+        else if (m_Name.Equal("SSM"))   // SetSubtitleMode
+        {
             // Enable or disable subtitles in addition to MHEG.
             MHERROR("SetSubtitleMode ResidentProgram is not implemented");
         }
 
-        else if (m_Name.Equal("WAI")) { // WhoAmI
+        else if (m_Name.Equal("WAI"))   // WhoAmI
+        {
             // Return a concatenation of the strings we respond to in
             // GetEngineSupport(UKEngineProfile(X))
             if (args.Size() == 1)
@@ -491,60 +756,78 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
-        else if (m_Name.Equal("DBG")) { // Debug - optional
+        else if (m_Name.Equal("DBG"))   // Debug - optional
+        {
             QString message = "DEBUG: ";
-            for (int i = 0; i < args.Size(); i++) {
+
+            for (int i = 0; i < args.Size(); i++)
+            {
                 MHUnion un;
                 un.GetValueFrom(*(args.GetAt(i)), engine);
-                switch (un.m_Type) {
-                case MHUnion::U_Int:
-                    message.append(QString("%1").arg(un.m_nIntVal));
-                    break;
-                case MHParameter::P_Bool:
-                    message.append(un.m_fBoolVal ? "True" : "False");
-                    break;
-                case MHParameter::P_String:
-                    message.append(QString::fromUtf8((const char *)un.m_StrVal.Bytes(), un.m_StrVal.Size()));
-                    break;
-                case MHParameter::P_ObjRef:
-                    message.append(un.m_ObjRefVal.Printable());
-                    break;
-                case MHParameter::P_ContentRef:
-                    message.append(un.m_ContentRefVal.Printable());
-                    break;
-                case MHParameter::P_Null:
-                    break;
+
+                switch (un.m_Type)
+                {
+                    case MHUnion::U_Int:
+                        message.append(QString("%1").arg(un.m_nIntVal));
+                        break;
+                    case MHParameter::P_Bool:
+                        message.append(un.m_fBoolVal ? "True" : "False");
+                        break;
+                    case MHParameter::P_String:
+                        message.append(QString::fromUtf8((const char *)un.m_StrVal.Bytes(), un.m_StrVal.Size()));
+                        break;
+                    case MHParameter::P_ObjRef:
+                        message.append(un.m_ObjRefVal.Printable());
+                        break;
+                    case MHParameter::P_ContentRef:
+                        message.append(un.m_ContentRefVal.Printable());
+                        break;
+                    case MHParameter::P_Null:
+                        break;
                 }
             }
+
             MHLOG(MHLogNotifications, message);
         }
 
-        else if (m_Name.Equal("SBI")) { // SetBroadcastInterrupt
+        else if (m_Name.Equal("SBI"))   // SetBroadcastInterrupt
+        {
             // Required for InteractionChannelExtension
             // En/dis/able program interruptions e.g. green button
             MHERROR("SetBroadcastInterrupt ResidentProgram is not implemented");
         }
 
-        else if (m_Name.Equal("GIS")) { // GetICStatus
+        else if (m_Name.Equal("GIS"))   // GetICStatus
+        {
             // Required for NativeApplicationExtension
             MHERROR("GetICStatus ResidentProgram is not implemented");
         }
 
-        else {
+        else
+        {
             MHERROR(QString("Unknown ResidentProgram %1").arg(m_Name.Printable()));
         }
     }
-    catch (char const *) {
+    catch (char const *)
+    {
         // If something went wrong set the succeeded flag to false
         SetSuccessFlag(success, false, engine);
         // And continue on.  In particular we need to deactivate.
     }
+
     Deactivation(engine);
-    // At the moment we always treat Fork as Call.  If we do get a Fork we should signal that we're done. 
-    if (fIsFork) engine->EventTriggered(this, EventAsyncStopped);
+
+    // At the moment we always treat Fork as Call.  If we do get a Fork we should signal that we're done.
+    if (fIsFork)
+    {
+        engine->EventTriggered(this, EventAsyncStopped);
+    }
 }
 
 MHRemoteProgram::MHRemoteProgram()
@@ -565,10 +848,12 @@ void MHRemoteProgram::Initialise(MHParseNode *p, MHEngine *engine)
 
 void MHRemoteProgram::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:RemotePrg");
-    MHProgram::PrintMe(fd, nTabs+1);
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:RemotePrg");
+    MHProgram::PrintMe(fd, nTabs + 1);
     fprintf(fd, "****TODO\n");
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 MHInterChgProgram::MHInterChgProgram()
@@ -589,10 +874,12 @@ void MHInterChgProgram::Initialise(MHParseNode *p, MHEngine *engine)
 
 void MHInterChgProgram::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:InterchgPrg");
-    MHProgram::PrintMe(fd, nTabs+1);
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:InterchgPrg");
+    MHProgram::PrintMe(fd, nTabs + 1);
     fprintf(fd, "****TODO\n");
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 // Actions.
@@ -602,7 +889,9 @@ void MHCall::Initialise(MHParseNode *p, MHEngine *engine)
     m_Succeeded.Initialise(p->GetArgN(1), engine); // Call/fork succeeded flag
     // Arguments.
     MHParseNode *args = p->GetArgN(2);
-    for (int i = 0; i < args->GetSeqCount(); i++) {
+
+    for (int i = 0; i < args->GetSeqCount(); i++)
+    {
         MHParameter *pParm = new MHParameter;
         m_Parameters.Append(pParm);
         pParm->Initialise(args->GetSeqN(i), engine);
@@ -613,7 +902,12 @@ void MHCall::PrintArgs(FILE *fd, int nTabs) const
 {
     m_Succeeded.PrintMe(fd, nTabs);
     fprintf(fd, " ( ");
-    for (int i = 0; i < m_Parameters.Size(); i++) m_Parameters.GetAt(i)->PrintMe(fd, 0);
+
+    for (int i = 0; i < m_Parameters.Size(); i++)
+    {
+        m_Parameters.GetAt(i)->PrintMe(fd, 0);
+    }
+
     fprintf(fd, " )\n");
 }
 

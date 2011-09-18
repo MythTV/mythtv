@@ -35,12 +35,10 @@
 // C++ headers
 #include <map>
 
-// Qt headers
-#include <QThread>
-
 // MythTV headers
-#include "upnputil.h"
 #include "refcounted.h"
+#include "upnputil.h"
+#include "mthread.h"
 #include "upnpexp.h"
 
 class Task;
@@ -77,7 +75,7 @@ class Task : public RefCounted
 
                         Task(); 
 
-                long    Id() { return( m_nTaskId ); }
+                long    Id() const { return( m_nTaskId ); }
 
         virtual void    Execute( TaskQueue *pQueue ) = 0;
         virtual QString Name   () = 0;
@@ -89,7 +87,7 @@ class Task : public RefCounted
 // TaskQueue Singleton
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC TaskQueue : public QThread
+class UPNP_PUBLIC TaskQueue : public MThread
 {
     private: 
 
@@ -119,6 +117,7 @@ class UPNP_PUBLIC TaskQueue : public QThread
     public:
 
         static TaskQueue* Instance();
+        static void Shutdown();
 
         virtual ~TaskQueue();
 

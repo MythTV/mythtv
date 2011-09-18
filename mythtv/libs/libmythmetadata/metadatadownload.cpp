@@ -21,7 +21,8 @@ QEvent::Type MetadataLookupEvent::kEventType =
 QEvent::Type MetadataLookupFailure::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-MetadataDownload::MetadataDownload(QObject *parent)
+MetadataDownload::MetadataDownload(QObject *parent) :
+    MThread("MetadataDownload")
 {
     m_parent = parent;
 }
@@ -63,8 +64,9 @@ void MetadataDownload::cancel()
 
 void MetadataDownload::run()
 {
+    RunProlog();
+
     MetadataLookup* lookup;
-    threadRegister("MetadataDownload");
     while ((lookup = moreWork()) != NULL)
     {
         MetadataLookupList list;
@@ -92,17 +94,21 @@ void MetadataDownload::run()
                     list = handleTelevision(lookup);
                 else if (!lookup->GetSubtitle().isEmpty())
                     list = handleVideoUndetermined(lookup);
+
+                if (!list.size())
+                    list = handleRecordingGeneric(lookup);
             }
             else if (lookup->GetSubtype() == kProbableMovie)
+            {
                 list = handleMovie(lookup);
+                if (lookup->GetInetref().isEmpty())
+                    list.append(handleRecordingGeneric(lookup));
+            }
             else
-                list = handleRecordingGeneric(lookup);
-
-            if (!list.size() &&
-                (lookup->GetSubtype() == kProbableMovie ||
-                lookup->GetSubtype() == kProbableTelevision))
             {
                 list = handleRecordingGeneric(lookup);
+                if (lookup->GetInetref().isEmpty())
+                    list.append(handleMovie(lookup));
             }
         }
         else if (lookup->GetType() == kMetadataGame)
@@ -146,7 +152,8 @@ void MetadataDownload::run()
                 new MetadataLookupFailure(list));
         }
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 MetadataLookup* MetadataDownload::moreWork()

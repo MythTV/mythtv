@@ -33,9 +33,9 @@ InteractiveTV::~InteractiveTV()
 }
 
 // Start or restart the MHEG engine.
-void InteractiveTV::Restart(uint chanid, uint cardid, bool isLive)
+void InteractiveTV::Restart(uint chanid, uint sourceid, bool isLive)
 {
-    m_context->Restart(chanid, cardid, isLive);
+    m_context->Restart(chanid, sourceid, isLive);
 }
 
 // Called by the video player to see if the image needs to be updated

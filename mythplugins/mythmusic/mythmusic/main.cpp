@@ -170,8 +170,6 @@ static void loadMusic()
     if (gMusicData->initialized)
         return;
 
-    srand(time(NULL));
-
     CheckFreeDBServerFile();
 
     MSqlQuery count_query(MSqlQuery::InitCon());

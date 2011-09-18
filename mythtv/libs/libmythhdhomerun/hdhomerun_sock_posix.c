@@ -65,19 +65,34 @@ int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int
 	}
 
 	struct ifconf ifc;
-	uint8_t buf[8192];
-	ifc.ifc_len = sizeof(buf);
-	ifc.ifc_buf = (char *)buf;
+	size_t ifreq_buffer_size = 1024;
 
-	memset(buf, 0, sizeof(buf));
+	while (1) {
+		ifc.ifc_len = ifreq_buffer_size;
+		ifc.ifc_buf = (char *)malloc(ifreq_buffer_size);
+		if (!ifc.ifc_buf) {
+			close(sock);
+			return -1;
+		}
 
-	if (ioctl(sock, SIOCGIFCONF, &ifc) != 0) {
-		close(sock);
-		return -1;
+		memset(ifc.ifc_buf, 0, ifreq_buffer_size);
+
+		if (ioctl(sock, SIOCGIFCONF, &ifc) != 0) {
+			free(ifc.ifc_buf);
+			close(sock);
+			return -1;
+		}
+
+		if (ifc.ifc_len < ifreq_buffer_size) {
+			break;
+		}
+
+		free(ifc.ifc_buf);
+		ifreq_buffer_size += 1024;
 	}
 
-	uint8_t *ptr = (uint8_t *)ifc.ifc_req;
-	uint8_t	*end = (uint8_t *)&ifc.ifc_buf[ifc.ifc_len];
+	char *ptr = ifc.ifc_buf;
+	char *end = ifc.ifc_buf + ifc.ifc_len;
 
 	int count = 0;
 	while (ptr <= end) {
@@ -110,6 +125,7 @@ int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int
 		}
 	}
 
+	free(ifc.ifc_buf);
 	close(sock);
 	return count;
 }
@@ -200,12 +216,6 @@ uint32_t hdhomerun_sock_getpeername_addr(hdhomerun_sock_t sock)
 	return ntohl(sock_addr.sin_addr.s_addr);
 }
 
-#if defined(__CYGWIN__)
-uint32_t hdhomerun_sock_getaddrinfo_addr(hdhomerun_sock_t sock, const char *name)
-{
-	return 0;
-}
-#else
 uint32_t hdhomerun_sock_getaddrinfo_addr(hdhomerun_sock_t sock, const char *name)
 {
 	struct addrinfo hints;
@@ -225,7 +235,6 @@ uint32_t hdhomerun_sock_getaddrinfo_addr(hdhomerun_sock_t sock, const char *name
 	freeaddrinfo(sock_info);
 	return addr;
 }
-#endif
 
 bool_t hdhomerun_sock_bind(hdhomerun_sock_t sock, uint32_t local_addr, uint16_t local_port)
 {

@@ -2168,14 +2168,14 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
         unsigned int cc_bytes = (cc_bits + 7 - 3) / 8;
         Mpeg1Context *s1 = avctx->priv_data;
         MpegEncContext *s = &s1->mpeg_enc_ctx;
-        if (buf_end - p >= (2+cc_bytes) && (s->tmp_atsc_cc_len + 2 + 3*cc_count) < ATSC_CC_BUF_SIZE) {
-            int atsc_cnt_loc = s->tmp_atsc_cc_len;
+        if (buf_end - p >= (2+cc_bytes) && (s->tmp_scte_cc_len + 2 + 3*cc_count) < SCTE_CC_BUF_SIZE) {
+            int scte_cnt_loc = s->tmp_scte_cc_len;
             uint8_t real_count = 0, marker = 1, i;
             GetBitContext gb;
             init_get_bits(&gb, p+2, (buf_end-p-2) * sizeof(uint8_t));
             get_bits(&gb, 5); // swallow cc_count
-            s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&cc_count);
-            s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+            s->tmp_scte_cc_buf[s->tmp_scte_cc_len++] = 0x40 | (0x1f&cc_count);
+            s->tmp_scte_cc_buf[s->tmp_scte_cc_len++] = 0x00; // em_data
             for (i = 0; i < cc_count; i++) {
                 uint8_t valid, cc608_hdr;
                 uint8_t priority = get_bits(&gb, 2);
@@ -2196,18 +2196,18 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
                     continue;
                 cc608_hdr = 0xf8 | (valid ? 0x04 : 0x00) | type;
                 real_count++;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_1;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_2;
+                s->tmp_scte_cc_buf[s->tmp_scte_cc_len++] = cc608_hdr;
+                s->tmp_scte_cc_buf[s->tmp_scte_cc_len++] = cc_data_1;
+                s->tmp_scte_cc_buf[s->tmp_scte_cc_len++] = cc_data_2;
             }
             if (!real_count)
             {
-                s->tmp_atsc_cc_len = atsc_cnt_loc;
+                s->tmp_scte_cc_len = scte_cnt_loc;
             }
             else
             {
-                s->tmp_atsc_cc_buf[atsc_cnt_loc] = 0x40 | (0x1f&real_count);
-                s->tmp_atsc_cc_len = atsc_cnt_loc + 2 + 3 * real_count;
+                s->tmp_scte_cc_buf[scte_cnt_loc] = 0x40 | (0x1f&real_count);
+                s->tmp_scte_cc_len = scte_cnt_loc + 2 + 3 * real_count;
             }
         }
     } else if (buf_end - p >= 11 &&

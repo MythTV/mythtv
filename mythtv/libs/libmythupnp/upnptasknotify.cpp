@@ -85,7 +85,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                               "USN: %5\r\n"
                               "CACHE-CONTROL: max-age=%6\r\n"
                               "Content-Length: 0\r\n\r\n" )
-                            .arg( HttpServer::g_sPlatform )
+                            .arg( HttpServer::GetPlatform() )
                             .arg( MYTH_BINARY_VERSION )
                             .arg( GetNTSString()    )
                             .arg( sNT          )
@@ -137,7 +137,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 
         pSocket->writeBlock( scPacket, scPacket.length(),
                              pSocket->address(), pSocket->port() );
-        usleep( rand() % 250000 );
+        usleep( random() % 250000 );
         pSocket->writeBlock( scPacket, scPacket.length(),
                              pSocket->address(), pSocket->port() );
     }

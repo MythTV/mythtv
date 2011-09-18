@@ -32,7 +32,7 @@ class MHParseNode;
 // Abstract class for ingredients of a scene or application.
 class MHIngredient : public MHRoot  
 {
-public:
+  public:
     MHIngredient();
     MHIngredient(const MHIngredient &ref);
     virtual ~MHIngredient() {}
@@ -56,7 +56,7 @@ public:
     // Called by the engine to deliver external content.
     virtual void ContentArrived(const unsigned char *, int, MHEngine *) { }
 
-protected:
+  protected:
     bool    m_fInitiallyActive;
     int     m_nContentHook;
     bool    m_fShared;
@@ -78,53 +78,53 @@ protected:
 // Font - not needed for UK MHEG
 class MHFont : public MHIngredient  
 {
-public:
+  public:
     MHFont();
     virtual ~MHFont();
     virtual const char *ClassName() { return "Font"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
 
-protected:
+  protected:
 };
 
 // CursorShape - not needed for UK MHEG
 class MHCursorShape : public MHIngredient  
 {
-public:
+  public:
     MHCursorShape();
     virtual ~MHCursorShape();
     virtual const char *ClassName() { return "CursorShape"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
 
-protected:
+  protected:
 };
 
 // Paletter - not needed for UK MHEG
 class MHPalette : public MHIngredient  
 {
-public:
+  public:
     MHPalette();
     virtual ~MHPalette();
     virtual const char *ClassName() { return "Palette"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
 
-protected:
+  protected:
 };
 
 // Actions.
 // SetData - provide new content for an ingredient.
 class MHSetData: public MHElemAction
 {
-public:
+  public:
   MHSetData(): MHElemAction(":SetData"), m_fIsIncluded(false),
         m_fSizePresent(false), m_fCCPriorityPresent(false) {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
     virtual void PrintArgs(FILE *fd, int nTabs) const;
-protected:
+  protected:
     // Either included content or referenced content.
     bool m_fIsIncluded, m_fSizePresent, m_fCCPriorityPresent;
     MHGenericOctetString m_Included;
@@ -136,14 +136,14 @@ protected:
 // Preload and unload
 class MHPreload: public MHElemAction
 {
-public:
+  public:
     MHPreload(): MHElemAction(":Preload") {}
     virtual void Perform(MHEngine *engine) { Target(engine)->Preload(engine); }
 };
 
 class MHUnload: public MHElemAction
 {
-public:
+  public:
     MHUnload(): MHElemAction(":Unload") {}
     virtual void Perform(MHEngine *engine) { Target(engine)->Unload(engine); }
 };
@@ -151,7 +151,7 @@ public:
 // Clone - make a copy of an existing object.
 class MHClone: public MHActionGenericObjectRef
 {
-public:
+  public:
     MHClone(): MHActionGenericObjectRef(":Clone") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pRef);
 };

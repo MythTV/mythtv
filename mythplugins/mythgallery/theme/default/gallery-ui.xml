@@ -112,4 +112,67 @@
         </textarea>
     </window>
 
+    <window name="filter">
+
+        <textarea name="title" from="basetextarea">
+            <area>20,50,770,30</area>
+            <value>Filter/sort images</value>
+            <align>hcenter,vcenter</align>
+            <font>baselarge</font>
+        </textarea>
+
+        <!-- Filter: labels -->
+        <textarea name="filter_text" from="basetextarea">
+            <area>10,107,180,34</area>
+            <value>Directory filter :</value>
+            <align>right,top</align>
+        </textarea>
+
+        <textarea name="type_filter" from="filter_text">
+            <position>10,161</position>
+            <value>Type filter :</value>
+        </textarea>
+
+        <textarea name="numimages_text" from="basetextarea">
+            <area>200,255,770,30</area>
+            <value>NumImages_Text</value>
+            <align>left,top</align>
+        </textarea>
+
+        <!-- Sort: labels -->
+        <textarea name="sort_text" from="basetextarea">
+            <area>10,319,180,34</area>
+            <value>Sort by :</value>
+            <align>right,top</align>
+        </textarea>
+
+        <!-- Widgets -->
+        <textedit name="dirfilter_text" from="basetextedit">
+            <position>200,100</position>
+        </textedit>
+
+        <buttonlist name="typefilter_select" from="baseselector">
+            <position>200,154</position>
+        </buttonlist>
+
+        <button name="check_button" from="basebutton">
+            <position>200,200</position>
+            <value>Check Filter</value>
+        </button>
+
+        <buttonlist name="sort_select" from="baseselector">
+            <position>200,312</position>
+        </buttonlist>
+
+        <button name="done_button" from="basebutton">
+            <position>380,505</position>
+            <value>Done</value>
+        </button>
+
+        <button name="save_button" from="basebutton">
+            <position>200,505</position>
+            <value>Save as default</value>
+        </button>
+
+    </window>
 </mythuitheme>

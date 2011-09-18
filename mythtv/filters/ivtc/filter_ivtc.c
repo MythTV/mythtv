@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef HAV_STDINT_H
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
 

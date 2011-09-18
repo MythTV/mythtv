@@ -2085,15 +2085,15 @@ bool PlaybackBox::UpdateUILists(void)
     return true;
 }
 
-void PlaybackBox::playSelectedPlaylist(bool random)
+void PlaybackBox::playSelectedPlaylist(bool _random)
 {
-    if (random)
+    if (_random)
     {
         m_playListPlay.clear();
         QStringList tmp = m_playList;
         while (!tmp.empty())
         {
-            uint i = rand() % tmp.size();
+            uint i = random() % tmp.size();
             m_playListPlay.push_back(tmp[i]);
             tmp.removeAll(tmp[i]);
         }
@@ -2915,10 +2915,10 @@ void PlaybackBox::showRecordingPopup()
     m_popupMenu->AddButton(tr("Edit Recording Schedule"),
                             SLOT(doEditScheduled()));
 
-    m_popupMenu->AddButton(tr("Allow this program to re-record"),
+    m_popupMenu->AddButton(tr("Allow this episode to re-record"),
                             SLOT(doAllowRerecord()));
 
-    m_popupMenu->AddButton(tr("Show Program Details"),
+    m_popupMenu->AddButton(tr("Show Recording Details"),
                             SLOT(showProgramDetails()));
 
     m_popupMenu->AddButton(tr("Change Recording Metadata"),
@@ -3078,7 +3078,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         (asZeroByte      == pginfo.GetAvailableStatus()))
     {
         m_popupMenu->AddButton(
-            tr("Show Program Details"), SLOT(showProgramDetails()));
+            tr("Show Recording Details"), SLOT(showProgramDetails()));
         m_popupMenu->AddButton(
             tr("Delete"),               SLOT(askDelete()));
 
@@ -4098,7 +4098,7 @@ void PlaybackBox::customEvent(QEvent *event)
             {
                 if (asAvailable != availableStatus)
                 {
-                    if (kCheckForPlayAction == cat)
+                    if (kCheckForPlayAction == cat && pginfo)
                         ShowAvailabilityPopup(*pginfo);
                 }
                 else if (pginfo)
@@ -4225,7 +4225,7 @@ void PlaybackBox::HandleRecordingRemoveEvent(
             }
             else
             {
-                pit++;
+                ++pit;
             }
         }
 
@@ -4248,7 +4248,9 @@ void PlaybackBox::HandleRecordingRemoveEvent(
             git = m_progLists.erase(git);
         }
         else
-            git++;
+        {
+            ++git;
+        }
     }
 
     m_helper.ForceFreeSpaceUpdate();

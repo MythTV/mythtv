@@ -5,14 +5,14 @@
 #include <QWaitCondition>
 #include <QDateTime>
 #include <QString>
-#include <QThread>
 #include <QMutex>
 #include <QSize>
 #include <QMap>
 #include <QSet>
 
-#include "mythtvexp.h"
 #include "programinfo.h"
+#include "mythtvexp.h"
+#include "mthread.h"
 #include "util.h"
 
 class PreviewGenerator;
@@ -23,7 +23,7 @@ class QEvent;
 
 typedef QMap<QString,QDateTime> FileTimeStampMap;
 
-class MTV_PUBLIC PreviewGenerator : public QThread
+class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
 {
     friend int preview_helper(uint           chanid,
                               QDateTime      starttime,
@@ -62,7 +62,7 @@ class MTV_PUBLIC PreviewGenerator : public QThread
 
     QString GetToken(void) const { return token; }
 
-    void run(void); // QThread
+    void run(void); // MThread
     bool Run(void);
 
     void AttachSignals(QObject*);

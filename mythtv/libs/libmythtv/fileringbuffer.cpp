@@ -162,7 +162,7 @@ static QString local_sub_filename(QFileInfo &fileInfo)
 
         QMutexLocker locker(&RingBuffer::subExtLock);
         QStringList::const_iterator eit = RingBuffer::subExt.begin();
-        for (; eit != RingBuffer::subExt.end(); eit++)
+        for (; eit != RingBuffer::subExt.end(); ++eit)
             el += findBaseName + *eit;
     }
 
@@ -328,7 +328,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             {
                 QMutexLocker locker(&subExtLock);
                 QStringList::const_iterator eit = subExt.begin();
-                for (; eit != subExt.end(); eit++)
+                for (; eit != subExt.end(); ++eit)
                     auxFiles += baseName + *eit;
             }
         }

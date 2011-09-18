@@ -6,10 +6,11 @@
 #include <QWaitCondition>
 #include <QStringList>
 #include <QDateTime>
-#include <QThread>
+#include <QRunnable>
 #include <QMutex>
 
 class TVRec;
+class MThread;
 class ChannelBase;
 class DVBSIParser;
 class EITHelper;
@@ -26,17 +27,8 @@ class EITSource
 
 class EITScanner;
 
-class EITThread : public QThread
+class EITScanner : public QRunnable
 {
-  public:
-    virtual void run();
-    EITScanner   *scanner;
-};
-
-class EITScanner
-{
-  friend class EITThread;
-
   public:
     EITScanner(uint cardnum);
     ~EITScanner() { TeardownAll(); }
@@ -49,7 +41,7 @@ class EITScanner
     void StopActiveScan(void);
 
   protected:
-    void RunEventLoop(void);
+    void run(void);
 
   private:
     void TeardownAll(void);
@@ -61,7 +53,7 @@ class EITScanner
     EITSource       *eitSource;
 
     EITHelper       *eitHelper;
-    EITThread        eventThread;
+    MThread         *eventThread;
     bool             exitThread;
     QWaitCondition   exitThreadCond;
 

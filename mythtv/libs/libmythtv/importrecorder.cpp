@@ -75,9 +75,9 @@ void ImportRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     SetOption("vbiformat",   gCoreContext->GetSetting("VbiFormat"));
 }
 
-void ImportRecorder::StartRecording(void)
+void ImportRecorder::run(void)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run -- begin");
 
     _continuity_error_count = 0;
 
@@ -88,7 +88,7 @@ void ImportRecorder::StartRecording(void)
         recordingWait.wakeAll();
     }
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- " +
+    LOG(VB_RECORD, LOG_INFO, LOC + "run -- " +
         QString("attempting to open '%1'")
             .arg(curRecording->GetPathname()));
 
@@ -132,7 +132,7 @@ void ImportRecorder::StartRecording(void)
     recording = false;
     recordingWait.wakeAll();
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartRecording -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run -- end");
 }
 
 bool ImportRecorder::Open(void)
@@ -182,7 +182,7 @@ bool ImportRecorder::Open(void)
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("'%1' does not exist yet").arg(fn));
 
-        // Slow down StartRecording open loop when debugging -v record.
+        // Slow down run open loop when debugging -v record.
         // This is just to make the debugging output less spammy.
         if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_ANY))
             usleep(250 * 1000);

@@ -1,19 +1,19 @@
 #ifndef JOBQUEUE_H_
 #define JOBQUEUE_H_
 
-#include <pthread.h>
 #include <sys/types.h>
 
 #include <QWaitCondition>
 #include <QDateTime>
+#include <QRunnable>
 #include <QObject>
-#include <QThread>
 #include <QEvent>
 #include <QMutex>
 #include <QMap>
 
 #include "mythtvexp.h"
 
+class MThread;
 class ProgramInfo;
 class RecordingInfo;
 
@@ -113,18 +113,7 @@ typedef struct runningjobinfo {
 
 class JobQueue;
 
-class QueueProcessorThread : public QThread
-{
-    Q_OBJECT
-  public:
-    QueueProcessorThread(JobQueue *parent) : m_parent(parent) {}
-    ~QueueProcessorThread() { wait(); m_parent = NULL; }
-    virtual void run(void);
-  private:
-    JobQueue *m_parent;
-};
-
-class MTV_PUBLIC JobQueue : public QObject
+class MTV_PUBLIC JobQueue : public QObject, public QRunnable
 {
     Q_OBJECT
 
@@ -215,7 +204,7 @@ class MTV_PUBLIC JobQueue : public QObject
         int jobID;
     } JobThreadStruct;
 
-    void RunQueueProcessor(void);
+    void run(void); // QRunnable
     void ProcessQueue(void);
 
     void ProcessJob(JobQueueEntry job);
@@ -259,7 +248,7 @@ class MTV_PUBLIC JobQueue : public QObject
 
     bool isMaster;
 
-    QueueProcessorThread *queueThread;
+    MThread *queueThread;
     QWaitCondition queueThreadCond;
     QMutex queueThreadCondLock;
     bool processQueue;

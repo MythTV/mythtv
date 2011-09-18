@@ -9,6 +9,9 @@
 #include "mythsocket_cb.h"
 #include "mythbaseexp.h"
 
+template<class T >
+class QList;
+class QString;
 class QHostAddress;
 class MythSocketThread;
 
@@ -73,7 +76,7 @@ class MBASE_PUBLIC MythSocket : public MSocketDevice
     bool readData(char *data, quint64 len);
     bool writeData(const char *data, quint64 len);
 
-    bool connect(const QHostAddress &addr, quint16 port);
+    bool connect(const QHostAddress &hadr, quint16 port);
     bool connect(const QString &host, quint16 port);
 
     void Lock(void) const;
@@ -105,7 +108,10 @@ class MBASE_PUBLIC MythSocket : public MSocketDevice
     QStringList     m_announce;
 
     static const uint kSocketBufferSize;
+    static QMutex s_readyread_thread_lock;
     static MythSocketThread *s_readyread_thread;
+    
+    static QMap<QString, QHostAddress::SpecialAddress> s_loopback_cache;
 };
 
 #endif

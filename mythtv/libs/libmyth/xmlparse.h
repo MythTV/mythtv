@@ -30,17 +30,13 @@ class MPUBLIC XMLParse
     void parseContainer(QDomElement &, QString &, int &, QRect &);
     void parseListArea(LayerSet *, QDomElement &);
     bool parseDefaultCategoryColors(QMap<QString, QString> &catColors);
-    void parseImageGrid(LayerSet *, QDomElement &);
     void parseManagedTreeList(LayerSet *, QDomElement &);
     void parseTextArea(LayerSet *, QDomElement &);
-    void parseRemoteEdit(LayerSet *, QDomElement &);
     void parseStatusBar(LayerSet *, QDomElement &);
     void parseImage(LayerSet *, QDomElement &);
     void parseRepeatedImage(LayerSet *, QDomElement &);
     void parsePushButton(LayerSet *, QDomElement &);
     void parseTextButton(LayerSet *, QDomElement &);
-    void parseCheckBox(LayerSet *, QDomElement &);
-    void parseSelector(LayerSet *, QDomElement &);
     void parseBlackHole(LayerSet *, QDomElement &);
     void parseListBtnArea(LayerSet *, QDomElement &);
     void parseListTreeArea(LayerSet *, QDomElement &);

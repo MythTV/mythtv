@@ -1,7 +1,7 @@
 INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmyth/audio
 INCLUDEPATH +=  ../../libs/libmythtv ../../external/FFmpeg
 INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui ../../libs/libmythmetadata
-INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythbase ../../libmythhdhomerun
+INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythbase ../../libs/libmythhdhomerun
 INCLUDEPATH += ../../libs/libmythdvdnav ../../libs/libmythbluray ../../libs/libmythsamplerate
 INCLUDEPATH += ../../libs/libmythtv/mpeg
 INCLUDEPATH += ../../libs/libmythtv/vbitext

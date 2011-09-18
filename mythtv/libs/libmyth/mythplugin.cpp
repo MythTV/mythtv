@@ -148,7 +148,7 @@ MythPluginManager::MythPluginManager()
                     "No libraries in plugins directory " + filterDir.path());
 
         for (QStringList::iterator i = libraries.begin(); i != libraries.end();
-             i++)
+             ++i)
         {
             QString library = *i;
 

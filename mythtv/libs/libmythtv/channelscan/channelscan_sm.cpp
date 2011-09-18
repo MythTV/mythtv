@@ -44,6 +44,7 @@ using namespace std;
 #include "channelutil.h"
 #include "cardutil.h"
 #include "sourceutil.h"
+#include "mthread.h"
 #include "mythdb.h"
 #include "mythlogging.h"
 
@@ -61,17 +62,6 @@ using namespace std;
 #include "dvbchannel.h"
 #include "hdhrchannel.h"
 #include "v4lchannel.h"
-
-/** \fn ScannerThread::run(void)
- *  \brief Thunk that allows scannerThread thread to
- *         call ChannelScanSM::RunScanner().
- */
-void ScannerThread::run(void)
-{
-    threadRegister("Scanner");
-    m_parent->RunScanner();
-    threadDeregister();
-}
 
 /// SDT's should be sent every 2 seconds and NIT's every
 /// 10 seconds, so lets wait at least 30 seconds, in
@@ -317,10 +307,10 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
 
     vector<uint> multiplexes = SourceUtil::GetMplexIDs(sourceid);
 
-    if (!multiplexes.size())
+    if (multiplexes.empty())
     {
         LOG(VB_CHANSCAN, LOG_ERR, LOC + "Unable to find any transports for " +
-                QString("sourceid %1").arg(sourceid));
+            QString("sourceid %1").arg(sourceid));
 
         return false;
     }
@@ -632,7 +622,7 @@ DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
             return type;
     }
 
-    if (tts.size() > 0)
+    if (!tts.empty())
         return tts[0];
 
     return type;
@@ -748,7 +738,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         if (!wait_until_complete || sd->HasCachedAllPAT(tsid))
         {
             currentInfo->pats[tsid] = sd->GetCachedPATs(tsid);
-            if (currentInfo->pmts.size())
+            if (!currentInfo->pmts.empty())
             {
                 sd->ReturnCachedPMTTables(currentInfo->pmts);
                 currentInfo->pmts.clear();
@@ -1438,16 +1428,16 @@ void ChannelScanSM::StartScanner(void)
         }
     }
     threadExit = false;
-    scannerThread = new ScannerThread(this);
+    scannerThread = new MThread("Scanner", this);
     scannerThread->start();
 }
 
-/** \fn ChannelScanSM::RunScanner(void)
+/** \fn ChannelScanSM::run(void)
  *  \brief This runs the event loop for ChannelScanSM until 'threadExit' is true.
  */
-void ChannelScanSM::RunScanner(void)
+void ChannelScanSM::run(void)
 {
-    LOG(VB_CHANSCAN, LOG_INFO, LOC + "RunScanner -- begin");
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "run -- begin");
 
     while (!threadExit)
     {
@@ -1457,7 +1447,7 @@ void ChannelScanSM::RunScanner(void)
         usleep(10 * 1000);
     }
 
-    LOG(VB_CHANSCAN, LOG_INFO, LOC + "RunScanner -- end");
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "run -- end");
 }
 
 // See if we have timed out
@@ -1709,9 +1699,9 @@ void ChannelScanSM::StopScanner(void)
  */
 bool ChannelScanSM::ScanTransports(
     int SourceID,
-    const QString std,
-    const QString modulation,
-    const QString country,
+    const QString &std,
+    const QString &modulation,
+    const QString &country,
     const QString &table_start,
     const QString &table_end)
 {

@@ -10,17 +10,18 @@ using namespace std;
 #include <QWaitCondition>
 #include <QObject>
 #include <QString>
-#include <QThread>
 #include <QMutex>
 #include <QMap>
 #include <QSet>
 
 // MythTV headers
+#include "filesysteminfo.h"
 #include "recordinginfo.h"
 #include "remoteutil.h"
 #include "inputgroupmap.h"
 #include "mythdeque.h"
 #include "mythscheduler.h"
+#include "mthread.h"
 
 class EncoderLink;
 class MainServer;
@@ -28,17 +29,15 @@ class AutoExpire;
 
 class Scheduler;
 
-class Scheduler : public QThread, public MythScheduler
+class Scheduler : public MThread, public MythScheduler
 {
-    Q_OBJECT
-
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
               QString recordTbl = "record", Scheduler *master_sched = NULL);
     ~Scheduler();
 
     void Stop(void);
-    void Wait(void) { QThread::wait(); }
+    void Wait(void) { MThread::wait(); }
 
     void SetExpirer(AutoExpire *autoExpirer) { m_expirer = autoExpirer; }
 
@@ -84,7 +83,7 @@ class Scheduler : public QThread, public MythScheduler
     int GetError(void) const { return error; }
 
   protected:
-    virtual void run(void); // QThread
+    virtual void run(void); // MThread
 
   private:
     QString recordTable;

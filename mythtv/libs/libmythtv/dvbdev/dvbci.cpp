@@ -985,13 +985,13 @@ public:
   bool NeedCaPmt(void) { return needCaPmt; }
   };
 
-cCiConditionalAccessSupport::cCiConditionalAccessSupport(int SessionId, cCiTransportConnection *Tc)
-:cCiSession(SessionId, RI_CONDITIONAL_ACCESS_SUPPORT, Tc)
+cCiConditionalAccessSupport::cCiConditionalAccessSupport(
+    int SessionId, cCiTransportConnection *Tc) :
+    cCiSession(SessionId, RI_CONDITIONAL_ACCESS_SUPPORT, Tc),
+    state(0), numCaSystemIds(0), needCaPmt(false)
 {
   dbgprotocol("New Conditional Access Support (session id %d)\n", SessionId);
-  state = 0;
-  caSystemIds[numCaSystemIds = 0] = 0;
-  needCaPmt = false;
+  memset(caSystemIds, 0, sizeof(caSystemIds));
 }
 
 bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)

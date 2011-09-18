@@ -8,12 +8,12 @@ using namespace std;
 
 #include <QWaitCondition>
 #include <QString>
-#include <QThread>
 #include <QMutex>
 #include <QMap>
 
 #include "DeviceReadBuffer.h" // for ReaderPausedCB
 #include "mpegstreamdata.h" // for PIDPriority
+#include "mthread.h"
 #include "util.h"
 
 //#define DEBUG_PID_FILTERS
@@ -47,7 +47,7 @@ typedef QMap<uint,PIDInfo*> PIDInfoMap;
 // locking order
 // _pid_lock -> _listener_lock -> _start_stop_lock
 
-class StreamHandler : protected QThread, public DeviceReaderCB
+class StreamHandler : protected MThread, public DeviceReaderCB
 {
   public:
     virtual void AddListener(MPEGStreamData *data,

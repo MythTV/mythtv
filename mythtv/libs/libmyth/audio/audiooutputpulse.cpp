@@ -140,7 +140,6 @@ bool AudioOutputPulseAudio::OpenDevice()
 #endif
         case FORMAT_S32:    sample_spec.format = PA_SAMPLE_S32NE;      break;
         case FORMAT_FLT:    sample_spec.format = PA_SAMPLE_FLOAT32NE;  break;
-            break;
         default:
             VBERROR(fn_log_tag + QString("unsupported sample format %1")
                                  .arg(output_format));

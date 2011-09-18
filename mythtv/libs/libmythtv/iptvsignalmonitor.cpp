@@ -17,9 +17,9 @@
 
 void IPTVTableMonitorThread::run(void)
 {
-    threadRegister("IPTVTableMonitor");
+    RunProlog();
     m_parent->RunTableMonitor();
-    threadDeregister();
+    RunEpilog();
 }
 
 /** \fn IPTVSignalMonitor::IPTVSignalMonitor(int,IPTVChannel*,uint64_t)
@@ -115,7 +115,7 @@ void IPTVSignalMonitor::AddData(
 /** \fn IPTVSignalMonitor::UpdateValues(void)
  *  \brief Fills in frontend stats and emits status Qt signals.
  *
- *   This is automatically called by MonitorLoop(), after Start()
+ *   This is automatically called by run(), after Start()
  *   has been used to start the signal monitoring thread.
  */
 void IPTVSignalMonitor::UpdateValues(void)

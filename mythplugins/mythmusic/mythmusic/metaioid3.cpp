@@ -2,19 +2,26 @@
 #include "metaioid3.h"
 #include "metadata.h"
 
-// Libmyth
+// Libmythbase
 #include <mythlogging.h>
 #include <set>
+
+// Taglib
+#include <flacfile.h>
+#include <mpegfile.h>
 
 const String email = "music@mythtv.org";  // TODO username/ip/hostname?
 
 MetaIOID3::MetaIOID3(void)
-    : MetaIOTagLib()
+    : MetaIOTagLib(),
+        m_file(NULL), m_fileType(kMPEG)
+        
 {
 }
 
 MetaIOID3::~MetaIOID3(void)
 {
+    CloseFile();
 }
 
 /*!
@@ -23,37 +30,137 @@ MetaIOID3::~MetaIOID3(void)
 * \param filename The filename
 * \returns A taglib file object for this format
 */
-TagLib::MPEG::File *MetaIOID3::OpenFile(const QString &filename)
+bool MetaIOID3::OpenFile(const QString &filename, bool forWriting)
 {
-    QByteArray fname = filename.toLocal8Bit();
-    TagLib::MPEG::File *mpegfile = new TagLib::MPEG::File(fname.constData());
+    
 
-    if (!mpegfile->isOpen())
+    // Check if file is already opened
+    if (m_file && (m_filename == filename) &&
+        (!forWriting || !m_file->readOnly()))
+        return true;
+    
+    if (m_file)
     {
-        delete mpegfile;
-        mpegfile = NULL;
+        LOG(VB_FILE, LOG_DEBUG,
+                        QString("MetaIO switch file: %1 New File: %2 Type: %3")
+                                    .arg(m_filename)
+                                    .arg(filename)
+                                    .arg(m_fileType));
+    }
+    
+    // If a file is open but it's not the requested file then close it first
+    if (m_file)
+        CloseFile();
+ 
+    m_filename = filename;
+    
+    QString extension = m_filename.section('.', -1);
+    
+    if (extension.toLower() == "flac")
+        m_fileType = kFLAC;
+    else if (extension.toLower() == "mp3")
+        m_fileType = kMPEG;
+    else
+        return false;
+    
+    QByteArray fname = m_filename.toLocal8Bit();
+    // Open the file
+    switch (m_fileType)
+    {
+        case kMPEG :
+            m_file = new TagLib::MPEG::File(fname.constData());
+            break;
+        case kFLAC :
+            m_file = new TagLib::FLAC::File(fname.constData());
+            break;
     }
 
-    return mpegfile;
+    // If the requested file could not be opened then close it and return false
+    if (!m_file->isOpen() || (forWriting && m_file->readOnly()))
+    {
+        if (m_file->isOpen())
+            LOG(VB_FILE, LOG_NOTICE,
+                QString("Could not open file for writing: %1").arg(m_filename));
+        else
+            LOG(VB_FILE, LOG_ERR,
+                QString("Could not open file: %1").arg(m_filename));
+
+        CloseFile();
+        return false;
+    }
+
+    return true;
+}
+
+bool MetaIOID3::SaveFile()
+{
+    if (!m_file)
+        return false;
+
+    bool retval = m_file->save();
+    
+    return retval;
+}
+
+void MetaIOID3::CloseFile()
+{
+    LOG(VB_FILE, LOG_DEBUG, QString("MetaIO Close file: %1") .arg(m_filename));
+    delete m_file;
+    m_file = NULL;
+    m_fileType = kMPEG;
+    m_filename.clear();
+}
+
+TagLib::ID3v2::Tag* MetaIOID3::GetID3v2Tag(bool create)
+{
+    if (!m_file)
+        return NULL;
+
+    TagLib::ID3v2::Tag *tag = NULL;
+    switch (m_fileType)
+    {
+        case kMPEG :
+            tag = (static_cast<TagLib::MPEG::File*>(m_file))->ID3v2Tag(create);
+            break;
+        case kFLAC :
+            tag = (static_cast<TagLib::FLAC::File*>(m_file))->ID3v2Tag(create);
+            break;
+    }
+
+    return tag;
+}
+
+TagLib::ID3v1::Tag* MetaIOID3::GetID3v1Tag(bool create)
+{
+    if (!m_file)
+        return NULL;
+
+    TagLib::ID3v1::Tag *tag = NULL;
+    switch (m_fileType)
+    {
+        case kMPEG :
+            tag = (static_cast<TagLib::MPEG::File*>(m_file))->ID3v1Tag(create);
+            break;
+        case kFLAC :
+            // Flac doesn't support ID3v1
+            break;
+    }
+
+    return tag;
 }
 
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOID3::write(Metadata* mdata)
+bool MetaIOID3::write(const Metadata* mdata)
 {
-    TagLib::MPEG::File *mpegfile = OpenFile(mdata->Filename());
-
-    if (!mpegfile)
+    if (!OpenFile(mdata->Filename(), true))
         return false;
 
-    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+    TagLib::ID3v2::Tag *tag = GetID3v2Tag();
 
     if (!tag)
-    {
-        delete mpegfile;
         return false;
-    }
 
     WriteGenericMetadata(tag, mdata);
 
@@ -111,41 +218,30 @@ bool MetaIOID3::write(Metadata* mdata)
         tpe2frame->setText(QStringToTString(mdata->CompilationArtist()));
     }
 
-    bool result = mpegfile->save();
+    if (!SaveFile())
+        return false;
 
-    delete mpegfile;
-
-    return result;
+    return true;
 }
 
 /*!
  * \copydoc MetaIO::read()
  */
-Metadata *MetaIOID3::read(QString filename)
+Metadata *MetaIOID3::read(const QString &filename)
 {
-    TagLib::MPEG::File *mpegfile = OpenFile(filename);
-
-    if (!mpegfile)
+    if (!OpenFile(filename))
         return NULL;
 
-    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+    TagLib::ID3v2::Tag *tag = GetID3v2Tag(true); // Create tag if none are found
 
-    if (!tag)
-    {
-        delete mpegfile;
-        return NULL;
-    }
-
-    // if there is no ID3v2 tag, try to read the ID3v1 tag and copy it to the ID3v2 tag structure
+    // if there is no ID3v2 tag, try to read the ID3v1 tag and copy it to
+    // the ID3v2 tag structure
     if (tag->isEmpty())
     {
-        TagLib::ID3v1::Tag *tag_v1 = mpegfile->ID3v1Tag();
+        TagLib::ID3v1::Tag *tag_v1 = GetID3v1Tag();
 
         if (!tag_v1)
-        {
-            delete mpegfile;
             return NULL;
-        }
 
         if (!tag_v1->isEmpty())
         {
@@ -219,13 +315,8 @@ Metadata *MetaIOID3::read(QString filename)
     // 27 hours
 
     metadata->setCompilation(compilation);
-
-    TagLib::FileRef *fileref = new TagLib::FileRef(mpegfile);
-    metadata->setLength(getTrackLength(fileref));
-    // FileRef takes ownership of mpegfile, and is responsible for it's
-    // deletion. Messy.
-    delete fileref;
-
+    metadata->setLength(getTrackLength(m_file));
+    
     return metadata;
 }
 
@@ -236,7 +327,7 @@ Metadata *MetaIOID3::read(QString filename)
  * \param type The type of image we want - front/back etc
  * \returns A pointer to a QImage owned by the caller or NULL if not found.
  */
-QImage* MetaIOID3::getAlbumArt(QString filename, ImageType type)
+QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
 {
     QImage *picture = new QImage();
 
@@ -264,16 +355,12 @@ QImage* MetaIOID3::getAlbumArt(QString filename, ImageType type)
             return picture;
     }
 
-    QByteArray fname = filename.toLocal8Bit();
-    TagLib::MPEG::File *mpegfile = new TagLib::MPEG::File(fname.constData());
-
-    if (mpegfile)
+    if (OpenFile(filename))
     {
-        if (mpegfile->isOpen()
-            && !mpegfile->ID3v2Tag()->frameListMap()["APIC"].isEmpty())
+        TagLib::ID3v2::Tag *tag = GetID3v2Tag();
+        if (tag && !tag->frameListMap()["APIC"].isEmpty())
         {
-            TagLib::ID3v2::FrameList apicframes =
-                                    mpegfile->ID3v2Tag()->frameListMap()["APIC"];
+            TagLib::ID3v2::FrameList apicframes = tag->frameListMap()["APIC"];
 
             for(TagLib::ID3v2::FrameList::Iterator it = apicframes.begin();
                 it != apicframes.end(); ++it)
@@ -288,8 +375,6 @@ QImage* MetaIOID3::getAlbumArt(QString filename, ImageType type)
                 }
             }
         }
-
-        delete mpegfile;
     }
 
     delete picture;
@@ -306,22 +391,14 @@ QImage* MetaIOID3::getAlbumArt(QString filename, ImageType type)
 AlbumArtList MetaIOID3::getAlbumArtList(const QString &filename)
 {
     AlbumArtList imageList;
-    QByteArray fname = filename.toLocal8Bit();
-    TagLib::MPEG::File *mpegfile = new TagLib::MPEG::File(fname.constData());
-
-    if (mpegfile)
+    if (OpenFile(filename))
     {
-        TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+        TagLib::ID3v2::Tag *tag = GetID3v2Tag();
 
         if (!tag)
-        {
-            delete mpegfile;
             return imageList;
-        }
 
         imageList = readAlbumArt(tag);
-
-        delete mpegfile;
     }
 
     return imageList;
@@ -368,7 +445,8 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
 
             art->embedded = true;
 
-            QString ext = getExtFromMimeType(TStringToQString(frame->mimeType()).toLower());
+            QString ext = getExtFromMimeType(
+                                TStringToQString(frame->mimeType()).toLower());
 
             switch (frame->type())
             {
@@ -454,7 +532,8 @@ AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
  *
  * \Note We always save the image in JPEG format
  */
-bool MetaIOID3::writeAlbumArt(const QString &filename, const AlbumArtImage *albumart)
+bool MetaIOID3::writeAlbumArt(const QString &filename,
+                              const AlbumArtImage *albumart)
 {
     if (filename.isEmpty() || !albumart)
         return false;
@@ -486,20 +565,16 @@ bool MetaIOID3::writeAlbumArt(const QString &filename, const AlbumArtImage *albu
             break;
     }
 
-    TagLib::MPEG::File *mpegfile = OpenFile(filename);
-
-    if (!mpegfile)
+    if (!OpenFile(filename, true))
         return false;
 
-    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+    TagLib::ID3v2::Tag *tag = GetID3v2Tag();
 
     if (!tag)
-    {
-        delete mpegfile;
         return false;
-    }
 
-    AttachedPictureFrame *apic = findAPIC(tag, type, QStringToTString(albumart->description));
+    AttachedPictureFrame *apic = findAPIC(tag, type,
+                                    QStringToTString(albumart->description));
 
     if (!apic)
     {
@@ -517,8 +592,8 @@ bool MetaIOID3::writeAlbumArt(const QString &filename, const AlbumArtImage *albu
     apic->setPicture(bytevector);
     apic->setDescription(QStringToTString(albumart->description));
 
-    mpegfile->save();
-    delete mpegfile;
+    if (!SaveFile())
+        return false;
 
     return true;
 }
@@ -530,7 +605,8 @@ bool MetaIOID3::writeAlbumArt(const QString &filename, const AlbumArtImage *albu
  * \param albumart The Album Art image to remove
  * \returns True if successful
  */
-bool MetaIOID3::removeAlbumArt(const QString &filename, const AlbumArtImage *albumart)
+bool MetaIOID3::removeAlbumArt(const QString &filename,
+                               const AlbumArtImage *albumart)
 {
     if (filename.isEmpty() || !albumart)
         return false;
@@ -555,35 +631,29 @@ bool MetaIOID3::removeAlbumArt(const QString &filename, const AlbumArtImage *alb
             break;
     }
 
-    TagLib::MPEG::File *mpegfile = OpenFile(filename);
-
-    if (!mpegfile)
+    if (!OpenFile(filename, true))
         return false;
 
-    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+    TagLib::ID3v2::Tag *tag = GetID3v2Tag();
 
     if (!tag)
-    {
-        delete mpegfile;
         return false;
-    }
 
-    AttachedPictureFrame *apic = findAPIC(tag, type, QStringToTString(albumart->description));
+    AttachedPictureFrame *apic = findAPIC(tag, type,
+                                    QStringToTString(albumart->description));
     if (!apic)
-    {
-        delete mpegfile;
         return false;
-    }
 
     tag->removeFrame(apic);
 
-    mpegfile->save();
-    delete mpegfile;
+    if (!SaveFile())
+        return false;
 
     return true;
 }
 
-bool MetaIOID3::changeImageType(const QString &filename, const AlbumArtImage* albumart,
+bool MetaIOID3::changeImageType(const QString &filename,
+                                const AlbumArtImage* albumart,
                                 ImageType newType)
 {
     if (!albumart)
@@ -612,25 +682,18 @@ bool MetaIOID3::changeImageType(const QString &filename, const AlbumArtImage* al
             break;
     }
 
-    TagLib::MPEG::File *mpegfile = OpenFile(filename);
-
-    if (!mpegfile)
+    if (!OpenFile(filename, true))
         return false;
 
-    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+    TagLib::ID3v2::Tag *tag = GetID3v2Tag();
 
     if (!tag)
-    {
-        delete mpegfile;
         return false;
-    }
 
-    AttachedPictureFrame *apic = findAPIC(tag, type, QStringToTString(albumart->description));
+    AttachedPictureFrame *apic = findAPIC(tag, type,
+                                    QStringToTString(albumart->description));
     if (!apic)
-    {
-        delete mpegfile;
         return false;
-    }
 
     // set the new image type
     switch (newType)
@@ -652,8 +715,8 @@ bool MetaIOID3::changeImageType(const QString &filename, const AlbumArtImage* al
             break;
     }
 
-    mpegfile->save();
-    delete mpegfile;
+    if (!SaveFile())
+        return false;
 
     return true;
 }
@@ -726,23 +789,19 @@ bool MetaIOID3::writeVolatileMetadata(const Metadata* mdata)
     QString filename = mdata->Filename();
     int rating = mdata->Rating();
     int playcount = mdata->PlayCount();
-    TagLib::MPEG::File *mpegfile = OpenFile(filename);
 
-    if (!mpegfile)
+    if (!OpenFile(filename, true))
         return false;
 
-    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+    TagLib::ID3v2::Tag *tag = GetID3v2Tag();
 
     if (!tag)
-    {
-        delete mpegfile;
         return false;
-    }
 
     bool result = (writeRating(tag, rating) && writePlayCount(tag, playcount));
 
-    mpegfile->save();
-    delete mpegfile;
+    if (!SaveFile())
+        return false;
 
     return result;
 }
@@ -765,4 +824,21 @@ bool MetaIOID3::writeRating(TagLib::ID3v2::Tag *tag, int rating)
     popm->setRating(popmrating);
 
     return true;
+}
+
+bool MetaIOID3::TagExists(const QString &filename)
+{
+    if (!OpenFile(filename))
+        return false;
+    
+    TagLib::ID3v1::Tag *v1_tag = GetID3v1Tag();
+    TagLib::ID3v2::Tag *v2_tag = GetID3v2Tag();
+    
+    bool retval = false;
+    
+    if ((v2_tag && !v2_tag->isEmpty()) ||
+        (v1_tag && !v1_tag->isEmpty()))
+        retval = true;
+    
+    return retval;
 }

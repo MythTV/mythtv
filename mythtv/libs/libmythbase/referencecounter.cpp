@@ -23,7 +23,7 @@ void ReferenceCounter::UpRef(void)
 
 bool ReferenceCounter::DownRef(void)
 {
-    QMutexLocker mlock(&m_refLock);
+    m_refLock.lock();
     m_refCount--;
     LOG(VB_GENERAL, LOG_DEBUG, QString("%1(%2)::DownRef() -> %3")
                     .arg(metaObject()->className())
@@ -33,10 +33,12 @@ bool ReferenceCounter::DownRef(void)
 
     if (m_refCount == 0)
     {
+        m_refLock.unlock();
         delete this;
         return true;
     }
 
+    m_refLock.unlock();
     return false;
 }
 

@@ -37,6 +37,7 @@ TVBrowseHelper::TVBrowseHelper(
     bool     browse_all_tuners,
     bool     use_channel_groups,
     QString  db_channel_ordering) :
+    MThread("TVBrowseHelper"),
     m_tv(tv),
     db_time_format(time_format),
     db_short_date_format(short_date_format),
@@ -367,10 +368,10 @@ void TVBrowseHelper::GetNextProgramDB(
 
     MSqlBindings bindings;
     bindings[":CHANID"] = chanid;
-    bindings[":NOWTS"] = nowtime.toString("yyyy-MM-ddThh:mm:ss");
-    bindings[":LATESTTS"] = latesttime.toString("yyyy-MM-ddThh:mm:ss");
-    bindings[":BROWSETS"] = browsetime.toString("yyyy-MM-ddThh:mm:ss");
-    bindings[":BROWSETS2"] = browsetime.toString("yyyy-MM-ddThh:mm:ss");
+    bindings[":NOWTS"] = nowtime;
+    bindings[":LATESTTS"] = latesttime;
+    bindings[":BROWSETS"] = browsetime;
+    bindings[":BROWSETS2"] = browsetime;
 
     QString querystr = " WHERE program.chanid = :CHANID ";
     switch (direction)
@@ -417,7 +418,7 @@ inline static QString toString(const InfoMap &infoMap, const QString sep="\n")
 
 void TVBrowseHelper::run()
 {
-    threadRegister("TVBrowseHelper");
+    RunProlog();
     QMutexLocker locker(&m_lock);
     while (true)
     {
@@ -442,7 +443,7 @@ void TVBrowseHelper::run()
                 QMultiMap<QString,uint>::iterator it;
                 it = db_channum_to_chanids.lowerBound(bi.m_channum);
                 for ( ; (it != db_channum_to_chanids.end()) &&
-                          (it.key() == bi.m_channum); it++)
+                          (it.key() == bi.m_channum); ++it)
                 {
                     if (db_chanid_to_sourceid[*it] == sourceid)
                         chanids.push_back(*it);
@@ -587,5 +588,5 @@ void TVBrowseHelper::run()
                 m_tv, new UpdateBrowseInfoEvent(infoMap));
         }
     }
-    threadDeregister();
+    RunEpilog();
 }

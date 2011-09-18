@@ -42,7 +42,7 @@ TagLib::FLAC::File *MetaIOFLACVorbis::OpenFile(const QString &filename)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOFLACVorbis::write(Metadata* mdata)
+bool MetaIOFLACVorbis::write(const Metadata* mdata)
 {
     if (!mdata)
         return false;
@@ -52,7 +52,7 @@ bool MetaIOFLACVorbis::write(Metadata* mdata)
     if (!flacfile)
         return false;
     
-    TagLib::Ogg::XiphComment *tag = flacfile->xiphComment();
+    TagLib::Ogg::XiphComment *tag = flacfile->xiphComment(true);
     
     if (!tag)
     {
@@ -93,7 +93,7 @@ bool MetaIOFLACVorbis::write(Metadata* mdata)
 /*!
  * \copydoc MetaIO::read()
  */
-Metadata* MetaIOFLACVorbis::read(QString filename)
+Metadata* MetaIOFLACVorbis::read(const QString &filename)
 {
     TagLib::FLAC::File *flacfile = OpenFile(filename);
     
@@ -136,15 +136,27 @@ Metadata* MetaIOFLACVorbis::read(QString filename)
     metadata->setCompilation(compilation);
 
     if (metadata->Length() <= 0)
-    {
-        TagLib::FileRef *fileref = new TagLib::FileRef(flacfile);
-        metadata->setLength(getTrackLength(fileref));
-        // FileRef takes ownership of flacfile, and is responsible for it's
-        // deletion. Messy.
-        delete fileref;
-    }
+        metadata->setLength(getTrackLength(flacfile));
     else
         delete flacfile;
     
     return metadata;
+}
+
+bool MetaIOFLACVorbis::TagExists(const QString &filename)
+{
+    TagLib::FLAC::File *flacfile = OpenFile(filename);
+    
+    if (!flacfile)
+        return false;
+    
+    TagLib::Ogg::XiphComment *tag = flacfile->xiphComment(false);
+    
+    bool retval = false;
+    if (tag && !tag->isEmpty())
+        retval = true;
+    
+    delete flacfile;
+    
+    return retval;
 }

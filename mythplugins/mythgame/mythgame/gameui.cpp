@@ -18,6 +18,7 @@
 #include "rominfo.h"
 #include "gamedetails.h"
 #include "romedit.h"
+#include "gamescan.h"
 #include "gameui.h"
 
 class GameTreeInfo
@@ -41,7 +42,16 @@ class GameTreeInfo
 Q_DECLARE_METATYPE(GameTreeInfo *)
 
 GameUI::GameUI(MythScreenStack *parent)
-       : MythScreenType(parent, "GameUI"), m_busyPopup(0)
+       : MythScreenType(parent, "GameUI"),
+            m_showHashed(false), m_gameShowFileName(0),
+            m_gameTree(NULL), m_favouriteNode(NULL),
+            m_busyPopup(0),
+            m_gameUITree(NULL), m_gameTitleText(NULL),
+            m_gameSystemText(NULL), m_gameYearText(NULL),
+            m_gameGenreText(NULL), m_gamePlotText(NULL),
+            m_gameFavouriteState(NULL), m_gameImage(NULL),
+            m_fanartImage(NULL), m_boxImage(NULL),
+            m_scanner(NULL)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -84,6 +94,15 @@ bool GameUI::Create()
 
     m_gameShowFileName = gCoreContext->GetSetting("GameShowFileNames").toInt();
 
+    Load();
+
+    BuildFocusList();
+
+    return true;
+}
+
+void GameUI::Load()
+{
     m_gameTree = new MythGenericTree("game root", 0, false);
 
     //  create system filter to only select games where handlers are present
@@ -157,10 +176,6 @@ bool GameUI::Create()
     m_gameTree->addNode(new_node);
 
     m_gameUITree->AssignTree(m_gameTree);
-
-    BuildFocusList();
-
-    return true;
 }
 
 bool GameUI::keyPressEvent(QKeyEvent *event)
@@ -412,17 +427,19 @@ void GameUI::showInfo()
 void GameUI::showMenu()
 {
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
-    if (isLeaf(node))
-    {
-        MythScreenStack *popupStack = GetMythMainWindow()->
-                                              GetStack("popup stack");
-        MythDialogBox *showMenuPopup =
+
+    MythScreenStack *popupStack = GetMythMainWindow()->
+                                          GetStack("popup stack");
+    MythDialogBox *showMenuPopup =
             new MythDialogBox(node->getString(), popupStack, "showMenuPopup");
 
-        if (showMenuPopup->Create())
-        {
-            showMenuPopup->SetReturnEvent(this, "showMenuPopup");
+    if (showMenuPopup->Create())
+    {
+        showMenuPopup->SetReturnEvent(this, "showMenuPopup");
 
+        showMenuPopup->AddButton(tr("Scan For Changes"));
+        if (isLeaf(node))
+        {
             RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
             if (romInfo)
             {
@@ -434,11 +451,11 @@ void GameUI::showMenu()
                 showMenuPopup->AddButton(tr("Retrieve Details"));
                 showMenuPopup->AddButton(tr("Edit Details"));
             }
-            popupStack->AddScreen(showMenuPopup);
         }
-        else
-            delete showMenuPopup;
+        popupStack->AddScreen(showMenuPopup);
     }
+    else
+        delete showMenuPopup;
 }
 
 void GameUI::searchStart(void)
@@ -500,6 +517,10 @@ void GameUI::customEvent(QEvent *event)
             {
                 edit();
             }
+            if (resulttext == tr("Scan For Changes"))
+            {
+                doScan();
+            }
             else if (resulttext == tr("Show Information"))
             {
                 showInfo();
@@ -533,7 +554,7 @@ void GameUI::customEvent(QEvent *event)
             node->SetData(qVariantFromValue(romInfo));
             node->setString(romInfo->Gamename());
 
-            romInfo->UpdateDatabase();
+            romInfo->SaveToDatabase();
             updateChangedNode(node, romInfo);
         }
         else if (resultid == "detailsPopup")
@@ -977,7 +998,7 @@ void GameUI::OnGameSearchDone(MetadataLookup *lookup)
 
     StartGameImageSet(node, coverart, fanart, screenshot);
 
-    metadata->UpdateDatabase();
+    metadata->SaveToDatabase();
     updateChangedNode(node, metadata);
 }
 
@@ -1065,6 +1086,28 @@ void GameUI::handleDownloadedImages(MetadataLookup *lookup)
             metadata->setScreenshot(filename);
     }
 
-    metadata->UpdateDatabase();
+    metadata->SaveToDatabase();
     updateChangedNode(node, metadata);
 }
+
+void GameUI::doScan()
+{
+    if (!m_scanner)
+        m_scanner = new GameScanner();
+    connect(m_scanner, SIGNAL(finished(bool)), SLOT(reloadAllData(bool)));
+    m_scanner->doScanAll();
+}
+
+void GameUI::reloadAllData(bool dbChanged)
+{
+    delete m_scanner;
+    m_scanner = NULL;
+
+    if (dbChanged)
+    {
+        delete m_gameTree;
+        m_gameTree = NULL;
+        Load();
+    }
+}
+

@@ -35,16 +35,16 @@ using namespace std;
 
 void HouseKeepingThread::run(void)
 {
-    threadRegister("HouseKeeping");
+    RunProlog();
     m_parent->RunHouseKeeping();
-    threadDeregister();
+    RunEpilog();
 }
 
 void MythFillDatabaseThread::run(void)
 {
-    threadRegister("MythFillDB");
+    RunProlog();
     m_parent->RunMFD();
-    threadDeregister();
+    RunEpilog();
 }
 
 HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched) :
@@ -393,7 +393,7 @@ void HouseKeeper::flushDBLogs()
             while (query.next())
             {
                 totalrows = query.value(0).toLongLong();
-                LOG(VB_GENERAL, LOG_INFO,
+                LOG(VB_GENERAL, LOG_DEBUG,
                     QString("Database has %1 log entries.").arg(totalrows));
             }
             if (totalrows > maxrows)
@@ -402,7 +402,7 @@ void HouseKeeper::flushDBLogs()
                 query.prepare(sql);
                 quint64 extrarows = totalrows - maxrows;
                 query.bindValue(":ROWS", extrarows);
-                LOG(VB_GENERAL, LOG_INFO,
+                LOG(VB_GENERAL, LOG_DEBUG,
                     QString("Deleting oldest %1 database log entries.")
                         .arg(extrarows));
                 if (!query.exec())
@@ -416,8 +416,6 @@ void HouseKeeper::flushDBLogs()
 
 void HouseKeeper::RunMFD(void)
 {
-    fillDBThread->setTerminationEnabled(false);
-
     {
         QMutexLocker locker(&fillDBLock);
         fillDBStarted = true;
@@ -474,11 +472,11 @@ void HouseKeeper::RunMFD(void)
         fillDBWait.wakeAll();
     }
 
-    fillDBThread->setTerminationEnabled(true);
+    MythFillDatabaseThread::setTerminationEnabled(true);
 
     uint result = fillDBMythSystem->Wait(0);
 
-    fillDBThread->setTerminationEnabled(false);
+    MythFillDatabaseThread::setTerminationEnabled(false);
 
     {
         QMutexLocker locker(&fillDBLock);
@@ -824,7 +822,7 @@ void HouseKeeper::UpdateThemeChooserInfoCache(void)
 
     if (!extractZIP(remoteThemesFile, remoteThemesDir))
     {
-        LOG(VB_GENERAL, LOG_INFO,
+        LOG(VB_GENERAL, LOG_ERR,
             QString("HouseKeeper: Error extracting %1"
                     "remote themes info package.").arg(remoteThemesFile));
         QFile::remove(remoteThemesFile);

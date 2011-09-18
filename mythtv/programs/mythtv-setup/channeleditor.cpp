@@ -57,11 +57,14 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
 /////////////////////////////////////////////////////////
 
 ChannelEditor::ChannelEditor(MythScreenStack *parent)
-              : MythScreenType(parent, "channeleditor")
+              : MythScreenType(parent, "channeleditor"),
+    m_sourceFilter(FILTER_ALL),
+    m_currentSortMode(QObject::tr("Channel Name")),
+    m_currentHideMode(false),
+    m_channelList(NULL), m_sourceList(NULL), m_preview(NULL),
+    m_channame(NULL), m_channum(NULL), m_callsign(NULL),
+    m_chanid(NULL), m_sourcename(NULL), m_compoundname(NULL)
 {
-    m_currentSortMode = tr("Channel Name");
-    m_sourceFilter = FILTER_ALL; // All
-    m_currentHideMode = false;
 }
 
 bool ChannelEditor::Create()
@@ -383,15 +386,15 @@ void ChannelEditor::setHideMode(bool hide)
 void ChannelEditor::del()
 {
     MythUIButtonListItem *item = m_channelList->GetItemCurrent();
-    
+
     if (!item)
         return;
-    
+
     QString message = tr("Delete channel '%1'?").arg(item->GetText("name"));
-    
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
-    
+
     if (dialog->Create())
     {
         dialog->SetData(qVariantFromValue(item));
@@ -400,7 +403,7 @@ void ChannelEditor::del()
     }
     else
         delete dialog;
-    
+
 }
 
 void ChannelEditor::deleteChannels(void)
@@ -414,10 +417,10 @@ void ChannelEditor::deleteChannels(void)
         (del_all) ? tr("Delete ALL channels?") :
         ((del_nul) ? tr("Delete all unassigned channels?") :
             tr("Delete all channels on %1?").arg(currentLabel));
-    
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
-    
+
     if (dialog->Create())
     {
         dialog->SetReturnEvent(this, "delall");
@@ -586,7 +589,7 @@ void ChannelEditor::customEvent(QEvent *event)
         {
             bool del_all = m_sourceFilter == FILTER_ALL;
             bool del_nul = m_sourceFilter == FILTER_UNASSIGNED;
-            
+
             MSqlQuery query(MSqlQuery::InitCon());
             if (del_all)
             {
@@ -597,17 +600,17 @@ void ChannelEditor::customEvent(QEvent *event)
                 query.prepare("SELECT sourceid "
                 "FROM videosource "
                 "GROUP BY sourceid");
-                
+
                 if (!query.exec() || !query.isActive())
                 {
                     MythDB::DBError("ChannelEditor Delete Channels", query);
                     return;
                 }
-                
+
                 QString tmp = "";
                 while (query.next())
                     tmp += "'" + query.value(0).toString() + "',";
-                
+
                 if (tmp.isEmpty())
                 {
                     query.prepare("TRUNCATE TABLE channel");
@@ -625,10 +628,10 @@ void ChannelEditor::customEvent(QEvent *event)
                 "WHERE sourceid = :SOURCEID");
                 query.bindValue(":SOURCEID", m_sourceFilter);
             }
-            
+
             if (!query.exec())
                 MythDB::DBError("ChannelEditor Delete Channels", query);
-            
+
             fillList();
         }
         else if (resultid == "iconimportopt")
@@ -638,7 +641,7 @@ void ChannelEditor::customEvent(QEvent *event)
             ImportIconsWizard *iconwizard;
 
             QString channelname = dce->GetData().toString();
-            
+
             switch (buttonnum)
             {
                 case 0 : // Import all icons
@@ -663,5 +666,5 @@ void ChannelEditor::customEvent(QEvent *event)
             else
                 delete iconwizard;
         }
-    }   
+    }
 }

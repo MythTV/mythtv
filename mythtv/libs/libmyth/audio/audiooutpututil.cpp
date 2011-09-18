@@ -642,11 +642,11 @@ void AudioOutputUtil::MuteChannel(int obits, int channels, int ch,
 }
 
 #if HAVE_BIGENDIAN
-#define LE_SHORT(v)		bswap_16(v)
-#define LE_INT(v)		bswap_32(v)
+#define LE_SHORT(v)      bswap_16(v)
+#define LE_INT(v)        bswap_32(v)
 #else
-#define LE_SHORT(v)		(v)
-#define LE_INT(v)		(v)
+#define LE_SHORT(v)      (v)
+#define LE_INT(v)        (v)
 #endif
 
 char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,

@@ -16,7 +16,7 @@ class HttpConfig : public HttpServerExtension
 
     virtual QStringList GetBasePaths();
 
-    bool ProcessRequest(HttpWorkerThread *pThread, HTTPRequest *pRequest);
+    bool ProcessRequest(HTTPRequest *pRequest);
 
   private:
     static void PrintHeader(QBuffer&, const QString &form,

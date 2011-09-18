@@ -66,6 +66,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void RegisterJump(const QString &destination, const QString &description,
                       const QString &key, void (*callback)(void),
                       bool exittomain = true, QString localAction = "");
+    void ClearAllJumps();
 
     void RegisterMediaPlugin(const QString &name, const QString &desc,
                              MediaPlayCallback fn);

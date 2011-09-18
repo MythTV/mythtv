@@ -12,16 +12,19 @@ static int calcOffset(QString GameType, uLong filesize) {
 
     result = 0;
 
-    if (GameType == "NES") {
+    if (GameType == "NES")
+    {
         result = 16;
     }
-    else if (GameType == "SNES") {
+    else if (GameType == "SNES")
+    {
          rom_size = (filesize / 0x2000) * 0x2000;
 
          if (rom_size < filesize)
              result = filesize - rom_size;
     }
-    else if (GameType == "PCE") {
+    else if (GameType == "PCE")
+    {
          if (filesize & 0x0FFF)
              result = filesize & 0x0FFF;
 
@@ -30,7 +33,8 @@ static int calcOffset(QString GameType, uLong filesize) {
     return result;
 }
 
-static QString crcStr(uLong crc) {
+static QString crcStr(uLong crc)
+{
     QString tmpcrc("");
 
     tmpcrc = QString("%1").arg( crc, 0, 16 );
@@ -51,7 +55,6 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
     QString crcRes;
     char filename_inzip[256];
     unz_file_info file_info;
-    int err;
     int offset;
     unzFile zf;
     int blocksize;
@@ -70,7 +73,7 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
         {
             if (unzOpenCurrentFile(zf) == UNZ_OK)
             {
-                err = unzGetCurrentFileInfo(zf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
+                unzGetCurrentFileInfo(zf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
 
                 offset = calcOffset(GameType, file_info.uncompressed_size);
 

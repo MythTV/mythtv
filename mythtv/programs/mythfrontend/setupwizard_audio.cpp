@@ -158,8 +158,9 @@ void AudioSetupWizard::Load(void)
 
 void AudioSetupWizard::Init(void)
 {
-    for (QVector<AudioOutput::AudioDeviceConfig>::const_iterator it = m_outputlist->begin();
-        it != m_outputlist->end(); it++)
+    for (QVector<AudioOutput::AudioDeviceConfig>::const_iterator it =
+             m_outputlist->begin();
+         it != m_outputlist->end(); ++it)
     {
         QString name = it->name;
         MythUIButtonListItem *output =

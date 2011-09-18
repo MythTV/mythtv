@@ -3,7 +3,8 @@
 
 #include "DisplayRes.h"
 
-class DisplayResX : public DisplayRes {
+class DisplayResX : public DisplayRes
+{
   public:
     DisplayResX(void);
     ~DisplayResX(void);
@@ -16,8 +17,8 @@ class DisplayResX : public DisplayRes {
     bool SwitchToVideoMode(int width, int height, double framerate);
 
   private:
-    mutable std::vector<DisplayResScreen> m_video_modes;
-    mutable std::vector<DisplayResScreen> m_video_modes_unsorted;
+    mutable std::vector<DisplayResScreen> m_videoModes;
+    mutable std::vector<DisplayResScreen> m_videoModesUnsorted;
 };
 
 #endif // _DISPLAYRESX_H_

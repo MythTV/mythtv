@@ -15,7 +15,8 @@ void MythFrontendCommandLineParser::LoadArguments(void)
     allowArgs();
     addHelp();
     addVersion();
-    addWindowed(false);
+    addWindowed();
+    addMouse();
     addSettingsOverride();
     addGeometry();
     addDisplay();

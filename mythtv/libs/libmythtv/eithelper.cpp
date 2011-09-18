@@ -20,12 +20,7 @@ using namespace std;
 #include "util.h"
 #include "programdata.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
-
-#ifdef USING_MINGW
-    #define gmtime_r( _clock, _result ) \
-            ( *(_result) = *gmtime( (_clock) ), \
-              (_result) )
-#endif
+#include "compat.h" // for gmtime_r on windows.
 
 const uint EITHelper::kChunkSize = 20;
 EITCache *EITHelper::eitcache = new EITCache();

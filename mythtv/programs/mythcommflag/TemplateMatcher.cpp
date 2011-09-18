@@ -108,7 +108,7 @@ bool readMatches(QString filename, unsigned short *matches, long long nframes)
 
     for (frameno = 0; frameno < nframes; frameno++)
     {
-        int nitems = fscanf(fp, "%hu", &matches[frameno]);
+        int nitems = fscanf(fp, "%20hu", &matches[frameno]);
         if (nitems != 1)
         {
             LOG(VB_COMMFLAG, LOG_ERR,

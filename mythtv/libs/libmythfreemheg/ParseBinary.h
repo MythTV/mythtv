@@ -30,20 +30,20 @@ class MHGroup;
 
 class MHParseBinary: public MHParseBase
 {
-public:
+  public:
     MHParseBinary(QByteArray &program);
     virtual ~MHParseBinary() {}
 
     // Parse the binary and return a pointer to the parse tree
     virtual MHParseNode *Parse() { return DoParse(); }
 
-private:
+  private:
     MHParseNode *DoParse();
     unsigned char GetNextChar();
     void ParseString(int endStr, MHOctetString &str);
     int ParseInt(int endInt);
 
-private:
+  private:
     int m_p; // Count of bytes read
     QByteArray m_data;
 };

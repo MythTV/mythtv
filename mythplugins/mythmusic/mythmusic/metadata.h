@@ -8,10 +8,10 @@ using namespace std;
 // qt
 #include <QStringList>
 #include <QMap>
-#include <QThread>
 
 // mythtv
 #include <uitypes.h>
+#include <mthread.h>
 
 // mythmusic
 #include "treecheckitem.h"
@@ -47,7 +47,6 @@ class AlbumArtImage
      QString   description;
      bool      embedded;
 };
-typedef QList<AlbumArtImage*> AlbumArtList;
 
 typedef QList<AlbumArtImage*> AlbumArtList;
 
@@ -145,7 +144,7 @@ class Metadata
     QString FormatArtist();
     QString FormatTitle();
 
-    QString Genre() { return m_genre; }
+    QString Genre() const { return m_genre; }
     void setGenre(const QString &lgenre) { m_genre = lgenre; }
 
     void setDirectoryId(int ldirectoryid) { m_directoryid = ldirectoryid; }
@@ -160,7 +159,7 @@ class Metadata
     void setGenreId(int lgenreid) { m_genreid = lgenreid; }
     int getGenreId() const { return m_genreid; }
 
-    int Year() { return m_year; }
+    int Year() const { return m_year; }
     void setYear(int lyear) { m_year = lyear; }
 
     int Track() const { return m_tracknum; }
@@ -189,7 +188,7 @@ class Metadata
     void incRating();
     void setRating(int lrating) { m_rating = lrating; }
 
-    QDateTime LastPlay();
+    QDateTime LastPlay() const { return m_lastplay; }
     void setLastPlay();
 
     int PlayCount() const { return m_playcount; }
@@ -218,7 +217,7 @@ class Metadata
 
     void persist(void) const;
     void UpdateModTime(void) const;
-    bool hasChanged() {return m_changed;}
+    bool hasChanged() const { return m_changed; }
     int compare(const Metadata *other) const;
     static void setArtistAndTrackFormats();
 
@@ -348,7 +347,7 @@ class MusicNode
 
 //---------------------------------------------------------------------------
 
-class MetadataLoadingThread : public QThread
+class MetadataLoadingThread : public MThread
 {
 
   public:

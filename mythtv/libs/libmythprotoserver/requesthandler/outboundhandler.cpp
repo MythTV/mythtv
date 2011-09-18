@@ -11,6 +11,7 @@ using namespace std;
 #include "sockethandler.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
+#include "compat.h"
 
 #include "requesthandler/outboundhandler.h"
 

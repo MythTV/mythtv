@@ -31,8 +31,10 @@
 const int STATUS_UPDATE_TIME = 1000 * 10; // update the status every 10 seconds
 const int TIME_UPDATE_TIME = 1000 * 1;    // update the time every 1 second
 
-FunctionDialog::FunctionDialog(MythScreenStack *parent, Monitor *monitor)
-               : MythScreenType(parent, "functionpopup"), m_monitor(monitor)
+FunctionDialog::FunctionDialog(MythScreenStack *parent, Monitor *monitor) :
+    MythScreenType(parent, "functionpopup"), m_monitor(monitor),
+    m_captionText(NULL), m_functionList(NULL),
+    m_enabledCheck(NULL), m_okButton(NULL)
 {
 }
 

@@ -64,25 +64,25 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
     if (m_pPayload == NULL)
         return;
 
-    MSocketDevice        *pSockDev = new MSocketDevice( MSocketDevice::Stream );
-    BufferedSocketDevice *pSock    = new BufferedSocketDevice( pSockDev );
+    MSocketDevice        sockDev( MSocketDevice::Stream );
+    BufferedSocketDevice sock   ( &sockDev );
 
-    pSockDev->setBlocking( true );
+    sockDev.setBlocking( true );
 
-    if (pSock->Connect( m_PeerAddress, m_nPeerPort ))
+    if (sock.Connect( m_PeerAddress, m_nPeerPort ))
     {
         // ------------------------------------------------------------------
         // Send NOTIFY message
         // ------------------------------------------------------------------
 
-        if (pSock->WriteBlockDirect( m_pPayload->data(),
+        if (sock.WriteBlockDirect( m_pPayload->data(),
                                      m_pPayload->size() ) != -1) 
         {
             // --------------------------------------------------------------
             // Read first line to determine success/Fail
             // --------------------------------------------------------------
 
-            QString sResponseLine = pSock->ReadLine( 3000 );
+            QString sResponseLine = sock.ReadLine( 3000 );
 
             if ( sResponseLine.length() > 0)
             {
@@ -112,7 +112,7 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
                 QString("UPnpEventTask::Execute - Error sending to %1:%2.")
                     .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
 
-        pSock->Close();
+        sock.Close();
     }
     else
     {
@@ -120,11 +120,5 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
             QString("UPnpEventTask::Execute - Error sending to %1:%2.")
                 .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
     }
-
-    if ( pSock != NULL )
-        delete pSock;
-
-    if ( pSockDev != NULL )
-        delete pSockDev;
 }
 

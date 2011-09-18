@@ -39,18 +39,29 @@ void showLogViewer(void)
         showWarningDialog(QObject::tr("Cannot find any logs to show!"));
 }
 
-LogViewer::LogViewer(MythScreenStack *parent)
-          : MythScreenType(parent, "logviewer")
+LogViewer::LogViewer(MythScreenStack *parent) :
+    MythScreenType(parent, "logviewer"),
+    m_autoUpdate(false),
+    m_updateTime(DEFAULT_UPDATE_TIME),
+    m_updateTimer(NULL),
+    m_currentLog(),
+    m_progressLog(),
+    m_fullLog(),
+    m_logList(NULL),
+    m_logText(NULL),
+    m_exitButton(NULL),
+    m_cancelButton(NULL),
+    m_updateButton(NULL)
 {
-    m_updateTime = gCoreContext->GetNumSetting("LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
-    m_updateTimer = NULL;
-    m_autoUpdate = (gCoreContext->GetNumSetting("LogViewerAutoUpdate", 1) == 1);
+    m_updateTime = gCoreContext->GetNumSetting(
+        "LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
+    m_autoUpdate = gCoreContext->GetNumSetting("LogViewerAutoUpdate", 1);
 }
 
 LogViewer::~LogViewer(void)
 {
     gCoreContext->SaveSetting("LogViewerUpdateTime", m_updateTime);
-    gCoreContext->SaveSetting("LogViewerAutoUpdate", (m_autoUpdate ? "1" : "0"));
+    gCoreContext->SaveSetting("LogViewerAutoUpdate", m_autoUpdate ? "1" : "0");
 
     if (m_updateTimer)
         delete m_updateTimer;

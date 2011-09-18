@@ -44,8 +44,16 @@ enum MonitorPalette
     MP_RGB24 = 4
 };
 
-typedef struct
+class Monitor
 {
+  public:
+    Monitor() :
+        id(0), enabled(0), events(0),
+        width(0), height(0), palette(0), isV4L2(false)
+    {
+    }
+
+  public:
     // used by console view
     int     id;
     QString name;
@@ -62,6 +70,6 @@ typedef struct
     int height;
     int palette;
     bool isV4L2;
-} Monitor;
+};
 
 #endif

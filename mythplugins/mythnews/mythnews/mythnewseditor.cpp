@@ -25,20 +25,20 @@
  */
 MythNewsEditor::MythNewsEditor(NewsSite *site, bool edit,
                                MythScreenStack *parent,
-                               const QString name) :
+                               const QString &name) :
     MythScreenType(parent, name),
     m_lock(QMutex::Recursive),
-    m_site(site),          m_siteName(QString::null),
+    m_site(site),
+    m_siteName((edit && site) ? site->name() : QString()),
     m_editing(edit),
     m_titleText(NULL),     m_nameLabelText(NULL),
     m_urlLabelText(NULL),  m_iconLabelText(NULL),
+    m_podcastLabelText(NULL),
     m_nameEdit(NULL),      m_urlEdit(NULL),
     m_iconEdit(NULL),
     m_okButton(NULL),      m_cancelButton(NULL),
     m_podcastCheck(NULL)
 {
-    if (m_editing)
-        m_siteName = m_site->name();
 }
 
 MythNewsEditor::~MythNewsEditor()

@@ -179,7 +179,7 @@ float MythXDisplay::GetRefreshRate(void)
 
     if (!XF86VidModeGetModeLine(m_disp, m_screen_num, &dot_clock, &mode_line))
     {
-        LOG(VB_GENERAL, LOG_CRIT, "X11 ModeLine query failed");
+        LOG(VB_GENERAL, LOG_ERR, "X11 ModeLine query failed");
         return -1;
     }
 
@@ -188,7 +188,7 @@ float MythXDisplay::GetRefreshRate(void)
     // Catch bad data from video drivers (divide by zero causes return of NaN)
     if (rate == 0.0 || dot_clock == 0)
     {
-        LOG(VB_GENERAL, LOG_CRIT, "X11 ModeLine query returned zeroes");
+        LOG(VB_GENERAL, LOG_ERR, "X11 ModeLine query returned zeroes");
         return -1;
     }
 

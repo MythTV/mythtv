@@ -6,7 +6,6 @@
 
 #include <QFileInfo>
 #include <QRegExp>
-#include <QThread>
 #include <QFile>
 #include <QDir>
 #include <QMap>

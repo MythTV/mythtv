@@ -652,7 +652,7 @@ void MusicCommon::cycleVisualizer(void)
 
             //Find a visual thats not like the previous visual
             do
-                next_visualizer = rand() % m_visualModes.count();
+                next_visualizer = random() % m_visualModes.count();
             while (next_visualizer == m_currentVisual);
             m_currentVisual = next_visualizer;
         }
@@ -1321,7 +1321,7 @@ void MusicCommon::updateUIPlaylist(void)
 
     QList<Track*> songlist = playlist->getSongs();
     QList<Track*>::iterator it = songlist.begin();
-    for (; it != songlist.end(); it++)
+    for (; it != songlist.end(); ++it)
     {
         int trackid = (*it)->getValue();
         Metadata *mdata = gMusicData->all_music->getMetadata(trackid);

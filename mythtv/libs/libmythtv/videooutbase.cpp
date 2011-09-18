@@ -971,17 +971,17 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
         return;
 
     const float video_aspect           = window.GetVideoAspect();
-    const QRect display_video_rect     = window.GetDisplayVideoRect();
-    const QRect video_rect             = window.GetVideoRect();
-    const QRect display_visible_rect   = window.GetDisplayVisibleRect();
-    const QSize video_disp_dim         = window.GetVideoDispDim();
+//     const QRect display_video_rect     = window.GetDisplayVideoRect();
+//     const QRect video_rect             = window.GetVideoRect();
+//     const QRect display_visible_rect   = window.GetDisplayVisibleRect();
+//     const QSize video_disp_dim         = window.GetVideoDispDim();
 
     int pipw, piph;
     VideoFrame *pipimage       = pipplayer->GetCurrentFrame(pipw, piph);
     const bool  pipActive      = pipplayer->IsPIPActive();
     const bool  pipVisible     = pipplayer->IsPIPVisible();
     const float pipVideoAspect = pipplayer->GetVideoAspect();
-    const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
+//     const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
 
     // If PiP is not initialized to values we like, silently ignore the frame.
     if ((video_aspect <= 0) || (pipVideoAspect <= 0) ||

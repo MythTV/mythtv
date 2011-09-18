@@ -584,7 +584,7 @@ static void append_cc(CC708Reader* cc, uint service_num,
 #if DEBUG_CC_SERVICE_2
     {
         uint i;
-	QString msg("append_cc: ");
+        QString msg("append_cc: ");
         for (i = 0; i < cc->buf_size[service_num]; i++)
             msg += QString("0x%1").arg(cc->buf[service_num][i], 0, 16);
         LOG(VB_GENERAL, LOG_DEBUG, msg);

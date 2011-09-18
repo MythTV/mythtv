@@ -13,10 +13,10 @@
 
 
 MythUIProgressBar::MythUIProgressBar(MythUIType *parent, const QString &name)
-                  : MythUIType(parent, name),
-                    m_layout(LayoutHorizontal), m_effect(EffectReveal),
-                    m_total(0),                 m_start(0),
-                    m_current(0)
+    : MythUIType(parent, name),
+      m_layout(LayoutHorizontal), m_effect(EffectReveal),
+      m_total(0),                 m_start(0),
+      m_current(0)
 {
 }
 
@@ -92,8 +92,8 @@ void MythUIProgressBar::CalculatePosition(void)
 
     progressType->SetVisible(false);
 
-    int total = m_total-m_start;
-    int current = m_current-m_start;
+    int total = m_total - m_start;
+    int current = m_current - m_start;
     float percentage = 0.0;
 
     if (total <= 0 || current <= 0 || current > total)
@@ -112,6 +112,7 @@ void MythUIProgressBar::CalculatePosition(void)
     switch (m_effect)
     {
         case EffectReveal :
+
             if (m_layout == LayoutHorizontal)
             {
                 width = (int)((float)fillArea.width() * percentage);
@@ -120,8 +121,10 @@ void MythUIProgressBar::CalculatePosition(void)
             {
                 height = (int)((float)fillArea.height() * percentage);
             }
-        break;
+
+            break;
         case EffectSlide :
+
             if (m_layout == LayoutHorizontal)
             {
                 int newwidth = (int)((float)fillArea.width() * percentage);
@@ -134,25 +137,26 @@ void MythUIProgressBar::CalculatePosition(void)
                 y = height - newheight;
                 height = newheight;
             }
-        break;
+
+            break;
         case EffectAnimate :
             // Not implemented yet
-        break;
+            break;
     }
 
     MythUIImage *progressImage = dynamic_cast<MythUIImage *>(progressType);
     MythUIShape *progressShape = dynamic_cast<MythUIShape *>(progressType);
 
-     if (width <= 0)
-         width = 1;
+    if (width <= 0)
+        width = 1;
 
-     if (height <= 0)
-         height = 1;
+    if (height <= 0)
+        height = 1;
 
     if (progressImage)
-        progressImage->SetCropRect(x,y,width,height);
+        progressImage->SetCropRect(x, y, width, height);
     else if (progressShape)
-        progressShape->SetCropRect(x,y,width,height);
+        progressShape->SetCropRect(x, y, width, height);
 
     SetRedraw();
 }
@@ -165,6 +169,7 @@ void MythUIProgressBar::Finalize()
 void MythUIProgressBar::CopyFrom(MythUIType *base)
 {
     MythUIProgressBar *progressbar = dynamic_cast<MythUIProgressBar *>(base);
+
     if (!progressbar)
         return;
 

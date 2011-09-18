@@ -24,21 +24,28 @@
 
 ////////////////////////////////////////////////////////////////
 
-FileSelector::FileSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList,
-                           FSTYPE type, const QString &startDir, const QString &filemask)
-             :MythScreenType(parent, "FileSelector")
+FileSelector::FileSelector(
+    MythScreenStack *parent, QList<ArchiveItem *> *archiveList,
+    FSTYPE type, const QString &startDir, const QString &filemask) :
+    MythScreenType(parent, "FileSelector"),
+    m_selectorType(type),
+    m_filemask(filemask),
+    m_curDirectory(startDir),
+    m_archiveList(archiveList),
+    m_titleText(NULL),
+    m_fileButtonList(NULL),
+    m_locationEdit(NULL),
+    m_okButton(NULL),
+    m_cancelButton(NULL),
+    m_backButton(NULL),
+    m_homeButton(NULL)
 {
-    m_archiveList = archiveList;
-    m_selectorType = type;
-    m_filemask = filemask;
-    m_curDirectory = startDir;
 }
 
 FileSelector::~FileSelector()
 {
     while (!m_fileData.isEmpty())
         delete m_fileData.takeFirst();
-    m_fileData.clear();
 }
 
 bool FileSelector::Create(void)

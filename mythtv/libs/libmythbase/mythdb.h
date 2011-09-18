@@ -14,12 +14,14 @@ class MDBManager;
 
 class MBASE_PUBLIC MythDB
 {
+    friend class MSqlQuery;
   public:
     MDBManager *GetDBManager(void);
     Settings *GetOldSettings(void);
 
-    static void DBError(const QString &where, const QSqlQuery &query);
-    static QString DBErrorMessage(const QSqlError& err);
+    static QString GetError(const QString &where, const MSqlQuery &query);
+    static void DBError(const QString &where, const MSqlQuery &query);
+    static QString DBErrorMessage(const QSqlError &err);
 
     DatabaseParams GetDatabaseParams(void) const;
     void SetDatabaseParams(const DatabaseParams &params);

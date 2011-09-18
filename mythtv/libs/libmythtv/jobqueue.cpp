@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <fcntl.h>
+#include <pthread.h>
 using namespace std;
 
 #include <QDateTime>
@@ -23,6 +24,7 @@ using namespace std;
 #include "compat.h"
 #include "recordingprofile.h"
 #include "recordinginfo.h"
+#include "mthread.h"
 
 #include "mythdb.h"
 #include "mythdirs.h"
@@ -36,13 +38,6 @@ using namespace std;
 #define O_LARGEFILE 0
 #endif
 
-void QueueProcessorThread::run(void)
-{
-    threadRegister("QueueProcessor");
-    m_parent->RunQueueProcessor();
-    threadDeregister();
-}
-
 #define LOC     QString("JobQueue: ")
 
 JobQueue::JobQueue(bool master) :
@@ -52,7 +47,7 @@ JobQueue::JobQueue(bool master) :
     m_pginfo(NULL),
     runningJobsLock(new QMutex(QMutex::Recursive)),
     isMaster(master),
-    queueThread(new QueueProcessorThread(this)),
+    queueThread(new MThread("JobQueue", this)),
     processQueue(false)
 {
     jobQueueCPU = gCoreContext->GetNumSetting("JobQueueCPU", 0);
@@ -150,7 +145,7 @@ void JobQueue::customEvent(QEvent *e)
     }
 }
 
-void JobQueue::RunQueueProcessor(void)
+void JobQueue::run(void)
 {
     queueThreadCondLock.lock();
     queueThreadCond.wakeAll();
@@ -489,7 +484,7 @@ bool JobQueue::QueueRecordingJobs(const RecordingInfo &recinfo, int jobTypes)
 
     if (jobTypes != JOB_NONE)
     {
-        QString jobHost;
+        QString jobHost = QString("");
 
         if (gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0))
             jobHost = recinfo.GetHostname();
@@ -562,6 +557,9 @@ bool JobQueue::QueueJob(int jobType, uint chanid, const QDateTime &recstartts,
 
         chanidInt = chanid;
     }
+
+    if (host.isNull())
+        host = QString("");
 
     query.prepare("INSERT INTO jobqueue (chanid, starttime, inserttime, type, "
                   "status, statustime, schedruntime, hostname, args, comment, "
@@ -1624,7 +1622,7 @@ void JobQueue::CleanupOldJobsInQueue()
 void JobQueue::ProcessJob(JobQueueEntry job)
 {
     int jobID = job.id;
-    QString name = QString("jobqueue%1%2").arg(jobID).arg(rand());
+    QString name = QString("jobqueue%1%2").arg(jobID).arg(random());
 
     if (!MSqlQuery::testDBConnection())
     {

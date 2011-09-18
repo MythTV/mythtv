@@ -6,7 +6,6 @@
 
 #include <sys/time.h>
 #include <time.h>
-#include <QThread>
 #ifdef MMX
 #undef MMX
 #define MMXBLAH
@@ -27,7 +26,6 @@ using namespace std;
 
 // Qt headers
 #include <QString>
-#include <QThread>
 
 // MythTV headers
 #include "v4lrecorder.h"
@@ -35,6 +33,7 @@ using namespace std;
 #include "cc608decoder.h"
 #include "filter.h"
 #include "minilzo.h"
+#include "mthread.h"
 
 #include "mythtvexp.h"
 
@@ -47,22 +46,22 @@ class FilterChain;
 class AudioInput;
 class NuppelVideoRecorder;
 
-class NVRWriteThread : public QThread
+class NVRWriteThread : public MThread
 {
-    Q_OBJECT
   public:
-    NVRWriteThread(NuppelVideoRecorder *parent) : m_parent(parent) {}
+    NVRWriteThread(NuppelVideoRecorder *parent) :
+        MThread("NVRWrite"), m_parent(parent) {}
     virtual ~NVRWriteThread() { wait(); m_parent = NULL; }
     virtual void run(void);
   private:
     NuppelVideoRecorder *m_parent;
 };
 
-class NVRAudioThread : public QThread
+class NVRAudioThread : public MThread
 {
-    Q_OBJECT
   public:
-    NVRAudioThread(NuppelVideoRecorder *parent) : m_parent(parent) {}
+    NVRAudioThread(NuppelVideoRecorder *parent) :
+        MThread("NVRAudio"), m_parent(parent) {}
     virtual ~NVRAudioThread() { wait(); m_parent = NULL; }
     virtual void run(void);
   private:
@@ -87,7 +86,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
                                const QString &vbidev);
  
     void Initialize(void);
-    void StartRecording(void);
+    void run(void);
     void StopRecording(void); 
     
     virtual void Pause(bool clear = true);

@@ -167,7 +167,7 @@ int MythCDROMLinux::driveStatus()
 
     if (drive_status == -1)   // Very unlikely, but we should check
     {
-        LOG(VB_MEDIA, LOG_INFO, LOC + ":driveStatus() - ioctl failed: " + ENO);
+        LOG(VB_MEDIA, LOG_ERR, LOC + ":driveStatus() - ioctl failed: " + ENO);
         return CDS_NO_INFO;
     }
 
@@ -406,8 +406,8 @@ MythMediaStatus MythCDROMLinux::checkMedia()
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
         default:
-            LOG(VB_GENERAL, LOG_CRIT, "Failed to get drive status of " +
-                                      m_DevicePath + " : " + ENO);
+            LOG(VB_GENERAL, LOG_ERR, "Failed to get drive status of " +
+                m_DevicePath + " : " + ENO);
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
     }
@@ -628,7 +628,7 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
 
     if (stat(path.toLocal8Bit().constData(), &sb) < 0)
     {
-        LOG(VB_GENERAL, LOG_CRIT, LOC + ":isSameDevice() -- " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + ":isSameDevice() -- " +
             QString("Failed to stat '%1'").arg(path) + ENO);
         return false;
     }
@@ -637,7 +637,7 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
     // Check against m_DevicePath...
     if (stat(m_DevicePath.toLocal8Bit().constData(), &sb) < 0)
     {
-        LOG(VB_GENERAL, LOG_CRIT, LOC + ":isSameDevice() -- " +
+        LOG(VB_GENERAL, LOG_ERR, LOC + ":isSameDevice() -- " +
             QString("Failed to stat '%1'").arg(m_DevicePath) + ENO);
         return false;
     }

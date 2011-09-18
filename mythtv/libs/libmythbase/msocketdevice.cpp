@@ -51,9 +51,10 @@
 
 class MSocketDevicePrivate
 {
+
 public:
-    MSocketDevicePrivate( MSocketDevice::Protocol p )
-	: protocol(p)
+    MSocketDevicePrivate(MSocketDevice::Protocol p)
+            : protocol(p)
     { }
 
     MSocketDevice::Protocol protocol;
@@ -95,9 +96,9 @@ public:
     \value IPv4 The socket is an IPv4 socket.
     \value IPv6 The socket is an IPv6 socket.
     \value Unknown The protocol family of the socket is not known. This can
-	   happen if you use MSocketDevice with an already existing socket; it
-	   tries to determine the protocol family, but this can fail if the
-	   protocol family is not known to MSocketDevice.
+    happen if you use MSocketDevice with an already existing socket; it
+    tries to determine the protocol family, but this can fail if the
+    protocol family is not known to MSocketDevice.
 
     \sa protocol() setSocket()
 */
@@ -112,7 +113,7 @@ public:
     \value AlreadyBound  The device is already bound, according to bind().
 
     \value Inaccessible  The operating system or firewall prohibited
-			the action.
+   the action.
 
     \value NoResources  The operating system ran out of a resource.
 
@@ -155,16 +156,16 @@ public:
     socket, or MSocketDevice::Datagram for an unreliable,
     connectionless UDP socket.
 */
-MSocketDevice::MSocketDevice( int socket, Type type )
-    : fd( socket ), t( type ), p( 0 ), pp( 0 ), e( NoError ),
-      d(new MSocketDevicePrivate(Unknown))
+MSocketDevice::MSocketDevice(int socket, Type type)
+        : fd(socket), t(type), p(0), pp(0), e(NoError),
+        d(new MSocketDevicePrivate(Unknown))
 {
 #if defined(MSOCKETDEVICE_DEBUG)
-    qDebug( "MSocketDevice: Created MSocketDevice %p (socket %x, type %d)",
-	   this, socket, type );
+    qDebug("MSocketDevice: Created MSocketDevice %p (socket %x, type %d)",
+           this, socket, type);
 #endif
     init();
-    setSocket( socket, type );
+    setSocket(socket, type);
 }
 
 /*!
@@ -173,27 +174,28 @@ MSocketDevice::MSocketDevice( int socket, Type type )
     The \a type argument must be either MSocketDevice::Stream for a
     reliable, connection-oriented TCP socket, or \c
     MSocketDevice::Datagram for an unreliable UDP socket.
-    The socket protocol type is defaulting to unknown leaving it to 
+    The socket protocol type is defaulting to unknown leaving it to
     connect() to determine if an IPv6 or IPv4 type is required.
 
     \sa blocking() protocol()
 */
-MSocketDevice::MSocketDevice( Type type )
-    : fd( -1 ), t( type ), p( 0 ), pp( 0 ), e( NoError ),
-      d(new MSocketDevicePrivate(Unknown))
+MSocketDevice::MSocketDevice(Type type)
+        : fd(-1), t(type), p(0), pp(0), e(NoError),
+        d(new MSocketDevicePrivate(Unknown))
 
-    //  d(new MSocketDevicePrivate(IPv4))
+        //  d(new MSocketDevicePrivate(IPv4))
 {
 #if defined(MSOCKETDEVICE_DEBUG)
-    qDebug( "MSocketDevice: Created MSocketDevice object %p, type %d",
-	    this, type );
+    qDebug("MSocketDevice: Created MSocketDevice object %p, type %d",
+           this, type);
 #endif
     init();
 
     // For the time being, if it's of type Datagram create the socket now
     // rather than later during connect (since there wont be one with udp)
+
     if (type == Datagram)
-        setSocket( createNewSocket(), type );
+        setSocket(createNewSocket(), type);
 }
 
 /*!
@@ -213,16 +215,16 @@ MSocketDevice::MSocketDevice( Type type )
 
     \sa blocking() protocol()
 */
-MSocketDevice::MSocketDevice( Type type, Protocol protocol, int )
-    : fd( -1 ), t( type ), p( 0 ), pp( 0 ), e( NoError ),
-      d(new MSocketDevicePrivate(protocol))
+MSocketDevice::MSocketDevice(Type type, Protocol protocol, int)
+        : fd(-1), t(type), p(0), pp(0), e(NoError),
+        d(new MSocketDevicePrivate(protocol))
 {
 #if defined(MSOCKETDEVICE_DEBUG)
-    qDebug( "MSocketDevice: Created MSocketDevice object %p, type %d",
-	    this, type );
+    qDebug("MSocketDevice: Created MSocketDevice object %p, type %d",
+           this, type);
 #endif
     init();
-    setSocket( createNewSocket(), type );
+    setSocket(createNewSocket(), type);
 }
 
 /*!
@@ -234,7 +236,7 @@ MSocketDevice::~MSocketDevice()
     delete d;
     d = 0;
 #if defined(MSOCKETDEVICE_DEBUG)
-    qDebug( "MSocketDevice: Destroyed MSocketDevice %p", this );
+    qDebug("MSocketDevice: Destroyed MSocketDevice %p", this);
 #endif
 }
 
@@ -277,12 +279,13 @@ MSocketDevice::Type MSocketDevice::type() const
 */
 MSocketDevice::Protocol MSocketDevice::protocol() const
 {
-    if ( d->protocol == Unknown )
-	d->protocol = getProtocol();
+    if (d->protocol == Unknown)
+        d->protocol = getProtocol();
+
     return d->protocol;
 }
 
-void MSocketDevice::setProtocol( Protocol protocol )
+void MSocketDevice::setProtocol(Protocol protocol)
 {
     d->protocol = protocol;
 }
@@ -311,19 +314,26 @@ int MSocketDevice::socket() const
 
     \sa isValid(), close()
 */
-void MSocketDevice::setSocket( int socket, Type type )
+void MSocketDevice::setSocket(int socket, Type type)
 {
-    if ( fd != -1 )			// close any open socket
-	close();
+    if (fd != -1)     // close any open socket
+        close();
+
 #if defined(MSOCKETDEVICE_DEBUG)
-    qDebug( "MSocketDevice::setSocket: socket %x, type %d", socket, type );
+    qDebug("MSocketDevice::setSocket: socket %x, type %d", socket, type);
+
 #endif
     t = type;
+
     fd = socket;
+
     d->protocol = Unknown;
+
     e = NoError;
+
     //resetStatus();
-    open( ReadWrite );
+    open(ReadWrite);
+
     fetchConnectionParameters();
 }
 
@@ -335,14 +345,17 @@ void MSocketDevice::setSocket( int socket, Type type )
 
     \sa close()
 */
-bool MSocketDevice::open( OpenMode mode )
+bool MSocketDevice::open(OpenMode mode)
 {
-    if ( isOpen() || !isValid() )
-	return false;
+    if (isOpen() || !isValid())
+        return false;
+
 #if defined(MSOCKETDEVICE_DEBUG)
-    qDebug( "MSocketDevice::open: mode %x", mode );
+    qDebug("MSocketDevice::open: mode %x", mode);
+
 #endif
-    setOpenMode( (mode & ReadWrite) | Unbuffered );
+    setOpenMode((mode & ReadWrite) | Unbuffered);
+
     return true;
 }
 
@@ -411,7 +424,7 @@ bool MSocketDevice::atEnd() const
 */
 bool MSocketDevice::broadcast() const
 {
-	return option( Broadcast );
+    return option(Broadcast);
 }
 
 /*!
@@ -419,9 +432,9 @@ bool MSocketDevice::broadcast() const
 
     \sa broadcast()
 */
-void MSocketDevice::setBroadcast( bool enable )
+void MSocketDevice::setBroadcast(bool enable)
 {
-    setOption( Broadcast, enable );
+    setOption(Broadcast, enable);
 }
 
 /*!
@@ -433,7 +446,7 @@ void MSocketDevice::setBroadcast( bool enable )
 */
 bool MSocketDevice::addressReusable() const
 {
-    return option( ReuseAddress );
+    return option(ReuseAddress);
 }
 
 
@@ -450,9 +463,9 @@ bool MSocketDevice::addressReusable() const
 
     \sa addressReusable()
 */
-void MSocketDevice::setAddressReusable( bool enable )
+void MSocketDevice::setAddressReusable(bool enable)
 {
-    setOption( ReuseAddress, enable );
+    setOption(ReuseAddress, enable);
 }
 
 
@@ -463,7 +476,7 @@ void MSocketDevice::setAddressReusable( bool enable )
 */
 bool MSocketDevice::keepalive() const
 {
-	return option( Keepalive );
+    return option(Keepalive);
 }
 
 /*!
@@ -471,9 +484,9 @@ bool MSocketDevice::keepalive() const
 
     \sa keepalive()
 */
-void MSocketDevice::setKeepalive( bool enable )
+void MSocketDevice::setKeepalive(bool enable)
 {
-    setOption( Keepalive, enable );
+    setOption(Keepalive, enable);
 }
 
 
@@ -484,7 +497,7 @@ void MSocketDevice::setKeepalive( bool enable )
 */
 int MSocketDevice::receiveBufferSize() const
 {
-    return option( ReceiveBuffer );
+    return option(ReceiveBuffer);
 }
 
 
@@ -499,9 +512,9 @@ int MSocketDevice::receiveBufferSize() const
     large amounts of data is probably best with a buffer size of
     49152.
 */
-void MSocketDevice::setReceiveBufferSize( uint size )
+void MSocketDevice::setReceiveBufferSize(uint size)
 {
-    setOption( ReceiveBuffer, size );
+    setOption(ReceiveBuffer, size);
 }
 
 
@@ -512,7 +525,7 @@ void MSocketDevice::setReceiveBufferSize( uint size )
 */
 int MSocketDevice::sendBufferSize() const
 {
-    return option( SendBuffer );
+    return option(SendBuffer);
 }
 
 
@@ -526,9 +539,9 @@ int MSocketDevice::sendBufferSize() const
     large amounts of data is probably best with a buffer size of
     49152.
 */
-void MSocketDevice::setSendBufferSize( uint size )
+void MSocketDevice::setSendBufferSize(uint size)
 {
-    setOption( SendBuffer, size );
+    setOption(SendBuffer, size);
 }
 
 
@@ -555,10 +568,11 @@ QHostAddress MSocketDevice::address() const
 {
 
     QString ipaddress;
+
     if (a.toString().startsWith("0:0:0:0:0:FFFF:"))
     {
         Q_IPV6ADDR addr = a.toIPv6Address();
-         // addr contains 16 unsigned characters
+        // addr contains 16 unsigned characters
 
         ipaddress = QString("%1.%2.%3.%4").arg(addr[12]).arg(addr[13]).arg(addr[14]).arg(addr[15]);
     }
@@ -581,7 +595,7 @@ MSocketDevice::Error MSocketDevice::error() const
 /*!
     Allows subclasses to set the error state to \a err.
 */
-void MSocketDevice::setError( Error err )
+void MSocketDevice::setError(Error err)
 {
     e = err;
 }

@@ -8,6 +8,18 @@
 
 #define LOC QString("LiveTVChain(%1): ").arg(m_id)
 
+static inline void clear(LiveTVChainEntry &entry)
+{
+    entry.chanid = 0;
+    entry.starttime.setTime_t(0);
+    entry.endtime = QDateTime();
+    entry.discontinuity = true;
+    entry.hostprefix = QString();
+    entry.cardtype = QString();
+    entry.channum = QString();
+    entry.inputname = QString();
+}
+
 /** \class LiveTVChain
  *  \brief Keeps track of recordings in a current LiveTV instance
  */
@@ -16,6 +28,7 @@ LiveTVChain::LiveTVChain() :
     m_curpos(0), m_cur_chanid(0),
     m_switchid(-1), m_jumppos(0)
 {
+    clear(m_switchentry);
 }
 
 LiveTVChain::~LiveTVChain()
@@ -249,7 +262,7 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
     int size = m_chain.count();
     int new_at = (size && (at < 0 || at >= size)) ? size - 1 : at;
 
-    if (size && new_at >= 0 && new_at <= size)
+    if (size && new_at >= 0 && new_at < size)
         entry = m_chain[new_at];
     else
     {
@@ -261,8 +274,7 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
                 "configuration are reporting errors.  This issue is commonly "
                 "caused by failing to complete all setup steps properly.  You "
                 "may wish to review the documentation for mythtv-setup.");
-        entry.chanid = 0;
-        entry.starttime.setTime_t(0);
+        clear(entry);
     }
 }
 

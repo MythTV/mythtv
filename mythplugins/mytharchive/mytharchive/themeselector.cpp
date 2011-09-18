@@ -24,13 +24,25 @@
 #include "mythburn.h"
 #include "themeselector.h"
 
-DVDThemeSelector::DVDThemeSelector(MythScreenStack *parent, MythScreenType *destinationScreen,
-                             ArchiveDestination archiveDestination, QString name)
-                : MythScreenType(parent, name, true)
+DVDThemeSelector::DVDThemeSelector(
+    MythScreenStack *parent, MythScreenType *destinationScreen,
+    ArchiveDestination archiveDestination, QString name) :
+    MythScreenType(parent, name, true),
+    m_destinationScreen(destinationScreen),
+    m_archiveDestination(archiveDestination),
+    themeDir(GetShareDir() + "mytharchive/themes/"),
+    theme_selector(NULL),
+    theme_image(NULL),
+    theme_no(0),
+    intro_image(NULL),
+    mainmenu_image(NULL),
+    chapter_image(NULL),
+    details_image(NULL),
+    themedesc_text(NULL),
+    m_nextButton(NULL),
+    m_prevButton(NULL),
+    m_cancelButton(NULL)
 {
-    m_destinationScreen = destinationScreen;
-    m_archiveDestination = archiveDestination;
-    themeDir = GetShareDir() + "mytharchive/themes/";
 }
 
 DVDThemeSelector::~DVDThemeSelector(void)

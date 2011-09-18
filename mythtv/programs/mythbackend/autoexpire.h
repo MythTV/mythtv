@@ -7,14 +7,15 @@
 using namespace std;
 
 #include <QWaitCondition>
+#include <QDateTime>
+#include <QPointer>
 #include <QObject>
 #include <QString>
 #include <QMutex>
 #include <QSet>
 #include <QMap>
-#include <QDateTime>
-#include <QThread>
-#include <QPointer>
+
+#include "mthread.h"
 
 class ProgramInfo;
 class EncoderLink;
@@ -36,22 +37,21 @@ enum ExpireMethodType {
 
 class AutoExpire;
 
-class ExpireThread : public QThread
+class ExpireThread : public MThread
 {
-    Q_OBJECT
   public:
-    ExpireThread(AutoExpire *p) : m_parent(p) {}
+    ExpireThread(AutoExpire *p) : MThread("Expire"), m_parent(p) {}
     virtual ~ExpireThread() { wait(); }
     virtual void run(void);
   private:
     QPointer<AutoExpire> m_parent;
 };
 
-class UpdateThread : public QThread
+class UpdateThread : public QObject, public MThread
 {
     Q_OBJECT
   public:
-    UpdateThread(AutoExpire *p) : m_parent(p) {}
+    UpdateThread(AutoExpire *p) : MThread("Update"), m_parent(p) {}
     virtual ~UpdateThread() { wait(); }
     virtual void run(void);
   private:

@@ -323,7 +323,7 @@ bool OpenGLVideo::OptimiseFilters(void)
     // and link filters
     uint buffers_needed = 1;
     bool last_filter    = true;
-    for (it = filters.rbegin(); it != filters.rend(); it++)
+    for (it = filters.rbegin(); it != filters.rend(); ++it)
     {
         if (!last_filter)
         {
@@ -393,7 +393,7 @@ void OpenGLVideo::SetFiltering(void)
     glfilt_map_t::reverse_iterator rit;
     int last_filter = 0;
 
-    for (rit = filters.rbegin(); rit != filters.rend(); rit++)
+    for (rit = filters.rbegin(); rit != filters.rend(); ++rit)
     {
         if (last_filter == 1)
         {
@@ -405,7 +405,7 @@ void OpenGLVideo::SetFiltering(void)
             SetTextureFilters(&(rit->second->frameBufferTextures),
                               GL_NEAREST, GL_CLAMP_TO_EDGE);
         }
-        last_filter++;
+        ++last_filter;
     }
 }
 
@@ -505,12 +505,12 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
     vector<GLuint>::iterator it;
 
     temp = filters[filter]->fragmentPrograms;
-    for (it = temp.begin(); it != temp.end(); it++)
+    for (it = temp.begin(); it != temp.end(); ++it)
         gl_context->DeleteShaderObject(*it);
     filters[filter]->fragmentPrograms.clear();
 
     temp = filters[filter]->frameBuffers;
-    for (it = temp.begin(); it != temp.end(); it++)
+    for (it = temp.begin(); it != temp.end(); ++it)
         gl_context->DeleteFrameBuffer(*it);
     filters[filter]->frameBuffers.clear();
 
@@ -761,12 +761,12 @@ QSize OpenGLVideo::GetTextureSize(const QSize &size)
     return QSize(w, h);
 }
 
-uint OpenGLVideo::GetInputTexture(void)
+uint OpenGLVideo::GetInputTexture(void) const
 {
     return inputTextures[0];
 }
 
-uint OpenGLVideo::GetTextureType(void)
+uint OpenGLVideo::GetTextureType(void) const
 {
     return textureType;
 }
@@ -883,7 +883,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
     QSize realsize  = GetTextureSize(video_disp_dim);
 
     glfilt_map_t::iterator it;
-    for (it = filters.begin(); it != filters.end(); it++)
+    for (it = filters.begin(); it != filters.end(); ++it)
     {
         OpenGLFilterType type = it->first;
         OpenGLFilter *filter = it->second;

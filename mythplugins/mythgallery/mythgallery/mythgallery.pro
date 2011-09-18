@@ -19,11 +19,13 @@ INCLUDEPATH += $${PREFIX}/include/mythtv
 # Input
 HEADERS += iconview.h          singleview.h
 HEADERS += imageview.h
+HEADERS += galleryfilter.h galleryfilterdlg.h
 HEADERS += gallerysettings.h   dbcheck.h
 HEADERS += galleryutil.h
 HEADERS += thumbgenerator.h    thumbview.h
 SOURCES += iconview.cpp        singleview.cpp
 SOURCES += imageview.cpp
+SOURCES += galleryfilter.cpp galleryfilterdlg.cpp
 SOURCES += gallerysettings.cpp dbcheck.cpp
 SOURCES += galleryutil.cpp
 SOURCES += thumbgenerator.cpp  thumbview.cpp

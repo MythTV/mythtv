@@ -1060,6 +1060,13 @@ typedef struct AVPanScan{
     uint8_t atsc_cc_buf[1024];\
     int atsc_cc_len;\
 \
+    /** SCTE CC data CEA-608 \
+     * - encoding: unused\
+     * - decoding: Set by libavcodec
+     */\
+    uint8_t scte_cc_buf[1024];\
+    int scte_cc_len;\
+\
 
 #define FF_QSCALE_TYPE_MPEG1 0
 #define FF_QSCALE_TYPE_MPEG2 1
@@ -3176,6 +3183,7 @@ typedef struct AVSubtitle {
     unsigned num_rects;
     AVSubtitleRect **rects;
     int64_t pts;    ///< Same as packet pts, in AV_TIME_BASE
+    int forced;
 } AVSubtitle;
 
 /* packet functions */

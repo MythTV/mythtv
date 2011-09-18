@@ -1,9 +1,9 @@
 /*
-	main.cpp
+    main.cpp
 
-	MythArchive - mythtv plugin
-	
-	Starting point for the MythArchive module
+    MythArchive - mythtv plugin
+    
+    Starting point for the MythArchive module
 */
 #include <iostream>
 #include <cstdlib>

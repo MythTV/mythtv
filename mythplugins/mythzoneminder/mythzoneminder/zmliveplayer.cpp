@@ -118,10 +118,11 @@ bool ZMLivePlayer::hideAll(void)
 bool ZMLivePlayer::initMonitorLayout()
 {
     // if we haven't got any monitors there's not much we can do so bail out!
-    if (m_monitors->size() == 0)
+    if (m_monitors->empty())
     {
         LOG(VB_GENERAL, LOG_ERR, "Cannot find any monitors. Bailing out!");
-        ShowOkPopup(tr("Can't show live view.\nYou don't have any monitors defined!"));
+        ShowOkPopup(tr("Can't show live view.") + "\n" +
+                    tr("You don't have any monitors defined!"));
         return false;
     }
 
@@ -142,7 +143,7 @@ ZMLivePlayer::~ZMLivePlayer()
         QString s = "";
         Player *p;
         vector<Player*>::iterator i = m_players->begin();
-        for (; i != m_players->end(); i++)
+        for (; i != m_players->end(); ++i)
         {
             p = *i;
             if (s != "")
@@ -223,7 +224,7 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
 
     // find the old monitor ID in the list of available monitors
     vector<Monitor*>::iterator i = m_monitors->begin();
-    for (; i != m_monitors->end(); i++)
+    for (; i != m_monitors->end(); ++i)
     {
         mon = *i;
         if (oldMonID == mon->id)
@@ -234,7 +235,7 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
 
     // get the next monitor in the list
     if (i != m_monitors->end())
-        i++;
+        ++i;
 
     // wrap around to the start if we've reached the end
     if (i == m_monitors->end())
@@ -261,7 +262,7 @@ void ZMLivePlayer::updateFrame()
     QList<int> monList;
     Player *p;
     vector<Player*>::iterator i = m_players->begin();
-    for (; i != m_players->end(); i++)
+    for (; i != m_players->end(); ++i)
     {
         p = *i;
         if (!monList.contains(p->getMonitor()->id))
@@ -278,7 +279,7 @@ void ZMLivePlayer::updateFrame()
             // update each player that is displaying this monitor
             Player *p;
             vector<Player*>::iterator i = m_players->begin();
-            for (; i != m_players->end(); i++)
+            for (; i != m_players->end(); ++i)
             {
                 p = *i;
                 if (p->getMonitor()->id == monList[x])
@@ -342,7 +343,7 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
 
                 // try to find a monitor that matches the monID
                 vector<Monitor*>::iterator i = m_monitors->begin();
-                for (; i != m_monitors->end(); i++)
+                for (; i != m_monitors->end(); ++i)
                 {
                     if ((*i)->id == monID)
                     {
@@ -387,13 +388,10 @@ void ZMLivePlayer::getMonitorList(void)
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-Player::Player()
+Player::Player() :
+    m_frameImage(NULL), m_statusText(NULL), m_cameraText(NULL),
+    m_image(NULL), m_rgba(NULL)
 {
-    m_frameImage = NULL;
-    m_statusText = NULL;
-    m_cameraText = NULL;
-    m_image = NULL;
-    m_rgba = NULL;
 }
 
 Player::~Player()

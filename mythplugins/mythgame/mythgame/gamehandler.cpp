@@ -318,12 +318,12 @@ static void UpdateGameCounts(QStringList updatelist)
                 QString System = query.value(1).toString();
                 int spandisks = query.value(2).toInt();
                 QString GameName = query.value(3).toString();
-                int extlength = 0;
 
                 basename = RomName;
 
                 if (spandisks)
                 {
+                    int extlength = 0;
                     pos = RomName.lastIndexOf(".");
                     if (pos > 1)
                     {
@@ -517,38 +517,35 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
         m_progressDlg->SetTotal(query.size());
 
     // For every file we know about, check to see if it still exists.
-    if (query.isActive() && query.size() > 0)
+    while (query.next())
     {
-        while (query.next())
+        QString RomName = query.value(0).toString();
+        QString RomPath = query.value(1).toString();
+        QString GameName = query.value(2).toString();
+        if (RomName != QString::null)
         {
-            QString RomName = query.value(0).toString();
-            QString RomPath = query.value(1).toString();
-            QString GameName = query.value(2).toString();
-            if (RomName != QString::null)
+            if ((iter = m_GameMap.find(RomName)) != m_GameMap.end())
             {
-                if ((iter = m_GameMap.find(RomName)) != m_GameMap.end())
-                {
-                    // If it's both on disk and in the database we're done with it.
-                    m_GameMap.erase(iter);
-                }
-                else
-                {
-                    // If it's only in the database add it to our list and mark it for
-                    // removal.
-                    m_GameMap[RomName] = GameScan(RomName,RomPath + "/" + RomName,inDatabase,
-                                         GameName,RomPath);
-                }
+                // If it's both on disk and in the database we're done with it.
+                m_GameMap.erase(iter);
             }
-            if (m_progressDlg)
-                m_progressDlg->SetProgress(++counter);
+            else
+            {
+                // If it's only in the database add it to our list and mark it for
+                // removal.
+                m_GameMap[RomName] = GameScan(RomName,RomPath + "/" + RomName,inDatabase,
+                                        GameName,RomPath);
+            }
         }
+        if (m_progressDlg)
+            m_progressDlg->SetProgress(++counter);
     }
 
     if (m_progressDlg)
     {
         m_progressDlg->Close();
         m_progressDlg = NULL;
-}
+    }
 }
 
 // Recurse through the directory and gather a count on how many files there are to process.
@@ -722,7 +719,10 @@ void GameHandler::processGames(GameHandler *handler)
         if (busyDialog->Create())
             popupStack->AddScreen(busyDialog, false);
         else
-            delete m_progressDlg;
+        {
+            delete busyDialog;
+            busyDialog = NULL;
+        }
 
         m_GameMap[handler->SystemCmdLine()] =
                 GameScan(handler->SystemCmdLine(),
@@ -739,7 +739,7 @@ void GameHandler::processGames(GameHandler *handler)
     }
     else
     {
-        QString message = QObject::tr("Scanning for %1 game(s)...")
+        QString message = QObject::tr("Scanning for %1 games...")
                                                 .arg(handler->SystemName());
         CreateProgress(message);
 

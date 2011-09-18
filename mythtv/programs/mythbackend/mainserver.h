@@ -3,7 +3,6 @@
 
 #include <QReadWriteLock>
 #include <QStringList>
-#include <QThreadPool>
 #include <QRunnable>
 #include <QEvent>
 #include <QMutex>
@@ -15,6 +14,7 @@ using namespace std;
 
 #include "tv.h"
 #include "playbacksock.h"
+#include "mthreadpool.h"
 #include "encoderlink.h"
 #include "filetransfer.h"
 #include "scheduler.h"
@@ -28,26 +28,32 @@ using namespace std;
 #undef DeleteFile
 #endif
 
-class ProcessRequestThread;
 class QUrl;
 class MythServer;
 class QTimer;
 class FileSystemInfo;
 class MetadataFactory;
+class FreeSpaceUpdater;
+
 class DeleteStruct 
 {
     friend class MainServer;
   public:
     DeleteStruct(MainServer *ms, QString filename, QString title,
-             uint chanid, QDateTime recstartts, QDateTime recendts, 
-             bool forceMetadataDelete) : 
-                 m_ms(ms), m_filename(filename), m_title(title), 
-                 m_chanid(chanid), m_recstartts(recstartts), 
-                 m_recendts(recendts),
-                 m_forceMetadataDelete(forceMetadataDelete)  {}
+                 uint chanid, QDateTime recstartts, QDateTime recendts, 
+                 bool forceMetadataDelete) : 
+        m_ms(ms), m_filename(filename), m_title(title), 
+        m_chanid(chanid), m_recstartts(recstartts), 
+        m_recendts(recendts),
+        m_forceMetadataDelete(forceMetadataDelete), m_fd(-1), m_size(0)
+    {
+    }
 
     DeleteStruct(MainServer *ms, QString filename, int fd, off_t size) : 
-             m_ms(ms), m_filename(filename), m_fd(fd), m_size(size)  {}
+        m_ms(ms), m_filename(filename), m_chanid(0),
+        m_forceMetadataDelete(false), m_fd(fd), m_size(size)
+    {
+    }
 
   protected:
     MainServer *m_ms;
@@ -69,7 +75,8 @@ class DeleteThread : public QRunnable, public DeleteStruct
                  bool forceMetadataDelete) :
                      DeleteStruct(ms, filename, title, chanid, recstartts,
                                   recendts, forceMetadataDelete)  {}
-    void start(void) { QThreadPool::globalInstance()->start(this); }
+    void start(void)
+        { MThreadPool::globalInstance()->startReserved(this, "DeleteThread"); }
     void run(void);
 };
 
@@ -78,7 +85,8 @@ class TruncateThread : public QRunnable, public DeleteStruct
   public:
     TruncateThread(MainServer *ms, QString filename, int fd, off_t size) :
                 DeleteStruct(ms, filename, fd, size)  {}
-    void start(void) { QThreadPool::globalInstance()->start(this); }
+    void start(void)
+        { MThreadPool::globalInstance()->start(this, "Truncate"); }
     void run(void);
 };
 
@@ -88,6 +96,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     friend class DeleteThread;
     friend class TruncateThread;
+    friend class FreeSpaceUpdater;
   public:
     MainServer(bool master, int port,
                QMap<int, EncoderLink *> *tvList,
@@ -103,7 +112,6 @@ class MainServer : public QObject, public MythSocketCBs
     void ShutSlaveBackendsDown(QString &haltcmd);
 
     void ProcessRequest(MythSocket *sock);
-    void MarkUnused(ProcessRequestThread *prt);
 
     void readyRead(MythSocket *socket);
     void connectionClosed(MythSocket *socket);
@@ -263,16 +271,18 @@ class MainServer : public QObject, public MythSocketCBs
     vector<PlaybackSock *> playbackList;
     vector<FileTransfer *> fileTransferList;
 
+    QMutex masterFreeSpaceListLock;
+    FreeSpaceUpdater *masterFreeSpaceListUpdater;
+    QWaitCondition masterFreeSpaceListWait;
+    QStringList masterFreeSpaceList;
+
     QTimer *masterServerReconnect; // audited ref #5318
     PlaybackSock *masterServer;
 
     bool ismaster;
 
     QMutex deletelock;
-    QMutex threadPoolLock;
-    QWaitCondition threadPoolCond;
-    MythDeque<ProcessRequestThread *> threadPool;
-    MythDeque<ProcessRequestThread *> threadPoolAll;
+    MThreadPool threadPool;
 
     bool masterBackendOverride;
 

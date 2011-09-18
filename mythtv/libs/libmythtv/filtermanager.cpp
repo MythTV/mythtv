@@ -72,7 +72,7 @@ FilterManager::FilterManager()
     {
         QStringList LibList = FiltDir.entryList();
         for (QStringList::iterator i = LibList.begin(); i != LibList.end();
-             i++)
+             ++i)
         {
             QString path = FiltDir.filePath(*i);
             if (path.length() <= 1)
@@ -372,7 +372,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 
     nbufsize = -1;
 
-    if (!FiltInfoChain.size())
+    if (FiltInfoChain.empty())
     {
         delete FiltChain;
         FiltChain = NULL;

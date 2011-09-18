@@ -1,14 +1,14 @@
 #include <QCoreApplication>
 #include <QFileInfo>
-#include <QThread>
 
 #include "previewgeneratorqueue.h"
 #include "previewgenerator.h"
 #include "mythcorecontext.h"
 #include "mythcontext.h"
+#include "mythlogging.h"
 #include "remoteutil.h"
 #include "mythdirs.h"
-#include "mythlogging.h"
+#include "mthread.h"
 
 #define LOC QString("PreviewQueue: ")
 
@@ -31,6 +31,7 @@ void PreviewGeneratorQueue::TeardownPreviewGeneratorQueue()
 PreviewGeneratorQueue::PreviewGeneratorQueue(
     PreviewGenerator::Mode mode,
     uint maxAttempts, uint minBlockSeconds) :
+    MThread("PreviewGeneratorQueue"),
     m_mode(mode),
     m_running(0), m_maxThreads(2),
     m_maxAttempts(maxAttempts), m_minBlockSeconds(minBlockSeconds)
@@ -41,7 +42,7 @@ PreviewGeneratorQueue::PreviewGeneratorQueue(
         m_maxThreads = (idealThreads >= 1) ? idealThreads * 2 : 2;
     }
 
-    moveToThread(this);
+    moveToThread(qthread());
     start();
 }
 
@@ -57,13 +58,6 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
     }
     locker.unlock();
     wait();
-}
-
-void PreviewGeneratorQueue::run(void)
-{
-    threadRegister("PreviewGeneratorQueue");
-    exec();
-    threadDeregister();
 }
 
 void PreviewGeneratorQueue::GetPreviewImage(

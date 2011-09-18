@@ -423,7 +423,7 @@ void LCDProcClient::init()
     QString aString;
     lcd_keystring = "";
 
-    connected = TRUE;
+    connected = true;
 
     // This gets called when we receive the "connect" string from the server
     // indicating that "hello" was succesful
@@ -1683,28 +1683,6 @@ void LCDProcClient::unPopMenu()
     // Stop the scrolling timer
     menuScrollTimer->stop();
     setPriority("Menu", OFF);
-}
-
-void LCDProcClient::setLevels(int numbLevels, float *values)
-{
-    if (!lcd_ready)
-        return;
-
-    // Set the EQ levels
-
-    for(int i = 0; i < 10; i++)
-    {
-        if (i >= numbLevels)
-            EQlevels[i] = 0.0;
-        else
-        {
-            EQlevels[i] = values[i];
-            if (EQlevels[i] < 0.0)
-                EQlevels[i] = 0.0;
-            else if (EQlevels[i] > 1.0)
-                EQlevels[i] = 1.0;
-        }
-    }
 }
 
 void LCDProcClient::setChannelProgress(const QString &time, float value)

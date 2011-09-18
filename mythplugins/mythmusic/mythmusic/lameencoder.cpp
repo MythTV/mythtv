@@ -96,21 +96,18 @@ int LameEncoder::init_encoder(lame_global_flags *gf, int quality, bool vbr)
 }
 
 LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
-                         Metadata *metadata, bool vbr)
-           : Encoder(outfile, qualitylevel, metadata)
+                         Metadata *metadata, bool vbr) :
+    Encoder(outfile, qualitylevel, metadata),
+    bits(16),
+    channels(2),
+    samplerate(44100),
+    bytes_per_sample(channels * bits / 8),
+    samples_per_channel(0),
+    mp3buf_size((int)(1.25 * 16384 + 7200)), // worst-case estimate
+    mp3buf(new char[mp3buf_size]),
+    mp3bytes(0),
+    gf(lame_init())
 {
-    channels = 2;
-    bits = 16;
-    samplerate = 44100;
-
-    bytes_per_sample = channels * bits / 8;
-    samples_per_channel = 0;
-
-    mp3buf_size = (int)(1.25 * 16384 + 7200); // worst-case estimate
-    mp3buf = new char[mp3buf_size];
-
-    gf = lame_init();
-
     init_id3tags(gf);
 
     int lameret = init_encoder(gf, qualitylevel, vbr);
@@ -118,7 +115,7 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Error initializing LAME encoder. Got return code: %1")
-                .arg(lameret));
+            .arg(lameret));
         return;
     }
 }

@@ -7,18 +7,12 @@
 #include <QDateTime>
 
 // MythDB headers
-#include "mythexp.h"
-
-// MythUI headers
-#include "mythscreentype.h"
-#include "mythscreenstack.h"
-
-class MythUIBusyDialog;
+#include "mythbaseexp.h"
 
 extern const QString SMOLT_SERVER_LOCATION;
 extern const QString SMOLT_TOKEN;
 
-class MPUBLIC HardwareProfile : public QObject
+class MBASE_PUBLIC HardwareProfile : public QObject
 {
     Q_OBJECT
 
@@ -28,20 +22,20 @@ class MPUBLIC HardwareProfile : public QObject
 
     void GenerateUUIDs(void);
 
-    QString GetPrivateUUIDFromFile(void);
+    QString GetPrivateUUIDFromFile(void) const;
     bool WritePrivateUUIDToFile(QString uuid);
-    QString GetPublicUUIDFromFile(void);
-    QString GetAdminPasswordFromFile(void);
+    QString GetPublicUUIDFromFile(void) const;
+    QString GetAdminPasswordFromFile(void) const;
 
-    bool NeedsUpdate(void);
+    bool NeedsUpdate(void) const;
     bool SubmitProfile(void);
     bool DeleteProfile(void);
 
-    QString   GetPublicUUID(void) { return m_publicuuid; };
-    QString   GetPrivateUUID(void) { return m_uuid; };
-    QDateTime GetLastUpdate(void) { return m_lastUpdate; };
-    QString   GetProfileURL(void);
-    QString   GetHardwareProfile(void);
+    QString   GetPublicUUID(void) const { return m_publicuuid; };
+    QString   GetPrivateUUID(void) const { return m_uuid; };
+    QDateTime GetLastUpdate(void) const { return m_lastUpdate; };
+    QString   GetProfileURL(void) const;
+    QString   GetHardwareProfile(void) const;
 
   private:
     QString   m_uuid;

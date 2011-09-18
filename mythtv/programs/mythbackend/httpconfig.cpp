@@ -30,7 +30,7 @@ QStringList HttpConfig::GetBasePaths()
     return paths;
 }
 
-bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
+bool HttpConfig::ProcessRequest(HTTPRequest *request)
 {
     if (!request)
         return false;
@@ -179,8 +179,7 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
                 os << "<ul class=\"jqueryFileTree\" style=\"display: none;\">\r\n";
 
                 for (QStringList::iterator it = entries.begin();
-                                           it != entries.end();
-                                           it++)
+                     it != entries.end(); ++it)
                 {
                     QString entry = *it;
                     QStringList parts = entry.split("::");
@@ -404,4 +403,3 @@ void HttpConfig::PrintSettings(QBuffer &buffer, const MythSettingList &settings)
     for (; it != settings.end(); ++it)
         os << (*it)->ToHTML(1);
 }
-

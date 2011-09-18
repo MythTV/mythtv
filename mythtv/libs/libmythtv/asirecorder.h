@@ -63,7 +63,7 @@ class ASIRecorder : public DTVRecorder
                                const QString &vbidev);
     void SetOption(const QString &name, int value);
 
-    void StartRecording(void);
+    void run(void);
 
     bool Open(void);
     bool IsOpen(void) const;

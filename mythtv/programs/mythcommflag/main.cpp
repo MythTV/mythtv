@@ -349,7 +349,7 @@ static void streamOutCommercialBreakList(
     else
     {
         frm_dir_map_t::const_iterator it = commercialBreakList.begin();
-        for (; it != commercialBreakList.end(); it++)
+        for (; it != commercialBreakList.end(); ++it)
         {
             output << "framenum: " << it.key() << "\tmarktype: " << *it
                    << endl;
@@ -725,7 +725,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     int breaksFound = 0;
 
     // configure commercial detection method
-    SkipTypes commDetectMethod = 
+    SkipTypes commDetectMethod =
             (enum SkipTypes)gCoreContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
 
@@ -792,7 +792,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             if (commDetectMethod == COMM_DETECT_COMMFREE)
             {
                 // if the channel is commercial free, drop to the default instead
-                commDetectMethod = 
+                commDetectMethod =
                         (enum SkipTypes)gCoreContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
                 LOG(VB_COMMFLAG, LOG_INFO,
@@ -802,7 +802,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             }
             else if (commDetectMethod == COMM_DETECT_UNINIT)
                 // no value set, so use the database default
-                commDetectMethod = 
+                commDetectMethod =
                         (enum SkipTypes)gCoreContext->GetNumSetting(
                                      "CommercialSkipMethod", COMM_DETECT_ALL);
             LOG(VB_COMMFLAG, LOG_INFO,
@@ -962,14 +962,14 @@ static int FlagCommercials( uint chanid, const QDateTime &starttime,
             cerr << "IN USE\n";
             cerr << "                        "
                     "(the program is already being flagged elsewhere)\n";
-        }           
+        }
         LOG(VB_GENERAL, LOG_ERR, "Program is already being flagged elsewhere");
         return GENERIC_EXIT_IN_USE;
     }
-     
+
 
     if (progress)
-    {   
+    {
         cerr << "MythTV Commercial Flagger, flagging commercials for:" << endl;
         if (pginfo.GetSubtitle().isEmpty())
             cerr << "    " << pginfo.GetTitle().toLocal8Bit().constData() << endl;
@@ -982,15 +982,15 @@ static int FlagCommercials( uint chanid, const QDateTime &starttime,
 }
 
 static int FlagCommercials(QString filename, int jobid,
-                const QString outputfilename, bool useDB,
-                bool fullSpeed)
+                            const QString &outputfilename, bool useDB,
+                            bool fullSpeed)
 {
 
     if (progress)
-    {   
+    {
         cerr << "MythTV Commercial Flagger, flagging commercials for:" << endl
              << "    " << filename.toAscii().constData() << endl;
-    }    
+    }
 
     ProgramInfo pginfo(filename);
     return FlagCommercials(&pginfo, jobid, outputfilename, useDB, fullSpeed);
@@ -1081,7 +1081,6 @@ static int RebuildSeekTable(uint chanid, QDateTime starttime, int jobid)
 
 int main(int argc, char *argv[])
 {
-    bool isVideo = false;
     int result = GENERIC_EXIT_OK;
 
 //    QString allStart = "19700101000000";
@@ -1119,12 +1118,12 @@ int main(int argc, char *argv[])
                          false, /*prompt for backend*/
                          false, /*bypass auto discovery*/
                          cmdline.toBool("skipdb"))) /*ignoreDB*/
-    {   
+    {
         LOG(VB_GENERAL, LOG_EMERG, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
     cmdline.ApplySettingsOverride();
-    
+
     MythTranslation::load("mythfrontend");
 
     if (cmdline.toBool("chanid") && cmdline.toBool("starttime"))
@@ -1154,7 +1153,7 @@ int main(int argc, char *argv[])
         else if (cmdline.toBool("rebuild"))
             result = RebuildSeekTable(chanid, starttime, -1);
         else
-            result = FlagCommercials(chanid, starttime, -1, 
+            result = FlagCommercials(chanid, starttime, -1,
                                      cmdline.toString("outputfile"), true);
     }
     else if (cmdline.toBool("jobid"))
@@ -1179,7 +1178,6 @@ int main(int argc, char *argv[])
         }
 
         progress = false;
-        isVideo = false;
 
         int ret = 0;
 
@@ -1249,7 +1247,7 @@ int main(int argc, char *argv[])
                     "ORDER BY starttime;");
         //query.bindValue(":STARTTIME", allStart);
         //query.bindValue(":ENDTIME", allEnd);
-        
+
         if (query.exec() && query.isActive() && query.size() > 0)
         {
             QDateTime starttime;

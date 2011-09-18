@@ -1,13 +1,13 @@
 #include <algorithm>
 using namespace std;
 
-#include <QThread>
 #include "DeviceReadBuffer.h"
 #include "mythcorecontext.h"
 #include "mythbaseutil.h"
-#include "tspacket.h"
-#include "compat.h"
 #include "mythlogging.h"
+#include "tspacket.h"
+#include "mthread.h"
+#include "compat.h"
 
 #ifndef USING_MINGW
 #include <sys/poll.h>
@@ -19,11 +19,12 @@ using namespace std;
 #define LOC QString("DevRdB(%1): ").arg(videodevice)
 
 DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
-    : videodevice(""),              _stream_fd(-1),
+    : MThread("DeviceReadBuffer"),
+      videodevice(""),              _stream_fd(-1),
       readerCB(cb),
 
       // Data for managing the device ringbuffer
-      dorun(false),                 running(false),
+      dorun(false),
       eof(false),                   error(false),
       request_pause(false),         paused(false),
       using_poll(use_poll),         max_poll_wait(2500 /*ms*/),
@@ -58,10 +59,12 @@ DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
 
 DeviceReadBuffer::~DeviceReadBuffer()
 {
+    Stop();
     if (buffer)
+    {
         delete[] buffer;
-    if (isRunning() || dorun)
-        Stop();
+        buffer = NULL;
+    }
 }
 
 bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
@@ -125,28 +128,25 @@ void DeviceReadBuffer::Start(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- begin");
 
+    QMutexLocker locker(&lock);
     if (isRunning() || dorun)
     {
-        {
-            QMutexLocker locker(&lock);
-            dorun = false;
-        }
+        dorun = false;
+        locker.unlock();
         WakePoll();
         wait();
+        locker.relock();
     }
 
-    {
-        QMutexLocker locker(&lock);
-        error = false;
-        eof   = false;
-    }
+    dorun = true;
+    error = false;
+    eof   = false;
 
     start();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- middle");
 
-    QMutexLocker locker(&lock);
-    while (dorun && !running)
+    while (dorun && !isRunning())
         runWait.wait(locker.mutex(), 100);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Start() -- end");
@@ -170,15 +170,14 @@ void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
 void DeviceReadBuffer::Stop(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- begin");
+    QMutexLocker locker(&lock);
+    if (isRunning() || dorun)
     {
-        QMutexLocker locker(&lock);
         dorun = false;
+        locker.unlock();
+        WakePoll();
+        wait();
     }
-
-    WakePoll();
-    LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- middle");
-
-    wait();
     LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- end");
 }
 
@@ -205,7 +204,7 @@ void DeviceReadBuffer::WakePoll(void) const
     char buf[1];
     buf[0] = '0';
     ssize_t wret = 0;
-    while (running && (wret <= 0) && (wake_pipe[1] >= 0))
+    while (isRunning() && (wret <= 0) && (wake_pipe[1] >= 0))
     {
         wret = ::write(wake_pipe[1], &buf, 1);
         if ((wret < 0) && (EAGAIN != errno) && (EINTR != errno))
@@ -277,7 +276,7 @@ bool DeviceReadBuffer::IsEOF(void) const
 bool DeviceReadBuffer::IsRunning(void) const
 {
     QMutexLocker locker(&lock);
-    return running;
+    return isRunning();
 }
 
 uint DeviceReadBuffer::GetUnused(void) const
@@ -321,12 +320,11 @@ void DeviceReadBuffer::IncrReadPointer(uint len)
 
 void DeviceReadBuffer::run(void)
 {
+    RunProlog();
+
     uint      errcnt = 0;
 
-    threadRegister("DeviceReadBuffer");
     lock.lock();
-    dorun   = true;
-    running = true;
     runWait.wakeAll();
     lock.unlock();
 
@@ -382,7 +380,6 @@ void DeviceReadBuffer::run(void)
     ClosePipes();
 
     lock.lock();
-    running = false;
     eof     = true;
     runWait.wakeAll();
     dataWait.wakeAll();
@@ -390,7 +387,7 @@ void DeviceReadBuffer::run(void)
     unpauseWait.wakeAll();
     lock.unlock();
 
-    threadDeregister();
+    RunEpilog();
 }
 
 bool DeviceReadBuffer::HandlePausing(void)
@@ -675,7 +672,7 @@ uint DeviceReadBuffer::WaitForUsed(uint needed, uint max_wait) const
 
     QMutexLocker locker(&lock);
     size_t avail = used;
-    while ((needed > avail) && running &&
+    while ((needed > avail) && isRunning() &&
            !request_pause && !error && !eof &&
            (timer.elapsed() < (int)max_wait))
     {

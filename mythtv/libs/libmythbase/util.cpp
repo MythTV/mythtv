@@ -248,7 +248,7 @@ static QString findZoneinfoFile(QString zoneinfo_file_path,
     QFileInfo zoneinfo_file_info(zoneinfo_file_path);
 
     for (QFileInfoList::const_iterator it = dirlist.begin();
-         it != dirlist.end(); it++)
+         it != dirlist.end(); ++it)
     {
         info = *it;
          // Skip '.' and '..' and other files starting with "." and
@@ -489,7 +489,7 @@ static void print_timezone_info(QString master_zone_id, QString local_zone_id,
                                 int master_utc_offset, int local_utc_offset,
                                 QString master_time, QString local_time)
 {
-    LOG(VB_GENERAL, LOG_CRIT,
+    LOG(VB_GENERAL, LOG_NOTICE,
         QString("Detected time zone settings:\n"
             "    Master: Zone ID: '%1', UTC Offset: '%2', Current Time: '%3'\n"
             "     Local: Zone ID: '%4', UTC Offset: '%5', Current Time: '%6'\n")
@@ -671,7 +671,7 @@ bool getUptime(time_t &uptime)
     uptime = ::GetTickCount() / 1000;
 #else
     // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
-    LOG(VB_GENERAL, LOG_CRIT, "Unknown platform. How do I get the uptime?");
+    LOG(VB_GENERAL, LOG_NOTICE, "Unknown platform. How do I get the uptime?");
     return false;
 #endif
 
@@ -691,7 +691,7 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     struct sysinfo sinfo;
     if (sysinfo(&sinfo) == -1)
     {
-        LOG(VB_GENERAL, LOG_CRIT,
+        LOG(VB_GENERAL, LOG_ERR,
             "getMemStats(): Error, sysinfo() call failed.");
         return false;
     }
@@ -717,8 +717,8 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     if (host_statistics(mp, HOST_VM_INFO,
                         (host_info_t)&s, &count) != KERN_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_CRIT, "getMemStats(): Error, "
-                                  "failed to get virtual memory statistics.");
+        LOG(VB_GENERAL, LOG_ERR, "getMemStats(): Error, "
+            "failed to get virtual memory statistics.");
         return false;
     }
 
@@ -737,8 +737,8 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     freeVM = (int)(free/1024LL);
 
 #else
-    LOG(VB_GENERAL, LOG_CRIT, "getMemStats(): Unknown platform. "
-                              "How do I get the memory stats?");
+    LOG(VB_GENERAL, LOG_NOTICE, "getMemStats(): Unknown platform. "
+        "How do I get the memory stats?");
     return false;
 #endif
 
@@ -1489,7 +1489,7 @@ void setHttpProxy(void)
                 .arg(url.userName()).arg(url.password())
                 .arg(host).arg(port));
 #endif
-        p = QNetworkProxy(QNetworkProxy::HttpProxy,
+        p = QNetworkProxy(QNetworkProxy::HttpCachingProxy,
                           host, port, url.userName(), url.password());
         QNetworkProxy::setApplicationProxy(p);
         return;

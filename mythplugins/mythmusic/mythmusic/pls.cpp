@@ -145,7 +145,7 @@ class CfgReader
     QList<QString> getSections(void)
     {
         QList<QString> res;
-        for (ConfigMap::iterator it = cfg.begin(); it != cfg.end(); it++)
+        for (ConfigMap::iterator it = cfg.begin(); it != cfg.end(); ++it)
             res.push_back(it.key());
         return res;
     }
@@ -154,16 +154,21 @@ class CfgReader
     {
         KeyValueList keylist = cfg[section];
         QList<QString> res;
-        for (KeyValueList::iterator it = keylist.begin(); it != keylist.end(); it++)
+        for (KeyValueList::iterator it = keylist.begin();
+             it != keylist.end(); ++it)
+        {
             res.push_back((*it).first);
+        }
         return res;
     }
 
-    QString getStrVal(const QString &section, const QString &key, const QString &def = "")
+    QString getStrVal(const QString &section, const QString &key,
+                      const QString &def = "")
     {
         KeyValueList keylist = cfg[section];
         QString res = def;
-        for (KeyValueList::iterator it = keylist.begin(); it != keylist.end(); it++)
+        for (KeyValueList::iterator it = keylist.begin();
+             it != keylist.end(); ++it)
         {
             if ((*it).first == key) 
             {
@@ -187,7 +192,7 @@ class CfgReader
 
 /****************************************************************************/
 
-PlayListFile::PlayListFile(void)
+PlayListFile::PlayListFile(void) : m_version(0)
 {
 }
 

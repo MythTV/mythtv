@@ -67,16 +67,14 @@ bool ManualSchedule::Create(void)
         return false;
     }
 
-    QString longChannelFormat = gCoreContext->GetSetting("LongChannelFormat",
-                                                     "<num> <name>");
     QString chanorder = gCoreContext->GetSetting("ChannelOrdering", "channum");
     DBChanList channels = ChannelUtil::GetChannels(0, false, "channum,callsign");
     ChannelUtil::SortChannels(channels, chanorder);
 
     for (uint i = 0; i < channels.size(); i++)
     {
-        QString chantext = channels[i].GetFormatted(longChannelFormat);
-        
+        QString chantext = channels[i].GetFormatted(DBChannel::kChannelLong);
+
         MythUIButtonListItem *item =
                             new MythUIButtonListItem(m_channelList, chantext);
         InfoMap infomap;

@@ -699,7 +699,7 @@ bool CommDetector2::go(void)
                 frm_dir_map_t::const_iterator ii, jj;
                 ii = breakMap.begin();
                 jj = lastBreakMap.begin();
-                while (ii != breakMap.end() && jj != breakMap.end())
+                while (ii != breakMap.end() && jj != lastBreakMap.end())
                 {
                     if (ii.key() != jj.key())
                         break;
@@ -808,6 +808,8 @@ void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
         /* Display as 1-based frame numbers. */
         markstart = iimark.key() + 1;   /* MARK_COMM_BEGIN */
         ++iimark;                       /* MARK_COMM_END */
+        if (iimark == marks.end())
+            break;
         markend = iimark.key() + 1;
 
         LOG(VB_COMMFLAG, LOG_INFO, QString("Break: frame %1-%2 (%3-%4, %5)")

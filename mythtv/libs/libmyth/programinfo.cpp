@@ -1893,10 +1893,16 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
         return false;
 
     if ((dupmethod & kDupCheckSubThenDesc) &&
-        ((subtitle.isEmpty() && other.subtitle.isEmpty() &&
-          description.toLower() != other.description.toLower()) ||
-         (subtitle.toLower() != other.subtitle.toLower()) ||
-         (description.isEmpty() && subtitle.isEmpty())))
+        ((subtitle.isEmpty() &&
+          ((!other.subtitle.isEmpty() &&
+            description.toLower() != other.subtitle.toLower()) ||
+           (other.subtitle.isEmpty() &&
+            description.toLower() != other.description.toLower()))) ||
+         (!subtitle.isEmpty() &&
+          ((other.subtitle.isEmpty() &&
+            subtitle.toLower() != other.description.toLower()) ||
+           (!other.subtitle.isEmpty() &&
+            subtitle.toLower() != other.subtitle.toLower())))))
         return false;
 
     return true;
@@ -2372,8 +2378,8 @@ QStringList ProgramInfo::QueryDVDBookmark(
     {
         query.prepare(" SELECT title, framenum, audionum, subtitlenum "
                         " FROM dvdbookmark "
-                        " WHERE serialid = ? ");
-        query.addBindValue(serialid);
+                        " WHERE serialid = :SERIALID ");
+        query.bindValue(":SERIALID", serialid);
 
         if (query.exec() && query.next())
         {
@@ -2407,17 +2413,17 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
         MythDB::DBError("SetDVDBookmark inserting", query);
 
     query.prepare(" UPDATE dvdbookmark "
-                    " SET title       = ? , "
-                    "     audionum    = ? , "
-                    "     subtitlenum = ? , "
-                    "     framenum    = ? , "
+                    " SET title       = :TITLE , "
+                    "     audionum    = :AUDIONUM , "
+                    "     subtitlenum = :SUBTITLENUM , "
+                    "     framenum    = :FRAMENUM , "
                     "     timestamp   = NOW() "
-                    " WHERE serialid = ? ;");
-    query.addBindValue(title);
-    query.addBindValue(audionum);
-    query.addBindValue(subtitlenum);
-    query.addBindValue(frame);
-    query.addBindValue(serialid);
+                    " WHERE serialid = :SERIALID");
+    query.bindValue(":TITLE",title);
+    query.bindValue(":AUDIONUM",audionum);
+    query.bindValue(":SUBTITLENUM",subtitlenum);
+    query.bindValue(":FRAMENUM",frame);
+    query.bindValue(":SERIALID",serialid);
 
     if (!query.exec())
         MythDB::DBError("SetDVDBookmark updating", query);
@@ -3522,6 +3528,37 @@ void ProgramInfo::SaveTotalDuration(int64_t duration)
         MythDB::DBError("Duration insert", query);
 }
 
+/// \brief Store the Total Frames at frame 0 in the recordedmarkup table
+void ProgramInfo::SaveTotalFrames(int64_t frames)
+{
+    if (!IsRecording())
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM recordedmarkup "
+                  " WHERE chanid=:CHANID "
+                  " AND starttime=:STARTTIME "
+                  " AND type=:TYPE");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":TYPE", MARK_TOTAL_FRAMES);
+
+    if (!query.exec())
+        MythDB::DBError("Frames delete", query);
+
+    query.prepare("INSERT INTO recordedmarkup"
+                  "    (chanid, starttime, mark, type, data)"
+                  "    VALUES"
+                  " ( :CHANID, :STARTTIME, 0, :TYPE, :DATA);");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":TYPE", MARK_TOTAL_FRAMES);
+    query.bindValue(":DATA", (uint)(frames));
+
+    if (!query.exec())
+        MythDB::DBError("Frames insert", query);
+}
 
 /// \brief Store the Resolution at frame in the recordedmarkup table
 /// \note  All frames until the next one with a stored resolution
@@ -3631,6 +3668,14 @@ int64_t ProgramInfo::QueryTotalDuration(void) const
     return msec * 1000;
 }
 
+/** \brief If present in recording this loads total frames of the
+ *         main video stream from database's stream markup table.
+ */
+int64_t ProgramInfo::QueryTotalFrames(void) const
+{
+    int64_t frames = load_markup_datum(MARK_TOTAL_FRAMES, chanid, recstartts);
+    return frames;
+}
 
 void ProgramInfo::SaveResolutionProperty(VideoProperty vid_flags)
 {
@@ -3812,7 +3857,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
     if (!IsLocal())
     {
         if (!gCoreContext->IsBackend())
-            return QString();
+            return "";
 
         QString path = GetPlaybackURL(false, true);
         if (path.left(1) == "/")
@@ -3821,7 +3866,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
             return testFile.path();
         }
 
-        return QString();
+        return "";
     }
 
     QFileInfo testFile(pathname);
@@ -3853,7 +3898,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
         }
     }
 
-    return QString();
+    return "";
 }
 
 #include <cassert>

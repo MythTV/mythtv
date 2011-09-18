@@ -73,6 +73,7 @@ using namespace std;
 #include "backendconnectionmanager.h"
 #include "themechooser.h"
 #include "mythversion.h"
+#include "taskqueue.h"
 
 // Video
 #include "cleanup.h"
@@ -236,6 +237,8 @@ namespace
 
         delete gContext;
         gContext = NULL;
+
+        delete qApp;
 
 #ifndef _MSC_VER
         signal(SIGUSR1, SIG_DFL);
@@ -901,11 +904,6 @@ static void TVMenuCallback(void *data, QString &selection)
         QStringList strlist( QString("REFRESH_BACKEND") );
         gCoreContext->SendReceiveStringList(strlist);
     }
-    else if (sel == "settings audiogeneral")
-    {
-        AudioGeneralSettings audiosettings;
-        audiosettings.exec();
-    }
     else if (sel == "settings playback")
     {
         PlaybackSettings settings;
@@ -1256,8 +1254,6 @@ static void setDebugShowNames(void)
         GetMythMainWindow()->GetMainStack()->GetTopScreen()->SetRedraw();
 }
 
-// If adding a new jump point, remember to also add a line to clear it in
-// ReloadJumpPoints(), below
 static void InitJumpPoints(void)
 {
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Reload Theme"),
@@ -1318,30 +1314,7 @@ static void InitJumpPoints(void)
 static void ReloadJumpPoints(void)
 {
     MythMainWindow *mainWindow = GetMythMainWindow();
-    mainWindow->ClearJump("Reload Theme");
-    mainWindow->ClearJump("Main Menu");
-    mainWindow->ClearJump("Program Guide");
-    mainWindow->ClearJump("Program Finder");
-    //mainWindow->ClearJump("Search Listings");
-    mainWindow->ClearJump("Manage Recordings / Fix Conflicts");
-    mainWindow->ClearJump("Program Recording Priorities");
-    mainWindow->ClearJump("Manage Recording Rules");
-    mainWindow->ClearJump("Channel Recording Priorities");
-    mainWindow->ClearJump("TV Recording Playback");
-    mainWindow->ClearJump("TV Recording Deletion");
-    mainWindow->ClearJump("Live TV");
-    mainWindow->ClearJump("Live TV In Guide");
-    mainWindow->ClearJump("Status Screen");
-    mainWindow->ClearJump("Previously Recorded");
-    mainWindow->ClearJump("Video Default");
-    mainWindow->ClearJump("Video Manager");
-    mainWindow->ClearJump("Video Browser");
-    mainWindow->ClearJump("Video Listings");
-    mainWindow->ClearJump("Video Gallery");
-    mainWindow->ClearJump("Play Disc");
-    mainWindow->ClearJump("Toggle Show Widget Borders");
-    mainWindow->ClearJump("Toggle Show Widget Names");
-    mainWindow->ClearJump("Reset All Keys");
+    mainWindow->ClearAllJumps();
     InitJumpPoints();
 }
 
@@ -1480,17 +1453,19 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
+    CleanupGuard callCleanup(cleanup);
+
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);
 #endif
-    QApplication a(argc, argv);
+    new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
 
     QString pluginname;
 
-    QFileInfo finfo(a.argv()[0]);
+    QFileInfo finfo(qApp->argv()[0]);
     QString binname = finfo.baseName();
 
     int retval;
@@ -1519,8 +1494,6 @@ int main(int argc, char **argv)
     {
         MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
     }
-
-    CleanupGuard callCleanup(cleanup);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 

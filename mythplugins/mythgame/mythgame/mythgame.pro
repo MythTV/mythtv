@@ -20,11 +20,11 @@ INSTALLS += target installscripts installgiantbomb installgiantbombxsl
 
 # Input
 HEADERS += gamehandler.h rominfo.h unzip.h gamesettings.h gameui.h
-HEADERS += rom_metadata.h romedit.h gamedetails.h
+HEADERS += rom_metadata.h romedit.h gamedetails.h gamescan.h
 
 SOURCES += main.cpp gamehandler.cpp rominfo.cpp gameui.cpp unzip.c
 SOURCES += gamesettings.cpp dbcheck.cpp rom_metadata.cpp romedit.cpp
-SOURCES += gamedetails.cpp
+SOURCES += gamedetails.cpp gamescan.cpp
 
 DEFINES += MPLUGIN_API
 

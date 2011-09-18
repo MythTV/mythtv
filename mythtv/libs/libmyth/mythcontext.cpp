@@ -27,6 +27,7 @@ using namespace std;
 #include "dbutil.h"
 #include "DisplayRes.h"
 #include "mythmediamonitor.h"
+#include "mythsocketthread.h"
 
 #include "mythdb.h"
 #include "mythdirs.h"
@@ -554,7 +555,6 @@ QString MythContextPrivate::TestDBconnection(void)
     bool    doPing = m_DBparams.dbHostPing;
     QString err    = QString::null;
     QString host   = m_DBparams.dbHostName;
-    int     port   = m_DBparams.dbPort;
 
 
     // 1. Check the supplied host or IP address, to prevent the app
@@ -602,17 +602,7 @@ QString MythContextPrivate::TestDBconnection(void)
     }
 
 
-    // 2. Check that the supplied DBport is listening:
-
-    if (host != "localhost" && port && !telnet(host, port))
-    {
-        SilenceDBerrors();
-        err = QObject::tr("Cannot connect to port %1 on database host %2");
-        return err.arg(port).arg(host);
-    }
-
-
-    // 3. Finally, try to login, et c:
+    // 2. Try to login, et c:
 
     // Current DB connection may have been silenced (invalid):
     ResetDatabase();
@@ -1107,11 +1097,15 @@ bool MythContext::Init(const bool gui,
 
 MythContext::~MythContext()
 {
-    if (QThreadPool::globalInstance()->activeThreadCount())
+    if (MThreadPool::globalInstance()->activeThreadCount())
         LOG(VB_GENERAL, LOG_INFO, "Waiting for threads to exit.");
 
-    QThreadPool::globalInstance()->waitForDone();
+    ShutdownRRT();
+    MThreadPool::globalInstance()->waitForDone();
     logStop();
+
+    SSDP::Shutdown();
+    TaskQueue::Shutdown();
 
     delete gCoreContext;
     gCoreContext = NULL;

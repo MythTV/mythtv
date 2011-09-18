@@ -156,9 +156,9 @@ bool SetArtwork(const QString &inetref,
     query.bindValue(":INETREF", inetref);
     query.bindValue(":SEASON", season);
     query.bindValue(":HOST", host);
-    query.bindValue(":COVERART", coverart);
-    query.bindValue(":FANART", fanart);
-    query.bindValue(":BANNER", banner);
+    query.bindValue(":COVERART", coverart.isNull() ? "" : coverart);
+    query.bindValue(":FANART", fanart.isNull() ? "" : fanart);
+    query.bindValue(":BANNER", banner.isNull() ? "" : banner);
 
     if (!query.exec())
     {

@@ -2,11 +2,10 @@
 #ifndef _V4L_RECORDER_H_
 #define _V4L_RECORDER_H_
 
-#include <QThread>
-
 #include "dtvrecorder.h"
 #include "cc608decoder.h"
 #include "vbitext/vt.h"
+#include "mthread.h"
 
 class VBI608Extractor;
 class VBIThread;
@@ -57,11 +56,14 @@ class MPUBLIC V4LRecorder : public DTVRecorder
     int              vbi_fd;
 };
 
-class VBIThread : public QThread
+class VBIThread : public MThread
 {
   public:
-    VBIThread(V4LRecorder *_parent) : parent(_parent)
-        { start(); }
+    VBIThread(V4LRecorder *_parent) :
+        MThread("VBIThread"), parent(_parent)
+    {
+        start();
+    }
 
     virtual ~VBIThread()
     {
@@ -72,9 +74,12 @@ class VBIThread : public QThread
         }
     }
 
-    virtual void run(void) { parent->RunVBIDevice(); }
-
-    virtual void deleteLater(void) { parent->StopRecording(); }
+    virtual void run(void)
+    {
+        RunProlog();
+        parent->RunVBIDevice();
+        RunEpilog();
+    }
 
   private:
     V4LRecorder *parent;

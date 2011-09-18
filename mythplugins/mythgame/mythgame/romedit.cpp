@@ -18,10 +18,11 @@
 
 EditRomInfoDialog::EditRomInfoDialog(MythScreenStack *parent,
         QString name, RomInfo *romInfo) : MythScreenType(parent, name),
-    m_id(""), m_retObject(0), m_gamenameEdit(0), m_genreEdit(0),
-    m_yearEdit(0), m_countryEdit(0), m_plotEdit(0), m_publisherEdit(0),
-    m_favoriteCheck(0), m_screenshotButton(0), m_fanartButton(0),
-    m_fanartText(0), m_boxartButton(0), m_boxartText(0), m_doneButton(0)
+    m_id(""), m_retObject(NULL), m_gamenameEdit(NULL), m_genreEdit(NULL),
+    m_yearEdit(NULL), m_countryEdit(NULL), m_plotEdit(NULL),
+    m_publisherEdit(NULL), m_favoriteCheck(NULL), m_screenshotButton(NULL),
+    m_screenshotText(NULL), m_fanartButton(NULL), m_fanartText(NULL),
+    m_boxartButton(NULL), m_boxartText(NULL), m_doneButton(NULL)
 {
     m_workingRomInfo = new RomInfo(*romInfo);
 }
@@ -79,7 +80,7 @@ bool EditRomInfoDialog::Create()
     connect(m_boxartButton, SIGNAL(Clicked()), SLOT(FindBoxart()));
 
     connect(m_doneButton, SIGNAL(Clicked()), SLOT(SaveAndExit()));
- 
+
     return true;
 }
 
@@ -149,7 +150,7 @@ void EditRomInfoDialog::fillWidgets()
 
     if (m_workingRomInfo->Favorite())
         m_favoriteCheck->SetCheckState(MythUIStateType::Full);
- 
+
     m_screenshotText->SetText(m_workingRomInfo->Screenshot());
     m_fanartText->SetText(m_workingRomInfo->Fanart());
     m_boxartText->SetText(m_workingRomInfo->Boxart());

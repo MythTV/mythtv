@@ -558,7 +558,7 @@ class ItemDetailPopup : public MythScreenType
     ItemDetailPopup(MythScreenStack *lparent, VideoMetadata *metadata,
             const VideoMetadataListManager &listManager) :
         MythScreenType(lparent, WINDOW_NAME), m_metadata(metadata),
-        m_listManager(listManager)
+        m_listManager(listManager), m_playButton(NULL), m_doneButton(NULL)
     {
     }
 
@@ -768,7 +768,6 @@ class VideoDialogPrivate
     bool m_treeLoaded;
 
     bool m_isFileBrowser;
-    bool m_isGroupList;
     int  m_groupType;
     bool m_isFlatList;
     bool m_altPlayerEnabled;
@@ -852,8 +851,6 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
 
     m_d->m_videoList->setCurrentVideoFilter(VideoFilterSettings(true,
                     lname));
-
-    srand(time(NULL));
 
     StorageGroup::ClearGroupToUseCache();
 }
@@ -3041,10 +3038,10 @@ void VideoDialog::playFolder()
                     playing_time.start();
                     video_started = true;
                     PlayVideo(metadata->GetFilename(),
-                                       m_d->m_videoList->getListCache());
+                              m_d->m_videoList->getListCache());
                 }
             }
-	    i++;
+            i++;
         }
     }
 }
@@ -3111,7 +3108,7 @@ void VideoDialog::playVideoWithTrailers()
     while (trailers.size() && i < trailersToPlay)
     {
         ++i;
-        QString trailer = trailers.takeAt(rand() % trailers.size());
+        QString trailer = trailers.takeAt(random() % trailers.size());
 
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("Random trailer to play will be: %1").arg(trailer));

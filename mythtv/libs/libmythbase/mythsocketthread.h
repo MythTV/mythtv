@@ -2,20 +2,19 @@
 #define _MYTH_SOCKET_THREAD_H_
 
 #include <QWaitCondition>
-#include <QThread>
 #include <QMutex>
 #include <QList>
 
 #include "mythbaseexp.h"
+#include "mthread.h"
 
 MBASE_PUBLIC void ShutdownRRT(void);
 
 class MythSocket;
-class MythSocketThread : public QThread
+class MythSocketThread : public MThread
 {
   public:
     MythSocketThread();
-    virtual ~MythSocketThread() { wait(); }
 
     virtual void run(void);
 

@@ -1,18 +1,18 @@
 #include <QCoreApplication>
-#include <QThreadPool>
 #include <QRunnable>
 #include <QString>
 #include <QEvent>
 #include <QTimer>
 
+#include "backendconnectionmanager.h"
 #include "mythcorecontext.h"
 #include "mythdialogbox.h"
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
+#include "mthreadpool.h"
+#include "mythlogging.h"
 #include "exitcodes.h"
 #include "util.h" // for checkTimeZone()
-#include "backendconnectionmanager.h"
-#include "mythlogging.h"
 
 class Reconnect : public QRunnable
 {
@@ -24,12 +24,10 @@ class Reconnect : public QRunnable
 
     virtual void run(void)
     {
-        threadRegister("Reconnect");
         if (gCoreContext->GetMasterHostPrefix().isEmpty())
             gCoreContext->dispatch(MythEvent(QString("RECONNECT_FAILURE")));
         else
             gCoreContext->dispatch(MythEvent(QString("RECONNECT_SUCCESS")));
-        threadDeregister();
     }
 };
 
@@ -133,5 +131,5 @@ void BackendConnectionManager::customEvent(QEvent *event)
 void BackendConnectionManager::ReconnectToBackend(void)
 {
     m_reconnecting = new Reconnect();
-    QThreadPool::globalInstance()->start(m_reconnecting);
+    MThreadPool::globalInstance()->start(m_reconnecting, "Reconnect");
 }

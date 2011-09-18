@@ -109,7 +109,7 @@ void GrabberSettings::Load(void)
     if (MovieScripts.count())
     {
         for (QStringList::const_iterator i = MovieScripts.begin();
-                i != MovieScripts.end(); i++)
+             i != MovieScripts.end(); ++i)
         {
             QString commandline = QString("%1/%2")
                                       .arg(MovieScriptPath.path()).arg(*i);
@@ -197,8 +197,9 @@ void GrabberSettings::Load(void)
 
 void GrabberSettings::Init(void)
 {
-    for (QList<MetaGrabberScript*>::const_iterator it = m_movieGrabberList.begin();
-        it != m_movieGrabberList.end(); it++)
+    for (QList<MetaGrabberScript*>::const_iterator it =
+             m_movieGrabberList.begin();
+         it != m_movieGrabberList.end(); ++it)
     {
         QString commandline = QString("%1metadata/Movie/%2")
                     .arg(GetShareDir()).arg((*it)->GetCommand());
@@ -213,7 +214,7 @@ void GrabberSettings::Init(void)
     m_movieGrabberList.clear();
 
     for (QList<MetaGrabberScript*>::const_iterator it = m_tvGrabberList.begin();
-        it != m_tvGrabberList.end(); it++)
+         it != m_tvGrabberList.end(); ++it)
     {
         QString commandline = QString("%1metadata/Television/%2")
                     .arg(GetShareDir()).arg((*it)->GetCommand());
@@ -227,8 +228,9 @@ void GrabberSettings::Init(void)
 
     m_tvGrabberList.clear();
 
-    for (QList<MetaGrabberScript*>::const_iterator it = m_gameGrabberList.begin();
-        it != m_gameGrabberList.end(); it++)
+    for (QList<MetaGrabberScript*>::const_iterator it =
+             m_gameGrabberList.begin();
+         it != m_gameGrabberList.end(); ++it)
     {
         QString commandline = QString("%1metadata/Game/%2")
                     .arg(GetShareDir()).arg((*it)->GetCommand());
