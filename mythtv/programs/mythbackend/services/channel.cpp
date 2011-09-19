@@ -32,6 +32,7 @@
 #include "mythcorecontext.h"
 #include "channelutil.h"
 #include "sourceutil.h"
+#include "datadirect.h"
 
 #include "serviceUtil.h"
 
@@ -416,6 +417,47 @@ bool Channel::DeleteVideoSource( uint nSourceID )
     bResult = SourceUtil::DeleteSource( nSourceID );
 
     return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::LineupList* Channel::GetDDLineups( const QString &sSource,
+                                        const QString &sUserId,
+                                        const QString &sPassword )
+{
+    int source = 0;
+
+    DTC::LineupList *pLineups = new DTC::LineupList();
+
+    if (sSource.toLower() == "schedulesdirect1" ||
+        sSource.toLower() == "schedulesdirect" ||
+        sSource.isEmpty())
+    {
+        source = 1;
+        DataDirectProcessor ddp(source, sUserId, sPassword);
+        if (!ddp.GrabLineupsOnly())
+        {
+            throw( QString("Unable to grab lineups. Check info."));
+        }
+        const DDLineupList lineups = ddp.GetLineups();
+
+        DDLineupList::const_iterator it;
+        for (it = lineups.begin(); it != lineups.end(); ++it)
+        {
+            DTC::Lineup *pLineup = pLineups->AddNewLineup();
+
+            pLineup->setLineupId((*it).lineupid);
+            pLineup->setName((*it).name);
+            pLineup->setDisplayName((*it).displayname);
+            pLineup->setType((*it).type);
+            pLineup->setPostal((*it).postal);
+            pLineup->setDevice((*it).device);
+        }
+    }
+
+    return pLineups;
 }
 
 /////////////////////////////////////////////////////////////////////////////
