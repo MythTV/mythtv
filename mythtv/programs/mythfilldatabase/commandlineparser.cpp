@@ -103,32 +103,45 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "in case MythTV's smarts fail you.");
     // need documentation for this one
     add("--cardtype", "cardtype", "", "", "No information.");
+
+    add("--refresh", "refresh", QVariant::StringList,
+            "Provide a day or range of days to refresh. Can be "
+            "used repeatedly.",
+            "Provide days to refresh during the grabber run.  Multiple \n"
+            "days or ranges can be supplied by multiple instances of the \n"
+            "option. Supported days are:\n"
+            "    [not]today\n"
+            "    [not]tomorrow\n"
+            "    [not]second\n"
+            "    #[-#]\n"
+            "    all\n\n"
+            "example:\n"
+            "   --refresh today --refresh 4-8 --refresh nottomorrow");
+
     add("--max-days", "maxdays", 0, "force number of days to update",
             "Force the maximum number of days, counting today, "
             "for the guide data grabber to check for future "
             "listings.");
-    add("--refresh-today", "refreshtoday", false, "refresh today's listings",
+    add("--refresh-today", "refreshtoday", false, "",
             "This option is only valid for selected grabbers.\n"
             "Force a refresh for today's guide data.\nThis can be used "
             "in combination with other --refresh-<n> options.\n"
             "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.");
-    add("--dont-refresh-tomorrow", "dontrefreshtomorrow", false,
-            "don't refresh tomorrow's listings",
+    add("--dont-refresh-tomorrow", "dontrefreshtomorrow", false, "",
             "This option is only valid for selected grabbers.\n"
             "Prevent mythfilldatabase from pulling information for "
             "tomorrow's listings. Data for tomorrow is always pulled "
             "unless specifically specified otherwise.\n"
             "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.");
-    add("--refresh-second", "refreshsecond", false,
-            "refresh listings two days from now",
+    add("--refresh-second", "refreshsecond", false, "",
             "This option is only valid for selected grabbers.\n"
             "Force a refresh for guide data two days from now. This can "
             "be used in combination with other --refresh-<n> options.\n"
             "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.");
-    add("--refresh-day", "refreshday", 0U, "refresh specific day's listings",
+    add("--refresh-day", "refreshday", 0U, "",
             "This option is only valid for selected grabbers.\n"
             "Force a refresh for guide data on a specific day. This can "
             "be used in combination with other --refresh-<n> options.\n"
@@ -142,7 +155,7 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.");
 
-    add("--refresh-all", "refreshall", false, "refresh listings on all days",
+    add("--refresh-all", "refreshall", false, "",
             "This option is only valid for selected grabbers.\n"
             "This option forces a refresh of all guide data, but does so "
             "with fourteen downloads of one day each.\n"

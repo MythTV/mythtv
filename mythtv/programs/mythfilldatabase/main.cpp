@@ -233,16 +233,88 @@ int main(int argc, char *argv[])
         if (fill_data.maxDays == 1)
             fill_data.SetRefresh(0, true);
     }
+
     if (cmdline.toBool("refreshtoday"))
-        fill_data.SetRefresh(0, true);
+        cmdline.SetValue("refresh",
+                cmdline.toStringList("refresh") << "today");
     if (cmdline.toBool("dontrefreshtomorrow"))
-        fill_data.SetRefresh(1, false);
+        cmdline.SetValue("refresh", 
+                cmdline.toStringList("refresh") << "nottomorrow");
     if (cmdline.toBool("refreshsecond"))
-        fill_data.SetRefresh(2, true);
+        cmdline.SetValue("refresh", 
+                cmdline.toStringList("refresh") << "today");
     if (cmdline.toBool("refreshall"))
-        fill_data.SetRefresh(FillData::kRefreshAll, true);
+        cmdline.SetValue("refresh", 
+                cmdline.toStringList("refresh") << "all");
     if (cmdline.toBool("refreshday"))
-        fill_data.SetRefresh(cmdline.toUInt("refreshday"), true);
+        cmdline.SetValue("refresh",
+                cmdline.toStringList("refresh") << 
+                         QString::number(cmdline.toUInt("refreshday")));
+
+    QStringList sl =cmdline.toStringList("refresh");
+    if (!sl.isEmpty())
+    {
+        QStringList::const_iterator i = sl.constBegin();
+        for (; i != sl.constEnd(); ++i)
+        {
+            QString warn = QString("Invalid entry in --refresh list: %1")
+                                .arg(*i);
+
+            bool enable = (*i).contains("not") ? false : true;
+
+            if ((*i).contains("today"))
+                fill_data.SetRefresh(0, enable);
+            else if ((*i).contains("tomorrow"))
+                fill_data.SetRefresh(1, enable);
+            else if ((*i).contains("second"))
+                fill_data.SetRefresh(2, enable);
+            else if ((*i).contains("all"))
+                fill_data.SetRefresh(FillData::kRefreshAll, enable);
+            else if ((*i).contains("-"))
+            {
+                bool ok;
+                QStringList r = (*i).split("-");
+
+                uint lower = r[0].toUInt(&ok);
+                if (!ok)
+                {
+                    cerr << warn.toLocal8Bit().constData() << endl;
+                    return false;
+                }
+
+                uint upper = r[1].toUInt(&ok);
+                if (!ok)
+                {
+                    cerr << warn.toLocal8Bit().constData() << endl;
+                    return false;
+                }
+
+                if (lower > upper)
+                {
+                    cerr << warn.toLocal8Bit().constData() << endl;
+                    return false;
+                }
+
+                for (uint j = lower; j <= upper; ++j)
+                    fill_data.SetRefresh(j, true);
+            }
+            else
+            {
+                bool ok;
+                uint day = (*i).toUInt(&ok);
+                if (!ok)
+                {
+                    cerr << warn.toLocal8Bit().constData() << endl;
+                    return false;
+                }
+
+                fill_data.SetRefresh(day, true);
+            }
+        }
+    }
+
+    return 0;
+
     if (cmdline.toBool("dontrefreshtba"))
         fill_data.refresh_tba = false;
     if (cmdline.toBool("ddgraball"))
