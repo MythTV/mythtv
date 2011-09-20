@@ -313,8 +313,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    return 0;
-
     if (cmdline.toBool("dontrefreshtba"))
         fill_data.refresh_tba = false;
     if (cmdline.toBool("ddgraball"))
