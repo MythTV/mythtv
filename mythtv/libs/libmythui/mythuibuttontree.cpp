@@ -593,7 +593,7 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
 
         if (m_activeList && m_activeList->m_layout == MythUIButtonList::LayoutGrid)
         {
-            if (action == "SELECT" && m_currentNode->childCount() > 0)
+            if (action == "SELECT" && m_currentNode->visibleChildCount() > 0)
             {
                 SwitchList(true);
             }
@@ -606,11 +606,11 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
         }
         else
         {
-            if (action == "RIGHT")
+            if (action == "RIGHT" && m_currentNode->visibleChildCount() > 0)
             {
                 SwitchList(true);
             }
-            else if (action == "LEFT")
+            else if (action == "LEFT" && !(m_currentDepth == 0 && m_activeListID == 0))
             {
                 SwitchList(false);
             }
