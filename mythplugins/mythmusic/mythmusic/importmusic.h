@@ -66,6 +66,7 @@ class ImportMusicDialog : public MythScreenType
     void prevPressed(void);
     void showEditMetadataDialog(void);
     void startScan(void);
+    void doExit(bool ok);
 
     // popup menu
     void showMenu(void);
