@@ -51,7 +51,6 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     m_playlistTree = NULL;
     m_currentNode = NULL;
     m_currentMetadata = NULL;
-    m_arbitraryFileMetadata = NULL;
 
     m_isAutoplay = false;
     m_isPlaying = false;
@@ -200,12 +199,7 @@ void MusicPlayer::removeVisual(MainVisual *visual)
 
 void MusicPlayer::playFile(const Metadata &meta)
 {
-    delete m_arbitraryFileMetadata;
-    m_arbitraryFileMetadata = NULL;
-    m_currentMetadata = NULL;
-
-    m_arbitraryFileMetadata = new Metadata(meta);
-    m_currentMetadata = m_arbitraryFileMetadata;
+    m_currentMetadata = new Metadata(meta);
     play();
     m_currentNode = NULL;
 }
@@ -303,9 +297,6 @@ void MusicPlayer::stopDecoder(void)
     if (getDecoderHandler())
         getDecoderHandler()->stop();
 
-
-    delete m_arbitraryFileMetadata;
-    m_arbitraryFileMetadata = NULL;
     m_currentMetadata = NULL;
 }
 
