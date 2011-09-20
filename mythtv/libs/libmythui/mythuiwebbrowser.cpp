@@ -484,7 +484,7 @@ void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
     if (!extension.isEmpty())
         extension = '.' + extension;
 
-    QString saveFilename = QString("%1%2%3%")
+    QString saveFilename = QString("%1%2%3")
                                 .arg(m_parentBrowser->GetDefaultSaveDirectory())
                                 .arg(saveBaseName)
                                 .arg(extension);
