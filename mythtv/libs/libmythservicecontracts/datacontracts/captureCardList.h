@@ -38,7 +38,7 @@ class SERVICE_PUBLIC CaptureCardList : public QObject
     Q_CLASSINFO( "version", "1.0" );
 
     // We need to know the type that will ultimately be contained in
-    // any QVariantList or QVariantMap.  We do his by specifying
+    // any QVariantList or QVariantMap.  We do this by specifying
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
