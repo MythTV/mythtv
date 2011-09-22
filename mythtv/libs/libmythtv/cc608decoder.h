@@ -114,6 +114,8 @@ class CC608Decoder
 
     // temporary buffer
     unsigned char *rbuf;
+    int last_format_tc[2];
+    int last_format_data[2];
 
     // VPS data
     char            vps_pr_label[20];
