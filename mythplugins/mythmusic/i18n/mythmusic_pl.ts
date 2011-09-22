@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="pl_PL">
 <context>
     <name>AlbumArtImages</name>
     <message>
@@ -40,7 +40,7 @@
     </message>
     <message>
         <source>Blechy Blech Blah</source>
-        <translation type="unfinished"></translation>
+        <translation>Blechy Blech Blah</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -135,7 +135,7 @@
     <name>EditMetadataDialog</name>
     <message>
         <source>Track Info.</source>
-        <translation>Inf. o utworze</translation>
+        <translation>Inf. o utworze.</translation>
     </message>
     <message>
         <source>Album Art</source>
@@ -294,11 +294,11 @@ Could not copy file to: %1</source>
     </message>
     <message>
         <source>Already in Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Już jest w bazie</translation>
     </message>
     <message>
         <source>Not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie znaleziono</translation>
     </message>
 </context>
 <context>
@@ -309,11 +309,11 @@ Could not copy file to: %1</source>
     </message>
     <message>
         <source>Mute: On</source>
-        <translation>Wyciszanie: wł.</translation>
+        <translation>Wyciszenie: On</translation>
     </message>
     <message>
         <source>Mute: Off</source>
-        <translation>Wyciszanie: wył.</translation>
+        <translation>Wyciszenie: OFF</translation>
     </message>
     <message>
         <source>kbps</source>
@@ -325,7 +325,7 @@ Could not copy file to: %1</source>
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished"></translation>
+        <translation>kanały(ów)</translation>
     </message>
     <message>
         <source>%1  by  %2</source>
@@ -374,11 +374,11 @@ Could not copy file to: %1</source>
     </message>
     <message>
         <source>On</source>
-        <translation>Wł.</translation>
+        <translation>ON</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation>Wył.</translation>
+        <translation>OFF</translation>
     </message>
     <message>
         <source>Volume: </source>
@@ -404,118 +404,118 @@ Could not copy file to: %1</source>
     <name>MythControls</name>
     <message>
         <source>Play music</source>
-        <translation type="unfinished"></translation>
+        <translation>Odtwarzaj</translation>
     </message>
     <message>
         <source>Select music playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz playlistę</translation>
     </message>
     <message>
         <source>Rip CD</source>
-        <translation type="unfinished">Rippuj CD</translation>
+        <translation>Zgrywaj CD</translation>
     </message>
     <message>
         <source>Scan music</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanuj</translation>
     </message>
     <message>
         <source>Show Music Miniplayer</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż MiniPlayer</translation>
     </message>
     <message>
         <source>Move to the next track</source>
-        <translation type="unfinished"></translation>
+        <translation>Idź do następnego utworu</translation>
     </message>
     <message>
         <source>Move to the previous track</source>
-        <translation type="unfinished"></translation>
+        <translation>Idź do poprzedniego utworu</translation>
     </message>
     <message>
         <source>Fast forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Przewiń do przodu</translation>
     </message>
     <message>
         <source>Rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Przewiń do tyłu</translation>
     </message>
     <message>
         <source>Pause/Start playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Pauza/Odtwarzanie</translation>
     </message>
     <message>
         <source>Start playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Odtwarzaj</translation>
     </message>
     <message>
         <source>Stop playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj</translation>
     </message>
     <message>
         <source>Volume down</source>
-        <translation type="unfinished"></translation>
+        <translation>Ciszej</translation>
     </message>
     <message>
         <source>Volume up</source>
-        <translation type="unfinished"></translation>
+        <translation>Głośniej</translation>
     </message>
     <message>
         <source>Mute</source>
-        <translation type="unfinished"></translation>
+        <translation>Wycisz</translation>
     </message>
     <message>
         <source>Cycle visualizer mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz wizualizer</translation>
     </message>
     <message>
         <source>Blank screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Wygaś ekran</translation>
     </message>
     <message>
         <source>Increase rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwiększ ocenę</translation>
     </message>
     <message>
         <source>Decrease rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmniejsz ocenę</translation>
     </message>
     <message>
         <source>Refresh music tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Odśwież drzewo</translation>
     </message>
     <message>
         <source>Filter All My Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtruj całą moją kolekcję</translation>
     </message>
     <message>
         <source>Show incremental search dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż okienko wyszukiwania</translation>
     </message>
     <message>
         <source>Incremental search find next match</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyszukiwanie- następny wynik</translation>
     </message>
     <message>
         <source>Increase Play Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwiększ Prędkość Odtwarzania</translation>
     </message>
     <message>
         <source>Decrease Play Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmniejsz Prędkość Odtwarzania</translation>
     </message>
     <message>
         <source>MythMusic Media Handler 1/2</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMusic - obsługa madiów 1/2</translation>
     </message>
     <message>
         <source>MythMusic Media Handler 2/2</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMusic - obsługa madiów 2/2</translation>
     </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation>Edytuj listę odtw.</translation>
+        <translation>Edytuj listę odtwarzania</translation>
     </message>
     <message>
         <source>Visualize</source>
@@ -768,7 +768,7 @@ Następny ekran będzie pusty. Opuść go, żeby wrócić do menu.</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation>Ten katalog musi istnieć i użytkownik, który uruchamia MythMusic, powinien mieć prawo do zapisu w tym katalogu</translation>
+        <translation>Ten katalog musi istnieć i użytkownik, który uruchamia MythMusic, powinien mieć prawo do zapisu w tym katalogu.</translation>
     </message>
     <message>
         <source>Audio device</source>
@@ -848,7 +848,7 @@ Następny ekran będzie pusty. Opuść go, żeby wrócić do menu.</translation>
     </message>
     <message>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation>Automatycznie wykrywa płyty CD Audio i pokazuje informacje o nich, o ile są dostępne, w drzewie wyboru muzyki</translation>
+        <translation>Automatycznie wykrywa płyty CD Audio i pokazuje informacje o nich, o ile są dostępne, w drzewie wyboru muzyki.</translation>
     </message>
     <message>
         <source>Automatically play CDs</source>
@@ -856,11 +856,11 @@ Następny ekran będzie pusty. Opuść go, żeby wrócić do menu.</translation>
     </message>
     <message>
         <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation>Automatczynie umieszcza nową płytę CD na liście odtwarzania i uruchamia odtwarzanie tej płyty</translation>
+        <translation>Automatczynie umieszcza nową płytę CD na liście odtwarzania i uruchamia odtwarzanie tej płyty.</translation>
     </message>
     <message>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
-        <translation>Użyj akceleracji przycisków klawiatury/pilota.</translation>
+        <translation>Użyj akceleracji przycisków klawiatury/pilota</translation>
     </message>
     <message>
         <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
@@ -952,7 +952,7 @@ Następny ekran będzie pusty. Opuść go, żeby wrócić do menu.</translation>
     </message>
     <message>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
-        <translation>Jeżeli ustawione, tacka CD zostanie automatycznie wysunięta po zrippowaniu CD</translation>
+        <translation>Jeżeli ustawione, tacka CD zostanie automatycznie wysunięta po zrippowaniu CD.</translation>
     </message>
     <message>
         <source>Rating Weight</source>
@@ -1112,7 +1112,7 @@ Następny ekran będzie pusty. Opuść go, żeby wrócić do menu.</translation>
     </message>
     <message>
         <source>Change Visualizer on each song</source>
-        <translation>Zmień wizualizację przy każdym utworze.</translation>
+        <translation>Zmień wizualizację przy każdym utworze</translation>
     </message>
     <message>
         <source>Change the visualizer when the song changes.</source>
@@ -1124,7 +1124,7 @@ Następny ekran będzie pusty. Opuść go, żeby wrócić do menu.</translation>
     </message>
     <message>
         <source>When the song changes and the new song has an album art image display it in the visualizer for a short period.</source>
-        <translation>Przy zmianie utworu i przy nowym albumie na ekranie wizualizacji krótką chwilę wyświetli się okładka albumu</translation>
+        <translation>Przy zmianie utworu i przy nowym albumie na ekranie wizualizacji krótką chwilę wyświetli się okładka albumu.</translation>
     </message>
     <message>
         <source>Randomize Visualizer order</source>
@@ -1132,7 +1132,7 @@ Następny ekran będzie pusty. Opuść go, żeby wrócić do menu.</translation>
     </message>
     <message>
         <source>On changing the visualizer pick a new one at random.</source>
-        <translation>Przy zmianie wizualizacji losowo wybiera nową</translation>
+        <translation>Przy zmianie wizualizacji losowo wybiera nową.</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
@@ -1152,7 +1152,7 @@ Następny ekran będzie pusty. Opuść go, żeby wrócić do menu.</translation>
     </message>
     <message>
         <source>List of visualizations to use during playback. Click the button below to edit this list</source>
-        <translation>Lista wizualizacji użzywanychpodczas odtwarzania. Naciścnij przycisk poniżej, aby edytować tą listę.</translation>
+        <translation>Lista wizualizacji użzywanychpodczas odtwarzania. Naciścnij przycisk poniżej, aby edytować tą listę</translation>
     </message>
     <message>
         <source>Edit Visualizations</source>
@@ -1160,11 +1160,11 @@ Następny ekran będzie pusty. Opuść go, żeby wrócić do menu.</translation>
     </message>
     <message>
         <source>Edit the list of visualizations to use during playback.</source>
-        <translation>Edytuj listę wizualizacji używanych podczas odtwarzania</translation>
+        <translation>Edytuj listę wizualizacji używanych podczas odtwarzania.</translation>
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation>Zezwalaj na nagrywanie CD</translation>
+        <translation>Zezwalaj na nagrywanie CD.</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
@@ -1604,7 +1604,7 @@ Chcesz usunąć istniejący utwór?</translation>
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>Artist</source>
@@ -1628,7 +1628,7 @@ Chcesz usunąć istniejący utwór?</translation>
     </message>
     <message>
         <source>Track No.</source>
-        <translation>Nr ścieżki</translation>
+        <translation>Nr ścieżki.</translation>
     </message>
     <message>
         <source>Exit</source>
@@ -1889,99 +1889,99 @@ Chcesz usunąć istniejący utwór?</translation>
     </message>
     <message>
         <source>Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę czekać ...</translation>
     </message>
     <message>
         <source>Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadane</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished">Zakończone</translation>
+        <translation>Zakończone</translation>
     </message>
     <message>
         <source>Switch Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz Tytuły</translation>
     </message>
     <message>
         <source>Scan CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanuj CD</translation>
     </message>
     <message>
         <source>Already in database</source>
-        <translation type="unfinished"></translation>
+        <translation>Już jest w bazie</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Szukaj</translation>
+        <translation>Szukaj</translation>
     </message>
     <message>
         <source>Cover Art</source>
-        <translation type="unfinished"></translation>
+        <translation>Okładka</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Odtwarzaj</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Dodaj</translation>
+        <translation>Dodaj</translation>
     </message>
     <message>
         <source>Next New</source>
-        <translation type="unfinished"></translation>
+        <translation>Następny Nowy</translation>
     </message>
     <message>
         <source>Add All New</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj Wszystkie Nowe</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiuj</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia ogólne</translation>
     </message>
     <message>
         <source>Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia odtwarzacza</translation>
     </message>
     <message>
         <source>Ripper Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia ripera CD</translation>
     </message>
     <message>
         <source>Play Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Odtwarzaj Muzykę</translation>
     </message>
     <message>
         <source>Select Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz Utwór(y)</translation>
     </message>
     <message>
         <source>Import CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Importuj CD</translation>
     </message>
     <message>
         <source>Import Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Importuj Pliki</translation>
     </message>
     <message>
         <source>Scan for New Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyszukiwanie nowych plików muzycznych</translation>
     </message>
     <message>
         <source>Eject media</source>
-        <translation type="unfinished"></translation>
+        <translation>Wysuń Media</translation>
     </message>
     <message>
         <source>Music Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia dla Muzyki</translation>
     </message>
     <message>
         <source>Configure playback and CD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfiguruj odtwarzanie oraz ripowanie CD</translation>
     </message>
 </context>
 <context>

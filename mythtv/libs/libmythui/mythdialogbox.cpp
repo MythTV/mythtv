@@ -183,16 +183,30 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "ESCAPE" )
+        if (action == "ESCAPE")
         {
             SendEvent(-1, m_exittext, m_exitdata);
             if (m_exitdata == 0 && m_exittext.isEmpty())
                 Close();
         }
+        else if ((action == "LEFT" &&
+             m_buttonList->GetLayout() == MythUIButtonList::LayoutVertical) ||
+            (action == "UP" &&
+             m_buttonList->GetLayout() == MythUIButtonList::LayoutHorizontal))
+        {
+            SendEvent(-1, m_backtext, m_backdata);
+        }
         else if (action == "MENU")
         {
             SendEvent(-2);
             Close();
+        }
+        else if ((action == "RIGHT" &&
+                  m_buttonList->GetLayout() == MythUIButtonList::LayoutVertical) ||
+                 (action == "DOWN" &&
+                  m_buttonList->GetLayout() == MythUIButtonList::LayoutHorizontal))
+        {
+            Select(m_buttonList->GetItemCurrent());
         }
         else
             handled = false;

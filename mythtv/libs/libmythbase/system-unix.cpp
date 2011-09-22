@@ -2,6 +2,7 @@
 // Own header
 #include "mythsystem.h"
 #include "system-unix.h"
+#include "util.h"
 
 // compat header
 #include "compat.h"
@@ -676,6 +677,9 @@ void MythSystemUnix::Fork(time_t timeout)
     // check before fork to avoid QString use in child
     bool setpgidsetting = GetSetting("SetPGID");
 
+    int niceval = m_parent->GetNice();
+    int ioprioval = m_parent->GetIOPrio();
+
     /* Do this before forking in case the child miserably fails */
     m_timeout = timeout;
     if( timeout )
@@ -800,6 +804,12 @@ void MythSystemUnix::Fork(time_t timeout)
                  << "setpgid() failed: "
                  << strerror(errno) << endl;
         }
+
+        /* Set nice and ioprio values if non-default */
+        if (niceval)
+            myth_nice(niceval);
+        if (ioprioval)
+            myth_ioprio(ioprioval);
 
         /* run command */
         if( execv(command, cmdargs) < 0 )

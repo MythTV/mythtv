@@ -210,6 +210,31 @@ bool ImportMusicDialog::keyPressEvent(QKeyEvent *event)
         {
             showMenu();
         }
+        else if (action == "ESCAPE" && !GetMythMainWindow()->IsExitingToMain())
+        {
+            bool found = false;
+            if (!m_tracks->empty())
+            {
+                uint track = 0;
+                while (track < m_tracks->size())
+                {
+                    if (m_tracks->at(track)->isNewTune)
+                    {
+                        found = true;
+                        break;
+                    }
+                    track++;
+                }
+
+                if (found)
+                {
+                    QString msg = tr("You might have unsaved changes.\nAre you sure you want to exit this screen?");
+                    ShowOkPopup(msg, this, SLOT(doExit(bool)), true);
+                }
+            }
+
+            handled = found;
+        }
         else if (action == "1")
         {
             setCompilation();
@@ -311,6 +336,12 @@ bool ImportMusicDialog::Create()
     m_locationEdit->SetText(gCoreContext->GetSetting("MythMusicLastImportDir", "/"));
 
     return true;
+}
+
+void ImportMusicDialog::doExit(bool ok)
+{
+    if (ok)
+        Close();
 }
 
 void ImportMusicDialog::locationPressed()
