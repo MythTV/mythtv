@@ -1937,6 +1937,97 @@ void CardUtil::GetCardInputs(
 #endif // USING_DVB
 }
 
+int CardUtil::CreateCaptureCard(const QString &videodevice,
+                                 const QString &audiodevice,
+                                 const QString &vbidevice,
+                                 const QString &cardtype,
+                                 const QString &defaultinput,
+                                 const uint audioratelimit,
+                                 const QString &hostname,
+                                 const uint dvb_swfilter,
+                                 const uint dvb_sat_type,
+                                 bool       dvb_wait_for_seqstart,
+                                 bool       skipbtaudio,
+                                 bool       dvb_on_demand,
+                                 const uint dvb_diseqc_type,
+                                 const uint firewire_speed,
+                                 const QString &firewire_model,
+                                 const uint firewire_connection,
+                                 const uint signal_timeout,
+                                 const uint channel_timeout,
+                                 const uint dvb_tuning_delay,
+                                 const uint contrast,
+                                 const uint brightness,
+                                 const uint colour,
+                                 const uint hue,
+                                 const uint diseqcid,
+                                 bool       dvb_eitscan)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "INSERT INTO capturecard "
+        "(videodevice, audiodevice, vbidevice, cardtype, defaultinput, "
+        "audioratelimit, hostname, dvb_swfilter, dvb_sat_type, "
+        "dvb_wait_for_seqstart, skipbtaudio, dvb_on_demand, dvb_diseqc_type, "
+        "firewire_speed, firewire_model, firewire_connection, signal_timeout, "
+        "channel_timeout, dvb_tuning_delay, contrast, brightness, colour, "
+        "hue, diseqcid, dvb_eitscan) "
+        "VALUES (:VIDEODEVICE, :AUDIODEVICE, :VBIDEVICE, :CARDTYPE, "
+        ":DEFAULTINPUT, :AUDIORATELIMIT, :HOSTNAME, :DVBSWFILTER, :DVBSATTYPE, "
+        ":DVBWAITFORSEQSTART, :SKIPBTAUDIO, :DVBONDEMAND, :DVBDISEQCTYPE, "
+        ":FIREWIRESPEED, :FIREWIREMODEL, :FIREWIRECONNECTION, :SIGNALTIMEOUT, "
+        ":CHANNELTIMEOUT, :DVBTUNINGDELAY, :CONTRAST, :BRIGHTNESS, :COLOUR, "
+        ":HUE, :DISEQCID, :DVBEITSCAN ) ");
+
+    query.bindValue(":VIDEODEVICE", videodevice);
+    query.bindValue(":AUDIODEVICE", audiodevice);
+    query.bindValue(":VBIDEVICE", vbidevice);
+    query.bindValue(":CARDTYPE", cardtype);
+    query.bindValue(":DEFAULTINPUT", defaultinput);
+    query.bindValue(":AUDIORATELIMIT", audioratelimit);
+    query.bindValue(":HOSTNAME", hostname);
+    query.bindValue(":DVBSWFILTER", dvb_swfilter);
+    query.bindValue(":DVBSATTYPE", dvb_sat_type);
+    query.bindValue(":DVBWAITFORSEQSTART", dvb_wait_for_seqstart);
+    query.bindValue(":SKIPBTAUDIO", skipbtaudio);
+    query.bindValue(":DVBONDEMAND", dvb_on_demand);
+    query.bindValue(":DVBDISEQCTYPE", dvb_diseqc_type);
+    query.bindValue(":FIREWIRESPEED", firewire_speed);
+    query.bindValue(":FIREWIREMODEL", firewire_model);
+    query.bindValue(":FIREWIRECONNECTION", firewire_connection);
+    query.bindValue(":SIGNALTIMEOUT", signal_timeout);
+    query.bindValue(":CHANNELTIMEOUT", channel_timeout);
+    query.bindValue(":DVBTUNINGDELAY", dvb_tuning_delay);
+    query.bindValue(":CONTRAST", contrast);
+    query.bindValue(":BRIGHTNESS", brightness);
+    query.bindValue(":COLOUR", colour);
+    query.bindValue(":HUE", hue);
+    query.bindValue(":DISEQCID", diseqcid);
+    query.bindValue(":DVBEITSCAN", dvb_eitscan);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateCaptureCard", query);
+        return -1;
+    }
+
+    query.prepare("SELECT MAX(cardid) FROM capturecard");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateCaptureCard maxcard", query);
+        return -1;
+    }
+
+    uint cardid = -1;
+
+    if (query.next())
+        cardid = query.value(0).toUInt();
+
+    return cardid;
+}
+
 bool CardUtil::DeleteCard(uint cardid)
 {
     MSqlQuery query(MSqlQuery::InitCon());

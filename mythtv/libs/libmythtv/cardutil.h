@@ -174,6 +174,38 @@ class MTV_PUBLIC CardUtil
             (rawtype == "IMPORT")    || (rawtype == "DEMO");
     }
 
+    // Card creation and deletion
+
+    static int          CreateCaptureCard(const QString &videodevice,
+                                          const QString &audiodevice,
+                                          const QString &vbidevice,
+                                          const QString &cardtype,
+                                          const QString &defaultinput,
+                                          const uint audioratelimit,
+                                          const QString &hostname,
+                                          const uint dvb_swfilter,
+                                          const uint dvb_sat_type,
+                                          bool       dvb_wait_for_seqstart,
+                                          bool       skipbtaudio,
+                                          bool       dvb_on_demand,
+                                          const uint dvb_diseqc_type,
+                                          const uint firewire_speed,
+                                          const QString &firewire_model,
+                                          const uint firewire_connection,
+                                          const uint signal_timeout,
+                                          const uint channel_timeout,
+                                          const uint dvb_tuning_delay,
+                                          const uint contrast,
+                                          const uint brightness,
+                                          const uint colour,
+                                          const uint hue,
+                                          const uint diseqcid,
+                                          bool       dvb_eitscan);
+
+    static bool         DeleteCard(uint cardid);
+    static bool         DeleteAllCards(void);
+    static vector<uint> GetCardList(void);
+
     /// Convenience function for GetCardIDs()
     static uint         GetFirstCardID(const QString &videodevice)
     {
@@ -267,10 +299,6 @@ class MTV_PUBLIC CardUtil
                                       const QString      &cardtype,
                                       QStringList        &inputLabels,
                                       vector<CardInput*> &cardInputs);
-
-    static bool         DeleteCard(uint cardid);
-    static bool         DeleteAllCards(void);
-    static vector<uint> GetCardList(void);
 
     // General info from OS
     static QStringList  ProbeVideoDevices(const QString &rawtype);
