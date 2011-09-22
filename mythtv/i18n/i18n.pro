@@ -14,6 +14,7 @@ trans.files += mythfrontend_en_ca.qm
 trans.files += mythfrontend_en_gb.qm
 trans.files += mythfrontend_en_us.qm
 trans.files += mythfrontend_es.qm
+trans.files += mythfrontend_es_es.qm
 trans.files += mythfrontend_et.qm
 trans.files += mythfrontend_fi.qm
 trans.files += mythfrontend_fr.qm
