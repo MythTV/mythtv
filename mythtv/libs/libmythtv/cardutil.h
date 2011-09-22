@@ -234,8 +234,6 @@ class MTV_PUBLIC CardUtil
         { return get_on_cardid("audiodevice", cardid); }
     static QString      GetVBIDevice(uint cardid)
         { return get_on_cardid("vbidevice", cardid); }
-    static uint         GetHDHRTuner(uint cardid)
-        { return get_on_cardid("dbox2_port", cardid).toUInt(); }
 
     static int          GetValueInt(const QString &col, uint cid)
         { return get_on_cardid(col, cid).toInt(); }
