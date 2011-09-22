@@ -37,9 +37,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Capture::RemoveCaptureCard( int Id )
+bool Capture::RemoveCaptureCard( int nId )
 {
-    bool bResult = CardUtil::DeleteCard(Id);
+    if ( nId < 1 )
+        throw( QString( "The Card ID is invalid.");
+
+    bool bResult = CardUtil::DeleteCard(nId);
 
     return bResult;
 }
@@ -74,6 +77,11 @@ int Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                                   const uint       nDiSEqCId,
                                   bool             bDVBEITScan)
 {
+    if ( sVideoDevice.isEmpty() || sCardType.isEmpty() || sHostName.isEmpty() ||
+         sDefaultInput.isEmpty() )
+        throw( QString( "This API requires at least a video device node, a card type, "
+                        "a default input, and a hostname." ));
+
     int nResult = CardUtil::CreateCaptureCard(sVideoDevice, sAudioDevice,
                       sVBIDevice, sCardType, sDefaultInput, nAudioRateLimit,
                       sHostName, nDVBSWFilter, nDVBSatType, bDVBWaitForSeqStart,
