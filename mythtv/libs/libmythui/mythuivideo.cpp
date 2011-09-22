@@ -19,7 +19,7 @@
 #define LOC      QString("MythUIVideo(0x%1): ").arg((uint64_t)this, 0, 16)
 
 MythUIVideo::MythUIVideo(MythUIType *parent, const QString &name)
-           : MythUIType(parent, name)
+    : MythUIType(parent, name)
 {
     m_image = NULL;
     m_backgroundColor = QColor(Qt::black);
@@ -44,6 +44,7 @@ void MythUIVideo::Reset(void)
         m_image->DownRef();
         m_image = NULL;
     }
+
     MythUIType::Reset();
 }
 

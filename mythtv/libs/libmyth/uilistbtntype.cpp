@@ -737,7 +737,7 @@ bool UIListTreeType::tryToSetCurrent(QStringList route)
             currentpos = (UIListGenericTree *)next_child;
             if (!currentlevel->MoveToNamedPosition(currentpos->getString()))
             {
-                LOG(VB_GENERAL, LOG_CRIT,
+                LOG(VB_GENERAL, LOG_ERR,
                          "had problem finding something it knows is there");
                 keep_going = false;
             }

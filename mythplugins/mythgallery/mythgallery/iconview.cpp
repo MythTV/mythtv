@@ -39,26 +39,26 @@ using namespace std;
 #include <mythdbcon.h>
 #include <httpcomms.h>
 #include <mythcontext.h>
+#include <mythlogging.h>
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
 #include <mythmediamonitor.h>
-#include "mythlogging.h"
 
 // MythGallery headers
 #include "galleryutil.h"
 #include "gallerysettings.h"
+#include "galleryfilter.h"
 #include "thumbgenerator.h"
 #include "iconview.h"
 #include "singleview.h"
 #include "glsingleview.h"
 
 #define LOC QString("IconView: ")
-#define LOC_ERR QString("IconView, Error: ")
 
 QEvent::Type ChildCountEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-class FileCopyThread: public QThread
+class FileCopyThread : public MThread
 {
   public:
     FileCopyThread(IconView *parent, bool move);
@@ -71,23 +71,23 @@ class FileCopyThread: public QThread
     volatile int m_progress;
 };
 
-FileCopyThread::FileCopyThread(IconView *parent, bool move)
+FileCopyThread::FileCopyThread(IconView *parent, bool move) :
+    MThread("FileCopy"), m_move(move), m_parent(parent), m_progress(0)
 {
-    m_move = move;
-    m_parent = parent;
-    m_progress = 0;
 }
 
 void FileCopyThread::run()
 {
+    RunProlog();
+
     QStringList::iterator it;
     QFileInfo fi;
     QFileInfo dest;
 
-    threadRegister("FileCopy");
     m_progress = 0;
 
-    for (it = m_parent->m_itemMarked.begin(); it != m_parent->m_itemMarked.end(); it++)
+    for (it = m_parent->m_itemMarked.begin();
+         it != m_parent->m_itemMarked.end(); ++it)
     {
         fi.setFile(*it);
         dest.setFile(QDir(m_parent->m_currDir), fi.fileName());
@@ -97,7 +97,8 @@ void FileCopyThread::run()
 
         m_progress++;
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -107,6 +108,7 @@ IconView::IconView(MythScreenStack *parent, const char *name,
         : MythScreenType(parent, name)
 {
     m_galleryDir = galleryDir;
+    m_galleryFilter = new GalleryFilter();
 
     m_isGallery = false;
     m_showDevices = false;
@@ -146,7 +148,11 @@ IconView::~IconView()
         delete m_thumbGen;
         m_thumbGen = NULL;
     }
-
+    if (m_galleryFilter)
+    {
+        delete m_galleryFilter;
+        m_galleryFilter = NULL;
+    }
     if (m_childCountThread)
     {
         delete m_childCountThread;
@@ -207,7 +213,8 @@ bool IconView::Create(void)
         m_thumbGen->setSize(thumbWidth, thumbHeight);
 
     SetupMediaMonitor();
-    LoadDirectory(m_galleryDir);
+    if (!m_currDevice)
+        LoadDirectory(m_galleryDir);
 
     return true;
 }
@@ -238,7 +245,7 @@ void IconView::LoadDirectory(const QString &dir)
     m_itemHash.clear();
     m_imageList->Reset();
 
-    m_isGallery = GalleryUtil::LoadDirectory(m_itemList, dir, m_sortorder,
+    m_isGallery = GalleryUtil::LoadDirectory(m_itemList, dir, *m_galleryFilter,
                                              false, &m_itemHash, m_thumbGen);
 
     if (m_thumbGen && !m_thumbGen->isRunning())
@@ -342,7 +349,10 @@ void IconView::LoadThumbnail(ThumbItem *item)
 
 void IconView::SetupMediaMonitor(void)
 {
-#ifndef _WIN32
+#ifdef _WIN32
+    if (m_currDevice)
+        LoadDirectory(m_currDevice->getDevicePath());
+#else
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
     {
@@ -373,7 +383,6 @@ void IconView::SetupMediaMonitor(void)
             mon->Unlock(m_currDevice);
         }
     }
-    m_currDevice = NULL;
 #endif // _WIN32
 }
 
@@ -533,6 +542,9 @@ bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
     {
         m_currDevice = item->GetMediaDevice();
 
+#ifdef _WIN32
+        LoadDirectory(m_currDevice->getDevicePath());
+#else
         if (!m_currDevice->isMounted(false))
             m_currDevice->mount();
 
@@ -545,6 +557,7 @@ bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
                                         MythMediaDevice*)));
 
         LoadDirectory(m_currDevice->getMountPath());
+#endif
 
         mon->Unlock(m_currDevice);
     }
@@ -617,7 +630,7 @@ bool IconView::HandleMediaEscape(MediaMonitor *mon)
     QDir curdir(m_currDir);
     QList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
     QList<MythMediaDevice*>::iterator it = removables.begin();
-    for (; !handled && (it != removables.end()); it++)
+    for (; !handled && (it != removables.end()); ++it)
     {
         if (!mon->ValidateAndLock(*it))
             continue;
@@ -654,8 +667,8 @@ bool IconView::HandleMediaEscape(MediaMonitor *mon)
 
 static bool is_subdir(const QDir &parent, const QDir &subdir)
 {
-    QString pstr = parent.canonicalPath();
-    QString cstr = subdir.canonicalPath();
+    QString pstr = QDir::cleanPath(parent.path());
+    QString cstr = QDir::cleanPath(subdir.path());
     bool ret = !cstr.indexOf(pstr);
 
     return ret;
@@ -723,7 +736,10 @@ void IconView::customEvent(QEvent *event)
 {
     if (event->type() == ThumbGenEvent::kEventType)
     {
-        ThumbGenEvent *tge = (ThumbGenEvent *)event;
+        ThumbGenEvent *tge = dynamic_cast<ThumbGenEvent *>(event);
+
+        if (!tge)
+            return;
 
         ThumbData *td = tge->thumbData;
         if (!td)
@@ -757,7 +773,10 @@ void IconView::customEvent(QEvent *event)
     }
     else if (event->type() == ChildCountEvent::kEventType)
     {
-        ChildCountEvent *cce = (ChildCountEvent *)event;
+        ChildCountEvent *cce = dynamic_cast<ChildCountEvent *>(event);
+
+        if (!cce)
+            return;
 
         ChildCountData *ccd = cce->childCountData;
         if (!ccd)
@@ -797,9 +816,12 @@ void IconView::customEvent(QEvent *event)
                     HandleSubMenuMark();
                     break;
                 case 4:
-                    HandleSubMenuFile();
+                    HandleSubMenuFilter();
                     break;
                 case 5:
+                    HandleSubMenuFile();
+                    break;
+                case 6:
                     HandleSettings();
                     break;
             }
@@ -871,6 +893,11 @@ void IconView::customEvent(QEvent *event)
 
 }
 
+void IconView::reloadData()
+{
+    LoadDirectory(m_galleryDir);
+}
+
 void IconView::HandleMainMenu(void)
 {
     QString label = tr("Gallery Options");
@@ -890,6 +917,7 @@ void IconView::HandleMainMenu(void)
     m_menuPopup->AddButton(tr("Random"));
     m_menuPopup->AddButton(tr("Meta Data Menu"));
     m_menuPopup->AddButton(tr("Marking Menu"));
+    m_menuPopup->AddButton(tr("Filter / Sort Menu"));
     m_menuPopup->AddButton(tr("File Menu"));
     m_menuPopup->AddButton(tr("Settings"));
 //     if (m_showDevices)
@@ -924,7 +952,8 @@ void IconView::HandleSubMenuMark(void)
 {
     QString label = tr("Marking Options");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
+    m_menuPopup = new MythDialogBox(label, m_popupStack,
+                                    "mythgallerymenupopup");
 
     if (m_menuPopup->Create())
         m_popupStack->AddScreen(m_menuPopup);
@@ -937,11 +966,25 @@ void IconView::HandleSubMenuMark(void)
     m_menuPopup->AddButton(tr("Clear Marked"));
 }
 
+void IconView::HandleSubMenuFilter(void)
+{
+    MythScreenStack *mainStack = GetScreenStack();
+
+    GalleryFilterDialog *filterdialog =
+        new GalleryFilterDialog(mainStack, "galleryfilter", m_galleryFilter);
+
+    if (filterdialog->Create())
+        mainStack->AddScreen(filterdialog);
+
+    connect(filterdialog, SIGNAL(filterChanged()), SLOT(reloadData()));
+}
+
 void IconView::HandleSubMenuFile(void)
 {
     QString label = tr("File Options");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
+    m_menuPopup = new MythDialogBox(label, m_popupStack,
+                                    "mythgallerymenupopup");
 
     if (m_menuPopup->Create())
         m_popupStack->AddScreen(m_menuPopup);
@@ -1047,7 +1090,11 @@ void IconView::HandleSettings(void)
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
     {
+#ifdef _WIN32
+        LoadDirectory(m_currDevice->getDevicePath());
+#else
         LoadDirectory(m_currDevice->getMountPath());
+#endif
         mon->Unlock(m_currDevice);
     }
     else
@@ -1132,8 +1179,8 @@ void IconView::HandleImport(void)
 
 void IconView::HandleShowDevices(void)
 {
-#ifndef _WIN32
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+#ifndef _WIN32
     if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
     {
         m_currDevice->disconnect(this);
@@ -1161,12 +1208,12 @@ void IconView::HandleShowDevices(void)
     m_itemList.append(item);
     m_itemHash.insert(item->GetName(), item);
 
-#ifndef _WIN32
     if (mon)
     {
-        QList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
+        MythMediaType type = MythMediaType(MEDIATYPE_DATA | MEDIATYPE_MGALLERY);
+        QList<MythMediaDevice*> removables = mon->GetMedias(type);
         QList<MythMediaDevice*>::Iterator it = removables.begin();
-        for (; it != removables.end(); it++)
+        for (; it != removables.end(); ++it)
         {
             if (mon->ValidateAndLock(*it))
             {
@@ -1182,7 +1229,6 @@ void IconView::HandleShowDevices(void)
             }
         }
     }
-#endif
 
     ThumbItem *thumbitem;
     for (int x = 0; x < m_itemList.size(); x++)
@@ -1235,7 +1281,7 @@ void IconView::DoDeleteMarked(bool doDelete)
         QStringList::iterator it;
         QFileInfo fi;
 
-        for (it = m_itemMarked.begin(); it != m_itemMarked.end(); it++)
+        for (it = m_itemMarked.begin(); it != m_itemMarked.end(); ++it)
         {
             fi.setFile(*it);
 
@@ -1470,9 +1516,9 @@ ThumbItem *IconView::GetCurrentThumb(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ChildCountThread::ChildCountThread(QObject *parent)
+ChildCountThread::ChildCountThread(QObject *parent) :
+    MThread("ChildCountThread"), m_parent(parent)
 {
-    m_parent = parent;
 }
 
 ChildCountThread::~ChildCountThread()
@@ -1497,7 +1543,8 @@ void ChildCountThread::cancel()
 
 void ChildCountThread::run()
 {
-    threadRegister("ChildCount");
+    RunProlog();
+
     while (moreWork())
     {
         QString file;
@@ -1519,7 +1566,8 @@ void ChildCountThread::run()
         // inform parent we have got a count ready for it
         QApplication::postEvent(m_parent, new ChildCountEvent(ccd));
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 bool ChildCountThread::moreWork()

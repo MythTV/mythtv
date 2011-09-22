@@ -1,5 +1,5 @@
 /****************************************************************************
-** 
+**
 **
 ** Definition of the MythWizard class.
 **
@@ -93,7 +93,7 @@ public slots:
     virtual void setBackEnabled(QWidget *, bool);
     virtual void setNextEnabled(QWidget *, bool);
     virtual void setFinishEnabled(QWidget *, bool);
-    
+
     virtual void setHelpText(QString helptext);
 
 protected slots:
@@ -117,16 +117,6 @@ protected:
     void layOut();
 
     MythWizardPrivate *d;
-};
-
-class MPUBLIC MythJumpWizard : public MythWizard
-{
-    Q_OBJECT
-
-  public:
-    MythJumpWizard(MythMainWindow *parent, const char *name = NULL);
-    virtual ~MythJumpWizard();
-
 };
 
 #endif

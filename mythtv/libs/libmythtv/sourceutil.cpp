@@ -7,6 +7,7 @@
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "mythdb.h"
+#include "mythdirs.h"
 #include "mythlogging.h"
 #include "util.h"
 
@@ -347,7 +348,8 @@ bool SourceUtil::IsAnySourceScanable(void)
 
 bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
 {
-    QString cmd = "mythfilldatabase --only-update-channels";
+    QString cmd = GetInstallPrefix() +
+                  "/bin/mythfilldatabase --only-update-channels";
     if (sourceid)
         cmd += QString(" --sourceid %1").arg(sourceid);
     if (!cardtype.isEmpty())

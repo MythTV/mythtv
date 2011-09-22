@@ -9,11 +9,11 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include <QApplication>
-#include <QThread>
 
 // mythtv
 #include <mythcontext.h>
 #include <mythdb.h>
+#include <mthread.h>
 #include <programinfo.h>
 #include <remoteutil.h>
 #include <mythtimer.h>
@@ -24,37 +24,47 @@
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
 #include <mythdialogbox.h>
-#include "mythlogging.h"
+#include <mythlogging.h>
 
 // mytharchive
 #include "recordingselector.h"
 #include "archiveutil.h"
 
-class GetRecordingListThread : public QThread
+class GetRecordingListThread : public MThread
 {
   public:
-    GetRecordingListThread(RecordingSelector *parent)
+    GetRecordingListThread(RecordingSelector *parent) :
+        MThread("GetRecordingList"), m_parent(parent)
     {
-        m_parent = parent;
         start();
     }
 
     virtual void run(void)
     {
-        threadRegister("GetRecordingList");
+        RunProlog();
         m_parent->getRecordingList();
-        threadDeregister();
+        RunEpilog();
     }
 
     RecordingSelector *m_parent;
 };
 
-RecordingSelector::RecordingSelector(MythScreenStack *parent,
-                                     QList<ArchiveItem *> *archiveList)
-                  : MythScreenType(parent, "RecordingSelector")
+RecordingSelector::RecordingSelector(
+    MythScreenStack *parent, QList<ArchiveItem *> *archiveList) :
+    MythScreenType(parent, "RecordingSelector"),
+    m_archiveList(archiveList),
+    m_recordingList(NULL),
+    m_recordingButtonList(NULL),
+    m_okButton(NULL),
+    m_cancelButton(NULL),
+    m_categorySelector(NULL),
+    m_titleText(NULL),
+    m_datetimeText(NULL),
+    m_filesizeText(NULL),
+    m_descriptionText(NULL),
+    m_previewImage(NULL),
+    m_cutlistImage(NULL)
 {
-    m_archiveList = archiveList;
-    m_recordingList = NULL;
 }
 
 RecordingSelector::~RecordingSelector(void)
@@ -63,8 +73,7 @@ RecordingSelector::~RecordingSelector(void)
         delete m_recordingList;
 
     while (!m_selectedList.isEmpty())
-         delete m_selectedList.takeFirst();
-    m_selectedList.clear();
+        delete m_selectedList.takeFirst();
 }
 
 bool RecordingSelector::Create(void)
@@ -131,17 +140,17 @@ void RecordingSelector::Init(void)
     else
     {
         delete busyPopup;
-        busyPopup = false;
+        busyPopup = NULL;
     }
 
     GetRecordingListThread *thread = new GetRecordingListThread(this);
     while (thread->isRunning())
     {
         qApp->processEvents();
-        usleep(100);
+        usleep(2000);
     }
 
-    if (!m_recordingList || m_recordingList->size() == 0)
+    if (!m_recordingList || m_recordingList->empty())
     {
         ShowOkPopup(tr("Either you don't have any recordings or "
                        "no recordings are available locally!"));
@@ -212,7 +221,7 @@ void RecordingSelector::selectAll()
 
     ProgramInfo *p;
     vector<ProgramInfo *>::iterator i = m_recordingList->begin();
-    for ( ; i != m_recordingList->end(); i++)
+    for ( ; i != m_recordingList->end(); ++i)
     {
         p = *i;
         m_selectedList.append(p);
@@ -391,7 +400,7 @@ void RecordingSelector::cancelPressed()
 
 void RecordingSelector::updateRecordingList(void)
 {
-    if (!m_recordingList || m_recordingList->size() == 0)
+    if (!m_recordingList || m_recordingList->empty())
         return;
 
     m_recordingButtonList->Reset();
@@ -400,7 +409,7 @@ void RecordingSelector::updateRecordingList(void)
     {
         ProgramInfo *p;
         vector<ProgramInfo *>::iterator i = m_recordingList->begin();
-        for ( ; i != m_recordingList->end(); i++)
+        for ( ; i != m_recordingList->end(); ++i)
         {
             p = *i;
 
@@ -437,10 +446,10 @@ void RecordingSelector::getRecordingList(void)
     m_recordingList = RemoteGetRecordedList(-1);
     m_categories.clear();
 
-    if (m_recordingList && m_recordingList->size() > 0)
+    if (m_recordingList && !m_recordingList->empty())
     {
         vector<ProgramInfo *>::iterator i = m_recordingList->begin();
-        for ( ; i != m_recordingList->end(); i++)
+        for ( ; i != m_recordingList->end(); ++i)
         {
             p = *i;
 
@@ -452,7 +461,7 @@ void RecordingSelector::getRecordingList(void)
                             "isn't available locally - %1")
                         .arg(p->GetPlaybackURL(false, true)));
                 i = m_recordingList->erase(i);
-                i--;
+                --i;
                 continue;
             }
 
@@ -461,7 +470,7 @@ void RecordingSelector::getRecordingList(void)
                 p->GetRecordingGroup() == "Deleted")
             {
                 i = m_recordingList->erase(i);
-                i--;
+                --i;
                 continue;
             }
 

@@ -585,7 +585,7 @@ Most MythTV programs follow a common sequence:
   </ul>
   <li>Create the main window/screen, display themed menus, <i>et c.</i></li>
 </ol>
-(examine program/*/main.cpp, and libs/libmyth/mythcontext.cpp,
+(examine program/{appname}/main.cpp, and libs/libmyth/mythcontext.cpp,
 for further detail).
 
 <p>
@@ -648,7 +648,7 @@ some messages will still appear in English.
 If there is no exact translation for a particular message, the Qt runtime
 system attempts to build a translation from existing elements.
 The Qt Linguist tool is the recommended way to update the translation files
-(which live in mythtv/i18n and mythplugins/*/i18n).
+(which live in mythtv/i18n and mythplugins/{pluginname}/i18n).
 If you choose to edit them manually, you must use a UTF compatible editor,
 so that the languages which contain accents and multi-byte strings
 are not corrupted.

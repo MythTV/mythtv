@@ -256,7 +256,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
             db.bindValue(":EMAIL", info.email);
             if (!db.exec())
             {
-                MythDB::DBError("Updating weather source settings.", query);
+                MythDB::DBError("Updating weather source settings.", db);
                 return NULL;
             }
         }
@@ -290,7 +290,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
         db.bindValue(":TYPES", info.types.join(","));
         if (!db.exec())
         {
-            MythDB::DBError("Inserting weather source", query);
+            MythDB::DBError("Inserting weather source", db);
             return NULL;
         }
         query = "SELECT sourceid FROM weathersourcesettings "
@@ -302,7 +302,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
         db.bindValue(":NAME", info.name);
         if (!db.exec())
         {
-            MythDB::DBError("Getting weather sourceid", query);
+            MythDB::DBError("Getting weather sourceid", db);
             return NULL;
         }
         else if (!db.next())

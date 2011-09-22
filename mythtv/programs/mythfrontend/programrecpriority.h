@@ -104,7 +104,6 @@ class ProgramRecPriority : public ScheduleCommon
     MythUIText *m_recPriorityText;
     MythUIText *m_recPriorityBText;
     MythUIText *m_finalPriorityText;
-    MythUIText *m_storageGroupText;
     MythUIText *m_lastRecordedText;
     MythUIText *m_lastRecordedDateText;
     MythUIText *m_lastRecordedTimeText;

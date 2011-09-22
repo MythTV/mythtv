@@ -13,6 +13,8 @@
 // Qt
 #include <QByteArray>
 #include <QHostInfo>
+#include <QNetworkInterface> // for QNetworkInterface::allAddresses ()
+#include <QAbstractSocket> // for QAbstractSocket::NetworkLayerProtocol
 #include <QMap>
 #include <QCoreApplication>
 
@@ -34,7 +36,10 @@ const uint MythSocket::kSocketBufferSize = 128000;
 const uint MythSocket::kShortTimeout = kMythSocketShortTimeout;
 const uint MythSocket::kLongTimeout  = kMythSocketLongTimeout;
 
-MythSocketThread *MythSocket::s_readyread_thread = new MythSocketThread();
+QMutex MythSocket::s_readyread_thread_lock;
+MythSocketThread *MythSocket::s_readyread_thread = NULL;
+
+QMap<QString, QHostAddress::SpecialAddress> MythSocket::s_loopback_cache;
 
 MythSocket::MythSocket(int socket, MythSocketCBs *cb)
     : MSocketDevice(MSocketDevice::Stream),            m_cb(cb),
@@ -52,6 +57,13 @@ MythSocket::MythSocket(int socket, MythSocketCBs *cb)
         // Could this apply to other platforms, too?
         setSendBufferSize(kSocketBufferSize);
 #endif
+    }
+
+    if (!s_readyread_thread)
+    {
+        QMutexLocker locker(&s_readyread_thread_lock);
+        if (!s_readyread_thread)
+            s_readyread_thread = new MythSocketThread();
     }
 
     if (m_cb)
@@ -744,6 +756,7 @@ void MythSocket::Unlock(bool wake_readyread) const
 bool MythSocket::connect(const QString &host, quint16 port)
 {
     QHostAddress hadr;
+    
     if (!hadr.setAddress(host))
     {
         QHostInfo info = QHostInfo::fromName(host);
@@ -766,14 +779,44 @@ bool MythSocket::connect(const QString &host, quint16 port)
  *  \brief connect to host
  *  \return true on success
  */
-bool MythSocket::connect(const QHostAddress &addr, quint16 port)
+bool MythSocket::connect(const QHostAddress &hadr, quint16 port)
 {
+    QHostAddress addr = hadr;
+
     if (state() == Connected)
     {
         LOG(VB_SOCKET, LOG_ERR, LOC +
             "connect() called with already open socket, closing");
         close();
     }
+
+    bool usingLoopback = false;
+    if (s_loopback_cache.contains(addr.toString()))
+    {
+        addr = QHostAddress(s_loopback_cache.value(addr.toString()));
+        usingLoopback = true;
+    }
+    else
+    {
+        QList<QHostAddress> localIPs = QNetworkInterface::allAddresses();
+        for (int i = 0; i < localIPs.count() && !usingLoopback; ++i)
+        {
+            if (addr == localIPs[i])
+            {
+                QHostAddress::SpecialAddress loopback = QHostAddress::LocalHost;
+                if (addr.protocol() == QAbstractSocket::IPv6Protocol)
+                    loopback = QHostAddress::LocalHostIPv6;
+                
+                s_loopback_cache[addr.toString()] = loopback;
+                addr = QHostAddress(loopback);
+                usingLoopback = true;
+            }
+        }
+    }
+
+    if (usingLoopback)
+        LOG(VB_SOCKET, LOG_INFO, LOC + QString("IP is local, using "
+                                               "loopback address instead"));
 
     LOG(VB_SOCKET, LOG_INFO, LOC + QString("attempting connect() to (%1:%2)")
             .arg(addr.toString()).arg(port));
@@ -845,7 +888,7 @@ bool MythSocket::Validate(uint timeout_ms, bool error_dialog_desired)
     }
     else if (strlist[0] == "ACCEPT")
     {
-        LOG(VB_GENERAL, LOG_CRIT, QString("Using protocol version %1")
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Using protocol version %1")
                                .arg(MYTH_PROTO_VERSION));
         setValidated();
         return true;

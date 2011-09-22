@@ -119,7 +119,7 @@ qint64 MMulticastSocketDevice::writeBlock(
             LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("writeBlock on %1 %2")
                     .arg((*it).toString()).arg((retx==(int)len)?"ok":"err"));
 #endif
-            usleep(5000 + (rand() % 5000));
+            usleep(5000 + (random() % 5000));
         }
         return retx;
     }

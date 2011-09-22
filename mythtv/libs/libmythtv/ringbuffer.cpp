@@ -172,6 +172,7 @@ RingBuffer *RingBuffer::Create(
 }
 
 RingBuffer::RingBuffer(RingBufferType rbtype) :
+    MThread("RingBuffer"),
     type(rbtype),
     readpos(0),               writepos(0),
     internalreadpos(0),       ignorereadpos(-1),
@@ -235,6 +236,8 @@ RingBuffer::~RingBuffer(void)
     }
 
     rwlock.unlock();
+
+    wait();
 }
 
 /** \fn RingBuffer::Reset(bool, bool, bool)
@@ -502,7 +505,7 @@ void RingBuffer::Start(void)
 
     StartReads();
 
-    QThread::start();
+    MThread::start();
 
     while (readaheadrunning && !reallyrunning)
         generalWait.wait(&rwlock);
@@ -522,7 +525,7 @@ void RingBuffer::KillReadAheadThread(void)
         StopReads();
         generalWait.wakeAll();
         rwlock.unlock();
-        QThread::wait(5000);
+        MThread::wait(5000);
     }
 }
 
@@ -697,7 +700,8 @@ void RingBuffer::CreateReadAheadBuffer(void)
 
 void RingBuffer::run(void)
 {
-    threadRegister("RingBuffer");
+    RunProlog();
+
     // These variables are used to adjust the read block size
     struct timeval lastread, now;
     int readtimeavg = 300;
@@ -736,9 +740,11 @@ void RingBuffer::run(void)
 
         long long totfree = ReadBufFree();
 
+        const uint KB32 = 32*1024;
         // These are conditions where we don't want to go through
         // the loop if they are true.
-        if ((ignorereadpos >= 0) || commserror || stopreads)
+        if (((totfree < KB32) && readsallowed) ||
+            (ignorereadpos >= 0) || commserror || stopreads)
         {
             ignore_for_read_timing |=
                 (ignorereadpos >= 0) || commserror || stopreads;
@@ -755,7 +761,6 @@ void RingBuffer::run(void)
             totfree = ReadBufFree();
         }
 
-        const uint KB32 = 32*1024;
         int read_return = -1;
         if (totfree >= KB32 && !commserror &&
             !ateof && !setswitchtonext)
@@ -828,7 +833,13 @@ void RingBuffer::run(void)
             MythTimer sr_timer;
             sr_timer.start();
 
-            read_return = safe_read(readAheadBuffer + rbwpos, totfree);
+            int rbwposcopy = rbwpos;
+
+            // FileRingBuffer::safe_read(RemoteFile*...) acquires poslock;
+            // so we need to unlock this here to preserve locking order.
+            rbwlock.unlock();
+
+            read_return = safe_read(readAheadBuffer + rbwposcopy, totfree);
 
             int sr_elapsed = sr_timer.elapsed();
             uint64_t bps = !sr_elapsed ? 1000000001 :
@@ -836,24 +847,26 @@ void RingBuffer::run(void)
                                       (double)sr_elapsed);
             LOG(VB_FILE, LOG_INFO, LOC +
                 QString("safe_read(...@%1, %2) -> %3, took %4 ms %5")
-                    .arg(rbwpos).arg(totfree).arg(read_return)
+                    .arg(rbwposcopy).arg(totfree).arg(read_return)
                     .arg(sr_elapsed)
                     .arg(QString("(%1Mbps)").arg((double)bps / 1000000.0)));
             UpdateStorageRate(bps);
-            rbwlock.unlock();
-        }
 
-        if (read_return >= 0)
-        {
-            poslock.lockForWrite();
-            rbwlock.lockForWrite();
-            internalreadpos += read_return;
-            rbwpos = (rbwpos + read_return) % bufferSize;
-            LOG(VB_FILE, LOG_DEBUG,
-                LOC + QString("rbwpos += %1K requested %2K in read")
-                    .arg(read_return/1024,3).arg(totfree/1024,3));
-            rbwlock.unlock();
-            poslock.unlock();
+            if (read_return >= 0)
+            {
+                poslock.lockForWrite();
+                rbwlock.lockForWrite();
+                if (rbwposcopy == rbwpos)
+                {
+                    internalreadpos += read_return;
+                    rbwpos = (rbwpos + read_return) % bufferSize;
+                    LOG(VB_FILE, LOG_DEBUG,
+                        LOC + QString("rbwpos += %1K requested %2K in read")
+                        .arg(read_return/1024,3).arg(totfree/1024,3));
+                }
+                rbwlock.unlock();
+                poslock.unlock();
+            }
         }
 
         int used = bufferSize - ReadBufFree();
@@ -948,7 +961,8 @@ void RingBuffer::run(void)
     rbwlock.unlock();
     rbrlock.unlock();
     rwlock.unlock();
-    threadDeregister();
+
+    RunEpilog();
 }
 
 long long RingBuffer::SetAdjustFilesize(void)

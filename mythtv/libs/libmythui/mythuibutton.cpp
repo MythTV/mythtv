@@ -14,7 +14,7 @@
 #include "mythuigroup.h"
 
 MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
-            : MythUIType(parent, name)
+    : MythUIType(parent, name)
 {
     m_clickTimer = new QTimer();
     m_clickTimer->setSingleShot(true);
@@ -43,11 +43,11 @@ MythUIButton::~MythUIButton()
 
 void MythUIButton::SetInitialStates()
 {
-    m_BackgroundState = dynamic_cast<MythUIStateType*>(GetChild("buttonstate"));
+    m_BackgroundState = dynamic_cast<MythUIStateType *>(GetChild("buttonstate"));
 
     if (!m_BackgroundState)
         LOG(VB_GENERAL, LOG_ERR, QString("Button %1 is missing required "
-                                      "elements").arg(objectName()));
+                                         "elements").arg(objectName()));
 
     SetState("active");
 
@@ -107,10 +107,11 @@ void MythUIButton::SetState(QString state)
 
     m_BackgroundState->DisplayState(m_state);
 
-    MythUIGroup *activeState = dynamic_cast<MythUIGroup*>
-                                    (m_BackgroundState->GetCurrentState());
+    MythUIGroup *activeState = dynamic_cast<MythUIGroup *>
+                               (m_BackgroundState->GetCurrentState());
+
     if (activeState)
-        m_Text = dynamic_cast<MythUIText*>(activeState->GetChild("text"));
+        m_Text = dynamic_cast<MythUIText *>(activeState->GetChild("text"));
 
     if (m_Text)
     {
@@ -167,6 +168,7 @@ bool MythUIButton::gestureEvent(MythGestureEvent *event)
             return true;
         }
     }
+
     return false;
 }
 
@@ -174,8 +176,10 @@ void MythUIButton::Push(bool lock)
 {
     m_Pushed = true;
     SetState("pushed");
+
     if (!lock && !m_Lockable)
         m_clickTimer->start(500);
+
     emit Clicked();
 }
 
@@ -229,10 +233,11 @@ void MythUIButton::SetText(const QString &msg)
 
     m_Message = msg;
 
-    MythUIGroup *activeState = dynamic_cast<MythUIGroup*>
-                                    (m_BackgroundState->GetCurrentState());
+    MythUIGroup *activeState = dynamic_cast<MythUIGroup *>
+                               (m_BackgroundState->GetCurrentState());
+
     if (activeState)
-        m_Text = dynamic_cast<MythUIText*>(activeState->GetChild("text"));
+        m_Text = dynamic_cast<MythUIText *>(activeState->GetChild("text"));
 
     if (m_Text)
         m_Text->SetText(msg);
@@ -283,6 +288,7 @@ void MythUIButton::CreateCopy(MythUIType *parent)
 void MythUIButton::CopyFrom(MythUIType *base)
 {
     MythUIButton *button = dynamic_cast<MythUIButton *>(base);
+
     if (!button)
     {
         LOG(VB_GENERAL, LOG_ERR, "Dynamic cast of base failed");

@@ -35,7 +35,7 @@ class MHBitmapDisplay;
 
 class MHBitmap : public MHVisible  
 {
-public:
+  public:
     MHBitmap();
     MHBitmap(const MHBitmap &ref);
     virtual const char *ClassName() { return "Bitmap"; }
@@ -59,7 +59,7 @@ public:
     virtual QRegion GetVisibleArea();
     virtual QRegion GetOpaqueArea();
 
-protected:
+  protected:
     bool    m_fTiling;
     int     m_nOrigTransparency;
 
@@ -73,13 +73,13 @@ protected:
 
 // Actions.
 class MHSetTransparency: public MHActionInt {
-public:
+  public:
     MHSetTransparency(): MHActionInt(":SetTransparency") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetTransparency(nArg, engine); }
 };
 
 class MHScaleBitmap: public MHActionIntInt {
-public:
+  public:
     MHScaleBitmap(): MHActionIntInt(":ScaleBitmap") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) { pTarget->ScaleBitmap(nArg1, nArg2, engine); }
 };
@@ -87,7 +87,7 @@ public:
 // Actions added in the UK MHEG profile.
 class MHSetBitmapDecodeOffset: public MHActionIntInt
 {
-public:
+  public:
     MHSetBitmapDecodeOffset(): MHActionIntInt(":SetBitmapDecodeOffset") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2)
     { pTarget->SetBitmapDecodeOffset(nArg1, nArg2, engine); }
@@ -95,7 +95,7 @@ public:
 
 class MHGetBitmapDecodeOffset: public MHActionObjectRef2
 {
-public:
+  public:
     MHGetBitmapDecodeOffset(): MHActionObjectRef2(":GetBitmapDecodeOffset")  {}
     virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) { pTarget->GetBitmapDecodeOffset(pArg1, pArg2); }
 };

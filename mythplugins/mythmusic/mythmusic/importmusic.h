@@ -5,10 +5,10 @@
 #include <vector>
 using namespace std;
 
-#include <QThread>
 #include <QStringList>
 
 #include <mythscreentype.h>
+#include <mthread.h>
 
 class Metadata;
 class ImportMusicDialog;
@@ -28,7 +28,7 @@ typedef struct
     bool      metadataHasChanged;
 } TrackInfo;
 
-class FileScannerThread: public QThread
+class FileScannerThread: public MThread
 {
     public:
         FileScannerThread(ImportMusicDialog *parent);
@@ -66,6 +66,7 @@ class ImportMusicDialog : public MythScreenType
     void prevPressed(void);
     void showEditMetadataDialog(void);
     void startScan(void);
+    void doExit(bool ok);
 
     // popup menu
     void showMenu(void);

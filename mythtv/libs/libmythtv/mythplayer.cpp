@@ -24,11 +24,11 @@ using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
-#include <QThread>
 #include <QKeyEvent>
 #include <QDir>
 
 // MythTV headers
+#include "mthread.h"
 #include "mythconfig.h"
 #include "mythdbcon.h"
 #include "dialogbox.h"
@@ -88,14 +88,12 @@ static unsigned dbg_ident(const MythPlayer*);
 
 void DecoderThread::run(void)
 {
-    if (!m_mp)
-        return;
-
-    threadRegister("Decoder");
-    LOG(VB_PLAYBACK, LOG_INFO, LOC_DEC + QString("Decoder thread starting."));
-    m_mp->DecoderLoop(m_start_paused);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC_DEC + QString("Decoder thread exiting."));
-    threadDeregister();
+    RunProlog();
+    LOG(VB_PLAYBACK, LOG_INFO, LOC_DEC + "Decoder thread starting.");
+    if (m_mp)
+        m_mp->DecoderLoop(m_start_paused);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC_DEC + "Decoder thread exiting.");
+    RunEpilog();
 }
 
 static const int toCaptionType(int type)
@@ -550,7 +548,7 @@ void MythPlayer::ReinitOSD(void)
     if (videoOutput && !using_null_videoout)
     {
         osdLock.lock();
-        if (QThread::currentThread() != (QThread*)playerThread)
+        if (!is_current_thread(playerThread))
         {
             reinit_osd = true;
             osdLock.unlock();
@@ -746,7 +744,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
 {
     QMutexLocker locker(&videofiltersLock);
 
-    if (QThread::currentThread() != (QThread*)playerThread)
+    if (!is_current_thread(playerThread))
     {
         resetScan = scan;
         return;
@@ -1664,7 +1662,7 @@ int64_t MythPlayer::AVSyncGetAudiotime(void)
     }
     return currentaudiotime;
 }
- 
+
 #define MAXDIVERGE  3.0f
 #define DIVERGELIMIT 30.0f
 void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
@@ -1682,7 +1680,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     float diverge = 0.0f;
     int frameDelay = m_double_framerate ? frame_interval / 2 : frame_interval;
     int vsync_delay_clock = 0;
-    int64_t currentaudiotime = 0;
+    //int64_t currentaudiotime = 0;
 
     if (videoOutput->IsErrored())
     {
@@ -1703,7 +1701,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
         ps = kScan_Progressive;
 
-    bool max_video_behind = diverge < -MAXDIVERGE; 
+    bool max_video_behind = diverge < -MAXDIVERGE;
     bool dropframe = false;
     QString dbg;
 
@@ -1740,7 +1738,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     {
         // Reset A/V Sync
         lastsync = true;
-        currentaudiotime = AVSyncGetAudiotime();
+        //currentaudiotime = AVSyncGetAudiotime();
         LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg + "dropping frame to catch up.");
         if (!audio.IsPaused() && max_video_behind)
         {
@@ -1759,7 +1757,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
                 .arg(avsync_adjustment).arg(m_double_framerate));
         vsync_delay_clock = videosync->WaitForFrame
                             (frameDelay + avsync_adjustment + repeat_delay);
-        currentaudiotime = AVSyncGetAudiotime();
+        //currentaudiotime = AVSyncGetAudiotime();
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "AVSync show");
         videoOutput->Show(ps);
 
@@ -1803,7 +1801,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     else
     {
         vsync_delay_clock = videosync->WaitForFrame(frameDelay);
-        currentaudiotime = AVSyncGetAudiotime();
+        //currentaudiotime = AVSyncGetAudiotime();
     }
 
     if (output_jmeter && output_jmeter->RecordCycleTime())
@@ -2773,7 +2771,7 @@ void MythPlayer::AudioEnd(void)
 bool MythPlayer::PauseDecoder(void)
 {
     decoderPauseLock.lock();
-    if (QThread::currentThread() == (QThread*)decoderThread)
+    if (is_current_thread(decoderThread))
     {
         decoderPaused = true;
         decoderThreadPause.wakeAll();
@@ -2797,7 +2795,7 @@ void MythPlayer::UnpauseDecoder(void)
 {
     decoderPauseLock.lock();
 
-    if (QThread::currentThread() == (QThread*)decoderThread)
+    if (is_current_thread(decoderThread))
     {
         decoderPaused = false;
         decoderThreadUnpause.wakeAll();
@@ -2851,18 +2849,19 @@ void MythPlayer::DecoderEnd(void)
 
 void MythPlayer::DecoderPauseCheck(void)
 {
-    if (QThread::currentThread() != (QThread*)decoderThread)
-        return;
-    if (pauseDecoder)
-        PauseDecoder();
-    if (unpauseDecoder)
-        UnpauseDecoder();
+    if (is_current_thread(decoderThread))
+    {
+        if (pauseDecoder)
+            PauseDecoder();
+        if (unpauseDecoder)
+            UnpauseDecoder();
+    }
 }
 
 //// FIXME - move the eof ownership back into MythPlayer
 bool MythPlayer::GetEof(void)
 {
-    if (QThread::currentThread() == (QThread*)playerThread)
+    if (is_current_thread(playerThread))
         return decoder ? decoder->GetEof() : true;
 
     decoder_change_lock.lock();
@@ -2873,7 +2872,7 @@ bool MythPlayer::GetEof(void)
 
 void MythPlayer::SetEof(bool eof)
 {
-    if (QThread::currentThread() == (QThread*)playerThread)
+    if (is_current_thread(playerThread))
     {
         if (decoder)
             decoder->SetEof(eof);
@@ -3037,7 +3036,7 @@ void MythPlayer::SetTranscoding(bool value)
 
 bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
 {
-    if (QThread::currentThread() != playerThread)
+    if (!is_current_thread(playerThread))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot add PiP from another thread");
         return false;
@@ -3062,7 +3061,7 @@ bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
 
 bool MythPlayer::RemovePIPPlayer(MythPlayer *pip, uint timeout)
 {
-    if (QThread::currentThread() != playerThread)
+    if (!is_current_thread(playerThread))
         return false;
 
     if (!pip_players.contains(pip))
@@ -3076,7 +3075,7 @@ bool MythPlayer::RemovePIPPlayer(MythPlayer *pip, uint timeout)
 
 PIPLocation MythPlayer::GetNextPIPLocation(void) const
 {
-    if (QThread::currentThread() != playerThread)
+    if (!is_current_thread(playerThread))
         return kPIP_END;
 
     if (pip_players.isEmpty())

@@ -33,7 +33,7 @@
 
 class MHPresentable : public MHIngredient  
 {
-public:
+  public:
     MHPresentable() {}
     MHPresentable(const MHPresentable &ref): MHIngredient(ref) {}
     // No new components.
@@ -51,14 +51,14 @@ public:
 // Run and stop actions.
 class MHRun: public MHElemAction
 {
-public:
+  public:
     MHRun(): MHElemAction(":Run") {}
     virtual void Perform(MHEngine *engine) { Target(engine)->Run(engine); }
 };
 
 class MHStop: public MHElemAction
 {
-public:
+  public:
     MHStop(): MHElemAction(":Stop") {}
     virtual void Perform(MHEngine *engine) { Target(engine)->Stop(engine); }
 };

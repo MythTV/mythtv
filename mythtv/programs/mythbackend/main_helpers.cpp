@@ -25,6 +25,7 @@
 
 #include "tv_rec.h"
 #include "scheduledrecording.h"
+#include "mythsocketthread.h"
 #include "autoexpire.h"
 #include "scheduler.h"
 #include "mainserver.h"
@@ -56,6 +57,8 @@
 #define LOC_WARN QString("MythBackend, Warning: ")
 #define LOC_ERR  QString("MythBackend, Error: ")
 
+static MainServer *mainServer = NULL;
+
 bool setupTVs(bool ismaster, bool &error)
 {
     error = false;
@@ -72,15 +75,14 @@ bool setupTVs(bool ismaster, bool &error)
                         "DATE_FORMAT(starttime, '%Y%m%d%H%i00'), '_', "
                         "DATE_FORMAT(endtime, '%Y%m%d%H%i00'), '.nuv') "
                         "WHERE basename = '';"))
-            MythDB::DBError("Updating record basename",
-                                 query.lastQuery());
+            MythDB::DBError("Updating record basename", query);
 
         // Hack to make sure record.station gets set if the user
         // downgrades to a prior version and creates new entries
         // without it.
         if (!query.exec("UPDATE channel SET callsign=chanid "
                         "WHERE callsign IS NULL OR callsign='';"))
-            MythDB::DBError("Updating channel callsign", query.lastQuery());
+            MythDB::DBError("Updating channel callsign", query);
 
         if (query.exec("SELECT MIN(chanid) FROM channel;"))
         {
@@ -88,10 +90,10 @@ bool setupTVs(bool ismaster, bool &error)
             int min_chanid = query.value(0).toInt();
             if (!query.exec(QString("UPDATE record SET chanid = %1 "
                                     "WHERE chanid IS NULL;").arg(min_chanid)))
-                MythDB::DBError("Updating record chanid", query.lastQuery());
+                MythDB::DBError("Updating record chanid", query);
         }
         else
-            MythDB::DBError("Querying minimum chanid", query.lastQuery());
+            MythDB::DBError("Querying minimum chanid", query);
 
         MSqlQuery records_without_station(MSqlQuery::InitCon());
         records_without_station.prepare("SELECT record.chanid,"
@@ -110,8 +112,7 @@ bool setupTVs(bool ismaster, bool &error)
                         records_without_station.value(0));
                 if (!update_record.exec())
                 {
-                    MythDB::DBError("Updating record station",
-                            update_record.lastQuery());
+                    MythDB::DBError("Updating record station", update_record);
                 }
             } while (records_without_station.next());
         }
@@ -220,14 +221,50 @@ void cleanup(void)
     signal(SIGUSR1, SIG_DFL);
 #endif
 
-    delete sched;
-    sched = NULL;
+    if (mainServer)
+        mainServer->Stop();
+
+    delete housekeeping;
+    housekeeping = NULL;
+
+    if (gCoreContext)
+    {
+        delete gCoreContext->GetScheduler();
+        gCoreContext->SetScheduler(NULL);
+    }
+
+    delete expirer;
+    expirer = NULL;
+
+    delete jobqueue;
+    jobqueue = NULL;
 
     delete g_pUPnp;
     g_pUPnp = NULL;
 
+    if (SSDP::Instance())
+    {
+        SSDP::Instance()->RequestTerminate();
+        SSDP::Instance()->wait();
+    }
+
+    if (TaskQueue::Instance())
+    {
+        TaskQueue::Instance()->RequestTerminate();
+        TaskQueue::Instance()->wait();
+    }
+
+    while (!TVRec::cards.empty())
+    {
+        TVRec *rec = *TVRec::cards.begin();
+        delete rec;
+    }
+
     delete gContext;
     gContext = NULL;
+
+    delete mainServer;
+    mainServer = NULL;
 
     if (pidfile.size())
     {
@@ -316,7 +353,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
     if (cmdline.toBool("printsched") ||
         cmdline.toBool("testsched"))
     {
-        sched = new Scheduler(false, &tvList);
+        Scheduler *sched = new Scheduler(false, &tvList);
         if (!cmdline.toBool("testsched") &&
             gCoreContext->ConnectToMasterServer())
         {
@@ -333,6 +370,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
 
         verboseMask |= VB_SCHEDULE;
         sched->PrintList(true);
+        delete sched;
         return GENERIC_EXIT_OK;
     }
 
@@ -531,6 +569,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_SETUP_ERROR;
     }
 
+    Scheduler *sched = NULL;
     if (ismaster)
     {
         if (runsched)
@@ -553,6 +592,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
             if (sched)
                 sched->SetExpirer(expirer);
         }
+        gCoreContext->SetScheduler(sched);
     }
     else if (!cmdline.toBool("nohousekeeper"))
     {
@@ -588,8 +628,8 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         pHS->RegisterExtension( httpStatus );
     }
 
-    MainServer *mainServer = new MainServer(ismaster, port, &tvList, sched,
-                                            expirer);
+    mainServer = new MainServer(
+        ismaster, port, &tvList, sched, expirer);
 
     int exitCode = mainServer->GetExitCode();
     if (exitCode != GENERIC_EXIT_OK)
@@ -623,9 +663,6 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     LOG(VB_GENERAL, LOG_NOTICE, "MythBackend exiting");
 
     delete sysEventHandler;
-    delete mainServer;
-
-    cleanup();
 
     return exitCode;
 }

@@ -165,7 +165,6 @@ int main(int argc, char *argv[])
     QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap;
-    srand(time(NULL));
     int AudioTrackNo = -1;
 
     int found_starttime = 0;
@@ -632,21 +631,24 @@ static uint64_t ComputeNewBookmark(uint64_t oldBookmark,
     bool firstMark = true;
     while (delMap.count() && delMap.begin().key() <= oldBookmark)
     {
-        if (delMap.begin().data() == MARK_CUT_START && !withinCut)
+        uint64_t key = delMap.begin().key();
+        MarkTypes mark = delMap.begin().value();
+
+        if (mark == MARK_CUT_START && !withinCut)
         {
             withinCut = true;
-            startOfCutRegion = delMap.begin().key();
+            startOfCutRegion = key;
         }
-        else if (delMap.begin().data() == MARK_CUT_END && firstMark)
+        else if (mark == MARK_CUT_END && firstMark)
         {
-            subtraction += delMap.begin().key();
+            subtraction += key;
         }
-        else if (delMap.begin().data() == MARK_CUT_END && withinCut)
+        else if (mark == MARK_CUT_END && withinCut)
         {
             withinCut = false;
-            subtraction += (delMap.begin().key() - startOfCutRegion);
+            subtraction += (key - startOfCutRegion);
         }
-        delMap.remove(delMap.begin());
+        delMap.remove(key);
         firstMark = false;
     }
     if (withinCut)

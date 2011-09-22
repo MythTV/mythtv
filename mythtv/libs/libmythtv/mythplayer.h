@@ -80,13 +80,12 @@ enum
     kDisplayTeletextMenu        = 0x200,
 };
 
-class DecoderThread : public QThread
+class DecoderThread : public MThread
 {
-    Q_OBJECT
-
   public:
     DecoderThread(MythPlayer *mp, bool start_paused)
-      : QThread(NULL), m_mp(mp), m_start_paused(start_paused) { }
+      : MThread("Decoder"), m_mp(mp), m_start_paused(start_paused) { }
+    ~DecoderThread() { wait(); }
 
   protected:
     virtual void run(void);
@@ -176,7 +175,7 @@ class MTV_PUBLIC MythPlayer
     PIPLocation GetNextPIPLocation(void) const;
 
     // Bool Gets
-    bool    IsPaused(void)                    { return allpaused;      }
+    bool    IsPaused(void) const              { return allpaused;      }
     bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
     bool    GetEof(void);

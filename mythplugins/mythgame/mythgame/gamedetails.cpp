@@ -12,7 +12,13 @@
 
 GameDetailsPopup::GameDetailsPopup(MythScreenStack *parent,
                                    const RomInfo *romInfo)
-           : MythScreenType (parent, "gamedetailspopup")
+           : MythScreenType (parent, "gamedetailspopup"),
+        m_romInfo(romInfo), m_id(""), m_retObject(NULL),
+        m_gameName(NULL), m_gameType(NULL), m_romName(NULL),
+        m_crc(NULL), m_romPath(NULL), m_genre(NULL),
+        m_year(NULL), m_country(NULL), m_plot(NULL),
+        m_publisher(NULL), m_allSystems(NULL), m_fanartImage(NULL),
+        m_boxImage(NULL), m_playButton(NULL), m_doneButton(NULL)
 {
     m_romInfo = romInfo;
 }

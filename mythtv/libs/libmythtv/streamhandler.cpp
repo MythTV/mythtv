@@ -6,6 +6,7 @@
 #define LOC      QString("SH(%1): ").arg(_device)
 
 StreamHandler::StreamHandler(const QString &device) :
+    MThread("StreamHandler"),
     _device(device),
     _needs_buffering(false),
     _allow_section_reader(false),
@@ -152,7 +153,7 @@ void StreamHandler::Start(void)
 
     _error = false;
     SetRunningDesired(true);
-    QThread::start();
+    MThread::start();
 
     while (!_running && !_error && _running_desired)
         _running_state_changed.wait(&_start_stop_lock, 100);

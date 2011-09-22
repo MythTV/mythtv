@@ -35,8 +35,7 @@ class HDHRChannel : public DTVChannel
     QString GetDevice(void) const { return _device_id; }
     virtual vector<DTVTunerType> GetTunerTypes(void) const
         { return _tuner_types; }
-    virtual bool IsMaster(void) const
-        { return _master == NULL; }
+    virtual bool IsMaster(void) const;
 
     // Sets
     virtual bool SetChannelByString(const QString &channum);
@@ -49,7 +48,6 @@ class HDHRChannel : public DTVChannel
 
   private:
     QString               _device_id;
-    HDHRChannel          *_master;
     HDHRStreamHandler    *_stream_handler;
     vector<DTVTunerType>  _tuner_types;
 };

@@ -31,6 +31,7 @@
 #include "datacontracts/videoSourceList.h"
 #include "datacontracts/videoMultiplex.h"
 #include "datacontracts/videoMultiplexList.h"
+#include "datacontracts/lineup.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -71,6 +72,8 @@ class SERVICE_PUBLIC ChannelServices : public Service
             DTC::VideoSourceList::InitializeCustomTypes();
             DTC::VideoMultiplex::InitializeCustomTypes();
             DTC::VideoMultiplexList::InitializeCustomTypes();
+            DTC::Lineup::InitializeCustomTypes();
+            DTC::LineupList::InitializeCustomTypes();
         }
 
     public slots:
@@ -147,6 +150,10 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                                    int           NITId ) = 0;
 
         virtual bool                      DeleteVideoSource      ( uint          SourceID ) = 0;
+
+        virtual DTC::LineupList*          GetDDLineups           ( const QString &Source,
+                                                                   const QString &UserId,
+                                                                   const QString &Password ) = 0;
 
         /* Multiplex Methods */
 

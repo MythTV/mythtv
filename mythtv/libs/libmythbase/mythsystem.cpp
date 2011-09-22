@@ -16,11 +16,6 @@
 
 // QT headers
 #include <QCoreApplication>
-#include <QThread>
-#include <QMutex>
-#include <QMap>
-#include <QString>
-#include <QStringList>
 
 // libmythbase headers
 #include "mythcorecontext.h"
@@ -41,6 +36,8 @@
 
 void MythSystem::initializePrivate(void)
 {
+    m_nice = 0;
+    m_ioprio = 0;
 #if CONFIG_CYGWIN || defined(_WIN32)
     d = new MythSystemWindows(this);
 #else
@@ -134,6 +131,24 @@ void MythSystem::SetDirectory(const QString &directory)
 {
     m_settings["SetDirectory"] = true;
     m_directory = QString(directory);
+}
+
+bool MythSystem::SetNice(int nice)
+{
+    if( !d || (GetStatus() != GENERIC_EXIT_START) )
+        return false;
+
+    m_nice = nice;
+    return true;
+}
+
+bool MythSystem::SetIOPrio(int prio)
+{
+    if( !d || (GetStatus() != GENERIC_EXIT_START) )
+        return false;
+
+    m_ioprio = prio;
+    return true;
 }
 
 /** \fn MythSystem::Run()

@@ -946,7 +946,7 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
     for (; itn != pid_cache.end(); ++itn)
     {
         // if old pid smaller than current new pid, skip this old pid
-        for (; ito != old_cache.end() && ito->GetPID() < itn->GetPID(); ito++);
+        for (; ito != old_cache.end() && ito->GetPID() < itn->GetPID(); ++ito);
 
         // if already in DB, skip DB insert
         if (ito != old_cache.end() && ito->GetPID() == itn->GetPID())
@@ -2226,7 +2226,7 @@ uint ChannelUtil::GetNextChannel(
                 it = find(sorted.begin(), sorted.end(),
                           sorted.rbegin()->chanid);
             else
-                it--;
+                --it;
         }
         while ((it != start) &&
                ((skip_non_visible && !it->visible) ||
@@ -2241,7 +2241,7 @@ uint ChannelUtil::GetNextChannel(
     {
         do
         {
-            it++;
+            ++it;
             if (it == sorted.end())
                 it = sorted.begin();
         }

@@ -1,10 +1,10 @@
 // qt
 #include <QCoreApplication>
+#include <QRunnable>
 #include <QString>
 #include <QByteArray>
 #include <QFile>
 #include <QDir>
-#include <QThreadPool>
 #include <QNetworkCookieJar>
 
 #include "stdlib.h"
@@ -13,6 +13,7 @@
 #include "compat.h"
 #include "mythcorecontext.h"
 #include "mythcoreutil.h"
+#include "mthreadpool.h"
 #include "mythdirs.h"
 #include "mythevent.h"
 #include "mythversion.h"
@@ -97,7 +98,6 @@ class RemoteFileDownloadThread : public QRunnable
     {
         bool ok = false;
 
-        threadRegister("RemoteFileDownload");
         RemoteFile *rf = new RemoteFile(m_dlInfo->m_url, false, false, 0);
         ok = rf->SaveAs(m_dlInfo->m_privData);
         delete rf;
@@ -109,7 +109,6 @@ class RemoteFileDownloadThread : public QRunnable
         m_dlInfo->m_bytesTotal = m_dlInfo->m_bytesReceived;
 
         m_parent->downloadFinished(m_dlInfo);
-        threadDeregister();
     }
 
   private:
@@ -120,7 +119,7 @@ class RemoteFileDownloadThread : public QRunnable
 /** \fn ShutdownMythDownloadManager(void)
  *  \brief Deletes the running MythDownloadManager at program exit.
  */
-static void ShutdownMythDownloadManager(void)
+void ShutdownMythDownloadManager(void)
 {
     if (downloadManager)
     {
@@ -159,6 +158,7 @@ MythDownloadManager *GetMythDownloadManager(void)
  *         QNetworkAccessManager and QNetworkDiskCache.
  */
 MythDownloadManager::MythDownloadManager() :
+    MThread("DownloadManager"),
     m_manager(NULL),
     m_diskCache(NULL),
     m_infoLock(new QMutex(QMutex::Recursive)),
@@ -187,13 +187,13 @@ MythDownloadManager::~MythDownloadManager()
  */
 void MythDownloadManager::run(void)
 {
+    RunProlog();
+
     bool downloading = false;
     bool itemsInQueue = false;
     bool waitAnyway = false;
 
-    threadRegister("DownloadManager");
-
-    m_queueThread = currentThread();
+    m_queueThread = QThread::currentThread();
 
     while (!m_runThread)
         usleep(50000);
@@ -264,7 +264,8 @@ void MythDownloadManager::run(void)
         m_infoLock->unlock();
     }
     m_isRunning = false;
-    threadDeregister();
+
+    RunEpilog();
 }
 
 /** \fn MythDownloadManager::queueItem(const QString &url, QNetworkRequest *req,
@@ -552,7 +553,7 @@ void MythDownloadManager::downloadRemoteFile(MythDownloadInfo *dlInfo)
 {
     RemoteFileDownloadThread *dlThread =
         new RemoteFileDownloadThread(this, dlInfo);
-    QThreadPool::globalInstance()->start(dlThread);
+    MThreadPool::globalInstance()->start(dlThread, "RemoteFileDownload");
 }
 
 /** \fn MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
@@ -665,6 +666,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
 
     if (!dlInfo->m_done)
     {
+        dlInfo->m_data = NULL;      // Prevent downloadFinished() from updating
         dlInfo->m_syncMode = false; // Let downloadFinished() cleanup for us
         if ((dlInfo->m_reply) &&
             (dlInfo->m_errorCode == QNetworkReply::NoError))
@@ -713,8 +715,8 @@ void MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
 {
     QNetworkReply *reply = (QNetworkReply*)sender();
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("downloadError(%1) (for reply %2)")
-                    .arg(errorCode).arg((long long)reply));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("downloadError %1 ")
+                    .arg(errorCode) + reply->errorString() );
 
     QMutexLocker locker(m_infoLock);
     if (!m_downloadReplies.contains(reply))
@@ -891,8 +893,8 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
                 args << dlInfo->m_url;
                 args << dlInfo->m_outFile;
                 args << QString::number(dlInfo->m_bytesTotal);
-                args << QString();  // placeholder for error string
-                args << QString::number((int)dlInfo->m_errorCode);
+                args << (reply ? reply->errorString() : QString());  // placeholder for error string
+                args << QString::number((int)(reply ? reply->error() : dlInfo->m_errorCode));
 
                 QCoreApplication::postEvent(dlInfo->m_caller,
                     new MythEvent("DOWNLOAD_FILE FINISHED", args));

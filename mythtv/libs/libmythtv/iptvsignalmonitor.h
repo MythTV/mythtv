@@ -4,19 +4,17 @@
 #define _IPTVSIGNALMONITOR_H_
 
 #include "dtvsignalmonitor.h"
-
-#include <QThread>
-#include <QObject>
+#include "mthread.h"
 
 class IPTVChannel;
 class IPTVSignalMonitor;
 
-class IPTVTableMonitorThread : public QThread
+class IPTVTableMonitorThread : public MThread
 {
-    Q_OBJECT
   public:
-    IPTVTableMonitorThread(IPTVSignalMonitor *p) : m_parent(p) { start(); }
-    virtual ~IPTVTableMonitorThread() { wait(); }
+    IPTVTableMonitorThread(IPTVSignalMonitor *p) :
+        MThread("IPTVTableMonitor"), m_parent(p) { start(); }
+    virtual ~IPTVTableMonitorThread() { wait(); m_parent = NULL; }
     virtual void run(void);
   private:
     IPTVSignalMonitor *m_parent;
@@ -24,8 +22,6 @@ class IPTVTableMonitorThread : public QThread
 
 class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
 {
-    Q_OBJECT
-
     friend class IPTVTableMonitorThread;
   public:
     IPTVSignalMonitor(int db_cardnum, IPTVChannel *_channel,

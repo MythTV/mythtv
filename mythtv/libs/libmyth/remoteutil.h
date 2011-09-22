@@ -8,13 +8,11 @@
 using namespace std;
 
 #include "mythexp.h"
-#include "filesysteminfo.h"
 
 class ProgramInfo;
 class MythEvent;
 
 MPUBLIC vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
-MPUBLIC QVector<FileSystemInfo> RemoteGetFreeSpace(void);
 MPUBLIC bool RemoteGetLoad(float load[3]);
 MPUBLIC bool RemoteGetUptime(time_t &uptime);
 MPUBLIC

@@ -128,6 +128,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
                         MoveMid, MoveByAmount };
+    enum LayoutType  { LayoutVertical, LayoutHorizontal, LayoutGrid };
 
     void SetDrawFromBottom(bool draw);
 
@@ -151,6 +152,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     uint ItemWidth(void);
     uint ItemHeight(void);
+    const LayoutType GetLayout() const { return m_layout; }
 
     bool MoveItemUpDown(MythUIButtonListItem *item, bool up);
 
@@ -188,7 +190,6 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
   protected:
     enum ScrollStyle { ScrollFree, ScrollCenter, ScrollGroupCenter };
-    enum LayoutType  { LayoutVertical, LayoutHorizontal, LayoutGrid };
     enum ArrangeType { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack };
     enum WrapStyle   { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems,
                        WrapFlowing };

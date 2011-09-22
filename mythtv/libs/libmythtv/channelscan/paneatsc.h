@@ -123,7 +123,7 @@ class PaneATSC : public VerticalConfigurationGroup
         for (; it != tables.end(); ++it)
         {
             freq_table_list_t::iterator next = it;
-            next++;
+            ++next;
 
             const FrequencyTable &ft = **it;
             int     name_num         = ft.name_offset;

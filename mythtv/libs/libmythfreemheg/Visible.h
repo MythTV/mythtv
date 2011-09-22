@@ -34,7 +34,7 @@ class MHEngine;
 
 class MHVisible : public MHPresentable  
 {
-public:
+  public:
     MHVisible();
     MHVisible(const MHVisible &ref);
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
@@ -67,7 +67,7 @@ public:
     // Reset the position - used by ListGroup.
     virtual void ResetPosition() { m_nPosX = m_nOriginalPosX; m_nPosY = m_nOriginalPosY; }
 
-protected:
+  protected:
     // Exchange attributes
     int m_nOriginalBoxWidth, m_nOriginalBoxHeight;
     int m_nOriginalPosX, m_nOriginalPosY;
@@ -83,7 +83,7 @@ protected:
 
 class MHLineArt : public MHVisible  
 {
-public:
+  public:
     MHLineArt();
     MHLineArt(const MHLineArt &ref);
     virtual const char *ClassName() { return "LineArt"; }
@@ -98,7 +98,7 @@ public:
     virtual void SetLineWidth(int nWidth, MHEngine *engine);
     virtual void SetLineStyle(int nStyle, MHEngine *engine);
 
-protected:
+  protected:
     // Exchanged attributes,
     bool    m_fBorderedBBox; // Does it have lines round or not?
     int     m_nOriginalLineWidth;
@@ -113,7 +113,7 @@ protected:
 
 class MHRectangle : public MHLineArt  
 {
-public:
+  public:
     MHRectangle() {}
     MHRectangle(const MHRectangle &ref): MHLineArt(ref) {}
     virtual const char *ClassName() { return "Rectangle"; }
@@ -128,7 +128,7 @@ public:
 // in various classes which complicates inheritance.
 class MHInteractible
 {
-public:
+  public:
     MHInteractible(MHVisible *parent);
     virtual ~MHInteractible();
     void Initialise(MHParseNode *p, MHEngine *engine);
@@ -149,7 +149,7 @@ public:
     // of derived classes.
     void InteractDeactivation(void) { m_fInteractionStatus = false; }
 
-protected:
+  protected:
     // Exchanged attributes
     bool     m_fEngineResp;
     MHColour m_highlightRefColour;
@@ -157,13 +157,13 @@ protected:
     bool     m_fHighlightStatus;
     bool     m_fInteractionStatus;
 
-private:
+  private:
     MHVisible *m_parent;
 };
 
 class MHSlider : public MHVisible, public MHInteractible
 {
-public:
+  public:
     MHSlider();
     virtual ~MHSlider();
     virtual const char *ClassName() { return "Slider"; }
@@ -197,7 +197,7 @@ public:
     // Enumerated type lookup functions for the text parser.
     static int GetOrientation(const char *str);
     static int GetStyle(const char *str);
-protected:
+  protected:
     void Increment(MHEngine *engine);
     void Decrement(MHEngine *engine);
 
@@ -221,7 +221,7 @@ protected:
 
 class MHEntryField : public MHVisible, public MHInteractible
 {
-public:
+  public:
     MHEntryField();
     virtual ~MHEntryField();
     virtual const char *ClassName() { return "EntryField"; }
@@ -242,7 +242,7 @@ public:
 // Button - not needed for UK MHEG.
 class MHButton : public MHVisible  
 {
-public:
+  public:
     MHButton();
     virtual ~MHButton();
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
@@ -253,7 +253,7 @@ public:
 // HotSpot - not needed for UK MHEG.
 class MHHotSpot : public MHButton  
 {
-public:
+  public:
     MHHotSpot();
     virtual ~MHHotSpot();
     virtual const char *ClassName() { return "HotSpot"; }
@@ -265,7 +265,7 @@ public:
 // PushButton - not needed for UK MHEG.
 class MHPushButton : public MHButton  
 {
-public:
+  public:
     MHPushButton();
     virtual ~MHPushButton();
     virtual const char *ClassName() { return "PushButton"; }
@@ -277,7 +277,7 @@ public:
 // SwitchButton - not needed for UK MHEG.
 class MHSwitchButton : public MHPushButton  
 {
-public:
+  public:
     MHSwitchButton();
     virtual ~MHSwitchButton();
     virtual const char *ClassName() { return "SwitchButton"; }
@@ -291,11 +291,11 @@ public:
 // Set Line or Fill colour
 class MHSetColour: public MHElemAction
 {
-public:
+  public:
     MHSetColour(const char *name): MHElemAction(name), m_ColourType(CT_None) { }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
-protected:
+  protected:
     virtual void PrintArgs(FILE *fd, int nTabs) const;
     virtual void SetColour(const MHColour &colour, MHEngine *engine) = 0;
     // The colour can be specified as either an index or an absolute colour.
@@ -306,23 +306,23 @@ protected:
 };
 
 class MHSetLineColour: public MHSetColour {
-public:
+  public:
     MHSetLineColour(): MHSetColour(":SetLineColour") { }
-protected:
+  protected:
     virtual void SetColour(const MHColour &colour, MHEngine *engine) { Target(engine)->SetLineColour(colour, engine); }
 };
 
 class MHSetFillColour: public MHSetColour {
-public:
+  public:
     MHSetFillColour(): MHSetColour(":SetFillColour") { }
-protected:
+  protected:
     virtual void SetColour(const MHColour &colour, MHEngine *engine) { Target(engine)->SetFillColour(colour, engine); }
 };
 
 // BringToFront - bring a visible to the front of the display stack.
 class MHBringToFront: public MHElemAction
 {
-public:
+  public:
     MHBringToFront(): MHElemAction(":BringToFront") {}
     virtual void Perform(MHEngine *engine) { Target(engine)->BringToFront(engine); }
 };
@@ -330,7 +330,7 @@ public:
 // PutBefore - put a visible in front of another.
 class MHPutBefore: public MHActionGenericObjectRef
 {
-public:
+  public:
     MHPutBefore(): MHActionGenericObjectRef(":PutBefore") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pRef) { pTarget->PutBefore(pRef, engine); }
 };
@@ -338,7 +338,7 @@ public:
 // PutBehind - put a visible behind another.
 class MHPutBehind: public MHActionGenericObjectRef
 {
-public:
+  public:
     MHPutBehind(): MHActionGenericObjectRef(":PutBehind") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pRef) { pTarget->PutBehind(pRef, engine); }
 };
@@ -346,21 +346,21 @@ public:
 // SendToBack - put a visible at the bottom of the display stack.
 class MHSendToBack: public MHElemAction
 {
-public:
+  public:
     MHSendToBack(): MHElemAction(":SendToBack") {}
     virtual void Perform(MHEngine *engine) { Target(engine)->SendToBack(engine); }
 };
 
 class MHSetPosition: public MHActionIntInt
 {
-public:
+  public:
     MHSetPosition(): MHActionIntInt(":SetPosition") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) { pTarget->SetPosition(nArg1, nArg2, engine); };
 };
 
 class MHSetBoxSize: public MHActionIntInt
 {
-public:
+  public:
     MHSetBoxSize(): MHActionIntInt(":SetBoxSize") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) { pTarget->SetBoxSize(nArg1, nArg2, engine); }
 };
@@ -368,7 +368,7 @@ public:
 // Get box size of a visible
 class MHGetBoxSize: public MHActionObjectRef2
 {
-public:
+  public:
     MHGetBoxSize(): MHActionObjectRef2(":GetBoxSize")  {}
     virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) { pTarget->GetBoxSize(pArg1, pArg2); }
 };
@@ -376,28 +376,28 @@ public:
 // GetPosition of a visible
 class MHGetPosition: public MHActionObjectRef2
 {
-public:
+  public:
     MHGetPosition(): MHActionObjectRef2(":GetPosition")  {}
     virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) { pTarget->GetPosition(pArg1, pArg2); }
 };
 
 class MHSetLineWidth: public MHActionInt
 {
-public:
+  public:
     MHSetLineWidth(): MHActionInt(":SetLineWidth") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetLineWidth(nArg, engine); };
 };
 
 class MHSetLineStyle: public MHActionInt
 {
-public:
+  public:
     MHSetLineStyle(): MHActionInt(":SetLineStyle") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetLineStyle(nArg, engine); };
 };
 
 class MHSetInteractionStatus: public MHActionBool
 {
-public:
+  public:
     MHSetInteractionStatus(): MHActionBool("SetInteractionStatus") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, bool newStatus)
     { Target(engine)->SetInteractionStatus(newStatus, engine); }
@@ -405,7 +405,7 @@ public:
 
 class MHGetInteractionStatus: public MHActionObjectRef
 {
-public:
+  public:
     MHGetInteractionStatus(): MHActionObjectRef(":GetInteractionStatus")  {}
     virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult)
         { pResult->SetVariableValue(pTarget->GetInteractionStatus());}
@@ -413,7 +413,7 @@ public:
 
 class MHSetHighlightStatus: public MHActionBool
 {
-public:
+  public:
     MHSetHighlightStatus(): MHActionBool("SetHighlightStatus") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, bool newStatus)
     { Target(engine)->SetHighlightStatus(newStatus, engine); }
@@ -421,7 +421,7 @@ public:
 
 class MHGetHighlightStatus: public MHActionObjectRef
 {
-public:
+  public:
     MHGetHighlightStatus(): MHActionObjectRef(":GetHighlightStatus")  {}
     virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult)
         { pResult->SetVariableValue(pTarget->GetHighlightStatus());}
@@ -429,21 +429,21 @@ public:
 
 class MHStep: public MHActionInt
 {
-public:
+  public:
     MHStep(): MHActionInt(":Step") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->Step(nArg, engine); };
 };
 
 class MHSetSliderValue: public MHActionInt
 {
-public:
+  public:
     MHSetSliderValue(): MHActionInt(":SetSliderValue") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetSliderValue(nArg, engine); };
 };
 
 class MHGetSliderValue: public MHActionObjectRef
 {
-public:
+  public:
     MHGetSliderValue(): MHActionObjectRef(":GetSliderValue")  {}
     virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult)
         { pResult->SetVariableValue(pTarget->GetSliderValue());}
@@ -451,14 +451,14 @@ public:
 
 class MHSetPortion: public MHActionInt
 {
-public:
+  public:
     MHSetPortion(): MHActionInt(":SetPortion") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetPortion(nArg, engine); };
 };
 
 class MHGetPortion: public MHActionObjectRef
 {
-public:
+  public:
     MHGetPortion(): MHActionObjectRef(":GetPortion")  {}
     virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult)
         { pResult->SetVariableValue(pTarget->GetPortion());}
@@ -466,7 +466,7 @@ public:
 
 class MHSetSliderParameters: public MHActionInt3
 {
-public:
+  public:
     MHSetSliderParameters(): MHActionInt3(":SetSliderParameters") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int newMin, int newMax, int newStep)
         { pTarget->SetSliderParameters(newMin, newMax, newStep, engine); };

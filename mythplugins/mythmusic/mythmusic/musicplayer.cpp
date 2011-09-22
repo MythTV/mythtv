@@ -271,7 +271,10 @@ void MusicPlayer::play(void)
 
 
     if (!m_output)
-        openOutputDevice();
+    {
+        if (!openOutputDevice())
+            return;
+    }
 
     if (!getDecoderHandler())
         setupDecoderHandler();
@@ -297,7 +300,7 @@ void MusicPlayer::stopDecoder(void)
     m_currentMetadata = NULL;
 }
 
-void MusicPlayer::openOutputDevice(void)
+bool MusicPlayer::openOutputDevice(void)
 {
     QString adevice, pdevice;
 
@@ -309,11 +312,31 @@ void MusicPlayer::openOutputDevice(void)
     pdevice = gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
               gCoreContext->GetSetting("PassThruOutputDevice") : "auto";
 
-    // TODO: Error checking that device is opened correctly!
     m_output = AudioOutput::OpenAudio(
                    adevice, pdevice, FORMAT_S16, 2, 0, 44100,
                    AUDIOOUTPUT_MUSIC, true, false,
                    gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
+
+    if (!m_output)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MusicPlayer: Cannot open audio output device: %1").arg(adevice));
+
+        return false;
+    }
+
+    if (!m_output->GetError().isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MusicPlayer: Cannot open audio output device: %1").arg(adevice));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error was: %1").arg(m_output->GetError()));
+
+        delete m_output;
+        m_output = NULL;
+
+        return false;
+    }
 
     m_output->setBufferSize(256 * 1024);
 
@@ -333,6 +356,8 @@ void MusicPlayer::openOutputDevice(void)
     {
         m_output->addListener(*it);
     }
+
+    return true;
 }
 
 void MusicPlayer::next(void)
@@ -605,10 +630,6 @@ void MusicPlayer::customEvent(QEvent *event)
                 .arg(*aoe->errorMessage()));
             stop(true);
         }
-        else if (event->type() == DecoderEvent::Finished)
-        {
-            nextAuto();
-        }
         else if (event->type() == DecoderEvent::Error)
         {
             stop(true);
@@ -642,6 +663,27 @@ void MusicPlayer::customEvent(QEvent *event)
                 updateLastplay();
             }
         }
+    }
+    else if (event->type() == DecoderEvent::Finished)
+    {
+        if (m_currentMetadata && m_currentTime != m_currentMetadata->Length() / 1000)
+        {
+            LOG(VB_GENERAL, LOG_NOTICE, QString("MusicPlayer: Updating track length was %1s, should be %2s")
+                .arg(m_currentMetadata->Length() / 1000).arg(m_currentTime));
+
+            m_currentMetadata->setLength(m_currentTime * 1000);
+            m_currentMetadata->dumpToDatabase();
+
+            // this will update any track lengths displayed on screen
+            gPlayer->sendMetadataChangedEvent(m_currentMetadata->ID());
+
+            // this will force the playlist stats to update
+            MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentTrack);
+            dispatch(me);
+        }
+
+        if (m_isAutoplay)
+            nextAuto();
     }
 
     QObject::customEvent(event);

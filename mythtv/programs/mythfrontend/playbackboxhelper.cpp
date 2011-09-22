@@ -11,13 +11,14 @@ using namespace std;
 #include "metadataimagehelper.h"
 #include "playbackboxhelper.h"
 #include "mythcorecontext.h"
+#include "filesysteminfo.h"
 #include "tvremoteutil.h"
 #include "storagegroup.h"
+#include "mythlogging.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "mythevent.h"
 #include "mythdirs.h"
-#include "mythlogging.h"
 
 #define LOC      QString("PlaybackBoxHelper: ")
 #define LOC_WARN QString("PlaybackBoxHelper Warning: ")
@@ -61,7 +62,10 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
         if (it != m_checkAvailability.end())
             m_checkAvailability.erase(it);
         if (m_checkAvailability.empty() && m_checkAvailabilityTimerId)
+        {
             killTimer(m_checkAvailabilityTimerId);
+            m_checkAvailabilityTimerId = 0;
+        }
     }
 
     if (cats.empty())
@@ -313,11 +317,15 @@ void PBHEventHandler::UpdateFreeSpaceEvent(void)
 //////////////////////////////////////////////////////////////////////
 
 PlaybackBoxHelper::PlaybackBoxHelper(QObject *listener) :
-    m_listener(listener), m_eventHandler(NULL),
+    MThread("PlaybackBoxHelper"),
+    m_listener(listener), m_eventHandler(new PBHEventHandler(*this)),
     // Free Space Tracking Variables
     m_freeSpaceTotalMB(0ULL), m_freeSpaceUsedMB(0ULL)
 {
     start();
+    m_eventHandler->moveToThread(qthread());
+    // Prime the pump so the disk free display starts updating
+    ForceFreeSpaceUpdate();
 }
 
 PlaybackBoxHelper::~PlaybackBoxHelper()
@@ -372,19 +380,9 @@ void PlaybackBoxHelper::UndeleteRecording(
     QCoreApplication::postEvent(m_eventHandler, e);
 }
 
-void PlaybackBoxHelper::run(void)
-{
-    threadRegister("PlaybackBoxHelper");
-    m_eventHandler = new PBHEventHandler(*this);
-    // Prime the pump so the disk free display starts updating
-    ForceFreeSpaceUpdate();
-    exec();
-    threadDeregister();
-}
-
 void PlaybackBoxHelper::UpdateFreeSpace(void)
 {
-    QVector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
+    QList<FileSystemInfo> fsInfos = FileSystemInfo::RemoteGetInfo();
 
     QMutexLocker locker(&m_lock);
     for (int i = 0; i < fsInfos.size(); i++)
@@ -471,7 +469,7 @@ QString PlaybackBoxHelper::GetPreviewImage(
         return QString();
 
     QString token = QString("%1:%2")
-        .arg(pginfo.MakeUniqueKey()).arg(rand());
+        .arg(pginfo.MakeUniqueKey()).arg(random());
 
     QStringList extra(token);
     extra.push_back(check_availability?"1":"0");

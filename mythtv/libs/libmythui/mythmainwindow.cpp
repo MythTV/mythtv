@@ -899,7 +899,7 @@ void MythMainWindow::Init(void)
     }
 
     // Workaround Qt/Windows playback bug?
-#ifdef WIN32
+#ifdef _WIN32
     flags |= Qt::MSWindowsOwnDC;
 #endif
 
@@ -1684,7 +1684,7 @@ void MythMainWindow::BindJump(const QString &destination, const QString &key)
     /* make sure the jump point exists */
     if (d->destinationMap.find(destination) == d->destinationMap.end())
     {
-       LOG(VB_GENERAL, LOG_ERR, 
+       LOG(VB_GENERAL, LOG_ERR,
            "Cannot bind to ficticious jump point" + destination);
        return;
     }
@@ -1761,6 +1761,14 @@ void MythMainWindow::RegisterJump(const QString &destination,
     d->destinationMap[destination] = jd;
 
     BindJump(destination, keybind);
+}
+
+void MythMainWindow::ClearAllJumps()
+{
+    QList<QString> destinations = d->destinationMap.keys();
+    QList<QString>::Iterator it;
+    for (it = destinations.begin(); it != destinations.end(); ++it)
+        ClearJump(*it);
 }
 
 void MythMainWindow::JumpTo(const QString& destination, bool pop)
@@ -2256,7 +2264,7 @@ void MythMainWindow::customEvent(QEvent *ce)
                 if (me->ExtraDataCount() == 3)
                     filename = me->ExtraData(2);
             }
-	    ScreenShot(width, height, filename);
+            ScreenShot(width, height, filename);
         }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)

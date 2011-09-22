@@ -63,7 +63,7 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
  *  \bug Only supports single input cards.
  */
 DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
-    : DTVChannel(parent),           master(NULL),
+    : DTVChannel(parent),
       // Helper classes
       diseqc_tree(NULL),            dvbcam(NULL),
       // Device info
@@ -77,11 +77,11 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
       fd_frontend(-1),              device(aDevice),
       has_crc_bug(false)
 {
+    master_map_lock.lockForWrite();
     QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    master = dynamic_cast<DVBChannel*>(GetMaster(devname));
-    master = (master == this) ? NULL : master;
-
-    if (!master)
+    master_map[devname].push_back(this); // == RegisterForMaster
+    DVBChannel *master = dynamic_cast<DVBChannel*>(master_map[devname].front());
+    if (master == this)
     {
         dvbcam = new DVBCam(device);
         has_crc_bug = CardUtil::HasDVBCRCBug(device);
@@ -91,20 +91,42 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
         dvbcam       = master->dvbcam;
         has_crc_bug  = master->has_crc_bug;
     }
+    master_map_lock.unlock();
 
     sigmon_delay = CardUtil::GetMinSignalMonitoringDelay(device);
 }
 
 DVBChannel::~DVBChannel()
 {
-    if (IsOpen())
-        Close();
-
-    if (dvbcam && !master)
+    // set a new master if there are other instances and we're the master
+    // whether we are the master or not remove us from the map..
+    master_map_lock.lockForWrite();
+    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    DVBChannel *master = dynamic_cast<DVBChannel*>(master_map[devname].front());
+    if (master == this)
     {
-        delete dvbcam;
-        dvbcam = NULL;
+        master_map[devname].pop_front();
+        DVBChannel *new_master = NULL;
+        if (!master_map[devname].empty())
+            new_master = dynamic_cast<DVBChannel*>(master_map[devname].front());
+        if (new_master)
+            new_master->is_open = master->is_open;
     }
+    else
+    {
+        master_map[devname].removeAll(this);
+    }
+    master_map_lock.unlock();
+
+    Close();
+
+    // if we're the last one out delete dvbcam
+    master_map_lock.lockForRead();
+    MasterMap::iterator mit = master_map.find(devname);
+    if ((*mit).empty())
+        delete dvbcam;
+    dvbcam = NULL;
+    master_map_lock.unlock();
 
     // diseqc_tree is managed elsewhere
 }
@@ -119,15 +141,19 @@ void DVBChannel::Close(DVBChannel *who)
 
     is_open.erase(it);
 
-    if (master)
+    QMutexLocker locker(&hw_lock);
+
+    DVBChannel *master = GetMasterLock();
+    if (master != NULL && master != this)
     {
-        QMutexLocker locker(&hw_lock);
         if (dvbcam->IsRunning())
             dvbcam->SetPMT(this, NULL);
         master->Close(this);
         fd_frontend = -1;
+        ReturnMasterLock(master);
         return;
     }
+    ReturnMasterLock(master); // if we're the master we don't need this lock..
 
     if (!is_open.empty())
         return; // not all callers have closed the DVB channel yet..
@@ -135,7 +161,6 @@ void DVBChannel::Close(DVBChannel *who)
     if (diseqc_tree)
         diseqc_tree->Close();
 
-    QMutexLocker locker(&hw_lock);
     if (fd_frontend >= 0)
     {
         close(fd_frontend);
@@ -157,10 +182,14 @@ bool DVBChannel::Open(DVBChannel *who)
         return true;
     }
 
-    if (master)
+    DVBChannel *master = GetMasterLock();
+    if (master != this)
     {
         if (!master->Open(who))
+        {
+            ReturnMasterLock(master);
             return false;
+        }
 
         fd_frontend         = master->fd_frontend;
         frontend_name       = master->frontend_name;
@@ -177,11 +206,14 @@ bool DVBChannel::Open(DVBChannel *who)
         if (!InitializeInputs())
         {
             Close();
+            ReturnMasterLock(master);
             return false;
         }
 
+        ReturnMasterLock(master);
         return true;
     }
+    ReturnMasterLock(master); // if we're the master we don't need this lock..
 
     QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     QByteArray devn = devname.toAscii();
@@ -609,13 +641,19 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
                       bool same_input)
 {
     QMutexLocker lock(&tune_lock);
+    QMutexLocker locker(&hw_lock);
 
-    if (master)
+    DVBChannel *master = GetMasterLock();
+    if (master != this)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "tuning on slave channel");
         SetSIStandard(tuning.sistandard);
-        return master->Tune(tuning, inputid, force_reset, false);
+        bool ok = master->Tune(tuning, inputid, force_reset, false);
+        ReturnMasterLock(master);
+        return ok;
     }
+    ReturnMasterLock(master); // if we're the master we don't need this lock..
+
 
     int intermediate_freq = 0;
     bool can_fec_auto = false;
@@ -629,8 +667,6 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     }
 
     desired_tuning = tuning;
-
-    QMutexLocker locker(&hw_lock);
 
     if (fd_frontend < 0)
     {
@@ -806,8 +842,14 @@ bool DVBChannel::IsTuningParamsProbeSupported(void) const
         return false;
     }
 
-    if (master)
-        return master->IsTuningParamsProbeSupported();
+    const DVBChannel *master = GetMasterLock();
+    if (master != this)
+    {
+        bool ok = master->IsTuningParamsProbeSupported();
+        ReturnMasterLock(master);
+        return ok;
+    }
+    ReturnMasterLock(master); // if we're the master we don't need this lock..
 
     if (diseqc_tree)
     {
@@ -839,8 +881,14 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
         return false;
     }
 
-    if (master)
-        return master->ProbeTuningParams(tuning);
+    const DVBChannel *master = GetMasterLock();
+    if (master != this)
+    {
+        bool ok = master->ProbeTuningParams(tuning);
+        ReturnMasterLock(master);
+        return ok;
+    }
+    ReturnMasterLock(master); // if we're the master we don't need this lock..
 
     if (diseqc_tree)
     {
@@ -919,8 +967,14 @@ const DiSEqCDevRotor *DVBChannel::GetRotor(void) const
 // documented in dvbchannel.h
 bool DVBChannel::HasLock(bool *ok) const
 {
-    if (master)
-        return master->HasLock(ok);
+    const DVBChannel *master = GetMasterLock();
+    if (master != this)
+    {
+        bool haslock = master->HasLock(ok);
+        ReturnMasterLock(master);
+        return haslock;
+    }
+    ReturnMasterLock(master); // if we're the master we don't need this lock..
 
     fe_status_t status;
     memset(&status, 0, sizeof(status));
@@ -935,8 +989,14 @@ bool DVBChannel::HasLock(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetSignalStrength(bool *ok) const
 {
-    if (master)
-        return master->GetSignalStrength(ok);
+    const DVBChannel *master = GetMasterLock();
+    if (master != this)
+    {
+        double val = master->GetSignalStrength(ok);
+        ReturnMasterLock(master);
+        return val;
+    }
+    ReturnMasterLock(master); // if we're the master we don't need this lock..
 
     // We use uint16_t for sig because this is correct for DVB API 4.0,
     // and works better than the correct int16_t for the 3.x API
@@ -953,8 +1013,14 @@ double DVBChannel::GetSignalStrength(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetSNR(bool *ok) const
 {
-    if (master)
-        return master->GetSNR(ok);
+    const DVBChannel *master = GetMasterLock();
+    if (master != this)
+    {
+        double val = master->GetSNR(ok);
+        ReturnMasterLock(master);
+        return val;
+    }
+    ReturnMasterLock(master); // if we're the master we don't need this lock..
 
     // We use uint16_t for sig because this is correct for DVB API 4.0,
     // and works better than the correct int16_t for the 3.x API
@@ -971,8 +1037,14 @@ double DVBChannel::GetSNR(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetBitErrorRate(bool *ok) const
 {
-    if (master)
-        return master->GetBitErrorRate(ok);
+    const DVBChannel *master = GetMasterLock();
+    if (master != this)
+    {
+        double val = master->GetBitErrorRate(ok);
+        ReturnMasterLock(master);
+        return val;
+    }
+    ReturnMasterLock(master); // if we're the master we don't need this lock..
 
     uint32_t ber = 0;
     int ret = ioctl(fd_frontend, FE_READ_BER, &ber);
@@ -986,8 +1058,14 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
 {
-    if (master)
-        return master->GetUncorrectedBlockCount(ok);
+    const DVBChannel *master = GetMasterLock();
+    if (master != this)
+    {
+        double val = master->GetUncorrectedBlockCount(ok);
+        ReturnMasterLock(master);
+        return val;
+    }
+    ReturnMasterLock(master); // if we're the master we don't need this lock..
 
     uint32_t ublocks = 0;
     int ret = ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &ublocks);
@@ -996,6 +1074,49 @@ double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
         *ok = (0 == ret);
 
     return (double) ublocks;
+}
+
+DVBChannel *DVBChannel::GetMasterLock(void)
+{
+    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    DTVChannel *master = DTVChannel::GetMasterLock(devname);
+    DVBChannel *dvbm = dynamic_cast<DVBChannel*>(master);
+    if (master && !dvbm)
+        DTVChannel::ReturnMasterLock(master);
+    return dvbm;
+}
+
+void DVBChannel::ReturnMasterLock(DVBChannelP &dvbm)
+{
+    DTVChannel *chan = static_cast<DTVChannel*>(dvbm);
+    DTVChannel::ReturnMasterLock(chan);
+    dvbm = NULL;
+}
+
+const DVBChannel *DVBChannel::GetMasterLock(void) const
+{
+    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    DTVChannel *master = DTVChannel::GetMasterLock(devname);
+    DVBChannel *dvbm = dynamic_cast<DVBChannel*>(master);
+    if (master && !dvbm)
+        DTVChannel::ReturnMasterLock(master);
+    return dvbm;
+}
+
+void DVBChannel::ReturnMasterLock(DVBChannelCP &dvbm)
+{
+    DTVChannel *chan =
+        static_cast<DTVChannel*>(const_cast<DVBChannel*>(dvbm));
+    DTVChannel::ReturnMasterLock(chan);
+    dvbm = NULL;
+}
+
+bool DVBChannel::IsMaster(void) const
+{
+    const DVBChannel *master = GetMasterLock();
+    bool is_master = (master == this);
+    ReturnMasterLock(master);
+    return is_master;
 }
 
 /** \fn drain_dvb_events(int)

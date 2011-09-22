@@ -662,7 +662,7 @@ void VideoMetadataImp::saveToDatabase()
     }
 
     query.bindValue(":TITLE", m_title);
-    query.bindValue(":SUBTITLE", m_subtitle);
+    query.bindValue(":SUBTITLE", m_subtitle.isNull() ? "" : m_subtitle);
     query.bindValue(":TAGLINE", m_tagline);
     query.bindValue(":DIRECTOR", m_director);
     query.bindValue(":STUDIO", m_studio);
@@ -1447,12 +1447,12 @@ void VideoMetadata::SetEpisode(int episode)
 
 QDate VideoMetadata::GetInsertdate() const
 {
-	return m_imp->GetInsertdate();
+    return m_imp->GetInsertdate();
 }
 
 void VideoMetadata::SetInsertdate(QDate date)
 {
-	m_imp->SetInsertdate(date);
+    m_imp->SetInsertdate(date);
 }
 
 unsigned int VideoMetadata::GetID() const

@@ -25,7 +25,7 @@ GrabberScript::GrabberScript(const QString& title, const QString& image,
               const bool& search, const bool& tree,
               const QString& description, const QString& commandline,
               const double& version) :
-        m_lock(QMutex::Recursive)
+    MThread("GrabberScript"), m_lock(QMutex::Recursive)
 {
     m_title = title;
     m_image = image;
@@ -40,11 +40,12 @@ GrabberScript::GrabberScript(const QString& title, const QString& image,
 
 GrabberScript::~GrabberScript()
 {
+    wait();
 }
 
 void GrabberScript::run()
 {
-    threadRegister("GrabberScript");
+    RunProlog();
     QMutexLocker locker(&m_lock);
 
     QString commandline = m_commandline;
@@ -54,7 +55,7 @@ void GrabberScript::run()
     uint status = getTree.Wait();
 
     if( status == GENERIC_EXIT_CMD_NOT_FOUND )
-        LOG(VB_GENERAL, LOG_CRIT, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Internet Content Source %1 cannot run, file missing.")
                 .arg(m_title));
     else if( status == GENERIC_EXIT_OK )
@@ -88,7 +89,7 @@ void GrabberScript::run()
                 .arg(m_title));
 
     emit finished();
-    threadDeregister();
+    RunEpilog();
 }
 
 void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
@@ -185,7 +186,8 @@ void GrabberManager::refreshAll()
     m_refreshAll = true;
 }
 
-GrabberDownloadThread::GrabberDownloadThread(QObject *parent)
+GrabberDownloadThread::GrabberDownloadThread(QObject *parent) :
+    MThread("GrabberDownload")
 {
     m_parent = parent;
     m_refreshAll = false;
@@ -216,7 +218,8 @@ void GrabberDownloadThread::refreshAll()
 
 void GrabberDownloadThread::run()
 {
-    threadRegister("GrabberDownload");
+    RunProlog();
+
     m_scripts = findAllDBTreeGrabbers();
     uint updateFreq = gCoreContext->GetNumSetting(
                "netsite.updateFreq", 24);
@@ -237,7 +240,7 @@ void GrabberDownloadThread::run()
     if (m_parent)
         QCoreApplication::postEvent(m_parent, new GrabberUpdateEvent());
 
-    threadDeregister();
+    RunEpilog();
 }
 
 Search::Search()

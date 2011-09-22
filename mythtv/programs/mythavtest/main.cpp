@@ -114,13 +114,6 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
-    TV *tv = new TV();
-    if (!tv->Init())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Fatal Error: Could not initialize TV class.");
-        return GENERIC_EXIT_NOT_OK;
-    }
-
     if (filename.isEmpty())
     {
         TV::StartTV(NULL, kStartTVNoFlags);
@@ -130,6 +123,9 @@ int main(int argc, char *argv[])
         ProgramInfo pginfo(filename);
         TV::StartTV(&pginfo, kStartTVNoFlags);
     }
+
+    DestroyMythMainWindow();
+
     delete gContext;
 
     return GENERIC_EXIT_OK;

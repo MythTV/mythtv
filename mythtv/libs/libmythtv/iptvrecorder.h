@@ -29,7 +29,7 @@ class IPTVRecorder : public DTVRecorder, public TSDataListener
     bool Open(void);
     void Close(void);
 
-    virtual void StartRecording(void);
+    virtual void run(void);
 
     virtual void SetOptionsFromProfile(RecordingProfile*, const QString&,
                                        const QString&, const QString&) {}

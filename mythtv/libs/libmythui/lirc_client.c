@@ -652,11 +652,11 @@ int lirc_mode(const struct lirc_state *state,
 
 unsigned int lirc_flags(const struct lirc_state *state, char *string)
 {
-	char *s;
+	char *s, *strtok_state = NULL;
 	unsigned int flags;
 
 	flags=none;
-	s=strtok(string," \t|");
+	s=strtok_r(string," \t|",&strtok_state);
 	while(s)
 	{
 		if(strcasecmp(s,"once")==0)
@@ -683,7 +683,7 @@ unsigned int lirc_flags(const struct lirc_state *state, char *string)
 		{
 			lirc_printf(state, "%s: unknown flag \"%s\"\n",state->lirc_prog,s);
 		}
-		s=strtok(NULL," \t");
+		s=strtok_r(NULL," \t",&strtok_state);
 	}
 	return(flags);
 }
@@ -980,7 +980,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
                                          char **full_name,
                                          char **sha_bang)
 {
-	char *string,*eq,*token,*token2,*token3;
+	char *string,*eq,*token,*token2,*token3,*strtok_state = NULL;
 	struct filestack_t *filestack, *stack_tmp;
 	int open_files;
 	struct lirc_config_entry *new_entry,*first,*last;
@@ -1042,7 +1042,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 		eq=strchr(string,'=');
 		if(eq==NULL)
 		{
-			token=strtok(string," \t");
+			token=strtok_r(string," \t",&strtok_state);
 			if(token==NULL)
 			{
 				/* ignore empty line */
@@ -1064,7 +1064,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 				}
 				else
 				{
-					token2 = strtok(NULL, "");
+					token2 = strtok_r(NULL, "", &strtok_state);
 					token2 = lirc_trim(token2);
 					lirc_parse_include
 						(token2, filestack->name,
@@ -1093,9 +1093,9 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 			}
 			else
 			{
-				token2=strtok(NULL," \t");
+				token2=strtok_r(NULL," \t",&strtok_state);
 				if(token2!=NULL && 
-				   (token3=strtok(NULL," \t"))!=NULL)
+				   (token3=strtok_r(NULL," \t",&strtok_state))!=NULL)
 				{
 					lirc_printf(state, "%s: unexpected token in line %s:%d\n",
 						    state->lirc_prog,filestack->name,filestack->line);
@@ -1726,7 +1726,7 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 								   char **string, char **prog)
 {
 	int rep;
-	char *backup;
+	char *backup, *strtok_state = NULL;
 	char *remote,*button;
 	char *s=NULL;
 	struct lirc_config_entry *scan;
@@ -1739,10 +1739,10 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 		backup=strdup(code);
 		if(backup==NULL) return(-1);
 
-		strtok(backup," ");
-		strtok(NULL," ");
-		button=strtok(NULL," ");
-		remote=strtok(NULL,"\n");
+		strtok_r(backup," ",&strtok_state);
+		strtok_r(NULL," ",&strtok_state);
+		button=strtok_r(NULL," ",&strtok_state);
+		remote=strtok_r(NULL,"\n",&strtok_state);
 
 		if(button==NULL || remote==NULL)
 		{

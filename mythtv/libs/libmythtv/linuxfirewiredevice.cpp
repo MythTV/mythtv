@@ -43,13 +43,6 @@ using namespace std;
 
 typedef QMap<raw1394handle_t,LinuxFirewireDevice*> handle_to_lfd_t;
 
-void LinuxControllerThread::run(void)
-{
-    threadRegister("LinuxController");
-    m_parent->RunPortHandler();
-    threadDeregister();
-}
-
 class LFDPriv
 {
   public:
@@ -97,8 +90,8 @@ class LFDPriv
     bool             is_bcast_node_open;
     bool             is_streaming;
 
-    QDateTime              stop_streaming_timer;
-    LinuxControllerThread *port_handler_thread;
+    QDateTime        stop_streaming_timer;
+    MThread         *port_handler_thread;
 
     avcinfo_list_t   devices;
 
@@ -289,7 +282,7 @@ bool LinuxFirewireDevice::OpenPort(void)
     m_priv->run_port_handler = true;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Starting port handler thread");
-    m_priv->port_handler_thread = new LinuxControllerThread(this);
+    m_priv->port_handler_thread = new MThread("LinuxController", this);
     m_priv->port_handler_thread->start();
 
     while (!m_priv->is_port_handler_running)
@@ -593,7 +586,7 @@ bool LinuxFirewireDevice::CloseAVStream(void)
     return true;
 }
 
-void LinuxFirewireDevice::RunPortHandler(void)
+void LinuxFirewireDevice::run(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "RunPortHandler -- start");
     m_lock.lock();

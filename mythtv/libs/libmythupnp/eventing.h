@@ -299,7 +299,7 @@ class UPNP_PUBLIC  Eventing : public HttpServerExtension,
 
         virtual QStringList GetBasePaths();
 
-        virtual bool ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
+        virtual bool ProcessRequest( HTTPRequest *pRequest );
 
         short    HoldEvents    ( );
         short    ReleaseEvents ( );

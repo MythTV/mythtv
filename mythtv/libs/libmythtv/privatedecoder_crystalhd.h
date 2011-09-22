@@ -1,7 +1,7 @@
 #ifndef PRIVATEDECODER_CRYSTALHD_H
 #define PRIVATEDECODER_CRYSTALHD_H
 
-#include <QThread>
+#include "mthread.h"
 
 #if defined(WIN32)
 typedef void                *HANDLE;
@@ -18,13 +18,11 @@ typedef void                *HANDLE;
 #include "privatedecoder.h"
 
 class PrivateDecoderCrystalHD;
-class FetcherThread : public QThread
+class FetcherThread : public MThread
 {
-    Q_OBJECT
-
   public:
     FetcherThread(PrivateDecoderCrystalHD *dec)
-      : QThread(NULL), m_dec(dec) { }
+      : MThread("Fetcher"), m_dec(dec) { }
 
   protected:
     virtual void run(void);

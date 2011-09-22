@@ -33,21 +33,33 @@ enum TestCodes { TC_Equal = 1, TC_NotEqual, TC_Less, TC_LessOrEqual, TC_Greater,
 
 static const char *TestToText(int tc)
 {
-    switch (tc) {
-    case TC_Equal: return "Equal";
-    case TC_NotEqual: return "NotEqual";
-    case TC_Less: return "Less";
-    case TC_LessOrEqual: return "LessOrEqual";
-    case TC_Greater: return "Greater";
-    case TC_GreaterOrEqual: return "GreaterOrEqual";
+    switch (tc)
+    {
+        case TC_Equal:
+            return "Equal";
+        case TC_NotEqual:
+            return "NotEqual";
+        case TC_Less:
+            return "Less";
+        case TC_LessOrEqual:
+            return "LessOrEqual";
+        case TC_Greater:
+            return "Greater";
+        case TC_GreaterOrEqual:
+            return "GreaterOrEqual";
     }
+
     return NULL; // To keep the compiler happy
 }
 
 // Normal activation behaviour.
 void MHVariable::Activation(MHEngine *engine)
 {
-    if (m_fRunning) return;
+    if (m_fRunning)
+    {
+        return;
+    }
+
     MHIngredient::Activation(engine);
     m_fRunning = true;
     engine->EventTriggered(this, EventIsRunning);
@@ -58,20 +70,31 @@ void MHBooleanVar::Initialise(MHParseNode *p, MHEngine *engine)
     MHVariable::Initialise(p, engine);
     // Original value should be a bool.
     MHParseNode *pInitial = p->GetNamedArg(C_ORIGINAL_VALUE);
-    if (pInitial) m_fOriginalValue = pInitial->GetArgN(0)->GetBoolValue();
+
+    if (pInitial)
+    {
+        m_fOriginalValue = pInitial->GetArgN(0)->GetBoolValue();
+    }
 }
 
 void MHBooleanVar::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:BooleanVar");
-    MHVariable::PrintMe(fd, nTabs+1);
-    PrintTabs(fd, nTabs+1); fprintf(fd, ":OrigValue %s\n", m_fOriginalValue ? "true" : "false");
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:BooleanVar");
+    MHVariable::PrintMe(fd, nTabs + 1);
+    PrintTabs(fd, nTabs + 1);
+    fprintf(fd, ":OrigValue %s\n", m_fOriginalValue ? "true" : "false");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 void MHBooleanVar::Preparation(MHEngine *engine)
 {
-    if (m_fAvailable) return;
+    if (m_fAvailable)
+    {
+        return;
+    }
+
     m_fValue = m_fOriginalValue;
     MHVariable::Preparation(engine);
 }
@@ -81,13 +104,21 @@ void MHBooleanVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
 {
     parm.CheckType(MHUnion::U_Bool);
     bool fRes = false;
-    switch (nOp) {
-    case TC_Equal: fRes = m_fValue == parm.m_fBoolVal; break;
-    case TC_NotEqual: fRes = m_fValue != parm.m_fBoolVal; break;
-    default: MHERROR("Invalid comparison for bool");
+
+    switch (nOp)
+    {
+        case TC_Equal:
+            fRes = m_fValue == parm.m_fBoolVal;
+            break;
+        case TC_NotEqual:
+            fRes = m_fValue != parm.m_fBoolVal;
+            break;
+        default:
+            MHERROR("Invalid comparison for bool");
     }
+
     MHLOG(MHLogDetail, QString("Comparison %1 between %2 and %3 => %4").arg(TestToText(nOp))
-        .arg(m_fValue ? "true" : "false").arg(parm.m_fBoolVal ? "true" : "false").arg(fRes ? "true" : "false"));
+          .arg(m_fValue ? "true" : "false").arg(parm.m_fBoolVal ? "true" : "false").arg(fRes ? "true" : "false"));
     engine->EventTriggered(this, EventTestEvent, fRes);
 }
 
@@ -103,7 +134,7 @@ void MHBooleanVar::SetVariableValue(const MHUnion &value)
 {
     value.CheckType(MHUnion::U_Bool);
     m_fValue = value.m_fBoolVal;
-    MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable()).arg( m_fValue ? "true": "false"));
+    MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable()).arg(m_fValue ? "true" : "false"));
 }
 
 
@@ -112,20 +143,31 @@ void MHIntegerVar::Initialise(MHParseNode *p, MHEngine *engine)
     MHVariable::Initialise(p, engine);
     // Original value should be an int.
     MHParseNode *pInitial = p->GetNamedArg(C_ORIGINAL_VALUE);
-    if (pInitial) m_nOriginalValue = pInitial->GetArgN(0)->GetIntValue();
+
+    if (pInitial)
+    {
+        m_nOriginalValue = pInitial->GetArgN(0)->GetIntValue();
+    }
 }
 
 void MHIntegerVar::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:IntegerVar");
-    MHVariable::PrintMe(fd, nTabs+1);
-    PrintTabs(fd, nTabs+1); fprintf(fd, ":OrigValue %d\n", m_nOriginalValue);
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:IntegerVar");
+    MHVariable::PrintMe(fd, nTabs + 1);
+    PrintTabs(fd, nTabs + 1);
+    fprintf(fd, ":OrigValue %d\n", m_nOriginalValue);
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 void MHIntegerVar::Preparation(MHEngine *engine)
 {
-    if (m_fAvailable) return;
+    if (m_fAvailable)
+    {
+        return;
+    }
+
     m_nValue = m_nOriginalValue;
     MHVariable::Preparation(engine);
 }
@@ -135,17 +177,33 @@ void MHIntegerVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
 {
     parm.CheckType(MHUnion::U_Int);
     bool fRes = false;
-    switch (nOp) {
-    case TC_Equal: fRes = m_nValue == parm.m_nIntVal; break;
-    case TC_NotEqual: fRes = m_nValue != parm.m_nIntVal; break;
-    case TC_Less: fRes = m_nValue < parm.m_nIntVal; break;
-    case TC_LessOrEqual: fRes = m_nValue <= parm.m_nIntVal; break;
-    case TC_Greater: fRes = m_nValue > parm.m_nIntVal; break;
-    case TC_GreaterOrEqual: fRes = m_nValue >= parm.m_nIntVal; break;
-    default: MHERROR("Invalid comparison for int"); // Shouldn't ever happen
+
+    switch (nOp)
+    {
+        case TC_Equal:
+            fRes = m_nValue == parm.m_nIntVal;
+            break;
+        case TC_NotEqual:
+            fRes = m_nValue != parm.m_nIntVal;
+            break;
+        case TC_Less:
+            fRes = m_nValue < parm.m_nIntVal;
+            break;
+        case TC_LessOrEqual:
+            fRes = m_nValue <= parm.m_nIntVal;
+            break;
+        case TC_Greater:
+            fRes = m_nValue > parm.m_nIntVal;
+            break;
+        case TC_GreaterOrEqual:
+            fRes = m_nValue >= parm.m_nIntVal;
+            break;
+        default:
+            MHERROR("Invalid comparison for int"); // Shouldn't ever happen
     }
+
     MHLOG(MHLogDetail, QString("Comparison %1 between %2 and %3 => %4").arg(TestToText(nOp))
-        .arg(m_nValue).arg(parm.m_nIntVal).arg(fRes ? "true" : "false"));
+          .arg(m_nValue).arg(parm.m_nIntVal).arg(fRes ? "true" : "false"));
     engine->EventTriggered(this, EventTestEvent, fRes);
 }
 
@@ -159,23 +217,46 @@ void MHIntegerVar::GetVariableValue(MHUnion &value, MHEngine *)
 // Implement the SetVariable action.  Also used as part of Add, Subtract etc
 void MHIntegerVar::SetVariableValue(const MHUnion &value)
 {
-    if (value.m_Type == MHUnion::U_String) {
+    if (value.m_Type == MHUnion::U_String)
+    {
         // Implicit conversion of string to integer.
         int v = 0;
         int p = 0;
         bool fNegative = false;
-        if (value.m_StrVal.Size() > 0 && value.m_StrVal.GetAt(0) == '-') { p++; fNegative = true; }
-        for ( ; p < value.m_StrVal.Size(); p++) {
+
+        if (value.m_StrVal.Size() > 0 && value.m_StrVal.GetAt(0) == '-')
+        {
+            p++;
+            fNegative = true;
+        }
+
+        for (; p < value.m_StrVal.Size(); p++)
+        {
             unsigned char ch =  value.m_StrVal.GetAt(p);
-            if (ch < '0' || ch > '9') break;
+
+            if (ch < '0' || ch > '9')
+            {
+                break;
+            }
+
             v = v * 10 + ch - '0';
         }
-        if (fNegative) m_nValue = -v; else m_nValue = v;
+
+        if (fNegative)
+        {
+            m_nValue = -v;
+        }
+        else
+        {
+            m_nValue = v;
+        }
     }
-    else {
+    else
+    {
         value.CheckType(MHUnion::U_Int);
         m_nValue = value.m_nIntVal;
     }
+
     MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable()).arg(m_nValue));
 }
 
@@ -186,20 +267,33 @@ void MHOctetStrVar::Initialise(MHParseNode *p, MHEngine *engine)
     MHVariable::Initialise(p, engine);
     // Original value should be a string.
     MHParseNode *pInitial = p->GetNamedArg(C_ORIGINAL_VALUE);
-    if (pInitial) pInitial->GetArgN(0)->GetStringValue(m_OriginalValue);
+
+    if (pInitial)
+    {
+        pInitial->GetArgN(0)->GetStringValue(m_OriginalValue);
+    }
 }
 
 void MHOctetStrVar::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:OStringVar");
-    MHVariable::PrintMe(fd, nTabs+1);
-    PrintTabs(fd, nTabs+1); fprintf(fd, ":OrigValue "); m_OriginalValue.PrintMe(fd, nTabs+1); fprintf(fd, "\n");
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:OStringVar");
+    MHVariable::PrintMe(fd, nTabs + 1);
+    PrintTabs(fd, nTabs + 1);
+    fprintf(fd, ":OrigValue ");
+    m_OriginalValue.PrintMe(fd, nTabs + 1);
+    fprintf(fd, "\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 void MHOctetStrVar::Preparation(MHEngine *engine)
 {
-    if (m_fAvailable) return;
+    if (m_fAvailable)
+    {
+        return;
+    }
+
     m_Value.Copy(m_OriginalValue);
     MHVariable::Preparation(engine);
 }
@@ -210,19 +304,27 @@ void MHOctetStrVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
     parm.CheckType(MHUnion::U_String);
     int nRes = m_Value.Compare(parm.m_StrVal);
     bool fRes = false;
-    switch (nOp) {
-    case TC_Equal: fRes = nRes == 0; break;
-    case TC_NotEqual: fRes = nRes != 0; break;
-/*  case TC_Less: fRes = nRes < 0; break;
-    case TC_LessOrEqual: fRes = nRes <= 0; break;
-    case TC_Greater: fRes = nRes > 0; break;
-    case TC_GreaterOrEqual: fRes = nRes >= 0; break;*/
-    default: MHERROR("Invalid comparison for string"); // Shouldn't ever happen
+
+    switch (nOp)
+    {
+        case TC_Equal:
+            fRes = nRes == 0;
+            break;
+        case TC_NotEqual:
+            fRes = nRes != 0;
+            break;
+            /*  case TC_Less: fRes = nRes < 0; break;
+                case TC_LessOrEqual: fRes = nRes <= 0; break;
+                case TC_Greater: fRes = nRes > 0; break;
+                case TC_GreaterOrEqual: fRes = nRes >= 0; break;*/
+        default:
+            MHERROR("Invalid comparison for string"); // Shouldn't ever happen
     }
+
     MHOctetString sample1(m_Value, 0, 10);
     MHOctetString sample2(parm.m_StrVal, 0, 10);
     MHLOG(MHLogDetail, QString("Comparison %1 %2 and %3 => %4").arg(TestToText(nOp))
-        .arg(sample1.Printable()).arg(sample2.Printable()).arg(fRes ? "true" : "false"));
+          .arg(sample1.Printable()).arg(sample2.Printable()).arg(fRes ? "true" : "false"));
     engine->EventTriggered(this, EventTestEvent, fRes);
 }
 
@@ -236,20 +338,23 @@ void MHOctetStrVar::GetVariableValue(MHUnion &value, MHEngine *)
 // Implement the SetVariable action.
 void MHOctetStrVar::SetVariableValue(const MHUnion &value)
 {
-    if (value.m_Type == MHUnion::U_Int) {
+    if (value.m_Type == MHUnion::U_Int)
+    {
         // Implicit conversion of int to string.
         char buff[30]; // 30 chars is more than enough.
         snprintf(buff, sizeof(buff), "%0d", value.m_nIntVal);
         m_Value.Copy(buff);
     }
-    else {
+    else
+    {
         value.CheckType(MHUnion::U_String);
         m_Value.Copy(value.m_StrVal);
     }
+
     // Debug
     MHOctetString sample(m_Value, 0, 60);
     MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable())
-        .arg(sample.Printable()));
+          .arg(sample.Printable()));
 }
 
 
@@ -258,24 +363,39 @@ void MHObjectRefVar::Initialise(MHParseNode *p, MHEngine *engine)
     MHVariable::Initialise(p, engine);
     // Original value should be an object reference.
     MHParseNode *pInitial = p->GetNamedArg(C_ORIGINAL_VALUE);
+
     // and this should be a ObjRef node.
-    if (pInitial) {
+    if (pInitial)
+    {
         MHParseNode *pArg = pInitial->GetNamedArg(C_OBJECT_REFERENCE);
-        if (pArg) m_OriginalValue.Initialise(pArg->GetArgN(0), engine);
+
+        if (pArg)
+        {
+            m_OriginalValue.Initialise(pArg->GetArgN(0), engine);
+        }
     }
 }
 
 void MHObjectRefVar::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:ObjectRefVar");
-    MHVariable::PrintMe(fd, nTabs+1);
-    PrintTabs(fd, nTabs+1); fprintf(fd, ":OrigValue "); m_OriginalValue.PrintMe(fd, nTabs+1); fprintf(fd, "\n");
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:ObjectRefVar");
+    MHVariable::PrintMe(fd, nTabs + 1);
+    PrintTabs(fd, nTabs + 1);
+    fprintf(fd, ":OrigValue ");
+    m_OriginalValue.PrintMe(fd, nTabs + 1);
+    fprintf(fd, "\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 void MHObjectRefVar::Preparation(MHEngine *engine)
 {
-    if (m_fAvailable) return;
+    if (m_fAvailable)
+    {
+        return;
+    }
+
     m_Value.Copy(m_OriginalValue);
     MHVariable::Preparation(engine);
 }
@@ -285,11 +405,19 @@ void MHObjectRefVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine
 {
     parm.CheckType(MHUnion::U_ObjRef);
     bool fRes = false;
-    switch (nOp) {
-    case TC_Equal: fRes = m_Value.Equal(parm.m_ObjRefVal, engine); break;
-    case TC_NotEqual: fRes = ! m_Value.Equal(parm.m_ObjRefVal, engine); break;
-    default: MHERROR("Invalid comparison for object ref");
+
+    switch (nOp)
+    {
+        case TC_Equal:
+            fRes = m_Value.Equal(parm.m_ObjRefVal, engine);
+            break;
+        case TC_NotEqual:
+            fRes = ! m_Value.Equal(parm.m_ObjRefVal, engine);
+            break;
+        default:
+            MHERROR("Invalid comparison for object ref");
     }
+
     engine->EventTriggered(this, EventTestEvent, fRes);
 }
 
@@ -314,24 +442,39 @@ void MHContentRefVar::Initialise(MHParseNode *p, MHEngine *engine)
     MHVariable::Initialise(p, engine);
     // Original value should be a content reference.
     MHParseNode *pInitial = p->GetNamedArg(C_ORIGINAL_VALUE);
+
     // and this should be a ContentRef node.
-    if (pInitial) {
+    if (pInitial)
+    {
         MHParseNode *pArg = pInitial->GetNamedArg(C_CONTENT_REFERENCE);
-        if (pArg) m_OriginalValue.Initialise(pArg->GetArgN(0), engine);
+
+        if (pArg)
+        {
+            m_OriginalValue.Initialise(pArg->GetArgN(0), engine);
+        }
     }
 }
 
 void MHContentRefVar::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:ContentRefVar");
-    MHVariable::PrintMe(fd, nTabs+1);
-    PrintTabs(fd, nTabs+1); fprintf(fd, ":OrigValue "); m_OriginalValue.PrintMe(fd, nTabs+1); fprintf(fd, "\n");
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:ContentRefVar");
+    MHVariable::PrintMe(fd, nTabs + 1);
+    PrintTabs(fd, nTabs + 1);
+    fprintf(fd, ":OrigValue ");
+    m_OriginalValue.PrintMe(fd, nTabs + 1);
+    fprintf(fd, "\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 void MHContentRefVar::Preparation(MHEngine *engine)
 {
-    if (m_fAvailable) return;
+    if (m_fAvailable)
+    {
+        return;
+    }
+
     m_Value.Copy(m_OriginalValue);
     MHVariable::Preparation(engine);
 }
@@ -341,11 +484,19 @@ void MHContentRefVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engin
 {
     parm.CheckType(MHUnion::U_ContentRef);
     bool fRes = false;
-    switch (nOp) {
-    case TC_Equal: fRes = m_Value.Equal(parm.m_ContentRefVal, engine); break;
-    case TC_NotEqual: fRes = !m_Value.Equal(parm.m_ContentRefVal, engine); break;
-    default: MHERROR("Invalid comparison for content ref");
+
+    switch (nOp)
+    {
+        case TC_Equal:
+            fRes = m_Value.Equal(parm.m_ContentRefVal, engine);
+            break;
+        case TC_NotEqual:
+            fRes = !m_Value.Equal(parm.m_ContentRefVal, engine);
+            break;
+        default:
+            MHERROR("Invalid comparison for content ref");
     }
+
     engine->EventTriggered(this, EventTestEvent, fRes);
 }
 

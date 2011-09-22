@@ -2,7 +2,7 @@ include ( ../../settings.pro)
 include ( ../../version.pro)
 include ( ../programs-libs.pro)
 
-QT += network xml sql qt3support
+QT += network xml sql
 
 TEMPLATE = app
 CONFIG += thread
@@ -25,7 +25,6 @@ INCLUDEPATH += replex
 INCLUDEPATH += ../../libs/libavcodec
 INCLUDEPATH += ../../libs/libavformat
 INCLUDEPATH += ../../libs/libavutil
-INCLUDEPATH += ../../libs/
 
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes) {
         DEPENDPATH  += ../../libs/libmythmpeg2

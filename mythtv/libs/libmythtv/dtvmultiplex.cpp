@@ -6,6 +6,25 @@
 
 #define LOC      QString("DTVMux: ")
 
+DTVMultiplex::DTVMultiplex(const DTVMultiplex &other) :
+    frequency(other.frequency),
+    symbolrate(other.symbolrate),
+    inversion(other.inversion),
+    bandwidth(other.bandwidth),
+    hp_code_rate(other.hp_code_rate),
+    lp_code_rate(other.lp_code_rate),
+    modulation(other.modulation),
+    trans_mode(other.trans_mode),
+    guard_interval(other.guard_interval),
+    hierarchy(other.hierarchy),
+    polarity(other.polarity),
+    fec(other.fec),
+    mod_sys(other.mod_sys),
+    rolloff(other.rolloff),
+    mplex(other.mplex),
+    sistandard(other.sistandard)
+{
+}
 
 DTVMultiplex &DTVMultiplex::operator=(const DTVMultiplex &other)
 {
@@ -25,7 +44,6 @@ DTVMultiplex &DTVMultiplex::operator=(const DTVMultiplex &other)
     rolloff        = other.rolloff;
     mplex          = other.mplex;
     sistandard     = other.sistandard;
-    sistandard.detach();
     return *this;
 }
 
@@ -324,7 +342,6 @@ bool DTVMultiplex::FillFromDB(DTVTunerType type, uint mplexid)
 
     mplex = mplexid;
     sistandard = query.value(13).toString();
-    sistandard.detach();
 
     // Parse the query into our DVBTuning class
     return ParseTuningParams(

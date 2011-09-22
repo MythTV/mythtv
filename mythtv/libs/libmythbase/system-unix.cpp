@@ -2,6 +2,7 @@
 // Own header
 #include "mythsystem.h"
 #include "system-unix.h"
+#include "util.h"
 
 // compat header
 #include "compat.h"
@@ -20,7 +21,6 @@
 
 // QT headers
 #include <QCoreApplication>
-#include <QThread>
 #include <QMutex>
 #include <QMap>
 #include <QString>
@@ -52,6 +52,7 @@ typedef QMap<int, FDType_t*> FDMap_t;
 /**********************************
  * MythSystemManager method defines
  *********************************/
+static bool                     run_system = true;
 static MythSystemManager       *manager = NULL;
 static MythSystemSignalManager *smanager = NULL;
 static MythSystemIOHandler     *readThread = NULL;
@@ -61,16 +62,29 @@ static QMutex                   listLock;
 static FDMap_t                  fdMap;
 static QMutex                   fdLock;
 
+void ShutdownMythSystem(void)
+{
+    run_system = false;
+    if (manager)
+        manager->wait();
+    if (smanager)
+        smanager->wait();
+    if (readThread)
+        readThread->wait();
+    if (writeThread)
+        writeThread->wait();
+}
 
 MythSystemIOHandler::MythSystemIOHandler(bool read) :
-    QThread(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
+    MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
+    m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()), m_maxfd(-1),
     m_read(read)
 {
 }
 
 void MythSystemIOHandler::run(void)
 {
-    threadRegister(QString("SystemIOHandler%1").arg(m_read ? "R" : "W"));
+    RunProlog();
     LOG(VB_GENERAL, LOG_INFO, QString("Starting IO manager (%1)")
                 .arg(m_read ? "read" : "write"));
 
@@ -78,17 +92,19 @@ void MythSystemIOHandler::run(void)
     BuildFDs();
     m_pLock.unlock();
 
-    QMutex mutex;
-
-    while( gCoreContext )
+    while( run_system )
     {
-        mutex.lock();
-        m_pWait.wait(&mutex);
-        mutex.unlock();
-
-        while( gCoreContext )
         {
-            usleep(10000); // ~100x per second, for ~3MBps throughput
+            QMutexLocker locker(&m_pWaitLock);
+            m_pWait.wait(&m_pWaitLock);
+        }
+
+        while( run_system )
+        {
+            struct timespec ts;
+            ts.tv_sec = 0;
+            ts.tv_nsec = 10*1000*1000;  // 10ms
+            nanosleep(&ts, NULL); // ~100x per second, for ~3MBps throughput
             m_pLock.lock();
             if( m_pMap.isEmpty() )
             {
@@ -131,7 +147,8 @@ void MythSystemIOHandler::run(void)
             m_pLock.unlock();
         }
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 void MythSystemIOHandler::HandleRead(int fd, QBuffer *buff)
@@ -216,6 +233,7 @@ void MythSystemIOHandler::remove(int fd)
 
 void MythSystemIOHandler::wake()
 {
+    QMutexLocker locker(&m_pWaitLock);
     m_pWait.wakeAll();
 }
 
@@ -233,21 +251,24 @@ void MythSystemIOHandler::BuildFDs()
     }
 }
 
-MythSystemManager::MythSystemManager() : QThread()
+MythSystemManager::MythSystemManager() : MThread("SystemManager")
 {
     m_jumpAbort = false;
 }
 
 void MythSystemManager::run(void)
 {
-    threadRegister("SystemManager");
+    RunProlog();
     LOG(VB_GENERAL, LOG_INFO, "Starting process manager");
 
-    // gCoreContext is set to NULL during shutdown, and we need this thread to
+    // run_system is set to NULL during shutdown, and we need this thread to
     // exit during shutdown.
-    while( gCoreContext )
+    while( run_system )
     {
-        usleep(100000); // sleep 100ms
+        struct timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 100 * 1000 * 1000; // 100ms
+        nanosleep(&ts, NULL); // sleep 100ms
 
         // check for any running processes
         m_mapLock.lock();
@@ -382,7 +403,8 @@ void MythSystemManager::run(void)
         readThread->wake();
     if (writeThread)
         writeThread->wake();
-    threadDeregister();
+
+    RunEpilog();
 }
 
 void MythSystemManager::append(MythSystemUnix *ms)
@@ -424,18 +446,23 @@ void MythSystemManager::jumpAbort(void)
 
 // spawn separate thread for signals to prevent manager
 // thread from blocking in some slot
-MythSystemSignalManager::MythSystemSignalManager() : QThread()
+MythSystemSignalManager::MythSystemSignalManager() :
+    MThread("SystemSignalManager")
 {
 }
 
 void MythSystemSignalManager::run(void)
 {
-    threadRegister("SystemSignalManager");
+    RunProlog();
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
-    while( gCoreContext )
+    while( run_system )
     {
-        usleep(50000); // sleep 50ms
-        while( gCoreContext )
+        struct timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 50 * 1000 * 1000; // 50ms
+        nanosleep(&ts, NULL); // sleep 50ms
+
+        while( run_system )
         {
             // handle cleanup and signalling for closed processes
             listLock.lock();
@@ -480,7 +507,7 @@ void MythSystemSignalManager::run(void)
                 ms->deleteLater();
         }
     }
-    threadDeregister();
+    RunEpilog();
 }
 
 /*******************************
@@ -636,9 +663,9 @@ void MythSystemUnix::Fork(time_t timeout)
     int i;
     QStringList::const_iterator it;
 
-    for( i = 0, it = args.constBegin(); it != args.constEnd(); it++, i++ )
+    for (i = 0, it = args.constBegin(); it != args.constEnd(); ++it)
     {
-        cmdargs[i] = strdup( it->toUtf8().constData() );
+        cmdargs[i++] = strdup(it->toUtf8().constData());
     }
     cmdargs[i] = NULL;
 
@@ -649,6 +676,9 @@ void MythSystemUnix::Fork(time_t timeout)
 
     // check before fork to avoid QString use in child
     bool setpgidsetting = GetSetting("SetPGID");
+
+    int niceval = m_parent->GetNice();
+    int ioprioval = m_parent->GetIOPrio();
 
     /* Do this before forking in case the child miserably fails */
     m_timeout = timeout;
@@ -774,6 +804,12 @@ void MythSystemUnix::Fork(time_t timeout)
                  << "setpgid() failed: "
                  << strerror(errno) << endl;
         }
+
+        /* Set nice and ioprio values if non-default */
+        if (niceval)
+            myth_nice(niceval);
+        if (ioprioval)
+            myth_ioprio(ioprioval);
 
         /* run command */
         if( execv(command, cmdargs) < 0 )

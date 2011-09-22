@@ -601,6 +601,9 @@ class MovieDb(object):
                 prepend += '\.'
             title = prepend + title.lstrip('.')
 
+        # strip out question marks
+        title = title.replace('?','')
+
         title = urllib.quote(title.encode("utf-8"))
 
         url = URL % (title)

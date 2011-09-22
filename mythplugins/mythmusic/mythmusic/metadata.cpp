@@ -102,8 +102,8 @@ Metadata& Metadata::operator=(const Metadata &rhs)
     m_genreid = rhs.m_genreid;
     m_albumArt = NULL;
     m_format = rhs.m_format;
-
     m_changed = rhs.m_changed;
+    m_show = rhs.m_show;
 
     return *this;
 }
@@ -689,7 +689,7 @@ void Metadata::toMap(MetadataMap &metadataMap)
     metadataMap["tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
     metadataMap["genre"] = m_genre;
     metadataMap["year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
-    
+
     int len = m_length / 1000;
     int eh = len / 3600;
     int em = (len / 60) % 60;
@@ -722,11 +722,6 @@ void Metadata::incRating()
         m_rating++;
     }
     m_changed = true;
-}
-
-QDateTime Metadata::LastPlay()
-{
-    return m_lastplay;
 }
 
 void Metadata::setLastPlay()
@@ -917,7 +912,12 @@ MetaIO* Metadata::getTagger(void)
     else if (extension == "ogg" || extension == "oga")
         return &metaIOOggVorbis;
     else if (extension == "flac")
-        return &metaIOFLACVorbis;
+    {
+        if (metaIOID3.TagExists(m_filename))
+            return &metaIOID3;
+        else
+            return &metaIOFLACVorbis;
+    }
     else if (extension == "m4a")
         return &metaIOMP4;
     else if (extension == "wv")
@@ -928,42 +928,43 @@ MetaIO* Metadata::getTagger(void)
 
 //--------------------------------------------------------------------------
 
-MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)
+MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr) :
+    MThread("MetadataLoading"), parent(parent_ptr)
 {
-    parent = parent_ptr;
 }
 
 void MetadataLoadingThread::run()
 {
-    threadRegister("MetadataLoading");
+    RunProlog();
     //if you want to simulate a big music collection load
     //sleep(3);
     parent->resync();
-    threadDeregister();
+    RunEpilog();
 }
 
-AllMusic::AllMusic(QString path_assignment, QString a_startdir)
+AllMusic::AllMusic(QString path_assignment, QString a_startdir) :
+    m_root_node(NULL),
+
+    m_numPcs(0),
+    m_numLoaded(0),
+    m_cd_title(QObject::tr("CD -- none")),
+    m_startdir(a_startdir),
+    m_metadata_loader(NULL),
+    m_done_loading(false),
+    m_last_listed(-1),
+
+    m_playcountMin(0),
+    m_playcountMax(0),
+    m_lastplayMin(0.0),
+    m_lastplayMax(0.0)
 {
-    m_startdir = a_startdir;
-    m_done_loading = false;
-    m_numPcs = m_numLoaded = 0;
-
-    m_cd_title = QObject::tr("CD -- none");
-
     //  How should we sort?
     setSorting(path_assignment);
 
     m_root_node = new MusicNode(QObject::tr("All My Music"), m_paths);
 
-    //
-    //  Start a thread to do data
-    //  loading and sorting
-    //
-
-    m_metadata_loader = NULL;
+    //  Start a thread to do data loading and sorting
     startLoading();
-
-    m_last_listed = -1;
 }
 
 AllMusic::~AllMusic()
@@ -1452,7 +1453,7 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
         GenericTree *subsub_node = sub_node->addNode(title_temp, (*it)->ID(), true);
         subsub_node->setAttribute(0, 1);
         subsub_node->setAttribute(1, track_counter);    // regular order
-        subsub_node->setAttribute(2, rand());           // random order
+        subsub_node->setAttribute(2, random());           // random order
 
         //
         //  "Intelligent" ordering
@@ -1487,7 +1488,7 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
             m_RatingWeight * ratingValue +
             m_PlayCountWeight * playcountValue +
             m_LastPlayWeight * lastplayValue +
-            m_RandomWeight * (double)rand() / (RAND_MAX + 1.0);
+            m_RandomWeight * (double)random() / (RAND_MAX + 1.0);
 
         int integer_rating = (int) (4000001 - rating_value * 10000);
         subsub_node->setAttribute(3, integer_rating);   //  "intelligent" order
@@ -1752,7 +1753,7 @@ void AlbumArtImages::addImage(const AlbumArtImage &newImage)
     }
 }
 
-/// saves or updates the image details in the DB 
+/// saves or updates the image details in the DB
 void AlbumArtImages::dumpToDatabase(void)
 {
     Metadata::IdType trackID = ID_TO_ID(m_parent->ID());

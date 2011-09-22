@@ -51,7 +51,7 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
 
         virtual QStringList GetBasePaths() { return QStringList(); }
 
-        bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
+        bool     ProcessRequest( HTTPRequest *pRequest );
 
         QScriptEngine* ScriptEngine()
         {

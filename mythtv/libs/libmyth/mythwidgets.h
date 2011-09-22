@@ -151,11 +151,11 @@ class MPUBLIC MythLineEdit : public QLineEdit
     void setRW(bool readwrite = true) { rw = readwrite; };
     void setRO() { rw = false; };
     void setAllowVirtualKeyboard(bool allowKbd = true)
-	       { allowVirtualKeyboard = allowKbd; }
+        { allowVirtualKeyboard = allowKbd; }
     // muthui's MythUITextEdit m_Filter & FilterNumeric
     // may be a better way to do it
     //void setSmartVirtualKeyboard(bool allowKbd = true)
-	//       { allowSmartKeyboard   = allowKbd; }
+    //       { allowSmartKeyboard   = allowKbd; }
     void setPopupPosition(PopupPositionQt pos) { popupPosition = pos; }
     PopupPositionQt getPopupPosition(void) { return popupPosition; }
 
@@ -282,23 +282,22 @@ class MPUBLIC MythPushButton : public QPushButton
     Q_OBJECT
 
   public:
-    MythPushButton(QWidget *parent, const char *name = "MythPushButton",
-                   bool aa = false)
-        : QPushButton(parent), arrowAccel(aa)
+    MythPushButton(QWidget *parent, const char *name = "MythPushButton")
+        : QPushButton(parent)
     {
         setObjectName(name);
         setCheckable(false);
     }
 
-    MythPushButton(const QString &text, QWidget *parent, bool aa = false)
-        : QPushButton(text, parent), arrowAccel(aa)
+    MythPushButton(const QString &text, QWidget *parent)
+        : QPushButton(text, parent)
     {
         setObjectName("MythPushButton");
         setCheckable(false);
     }
 
     MythPushButton(const QString &ontext, const QString &offtext,
-                   QWidget *parent, bool isOn = true, bool aa = false);
+                   QWidget *parent, bool isOn = true);
 
     void setHelpText(const QString &help);
 
@@ -319,7 +318,6 @@ class MPUBLIC MythPushButton : public QPushButton
     QString helptext;
     QString onText;
     QString offText;
-    bool arrowAccel;
 
     QStringList keyPressActions;
 };

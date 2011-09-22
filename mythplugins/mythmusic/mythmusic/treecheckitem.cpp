@@ -109,13 +109,10 @@ static QPixmap *getPixmap(const QString &level)
 }
 
 TreeCheckItem::TreeCheckItem(UIListGenericTree *parent, const QString &text, 
-                             const QString &level, int id)
-             : UIListGenericTree(parent, text, "TREECHECK", 0)
+                             const QString &level, int id) :
+    UIListGenericTree(parent, text, "TREECHECK", 0),
+    m_id(id), m_level(level), m_checkable(true)
 {
-    m_checkable = true;
-    m_level = level;
-    m_id = id;
-
     pickPixmap();
 }
 
@@ -143,22 +140,20 @@ void TreeCheckItem::pickPixmap(void)
 }
 
 CDCheckItem::CDCheckItem(UIListGenericTree *parent, const QString &text, 
-                         const QString &level, int track)
-           : TreeCheckItem(parent, text, level, track)
+                         const QString &level, int track) :
+    TreeCheckItem(parent, text, level, track)
 {
 }
 
-PlaylistItem::PlaylistItem(UIListGenericTree *parent, const QString &title)
-            : UIListGenericTree(parent, title, "PLAYLISTITEM", -1)
+PlaylistItem::PlaylistItem(UIListGenericTree *parent, const QString &title) :
+    UIListGenericTree(parent, title, "PLAYLISTITEM", -1)
 {
     text = title;
 }
 
-PlaylistTitle::PlaylistTitle(UIListGenericTree *parent, const QString &title)
-             : PlaylistItem(parent, title)
+PlaylistTitle::PlaylistTitle(UIListGenericTree *parent, const QString &title) :
+    PlaylistItem(parent, title), ptr_to_owner(NULL), active(false)
 {
-    active = false;
-
     if (!pixmapsSet)
         setupPixmaps();
 
@@ -176,11 +171,9 @@ void PlaylistTitle::setOwner(Playlist *owner)
     ptr_to_owner = owner;
 }
 
-PlaylistTrack::PlaylistTrack(UIListGenericTree *parent, const QString &title)
-             : PlaylistItem(parent, title)
+PlaylistTrack::PlaylistTrack(UIListGenericTree *parent, const QString &title) :
+    PlaylistItem(parent, title), pixmap(NULL), ptr_to_owner(NULL), held(false)
 {
-    held = false;
-
     QString level = "title";
     if (title.left(10).lower() == "playlist -")
         level = "playlist";
@@ -229,19 +222,18 @@ void PlaylistTrack::moveUpDown(bool flag)
 }
 
 PlaylistPlaylist::PlaylistPlaylist(UIListGenericTree *parent, 
-                                   const QString &title)
-                : PlaylistTrack(parent, title)
+                                   const QString &title) :
+    PlaylistTrack(parent, title)
 {
     pixmap = getPixmap("playlist");
     if (pixmap)
         m_image = pixmap;
 }
 
-PlaylistCD::PlaylistCD(UIListGenericTree *parent, const QString &title)
-          : PlaylistTrack(parent, title)
+PlaylistCD::PlaylistCD(UIListGenericTree *parent, const QString &title) :
+    PlaylistTrack(parent, title)
 {
     pixmap = getPixmap("cd");
     if (pixmap)
         m_image = pixmap;
 }
-

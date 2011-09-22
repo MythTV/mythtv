@@ -45,6 +45,7 @@ static const char *quality_string(int q)
 }
 
 AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
+    MThread("AudioOutputBase"),
     // protected
     channels(-1),               codec(CODEC_ID_NONE),
     bytes_per_frame(0),         output_bytes_per_frame(0),
@@ -66,6 +67,10 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 
     set_initial_vol(settings.set_initial_vol),
     buffer_output_data_for_use(false),
+
+    configured_channels(0),
+    max_channels(0),
+    src_quality(QUALITY_MEDIUM),
 
     // private
     output_settingsraw(NULL),   output_settings(NULL),
@@ -105,9 +110,6 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memset(&src_data,          0, sizeof(SRC_DATA));
     memset(src_in,             0, sizeof(float) * kAudioSRCInputSize);
     memset(audiobuffer,        0, sizeof(char)  * kAudioRingBufferSize);
-
-    // Default SRC quality - QUALITY_HIGH is quite expensive
-    src_quality  = QUALITY_MEDIUM;
 
     // Handle override of SRC quality settings
     if (gCoreContext->GetNumSetting("SRCQualityOverride", false))
@@ -1277,15 +1279,16 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
               .arg(needs_upmix));
 
     // Mythmusic doesn't give us timestamps
+    if (timecode < 0)
+    {
+        timecode = (frames_buffered * 1000) / source_samplerate;
+        frames_buffered += frames;
+        music = true;
+    }
+
     if (hasVisual())
     {
-        if (timecode < 0)
-        {
-            // Send original samples to mythmusic visualisation
-            timecode = (frames_buffered * 1000) / source_samplerate;
-            frames_buffered += frames;
-            music = true;
-        }
+        // Send original samples to any attached visualisations
         dispatchVisual((uchar *)in_buffer, len, timecode, source_channels,
                        output_settings->FormatToBits(format));
     }
@@ -1691,11 +1694,11 @@ void AudioOutputBase::Drain()
  */
 void AudioOutputBase::run(void)
 {
-    threadRegister("AudioOutputBase");
+    RunProlog();
     VBAUDIO(QString("kickoffOutputAudioLoop: pid = %1").arg(getpid()));
     OutputAudioLoop();
     VBAUDIO("kickoffOutputAudioLoop exiting");
-    threadDeregister();
+    RunEpilog();
 }
 
 int AudioOutputBase::readOutputData(unsigned char*, int)

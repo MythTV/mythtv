@@ -20,8 +20,9 @@
 #ifdef DCRAW_SUPPORT
 Q_IMPORT_PLUGIN(dcrawplugin)
 #endif // DCRAW_SUPPORT
+void runRandomSlideshow(void);
 
-static int run(MythMediaDevice *dev = NULL)
+static int run(MythMediaDevice *dev = NULL, bool startRandomShow = false)
 {
     QDir startdir(gCoreContext->GetSetting("GalleryDir"));
     if (startdir.exists() && startdir.isReadable())
@@ -33,7 +34,14 @@ static int run(MythMediaDevice *dev = NULL)
 
         if (iconview->Create())
         {
-            mainStack->AddScreen(iconview);
+            if (startRandomShow)
+            {
+                iconview->HandleRandomShow();
+            }
+            else
+            {
+                mainStack->AddScreen(iconview);
+            }
             return 0;
         }
         else
@@ -57,6 +65,11 @@ static void runGallery(void)
     run();
 }
 
+void runRandomSlideshow(void)
+{
+    run(NULL, true);
+}
+
 static void handleMedia(MythMediaDevice *dev)
 {
     if (! gCoreContext->GetNumSetting("GalleryAutoLoad", 0))
@@ -73,6 +86,8 @@ static void setupKeys(void)
 {
     REG_JUMP("MythGallery", QT_TRANSLATE_NOOP("MythControls",
         "Image viewer / slideshow"), "", runGallery);
+    REG_JUMP("Random Slideshow", QT_TRANSLATE_NOOP("MythControls",
+        "Start Random Slideshow in thumbnail view"), "", runRandomSlideshow);
 
     REG_KEY("Gallery", "PLAY", QT_TRANSLATE_NOOP("MythControls",
         "Start/Stop Slideshow"), "P");

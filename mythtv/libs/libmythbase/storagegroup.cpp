@@ -50,6 +50,9 @@ StorageGroup::StorageGroup(const QString group, const QString hostname,
     m_hostname.detach();
     m_dirlist.clear();
 
+    if (getenv("MYTHTV_NOSGFALLBACK"))
+        m_allowFallback = false;
+
     Init(m_groupname, m_hostname, m_allowFallback);
 }
 

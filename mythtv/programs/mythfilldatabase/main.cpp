@@ -95,7 +95,6 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showhelp"))
     {
-        cerr << "displaying help" << endl;
         cmdline.PrintHelp();
         return GENERIC_EXIT_OK;
     }
@@ -234,16 +233,86 @@ int main(int argc, char *argv[])
         if (fill_data.maxDays == 1)
             fill_data.SetRefresh(0, true);
     }
+
     if (cmdline.toBool("refreshtoday"))
-        fill_data.SetRefresh(0, true);
+        cmdline.SetValue("refresh",
+                cmdline.toStringList("refresh") << "today");
     if (cmdline.toBool("dontrefreshtomorrow"))
-        fill_data.SetRefresh(1, false);
+        cmdline.SetValue("refresh", 
+                cmdline.toStringList("refresh") << "nottomorrow");
     if (cmdline.toBool("refreshsecond"))
-        fill_data.SetRefresh(2, true);
+        cmdline.SetValue("refresh", 
+                cmdline.toStringList("refresh") << "today");
     if (cmdline.toBool("refreshall"))
-        fill_data.SetRefresh(FillData::kRefreshAll, true);
+        cmdline.SetValue("refresh", 
+                cmdline.toStringList("refresh") << "all");
     if (cmdline.toBool("refreshday"))
-        fill_data.SetRefresh(cmdline.toUInt("refreshday"), true);
+        cmdline.SetValue("refresh",
+                cmdline.toStringList("refresh") << 
+                         QString::number(cmdline.toUInt("refreshday")));
+
+    QStringList sl =cmdline.toStringList("refresh");
+    if (!sl.isEmpty())
+    {
+        QStringList::const_iterator i = sl.constBegin();
+        for (; i != sl.constEnd(); ++i)
+        {
+            QString warn = QString("Invalid entry in --refresh list: %1")
+                                .arg(*i);
+
+            bool enable = (*i).contains("not") ? false : true;
+
+            if ((*i).contains("today"))
+                fill_data.SetRefresh(0, enable);
+            else if ((*i).contains("tomorrow"))
+                fill_data.SetRefresh(1, enable);
+            else if ((*i).contains("second"))
+                fill_data.SetRefresh(2, enable);
+            else if ((*i).contains("all"))
+                fill_data.SetRefresh(FillData::kRefreshAll, enable);
+            else if ((*i).contains("-"))
+            {
+                bool ok;
+                QStringList r = (*i).split("-");
+
+                uint lower = r[0].toUInt(&ok);
+                if (!ok)
+                {
+                    cerr << warn.toLocal8Bit().constData() << endl;
+                    return false;
+                }
+
+                uint upper = r[1].toUInt(&ok);
+                if (!ok)
+                {
+                    cerr << warn.toLocal8Bit().constData() << endl;
+                    return false;
+                }
+
+                if (lower > upper)
+                {
+                    cerr << warn.toLocal8Bit().constData() << endl;
+                    return false;
+                }
+
+                for (uint j = lower; j <= upper; ++j)
+                    fill_data.SetRefresh(j, true);
+            }
+            else
+            {
+                bool ok;
+                uint day = (*i).toUInt(&ok);
+                if (!ok)
+                {
+                    cerr << warn.toLocal8Bit().constData() << endl;
+                    return false;
+                }
+
+                fill_data.SetRefresh(day, true);
+            }
+        }
+    }
+
     if (cmdline.toBool("dontrefreshtba"))
         fill_data.refresh_tba = false;
     if (cmdline.toBool("ddgraball"))
@@ -481,7 +550,7 @@ int main(int argc, char *argv[])
 
     if (grab_data)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Fudging non-unique programids "
+        LOG(VB_GENERAL, LOG_INFO, "Extending non-unique programids "
                                   "with multiple parts.");
 
         int found = 0;
@@ -492,6 +561,10 @@ int main(int argc, char *argv[])
         if (sel.exec())
         {
             MSqlQuery repl(MSqlQuery::InitCon());
+            repl.prepare("UPDATE program SET programid = :NEWID "
+                         "WHERE programid = :OLDID AND "
+                         "partnumber = :PARTNUM AND "
+                         "parttotal = :PARTTOTAL");
 
             while (sel.next())
             {
@@ -513,10 +586,6 @@ int main(int argc, char *argv[])
                         .arg(orig_programid).arg(new_programid)
                         .arg(partnum).arg(parttotal));
 
-                repl.prepare("UPDATE program SET programid = :NEWID "
-                             "WHERE programid = :OLDID AND "
-                             "partnumber = :PARTNUM AND "
-                             "parttotal = :PARTTOTAL");
                 repl.bindValue(":NEWID", new_programid);
                 repl.bindValue(":OLDID", orig_programid);
                 repl.bindValue(":PARTNUM",   partnum);
@@ -583,11 +652,11 @@ int main(int argc, char *argv[])
                       "WHERE programid > '' GROUP BY programid;");
         if (query.exec())
         {
+            updt.prepare("UPDATE program set first = 1 "
+                         "WHERE starttime = :STARTTIME "
+                         "  AND programid = :PROGRAMID;");
             while(query.next())
             {
-                updt.prepare("UPDATE program set first = 1 "
-                             "WHERE starttime = :STARTTIME "
-                             "  AND programid = :PROGRAMID;");
                 updt.bindValue(":STARTTIME", query.value(0).toDateTime());
                 updt.bindValue(":PROGRAMID", query.value(1).toString());
                 if (!updt.exec())
@@ -595,22 +664,23 @@ int main(int argc, char *argv[])
             }
         }
         int found = query.size();
-        query.prepare("SELECT MIN(starttime),title,subtitle,description "
+        query.prepare("SELECT MIN(starttime),title,subtitle,"
+                      "       LEFT(description, 1024) AS partdesc "
                       "FROM program WHERE programid = '' "
-                      "GROUP BY title,subtitle,description;");
+                      "GROUP BY title,subtitle,partdesc;");
         if (query.exec())
         {
+            updt.prepare("UPDATE program set first = 1 "
+                         "WHERE starttime = :STARTTIME "
+                         "  AND title = :TITLE "
+                         "  AND subtitle = :SUBTITLE "
+                         "  AND LEFT(description, 1024) = :PARTDESC");
             while(query.next())
             {
-                updt.prepare("UPDATE program set first = 1 "
-                             "WHERE starttime = :STARTTIME "
-                             "  AND title = :TITLE "
-                             "  AND subtitle = :SUBTITLE "
-                             "  AND description = :DESCRIPTION");
                 updt.bindValue(":STARTTIME", query.value(0).toDateTime());
                 updt.bindValue(":TITLE", query.value(1).toString());
                 updt.bindValue(":SUBTITLE", query.value(2).toString());
-                updt.bindValue(":DESCRIPTION", query.value(3).toString());
+                updt.bindValue(":PARTDESC", query.value(3).toString());
                 if (!updt.exec())
                     MythDB::DBError("Marking first showings", updt);
             }
@@ -623,11 +693,11 @@ int main(int argc, char *argv[])
                       "WHERE programid > '' GROUP BY programid;");
         if (query.exec())
         {
+            updt.prepare("UPDATE program set last = 1 "
+                         "WHERE starttime = :STARTTIME "
+                         "  AND programid = :PROGRAMID;");
             while(query.next())
             {
-                updt.prepare("UPDATE program set last = 1 "
-                             "WHERE starttime = :STARTTIME "
-                             "  AND programid = :PROGRAMID;");
                 updt.bindValue(":STARTTIME", query.value(0).toDateTime());
                 updt.bindValue(":PROGRAMID", query.value(1).toString());
                 if (!updt.exec())
@@ -635,22 +705,23 @@ int main(int argc, char *argv[])
             }
         }
         found = query.size();
-        query.prepare("SELECT MAX(starttime),title,subtitle,description "
+        query.prepare("SELECT MAX(starttime),title,subtitle,"
+                      "       LEFT(description, 1024) AS partdesc "
                       "FROM program WHERE programid = '' "
-                      "GROUP BY title,subtitle,description;");
+                      "GROUP BY title,subtitle,partdesc;");
         if (query.exec())
         {
+            updt.prepare("UPDATE program set last = 1 "
+                         "WHERE starttime = :STARTTIME "
+                         "  AND title = :TITLE "
+                         "  AND subtitle = :SUBTITLE "
+                         "  AND LEFT(description, 1024) = :PARTDESC");
             while(query.next())
             {
-                updt.prepare("UPDATE program set last = 1 "
-                             "WHERE starttime = :STARTTIME "
-                             "  AND title = :TITLE "
-                             "  AND subtitle = :SUBTITLE "
-                             "  AND description = :DESCRIPTION");
                 updt.bindValue(":STARTTIME", query.value(0).toDateTime());
                 updt.bindValue(":TITLE", query.value(1).toString());
                 updt.bindValue(":SUBTITLE", query.value(2).toString());
-                updt.bindValue(":DESCRIPTION", query.value(3).toString());
+                updt.bindValue(":PARTDESC", query.value(3).toString());
                 if (!updt.exec())
                     MythDB::DBError("Marking last showings", updt);
             }

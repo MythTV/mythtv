@@ -124,7 +124,7 @@ class SchedFilterEditor : public MythScreenType
   Q_OBJECT
   public:
     SchedFilterEditor(MythScreenStack *parent, RecordingInfo *recinfo,
-		      RecordingRule *rule);
+                      RecordingRule *rule);
    ~SchedFilterEditor();
 
     bool Create(void);

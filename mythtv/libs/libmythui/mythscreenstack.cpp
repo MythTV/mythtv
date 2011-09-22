@@ -33,6 +33,8 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
 
 MythScreenStack::~MythScreenStack()
 {
+    CheckDeletes(true);
+    
     while (!m_Children.isEmpty())
     {
         MythScreenType *child = m_Children.back();
@@ -298,7 +300,7 @@ void MythScreenStack::CheckNewFadeTransition(void)
     }
 }
 
-void MythScreenStack::CheckDeletes(void)
+void MythScreenStack::CheckDeletes(bool force)
 {
     if (m_ToDelete.isEmpty())
         return;
@@ -310,7 +312,7 @@ void MythScreenStack::CheckDeletes(void)
     {
         bool deleteit = false;
 
-        if ((*it)->GetAlpha() <= 0)
+        if (force || (*it)->GetAlpha() <= 0)
         {
             deleteit = true;
         }

@@ -1,7 +1,9 @@
+// MythTV headers
 #include "programinfoupdater.h"
+#include "mthreadpool.h"
+#include "mythlogging.h"
 #include "remoteutil.h"
 #include "compat.h"
-#include "mythlogging.h"
 
 uint qHash(const PIKey &k)
 {
@@ -35,7 +37,7 @@ void ProgramInfoUpdater::insert(
     if (!isRunning)
     {
         isRunning = true;
-        QThreadPool::globalInstance()->start(this);
+        MThreadPool::globalInstance()->start(this, "ProgramInfoUpdater");
     }
     else
         moreWork.wakeAll();
@@ -44,9 +46,6 @@ void ProgramInfoUpdater::insert(
 void ProgramInfoUpdater::run(void)
 {
     bool workDone;
-    QMutex mutex;
-
-    threadRegister("ProgramInfoUpdater");
 
     do {
         workDone = false;
@@ -56,7 +55,7 @@ void ProgramInfoUpdater::run(void)
         // updates to be consolidated into one update...
         usleep(50 * 1000);
 
-        QMutexLocker locker(&lock);
+        lock.lock();
 
         // send adds and deletes in the order they were queued
         vector<PIKeyAction>::iterator ita = needsAddDelete.begin();
@@ -102,13 +101,11 @@ void ProgramInfoUpdater::run(void)
         needsUpdate.clear();
 
         if ( workDone )
-        {
-            QMutexLocker mlock(&mutex);
-            moreWork.wait(&mutex, 1000);
-        }
+            moreWork.wait(&lock, 1000);
+
+        lock.unlock();
     } while( workDone );
 
-    threadDeregister();
     isRunning = false;
 }
 

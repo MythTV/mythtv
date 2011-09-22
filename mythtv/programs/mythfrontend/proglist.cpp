@@ -34,7 +34,6 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_startTime(QDateTime::currentDateTime()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-    m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
 
     m_searchType(kNoSearch),
 
@@ -84,7 +83,6 @@ ProgLister::ProgLister(
     m_startTime(QDateTime::currentDateTime()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-    m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
 
     m_searchType(kNoSearch),
 
@@ -690,7 +688,7 @@ void ProgLister::DeleteOldEpisode(bool ok)
         "WHERE chanid    = :CHANID AND "
         "      starttime = :STARTTIME");
     query.bindValue(":CHANID",    pi->GetChanID());
-    query.bindValue(":STARTTIME", pi->GetScheduledStartTime(ISODate));
+    query.bindValue(":STARTTIME", pi->GetScheduledStartTime());
 
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldEpisode", query);
@@ -787,7 +785,7 @@ void ProgLister::FillViewList(const QString &view)
 
         for (uint i = 0; i < channels.size(); ++i)
         {
-            QString chantext = channels[i].GetFormatted(m_channelFormat);
+            QString chantext = channels[i].GetFormatted(DBChannel::kChannelShort);
 
             m_viewList.push_back(QString::number(channels[i].chanid));
             m_viewTextList.push_back(chantext);
@@ -798,7 +796,8 @@ void ProgLister::FillViewList(const QString &view)
     }
     else if (m_type == plCategory) // list by category
     {
-        QString startstr = m_startTime.toString("yyyy-MM-ddThh:mm:50");
+        QDateTime query_starttime = m_startTime.addSecs(50 -
+                m_startTime.time().second());
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT g1.genre, g2.genre "
                       "FROM program "
@@ -810,7 +809,7 @@ void ProgLister::FillViewList(const QString &view)
                       "  g1.starttime = g2.starttime "
                       "WHERE program.endtime > :PGILSTART "
                       "GROUP BY g1.genre, g2.genre;");
-        query.bindValue(":PGILSTART", startstr);
+        query.bindValue(":PGILSTART", query_starttime);
 
         m_useGenres = false;
 
@@ -848,7 +847,7 @@ void ProgLister::FillViewList(const QString &view)
                           "FROM program "
                           "WHERE program.endtime > :PGILSTART "
                           "GROUP BY category");
-            query.bindValue(":PGILSTART", startstr);
+            query.bindValue(":PGILSTART", query_starttime);
 
             if (query.exec())
             {
@@ -1132,13 +1131,13 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
 
     bool oneChanid = false;
     QString where;
-    QString startstr = m_startTime.toString("yyyy-MM-ddThh:mm:50");
     QString qphrase = m_viewList[m_curView];
 
     MSqlBindings bindings;
 
     if (m_type != plPreviouslyRecorded)
-        bindings[":PGILSTART"] = startstr;
+        bindings[":PGILSTART"] =
+            m_startTime.addSecs(50 - m_startTime.time().second());
 
     if (m_type == plTitle) // per title listings
     {
@@ -1294,8 +1293,9 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plTime) // list by time
     {
-        bindings[":PGILSEARCHTIME1"] =
-            m_searchTime.toString("yyyy-MM-dd hh:00:00");
+        QDateTime searchTime(m_searchTime);
+        searchTime.setTime(QTime(searchTime.time().hour(), 0, 0));
+        bindings[":PGILSEARCHTIME1"] = searchTime;
         where = "WHERE channel.visible = 1 "
             "  AND program.starttime >= :PGILSEARCHTIME1 ";
         if (m_titleSort)
@@ -1360,7 +1360,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         selected = *selectedP;
         selectedP = &selected;
     }
-    int selectedOffset = 
+    int selectedOffset =
         m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
 
     m_progList->Reset();
@@ -1399,7 +1399,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
                 if ((*it)->sortTitle != curtitle)
                 {
                     curtitle = (*it)->sortTitle;
-                    it++;
+                    ++it;
                 }
                 else
                 {

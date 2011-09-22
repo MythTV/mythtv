@@ -107,12 +107,14 @@ class GameHandler : public QObject
     QString SystemScreenShots() const { return screenshots; }
     uint GamePlayerID() const { return gameplayerid; }
     QString GameType() const { return gametype; }
+    QStringList ValidExtensions() const { return validextensions; }
 
     void clearAllMetadata(void);
 
-  protected:
     static GameHandler* GetHandler(RomInfo *rominfo);
     static GameHandler* GetHandlerByName(QString systemname);
+
+  protected:
     void customEvent(QEvent *event);
 
     bool rebuild;

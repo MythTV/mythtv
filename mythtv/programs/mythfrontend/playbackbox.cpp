@@ -122,6 +122,26 @@ static int comp_recordDate_rev(const ProgramInfo *a, const ProgramInfo *b)
                 b->GetScheduledStartTime().date() ? 1 : -1);
 }
 
+static int comp_season(const ProgramInfo *a, const ProgramInfo *b)
+{
+    if (a->GetSeason() == b->GetSeason())
+        return (a->GetEpisode() <
+                b->GetEpisode() ? 1 : -1);
+    else
+        return (a->GetSeason() <
+                b->GetSeason() ? 1 : -1);
+}
+
+static int comp_season_rev(const ProgramInfo *a, const ProgramInfo *b)
+{
+    if (a->GetSeason() == b->GetSeason())
+        return (a->GetEpisode() >
+                b->GetEpisode() ? 1 : -1);
+    else
+        return (a->GetSeason() >
+                b->GetSeason() ? 1 : -1);
+}
+
 static bool comp_programid_less_than(
     const ProgramInfo *a, const ProgramInfo *b)
 {
@@ -162,6 +182,18 @@ static bool comp_recordDate_rev_less_than(
     const ProgramInfo *a, const ProgramInfo *b)
 {
     return comp_recordDate_rev(a, b) < 0;
+}
+
+static bool comp_season_less_than(
+    const ProgramInfo *a, const ProgramInfo *b)
+{
+    return comp_season(a, b) < 0;
+}
+
+static bool comp_season_rev_less_than(
+    const ProgramInfo *a, const ProgramInfo *b)
+{
+    return comp_season_rev(a, b) < 0;
 }
 
 static const uint s_artDelay[] =
@@ -1228,12 +1260,12 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     QString groupname = sel_item->GetData().toString();
     QString grouplabel = sel_item->GetText();
 
+    updateGroupInfo(groupname, grouplabel);
+
     if (((m_currentGroup == groupname) && !m_needUpdate) ||
         m_playingSomething)
         return;
 
-    updateGroupInfo(groupname, grouplabel);
-    
     m_needUpdate = false;
 
     if (!m_isFilling)
@@ -1734,6 +1766,20 @@ bool PlaybackBox::UpdateUILists(void)
             }
         }
     }
+    else if (episodeSort == "Season")
+    {
+        QMap<QString, ProgramList>::iterator it;
+        for (it = m_progLists.begin(); it != m_progLists.end(); ++it)
+        {
+            if (!it.key().isEmpty())
+            {
+                std::stable_sort((*it).begin(), (*it).end(),
+                                 (!m_listOrder || m_type == kDeleteBox) ?
+                                 comp_season_rev_less_than :
+                                 comp_season_less_than);
+            }
+        }
+    }
 
     if (!m_progLists[m_watchGroupLabel].empty())
     {
@@ -2039,15 +2085,15 @@ bool PlaybackBox::UpdateUILists(void)
     return true;
 }
 
-void PlaybackBox::playSelectedPlaylist(bool random)
+void PlaybackBox::playSelectedPlaylist(bool _random)
 {
-    if (random)
+    if (_random)
     {
         m_playListPlay.clear();
         QStringList tmp = m_playList;
         while (!tmp.empty())
         {
-            uint i = rand() % tmp.size();
+            uint i = random() % tmp.size();
             m_playListPlay.push_back(tmp[i]);
             tmp.removeAll(tmp[i]);
         }
@@ -2869,10 +2915,10 @@ void PlaybackBox::showRecordingPopup()
     m_popupMenu->AddButton(tr("Edit Recording Schedule"),
                             SLOT(doEditScheduled()));
 
-    m_popupMenu->AddButton(tr("Allow this program to re-record"),
+    m_popupMenu->AddButton(tr("Allow this episode to re-record"),
                             SLOT(doAllowRerecord()));
 
-    m_popupMenu->AddButton(tr("Show Program Details"),
+    m_popupMenu->AddButton(tr("Show Recording Details"),
                             SLOT(showProgramDetails()));
 
     m_popupMenu->AddButton(tr("Change Recording Metadata"),
@@ -3032,7 +3078,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         (asZeroByte      == pginfo.GetAvailableStatus()))
     {
         m_popupMenu->AddButton(
-            tr("Show Program Details"), SLOT(showProgramDetails()));
+            tr("Show Recording Details"), SLOT(showProgramDetails()));
         m_popupMenu->AddButton(
             tr("Delete"),               SLOT(askDelete()));
 
@@ -4052,7 +4098,7 @@ void PlaybackBox::customEvent(QEvent *event)
             {
                 if (asAvailable != availableStatus)
                 {
-                    if (kCheckForPlayAction == cat)
+                    if (kCheckForPlayAction == cat && pginfo)
                         ShowAvailabilityPopup(*pginfo);
                 }
                 else if (pginfo)
@@ -4179,7 +4225,7 @@ void PlaybackBox::HandleRecordingRemoveEvent(
             }
             else
             {
-                pit++;
+                ++pit;
             }
         }
 
@@ -4202,7 +4248,9 @@ void PlaybackBox::HandleRecordingRemoveEvent(
             git = m_progLists.erase(git);
         }
         else
-            git++;
+        {
+            ++git;
+        }
     }
 
     m_helper.ForceFreeSpaceUpdate();

@@ -1,7 +1,5 @@
 #include <QImageReader>
 #include <QApplication>
-#include <QThread>
-#include <QStringList>
 #include <QUrl>
 
 #include "mythcontext.h"
@@ -75,8 +73,9 @@ class VideoMetadataListManager;
 class MythUIProgressDialog;
 
 VideoScannerThread::VideoScannerThread(QObject *parent) :
-        m_RemoveAll(false), m_KeepAll(false),
-        m_DBDataChanged(false)
+    MThread("VideoScanner"),
+    m_RemoveAll(false), m_KeepAll(false),
+    m_DBDataChanged(false)
 {
     m_parent = parent;
     m_dbmetadata = new VideoMetadataListManager;
@@ -91,7 +90,7 @@ VideoScannerThread::~VideoScannerThread()
 
 void VideoScannerThread::run()
 {
-    threadRegister("VideoScanner");
+    RunProlog();
 
     VideoMetadataListManager::metadata_list ml;
     VideoMetadataListManager::loadAllFromDatabase(ml);
@@ -113,7 +112,7 @@ void VideoScannerThread::run()
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_directories.size(),
-                          tr("Searching for video files"));
+                          QObject::tr("Searching for video files"));
     for (QStringList::const_iterator iter = m_directories.begin();
          iter != m_directories.end(); ++iter)
     {
@@ -161,7 +160,8 @@ void VideoScannerThread::run()
     }
     else
         RemoteSendMessage("VIDEO_LIST_NO_CHANGE");
-    threadDeregister();
+
+    RunEpilog();
 }
 
 
@@ -189,7 +189,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_dbmetadata->getList().size(),
-                          tr("Verifying video files"));
+                          QObject::tr("Verifying video files"));
 
     // For every file we know about, check to see if it still exists.
     for (VideoMetadataListManager::metadata_list::const_iterator p =
@@ -236,7 +236,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
     uint counter = 0;
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)(add.size() + remove.size()),
-                          tr("Updating video database"));
+                          QObject::tr("Updating video database"));
 
     for (FileCheckList::const_iterator p = add.begin(); p != add.end(); ++p)
     {
@@ -363,9 +363,9 @@ void VideoScanner::doScan(const QStringList &dirs)
         if (progressDlg->Create())
         {
             popupStack->AddScreen(progressDlg, false);
-            connect(m_scanThread, SIGNAL(finished()),
+            connect(m_scanThread->qthread(), SIGNAL(finished()),
                     progressDlg, SLOT(Close()));
-            connect(m_scanThread, SIGNAL(finished()),
+            connect(m_scanThread->qthread(), SIGNAL(finished()),
                     SLOT(finishedScan()));
         }
         else

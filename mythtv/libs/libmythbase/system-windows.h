@@ -1,16 +1,18 @@
 #ifndef SYSTEM_UNIX_H_
 #define SYSTEM_UNIX_H_
 
-#include "mythbaseexp.h"
 #include <signal.h>
-#include <QObject>
-#include <QMap>
-#include <QList>
-#include <QBuffer>
-#include <QThread>
+
 #include <QWaitCondition>
+#include <QBuffer>
+#include <QObject>
 #include <QMutex>
+#include <QList>
+#include <QMap>
+
+#include "mythbaseexp.h"
 #include "mythsystem.h"
+#include "mthread.h"
 
 class MythSystemWindows;
 
@@ -18,10 +20,11 @@ typedef QMap<HANDLE, MythSystemWindows *> MSMap_t;
 typedef QMap<HANDLE, QBuffer *> PMap_t;
 typedef QList<MythSystemWindows *> MSList_t;
 
-class MythSystemIOHandler: public QThread
+class MythSystemIOHandler: public MThread
 {
     public:
         MythSystemIOHandler(bool read);
+        ~MythSystemIOHandler() { wait(); }
         void   run(void);
 
         void   insert(HANDLE h, QBuffer *buff);
@@ -32,6 +35,7 @@ class MythSystemIOHandler: public QThread
         bool   HandleRead(HANDLE h, QBuffer *buff);
         bool   HandleWrite(HANDLE h, QBuffer *buff);
 
+        QMutex          m_pWaitLock;
         QWaitCondition  m_pWait;
         QMutex          m_pLock;
         PMap_t          m_pMap;
@@ -40,7 +44,7 @@ class MythSystemIOHandler: public QThread
         char    m_readbuf[65536];
 };
 
-class MythSystemManager : public QThread
+class MythSystemManager : public MThread
 {
     public:
         MythSystemManager();
@@ -61,10 +65,11 @@ class MythSystemManager : public QThread
         QMutex     m_jumpLock;
 };
 
-class MythSystemSignalManager : public QThread
+class MythSystemSignalManager : public MThread
 {
     public:
         MythSystemSignalManager();
+        ~MythSystemSignalManager() { wait(); }
         void run(void);
     private:
 };

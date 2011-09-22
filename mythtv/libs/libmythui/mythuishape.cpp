@@ -19,13 +19,13 @@ using namespace std;
 #include "mythmainwindow.h"
 
 MythUIShape::MythUIShape(MythUIType *parent, const QString &name)
-          : MythUIType(parent, name)
+    : MythUIType(parent, name)
 {
     m_type = "box";
     m_fillBrush = QBrush(Qt::NoBrush);
     m_linePen = QPen(Qt::NoPen);
     m_cornerRadius = 10;
-    m_cropRect = MythRect(0,0,0,0);
+    m_cropRect = MythRect(0, 0, 0, 0);
 }
 
 void MythUIShape::SetCropRect(int x, int y, int width, int height)
@@ -53,12 +53,14 @@ void MythUIShape::SetLinePen(QPen pen)
  *  \copydoc MythUIType::DrawSelf()
  */
 void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect)
+                           int alphaMod, QRect clipRect)
 {
     QRect area = GetArea();
     m_cropRect.CalculateArea(area);
+
     if (!m_cropRect.isEmpty())
         area &= m_cropRect.toQRect();
+
     area.translate(xoffset, yoffset);
 
     if (m_type == "box")
@@ -78,6 +80,7 @@ bool MythUIShape::ParseElement(
     if (element.tagName() == "type")
     {
         QString type = getFirstText(element);
+
         if (type == "box" || type == "roundbox" || type == "ellipse") // Validate input
             m_type = type;
     }
@@ -97,9 +100,10 @@ bool MythUIShape::ParseElement(
         else if (style == "gradient")
         {
             for (QDomNode child = element.firstChild(); !child.isNull();
-                child = child.nextSibling())
+                 child = child.nextSibling())
             {
                 QDomElement childElem = child.toElement();
+
                 if (childElem.tagName() == "gradient")
                     m_fillBrush = parseGradient(childElem);
             }
@@ -115,7 +119,7 @@ bool MythUIShape::ParseElement(
         if (style == "solid" && !color.isEmpty())
         {
             int orig_width = element.attribute("width", "1").toInt();
-            int width = (orig_width) ? max(NormX(orig_width),1) : 0;
+            int width = (orig_width) ? max(NormX(orig_width), 1) : 0;
             int alpha = element.attribute("alpha", "255").toInt();
             QColor lineColor = QColor(color);
             lineColor.setAlpha(alpha);
@@ -124,7 +128,7 @@ bool MythUIShape::ParseElement(
             m_linePen.setStyle(Qt::SolidLine);
         }
         else
-           m_linePen.setStyle(Qt::NoPen);
+            m_linePen.setStyle(Qt::NoPen);
     }
     else if (element.tagName() == "cornerradius")
     {
@@ -144,6 +148,7 @@ bool MythUIShape::ParseElement(
 void MythUIShape::CopyFrom(MythUIType *base)
 {
     MythUIShape *shape = dynamic_cast<MythUIShape *>(base);
+
     if (!shape)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");

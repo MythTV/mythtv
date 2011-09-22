@@ -34,8 +34,8 @@ using namespace std;
 MediaMonitor *MediaMonitor::c_monitor = NULL;
 
 // MonitorThread
-MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval)
-             : QThread()
+MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) :
+    MThread("Monitor")
 {
     m_Monitor = pMon;
     m_Interval = interval;
@@ -45,13 +45,13 @@ MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval)
 // loop and check it's devices.
 void MonitorThread::run(void)
 {
-    threadRegister("Monitor");
+    RunProlog();
     while (m_Monitor && m_Monitor->IsActive())
     {
         m_Monitor->CheckDevices();
         msleep(m_Interval);
     }
-    threadDeregister();
+    RunEpilog();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -359,7 +359,7 @@ bool MediaMonitor::RemoveDevice(const QString &dev)
     QMutexLocker locker(&m_DevicesLock);
 
     QList<MythMediaDevice*>::iterator it;
-    for (it = m_Devices.begin(); it != m_Devices.end(); it++)
+    for (it = m_Devices.begin(); it != m_Devices.end(); ++it)
     {
         if ((*it)->getDevicePath() == dev)
         {
@@ -399,7 +399,7 @@ void MediaMonitor::CheckDevices(void)
         pDev = *itr;
         if (pDev)
             pDev->checkMedia();
-        itr++;
+        ++itr;
     }
 }
 
@@ -494,7 +494,7 @@ MythMediaDevice* MediaMonitor::GetMedia(const QString& path)
     QMutexLocker locker(&m_DevicesLock);
 
     QList<MythMediaDevice*>::iterator it = m_Devices.begin();
-    for (;it != m_Devices.end(); it++)
+    for (;it != m_Devices.end(); ++it)
     {
         if ((*it)->isSameDevice(path) &&
             (((*it)->getStatus() == MEDIASTAT_USEABLE) ||
@@ -568,7 +568,7 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
     QList<MythMediaDevice*> medias;
 
     QList<MythMediaDevice*>::iterator it = m_Devices.begin();
-    for (;it != m_Devices.end(); it++)
+    for (;it != m_Devices.end(); ++it)
     {
         if (((*it)->getMediaType() == mediatype) &&
             (((*it)->getStatus() == MEDIASTAT_USEABLE) ||

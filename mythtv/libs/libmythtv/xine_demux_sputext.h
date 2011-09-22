@@ -7,7 +7,7 @@
 #define SUB_MAX_TEXT  5
 #define MAX_TIMEOUT 4
 
-#define DEBUG_XINE_DEMUX_SPUTEXT 1
+#define DEBUG_XINE_DEMUX_SPUTEXT 0
 
 typedef struct {
 
@@ -15,7 +15,7 @@ typedef struct {
 
     long start; ///< Starting time in msec or starting frame
     long end;   ///< Ending time in msec or starting frame
-    
+
     char *text[SUB_MAX_TEXT]; ///< The subtitle text lines.
 } subtitle_t;
 
@@ -29,10 +29,10 @@ typedef struct {
   off_t              buflen;
   off_t              emptyReads;
 
-  float              mpsub_position;  
+  float              mpsub_position;
 
-  int                uses_time;  
-  int                errs;  
+  int                uses_time;
+  int                errs;
   subtitle_t        *subtitles;
   int                num;            /* number of subtitle structs */
   int                cur;            /* current subtitle           */

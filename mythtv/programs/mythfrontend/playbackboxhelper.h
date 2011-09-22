@@ -5,13 +5,13 @@
 
 #include <QStringList>
 #include <QDateTime>
-#include <QThread>
 #include <QMutex>
 #include <QHash>
 #include <QMap>
 
 #include "mythcorecontext.h"
 #include "metadatacommon.h"
+#include "mthread.h"
 
 class PreviewGenerator;
 class PBHEventHandler;
@@ -27,11 +27,9 @@ typedef enum CheckAvailabilityType {
     kCheckForPlaylistAction,
 } CheckAvailabilityType;
 
-class PlaybackBoxHelper : public QThread
+class PlaybackBoxHelper : public MThread
 {
     friend class PBHEventHandler;
-
-    Q_OBJECT
 
   public:
     PlaybackBoxHelper(QObject *listener);
@@ -51,8 +49,6 @@ class PlaybackBoxHelper : public QThread
     QString LocateArtwork(const QString &inetref, uint season,
                           VideoArtworkType type, const ProgramInfo *pginfo,
                           const QString &groupname = NULL);
-
-    virtual void run(void);      // QThread
 
     uint64_t GetFreeSpaceTotalMB(void) const;
     uint64_t GetFreeSpaceUsedMB(void) const;

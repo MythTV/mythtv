@@ -73,7 +73,7 @@ class MMulticastSocketDevice : public MSocketDevice
         const QHostAddress & host, quint16 port);
 
     virtual QHostAddress address() const { return m_address; }
-    virtual quint16	 port() const { return m_port; }
+    virtual quint16 port() const { return m_port; }
 
   private:
     QList<QHostAddress> m_local_addresses;

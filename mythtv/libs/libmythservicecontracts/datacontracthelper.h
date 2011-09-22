@@ -76,7 +76,7 @@
         if (m_##name == NULL)           \
             m_##name = new type( this );\
         return m_##name;                \
-    }                                   
+    }
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -86,7 +86,7 @@
     type &name()                         \
     {                                    \
         return m_##name;                 \
-    }                                    
+    }
 
 
 namespace DTC
@@ -102,7 +102,7 @@ inline void DeleteListContents( QVariantList &list )
     {
         QVariant vValue = list.takeFirst();
 
-        const QObject *pObject = vValue.value< QObject* >(); 
+        const QObject *pObject = vValue.value< QObject* >();
 
         if (pObject != NULL)
             delete pObject;
@@ -118,9 +118,9 @@ void CopyListContents( QObject *pParent, QVariantList &dst, const QVariantList &
     {
         QVariant vValue = src[ nIdx ];
 
-        if ( vValue.canConvert< QObject* >()) 
-    	{ 
-		    const QObject *pObject = vValue.value< QObject* >(); 
+        if ( vValue.canConvert< QObject* >())
+        {
+            const QObject *pObject = vValue.value< QObject* >();
 
             if (pObject != NULL)
             {

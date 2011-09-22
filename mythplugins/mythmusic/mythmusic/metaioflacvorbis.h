@@ -24,9 +24,11 @@ public:
     MetaIOFLACVorbis(void);
     virtual ~MetaIOFLACVorbis(void);
 
-    bool write(Metadata* mdata);
-    Metadata* read(QString filename);
+    bool write(const Metadata* mdata);
+    Metadata* read(const QString &filename);
 
+    virtual bool TagExists(const QString &filename);
+    
 private:
     TagLib::FLAC::File *OpenFile(const QString &filename);
 };

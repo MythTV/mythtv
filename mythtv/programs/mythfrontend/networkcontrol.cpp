@@ -51,19 +51,12 @@ static bool is_abbrev(QString const& command,
         return test.toLower() == command.left(test.length()).toLower();
 }
 
-void NetworkCommandThread::run(void)
-{
-    threadRegister("NetworkCommand");
-    m_parent->RunCommandThread();
-    threadDeregister();
-}
-
 NetworkControl::NetworkControl() :
     QTcpServer(),
     prompt("# "),
     gotAnswer(false), answer(""),
     clientLock(QMutex::Recursive),
-    commandThread(new NetworkCommandThread(this)),
+    commandThread(new MThread("NetworkControl", this)),
     stopCommandThread(false)
 {
     // Eventually this map should be in the jumppoints table
@@ -272,7 +265,7 @@ bool NetworkControl::listen(const QHostAddress & address, quint16 port)
     return false;
 }
 
-void NetworkControl::RunCommandThread(void)
+void NetworkControl::run(void)
 {
     QMutexLocker locker(&ncLock);
     while (!stopCommandThread)
@@ -1241,6 +1234,11 @@ void NetworkControl::notifyDataAvailable(void)
 void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
                                        QString &reply)
 {
+    if (!clients.contains(ncc))
+        // NetworkControl instance is unaware of control client
+        // assume connection to client has been terminated and bail
+        return;
+
     QRegExp crlfRegEx("\r\n$");
     QRegExp crlfcrlfRegEx("\r\n.*\r\n");
 

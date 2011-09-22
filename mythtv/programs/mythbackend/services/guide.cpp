@@ -97,28 +97,15 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
 
     bindings[":StartChanId"] = nStartChanId;
     bindings[":EndChanId"  ] = nEndChanId;
-    bindings[":StartDate"  ] = dtStartTime.toString( Qt::ISODate );
-    bindings[":EndDate"    ] = dtEndTime.toString( Qt::ISODate );
+    bindings[":StartDate"  ] = dtStartTime;
+    bindings[":EndDate"    ] = dtEndTime;
 
     // ----------------------------------------------------------------------
     // Get all Pending Scheduled Programs
     // ----------------------------------------------------------------------
 
-    RecList      recList;
-
-    if (sched)
-        sched->getAllPending( &recList);
-
-    // ----------------------------------------------------------------------
-    // We need to convert from a RecList to a ProgramList
-    // (ProgramList will autodelete ProgramInfo pointers)
-    // ----------------------------------------------------------------------
-
-    for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end();   itRecList++)
-    {
-        schedList.push_back( *itRecList );
-    }
+    bool hasConflicts;
+    LoadFromScheduler(schedList, hasConflicts);
 
     // ----------------------------------------------------------------------
 
@@ -195,26 +182,13 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
                           "AND program.starttime = :StartTime ";
 
     bindings[":ChanId"   ] = nChanId;
-    bindings[":StartTime"] = dtStartTime.toString( Qt::ISODate );
+    bindings[":StartTime"] = dtStartTime;
 
     // Get all Pending Scheduled Programs
 
-    RecList      recList;
     ProgramList  schedList;
-
-    if (sched)
-        sched->getAllPending( &recList);
-
-    // ----------------------------------------------------------------------
-    // We need to convert from a RecList to a ProgramList
-    // (ProgramList will autodelete ProgramInfo pointers)
-    // ----------------------------------------------------------------------
-
-    for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end();   itRecList++)
-    {
-        schedList.push_back( *itRecList );
-    }
+    bool hasConflicts;
+    LoadFromScheduler(schedList, hasConflicts);
 
     // ----------------------------------------------------------------------
 

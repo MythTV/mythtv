@@ -7,6 +7,7 @@
 #include <QVector>
 
 #include <mythscreentype.h>
+#include <mthread.h>
 
 class MythUIText;
 class MythUITextEdit;
@@ -19,7 +20,7 @@ class CdDecoder;
 class Encoder;
 class Ripper;
 
-class CDScannerThread: public QThread
+class CDScannerThread: public MThread
 {
   public:
     CDScannerThread(Ripper *ripper);
@@ -29,7 +30,7 @@ class CDScannerThread: public QThread
     Ripper *m_parent;
 };
 
-class CDEjectorThread: public QThread
+class CDEjectorThread: public MThread
 {
     public:
         CDEjectorThread(Ripper *ripper);
@@ -48,7 +49,7 @@ typedef struct
 
 class RipStatus;
 
-class CDRipperThread: public QThread
+class CDRipperThread: public MThread
 {
     public:
         CDRipperThread(RipStatus *parent,  QString device,

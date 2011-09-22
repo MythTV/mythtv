@@ -606,7 +606,7 @@ int CoreAudioData::GetTotalOutputChannels()
     if (!mDeviceID)
         return 0;
     UInt32 channels = 0;
-	UInt32 size = 0;
+    UInt32 size = 0;
     AudioDeviceGetPropertyInfo(mDeviceID, 0, false,
                                kAudioDevicePropertyStreamConfiguration,
                                &size, NULL);
@@ -629,7 +629,7 @@ int CoreAudioData::GetTotalOutputChannels()
     Debug(QString("GetTotalOutputChannels: Found %1 channels in %2 buffers")
           .arg(channels).arg(pList->mNumberBuffers));
     free(pList);
-	return channels;
+    return channels;
 }
 
 QString *CoreAudioData::GetName()
@@ -894,14 +894,14 @@ static Float64  sCommonSampleRates[] = {
     64000.0,  88200.0,  96000.0,
     128000.0, 176400.0, 192000.0 };
 
-static bool		IsRateCommon(Float64 inRate)
+static bool IsRateCommon(Float64 inRate)
 {
-	bool theAnswer = false;
-	for(UInt32 i = 0; !theAnswer && (i < sNumberCommonSampleRates); i++)
-	{
-		theAnswer = inRate == sCommonSampleRates[i];
-	}
-	return theAnswer;
+    bool theAnswer = false;
+    for(UInt32 i = 0; !theAnswer && (i < sNumberCommonSampleRates); i++)
+    {
+        theAnswer = inRate == sCommonSampleRates[i];
+    }
+    return theAnswer;
 }
 
 int *CoreAudioData::RatesList(AudioDeviceID d)
@@ -930,9 +930,9 @@ int *CoreAudioData::RatesList(AudioDeviceID d)
         return NULL;
     }
 
-	err = AudioDeviceGetProperty(d, 0, 0,
-                                 kAudioDevicePropertyAvailableNominalSampleRates,
-                                 &listSize, list);
+    err = AudioDeviceGetProperty(
+        d, 0, 0, kAudioDevicePropertyAvailableNominalSampleRates,
+        &listSize, list);
     if (err != noErr)
     {
         Warn(QString("RatesList(): couldn't get list: [%1]")

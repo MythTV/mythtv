@@ -99,6 +99,7 @@ HDHRStreamHandler::HDHRStreamHandler(const QString &device) :
 
     _hdhr_lock(QMutex::Recursive)
 {
+    setObjectName("HDHRStreamHandler");
 }
 
 /** \fn HDHRStreamHandler::run(void)
@@ -106,14 +107,14 @@ HDHRStreamHandler::HDHRStreamHandler(const QString &device) :
  */
 void HDHRStreamHandler::run(void)
 {
-    threadRegister("HDHRStreamHandler");
+    RunProlog();
     /* Create TS socket. */
     if (!hdhomerun_device_stream_start(_hdhomerun_device))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Starting recording (set target failed). Aborting.");
         _error = true;
-	threadDeregister();
+        RunEpilog();
         return;
     }
     hdhomerun_device_stream_flush(_hdhomerun_device);
@@ -179,7 +180,7 @@ void HDHRStreamHandler::run(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "end");
 
     SetRunning(false, false, false);
-    threadDeregister();
+    RunEpilog();
 }
 
 static QString filt_str(uint pid)

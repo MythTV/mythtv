@@ -3,33 +3,34 @@
 
 #include <QWaitCondition>
 #include <QDateTime>
-#include <QThread>
 #include <QMutex>
+
+#include "mthread.h"
 
 class Scheduler;
 class QString;
 class HouseKeeper;
 class MythSystem;
 
-class HouseKeepingThread : public QThread
+class HouseKeepingThread : public MThread
 {
-    Q_OBJECT
   public:
-    HouseKeepingThread(HouseKeeper *p) : m_parent(p) {}
+    HouseKeepingThread(HouseKeeper *p) :
+        MThread("HouseKeeping"), m_parent(p) {}
     ~HouseKeepingThread() { wait(); }
     virtual void run(void);
   private:
     HouseKeeper *m_parent;
 };
 
-class MythFillDatabaseThread : public QThread
+class MythFillDatabaseThread : public MThread
 {
-    Q_OBJECT
   public:
-    MythFillDatabaseThread(HouseKeeper *p) : m_parent(p) {}
+    MythFillDatabaseThread(HouseKeeper *p) :
+        MThread("MythFillDB"), m_parent(p) {}
     ~MythFillDatabaseThread() { wait(); }
-    virtual void setTerminationEnabled(bool v)
-        { QThread::setTerminationEnabled(v); }
+    static void setTerminationEnabled(bool v)
+        { MThread::setTerminationEnabled(v); }
     virtual void run(void);
   private:
     HouseKeeper *m_parent;

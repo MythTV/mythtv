@@ -106,6 +106,7 @@ ASIStreamHandler::ASIStreamHandler(const QString &device) :
     _packet_size(TSPacket::kSize), _clock_source(kASIInternalClock),
     _rx_mode(kASIRXSyncOnActualConvertTo188), _drb(NULL), _mpts(NULL)
 {
+    setObjectName("ASISH");
 }
 
 void ASIStreamHandler::SetClockSource(ASIClockSource cs)
@@ -131,6 +132,8 @@ void ASIStreamHandler::SetRunningDesired(bool desired)
 
 void ASIStreamHandler::run(void)
 {
+    RunProlog();
+
     LOG(VB_RECORD, LOG_INFO, LOC + "run(): begin");
 
     if (!Open())
@@ -150,6 +153,7 @@ void ASIStreamHandler::run(void)
         drb = NULL;
         Close();
         _error = true;
+        RunEpilog();
         return;
     }
 
@@ -162,6 +166,7 @@ void ASIStreamHandler::run(void)
         drb = NULL;
         Close();
         _error = true;
+        RunEpilog();
         return;
     }
     memset(buffer, 0, buffer_size);
@@ -258,6 +263,7 @@ void ASIStreamHandler::run(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "run(): " + "end");
 
     SetRunning(false, true, false);
+    RunEpilog();
 }
 
 bool ASIStreamHandler::Open(void)

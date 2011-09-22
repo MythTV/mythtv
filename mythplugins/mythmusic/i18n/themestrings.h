@@ -76,8 +76,10 @@ void strings_null() {
     ThemeUI::tr("Directory Finder");
     ThemeUI::tr("/some/file/goes/here/test.mp3");
     ThemeUI::tr("123 of 345");
+    ThemeUI::tr("Edit Track Information");
+    ThemeUI::tr("N/A");
     ThemeUI::tr("Volume");
-    ThemeUI::tr("0%");
+    ThemeUI::tr("%VOLUMEPERCENT%");
     ThemeUI::tr("Length:");
     ThemeUI::tr("Last Played:");
     ThemeUI::tr("Last Value");

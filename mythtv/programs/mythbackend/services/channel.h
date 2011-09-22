@@ -109,6 +109,10 @@ class Channel : public ChannelServices
 
         bool                      DeleteVideoSource      ( uint SourceID );
 
+        DTC::LineupList*          GetDDLineups           ( const QString &Source,
+                                                           const QString &UserId,
+                                                           const QString &Password );
+
         /* Multiplex Methods */
 
         DTC::VideoMultiplexList*  GetVideoMultiplexList  ( int SourceID,

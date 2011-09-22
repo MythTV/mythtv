@@ -41,7 +41,7 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
     {
         int monochromaticval, medianval, widthval, heightval, colval, rowval;
         float meanval, stddevval;
-        int nitems = fscanf(fp, "%d %f %d %f %d %d %d %d",
+        int nitems = fscanf(fp, "%20d %20f %20d %20f %20d %20d %20d %20d",
                 &monochromaticval, &meanval, &medianval, &stddevval,
                 &widthval, &heightval, &colval, &rowval);
         if (nitems != 8)
@@ -62,7 +62,7 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
         }
         for (unsigned int ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
         {
-            if ((nitems = fscanf(fp, "%x", &counter[ii])) != 1)
+            if ((nitems = fscanf(fp, "%20x", &counter[ii])) != 1)
             {
                 LOG(VB_COMMFLAG, LOG_ERR,
                     QString("Not enough data in %1: frame %2")

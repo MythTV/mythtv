@@ -25,7 +25,7 @@ using namespace std;
 #define LOC QString("MythUIGuideGrid: ")
 
 MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
-               : MythUIType(parent, name)
+    : MythUIType(parent, name)
 {
     // themeable setting defaults
     m_channelCount = 5;
@@ -66,7 +66,7 @@ void MythUIGuideGrid::Finalize(void)
 {
     m_rowCount = m_channelCount;
 
-    allData = new QList<UIGTCon*>[m_rowCount];
+    allData = new QList<UIGTCon *>[m_rowCount];
 
     MythUIType::Finalize();
 }
@@ -143,7 +143,7 @@ bool MythUIGuideGrid::ParseElement(
         {
             m_drawSelFill = QBrush(Qt::NoBrush);
         }
-   }
+    }
     else if (element.tagName() == "recordingcolor")
     {
         QString color = getFirstText(element);
@@ -184,6 +184,7 @@ bool MythUIGuideGrid::ParseElement(
     {
         QString fontname = getFirstText(element);
         MythFontProperties *font = GetFont(fontname);
+
         if (!font)
             font = GetGlobalFontMap()->GetFont(fontname);
 
@@ -247,6 +248,7 @@ bool MythUIGuideGrid::ParseElement(
 void MythUIGuideGrid::CopyFrom(MythUIType *base)
 {
     MythUIGuideGrid *gg = dynamic_cast<MythUIGuideGrid *>(base);
+
     if (!gg)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "bad parsing");
@@ -287,7 +289,7 @@ void MythUIGuideGrid::CreateCopy(MythUIType *parent)
 QColor MythUIGuideGrid::calcColor(const QColor &color, int alphaMod)
 {
     QColor newColor(color);
-    newColor.setAlpha((int)(color.alpha() * (alphaMod / 255.0)));
+    newColor.setAlpha((int)(color.alpha() *(alphaMod / 255.0)));
     return newColor;
 }
 
@@ -296,10 +298,12 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 {
     for (int i = 0; i < m_rowCount; i++)
     {
-        QList<UIGTCon*>::iterator it = allData[i].begin();
+        QList<UIGTCon *>::iterator it = allData[i].begin();
+
         for (; it != allData[i].end(); ++it)
         {
             UIGTCon *data = *it;
+
             if (data->recStat == 0)
                 drawBackground(p, data, alphaMod);
             else if (data->recStat == 1)
@@ -313,7 +317,8 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     for (int i = 0; i < m_rowCount; i++)
     {
-        QList<UIGTCon*>::iterator it = allData[i].begin();
+        QList<UIGTCon *>::iterator it = allData[i].begin();
+
         for (; it != allData[i].end(); ++it)
         {
             UIGTCon *data = *it;
@@ -336,6 +341,7 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
     if (m_selType == "roundbox")
     {
         QPen pen = m_drawSelLine;
+
         if (status == 1)
             pen.setColor(m_recordingColor);
         else if (status == 2)
@@ -365,6 +371,7 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
     {
         // default to "box" selection type
         QPen pen = m_drawSelLine;
+
         if (status == 1)
             pen.setColor(m_recordingColor);
         else if (status == 2)
@@ -399,6 +406,7 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
                                  (m_arrowImages[0]->height() / 2), m_arrowImages[0], alphaMod);
             }
         }
+
         if (data->arrow == 2 || data->arrow == 3)
         {
             if (m_verticalLayout)
@@ -507,11 +515,13 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data, int alphaMod
 
     if (area.width() <= 1)
         area.setWidth(2);
+
     if (area.height() <= 1)
         area.setHeight(2);
 
     static const QPen nopen(Qt::NoPen);
     p->DrawRect(area, QBrush(fillColor), nopen, alphaMod);
+
     if (overArea.width() > 0)
         p->DrawRect(overArea, QBrush(overColor), nopen, alphaMod);
 }
@@ -532,6 +542,7 @@ void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
     {
         if ((data->arrow == 1 || data->arrow == 3) && m_arrowImages[2])
             area.setTop(area.top() + m_arrowImages[2]->height());
+
         if ((data->arrow == 2 || data->arrow == 3) && m_arrowImages[3])
             area.setBottom(area.bottom() - m_arrowImages[3]->height());
     }
@@ -539,6 +550,7 @@ void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
     {
         if ((data->arrow == 1 || data->arrow == 3) && m_arrowImages[0])
             area.setLeft(area.left() + m_arrowImages[0]->width());
+
         if ((data->arrow == 2 || data->arrow == 3) && m_arrowImages[1])
             area.setRight(area.right() - m_arrowImages[1]->width());
     }
@@ -550,9 +562,9 @@ void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
 }
 
 void MythUIGuideGrid::SetProgramInfo(int row, int col, const QRect &area,
-                                 const QString &title, const QString &genre,
-                                 int arrow, int recType, int recStat,
-                                 bool selected)
+                                     const QString &title, const QString &genre,
+                                     int arrow, int recType, int recStat,
+                                     bool selected)
 {
     (void)col;
     UIGTCon *data = new UIGTCon(area, title, genre, arrow, recType, recStat);
@@ -561,6 +573,7 @@ void MythUIGuideGrid::SetProgramInfo(int row, int col, const QRect &area,
     if (m_drawCategoryColors)
     {
         data->categoryColor = categoryColors[data->category.toLower()];
+
         if (!data->categoryColor.isValid())
             data->categoryColor = categoryColors["none"];
     }
@@ -573,17 +586,20 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
 {
     QFile f;
     QStringList searchpath = GetMythUI()->GetThemeSearchPath();
+
     for (QStringList::const_iterator ii = searchpath.begin();
-        ii != searchpath.end(); ++ii)
+         ii != searchpath.end(); ++ii)
     {
         f.setFileName(*ii + "categories.xml");
+
         if (f.open(QIODevice::ReadOnly))
             break;
     }
+
     if (f.handle() == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to open '%1'")
-                .arg(f.fileName()));
+            .arg(f.fileName()));
         return false;
     }
 
@@ -596,7 +612,7 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Parsing colors: %1 at line: %2 column: %3")
-                .arg(f.fileName()).arg(errorLine).arg(errorColumn) +
+            .arg(f.fileName()).arg(errorLine).arg(errorColumn) +
             QString("\n\t\t\t%1").arg(errorMsg));
         f.close();
         return false;
@@ -605,10 +621,12 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
     f.close();
 
     QDomElement element = doc.documentElement();
+
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
         QDomElement info = child.toElement();
+
         if (!info.isNull() && info.tagName() == "catcolor")
         {
             QString cat = info.attribute("category");
@@ -688,6 +706,7 @@ void MythUIGuideGrid::SetProgPast(int ppast)
 void MythUIGuideGrid::SetMultiLine(bool multiline)
 {
     m_multilineText = multiline;
+
     if (m_multilineText)
         m_justification |= Qt::TextWordWrap;
     else

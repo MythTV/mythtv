@@ -25,7 +25,6 @@
 #include <QStringList>
 #include <QList>
 #include <QHash>
-#include <QThread>
 
 // MythTV headers
 #include <mythscreentype.h>
@@ -34,8 +33,11 @@
 #include <mythuiimage.h>
 #include <mythdialogbox.h>
 #include <mythmedia.h>
+#include <mthread.h>
 
 // MythGallery headers
+#include "galleryfilter.h"
+#include "galleryfilterdlg.h"
 #include "thumbview.h"
 
 using namespace std;
@@ -58,6 +60,7 @@ class IconView : public MythScreenType
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent*);
+    void HandleRandomShow(void);
 
     QString GetError(void) { return m_errorStr; }
 
@@ -76,6 +79,7 @@ class IconView : public MythScreenType
     void HandleMainMenu(void);
     void HandleSubMenuMetadata(void);
     void HandleSubMenuMark(void);
+    void HandleSubMenuFilter(void);
     void HandleSubMenuFile(void);
 
   private slots:
@@ -83,7 +87,6 @@ class IconView : public MythScreenType
     void HandleRotateCCW(void);
     void HandleDeleteCurrent(void);
     void HandleSlideShow(void);
-    void HandleRandomShow(void);
     void HandleSettings(void);
     void HandleEject(void);
     void HandleImport(void);
@@ -116,6 +119,7 @@ class IconView : public MythScreenType
     QStringList         m_itemMarked;
     QString             m_galleryDir;
     vector<int>         m_history;
+    GalleryFilter      *m_galleryFilter;
 
     MythUIButtonList   *m_imageList;
     MythUIText         *m_captionText;
@@ -141,6 +145,9 @@ class IconView : public MythScreenType
     QStringList         m_paths;
 
     QString             m_errorStr;
+
+  protected slots:
+    void reloadData();
 
   public slots:
     void mediaStatusChanged(MythMediaStatus oldStatus, MythMediaDevice *pMedia);
@@ -169,7 +176,7 @@ class ChildCountEvent : public QEvent
     static Type kEventType;
 };
 
-class ChildCountThread : public QThread
+class ChildCountThread : public MThread
 {
 public:
 

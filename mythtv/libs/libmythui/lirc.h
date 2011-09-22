@@ -4,11 +4,12 @@
 #include <QByteArray>
 #include <QString>
 #include <QObject>
-#include <QThread>
 #include <QMutex>
 #include <QList>
 
 #include <sys/types.h>   // for uint
+
+#include "mthread.h"
 
 class LIRCPriv;
 
@@ -20,7 +21,7 @@ class LIRCPriv;
  *
  * \ingroup MythUI_Input
  */
-class LIRC : public QThread
+class LIRC : public QObject, public MThread
 {
     Q_OBJECT
   public:

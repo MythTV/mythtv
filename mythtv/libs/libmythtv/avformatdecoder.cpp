@@ -169,11 +169,13 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
             break;
         case AV_LOG_ERROR:
             verbose_level = LOG_ERR;
+            verbose_mask |= VB_LIBAV;
             break;
         case AV_LOG_DEBUG:
         case AV_LOG_VERBOSE:
         case AV_LOG_INFO:
             verbose_level = LOG_DEBUG;
+            verbose_mask |= VB_LIBAV;
         case AV_LOG_WARNING:
             verbose_mask |= VB_LIBAV;
             break;
@@ -268,6 +270,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       frame_decoded(0),             decoded_video_frame(NULL),
       avfRingBuffer(NULL),          sws_ctx(NULL),
       directrendering(false),
+      no_dts_hack(false),           dorewind(false),
       gopset(false),                seen_gop(false),
       seq_count(0),
       prevgoppos(0),                gotvideo(false),
@@ -289,6 +292,9 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       special_decode(special_decoding),
       maxkeyframedist(-1),
       // Closed Caption & Teletext decoders
+      ignore_scte(false),
+      invert_scte_field(0),
+      last_scte_field(0),
       ccd608(new CC608Decoder(parent->GetCC608Reader())),
       ccd708(new CC708Decoder(parent->GetCC708Reader())),
       ttd(new TeletextDecoder(parent->GetTeletextReader())),
@@ -303,6 +309,9 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 {
     memset(&params, 0, sizeof(AVFormatParameters));
     memset(&readcontext, 0, sizeof(readcontext));
+    memset(ccX08_in_pmt, 0, sizeof(ccX08_in_pmt));
+    memset(ccX08_in_tracks, 0, sizeof(ccX08_in_tracks));
+
     // using preallocated AVFormatContext for our own ByteIOContext
     params.prealloced_context = 1;
     audioSamples = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
@@ -320,8 +329,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 
     if (gCoreContext->GetNumSetting("CCBackground", 0))
         CC708Window::forceWhiteOnBlackText = true;
-
-    no_dts_hack = false;
 
     int x = gCoreContext->GetNumSetting("CommFlagFast", 0);
     LOG(VB_COMMFLAG, LOG_INFO, LOC + QString("CommFlagFast: %1").arg(x));
@@ -2091,12 +2098,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_SUBTITLE)
         {
+            bool forced = ic->streams[i]->disposition & AV_DISPOSITION_FORCED;
             int lang = GetSubtitleLanguage(subtitleStreamCount, i);
             int lang_indx = lang_sub_cnt[lang]++;
             subtitleStreamCount++;
 
             tracks[kTrackTypeSubtitle].push_back(
-                StreamInfo(i, lang, lang_indx, ic->streams[i]->id, 0));
+                StreamInfo(i, lang, lang_indx, ic->streams[i]->id, 0, 0, false, false, forced));
 
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Subtitle track #%1 is A/V stream #%2 "
@@ -2483,7 +2491,7 @@ int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic)
     return 0;
 }
 
-void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len)
+void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len, bool scte)
 {
     if (!len)
         return;
@@ -2517,13 +2525,41 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len)
         uint data2    = buf[4+(cur*3)];
         uint data     = (data2 << 8) | data1;
         uint cc_type  = cc_code & 0x03;
+        uint field;
 
-        if (cc_type <= 0x1) // EIA-608 field-1/2
+        if (scte || cc_type <= 0x1) // EIA-608 field-1/2
         {
+            if (cc_type == 0x2)
+            {
+                // SCTE repeated field
+                field = !last_scte_field;
+                invert_scte_field = !invert_scte_field;
+            }
+            else
+            {
+                field = cc_type ^ invert_scte_field;
+            }
+
             if (cc608_good_parity(cc608_parity_table, data))
             {
+                // in film mode, we may start at the wrong field;
+                // correct if XDS start/cont/end code is detected
+                // (must be field 2)
+                if (scte && field == 0 &&
+                    (data1 & 0x7f) <= 0x0f && (data1 & 0x7f) != 0x00)
+                {
+                    if (cc_type == 1)
+                        invert_scte_field = 0;
+                    field = 1;
+
+                    // flush decoder
+                    ccd608->FormatCC(0, -1, -1);
+                }
+
                 had_608 = true;
-                ccd608->FormatCCField(lastccptsu / 1000, cc_type, data);
+                ccd608->FormatCCField(lastccptsu / 1000, field, data);
+
+                last_scte_field = field;
             }
         }
         else
@@ -3034,13 +3070,22 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
     AVCodecContext *context = stream->codec;
 
-    // Decode CEA-608 and CEA-708 captions
-    for (uint i = 0; i < (uint)mpa_pic->atsc_cc_len;
-    i += ((mpa_pic->atsc_cc_buf[i] & 0x1f) * 3) + 2)
+    uint cc_len = (uint) max(mpa_pic->scte_cc_len,0);
+    uint8_t *cc_buf = mpa_pic->scte_cc_buf;
+    bool scte = true;
+
+    // If both ATSC and SCTE caption data are available, prefer ATSC
+    if ((mpa_pic->atsc_cc_len > 0) || ignore_scte)
     {
-        DecodeDTVCC(mpa_pic->atsc_cc_buf + i,
-                    mpa_pic->atsc_cc_len - i);
+        ignore_scte = true;
+        cc_len = (uint) max(mpa_pic->atsc_cc_len, 0);
+        cc_buf = mpa_pic->atsc_cc_buf;
+        scte = false;
     }
+
+    // Decode CEA-608 and CEA-708 captions
+    for (uint i = 0; i < cc_len; i += ((cc_buf[i] & 0x1f) * 3) + 2)
+        DecodeDTVCC(cc_buf + i, cc_len - i, scte);
 
     VideoFrame *picframe = (VideoFrame *)(mpa_pic->opaque);
 
@@ -3436,6 +3481,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
     if (trackNo >= tracks[type].size())
         return "";
 
+    bool forced = tracks[type][trackNo].forced;
     int lang_key = tracks[type][trackNo].language;
     if (kTrackTypeAudio == type)
     {
@@ -3475,8 +3521,9 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
         if (ringBuffer->IsDVD())
             lang_key = ringBuffer->DVD()->GetSubtitleLanguage(trackNo);
 
-        return QObject::tr("Subtitle") + QString(" %1: %2")
-            .arg(trackNo + 1).arg(iso639_key_toName(lang_key));
+        return QObject::tr("Subtitle") + QString(" %1: %2%3")
+            .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
+            .arg(forced ? " (forced)" : "");
     }
     else
     {

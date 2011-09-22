@@ -166,10 +166,8 @@ void UPNPSubscription::Remove(const QString &usn)
     m_subscriptionLock.unlock();
 }
 
-bool UPNPSubscription::ProcessRequest(HttpWorkerThread *pThread,
-                                      HTTPRequest *pRequest)
+bool UPNPSubscription::ProcessRequest(HTTPRequest *pRequest)
 {
-    (void)pThread;
     if (!pRequest)
         return false;
 

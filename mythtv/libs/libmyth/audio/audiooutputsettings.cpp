@@ -85,7 +85,7 @@ bool AudioOutputSettings::IsSupportedRate(int rate)
 
     vector<int>::iterator it;
 
-    for (it = m_rates.begin(); it != m_rates.end(); it++)
+    for (it = m_rates.begin(); it != m_rates.end(); ++it)
         if (*it == rate)
             return true;
 
@@ -107,7 +107,7 @@ int AudioOutputSettings::NearestSupportedRate(int rate)
     vector<int>::iterator it;
 
     // Assume rates vector is sorted
-    for (it = m_rates.begin(); it != m_rates.end(); it++)
+    for (it = m_rates.begin(); it != m_rates.end(); ++it)
     {
         if (*it >= rate)
             return *it;
@@ -139,7 +139,7 @@ bool AudioOutputSettings::IsSupportedFormat(AudioFormat format)
 
     vector<AudioFormat>::iterator it;
 
-    for (it = m_formats.begin(); it != m_formats.end(); it++)
+    for (it = m_formats.begin(); it != m_formats.end(); ++it)
         if (*it == format)
             return true;
 
@@ -211,7 +211,7 @@ bool AudioOutputSettings::IsSupportedChannels(int channels)
 
     vector<int>::iterator it;
 
-    for (it = m_channels.begin(); it != m_channels.end(); it++)
+    for (it = m_channels.begin(); it != m_channels.end(); ++it)
         if (*it == channels)
             return true;
 
@@ -244,8 +244,10 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
 
     for (it = m_channels.rbegin();
          it != m_channels.rend() && *it >= channels;
-         it++)
+         ++it)
+    {
         m_channels.pop_back();
+    }
     m_channels.push_back(channels);
 }
 

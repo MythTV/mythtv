@@ -94,8 +94,7 @@ QStringList HttpStatus::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */,
-                                 HTTPRequest *pRequest )
+bool HttpStatus::ProcessRequest( HTTPRequest *pRequest )
 {
     try
     {
@@ -215,7 +214,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             else
                 encoder.setAttribute("hostname", elink->GetHostName());
 
-            encoder.setAttribute("devlabel", 
+            encoder.setAttribute("devlabel",
                           CardUtil::GetDeviceLabel(elink->GetCardID()) );
 
             if (elink->IsConnected())
@@ -254,7 +253,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     RecList recordingList;
 
     if (m_pSched)
-        m_pSched->getAllPending(&recordingList);
+        m_pSched->GetAllPending(recordingList);
 
     unsigned int iNum = 10;
     unsigned int iNumRecordings = 0;
@@ -451,8 +450,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         directory  = *(sit++);
         isLocalstr = *(sit++);
         fsID       = *(sit++);
-        sit++; // ignore dirID
-        sit++; // ignore blocksize
+        ++sit; // ignore dirID
+        ++sit; // ignore blocksize
         iTotal     = (*(sit++)).toLongLong();
         iUsed      = (*(sit++)).toLongLong();;
         iAvail     = iTotal - iUsed;
@@ -526,13 +525,10 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT MAX(endtime) FROM program WHERE manualid = 0;");
 
-    if (query.exec() && query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.next();
-
-        if (query.isValid())
-            GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
-                                                     Qt::ISODate);
+        GuideDataThrough = QDateTime::fromString(
+            query.value(0).toString(), Qt::ISODate);
     }
 
     guide.setAttribute("start",
@@ -576,10 +572,10 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                         "status information script: %1").arg(info_script));
             return;
         }
-    
+
         QByteArray input = ms.ReadAll();
 
-        QStringList output = QString(input).split('\n', 
+        QStringList output = QString(input).split('\n',
                                                   QString::SkipEmptyParts);
 
         QStringList::iterator iter;
@@ -647,14 +643,12 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
        << "<div class=\"status\">\r\n"
        << "  <h1 class=\"status\">MythTV Status</h1>\r\n";
 
-    int nNumEncoders = 0;
-
     // encoder information ---------------------
 
     QDomNode node = docElem.namedItem( "Encoders" );
 
     if (!node.isNull())
-        nNumEncoders = PrintEncoderStatus( os, node.toElement() );
+        PrintEncoderStatus( os, node.toElement() );
 
     // upcoming shows --------------------------
 
@@ -737,7 +731,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 
                 QString sDevlabel = e.attribute( "devlabel", "[ UNKNOWN ]");
 
-                os << "    Encoder " << sCardId << " " << sDevlabel 
+                os << "    Encoder " << sCardId << " " << sDevlabel
                    << " is " << sIsLocal << " on " << sHostName;
 
                 if ((sIsLocal == "remote") && !bConnected)

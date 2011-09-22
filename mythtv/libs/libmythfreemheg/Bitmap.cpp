@@ -67,60 +67,106 @@ void MHBitmap::Initialise(MHParseNode *p, MHEngine *engine)
     MHVisible::Initialise(p, engine);
     // Tiling - optional
     MHParseNode *pTiling = p->GetNamedArg(C_TILING);
-    if (pTiling) m_fTiling = pTiling->GetArgN(0)->GetBoolValue();
+
+    if (pTiling)
+    {
+        m_fTiling = pTiling->GetArgN(0)->GetBoolValue();
+    }
+
     // Transparency - optional
     MHParseNode *pTransparency = p->GetNamedArg(C_ORIGINAL_TRANSPARENCY);
-    if (pTransparency) m_nOrigTransparency = pTransparency->GetArgN(0)->GetIntValue();
+
+    if (pTransparency)
+    {
+        m_nOrigTransparency = pTransparency->GetArgN(0)->GetIntValue();
+    }
+
     m_pContent = engine->GetContext()->CreateBitmap(m_fTiling);
 }
 
 void MHBitmap::PrintMe(FILE *fd, int nTabs) const
 {
-    PrintTabs(fd, nTabs); fprintf(fd, "{:Bitmap ");
-    MHVisible::PrintMe(fd, nTabs+1);
-    if (m_fTiling) { PrintTabs(fd, nTabs+1); fprintf(fd, ":Tiling true\n"); }
-    if (m_nOrigTransparency != 0) { PrintTabs(fd, nTabs+1); fprintf(fd, ":OrigTransparency %d\n", m_nOrigTransparency); }
-    PrintTabs(fd, nTabs); fprintf(fd, "}\n");
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "{:Bitmap ");
+    MHVisible::PrintMe(fd, nTabs + 1);
+
+    if (m_fTiling)
+    {
+        PrintTabs(fd, nTabs + 1);
+        fprintf(fd, ":Tiling true\n");
+    }
+
+    if (m_nOrigTransparency != 0)
+    {
+        PrintTabs(fd, nTabs + 1);
+        fprintf(fd, ":OrigTransparency %d\n", m_nOrigTransparency);
+    }
+
+    PrintTabs(fd, nTabs);
+    fprintf(fd, "}\n");
 }
 
 void MHBitmap::Preparation(MHEngine *engine)
 {
-    if (m_fAvailable) return;
+    if (m_fAvailable)
+    {
+        return;
+    }
+
     m_nTransparency = m_nOrigTransparency; // Transparency isn't used in UK MHEG
     MHVisible::Preparation(engine);
 }
 
-// 
+//
 void MHBitmap::ContentPreparation(MHEngine *engine)
 {
     MHVisible::ContentPreparation(engine);
+
     if (m_ContentType == IN_NoContent)
+    {
         MHERROR("Bitmap must contain a content");
+    }
+
     if (m_ContentType == IN_IncludedContent) // We can't handle included content at the moment.
+    {
         MHERROR("Included content in bitmap is not implemented");
+    }
 }
 
 // Decode the content.
 void MHBitmap::ContentArrived(const unsigned char *data, int length, MHEngine *engine)
 {
     QRegion updateArea = GetVisibleArea(); // If there's any content already we have to redraw it.
-    if (! m_pContent) return; // Shouldn't happen.
+
+    if (! m_pContent)
+    {
+        return;    // Shouldn't happen.
+    }
 
     int nCHook = m_nContentHook;
-    if (nCHook == 0) nCHook = engine->GetDefaultBitmapCHook();
+
+    if (nCHook == 0)
+    {
+        nCHook = engine->GetDefaultBitmapCHook();
+    }
 
     // TODO: What if we can't convert it?
-    if (nCHook == 4) { // PNG.
+    if (nCHook == 4)   // PNG.
+    {
         m_pContent->CreateFromPNG(data, length);
     }
     // CHook 5 seems to be used by the BBC on Freesat for an MPEG I-frame for the
     // background but enabling it here results in it overlaying the video.
     // Presumably it is not simply the same as CHook 2.
-    else if (nCHook == 2 /* ||nCHook == 5 */) { // MPEG I-frame.
+    else if (nCHook == 2 /* ||nCHook == 5 */)   // MPEG I-frame.
+    {
         m_pContent->CreateFromMPEG(data, length);
     }
 
-    else MHERROR(QString("Unknown bitmap content hook %1").arg(nCHook));
+    else
+    {
+        MHERROR(QString("Unknown bitmap content hook %1").arg(nCHook));
+    }
 
     updateArea += GetVisibleArea(); // Redraw this bitmap.
     engine->Redraw(updateArea); // Mark for redrawing
@@ -136,8 +182,16 @@ void MHBitmap::SetTransparency(int nTransPerCent, MHEngine *)
 {
     // The object transparency isn't actually used in UK MHEG.
     // We want a value between 0 and 255
-    if (nTransPerCent < 0) nTransPerCent = 0; // Make sure it's in the bounds
-    if (nTransPerCent > 100) nTransPerCent = 100;
+    if (nTransPerCent < 0)
+    {
+        nTransPerCent = 0;    // Make sure it's in the bounds
+    }
+
+    if (nTransPerCent > 100)
+    {
+        nTransPerCent = 100;
+    }
+
     m_nTransparency = ((nTransPerCent * 255) + 50) / 100;
 }
 
@@ -169,22 +223,29 @@ void MHBitmap::GetBitmapDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset)
 
 void MHBitmap::Display(MHEngine *)
 {
-    if (! m_fRunning || ! m_pContent || m_nBoxWidth == 0 || m_nBoxHeight == 0) return; // Can't draw zero sized boxes.
+    if (! m_fRunning || ! m_pContent || m_nBoxWidth == 0 || m_nBoxHeight == 0)
+    {
+        return;    // Can't draw zero sized boxes.
+    }
 
-    m_pContent->Draw(m_nPosX+m_nXDecodeOffset, m_nPosY+m_nYDecodeOffset,
-        QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight), m_fTiling);
+    m_pContent->Draw(m_nPosX + m_nXDecodeOffset, m_nPosY + m_nYDecodeOffset,
+                     QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight), m_fTiling);
 }
 
 // Return the region drawn by the bitmap.
 QRegion MHBitmap::GetVisibleArea()
 {
-    if (! m_fRunning || m_pContent == NULL) return QRegion();
+    if (! m_fRunning || m_pContent == NULL)
+    {
+        return QRegion();
+    }
+
     // The visible area is the intersection of the containing box with the, possibly offset,
     // bitmap.
     QSize imageSize = m_pContent->GetSize();
     QRegion boxRegion = QRegion(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight);
-    QRegion bitmapRegion = QRegion(m_nPosX+m_nXDecodeOffset, m_nPosY+m_nYDecodeOffset,
-                                imageSize.width(), imageSize.height());
+    QRegion bitmapRegion = QRegion(m_nPosX + m_nXDecodeOffset, m_nPosY + m_nYDecodeOffset,
+                                   imageSize.width(), imageSize.height());
     return boxRegion & bitmapRegion;
 }
 
@@ -192,7 +253,13 @@ QRegion MHBitmap::GetVisibleArea()
 QRegion MHBitmap::GetOpaqueArea()
 {
     // The area is empty unless the bitmap is opaque.
-    if (! m_fRunning || m_pContent == NULL || ! m_pContent->IsOpaque()) return QRegion();
-    else return GetVisibleArea();
+    if (! m_fRunning || m_pContent == NULL || ! m_pContent->IsOpaque())
+    {
+        return QRegion();
+    }
+    else
+    {
+        return GetVisibleArea();
+    }
 }
 

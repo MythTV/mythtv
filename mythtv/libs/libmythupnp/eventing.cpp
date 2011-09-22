@@ -157,7 +157,7 @@ QStringList Eventing::GetBasePaths()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Eventing::ProcessRequest( HttpWorkerThread * /*pThread*/, HTTPRequest *pRequest )
+bool Eventing::ProcessRequest( HTTPRequest *pRequest )
 {
     if (pRequest)
     {

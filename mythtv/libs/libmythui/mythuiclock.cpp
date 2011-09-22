@@ -12,7 +12,7 @@
 #include "mythdb.h"
 
 MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
-           : MythUIText(parent, name)
+    : MythUIText(parent, name)
 {
     m_DateFormat = GetMythDB()->GetSetting("DateFormat", "ddd d MMMM");
     m_ShortDateFormat = GetMythDB()->GetSetting("ShortDateFormat", "ddd d");
@@ -35,6 +35,7 @@ MythUIClock::~MythUIClock()
 void MythUIClock::Pulse(void)
 {
     m_Time = QDateTime::currentDateTime();
+
     if (m_nextUpdate.isNull() || (m_Time >= m_nextUpdate))
         MythUIText::SetText(GetTimeText());
 
@@ -54,7 +55,7 @@ QString MythUIClock::GetTimeText(void)
 
     m_nextUpdate = m_Time.addSecs(1);
     m_nextUpdate = QDateTime(
-        m_Time.date(), m_Time.time().addMSecs(m_Time.time().msec()));
+                       m_Time.date(), m_Time.time().addMSecs(m_Time.time().msec()));
 
     return newMsg;
 }
@@ -65,11 +66,13 @@ QString MythUIClock::GetTimeText(void)
 void MythUIClock::SetText(const QString &text)
 {
     QString txt = text;
+
     if (txt.isEmpty())
     {
         m_Time = QDateTime::currentDateTime();
         txt = GetTimeText();
     }
+
     MythUIText::SetText(txt);
 }
 
@@ -104,6 +107,7 @@ bool MythUIClock::ParseElement(
 void MythUIClock::CopyFrom(MythUIType *base)
 {
     MythUIClock *clock = dynamic_cast<MythUIClock *>(base);
+
     if (!clock)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");

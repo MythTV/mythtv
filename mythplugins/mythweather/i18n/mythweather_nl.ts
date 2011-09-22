@@ -176,7 +176,8 @@
     </message>
     <message>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Controleren of deze tekst niet te lang is.</translatorcomment>
+        <translation>Script %1 is nog steeds bezig een update te draaien, Mogelijk hangt het, zorg ervoor dat de time-out waardes normaal zijn... Het wordt deze keer niet gedraaid.</translation>
     </message>
 </context>
 <context>
@@ -259,7 +260,7 @@
     <message>
         <source>AM Showers</source>
         <translatorcomment>Gerbuik van AM/PM is in NL niet ingeburgerd</translatorcomment>
-        <translation type="unfinished">&apos;s Ochtends buien</translation>
+        <translation>&apos;s Ochtends buien</translation>
     </message>
     <message>
         <source>Fog</source>
@@ -279,27 +280,30 @@
     </message>
     <message>
         <source>Scattered Flurries</source>
-        <translation type="unfinished">Plaatselijke windstoten</translation>
+        <translatorcomment>Verspreide klinkt niet.</translatorcomment>
+        <translation type="unfinished">Verspreide Sneeuwbuitjes</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun</source>
-        <translation type="unfinished">&apos;s Ochtends bewolkt/&apos;s middags zonnig</translation>
+        <translation>&apos;s Ochtends bewolkt/&apos;s middags zonnig</translation>
     </message>
     <message>
         <source>Isolated T-Storms</source>
-        <translation type="unfinished">Geisoleerde onweersbuien</translation>
+        <translatorcomment>Geïsoleerde is de letterlijke vertaling, maar in Nederland wordt &apos;lokale&apos; gebruikt.</translatorcomment>
+        <translation>Lokale onweersbuien</translation>
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
-        <translation type="unfinished">Plaatselijke onweersbuien</translation>
+        <translatorcomment>Scattered is verspreid, niet plaatselijk, maar er zou iets moeten staan als verstrooid, af en toe of van tijd tot tijd</translatorcomment>
+        <translation type="unfinished">Van tijd tot tijd onweersbuien</translation>
     </message>
     <message>
         <source>PM Showers</source>
-        <translation type="unfinished">&apos;s Middags buien</translation>
+        <translation>&apos;s Middags buien</translation>
     </message>
     <message>
         <source>PM Showers/Wind</source>
-        <translation type="unfinished">&apos;s Middags buien/wind</translation>
+        <translation>&apos;s Middags buien/wind</translation>
     </message>
     <message>
         <source>Rain/Snow Showers</source>
@@ -355,15 +359,16 @@
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verspreide Sneeuwbuitjes/Wind</translation>
     </message>
     <message>
         <source>Sct Strong Storms</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Dit weer komt niet in Nederland voor.</translatorcomment>
+        <translation type="unfinished">Verspreide Zware Stormen</translation>
     </message>
     <message>
         <source>PM T-Storms</source>
-        <translation type="unfinished">&apos;s Middags onweersbuien</translation>
+        <translation>&apos;s Middags onweersbuien</translation>
     </message>
     <message>
         <source>Thunderstorms</source>
@@ -375,15 +380,15 @@
     </message>
     <message>
         <source>AM Thunderstorms</source>
-        <translation type="unfinished">&apos;s Ochtends onweersbuien</translation>
+        <translation>&apos;s Ochtends onweersbuien</translation>
     </message>
     <message>
         <source>AM Rain</source>
-        <translation type="unfinished">&apos;s Ochtends regen</translation>
+        <translation>&apos;s Ochtends regen</translation>
     </message>
     <message>
         <source>Iso T-Storms/Wind</source>
-        <translation type="unfinished">Geisoleerde onweersbuien/wind</translation>
+        <translation type="unfinished">Lokale onweersbuien/wind</translation>
     </message>
     <message>
         <source>Rain/Snow</source>
@@ -395,7 +400,7 @@
     </message>
     <message>
         <source>AM Showers/Wind</source>
-        <translation type="unfinished">&apos;s Ochtends buien/wind</translation>
+        <translation>&apos;s Ochtends buien/wind</translation>
     </message>
     <message>
         <source>Sct Snow Showers</source>
@@ -411,15 +416,15 @@
     </message>
     <message>
         <source>AM Light Rain</source>
-        <translation type="unfinished">&apos;s Ochtends lichte regen</translation>
+        <translation>&apos;s Ochtends lichte regen</translation>
     </message>
     <message>
         <source>PM Light Rain</source>
-        <translation type="unfinished">&apos;s Middags lichte regen</translation>
+        <translation>&apos;s Middags lichte regen</translation>
     </message>
     <message>
         <source>PM Rain</source>
-        <translation type="unfinished">&apos;s Middags regen</translation>
+        <translation>&apos;s Middags regen</translation>
     </message>
     <message>
         <source>Snow Showers</source>
@@ -431,7 +436,7 @@
     </message>
     <message>
         <source>PM Rain/Snow</source>
-        <translation type="unfinished">&apos;s Middags regen/sneeuw</translation>
+        <translation>&apos;s Middags regen/sneeuw</translation>
     </message>
     <message>
         <source>Few Showers/Wind</source>
@@ -443,11 +448,11 @@
     </message>
     <message>
         <source>PM Rain/Snow Showers</source>
-        <translation type="unfinished">&apos;s Middags regen/sneeuwbuien</translation>
+        <translation>&apos;s Middags regen/sneeuwbuien</translation>
     </message>
     <message>
         <source>PM Rain/Snow/Wind</source>
-        <translation type="unfinished">&apos;s Middags regen/sneeuw/wind</translation>
+        <translation>&apos;s Middags regen/sneeuw/wind</translation>
     </message>
     <message>
         <source>Rain/Snow Showers/Wind</source>
@@ -463,7 +468,7 @@
     </message>
     <message>
         <source>PM Snow</source>
-        <translation type="unfinished">&apos;s Middags sneeuw</translation>
+        <translation>&apos;s Middags sneeuw</translation>
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
@@ -479,7 +484,7 @@
     </message>
     <message>
         <source>AM Wintry Mix</source>
-        <translation type="unfinished">&apos;s Ochtends winterse buien</translation>
+        <translation>&apos;s Ochtends winterse buien</translation>
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
@@ -487,7 +492,7 @@
     </message>
     <message>
         <source>AM Light Snow</source>
-        <translation type="unfinished">&apos;s Ochtends lichte sneeuw</translation>
+        <translation>&apos;s Ochtends lichte sneeuw</translation>
     </message>
     <message>
         <source>Rain/Freezing Rain</source>
@@ -503,15 +508,15 @@
     </message>
     <message>
         <source>AM Snow Showers</source>
-        <translation type="unfinished">&apos;s Ochtends sneeuwbuien</translation>
+        <translation>&apos;s Ochtends sneeuwbuien</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun/Wind</source>
-        <translation type="unfinished">&apos;s Ochtends wolken/&apos;s middags zon/wind</translation>
+        <translation>&apos;s Ochtends wolken/&apos;s middags zon/wind</translation>
     </message>
     <message>
         <source>AM Rain/Snow/Wind</source>
-        <translation type="unfinished">&apos;s Ochtends regen/sneeuw/wind</translation>
+        <translation>&apos;s Ochtends regen/sneeuw/wind</translation>
     </message>
     <message>
         <source>Rain to Snow/Wind</source>
@@ -523,7 +528,7 @@
     </message>
     <message>
         <source>PM Snow Showers/Wind</source>
-        <translation type="unfinished">&apos;s Middags sneeuw buien/wind</translation>
+        <translation>&apos;s Middags sneeuwbuien/wind</translation>
     </message>
     <message>
         <source>Snow and Ice to Rain</source>
@@ -535,27 +540,28 @@
     </message>
     <message>
         <source>AM Rain/Ice</source>
+        <translatorcomment>ijzel zou beter zijn ipv ijs.Een andere mogelijkheid van ice is &apos;opvriezing van natte weggedeelten&apos;.</translatorcomment>
         <translation type="unfinished">&apos;s Ochtends regen/ijs</translation>
     </message>
     <message>
         <source>AM Snow Showers/Wind</source>
-        <translation type="unfinished">&apos;s Ochtends sneeuwbuien/wind</translation>
+        <translation>&apos;s Ochtends sneeuwbuien/wind</translation>
     </message>
     <message>
         <source>AM Light Snow/Wind</source>
-        <translation type="unfinished">&apos;s Ochtends lichte sneeuw/wind</translation>
+        <translation>&apos;s Ochtends lichte sneeuw/wind</translation>
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
-        <translation type="unfinished">&apos;s Middags lichte regen/wind</translation>
+        <translation>&apos;s Middags lichte regen/wind</translation>
     </message>
     <message>
         <source>AM Light Wintry Mix</source>
-        <translation type="unfinished">&apos;s Ochtends lichte winterse buien</translation>
+        <translation>&apos;s Ochtends lichte winterse buien</translation>
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation type="unfinished">&apos;s Middags lichte sneeuw/wind</translation>
+        <translation>&apos;s Middags lichte sneeuw/wind</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
@@ -563,7 +569,7 @@
     </message>
     <message>
         <source>PM Snow Shower</source>
-        <translation type="unfinished">&apos;s Middags sneeuw buien</translation>
+        <translation>&apos;s Middags sneeuwbuien</translation>
     </message>
     <message>
         <source>Snow to Rain/Wind</source>
@@ -571,15 +577,16 @@
     </message>
     <message>
         <source>PM Light Rain/Ice</source>
+        <translatorcomment>ijzel zou beter zijn ipv ijs.Een andere mogelijkheid van ice is &apos;opvriezing van natte weggedeelten&apos;.</translatorcomment>
         <translation type="unfinished">&apos;s Middags lichte regen/ijs</translation>
     </message>
     <message>
         <source>AM Snow</source>
-        <translation type="unfinished">&apos;s Ochtends sneeuw</translation>
+        <translation>&apos;s Ochtends sneeuw</translation>
     </message>
     <message>
         <source>Snow to Ice</source>
-        <translation>Sneeuw tot ijs</translation>
+        <translation type="unfinished">Sneeuw tot ijs</translation>
     </message>
     <message>
         <source>Wintry Mix/Wind</source>
@@ -587,11 +594,11 @@
     </message>
     <message>
         <source>PM Light Snow</source>
-        <translation type="unfinished">&apos;s Middags lichte sneeuw</translation>
+        <translation>&apos;s Middags lichte sneeuw</translation>
     </message>
     <message>
         <source>AM Drizzle</source>
-        <translation type="unfinished">&apos;s Ochtends motregen</translation>
+        <translation>&apos;s Ochtends motregen</translation>
     </message>
     <message>
         <source>Strong Storms/Wind</source>
@@ -599,7 +606,7 @@
     </message>
     <message>
         <source>PM Drizzle</source>
-        <translation type="unfinished">&apos;s Middags motregen</translation>
+        <translation>&apos;s Middags motregen</translation>
     </message>
     <message>
         <source>Drizzle</source>
@@ -607,11 +614,11 @@
     </message>
     <message>
         <source>AM Light Rain/Wind</source>
-        <translation type="unfinished">&apos;s Ochtends lichte regen/wind</translation>
+        <translation>&apos;s Ochtends lichte regen/wind</translation>
     </message>
     <message>
         <source>AM Rain/Wind</source>
-        <translation type="unfinished">&apos;s Ochtends regen/wind</translation>
+        <translation>&apos;s Ochtends regen/wind</translation>
     </message>
     <message>
         <source>Wintry Mix to Snow</source>
@@ -749,7 +756,8 @@
     </message>
     <message>
         <source>Wind(Gust)</source>
-        <translation type="unfinished">Wind(vlaag)</translation>
+        <translatorcomment>Hoewel Gust vlaag is, komen ze meestal niet alleen</translatorcomment>
+        <translation type="unfinished">Wind(vlagen)</translation>
     </message>
     <message>
         <source>Wind Direction</source>
@@ -801,7 +809,7 @@
     </message>
     <message>
         <source>Precip</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Neerslag</translation>
     </message>
     <message>
         <source>Screen Setup</source>
@@ -841,21 +849,23 @@
     </message>
     <message>
         <source>Chance of Precipitation:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kans op neerslag:  %1</translation>
     </message>
     <message>
         <source>Weather Screen Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Weerscherm instellingen</translation>
     </message>
     <message>
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dit scherm bepaalt het gedrag van de weerschermen.  U kunt een achtergrond-weer-update activeren die onafhankelijk van de weergave van de weerschermen loopt en configureren hoeveel seconden ieder scherm wordt weergegeven
+
+Wanneer u klaar bent het configureren van de weer plugin, klikt u op &quot;Klaar&quot; om verder te gaan.</translation>
     </message>
     <message>
         <source>Retrieve data in background:</source>
-        <translation type="unfinished"></translation>
+        <translation>Haal data op in de achtergrond:</translation>
     </message>
     <message>
         <source>OK</source>
@@ -863,25 +873,27 @@ When you are done configuring the Weather Plugin, click &quot;Finish&quot; to co
     </message>
     <message>
         <source>Weather Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Weer Instelling</translation>
     </message>
     <message>
         <source>Available Screens</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschikbare Schermen</translation>
     </message>
     <message>
         <source>Active Screens</source>
-        <translation type="unfinished">Actieve schermen</translation>
+        <translation>Actieve schermen</translation>
     </message>
     <message>
         <source>Weather Script Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Weer Script Instellingen</translation>
     </message>
     <message>
         <source>This settings screen governs the behavior of individual weather scripts.  Select the script whose behavior you with to change and press the right arrow. Adjust the interval at which data is retrieved, and the timeout for accessing the site.
 
 When you have completed your changes, click &quot;Finish&quot; to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dit instellingenscherm regelt het gedrag van individuele weerscripts. Selecteer het script wiens gedrag u wilt wijzigen en druk op de pijl naar rechts. Stel het interval in waarmee gegevens worden opgehaald, en de time-out voor toegang tot de site.
+
+Wanneer u uw wijzigingen voltooid heeft, klikt u op &quot;Klaar&quot; om verder te gaan.</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -897,11 +909,11 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     </message>
     <message>
         <source>Weather Screen Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Weerscherm Instelling</translation>
     </message>
     <message>
         <source>Weather Source Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Weerbron Instelling</translation>
     </message>
     <message>
         <source>Source</source>
@@ -909,7 +921,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     </message>
     <message>
         <source>Weather Location Search</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Weer Locatie Zoeken</translation>
     </message>
     <message>
         <source>Weather</source>
@@ -917,7 +929,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     </message>
     <message>
         <source>Global Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Globale Instelling</translation>
     </message>
     <message>
         <source>Humidity:</source>
@@ -929,7 +941,8 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     </message>
     <message>
         <source>Wind(Gust):</source>
-        <translation type="unfinished">Wind(stoot):</translation>
+        <translatorcomment>Windstoten is een synoniem voor Windvlagen, maar stoten is niet los te gebruiken en vlagen wel.</translatorcomment>
+        <translation type="unfinished">Wind(vlagen):</translation>
     </message>
     <message>
         <source>Wind Direction:</source>
@@ -941,27 +954,27 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     </message>
     <message>
         <source>Feels Like:</source>
-        <translation type="unfinished">Gevoelstemperatuur:</translation>
+        <translation>Gevoelstemperatuur:</translation>
     </message>
     <message>
         <source>General weather plugin options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Algemene weerplugin opties</translation>
     </message>
     <message>
         <source>Screen Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scherm Instellingen</translation>
     </message>
     <message>
         <source>Choose which weather forecasts to display</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kies welke weersvoorspelling wordt weergegeven</translation>
     </message>
     <message>
         <source>Source Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bron Instellingen</translation>
     </message>
     <message>
         <source>Configure the behavior of weather scripts</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configureer het gedrag van weerscripts</translation>
     </message>
 </context>
 <context>
@@ -972,7 +985,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     </message>
     <message>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Geen van de geconfigureerde schermen is compleet in dit thema (mist copyright informatie).</translation>
     </message>
 </context>
 <context>

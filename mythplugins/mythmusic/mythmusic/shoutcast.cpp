@@ -186,7 +186,8 @@ int ShoutCastResponse::fillResponse(const char *s, int l)
 class ShoutCastMetaParser
 {
   public:
-    ShoutCastMetaParser(void) { }
+    ShoutCastMetaParser(void) :
+        m_meta_artist_pos(-1), m_meta_title_pos(-1), m_meta_album_pos(-1) { }
     ~ShoutCastMetaParser(void) { }
 
     void setMetaFormat(const QString &metaformat);

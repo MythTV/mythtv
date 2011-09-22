@@ -1196,7 +1196,7 @@
         <textarea name="msg" from="basetextarea">
             <area>0,210,1280,70</area>
             <align>allcenter</align>
-            <value>No listings found for this program.</value>
+            <value>No results found for this search</value>
             <multiline>yes</multiline>
         </textarea>
 
@@ -1440,7 +1440,7 @@
             <buttonarea>0,0,760,340</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <textarea name="rectype" from="buttontext">
+                    <textarea name="rectypechar" from="buttontext">
                         <area>30,1,20,24</area>
                         <align>hcenter</align>
                     </textarea>

@@ -35,12 +35,12 @@
 class Jitterometer
 {
   public:
-    Jitterometer(QString nname, int num_cycles = 0);
+    Jitterometer(const QString &nname, int num_cycles = 0);
    ~Jitterometer();
 
-    float GetLastFPS(void) { return last_fps; }
-    float GetLastSD(void)  { return last_sd;  }
-    QString GetLastCPUStats(void) { return lastcpustats; }
+    float GetLastFPS(void) const { return last_fps; }
+    float GetLastSD(void) const { return last_sd;  }
+    QString GetLastCPUStats(void) const { return lastcpustats; }
     void SetNumCycles(int cycles);
     bool RecordCycleTime();
     void RecordStartTime();

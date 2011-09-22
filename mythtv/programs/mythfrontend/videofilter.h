@@ -180,8 +180,8 @@ class VideoFilterSettings
     int season;
     int episode;
     QDate insertdate;
-    QRegExp re_season;
-    QRegExp re_date;
+    const QRegExp re_season;
+    const QRegExp re_date;
 
 
     unsigned int m_changed_state;
@@ -266,7 +266,7 @@ class VideoFilterDialog : public MythScreenType
     MythUIButton    *m_saveButton;
     MythUIButton    *m_doneButton;
     MythUIText      *m_numvideosText;
-    MythUITextEdit	*m_textfilter;
+    MythUITextEdit    *m_textfilter;
 
     const VideoList &m_videoList;
     FilterSettingsProxy *m_fsp;

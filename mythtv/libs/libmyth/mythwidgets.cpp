@@ -1168,11 +1168,9 @@ void MythRemoteLineEdit::backspace()
 }
 
 MythPushButton::MythPushButton(const QString &ontext, const QString &offtext,
-                               QWidget *parent, bool isOn, bool aa)
+                               QWidget *parent, bool isOn)
                                : QPushButton(ontext, parent)
 {
-    arrowAccel = aa;
-
     onText = ontext;
     offText = offtext;
 
@@ -1217,22 +1215,6 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
                 setDown(true);
                 emit pressed();
                 handled = true;
-            }
-            else if (arrowAccel)
-            {
-                if (action == "LEFT")
-                {
-                    parent()->event(e);
-                    handled = true;
-                }
-                else if (action == "RIGHT")
-                {
-                    if (isCheckable())
-                        toggleText();
-                    setDown(true);
-                    emit pressed();
-                    handled = true;
-                }
             }
         }
     }

@@ -35,7 +35,7 @@ class MHParseNode;
 // Link - basically a guarded command.
 class MHLink : public MHIngredient  
 {
-public:
+  public:
     MHLink();
     virtual const char *ClassName() { return "Link"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
@@ -54,7 +54,7 @@ public:
     // Called when an event has been triggered and fires this link if it matches. 
     virtual void MatchEvent(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un, MHEngine *engine);
 
-protected:
+  protected:
     MHObjectRef m_EventSource;
     enum EventType m_nEventType;
     MHUnion m_EventData;
@@ -65,10 +65,10 @@ protected:
 // Activate and deactivate actions.
 class MHActivate: public MHElemAction
 {
-public:
+  public:
     MHActivate(const char *name, bool fActivate): MHElemAction(name), m_fActivate(fActivate) {}
     virtual void Perform(MHEngine *engine) { Target(engine)->Activate(m_fActivate, engine); }
-protected:
+  protected:
     bool m_fActivate;
 };
 

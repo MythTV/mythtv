@@ -451,10 +451,8 @@ QString CardUtil::ProbeSubTypeName(uint cardid)
     return ProbeDVBType(device);
 }
 
-/** \fn CardUtil::IsDVBCardType(const QString)
- *  \brief Returns true iff the card_type is one of the DVB types.
- */
-bool CardUtil::IsDVBCardType(const QString card_type)
+/// \brief Returns true iff the card_type is one of the DVB types.
+bool CardUtil::IsDVBCardType(const QString &card_type)
 {
     QString ct = card_type.toUpper();
     return (ct == "DVB") || (ct == "QAM") || (ct == "QPSK") ||
@@ -890,6 +888,40 @@ vector<uint> CardUtil::GetCloneCardIDs(uint cardid)
         list.push_back(query.value(0).toUInt());
 
     return list;
+}
+
+QString CardUtil::GetFirewireChangerNode(uint inputid)
+{
+    QString fwnode;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT changer_device "
+                  "FROM cardinput WHERE cardinputid = :INPUTID ");
+    query.bindValue(":CARDID", inputid);
+
+    if (query.exec() && query.next())
+    {
+        fwnode = query.value(0).toString();
+    }
+
+    return fwnode;
+}
+
+QString CardUtil::GetFirewireChangerModel(uint inputid)
+{
+    QString fwnode;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT changer_model "
+                  "FROM cardinput WHERE cardinputid = :INPUTID ");
+    query.bindValue(":CARDID", inputid);
+
+    if (query.exec() && query.next())
+    {
+        fwnode = query.value(0).toString();
+    }
+
+    return fwnode;
 }
 
 vector<uint> CardUtil::GetCardIDs(uint sourceid)
@@ -1833,16 +1865,16 @@ QString CardUtil::GetDeviceLabel(uint cardid)
     QString devlabel;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardtype, videodevice "
-		  "FROM capturecard WHERE cardid = :CARDID ");
+                  "FROM capturecard WHERE cardid = :CARDID ");
     query.bindValue(":CARDID", cardid);
 
     if (query.exec() && query.next())
     {
-	return( GetDeviceLabel( query.value(0).toString(),
-	 	                query.value(1).toString()) );
+        return GetDeviceLabel(query.value(0).toString(),
+                              query.value(1).toString());
     }
 
-    return( "[ UNKNOWN ]" );
+    return "[ UNKNOWN ]";
 }
 
 void CardUtil::GetCardInputs(

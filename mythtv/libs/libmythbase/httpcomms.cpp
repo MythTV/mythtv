@@ -137,7 +137,7 @@ void HttpComms::done(bool error)
     {
        LOG(VB_GENERAL, LOG_ERR, 
            QString("NetworkOperation Error on Finish: %1 (%2): url: '%3'")
-	       .arg(http->errorString()) .arg(error) .arg(m_url.toString()));
+           .arg(http->errorString()) .arg(error) .arg(m_url.toString()));
     }
     else if (m_authNeeded)
     {
@@ -358,7 +358,7 @@ QString HttpComms::getHttp(QString     &url,
             // Increment the counter and check we're not over the limit
             if (redirectCount++ >= maxRedirects)
             {
-                LOG(VB_GENERAL, LOG_CRIT,
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("Maximum redirections reached for url: %1")
                         .arg(url));
                 break;
@@ -428,7 +428,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
         int statusCode = httpGrabber->getStatusCode();
         if (statusCode < 200 || statusCode > 401)
         {
-            LOG(VB_GENERAL, LOG_CRIT,
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("Server returned an error status code %1 for url: %2")
                                             .arg(statusCode)
                                             .arg(url));
@@ -444,7 +444,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
             // Increment the counter and check we're not over the limit
             if (timeoutCount++ >= maxRetries)
             {
-                LOG(VB_GENERAL, LOG_CRIT,
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("Failed to contact server for url: '%1'")
                                               .arg(url));
                 break;
@@ -471,7 +471,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
             // Increment the counter and check we're not over the limit
             if (redirectCount++ >= maxRedirects)
             {
-                LOG(VB_GENERAL, LOG_CRIT,
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("Maximum redirections reached for url: %1")
                         .arg(url));
                 break;
@@ -603,7 +603,7 @@ QString HttpComms::postHttp(
             // Increment the counter and check we're not over the limit
             if (timeoutCount++ >= maxRetries)
             {
-                LOG(VB_GENERAL, LOG_CRIT, 
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("Failed to contact server for url: %1")
                         .arg(url.toString()));
                 break;
@@ -630,7 +630,7 @@ QString HttpComms::postHttp(
             // Increment the counter and check we're not over the limit
             if (redirectCount++ >= maxRedirects)
             {
-                LOG(VB_GENERAL, LOG_CRIT, 
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("Maximum redirections reached for url: %1")
                         .arg(url.toString()));
                 break;

@@ -27,10 +27,12 @@
 #define MYTH_APPNAME_MYTHLCDSERVER "mythlcdserver"
 #define MYTH_APPNAME_MYTHAVTEST "mythavtest"
 #define MYTH_APPNAME_MYTHMEDIASERVER "mythmediaserver"
+#define MYTH_APPNAME_MYTHMETADATALOOKUP "mythmetadatalookup"
 
 class MDBManager;
 class MythCoreContextPrivate;
 class MythSocket;
+class MythScheduler;
 
 /** \class MythCoreContext
  *  \brief This class contains the runtime context for MythTV.
@@ -53,6 +55,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void SetLocalHostname(const QString &hostname);
     void SetServerSocket(MythSocket *serverSock);
     void SetEventSocket(MythSocket *eventSock);
+    void SetScheduler(MythScheduler *sched);
 
     bool ConnectToMasterServer(bool blockingClient = true);
 
@@ -76,7 +79,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     QString GenMythURL(QString host = QString(), QString port = QString(),
                        QString path = QString(), QString storageGroup = QString());
 
-    QString GenMythURL(QString host = QString(), int port = 0, 
+    QString GenMythURL(QString host = QString(), int port = 0,
                        QString path = QString(), QString storageGroup = QString());
 
     QString GetMasterHostPrefix(QString storageGroup = QString());
@@ -86,7 +89,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 
     bool IsConnectedToMaster(void);
     void SetBackend(bool backend);
-    bool IsBackend(void);        ///< is this process a backend process
+    bool IsBackend(void) const;        ///< is this process a backend process
     bool IsFrontendOnly(void);   ///< is there a frontend, but no backend,
                                  ///  running on this host
     bool IsMasterHost(void);     ///< is this the same host as the master
@@ -101,11 +104,12 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 
     void SetGUIObject(QObject *gui);
     QObject *GetGUIObject(void);
-    bool HasGUI(void);
+    bool HasGUI(void) const;
     bool IsUIThread(void);
 
     MythDB *GetDB(void);
     MDBManager *GetDBManager(void);
+    MythScheduler *GetScheduler(void);
 
     bool IsDatabaseIgnored(void) const;
     DatabaseParams GetDatabaseParams(void)
@@ -143,7 +147,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void dispatchNow(const MythEvent &event) MDEPRECATED;
 
     void InitLocale(void);
-    const MythLocale *GetLocale(void);
+    const MythLocale *GetLocale(void) const;
     void SaveLocaleDefaults(void);
     QString GetLanguage(void);
     QString GetLanguageAndVariant(void);
@@ -151,8 +155,6 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 
   private:
     MythCoreContextPrivate *d;
-
-    bool has_ipv6;
 
     void connected(MythSocket *sock)         { (void)sock; }
     void connectionFailed(MythSocket *sock)  { (void)sock; }

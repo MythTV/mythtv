@@ -39,7 +39,7 @@ class MPUBLIC Configurable : public QObject
     /// Tell any Configurable keeping a pointer to a widget,
     /// that the pointer returned by an earlier configWidget
     /// call is invalid.
-    /// Note: It is possible that this may be called after 
+    /// Note: It is possible that this may be called after
     ///       configWidget() has been called another time
     ///       so you must check the pointer param.
     virtual void widgetInvalid(QObject*) { }
@@ -82,7 +82,7 @@ class MPUBLIC Configurable : public QObject
     virtual ~Configurable() { }
 
   protected:
-    bool labelAboveWidget; 
+    bool labelAboveWidget;
     bool enabled;
     Storage *storage;
     QString configName;
@@ -128,7 +128,7 @@ class MPUBLIC LabelSetting : public Setting
   protected:
     LabelSetting(Storage *_storage) : Setting(_storage) { }
   public:
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
 };
 
@@ -140,7 +140,7 @@ class MPUBLIC LineEditSetting : public Setting
         rw(readwrite), password_echo(false) { }
 
   public:
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
     virtual void widgetInvalid(QObject *obj);
 
@@ -208,7 +208,7 @@ protected:
     SliderSetting(Storage *_storage, int min, int max, int step) :
         BoundedIntegerSetting(_storage, min, max, step) { }
 public:
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
 };
 
@@ -217,11 +217,11 @@ class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting
     Q_OBJECT
 
   public:
-    SpinBoxSetting(Storage *_storage, int min, int max, int step, 
+    SpinBoxSetting(Storage *_storage, int min, int max, int step,
                    bool allow_single_step = false,
                    QString special_value_text = "");
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent, 
+    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
                                   const char *widgetName = 0);
     virtual void widgetInvalid(QObject *obj);
 
@@ -308,7 +308,7 @@ class MPUBLIC SelectLabelSetting : public SelectSetting
     SelectLabelSetting(Storage *_storage) : SelectSetting(_storage) { }
 
   public:
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
 };
 
@@ -324,12 +324,12 @@ public:
     virtual void setValue(QString newValue);
     virtual void setValue(int which);
 
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
     virtual void widgetInvalid(QObject *obj);
 
     void setFocus() { if (cbwidget) cbwidget->setFocus(); }
-    void resetMaxCount(int count) 
+    void resetMaxCount(int count)
         { if (cbwidget) cbwidget->setMaxCount(count + rw); }
 
     virtual void setEnabled(bool b);
@@ -362,7 +362,7 @@ public:
         bxwidget(NULL), lbwidget(NULL), eventFilter(NULL),
         selectionMode(MythListBox::SingleSelection) { }
 
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
     virtual void widgetInvalid(QObject *obj);
 
@@ -401,47 +401,6 @@ protected:
     MythListBox *lbwidget;
     QObject     *eventFilter;
     MythListBox::SelectionMode selectionMode;
-};
-
-class MPUBLIC RadioSetting : public SelectSetting
-{
-public:
-    RadioSetting(Storage *_storage) : SelectSetting(_storage) { }
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
-                                  const char* widgetName = 0);
-};
-
-class MPUBLIC ImageSelectSetting: public SelectSetting {
-    Q_OBJECT
-public:
-    ImageSelectSetting(Storage *_storage) :
-        SelectSetting(_storage),
-        bxwidget(NULL), imagelabel(NULL), combo(NULL),
-        m_hmult(1.0f), m_wmult(1.0f) { }
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
-                                  const char* widgetName = 0);
-    virtual void widgetInvalid(QObject *obj);
-    virtual void deleteLater(void);
-    virtual void setHelpText(const QString &str);
-
-    virtual void addImageSelection(const QString& label,
-                                   QImage* image,
-                                   QString value=QString::null,
-                                   bool select=false);
-
-protected slots:
-    void imageSet(int);
-
-  protected:
-    void Teardown(void);
-    virtual ~ImageSelectSetting();
-
-protected:
-    vector<QImage*> images;
-    QWidget *bxwidget;
-    QLabel *imagelabel;
-    MythComboBox *combo;
-    float m_hmult, m_wmult;
 };
 
 class MPUBLIC BooleanSetting : public Setting
@@ -681,7 +640,7 @@ class MPUBLIC HostSlider : public SliderSetting, public HostDBStorage
 class MPUBLIC HostSpinBox: public SpinBoxSetting, public HostDBStorage
 {
   public:
-    HostSpinBox(const QString &name, int min, int max, int step, 
+    HostSpinBox(const QString &name, int min, int max, int step,
                   bool allow_single_step = false) :
         SpinBoxSetting(this, min, max, step, allow_single_step),
         HostDBStorage(this, name) { }
@@ -749,13 +708,6 @@ class MPUBLIC HostLineEdit: public LineEditSetting, public HostDBStorage
         LineEditSetting(this, rw), HostDBStorage(this, name) { }
 };
 
-class MPUBLIC HostImageSelect : public ImageSelectSetting, public HostDBStorage
-{
-  public:
-    HostImageSelect(const QString &name) :
-        ImageSelectSetting(this), HostDBStorage(this, name) { }
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 
 class MPUBLIC GlobalSlider : public SliderSetting, public GlobalDBStorage
@@ -793,14 +745,6 @@ class MPUBLIC GlobalLineEdit : public LineEditSetting, public GlobalDBStorage
   public:
     GlobalLineEdit(const QString &name, bool rw = true) :
         LineEditSetting(this, rw), GlobalDBStorage(this, name) { }
-};
-
-class MPUBLIC GlobalImageSelect :
-   public ImageSelectSetting, public GlobalDBStorage
-{
-  public:
-    GlobalImageSelect(const QString &name) :
-        ImageSelectSetting(this), GlobalDBStorage(this, name) { }
 };
 
 class MPUBLIC GlobalTimeBox : public ComboBoxSetting, public GlobalDBStorage

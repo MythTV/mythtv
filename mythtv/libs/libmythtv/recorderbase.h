@@ -5,8 +5,8 @@
 #include <stdint.h>
 
 #include <QWaitCondition>
+#include <QRunnable>
 #include <QString>
-#include <QThread>
 #include <QMutex>
 #include <QMap>
 
@@ -24,17 +24,6 @@ class ProgramInfo;
 class RingBuffer;
 class TVRec;
 
-class MTV_PUBLIC RecorderThread : public QThread
-{
-    Q_OBJECT
-  public:
-    RecorderThread(RecorderBase *p) : m_parent(p) {}
-    virtual ~RecorderThread() { wait(); m_parent = NULL; }
-    virtual inline void run(void);
-  private:
-    RecorderBase *m_parent;
-};
-
 /** \class RecorderBase
  *  \brief This is the abstract base class for supporting
  *         recorder hardware.
@@ -47,7 +36,7 @@ class MTV_PUBLIC RecorderThread : public QThread
  *
  *  \sa TVRec
  */
-class MTV_PUBLIC RecorderBase
+class MTV_PUBLIC RecorderBase : public QRunnable
 {
     friend class Transcode; // for access to SetIntOption(), SetStrOption()
 
@@ -127,15 +116,15 @@ class MTV_PUBLIC RecorderBase
     virtual void SetNextRecording(const ProgramInfo*, RingBuffer*) = 0;
 
     /** \brief This is called between SetOptionsFromProfile() and
-     *         StartRecording() to initialize any devices, etc.
+     *         run() to initialize any devices, etc.
      */
     virtual void Initialize(void) = 0;
 
-    /** \brief StartRecording() starts the recording process, and does not
+    /** \brief run() starts the recording process, and does not
      *         exit until the recording is complete.
      *  \sa StopRecording()
      */
-    virtual void StartRecording(void) = 0;
+    virtual void run(void) = 0;
 
     /** \brief Reset the recorder to the startup state.
      *
@@ -303,11 +292,6 @@ class MTV_PUBLIC RecorderBase
     frm_pos_map_t  positionMapDelta;
     MythTimer      positionMapTimer;
 };
-
-inline void RecorderThread::run(void)
-{
-    m_parent->StartRecording();
-}
 
 #endif
 

@@ -17,7 +17,6 @@
 
 // QT headers
 #include <QCoreApplication>
-#include <QThread>
 #include <QMutex>
 #include <QMap>
 #include <QString>
@@ -25,9 +24,9 @@
 
 // libmythbase headers
 #include "mythcorecontext.h"
+#include "mythlogging.h"
 #include "mythevent.h"
 #include "exitcodes.h"
-#include "mythlogging.h"
 
 // Windows headers
 #include <windows.h>
@@ -54,6 +53,7 @@ typedef QMap<HANDLE, FDType_t*> FDMap_t;
 /**********************************
  * MythSystemManager method defines
  *********************************/
+static bool                     run_system = true;
 static MythSystemManager       *manager = NULL;
 static MythSystemSignalManager *smanager = NULL;
 static MythSystemIOHandler     *readThread = NULL;
@@ -63,28 +63,41 @@ static QMutex                   listLock;
 static FDMap_t                  fdMap;
 static QMutex                   fdLock;
 
+void ShutdownMythSystem(void)
+{
+    run_system = false;
+    if (manager)
+        manager->wait();
+    if (smanager)
+        smanager->wait();
+    if (readThread)
+        readThread->wait();
+    if (writeThread)
+        writeThread->wait();
+}
 
 MythSystemIOHandler::MythSystemIOHandler(bool read) :
-    QThread(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
+    MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
+    m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
     m_read(read)
 {
 }
 
 void MythSystemIOHandler::run(void)
 {
-    threadRegister(QString("SystemIOHandler%1").arg(m_read ? "R" : "W"));
+    RunProlog();
+
     LOG(VB_GENERAL, LOG_INFO, QString("Starting IO manager (%1)")
         .arg(m_read ? "read" : "write"));
 
-    QMutex mutex;
-
-    while( gCoreContext )
+    while( run_system )
     {
-        mutex.lock();
-        m_pWait.wait(&mutex);
-        mutex.unlock();
+        {
+            QMutexLocker locker(&m_pWaitLock);
+            m_pWait.wait(&m_pWaitLock);
+        }
 
-        while( gCoreContext )
+        while( run_system )
         {
             usleep(10000); // ~100x per second, for ~3MBps throughput
             m_pLock.lock();
@@ -97,7 +110,7 @@ void MythSystemIOHandler::run(void)
             bool datafound = true;
             m_pLock.unlock();
 
-            while ( datafound && gCoreContext )
+            while ( datafound && run_system )
             {
                 m_pLock.lock();
 
@@ -116,7 +129,7 @@ void MythSystemIOHandler::run(void)
             }
         }
     }
-    threadDeregister();
+    RunEpilog();
 }
 
 bool MythSystemIOHandler::HandleRead(HANDLE h, QBuffer *buff)
@@ -200,11 +213,13 @@ void MythSystemIOHandler::remove(HANDLE h)
 
 void MythSystemIOHandler::wake()
 {
+    QMutexLocker locker(&m_pWaitLock);
     m_pWait.wakeAll();
 }
 
 
-MythSystemManager::MythSystemManager() : QThread()
+MythSystemManager::MythSystemManager() :
+    MThread("SystemManager")
 {
     m_jumpAbort = false;
     m_childCount = 0;
@@ -215,16 +230,18 @@ MythSystemManager::~MythSystemManager()
 {
     if (m_children)
         free( m_children );
+    wait();
 }
 
 void MythSystemManager::run(void)
 {
-    threadRegister("SystemManager");
+    RunProlog();
+
     LOG(VB_GENERAL, LOG_INFO, "Starting process manager");
 
-    // gCoreContext is set to NULL during shutdown, and we need this thread to
+    // run_system is set to NULL during shutdown, and we need this thread to
     // exit during shutdown.
-    while( gCoreContext )
+    while( run_system )
     {
         // check for any running processes
         m_mapLock.lock();
@@ -277,7 +294,7 @@ void MythSystemManager::run(void)
 
         m_mapLock.lock();
         m_jumpLock.lock();
-        for( i = m_pMap.begin(); i != m_pMap.end(); i++ )
+        for (i = m_pMap.begin(); i != m_pMap.end(); ++i)
         {
             child = i.key();
             ms    = i.value();
@@ -326,7 +343,8 @@ void MythSystemManager::run(void)
     // kick to allow them to close themselves cleanly
     readThread->wake();
     writeThread->wake();
-    threadDeregister();
+
+    RunEpilog();
 }
 
 // NOTE: This is only to be run while m_mapLock is locked!!!
@@ -345,10 +363,10 @@ void MythSystemManager::ChildListRebuild()
         m_children = (HANDLE *)realloc(m_children, 
                                        m_childCount * sizeof(HANDLE));
 
-    for( i = m_pMap.begin(), j = 0; i != m_pMap.end(); i++, j++ )
+    for (i = m_pMap.begin(), j = 0; i != m_pMap.end(); ++i)
     {
         child = i.key();
-        m_children[j] = child;
+        m_children[j++] = child;
     }
 }
 
@@ -392,18 +410,20 @@ void MythSystemManager::jumpAbort(void)
 
 // spawn separate thread for signals to prevent manager
 // thread from blocking in some slot
-MythSystemSignalManager::MythSystemSignalManager() : QThread()
+MythSystemSignalManager::MythSystemSignalManager() :
+    MThread("SystemSignalManager")
 {
 }
 
 void MythSystemSignalManager::run(void)
 {
-    threadRegister("SystemSignalManager");
+    RunProlog();
+
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
-    while( gCoreContext )
+    while( run_system )
     {
         usleep(50000); // sleep 50ms
-        while( gCoreContext )
+        while( run_system )
         {
             // handle cleanup and signalling for closed processes
             listLock.lock();
@@ -442,7 +462,8 @@ void MythSystemSignalManager::run(void)
                 delete ms;
         }
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 /*******************************
@@ -541,7 +562,7 @@ void MythSystemWindows::Fork(time_t timeout)
         
     // Set the bInheritHandle flag so pipe handles are inherited. 
     saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
-    saAttr.bInheritHandle = TRUE; 
+    saAttr.bInheritHandle = true; 
     saAttr.lpSecurityDescriptor = NULL; 
 
     /* set up pipes */

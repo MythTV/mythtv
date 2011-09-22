@@ -489,7 +489,7 @@
         </textarea>
 
         <textarea name="subtitle" from="basetextarea">
-            <area>40,45,500,100</area>
+            <area>30,53,500,100</area>
             <multiline>yes</multiline>
             <font>basemedium</font>
         </textarea>
@@ -511,22 +511,22 @@
         </textarea>
 
         <textarea name="dirlbl" from="basetextarea">
-            <area>30,68,120,35</area>
+            <area>30,80,140,35</area>
             <value>Directed by</value>
             <align>left</align>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>155,68,350,35</area>
+            <area>160,80,350,35</area>
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>35,97,733,145</area>
+            <area>35,113,733,145</area>
             <multiline>yes</multiline>
         </textarea>
 
         <textarea name="rating" from="basetextarea">
-            <area>30,237,533,35</area>
+            <area>30,245,533,35</area>
             <multiline>yes</multiline>
         </textarea>
 

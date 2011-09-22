@@ -32,6 +32,7 @@
 // Define Global instance 
 /////////////////////////////////////////////////////////////////////////////
 
+static QMutex g_pTaskQueueCreationLock;
 TaskQueue* TaskQueue::g_pTaskQueue = NULL;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -75,15 +76,26 @@ Task::~Task()
 
 TaskQueue* TaskQueue::Instance()
 {
+    QMutexLocker locker(&g_pTaskQueueCreationLock);
     return g_pTaskQueue ? g_pTaskQueue : (g_pTaskQueue = new TaskQueue());
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-TaskQueue::TaskQueue() : m_bTermRequested( false )
+void TaskQueue::Shutdown()
+{
+    QMutexLocker locker(&g_pTaskQueueCreationLock);
+    delete g_pTaskQueue;
+    g_pTaskQueue = NULL;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+TaskQueue::TaskQueue() : MThread("TaskQueue"), m_bTermRequested( false )
 {
     LOG(VB_UPNP, LOG_INFO, "Starting TaskQueue Thread...");
 
@@ -105,15 +117,21 @@ TaskQueue::~TaskQueue()
     Clear();
 }
 
+void TaskQueue::RequestTerminate()
+{
+    m_bTermRequested = true;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
 void TaskQueue::run( )
 {
+    RunProlog();
+
     Task *pTask;
 
-    threadRegister("TaskQueue");
     LOG(VB_UPNP, LOG_INFO, "TaskQueue Thread Running.");
 
     while ( !m_bTermRequested )
@@ -142,7 +160,8 @@ void TaskQueue::run( )
 
         msleep( 100 );
     }
-    threadDeregister();
+
+    RunEpilog();
 }
 
 /////////////////////////////////////////////////////////////////////////////

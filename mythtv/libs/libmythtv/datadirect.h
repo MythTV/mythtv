@@ -9,6 +9,7 @@
 #include "mythtvexp.h"
 
 #include <vector>
+
 using namespace std;
 
 enum DD_PROVIDERS
@@ -20,27 +21,34 @@ enum DD_PROVIDERS
 
 class DataDirectURLs
 {
-  public:
+
+public:
     DataDirectURLs(QString a, QString b, QString c, QString d) :
-        name(a), webServiceURL(b), webURL(c), loginPage(d) {}
+            name(a), webServiceURL(b), webURL(c), loginPage(d) {}
 
     QString name;
     QString webServiceURL;
     QString webURL;
     QString loginPage;
 };
+
 typedef vector<DataDirectURLs> DDProviders;
 
 class DataDirectProcessor;
 
 class DataDirectStation
 {
-  public:
+
+public:
     DataDirectStation();
 
-    void Reset(void) { DataDirectStation tmp; *this = tmp; }
+    void Reset(void)
+    {
+        DataDirectStation tmp;
+        *this = tmp;
+    }
 
-  public:
+public:
     //                      field length   req/opt
     QString stationid;      //   12        required
     QString callsign;       //   10        required
@@ -48,16 +56,22 @@ class DataDirectStation
     QString affiliate;      //   25        optional
     QString fccchannelnumber;//   8        optional
 };
+
 typedef DataDirectStation DDStation;
 
 class DataDirectLineup
 {
-  public:
+
+public:
     DataDirectLineup();
 
-    void Reset(void) { DataDirectLineup tmp; *this = tmp; }
+    void Reset(void)
+    {
+        DataDirectLineup tmp;
+        *this = tmp;
+    }
 
-  public:
+public:
     //                      field length   req/opt
     QString lineupid;       //   12        required
     QString name;           //  100        required
@@ -70,12 +84,17 @@ class DataDirectLineup
 
 class DataDirectLineupMap
 {
-  public:
+
+public:
     DataDirectLineupMap();
 
-    void Reset(void) { DataDirectLineupMap tmp; *this = tmp; }
+    void Reset(void)
+    {
+        DataDirectLineupMap tmp;
+        *this = tmp;
+    }
 
-  public:
+public:
     //                      field length   req/opt
     QString lineupid;       //   12        required
     QString stationid;      //   12        required
@@ -87,12 +106,17 @@ class DataDirectLineupMap
 
 class DataDirectSchedule
 {
-  public:
+
+public:
     DataDirectSchedule();
 
-    void Reset(void) { DataDirectSchedule tmp; *this = tmp; }
+    void Reset(void)
+    {
+        DataDirectSchedule tmp;
+        *this = tmp;
+    }
 
-  public:
+public:
     QString   programid; // 12
     QString   stationid; // 12
     QDateTime time;
@@ -111,12 +135,17 @@ class DataDirectSchedule
 
 class DataDirectProgram
 {
-  public:
+
+public:
     DataDirectProgram();
 
-    void Reset(void) { DataDirectProgram tmp; *this = tmp; }
+    void Reset(void)
+    {
+        DataDirectProgram tmp;
+        *this = tmp;
+    }
 
-  public:
+public:
     QString programid;   // 12
     QString seriesid;    // 12
     QString title;       // 120
@@ -135,12 +164,17 @@ class DataDirectProgram
 
 class DataDirectProductionCrew
 {
-  public:
+
+public:
     DataDirectProductionCrew();
 
-    void Reset(void) { DataDirectProductionCrew tmp; *this = tmp; }
+    void Reset(void)
+    {
+        DataDirectProductionCrew tmp;
+        *this = tmp;
+    }
 
-  public:
+public:
     QString programid; // 12
     QString role;      // 30
     QString givenname; // 20
@@ -150,12 +184,17 @@ class DataDirectProductionCrew
 
 class DataDirectGenre
 {
-  public:
+
+public:
     DataDirectGenre();
 
-    void Reset(void) { DataDirectGenre tmp; *this = tmp; }
+    void Reset(void)
+    {
+        DataDirectGenre tmp;
+        *this = tmp;
+    }
 
-  public:
+public:
     QString programid; // 12
     QString gclass;    // 30
     QString relevance; // 1
@@ -163,19 +202,20 @@ class DataDirectGenre
 
 class RawLineupChannel
 {
-  public:
+
+public:
     RawLineupChannel() :
-        chk_name(QString::null),  chk_id(QString::null),
-        chk_value(QString::null), chk_checked(false),
-        lbl_ch(QString::null),    lbl_callsign(QString::null) {}
+            chk_name(QString::null),  chk_id(QString::null),
+            chk_value(QString::null), chk_checked(false),
+            lbl_ch(QString::null),    lbl_callsign(QString::null) {}
 
     RawLineupChannel(QString name,  QString id,
                      QString value, bool    checked,
                      QString ch,    QString callsign) :
-        chk_name(name),       chk_id(id), chk_value(value),
-        chk_checked(checked), lbl_ch(ch), lbl_callsign(callsign) {}
+            chk_name(name),       chk_id(id), chk_value(value),
+            chk_checked(checked), lbl_ch(ch), lbl_callsign(callsign) {}
 
-  public:
+public:
     QString chk_name;
     QString chk_id;
     QString chk_value;
@@ -183,18 +223,21 @@ class RawLineupChannel
     QString lbl_ch;
     QString lbl_callsign;
 };
+
 typedef vector<RawLineupChannel> RawLineupChannels;
 
 class RawLineup
 {
-  public:
-    RawLineup() :
-        get_action(QString::null), set_action(QString::null),
-        udl_id(QString::null),     zipcode(QString::null) {}
-    RawLineup(QString a, QString b, QString c) :
-        get_action(a), set_action(QString::null), udl_id(b), zipcode(c) {}
 
-  public:
+public:
+    RawLineup() :
+            get_action(QString::null), set_action(QString::null),
+            udl_id(QString::null),     zipcode(QString::null) {}
+
+    RawLineup(QString a, QString b, QString c) :
+            get_action(a), set_action(QString::null), udl_id(b), zipcode(c) {}
+
+public:
     QString get_action;
     QString set_action;
     QString udl_id;
@@ -202,23 +245,27 @@ class RawLineup
 
     RawLineupChannels channels;
 };
-typedef QMap<QString,RawLineup> RawLineupMap;
+
+typedef QMap<QString, RawLineup> RawLineupMap;
 
 class PostItem
 {
-  public:
+
+public:
     PostItem(QString k, QString v) : key(k), value(v) {}
 
     QString key;
     QString value;
 };
+
 typedef vector<PostItem> PostList;
 
 class DDStructureParser: public QXmlDefaultHandler
 {
-  public:
+
+public:
     DDStructureParser(DataDirectProcessor& _ddparent) :
-        parent(_ddparent) {}
+            parent(_ddparent) {}
 
     bool startElement(const QString &pnamespaceuri, const QString &plocalname,
                       const QString &pqname, const QXmlAttributes &pxmlatts);
@@ -231,7 +278,7 @@ class DDStructureParser: public QXmlDefaultHandler
     bool startDocument(void);
     bool endDocument(void);
 
-  private:
+private:
     DataDirectProcessor     &parent;
 
     QString                  currtagname;
@@ -246,23 +293,25 @@ class DDStructureParser: public QXmlDefaultHandler
 };
 
 
-typedef QMap<QString,DataDirectStation>    DDStationList; // stationid ->
+typedef QMap<QString, DataDirectStation>    DDStationList; // stationid ->
 typedef vector<DataDirectLineup>           DDLineupList;
 typedef vector<DataDirectLineupMap>        DDLineupChannels;
-typedef QMap<QString,DDLineupChannels>     DDLineupMap;   // lineupid ->
+typedef QMap<QString, DDLineupChannels>     DDLineupMap;  // lineupid ->
 
 class MTV_PUBLIC DataDirectProcessor
 {
+
     friend class DDStructureParser;
+
   public:
     DataDirectProcessor(uint listings_provider = DD_ZAP2IT,
                         QString userid = "", QString password = "");
-   ~DataDirectProcessor();
+    ~DataDirectProcessor();
 
-    QString CreateTempDirectory(bool *ok = NULL);
+    QString CreateTempDirectory(bool *ok = NULL) const;
 
     // web service commands
-    bool GrabData(const QDateTime pstartdate, const QDateTime penddate);
+    bool GrabData(const QDateTime &startdate, const QDateTime &enddate);
     bool GrabNextSuggestedTime(void);
 
     // utility wrappers
@@ -279,7 +328,7 @@ class MTV_PUBLIC DataDirectProcessor
                         bool onlyGrabSelected = false,
                         uint cache_age_allowed_in_seconds = 0);
     bool SaveLineup(const QString &lineupid,
-                    const QMap<QString,bool> &xmltvids);
+                    const QMap<QString, bool> &xmltvids);
     bool UpdateListings(uint sourceid);
 
     // cache commands
@@ -287,36 +336,46 @@ class MTV_PUBLIC DataDirectProcessor
     bool SaveLineupToCache(const QString &lineupid) const;
 
     // gets
-    DDStationList GetStations(void)       const { return stations;           }
-    DDLineupList  GetLineups(void)        const { return lineups;            }
-    DDLineupMap   GetLineupMap(void)      const { return lineupmaps;         }
-    QDateTime     GetLineupCacheAge(const QString &lineupid) const;
+    DDStationList GetStations(void) const { return m_stations; }
+    DDLineupList GetLineups(void) const { return m_lineups; }
+    DDLineupMap GetLineupMap(void) const { return m_lineupmaps; }
+    QDateTime GetLineupCacheAge(const QString &lineupid) const;
 
-    QString   GetUserID(void)             const { return userid.toLower();   }
-    QString   GetPassword(void)           const { return password;           }
-    uint      GetListingsProvider(void)   const { return listings_provider;  }
+    QString GetUserID(void) const { return m_userid.toLower(); }
+    QString GetPassword(void) const { return m_password; }
+    uint GetListingsProvider(void) const { return m_listingsProvider; }
+
     QString   GetListingsProviderName(void) const
-        { return providers[listings_provider % DD_PROVIDER_COUNT].name; }
+    {
+        return m_providers[m_listingsProvider % DD_PROVIDER_COUNT].name;
+    }
 
     QDateTime GetDDProgramsStartAt(bool localtime = false) const;
     QDateTime GetDDProgramsEndAt(bool localtime = false) const;
     DDLineupChannels GetDDLineup(const QString &lineupid) const
-        { return lineupmaps[lineupid]; }
-    DDStation GetDDStation( const QString &xmltvid ) const
-        { return stations[xmltvid]; }
+    {
+        return m_lineupmaps[lineupid];
+    }
 
-    QString   GetRawUDLID(  const QString &lineupid) const;
+    DDStation GetDDStation(const QString &xmltvid) const
+    {
+        return m_stations[xmltvid];
+    }
+
+    QString   GetRawUDLID(const QString &lineupid) const;
     QString   GetRawZipCode(const QString &lineupid) const;
-    RawLineup GetRawLineup( const QString &lineupid) const;
+    RawLineup GetRawLineup(const QString &lineupid) const;
 
     // sets
     void SetUserID(const QString &uid);
     void SetPassword(const QString &pwd);
     void SetListingsProvider(uint i)
-        { listings_provider = i % DD_PROVIDER_COUNT; }
+    {
+        m_listingsProvider = i % DD_PROVIDER_COUNT;
+    }
 
     void SetInputFile(const QString &file);
-    void SetCacheData(bool cd) { cachedata = cd; }
+    void SetCacheData(bool cd) { m_cacheData = cd; }
 
     // static commands (these update temp DB tables)
     static void UpdateStationViewTable(QString lineupid);
@@ -329,7 +388,7 @@ class MTV_PUBLIC DataDirectProcessor
         uint sourceid, bool filter_new_channels);
     static void DataDirectProgramUpdate(void);
 
-    QStringList GetFatalErrors(void) const { return fatalErrors; }
+    QStringList GetFatalErrors(void) const { return m_fatalErrors; }
 
   private:
     void CreateTempTables(void);
@@ -342,13 +401,13 @@ class MTV_PUBLIC DataDirectProcessor
     void CreateTemp(const QString &templatefilename, const QString &errmsg,
                     bool directory, QString &filename, bool &ok) const;
 
-    QString GetPostFilename  (bool &ok) const;
+    QString GetPostFilename(bool &ok) const;
     QString GetResultFilename(bool &ok) const;
     QString GetCookieFilename(bool &ok) const;
 
     void SetAll(const QString &lineupid, bool val);
-    void SetDDProgramsStartAt(QDateTime begts)  { actuallistingsfrom = begts; }
-    void SetDDProgramsEndAt(QDateTime endts)    { actuallistingsto   = endts; }
+    void SetDDProgramsStartAt(QDateTime begts) { m_actualListingsFrom = begts; }
+    void SetDDProgramsEndAt(QDateTime endts) { m_actualListingsTo = endts; }
 
     static bool Post(QString url, const PostList &list, QString documentFile,
                      QString inCookieFile, QString outCookieFile);
@@ -361,30 +420,30 @@ class MTV_PUBLIC DataDirectProcessor
 
 
   private:
-    uint          listings_provider;
-    DDProviders   providers;
+    uint          m_listingsProvider;
+    DDProviders   m_providers;
 
-    QString       userid;
-    QString       password;
-    QString       tmpDir;
-    bool          cachedata;
+    QString         m_userid;
+    QString         m_password;
+    mutable QString m_tmpDir;
+    bool            m_cacheData;
 
-    QDateTime     actuallistingsfrom;
-    QDateTime     actuallistingsto;
+    QDateTime     m_actualListingsFrom;
+    QDateTime     m_actualListingsTo;
 
-    QString       inputfilename;
+    QString       m_inputFilename;
 
-    DDStationList stations;
-    DDLineupList  lineups;
-    DDLineupMap   lineupmaps;
+    DDStationList m_stations;
+    DDLineupList  m_lineups;
+    DDLineupMap   m_lineupmaps;
 
-    RawLineupMap    rawlineups;
-    mutable QString tmpPostFile;
-    mutable QString tmpResultFile;
-    mutable QString cookieFile;
-    QDateTime       cookieFileDT;
+    RawLineupMap    m_rawLineups;
+    mutable QString m_tmpPostFile;
+    mutable QString m_tmpResultFile;
+    mutable QString m_cookieFile;
+    QDateTime       m_cookieFileDT;
 
-    mutable QStringList fatalErrors;
+    mutable QStringList m_fatalErrors;
 };
 
 #endif

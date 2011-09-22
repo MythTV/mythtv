@@ -309,7 +309,7 @@ PowerSearchPopup::PowerSearchPopup(MythScreenStack *parentStack,
     : MythScreenType(parentStack, "phrasepopup"),
       m_parent(parent), m_searchType(searchType), m_list(list),
       m_currentValue(currentValue),
-      m_titleText(NULL), m_phraseList(NULL),
+      m_titleText(NULL), m_phraseList(NULL), m_phraseEdit(NULL),
       m_editButton(NULL), m_deleteButton(NULL), m_recordButton(NULL)
 {
 }
@@ -508,7 +508,10 @@ void PowerSearchPopup::recordClicked(void)
 EditPowerSearchPopup::EditPowerSearchPopup(MythScreenStack *parentStack,
                                            ProgLister *parent,
                                            const QString &currentValue)
-    : MythScreenType(parentStack, "phrasepopup")
+    : MythScreenType(parentStack, "phrasepopup"),
+        m_titleEdit(NULL), m_subtitleEdit(NULL), m_descEdit(NULL),
+        m_categoryList(NULL), m_genreList(NULL), m_channelList(NULL),
+        m_okButton(NULL)
 {
     m_parent = parent;
 
@@ -632,8 +635,6 @@ void EditPowerSearchPopup::initLists(void)
     // channel
     QString channelOrdering = gCoreContext->GetSetting(
         "ChannelOrdering", "channum");
-    QString channelFormat = gCoreContext->GetSetting(
-        "ChannelFormat", "<num> <sign>");
 
     m_channels.clear();
     new MythUIButtonListItem(m_channelList, tr("(Any Channel)"), NULL, false);
@@ -642,14 +643,19 @@ void EditPowerSearchPopup::initLists(void)
     DBChanList channels = ChannelUtil::GetChannels(0, true, "callsign");
     ChannelUtil::SortChannels(channels, channelOrdering, true);
 
+    MythUIButtonListItem *item;
     for (uint i = 0; i < channels.size(); ++i)
     {
-        QString chantext = channels[i].GetFormatted(channelFormat);
+        QString chantext = channels[i].GetFormatted(DBChannel::kChannelShort);
 
         m_parent->m_viewList << QString::number(channels[i].chanid);
         m_parent->m_viewTextList << chantext;
 
-        new MythUIButtonListItem(m_channelList, chantext, NULL, false);
+        item = new MythUIButtonListItem(m_channelList, chantext, NULL, false);
+
+        InfoMap chanmap;
+        channels[i].ToMap(chanmap);
+        item->SetTextFromMap(chanmap);
 
         m_channels << channels[i].callsign;
         if (channels[i].callsign == field[5])

@@ -62,34 +62,57 @@ static bool copyFile(const QString &src, const QString &dst)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FileScannerThread::FileScannerThread(ImportMusicDialog *parent)
+FileScannerThread::FileScannerThread(ImportMusicDialog *parent) :
+    MThread("FileScanner"), m_parent(parent)
 {
-    m_parent = parent;
 }
 
 void FileScannerThread::run()
 {
-    threadRegister("FileScanner");
+    RunProlog();
     m_parent->doScan();
-    threadDeregister();
+    RunEpilog();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent)
-                :MythScreenType(parent, "musicimportfiles")
-{
-    m_popupMenu = NULL;
-    m_playingMetaData = NULL;
-    
-    m_defaultCompilation = false;
-    m_defaultYear = 0;
-    m_defaultRating = 0;
-    m_haveDefaults = false;
+ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent) :
+    MythScreenType(parent, "musicimportfiles"),
 
-    m_somethingWasImported = false;
-    m_tracks = new vector<TrackInfo*>;
+    m_somethingWasImported(false),
+    m_tracks(new vector<TrackInfo*>),
+    m_currentTrack(0),
+    m_playingMetaData(NULL),
+    // GUI stuff
+    m_locationEdit(NULL),
+    m_locationButton(NULL),
+    m_scanButton(NULL),
+    m_coverartButton(NULL),
+    m_filenameText(NULL),
+    m_compartistText(NULL),
+    m_artistText(NULL),
+    m_albumText(NULL),
+    m_titleText(NULL),
+    m_genreText(NULL),
+    m_yearText(NULL),
+    m_trackText(NULL),
+    m_nextButton(NULL),
+    m_prevButton(NULL),
+    m_currentText(NULL),
+    m_statusText(NULL),
+    m_playButton(NULL),
+    m_addButton(NULL),
+    m_addallnewButton(NULL),
+    m_nextnewButton(NULL),
+    m_compilationCheck(NULL),
+    m_popupMenu(NULL),
+    // default metadata values
+    m_defaultCompilation(false),
+    m_defaultYear(0),
+    m_defaultRating(0),
+    m_haveDefaults(false)
+{
 }
 
 ImportMusicDialog::~ImportMusicDialog()
@@ -112,7 +135,7 @@ ImportMusicDialog::~ImportMusicDialog()
 
 void ImportMusicDialog::fillWidgets()
 {
-    if (m_tracks->size() > 0)
+    if (!m_tracks->empty())
     {
         // update current
         m_currentText->SetText(QString("%1 of %2")
@@ -186,6 +209,31 @@ bool ImportMusicDialog::keyPressEvent(QKeyEvent *event)
         else if (action == "MENU")
         {
             showMenu();
+        }
+        else if (action == "ESCAPE" && !GetMythMainWindow()->IsExitingToMain())
+        {
+            bool found = false;
+            if (!m_tracks->empty())
+            {
+                uint track = 0;
+                while (track < m_tracks->size())
+                {
+                    if (m_tracks->at(track)->isNewTune)
+                    {
+                        found = true;
+                        break;
+                    }
+                    track++;
+                }
+
+                if (found)
+                {
+                    QString msg = tr("You might have unsaved changes.\nAre you sure you want to exit this screen?");
+                    ShowOkPopup(msg, this, SLOT(doExit(bool)), true);
+                }
+            }
+
+            handled = found;
         }
         else if (action == "1")
         {
@@ -290,6 +338,12 @@ bool ImportMusicDialog::Create()
     return true;
 }
 
+void ImportMusicDialog::doExit(bool ok)
+{
+    if (ok)
+        Close();
+}
+
 void ImportMusicDialog::locationPressed()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -312,7 +366,7 @@ void ImportMusicDialog::coverArtPressed()
 
 void ImportMusicDialog::playPressed()
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     m_playingMetaData = m_tracks->at(m_currentTrack)->metadata;
@@ -340,7 +394,7 @@ void ImportMusicDialog::nextPressed()
 
 void ImportMusicDialog::addPressed()
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     Metadata *meta = m_tracks->at(m_currentTrack)->metadata;
@@ -402,7 +456,7 @@ void ImportMusicDialog::addPressed()
 
 void ImportMusicDialog::addAllNewPressed()
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     m_currentTrack = 0;
@@ -431,7 +485,7 @@ void ImportMusicDialog::addAllNewPressed()
 
 void ImportMusicDialog::nextNewPressed()
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     uint track = m_currentTrack + 1;
@@ -538,7 +592,7 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
 
 void ImportMusicDialog::showEditMetadataDialog()
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     Metadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
@@ -573,7 +627,7 @@ void ImportMusicDialog::showMenu()
     if (m_popupMenu)
         return;
 
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -774,7 +828,7 @@ void ImportMusicDialog::setTitleWordCaps(void)
 
 void ImportMusicDialog::showImportCoverArtDialog(void)
 {
-    if (m_tracks->size() == 0)
+    if (m_tracks->empty())
         return;
 
     QFileInfo fi(m_sourceFiles.at(m_currentTrack));
@@ -808,11 +862,23 @@ void ImportMusicDialog::customEvent(QEvent *event)
 
 ImportCoverArtDialog::ImportCoverArtDialog(MythScreenStack *parent,
                                            const QString &sourceDir,
-                                           Metadata *metadata)
-    :MythScreenType(parent, "import_coverart")
+                                           Metadata *metadata) :
+    MythScreenType(parent, "import_coverart"),
+    m_sourceDir(sourceDir),
+    m_metadata(metadata),
+    m_currentFile(0),
+    //  GUI stuff
+    m_filenameText(NULL),
+    m_currentText(NULL),
+    m_statusText(NULL),
+    m_destinationText(NULL),
+    m_coverartImage(NULL),
+    m_typeList(NULL),
+    m_nextButton(NULL),
+    m_prevButton(NULL),
+    m_copyButton(NULL),
+    m_exitButton(NULL)
 {
-    m_sourceDir = sourceDir;
-    m_metadata = metadata;
 }
 
 ImportCoverArtDialog::~ImportCoverArtDialog()

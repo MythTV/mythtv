@@ -23,7 +23,7 @@ class DVBRecorder : public DTVRecorder
   public:
     DVBRecorder(TVRec*, DVBChannel*);
 
-    void StartRecording(void);
+    void run(void);
 
     bool Open(void);
     bool IsOpen(void) const;

@@ -53,92 +53,107 @@ class MSocketDevicePrivate;
 
 class MBASE_PUBLIC MSocketDevice: public QIODevice
 {
+
 public:
     enum Type { Stream, Datagram };
     enum Protocol { IPv4, IPv6, Unknown };
 
-    MSocketDevice( Type type = Stream );
-    MSocketDevice( Type type, Protocol protocol, int dummy );
-    MSocketDevice( int socket, Type type );
+    MSocketDevice(Type type = Stream);
+    MSocketDevice(Type type, Protocol protocol, int dummy);
+    MSocketDevice(int socket, Type type);
     virtual ~MSocketDevice();
 
-    bool	 isValid() const;
-    Type	 type() const;
-    Protocol	 protocol() const;
+    bool  isValid() const;
+    Type  type() const;
+    Protocol  protocol() const;
 
-    void setProtocol( Protocol protocol );
+    void setProtocol(Protocol protocol);
 
-    int		 socket() const;
-    virtual void setSocket( int socket, Type type );
+    int   socket() const;
+    virtual void setSocket(int socket, Type type);
 
-    bool	 open( OpenMode mode );
-    bool	 open( int mode ) { return open((OpenMode)mode); }
-    void	 close();
-    bool	 flush();
+    bool  open(OpenMode mode);
+    bool  open(int mode)
+    {
+        return open((OpenMode)mode);
+    }
+
+    void  close();
+    bool  flush();
 
     // Implementation of QIODevice abstract virtual functions
-    qint64	 size() const;
-    qint64	 pos() const;
-    bool	 seek(qint64);
-    bool	 atEnd() const;
+    qint64  size() const;
+    qint64  pos() const;
+    bool  seek(qint64);
+    bool  atEnd() const;
 
-    bool	 blocking() const;
-    virtual void setBlocking( bool );
+    bool  blocking() const;
+    virtual void setBlocking(bool);
 
-    bool	 broadcast() const;
-    virtual void setBroadcast( bool );
+    bool  broadcast() const;
+    virtual void setBroadcast(bool);
 
-    bool	 addressReusable() const;
-    virtual void setAddressReusable( bool );
+    bool  addressReusable() const;
+    virtual void setAddressReusable(bool);
 
-    int		 receiveBufferSize() const;
-    virtual void setReceiveBufferSize( uint );
-    int		 sendBufferSize() const;
-    virtual void setSendBufferSize( uint );
+    int   receiveBufferSize() const;
+    virtual void setReceiveBufferSize(uint);
+    int   sendBufferSize() const;
+    virtual void setSendBufferSize(uint);
 
-    bool	 keepalive() const;
-    virtual void setKeepalive( bool );
+    bool  keepalive() const;
+    virtual void setKeepalive(bool);
 
-    virtual bool connect( const QHostAddress &, quint16 );
+    virtual bool connect(const QHostAddress &, quint16);
 
-    virtual bool bind( const QHostAddress &, quint16 );
-    virtual bool listen( int backlog );
-    virtual int	 accept();
+    virtual bool bind(const QHostAddress &, quint16);
+    virtual bool listen(int backlog);
+    virtual int  accept();
 
-    qint64	 bytesAvailable() const;
-    qint64	 waitForMore( int msecs, bool *timeout=0 ) const;
-    virtual qint64 writeBlock( const char *data, quint64 len,
-		 	       const QHostAddress & host, quint16 port );
+    qint64  bytesAvailable() const;
+    qint64  waitForMore(int msecs, bool *timeout = 0) const;
+    virtual qint64 writeBlock(const char *data, quint64 len,
+                              const QHostAddress & host, quint16 port);
     inline qint64  writeBlock(const char *data, quint64 len)
-        { return qint64(write(data, qint64(len))); }
-    inline qint64 readBlock(char *data, quint64 maxlen)
-        { return qint64(read(data, qint64(maxlen))); }
+    {
+        return qint64(write(data, qint64(len)));
+    }
 
-    virtual quint16	 port() const;
-    virtual quint16	 peerPort() const;
+    inline qint64 readBlock(char *data, quint64 maxlen)
+    {
+        return qint64(read(data, qint64(maxlen)));
+    }
+
+    virtual quint16  port() const;
+    virtual quint16  peerPort() const;
     virtual QHostAddress address() const;
     virtual QHostAddress peerAddress() const;
 
-    enum Error {
-	NoError,
-	AlreadyBound,
-	Inaccessible,
-	NoResources,
-	InternalError,
-	Bug = InternalError, // ### remove in 4.0?
-	Impossible,
-	NoFiles,
-	ConnectionRefused,
-	NetworkFailure,
-	UnknownError
+    enum Error
+    {
+        NoError,
+        AlreadyBound,
+        Inaccessible,
+        NoResources,
+        InternalError,
+        Bug = InternalError, // ### remove in 4.0?
+        Impossible,
+        NoFiles,
+        ConnectionRefused,
+        NetworkFailure,
+        UnknownError
     };
-    Error	 error() const;
+    Error  error() const;
 
-    inline bool isSequential() const { return true; }
+    inline bool isSequential() const
+    {
+        return true;
+    }
+
     int      createNewSocket();
 
 protected:
-    void setError( Error err );
+    void setError(Error err);
     qint64 readData(char *data, qint64 maxlen);
     qint64 writeData(const char *data, qint64 len);
 
@@ -154,21 +169,21 @@ private:
 
     enum Option { Broadcast, ReceiveBuffer, ReuseAddress, SendBuffer, Keepalive };
 
-    int		 option( Option ) const;
-    virtual void setOption( Option, int );
+    int   option(Option) const;
+    virtual void setOption(Option, int);
 
-    void	 fetchConnectionParameters();
+    void  fetchConnectionParameters();
 #if defined(Q_OS_WIN32) || defined(Q_OS_WINCE)
-    void	 fetchPeerConnectionParameters();
+    void  fetchPeerConnectionParameters();
 #endif
 
     static void  init();
-    Protocol	 getProtocol() const;
+    Protocol  getProtocol() const;
 
-private:	// Disabled copy constructor and operator=
+private: // Disabled copy constructor and operator=
 #if defined(Q_DISABLE_COPY)
-    MSocketDevice( const MSocketDevice & );
-    MSocketDevice &operator=( const MSocketDevice & );
+    MSocketDevice(const MSocketDevice &);
+    MSocketDevice &operator=(const MSocketDevice &);
 #endif
 };
 

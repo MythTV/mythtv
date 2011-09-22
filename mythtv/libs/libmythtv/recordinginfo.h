@@ -29,7 +29,11 @@ typedef AutoDeleteDeque<RecordingInfo*> RecordingList;
 class MTV_PUBLIC RecordingInfo : public ProgramInfo
 {
   public:
-    RecordingInfo(void) : record(NULL) {}
+    RecordingInfo(void) : 
+        oldrecstatus(rsUnknown),
+        savedrecstatus(rsUnknown),
+        future(false),
+        record(NULL) {}
     RecordingInfo(const RecordingInfo &other) :
         ProgramInfo(other),
         oldrecstatus(other.oldrecstatus),
