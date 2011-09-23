@@ -54,6 +54,10 @@ class SERVICE_PUBLIC CaptureServices : public Service
     Q_CLASSINFO( "version"    , "1.0" );
     Q_CLASSINFO( "RemoveCaptureCard_Method",                 "POST" )
     Q_CLASSINFO( "AddCaptureCard_Method",                    "POST" )
+    Q_CLASSINFO( "UpdateCaptureCard_Method",                 "POST" )
+    Q_CLASSINFO( "RemoveCardInput_Method",                   "POST" )
+    Q_CLASSINFO( "AddCardInput_Method",                      "POST" )
+    Q_CLASSINFO( "UpdateCardInput_Method",                   "POST" )
 
     public:
 
@@ -95,6 +99,32 @@ class SERVICE_PUBLIC CaptureServices : public Service
                                                                  const uint       Hue,
                                                                  const uint       DiSEqCId,
                                                                  bool             DVBEITScan) = 0;
+
+        virtual bool                        UpdateCaptureCard  ( int              Id,
+                                                                 const QString    &Setting,
+                                                                 const QString    &Value ) = 0;
+
+        // Card Inputs
+
+        virtual bool                        RemoveCardInput    ( int              Id         ) = 0;
+
+        virtual int                         AddCardInput       ( const uint CardId,
+                                                                 const uint SourceId,
+                                                                 const QString &InputName,
+                                                                 const QString &ExternalCommand,
+                                                                 const QString &ChangerDevice,
+                                                                 const QString &ChangerModel,
+                                                                 const QString &HostName,
+                                                                 const QString &TuneChan,
+                                                                 const QString &StartChan,
+                                                                 const QString &DisplayName,
+                                                                 bool          DishnetEIT,
+                                                                 const uint RecPriority,
+                                                                 const uint Quicktune) = 0;
+
+        virtual bool                        UpdateCardInput    ( int              Id,
+                                                                 const QString    &Setting,
+                                                                 const QString    &Value ) = 0;
 };
 
 #endif

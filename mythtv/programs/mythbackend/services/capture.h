@@ -65,6 +65,32 @@ class Capture : public CaptureServices
                                                          const uint       DiSEqCId,
                                                          bool             DVBEITScan);
 
+        bool                        UpdateCaptureCard  ( int              Id,
+                                                         const QString    &Setting,
+                                                         const QString    &Value );
+
+        // Card Inputs
+
+        bool                        RemoveCardInput    ( int              Id         );
+
+        int                         AddCardInput       ( const uint CardId,
+                                                         const uint SourceId,
+                                                         const QString &InputName,
+                                                         const QString &ExternalCommand,
+                                                         const QString &ChangerDevice,
+                                                         const QString &ChangerModel,
+                                                         const QString &HostName,
+                                                         const QString &TuneChan,
+                                                         const QString &StartChan,
+                                                         const QString &DisplayName,
+                                                         bool          DishnetEIT,
+                                                         const uint RecPriority,
+                                                         const uint Quicktune);
+
+        bool                        UpdateCardInput    ( int              Id,
+                                                         const QString    &Setting,
+                                                         const QString    &Value );
+
 };
 
 // --------------------------------------------------------------------------

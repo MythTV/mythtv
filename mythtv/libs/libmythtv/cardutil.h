@@ -23,7 +23,11 @@ typedef QMap<int,QString> InputNames;
 
 MTV_PUBLIC QString get_on_cardid(const QString&, uint);
 
-bool set_on_source(const QString&, uint, uint, const QString);
+MTV_PUBLIC bool set_on_source(const QString&, uint, uint, const QString);
+
+MTV_PUBLIC QString get_on_inputid(const QString&, uint);
+
+MTV_PUBLIC bool set_on_input(const QString&, uint, const QString);
 
 typedef enum
 {
@@ -251,7 +255,25 @@ class MTV_PUBLIC CardUtil
     static bool         SetStartInput(uint cardid,
                                       const QString &inputname);
 
-    // Inputs
+    // Input creation and deletion
+    static int           CreateCardInput(const uint cardid,
+                                         const uint sourceid,
+                                         const QString &inputname,
+                                         const QString &externalcommand,
+                                         const QString &changer_device,
+                                         const QString &changer_model,
+                                         const QString &hostname,
+                                         const QString &tunechan,
+                                         const QString &startchan,
+                                         const QString &displayname,
+                                         bool  dishnet_eit,
+                                         const uint recpriority,
+                                         const uint quicktune);
+
+    static bool         DeleteInput(uint inputid);
+
+    // Other input functions
+
     static vector<uint> GetCardIDs(uint sourceid);
     static QString      GetDefaultInput(uint cardid);
     static QStringList  GetInputNames(uint cardid, uint sourceid = 0);
@@ -269,8 +291,14 @@ class MTV_PUBLIC CardUtil
     static uint         GetInputID(uint cardid, const QString &inputname);
     static uint         GetInputID(uint cardid, uint sourceid);
     static uint         GetSourceID(uint inputid);
-    static bool         DeleteInput(uint inputid);
     static bool         DeleteOrphanInputs(void);
+
+    static bool         SetInputValue(const QString &col, uint iid,
+                                 int val)
+        { return set_on_input(col, iid, QString::number(val)); }
+    static bool         SetInputValue(const QString &col, uint iid,
+                                 const QString &val)
+        { return set_on_input(col, iid, val); }
 
     // Input Groups
     static uint         CreateInputGroup(const QString &name);

@@ -95,3 +95,62 @@ int Capture::AddCaptureCard     ( const QString    &sVideoDevice,
 
     return nResult;
 }
+
+bool Capture::UpdateCaptureCard  ( int              nId,
+                                   const QString    &sSetting,
+                                   const QString    &sValue )
+{
+    if ( nId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
+        throw( QString( "Card ID, Setting Name, and Value are required." ));
+
+    return set_on_source(sSetting, nId, 0, sValue);
+}
+
+// Card Inputs
+
+bool Capture::RemoveCardInput( int nId )
+{
+    if ( nId < 1 )
+        throw( QString( "The Input ID is invalid."));
+
+    bool bResult = CardUtil::DeleteInput(nId);
+
+    return bResult;
+}
+
+int Capture::AddCardInput       ( const uint nCardId,
+                                  const uint nSourceId,
+                                  const QString &sInputName,
+                                  const QString &sExternalCommand,
+                                  const QString &sChangerDevice,
+                                  const QString &sChangerModel,
+                                  const QString &sHostName,
+                                  const QString &sTuneChan,
+                                  const QString &sStartChan,
+                                  const QString &sDisplayName,
+                                  bool          bDishnetEIT,
+                                  const uint nRecPriority,
+                                  const uint nQuicktune)
+{
+    if ( nCardId < 1 || nSourceId < 1 || sInputName.isEmpty() )
+        throw( QString( "This API requires at least an card ID, a source ID, "
+                        "and an input name." ));
+
+    int nResult = CardUtil::CreateCardInput(nCardId, nSourceId, sInputName,
+                      sExternalCommand, sChangerDevice, sChangerModel,
+                      sHostName, sTuneChan, sStartChan, sDisplayName,
+                      bDishnetEIT, nRecPriority, nQuicktune);
+
+    return nResult;
+}
+
+bool Capture::UpdateCardInput    ( int              nId,
+                                   const QString    &sSetting,
+                                   const QString    &sValue )
+{
+    if ( nId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
+        throw( QString( "Input ID, Setting Name, and Value are required." ));
+
+    return set_on_input(sSetting, nId, sValue);
+}
+

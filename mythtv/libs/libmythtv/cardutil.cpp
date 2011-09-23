@@ -502,6 +502,48 @@ bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
     return false;
 }
 
+QString get_on_inputid(const QString &to_get, uint inputid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        QString("SELECT %1 ").arg(to_get) +
+        "FROM cardinput "
+        "WHERE cardinput.cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
+
+    if (!query.exec())
+        MythDB::DBError("CardUtil::get_on_inputid", query);
+    else if (query.next())
+        return query.value(0).toString();
+
+    return QString::null;
+}
+
+bool set_on_input(const QString &to_set, uint inputid, const QString value)
+{
+    QString tmp = get_on_inputid("cardinput.cardinputid", inputid);
+    if (tmp.isEmpty())
+        return false;
+
+    bool ok;
+    uint input_cardinputid = tmp.toUInt(&ok);
+    if (!ok)
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        QString("UPDATE cardinput SET %1 = :VALUE ").arg(to_set) +
+        "WHERE cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", input_cardinputid);
+    query.bindValue(":VALUE",  value);
+
+    if (query.exec())
+        return true;
+
+    MythDB::DBError("CardUtil::set_on_input", query);
+    return false;
+}
+
 /**
  *  \brief Returns all cardids of cards that uses the specified
  *         videodevice if specified, and optionally rawtype and a non-local
@@ -1215,6 +1257,66 @@ vector<uint> CardUtil::GetInputIDs(uint cardid)
         list.push_back(query.value(0).toUInt());
 
     return list;
+}
+
+int CardUtil::CreateCardInput(const uint cardid,
+                              const uint sourceid,
+                              const QString &inputname,
+                              const QString &externalcommand,
+                              const QString &changer_device,
+                              const QString &changer_model,
+                              const QString &hostname,
+                              const QString &tunechan,
+                              const QString &startchan,
+                              const QString &displayname,
+                              bool          dishnet_eit,
+                              const uint recpriority,
+                              const uint quicktune)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "INSERT INTO cardinput "
+        "(cardid, sourceid, inputname, externalcommand, changer_device, "
+        "changer_model, tunechan, startchan, displayname, dishnet_eit, "
+        "recpriority, quicktune) "
+        "VALUES (:CARDID, :SOURCEID, :INPUTNAME, :EXTERNALCOMMAND, "
+        ":CHANGERDEVICE, :CHANGERMODEL, :TUNECHAN, :STARTCHAN, :DISPLAYNAME, "
+        ":DISHNETEIT, :RECPRIORITY, :QUICKTUNE ) ");
+
+    query.bindValue(":CARDID", cardid);
+    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":INPUTNAME", inputname);
+    query.bindValue(":EXTERNALCOMMAND", externalcommand);
+    query.bindValue(":CHANGERDEVICE", changer_device);
+    query.bindValue(":CHANGERMODEL", changer_model);
+    query.bindValue(":TUNECHAN", tunechan);
+    query.bindValue(":STARTCHAN", startchan);
+    query.bindValue(":DISPLAYNAME", displayname.isNull() ? "" : displayname);
+    query.bindValue(":DISHNETEIT", dishnet_eit);
+    query.bindValue(":RECPRIORITY", recpriority);
+    query.bindValue(":QUICKTUNE", quicktune);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateCardInput", query);
+        return -1;
+    }
+
+    query.prepare("SELECT MAX(cardinputid) FROM cardinput");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateCardInput maxinput", query);
+        return -1;
+    }
+
+    uint inputid = -1;
+
+    if (query.next())
+        inputid = query.value(0).toUInt();
+
+    return inputid;
 }
 
 bool CardUtil::DeleteInput(uint inputid)
