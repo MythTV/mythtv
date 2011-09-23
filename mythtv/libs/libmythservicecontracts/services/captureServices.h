@@ -51,7 +51,7 @@
 class SERVICE_PUBLIC CaptureServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.1" );
     Q_CLASSINFO( "RemoveCaptureCard_Method",                 "POST" )
     Q_CLASSINFO( "AddCaptureCard_Method",                    "POST" )
     Q_CLASSINFO( "UpdateCaptureCard_Method",                 "POST" )

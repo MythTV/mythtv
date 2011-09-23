@@ -97,7 +97,7 @@ class Channel : public ChannelServices
                                                            const QString &ConfigPath,
                                                            int           NITId );
 
-        bool                      CreateVideoSource      ( const QString &SourceName,
+        int                       CreateVideoSource      ( const QString &SourceName,
                                                            const QString &Grabber,
                                                            const QString &UserId,
                                                            const QString &FreqTable,

@@ -387,7 +387,7 @@ bool Channel::UpdateVideoSource( uint nSourceId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Channel::CreateVideoSource( const QString &sSourceName,
+int  Channel::CreateVideoSource( const QString &sSourceName,
                                  const QString &sGrabber,
                                  const QString &sUserId,
                                  const QString &sFreqTable,
@@ -397,13 +397,11 @@ bool Channel::CreateVideoSource( const QString &sSourceName,
                                  const QString &sConfigPath,
                                  int           nNITId )
 {
-    bool bResult = false;
-
-    bResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
+    int nResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
                                        sLineupId, sPassword, bUseEIT, sConfigPath,
                                        nNITId);
 
-    return bResult;
+    return nResult;
 }
 
 /////////////////////////////////////////////////////////////////////////////
