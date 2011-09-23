@@ -346,17 +346,44 @@ bool SourceUtil::IsAnySourceScanable(void)
     return false;
 }
 
-bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
+bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype, bool wait)
 {
-    QString cmd = GetInstallPrefix() +
-                  "/bin/mythfilldatabase --only-update-channels";
-    if (sourceid)
-        cmd += QString(" --sourceid %1").arg(sourceid);
-    if (!cardtype.isEmpty())
-        cmd += QString(" --cardtype %1").arg(cardtype);
-    cmd += logPropagateArgs;
+    if (wait)
+    {
+        QString cmd = GetInstallPrefix() +
+                      "/bin/mythfilldatabase";
+        QStringList args;
+        args.append("--only-update-channels");
 
-    myth_system(cmd);
+        if (sourceid)
+        {
+            args.append(QString("--sourceid"));
+            args.append(QString::number(sourceid));
+        }
+        if (!cardtype.isEmpty())
+        {
+            args.append(QString("--cardtype"));
+            args.append(cardtype);
+        }
+
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Using command %1 with args %2").arg(cmd).arg(args.join(",")));
+
+        MythSystem getchan(cmd, args, kMSRunShell | kMSAutoCleanup );
+        getchan.Run();
+        getchan.Wait();
+    }
+    else
+    {
+        QString cmd = GetInstallPrefix() +
+                      "/bin/mythfilldatabase --only-update-channels";
+        if (sourceid)
+            cmd += QString(" --sourceid %1").arg(sourceid);
+        if (!cardtype.isEmpty())
+            cmd += QString(" --cardtype %1").arg(cardtype);
+        cmd += logPropagateArgs;
+
+        myth_system(cmd);
+    }
 
     return true;
 }

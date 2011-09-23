@@ -113,6 +113,10 @@ class Channel : public ChannelServices
                                                            const QString &UserId,
                                                            const QString &Password );
 
+        int                       FetchChannelsFromSource( const uint SourceId,
+                                                           const uint CardId,
+                                                           bool       WaitForFinish );
+
         /* Multiplex Methods */
 
         DTC::VideoMultiplexList*  GetVideoMultiplexList  ( int SourceID,
