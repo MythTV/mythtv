@@ -394,7 +394,7 @@ bool SourceUtil::UpdateSource( uint sourceid, QString sourcename,
     return true;
 }
 
-bool SourceUtil::CreateSource( QString sourcename,
+int SourceUtil::CreateSource( QString sourcename,
                                QString grabber, QString userid,
                                QString freqtable, QString lineupid,
                                QString password, bool useeit,
@@ -419,10 +419,23 @@ bool SourceUtil::CreateSource( QString sourcename,
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("Adding Video Source", query);
-        return false;
+        return -1;
     }
 
-    return true;
+    query.prepare("SELECT MAX(sourceid) FROM videosource");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateSource maxsource", query);
+        return -1;
+    }
+
+    uint sourceid = -1;
+
+    if (query.next())
+        sourceid = query.value(0).toUInt();
+
+    return sourceid;
 }
 
 bool SourceUtil::DeleteSource(uint sourceid)
