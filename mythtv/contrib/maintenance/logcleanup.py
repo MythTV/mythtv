@@ -16,6 +16,7 @@
 #----------------------------
 
 import os
+import re
 import sys
 from datetime import datetime, timedelta
 from optparse import OptionParser
@@ -27,6 +28,11 @@ class LogFile( object ):
     pid = None
     compressed = False
     sequence = None
+
+    @classmethod
+    def filter(cls, path, filelist):
+        r = re.compile("[a-z]*.[0-9]{14}.[0-9]{1,6}.log(.[0-9]+(.[a-zA-Z0-9]+)?)?")
+        return [cls(path, f) for f in filelist if r.match(f)]
 
     def __init__(self, path, filename):
         self.path = path
@@ -47,8 +53,8 @@ class LogFile( object ):
     def __repr__(self):
         return "<LogFile %s, %s%s%s>" % \
                 (self.application, self.datetime.strftime("%b %d, %H:%M"),
-                 " #%d" % self.sequence if self.sequence else "",
-                 "(compressed)" if self.compressed else "")
+                 " #%d" % self.sequence if self.sequence is not None else "",
+                 " (compressed)" if self.compressed else "")
 
     def __cmp__(self, other):
         if self.application != other.application:
@@ -76,7 +82,7 @@ class LogFile( object ):
         for child in self.children:
             child.delete()
         #print 'deleting %s' % os.path.join(self.path, self.filename)
-        os.unlink(os.path.join(self.path, self.filename)
+        os.unlink(os.path.join(self.path, self.filename))
 
 def deletelogs(instances, opts):
     while len(instances) > int(opts.minfiles):
