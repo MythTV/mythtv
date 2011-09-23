@@ -366,8 +366,6 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype, boo
             args.append(cardtype);
         }
 
-        LOG(VB_GENERAL, LOG_NOTICE, QString("Using command %1 with args %2").arg(cmd).arg(args.join(",")));
-
         MythSystem getchan(cmd, args, kMSRunShell | kMSAutoCleanup );
         getchan.Run();
         getchan.Wait();
