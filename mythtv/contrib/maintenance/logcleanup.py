@@ -92,7 +92,7 @@ def deletelogs(instances, opts):
         instances.pop(0).delete()
 
 def main(opts):
-    ls = sorted([LogFile(opts.logpath, f) for f in os.listdir(opts.logpath)])
+    ls = sorted(LogFile.filter(opts.logpath, os.listdir(opts.logpath)))
     if len(ls) == 0:
         print "Warning: Empty log path!"
         sys.exit(1)
