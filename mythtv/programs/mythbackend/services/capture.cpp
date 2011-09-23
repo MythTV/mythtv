@@ -133,7 +133,7 @@ int Capture::AddCardInput       ( const uint nCardId,
                                   const uint nQuicktune)
 {
     if ( nCardId < 1 || nSourceId < 1 || sInputName.isEmpty() )
-        throw( QString( "This API requires at least an card ID, a source ID, "
+        throw( QString( "This API requires at least a card ID, a source ID, "
                         "and an input name." ));
 
     int nResult = CardUtil::CreateCardInput(nCardId, nSourceId, sInputName,
