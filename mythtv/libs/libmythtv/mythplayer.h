@@ -314,7 +314,7 @@ class MTV_PUBLIC MythPlayer
     void DisableHardwareDecoders(void)        { no_hardware_decoders = true; }
     void NextScanType(void)
         { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
-    void SetScanType(FrameScanType);
+    void SetScanType(FrameScanType, bool allow_lock = true);
     FrameScanType GetScanType(void) const { return m_scan; }
     bool IsScanTypeLocked(void) const { return m_scan_locked; }
     void Zoom(ZoomDirection direction);
@@ -461,7 +461,7 @@ class MTV_PUBLIC MythPlayer
     void InitFilters(void);
     FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
                                   float fps, int video_height);
-    virtual void AutoDeint(VideoFrame* frame, bool allow_lock = true);
+    void AutoDeint(VideoFrame*);
 
     // Private Sets
     void SetPlayingInfo(const ProgramInfo &pginfo);
@@ -614,13 +614,16 @@ class MTV_PUBLIC MythPlayer
     float    video_aspect;    ///< Video (input) Apect Ratio
     float    forced_video_aspect;
     /// Tell the player thread to set the scan type (and hence deinterlacers)
-    FrameScanType resetScan;
+    FrameScanType resetScanType;
+    bool          resetScanAllowLock;
     /// Video (input) Scan Type (interlaced, progressive, detect, ignore...)
     FrameScanType m_scan;
     /// Set when the user selects a scan type, overriding the detected one
     bool     m_scan_locked;
+    /// Index into m_scan_tracker
+    int      m_scan_tracker_index;
     /// Used for tracking of scan type for auto-detection of interlacing
-    int      m_scan_tracker;
+    QList<bool> m_scan_tracker;
     /// Set when SetScanType runs the first time
     bool     m_scan_initialized;
     /// Video (input) Number of frames between key frames (often inaccurate)
