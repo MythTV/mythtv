@@ -278,24 +278,31 @@ void MythSocketThread::run(void)
         {
             LOG(VB_SOCKET, LOG_DEBUG, LOC + "Waiting on select.. (no pipe)");
 
-            // also exit select on exceptions on same descriptors
-            fd_set efds;
-            memcpy(&efds, &rfds, sizeof(fd_set));
+            fd_set savefds;
+            memcpy(&savefds, &rfds, sizeof(fd_set));
 
             // Unfortunately, select on a pipe is not supported on all
             // platforms. So we fallback to a loop that instead times out
             // of select and checks for wakeAll event.
             while (!rval)
             {
+                // also exit select on exceptions on same descriptors
+                fd_set efds;
+                memcpy(&efds, &savefds, sizeof(fd_set));
+
                 struct timeval timeout;
                 timeout.tv_sec = 0;
                 timeout.tv_usec = kShortWait * 1000;
                 rval = select(maxfd + 1, &rfds, NULL, &efds, &timeout);
                 if (!rval)
+                {
                     m_readyread_wait.wait(&m_readyread_lock, kShortWait);
+                    memcpy(&rfds, &savefds, sizeof(fd_set));
+                }
             }
 
-            LOG(VB_SOCKET, LOG_DEBUG, LOC + "Got data on select (no pipe)");
+            if (rval > 0)
+                LOG(VB_SOCKET, LOG_DEBUG, LOC + "Got data on select (no pipe)");
         }
 
         if (rval <= 0)
