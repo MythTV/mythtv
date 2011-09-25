@@ -32,6 +32,7 @@
 #include "mythcorecontext.h"
 #include "channelutil.h"
 #include "sourceutil.h"
+#include "cardutil.h"
 #include "datadirect.h"
 
 #include "serviceUtil.h"
@@ -387,7 +388,7 @@ bool Channel::UpdateVideoSource( uint nSourceId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Channel::CreateVideoSource( const QString &sSourceName,
+int  Channel::CreateVideoSource( const QString &sSourceName,
                                  const QString &sGrabber,
                                  const QString &sUserId,
                                  const QString &sFreqTable,
@@ -397,13 +398,11 @@ bool Channel::CreateVideoSource( const QString &sSourceName,
                                  const QString &sConfigPath,
                                  int           nNITId )
 {
-    bool bResult = false;
-
-    bResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
+    int nResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
                                        sLineupId, sPassword, bUseEIT, sConfigPath,
                                        nNITId);
 
-    return bResult;
+    return nResult;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -458,6 +457,37 @@ DTC::LineupList* Channel::GetDDLineups( const QString &sSource,
     }
 
     return pLineups;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+int Channel::FetchChannelsFromSource( const uint nSourceId,
+                                      const uint nCardId,
+                                      bool       bWaitForFinish )
+{
+    if ( nSourceId < 1 || nCardId < 1)
+        throw( QString("A source ID and card ID are both required."));
+
+    int nResult = 0;
+
+    uint num_channels_before = SourceUtil::GetChannelCount(nSourceId);
+
+    QString cardtype = CardUtil::GetRawCardType(nCardId);
+
+    if (!CardUtil::IsUnscanable(cardtype) &&
+        !CardUtil::IsEncoder(cardtype))
+    {
+        throw( QString("This device is incompatible with channel fetching.") );
+    }
+
+    SourceUtil::UpdateChannelsFromListings(nSourceId, cardtype, bWaitForFinish);
+
+    if (bWaitForFinish)
+        nResult = SourceUtil::GetChannelCount(nSourceId);
+
+    return nResult;
 }
 
 /////////////////////////////////////////////////////////////////////////////

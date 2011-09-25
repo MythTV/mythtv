@@ -10,6 +10,7 @@ class MBASE_PUBLIC MythHDD : public MythMediaDevice
             bool SuperMount, bool AllowEject);
 
     virtual MythMediaStatus checkMedia(void);
+    virtual MythMediaError eject(bool);
 
     static MythHDD* Get(QObject* par, const char* devicePath,
                         bool SuperMount, bool AllowEject);

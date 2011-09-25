@@ -97,7 +97,7 @@ class Channel : public ChannelServices
                                                            const QString &ConfigPath,
                                                            int           NITId );
 
-        bool                      CreateVideoSource      ( const QString &SourceName,
+        int                       CreateVideoSource      ( const QString &SourceName,
                                                            const QString &Grabber,
                                                            const QString &UserId,
                                                            const QString &FreqTable,
@@ -112,6 +112,10 @@ class Channel : public ChannelServices
         DTC::LineupList*          GetDDLineups           ( const QString &Source,
                                                            const QString &UserId,
                                                            const QString &Password );
+
+        int                       FetchChannelsFromSource( const uint SourceId,
+                                                           const uint CardId,
+                                                           bool       WaitForFinish );
 
         /* Multiplex Methods */
 

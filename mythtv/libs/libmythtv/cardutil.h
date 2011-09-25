@@ -23,7 +23,11 @@ typedef QMap<int,QString> InputNames;
 
 MTV_PUBLIC QString get_on_cardid(const QString&, uint);
 
-bool set_on_source(const QString&, uint, uint, const QString);
+MTV_PUBLIC bool set_on_source(const QString&, uint, uint, const QString);
+
+MTV_PUBLIC QString get_on_inputid(const QString&, uint);
+
+MTV_PUBLIC bool set_on_input(const QString&, uint, const QString);
 
 typedef enum
 {
@@ -174,6 +178,38 @@ class MTV_PUBLIC CardUtil
             (rawtype == "IMPORT")    || (rawtype == "DEMO");
     }
 
+    // Card creation and deletion
+
+    static int          CreateCaptureCard(const QString &videodevice,
+                                          const QString &audiodevice,
+                                          const QString &vbidevice,
+                                          const QString &cardtype,
+                                          const QString &defaultinput,
+                                          const uint audioratelimit,
+                                          const QString &hostname,
+                                          const uint dvb_swfilter,
+                                          const uint dvb_sat_type,
+                                          bool       dvb_wait_for_seqstart,
+                                          bool       skipbtaudio,
+                                          bool       dvb_on_demand,
+                                          const uint dvb_diseqc_type,
+                                          const uint firewire_speed,
+                                          const QString &firewire_model,
+                                          const uint firewire_connection,
+                                          const uint signal_timeout,
+                                          const uint channel_timeout,
+                                          const uint dvb_tuning_delay,
+                                          const uint contrast,
+                                          const uint brightness,
+                                          const uint colour,
+                                          const uint hue,
+                                          const uint diseqcid,
+                                          bool       dvb_eitscan);
+
+    static bool         DeleteCard(uint cardid);
+    static bool         DeleteAllCards(void);
+    static vector<uint> GetCardList(void);
+
     /// Convenience function for GetCardIDs()
     static uint         GetFirstCardID(const QString &videodevice)
     {
@@ -202,8 +238,6 @@ class MTV_PUBLIC CardUtil
         { return get_on_cardid("audiodevice", cardid); }
     static QString      GetVBIDevice(uint cardid)
         { return get_on_cardid("vbidevice", cardid); }
-    static uint         GetHDHRTuner(uint cardid)
-        { return get_on_cardid("dbox2_port", cardid).toUInt(); }
 
     static int          GetValueInt(const QString &col, uint cid)
         { return get_on_cardid(col, cid).toInt(); }
@@ -221,7 +255,25 @@ class MTV_PUBLIC CardUtil
     static bool         SetStartInput(uint cardid,
                                       const QString &inputname);
 
-    // Inputs
+    // Input creation and deletion
+    static int           CreateCardInput(const uint cardid,
+                                         const uint sourceid,
+                                         const QString &inputname,
+                                         const QString &externalcommand,
+                                         const QString &changer_device,
+                                         const QString &changer_model,
+                                         const QString &hostname,
+                                         const QString &tunechan,
+                                         const QString &startchan,
+                                         const QString &displayname,
+                                         bool  dishnet_eit,
+                                         const uint recpriority,
+                                         const uint quicktune);
+
+    static bool         DeleteInput(uint inputid);
+
+    // Other input functions
+
     static vector<uint> GetCardIDs(uint sourceid);
     static QString      GetDefaultInput(uint cardid);
     static QStringList  GetInputNames(uint cardid, uint sourceid = 0);
@@ -239,8 +291,14 @@ class MTV_PUBLIC CardUtil
     static uint         GetInputID(uint cardid, const QString &inputname);
     static uint         GetInputID(uint cardid, uint sourceid);
     static uint         GetSourceID(uint inputid);
-    static bool         DeleteInput(uint inputid);
     static bool         DeleteOrphanInputs(void);
+
+    static bool         SetInputValue(const QString &col, uint iid,
+                                 int val)
+        { return set_on_input(col, iid, QString::number(val)); }
+    static bool         SetInputValue(const QString &col, uint iid,
+                                 const QString &val)
+        { return set_on_input(col, iid, val); }
 
     // Input Groups
     static uint         CreateInputGroup(const QString &name);
@@ -267,10 +325,6 @@ class MTV_PUBLIC CardUtil
                                       const QString      &cardtype,
                                       QStringList        &inputLabels,
                                       vector<CardInput*> &cardInputs);
-
-    static bool         DeleteCard(uint cardid);
-    static bool         DeleteAllCards(void);
-    static vector<uint> GetCardList(void);
 
     // General info from OS
     static QStringList  ProbeVideoDevices(const QString &rawtype);

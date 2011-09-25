@@ -346,17 +346,42 @@ bool SourceUtil::IsAnySourceScanable(void)
     return false;
 }
 
-bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
+bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype, bool wait)
 {
-    QString cmd = GetInstallPrefix() +
-                  "/bin/mythfilldatabase --only-update-channels";
-    if (sourceid)
-        cmd += QString(" --sourceid %1").arg(sourceid);
-    if (!cardtype.isEmpty())
-        cmd += QString(" --cardtype %1").arg(cardtype);
-    cmd += logPropagateArgs;
+    if (wait)
+    {
+        QString cmd = GetInstallPrefix() +
+                      "/bin/mythfilldatabase";
+        QStringList args;
+        args.append("--only-update-channels");
 
-    myth_system(cmd);
+        if (sourceid)
+        {
+            args.append(QString("--sourceid"));
+            args.append(QString::number(sourceid));
+        }
+        if (!cardtype.isEmpty())
+        {
+            args.append(QString("--cardtype"));
+            args.append(cardtype);
+        }
+
+        MythSystem getchan(cmd, args, kMSRunShell | kMSAutoCleanup );
+        getchan.Run();
+        getchan.Wait();
+    }
+    else
+    {
+        QString cmd = GetInstallPrefix() +
+                      "/bin/mythfilldatabase --only-update-channels";
+        if (sourceid)
+            cmd += QString(" --sourceid %1").arg(sourceid);
+        if (!cardtype.isEmpty())
+            cmd += QString(" --cardtype %1").arg(cardtype);
+        cmd += logPropagateArgs;
+
+        myth_system(cmd);
+    }
 
     return true;
 }
@@ -394,7 +419,7 @@ bool SourceUtil::UpdateSource( uint sourceid, QString sourcename,
     return true;
 }
 
-bool SourceUtil::CreateSource( QString sourcename,
+int SourceUtil::CreateSource( QString sourcename,
                                QString grabber, QString userid,
                                QString freqtable, QString lineupid,
                                QString password, bool useeit,
@@ -419,10 +444,23 @@ bool SourceUtil::CreateSource( QString sourcename,
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("Adding Video Source", query);
-        return false;
+        return -1;
     }
 
-    return true;
+    query.prepare("SELECT MAX(sourceid) FROM videosource");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateSource maxsource", query);
+        return -1;
+    }
+
+    uint sourceid = -1;
+
+    if (query.next())
+        sourceid = query.value(0).toUInt();
+
+    return sourceid;
 }
 
 bool SourceUtil::DeleteSource(uint sourceid)

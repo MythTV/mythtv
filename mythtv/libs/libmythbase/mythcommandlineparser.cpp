@@ -51,6 +51,7 @@ const int kEnd          = 0,
 const char* NamedOptType(int type);
 bool openPidfile(ofstream &pidfs, const QString &pidfile);
 bool setUser(const QString &username);
+int GetTermWidth(void);
 
 int GetTermWidth(void)
 {

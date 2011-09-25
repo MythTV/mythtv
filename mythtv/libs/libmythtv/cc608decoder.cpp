@@ -37,6 +37,8 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
         xds[i]         =  0;
         txtmode[i*2+0] =  0;
         txtmode[i*2+1] =  0;
+        last_format_tc[i]   = 0;
+        last_format_data[i] = 0;
     }
 
     // The following are not bzero() because MS Windows doesn't like it.
@@ -155,9 +157,19 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
         return;
     }
 
+    if ((last_format_data[field&1] == data) &&
+        (last_format_tc[field&1] == tc))
+    {
+        LOG(VB_VBI, LOG_DEBUG, "Format CC -- Duplicate");
+        return;
+    }
+
+    last_format_tc[field&1] = tc;
+    last_format_data[field&1] = data;
+
     b1 = data & 0x7f;
     b2 = (data >> 8) & 0x7f;
-#if 0
+#if 1
     LOG(VB_VBI, LOG_DEBUG, QString("Format CC @%1/%2 = %3 %4")
                     .arg(tc).arg(field)
                     .arg((data&0xff), 2, 16)

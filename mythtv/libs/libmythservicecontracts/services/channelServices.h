@@ -52,7 +52,7 @@
 class SERVICE_PUBLIC ChannelServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.05" );
+    Q_CLASSINFO( "version"    , "1.1" );
     Q_CLASSINFO( "CreateDBChannel_Method",           "POST" )
     Q_CLASSINFO( "UpdateDBChannel_Method",           "POST" )
     Q_CLASSINFO( "DeleteDBChannel_Method",           "POST" )
@@ -139,7 +139,7 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                                    const QString &ConfigPath,
                                                                    int           NITId ) = 0;
 
-        virtual bool                      CreateVideoSource      ( const QString &SourceName,
+        virtual int                       CreateVideoSource      ( const QString &SourceName,
                                                                    const QString &Grabber,
                                                                    const QString &UserId,
                                                                    const QString &FreqTable,
@@ -154,6 +154,10 @@ class SERVICE_PUBLIC ChannelServices : public Service
         virtual DTC::LineupList*          GetDDLineups           ( const QString &Source,
                                                                    const QString &UserId,
                                                                    const QString &Password ) = 0;
+
+        virtual int                       FetchChannelsFromSource( const uint SourceId,
+                                                                   const uint CardId,
+                                                                   bool       WaitForFinish ) = 0;
 
         /* Multiplex Methods */
 
