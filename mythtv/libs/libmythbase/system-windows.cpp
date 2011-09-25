@@ -636,7 +636,7 @@ void MythSystemWindows::Fork(time_t timeout)
     }
 
     // set up command args
-    QString cmd = GetCommand() + " " + GetArgs().join(" ");
+    QString cmd = GetCommand().replace('/','\\') + " " + GetArgs().join(" ");
     if (GetSetting("UseShell"))
         cmd.prepend("cmd.exe /c ");
 
