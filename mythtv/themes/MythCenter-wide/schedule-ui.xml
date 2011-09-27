@@ -81,6 +81,7 @@
             <area>226,250,1020,36</area>
             <layout>horizontal</layout>
             <buttonarea>0,0,1020,36</buttonarea>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <area>0,0,20%,36</area>
                 <state name="active">
@@ -102,6 +103,7 @@
         <buttonlist name="channellist">
             <area>24,294,194,396</area>
             <buttonarea>0,0,194,396</buttonarea>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <area>0,0,194,74</area>
                 <state name="active">
@@ -254,6 +256,7 @@
             <layout>horizontal</layout>
             <spacing>0</spacing>
             <buttonarea>0,0,1036,36</buttonarea>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <area>0,0,258,36</area>
                 <state name="active">
@@ -301,6 +304,7 @@
             <layout>vertical</layout>
             <spacing>0</spacing>
             <buttonarea>0,0,190,396</buttonarea>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <area>0,0,196,74</area>
                 <state name="active">

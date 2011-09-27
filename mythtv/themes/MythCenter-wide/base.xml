@@ -701,6 +701,8 @@
             <drawfrombottom>yes</drawfrombottom>
             <showarrow>no</showarrow>
             <wrapstyle>selection</wrapstyle>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
+            <triggerevent context="Global" action="SELECT">RIGHT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">
@@ -750,6 +752,8 @@
             <drawfrombottom>yes</drawfrombottom>
             <showarrow>no</showarrow>
             <wrapstyle>selection</wrapstyle>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
+            <triggerevent context="Global" action="SELECT">RIGHT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">
@@ -926,6 +930,7 @@
             <area>4,70,500,440</area>
             <layout>grid</layout>
             <buttonarea>0,0,500,430</buttonarea>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <area>0,0,166,106</area>
                 <state name="active">
@@ -1080,6 +1085,7 @@
             <spacing>5</spacing>
             <wrapstyle>selection</wrapstyle>
             <buttonarea>0,0,100%,97%</buttonarea>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,100%,85</area>

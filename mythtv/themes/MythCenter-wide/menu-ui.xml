@@ -141,6 +141,8 @@
             <spacing>6</spacing>
             <wrapstyle>selection</wrapstyle>
             <buttonarea>0,0,550,400</buttonarea>
+            <triggerevent context="Global" action="SELECT">RIGHT</triggerevent>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,550,60</area>

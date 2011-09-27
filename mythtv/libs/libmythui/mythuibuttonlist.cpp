@@ -1,10 +1,11 @@
-
 #include "mythuibuttonlist.h"
 
 #include <math.h>
 
 // QT headers
+#include <QCoreApplication>
 #include <QDomDocument>
+#include <QKeyEvent>
 
 // libmyth headers
 #include "mythlogging.h"
@@ -2245,6 +2246,46 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     handled = GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
 
+    // Handle action remappings
+    for (int i = 0; i < actions.size(); i++)
+    {
+        if (!m_actionRemap.contains(actions[i]))
+            continue;
+
+        QString key = m_actionRemap[actions[i]];
+        if (key.isEmpty())
+            return true;
+
+        QKeySequence a(key);
+        if (a.isEmpty())
+            continue;
+
+        int keyCode = a[0];
+        Qt::KeyboardModifiers modifiers = Qt::NoModifier;
+        QStringList parts = key.split('+');
+        for (int j = 0; j < parts.count(); j++)
+        {
+            if (parts[j].toUpper() == "CTRL")
+                modifiers |= Qt::ControlModifier;
+            if (parts[j].toUpper() == "SHIFT")
+                modifiers |= Qt::ShiftModifier;
+            if (parts[j].toUpper() == "ALT")
+                modifiers |= Qt::AltModifier;
+            if (parts[j].toUpper() == "META")
+                modifiers |= Qt::MetaModifier;
+        }
+
+        QCoreApplication::postEvent(
+            GetMythMainWindow(),
+            new QKeyEvent(QEvent::KeyPress, keyCode, modifiers, key));
+        QCoreApplication::postEvent(
+            GetMythMainWindow(),
+            new QKeyEvent(QEvent::KeyRelease, keyCode, modifiers, key));
+
+        return true;
+    }
+
+    // handle actions for this container
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
@@ -2538,6 +2579,26 @@ bool MythUIButtonList::ParseElement(
     {
         m_searchPosition = parsePoint(element);
     }
+    else if (element.tagName() == "triggerevent")
+    {
+        QString trigger = getFirstText(element);
+        if (!trigger.isEmpty())
+        {
+            QString action = element.attribute("action", "");
+            if (action.isEmpty())
+            {
+                m_actionRemap[trigger] = "";
+            }
+            else
+            {
+                QString context = element.attribute("context", "");
+                QString keylist = GetMythMainWindow()->GetKey(context, action);
+                QStringList keys = keylist.split(',', QString::SkipEmptyParts);
+                if (!keys.empty())
+                    m_actionRemap[trigger] = keys[0];
+            }
+        }
+    }
     else
     {
         return MythUIType::ParseElement(filename, element, showWarnings);
@@ -2615,6 +2676,8 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
     }
 
     m_ButtonList.clear();
+
+    m_actionRemap = lb->m_actionRemap;
 
     m_initialized = false;
 }
