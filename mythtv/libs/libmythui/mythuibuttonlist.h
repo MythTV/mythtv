@@ -152,7 +152,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     uint ItemWidth(void);
     uint ItemHeight(void);
-    const LayoutType GetLayout() const { return m_layout; }
+    LayoutType GetLayout() const { return m_layout; }
 
     bool MoveItemUpDown(MythUIButtonListItem *item, bool up);
 
