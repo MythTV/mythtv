@@ -62,13 +62,14 @@ bool MythDVDPlayer::PrebufferEnoughFrames(int min_buffers)
 
 bool MythDVDPlayer::DecoderGetFrameFFREW(void)
 {
-    return MythPlayer::DecoderGetFrameFFREW();
+    bool res = MythPlayer::DecoderGetFrameFFREW();
     if (decoder_change_lock.tryLock(1))
     {
         if (decoder)
             decoder->UpdateDVDFramesPlayed();
         decoder_change_lock.unlock();
     }
+    return res;
 }
 
 bool MythDVDPlayer::DecoderGetFrameREW(void)
