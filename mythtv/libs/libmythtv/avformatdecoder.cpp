@@ -3413,8 +3413,8 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
 bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
 {
-    if (!decodeAllSubtitles ||
-        selectedTrack[kTrackTypeRawText].av_stream_index != pkt->stream_index)
+    if (!(decodeAllSubtitles ||
+        selectedTrack[kTrackTypeRawText].av_stream_index == pkt->stream_index))
     {
         return false;
     }
