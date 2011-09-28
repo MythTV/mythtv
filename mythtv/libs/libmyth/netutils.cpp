@@ -124,7 +124,7 @@ GrabberScript* findSearchGrabberByCommand(const QString& commandline,
 GrabberScript::scriptList findAllDBTreeGrabbers()
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT name,thumbnail,type,"
+    query.prepare("SELECT DISTINCT name,thumbnail,type,"
                   "author,description,commandline,"
                   "version,search,tree FROM internetcontent "
                   "where tree = 1 ORDER BY name;");

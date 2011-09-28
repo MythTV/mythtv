@@ -651,6 +651,7 @@ void ThemeChooser::customEvent(QEvent *e)
                         if (file.exists())
                         {
                             remoteFileIsLocal = true;
+                            m_downloadFile = localFile;
                         }
                         else
                         {
@@ -658,8 +659,9 @@ void ThemeChooser::customEvent(QEvent *e)
                                 m_downloadFile, localFile, this);
                             OpenBusyPopup(tr("Copying %1 Theme Package")
                                           .arg(m_downloadTheme->GetName()));
+                            m_downloadFile = localFile;
+                            return;
                         }
-                        m_downloadFile = localFile;
                     }
                     else
                     {

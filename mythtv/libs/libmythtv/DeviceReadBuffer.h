@@ -13,6 +13,12 @@
 
 #include "util.h"
 
+// Locking order
+//
+// thread_lock -> lock
+//
+// See tv_play.h for an explanation of locking order.
+
 class ReaderPausedCB
 {
   protected:
@@ -77,11 +83,18 @@ class DeviceReadBuffer
     int              _stream_fd;
 
     ReaderPausedCB  *readerPausedCB;
+
+    // Manage access to thread variable
+    mutable QMutex   thread_lock;
+    /// True if a thread has been created and needs reaping
+    bool             thread_exists;
     pthread_t        thread;
 
     // Data for managing the device ringbuffer
     mutable QMutex   lock;
+    /// true when we want the thread to be running
     bool             run;
+    /// true if the read thread is doing work
     bool             running;
     bool             eof;
     mutable bool     error;

@@ -1145,9 +1145,10 @@ void RingBuffer::run(void)
 
         long long totfree = ReadBufFree();
 
+        const uint KB32 = 32*1024;
         // These are conditions where we don't want to go through
         // the loop if they are true.
-        if (((totfree < readblocksize) && readsallowed) ||
+        if (((totfree < KB32) && readsallowed) ||
             (ignorereadpos >= 0) || commserror || stopreads)
         {
             ignore_for_read_timing |=
@@ -1166,11 +1167,14 @@ void RingBuffer::run(void)
         }
 
         int read_return = -1;
-        if (totfree >= readblocksize && !commserror &&
+        if (totfree >= KB32 && !commserror &&
             !ateof && !setswitchtonext)
         {
             // limit the read size
-            totfree = readblocksize;
+            if (readblocksize > totfree)
+                totfree = (int)(totfree / KB32) * KB32; // must be multiple of 32KB
+            else
+                totfree = readblocksize;
 
             // adapt blocksize
             gettimeofday(&now, NULL);
@@ -1205,7 +1209,7 @@ void RingBuffer::run(void)
                     readtimeavg = 225;
                 }
             }
-            ignore_for_read_timing = false;
+            ignore_for_read_timing = (totfree < readblocksize) ? true : false;
             lastread = now;
 
             rbwlock.lockForRead();
@@ -1270,6 +1274,8 @@ void RingBuffer::run(void)
 
         int used = kBufferSize - ReadBufFree();
 
+        bool reads_were_allowed = readsallowed;
+
         if ((0 == read_return) || (numfailures > 5) ||
             (readsallowed != (used >= fill_min || ateof ||
                               setswitchtonext || commserror)))
@@ -1312,7 +1318,7 @@ void RingBuffer::run(void)
 
         VERBOSE(VB_FILE|VB_EXTRA, LOC + "@ end of read ahead loop");
 
-        if (readsallowed || commserror || ateof || setswitchtonext ||
+        if (!readsallowed || commserror || ateof || setswitchtonext ||
             (wanttoread <= used && wanttoread > 0))
         {
             // To give other threads a good chance to handle these
@@ -1326,10 +1332,18 @@ void RingBuffer::run(void)
         else
         {
             // yield if we have nothing to do...
-            if (!request_pause &&
+            if (!request_pause && reads_were_allowed &&
                 (used >= fill_threshold || ateof || setswitchtonext))
             {
-                generalWait.wait(&rwlock, 1000);
+                generalWait.wait(&rwlock, 100);
+            }
+            else if (readsallowed)
+            { // if reads are allowed release the lock and yield so the
+              // reader gets a chance to read before the buffer is full.
+                generalWait.wakeAll();
+                rwlock.unlock();
+                usleep(5 * 1000);
+                rwlock.lockForRead();            
             }
         }
     }
