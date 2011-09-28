@@ -4601,9 +4601,11 @@ inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
 {
     // Until ffmpeg properly implements dialnorm
     // use Myth internal downmixer if machines has FPU/SSE
-    if (!m_audio->CanDownmix() || !AudioOutputUtil::has_hardware_fpu())
+    if (m_audio->CanDownmix() && AudioOutputUtil::has_hardware_fpu())
+        return false;
+    if (!m_audio->CanDownmix())
         return true;
-
+    // use ffmpeg only for dolby codecs if we have to
     switch (ctx->codec_id)
     {
         case CODEC_ID_AC3:
