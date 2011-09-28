@@ -287,9 +287,6 @@ bool VideoOutputOpenGL::SetupContext(void)
         return true;
     }
 
-    QGLFormat fmt;
-    fmt.setDepth(false);
-
     QGLWidget *device = (QGLWidget*)QWidget::find(gl_parent_win);
     if (!device)
     {
@@ -297,7 +294,7 @@ bool VideoOutputOpenGL::SetupContext(void)
         return false;
     }
 
-    gl_context = MythRenderOpenGL::Create(fmt, device);
+    gl_context = MythRenderOpenGL::Create(device);
     if (gl_context && gl_context->create())
     {
         gl_context->Init();

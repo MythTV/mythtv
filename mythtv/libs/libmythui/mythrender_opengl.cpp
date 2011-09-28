@@ -42,8 +42,15 @@ OpenGLLocker::~OpenGLLocker()
         m_render->doneCurrent();
 }
 
-MythRenderOpenGL* MythRenderOpenGL::Create(const QGLFormat& format, QPaintDevice* device)
+MythRenderOpenGL* MythRenderOpenGL::Create(QPaintDevice* device)
 {
+    QGLFormat format;
+    format.setDepth(false);
+
+#if defined(Q_WS_MAC)
+    format.setSwapInterval(1);
+#endif
+
 #ifdef USING_OPENGLES
     if (device)
         return new MythRenderOpenGL2ES(format, device);
