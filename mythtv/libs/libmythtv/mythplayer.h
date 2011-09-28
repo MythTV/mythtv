@@ -491,6 +491,7 @@ class MTV_PUBLIC MythPlayer
     bool         DecoderGetFrame(DecodeType, bool unsafe = false);
 
     // These actually execute commands requested by public members
+    bool UpdateFFRewSkip(void);
     virtual void ChangeSpeed(void);
     bool DoFastForward(uint64_t frames, bool override_seeks = false,
                        bool seeks_wanted = false);
