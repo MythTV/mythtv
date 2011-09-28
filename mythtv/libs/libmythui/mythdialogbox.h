@@ -17,6 +17,8 @@ class MythUIButton;
 class MythUITextEdit;
 class MythUIImage;
 class MythUIStateType;
+class MythMenu;
+
 
 /**
  *  \class DialogCompletionEvent
@@ -49,6 +51,48 @@ class MUI_PUBLIC DialogCompletionEvent : public QEvent
     QVariant m_resultData;
 };
 
+
+class MUI_PUBLIC MythMenuItem
+{
+  public:
+    MythMenuItem(const QString &text, QVariant data = 0, bool checked = false, MythMenu *subMenu = NULL) :
+        Text(text), Data(data), Checked(checked), SubMenu(subMenu), UseSlot(false) {}
+    MythMenuItem(const QString &text, const char *slot, bool checked = false, MythMenu *subMenu = NULL) :
+        Text(text), Data(qVariantFromValue(slot)), Checked(checked), SubMenu(subMenu), UseSlot(true) {}
+
+    QString   Text;
+    QVariant  Data;
+    bool      Checked;
+    MythMenu *SubMenu;
+    bool      UseSlot;
+};
+
+class MUI_PUBLIC MythMenu
+{
+  friend class MythDialogBox;
+
+  public:
+    MythMenu(const QString &text, QObject *retobject, const QString &resultid);
+    MythMenu(const QString &title, const QString &text, QObject *retobject, const QString &resultid);
+    ~MythMenu(void);
+
+    void AddItem(const QString &title, QVariant data = 0, MythMenu *subMenu = NULL,
+                 bool selected = false, bool checked = false);
+    void AddItem(const QString &title, const char *slot, MythMenu *subMenu = NULL,
+                 bool selected = false, bool checked = false);
+
+    void SetParent(MythMenu *parent) { m_parentMenu = parent; }
+
+  private:
+    MythMenu *m_parentMenu;
+    QString   m_title;
+    QString   m_text;
+    QString   m_resultid;
+    QObject  *m_retObject;
+    QList<MythMenuItem*> m_menuItems;
+    int m_selectedItem;
+};
+
 /**
  *  \class MythDialogBox
  *
@@ -67,8 +111,14 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
     MythDialogBox(const QString &title, const QString &text,
                   MythScreenStack *parent, const char *name,
                   bool fullscreen = false, bool osd = false);
+    MythDialogBox(MythMenu* menu, MythScreenStack *parent, const char *name,
+                   bool fullscreen = false, bool osd = false);
+
+    ~MythDialogBox(void);
 
     virtual bool Create(void);
+
+    void SetMenuItems(MythMenu *menu);
 
     void SetReturnEvent(QObject *retobject, const QString &resultid);
     void SetBackAction(const QString &text, QVariant data);
@@ -92,6 +142,7 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
 
   protected:
     void SendEvent(int res, QString text = "", QVariant data = 0);
+    void updateMenu(void);
 
     MythUIText       *m_titlearea;
     MythUIText       *m_textarea;
@@ -109,7 +160,11 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
     QVariant m_backdata;
     QString  m_exittext;
     QVariant m_exitdata;
+
+    MythMenu *m_menu;
+    MythMenu *m_currentMenu;
 };
+
 
 /**
  *  \class MythConfirmationDialog
@@ -240,6 +295,7 @@ class MUI_PUBLIC MythUISearchDialog : public MythScreenType
 MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
                                              const char *slot = NULL, bool showCancel = false);
 
+Q_DECLARE_METATYPE(MythMenuItem*)
 Q_DECLARE_METATYPE(const char*)
 Q_DECLARE_METATYPE(QFileInfo)
 

@@ -701,8 +701,6 @@
             <drawfrombottom>yes</drawfrombottom>
             <showarrow>no</showarrow>
             <wrapstyle>selection</wrapstyle>
-            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
-            <triggerevent context="Global" action="SELECT">RIGHT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">
