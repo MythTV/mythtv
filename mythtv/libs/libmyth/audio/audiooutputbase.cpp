@@ -33,6 +33,10 @@
 #define QUALITY_MEDIUM      1
 #define QUALITY_HIGH        2
 
+// 1,2 and 5 channels are currently valid for upmixing if required
+#define UPMIX_CHANNEL_MASK ((1<<1)|(1<<2)|(1<<5))
+#define IS_VALID_UPMIX_CHANNEL(ch) ((1 << (ch)) & UPMIX_CHANNEL_MASK)
+
 static const char *quality_string(int q)
 {
     switch(q) {
@@ -461,13 +465,15 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         }
         else
         {
-            // if source was mono, and hardware doesn't support it
-            // we will upmix it to stereo (can safely assume hardware supports
-            // stereo)
-            if (lsource_channels == 1 &&
-                !output_settings->IsSupportedChannels(1))
+            // if source was mono or 5.0, and hardware doesn't support it
+            // we will upmix it respectively to stereo or 5.1
+            // (can safely assume hardware supports stereo)
+            // Ideally we should be able to upmix any channels configuration
+            if ((lsource_channels == 1 || lsource_channels == 5) &&
+                !output_settings->IsSupportedChannels(lsource_channels))
             {
-                configured_channels = 2;
+                    // 1 => 2, 5 => 6
+                configured_channels = lsource_channels + 1;
             }
             else
                 configured_channels = (upmix_default && lsource_channels == 2) ?
@@ -482,8 +488,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             lreenc = true;
         }
 
-        // Enough channels? Upmix if not, but only from mono/stereo to 5.1
-        if (settings.channels <= 2 && settings.channels < configured_channels)
+        // Enough channels? Upmix if not, but only from mono/stereo/5.0 to 5.1
+        if (IS_VALID_UPMIX_CHANNEL(settings.channels) && settings.channels < configured_channels)
         {
             int conf_channels = (configured_channels > 6) ?
                                                     6 : configured_channels;
@@ -738,8 +744,10 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     VolumeBase::SyncVolume();
     VolumeBase::UpdateVolume();
 
-    // Upmix Stereo to 5.1
-    if (needs_upmix && source_channels == 2 && configured_channels > 2)
+    // Upmix Stereo or 5.0 to 5.1
+    if (needs_upmix &&
+        (source_channels == 2 || source_channels == 5) &&
+        configured_channels > 2)
     {
         surround_mode = gCoreContext->GetNumSetting("AudioUpmixType", QUALITY_HIGH);
         if ((upmixer = new FreeSurround(samplerate, source == AUDIOOUTPUT_VIDEO,
