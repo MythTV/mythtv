@@ -2326,12 +2326,7 @@ void VideoDialog::VideoMenu()
     else
         label = tr("Video Options");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
-
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
-
-    m_menuPopup->SetReturnEvent(this, "actions");
+    MythMenu *menu = new MythMenu(label, this, "actions");
 
     MythUIButtonListItem *item = GetItemCurrent();
     MythGenericTree *node = GetNodePtrFromButton(item);
@@ -2340,31 +2335,39 @@ void VideoDialog::VideoMenu()
         if (!metadata->GetTrailer().isEmpty() ||
                 gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0) ||
                 m_d->m_altPlayerEnabled)
-            m_menuPopup->AddButton(tr("Play..."), SLOT(PlayMenu()), true);
+            menu->AddItem(tr("Play..."), NULL, CreatePlayMenu());
         else
-            m_menuPopup->AddButton(tr("Play"), SLOT(playVideo()));
+            menu->AddItem(tr("Play"), SLOT(playVideo()));
         if (metadata->GetWatched())
-            m_menuPopup->AddButton(tr("Mark as Unwatched"), SLOT(ToggleWatched()));
+            menu->AddItem(tr("Mark as Unwatched"), SLOT(ToggleWatched()));
         else
-            m_menuPopup->AddButton(tr("Mark as Watched"), SLOT(ToggleWatched()));
-        m_menuPopup->AddButton(tr("Video Info"), SLOT(InfoMenu()), true);
-        m_menuPopup->AddButton(tr("Change Video Details"), SLOT(ManageMenu()), true);
+            menu->AddItem(tr("Mark as Watched"), SLOT(ToggleWatched()));
+        menu->AddItem(tr("Video Info"), NULL, CreateInfoMenu());
+        menu->AddItem(tr("Change Video Details"), NULL, CreateManageMenu());
 
         if (m_d->m_type == DLG_MANAGER)
         {
-            m_menuPopup->AddButton(tr("Delete"), SLOT(RemoveVideo()));
+            menu->AddItem(tr("Delete"), SLOT(RemoveVideo()));
         }
     }
     if (node && !(node->getInt() >= 0) && node->getInt() != kUpFolder)
-        m_menuPopup->AddButton(tr("Play Folder"), SLOT(playFolder()));
+        menu->AddItem(tr("Play Folder"), SLOT(playFolder()));
+
+
+    m_menuPopup = new MythDialogBox(menu, m_popupStack, "videomenupopup");
+
+    if (m_menuPopup->Create())
+        m_popupStack->AddScreen(m_menuPopup);
+    else
+        delete m_menuPopup;
 }
 
-/** \fn VideoDialog::PlayMenu()
- *  \brief Pop up a MythUI "Play Menu" for MythVideo.  Appears if multiple play
+/** \fn VideoDialog::CreatePlayMenu()
+ *  \brief Create a "Play Menu" for MythVideo.  Appears if multiple play
  *         options exist.
- *  \return void.
+ *  \return MythMenu*.
  */
-void VideoDialog::PlayMenu()
+MythMenu* VideoDialog::CreatePlayMenu()
 {
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     QString label;
@@ -2372,35 +2375,30 @@ void VideoDialog::PlayMenu()
     if (metadata)
         label = tr("Playback Options\n%1").arg(metadata->GetTitle());
     else
-        return;
+        return NULL;
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "play");
+    MythMenu *menu = new MythMenu(label, this, "actions");
 
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
-
-    m_menuPopup->SetReturnEvent(this, "actions");
-
-    m_menuPopup->AddButton(tr("Play"), SLOT(playVideo()));
+    menu->AddItem(tr("Play"), SLOT(playVideo()));
 
     if (m_d->m_altPlayerEnabled)
     {
-        m_menuPopup->AddButton(tr("Play in Alternate Player"), SLOT(playVideoAlt()));
+        menu->AddItem(tr("Play in Alternate Player"), SLOT(playVideoAlt()));
     }
 
     if (gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
     {
-         m_menuPopup->AddButton(tr("Play With Trailers"),
-              SLOT(playVideoWithTrailers()));
+         menu->AddItem(tr("Play With Trailers"), SLOT(playVideoWithTrailers()));
     }
 
     QString trailerFile = metadata->GetTrailer();
     if (QFile::exists(trailerFile) ||
         (!metadata->GetHost().isEmpty() && !trailerFile.isEmpty()))
     {
-        m_menuPopup->AddButton(tr("Play Trailer"),
-                        SLOT(playTrailer()));
+        menu->AddItem(tr("Play Trailer"), SLOT(playTrailer()));
     }
+
+    return menu;
 }
 
 /** \fn VideoDialog::DisplayMenu()
@@ -2411,87 +2409,73 @@ void VideoDialog::DisplayMenu()
 {
     QString label = tr("Video Display Menu");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
+    MythMenu *menu = new MythMenu(label, this, "display");
+
+    menu->AddItem(tr("Scan For Changes"), SLOT(doVideoScan()));
+    menu->AddItem(tr("Retrieve All Details"), SLOT(VideoAutoSearch()));
+    menu->AddItem(tr("Filter Display"), SLOT(ChangeFilter()));
+    menu->AddItem(tr("Browse By..."), NULL, CreateMetadataBrowseMenu());
+    menu->AddItem(tr("Change View"), NULL, CreateViewMenu());
+    menu->AddItem(tr("Settings"), NULL, CreateSettingsMenu());
+
+    m_menuPopup = new MythDialogBox(menu, m_popupStack, "videomenupopup");
 
     if (m_menuPopup->Create())
         m_popupStack->AddScreen(m_menuPopup);
-
-    m_menuPopup->SetReturnEvent(this, "display");
-
-    m_menuPopup->AddButton(tr("Scan For Changes"), SLOT(doVideoScan()));
-    m_menuPopup->AddButton(tr("Retrieve All Details"), SLOT(VideoAutoSearch()));
-    m_menuPopup->AddButton(tr("Filter Display"), SLOT(ChangeFilter()));
-
-    m_menuPopup->AddButton(tr("Browse By..."), SLOT(MetadataBrowseMenu()), true);
-
-    m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()), true);
-
-    m_menuPopup->AddButton(tr("Settings"), SLOT(SettingsMenu()), true);
+    else
+        delete m_menuPopup;
 }
 
-/** \fn VideoDialog::ViewMenu()
- *  \brief Pop up a MythUI Menu for MythVideo Views.
- *  \return void.
+/** \fn VideoDialog::CreateViewMenu()
+ *  \brief Create a  MythMenu for MythVideo Views.
+ *  \return MythMenu.
  */
-void VideoDialog::ViewMenu()
+MythMenu* VideoDialog::CreateViewMenu()
 {
     QString label = tr("Change View");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
-
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
-
-    m_menuPopup->SetReturnEvent(this, "view");
+    MythMenu *menu = new MythMenu(label, this, "view");
 
     if (!(m_d->m_type & DLG_BROWSER))
-        m_menuPopup->AddButton(tr("Switch to Browse View"),
-                SLOT(SwitchBrowse()));
+        menu->AddItem(tr("Switch to Browse View"), SLOT(SwitchBrowse()));
 
     if (!(m_d->m_type & DLG_GALLERY))
-        m_menuPopup->AddButton(tr("Switch to Gallery View"),
-                SLOT(SwitchGallery()));
+        menu->AddItem(tr("Switch to Gallery View"), SLOT(SwitchGallery()));
 
     if (!(m_d->m_type & DLG_TREE))
-        m_menuPopup->AddButton(tr("Switch to List View"), SLOT(SwitchTree()));
+        menu->AddItem(tr("Switch to List View"), SLOT(SwitchTree()));
 
     if (!(m_d->m_type & DLG_MANAGER))
-        m_menuPopup->AddButton(tr("Switch to Manage View"),
-                SLOT(SwitchManager()));
+        menu->AddItem(tr("Switch to Manage View"), SLOT(SwitchManager()));
 
     if (m_d->m_isFileBrowser)
-        m_menuPopup->AddButton(tr("Disable File Browse Mode"),
-                                                    SLOT(ToggleBrowseMode()));
+        menu->AddItem(tr("Disable File Browse Mode"), SLOT(ToggleBrowseMode()));
     else
-        m_menuPopup->AddButton(tr("Enable File Browse Mode"),
-                                                    SLOT(ToggleBrowseMode()));
+        menu->AddItem(tr("Enable File Browse Mode"), SLOT(ToggleBrowseMode()));
 
     if (m_d->m_isFlatList)
-        m_menuPopup->AddButton(tr("Disable Flat View"),
-                                                    SLOT(ToggleFlatView()));
+        menu->AddItem(tr("Disable Flat View"), SLOT(ToggleFlatView()));
     else
-        m_menuPopup->AddButton(tr("Enable Flat View"),
-                                                    SLOT(ToggleFlatView()));
+        menu->AddItem(tr("Enable Flat View"), SLOT(ToggleFlatView()));
+
+    return menu;
 }
 
-/** \fn VideoDialog::SettingsMenu()
- *  \brief Pop up a MythUI Menu for MythVideo Settings.
+/** \fn VideoDialog::CreateSettingsMenu()
+ *  \brief Create a MythMenu for MythVideo Settings.
  *  \return void.
  */
-void VideoDialog::SettingsMenu()
+MythMenu* VideoDialog::CreateSettingsMenu()
 {
     QString label = tr("Video Settings");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "videosettingspopup");
+    MythMenu *menu = new MythMenu(label, this, "settings");
 
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
+    menu->AddItem(tr("Player Settings"), SLOT(ShowPlayerSettings()));
+    menu->AddItem(tr("Metadata Settings"), SLOT(ShowMetadataSettings()));
+    menu->AddItem(tr("File Type Settings"), SLOT(ShowExtensionSettings()));
 
-    m_menuPopup->SetReturnEvent(this, "view");
-
-    m_menuPopup->AddButton(tr("Player Settings"), SLOT(ShowPlayerSettings()));
-    m_menuPopup->AddButton(tr("Metadata Settings"), SLOT(ShowMetadataSettings()));
-    m_menuPopup->AddButton(tr("File Type Settings"), SLOT(ShowExtensionSettings()));
+    return menu;
 }
 
 /** \fn VideoDialog::ShowPlayerSettings()
@@ -2536,116 +2520,97 @@ void VideoDialog::ShowExtensionSettings()
         delete fa;
 }
 
-/** \fn VideoDialog::MetadataBrowseMenu()
- *  \brief Pop up a MythUI Menu for MythVideo Metadata Browse modes.
+/** \fn VideoDialog::CreateMetadataBrowseMenu()
+ *  \brief Create a MythMenu for MythVideo Metadata Browse modes.
  *  \return void.
  */
-void VideoDialog::MetadataBrowseMenu()
+MythMenu* VideoDialog::CreateMetadataBrowseMenu()
 {
     QString label = tr("Browse By");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
-
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
-
-    m_menuPopup->SetReturnEvent(this, "metadata");
+    MythMenu *menu = new MythMenu(label, this, "metadata");
 
     if (m_d->m_groupType != BRS_CAST)
-        m_menuPopup->AddButton(tr("Cast"),
-                  SLOT(SwitchVideoCastGroup()));
+        menu->AddItem(tr("Cast"), SLOT(SwitchVideoCastGroup()));
 
     if (m_d->m_groupType != BRS_CATEGORY)
-        m_menuPopup->AddButton(tr("Category"),
-                  SLOT(SwitchVideoCategoryGroup()));
+        menu->AddItem(tr("Category"), SLOT(SwitchVideoCategoryGroup()));
 
     if (m_d->m_groupType != BRS_INSERTDATE)
-        m_menuPopup->AddButton(tr("Date Added"),
-                  SLOT(SwitchVideoInsertDateGroup()));
+        menu->AddItem(tr("Date Added"), SLOT(SwitchVideoInsertDateGroup()));
 
     if (m_d->m_groupType != BRS_DIRECTOR)
-        m_menuPopup->AddButton(tr("Director"),
-                  SLOT(SwitchVideoDirectorGroup()));
+        menu->AddItem(tr("Director"), SLOT(SwitchVideoDirectorGroup()));
 
     if (m_d->m_groupType != BRS_STUDIO)
-        m_menuPopup->AddButton(tr("Studio"),
-                  SLOT(SwitchVideoStudioGroup()));
+        menu->AddItem(tr("Studio"), SLOT(SwitchVideoStudioGroup()));
 
     if (m_d->m_groupType != BRS_FOLDER)
-        m_menuPopup->AddButton(tr("Folder"),
-                 SLOT(SwitchVideoFolderGroup()));
+        menu->AddItem(tr("Folder"), SLOT(SwitchVideoFolderGroup()));
 
     if (m_d->m_groupType != BRS_GENRE)
-        m_menuPopup->AddButton(tr("Genre"),
-                  SLOT(SwitchVideoGenreGroup()));
+        menu->AddItem(tr("Genre"), SLOT(SwitchVideoGenreGroup()));
 
     if (m_d->m_groupType != BRS_TVMOVIE)
-        m_menuPopup->AddButton(tr("TV/Movies"),
-                  SLOT(SwitchVideoTVMovieGroup()));
+        menu->AddItem(tr("TV/Movies"),SLOT(SwitchVideoTVMovieGroup()));
 
     if (m_d->m_groupType != BRS_USERRATING)
-        m_menuPopup->AddButton(tr("User Rating"),
-                  SLOT(SwitchVideoUserRatingGroup()));
+        menu->AddItem(tr("User Rating"), SLOT(SwitchVideoUserRatingGroup()));
 
     if (m_d->m_groupType != BRS_YEAR)
-        m_menuPopup->AddButton(tr("Year"),
-                  SLOT(SwitchVideoYearGroup()));
+        menu->AddItem(tr("Year"), SLOT(SwitchVideoYearGroup()));
+
+    return menu;
 }
 
-/** \fn VideoDialog::InfoMenu()
- *  \brief Pop up a MythUI Menu for Info pertaining to the selected item.
- *  \return void.
+/** \fn VideoDialog::CreateInfoMenu()
+ *  \brief Create a MythMenu for Info pertaining to the selected item.
+ *  \return MythMenu*.
  */
-void VideoDialog::InfoMenu()
+MythMenu *VideoDialog::CreateInfoMenu()
 {
     QString label = tr("Video Info");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
-
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
-
-    m_menuPopup->SetReturnEvent(this, "info");
+    MythMenu *menu = new MythMenu(label, this, "info");
 
     if (ItemDetailPopup::Exists())
-        m_menuPopup->AddButton(tr("View Details"), SLOT(DoItemDetailShow()));
+        menu->AddItem(tr("View Details"), SLOT(DoItemDetailShow()));
 
-    m_menuPopup->AddButton(tr("View Full Plot"), SLOT(ViewPlot()));
+    menu->AddItem(tr("View Full Plot"), SLOT(ViewPlot()));
 
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
     {
         if (metadata->GetCast().size())
-            m_menuPopup->AddButton(tr("View Cast"), SLOT(ShowCastDialog()));
+            menu->AddItem(tr("View Cast"), SLOT(ShowCastDialog()));
         if (!metadata->GetHomepage().isEmpty())
-            m_menuPopup->AddButton(tr("View Homepage"), SLOT(ShowHomepage()));
+            menu->AddItem(tr("View Homepage"), SLOT(ShowHomepage()));
     }
+
+    return menu;
 }
 
-/** \fn VideoDialog::ManageMenu()
- *  \brief Pop up a MythUI Menu for metadata management.
- *  \return void.
+/** \fn VideoDialog::CreateManageMenu()
+ *  \brief Create a MythMenu for metadata management.
+ *  \return MythMenu*.
  */
-void VideoDialog::ManageMenu()
+MythMenu *VideoDialog::CreateManageMenu()
 {
     QString label = tr("Manage Video Details");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
-
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
+    MythMenu *menu = new MythMenu(label, this, "manage");
 
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
-    m_menuPopup->SetReturnEvent(this, "manage");
-
-    m_menuPopup->AddButton(tr("Edit Details"), SLOT(EditMetadata()));
-    m_menuPopup->AddButton(tr("Retrieve Details"), SLOT(VideoSearch()));
+    menu->AddItem(tr("Edit Details"), SLOT(EditMetadata()));
+    menu->AddItem(tr("Retrieve Details"), SLOT(VideoSearch()));
     if (metadata->GetProcessed())
-        m_menuPopup->AddButton(tr("Allow Updates"), SLOT(ToggleProcess()));
+        menu->AddItem(tr("Allow Updates"), SLOT(ToggleProcess()));
     else
-        m_menuPopup->AddButton(tr("Disable Updates"), SLOT(ToggleProcess()));
-    m_menuPopup->AddButton(tr("Reset Details"), SLOT(ResetMetadata()));
+        menu->AddItem(tr("Disable Updates"), SLOT(ToggleProcess()));
+    menu->AddItem(tr("Reset Details"), SLOT(ResetMetadata()));
+
+    return menu;
 }
 
 void VideoDialog::ToggleProcess()

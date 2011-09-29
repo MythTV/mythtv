@@ -22,6 +22,7 @@ class MetadataLookup;
 class MetadataFactory;
 class VideoMetadata;
 class VideoScanner;
+class MythMenu;
 
 class QUrl;
 
@@ -102,13 +103,13 @@ class VideoDialog : public MythScreenType
     void OnRemoveVideo(bool);
 
     void VideoMenu();
-    void InfoMenu();
-    void ManageMenu();
-    void PlayMenu();
+    MythMenu* CreateInfoMenu();
+    MythMenu* CreateManageMenu();
+    MythMenu* CreatePlayMenu();
     void DisplayMenu();
-    void ViewMenu();
-    void SettingsMenu();
-    void MetadataBrowseMenu();
+    MythMenu* CreateViewMenu();
+    MythMenu* CreateSettingsMenu();
+    MythMenu* CreateMetadataBrowseMenu();
 
     void ChangeFilter();
 
