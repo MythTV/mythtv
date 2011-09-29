@@ -810,16 +810,13 @@ void IconView::customEvent(QEvent *event)
                     HandleRandomShow();
                     break;
                 case 2:
-                    HandleSubMenuMetadata();
                     break;
                 case 3:
-                    HandleSubMenuMark();
                     break;
                 case 4:
                     HandleSubMenuFilter();
                     break;
                 case 5:
-                    HandleSubMenuFile();
                     break;
                 case 6:
                     HandleSettings();
@@ -902,24 +899,15 @@ void IconView::HandleMainMenu(void)
 {
     QString label = tr("Gallery Options");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
+    MythMenu *menu = new MythMenu(label, this, "mainmenu");
 
-    if (!m_menuPopup->Create())
-    {
-        delete m_menuPopup;
-        m_menuPopup = NULL;
-        return;
-    }
-
-    m_menuPopup->SetReturnEvent(this, "mainmenu");
-
-    m_menuPopup->AddButton(tr("SlideShow"));
-    m_menuPopup->AddButton(tr("Random"));
-    m_menuPopup->AddButton(tr("Meta Data Menu"));
-    m_menuPopup->AddButton(tr("Marking Menu"));
-    m_menuPopup->AddButton(tr("Filter / Sort Menu"));
-    m_menuPopup->AddButton(tr("File Menu"));
-    m_menuPopup->AddButton(tr("Settings"));
+    menu->AddItem(tr("SlideShow"));
+    menu->AddItem(tr("Random"));
+    menu->AddItem(tr("Meta Data Options"), NULL, CreateMetadataMenu());
+    menu->AddItem(tr("Marking Options"), NULL, CreateMarkingMenu());
+    menu->AddItem(tr("Filter / Sort..."));
+    menu->AddItem(tr("File Options"), NULL, CreateFileMenu());
+    menu->AddItem(tr("Settings..."));
 //     if (m_showDevices)
 //     {
 //         QDir d(m_currDir);
@@ -930,40 +918,42 @@ void IconView::HandleMainMenu(void)
 //         m_showDevices = false;
 //     }
 
+    m_menuPopup = new MythDialogBox(menu, m_popupStack, "mythgallerymenupopup");
+
+    if (!m_menuPopup->Create())
+    {
+        delete m_menuPopup;
+        m_menuPopup = NULL;
+        return;
+    }
+
     m_popupStack->AddScreen(m_menuPopup);
 }
 
-void IconView::HandleSubMenuMetadata(void)
+MythMenu* IconView::CreateMetadataMenu(void)
 {
     QString label = tr("Metadata Options");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
+    MythMenu *menu = new MythMenu(label, this, "metadatamenu");
 
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
+    menu->AddItem(tr("Rotate CW"));
+    menu->AddItem(tr("Rotate CCW"));
 
-    m_menuPopup->SetReturnEvent(this, "metadatamenu");
-
-    m_menuPopup->AddButton(tr("Rotate CW"));
-    m_menuPopup->AddButton(tr("Rotate CCW"));
+    return menu;
 }
 
-void IconView::HandleSubMenuMark(void)
+MythMenu* IconView::CreateMarkingMenu(void)
 {
     QString label = tr("Marking Options");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack,
-                                    "mythgallerymenupopup");
+    MythMenu *menu = new MythMenu(label, this, "markingmenu");
 
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
+    menu->AddItem(tr("Select One"));
+    menu->AddItem(tr("Clear One Marked"));
+    menu->AddItem(tr("Select All"));
+    menu->AddItem(tr("Clear Marked"));
 
-    m_menuPopup->SetReturnEvent(this, "markingmenu");
-
-    m_menuPopup->AddButton(tr("Select One"));
-    m_menuPopup->AddButton(tr("Clear One Marked"));
-    m_menuPopup->AddButton(tr("Select All"));
-    m_menuPopup->AddButton(tr("Clear Marked"));
+    return menu;
 }
 
 void IconView::HandleSubMenuFilter(void)
@@ -979,26 +969,22 @@ void IconView::HandleSubMenuFilter(void)
     connect(filterdialog, SIGNAL(filterChanged()), SLOT(reloadData()));
 }
 
-void IconView::HandleSubMenuFile(void)
+MythMenu* IconView::CreateFileMenu(void)
 {
     QString label = tr("File Options");
 
-    m_menuPopup = new MythDialogBox(label, m_popupStack,
-                                    "mythgallerymenupopup");
+    MythMenu *menu = new MythMenu(label, this, "filemenu");
 
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
+    menu->AddItem(tr("Show Devices"));
+    menu->AddItem(tr("Eject"));
+    menu->AddItem(tr("Import"));
+    menu->AddItem(tr("Copy here"));
+    menu->AddItem(tr("Move here"));
+    menu->AddItem(tr("Delete"));
+    menu->AddItem(tr("Create Dir"));
+    menu->AddItem(tr("Rename"));
 
-    m_menuPopup->SetReturnEvent(this, "filemenu");
-
-    m_menuPopup->AddButton(tr("Show Devices"));
-    m_menuPopup->AddButton(tr("Eject"));
-    m_menuPopup->AddButton(tr("Import"));
-    m_menuPopup->AddButton(tr("Copy here"));
-    m_menuPopup->AddButton(tr("Move here"));
-    m_menuPopup->AddButton(tr("Delete"));
-    m_menuPopup->AddButton(tr("Create Dir"));
-    m_menuPopup->AddButton(tr("Rename"));
+    return menu;
 }
 
 void IconView::HandleRotateCW(void)
