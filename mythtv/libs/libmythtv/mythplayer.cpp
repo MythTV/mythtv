@@ -824,9 +824,17 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
     if (fps > 0.0f && fps < 121.0f)
     {
         video_frame_rate = fps;
-        float temp_speed = (play_speed == 0.0f) ?
-            audio.GetStretchFactor() : play_speed;
-        frame_interval = (int)(1000000.0f / video_frame_rate / temp_speed);
+        if (ffrew_skip != 0 && ffrew_skip != 1)
+        {
+            UpdateFFRewSkip();
+            videosync->setFrameInterval(frame_interval);
+        }
+        else
+        {
+            float temp_speed = (play_speed == 0.0f) ?
+                audio.GetStretchFactor() : play_speed;
+            frame_interval = (int)(1000000.0f / video_frame_rate / temp_speed);
+        }
     }
 
     if (videoOutput)
@@ -3135,15 +3143,12 @@ uint64_t MythPlayer::GetBookmark(void)
     return bookmark;
 }
 
-void MythPlayer::ChangeSpeed(void)
+bool MythPlayer::UpdateFFRewSkip(void)
 {
-    float last_speed = play_speed;
-    play_speed   = next_play_speed;
-    normal_speed = next_normal_speed;
-
-    float temp_speed = (play_speed == 0.0) ? audio.GetStretchFactor() : play_speed;
-
     bool skip_changed;
+
+    float temp_speed = (play_speed == 0.0) ?
+        audio.GetStretchFactor() : play_speed;
     if (play_speed >= 0.0f && play_speed <= 3.0f)
     {
         skip_changed = (ffrew_skip != 1);
@@ -3170,6 +3175,17 @@ void MythPlayer::ChangeSpeed(void)
         ffrew_skip = play_speed < 0.0f ? -ffrew_skip : ffrew_skip;
         ffrew_adjust = 0;
     }
+
+    return skip_changed;
+}
+
+void MythPlayer::ChangeSpeed(void)
+{
+    float last_speed = play_speed;
+    play_speed   = next_play_speed;
+    normal_speed = next_normal_speed;
+
+    bool skip_changed = UpdateFFRewSkip();
     videosync->setFrameInterval(frame_interval);
 
     if (skip_changed && videoOutput)

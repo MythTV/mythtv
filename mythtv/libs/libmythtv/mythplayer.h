@@ -479,6 +479,10 @@ class MPUBLIC MythPlayer
     bool         DecoderGetFrame(DecodeType, bool unsafe = false);
 
     // These actually execute commands requested by public members
+  private:
+    // Make this private in 0.24-fixes so as to not change the ABI.
+    bool UpdateFFRewSkip(void);
+  protected:
     virtual void ChangeSpeed(void);
     bool DoFastForward(uint64_t frames, bool override_seeks = false,
                        bool seeks_wanted = false);
