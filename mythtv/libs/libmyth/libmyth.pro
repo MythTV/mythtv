@@ -191,13 +191,13 @@ macx {
 INSTALLS += inc inc2
 
 using_alsa {
-    DEFINES += USE_ALSA
+    DEFINES += USING_ALSA
     HEADERS += audio/audiooutputalsa.h
     SOURCES += audio/audiooutputalsa.cpp
 }
 
 using_jack {
-    DEFINES += USE_JACK
+    DEFINES += USING_JACK
     HEADERS += audio/audiooutputjack.h
     SOURCES += audio/audiooutputjack.cpp
 }
