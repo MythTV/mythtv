@@ -12,7 +12,7 @@ using namespace std;
 VolumeBase::VolumeBase() :
     volume(80), current_mute_state(kMuteOff)
 {
-    internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
+    internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 1);
     swvol = swvol_setting =
         (gCoreContext->GetSetting("MixerDevice", "default").toLower() == "software");
 }
