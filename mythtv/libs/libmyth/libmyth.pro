@@ -196,13 +196,13 @@ freebsd {
 INSTALLS += inc inc2
 
 using_alsa {
-    DEFINES += USE_ALSA
+    DEFINES += USING_ALSA
     HEADERS += audiooutputalsa.h
     SOURCES += audiooutputalsa.cpp
 }
 
 using_jack {
-    DEFINES += USE_JACK
+    DEFINES += USING_JACK
     HEADERS += audiooutputjack.h
     SOURCES += audiooutputjack.cpp
 }
