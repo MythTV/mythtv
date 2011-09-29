@@ -188,6 +188,7 @@ class MTV_PUBLIC MythPlayer
     bool    IsPIPActive(void) const           { return pip_active; }
     bool    IsPIPVisible(void) const          { return pip_visible; }
     bool    IsMuted(void)                     { return audio.IsMuted(); }
+    bool    PlayerControlsVolume(void) const  { return audio.ControlsVolume(); }
     bool    UsingNullVideo(void) const { return using_null_videoout; }
     bool    HasTVChainNext(void) const;
     bool    CanSupportDoubleRate(void);
