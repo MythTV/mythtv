@@ -7776,7 +7776,7 @@ void TV::ChangeVolume(PlayerContext *ctx, bool up)
         return;
     }
 
-    if (ctx->player->IsMuted())
+    if (ctx->player->IsMuted() && up)
         ToggleMute(ctx);
 
     uint curvol = ctx->player->AdjustVolume((up) ? +2 : -2);
