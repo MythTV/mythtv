@@ -368,7 +368,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 #endif
 #ifdef USING_JACK
     {
-        QString name = "JACK:output";
+        QString name = "JACK:";
         QString desc = "Use JACK default sound server.";
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)
