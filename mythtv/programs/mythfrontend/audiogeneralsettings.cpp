@@ -583,7 +583,7 @@ void AudioTestThread::run()
     RunProlog();
     m_interrupted = false;
     int smptelayout[7][8] = { 
-        { 0, 1 },                       //stereo
+        { 0, 0 , 1 },                   //stereo
         { },                            //not used
         { },                            //not used
         { },                            //not used
