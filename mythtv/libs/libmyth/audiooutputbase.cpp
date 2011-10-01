@@ -371,8 +371,8 @@ float AudioOutputBase::GetStretchFactor(void) const
  */
 bool AudioOutputBase::ToggleUpmix(void)
 {
-    // Can only upmix from stereo to 6 ch
-    if (max_channels == 2 || source_channels != 2 || passthru)
+    // Can only upmix from mono/stereo to 6 ch
+    if (max_channels == 2 || source_channels > 2 || passthru)
         return false;
 
     upmix_default = !upmix_default;
@@ -390,11 +390,17 @@ bool AudioOutputBase::ToggleUpmix(void)
 bool AudioOutputBase::SetupPassthrough(int codec, int codec_profile,
                                        int &samplerate_tmp, int &channels_tmp)
 {
+    if (codec == CODEC_ID_DTS &&
+        !output_settingsdigital->canFeature(FEATURE_DTSHD))
+    {
+        // We do not support DTS-HD bitstream so force extraction of the
+        // DTS core track instead
+        codec_profile = FF_PROFILE_DTS;
+    }
     QString log = AudioOutputSettings::GetPassthroughParams(
         codec, codec_profile,
         samplerate_tmp, channels_tmp,
         output_settingsdigital->GetMaxHDRate() == 768000);
-
     VBAUDIO("Setting " + log + " passthrough");
 
     if (m_spdifenc)
@@ -413,12 +419,8 @@ bool AudioOutputBase::SetupPassthrough(int codec, int codec_profile,
                 m_spdifenc->SetMaxHDRate(0);
                 break;
             case FF_PROFILE_DTS_HD_HRA:
-                m_spdifenc->SetMaxHDRate(
-                    OutputSettings(true)->canFeature(FEATURE_DTSHD) ?
-                    192000 : 0);
-                break;
             case FF_PROFILE_DTS_HD_MA:
-                m_spdifenc->SetMaxHDRate(OutputSettings(true)->GetMaxHDRate());
+                m_spdifenc->SetMaxHDRate(samplerate_tmp * channels_tmp / 2);
                 break;
         }
     }
@@ -446,11 +448,12 @@ AudioOutputSettings *AudioOutputBase::OutputSettings(bool digital)
  */
 void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 {
-    AudioSettings settings  = orig_settings;
-    int  lsource_channels   = settings.channels;
-    bool lneeds_upmix       = false;
-    bool lneeds_downmix     = false;
-    bool lreenc             = false;
+    AudioSettings settings    = orig_settings;
+    int  lsource_channels     = settings.channels;
+    int  lconfigured_channels = configured_channels;
+    bool lneeds_upmix         = false;
+    bool lneeds_downmix       = false;
+    bool lreenc               = false;
 
     if (!settings.use_passthru)
     {
@@ -458,27 +461,46 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (lsource_channels > configured_channels)
         {
             if (lsource_channels <= 6)
-                configured_channels = min(max_channels, 6);
+                lconfigured_channels = min(max_channels, 6);
             else if (lsource_channels > 6)
-                 configured_channels = max_channels;
+                 lconfigured_channels = max_channels;
         }
         else
         {
-            // if source was mono or 5.0, and hardware doesn't support it
-            // we will upmix it respectively to stereo or 5.1
-            // (can safely assume hardware supports stereo)
-            // Ideally we should be able to upmix any channels configuration
-            if ((lsource_channels == 1 || lsource_channels == 5) &&
-                !output_settings->IsSupportedChannels(lsource_channels))
+            if (!output_settings->IsSupportedChannels(lsource_channels))
             {
-                    // 1 => 2, 5 => 6
-                configured_channels = lsource_channels + 1;
+                // if hardware doesn't support source audio configuration
+                // we will upmix/downmix to what we can
+                // (can safely assume hardware supports stereo)
+                switch (lsource_channels)
+                {
+                    case 1:
+                        lconfigured_channels = upmix_default ? 6 : 2;
+                        break;
+                    case 2:
+                        //Will never happen
+                    case 3:
+                    case 4:
+                    case 6:
+                        lconfigured_channels = 2;
+                        break;
+                    case 5:
+                    case 7:
+                        if (output_settings->IsSupportedChannels(6))
+                            lconfigured_channels = 6;
+                        else
+                            lconfigured_channels = 2;
+                        break;
+                    default:
+                        lconfigured_channels = max_channels;
+                        break;
+                }
             }
             else
-                configured_channels = (upmix_default && lsource_channels == 2) ?
+                lconfigured_channels =
+                    (upmix_default && lsource_channels <= 2) ?
                     max_channels : lsource_channels;
         }
-
         /* Might we reencode a bitstream that's been decoded for timestretch?
            If the device doesn't support the number of channels - see below */
         if (output_settingsdigital->canFeature(FEATURE_AC3) &&
@@ -488,20 +510,21 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         }
 
         // Enough channels? Upmix if not, but only from mono/stereo/5.0 to 5.1
-        if (IS_VALID_UPMIX_CHANNEL(settings.channels) && settings.channels < configured_channels)
+        if (IS_VALID_UPMIX_CHANNEL(settings.channels) &&
+            settings.channels < lconfigured_channels)
         {
-            int conf_channels = (configured_channels > 6) ?
-                                                    6 : configured_channels;
+            lconfigured_channels =
+                (lconfigured_channels > 6) ? 6 : lconfigured_channels;
             VBAUDIO(QString("Needs upmix from %1 -> %2 channels")
-                    .arg(settings.channels).arg(conf_channels));
-            settings.channels = conf_channels;
+                    .arg(settings.channels).arg(lconfigured_channels));
+            settings.channels = lconfigured_channels;
             lneeds_upmix = true;
         }
-        else if (settings.channels > max_channels)
+        else if (settings.channels > lconfigured_channels)
         {
             VBAUDIO(QString("Needs downmix from %1 -> %2 channels")
-                    .arg(settings.channels).arg(max_channels));
-            settings.channels = max_channels;
+                    .arg(settings.channels).arg(lconfigured_channels));
+            settings.channels = lconfigured_channels;
             lneeds_downmix = true;
         }
     }
@@ -515,13 +538,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     int samplerate_tmp, channels_tmp;
     if (settings.use_passthru)
     {
-        if (settings.codec == CODEC_ID_DTS &&
-            !output_settingsdigital->canFeature(FEATURE_DTSHD))
-        {
-            // We do not support DTS-HD bitstream so force extraction of the
-            // DTS core track instead
-            settings.codec_profile = FF_PROFILE_DTS;
-        }
         samplerate_tmp = settings.samplerate;
         SetupPassthrough(settings.codec, settings.codec_profile,
                          samplerate_tmp, channels_tmp);
@@ -533,6 +549,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         settings.format == format &&
         settings.samplerate  == source_samplerate &&
         settings.use_passthru == passthru &&
+        lconfigured_channels == configured_channels &&
         lneeds_upmix == needs_upmix && lreenc == reenc &&
         lsource_channels == source_channels &&
         lneeds_downmix == needs_downmix;
@@ -557,6 +574,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     reenc                  = lreenc;
     codec                  = settings.codec;
     passthru               = settings.use_passthru;
+    configured_channels    = lconfigured_channels;
     needs_upmix            = lneeds_upmix;
     needs_downmix          = lneeds_downmix;
     format                 = output_format   = settings.format;
@@ -591,13 +609,15 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             !output_settings->IsSupportedChannels(channels)));
 
     VBAUDIO(QString("enc(%1), passthru(%2), features (%3) "
-                    "configured_channels(%4), %5 channels supported(%6)")
+                    "configured_channels(%4), %5 channels supported(%6) "
+                    "max_channels(%7)")
             .arg(enc)
             .arg(passthru)
             .arg(output_settingsdigital->FeaturesToString())
             .arg(configured_channels)
             .arg(channels)
-            .arg(output_settings->IsSupportedChannels(channels)));
+            .arg(output_settings->IsSupportedChannels(channels))
+            .arg(max_channels));
 
     int dest_rate = 0;
 
@@ -628,7 +648,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
                 .arg(settings.samplerate/1000).arg(samplerate/1000)
                 .arg(quality_string(src_quality)));
 
-        int chans = needs_downmix ? channels : source_channels;
+        int chans = needs_downmix ? configured_channels : source_channels;
 
         src_ctx = src_new(2-src_quality, chans, &error);
         if (error)
@@ -746,13 +766,12 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         volume = gCoreContext->GetNumSetting(volumeControl, 80);
     }
 
-    VolumeBase::SetChannels(channels);
+    VolumeBase::SetChannels(configured_channels);
     VolumeBase::SyncVolume();
     VolumeBase::UpdateVolume();
 
-    // Upmix Stereo or 5.0 to 5.1
-    if (needs_upmix &&
-        (source_channels == 2 || source_channels == 5) &&
+    // Upmix Mono, Stereo or 5.0 to 5.1
+    if (needs_upmix && IS_VALID_UPMIX_CHANNEL(source_channels) &&
         configured_channels > 2)
     {
         surround_mode = gCoreContext->GetNumSetting("AudioUpmixType", QUALITY_HIGH);
@@ -1160,7 +1179,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
     }
 
     // Convert mono to stereo as most devices can't accept mono
-    if (channels == 2 && source_channels == 1)
+    if (configured_channels == 2 && source_channels == 1)
     {
         int bdFrames = bdiff / bpf;
         if (bdFrames <= frames)
@@ -1312,7 +1331,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
         // Account for changes in number of channels
         if (needs_upmix || needs_downmix)
-            len = (len / source_channels) * channels;
+            len = (len / source_channels) * configured_channels;
 
         // Check we have enough space to write the data
         if (need_resampler && src_ctx)
@@ -1361,7 +1380,8 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
         // Perform downmix if necessary
         if (needs_downmix)
-            if(AudioOutputDownmix::DownmixFrames(source_channels, channels,
+            if(AudioOutputDownmix::DownmixFrames(source_channels,
+                                                 configured_channels,
                                                  src_in, src_in, frames) < 0)
                 VBERROR("Error occurred while downmixing");
 
@@ -1679,10 +1699,11 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
 
     // Mute individual channels through mono->stereo duplication
     MuteState mute_state = GetMuteState();
-    if (written_size && channels > 1 &&
+    if (!enc && !passthru &&
+        written_size && configured_channels > 1 &&
         (mute_state == kMuteLeft || mute_state == kMuteRight))
     {
-        AudioOutputUtil::MuteChannel(obytes << 3, channels,
+        AudioOutputUtil::MuteChannel(obytes << 3, configured_channels,
                                      mute_state == kMuteLeft ? 0 : 1,
                                      buffer, written_size);
     }
