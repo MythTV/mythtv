@@ -266,6 +266,7 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
                 case FF_PROFILE_DTS_HD_HRA:
                 case FF_PROFILE_DTS_HD_MA:
                     arg = FEATURE_DTSHD;
+                    break;
                 default:
                     break;
             }
@@ -514,6 +515,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     int samplerate_tmp, channels_tmp;
     if (settings.use_passthru)
     {
+        if (settings.codec == CODEC_ID_DTS &&
+            !output_settingsdigital->canFeature(FEATURE_DTSHD))
+        {
+            // We do not support DTS-HD bitstream so force extraction of the
+            // DTS core track instead
+            settings.codec_profile = FF_PROFILE_DTS;
+        }
         samplerate_tmp = settings.samplerate;
         SetupPassthrough(settings.codec, settings.codec_profile,
                          samplerate_tmp, channels_tmp);
