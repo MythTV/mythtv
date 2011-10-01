@@ -3838,12 +3838,13 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
 
         vector<int> flang = filter_lang(atracks, canonical_key);
 
-        selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
-                                 FF_PROFILE_DTS_HD_MA);
+        if (m_audio->CanDTSHD())
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                     FF_PROFILE_DTS_HD_MA);
         if (selTrack < 0)
             selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
 
-        if (selTrack < 0)
+        if (selTrack < 0 && m_audio->CanDTSHD())
             selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
                                      FF_PROFILE_DTS_HD_HRA);
         if (selTrack < 0)
@@ -3867,13 +3868,14 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             {
                 vector<int> flang = filter_lang(atracks, *it);
 
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
-                                         FF_PROFILE_DTS_HD_MA);
+                if (m_audio->CanDTSHD())
+                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                             FF_PROFILE_DTS_HD_MA);
                 if (selTrack < 0)
                     selTrack = filter_max_ch(ic, atracks, flang,
                                              CODEC_ID_TRUEHD);
 
-                if (selTrack < 0)
+                if (selTrack < 0 && m_audio->CanDTSHD())
                     selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
                                              FF_PROFILE_DTS_HD_HRA);
 
@@ -3897,12 +3899,13 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             VERBOSE(VB_AUDIO, LOC + "Trying to select audio track (wo/lang)");
             vector<int> flang = filter_lang(atracks, -1);
 
-            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
-                                     FF_PROFILE_DTS_HD_MA);
+            if (m_audio->CanDTSHD())
+                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                         FF_PROFILE_DTS_HD_MA);
             if (selTrack < 0)
                 selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
 
-            if (selTrack < 0)
+            if (selTrack < 0 && m_audio->CanDTSHD())
                 selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
                                          FF_PROFILE_DTS_HD_HRA);
 
