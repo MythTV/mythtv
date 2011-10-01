@@ -3646,7 +3646,7 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
             if (codecId == CODEC_ID_DTS && profile > 0)
             {
                 // we cannot decode dts-hd, so only select it if passthrough
-                if (!DoPassThrough(ctx) || ctx->profile != profile)
+                if (!DoPassThrough(ctx, true) || ctx->profile != profile)
                     continue;
             }
             selectedTrack = *it;
@@ -3722,7 +3722,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         AVCodecContext *codec_ctx = ic->streams[idx]->codec;
         AudioInfo item(codec_ctx->codec_id, codec_ctx->bps,
                        codec_ctx->sample_rate, codec_ctx->channels,
-                       DoPassThrough(codec_ctx));
+                       DoPassThrough(codec_ctx, true));
         LOG(VB_AUDIO, LOG_DEBUG, LOC + " * " + item.toString());
     }
 #endif
@@ -3981,7 +3981,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
             QMutexLocker locker(avcodeclock);
 
-            if (DoPassThrough(ctx) || !DecoderWillDownmix(ctx))
+            if (DoPassThrough(ctx, false) || !DecoderWillDownmix(ctx))
             {
                 // for passthru or codecs for which the decoder won't downmix
                 // let the decoder set the number of channels. For other codecs
@@ -4557,12 +4557,19 @@ inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
     }
 }
 
-bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
+bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx, bool withProfile)
 {
     bool passthru;
 
-    passthru = m_audio->CanPassthrough(ctx->sample_rate, ctx->channels,
-                                       ctx->codec_id, ctx->profile);
+    // if withProfile == false, we will accept any DTS stream regardless
+    // of its profile. We do so, so we can bitstream DTS-HD as DTS core
+    if (!withProfile && ctx->codec_id == CODEC_ID_DTS && !m_audio->CanDTSHD())
+        passthru = m_audio->CanPassthrough(ctx->sample_rate, ctx->channels,
+                                           ctx->codec_id, FF_PROFILE_DTS);
+    else
+        passthru = m_audio->CanPassthrough(ctx->sample_rate, ctx->channels,
+                                           ctx->codec_id, ctx->profile);
+
     passthru &= !disable_passthru;
 
     return passthru;
@@ -4624,7 +4631,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
             return false;
         }
 
-        using_passthru = DoPassThrough(ctx);
+        using_passthru = DoPassThrough(ctx, false);
 
         ctx->request_channels = ctx->channels;
 
