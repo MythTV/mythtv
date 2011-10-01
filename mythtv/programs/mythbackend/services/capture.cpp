@@ -37,12 +37,165 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Capture::RemoveCaptureCard( int nId )
+DTC::CaptureCardList* Capture::GetCaptureCardList( const QString &sHostName,
+                                                   const QString &sCardType )
 {
-    if ( nId < 1 )
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to list "
+                       "Capture Cards."));
+
+    QString str = "SELECT cardid, videodevice, audiodevice, vbidevice, "
+                  "cardtype, defaultinput, audioratelimit, hostname, "
+                  "dvb_swfilter, dvb_sat_type, dvb_wait_for_seqstart, "
+                  "skipbtaudio, dvb_on_demand, dvb_diseqc_type, "
+                  "firewire_speed, firewire_model, firewire_connection, "
+                  "signal_timeout, channel_timeout, dvb_tuning_delay, "
+                  "contrast, brightness, colour, hue, diseqcid, dvb_eitscan "
+                  "from capturecard";
+
+    if (!sHostName.isEmpty())
+        str += " WHERE hostname = :HOSTNAME";
+    else if (!sCardType.isEmpty())
+        str += " WHERE cardtype = :CARDTYPE";
+
+    if (!sHostName.isEmpty() && !sCardType.isEmpty())
+        str += " AND cardtype = :CARDTYPE";
+
+    query.prepare(str);
+
+    if (!sHostName.isEmpty())
+        query.bindValue(":HOSTNAME", sHostName);
+    if (!sCardType.isEmpty())
+        query.bindValue(":CARDTYPE", sCardType);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetCaptureCardList()", query);
+        throw( QString( "Database Error executing query." ));
+    }
+
+    // ----------------------------------------------------------------------
+    // return the results of the query
+    // ----------------------------------------------------------------------
+
+    DTC::CaptureCardList* pList = new DTC::CaptureCardList();
+
+    while (query.next())
+    {
+
+        DTC::CaptureCard *pCaptureCard = pList->AddNewCaptureCard();
+
+        pCaptureCard->setCardId            ( query.value(0).toInt()       );
+        pCaptureCard->setVideoDevice       ( query.value(1).toString()    );
+        pCaptureCard->setAudioDevice       ( query.value(2).toString()    );
+        pCaptureCard->setVBIDevice         ( query.value(3).toString()    );
+        pCaptureCard->setCardType          ( query.value(4).toString()    );
+        pCaptureCard->setDefaultInput      ( query.value(5).toString()    );
+        pCaptureCard->setAudioRateLimit    ( query.value(6).toUInt()      );
+        pCaptureCard->setHostName          ( query.value(7).toString()    );
+        pCaptureCard->setDVBSWFilter       ( query.value(8).toUInt()      );
+        pCaptureCard->setDVBSatType        ( query.value(9).toUInt()      );
+        pCaptureCard->setDVBWaitForSeqStart( query.value(10).toBool()     );
+        pCaptureCard->setSkipBTAudio       ( query.value(11).toBool()     );
+        pCaptureCard->setDVBOnDemand       ( query.value(12).toBool()     );
+        pCaptureCard->setDVBDiSEqCType     ( query.value(13).toUInt()     );
+        pCaptureCard->setFirewireSpeed     ( query.value(14).toUInt()     );
+        pCaptureCard->setFirewireModel     ( query.value(15).toString()   );
+        pCaptureCard->setFirewireConnection( query.value(16).toUInt()     );
+        pCaptureCard->setSignalTimeout     ( query.value(17).toUInt()     );
+        pCaptureCard->setChannelTimeout    ( query.value(18).toUInt()     );
+        pCaptureCard->setDVBTuningDelay    ( query.value(19).toUInt()     );
+        pCaptureCard->setContrast          ( query.value(20).toUInt()     );
+        pCaptureCard->setBrightness        ( query.value(21).toUInt()     );
+        pCaptureCard->setColour            ( query.value(22).toUInt()     );
+        pCaptureCard->setHue               ( query.value(23).toUInt()     );
+        pCaptureCard->setDiSEqCId          ( query.value(24).toUInt()     );
+        pCaptureCard->setDVBEITScan        ( query.value(25).toBool()     );
+    }
+
+    return pList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::CaptureCard* Capture::GetCaptureCard( int nCardId )
+{
+    if ( nCardId < 1 )
         throw( QString( "The Card ID is invalid."));
 
-    bool bResult = CardUtil::DeleteCard(nId);
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to list "
+                       "Capture Cards."));
+
+    QString str = "SELECT cardid, videodevice, audiodevice, vbidevice, "
+                  "cardtype, defaultinput, audioratelimit, hostname, "
+                  "dvb_swfilter, dvb_sat_type, dvb_wait_for_seqstart, "
+                  "skipbtaudio, dvb_on_demand, dvb_diseqc_type, "
+                  "firewire_speed, firewire_model, firewire_connection, "
+                  "signal_timeout, channel_timeout, dvb_tuning_delay, "
+                  "contrast, brightness, colour, hue, diseqcid, dvb_eitscan "
+                  "from capturecard WHERE cardid = :CARDID";
+
+    query.prepare(str);
+    query.bindValue(":CARDID", nCardId);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetCaptureCard()", query);
+        throw( QString( "Database Error executing query." ));
+    }
+
+    DTC::CaptureCard* pCaptureCard = new DTC::CaptureCard();
+
+    if (query.next())
+    {
+        pCaptureCard->setCardId            ( query.value(0).toInt()       );
+        pCaptureCard->setVideoDevice       ( query.value(1).toString()    );
+        pCaptureCard->setAudioDevice       ( query.value(2).toString()    );
+        pCaptureCard->setVBIDevice         ( query.value(3).toString()    );
+        pCaptureCard->setCardType          ( query.value(4).toString()    );
+        pCaptureCard->setDefaultInput      ( query.value(5).toString()    );
+        pCaptureCard->setAudioRateLimit    ( query.value(6).toUInt()      );
+        pCaptureCard->setHostName          ( query.value(7).toString()    );
+        pCaptureCard->setDVBSWFilter       ( query.value(8).toUInt()      );
+        pCaptureCard->setDVBSatType        ( query.value(9).toUInt()      );
+        pCaptureCard->setDVBWaitForSeqStart( query.value(10).toBool()     );
+        pCaptureCard->setSkipBTAudio       ( query.value(11).toBool()     );
+        pCaptureCard->setDVBOnDemand       ( query.value(12).toBool()     );
+        pCaptureCard->setDVBDiSEqCType     ( query.value(13).toUInt()     );
+        pCaptureCard->setFirewireSpeed     ( query.value(14).toUInt()     );
+        pCaptureCard->setFirewireModel     ( query.value(15).toString()   );
+        pCaptureCard->setFirewireConnection( query.value(16).toUInt()     );
+        pCaptureCard->setSignalTimeout     ( query.value(17).toUInt()     );
+        pCaptureCard->setChannelTimeout    ( query.value(18).toUInt()     );
+        pCaptureCard->setDVBTuningDelay    ( query.value(19).toUInt()     );
+        pCaptureCard->setContrast          ( query.value(20).toUInt()     );
+        pCaptureCard->setBrightness        ( query.value(21).toUInt()     );
+        pCaptureCard->setColour            ( query.value(22).toUInt()     );
+        pCaptureCard->setHue               ( query.value(23).toUInt()     );
+        pCaptureCard->setDiSEqCId          ( query.value(24).toUInt()     );
+        pCaptureCard->setDVBEITScan        ( query.value(25).toBool()     );
+    }
+
+    return pCaptureCard;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Capture::RemoveCaptureCard( int nCardId )
+{
+    if ( nCardId < 1 )
+        throw( QString( "The Card ID is invalid."));
+
+    bool bResult = CardUtil::DeleteCard(nCardId);
 
     return bResult;
 }
@@ -96,24 +249,24 @@ int Capture::AddCaptureCard     ( const QString    &sVideoDevice,
     return nResult;
 }
 
-bool Capture::UpdateCaptureCard  ( int              nId,
+bool Capture::UpdateCaptureCard  ( int              nCardId,
                                    const QString    &sSetting,
                                    const QString    &sValue )
 {
-    if ( nId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
+    if ( nCardId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
         throw( QString( "Card ID, Setting Name, and Value are required." ));
 
-    return set_on_source(sSetting, nId, 0, sValue);
+    return set_on_source(sSetting, nCardId, 0, sValue);
 }
 
 // Card Inputs
 
-bool Capture::RemoveCardInput( int nId )
+bool Capture::RemoveCardInput( int nCardInputId )
 {
-    if ( nId < 1 )
+    if ( nCardInputId < 1 )
         throw( QString( "The Input ID is invalid."));
 
-    bool bResult = CardUtil::DeleteInput(nId);
+    bool bResult = CardUtil::DeleteInput(nCardInputId);
 
     return bResult;
 }
@@ -144,13 +297,13 @@ int Capture::AddCardInput       ( const uint nCardId,
     return nResult;
 }
 
-bool Capture::UpdateCardInput    ( int              nId,
+bool Capture::UpdateCardInput    ( int              nCardInputId,
                                    const QString    &sSetting,
                                    const QString    &sValue )
 {
-    if ( nId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
+    if ( nCardInputId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
         throw( QString( "Input ID, Setting Name, and Value are required." ));
 
-    return set_on_input(sSetting, nId, sValue);
+    return set_on_input(sSetting, nCardInputId, sValue);
 }
 

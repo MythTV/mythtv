@@ -472,8 +472,6 @@ int Channel::FetchChannelsFromSource( const uint nSourceId,
 
     int nResult = 0;
 
-    uint num_channels_before = SourceUtil::GetChannelCount(nSourceId);
-
     QString cardtype = CardUtil::GetRawCardType(nCardId);
 
     if (!CardUtil::IsUnscanable(cardtype) &&
