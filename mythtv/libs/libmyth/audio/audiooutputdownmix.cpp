@@ -1,6 +1,9 @@
+#include "audiooutputbase.h"
 #include "audiooutputdownmix.h"
 
 #include "string.h"
+
+#define LOC QString("Downmixer: ")
 
 /*
  SMPTE channel layout
@@ -134,9 +137,11 @@ static const float s51_matrix[2][8][6] =
 int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
                                       float *dst, float *src, int frames)
 {
-    if (channels_in <= channels_out)
+    if (channels_in < channels_out)
         return -1;
 
+    //VBAUDIO(LOC + QString("Downmixing %1 frames (in:%2 out:%3)")
+    //    .arg(frames).arg(channels_in).arg(channels_out));
     if (channels_out == 2)
     {
         float tmp;
@@ -155,21 +160,36 @@ int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
     }
     else if (channels_out == 6)
     {
-        int lensamples = channels_in - 4;
-        int lenbytes = lensamples * sizeof(float);
-        for (int n=0; n < frames; n++)
+        // dummy 5.1 -> 5.1 downmixer for test purposes
+        if (channels_in == 6)
         {
-            memcpy(dst, src, lenbytes);
-            src += lensamples;
-            dst += 4;
-            //read value first, as src and dst can overlap
-            float ls = src[0];
-            float rs = src[1];
-            float rls = src[2];
-            float rrs = src[3];
-            *dst++ = ls * m3db + rls * m3db;    // LS = LS*-3dB + Rls*-3dB
-            *dst++ = rs * m3db + rrs * m3db;    // RS = RS*-3dB + Rrs*-3dB
-            src += 4;
+            int lensamples = channels_in;
+            int lenbytes = lensamples * sizeof(float);
+            for (int n=0; n < frames; n++)
+            {
+                memcpy(dst, src, lenbytes);
+                src += lensamples;
+                dst += lensamples;
+            }
+        }
+        else
+        {
+            int lensamples = channels_in - 4;
+            int lenbytes = lensamples * sizeof(float);
+            for (int n=0; n < frames; n++)
+            {
+                memcpy(dst, src, lenbytes);
+                src += lensamples;
+                dst += 4;
+                    //read value first, as src and dst can overlap
+                float ls = src[0];
+                float rs = src[1];
+                float rls = src[2];
+                float rrs = src[3];
+                *dst++ = ls * m3db + rls * m3db;    // LS = LS*-3dB + Rls*-3dB
+                *dst++ = rs * m3db + rrs * m3db;    // RS = RS*-3dB + Rrs*-3dB
+                src += 4;
+            }
         }
     }
     else

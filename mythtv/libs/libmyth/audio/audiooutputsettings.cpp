@@ -450,6 +450,9 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
                     log = "DTS 96/24";
                     break;
                 case FF_PROFILE_DTS_HD_HRA:
+                    samplerate = 192000;
+                    log = "DTS-HD High-Res";
+                    break;
                 case FF_PROFILE_DTS_HD_MA:
                     samplerate = 192000;
                     if (canDTSHDMA)
