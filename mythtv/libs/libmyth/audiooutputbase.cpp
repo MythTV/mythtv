@@ -475,7 +475,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
                 switch (lsource_channels)
                 {
                     case 1:
-                        lconfigured_channels = upmix_default ? 6 : 2;
+                        lconfigured_channels = upmix_default ? max_channels : 2;
                         break;
                     case 2:
                         //Will never happen
