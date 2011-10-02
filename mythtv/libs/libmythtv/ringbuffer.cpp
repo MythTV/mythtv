@@ -1290,7 +1290,7 @@ int RingBuffer::Read(void *buf, int count)
     return ret;
 }
 
-QString RingBuffer::BitrateToString(uint64_t rate)
+QString RingBuffer::BitrateToString(uint64_t rate, bool hz)
 {
     QString msg;
     float bitrate;
@@ -1305,18 +1305,19 @@ QString RingBuffer::BitrateToString(uint64_t rate)
     }
     else if (rate >= 1000000)
     {
-        msg = QObject::tr("%1Mbps");
+        msg = hz ? QObject::tr("%1MHz") : QObject::tr("%1Mbps");
         bitrate  = (float)rate / (1000000.0);
-        range = 1;
+        range = hz ? 3 : 1;
     }
     else if (rate >= 1000)
     {
-        msg = QObject::tr("%1Kbps");
+        msg = hz ? QObject::tr("%1KHz") : QObject::tr("%1Kbps");
         bitrate = (float)rate / 1000.0;
+        range = hz ? 1 : 0;
     }
     else
     {
-        msg = QObject::tr("%1bps");
+        msg = hz ? QObject::tr("%1Hz") : QObject::tr("%1bps");
         bitrate = (float)rate;
     }
     return msg.arg(bitrate, 0, 'f', range);

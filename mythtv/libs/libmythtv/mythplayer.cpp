@@ -4366,7 +4366,8 @@ int MythPlayer::GetStatusbarPos(void) const
 
 void MythPlayer::GetPlaybackData(InfoMap &infoMap)
 {
-    QString samplerate = RingBuffer::BitrateToString(audio.GetSampleRate());
+    QString samplerate = RingBuffer::BitrateToString(audio.GetSampleRate(),
+                                                     true);
     infoMap.insert("samplerate",  samplerate);
     infoMap.insert("filename",    player_ctx->buffer->GetSafeFilename());
     infoMap.insert("decoderrate", player_ctx->buffer->GetDecoderRate());
