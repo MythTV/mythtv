@@ -2833,25 +2833,16 @@ MythMenu* PlaybackBox::createStorageMenu()
         return NULL;
 
     QString title = tr("Storage Options") + CreateProgramInfoString(*pginfo);
+    QString autoExpireText = (pginfo->IsAutoExpirable()) ?
+        tr("Disable Auto Expire") : tr("Enable Auto Expire");
+    QString preserveText = (pginfo->IsPreserved()) ?
+        tr("Do not preserve this episode") : tr("Preserve this episode");
 
     MythMenu *menu = new MythMenu(title, this, "slotmenu");
-
     menu->AddItem(tr("Change Recording Group"), SLOT(ShowRecGroupChanger()));
-
     menu->AddItem(tr("Change Playback Group"), SLOT(ShowPlayGroupChanger()));
-
-    if (pginfo)
-    {
-        if (pginfo->IsAutoExpirable())
-            menu->AddItem(tr("Disable Auto Expire"), SLOT(toggleAutoExpire()));
-        else
-            menu->AddItem(tr("Enable Auto Expire"), SLOT(toggleAutoExpire()));
-
-        if (pginfo->IsPreserved())
-            menu->AddItem(tr("Do not preserve this episode"), SLOT(togglePreserveEpisode()));
-        else
-            menu->AddItem(tr("Preserve this episode"), SLOT(togglePreserveEpisode()));
-    }
+    menu->AddItem(autoExpireText, SLOT(toggleAutoExpire()));
+    menu->AddItem(preserveText, SLOT(togglePreserveEpisode()));
 
     return menu;
 }
