@@ -47,6 +47,7 @@ class MHIImageData
     QImage m_image;
     int    m_x;
     int    m_y;
+    bool   m_bUnder;
 };
 
 // Special value for the NetworkBootInfo version.  Real values are a byte.
@@ -131,6 +132,7 @@ void MHIContext::ClearDisplay(void)
     for (; it != m_display.end(); ++it)
         delete *it;
     m_display.clear();
+    m_videoDisplayRect = QRect();
 }
 
 void MHIContext::ClearQueue(void)
@@ -583,10 +585,50 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
         return;
 
     QMutexLocker locker(&m_display_lock);
+
+    // In MHEG the video is just another item in the display stack
+    // but when we create the OSD we overlay everything over the video.
+    // We need to cut out anything belowthe video on the display stack
+    // to leave the video area clear.
+    list<MHIImageData*>::iterator it = m_display.begin();
+    for (; it != m_display.end(); ++it)
+    {
+        MHIImageData *data = *it;
+        if (!data->m_bUnder)
+            continue;
+
+        QRect imageRect(data->m_x, data->m_y,
+                        data->m_image.width(), data->m_image.height());
+        if (!m_videoDisplayRect.intersects(imageRect))
+            continue;
+
+        // Replace this item with a set of cut-outs.
+        it = m_display.erase(it);
+
+        QVector<QRect> rects =
+            (QRegion(imageRect) - QRegion(m_videoDisplayRect)).rects();
+        for (uint j = 0; j < (uint)rects.size(); j++)
+        {
+            QRect &rect = rects[j];
+            QImage image =
+                data->m_image.copy(rect.x()-data->m_x, rect.y()-data->m_y,
+                                   rect.width(), rect.height());
+            MHIImageData *newData = new MHIImageData;
+            newData->m_image = image;
+            newData->m_x = rect.x();
+            newData->m_y = rect.y();
+            newData->m_bUnder = true;
+            it = m_display.insert(it, newData);
+            ++it;
+        }
+        --it;
+        delete data;
+    }
+
     m_updated = false;
     osdWindow->DeleteAllChildren();
     // Copy all the display items into the display.
-    list<MHIImageData*>::iterator it = m_display.begin();
+    it = m_display.begin();
     for (int count = 0; it != m_display.end(); ++it, count++)
     {
         MHIImageData *data = *it;
@@ -630,7 +672,7 @@ void MHIContext::RequireRedraw(const QRegion &)
     m_updated = true;
 }
 
-void MHIContext::AddToDisplay(const QImage &image, int x, int y)
+void MHIContext::AddToDisplay(const QImage &image, int x, int y, bool bUnder /*=false*/)
 {
     MHIImageData *data = new MHIImageData;
     int dispx = x + m_displayRect.left();
@@ -639,14 +681,29 @@ void MHIContext::AddToDisplay(const QImage &image, int x, int y)
     data->m_image = image;
     data->m_x = dispx;
     data->m_y = dispy;
+    data->m_bUnder = bUnder;
     QMutexLocker locker(&m_display_lock);
-    m_display.push_back(data);
+    if (!bUnder)
+        m_display.push_back(data);
+    else
+    {
+        // Replace any existing items under the video with this
+        list<MHIImageData*>::iterator it = m_display.begin();
+        while (it != m_display.end())
+        {
+            MHIImageData *old = *it;
+            if (!old->m_bUnder)
+                ++it;
+            else
+            {
+                it = m_display.erase(it);
+                delete old;
+            }
+        }
+        m_display.push_front(data);
+    }
 }
 
-// In MHEG the video is just another item in the display stack
-// but when we create the OSD we overlay everything over the video.
-// We need to cut out anything belowthe video on the display stack
-// to leave the video area clear.
 // The videoRect gives the size and position to which the video must be scaled.
 // The displayRect gives the rectangle reserved for the video.
 // e.g. part of the video may be clipped within the displayRect.
@@ -666,40 +723,17 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
         }
     }
 
-    QMutexLocker locker(&m_display_lock);
-    QRect displayRect(SCALED_X(dispRect.x()),
+    m_videoDisplayRect = QRect(SCALED_X(dispRect.x()),
                       SCALED_Y(dispRect.y()),
                       SCALED_X(dispRect.width()),
                       SCALED_Y(dispRect.height()));
 
+    // Mark all existing items in the display stack as under the video
+    QMutexLocker locker(&m_display_lock);
     list<MHIImageData*>::iterator it = m_display.begin();
     for (; it != m_display.end(); ++it)
     {
-        MHIImageData *data = *it;
-        QRect imageRect(data->m_x, data->m_y,
-                        data->m_image.width(), data->m_image.height());
-        if (displayRect.intersects(imageRect))
-        {
-            // Replace this item with a set of cut-outs.
-            it = m_display.erase(it);
-
-            QVector<QRect> rects =
-                (QRegion(imageRect) - QRegion(displayRect)).rects();
-            for (uint j = 0; j < (uint)rects.size(); j++)
-            {
-                QRect &rect = rects[j];
-                QImage image =
-                    data->m_image.copy(rect.x()-data->m_x, rect.y()-data->m_y,
-                                       rect.width(), rect.height());
-                MHIImageData *newData = new MHIImageData;
-                newData->m_image = image;
-                newData->m_x = rect.x();
-                newData->m_y = rect.y();
-                m_display.insert(it, newData);
-                ++it;
-            }
-            delete data;
-        }
+        (*it)->m_bUnder = true;
     }
 }
 
@@ -1021,7 +1055,7 @@ void MHIContext::DrawRect(int xPos, int yPos, int width, int height,
 // and usually that will be the same as the origin of the bounding
 // box (clipRect).
 void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
-                           const QImage &qImage, bool bScaled /* = false */)
+                           const QImage &qImage, bool bScaled, bool bUnder)
 {
     if (qImage.isNull())
         return;
@@ -1038,7 +1072,7 @@ void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
                 Qt::IgnoreAspectRatio,
                 Qt::SmoothTransformation);
         AddToDisplay(q_scaled.convertToFormat(QImage::Format_ARGB32),
-                     SCALED_X(x), SCALED_Y(y));
+                     SCALED_X(x), SCALED_Y(y), bUnder);
     }
     else if (!displayRect.isEmpty())
     { // We must clip the image.
@@ -1052,7 +1086,7 @@ void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
                 Qt::SmoothTransformation);
         AddToDisplay(q_scaled,
                      SCALED_X(displayRect.x()),
-                     SCALED_Y(displayRect.y()));
+                     SCALED_Y(displayRect.y()), bUnder);
     }
     // Otherwise draw nothing.
 }
@@ -1629,7 +1663,7 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
 }
 
 
-void MHIBitmap::Draw(int x, int y, QRect rect, bool tiled)
+void MHIBitmap::Draw(int x, int y, QRect rect, bool tiled, bool bUnder)
 {
     if (tiled)
     {
@@ -1647,12 +1681,12 @@ void MHIBitmap::Draw(int x, int y, QRect rect, bool tiled)
                 tiledImage.setPixel(i, j, m_image.pixel(i % m_image.width(), j % m_image.height()));
             }
         }
-        m_parent->DrawImage(rect.x(), rect.y(), rect, tiledImage, true);
+        m_parent->DrawImage(rect.x(), rect.y(), rect, tiledImage, true, bUnder);
     }
     else
     {
         // NB THe BBC expects bitmaps to be scaled, not clipped
-        m_parent->DrawImage(x, y, rect, m_image, true);
+        m_parent->DrawImage(x, y, rect, m_image, true, bUnder);
     }
 }
 

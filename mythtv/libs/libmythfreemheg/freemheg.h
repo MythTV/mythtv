@@ -209,7 +209,7 @@ class MHBitmapDisplay
     // Draw the completed drawing onto the display.  x and y give the position of the image
     // relative to the screen.  rect gives the bounding box for the image, again relative to
     // the screen.
-    virtual void Draw(int x, int y, QRect rect, bool tiled) = 0;
+    virtual void Draw(int x, int y, QRect rect, bool tiled, bool bUnder) = 0;
     // Creation functions
     virtual void CreateFromPNG(const unsigned char *data, int length) = 0;
     virtual void CreateFromMPEG(const unsigned char *data, int length) = 0;
