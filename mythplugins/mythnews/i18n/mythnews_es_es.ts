@@ -6,22 +6,22 @@
     <message>
         <location filename="../mythnews/main.cpp" line="47"/>
         <source>RSS News feed reader</source>
-        <translation>Lector de noticias RSS</translation>
+        <translation>Lector de canales de Noticias RSS</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="51"/>
         <source>Update news items</source>
-        <translation type="unfinished">Actualizar noticias</translation>
+        <translation>Actualizar noticias</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="53"/>
         <source>Force update news items</source>
-        <translation type="unfinished">Forzar actualización de noticias</translation>
+        <translation>Forzar la actualización de noticias</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="55"/>
         <source>Cancel news item updating</source>
-        <translation type="unfinished">Cancelar la actualización de noticias</translation>
+        <translation>Cancelar la actualización de noticias</translation>
     </message>
 </context>
 <context>
@@ -29,7 +29,7 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="452"/>
         <source>Updated</source>
-        <translation>Actualizado</translation>
+        <translation>Actualizadas</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="459"/>
@@ -44,12 +44,12 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="929"/>
         <source>Edit News Site</source>
-        <translation>Editar Fuente Noticias</translation>
+        <translation>Editar Fuente de Noticias</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="122"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
-        <translation>MythNews no tiene configurado ningún sitio.</translation>
+        <translation>No ha configurado MythNews para acceder a ningún sitio.</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="470"/>
@@ -60,17 +60,17 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="801"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
-        <translation>No hay ningún navegador configurado! MythNews necesita que MythBrowser esté instalado.</translation>
+        <translation>¡No hay ningún navegador configurado! MythNews necesita que MythBrowser esté instalado.</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="930"/>
         <source>Add News Site</source>
-        <translation>Añadir Fuente Noticias</translation>
+        <translation>Añadir Fuente de Noticias</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="932"/>
         <source>Delete News Site</source>
-        <translation>Borrar Fuente Noticias</translation>
+        <translation>Eliminar Fuente de Noticias</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="915"/>
@@ -113,7 +113,7 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation>Aceptar</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
@@ -128,12 +128,12 @@
         <location filename="../mythnews/newssite.cpp" line="234"/>
         <location filename="../mythnews/newssite.cpp" line="243"/>
         <source>Failed to retrieve news</source>
-        <translation>Fallo al descargar noticias</translation>
+        <translation>Fallo al descargar las noticias</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="226"/>
         <source>No Cached News.</source>
-        <translation type="unfinished">Sin noticias almacenadas en caché.</translation>
+        <translation>No hay noticias en el archivo temporal.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="245"/>
@@ -143,17 +143,17 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Showing Cached News.</source>
-        <translation type="unfinished">Mostrando noticias almacenadas en caché.</translation>
+        <translation>Mostrando noticias almacenadas temporalmente.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="274"/>
         <source>XML-file is not valid RSS-feed</source>
-        <translation>El archivo XML no es una fuente válida de RSS</translation>
+        <translation>El archivo XML no es un canal RSS válido</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="218"/>
         <source>Retrieve Failed. </source>
-        <translation>Descarga fallida. </translation>
+        <translation>Fallo en la Descarga.</translation>
     </message>
 </context>
 <context>
@@ -161,7 +161,7 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="702"/>
         <source>Downloading media...</source>
-        <translation>Obteniendo recurso...</translation>
+        <translation>Descargando medios...</translation>
     </message>
 </context>
 <context>
@@ -169,21 +169,21 @@
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>%DATE%, %TIME%</source>
-        <translation>%FECHA%, %HORA%</translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>Edit RSS News Feeds</source>
-        <translation>Editar fuentes de noticias RSS</translation>
+        <translation>Editar Canales de Noticias RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
-        <translation>En esta pantalla puede editar el nombre, URL, y la ruta del icono para la fuente RSS seleccionada. Puede también establecer el objeto como un podcast
+        <translation>En esta pantalla puede editar el nombre, URL, y la ruta del icono para el Canal RSS seleccionado. Puede también definir el elemento como un podcast
 
-Cuando haya terminado de editar, seleccione &quot;OK&quot; o &quot;Cancelar&quot; para continuar.</translation>
+Cuando haya terminado la edición, seleccione &quot;Aceptar&quot; o &quot;Cancelar&quot; para continuar.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
@@ -223,32 +223,32 @@ Cuando haya terminado de editar, seleccione &quot;OK&quot; o &quot;Cancelar&quot
     <message>
         <location filename="themestrings.h" line="2"/>
         <source>Bookmark Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Administrador de Marcadores</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation>Aceptar</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>News Subscriptions</source>
-        <translation>Subscripciones de noticias</translation>
+        <translation>Suscripciones a Noticias</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>Choose the news sites you would like to read.</source>
-        <translation>Seleccione que sitios de noticias desea leer.</translation>
+        <translation>Elija qué sitios de noticias le gustaría leer.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>News Feeds</source>
-        <translation>Fuentes de noticias</translation>
+        <translation>Canales de Noticias</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>News Settings</source>
-        <translation type="unfinished">Ajustes de las noticias</translation>
+        <translation>Configuración de Noticias</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
@@ -263,16 +263,12 @@ Cuando haya terminado de editar, seleccione &quot;OK&quot; o &quot;Cancelar&quot
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Web Site</source>
-        <translation>Página web</translation>
+        <translation>Sitio Web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Edit RSS News Feed</source>
-        <translation>Editar fuente de noticias RSS</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
+        <translation>Editar Canal de Noticias RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
@@ -287,7 +283,7 @@ Cuando haya terminado de editar, seleccione &quot;OK&quot; o &quot;Cancelar&quot
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>RSS Feeds</source>
-        <translation>Fuentes RSS</translation>
+        <translation>Canales RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>

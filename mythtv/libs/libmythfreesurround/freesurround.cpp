@@ -137,7 +137,8 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     out_count(0),
     processed(true),
     processed_size(0),
-    surround_mode(smode)
+    surround_mode(smode),
+    latency_frames(0)
 {
     LOG(VB_AUDIO, LOG_DEBUG,
         QString("FreeSurround::FreeSurround rate %1 moviemode %2")
@@ -161,6 +162,7 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
             break;
         case SurroundModeActiveLinear:
             params.steering = 1;
+            latency_frames = block_size/2;
             break;
         default:
             break;
@@ -242,10 +244,28 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                         bufs->ls[ic]  = bufs->rs[ic] = (lt-rt) * center_level;
                     }
                     break;
+                case 5:
+                    for (i = 0; i < numFrames && ic < bs; i++,ic++)
+                    {
+                        float lt      = *samples++;
+                        float rt      = *samples++;
+                        float c       = *samples++;
+                        float lfe     = (lt+rt) * center_level;
+                        float ls      = *samples++;
+                        float rs      = *samples++;
+                        bufs->l[ic]   = lt;
+                        bufs->lfe[ic] = lfe;
+                        bufs->c[ic]   = c;
+                        bufs->r[ic]   = rt;
+                        bufs->ls[ic]  = ls;
+                        bufs->rs[ic]  = rs;
+                    }
+                    break;
             }
             in_count = 0;
             out_count = processed_size = ic;
             processed = false;
+            latency_frames = 0;
             break;
 
         default:
@@ -267,23 +287,52 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                         *rt++ = *samples++;
                     }
                     break;
+                case 5:
+                    // 5 ch is always passive mode,
+                    for (i = 0; i < numFrames && ic < bs; i++,ic++)
+                    {
+                        float l       = *samples++;
+                        float r       = *samples++;
+                        float c       = *samples++;
+                        float lfe     = (l+r) * center_level;
+                        float ls      = *samples++;
+                        float rs      = *samples++;
+                        bufs->l[ic]   = l;
+                        bufs->lfe[ic] = lfe;
+                        bufs->c[ic]   = c;
+                        bufs->r[ic]   = r;
+                        bufs->ls[ic]  = ls;
+                        bufs->rs[ic]  = rs;
+                    }
+                    process = false;
+                    break;
             }
-            ic += numFrames;
-            processed = process;
-            if (ic != bs)
-            {
-                // dont modify unless no processing is to be done
-                // for audiotime consistency
-                in_count = ic;
-                break;
-            }
-            // process_block takes some time so dont update in and out count
-            // before its finished so that Audiotime is correctly calculated
             if (process)
+            {
+                ic += numFrames;
+                if (ic != bs)
+                {
+                    // dont modify unless no processing is to be done
+                    // for audiotime consistency
+                    in_count = ic;
+                    break;
+                }
+                processed = process;
+                // process_block takes some time so dont update in and out count
+                // before its finished so that Audiotime is correctly calculated
                 process_block();
-            in_count = 0;
-            out_count = bs;
-            processed_size = bs;
+                in_count = 0;
+                out_count = bs;
+                processed_size = bs;
+                latency_frames = block_size/2;
+            }
+            else
+            {
+                in_count = 0;
+                out_count = processed_size = ic;
+                processed = false;
+                latency_frames = 0;
+            }
             break;
     }
 
@@ -386,9 +435,9 @@ void FreeSurround::process_block()
 long long FreeSurround::getLatency() 
 {
     // returns in usec
-    if (surround_mode == SurroundModePassive)
+    if (latency_frames = 0)
         return 0;
-    return decoder ? ((block_size/2 + in_count)*1000000)/(2*srate) : 0;
+    return decoder ? ((latency_frames + in_count)*1000000)/(2*srate) : 0;
 }
 
 void FreeSurround::flush()

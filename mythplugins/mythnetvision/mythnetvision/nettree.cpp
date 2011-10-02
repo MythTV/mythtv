@@ -468,8 +468,7 @@ void NetTree::showMenu(void)
 {
     QString label = tr("Playback/Download Options");
 
-    MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
-                                                    "mythnettreemenupopup");
+    MythMenu *menu = new MythMenu(label, this, "options");
 
     ResultItem *item = NULL;
     if (m_type == DLG_TREE)
@@ -482,87 +481,65 @@ void NetTree::showMenu(void)
             item = qVariantValue<ResultItem *>(node->GetData());
     }
 
+
+    if (item)
+    {
+        if (item->GetDownloadable())
+            menu->AddItem(tr("Stream Video"), SLOT(streamWebVideo()));
+        menu->AddItem(tr("Open Web Link"), SLOT(showWebVideo()));
+
+        if (item->GetDownloadable())
+            menu->AddItem(tr("Save This Video"), SLOT(doDownloadAndPlay()));
+    }
+
+    menu->AddItem(tr("Scan/Manage Subscriptions"), NULL, createShowManageMenu());
+    menu->AddItem(tr("Change View"), NULL, createShowViewMenu());
+
+    MythDialogBox *menuPopup = new MythDialogBox(menu, m_popupStack, "mythnettreemenupopup");
+
     if (menuPopup->Create())
-    {
         m_popupStack->AddScreen(menuPopup);
-
-        if (item)
-        {
-            if (item->GetDownloadable())
-                menuPopup->AddButton(tr("Stream Video"), SLOT(streamWebVideo()));
-            menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
-
-            if (item->GetDownloadable())
-                menuPopup->AddButton(tr("Save This Video"), SLOT(doDownloadAndPlay()));
-        }
-
-        menuPopup->AddButton(tr("Scan/Manage Subscriptions"), SLOT(showManageMenu()), true);
-        menuPopup->AddButton(tr("Change View"), SLOT(showViewMenu()), true);
-
-        menuPopup->SetReturnEvent(this, "options");
-    }
     else
-    {
         delete menuPopup;
-    }
 }
 
-void NetTree::showViewMenu()
+MythMenu* NetTree::createShowViewMenu()
 {
     QString label = tr("View Options");
 
-    MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
-                                                    "mythnetvisionmenupopup");
+    MythMenu *menu = new MythMenu(label, this, "options");
 
-    if (menuPopup->Create())
-    {
-        m_popupStack->AddScreen(menuPopup);
+    if (m_type != DLG_TREE)
+        menu->AddItem(tr("Switch to List View"), SLOT(switchTreeView()));
+    if (m_type != DLG_GALLERY)
+        menu->AddItem(tr("Switch to Gallery View"), SLOT(switchGalleryView()));
+    if (m_type != DLG_BROWSER)
+        menu->AddItem(tr("Switch to Browse View"), SLOT(switchBrowseView()));
 
-        menuPopup->SetReturnEvent(this, "options");
-
-        if (m_type != DLG_TREE)
-            menuPopup->AddButton(tr("Switch to List View"), SLOT(switchTreeView()));
-        if (m_type != DLG_GALLERY)
-            menuPopup->AddButton(tr("Switch to Gallery View"), SLOT(switchGalleryView()));
-        if (m_type != DLG_BROWSER)
-            menuPopup->AddButton(tr("Switch to Browse View"), SLOT(switchBrowseView()));
-    }
-    else
-    {
-        delete menuPopup;
-    }
+    return menu;
 }
 
-void NetTree::showManageMenu()
+MythMenu* NetTree::createShowManageMenu()
 {
     QString label = tr("Subscription Management");
 
-    MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
-                                                    "mythnetvisionmanagepopup");
+    MythMenu *menu = new MythMenu(label, this, "options");
 
-    if (menuPopup->Create())
-    {
-        m_popupStack->AddScreen(menuPopup);
 
-        menuPopup->SetReturnEvent(this, "options");
-
-        menuPopup->AddButton(tr("Update Site Maps"), SLOT(updateTrees()));
-        menuPopup->AddButton(tr("Update RSS"), SLOT(updateRSS()));
-        menuPopup->AddButton(tr("Manage Site Subscriptions"), SLOT(runTreeEditor()));
-        menuPopup->AddButton(tr("Manage RSS Subscriptions"), SLOT(runRSSEditor()));
-        if (!m_treeAutoUpdate)
-            menuPopup->AddButton(tr("Enable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
-        else
-            menuPopup->AddButton(tr("Disable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
-//        if (!m_rssAutoUpdate)
-//            menuPopup->AddButton(tr("Enable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
-//        else
-//            menuPopup->AddButton(tr("Disable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
-    }
+    menu->AddItem(tr("Update Site Maps"), SLOT(updateTrees()));
+    menu->AddItem(tr("Update RSS"), SLOT(updateRSS()));
+    menu->AddItem(tr("Manage Site Subscriptions"), SLOT(runTreeEditor()));
+    menu->AddItem(tr("Manage RSS Subscriptions"), SLOT(runRSSEditor()));
+    if (!m_treeAutoUpdate)
+        menu->AddItem(tr("Enable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
     else
-    {
-        delete menuPopup;
-    }
+        menu->AddItem(tr("Disable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
+//    if (!m_rssAutoUpdate)
+//        menu->AddItem(tr("Enable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
+//    else
+//        menu->AddItem(tr("Disable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
+
+    return menu;
 }
 
 void NetTree::switchTreeView()

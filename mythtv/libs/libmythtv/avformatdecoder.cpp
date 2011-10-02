@@ -3413,8 +3413,8 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
 bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
 {
-    if (!decodeAllSubtitles ||
-        selectedTrack[kTrackTypeRawText].av_stream_index != pkt->stream_index)
+    if (!(decodeAllSubtitles ||
+        selectedTrack[kTrackTypeRawText].av_stream_index == pkt->stream_index))
     {
         return false;
     }
@@ -3646,7 +3646,7 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
             if (codecId == CODEC_ID_DTS && profile > 0)
             {
                 // we cannot decode dts-hd, so only select it if passthrough
-                if (!DoPassThrough(ctx) || ctx->profile != profile)
+                if (!DoPassThrough(ctx, true) || ctx->profile != profile)
                     continue;
             }
             selectedTrack = *it;
@@ -3722,7 +3722,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         AVCodecContext *codec_ctx = ic->streams[idx]->codec;
         AudioInfo item(codec_ctx->codec_id, codec_ctx->bps,
                        codec_ctx->sample_rate, codec_ctx->channels,
-                       DoPassThrough(codec_ctx));
+                       DoPassThrough(codec_ctx, true));
         LOG(VB_AUDIO, LOG_DEBUG, LOC + " * " + item.toString());
     }
 #endif
@@ -3790,12 +3790,13 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
 
         vector<int> flang = filter_lang(atracks, canonical_key);
 
-        selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
-                                 FF_PROFILE_DTS_HD_MA);
+        if (m_audio->CanDTSHD())
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                     FF_PROFILE_DTS_HD_MA);
         if (selTrack < 0)
             selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
 
-        if (selTrack < 0)
+        if (selTrack < 0 && m_audio->CanDTSHD())
             selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
                                      FF_PROFILE_DTS_HD_HRA);
         if (selTrack < 0)
@@ -3819,13 +3820,14 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             {
                 vector<int> flang = filter_lang(atracks, *it);
 
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
-                                         FF_PROFILE_DTS_HD_MA);
+                if (m_audio->CanDTSHD())
+                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                             FF_PROFILE_DTS_HD_MA);
                 if (selTrack < 0)
                     selTrack = filter_max_ch(ic, atracks, flang,
                                              CODEC_ID_TRUEHD);
 
-                if (selTrack < 0)
+                if (selTrack < 0 && m_audio->CanDTSHD())
                     selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
                                              FF_PROFILE_DTS_HD_HRA);
 
@@ -3850,12 +3852,13 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
                 "Trying to select audio track (wo/lang)");
             vector<int> flang = filter_lang(atracks, -1);
 
-            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
-                                     FF_PROFILE_DTS_HD_MA);
+            if (m_audio->CanDTSHD())
+                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                         FF_PROFILE_DTS_HD_MA);
             if (selTrack < 0)
                 selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
 
-            if (selTrack < 0)
+            if (selTrack < 0 && m_audio->CanDTSHD())
                 selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
                                          FF_PROFILE_DTS_HD_HRA);
 
@@ -3978,7 +3981,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
             QMutexLocker locker(avcodeclock);
 
-            if (DoPassThrough(ctx) || !DecoderWillDownmix(ctx))
+            if (DoPassThrough(ctx, false) || !DecoderWillDownmix(ctx))
             {
                 // for passthru or codecs for which the decoder won't downmix
                 // let the decoder set the number of channels. For other codecs
@@ -4538,9 +4541,11 @@ inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
 {
     // Until ffmpeg properly implements dialnorm
     // use Myth internal downmixer if machines has FPU/SSE
-    if (!m_audio->CanDownmix() || !AudioOutputUtil::has_hardware_fpu())
+    if (m_audio->CanDownmix() && AudioOutputUtil::has_hardware_fpu())
+        return false;
+    if (!m_audio->CanDownmix())
         return true;
-
+    // use ffmpeg only for dolby codecs if we have to
     switch (ctx->codec_id)
     {
         case CODEC_ID_AC3:
@@ -4552,12 +4557,19 @@ inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
     }
 }
 
-bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
+bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx, bool withProfile)
 {
     bool passthru;
 
-    passthru = m_audio->CanPassthrough(ctx->sample_rate, ctx->channels,
-                                       ctx->codec_id, ctx->profile);
+    // if withProfile == false, we will accept any DTS stream regardless
+    // of its profile. We do so, so we can bitstream DTS-HD as DTS core
+    if (!withProfile && ctx->codec_id == CODEC_ID_DTS && !m_audio->CanDTSHD())
+        passthru = m_audio->CanPassthrough(ctx->sample_rate, ctx->channels,
+                                           ctx->codec_id, FF_PROFILE_DTS);
+    else
+        passthru = m_audio->CanPassthrough(ctx->sample_rate, ctx->channels,
+                                           ctx->codec_id, ctx->profile);
+
     passthru &= !disable_passthru;
 
     return passthru;
@@ -4619,7 +4631,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
             return false;
         }
 
-        using_passthru = DoPassThrough(ctx);
+        using_passthru = DoPassThrough(ctx, false);
 
         ctx->request_channels = ctx->channels;
 

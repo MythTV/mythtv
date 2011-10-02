@@ -43,6 +43,7 @@ class MythUIText;
 class MythUITextEdit;
 class MythUIButton;
 class MythDialogBox;
+class MythMenu;
 
 typedef QMap<QString,ProgramList>       ProgramMap;
 typedef QMap<QString,QString>           Str2StrMap;
@@ -157,15 +158,15 @@ class PlaybackBox : public ScheduleCommon
     void showMetadataEditor();
     void showGroupFilter();
     void showRecGroupPasswordChanger();
-    void showPlayFromPopup();
-    void showRecordingPopup();
-    void showJobPopup();
-    void showTranscodingProfiles();
+    MythMenu*  createPlayFromMenu();
+    MythMenu*  createRecordingMenu();
+    MythMenu*  createJobMenu();
+    MythMenu*  createTranscodingProfilesMenu();
+    MythMenu* createStorageMenu();
+    MythMenu* createPlaylistMenu();
+    MythMenu* createPlaylistStorageMenu();
+    MythMenu* createPlaylistJobMenu();
     void changeProfileAndTranscode(int id);
-    void showStoragePopup();
-    void showPlaylistPopup();
-    void showPlaylistStoragePopup();
-    void showPlaylistJobPopup();
     void showProgramDetails();
     void showIconHelp();
     void ShowRecGroupChangerUsePlaylist(void)  { ShowRecGroupChanger(true);  }
@@ -325,9 +326,10 @@ class PlaybackBox : public ScheduleCommon
 
     void ScheduleUpdateUIList(void);
 
+    void ShowMenu(void);
     bool CreatePopupMenu(const QString &title);
-    bool CreatePopupMenu(const QString &title, const ProgramInfo &pginfo)
-        { return CreatePopupMenu(title + CreateProgramInfoString(pginfo)); }
+    //bool CreatePopupMenu(const QString &title, const ProgramInfo &pginfo)
+    //    { return CreatePopupMenu(title + CreateProgramInfoString(pginfo)); }
     bool CreatePopupMenuPlaylist(void);
 
     QString CreateProgramInfoString(const ProgramInfo &program) const;
@@ -386,7 +388,7 @@ class PlaybackBox : public ScheduleCommon
 
     // Popup support //////////////////////////////////////////////////////////
     // General popup support
-    MythDialogBox      *m_popupMenu;
+    MythMenu           *m_popupMenu;
     MythScreenStack    *m_popupStack;
 
     bool m_doToggleMenu;

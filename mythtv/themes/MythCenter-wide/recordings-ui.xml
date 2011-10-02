@@ -69,6 +69,7 @@
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <searchposition>-1,390</searchposition>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="name">
@@ -93,6 +94,7 @@
             <wrapstyle>captive</wrapstyle>
             <spacing>0</spacing>
             <searchposition>-1,390</searchposition>
+            <triggerevent context="Global" action="MENU">RIGHT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
                 <area>0,0,100%,30</area>

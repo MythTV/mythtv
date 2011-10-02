@@ -37,9 +37,10 @@ class SERVICE_PUBLIC CaptureCard : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.0" );
 
-    Q_PROPERTY( QString         CardId              READ CardId             WRITE setCardId             )
+    Q_PROPERTY( uint            CardId              READ CardId             WRITE setCardId             )
     Q_PROPERTY( QString         VideoDevice         READ VideoDevice        WRITE setVideoDevice        )
     Q_PROPERTY( QString         AudioDevice         READ AudioDevice        WRITE setAudioDevice        )
+    Q_PROPERTY( QString         VBIDevice           READ VBIDevice          WRITE setVBIDevice          )
     Q_PROPERTY( QString         CardType            READ CardType           WRITE setCardType           )
     Q_PROPERTY( QString         DefaultInput        READ DefaultInput       WRITE setDefaultInput       )
     Q_PROPERTY( uint            AudioRateLimit      READ AudioRateLimit     WRITE setAudioRateLimit     )
@@ -63,9 +64,10 @@ class SERVICE_PUBLIC CaptureCard : public QObject
     Q_PROPERTY( uint            DiSEqCId            READ DiSEqCId           WRITE setDiSEqCId           )
     Q_PROPERTY( bool            DVBEITScan          READ DVBEITScan         WRITE setDVBEITScan         )
 
-    PROPERTYIMP( QString    ,     CardId            )
+    PROPERTYIMP( uint       ,     CardId            )
     PROPERTYIMP( QString    ,     VideoDevice       )
     PROPERTYIMP( QString    ,     AudioDevice       )
+    PROPERTYIMP( QString    ,     VBIDevice         )
     PROPERTYIMP( QString    ,     CardType          )
     PROPERTYIMP( QString    ,     DefaultInput      )
     PROPERTYIMP( uint       ,     AudioRateLimit    )
@@ -100,7 +102,7 @@ class SERVICE_PUBLIC CaptureCard : public QObject
     public:
 
         CaptureCard(QObject *parent = 0)
-            : QObject         ( parent ),
+            : QObject         ( parent ), m_CardId(0),
             m_AudioRateLimit(0), m_DVBSWFilter(0),
             m_DVBSatType(0), m_DVBWaitForSeqStart(false),
             m_SkipBTAudio(false), m_DVBOnDemand(false),

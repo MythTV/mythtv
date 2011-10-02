@@ -43,7 +43,7 @@ class DeviceMap:
 
     def device_map(self, bus='pci'):
         import os
-        HWDATA_DIRS = [ get_config_attr("HWDATA_DIR"), '/usr/share/hwdata','/usr/share/misc' ]
+        HWDATA_DIRS = [ get_config_attr("HWDATA_DIR"), '/usr/share/hwdata','/usr/share/misc','/usr/share/' ]
         for hwd_file in HWDATA_DIRS:
             fn = "%s/%s.ids" % (hwd_file, bus)
             if os.path.isfile(fn + ".gz"):

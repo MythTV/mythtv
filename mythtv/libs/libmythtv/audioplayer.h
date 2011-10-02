@@ -34,9 +34,10 @@ class MTV_PUBLIC AudioPlayer
     void  SetEffDsp(int dsprate);
 
     void  CheckFormat(void);
-    void  SetNoAudio(void)        { m_no_audio_out = true;  }
-    bool  HasAudioIn(void) const  { return !m_no_audio_in;  }
-    bool  HasAudioOut(void) const { return !m_no_audio_out; }
+    void  SetNoAudio(void)           { m_no_audio_out = true;    }
+    bool  HasAudioIn(void) const     { return !m_no_audio_in;    }
+    bool  HasAudioOut(void) const    { return !m_no_audio_out;   }
+    bool  ControlsVolume(void) const { return m_controls_volume; }
 
     bool  Pause(bool pause);
     bool  IsPaused(void);
@@ -94,6 +95,7 @@ class MTV_PUBLIC AudioPlayer
     QString      m_passthru_device;
     bool         m_no_audio_in;
     bool         m_no_audio_out;
+    bool         m_controls_volume;
     vector<MythTV::Visual*> m_visuals;
 };
 

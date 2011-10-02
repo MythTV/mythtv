@@ -121,6 +121,8 @@
             <spacing>2</spacing>
             <drawfrombottom>false</drawfrombottom>
             <buttonarea>0,0,100%,620</buttonarea>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
+            <triggerevent context="Global" action="MENU">RIGHT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,600,66</area>

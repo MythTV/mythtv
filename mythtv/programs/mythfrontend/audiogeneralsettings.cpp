@@ -583,7 +583,7 @@ void AudioTestThread::run()
     RunProlog();
     m_interrupted = false;
     int smptelayout[7][8] = { 
-        { 0, 1 },                       //stereo
+        { 0, 1, 1 },                    //stereo
         { },                            //not used
         { },                            //not used
         { },                            //not used
@@ -731,11 +731,6 @@ AudioTest::AudioTest(QString main, QString passthrough,
     m_frontright->setLabel(QObject::tr("Front Right"));
     connect(m_frontright,
             SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
-    m_center = new TransButtonSetting("1");
-    m_center->setLabel(QObject::tr("Center"));
-    connect(m_center,
-            SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
-
     frontgroup->addChild(m_frontleft);
 
     switch(m_channels)
@@ -768,6 +763,10 @@ AudioTest::AudioTest(QString main, QString passthrough,
             connect(m_lfe,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
 
+            m_center = new TransButtonSetting("1");
+            m_center->setLabel(QObject::tr("Center"));
+            connect(m_center,
+                    SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
             frontgroup->addChild(m_center);
             middlegroup->addChild(m_surroundleft);
             middlegroup->addChild(m_lfe);

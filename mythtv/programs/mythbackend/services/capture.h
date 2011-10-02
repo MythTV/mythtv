@@ -37,7 +37,12 @@ class Capture : public CaptureServices
 
     public:
 
-        bool                        RemoveCaptureCard  ( int              Id         );
+        DTC::CaptureCardList*       GetCaptureCardList ( const QString    &HostName,
+                                                         const QString    &CardType  );
+
+        DTC::CaptureCard*           GetCaptureCard     ( int              CardId     );
+
+        bool                        RemoveCaptureCard  ( int              CardId     );
 
         int                         AddCaptureCard     ( const QString    &VideoDevice,
                                                          const QString    &AudioDevice,
@@ -65,13 +70,13 @@ class Capture : public CaptureServices
                                                          const uint       DiSEqCId,
                                                          bool             DVBEITScan);
 
-        bool                        UpdateCaptureCard  ( int              Id,
+        bool                        UpdateCaptureCard  ( int              CardId,
                                                          const QString    &Setting,
                                                          const QString    &Value );
 
         // Card Inputs
 
-        bool                        RemoveCardInput    ( int              Id         );
+        bool                        RemoveCardInput    ( int              CardInputId);
 
         int                         AddCardInput       ( const uint CardId,
                                                          const uint SourceId,
@@ -87,7 +92,7 @@ class Capture : public CaptureServices
                                                          const uint RecPriority,
                                                          const uint Quicktune);
 
-        bool                        UpdateCardInput    ( int              Id,
+        bool                        UpdateCardInput    ( int              CardInputId,
                                                          const QString    &Setting,
                                                          const QString    &Value );
 

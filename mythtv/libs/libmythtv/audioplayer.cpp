@@ -11,8 +11,9 @@ AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
     m_stretchfactor(1.0f),m_passthru(false),
     m_lock(QMutex::Recursive), m_muted_on_creation(muted),
     m_main_device(QString::null), m_passthru_device(QString::null),
-    m_no_audio_in(false), m_no_audio_out(false)
+    m_no_audio_in(false), m_no_audio_out(false), m_controls_volume(true)
 {
+    m_controls_volume = gCoreContext->GetNumSetting("MythControlsVolume", 1);
 }
 
 AudioPlayer::~AudioPlayer()
@@ -112,13 +113,12 @@ QString AudioPlayer::ReinitAudio(void)
     if (want_audio && !m_audioOutput)
     {
         // AudioOutput has never been created and we will want audio
-        bool setVolume = gCoreContext->GetNumSetting("MythControlsVolume", 1);
         AudioSettings aos = AudioSettings(m_main_device,
                                           m_passthru_device,
                                           m_format, m_channels,
                                           m_codec, m_samplerate,
                                           AUDIOOUTPUT_VIDEO,
-                                          setVolume, m_passthru);
+                                          m_controls_volume, m_passthru);
         if (m_no_audio_in)
             aos.init = false;
 

@@ -51,7 +51,7 @@
 class SERVICE_PUBLIC CaptureServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.1" );
+    Q_CLASSINFO( "version"    , "1.2" );
     Q_CLASSINFO( "RemoveCaptureCard_Method",                 "POST" )
     Q_CLASSINFO( "AddCaptureCard_Method",                    "POST" )
     Q_CLASSINFO( "UpdateCaptureCard_Method",                 "POST" )
@@ -72,7 +72,12 @@ class SERVICE_PUBLIC CaptureServices : public Service
 
     public slots:
 
-        virtual bool                        RemoveCaptureCard  ( int              Id         ) = 0;
+        virtual DTC::CaptureCardList*       GetCaptureCardList ( const QString    &HostName,
+                                                                 const QString    &CardType  ) = 0;
+
+        virtual DTC::CaptureCard*           GetCaptureCard     ( int              CardId     ) = 0;
+
+        virtual bool                        RemoveCaptureCard  ( int              CardId     ) = 0;
 
         virtual int                         AddCaptureCard     ( const QString    &VideoDevice,
                                                                  const QString    &AudioDevice,
@@ -100,13 +105,13 @@ class SERVICE_PUBLIC CaptureServices : public Service
                                                                  const uint       DiSEqCId,
                                                                  bool             DVBEITScan) = 0;
 
-        virtual bool                        UpdateCaptureCard  ( int              Id,
+        virtual bool                        UpdateCaptureCard  ( int              CardId,
                                                                  const QString    &Setting,
                                                                  const QString    &Value ) = 0;
 
         // Card Inputs
 
-        virtual bool                        RemoveCardInput    ( int              Id         ) = 0;
+        virtual bool                        RemoveCardInput    ( int              CardInputId) = 0;
 
         virtual int                         AddCardInput       ( const uint CardId,
                                                                  const uint SourceId,
@@ -122,7 +127,7 @@ class SERVICE_PUBLIC CaptureServices : public Service
                                                                  const uint RecPriority,
                                                                  const uint Quicktune) = 0;
 
-        virtual bool                        UpdateCardInput    ( int              Id,
+        virtual bool                        UpdateCardInput    ( int              CardInputId,
                                                                  const QString    &Setting,
                                                                  const QString    &Value ) = 0;
 };

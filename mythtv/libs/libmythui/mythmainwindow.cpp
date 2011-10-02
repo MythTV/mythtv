@@ -961,9 +961,7 @@ void MythMainWindow::Init(void)
     {
         LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL painter");
         d->painter = new MythOpenGLPainter();
-        QGLFormat fmt;
-        fmt.setDepth(false);
-        d->render = MythRenderOpenGL::Create(fmt);
+        d->render = MythRenderOpenGL::Create();
         MythRenderOpenGL *gl = dynamic_cast<MythRenderOpenGL*>(d->render);
         d->paintwin = new MythPainterWindowGL(this, d, gl);
         QGLWidget *qgl = dynamic_cast<QGLWidget *>(d->paintwin);

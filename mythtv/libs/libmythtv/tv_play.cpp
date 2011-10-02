@@ -7769,11 +7769,16 @@ void TV::EditSchedule(const PlayerContext *ctx, int editType)
 void TV::ChangeVolume(PlayerContext *ctx, bool up)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (!ctx->player)
+    if (!ctx->player ||
+        (ctx->player && !ctx->player->PlayerControlsVolume()))
     {
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         return;
     }
+
+    if (ctx->player->IsMuted() && up)
+        ToggleMute(ctx);
+
     uint curvol = ctx->player->AdjustVolume((up) ? +2 : -2);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -7916,7 +7921,8 @@ void TV::ChangeAudioSync(PlayerContext *ctx, int dir)
 void TV::ToggleMute(PlayerContext *ctx, const bool muteIndividualChannels)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (!ctx->player || !ctx->player->HasAudioOut())
+    if (!ctx->player || !ctx->player->HasAudioOut() ||
+        !ctx->player->PlayerControlsVolume())
     {
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         return;
@@ -8725,7 +8731,7 @@ PictureAttribute TV::NextPictureAdjustType(
     if ((kAdjustingPicture_Playback == type) && mp && mp->GetVideoOutput())
     {
         sup = mp->GetVideoOutput()->GetSupportedPictureAttributes();
-        if (mp->HasAudioOut())
+        if (mp->HasAudioOut() && mp->PlayerControlsVolume())
             sup |= kPictureAttributeSupported_Volume;
     }
     else if (kAdjustingPicture_Channel == type)

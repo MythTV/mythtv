@@ -4064,10 +4064,11 @@ fi
 enabled qtscript || die "Error! QtScript headers not found"
 
 # Check if Qt was built with DBus support:
-if $(pkg-config --exists QtDBus) ; then
-    enable qtdbus
-else
-    check_cxx ${qt_inc} <<EOF && enable qtdbus
+if ! disabled qtdbus; then
+    if $(pkg-config --exists QtDBus) ; then
+        enable qtdbus
+    else
+        check_cxx ${qt_inc} <<EOF && enable qtdbus
 #include <QtDBus/QtDBus>
 #include <QtDBus/QDBusInterface>
 int main(void)
@@ -4076,6 +4077,7 @@ int main(void)
     return 0;
 }
 EOF
+    fi
 fi
 
 if enabled firewire; then

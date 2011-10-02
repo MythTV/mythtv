@@ -14,6 +14,7 @@
             <buttonarea>0,0,1240,520</buttonarea>
             <layout>grid</layout>
             <spacing>5</spacing>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,300,60</area>

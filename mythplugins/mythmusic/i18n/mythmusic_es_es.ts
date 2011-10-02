@@ -285,10 +285,6 @@
 <context>
     <name>EditMetadataDialog</name>
     <message>
-        <source>Done</source>
-        <translation type="obsolete">Hecho</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/editmetadata.cpp" line="505"/>
         <source>Options</source>
         <translation type="unfinished"></translation>
@@ -343,53 +339,9 @@
         <translation>Selecciona un Género</translation>
     </message>
     <message>
-        <source>Save Changes?</source>
-        <translation type="obsolete">¿Guardar Cambios?</translation>
-    </message>
-    <message>
-        <source>Save to Database Only</source>
-        <translation type="obsolete">Guardar Sólo en la Base de Datos</translation>
-    </message>
-    <message>
-        <source>Save to File Only</source>
-        <translation type="obsolete">Guardar Sólo en Archivo</translation>
-    </message>
-    <message>
-        <source>Save to File and Database</source>
-        <translation type="obsolete">Guardar en Archivo y en la Base de Datos</translation>
-    </message>
-    <message>
-        <source>Exit/Do Not Save</source>
-        <translation type="obsolete">Salir/No Guardar</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/editmetadata.cpp" line="524"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation type="obsolete">¿Seguro que deseas guardar los metadatos modificados en el archivo?</translation>
-    </message>
-    <message>
-        <source>Track Info.</source>
-        <translation type="obsolete">Información sobre la Pista</translation>
-    </message>
-    <message>
-        <source>Album Art</source>
-        <translation type="obsolete">Arte del Álbum</translation>
-    </message>
-    <message>
-        <source>Statistics</source>
-        <translation type="obsolete">Estadísticas</translation>
-    </message>
-    <message>
-        <source>Save Changes</source>
-        <translation type="obsolete">Guardar Cambios</translation>
-    </message>
-    <message>
-        <source>Change Image Type</source>
-        <translation type="obsolete">Cambiar Tipo de Imagen</translation>
     </message>
 </context>
 <context>
@@ -521,25 +473,6 @@ No fue posible copiar el archivo a: %1</translation>
         <location filename="../mythmusic/importmusic.cpp" line="660"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
-    </message>
-</context>
-<context>
-    <name>MiniPlayer</name>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">can</translation>
-    </message>
-    <message>
-        <source>Album</source>
-        <translation type="obsolete">Álbum</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artista</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="obsolete">Todas</translation>
     </message>
 </context>
 <context>
@@ -1070,10 +1003,6 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ogg Vorbis Audio</source>
-        <translation type="obsolete">Sonido Ogg Vorbis</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/databasebox.cpp" line="1355"/>
         <location filename="../mythmusic/metadata.cpp" line="1188"/>
         <source>Unknown</source>
@@ -1133,14 +1062,6 @@ Do you want to continue playing in the background?</source>
         <location filename="../mythmusic/globalsettings.cpp" line="115"/>
         <source>Filename Format</source>
         <translation>Formato del Nombre de Archivo</translation>
-    </message>
-    <message>
-        <source>Ignore ID3 Tags</source>
-        <translation type="obsolete">Ignorar Marcas ID3</translation>
-    </message>
-    <message>
-        <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation type="obsolete">Si se activa, MythMusic no comprobará las marcas ID3 en los archivos y simplemente tratará de determinar el Género, el Artista, el Álbum, el Número de Pista y el Título a partir del nombre del archivo.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="164"/>
@@ -1407,11 +1328,6 @@ Do you want to continue playing in the background?</source>
         <location filename="../mythmusic/metadata.cpp" line="572"/>
         <source>Unknown Genre</source>
         <translation>Género Desconocido</translation>
-    </message>
-    <message>
-        <source>%1  by  %2</source>
-        <comment>Music track &apos;title by artist&apos;</comment>
-        <translation type="obsolete">%1  por  %2</translation>
     </message>
     <message>
         <location filename="../mythmusic/metadata.cpp" line="950"/>
@@ -1707,10 +1623,6 @@ Do you want to continue playing in the background?</source>
         <location filename="../mythmusic/globalsettings.cpp" line="65"/>
         <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
         <translation>Dispositivo de Sonido usado para la reproducción. &apos;por defecto&apos; usará el especificado en MythTV</translation>
-    </message>
-    <message>
-        <source>Unknown Title</source>
-        <translation type="obsolete">Título Desconocido</translation>
     </message>
     <message>
         <location filename="../mythmusic/cdrip.cpp" line="224"/>
@@ -2446,7 +2358,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>Please Wait...</source>
-        <translation>Por Favor, Espera ...</translation>
+        <translation>Por Favor, Espere ...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
@@ -2501,7 +2413,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>Compilation:</source>
-        <translation>Compilación:</translation>
+        <translation>Recopilación:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
@@ -2521,7 +2433,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="59"/>
         <source>Cover Art</source>
-        <translation>Arte de la Carátula</translation>
+        <translation>Grafismo de Portada</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
@@ -2551,17 +2463,17 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>Comp. Artist:</source>
-        <translation>Artista de Recopil.</translation>
+        <translation>Artista de Recopil.:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Album Art</source>
-        <translation>Arte del Álbum</translation>
+        <translation>Grafismo del Álbum</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>No Album Art Found</source>
-        <translation>No se encontró Arte del Álbum</translation>
+        <translation>No se encontraron Grafismos del Álbum</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
@@ -2646,7 +2558,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="68"/>
         <source>Import Cover Art</source>
-        <translation>Importar Arte de Carátula</translation>
+        <translation>Importar Grafismos de Portada</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
@@ -2656,17 +2568,17 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="2"/>
         <source>Playing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproduciendo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>None</source>
-        <translation type="unfinished">Ninguno</translation>
+        <translation>Ninguno</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
         <source>%TITLE%  by  %ARTIST%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE% por %ARTIST%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
@@ -2676,12 +2588,12 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Import Coverart</source>
-        <translation>Importar Arte de Carátula</translation>
+        <translation>Importar Grafismos de Portada</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>Browse cover images on your system.</source>
-        <translation>Explorar las carátulas existentes en tu sistema</translation>
+        <translation>Navegar por las imágenes de portada existentes en su sistema.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
@@ -2706,22 +2618,22 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Import local music files.</source>
-        <translation>Importar archivos de música locales</translation>
+        <translation>Importar archivos de música locales.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Track is part of a compilation</source>
-        <translation>Esta pista es parte de una compilación</translation>
+        <translation>Esta pista es parte de una recopilación</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Click to browse directories...</source>
-        <translation>Pulsar para explorar los directorios...</translation>
+        <translation>Pulsar para navegar por los directorios...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Choose Coverart</source>
-        <translation type="unfinished"></translation>
+        <translation>Elegir Grafismo de Portada</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
@@ -2731,7 +2643,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>Input metadata for the CD you have inserted.</source>
-        <translation>Introducir metadatos para el CD que has insertado</translation>
+        <translation>Introducir metadatos para el CD que ha introducido.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
@@ -2746,31 +2658,27 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Album is a compilation</source>
-        <translation>El álbum es una compilación</translation>
+        <translation>El álbum es una recopilación</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>Click here to search existing artists...</source>
-        <translation>Pulsar aquí para buscar artistas...</translation>
+        <translation>Pulsar aquí para buscar artistas existentes...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Click here to search existing albums...</source>
-        <translation>Pulsar aquí para buscar álbumes...</translation>
+        <translation>Pulsar aquí para buscar álbumes existentes...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Click here to search existing genres...</source>
-        <translation>Pulsar aquí para buscar géneros...</translation>
+        <translation>Pulsar aquí para buscar géneros existentes...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="58"/>
         <source>Scan</source>
         <translation>Explorar</translation>
-    </message>
-    <message>
-        <source>All ready in database</source>
-        <translation type="obsolete">Todo preparado en la base de datos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="62"/>
@@ -2785,7 +2693,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>Edit Playlist</source>
-        <translation>Editar Lista</translation>
+        <translation>Editar Lista de Reproducción</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="72"/>
@@ -2795,7 +2703,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="73"/>
         <source>Edit AlbumArt</source>
-        <translation>Editar Arte del Álbum</translation>
+        <translation>Editar Grafismo del Álbum</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
@@ -2820,21 +2728,17 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="79"/>
         <source>Edit Track Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar Información de Pista</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="80"/>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="81"/>
         <source>Volume</source>
         <translation>Volumen</translation>
-    </message>
-    <message>
-        <source>0%</source>
-        <translation type="obsolete">0%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="83"/>
@@ -2849,7 +2753,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>Last Value</source>
-        <translation>Último Valor:</translation>
+        <translation>Último Valor</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="86"/>
@@ -2879,7 +2783,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="91"/>
         <source>Music playback options</source>
-        <translation>Opciones de reproducción</translation>
+        <translation>Opciones de reproducción de música</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="92"/>
@@ -2909,7 +2813,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>%VOLUMEPERCENT%</source>
-        <translation type="unfinished"></translation>
+        <translation>%VOLUMEPERCENT%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>

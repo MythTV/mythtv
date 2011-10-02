@@ -152,7 +152,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     uint ItemWidth(void);
     uint ItemHeight(void);
-    const LayoutType GetLayout() const { return m_layout; }
+    LayoutType GetLayout() const { return m_layout; }
 
     bool MoveItemUpDown(MythUIButtonListItem *item, bool up);
 
@@ -280,6 +280,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     QVector<MythUIStateType *> m_ButtonList;
     QMap<int, MythUIButtonListItem *> m_ButtonToItem;
+    QHash<QString, QString> m_actionRemap;
 
     bool m_initialized;
     bool m_needsUpdate;
