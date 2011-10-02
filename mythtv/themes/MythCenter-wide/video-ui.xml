@@ -720,7 +720,7 @@
             <spacing>10</spacing>
             <buttonlist name="listtemplate" from="basebuttonlist">
                 <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
-                <triggerevent context="Global" action="SELECT">RIGHT</triggerevent>
+                <triggerevent context="Global" action="INFO">RIGHT</triggerevent>
             </buttonlist>
         </buttontree>
 
