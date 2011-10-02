@@ -336,7 +336,8 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
                        QString::number(canvas.width()) +
                        QString::number(canvas.height()) +
                        QString::number(dest.width()) +
-                       QString::number(dest.height());
+                       QString::number(dest.height()) +
+                       font.GetHash();
 
     for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
         incoming += (*Ipara)->text();
