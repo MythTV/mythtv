@@ -278,6 +278,14 @@ class MiroInterpreter(cmd.Cmd):
                 if hasattr(it.get_parent(), u'url'):
                     if filetypes.is_torrent_filename(it.get_parent().url):
                         continue
+
+                # Any item without a proper file name needs to be removed as Miro metadata is corrupt
+                if it.get_filename() == None:
+                    it.expire()
+                    self.statistics[u'Miro_videos_deleted']+=1
+                    logging.info(u'Unwatched video (%s) has been removed from Miro as item had no valid file name' % it.get_title())
+                    continue
+
                 self.printItems(it)
                 self.videofiles.append(self._get_item_dict(it))
             if self.verbose:
@@ -304,6 +312,14 @@ class MiroInterpreter(cmd.Cmd):
                 if hasattr(it.get_parent(), u'url'):
                     if filetypes.is_torrent_filename(it.get_parent().url):
                         continue
+
+                # Any item without a proper file name needs to be removed as Miro metadata is corrupt
+                if it.get_filename() == None:
+                    it.expire()
+                    self.statistics[u'Miro_videos_deleted']+=1
+                    logging.info(u'Watched video (%s) has been removed from Miro as item had no valid file name' % it.get_title())
+                    continue
+
                 self.printItems(it)
                 self.videofiles.append(self._get_item_dict(it))
             if self.verbose:
