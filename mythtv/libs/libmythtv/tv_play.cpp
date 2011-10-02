@@ -7770,7 +7770,7 @@ void TV::ChangeVolume(PlayerContext *ctx, bool up)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (!ctx->player ||
-        ctx->player && !ctx->player->PlayerControlsVolume())
+        (ctx->player && !ctx->player->PlayerControlsVolume()))
     {
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         return;
