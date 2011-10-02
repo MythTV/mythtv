@@ -567,7 +567,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
                 "Frame buffer incomplete_DRAW_BUFFER");
             break;
         case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + 
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 "Frame buffer incomplete_READ_BUFFER");
             break;
         case GL_FRAMEBUFFER_UNSUPPORTED:

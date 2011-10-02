@@ -2,6 +2,7 @@
 #define MYTHUI_TEXT_H_
 
 // QT headers
+#include <QTextLayout>
 #include <QColor>
 
 // Mythdb headers
@@ -45,6 +46,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void UseAlternateArea(bool useAlt);
 
     virtual void Pulse(void);
+    QPoint CursorPosition(int text_offset);
 
     // StorageUser
     void SetDBValue(const QString &text) { SetText(text); }
@@ -79,20 +81,26 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetPosition(const MythPoint &pos);
     MythRect GetDrawRect(void) { return m_drawRect; }
 
-    void SetDrawRectSize(const int width, const int height);
-    void SetDrawRectPosition(const int x, const int y);
-    void MoveDrawRect(const int x, const int y);
+    void SetCanvasPosition(int x, int y);
+    void ShiftCanvas(int x, int y);
 
-    bool MakeNarrow(QRect &min_rect);
-    bool MakeShort(QRect &min_rect);
+    bool Layout(QString & paragraph, QTextLayout *layout,
+		bool & overflow, qreal width, qreal & height,
+		qreal & last_line_width, QRectF & min_rect, int & num_lines);
+    bool LayoutParagraphs(const QStringList & paragraphs,
+			  const QTextOption & textoption,
+			  qreal width, qreal & height, QRectF & min_rect,
+			  qreal & last_line_width, int & num_lines);
+    bool GetNarrowWidth(const QStringList & paragraphs,
+			const QTextOption & textoption, qreal & width);
     void FillCutMessage(bool reset_size = false);
-    QString cutDown(const QString &data, MythFontProperties *font,
-                    bool multiline = false);
 
     int m_Justification;
     MythRect m_OrigDisplayRect;
     MythRect m_AltDisplayRect;
+    MythRect m_Canvas;
     MythRect m_drawRect;
+    QPoint   m_cursorPos;
 
     QString m_Message;
     QString m_CutMessage;
@@ -103,6 +111,12 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     bool m_ShrinkNarrow;
     bool m_Cutdown;
     bool m_MultiLine;
+    int  m_Leading;
+    int  m_extraLeading;
+    int  m_lineHeight;
+    int  m_textCursor;
+
+    QVector<QTextLayout *> m_Layouts;
 
     MythFontProperties* m_Font;
     QMap<QString, MythFontProperties> m_FontStates;
