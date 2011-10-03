@@ -1431,6 +1431,8 @@ void ProgramRecPriority::UpdateList()
             state = "normal";
         else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
             state = "running";
+        else
+            state = "warning";
 
         InfoMap infoMap;
         progInfo->ToMap(infoMap);
