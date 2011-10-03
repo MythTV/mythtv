@@ -71,7 +71,7 @@ static bool_t hdhomerun_discover_sock_add(struct hdhomerun_discover_t *ds, uint3
 	}
 
 	/* Bind socket. */
-	if (!hdhomerun_sock_bind(sock, local_ip, 0)) {
+	if (!hdhomerun_sock_bind(sock, local_ip, 0, FALSE)) {
 		hdhomerun_sock_destroy(sock);
 		return FALSE;
 	}
