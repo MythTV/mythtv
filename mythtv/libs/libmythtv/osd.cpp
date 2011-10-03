@@ -1074,6 +1074,16 @@ void OSD::TeletextReset(void)
         tt->Reset();
 }
 
+void OSD::TeletextClear(void)
+{
+    if (!HasWindow(OSD_WIN_TELETEXT))
+        return;
+
+    TeletextScreen* tt = (TeletextScreen*)m_Children.value(OSD_WIN_TELETEXT);
+    if (tt)
+        tt->ClearScreen();
+}
+
 SubtitleScreen* OSD::InitSubtitles(void)
 {
     SubtitleScreen *sub = NULL;

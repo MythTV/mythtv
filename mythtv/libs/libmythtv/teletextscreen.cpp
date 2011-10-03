@@ -52,7 +52,7 @@ TeletextScreen::TeletextScreen(MythPlayer *player, const char * name,
 
 TeletextScreen::~TeletextScreen()
 {
-    CleanUp();
+    ClearScreen();
 }
 
 bool TeletextScreen::Create(void)
@@ -62,7 +62,7 @@ bool TeletextScreen::Create(void)
     return m_player && m_teletextReader;
 }
 
-void TeletextScreen::CleanUp(void)
+void TeletextScreen::ClearScreen(void)
 {
     DeleteAllChildren();
     for (int i = 0; i < m_rowImages.size(); i++)
@@ -191,7 +191,7 @@ void TeletextScreen::Pulse(void)
     if (!m_teletextReader->PageChanged())
         return;
 
-    CleanUp();
+    ClearScreen();
 
     const TeletextSubPage *ttpage = m_teletextReader->FindSubPage();
 
@@ -247,7 +247,7 @@ void TeletextScreen::SetDisplaying(bool display)
 {
     m_displaying = display;
     if (!m_displaying)
-        CleanUp();
+        ClearScreen();
 }
 
 void TeletextScreen::Reset(void)

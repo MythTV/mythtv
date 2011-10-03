@@ -174,6 +174,7 @@ class OSD
     void EnableTeletext(bool enable, int page);
     bool TeletextAction(const QString &action);
     void TeletextReset(void);
+    void TeletextClear(void);
 
     SubtitleScreen* InitSubtitles(void);
     void EnableSubtitles(int type);

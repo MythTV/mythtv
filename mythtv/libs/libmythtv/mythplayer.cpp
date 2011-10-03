@@ -1304,6 +1304,11 @@ void MythPlayer::ResetCaptions(void)
     {
         osd->ClearSubtitles();
     }
+    else if ((textDisplayMode & kDisplayTeletextCaptions) ||
+             (textDisplayMode & kDisplayNUVTeletextCaptions))
+    {
+        osd->TeletextClear();
+    }
 }
 
 void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
