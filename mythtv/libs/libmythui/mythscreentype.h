@@ -95,7 +95,7 @@ class MUI_PUBLIC MythScreenType : public MythUIType
     virtual bool ParseElement(
         const QString &filename, QDomElement &element, bool showWarnings);
 
-    virtual void Load(void);   // ONLY to be used for loading data, NO UI WORK
+    virtual void Load(void);   // ONLY to be used for loading data, NO UI WORK or it will segfault
     virtual void Init(void);   // UI work to draw data loaded
 
     void LoadInBackground(QString message = "");

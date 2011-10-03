@@ -260,7 +260,16 @@ bool MythScreenType::Create(void)
     return true;
 }
 
-// This method should only load data, it should never perform UI routines
+/**
+ * \brief Load data which will ultimately be displayed on-screen or used to
+ *        determine what appears on-screen (See Warning)
+ *
+ * \warning This method should only load data, it should NEVER perform UI
+ *          routines or segfaults WILL result. This includes assinging data to
+ *          any widgets, calling methods on a widget or anything else which
+ *          triggers redraws. The safest and recommended approach is to avoid
+ *          any interaction with a libmythui class or class member.
+ */
 void MythScreenType::Load(void)
 {
     // Virtual
@@ -329,6 +338,9 @@ void MythScreenType::ResetBusyPopup(void)
         m_BusyPopup->Reset();
 }
 
+/**
+ * \brief Has Init() been called on this screen?
+ */
 bool MythScreenType::IsInitialized(void) const
 {
     return m_IsInitialized;
@@ -341,6 +353,13 @@ void MythScreenType::doInit(void)
     m_IsInitialized = true;
 }
 
+/**
+ * \brief Used after calling Load() to assign data to widgets and other UI
+ *        initilisation which is prohibited in Load()
+ *
+ * \warning Do NOT confuse this with Load(), they serve very different purposes
+ *          and most often both should be used when creating a new screen.
+ */
 void MythScreenType::Init(void)
 {
     // Virtual
