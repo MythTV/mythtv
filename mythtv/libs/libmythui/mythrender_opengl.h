@@ -22,14 +22,6 @@
 #include "mythrender_base.h"
 #include "mythrender_opengl_defs.h"
 
-#ifdef GL_ES_VERSION_2_0
-#define GL_BGRA  GL_RGBA
-#define GL_RGBA8 GL_RGBA
-#define GL_TEXTURE_1D 0x0
-static inline void glTexImage1D(GLenum, GLint, GLint, GLsizei, GLint,
-                                GLenum, GLenum, const GLvoid*) { };
-#endif
-
 typedef enum
 {
     kGLFeatNone    = 0x0000,
@@ -233,6 +225,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     QList<uint64_t>         m_vertexExpiry;
     QMap<uint64_t,GLuint>   m_cachedVBOS;
     QList<uint64_t>         m_vboExpiry;
+
+    // 1D Textures (not available on GL ES 2.0)
+    MYTH_GLTEXIMAGE1DPROC                m_glTexImage1D;
 
     // Multi-texturing
     MYTH_GLACTIVETEXTUREPROC             m_glActiveTexture;

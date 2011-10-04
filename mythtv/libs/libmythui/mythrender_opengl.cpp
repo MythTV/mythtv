@@ -700,6 +700,8 @@ void MythRenderOpenGL::InitProcs(void)
 {
     m_extensions = (reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
 
+    m_glTexImage1D = (MYTH_GLTEXIMAGE1DPROC)
+        GetProcAddress("glTexImage1D");
     m_glActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
         GetProcAddress("glActiveTexture");
     m_glMapBuffer = (MYTH_GLMAPBUFFERPROC)
@@ -933,6 +935,7 @@ void MythRenderOpenGL::ResetProcs(void)
 {
     m_extensions = QString();
 
+    m_glTexImage1D = NULL;
     m_glActiveTexture = NULL;
     m_glMapBuffer = NULL;
     m_glBindBuffer = NULL;
@@ -1236,11 +1239,12 @@ bool MythRenderOpenGL::ClearTexture(uint tex)
 
     memset(scratch, 0, tmp_size);
 
-    if (m_textures[tex].m_type == GL_TEXTURE_1D)
+    if ((m_textures[tex].m_type == GL_TEXTURE_1D) && m_glTexImage1D)
     {
-        glTexImage1D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
-                     size.width(), 0, m_textures[tex].m_data_fmt ,
-                     m_textures[tex].m_data_type, scratch);
+        m_glTexImage1D(m_textures[tex].m_type, 0,
+                       m_textures[tex].m_internal_fmt,
+                       size.width(), 0, m_textures[tex].m_data_fmt,
+                       m_textures[tex].m_data_type, scratch);
     }
     else
     {

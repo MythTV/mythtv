@@ -232,6 +232,12 @@ void MythRenderOpenGL1::SetShaderParams(uint obj, void* vals,
 
 uint MythRenderOpenGL1::CreateHelperTexture(void)
 {
+    if (!m_glTexImage1D)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "glTexImage1D not available.");
+        return 0;
+    }
+
     makeCurrent();
 
     uint width = m_max_tex_size;
