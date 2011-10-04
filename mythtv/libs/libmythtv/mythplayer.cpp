@@ -3186,11 +3186,6 @@ void MythPlayer::SetWatched(bool forceWatched)
             QString("Marking recording as watched using offset %1 minutes")
                 .arg(offset/60));
     }
-    else
-    {
-        player_ctx->playingInfo->SaveWatched(false);
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Marking recording as unwatched");
-    }
 
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
