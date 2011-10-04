@@ -69,6 +69,9 @@ class MythDVDPlayer : public MythPlayer
     virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
                                    bool absolute);
 
+    // Private initialization stuff
+    virtual void AutoDeint(VideoFrame* frame, bool allow_lock = true);
+
     // Complicated gets
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);

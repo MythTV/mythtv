@@ -44,7 +44,7 @@ void MythBDPlayer::DisplayPauseFrame(void)
     if (player_ctx->buffer->IsBD() &&
         player_ctx->buffer->BD()->IsInStillFrame())
     {
-        SetScanType(kScan_Progressive, false);
+        SetScanType(kScan_Progressive);
     }
     DisplayMenu();
     MythPlayer::DisplayPauseFrame();
