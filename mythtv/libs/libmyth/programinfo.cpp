@@ -1396,6 +1396,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["recstartdate"] = MythDateTimeToString(recstartts, kDateShort);
         progMap["recendtime"] = MythDateTimeToString(recendts, kTime);
         progMap["recenddate"] = MythDateTimeToString(recendts, kDateShort);
+        progMap["startts"] = QString::number(startts.toTime_t());
+        progMap["endts"]   = QString::number(endts.toTime_t());
     }
 
     progMap["timedate"] = MythDateTimeToString(recstartts,
