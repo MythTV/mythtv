@@ -201,8 +201,8 @@ void GrabberSettings::Init(void)
              m_movieGrabberList.begin();
          it != m_movieGrabberList.end(); ++it)
     {
-        QString commandline = QString("%1metadata/Movie/%2")
-                    .arg(GetShareDir()).arg((*it)->GetCommand());
+        QString commandline = QString("metadata/Movie/%1")
+                    .arg((*it)->GetCommand());
         MetadataMap map;
         (*it)->toMap(map);
         MythUIButtonListItem *item =
@@ -216,8 +216,8 @@ void GrabberSettings::Init(void)
     for (QList<MetaGrabberScript*>::const_iterator it = m_tvGrabberList.begin();
          it != m_tvGrabberList.end(); ++it)
     {
-        QString commandline = QString("%1metadata/Television/%2")
-                    .arg(GetShareDir()).arg((*it)->GetCommand());
+        QString commandline = QString("metadata/Television/%1")
+                    .arg((*it)->GetCommand());
         MetadataMap map;
         (*it)->toMap(map);
         MythUIButtonListItem *item =
@@ -232,8 +232,8 @@ void GrabberSettings::Init(void)
              m_gameGrabberList.begin();
          it != m_gameGrabberList.end(); ++it)
     {
-        QString commandline = QString("%1metadata/Game/%2")
-                    .arg(GetShareDir()).arg((*it)->GetCommand());
+        QString commandline = QString("metadata/Game/%1")
+                    .arg((*it)->GetCommand());
         MetadataMap map;
         (*it)->toMap(map);
         MythUIButtonListItem *item =
@@ -245,14 +245,11 @@ void GrabberSettings::Init(void)
     m_gameGrabberList.clear();
 
     QString currentTVGrabber = gCoreContext->GetSetting("TelevisionGrabber",
-                                         QString("%1metadata/Television/%2")
-                                         .arg(GetShareDir()).arg("ttvdb.py"));
+                                         "metadata/Television/ttvdb.py");
     QString currentMovieGrabber = gCoreContext->GetSetting("MovieGrabber",
-                                         QString("%1metadata/Movie/%2")
-                                         .arg(GetShareDir()).arg("tmdb.py"));
+                                         "metadata/Movie/tmdb.py");
     QString currentGameGrabber = gCoreContext->GetSetting("mythgame.MetadataGrabber",
-                                         QString("%1metadata/Game/%2")
-                                         .arg(GetShareDir()).arg("giantbomb.py"));
+                                         "metadata/Game/giantbomb.py");
 
     m_movieGrabberButtonList->SetValueByData(qVariantFromValue(currentMovieGrabber));
     m_tvGrabberButtonList->SetValueByData(qVariantFromValue(currentTVGrabber));

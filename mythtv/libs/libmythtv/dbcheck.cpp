@@ -5879,6 +5879,22 @@ NULL
             return false;
     }
 
+    if (dbver == "1282")
+    {
+        const char *updates[] = {
+"UPDATE settings"
+"   SET data = SUBSTR(data, INSTR(data, 'share/mythtv/metadata')+13)"
+" WHERE value "
+"    IN ('TelevisionGrabber', "
+"        'MovieGrabber', "
+"        'mythgame.MetadataGrabber');",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1283", dbver))
+            return false;
+    }
+
     return true;
 }
 
