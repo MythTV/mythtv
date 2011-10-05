@@ -475,7 +475,7 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="88"/>
         <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation>Este directorio será el lugar de navegación por defecto al asignar capturas de imágenes.</translation>
+        <translation>Este directorio será el lugar de exploración por defecto al asignar capturas de imágenes.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="96"/>
@@ -486,7 +486,7 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="98"/>
         <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation>Este directorio sera el lugar de navegación por defecto al asignar fanart (grafismos de terceros).</translation>
+        <translation>Este directorio sera el lugar de exploración por defecto al asignar fanart (grafismos de terceros).</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="106"/>
@@ -496,7 +496,7 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="108"/>
         <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation>Este directorio será el lugar de navegación por defecto al asignar carátulas.</translation>
+        <translation>Este directorio será el lugar de exploración por defecto al asignar carátulas.</translation>
     </message>
 </context>
 <context>

@@ -42,7 +42,7 @@ class System( DBCache ):
         except MythError:
             return s.returncode
 
-    def __init__(self, path=None, setting=None, db=None, useshell=True):
+    def __init__(self, path=None, setting=None, db=None, useshell=True, prefix=''):
         DBCache.__init__(self, db=db)
         self.log = MythLog(self.logmodule, db=self)
         self.path = None
@@ -59,6 +59,9 @@ class System( DBCache ):
             if path is None:
                 raise MythError('Invalid input to System()')
             self.path = path
+
+        if prefix:
+            self.path = os.path.join(prefix, self.path)
 
         cmd = self.path.split()[0]
         if self.path.startswith('/'):

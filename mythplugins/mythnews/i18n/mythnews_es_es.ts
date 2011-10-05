@@ -6,7 +6,7 @@
     <message>
         <location filename="../mythnews/main.cpp" line="47"/>
         <source>RSS News feed reader</source>
-        <translation>Lector de canales de Noticias RSS</translation>
+        <translation>Lector de Canales de Noticias RSS</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="51"/>
@@ -44,7 +44,7 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="929"/>
         <source>Edit News Site</source>
-        <translation>Editar Fuente de Noticias</translation>
+        <translation>Editar Sitio de Noticias</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="122"/>
@@ -65,12 +65,12 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="930"/>
         <source>Add News Site</source>
-        <translation>Añadir Fuente de Noticias</translation>
+        <translation>Añadir Sitio de Noticias</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="932"/>
         <source>Delete News Site</source>
-        <translation>Eliminar Fuente de Noticias</translation>
+        <translation>Eliminar Sitio de Noticias</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="915"/>
