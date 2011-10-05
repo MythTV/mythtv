@@ -216,112 +216,112 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="69"/>
+        <location filename="../mythgallery/main.cpp" line="71"/>
         <source>Image viewer / slideshow</source>
         <translation>Billedviser / slideshow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="72"/>
+        <location filename="../mythgallery/main.cpp" line="74"/>
         <source>Start/Stop Slideshow</source>
         <translation>Start/stop slideshow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="74"/>
+        <location filename="../mythgallery/main.cpp" line="76"/>
         <source>Go to the first image in thumbnail view</source>
         <translation>Gå til det første billede i oversigtsvisning</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="76"/>
+        <location filename="../mythgallery/main.cpp" line="78"/>
         <source>Go to the last image in thumbnail view</source>
         <translation>Gå til det sidste billede i oversigtsvisning</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="78"/>
+        <location filename="../mythgallery/main.cpp" line="80"/>
         <source>Start Slideshow in thumbnail view</source>
         <translation>Start slideshow i oversigtsvisning</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="80"/>
+        <location filename="../mythgallery/main.cpp" line="82"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Start tilfældigt slideshow i oversigtsvisning</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="83"/>
+        <location filename="../mythgallery/main.cpp" line="85"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Roter billede 90 grader mod højre</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="85"/>
+        <location filename="../mythgallery/main.cpp" line="87"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Roter billede 90 grader mod venstre</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="87"/>
+        <location filename="../mythgallery/main.cpp" line="89"/>
         <source>Zoom image out</source>
         <translation>Zoom ud</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="89"/>
+        <location filename="../mythgallery/main.cpp" line="91"/>
         <source>Zoom image in</source>
         <translation>Zoom ind</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="91"/>
+        <location filename="../mythgallery/main.cpp" line="93"/>
         <source>Scroll image up</source>
         <translation>Flyt billede op</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="93"/>
+        <location filename="../mythgallery/main.cpp" line="95"/>
         <source>Scroll image left</source>
         <translation>Flyt billede til venstre</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="95"/>
+        <location filename="../mythgallery/main.cpp" line="97"/>
         <source>Scroll image right</source>
         <translation>Flyt billede til venstre</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="97"/>
+        <location filename="../mythgallery/main.cpp" line="99"/>
         <source>Scroll image down</source>
         <translation>Flyt billede ned</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="99"/>
+        <location filename="../mythgallery/main.cpp" line="101"/>
         <source>Recenter image</source>
         <translation>Centrer billedet</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="101"/>
+        <location filename="../mythgallery/main.cpp" line="103"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Vis billede i fuld størrelse</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="103"/>
+        <location filename="../mythgallery/main.cpp" line="105"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>Gå til øverste venstre hjørne af billedet</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="105"/>
+        <location filename="../mythgallery/main.cpp" line="107"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>Gå til nederste højre hjørne af billedet</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="107"/>
+        <location filename="../mythgallery/main.cpp" line="109"/>
         <source>Mark image</source>
         <translation>Marker billede</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="109"/>
+        <location filename="../mythgallery/main.cpp" line="111"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
         <translation>Skift mellem skaler-til-fuldskærm og skaler-for-tilpasning</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="111"/>
+        <location filename="../mythgallery/main.cpp" line="113"/>
         <source>MythGallery Media Handler 1/2</source>
         <translation>MythGallery mediehåndtering 1/2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="114"/>
+        <location filename="../mythgallery/main.cpp" line="116"/>
         <source>MythGallery Media Handler 2/2</source>
         <translation>MythGallery mediehåndtering 2/2</translation>
     </message>
@@ -344,17 +344,27 @@
         <translation>Stier hvor der skal importeres billeder fra</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="127"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="84"/>
+        <source>Automatically load MythGallery to display pictures</source>
+        <translation>Start automatisk MythGallery for at vise billeder</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/gallerysettings.cpp" line="86"/>
+        <source>When a new CD-Rom or removable storage device containing pictures is detected then load MythGallery to display the content.</source>
+        <translation>Når der detekteres en ny CD-ROM eller flytbar disk indeholdende billeder, startes MythGallery for at vise indholdet.</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/gallerysettings.cpp" line="136"/>
         <source>Type of transition</source>
         <translation>Overgangstype</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="150"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="159"/>
         <source>Type of background</source>
         <translation>Baggrundstype</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="165"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="174"/>
         <source>This is the number of seconds to display each picture.</source>
         <translation>Antal sekunder som hvert billede skal vises.</translation>
     </message>
@@ -364,37 +374,37 @@
         <translation>Dette er en kolon separeret liste af stier. Hvis stien i listen er en mappe, bliver indeholdet kopieret. Hvis det er en kommando, bliver den kørt.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="142"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="151"/>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
         <translation>Dette er den overgangstype der benyttes mellem billederne under slideshow.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="155"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="164"/>
         <source>This is the type of background for each picture in single view mode.</source>
         <translation>Dette er den baggrundstype der benyttes til hvert billede under enkeltbilledvisning.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="163"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="172"/>
         <source>Slideshow Delay</source>
         <translation>Slideshow pause</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="86"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="95"/>
         <source>Use OpenGL transitions</source>
         <translation>Brug OpenGL overgange</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="88"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="97"/>
         <source>Check this to enable OpenGL based slideshow transitions</source>
         <translation>Sæt denne for at aktivere OpenGL overgange</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="96"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="105"/>
         <source>Type of OpenGL transition</source>
         <translation>OpenGL overgangstype</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="108"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="117"/>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
         <translation>Dette er den OpenGL overgangetype som benyttes mellem billeder i slideshow mode.</translation>
     </message>
@@ -419,12 +429,12 @@
         <translation>Hvis aktiv, bliver mini-billederne gemt i&apos;.thumbcache&apos; mapper i ovenstående mappe. Ellers bliver de gemt i brugerens hjemmemappe.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="173"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="182"/>
         <source>Recurse into directories</source>
         <translation>Inkluder undermapper</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="174"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="183"/>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
         <translation>Sættes hvis slideshowet skal indeholde billeder fra undermapper.</translation>
     </message>
@@ -449,22 +459,22 @@
         <translation>Sorteringsorden af mini-billeder under navigering.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="117"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="126"/>
         <source>Duration of OpenGL Transition (milliseconds)</source>
         <translation>Varighed af OpenGL overgang (millisekunder)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="185"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="194"/>
         <source>MythGallery Settings (Slideshow)</source>
         <translation>MythGallery indstillinger (Slideshow)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="215"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="224"/>
         <source>MythGallery Settings (General)</source>
         <translation>MythGallery indstillinger (Generelt)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="45"/>
+        <location filename="../mythgallery/main.cpp" line="44"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
