@@ -33,8 +33,8 @@
 #define QUALITY_MEDIUM      1
 #define QUALITY_HIGH        2
 
-// 1,2 and 5 channels are currently valid for upmixing if required
-#define UPMIX_CHANNEL_MASK ((1<<1)|(1<<2)|(1<<5))
+// 1,2,5 and 7 channels are currently valid for upmixing if required
+#define UPMIX_CHANNEL_MASK ((1<<1)|(1<<2)|(1<<5)|1<<7)
 #define IS_VALID_UPMIX_CHANNEL(ch) ((1 << (ch)) & UPMIX_CHANNEL_MASK)
 
 static const char *quality_string(int q)
@@ -456,53 +456,63 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     bool lneeds_upmix         = false;
     bool lneeds_downmix       = false;
     bool lreenc               = false;
+    bool lenc                 = false;
 
     if (!settings.use_passthru)
     {
-        // update channels configuration if source_channels has changed
-        if (lsource_channels > configured_channels)
+        // Do we upmix stereo or mono?
+        lconfigured_channels =
+            (upmix_default && lsource_channels <= 2) ? 6 : lsource_channels;
+        bool cando_channels =
+            output_settings->IsSupportedChannels(lconfigured_channels);
+
+        // check if the number of channels could be transmitted via AC3 encoding
+        lenc = output_settingsdigital->canFeature(FEATURE_AC3) &&
+            (!output_settings->canFeature(FEATURE_LPCM) &&
+             lconfigured_channels > 2 && lconfigured_channels <= 6);
+
+        if (!lenc && !cando_channels)
         {
-            if (lsource_channels <= 6)
-                lconfigured_channels = min(max_channels, 6);
-            else if (lsource_channels > 6)
-                 lconfigured_channels = max_channels;
-        }
-        else
-        {
-            if (!output_settings->IsSupportedChannels(lsource_channels))
+            // if hardware doesn't support source audio configuration
+            // we will upmix/downmix to what we can
+            // (can safely assume hardware supports stereo)
+            switch (lconfigured_channels)
             {
-                // if hardware doesn't support source audio configuration
-                // we will upmix/downmix to what we can
-                // (can safely assume hardware supports stereo)
-                switch (lsource_channels)
-                {
-                    case 1:
-                        lconfigured_channels = upmix_default ? max_channels : 2;
+                case 7:
+                    lconfigured_channels = 8;
+                    break;
+                case 8:
+                case 5:
+                    lconfigured_channels = 6;
                         break;
-                    case 2:
-                        //Will never happen
-                    case 3:
-                    case 4:
-                    case 6:
-                        lconfigured_channels = 2;
-                        break;
-                    case 5:
-                    case 7:
-                        if (output_settings->IsSupportedChannels(6))
-                            lconfigured_channels = 6;
-                        else
-                            lconfigured_channels = 2;
-                        break;
-                    default:
-                        lconfigured_channels = max_channels;
-                        break;
-                }
+                case 6:
+                case 4:
+                case 3:
+                case 2: //Will never happen
+                    lconfigured_channels = 2;
+                    break;
+                case 1:
+                    lconfigured_channels = upmix_default ? 6 : 2;
+                    break;
+                default:
+                    lconfigured_channels = 2;
+                    break;
             }
-            else
-                lconfigured_channels =
-                    (upmix_default && lsource_channels <= 2) ?
-                    max_channels : lsource_channels;
         }
+        // Make sure we never attempt to output more than what we can
+        // the upmixer can only upmix to 6 channels when source < 6
+        if (lsource_channels <= 6)
+            lconfigured_channels = min(lconfigured_channels, 6);
+        lconfigured_channels = min(lconfigured_channels, max_channels);
+        /* Encode to AC-3 if we're allowed to passthru but aren't currently
+           and we have more than 2 channels but multichannel PCM is not
+           supported or if the device just doesn't support the number of
+           channels */
+        lenc = output_settingsdigital->canFeature(FEATURE_AC3) &&
+            ((!output_settings->canFeature(FEATURE_LPCM) &&
+              lconfigured_channels > 2) ||
+             !output_settings->IsSupportedChannels(lconfigured_channels));
+
         /* Might we reencode a bitstream that's been decoded for timestretch?
            If the device doesn't support the number of channels - see below */
         if (output_settingsdigital->canFeature(FEATURE_AC3) &&
@@ -515,8 +525,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (IS_VALID_UPMIX_CHANNEL(settings.channels) &&
             settings.channels < lconfigured_channels)
         {
-            lconfigured_channels =
-                (lconfigured_channels > 6) ? 6 : lconfigured_channels;
             VBAUDIO(QString("Needs upmix from %1 -> %2 channels")
                     .arg(settings.channels).arg(lconfigured_channels));
             settings.channels = lconfigured_channels;
@@ -581,6 +589,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     needs_downmix          = lneeds_downmix;
     format                 = output_format   = settings.format;
     source_samplerate      = samplerate      = settings.samplerate;
+    enc                    = lenc;
 
     killaudio = pauseaudio = false;
     was_paused = true;
@@ -600,15 +609,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             .arg(output_settings->FormatToString(format))
             .arg(samplerate/1000)
             .arg(source_channels));
-
-    /* Encode to AC-3 if we're allowed to passthru but aren't currently
-       and we have more than 2 channels but multichannel PCM is not supported
-       or if the device just doesn't support the number of channels */
-    enc = (!passthru &&
-           output_settingsdigital->canFeature(FEATURE_AC3) &&
-           ((!output_settings->canFeature(FEATURE_LPCM) &&
-             configured_channels > 2) ||
-            !output_settings->IsSupportedChannels(channels)));
 
     VBAUDIO(QString("enc(%1), passthru(%2), features (%3) "
                     "configured_channels(%4), %5 channels supported(%6) "
@@ -685,10 +685,11 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             VBAUDIO("Reencoding decoded AC-3/DTS to AC-3");
 
         VBAUDIO(QString("Creating AC-3 Encoder with sr = %1, ch = %2")
-                .arg(samplerate).arg(channels));
+                .arg(samplerate).arg(configured_channels));
 
         encoder = new AudioOutputDigitalEncoder();
-        if (!encoder->Init(CODEC_ID_AC3, 448000, samplerate, channels))
+        if (!encoder->Init(CODEC_ID_AC3, 448000, samplerate,
+                           configured_channels))
         {
             Error("AC-3 encoder initialization failed");
             delete encoder;
@@ -772,7 +773,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     VolumeBase::SyncVolume();
     VolumeBase::UpdateVolume();
 
-    // Upmix Mono, Stereo or 5.0 to 5.1
     if (needs_upmix && IS_VALID_UPMIX_CHANNEL(source_channels) &&
         configured_channels > 2)
     {

@@ -586,10 +586,10 @@ void AudioTestThread::run()
         { 0, 1, 1 },                    //stereo
         { },                            //not used
         { },                            //not used
-        { },                            //not used
+        { 0, 2, 1, 4, 3 },              //5.0
         { 0, 2, 1, 5, 4, 3 },           //5.1
-        { },                            //not used
-        { 0, 2, 1, 7,  5, 4, 6, 3 },    //7.1
+        { 0, 2, 1, 6, 4, 5, 3 },        //6.1
+        { 0, 2, 1, 7, 5, 4, 6, 3 },     //7.1
     };
 
     if (m_audioOutput)
@@ -633,17 +633,24 @@ void AudioTestThread::run()
                         case 4:
                             if (m_channels == 6)
                                 channel = "surroundleft";
+                            else if (m_channels == 7)
+                                channel = "rearright";
                             else
                                 channel = "rearleft";
                             break;
                         case 5:
                             if (m_channels == 6)
                                 channel = "surroundright";
+                            else if (m_channels == 7)
+                                channel = "surroundleft";
                             else
                                 channel = "rearright";
                             break;
                         case 6:
-                            channel = "surroundleft";
+                            if (m_channels == 7)
+                                channel = "surroundright";
+                            else
+                                channel = "surroundleft";
                             break;
                         case 7:
                             channel = "surroundright";
@@ -668,8 +675,7 @@ void AudioTestThread::run()
                         LOG(VB_AUDIO, LOG_ERR, "AddData() Audio buffer "
                                                "overflow, audio data lost!");
                     }
-                     // a tad less than 1/48th of a second to avoid underruns
-                    usleep((1000000 / m_samplerate) * 1000);
+                    usleep(m_audioOutput->LengthLastData() * 1000);
                 }
                 m_audioOutput->Drain();
                 m_audioOutput->Pause(true);
@@ -689,17 +695,17 @@ void AudioTestThread::run()
 AudioTest::AudioTest(QString main, QString passthrough,
                      int channels, AudioOutputSettings settings) 
     : VerticalConfigurationGroup(false, true, false, false),
-      m_channels(channels),
       m_frontleft(NULL), m_frontright(NULL), m_center(NULL),
       m_surroundleft(NULL), m_surroundright(NULL),
       m_rearleft(NULL), m_rearright(NULL), m_lfe(NULL),
       m_main(main), m_passthrough(passthrough), m_settings(settings),
       m_quality(false)
 {
+    m_channels = gCoreContext->GetNumSetting("TestingChannels", channels);
     setLabel(QObject::tr("Audio Configuration Testing"));
 
-    m_at = new AudioTestThread(this, main, passthrough, channels,
-                               settings, m_quality);
+    m_at = new AudioTestThread(this, m_main, m_passthrough, m_channels,
+                               m_settings, m_quality);
     if (!m_at->result().isEmpty())
     {
         QString msg = main + QObject::tr(" is invalid or not "
@@ -740,17 +746,27 @@ AudioTest::AudioTest(QString main, QString passthrough,
             m_rearleft->setLabel(QObject::tr("Rear Left"));
             connect(m_rearleft,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
+            reargroup->addChild(m_rearleft);
+
+        case 7:
             m_rearright = new TransButtonSetting("4");
-            m_rearright->setLabel(QObject::tr("Rear Right"));
+            m_rearright->setLabel(QObject::tr(m_channels == 8 ?
+                                              "Rear Right" : "Rear Center"));
             connect(m_rearright,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
 
-            reargroup->addChild(m_rearleft);
             reargroup->addChild(m_rearright);
-    
+
         case 6:
-            m_surroundleft = new TransButtonSetting(m_channels == 6 ?
-                                                    "4" : "6");
+            m_lfe = new TransButtonSetting(m_channels == 6 ? "5" :
+                                           m_channels == 7 ? "6" : "7");
+            m_lfe->setLabel(QObject::tr("LFE"));
+            connect(m_lfe,
+                    SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
+
+        case 5:
+            m_surroundleft = new TransButtonSetting(m_channels == 6 ? "4" :
+                                                    m_channels == 7 ? "5" : "6");
             m_surroundleft->setLabel(QObject::tr("Surround Left"));
             connect(m_surroundleft,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
@@ -758,18 +774,14 @@ AudioTest::AudioTest(QString main, QString passthrough,
             m_surroundright->setLabel(QObject::tr("Surround Right"));
             connect(m_surroundright,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
-            m_lfe = new TransButtonSetting(m_channels == 6 ? "5" : "7");
-            m_lfe->setLabel(QObject::tr("LFE"));
-            connect(m_lfe,
-                    SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
-
             m_center = new TransButtonSetting("1");
             m_center->setLabel(QObject::tr("Center"));
             connect(m_center,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
             frontgroup->addChild(m_center);
             middlegroup->addChild(m_surroundleft);
-            middlegroup->addChild(m_lfe);
+            if (m_lfe)
+                middlegroup->addChild(m_lfe);
             middlegroup->addChild(m_surroundright);
 
         case 2:

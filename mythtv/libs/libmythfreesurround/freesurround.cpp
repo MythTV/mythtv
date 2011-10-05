@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2007 Christian Kothe, Mark Spieth
+Copyright (C) 2010-2011 Jean-Yves Avenard
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -40,6 +41,7 @@ using namespace std;
 static const unsigned default_block_size = SURROUND_BUFSIZE;
 // Gain of center and lfe channels in passive mode (sqrt 0.5)
 static const float center_level = 0.707107; 
+static const float m3db = 0.7071067811865476f;           // 3dB  = SQRT(2)
 
 unsigned int block_size = default_block_size;
 
@@ -101,18 +103,21 @@ public:
 struct buffers
 {
     buffers(unsigned int s): 
-    l(s),r(s),c(s),ls(s),rs(s),lfe(s) { }
+        l(s),r(s),c(s),ls(s),rs(s),lfe(s), rls(s), rrs(s) { }
     void resize(unsigned int s)
     {
         l.resize(s); r.resize(s); lfe.resize(s); 
         ls.resize(s); rs.resize(s); c.resize(s);
+        rls.resize(s); rrs.resize(s);
     }
     void clear()
     {
         l.clear(); r.clear(); lfe.clear();
         ls.clear(); rs.clear(); c.clear();
+        rls.clear(); rrs.clear();
     }
-    std::vector<float> l,r,c,ls,rs,lfe,cs,lcs,rcs;  // for demultiplexing
+    std::vector<float> l,r,c,ls,rs,lfe,cs,lcs,rcs,
+                       rls, rrs;       // for demultiplexing
 };
 
 // construction methods
@@ -224,16 +229,39 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
     bool process = true;
     float *samples = (float *)buffer;
     // demultiplex
-    switch (surround_mode)
+
+    float **inputs = decoder->getInputBuffers();
+    float *lt      = &inputs[0][ic];
+    float *rt      = &inputs[1][ic];
+
+    if ((surround_mode != SurroundModePassive) && (ic+numFrames > bs))
     {
-        case SurroundModePassive:
-            switch (numChannels)
+        numFrames = bs - ic;
+    }
+
+    switch (numChannels)
+    {
+        case 1:
+            switch (surround_mode)
             {
-                case 1:
+                case SurroundModePassive:
                     for (i = 0; i < numFrames && ic < bs; i++,ic++)
                         bufs->l[ic] = bufs->c[ic] = bufs->r[ic] = samples[i];
+                    process = false;
                     break;
-                case 2:
+                default:
+                    for (i=0; i<numFrames; i++)
+                        *lt++ = *rt++ = *samples++;
+                    process = true;
+                    break;
+            }
+            channels = 6;
+            break;  
+
+        case 2:
+            switch (surround_mode)
+            {
+                case SurroundModePassive:
                     for (i = 0; i < numFrames && ic < bs; i++,ic++)
                     {
                         float lt      = *samples++;
@@ -243,97 +271,91 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                         bufs->r[ic]   = rt;
                         bufs->ls[ic]  = bufs->rs[ic] = (lt-rt) * center_level;
                     }
+                    process = false;
                     break;
-                case 5:
-                    for (i = 0; i < numFrames && ic < bs; i++,ic++)
-                    {
-                        float lt      = *samples++;
-                        float rt      = *samples++;
-                        float c       = *samples++;
-                        float lfe     = (lt+rt) * center_level;
-                        float ls      = *samples++;
-                        float rs      = *samples++;
-                        bufs->l[ic]   = lt;
-                        bufs->lfe[ic] = lfe;
-                        bufs->c[ic]   = c;
-                        bufs->r[ic]   = rt;
-                        bufs->ls[ic]  = ls;
-                        bufs->rs[ic]  = rs;
-                    }
-                    break;
-            }
-            in_count = 0;
-            out_count = processed_size = ic;
-            processed = false;
-            latency_frames = 0;
-            break;
-
-        default:
-            float **inputs = decoder->getInputBuffers();
-            float *lt      = &inputs[0][ic];
-            float *rt      = &inputs[1][ic];
-            if ((ic+numFrames) > bs)
-                numFrames = bs - ic;
-            switch (numChannels)
-            {
-                case 1:
-                    for (i=0; i<numFrames; i++)
-                        *lt++ = *rt++ = *samples++;
-                    break;
-                case 2:
+                default:
                     for (i=0; i<numFrames; i++)
                     {
                         *lt++ = *samples++;
                         *rt++ = *samples++;
                     }
-                    break;
-                case 5:
-                    // 5 ch is always passive mode,
-                    for (i = 0; i < numFrames && ic < bs; i++,ic++)
-                    {
-                        float l       = *samples++;
-                        float r       = *samples++;
-                        float c       = *samples++;
-                        float lfe     = (l+r) * center_level;
-                        float ls      = *samples++;
-                        float rs      = *samples++;
-                        bufs->l[ic]   = l;
-                        bufs->lfe[ic] = lfe;
-                        bufs->c[ic]   = c;
-                        bufs->r[ic]   = r;
-                        bufs->ls[ic]  = ls;
-                        bufs->rs[ic]  = rs;
-                    }
-                    process = false;
+                    process = true;
                     break;
             }
-            if (process)
+            channels = 6;
+            break;            
+
+        case 5:
+            for (i = 0; i < numFrames && ic < bs; i++,ic++)
             {
-                ic += numFrames;
-                if (ic != bs)
-                {
-                    // dont modify unless no processing is to be done
-                    // for audiotime consistency
-                    in_count = ic;
-                    break;
-                }
-                processed = process;
-                // process_block takes some time so dont update in and out count
-                // before its finished so that Audiotime is correctly calculated
-                process_block();
-                in_count = 0;
-                out_count = bs;
-                processed_size = bs;
-                latency_frames = block_size/2;
+                float lt      = *samples++;
+                float rt      = *samples++;
+                float c       = *samples++;
+                float ls      = *samples++;
+                float rs      = *samples++;
+                bufs->l[ic]   = lt;
+                bufs->lfe[ic] = 0.0f;
+                bufs->c[ic]   = c;
+                bufs->r[ic]   = rt;
+                bufs->ls[ic]  = ls;
+                bufs->rs[ic]  = rs;
             }
-            else
-            {
-                in_count = 0;
-                out_count = processed_size = ic;
-                processed = false;
-                latency_frames = 0;
-            }
+            process = false;
+            channels = 6;
             break;
+
+        case 7:
+            for (i = 0; i < numFrames && ic < bs; i++,ic++)
+            {
+                // 3F3R-LFE  L  R  C  LFE  BC  LS   RS
+                float lt      = *samples++;
+                float rt      = *samples++;
+                float c       = *samples++;
+                float lfe     = *samples++;
+                float cs      = *samples++;
+                float ls      = *samples++;
+                float rs      = *samples++;
+                bufs->l[ic]   = lt;
+                bufs->lfe[ic] = lfe;
+                bufs->c[ic]   = c;
+                bufs->r[ic]   = rt;
+                bufs->ls[ic]  = ls;
+                bufs->rs[ic]  = rs;
+                bufs->rls[ic]  = bufs->rrs[ic]  = cs * m3db;
+            }
+            process = false;
+            channels = 8;
+            break;
+        default:
+            break;
+    }
+    if (process)
+    {
+        ic += numFrames;
+        if (ic != bs)
+        {
+            // dont modify unless no processing is to be done
+            // for audiotime consistency
+            in_count = ic;
+        }
+        else
+        {
+            processed = process;
+            // process_block takes some time so dont update in and out count
+            // before its finished so that Audiotime is correctly calculated
+            process_block();
+            in_count = 0;
+            out_count = bs;
+            processed_size = bs;
+            latency_frames = block_size/2;
+        }
+    }
+    else
+    {
+        in_count = 0;
+        out_count = processed_size = ic;
+        processed = false;
+        latency_frames = 0;
     }
 
     LOG(VB_AUDIO | VB_TIMESTAMP, LOG_DEBUG,
@@ -350,66 +372,77 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
     if (maxFrames > oc) maxFrames = oc;
     uint outindex = processed_size - oc;
     float *output = (float *)buffer;
-
-    switch (surround_mode)
+    if (channels == 8)
     {
-        case SurroundModePassive:
+        float *l   = &bufs->l[outindex];
+        float *c   = &bufs->c[outindex];
+        float *r   = &bufs->r[outindex];
+        float *ls  = &bufs->ls[outindex];
+        float *rs  = &bufs->rs[outindex];
+        float *lfe = &bufs->lfe[outindex];
+        float *rls = &bufs->rls[outindex];
+        float *rrs = &bufs->rrs[outindex];
+        for (i = 0; i < maxFrames; i++) 
+        {
+//            printf("1:%f 2:%f 3:%f 4:%f 5:%f 6:%f 7:%f 8:%f\n",
+//                   *l, *r, *c, *lfe, *rls, *rrs, *ls, *rs);
+            
+            // 3F4-LFE   L   R   C    LFE  Rls  Rrs  LS   RS
+            *output++ = *l++;
+            *output++ = *r++;
+            *output++ = *c++;
+            *output++ = *lfe++;
+            *output++ = *rls++;
+            *output++ = *rrs++;
+            *output++ = *ls++;
+            *output++ = *rs++;
+        }
+        oc -= maxFrames;
+        outindex += maxFrames;
+    }
+    else        // channels == 6
+    {
+        if (processed)
+        {
+            float** outputs = decoder->getOutputBuffers();
+            float *l   = &outputs[0][outindex];
+            float *c   = &outputs[1][outindex];
+            float *r   = &outputs[2][outindex];
+            float *ls  = &outputs[3][outindex];
+            float *rs  = &outputs[4][outindex];
+            float *lfe = &outputs[5][outindex];
             for (i = 0; i < maxFrames; i++) 
             {
-                *output++ = bufs->l[outindex];
-                *output++ = bufs->r[outindex];
-                *output++ = bufs->c[outindex];
-                *output++ = bufs->lfe[outindex];
-                *output++ = bufs->ls[outindex];
-                *output++ = bufs->rs[outindex];
-                oc--;
-                outindex++;
+                *output++ = *l++;
+                *output++ = *r++;
+                *output++ = *c++;
+                *output++ = *lfe++;
+                *output++ = *ls++;
+                *output++ = *rs++;
             }
-            break;
-
-        default:
-            if (processed)
+            oc -= maxFrames;
+            outindex += maxFrames;
+        }
+        else
+        {
+            float *l   = &bufs->l[outindex];
+            float *c   = &bufs->c[outindex];
+            float *r   = &bufs->r[outindex];
+            float *ls  = &bufs->ls[outindex];
+            float *rs  = &bufs->rs[outindex];
+            float *lfe = &bufs->lfe[outindex];
+            for (i = 0; i < maxFrames; i++) 
             {
-                float** outputs = decoder->getOutputBuffers();
-                float *l   = &outputs[0][outindex];
-                float *c   = &outputs[1][outindex];
-                float *r   = &outputs[2][outindex];
-                float *ls  = &outputs[3][outindex];
-                float *rs  = &outputs[4][outindex];
-                float *lfe = &outputs[5][outindex];
-                for (i = 0; i < maxFrames; i++) 
-                {
-                    *output++ = *l++;
-                    *output++ = *r++;
-                    *output++ = *c++;
-                    *output++ = *lfe++;
-                    *output++ = *ls++;
-                    *output++ = *rs++;
-                }
-                oc -= maxFrames;
-                outindex += maxFrames;
+                *output++ = *l++;
+                *output++ = *r++;
+                *output++ = *c++;
+                *output++ = *lfe++;
+                *output++ = *ls++;
+                *output++ = *rs++;
             }
-            else
-            {
-                float *l   = &bufs->l[outindex];
-                float *c   = &bufs->c[outindex];
-                float *r   = &bufs->r[outindex];
-                float *ls  = &bufs->ls[outindex];
-                float *rs  = &bufs->rs[outindex];
-                float *lfe = &bufs->lfe[outindex];
-                for (i = 0; i < maxFrames; i++) 
-                {
-                    *output++ = *l++;
-                    *output++ = *r++;
-                    *output++ = *c++;
-                    *output++ = *lfe++;
-                    *output++ = *ls++;
-                    *output++ = *rs++;
-                }
-                oc -= maxFrames;
-                outindex += maxFrames;
-            }
-            break;
+            oc -= maxFrames;
+            outindex += maxFrames;
+        }
     }
     out_count = oc;
     LOG(VB_AUDIO | VB_TIMESTAMP, LOG_DEBUG,
