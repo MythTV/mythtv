@@ -385,6 +385,7 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
         QFont tmpfont = font.face();
         tmpfont.setStyleStrategy(QFont::OpenGLCompatible);
         painter.setFont(tmpfont);
+        painter.setRenderHint(QPainter::Antialiasing);
 
         if (font.hasShadow())
         {
