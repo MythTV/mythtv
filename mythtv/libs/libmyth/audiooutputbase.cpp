@@ -1154,7 +1154,7 @@ int AudioOutputBase::CheckFreeSpace(int &frames)
  * Returns the number of frames written, which may be less than requested
  * if the upmixer buffered some (or all) of them
  */
-int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
+int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
 {
     int len   = CheckFreeSpace(frames);
     int bdiff = kAudioRingBufferSize - org_waud;
@@ -1174,7 +1174,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
         }
         if (num > 0)
             memcpy(WPOS, buffer + off, num);
-        org_waud += num;
+        org_waud = (org_waud + num) % kAudioRingBufferSize;
         return len;
     }
 
@@ -1192,7 +1192,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
         if (frames > 0)
             AudioOutputUtil::MonoToStereo(WPOS, buffer + off, frames);
 
-        org_waud += frames * bpf;
+        org_waud = (org_waud + frames * bpf) % kAudioRingBufferSize;
         return len;
     }
 
@@ -1223,7 +1223,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
         if (nFrames > 0)
             upmixer->receiveFrames((float *)(WPOS), nFrames);
 
-        org_waud += nFrames * bpf;
+        org_waud = (org_waud + nFrames * bpf) % kAudioRingBufferSize;
     }
     return len;
 }
@@ -1274,9 +1274,9 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     // Don't write new samples if we're resetting the buffer or reconfiguring
     QMutexLocker lock(&audio_buflock);
 
-    int org_waud = waud;
-    int afree    = audiofree();
-    int used     = kAudioRingBufferSize - afree;
+    uint org_waud = waud;
+    int  afree    = audiofree();
+    int  used     = kAudioRingBufferSize - afree;
 
     if (passthru && m_spdifenc)
     {
@@ -1330,12 +1330,15 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             AudioOutputSettings::SampleSize(format) * len;
 
         // Account for changes in number of channels
-        if (needs_upmix || needs_downmix)
-            len = (len / source_channels) * configured_channels;
+        if (needs_downmix)
+            len = (len * configured_channels ) / source_channels;
 
         // Check we have enough space to write the data
         if (need_resampler && src_ctx)
             len = (int)ceilf(float(len) * src_data.src_ratio);
+
+        if (needs_upmix)
+            len = (len * configured_channels ) / source_channels;
 
         // Include samples in upmix buffer that may be flushed
         if (needs_upmix && upmixer)
@@ -1446,7 +1449,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                 nFrames = pSoundStretch->receiveSamples((STST *)(WPOS),
                                                         nFrames);
 
-            org_waud += nFrames * bpf;
+            org_waud = (org_waud + nFrames * bpf) % kAudioRingBufferSize;
         }
 
         if (internal_vol && SWVolume())
@@ -1464,7 +1467,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             if (num > 0)
                 AudioOutputUtil::AdjustVolume(WPOS, num, volume,
                                               music, needs_upmix && upmixer);
-            org_waud += num;
+            org_waud = (org_waud + num) % kAudioRingBufferSize;
         }
 
         if (encoder)
@@ -1493,7 +1496,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             if (to_get > 0)
                 encoder->GetFrames(WPOS, to_get);
 
-            org_waud += to_get;
+            org_waud = (org_waud + to_get) % kAudioRingBufferSize;
         }
 
         waud = org_waud;
@@ -1606,7 +1609,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         // delay setting raud until after phys buffer is filled
         // so GetAudiotime will be accurate without locking
         reset_active.TestAndDeref();
-        int next_raud = raud;
+        volatile uint next_raud = raud;
         if (GetAudioData(fragment, fragment_size, true, &next_raud))
         {
             if (!reset_active.TestAndDeref())
@@ -1638,7 +1641,7 @@ void AudioOutputBase::OutputAudioLoop(void)
  * available. Returns the number of bytes copied.
  */
 int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
-                                  int *local_raud)
+                                  volatile uint *local_raud)
 {
 
 #define LRPOS audiobuffer + *local_raud
@@ -1735,5 +1738,3 @@ int AudioOutputBase::readOutputData(unsigned char*, int)
     VBERROR("AudioOutputBase should not be getting asked to readOutputData()");
     return 0;
 }
-
-
