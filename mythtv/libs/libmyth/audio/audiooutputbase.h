@@ -111,7 +111,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     static const uint kAudioSRCInputSize = 16384;
 
     /// Audio Buffer Size -- should be divisible by 32,24,16,12,10,8,6,4,2..
-    static const uint kAudioRingBufferSize   = 3072000;
+    static const uint kAudioRingBufferSize   = 3072000u;
 
  protected:
     // Following function must be called from subclass constructor
@@ -137,7 +137,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     virtual void StopOutputThread(void);
 
     int GetAudioData(uchar *buffer, int buf_size, bool fill_buffer,
-                     int *local_raud = NULL);
+                     volatile uint *local_raud = NULL);
 
     void OutputAudioLoop(void);
 
@@ -191,7 +191,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     bool SetupPassthrough(int codec, int codec_profile,
                           int &samplerate_tmp, int &channels_tmp);
     AudioOutputSettings* OutputSettings(bool digital = true);
-    int CopyWithUpmix(char *buffer, int frames, int &org_waud);
+    int CopyWithUpmix(char *buffer, int frames, uint &org_waud);
     void SetAudiotime(int frames, int64_t timecode);
     AudioOutputSettings *output_settingsraw;
     AudioOutputSettings *output_settings;
@@ -240,7 +240,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     /**
      * Audio circular buffer
      */
-    int raud, waud;     // read and write positions
+    volatile uint raud, waud;     // read and write positions
     /**
      * timecode of audio most recently placed into buffer
      */
