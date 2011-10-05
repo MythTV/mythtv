@@ -24,7 +24,7 @@
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="239"/>
         <source>Stream Video</source>
-        <translation>Difundir Vídeo</translation>
+        <translation>Emitir Vídeo</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="240"/>
@@ -59,7 +59,7 @@
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="272"/>
         <source>Manage Search Scripts</source>
-        <translation>Administrar Guiones de Búsqueda</translation>
+        <translation>Gestionar Guiones de Búsqueda</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="348"/>
@@ -80,7 +80,7 @@
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="572"/>
         <source>No browser command set! MythNetVision needs MythBrowser installed to display the video.</source>
-        <translation>¡No se ha definido una orden de navegador! MythNetVision necesita que MythBrowser esté instalado para mostrar el vídeo.</translation>
+        <translation>¡No se ha definido un navegador! MythNetVision necesita que MythBrowser esté instalado para mostrar el vídeo.</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="612"/>
@@ -113,128 +113,128 @@
         <translation>Opciones de Reproducción/Descarga</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="492"/>
+        <location filename="../mythnetvision/nettree.cpp" line="488"/>
         <source>Stream Video</source>
-        <translation>Difundir Vídeo</translation>
+        <translation>Emitir Vídeo</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="493"/>
+        <location filename="../mythnetvision/nettree.cpp" line="489"/>
         <source>Open Web Link</source>
         <translation>Abrir Enlace Web</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="496"/>
+        <location filename="../mythnetvision/nettree.cpp" line="492"/>
         <source>Save This Video</source>
         <translation>Guardar Este Vídeo</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="499"/>
+        <location filename="../mythnetvision/nettree.cpp" line="495"/>
         <source>Scan/Manage Subscriptions</source>
-        <translation>Buscar/Administrar Suscripciones</translation>
+        <translation>Buscar/Gestionar Suscripciones</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="500"/>
+        <location filename="../mythnetvision/nettree.cpp" line="496"/>
         <source>Change View</source>
         <translation>Cambiar Vista</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="512"/>
+        <location filename="../mythnetvision/nettree.cpp" line="508"/>
         <source>View Options</source>
         <translation>Opciones de Vista</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="524"/>
+        <location filename="../mythnetvision/nettree.cpp" line="513"/>
         <source>Switch to List View</source>
         <translation>Cambiar a Vista de Lista</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="526"/>
+        <location filename="../mythnetvision/nettree.cpp" line="515"/>
         <source>Switch to Gallery View</source>
         <translation>Cambiar a Vista de Galería</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="528"/>
+        <location filename="../mythnetvision/nettree.cpp" line="517"/>
         <source>Switch to Browse View</source>
-        <translation>Cambiar a Vista de Navegación</translation>
+        <translation>Cambiar a Vista de Exploración</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="538"/>
+        <location filename="../mythnetvision/nettree.cpp" line="524"/>
         <source>Subscription Management</source>
-        <translation>Administración de Suscripciones</translation>
+        <translation>Gestión de Suscripciones</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="549"/>
+        <location filename="../mythnetvision/nettree.cpp" line="529"/>
         <source>Update Site Maps</source>
         <translation>Actualizar Mapas de Sitio</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="550"/>
+        <location filename="../mythnetvision/nettree.cpp" line="530"/>
         <source>Update RSS</source>
         <translation>Actualizar RSS</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="551"/>
+        <location filename="../mythnetvision/nettree.cpp" line="531"/>
         <source>Manage Site Subscriptions</source>
-        <translation>Administrar Suscripciones a Sitios</translation>
+        <translation>Gestionar Suscripciones a Sitios</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="552"/>
+        <location filename="../mythnetvision/nettree.cpp" line="532"/>
         <source>Manage RSS Subscriptions</source>
-        <translation>Administrar Suscripciones RSS</translation>
+        <translation>Gestionar Suscripciones RSS</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="554"/>
+        <location filename="../mythnetvision/nettree.cpp" line="534"/>
         <source>Enable Automatic Site Updates</source>
         <translation>Activar Actualización Automática de Sitios</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="556"/>
+        <location filename="../mythnetvision/nettree.cpp" line="536"/>
         <source>Disable Automatic Site Updates</source>
         <translation>Desactivar Actualización Automática de Sitios</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="613"/>
-        <location filename="../mythnetvision/nettree.cpp" line="632"/>
-        <location filename="../mythnetvision/nettree.cpp" line="670"/>
-        <location filename="../mythnetvision/nettree.cpp" line="714"/>
+        <location filename="../mythnetvision/nettree.cpp" line="590"/>
+        <location filename="../mythnetvision/nettree.cpp" line="609"/>
+        <location filename="../mythnetvision/nettree.cpp" line="647"/>
+        <location filename="../mythnetvision/nettree.cpp" line="691"/>
         <source>Back</source>
         <translatorcomment>Atrás, mejor</translatorcomment>
         <translation>Atrás</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="835"/>
+        <location filename="../mythnetvision/nettree.cpp" line="812"/>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
-        <translation>¡No se ha definido una orden de navegador! MythNetVision necesita que MythBrowser esté instalado para mostrar el vídeo.</translation>
+        <translation>¡No se ha definido un navegador! MythNetVision necesita que MythBrowser esté instalado para mostrar el vídeo.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="885"/>
+        <location filename="../mythnetvision/nettree.cpp" line="862"/>
         <source>Are you sure you want to delete this file?</source>
         <translation>¿Seguro que desea eliminar este archivo?</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="981"/>
+        <location filename="../mythnetvision/nettree.cpp" line="958"/>
         <source>Downloading Video...</source>
         <translation>Descargando Vídeo...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1219"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1196"/>
         <source>Updating RSS.  This could take a while...</source>
         <translation>Actualizando RSS.  Esto puede tardar un poco...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1234"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1211"/>
         <source>Updating Site Maps.  This could take a while...</source>
         <translation>Actualizando Mapas de Sitio.  Esto puede tardar un poco...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1324"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1301"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation>Descargando Vídeo...
 (%1 de %2 MB)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1350"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1327"/>
         <source>Error downloading video to backend.</source>
         <translation>Error al descargar el vídeo al servidor.</translation>
     </message>
@@ -260,7 +260,7 @@
     <message>
         <location filename="themestrings.h" line="2"/>
         <source>Internet Video Browser</source>
-        <translation>Navegador de Vídeos por Internet</translation>
+        <translation>Explorador de Vídeos de Internet</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
@@ -360,17 +360,17 @@ Para nuevas suscripciones, simplemente introduzca el URL y pulse &quot;Guardar&q
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
-        <translation>¡Aún no ha añadido un Sitio/Canal RSS!  Para añadir un sitio, pulse MENU, luego seleccione &quot;Buscar/Administrar Suscripciones,&quot; y luego &quot;Administrar Suscripciones a Sitios.&quot;</translation>
+        <translation>¡Aún no ha añadido un Sitio/Canal RSS!  Para añadir un sitio, pulse MENU, luego seleccione &quot;Buscar/Gestionar Suscripciones,&quot; y luego &quot;Gestionar Suscripciones a Sitios.&quot;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
         <source>Manage Subscriptions</source>
-        <translation>Administrar Suscripciones</translation>
+        <translation>Gestionar Suscripciones</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Choose the sites you wish to browse/search.</source>
-        <translation>Elija los sitios que por/en los que desee navegar/buscar.</translation>
+        <translation>Elija los sitios que desee explorar/buscar.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
@@ -416,7 +416,7 @@ Para nuevas suscripciones, simplemente introduzca el URL y pulse &quot;Guardar&q
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Manage Site Subscriptions</source>
-        <translation>Administrar Suscripciones de Sitios</translation>
+        <translation>Gestionar Suscripciones de Sitios</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
@@ -436,7 +436,7 @@ Para nuevas suscripciones, simplemente introduzca el URL y pulse &quot;Guardar&q
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Manage RSS Subscriptions</source>
-        <translation>Administrar Suscripciones RSS</translation>
+        <translation>Gestionar Suscripciones RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
@@ -471,7 +471,7 @@ Para nuevas suscripciones, simplemente introduzca el URL y pulse &quot;Guardar&q
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Browse Net Videos</source>
-        <translation>Navegar por Vídeos de Red</translation>
+        <translation>Explorar Vídeos en la Red</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
@@ -506,12 +506,12 @@ Para nuevas suscripciones, simplemente introduzca el URL y pulse &quot;Guardar&q
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>Browse Internet Video</source>
-        <translation>Navegar por Vídeos de Internet</translation>
+        <translation>Explorar Vídeos de Internet</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Browse highlights and entire sites</source>
-        <translation>Navegar por vídeos destacados y sitios completos</translation>
+        <translation>Explorar vídeos destacados y sitios completos</translation>
     </message>
 </context>
 <context>

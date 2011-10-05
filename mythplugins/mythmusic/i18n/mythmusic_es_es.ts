@@ -31,27 +31,27 @@
     <message>
         <location filename="../mythmusic/metadata.cpp" line="1670"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>desconocido</translation>
     </message>
     <message>
         <location filename="../mythmusic/metadata.cpp" line="1671"/>
         <source>front</source>
-        <translation type="unfinished">portada</translation>
+        <translation>portada</translation>
     </message>
     <message>
         <location filename="../mythmusic/metadata.cpp" line="1672"/>
         <source>back</source>
-        <translation type="unfinished">contraportada</translation>
+        <translation>contraportada</translation>
     </message>
     <message>
         <location filename="../mythmusic/metadata.cpp" line="1673"/>
         <source>cd</source>
-        <translation type="unfinished">cd</translation>
+        <translation>cd</translation>
     </message>
     <message>
         <location filename="../mythmusic/metadata.cpp" line="1674"/>
         <source>inlay</source>
-        <translation type="unfinished">interior</translation>
+        <translation>interior</translation>
     </message>
 </context>
 <context>
@@ -189,7 +189,7 @@
     <message>
         <location filename="../mythmusic/databasebox.cpp" line="659"/>
         <source>Compilation Artist:	</source>
-        <translation>Artista de la Compilación</translation>
+        <translation>Artista de la Recopilación:	</translation>
     </message>
 </context>
 <context>
@@ -199,63 +199,63 @@
         <location filename="../mythmusic/editmetadata.cpp" line="1060"/>
         <location filename="../mythmusic/editmetadata.cpp" line="1200"/>
         <source>Change Image Type</source>
-        <translation type="unfinished">Cambiar Tipo de Imagen</translation>
+        <translation>Cambiar Tipo de Imagen</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="1008"/>
         <source>What image type do you want to use for this image?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Qué tipo desea usar para esta imagen?</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="1040"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="1054"/>
         <location filename="../mythmusic/editmetadata.cpp" line="1194"/>
         <source>Edit Metadata</source>
-        <translation type="unfinished">Editar Metadatos</translation>
+        <translation>Editar Metadatos</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="1055"/>
         <location filename="../mythmusic/editmetadata.cpp" line="1196"/>
         <source>Rescan For Images</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar Imágenes de Nuevo</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="1056"/>
         <location filename="../mythmusic/editmetadata.cpp" line="1198"/>
         <source>Search Internet For Images</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar Imágenes en Internet</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="1073"/>
         <location filename="../mythmusic/editmetadata.cpp" line="1202"/>
         <source>Copy Selected Image To Tag</source>
-        <translation type="unfinished"></translation>
+        <translation>Copiar la Imagen Seleccionada a la Etiqueta</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="1078"/>
         <location filename="../mythmusic/editmetadata.cpp" line="1204"/>
         <source>Remove Selected Image From Tag</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar la Imagen Seleccionada de la Etiqueta</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="1088"/>
         <location filename="../mythmusic/editmetadata.cpp" line="1206"/>
         <source>Copy Image To Tag</source>
-        <translation type="unfinished"></translation>
+        <translation>Copiar Imagen a la Etiqueta</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="1091"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="1295"/>
         <source>Are you sure you want to permanently remove this image from the tag?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Seguro que desea eliminar permanentemente esta imagen de la etiqueta?</translation>
     </message>
 </context>
 <context>
@@ -263,23 +263,23 @@
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="150"/>
         <source>Save Changes?</source>
-        <translation type="unfinished">¿Guardar Cambios?</translation>
+        <translation>¿Guardar Cambios?</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="165"/>
         <location filename="../mythmusic/editmetadata.cpp" line="167"/>
         <source>Save Changes</source>
-        <translation type="unfinished">Guardar Cambios</translation>
+        <translation>Guardar Cambios</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="169"/>
         <source>Exit/Do Not Save</source>
-        <translation type="unfinished">Salir/No Guardar</translation>
+        <translation>Salir/No Guardar</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="170"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>
@@ -287,31 +287,31 @@
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="505"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="519"/>
         <location filename="../mythmusic/editmetadata.cpp" line="791"/>
         <source>Edit Albumart Images</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar Imágenes del Álbum</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="520"/>
         <location filename="../mythmusic/editmetadata.cpp" line="798"/>
         <source>Search Internet For Artist Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar Imágenes del Artista en Internet</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="521"/>
         <location filename="../mythmusic/editmetadata.cpp" line="803"/>
         <source>Search Internet For Album Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar Imágenes del Álbum en Internet</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="522"/>
         <location filename="../mythmusic/editmetadata.cpp" line="793"/>
         <source>Search Internet For Genre Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar Imágenes del Género en Internet</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="560"/>
@@ -413,7 +413,8 @@
         <location filename="../mythmusic/importmusic.cpp" line="231"/>
         <source>You might have unsaved changes.
 Are you sure you want to exit this screen?</source>
-        <translation type="unfinished"></translation>
+        <translation>Podría tener cambios sin guardar.
+¿Seguro que desea salir de esta pantalla?</translation>
     </message>
     <message>
         <location filename="../mythmusic/importmusic.cpp" line="415"/>
@@ -578,13 +579,13 @@ No fue posible copiar el archivo a: %1</translation>
 <context>
     <name>MusicPlayer</name>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="744"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="761"/>
         <source>playlist root</source>
         <translation>raíz de la lista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1078"/>
-        <location filename="../mythmusic/musicplayer.cpp" line="1081"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1095"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1098"/>
         <source>Muted</source>
         <translation>Sin Sonido</translation>
     </message>
@@ -1000,7 +1001,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/cddecoder.cpp" line="592"/>
         <source>CD Audio decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Decodificador de CD de Audio</translation>
     </message>
     <message>
         <location filename="../mythmusic/databasebox.cpp" line="1355"/>
@@ -1457,22 +1458,22 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="127"/>
         <source>Allow metadata to be written to tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Permitir escribir metadatos en las etiquetas</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="129"/>
         <source>If set, MythMusic will be allowed to update the metadata in the file (e.g. ID3) to match the database. This means allowing MythTV to write to the file and permissions must be set accordingly. Features such as ID3 playcounts and ratings depend on this being enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si se activa, se permitirá a MythMusic actualizar los metadatos del archivo (p. ej. ID3) que coincidan con la base de datos. Esto significa permitir que MythTV escriba en el archivo y los permisos deben ser los adecuados. Características como la cuenta de reproducciones y puntuaciones ID3 dependen de ello.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="141"/>
         <source>Ignore Metadata Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorar Etiquetas de Metadatos</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="143"/>
         <source>If set, MythMusic will skip checking the metadata tags in files (ID3 etc) and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si se activa, MythMusic no comprobará las etiquetas de metadatos en los archivos (ID3, etc.) y tratará de determinar Género, Artista, Álbum, número de Pista y Título a partir del nombre de archivo.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="505"/>
@@ -1632,7 +1633,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/cdrip.cpp" line="625"/>
         <source>Scanning CD. Please Wait ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Explorando CD. Por favor, espere...</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="117"/>
@@ -1742,7 +1743,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="369"/>
         <source>If selected, you can navigate your entire music tree from the playing screen. N.B. Does not work with accelerated buttons disabled</source>
-        <translation>Al seleccionarlo, podrás navegar por todo el árbol de música desde la pantalla de reproducción. NOTA: No funciona si se desactiva el uso de teclas rápidas.</translation>
+        <translation>Al seleccionarlo, podrá navegar por todo el árbol de música desde la pantalla de reproducción. NOTA: No funciona si se desactiva el uso de teclas rápidas</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="384"/>
@@ -1782,7 +1783,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="484"/>
         <source>List of visualizations to use during playback. Click the button below to edit this list</source>
-        <translation>Lista de visualizaciones a usar durante la reproducción. Pulsa el siguiente botón para editar esta lista.</translation>
+        <translation>Lista de visualizaciones a usar durante la reproducción. Pulsa el siguiente botón para editar esta lista</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="493"/>
@@ -2194,7 +2195,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1700"/>
         <source>Track No.</source>
-        <translation>Nº Pista</translation>
+        <translation>Pista Nº.</translation>
     </message>
 </context>
 <context>
@@ -2593,7 +2594,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>Browse cover images on your system.</source>
-        <translation>Navegar por las imágenes de portada existentes en su sistema.</translation>
+        <translation>Explorar las imágenes de portada existentes en su sistema.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
@@ -2628,7 +2629,7 @@ Esta pista ya está en la base de datos.
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Click to browse directories...</source>
-        <translation>Pulsar para navegar por los directorios...</translation>
+        <translation>Pulsar para explorar los directorios...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="39"/>
