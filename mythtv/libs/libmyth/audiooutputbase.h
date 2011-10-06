@@ -99,7 +99,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     static const uint kAudioSRCInputSize = 32768;
 
     /// Audio Buffer Size -- should be divisible by 32,24,16,12,10,8,6,4,2..
-    static const uint kAudioRingBufferSize   = 3072000;
+    static const uint kAudioRingBufferSize   = 3072000u;
 
  protected:
     // Following function must be called from subclass constructor
@@ -120,7 +120,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual bool StartOutputThread(void);
     virtual void StopOutputThread(void);
 
-    int GetAudioData(uchar *buffer, int buf_size, bool fill_buffer, int *local_raud = NULL);
+    int GetAudioData(uchar *buffer, int buf_size, bool fill_buffer,
+                     volatile uint *local_raud = NULL);
 
     void OutputAudioLoop(void);
 
@@ -169,7 +170,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     int src_quality;
 
  private:
-    int CopyWithUpmix(char *buffer, int frames, int &org_waud);
+    int CopyWithUpmix(char *buffer, int frames, uint &org_waud);
     void SetAudiotime(int frames, int64_t timecode);
     AudioOutputSettings *output_settingsraw;
     AudioOutputSettings *output_settings;
@@ -208,7 +209,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     int64_t audiotime;
 
     /* Audio circular buffer */
-    int raud, waud;     /* read and write positions */
+    volatile uint raud, waud;     /* read and write positions */
     // timecode of audio most recently placed into buffer
     int64_t audbuf_timecode;
     AsyncLooseLock reset_active;
