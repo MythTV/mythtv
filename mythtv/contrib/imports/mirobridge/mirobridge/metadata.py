@@ -216,22 +216,25 @@ class MetaData(object):
         (dirName, fileName) = os.path.split(fileName)
         (fileBaseName, fileExtension)=os.path.splitext(fileName)
         try:
-            dirName = unicode(dirName, u'utf8')
-        except (UnicodeEncodeError, TypeError):
-            pass
-        try:
             fileBaseName = unicode(fileBaseName, u'utf8')
         except (UnicodeEncodeError, TypeError):
             pass
-        for name in os.listdir(dirName): # Clean up
-            if name.startswith(fileBaseName):
-                try:
-                    if self.simulation:
-                        self.logger.info(u"Simulation: Remove file/symbolic link(%s)" % (u"%s/%s" % (dirName, name)))
-                    else:
-                        os.remove(u"%s/%s" % (dirName, name))
-                except OSError:
-                    pass
+        try:
+            names = os.listdir(unicode(dirName, 'utf8'))
+        except (UnicodeEncodeError, TypeError):
+            names = os.listdir(dirName)
+        for name in names: # Clean up
+            try:
+                if name.startswith(fileBaseName):
+                    try:
+                        if self.simulation:
+                            self.logger.info(u"Simulation: Remove file/symbolic link(%s)" % (u"%s/%s" % (dirName, name)))
+                        else:
+                            os.remove(u"%s/%s" % (dirName, name))
+                    except OSError:
+                        pass
+            except (UnicodeEncodeError, TypeError):
+                pass
         return
         # end cleanupVideoAndGraphics()
 
