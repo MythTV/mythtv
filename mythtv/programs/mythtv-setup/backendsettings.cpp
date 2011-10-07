@@ -715,7 +715,7 @@ static GlobalCheckBox *UPNPShowRecordingUnderVideos()
 static GlobalComboBox *UPNPWmpSource()
 {
     GlobalComboBox *gc = new GlobalComboBox("UPnP/WMPSource");
-    gc->setLabel(QObject::tr("Video content to show a WMP cient"));
+    gc->setLabel(QObject::tr("Video content to show a WMP client"));
     gc->addSelection(QObject::tr("Recordings"),"0");
     gc->addSelection(QObject::tr("Videos"),"1");
     gc->setValue("0");
