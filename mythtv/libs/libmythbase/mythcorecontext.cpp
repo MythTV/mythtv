@@ -281,7 +281,8 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
 
 // Assumes that either m_sockLock is held, or the app is still single
 // threaded (i.e. during startup).
-bool MythCoreContext::ConnectToMasterServer(bool blockingClient)
+bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
+                                            bool openEventSocket)
 {
     if (IsMasterBackend())
     {
@@ -307,6 +308,9 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient)
 
     if (!d->m_serverSock)
         return false;
+
+    if (!openEventSocket)
+        return true;
 
     if (!IsBackend() && !d->m_eventSock)
         d->m_eventSock = ConnectEventSocket(server, port);
