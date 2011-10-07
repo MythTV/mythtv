@@ -1287,6 +1287,11 @@ QStringList MythCommandLineParser::GetArgs(void) const
     return toStringList("_args");
 }
 
+QMap<QString,QString> MythCommandLineParser::GetExtra(void) const
+{
+    return toMap("_extra");
+}
+
 QString MythCommandLineParser::GetPassthrough(void) const
 {
     return toStringList("_passthrough").join(" ");

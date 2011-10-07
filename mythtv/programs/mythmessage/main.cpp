@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
         address.setAddress(cmdline.toString("addr"));
 
     QMap<QString,QString>::const_iterator i;
-    QMap<QString,QString> extras = cmdline.toMap("extra");
+    QMap<QString,QString> extras = cmdline.GetExtra();
     for (i = extras.begin(); i != extras.end(); ++i)
     {
         QString name = i.key();
