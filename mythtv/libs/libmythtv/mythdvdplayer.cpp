@@ -18,7 +18,9 @@ MythDVDPlayer::MythDVDPlayer(bool muted)
 
 void MythDVDPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
 {
-    MythPlayer::AutoDeint(frame, false);
+    (void)frame;
+    (void)allow_lock;
+    SetScanType(kScan_Interlaced);
 }
 
 void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
@@ -215,6 +217,7 @@ void MythDVDPlayer::DisplayLastFrame(void)
     // clear the buffering state
     SetBuffering(false);
 
+    SetScanType(kScan_Progressive);
     DisplayDVDButton();
 
     osdLock.lock();
