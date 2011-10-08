@@ -28,6 +28,7 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
                  'inetref':'',       'next_record':datetime(1900,1,1),
                  'season':0,         'last_delete':datetime(1900,1,1),
                  'episode':0}
+    _artwork = None
 
     def __str__(self):
         if self._wheredat is None:
@@ -59,6 +60,24 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
             recstatus=Program.rsWillRecord
         return FileOps(db=self._db)._getSortedPrograms('QUERY_GETALLPENDING',
                     header=1, recordid=self.recordid, recstatus=recstatus)
+
+    @property
+    def artwork(self):
+        if self._artwork is None:
+            if (self.inetref is None) or (self.inetref == ""):
+                raise MythError("Record cannot have artwork without inetref")
+
+            try:
+                self._artwork = \
+                    RecordedArtwork((self.inetref, self.season), self._db)
+            except MythError:
+                #artwork does not exist, create new
+                self._artwork = RecordedArtwork(db=self._db)
+                self._artwork.inetref = self.inetref
+                self._artwork.season = self.season
+                self._artwork.host = self._db.getMasterBackend()
+                self._artwork.create()
+        return self._artwork
 
     @classmethod
     def fromGuide(cls, guide, type=RECTYPE.kAllRecord, wait=False):
@@ -146,6 +165,7 @@ class Recorded( CMPRecord, DBDataWrite ):
                  'profile':'No',     'duplicate':1,          'transcoded':0,
                  'watched':0,        'storagegroup':'Default',
                  'inetref':'',       'season':0,            'episode':0}
+    _artwork = None
 
     class _Cast( DBDataCRef ):
         _table = ['recordedcredits','people']
@@ -236,6 +256,25 @@ class Recorded( CMPRecord, DBDataWrite ):
     def getRecordedProgram(self):
         """Recorded.getRecordedProgram() -> RecordedProgram object"""
         return RecordedProgram.fromRecorded(self)
+
+    @property
+    def artwork(self):
+        if self._artwork is None:
+            if (self.inetref is None) or (self.inetref == ""):
+                raise MythError("Recorded cannot have artwork without inetref")
+
+            try:
+                self._artwork = \
+                    RecordedArtwork((self.inetref, self.season), self._db)
+            except MythError:
+                #artwork does not exist, create new
+                self._artwork = RecordedArtwork(db=self._db)
+                self._artwork.inetref = self.inetref
+                self._artwork.season = self.season
+                self._artwork.host = self._db.getMasterBackend()
+                self._artwork.create()
+        return self._artwork
+
 
     def formatPath(self, path, replace=None):
         """
@@ -469,18 +508,48 @@ class RecordedArtwork( DBDataWrite ):
     """
     RecordedArtwork(data=None, db=None)
     """
-    _key = ('inetref', 'season', 'host')
+    _key = ('inetref', 'season')
     _defaults = {'inetref':'',      'season':0,     'host':'',
                  'coverart':'',     'fanart':'',    'banner':''}
+
+    class _open(object):
+        def __init__(self, func):
+            self.__name__ = func.__name__
+            self.__module__ = func.__module__
+            self.__doc__ = """RecordedArtwork.%s(mode='r', nooverwrite=False)
+                        -> file or FileTransfer object""" % self.__name__
+            self.type, self.sgroup = \
+                        {'Banner':('banner','Banners'),
+                         'Coverart':('coverart','Coverart'),
+                         'Fanart':('fanart','Fanart')}[self.__name__[4:]]
+        def __get__(self, inst, own):
+            self.inst = inst
+            return self
+
+        def __call__(self, mode='r', nooverwrite=False):
+            if self.inst.host == '':
+                raise MythFileError('File access only works '
+                                    'with Storage Group content')
+            return ftopen('myth://%s@%s/%s' % ( self.sgroup,
+                                                self.inst.host,
+                                                self.inst[self.type]),
+                                    mode, False, nooverwrite, self.inst._db)
 
     def __str__(self):
         if self._wheredat is None:
             return u"<Uninitialized Artwork at %s>" % hex(id(self))
-        return u"<Channel '%s','%d' at %s>" % \
+        return u"<RecordedArtwork '%s','%d' at %s>" % \
                         (self.inetref, self.season, hex(id(self)))
 
     def __repr__(self):
         return str(self).encode('utf-8')
+
+    @_open
+    def openCoverart(self,mode='r',nooverwrite=False): pass
+    @_open
+    def openBanner(self,mode='r',nooverwrite=False): pass
+    @_open
+    def openFanart(self,mode='r',nooverwrite=False): pass
 
 class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
     """

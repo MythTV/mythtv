@@ -1088,6 +1088,16 @@ class DBCache( MythSchema ):
     def gethostname(self):
         return self.dbconn['LocalHostName']
 
+    def getMasterBackend(self):
+        ip = self.settings.NULL.MasterServerIP
+        with self as cursor:
+            if cursor.execute("""SELECT hostname FROM settings
+                                     WHERE value='BackendServerIP'
+                                     AND data=?""", [ip]) == 0:
+                # no match found
+                raise MythDBError(MythError.DB_SETTING, 'BackendServerIP', ip)
+            return cursor.fetchone()[0]
+
     def getStorageGroup(self, groupname=None, hostname=None):
         """
         obj.getStorageGroup(groupname=None, hostname=None)
