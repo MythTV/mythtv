@@ -711,7 +711,8 @@ int DataDirectProcessor::UpdateChannelsSafe(
         return -1;
     }
 
-    bool is_encoder = (SourceUtil::IsEncoder(sourceid, true) ||
+    bool is_encoder = (SourceUtil::IsCableCardPresent(sourceid) ||
+                       SourceUtil::IsEncoder(sourceid, true) ||
                        SourceUtil::IsUnscanable(sourceid));
 
     while (query.next())
@@ -786,7 +787,8 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(
         "    atsc_minor_chan = :MINORCHAN "
         "WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID");
 
-    bool is_encoder = (SourceUtil::IsEncoder(sourceid, true) ||
+    bool is_encoder = (SourceUtil::IsCableCardPresent(sourceid) ||
+                       SourceUtil::IsEncoder(sourceid, true) ||
                        SourceUtil::IsUnscanable(sourceid));
 
     while (dd_station_info.next())

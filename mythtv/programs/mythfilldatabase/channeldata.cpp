@@ -62,6 +62,7 @@ bool ChannelData::insert_chan(uint sourceid)
     if (!insert_channels)
     {
         bool isEncoder, isUnscanable;
+        bool isCableCard  = SourceUtil::IsCableCardPresent(sourceid);
         if (cardtype.isEmpty())
         {
             isEncoder    = SourceUtil::IsEncoder(sourceid);
@@ -72,7 +73,8 @@ bool ChannelData::insert_chan(uint sourceid)
             isEncoder    = CardUtil::IsEncoder(cardtype);
             isUnscanable = CardUtil::IsUnscanable(cardtype);
         }
-        insert_channels = (isEncoder || isUnscanable) && !remove_new_channels;
+        insert_channels = (isCableCard || isEncoder || isUnscanable) &&
+                           !remove_new_channels;
     }
 
     return insert_channels;

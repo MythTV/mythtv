@@ -86,6 +86,37 @@ QString CardUtil::GetScanableCardTypes(void)
     return QString("(%1)").arg(cardTypes);
 }
 
+bool CardUtil::IsCableCardPresent(uint cardid,
+                                  const QString &cardType)
+{
+    if (cardType == "HDHOMERUN")
+    {
+#ifdef USING_HDHOMERUN
+        hdhomerun_device_t *hdhr;
+        hdhomerun_tuner_status_t status;
+        QString device = GetVideoDevice(cardid);
+        hdhr = hdhomerun_device_create_from_str(device.toAscii(), NULL);
+        if (!hdhr)
+            return false;
+
+        int oob = -1;
+        oob = hdhomerun_device_get_oob_status(hdhr, NULL, &status);
+
+        // if no OOB tuner, oob will be < 1.  If no CC present, OOB
+        // status will be "none."
+        if (oob > 0 && (strncmp(status.channel, "none", 4) != 0))
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Cardutil: HDHomeRun Cablecard Present.");
+            return true;
+        }
+        else
+#endif
+            return false;
+    }
+    else
+        return false;
+}
+
 bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("IsTunerShared(%1,%2)")

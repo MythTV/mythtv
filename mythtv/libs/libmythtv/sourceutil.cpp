@@ -326,6 +326,20 @@ bool SourceUtil::IsUnscanable(uint sourceid)
     return types.empty() || unscanable;
 }
 
+bool SourceUtil::IsCableCardPresent(uint sourceid)
+{
+    bool ccpresent = false;
+    vector<uint> cards = CardUtil::GetCardIDs(sourceid);
+    vector<uint>::iterator it = cards.begin();
+    for (; it != cards.end(); ++it)
+    {
+        if (CardUtil::IsCableCardPresent(*it, CardUtil::GetRawCardType(*it)))
+            ccpresent = true;
+    }
+
+    return ccpresent;
+}
+
 bool SourceUtil::IsAnySourceScanable(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());

@@ -2980,7 +2980,8 @@ void CardInput::sourceFetch(void)
 
         QString cardtype = CardUtil::GetRawCardType(crdid);
 
-        if (!CardUtil::IsUnscanable(cardtype) &&
+        if (!CardUtil::IsCableCardPresent(crdid, cardtype) &&
+            !CardUtil::IsUnscanable(cardtype) &&
             !CardUtil::IsEncoder(cardtype)    &&
             !num_channels_before)
         {

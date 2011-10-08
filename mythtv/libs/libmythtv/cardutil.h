@@ -136,6 +136,9 @@ class MTV_PUBLIC CardUtil
     }
     static QString      GetScanableCardTypes(void);
 
+    static bool         IsCableCardPresent(uint cardid,
+                                           const QString &cardType);
+
     static bool         IsEITCapable(const QString &rawtype)
     {
         return
