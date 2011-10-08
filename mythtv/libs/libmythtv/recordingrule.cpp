@@ -27,7 +27,7 @@ RecordingRule::RecordingRule()
     m_startdate(QDate::currentDate()),
     m_endtime(QTime::currentTime()),
     m_enddate(QDate::currentDate()),
-    m_inetref(""), // String could be null when we trying to insert into DB
+    m_inetref(), // String could be null when we trying to insert into DB
     m_channelid(0),
     m_findday(-1),
     m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
@@ -608,7 +608,7 @@ void RecordingRule::AssignProgramInfo()
         }
     }
     m_category = m_progInfo->GetCategory();
-    m_inetref = "";
+    m_inetref = m_progInfo->GetInetRef();
 }
 
 unsigned RecordingRule::GetDefaultFilter(void)
