@@ -3748,7 +3748,7 @@ enabled mlib       && require  mediaLib mlib_types.h mlib_VectorSub_S16_U8_Mod -
 if enabled libmpeg2external; then
     check_lib mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external
     if disabled libmpeg2external; then
-        die "Warning! No suiteable external libmpeg2 found, use internal copy."
+        die "Warning! No suitable external libmpeg2 found, use internal copy."
     fi
     disable mythtranscode
 fi
