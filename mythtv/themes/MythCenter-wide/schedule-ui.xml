@@ -618,27 +618,35 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <imagetype name="icon">
-                        <area>0,0,26,26</area>
+                        <area>4,0,26,26</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <statetype name="status">
                         <position>30,0</position>
                     </statetype>
-                    <textarea name="channum" from="buttontext">
+                    <textarea name="chanstr" from="buttontext">
                         <area>60,2,150,24</area>
                     </textarea>
-                    <textarea name="callsign" from="channum">
+                    <textarea name="callsign" from="chanstr">
                         <area>220,2,250,24</area>
                     </textarea>
-                    <textarea name="name" from="channum">
+                    <textarea name="channelname" from="chanstr">
                         <area>570,2,500,24</area>
                     </textarea>
-                    <textarea name="priority" from="channum">
+                    <textarea name="priority" from="chanstr">
                         <area>1140,2,30,24</area>
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selectedactive" from="active" />
+                <state name="selectedactive" from="active">
+		    <shape name="selectbar">
+			<area>0,0,1176,30</area>
+			<type>roundbox</type>
+			<line color="#00FF00" alpha="255" width="1" />
+			<fill color="#43b038" alpha="128" />
+			<cornerradius>4</cornerradius>
+		    </shape>
+                </state>
                 <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
@@ -654,36 +662,36 @@
             <preserveaspect>true</preserveaspect>
         </imagetype>
 
-        <textarea name="channame" from="basetextarea">
+        <textarea name="channelname" from="basetextarea">
             <area>540,472,740,40</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="sourcelabel" from="basetextarea">
-            <area>540,514,100,30</area>
+            <area>540,514,140,30</area>
             <value>Source:</value>
         </textarea>
 
-        <textarea name="sourcename" from="basetextarea">
-            <area>660,514,400,30</area>
+        <textarea name="channelsourcename" from="basetextarea">
+            <area>700,514,400,30</area>
         </textarea>
 
         <textarea name="callsignlabel" from="basetextarea">
-            <area>540,550,100,30</area>
+            <area>540,550,140,30</area>
             <value>Callsign:</value>
         </textarea>
 
         <textarea name="callsign" from="basetextarea">
-            <area>660,550,400,30</area>
+            <area>700,550,400,30</area>
         </textarea>
 
         <textarea name="recprioritylabel" from="basetextarea">
-            <area>540,584,100,30</area>
+            <area>540,584,140,30</area>
             <value>Priority:</value>
         </textarea>
 
-        <textarea name="priority" from="basetextarea">
-            <area>660,584,400,30</area>
+        <textarea name="channelrecpriority" from="basetextarea">
+            <area>700,584,400,30</area>
         </textarea>
 
         <textarea name="norecordings_info">
