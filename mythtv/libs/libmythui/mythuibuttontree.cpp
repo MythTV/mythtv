@@ -138,8 +138,8 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
         {
             m_activeList = list;
             list->SetActive(true);
-            emit itemSelected(list->GetItemCurrent());
             DoSetCurrentNode(selectedNode);
+            emit itemSelected(list->GetItemCurrent());
         }
 
         listid++;
