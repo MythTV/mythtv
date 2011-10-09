@@ -852,7 +852,7 @@
         </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>500,335,280,50</area>
+            <area>0,335,1280,50</area>
             <font>baselarge</font>
             <align>allcenter</align>
             <value>Please Wait...</value>
