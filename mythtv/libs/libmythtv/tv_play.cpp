@@ -8084,7 +8084,7 @@ void TV::HandleOSDIdle(PlayerContext *ctx, QString action)
         }
         if (idleTimerId)
             KillTimer(idleTimerId);
-        idleTimerId = StartTimer(db_idle_timeout * 1000, __LINE__);
+        idleTimerId = StartTimer(db_idle_timeout, __LINE__);
     }
     else
     {
