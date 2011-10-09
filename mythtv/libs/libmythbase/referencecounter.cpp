@@ -14,10 +14,9 @@ void ReferenceCounter::UpRef(void)
 {
     QMutexLocker mlock(&m_refLock);
     m_refCount++;
-    LOG(VB_GENERAL, LOG_DEBUG, QString("%1(%2)::UpRef() -> %3")
+    LOG(VB_GENERAL, LOG_DEBUG, QString("%1(0x%2)::UpRef() -> %3")
                     .arg(metaObject()->className())
-//                    .arg(QString::number((uint)this))
-                    .arg("0")
+                    .arg((uint64_t)this,0,16)
                     .arg(QString::number(m_refCount)));
 }
 
@@ -25,10 +24,9 @@ bool ReferenceCounter::DownRef(void)
 {
     m_refLock.lock();
     m_refCount--;
-    LOG(VB_GENERAL, LOG_DEBUG, QString("%1(%2)::DownRef() -> %3")
+    LOG(VB_GENERAL, LOG_DEBUG, QString("%1(0x%2)::DownRef() -> %3")
                     .arg(metaObject()->className())
-//                    .arg(QString::number((uint)this))
-                    .arg("0")
+                    .arg((uint64_t)this,0,16)
                     .arg(QString::number(m_refCount)));
 
     if (m_refCount == 0)
