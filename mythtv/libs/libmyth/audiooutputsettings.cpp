@@ -128,6 +128,8 @@ AudioFormat AudioOutputSettings::GetNextFormat()
 
 void AudioOutputSettings::AddSupportedFormat(AudioFormat format)
 {
+    VERBOSE(VB_AUDIO, LOC + QString("Format %1 is supported")
+            .arg(FormatToString(format)));
     m_formats.push_back(format);
 }
 
