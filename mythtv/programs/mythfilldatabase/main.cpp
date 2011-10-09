@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
                 cmdline.toStringList("refresh") << "nottomorrow");
     if (cmdline.toBool("refreshsecond"))
         cmdline.SetValue("refresh", 
-                cmdline.toStringList("refresh") << "today");
+                cmdline.toStringList("refresh") << "second");
     if (cmdline.toBool("refreshall"))
         cmdline.SetValue("refresh", 
                 cmdline.toStringList("refresh") << "all");
@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
                 cmdline.toStringList("refresh") << 
                          QString::number(cmdline.toUInt("refreshday")));
 
-    QStringList sl =cmdline.toStringList("refresh");
+    QStringList sl = cmdline.toStringList("refresh");
     if (!sl.isEmpty())
     {
         QStringList::const_iterator i = sl.constBegin();

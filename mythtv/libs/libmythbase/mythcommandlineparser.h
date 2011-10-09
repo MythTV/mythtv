@@ -36,7 +36,8 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 
     bool            Set(QString opt);
     bool            Set(QString opt, QString val);
-    void            Set(QVariant val)               { m_stored = val; }
+    void            Set(QVariant val)               { m_stored = val;
+                                                      m_given = true; }
 
     CommandLineArg* SetParentOf(QString opt);
     CommandLineArg* SetParentOf(QStringList opts);
@@ -48,6 +49,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     CommandLineArg* SetRequires(QStringList opts);
     CommandLineArg* SetBlocks(QString opt);
     CommandLineArg* SetBlocks(QStringList opts);
+    CommandLineArg* SetDeprecated(QString depstr = "");
 
     static void     AllowOneOf(QList<CommandLineArg*> args);
 
@@ -70,6 +72,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     bool                    m_given;
     QString                 m_name;
     QString                 m_group;
+    QString                 m_deprecated;
     QVariant::Type          m_type;
     QVariant                m_default;
     QVariant                m_stored;

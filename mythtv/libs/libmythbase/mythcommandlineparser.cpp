@@ -100,18 +100,19 @@ const char* NamedOptType(int type)
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
                    QVariant def, QString help, QString longhelp) :
     ReferenceCounter(), m_given(false), m_name(name), m_group(""),
-    m_type(type), m_default(def), m_help(help), m_longhelp(longhelp)
+    m_deprecated(""), m_type(type), m_default(def), m_help(help),
+    m_longhelp(longhelp)
 {
 }
 
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
   : ReferenceCounter(), m_given(false), m_name(name), m_group(""),
-    m_type(type), m_default(def)
+    m_deprecated(""), m_type(type), m_default(def)
 {
 }
 
 CommandLineArg::CommandLineArg(QString name) :
-    ReferenceCounter(), m_given(false), m_name(name), 
+    ReferenceCounter(), m_given(false), m_name(name), m_deprecated(""),
     m_type(QVariant::Invalid)
 {
 }
@@ -443,6 +444,11 @@ CommandLineArg* CommandLineArg::SetBlocks(QStringList opts)
     QStringList::const_iterator i = opts.begin();
     for (; i != opts.end(); ++i)
         m_blocks << new CommandLineArg(*i);
+    return this;
+}
+
+CommandLineArg* CommandLineArg::SetDeprecated(QString depstr)
+{
     return this;
 }
 
