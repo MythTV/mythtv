@@ -47,15 +47,15 @@ class AudioReencodeBuffer : public AudioOutput
         audiobuffer = new unsigned char[bufsize];
 
         ab_count = 0;
-        memset(ab_len, 0, sizeof(ab_len));
-        memset(ab_offset, 0, sizeof(ab_offset));
-        memset(ab_time, 0, sizeof(ab_time));
+        ab_size = 128;
+        ab = new AudioBuffer[ab_size];
         m_initpassthru = passthru;
     }
 
     ~AudioReencodeBuffer()
     {
         delete [] audiobuffer;
+        delete [] ab;
     }
 
     // reconfigure sound out for new params
@@ -102,9 +102,16 @@ class AudioReencodeBuffer : public AudioOutput
             delete [] audiobuffer;
             audiobuffer = tmpbuf;
         }
-
-        ab_len[ab_count] = len;
-        ab_offset[ab_count] = audiobuffer_len;
+        if (ab_count >= ab_size)
+        {
+            AudioBuffer *tmp = new AudioBuffer[ab_size + 128];
+            memcpy(tmp, ab, sizeof(AudioBuffer) * ab_size);
+            delete[] ab;
+            ab = tmp;
+            ab_size += 128;
+        }
+        ab[ab_count].len = len;
+        ab[ab_count].offset = audiobuffer_len;
 
         memcpy(audiobuffer + audiobuffer_len, buffer,
                len);
@@ -115,7 +122,7 @@ class AudioReencodeBuffer : public AudioOutput
         last_audiotime = timecode + frames * 1000 /
             eff_audiorate;
 
-        ab_time[ab_count] = last_audiotime;
+        ab[ab_count].time = last_audiotime;
         ab_count++;
 
         return true;
@@ -219,10 +226,15 @@ class AudioReencodeBuffer : public AudioOutput
         { return m_initpassthru; }
 
     int bufsize;
-    int ab_count;
-    int ab_len[128];
-    int ab_offset[128];
-    long long ab_time[128];
+    uint ab_count;
+    struct AudioBuffer
+    {
+        int len;
+        int offset;
+        long long time;
+    };
+    AudioBuffer *ab;
+    uint ab_size;
     unsigned char *audiobuffer;
     int audiobuffer_len, audiobuffer_frames;
     int channels, bits, bytes_per_frame, eff_audiorate;
@@ -1152,12 +1164,12 @@ int Transcode::TranscodeFile(const QString &inputname,
             audioframesize = arb->audiobuffer_len;
             if (arb->ab_count)
             {
-                for (int loop = 0; loop < arb->ab_count; loop++)
+                for (uint loop = 0; loop < arb->ab_count; loop++)
                 {
-                    nvr->SetOption("audioframesize", arb->ab_len[loop]);
-                    nvr->WriteAudio(arb->audiobuffer + arb->ab_offset[loop],
+                    nvr->SetOption("audioframesize", arb->ab[loop].len);
+                    nvr->WriteAudio(arb->audiobuffer + arb->ab[loop].offset,
                                     audioFrame++,
-                                    arb->ab_time[loop] - timecodeOffset);
+                                    arb->ab[loop].time - timecodeOffset);
                     if (nvr->IsErrored())
                     {
                         LOG(VB_GENERAL, LOG_ERR,
