@@ -192,7 +192,8 @@ void MythOpenGLPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
                                  const QPen &linePen, int alpha)
 {
     if ((fillBrush.style() == Qt::SolidPattern ||
-         fillBrush.style() == Qt::NoBrush) && realRender)
+         fillBrush.style() == Qt::NoBrush) &&
+        (realRender && realRender->RectanglesAreAccelerated()))
     {
         realRender->DrawRect(area, fillBrush, linePen, alpha);
         return;
