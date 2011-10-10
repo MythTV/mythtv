@@ -1941,7 +1941,8 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
 // WARNING: this must not be called until after MythContext is initialized
 void MythCommandLineParser::ApplySettingsOverride(void)
 {
-    cerr << "Applying settings override" << endl;
+    if (m_verbose)
+        cerr << "Applying settings override" << endl;
 
     QMap<QString, QString> override = GetSettingsOverride();
     if (override.size())
