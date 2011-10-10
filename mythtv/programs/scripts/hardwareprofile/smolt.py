@@ -701,7 +701,7 @@ class _HardwareProfile:
         logdir = os.path.expanduser('~/.smolt/')
         try:
             if not os.path.exists(logdir):
-                os.mkdir(logdir, 1700)
+                os.mkdir(logdir, 0700)
 
             for k, v in log_matrix.items():
                 filename = os.path.expanduser(os.path.join(
