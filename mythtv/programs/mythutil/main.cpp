@@ -1,5 +1,9 @@
 // Qt includes
+#ifndef _WIN32
+#include <QCoreApplication>
+#else
 #include <QApplication>
+#endif
 
 // libmyth* includes
 #include "exitcodes.h"
@@ -38,7 +42,14 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
+#ifndef _WIN32
+    QCoreApplication a(argc, argv);
+#else
+    // MINGW application needs a window to receive messages
+    // such as socket notifications :[
     QApplication a(argc, argv);
+#endif
+
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHUTIL);
 
     int retval;
