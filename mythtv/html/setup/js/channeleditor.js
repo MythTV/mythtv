@@ -196,9 +196,9 @@ function saveChannelEdits() {
     var sourceid = $("#channelDetailSettingSourceId").html();
     var chanid = $("#channelDetailSettingChanId").html()
 
-    var callsign = $("#channelDetailSettingCallSign").val();
-    var channelname = $("#channelDetailSettingChannelName").val();
-    var channum =  $("#channelDetailSettingChanNum").val();
+    var callsign = $.trim($("#channelDetailSettingCallSign").val());
+    var channelname = $.trim($("#channelDetailSettingChannelName").val());
+    var channum =  $.trim($("#channelDetailSettingChanNum").val());
     var serviceid =  $("#channelDetailSettingServiceId").val();
     var atscmajorchannel =  $("#channelDetailSettingATSCMajorChannel").val();
     var atscminorchannel =  $("#channelDetailSettingATSCMinorChannel").val();
