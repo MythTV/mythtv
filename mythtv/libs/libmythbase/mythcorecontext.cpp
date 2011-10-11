@@ -205,22 +205,21 @@ bool MythCoreContext::Init(void)
         if (lc_value.isEmpty())
             lc_value = getenv("LC_CTYPE");
     }
-    if (!lc_value.contains("UTF-8", Qt::CaseInsensitive))
-        lang_variables.append("LC_ALL or LC_CTYPE");
-    lc_value = getenv("LANG");
+    if (lc_value.isEmpty())
+    {
+        // Some environments, like OS X, only set LANG, so check that also:
+        lc_value = getenv("LANG");
+    }
     if (!lc_value.contains("UTF-8", Qt::CaseInsensitive))
     {
-        if (!lang_variables.isEmpty())
-            lang_variables.append(", and ");
-        lang_variables.append("LANG");
-    }
-    if (!lang_variables.isEmpty())
+        lang_variables.append("LC_ALL, LC_CTYPE or LANG");
         LOG(VB_GENERAL, LOG_WARNING, QString("This application expects to "
             "be running a locale that specifies a UTF-8 codeset, and many "
             "features may behave improperly with your current language "
             "settings. Please set the %1 variable(s) in the environment "
             "in which this program is executed to include a UTF-8 codeset "
             "(such as 'en_US.UTF-8').").arg(lang_variables));
+    }
 #endif
 
     // If any of the IPs on any interfaces look like IPv6 addresses, assume IPv6
