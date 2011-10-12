@@ -152,6 +152,10 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
         // to a parent option
         return helpstr;
 
+    if (!m_deprecated.isEmpty())
+        // option is marked as deprecated, do not show
+        return helpstr;
+
     QString pad;
     pad.fill(' ', off);
 
@@ -182,6 +186,14 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
 
     if (!m_keywords.contains(keyword))
         return helpstr;
+
+    if (!m_deprecated.isEmpty())
+        cerr << QString("****************************************************\n"
+                        " WARNING: %1 has been deprecated\n"
+                        "          %2\n"
+                        "****************************************************\n\n")
+                    .arg(keyword).arg(m_deprecated)
+                    .toLocal8Bit().constData();
 
     msg << "Option:      " << keyword << endl << endl;
 
@@ -449,6 +461,9 @@ CommandLineArg* CommandLineArg::SetBlocks(QStringList opts)
 
 CommandLineArg* CommandLineArg::SetDeprecated(QString depstr)
 {
+    if (depstr.isEmpty())
+        depstr = "and will be removed in a future version.";
+    m_deprecated = depstr;
     return this;
 }
 
@@ -854,14 +869,14 @@ QString MythCommandLineParser::GetHelpString(void) const
         .arg(m_appname).arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION);
     msg << versionStr << endl;
 
-    QString descr = GetHelpHeader();
-    if (descr.size() > 0)
-        msg << endl << descr << endl << endl;
-
     if (toString("showhelp").isEmpty())
     {
         // build generic help text
         //msg << "Valid options are: " << endl;
+
+        QString descr = GetHelpHeader();
+        if (descr.size() > 0)
+            msg << endl << descr << endl << endl;
 
         QStringList groups("");
         int maxlen = 0;
@@ -1075,6 +1090,14 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         }
         else
             argdef = m_optionedArgs[opt];
+
+        if (!argdef->m_deprecated.isEmpty())
+            cerr << QString("****************************************************\n"
+                            " WARNING: %1 has been deprecated\n"
+                            "          %2\n"
+                            "****************************************************\n\n")
+                        .arg(opt).arg(argdef->m_deprecated)
+                        .toLocal8Bit().constData();
 
         if (m_verbose)
             cerr << "name: " << argdef->GetName().toLocal8Bit().constData()
