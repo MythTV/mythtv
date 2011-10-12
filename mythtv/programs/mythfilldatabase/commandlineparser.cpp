@@ -184,8 +184,7 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
     add("--only-update-channels", "onlychannels", false,
             "only update channel lineup",
             "Download as little listings data as possible to update the "
-            "channel lineup.")
-        ->SetParentOf("sourceid");
+            "channel lineup.");
     add("--no-mark-repeats", "markrepeats", true, "do not mark repeats", "");
     add("--export-icon-map", "exporticonmap", "iconmap.xml",
             "export icon map to file", "");
