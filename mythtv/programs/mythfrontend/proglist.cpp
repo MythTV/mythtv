@@ -1336,10 +1336,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         selected = *selectedP;
         selectedP = &selected;
     }
-    int selectedOffset =
-        m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
 
-    m_progList->Reset();
     m_itemList.clear();
 
     if (m_type == plPreviouslyRecorded)
@@ -1389,7 +1386,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         SortList(GetSortBy(), m_reverseSort);
 
     if (updateDisp)
-        UpdateDisplay(selectedP, selectedOffset);
+        UpdateDisplay(selectedP);
 }
 
 ProgLister::SortBy ProgLister::GetSortBy(void) const
@@ -1436,8 +1433,13 @@ void ProgLister::ClearCurrentProgramInfo(void)
         m_positionText->Reset();
 }
 
-void ProgLister::UpdateDisplay(void)
+void ProgLister::UpdateDisplay(const ProgramInfo *selected)
 {
+    int offset = 0;
+
+    if (selected)
+        offset = m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
+
     m_progList->Reset();
 
     if (m_messageText)
@@ -1449,16 +1451,14 @@ void ProgLister::UpdateDisplay(void)
         m_curviewText->SetText(m_viewTextList[m_curView]);
 
     UpdateButtonList();
+
+    if (selected)
+        RestoreSelection(selected, offset);
 }
 
-void ProgLister::UpdateDisplay(const ProgramInfo *selected, int selectedOffset)
+void ProgLister::RestoreSelection(const ProgramInfo *selected,
+                                  int selectedOffset)
 {
-    UpdateDisplay();
-
-    if (!selected)
-        return;
-
-    // Restore selection
     plCompare *comp;
     if (!m_titleSort)
         comp = new plTimeSort();
