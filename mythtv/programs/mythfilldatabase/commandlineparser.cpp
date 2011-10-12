@@ -39,15 +39,18 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "Directly define the sourceid and XMLTV file to "
             "import.")
         ->SetBlocks("ddfile")
-        ->SetBlocks("xawchannels");
+        ->SetBlocks("xawchannels")
+        ->SetRequires("sourceid");
     add("--dd-file", "ddfile", false,
             "Bypass grabber, and read SD data from file",
             "Directly define the data needed to import a local "
             "DataDirect download.")
-        ->SetBlocks("xawchannels");
+        ->SetBlocks("xawchannels")
+        ->SetRequires("sourceid");
     add("--xawchannels", "xawchannels", false,
             "Read channels from xawtvrc file",
-            "Import channels from an xawtvrc file.");
+            "Import channels from an xawtvrc file.")
+        ->SetRequires("sourceid");
 
     add("--sourceid", "sourceid", 0, "Operate on single source",
             "Limit mythfilldatabase to only operate on the "
