@@ -1031,7 +1031,6 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_focusOrder = base->m_focusOrder;
 
     SetArea(base->m_Area);
-    m_MinArea = base->m_MinArea;
     m_MinSize = base->m_MinSize;
     m_Initiator = base->m_Initiator;
     m_Vanish = base->m_Vanish;
@@ -1060,6 +1059,9 @@ void MythUIType::CopyFrom(MythUIType *base)
         else
             (*it)->CreateCopy(this);
     }
+
+    if (m_Initiator)
+        SetMinArea(base->m_MinArea.size());
 }
 
 /**
