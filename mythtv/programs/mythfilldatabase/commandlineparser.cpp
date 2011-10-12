@@ -51,10 +51,7 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
 
     add("--sourceid", "sourceid", 0, "Operate on single source",
             "Limit mythfilldatabase to only operate on the "
-            "specified channel source.")
-        ->SetRequiredChildOf("file")
-        ->SetRequiredChildOf("ddfile")
-        ->SetRequiredChildOf("xawchannels");
+            "specified channel source.");
 
     add("--offset", "offset", 0, "Day offset of input xml file",
             "Specify how many days offset from today is the "
