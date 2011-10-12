@@ -33,17 +33,23 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
          << add("--gencutlist", "gencutlist", false,
                 "Copy the commercial skip list to the cutlist.", "")
+                    ->SetDeprecated("use mythutil instead")
          << add("--clearcutlist", "clearcutlist", false,
                 "Clear the cutlist.", "")
+                    ->SetDeprecated("use mythutil instead")
          << add("--clearskiplist", "clearskiplist", false,
                 "Clear the commercial skip list.", "")
+                    ->SetDeprecated("use mythutil instead")
          << add("--getcutlist", "getcutlist", false,
                 "Display the current cutlist.", "")
+                    ->SetDeprecated("use mythutil instead")
          << add("--getskiplist", "getskiplist", false,
                 "Display the current commercial skip list.", "")
+                    ->SetDeprecated("use mythutil instead")
          << add("--setcutlist", "setcutlist", "",
                 "Set a new cutlist in the form:\n"
                 "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "")
+                    ->SetDeprecated("use mythutil instead")
          << add("--skipdb", "skipdb", false, "",
                 "Intended for external 3rd party use.")
                     ->SetGroup("Advanced")

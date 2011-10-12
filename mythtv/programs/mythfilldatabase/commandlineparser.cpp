@@ -127,26 +127,30 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "Force a refresh for today's guide data.\nThis can be used "
             "in combination with other --refresh-<n> options.\n"
             "If being used with datadirect, this option should not be "
-            "used, rather use --dd-grab-all to pull all listings each time.");
+            "used, rather use --dd-grab-all to pull all listings each time.")
+        ->SetDeprecated("use --refresh instead");
     add("--dont-refresh-tomorrow", "dontrefreshtomorrow", false, "",
             "This option is only valid for selected grabbers.\n"
             "Prevent mythfilldatabase from pulling information for "
             "tomorrow's listings. Data for tomorrow is always pulled "
             "unless specifically specified otherwise.\n"
             "If being used with datadirect, this option should not be "
-            "used, rather use --dd-grab-all to pull all listings each time.");
+            "used, rather use --dd-grab-all to pull all listings each time.")
+        ->SetDeprecated("use --refresh instead");
     add("--refresh-second", "refreshsecond", false, "",
             "This option is only valid for selected grabbers.\n"
             "Force a refresh for guide data two days from now. This can "
             "be used in combination with other --refresh-<n> options.\n"
             "If being used with datadirect, this option should not be "
-            "used, rather use --dd-grab-all to pull all listings each time.");
+            "used, rather use --dd-grab-all to pull all listings each time.")
+        ->SetDeprecated("use --refresh instead");
     add("--refresh-day", "refreshday", 0U, "",
             "This option is only valid for selected grabbers.\n"
             "Force a refresh for guide data on a specific day. This can "
             "be used in combination with other --refresh-<n> options.\n"
             "If being used with datadirect, this option should not be "
-            "used, rather use --dd-grab-all to pull all listings each time.");
+            "used, rather use --dd-grab-all to pull all listings each time.")
+        ->SetDeprecated("use --refresh instead");
     add("--dont-refresh-tba", "dontrefreshtba", false,
             "don't refresh \"To be announced\" programs",
             "This option is only valid for selected grabbers.\n"
@@ -161,6 +165,7 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "with fourteen downloads of one day each.\n"
             "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.")
+        ->SetDeprecated("use --refresh instead")
         ->SetBlocks("dontrefreshtomorrow")
         ->SetBlocks("refreshsecond")
         ->SetBlocks("refreshday")
