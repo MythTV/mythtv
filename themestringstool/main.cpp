@@ -206,6 +206,8 @@ int main(int argc, char *argv[])
 
     fdataout.setDevice(&fstringout);
 
+    fdataout << QString("// This is an automatically generated file\n");
+    fdataout << QString("// Do not edit\n\n");
     fdataout << QString("void strings_null() {\n");
 
     int lineCount = 2;
