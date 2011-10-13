@@ -7,7 +7,6 @@
 #include <QString>
 #include "mpegtables.h"
 #include "atscdescriptors.h"
-#include "mythlogging.h"
 
 // Some sample code is in pcHDTV's dtvscan.c,
 // accum_sect/dequeue_buf/atsc_tables.  We should stuff
@@ -44,12 +43,6 @@
  *   in an EIT, then when the data is complete a new MGT is sent with an
  *   updated version_number for that EIT, updating the data.
  */
-
-/** Seconds between start of GPS time and the start of UNIX time. */
-#define secs_Between_1Jan1970_6Jan1980 315964800
-
-/** Leap seconds as of Jan 1st, 2006. */
-#define GPS_LEAP_SECONDS 14
 
 class TableClass
 {
@@ -561,7 +554,7 @@ class EventInformationTable : public PSIPTable
     {
         // Time in GPS seconds since 00:00:00 on January 6th, 1980 UTC
         QDateTime dt;
-        dt.setTime_t(secs_Between_1Jan1970_6Jan1980 + StartTimeRaw(i));
+        dt.setTime_t(GPS_EPOCH + StartTimeRaw(i));
         return dt;
     }
     //   reserved               2   6.0    3
@@ -705,11 +698,11 @@ class SystemTimeTable : public PSIPTable
     QDateTime SystemTimeGPS(void) const
     {
         QDateTime dt;
-        dt.setTime_t(secs_Between_1Jan1970_6Jan1980 + GPSRaw());
+        dt.setTime_t(GPS_EPOCH + GPSRaw());
         return dt;
     }
     time_t GPSUnix(void) const
-        { return secs_Between_1Jan1970_6Jan1980 + GPSRaw(); }
+        { return GPS_EPOCH + GPSRaw(); }
     time_t UTCUnix(void) const
         { return GPSUnix() - GPSOffset(); }
 

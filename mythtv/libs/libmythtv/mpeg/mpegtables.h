@@ -20,6 +20,15 @@
  *  \endcode
  */
 
+/** Seconds between start of GPS time and the start of UNIX time.
+ *  i.e. from Jan 1st, 1970 UTC to Jan 6th, 1980 UTC
+ */
+#define GPS_EPOCH 315964800
+
+/** Leap seconds as of Jan 1st, 2006. */
+#define GPS_LEAP_SECONDS 14
+
+
 /** \class PESStreamID
  *  \brief Contains a listing of PES Stream ID's for various PES Packet types.
  */

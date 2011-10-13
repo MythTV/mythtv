@@ -620,7 +620,7 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
         return;
 
     QDateTime starttime;
-    time_t off = secs_Between_1Jan1970_6Jan1980 + gps_offset + utc_offset;
+    time_t off = GPS_EPOCH + gps_offset + utc_offset;
     time_t tmp = event.start_time + off;
     tm result;
 
