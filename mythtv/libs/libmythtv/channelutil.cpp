@@ -1593,16 +1593,17 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
         query.bindValue(":FREQID",    freqid);
 
     QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : format;
+    tvformat = tvformat.isNull() ? "" : tvformat;
     query.bindValue(":TVFORMAT", tvformat);
 
-    icon = (icon.isEmpty()) ? "" : icon;
-    query.bindValue(":ICON",      icon);
+    icon = (icon.isNull()) ? "" : icon;
+    query.bindValue(":ICON", icon);
 
-    xmltvid = (xmltvid.isEmpty()) ? "" : xmltvid;
-    query.bindValue(":XMLTVID",   xmltvid);
+    xmltvid = (xmltvid.isNull()) ? "" : xmltvid;
+    query.bindValue(":XMLTVID", xmltvid);
 
-    default_authority = (default_authority.isEmpty()) ? "" : default_authority;
-    query.bindValue(":AUTHORITY",   default_authority);
+    default_authority = (default_authority.isNull()) ? "" : default_authority;
+    query.bindValue(":AUTHORITY", default_authority);
 
     if (!query.exec() || !query.isActive())
     {
