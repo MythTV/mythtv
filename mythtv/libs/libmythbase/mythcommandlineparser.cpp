@@ -1696,7 +1696,7 @@ void MythCommandLineParser::addWindowed(void)
 {
     add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
             "notwindowed", false, 
-            "Prevent application from running in window.", "")
+            "Prevent application from running in a window.", "")
         ->SetBlocks("windowed")
         ->SetGroup("User Interface");
 
