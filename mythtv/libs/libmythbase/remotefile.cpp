@@ -384,8 +384,12 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     controlSock->readStringList(strlist);
     lock.unlock();
 
-    long long retval = strlist[0].toLongLong();
-    readposition = retval;
+    long long retval = -1;
+    if (!strlist.empty())
+    {
+        retval = strlist[0].toLongLong();
+        readposition = retval;
+    }
 
     Reset();
 
