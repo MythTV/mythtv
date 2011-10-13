@@ -289,13 +289,14 @@ void RingBuffer::UpdateRawBitrate(uint raw_bitrate)
 {
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("UpdateRawBitrate(%1Kb)").arg(raw_bitrate));
-    if (raw_bitrate < 2500)
+
+    // an audio only stream could be as low as 64Kb (DVB radio) and
+    // an MHEG only stream is likely to be reported as 0Kb
+    if (raw_bitrate < 64)
     {
         LOG(VB_FILE, LOG_INFO, LOC +
-            QString("UpdateRawBitrate(%1Kb) - ignoring bitrate,")
-                .arg(raw_bitrate) +
-                "\n\t\t\tappears to be abnormally low.");
-        return;
+            QString("Bitrate too low - setting to 64Kb"));
+        raw_bitrate = 64;
     }
 
     rwlock.lockForWrite();
