@@ -536,8 +536,14 @@ void DBLoggerThread::run(void)
     // We want the query to be out of scope before the RunEpilog() so shutdown
     // occurs correctly as otherwise the connection appears still in use, and
     // we get a qWarning on shutdown.
+    //
+    // Once again, we can't have the mutex locked WHILE doing InitCon() as it
+    // can deadlock if the program is exiting before the database is ready.
+    // Maybe it would be better to not use m_wait->wait() on this mutex above?
+    qLock.unlock();
     MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
     m_logger->prepare(*query);
+    qLock.relock();
 
     while (!aborted || !m_queue->isEmpty())
     {
