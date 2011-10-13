@@ -554,7 +554,7 @@ class MTV_PUBLIC MythPlayer
     bool           decoderPaused;
     bool           pauseDecoder;
     bool           unpauseDecoder;
-    bool           killdecoder;
+    bool volatile  killdecoder;
     int64_t        decoderSeek;
     bool           decodeOneFrame;
     bool           needNewPauseFrame;
