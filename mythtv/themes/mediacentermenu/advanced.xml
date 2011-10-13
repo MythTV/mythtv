@@ -33,7 +33,7 @@
     <button>
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
-        <description>Change MythTV key bindings.</description>
+        <description>Change MythTV key bindings</description>
         <action>SETUP_KEYS</action>
     </button>
 
