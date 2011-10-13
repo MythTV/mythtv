@@ -514,37 +514,29 @@ void DBLoggerThread::run(void)
 {
     RunProlog();
 
-    QMutexLocker qLock(&m_queueMutex);
-
     // Wait a bit before we start logging to the DB..  If we wait too long,
     // then short-running tasks (like mythpreviewgen) will not log to the db
     // at all, and that's undesirable.
     bool ready = false;
     while (!gCoreContext && !aborted && !ready)
     {
-        // If the mutex is locked during this call, it causes deadlock in some
-        // situations.
-        qLock.unlock();
         ready = m_logger->isDatabaseReady();
-        qLock.relock();
 
         // Don't delay if aborted was set while we were checking database ready
         if (!ready && !aborted && !gCoreContext)
+        {
+            QMutexLocker qLock(&m_queueMutex);
             m_wait->wait(qLock.mutex(), 100);
+        }
     }
 
     // We want the query to be out of scope before the RunEpilog() so shutdown
     // occurs correctly as otherwise the connection appears still in use, and
     // we get a qWarning on shutdown.
-    //
-    // Once again, we can't have the mutex locked WHILE doing InitCon() as it
-    // can deadlock if the program is exiting before the database is ready.
-    // Maybe it would be better to not use m_wait->wait() on this mutex above?
-    qLock.unlock();
     MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
     m_logger->prepare(*query);
-    qLock.relock();
 
+    QMutexLocker qLock(&m_queueMutex);
     while (!aborted || !m_queue->isEmpty())
     {
         if (m_queue->isEmpty())
