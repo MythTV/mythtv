@@ -452,7 +452,7 @@ void strings_null() {
     ThemeUI::tr("Item has been Watched:");
     ThemeUI::tr("Enable random trailer playback");
     ThemeUI::tr("Play %n trailer(s)", 0, 1);
-    ThemeUI::tr("Change MythTV key bindings.");
+    ThemeUI::tr("Change MythTV key bindings");
     ThemeUI::tr("MythStream Settings");
     ThemeUI::tr("Weather Station Settings");
     ThemeUI::tr("TV");
@@ -875,11 +875,11 @@ void strings_null() {
     ThemeUI::tr("Video Filters");
     ThemeUI::tr("Another Theme build on the new UI library Any suggestions or bugs to https://code.google.com/p/a-forest/ A special thank to Steve Adeff for his help on this project.");
     ThemeUI::tr("LCARS");
-    ThemeUI::tr(" Retro Originally by Gerhard Aldorf MythUI version based on MythCenter by Jeroen Brosens Conversion of Retro to MythUI by Chris Candreva A generally blue theme. Icon style is realistic based on clasic, 'Retro' styles. ");
+    ThemeUI::tr(" Retro Originally by Gerhard Aldorf MythUI version based on MythCenter by Jeroen Brosens Conversion of Retro to MythUI by Chris Candreva A generally blue theme. Icon style is realistic based on classic, 'Retro' styles. ");
     ThemeUI::tr("TintedGlass is a transparent theme that is a little old school MythTV yet takes advantage of new MythUI features.");
     ThemeUI::tr("a nice transparent theme to use your own background if you want. just copy your favorite picture (be sure that its resolution is 1920x1200) to /usr/share/mythtv/themes/TransBlue/background.jpg");
     ThemeUI::tr("A UI and OSD theme with focus for fanart, banners and cover display.");
-    ThemeUI::tr("This theme breaks away from many convetions. It uses squirrly fonts!");
+    ThemeUI::tr("This theme breaks away from many conventions. It uses squirrly fonts!");
     ThemeUI::tr("blootube-ng is a theme based on the original blootube-wide by Justin Hornsby (justin.hornsby@gmail.com) which uses very large graphics associated with every menu entry. All changes where made to bring this theme forward to MythTV 0.24.");
     ThemeUI::tr("Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme.");
 }
