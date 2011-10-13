@@ -3,9 +3,6 @@
 #ifndef _MPEG_DESCRIPTORS_H_
 #define _MPEG_DESCRIPTORS_H_
 
-// ANSI C headers
-#include <cassert>
-
 // C++ headers
 #include <vector>
 using namespace std;
@@ -200,12 +197,46 @@ class MPEGDescriptor
   public:
     operator const unsigned char*() const { return _data; }
 
-    MPEGDescriptor(const unsigned char* data) : _data(data) { ; }
+    MPEGDescriptor(const unsigned char *data, int len = 300) : _data(data)
+    {
+        if ((len < 2) || (int(DescriptorLength()) + 2) > len)
+            _data = NULL;
+        else if (!Parse())
+            _data = NULL;
+    }
+    MPEGDescriptor(const unsigned char *data,
+                   int len, uint tag) : _data(data)
+    {
+        if ((len < 2) || (int(DescriptorLength()) + 2) > len)
+            _data = NULL;
+        else if (DescriptorTag() != tag)
+            _data = NULL;
+        else if (!Parse())
+            _data = NULL;
+    }
+    MPEGDescriptor(const unsigned char *data,
+                   int len, uint tag, uint req_desc_len) : _data(data)
+    {
+        if ((len < 2) || (int(DescriptorLength()) + 2) > len)
+            _data = NULL;
+        else if (DescriptorTag() != tag)
+            _data = NULL;
+        else if (DescriptorLength() != req_desc_len)
+            _data = NULL;
+        else if (!Parse())
+            _data = NULL;
+    }
     virtual ~MPEGDescriptor() {}
 
-    uint DescriptorTag() const    { return _data[0]; }
-    QString DescriptorTagString() const;
-    uint DescriptorLength() const { return _data[1]; }
+    bool IsValid(void) const { return _data; }
+    uint size(void) const { return DescriptorLength() + 2; }
+
+    uint DescriptorTag(void) const { return _data[0]; }
+    QString DescriptorTagString(void) const;
+    uint DescriptorLength(void) const { return _data[1]; }
+
+    virtual QString toString(void) const;
+    
     static desc_list_t Parse(const unsigned char* data, uint len);
     static desc_list_t ParseAndExclude(const unsigned char* data, uint len,
                                        int descriptorid);
@@ -220,26 +251,18 @@ class MPEGDescriptor
     static desc_list_t FindBestMatches(
         const desc_list_t &parsed, uint desc_tag, QMap<uint,uint> &langPref);
 
-    virtual QString toString() const;
   protected:
-    const unsigned char* _data;
+    virtual bool Parse(void) { return true; }
+
+    const unsigned char *_data;
 };
 
 // a_52a.pdf p119, Table A1
 class RegistrationDescriptor : public MPEGDescriptor
 {
   public:
-    RegistrationDescriptor(const unsigned char* data) : MPEGDescriptor(data)
-    {
-        assert(DescriptorID::registration == DescriptorTag());
-        if (0x04 != DescriptorLength())
-        {
-#if 0
-            LOG(VB_GENERAL, LOG_ERR, 
-                "Registration Descriptor length != 4 !!!!");
-#endif
-        }
-    }
+    RegistrationDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::registration, 4) { }
 
     uint FormatIdentifier(void) const
         { return (_data[2]<<24) | (_data[3]<<16) | (_data[4]<<8) | _data[5]; }
@@ -263,24 +286,22 @@ class RegistrationDescriptor : public MPEGDescriptor
 class ConditionalAccessDescriptor : public MPEGDescriptor
 {
   public:
-    ConditionalAccessDescriptor(const unsigned char* data) : MPEGDescriptor(data)
-    {
-        assert(DescriptorID::conditional_access == DescriptorTag());
-    }
+    ConditionalAccessDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::conditional_access) { }
+
     uint SystemID(void) const { return  _data[2] << 8 | _data[3]; }
     uint PID(void) const      { return (_data[4] & 0x1F) << 8 | _data[5]; }
     uint DataSize(void) const { return DescriptorLength() - 4; }
-    const unsigned char* Data(void) const { return _data+6; }
+    const unsigned char *Data(void) const { return _data+6; }
     QString toString() const;
 };
 
 class ISO639LanguageDescriptor : public MPEGDescriptor
 {
   public:
-    ISO639LanguageDescriptor(const unsigned char* data) : MPEGDescriptor(data)
-    {
-        assert(DescriptorID::ISO_639_language == DescriptorTag());
-    }
+    ISO639LanguageDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::iso_639_language) { }
+
     const unsigned char* CodeRaw() const { return &_data[2]; }
 
     int LanguageKey(void) const
@@ -298,13 +319,11 @@ class ISO639LanguageDescriptor : public MPEGDescriptor
 class AVCVideoDescriptor : public MPEGDescriptor
 {
   public:
-    AVCVideoDescriptor(const unsigned char* data) : MPEGDescriptor(data)
-    {
+    AVCVideoDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::avc_video) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x
-        assert(DescriptorID::avc_video == DescriptorTag());
     // descriptor_length        8   1.0
-    }
     // profile_idc              8   2.0
     uint ProfileIDC(void)         const { return _data[2]; }
     // constraint_set0_flag     1   3.0
@@ -328,13 +347,11 @@ class AVCVideoDescriptor : public MPEGDescriptor
 /// ISO 13818-1:2000/Amd.3:2004 page 12
 class AVCTimingAndHRDDescriptor : public MPEGDescriptor
 {
-    AVCTimingAndHRDDescriptor(const unsigned char* data) : MPEGDescriptor(data)
-    {
+    AVCTimingAndHRDDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::avc_timing_and_hrd) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x
-        assert(DescriptorID::avc_timing__hrd == DescriptorTag());
     // descriptor_length        8   1.0
-    }
     // hrd_management_valid     1   2.0
     bool HRDManagementValid(void)      const { return _data[2]&0x80; }
     // reserved                 6   2.1

@@ -160,9 +160,9 @@ QDate DishEventTagsDescriptor::originalairdate(void) const
     return originalairdate;
 }
 
-QMutex            DishEventMPAADescriptor::mpaaRatingsLock;
-map<uint,QString> DishEventMPAADescriptor::mpaaRatingsDesc;
-bool              DishEventMPAADescriptor::mpaaRatingsExists = false;
+QMutex             DishEventMPAADescriptor::mpaaRatingsLock;
+QMap<uint,QString> DishEventMPAADescriptor::mpaaRatingsDesc;
+bool               DishEventMPAADescriptor::mpaaRatingsExists = false;
 
 float DishEventMPAADescriptor::stars(void) const
 {
@@ -187,13 +187,9 @@ QString DishEventMPAADescriptor::rating(void) const
 
     QMutexLocker locker(&mpaaRatingsLock);
 
-    map<uint,QString>::const_iterator it = mpaaRatingsDesc.find(rating_raw());
+    QMap<uint,QString>::const_iterator it = mpaaRatingsDesc.find(rating_raw());
     if (it != mpaaRatingsDesc.end())
-    {
-        QString ret = (*it).second;
-        ret.detach();
-        return ret;
-    }
+        return *it;
 
     // Found nothing? Just return empty string.
     return "";
@@ -239,9 +235,9 @@ void DishEventMPAADescriptor::Init(void)
     mpaaRatingsExists = true;
 }
 
-QMutex            DishEventVCHIPDescriptor::vchipRatingsLock;
-map<uint,QString> DishEventVCHIPDescriptor::vchipRatingsDesc;
-bool              DishEventVCHIPDescriptor::vchipRatingsExists = false;
+QMutex             DishEventVCHIPDescriptor::vchipRatingsLock;
+QMap<uint,QString> DishEventVCHIPDescriptor::vchipRatingsDesc;
+bool               DishEventVCHIPDescriptor::vchipRatingsExists = false;
 
 QString DishEventVCHIPDescriptor::rating(void) const
 {
@@ -250,13 +246,9 @@ QString DishEventVCHIPDescriptor::rating(void) const
 
     QMutexLocker locker(&vchipRatingsLock);
 
-    map<uint,QString>::const_iterator it = vchipRatingsDesc.find(rating_raw());
+    QMap<uint,QString>::const_iterator it = vchipRatingsDesc.find(rating_raw());
     if (it != vchipRatingsDesc.end())
-    {
-        QString ret = (*it).second;
-        ret.detach();
-        return ret;
-    }
+        return *it;
 
     // Found nothing? Just return empty string.
     return "";

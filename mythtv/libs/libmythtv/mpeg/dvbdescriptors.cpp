@@ -197,9 +197,9 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
     return sStr;
 }
 
-QMutex            ContentDescriptor::categoryLock;
-map<uint,QString> ContentDescriptor::categoryDesc;
-bool              ContentDescriptor::categoryDescExists = false;
+QMutex             ContentDescriptor::categoryLock;
+QMap<uint,QString> ContentDescriptor::categoryDesc;
+volatile bool      ContentDescriptor::categoryDescExists = false;
 
 QString myth_category_type_to_string(uint category_type)
 {
@@ -240,22 +240,14 @@ QString ContentDescriptor::GetDescription(uint i) const
     QMutexLocker locker(&categoryLock);
 
     // Try to get detailed description
-    map<uint,QString>::const_iterator it = categoryDesc.find(Nibble(i));
+    QMap<uint,QString>::const_iterator it = categoryDesc.find(Nibble(i));
     if (it != categoryDesc.end())
-    {
-        QString ret = (*it).second;
-        ret.detach();
-        return ret;
-    }
+        return *it;
 
     // Fall back to category description
     it = categoryDesc.find(Nibble1(i)<<4);
     if (it != categoryDesc.end())
-    {
-        QString ret = (*it).second;
-        ret.detach();
-        return ret;
-    }
+        return *it;
 
     // Found nothing? Just return empty string.
     return "";
@@ -263,9 +255,9 @@ QString ContentDescriptor::GetDescription(uint i) const
 
 QString ContentDescriptor::toString() const
 {
-    QString tmp("");
+    QString tmp("ContentDescriptor: ");
     for (uint i = 0; i < Count(); i++)
-        tmp += GetMythCategory(i) + " : " + GetDescription(i);
+        tmp += GetMythCategory(i) + " : " + GetDescription(i) + ", ";
     return tmp;
 }
 
