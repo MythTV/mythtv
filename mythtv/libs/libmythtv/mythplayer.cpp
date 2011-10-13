@@ -2878,7 +2878,9 @@ bool MythPlayer::GetEof(void)
     if (is_current_thread(playerThread))
         return decoder ? decoder->GetEof() : true;
 
-    decoder_change_lock.lock();
+    if (!decoder_change_lock.tryLock(50))
+        return false;
+
     bool eof = decoder ? decoder->GetEof() : true;
     decoder_change_lock.unlock();
     return eof;
@@ -2893,7 +2895,9 @@ void MythPlayer::SetEof(bool eof)
         return;
     }
 
-    decoder_change_lock.lock();
+    if (!decoder_change_lock.tryLock(50))
+        return;
+
     if (decoder)
         decoder->SetEof(eof);
     decoder_change_lock.unlock();
