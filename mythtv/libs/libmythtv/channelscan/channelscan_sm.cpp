@@ -1261,8 +1261,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                                           nit->TransportDescriptorsLength(i));
 
                 const unsigned char *desc =
-                    MPEGDescriptor::Find(list,
-                                         DescriptorID::dvb_uk_channel_list);
+                    MPEGDescriptor::Find(
+                        list, PrivateDescriptorID::dvb_uk_channel_list);
 
                 if (desc)
                 {

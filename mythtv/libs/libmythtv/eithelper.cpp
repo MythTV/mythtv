@@ -335,8 +335,12 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         desc_list_t list = MPEGDescriptor::Parse(
             eit->Descriptors(i), eit->DescriptorsLength(i));
 
-        const unsigned char *dish_event_name =
-            MPEGDescriptor::Find(list, DescriptorID::dish_event_name);
+        const unsigned char *dish_event_name = NULL;
+        if (EITFixUp::kFixDish & fix)
+        {
+            dish_event_name = MPEGDescriptor::Find(
+                    list, PrivateDescriptorID::dish_event_name);
+        }
 
         if (dish_event_name)
         {
@@ -345,8 +349,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 title = dend.Name(descCompression);
 
             const unsigned char *dish_event_description =
-                MPEGDescriptor::Find(list,
-                                     DescriptorID::dish_event_description);
+                MPEGDescriptor::Find(
+                    list, PrivateDescriptorID::dish_event_description);
             if (dish_event_description)
             {
                 DishEventDescriptionDescriptor dedd(dish_event_description);
@@ -373,8 +377,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 
         if (EITFixUp::kFixDish & fix)
         {
-            const unsigned char *mpaa_data =
-                MPEGDescriptor::Find(list, DescriptorID::dish_event_mpaa);
+            const unsigned char *mpaa_data = MPEGDescriptor::Find(
+                list, PrivateDescriptorID::dish_event_mpaa);
             if (mpaa_data)
             {
                 DishEventMPAADescriptor mpaa(mpaa_data);
@@ -390,8 +394,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 
             if (!stars) // Not MPAA rated, check VCHIP
             {
-                const unsigned char *vchip_data =
-                    MPEGDescriptor::Find(list, DescriptorID::dish_event_vchip);
+                const unsigned char *vchip_data = MPEGDescriptor::Find(
+                    list, PrivateDescriptorID::dish_event_vchip);
                 if (vchip_data)
                 {
                     DishEventVCHIPDescriptor vchip(vchip_data);
@@ -409,8 +413,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 rating_system = "advisory";
             }
 
-            const unsigned char *tags_data =
-                MPEGDescriptor::Find(list, DescriptorID::dish_event_tags);
+            const unsigned char *tags_data = MPEGDescriptor::Find(
+                list, PrivateDescriptorID::dish_event_tags);
             if (tags_data)
             {
                 DishEventTagsDescriptor tags(tags_data);
@@ -422,8 +426,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                     seriesId = "";
             }
 
-            const unsigned char *properties_data =
-                MPEGDescriptor::Find(list, DescriptorID::dish_event_properties);
+            const unsigned char *properties_data = MPEGDescriptor::Find(
+                list, PrivateDescriptorID::dish_event_properties);
             if (properties_data)
             {
                 DishEventPropertiesDescriptor properties(properties_data);
@@ -546,8 +550,8 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
 
     // Find Transmissions
     desc_list_t transmissions =
-        MPEGDescriptor::FindAll(list,
-                                DescriptorID::premiere_content_transmission);
+        MPEGDescriptor::FindAll(
+            list, PrivateDescriptorID::premiere_content_transmission);
     for(uint j=0; j< transmissions.size(); j++)
     {
         PremiereContentTransmissionDescriptor transmission(transmissions[j]);

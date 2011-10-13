@@ -46,7 +46,7 @@ uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
     if ((sistandard != "dvb") && (OpenCableVideo == stream_id))
         return MPEG2Video;
 
-    if (MPEGDescriptor::Find(desc, DescriptorID::AC3))
+    if (MPEGDescriptor::Find(desc, DescriptorID::ac3))
         return AC3Audio;
 
     const unsigned char* d = NULL;
@@ -916,7 +916,7 @@ QString ProgramMapTable::GetLanguage(uint i) const
     const desc_list_t list = MPEGDescriptor::Parse(
         StreamInfo(i), StreamInfoLength(i));
     const unsigned char *lang_desc = MPEGDescriptor::Find(
-        list, DescriptorID::ISO_639_language);
+        list, DescriptorID::iso_639_language);
 
     if (!lang_desc)
         return QString::null;
