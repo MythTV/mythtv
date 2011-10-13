@@ -1267,12 +1267,12 @@ void verboseHelp()
     cerr << endl <<
       "The default for this program appears to be: '-v " <<
       m_verbose.toLocal8Bit().constData() << "'\n\n"
-      "Most options are additive except for none, and all.\n"
+      "Most options are additive except for 'none' and 'all'.\n"
       "These two are semi-exclusive and take precedence over any\n"
-      "prior options given.  You can however use something like\n"
-      "'-v none,jobqueue' to get only JobQueue related messages\n"
+      "other options.  However, you may use something like\n"
+      "'-v none,jobqueue' to receive only JobQueue related messages\n"
       "and override the default verbosity level.\n\n"
-      "The additive options may also be subtracted from 'all' by \n"
+      "Additive options may also be subtracted from 'all' by\n"
       "prefixing them with 'no', so you may use '-v all,nodatabase'\n"
       "to view all but database debug messages.\n\n"
       "Some debug levels may not apply to this program.\n\n";
