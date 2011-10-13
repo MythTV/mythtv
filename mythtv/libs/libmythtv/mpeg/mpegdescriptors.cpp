@@ -180,6 +180,116 @@ desc_list_t MPEGDescriptor::FindBestMatches(
     return tmp;
 }
 
+#define EMPTY_STR_16 "","","","", "","","","", "","","","", "","","","",
+
+const char *descriptor_tag_strings[256] =
+{
+    /* 0x00 */ "",                      /* 0x01 */ "",
+    /* 0x02 */ "Video",                 /* 0x03 */ "Audio",
+    /* 0x04 */ "Hierarchy",             /* 0x05 */ "Registration",
+    /* 0x06 */ "Data Stream Alignment", /* 0x07 */ "Target Background Grid",
+    /* 0x08 */ "Video Window",          /* 0x09 */ "Conditional Access",
+    /* 0x0A */ "ISO-639 Language",      /* 0x0B */ "System Clock",
+    /* 0x0C */ "Multiplex Buffer Utilization", /* 0x0D */ "Copyright",
+    /* 0x0E */ "Maximum Bitrate",       /* 0x0F */ "Private Data Indicator",
+
+    /* 0x10 */ "Smooting Buffer",       /* 0x11 */ "STD",
+    /* 0x12 */ "IBP",                   /* 0x13 */ "DSM-CC Carousel Identifier",
+    /* 0x14 */ "DSM-CC Association Tag",
+    /* 0x15 */ "DSM-CC Deferred Association Tag",
+    /* 0x16 */ "Reserved(0x16)",        /* 0x17 */ "DSM-CC NPT Reference",
+    /* 0x18 */ "DSM-CC NPT Endpoint",   /* 0x19 */ "DSM-CC Stream Mode",
+    /* 0x1A */ "DSM-CC Stream Event",   /* 0x1B */ "MPEG-4 Video",
+    /* 0x1C */ "MPEG-4 Audio",          /* 0x1D */ "IOD",
+    /* 0x1E */ "SL",                    /* 0x1F */ "FMC",
+    
+    /* 0x20 */ "External ES ID",        /* 0x21 */ "Multimpex Code",
+    /* 0x22 */ "FMX buffer Size",       /* 0x23 */ "Multiplex Buffer",
+    /* 0x24 */ "Content Labeling",      /* 0x25 */ "Metadata Pointer",
+    /* 0x26 */ "Metadata",              /* 0x27 */ "Metadata Std",
+    /* 0x28 */ "AVC Video",             /* 0x29 */ "IPMP DRM",
+    /* 0x2A */ "AVC Timing & HRD",      /* 0x2B */ "AAC Audio",
+    /* 0x2C */ "Flex Mux Timing",       /* 0x2D */ "",
+    /* 0x2E */ "",                      /* 0x2F */ "",
+
+    /* 0x30-0x3F */ EMPTY_STR_16
+
+    /* 0x40 */ "Network Name",          /* 0x41 */ "Service List",
+    /* 0x42 */ "DVB Stuffing",          /* 0x43 */ "Satellite Delivery System",
+    /* 0x44 */ "Cable Delivery System", /* 0x45 */ "VBI Data",
+    /* 0x46 */ "VBI Teletext",          /* 0x47 */ "Bouquet Name",
+    /* 0x48 */ "Service",               /* 0x49 */ "Country Availability",
+    /* 0x4A */ "Linkage",               /* 0x4B */ "NVOD Reference",
+    /* 0x4C */ "DVB Time-shifted Service",/* 0x4D */ "Short Event",
+    /* 0x4E */ "Extended Event",        /* 0x4F */ "Time-shifted Event",
+
+    /* 0x50 */ "Component",             /* 0x51 */ "Mosaic",
+    /* 0x52 */ "Stream Identifier",
+    /* 0x53 */ "Conditional Access Identifier",
+    /* 0x54 */ "Content",               /* 0x55 */ "Parental Rating",
+    /* 0x56 */ "Teletext",              /* 0x57 */ "Telephone",
+    /* 0x58 */ "Local Time Offset",     /* 0x59 */ "Subtitling",
+    /* 0x5A */ "Terrestrial Delivery System",
+    /* 0x5B */ "Multilingual Network Name",
+    /* 0x5C */ "Multilingual Bouquet Name",
+    /* 0x5D */ "Multilingual Service Name",
+    /* 0x5E */ "Multilingual Component",
+    /* 0x5F */ "Private Data Specifier",
+
+    /* 0x60 */ "Service Move",          /* 0x61 */ "Short Smoothing Buffer",
+    /* 0x62 */ "Frequency List",        /* 0x63 */ "Partial Transport Stream",
+    /* 0x64 */ "Data Broadcast",        /* 0x65 */ "Scrambling",
+    /* 0x66 */ "Data Broadcast ID",     /* 0x67 */ "Transport Stream",
+    /* 0x68 */ "DSNG",                  /* 0x69 */ "PDC",
+    /* 0x6A */ "AC-3",                  /* 0x6B */ "Ancillary Data",
+    /* 0x6C */ "Cell List",             /* 0x6D */ "Cell Frequency Link",
+    /* 0x6E */ "Announcement Support",  /* 0x6F */ "Application Signalling",
+
+    /* 0x70 */ "Adaptation Field Data", /* 0x71 */ "Service Identifier",
+    /* 0x72 */ "Service Availability",  /* 0x73 */ "Default Authority",
+    /* 0x74 */ "Related Content",       /* 0x75 */ "TVA ID",
+    /* 0x76 */ "DVB Content Identifier",/* 0x77 */ "Time Slice FEC Identifier",
+    /* 0x78 */ "ECM Repetition Rate",   /* 0x79 */ "DVB-S2 Delivery Identifier",
+    /* 0x7A */ "E-AC-3",                /* 0x7B */ "DTS",
+    /* 0x7C */ "AAC",                   /* 0x7D */ "",
+    /* 0x7E */ "",                      /* 0x7F */ "",
+
+    /* 0x80 */ "ATSC Stuffing",         /* 0x81 */ "AC-3 Audio",
+    /* 0x82 */ "SCTE Frame Rate",       /* 0x83 */ "",
+    /* 0x84 */ "SCTE Component Name",   /* 0x85 */ "ATSC Program Identifier",
+    /* 0x86 */ "Caption Service",       /* 0x87 */ "Content Advisory",
+    /* 0x88 */ "ATSC CA Descriptor",    /* 0x89 */ "ATSC Descriptor Tag",
+    /* 0x8A */ "SCTE CUE Identifier",   /* 0x8B */ "",
+    /* 0x8C */ "",                      /* 0x8D */ "",
+    /* 0x8E */ "",                      /* 0x8F */ "",
+
+    /* 0x90-0x9F */ EMPTY_STR_16
+
+    /* 0xA0 */ "Extended Channel Name", /* 0xA1 */ "Service Location",
+    /* 0xA2 */ "ATSC Time-shifted Service", /* 0xA3 */ "Component Name",
+    /* 0xA4 */ "ATSC Data Service",     /* 0xA5 */ "ATSC PID Count",
+    /* 0xA6 */ "ATSC Download",
+    /* 0xA7 */ "ATSC Multiprotocol Encapsulation",
+    /* 0xA8 */ "DCC Departing Request", /* 0xA9 */ "DCC Arriving Request",
+    /* 0xAA */ "Consumer Restrictions Control", /* 0xAB */ "ATSC Genre",
+    /* 0xAC */ "",                      /* 0xAD */ "ATSC Private Information",
+    /* 0xAE */ "",                      /* 0xAF */ "",
+
+    /* 0xB0 */ "", /* 0xB1 */ "",
+    /* 0xB2 */ "", /* 0xB3 */ "",
+    /* 0xB4 */ "", /* 0xB5 */ "",
+    /* 0xB6 */ "ATSC Content ID", /* 0xB7 */ "",
+    /* 0xB8 */ "", /* 0xB9 */ "",
+    /* 0xBA */ "", /* 0xBB */ "",
+    /* 0xBC */ "", /* 0xBD */ "",
+    /* 0xBE */ "", /* 0xBF */ "",
+
+    /* 0xC0-0xCF */ EMPTY_STR_16
+    /* 0xD0-0xDF */ EMPTY_STR_16
+    /* 0xE0-0xEF */ EMPTY_STR_16
+    /* 0xF0-0xFF */ EMPTY_STR_16
+};
+
 static void comma_list_append(QString &str, QString extra)
 {
     if (str.isEmpty())
@@ -190,266 +300,7 @@ static void comma_list_append(QString &str, QString extra)
 
 QString MPEGDescriptor::DescriptorTagString(void) const
 {
-    switch (DescriptorTag())
-    {
-        // MPEG
-        case DescriptorID::video:
-            return QString("Video");
-        case DescriptorID::audio:
-            return QString("Audio");
-        case DescriptorID::hierarchy:
-            return QString("Hierarchy");
-        case DescriptorID::registration:
-            return QString("Registration");
-        case DescriptorID::data_stream_alignment:
-            return QString("Data Stream Alignment");
-        case DescriptorID::conditional_access:
-            return QString("Conditional Access");
-        case DescriptorID::iso_639_language:
-            return QString("ISO-639 Language");
-        case DescriptorID::system_clock:
-            return QString("System Clock");
-        case DescriptorID::multiplex_buffer_utilization:
-            return QString("Multiplex Buffer Utilization");
-        case DescriptorID::copyright:
-            return QString("Copyright");
-        case DescriptorID::maximum_bitrate:
-            return QString("Maximum Bitrate");
-        case DescriptorID::private_data_indicator:
-            return QString("Private Data Indicator");
-        case DescriptorID::smoothing_buffer:
-            return QString("Smoothing Buffer");
-        case DescriptorID::std:
-            return QString("STD");
-        case DescriptorID::ibp:
-            return QString("IBP");
-        case DescriptorID::carousel_identifier:
-            return QString("DSM-CC Carousel Identifier");
-        case DescriptorID::association_tag:
-            return QString("DSM-CC Association Tag");
-        case DescriptorID::deferred_association_tag:
-            return QString("DSM-CC Deferred Association Tag");
-        case DescriptorID::npt_reference:
-            return QString("DSM-CC NPT Reference");
-        case DescriptorID::npt_endpoint:
-            return QString("DSM-CC NPT Endpoint");
-        case DescriptorID::stream_mode:
-            return QString("DSM-CC Stream Mode");
-        case DescriptorID::stream_event:
-            return QString("DSM-CC Stream Event");
-        case DescriptorID::mpeg4_video:
-            return QString("MPEG-4 Video");
-        case DescriptorID::mpeg4_audio:
-            return QString("MPEG-4 Audio");
-        case DescriptorID::iod:
-            return QString("IOD");
-        case DescriptorID::sl:
-            return QString("SL");
-        case DescriptorID::fmc:
-            return QString("FMC");
-        case DescriptorID::external_es_id:
-            return QString("External ES ID");
-        case DescriptorID::mux_code:
-            return QString("Multimpex Code");
-        case DescriptorID::fmx_buffer_size:
-            return QString("FMX buffer Size");
-        case DescriptorID::multiplex_buffer:
-            return QString("Multiplex Buffer");
-        case DescriptorID::content_labeling:
-            return QString("Content Labeling");
-        case DescriptorID::metadata_pointer:
-            return QString("Metadata Pointer");
-        case DescriptorID::metadata:
-            return QString("Metadata");
-        case DescriptorID::metadata_std:
-            return QString("Metadata Std");
-        case DescriptorID::avc_video:
-            return QString("AVC Video");
-        case DescriptorID::ipmp:
-            return QString("IPMP Digital Restrictions Management");
-        case DescriptorID::avc_timing_and_hrd:
-            return QString("AVC Timing & HRD");
-        case DescriptorID::mpeg2_aac_audio:
-            return QString("AAC Audio");
-        case DescriptorID::flex_mux_timing:
-            return QString("Flex Mux Timing");
-
-        // DVB
-        case DescriptorID::network_name:
-            return QString("Network Name");
-        case DescriptorID::service_list:
-            return QString("Service List");
-        case DescriptorID::dvb_stuffing:
-            return QString("DVB Stuffing");
-        case DescriptorID::satellite_delivery_system:
-            return QString("Satellite Delivery System");
-        case DescriptorID::cable_delivery_system:
-            return QString("Cable Delivery System");
-        case DescriptorID::vbi_data:
-            return QString("VBI Data");
-        case DescriptorID::vbi_teletext:
-            return QString("VBI Teletext");
-        case DescriptorID::bouquet_name:
-            return QString("Bouquet Name");
-        case DescriptorID::service:
-            return QString("Service");
-        case DescriptorID::country_availability:
-            return QString("Country Availability");
-        case DescriptorID::linkage:
-            return QString("Linkage");
-        case DescriptorID::nvod_reference:
-            return QString("NVOD Reference");
-        case DescriptorID::dvb_time_shifted_service:
-            return QString("DVB Time-shifted Service");
-        case DescriptorID::short_event:
-            return QString("Short Event");
-        case DescriptorID::extended_event:
-            return QString("Extended Event");
-        case DescriptorID::time_shifted_event:
-            return QString("Time-shifted Event");
-        case DescriptorID::component:
-            return QString("Component");
-        case DescriptorID::mosaic:
-            return QString("Mosaic");
-        case DescriptorID::stream_identifier:
-            return QString("Stream Identifier");
-        case DescriptorID::ca_identifier:
-            return QString("Conditional Access Identifier");
-        case DescriptorID::content:
-            return QString("Content");
-        case DescriptorID::parental_rating:
-            return QString("Parental Rating");
-        case DescriptorID::teletext:
-            return QString("Teletext");
-        case DescriptorID::telephone:
-            return QString("Telephone");
-        case DescriptorID::local_time_offset:
-            return QString("Local Time Offset");
-        case DescriptorID::subtitling:
-            return QString("Subtitling");
-        case DescriptorID::terrestrial_delivery_system:
-            return QString("Terrestrial Delivery System");
-        case DescriptorID::multilingual_network_name:
-            return QString("Multilingual Network Name");
-        case DescriptorID::multilingual_bouquet_name:
-            return QString("Multilingual Bouquet Name");
-        case DescriptorID::multilingual_service_name:
-            return QString("Multilingual Service Name");
-        case DescriptorID::multilingual_component:
-            return QString("Multilingual Component");
-        case DescriptorID::private_data_specifier:
-            return QString("Private Data Specifier");
-        case DescriptorID::service_move:
-            return QString("Service Move");
-        case DescriptorID::short_smoothing_buffer:
-            return QString("Short Smoothing Buffer");
-        case DescriptorID::frequency_list:
-            return QString("Frequency List");
-        case DescriptorID::partial_transport_stream:
-            return QString("Partial Transport Stream");
-        case DescriptorID::data_broadcast:
-            return QString("Data Broadcast");
-        case DescriptorID::scrambling:
-            return QString("Scrambling");
-        case DescriptorID::data_broadcast_id:
-            return QString("Data Broadcast Identifier");
-        case DescriptorID::transport_stream:
-            return QString("Transport Stream");
-        case DescriptorID::dsng:
-            return QString("DSNG");
-        case DescriptorID::pdc:
-            return QString("PDC");
-        case DescriptorID::ac3:
-            return QString("AC-3");
-        case DescriptorID::ancillary_data:
-            return QString("Ancillary Data");
-        case DescriptorID::cell_list:
-            return QString("Cell List");
-        case DescriptorID::cell_frequency_link:
-            return QString("Cell Frequency Link");
-        case DescriptorID::announcement_support:
-            return QString("Announcement Support");
-        case DescriptorID::application_signalling:
-            return QString("Application Signalling");
-        case DescriptorID::adaptation_field_data:
-            return QString("Adaptation Field Data");
-        case DescriptorID::service_identifier:
-            return QString("Service Identifier");
-        case DescriptorID::service_availability:
-            return QString("Service Availability");
-        case DescriptorID::default_authority:
-            return QString("Default Authority");
-        case DescriptorID::related_content:
-            return QString("Related Content");
-        case DescriptorID::tva_id:
-            return QString("TVA Id");
-        case DescriptorID::dvb_content_identifier:
-            return QString("DVB Content Identifier");
-        case DescriptorID::time_slice_fec_identifier:
-            return QString("Time Slice FEC Identifier");
-        case DescriptorID::ecm_repetition_rate:
-            return QString("ECM Repetition Rate");
-        case DescriptorID::s2_delivery_system:
-            return QString("DVB-S2 Delivery Identifier");
-        case DescriptorID::eac3:
-            return QString("E-AC-3");
-        case DescriptorID::dts:
-            return QString("DTS");
-        case DescriptorID::aac:
-            return QString("AAC");
-
-        /// ATSC
-        case DescriptorID::atsc_stuffing:
-            return QString("ATSC Stuffing");
-        case DescriptorID::ac3_audio_stream:
-            return QString("AC-3 Audio");
-        case DescriptorID::scte_frame_rate:
-            return QString("SCTE Frame Rate");
-        case DescriptorID::scte_component_name:
-            return QString("SCTE Component Name");
-        case DescriptorID::atsc_program_identifier:
-            return QString("ATSC Program Identifier");
-        case DescriptorID::caption_service:
-            return QString("Caption Service");
-        case DescriptorID::content_advisory:
-            return QString("Content Advisory");
-        case DescriptorID::atsc_ca_descriptor:
-            return QString("ATSC CA Descriptor");
-        case DescriptorID::atsc_descriptor_tag:
-            return QString("ATSC Descriptor Tag");
-        case DescriptorID::scte_cue_identifier:
-            return QString("SCTE CUE Identifier");
-        case DescriptorID::extended_channel_name:
-            return QString("Extended Channel Name");
-        case DescriptorID::service_location:
-            return QString("Service Location");
-        case DescriptorID::atsc_time_shifted_service:
-            return QString("ATSC Time-shifted Service");
-        case DescriptorID::component_name:
-            return QString("Component Name");
-        case DescriptorID::atsc_data_service:
-            return QString("ATSC Data Service");
-        case DescriptorID::atsc_pid_count:
-            return QString("ATSC PID Count");
-        case DescriptorID::atsc_download:
-            return QString("ATSC Download");
-        case DescriptorID::multiprotocol_encapsulation:
-            return QString("ATSC Multiprotocol Encapsulation");
-        case DescriptorID::dcc_departing_request:
-            return QString("DCC Departing Request");
-        case DescriptorID::dcc_arriving_request:
-            return QString("DCC Arriving Request");
-        case DescriptorID::drm_control:
-            return QString("Consumer Restrictions Control");
-        case DescriptorID::atsc_genre:
-            return QString("ATSC Genre");
-        case DescriptorID::atsc_private_information:
-            return QString("ATSC Private Information");
-        case DescriptorID::atsc_content_identifier:
-            return QString("Content Identifier");
-    }
-
-    QString str;
+    QString str = descriptor_tag_strings[DescriptorTag()];
 
     switch (DescriptorTag())
     {
