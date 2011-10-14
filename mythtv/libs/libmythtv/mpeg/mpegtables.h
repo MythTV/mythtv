@@ -146,6 +146,8 @@ class StreamID
         MPEG2IPMP      = 0x1a, ///< ISO 13818-10 Digital Restrictions Mangment
         MPEG2IPMP2     = 0x7f, ///< ISO 13818-10 Digital Restrictions Mangment
 
+        Splice         = 0x86, ///< ANSI/SCTE 35 2007 
+
         // special id's, not actually ID's but can be used in FindPIDs
         AnyMask        = 0xFFFF0000,
         AnyVideo       = 0xFFFF0001,
@@ -290,6 +292,8 @@ class TableID
         CEA      = 0xD8, // Cable Emergency Alert (18 2002)
         ADET     = 0xD9, // Aggregate Data Event Table (80 2002)
 
+        SITscte  = 0xFC, // SCTE 35 Splice Info Table (Cueing messages)
+
         // ATSC Conditional Access (A/70)
         ECM0     = 0x80,
         ECM1     = 0x81,
@@ -408,9 +412,9 @@ class PSIPTable : public PESPacket
     // last_section_number  8       7.0      56
     uint LastSection(void) const { return pesdata()[7]; }
 
-    // this is only for real ATSC PSIP tables, not similar MPEG2 tables
+    // Protocol Version for ATSC PSIP tables
     // protocol_version     8       8.0      64   should always be 0 for now
-    uint ProtocolVersion(void) const { return pesdata()[8]; }
+    uint ATSCProtocolVersion(void) const { return pesdata()[8]; }
 
     // PSIP_table_data      x       8.0      72 (incl. protocolVersion)
     const unsigned char* psipdata(void) const
@@ -435,8 +439,8 @@ class PSIPTable : public PESPacket
     void SetSection(uint num) { pesdata()[6] = num; }
     void SetLastSection(uint num) { pesdata()[7] = num; }
 
-    // only for real ATSC PSIP tables, not similar MPEG2 tables
-    void SetProtocolVersion(int ver) { pesdata()[8] = ver; }
+    // Only for real ATSC PSIP tables.
+    void SetATSCProtocolVersion(int ver) { pesdata()[8] = ver; }
 
     bool HasCRC(void) const;
 
@@ -719,6 +723,298 @@ class ConditionalAccessTable : public PSIPTable
     const unsigned char *Descriptors(void) const { return psipdata(); }
 
     // CRC_32 32 rpchof
+};
+
+
+class SpliceTimeView
+{
+  public:
+    SpliceTimeView(const unsigned char *data) : _data(data) { }
+    //   time_specified_flag    1  0.0
+    bool IsTimeSpecified(void) const { return _data[0] & 0x80; }
+    //   if (time_specified_flag == 1)
+    //     reserved             6  0.1
+    //     pts_time            33  0.6
+    uint64_t PTSTime(void) const
+    {
+        return ((uint64_t(_data[0] & 0x1) << 32) |
+                (uint64_t(_data[1])       << 24) |
+                (uint64_t(_data[2])       << 16) |
+                (uint64_t(_data[3])       <<  8) |
+                (uint64_t(_data[4])));
+    }
+    //   else
+    //     reserved             7  0.1
+    // }
+    uint size(void) const { return IsTimeSpecified() ? 1 : 5; }
+  private:
+    const unsigned char *_data;
+};
+
+class SpliceScheduleView
+{
+  public:
+    SpliceScheduleView(const vector<const unsigned char*> &ptrs0,
+                       const vector<const unsigned char*> &ptrs1) :
+        _ptrs0(ptrs0), _ptrs1(ptrs1)
+    {
+    }
+    //   splice_count           8  14.0
+    uint SpliceCount(void) const { return min(_ptrs0.size(), _ptrs1.size()); }
+
+    //   splice_event_id       32  0.0 + _ptrs0[i]
+    uint SpliceEventID(uint i) const
+    {
+        return ((_ptrs0[i][0] << 24) | (_ptrs0[i][1] << 16) |
+                (_ptrs0[i][2] <<  8) | (_ptrs0[i][3]));
+    }
+    //   splice_event_cancel_indicator 1 4.0 + _ptrs0[i]
+    //   reserved               7   4.1 + _ptrs0[i]
+    //   if (splice_event_cancel_indicator == ‘0’) {
+    //     out_of_network_indicator 1 5.0 + _ptrs0[i]
+    //     program_splice_flag  1 5.1 + _ptrs0[i]
+    //     duration_flag        1 5.2 + _ptrs0[i]
+    //     reserved             5 5.3 + _ptrs0[i]
+    //     if (program_splice_flag == ‘1’) 
+    //       utc_splice_time   32 6.0 + _ptrs0[i]
+    //     else {
+    //       component_count    8 6.0 + _ptrs0[i]
+    //       for(j = 0; j < component_count; j++) {
+    //         component_tag    8 7.0 + _ptrs0[i]+j*5
+    //         utc_splice_time 32 8.0 + _ptrs0[i]+j*5
+    //       }
+    //     }
+    //     if (duration_flag) {
+    //       auto_return        1 0.0 + _ptrs1[i]
+    //       reserved           6 0.1 + _ptrs1[i]
+    //       duration          33 0.7 + _ptrs1[i]
+    //     }
+    //     unique_program_id   16 0.0 + _ptrs1[i] + (duration_flag)?5:0
+    //     avail_num            8 2.0 + _ptrs1[i] + (duration_flag)?5:0
+    //     avails_expected      8 3.0 + _ptrs1[i] + (duration_flag)?5:0
+    //   }
+
+  private:
+    vector<const unsigned char*> _ptrs0;
+    vector<const unsigned char*> _ptrs1;    
+};
+
+class SpliceInsertView
+{
+  public:
+    SpliceInsertView(const vector<const unsigned char*> &ptrs0,
+                     const vector<const unsigned char*> &ptrs1) :
+        _ptrs0(ptrs0), _ptrs1(ptrs1)
+    {
+    }
+
+    //   splice_event_id       32   0.0 + _ptrs1[0]
+    uint SpliceEventID(void) const
+    {
+        return ((_ptrs1[0][0] << 24) | (_ptrs1[0][1] << 16) |
+                (_ptrs1[0][2] <<  8) | (_ptrs1[0][3]));
+    }
+    //   splice_event_cancel    1    4.0 + _ptrs1[0]
+    bool IsSpliceEventCancel(void) const { return _ptrs1[0][4] & 0x80; }
+    //   reserved               7    4.1 + _ptrs1[0]
+    //   if (splice_event_cancel_indicator == 0) {
+    //     out_of_network_flag  1    5.0 + _ptrs1[0]
+    //     program_splice_flag  1    5.1 + _ptrs1[0]
+    //     duration_flag        1    5.2 + _ptrs1[0]
+    //     splice_immediate_flag 1   5.3 + _ptrs1[0]
+    //     reserved             4    5.4 + _ptrs1[0]
+    //     if ((program_splice_flag == 1) && (splice_immediate_flag == ‘0’))
+    //       splice_time()   8-38    6.0 + _ptrs1[0]
+    //     if (program_splice_flag == 0) {
+    //       component_count    8    6.0 + _ptrs1[0]
+    //       for (i = 0; i < component_count; i++) {
+    //         component_tag    8    0.0 + _ptrs0[i]
+    //         if (splice_immediate_flag == ‘0’)
+    //           splice_time() 8-38  1.0 + _ptrs0[i]
+    //       }
+    //     }
+    //     if (duration_flag == ‘1’)
+    //       auto_return        1    0.0 + _ptrs1[1]
+    //       reserved           6    0.1 + _ptrs1[1]
+    //       duration          33    0.7 + _ptrs1[1]
+    //     unique_program_id   16    0.0 + _ptrs1[2]
+    //     avail_num            8    2.0 + _ptrs1[2]
+    //     avails_expected      8    3.0 + _ptrs1[2]
+    //   }
+
+  private:
+    vector<const unsigned char*> _ptrs0;
+    vector<const unsigned char*> _ptrs1;
+};
+
+class SpliceInformationTable : public PSIPTable
+{
+  public:
+    SpliceInformationTable(const SpliceInformationTable &table) :
+        PSIPTable(table), _epilog(NULL)
+    {
+        assert(TableID::SITscte == TableID());
+        Parse();
+    }
+    SpliceInformationTable(const PSIPTable &table) :
+        PSIPTable(table), _epilog(NULL)
+    {
+        assert(TableID::SITscte == TableID());
+        Parse();
+    }
+    ~SpliceInformationTable() { ; }
+
+    // ANCE/SCTE 35 2007
+    //       Name             bits  loc  expected value
+    // table_id                 8   0.0       0xFC
+    // section_syntax_indicator 1   1.0          1
+    // private_indicator        1   1.1          0
+    // reserved                 2   1.2          3
+    // section_length          12   1.4
+    // ^^^ All above this line provided by PSIPTable
+    // protocol_version         8   3.0          0
+    uint SpliceProtocolVersion(void) const { return pesdata()[3]; }
+    void SetSpliceProtocolVersion(uint ver) { pesdata()[3] = ver; }
+    // encrypted_packet         1   4.0
+    bool IsEncryptedPacket(void) const { return pesdata()[4] & 0x80; }
+    void SetEncryptedPacket(bool val)
+    {
+        pesdata()[4] = (pesdata()[4] & ~0x80) | ((val) ? 0x80 : 0);
+    }
+    // encryption_algorithm     6   4.1
+    enum
+    {
+        kNoEncryption = 0,
+        kECB          = 1, // DES - ECB mode, FIPS PUB 81 (8 byte blocks)
+        kCBC          = 2, // DES - CBC mode, FIPS PUB 81 (8 byte blocks)
+        k3DES         = 3, // 3 DES - TDEA, FIPS PUB 46-3 (8 byte blocks)
+        // values 4-31 are reserved for future extension
+        // values 32-63 are user private
+    };
+    uint EncryptionAlgorithm(void) const { return (pesdata()[4] >> 1) & 0x3f; }
+    QString EncryptionAlgorithmString(void) const;
+    void SetEncryptionAlgorithm(uint val)
+    {
+        pesdata()[4] &= 0x81;
+        pesdata()[4] |= ((val&0x3f) << 1);
+    }
+    // pts_adjustment          33   4.7
+    uint64_t PTSAdjustment(void) const
+    {
+        return ((uint64_t(pesdata()[4] & 0x1) << 32) |
+                (uint64_t(pesdata()[5])       << 24) |
+                (uint64_t(pesdata()[6])       << 16) |
+                (uint64_t(pesdata()[7])       <<  8) |
+                (uint64_t(pesdata()[8])));
+    }
+    void SetPTSAdjustment(uint64_t val)
+    {
+        pesdata()[4] &= ~0x1;
+        pesdata()[4] |= (val>>32) & 0x1;
+        pesdata()[5] = ((val>>24) & 0xff);
+        pesdata()[6] = ((val>>16) & 0xff);
+        pesdata()[7] = ((val>>8 ) & 0xff);
+        pesdata()[8] = ((val    ) & 0xff);
+    }
+    // cw_index (enc key)       8   9.0
+    uint CodeWordIndex(void) const { return pesdata()[9]; }
+    void SetCodeWordIndex(uint val) { pesdata()[9] = val; }
+    // reserved                12  10.0
+    // splice_command_length   12  11.4
+    uint SpliceCommandLength(void) const
+    {
+        return ((pesdata()[11] & 0xf) << 8) | pesdata()[12];
+    }
+    void SetSpliceCommandLength(uint len)
+    {
+        pesdata()[11] &= ~0xf;
+        pesdata()[11] |= (len >> 8) & 0xf;
+        pesdata()[12] = len & 0xff;
+    }
+    // splice_command_type      8  13.0
+    enum {
+        kSCTNull                 = 0x00,
+        kSCTReserved0            = 0x01,
+        kSCTReserved1            = 0x02,
+        kSCTReserved2            = 0x03,
+        kSCTSpliceSchedule       = 0x04,
+        kSCTSpliceInsert         = 0x05,
+        kSCTTimeSignal           = 0x06,
+        kSCTBandwidthReservation = 0x07,
+        // 0x08-0xfe reserved
+        kSCTPrivateCommand       = 0xff,
+    };
+    uint SpliceCommandType(void) const { return pesdata()[13]; }
+    QString SpliceCommandTypeString(void) const;
+    void SetSpliceCommandType(uint type) { pesdata()[13] = type & 0xff; }
+
+    // ALL BELOW THIS LINE OTHER THAN CRC_32 ARE ENCRYPTED IF FLAG SET
+
+    //////////// SPLICE NULL ////////////
+
+    // nothing here, info in descriptors
+
+    //////////// SPLICE SCHEDULE ////////////
+
+    // if (splice_command_type == 0x04) splice_schedule()
+    SpliceScheduleView SpliceSchedule(void) const
+        { return SpliceScheduleView(_ptrs0, _ptrs1); }
+
+    //////////// SPLICE INSERT ////////////
+
+    // if (splice_command_type == 0x05) splice_insert()
+    SpliceInsertView SpliceInsert(void) const
+        { return SpliceInsertView(_ptrs0, _ptrs1); }
+
+    //////////// TIME SIGNAL ////////////
+
+    // if (splice_command_type == 0x06) splice_time()
+    SpliceTimeView TimeSignal(void) const
+        { return SpliceTimeView(pesdata()+14); }
+
+    //////////// BANDWIDTH RESERVATION ////////////
+
+    // nothing here, info in descriptors
+
+    //////////// PRIVATE COMMAND ////////////
+
+    // if (splice_command_type == 0xff) private_command()
+    //   identifier            32  14.0
+    //   for (i = 0; i < N; i++)
+    //     private_byte         8  ??.0
+    //
+
+    //////////////////////////////////////////////////////////////
+    // NOTE: Aside from CRC's we can not interpret things below
+    // this comment with private or reserved commands.
+
+    // descriptor_loop_length  16   0.0 + _epilog
+    uint SpliceDescriptorsLength(uint i) const
+    {
+        return (_epilog[0] << 8) | _epilog[1];
+    }
+
+    // for (i = 0; i < ? ; i++)
+    //   splice_descriptor()   ??   ??.?
+    const unsigned char *SpliceDescriptors(void) const
+    {
+        return (_epilog) ? _epilog + 2 : NULL;
+    }
+    // for (i = 0; i < ?; i++)
+    //   alignment_stuffing     8   ??.0
+    // if (encrypted_packet())
+    //    E_CRC_32             32   ??.0
+    // CRC_32                  32   ??.0
+
+    SpliceInformationTable *GetDecrypted(const QString &codeWord) const;
+    bool Parse(void);
+    QString toString(void) const;
+    QString toStringXML(void) const;
+
+  private:
+    vector<const unsigned char*> _ptrs0;
+    vector<const unsigned char*> _ptrs1;
+    const unsigned char *_epilog;
 };
 
 /** \class AdaptationFieldControl

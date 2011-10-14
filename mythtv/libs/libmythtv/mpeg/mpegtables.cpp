@@ -1,8 +1,10 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#include "mpegtables.h"
+
+#include "splicedescriptors.h"
 #include "atscdescriptors.h"
 #include "mythlogging.h"
+#include "mpegtables.h"
 
 const unsigned char DEFAULT_PAT_HEADER[8] =
 {
@@ -52,7 +54,7 @@ uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
     const unsigned char* d = NULL;
     QString reg("");
     if ((d = MPEGDescriptor::Find(desc, DescriptorID::registration)))
-        reg = RegistrationDescriptor(d).FormatIdentifierString();
+        reg = RegistrationDescriptor(d,300).FormatIdentifierString();
 
     if (reg == "DTS1")
         return DTSAudio;
@@ -116,6 +118,10 @@ bool PSIPTable::HasCRC(void) const
         case TableID::SIT:
             has_crc = true;
             break;
+
+        // SCTE
+        case TableID::SITscte:
+            has_crc = true;
 
         // ATSC
         case TableID::MGT:
@@ -742,7 +748,7 @@ const QString ProgramMapTable::toString() const
             MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
         for (uint i=0; i<desc.size(); i++)
             str.append(QString("  %1\n")
-                       .arg(MPEGDescriptor(desc[i]).toString()));
+                       .arg(MPEGDescriptor(desc[i], 300).toString()));
     }
     str.append("\n");
     for (uint i = 0; i < StreamCount(); i++)
@@ -756,7 +762,7 @@ const QString ProgramMapTable::toString() const
                 MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
             for (uint i=0; i<desc.size(); i++)
                 str.append(QString("  %1\n")
-                           .arg(MPEGDescriptor(desc[i]).toString()));
+                           .arg(MPEGDescriptor(desc[i], 300).toString()));
         }
     }
     return str;
@@ -808,10 +814,12 @@ const char *StreamID::toString(uint streamID)
     case StreamID::DSMCC_D:
         return "dsmcc-d data";
 
+    // Can be in any MPEG stream ATSC, DVB, or ARIB ; but defined in SCTE 35
+    case StreamID::Splice:
+        return "splice"; // PMT
+
     //case TableID::STUFFING: XXX: Duplicate?
     //    return "stuffing"; // optionally in any
-    case TableID::CAPTION:
-        return "caption service"; // EIT, optionally in PMT
     case TableID::CENSOR:
         return "censor"; // EIT, optionally in PMT
     case TableID::ECN:
@@ -938,4 +946,164 @@ QString ProgramMapTable::StreamDescription(uint i, QString sistandard) const
         desc += QString(" (%1)").arg(lang);
 
     return desc;
+}
+
+
+/// \brief Returns decrypted version of this packet.
+SpliceInformationTable *SpliceInformationTable::GetDecrypted(
+    const QString &codeWord) const
+{
+    // TODO
+    return NULL;
+}
+
+bool SpliceInformationTable::Parse(void)
+{
+    _epilog = NULL;
+    _ptrs0.clear();
+    _ptrs1.clear();
+
+    if (TableID::SITscte != TableID())
+        return false;
+
+    if (SpliceProtocolVersion() != 0)
+        return false;
+
+    if (IsEncryptedPacket())
+        return true; // it's "parsed" but you can't read encrypted portion
+
+    uint type = SpliceCommandType();
+    if (kSCTNull == type || kSCTBandwidthReservation == type)
+    {
+        _epilog = pesdata() + 14;
+    }
+    else if (kSCTTimeSignal == type)
+    {
+        _epilog = pesdata() + 14 + TimeSignal().size();
+    }
+    else if (kSCTSpliceSchedule == type)
+    {
+        uint splice_count = pesdata()[14];
+        const unsigned char *cur = pesdata() + 15;
+        for (uint i = 0; i < splice_count; i++)
+        {
+            _ptrs0.push_back(cur);
+            bool event_cancel = cur[4] & 0x80;
+            if (event_cancel)
+            {
+                _ptrs1.push_back(NULL);
+                cur += 5;
+                continue;
+            }
+            bool program_slice = cur[5] & 0x40;
+            uint component_count = cur[6];
+            _ptrs1.push_back(cur + (program_slice ? 10 : 7 * component_count));
+        }
+        if (splice_count)
+        {
+            bool duration = _ptrs0.back()[5] & 0x2;
+            _epilog = _ptrs1.back() + ((duration) ? 9 : 4);
+        }
+        else
+        {
+            _epilog = cur;
+        }
+    }
+    else if (kSCTSpliceInsert == type)
+    {
+        _ptrs1.push_back(pesdata() + 14);
+        bool splice_cancel = pesdata()[18] & 0x80;
+        if (splice_cancel)
+        {
+            _epilog = pesdata() + 19;
+        }
+        else
+        {
+            bool program_splice = pesdata()[19] & 0x40;
+            bool duration = pesdata()[19] & 0x20;
+            bool splice_immediate = pesdata()[19] & 0x10;
+            const unsigned char *cur = pesdata() + 20;
+            if (program_splice && !splice_immediate)
+            {
+                cur += SpliceTimeView(cur).size();
+            }
+            else if (!program_splice)
+            {
+                uint component_count = pesdata()[20];
+                cur = pesdata() + 21;
+                for (uint i = 0; i < component_count; i++)
+                {
+                    _ptrs0.push_back(cur);
+                    cur += (splice_immediate) ?
+                        1 : 1 + SpliceTimeView(cur).size();
+                }
+            }
+            _ptrs1.push_back(cur);
+            _ptrs1.push_back(cur + (duration ? 5 : 0));
+        }
+    }
+    else
+    {
+        _epilog = NULL;
+    }
+
+    return _epilog != NULL;
+}
+
+QString SpliceInformationTable::EncryptionAlgorithmString(void) const
+{
+    uint alg = EncryptionAlgorithm();
+    switch (alg)
+    {
+        case kNoEncryption: return "None";
+        case kECB:          return "DES-ECB";
+        case kCBC:          return "DES-CBC";
+        case k3DES:         return "3DES";
+        default:
+            return QString((alg<32) ? "Reserved(%1)" : "Private(%1)").arg(alg);
+    }
+}
+
+QString SpliceInformationTable::SpliceCommandTypeString(void) const
+{
+    uint type = SpliceCommandType();
+    switch (type)
+    {
+        case kSCTNull:
+            return "Null";
+        case kSCTSpliceSchedule:
+            return "SpliceSchedule";
+        case kSCTSpliceInsert:
+            return "SpliceInsert";
+        case kSCTTimeSignal:
+            return "TimeSignal";
+        case kSCTBandwidthReservation:
+            return "BandwidthReservation";
+        case kSCTPrivateCommand:
+            return "Private";
+        default:
+            return QString("Reserved(%1)").arg(type);
+    };
+}
+
+QString SpliceInformationTable::toString(void) const
+{
+    QString str =
+        QString("SpliceInformationTable enc_alg(%1) pts_adj(%2)")
+        .arg(IsEncryptedPacket()?EncryptionAlgorithmString():"None")
+        .arg(PTSAdjustment());
+    str += IsEncryptedPacket() ? QString(" cw_index(%1)") : QString("");
+    str += QString(" command_len(%1) command_type(%2)")
+        .arg(SpliceCommandLength())
+        .arg(SpliceCommandTypeString());
+
+    // TODO the actual meat
+
+    return str;
+}
+
+QString SpliceInformationTable::toStringXML(void) const
+{
+    // TODO
+    return "<SpliceInformationTable></SpliceInformationTable>";
 }
