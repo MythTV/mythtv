@@ -544,9 +544,6 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
     LOG(VB_TIMESTAMP, LOG_DEBUG, LOC +
         QString("decoder output timecode %1 ms (pts %2)")
             .arg(frame->timecode / 10000).arg(picture->reordered_opaque));
-    picture->interlaced_frame = frame->interlaced_frame;
-    picture->top_field_first  = frame->top_field_first;
-    picture->repeat_pict      = frame->repeat_pict;
     copy((VideoFrame*)picture->opaque, frame);
     if (frame->priv[0] && frame->qstride)
     {

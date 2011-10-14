@@ -180,6 +180,10 @@ static inline void copy(VideoFrame *dst, const VideoFrame *src)
     if (dst->codec != src->codec)
         return;
 
+    dst->interlaced_frame = src->interlaced_frame;
+    dst->repeat_pict      = src->repeat_pict;
+    dst->top_field_first  = src->top_field_first;
+
     if (FMT_YV12 == codec)
     {
         int height0 = (dst->height < src->height) ? dst->height : src->height;
