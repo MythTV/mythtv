@@ -236,6 +236,7 @@ class MPEGDescriptor
     uint DescriptorLength(void) const { return _data[1]; }
 
     virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
     
     static desc_list_t Parse(const unsigned char* data, uint len);
     static desc_list_t ParseAndExclude(const unsigned char* data, uint len,

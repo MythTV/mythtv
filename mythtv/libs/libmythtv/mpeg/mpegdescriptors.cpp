@@ -449,6 +449,41 @@ QString MPEGDescriptor::toString() const
     return str;
 }
 
+static inline QString indent(uint level)
+{
+    QString ret;
+    for (uint i = 0; i < level; i++)
+        ret += "  ";
+    return ret;
+}
+
+/// Returns XML representation of string the TS Reader XML format.
+/// When possible matching http://www.tsreader.com/tsreader/text-export.html
+QString MPEGDescriptor::toStringXML(uint level) const
+{
+    QString indent_0 = indent(level);
+    QString indent_1 = indent(level+1);
+    QString str;
+
+    str += indent_0 + "<DESCRIPTOR>\n";
+    str += indent_1 + QString("<TAG>0x%1</TAG>\n")
+        .arg(DescriptorTag(),2,16,QChar('0'));
+    str += indent_1 + QString("<DESCRIPTION>%1</DESCRIPTION>\n")
+        .arg(DescriptorTagString(),0,16);
+
+    str += indent_1 + "<DATA>";
+    for (uint i = 0; i < DescriptorLength(); i++)
+        str += QString("0x%1 ").arg(_data[i+2],2,16,QChar('0'));
+    str = str.trimmed();
+    str += "</DATA>\n";
+
+    str += indent_1 + "<DECODED>" + toString() + "</DECODED>";
+
+    str += indent_0 + "</DESCRIPTOR>";
+
+    return str;
+}
+
 void RegistrationDescriptor::InitializeDescriptionMap(void)
 {
     QMutexLocker locker(&description_map_lock);
