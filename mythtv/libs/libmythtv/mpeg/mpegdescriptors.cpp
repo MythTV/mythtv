@@ -11,7 +11,7 @@ bool                  RegistrationDescriptor::description_map_initialized = fals
 QMap<QString,QString> RegistrationDescriptor::description_map;
 
 desc_list_t MPEGDescriptor::Parse(
-    const unsigned char* data, uint len)
+    const unsigned char *data, uint len)
 {
     desc_list_t tmp;
     uint off = 0;
@@ -30,7 +30,7 @@ desc_list_t MPEGDescriptor::Parse(
 }
 
 desc_list_t MPEGDescriptor::ParseAndExclude(
-    const unsigned char* data, uint len, int excluded_descid)
+    const unsigned char *data, uint len, int excluded_descid)
 {
     desc_list_t tmp;
     uint off = 0;
@@ -51,7 +51,7 @@ desc_list_t MPEGDescriptor::ParseAndExclude(
 }
 
 desc_list_t MPEGDescriptor::ParseOnlyInclude(
-    const unsigned char* data, uint len, int excluded_descid)
+    const unsigned char *data, uint len, int excluded_descid)
 {
     desc_list_t tmp;
     uint off = 0;
@@ -72,7 +72,7 @@ desc_list_t MPEGDescriptor::ParseOnlyInclude(
     return tmp;
 }
 
-const unsigned char* MPEGDescriptor::Find(const desc_list_t &parsed,
+const unsigned char *MPEGDescriptor::Find(const desc_list_t &parsed,
                                           uint desc_tag)
 {
     desc_list_t::const_iterator it = parsed.begin();
@@ -105,7 +105,7 @@ static uint maxPriority(const QMap<uint,uint> &langPrefs)
     return max_pri;
 }
 
-const unsigned char* MPEGDescriptor::FindBestMatch(
+const unsigned char *MPEGDescriptor::FindBestMatch(
     const desc_list_t &parsed, uint desc_tag, QMap<uint,uint> &langPrefs)
 {
     uint match_idx = 0;

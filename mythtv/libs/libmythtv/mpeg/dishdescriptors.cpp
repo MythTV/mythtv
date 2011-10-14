@@ -297,9 +297,11 @@ bool              DishContentDescriptor::categoriesExists = false;
 
 QString dish_theme_type_to_string(uint theme_type)
 {
-    static const char *themes[] =
-        { "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
-          "Series/Special", "Music/Art", "Religious", "Off-Air" };
+    static const char *themes[kThemeLast] =
+    {
+        "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
+        "Series/Special", "Music/Art", "Religious", "Off-Air"
+    };
 
     if ((theme_type > kThemeNone) && (theme_type < kThemeLast))
         return QString(themes[theme_type]);
@@ -309,9 +311,11 @@ QString dish_theme_type_to_string(uint theme_type)
 
 DishThemeType string_to_dish_theme_type(const QString &theme_type)
 {
-    static const char *themes[] =
-        { "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
-          "Series/Special", "Music/Art", "Religious", "Off-Air" };
+    static const char *themes[kThemeLast] =
+    {
+        "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
+        "Series/Special", "Music/Art", "Religious", "Off-Air"
+    };
 
     for (uint i = 1; i < 10; i++)
         if (theme_type == themes[i])
