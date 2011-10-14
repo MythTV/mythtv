@@ -81,7 +81,7 @@ LogPropagateOpts        logPropagateOpts;
 QString                 logPropagateArgs;
 
 #define TIMESTAMP_MAX 30
-#define MAX_STRING_LENGTH 2048
+#define MAX_STRING_LENGTH (LOGLINE_MAX+120)
 
 LogLevel_t logLevel = (LogLevel_t)LOG_INFO;
 
