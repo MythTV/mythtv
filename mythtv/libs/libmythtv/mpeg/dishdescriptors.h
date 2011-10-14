@@ -3,14 +3,13 @@
 #ifndef _DISH_DESCRIPTORS_H_
 #define _DISH_DESCRIPTORS_H_
 
-#include <map>
-
 #include <QString>
 #include <QMutex>
 #include <QDate>
 #include <QMap>
 
 #include "atscdescriptors.h"
+#include "dvbdescriptors.h"
 
 class DishEventMPAADescriptor : public MPEGDescriptor
 {
@@ -153,25 +152,11 @@ typedef enum
 QString dish_theme_type_to_string(uint category_type);
 DishThemeType string_to_dish_theme_type(const QString &type);
 
-class DishContentDescriptor : public MPEGDescriptor
+class DishContentDescriptor : public ContentDescriptor
 {
   public:
     DishContentDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len) { }
-
-    //   content_nibble_level_1 4   2.0
-    uint Nibble1(void)       const { return _data[2] >> 4; }
-    //   content_nibble_level_2 4   2.4
-    uint Nibble2(void)       const { return _data[2] & 0xf; }
-
-    uint Nibble(void)        const { return _data[2]; }
-
-    //   user_nibble            4   3.0
-    uint UserNibble1(void)   const { return _data[3] >> 4; }
-    //   user_nibble            4   3.4
-    uint UserNibble2(void)   const { return _data[3] & 0xf; }
-    uint UserNibble(void)    const { return _data[3]; }
-    // }                            4.0
+        ContentDescriptor(data, len) { }
 
     DishThemeType GetTheme(void) const;
     QString GetCategory(void) const;
@@ -181,10 +166,9 @@ class DishContentDescriptor : public MPEGDescriptor
     static void Init(void);
 
   private:
-    static QMutex            categoryLock;
-    static map<uint,QString> themeDesc;
-    static map<uint,QString> categoryDesc;
-    static bool              categoriesExists;
+    static QMap<uint,QString> themeDesc;
+    static QMap<uint,QString> dishCategoryDesc;
+    static volatile bool      dishCategoryDescExists;
 };
 
 #endif // _DISH_DESCRIPTORS_H_
