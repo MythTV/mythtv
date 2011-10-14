@@ -283,10 +283,13 @@ void OSD::HideAll(bool keepsubs, MythScreenType* except)
     while (it.hasNext())
     {
         it.next();
-        if (!((keepsubs && (it.key() == OSD_WIN_SUBTITLE ||
-            it.key() == OSD_WIN_TELETEXT)) ||
-            (it.key() == OSD_WIN_BDOVERLAY) ||
-            it.value() == except))
+        bool match1 = keepsubs &&
+                     (it.key() == OSD_WIN_SUBTITLE  ||
+                      it.key() == OSD_WIN_TELETEXT);
+        bool match2 = it.key() == OSD_WIN_BDOVERLAY ||
+                      it.key() == OSD_WIN_INTERACT  ||
+                      it.value() == except;
+        if (!(match1 || match2))
             HideWindow(it.key());
     }
 }
