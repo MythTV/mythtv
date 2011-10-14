@@ -3,6 +3,7 @@
 
 #include <limits.h>
 
+#include "sctedescriptors.h"
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
 
@@ -432,6 +433,9 @@ QString MPEGDescriptor::toString() const
             _data, DescriptorLength()+2).toString();
     else if (DescriptorID::service_list == DescriptorTag())
         str = ServiceListDescriptor(
+            _data, DescriptorLength()+2).toString();
+    else if (DescriptorID::scte_cue_identifier == DescriptorTag())
+        str = CueIdentifierDescriptor(
             _data, DescriptorLength()+2).toString();
     /// POSSIBLY UNSAFE ! -- begin
     else if (PrivateDescriptorID::dvb_uk_channel_list == DescriptorTag())
