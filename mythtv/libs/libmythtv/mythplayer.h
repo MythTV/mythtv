@@ -151,6 +151,7 @@ class MTV_PUBLIC MythPlayer
     bool    IsAudioNeeded(void) { return !using_null_videoout && player_ctx->IsAudioNeeded(); }
     uint    GetVolume(void) { return audio.GetVolume(); }
     int     GetSecondsBehind(void) const;
+    int     GetFreeVideoFrames(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
     AdjustFillMode     GetAdjustFill(void) const;
     MuteState          GetMuteState(void) { return audio.GetMuteState(); }

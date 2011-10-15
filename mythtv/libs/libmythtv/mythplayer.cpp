@@ -1084,6 +1084,16 @@ void MythPlayer::InitFilters(void)
             .arg(filters).arg((uint64_t)videoFilters,0,16));
 }
 
+/** \fn MythPlayer::GetFreeVideoFrames(void)
+ *  \brief Returns the number of frames available for decoding onto.
+ */
+int MythPlayer::GetFreeVideoFrames(void) const
+{
+    if (videoOutput)
+        return videoOutput->FreeVideoFrames();
+    return 0;
+}
+
 /** \fn MythPlayer::GetNextVideoFrame(bool)
  *  \brief Removes a frame from the available queue for decoding onto.
  *
