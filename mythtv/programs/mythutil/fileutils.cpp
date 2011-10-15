@@ -67,25 +67,36 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
         return GENERIC_EXIT_NOT_OK;
     }
 
+    long long totalBytes = srcRB->GetRealFileSize();
+    long long totalBytesCopied = 0;
+    int percentComplete = 0;
     bool ok = true;
     int r;
     int ret;
-    int written = 0;
     while (ok && ((r = srcRB->Read(buf, readSize)) > 0))
     {
         ret = destRB->Write(buf, r);
         if (ret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR,
-                    QString("ERROR, couldn't write at offset %1").arg(written));
+                    QString("ERROR, couldn't write at offset %1")
+                            .arg(totalBytesCopied));
             ok = false;
         }
         else
-            written += ret;
+            totalBytesCopied += ret;
+
+        percentComplete = totalBytesCopied * 100 / totalBytes;
+        if ((percentComplete % 5) == 0)
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("%1 bytes copied, %2%% complete")
+                    .arg(totalBytesCopied).arg(percentComplete));
     }
 
     LOG(VB_GENERAL, LOG_INFO,
-            QString("Wrote %1 bytes total").arg(written));
+        QString("Wrote %1 bytes total").arg(totalBytesCopied));
+
+    LOG(VB_GENERAL, LOG_INFO, "Waiting for write buffer to flush");
 
     delete buf;
     delete srcRB;
