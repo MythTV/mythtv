@@ -306,6 +306,18 @@ QString MythRect::getHeight(void) const
     return stringHeight;
 }
 
+QString MythRect::toString(bool details) const
+{
+    QString result = QString("(%1,%2,%3,%4)")
+                     .arg(x()).arg(y()).arg(width()).arg(height());
+
+    if (details)
+        result += QString(" [%1,%2,%3,%4]")
+                  .arg(getX()).arg(getY()).arg(getWidth()).arg(getHeight());
+
+    return result;
+}
+
 QRect MythRect::toQRect() const
 {
     return QRect(x(),y(),width(),height());
@@ -477,6 +489,18 @@ QString MythPoint::getY(void) const
         stringY += QString("%1").arg(m_offsetY);
     }
     return stringY;
+}
+
+QString MythPoint::toString(bool details) const
+{
+    QString result = QString("(%1,%2)")
+                     .arg(x()).arg(y());
+
+    if (details)
+        result += QString(" [%1,%2]")
+                      .arg(getX()).arg(getY());
+
+    return result;
 }
 
 QPoint MythPoint::toQPoint() const
