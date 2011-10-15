@@ -1440,7 +1440,10 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
     if (sub->num_rects > 0)
     {
         if (force_subtitle_display)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Decoded menu item");
+        {
+            sub->forced = 1;
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Decoded forced subtitle");
+        }
         return true;
     }
 fail:

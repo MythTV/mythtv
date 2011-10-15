@@ -346,7 +346,10 @@ static int decode_dvd_subtitles(AVSubtitle *sub_header,
         cmd_pos = next_cmd_pos;
     }
     if (sub_header->num_rects > 0)
+    {
+        sub_header->forced = is_menu;
         return is_menu;
+    }
  fail:
     if (sub_header->rects != NULL) {
         for (i = 0; i < sub_header->num_rects; i++) {
