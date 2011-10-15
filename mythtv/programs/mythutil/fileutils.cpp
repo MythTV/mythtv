@@ -37,14 +37,14 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     if (!srcRB)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, couldn't create Read RingBuffer");
-        delete buf;
+        delete[] buf;
         return GENERIC_EXIT_NOT_OK;
     }
 
     if (!srcRB->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, srcRB is not open");
-        delete buf;
+        delete[] buf;
         delete srcRB;
         return GENERIC_EXIT_NOT_OK;
     }
@@ -53,7 +53,7 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     if (!destRB)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, couldn't create Write RingBuffer");
-        delete buf;
+        delete[] buf;
         delete srcRB;
         return GENERIC_EXIT_NOT_OK;
     }
@@ -61,7 +61,7 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     if (!destRB->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, destRB is not open");
-        delete buf;
+        delete[] buf;
         delete srcRB;
         delete destRB;
         return GENERIC_EXIT_NOT_OK;
@@ -98,7 +98,7 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
 
     LOG(VB_GENERAL, LOG_INFO, "Waiting for write buffer to flush");
 
-    delete buf;
+    delete[] buf;
     delete srcRB;
     delete destRB;
 
