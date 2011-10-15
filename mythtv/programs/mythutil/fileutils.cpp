@@ -24,17 +24,28 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     }
     QString dest = cmdline.toString("destfile");
 
+    const int readSize = 2 * 1024 * 1024;
+    char *buf = new char[readSize];
+    if (!buf)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ERROR, unable to allocate copy buffer ");
+        return GENERIC_EXIT_NOT_OK;
+    }
+
     LOG(VB_GENERAL, LOG_INFO, QString("Copying %1 to %2").arg(src).arg(dest));
     RingBuffer *srcRB = RingBuffer::Create(src, false);
     if (!srcRB)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, couldn't create Read RingBuffer");
+        delete buf;
         return GENERIC_EXIT_NOT_OK;
     }
 
     if (!srcRB->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, srcRB is not open");
+        delete buf;
+        delete srcRB;
         return GENERIC_EXIT_NOT_OK;
     }
 
@@ -42,6 +53,7 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     if (!destRB)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, couldn't create Write RingBuffer");
+        delete buf;
         delete srcRB;
         return GENERIC_EXIT_NOT_OK;
     }
@@ -49,11 +61,12 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     if (!destRB->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, destRB is not open");
+        delete buf;
+        delete srcRB;
+        delete destRB;
         return GENERIC_EXIT_NOT_OK;
     }
 
-    const int readSize = 2 * 1024 * 1024;
-    char buf[readSize];
     bool ok = true;
     int r;
     int ret;
@@ -74,6 +87,7 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     LOG(VB_GENERAL, LOG_INFO,
             QString("Wrote %1 bytes total").arg(written));
 
+    delete buf;
     delete srcRB;
     delete destRB;
 
