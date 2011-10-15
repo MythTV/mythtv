@@ -273,7 +273,8 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       no_dts_hack(false),           dorewind(false),
       gopset(false),                seen_gop(false),
       seq_count(0),
-      prevgoppos(0),                gotvideo(false),
+      prevgoppos(0),                gotVideoFrame(false),
+      hasVideo(false),              needDummyVideoFrames(false),
       skipaudio(false),             allowedquit(false),
       start_code_state(0xffffffff),
       lastvpts(0),                  lastapts(0),
@@ -303,7 +304,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       // Audio
       audioSamples(NULL),
       disable_passthru(false),
-      dummy_frame(NULL),
       m_fps(0.0f),
       codec_is_mpeg(false)
 {
@@ -357,13 +357,6 @@ AvFormatDecoder::~AvFormatDecoder()
     sws_freeContext(sws_ctx);
 
     av_freep((void *)&audioSamples);
-
-    if (dummy_frame)
-    {
-        delete [] dummy_frame->buf;
-        delete dummy_frame;
-        dummy_frame = NULL;
-    }
 
     if (avfRingBuffer)
         delete avfRingBuffer;
@@ -2962,7 +2955,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     justAfterChange = false;
 
     if (exitafterdecoded)
-        gotvideo = 1;
+        gotVideoFrame = 1;
 
     return true;
 }
@@ -3178,7 +3171,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         context->release_buffer(context, mpa_pic);
 
     decoded_video_frame = picframe;
-    gotvideo = 1;
+    gotVideoFrame = 1;
     framesPlayed++;
 
     lastvpts = temppts;
@@ -3451,7 +3444,7 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
     case CODEC_ID_DSMCC_B:
     {
         ProcessDSMCCPacket(curstream, pkt);
-
+        GenerateDummyVideoFrames();
         // Have to return regularly to ensure that the OSD is updated.
         // This applies both to MHEG and also channel browsing.
         if (!(decodetype & kDecodeVideo))
@@ -4151,7 +4144,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     AVPacket *pkt = NULL;
     bool have_err = false;
 
-    gotvideo = false;
+    gotVideoFrame = false;
 
     frame_decoded = 0;
     decoded_video_frame = NULL;
@@ -4165,11 +4158,14 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
     skipaudio = (lastvpts == 0);
 
-    bool has_video = HasVideo(ic);
+    hasVideo = HasVideo(ic);
+    needDummyVideoFrames = false;
 
-    if (!has_video && (decodetype & kDecodeVideo))
+    if (!hasVideo && (decodetype & kDecodeVideo))
     {
-        gotvideo = GenerateDummyVideoFrame();
+        // NB This could be an issue if the video stream is not
+        // detected initially as the video buffers will be filled.
+        needDummyVideoFrames = true;
         decodetype = (DecodeType)((int)decodetype & ~kDecodeVideo);
         skipaudio = false;
     }
@@ -4197,7 +4193,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         {
             // disable audio request if there are no audio streams anymore
             // and we have video, otherwise allow decoding to stop
-            if (has_video)
+            if (hasVideo)
                 decodetype = (DecodeType)((int)decodetype & ~kDecodeAudio);
             else
                 allowedquit = true;
@@ -4205,7 +4201,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
         StreamChangeCheck();
 
-        if (gotvideo)
+        if (gotVideoFrame)
         {
             if (decodetype == kDecodeNothing)
             {
@@ -4361,6 +4357,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             {
                 if (!ProcessAudioPacket(curstream, pkt, decodetype))
                     have_err = true;
+                else
+                    GenerateDummyVideoFrames();
                 break;
             }
 
@@ -4380,7 +4378,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 if (!(decodetype & kDecodeVideo))
                 {
                     framesPlayed++;
-                    gotvideo = 1;
+                    gotVideoFrame = 1;
                     break;
                 }
 
@@ -4448,47 +4446,28 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
     return GetTrackCount(kTrackTypeVideo);
 }
 
-bool AvFormatDecoder::GenerateDummyVideoFrame(void)
+bool AvFormatDecoder::GenerateDummyVideoFrames(void)
 {
-    VideoFrame *frame = m_parent->GetNextVideoFrame();
-    if (!frame)
-        return false;
-
-    if (dummy_frame && !compatible(frame, dummy_frame))
+    while (needDummyVideoFrames && m_parent &&
+           m_parent->GetFreeVideoFrames())
     {
-        delete [] dummy_frame->buf;
-        delete dummy_frame;
-        dummy_frame = NULL;
+        VideoFrame *frame = m_parent->GetNextVideoFrame();
+        if (!frame)
+            return false;
+
+        m_parent->ClearDummyVideoFrame(frame);
+        m_parent->ReleaseNextVideoFrame(frame, lastvpts);
+        m_parent->DeLimboFrame(frame);
+
+        frame->interlaced_frame = 0; // not interlaced
+        frame->top_field_first  = 1; // top field first
+        frame->repeat_pict      = 0; // not a repeated picture
+        frame->frameNumber      = framesPlayed;
+
+        decoded_video_frame = frame;
+        framesPlayed++;
+        gotVideoFrame = true;
     }
-
-    if (!dummy_frame)
-    {
-        dummy_frame = new VideoFrame;
-        init(dummy_frame,
-             frame->codec, new unsigned char[frame->size],
-             frame->width, frame->height, frame->size,
-             frame->pitches, frame->offsets,
-             frame->aspect, frame->frame_rate);
-
-        clear(dummy_frame);
-        // Note: instead of clearing the frame to black, one
-        // could load an image or a series of images...
-
-        dummy_frame->interlaced_frame = 0; // not interlaced
-        dummy_frame->top_field_first  = 1; // top field first
-        dummy_frame->repeat_pict      = 0; // not a repeated picture
-    }
-
-    copy(frame, dummy_frame);
-
-    frame->frameNumber = framesPlayed;
-
-    m_parent->ReleaseNextVideoFrame(frame, lastvpts);
-    m_parent->DeLimboFrame(frame);
-
-    decoded_video_frame = frame;
-    framesPlayed++;
-
     return true;
 }
 

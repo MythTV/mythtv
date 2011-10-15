@@ -69,7 +69,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         const int *p = 0,
                         const int *o = 0,
                         float _aspect = -1.0f, double _rate = -1.0f) MUNUSED;
-static inline void clear(VideoFrame *vf) MUNUSED;
+static inline void clear(VideoFrame *vf);
 static inline bool compatible(const VideoFrame *a,
                               const VideoFrame *b) MUNUSED;
 static inline int  bitsperpixel(VideoFrameType type);

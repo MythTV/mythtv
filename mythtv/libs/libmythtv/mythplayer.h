@@ -231,6 +231,7 @@ class MTV_PUBLIC MythPlayer
     void ReleaseNextVideoFrame(void)
         { videoOutput->ReleaseFrame(GetNextVideoFrame()); }
     void ReleaseCurrentFrame(VideoFrame *frame);
+    void ClearDummyVideoFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
     void DiscardVideoFrames(bool next_frame_keyframe);
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);

@@ -240,7 +240,7 @@ class AvFormatDecoder : public DecoderBase
     /// Called for key frame packets.
     void HandleGopStart(AVPacket *pkt, bool can_reliably_parse_keyframes);
 
-    bool GenerateDummyVideoFrame(void);
+    bool GenerateDummyVideoFrames(void);
     bool HasVideo(const AVFormatContext *ic);
     float normalized_fps(AVStream *stream, AVCodecContext *enc);
     void av_update_stream_timings_video(AVFormatContext *ic);
@@ -280,9 +280,10 @@ class AvFormatDecoder : public DecoderBase
 
     int prevgoppos;
 
-    bool gotvideo;
-
-    // from full GetFrame implementation
+    // GetFrame
+    bool gotVideoFrame;
+    bool hasVideo;
+    bool needDummyVideoFrames;
     bool skipaudio;
     bool allowedquit;
 
@@ -343,8 +344,6 @@ class AvFormatDecoder : public DecoderBase
     // Audio
     short int        *audioSamples;
     bool              disable_passthru;
-
-    VideoFrame       *dummy_frame;
 
     AudioInfo         audioIn;
     AudioInfo         audioOut;

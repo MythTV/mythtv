@@ -201,7 +201,9 @@ class VideoOutput
     /// \brief Releases all frames not being actively displayed from any queue
     ///        onto the queue of frames ready for decoding onto.
     virtual void DiscardFrames(bool kf) { vbuffers.DiscardFrames(kf); }
-
+    /// \brief Clears the frame to black. Subclasses may choose
+    ///        to mark the frame as a dummy and act appropriately
+    virtual void ClearDummyFrame(VideoFrame* frame) { clear(frame); }
     virtual void CheckFrameStates(void) { }
 
     /// \bug not implemented correctly. vpos is not updated.
