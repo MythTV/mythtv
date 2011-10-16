@@ -203,7 +203,7 @@ class VideoOutput
     virtual void DiscardFrames(bool kf) { vbuffers.DiscardFrames(kf); }
     /// \brief Clears the frame to black. Subclasses may choose
     ///        to mark the frame as a dummy and act appropriately
-    virtual void ClearDummyFrame(VideoFrame* frame) { clear(frame); }
+    virtual void ClearDummyFrame(VideoFrame* frame);
     virtual void CheckFrameStates(void) { }
 
     /// \bug not implemented correctly. vpos is not updated.

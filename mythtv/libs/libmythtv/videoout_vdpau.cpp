@@ -408,6 +408,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     }
 
     bool new_frame = false;
+    bool dummy     = false;
     if (frame)
     {
         // FIXME for 0.23. This should be triggered from AFD by a seek
@@ -415,6 +416,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
             ClearReferenceFrames();
         new_frame = (framesPlayed != frame->frameNumber + 1);
         framesPlayed = frame->frameNumber + 1;
+        dummy = frame->dummy;
     }
 
     uint video_surface = m_video_surfaces[0];
@@ -436,7 +438,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
             return;
         video_surface = m_render->GetSurfaceOwner(render->surface);
     }
-    else if (new_frame && frame)
+    else if (new_frame && frame && !dummy)
     {
         // FIXME - reference frames for software decode
         if (deint)
@@ -489,15 +491,20 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     if (size != m_render->GetSize())
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unexpected display size.");
 
-    if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
-                              deint ? &m_reference_frames : NULL,
-                              scan == kScan_Interlaced,
-                              window.GetVideoRect(),
-                              QRect(QPoint(0,0), size),
-                              vsz_enabled ? vsz_desired_display_rect :
-                                            window.GetDisplayVideoRect(),
-                              m_pip_ready ? m_pip_layer : 0, 0))
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Prepare frame failed.");
+    if (!dummy)
+    {
+        if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
+                                  deint ? &m_reference_frames : NULL,
+                                  scan == kScan_Interlaced,
+                                  window.GetVideoRect(),
+                                  QRect(QPoint(0,0), size),
+                                  vsz_enabled ? vsz_desired_display_rect :
+                                                window.GetDisplayVideoRect(),
+                                  m_pip_ready ? m_pip_layer : 0, 0))
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Prepare frame failed.");
+        }
+    }
 
     if (m_visual)
         m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, NULL);

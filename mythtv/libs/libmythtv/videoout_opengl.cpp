@@ -448,12 +448,13 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
         pauseframe = true;
     }
 
-    if (filterList && sw_frame)
+    bool dummy = frame->dummy;
+    if (filterList && sw_frame && !dummy)
         filterList->ProcessFrame(frame);
 
     bool safepauseframe = pauseframe && !IsBobDeint();
     if (sw_frame && deint_proc && m_deinterlaceBeforeOSD &&
-       (!pauseframe || safepauseframe))
+       (!pauseframe || safepauseframe) && !dummy)
     {
         m_deintFilter->ProcessFrame(frame, scan);
     }
@@ -465,12 +466,12 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
     }
 
     if (sw_frame && (!pauseframe || safepauseframe) &&
-        deint_proc && !m_deinterlaceBeforeOSD)
+        deint_proc && !m_deinterlaceBeforeOSD && !dummy)
     {
         m_deintFilter->ProcessFrame(frame, scan);
     }
 
-    if (gl_videochain && sw_frame)
+    if (gl_videochain && sw_frame && !dummy)
     {
         bool soft_bob = m_deinterlacing && (m_deintfiltername == "bobdeint");
         gl_videochain->UpdateInputFrame(frame, soft_bob);
@@ -511,7 +512,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         mwnd->draw();
     }
 
-    if (gl_videochain)
+    if (gl_videochain && !buffer->dummy)
     {
         gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),

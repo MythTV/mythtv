@@ -1213,6 +1213,15 @@ void VideoOutput::ShutdownVideoResize(void)
     vsz_enabled      = false;
 }
 
+void VideoOutput::ClearDummyFrame(VideoFrame *frame)
+{
+    // used by render devices to ignore frame rendering
+    if (frame)
+        frame->dummy = 1;
+    // will only clear frame in main memory
+    clear(frame);
+}
+
 void VideoOutput::SetVideoResize(const QRect &videoRect)
 {
     if (!videoRect.isValid()    ||
