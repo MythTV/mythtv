@@ -524,7 +524,7 @@
         </clock>
 
         <clock name="time">
-            <area>1185,688,80,30</area>
+            <area>1185,688,110,30</area>
             <font>timefont</font>
             <cutdown>no</cutdown>
             <align>left,vcenter</align>
