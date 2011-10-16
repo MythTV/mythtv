@@ -3165,6 +3165,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     picframe->disp_timecode    = NormalizeVideoTimecode(stream, temppts);
     picframe->frameNumber      = framesPlayed;
     picframe->aspect           = current_aspect;
+    picframe->dummy            = 0;
 
     m_parent->ReleaseNextVideoFrame(picframe, temppts);
     if (private_dec)
@@ -4463,6 +4464,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         frame->top_field_first  = 1; // top field first
         frame->repeat_pict      = 0; // not a repeated picture
         frame->frameNumber      = framesPlayed;
+        frame->dummy            = 1;
 
         decoded_video_frame = frame;
         framesPlayed++;
