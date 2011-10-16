@@ -74,7 +74,7 @@ private:
     bool        _createDeviceInterface(io_object_t hidDevice);
     bool        _openDevice();
 
-    static void QueueCallbackFunction(void* target, IOReturn result, 
+    static void QueueCallbackFunction(void* target, IOReturn result,
                                       void* refcon, void* sender);
     void        _queueCallbackFunction(IOReturn result,
                                        void* refcon, void* sender);

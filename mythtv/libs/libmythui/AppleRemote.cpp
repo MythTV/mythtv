@@ -19,8 +19,8 @@
 
 #include "mythlogging.h"
 
-AppleRemote*      AppleRemote::_instance = 0;
-const int         AppleRemote::REMOTE_SWITCH_COOKIE = 19;
+AppleRemote*    AppleRemote::_instance = 0;
+const int       AppleRemote::REMOTE_SWITCH_COOKIE = 19;
 
 #define LOC QString("AppleRemote::")
 
@@ -363,7 +363,7 @@ bool AppleRemote::_openDevice()
 }
 
 void AppleRemote::QueueCallbackFunction(void* target, IOReturn result,
-                                   void* refcon, void* sender)
+                                        void* refcon, void* sender)
 {
     AppleRemote* remote = static_cast<AppleRemote*>(target);
 
@@ -371,7 +371,7 @@ void AppleRemote::QueueCallbackFunction(void* target, IOReturn result,
 }
 
 void AppleRemote::_queueCallbackFunction(IOReturn result,
-                                    void* /*refcon*/, void* /*sender*/)
+                                         void* /*refcon*/, void* /*sender*/)
 {
     AbsoluteTime      zeroTime = {0,0};
     SInt32            sumOfValues = 0;
@@ -401,7 +401,7 @@ void AppleRemote::_queueCallbackFunction(IOReturn result,
 }
 
 void AppleRemote::_handleEventWithCookieString(std::string cookieString,
-                                          SInt32 sumOfValues)
+                                               SInt32 sumOfValues)
 {
     std::map<std::string,AppleRemote::Event>::iterator ii;
 
