@@ -201,8 +201,6 @@ class MPEGDescriptor
     {
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
             _data = NULL;
-        else if (!Parse())
-            _data = NULL;
     }
     MPEGDescriptor(const unsigned char *data,
                    int len, uint tag) : _data(data)
@@ -210,8 +208,6 @@ class MPEGDescriptor
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
             _data = NULL;
         else if (DescriptorTag() != tag)
-            _data = NULL;
-        else if (!Parse())
             _data = NULL;
     }
     MPEGDescriptor(const unsigned char *data,
@@ -222,8 +218,6 @@ class MPEGDescriptor
         else if (DescriptorTag() != tag)
             _data = NULL;
         else if (DescriptorLength() != req_desc_len)
-            _data = NULL;
-        else if (!Parse())
             _data = NULL;
     }
     virtual ~MPEGDescriptor() {}
@@ -253,8 +247,6 @@ class MPEGDescriptor
         const desc_list_t &parsed, uint desc_tag, QMap<uint,uint> &langPref);
 
   protected:
-    virtual bool Parse(void) { return true; }
-
     const unsigned char *_data;
 };
 

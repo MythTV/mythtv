@@ -77,7 +77,11 @@ class CaptionServiceDescriptor : public MPEGDescriptor
 {
   public:
     CaptionServiceDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::caption_service) { }
+        MPEGDescriptor(data, len, DescriptorID::caption_service)
+    {
+        if (_data && !Parse())
+            _data = NULL;
+    }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x86
     // descriptor_length        8   1.0
@@ -131,7 +135,11 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
 {
   public:
     ContentAdvisoryDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::content_advisory) { }
+        MPEGDescriptor(data, len, DescriptorID::content_advisory)
+    {
+        if (_data && !Parse())
+            _data = NULL;
+    }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x87
     // descriptor_length        8   1.0

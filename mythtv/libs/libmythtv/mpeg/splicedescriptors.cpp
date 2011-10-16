@@ -80,7 +80,6 @@ desc_list_t SpliceDescriptor::ParseOnlyInclude(
             break;
         }
         off += desc.size();
-        off += desc.DescriptorLength() + 2;
     }
     return tmp;
 }
