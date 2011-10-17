@@ -999,46 +999,37 @@ bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
             out_surface = m_surfaces[m_surface];
 
         if (!m_videoMixers.contains(id) ||
+            !m_videoSurfaces.contains(vid_surface)||
             !m_outputSurfaces.contains(out_surface))
             return false;
 
-        surf  = m_outputSurfaces[out_surface].m_id;
-        mixer = m_videoMixers[id].m_id;
+        vid_surf = m_videoSurfaces[vid_surface].m_id;
 
-        if (!m_videoSurfaces.contains(vid_surface))
+        if (refs && refs->size() == NUM_REFERENCE_FRAMES)
         {
-            vid_surf = VDP_INVALID_HANDLE;
-        }
-        else
-        {
-            vid_surf = m_videoSurfaces[vid_surface].m_id;
-
-            if (refs && refs->size() == NUM_REFERENCE_FRAMES)
+            deint = true;
+            VdpVideoSurface act_refs[NUM_REFERENCE_FRAMES];
+            for (int i = 0; i < NUM_REFERENCE_FRAMES; i++)
             {
-                deint = true;
-                VdpVideoSurface act_refs[NUM_REFERENCE_FRAMES];
-                for (int i = 0; i < NUM_REFERENCE_FRAMES; i++)
-                {
-                    if (m_videoSurfaces.contains(refs->value(i)))
-                        act_refs[i] = m_videoSurfaces[refs->value(i)].m_id;
-                    else
-                        act_refs[i] = VDP_INVALID_HANDLE;
-                }
-
-                vid_surf = act_refs[1];
-
-                if (top)
-                {
-                    future_surfaces[0] = act_refs[1];
-                    past_surfaces[0]   = act_refs[0];
-                    past_surfaces[1]   = act_refs[0];
-                }
+                if (m_videoSurfaces.contains(refs->value(i)))
+                    act_refs[i] = m_videoSurfaces[refs->value(i)].m_id;
                 else
-                {
-                    future_surfaces[0] = act_refs[2];
-                    past_surfaces[0]   = act_refs[1];
-                    past_surfaces[1]   = act_refs[0];
-                }
+                    act_refs[i] = VDP_INVALID_HANDLE;
+            }
+
+            vid_surf = act_refs[1];
+
+            if (top)
+            {
+                future_surfaces[0] = act_refs[1];
+                past_surfaces[0]   = act_refs[0];
+                past_surfaces[1]   = act_refs[0];
+            }
+            else
+            {
+                future_surfaces[0] = act_refs[2];
+                past_surfaces[0]   = act_refs[1];
+                past_surfaces[1]   = act_refs[0];
             }
         }
 
@@ -1054,6 +1045,9 @@ bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
                    sizeof(VdpLayer));
             num_layers++;
         }
+
+        surf  = m_outputSurfaces[out_surface].m_id;
+        mixer = m_videoMixers[id].m_id;
     }
 
     if (dst_vid.top() < 0 && dst_vid.height() > 0)

@@ -420,8 +420,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     }
 
     uint video_surface = m_video_surfaces[0];
-    bool deint = (m_deinterlacing && m_need_deintrefs &&
-                  frame && !dummy);
+    bool deint = (m_deinterlacing && m_need_deintrefs && frame);
 
     if (deint)
     {
@@ -492,17 +491,19 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     if (size != m_render->GetSize())
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unexpected display size.");
 
-    if (!m_render->MixAndRend(m_video_mixer, field,
-                              dummy ? VDP_INVALID_HANDLE : video_surface,
-                              0, deint ? &m_reference_frames : NULL,
-                              scan == kScan_Interlaced,
-                              window.GetVideoRect(),
-                              QRect(QPoint(0,0), size),
-                              vsz_enabled ? vsz_desired_display_rect :
-                                            window.GetDisplayVideoRect(),
-                              m_pip_ready ? m_pip_layer : 0, 0))
+    if (!dummy)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Prepare frame failed.");
+        if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
+                                  deint ? &m_reference_frames : NULL,
+                                  scan == kScan_Interlaced,
+                                  window.GetVideoRect(),
+                                  QRect(QPoint(0,0), size),
+                                  vsz_enabled ? vsz_desired_display_rect :
+                                                window.GetDisplayVideoRect(),
+                                  m_pip_ready ? m_pip_layer : 0, 0))
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Prepare frame failed.");
+        }
     }
 
     if (m_visual)
