@@ -177,7 +177,8 @@ class OSD
     void TeletextClear(void);
 
     SubtitleScreen* InitSubtitles(void);
-    void EnableSubtitles(int type);
+    void EnableSubtitles(int type, bool forced_only = false);
+    void DisableForcedSubtitles(void);
     void ClearSubtitles(void);
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &pos);
 

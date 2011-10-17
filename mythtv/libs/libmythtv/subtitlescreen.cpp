@@ -48,8 +48,15 @@ SubtitleScreen::~SubtitleScreen(void)
 #endif
 }
 
-void SubtitleScreen::EnableSubtitles(int type)
+void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
 {
+    if (forced_only)
+    {
+        SetVisible(true);
+        SetArea(MythRect());
+        return;
+    }
+
     m_subtitleType = type;
     if (m_subreader)
     {
@@ -63,6 +70,15 @@ void SubtitleScreen::EnableSubtitles(int type)
         m_708reader->SetEnabled(kDisplayCC708 == m_subtitleType);
     ClearAllSubtitles();
     SetVisible(m_subtitleType != kDisplayNone);
+    SetArea(MythRect());
+}
+
+void SubtitleScreen::DisableForcedSubtitles(void)
+{
+    if (kDisplayNone != m_subtitleType)
+        return;
+    ClearAllSubtitles();
+    SetVisible(false);
     SetArea(MythRect());
 }
 
@@ -302,10 +318,12 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 if (uiimage)
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                        QString("Display AV sub for %1 ms").arg(displayfor));
+                        QString("Display %1AV subtitle for %2ms")
+                        .arg(subtitle.forced ? "FORCED " : "")
+                        .arg(displayfor));
                     if (late > 50)
                         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                            QString("AV Sub was %1 ms late").arg(late));
+                            QString("AV Sub was %1ms late").arg(late));
                 }
             }
 #ifdef USING_LIBASS

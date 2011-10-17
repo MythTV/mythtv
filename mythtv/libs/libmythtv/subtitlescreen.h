@@ -22,7 +22,8 @@ class SubtitleScreen : public MythScreenType
     SubtitleScreen(MythPlayer *player, const char * name, int fontStretch);
     virtual ~SubtitleScreen();
 
-    void EnableSubtitles(int type);
+    void EnableSubtitles(int type, bool forced_only = false);
+    void DisableForcedSubtitles(void);
     int  EnabledSubtitleType(void) { return m_subtitleType; }
 
     void ClearAllSubtitles(void);

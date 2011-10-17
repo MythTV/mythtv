@@ -1150,11 +1150,20 @@ SubtitleScreen* OSD::InitSubtitles(void)
     return sub;
 }
 
-void OSD::EnableSubtitles(int type)
+void OSD::EnableSubtitles(int type, bool forced_only)
 {
     SubtitleScreen *sub = InitSubtitles();
     if (sub)
-        sub->EnableSubtitles(type);
+        sub->EnableSubtitles(type, forced_only);
+}
+
+void OSD::DisableForcedSubtitles(void)
+{
+    if (!HasWindow(OSD_WIN_SUBTITLE))
+        return;
+
+    SubtitleScreen *sub = InitSubtitles();
+    sub->DisableForcedSubtitles();
 }
 
 void OSD::ClearSubtitles(void)

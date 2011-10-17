@@ -258,7 +258,9 @@ class MTV_PUBLIC MythPlayer
     // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
     void TracksChanged(uint trackType);
     void EnableSubtitles(bool enable);
-    void EnableForcedSubtitles(void) { enableForcedSubtitles = true; }
+    void EnableForcedSubtitles(bool enable);
+    void SetAllowForcedSubtitles(bool allow);
+    bool GetAllowForcedSubtitles(void) { return allowForcedSubtitles; }
 
     // Public MHEG/MHI stream selection
     bool SetAudioByComponentTag(int tag);
@@ -442,6 +444,7 @@ class MTV_PUBLIC MythPlayer
     int  ChangeTrack(uint type, int dir);
     void ChangeCaptionTrack(int dir);
     int  NextCaptionTrack(int mode);
+    void DoDisableForcedSubtitles(void);
     void DoEnableForcedSubtitles(void);
 
     // Teletext Menu and non-NUV teletext decoder
@@ -656,6 +659,7 @@ class MTV_PUBLIC MythPlayer
     bool      enableCaptions;
     bool      disableCaptions;
     bool      enableForcedSubtitles;
+    bool      disableForcedSubtitles;
     bool      allowForcedSubtitles;
 
     // CC608/708

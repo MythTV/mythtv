@@ -30,7 +30,8 @@ void SubtitleReader::EnableRawTextSubtitles(bool enable)
 }
 
 bool SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle,
-                                   bool fix_position)
+                                   bool fix_position,
+                                   bool allow_forced)
 {
     bool enableforced = false;
     if (!m_AVSubtitlesEnabled && !subtitle.forced)
@@ -40,7 +41,18 @@ bool SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle,
     }
 
     if (!m_AVSubtitlesEnabled && subtitle.forced)
+    {
+        if (!allow_forced)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO,
+                "SubtitleReader: Ignoring forced AV subtitle.");
+            FreeAVSubtitle(subtitle);
+            return enableforced;
+        }
+        LOG(VB_PLAYBACK, LOG_INFO,
+            "SubtitleReader: Allowing forced AV subtitle.");
         enableforced = true;
+    }
 
     bool clearsubs = false;
     m_AVSubtitles.lock.lock();
@@ -50,7 +62,8 @@ bool SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle,
     // manually clearing the subtitles
     if (m_AVSubtitles.buffers.size() > 20)
     {
-        LOG(VB_GENERAL, LOG_ERR, ">20 AVSubtitles queued - clearing.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "SubtitleReader: >20 AVSubtitles queued - clearing.");
         clearsubs = true;
     }
     m_AVSubtitles.lock.unlock();

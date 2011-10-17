@@ -167,7 +167,8 @@ MythPlayer::MythPlayer(bool muted)
       ttPageNum(0x888),
       // Support for captions, teletext, etc. decoded by libav
       textDesired(false), enableCaptions(false), disableCaptions(false),
-      enableForcedSubtitles(false), allowForcedSubtitles(true),
+      enableForcedSubtitles(false), disableForcedSubtitles(false),
+      allowForcedSubtitles(true),
       // CC608/708
       db_prefer708(true), cc608(this), cc708(this),
       // MHEG/MHI Interactive TV visible in OSD
@@ -227,6 +228,7 @@ MythPlayer::MythPlayer(bool muted)
     endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
     pip_default_loc    = (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
     tc_wrap[TC_AUDIO]  = gCoreContext->GetNumSetting("AudioSyncOffset", 0);
+    allowForcedSubtitles = gCoreContext->GetNumSetting("AllowForcedSubtitles", 1);
 
     // Get VBI page number
     QString mypage = gCoreContext->GetSetting("VBIpageNr", "888");
@@ -1537,6 +1539,38 @@ void MythPlayer::EnableSubtitles(bool enable)
         disableCaptions = true;
 }
 
+void MythPlayer::EnableForcedSubtitles(bool enable)
+{
+    if (enable)
+        enableForcedSubtitles = true;
+    else
+        disableForcedSubtitles = true;
+}
+
+void MythPlayer::SetAllowForcedSubtitles(bool allow)
+{
+    bool old = allowForcedSubtitles;
+    allowForcedSubtitles = allow;
+    SetOSDMessage(allowForcedSubtitles ?
+                      QObject::tr("Forced Subtitles On") :
+                      QObject::tr("Forced Subtitles Off"),
+                  kOSDTimeout_Med);
+    if (old != allowForcedSubtitles)
+    {
+        gCoreContext->SaveSetting("AllowForcedSubtitles",
+                                  allowForcedSubtitles);
+    }
+}
+
+void MythPlayer::DoDisableForcedSubtitles(void)
+{
+    disableForcedSubtitles = false;
+    osdLock.lock();
+    if (osd)
+        osd->DisableForcedSubtitles();
+    osdLock.unlock();
+}
+
 void MythPlayer::DoEnableForcedSubtitles(void)
 {
     enableForcedSubtitles = false;
@@ -1545,7 +1579,7 @@ void MythPlayer::DoEnableForcedSubtitles(void)
 
     osdLock.lock();
     if (osd)
-        osd->InitSubtitles();
+        osd->EnableSubtitles(kDisplayAVSubtitle, true /*forced only*/);
     osdLock.unlock();
 }
 
@@ -2616,9 +2650,11 @@ void MythPlayer::EventLoop(void)
     if (disableCaptions)
         SetCaptionsEnabled(false, false);
 
-    // enable forced subtitles if signalled by the decoder
+    // enable/disable forced subtitles if signalled by the decoder
     if (enableForcedSubtitles)
         DoEnableForcedSubtitles();
+    if (disableForcedSubtitles)
+        DoDisableForcedSubtitles();
 
     // reset the scan (and hence deinterlacers) if triggered by the decoder
     if (resetScan != kScan_Ignore)

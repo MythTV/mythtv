@@ -3262,6 +3262,16 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
         handled = true;
         ctx->player->ToggleCaptions(kTrackTypeTextSubtitle);
     }
+    else if (ACTION_ENABLEFORCEDSUBS == action)
+    {
+        handled = true;
+        ctx->player->SetAllowForcedSubtitles(true);
+    }
+    else if (ACTION_DISABLEFORCEDSUBS == action)
+    {
+        handled = true;
+        ctx->player->SetAllowForcedSubtitles(false);
+    }
     else if (action == "TOGGLECC" && !browsehelper->IsBrowsing())
     {
         handled = true;
@@ -10149,11 +10159,13 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
     uint ttx_curtrack   = ~0;
     uint text_curtrack  = ~0;
     bool havetext = false;
+    bool forcedon = true;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
         // capmode      = ctx->player->GetCaptionMode();
         havetext     = ctx->player->HasTextSubtitles();
+        forcedon     = ctx->player->GetAllowForcedSubtitles();
         av_tracks    = ctx->player->GetTracks(kTrackTypeSubtitle);
         cc708_tracks = ctx->player->GetTracks(kTrackTypeCC708);
         cc608_tracks = ctx->player->GetTracks(kTrackTypeCC608);
@@ -10195,6 +10207,16 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
             osd->DialogAddButton(tr("Toggle Subtitles"), "TOGGLECC");
         if (!av_tracks.empty())
         {
+            if (forcedon)
+            {
+                osd->DialogAddButton(tr("Disable Forced Subtitles"),
+                                     ACTION_DISABLEFORCEDSUBS);
+            }
+            else
+            {
+                osd->DialogAddButton(tr("Enable Forced Subtitles"),
+                                     ACTION_ENABLEFORCEDSUBS);
+            }
             osd->DialogAddButton(tr("Select Subtitle"),
                                  "DIALOG_MENU_AVSUBTITLES_0",
                                  true, selected == "AVSUBTITLES");
