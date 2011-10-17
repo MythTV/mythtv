@@ -254,6 +254,7 @@ void MythUIButtonTree::Reset(void)
     m_active = true;
 
     SetTreeState(true);
+    emit rootChanged(m_rootNode);
 
     MythUIType::Reset();
 }
