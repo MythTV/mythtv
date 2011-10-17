@@ -1079,7 +1079,7 @@ void ProgramData::HandlePrograms(
 
         if (chanids.empty())
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GENERAL, LOG_NOTICE,
                 QString("Unknown xmltv channel identifier: %1"
                         " - Skipping channel.").arg(mapiter.key()));
             continue;
