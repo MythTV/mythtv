@@ -2745,7 +2745,7 @@ void MythPlayer::EventLoop(void)
             message += player_ctx->playingInfo->GetChanID() + " " +
                    player_ctx->playingInfo->MakeUniqueKey();
             player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-            RemoteSendMessage(message);
+            gCoreContext->SendMessage(message);
         }
         else
         {

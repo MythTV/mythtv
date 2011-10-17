@@ -1365,8 +1365,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         sockListLock.unlock();
 
         if (eventsMode != kPBSEvents_None && commands[2] != "tzcheck")
-            SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
-                                        .arg(commands[2]));
+            gCoreContext->SendSystemEvent(
+                QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
     if (commands[1] == "MediaServer")
     {
@@ -1386,8 +1386,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         playbackList.push_back(pbs);
         sockListLock.unlock();
 
-        SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
-                                .arg(commands[2]));
+        gCoreContext->SendSystemEvent(
+            QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
     else if (commands[1] == "SlaveBackend")
     {
@@ -1454,8 +1454,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         autoexpireUpdateTimer->start(1000);
 
-        SendMythSystemEvent(QString("SLAVE_CONNECTED HOSTNAME %1")
-                                    .arg(commands[2]));
+        gCoreContext->SendSystemEvent(
+            QString("SLAVE_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
     else if (commands[1] == "FileTransfer")
     {
@@ -2107,7 +2107,7 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     // Notify the frontend so it can requery for Free Space
     QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
         .arg(ds->m_chanid).arg(ds->m_recstartts.toString(Qt::ISODate));
-    RemoteSendEvent(MythEvent(msg));
+    gCoreContext->SendEvent(MythEvent(msg));
 
     // sleep a little to let frontends reload the recordings list
     sleep(3);
@@ -2621,9 +2621,10 @@ void MainServer::DoHandleDeleteRecording(
     // Tell MythTV frontends that the recording list needs to be updated.
     if (fileExists || !recinfo.GetFilesize() || forceMetadataDelete)
     {
-        SendMythSystemEvent(QString("REC_DELETED CHANID %1 STARTTIME %2")
-                            .arg(recinfo.GetChanID())
-                            .arg(recinfo.GetRecordingStartTime(ISODate)));
+        gCoreContext->SendSystemEvent(
+            QString("REC_DELETED CHANID %1 STARTTIME %2")
+                    .arg(recinfo.GetChanID())
+                    .arg(recinfo.GetRecordingStartTime(ISODate)));
 
         recinfo.SendDeletedEvent();
     }
@@ -5702,13 +5703,15 @@ void MainServer::connectionClosed(MythSocket *socket)
                 MythEvent me2("RECORDING_LIST_CHANGE");
                 gCoreContext->dispatch(me2);
 
-                SendMythSystemEvent(QString("SLAVE_DISCONNECTED HOSTNAME %1")
-                                    .arg(pbs->getHostname()));
+                gCoreContext->SendSystemEvent(
+                    QString("SLAVE_DISCONNECTED HOSTNAME %1")
+                            .arg(pbs->getHostname()));
             }
             else if (ismaster && pbs->getHostname() != "tzcheck")
             {
-                SendMythSystemEvent(QString("CLIENT_DISCONNECTED HOSTNAME %1")
-                                    .arg(pbs->getHostname()));
+                gCoreContext->SendSystemEvent(
+                    QString("CLIENT_DISCONNECTED HOSTNAME %1")
+                            .arg(pbs->getHostname()));
             }
 
             LiveTVChain *chain;

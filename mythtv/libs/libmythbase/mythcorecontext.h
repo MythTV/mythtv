@@ -103,6 +103,11 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 
     bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false,
                                bool block = true);
+    void SendMessage(const QString &message);
+    void SendEvent(const MythEvent &event);
+    void SendSystemEvent(const QString msg);
+    void SendHostSystemEvent(const QString msg, const QString &hostname,
+                             const QString args);
 
     void SetGUIObject(QObject *gui);
     QObject *GetGUIObject(void);

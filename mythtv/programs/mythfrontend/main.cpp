@@ -1007,7 +1007,7 @@ static void TVMenuCallback(void *data, QString &selection)
         GetMythUI()->RemoveCurrentLocation();
 
         gCoreContext->ActivateSettingsCache(true);
-        RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+        gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
 
         if (sel == "settings general" ||
             sel == "settings generalrecpriorities")
@@ -1395,7 +1395,7 @@ static void resetAllKeys(void)
 
 static void signal_USR1_handler(int){
       LOG(VB_GENERAL, LOG_NOTICE, "SIGUSR1 received, reloading theme");
-      RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+      gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
       gCoreContext->ActivateSettingsCache(false);
       GetMythMainWindow()->JumpTo("Reload Theme");
       gCoreContext->ActivateSettingsCache(true);

@@ -2092,7 +2092,7 @@ bool Scheduler::HandleReschedule(void)
         p->future = false;
     }
 
-    SendMythSystemEvent("SCHEDULER_RAN");
+    gCoreContext->SendSystemEvent("SCHEDULER_RAN");
 
     return true;
 }

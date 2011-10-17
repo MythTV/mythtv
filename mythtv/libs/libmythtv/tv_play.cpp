@@ -310,7 +310,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
             else if (!startSysEventSent)
             {
                 startSysEventSent = true;
-                SendMythSystemEvent("LIVETV_STARTED");
+                gCoreContext->SendSystemEvent("LIVETV_STARTED");
             }
 
             if (!quitAll && (startInGuide || tv->StartLiveTVInGuide()))
@@ -399,7 +399,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         delete curProgram;
     }
     else
-        SendMythSystemEvent("PLAY_STOPPED");
+        gCoreContext->SendSystemEvent("PLAY_STOPPED");
 
     if (!playerError.isEmpty())
     {
@@ -2039,7 +2039,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                 {
                     QString message = "COMMFLAG_REQUEST ";
                     message += ctx->playingInfo->MakeUniqueKey();
-                    RemoteSendMessage(message);
+                    gCoreContext->SendMessage(message);
                 }
                 ctx->UnlockPlayingInfo(__FILE__, __LINE__);
             }
@@ -8570,7 +8570,7 @@ void TV::customEvent(QEvent *e)
             {
                 QString msg = "COMMFLAG_REQUEST ";
                 msg += ProgramInfo::MakeUniqueKey(evchanid, evrecstartts);
-                RemoteSendMessage(msg);
+                gCoreContext->SendMessage(msg);
             }
         }
         ReturnPlayerLock(mctx);

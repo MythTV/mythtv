@@ -250,7 +250,7 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
             MythWelcomeSettings settings;
             if (kDialogCodeAccepted == settings.exec())
             {
-                RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+                gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
                 updateStatus();
                 updateScreen();
 
@@ -262,7 +262,7 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         {
             MythShutdownSettings settings;
             if (kDialogCodeAccepted == settings.exec())
-                RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+                gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
         }
         else if (action == "0")
         {

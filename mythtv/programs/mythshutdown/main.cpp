@@ -175,7 +175,7 @@ static int unlockShutdown()
         MythDB::DBError("unlockShutdown -- unlock", query);
 
     // tell the master BE to reset its idle time
-    RemoteSendMessage("RESET_IDLETIME");
+    gCoreContext->SendMessage("RESET_IDLETIME");
 
     return 0;
 }
