@@ -313,7 +313,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                 }
             }
         }
-        else
+        else if (insert_chan(id)) // Only insert channels for non-scannable sources
         {
             int major, minor;
             long long freq;
