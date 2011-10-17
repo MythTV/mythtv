@@ -16,10 +16,13 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 ->SetGroup("File")
         << add("--pidcounter", "pidcounter", false,
                 "Count pids in a MythTV Storage Group file", "")
-                ->SetGroup("MPEG-TS PID")
+                ->SetGroup("MPEG-TS")
         << add("--pidfilter", "pidfilter", false,
                 "Filter pids in a MythTV Storage Group file", "")
-                ->SetGroup("MPEG-TS PID")
+                ->SetGroup("MPEG-TS")
+        << add("--pidprinter", "pidprinter", false,
+                "Print PSIP pids in a MythTV Storage Group file", "")
+                ->SetGroup("MPEG-TS")
         << add("--gencutlist", "gencutlist", false,
                 "Copy the commercial skip list to the cutlist.", "")
                 ->SetGroup("Recording Markup")
@@ -106,11 +109,13 @@ void MythUtilCommandLineParser::LoadArguments(void)
 
     add("--infile", "infile", "", "Input file URI", "")
         ->SetRequiredChildOf("pidcounter")
-        ->SetRequiredChildOf("pidfilter");
+        ->SetRequiredChildOf("pidfilter")
+        ->SetRequiredChildOf("pidprinter");
     add("--outfile", "outfile", "", "Output file URI", "")
         ->SetRequiredChildOf("pidfilter");
     add("--pids", "pids", "", "Pids to write", "")
-        ->SetRequiredChildOf("pidfilter");
+        ->SetRequiredChildOf("pidfilter")
+        ->SetRequiredChildOf("pidprinter");
     add("--packetsize", "packetsize", 188, "TS Packet Size", "")
         ->SetChildOf("pidcounter")
         ->SetChildOf("pidfilter");

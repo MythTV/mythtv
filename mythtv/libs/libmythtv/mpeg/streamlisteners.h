@@ -18,6 +18,7 @@ class ScanStreamData;
 class ProgramAssociationTable;
 class ConditionalAccessTable;
 class ProgramMapTable;
+class SpliceInformationTable;
 
 class SystemTimeTable;
 class MasterGuideTable;
@@ -75,6 +76,7 @@ class MPEGStreamListener
     virtual void HandleCAT(const ConditionalAccessTable*) = 0;
     virtual void HandlePMT(uint program_num, const ProgramMapTable*) = 0;
     virtual void HandleEncryptionStatus(uint program_number, bool) = 0;
+    virtual void HandleSplice(const SpliceInformationTable*) { }
 };
 
 class MPEGSingleProgramStreamListener

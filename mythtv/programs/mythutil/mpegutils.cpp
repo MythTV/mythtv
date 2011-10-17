@@ -21,14 +21,18 @@
  */
 
 // MythTV headers
-#include "exitcodes.h"
+#include "streamlisteners.h"
+#include "scanstreamdata.h"
+#include "premieretables.h"
 #include "mythlogging.h"
+#include "atsctables.h"
 #include "ringbuffer.h"
+#include "dvbtables.h"
+#include "exitcodes.h"
+#include "mpegutils.h"
 
 // Application local headers
 #include "mpegutils.h"
-
-#define SYNC_BYTE 0x47
 
 static int resync_stream(
     const char *buffer, int curr_pos, int len, int packet_size)
@@ -279,8 +283,294 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
+class PrintMPEGStreamListener : public MPEGStreamListener
+{
+  public:
+    void HandlePAT(const ProgramAssociationTable *pat)
+    {
+        if (pat)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, pat->toString());
+    }
+
+    void HandleCAT(const ConditionalAccessTable *cat)
+    {
+        if (cat)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, cat->toString());
+    }
+
+    void HandlePMT(uint program_num, const ProgramMapTable *pmt)
+    {
+        if (pmt)
+        {
+            LOG(VB_STDIO|VB_FLUSH, logLevel,
+                QString("Program Number %1\n").arg(program_num) +
+                pmt->toString());
+        }
+    }
+
+    void HandleEncryptionStatus(uint program_number, bool)
+    {
+    }
+
+    void HandleSplice(const SpliceInformationTable *sit)
+    {
+        if (sit)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, sit->toString());
+    }
+};
+
+class PrintATSCMainStreamListener : public ATSCMainStreamListener
+{
+    void HandleSTT(const SystemTimeTable *stt)
+    {
+        if (stt)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, stt->toString());
+    }
+
+    void HandleMGT(const MasterGuideTable *mgt)
+    {
+        if (mgt)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, mgt->toString());
+    }
+
+    void HandleVCT(uint pid, const VirtualChannelTable *vct)
+    {
+        if (vct)
+        {
+            LOG(VB_STDIO|VB_FLUSH, logLevel,
+                QString("VCT PID 0x%1\n").arg(pid,0,16) + vct->toString());
+        }
+    }
+};
+
+class PrintATSCAuxStreamListener : public ATSCAuxStreamListener
+{
+    virtual void HandleTVCT(
+        uint pid, const TerrestrialVirtualChannelTable *tvct)
+    {
+        if (tvct)
+        {
+            LOG(VB_STDIO|VB_FLUSH, logLevel,
+                QString("TVCT PID 0x%1\n").arg(pid,0,16) + tvct->toString());
+        }
+    }
+
+    virtual void HandleCVCT(uint pid, const CableVirtualChannelTable *cvct)
+    {
+        if (cvct)
+        {
+            LOG(VB_STDIO|VB_FLUSH, logLevel,
+                QString("CVCT PID 0x%1\n").arg(pid,0,16) + cvct->toString());
+        }
+    }
+
+    virtual void HandleRRT(const RatingRegionTable *rrt)
+    {
+        if (rrt)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, rrt->toString());
+    }
+
+    virtual void HandleDCCT(const DirectedChannelChangeTable *dcct)
+    {
+        if (dcct)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, dcct->toString());
+    }
+
+    virtual void HandleDCCSCT(
+        const DirectedChannelChangeSelectionCodeTable *dccsct)
+    {
+        if (dccsct)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, dccsct->toString());
+    }
+};
+
+class PrintATSCEITStreamListener : public ATSCEITStreamListener
+{
+    virtual void HandleEIT(uint pid, const EventInformationTable *eit)
+    {
+        if (eit)
+        {
+            LOG(VB_STDIO|VB_FLUSH, logLevel,
+                QString("EIT PID 0x%1\n").arg(pid,0,16) + eit->toString());
+        }
+    }
+
+    virtual void HandleETT(uint pid, const ExtendedTextTable *ett)
+    {
+        if (ett)
+        {
+            LOG(VB_STDIO|VB_FLUSH, logLevel,
+                QString("ETT PID 0x%1\n").arg(pid,0,16) + ett->toString());
+        }
+    }
+};
+
+class PrintDVBMainStreamListener : public DVBMainStreamListener
+{
+    virtual void HandleTDT(const TimeDateTable *tdt)
+    {
+        if (tdt)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, tdt->toString());
+    }
+
+    virtual void HandleNIT(const NetworkInformationTable *nit)
+    {
+        if (nit)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, nit->toString());
+    }
+
+    virtual void HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
+    {
+        if (sdt)
+        {
+            LOG(VB_STDIO|VB_FLUSH, logLevel,
+                QString("TSID 0x%1\n").arg(tsid,0,16) + sdt->toString());
+        }
+    }
+
+};
+
+class PrintDVBOtherStreamListener : public DVBOtherStreamListener
+{
+    virtual void HandleNITo(const NetworkInformationTable *nit)
+    {
+        if (nit)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, nit->toString());
+    }
+
+    virtual void HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
+    {
+        if (sdt)
+        {
+            LOG(VB_STDIO|VB_FLUSH, logLevel,
+                QString("TSID 0x%1\n").arg(tsid,0,16) + sdt->toString());
+        }
+    }
+
+    virtual void HandleBAT(const BouquetAssociationTable *bat)
+    {
+        if (bat)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, bat->toString());
+    }
+
+};
+
+class PrintDVBEITStreamListener : public DVBEITStreamListener
+{
+    virtual void HandleEIT(const DVBEventInformationTable *eit)
+    {
+        if (eit)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, eit->toString());
+    }
+
+    virtual void HandleEIT(const PremiereContentInformationTable *pcit)
+    {
+        if (pcit)
+            LOG(VB_STDIO|VB_FLUSH, logLevel, pcit->toString());
+    }
+};
+
+static int pid_printer(const MythUtilCommandLineParser &cmdline)
+{
+    if (cmdline.toString("infile").isEmpty())
+    {
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --infile option\n");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+    QString src = cmdline.toString("infile");
+
+    RingBuffer *srcRB = RingBuffer::Create(src, false);
+    if (!srcRB)
+    {
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open input URL\n");
+        return GENERIC_EXIT_NOT_OK;
+    }
+
+    QHash<uint,bool> use_pid;
+    if (cmdline.toString("pids").isEmpty())
+    {
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --pids option\n");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+    else
+    {
+        QString pidsStr = cmdline.toString("pids");
+        QStringList pidsList = pidsStr.split(",");
+        for (uint i = 0; i < (uint) pidsList.size(); i++)
+        {
+            bool ok;
+            uint tmp = pidsList[i].toUInt(&ok, 0);
+            if (ok && (tmp < 0x2000))
+                use_pid[tmp] = true;
+        }
+        if (use_pid.empty())
+        {
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                "At least one pid must be specified\n");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
+
+    ScanStreamData *sd = new ScanStreamData();
+    for (QHash<uint,bool>::iterator it = use_pid.begin();
+         it != use_pid.end(); ++it)
+    {
+        sd->AddListeningPID(it.key());
+    }
+
+    PrintMPEGStreamListener     *pmsl  = new PrintMPEGStreamListener();
+    PrintATSCMainStreamListener *pasl  = new PrintATSCMainStreamListener();
+    PrintATSCAuxStreamListener  *paasl = new PrintATSCAuxStreamListener();
+    PrintATSCEITStreamListener  *paesl = new PrintATSCEITStreamListener();
+    PrintDVBMainStreamListener  *pdmsl = new PrintDVBMainStreamListener();
+    PrintDVBOtherStreamListener *pdosl = new PrintDVBOtherStreamListener();
+    PrintDVBEITStreamListener   *pdesl = new PrintDVBEITStreamListener();
+
+    sd->AddMPEGListener(pmsl);
+    sd->AddATSCMainListener(pasl);
+    sd->AddATSCAuxListener(paasl);
+    sd->AddATSCEITListener(paesl);
+    sd->AddDVBMainListener(pdmsl);
+    sd->AddDVBOtherListener(pdosl);
+    sd->AddDVBEITListener(pdesl);
+
+    const int kBufSize = 2 * 1024 * 1024;
+    char *buffer = new char[kBufSize];
+    int offset = 0;
+
+    while (true)
+    {
+        int r = srcRB->Read(&buffer[offset], kBufSize - offset);
+        if (r <= 0)
+            break;
+
+        int len = offset + r;
+
+        offset = sd->ProcessData((const unsigned char*)buffer, len);
+
+        LOG(VB_STDIO|VB_FLUSH, logLevel,
+            QString("\r                                            \r"
+                    "Processed %1 bytes")
+            .arg(len - offset));
+    }
+    LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
+
+    delete sd;
+    delete pmsl;
+    delete pasl;
+    delete paasl;
+    delete paesl;
+    delete pdmsl;
+    delete pdosl;
+    delete pdesl;
+    delete srcRB;
+
+    return GENERIC_EXIT_OK;
+}
+
 void registerMPEGUtils(UtilMap &utilMap)
 {
     utilMap["pidcounter"] = &pid_counter;
     utilMap["pidfilter"]  = &pid_filter;
+    utilMap["pidprinter"] = &pid_printer;
 }
