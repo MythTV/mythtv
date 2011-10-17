@@ -390,6 +390,7 @@ MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
     m_settings["EventCmdMythfilldatabaseRan"]  = tr("mythfilldatabase ran");
     m_settings["EventCmdSchedulerRan"]         = tr("Scheduler ran");
     m_settings["EventCmdSettingsCacheCleared"] = tr("Settings cache cleared");
+    m_settings["EventCmdScreenType"]           = tr("Screen created or destroyed");
     m_settings["EventCmdKey01"]                = tr("Keystroke event #1");
     m_settings["EventCmdKey02"]                = tr("Keystroke event #2");
     m_settings["EventCmdKey03"]                = tr("Keystroke event #3");

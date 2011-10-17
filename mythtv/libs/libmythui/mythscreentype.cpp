@@ -49,6 +49,10 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
 
     // Can be overridden, of course, but default to full sized.
     m_Area = GetMythMainWindow()->GetUIScreenRect();
+
+    MythEvent me(QString("GLOBAL_SYSTEM_EVENT SCREEN_TYPE CREATED %1").arg(name));
+    QCoreApplication::postEvent(
+        GetMythMainWindow()->GetSystemEventHandler(), me.clone());
 }
 
 MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
@@ -66,10 +70,19 @@ MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
     m_IsInitialized = false;
 
     m_Area = GetMythMainWindow()->GetUIScreenRect();
+
+    MythEvent me(QString("GLOBAL_SYSTEM_EVENT SCREEN_TYPE CREATED %1").arg(name));
+    QCoreApplication::postEvent(
+        GetMythMainWindow()->GetSystemEventHandler(), me.clone());
 }
 
 MythScreenType::~MythScreenType()
 {
+    MythEvent me(QString("GLOBAL_SYSTEM_EVENT SCREEN_TYPE DESTROYED %1")
+                         .arg(objectName()));
+    QCoreApplication::postEvent(
+        GetMythMainWindow()->GetSystemEventHandler(), me.clone());
+
     m_CurrentFocusWidget = NULL;
     emit Exiting();
 }
