@@ -4,8 +4,9 @@
 #define _MPEG_TABLES_H_
 
 #include <cassert>
-#include "pespacket.h"
 #include "mpegdescriptors.h"
+#include "pespacket.h"
+#include "mythtvexp.h"
 
 /** \file mpegtables.h
  *  \code
@@ -32,7 +33,7 @@
 /** \class PESStreamID
  *  \brief Contains a listing of PES Stream ID's for various PES Packet types.
  */
-class PESStreamID
+class MTV_PUBLIC PESStreamID
 {
   public:
     enum
@@ -97,7 +98,7 @@ class PESStreamID
  *   This is used by the Program Map Table (PMT), and often used by other
  *   tables, such as the DVB SDT table.
  */
-class StreamID
+class MTV_PUBLIC StreamID
 {
   public:
     enum
@@ -220,7 +221,7 @@ enum
 /** \class TableID
  *  \brief Contains listing of Table ID's for various tables (PAT=0,PMT=2,etc).
  */
-class TableID
+class MTV_PUBLIC TableID
 {
   public:
     enum
@@ -343,7 +344,7 @@ class TableID
  *  \brief A PSIP table is a special type of PES packet containing an
  *         MPEG, ATSC, or DVB table.
  */
-class PSIPTable : public PESPacket
+class MTV_PUBLIC PSIPTable : public PESPacket
 {
   private:
     // creates non-clone version, for View
@@ -469,7 +470,7 @@ class PSIPTable : public PESPacket
  *  \sa ProgramMapTable
  */
 
-class ProgramAssociationTable : public PSIPTable
+class MTV_PUBLIC ProgramAssociationTable : public PSIPTable
 {
   public:
     ProgramAssociationTable(const ProgramAssociationTable& table)
@@ -542,7 +543,7 @@ class ProgramAssociationTable : public PSIPTable
  *         to various PID's which describe the multimedia contents of the
  *         program.
  */
-class ProgramMapTable : public PSIPTable
+class MTV_PUBLIC ProgramMapTable : public PSIPTable
 {
   public:
 
@@ -695,7 +696,7 @@ class ProgramMapTable : public PSIPTable
  *  \brief The CAT is used to transmit additional ConditionalAccessDescriptor
  *         instances, in addition to the ones in the PMTs.
  */
-class ConditionalAccessTable : public PSIPTable
+class MTV_PUBLIC ConditionalAccessTable : public PSIPTable
 {
   public:
     ConditionalAccessTable(const PSIPTable &table) : PSIPTable(table)
@@ -725,8 +726,7 @@ class ConditionalAccessTable : public PSIPTable
     // CRC_32 32 rpchof
 };
 
-
-class SpliceTimeView
+class MTV_PUBLIC SpliceTimeView
 {
   public:
     SpliceTimeView(const unsigned char *data) : _data(data) { }
@@ -751,7 +751,7 @@ class SpliceTimeView
     const unsigned char *_data;
 };
 
-class SpliceScheduleView
+class MTV_PUBLIC SpliceScheduleView
 {
   public:
     SpliceScheduleView(const vector<const unsigned char*> &ptrs0,
@@ -799,7 +799,7 @@ class SpliceScheduleView
     vector<const unsigned char*> _ptrs1;    
 };
 
-class SpliceInsertView
+class MTV_PUBLIC SpliceInsertView
 {
   public:
     SpliceInsertView(const vector<const unsigned char*> &ptrs0,
@@ -847,7 +847,7 @@ class SpliceInsertView
     vector<const unsigned char*> _ptrs1;
 };
 
-class SpliceInformationTable : public PSIPTable
+class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 {
   public:
     SpliceInformationTable(const SpliceInformationTable &table) :
@@ -1026,7 +1026,7 @@ class SpliceInformationTable : public PSIPTable
  *   currently just passed through the MythTV recorders to the recorded
  *   stream.
  */
-class AdaptationFieldControl
+class MTV_PUBLIC AdaptationFieldControl
 {
   public:
     AdaptationFieldControl(const unsigned char* packet) : _data(packet) { ; }

@@ -5,8 +5,10 @@
 
 #include <QString>
 #include <stdint.h>  // uint32_t
-#include "mpegtables.h"
+
 #include "dvbdescriptors.h"
+#include "mpegtables.h"
+#include "mythtvexp.h"
 
 QDateTime dvbdate2qt(const unsigned char*);
 time_t dvbdate2unix(const unsigned char*);
@@ -16,7 +18,7 @@ uint32_t dvbdate2key(const unsigned char*);
  *  \brief This table tells the decoder on which PIDs to find other tables.
  *  \todo This is just a stub.
  */
-class NetworkInformationTable : public PSIPTable
+class MTV_PUBLIC NetworkInformationTable : public PSIPTable
 {
   public:
     NetworkInformationTable(const NetworkInformationTable& table)
@@ -93,7 +95,7 @@ class NetworkInformationTable : public PSIPTable
  *  \brief This table tells the decoder on which PIDs to find A/V data.
  *  \todo This is just a stub.
  */
-class ServiceDescriptionTable : public PSIPTable
+class MTV_PUBLIC ServiceDescriptionTable : public PSIPTable
 {
   public:
     ServiceDescriptionTable(const ServiceDescriptionTable& table)
@@ -171,7 +173,7 @@ class ServiceDescriptionTable : public PSIPTable
  *  with an index used in their proprietary EIT
  */
 
-class BouquetAssociationTable : public PSIPTable
+class MTV_PUBLIC BouquetAssociationTable : public PSIPTable
 {
   public:
     BouquetAssociationTable(const PSIPTable& table) : PSIPTable(table)
@@ -235,7 +237,7 @@ class BouquetAssociationTable : public PSIPTable
     mutable vector<const unsigned char*> _ptrs;
 };
 
-class DiscontinuityInformationTable : public PSIPTable
+class MTV_PUBLIC DiscontinuityInformationTable : public PSIPTable
 {
     DiscontinuityInformationTable(const PSIPTable& table) : PSIPTable(table)
         { ; }
@@ -248,7 +250,7 @@ class DiscontinuityInformationTable : public PSIPTable
     // reserved_future_use      7
 };
 
-class SelectionInformationTable : public PSIPTable
+class MTV_PUBLIC SelectionInformationTable : public PSIPTable
 {
     SelectionInformationTable(const PSIPTable& table) : PSIPTable(table)
         { ; }
@@ -277,7 +279,7 @@ class SelectionInformationTable : public PSIPTable
     // CRC_32 32 rpchof
 };
 
-class DVBEventInformationTable : public PSIPTable
+class MTV_PUBLIC DVBEventInformationTable : public PSIPTable
 {
   public:
     DVBEventInformationTable(const PSIPTable& table) : PSIPTable(table)
@@ -365,7 +367,7 @@ class DVBEventInformationTable : public PSIPTable
 /** \class TimeDateTable
  *  \brief This table gives the current DVB stream time
  */
-class TimeDateTable : public PSIPTable
+class MTV_PUBLIC TimeDateTable : public PSIPTable
 {
   public:
     TimeDateTable(const PSIPTable& table)

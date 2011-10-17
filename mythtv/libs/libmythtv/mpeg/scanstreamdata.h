@@ -5,8 +5,9 @@
 
 #include "atscstreamdata.h"
 #include "dvbstreamdata.h"
+#include "mythtvexp.h"
 
-class ScanStreamData :
+class MTV_PUBLIC ScanStreamData :
     public virtual MPEGStreamData,
     public ATSCStreamData,
     public DVBStreamData

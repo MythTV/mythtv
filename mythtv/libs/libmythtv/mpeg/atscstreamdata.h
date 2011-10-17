@@ -4,6 +4,7 @@
 #define ATSCSTREAMDATA_H_
 
 #include "mpegstreamdata.h"
+#include "mythtvexp.h"
 
 typedef QMap<uint, uint_vec_t>          pid_tsid_vec_t;
 typedef TerrestrialVirtualChannelTable* tvct_ptr_t;
@@ -19,7 +20,7 @@ typedef vector<ATSCMainStreamListener*> atsc_main_listener_vec_t;
 typedef vector<ATSCAuxStreamListener*>  atsc_aux_listener_vec_t;
 typedef vector<ATSCEITStreamListener*>  atsc_eit_listener_vec_t;
 
-class ATSCStreamData : virtual public MPEGStreamData
+class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
 {
   public:
     ATSCStreamData(int desiredMajorChannel,

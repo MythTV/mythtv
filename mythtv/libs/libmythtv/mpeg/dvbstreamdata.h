@@ -4,6 +4,7 @@
 #define DVBSTREAMDATA_H_
 
 #include "mpegstreamdata.h"
+#include "mythtvexp.h"
 
 typedef NetworkInformationTable* nit_ptr_t;
 typedef vector<const NetworkInformationTable*>  nit_vec_t;
@@ -20,7 +21,7 @@ typedef vector<DVBEITStreamListener*>    dvb_eit_listener_vec_t;
 
 typedef QMap<uint, bool>                 dvb_has_eit_t;
 
-class DVBStreamData : virtual public MPEGStreamData
+class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 {
   public:
     DVBStreamData(uint desired_netid, uint desired_tsid,

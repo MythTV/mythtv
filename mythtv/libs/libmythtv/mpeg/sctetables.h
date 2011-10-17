@@ -24,6 +24,7 @@
 
 #include <cassert>
 #include "mpegtables.h"
+#include "mythtvexp.h"
 
 // NOTE: MasterGuideTable defined in atsctables.h
 // NOTE: VirtualChannelTable defined in atsctables.h
@@ -33,7 +34,7 @@
 //       the one we are familiar with, as of the SCTE65-2002
 //       standard 0 is the only recognized version.
 
-class SCTENetworkInformationTable : public PSIPTable
+class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
 {
   public:
     SCTENetworkInformationTable(const SCTENetworkInformationTable &table) :
@@ -164,7 +165,7 @@ class SCTENetworkInformationTable : public PSIPTable
     QString toStringXML(void) const;
 };
 
-class NetworkTextTable : public PSIPTable
+class MTV_PUBLIC NetworkTextTable : public PSIPTable
 {
   public:
     NetworkTextTable(const NetworkTextTable &table) :
@@ -226,7 +227,7 @@ class NetworkTextTable : public PSIPTable
 };
 
 // AKA Short-form Virtual Channel Table
-class ShortVirtualChannelMap : public PSIPTable
+class MTV_PUBLIC ShortVirtualChannelMap : public PSIPTable
 {
     ShortVirtualChannelMap(const ShortVirtualChannelMap &table) :
         PSIPTable(table)
@@ -357,7 +358,7 @@ class ShortVirtualChannelMap : public PSIPTable
 /** \class SCTESystemTimeTable
  *  \brief This table contains the GPS time at the time of transmission.
  */
-class SCTESystemTimeTable : public PSIPTable
+class MTV_PUBLIC SCTESystemTimeTable : public PSIPTable
 {
   public:
     SCTESystemTimeTable(const SCTESystemTimeTable &table) : PSIPTable(table)

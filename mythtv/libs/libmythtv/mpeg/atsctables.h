@@ -5,8 +5,10 @@
 
 #include <stdint.h>  // uint32_t
 #include <QString>
-#include "mpegtables.h"
+
 #include "atscdescriptors.h"
+#include "mpegtables.h"
+#include "mythtvexp.h"
 
 // Some sample code is in pcHDTV's dtvscan.c,
 // accum_sect/dequeue_buf/atsc_tables.  We should stuff
@@ -44,7 +46,7 @@
  *   updated version_number for that EIT, updating the data.
  */
 
-class TableClass
+class MTV_PUBLIC TableClass
 {
   public:
     typedef enum
@@ -67,7 +69,7 @@ class TableClass
  *  \brief This table tells the decoder on which PIDs to find other tables,
  *         and their sizes and each table's current version number.
  */
-class MasterGuideTable : public PSIPTable
+class MTV_PUBLIC MasterGuideTable : public PSIPTable
 {
   public:
     MasterGuideTable(const MasterGuideTable& table) : PSIPTable(table)
@@ -182,7 +184,7 @@ class MasterGuideTable : public PSIPTable
  *  \sa TerrestrialVirtualChannelTable,
  *      CableVirtualChannelTable
  */
-class VirtualChannelTable : public PSIPTable
+class MTV_PUBLIC VirtualChannelTable : public PSIPTable
 {
   public:
     VirtualChannelTable(const VirtualChannelTable &table) : PSIPTable(table)
@@ -329,7 +331,7 @@ class VirtualChannelTable : public PSIPTable
  *         channels transmitted on this multiplex.
  *  \sa CableVirtualChannelTable
  */
-class TerrestrialVirtualChannelTable : public VirtualChannelTable
+class MTV_PUBLIC TerrestrialVirtualChannelTable : public VirtualChannelTable
 {
   public:
     TerrestrialVirtualChannelTable(const TerrestrialVirtualChannelTable &table)
@@ -398,7 +400,7 @@ class TerrestrialVirtualChannelTable : public VirtualChannelTable
  *         channels transmitted on this multiplex.
  *  \sa TerrestrialVirtualChannelTable
  */
-class CableVirtualChannelTable : public VirtualChannelTable
+class MTV_PUBLIC CableVirtualChannelTable : public VirtualChannelTable
 {
   public:
     CableVirtualChannelTable(const CableVirtualChannelTable &table)
@@ -503,7 +505,7 @@ class CableVirtualChannelTable : public VirtualChannelTable
  *         and channel information.
  *  \sa ExtendedTextTable, TerrestrialVirtualChannelTable, CableVirtualChannelTable
  */
-class EventInformationTable : public PSIPTable
+class MTV_PUBLIC EventInformationTable : public PSIPTable
 {
   public:
     EventInformationTable(const EventInformationTable &table)
@@ -605,7 +607,7 @@ class EventInformationTable : public PSIPTable
  *         contained in EventInformationTables.
  *  \sa EventInformationTable
  */
-class ExtendedTextTable : public PSIPTable
+class MTV_PUBLIC ExtendedTextTable : public PSIPTable
 {
   public:
     ExtendedTextTable(const ExtendedTextTable &table) : PSIPTable(table)
@@ -663,7 +665,7 @@ class ExtendedTextTable : public PSIPTable
  *   is currently at 14 seconds.
  *   See also: a_65b.pdf page 23
  */
-class SystemTimeTable : public PSIPTable
+class MTV_PUBLIC SystemTimeTable : public PSIPTable
 {
   public:
     SystemTimeTable(const SystemTimeTable &table) : PSIPTable(table)
@@ -735,7 +737,7 @@ class SystemTimeTable : public PSIPTable
 /** \class RatingRegionTable
  *  \brief No one has had time to decode this table yet...
  */
-class RatingRegionTable : public PSIPTable
+class MTV_PUBLIC RatingRegionTable : public PSIPTable
 {
   public:
     RatingRegionTable(const RatingRegionTable &table) : PSIPTable(table)
@@ -751,7 +753,7 @@ class RatingRegionTable : public PSIPTable
 /** \class DirectedChannelChangeTable
  *  \brief No one has had time to decode this table yet...
  */
-class DirectedChannelChangeTable : public PSIPTable
+class MTV_PUBLIC DirectedChannelChangeTable : public PSIPTable
 {
   public:
     DirectedChannelChangeTable(const DirectedChannelChangeTable &table)
@@ -768,7 +770,7 @@ class DirectedChannelChangeTable : public PSIPTable
 /** \class DirectedChannelChangeSelectionCodeTable
  *  \brief No one has had time to decode this table yet...
  */
-class DirectedChannelChangeSelectionCodeTable : public PSIPTable
+class MTV_PUBLIC DirectedChannelChangeSelectionCodeTable : public PSIPTable
 {
   public:
     DirectedChannelChangeSelectionCodeTable(
