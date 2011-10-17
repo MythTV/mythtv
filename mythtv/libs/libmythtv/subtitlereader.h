@@ -38,7 +38,7 @@ class SubtitleReader
     void EnableRawTextSubtitles(bool enable);
 
     AVSubtitles* GetAVSubtitles(void) { return &m_AVSubtitles; }
-    void AddAVSubtitle(const AVSubtitle& subtitle, bool fix_position);
+    bool AddAVSubtitle(const AVSubtitle& subtitle, bool fix_position);
     void ClearAVSubtitles(void);
     void FreeAVSubtitle(const AVSubtitle &sub);
 

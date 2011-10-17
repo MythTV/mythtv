@@ -167,6 +167,7 @@ MythPlayer::MythPlayer(bool muted)
       ttPageNum(0x888),
       // Support for captions, teletext, etc. decoded by libav
       textDesired(false), enableCaptions(false), disableCaptions(false),
+      enableForcedSubtitles(false), allowForcedSubtitles(true),
       // CC608/708
       db_prefer708(true), cc608(this), cc708(this),
       // MHEG/MHI Interactive TV visible in OSD
@@ -1536,6 +1537,18 @@ void MythPlayer::EnableSubtitles(bool enable)
         disableCaptions = true;
 }
 
+void MythPlayer::DoEnableForcedSubtitles(void)
+{
+    enableForcedSubtitles = false;
+    if (!allowForcedSubtitles)
+        return;
+
+    osdLock.lock();
+    if (osd)
+        osd->InitSubtitles();
+    osdLock.unlock();
+}
+
 int MythPlayer::GetTrack(uint type)
 {
     if (decoder)
@@ -2602,6 +2615,10 @@ void MythPlayer::EventLoop(void)
         SetCaptionsEnabled(true, false);
     if (disableCaptions)
         SetCaptionsEnabled(false, false);
+
+    // enable forced subtitles if signalled by the decoder
+    if (enableForcedSubtitles)
+        DoEnableForcedSubtitles();
 
     // reset the scan (and hence deinterlacers) if triggered by the decoder
     if (resetScan != kScan_Ignore)

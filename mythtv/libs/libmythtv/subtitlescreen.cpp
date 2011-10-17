@@ -88,9 +88,10 @@ bool SubtitleScreen::Create(void)
 void SubtitleScreen::Pulse(void)
 {
     ExpireSubtitles();
-    if (kDisplayAVSubtitle == m_subtitleType)
-        DisplayAVSubtitles();
-    else if (kDisplayTextSubtitle == m_subtitleType)
+
+    DisplayAVSubtitles(); // allow forced subtitles to work
+
+    if (kDisplayTextSubtitle == m_subtitleType)
         DisplayTextSubtitles();
     else if (kDisplayCC608 == m_subtitleType)
         DisplayCC608Subtitles();

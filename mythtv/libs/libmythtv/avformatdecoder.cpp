@@ -3398,8 +3398,11 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
                 .arg(subtitle.start_display_time)
                 .arg(subtitle.end_display_time));
 
-        m_parent->GetSubReader(pkt->stream_index)->AddAVSubtitle(
-            subtitle, curstream->codec->codec_id == CODEC_ID_XSUB);
+        if (m_parent->GetSubReader(pkt->stream_index)->AddAVSubtitle(
+               subtitle, curstream->codec->codec_id == CODEC_ID_XSUB))
+        {
+            m_parent->EnableForcedSubtitles();
+        }
     }
 
     return true;
