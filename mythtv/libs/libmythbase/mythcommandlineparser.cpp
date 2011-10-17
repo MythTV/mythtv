@@ -1930,10 +1930,12 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     else if (toBool("verboseint"))
         verboseMask = toUInt("verboseint");
 
+    verboseMask |= VB_STDIO|VB_FLUSH;
+
     int quiet = toUInt("quiet");
     if (max(quiet, (int)progress) > 1)
     {
-        verboseMask = VB_NONE;
+        verboseMask = VB_NONE|VB_FLUSH;
         verboseArgParse("none");
     }
 
