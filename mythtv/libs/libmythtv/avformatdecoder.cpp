@@ -3438,24 +3438,24 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
 
     switch (codec_id)
     {
-    case CODEC_ID_MPEG2VBI:
-        ProcessVBIDataPacket(curstream, pkt);
-        break;
-    case CODEC_ID_DVB_VBI:
-        ProcessDVBDataPacket(curstream, pkt);
-        break;
+        case CODEC_ID_MPEG2VBI:
+            ProcessVBIDataPacket(curstream, pkt);
+            break;
+        case CODEC_ID_DVB_VBI:
+            ProcessDVBDataPacket(curstream, pkt);
+            break;
+        case CODEC_ID_DSMCC_B:
+        {
+            ProcessDSMCCPacket(curstream, pkt);
+            GenerateDummyVideoFrames();
+            // Have to return regularly to ensure that the OSD is updated.
+            // This applies both to MHEG and also channel browsing.
 #ifdef USING_MHEG
-    case CODEC_ID_DSMCC_B:
-    {
-        ProcessDSMCCPacket(curstream, pkt);
-        GenerateDummyVideoFrames();
-        // Have to return regularly to ensure that the OSD is updated.
-        // This applies both to MHEG and also channel browsing.
-        if (!(decodetype & kDecodeVideo))
-            allowedquit |= (itv && itv->ImageHasChanged());
-        break;
-    }
+            if (!(decodetype & kDecodeVideo))
+                allowedquit |= (itv && itv->ImageHasChanged());
 #endif // USING_MHEG:
+            break;
+        }
     }
     return true;
 }
