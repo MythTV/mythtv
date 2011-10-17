@@ -68,6 +68,7 @@ class VideoOutputVDPAU : public VideoOutput
         { return VideoOutput::CanVisualise(audio, m_render);       }
     virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
         { return VideoOutput::SetupVisualisation(audio, m_render); }
+    virtual void ClearDummyFrame(VideoFrame* frame);
 
   private:
     virtual bool hasFullScreenOSD(void) const { return true; }
