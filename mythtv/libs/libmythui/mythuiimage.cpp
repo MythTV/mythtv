@@ -42,7 +42,16 @@ public:
                    int number)
         : QEvent(kEventType),
           m_parent(parent), m_image(image), m_basefile(basefile),
-          m_filename(filename), m_number(number) { }
+          m_filename(filename), m_number(number),
+          m_images(NULL), m_delays(NULL) { }
+
+    ImageLoadEvent(MythUIImage *parent, QVector<MythImage *> *images,
+                   QVector<int> *delays, const QString &basefile,
+                   const QString &filename)
+        : QEvent(kEventType),
+          m_parent(parent), m_image(NULL), m_basefile(basefile),
+          m_filename(filename), m_number(0),
+          m_images(images), m_delays(delays) { }
 
     MythUIImage *GetParent() const
     {
@@ -64,6 +73,14 @@ public:
     {
         return m_number;
     }
+    QVector<MythImage *> *GetImages() const
+    {
+        return m_images;
+    }
+    QVector<int> *GetDelays() const
+    {
+        return m_delays;
+    }
 
     static Type kEventType;
 
@@ -73,6 +90,10 @@ private:
     QString          m_basefile;
     QString          m_filename;
     int              m_number;
+
+    // Animated Images
+    QVector<MythImage *> *m_images;
+    QVector<int>         *m_delays;
 };
 
 QEvent::Type ImageLoadEvent::kEventType =
@@ -107,8 +128,16 @@ public:
 
         if (imageReader.supportsAnimation())
         {
+            QVector<MythImage *> *images = new QVector<MythImage *>;
+            QVector<int>         *delays = new QVector<int>;
+
             m_parent->LoadAnimatedImage(
-                imageReader, m_filename, m_ForceSize, m_cacheMode);
+                imageReader, m_filename, m_ForceSize, m_cacheMode,
+                images, delays);
+
+            ImageLoadEvent *le = new ImageLoadEvent(m_parent, images, delays,
+                                                    m_basefile, m_filename);
+            QCoreApplication::postEvent(m_parent, le);
         }
         else
         {
@@ -412,7 +441,7 @@ void MythUIImage::SetImage(MythImage *img)
  *         Use is strongly discouraged, use SetFilepattern() instead.
  *
  */
-void MythUIImage::SetImages(QVector<MythImage *> &images)
+void MythUIImage::SetImages(QVector<MythImage *> *images)
 {
     Clear();
 
@@ -421,7 +450,7 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
 
     QVector<MythImage *>::iterator it;
 
-    for (it = images.begin(); it != images.end(); ++it)
+    for (it = images->begin(); it != images->end(); ++it)
     {
         MythImage *im = (*it);
 
@@ -462,6 +491,7 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
         SetSize(aSize);
 
     m_CurPos = 0;
+    m_animatedImage = true;
     SetRedraw();
 }
 
@@ -873,7 +903,8 @@ MythImage *MythUIImage::LoadImage(
 */
 bool MythUIImage::LoadAnimatedImage(
     MythImageReader &imageReader, const QString &imFile,
-    QSize bForceSize, int cacheMode)
+    QSize bForceSize, int cacheMode, QVector<MythImage *> *images,
+    QVector<int> *delays)
 {
     bool result = false;
     m_loadingImagesLock.lock();
@@ -899,13 +930,24 @@ bool MythUIImage::LoadAnimatedImage(
 
     QString filename = QString("frame-%1-") + imFile;
     QString frameFilename;
-    QVector<MythImage *> images;
-    QVector<int> delays;
+    QVector<MythImage *> *myImages = NULL;
+    QVector<int> *myDelays = NULL;
     int imageCount = 1;
     QString imageLabel;
 
     int w = -1;
     int h = -1;
+
+    if (images)
+    {
+        myImages = images;
+        myDelays = delays;
+    }
+    else
+    {
+        myImages = new QVector<MythImage *>;
+        myDelays = new QVector<int>;
+    }
 
     if (!bForceSize.isNull())
     {
@@ -927,21 +969,27 @@ bool MythUIImage::LoadAnimatedImage(
         if (!im)
             break;
 
-        images.append(im);
-        delays.append(imageReader.nextImageDelay());
+        myImages->append(im);
+        myDelays->append(imageReader.nextImageDelay());
         imageCount++;
     }
 
-    if (images.size())
+    if (myImages->size())
     {
-        m_animatedImage = true;
-        SetImages(images);
-
-        if ((m_Delay == -1) &&
-            (imageReader.supportsAnimation()) &&
-            (delays.size()))
+        // Only SetImages() if not returning them via the passed-in QVector
+        if (!images)
         {
-            SetDelays(delays);
+            SetImages(myImages);
+
+            if ((m_Delay == -1) &&
+                (imageReader.supportsAnimation()) &&
+                (myDelays->size()))
+            {
+                SetDelays(*myDelays);
+            }
+
+            delete myImages;
+            delete myDelays;
         }
 
         result = true;
@@ -1316,7 +1364,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_animationCycle = im->m_animationCycle;
     m_animatedImage = im->m_animatedImage;
 
-    //SetImages(im->m_Images);
+    //SetImages(&im->m_Images);
 
     MythUIType::CopyFrom(base);
 
@@ -1389,6 +1437,11 @@ void MythUIImage::LoadNow(void)
 */
 void MythUIImage::customEvent(QEvent *event)
 {
+    MythImage *image = NULL;
+    QVector<MythImage *> *images = NULL;
+    QVector<int> *delays = NULL;
+    int number = 0;
+
     if (event->type() == ImageLoadEvent::kEventType)
     {
         ImageLoadEvent *le = dynamic_cast<ImageLoadEvent *>(event);
@@ -1396,30 +1449,60 @@ void MythUIImage::customEvent(QEvent *event)
         if (le->GetParent() != this)
             return;
 
-        MythImage *image = le->GetImage();
-
-        if (!image)
-            return;
+        image  = le->GetImage();
+        number = le->GetNumber();
+        images = le->GetImages();
+        delays = le->GetDelays();
 
         d->m_UpdateLock.lockForRead();
 
         if (le->GetBasefile() != m_Filename)
         {
             d->m_UpdateLock.unlock();
-#if 0
-            LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
-                QString("customEvent(): Expecting '%2', got '%3'")
-                .arg(m_Filename).arg(le->GetBasefile()));
-#endif
-            image->DownRef();
+
+            if (image)
+                image->DownRef();
+
+            if (images)
+            {
+                QVector<MythImage *>::iterator it;
+
+                for (it = images->begin(); it != images->end(); ++it)
+                {
+                    MythImage *im = (*it);
+                    im->DownRef();
+                }
+
+                delete images;
+                delete delays;
+            }
+
             return;
         }
 
         d->m_UpdateLock.unlock();
+    }
 
-        QString filename = le->GetFilename();
-        int number = le->GetNumber();
+    if (images)
+    {
+        if (images->size())
+        {
+            SetImages(images);
 
+            if (delays && delays->size())
+                SetDelays(*delays);
+        }
+
+        delete images;
+
+        if (delays)
+            delete delays;
+
+        return;
+    }
+
+    if (image)
+    {
         d->m_UpdateLock.lockForWrite();
 
         if (m_ForceSize.isNull())
