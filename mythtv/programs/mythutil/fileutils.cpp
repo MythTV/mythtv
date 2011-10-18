@@ -10,19 +10,19 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
 {
     int result = GENERIC_EXIT_OK;
 
-    if (cmdline.toString("srcfile").isEmpty())
+    if (cmdline.toString("infile").isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Missing --srcfile option");
+        LOG(VB_GENERAL, LOG_ERR, "Missing --infile option");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
-    QString src = cmdline.toString("srcfile");
+    QString src = cmdline.toString("infile");
 
-    if (cmdline.toString("destfile").isEmpty())
+    if (cmdline.toString("outfile").isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Missing --destfile option");
+        LOG(VB_GENERAL, LOG_ERR, "Missing --outfile option");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
-    QString dest = cmdline.toString("destfile");
+    QString dest = cmdline.toString("outfile");
 
     const int readSize = 2 * 1024 * 1024;
     char *buf = new char[readSize];
