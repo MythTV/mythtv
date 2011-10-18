@@ -325,8 +325,12 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     if (!buffer && codec_is_std(video_codec_id))
         buffer = vbuffers.GetScratchFrame();
 
+    bool dummy = false;
     if (buffer)
+    {
+        dummy = buffer->dummy;
         framesPlayed = buffer->frameNumber + 1;
+    }
 
     if (!m_render || !m_video)
         return;
@@ -337,7 +341,7 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         QRect dvr = vsz_enabled ? vsz_desired_display_rect :
                                   window.GetDisplayVideoRect();
         bool ok = m_render->ClearBuffer();
-        if (ok)
+        if (ok && !dummy)
             ok = m_video->UpdateVertices(dvr, window.GetVideoRect(),
                                          255, true);
 
@@ -346,7 +350,8 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
             ok = m_render->Begin();
             if (ok)
             {
-                m_video->Draw();
+                if (!dummy)
+                    m_video->Draw();
                 QMap<MythPlayer*,D3D9Image*>::iterator it = m_pips.begin();
                 for (; it != m_pips.end(); ++it)
                 {
@@ -516,8 +521,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
     }
 
-    bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);
-
+    bool dummy = false;
     bool pauseframe = false;
     if (!frame)
     {
@@ -529,7 +533,12 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         pauseframe = true;
     }
 
-    if (filterList && !gpu)
+    if (frame)
+        dummy = frame->dummy;
+    bool deint_proc = m_deinterlacing && (m_deintFilter != NULL) &&
+                      !dummy;
+
+    if (filterList && !gpu && !dummy)
         filterList->ProcessFrame(frame);
 
     bool safepauseframe = pauseframe && !IsBobDeint() && !gpu;
@@ -554,11 +563,11 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         SetupContext();
 
     // Update a software decoded frame
-    if (m_render_valid && !gpu)
+    if (m_render_valid && !gpu && !dummy)
         UpdateFrame(frame, m_video);
 
     // Update a GPU decoded frame
-    if (m_render_valid && gpu)
+    if (m_render_valid && gpu && !dummy)
     {
         m_render_valid = m_render->Test(m_render_reset);
         if (m_render_reset)
