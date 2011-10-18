@@ -43,6 +43,8 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     CommandLineArg* SetParentOf(QStringList opts);
     CommandLineArg* SetChildOf(QString opt);
     CommandLineArg* SetChildOf(QStringList opts);
+    CommandLineArg* SetRequiredChild(QString opt);
+    CommandLineArg* SetRequiredChild(QStringList opt);
     CommandLineArg* SetRequiredChildOf(QString opt);
     CommandLineArg* SetRequiredChildOf(QStringList opt);
     CommandLineArg* SetRequires(QString opt);
@@ -261,6 +263,7 @@ class MBASE_PUBLIC MythCommandLineParser
                     LogLevel_t defaultLogLevel = LOG_INFO);
     void addPIDFile(void);
     void addJob(void);
+    void addInFile(bool addOutFile = false);
 
   private:
     int getOpt(int argc, const char * const * argv, int &argpos,

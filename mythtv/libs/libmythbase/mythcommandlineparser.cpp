@@ -413,6 +413,25 @@ CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
     return this;
 }
 
+
+CommandLineArg* CommandLineArg::SetRequiredChild(QString opt)
+{
+    m_children << new CommandLineArg(opt);
+    m_requires << new CommandLineArg(opt);
+    return this;
+}
+
+CommandLineArg* CommandLineArg::SetRequiredChild(QStringList opts)
+{
+    QStringList::const_iterator i = opts.begin();
+    for (; i != opts.end(); ++i)
+    {
+        m_children << new CommandLineArg(*i);
+        m_requires << new CommandLineArg(*i);
+    }
+    return this;
+}
+
 CommandLineArg* CommandLineArg::SetRequiredChildOf(QString opt)
 {
     m_parents << new CommandLineArg(opt);
@@ -1833,6 +1852,13 @@ void MythCommandLineParser::addJob(void)
             "Intended for internal use only, specify the JobID to match "
             "up with in the database for additional information and the "
             "ability to update runtime status in the database.");
+}
+
+void MythCommandLineParser::addInFile(bool addOutFile)
+{
+    add("--infile", "infile", "", "Input file URI", "");
+    if (addOutFile)
+        add("--outfile", "outfile", "", "Output file URI", "");
 }
 
 QString MythCommandLineParser::GetLogFilePath(void)
