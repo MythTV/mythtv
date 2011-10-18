@@ -5,6 +5,7 @@
 
 // local headers
 #include "mythutil.h"
+#include "fileutils.h"
 
 static int CopyFile(const MythUtilCommandLineParser &cmdline)
 {

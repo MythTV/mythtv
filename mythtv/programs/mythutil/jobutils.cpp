@@ -8,6 +8,7 @@
 
 // Local includes
 #include "mythutil.h"
+#include "jobutils.h"
 
 static int QueueJob(const MythUtilCommandLineParser &cmdline)
 {
