@@ -200,8 +200,7 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     bool first = true;
 
     QStringList::const_iterator i1;
-    i1 = m_keywords.begin();
-    while (i1 != m_keywords.end())
+    for (i1 = m_keywords.begin(); i1 != m_keywords.end(); ++i1)
     {
         if (*i1 != keyword)
         {
@@ -213,7 +212,6 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
             else
                 msg << "             " << *i1 << endl;
         }
-        i1++;
     }
 
     msg << "Type:        " << QVariant::typeToName(m_type) << endl;
@@ -766,7 +764,7 @@ void CommandLineArg::PrintVerbose(void) const
         tmpmap = m_stored.toMap();
         first = true;
 
-        for (it = tmpmap.begin(); it != tmpmap.end(); it++)
+        for (it = tmpmap.begin(); it != tmpmap.end(); ++it)
         {
             if (first)
                 first = false;
@@ -1283,7 +1281,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
         {
             if ((*i2)->m_type != QVariant::Invalid)
             {
-                i2++;
+                ++i2;
                 continue; // already handled
             }
 
@@ -1301,7 +1299,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
                             .toLocal8Bit().constData()
                      << endl;
             (*i1)->SetBlocks(m_namedArgs[(*i2)->m_name]);
-            i2++;
+            ++i2;
         }
     }
 
