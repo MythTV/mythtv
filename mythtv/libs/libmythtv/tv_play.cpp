@@ -617,6 +617,10 @@ void TV::InitKeys(void)
             "Display ATSC CC3"), "");
     REG_KEY("TV Playback", "SELECTCC708_3", QT_TRANSLATE_NOOP("MythControls",
             "Display ATSC CC4"), "");
+    REG_KEY("TV Playback", ACTION_ENABLEFORCEDSUBS, QT_TRANSLATE_NOOP("MythControls",
+            "Enable Forced Subtitles"), "");
+    REG_KEY("TV Playback", ACTION_DISABLEFORCEDSUBS, QT_TRANSLATE_NOOP("MythControls",
+            "Disable Forced Subtitles"), "");
 
     REG_KEY("TV Playback", "NEXTAUDIO", QT_TRANSLATE_NOOP("MythControls",
             "Next audio track"), "+");
