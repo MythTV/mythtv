@@ -71,9 +71,6 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void RegisterMediaPlugin(const QString &name, const QString &desc,
                              MediaPlayCallback fn);
 
-    void RegisterSystemEventHandler(QObject *eventHandler);
-    QObject *GetSystemEventHandler(void);
-
     bool HandleMedia(const QString& handler, const QString& mrl,
                      const QString& plot="", const QString& title="",
                      const QString& subtitle="", const QString& director="",

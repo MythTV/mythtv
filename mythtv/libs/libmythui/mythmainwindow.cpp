@@ -605,16 +605,6 @@ MythScreenStack* MythMainWindow::GetStackAt(int pos)
     return NULL;
 }
 
-void MythMainWindow::RegisterSystemEventHandler(QObject *eventHandler)
-{
-    d->sysEventHandler = eventHandler;
-}
-
-QObject *MythMainWindow::GetSystemEventHandler(void)
-{
-    return d->sysEventHandler;
-}
-
 void MythMainWindow::animate(void)
 {
     /* FIXME: remove */

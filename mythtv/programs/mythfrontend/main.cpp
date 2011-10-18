@@ -1673,7 +1673,6 @@ int main(int argc, char **argv)
         themeUpdateChecker = new ThemeUpdateChecker();
 
     MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
-    GetMythMainWindow()->RegisterSystemEventHandler(sysEventHandler);
 
     BackendConnectionManager bcm;
 
