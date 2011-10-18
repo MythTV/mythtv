@@ -255,7 +255,13 @@ class RegistrationDescriptor : public MPEGDescriptor
 {
   public:
     RegistrationDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::registration, 4) { }
+        MPEGDescriptor(data, len, DescriptorID::registration)
+    {
+        // The HD-PVR outputs a registration descriptor with a length
+        // of 8 rather than 4, so we accept any length >= 4, not just 4.
+        if (DescriptorLength() < 4)
+            _data = NULL;
+    }
 
     uint FormatIdentifier(void) const
         { return (_data[2]<<24) | (_data[3]<<16) | (_data[4]<<8) | _data[5]; }
