@@ -51,10 +51,15 @@ uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
     if (MPEGDescriptor::Find(desc, DescriptorID::ac3))
         return AC3Audio;
 
-    const unsigned char* d = NULL;
-    QString reg("");
-    if ((d = MPEGDescriptor::Find(desc, DescriptorID::registration)))
-        reg = RegistrationDescriptor(d,300).FormatIdentifierString();
+    QString reg;
+    const unsigned char *d = MPEGDescriptor::Find(
+        desc, DescriptorID::registration);
+    if (d)
+    {
+        RegistrationDescriptor rd(d);
+        if (rd.IsValid())
+            reg = rd.FormatIdentifierString();
+    }
 
     if (reg == "DTS1")
         return DTSAudio;

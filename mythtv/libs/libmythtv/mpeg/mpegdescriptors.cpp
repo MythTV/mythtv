@@ -374,84 +374,65 @@ QString MPEGDescriptor::DescriptorTagString(void) const
     return str;
 }
 
+#define SET_STRING(DESC_NAME) do { \
+    if (IsValid()) { DESC_NAME d(_data, DescriptorLength()+2); \
+    if (d.IsValid()) str = d.toString(); } } while (0)
+
 QString MPEGDescriptor::toString() const
 {
     QString str;
 
     if (DescriptorID::registration == DescriptorTag())
-        str = RegistrationDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(RegistrationDescriptor);
     else if (DescriptorID::iso_639_language == DescriptorTag())
-        str = ISO639LanguageDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ISO639LanguageDescriptor);
     else if (DescriptorID::avc_video == DescriptorTag())
-        str = AVCVideoDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(AVCVideoDescriptor);
     else if (DescriptorID::ac3_audio_stream == DescriptorTag())
-        str = AudioStreamDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(AudioStreamDescriptor);
     else if (DescriptorID::caption_service == DescriptorTag())
-        str = CaptionServiceDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(CaptionServiceDescriptor);
     else if (DescriptorID::extended_channel_name == DescriptorTag())
-        str = ExtendedChannelNameDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ExtendedChannelNameDescriptor);
     else if (DescriptorID::component_name == DescriptorTag())
-        str = ComponentNameDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ComponentNameDescriptor);
     else if (DescriptorID::conditional_access == DescriptorTag())
-        str = ConditionalAccessDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ConditionalAccessDescriptor);
     else if (DescriptorID::network_name == DescriptorTag())
-        str = NetworkNameDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(NetworkNameDescriptor);
     else if (DescriptorID::linkage == DescriptorTag())
-        str = LinkageDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(LinkageDescriptor);
     else if (DescriptorID::adaptation_field_data == DescriptorTag())
-        str = AdaptationFieldDataDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(AdaptationFieldDataDescriptor);
     else if (DescriptorID::ancillary_data == DescriptorTag())
-        str = AncillaryDataDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(AncillaryDataDescriptor);
     else if (DescriptorID::cable_delivery_system == DescriptorTag())
-        str = CableDeliverySystemDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(CableDeliverySystemDescriptor);
     else if (DescriptorID::satellite_delivery_system == DescriptorTag())
-        str = SatelliteDeliverySystemDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(SatelliteDeliverySystemDescriptor);
     else if (DescriptorID::terrestrial_delivery_system == DescriptorTag())
-        str = TerrestrialDeliverySystemDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(TerrestrialDeliverySystemDescriptor);
     else if (DescriptorID::frequency_list == DescriptorTag())
-        str = FrequencyListDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(FrequencyListDescriptor);
     else if (DescriptorID::service == DescriptorTag())
-        str = ServiceDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ServiceDescriptor);
     else if (DescriptorID::stream_identifier == DescriptorTag())
-        str = StreamIdentifierDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(StreamIdentifierDescriptor);
     else if (DescriptorID::default_authority == DescriptorTag())
-        str = DefaultAuthorityDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(DefaultAuthorityDescriptor);
     else if (DescriptorID::bouquet_name == DescriptorTag())
-        str = BouquetNameDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(BouquetNameDescriptor);
     else if (DescriptorID::country_availability == DescriptorTag())
-        str = CountryAvailabilityDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(CountryAvailabilityDescriptor);
     else if (DescriptorID::service_list == DescriptorTag())
-        str = ServiceListDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ServiceListDescriptor);
     else if (DescriptorID::scte_cue_identifier == DescriptorTag())
-        str = CueIdentifierDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(CueIdentifierDescriptor);
     /// POSSIBLY UNSAFE ! -- begin
     else if (PrivateDescriptorID::dvb_uk_channel_list == DescriptorTag())
-        str = UKChannelListDescriptor(_data, DescriptorLength()+2).toString();
+        SET_STRING(UKChannelListDescriptor);
     /// POSSIBLY UNSAFE ! -- end
-    else
+    else if (IsValid())
     {
         str = QString("%1 Descriptor (0x%2) length(%3)")
             .arg(DescriptorTagString())
@@ -459,6 +440,10 @@ QString MPEGDescriptor::toString() const
             .arg(DescriptorLength());
         //for (uint i=0; i<DescriptorLength(); i++)
         //    str.append(QString(" 0x%1").arg(int(_data[i+2]), 0, 16));
+    }
+    else
+    {
+        str = "Invalid Descriptor";
     }
     return str;
 }
