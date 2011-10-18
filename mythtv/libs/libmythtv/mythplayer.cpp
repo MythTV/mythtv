@@ -4396,6 +4396,18 @@ bool MythPlayer::TranscodeGetNextFrame(
     if (GetEof())
       return false;
     is_key = decoder->isLastFrameKey();
+
+    videofiltersLock.lock();
+    if (videoFilters)
+    {
+        FrameScanType ps = m_scan;
+        if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
+            ps = kScan_Progressive;
+
+        videoFilters->ProcessFrame(videoOutput->GetLastDecodedFrame(), ps);
+    }
+    videofiltersLock.unlock();
+
     return true;
 }
 
