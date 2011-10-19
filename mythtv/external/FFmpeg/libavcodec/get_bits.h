@@ -129,7 +129,11 @@ for examples see get_bits, show_bits, skip_bits, get_vlc
     unsigned int name##_index = (gb)->index;    \
     int name##_cache          = 0
 
-#   define CLOSE_READER(name, gb) (gb)->index = name##_index
+// Added the void use of the cache to defeat compiler warnings with newer gcc
+// (warning: variable 're_cache" set but not used)
+#   define CLOSE_READER(name, gb) \
+    (gb)->index = name##_index;   \
+    (void)name##_cache
 
 # ifdef ALT_BITSTREAM_READER_LE
 #   define UPDATE_CACHE(name, gb) \
