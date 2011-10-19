@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     bool cmdFound = false;
     int cmdResult = GENERIC_EXIT_OK;
     UtilMap::iterator i;
-    for (i = utilMap.begin(); i != utilMap.end(); i++)
+    for (i = utilMap.begin(); i != utilMap.end(); ++i)
     {
         if (cmdline.toBool(i.key()))
         {
