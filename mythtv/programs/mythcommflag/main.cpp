@@ -1006,7 +1006,7 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
         // assume file is in Video storage group on local backend
         // and try again
 
-        filename = QString("myth://Video@%1/%2")
+        filename = QString("myth://Videos@%1/%2")
                             .arg(gCoreContext->GetHostName()).arg(filename);
         pginfo->SetPathname(filename);
         if (!DoesFileExist(pginfo))
