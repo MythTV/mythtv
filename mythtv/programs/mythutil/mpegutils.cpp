@@ -288,13 +288,13 @@ class PrintMPEGStreamListener : public MPEGStreamListener
     void HandlePAT(const ProgramAssociationTable *pat)
     {
         if (pat)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, pat->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, pat->toString() + "\n");
     }
 
     void HandleCAT(const ConditionalAccessTable *cat)
     {
         if (cat)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, cat->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, cat->toString() + "\n");
     }
 
     void HandlePMT(uint program_num, const ProgramMapTable *pmt)
@@ -314,7 +314,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener
     void HandleSplice(const SpliceInformationTable *sit)
     {
         if (sit)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, sit->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, sit->toString() + "\n");
     }
 };
 
@@ -323,13 +323,13 @@ class PrintATSCMainStreamListener : public ATSCMainStreamListener
     void HandleSTT(const SystemTimeTable *stt)
     {
         if (stt)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, stt->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, stt->toString() + "\n");
     }
 
     void HandleMGT(const MasterGuideTable *mgt)
     {
         if (mgt)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, mgt->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, mgt->toString() + "\n");
     }
 
     void HandleVCT(uint pid, const VirtualChannelTable *vct)
@@ -366,20 +366,20 @@ class PrintATSCAuxStreamListener : public ATSCAuxStreamListener
     virtual void HandleRRT(const RatingRegionTable *rrt)
     {
         if (rrt)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, rrt->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, rrt->toString() + "\n");
     }
 
     virtual void HandleDCCT(const DirectedChannelChangeTable *dcct)
     {
         if (dcct)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, dcct->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, dcct->toString() + "\n");
     }
 
     virtual void HandleDCCSCT(
         const DirectedChannelChangeSelectionCodeTable *dccsct)
     {
         if (dccsct)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, dccsct->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, dccsct->toString() + "\n");
     }
 };
 
@@ -409,13 +409,13 @@ class PrintDVBMainStreamListener : public DVBMainStreamListener
     virtual void HandleTDT(const TimeDateTable *tdt)
     {
         if (tdt)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, tdt->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, tdt->toString() + "\n");
     }
 
     virtual void HandleNIT(const NetworkInformationTable *nit)
     {
         if (nit)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, nit->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, nit->toString() + "\n");
     }
 
     virtual void HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
@@ -434,7 +434,7 @@ class PrintDVBOtherStreamListener : public DVBOtherStreamListener
     virtual void HandleNITo(const NetworkInformationTable *nit)
     {
         if (nit)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, nit->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, nit->toString() + "\n");
     }
 
     virtual void HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
@@ -449,7 +449,7 @@ class PrintDVBOtherStreamListener : public DVBOtherStreamListener
     virtual void HandleBAT(const BouquetAssociationTable *bat)
     {
         if (bat)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, bat->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, bat->toString() + "\n");
     }
 
 };
@@ -459,13 +459,13 @@ class PrintDVBEITStreamListener : public DVBEITStreamListener
     virtual void HandleEIT(const DVBEventInformationTable *eit)
     {
         if (eit)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, eit->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, eit->toString() + "\n");
     }
 
     virtual void HandleEIT(const PremiereContentInformationTable *pcit)
     {
         if (pcit)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, pcit->toString());
+            LOG(VB_STDIO|VB_FLUSH, logLevel, pcit->toString() + "\n");
     }
 };
 
