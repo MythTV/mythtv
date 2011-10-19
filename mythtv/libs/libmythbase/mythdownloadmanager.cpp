@@ -27,6 +27,7 @@ using namespace std;
 #define LOC      QString("DownloadManager: ")
 
 MythDownloadManager *downloadManager = NULL;
+QMutex               dmCreateLock;
 
 /*!
 * \class MythDownloadInfo
@@ -134,21 +135,30 @@ void ShutdownMythDownloadManager(void)
  */
 MythDownloadManager *GetMythDownloadManager(void)
 {
-    if (!downloadManager)
-    {
-        downloadManager = new MythDownloadManager();
-        downloadManager->start();
-        while (!downloadManager->getQueueThread())
-            usleep(10000);
+    if (downloadManager)
+        return downloadManager;
 
-        downloadManager->moveToThread(downloadManager->getQueueThread());
-        downloadManager->setRunThread();
+    QMutexLocker locker(&dmCreateLock);
 
-        while (!downloadManager->isRunning())
-            usleep(10000);
+    // Check once more in case the download manager was created
+    // while we were securing the lock.
+    if (downloadManager)
+        return downloadManager;
 
-        atexit(ShutdownMythDownloadManager);
-    }
+    MythDownloadManager *tmpDLM = new MythDownloadManager();
+    tmpDLM->start();
+    while (!tmpDLM->getQueueThread())
+        usleep(10000);
+
+    tmpDLM->moveToThread(tmpDLM->getQueueThread());
+    tmpDLM->setRunThread();
+
+    while (!tmpDLM->isRunning())
+        usleep(10000);
+
+    downloadManager = tmpDLM;
+
+    atexit(ShutdownMythDownloadManager);
 
     return downloadManager;
 }
@@ -1039,7 +1049,10 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
     QDateTime result;
 
     QDateTime now = QDateTime::currentDateTime();
+
+    m_infoLock->lock();
     QNetworkCacheMetaData urlData = m_manager->cache()->metaData(QUrl(url));
+    m_infoLock->unlock();
 
     if (urlData.isValid())
     {
