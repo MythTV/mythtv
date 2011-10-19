@@ -178,12 +178,12 @@ void AppleRemote::_initCookieMap()
     cookieToButtonMapping["19_15_19_15_"]         = PlayHold;
 
     // ATV 2.30
-    cookieToButtonMapping["80"]                   = Up;
-    cookieToButtonMapping["48"]                   = Down;
-    cookieToButtonMapping["64"]                   = Menu;
-    cookieToButtonMapping["32"]                   = Select;
-    cookieToButtonMapping["96"]                   = Right;
-    cookieToButtonMapping["16"]                   = Left;
+    cookieToButtonMapping["17_9_280_80"]          = Up;
+    cookieToButtonMapping["17_9_280_48"]          = Down;
+    cookieToButtonMapping["17_9_280_64"]          = Menu;
+    cookieToButtonMapping["17_9_280_32"]          = Select;
+    cookieToButtonMapping["17_9_280_96"]          = Right;
+    cookieToButtonMapping["17_9_280_16"]          = Left;
 
     // 10.6 sequences:
     cookieToButtonMapping["33_31_30_21_20_2_"]            = Up;
