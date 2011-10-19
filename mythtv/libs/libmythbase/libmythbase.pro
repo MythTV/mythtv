@@ -81,15 +81,8 @@ macx {
     HEADERS += mythcdrom-darwin.h
     SOURCES += mythcdrom-darwin.cpp
 
-    # Mac OS X Frameworks
-    FWKS = IOKit
-
-    # The following trick is tidier, and shortens the command line, but it
-    # depends on the shell expanding Csh-style braces. Luckily, Bash & Zsh do.
-    FC = $$join(FWKS,",","{","}")
-
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
-    LIBS           += -framework $$join(FWKS," -framework ")
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/IOKit.framework/Frameworks
+    LIBS           += -framework IOKit
 }
 
 linux {
