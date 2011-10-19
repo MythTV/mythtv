@@ -1102,7 +1102,52 @@ QString SpliceInformationTable::toString(void) const
         .arg(SpliceCommandLength())
         .arg(SpliceCommandTypeString());
 
-    // TODO the actual meat
+    if (IsEncryptedPacket())
+        return str;
+
+    switch (SpliceCommandType())
+    {
+        case kSCTSpliceSchedule:
+            break;
+        case kSCTSpliceInsert:
+        {
+            str += "\n  " + SpliceInsert().toString();
+            break;
+        }
+        case kSCTTimeSignal:
+            break;
+    }
+
+    return str;
+}
+
+QString SpliceInsertView::toString(void) const
+{
+    QString str = 
+        QString("eventid(0x%1) cancel(%2) "
+                "out_of_network(%3) program_splice(%4) "
+                "duration(%5) immediate(%6)\n  ")
+        .arg(SpliceEventID(),0,16)
+        .arg(IsSpliceEventCancel()?"yes":"no")
+        .arg(IsOutOfNetwork()?"yes":"no")
+        .arg(IsProgramSplice()?"yes":"no")
+        .arg(IsDuration()?"yes":"no")
+        .arg(IsSpliceImmediate()?"yes":"no");
+
+    if (IsProgramSplice() && !IsSpliceImmediate())
+    {
+        SpliceTimeView tv = SpliceTime();
+        if (tv.IsTimeSpecified())
+            str += QString("splice_time(%1)").arg(tv.PTSTime());
+        else
+            str += QString("splice_time(N/A)");
+    }
+
+    str += QString(" unique_program_id(0x%1)")
+        .arg(UniqueProgramID(),0,16);
+
+    str += QString(" avail(%1/%2)")
+        .arg(AvailNum()).arg(AvailsExpected());
 
     return str;
 }

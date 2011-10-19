@@ -391,6 +391,9 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     // before the end of the section length field.
     uint SectionLength(void) const { return Length() + 3; }
 
+    ////////////////////////////////////////////////////////////
+    // Things below this line may not apply to SCTE/DVB tables.
+
     // table_id_extension  16       3.0      24   table dependent
     uint TableIDExtension(void) const
         { return (pesdata()[3]<<8) | pesdata()[4]; }
@@ -819,12 +822,18 @@ class MTV_PUBLIC SpliceInsertView
     //   reserved               7    4.1 + _ptrs1[0]
     //   if (splice_event_cancel_indicator == 0) {
     //     out_of_network_flag  1    5.0 + _ptrs1[0]
+    bool IsOutOfNetwork(void) const { return _ptrs1[0][5] & 0x80; }
     //     program_splice_flag  1    5.1 + _ptrs1[0]
+    bool IsProgramSplice(void) const { return _ptrs1[0][5] & 0x40; }
     //     duration_flag        1    5.2 + _ptrs1[0]
+    bool IsDuration(void) const { return _ptrs1[0][5] & 0x20; }
     //     splice_immediate_flag 1   5.3 + _ptrs1[0]
+    bool IsSpliceImmediate(void) const { return _ptrs1[0][5] & 0x20; }
     //     reserved             4    5.4 + _ptrs1[0]
     //     if ((program_splice_flag == 1) && (splice_immediate_flag == ‘0’))
     //       splice_time()   8-38    6.0 + _ptrs1[0]
+    SpliceTimeView SpliceTime(void) const
+        { return SpliceTimeView(_ptrs1[0]+6); }
     //     if (program_splice_flag == 0) {
     //       component_count    8    6.0 + _ptrs1[0]
     //       for (i = 0; i < component_count; i++) {
@@ -838,9 +847,15 @@ class MTV_PUBLIC SpliceInsertView
     //       reserved           6    0.1 + _ptrs1[1]
     //       duration          33    0.7 + _ptrs1[1]
     //     unique_program_id   16    0.0 + _ptrs1[2]
+    uint UniqueProgramID(void) const
+        { return (_ptrs1[2][0]<<8) | _ptrs1[2][1]; }
     //     avail_num            8    2.0 + _ptrs1[2]
+    uint AvailNum(void) const { return _ptrs1[2][2]; }
     //     avails_expected      8    3.0 + _ptrs1[2]
+    uint AvailsExpected(void) const { return _ptrs1[2][3]; }
     //   }
+
+    QString toString(void) const;
 
   private:
     vector<const unsigned char*> _ptrs0;
