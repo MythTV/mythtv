@@ -5,7 +5,6 @@
 #include "remoteutil.h"
 
 // local headers
-#include "mythutil.h"
 #include "backendutils.h"
 
 static int RawSendEvent(const QString &eventString)
