@@ -748,6 +748,19 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
             return true;
         }
+        case TableID::SITscte:
+        {
+            uint prog_num = psip.TableIDExtension();
+
+            SpliceInformationTable sit(psip);
+
+            _listener_lock.lock();
+            for (uint i = 0; i < _mpeg_listeners.size(); i++)
+                _mpeg_listeners[i]->HandleSplice(&sit);
+            _listener_lock.unlock();
+
+            return true;
+        }
     }
     return false;
 }
@@ -894,8 +907,11 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
         DONE_WITH_PES_PACKET();
     }
 
-    if (!psip->IsCurrent()) // we don't cache the next table, for now
+    // IsCurrent() does not apply to splice table..
+    if (TableID::SITscte != psip->TableID() && !psip->IsCurrent())
+    { // we don't cache the next table, for now
         DONE_WITH_PES_PACKET();
+    }
 
     if (tspacket->Scrambled())
     { // scrambled! ATSC, DVB require tables not to be scrambled
