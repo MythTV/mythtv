@@ -140,6 +140,14 @@ static int *firedec = 0;
 /** modif d'optim by Jeko : precalcul des 4 coefs résultant des 2 pos */
 int     precalCoef[16][16];
 
+/* Prototypes to keep gcc from spewing warnings */
+void generatePrecalCoef (void);
+void calculatePXandPY (int x, int y, int *px, int *py);
+void setPixelRGB (Uint * buffer, Uint x, Uint y, Color c);
+void setPixelRGB_ (Uint * buffer, Uint x, Color c);
+inline void getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c);
+void getPixelRGB_ (Uint * buffer, Uint x, Color * c);
+
 void
 generatePrecalCoef ()
 {
@@ -467,6 +475,9 @@ void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, uns
 }
 
 #ifdef USE_ASM
+void setAsmUse (int useIt);
+int getAsmUse (void);
+
 static int use_asm = 1;
 void
 setAsmUse (int useIt)
@@ -541,6 +552,9 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 		hypercosEffect = zf->hypercosEffect;
 		noisify = zf->noisify;
 	}
+
+	/* Silence a gcc warning */
+	(void)pertedec;
 
 	/** generation d'un effet **/
 	if (firstTime || zf) {

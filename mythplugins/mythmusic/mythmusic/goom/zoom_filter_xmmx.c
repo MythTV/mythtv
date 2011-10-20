@@ -1,5 +1,10 @@
 #include <mythtv/mythconfig.h>
 
+/* Prototypes to keep gcc from spewing warnings */
+void    zoom_filter_xmmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
+int 	zoom_filter_xmmx_supported (void);
+
+
 #if defined(MMX) && !defined(ARCH_X86_64)
 /* a definir pour avoir exactement le meme resultat que la fonction C
  * (un chouillat plus lent)

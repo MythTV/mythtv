@@ -304,7 +304,8 @@ class MTV_PUBLIC MythPlayer
 
     // Visualisations
     bool CanVisualise(void);
-    bool ToggleVisualisation(void);
+    bool IsVisualising(void);
+    bool EnableVisualisation(bool enable);
 
     void SaveTotalDuration(void);
     void ResetTotalDuration(void);

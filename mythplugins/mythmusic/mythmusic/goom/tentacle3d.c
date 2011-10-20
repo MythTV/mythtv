@@ -15,6 +15,11 @@ static float cycle = 0.0f;
 static grid3d *grille[nbgrid];
 static float *vals;
 
+/* Prototypes to keep gcc from spewing warnings */
+void tentacle_free (void);
+void tentacle_new (void);
+void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], float rapport, int drawit);
+
 void tentacle_free (void) {
         int tmp;
 	free (vals);

@@ -57,6 +57,9 @@ void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int
 			*p1 = color;
 		}
 	}
+
+	/* Squelch a gcc warning */
+	(void)p2;
 }
 
 void grid3d_draw (grid3d *g, int color, int colorlow,
