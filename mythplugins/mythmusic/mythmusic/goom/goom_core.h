@@ -14,6 +14,6 @@ void    goom_set_resolution (guint32 resx, guint32 resy, int cinemascope);
  * forceMode == 1..NB_FX : force a switch to FX n°forceMode
  */
 guint32 *goom_update (gint16 data[2][512], int forceMode);
-void    goom_close ();
+void    goom_close (void);
 
 #endif
