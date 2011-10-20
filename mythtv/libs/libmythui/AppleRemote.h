@@ -9,14 +9,17 @@
 // MythTV headers
 #include "mthread.h"
 
+#include <QTimer>
+
 #include <IOKit/IOKitLib.h>
 #include <IOKit/IOCFPlugIn.h>
 #include <IOKit/hid/IOHIDLib.h>
 #include <IOKit/hid/IOHIDKeys.h>
 #include <CoreFoundation/CoreFoundation.h>
 
-class AppleRemote : public MThread
+class AppleRemote : public QObject, public MThread
 {
+    Q_OBJECT
 public:
     enum Event
     { // label/meaning on White ... and Aluminium remote
@@ -31,7 +34,8 @@ public:
         MenuHold,
         PlayHold,  // was PlaySleep
         ControlSwitched,
-        PlayPause      // Play or Pause
+        PlayPause,     // Play or Pause
+        Undefined      // Used to handle the Apple TV > v2.3
     };
 
     class Listener
@@ -68,6 +72,12 @@ private:
     int                    remoteId;
     Listener*              _listener;
 
+    bool                   mUsingNewAtv;
+    AppleRemote::Event     mLastEvent;
+    int                    mEventCount;
+    bool                   mKeyIsDown;
+    QTimer*                mCallbackTimer;
+
     void        _initCookieMap();
     bool        _initCookies();
     bool        _createDeviceInterface(io_object_t hidDevice);
@@ -77,8 +87,14 @@ private:
                                       void* refcon, void* sender);
     void        _queueCallbackFunction(IOReturn result,
                                        void* refcon, void* sender);
+    void        _queueCallbackATV23(IOReturn result);
     void        _handleEventWithCookieString(std::string cookieString,
                                              SInt32 sumOfValues);
+    void        _handleEventATV23(std::string cookieString, SInt32 sumOfValues);
+    
+private slots:
+    // Key up event handling on the ATV v2.3 and above
+    void         TimeoutHandler();
 };
 
 #endif // APPLEREMOTE
