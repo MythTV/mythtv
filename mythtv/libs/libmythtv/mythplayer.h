@@ -434,6 +434,7 @@ class MTV_PUBLIC MythPlayer
     bool ToggleCaptions(uint mode);
     bool HasTextSubtitles(void)        { return subReader.HasTextSubtitles(); }
     void SetCaptionsEnabled(bool, bool osd_msg=true);
+    bool GetCaptionsEnabled(void);
     virtual void DisableCaptions(uint mode, bool osd_msg=true);
     virtual void EnableCaptions(uint mode, bool osd_msg=true);
 

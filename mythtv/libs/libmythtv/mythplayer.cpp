@@ -1469,6 +1469,18 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
     }
 }
 
+bool MythPlayer::GetCaptionsEnabled(void)
+{
+    return (kDisplayNUVTeletextCaptions == textDisplayMode) ||
+           (kDisplayTeletextCaptions    == textDisplayMode) ||
+           (kDisplayAVSubtitle          == textDisplayMode) ||
+           (kDisplayCC608               == textDisplayMode) ||
+           (kDisplayCC708               == textDisplayMode) ||
+           (kDisplayTextSubtitle        == textDisplayMode) ||
+           (kDisplayRawTextSubtitle     == textDisplayMode) ||
+           (kDisplayTeletextMenu        == textDisplayMode);
+}
+
 QStringList MythPlayer::GetTracks(uint type)
 {
     if (decoder)

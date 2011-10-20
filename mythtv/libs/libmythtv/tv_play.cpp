@@ -574,8 +574,12 @@ void TV::InitKeys(void)
             "Toggle the video aspect ratio"), "Ctrl+W");
     REG_KEY("TV Playback", "TOGGLEFILL", QT_TRANSLATE_NOOP("MythControls",
             "Next Preconfigured Zoom mode"), "W");
-    REG_KEY("TV Playback", "TOGGLECC", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_TOGGLESUBS, QT_TRANSLATE_NOOP("MythControls",
             "Toggle any captions"), "T");
+    REG_KEY("TV Playback", ACTION_ENABLESUBS, QT_TRANSLATE_NOOP("MythControls",
+            "Enable any captions"), "");
+    REG_KEY("TV Playback", ACTION_DISABLESUBS, QT_TRANSLATE_NOOP("MythControls",
+            "Disable any captions"), "");
     REG_KEY("TV Playback", "TOGGLETTC", QT_TRANSLATE_NOOP("MythControls",
             "Toggle Teletext Captions"),"");
     REG_KEY("TV Playback", "TOGGLESUBTITLE", QT_TRANSLATE_NOOP("MythControls",
@@ -3276,7 +3280,17 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
         handled = true;
         ctx->player->SetAllowForcedSubtitles(false);
     }
-    else if (action == "TOGGLECC" && !browsehelper->IsBrowsing())
+    else if (action == ACTION_ENABLESUBS)
+    {
+        handled = true;
+        ctx->player->SetCaptionsEnabled(true, true);
+    }
+    else if (action == ACTION_DISABLESUBS)
+    {
+        handled = true;
+        ctx->player->SetCaptionsEnabled(false, true);
+    }
+    else if (action == ACTION_TOGGLESUBS && !browsehelper->IsBrowsing())
     {
         handled = true;
         if (ccInputMode)
@@ -6609,7 +6623,7 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
     {
         commited = true;
         if (HasQueuedInput())
-            HandleTrackAction(ctx, "TOGGLECC");
+            HandleTrackAction(ctx, ACTION_TOGGLESUBS);
     }
     else if (asInputMode)
     {
@@ -10182,10 +10196,12 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
     uint text_curtrack  = ~0;
     bool havetext = false;
     bool forcedon = true;
+    bool enabled  = false;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
         // capmode      = ctx->player->GetCaptionMode();
+        enabled      = ctx->player->GetCaptionsEnabled();
         havetext     = ctx->player->HasTextSubtitles();
         forcedon     = ctx->player->GetAllowForcedSubtitles();
         av_tracks    = ctx->player->GetTracks(kTrackTypeSubtitle);
@@ -10225,8 +10241,10 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
         backaction = "MAIN";
         currenttext = tr("Subtitles");
 
-        if (have_subs)
-            osd->DialogAddButton(tr("Toggle Subtitles"), "TOGGLECC");
+        if (have_subs &&enabled)
+            osd->DialogAddButton(tr("Disable Subtitles"), ACTION_DISABLESUBS);
+        else if (have_subs && !enabled)
+            osd->DialogAddButton(tr("Enable Subtitles"), ACTION_ENABLESUBS);
         if (!av_tracks.empty())
         {
             if (forcedon)
