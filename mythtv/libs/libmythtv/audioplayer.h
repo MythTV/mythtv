@@ -77,6 +77,7 @@ class MTV_PUBLIC AudioPlayer
   private:
     void AddVisuals(void);
     void RemoveVisuals(void);
+    void ResetVisuals(void);
 
   private:
     MythPlayer  *m_parent;

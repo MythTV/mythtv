@@ -12,6 +12,7 @@ class VideoVisualSpectrum : public VideoVisual
 
     virtual void Draw(const QRect &area, MythPainter *painter,
                       QPaintDevice* device);
+    virtual void prepare();
 
   protected:
     virtual bool Initialise(const QRect &area);
