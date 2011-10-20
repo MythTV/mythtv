@@ -246,11 +246,11 @@ class VideoOutput
     QRect   GetSafeRect(void);
 
     // Visualisations
-    bool ToggleVisualisation(AudioPlayer *audio);
+    bool EnableVisualisation(AudioPlayer *audio, bool enable);
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render);
     virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render);
+    VideoVisual* GetVisualisation(void) { return m_visual; }
     void DestroyVisualisation(void);
-
 
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,

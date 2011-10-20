@@ -4116,7 +4116,11 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
     else if (has_action("TOGGLEAUDIOSYNC", actions))
         ChangeAudioSync(ctx, 0);   // just display
     else if (has_action(ACTION_TOGGLEVISUALISATION, actions))
-        ToggleVisualisation(ctx);
+        EnableVisualisation(ctx, false, true /*toggle*/);
+    else if (has_action(ACTION_ENABLEVISUALISATION, actions))
+        EnableVisualisation(ctx, true);
+    else if (has_action(ACTION_DISABLEVISUALISATION, actions))
+        EnableVisualisation(ctx, false);
     else if (has_action("TOGGLEPICCONTROLS", actions))
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Playback);
     else if (has_action(ACTION_TOGGLESTUDIOLEVELS, actions))
@@ -4162,12 +4166,15 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
     return handled;
 }
 
-void TV::ToggleVisualisation(const PlayerContext *ctx)
+void TV::EnableVisualisation(const PlayerContext *ctx, bool enable, bool toggle)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player && ctx->player->CanVisualise())
     {
-        bool on = ctx->player->ToggleVisualisation();
+        bool want = enable;
+        if (toggle)
+            want = !ctx->player->IsVisualising();
+        bool on = ctx->player->EnableVisualisation(want);
         SetOSDMessage(ctx, on ? tr("Visualisation On") :
                                 tr("Visualisation Off"));
     }
@@ -9632,7 +9639,11 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
     else if (action.left(15) == "TOGGLEAUDIOSYNC")
         ChangeAudioSync(actx, 0);
     else if (action == ACTION_TOGGLEVISUALISATION)
-        ToggleVisualisation(actx);
+        EnableVisualisation(actx, false, true /*toggle*/);
+    else if (action == ACTION_ENABLEVISUALISATION)
+        EnableVisualisation(actx, true);
+    else if (action == ACTION_DISABLEVISUALISATION)
+        EnableVisualisation(actx, false);
     else if (action.left(11) == ACTION_TOGGLESLEEP)
     {
         ToggleSleepTimer(actx, action.left(13));
@@ -9897,10 +9908,12 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
     uint curtrack = ~0;
     bool avsync = true;
     bool visual = false;
+    bool active = false;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
         visual = ctx->player->CanVisualise();
+        active = ctx->player->IsVisualising();
         tracks = ctx->player->GetTracks(kTrackTypeAudio);
         if (!tracks.empty())
             curtrack = (uint) ctx->player->GetTrack(kTrackTypeAudio);
@@ -9928,13 +9941,18 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
                                  "DIALOG_MENU_AUDIOTRACKS_0", true,
                                  selected == "AUDIOTRACKS");
         }
-        if (visual)
-        {
-            osd->DialogAddButton(tr("Toggle Visualisation"),
-                                 ACTION_TOGGLEVISUALISATION);
-        }
         if (avsync)
             osd->DialogAddButton(tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
+        if (visual && !active)
+        {
+            osd->DialogAddButton(tr("Enable Visualisation"),
+                                 ACTION_ENABLEVISUALISATION);
+        }
+        if (visual && active)
+        {
+            osd->DialogAddButton(tr("Disable Visualisation"),
+                                 ACTION_DISABLEVISUALISATION);
+        }
         osd->DialogAddButton(tr("Toggle Audio Upmixer"), ACTION_TOGGLEUPMIX);
     }
     else if (category == "AUDIOTRACKS")

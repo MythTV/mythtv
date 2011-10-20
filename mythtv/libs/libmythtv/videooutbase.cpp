@@ -1351,9 +1351,9 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     return show;
 }
 
-bool VideoOutput::ToggleVisualisation(AudioPlayer *audio)
+bool VideoOutput::EnableVisualisation(AudioPlayer *audio, bool enable)
 {
-    if (m_visual)
+    if (!enable)
     {
         DestroyVisualisation();
         return false;

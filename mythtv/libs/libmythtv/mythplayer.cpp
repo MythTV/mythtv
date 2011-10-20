@@ -4850,10 +4850,17 @@ bool MythPlayer::CanVisualise(void)
     return false;
 }
 
-bool MythPlayer::ToggleVisualisation(void)
+bool MythPlayer::IsVisualising(void)
 {
     if (videoOutput)
-        return videoOutput->ToggleVisualisation(&audio);
+        return videoOutput->GetVisualisation();
+    return false;
+}
+
+bool MythPlayer::EnableVisualisation(bool enable)
+{
+    if (videoOutput)
+        return videoOutput->EnableVisualisation(&audio, enable);
     return false;
 }
 

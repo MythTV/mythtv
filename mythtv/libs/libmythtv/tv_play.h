@@ -592,7 +592,7 @@ class MTV_PUBLIC TV : public QObject
     bool DiscMenuHandleAction(PlayerContext*, const QStringList &actions);
 
     // Visualisations
-    void ToggleVisualisation(const PlayerContext*);
+    void EnableVisualisation(const PlayerContext*, bool enable, bool toggle = false);
 
     // Program jumping stuff
     void SetLastProgram(const ProgramInfo *rcinfo);
