@@ -9886,9 +9886,9 @@ void TV::ShowOSDMenu(const PlayerContext *ctx, const QString category,
         FillOSDMenuAudio    (ctx, osd, cat, selected, currenttext, back);
         FillOSDMenuVideo    (ctx, osd, cat, selected, currenttext, back);
         FillOSDMenuSubtitles(ctx, osd, cat, selected, currenttext, back);
+        FillOSDMenuPlayback (ctx, osd, cat, selected, currenttext, back);
         FillOSDMenuNavigate (ctx, osd, cat, selected, currenttext, back);
         FillOSDMenuSchedule (ctx, osd, cat, selected, currenttext, back);
-        FillOSDMenuPlayback (ctx, osd, cat, selected, currenttext, back);
         FillOSDMenuSource   (ctx, osd, cat, selected, currenttext, back);
         FillOSDMenuJobs     (ctx, osd, cat, selected, currenttext, back);
 
