@@ -70,7 +70,6 @@ static QStringList allowed_video_renderers(
 static void SetFromEnv(bool &useXV, bool &useShm);
 static void SetFromHW(MythXDisplay *d, Window curwin,
                       bool &useXV, bool &useShm);
-static int calc_hue_base(const QString &adaptor_name);
 
 const char *vr_str[] =
 {
@@ -612,7 +611,7 @@ bool VideoOutputXv::InitXVideo()
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("XVideo Adaptor Name: '%1'")
             .arg(adaptor_name));
 
-    xv_hue_base = calc_hue_base(adaptor_name);
+    xv_hue_base = VideoOutput::CalcHueBase(adaptor_name);
 
     bool foundimageformat = false;
     int ids[] = { GUID_YV12_PLANAR, GUID_I420_PLANAR, GUID_IYUV_PLANAR, };
@@ -2089,17 +2088,4 @@ static QStringList allowed_video_renderers(
     }
 
     return list;
-}
-
-static int calc_hue_base(const QString &adaptor_name)
-{
-    if ((adaptor_name == "ATI Radeon Video Overlay") ||
-        (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
-        (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */) ||
-        (adaptor_name == "SIS 300/315/330 series Video Overlay"))
-    {
-        return 50;
-    }
-
-    return 0; //< nVidia normal
 }

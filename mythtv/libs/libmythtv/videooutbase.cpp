@@ -1739,3 +1739,21 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
             .arg(window.GetDisplayDim().height())
             .arg(window.GetDisplayAspect()));
 }
+
+int VideoOutput::CalcHueBase(const QString &adaptor_name)
+{
+    // XVideo adjustments
+    if ((adaptor_name == "ATI Radeon Video Overlay") ||
+        (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
+        (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */) ||
+        (adaptor_name == "SIS 300/315/330 series Video Overlay"))
+    {
+        return 50;
+    }
+
+    // VAAPI
+    if (adaptor_name.toLower().contains("xvba"))
+        return 50;
+
+    return 0; //< nVidia normal
+}

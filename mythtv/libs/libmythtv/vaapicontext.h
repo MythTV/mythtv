@@ -56,6 +56,7 @@ class VAAPIContext
     QHash<uint, void*> m_glxSurfaces;
     VADisplayAttribute* m_pictureAttributes;
     int            m_pictureAttributeCount;
+    int            m_hueBase;
 };
 
 #endif // VAAPICONTEXT_H

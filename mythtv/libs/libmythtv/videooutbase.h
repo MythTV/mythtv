@@ -252,6 +252,9 @@ class VideoOutput
     VideoVisual* GetVisualisation(void) { return m_visual; }
     void DestroyVisualisation(void);
 
+    // Hue adjustment for certain vendors (mostly ATI)
+    static int CalcHueBase(const QString &adaptor_name);
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,
