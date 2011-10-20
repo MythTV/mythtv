@@ -116,9 +116,10 @@ void MythUtilCommandLineParser::LoadArguments(void)
         );
 
     // mpegutils.cpp
-    add("--pids", "pids", "", "Pids to write", "")
+    add("--pids", "pids", "", "Pids to process", "")
         ->SetRequiredChildOf("pidfilter")
         ->SetRequiredChildOf("pidprinter");
+    add("--ptspids", "ptspids", "", "Pids to extract PTS from", "");
     add("--packetsize", "packetsize", 188, "TS Packet Size", "")
         ->SetChildOf("pidcounter")
         ->SetChildOf("pidfilter");

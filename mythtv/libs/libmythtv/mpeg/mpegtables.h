@@ -855,7 +855,7 @@ class MTV_PUBLIC SpliceInsertView
     uint AvailsExpected(void) const { return _ptrs1[2][3]; }
     //   }
 
-    QString toString(void) const;
+    QString toString(int64_t first, int64_t last) const;
 
   private:
     vector<const unsigned char*> _ptrs0;
@@ -1023,8 +1023,8 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 
     SpliceInformationTable *GetDecrypted(const QString &codeWord) const;
     bool Parse(void);
-    QString toString(void) const;
-    QString toStringXML(void) const;
+    QString toString(int64_t first=-1LL, int64_t last=-1LL) const;
+    QString toStringXML(int64_t first=-1LL, int64_t last=-1LL) const;
 
   private:
     vector<const unsigned char*> _ptrs0;

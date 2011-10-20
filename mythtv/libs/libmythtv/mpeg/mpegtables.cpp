@@ -1091,7 +1091,7 @@ QString SpliceInformationTable::SpliceCommandTypeString(void) const
     };
 }
 
-QString SpliceInformationTable::toString(void) const
+QString SpliceInformationTable::toString(int64_t first, int64_t last) const
 {
     QString str =
         QString("SpliceInformationTable enc_alg(%1) pts_adj(%2)")
@@ -1111,7 +1111,7 @@ QString SpliceInformationTable::toString(void) const
             break;
         case kSCTSpliceInsert:
         {
-            str += "\n  " + SpliceInsert().toString();
+            str += "\n  " + SpliceInsert().toString(first, last);
             break;
         }
         case kSCTTimeSignal:
@@ -1121,7 +1121,7 @@ QString SpliceInformationTable::toString(void) const
     return str;
 }
 
-QString SpliceInsertView::toString(void) const
+QString SpliceInsertView::toString(int64_t first, int64_t last) const
 {
     QString str = 
         QString("eventid(0x%1) cancel(%2) "
@@ -1138,9 +1138,33 @@ QString SpliceInsertView::toString(void) const
     {
         SpliceTimeView tv = SpliceTime();
         if (tv.IsTimeSpecified())
-            str += QString("splice_time(%1)").arg(tv.PTSTime());
+        {
+            int64_t abs_pts_time = tv.PTSTime();
+            if ((first > 0) && (last > 0))
+            {
+                int64_t elapsed = abs_pts_time - first;
+                elapsed = (elapsed < 0) ? elapsed + 0x1000000000LL : elapsed;
+                QTime abs = QTime(0,0,0,0).addMSecs(elapsed/90);
+
+                elapsed = abs_pts_time - last; /* rel_pts_time */
+                elapsed = (elapsed < 0) ? elapsed + 0x1000000000LL : elapsed;
+                QTime rel = QTime(0,0,0,0).addMSecs(elapsed/90);
+
+                str += QString("splice_time(pts: %1 abs: %2, rel: +%3)")
+                    .arg(abs_pts_time)
+                    .arg(abs.toString("hh:mm:ss.zzz"))
+                    .arg(rel.toString("hh:mm:ss.zzz"));
+            }
+            else
+            {
+                str += QString("splice_time(pts: %1)")
+                    .arg(abs_pts_time);
+            }
+        }
         else
+        {
             str += QString("splice_time(N/A)");
+        }
     }
 
     str += QString(" unique_program_id(0x%1)")
@@ -1152,7 +1176,7 @@ QString SpliceInsertView::toString(void) const
     return str;
 }
 
-QString SpliceInformationTable::toStringXML(void) const
+QString SpliceInformationTable::toStringXML(int64_t first, int64_t last) const
 {
     // TODO
     return "<SpliceInformationTable></SpliceInformationTable>";
