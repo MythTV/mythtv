@@ -191,6 +191,29 @@ class PESPacket
     /// 1 bit  Extension flags are present
     bool HasExtensionFlags()  const { return _pesdata[4] & 0x1; }
 
+    /// Presentation Time Stamp, present if HasPTS() is true
+    uint64_t PTS(void) const
+    {
+        int i = 6;
+        return
+            (uint64_t(_pesdata[i+0] & 0x0e) << 29) |
+            (uint64_t(_pesdata[i+1]       ) << 22) |
+            (uint64_t(_pesdata[i+2] & 0xfe) << 14) |
+            (uint64_t(_pesdata[i+3]       ) <<  7) |
+            (uint64_t(_pesdata[i+4] & 0xfe) >> 1);
+    }
+    /// Decode Time Stamp, present if HasDTS() is true
+    uint64_t DTS(void) const
+    {
+        int i = 6+5;
+        return
+            (uint64_t(_pesdata[i+0] & 0x0e) << 29) |
+            (uint64_t(_pesdata[i+1]       ) << 22) |
+            (uint64_t(_pesdata[i+2] & 0xfe) << 14) |
+            (uint64_t(_pesdata[i+3]       ) <<  7) |
+            (uint64_t(_pesdata[i+4] & 0xfe) >> 1);
+    }
+
     // 8 bits PES Header Length
     // variable length -- pes header fields
     // variable length -- pes data block
