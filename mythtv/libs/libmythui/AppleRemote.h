@@ -57,7 +57,6 @@ protected:
     AppleRemote(); // will be a singleton class
 
     static AppleRemote*      _instance;
-    static const int         REMOTE_SWITCH_COOKIE;
 
 
 private:

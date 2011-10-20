@@ -20,7 +20,9 @@
 #include "mythlogging.h"
 
 AppleRemote*    AppleRemote::_instance = 0;
-const int       AppleRemote::REMOTE_SWITCH_COOKIE = 19;
+
+
+#define REMOTE_SWITCH_COOKIE 19
 
 #define LOC QString("AppleRemote::")
 
