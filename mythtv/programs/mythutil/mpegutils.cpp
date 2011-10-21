@@ -33,6 +33,33 @@
 // Application local headers
 #include "mpegutils.h"
 
+static QHash<uint,bool> extract_pids(const QString &pidsStr, bool required)
+{
+    QHash<uint,bool> use_pid;
+    if (pidsStr.isEmpty())
+    {
+        if (required)
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --pids option\n");
+    }
+    else
+    {
+        QStringList pidsList = pidsStr.split(",");
+        for (uint i = 0; i < (uint) pidsList.size(); i++)
+        {
+            bool ok;
+            uint tmp = pidsList[i].toUInt(&ok, 0);
+            if (ok && (tmp < 0x2000))
+                use_pid[tmp] = true;
+        }
+        if (required && use_pid.empty())
+        {
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                "At least one pid must be specified\n");
+        }
+    }
+    return use_pid;
+}
+
 static int resync_stream(
     const char *buffer, int curr_pos, int len, int packet_size)
 {
@@ -179,33 +206,9 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    bool use_pid[0x2000];
-    if (cmdline.toString("pids").isEmpty())
-    {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --pids option\n");
+    QHash<uint,bool> use_pid = extract_pids(cmdline.toString("pids"), true);
+    if (use_pid.empty())
         return GENERIC_EXIT_INVALID_CMDLINE;
-    }
-    else
-    {
-        bool use_any_pid = false;
-        QString pidsStr = cmdline.toString("pids");
-        QStringList pidsList = pidsStr.split(",");
-        for (uint i = 0; i < 0x2000 ; i++)
-            use_pid[i] = false;
-        for (uint i = 0; i < (uint) pidsList.size(); i++)
-        {
-            bool ok;
-            uint tmp = pidsList[i].toUInt(&ok, 0);
-            if (ok && (tmp < 0x2000))
-                use_pid[tmp] = use_any_pid = true;
-        }
-        if (!use_any_pid)
-        {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-                "At least one pid must be specified\n");
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-    }
 
     RingBuffer *srcRB = RingBuffer::Create(src, false);
     if (!srcRB)
@@ -616,44 +619,12 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         return GENERIC_EXIT_NOT_OK;
     }
 
-    QHash<uint,bool> use_pid;
-    if (cmdline.toString("pids").isEmpty())
-    {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --pids option\n");
+    QHash<uint,bool> use_pid = extract_pids(cmdline.toString("pids"), true);
+    if (use_pid.empty())
         return GENERIC_EXIT_INVALID_CMDLINE;
-    }
-    else
-    {
-        QString pidsStr = cmdline.toString("pids");
-        QStringList pidsList = pidsStr.split(",");
-        for (uint i = 0; i < (uint) pidsList.size(); i++)
-        {
-            bool ok;
-            uint tmp = pidsList[i].toUInt(&ok, 0);
-            if (ok && (tmp < 0x2000))
-                use_pid[tmp] = true;
-        }
-        if (use_pid.empty())
-        {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-                "At least one pid must be specified\n");
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-    }
 
-    QHash<uint,bool> use_pid_for_pts;
-    if (!cmdline.toString("ptspids").isEmpty())
-    {
-        QString pidsStr = cmdline.toString("ptspids");
-        QStringList pidsList = pidsStr.split(",");
-        for (uint i = 0; i < (uint) pidsList.size(); i++)
-        {
-            bool ok;
-            uint tmp = pidsList[i].toUInt(&ok, 0);
-            if (ok && (tmp < 0x2000))
-                use_pid_for_pts[tmp] = true;
-        }
-    }
+    QHash<uint,bool> use_pid_for_pts =
+        extract_pids(cmdline.toString("ptspids"), false);
 
     ScanStreamData *sd = new ScanStreamData();
     for (QHash<uint,bool>::iterator it = use_pid.begin();
