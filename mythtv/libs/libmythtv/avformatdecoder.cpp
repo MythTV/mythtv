@@ -1352,7 +1352,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         QSize dim    = get_video_dim(*enc);
         int   width  = current_width  = dim.width();
         int   height = current_height = dim.height();
-        float aspect = current_aspect = get_aspect(*enc);
+        current_aspect = get_aspect(*enc);
 
         if (!width || !height)
         {
@@ -1361,7 +1361,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             width  = 640;
             height = 480;
             fps    = 29.97f;
-            aspect = 4.0f / 3.0f;
+            current_aspect = 4.0f / 3.0f;
         }
 
         m_parent->SetKeyframeDistance(keyframedist);

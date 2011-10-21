@@ -796,7 +796,6 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 }
 
                 // update our status
-                dvd_time_t timeFromCellStart = dsi->dsi_gi.c_eltm;
                 m_currentTime = (uint)dvdnav_get_current_time(m_dvdnav);
                 m_currentpos = GetReadPosition();
 

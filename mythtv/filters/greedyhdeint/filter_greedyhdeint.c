@@ -201,6 +201,7 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
 #endif
     {
         /* TODO plain old C implementation */
+        (void) bottom_field;
     }
 
 #if 0
