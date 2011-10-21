@@ -660,6 +660,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     const int kBufSize = 2 * 1024 * 1024;
     char *buffer = new char[kBufSize];
     int offset = 0;
+    uint64_t totalBytes = 0ULL;
 
     while (true)
     {
@@ -671,10 +672,11 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
 
         offset = sd->ProcessData((const unsigned char*)buffer, len);
 
+        totalBytes += len - offset;
         LOG(VB_STDIO|VB_FLUSH, logLevel,
             QString("\r                                            \r"
                     "Processed %1 bytes")
-            .arg(len - offset));
+            .arg(totalBytes));
     }
     LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
 
