@@ -664,7 +664,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         }
     }
 
-    ScanStreamData *sd = new ScanStreamData();
+    ScanStreamData *sd = new ScanStreamData(true);
     for (QHash<uint,bool>::iterator it = use_pid.begin();
          it != use_pid.end(); ++it)
     {
