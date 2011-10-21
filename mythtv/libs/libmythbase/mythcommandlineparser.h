@@ -41,6 +41,8 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 
     CommandLineArg* SetParentOf(QString opt);
     CommandLineArg* SetParentOf(QStringList opts);
+    CommandLineArg* SetChild(QString opt);
+    CommandLineArg* SetChild(QStringList opt);
     CommandLineArg* SetChildOf(QString opt);
     CommandLineArg* SetChildOf(QStringList opts);
     CommandLineArg* SetRequiredChild(QString opt);

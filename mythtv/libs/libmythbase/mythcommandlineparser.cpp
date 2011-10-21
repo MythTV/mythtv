@@ -411,6 +411,19 @@ CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
     return this;
 }
 
+CommandLineArg* CommandLineArg::SetChild(QString opt)
+{
+    m_children << new CommandLineArg(opt);
+    return this;
+}
+
+CommandLineArg* CommandLineArg::SetChild(QStringList opts)
+{
+    QStringList::const_iterator i = opts.begin();
+    for (; i != opts.end(); ++i)
+        m_children << new CommandLineArg(*i);
+    return this;
+}
 
 CommandLineArg* CommandLineArg::SetRequiredChild(QString opt)
 {
