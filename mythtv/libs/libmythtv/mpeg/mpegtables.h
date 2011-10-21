@@ -457,7 +457,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
 
 /** \class ProgramAssociationTable
  *  \brief The Program Association Table lists all the programs
- *         in a stream, and is alwyas found on PID 0.
+ *         in a stream, and is always found on PID 0.
  *
  *   Based on info in this table and the ProgramMapTable
  *   for the program we are interested in we should
