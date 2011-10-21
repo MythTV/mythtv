@@ -1366,12 +1366,9 @@ void VideoOutputXv::PrepareFrameXv(VideoFrame *frame)
     if (!frame)
         frame = vbuffers.GetScratchFrame();
 
-    XvImage *image = NULL;
-    {
-        QMutexLocker locker(&global_lock);
-        framesPlayed = frame->frameNumber + 1;
-        image        = (XvImage*) xv_buffers[frame->buf];
-    }
+    global_lock.lock();
+    framesPlayed = frame->frameNumber + 1;
+    global_lock.unlock();
 
     if (vbuffers.GetScratchFrame() == frame)
         vbuffers.SetLastShownFrameToScratch();
