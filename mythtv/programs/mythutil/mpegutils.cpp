@@ -406,30 +406,52 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
     return true;
 }
 
-class PrintMPEGStreamListener : public MPEGStreamListener
+class PrintOutput
 {
   public:
-    PrintMPEGStreamListener(PTSListener &ptsl) : m_ptsl(ptsl) { }
+    PrintOutput(RingBuffer *out) : m_out(out) { }
+
+    void Output(const QString &msg)
+    {
+        if (m_out)
+        {
+            QByteArray ba = msg.toUtf8();
+            m_out->Write(ba.constData(), ba.size());
+        }
+        else
+        {
+            LOG(VB_STDIO|VB_FLUSH, logLevel, msg);
+        }
+    }
+
+  private:
+    RingBuffer *m_out;
+};
+
+class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
+{
+  public:
+    PrintMPEGStreamListener(RingBuffer *out, PTSListener &ptsl) :
+        PrintOutput(out), m_ptsl(ptsl) { }
 
     void HandlePAT(const ProgramAssociationTable *pat)
     {
         if (pat)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, pat->toString() + "\n");
+            Output(pat->toString() + "\n");
     }
 
     void HandleCAT(const ConditionalAccessTable *cat)
     {
         if (cat)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, cat->toString() + "\n");
+            Output(cat->toString() + "\n");
     }
 
     void HandlePMT(uint program_num, const ProgramMapTable *pmt)
     {
         if (pmt)
         {
-            LOG(VB_STDIO|VB_FLUSH, logLevel,
-                QString("Program Number %1\n").arg(program_num) +
-                pmt->toString());
+            Output(QString("Program Number %1\n").arg(program_num) +
+                   pmt->toString());
         }
     }
 
@@ -442,7 +464,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener
         if (sit)
         {
             QTime ot = QTime(0,0,0,0).addMSecs(m_ptsl.GetElapsedPTS()/90);
-            LOG(VB_STDIO|VB_FLUSH, logLevel,
+            Output(
                 ot.toString("hh:mm:ss.zzz") + " " +
                 sit->toString(m_ptsl.GetFirstPTS(),
                               m_ptsl.GetLastPTS()) + "\n");
@@ -452,154 +474,157 @@ class PrintMPEGStreamListener : public MPEGStreamListener
     const PTSListener &m_ptsl;
 };
 
-class PrintATSCMainStreamListener : public ATSCMainStreamListener
+class PrintATSCMainStreamListener :
+    public ATSCMainStreamListener, public PrintOutput
 {
+  public:
+    PrintATSCMainStreamListener(RingBuffer *out) : PrintOutput(out) { }
+
     void HandleSTT(const SystemTimeTable *stt)
     {
         if (stt)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, stt->toString() + "\n");
+            Output(stt->toString() + "\n");
     }
 
     void HandleMGT(const MasterGuideTable *mgt)
     {
         if (mgt)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, mgt->toString() + "\n");
+            Output(mgt->toString() + "\n");
     }
 
     void HandleVCT(uint pid, const VirtualChannelTable *vct)
     {
         if (vct)
-        {
-            LOG(VB_STDIO|VB_FLUSH, logLevel,
-                QString("VCT PID 0x%1\n").arg(pid,0,16) + vct->toString());
-        }
+            Output(QString("VCT PID 0x%1\n").arg(pid,0,16) + vct->toString());
     }
 };
 
-class PrintATSCAuxStreamListener : public ATSCAuxStreamListener
+class PrintATSCAuxStreamListener :
+    public ATSCAuxStreamListener, public PrintOutput
 {
+  public:
+    PrintATSCAuxStreamListener(RingBuffer *out) : PrintOutput(out) { }
+
     virtual void HandleTVCT(
         uint pid, const TerrestrialVirtualChannelTable *tvct)
     {
         if (tvct)
-        {
-            LOG(VB_STDIO|VB_FLUSH, logLevel,
-                QString("TVCT PID 0x%1\n").arg(pid,0,16) + tvct->toString());
-        }
+            Output(QString("TVCT PID 0x%1\n").arg(pid,0,16) + tvct->toString());
     }
 
     virtual void HandleCVCT(uint pid, const CableVirtualChannelTable *cvct)
     {
         if (cvct)
-        {
-            LOG(VB_STDIO|VB_FLUSH, logLevel,
-                QString("CVCT PID 0x%1\n").arg(pid,0,16) + cvct->toString());
-        }
+            Output(QString("CVCT PID 0x%1\n").arg(pid,0,16) + cvct->toString());
     }
 
     virtual void HandleRRT(const RatingRegionTable *rrt)
     {
         if (rrt)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, rrt->toString() + "\n");
+            Output(rrt->toString() + "\n");
     }
 
     virtual void HandleDCCT(const DirectedChannelChangeTable *dcct)
     {
         if (dcct)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, dcct->toString() + "\n");
+            Output(dcct->toString() + "\n");
     }
 
     virtual void HandleDCCSCT(
         const DirectedChannelChangeSelectionCodeTable *dccsct)
     {
         if (dccsct)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, dccsct->toString() + "\n");
+            Output(dccsct->toString() + "\n");
     }
 };
 
-class PrintATSCEITStreamListener : public ATSCEITStreamListener
+class PrintATSCEITStreamListener :
+    public ATSCEITStreamListener, public PrintOutput
 {
+  public:
+    PrintATSCEITStreamListener(RingBuffer *out) : PrintOutput(out) { }
+
     virtual void HandleEIT(uint pid, const EventInformationTable *eit)
     {
         if (eit)
-        {
-            LOG(VB_STDIO|VB_FLUSH, logLevel,
-                QString("EIT PID 0x%1\n").arg(pid,0,16) + eit->toString());
-        }
+            Output(QString("EIT PID 0x%1\n").arg(pid,0,16) + eit->toString());
     }
 
     virtual void HandleETT(uint pid, const ExtendedTextTable *ett)
     {
         if (ett)
-        {
-            LOG(VB_STDIO|VB_FLUSH, logLevel,
-                QString("ETT PID 0x%1\n").arg(pid,0,16) + ett->toString());
-        }
+            Output(QString("ETT PID 0x%1\n").arg(pid,0,16) + ett->toString());
     }
 };
 
-class PrintDVBMainStreamListener : public DVBMainStreamListener
+class PrintDVBMainStreamListener :
+    public DVBMainStreamListener, public PrintOutput
 {
+  public:
+    PrintDVBMainStreamListener(RingBuffer *out) : PrintOutput(out) { }
+
     virtual void HandleTDT(const TimeDateTable *tdt)
     {
         if (tdt)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, tdt->toString() + "\n");
+            Output(tdt->toString() + "\n");
     }
 
     virtual void HandleNIT(const NetworkInformationTable *nit)
     {
         if (nit)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, nit->toString() + "\n");
+            Output(nit->toString() + "\n");
     }
 
     virtual void HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
     {
         if (sdt)
-        {
-            LOG(VB_STDIO|VB_FLUSH, logLevel,
-                QString("TSID 0x%1\n").arg(tsid,0,16) + sdt->toString());
-        }
+            Output(sdt->toString() + "\n");
     }
 
 };
 
-class PrintDVBOtherStreamListener : public DVBOtherStreamListener
+class PrintDVBOtherStreamListener :
+    public DVBOtherStreamListener, public PrintOutput
 {
+  public:
+    PrintDVBOtherStreamListener(RingBuffer *out) : PrintOutput(out) { }
+
     virtual void HandleNITo(const NetworkInformationTable *nit)
     {
         if (nit)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, nit->toString() + "\n");
+            Output(nit->toString() + "\n");
     }
 
     virtual void HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
     {
         if (sdt)
-        {
-            LOG(VB_STDIO|VB_FLUSH, logLevel,
-                QString("TSID 0x%1\n").arg(tsid,0,16) + sdt->toString());
-        }
+            Output(sdt->toString() + "\n");
     }
 
     virtual void HandleBAT(const BouquetAssociationTable *bat)
     {
         if (bat)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, bat->toString() + "\n");
+            Output(bat->toString() + "\n");
     }
 
 };
 
-class PrintDVBEITStreamListener : public DVBEITStreamListener
+class PrintDVBEITStreamListener :
+    public DVBEITStreamListener, public PrintOutput
 {
+  public:
+    PrintDVBEITStreamListener(RingBuffer *out) : PrintOutput(out) { }
+
     virtual void HandleEIT(const DVBEventInformationTable *eit)
     {
         if (eit)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, eit->toString() + "\n");
+            Output(eit->toString() + "\n");
     }
 
     virtual void HandleEIT(const PremiereContentInformationTable *pcit)
     {
         if (pcit)
-            LOG(VB_STDIO|VB_FLUSH, logLevel, pcit->toString() + "\n");
+            Output(pcit->toString() + "\n");
     }
 };
 
@@ -626,6 +651,19 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     QHash<uint,bool> use_pid_for_pts =
         extract_pids(cmdline.toString("ptspids"), false);
 
+    QString dest = cmdline.toString("outfile");
+    RingBuffer *out = NULL;
+    if (!dest.isEmpty())
+    {
+        out = RingBuffer::Create(dest, true);
+        if (!out)
+        {
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open output URL\n");
+            delete srcRB;
+            return GENERIC_EXIT_NOT_OK;
+        }
+    }
+
     ScanStreamData *sd = new ScanStreamData();
     for (QHash<uint,bool>::iterator it = use_pid.begin();
          it != use_pid.end(); ++it)
@@ -640,13 +678,13 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     }
 
     PTSListener                 *ptsl  = new PTSListener();
-    PrintMPEGStreamListener     *pmsl  = new PrintMPEGStreamListener(*ptsl);
-    PrintATSCMainStreamListener *pasl  = new PrintATSCMainStreamListener();
-    PrintATSCAuxStreamListener  *paasl = new PrintATSCAuxStreamListener();
-    PrintATSCEITStreamListener  *paesl = new PrintATSCEITStreamListener();
-    PrintDVBMainStreamListener  *pdmsl = new PrintDVBMainStreamListener();
-    PrintDVBOtherStreamListener *pdosl = new PrintDVBOtherStreamListener();
-    PrintDVBEITStreamListener   *pdesl = new PrintDVBEITStreamListener();
+    PrintMPEGStreamListener     *pmsl  = new PrintMPEGStreamListener(out,*ptsl);
+    PrintATSCMainStreamListener *pasl  = new PrintATSCMainStreamListener(out);
+    PrintATSCAuxStreamListener  *paasl = new PrintATSCAuxStreamListener(out);
+    PrintATSCEITStreamListener  *paesl = new PrintATSCEITStreamListener(out);
+    PrintDVBMainStreamListener  *pdmsl = new PrintDVBMainStreamListener(out);
+    PrintDVBOtherStreamListener *pdosl = new PrintDVBOtherStreamListener(out);
+    PrintDVBEITStreamListener   *pdesl = new PrintDVBEITStreamListener(out);
 
     sd->AddWritingListener(ptsl);
     sd->AddMPEGListener(pmsl);
@@ -699,8 +737,10 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     delete pdmsl;
     delete pdosl;
     delete pdesl;
-    delete srcRB;
     delete ptsl;
+
+    delete srcRB;
+    delete out;
 
     return GENERIC_EXIT_OK;
 }

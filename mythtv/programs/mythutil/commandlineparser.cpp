@@ -30,6 +30,7 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "Print PSIP pids in a MythTV Storage Group file", "")
                 ->SetGroup("MPEG-TS")
                 ->SetRequiredChild("infile")
+                ->SetChild("outfile")
 
         // markuputils.cpp
         << add("--gencutlist", "gencutlist", false,
