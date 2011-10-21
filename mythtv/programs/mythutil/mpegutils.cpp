@@ -431,13 +431,25 @@ class PrintOutput
 class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
 {
   public:
-    PrintMPEGStreamListener(RingBuffer *out, PTSListener &ptsl) :
-        PrintOutput(out), m_ptsl(ptsl) { }
+    PrintMPEGStreamListener(
+        RingBuffer *out, PTSListener &ptsl, bool autopts,
+        MPEGStreamData *sd, const QHash<uint,bool> &use_pid) :
+        PrintOutput(out), m_ptsl(ptsl),
+        m_autopts(autopts), m_sd(sd), m_use_pid(use_pid)
+    {
+        if (m_autopts)
+            m_sd->AddListeningPID(MPEG_PAT_PID);
+    }
 
     void HandlePAT(const ProgramAssociationTable *pat)
     {
-        if (pat)
+        if (pat && (!m_autopts || m_use_pid[MPEG_PAT_PID]))
             Output(pat->toString() + "\n");
+        if (pat && m_autopts)
+        {
+            for (uint i = 0; i < pat->ProgramCount(); i++)
+                m_sd->AddListeningPID(pat->ProgramPID(i));
+        }
     }
 
     void HandleCAT(const ConditionalAccessTable *cat)
@@ -448,10 +460,27 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
 
     void HandlePMT(uint program_num, const ProgramMapTable *pmt)
     {
-        if (pmt)
+        if (pmt && (!m_autopts || m_use_pid[pmt->tsheader()->PID()]))
+            Output(pmt->toString() + "\n");
+        if (pmt && m_autopts)
         {
-            Output(QString("Program Number %1\n").arg(program_num) +
-                   pmt->toString());
+            uint video_pid = 0, audio_pid = 0;
+            for (uint i = 0; i < pmt->StreamCount(); i++)
+            {
+                if (pmt->IsVideo(i, "mpeg"))
+                    video_pid = pmt->StreamPID(i);
+                else if (pmt->IsAudio(i, "mpeg"))
+                    audio_pid = pmt->StreamPID(i);
+            }
+            if (video_pid)
+                m_sd->AddWritingPID(video_pid);
+            else if (audio_pid)
+                m_sd->AddWritingPID(audio_pid);
+            else
+            {
+                LOG(VB_STDIO|VB_FLUSH, LOG_WARNING,
+                    "Couldn't find PTS stream\n");
+            }
         }
     }
 
@@ -472,6 +501,9 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
     }
   private:
     const PTSListener &m_ptsl;
+    bool m_autopts;
+    MPEGStreamData *m_sd;
+    const QHash<uint,bool> &m_use_pid;
 };
 
 class PrintATSCMainStreamListener :
@@ -664,6 +696,8 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         }
     }
 
+    bool autopts = !cmdline.toBool("noautopts");
+
     ScanStreamData *sd = new ScanStreamData(true);
     for (QHash<uint,bool>::iterator it = use_pid.begin();
          it != use_pid.end(); ++it)
@@ -678,7 +712,8 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     }
 
     PTSListener                 *ptsl  = new PTSListener();
-    PrintMPEGStreamListener     *pmsl  = new PrintMPEGStreamListener(out,*ptsl);
+    PrintMPEGStreamListener     *pmsl  =
+        new PrintMPEGStreamListener(out, *ptsl, autopts, sd, use_pid);
     PrintATSCMainStreamListener *pasl  = new PrintATSCMainStreamListener(out);
     PrintATSCAuxStreamListener  *paasl = new PrintATSCAuxStreamListener(out);
     PrintATSCEITStreamListener  *paesl = new PrintATSCEITStreamListener(out);
@@ -718,7 +753,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     }
     LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
 
-    if (!cmdline.toString("ptspids").isEmpty())
+    if (ptsl->GetFirstPTS() >= 0)
     {
         QTime ot = QTime(0,0,0,0).addMSecs(ptsl->GetElapsedPTS()/90);
 

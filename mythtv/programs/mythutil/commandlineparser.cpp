@@ -124,6 +124,8 @@ void MythUtilCommandLineParser::LoadArguments(void)
     add("--packetsize", "packetsize", 188, "TS Packet Size", "")
         ->SetChildOf("pidcounter")
         ->SetChildOf("pidfilter");
+    add("--noautopts", "noautopts", false, "Disables PTS discovery", "")
+        ->SetChildOf("pidprinter");
 
     // messageutils.cpp
     add("--udpport", "udpport", 6948, "(optional) UDP Port to send to", "")
