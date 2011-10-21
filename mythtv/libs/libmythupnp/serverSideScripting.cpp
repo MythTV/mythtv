@@ -21,6 +21,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
 
@@ -276,7 +277,7 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
 
         sTransBuffer.append(sLine.left(nEndTransPos).trimmed());
         QString trStr =
-            QObject::tr(sTransBuffer.trimmed().toLocal8Bit().data());
+            QCoreApplication::translate("HtmlUI", sTransBuffer.trimmed().toLocal8Bit().data());
         trStr.replace( '"', "\\\"" );
         sCode << "os.write( \"" << trStr << "\" );\n";
         sTransBuffer = "";
@@ -296,7 +297,7 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
             QString patStr = sLine.mid(nStartTransPos,
                                        (nEndTransPos + 7 - nStartTransPos));
             QString repStr = patStr.mid(6, patStr.length() - 13).trimmed();
-            sLine.replace(patStr, QObject::tr(repStr.toLocal8Bit().data()));
+            sLine.replace(patStr, QCoreApplication::translate("HtmlUI", repStr.toLocal8Bit().data()));
             return ProcessLine(sCode, sLine, bInCode, sTransBuffer);
         }
         else
