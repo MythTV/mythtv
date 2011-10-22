@@ -18,6 +18,8 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
 
     virtual void InitProcs(void)
     {
+        // GLSL version
+        m_GLSLVersion = "#version 100\n";
         // GLSL ES precision qualifiers
         m_qualifiers = "precision mediump float;\n";
 

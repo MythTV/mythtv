@@ -252,6 +252,8 @@ void MythRenderOpenGL2::InitProcs(void)
 {
     MythRenderOpenGL::InitProcs();
 
+    // GLSL version
+    m_GLSLVersion = "#version 110\n";
     m_qualifiers = QString();
 
     m_glCreateShader = (MYTH_GLCREATESHADERPROC)
@@ -813,7 +815,6 @@ bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
 
 void MythRenderOpenGL2::OptimiseShaderSource(QString &source)
 {
-    QString version = "#version 100\n";
     QString extensions = "";
     QString sampler = "sampler2D";
     QString texture = "texture2D";
@@ -827,7 +828,7 @@ void MythRenderOpenGL2::OptimiseShaderSource(QString &source)
 
     source.replace("GLSL_SAMPLER", sampler);
     source.replace("GLSL_TEXTURE", texture);
-    source.replace("GLSL_DEFINES", version + extensions + m_qualifiers);
+    source.replace("GLSL_DEFINES", m_GLSLVersion + extensions + m_qualifiers);
 
     LOG(VB_GENERAL, LOG_DEBUG, "\n" + source);
 }
