@@ -621,14 +621,10 @@ bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
         return false;
 
     int field = VA_FRAME_PICTURE;
-    //if (scan == kScan_Interlaced)
-    //    field = VA_TOP_FIELD;
-    //else if (scan == kScan_Intr2ndField)
-    //    field = VA_BOTTOM_FIELD;
-
-    //INIT_ST;
-    //va_status = vaSyncSurface(m_ctx.display, surf->m_id);
-    //CHECK_ST;
+    if (scan == kScan_Interlaced)
+        field = VA_TOP_FIELD;
+    else if (scan == kScan_Intr2ndField)
+        field = VA_BOTTOM_FIELD;
 
     INIT_ST;
     va_status = vaCopySurfaceGLX(m_ctx.display, glx_surface, surf->m_id, field);
