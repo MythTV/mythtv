@@ -626,9 +626,11 @@ bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
     else if (scan == kScan_Intr2ndField)
         field = VA_BOTTOM_FIELD;
 
+    m_display->m_x_disp->Lock();
     INIT_ST;
     va_status = vaCopySurfaceGLX(m_ctx.display, glx_surface, surf->m_id, field);
     CHECK_ST;
+    m_display->m_x_disp->Unlock();
     return true;
 }
 
@@ -637,6 +639,7 @@ void* VAAPIContext::GetGLXSurface(uint texture, uint texture_type)
     if (m_glxSurfaces.contains(texture))
         return m_glxSurfaces.value(texture);
 
+    MythXLocker locker(m_display->m_x_disp);
     void *glx_surface = NULL;
     INIT_ST;
     va_status = vaCreateSurfaceGLX(m_ctx.display, texture_type,
@@ -660,7 +663,7 @@ void VAAPIContext::ClearGLXSurfaces(void)
     if (!m_display)
         return;
 
-    m_display->m_x_disp->Lock();
+    MythXLocker locker(m_display->m_x_disp);
     INIT_ST;
     foreach (void* surface, m_glxSurfaces)
     {
@@ -668,5 +671,4 @@ void VAAPIContext::ClearGLXSurfaces(void)
         CHECK_ST;
     }
     m_glxSurfaces.clear();
-    m_display->m_x_disp->Unlock();
 }
