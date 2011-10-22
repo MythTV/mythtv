@@ -12,7 +12,7 @@ Jitterometer::Jitterometer(const QString &nname, int ncycles)
   : count(0), num_cycles(ncycles), starttime_valid(0), last_fps(0),
     last_sd(0), name(nname), cpustat(NULL), laststats(NULL)
 {
-    times = (unsigned*) malloc(num_cycles * sizeof(unsigned));
+    times.resize(num_cycles);
     memset(&starttime, 0, sizeof(struct timeval));
 
     if (name.isEmpty())
@@ -44,14 +44,14 @@ Jitterometer::~Jitterometer()
         cpustat->close();
     delete cpustat;
     delete [] laststats;
-
-    free(times);
 }
 
 void Jitterometer::SetNumCycles(int cycles)
 {
     num_cycles = cycles;
-    times = (unsigned*) realloc(times, num_cycles * sizeof(unsigned));
+    times.resize(num_cycles);
+    if (count >= num_cycles)
+        count = num_cycles - 1;
 }
 
 bool Jitterometer::RecordCycleTime()
