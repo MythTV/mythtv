@@ -367,11 +367,15 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
     DisableTextures();
     glEnableClientState(GL_VERTEX_ARRAY);
 
+    int lineWidth = linePen.width();
+    QRect r(area.left() + lineWidth, area.top() + lineWidth,
+            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
+
     if (fillBrush.style() != Qt::NoBrush)
     {
         SetColor(fillBrush.color().red(), fillBrush.color().green(),
                  fillBrush.color().blue(), fillBrush.color().alpha());
-        GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, area);
+        GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, r);
         glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
@@ -381,7 +385,7 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
         SetColor(linePen.color().red(), linePen.color().green(),
                  linePen.color().blue(), linePen.color().alpha());
         glLineWidth(linePen.width());
-        GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, area);
+        GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, r);
         glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
     }
