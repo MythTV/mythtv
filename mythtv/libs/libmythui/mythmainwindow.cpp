@@ -947,11 +947,11 @@ void MythMainWindow::Init(void)
 #endif
 #ifdef USE_OPENGL_PAINTER
     if ((painter == "auto" && (!d->painter && !d->paintwin)) ||
-        painter == "opengl")
+        painter.contains("opengl"))
     {
         LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL painter");
         d->painter = new MythOpenGLPainter();
-        d->render = MythRenderOpenGL::Create();
+        d->render = MythRenderOpenGL::Create(painter);
         MythRenderOpenGL *gl = dynamic_cast<MythRenderOpenGL*>(d->render);
         d->paintwin = new MythPainterWindowGL(this, d, gl);
         QGLWidget *qgl = dynamic_cast<QGLWidget *>(d->paintwin);

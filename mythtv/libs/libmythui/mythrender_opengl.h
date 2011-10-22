@@ -89,7 +89,8 @@ class MUI_PUBLIC OpenGLLocker
 class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 {
   public:
-    static MythRenderOpenGL* Create(QPaintDevice* device = NULL);
+    static MythRenderOpenGL* Create(const QString &painter,
+                                    QPaintDevice* device = NULL);
 
     MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
                      RenderType type = kRenderUnknown);
