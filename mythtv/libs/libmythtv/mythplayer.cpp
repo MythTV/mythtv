@@ -48,6 +48,7 @@ using namespace std;
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
 #include "avformatdecoder.h"
+#include "gpuavdecoder.h"
 #include "dummydecoder.h"
 #include "jobqueue.h"
 #include "NuppelVideoRecorder.h"
@@ -881,7 +882,20 @@ void MythPlayer::OpenDummy(void)
 void MythPlayer::CreateDecoder(char *testbuf, int testreadsize,
                                bool allow_libmpeg2, bool no_accel)
 {
-    if (NuppelDecoder::CanHandle(testbuf, testreadsize))
+    if (player_ctx->GetSpecialDecode() == kAVSpecialDecode_GPUDecode)
+    {
+        player_ctx->SetSpecialDecode(kAVSpecialDecode_NoDecode);
+        if (GPUAvDecoder::CanHandle(testbuf,
+                                    player_ctx->buffer->GetFilename(),
+                                    testreadsize))
+        {
+            SetDecoder(new GPUAvDecoder(this, *player_ctx->playingInfo,
+                                        using_null_videoout,
+                                        allow_libmpeg2, no_accel,
+                                        player_ctx->GetSpecialDecode()));
+        }
+    }
+    else if (NuppelDecoder::CanHandle(testbuf, testreadsize))
         SetDecoder(new NuppelDecoder(this, *player_ctx->playingInfo));
     else if (AvFormatDecoder::CanHandle(testbuf,
                                         player_ctx->buffer->GetFilename(),

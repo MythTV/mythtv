@@ -289,9 +289,11 @@ using_frontend {
     # A/V decoders
     HEADERS += decoderbase.h
     HEADERS += nuppeldecoder.h          avformatdecoder.h
+    HEADERS += gpuavdecoder.h
     HEADERS += avformatdecoderbd.h      avformatdecoderdvd.h
     HEADERS += privatedecoder.h
     SOURCES += decoderbase.cpp
+    SOURCES += gpuavdecoder.cpp
     SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
     SOURCES += avformatdecoderbd.cpp    avformatdecoderdvd.cpp
     SOURCES += privatedecoder.cpp

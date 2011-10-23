@@ -121,6 +121,7 @@ typedef enum AVSpecialDecode
     kAVSpecialDecode_FewBlocks      = 0x04,
     kAVSpecialDecode_NoLoopFilter   = 0x08,
     kAVSpecialDecode_NoDecode       = 0x10,
+    kAVSpecialDecode_GPUDecode      = 0x20,
 } AVSpecialDecode;
 
 inline bool is_interlaced(FrameScanType scan)
