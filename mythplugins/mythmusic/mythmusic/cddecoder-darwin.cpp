@@ -221,7 +221,7 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
     QString cddb = HttpComms::getHttp(URL2);
 
 #if 0
-    LOG(VB_MEDIA, LOG_INFO, "CDDB lookup: " + URL);
+    LOG(VB_MEDIA, LOG_INFO, "CDDB lookup: " + URL2);
     LOG(VB_MEDIA, LOG_INFO, "...returned: " + cddb);
 #endif
     //
@@ -234,12 +234,24 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
     // We should check for errors here, and possibly do a CDDB lookup
     // (telnet 8880) if it failed, but Nigel is feeling lazy.
 
-    if (stat == 211)  // Multiple matches
+    if (stat == 210 || stat == 211)  // Multiple matches
     {
+        // e.g. 210 Found exact matches, list follows (until terminating `.')
+        //      folk 9c09590b Michael W Smith / Stand
+        //      misc 9c09590b Michael W. Smith / Stand
+        //      rock 9c09590b Michael W. Smith / Stand
+        //      classical 9c09590b Michael W. Smith / Stand
+        //      .
         // TODO
         // Parse disks, put up dialog box, select disk, prune cddb to selected
         LOG(VB_MEDIA, LOG_INFO,
             "Multiple CDDB matches. Please implement this code");
+
+        // For now, we just choose the first match.
+        //int EOL = cddb.indexOf('\n');
+        cddb.remove(0, cddb.indexOf('\n'));
+        LOG(VB_MEDIA, LOG_INFO, "String now: " + cddb);
+        stat = 200;
     }
 
     if (stat == 200)  // One unique match
