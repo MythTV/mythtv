@@ -7,6 +7,7 @@
 
 #if defined(Q_WS_X11)
 #include <QX11Info>
+#include <GL/glu.h>
 #include <GL/glx.h>
 #include <GL/glu.h>
 #endif
