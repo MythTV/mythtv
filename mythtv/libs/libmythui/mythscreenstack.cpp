@@ -171,9 +171,12 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
     {
         // Screen still needs to be redrawn if we have popped the last screen
         // off the popup stack, or similar
-        MythScreenType *mainscreen = mainwindow->GetMainStack()->GetTopScreen();
-        if (mainscreen)
-            mainscreen->SetRedraw();
+        if (mainwindow->GetMainStack())
+        {
+            MythScreenType *mainscreen = mainwindow->GetMainStack()->GetTopScreen();
+            if (mainscreen)
+                mainscreen->SetRedraw();
+        }
 
         if (!allowFade || !m_DoTransitions)
             emit topScreenChanged(NULL);

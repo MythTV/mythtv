@@ -475,8 +475,13 @@ MythMainWindow::~MythMainWindow()
 
     while (!d->stackList.isEmpty())
     {
-        delete d->stackList.back();
+        MythScreenStack *stack = d->stackList.back();
         d->stackList.pop_back();
+
+        if (stack == d->mainStack)
+            d->mainStack = NULL;
+
+        delete stack;
     }
 
     delete d->m_themeBase;
