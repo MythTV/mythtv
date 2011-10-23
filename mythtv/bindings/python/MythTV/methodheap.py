@@ -393,7 +393,7 @@ class BEEventMonitor( BECache ):
     def eventMonitor(self, event=None):
         if event is None:
             return re.compile('BACKEND_MESSAGE')
-        self.log(MythLog.ALL-MythLog.EXTRA, event)
+        self.log(MythLog.ALL, MythLog.INFO, event)
 
 class MythSystemEvent( BECache ):
     class systemeventhandler( object ):
@@ -611,7 +611,6 @@ class Frontend( FEConnection ):
 class MythDB( DBCache ):
     __doc__ = DBCache.__doc__+"""
         obj.searchRecorded()    - return a list of matching Recorded objects
-        obj.getRecorded()       - return a single matching Recorded object
         obj.searchOldRecorded() - return a list of matching
                                   OldRecorded objects
         obj.searchJobs()        - return a list of matching Job objects
@@ -619,7 +618,6 @@ class MythDB( DBCache ):
         obj.searchRecord()      - return a list of matching Record rules
         obj.getFrontends()      - return a list of available Frontends
         obj.getFrontend()       - return a single Frontend object
-        obj.getChannels()       - return a list of all channels
     """
 
 

@@ -32,9 +32,9 @@ class System( DBCache ):
             s = cls(path, db=db)
             res = s._runcmd(command)
             if len(res):
-                s.log(MythLog.SYSTEM|MythLog.EXTRA, '---- Output ----', res)
+                s.log(MythLog.SYSTEM, MythLog.DEBUG, '---- Output ----', res)
             if len(s.stderr):
-                s.log(MythLog.SYSTEM|MythLog.EXTRA,
+                s.log(MythLog.SYSTEM, MythLog.DEBUG,
                                                '---- Error  ----', s.stderr)
             return 0
         except (MythDBError,MythFileError):
@@ -116,12 +116,12 @@ class System( DBCache ):
         return self._runcmd('%s %s' % (self.path, arg))
 
     def _runshell(self, cmd):
-        self.log(MythLog.SYSTEM, 'Running external command', cmd)
+        self.log(MythLog.SYSTEM, MythLog.INFO, 'Running external command', cmd)
         fd = Popen(cmd, stdout=-1, stderr=-1, shell=True)
         return self._runshared(fd, cmd)
 
     def _runnative(self, cmd):
-        self.log(MythLog.SYSTEM, 'Running external command', cmd)
+        self.log(MythLog.SYSTEM, MythLog.INFO, 'Running external command', cmd)
         args = shlex.split(cmd)
         fd = Popen(args, stdout=-1, stderr=-1)
         return self._runshared(fd, cmd)

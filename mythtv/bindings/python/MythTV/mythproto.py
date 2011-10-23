@@ -296,7 +296,8 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
                 path = sg.dirname+filename.rsplit('/',1)[0]
                 if not os.access(path, os.F_OK):
                     os.makedirs(path)
-            log(log.FILE, 'Opening local file (w)', sg.dirname+filename)
+            log(log.FILE, log.INFO, 'Opening local file (w)',
+                sg.dirname+filename)
             return open(sg.dirname+filename, mode)
 
         # fallback to remote write
@@ -310,8 +311,8 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
         sg = findfile(filename, sgroup, db)
         if sg is not None:
             # file found, open local
-            log(log.FILE, 'Opening local file (r)',
-                           sg.dirname+filename)
+            log(log.FILE, log.INFO, 'Opening local file (r)',
+                sg.dirname+filename)
             return open(sg.dirname+filename, mode)
         else:
         # file not found, open remote
@@ -988,7 +989,7 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
             cmd = cmd.replace('%%%sISO%%' % tag, t.isoformat())
             cmd = cmd.replace('%%%sISOUTC%%' % tag, \
                         (t+timedelta(0,altzone)).isoformat())
-        cmd = cmd.replace('%VERBOSELEVEL%', MythLog._parselevel())
+        cmd = cmd.replace('%VERBOSELEVEL%', MythLog._parsemask())
         cmd = cmd.replace('%RECID%', str(self.recordid))
 
         path = FileOps(self.hostname, db=self._db).fileExists(\
