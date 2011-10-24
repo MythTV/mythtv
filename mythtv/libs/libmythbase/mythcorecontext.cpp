@@ -980,6 +980,9 @@ void MythCoreContext::SendEvent(const MythEvent &event)
 
 void MythCoreContext::SendSystemEvent(const QString msg)
 {
+    if (GetSetting("MasterServerIP", "").isEmpty())
+        return;
+
     SendMessage(QString("SYSTEM_EVENT %1 SENDER %2")
                         .arg(msg).arg(GetHostName()));
 }
