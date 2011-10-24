@@ -2,6 +2,7 @@ SOURCES += ../libs/libmythbase/*.cpp
 SOURCES += ../libs/libmythbase/*.h
 SOURCES += ../libs/libmyth/*.cpp
 SOURCES += ../libs/libmyth/*.h
+SOURCES += ../libs/libmythmetadata/*.cpp
 SOURCES += ../libs/libmythtv/*.cpp
 SOURCES += ../libs/libmythtv/*.h
 SOURCES += ../libs/libmythtv/channelscan/*.cpp
