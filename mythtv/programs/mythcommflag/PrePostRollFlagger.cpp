@@ -406,10 +406,11 @@ void PrePostRollFlagger::GetCommercialBreakList(frm_dir_map_t &marks)
             end = closestAfterPre;
         else
             end = closestBeforePre;
-    }else if(closestBeforePre)
+    }
+    else if(closestBeforePre)
         end = closestBeforePre;
     else if(closestAfterPre)
-        end  = closestAfterPre;
+        end = closestAfterPre;
     else
         end = preRoll;
 
@@ -431,7 +432,7 @@ void PrePostRollFlagger::GetCommercialBreakList(frm_dir_map_t &marks)
     else if(closestBeforePost)
         start = closestBeforePost;
     else if(closestAfterPost)
-        start  = closestAfterPre;
+        start = closestAfterPost;
     else if(postRoll)
         start = myTotalFrames - postRoll;
 
