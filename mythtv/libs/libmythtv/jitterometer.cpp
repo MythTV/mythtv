@@ -50,8 +50,7 @@ void Jitterometer::SetNumCycles(int cycles)
 {
     num_cycles = cycles;
     times.resize(num_cycles);
-    if (count >= num_cycles)
-        count = num_cycles - 1;
+    count = 0;
 }
 
 bool Jitterometer::RecordCycleTime()
