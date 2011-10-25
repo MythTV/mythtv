@@ -146,9 +146,8 @@ void MythUITextEdit::Finalize()
 
     // Give it something to chew on, so it can position the initial
     // cursor in the right place
-    SetText(".", false);
+    m_Text->SetText("");
     m_cursorImage->SetPosition(m_Text->CursorPosition(0));
-    SetText("", false);
 }
 
 void MythUITextEdit::SetInitialStates()

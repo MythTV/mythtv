@@ -109,7 +109,7 @@ void MythUIText::SetText(const QString &text)
 {
     QString newtext = text;
 
-    if (newtext == m_Message)
+    if (!m_Layouts.isEmpty() && newtext == m_Message)
         return;
 
     if (newtext.isEmpty())
@@ -535,6 +535,9 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
 
 void MythUIText::FillCutMessage(bool reset_size)
 {
+    if (m_Area.isNull())
+        return;
+
     qreal  width, height;
     QRectF min_rect;
     QFontMetrics fm(GetFontProperties()->face());
@@ -567,16 +570,31 @@ void MythUIText::FillCutMessage(bool reset_size)
     if (m_CutMessage.isEmpty())
         m_CutMessage = m_Message;
 
-    if (m_Area.isNull() || (!reset_size && m_CutMessage.isEmpty()))
-        return;
-
     if (m_CutMessage.isEmpty())
     {
-        QVector<QTextLayout *>::iterator Ilayout;
-        for (Ilayout = m_Layouts.begin(); Ilayout != m_Layouts.end(); ++Ilayout)
-            (*Ilayout)->clearLayout();
+        if (!reset_size)
+            return;
 
-        m_drawRect = m_Area;
+        if (m_Layouts.empty())
+            m_Layouts.push_back(new QTextLayout);
+
+        QTextLine line;
+        QTextOption textoption(static_cast<Qt::Alignment>(m_Justification));
+        QVector<QTextLayout *>::iterator Ilayout = m_Layouts.begin();
+
+        (*Ilayout)->setTextOption(textoption);
+        (*Ilayout)->setText("");
+        (*Ilayout)->beginLayout();
+        line = (*Ilayout)->createLine();
+        line.setLineWidth(m_Area.width());
+        line.setPosition(QPointF(0, 0));
+        (*Ilayout)->endLayout();
+        min_rect = line.naturalTextRect();
+        m_drawRect.setWidth(m_Area.width());
+        m_drawRect.setHeight(m_lineHeight);
+
+        for (++Ilayout ; Ilayout != m_Layouts.end(); ++Ilayout)
+            (*Ilayout)->clearLayout();
     }
     else
     {
@@ -828,23 +846,6 @@ void MythUIText::Pulse(void)
             }
             break;
         }
-#if 0
-        LOG(VB_GENERAL, LOG_ERR, QString("'%1' Area (%2,%3,%4,%5) draw (%6,%7,%8,%9) canvas (%10,%11,%12,%13)")
-            .arg(objectName())
-            .arg(m_Area.x())
-            .arg(m_Area.y())
-            .arg(m_Area.width())
-            .arg(m_Area.height())
-            .arg(m_drawRect.x())
-            .arg(m_drawRect.y())
-            .arg(m_drawRect.width())
-            .arg(m_drawRect.height())
-            .arg(m_Canvas.x())
-            .arg(m_Canvas.y())
-            .arg(m_Canvas.width())
-            .arg(m_Canvas.height())
-            );
-#endif
     }
 }
 
