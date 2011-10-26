@@ -7,7 +7,7 @@ using namespace std;
 #include <QRegExp>
 #include <QDir>
 #include <QApplication>
-#include <QDateTime>
+#include <QTime>
 
 #include "tv_play.h"
 #include "programinfo.h"
@@ -88,10 +88,11 @@ class VideoPerformanceTest
         Jitterometer *jitter = new Jitterometer("Performance: ", mp->GetFrameRate());
 
         int ms = secondstorun * 1000;
-        QDateTime start = QDateTime::currentDateTime();
+        QTime start = QTime::currentTime();
         while (1)
         {
-            if (start.msecsTo(QDateTime::currentDateTime()) > ms)
+            int duration = start.msecsTo(QTime::currentTime());
+            if (duration < 0 || duration > ms)
             {
                 LOG(VB_GENERAL, LOG_INFO, "Complete.");
                 break;
