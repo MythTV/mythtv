@@ -387,6 +387,7 @@ class MTV_PUBLIC MythPlayer
     virtual bool PrebufferEnoughFrames(int min_buffers = 0);
     void         SetBuffering(bool new_buffering);
     void         RefreshPauseFrame(void);
+    void         CheckAspectRatio(VideoFrame* frame);
     virtual void DisplayPauseFrame(void);
     virtual void DisplayNormalFrame(bool check_prebuffer = true);
     virtual void PreProcessNormalFrame(void);

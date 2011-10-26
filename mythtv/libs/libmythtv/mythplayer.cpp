@@ -2109,6 +2109,25 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     return true;
 }
 
+void MythPlayer::CheckAspectRatio(VideoFrame* frame)
+{
+    if (!frame)
+        return;
+
+    if (!qFuzzyCompare(frame->aspect, video_aspect) && frame->aspect > 0.0f)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Video Aspect ratio changed from %1 to %2")
+            .arg(video_aspect).arg(frame->aspect));
+        video_aspect = frame->aspect;
+        if (videoOutput)
+        {
+            videoOutput->VideoAspectRatioChanged(video_aspect);
+            ReinitOSD();
+        }
+    }
+}
+
 void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 {
     if (allpaused || (check_prebuffer && !PrebufferEnoughFrames()))
@@ -2122,21 +2141,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     VideoFrame *frame = videoOutput->GetLastShownFrame();
 
     // Check aspect ratio
-    if (frame)
-    {
-        if (!qFuzzyCompare(frame->aspect, video_aspect) && frame->aspect > 0.0f)
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Video Aspect ratio changed from %1 to %2")
-                    .arg(video_aspect).arg(frame->aspect));
-            video_aspect = frame->aspect;
-            if (videoOutput)
-            {
-                videoOutput->VideoAspectRatioChanged(video_aspect);
-                ReinitOSD();
-            }
-        }
-    }
+    CheckAspectRatio(frame);
 
     // Player specific processing (dvd, bd, mheg etc)
     PreProcessNormalFrame();
