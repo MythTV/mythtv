@@ -116,6 +116,12 @@ using_lirc {
     SOURCES += lirc.cpp lircevent.cpp lirc_client.c
 }
 
+using_libcec {
+    DEFINES += USING_LIBCEC
+    HEADERS += cecadapter.h
+    SOURCES += cecadapter.cpp
+}
+
 using_xrandr {
     DEFINES += USING_XRANDR
     HEADERS += DisplayResX.h

@@ -105,6 +105,9 @@ Advanced options (experts only):
   --enable-valgrind        disables timeouts for valgrind memory debugging
   --disable-lirc           disable lirc support (Infrared Remotes)
   --disable-joystick-menu  disable joystick menu
+  --disable-libcec         disable libCEC device support
+  --libcec-path=HDRLOC     location of directory containing
+                           cec.h [$libcec_path_default]
   --disable-firewire       disable support for FireWire cable boxes
   --disable-iptv           disable support for recording RTSP/UDP/RTP streams
   --disable-hdhomerun      disable support for HDHomeRun boxes
@@ -1346,6 +1349,7 @@ MYTHTV_CONFIG_LIST='
     ivtv
     asi
     joystick_menu
+    libcec
     libfftw3
     libmpeg2external
     libxml2
@@ -1428,6 +1432,7 @@ PATHS_LIST='
     datadir
     dvb_path
     incdir
+    libcec_path
     libdir
     mandir
     prefix
@@ -1986,6 +1991,7 @@ enable ivtv
 enable asi
 enable lamemp3
 enable libass
+enable libcec
 enable libxml2
 enable libudf
 enable lirc
@@ -2006,6 +2012,7 @@ disable indevs
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
 x11_path_default="${sysroot}/usr/X11R6/include"
+libcec_path_default="${sysroot}/usr/include/libcec"
 libxml2_path_default="${sysroot}/usr/include/libxml2"
 
 # configurable options
@@ -4105,6 +4112,19 @@ enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3
 # ass_flush_events was added in 0.9.10
 enabled libass && check_lib2 ass/ass.h ass_flush_events -lass || disable libass
 
+enabled libcec && check_cxx -I"$libcec_path" <<EOF || { echolog "libCEC support needs libcec >= 7" && disable libcec; }
+#include <libcec/cec.h>
+#include <iostream>
+using namespace std;
+using namespace CEC;
+#include <libcec/cecloader.h>
+int main(void) {
+    if (CEC_LIB_VERSION < 7)
+        return 0;
+    return (long) LoadLibCec;
+}
+EOF
+
 if enabled libxml2 ; then
    if pkg-config --exists libxml-2.0 ; then
         libxml2_path=`pkg-config --cflags-only-I libxml-2.0|sed -n "s/-I\([^ ]*\) *$/\1/p"`
@@ -4437,6 +4457,7 @@ if enabled frontend; then
   echo "# Input Support"
   echo "Joystick menu             ${joystick_menu-no}"
   echo "lirc support              ${lirc-no}"
+  echo "libCEC device support     ${libcec-no} [$libcec_path]"
   if test x"$target_os" = x"darwin" ; then
     echo "Apple Remote              ${appleremote-no}"
   fi
@@ -4828,6 +4849,11 @@ fi
 
 if enabled dvb; then
   append CONFIG_INCLUDEPATH "$dvb_path"
+fi
+
+if enabled libcec; then
+  append CONFIG_DEFINES "using_libcec"
+  append CONFIG_INCLUDEPATH "$libcec_path"
 fi
 
 if enabled libxml2; then

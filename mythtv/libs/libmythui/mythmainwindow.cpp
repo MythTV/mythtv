@@ -62,6 +62,10 @@ using namespace std;
 #include "jsmenuevent.h"
 #endif
 
+#ifdef USING_LIBCEC
+#include "cecadapter.h"
+#endif
+
 #include "mythscreentype.h"
 #include "mythpainter.h"
 #ifdef USE_OPENGL_PAINTER
@@ -134,6 +138,11 @@ class MythMainWindowPrivate
         appleRemoteListener(NULL),
         appleRemote(NULL),
 #endif
+
+#ifdef USING_LIBCEC
+        cecAdapter(NULL),
+#endif
+
         exitingtomain(false),
         popwindows(false),
 
@@ -200,6 +209,10 @@ class MythMainWindowPrivate
 #ifdef USING_APPLEREMOTE
     AppleRemoteListener *appleRemoteListener;
     AppleRemote         *appleRemote;
+#endif
+
+#ifdef USING_LIBCEC
+    CECAdapter* cecAdapter;
 #endif
 
     bool exitingtomain;
@@ -444,6 +457,15 @@ MythMainWindow::MythMainWindow(const bool useDB)
         d->appleRemote->start();
 #endif
 
+#ifdef USING_LIBCEC
+    d->cecAdapter = new CECAdapter();
+    if (!d->cecAdapter->IsValid())
+    {
+        delete d->cecAdapter;
+        d->cecAdapter = NULL;
+    }
+#endif
+
     d->m_udpListener = new MythUDPListener();
 
     InitKeys();
@@ -522,6 +544,11 @@ MythMainWindow::~MythMainWindow()
         d->appleRemote->stopListening();
 
     delete d->appleRemoteListener;
+#endif
+
+#ifdef USING_LIBCEC
+    if (d->cecAdapter)
+        delete d->cecAdapter;
 #endif
 
     delete d;
@@ -1101,6 +1128,11 @@ void MythMainWindow::InitKeys()
     RegisterKey("Global", ACTION_7, QT_TRANSLATE_NOOP("MythControls","7"), "7");
     RegisterKey("Global", ACTION_8, QT_TRANSLATE_NOOP("MythControls","8"), "8");
     RegisterKey("Global", ACTION_9, QT_TRANSLATE_NOOP("MythControls","9"), "9");
+
+    RegisterKey("Global", ACTION_TVPOWERON,  QT_TRANSLATE_NOOP("MythControls",
+        "Turn the display on"),   "");
+    RegisterKey("Global", ACTION_TVPOWEROFF, QT_TRANSLATE_NOOP("MythControls",
+        "Turn the display off"),  "");
 
     RegisterKey("Global", "SYSEVENT01", QT_TRANSLATE_NOOP("MythControls",
         "Trigger System Key Event #1"), "");
@@ -1822,6 +1854,24 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
     }
 
     return false;
+}
+
+void MythMainWindow::HandleTVPower(bool poweron)
+{
+    if (poweron)
+    {
+#ifdef USING_LIBCEC
+        if (d->cecAdapter)
+            d->cecAdapter->Action(ACTION_TVPOWERON);
+#endif
+    }
+    else
+    {
+#ifdef USING_LIBCEC
+        if (d->cecAdapter)
+            d->cecAdapter->Action(ACTION_TVPOWEROFF);
+#endif
+    }
 }
 
 void MythMainWindow::AllowInput(bool allow)

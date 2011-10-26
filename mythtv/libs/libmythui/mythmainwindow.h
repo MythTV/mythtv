@@ -76,6 +76,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
                      const QString& subtitle="", const QString& director="",
                      int season=0, int episode=0, const QString& inetref="",
                      int lenMins=120, const QString& year="1895");
+    void HandleTVPower(bool poweron);
 
     void JumpTo(const QString &destination, bool pop = true);
     bool DestinationExists(const QString &destination) const;
