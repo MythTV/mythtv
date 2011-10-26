@@ -107,6 +107,7 @@ class MTV_PUBLIC MythPlayer
     friend class SubtitleScreen;
     friend class InteractiveScreen;
     friend class BDOverlayScreen;
+    friend class VideoPerformanceTest;
     // TODO remove these
     friend class TV;
     friend class Transcode;

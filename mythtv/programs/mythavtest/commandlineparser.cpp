@@ -26,5 +26,26 @@ void MythAVTestCommandLineParser::LoadArguments(void)
     addGeometry();
     addDisplay();
     addLogging();
+    add(QStringList(QStringList() << "-f" << "--file"), "file", "",
+                    "Specify the file to play.", "");
+    add(QStringList(QStringList() << "-t" << "--test"), "test", false,
+                    "Test video performance.",
+                    "Test and debug video playback performance."
+                    "Audio, captions, deinterlacing and the On Screen Display will all "
+                    "be disabled and video will be displayed at the fastest possible rate. ")
+                    ->SetGroup("Video Performance Testing")
+                    ->SetRequires("file");
+    add(QStringList(QStringList() << "-d" << "--decodeonly"),
+                    "decodeonly", false,
+                    "Decode video frames but do not display them.",
+                    "")
+                    ->SetGroup("Video Performance Testing")
+                    ->SetRequires("test")
+                    ->SetRequires("file");
+    add(QStringList(QStringList() << "-s" << "--seconds"), "seconds", "",
+                    "The number of seconds to run the test (default 5).", "")
+                    ->SetGroup("Video Performance Testing")
+                    ->SetRequires("test")
+                    ->SetRequires("file");
 }
 

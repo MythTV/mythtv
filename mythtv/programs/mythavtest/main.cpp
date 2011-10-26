@@ -7,10 +7,13 @@ using namespace std;
 #include <QRegExp>
 #include <QDir>
 #include <QApplication>
+#include <QDateTime>
 
 #include "tv_play.h"
 #include "programinfo.h"
 #include "commandlineparser.h"
+#include "mythplayer.h"
+#include "jitterometer.h"
 
 #include "exitcodes.h"
 #include "mythcontext.h"
@@ -24,6 +27,115 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 
+class VideoPerformanceTest
+{
+  public:
+    VideoPerformanceTest(const QString &filename, bool novsync, bool onlydecode,
+                         int runfor)
+      : file(filename), novideosync(novsync), decodeonly(onlydecode),
+        secondstorun(runfor), ctx(NULL)
+    {
+        if (secondstorun < 1)
+            secondstorun = 1;
+        if (secondstorun > 3600)
+            secondstorun = 3600;
+    }
+
+   ~VideoPerformanceTest()
+    {
+        delete ctx;
+    }
+
+    void Test(void)
+    {
+        PIPMap dummy;
+
+        if (novideosync) // TODO
+            LOG(VB_GENERAL, LOG_INFO, "Will attempt to disable sync-to-vblank.");
+
+        RingBuffer *rb  = RingBuffer::Create(file, false, true, 2000);
+        MythPlayer  *mp  = new MythPlayer(true);
+        mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
+        mp->GetAudio()->SetNoAudio();
+        ctx = new PlayerContext("VideoPerformanceTest");
+        ctx->SetRingBuffer(rb);
+        ctx->SetPlayer(mp);
+        ctx->SetPlayingInfo(new ProgramInfo(file));
+        mp->SetPlayerInfo(NULL, GetMythMainWindow(), true, ctx);
+
+        if (!mp->StartPlaying())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Failed to start playback.");
+            return;
+        }
+
+        VideoOutput *vo = mp->GetVideoOutput();
+        if (!vo)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "No video output.");
+            return;
+        }
+
+        LOG(VB_GENERAL, LOG_INFO, "-----------------------------------");
+        LOG(VB_GENERAL, LOG_INFO, QString("Starting video performance test for '%1'.")
+            .arg(file));
+        LOG(VB_GENERAL, LOG_INFO, QString("Test will run for %1 seconds.")
+            .arg(secondstorun));
+
+        if (decodeonly)
+            LOG(VB_GENERAL, LOG_INFO, "Decoding frames only - skipping display.");
+
+        Jitterometer *jitter = new Jitterometer("Performance: ", mp->GetFrameRate());
+
+        int ms = secondstorun * 1000;
+        QDateTime start = QDateTime::currentDateTime();
+        while (1)
+        {
+            if (start.msecsTo(QDateTime::currentDateTime()) > ms)
+            {
+                LOG(VB_GENERAL, LOG_INFO, "Complete.");
+                break;
+            }
+
+            if (mp->IsErrored())
+            {
+                LOG(VB_GENERAL, LOG_ERR, "Playback error.");
+                break;
+            }
+
+            if (mp->GetEof())
+            {
+                LOG(VB_GENERAL, LOG_INFO, "End of file.");
+                break;
+            }
+
+            if (!mp->PrebufferEnoughFrames())
+                continue;
+
+            mp->SetBuffering(false);
+            vo->StartDisplayingFrame();
+            VideoFrame *frame = vo->GetLastShownFrame();
+            mp->CheckAspectRatio(frame);
+
+            if (!decodeonly)
+            {
+                vo->ProcessFrame(frame, NULL, NULL, dummy, kScan_Progressive);
+                vo->PrepareFrame(frame, kScan_Progressive, NULL);
+                vo->Show(kScan_Progressive);
+            }
+            vo->DoneDisplayingFrame(frame);
+            jitter->RecordCycleTime();
+        }
+        LOG(VB_GENERAL, LOG_INFO, "-----------------------------------");
+    }
+
+  private:
+    QString file;
+    bool    novideosync;
+    bool    decodeonly;
+    int     secondstorun;
+    PlayerContext *ctx;
+};
 
 int main(int argc, char *argv[])
 {
@@ -64,7 +176,9 @@ int main(int argc, char *argv[])
     }
 
     QString filename = "";
-    if (cmdline.GetArgs().size() >= 1)
+    if (!cmdline.toString("file").isEmpty())
+        filename = cmdline.toString("file");
+    else if (cmdline.GetArgs().size() >= 1)
         filename = cmdline.GetArgs()[0];
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
@@ -105,25 +219,37 @@ int main(int argc, char *argv[])
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
 
-    TV::InitKeys();
-
-    if (!UpgradeTVDatabaseSchema(false))
+    if (cmdline.toBool("test"))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Fatal Error: Incorrect database schema.");
-        delete gContext;
-        return GENERIC_EXIT_DB_OUTOFDATE;
-    }
-
-    if (filename.isEmpty())
-    {
-        TV::StartTV(NULL, kStartTVNoFlags);
+        int seconds = 5;
+        if (!cmdline.toString("seconds").isEmpty())
+            seconds = cmdline.toInt("seconds");
+        VideoPerformanceTest *test = new VideoPerformanceTest(filename, false,
+                    cmdline.toBool("decodeonly"), seconds);
+        test->Test();
+        delete test;
     }
     else
     {
-        ProgramInfo pginfo(filename);
-        TV::StartTV(&pginfo, kStartTVNoFlags);
-    }
+        TV::InitKeys();
 
+        if (!UpgradeTVDatabaseSchema(false))
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Fatal Error: Incorrect database schema.");
+            delete gContext;
+            return GENERIC_EXIT_DB_OUTOFDATE;
+        }
+
+        if (filename.isEmpty())
+        {
+            TV::StartTV(NULL, kStartTVNoFlags);
+        }
+        else
+        {
+            ProgramInfo pginfo(filename);
+            TV::StartTV(&pginfo, kStartTVNoFlags);
+        }
+    }
     DestroyMythMainWindow();
 
     delete gContext;
