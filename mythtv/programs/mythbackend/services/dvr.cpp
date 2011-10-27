@@ -207,11 +207,29 @@ DTC::EncoderList* Dvr::Encoders()
 /////////////////////////////////////////////////////////////////////////////
 
 DTC::ProgramList* Dvr::GetUpcoming( int  nStartIndex,
-                                    int  nCount      )
+                                    int  nCount,
+                                    bool bShowAll )
 {
     ProgramList  recordingList;
+    ProgramList  tmpList;
     bool hasConflicts;
-    LoadFromScheduler(recordingList, hasConflicts);
+    LoadFromScheduler(tmpList, hasConflicts);
+
+    // Sort the upcoming into only those which will record
+    for( uint n = 0; n < tmpList.size(); n++)
+    {
+        if (!bShowAll && (tmpList[n]->GetRecordingStatus() <= rsWillRecord) &&
+            (tmpList[n]->GetRecordingStartTime() >=
+             QDateTime::currentDateTime()))
+        {
+            recordingList.push_back(tmpList.take(n));
+        }
+        else if (bShowAll && (tmpList[n]->GetRecordingStartTime() >=
+             QDateTime::currentDateTime()))
+        {
+            recordingList.push_back(tmpList.take(n));
+        }
+    }
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -225,16 +243,11 @@ DTC::ProgramList* Dvr::GetUpcoming( int  nStartIndex,
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
-        if ((recordingList[n]->GetRecordingStatus() <= rsWillRecord) &&
-            (recordingList[n]->GetRecordingStartTime() >=
-             QDateTime::currentDateTime()))
-        {
-            ProgramInfo *pInfo = recordingList[ n ];
+        ProgramInfo *pInfo = recordingList[ n ];
 
-            DTC::Program *pProgram = pPrograms->AddNewProgram();
+        DTC::Program *pProgram = pPrograms->AddNewProgram();
 
-            FillProgramInfo( pProgram, pInfo, true );
-        }
+        FillProgramInfo( pProgram, pInfo, true );
     }
 
     // ----------------------------------------------------------------------
