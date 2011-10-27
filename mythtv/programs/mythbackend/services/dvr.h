@@ -43,6 +43,9 @@ class Dvr : public DvrServices
                                                 int              StartIndex,
                                                 int              Count      );
 
+        DTC::ProgramList* GetUpcoming         ( int              StartIndex,
+                                                int              Count      );
+
         DTC::EncoderList* Encoders            ( );
 };
 
