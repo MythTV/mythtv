@@ -205,6 +205,11 @@ void SubtitleScreen::DisplayAVSubtitles(void)
     if (!m_player || !m_subreader)
         return;
 
+    AVSubtitles* subs = m_subreader->GetAVSubtitles();
+    QMutexLocker lock(&(subs->lock));
+    if (subs->buffers.empty())
+        return;
+
     VideoOutput    *videoOut = m_player->GetVideoOutput();
     VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : NULL;
 
@@ -215,8 +220,6 @@ void SubtitleScreen::DisplayAVSubtitles(void)
     QRect dummy;
     videoOut->GetOSDBounds(dummy, m_safeArea, tmp, tmp, tmp);
 
-    AVSubtitles* subs = m_subreader->GetAVSubtitles();
-    subs->lock.lock();
     while (!subs->buffers.empty())
     {
         const AVSubtitle subtitle = subs->buffers.front();
@@ -339,7 +342,6 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 #ifdef USING_LIBASS
     RenderAssTrack(currentFrame->timecode);
 #endif
-    subs->lock.unlock();
 }
 
 void SubtitleScreen::DisplayTextSubtitles(void)
