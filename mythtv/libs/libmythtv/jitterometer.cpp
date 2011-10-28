@@ -114,9 +114,9 @@ bool Jitterometer::RecordEndTime()
             extra = QString("CPUs: ") + lastcpustats;
 
         LOG(VB_GENERAL, LOG_INFO,
-            name + QString("Mean: %1 Std.Dev: %2 fps: %3 ")
-                .arg((int)mean).arg((int)standard_deviation)
-                .arg(last_fps, 0, 'f', 2) + extra);
+            name + QString("FPS: %1 Mean: %2 Std.Dev: %3 ")
+                .arg(last_fps, 7, 'f', 2).arg((int)mean, 5)
+                .arg((int)standard_deviation, 5) + extra);
 
         count = 0;
         return true;
