@@ -177,8 +177,8 @@ int main(int argc, char *argv[])
     }
 
     QString filename = "";
-    if (!cmdline.toString("file").isEmpty())
-        filename = cmdline.toString("file");
+    if (!cmdline.toString("infile").isEmpty())
+        filename = cmdline.toString("infile");
     else if (cmdline.GetArgs().size() >= 1)
         filename = cmdline.GetArgs()[0];
 
