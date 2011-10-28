@@ -32,8 +32,9 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
       curR(0.0),              curG(0.0),             curB(0.0),
       incR(0.0),              incG(0.0),             incB(0.0)
 {
-    m_Initiator = true;
+#if 0 // Not currently used
     m_usingAltArea = false;
+#endif
     m_ShrinkNarrow = true;
     m_MultiLine = false;
     m_scrolling = false;
@@ -65,8 +66,9 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
       curR(0.0),      curG(0.0),      curB(0.0),
       incR(0.0),      incG(0.0),      incB(0.0)
 {
-    m_Initiator = true;
+#if 0 // Not currently used
     m_usingAltArea = false;
+#endif
     m_ShrinkNarrow = true;
     m_MultiLine = false;
     m_scrolling = false;
@@ -118,7 +120,7 @@ void MythUIText::SetText(const QString &text)
         m_Message = newtext;
 
     m_CutMessage.clear();
-    FillCutMessage(true);
+    FillCutMessage();
 
     SetRedraw();
 }
@@ -183,22 +185,39 @@ QString MythUIText::GetDefaultText(void) const
 void MythUIText::SetFontProperties(const MythFontProperties &fontProps)
 {
     m_FontStates.insert("default", fontProps);
-    *m_Font = m_FontStates["default"];
-    FillCutMessage(false);
-    SetRedraw();
+    if (m_Font->GetHash() != m_FontStates["default"].GetHash())
+    {
+        *m_Font = m_FontStates["default"];
+        if (!m_Message.isEmpty())
+        {
+            FillCutMessage();
+            SetRedraw();
+        }
+    }
 }
 
 void MythUIText::SetFontState(const QString &state)
 {
     if (m_FontStates.contains(state))
+    {
+        if (m_Font->GetHash() == m_FontStates[state].GetHash())
+            return;
         *m_Font = m_FontStates[state];
+    }
     else
+    {
+        if (m_Font->GetHash() == m_FontStates["default"].GetHash())
+            return;
         *m_Font = m_FontStates["default"];
-
-    FillCutMessage(false);
-    SetRedraw();
+    }
+    if (!m_Message.isEmpty())
+    {
+        FillCutMessage();
+        SetRedraw();
+    }
 }
 
+#if 0 // Not currently used
 void MythUIText::UseAlternateArea(bool useAlt)
 {
     if (useAlt && m_AltDisplayRect.width() > 1)
@@ -212,8 +231,9 @@ void MythUIText::UseAlternateArea(bool useAlt)
         m_usingAltArea = false;
     }
 
-    FillCutMessage(false);
+    FillCutMessage();
 }
+#endif
 
 void MythUIText::SetJustification(int just)
 {
@@ -222,8 +242,11 @@ void MythUIText::SetJustification(int just)
         // preserve the wordbreak attribute, drop everything else
         m_Justification = m_Justification & Qt::TextWordWrap;
         m_Justification |= just;
-        FillCutMessage(false);
-        SetRedraw();
+        if (!m_Message.isEmpty())
+        {
+            FillCutMessage();
+            SetRedraw();
+        }
     }
 }
 
@@ -234,28 +257,41 @@ int MythUIText::GetJustification(void)
 
 void MythUIText::SetCutDown(bool cut)
 {
-    m_Cutdown = cut;
-    if (m_scrolling && m_Cutdown)
+    if (cut != m_Cutdown)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("'%1': <scroll> and <cutdown> are "
-                                         "not combinable.").arg(objectName()));
-        m_Cutdown = false;
+        m_Cutdown = cut;
+        if (m_scrolling && m_Cutdown)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("'%1': <scroll> and <cutdown> are "
+                                             "not combinable.")
+                .arg(objectName()));
+            m_Cutdown = false;
+        }
+        if (!m_Message.isEmpty())
+        {
+            FillCutMessage();
+            SetRedraw();
+        }
     }
-    FillCutMessage(false);
-    SetRedraw();
 }
 
 void MythUIText::SetMultiLine(bool multiline)
 {
-    m_MultiLine = multiline;
+    if (multiline != m_MultiLine)
+    {
+        m_MultiLine = multiline;
 
-    if (m_MultiLine)
-        m_Justification |= Qt::TextWordWrap;
-    else
-        m_Justification &= ~Qt::TextWordWrap;
+        if (m_MultiLine)
+            m_Justification |= Qt::TextWordWrap;
+        else
+            m_Justification &= ~Qt::TextWordWrap;
 
-    FillCutMessage(false);
-    SetRedraw();
+        if (!m_Message.isEmpty())
+        {
+            FillCutMessage();
+            SetRedraw();
+        }
+    }
 }
 
 void MythUIText::SetArea(const MythRect &rect)
@@ -264,7 +300,7 @@ void MythUIText::SetArea(const MythRect &rect)
     m_CutMessage.clear();
 
     m_drawRect = m_Area;
-    FillCutMessage(false);
+    FillCutMessage();
 }
 
 void MythUIText::SetPosition(const MythPoint &pos)
@@ -533,7 +569,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
     return false;
 }
 
-void MythUIText::FillCutMessage(bool reset_size)
+void MythUIText::FillCutMessage(void)
 {
     if (m_Area.isNull())
         return;
@@ -572,9 +608,6 @@ void MythUIText::FillCutMessage(bool reset_size)
 
     if (m_CutMessage.isEmpty())
     {
-        if (!reset_size)
-            return;
-
         if (m_Layouts.empty())
             m_Layouts.push_back(new QTextLayout);
 
@@ -589,7 +622,6 @@ void MythUIText::FillCutMessage(bool reset_size)
         line.setLineWidth(m_Area.width());
         line.setPosition(QPointF(0, 0));
         (*Ilayout)->endLayout();
-        min_rect = line.naturalTextRect();
         m_drawRect.setWidth(m_Area.width());
         m_drawRect.setHeight(m_lineHeight);
 
@@ -654,12 +686,6 @@ void MythUIText::FillCutMessage(bool reset_size)
         m_Canvas.setHeight(height);
     }
 
-    if (m_MinSize.isValid())
-    {
-        // Record the minimal area needed for the message.
-        SetMinArea(min_rect.toRect().size());
-    }
-
     if (m_scrolling)
     {
         if (m_scrollDirection == ScrollLeft ||
@@ -683,17 +709,39 @@ void MythUIText::FillCutMessage(bool reset_size)
 
     // If any of hcenter|vcenter|Justify, center it all, then adjust later
     if (m_Justification & (Qt::AlignCenter|Qt::AlignJustify))
+    {
         m_drawRect.moveCenter(m_Area.center());
+        min_rect.moveCenter(m_Area.center());
+    }
     // Adjust horizontal
     if (m_Justification & Qt::AlignLeft)
+    {
         m_drawRect.moveLeft(m_Area.x());
+        min_rect.moveLeft(m_Area.x());
+    }
     else if (m_Justification & Qt::AlignRight)
+    {
         m_drawRect.moveRight(m_Area.x() + m_Area.width());
+        min_rect.moveRight(m_Area.x() + m_Area.width());
+    }
     // Adjust vertical
     if (m_Justification & Qt::AlignTop)
+    {
         m_drawRect.moveTop(m_Area.y());
+        min_rect.moveTop(m_Area.y());
+    }
     else if (m_Justification & Qt::AlignBottom)
+    {
         m_drawRect.moveBottom(m_Area.y() + m_Area.height());
+        min_rect.moveBottom(m_Area.y() + m_Area.height());
+    }
+
+    m_Initiator = true;
+    if (m_MinSize.isValid())
+    {
+        // Record the minimal area needed for the message.
+        SetMinArea(min_rect.toRect());
+    }
 }
 
 QPoint MythUIText::CursorPosition(int text_offset)
@@ -1027,8 +1075,6 @@ bool MythUIText::ParseElement(
             m_textCase = CaseCapitaliseAll;
         else
             m_textCase = CaseNormal;
-
-        FillCutMessage(true);
     }
     else
     {
@@ -1117,5 +1163,5 @@ void MythUIText::Finalize(void)
                                          "not combinable.").arg(objectName()));
         m_Cutdown = false;
     }
-    FillCutMessage(true);
+    FillCutMessage();
 }

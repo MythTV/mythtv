@@ -446,7 +446,7 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
     Clear();
 
     QWriteLocker updateLocker(&d->m_UpdateLock);
-    QSize aSize = GetArea().size();
+    QSize aSize = GetFullArea().size();
 
     QVector<MythImage *>::iterator it;
 
@@ -1084,7 +1084,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             }
         }
 
-        QRect area = GetArea().toQRect();
+        QRect area = GetFullArea().toQRect();
         area.translate(xoffset, yoffset);
 
         int alpha = CalcAlpha(alphaMod);
@@ -1121,7 +1121,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             area.translate(x, y);
 
         QRect srcRect;
-        m_cropRect.CalculateArea(GetArea());
+        m_cropRect.CalculateArea(GetFullArea());
 
         if (!m_cropRect.isEmpty())
             srcRect = m_cropRect.toQRect();

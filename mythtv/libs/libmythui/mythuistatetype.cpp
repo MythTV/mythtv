@@ -50,7 +50,7 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
     MythRect objectArea = object->GetArea();
 
     if (m_Parent)
-        objectArea.CalculateArea(m_Parent->GetArea());
+        objectArea.CalculateArea(m_Parent->GetFullArea());
     else
         objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 
@@ -83,7 +83,7 @@ bool MythUIStateType::AddObject(StateType type, MythUIType *object)
     MythRect objectArea = object->GetArea();
 
     if (m_Parent)
-        objectArea.CalculateArea(m_Parent->GetArea());
+        objectArea.CalculateArea(m_Parent->GetFullArea());
     else
         objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 

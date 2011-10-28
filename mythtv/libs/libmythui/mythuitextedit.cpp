@@ -145,7 +145,8 @@ void MythUITextEdit::Finalize()
     SetInitialStates();
 
     // Give it something to chew on, so it can position the initial
-    // cursor in the right place
+    // cursor in the right place.  Toggle text, to force an area recalc.
+    m_Text->SetText(".");
     m_Text->SetText("");
     m_cursorImage->SetPosition(m_Text->CursorPosition(0));
 }
@@ -188,7 +189,7 @@ void MythUITextEdit::SetInitialStates()
 
     if (height > 0)
     {
-        MythRect imageArea = m_cursorImage->GetArea();
+        MythRect imageArea = m_cursorImage->GetFullArea();
         int width = int(((float)height / (float)imageArea.height())
                         * (float)imageArea.width());
 

@@ -170,17 +170,19 @@ int MythUIButtonList::minButtonWidth(const MythRect &area)
 {
     int width = area.width();
 
-    /*
-     * Assume if an overlap is allowed on the left, the same overlap
-     * is on the right
-     */
     if (area.x() < 0)
+    {
+        /*
+         * Assume if an overlap is allowed on the left, the same overlap
+         * is on the right
+         */
         width += (area.x() * 2 - 1); // x is negative
-    else
-        width += area.x();
 
-    while (width < 0)
-        width -= area.x(); // Oops
+        while (width < 0)
+            width -= area.x(); // Oops
+    }
+    else if (m_layout == LayoutHorizontal)
+        width -= area.x();  // Get rid of any "space" betwen the buttons
 
     return width;
 }
@@ -196,17 +198,19 @@ int MythUIButtonList::minButtonHeight(const MythRect &area)
 {
     int height = area.height();
 
-    /*
-     * Assume if an overlap is allowed on the top, the same overlap
-     * is on the bottom
-     */
     if (area.y() < 0)
+    {
+        /*
+         * Assume if an overlap is allowed on the top, the same overlap
+         * is on the bottom
+         */
         height += (area.y() * 2 - 1);
-    else
-        height += area.y();
 
-    while (height < 0)
-        height -= area.y(); // Oops
+        while (height < 0)
+            height -= area.y(); // Oops
+    }
+    else if (m_layout == LayoutVertical)
+        height -= area.y();  // Get rid of any "space" betwen the buttons
 
     return height;
 }
@@ -348,7 +352,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
 
     /*
      * If total_height == 0, then this is the first row, so allow any height.
-     * Otherwide, If adding a button to a column would exceed the
+     * Otherwise, If adding a button to a column would exceed the
      * parent height, abort
     */
     if (total_height > 0 &&
@@ -537,7 +541,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
 
     /*
      * If total_height == 0, then this is the first row, so allow any height.
-     * Otherwide, If adding a button to a column would exceed the
+     * Otherwise, If adding a button to a column would exceed the
      * parent height, abort
     */
     if (total_height > 0 &&
@@ -600,7 +604,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
         if ((*col_widths)[col_idx] < width)
             (*col_widths)[col_idx] = width;
 
-        // Make note of which column as the selected button
+        // Make note of which column has the selected button
         if (selectedIdx == buttonIdx)
             selected_column = col_idx;
     }
@@ -1155,26 +1159,27 @@ bool MythUIButtonList::DistributeButtons(void)
             realButton = m_ButtonList[buttonIdx];
             buttonstate = dynamic_cast<MythUIGroup *>
                           (realButton->GetCurrentState());
+            MythRect area = buttonstate->GetArea();
 
             // Center button within width of column
             if (m_alignment & Qt::AlignHCenter)
-                x_adj = (col_widths[col] -
-                         minButtonWidth(buttonstate->GetArea())) / 2;
+                x_adj = (col_widths[col] - minButtonWidth(area)) / 2;
             else if (m_alignment & Qt::AlignRight)
-                x_adj = (col_widths[col] -
-                         minButtonWidth(buttonstate->GetArea()));
+                x_adj = (col_widths[col] - minButtonWidth(area));
             else
                 x_adj = 0;
+            if (m_layout == LayoutHorizontal)
+                x_adj -= area.x(); // Negate button's own offset
 
             // Center button within height of row.
             if (m_alignment & Qt::AlignVCenter)
-                y_adj = (row_heights[row] -
-                         minButtonHeight(buttonstate->GetArea())) / 2;
+                y_adj = (row_heights[row] - minButtonHeight(area)) / 2;
             else if (m_alignment & Qt::AlignBottom)
-                y_adj = (row_heights[row] -
-                         minButtonHeight(buttonstate->GetArea()));
+                y_adj = (row_heights[row] - minButtonHeight(area));
             else
                 y_adj = 0;
+            if (m_layout == LayoutVertical)
+                y_adj -= area.y(); // Negate button's own offset
 
             // Set position of button
             realButton->SetPosition(x + x_adj, y + y_adj);
@@ -1224,7 +1229,8 @@ void MythUIButtonList::SetPosition(void)
     {
         case ScrollCenter:
         case ScrollGroupCenter:
-            m_topPosition = qMax(m_selPosition - (int)((float)m_itemsVisible / 2), 0);
+            m_topPosition = qMax(m_selPosition -
+                                 (int)((float)m_itemsVisible / 2), 0);
             break;
         case ScrollFree:
         {
@@ -2407,7 +2413,8 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
     if (event->gesture() == MythGestureEvent::Click)
     {
         // We want the relative position of the click
-        QPoint position = event->GetPosition() - m_Parent->GetArea().topLeft();
+        QPoint position = event->GetPosition() -
+                          m_Parent->GetArea().topLeft();
 
         MythUIType *type = GetChildAt(position, false, false);
 

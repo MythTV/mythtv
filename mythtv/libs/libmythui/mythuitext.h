@@ -43,7 +43,9 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetTemplateText(const QString &text) { m_TemplateText = text; }
     QString GetTemplateText(void) const { return m_TemplateText; }
 
+#if 0 // Not currently used
     void UseAlternateArea(bool useAlt);
+#endif
 
     virtual void Pulse(void);
     QPoint CursorPosition(int text_offset);
@@ -93,7 +95,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
 			  qreal & last_line_width, int & num_lines);
     bool GetNarrowWidth(const QStringList & paragraphs,
 			const QTextOption & textoption, qreal & width);
-    void FillCutMessage(bool reset_size = false);
+    void FillCutMessage(void);
 
     int m_Justification;
     MythRect m_OrigDisplayRect;
@@ -107,7 +109,9 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     QString m_DefaultMessage;
     QString m_TemplateText;
 
+#if 0 // Not currently used
     bool m_usingAltArea;
+#endif
     bool m_ShrinkNarrow;
     bool m_Cutdown;
     bool m_MultiLine;
