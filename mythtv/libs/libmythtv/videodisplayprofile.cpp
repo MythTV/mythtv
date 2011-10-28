@@ -1167,10 +1167,15 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
     {
         msg = QObject::tr(
             "This video renderer uses OpenGL for scaling and color conversion "
-            "and can offer limited picture contols. This requires a faster "
-            "GPU than XVideo. Also, when enabled, picture controls consume "
-            "additional resources.");
+            "with full picture contols. The GPU can be used for deinterlacing. "
+            "This requires a faster GPU than XVideo.");
     }
+
+    if (renderer == "opengl-lite")
+        msg = QObject::tr(
+            "This video renderer uses OpenGL for scaling and color conversion. "
+            "It uses faster OpenGL functionality when available but at the "
+            "expense of picture controls and GPU based deinterlacing.");
 
     if (renderer == "vdpau")
     {

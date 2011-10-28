@@ -187,8 +187,8 @@ VideoOutput *VideoOutput::Create(
 #endif // Q_OS_MACX
 
 #ifdef USING_OPENGL_VIDEO
-        if (renderer == "opengl")
-            vo = new VideoOutputOpenGL();
+        if (renderer.contains("opengl"))
+            vo = new VideoOutputOpenGL(renderer);
 #endif // USING_OPENGL_VIDEO
 
 #ifdef USING_VDPAU

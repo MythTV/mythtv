@@ -13,6 +13,7 @@
 void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
                                          QStringList &cpudeints)
 {
+    // full featured profile
     opts.renderers->append("opengl");
     opts.deints->insert("opengl", cpudeints);
     (*opts.deints)["opengl"].append("opengllinearblend");
@@ -35,14 +36,33 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
     if (opts.decoders->contains("crystalhd"))
         (*opts.safe_renderers)["crystalhd"].append("opengl");
     opts.priorities->insert("opengl", 65);
+
+    // lite profile - no colourspace control, GPU deinterlacing
+    opts.renderers->append("opengl-lite");
+    opts.deints->insert("opengl-lite", cpudeints);
+    (*opts.deints)["opengl-lite"].append("bobdeint");
+    (*opts.osds)["opengl-lite"].append("opengl2");
+    (*opts.safe_renderers)["dummy"].append("opengl-lite");
+    (*opts.safe_renderers)["nuppel"].append("opengl-lite");
+    if (opts.decoders->contains("ffmpeg"))
+        (*opts.safe_renderers)["ffmpeg"].append("opengl-lite");
+    if (opts.decoders->contains("vda"))
+        (*opts.safe_renderers)["vda"].append("opengl-lite");
+    if (opts.decoders->contains("crystalhd"))
+        (*opts.safe_renderers)["crystalhd"].append("opengl-lite");
+    opts.priorities->insert("opengl", 60);
 }
 
-VideoOutputOpenGL::VideoOutputOpenGL()
+VideoOutputOpenGL::VideoOutputOpenGL(const QString &profile)
     : VideoOutput(),
     gl_context_lock(QMutex::Recursive), gl_context(NULL), gl_valid(true),
     gl_videochain(NULL), gl_pipchain_active(NULL),
-    gl_parent_win(0),    gl_painter(NULL), gl_created_painter(false)
+    gl_parent_win(0),    gl_painter(NULL), gl_created_painter(false),
+    gl_opengl_lite(false)
 {
+    if (profile.contains("lite"))
+        gl_opengl_lite = true;
+
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
     av_pause_frame.buf = NULL;
 
@@ -190,7 +210,10 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect, WId winid,
 void VideoOutputOpenGL::SetProfile(void)
 {
     if (db_vdisp_profile)
-        db_vdisp_profile->SetVideoRenderer("opengl");
+    {
+        db_vdisp_profile->SetVideoRenderer(
+                    gl_opengl_lite ? "opengl-lite" : "opengl");
+    }
 }
 
 bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
@@ -330,12 +353,15 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     bool success = false;
     OpenGLLocker ctx_lock(gl_context);
     gl_videochain = new OpenGLVideo();
+    QString options = GetFilters();
+    if (gl_opengl_lite)
+        options += " preferycbcr";
     success = gl_videochain->Init(gl_context, &videoColourSpace,
                                   window.GetVideoDim(),
                                   window.GetVideoDispDim(), dvr,
                                   window.GetDisplayVideoRect(),
                                   window.GetVideoRect(), true,
-                                  GetFilters(), !codec_is_std(video_codec_id));
+                                  options, !codec_is_std(video_codec_id));
     if (success)
     {
         bool temp_deinterlacing = m_deinterlacing;
@@ -569,7 +595,7 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(
 
     if (codec_is_std(myth_codec_id) && !getenv("NO_OPENGL"))
     {
-        list += "opengl";
+        list << "opengl" << "opengl-lite";
     }
 
     return list;
@@ -764,11 +790,14 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP.");
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
+        QString options = GetFilters();
+        if (gl_opengl_lite)
+            options += " preferycbcr";
         bool success = gl_pipchain->Init(gl_context, &videoColourSpace,
                      pipVideoDim, pipVideoDim,
                      dvr, position,
                      QRect(0, 0, pipVideoWidth, pipVideoHeight),
-                     false, GetFilters(), false);
+                     false, options, false);
         QSize viewport = gl_videochain ? gl_videochain->GetViewPort() :
                                          window.GetDisplayVisibleRect().size();
         gl_pipchain->SetMasterViewport(viewport);
@@ -786,11 +815,14 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
         delete gl_pipchain;
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
+        QString options = GetFilters();
+        if (gl_opengl_lite)
+            options += " preferycbcr";
         bool success = gl_pipchain->Init(
             gl_context, &videoColourSpace,
             pipVideoDim, pipVideoDim, dvr, position,
             QRect(0, 0, pipVideoWidth, pipVideoHeight),
-            false, GetFilters(), false);
+            false, options, false);
 
         QSize viewport = gl_videochain ? gl_videochain->GetViewPort() :
                                          window.GetDisplayVisibleRect().size();
@@ -854,7 +886,7 @@ void VideoOutputOpenGL::StopEmbedding(void)
 
 bool VideoOutputOpenGL::ApproveDeintFilter(const QString& filtername) const
 {
-    if (filtername.contains("opengl"))
+    if (filtername.contains("opengl") && !gl_opengl_lite)
         return true;
 
     if (filtername.contains("bobdeint"))

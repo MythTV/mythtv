@@ -10,7 +10,7 @@ class VideoOutputOpenGL : public VideoOutput
 {
   public:
     static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
-    VideoOutputOpenGL();
+    VideoOutputOpenGL(const QString &profile = QString());
     virtual ~VideoOutputOpenGL();
 
     virtual bool Init(int width, int height, float aspect,
@@ -80,6 +80,7 @@ class VideoOutputOpenGL : public VideoOutput
 
     MythOpenGLPainter *gl_painter;
     bool               gl_created_painter;
+    bool               gl_opengl_lite;
 };
 
 #endif

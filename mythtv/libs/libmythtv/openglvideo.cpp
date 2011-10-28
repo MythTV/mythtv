@@ -86,7 +86,8 @@ OpenGLVideo::OpenGLVideo() :
     inputUpdated(false),      refsNeeded(0),
     textureRects(false),      textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
-    gl_features(0),           videoTextureType(GL_BGRA)
+    gl_features(0),           videoTextureType(GL_BGRA),
+    preferYCBCR(false)
 {
 }
 
@@ -162,6 +163,10 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     currentFrameNum       = -1;
     inputUpdated          = false;
 
+    // OpenGL-Lite - use implementation specific extensions for updating frames
+    if (options.contains("preferycbcr"))
+        preferYCBCR = true;
+
     // Set OpenGL feature support
     gl_features = gl_context->GetFeatures();
 
@@ -171,6 +176,15 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     SetViewPort(display_visible_rect.size());
 
     bool shaders = (gl_features & kGLExtFragProg) || (gl_features & kGLSL);
+
+    // warn about the lite profile when it offers no benefit
+    if (!((gl_features & kGLMesaYCbCr) || (gl_features & kGLAppleYCbCr)) &&
+        preferYCBCR)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "You have selected the opengl-lite profile but no required OpenGL "
+            "extensions are available.");
+    }
 
     // decide on best video input texture format
     videoTextureType = GL_BGRA;
@@ -182,9 +196,9 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     //{
     //    videoTextureType = GL_RGB_422_APPLE;
     //}
-    else if (!shaders && (gl_features & kGLMesaYCbCr))
+    else if ((!shaders || preferYCBCR) && (gl_features & kGLMesaYCbCr))
         videoTextureType = GL_YCBCR_MESA;
-    else if (!shaders && (gl_features & kGLAppleYCbCr))
+    else if ((!shaders || preferYCBCR) && (gl_features & kGLAppleYCbCr))
         videoTextureType = GL_YCBCR_422_APPLE;
 
     // colourspace adjustments require shaders to operate on YUV textures
