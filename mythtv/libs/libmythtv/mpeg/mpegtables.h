@@ -7,6 +7,7 @@
 #include "mpegdescriptors.h"
 #include "pespacket.h"
 #include "mythtvexp.h"
+#include "util.h" // for xml_indent
 
 /** \file mpegtables.h
  *  \code
@@ -450,9 +451,13 @@ class MTV_PUBLIC PSIPTable : public PESPacket
 
     bool VerifyPSIP(bool verify_crc) const;
 
-    const QString toString(void) const;
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
 
     static const uint PSIP_OFFSET = 8; // general PSIP header offset
+
+  protected:
+    QString XMLValues(uint indent_level) const;
 };
 
 /** \class ProgramAssociationTable
@@ -535,7 +540,8 @@ class MTV_PUBLIC ProgramAssociationTable : public PSIPTable
         return 0;
     }
 
-    const QString toString(void) const;
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
 
   private:
     static ProgramAssociationTable* CreateBlank(bool smallPacket = true);
@@ -661,7 +667,8 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
     void AppendStream(uint pid, uint type, unsigned char* si = 0, uint il = 0);
 
     void Parse(void) const;
-    const QString toString(void) const;
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
     // unsafe sets
   private:
     void SetStreamInfoLength(uint i, uint length)
@@ -726,6 +733,9 @@ class MTV_PUBLIC ConditionalAccessTable : public PSIPTable
         { return SectionLength() - PSIP_OFFSET; }
     const unsigned char *Descriptors(void) const { return psipdata(); }
 
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
+
     // CRC_32 32 rpchof
 };
 
@@ -749,6 +759,10 @@ class MTV_PUBLIC SpliceTimeView
     //   else
     //     reserved             7  0.1
     // }
+    virtual QString toString(int64_t first, int64_t last) const;
+    virtual QString toStringXML(
+        uint indent_level, int64_t first, int64_t last) const;
+
     uint size(void) const { return IsTimeSpecified() ? 1 : 5; }
   private:
     const unsigned char *_data;
@@ -855,7 +869,9 @@ class MTV_PUBLIC SpliceInsertView
     uint AvailsExpected(void) const { return _ptrs1[2][3]; }
     //   }
 
-    QString toString(int64_t first, int64_t last) const;
+    virtual QString toString(int64_t first, int64_t last) const;
+    virtual QString toStringXML(
+        uint indent_level, int64_t first, int64_t last) const;
 
   private:
     vector<const unsigned char*> _ptrs0;
@@ -1023,8 +1039,13 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 
     SpliceInformationTable *GetDecrypted(const QString &codeWord) const;
     bool Parse(void);
-    QString toString(int64_t first=-1LL, int64_t last=-1LL) const;
-    QString toStringXML(int64_t first=-1LL, int64_t last=-1LL) const;
+
+    virtual QString toString(void) const { return toString(-1LL, -1LL); }
+    virtual QString toStringXML(uint indent_level) const
+        { return toStringXML(indent_level, -1LL, -1LL); }
+
+    QString toString(int64_t first, int64_t last) const;
+    QString toStringXML(uint indent_level, int64_t first, int64_t last) const;
 
   private:
     vector<const unsigned char*> _ptrs0;

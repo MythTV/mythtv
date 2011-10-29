@@ -91,6 +91,13 @@ inline int   lerp(float r, int a, int b)
 inline float sq(float a) { return a*a; }
 inline int   sq(int   a) { return a*a; }
 
+static inline QString xml_bool_to_string(bool val)
+{
+    return (val) ? "true" : "false";
+}
+
+MBASE_PUBLIC QString xml_indent(uint level);
+
  MBASE_PUBLIC  bool IsMACAddress(QString MAC);
  MBASE_PUBLIC  bool WakeOnLAN(QString MAC);
  MBASE_PUBLIC  QString FileHash(QString filename);

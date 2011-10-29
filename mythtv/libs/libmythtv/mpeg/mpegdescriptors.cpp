@@ -464,21 +464,25 @@ QString MPEGDescriptor::toStringXML(uint level) const
     QString indent_1 = indent(level+1);
     QString str;
 
-    str += indent_0 + "<DESCRIPTOR>\n";
-    str += indent_1 + QString("<TAG>0x%1</TAG>\n")
+    str += indent_0 + "<Descriptor>\n";
+    str += indent_1 + QString("<Tag>0x%1</Tag>\n")
         .arg(DescriptorTag(),2,16,QChar('0'));
-    str += indent_1 + QString("<DESCRIPTION>%1</DESCRIPTION>\n")
+    str += indent_1 + QString("<Description>%1</Description>\n")
         .arg(DescriptorTagString(),0,16);
 
-    str += indent_1 + "<DATA>";
+    str += indent_1 + "<Data>";
     for (uint i = 0; i < DescriptorLength(); i++)
+    {
+        if (((i%8) == 0) && i)
+            str += "\n" + indent_1 + "      ";
         str += QString("0x%1 ").arg(_data[i+2],2,16,QChar('0'));
-    str = str.trimmed();
-    str += "</DATA>\n";
+    }
 
-    str += indent_1 + "<DECODED>" + toString() + "</DECODED>";
+    str += "\n" + indent_1 + "</Data>\n";
 
-    str += indent_0 + "</DESCRIPTOR>";
+    str += indent_1 + "<Decoded>" + toString() + "</Decoded>\n";
+
+    str += indent_0 + "</Descriptor>";
 
     return str;
 }
