@@ -499,6 +499,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
         // This will only happen at start-up
         if (AddTap(componentTag, carouselId))
         {
+            LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Initial stream tag %1").arg(componentTag));
             m_startTag = componentTag;
             found = true;
         }
@@ -516,6 +517,12 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
 
     unsigned short section_len = ((data[1] & 0xF) << 8) | (data[2]);
     section_len += 3;/* 3 bytes before length count starts */
+    if (section_len > length)
+    {
+        LOG(VB_DSMCC, LOG_WARNING, "[dsmcc] section length > data length");
+        return;
+    }
+
     /* Check CRC before trying to parse */
     unsigned long crc32_decode = crc32(data, section_len);
 
