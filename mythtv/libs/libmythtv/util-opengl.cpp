@@ -10,24 +10,6 @@ extern "C" {
 #include "libavcodec/x86/mmx.h"
 }
 
-static inline void mmx_pack_alpha_high(uint8_t *a1, uint8_t *a2,
-                                       uint8_t *y1, uint8_t *y2)
-{
-    movq_m2r (*a1, mm4);
-    punpckhbw_m2r (*y1, mm4);
-    movq_m2r (*a2, mm7);
-    punpckhbw_m2r (*y2, mm7);
-}
-
-static inline void mmx_pack_alpha_low(uint8_t *a1, uint8_t *a2,
-                                      uint8_t *y1, uint8_t *y2)
-{
-    movq_m2r (*a1, mm4);
-    punpcklbw_m2r (*y1, mm4);
-    movq_m2r (*a2, mm7);
-    punpcklbw_m2r (*y2, mm7);
-}
-
 static mmx_t mmx_1s = {0xffffffffffffffffLL};
 
 static inline void mmx_pack_alpha1s_high(uint8_t *y1, uint8_t *y2)
@@ -188,12 +170,10 @@ static inline void c_interp(uint8_t *dest, uint8_t *a, uint8_t *b,
     dest[3] = (uint8_t) (tmp >> 2);
 }
 
-void pack_yv12alpha(const unsigned char *source,
-                    const unsigned char *dest,
-                    const int *offsets,
-                    const int *pitches,
-                    const QSize size,
-                    const unsigned char *alpha)
+void pack_yv12progressive(const unsigned char *source,
+                          const unsigned char *dest,
+                          const int *offsets, const int *pitches,
+                          const QSize &size)
 {
     const int width = size.width();
     const int height = size.height();
@@ -225,152 +205,68 @@ void pack_yv12alpha(const unsigned char *source,
     uint8_t *dst_1   = (uint8_t *) dest;
     uint8_t *dst_2   = dst_1 + bgra_width;
 
-    if (alpha)
-    {
-        uint8_t *alpha_1 = (uint8_t *) alpha;
-        uint8_t *alpha_2 = alpha_1 + width;
-        uint a_extra  = width + residual;
-
 #ifdef MMX
-        for (int row = 0; row < height; row += 2)
+    for (int row = 0; row < height; row += 2)
+    {
+        for (int col = 0; col < mmx_width; col += 8)
         {
-            for (int col = 0; col < mmx_width; col += 8)
-            {
-                mmx_pack_chroma(upt,  vpt);
-                mmx_pack_alpha_low(alpha_1, alpha_2, ypt_1, ypt_2);
-                mmx_pack_middle(dst_1, dst_2);
-                mmx_pack_alpha_high(alpha_1, alpha_2, ypt_1, ypt_2);
-                mmx_pack_end(dst_1, dst_2);
+            mmx_pack_chroma(upt,  vpt);
+            mmx_pack_alpha1s_low(ypt_1, ypt_2);
+            mmx_pack_middle(dst_1, dst_2);
+            mmx_pack_alpha1s_high(ypt_1, ypt_2);
+            mmx_pack_end(dst_1, dst_2);
 
-                dst_1 += 32; dst_2 += 32;
-                alpha_1 += 8; alpha_2 += 8;
-                ypt_1 += 8; ypt_2 += 8;
-                upt   += 4; vpt   += 4;
-            }
+            dst_1 += 32; dst_2 += 32;
+            ypt_1 += 8;  ypt_2 += 8;
+            upt   += 4;  vpt   += 4;
 
-            ypt_1   += y_extra; ypt_2   += y_extra;
-            upt     += u_extra; vpt     += v_extra;
-            dst_1   += d_extra; dst_2   += d_extra;
-            alpha_1 += a_extra; alpha_2 += a_extra;
         }
+        ypt_1 += y_extra; ypt_2 += y_extra;
+        upt   += u_extra; vpt   += v_extra;
+        dst_1 += d_extra; dst_2 += d_extra;
+    }
 
-        emms();
+    emms();
 
-        if (residual)
-        {
-            y_extra     = (pitches[0] << 1) - width + mmx_width;
-            u_extra     = pitches[1] - chroma_width + (mmx_width >> 1);
-            v_extra     = pitches[2] - chroma_width + (mmx_width >> 1);
-            d_extra     = bgra_width + (mmx_width << 2);
+    if (residual)
+    {
+        y_extra     = (pitches[0] << 1) - width + mmx_width;
+        u_extra     = pitches[1] - chroma_width + (mmx_width >> 1);
+        v_extra     = pitches[2] - chroma_width + (mmx_width >> 1);
+        d_extra     = bgra_width + (mmx_width << 2);
 
-            ypt_1   = (uint8_t *)source + offsets[0] + mmx_width;
-            ypt_2   = ypt_1 + pitches[0];
-            upt     = (uint8_t *)source + offsets[1] + (mmx_width>>1);
-            vpt     = (uint8_t *)source + offsets[2] + (mmx_width>>1);
-            dst_1   = (uint8_t *) dest + (mmx_width << 2);
-            dst_2   = dst_1 + bgra_width;
-
-            alpha_1 = (uint8_t *) alpha + mmx_width;
-            alpha_2 = alpha_1 + width;
-            a_extra  = width + mmx_width;
-        }
-        else
-        {
-            return;
-        }
-#endif //MMX
-
-        for (int row = 0; row < height; row += 2)
-        {
-            for (int col = c_start_w; col < width; col += 2)
-            {
-                *(dst_1++) = *vpt; *(dst_2++) = *vpt;
-                *(dst_1++) = *(alpha_1++);
-                *(dst_2++) = *(alpha_2++);
-                *(dst_1++) = *upt; *(dst_2++) = *upt;
-                *(dst_1++) = *(ypt_1++);
-                *(dst_2++) = *(ypt_2++);
-
-                *(dst_1++) = *vpt; *(dst_2++) = *(vpt++);
-                *(dst_1++) = *(alpha_1++);
-                *(dst_2++) = *(alpha_2++);
-                *(dst_1++) = *upt; *(dst_2++) = *(upt++);
-                *(dst_1++) = *(ypt_1++);
-                *(dst_2++) = *(ypt_2++);
-            }
-
-            ypt_1   += y_extra; ypt_2   += y_extra;
-            upt     += u_extra; vpt     += v_extra;
-            alpha_1 += a_extra; alpha_2 += a_extra;
-            dst_1   += d_extra; dst_2   += d_extra;
-        }
+        ypt_1   = (uint8_t *)source + offsets[0] + mmx_width;
+        ypt_2   = ypt_1 + pitches[0];
+        upt     = (uint8_t *)source + offsets[1] + (mmx_width>>1);
+        vpt     = (uint8_t *)source + offsets[2] + (mmx_width>>1);
+        dst_1   = (uint8_t *) dest + (mmx_width << 2);
+        dst_2   = dst_1 + bgra_width;
     }
     else
     {
-
-#ifdef MMX
-        for (int row = 0; row < height; row += 2)
-        {
-            for (int col = 0; col < mmx_width; col += 8)
-            {
-                mmx_pack_chroma(upt,  vpt);
-                mmx_pack_alpha1s_low(ypt_1, ypt_2);
-                mmx_pack_middle(dst_1, dst_2);
-                mmx_pack_alpha1s_high(ypt_1, ypt_2);
-                mmx_pack_end(dst_1, dst_2);
-
-                dst_1 += 32; dst_2 += 32;
-                ypt_1 += 8;  ypt_2 += 8;
-                upt   += 4;  vpt   += 4;
-
-            }
-            ypt_1 += y_extra; ypt_2 += y_extra;
-            upt   += u_extra; vpt   += v_extra;
-            dst_1 += d_extra; dst_2 += d_extra;
-        }
-
-        emms();
-
-        if (residual)
-        {
-            y_extra     = (pitches[0] << 1) - width + mmx_width;
-            u_extra     = pitches[1] - chroma_width + (mmx_width >> 1);
-            v_extra     = pitches[2] - chroma_width + (mmx_width >> 1);
-            d_extra     = bgra_width + (mmx_width << 2);
-
-            ypt_1   = (uint8_t *)source + offsets[0] + mmx_width;
-            ypt_2   = ypt_1 + pitches[0];
-            upt     = (uint8_t *)source + offsets[1] + (mmx_width>>1);
-            vpt     = (uint8_t *)source + offsets[2] + (mmx_width>>1);
-            dst_1   = (uint8_t *) dest + (mmx_width << 2);
-            dst_2   = dst_1 + bgra_width;
-        }
-        else
-        {
-            return;
-        }
+        return;
+    }
 #endif //MMX
 
-        for (int row = 0; row < height; row += 2)
+    for (int row = 0; row < height; row += 2)
+    {
+        for (int col = c_start_w; col < width; col += 2)
         {
-            for (int col = c_start_w; col < width; col += 2)
-            {
-                *(dst_1++) = *vpt; *(dst_2++) = *vpt;
-                *(dst_1++) = 255;  *(dst_2++) = 255;
-                *(dst_1++) = *upt; *(dst_2++) = *upt;
-                *(dst_1++) = *(ypt_1++);
-                *(dst_2++) = *(ypt_2++);
+            *(dst_1++) = *vpt; *(dst_2++) = *vpt;
+            *(dst_1++) = 255;  *(dst_2++) = 255;
+            *(dst_1++) = *upt; *(dst_2++) = *upt;
+            *(dst_1++) = *(ypt_1++);
+            *(dst_2++) = *(ypt_2++);
 
-                *(dst_1++) = *vpt; *(dst_2++) = *(vpt++);
-                *(dst_1++) = 255;  *(dst_2++) = 255;
-                *(dst_1++) = *upt; *(dst_2++) = *(upt++);
-                *(dst_1++) = *(ypt_1++);
-                *(dst_2++) = *(ypt_2++);
-            }
-            ypt_1   += y_extra; ypt_2   += y_extra;
-            upt     += u_extra; vpt     += v_extra;
-            dst_1   += d_extra; dst_2   += d_extra;
+            *(dst_1++) = *vpt; *(dst_2++) = *(vpt++);
+            *(dst_1++) = 255;  *(dst_2++) = 255;
+            *(dst_1++) = *upt; *(dst_2++) = *(upt++);
+            *(dst_1++) = *(ypt_1++);
+            *(dst_2++) = *(ypt_2++);
         }
+        ypt_1   += y_extra; ypt_2   += y_extra;
+        upt     += u_extra; vpt     += v_extra;
+        dst_1   += d_extra; dst_2   += d_extra;
     }
 }
 
@@ -378,7 +274,7 @@ void pack_yv12interlaced(const unsigned char *source,
                          const unsigned char *dest,
                          const int *offsets,
                          const int *pitches,
-                         const QSize size)
+                         const QSize &size)
 {
     int width = size.width();
     int height = size.height();

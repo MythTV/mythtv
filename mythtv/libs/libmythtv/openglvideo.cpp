@@ -840,8 +840,8 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
     }
     else
     {
-        pack_yv12alpha(frame->buf, (unsigned char*)buf, frame->offsets,
-                       frame->pitches, video_dim, NULL);
+        pack_yv12progressive(frame->buf, (unsigned char*)buf, frame->offsets,
+                             frame->pitches, video_dim);
     }
 
     gl_context->UpdateTexture(inputTextures[0], buf);
