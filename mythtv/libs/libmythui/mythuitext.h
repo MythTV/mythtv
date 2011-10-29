@@ -131,8 +131,13 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     float curR, curG, curB;
     float incR, incG, incB;
 
-    enum ScrollDir {ScrollLeft, ScrollRight, ScrollUp, ScrollDown};
+    enum Constants {ScrollBounceDelay = 250};
+    enum ScrollDir {ScrollNone, ScrollLeft, ScrollRight, ScrollUp, ScrollDown,
+                    ScrollHorizontal, ScrollVertical};
 
+    int  m_scrollPause;
+    int  m_scrollOffset;
+    bool m_scrollBounce;
     bool m_scrolling;
     ScrollDir m_scrollDirection;
 

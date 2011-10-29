@@ -37,8 +37,10 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
 #endif
     m_ShrinkNarrow = true;
     m_MultiLine = false;
+    m_scrollPause = ScrollBounceDelay;
+    m_scrollBounce = false;
     m_scrolling = false;
-    m_scrollDirection = ScrollLeft;
+    m_scrollDirection = ScrollNone;
     m_textCase = CaseNormal;
     m_Leading = 1;
     m_extraLeading = 0;
@@ -71,8 +73,10 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
 #endif
     m_ShrinkNarrow = true;
     m_MultiLine = false;
+    m_scrollPause = ScrollBounceDelay;
+    m_scrollBounce = false;
     m_scrolling = false;
-    m_scrollDirection = ScrollLeft;
+    m_scrollDirection = ScrollNone;
     m_textCase = CaseNormal;
     m_Leading = 1;
     m_extraLeading = 0;
@@ -686,19 +690,22 @@ void MythUIText::FillCutMessage(void)
         LayoutParagraphs(paragraphs, textoption, width, height,
                          min_rect, last_line_width, num_lines);
 
-        m_Canvas.setWidth(min_rect.x() + min_rect.width());
-        m_Canvas.setHeight(height);
+        m_Canvas.setRect(0, 0, min_rect.x() + min_rect.width(), height);
+        m_scrollPause = ScrollBounceDelay;
+        m_scrollBounce = false;
     }
 
     if (m_scrolling)
     {
         if (m_scrollDirection == ScrollLeft ||
-            m_scrollDirection == ScrollRight)
+            m_scrollDirection == ScrollRight ||
+            m_scrollDirection == ScrollHorizontal)
         {
             if (m_Canvas.width() > m_drawRect.width())
             {
                 m_drawRect.setX(m_Area.x());
                 m_drawRect.setWidth(m_Area.width());
+                m_scrollOffset = m_drawRect.x() - m_Canvas.x();
             }
         }
         else
@@ -707,6 +714,7 @@ void MythUIText::FillCutMessage(void)
             {
                 m_drawRect.setY(m_Area.y());
                 m_drawRect.setHeight(m_Area.height());
+                m_scrollOffset = m_drawRect.y() - m_Canvas.y();
             }
         }
     }
@@ -880,6 +888,36 @@ void MythUIText::Pulse(void)
                     SetCanvasPosition(-m_Canvas.width(), 0);
             }
             break;
+          case ScrollHorizontal:
+            if (m_Canvas.width() <= m_drawRect.width())
+                break;
+            if (m_scrollPause > 0)
+            {
+                --m_scrollPause;
+                break;
+            }
+            if (m_scrollBounce) // scroll right
+            {
+                if (m_Canvas.x() + m_scrollOffset > m_drawRect.x())
+                {
+                    m_scrollBounce = false;
+                    m_scrollPause = ScrollBounceDelay;
+                }
+                else
+                    ShiftCanvas(1, 0);
+            }
+            else // scroll left
+            {
+                if (m_Canvas.x() + m_Canvas.width() + m_scrollOffset <
+                    m_drawRect.x() + m_drawRect.width())
+                {
+                    m_scrollBounce = true;
+                    m_scrollPause = ScrollBounceDelay;
+                }
+                else
+                    ShiftCanvas(-1, 0);
+            }
+            break;
           case ScrollUp :
             if (m_Canvas.height() > m_drawRect.height())
             {
@@ -894,6 +932,36 @@ void MythUIText::Pulse(void)
                 ShiftCanvas(0, 1);
                 if (m_Canvas.y() > m_drawRect.height())
                     SetCanvasPosition(0, -m_Canvas.height());
+            }
+            break;
+          case ScrollVertical:
+            if (m_Canvas.height() <= m_drawRect.height())
+                break;
+            if (m_scrollPause > 0)
+            {
+                --m_scrollPause;
+                break;
+            }
+            if (m_scrollBounce) // scroll down
+            {
+                if (m_Canvas.y() + m_scrollOffset > m_drawRect.y())
+                {
+                    m_scrollBounce = false;
+                    m_scrollPause = ScrollBounceDelay;
+                }
+                else
+                    ShiftCanvas(0, 1);
+            }
+            else // scroll up
+            {
+                if (m_Canvas.y() + m_Canvas.height() + m_scrollOffset <
+                    m_drawRect.y() + m_drawRect.height())
+                {
+                    m_scrollBounce = true;
+                    m_scrollPause = ScrollBounceDelay;
+                }
+                else
+                    ShiftCanvas(0, -1);
             }
             break;
         }
@@ -1057,6 +1125,15 @@ bool MythUIText::ParseElement(
                     m_scrollDirection = ScrollUp;
                 else if (tmp == "down")
                     m_scrollDirection = ScrollDown;
+                else if (tmp == "horizontal")
+                    m_scrollDirection = ScrollHorizontal;
+                else if (tmp == "vertical")
+                    m_scrollDirection = ScrollVertical;
+                else
+                {
+                    m_scrollDirection = ScrollNone;
+                    LOG(VB_GENERAL, LOG_ERR, "Invalid scroll attribute");
+                }
             }
 
             m_scrolling = true;
