@@ -237,7 +237,11 @@ void MythUIText::UseAlternateArea(bool useAlt)
 
 void MythUIText::SetJustification(int just)
 {
-    if (m_Justification != (just & ~Qt::TextWordWrap))
+    int h = just & Qt::AlignHorizontal_Mask;
+    int v = just & Qt::AlignVertical_Mask;
+
+    if ((h && (m_Justification & Qt::AlignHorizontal_Mask) ^ h) ||
+        (v && (m_Justification & Qt::AlignVertical_Mask) ^ v))
     {
         // preserve the wordbreak attribute, drop everything else
         m_Justification = m_Justification & Qt::TextWordWrap;
@@ -819,7 +823,6 @@ QPoint MythUIText::CursorPosition(int text_offset)
     pos += m_Area.topLeft().toQPoint();
     m_cursorPos = pos;
 
-    SetRedraw();
     return pos;
 }
 

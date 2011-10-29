@@ -555,6 +555,8 @@ void MythUIType::SetMinSize(const MythPoint &minsize)
         point.CalculatePoint(m_Parent->GetFullArea());
 
     m_MinSize = point;
+
+    SetRedraw();
 }
 
 QSize MythUIType::GetMinSize(void) const
