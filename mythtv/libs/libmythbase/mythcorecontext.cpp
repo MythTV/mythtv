@@ -980,7 +980,7 @@ void MythCoreContext::SendEvent(const MythEvent &event)
 
 void MythCoreContext::SendSystemEvent(const QString msg)
 {
-    if (GetSetting("MasterServerIP", "").isEmpty())
+    if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHTV_SETUP)
         return;
 
     SendMessage(QString("SYSTEM_EVENT %1 SENDER %2")
