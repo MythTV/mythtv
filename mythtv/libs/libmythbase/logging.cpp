@@ -518,7 +518,7 @@ void DBLoggerThread::run(void)
     // then short-running tasks (like mythpreviewgen) will not log to the db
     // at all, and that's undesirable.
     bool ready = false;
-    while (!gCoreContext && !aborted && !ready)
+    while ( !aborted && ( !gCoreContext || !ready ) )
     {
         ready = m_logger->isDatabaseReady();
 
