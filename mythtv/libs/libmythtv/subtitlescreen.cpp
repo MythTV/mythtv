@@ -2,7 +2,7 @@
 
 #include "mythlogging.h"
 #include "mythfontproperties.h"
-#include "mythuitext.h"
+#include "mythuisimpletext.h"
 #include "mythuishape.h"
 #include "mythuiimage.h"
 #include "mythpainter.h"
@@ -503,7 +503,7 @@ void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
     int pad_width = font.maxWidth() * PAD_WIDTH;
     int y = m_safeArea.height() - (height * wrappedsubs.size());
     int centre = m_safeArea.width() / 2;
-    QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
+    QBrush bgfill = QBrush(QColor(0, 0, 0, 128), Qt::SolidPattern);
     foreach (QString subtitle, wrappedsubs)
     {
         if (subtitle.isEmpty())
@@ -521,10 +521,10 @@ void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
             if (duration > 0)
                 m_expireTimes.insert(shape, start + duration);
         }
-        MythUIText* text = new MythUIText(subtitle, *gTextSubFont, rect,
-                                rect, this, QString("tsub%1%2").arg(x).arg(y));
-        if (text)
-            text->SetJustification(Qt::AlignCenter);
+        MythUISimpleText* text = new MythUISimpleText
+                                 (subtitle, *gTextSubFont, rect,
+                                  Qt::AlignCenter, this,
+                                  QString("tsub%1%2").arg(x).arg(y));
         y += height;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + subtitle);
         m_refreshArea = true;
@@ -658,7 +658,7 @@ static QString extract_cc608(
         result = text.left(nextControl);
         // Print the space character before handling the next control
         // character, otherwise the space character will be lost due
-        // to the text.trimmed() operation in the MythUIText
+        // to the text.trimmed() operation in the MythUISimpleText
         // constructor, combined with the left-justification of
         // captions.
         if (text[nextControl] < (0x7000 + 0x10))
@@ -702,9 +702,9 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
 
     if (textlist)
         textlist->lock.lock();
-    
+
     DeleteAllChildren();
-    
+
     if (!textlist)
         return;
 
@@ -720,7 +720,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     int xscale = teletextmode ? 40 : 36;
     int yscale = teletextmode ? 25 : 17;
     gTextSubFont->GetFace()->setPixelSize(m_safeArea.height() / (yscale * 1.2));
-    QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
+    QBrush bgfill = QBrush(QColor(0, 0, 0, 128), Qt::SolidPattern);
 
     for (; i != textlist->buffers.end(); ++i)
     {
@@ -778,12 +778,11 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
                 shape->SetArea(MythRect(bgrect));
             }
 
-            MythUIText *text = new MythUIText(
-                captionText, *gTextSubFont, rect, rect, (MythUIType*)this,
+            MythUISimpleText *text = new MythUISimpleText
+                                     (captionText, *gTextSubFont, rect,
+                                      Qt::AlignLeft, (MythUIType*)this,
                 QString("cc608txt%1%2%3%4").arg(cc->x).arg(cc->y)
                 .arg(width).arg(chunk));
-            if (text)
-                text->SetJustification(Qt::AlignLeft);
 
             m_refreshArea = true;
 
@@ -1012,13 +1011,12 @@ void SubtitleScreen::Display708Strings(const CC708Window &win, int num,
 
             if (trimmed.size() && textwidth)
             {
-                MythUIText *text = new MythUIText(list[i]->str, *mythfont,
-                                                  rect, rect,
-                                                  (MythUIType*)this,
-                                                  QString("cc708text%1x%2").arg(row).arg(i));
+                MythUISimpleText *text = new MythUISimpleText
+                                         (list[i]->str, *mythfont,
+                                          rect, Qt::AlignCenter,
+                                          (MythUIType*)this,
+                                  QString("cc708text%1x%2").arg(row).arg(i));
                 m_708imageCache[num].append(text);
-                if (text)
-                    text->SetJustification(Qt::AlignCenter);
                 m_refreshArea = true;
             }
 
