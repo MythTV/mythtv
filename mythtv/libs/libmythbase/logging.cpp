@@ -530,51 +530,54 @@ void DBLoggerThread::run(void)
         }
     }
 
-    // We want the query to be out of scope before the RunEpilog() so shutdown
-    // occurs correctly as otherwise the connection appears still in use, and
-    // we get a qWarning on shutdown.
-    MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
-    m_logger->prepare(*query);
-
-    QMutexLocker qLock(&m_queueMutex);
-    while (!aborted || !m_queue->isEmpty())
+    if (!aborted)
     {
-        if (m_queue->isEmpty())
+        // We want the query to be out of scope before the RunEpilog() so
+        // shutdown occurs correctly as otherwise the connection appears still
+        // in use, and we get a qWarning on shutdown.
+        MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
+        m_logger->prepare(*query);
+
+        QMutexLocker qLock(&m_queueMutex);
+        while (!aborted || !m_queue->isEmpty())
         {
-            m_wait->wait(qLock.mutex(), 100);
-            continue;
-        }
-
-        LoggingItem *item = m_queue->dequeue();
-        if (!item)
-            continue;
-
-        qLock.unlock();
-
-        if (item->message[0] != '\0')
-        {
-            if (!m_logger->logqmsg(*query, item))
+            if (m_queue->isEmpty())
             {
-                qLock.relock();
-                m_queue->prepend(item);
                 m_wait->wait(qLock.mutex(), 100);
-                delete query;
-                query = new MSqlQuery(MSqlQuery::InitCon());
-                m_logger->prepare(*query);
                 continue;
             }
-        }
-        else
-        {
-            deleteItem(item);
+
+            LoggingItem *item = m_queue->dequeue();
+            if (!item)
+                continue;
+
+            qLock.unlock();
+
+            if (item->message[0] != '\0')
+            {
+                if (!m_logger->logqmsg(*query, item))
+                {
+                    qLock.relock();
+                    m_queue->prepend(item);
+                    m_wait->wait(qLock.mutex(), 100);
+                    delete query;
+                    query = new MSqlQuery(MSqlQuery::InitCon());
+                    m_logger->prepare(*query);
+                    continue;
+                }
+            }
+            else
+            {
+                deleteItem(item);
+            }
+
+            qLock.relock();
         }
 
-        qLock.relock();
+        delete query;
+
+        qLock.unlock();
     }
-
-    delete query;
-
-    qLock.unlock();
 
     RunEpilog();
 }
