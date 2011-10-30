@@ -53,6 +53,9 @@ DTC::VideoMetadataInfoList* Video::GetVideos( bool bDescending,
 
     std::vector<VideoMetadataListManager::VideoMetadataPtr> videos(videolist.begin(), videolist.end());
 
+    if (bDescending)
+        std::reverse(videos.begin(), videos.end());
+
     // ----------------------------------------------------------------------
     // Build Response
     // ----------------------------------------------------------------------
