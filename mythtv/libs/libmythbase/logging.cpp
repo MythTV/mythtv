@@ -530,7 +530,7 @@ void DBLoggerThread::run(void)
         }
     }
 
-    if (!aborted)
+    if (ready)
     {
         // We want the query to be out of scope before the RunEpilog() so
         // shutdown occurs correctly as otherwise the connection appears still
