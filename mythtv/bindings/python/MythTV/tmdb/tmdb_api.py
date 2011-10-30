@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.2.5"
+__version__="v0.2.6"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -41,6 +41,8 @@ __version__="v0.2.5"
 # 0.2.4 Added width and height attributes to images
 # 0.2.5 Added a replace text XPatch extention so that "person" full size images can be created from
 #       the thumbnail.
+# 0.2.6 Fixed processing publish date when it is a 'UTC' date
+#       Code line length clean up
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -348,23 +350,38 @@ class MovieDb(object):
         self.config[u'urls'] = {}
 
         # v2.1 api calls
-        self.config[u'urls'][u'movie.search'] = u'%(base_url)s/Movie.search/%(language)s/xml/%(apikey)s/%%s' % (self.config)
-        self.config[u'urls'][u'tmdbid.search'] = u'%(base_url)s/Movie.getInfo/%(language)s/xml/%(apikey)s/%%s' % (self.config)
-        self.config[u'urls'][u'imdb.search'] = u'%(base_url)s/Movie.imdbLookup/%(language)s/xml/%(apikey)s/tt%%s'  % (self.config)
-        self.config[u'urls'][u'image.search'] = u'%(base_url)s/Movie.getImages/%(language)s/xml/%(apikey)s/%%s' % (self.config)
-        self.config[u'urls'][u'person.search'] = u'%(base_url)s/Person.search/%(language)s/xml/%(apikey)s/%%s' % (self.config)
-        self.config[u'urls'][u'person.info'] = u'%(base_url)s/Person.getInfo/%(language)s/xml/%(apikey)s/%%s' % (self.config)
-        self.config[u'urls'][u'hash.info'] = u'%(base_url)s/Hash.getInfo/%(language)s/xml/%(apikey)s/%%s' % (self.config)
+        self.config[u'urls'][u'movie.search'] = \
+        u'%(base_url)s/Movie.search/%(language)s/xml/%(apikey)s/%%s' % (self.config)
+        self.config[u'urls'][u'tmdbid.search'] = \
+        u'%(base_url)s/Movie.getInfo/%(language)s/xml/%(apikey)s/%%s' % (self.config)
+        self.config[u'urls'][u'imdb.search'] = \
+        u'%(base_url)s/Movie.imdbLookup/%(language)s/xml/%(apikey)s/tt%%s'  % (self.config)
+        self.config[u'urls'][u'image.search'] = \
+        u'%(base_url)s/Movie.getImages/%(language)s/xml/%(apikey)s/%%s' % (self.config)
+        self.config[u'urls'][u'person.search'] = \
+        u'%(base_url)s/Person.search/%(language)s/xml/%(apikey)s/%%s' % (self.config)
+        self.config[u'urls'][u'person.info'] = \
+        u'%(base_url)s/Person.getInfo/%(language)s/xml/%(apikey)s/%%s' % (self.config)
+        self.config[u'urls'][u'hash.info'] = \
+        u'%(base_url)s/Hash.getInfo/%(language)s/xml/%(apikey)s/%%s' % (self.config)
 
         # Translation of TMDB elements into MythTV keys/db grabber names
-        self.config[u'mythtv_translation'] = {u'actor': u'cast', u'backdrop': u'fanart', u'categories': u'genres', u'director':  u'director', u'id': u'inetref', u'name': u'title', u'overview': u'plot', u'rating': u'userrating', u'poster': u'coverart', u'production_countries': u'countries', u'released': u'releasedate', u'runtime': u'runtime', u'url': u'url', u'imdb_id': u'imdb', u'certification': u'movierating', }
+        self.config[u'mythtv_translation'] = {\
+        u'actor': u'cast', u'backdrop': u'fanart', u'categories': u'genres',
+        u'director':  u'director', u'id': u'inetref', u'name': u'title',
+        u'overview': u'plot', u'rating': u'userrating', u'poster': u'coverart',
+        u'production_countries': u'countries', u'released': u'releasedate',
+        u'runtime': u'runtime', u'url': u'url', u'imdb_id': u'imdb',
+        u'certification': u'movierating', }
         self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
         self.thumbnails = False
         self.xml = False
         self.pubDateFormat = u'%a, %d %b %Y %H:%M:%S GMT'
         self.xmlParser = eTree.HTMLParser(remove_blank_text=True)
         self.baseProcessingDir = os.path.dirname( os.path.realpath( __file__ ))
-        self.supportedJobList = ["actor", "author", "producer", "executive producer", "director", "cinematographer", "composer", "editor", "casting", ]
+        self.supportedJobList = [\
+        "actor", "author", "producer", "executive producer",
+        "director", "cinematographer", "composer", "editor", "casting", ]
         self.tagTranslations = {
             'poster': 'coverart',
             'backdrop': 'fanart',
@@ -940,9 +957,12 @@ class MovieDb(object):
         try:
             if len(args) > 1:
                 args[1] = args[1].replace(',', u'').replace('.', u'')
-                if args[1].find('GMT') != -1:
-                    args[1] = args[1][:args[1].find('GMT')].strip()
-                    args[0] = args[0][:args[0].rfind(' ')].strip()
+                for cutOff in ['GMT', 'UTC']:
+                    if args[1].find(cutOff) != -1:
+                        args[1] = args[1][:args[1].find(cutOff)].strip()
+                        args[0] = args[0][:args[0].rfind(' ')].strip()
+                    if args[0].find(cutOff) != -1:
+                        args[0] = args[0][:args[0].find(cutOff)].strip()
                 try:
                     pubdate = time.strptime(args[0], args[1])
                 except ValueError:
@@ -950,6 +970,8 @@ class MovieDb(object):
                         pubdate = time.strptime(args[0], '%a %d %B %Y %H:%M:%S')
                     elif args[1] == '%a %d %B %Y %H:%M:%S':
                         pubdate = time.strptime(args[0], '%a %d %b %Y %H:%M:%S')
+                    else:
+                        pubdate = datetime.datetime.now().strftime(self.pubDateFormat)
                 if len(args) > 2:
                     return time.strftime(args[2], pubdate)
                 else:
@@ -1136,8 +1158,19 @@ class Videos(MovieDb):
         super(Videos, self).__init__(apikey, mythtv, interactive, select_first, debug, custom_ui, language, search_all_languages, )
     # end __init__()
 
-    error_messages = {'TmdHttpError': u"! Error: A connection error to themoviedb.org was raised (%s)\n", 'TmdXmlError': u"! Error: Invalid XML was received from themoviedb.org (%s)\n", 'TmdBaseError': u"! Error: A user interface error was raised (%s)\n", 'TmdbUiAbort': u"! Error: A user interface input error was raised (%s)\n", }
-    key_translation = [{'channel_title': 'channel_title', 'channel_link': 'channel_link', 'channel_description': 'channel_description', 'channel_numresults': 'channel_numresults', 'channel_returned': 'channel_returned', 'channel_startindex': 'channel_startindex'}, {'title': 'item_title', 'item_author': 'item_author', 'releasedate': 'item_pubdate', 'overview': 'item_description', 'url': 'item_link', 'trailer': 'item_url', 'runtime': 'item_duration', 'userrating': 'item_rating', 'width': 'item_width', 'height': 'item_height', 'language': 'item_lang'}]
+    error_messages = {\
+    'TmdHttpError': u"! Error: A connection error to themoviedb.org was raised (%s)\n",
+    'TmdXmlError': u"! Error: Invalid XML was received from themoviedb.org (%s)\n",
+    'TmdBaseError': u"! Error: A user interface error was raised (%s)\n",
+    'TmdbUiAbort': u"! Error: A user interface input error was raised (%s)\n", }
+    key_translation = [{\
+    'channel_title': 'channel_title', 'channel_link': 'channel_link', 'channel_description':
+    'channel_description', 'channel_numresults': 'channel_numresults', 'channel_returned':
+    'channel_returned', 'channel_startindex': 'channel_startindex'},
+    {'title': 'item_title', 'item_author': 'item_author', 'releasedate':
+    'item_pubdate', 'overview': 'item_description', 'url': 'item_link', 'trailer': 'item_url',
+    'runtime': 'item_duration', 'userrating': 'item_rating', 'width': 'item_width', 'height':
+    'item_height', 'language': 'item_lang'}]
 
     def searchForVideos(self, title, pagenumber):
         """Common name for a video search. Used to interface with MythTV plugin NetVision
@@ -1166,7 +1199,8 @@ class Videos(MovieDb):
                         continue
                     if key == 'releasedate':
                         c = time.strptime(data[key],"%Y-%m-%d")
-                        trailer_data[self.key_translation[1][key]] = time.strftime("%a, %d %b %Y 00:%M:%S GMT",c) # <pubDate>Tue, 14 Jul 2009 17:05:00 GMT</pubDate> <pubdate>Wed, 24 Jun 2009 03:53:00 GMT</pubdate>
+            # <pubDate>Tue, 14 Jul 2009 17:05:00 GMT</pubDate> <pubdate>Wed, 24 Jun 2009 03:53:00 GMT</pubdate>
+                        trailer_data[self.key_translation[1][key]] = time.strftime("%a, %d %b %Y 00:%M:%S GMT",c)
                         continue
                     trailer_data[self.key_translation[1][key]] = data[key]
                 else:
@@ -1230,7 +1264,10 @@ class Videos(MovieDb):
         self.key_translation[1][self.thumbnails] = 'item_thumbnail'
 
         # Channel details and search results
-        channel = {'channel_title': u'themoviedb.org', 'channel_link': u'http://themoviedb.org', 'channel_description': u'themoviedb.org is an open “wiki-style” movie database', 'channel_numresults': 0, 'channel_returned': self.page_limit, u'channel_startindex': 0}
+        channel = {\
+        'channel_title': u'themoviedb.org', 'channel_link': u'http://themoviedb.org',
+        'channel_description': u'themoviedb.org is an open “wiki-style” movie database',
+        'channel_numresults': 0, 'channel_returned': self.page_limit, u'channel_startindex': 0}
 
         trailers = []
         trailer_total = 0
