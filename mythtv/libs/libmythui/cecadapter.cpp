@@ -14,7 +14,7 @@
 #include "cecadapter.h"
 #include <vector>
 
-#define MIN_LIBCEC_VERSION 7
+#define MIN_LIBCEC_VERSION 8
 #define MAX_CEC_DEVICES 10
 #define LOC QString("CECAdapter: ")
 
