@@ -186,7 +186,7 @@ DTC::EncoderList* Dvr::Encoders()
                     {
                         DTC::Program *pProgram = pEncoder->Recording();
 
-                        FillProgramInfo( pProgram, pInfo, false, true );
+                        FillProgramInfo( pProgram, pInfo, true, true );
 
                         delete pInfo;
                     }
