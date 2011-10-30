@@ -211,7 +211,7 @@ DTC::ProgramList* Dvr::GetUpcoming( int  nStartIndex,
                                     bool bShowAll )
 {
     RecordingList  recordingList;
-    RecordingList  tmpList(false);
+    RecordingList  tmpList;
     bool hasConflicts;
     LoadFromScheduler(tmpList, hasConflicts);
 
@@ -223,12 +223,12 @@ DTC::ProgramList* Dvr::GetUpcoming( int  nStartIndex,
             ((*it)->GetRecordingStartTime() >=
              QDateTime::currentDateTime()))
         {
-            recordingList.push_back(*it);
+            recordingList.push_back(new RecordingInfo(**it));
         }
         else if (bShowAll && ((*it)->GetRecordingStartTime() >=
              QDateTime::currentDateTime()))
         {
-            recordingList.push_back(*it);
+            recordingList.push_back(new RecordingInfo(**it));
         }
     }
 
