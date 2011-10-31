@@ -169,7 +169,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
     def _setpath(cls, filepath):
         cls._initlogger()
         cls._setfile(os.path.join(filepath, "{0}.{1}.{2}.log"\
-                            .format(argv[0].rsplit('/', 1)[1],
+                            .format(argv[0].split('/')[-1],
                                     datetime.now().strftime('%Y%m%d%H%M%S'),
                                     os.getpid())))
 
@@ -229,7 +229,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
                     if m in ('all','most','none'):
                         # set initial bitfield
                         mask = getattr(cls, m.upper())
-                    elif l in bwlist:
+                    elif m in bwlist:
                         # update bitfield OR
                         mask |= getattr(cls, m.upper())
                     elif len(m) > 2:
