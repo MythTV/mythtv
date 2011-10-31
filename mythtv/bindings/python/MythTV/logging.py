@@ -114,10 +114,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
                 elif arg == '--logfile':
                     cls._setfile(args.next())
                 elif arg == '--logpath':
-                    cls._setfile(os.path.join(args.next(), "{0}.{1}.{2}.log"\
-                            .format(argv[0].rsplit('/', 1)[1],
-                                    datetime.now().strftime('%Y%m%d%H%M%S'),
-                                    os.getpid())))
+                    cls._setpath(args.next())
                 elif arg == '--syslog':
                     cls._setsyslog(args.next())
                 elif arg == '--':
@@ -167,6 +164,14 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         """Redirect log output to a specific file."""
         cls._initlogger()
         cls._setfileobject(open(filename, 'w'))
+
+    @classmethod
+    def _setpath(cls, filepath):
+        cls._initlogger()
+        cls._setfile(os.path.join(filepath, "{0}.{1}.{2}.log"\
+                            .format(argv[0].rsplit('/', 1)[1],
+                                    datetime.now().strftime('%Y%m%d%H%M%S'),
+                                    os.getpid())))
 
     @classmethod
     def _setfileobject(cls, fileobject, close=True):
