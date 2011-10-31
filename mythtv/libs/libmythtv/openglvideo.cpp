@@ -306,6 +306,7 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
         RemoveFilter(kGLFilterResize);
         filters.erase(kGLFilterResize);
         AddFilter(kGLFilterBicubic);
+        OptimiseFilters();
         return;
     }
 
@@ -314,12 +315,12 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
         RemoveFilter(kGLFilterBicubic);
         filters.erase(kGLFilterBicubic);
         AddFilter(kGLFilterResize);
+        OptimiseFilters();
         return;
     }
 
     RemoveFilter(kGLFilterBicubic);
     filters.erase(kGLFilterBicubic);
-
     OptimiseFilters();
 }
 
@@ -394,15 +395,15 @@ bool OpenGLVideo::OptimiseFilters(void)
 
 void OpenGLVideo::SetFiltering(void)
 {
-    // filter settings included for performance only
-    // no (obvious) quality improvement over GL_LINEAR throughout
-    if (filters.empty() || filters.size() == 1)
+    if (filters.size() < 2)
     {
         SetTextureFilters(&inputTextures, GL_LINEAR, GL_CLAMP_TO_EDGE);
+        SetTextureFilters(&referenceTextures, GL_LINEAR, GL_CLAMP_TO_EDGE);
         return;
     }
 
     SetTextureFilters(&inputTextures, GL_NEAREST, GL_CLAMP_TO_EDGE);
+    SetTextureFilters(&referenceTextures, GL_NEAREST, GL_CLAMP_TO_EDGE);
 
     glfilt_map_t::reverse_iterator rit;
     int last_filter = 0;
