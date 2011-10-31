@@ -48,7 +48,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.1" );
 
     public:
 
@@ -69,6 +69,9 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         virtual DTC::ProgramList* GetRecorded         ( bool             Descending,
                                                         int              StartIndex,
                                                         int              Count      ) = 0;
+
+        virtual DTC::Program*     GetRecordedItem     ( int              ChanId,
+                                                        const QDateTime &StartTime  ) = 0;
 
         virtual DTC::ProgramList* GetUpcoming         ( int              StartIndex,
                                                         int              Count,

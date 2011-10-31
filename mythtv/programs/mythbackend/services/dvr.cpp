@@ -100,6 +100,24 @@ DTC::ProgramList* Dvr::GetRecorded( bool bDescending,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::Program* Dvr::GetRecordedItem( int              nChanId,
+                                    const QDateTime &dStartTime  )
+{
+    if (nChanId <= 0 || !dStartTime.isValid())
+        throw( QString("Channel ID or StartTime appears invalid."));
+
+    ProgramInfo *pInfo = new ProgramInfo(nChanId, dStartTime);
+
+    DTC::Program *pProgram = new DTC::Program();
+    FillProgramInfo( pProgram, pInfo, true );
+
+    return pProgram;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::ProgramList* Dvr::GetExpiring( int nStartIndex, 
                                     int nCount      )
 {

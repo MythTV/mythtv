@@ -43,6 +43,9 @@ class Dvr : public DvrServices
                                                 int              StartIndex,
                                                 int              Count      );
 
+        DTC::Program*     GetRecordedItem     ( int              ChanId,
+                                                const QDateTime &StartTime  );
+
         DTC::ProgramList* GetUpcoming         ( int              StartIndex,
                                                 int              Count,
                                                 bool             ShowAll );
@@ -90,6 +93,12 @@ class ScriptableDvr : public QObject
                                        int              Count      )
         {
             return m_obj.GetRecorded( Descending, StartIndex, Count );
+        }
+
+        QObject* GetRecordedItem     ( int              ChanId,
+                                       const QDateTime &StartTime  )
+        {
+            return m_obj.GetRecordedItem( ChanId, StartTime );
         }
 
         QObject* Encoders            () { return m_obj.Encoders(); }
