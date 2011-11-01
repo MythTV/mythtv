@@ -113,7 +113,7 @@ class OpenCLDeviceMap : public QMap<uint64_t, OpenCLDevice *>
     ~OpenCLDeviceMap();
 
     void Display(void);
-    OpenCLDevice *GetBestDevice(OpenCLDevice *prev);
+    OpenCLDevice *GetBestDevice(OpenCLDevice *prev, bool forceSw);
 
     bool m_valid;
 };

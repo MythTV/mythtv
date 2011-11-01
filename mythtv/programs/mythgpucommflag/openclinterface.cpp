@@ -193,8 +193,11 @@ void OpenCLDeviceMap::Display(void)
     }
 }
 
-OpenCLDevice *OpenCLDeviceMap::GetBestDevice(OpenCLDevice *prev)
+OpenCLDevice *OpenCLDeviceMap::GetBestDevice(OpenCLDevice *prev, bool forceSw)
 {
+    if (forceSw)
+        return NULL;
+
     OpenCLDevice *previous = NULL;
     for (OpenCLDeviceMap::iterator it = begin(); it != end(); ++it)
     {

@@ -86,5 +86,15 @@ void MythGPUCommFlagCommandLineParser::LoadArguments(void)
             ->SetGroup("Advanced");
     add("--dry-run", "dryrun", false,
         "Don't actually queue operation, just list what would be done", "");
+    add("--force-sw-audio", "swaudio", false,
+        "Force audio processing to be done in software.", "")
+            ->SetGroup("Advanced");
+    add("--force-sw-video", "swvideo", false,
+        "Force video processing to be done in software.", "")
+            ->SetGroup("Advanced");
 }
 
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

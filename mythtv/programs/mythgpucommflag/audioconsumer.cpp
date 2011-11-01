@@ -2,11 +2,25 @@
 #include "packetqueue.h"
 #include "resultslist.h"
 #include "audioconsumer.h"
+#include "audioprocessor.h"
 
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
+}
+
+AudioConsumer::AudioConsumer(PacketQueue *inQ, ResultsList *outL,
+                             OpenCLDevice *dev) : 
+    QueueConsumer(inQ, outL, dev, "AudioConsumer") 
+{
+    m_audioSamples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
+                                           sizeof(int32_t));
+    InitAudioProcessors();
+    if (m_dev)
+        m_proclist = openCLAudioProcessorList;
+    else
+        m_proclist = softwareAudioProcessorList;
 }
 
 void AudioConsumer::ProcessPacket(Packet *packet)
@@ -69,14 +83,31 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Audio Frame: %1 samples (%2 size)")
         .arg(frames).arg(size));
+
     // Push PCM frame to GPU/CPU Processing memory
+    if (m_dev)
+    {
+        // Push PCM frame to GPU
+    }
 
     // Loop through the list of detection routines
-        // Run the routine in GPU/CPU
-        // Pull the results
-        // Toss the results onto the results list
+    for (AudioProcessorList::iterator it = m_proclist->begin();
+         it != m_proclist->end(); ++it)
+    {
+        AudioProcessor *proc = *it;
 
-    // Free the frame in GPU/CPU memory if not needed
+        // Run the routine in GPU/CPU & pull results
+        FlagResults *result = proc->m_func(m_dev, samples, size, frames, pts);
+
+        // Toss the results onto the results list
+        if (result)
+            m_outL->append(result);
+    }
+
+    if (m_dev)
+    {
+        // Free the frame in GPU/CPU memory if not needed
+    }
 }
 
 /*

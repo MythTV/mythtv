@@ -147,8 +147,8 @@ int main(int argc, char **argv)
     OpenCLDeviceMap *devMap = new OpenCLDeviceMap();
 
     OpenCLDevice *devices[2];    // 0 = video, 1 = audio;
-    devices[0] = devMap->GetBestDevice(NULL);
-    devices[1] = devMap->GetBestDevice(devices[0]);
+    devices[0] = devMap->GetBestDevice(NULL, cmdline.toBool("swvideo"));
+    devices[1] = devMap->GetBestDevice(devices[0], cmdline.toBool("swaudio"));
 
     if (devices[0])
     {
@@ -252,11 +252,10 @@ int main(int argc, char **argv)
     ResultsList videoMarks;
 
     // Create consumer threads
-    AudioConsumer *audioThread = new AudioConsumer(&audioQ, &audioMarks);
-    VideoConsumer *videoThread = new VideoConsumer(&videoQ, &videoMarks);
-
-    audioThread->SetOpenCLDevice(devices[1]);
-    videoThread->SetOpenCLDevice(devices[0]);
+    AudioConsumer *audioThread = new AudioConsumer(&audioQ, &audioMarks,
+                                                   devices[1]);
+    VideoConsumer *videoThread = new VideoConsumer(&videoQ, &videoMarks,
+                                                   devices[0]);
 
     audioThread->start();
     videoThread->start();

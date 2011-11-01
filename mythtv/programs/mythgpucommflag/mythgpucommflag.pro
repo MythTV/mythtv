@@ -23,12 +23,15 @@ HEADERS += packetqueue.h
 HEADERS += resultslist.h
 HEADERS += gpuplayer.h
 HEADERS += queueconsumer.h audioconsumer.h videoconsumer.h
+HEADERS += audioprocessor.h
 
 SOURCES += main.cpp commandlineparser.cpp
 SOURCES += openclinterface.cpp
 SOURCES += packetqueue.cpp
 SOURCES += gpuplayer.cpp
 SOURCES += queueconsumer.cpp audioconsumer.cpp videoconsumer.cpp
+SOURCES += audioprocessor.cpp
+SOURCES += openclaudioprocessor.cpp softwareaudioprocessor.cpp
 
 #The following line was inserted by qt3to4
 QT += xml sql network

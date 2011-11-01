@@ -8,8 +8,8 @@
 class VideoConsumer : public QueueConsumer
 {
   public:
-    VideoConsumer(PacketQueue *inQ, ResultsList *outL) : 
-        QueueConsumer(inQ, outL, "VideoConsumer") {};
+    VideoConsumer(PacketQueue *inQ, ResultsList *outL, OpenCLDevice *dev) : 
+        QueueConsumer(inQ, outL, dev, "VideoConsumer") {};
     ~VideoConsumer() {};
     void ProcessPacket(Packet *packet);
 };
