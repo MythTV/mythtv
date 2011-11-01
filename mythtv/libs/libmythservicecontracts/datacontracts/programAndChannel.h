@@ -39,7 +39,7 @@ class Program;
 class SERVICE_PUBLIC ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.02" );
+    Q_CLASSINFO( "version", "1.04" );
 
     // We need to know the type that will ultimately be contained in 
     // any QVariantList or QVariantMap.  We do his by specifying
@@ -171,6 +171,9 @@ class SERVICE_PUBLIC Program : public QObject
     Q_PROPERTY( QString     Category     READ Category     WRITE setCategory  )
     Q_PROPERTY( QString     CatType      READ CatType      WRITE setCatType   )
     Q_PROPERTY( bool        Repeat       READ Repeat       WRITE setRepeat    )
+    Q_PROPERTY( int         VideoProps   READ VideoProps   WRITE setVideoProps)
+    Q_PROPERTY( int         AudioProps   READ AudioProps   WRITE setAudioProps)
+    Q_PROPERTY( int         SubProps     READ SubProps     WRITE setSubProps  )
 
     Q_PROPERTY( QString     SeriesId     READ SeriesId     WRITE setSeriesId     DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     ProgramId    READ ProgramId    WRITE setProgramId    DESIGNABLE SerializeDetails )
@@ -202,6 +205,9 @@ class SERVICE_PUBLIC Program : public QObject
     PROPERTYIMP    ( qlonglong   , FileSize     )
     PROPERTYIMP    ( QDateTime   , LastModified )
     PROPERTYIMP    ( int         , ProgramFlags )
+    PROPERTYIMP    ( int         , VideoProps   )
+    PROPERTYIMP    ( int         , AudioProps   )
+    PROPERTYIMP    ( int         , SubProps     )
     PROPERTYIMP    ( QString     , Hostname     )
     PROPERTYIMP    ( QDate       , Airdate      )
     PROPERTYIMP    ( QString     , Description  )
@@ -239,6 +245,9 @@ class SERVICE_PUBLIC Program : public QObject
               m_Stars               ( 0      ),
               m_FileSize            ( 0      ),
               m_ProgramFlags        ( 0      ),
+              m_VideoProps          ( 0      ),
+              m_AudioProps          ( 0      ),
+              m_SubProps            ( 0      ),
               m_Season              ( 0      ),
               m_Episode             ( 0      ),
               m_Channel             ( NULL   ),
@@ -269,6 +278,9 @@ class SERVICE_PUBLIC Program : public QObject
             m_FileSize          = src.m_FileSize;
             m_LastModified      = src.m_LastModified;
             m_ProgramFlags      = src.m_ProgramFlags;
+            m_VideoProps        = src.m_VideoProps;
+            m_AudioProps        = src.m_AudioProps;
+            m_SubProps          = src.m_SubProps;
             m_Hostname          = src.m_Hostname;
             m_Airdate           = src.m_Airdate;
             m_Description       = src.m_Description;
