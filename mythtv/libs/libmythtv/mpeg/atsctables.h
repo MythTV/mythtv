@@ -172,8 +172,9 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     // }
     // CRC_32                          32
 
-    void Parse() const;
-    QString toString() const;
+    void Parse(void) const;
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
   private:
     mutable vector<unsigned char*> _ptrs; // used to parse
 };
@@ -251,6 +252,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     {
         return _ptrs[i][17];
     }
+    QString ModulationModeString(uint i) const;
     //   carrier_frequency     32  17.0 deprecated
     //   channel_TSID          16  21.0
     uint ChannelTransportStreamID(uint i) const
@@ -289,6 +291,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     {
         return _ptrs[i][27] & 0x3f;
     }
+    QString ServiceTypeString(uint i) const;
     //   source_id             16  27.0
     uint SourceID(uint i) const
     {
@@ -322,6 +325,11 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     void Parse() const;
     int Find(int major, int minor) const;
     QString GetExtendedChannelName(uint idx) const;
+    virtual QString toString(void) const;
+    virtual QString ChannelString(uint channel) const = 0;
+    virtual QString toStringXML(uint indent_level) const;
+    virtual QString ChannelStringXML(uint indent_level, uint channel) const;
+    virtual QString XMLChannelValues(uint indent_level, uint channel) const;
   protected:
     mutable vector<unsigned char*> _ptrs;
 };
@@ -390,8 +398,8 @@ class MTV_PUBLIC TerrestrialVirtualChannelTable : public VirtualChannelTable
     // additional_descriptors_length 10
     // for (j=0; j<N; j++) { additional_descriptor() }
     // CRC_32                  32
-    QString toString() const;
-    QString toString(int) const;
+    virtual QString ChannelString(uint channel) const;
+    virtual QString XMLChannelValues(uint indent_level, uint channel) const;
 };
 
 
@@ -426,7 +434,8 @@ class MTV_PUBLIC CableVirtualChannelTable : public VirtualChannelTable
      * is expected to ignore any Map ID's other than the one corresponding
      * to it's head-end.
      *
-     * Note: This is only defined for SCTE streams, it is always 0 in ATSC streams
+     * Note: This is only defined for SCTE streams,
+     *       it is always 0 in ATSC streams.
      */
     uint SCTEMapId() const
     {
@@ -496,8 +505,8 @@ class MTV_PUBLIC CableVirtualChannelTable : public VirtualChannelTable
     // additional_descriptors_length 10
     // for (j=0; j<N; j++) { additional_descriptor() }
     // CRC_32                  32
-    QString toString() const;
-    QString toString(int) const;
+    virtual QString ChannelString(uint channel) const;
+    virtual QString XMLChannelValues(uint indent_level, uint channel) const;
 };
 
 /** \class EventInformationTable
@@ -721,17 +730,8 @@ class MTV_PUBLIC SystemTimeTable : public PSIPTable
     // for (I = 0;I< N;I++) { descriptor() }
     // CRC_32                  32
 
-    QString toString() const
-    {
-        QString str =
-            QString("    SystemTimeTable  GPSTime(%1) GPS2UTC_Offset(%2) ")
-            .arg(SystemTimeGPS().toString(Qt::LocalDate)).arg(GPSOffset());
-        str.append(QString("DS(%3) Day(%4) Hour(%5)")
-                   .arg(InDaylightSavingsTime())
-                   .arg(DayDaylightSavingsStarts())
-                   .arg(HourDaylightSavingsStarts()));
-        return str;
-    }
+    QString toString(void) const;
+    QString toStringXML(uint indent_level) const;
 };
 
 /** \class RatingRegionTable
