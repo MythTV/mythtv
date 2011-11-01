@@ -1322,10 +1322,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
         item->DisplayState(state, "status");
 
-        state = extract_job_state(**it);
-
-        item->DisplayState(state, "jobstate");
-
         item->DisplayState(QString::number((*it)->GetStars(10)), "ratingstate");
 
         SetItemIcons(item, (*it));
