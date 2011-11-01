@@ -194,6 +194,10 @@ class MPUBLIC ProgramInfo
                 bool commfree,
                 bool repeat,
 
+                uint videoprops,
+                uint audioprops,
+                uint subtitletype,
+
                 const ProgramList &schedList,
                 bool               oneChanid);
     /// Constructs a basic ProgramInfo (used by RecordingInfo)

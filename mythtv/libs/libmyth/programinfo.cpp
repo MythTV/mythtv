@@ -511,6 +511,10 @@ ProgramInfo::ProgramInfo(
     bool commfree,
     bool repeat,
 
+    uint _videoproperties,
+    uint _audioproperties,
+    uint _subtitleType,
+
     const ProgramList &schedList, bool oneChanid) :
     title(_title),
     subtitle(_subtitle),
@@ -565,7 +569,7 @@ ProgramInfo::ProgramInfo(
     findid(_findid),
 
     programflags(FL_NONE),
-    properties(0),
+    properties((_subtitleType<<11) | (_videoproperties<<6) | _audioproperties),
     year(_year),
 
     recstatus(_recstatus),
@@ -4376,7 +4380,8 @@ static bool FromProgramQuery(
         "    program.airdate, program.stars, program.originalairdate, "
         "    program.category_type, oldrecstatus.recordid, "
         "    oldrecstatus.rectype, oldrecstatus.recstatus, "
-        "    oldrecstatus.findid "
+        "    oldrecstatus.findid, program.videoprop+0, program.audioprop+0, "
+        "    program.subtitletypes+0 "
         "FROM program "
         "LEFT JOIN channel ON program.chanid = channel.chanid "
         "LEFT JOIN oldrecorded AS oldrecstatus ON "
@@ -4464,6 +4469,9 @@ bool LoadFromProgram(
 
                 query.value(11).toInt() == COMM_DETECT_COMMFREE, // commfree
                 query.value(10).toInt(), // repeat
+                query.value(23).toInt(), // videoprop
+                query.value(24).toInt(), // audioprop
+                query.value(25).toInt(), // subtitletypes
 
                 schedList, oneChanid));
     }
