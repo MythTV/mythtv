@@ -31,9 +31,9 @@ class VideoPerformanceTest
 {
   public:
     VideoPerformanceTest(const QString &filename, bool novsync, bool onlydecode,
-                         int runfor)
+                         int runfor, bool deint)
       : file(filename), novideosync(novsync), decodeonly(onlydecode),
-        secondstorun(runfor), ctx(NULL)
+        secondstorun(runfor), deinterlace(deint), ctx(NULL)
     {
         if (secondstorun < 1)
             secondstorun = 1;
@@ -62,7 +62,7 @@ class VideoPerformanceTest
         ctx->SetPlayer(mp);
         ctx->SetPlayingInfo(new ProgramInfo(file));
         mp->SetPlayerInfo(NULL, GetMythMainWindow(), true, ctx);
-
+        FrameScanType scan = deinterlace ? kScan_Interlaced : kScan_Progressive;
         if (!mp->StartPlaying())
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to start playback.");
@@ -84,6 +84,8 @@ class VideoPerformanceTest
 
         if (decodeonly)
             LOG(VB_GENERAL, LOG_INFO, "Decoding frames only - skipping display.");
+        LOG(VB_GENERAL, LOG_INFO, QString("Deinterlacing %1")
+            .arg(deinterlace ? "enabled" : "disabled"));
 
         Jitterometer *jitter = new Jitterometer("Performance: ", mp->GetFrameRate());
 
@@ -120,9 +122,9 @@ class VideoPerformanceTest
 
             if (!decodeonly)
             {
-                vo->ProcessFrame(frame, NULL, NULL, dummy, kScan_Progressive);
-                vo->PrepareFrame(frame, kScan_Progressive, NULL);
-                vo->Show(kScan_Progressive);
+                vo->ProcessFrame(frame, NULL, NULL, dummy, scan);
+                vo->PrepareFrame(frame, scan, NULL);
+                vo->Show(scan);
             }
             vo->DoneDisplayingFrame(frame);
             jitter->RecordCycleTime();
@@ -135,6 +137,7 @@ class VideoPerformanceTest
     bool    novideosync;
     bool    decodeonly;
     int     secondstorun;
+    bool    deinterlace;
     PlayerContext *ctx;
 };
 
@@ -226,7 +229,8 @@ int main(int argc, char *argv[])
         if (!cmdline.toString("seconds").isEmpty())
             seconds = cmdline.toInt("seconds");
         VideoPerformanceTest *test = new VideoPerformanceTest(filename, false,
-                    cmdline.toBool("decodeonly"), seconds);
+                    cmdline.toBool("decodeonly"), seconds,
+                    cmdline.toBool("deinterlace"));
         test->Test();
         delete test;
     }

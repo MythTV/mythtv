@@ -40,6 +40,12 @@ void MythAVTestCommandLineParser::LoadArguments(void)
                     "")
                     ->SetGroup("Video Performance Testing")
                     ->SetChildOf("test");
+    add(QStringList(QStringList() << "--deinterlace"),
+                    "deinterlace", false,
+                    "Deinterlace video frames (even if progressive).",
+                    "")
+                    ->SetGroup("Video Performance Testing")
+                    ->SetChildOf("test");
     add(QStringList(QStringList() << "-s" << "--seconds"), "seconds", "",
                     "The number of seconds to run the test (default 5).", "")
                     ->SetGroup("Video Performance Testing")
