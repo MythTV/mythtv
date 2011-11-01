@@ -281,3 +281,58 @@ DTC::ProgramList* Dvr::GetUpcoming( int  nStartIndex,
     return pPrograms;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::ProgramList* Dvr::GetConflicts( int  nStartIndex,
+                                    int  nCount       )
+{
+    RecordingList  recordingList;
+    RecordingList  tmpList;
+    bool hasConflicts;
+    LoadFromScheduler(tmpList, hasConflicts);
+
+    // Sort the upcoming into only those which are conflicts
+    RecordingList::iterator it = tmpList.begin();
+    for(; it < tmpList.end(); ++it)
+    {
+        if (((*it)->GetRecordingStatus() == rsConflict) &&
+            ((*it)->GetRecordingStartTime() >=
+             QDateTime::currentDateTime()))
+        {
+            recordingList.push_back(new RecordingInfo(**it));
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // Build Response
+    // ----------------------------------------------------------------------
+
+    DTC::ProgramList *pPrograms = new DTC::ProgramList();
+
+    nStartIndex   = min( nStartIndex, (int)recordingList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (int)recordingList.size() ) : recordingList.size();
+    int nEndIndex = min((nStartIndex + nCount), (int)recordingList.size() );
+
+    for( int n = nStartIndex; n < nEndIndex; n++)
+    {
+        ProgramInfo *pInfo = recordingList[ n ];
+
+        DTC::Program *pProgram = pPrograms->AddNewProgram();
+
+        FillProgramInfo( pProgram, pInfo, true );
+    }
+
+    // ----------------------------------------------------------------------
+
+    pPrograms->setStartIndex    ( nStartIndex     );
+    pPrograms->setCount         ( nCount          );
+    pPrograms->setTotalAvailable( recordingList.size() );
+    pPrograms->setAsOf          ( QDateTime::currentDateTime() );
+    pPrograms->setVersion       ( MYTH_BINARY_VERSION );
+    pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
+
+    return pPrograms;
+}
+

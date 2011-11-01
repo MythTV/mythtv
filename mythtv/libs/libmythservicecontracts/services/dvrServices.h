@@ -73,6 +73,9 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         virtual DTC::Program*     GetRecordedItem     ( int              ChanId,
                                                         const QDateTime &StartTime  ) = 0;
 
+        virtual DTC::ProgramList* GetConflicts        ( int              StartIndex,
+                                                        int              Count      ) = 0;
+
         virtual DTC::ProgramList* GetUpcoming         ( int              StartIndex,
                                                         int              Count,
                                                         bool             ShowAll    ) = 0;
