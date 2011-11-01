@@ -34,15 +34,16 @@ typedef enum
     kGLAppleFence  = 0x0040,
     kGLMesaYCbCr   = 0x0080,
     kGLAppleYCbCr  = 0x0100,
-    kGLAppleRGB422 = 0x0200,
-    kGLMipMaps     = 0x0400,
-    kGLSL          = 0x0800,
-    kGLVertexArray = 0x1000,
-    kGLExtVBO      = 0x2000,
-    kGLMaxFeat     = 0x4000,
+    kGLMipMaps     = 0x0200,
+    kGLSL          = 0x0400,
+    kGLVertexArray = 0x0800,
+    kGLExtVBO      = 0x1000,
+    kGLMaxFeat     = 0x2000,
 } GLFeatures;
 
+#define MYTHTV_UYVY 0x8A1F
 #define TEX_OFFSET 8
+
 class MythGLTexture
 {
   public:
