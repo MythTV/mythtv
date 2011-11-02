@@ -740,8 +740,8 @@ QString ProgramAssociationTable::toString(void) const
     QString str;
     str.append(QString("Program Association Section\n"));
     str.append(PSIPTable::toString());
-    str.append(QString("         tsid: %1\n").arg(TransportStreamID()));
-    str.append(QString(" programCount: %1\n").arg(ProgramCount()));
+    str.append(QString("      tsid(%1) ").arg(TransportStreamID()));
+    str.append(QString("programCount(%1)\n").arg(ProgramCount()));
 
     uint cnt0 = 0, cnt1fff = 0;
     for (uint i = 0; i < ProgramCount(); i++)
@@ -758,7 +758,7 @@ QString ProgramAssociationTable::toString(void) const
             continue;
         }
 
-        str += QString("  program number %1 has PID 0x%1\n")
+        str += QString("  program number %1 has PID 0x%2\n")
             .arg(ProgramNumber(i),5)
             .arg(ProgramPID(i),4,16,QChar('0'));
     }
@@ -802,31 +802,33 @@ QString ProgramAssociationTable::toStringXML(uint indent_level) const
 QString ProgramMapTable::toString(void) const
 {
     QString str =
-        QString("Program Map Section ver(%1) pid(0x%2) pnum(%3) len(%4)\n")
-        .arg(Version()).arg(tsheader()->PID(), 0, 16)
-        .arg(ProgramNumber()).arg(Length());
+        QString("Program Map Section"
+                "\n%1"
+                "      pnum(%2) pid(0x%3)\n")
+        .arg(PSIPTable::toString())
+        .arg(ProgramNumber())
+        .arg(tsheader()->PID(),0,16);
 
-    if (ProgramInfoLength())
+    vector<const unsigned char*> desc =
+        MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
+    for (uint i = 0; i < desc.size(); i++)
     {
-        vector<const unsigned char*> desc =
-            MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
-        for (uint i=0; i<desc.size(); i++)
-            str.append(QString("  %1\n")
-                       .arg(MPEGDescriptor(desc[i], 300).toString()));
+        str.append(QString("  %1\n")
+                   .arg(MPEGDescriptor(desc[i], 300).toString()));
     }
-    str.append("\n");
+
     for (uint i = 0; i < StreamCount(); i++)
     {
-        str.append(QString(" Stream #%1 pid(0x%2) type(%3  0x%4)\n")
+        str.append(QString("  Stream #%1 pid(0x%2) type(0x%3 %4)\n")
                    .arg(i).arg(StreamPID(i), 0, 16)
-                   .arg(StreamTypeString(i)).arg(StreamType(i), 0, 16));
-        if (0 != StreamInfoLength(i))
+                   .arg(StreamType(i), 2, 16, QChar('0'))
+                   .arg(StreamTypeString(i)));
+        vector<const unsigned char*> desc =
+            MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
+        for (uint i = 0; i < desc.size(); i++)
         {
-            vector<const unsigned char*> desc =
-                MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
-            for (uint i=0; i<desc.size(); i++)
-                str.append(QString("  %1\n")
-                           .arg(MPEGDescriptor(desc[i], 300).toString()));
+            str.append(QString("    %1\n")
+                       .arg(MPEGDescriptor(desc[i], 300).toString()));
         }
     }
     return str;
