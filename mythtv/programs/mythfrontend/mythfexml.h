@@ -9,6 +9,7 @@
 #define MYTHFEXML_H_
 
 #include <QDateTime>
+#include <QWaitCondition>
 
 #include "upnp.h"
 #include "eventing.h"
@@ -24,6 +25,7 @@ typedef enum
     MFEXML_ActionList,
     MFEXML_ActionListTest,
     MFEXML_GetRemote,
+    MFEXML_GetStatus,
 } MythFEXMLMethod;
 
 class MythFEXML : public Eventing
@@ -36,6 +38,11 @@ class MythFEXML : public Eventing
     QStringList m_actionList;
     QHash<QString,QStringList> m_actionDescriptions;
 
+    QHash<QString,QString> m_latestStatus;
+    QWaitCondition         m_statusWait;
+    QMutex                *m_statusLock;
+    QTime                  m_lastUpdate;
+
   protected:
 
     // Implement UPnpServiceImpl methods that we can
@@ -45,6 +52,8 @@ class MythFEXML : public Eventing
     virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
     virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
+    virtual void customEvent(QEvent *event);
+
   private:
 
     MythFEXMLMethod GetMethod( const QString &sURI );
@@ -52,6 +61,7 @@ class MythFEXML : public Eventing
     void GetScreenShot    ( HTTPRequest *pRequest );
     void SendMessage      ( HTTPRequest *pRequest );
     void SendAction       ( HTTPRequest *pRequest );
+    void GetStatus        ( HTTPRequest *pRequest );
     void GetActionList    ( HTTPRequest *pRequest );
     void GetActionListTest( HTTPRequest *pRequest );
     void GetRemote        ( HTTPRequest *pRequest );

@@ -1326,6 +1326,27 @@ TVState TV::GetState(int player_idx) const
     return ret;
 }
 
+void TV::GetStatus(void)
+{
+    const PlayerContext *ctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+
+    osdInfo status;
+    status.text.insert("state", StateToString(GetState(ctx)));
+    ctx->LockPlayingInfo(__FILE__, __LINE__);
+    if (ctx->playingInfo)
+    {
+        status.text.insert("title", ctx->playingInfo->GetTitle());
+        status.text.insert("subtitle", ctx->playingInfo->GetSubtitle());
+    }
+    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    ctx->CalcPlayerSliderPosition(status);
+
+    ReturnPlayerLock(ctx);
+
+    MythInfoMapEvent info("STATUS_UPDATE", status.text);
+    gCoreContext->dispatch(info);
+}
+
 /**
  * \brief get tv state of active player context
  */
@@ -8277,6 +8298,10 @@ void TV::customEvent(QEvent *e)
             GetMythMainWindow()->ScreenShot(width, height, filename);
         }
         ReturnPlayerLock(mctx);
+    }
+    else if (message == ACTION_GETSTATUS)
+    {
+        GetStatus();
     }
     else if (message.left(14) == "DONE_RECORDING")
     {

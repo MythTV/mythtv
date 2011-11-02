@@ -229,6 +229,7 @@ class MTV_PUBLIC TV : public QObject
     int GetLastRecorderNum(int player_idx) const;
     TVState GetState(int player_idx) const;
     TVState GetState(const PlayerContext*) const;
+    void GetStatus(void);
 
     // Non-const queries
     OSD *GetOSDL(const char *, int);

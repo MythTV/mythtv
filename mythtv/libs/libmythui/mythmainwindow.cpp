@@ -2309,6 +2309,13 @@ void MythMainWindow::customEvent(QEvent *ce)
             }
             ScreenShot(width, height, filename);
         }
+        else if (message == ACTION_GETSTATUS)
+        {
+            QHash<QString,QString> status;
+            status.insert("state", "idle");
+            MythInfoMapEvent info("STATUS_UPDATE", status);
+            gCoreContext->dispatch(info);
+        }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)
     {
