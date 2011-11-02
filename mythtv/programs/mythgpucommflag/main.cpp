@@ -276,6 +276,9 @@ int main(int argc, char **argv)
     // Close file
     delete ctx;
 
+    LOG(VB_GENERAL, LOG_INFO, QString("audioMarks: %1, videoMarks: %2")
+        .arg(audioMarks.size()) .arg(videoMarks.size()));
+
     // Loop:
         // Summarize the various criteria to get commercial flag map
 

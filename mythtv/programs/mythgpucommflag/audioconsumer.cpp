@@ -36,6 +36,7 @@ void AudioConsumer::ProcessPacket(Packet *packet)
     int ret             = 0;
     int dataSize        = 0;
     int frames          = -1;
+    int rate;
     int64_t pts;
 
     pts = (long long)(av_q2d(curstream->time_base) * pkt->pts * 1000);
@@ -43,15 +44,21 @@ void AudioConsumer::ProcessPacket(Packet *packet)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
     AVPacket tmp_pkt;
+    av_init_packet(&tmp_pkt);
     tmp_pkt.data = pkt->data;
     tmp_pkt.size = pkt->size;
 
     while (tmp_pkt.size > 0)
     {
         dataSize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+
         avcodeclock->lock();
         ret = avcodec_decode_audio3(ctx, m_audioSamples, &dataSize, &tmp_pkt);
+        frames = dataSize / (ctx->channels *
+                 av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
+        rate = ctx->sample_rate;
         avcodeclock->unlock();
+
         if (ret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, "Unknown audio decoding error");
@@ -62,11 +69,17 @@ void AudioConsumer::ProcessPacket(Packet *packet)
         {
             int64_t temppts = pts;
 
-            frames = dataSize / (ctx->channels *
-                 av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
+#if 0
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Channels: %1, Size: %2, Rate: %3") .arg(ctx->channels)
+                .arg(av_get_bits_per_sample_fmt(ctx->sample_fmt))
+                .arg(ctx->sample_rate));
+#endif
+
             // Process each frame
-            ProcessFrame(m_audioSamples, dataSize, frames, pts);
-            pts += (long long) ((double)(frames * 1000) / ctx->sample_rate);
+            ProcessFrame(m_audioSamples, dataSize, frames, pts, rate, pkt->pos);
+
+            pts += (long long) ((double)(frames * 1000) / rate);
 
             LOG(VB_TIMESTAMP, LOG_DEBUG,  QString("audio timecode %1 %2 %3 %4")
                     .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(pts));
@@ -79,10 +92,12 @@ void AudioConsumer::ProcessPacket(Packet *packet)
     
 
 void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
-                                 int64_t pts)
+                                 int64_t pts, int rate, uint64_t pos)
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Audio Frame: %1 samples (%2 size)")
         .arg(frames).arg(size));
+
+    uint64_t duration = (uint64_t)((double)(frames * 1000) / rate);
 
     // Push PCM frame to GPU/CPU Processing memory
     if (m_dev)
@@ -97,11 +112,17 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
         AudioProcessor *proc = *it;
 
         // Run the routine in GPU/CPU & pull results
-        FlagResults *result = proc->m_func(m_dev, samples, size, frames, pts);
+        FlagResults *result = proc->m_func(m_dev, samples, size, frames, pts,
+                                           rate);
 
         // Toss the results onto the results list
         if (result)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Finding found");
+            result->m_pts = pts;
+            result->m_duration = duration;
             m_outL->append(result);
+        }
     }
 
     if (m_dev)

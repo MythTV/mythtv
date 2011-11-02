@@ -12,7 +12,8 @@ class AudioConsumer : public QueueConsumer
     AudioConsumer(PacketQueue *inQ, ResultsList *outL, OpenCLDevice *dev);
     ~AudioConsumer() { av_free(m_audioSamples); };
     void ProcessPacket(Packet *packet);
-    void ProcessFrame(int16_t *samples, int size, int frames, int64_t pts);
+    void ProcessFrame(int16_t *samples, int size, int frames, int64_t pts,
+                      int rate, uint64_t pos);
 
     int16_t *m_audioSamples;
     AudioProcessorList *m_proclist;

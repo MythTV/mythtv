@@ -8,7 +8,7 @@
 #include "resultslist.h"
 
 typedef FlagResults *(*AudioProcessorFunc)(OpenCLDevice *, int16_t *, int, int,
-                                           int64_t);
+                                           int64_t, int);
 
 typedef struct {
     QString name;

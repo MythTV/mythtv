@@ -3,6 +3,7 @@
 
 #include <QQueue>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QWaitCondition>
 
 extern "C" {
@@ -18,6 +19,7 @@ class Packet
         m_pkt(pkt), m_mutex(mutex) {};
     ~Packet()
     { 
+        QMutexLocker locker(m_mutex);
         av_free_packet(m_pkt);
         delete m_pkt; 
     };

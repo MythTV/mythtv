@@ -5,7 +5,7 @@
 
 // Prototypes
 FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
-                               int count, int64_t pts);
+                               int count, int64_t pts, int rate);
 
 AudioProcessorList *openCLAudioProcessorList;
 
@@ -21,7 +21,7 @@ void InitOpenCLAudioProcessors(void)
 }
 
 FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
-                               int count, int64_t pts)
+                               int count, int64_t pts, int rate)
 {
     LOG(VB_GENERAL, LOG_INFO, "OpenCL Volume Level");
 

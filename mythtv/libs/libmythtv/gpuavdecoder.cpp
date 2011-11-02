@@ -2499,10 +2499,12 @@ bool GPUAvDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 bool GPUAvDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 {
     if (m_videoCB)
+    {
         (*m_videoCB)(m_videoArg, curstream, pkt, avcodeclock);
-    else
-        av_free_packet(pkt);
-    return true;
+        return true;
+    }
+
+    return false;
 }
 
 
@@ -2953,10 +2955,12 @@ bool GPUAvDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 {
     (void)decodetype;
     if (m_audioCB)
+    {
         (*m_audioCB)(m_audioArg, curstream, pkt, avcodeclock);
-    else
-        av_free_packet(pkt);
-    return true;
+        return true;
+    }
+
+    return false;
 }
 
 // documented in decoderbase.h
@@ -2994,10 +2998,19 @@ bool GPUAvDecoder::GetFrame(DecodeType decodetype)
         av_init_packet(pkt);
 
         int retval = 0;
-        if (!ic || ((retval = av_read_frame(ic, pkt)) < 0))
+        if (ic)
+        {
+            QMutexLocker lock(avcodeclock);
+            retval = av_read_frame(ic, pkt);
+        }
+
+        if (!ic || (retval < 0))
         {
             if (retval == -EAGAIN)
+            {
+                av_free_packet(pkt);
                 continue;
+            }
 
             SetEof(true);
             delete pkt;
@@ -3039,7 +3052,10 @@ bool GPUAvDecoder::GetFrame(DecodeType decodetype)
             pkt->stream_index == selectedTrack[kTrackTypeVideo].av_stream_index)
         {
             if (!PreProcessVideoPacket(curstream, pkt))
+            {
+                av_free_packet(pkt);
                 continue;
+            }
 
             // If the resolution changed in XXXPreProcessPkt, we may
             // have a fatal error, so check for this before continuing.
@@ -3055,29 +3071,25 @@ bool GPUAvDecoder::GetFrame(DecodeType decodetype)
         switch (codec_type)
         {
           case CODEC_TYPE_AUDIO:
-            if (pkt->stream_index !=
+            if (pkt->stream_index ==
                 selectedTrack[kTrackTypeAudio].av_stream_index)
             {
-                break;
+                have_err = !ProcessAudioPacket(curstream, pkt, decodetype);
             }
-
-            have_err = !ProcessAudioPacket(curstream, pkt, decodetype);
             break;
 
           case CODEC_TYPE_VIDEO:
-            if (pkt->stream_index !=
+            if (pkt->stream_index ==
                 selectedTrack[kTrackTypeVideo].av_stream_index)
             {
-                break;
-            }
+                if (pkt->pts != (int64_t) AV_NOPTS_VALUE)
+                {
+                    lastccptsu = (long long)
+                               (av_q2d(curstream->time_base)*pkt->pts*1000000);
+                }
 
-            if (pkt->pts != (int64_t) AV_NOPTS_VALUE)
-            {
-                lastccptsu = (long long)
-                             (av_q2d(curstream->time_base)*pkt->pts*1000000);
+                have_err = !ProcessVideoPacket(curstream, pkt);
             }
-
-            have_err = !ProcessVideoPacket(curstream, pkt);
             break;
 
           case CODEC_TYPE_SUBTITLE:
@@ -3099,6 +3111,7 @@ bool GPUAvDecoder::GetFrame(DecodeType decodetype)
         {
             frame_decoded = 1;
             allowedquit = true;
+            pkt = NULL;
         }
         else
             av_free_packet(pkt);

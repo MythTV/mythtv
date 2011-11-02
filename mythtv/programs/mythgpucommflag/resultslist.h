@@ -7,10 +7,27 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
+typedef enum {
+    kFindingAudioHigh,
+    kFindingAudioLow,
+} FlagFindingsType;
+
+class FlagFindings
+{
+  public:
+    FlagFindings(int type, int64_t value) : m_type(type), m_value(value) {};
+    ~FlagFindings() {};
+
+    int m_type;
+    int64_t m_value;
+};
+
+typedef QList<FlagFindings *> FlagFindingsList;
+
 class FlagResults
 {
   public:
-    FlagResults(AVPacket *pkt)
+    FlagResults(AVPacket *pkt, FlagFindingsList *list) : m_findings(list)
     {
         m_valid = (pkt != NULL);
         if (m_valid)
@@ -22,7 +39,8 @@ class FlagResults
         }
     }
 
-    ~FlagResults() {};
+    FlagResults(FlagFindingsList *list) : m_findings(list) {};
+    ~FlagResults() { delete m_findings; };
 
     bool    m_valid;
     int64_t m_pts;
@@ -30,8 +48,7 @@ class FlagResults
     int     m_duration;
     int64_t m_pos;
 
-    // To fill in with the various findings
-    bool    m_logoFound;
+    FlagFindingsList *m_findings;
 };
 
 typedef QList<FlagResults *> ResultsList;
