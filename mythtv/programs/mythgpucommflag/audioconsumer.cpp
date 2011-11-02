@@ -21,6 +21,9 @@ AudioConsumer::AudioConsumer(PacketQueue *inQ, ResultsList *outL,
         m_proclist = openCLAudioProcessorList;
     else
         m_proclist = softwareAudioProcessorList;
+
+    m_context = avcodec_alloc_context();
+    m_opened = false;
 }
 
 void AudioConsumer::ProcessPacket(Packet *packet)
@@ -32,7 +35,14 @@ void AudioConsumer::ProcessPacket(Packet *packet)
     AVPacket *pkt = packet->m_pkt;
     QMutex   *avcodeclock = packet->m_mutex;
 
-    AVCodecContext *ctx = curstream->codec;
+    if (!m_opened)
+    {
+        QMutexLocker lock(avcodeclock);
+        m_codec = avcodec_find_decoder(curstream->codec->codec_id);
+        if (avcodec_open(m_context, m_codec) < 0)
+            return;
+        m_opened = true;
+    }
     int ret             = 0;
     int dataSize        = 0;
     int frames          = -1;
@@ -53,10 +63,11 @@ void AudioConsumer::ProcessPacket(Packet *packet)
         dataSize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
         avcodeclock->lock();
-        ret = avcodec_decode_audio3(ctx, m_audioSamples, &dataSize, &tmp_pkt);
-        frames = dataSize / (ctx->channels *
-                 av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
-        rate = ctx->sample_rate;
+        ret = avcodec_decode_audio3(m_context, m_audioSamples, &dataSize,
+                                    &tmp_pkt);
+        frames = dataSize / (m_context->channels *
+                 av_get_bits_per_sample_fmt(m_context->sample_fmt)>>3);
+        rate = m_context->sample_rate;
         avcodeclock->unlock();
 
         if (ret < 0)

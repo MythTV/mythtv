@@ -17,6 +17,9 @@ class AudioConsumer : public QueueConsumer
 
     int16_t *m_audioSamples;
     AudioProcessorList *m_proclist;
+    AVCodecContext *m_context;
+    AVCodec *m_codec;
+    bool m_opened;
 };
 
 #endif

@@ -2500,6 +2500,7 @@ bool GPUAvDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 {
     if (m_videoCB)
     {
+        av_dup_packet(pkt);
         (*m_videoCB)(m_videoArg, curstream, pkt, avcodeclock);
         return true;
     }
@@ -2956,6 +2957,7 @@ bool GPUAvDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     (void)decodetype;
     if (m_audioCB)
     {
+        av_dup_packet(pkt);
         (*m_audioCB)(m_audioArg, curstream, pkt, avcodeclock);
         return true;
     }
