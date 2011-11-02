@@ -1391,6 +1391,9 @@ void MythUIButtonList::SetPositionArrowStates()
             m_downArrow->DisplayState(MythUIStateType::Full);
         else
             m_downArrow->DisplayState(MythUIStateType::Off);
+
+        m_upArrow->MoveToTop();
+        m_downArrow->MoveToTop();
     }
 }
 
