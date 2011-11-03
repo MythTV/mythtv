@@ -122,7 +122,7 @@ int preview_helper(uint chanid, QDateTime starttime,
         pginfo = new ProgramInfo(
             infile, ""/*plot*/, ""/*title*/, ""/*subtitle*/, ""/*director*/,
             0/*season*/, 0/*episode*/, ""/*inetref*/, 120/*length_in_minutes*/,
-            1895/*year*/);
+            1895/*year*/, ""/*id*/);
     }
     else
     {

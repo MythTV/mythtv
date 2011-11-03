@@ -1838,7 +1838,8 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
                                  const QString &subtitle,
                                  const QString &director, int season,
                                  int episode, const QString &inetref,
-                                 int lenMins, const QString &year)
+                                 int lenMins, const QString &year,
+                                 const QString &id)
 {
     QString lhandler(handler);
     if (lhandler.isEmpty())
@@ -1849,7 +1850,7 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
     {
         d->mediaPluginMap[lhandler].playFn(mrl, plot, title, subtitle,
                                           director, season, episode,
-                                          inetref, lenMins, year);
+                                          inetref, lenMins, year, id);
         return true;
     }
 
@@ -2290,6 +2291,13 @@ void MythMainWindow::customEvent(QEvent *ce)
         {
             if (me->ExtraDataCount() == 1)
                 HandleMedia("Internal", me->ExtraData(0));
+            else if (me->ExtraDataCount() == 11)
+                HandleMedia("Internal", me->ExtraData(0),
+                    me->ExtraData(1), me->ExtraData(2),
+                    me->ExtraData(3), me->ExtraData(4),
+                    me->ExtraData(5).toInt(), me->ExtraData(6).toInt(),
+                    me->ExtraData(7), me->ExtraData(8).toInt(),
+                    me->ExtraData(9), me->ExtraData(10));
             else
                 LOG(VB_GENERAL, LOG_ERR, "Failed to handle media");
         }

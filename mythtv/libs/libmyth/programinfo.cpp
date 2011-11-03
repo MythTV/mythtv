@@ -771,7 +771,8 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
                          int _season, int _episode,
                          const QString &_inetref,
                          uint _length_in_minutes,
-                         uint _year) :
+                         uint _year,
+                         const QString &_programid) :
     positionMapDBReplacement(NULL)
 {
     clear();
@@ -813,6 +814,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     episode = _episode;
     inetref = _inetref;
     title = _title;
+    programid = _programid;
 }
 
 ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
