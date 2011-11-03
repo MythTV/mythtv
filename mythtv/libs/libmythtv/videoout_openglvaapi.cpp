@@ -232,7 +232,7 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(void)
 {
     if (codec_is_std(video_codec_id))
     {
-        VideoOutputOpenGLVAAPI::UpdatePauseFrame();
+        VideoOutputOpenGL::UpdatePauseFrame();
         return;
     }
 
