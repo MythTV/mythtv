@@ -23,6 +23,7 @@
 
 #include "programinfo.h"
 #include "recordinginfo.h"
+#include "channelutil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -118,20 +119,16 @@ void FillChannelInfo( DTC::ChannelInfo *pChannel,
 {
     if (pInfo)
     {
-/*
-        QString sHostName = gCoreContext->GetHostName();
-        QString sPort     = gCoreContext->GetSettingOnHost( "BackendStatusPort",
-                                                        sHostName);
-        QString sIconURL  = QString( "http://%1:%2/getChannelIcon?ChanId=%3" )
-                                   .arg( sHostName )
-                                   .arg( sPort )
-                                   .arg( pInfo->chanid );
-*/
+        if (!ChannelUtil::GetIcon(pInfo->GetChanID()).isEmpty())
+        {
+            QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
+                                       .arg( pInfo->GetChanID() );
+            pChannel->setIconURL    ( sIconURL                    );
+        }
 
         pChannel->setChanId     ( pInfo->GetChanID()              );
         pChannel->setChanNum    ( pInfo->GetChanNum()             );
         pChannel->setCallSign   ( pInfo->GetChannelSchedulingID() );
-      //pChannel->setIconURL    ( sIconURL                        );
         pChannel->setChannelName( pInfo->GetChannelName()         );
 
         pChannel->setSerializeDetails( bDetails );
