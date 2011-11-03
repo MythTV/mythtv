@@ -1337,6 +1337,11 @@ void TV::GetStatus(void)
     {
         status.text.insert("title", ctx->playingInfo->GetTitle());
         status.text.insert("subtitle", ctx->playingInfo->GetSubtitle());
+        status.text.insert("starttime",
+                           ctx->playingInfo->GetRecordingStartTime().toString(Qt::ISODate));
+        status.text.insert("chanid",
+                           QString::number(ctx->playingInfo->GetChanID()));
+        status.text.insert("programid", ctx->playingInfo->GetProgramID());
     }
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     ctx->CalcPlayerSliderPosition(status);
