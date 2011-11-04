@@ -30,6 +30,7 @@
 #include "autoexpire.h"
 #include "jobqueue.h"
 #include "encoderlink.h"
+#include "remoteutil.h"
 
 #include "serviceUtil.h"
 
@@ -112,6 +113,26 @@ DTC::Program* Dvr::GetRecordedItem( int              nChanId,
     FillProgramInfo( pProgram, pInfo, true );
 
     return pProgram;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Dvr::RemoveRecordedItem( int              nChanId,
+                              const QDateTime &dStartTime  )
+{
+    if (nChanId <= 0 || !dStartTime.isValid())
+        throw( QString("Channel ID or StartTime appears invalid."));
+
+    bool bResult = false;
+
+    ProgramInfo *pInfo = new ProgramInfo(nChanId, dStartTime);
+
+    if (pInfo->HasPathname())
+        bResult = RemoteDeleteRecording(nChanId, dStartTime, true, false);
+
+    return bResult;
 }
 
 /////////////////////////////////////////////////////////////////////////////

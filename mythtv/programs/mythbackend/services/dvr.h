@@ -46,6 +46,9 @@ class Dvr : public DvrServices
         DTC::Program*     GetRecordedItem     ( int              ChanId,
                                                 const QDateTime &StartTime  );
 
+        bool              RemoveRecordedItem  ( int              ChanId,
+                                                const QDateTime &StartTime  );
+
         DTC::ProgramList* GetConflicts        ( int              StartIndex,
                                                 int              Count      );
 
