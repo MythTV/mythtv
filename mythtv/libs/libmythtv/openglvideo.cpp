@@ -10,19 +10,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-// OpenGL headers
-#define GL_GLEXT_PROTOTYPES
-#ifdef USING_X11
-#define GLX_GLXEXT_PROTOTYPES
-#define XMD_H 1
-#ifndef GL_ES_VERSION_2_0
-#include <GL/gl.h>
-#endif
-#undef GLX_ARB_get_proc_address
-#endif // USING_X11
-
 #define LOC QString("GLVid: ")
-
 #define COLOUR_UNIFORM "m_colourMatrix"
 
 class OpenGLFilter
