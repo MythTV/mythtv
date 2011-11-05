@@ -267,7 +267,7 @@ class MiroInterpreter(cmd.Cmd):
                 print u"-" * 70
             for item in views.watchableItems:
                 # Skip any audio file as MythTV Internal player may abort the MythTV Frontend on a MP3
-                if not item.isVideo: 
+                if not item.isVideo:
                     continue
                 state = item.get_state()
                 if not state == u'newly-downloaded':
@@ -295,7 +295,7 @@ class MiroInterpreter(cmd.Cmd):
                 print "-" * 70
             for item in views.watchableItems:
                 # Skip any audio file as MythTV Internal player may abort the MythTV Frontend on a MP3
-                if not item.isVideo: 
+                if not item.isVideo:
                     continue
                 state = item.get_state()
                 if state == u'newly-downloaded':
@@ -362,7 +362,7 @@ class MiroInterpreter(cmd.Cmd):
             """ Using ImageMagick's utility 'identify'. Decide whether the screen shot is worth using.
             >>> useImageMagick('identify screenshot.jpg')
             >>> Example returned information "rose.jpg JPEG 640x480 DirectClass 87kb 0.050u 0:01"
-            >>> u'' if the screenshot quality is too low 
+            >>> u'' if the screenshot quality is too low
             >>> screenshot if the quality is good enough to use
             """
             if not self.imagemagick: # If imagemagick is not installed do not bother checking
