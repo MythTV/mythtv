@@ -503,7 +503,7 @@ void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
     int pad_width = font.maxWidth() * PAD_WIDTH;
     int y = m_safeArea.height() - (height * wrappedsubs.size());
     int centre = m_safeArea.width() / 2;
-    QBrush bgfill = QBrush(QColor(0, 0, 0, 128), Qt::SolidPattern);
+    QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
     foreach (QString subtitle, wrappedsubs)
     {
         if (subtitle.isEmpty())
@@ -720,7 +720,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     int xscale = teletextmode ? 40 : 36;
     int yscale = teletextmode ? 25 : 17;
     gTextSubFont->GetFace()->setPixelSize(m_safeArea.height() / (yscale * 1.2));
-    QBrush bgfill = QBrush(QColor(0, 0, 0, 128), Qt::SolidPattern);
+    QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
 
     for (; i != textlist->buffers.end(); ++i)
     {
