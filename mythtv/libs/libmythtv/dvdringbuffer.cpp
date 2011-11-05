@@ -861,8 +861,11 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                             .arg(aspect).arg(permission));
 
                 // trigger a rescan of the audio streams
-                if (vts->old_vtsN != vts->new_vtsN)
+                if ((vts->old_vtsN != vts->new_vtsN) ||
+                    (vts->old_domain != vts->new_domain))
+                {
                     m_audioStreamsChanged = true;
+                }
 
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)
