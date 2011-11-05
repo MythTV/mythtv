@@ -207,7 +207,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
     AVSubtitles* subs = m_subreader->GetAVSubtitles();
     QMutexLocker lock(&(subs->lock));
-    if (subs->buffers.empty())
+    if (subs->buffers.empty() && (kDisplayAVSubtitle != m_subtitleType))
         return;
 
     VideoOutput    *videoOut = m_player->GetVideoOutput();
