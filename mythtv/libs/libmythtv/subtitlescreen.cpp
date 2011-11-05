@@ -778,11 +778,11 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
                 shape->SetArea(MythRect(bgrect));
             }
 
-            MythUISimpleText *text = new MythUISimpleText
-                                     (captionText, *gTextSubFont, rect,
-                                      Qt::AlignLeft, (MythUIType*)this,
-                QString("cc608txt%1%2%3%4").arg(cc->x).arg(cc->y)
-                .arg(width).arg(chunk));
+            new MythUISimpleText(captionText, *gTextSubFont, rect,
+                                 Qt::AlignLeft, (MythUIType*)this,
+                                 QString("cc608txt%1%2%3%4")
+                                     .arg(cc->x).arg(cc->y)
+                                     .arg(width).arg(chunk));
 
             m_refreshArea = true;
 
