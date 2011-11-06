@@ -1,6 +1,8 @@
 #ifndef _AUDIOCONSUMER_H
 #define _AUDIOCONSUMER_H
 
+#include <QMap>
+
 #include "queueconsumer.h"
 #include "packetqueue.h"
 #include "resultslist.h"

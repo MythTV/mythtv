@@ -1,6 +1,8 @@
 #include <QString>
 #include <QStringList>
 #include <QMap>
+#include <QFile>
+#include <QByteArray>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -209,14 +211,34 @@ OpenCLDevice *OpenCLDeviceMap::GetBestDevice(OpenCLDevice *prev, bool forceSw)
     return NULL;
 }
 
+bool OpenCLDevice::Initialize(void)
+{
+    m_commandQ = clCreateCommandQueue(m_context, m_deviceId, 0, NULL);
+    if (!m_commandQ)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Error in clCreateCommandQueue");
+        return false;
+    }
+    return true;
+}
+
+bool OpenCLDevice::RegisterKernel(QString entry, QString filename)
+{
+    OpenCLKernel *kernel = OpenCLKernel::Create(this, entry, filename);
+    if (!kernel)
+        return false;
+
+    m_kernelMap.insert(entry, kernel);
+    return true;
+}
 
 OpenCLDevice::OpenCLDevice(cl_device_id device) : m_valid(false),
-    m_deviceId(device)
+    m_deviceId(device), m_commandQ(NULL)
 {
     cl_int ciErrNum;
 
     //Create a context for the device
-    m_gpuContext = clCreateContext(0, 1, &device, NULL, NULL, &ciErrNum);
+    m_context = clCreateContext(0, 1, &device, NULL, NULL, &ciErrNum);
     if (ciErrNum != CL_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Error %1 in clCreateContext call")
@@ -385,12 +407,9 @@ OpenCLDevice::OpenCLDevice(cl_device_id device) : m_valid(false),
         QString devString(device_string);
         m_extensions = devString.split(" ", QString::SkipEmptyParts);
 
-        for (QStringList::iterator it = m_extensions.begin();
-             it != m_extensions.end(); ++it)
-        {
-            if (*it == "cl_nv_device_attribute_query")
-                m_vendorType = kOpenCLVendorNvidia;
-        }
+        if (m_extensions.indexOf("cl_nv_device_attribute_query") != -1)
+            m_vendorType = kOpenCLVendorNvidia;
+        m_float64 = (m_extensions.indexOf("cl_khr_fp64") != -1);
     }
 
     switch (m_vendorType)
@@ -607,6 +626,73 @@ void OpenCLDeviceNvidiaSpecific::Display(void)
     LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Integrated Memory: %1")
         .arg(m_integratedMem ? "yes" : "no"));
 }
+
+OpenCLKernel *OpenCLKernel::Create(OpenCLDevice *device, QString entry,
+                                          QString filename)
+{
+    QFile file(filename);
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Loading OpenCL kernel %1 from %2")
+        .arg(entry) .arg(filename));
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Create(%1): Could not open program file: %2")
+            .arg(entry) .arg(filename));
+        return NULL;
+    }
+
+    QByteArray programText = file.readAll();
+    const char *programChar = programText.constData();
+    file.close();
+
+    cl_int ciErrNum;
+    cl_program program = clCreateProgramWithSource(device->m_context, 1,
+                                                   &programChar, NULL,
+                                                   &ciErrNum);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Create(%1): Error %2 trying to create program from source")
+            .arg(entry) .arg(ciErrNum));
+        return NULL;
+    }
+
+    ciErrNum = clBuildProgram(program, 1, &device->m_deviceId, NULL, NULL,
+                              NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        // Get the build errors
+        char buildLog[16384];
+        clGetProgramBuildInfo(program, device->m_deviceId, CL_PROGRAM_BUILD_LOG,
+                              sizeof(buildLog), buildLog, NULL);
+        LOG(VB_GENERAL, LOG_ERR, QString("Create(%1): Error %2 in kernel: %3")
+            .arg(entry) .arg(ciErrNum) .arg(buildLog));
+        clReleaseProgram(program);
+        return NULL;
+    }
+
+    const char *entryPt = entry.toLocal8Bit().constData();
+    cl_kernel kernel = clCreateKernel(program, entryPt, &ciErrNum);
+    if (!kernel)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Create(%1): Error %2 creating kernel")
+            .arg(entry) .arg(ciErrNum));
+        clReleaseProgram(program);
+        return NULL;
+    }
+
+    OpenCLKernel *newKernel = new OpenCLKernel(device, entry, program, kernel);
+    return newKernel;
+}
+
+OpenCLKernel::~OpenCLKernel()
+{
+    clReleaseKernel(m_kernel);
+    clReleaseProgram(m_program);
+}
+
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

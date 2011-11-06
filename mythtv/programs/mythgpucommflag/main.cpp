@@ -147,8 +147,15 @@ int main(int argc, char **argv)
     OpenCLDeviceMap *devMap = new OpenCLDeviceMap();
 
     OpenCLDevice *devices[2];    // 0 = video, 1 = audio;
-    devices[0] = devMap->GetBestDevice(NULL, cmdline.toBool("swvideo"));
-    devices[1] = devMap->GetBestDevice(devices[0], cmdline.toBool("swaudio"));
+    bool found;
+
+    for (found = false, devices[0] = NULL; !found; )
+    {
+        devices[0] = devMap->GetBestDevice(devices[0],
+                                           cmdline.toBool("swvideo"));
+
+        found = devices[0] ? devices[0]->Initialize() : true;
+    }
 
     if (devices[0])
     {
@@ -157,6 +164,14 @@ int main(int argc, char **argv)
     }
     else
         LOG(VB_GENERAL, LOG_INFO, "Video processing via software");
+
+    for (found = false, devices[1] = devices[0]; !found; )
+    {
+        devices[1] = devMap->GetBestDevice(devices[1],
+                                           cmdline.toBool("swaudio"));
+
+        found = devices[1] ? devices[1]->Initialize() : true;
+    }
 
     if (devices[1])
     {

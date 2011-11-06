@@ -1,6 +1,7 @@
 #include "mythlogging.h"
 #include "packetqueue.h"
 #include "resultslist.h"
+#include "audiopacket.h"
 #include "audioconsumer.h"
 #include "audioprocessor.h"
 
@@ -109,11 +110,13 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
         .arg(frames).arg(size));
 
     uint64_t duration = (uint64_t)((double)(frames * 1000) / rate);
+    AudioPacket *audioPacket = NULL;
 
     // Push PCM frame to GPU/CPU Processing memory
     if (m_dev)
     {
         // Push PCM frame to GPU
+        audioPacket = new AudioPacket(m_dev, samples, size, frames);
     }
 
     // Loop through the list of detection routines
@@ -139,6 +142,7 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
     if (m_dev)
     {
         // Free the frame in GPU/CPU memory if not needed
+        delete audioPacket;
     }
 }
 

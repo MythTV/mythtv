@@ -16,6 +16,7 @@
 #include <fcntl.h>
 #include <sched.h>
 #include <sys/time.h>
+#include <string.h>
 
 // C++ headers
 #include <algorithm>
@@ -929,6 +930,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     player_ctx->buffer->Start();
     /// OSX has a small stack, so we put this buffer on the heap instead.
     char *testbuf = new char[kDecoderProbeBufferSize];
+    memset(testbuf, 0, kDecoderProbeBufferSize);
     UnpauseBuffer();
 
     // delete any pre-existing recorder

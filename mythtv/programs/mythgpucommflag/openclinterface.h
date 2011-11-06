@@ -33,24 +33,33 @@ typedef enum {
 } OpenCLVendorType;
 
 class OpenCLDeviceSpecific;
+class OpenCLKernel;
+typedef QMap<QString, OpenCLKernel *> OpenCLKernelMap;
+
 class OpenCLDevice
 {
   public:
     OpenCLDevice(cl_device_id device);
     ~OpenCLDevice();
     void Display(void);
+    bool Initialize(void);
     uint64_t GetHash(void);
+    bool RegisterKernel(QString entry, QString filename);
+    OpenCLKernel *GetKernel(QString name) 
+        { return m_kernelMap.value(name, NULL); };
 
 //  private:
     bool m_valid;
     cl_device_id m_deviceId;
-    cl_context m_gpuContext;
+    cl_context m_context;
+    cl_command_queue m_commandQ;
     QString m_name;
     QString m_vendor;
     QString m_driverVersion;
     QString m_deviceVersion;
     QString m_openclCVersion;
     OpenCLDeviceType m_deviceType;
+    OpenCLKernelMap  m_kernelMap;
 
     cl_uint m_maxComputeUnits;
     size_t m_maxWorkItemSizes[3];
@@ -74,6 +83,8 @@ class OpenCLDevice
     OpenCLVendorType m_vendorType;
     OpenCLDeviceSpecific *m_vendorSpecific;
     cl_uint m_vectorWidth[6]; // char, short, int, long, float, double
+
+    bool m_float64;
 };
 
 class OpenCLDeviceSpecific
@@ -117,6 +128,29 @@ class OpenCLDeviceMap : public QMap<uint64_t, OpenCLDevice *>
 
     bool m_valid;
 };
+
+class OpenCLKernel
+{
+  public:
+    OpenCLKernel(OpenCLDevice *device, QString name, cl_program program,
+                 cl_kernel kernel) :
+        m_device(device), m_name(name), m_program(program), m_kernel(kernel) {};
+    ~OpenCLKernel();
+
+    static OpenCLKernel *Create(OpenCLDevice *device, QString entry,
+                                QString filename);
+
+    OpenCLDevice *m_device;
+    QString m_name;
+    cl_program m_program;
+    cl_kernel m_kernel;
+};
+
+typedef struct {
+    OpenCLKernel *kernel;
+    const char   *entry;
+    const char   *filename;
+} OpenCLKernelDef;
 
 #endif
 

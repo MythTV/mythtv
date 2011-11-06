@@ -27,10 +27,13 @@ FlagResults *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
 {
     static uint64_t accumSRMS = 0;
     static int accumSRMSShift = 0;
+    static int64_t accumDC = 0;
     static uint64_t accumSample = 0;
 
+    int16_t maxsample = 0;
     uint64_t accum = 0;
     int accumShift = 0;
+    int64_t accumWindowDC = 0;
     int channels = size / count / sizeof(int16_t);
     int sampleCount = count * channels;
 
@@ -41,13 +44,19 @@ FlagResults *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     // Accumulate this frame's partial squared RMS
     for (int i = 0; i < sampleCount; i++)
     {
+        int16_t sample = samples[i];
+
         // Check accumulator for potential overflow (shouldn't happen)
         if (accum >= MAX_ACCUM)
         {
             accum >>= 2;
             accumShift += 2;
         }
-        accum += (uint64_t)(samples[i]*samples[i]) >> accumShift;
+        accumWindowDC += sample;
+        accum += (uint64_t)(sample*sample) >> accumShift;
+        if (sample < 0)
+            sample = -sample;
+        maxsample = MAX(maxsample, sample);
     }
 
 #if 0
@@ -57,12 +66,14 @@ FlagResults *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
 #endif
 
     // Calculate RMS level of this window
-    uint16_t windowRMS = sqrt((double)accum * pow(2.0, (double)accumShift) /
+    uint16_t windowRMS = sqrt((double)accum * exp2((double)accumShift) /
                               (double)sampleCount);
     if (!windowRMS)
         windowRMS = 1;
 
     float windowRMSdB = 20.0 * log10((double)windowRMS / 32767.0);
+    int64_t windowDC = accumWindowDC / sampleCount;
+    LOG(VB_GENERAL, LOG_INFO, QString("Window DC: %1").arg(windowDC));
 
     // Check overall SRMS for potential overflow
     if (accumSRMS >= MAX_ACCUM)
@@ -86,6 +97,21 @@ FlagResults *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     // Accumulate the overall SRMS
     accumSRMS += accum;
     accumSample += sampleCount;
+    accumDC += accumWindowDC;
+
+    int64_t overallDC = accumDC / (int64_t)accumSample;
+
+#if 0
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("accumDC: %1  accumSample: %2  overallDC: %3")
+        .arg(accumDC) .arg(accumSample) .arg(overallDC));
+#endif
+
+    maxsample -= overallDC;
+    if (maxsample == 0)
+        maxsample = 1;
+
+    float DNRdB = 20.0 * log10((double)maxsample / (double) windowRMS);
 
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG,
@@ -95,19 +121,21 @@ FlagResults *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
 
     // Calculate RMS level of the recording so far
     uint16_t overallRMS = sqrt((double)accumSRMS *
-                               pow(2.0, (double)accumSRMSShift) /
+                               exp2((double)accumSRMSShift) /
                                (double)accumSample);
     if (!overallRMS)
         overallRMS = 1;
 
-    float overallRMSdB = 20.0 * log10(double(overallRMS) / 32767.0);
+    float overallRMSdB = 20.0 * log10((double)overallRMS / 32767.0);
     float deltaRMSdB = windowRMSdB - overallRMSdB;
 
-#if 0
+#if 1
     LOG(VB_GENERAL, LOG_INFO,
         QString("Window RMS: %1 (%2 dB), Overall RMS: %3 (%4 dB), Delta: %5 dB")
         .arg(windowRMS) .arg(windowRMSdB) .arg(overallRMS) .arg(overallRMSdB)
         .arg(deltaRMSdB));
+    LOG(VB_GENERAL, LOG_INFO, QString("Peak: %1  DNR: %2 dB  (DC: %3)")
+        .arg(maxsample) .arg(DNRdB) .arg(overallDC));
 #endif
 
     FlagFindings *finding = NULL;
