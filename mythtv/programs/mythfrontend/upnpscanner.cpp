@@ -361,7 +361,7 @@ void UPNPScanner::GetServerContent(QString &usn,
         QStringList data;
         data << usn;
         data << content->m_id;
-        //subnode->SetData(data);
+        subnode->SetData(data);
 
         VideoMetadataListManager::VideoMetadataPtr item(new VideoMetadata(QString()));
         item->SetTitle(QString("Dummy"));
@@ -370,7 +370,7 @@ void UPNPScanner::GetServerContent(QString &usn,
         return;
     }
 
-    //node->SetData(QVariant());
+    node->SetData(QVariant());
 
     if (content->m_url.isEmpty())
     {

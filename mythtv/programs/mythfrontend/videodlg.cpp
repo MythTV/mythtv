@@ -2662,6 +2662,18 @@ void VideoDialog::handleDirSelect(MythGenericTree *node)
     loadData();
 }
 
+/** \fn VideoDialog::handleDynamicDirSelect(MythGenericTree *node)
+ *  \brief Request the latest metadata for a folder.
+ *  \return void.
+ */
+void VideoDialog::handleDynamicDirSelect(MythGenericTree *node)
+{
+    QStringList route = node->getRouteByString();
+    if (m_d->m_videoList && m_d->m_videoList->refreshNode(node))
+        reloadData();
+    m_videoButtonTree->SetNodeByString(route);
+}
+
 /** \fn VideoDialog::handleSelect(MythUIButtonListItem *item)
  *  \brief Handle SELECT action for a given MythUIButtonListItem.
  *  \return void.
@@ -2673,6 +2685,9 @@ void VideoDialog::handleSelect(MythUIButtonListItem *item)
 
     switch (nodeInt)
     {
+        case kDynamicSubFolder:
+            handleDynamicDirSelect(node);
+            break;
         case kSubFolder:
             handleDirSelect(node);
             break;

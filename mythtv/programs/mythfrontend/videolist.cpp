@@ -377,6 +377,7 @@ class VideoListImp
 
     void refreshList(bool filebrowser, const ParentalLevel &parental_level,
                      bool flatlist, int group_type);
+    bool refreshNode(MythGenericTree *node);
 
     unsigned int count() const
     {
@@ -497,6 +498,11 @@ void VideoList::refreshList(bool filebrowser,
     m_imp->refreshList(filebrowser, parental_level, flat_list, group_type);
 }
 
+bool VideoList::refreshNode(MythGenericTree *node)
+{
+    return m_imp->refreshNode(node);
+}
+
 unsigned int VideoList::count() const
 {
     return m_imp->count();
@@ -556,6 +562,13 @@ VideoListImp::VideoListImp() : m_metadata_view_tree("", "top"),
 void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
                                       bool include_updirs)
 {
+    if (src->DataIsValid())
+    {
+        dst->setInt(kDynamicSubFolder);
+        dst->SetData(src->GetData());
+        return;
+    }
+
     for (meta_dir_node::const_dir_iterator dir = src->dirs_begin();
          dir != src->dirs_end(); ++dir)
     {
@@ -639,6 +652,29 @@ MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
     }
 
     return video_tree_root.get();
+}
+
+bool VideoListImp::refreshNode(MythGenericTree *node)
+{
+    if (!node)
+        return false;
+
+    // node->GetData() provides information on how/where to refresh the
+    // data for this node
+
+    QVariant data = node->GetData();
+    if (!data.isValid())
+        return false;
+
+    // currently only UPNPScanner can refresh data
+    if (UPNPScanner::Instance() && UPNPScanner::Instance()->GetMetadata(data))
+    {
+        // force a refresh
+        m_metadata_list_type = VideoListImp::ltNone;
+        return true;
+    }
+
+    return false;
 }
 
 void VideoListImp::refreshList(bool filebrowser,
@@ -1053,10 +1089,6 @@ void VideoListImp::buildFsysList()
     //  Fill metadata from directory structure
     //
 
-    // if available, start a UPnP MediaServer update first
-    if (UPNPScanner::Instance())
-        UPNPScanner::Instance()->StartFullScan();
-
     typedef std::vector<std::pair<QString, QString> > node_to_path_list;
 
     node_to_path_list node_paths;
@@ -1124,7 +1156,7 @@ void VideoListImp::buildFsysList()
 
     // retrieve any MediaServer data that may be available
     if (UPNPScanner::Instance())
-        UPNPScanner::Instance()->GetMetadata(&ml, &m_metadata_tree);
+        UPNPScanner::Instance()->GetInitialMetadata(&ml, &m_metadata_tree);
 
     // See if we can find this filename in DB
     if (m_LoadMetaData)
@@ -1168,7 +1200,8 @@ static void copy_filtered_tree(meta_dir_node &dst, meta_dir_node &src,
         smart_dir_node sdn = dst.addSubDir((*dir)->getPath(),
                                            (*dir)->getName(),
                                            (*dir)->GetHost(),
-                                           (*dir)->GetPrefix());
+                                           (*dir)->GetPrefix(),
+                                           (*dir)->GetData());
         copy_filtered_tree(*sdn, *(dir->get()), filter);
     }
 }
