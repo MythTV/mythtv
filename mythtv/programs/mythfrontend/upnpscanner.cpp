@@ -20,10 +20,7 @@ QString MediaServerItem::NextUnbrowsed(void)
 
     // scan this container
     if (!m_scanned)
-    {
-        m_scanned = true;
         return m_id;
-    }
 
     // scan children
     QMutableMapIterator<QString,MediaServerItem> it(m_children);
@@ -38,6 +35,23 @@ QString MediaServerItem::NextUnbrowsed(void)
     return QString();
 }
 
+MediaServerItem* MediaServerItem::Find(QString &id)
+{
+    if (m_id == id)
+        return this;
+
+    QMutableMapIterator<QString,MediaServerItem> it(m_children);
+    while (it.hasNext())
+    {
+        it.next();
+        MediaServerItem* result = it.value().Find(id);
+        if (result)
+            return result;
+    }
+
+    return NULL;
+}
+
 bool MediaServerItem::Add(MediaServerItem &item)
 {
     if (m_id == item.m_parentid)
@@ -45,15 +59,6 @@ bool MediaServerItem::Add(MediaServerItem &item)
         m_children.insert(item.m_id, item);
         return true;
     }
-
-    QMutableMapIterator<QString,MediaServerItem> it(m_children);
-    while (it.hasNext())
-    {
-        it.next();
-        if (it.value().Add(item))
-            return true;
-    }
-
     return false;
 }
 
@@ -128,7 +133,8 @@ QMutex*      UPNPScanner::gUPNPScannerLock    = new QMutex(QMutex::Recursive);
 UPNPScanner::UPNPScanner(UPNPSubscription *sub)
   : QObject(), m_subscription(sub), m_lock(QMutex::Recursive),
     m_network(NULL), m_updateTimer(NULL), m_watchdogTimer(NULL),
-    m_masterHost(QString()), m_masterPort(0), m_scanComplete(false)
+    m_masterHost(QString()), m_masterPort(0), m_scanComplete(false),
+    m_fullscan(false)
 {
 }
 
@@ -193,14 +199,49 @@ UPNPScanner* UPNPScanner::Instance(UPNPSubscription *sub)
  */
 void UPNPScanner::StartFullScan(void)
 {
+    m_fullscan = true;
     MythEvent *me = new MythEvent(QString("UPNP_STARTSCAN"));
     qApp->postEvent(this, me);
 }
 
 /**
+ * \fn UPNPScanner::GetInitialMetadata
+ *  Fill the given metadata_list and meta_dir_node with the root media
+ *  server metadata (i.e. the MediaServers) and any additional metadata that
+ *  that has already been scanned and cached.
+ */
+void UPNPScanner::GetInitialMetadata(VideoMetadataListManager::metadata_list* list,
+                                     meta_dir_node *node)
+{
+    // nothing to see..
+    QMap<QString,QString> servers = ServerList();
+    if (servers.isEmpty())
+        return;
+
+    // Add MediaServers
+    LOG(VB_GENERAL, LOG_INFO, QString("Adding MediaServer metadata."));
+
+    smart_dir_node mediaservers = node->addSubDir(tr("Media Servers"));
+    mediaservers->setPathRoot();
+
+    m_lock.lock();
+    QMutableHashIterator<QString,MediaServer*> it(m_servers);
+    while (it.hasNext())
+    {
+        it.next();
+        if (!it.value()->m_subscribed)
+            continue;
+
+        QString usn = it.key();
+        GetServerContent(usn, it.value(), list, mediaservers.get());
+    }
+    m_lock.unlock();
+}
+
+/**
  * \fn UPNPScanner::GetMetadata
  *  Fill the given metadata_list and meta_dir_node with the metadata
- *  of content retrieved from known media servers.
+ *  of content retrieved from known media servers. A full scan is triggered.
  */
 void UPNPScanner::GetMetadata(VideoMetadataListManager::metadata_list* list,
                               meta_dir_node *node)
@@ -228,14 +269,79 @@ void UPNPScanner::GetMetadata(VideoMetadataListManager::metadata_list* list,
 
 
     smart_dir_node mediaservers = node->addSubDir(tr("Media Servers"));
+    mediaservers->setPathRoot();
+
     m_lock.lock();
     QMutableHashIterator<QString,MediaServer*> it(m_servers);
     while (it.hasNext())
     {
         it.next();
-        GetServerContent(it.value(), list, mediaservers.get());
+        if (!it.value()->m_subscribed)
+            continue;
+
+        QString usn = it.key();
+        GetServerContent(usn, it.value(), list, mediaservers.get());
     }
     m_lock.unlock();
+}
+
+bool UPNPScanner::GetMetadata(QVariant &data)
+{
+    // we need a USN and objectID
+    if (!data.canConvert(QVariant::StringList))
+        return false;
+
+    QStringList list = data.toStringList();
+    if (list.size() != 2)
+        return false;
+
+    QString usn = list[0];
+    QString object = list[1];
+
+    m_lock.lock();
+    bool valid = m_servers.contains(usn);
+    if (valid)
+    {
+        MediaServerItem* item = m_servers[usn]->Find(object);
+        valid = item ? !item->m_scanned : false;
+    }
+    m_lock.unlock();
+    if (!valid)
+        return false;
+
+    MythEvent *me = new MythEvent("UPNP_BROWSEOBJECT", list);
+    qApp->postEvent(this, me);
+
+    int count = 0;
+    bool found = false;
+    LOG(VB_GENERAL, LOG_INFO, "START");
+    while (!found && (count++ < 100)) // 10 seconds
+    {
+        usleep(100000);
+        m_lock.lock();
+        if (m_servers.contains(usn))
+        {
+            MediaServerItem *item = m_servers[usn]->Find(object);
+            if (item)
+            {
+                found = item->m_scanned;
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString("Item went away..."));
+                found = true;
+            }
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Server went away while browsing."));
+            found = true;
+        }
+        m_lock.unlock();
+    }
+    LOG(VB_GENERAL, LOG_INFO, "END");
+    return true;
 }
 
 /**
@@ -243,10 +349,29 @@ void UPNPScanner::GetMetadata(VideoMetadataListManager::metadata_list* list,
  *  Recursively search a MediaServerItem for video metadata and add it to
  *  the metadata_list and meta_dir_node.
  */
-void UPNPScanner::GetServerContent(MediaServerItem *content,
+void UPNPScanner::GetServerContent(QString &usn,
+                                   MediaServerItem *content,
                                    VideoMetadataListManager::metadata_list* list,
                                    meta_dir_node *node)
 {
+    if (!content->m_scanned)
+    {
+        smart_dir_node subnode = node->addSubDir(content->m_name);
+
+        QStringList data;
+        data << usn;
+        data << content->m_id;
+        subnode->SetData(data);
+
+        VideoMetadataListManager::VideoMetadataPtr item(new VideoMetadata(QString()));
+        item->SetTitle(QString("Dummy"));
+        list->push_back(item);
+        subnode->addEntry(smart_meta_node(new meta_data_node(item.get())));
+        return;
+    }
+
+    node->SetData(QVariant());
+
     if (content->m_url.isEmpty())
     {
         smart_dir_node container = node->addSubDir(content->m_name);
@@ -254,7 +379,7 @@ void UPNPScanner::GetServerContent(MediaServerItem *content,
         while (it.hasNext())
         {
             it.next();
-            GetServerContent(&it.value(), list, container.get());
+            GetServerContent(usn, &it.value(), list, container.get());
         }
         return;
     }
@@ -491,8 +616,8 @@ void UPNPScanner::replyFinished(QNetworkReply *reply)
     if (browse && valid)
     {
         ParseBrowse(url, reply);
-        // a complete scan is event driven, so trigger the next browse
-        BrowseNextContainer();
+        if (m_fullscan)
+            BrowseNextContainer();
     }
     else if (description)
     {
@@ -526,6 +651,26 @@ void UPNPScanner::customEvent(QEvent *event)
     if (ev == "UPNP_STARTSCAN")
     {
         BrowseNextContainer();
+        return;
+    }
+    else if (ev == "UPNP_BROWSEOBJECT")
+    {
+        if (me->ExtraDataCount() == 2)
+        {
+            QUrl url;
+            QString usn = me->ExtraData(0);
+            QString objectid = me->ExtraData(1);
+            m_lock.lock();
+            if (m_servers.contains(usn))
+            {
+                url = m_servers[usn]->m_controlURL;
+                LOG(VB_GENERAL, LOG_INFO, QString("UPNP_BROWSEOBJECT: %1->%2")
+                    .arg(m_servers[usn]->m_friendlyName).arg(objectid));
+            }
+            m_lock.unlock();
+            if (!url.isEmpty())
+                SendBrowseRequest(url, objectid);
+        }
         return;
     }
     else if (ev == "UPNP_EVENT")
@@ -712,6 +857,7 @@ void UPNPScanner::BrowseNextContainer(void)
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Media Server scan is complete."));
         m_scanComplete = true;
+        m_fullscan = false;
     }
 }
 
@@ -918,12 +1064,14 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
         Debug();
     }
 
-    // find containers (directories) and actual items and add them
+    // find containers (directories) and actual items and add them and reset
+    // the parent when we have found the first item
+    bool reset = true;
     docElem = result->documentElement();
     n = docElem.firstChild();
     while (!n.isNull())
     {
-        FindItems(n, *server);
+        FindItems(n, *server, reset);
         n = n.nextSibling();
     }
     delete result;
@@ -931,7 +1079,8 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
     m_lock.unlock();
 }
 
-void UPNPScanner::FindItems(const QDomNode &n, MediaServerItem &content)
+void UPNPScanner::FindItems(const QDomNode &n, MediaServerItem &content,
+                            bool &resetparent)
 {
     QDomElement node = n.toElement();
     if (node.isNull())
@@ -949,11 +1098,21 @@ void UPNPScanner::FindItems(const QDomNode &n, MediaServerItem &content)
             next = next.nextSibling();
         }
 
+        QString thisid   = node.attribute("id", "ERROR");
+        QString parentid = node.attribute("parentID", "ERROR");
         MediaServerItem container =
-            MediaServerItem(node.attribute("id", "ERROR"),
-                            node.attribute("parentID", "ERROR"),
-                            title, QString());
-        content.Add(container);
+            MediaServerItem(thisid, parentid, title, QString());
+        MediaServerItem *parent = content.Find(parentid);
+        if (parent)
+        {
+            if (resetparent)
+            {
+                parent->Reset();
+                resetparent = false;
+            }
+            parent->m_scanned = true;
+            parent->Add(container);
+        }
         return;
     }
 
@@ -975,18 +1134,29 @@ void UPNPScanner::FindItems(const QDomNode &n, MediaServerItem &content)
             next = next.nextSibling();
         }
 
+        QString thisid   = node.attribute("id", "ERROR");
+        QString parentid = node.attribute("parentID", "ERROR");
         MediaServerItem item =
-                MediaServerItem(node.attribute("id", "ERROR"),
-                                node.attribute("parentID", "ERROR"),
-                                title, url);
-        content.Add(item);
+                MediaServerItem(thisid, parentid, title, url);
+        item.m_scanned = true;
+        MediaServerItem *parent = content.Find(parentid);
+        if (parent)
+        {
+            if (resetparent)
+            {
+                parent->Reset();
+                resetparent = false;
+            }
+            parent->m_scanned = true;
+            parent->Add(item);
+        }
         return;
     }
 
     QDomNode next = node.firstChild();
     while (!next.isNull())
     {
-        FindItems(next, content);
+        FindItems(next, content, resetparent);
         next = next.nextSibling();
     }
 }
