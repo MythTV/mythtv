@@ -9,23 +9,27 @@ using namespace std;
 class MythDialogBox;
 struct AVSubtitle;
 
-#define OSD_DLG_VIDEOEXIT "OSD_VIDEO_EXIT"
-#define OSD_DLG_MENU      "OSD_MENU"
-#define OSD_DLG_SLEEP     "OSD_SLEEP"
-#define OSD_DLG_IDLE      "OSD_IDLE"
-#define OSD_DLG_INFO      "OSD_INFO"
-#define OSD_DLG_EDITING   "OSD_EDITING"
-#define OSD_DLG_ASKALLOW  "OSD_ASKALLOW"
-#define OSD_DLG_EDITOR    "OSD_EDITOR"
-#define OSD_DLG_CUTPOINT  "OSD_CUTPOINT"
-#define OSD_DLG_DELETE    "OSD_DELETE"
-// Force subtitle/interactive screens to be drawn first (i.e. at the back) by
-// prepending their identifiers with a low numeric (may not always work as
-// QMap/QString ordering is based on unicode values)
-#define OSD_WIN_TELETEXT  "00_OSD_TELETEXT"
-#define OSD_WIN_SUBTITLE  "00_OSD_SUBTITLES"
-// MHEG should cover subtitles
-#define OSD_WIN_INTERACT  "01_OSD_INTERACTIVE"
+// Screen names are prepended with alphanumerics to force the correct ordering
+// when displayed. This is slightly complicated by the default windows
+// (e.g. osd_message) whose names are hard coded into existing themes.
+
+// menu dialogs should always be on top
+#define OSD_DLG_VIDEOEXIT "xx_OSD_VIDEO_EXIT"
+#define OSD_DLG_MENU      "xx_OSD_MENU"
+#define OSD_DLG_SLEEP     "xx_OSD_SLEEP"
+#define OSD_DLG_IDLE      "xx_OSD_IDLE"
+#define OSD_DLG_INFO      "xx_OSD_INFO"
+#define OSD_DLG_EDITING   "xx_OSD_EDITING"
+#define OSD_DLG_ASKALLOW  "xx_OSD_ASKALLOW"
+#define OSD_DLG_EDITOR    "xx_OSD_EDITOR"
+#define OSD_DLG_CUTPOINT  "xx_OSD_CUTPOINT"
+#define OSD_DLG_DELETE    "xx_OSD_DELETE"
+#define OSD_DLG_CONFIRM   "mythconfirmpopup"
+// subtitles are always painted first
+#define OSD_WIN_TELETEXT  "aa_OSD_TELETEXT"
+#define OSD_WIN_SUBTITLE  "aa_OSD_SUBTITLES"
+// MHEG and blu-ray overlay should cover subtitles
+#define OSD_WIN_INTERACT  "bb_OSD_INTERACTIVE"
 
 #define kOSDFadeTime 1000
 
