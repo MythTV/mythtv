@@ -50,6 +50,9 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     bool post(const QString &url, QByteArray *data);
     bool post(QNetworkRequest *req, QByteArray *data);
 
+    // Cancel a download
+    void cancelDownload(const QString &url);
+
     // Generic helpers
     void removeListener(QObject *caller);
     QDateTime GetLastModified(const QString &url);
