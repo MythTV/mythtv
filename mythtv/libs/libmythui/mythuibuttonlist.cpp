@@ -1330,7 +1330,7 @@ void MythUIButtonList::CalculateButtonPositions(void)
     if (it < m_itemList.begin())
         it = m_itemList.begin();
 
-    int curItem = GetItemPos(*it);
+    int curItem = it < m_itemList.end() ? GetItemPos(*it) : 0;
 
     while (it < m_itemList.end() && button < (int)m_itemsVisible)
     {
