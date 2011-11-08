@@ -5970,11 +5970,7 @@ void TV::DoJumpChapter(PlayerContext *ctx, int chapter)
 
     PauseAudioUntilBuffered(ctx);
 
-    osdInfo info;
-    ctx->CalcPlayerSliderPosition(info);
-    info.text["description"] = tr("Jump Chapter");
-    info.text["title"] = tr("Searching");
-    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default, kOSDTimeout_Med);
+    UpdateOSDSeekMessage(ctx, tr("Jump Chapter"), kOSDTimeout_Med);
     SetUpdateOSDPosition(true);
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6061,18 +6057,12 @@ void TV::DoSwitchTitle(PlayerContext *ctx, int title)
 
     PauseAudioUntilBuffered(ctx);
 
-    osdInfo info;
-    ctx->CalcPlayerSliderPosition(info);
-    info.text["description"] = tr("Jump Title");
-    info.text["title"] = tr("Searching");
-    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default, kOSDTimeout_Med);
+    UpdateOSDSeekMessage(ctx, tr("Switch Title"), kOSDTimeout_Med);
     SetUpdateOSDPosition(true);
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
-    {
         ctx->player->SwitchTitle(title);
-    }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
@@ -6083,11 +6073,7 @@ void TV::DoSwitchAngle(PlayerContext *ctx, int angle)
 
     PauseAudioUntilBuffered(ctx);
 
-    osdInfo info;
-    ctx->CalcPlayerSliderPosition(info);
-    info.text["description"] = tr("Switch Angle");
-    info.text["title"]       = tr("Switching");
-    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default, kOSDTimeout_Med);
+    UpdateOSDSeekMessage(ctx, tr("Switch Angle"), kOSDTimeout_Med);
     SetUpdateOSDPosition(true);
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
