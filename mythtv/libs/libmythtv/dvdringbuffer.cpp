@@ -590,7 +590,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     dvdnav_free_cache_block(m_dvdnav, blockBuf);
 
                 // debug
-                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_BLOCK_OK");
+                LOG(VB_PLAYBACK|VB_FILE, LOG_DEBUG, LOC + "DVDNAV_BLOCK_OK");
             }
             break;
 
