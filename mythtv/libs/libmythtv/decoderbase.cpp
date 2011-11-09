@@ -865,7 +865,7 @@ long long DecoderBase::DVDFindPosition(long long desiredFrame)
         current_speed = (int)m_parent->GetNextPlaySpeed();
     }
 
-    if (ffrewSkip == 1)
+    if (ffrewSkip == 1 || ffrewSkip == 0)
     {
         diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
         desiredTimePos = ringBuffer->DVD()->GetCurrentTime() +
@@ -896,7 +896,7 @@ long long DecoderBase::BDFindPosition(long long desiredFrame)
         current_speed = (int)m_parent->GetNextPlaySpeed();
     }
 
-    if (ffrewSkip == 1)
+    if (ffrewSkip == 1 || ffrewSkip == 0)
     {
         diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
         desiredTimePos = ringBuffer->BD()->GetCurrentTime() +
