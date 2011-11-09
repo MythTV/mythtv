@@ -245,6 +245,8 @@ class AvFormatDecoder : public DecoderBase
     float normalized_fps(AVStream *stream, AVCodecContext *enc);
     void av_update_stream_timings_video(AVFormatContext *ic);
 
+    virtual bool DoRewindSeek(long long desiredFrame);
+    virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
     virtual void StreamChangeCheck(void) { }
     virtual void PostProcessTracks(void) { }
     virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);

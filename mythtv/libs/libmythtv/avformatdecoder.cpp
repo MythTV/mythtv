@@ -2200,6 +2200,17 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     return scanerror;
 }
 
+bool AvFormatDecoder::DoRewindSeek(long long desiredFrame)
+{
+    return DecoderBase::DoRewindSeek(desiredFrame);
+}
+
+void AvFormatDecoder::DoFastForwardSeek(long long desiredFrame, bool &needflush)
+{
+    DecoderBase::DoFastForwardSeek(desiredFrame, needflush);
+    return;
+}
+
 int AvFormatDecoder::GetSubtitleLanguage(uint subtitle_index, uint stream_index)
 {
     (void)subtitle_index;

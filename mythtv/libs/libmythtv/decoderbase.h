@@ -170,11 +170,8 @@ class DecoderBase
     bool GetWaitForChange(void) const;
     void SetReadAdjust(long long adjust);
 
-    // DVD public stuff
-    long long DVDFindPosition(long long desiredFrame);
+    // DVD/BD public stuff
     void UpdateDVDFramesPlayed(void);
-
-    long long BDFindPosition(long long desiredFrame);
     void UpdateBDFramesPlayed(void);
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
@@ -216,8 +213,8 @@ class DecoderBase
 
     void FileChanged(void);
 
-    bool DoRewindSeek(long long desiredFrame);
-    void DoFastForwardSeek(long long desiredFrame, bool &needflush);
+    virtual bool DoRewindSeek(long long desiredFrame);
+    virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
 
     long long ConditionallyUpdatePosMap(long long desiredFrame);
     long long GetLastFrameInPosMap(void) const;

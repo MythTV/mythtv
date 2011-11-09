@@ -5,7 +5,7 @@
 
 class AvFormatDecoderDVD : public AvFormatDecoder
 {
-public:
+  public:
     AvFormatDecoderDVD(MythPlayer *parent, const ProgramInfo &pginfo,
                     bool use_null_video_out,
                     bool allow_private_decode = true,
@@ -14,9 +14,13 @@ public:
     virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
 
   private:
+    virtual bool DoRewindSeek(long long desiredFrame);
+    virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
     virtual void StreamChangeCheck(void);
     virtual void PostProcessTracks(void);
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
+
+    long long DVDFindPosition(long long desiredFrame);
 };
 
 #endif // AVFORMATDECODERDVD_H

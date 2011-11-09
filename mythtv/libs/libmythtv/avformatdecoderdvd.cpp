@@ -74,6 +74,30 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
     }
 }
 
+bool AvFormatDecoderDVD::DoRewindSeek(long long desiredFrame)
+{
+    if (!ringBuffer->IsDVD())
+        return false;
+
+    long long pos = DVDFindPosition(desiredFrame);
+    ringBuffer->Seek(pos, SEEK_SET);
+    lastKey = desiredFrame + 1;
+    return true;
+}
+
+void AvFormatDecoderDVD::DoFastForwardSeek(long long desiredFrame, bool &needflush)
+{
+    if (!ringBuffer->IsDVD())
+        return;
+
+    long long pos = DVDFindPosition(desiredFrame);
+    ringBuffer->Seek(pos,SEEK_SET);
+    needflush    = true;
+    lastKey      = desiredFrame+1;
+    framesPlayed = lastKey;
+    framesRead   = lastKey;
+}
+
 void AvFormatDecoderDVD::StreamChangeCheck(void)
 {
     if (!ringBuffer->IsDVD())
@@ -106,4 +130,36 @@ int AvFormatDecoderDVD::GetAudioLanguage(uint audio_index, uint stream_index)
             ringBuffer->DVD()->GetAudioTrackNum(ic->streams[stream_index]->id));
     }
     return iso639_str3_to_key("und");
+}
+
+long long AvFormatDecoderDVD::DVDFindPosition(long long desiredFrame)
+{
+    if (!ringBuffer->IsDVD())
+        return 0;
+
+    int diffTime = 0;
+    long long desiredTimePos;
+    int ffrewSkip = 1;
+    int current_speed = 0;
+    if (m_parent)
+    {
+        ffrewSkip = m_parent->GetFFRewSkip();
+        current_speed = (int)m_parent->GetNextPlaySpeed();
+    }
+
+    if (ffrewSkip == 1)
+    {
+        diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
+        desiredTimePos = ringBuffer->DVD()->GetCurrentTime() +
+                        diffTime;
+        if (diffTime <= 0)
+            desiredTimePos--;
+        else
+            desiredTimePos++;
+
+        if (desiredTimePos < 0)
+            desiredTimePos = 0;
+        return (desiredTimePos * 90000LL);
+    }
+    return current_speed;
 }
