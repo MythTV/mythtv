@@ -808,7 +808,7 @@ void VideoOutputVDPAU::DrawUnusedRects(bool sync)
     m_lock.unlock();
 }
 
-void VideoOutputVDPAU::UpdatePauseFrame(void)
+void VideoOutputVDPAU::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&m_lock);
 
@@ -820,6 +820,7 @@ void VideoOutputVDPAU::UpdatePauseFrame(void)
     if (vbuffers.size(kVideoBuffer_used) && m_render)
     {
         VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+        disp_timecode = frame->disp_timecode;
         if (codec_is_std(video_codec_id))
         {
             m_pause_surface = m_video_surfaces[0];

@@ -217,7 +217,7 @@ class VideoOutput
     QString GetFrameStatus(void) const { return vbuffers.GetStatus(); }
 
     /// \brief Updates frame displayed when video is paused.
-    virtual void UpdatePauseFrame(void) = 0;
+    virtual void UpdatePauseFrame(int64_t &disp_timecode) = 0;
 
     /// \brief Tells the player to resize the video frame (used for ITV)
     void SetVideoResize(const QRect &videoRect);

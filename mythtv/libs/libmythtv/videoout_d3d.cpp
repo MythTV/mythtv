@@ -424,7 +424,7 @@ void VideoOutputD3D::Zoom(ZoomDirection direction)
     MoveResize();
 }
 
-void VideoOutputD3D::UpdatePauseFrame(void)
+void VideoOutputD3D::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&m_lock);
     VideoFrame *used_frame = vbuffers.head(kVideoBuffer_used);
@@ -434,10 +434,17 @@ void VideoOutputD3D::UpdatePauseFrame(void)
         if (!used_frame)
             used_frame = vbuffers.GetScratchFrame();
         CopyFrame(&m_pauseFrame, used_frame);
+        disp_timecode = m_pauseFrame.disp_timecode;
     }
     else if (codec_is_dxva2(video_codec_id))
     {
-        m_pause_surface = used_frame->buf;
+        if (used_frame)
+        {
+            m_pause_surface = used_frame->buf;
+            disp_timecode = used_frame->disp_timecode;
+        }
+        else
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Failed to update pause frame");
     }
 }
 

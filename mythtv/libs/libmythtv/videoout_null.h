@@ -28,7 +28,7 @@ class VideoOutputNull : public VideoOutput
     void EmbedInWidget(const QRect &rect);
     void StopEmbedding(void);
     void DrawUnusedRects(bool sync = true);
-    void UpdatePauseFrame(void);
+    void UpdatePauseFrame(int64_t &disp_timecode);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,

@@ -27,7 +27,7 @@ class VideoOutputOpenGL : public VideoOutput
     virtual bool InputChanged(const QSize &input_size, float aspect,
                               MythCodecID  av_codec_id, void *codec_private,
                               bool &aspect_only);
-    virtual void UpdatePauseFrame(void);
+    virtual void UpdatePauseFrame(int64_t &disp_timecode);
     void DrawUnusedRects(bool) { }
     void Zoom(ZoomDirection direction);
     void MoveResize(void);

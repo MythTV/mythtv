@@ -618,7 +618,7 @@ void VideoOutputOpenGL::MoveResize(void)
     }
 }
 
-void VideoOutputOpenGL::UpdatePauseFrame(void)
+void VideoOutputOpenGL::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&gl_context_lock);
     VideoFrame *used_frame = vbuffers.head(kVideoBuffer_used);
@@ -626,6 +626,7 @@ void VideoOutputOpenGL::UpdatePauseFrame(void)
         used_frame = vbuffers.GetScratchFrame();
 
     CopyFrame(&av_pause_frame, used_frame);
+    disp_timecode = av_pause_frame.disp_timecode;
 }
 
 void VideoOutputOpenGL::InitPictureAttributes(void)

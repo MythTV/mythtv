@@ -46,7 +46,7 @@ class VideoOutputVDPAU : public VideoOutput
     void StopEmbedding(void);
     void MoveResizeWindow(QRect new_rect);
     void DrawUnusedRects(bool sync = true);
-    void UpdatePauseFrame(void);
+    void UpdatePauseFrame(int64_t &disp_timecode);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
     void InitPictureAttributes(void);
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,

@@ -2004,7 +2004,7 @@ void MythPlayer::RefreshPauseFrame(void)
     {
         if (videoOutput->ValidVideoFrames())
         {
-            videoOutput->UpdatePauseFrame();
+            videoOutput->UpdatePauseFrame(disp_timecode);
             needNewPauseFrame = false;
         }
         else

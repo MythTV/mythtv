@@ -1393,6 +1393,7 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
         return;
 
     to->frameNumber = from->frameNumber;
+    to->disp_timecode = from->disp_timecode;
 
     // guaranteed to be correct sizes.
     if (from->size == to->size)
