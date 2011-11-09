@@ -13,15 +13,13 @@ class AudioConsumer : public QueueConsumer
   public:
     AudioConsumer(PacketQueue *inQ, ResultsList *outL, OpenCLDevice *dev);
     ~AudioConsumer() { av_free(m_audioSamples); };
+    bool Initialize(void) { return true; };
     void ProcessPacket(Packet *packet);
     void ProcessFrame(int16_t *samples, int size, int frames, int64_t pts,
                       int rate, uint64_t pos);
 
     int16_t *m_audioSamples;
     AudioProcessorList *m_proclist;
-    AVCodecContext *m_context;
-    AVCodec *m_codec;
-    bool m_opened;
 };
 
 #endif

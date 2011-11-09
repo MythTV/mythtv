@@ -13,6 +13,7 @@ using namespace std;
 #include "playercontext.h"
 #include "remotefile.h"
 #include "jobqueue.h"
+#include "mythuihelper.h"
 
 #include "openclinterface.h"
 #include "packetqueue.h"
@@ -50,6 +51,7 @@ namespace
 }
 
 MythGPUCommFlagCommandLineParser cmdline;
+OpenCLDeviceMap *devMap = NULL;
 
 static QString get_filename(ProgramInfo *program_info)
 {
@@ -124,27 +126,50 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-    QCoreApplication a(argc, argv);
-    QCoreApplication::setApplicationName("mythgpucommflag");
+#ifdef Q_WS_X11
+    bool useX = (getenv("DISPLAY") != 0) ||
+                !cmdline.toString("display").isEmpty();
+
+    if (cmdline.toBool("noX"))
+        useX = false;
+#else
+    bool useX = true;
+#endif
+
+    QApplication app(argc, argv, useX);
+    QApplication::setApplicationName("mythgpucommflag");
     int retval = cmdline.ConfigureLogging("general", false);
 //                                          !cmdline.toBool("noprogress"));
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
+    if (useX && !cmdline.toString("display").isEmpty())
+    {
+        MythUIHelper::SetX11Display(cmdline.toString("display"));
+    }
+
+    if (!useX)
+    {
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Use of X disabled, reverting to software video decoding");
+    }
+
     CleanupGuard callCleanup(cleanup);
     gContext = new MythContext(MYTH_BINARY_VERSION);
+    
     if (!gContext->Init( false,  /* use gui */
                          false,  /* prompt for backend */
                          false,  /* bypass auto discovery */
-                         false)) /* ignoreDB */
+                         false) ) /* ignoreDB */
     {
         LOG(VB_GENERAL, LOG_EMERG, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
+
     cmdline.ApplySettingsOverride();
 
     // Determine capabilities
-    OpenCLDeviceMap *devMap = new OpenCLDeviceMap();
+    devMap = new OpenCLDeviceMap();
 
     OpenCLDevice *devices[2];    // 0 = video, 1 = audio;
     bool found;
@@ -271,6 +296,9 @@ int main(int argc, char **argv)
                                                    devices[1]);
     VideoConsumer *videoThread = new VideoConsumer(&videoQ, &videoMarks,
                                                    devices[0]);
+
+    if (useX)
+        videoThread->EnableX();
 
     audioThread->start();
     videoThread->start();

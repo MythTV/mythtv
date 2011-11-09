@@ -6,6 +6,7 @@ extern "C"
 {
 #include "libavcodec/avcodec.h"
 }
+#include "mythtvexp.h"
 
 typedef enum
 {
@@ -84,7 +85,7 @@ typedef enum
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id);
 QString toString(MythCodecID codecid);
-int myth2av_codecid(MythCodecID codec_id, bool &vdpau);
+int MTV_PUBLIC myth2av_codecid(MythCodecID codec_id, bool &vdpau);
 inline int myth2av_codecid(MythCodecID codec_id)
 {
     bool vdpau;
@@ -92,7 +93,7 @@ inline int myth2av_codecid(MythCodecID codec_id)
 }
 
 // AV codec id convenience functions
-int mpeg_version(int codec_id);
+int MTV_PUBLIC mpeg_version(int codec_id);
 #define CODEC_IS_H264(id)     (mpeg_version(id) == 5)
 #define CODEC_IS_MPEG(id)     (mpeg_version(id) && mpeg_version(id) <= 2)
 #define CODEC_IS_FFMPEG_MPEG(id) (CODEC_IS_MPEG(id))

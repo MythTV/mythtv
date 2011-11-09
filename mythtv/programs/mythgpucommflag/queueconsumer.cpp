@@ -15,6 +15,9 @@ void QueueConsumer::run(void)
     RunProlog();
     LOG(VB_GENERAL, LOG_INFO, QString("Starting %1").arg(m_name));
 
+    if (!Initialize())
+        return;
+
     while(!m_done || !m_inQ->isEmpty())
     {
         Packet *packet = m_inQ->dequeue(-1);

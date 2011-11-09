@@ -24,7 +24,6 @@ AudioConsumer::AudioConsumer(PacketQueue *inQ, ResultsList *outL,
         m_proclist = softwareAudioProcessorList;
 
     m_context = avcodec_alloc_context();
-    m_opened = false;
 }
 
 void AudioConsumer::ProcessPacket(Packet *packet)
@@ -44,6 +43,7 @@ void AudioConsumer::ProcessPacket(Packet *packet)
             return;
         m_opened = true;
     }
+
     int ret             = 0;
     int dataSize        = 0;
     int frames          = -1;
@@ -132,7 +132,7 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
         // Toss the results onto the results list
         if (result)
         {
-            LOG(VB_GENERAL, LOG_INFO, "Finding found");
+            LOG(VB_GENERAL, LOG_INFO, "Audio Finding found");
             result->m_pts = pts;
             result->m_duration = duration;
             m_outL->append(result);

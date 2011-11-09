@@ -17,9 +17,12 @@
 #endif
 #include <oclUtils.h>
 #include "openclinterface.h"
+#include "openglsupport.h"
 
 void openCLDisplayImageFormats(cl_context context);
 void openCLPrintDevInfo(cl_device_id device);
+
+cl_platform_id clSelectedPlatformID = NULL; 
 
 OpenCLDeviceMap::OpenCLDeviceMap(void)
 {
@@ -28,7 +31,6 @@ OpenCLDeviceMap::OpenCLDeviceMap(void)
     m_valid = false;
 
     // Get OpenCL platform ID for NVIDIA if avaiable, otherwise default
-    cl_platform_id clSelectedPlatformID = NULL; 
     cl_int ciErrNum = oclGetPlatformID (&clSelectedPlatformID);
     if (ciErrNum != CL_SUCCESS)
     {
@@ -232,13 +234,31 @@ bool OpenCLDevice::RegisterKernel(QString entry, QString filename)
     return true;
 }
 
-OpenCLDevice::OpenCLDevice(cl_device_id device) : m_valid(false),
-    m_deviceId(device), m_commandQ(NULL)
+OpenCLDevice::OpenCLDevice(cl_device_id device, bool needOpenGL) :
+    m_valid(false), m_deviceId(device), m_commandQ(NULL)
 {
     cl_int ciErrNum;
 
-    //Create a context for the device
-    m_context = clCreateContext(0, 1, &device, NULL, NULL, &ciErrNum);
+    m_props = NULL;
+
+    if (needOpenGL)
+    {
+        if (!openGLInitialize())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Could not open OpenGL Context!");
+            return;
+        }
+
+        cl_context_properties openGLProps[] = {
+            CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(), 
+            CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
+            0 };
+        m_props = new cl_context_properties[5];
+        memcpy(m_props, openGLProps, sizeof(openGLProps));
+    }
+
+    // Create a context for the device
+    m_context = clCreateContext(m_props, 1, &device, NULL, NULL, &ciErrNum);
     if (ciErrNum != CL_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Error %1 in clCreateContext call")
@@ -397,6 +417,9 @@ OpenCLDevice::OpenCLDevice(cl_device_id device) : m_valid(false),
     clGetDeviceInfo(device, CL_DEVICE_IMAGE3D_MAX_DEPTH, sizeof(size_t),
                     &m_max3DImageSize[2], NULL);
 
+    m_float64 = false;
+    m_opengl  = false;
+
     // CL_DEVICE_EXTENSIONS: get device extensions, and if any then parse & log
     // the string onto separate lines
     m_vendorType = kOpenCLVendorUnknown;
@@ -410,6 +433,7 @@ OpenCLDevice::OpenCLDevice(cl_device_id device) : m_valid(false),
         if (m_extensions.indexOf("cl_nv_device_attribute_query") != -1)
             m_vendorType = kOpenCLVendorNvidia;
         m_float64 = (m_extensions.indexOf("cl_khr_fp64") != -1);
+        m_opengl = (m_extensions.indexOf("cl_khr_gl_sharing") != -1);
     }
 
     switch (m_vendorType)
@@ -446,6 +470,12 @@ OpenCLDevice::~OpenCLDevice()
     {
         delete m_vendorSpecific;
         m_vendorSpecific = NULL;
+    }
+
+    if (m_props)
+    {
+        delete [] m_props;
+        m_props = NULL;
     }
 }
 

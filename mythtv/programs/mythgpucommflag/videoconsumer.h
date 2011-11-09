@@ -4,14 +4,25 @@
 #include "queueconsumer.h"
 #include "packetqueue.h"
 #include "resultslist.h"
+#include "mythxdisplay.h"
+#include "videodecoder.h"
+#include "videoouttypes.h"
+#include "videoprocessor.h"
 
 class VideoConsumer : public QueueConsumer
 {
   public:
-    VideoConsumer(PacketQueue *inQ, ResultsList *outL, OpenCLDevice *dev) : 
-        QueueConsumer(inQ, outL, dev, "VideoConsumer") {};
-    ~VideoConsumer() {};
+    VideoConsumer(PacketQueue *inQ, ResultsList *outL, OpenCLDevice *dev);
+    ~VideoConsumer() { if (m_decoder) delete m_decoder; };
+    bool Initialize(void);
     void ProcessPacket(Packet *packet);
+    void EnableX(void)  { m_useX = true; };
+    void InitVideoCodec(void);
+
+    bool m_useX;
+    VideoDecoder *m_decoder;
+    AVSpecialDecode m_specialDecode;
+    VideoProcessorList *m_proclist;
 };
 
 #endif

@@ -39,7 +39,7 @@ typedef QMap<QString, OpenCLKernel *> OpenCLKernelMap;
 class OpenCLDevice
 {
   public:
-    OpenCLDevice(cl_device_id device);
+    OpenCLDevice(cl_device_id device, bool needOpenGL = false);
     ~OpenCLDevice();
     void Display(void);
     bool Initialize(void);
@@ -53,6 +53,7 @@ class OpenCLDevice
     cl_device_id m_deviceId;
     cl_context m_context;
     cl_command_queue m_commandQ;
+    cl_context_properties *m_props;
     QString m_name;
     QString m_vendor;
     QString m_driverVersion;
@@ -85,6 +86,7 @@ class OpenCLDevice
     cl_uint m_vectorWidth[6]; // char, short, int, long, float, double
 
     bool m_float64;
+    bool m_opengl;
 };
 
 class OpenCLDeviceSpecific
@@ -151,6 +153,8 @@ typedef struct {
     const char   *entry;
     const char   *filename;
 } OpenCLKernelDef;
+
+extern OpenCLDeviceMap *devMap;
 
 #endif
 

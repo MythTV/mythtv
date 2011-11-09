@@ -18,6 +18,7 @@ void MythGPUCommFlagCommandLineParser::LoadArguments(void)
     addJob();
     addRecording();
     addLogging();
+    addDisplay();
 
     CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
          << new CommandLineArg("chanid")
@@ -91,6 +92,9 @@ void MythGPUCommFlagCommandLineParser::LoadArguments(void)
             ->SetGroup("Advanced");
     add("--force-sw-video", "swvideo", false,
         "Force video processing to be done in software.", "")
+            ->SetGroup("Advanced");
+    add("--force-disable-x", "noX", false,
+        "Force disabling X Windows use.  Forces software video decoding.", "")
             ->SetGroup("Advanced");
 }
 
