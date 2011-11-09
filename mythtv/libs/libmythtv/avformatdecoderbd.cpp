@@ -34,9 +34,8 @@ bool AvFormatDecoderBD::DoRewindSeek(long long desiredFrame)
     if (!ringBuffer->IsBD())
         return false;
 
-    long long pos = BDFindPosition(desiredFrame);
-    ringBuffer->Seek(pos, SEEK_SET);
-    lastKey = desiredFrame + 1;
+    ringBuffer->Seek(BDFindPosition(desiredFrame), SEEK_SET);
+    framesPlayed = framesRead = lastKey = desiredFrame + 1;
     return true;
 }
 
@@ -45,12 +44,9 @@ void AvFormatDecoderBD::DoFastForwardSeek(long long desiredFrame, bool &needflus
     if (!ringBuffer->IsBD())
         return;
 
-    long long pos = BDFindPosition(desiredFrame);
-    ringBuffer->Seek(pos,SEEK_SET);
+    ringBuffer->Seek(BDFindPosition(desiredFrame), SEEK_SET);
     needflush    = true;
-    lastKey      = desiredFrame+1;
-    framesPlayed = lastKey;
-    framesRead   = lastKey;
+    framesPlayed = framesRead = lastKey = desiredFrame + 1;
 }
 
 void AvFormatDecoderBD::StreamChangeCheck(void)
@@ -98,7 +94,7 @@ long long AvFormatDecoderBD::BDFindPosition(long long desiredFrame)
         current_speed = (int)m_parent->GetNextPlaySpeed();
     }
 
-    if (ffrewSkip == 1)
+    if (ffrewSkip == 1 || ffrewSkip == 0)
     {
         diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
         desiredTimePos = ringBuffer->BD()->GetCurrentTime() +
