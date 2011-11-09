@@ -806,24 +806,6 @@ bool DecoderBase::GetWaitForChange(void) const
     return waitingForChange;
 }
 
-void DecoderBase::UpdateDVDFramesPlayed(void)
-{
-    if (!ringBuffer->IsDVD())
-        return;
-    long long currentpos = (long long)(ringBuffer->DVD()->GetCurrentTime() * fps);
-    framesPlayed = framesRead = currentpos ;
-    m_parent->SetFramesPlayed(currentpos + 1);
-}
-
-void DecoderBase::UpdateBDFramesPlayed(void)
-{
-    if (!ringBuffer->IsBD())
-        return;
-    long long currentpos = (long long)(ringBuffer->BD()->GetCurrentTime() * fps);
-    framesPlayed = framesRead = currentpos ;
-    m_parent->SetFramesPlayed(currentpos + 1);
-}
-
 QStringList DecoderBase::GetTracks(uint type) const
 {
     QStringList list;

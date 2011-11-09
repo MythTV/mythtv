@@ -12,6 +12,7 @@ class AvFormatDecoderDVD : public AvFormatDecoder
                     bool no_hardware_decode = false,
                     AVSpecialDecode av_special_decode = kAVSpecialDecode_None);
     virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
+    virtual void UpdateFramesPlayed(void);
 
   private:
     virtual bool DoRewindSeek(long long desiredFrame);

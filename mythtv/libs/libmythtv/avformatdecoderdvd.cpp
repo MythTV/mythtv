@@ -19,6 +19,16 @@ void AvFormatDecoderDVD::Reset(bool reset_video_data, bool seek_reset, bool rese
     SyncPositionMap();
 }
 
+void AvFormatDecoderDVD::UpdateFramesPlayed(void)
+{
+    if (!ringBuffer->IsDVD())
+        return;
+
+    long long currentpos = (long long)(ringBuffer->DVD()->GetCurrentTime() * fps);
+    framesPlayed = framesRead = currentpos ;
+    m_parent->SetFramesPlayed(currentpos + 1);
+}
+
 void AvFormatDecoderDVD::PostProcessTracks(void)
 {
     if (!ringBuffer)

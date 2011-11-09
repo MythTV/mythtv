@@ -19,6 +19,16 @@ void AvFormatDecoderBD::Reset(bool reset_video_data, bool seek_reset, bool reset
     SyncPositionMap();
 }
 
+void AvFormatDecoderBD::UpdateFramesPlayed(void)
+{
+    if (!ringBuffer->IsBD())
+        return;
+
+    long long currentpos = (long long)(ringBuffer->BD()->GetCurrentTime() * fps);
+    framesPlayed = framesRead = currentpos ;
+    m_parent->SetFramesPlayed(currentpos + 1);
+}
+
 bool AvFormatDecoderBD::DoRewindSeek(long long desiredFrame)
 {
     if (!ringBuffer->IsBD())

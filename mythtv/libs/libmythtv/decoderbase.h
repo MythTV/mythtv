@@ -170,10 +170,6 @@ class DecoderBase
     bool GetWaitForChange(void) const;
     void SetReadAdjust(long long adjust);
 
-    // DVD/BD public stuff
-    void UpdateDVDFramesPlayed(void);
-    void UpdateBDFramesPlayed(void);
-
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     void SetDecodeAllSubtitles(bool val) { decodeAllSubtitles = val; }
     virtual QStringList GetTracks(uint type) const;

@@ -2200,6 +2200,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     return scanerror;
 }
 
+void AvFormatDecoder::UpdateFramesPlayed(void)
+{
+    return DecoderBase::UpdateFramesPlayed();
+}
+
 bool AvFormatDecoder::DoRewindSeek(long long desiredFrame)
 {
     return DecoderBase::DoRewindSeek(desiredFrame);

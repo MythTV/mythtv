@@ -73,7 +73,7 @@ bool MythDVDPlayer::DecoderGetFrameFFREW(void)
     if (decoder_change_lock.tryLock(1))
     {
         if (decoder)
-            decoder->UpdateDVDFramesPlayed();
+            decoder->UpdateFramesPlayed();
         decoder_change_lock.unlock();
     }
     return res;
@@ -233,21 +233,21 @@ void MythDVDPlayer::DisplayLastFrame(void)
 bool MythDVDPlayer::FastForward(float seconds)
 {
     if (decoder)
-        decoder->UpdateDVDFramesPlayed();
+        decoder->UpdateFramesPlayed();
     return MythPlayer::FastForward(seconds);
 }
 
 bool MythDVDPlayer::Rewind(float seconds)
 {
     if (decoder)
-        decoder->UpdateDVDFramesPlayed();
+        decoder->UpdateFramesPlayed();
     return MythPlayer::Rewind(seconds);
 }
 
 bool MythDVDPlayer::JumpToFrame(uint64_t frame)
 {
     if (decoder)
-        decoder->UpdateDVDFramesPlayed();
+        decoder->UpdateFramesPlayed();
     return MythPlayer::JumpToFrame(frame);
 }
 
@@ -370,7 +370,7 @@ void MythDVDPlayer::ChangeSpeed(void)
 {
     MythPlayer::ChangeSpeed();
     if (decoder)
-        decoder->UpdateDVDFramesPlayed();
+        decoder->UpdateFramesPlayed();
     if (play_speed != normal_speed && player_ctx->buffer->IsDVD())
         player_ctx->buffer->DVD()->SetDVDSpeed(-1);
     else if (player_ctx->buffer->IsDVD())
@@ -496,7 +496,7 @@ bool MythDVDPlayer::DoJumpChapter(int chapter)
     {
         if (decoder)
         {
-            decoder->UpdateDVDFramesPlayed();
+            decoder->UpdateFramesPlayed();
             if (player_ctx->buffer->DVD()->GetCellStart() == 0)
                 decoder->SeekReset(framesPlayed, 0, true, true);
         }
