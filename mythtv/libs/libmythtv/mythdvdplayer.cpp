@@ -135,7 +135,7 @@ bool MythDVDPlayer::VideoLoop(void)
         bool inStillFrame = player_ctx->buffer->DVD()->IsInStillFrame();
         player_ctx->buffer->DVD()->SkipDVDWaitingForPlayer();
         ClearAfterSeek(true);
-        if (!inStillFrame && videoPaused)
+        if (!inStillFrame && videoPaused && !allpaused)
             UnpauseVideo();
         return !IsErrored();
     }
@@ -149,7 +149,7 @@ bool MythDVDPlayer::VideoLoop(void)
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Clearing DVD wait state");
             bool inStillFrame = player_ctx->buffer->DVD()->IsInStillFrame();
             player_ctx->buffer->DVD()->WaitSkip();
-            if (!inStillFrame && videoPaused)
+            if (!inStillFrame && videoPaused && !allpaused)
                 UnpauseVideo();
             return !IsErrored();
         }

@@ -396,8 +396,8 @@ QFileInfo Content::GetAlbumArt( int nId, int nWidth, int nHeight )
 
 QFileInfo Content::GetPreviewImage(        int        nChanId,
                                      const QDateTime &dtStartTime,
-                                           int        nWidth,    
-                                           int        nHeight,   
+                                           int        nWidth,
+                                           int        nHeight,
                                            int        nSecsIn )
 {
     if (!dtStartTime.isValid())
@@ -524,13 +524,19 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
         return QFileInfo( sNewFileName );
     }
 
-    QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
-                                Qt::SmoothTransformation);
+    PreviewGenerator *previewgen = new PreviewGenerator( &pginfo,
+                                                         QString(),
+                                                         PreviewGenerator::kLocal);
+    previewgen->SetPreviewTimeAsSeconds( nSecsIn             );
+    previewgen->SetOutputFilename      ( sNewFileName        );
+    previewgen->SetOutputSize          (QSize(nWidth,nHeight));
 
-    QByteArray fname = sNewFileName.toAscii();
-    img.save( fname.constData(), "PNG" );
+    bool ok = previewgen->Run();
 
-    makeFileAccessible(fname.constData());
+    previewgen->deleteLater();
+
+    if (!ok)
+        return QFileInfo();
 
     delete pImage;
 

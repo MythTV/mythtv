@@ -84,7 +84,9 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
         case QMetaType::QString     : *(( QString        *)pParam) = sValue;                break;
         case QMetaType::QByteArray  : *(( QByteArray     *)pParam) = sValue.toUtf8      (); break;
 
-        case QMetaType::QDateTime   : *(( QDateTime      *)pParam) = QDateTime::fromString( sValue, Qt::ISODate ); break; 
+        case QMetaType::QDateTime   : *(( QDateTime      *)pParam) = QDateTime::fromString( sValue, Qt::ISODate ); break;
+        case QMetaType::QTime       : *(( QTime          *)pParam) = QTime::fromString    ( sValue, Qt::ISODate ); break;
+        case QMetaType::QDate       : *(( QDate          *)pParam) = QDate::fromString    ( sValue, Qt::ISODate ); break;
     }
 
     return pParam;

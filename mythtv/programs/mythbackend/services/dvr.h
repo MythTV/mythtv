@@ -57,6 +57,19 @@ class Dvr : public DvrServices
                                                 bool             ShowAll );
 
         DTC::EncoderList* Encoders            ( );
+
+        // Recording Rules
+
+        bool              RemoveRecordSchedule ( uint             RecordId   );
+
+        DTC::RecRuleList* GetRecordSchedules   ( int              StartIndex,
+                                                 int              Count      );
+
+        DTC::RecRule*     GetRecordSchedule    ( uint             RecordId   );
+
+        bool              EnableRecordSchedule ( uint             RecordId   );
+
+        bool              DisableRecordSchedule( uint             RecordId   );
 };
 
 // --------------------------------------------------------------------------
