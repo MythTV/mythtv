@@ -5895,6 +5895,22 @@ NULL
             return false;
     }
 
+    if (dbver == "1283")
+    {
+        const char *updates[] = {
+"UPDATE record SET filter = filter | 1 WHERE record.dupin & 0x20",
+"UPDATE record SET filter = filter | 2 WHERE record.dupin & 0x40",
+"UPDATE record SET filter = filter | 5 WHERE record.dupin & 0x80",
+"UPDATE record SET dupin = dupin & ~0xe0",
+"INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (6, 'This Episode', '(program.programid <> '''' AND program.programid = RECTABLE.programid) OR (program.programid = '''' AND program.subtitle = RECTABLE.subtitle AND program.description = RECTABLE.description)', 0);",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1284", dbver))
+            return false;
+    }
+
     return true;
 }
 

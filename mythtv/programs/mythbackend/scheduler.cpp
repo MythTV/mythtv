@@ -3345,11 +3345,6 @@ void Scheduler::UpdateMatches(int recordid) {
 "FROM (RECTABLE, program INNER JOIN channel "
 "      ON channel.chanid = program.chanid) ") + fromclauses[clause] + QString(
 " WHERE ") + whereclauses[clause] +
-    QString(" AND (NOT ((RECTABLE.dupin & %1) AND program.previouslyshown)) "
-            " AND (NOT ((RECTABLE.dupin & %2) AND program.generic > 0)) "
-            " AND (NOT ((RECTABLE.dupin & %3) AND (program.previouslyshown "
-            "                                      OR program.first = 0))) ")
-            .arg(kDupsExRepeats).arg(kDupsExGeneric).arg(kDupsFirstNew) +
     QString(" AND channel.visible = 1 ") +
     filterClause + QString(" AND "
 
