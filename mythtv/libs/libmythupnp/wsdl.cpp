@@ -622,6 +622,12 @@ QString Wsdl::ConvertTypeToXSD( const QString &sType, bool bCustomType )
     if (sType == "QDateTime")
         return "xs:dateTime";
 
+    if (sType == "QDate")
+        return "xs:date";
+
+    if (sType == "QTime")
+        return "xs:time";
+
     if (sType == "bool")
         return "xs:boolean";
 
