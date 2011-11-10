@@ -52,6 +52,7 @@ using namespace std;
 #include "lircevent.h"
 #include "mythudplistener.h"
 #include "mythrender_base.h"
+#include "mythuistatetracker.h"
 
 #ifdef USING_APPLEREMOTE
 #include "AppleRemoteListener.h"
@@ -2319,10 +2320,9 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
         else if (message == ACTION_GETSTATUS)
         {
-            QHash<QString,QString> status;
-            status.insert("state", "idle");
-            MythInfoMapEvent info("STATUS_UPDATE", status);
-            gCoreContext->dispatch(info);
+            QVariantMap state;
+            state.insert("state", "idle");
+            MythUIStateTracker::SetState(state);
         }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)

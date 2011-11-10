@@ -18,6 +18,8 @@
 #include "compat.h"
 #include "util.h"
 
+#include "serviceHosts/frontendServiceHost.h"
+
 class MythFrontendStatus : public HttpServerExtension
 {
   public:
@@ -267,6 +269,9 @@ MediaRenderer::MediaRenderer()
         LOG(VB_UPNP, LOG_INFO, "MediaRenderer::Registering MythFEXML Service.");
         m_pHttpServer->RegisterExtension(
             new MythFEXML(RootDevice(), m_pHttpServer->GetSharePath()));
+
+        LOG(VB_UPNP, LOG_INFO, "MediaRenderer::Registering Status Service.");
+        m_pHttpServer->RegisterExtension(new FrontendServiceHost(m_pHttpServer->GetSharePath()));
 
 #if 0
         LOG(VB_UPNP, LOG_INFO,

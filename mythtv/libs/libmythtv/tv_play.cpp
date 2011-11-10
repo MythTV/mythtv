@@ -57,6 +57,7 @@ using namespace std;
 #include "mythdirs.h"
 #include "tvbrowsehelper.h"
 #include "mythlogging.h"
+#include "mythuistatetracker.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -1328,28 +1329,43 @@ TVState TV::GetState(int player_idx) const
 
 void TV::GetStatus(void)
 {
+    QVariantMap status;
+
     const PlayerContext *ctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
 
-    osdInfo status;
-    status.text.insert("state", StateToString(GetState(ctx)));
+    status.insert("state", StateToString(GetState(ctx)));
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (ctx->playingInfo)
     {
-        status.text.insert("title", ctx->playingInfo->GetTitle());
-        status.text.insert("subtitle", ctx->playingInfo->GetSubtitle());
-        status.text.insert("starttime",
+        status.insert("title", ctx->playingInfo->GetTitle());
+        status.insert("subtitle", ctx->playingInfo->GetSubtitle());
+        status.insert("starttime",
                            ctx->playingInfo->GetRecordingStartTime().toString(Qt::ISODate));
-        status.text.insert("chanid",
+        status.insert("chanid",
                            QString::number(ctx->playingInfo->GetChanID()));
-        status.text.insert("programid", ctx->playingInfo->GetProgramID());
+        status.insert("programid", ctx->playingInfo->GetProgramID());
     }
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-    ctx->CalcPlayerSliderPosition(status);
+    osdInfo info;
+    ctx->CalcPlayerSliderPosition(info);
 
     ReturnPlayerLock(ctx);
 
-    MythInfoMapEvent info("STATUS_UPDATE", status.text);
-    gCoreContext->dispatch(info);
+    QHashIterator<QString,QString> tit(info.text);
+    while (tit.hasNext())
+    {
+        tit.next();
+        status.insert(tit.key(), tit.value());
+    }
+
+    QHashIterator<QString,int> vit(info.values);
+    while (vit.hasNext())
+    {
+        vit.next();
+        status.insert(vit.key(), vit.value());
+    }
+
+    MythUIStateTracker::SetState(status);
 }
 
 /**

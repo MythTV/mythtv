@@ -31,8 +31,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 MythFEXML::MythFEXML( UPnpDevice *pDevice , const QString sSharePath)
-  : Eventing( "MythFEXML", "MYTHTV_Event", sSharePath),
-    m_statusLock(new QMutex())
+  : Eventing( "MythFEXML", "MYTHTV_Event", sSharePath)
 {
 
     QString sUPnpDescPath =
@@ -44,9 +43,6 @@ MythFEXML::MythFEXML( UPnpDevice *pDevice , const QString sSharePath)
     // Add our Service Definition to the device.
 
     RegisterService( pDevice );
-
-    // listen for status updates
-    gCoreContext->addListener(this);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -55,35 +51,6 @@ MythFEXML::MythFEXML( UPnpDevice *pDevice , const QString sSharePath)
 
 MythFEXML::~MythFEXML()
 {
-    gCoreContext->removeListener(this);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void MythFEXML::customEvent(QEvent *e)
-{
-    if (e->type() != MythEvent::MythEventMessage)
-        return;
-
-    MythEvent *me = (MythEvent *)e;
-    if ("STATUS_UPDATE" == me->Message())
-    {
-        MythInfoMapEvent *info = (MythInfoMapEvent*)e;
-        if (info && info->InfoMap())
-        {
-            QMutexLocker lock(m_statusLock);
-            m_latestStatus.clear();
-            QHashIterator<QString,QString> it(*info->InfoMap());
-            while (it.hasNext())
-            {
-                it.next();
-                m_latestStatus.insert(it.key(), it.value());
-            }
-            m_statusWait.wakeAll();
-        }
-    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -99,7 +66,6 @@ MythFEXMLMethod MythFEXML::GetMethod(const QString &sURI)
     if (sURI == "GetActionList") return MFEXML_ActionList;
     if (sURI == "GetActionTest") return MFEXML_ActionListTest;
     if (sURI == "GetRemote")     return MFEXML_GetRemote;
-    if (sURI == "GetStatus")     return MFEXML_GetStatus;
 
     return( MFEXML_Unknown );
 }
@@ -150,9 +116,6 @@ bool MythFEXML::ProcessRequest( HTTPRequest *pRequest )
             break;
         case MFEXML_GetRemote:
             GetRemote(pRequest);
-            break;
-        case MFEXML_GetStatus:
-            GetStatus(pRequest);
             break;
         default:
             UPnp::FormatErrorResponse(pRequest, UPnPResult_InvalidAction);
@@ -310,40 +273,6 @@ void MythFEXML::GetActionListTest(HTTPRequest *pRequest)
         "  </body>\n"
         "</html>\n";
 
-}
-
-void MythFEXML::GetStatus(HTTPRequest *pRequest)
-{
-    QMutexLocker lock(m_statusLock);
-
-    pRequest->m_eResponseType = ResponseTypeXML;
-    pRequest->m_mapHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 1";
-
-    QTime now = QTime::currentTime();
-    int since = m_lastUpdate.msecsTo(now);
-
-    if (m_latestStatus.isEmpty() || (since < 0) || (since > 500))
-    {
-        m_lastUpdate = now;
-        MythEvent *req = new MythEvent(ACTION_GETSTATUS);
-        qApp->postEvent(GetMythMainWindow(), req);
-        if (!m_statusWait.wait(m_statusLock, 1000))
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "MythFEXML::GetStatus - failed to update status.");
-        }
-    }
-
-    QTextStream stream( &pRequest->m_response );
-    stream << "<mythstatus version=\"1\">\n";
-    QHashIterator<QString,QString> it(m_latestStatus);
-    while (it.hasNext())
-    {
-        it.next();
-        stream << "    <";
-        stream << it.key() << ">" << it.value() << "</" << it.key() << ">\n";
-    }
-    stream << "</mythstatus>\n";
 }
 
 void MythFEXML::GetActionList(HTTPRequest *pRequest)
