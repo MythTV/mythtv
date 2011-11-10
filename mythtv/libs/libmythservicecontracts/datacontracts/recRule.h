@@ -55,6 +55,10 @@ class SERVICE_PUBLIC RecRule : public QObject
     Q_PROPERTY( QString         StorageGroup    READ StorageGroup     WRITE setStorageGroup   )
     Q_PROPERTY( QString         PlayGroup       READ PlayGroup        WRITE setPlayGroup      )
 
+    Q_PROPERTY( bool            AutoExpire      READ AutoExpire       WRITE setAutoExpire     )
+    Q_PROPERTY( int             MaxEpisodes     READ MaxEpisodes      WRITE setMaxEpisodes    )
+    Q_PROPERTY( bool            MaxNewest       READ MaxNewest        WRITE setMaxNewest      )
+
     Q_PROPERTY( bool            AutoCommflag    READ AutoCommflag     WRITE setAutoCommflag   )
     Q_PROPERTY( bool            AutoTranscode   READ AutoTranscode    WRITE setAutoTranscode  )
     Q_PROPERTY( bool            AutoMetaLookup  READ AutoMetaLookup   WRITE setAutoMetaLookup )
@@ -101,6 +105,9 @@ class SERVICE_PUBLIC RecRule : public QObject
     PROPERTYIMP    ( QString    , RecGroup       )
     PROPERTYIMP    ( QString    , StorageGroup   )
     PROPERTYIMP    ( QString    , PlayGroup      )
+    PROPERTYIMP    ( bool       , AutoExpire     )
+    PROPERTYIMP    ( int        , MaxEpisodes    )
+    PROPERTYIMP    ( bool       , MaxNewest      )
     PROPERTYIMP    ( bool       , AutoCommflag   )
     PROPERTYIMP    ( bool       , AutoTranscode  )
     PROPERTYIMP    ( bool       , AutoMetaLookup )
@@ -143,6 +150,9 @@ class SERVICE_PUBLIC RecRule : public QObject
               m_DupMethod     ( 0      ),
               m_DupIn         ( 0      ),
               m_Filter        ( 0      ),
+              m_AutoExpire    ( false  ),
+              m_MaxEpisodes   ( 0      ),
+              m_MaxNewest     ( false  ),
               m_AutoCommflag  ( false  ),
               m_AutoTranscode ( false  ),
               m_AutoMetaLookup( false  ),
@@ -194,6 +204,9 @@ class SERVICE_PUBLIC RecRule : public QObject
             m_RecGroup      = src.m_RecGroup      ;
             m_StorageGroup  = src.m_StorageGroup  ;
             m_PlayGroup     = src.m_PlayGroup     ;
+            m_AutoExpire    = src.m_AutoExpire    ;
+            m_MaxEpisodes   = src.m_MaxEpisodes   ;
+            m_MaxNewest     = src.m_MaxNewest     ;
             m_AutoCommflag  = src.m_AutoCommflag  ;
             m_AutoTranscode = src.m_AutoTranscode ;
             m_AutoMetaLookup= src.m_AutoMetaLookup;

@@ -24,12 +24,18 @@ class SERVICE_PUBLIC RecRuleList : public QObject
 
     Q_CLASSINFO( "RecRules_type", "DTC::RecRule");
 
+    Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
+    Q_PROPERTY( int          Count          READ Count           WRITE setCount          )
+    Q_PROPERTY( int          TotalAvailable READ TotalAvailable  WRITE setTotalAvailable )
     Q_PROPERTY( QDateTime    AsOf           READ AsOf            WRITE setAsOf           )
     Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )
     Q_PROPERTY( QString      ProtoVer       READ ProtoVer        WRITE setProtoVer       )
 
     Q_PROPERTY( QVariantList RecRules READ RecRules DESIGNABLE true )
 
+    PROPERTYIMP       ( int         , StartIndex      )
+    PROPERTYIMP       ( int         , Count           )
+    PROPERTYIMP       ( int         , TotalAvailable  )    
     PROPERTYIMP       ( QDateTime   , AsOf            )
     PROPERTYIMP       ( QString     , Version         )
     PROPERTYIMP       ( QString     , ProtoVer        )

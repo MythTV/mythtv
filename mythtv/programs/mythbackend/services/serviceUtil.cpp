@@ -143,3 +143,60 @@ void FillChannelInfo( DTC::ChannelInfo *pChannel,
     }
 
 }
+
+void FillRecRuleInfo( DTC::RecRule  *pRecRule,
+                      RecordingRule *pRule    )
+{
+    if ((pRecRule == NULL) || (pRule == NULL))
+        return;
+
+    pRecRule->setId             (  pRule->m_recordID          );
+    pRecRule->setParentId       (  pRule->m_parentRecID       );
+    pRecRule->setInactive       (  pRule->m_isInactive        );
+    pRecRule->setTitle          (  pRule->m_title             );
+    pRecRule->setSubTitle       (  pRule->m_subtitle          );
+    pRecRule->setDescription    (  pRule->m_description       );
+    pRecRule->setSeason         (  pRule->m_season            );
+    pRecRule->setEpisode        (  pRule->m_episode           );
+    pRecRule->setCategory       (  pRule->m_category          );
+    pRecRule->setStartTime      (  QDateTime(pRule->m_startdate,
+                                             pRule->m_starttime) );
+    pRecRule->setEndTime        (  QDateTime(pRule->m_enddate,
+                                             pRule->m_endtime) );
+    pRecRule->setSeriesId       (  pRule->m_seriesid          );
+    pRecRule->setProgramId      (  pRule->m_programid         );
+    pRecRule->setInetRef        (  pRule->m_inetref           );
+    pRecRule->setChanId         (  pRule->m_channelid         );
+    pRecRule->setCallSign       (  pRule->m_station           );
+    pRecRule->setDay            (  pRule->m_findday           );
+    pRecRule->setTime           (  pRule->m_findtime          );
+    pRecRule->setFindId         (  pRule->m_findid            );
+    pRecRule->setType           (  pRule->m_type              );
+    pRecRule->setSearchType     (  pRule->m_searchType        );
+    pRecRule->setRecPriority    (  pRule->m_recPriority       );
+    pRecRule->setPreferredInput (  pRule->m_prefInput         );
+    pRecRule->setStartOffset    (  pRule->m_startOffset       );
+    pRecRule->setEndOffset      (  pRule->m_endOffset         );
+    pRecRule->setDupMethod      (  pRule->m_dupMethod         );
+    pRecRule->setDupIn          (  pRule->m_dupIn             );
+    pRecRule->setFilter         (  pRule->m_filter            );
+    pRecRule->setRecProfile     (  pRule->m_recProfile        );
+    pRecRule->setRecGroup       (  pRule->m_recGroup          );
+    pRecRule->setStorageGroup   (  pRule->m_storageGroup      );
+    pRecRule->setPlayGroup      (  pRule->m_playGroup         );
+    pRecRule->setAutoExpire     (  pRule->m_autoExpire        );
+    pRecRule->setMaxEpisodes    (  pRule->m_maxEpisodes       );
+    pRecRule->setMaxNewest      (  pRule->m_maxNewest         );
+    pRecRule->setAutoCommflag   (  pRule->m_autoCommFlag      );
+    pRecRule->setAutoTranscode  (  pRule->m_autoTranscode     );
+    pRecRule->setAutoMetaLookup (  pRule->m_autoMetadataLookup);
+    pRecRule->setAutoUserJob1   (  pRule->m_autoUserJob1      );
+    pRecRule->setAutoUserJob2   (  pRule->m_autoUserJob2      );
+    pRecRule->setAutoUserJob3   (  pRule->m_autoUserJob3      );
+    pRecRule->setAutoUserJob4   (  pRule->m_autoUserJob4      );
+    pRecRule->setTranscoder     (  pRule->m_transcoder        );
+    pRecRule->setNextRecording  (  pRule->m_nextRecording     );
+    pRecRule->setLastRecorded   (  pRule->m_lastRecorded      );
+    pRecRule->setLastDeleted    (  pRule->m_lastDeleted       );
+    pRecRule->setAverageDelay   (  pRule->m_averageDelay      );
+}

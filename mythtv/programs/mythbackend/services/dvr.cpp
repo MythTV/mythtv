@@ -357,3 +357,120 @@ DTC::ProgramList* Dvr::GetConflicts( int  nStartIndex,
     return pPrograms;
 }
 
+bool Dvr::RemoveRecordSchedule ( uint nRecordId )
+{
+    bool bResult = false;
+
+    if (nRecordId <= 0 )
+        throw( QString("Record ID appears invalid."));
+
+    RecordingRule *pRule = new RecordingRule();
+    pRule->m_recordID = nRecordId;
+
+    bResult = pRule->Delete();
+
+    return bResult;
+}
+
+DTC::RecRuleList* Dvr::GetRecordSchedules( int nStartIndex,
+                                           int nCount      )
+{
+    vector<ProgramInfo *> infoList;
+    RemoteGetAllScheduledRecordings(infoList);
+
+    // ----------------------------------------------------------------------
+    // Build Response
+    // ----------------------------------------------------------------------
+
+    DTC::RecRuleList *pRecRules = new DTC::RecRuleList();
+
+    nStartIndex   = min( nStartIndex, (int)infoList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (int)infoList.size() ) : infoList.size();
+    int nEndIndex = min((nStartIndex + nCount), (int)infoList.size() );
+
+    for( int n = nStartIndex; n < nEndIndex; n++)
+    {
+        RecordingRule *rule = new RecordingRule();
+        ProgramInfo *pInfo = infoList[ n ];
+        rule->LoadByProgram(pInfo);
+
+        if (pInfo != NULL)
+        {
+            DTC::RecRule *pRecRule = pRecRules->AddNewRecRule();
+
+            FillRecRuleInfo( pRecRule, rule );
+
+            delete rule;
+            delete pInfo;
+        }
+    }
+
+    // ----------------------------------------------------------------------
+
+    pRecRules->setStartIndex    ( nStartIndex     );
+    pRecRules->setCount         ( nCount          );
+    pRecRules->setTotalAvailable( infoList.size() );
+    pRecRules->setAsOf          ( QDateTime::currentDateTime() );
+    pRecRules->setVersion       ( MYTH_BINARY_VERSION );
+    pRecRules->setProtoVer      ( MYTH_PROTO_VERSION  );
+
+    return pRecRules;
+}
+
+DTC::RecRule* Dvr::GetRecordSchedule( uint nRecordId )
+{
+    if (nRecordId <= 0 )
+        throw( QString("Record ID appears invalid."));
+
+    RecordingRule *pRule = new RecordingRule();
+    pRule->m_recordID = nRecordId;
+    pRule->Load();
+
+    DTC::RecRule *pRecRule = new DTC::RecRule();
+    FillRecRuleInfo( pRecRule, pRule );
+
+    return pRecRule;
+}
+
+bool Dvr::EnableRecordSchedule ( uint nRecordId )
+{
+    bool bResult = false;
+
+    if (nRecordId <= 0 )
+        throw( QString("Record ID appears invalid."));
+
+    RecordingRule *pRule = new RecordingRule();
+    pRule->m_recordID = nRecordId;
+    pRule->Load();
+
+    if (pRule->IsLoaded())
+    {
+        pRule->m_isInactive = false;
+        pRule->Save();
+        bResult = true;
+    }
+
+    return bResult;
+}
+
+bool Dvr::DisableRecordSchedule( uint nRecordId )
+{
+    bool bResult = false;
+
+    if (nRecordId <= 0 )
+        throw( QString("Record ID appears invalid."));
+
+    RecordingRule *pRule = new RecordingRule();
+    pRule->m_recordID = nRecordId;
+    pRule->Load();
+
+    if (pRule->IsLoaded())
+    {
+        pRule->m_isInactive = true;
+        pRule->Save();
+        bResult = true;
+    }
+
+    return bResult;
+}
+

@@ -32,7 +32,8 @@ HEADERS += datacontracts/videoMetadataInfoList.h datacontracts/blurayInfo.h
 HEADERS += datacontracts/timeZoneInfo.h          datacontracts/videoLookupInfo.h
 HEADERS += datacontracts/videoLookupInfoList.h   datacontracts/versionInfo.h
 HEADERS += datacontracts/lineup.h                datacontracts/captureCard.h
-HEADERS += datacontracts/captureCardList.h
+HEADERS += datacontracts/captureCardList.h       datacontracts/recRule.h
+HEADERS += datacontracts/recRuleList.h
 
 SOURCES += service.cpp
 
@@ -65,6 +66,7 @@ incDatacontracts.files += datacontracts/blurayInfo.h          datacontracts/vide
 incDatacontracts.files += datacontracts/timeZoneInfo.h        datacontracts/videoLookupInfoList.h
 incDatacontracts.files += datacontracts/versionInfo.h         datacontracts/lineup.h
 incDatacontracts.files += datacontracts/captureCard.h         datacontracts/captureCardList.h
+incDatacontracts.files += datacontracts/recRule.h             datacontracts/recRuleList.h
 
 INSTALLS += inc incServices incDatacontracts
 

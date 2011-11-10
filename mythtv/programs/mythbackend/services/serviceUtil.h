@@ -23,7 +23,9 @@
 #define _SERVICEUTIL_H_
 
 #include "datacontracts/programAndChannel.h"
+#include "datacontracts/recRule.h"
 #include "programinfo.h"
+#include "recordingrule.h"
 
 void FillProgramInfo( DTC::Program *pProgram,
                       ProgramInfo  *pInfo,
@@ -33,5 +35,8 @@ void FillProgramInfo( DTC::Program *pProgram,
 void FillChannelInfo( DTC::ChannelInfo *pChannel, 
                       ProgramInfo      *pInfo,
                       bool              bDetails = true );
+
+void FillRecRuleInfo( DTC::RecRule  *pRecRule,
+                      RecordingRule *pRule              );
 
 #endif
