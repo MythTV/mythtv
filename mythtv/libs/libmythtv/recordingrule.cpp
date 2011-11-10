@@ -107,7 +107,7 @@ bool RecordingRule::Load()
         m_dupMethod = static_cast<RecordingDupMethodType>
                                                 (query.value(6).toInt());
         m_dupIn = static_cast<RecordingDupInType>(query.value(7).toInt());
-        m_filter = query.value(43).toUInt();
+        m_filter = query.value(47).toUInt();
         m_isInactive = query.value(8).toBool();
         // Storage
         m_recProfile = query.value(9).toString();
