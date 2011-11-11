@@ -14,7 +14,9 @@ class META_PUBLIC VideoMetadataListManager
     typedef std::list<VideoMetadataPtr> metadata_list;
 
   public:
-    static void loadAllFromDatabase(metadata_list &items);
+    static VideoMetadataPtr loadOneFromDatabase(uint id);
+    static void loadAllFromDatabase(metadata_list &items,
+                                    const QString &sql = "");
 
   public:
     VideoMetadataListManager();

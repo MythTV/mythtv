@@ -136,18 +136,17 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( bool bDescending,
 
 DTC::VideoMetadataInfo* Video::GetVideo( int Id )
 {
-    VideoMetadataListManager::metadata_list videolist;
-    VideoMetadataListManager::loadAllFromDatabase(videolist);
-    VideoMetadataListManager *mlm = new VideoMetadataListManager();
-    mlm->setList(videolist);
-    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(Id);
+//    VideoMetadataListManager::metadata_list videolist;
+    VideoMetadataListManager::VideoMetadataPtr metadata =
+                          VideoMetadataListManager::loadOneFromDatabase(Id);
+//    VideoMetadataListManager *mlm = new VideoMetadataListManager();
+//    mlm->setList(videolist);
+//    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(Id);
 
     if ( !metadata )
         throw( QString( "No metadata found for selected ID!." ));
 
     DTC::VideoMetadataInfo *pVideoMetadataInfo = GetInfoFromMetadata(metadata);
-
-    delete mlm;
 
     return pVideoMetadataInfo;
 }

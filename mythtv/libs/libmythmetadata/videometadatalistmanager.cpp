@@ -106,17 +106,35 @@ VideoMetadataListManager::~VideoMetadataListManager()
     delete m_imp;
 }
 
-void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items)
+VideoMetadataListManager::VideoMetadataPtr
+VideoMetadataListManager::loadOneFromDatabase(uint id)
+{
+    QString sql = QString("WHERE intid = %1 LIMIT 1").arg(id);
+    metadata_list item;
+    loadAllFromDatabase(item, sql);
+    if (item.size() > 0)
+    {
+        return item.front();
+    }
+
+    return VideoMetadataPtr(new VideoMetadata());
+}
+
+void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items,
+                                                   const QString &sql)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.setForwardOnly(true);
-    const QString BaseMetadataQuery(
+    QString BaseMetadataQuery(
         "SELECT title, director, studio, plot, rating, year, releasedate,"
         "userrating, length, filename, hash, showlevel, "
         "coverfile, inetref, homepage, childid, browse, watched, "
         "playcommand, category, intid, trailer, screenshot, banner, fanart, "
         "subtitle, tagline, season, episode, host, insertdate, processed "
-        " FROM videometadata");
+        " FROM videometadata ");
+
+    if (!sql.isEmpty())
+        BaseMetadataQuery.append(sql);
 
     query.prepare(BaseMetadataQuery);
 
