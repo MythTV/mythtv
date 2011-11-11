@@ -44,9 +44,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::VideoMetadataInfoList* Video::GetVideos( bool bDescending,
-                                              int nStartIndex,
-                                              int nCount       )
+DTC::VideoMetadataInfoList* Video::GetVideoList( bool bDescending,
+                                                 int nStartIndex,
+                                                 int nCount       )
 {
     VideoMetadataListManager::metadata_list videolist;
     VideoMetadataListManager::loadAllFromDatabase(videolist);
@@ -134,7 +134,7 @@ DTC::VideoMetadataInfoList* Video::GetVideos( bool bDescending,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::VideoMetadataInfo* Video::GetVideoById( int Id )
+DTC::VideoMetadataInfo* Video::GetVideo( int Id )
 {
     VideoMetadataListManager::metadata_list videolist;
     VideoMetadataListManager::loadAllFromDatabase(videolist);

@@ -12,7 +12,7 @@
         <div style="padding: 10px 0px;" id="lasttencontent">
 <%
             var oDvr = new Dvr();
-            var list = oDvr.GetRecorded( true, 0, 10 );
+            var list = oDvr.GetRecordedList( true, 0, 10 );
             for (var nIdx=0; nIdx < list.Programs.length; nIdx++)
             {
                 var program = list.Programs[ nIdx ];
@@ -75,7 +75,7 @@
         <ul>
 <%
             var oDvr = new Dvr();
-            var encoderlist = oDvr.Encoders();
+            var encoderlist = oDvr.GetEncoderList();
             for (var nIdx=0; nIdx < encoderlist.Encoders.length; nIdx++)
             {
                 var encoder = encoderlist.Encoders[ nIdx ];

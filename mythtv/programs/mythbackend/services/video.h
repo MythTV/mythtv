@@ -41,11 +41,11 @@ class Video : public VideoServices
 
         /* Video Metadata Methods */
 
-        DTC::VideoMetadataInfoList*  GetVideos       ( bool     Descending,
+        DTC::VideoMetadataInfoList*  GetVideoList    ( bool     Descending,
                                                        int      StartIndex,
                                                        int      Count            );
 
-        DTC::VideoMetadataInfo*   GetVideoById       ( int      Id               );
+        DTC::VideoMetadataInfo*   GetVideo           ( int      Id               );
 
         DTC::VideoMetadataInfo*   GetVideoByFilename ( const QString  &Filename  );
 
@@ -100,16 +100,16 @@ class ScriptableVideo : public QObject
 
     public slots:
 
-        QObject* GetVideos(          bool             Descending,
+        QObject* GetVideoList(          bool             Descending,
                                      int              StartIndex,
                                      int              Count      )
         {
-            return m_obj.GetVideos( Descending, StartIndex, Count );
+            return m_obj.GetVideoList( Descending, StartIndex, Count );
         }
 
-        QObject* GetVideoById(       int              Id         )
+        QObject* GetVideo(       int              Id         )
         {
-            return m_obj.GetVideoById( Id );
+            return m_obj.GetVideo( Id );
         }
 
         QObject* GetVideoByFilename( const QString    &Filename  )

@@ -41,9 +41,9 @@ extern AutoExpire  *expirer;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ProgramList* Dvr::GetRecorded( bool bDescending,
-                                    int  nStartIndex,
-                                    int  nCount      )
+DTC::ProgramList* Dvr::GetRecordedList( bool bDescending,
+                                        int  nStartIndex,
+                                        int  nCount      )
 {
     QMap< QString, ProgramInfo* > recMap;
 
@@ -101,8 +101,8 @@ DTC::ProgramList* Dvr::GetRecorded( bool bDescending,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::Program* Dvr::GetRecordedItem( int              nChanId,
-                                    const QDateTime &dStartTime  )
+DTC::Program* Dvr::GetRecorded( int              nChanId,
+                                const QDateTime &dStartTime  )
 {
     if (nChanId <= 0 || !dStartTime.isValid())
         throw( QString("Channel ID or StartTime appears invalid."));
@@ -119,8 +119,8 @@ DTC::Program* Dvr::GetRecordedItem( int              nChanId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Dvr::RemoveRecordedItem( int              nChanId,
-                              const QDateTime &dStartTime  )
+bool Dvr::RemoveRecorded( int              nChanId,
+                          const QDateTime &dStartTime  )
 {
     if (nChanId <= 0 || !dStartTime.isValid())
         throw( QString("Channel ID or StartTime appears invalid."));
@@ -139,8 +139,8 @@ bool Dvr::RemoveRecordedItem( int              nChanId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ProgramList* Dvr::GetExpiring( int nStartIndex, 
-                                    int nCount      )
+DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex, 
+                                        int nCount      )
 {
     pginfolist_t  infoList;
 
@@ -187,7 +187,7 @@ DTC::ProgramList* Dvr::GetExpiring( int nStartIndex,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::EncoderList* Dvr::Encoders()
+DTC::EncoderList* Dvr::GetEncoderList()
 {
     DTC::EncoderList* pList = new DTC::EncoderList();
 
@@ -245,9 +245,9 @@ DTC::EncoderList* Dvr::Encoders()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ProgramList* Dvr::GetUpcoming( int  nStartIndex,
-                                    int  nCount,
-                                    bool bShowAll )
+DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
+                                        int  nCount,
+                                        bool bShowAll )
 {
     RecordingList  recordingList;
     RecordingList  tmpList;
@@ -306,8 +306,8 @@ DTC::ProgramList* Dvr::GetUpcoming( int  nStartIndex,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ProgramList* Dvr::GetConflicts( int  nStartIndex,
-                                    int  nCount       )
+DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
+                                        int  nCount       )
 {
     RecordingList  recordingList;
     RecordingList  tmpList;
@@ -372,8 +372,8 @@ bool Dvr::RemoveRecordSchedule ( uint nRecordId )
     return bResult;
 }
 
-DTC::RecRuleList* Dvr::GetRecordSchedules( int nStartIndex,
-                                           int nCount      )
+DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
+                                              int nCount      )
 {
     vector<ProgramInfo *> infoList;
     RemoteGetAllScheduledRecordings(infoList);

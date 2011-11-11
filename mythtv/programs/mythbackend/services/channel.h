@@ -61,7 +61,7 @@ class Channel : public ChannelServices
                                                      const QString &XMLTVID,
                                                      const QString &DefaultAuthority );
 
-        bool                   CreateDBChannel     ( uint          MplexID,
+        bool                   AddDBChannel        ( uint          MplexID,
                                                      uint          SourceID,
                                                      uint          ChannelID,
                                                      const QString &CallSign,
@@ -78,7 +78,7 @@ class Channel : public ChannelServices
                                                      const QString &XMLTVID,
                                                      const QString &DefaultAuthority );
 
-        bool                   DeleteDBChannel     ( uint          ChannelID );
+        bool                   RemoveDBChannel     ( uint          ChannelID );
 
         /* Video Source Methods */
 
@@ -97,7 +97,7 @@ class Channel : public ChannelServices
                                                            const QString &ConfigPath,
                                                            int           NITId );
 
-        int                       CreateVideoSource      ( const QString &SourceName,
+        int                       AddVideoSource         ( const QString &SourceName,
                                                            const QString &Grabber,
                                                            const QString &UserId,
                                                            const QString &FreqTable,
@@ -107,9 +107,9 @@ class Channel : public ChannelServices
                                                            const QString &ConfigPath,
                                                            int           NITId );
 
-        bool                      DeleteVideoSource      ( uint SourceID );
+        bool                      RemoveVideoSource      ( uint SourceID );
 
-        DTC::LineupList*          GetDDLineups           ( const QString &Source,
+        DTC::LineupList*          GetDDLineupList        ( const QString &Source,
                                                            const QString &UserId,
                                                            const QString &Password );
 
@@ -125,7 +125,7 @@ class Channel : public ChannelServices
 
         DTC::VideoMultiplex*      GetVideoMultiplex      ( int MplexID    );
 
-        QStringList               GetXMLTVIds            ( int SourceID );
+        QStringList               GetXMLTVIdList         ( int SourceID );
 
 };
 
@@ -194,7 +194,7 @@ class ScriptableChannel : public QObject
                                          XMLTVID, DefaultAuthority);
         }
 
-        bool CreateDBChannel     ( uint          MplexID,
+        bool AddDBChannel        ( uint          MplexID,
                                    uint          SourceID,
                                    uint          ChannelID,
                                    const QString &CallSign,
@@ -211,16 +211,16 @@ class ScriptableChannel : public QObject
                                    const QString &XMLTVID,
                                    const QString &DefaultAuthority )
         {
-            return m_obj.CreateDBChannel(MplexID, SourceID, ChannelID,
-                                         CallSign, ChannelName, ChannelNumber,
-                                         ServiceID, ATSCMajorChannel, ATSCMinorChannel,
-                                         UseEIT, visible, FrequencyID, Icon, Format,
-                                         XMLTVID, DefaultAuthority);
+            return m_obj.AddDBChannel(MplexID, SourceID, ChannelID,
+                                      CallSign, ChannelName, ChannelNumber,
+                                      ServiceID, ATSCMajorChannel, ATSCMinorChannel,
+                                      UseEIT, visible, FrequencyID, Icon, Format,
+                                      XMLTVID, DefaultAuthority);
         }
 
-        bool DeleteDBChannel     ( uint          ChannelID )
+        bool RemoveDBChannel     ( uint          ChannelID )
         {
-            return m_obj.DeleteDBChannel(ChannelID);
+            return m_obj.RemoveDBChannel(ChannelID);
         }
 
         QObject* GetVideoSourceList ( void )
@@ -249,7 +249,7 @@ class ScriptableChannel : public QObject
                                             UseEIT, ConfigPath, NITId );
         }
 
-        bool CreateVideoSource ( const QString &SourceName,
+        bool AddVideoSource    ( const QString &SourceName,
                                  const QString &Grabber,
                                  const QString &UserId,
                                  const QString &FreqTable,
@@ -259,14 +259,14 @@ class ScriptableChannel : public QObject
                                  const QString &ConfigPath,
                                  int           NITId )
         {
-            return m_obj.CreateVideoSource( SourceName, Grabber, UserId,
-                                            FreqTable, LineupId, Password,
-                                            UseEIT, ConfigPath, NITId );
+            return m_obj.AddVideoSource( SourceName, Grabber, UserId,
+                                         FreqTable, LineupId, Password,
+                                         UseEIT, ConfigPath, NITId );
         }
 
-        bool DeleteVideoSource ( uint SourceID )
+        bool RemoveVideoSource ( uint SourceID )
         {
-            return m_obj.DeleteVideoSource( SourceID );
+            return m_obj.RemoveVideoSource( SourceID );
         }
 
         QObject* GetVideoMultiplexList  ( int      SourceID,
@@ -281,9 +281,9 @@ class ScriptableChannel : public QObject
             return m_obj.GetVideoMultiplex( MplexID );
         }
 
-        QStringList GetXMLTVIds ( int SourceID )
+        QStringList GetXMLTVIdList ( int SourceID )
         {
-            return m_obj.GetXMLTVIds(SourceID);
+            return m_obj.GetXMLTVIdList(SourceID);
         }
 };
 

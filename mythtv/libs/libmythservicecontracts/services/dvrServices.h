@@ -49,9 +49,9 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.2" );
+    Q_CLASSINFO( "version"    , "1.3" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
-    Q_CLASSINFO( "CreateRecordSchedule_Method",                 "POST" )
+    Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
     Q_CLASSINFO( "EnableRecordSchedule_Method",                 "POST" )
     Q_CLASSINFO( "DisableRecordSchedule_Method",                "POST" )
@@ -70,35 +70,35 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
     public slots:
 
-        virtual DTC::ProgramList*  GetExpiring           ( int              StartIndex, 
+        virtual DTC::ProgramList*  GetExpiringList       ( int              StartIndex, 
                                                            int              Count      ) = 0;
 
-        virtual DTC::ProgramList* GetRecorded            ( bool             Descending,
+        virtual DTC::ProgramList*  GetRecordedList       ( bool             Descending,
                                                            int              StartIndex,
                                                            int              Count      ) = 0;
 
-        virtual DTC::Program*     GetRecordedItem        ( int              ChanId,
+        virtual DTC::Program*      GetRecorded           ( int              ChanId,
+                                                            const QDateTime &StartTime  ) = 0;
+
+        virtual bool               RemoveRecorded        ( int              ChanId,
                                                            const QDateTime &StartTime  ) = 0;
 
-        virtual bool              RemoveRecordedItem     ( int              ChanId,
-                                                           const QDateTime &StartTime  ) = 0;
-
-        virtual DTC::ProgramList* GetConflicts           ( int              StartIndex,
+        virtual DTC::ProgramList*  GetConflictList       ( int              StartIndex,
                                                            int              Count      ) = 0;
 
-        virtual DTC::ProgramList* GetUpcoming            ( int              StartIndex,
+        virtual DTC::ProgramList*  GetUpcomingList       ( int              StartIndex,
                                                            int              Count,
                                                            bool             ShowAll    ) = 0;
 
-        virtual DTC::EncoderList*  Encoders              ( ) = 0;
+        virtual DTC::EncoderList*  GetEncoderList        ( ) = 0;
 
         // Recording Rules
 
-//        virtual bool               CreateRecordSchedule  ( ) = 0;
+//        virtual bool               AddRecordSchedule  ( ) = 0;
 
         virtual bool               RemoveRecordSchedule  ( uint             RecordId   ) = 0;
 
-        virtual DTC::RecRuleList*  GetRecordSchedules    ( int              StartIndex,
+        virtual DTC::RecRuleList*  GetRecordScheduleList ( int              StartIndex,
                                                            int              Count      ) = 0;
 
         virtual DTC::RecRule*      GetRecordSchedule     ( uint             RecordId   ) = 0;

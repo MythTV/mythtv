@@ -36,33 +36,33 @@ class Dvr : public DvrServices
 
     public:
 
-        DTC::ProgramList* GetExpiring         ( int              StartIndex, 
+        DTC::ProgramList* GetExpiringList     ( int              StartIndex, 
                                                 int              Count      );
 
-        DTC::ProgramList* GetRecorded         ( bool             Descending,
+        DTC::ProgramList* GetRecordedList     ( bool             Descending,
                                                 int              StartIndex,
                                                 int              Count      );
 
-        DTC::Program*     GetRecordedItem     ( int              ChanId,
+        DTC::Program*     GetRecorded         ( int              ChanId,
                                                 const QDateTime &StartTime  );
 
-        bool              RemoveRecordedItem  ( int              ChanId,
+        bool              RemoveRecorded      ( int              ChanId,
                                                 const QDateTime &StartTime  );
 
-        DTC::ProgramList* GetConflicts        ( int              StartIndex,
+        DTC::ProgramList* GetConflictList     ( int              StartIndex,
                                                 int              Count      );
 
-        DTC::ProgramList* GetUpcoming         ( int              StartIndex,
+        DTC::ProgramList* GetUpcomingList     ( int              StartIndex,
                                                 int              Count,
                                                 bool             ShowAll );
 
-        DTC::EncoderList* Encoders            ( );
+        DTC::EncoderList* GetEncoderList      ( );
 
         // Recording Rules
 
         bool              RemoveRecordSchedule ( uint             RecordId   );
 
-        DTC::RecRuleList* GetRecordSchedules   ( int              StartIndex,
+        DTC::RecRuleList* GetRecordScheduleList( int              StartIndex,
                                                  int              Count      );
 
         DTC::RecRule*     GetRecordSchedule    ( uint             RecordId   );
@@ -101,32 +101,32 @@ class ScriptableDvr : public QObject
 
     public slots:
 
-        QObject* GetExpiring         ( int              StartIndex, 
+        QObject* GetExpiringList      ( int              StartIndex, 
                                        int              Count      )
         {
-            return m_obj.GetExpiring( StartIndex, Count );
+            return m_obj.GetExpiringList( StartIndex, Count );
         }
 
-        QObject* GetRecorded         ( bool             Descending,
+        QObject* GetRecordedList     ( bool             Descending,
                                        int              StartIndex,
                                        int              Count      )
         {
-            return m_obj.GetRecorded( Descending, StartIndex, Count );
+            return m_obj.GetRecordedList( Descending, StartIndex, Count );
         }
 
-        QObject* GetRecordedItem     ( int              ChanId,
+        QObject* GetRecorded         ( int              ChanId,
                                        const QDateTime &StartTime  )
         {
-            return m_obj.GetRecordedItem( ChanId, StartTime );
+            return m_obj.GetRecorded( ChanId, StartTime );
         }
 
-        QObject* GetConflicts        ( int              StartIndex,
+        QObject* GetConflictList    ( int              StartIndex,
                                        int              Count      )
         {
-            return m_obj.GetConflicts( StartIndex, Count );
+            return m_obj.GetConflictList( StartIndex, Count );
         }
 
-        QObject* Encoders            () { return m_obj.Encoders(); }
+        QObject* GetEncoderList     () { return m_obj.GetEncoderList(); }
 
 
 };
