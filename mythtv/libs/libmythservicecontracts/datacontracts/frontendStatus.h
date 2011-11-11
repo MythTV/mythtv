@@ -11,7 +11,7 @@ namespace DTC
         Q_OBJECT
         Q_CLASSINFO("version", "1.0");
 
-        Q_CLASSINFO("Settings_type", "QString");
+        Q_CLASSINFO("State_type", "QString");
 
         Q_PROPERTY(QVariantMap State READ State DESIGNABLE true)
 
