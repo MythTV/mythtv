@@ -6,6 +6,7 @@
 #include "sctedescriptors.h"
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
+#include "util.h" // for xml_indent
 
 QMutex                RegistrationDescriptor::description_map_lock;
 bool                  RegistrationDescriptor::description_map_initialized = false;
@@ -448,20 +449,12 @@ QString MPEGDescriptor::toString() const
     return str;
 }
 
-static inline QString indent(uint level)
-{
-    QString ret;
-    for (uint i = 0; i < level; i++)
-        ret += "  ";
-    return ret;
-}
-
 /// Returns XML representation of string the TS Reader XML format.
 /// When possible matching http://www.tsreader.com/tsreader/text-export.html
 QString MPEGDescriptor::toStringXML(uint level) const
 {
-    QString indent_0 = indent(level);
-    QString indent_1 = indent(level+1);
+    QString indent_0 = xml_indent(level);
+    QString indent_1 = xml_indent(level+1);
     QString str;
 
     str += indent_0 + "<Descriptor>\n";
