@@ -5911,6 +5911,18 @@ NULL
             return false;
     }
 
+    if (dbver == "1284")
+    {
+        const char *updates[] = {
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (6, 'This Episode', '(RECTABLE.programid <> '''' AND program.programid = RECTABLE.programid) OR (RECTABLE.programid = '''' AND program.subtitle = RECTABLE.subtitle AND program.description = RECTABLE.description)', 0);",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1285", dbver))
+            return false;
+    }
+
     return true;
 }
 
