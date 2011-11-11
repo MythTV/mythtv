@@ -126,8 +126,16 @@ bool PSIPTable::HasCRC(void) const
             break;
 
         // SCTE
+        case TableID::NITscte:
+        case TableID::NTT:
+        case TableID::SVCTscte:
+        case TableID::STTscte:
         case TableID::SITscte:
             has_crc = true;
+            break;
+        case TableID::ADET:
+            has_crc = false;
+            break;
 
         // ATSC
         case TableID::MGT:
@@ -172,6 +180,32 @@ bool PSIPTable::HasCRC(void) const
     }
 
     return has_crc;
+}
+
+bool PSIPTable::HasSectionNumber(void) const
+{
+    bool has_sn = false;
+    switch (TableID())
+    {
+        // MPEG
+        case TableID::PAT:
+        case TableID::CAT:
+        case TableID::PMT:
+        // ATSC
+        case TableID::MGT:
+        case TableID::TVCT:
+        case TableID::CVCT:
+        case TableID::RRT:
+        case TableID::EIT:
+        case TableID::ETT:
+        case TableID::STT:
+        case TableID::DET:
+        case TableID::DST:
+            has_sn = true;
+            break;
+    }
+
+    return has_sn;
 }
 
 bool PSIPTable::VerifyPSIP(bool verify_crc) const
@@ -716,20 +750,24 @@ QString PSIPTable::XMLValues(uint indent_level) const
     QString indent = xml_indent(indent_level);
 
     QString str = QString(
-        "tableID=\"0x%1\" length=\"%2\" extension=\"0x%3\"\n")
+        "table_id=\"0x%1\" length=\"%2\"")
         .arg(TableID(), 2, 16, QChar('0'))
-        .arg(Length())
-        .arg(TableIDExtension(), 0, 16) + 
-        QString("%1version=\"%2\" current=\"%3\" "
-                "section=\"%4\" last_section=\"%5\"")
-        .arg(indent)
-        .arg(Version()).arg(xml_bool_to_string(IsCurrent()))
-        .arg(Section()).arg(LastSection());
+        .arg(Length());
+
+    if (HasSectionNumber())
+    {
+        str += QString(" section=\"%4\" last_section=\"%5\"")
+            .arg(Section()).arg(LastSection());
+    }
 
     if ((TableID() >= TableID::MGT) && (TableID() <= TableID::SRM))
     {
-        str += QString("\n%1atsc_protocol_version=\"%2\"")
-            .arg(indent).arg(ATSCProtocolVersion());
+        str += QString("\n%1version=\"%2\" current=\"%3\" "
+                       "protocol_version=\"%4\" extension=\"0x%5\"")
+            .arg(indent)
+            .arg(Version()).arg(xml_bool_to_string(IsCurrent()))
+            .arg(ATSCProtocolVersion())
+            .arg(TableIDExtension(), 0, 16);
     }
 
     return str;

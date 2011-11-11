@@ -12,6 +12,7 @@ class PSIPTable;
 
 class MPEGStreamData;
 class ATSCStreamData;
+class SCTEStreamData;
 class DVBStreamData;
 class ScanStreamData;
 
@@ -30,6 +31,16 @@ class ExtendedTextTable;
 class RatingRegionTable;
 class DirectedChannelChangeTable;
 class DirectedChannelChangeSelectionCodeTable;
+class AggregateEventInformationTable;
+class AggregateExtendedTextTable;
+
+class SCTESystemTimeTable;
+class SCTENetworkInformationTable;
+class NetworkTextTable;
+class ShortVirtualChannelTable;
+class ProgramInformationMessageTable;
+class ProgramNameMessageTable;
+class AggregateDataEventTable;
 
 class NetworkInformationTable;
 class BouquetAssociationTable;
@@ -118,6 +129,34 @@ class ATSCEITStreamListener
   public:
     virtual void HandleEIT( uint pid, const EventInformationTable*) = 0;
     virtual void HandleETT( uint pid, const ExtendedTextTable*) = 0;
+};
+
+class SCTEMainStreamListener // only adds the things not in ATSC
+{
+  protected:
+    virtual ~SCTEMainStreamListener() {}
+  public:
+    // SCTE 65
+    virtual void HandleNIT(const SCTENetworkInformationTable*) = 0;
+    virtual void HandleSTT(const SCTESystemTimeTable*) = 0;
+    virtual void HandleNTT(const NetworkTextTable*) = 0;
+    virtual void HandleSVCT(const ShortVirtualChannelTable*) = 0;
+
+    // SCTE 57
+    virtual void HandlePIM(const ProgramInformationMessageTable*) = 0;
+    virtual void HandlePNM(const ProgramNameMessageTable*) = 0;
+
+    // SCTE 80
+    virtual void HandleADET(const AggregateDataEventTable*) = 0;
+};
+
+class ATSC81EITStreamListener // ATSC A/81, & SCTE 65
+{
+  protected:
+    virtual ~ATSC81EITStreamListener() {}
+  public:
+    virtual void HandleAEIT(uint pid, const AggregateEventInformationTable*)=0;
+    virtual void HandleAETT(uint pid, const AggregateExtendedTextTable*) = 0;
 };
 
 class DVBMainStreamListener

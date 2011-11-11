@@ -26,6 +26,7 @@
 #include "premieretables.h"
 #include "mythlogging.h"
 #include "atsctables.h"
+#include "sctetables.h"
 #include "ringbuffer.h"
 #include "dvbtables.h"
 #include "exitcodes.h"
@@ -546,6 +547,49 @@ class PrintATSCMainStreamListener :
     }
 };
 
+class PrintSCTEMainStreamListener :
+    public SCTEMainStreamListener, public PrintOutput
+{
+  public:
+    PrintSCTEMainStreamListener(RingBuffer *out, bool use_xml) :
+        PrintOutput(out, use_xml) { }
+
+    void HandleNIT(const SCTENetworkInformationTable *nit)
+    {
+        Output(nit);
+    }
+
+    void HandleSTT(const SCTESystemTimeTable *stt)
+    {
+        Output(stt);
+    }
+
+    void HandleNTT(const NetworkTextTable *ntt)
+    {
+        Output(ntt);
+    }
+
+    void HandleSVCT(const ShortVirtualChannelTable *svct)
+    {
+        Output(svct);
+    }
+
+    void HandlePIM(const ProgramInformationMessageTable *pim)
+    {
+        Output(pim);
+    }
+
+    void HandlePNM(const ProgramNameMessageTable *pnm)
+    {
+        Output(pnm);
+    }
+
+    void HandleADET(const AggregateDataEventTable *adet)
+    {
+        Output(adet);
+    }
+};
+
 class PrintATSCAuxStreamListener :
     public ATSCAuxStreamListener, public PrintOutput
 {
@@ -724,6 +768,8 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         new PrintMPEGStreamListener(out, *ptsl, autopts, sd, use_pid, use_xml);
     PrintATSCMainStreamListener *pasl =
         new PrintATSCMainStreamListener(out, use_xml);
+    PrintSCTEMainStreamListener *pssl =
+        new PrintSCTEMainStreamListener(out, use_xml);
     PrintATSCAuxStreamListener  *paasl =
         new PrintATSCAuxStreamListener(out, use_xml);
     PrintATSCEITStreamListener  *paesl =
@@ -738,6 +784,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     sd->AddWritingListener(ptsl);
     sd->AddMPEGListener(pmsl);
     sd->AddATSCMainListener(pasl);
+    sd->AddSCTEMainListener(pssl);
     sd->AddATSCAuxListener(paasl);
     sd->AddATSCEITListener(paesl);
     sd->AddDVBMainListener(pdmsl);
@@ -781,6 +828,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     delete sd;
     delete pmsl;
     delete pasl;
+    delete pssl;
     delete paasl;
     delete paesl;
     delete pdmsl;

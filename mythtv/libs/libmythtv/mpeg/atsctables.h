@@ -74,13 +74,12 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
   public:
     MasterGuideTable(const MasterGuideTable& table) : PSIPTable(table)
     {
-        // note MGT == MGTscte, but we check "both"
-        assert(TableID::MGT == TableID() || TableID::MGTscte == TableID());
+        assert(TableID::MGT == TableID());
         Parse();
     }
     MasterGuideTable(const PSIPTable& table) : PSIPTable(table)
     {
-        assert(TableID::MGT == TableID() || TableID::MGTscte == TableID());
+        assert(TableID::MGT == TableID());
         Parse();
     }
     ~MasterGuideTable() { ; }
@@ -784,6 +783,46 @@ class MTV_PUBLIC DirectedChannelChangeSelectionCodeTable : public PSIPTable
     {
         assert(TableID::DCCSCT == TableID());
     }
+};
+
+/// SCTE 65 & ATSC/81 0xD6
+class MTV_PUBLIC AggregateEventInformationTable : public PSIPTable
+{
+  public:
+    AggregateEventInformationTable(
+        const AggregateEventInformationTable &table) : PSIPTable(table)
+    {
+        assert(TableID::AEIT == TableID());
+    }
+    AggregateEventInformationTable(const PSIPTable &table) : PSIPTable(table)
+    {
+        assert(TableID::AEIT == TableID());
+    }
+
+    QString toString(void) const
+        { return "AggregateEventInformationTable\n"; }
+    QString toStringXML(uint indent_level) const
+        { return "<AggregateEventInformationTable />"; }
+};
+
+/// SCTE 65 & ATSC/81 0xD7
+class MTV_PUBLIC AggregateExtendedTextTable : public PSIPTable
+{
+  public:
+    AggregateExtendedTextTable(
+        const AggregateExtendedTextTable &table) : PSIPTable(table)
+    {
+        assert(TableID::AETT == TableID());
+    }
+    AggregateExtendedTextTable(const PSIPTable &table) : PSIPTable(table)
+    {
+        assert(TableID::AETT == TableID());
+    }
+
+    QString toString(void) const
+        { return "AggregateExtendedTextTable\n"; }
+    QString toStringXML(uint indent_level) const
+        { return "<AggregateExtendedTextTable />"; }
 };
 
 #endif // _ATSC_TABLES_H_

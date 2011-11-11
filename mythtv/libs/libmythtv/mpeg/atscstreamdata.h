@@ -17,8 +17,10 @@ typedef QMap<uint, uint>                atsc_eit_pid_map_t;
 typedef QMap<uint, uint>                atsc_ett_pid_map_t;
 
 typedef vector<ATSCMainStreamListener*> atsc_main_listener_vec_t;
+typedef vector<SCTEMainStreamListener*> scte_main_listener_vec_t;
 typedef vector<ATSCAuxStreamListener*>  atsc_aux_listener_vec_t;
 typedef vector<ATSCEITStreamListener*>  atsc_eit_listener_vec_t;
+typedef vector<ATSC81EITStreamListener*> atsc81_eit_listener_vec_t;
 
 class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
 {
@@ -54,6 +56,8 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
         { _tvct_version[tsid] = version; }
     void SetVersionCVCT(uint tsid, int version)
         { _cvct_version[tsid] = version; }
+    void SetVersionRRT(uint region, int version)
+        { _rrt_version[region&0xff] = version; }
     void SetVersionEIT(uint pid, uint atsc_source_id, int version)
     {
         if (VersionEIT(pid, atsc_source_id) == version)
@@ -68,6 +72,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     int VersionMGT() const { return _mgt_version; }
     inline int VersionTVCT(uint tsid) const;
     inline int VersionCVCT(uint tsid) const;
+    inline int VersionRRT(uint region) const;
     inline int VersionEIT(uint pid, uint atsc_sourceid) const;
     bool EITSectionSeen(uint pid, uint atsc_source_id, uint section) const;
 
@@ -103,12 +108,16 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     int DesiredMinorChannel(void) const { return _desired_minor_channel; }
 
     void AddATSCMainListener(ATSCMainStreamListener*);
+    void AddSCTEMainListener(SCTEMainStreamListener*);
     void AddATSCAuxListener(ATSCAuxStreamListener*);
     void AddATSCEITListener(ATSCEITStreamListener*);
+    void AddATSC81EITListener(ATSC81EITStreamListener*);
 
     void RemoveATSCMainListener(ATSCMainStreamListener*);
+    void RemoveSCTEMainListener(SCTEMainStreamListener*);
     void RemoveATSCAuxListener(ATSCAuxStreamListener*);
     void RemoveATSCEITListener(ATSCEITStreamListener*);
+    void RemoveATSC81EITListener(ATSC81EITStreamListener*);
 
   private:
     void ProcessMGT(const MasterGuideTable*);
@@ -134,13 +143,16 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
 
     // Signals
     atsc_main_listener_vec_t  _atsc_main_listeners;
+    scte_main_listener_vec_t  _scte_main_listeners;
     atsc_aux_listener_vec_t   _atsc_aux_listeners;
     atsc_eit_listener_vec_t   _atsc_eit_listeners;
+    atsc81_eit_listener_vec_t _atsc81_eit_listeners;
 
     // Table versions
     int             _mgt_version;
     QMap<uint, int> _tvct_version;
     QMap<uint, int> _cvct_version;
+    QMap<uint, int> _rrt_version;
     QMap<uint, int> _eit_version;
     sections_map_t  _eit_section_seen;
 
@@ -179,6 +191,14 @@ inline int ATSCStreamData::VersionCVCT(uint tsid) const
 {
     const QMap<uint, int>::const_iterator it = _cvct_version.find(tsid);
     if (it == _cvct_version.end())
+        return -1;
+    return *it;
+}
+
+inline int ATSCStreamData::VersionRRT(uint region) const
+{
+    const QMap<uint, int>::const_iterator it = _rrt_version.find(region&0xff);
+    if (it == _rrt_version.end())
         return -1;
     return *it;
 }

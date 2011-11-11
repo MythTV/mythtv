@@ -213,6 +213,8 @@ enum
 
     ATSC_PSIP_PID = 0x1ffb,
 
+    SCTE_PSIP_PID = 0x1ffc,
+
     // UK Freesat PIDs: SDTo/BAT, longterm EIT, shortterm EIT
     FREESAT_SI_PID     = 0x0f01,
     FREESAT_EIT_PID    = 0x0f02,
@@ -270,30 +272,36 @@ class MTV_PUBLIC TableID
         ARIBbeg  = 0x80,
         ARIBend  = 0x8f,
 
-        // SCTE
+        // SCTE 57 -- old depreciated standard
         PIM      = 0xC0, // Program Information Message (57 2003) PMT PID
         PNM      = 0xC1, // Program Name Message (57 2003) PMT PID
-        NIM      = 0xC2, // Network Information Message (57 2003)
-                         // on Network PID (per PAT)
-        NITscte  = 0xC2, // Network Information Table (NIT) (65 2002) on 0x1FFC
-        NTM      = 0xC3, // Network Text Message (57 2003) on 0x1FFC
-                         // (terrestrial only, Map Name Table only) or
-                         // Network PID (per PAT)
-        NTT      = 0xC3, // Network Text Table (NTT) (65 2002) on 0x1FFC
-        VCM      = 0xC4, // Virtual Channel Message (57 2003) on 0x1FFC
-                         // (terrestrial only) or Network PID (per PAT)
-        SVCTscte = 0xC4, // Short Virtual Channel Table (65 2002) on 0x1FFC
-        STM      = 0xC5, // System Time Message (57 2003)
-                         // on Network PID (per PAT)
-        STTscte  = 0xC5, // System Time Table (STT) (65 2002) on 0x1FFC
-        SM       = 0xC6, // subtitle_message (27 2003)
-        MGTscte  = 0xC7, // Master Guide Table (57 2003) on 0x1ffc
-        LVCT     = 0xC9, // Long-form Virtual Channel Table (57 2003) on 0x1ffc
-        RRTscte  = 0xCA, // Region Rating Table (57 2003) on 0x1ffc
+        // The PIM and PNM do not have SCTE 65 equivalents.
 
+        // Under SCTE 57 -- NIM, NTM, VCM, and STM were carried on the
+        // network PID (Table ID 0x0) as defined in the PAT, but under
+        // SCTE 65 the equivalent tables are carried on 0x1FFC
+
+        NIM      = 0xC2, // Network Information Message (57 2003)
+        NTM      = 0xC3, // Network Text Message (57 2003)
+        // The NTM is like the SCTE 65 NTT table, except that it
+        // carries more subtable types and the id for the source name
+        // subtable they both share is type 5 rather than 6 which can
+        // cause calimity if not dealt with properly.
+        VCM      = 0xC4, // Virtual Channel Message (57 2003)
+        STM      = 0xC5, // System Time Message (57 2003)
+
+        // SCTE 65 -- Current US Cable TV standard
+        NITscte  = 0xC2, // Network Information Table (NIT) (65 2002) on 0x1FFC
+        NTT      = 0xC3, // Network Text Table (NTT) (65 2002) on 0x1FFC
+        SVCTscte = 0xC4, // Short Virtual Channel Table (65 2002) on 0x1FFC
+        STTscte  = 0xC5, // System Time Table (STT) (65 2002) on 0x1FFC
+
+        // Other SCTE
+        SM       = 0xC6, // subtitle_message (27 2003)
         CEA      = 0xD8, // Cable Emergency Alert (18 2002)
         ADET     = 0xD9, // Aggregate Data Event Table (80 2002)
 
+        // SCTE 35
         SITscte  = 0xFC, // SCTE 35 Splice Info Table (Cueing messages)
 
         // ATSC Conditional Access (A/70)
@@ -319,8 +327,8 @@ class MTV_PUBLIC TableID
         DCCT     = 0xD3, // Directed Channel Change Table A/57 on 0x1ffb
         DCCSCT   = 0xD4, // DCC Selection Code Table A/57 on 0x1ffb
         SITatsc  = 0xD5, // Selection Information Table (EIA-775.2 2000)
-        AEIT     = 0xD6, // Aggregate Event Information Table A/81
-        AETT     = 0xD7, // Aggregate Extended Text Table A/81
+        AEIT     = 0xD6, // Aggregate Event Information Table A/81, SCTE 65
+        AETT     = 0xD7, // Aggregate Extended Text Table A/81, SCTE 65
         SVCT     = 0xDA, // Satellite VCT A/81
 
         SRM      = 0xE0, // System Renewability Message (ATSC TSG-717r0)
@@ -381,7 +389,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     // table_id             8       0.0       0
     uint TableID(void) const { return StreamID(); }
 
-    // section_syntax_ind   1       1.0       8   should always be 1
+    // section_syntax_ind   1       1.0       8   ATSC -- should always be 1
     bool SectionSyntaxIndicator(void) const { return pesdata()[1] & 0x80; }
     // private_indicator    1       1.1       9
     bool PrivateIndicator(void) const { return pesdata()[1] & 0x40; }
@@ -448,6 +456,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     void SetATSCProtocolVersion(int ver) { pesdata()[8] = ver; }
 
     bool HasCRC(void) const;
+    bool HasSectionNumber(void) const;
 
     bool VerifyPSIP(bool verify_crc) const;
 
