@@ -750,8 +750,6 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::SITscte:
         {
-            uint prog_num = psip.TableIDExtension();
-
             SpliceInformationTable sit(psip);
 
             _listener_lock.lock();
