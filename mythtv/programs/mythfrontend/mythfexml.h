@@ -17,7 +17,6 @@ typedef enum
     MFEXML_Unknown = 0,
     MFEXML_GetServiceDescription,
     MFEXML_GetScreenShot,
-    MFEXML_Message,
     MFEXML_Action,
     MFEXML_ActionList,
     MFEXML_ActionListTest,
@@ -48,7 +47,6 @@ class MythFEXML : public Eventing
     MythFEXMLMethod GetMethod( const QString &sURI );
 
     void GetScreenShot    ( HTTPRequest *pRequest );
-    void SendMessage      ( HTTPRequest *pRequest );
     void SendAction       ( HTTPRequest *pRequest );
     void GetActionList    ( HTTPRequest *pRequest );
     void GetActionListTest( HTTPRequest *pRequest );

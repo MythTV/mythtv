@@ -61,7 +61,6 @@ MythFEXMLMethod MythFEXML::GetMethod(const QString &sURI)
 {
     if (sURI == "GetServDesc")   return MFEXML_GetServiceDescription;
     if (sURI == "GetScreenShot") return MFEXML_GetScreenShot;
-    if (sURI == "SendMessage")   return MFEXML_Message;
     if (sURI == "SendAction")    return MFEXML_Action;
     if (sURI == "GetActionList") return MFEXML_ActionList;
     if (sURI == "GetActionTest") return MFEXML_ActionListTest;
@@ -101,9 +100,6 @@ bool MythFEXML::ProcessRequest( HTTPRequest *pRequest )
             break;
         case MFEXML_GetScreenShot:
             GetScreenShot(pRequest);
-            break;
-        case MFEXML_Message:
-            SendMessage(pRequest);
             break;
         case MFEXML_Action:
             SendAction(pRequest);
@@ -161,17 +157,6 @@ void MythFEXML::GetScreenShot(HTTPRequest *pRequest)
     window->RemoteScreenShot(sFileName, nWidth, nHeight);
 
     pRequest->m_sFileName = sFileName;
-}
-
-void MythFEXML::SendMessage(HTTPRequest *pRequest)
-{
-    pRequest->m_eResponseType = ResponseTypeHTML;
-    QString sText = pRequest->m_mapParams[ "text" ];
-    LOG(VB_GENERAL, LOG_DEBUG, QString("UPNP message: ") + sText);
-
-    MythMainWindow *window = GetMythMainWindow();
-    MythEvent* me = new MythEvent(MythEvent::MythUserMessage, sText);
-    qApp->postEvent(window, me);
 }
 
 void MythFEXML::SendAction(HTTPRequest *pRequest)

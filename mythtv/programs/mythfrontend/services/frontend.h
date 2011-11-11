@@ -13,6 +13,7 @@ class Frontend : public FrontendServices
 
   public:
     DTC::FrontendStatus* GetStatus(void);
+    bool                 SendMessage(const QString &Message);
 };
 
 class ScriptableFrontend : public QObject
