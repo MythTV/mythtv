@@ -17,8 +17,6 @@ typedef enum
     MFEXML_Unknown = 0,
     MFEXML_GetServiceDescription,
     MFEXML_GetScreenShot,
-    MFEXML_Action,
-    MFEXML_ActionList,
     MFEXML_ActionListTest,
     MFEXML_GetRemote,
 } MythFEXMLMethod;
@@ -29,9 +27,6 @@ class MythFEXML : public Eventing
 
     QString m_sControlUrl;
     QString m_sServiceDescFileName;
-
-    QStringList m_actionList;
-    QHash<QString,QStringList> m_actionDescriptions;
 
   protected:
 
@@ -47,12 +42,8 @@ class MythFEXML : public Eventing
     MythFEXMLMethod GetMethod( const QString &sURI );
 
     void GetScreenShot    ( HTTPRequest *pRequest );
-    void SendAction       ( HTTPRequest *pRequest );
-    void GetActionList    ( HTTPRequest *pRequest );
     void GetActionListTest( HTTPRequest *pRequest );
     void GetRemote        ( HTTPRequest *pRequest );
-    bool IsValidAction    ( const QString &action );
-    void InitActions      ( void );
 
   public:
     MythFEXML( UPnpDevice *pDevice ,  const QString sSharePath);
@@ -61,18 +52,8 @@ class MythFEXML : public Eventing
     virtual QStringList GetBasePaths();
 
     bool ProcessRequest( HTTPRequest *pRequest );
-
-    // Static methods shared with HttpStatus
-
 };
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// 
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
 #endif
 
 

@@ -6,6 +6,8 @@
 
 class Frontend : public FrontendServices
 {
+    friend class MythFEXML;
+
     Q_OBJECT
 
   public:
@@ -14,6 +16,16 @@ class Frontend : public FrontendServices
   public:
     DTC::FrontendStatus* GetStatus(void);
     bool                 SendMessage(const QString &Message);
+    bool                 SendAction(const QString &Action, const QString &File,
+                                    uint Width, uint Height);
+    DTC::FrontendActionList* GetActionList(void);
+
+    static bool          IsValidAction(const QString &action);
+    static void          InitialiseActions(void);
+
+  protected:
+    static QStringList gActionList;
+    static QHash<QString,QStringList> gActionDescriptions;
 };
 
 class ScriptableFrontend : public QObject
