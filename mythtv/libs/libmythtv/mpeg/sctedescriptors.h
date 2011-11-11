@@ -57,4 +57,24 @@ class CueIdentifierDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// See SCTE 65 -- optional descriptor
+class RevisionDetectionDescriptor : public MPEGDescriptor
+{
+  public:
+    RevisionDetectionDescriptor(const unsigned char *data, uint len) :
+    MPEGDescriptor(data, len, DescriptorID::scte_revision_detection, 3) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x8A
+    // descriptor_length        8   1.0       0x01
+    // reserved                 3   2.0
+    // table_version_number     5   2.3
+    uint TableVersionNumber(void) const { return _data[2] & 0x1f; }
+    // section_number           8   3.0
+    uint SectionNumber(void) const { return _data[3]; }
+    // last_section_number      8   4.0
+    uint LastSectionNumber(void) const { return _data[4]; }
+
+    QString toString(void) const;
+};
+
 #endif // _SCTE_TABLES_H_

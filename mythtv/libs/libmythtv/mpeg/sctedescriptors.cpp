@@ -48,3 +48,12 @@ QString CueIdentifierDescriptor::toString(void) const
     return QString("Cue Identifier Descriptor (0x8A): StreamType(%1)")
         .arg(CueStreamTypeString());
 }
+
+QString RevisionDetectionDescriptor::toString(void) const
+{
+    return QString("Revision Detection Descriptor (0x93): "
+                   "Version(%1) Section(%2) LastSection(%3)")
+        .arg(TableVersionNumber())
+        .arg(SectionNumber())
+        .arg(LastSectionNumber());
+}

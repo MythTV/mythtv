@@ -136,6 +136,7 @@ class DescriptorID
         atsc_stuffing               = 0x80,
         ac3_audio_stream            = 0x81, /* partial */
         scte_frame_rate             = 0x82,
+        scte_extended_video         = 0x83,
         scte_component_name         = 0x84,
         atsc_program_identifier     = 0x85,
         caption_service             = 0x86, /* implemented */
@@ -145,6 +146,7 @@ class DescriptorID
 
         // SCTE
         scte_cue_identifier         = 0x8A, /* implemented */
+        scte_revision_detection     = 0x93, /* implemented */
 
         // ATSC
         extended_channel_name       = 0xA0, /* implemented */
