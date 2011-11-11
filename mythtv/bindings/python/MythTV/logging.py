@@ -6,11 +6,12 @@ from exceptions import MythError
 
 import os
 import syslog
+import codecs
 
 from sys import version_info, stdout, argv
 from datetime import datetime
 from thread import allocate_lock
-from cStringIO import StringIO
+from StringIO import StringIO
 from traceback import format_exc
 
 def _donothing(*args, **kwargs):
@@ -98,6 +99,10 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         cls._DBLOG = True
         cls._SYSLOG = None
         cls._lock = allocate_lock()
+        cls._parseinput()
+
+    @classmethod
+    def _parseinput(cls):
         args = iter(argv)
         args.next()
         try:
@@ -122,6 +127,89 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
 
         except StopIteration:
             pass
+
+    @classmethod
+    def _optparseinput(cls):
+        opts, args = cls._parser.parse_args()
+        if opts.quiet:
+            cls._QUIET = opts.quiet
+        if opts.dblog:
+            cls._DBLOG = False
+        if opts.loglevel:
+            cls._setlevel(opts.loglevel)
+        if opts.verbose:
+            cls._setmask(opts.verbose)
+        if opts.logfile:
+            cls._setfile(opts.logfile)
+        if opts.logpath:
+            cls._setpath(opts.logpath)
+        if opts.syslog:
+            cls._setsyslog(opts.syslog)
+
+    @classmethod
+    def _argparseinput(cls):
+        opts = cls._parser.parse_args()
+        if opts.quiet:
+            cls._QUIET = opts.quiet
+        if opts.dblog:
+            cls._DBLOG = False
+        if opts.loglevel:
+            cls._setlevel(opts.loglevel)
+        if opts.verbose:
+            cls._setmask(opts.verbose)
+        if opts.logfile:
+            cls._setfile(opts.logfile)
+        if opts.logpath:
+            cls._setpath(opts.logpath)
+        if opts.syslog:
+            cls._setsyslog(opts.syslog)
+
+    @classmethod
+    def loadOptParse(cls, parser):
+        cls._parser = parser
+        cls._parseinput = cls._optparseinput
+        parser.add_option('--quiet', action="count", dest="quiet",
+            help="Run quiet. One use squelches terminal, two stops all logging.")
+        parser.add_option('--nodblog', action="store_true", dest="dblog",
+            help="Prevent logging to the database.")
+        parser.add_option('--loglevel', type="string", action="store", dest="loglevel",
+            help="Specify log verbosity, using standard syslog levels.")
+        parser.add_option('--verbose', type="string", action="store", dest="verbose",
+            help="Specify log mask, deciding what areas are allowed to log.")
+        parser.add_option('--logfile', type="string", action="store", dest="logfile",
+            help="Specify file to log all output to.")
+        parser.add_option('--logpath', type="string", action="store", dest="logpath",
+            help="Specify directory to log to, filename will be automatically decided.")
+        parser.add_option('--syslog', type="string", action="store", dest="syslog",
+            help="Specify syslog facility to log to.")
+
+    @classmethod
+    def loadArgParse(cls, parser):
+        from argparse import Action
+        class Count( Action ):
+            def __call__(self, parser, namespace, values, option_string=None):
+                values = getattr(namespace, self.dest)
+                if values is None:
+                    values = 1
+                else:
+                    values += 1
+                setattr(namespace, self.dest, values)
+        cls._parser = parser
+        cls._parseinput = cls._argparseinput
+        parser.add_argument('--quiet', action=Count, nargs=0, dest="quiet",
+            help="Run quiet. One use squelches terminal, two stops all logging.")
+        parser.add_argument('--nodblog', action="store_true", dest="dblog",
+            help="Prevent logging to the database.")
+        parser.add_argument('--loglevel', action="store", dest="loglevel",
+            help="Specify log verbosity, using standard syslog levels.")
+        parser.add_argument('--verbose', action="store", dest="verbose",
+            help="Specify log mask, deciding what areas are allowed to log.")
+        parser.add_argument('--logfile', action="store", dest="logfile",
+            help="Specify file to log all output to.")
+        parser.add_argument('--logpath', action="store", dest="logpath",
+            help="Specify directory to log to, filename will be automatically decided.")
+        parser.add_argument('--syslog', action="store", dest="syslog",
+            help="Specify syslog facility to log to.")
 
     def __repr__(self):
         return "<%s '%s','%s' at %s>" % \
@@ -163,7 +251,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
     def _setfile(cls, filename):
         """Redirect log output to a specific file."""
         cls._initlogger()
-        cls._setfileobject(open(filename, 'w'))
+        cls._setfileobject(codecs.open(filename, 'w', encoding='utf-8'))
 
     @classmethod
     def _setpath(cls, filepath):
