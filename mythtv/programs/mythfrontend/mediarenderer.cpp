@@ -236,7 +236,7 @@ MediaRenderer::MediaRenderer()
         UPnpDevice &device = g_UPnpDeviceDesc.m_rootDevice;
 
         device.m_sDeviceType   = "urn:schemas-upnp-org:device:MediaRenderer:1";
-        device.m_sFriendlyName      = "MythTv AV Renderer";
+        device.m_sFriendlyName      = "MythTV AV Renderer";
         device.m_sManufacturer      = "MythTV";
         device.m_sManufacturerURL   = "http://www.mythtv.org";
         device.m_sModelDescription  = "MythTV AV Media Renderer";
