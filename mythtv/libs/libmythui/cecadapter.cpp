@@ -14,7 +14,7 @@
 #include "cecadapter.h"
 #include <vector>
 
-#define MIN_LIBCEC_VERSION 8
+#define MIN_LIBCEC_VERSION 1
 #define MAX_CEC_DEVICES 10
 #define LOC QString("CECAdapter: ")
 
@@ -124,11 +124,12 @@ class CECAdapterPriv
             return false;
         }
 
-        if (adapter->GetMinVersion() > MIN_LIBCEC_VERSION)
+        if (adapter->GetMinLibVersion() > MIN_LIBCEC_VERSION)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("You need at least libcec version %1 (found %2).")
-                .arg(MIN_LIBCEC_VERSION).arg(adapter->GetMinVersion()));
+                QString("The installed libCEC supports version %1 and above. "
+                        "This version of MythTV only supports version %2.")
+                .arg(adapter->GetMinLibVersion()).arg(MIN_LIBCEC_VERSION));
             return false;
         }
 
