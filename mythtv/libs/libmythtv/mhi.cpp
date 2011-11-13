@@ -421,12 +421,8 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
                     LOG(VB_MHEG, LOG_INFO, QString("[mhi] Received %1").arg(objectPath));
                 return true; // Found it
             }
-            else if (res < 0)
-            {
-                if (bReported)
-                    LOG(VB_MHEG, LOG_INFO, QString("[mhi] Not found %1").arg(objectPath));
-                return false; // Not there.
-            }
+            // NB don't exit if -1 (not present) is returned as the object may
+            // arrive later.  Exiting can cause the inital app to not be found
         }
 
         if (t.elapsed() > 60000) // TODO get this from carousel info
