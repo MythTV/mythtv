@@ -221,7 +221,7 @@ void JSONSerializer::RenderMap( const QVariantMap &map )
 {
     bool bFirst = true;
 
-    m_Stream << "[";
+    m_Stream << "{";
 
     QMapIterator< QString, QVariant > it( map );
 
@@ -234,11 +234,11 @@ void JSONSerializer::RenderMap( const QVariantMap &map )
         else
             m_Stream << ",";
 
-        m_Stream << "{ \"key\": \"" << it.key() << "\", \"Value\": \"";
-        m_Stream << Encode( it.value().toString() ) << "\"}";
+        m_Stream << "\"" << it.key() << "\":";
+        m_Stream << "\"" << Encode( it.value().toString() ) << "\"";
     }
 
-    m_Stream << "]";
+    m_Stream << "}";
 }
 
 //////////////////////////////////////////////////////////////////////////////
