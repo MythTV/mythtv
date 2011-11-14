@@ -203,6 +203,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     RemoteFile *remotefile;       // protected by rwlock
 
     uint      bufferSize;         // protected by rwlock
+    bool      low_buffers;        // protected by rwlock
     bool      fileismatroska;     // protected by rwlock
     bool      unknownbitrate;     // protected by rwlock
     bool      startreadahead;     // protected by rwlock

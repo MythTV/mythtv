@@ -182,6 +182,7 @@ RingBuffer::RingBuffer(RingBufferType rbtype) :
     tfw(NULL),                fd2(-1),
     writemode(false),         remotefile(NULL),
     bufferSize(BUFFER_SIZE_MINIMUM),
+    low_buffers(false),
     fileismatroska(false),    unknownbitrate(false),
     startreadahead(false),    readAheadBuffer(NULL),
     readaheadrunning(false),  reallyrunning(false),
@@ -348,6 +349,10 @@ void RingBuffer::CalcReadAheadThresh(void)
     // loop without sleeping if the buffered data is less than this
     fill_threshold = 7 * bufferSize / 8;
 
+    const uint KB2   =   2*1024;
+    const uint KB4   =   4*1024;
+    const uint KB8   =   8*1024;
+    const uint KB16  =  16*1024;
     const uint KB32  =  32*1024;
     const uint KB64  =  64*1024;
     const uint KB128 = 128*1024;
@@ -357,18 +362,40 @@ void RingBuffer::CalcReadAheadThresh(void)
     estbitrate     = (uint) max(abs(rawbitrate * playspeed),
                                 0.5f * rawbitrate);
     estbitrate     = min(rawbitrate * 3, estbitrate);
-    int rbs        = (estbitrate > 2500)  ? KB64  : KB32;
-    rbs            = (estbitrate > 5000)  ? KB128 : rbs;
-    rbs            = (estbitrate > 9000)  ? KB256 : rbs;
-    rbs            = (estbitrate > 18000) ? KB512 : rbs;
-    readblocksize  = max(rbs,readblocksize);
+    int const rbs  = (estbitrate > 18000) ? KB512 :
+                     (estbitrate >  9000) ? KB256 :
+                     (estbitrate >  5000) ? KB128 :
+                     (estbitrate >  2500) ? KB64  :
+                     (estbitrate >  1000) ? KB32  :
+                     (estbitrate >   500) ? KB16  :
+                     (estbitrate >   250) ? KB8   :
+                     (estbitrate >   125) ? KB4   : KB2;
+    if (rbs < CHUNK)
+        readblocksize = rbs;
+    else
+        readblocksize = max(rbs,readblocksize);
 
     // minumum seconds of buffering before allowing read
     float secs_min = 0.25;
     // set the minimum buffering before allowing ffmpeg read
     fill_min        = (uint) ((estbitrate * secs_min) * 0.125f);
     // make this a multiple of ffmpeg block size..
-    fill_min        = ((fill_min / KB32) + 1) * KB32;
+    if (fill_min >= CHUNK || rbs >= CHUNK)
+    {
+        if (low_buffers)
+        {
+            LOG(VB_FILE, LOG_INFO, LOC +
+                "Buffering optimisations disabled.");
+        }
+        low_buffers = false;
+        fill_min = ((fill_min / CHUNK) + 1) * CHUNK;
+    }
+    else
+    {
+        low_buffers = true;
+        LOG(VB_GENERAL, LOG_WARNING, "Enabling buffering optimisations "
+                                     "for low bitrate stream.");
+    }
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("CalcReadAheadThresh(%1 Kb)\n\t\t\t -> "
@@ -781,7 +808,8 @@ void RingBuffer::run(void)
                 readtimeavg = (readtimeavg * 9 + readinterval) / 10;
 
                 if (readtimeavg < 150 && 
-                    (uint)readblocksize < (BUFFER_SIZE_MINIMUM >>2))
+                    (uint)readblocksize < (BUFFER_SIZE_MINIMUM >>2) &&
+                    readblocksize >= CHUNK)
                 {
                     int old_block_size = readblocksize;
                     readblocksize = 3 * readblocksize / 2;
@@ -1051,13 +1079,15 @@ bool RingBuffer::WaitForAvail(int count)
         if (avail < count)
         {
             int elapsed = t.elapsed();
-            if  (((elapsed > 250)  && (elapsed < 500))  ||
-                 ((elapsed > 500)  && (elapsed < 750))  ||
-                 ((elapsed > 1000) && (elapsed < 1250)) ||
-                 ((elapsed > 2000) && (elapsed < 2250)) ||
-                 ((elapsed > 4000) && (elapsed < 4250)) ||
-                 ((elapsed > 8000) && (elapsed < 8250)) ||
-                 ((elapsed > 9000)))
+            if (elapsed > 500 && low_buffers && avail >= fill_min)
+                count = avail;
+            else if  (((elapsed > 250) && (elapsed < 500))  ||
+                     ((elapsed >  500) && (elapsed < 750))  ||
+                     ((elapsed > 1000) && (elapsed < 1250)) ||
+                     ((elapsed > 2000) && (elapsed < 2250)) ||
+                     ((elapsed > 4000) && (elapsed < 4250)) ||
+                     ((elapsed > 8000) && (elapsed < 8250)) ||
+                     ((elapsed > 9000)))
             {
                 LOG(VB_GENERAL, LOG_INFO, LOC + "Waited " +
                     QString("%1").arg((elapsed / 250) * 0.25f, 3, 'f', 1) +
