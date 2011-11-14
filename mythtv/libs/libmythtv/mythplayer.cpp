@@ -2937,6 +2937,7 @@ void MythPlayer::DecoderStart(bool start_paused)
 
 void MythPlayer::DecoderEnd(void)
 {
+    PauseDecoder();
     SetPlaying(false);
     killdecoder = true;
     int tries = 0;
