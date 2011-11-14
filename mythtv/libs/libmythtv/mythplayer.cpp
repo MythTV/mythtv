@@ -3055,8 +3055,7 @@ void MythPlayer::DecoderLoop(bool pause)
     }
 
     // Clear any wait conditions
-    PauseDecoder();
-    UnpauseDecoder();
+    DecoderPauseCheck();
     decoderSeek = -1;
 }
 
