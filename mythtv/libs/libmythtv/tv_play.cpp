@@ -1348,6 +1348,46 @@ void TV::GetStatus(void)
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     osdInfo info;
     ctx->CalcPlayerSliderPosition(info);
+    if (ctx->player)
+    {
+        status.insert("playspeed", ctx->player->GetPlaySpeed());
+        if (ctx->player->GetAudio()->ControlsVolume())
+        {
+            status.insert("volume", ctx->player->GetVolume());
+            status.insert("mute",   ctx->player->GetMuteState());
+        }
+        if (ctx->player->GetVideoOutput())
+        {
+            VideoOutput *vo = ctx->player->GetVideoOutput();
+            PictureAttributeSupported supp =
+                    vo->GetSupportedPictureAttributes();
+            if (supp & kPictureAttributeSupported_Brightness)
+            {
+                status.insert("brightness",
+                  vo->GetPictureAttribute(kPictureAttribute_Brightness));
+            }
+            if (supp & kPictureAttributeSupported_Brightness)
+            {
+                status.insert("contrast",
+                  vo->GetPictureAttribute(kPictureAttribute_Contrast));
+            }
+            if (supp & kPictureAttributeSupported_Brightness)
+            {
+                status.insert("colour",
+                  vo->GetPictureAttribute(kPictureAttribute_Colour));
+            }
+            if (supp & kPictureAttributeSupported_Brightness)
+            {
+                status.insert("hue",
+                  vo->GetPictureAttribute(kPictureAttribute_Hue));
+            }
+            if (supp & kPictureAttributeSupported_StudioLevels)
+            {
+                status.insert("studiolevels",
+                  vo->GetPictureAttribute(kPictureAttribute_StudioLevels));
+            }
+        }
+    }
 
     ReturnPlayerLock(ctx);
 
