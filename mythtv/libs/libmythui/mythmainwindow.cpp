@@ -2322,6 +2322,8 @@ void MythMainWindow::customEvent(QEvent *ce)
         {
             QVariantMap state;
             state.insert("state", "idle");
+            state.insert("menutheme",
+                 GetMythDB()->GetSetting("menutheme", "defaultmenu"));
             MythUIStateTracker::SetState(state);
         }
     }
