@@ -255,6 +255,56 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::ArtworkInfoList* Content::GetRecordingArtworkList( int              nChanId,
+                                                        const QDateTime &dStartTime  )
+{
+    if (nChanId <= 0 || !dStartTime.isValid())
+        throw( QString("Channel ID or StartTime appears invalid."));
+
+    ProgramInfo *pInfo = new ProgramInfo(nChanId, dStartTime);
+    ArtworkMap map = GetArtwork(pInfo->GetInetRef(), pInfo->GetSeason());
+
+    DTC::ArtworkInfoList *pInfos = new DTC::ArtworkInfoList();
+
+    for (ArtworkMap::const_iterator i = map.begin();
+         i != map.end(); ++i)
+    {
+        DTC::ArtworkInfo *pArtInfo = pInfos->AddNewArtworkInfo();
+        pArtInfo->setFileName(i.value().url);
+        switch (i.key())
+        {
+            case kArtworkFanart:
+                pArtInfo->setStorageGroup("Fanart");
+                pArtInfo->setType("fanart");
+                pArtInfo->setURL(QString("/Content/GetRecordingArtwork?InetRef=%1"
+                              "&Season=%2&Type=fanart").arg(pInfo->GetInetRef())
+                              .arg(pInfo->GetSeason()));
+//    LOG(VB_GENERAL, LOG_ERR, QString("Type: %1 URL: %2").arg(pArtInfo->Type()).arg(pArtInfo->URL()));
+                break;
+            case kArtworkBanner:
+                pArtInfo->setStorageGroup("Banners");
+                pArtInfo->setType("banner");
+                pArtInfo->setURL(QString("/Content/GetRecordingArtwork?InetRef=%1"
+                              "&Season=%2&Type=banner").arg(pInfo->GetInetRef())
+                              .arg(pInfo->GetSeason()));
+                break;
+            case kArtworkCoverart:
+            default:
+                pArtInfo->setStorageGroup("Coverart");
+                pArtInfo->setType("coverart");
+                pArtInfo->setURL(QString("/Content/GetRecordingArtwork?InetRef=%1"
+                              "&Season=%2&Type=coverart").arg(pInfo->GetInetRef())
+                              .arg(pInfo->GetSeason()));
+                break;
+        }
+    }
+    delete pInfo;
+    return pInfos;
+}
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QFileInfo Content::GetVideoArtwork( const QString &sType,
                                     int nId, int nWidth, int nHeight )
 {
