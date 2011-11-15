@@ -1465,19 +1465,11 @@ int main(int argc, char **argv)
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
 
-    QString pluginname;
-
-    QFileInfo finfo(qApp->argv()[0]);
-    QString binname = finfo.baseName();
-
     int retval;
     if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
         return retval;
 
     bool ResetSettings = false;
-
-    if (binname.toLower() != "mythfrontend")
-        pluginname = binname;
 
     if (cmdline.toBool("prompt"))
         bPromptForBackend = true;
@@ -1525,9 +1517,6 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("reset"))
         ResetSettings = true;
-
-    if (cmdline.GetArgs().size() >= 1)
-        pluginname = cmdline.GetArgs()[0];
 
     QString fileprefix = GetConfDir();
 
@@ -1616,17 +1605,22 @@ int main(int argc, char **argv)
     pmanager = new MythPluginManager();
     gContext->SetPluginManager(pmanager);
 
-    if (pluginname.size())
+    if (cmdline.toBool("runplugin"))
     {
-        if (pmanager->run_plugin(pluginname) ||
-            pmanager->run_plugin("myth" + pluginname))
+        if (!pmanager->run_plugin(cmdline.toString("runplugin")) ||
+            !pmanager->run_plugin("myth" + cmdline.toString("runplugin")))
         {
             qApp->exec();
-
             return GENERIC_EXIT_OK;
         }
-        else
-            return GENERIC_EXIT_INVALID_CMDLINE;
+
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Invalid plugin name supplied on command line: '%1'")
+                .arg(cmdline.toString("runplugin")));
+        // TODO: list available plugins
+        // will require new method in MythPluginManager to enumerate
+        // registered plugins
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
@@ -1680,6 +1674,24 @@ int main(int argc, char **argv)
 
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kRemote, 50, 60);
+
+    if (cmdline.toBool("jumppoint"))
+    {
+        MythMainWindow *mmw = GetMythMainWindow();
+
+        if (mmw->DestinationExists(cmdline.toString("jumppoint")))
+            mmw->JumpTo(cmdline.toString("jumppoint"));
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Invalid jump point supplied on the command line: %1")
+                    .arg(cmdline.toString("jumppoint")));
+            // TODO: list available jump points
+            // will require new method from MythMainWindow to enumerate
+            // registered points
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
 
     int ret = qApp->exec();
 
