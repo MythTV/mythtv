@@ -249,7 +249,7 @@ class MTV_PUBLIC TV : public QObject
     static int  ConfiguredTunerCards(void);
 
     // Used by EPG
-    void ChangeVolume(PlayerContext*, bool up);
+    void ChangeVolume(PlayerContext*, bool up, int newvolume = -1);
     void ToggleMute(PlayerContext*, const bool muteIndividualChannels = false);
 
     void SetNextProgPIPState(PIPState state) { jumpToProgramPIPState = state; }
