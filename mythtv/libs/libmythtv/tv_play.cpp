@@ -8923,7 +8923,8 @@ void TV::DoTogglePictureAttribute(const PlayerContext *ctx,
 
 void TV::DoChangePictureAttribute(
     PlayerContext *ctx,
-    PictureAdjustType type, PictureAttribute attr, bool up)
+    PictureAdjustType type, PictureAttribute attr,
+    bool up, int newvalue)
 {
     int value = 99;
 
@@ -8933,7 +8934,7 @@ void TV::DoChangePictureAttribute(
         if (kPictureAttribute_Volume == attr)
         {
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-            ChangeVolume(ctx, up);
+            ChangeVolume(ctx, up, newvalue);
             return;
         }
         if (!ctx->player)
@@ -8941,7 +8942,15 @@ void TV::DoChangePictureAttribute(
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
             return;
         }
-        value = ctx->player->GetVideoOutput()->ChangePictureAttribute(attr, up);
+
+        if (ctx->player->GetVideoOutput())
+        {
+            VideoOutput *vo = ctx->player->GetVideoOutput();
+            if ((newvalue >= 0) && (newvalue <= 100))
+                value = vo->SetPictureAttribute(attr, newvalue);
+            else
+                value = vo->ChangePictureAttribute(attr, up);
+        }
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 

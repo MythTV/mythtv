@@ -493,7 +493,8 @@ class MTV_PUBLIC TV : public QObject
                                   PictureAdjustType type);
     void DoChangePictureAttribute(
         PlayerContext*,
-        PictureAdjustType type, PictureAttribute attr, bool up);
+        PictureAdjustType type, PictureAttribute attr,
+        bool up, int newvalue = -1);
     bool PictureAttributeHandleAction(PlayerContext*,
                                       const QStringList &actions);
     static PictureAttribute NextPictureAdjustType(
