@@ -15,7 +15,7 @@ namespace DTC
 class SERVICE_PUBLIC RecRule : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.01" );
 
     Q_PROPERTY( int             Id              READ Id               WRITE setId             )
     Q_PROPERTY( int             ParentId        READ ParentId         WRITE setParentId       )
@@ -32,7 +32,7 @@ class SERVICE_PUBLIC RecRule : public QObject
 
     Q_PROPERTY( QString         SeriesId        READ SeriesId         WRITE setSeriesId       )
     Q_PROPERTY( QString         ProgramId       READ ProgramId        WRITE setProgramId      )
-    Q_PROPERTY( QString         InetRef         READ InetRef          WRITE setInetRef        )
+    Q_PROPERTY( QString         Inetref         READ Inetref          WRITE setInetref        )
 
     Q_PROPERTY( int             ChanId          READ ChanId           WRITE setChanId         )
     Q_PROPERTY( QString         CallSign        READ CallSign         WRITE setCallSign       )
@@ -86,7 +86,7 @@ class SERVICE_PUBLIC RecRule : public QObject
     PROPERTYIMP    ( QDateTime  , EndTime        )
     PROPERTYIMP    ( QString    , SeriesId       )
     PROPERTYIMP    ( QString    , ProgramId      )
-    PROPERTYIMP    ( QString    , InetRef        )
+    PROPERTYIMP    ( QString    , Inetref        )
     PROPERTYIMP    ( int        , ChanId         )
     PROPERTYIMP    ( QString    , CallSign       )
     PROPERTYIMP    ( int        , Day            )
@@ -185,7 +185,7 @@ class SERVICE_PUBLIC RecRule : public QObject
             m_EndTime       = src.m_EndTime       ;
             m_SeriesId      = src.m_SeriesId      ;
             m_ProgramId     = src.m_ProgramId     ;
-            m_InetRef       = src.m_InetRef       ;
+            m_Inetref       = src.m_Inetref       ;
             m_ChanId        = src.m_ChanId        ;
             m_CallSign      = src.m_CallSign      ;
             m_Day           = src.m_Day           ;

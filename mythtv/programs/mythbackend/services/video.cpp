@@ -82,7 +82,7 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( bool bDescending,
             pVideoMetadataInfo->setStudio(metadata->GetStudio());
             pVideoMetadataInfo->setDescription(metadata->GetPlot());
             pVideoMetadataInfo->setCertification(metadata->GetRating());
-            pVideoMetadataInfo->setInetRef(metadata->GetInetRef());
+            pVideoMetadataInfo->setInetref(metadata->GetInetRef());
             pVideoMetadataInfo->setHomePage(metadata->GetHomepage());
             pVideoMetadataInfo->setReleaseDate(QDateTime(metadata->GetReleaseDate()));
             pVideoMetadataInfo->setAddDate(QDateTime(metadata->GetInsertdate()));
@@ -209,7 +209,7 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
             pVideoLookup->setTagline(lookup->GetTagline());
             pVideoLookup->setDescription(lookup->GetDescription());
             pVideoLookup->setCertification(lookup->GetCertification());
-            pVideoLookup->setInetRef(lookup->GetInetref());
+            pVideoLookup->setInetref(lookup->GetInetref());
             pVideoLookup->setHomePage(lookup->GetHomepage());
             pVideoLookup->setReleaseDate(QDateTime(lookup->GetReleaseDate()));
             pVideoLookup->setUserRating(lookup->GetUserRating());
@@ -378,7 +378,7 @@ DTC::VideoMetadataInfo* Video::GetInfoFromMetadata(
         pVideoMetadataInfo->setStudio(metadata->GetStudio());
         pVideoMetadataInfo->setDescription(metadata->GetPlot());
         pVideoMetadataInfo->setCertification(metadata->GetRating());
-        pVideoMetadataInfo->setInetRef(metadata->GetInetRef());
+        pVideoMetadataInfo->setInetref(metadata->GetInetRef());
         pVideoMetadataInfo->setHomePage(metadata->GetHomepage());
         pVideoMetadataInfo->setReleaseDate(QDateTime(metadata->GetReleaseDate()));
         pVideoMetadataInfo->setAddDate(QDateTime(metadata->GetInsertdate()));
