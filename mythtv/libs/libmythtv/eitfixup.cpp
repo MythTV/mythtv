@@ -55,6 +55,7 @@ EITFixUp::EITFixUp()
       m_ukYearColon("^[\\d]{4}:"),
       m_ukExclusionFromSubtitle("(starring|stars\\s|drama|series|sitcom)",Qt::CaseInsensitive),
       m_ukCompleteDots("^\\.\\.+$"),
+      m_ukAllNew("All New To 4Music!\\s?"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -679,6 +680,9 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 
     // BBC 7 [Rpt of ...] case.
     event.description = event.description.remove(m_ukBBC7rpt);
+
+    // "All New To 4Music!
+    event.description = event.description.remove(m_ukAllNew);
 
     // Remove [AD,S] etc.
     QRegExp tmpCC = m_ukCC;
