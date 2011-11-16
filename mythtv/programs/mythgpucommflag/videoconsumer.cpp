@@ -167,6 +167,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
 
     // Decode the packet to YUV (using HW if possible)
     AVFrame mpa_pic;
+    AVFrame *wavelet = NULL;
     avcodec_get_frame_defaults(&mpa_pic);
     int gotpicture = 0;
     int ret = avcodec_decode_video2(m_context, &mpa_pic, &gotpicture, pkt);
@@ -180,6 +181,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         return;
 
     VideoPacket *videoFrame = NULL;
+    VideoPacket *gpuWavelet = NULL;
     static bool dumped = false;
     static uint64_t count = 0;
 
@@ -191,9 +193,25 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         count++;
         if (!dumped && count == 100 && videoFrame)
         {
-            videoFrame->m_frame->Dump();
+            videoFrame->m_frame->Dump("frame", 4);
+        }
+    }
+
+    // Get wavelet from the frame (one level)
+    if (m_dev)
+    {
+        gpuWavelet = new VideoPacket(videoFrame);
+        OpenCLWavelet(m_dev, videoFrame, gpuWavelet);
+        if (!dumped && count == 100 && gpuWavelet)
+        {
+            gpuWavelet->m_frame->Dump("wavelet", 2);
             dumped = true;
         }
+    }
+    else
+    {
+        wavelet = new AVFrame;
+        SoftwareWavelet(&mpa_pic, wavelet);
     }
 
     // Loop through the list of detection routines
@@ -203,7 +221,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         VideoProcessor *proc = *it;
 
         // Run the routine in GPU/CPU & pull results
-        FlagResults *result = proc->m_func(m_dev, &mpa_pic);
+        FlagResults *result = proc->m_func(m_dev, &mpa_pic, wavelet);
 
         // Toss the results onto the results list
         if (result)
@@ -219,6 +237,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
     {
         // Free the frame in GPU/CPU memory if not needed
         delete videoFrame;
+        delete gpuWavelet;
     }
 }
 

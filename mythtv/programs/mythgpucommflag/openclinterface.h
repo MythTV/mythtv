@@ -13,6 +13,8 @@
 #include <QStringList>
 #include <QList>
 #include <QMap>
+#include <QObject>
+#include <QPointer>
 
 typedef enum {
     kOpenCLDeviceUnknown     = 0x0000,
@@ -155,6 +157,20 @@ typedef struct {
 } OpenCLKernelDef;
 
 extern OpenCLDeviceMap *devMap;
+
+class OpenCLBuffers : public QObject
+{
+    Q_OBJECT;
+
+  public:
+    OpenCLBuffers(int count);
+    ~OpenCLBuffers();
+
+    int m_count;
+    cl_mem *m_bufs;
+};
+
+typedef QPointer<OpenCLBuffers> OpenCLBufferPtr;
 
 #endif
 

@@ -22,6 +22,7 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
     m_vdpSurface(vdpSurface), m_valid(false)
 {
     memset(&m_render, 0, sizeof(m_render));
+    memset(m_clBuffer, 0, sizeof(m_clBuffer));
     m_render.surface = m_vdpSurface;
 
     char *zeros = new char[m_width*m_height/2];
@@ -90,13 +91,43 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
             LOG(VB_GENERAL, LOG_ERR,
                 QString("VDPAU: OpenCL binding #%1 failed: %2 (%3)")
                 .arg(i) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
-sleep(2);
             return;
         }
     }
 
     delete [] zeros;
     m_valid = true;
+}
+
+VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height) :
+    m_id(0), m_dev(dev), m_width(width), m_height(height)
+{
+    memset(m_clBuffer, 0, sizeof(m_clBuffer));
+
+    int ciErrNum;
+    static cl_image_format format;
+    static bool formatInit = false;
+    
+    if (!formatInit)
+    {
+        format.image_channel_order = CL_R;
+        format.image_channel_data_type = CL_SNORM_INT8;
+        formatInit = true;
+    }
+
+    for (int i = 0; i < 2; i++)
+    {
+        m_clBuffer[i] = clCreateImage2D(m_dev->m_context, CL_MEM_READ_WRITE,
+                                        &format, m_width, m_height / 2, 0,
+                                        NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("VDPAU: OpenCL Image Create #%1 failed: %2 (%3)")
+                .arg(i) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+            return;
+        }
+    }
 }
 
 void VideoSurface::Bind(void)
@@ -127,11 +158,11 @@ void VideoSurface::Bind(void)
     glVDPAUUnmapSurfacesNV(1, &m_glSurface);
 }
 
-void VideoSurface::Dump(void)
+void VideoSurface::Dump(QString basename, int count)
 {
     cl_int ciErrNum;
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < count; i++)
     {
         cl_image_format format;
 
@@ -164,7 +195,7 @@ void VideoSurface::Dump(void)
         ciErrNum = clEnqueueReadImage(m_dev->m_commandQ, m_clBuffer[i], CL_TRUE,
                                       origin, region, pitch, 0, buf, NULL, 0,
                                       NULL);
-        QString extension = (elemSize == 1) ? "ppm" : "bin";
+        QString extension = (elemSize == 1) ? "pgm" : "bin";
         QString filename = QString("%1%2.%3").arg(basename).arg(i)
             .arg(extension);
         QFile file(filename);
@@ -189,7 +220,8 @@ VideoSurface::~VideoSurface()
             clReleaseMemObject(m_clBuffer[i]);
     }
 
-    glVDPAUUnregisterSurfaceNV(m_glSurface);
+    if (m_id)
+        glVDPAUUnregisterSurfaceNV(m_glSurface);
 }
 
 /*

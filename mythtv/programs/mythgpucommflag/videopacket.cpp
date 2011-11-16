@@ -19,11 +19,22 @@ VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame) :
     videoPacketMap.Add(m_frameIn, this);
 }
 
+VideoPacket::VideoPacket(VideoPacket *packet) : m_decoder(NULL), m_frameIn(NULL)
+{
+    m_frame = new VideoSurface(packet->m_frame->m_dev, packet->m_frame->m_width,
+                               packet->m_frame->m_height);
+    videoPacketMap.Add(m_frameIn, this);
+}
+
 VideoPacket::~VideoPacket()
 {
     videoPacketMap.Remove(m_frameIn);
 
-    m_decoder->DiscardFrame(m_frame);
+    if (m_decoder)
+        m_decoder->DiscardFrame(m_frame);
+
+    if (!m_frameIn && m_frame)
+        delete m_frame;
 }
 
 

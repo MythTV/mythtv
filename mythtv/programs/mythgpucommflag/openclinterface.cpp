@@ -707,8 +707,8 @@ OpenCLKernel *OpenCLKernel::Create(OpenCLDevice *device, QString entry,
     cl_kernel kernel = clCreateKernel(program, entryPt, &ciErrNum);
     if (!kernel)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Create(%1): Error %2 creating kernel")
-            .arg(entry) .arg(ciErrNum));
+        LOG(VB_GENERAL, LOG_ERR, QString("Error creating kernel %1: %2 (%3)")
+            .arg(entryPt) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
         clReleaseProgram(program);
         return NULL;
     }
@@ -723,6 +723,22 @@ OpenCLKernel::~OpenCLKernel()
     clReleaseProgram(m_program);
 }
 
+OpenCLBuffers::OpenCLBuffers(int count) : m_count(count)
+{
+    m_bufs = new cl_mem[count];
+    memset(m_bufs, 0, m_count * sizeof(cl_mem));
+}
+
+OpenCLBuffers::~OpenCLBuffers()
+{
+    if (!m_bufs)
+        return;
+
+    for (int i = 0; i < m_count; i++)
+        if (m_bufs[i])
+            clReleaseMemObject(m_bufs[i]);
+    delete [] m_bufs;
+}
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

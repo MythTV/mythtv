@@ -24,9 +24,10 @@ class VideoSurface
   public:
     VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height, uint id,
                  VdpVideoSurface vdpSurface);
+    VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height);
     ~VideoSurface();
     void Bind(void);
-    void Dump(void);
+    void Dump(QString basename, int count);
 
     uint                m_id;
     OpenCLDevice       *m_dev;

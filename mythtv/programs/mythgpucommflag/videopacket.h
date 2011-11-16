@@ -15,6 +15,7 @@ class VideoPacket
 {
   public:
     VideoPacket(VideoDecoder *decoder, AVFrame *frame);
+    VideoPacket(VideoPacket *packet);
     ~VideoPacket();
 
     VideoDecoder *m_decoder;

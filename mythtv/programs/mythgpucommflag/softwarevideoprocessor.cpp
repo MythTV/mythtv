@@ -18,6 +18,10 @@ void InitSoftwareVideoProcessors(void)
         new VideoProcessorList(softwareVideoProcessorInit);
 }
 
+void SoftwareWavelet(AVFrame *frame, AVFrame *wavelet)
+{
+}
+
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
  */

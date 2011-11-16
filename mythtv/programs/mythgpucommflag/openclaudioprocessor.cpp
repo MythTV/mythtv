@@ -48,21 +48,6 @@ unsigned int nextPow2( unsigned int x )
 
 #define KERNEL_VOLUME_CL "audioVolumeLevel.cl"
 #define KERNEL_VOLUME_64_CL "audioVolumeLevel64.cl"
-void OpenCLVolumeLevelCleanup(cl_mem **bufs)
-{
-    if (!bufs || !*bufs)
-        return;
-
-    cl_mem *memBufs = *bufs;
-    *bufs = NULL;
-
-    for (int i = 0; i < 5; i++)
-        if (memBufs[i])
-            clReleaseMemObject(memBufs[i]);
-
-    delete [] memBufs;
-}
-
 FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                int count, int64_t pts, int rate)
 {
@@ -100,14 +85,13 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     };
     static OpenCLKernelDef *kern = NULL;
     static cl_long globalResults[4] = { 0, 0, 0, 0 };
-    static cl_mem *memBufs = NULL;
+    static OpenCLBufferPtr memBufs = NULL;
 
     cl_float floatStats[4];
     cl_int   intStats[4];
     cl_int ciErrNum;
     bool init = false;
 
-    void (*cleanup)(cl_mem **bufs) = OpenCLVolumeLevelCleanup;
     cl_kernel kernel;
 
     if (!kern)
@@ -150,79 +134,79 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
         oldCount != count || oldBlockSize != blockSize)
     {
         // Cleanup any old ones (if threadCount changed)
-        cleanup(&memBufs);
+        if (memBufs)
+            delete memBufs;
 
         oldThreadCount = threadCount;
         oldCount = count;
 
         // Allocate the buffer structure
-        memBufs = new cl_mem[5];
+        memBufs = new OpenCLBuffers(5);
         if (!memBufs)
         {
             LOG(VB_GENERAL, LOG_ERR, "Out of memory allocating OpenCL buffers");
             return NULL;
         }
 
-        memset(memBufs, 0, sizeof(memBufs));
-
         // Setup the memory buffers
-        memBufs[0] = clCreateBuffer(dev->m_context,
-                                    CL_MEM_READ_WRITE,
-                                    sizeof(cl_long4) * count,
-                                    NULL, &ciErrNum);
+        memBufs->m_bufs[0] = clCreateBuffer(dev->m_context,
+                                            CL_MEM_READ_WRITE,
+                                            sizeof(cl_long4) * count,
+                                            NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Error %1 creating windowData")
                 .arg(ciErrNum));
-            cleanup(&memBufs);
+            delete memBufs;
             return NULL;
         }
 
-        memBufs[1] = clCreateBuffer(dev->m_context,
-                                    CL_MEM_READ_WRITE,
-                                    sizeof(cl_long4) * threadCount,
-                                    NULL, &ciErrNum);
+        memBufs->m_bufs[1] = clCreateBuffer(dev->m_context,
+                                            CL_MEM_READ_WRITE,
+                                            sizeof(cl_long4) * threadCount,
+                                            NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Error %1 creating reduceData")
                 .arg(ciErrNum));
-            cleanup(&memBufs);
+            delete memBufs;
             return NULL;
         }
 
-        memBufs[2] = clCreateBuffer(dev->m_context,
-                                    CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-                                    sizeof(globalResults),
-                                    globalResults, &ciErrNum);
+        memBufs->m_bufs[2] = clCreateBuffer(dev->m_context,
+                                            CL_MEM_READ_WRITE |
+                                            CL_MEM_COPY_HOST_PTR,
+                                            sizeof(globalResults),
+                                            globalResults, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Error %1 creating globalData")
                 .arg(ciErrNum));
-            cleanup(&memBufs);
+            delete memBufs;
             return NULL;
         }
 
-        memBufs[3] = clCreateBuffer(dev->m_context,
-                                    CL_MEM_READ_WRITE,
-                                    sizeof(intStats),
-                                    NULL, &ciErrNum);
+        memBufs->m_bufs[3] = clCreateBuffer(dev->m_context,
+                                            CL_MEM_READ_WRITE,
+                                            sizeof(intStats),
+                                            NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Error %1 creating intStatsData")
                 .arg(ciErrNum));
-            cleanup(&memBufs);
+            delete memBufs;
             return NULL;
         }
 
-        memBufs[4] = clCreateBuffer(dev->m_context,
-                                    CL_MEM_READ_WRITE,
-                                    sizeof(floatStats),
-                                    NULL, &ciErrNum);
+        memBufs->m_bufs[4] = clCreateBuffer(dev->m_context,
+                                            CL_MEM_READ_WRITE,
+                                            sizeof(floatStats),
+                                            NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Error %1 creating fltStatsData")
                 .arg(ciErrNum));
-            cleanup(&memBufs);
+            delete memBufs;
             return NULL;
         }
 
@@ -230,26 +214,33 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
 
         // for audioVolumeLevelMix
         kernel = kern[0].kernel->m_kernel;
-        ciErrNum  = clSetKernelArg(kernel, 1, sizeof(cl_mem), &memBufs[0]);
+        ciErrNum  = clSetKernelArg(kernel, 1, sizeof(cl_mem),
+                                   &memBufs->m_bufs[0]);
 
         // for audioVolumeLevelReduce
         kernel = kern[1].kernel->m_kernel;
-        ciErrNum |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &memBufs[0]);
-        ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &memBufs[1]);
+        ciErrNum |= clSetKernelArg(kernel, 0, sizeof(cl_mem),
+                                   &memBufs->m_bufs[0]);
+        ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
+                                   &memBufs->m_bufs[1]);
         ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_long4) * blockSize,
                                    NULL);
 
         // for audioVolumeLevelStats
         kernel = kern[2].kernel->m_kernel;
-        ciErrNum |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &memBufs[1]);
-        ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &memBufs[2]);
-        ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memBufs[3]);
-        ciErrNum |= clSetKernelArg(kernel, 3, sizeof(cl_mem), &memBufs[4]);
+        ciErrNum |= clSetKernelArg(kernel, 0, sizeof(cl_mem),
+                                   &memBufs->m_bufs[1]);
+        ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
+                                   &memBufs->m_bufs[2]);
+        ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem),
+                                   &memBufs->m_bufs[3]);
+        ciErrNum |= clSetKernelArg(kernel, 3, sizeof(cl_mem),
+                                   &memBufs->m_bufs[4]);
 
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
-            cleanup(&memBufs);
+            delete memBufs;
             return NULL;
         }
     }
@@ -267,7 +258,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     if (ciErrNum != CL_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
-        cleanup(&memBufs);
+        delete memBufs;
         return NULL;
     }
 
@@ -278,9 +269,9 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                       workDims, NULL, 0, NULL, NULL);
     if (ciErrNum != CL_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Error %1 running kernel %2")
-            .arg(ciErrNum) .arg(kern[0].entry));
-        cleanup(&memBufs);
+        LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+        delete memBufs;
         return NULL;
     }
 
@@ -292,9 +283,9 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                       0, NULL, NULL);
     if (ciErrNum != CL_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Error %1 running kernel %2")
-            .arg(ciErrNum) .arg(kern[1].entry));
-        cleanup(&memBufs);
+        LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[1].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+        delete memBufs;
         return NULL;
     }
 
@@ -304,27 +295,22 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                       &globalWorkDims, NULL, 0, NULL, NULL);
     if (ciErrNum != CL_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Error %1 running kernel %2")
-            .arg(ciErrNum) .arg(kern[2].entry));
-        cleanup(&memBufs);
+        LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[2].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+        delete memBufs;
         return NULL;
     }
 
     // Read back the results (finally!)
-    ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs[2], CL_TRUE,
-                                    0, sizeof(globalResults), globalResults,
+    ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[2],
+                                    CL_TRUE, 0, sizeof(globalResults),
+                                    globalResults, 0, NULL, NULL);
+    ciErrNum |= clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[3],
+                                    CL_TRUE, 0, sizeof(intStats), intStats,
                                     0, NULL, NULL);
-    ciErrNum |= clEnqueueReadBuffer(dev->m_commandQ, memBufs[3], CL_TRUE,
-                                    0, sizeof(intStats), intStats,
+    ciErrNum |= clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[4],
+                                    CL_TRUE, 0, sizeof(floatStats), floatStats,
                                     0, NULL, NULL);
-    ciErrNum |= clEnqueueReadBuffer(dev->m_commandQ, memBufs[4], CL_TRUE,
-                                    0, sizeof(floatStats), floatStats,
-                                    0, NULL, NULL);
-
-    // TODO: get rid of this.
-#if 0
-    cleanup(&memBufs);
-#endif
 
     if (ciErrNum != CL_SUCCESS)
     {
