@@ -416,7 +416,7 @@ void NetworkControlClient::readClient(void)
     while (socket->canReadLine())
     {
         lineIn = socket->readLine();
-        lineIn.replace(QRegExp("[^-a-zA-Z0-9\\s\\.:_#/$%&()*+,;<=>?\\[\\]\\|]"), "");
+        lineIn.replace(QRegExp("[^-a-zA-Z0-9\\s\\.:_@#/$%&()*+,;<=>?\\[\\]\\|]"), "");
         lineIn.replace(QRegExp("[\r\n]"), "");
         lineIn.replace(QRegExp("^\\s"), "");
 

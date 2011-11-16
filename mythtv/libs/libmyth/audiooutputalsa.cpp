@@ -339,11 +339,12 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
     {
         switch (fmt)
         {
-            case FORMAT_U8:  afmt = SND_PCM_FORMAT_U8;    break;
-            case FORMAT_S16: afmt = SND_PCM_FORMAT_S16;   break;
-            case FORMAT_S24: afmt = SND_PCM_FORMAT_S24;   break;
-            case FORMAT_S32: afmt = SND_PCM_FORMAT_S32;   break;
-            case FORMAT_FLT: afmt = SND_PCM_FORMAT_FLOAT; break;
+            case FORMAT_U8:     afmt = SND_PCM_FORMAT_U8;    break;
+            case FORMAT_S16:    afmt = SND_PCM_FORMAT_S16;   break;
+            case FORMAT_S24LSB: afmt = SND_PCM_FORMAT_S24;   break;
+            case FORMAT_S24:    afmt = SND_PCM_FORMAT_S32;   break;
+            case FORMAT_S32:    afmt = SND_PCM_FORMAT_S32;   break;
+            case FORMAT_FLT:    afmt = SND_PCM_FORMAT_FLOAT; break;
             default:         continue;
         }
         if (snd_pcm_hw_params_test_format(pcm_handle, params, afmt) >= 0)
@@ -415,17 +416,20 @@ bool AudioOutputALSA::OpenDevice()
 
     switch (output_format)
     {
-        case FORMAT_U8:  format = SND_PCM_FORMAT_U8;    break;
-        case FORMAT_S16: format = SND_PCM_FORMAT_S16;   break;
-        case FORMAT_S24: format = SND_PCM_FORMAT_S24;   break;
-        case FORMAT_S32: format = SND_PCM_FORMAT_S32;   break;
-        case FORMAT_FLT: format = SND_PCM_FORMAT_FLOAT; break;
+        case FORMAT_U8:     format = SND_PCM_FORMAT_U8;    break;
+        case FORMAT_S16:    format = SND_PCM_FORMAT_S16;   break;
+        case FORMAT_S24LSB: format = SND_PCM_FORMAT_S24;   break;
+        case FORMAT_S24:    format = SND_PCM_FORMAT_S32;   break;
+        case FORMAT_S32:    format = SND_PCM_FORMAT_S32;   break;
+        case FORMAT_FLT:    format = SND_PCM_FORMAT_FLOAT; break;
         default:
             Error(QString("Unknown sample format: %1").arg(output_format));
             return false;
     }
 
-    buffer_time = 500000; // buffer 0.5s worth of samples
+    // buffer 0.5s worth of samples
+    buffer_time = gCoreContext->GetNumSetting("ALSABufferOverride", 500) * 1000;
+
     period_time = 4;      // aim for an interrupt every (1/4th of buffer_time)
 
     err = SetParameters(pcm_handle, format, channels, samplerate,

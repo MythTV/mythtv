@@ -959,7 +959,7 @@ int AudioOutputBase::CheckFreeSpace(int &frames)
  * Returns the number of frames written, which may be less than requested
  * if the upmixer buffered some (or all) of them
  */
-int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
+int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
 {
     int len   = CheckFreeSpace(frames);
     int bdiff = kAudioRingBufferSize - org_waud;
@@ -978,7 +978,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
         }
         if (num > 0)
             memcpy(WPOS, buffer + off, num);
-        org_waud += num;
+        org_waud = (org_waud + num) % kAudioRingBufferSize;
         return len;
     }
 
@@ -996,7 +996,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
         if (frames > 0)
             AudioOutputUtil::MonoToStereo(WPOS, buffer + off, frames);
 
-        org_waud += frames * bpf;
+        org_waud = (org_waud + frames * bpf) % kAudioRingBufferSize;
         return len;
     }
 
@@ -1031,7 +1031,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
         if (nFrames > 0)
             upmixer->receiveFrames((float *)(WPOS), nFrames);
 
-        org_waud += nFrames * bpf;
+        org_waud = (org_waud + nFrames * bpf) % kAudioRingBufferSize;
     }
     return len;
 }
@@ -1044,12 +1044,13 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
 bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
                                 int64_t timecode)
 {
-    int org_waud = waud,               afree = audiofree();
-    int frames   = in_frames;
-    void *buffer = in_buffer;
-    int bpf      = bytes_per_frame,    len = frames * source_bytes_per_frame;
-    int used     = kAudioRingBufferSize - afree;
-    bool music   = false;
+    uint org_waud = waud;
+    int  afree    = audiofree();
+    int frames    = in_frames;
+    void *buffer  = in_buffer;
+    int bpf       = bytes_per_frame,    len = frames * source_bytes_per_frame;
+    int used      = kAudioRingBufferSize - afree;
+    bool music    = false;
     int bdiff;
 
     VBAUDIOTS(QString("AddFrames frames=%1, bytes=%2, used=%3, free=%4, "
@@ -1202,7 +1203,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
                 nFrames = pSoundStretch->receiveSamples((STST *)(WPOS),
                                                         nFrames);
 
-            org_waud += nFrames * bpf;
+            org_waud = (org_waud + nFrames * bpf) % kAudioRingBufferSize;
         }
 
         if (internal_vol && SWVolume())
@@ -1220,7 +1221,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
             if (num > 0)
                 AudioOutputUtil::AdjustVolume(WPOS, num, volume,
                                               music, needs_upmix && upmixer);
-            org_waud += num;
+            org_waud = (org_waud + num) % kAudioRingBufferSize;
         }
 
         if (encoder)
@@ -1253,7 +1254,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
                 else
                 {
                     to_get = encoder->Encode(WPOS, len, processing);
-                    org_waud += len;
+                    org_waud = (org_waud + len) % kAudioRingBufferSize;
                 }
 
                 bdiff = kAudioRingBufferSize - org_waud2;
@@ -1266,7 +1267,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
                 if (to_get > 0)
                     encoder->GetFrames(audiobuffer + org_waud2, to_get);
 
-                org_waud2 += to_get;
+                org_waud2 = (org_waud2 + to_get) % kAudioRingBufferSize;
             }
             while (remaining > 0);
             org_waud = org_waud2;
@@ -1387,7 +1388,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         // delay setting raud until after phys buffer is filled
         // so GetAudiotime will be accurate without locking
         reset_active.TestAndDeref();
-        int next_raud = raud;
+        volatile uint next_raud = raud;
         if (GetAudioData(fragment, fragment_size, true, &next_raud))
         {
             if (!reset_active.TestAndDeref())
@@ -1419,7 +1420,7 @@ void AudioOutputBase::OutputAudioLoop(void)
  * available. Returns the number of bytes copied.
  */
 int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
-                                  int *local_raud)
+                                  volatile uint *local_raud)
 {
 
 #define LRPOS audiobuffer + *local_raud

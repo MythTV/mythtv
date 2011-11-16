@@ -164,12 +164,12 @@
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="400"/>
         <source>Retrieving File Information. Please Wait...</source>
-        <translation>Modtager information.for fil Vent venligst...</translation>
+        <translation>Modtager information for fil. Vent venligst...</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="466"/>
         <source>Encoder: </source>
-        <translation>Encoder:</translation>
+        <translation>Encoder: </translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="792"/>
@@ -237,7 +237,7 @@
     <message>
         <location filename="../mytharchive/main.cpp" line="304"/>
         <source>View Archive Log</source>
-        <translation>Vis arkiv log</translation>
+        <translation>Vis arkivlog</translation>
     </message>
     <message>
         <location filename="../mytharchive/main.cpp" line="306"/>
@@ -657,6 +657,13 @@ Indsæt en blank DVD i drevet og vælg en af mulighederne nedenfor.</translation
 <context>
     <name>RecordingSelector</name>
     <message>
+        <location filename="../mytharchive/recordingselector.cpp" line="119"/>
+        <source>Retrieving Recording List.
+Please Wait...</source>
+        <translation>Modtager optagelseslisten.
+Vent venligst...</translation>
+    </message>
+    <message>
         <location filename="../mytharchive/recordingselector.cpp" line="199"/>
         <source>Clear All</source>
         <translation>Slet alt</translation>
@@ -677,11 +684,6 @@ Indsæt en blank DVD i drevet og vælg en af mulighederne nedenfor.</translation
         <location filename="../mytharchive/recordingselector.cpp" line="477"/>
         <source>All Recordings</source>
         <translation>Alle optagelser</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="119"/>
-        <source>Retrieving Recording List. Please Wait...</source>
-        <translation>Modtager optagelseslisten. Vent venligst...</translation>
     </message>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="143"/>
@@ -873,7 +875,7 @@ Indsæt en blank DVD i drevet og vælg en af mulighederne nedenfor.</translation
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>Select Archive Items</source>
-        <translation>Vælg arkiv emner</translation>
+        <translation>Vælg arkivemner</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
