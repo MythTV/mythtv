@@ -468,12 +468,12 @@ void TV::InitKeys(void)
             "program guide."), "/");
     REG_KEY("TV Frontend", "CHANUPDATE", QT_TRANSLATE_NOOP("MythControls",
             "Switch channels without exiting guide in Live TV mode."), "X");
-    REG_KEY("TV Frontend", "VOLUMEDOWN", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_VOLUMEDOWN, QT_TRANSLATE_NOOP("MythControls",
             "Volume down"), "[,{,F10,Volume Down");
-    REG_KEY("TV Frontend", "VOLUMEUP", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_VOLUMEUP, QT_TRANSLATE_NOOP("MythControls",
             "Volume up"), "],},F11,Volume Up");
-    REG_KEY("TV Frontend", "MUTE", QT_TRANSLATE_NOOP("MythControls", "Mute"),
-            "|,\\,F9,Volume Mute");
+    REG_KEY("TV Frontend", ACTION_MUTEAUDIO, QT_TRANSLATE_NOOP("MythControls",
+            "Mute"), "|,\\,F9,Volume Mute");
     REG_KEY("TV Frontend", "CYCLEAUDIOCHAN", QT_TRANSLATE_NOOP("MythControls",
             "Cycle audio channels"), "");
     REG_KEY("TV Frontend", "RANKINC", QT_TRANSLATE_NOOP("MythControls",
@@ -547,12 +547,12 @@ void TV::InitKeys(void)
             "Toggle recording status of current program"), "R");
     REG_KEY("TV Playback", ACTION_TOGGLEFAV, QT_TRANSLATE_NOOP("MythControls",
             "Toggle the current channel as a favorite"), "?");
-    REG_KEY("TV Playback", "VOLUMEDOWN", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_VOLUMEDOWN, QT_TRANSLATE_NOOP("MythControls",
             "Volume down"), "[,{,F10,Volume Down");
-    REG_KEY("TV Playback", "VOLUMEUP", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_VOLUMEUP, QT_TRANSLATE_NOOP("MythControls",
             "Volume up"), "],},F11,Volume Up");
-    REG_KEY("TV Playback", "MUTE", QT_TRANSLATE_NOOP("MythControls", "Mute"),
-            "|,\\,F9,Volume Mute");
+    REG_KEY("TV Playback", ACTION_MUTEAUDIO, QT_TRANSLATE_NOOP("MythControls",
+            "Mute"), "|,\\,F9,Volume Mute");
     REG_KEY("TV Playback", "CYCLEAUDIOCHAN", QT_TRANSLATE_NOOP("MythControls",
             "Cycle audio channels"), "");
     REG_KEY("TV Playback", ACTION_TOGGLEUPMIX, QT_TRANSLATE_NOOP("MythControls",
@@ -3716,11 +3716,11 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
 
     // only pass-through actions listed below
     return handled ||
-        !(has_action("VOLUMEDOWN",      actions) ||
-          has_action("VOLUMEUP",        actions) ||
+        !(has_action(ACTION_VOLUMEDOWN, actions) ||
+          has_action(ACTION_VOLUMEUP,   actions) ||
           has_action("STRETCHINC",      actions) ||
           has_action("STRETCHDEC",      actions) ||
-          has_action("MUTE",            actions) ||
+          has_action(ACTION_MUTEAUDIO,  actions) ||
           has_action("CYCLEAUDIOCHAN",  actions) ||
           has_action("TOGGLEASPECT",    actions) ||
           has_action("TOGGLEPIPMODE",   actions) ||
@@ -3759,9 +3759,9 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
         actx->player->Zoom(kZoomLeft);
     else if (has_action(ACTION_RIGHT, actions))
         actx->player->Zoom(kZoomRight);
-    else if (has_action("VOLUMEUP", actions))
+    else if (has_action(ACTION_VOLUMEUP, actions))
         actx->player->Zoom(kZoomAspectUp);
-    else if (has_action("VOLUMEDOWN", actions))
+    else if (has_action(ACTION_VOLUMEDOWN, actions))
         actx->player->Zoom(kZoomAspectDown);
     else if (has_action("ESCAPE", actions) ||
              has_action("BACK", actions))
@@ -3780,7 +3780,7 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
         // only pass-through actions listed below
         handled = !(has_action("STRETCHINC",     actions) ||
                     has_action("STRETCHDEC",     actions) ||
-                    has_action("MUTE",           actions) ||
+                    has_action(ACTION_MUTEAUDIO, actions) ||
                     has_action("CYCLEAUDIOCHAN", actions) ||
                     has_action(ACTION_PAUSE,     actions) ||
                     has_action(ACTION_CLEAROSD,  actions));
@@ -4123,13 +4123,13 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
 
         SetActive(ctx, 0, false);
     }
-    else if (has_action("VOLUMEDOWN", actions))
+    else if (has_action(ACTION_VOLUMEDOWN, actions))
         ChangeVolume(ctx, false);
-    else if (has_action("VOLUMEUP", actions))
+    else if (has_action(ACTION_VOLUMEUP, actions))
         ChangeVolume(ctx, true);
     else if (has_action("CYCLEAUDIOCHAN", actions))
         ToggleMute(ctx, true);
-    else if (has_action("MUTE", actions))
+    else if (has_action(ACTION_MUTEAUDIO, actions))
         ToggleMute(ctx);
     else if (has_action("STRETCHINC", actions))
         ChangeTimeStretch(ctx, 1);
