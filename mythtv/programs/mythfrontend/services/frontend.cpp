@@ -71,7 +71,13 @@ bool Frontend::SendAction(const QString &Action, const QString &File,
     return true;
 }
 
-DTC::FrontendActionList* Frontend::GetActionList(void)
+QStringList Frontend::GetContextList(void)
+{
+    InitialiseActions();
+    return gActionDescriptions.keys();
+}
+
+DTC::FrontendActionList* Frontend::GetActionList(const QString &Context)
 {
     DTC::FrontendActionList *list = new DTC::FrontendActionList();
 
@@ -81,6 +87,9 @@ DTC::FrontendActionList* Frontend::GetActionList(void)
     while (contexts.hasNext())
     {
         contexts.next();
+        if (!Context.isEmpty() && contexts.key() != Context)
+            continue;
+
         // TODO can we keep the context data with QMap<QString, QStringList>?
         QStringList actions = contexts.value();
         foreach (QString action, actions)

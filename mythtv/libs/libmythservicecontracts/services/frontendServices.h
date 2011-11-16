@@ -23,7 +23,10 @@ class SERVICE_PUBLIC FrontendServices : public Service
     virtual bool                 SendAction(const QString &Action,
                                             const QString &File,
                                             uint Width, uint Height) = 0;
-    virtual DTC::FrontendActionList* GetActionList(void) = 0;
+    virtual QStringList          GetContextList(void) = 0;
+    virtual DTC::FrontendActionList* GetActionList(const QString &Context) = 0;
+
+
 };
 
 #endif // FRONTENDSERVICES_H
