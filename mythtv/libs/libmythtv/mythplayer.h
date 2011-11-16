@@ -336,6 +336,7 @@ class MTV_PUBLIC MythPlayer
 
     // Audio Sets
     uint AdjustVolume(int change)           { return audio.AdjustVolume(change); }
+    uint SetVolume(int newvolume)           { return audio.SetVolume(newvolume); }
     bool SetMuted(bool mute)                { return audio.SetMuted(mute);       }
     MuteState SetMuteState(MuteState state) { return audio.SetMuteState(state);  }
     MuteState IncrMuteState(void)           { return audio.IncrMuteState();      }

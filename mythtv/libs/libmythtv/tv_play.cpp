@@ -7869,7 +7869,7 @@ void TV::EditSchedule(const PlayerContext *ctx, int editType)
     qApp->postEvent(this, me);
 }
 
-void TV::ChangeVolume(PlayerContext *ctx, bool up)
+void TV::ChangeVolume(PlayerContext *ctx, bool up, int newvolume)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (!ctx->player ||
@@ -7879,10 +7879,15 @@ void TV::ChangeVolume(PlayerContext *ctx, bool up)
         return;
     }
 
-    if (ctx->player->IsMuted() && up)
+    bool setabsolute = (newvolume >= 0 && newvolume <= 100);
+
+    if (ctx->player->IsMuted() && (up || setabsolute))
         ToggleMute(ctx);
 
-    uint curvol = ctx->player->AdjustVolume((up) ? +2 : -2);
+    uint curvol = setabsolute ?
+                      ctx->player->SetVolume(newvolume) :
+                      ctx->player->AdjustVolume((up) ? +2 : -2);
+
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!browsehelper->IsBrowsing())
