@@ -4081,7 +4081,8 @@ VideoFrame* MythPlayer::GetRawVideoFrame(long long frameNumber)
             VERBOSE(VB_PLAYBACK, LOC + QString("Waited 100ms for video frame"));
     }
 
-    return videoOutput->GetLastDecodedFrame();
+    videoOutput->StartDisplayingFrame();
+    return videoOutput->GetLastShownFrame();
 }
 
 QString MythPlayer::GetEncodingType(void) const

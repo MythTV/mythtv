@@ -1191,6 +1191,13 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
     return 0;
   }
 
+  if(vts_ptt_srpt->nr_of_srpts > info_length / sizeof(*data)) {
+    fprintf(stderr, "libdvdread: PTT search table too small.\n");
+    free(vts_ptt_srpt);
+    free(data);
+    ifofile->vts_ptt_srpt = 0;
+    return 0;
+  }
   for(i = 0; i < vts_ptt_srpt->nr_of_srpts; i++) {
     B2N_32(data[i]);
     /* assert(data[i] + sizeof(ptt_info_t) <= vts_ptt_srpt->last_byte + 1);
