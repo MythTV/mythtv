@@ -462,7 +462,7 @@ class MTV_PUBLIC MythPlayer
     void SetTeletextPage(uint page);
 
     // Time Code adjustment stuff
-    int64_t AdjustAudioTimecodeOffset(int64_t v);
+    int64_t AdjustAudioTimecodeOffset(int64_t v, int newsync = -9999);
     int64_t GetAudioTimecodeOffset(void) const
         { return tc_wrap[TC_AUDIO]; }
 

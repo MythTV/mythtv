@@ -405,7 +405,7 @@ class MTV_PUBLIC TV : public QObject
                                  const QStringList &actions);
 
     void ToggleUpmix(PlayerContext*);
-    void ChangeAudioSync(PlayerContext*, int dir);
+    void ChangeAudioSync(PlayerContext*, int dir, int newsync = -9999);
     bool AudioSyncHandleAction(PlayerContext*, const QStringList &actions);
 
     float StopFFRew(PlayerContext*);

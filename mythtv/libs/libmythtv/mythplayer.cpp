@@ -3204,9 +3204,12 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
     return kPIP_END;
 }
 
-int64_t MythPlayer::AdjustAudioTimecodeOffset(int64_t v)
+int64_t MythPlayer::AdjustAudioTimecodeOffset(int64_t v, int newsync)
 {
-    tc_wrap[TC_AUDIO] += v;
+    if ((newsync >= -1000) && (newsync <= 1000))
+        tc_wrap[TC_AUDIO] = newsync;
+    else
+        tc_wrap[TC_AUDIO] += v;
     gCoreContext->SaveSetting("AudioSyncOffset", tc_wrap[TC_AUDIO]);
     return tc_wrap[TC_AUDIO];
 }

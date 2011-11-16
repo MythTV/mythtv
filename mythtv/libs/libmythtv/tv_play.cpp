@@ -8000,7 +8000,7 @@ void TV::ToggleUpmix(PlayerContext *ctx)
 }
 
 // dir in 10ms jumps
-void TV::ChangeAudioSync(PlayerContext *ctx, int dir)
+void TV::ChangeAudioSync(PlayerContext *ctx, int dir, int newsync)
 {
     long long newval;
 
@@ -8012,7 +8012,10 @@ void TV::ChangeAudioSync(PlayerContext *ctx, int dir)
     }
 
     audiosyncAdjustment = true;
-    newval = ctx->player->AdjustAudioTimecodeOffset(dir * 10);
+    if ((newsync >= -1000) && (newsync <= 1000))
+        newval = ctx->player->AdjustAudioTimecodeOffset(0, newsync);
+    else
+        newval = ctx->player->AdjustAudioTimecodeOffset(dir * 10);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!browsehelper->IsBrowsing())
