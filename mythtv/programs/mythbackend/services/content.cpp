@@ -283,24 +283,24 @@ DTC::ArtworkInfoList* Content::GetProgramArtworkList( const QString &sInetref,
             case kArtworkFanart:
                 pArtInfo->setStorageGroup("Fanart");
                 pArtInfo->setType("fanart");
-                pArtInfo->setURL(QString("/Content/GetRecordingArtwork?InetRef=%1"
-                              "&Season=%2&Type=fanart").arg(sInetref)
-                              .arg(nSeason));
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                              "&FileName=%2").arg("Fanart")
+                              .arg(QUrl(i.value().url).path()));
                 break;
             case kArtworkBanner:
                 pArtInfo->setStorageGroup("Banners");
                 pArtInfo->setType("banner");
-                pArtInfo->setURL(QString("/Content/GetRecordingArtwork?InetRef=%1"
-                              "&Season=%2&Type=banner").arg(sInetref)
-                              .arg(nSeason));
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                              "&FileName=%2").arg("Fanart")
+                              .arg(QUrl(i.value().url).path()));
                 break;
             case kArtworkCoverart:
             default:
                 pArtInfo->setStorageGroup("Coverart");
                 pArtInfo->setType("coverart");
-                pArtInfo->setURL(QString("/Content/GetRecordingArtwork?InetRef=%1"
-                              "&Season=%2&Type=coverart").arg(sInetref)
-                              .arg(nSeason));
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                              "&FileName=%2").arg("Fanart")
+                              .arg(QUrl(i.value().url).path()));
                 break;
         }
     }
