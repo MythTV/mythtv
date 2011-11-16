@@ -36,7 +36,8 @@ using namespace std;
 class AudioReencodeBuffer : public AudioOutput
 {
  public:
-    AudioReencodeBuffer(AudioFormat audio_format, int audio_channels)
+    AudioReencodeBuffer(AudioFormat audio_format, int audio_channels,
+                        bool passthru)
     {
         Reset();
         const AudioSettings settings(audio_format, audio_channels, 0, 0, false);
@@ -45,14 +46,15 @@ class AudioReencodeBuffer : public AudioOutput
         audiobuffer = new unsigned char[bufsize];
 
         ab_count = 0;
-        memset(ab_len, 0, sizeof(ab_len));
-        memset(ab_offset, 0, sizeof(ab_offset));
-        memset(ab_time, 0, sizeof(ab_time));
+        ab_size = 128;
+        ab = new AudioBuffer[ab_size];
+        m_initpassthru = passthru;
     }
 
-   ~AudioReencodeBuffer()
+    ~AudioReencodeBuffer()
     {
         delete [] audiobuffer;
+        delete [] ab;
     }
 
     // reconfigure sound out for new params
@@ -60,49 +62,67 @@ class AudioReencodeBuffer : public AudioOutput
     {
         ClearError();
 
-        channels = settings.channels;
+        m_passthru      = settings.use_passthru;
+        channels        = settings.channels;
         bytes_per_frame = channels *
-                           AudioOutputSettings::SampleSize(settings.format);
+            AudioOutputSettings::SampleSize(settings.format);
+        eff_audiorate   = settings.samplerate;
     }
 
-    // dsprate is in 100 * samples/second
+    // dsprate is in 100 * frames/second
     virtual void SetEffDsp(int dsprate)
     {
         eff_audiorate = (dsprate / 100);
     }
 
-    virtual void SetBlocking(bool block) { (void)block; }
     virtual void Reset(void)
     {
         audiobuffer_len = 0;
+        audiobuffer_frames = 0;
         ab_count = 0;
     }
 
     // timecode is in milliseconds.
     virtual bool AddFrames(void *buffer, int frames, int64_t timecode)
     {
-        int freebuf = bufsize - audiobuffer_len;
+        return AddData(buffer, frames * bytes_per_frame, timecode, frames);
+    }
 
-        if (frames * bytes_per_frame > freebuf)
+    // timecode is in milliseconds.
+    virtual bool AddData(void *buffer, int len, int64_t timecode, int frames)
+    {
+        int freebuf = bufsize - audiobuffer_len;
+        int newlen;
+
+        if (len > freebuf)
         {
-            bufsize += frames * bytes_per_frame - freebuf;
+            bufsize += len - freebuf;
             unsigned char *tmpbuf = new unsigned char[bufsize];
             memcpy(tmpbuf, audiobuffer, audiobuffer_len);
             delete [] audiobuffer;
             audiobuffer = tmpbuf;
         }
-
-        ab_len[ab_count] = frames * bytes_per_frame;
-        ab_offset[ab_count] = audiobuffer_len;
+        if (ab_count >= ab_size)
+        {
+            AudioBuffer *tmp = new AudioBuffer[ab_size + 128];
+            memcpy(tmp, ab, sizeof(AudioBuffer) * ab_size);
+            delete[] ab;
+            ab = tmp;
+            ab_size += 128;
+        }
+        ab[ab_count].len = len;
+        ab[ab_count].offset = audiobuffer_len;
 
         memcpy(audiobuffer + audiobuffer_len, buffer,
-               frames * bytes_per_frame);
-        audiobuffer_len += frames * bytes_per_frame;
+               len);
+        audiobuffer_len    += len;
+        audiobuffer_frames += frames;
 
-        // last_audiotime is at the end of the sample
-        last_audiotime = timecode + frames * 1000 / eff_audiorate;
+        // last_audiotime is at the end of the frame
+        last_audiotime = timecode + frames * 1000 /
+            eff_audiorate;
 
-        ab_time[ab_count] = last_audiotime;
+        ab[ab_count].time = last_audiotime;
         ab_count++;
 
         return true;
@@ -111,10 +131,6 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void SetTimecode(int64_t timecode)
     {
         last_audiotime = timecode;
-    }
-    virtual bool CanPassthrough(int, int) const
-    {
-        return false;
     }
     virtual bool IsPaused(void) const
     {
@@ -203,14 +219,28 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void bufferOutputData(bool){ return; }
     virtual int readOutputData(unsigned char*, int ){ return 0; }
 
+    /**
+     * Test if we can output digital audio
+     */
+    virtual bool CanPassthrough(int, int, int, int) const
+        { return m_initpassthru; }
+
     int bufsize;
-    int ab_count;
-    int ab_len[128];
-    int ab_offset[128];
-    long long ab_time[128];
+    uint ab_count;
+    struct AudioBuffer
+    {
+        int len;
+        int offset;
+        long long time;
+    };
+    AudioBuffer *ab;
+    uint ab_size;
     unsigned char *audiobuffer;
-    int audiobuffer_len, channels, bits, bytes_per_frame, eff_audiorate;
+    int audiobuffer_len, audiobuffer_frames;
+    int channels, bits, bytes_per_frame, eff_audiorate;
     long long last_audiotime;
+private:
+    bool                m_passthru, m_initpassthru;
 };
 
 Transcode::Transcode(ProgramInfo *pginfo) :
@@ -362,7 +392,8 @@ int Transcode::TranscodeFile(
     bool honorCutList, bool framecontrol,
     int jobID, QString fifodir,
     bool fifo_info,
-    frm_dir_map_t &deleteMap)
+    frm_dir_map_t &deleteMap,
+    bool passthru)
 {
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
@@ -390,7 +421,8 @@ int Transcode::TranscodeFile(
         statustime = statustime.addSecs(5);
     }
 
-    AudioOutput *audioOutput = new AudioReencodeBuffer(FORMAT_NONE, 0);
+    AudioOutput *audioOutput = new AudioReencodeBuffer(FORMAT_NONE, 0,
+                                                       passthru);
     AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
     player->GetAudio()->SetAudioOutput(audioOutput);
     player->SetTranscoding(true);
@@ -794,8 +826,8 @@ int Transcode::TranscodeFile(
     long long lasttimecode = 0;
     long long timecodeOffset = 0;
 
-    float rateTimeConv = arb->eff_audiorate * arb->bytes_per_frame / 1000.0;
-    float vidFrameTime = 1000.0 / video_frame_rate;
+    float rateTimeConv = arb->eff_audiorate / 1000.0f;
+    float vidFrameTime = 1000.0f / video_frame_rate;
     int wait_recover = 0;
     VideoOutput *videoOutput = player->getVideoOutput();
     bool is_key = 0;
@@ -833,7 +865,7 @@ int Transcode::TranscodeFile(
         if (fifow)
         {
             frame.buf = lastDecode->buf;
-            totalAudio += arb->audiobuffer_len;
+            totalAudio += arb->audiobuffer_frames;
             int audbufTime = (int)(totalAudio / rateTimeConv);
             int auddelta = arb->last_audiotime - audbufTime;
             int vidTime = (int)(curFrameNum * vidFrameTime + 0.5);
@@ -841,10 +873,13 @@ int Transcode::TranscodeFile(
             int delta = viddelta - auddelta;
             if (abs(delta) < 500 && abs(delta) >= vidFrameTime)
             {
-               QString msg = QString("Audio is %1ms %2 video at # %3")
-                          .arg(abs(delta))
-                          .arg(((delta > 0) ? "ahead of" : "behind"))
-                          .arg((int)curFrameNum);
+               QString msg = QString("Audio is %1ms %2 video at # %3: "
+                                     "auddelta=%4, viddelta=%5")
+                   .arg(abs(delta))
+                   .arg(((delta > 0) ? "ahead of" : "behind"))
+                   .arg((int)curFrameNum)
+                   .arg(auddelta)
+                   .arg(viddelta);
                 VERBOSE(VB_GENERAL, msg);
                 dropvideo = (delta > 0) ? 1 : -1;
                 wait_recover = 0;
@@ -1072,12 +1107,12 @@ int Transcode::TranscodeFile(
             audioframesize = arb->audiobuffer_len;
             if (arb->ab_count)
             {
-                for (int loop = 0; loop < arb->ab_count; loop++)
+                for (uint loop = 0; loop < arb->ab_count; loop++)
                 {
-                    nvr->SetOption("audioframesize", arb->ab_len[loop]);
-                    nvr->WriteAudio(arb->audiobuffer + arb->ab_offset[loop],
+                    nvr->SetOption("audioframesize", arb->ab[loop].len);
+                    nvr->WriteAudio(arb->audiobuffer + arb->ab[loop].offset,
                                     audioFrame++,
-                                    arb->ab_time[loop] - timecodeOffset);
+                                    arb->ab[loop].time - timecodeOffset);
                     if (nvr->IsErrored())
                     {
                         VERBOSE(VB_IMPORTANT, "Transcode: Encountered "
