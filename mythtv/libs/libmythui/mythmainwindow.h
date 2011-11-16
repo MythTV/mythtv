@@ -81,6 +81,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
     void JumpTo(const QString &destination, bool pop = true);
     bool DestinationExists(const QString &destination) const;
+    QStringList EnumerateDestinations(void) const;
 
     bool IsExitingToMain(void) const;
 

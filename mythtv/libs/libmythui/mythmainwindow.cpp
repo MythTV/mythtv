@@ -1815,6 +1815,11 @@ bool MythMainWindow::DestinationExists(const QString& destination) const
     return (d->destinationMap.count(destination) > 0) ? true : false;
 }
 
+QStringList MythMainWindow::EnumerateDestinations(void) const
+{
+    return d->destinationMap.keys();
+}
+
 void MythMainWindow::RegisterMediaPlugin(const QString &name,
                                          const QString &desc,
                                          MediaPlayCallback fn)
