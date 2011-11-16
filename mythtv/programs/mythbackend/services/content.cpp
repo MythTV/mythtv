@@ -261,8 +261,15 @@ DTC::ArtworkInfoList* Content::GetRecordingArtworkList( int              nChanId
     if (nChanId <= 0 || !dStartTime.isValid())
         throw( QString("Channel ID or StartTime appears invalid."));
 
-    ProgramInfo *pInfo = new ProgramInfo(nChanId, dStartTime);
-    ArtworkMap map = GetArtwork(pInfo->GetInetRef(), pInfo->GetSeason());
+    ProgramInfo pInfo = ProgramInfo(nChanId, dStartTime);
+
+    return GetProgramArtworkList(pInfo.GetInetRef(), pInfo.GetSeason());
+}
+
+DTC::ArtworkInfoList* Content::GetProgramArtworkList( const QString &sInetref,
+                                                      int            nSeason  )
+{
+    ArtworkMap map = GetArtwork(sInetref, nSeason);
 
     DTC::ArtworkInfoList *pInfos = new DTC::ArtworkInfoList();
 
@@ -277,28 +284,26 @@ DTC::ArtworkInfoList* Content::GetRecordingArtworkList( int              nChanId
                 pArtInfo->setStorageGroup("Fanart");
                 pArtInfo->setType("fanart");
                 pArtInfo->setURL(QString("/Content/GetRecordingArtwork?InetRef=%1"
-                              "&Season=%2&Type=fanart").arg(pInfo->GetInetRef())
-                              .arg(pInfo->GetSeason()));
-//    LOG(VB_GENERAL, LOG_ERR, QString("Type: %1 URL: %2").arg(pArtInfo->Type()).arg(pArtInfo->URL()));
+                              "&Season=%2&Type=fanart").arg(sInetref)
+                              .arg(nSeason));
                 break;
             case kArtworkBanner:
                 pArtInfo->setStorageGroup("Banners");
                 pArtInfo->setType("banner");
                 pArtInfo->setURL(QString("/Content/GetRecordingArtwork?InetRef=%1"
-                              "&Season=%2&Type=banner").arg(pInfo->GetInetRef())
-                              .arg(pInfo->GetSeason()));
+                              "&Season=%2&Type=banner").arg(sInetref)
+                              .arg(nSeason));
                 break;
             case kArtworkCoverart:
             default:
                 pArtInfo->setStorageGroup("Coverart");
                 pArtInfo->setType("coverart");
                 pArtInfo->setURL(QString("/Content/GetRecordingArtwork?InetRef=%1"
-                              "&Season=%2&Type=coverart").arg(pInfo->GetInetRef())
-                              .arg(pInfo->GetSeason()));
+                              "&Season=%2&Type=coverart").arg(sInetref)
+                              .arg(nSeason));
                 break;
         }
     }
-    delete pInfo;
     return pInfos;
 }
 /////////////////////////////////////////////////////////////////////////////

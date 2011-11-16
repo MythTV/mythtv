@@ -49,7 +49,7 @@
 class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.31" );
+    Q_CLASSINFO( "version"    , "1.32" );
     Q_CLASSINFO( "DownloadFile_Method",            "POST" )
 
     public:
@@ -81,6 +81,11 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
         virtual DTC::ArtworkInfoList*
                                     GetRecordingArtworkList( int              ChanId,
                                                              const QDateTime &StartTime  ) = 0;
+
+        virtual DTC::ArtworkInfoList*
+                                    GetProgramArtworkList( const QString &Inetref,
+                                                           int            Season  ) = 0;
+
 
         virtual QFileInfo           GetVideoArtwork     ( const QString   &Type,
                                                           int Id, int Width,

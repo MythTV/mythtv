@@ -54,6 +54,10 @@ class Content : public ContentServices
                             GetRecordingArtworkList( int              ChanId,
                                                      const QDateTime &StartTime  );
 
+        DTC::ArtworkInfoList*
+                            GetProgramArtworkList( const QString &Inetref,
+                                                   int            Season  );
+
         QFileInfo           GetVideoArtwork     ( const QString   &Type,
                                                   int Id, int Width, int Height );
 
