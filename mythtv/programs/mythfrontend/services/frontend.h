@@ -16,7 +16,8 @@ class Frontend : public FrontendServices
   public:
     DTC::FrontendStatus* GetStatus(void);
     bool                 SendMessage(const QString &Message);
-    bool                 SendAction(const QString &Action, const QString &File,
+    bool                 SendAction(const QString &Action,
+                                    const QString &Value,
                                     uint Width, uint Height);
     QStringList          GetContextList(void);
     DTC::FrontendActionList* GetActionList(const QString &Context);

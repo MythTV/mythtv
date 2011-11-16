@@ -553,6 +553,8 @@ void TV::InitKeys(void)
             "Volume up"), "],},F11,Volume Up");
     REG_KEY("TV Playback", ACTION_MUTEAUDIO, QT_TRANSLATE_NOOP("MythControls",
             "Mute"), "|,\\,F9,Volume Mute");
+    REG_KEY("TV Playback", ACTION_SETVOLUME, QT_TRANSLATE_NOOP("MythControls",
+            "Set the volume"), "");
     REG_KEY("TV Playback", "CYCLEAUDIOCHAN", QT_TRANSLATE_NOOP("MythControls",
             "Cycle audio channels"), "");
     REG_KEY("TV Playback", ACTION_TOGGLEUPMIX, QT_TRANSLATE_NOOP("MythControls",
@@ -666,11 +668,23 @@ void TV::InitKeys(void)
             "Decrease time stretch speed"), "");
     REG_KEY("TV Playback", "TOGGLESTRETCH", QT_TRANSLATE_NOOP("MythControls",
             "Toggle time stretch speed"), "");
-    REG_KEY("TV Playback", "TOGGLEAUDIOSYNC", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_TOGGELAUDIOSYNC,
+            QT_TRANSLATE_NOOP("MythControls",
             "Turn on audio sync adjustment controls"), "");
+    REG_KEY("TV Playback", ACTION_SETAUDIOSYNC,
+            QT_TRANSLATE_NOOP("MythControls",
+            "Set the audio sync adjustment"), "");
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS",
             QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
              "F");
+    REG_KEY("TV Playback", ACTION_SETBRIGHTNESS,
+            QT_TRANSLATE_NOOP("MythControls", "Set the picture brightness"), "");
+    REG_KEY("TV Playback", ACTION_SETCONTRAST,
+            QT_TRANSLATE_NOOP("MythControls", "Set the picture contrast"), "");
+    REG_KEY("TV Playback", ACTION_SETCOLOUR,
+            QT_TRANSLATE_NOOP("MythControls", "Set the picture colour"), "");
+    REG_KEY("TV Playback", ACTION_SETHUE,
+            QT_TRANSLATE_NOOP("MythControls", "Set the picture hue"), "");
     REG_KEY("TV Playback", ACTION_TOGGLESTUDIOLEVELS,
             QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
              "");
@@ -3856,7 +3870,7 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
         ChangeAudioSync(ctx, -10);
     else if (has_action(ACTION_DOWN, actions))
         ChangeAudioSync(ctx, 10);
-    else if (has_action("TOGGLEAUDIOSYNC", actions))
+    else if (has_action(ACTION_TOGGELAUDIOSYNC, actions))
         ClearOSD(ctx);
     else
         handled = false;
@@ -4209,7 +4223,7 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         ToggleAspectOverride(ctx);
     else if (has_action("TOGGLEFILL", actions))
         ToggleAdjustFill(ctx);
-    else if (has_action("TOGGLEAUDIOSYNC", actions))
+    else if (has_action(ACTION_TOGGELAUDIOSYNC, actions))
         ChangeAudioSync(ctx, 0);   // just display
     else if (has_action(ACTION_TOGGLEVISUALISATION, actions))
         EnableVisualisation(ctx, false, true /*toggle*/);
@@ -8326,6 +8340,33 @@ void TV::customEvent(QEvent *e)
     // TODO Go through these and make sure they make sense...
     QStringList tokens = message.split(" ", QString::SkipEmptyParts);
 
+    if (me->ExtraDataCount() == 1)
+    {
+        PlayerContext *ctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
+        int value = me->ExtraData(0).toInt();
+        if (message == ACTION_SETVOLUME)
+            ChangeVolume(ctx, false, value);
+        else if (message == ACTION_SETAUDIOSYNC)
+            ChangeAudioSync(ctx, 0, value);
+        else if (message == ACTION_SETBRIGHTNESS)
+            DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
+                                     kPictureAttribute_Brightness,
+                                     false, value);
+        else if (message == ACTION_SETCONTRAST)
+            DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
+                                     kPictureAttribute_Contrast,
+                                     false, value);
+        else if (message == ACTION_SETCOLOUR)
+            DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
+                                     kPictureAttribute_Colour,
+                                     false, value);
+        else if (message == ACTION_SETHUE)
+            DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
+                                     kPictureAttribute_Hue,
+                                     false, value);
+        ReturnPlayerLock(ctx);
+    }
+
     if (message == ACTION_SCREENSHOT)
     {
         PlayerContext *mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
@@ -9736,7 +9777,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         if (!msg.isEmpty())
             SetOSDMessage(actx, msg);
     }
-    else if (action.left(15) == "TOGGLEAUDIOSYNC")
+    else if (action.left(15) == ACTION_TOGGELAUDIOSYNC)
         ChangeAudioSync(actx, 0);
     else if (action == ACTION_TOGGLEVISUALISATION)
         EnableVisualisation(actx, false, true /*toggle*/);
@@ -10042,7 +10083,7 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
                                  selected == "AUDIOTRACKS");
         }
         if (avsync)
-            osd->DialogAddButton(tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
+            osd->DialogAddButton(tr("Adjust Audio Sync"), ACTION_TOGGELAUDIOSYNC);
         if (visual && !active)
         {
             osd->DialogAddButton(tr("Enable Visualisation"),

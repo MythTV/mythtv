@@ -7,6 +7,7 @@
 #include "mythevent.h"
 #include "mythuistatetracker.h"
 #include "mythmainwindow.h"
+#include "tv_actions.h"
 
 #include "frontend.h"
 
@@ -32,21 +33,21 @@ bool Frontend::SendMessage(const QString &Message)
     return true;
 }
 
-bool Frontend::SendAction(const QString &Action, const QString &File,
+bool Frontend::SendAction(const QString &Action, const QString &Value,
                           uint Width, uint Height)
 {
     if (!IsValidAction(Action))
         return false;
 
-    if (ACTION_HANDLEMEDIA == Action)
-    {
-        if (File.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("No file specified."));
-            return false;
-        }
+    static const QStringList value_actions =
+        QStringList() << ACTION_HANDLEMEDIA  << ACTION_SETVOLUME <<
+                         ACTION_SETAUDIOSYNC << ACTION_SETBRIGHTNESS <<
+                         ACTION_SETCONTRAST  << ACTION_SETCOLOUR <<
+                         ACTION_SETHUE;
 
-        MythEvent* me = new MythEvent(Action, QStringList(File));
+    if (!Value.isEmpty() && value_actions.contains(Action))
+    {
+        MythEvent* me = new MythEvent(Action, QStringList(Value));
         qApp->postEvent(GetMythMainWindow(), me);
         return true;
     }
