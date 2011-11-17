@@ -2329,6 +2329,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             state.insert("state", "idle");
             state.insert("menutheme",
                  GetMythDB()->GetSetting("menutheme", "defaultmenu"));
+            state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
             MythUIStateTracker::SetState(state);
         }
     }

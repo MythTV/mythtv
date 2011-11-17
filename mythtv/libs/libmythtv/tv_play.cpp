@@ -1370,7 +1370,18 @@ void TV::GetStatus(void)
     ctx->CalcPlayerSliderPosition(info);
     if (ctx->player)
     {
+        if (!info.text["totalchapters"].isEmpty())
+        {
+            QList<long long> chapters;
+            ctx->player->GetChapterTimes(chapters);
+            QVariantList var;
+            foreach (long long chapter, chapters)
+                var << QVariant(chapter);
+            status.insert("chaptertimes", var);
+        }
+
         status.insert("playspeed", ctx->player->GetPlaySpeed());
+        status.insert("audiosyncoffset", ctx->player->GetAudioTimecodeOffset());
         if (ctx->player->GetAudio()->ControlsVolume())
         {
             status.insert("volume", ctx->player->GetVolume());

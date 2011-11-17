@@ -20,6 +20,7 @@ DTC::FrontendStatus* Frontend::GetStatus(void)
 {
     DTC::FrontendStatus *status = new DTC::FrontendStatus();
     MythUIStateTracker::GetFreshState(status->State());
+    status->Process();
     return status;
 }
 

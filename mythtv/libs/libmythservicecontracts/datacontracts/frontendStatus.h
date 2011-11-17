@@ -12,10 +12,13 @@ namespace DTC
         Q_CLASSINFO("version", "1.0");
 
         Q_CLASSINFO("State_type", "QString");
+        Q_CLASSINFO("ChapterTimes_type", "Chapter")
 
         Q_PROPERTY(QVariantMap State READ State DESIGNABLE true)
+        Q_PROPERTY(QVariantList ChapterTimes READ ChapterTimes DESIGNABLE true)
 
         PROPERTYIMP_RO_REF(QVariantMap, State)
+        PROPERTYIMP_RO_REF(QVariantList, ChapterTimes)
 
       public:
         static void InitializeCustomTypes()
@@ -37,6 +40,16 @@ namespace DTC
         void Copy(const FrontendStatus &src)
         {
             m_State = src.m_State;
+        }
+
+        void Process(void)
+        {
+            if (m_State.contains("chaptertimes"))
+            {
+                if (m_State["chaptertimes"].type() == QVariant::List)
+                    m_ChapterTimes = m_State["chaptertimes"].toList();
+                m_State.remove("chaptertimes");
+            }
         }
     };
 };
