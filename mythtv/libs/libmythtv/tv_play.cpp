@@ -724,6 +724,12 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", ACTION_EXITSHOWNOPROMPTS,
             QT_TRANSLATE_NOOP("MythControls", "Exit Show without any prompts"),
             "");
+    REG_KEY("TV Playback", ACTION_JUMPCHAPTER, QT_TRANSLATE_NOOP("MythControls",
+            "Jump to a chapter"), "");
+    REG_KEY("TV Playback", ACTION_SWITCHTITLE, QT_TRANSLATE_NOOP("MythControls",
+            "Switch title"), "");
+    REG_KEY("TV Playback", ACTION_SWITCHANGLE, QT_TRANSLATE_NOOP("MythControls",
+            "Switch angle"), "");
 
     /* Interactive Television keys */
     REG_KEY("TV Playback", ACTION_MENURED,    QT_TRANSLATE_NOOP("MythControls",
@@ -8364,6 +8370,12 @@ void TV::customEvent(QEvent *e)
             DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
                                      kPictureAttribute_Hue,
                                      false, value);
+        else if (message == ACTION_JUMPCHAPTER)
+            DoJumpChapter(ctx, value);
+        else if (message == ACTION_SWITCHTITLE)
+            DoSwitchTitle(ctx, value - 1);
+        else if (message == ACTION_SWITCHANGLE)
+            DoSwitchAngle(ctx, value);
         ReturnPlayerLock(ctx);
     }
 
@@ -9937,17 +9949,17 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                 actx->player->GoToMenu(menu);
             actx->UnlockDeletePlayer(__FILE__, __LINE__);
         }
-        else if (action.left(13) == "JUMPTOCHAPTER")
+        else if (action.left(13) == ACTION_JUMPCHAPTER)
         {
             int chapter = action.right(3).toInt();
             DoJumpChapter(actx, chapter);
         }
-        else if (action.left(11) == "JUMPTOTITLE")
+        else if (action.left(11) == ACTION_SWITCHTITLE)
         {
             int title = action.right(3).toInt();
             DoSwitchTitle(actx, title);
         }
-        else if (action.left(13) == "SWITCHTOANGLE")
+        else if (action.left(13) == ACTION_SWITCHANGLE)
         {
             int angle = action.right(3).toInt();
             DoSwitchAngle(actx, angle);
@@ -10581,7 +10593,7 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
                 QString desc = chapter1 + QString(" (%1:%2:%3)")
                     .arg(hours, 2, 10, QChar(48)).arg(minutes, 2, 10, QChar(48))
                     .arg(secs, 2, 10, QChar(48));
-                osd->DialogAddButton(desc, QString("JUMPTOCHAPTER%1").arg(chapter2),
+                osd->DialogAddButton(desc, ACTION_JUMPCHAPTER + chapter2,
                                      false, current_chapter == (i + 1));
             }
         }
@@ -10599,7 +10611,7 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
 
             QString titleIdx = QString("%1").arg(i, 3, 10, QChar(48));
             QString desc = GetTitleName(ctx, i);
-            osd->DialogAddButton(desc, QString("JUMPTOTITLE%1").arg(titleIdx),
+            osd->DialogAddButton(desc, ACTION_SWITCHTITLE + titleIdx,
                                  false, current_title == i);
         }
     }
@@ -10613,7 +10625,7 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
         {
             QString angleIdx = QString("%1").arg(i, 3, 10, QChar(48));
             QString desc = GetAngleName(ctx, i);
-            osd->DialogAddButton(desc, QString("SWITCHTOANGLE%1").arg(angleIdx),
+            osd->DialogAddButton(desc, ACTION_SWITCHANGLE + angleIdx,
                                  false, current_angle == i);
         }
     }

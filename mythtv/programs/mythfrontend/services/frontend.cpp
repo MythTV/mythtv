@@ -43,7 +43,8 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
         QStringList() << ACTION_HANDLEMEDIA  << ACTION_SETVOLUME <<
                          ACTION_SETAUDIOSYNC << ACTION_SETBRIGHTNESS <<
                          ACTION_SETCONTRAST  << ACTION_SETCOLOUR <<
-                         ACTION_SETHUE;
+                         ACTION_SETHUE       << ACTION_JUMPCHAPTER <<
+                         ACTION_SWITCHTITLE  << ACTION_SWITCHANGLE;
 
     if (!Value.isEmpty() && value_actions.contains(Action))
     {

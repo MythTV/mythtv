@@ -423,7 +423,7 @@ class MTV_PUBLIC TV : public QObject
     int  GetCurrentAngle(const PlayerContext *ctx) const;
     QString GetAngleName(const PlayerContext *ctx, int angle) const;
     void DoSwitchAngle(PlayerContext*, int angle);
-    void DoJumpChapter(PlayerContext*, int direction);
+    void DoJumpChapter(PlayerContext*, int chapter);
     void DoSkipCommercials(PlayerContext*, int direction);
     void DoQueueTranscode(PlayerContext*, QString profile);
     void SetAutoCommercialSkip(const PlayerContext*,
