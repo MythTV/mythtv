@@ -176,6 +176,11 @@ class AvFormatDecoder : public DecoderBase
     virtual bool SetAudioByComponentTag(int tag);
     virtual bool SetVideoByComponentTag(int tag);
 
+    // Stream language info
+    virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
+    virtual int GetCaptionLanguage(TrackTypes trackType, int service_num);
+    virtual int GetAudioLanguage(uint audio_index, uint stream_index);
+
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
@@ -250,8 +255,6 @@ class AvFormatDecoder : public DecoderBase
     virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
     virtual void StreamChangeCheck(void) { }
     virtual void PostProcessTracks(void) { }
-    virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
-    virtual int GetAudioLanguage(uint audio_index, uint stream_index);
 
     PrivateDecoder *private_dec;
 
