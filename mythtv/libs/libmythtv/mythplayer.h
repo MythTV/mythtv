@@ -165,6 +165,8 @@ class MTV_PUBLIC MythPlayer
     int     GetLength(void) const             { return totalLength; }
     uint64_t GetTotalFrameCount(void) const   { return totalFrames; }
     uint64_t GetFramesPlayed(void) const      { return framesPlayed; }
+    virtual  int64_t GetSecondsPlayed(void);
+    virtual  int64_t GetTotalSeconds(void) const;
     virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const
@@ -538,9 +540,6 @@ class MTV_PUBLIC MythPlayer
     // Private LiveTV stuff
     void  SwitchToProgram(void);
     void  JumpToProgram(void);
-
-    void calcSliderPosPriv(osdInfo &info, bool paddedFields,
-                           int playbackLen, float secsplayed, bool islive);
 
   protected:
     DecoderBase   *decoder;

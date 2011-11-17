@@ -390,33 +390,20 @@ long long MythDVDPlayer::CalcMaxFFTime(long long ff, bool setjump) const
     return MythPlayer::CalcMaxFFTime(ff, setjump);
 }
 
-void MythDVDPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
+int64_t MythDVDPlayer::GetSecondsPlayed(void)
 {
-    bool islive = false;
-    info.text.insert("description", "");
-    info.values.insert("position",   0);
-    info.values.insert("progbefore", 0);
-    info.values.insert("progafter",  0);
     if (!player_ctx->buffer->IsDVD())
-        return;
+        return 0;
 
-    int playbackLen = totalLength;
-    float secsplayed = 0.0f;
-#if !CONFIG_CYGWIN
-    if (m_stillFrameLength > 0)
-    {
-        playbackLen = m_stillFrameLength;
-        secsplayed  = m_stillFrameTimer.elapsed() / 1000;
-    }
-    else
-    {
-        secsplayed = player_ctx->buffer->DVD()->GetCurrentTime();
-    }
-#else
-    // DVD playing non-functional under windows for now
-    secsplayed = 0.0f;
-#endif
-    calcSliderPosPriv(info, paddedFields, playbackLen, secsplayed, islive);
+    return (m_stillFrameLength > 0) ?
+                (m_stillFrameTimer.elapsed() / 1000) :
+                (player_ctx->buffer->DVD()->GetCurrentTime());
+
+}
+
+int64_t MythDVDPlayer::GetTotalSeconds(void) const
+{
+    return (m_stillFrameLength > 0) ? m_stillFrameLength: totalLength;
 }
 
 void MythDVDPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
