@@ -1476,9 +1476,15 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
     if (!pmt.IsVideo(i, "dvb"))
         return;
 
-    const desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
+    desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
         pmt.StreamInfo(i), pmt.StreamInfoLength(i),
         DescriptorID::caption_service);
+
+    const desc_list_t desc_list2 = MPEGDescriptor::ParseOnlyInclude(
+        pmt.ProgramInfo(), pmt.ProgramInfoLength(),
+        DescriptorID::caption_service);
+
+    desc_list.insert(desc_list.end(), desc_list2.begin(), desc_list2.end());
 
     for (uint j = 0; j < desc_list.size(); j++)
     {
