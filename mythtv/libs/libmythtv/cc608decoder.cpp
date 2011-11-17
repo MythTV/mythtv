@@ -656,6 +656,43 @@ void CC608Decoder::ResetCC(int mode)
     ccbuf[mode] = "";
 }
 
+QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
+{
+    QString ret = "";
+    int i = 0;
+
+    for (int i = 0; i < cc608str.length(); i++)
+    {
+        QChar cp = cc608str[i];
+        int cpu = cp.unicode();
+        switch (cpu)
+        {
+            case 0x2120 :  ret += "(SM)"; break;
+            case 0x2122 :  ret += "(TM)"; break;
+            case 0x2014 :  ret += "(--)"; break;
+            case 0x201C :  ret += "``"; break;
+            case 0x201D :  ret += "''"; break;
+            case 0x250C :  ret += "|-"; break;
+            case 0x2510 :  ret += "-|"; break;
+            case 0x2514 :  ret += "|_"; break;
+            case 0x2518 :  ret += "_|"; break;
+            case 0x2588 :  ret += "[]"; break;
+            case 0x266A :  ret += "o/~"; break;
+            case '\b'   :  ret += "\\b"; break;
+            default     :
+                if (cpu >= 0x7000 && cpu < 0x7000 + 0x30)
+                {
+                    if (!suppress_unknown)
+                        ret += QString("[%1]").arg(cpu - 0x7000, 2, 16);
+                }
+                else
+                    ret += QString(cp.toLatin1());
+        }
+    }
+
+    return ret;
+}
+
 void CC608Decoder::BufferCC(int mode, int len, int clr)
 {
     QByteArray tmpbuf;
@@ -689,42 +726,14 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     else
         len = sizeof(ccsubtitle);
 
-    LOG(VB_VBI, LOG_INFO, QString("### %1 %2 %3 %4 %5 %6 %7 -")
-                           .arg(timecode[mode], 10)
-                           .arg(row[mode], 2).arg(rowcount[mode])
-                           .arg(style[mode]).arg(f, 2, 16)
-                           .arg(clr).arg(len, 3));
     if (len && VERBOSE_LEVEL_CHECK(VB_VBI, LOG_INFO))
     {
-        QString dispbuf = QString::fromUtf8(tmpbuf.constData(), len);
-        LOG(VB_VBI, LOG_INFO, QString("%1 '").arg(timecode[mode], 10));
-        QString vbuf = "";
-        int i = 0;
-        while (i < dispbuf.length()) {
-            QChar cp = dispbuf.at(i);
-            int cpu = cp.unicode();
-            switch (cpu)
-            {
-                case 0x2120 :  vbuf += "(SM)"; break;
-                case 0x2122 :  vbuf += "(TM)"; break;
-                case 0x2014 :  vbuf += "(--)"; break;
-                case 0x201C :  vbuf += "``"; break;
-                case 0x201D :  vbuf += "''"; break;
-                case 0x250C :  vbuf += "|-"; break;
-                case 0x2510 :  vbuf += "-|"; break;
-                case 0x2514 :  vbuf += "|_"; break;
-                case 0x2518 :  vbuf += "_|"; break;
-                case 0x2588 :  vbuf += "[]"; break;
-                case 0x266A :  vbuf += "o/~"; break;
-                case '\b'   :  vbuf += "\\b"; break;
-                default     :
-                    if (cpu >= 0x7000 && cpu < 0x7000 + 0x30)
-                        vbuf += QString("[%1]").arg(cpu - 0x7000, 2, 16);
-                    else vbuf += QString(cp.toLatin1());
-            }
-            i++;
-        }
-        LOG(VB_VBI, LOG_INFO, vbuf);
+        LOG(VB_VBI, LOG_INFO, QString("### %1 %2 %3 %4 %5 %6 %7 - '%8'")
+            .arg(timecode[mode], 10)
+            .arg(row[mode], 2).arg(rowcount[mode])
+            .arg(style[mode]).arg(f, 2, 16)
+            .arg(clr).arg(len, 3)
+            .arg(ToASCII(QString::fromUtf8(tmpbuf.constData(), len), false)));
     }
 
     reader->AddTextData(rbuf, len, timecode[mode], 'C');

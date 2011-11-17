@@ -11,14 +11,23 @@
 #include <QHash>
 
 #include "mythplayer.h"
-#include "teletextextractorreader.h"
+
+class SRTWriter;
+
+enum sub_types
+{
+    kSubCC608,
+    kSubCC708,
+    kSubDVB,
+    kSubTeletext,
+};
 
 /**
  * Represents one subtitle record.
  */
-
-struct OneSubtitle
+class MTV_PUBLIC OneSubtitle
 {
+  public:
     /// Time we have to start showing subtitle, msec.
     int64_t start_time;
     /// Time we have to show subtitle, msec.
@@ -39,48 +48,75 @@ struct OneSubtitle
         text(),
         img_shift(0, 0)
     {}
-
-    bool operator==(const OneSubtitle &x) const
-    {
-        if (is_text != x.is_text)
-            return false;
-        if (is_text && text != x.text)
-            return false;
-        if (!is_text && img != x.img)
-            return false;
-        if (!is_text && img_shift != x.img_shift)
-            return false;
-        if (start_time != x.start_time)
-            return false;
-        if (length != x.length)
-            return false;
-
-        return true;
-    }
 };
+
+/// Key is a CC number (1-4), values are the subtitles in chrono order.
+typedef QHash<int, QList<OneSubtitle> > CC608StreamType;
+/// Key is a CC service (1-63), values are the subtitles in chrono order.
+typedef QHash<int, QList<OneSubtitle> > CC708StreamType;
+/// Key is a page number, values are the subtitles in chrono order.
+typedef QHash<int, QList<OneSubtitle> > TeletextStreamType;
+/// Subtitles in chrono order.
+typedef QList<OneSubtitle> DVBStreamType;
+
+class SRTStuff
+{
+  public:
+    SRTStuff() {}
+    virtual ~SRTStuff();
+    QHash<int, SRTWriter*> srtwriters;
+    QHash<int,int>         subs_num;
+};
+
+class CC608Stuff : public SRTStuff
+{
+  public:
+    CC608Stuff() : reader(NULL) { }
+    ~CC608Stuff();
+    CC608Reader *reader;
+    CC608StreamType subs;
+};
+typedef QHash<uint, CC608Stuff> CC608Info;
+
+class CC708Stuff : public SRTStuff
+{
+  public:
+    CC708Stuff() : reader(NULL) { }
+    ~CC708Stuff();
+    CC708Reader *reader;
+    CC708StreamType subs;
+};
+typedef QHash<uint, CC708Stuff> CC708Info;
+
+class TeletextExtractorReader;
+class TeletextStuff : public SRTStuff
+{
+  public:
+    TeletextStuff() : reader(NULL) { }
+    ~TeletextStuff();
+    TeletextExtractorReader *reader;
+    TeletextStreamType subs;
+};
+typedef QHash<uint, TeletextStuff> TeletextInfo;
+
+class DVBSubStuff
+{
+  public:
+    DVBSubStuff() : reader(NULL), subs_num(0) { }
+    ~DVBSubStuff();
+    SubtitleReader *reader;
+    int             subs_num;
+    DVBStreamType   subs;
+};
+typedef QHash<uint, DVBSubStuff> DVBSubInfo;
+
+typedef QHash<uint, SubtitleReader*> SubtitleReaders;
 
 class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 {
   public:
-    /// Key is a page number, values are the subtitles in chrono order.
-    typedef QHash<int, QList<OneSubtitle> > TTXStreamType;
-    /// Key is a CC number (1-4), values are the subtitles in chrono order.
-    typedef QHash<int, QList<OneSubtitle> > CC608StreamType;
-    /// Key is a CC service (1-63), values are the subtitles in chrono order.
-    typedef QHash<int, QList<OneSubtitle> > CC708StreamType;
-    /// Subtitles in chrono order.
-    typedef QList<OneSubtitle> DVBStreamType;
-
-    MythCCExtractorPlayer(bool showProgress) :
-        MythPlayer(true /*muted*/),
-        m_curTime(0),
-        m_curTimeShift(-1),
-        m_myFramesPlayed(0),
-        m_showProgress(showProgress)
-    {
-    }
-
-    ~MythCCExtractorPlayer();
+    MythCCExtractorPlayer(bool showProgress, const QString &fileName);
+    ~MythCCExtractorPlayer() {}
 
     bool run(void);
 
@@ -89,94 +125,45 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     virtual SubtitleReader *GetSubReader(uint id=0);
     virtual TeletextReader *GetTeletextReader(uint id=0);
 
-    QList<uint> GetCC708StreamsList(void) const
-    {
-        return cc708.keys();
-    }
-
-    QList<uint> GetCC608StreamsList(void) const
-    {
-        return cc608.keys();
-    }
-
-    QList<uint> GetSubtitleStreamsList(void) const
-    {
-        return subReader.keys();
-    }
-
-    QList<uint> GetTTXStreamsList(void) const
-    {
-        return ttxReader.keys();
-    }
-
-    TTXStreamType GetTTXSubtitles(uint stream_id = 0) const
-    {
-        return ttxSubtitles.value(stream_id);
-    }
-
-    CC608StreamType GetCC608Subtitles(uint stream_id = 0) const
-    {
-        return cc608Subtitles.value(stream_id);
-    }
-
-    CC708StreamType GetCC708Subtitles(uint stream_id = 0) const
-    {
-        return cc708Subtitles.value(stream_id);
-    }
-
-    DVBStreamType GetDVBSubtitles(uint stream_id = 0) const
-    {
-        return dvbSubtitles.value(stream_id);
-    }
-
   private:
-    void ProcessNewSubtitle(QStringList content, QList<OneSubtitle> &list);
-    void ProcessNewSubtitle(OneSubtitle content, QList<OneSubtitle> &list);
+    void IngestSubtitle(QList<OneSubtitle>&, const QStringList&);
+    void IngestSubtitle(QList<OneSubtitle>&, const OneSubtitle&);
 
-    void Process608Subtitles(void);
-    void GotNew608Subtitle(uint streamId, int ccIdx, CC608Buffer *subtitles);
-    void Finish608SubtitlesProcess(void);
+    enum { kProcessNormal = 0, kProcessFinalize = 1 };
+    void Ingest608Captions(void);
+    void Process608Captions(uint flags);
 
-    void ProcessTTXSubtitles(void);
-    void GotNewTTXPage(uint stream_id, const TeletextSubPage &subPage);
-    void FinishTTXSubtitlesProcess(void);
+    void Ingest708Captions(void);
+    void Ingest708Caption(uint streamId, uint serviceIdx, uint windowIdx,
+                          const vector<CC708String*> &content);
+    void Process708Captions(void);
 
-    static QStringList ConvertTTXPage(const TeletextSubPage &subPage);
+    void IngestTeletext(void);
+    void ProcessTeletext(void);
 
-    void Process708Subtitles(void);
-    void GotNew708Subtitle(uint streamId, int serviceIdx, int windowIdx,
-                           const std::vector<CC708String *> &content);
-    void Finish708SubtitlesProcess(void);
-
-    void ProcessDVBSubtitles(void);
-    void FinishDVBSubtitlesProcess(void);
+    void IngestDVBSubtitles(void);
+    void ProcessDVBSubtitles(uint flags);
 
     void OnGotNewFrame(void);
-    void OnDecodingFinished(void);
 
-    QHash<uint, CC708Reader*>    cc708;
-    QHash<uint, CC608Reader*>    cc608;
-    QHash<uint, SubtitleReader*> subReader;
-    QHash<uint, TeletextExtractorReader*> ttxReader;
-
-    /// Keeps read subtitles from teletext for each ttx stream.
-    QHash<uint, TTXStreamType> ttxSubtitles;
-    /// Keeps read cc608 subtitles from for each cc608 stream.
-    QHash<uint, CC608StreamType> cc608Subtitles;
-    /// Keeps read cc708 subtitles from for each cc608 stream.
-    QHash<uint, CC708StreamType> cc708Subtitles;
-    /// Keeps read DVB subtitles
-    QHash<uint, DVBStreamType> dvbSubtitles;
+  protected:
+    CC608Info       m_cc608_info;
+    CC708Info       m_cc708_info;
+    TeletextInfo    m_ttx_info;
+    DVBSubInfo      m_dvbsub_info;
 
     /// Keeps cc708 windows (1-8) for all streams & services
     /// (which ids are the keys).
-    QHash<QPair<uint, int>, QHash<int, QStringList> > cc708windows;
+    QHash<uint, QMap<int, QStringList> > m_cc708_windows;
 
     /// Keeps track for decoding time to make timestamps for subtitles.
     int64_t m_curTime;
     int64_t m_curTimeShift;
     uint64_t m_myFramesPlayed;
     bool    m_showProgress;
+    QString m_fileName;
+    QDir    m_workingDir;
+    QString m_baseName;
 };
 
 #endif // MYTHCCEXTRACTORPLAYER_H

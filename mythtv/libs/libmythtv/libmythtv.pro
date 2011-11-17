@@ -253,6 +253,10 @@ SOURCES += dtvconfparser.cpp        dtvconfparserhelpers.cpp
 HEADERS += channelscan/scaninfo.h   channelscan/channelimporter.h
 SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
 
+# subtitles: srt
+HEADERS += srtwriter.h
+SOURCES += srtwriter.cpp
+
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
 inc.files += mythtvexp.h            metadataimagehelper.h
