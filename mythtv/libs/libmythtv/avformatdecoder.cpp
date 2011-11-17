@@ -330,11 +330,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     if (gCoreContext->GetNumSetting("CCBackground", 0))
         CC708Window::forceWhiteOnBlackText = true;
 
-    int x = gCoreContext->GetNumSetting("CommFlagFast", 0);
-    LOG(VB_COMMFLAG, LOG_INFO, LOC + QString("CommFlagFast: %1").arg(x));
-    if (x == 0)
-        special_decode = kAVSpecialDecode_None;
-    LOG(VB_COMMFLAG, LOG_INFO, LOC + QString("Special Decode Flags: 0x%1")
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Special Decode Flags: 0x%1")
         .arg(special_decode, 0, 16));
 }
 
