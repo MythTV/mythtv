@@ -1381,7 +1381,7 @@ void TV::GetStatus(void)
         }
 
         status.insert("playspeed", ctx->player->GetPlaySpeed());
-        status.insert("audiosyncoffset", ctx->player->GetAudioTimecodeOffset());
+        status.insert("audiosyncoffset", (long long)ctx->player->GetAudioTimecodeOffset());
         if (ctx->player->GetAudio()->ControlsVolume())
         {
             status.insert("volume", ctx->player->GetVolume());
