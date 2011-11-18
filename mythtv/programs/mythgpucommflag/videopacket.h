@@ -15,12 +15,13 @@ class VideoPacket
 {
   public:
     VideoPacket(VideoDecoder *decoder, AVFrame *frame);
-    VideoPacket(VideoPacket *packet);
     ~VideoPacket();
 
     VideoDecoder *m_decoder;
     AVFrame *m_frameIn;
-    VideoSurface *m_frame;
+    VideoSurface *m_frameRaw;
+    VideoSurface *m_frameYUV;
+    VideoSurface *m_wavelet;
 };
 
 class VideoPacketMap : public QMap<void *, VideoPacket *>

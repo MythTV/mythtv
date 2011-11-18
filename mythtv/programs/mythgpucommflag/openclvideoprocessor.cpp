@@ -25,44 +25,29 @@ void InitOpenCLVideoProcessors(void)
 
 #define KERNEL_WAVELET_CL "videoWavelet.cl"
 #define KERNEL_WAVELET_WORKSIZE 32
-void OpenCLWavelet(OpenCLDevice *dev, VideoPacket *frame, VideoPacket *wavelet)
+void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
+                   VideoSurface *wavelet)
 {
     LOG(VB_GENERAL, LOG_INFO, "OpenCL Wavelet");
 
-    static OpenCLKernelDef kern[2] = {
+    static OpenCLKernelDef kern[] = {
         { NULL, "videoWavelet",     KERNEL_WAVELET_CL }
     };
+    static int kernCount = sizeof(kern)/sizeof(kern[0]);
 
-    VideoSurface *inSurface  = frame->m_frame;
-    VideoSurface *outSurface = wavelet->m_frame; 
     int ciErrNum;
 
     cl_kernel kernel;
 
-    for (int i = 0; i < 1; i++)
-    {
-        if (!kern[i].kernel)
-        {
-            kern[i].kernel = dev->m_kernelMap.value(kern[i].entry, NULL);
-            if (!kern[i].kernel)
-            {
-                if (dev->RegisterKernel(kern[i].entry, kern[i].filename))
-                    kern[i].kernel = dev->GetKernel(kern[i].entry);
-
-                if (!kern[i].kernel)
-                {
-                    return;
-                }
-            }
-        }
-    }
+    if (!dev->OpenCLLoadKernels(kern, kernCount, NULL))
+        return;
 
     // Make sure previous commands are finished
     clFinish(dev->m_commandQ);
 
     // Setup the kernel arguments
-    int width   = inSurface->m_width;
-    int height  = inSurface->m_height / 2;
+    int width   = frame->m_width;
+    int height  = frame->m_height / 2;
     int widthR  = PAD_VALUE(width,  KERNEL_WAVELET_WORKSIZE);
     int heightR = PAD_VALUE(height, KERNEL_WAVELET_WORKSIZE);
 
@@ -73,9 +58,9 @@ void OpenCLWavelet(OpenCLDevice *dev, VideoPacket *frame, VideoPacket *wavelet)
     // for videoWavelet - top field
     kernel = kern[0].kernel->m_kernel;
     ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem),
-                               &inSurface->m_clBuffer[0]);
+                               &frame->m_clBuffer[0]);
     ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
-                               &outSurface->m_clBuffer[0]);
+                               &wavelet->m_clBuffer[0]);
     ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_int), &width);
     ciErrNum |= clSetKernelArg(kernel, 3, sizeof(cl_int), &height);
 
@@ -97,9 +82,9 @@ void OpenCLWavelet(OpenCLDevice *dev, VideoPacket *frame, VideoPacket *wavelet)
 
     // for videoWavelet - bottom field
     ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem),
-                               &inSurface->m_clBuffer[1]);
+                               &frame->m_clBuffer[1]);
     ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
-                               &outSurface->m_clBuffer[1]);
+                               &wavelet->m_clBuffer[1]);
     ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_int), &width);
     ciErrNum |= clSetKernelArg(kernel, 3, sizeof(cl_int), &height);
 
@@ -121,6 +106,152 @@ void OpenCLWavelet(OpenCLDevice *dev, VideoPacket *frame, VideoPacket *wavelet)
     LOG(VB_GENERAL, LOG_INFO, "OpenCL Wavelet Done");
 }
 
+#define KERNEL_CONVERT_CL "videoConvert.cl"
+void OpenCLCombineYUV(OpenCLDevice *dev, VideoSurface *frame,
+                      VideoSurface *yuvframe)
+{
+    LOG(VB_GENERAL, LOG_INFO, "OpenCL CombineYUV");
+
+    static OpenCLKernelDef kern[] = {
+        { NULL, "videoCombineYUV",     KERNEL_CONVERT_CL }
+    };
+    static int kernCount = sizeof(kern)/sizeof(kern[0]);
+
+    int ciErrNum;
+
+    cl_kernel kernel;
+
+    if (!dev->OpenCLLoadKernels(kern, kernCount, NULL))
+        return;
+
+    // Make sure previous commands are finished
+    clFinish(dev->m_commandQ);
+
+    // Setup the kernel arguments
+    int width   = frame->m_width;
+    int height  = frame->m_height / 2;
+
+    size_t globalWorkDims[2] = { width, height };
+
+    // for videoCombineYUV - top field
+    kernel = kern[0].kernel->m_kernel;
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem),
+                               &frame->m_clBuffer[0]);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
+                               &frame->m_clBuffer[2]);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem),
+                               &yuvframe->m_clBuffer[0]);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 2, NULL,
+                                      globalWorkDims, NULL, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+        return;
+    }
+
+    // for videoCombineYUV - bottom field
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem),
+                               &frame->m_clBuffer[1]);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
+                               &frame->m_clBuffer[3]);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem),
+                               &yuvframe->m_clBuffer[1]);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 2, NULL,
+                                      globalWorkDims, NULL, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+        return;
+    }
+    LOG(VB_GENERAL, LOG_INFO, "OpenCL CombineYUV Done");
+}
+
+void OpenCLYUVToRGB(OpenCLDevice *dev, VideoSurface *yuvframe,
+                    VideoSurface *rgbframe)
+{
+    LOG(VB_GENERAL, LOG_INFO, "OpenCL YUVToRGB");
+
+    static OpenCLKernelDef kern[] = {
+        { NULL, "videoYUVToRGB",     KERNEL_CONVERT_CL }
+    };
+    static int kernCount = sizeof(kern)/sizeof(kern[0]);
+
+    int ciErrNum;
+
+    cl_kernel kernel;
+
+    if (!dev->OpenCLLoadKernels(kern, kernCount, NULL))
+        return;
+
+    // Make sure previous commands are finished
+    clFinish(dev->m_commandQ);
+
+    // Setup the kernel arguments
+    int width   = yuvframe->m_width;
+    int height  = yuvframe->m_height / 2;
+
+    size_t globalWorkDims[2] = { width, height };
+
+    // for videoYUVToRGB - top field
+    kernel = kern[0].kernel->m_kernel;
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem),
+                               &yuvframe->m_clBuffer[0]);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
+                               &rgbframe->m_clBuffer[0]);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 2, NULL,
+                                      globalWorkDims, NULL, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+        return;
+    }
+
+    // for videoYUVToRGB - bottom field
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem),
+                               &yuvframe->m_clBuffer[1]);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
+                               &rgbframe->m_clBuffer[1]);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 2, NULL,
+                                      globalWorkDims, NULL, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+        return;
+    }
+    LOG(VB_GENERAL, LOG_INFO, "OpenCL YUVToRGB Done");
+}
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

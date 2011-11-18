@@ -19,20 +19,25 @@ void videoWavelet(__read_only image2d_t fIn, __write_only image2d_t fOut,
         int xin = (x - (halfx * isDx)) * 2; 
         int yin = (y - (halfy * isDy)) * 2;;
 
-        float4 val;
-        val.x = read_imagef(fIn, sampler, (int2)(xin, yin)).x;
-        val.y = read_imagef(fIn, sampler, (int2)(xin, yin + 1)).x;
-        val.z = read_imagef(fIn, sampler, (int2)(xin + 1, yin)).x;
-        val.w = read_imagef(fIn, sampler, (int2)(xin + 1, yin + 1)).x;
+        float4 val[4];
+        val[0] = read_imagef(fIn, sampler, (int2)(xin, yin));
+        val[1] = read_imagef(fIn, sampler, (int2)(xin, yin + 1));
+        val[2] = read_imagef(fIn, sampler, (int2)(xin + 1, yin));
+        val[3] = read_imagef(fIn, sampler, (int2)(xin + 1, yin + 1));
 
-        val.zw *= pown(-1.0, isDx);
+        float sign = pown(-1.0, isDx);
+        val[2] *= sign;
+        val[3] *= sign;
 
-        float2 outval;
-        outval = M_SQRT1_2 * (val.xy + val.zw);
-        outval.y *= pown(-1.0, isDy);
+        float4 outval[2];
+        outval[0] = M_SQRT1_2 * (val[0] + val[2]);
+        outval[1] = M_SQRT1_2 * (val[1] + val[3]);
+
+        sign = pown(-1.0, isDy);
+        outval[1] *= sign;
 
         float4 output;
-        output = M_SQRT1_2 * (outval.x + outval.y);
+        output = M_SQRT1_2 * (outval[0] + outval[1]);
 
         write_imagef(fOut, (int2)(x, y), output);
     }

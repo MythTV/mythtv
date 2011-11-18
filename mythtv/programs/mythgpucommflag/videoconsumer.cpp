@@ -193,22 +193,20 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         count++;
         if (!dumped && count == 100 && videoFrame)
         {
-            videoFrame->m_frame->Dump("frame", 4);
+            videoFrame->m_frameRaw->Dump("frame");
+            videoFrame->m_frameYUV->Dump("yuv");
+            videoFrame->m_wavelet->Dump("wavelet");
+            VideoSurface rgb(m_dev, kSurfaceRGB,
+                             videoFrame->m_frameRaw->m_width,
+                             videoFrame->m_frameRaw->m_height);
+            OpenCLYUVToRGB(m_dev, videoFrame->m_frameYUV, &rgb);
+            rgb.Dump("rgb");
+            dumped = true;
         }
     }
 
     // Get wavelet from the frame (one level)
-    if (m_dev)
-    {
-        gpuWavelet = new VideoPacket(videoFrame);
-        OpenCLWavelet(m_dev, videoFrame, gpuWavelet);
-        if (!dumped && count == 100 && gpuWavelet)
-        {
-            gpuWavelet->m_frame->Dump("wavelet", 2);
-            dumped = true;
-        }
-    }
-    else
+    if (!m_dev)
     {
         wavelet = new AVFrame;
         SoftwareWavelet(&mpa_pic, wavelet);

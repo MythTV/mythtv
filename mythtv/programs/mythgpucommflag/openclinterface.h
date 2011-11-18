@@ -38,6 +38,13 @@ class OpenCLDeviceSpecific;
 class OpenCLKernel;
 typedef QMap<QString, OpenCLKernel *> OpenCLKernelMap;
 
+typedef struct {
+    OpenCLKernel *kernel;
+    const char   *entry;
+    const char   *filename;
+} OpenCLKernelDef;
+
+
 class OpenCLDevice
 {
   public:
@@ -49,6 +56,8 @@ class OpenCLDevice
     bool RegisterKernel(QString entry, QString filename);
     OpenCLKernel *GetKernel(QString name) 
         { return m_kernelMap.value(name, NULL); };
+    bool OpenCLLoadKernels(OpenCLKernelDef *kerns, int count, bool *init);
+
 
 //  private:
     bool m_valid;
@@ -149,12 +158,6 @@ class OpenCLKernel
     cl_program m_program;
     cl_kernel m_kernel;
 };
-
-typedef struct {
-    OpenCLKernel *kernel;
-    const char   *entry;
-    const char   *filename;
-} OpenCLKernelDef;
 
 extern OpenCLDeviceMap *devMap;
 

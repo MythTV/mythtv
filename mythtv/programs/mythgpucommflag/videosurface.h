@@ -19,16 +19,26 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
+typedef enum {
+    kSurfaceUninit,
+    kSurfaceVDPAURender,
+    kSurfaceWavelet,
+    kSurfaceYUV,
+    kSurfaceRGB
+} VideoSurfaceType;
+
 class VideoSurface
 {
   public:
     VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height, uint id,
                  VdpVideoSurface vdpSurface);
-    VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height);
+    VideoSurface(OpenCLDevice *dev, VideoSurfaceType type, uint32_t width,
+                 uint32_t height);
     ~VideoSurface();
     void Bind(void);
-    void Dump(QString basename, int count);
+    void Dump(QString basename);
 
+    VideoSurfaceType    m_type;
     uint                m_id;
     OpenCLDevice       *m_dev;
     uint32_t            m_width;

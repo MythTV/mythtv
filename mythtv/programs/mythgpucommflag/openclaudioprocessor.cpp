@@ -78,12 +78,15 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
         { NULL, "audioVolumeLevelReduce",  KERNEL_VOLUME_CL },
         { NULL, "audioVolumeLevelStats32", KERNEL_VOLUME_CL }
     };
+    static int kern32Count = sizeof(kern32)/sizeof(kern32[0]);
     static OpenCLKernelDef kern64[3] = {
         { NULL, "audioVolumeLevelMix",     KERNEL_VOLUME_CL },
         { NULL, "audioVolumeLevelReduce",  KERNEL_VOLUME_CL },
         { NULL, "audioVolumeLevelStats64", KERNEL_VOLUME_64_CL }
     };
+    static int kern64Count = sizeof(kern64)/sizeof(kern64[0]);
     static OpenCLKernelDef *kern = NULL;
+    static int kernCount = 0;
     static cl_long globalResults[4] = { 0, 0, 0, 0 };
     static OpenCLBufferPtr memBufs = NULL;
 
@@ -100,32 +103,18 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
         {
             LOG(VB_GENERAL, LOG_INFO, "Using 64bit float kernels");
             kern = kern64;
+            kernCount = kern64Count;
         }
         else
         {
             LOG(VB_GENERAL, LOG_INFO, "Using 32bit float kernels");
             kern = kern32;
+            kernCount = kern32Count;
         }
     }
     
-    for (int i = 0; i < 3; i++)
-    {
-        if (!kern[i].kernel)
-        {
-            kern[i].kernel = dev->m_kernelMap.value(kern[i].entry, NULL);
-            if (!kern[i].kernel)
-            {
-                if (dev->RegisterKernel(kern[i].entry, kern[i].filename))
-                    kern[i].kernel = dev->GetKernel(kern[i].entry);
-
-                if (!kern[i].kernel)
-                {
-                    return NULL;
-                }
-            }
-            init = true;
-        }
-    }
+    if (!dev->OpenCLLoadKernels(kern, kernCount, &init))
+        return NULL;
 
     // Make sure previous commands are finished
     clFinish(dev->m_commandQ);

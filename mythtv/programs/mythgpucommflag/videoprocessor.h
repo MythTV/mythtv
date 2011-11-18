@@ -46,7 +46,12 @@ void InitOpenCLVideoProcessors(void);
 void InitSoftwareVideoProcessors(void);
 
 void SoftwareWavelet(AVFrame *frame, AVFrame *wavelet);
-void OpenCLWavelet(OpenCLDevice *dev, VideoPacket *frame, VideoPacket *wavelet);
+void OpenCLCombineYUV(OpenCLDevice *dev, VideoSurface *frame,
+                      VideoSurface *yuvframe);
+void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
+                   VideoSurface *wavelet);
+void OpenCLYUVToRGB(OpenCLDevice *dev, VideoSurface *yuvframe,
+                    VideoSurface *rgbframe);
 
 #endif
 

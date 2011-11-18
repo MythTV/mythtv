@@ -5,6 +5,7 @@
 #include "mythlogging.h"
 #include "videodecoder.h"
 #include "videopacket.h"
+#include "videoprocessor.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -15,14 +16,18 @@ VideoPacketMap videoPacketMap;
 VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame) :
     m_decoder(decoder), m_frameIn(frame)
 {
-    m_frame = m_decoder->DecodeFrame(frame);
-    videoPacketMap.Add(m_frameIn, this);
-}
+    m_frameRaw = m_decoder->DecodeFrame(frame);
 
-VideoPacket::VideoPacket(VideoPacket *packet) : m_decoder(NULL), m_frameIn(NULL)
-{
-    m_frame = new VideoSurface(packet->m_frame->m_dev, packet->m_frame->m_width,
-                               packet->m_frame->m_height);
+    OpenCLDevice *dev = m_frameRaw->m_dev;
+
+    m_frameYUV = new VideoSurface(m_frameRaw->m_dev, kSurfaceYUV,
+                                  m_frameRaw->m_width, m_frameRaw->m_height);
+    OpenCLCombineYUV(dev, m_frameRaw, m_frameYUV);
+
+    m_wavelet  = new VideoSurface(m_frameRaw->m_dev, kSurfaceWavelet,
+                                  m_frameRaw->m_width, m_frameRaw->m_height);
+    OpenCLWavelet(dev, m_frameYUV, m_wavelet);
+
     videoPacketMap.Add(m_frameIn, this);
 }
 
@@ -30,11 +35,13 @@ VideoPacket::~VideoPacket()
 {
     videoPacketMap.Remove(m_frameIn);
 
-    if (m_decoder)
-        m_decoder->DiscardFrame(m_frame);
+    if (m_decoder && m_frameRaw)
+        m_decoder->DiscardFrame(m_frameRaw);
 
-    if (!m_frameIn && m_frame)
-        delete m_frame;
+    if (m_frameYUV)
+        delete m_frameYUV;
+    if (m_wavelet)
+        delete m_wavelet;
 }
 
 

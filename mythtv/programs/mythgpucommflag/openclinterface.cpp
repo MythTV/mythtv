@@ -463,6 +463,38 @@ OpenCLDevice::OpenCLDevice(cl_device_id device, bool needOpenGL) :
     m_valid = true;
 }
 
+bool OpenCLDevice::OpenCLLoadKernels(OpenCLKernelDef *kerns, int count,
+                                     bool *init)
+{
+    if (!kerns)
+        return false;
+
+    if (init)
+        *init = false;
+
+    for (int i = 0; i < count; i++)
+    {
+        if (!kerns[i].kernel)
+        {
+            kerns[i].kernel = m_kernelMap.value(kerns[i].entry, NULL);
+            if (!kerns[i].kernel)
+            {
+                if (RegisterKernel(kerns[i].entry, kerns[i].filename))
+                    kerns[i].kernel = GetKernel(kerns[i].entry);
+
+                if (!kerns[i].kernel)
+                {
+                    return false;
+                }
+
+                if (init)
+                    *init = true;
+            }
+        }
+    }
+    return true;
+}
+
 OpenCLDevice::~OpenCLDevice()
 {
     m_valid = false;
@@ -661,6 +693,8 @@ OpenCLKernel *OpenCLKernel::Create(OpenCLDevice *device, QString entry,
                                           QString filename)
 {
     QFile file(filename);
+
+    entry.detach();
 
     LOG(VB_GENERAL, LOG_INFO, QString("Loading OpenCL kernel %1 from %2")
         .arg(entry) .arg(filename));

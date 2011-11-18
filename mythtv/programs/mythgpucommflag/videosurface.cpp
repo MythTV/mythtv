@@ -18,8 +18,8 @@
 
 VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
                            uint id, VdpVideoSurface vdpSurface) : 
-    m_id(id), m_dev(dev), m_width(width), m_height(height),
-    m_vdpSurface(vdpSurface), m_valid(false)
+    m_type(kSurfaceVDPAURender), m_id(id), m_dev(dev), m_width(width),
+    m_height(height), m_vdpSurface(vdpSurface), m_valid(false)
 {
     memset(&m_render, 0, sizeof(m_render));
     memset(m_clBuffer, 0, sizeof(m_clBuffer));
@@ -99,26 +99,40 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
     m_valid = true;
 }
 
-VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height) :
-    m_id(0), m_dev(dev), m_width(width), m_height(height)
+VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
+                           uint32_t width, uint32_t height) :
+    m_type(type), m_id(0), m_dev(dev), m_width(width), m_height(height)
 {
+    int ciErrNum;
+    cl_image_format format;
+    uint32_t bufWidth;
+    uint32_t bufHeight;
+    int bufCount;
+
     memset(m_clBuffer, 0, sizeof(m_clBuffer));
 
-    int ciErrNum;
-    static cl_image_format format;
-    static bool formatInit = false;
-    
-    if (!formatInit)
+    switch (m_type)
     {
-        format.image_channel_order = CL_R;
-        format.image_channel_data_type = CL_SNORM_INT8;
-        formatInit = true;
+        case kSurfaceWavelet:
+            format.image_channel_data_type = CL_SNORM_INT8;
+            break;
+        case kSurfaceYUV:
+        case kSurfaceRGB:
+            format.image_channel_data_type = CL_UNORM_INT8;
+            break;
+        default:
+            return;
     }
 
-    for (int i = 0; i < 2; i++)
+    format.image_channel_order = CL_RGBA;
+    bufWidth = m_width;
+    bufHeight = m_height / 2;
+    bufCount = 2;
+
+    for (int i = 0; i < bufCount; i++)
     {
         m_clBuffer[i] = clCreateImage2D(m_dev->m_context, CL_MEM_READ_WRITE,
-                                        &format, m_width, m_height / 2, 0,
+                                        &format, bufWidth, bufHeight, 0,
                                         NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
@@ -128,6 +142,19 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height) :
             return;
         }
     }
+    m_valid = true;
+}
+
+VideoSurface::~VideoSurface()
+{
+    for (int i = 0; i < 4; i++)
+    {
+        if (m_clBuffer[i])
+            clReleaseMemObject(m_clBuffer[i]);
+    }
+
+    if (m_id)
+        glVDPAUUnregisterSurfaceNV(m_glSurface);
 }
 
 void VideoSurface::Bind(void)
@@ -158,9 +185,26 @@ void VideoSurface::Bind(void)
     glVDPAUUnmapSurfacesNV(1, &m_glSurface);
 }
 
-void VideoSurface::Dump(QString basename, int count)
+void VideoSurface::Dump(QString basename)
 {
     cl_int ciErrNum;
+    QString extension;
+    int count;
+
+    switch (m_type)
+    {
+        case kSurfaceVDPAURender:
+            count = 4;
+            break;
+        case kSurfaceWavelet:
+        case kSurfaceYUV:
+        case kSurfaceRGB:
+            extension = "ppm";
+            count = 2;
+            break;
+        default:
+            return;
+    }
 
     for (int i = 0; i < count; i++)
     {
@@ -195,33 +239,42 @@ void VideoSurface::Dump(QString basename, int count)
         ciErrNum = clEnqueueReadImage(m_dev->m_commandQ, m_clBuffer[i], CL_TRUE,
                                       origin, region, pitch, 0, buf, NULL, 0,
                                       NULL);
-        QString extension = (elemSize == 1) ? "pgm" : "bin";
+        if (m_type == kSurfaceVDPAURender)
+        {
+            if (elemSize == 1)
+                extension = "pgm";
+            else
+                extension = "bin";
+        }
         QString filename = QString("%1%2.%3").arg(basename).arg(i)
             .arg(extension);
+        LOG(VB_GENERAL, LOG_INFO, QString("Saving to %1").arg(filename));
         QFile file(filename);
         file.open(QIODevice::WriteOnly);
-        if (elemSize == 1)
+
+        if (elemSize == 4)
         {
-            QString line = QString("P5\n%1 %2\n255\n").arg(width).arg(height);
+            QString line = QString("P6\n%1 %2\n255\n").arg(width).arg(height);
             file.write(line.toLocal8Bit().constData());
+            for(int j = 0; j < width * height * elemSize; j += elemSize)
+            {
+                file.write(&buf[j], 3);
+            }
         }
-        file.write(buf, pitch*height);
+        else
+        {
+            if (elemSize == 1)
+            {
+                QString line = QString("P5\n%1 %2\n255\n") .arg(width)
+                    .arg(height);
+                file.write(line.toLocal8Bit().constData());
+            }
+            file.write(buf, pitch*height);
+        }
         file.close();
 
         delete [] buf;
     }
-}
-
-VideoSurface::~VideoSurface()
-{
-    for (int i = 0; i < 4; i++)
-    {
-        if (m_clBuffer[i])
-            clReleaseMemObject(m_clBuffer[i]);
-    }
-
-    if (m_id)
-        glVDPAUUnregisterSurfaceNV(m_glSurface);
 }
 
 /*
