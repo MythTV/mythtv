@@ -468,12 +468,12 @@ void TV::InitKeys(void)
             "program guide."), "/");
     REG_KEY("TV Frontend", "CHANUPDATE", QT_TRANSLATE_NOOP("MythControls",
             "Switch channels without exiting guide in Live TV mode."), "X");
-    REG_KEY("TV Frontend", "VOLUMEDOWN", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_VOLUMEDOWN, QT_TRANSLATE_NOOP("MythControls",
             "Volume down"), "[,{,F10,Volume Down");
-    REG_KEY("TV Frontend", "VOLUMEUP", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_VOLUMEUP, QT_TRANSLATE_NOOP("MythControls",
             "Volume up"), "],},F11,Volume Up");
-    REG_KEY("TV Frontend", "MUTE", QT_TRANSLATE_NOOP("MythControls", "Mute"),
-            "|,\\,F9,Volume Mute");
+    REG_KEY("TV Frontend", ACTION_MUTEAUDIO, QT_TRANSLATE_NOOP("MythControls",
+            "Mute"), "|,\\,F9,Volume Mute");
     REG_KEY("TV Frontend", "CYCLEAUDIOCHAN", QT_TRANSLATE_NOOP("MythControls",
             "Cycle audio channels"), "");
     REG_KEY("TV Frontend", "RANKINC", QT_TRANSLATE_NOOP("MythControls",
@@ -547,12 +547,14 @@ void TV::InitKeys(void)
             "Toggle recording status of current program"), "R");
     REG_KEY("TV Playback", ACTION_TOGGLEFAV, QT_TRANSLATE_NOOP("MythControls",
             "Toggle the current channel as a favorite"), "?");
-    REG_KEY("TV Playback", "VOLUMEDOWN", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_VOLUMEDOWN, QT_TRANSLATE_NOOP("MythControls",
             "Volume down"), "[,{,F10,Volume Down");
-    REG_KEY("TV Playback", "VOLUMEUP", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_VOLUMEUP, QT_TRANSLATE_NOOP("MythControls",
             "Volume up"), "],},F11,Volume Up");
-    REG_KEY("TV Playback", "MUTE", QT_TRANSLATE_NOOP("MythControls", "Mute"),
-            "|,\\,F9,Volume Mute");
+    REG_KEY("TV Playback", ACTION_MUTEAUDIO, QT_TRANSLATE_NOOP("MythControls",
+            "Mute"), "|,\\,F9,Volume Mute");
+    REG_KEY("TV Playback", ACTION_SETVOLUME, QT_TRANSLATE_NOOP("MythControls",
+            "Set the volume"), "");
     REG_KEY("TV Playback", "CYCLEAUDIOCHAN", QT_TRANSLATE_NOOP("MythControls",
             "Cycle audio channels"), "");
     REG_KEY("TV Playback", ACTION_TOGGLEUPMIX, QT_TRANSLATE_NOOP("MythControls",
@@ -666,11 +668,23 @@ void TV::InitKeys(void)
             "Decrease time stretch speed"), "");
     REG_KEY("TV Playback", "TOGGLESTRETCH", QT_TRANSLATE_NOOP("MythControls",
             "Toggle time stretch speed"), "");
-    REG_KEY("TV Playback", "TOGGLEAUDIOSYNC", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_TOGGELAUDIOSYNC,
+            QT_TRANSLATE_NOOP("MythControls",
             "Turn on audio sync adjustment controls"), "");
+    REG_KEY("TV Playback", ACTION_SETAUDIOSYNC,
+            QT_TRANSLATE_NOOP("MythControls",
+            "Set the audio sync adjustment"), "");
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS",
             QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
              "F");
+    REG_KEY("TV Playback", ACTION_SETBRIGHTNESS,
+            QT_TRANSLATE_NOOP("MythControls", "Set the picture brightness"), "");
+    REG_KEY("TV Playback", ACTION_SETCONTRAST,
+            QT_TRANSLATE_NOOP("MythControls", "Set the picture contrast"), "");
+    REG_KEY("TV Playback", ACTION_SETCOLOUR,
+            QT_TRANSLATE_NOOP("MythControls", "Set the picture colour"), "");
+    REG_KEY("TV Playback", ACTION_SETHUE,
+            QT_TRANSLATE_NOOP("MythControls", "Set the picture hue"), "");
     REG_KEY("TV Playback", ACTION_TOGGLESTUDIOLEVELS,
             QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
              "");
@@ -710,6 +724,12 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", ACTION_EXITSHOWNOPROMPTS,
             QT_TRANSLATE_NOOP("MythControls", "Exit Show without any prompts"),
             "");
+    REG_KEY("TV Playback", ACTION_JUMPCHAPTER, QT_TRANSLATE_NOOP("MythControls",
+            "Jump to a chapter"), "");
+    REG_KEY("TV Playback", ACTION_SWITCHTITLE, QT_TRANSLATE_NOOP("MythControls",
+            "Switch title"), "");
+    REG_KEY("TV Playback", ACTION_SWITCHANGLE, QT_TRANSLATE_NOOP("MythControls",
+            "Switch angle"), "");
 
     /* Interactive Television keys */
     REG_KEY("TV Playback", ACTION_MENURED,    QT_TRANSLATE_NOOP("MythControls",
@@ -1350,7 +1370,18 @@ void TV::GetStatus(void)
     ctx->CalcPlayerSliderPosition(info);
     if (ctx->player)
     {
+        if (!info.text["totalchapters"].isEmpty())
+        {
+            QList<long long> chapters;
+            ctx->player->GetChapterTimes(chapters);
+            QVariantList var;
+            foreach (long long chapter, chapters)
+                var << QVariant(chapter);
+            status.insert("chaptertimes", var);
+        }
+
         status.insert("playspeed", ctx->player->GetPlaySpeed());
+        status.insert("audiosyncoffset", (long long)ctx->player->GetAudioTimecodeOffset());
         if (ctx->player->GetAudio()->ControlsVolume())
         {
             status.insert("volume", ctx->player->GetVolume());
@@ -3716,11 +3747,11 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
 
     // only pass-through actions listed below
     return handled ||
-        !(has_action("VOLUMEDOWN",      actions) ||
-          has_action("VOLUMEUP",        actions) ||
+        !(has_action(ACTION_VOLUMEDOWN, actions) ||
+          has_action(ACTION_VOLUMEUP,   actions) ||
           has_action("STRETCHINC",      actions) ||
           has_action("STRETCHDEC",      actions) ||
-          has_action("MUTE",            actions) ||
+          has_action(ACTION_MUTEAUDIO,  actions) ||
           has_action("CYCLEAUDIOCHAN",  actions) ||
           has_action("TOGGLEASPECT",    actions) ||
           has_action("TOGGLEPIPMODE",   actions) ||
@@ -3759,9 +3790,9 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
         actx->player->Zoom(kZoomLeft);
     else if (has_action(ACTION_RIGHT, actions))
         actx->player->Zoom(kZoomRight);
-    else if (has_action("VOLUMEUP", actions))
+    else if (has_action(ACTION_VOLUMEUP, actions))
         actx->player->Zoom(kZoomAspectUp);
-    else if (has_action("VOLUMEDOWN", actions))
+    else if (has_action(ACTION_VOLUMEDOWN, actions))
         actx->player->Zoom(kZoomAspectDown);
     else if (has_action("ESCAPE", actions) ||
              has_action("BACK", actions))
@@ -3780,7 +3811,7 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
         // only pass-through actions listed below
         handled = !(has_action("STRETCHINC",     actions) ||
                     has_action("STRETCHDEC",     actions) ||
-                    has_action("MUTE",           actions) ||
+                    has_action(ACTION_MUTEAUDIO, actions) ||
                     has_action("CYCLEAUDIOCHAN", actions) ||
                     has_action(ACTION_PAUSE,     actions) ||
                     has_action(ACTION_CLEAROSD,  actions));
@@ -3856,7 +3887,7 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
         ChangeAudioSync(ctx, -10);
     else if (has_action(ACTION_DOWN, actions))
         ChangeAudioSync(ctx, 10);
-    else if (has_action("TOGGLEAUDIOSYNC", actions))
+    else if (has_action(ACTION_TOGGELAUDIOSYNC, actions))
         ClearOSD(ctx);
     else
         handled = false;
@@ -4123,13 +4154,13 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
 
         SetActive(ctx, 0, false);
     }
-    else if (has_action("VOLUMEDOWN", actions))
+    else if (has_action(ACTION_VOLUMEDOWN, actions))
         ChangeVolume(ctx, false);
-    else if (has_action("VOLUMEUP", actions))
+    else if (has_action(ACTION_VOLUMEUP, actions))
         ChangeVolume(ctx, true);
     else if (has_action("CYCLEAUDIOCHAN", actions))
         ToggleMute(ctx, true);
-    else if (has_action("MUTE", actions))
+    else if (has_action(ACTION_MUTEAUDIO, actions))
         ToggleMute(ctx);
     else if (has_action("STRETCHINC", actions))
         ChangeTimeStretch(ctx, 1);
@@ -4209,7 +4240,7 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         ToggleAspectOverride(ctx);
     else if (has_action("TOGGLEFILL", actions))
         ToggleAdjustFill(ctx);
-    else if (has_action("TOGGLEAUDIOSYNC", actions))
+    else if (has_action(ACTION_TOGGELAUDIOSYNC, actions))
         ChangeAudioSync(ctx, 0);   // just display
     else if (has_action(ACTION_TOGGLEVISUALISATION, actions))
         EnableVisualisation(ctx, false, true /*toggle*/);
@@ -7869,7 +7900,7 @@ void TV::EditSchedule(const PlayerContext *ctx, int editType)
     qApp->postEvent(this, me);
 }
 
-void TV::ChangeVolume(PlayerContext *ctx, bool up)
+void TV::ChangeVolume(PlayerContext *ctx, bool up, int newvolume)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (!ctx->player ||
@@ -7879,10 +7910,15 @@ void TV::ChangeVolume(PlayerContext *ctx, bool up)
         return;
     }
 
-    if (ctx->player->IsMuted() && up)
+    bool setabsolute = (newvolume >= 0 && newvolume <= 100);
+
+    if (ctx->player->IsMuted() && (up || setabsolute))
         ToggleMute(ctx);
 
-    uint curvol = ctx->player->AdjustVolume((up) ? +2 : -2);
+    uint curvol = setabsolute ?
+                      ctx->player->SetVolume(newvolume) :
+                      ctx->player->AdjustVolume((up) ? +2 : -2);
+
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!browsehelper->IsBrowsing())
@@ -7995,7 +8031,7 @@ void TV::ToggleUpmix(PlayerContext *ctx)
 }
 
 // dir in 10ms jumps
-void TV::ChangeAudioSync(PlayerContext *ctx, int dir)
+void TV::ChangeAudioSync(PlayerContext *ctx, int dir, int newsync)
 {
     long long newval;
 
@@ -8007,7 +8043,7 @@ void TV::ChangeAudioSync(PlayerContext *ctx, int dir)
     }
 
     audiosyncAdjustment = true;
-    newval = ctx->player->AdjustAudioTimecodeOffset(dir * 10);
+    newval = ctx->player->AdjustAudioTimecodeOffset(dir * 10, newsync);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!browsehelper->IsBrowsing())
@@ -8320,6 +8356,39 @@ void TV::customEvent(QEvent *e)
 
     // TODO Go through these and make sure they make sense...
     QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+
+    if (me->ExtraDataCount() == 1)
+    {
+        PlayerContext *ctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
+        int value = me->ExtraData(0).toInt();
+        if (message == ACTION_SETVOLUME)
+            ChangeVolume(ctx, false, value);
+        else if (message == ACTION_SETAUDIOSYNC)
+            ChangeAudioSync(ctx, 0, value);
+        else if (message == ACTION_SETBRIGHTNESS)
+            DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
+                                     kPictureAttribute_Brightness,
+                                     false, value);
+        else if (message == ACTION_SETCONTRAST)
+            DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
+                                     kPictureAttribute_Contrast,
+                                     false, value);
+        else if (message == ACTION_SETCOLOUR)
+            DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
+                                     kPictureAttribute_Colour,
+                                     false, value);
+        else if (message == ACTION_SETHUE)
+            DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
+                                     kPictureAttribute_Hue,
+                                     false, value);
+        else if (message == ACTION_JUMPCHAPTER)
+            DoJumpChapter(ctx, value);
+        else if (message == ACTION_SWITCHTITLE)
+            DoSwitchTitle(ctx, value - 1);
+        else if (message == ACTION_SWITCHANGLE)
+            DoSwitchAngle(ctx, value);
+        ReturnPlayerLock(ctx);
+    }
 
     if (message == ACTION_SCREENSHOT)
     {
@@ -8918,7 +8987,8 @@ void TV::DoTogglePictureAttribute(const PlayerContext *ctx,
 
 void TV::DoChangePictureAttribute(
     PlayerContext *ctx,
-    PictureAdjustType type, PictureAttribute attr, bool up)
+    PictureAdjustType type, PictureAttribute attr,
+    bool up, int newvalue)
 {
     int value = 99;
 
@@ -8928,7 +8998,7 @@ void TV::DoChangePictureAttribute(
         if (kPictureAttribute_Volume == attr)
         {
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-            ChangeVolume(ctx, up);
+            ChangeVolume(ctx, up, newvalue);
             return;
         }
         if (!ctx->player)
@@ -8936,7 +9006,15 @@ void TV::DoChangePictureAttribute(
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
             return;
         }
-        value = ctx->player->GetVideoOutput()->ChangePictureAttribute(attr, up);
+
+        if (ctx->player->GetVideoOutput())
+        {
+            VideoOutput *vo = ctx->player->GetVideoOutput();
+            if ((newvalue >= 0) && (newvalue <= 100))
+                value = vo->SetPictureAttribute(attr, newvalue);
+            else
+                value = vo->ChangePictureAttribute(attr, up);
+        }
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -9722,7 +9800,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         if (!msg.isEmpty())
             SetOSDMessage(actx, msg);
     }
-    else if (action.left(15) == "TOGGLEAUDIOSYNC")
+    else if (action.left(15) == ACTION_TOGGELAUDIOSYNC)
         ChangeAudioSync(actx, 0);
     else if (action == ACTION_TOGGLEVISUALISATION)
         EnableVisualisation(actx, false, true /*toggle*/);
@@ -9882,17 +9960,17 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                 actx->player->GoToMenu(menu);
             actx->UnlockDeletePlayer(__FILE__, __LINE__);
         }
-        else if (action.left(13) == "JUMPTOCHAPTER")
+        else if (action.left(13) == ACTION_JUMPCHAPTER)
         {
             int chapter = action.right(3).toInt();
             DoJumpChapter(actx, chapter);
         }
-        else if (action.left(11) == "JUMPTOTITLE")
+        else if (action.left(11) == ACTION_SWITCHTITLE)
         {
             int title = action.right(3).toInt();
             DoSwitchTitle(actx, title);
         }
-        else if (action.left(13) == "SWITCHTOANGLE")
+        else if (action.left(13) == ACTION_SWITCHANGLE)
         {
             int angle = action.right(3).toInt();
             DoSwitchAngle(actx, angle);
@@ -10028,7 +10106,7 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
                                  selected == "AUDIOTRACKS");
         }
         if (avsync)
-            osd->DialogAddButton(tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
+            osd->DialogAddButton(tr("Adjust Audio Sync"), ACTION_TOGGELAUDIOSYNC);
         if (visual && !active)
         {
             osd->DialogAddButton(tr("Enable Visualisation"),
@@ -10526,7 +10604,7 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
                 QString desc = chapter1 + QString(" (%1:%2:%3)")
                     .arg(hours, 2, 10, QChar(48)).arg(minutes, 2, 10, QChar(48))
                     .arg(secs, 2, 10, QChar(48));
-                osd->DialogAddButton(desc, QString("JUMPTOCHAPTER%1").arg(chapter2),
+                osd->DialogAddButton(desc, ACTION_JUMPCHAPTER + chapter2,
                                      false, current_chapter == (i + 1));
             }
         }
@@ -10544,7 +10622,7 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
 
             QString titleIdx = QString("%1").arg(i, 3, 10, QChar(48));
             QString desc = GetTitleName(ctx, i);
-            osd->DialogAddButton(desc, QString("JUMPTOTITLE%1").arg(titleIdx),
+            osd->DialogAddButton(desc, ACTION_SWITCHTITLE + titleIdx,
                                  false, current_title == i);
         }
     }
@@ -10558,7 +10636,7 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
         {
             QString angleIdx = QString("%1").arg(i, 3, 10, QChar(48));
             QString desc = GetAngleName(ctx, i);
-            osd->DialogAddButton(desc, QString("SWITCHTOANGLE%1").arg(angleIdx),
+            osd->DialogAddButton(desc, ACTION_SWITCHANGLE + angleIdx,
                                  false, current_angle == i);
         }
     }

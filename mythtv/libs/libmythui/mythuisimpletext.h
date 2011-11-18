@@ -35,23 +35,12 @@ class MUI_PUBLIC MythUISimpleText : public MythUIType
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect);
 
-#if 0 // Any reason to support this in a theme?
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void Finalize(void);
-#endif
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 
-    int m_Justification;
-    QString m_Message;
+    Qt::Alignment m_Justification;
     MythFontProperties m_Font;
-
-#if 0 // Any reason to support this in a theme?
-    friend class MythUIButton;
-    friend class MythThemedMenu;
-    friend class MythThemedMenuPrivate;
-#endif
+    QString m_Message;
 };
 
 #endif

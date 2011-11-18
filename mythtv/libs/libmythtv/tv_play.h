@@ -249,7 +249,7 @@ class MTV_PUBLIC TV : public QObject
     static int  ConfiguredTunerCards(void);
 
     // Used by EPG
-    void ChangeVolume(PlayerContext*, bool up);
+    void ChangeVolume(PlayerContext*, bool up, int newvolume = -1);
     void ToggleMute(PlayerContext*, const bool muteIndividualChannels = false);
 
     void SetNextProgPIPState(PIPState state) { jumpToProgramPIPState = state; }
@@ -405,7 +405,7 @@ class MTV_PUBLIC TV : public QObject
                                  const QStringList &actions);
 
     void ToggleUpmix(PlayerContext*);
-    void ChangeAudioSync(PlayerContext*, int dir);
+    void ChangeAudioSync(PlayerContext*, int dir, int newsync = -9999);
     bool AudioSyncHandleAction(PlayerContext*, const QStringList &actions);
 
     float StopFFRew(PlayerContext*);
@@ -423,7 +423,7 @@ class MTV_PUBLIC TV : public QObject
     int  GetCurrentAngle(const PlayerContext *ctx) const;
     QString GetAngleName(const PlayerContext *ctx, int angle) const;
     void DoSwitchAngle(PlayerContext*, int angle);
-    void DoJumpChapter(PlayerContext*, int direction);
+    void DoJumpChapter(PlayerContext*, int chapter);
     void DoSkipCommercials(PlayerContext*, int direction);
     void DoQueueTranscode(PlayerContext*, QString profile);
     void SetAutoCommercialSkip(const PlayerContext*,
@@ -493,7 +493,8 @@ class MTV_PUBLIC TV : public QObject
                                   PictureAdjustType type);
     void DoChangePictureAttribute(
         PlayerContext*,
-        PictureAdjustType type, PictureAttribute attr, bool up);
+        PictureAdjustType type, PictureAttribute attr,
+        bool up, int newvalue = -1);
     bool PictureAttributeHandleAction(PlayerContext*,
                                       const QStringList &actions);
     static PictureAttribute NextPictureAdjustType(

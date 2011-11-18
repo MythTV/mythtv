@@ -559,13 +559,13 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "CHANUPDATE")
             channelUpdate();
-        else if (action == "VOLUMEUP")
+        else if (action == ACTION_VOLUMEUP)
             volumeUpdate(true);
-        else if (action == "VOLUMEDOWN")
+        else if (action == ACTION_VOLUMEDOWN)
             volumeUpdate(false);
         else if (action == "CYCLEAUDIOCHAN")
             toggleMute(true);
-        else if (action == "MUTE")
+        else if (action == ACTION_MUTEAUDIO)
             toggleMute();
         else if (action == ACTION_TOGGLEPGORDER)
         {

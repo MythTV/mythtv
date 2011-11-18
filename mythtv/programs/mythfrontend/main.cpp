@@ -1605,24 +1605,6 @@ int main(int argc, char **argv)
     pmanager = new MythPluginManager();
     gContext->SetPluginManager(pmanager);
 
-    if (cmdline.toBool("runplugin"))
-    {
-        if (!pmanager->run_plugin(cmdline.toString("runplugin")) ||
-            !pmanager->run_plugin("myth" + cmdline.toString("runplugin")))
-        {
-            qApp->exec();
-            return GENERIC_EXIT_OK;
-        }
-
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Invalid plugin name supplied on command line: '%1'")
-                .arg(cmdline.toString("runplugin")));
-        // TODO: list available plugins
-        // will require new method in MythPluginManager to enumerate
-        // registered plugins
-        return GENERIC_EXIT_INVALID_CMDLINE;
-    }
-
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)
     {
@@ -1675,7 +1657,26 @@ int main(int argc, char **argv)
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kRemote, 50, 60);
 
-    if (cmdline.toBool("jumppoint"))
+    if (cmdline.toBool("runplugin"))
+    {
+        QStringList plugins = pmanager->EnumeratePlugins();
+
+        if (plugins.contains(cmdline.toString("runplugin")))
+            pmanager->run_plugin(cmdline.toString("runplugin"));
+        else if (plugins.contains("myth" + cmdline.toString("runplugin")))
+            pmanager->run_plugin("myth" + cmdline.toString("runplugin"));
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Invalid plugin name supplied on command line: '%1'")
+                    .arg(cmdline.toString("runplugin")));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Available plugins: %1")
+                    .arg(plugins.join(", ")));
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
+    else if (cmdline.toBool("jumppoint"))
     {
         MythMainWindow *mmw = GetMythMainWindow();
 
@@ -1686,9 +1687,9 @@ int main(int argc, char **argv)
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Invalid jump point supplied on the command line: %1")
                     .arg(cmdline.toString("jumppoint")));
-            // TODO: list available jump points
-            // will require new method from MythMainWindow to enumerate
-            // registered points
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Available jump points: %2")
+                    .arg(mmw->EnumerateDestinations().join(", ")));
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }

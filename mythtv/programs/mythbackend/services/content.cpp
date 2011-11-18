@@ -255,6 +255,61 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::ArtworkInfoList* Content::GetRecordingArtworkList( int              nChanId,
+                                                        const QDateTime &dStartTime  )
+{
+    if (nChanId <= 0 || !dStartTime.isValid())
+        throw( QString("Channel ID or StartTime appears invalid."));
+
+    ProgramInfo pInfo = ProgramInfo(nChanId, dStartTime);
+
+    return GetProgramArtworkList(pInfo.GetInetRef(), pInfo.GetSeason());
+}
+
+DTC::ArtworkInfoList* Content::GetProgramArtworkList( const QString &sInetref,
+                                                      int            nSeason  )
+{
+    ArtworkMap map = GetArtwork(sInetref, nSeason);
+
+    DTC::ArtworkInfoList *pInfos = new DTC::ArtworkInfoList();
+
+    for (ArtworkMap::const_iterator i = map.begin();
+         i != map.end(); ++i)
+    {
+        DTC::ArtworkInfo *pArtInfo = pInfos->AddNewArtworkInfo();
+        pArtInfo->setFileName(i.value().url);
+        switch (i.key())
+        {
+            case kArtworkFanart:
+                pArtInfo->setStorageGroup("Fanart");
+                pArtInfo->setType("fanart");
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                              "&FileName=%2").arg("Fanart")
+                              .arg(QUrl(i.value().url).path()));
+                break;
+            case kArtworkBanner:
+                pArtInfo->setStorageGroup("Banners");
+                pArtInfo->setType("banner");
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                              "&FileName=%2").arg("Fanart")
+                              .arg(QUrl(i.value().url).path()));
+                break;
+            case kArtworkCoverart:
+            default:
+                pArtInfo->setStorageGroup("Coverart");
+                pArtInfo->setType("coverart");
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                              "&FileName=%2").arg("Fanart")
+                              .arg(QUrl(i.value().url).path()));
+                break;
+        }
+    }
+    return pInfos;
+}
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QFileInfo Content::GetVideoArtwork( const QString &sType,
                                     int nId, int nWidth, int nHeight )
 {

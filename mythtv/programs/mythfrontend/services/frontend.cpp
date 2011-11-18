@@ -7,6 +7,7 @@
 #include "mythevent.h"
 #include "mythuistatetracker.h"
 #include "mythmainwindow.h"
+#include "tv_actions.h"
 
 #include "frontend.h"
 
@@ -19,6 +20,7 @@ DTC::FrontendStatus* Frontend::GetStatus(void)
 {
     DTC::FrontendStatus *status = new DTC::FrontendStatus();
     MythUIStateTracker::GetFreshState(status->State());
+    status->Process();
     return status;
 }
 
@@ -32,21 +34,22 @@ bool Frontend::SendMessage(const QString &Message)
     return true;
 }
 
-bool Frontend::SendAction(const QString &Action, const QString &File,
+bool Frontend::SendAction(const QString &Action, const QString &Value,
                           uint Width, uint Height)
 {
     if (!IsValidAction(Action))
         return false;
 
-    if (ACTION_HANDLEMEDIA == Action)
-    {
-        if (File.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("No file specified."));
-            return false;
-        }
+    static const QStringList value_actions =
+        QStringList() << ACTION_HANDLEMEDIA  << ACTION_SETVOLUME <<
+                         ACTION_SETAUDIOSYNC << ACTION_SETBRIGHTNESS <<
+                         ACTION_SETCONTRAST  << ACTION_SETCOLOUR <<
+                         ACTION_SETHUE       << ACTION_JUMPCHAPTER <<
+                         ACTION_SWITCHTITLE  << ACTION_SWITCHANGLE;
 
-        MythEvent* me = new MythEvent(Action, QStringList(File));
+    if (!Value.isEmpty() && value_actions.contains(Action))
+    {
+        MythEvent* me = new MythEvent(Action, QStringList(Value));
         qApp->postEvent(GetMythMainWindow(), me);
         return true;
     }
@@ -71,7 +74,13 @@ bool Frontend::SendAction(const QString &Action, const QString &File,
     return true;
 }
 
-DTC::FrontendActionList* Frontend::GetActionList(void)
+QStringList Frontend::GetContextList(void)
+{
+    InitialiseActions();
+    return gActionDescriptions.keys();
+}
+
+DTC::FrontendActionList* Frontend::GetActionList(const QString &Context)
 {
     DTC::FrontendActionList *list = new DTC::FrontendActionList();
 
@@ -81,6 +90,9 @@ DTC::FrontendActionList* Frontend::GetActionList(void)
     while (contexts.hasNext())
     {
         contexts.next();
+        if (!Context.isEmpty() && contexts.key() != Context)
+            continue;
+
         // TODO can we keep the context data with QMap<QString, QStringList>?
         QStringList actions = contexts.value();
         foreach (QString action, actions)

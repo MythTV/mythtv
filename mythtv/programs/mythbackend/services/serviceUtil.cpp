@@ -165,7 +165,7 @@ void FillRecRuleInfo( DTC::RecRule  *pRecRule,
                                              pRule->m_endtime) );
     pRecRule->setSeriesId       (  pRule->m_seriesid          );
     pRecRule->setProgramId      (  pRule->m_programid         );
-    pRecRule->setInetRef        (  pRule->m_inetref           );
+    pRecRule->setInetref        (  pRule->m_inetref           );
     pRecRule->setChanId         (  pRule->m_channelid         );
     pRecRule->setCallSign       (  pRule->m_station           );
     pRecRule->setDay            (  pRule->m_findday           );

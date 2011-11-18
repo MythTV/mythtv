@@ -48,6 +48,7 @@ class MTV_PUBLIC AudioPlayer
     int   GetSampleRate(void)   const { return m_samplerate;    }
     uint  GetVolume(void);
     uint  AdjustVolume(int change);
+    uint  SetVolume(int newvolume);
     float GetStretchFactor(void) const { return m_stretchfactor; }
     void  SetStretchFactor(float factor);
     bool  ToggleUpmix(void);

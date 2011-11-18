@@ -36,7 +36,7 @@ namespace DTC
 class SERVICE_PUBLIC VideoMetadataInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.01" );
 
     Q_PROPERTY( int             Id              READ Id               WRITE setId             )
     Q_PROPERTY( QString         Title           READ Title            WRITE setTitle          )
@@ -46,7 +46,7 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     Q_PROPERTY( QString         Studio          READ Studio           WRITE setStudio         )
     Q_PROPERTY( QString         Description     READ Description      WRITE setDescription    )
     Q_PROPERTY( QString         Certification   READ Certification    WRITE setCertification  )
-    Q_PROPERTY( QString         InetRef         READ InetRef          WRITE setInetRef        )
+    Q_PROPERTY( QString         Inetref         READ Inetref          WRITE setInetref        )
     Q_PROPERTY( QString         HomePage        READ HomePage         WRITE setHomePage       )
     Q_PROPERTY( QDateTime       ReleaseDate     READ ReleaseDate      WRITE setReleaseDate    )
     Q_PROPERTY( QDateTime       AddDate         READ AddDate          WRITE setAddDate        )
@@ -75,7 +75,7 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     PROPERTYIMP    ( QString    , Studio         )
     PROPERTYIMP    ( QString    , Description    )
     PROPERTYIMP    ( QString    , Certification  )
-    PROPERTYIMP    ( QString    , InetRef        )
+    PROPERTYIMP    ( QString    , Inetref        )
     PROPERTYIMP    ( QString    , HomePage       )
     PROPERTYIMP    ( QDateTime  , ReleaseDate    )
     PROPERTYIMP    ( QDateTime  , AddDate        )
