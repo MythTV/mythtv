@@ -69,12 +69,12 @@ void MythRect::CalculateArea(const MythRect & parentArea)
         Y = (int) (m_percentY * (float)m_parentArea.height()) + m_offsetY;
     if (m_percentWidth > 0.0)
         w = (int) (m_percentWidth * (float)(m_parentArea.width() - X))
-                   + m_offsetWidth;
+            + m_offsetWidth;
     else if (m_offsetWidth != 0)
         w = m_parentArea.width() - X + m_offsetWidth;
     if (m_percentHeight > 0.0)
         h = (int) (m_percentHeight * (float)(m_parentArea.height() - Y))
-                   + m_offsetHeight;
+            + m_offsetHeight;
     else if (m_offsetHeight != 0)
         h = m_parentArea.height() - Y + m_offsetHeight;
 
@@ -99,6 +99,11 @@ void MythRect::NormRect(void)
     int Y = 0;
     if (m_percentY == 0.0)
         Y = GetMythMainWindow()->NormY(y());
+
+    m_offsetX = GetMythMainWindow()->NormX(m_offsetX);
+    m_offsetY = GetMythMainWindow()->NormY(m_offsetY);
+    m_offsetWidth = GetMythMainWindow()->NormX(m_offsetWidth);
+    m_offsetHeight = GetMythMainWindow()->NormY(m_offsetHeight);
 
     QRect::moveTopLeft(QPoint(X,Y));
 
@@ -390,6 +395,9 @@ void MythPoint::NormPoint(void)
 
     if (m_percentY == 0.0)
         QPoint::setY(GetMythMainWindow()->NormY(y()));
+
+    m_offsetX = GetMythMainWindow()->NormX(m_offsetX);
+    m_offsetY = GetMythMainWindow()->NormY(m_offsetY);
 }
 
 /**
