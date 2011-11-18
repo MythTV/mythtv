@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <QCoreApplication>
 #include "mythmainwindow.h"
 #include "mythevent.h"
