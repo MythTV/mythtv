@@ -19,10 +19,11 @@
 VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
                            uint id, VdpVideoSurface vdpSurface) : 
     m_type(kSurfaceVDPAURender), m_id(id), m_dev(dev), m_width(width),
-    m_height(height), m_vdpSurface(vdpSurface), m_valid(false)
+    m_height(height), m_vdpSurface(vdpSurface), m_bufCount(4), m_valid(false)
 {
     memset(&m_render, 0, sizeof(m_render));
-    memset(m_clBuffer, 0, sizeof(m_clBuffer));
+    m_clBuffer = new cl_mem[m_bufCount];
+    memset(m_clBuffer, 0, m_bufCount * sizeof(cl_mem));
     m_render.surface = m_vdpSurface;
 
     char *zeros = new char[m_width*m_height/2];
@@ -107,16 +108,17 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
     cl_image_format format;
     uint32_t bufWidth;
     uint32_t bufHeight;
-    int bufCount;
 
-    memset(m_clBuffer, 0, sizeof(m_clBuffer));
+    m_bufCount = 2;
 
     switch (m_type)
     {
         case kSurfaceWavelet:
-            format.image_channel_data_type = CL_SNORM_INT8;
-            break;
+        case kSurfaceYUV2:
         case kSurfaceYUV:
+            format.image_channel_data_type = CL_SNORM_INT8;
+            m_bufCount = 4;
+            break;
         case kSurfaceRGB:
             format.image_channel_data_type = CL_UNORM_INT8;
             break;
@@ -124,12 +126,14 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
             return;
     }
 
+    m_clBuffer = new cl_mem[m_bufCount];
+    memset(m_clBuffer, 0, m_bufCount * sizeof(cl_mem));
+
     format.image_channel_order = CL_RGBA;
     bufWidth = m_width;
     bufHeight = m_height / 2;
-    bufCount = 2;
 
-    for (int i = 0; i < bufCount; i++)
+    for (int i = 0; i < m_bufCount; i++)
     {
         m_clBuffer[i] = clCreateImage2D(m_dev->m_context, CL_MEM_READ_WRITE,
                                         &format, bufWidth, bufHeight, 0,
@@ -147,10 +151,14 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
 
 VideoSurface::~VideoSurface()
 {
-    for (int i = 0; i < 4; i++)
+    if (m_clBuffer)
     {
-        if (m_clBuffer[i])
-            clReleaseMemObject(m_clBuffer[i]);
+        for (int i = 0; i < m_bufCount; i++)
+        {
+            if (m_clBuffer[i])
+                clReleaseMemObject(m_clBuffer[i]);
+        }
+        delete [] m_clBuffer;
     }
 
     if (m_id)
@@ -185,28 +193,28 @@ void VideoSurface::Bind(void)
     glVDPAUUnmapSurfacesNV(1, &m_glSurface);
 }
 
-void VideoSurface::Dump(QString basename)
+void VideoSurface::Dump(QString basename, int framenum)
 {
     cl_int ciErrNum;
     QString extension;
-    int count;
 
     switch (m_type)
     {
         case kSurfaceVDPAURender:
-            count = 4;
             break;
         case kSurfaceWavelet:
+        case kSurfaceYUV2:
+            extension = "ppm";
+            break;
         case kSurfaceYUV:
         case kSurfaceRGB:
             extension = "ppm";
-            count = 2;
             break;
         default:
             return;
     }
 
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < m_bufCount; i++)
     {
         cl_image_format format;
 
@@ -246,8 +254,8 @@ void VideoSurface::Dump(QString basename)
             else
                 extension = "bin";
         }
-        QString filename = QString("%1%2.%3").arg(basename).arg(i)
-            .arg(extension);
+        QString filename = QString("out/%1%2-%3.%4") .arg(basename) .arg(i)
+            .arg(framenum) .arg(extension);
         LOG(VB_GENERAL, LOG_INFO, QString("Saving to %1").arg(filename));
         QFile file(filename);
         file.open(QIODevice::WriteOnly);
@@ -256,7 +264,7 @@ void VideoSurface::Dump(QString basename)
         {
             QString line = QString("P6\n%1 %2\n255\n").arg(width).arg(height);
             file.write(line.toLocal8Bit().constData());
-            for(int j = 0; j < width * height * elemSize; j += elemSize)
+            for(int j = 0; j < (int)(width * height * elemSize); j += elemSize)
             {
                 file.write(&buf[j], 3);
             }

@@ -24,9 +24,13 @@ VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame) :
                                   m_frameRaw->m_width, m_frameRaw->m_height);
     OpenCLCombineYUV(dev, m_frameRaw, m_frameYUV);
 
+    m_frameYUVSNORM = new VideoSurface(m_frameRaw->m_dev, kSurfaceYUV,
+                                       m_frameRaw->m_width,
+                                       m_frameRaw->m_height);
+    OpenCLYUVToSNORM(dev, m_frameYUV, m_frameYUVSNORM);
     m_wavelet  = new VideoSurface(m_frameRaw->m_dev, kSurfaceWavelet,
                                   m_frameRaw->m_width, m_frameRaw->m_height);
-    OpenCLWavelet(dev, m_frameYUV, m_wavelet);
+    OpenCLWavelet(dev, m_frameYUVSNORM, m_wavelet);
 
     videoPacketMap.Add(m_frameIn, this);
 }
@@ -38,6 +42,8 @@ VideoPacket::~VideoPacket()
     if (m_decoder && m_frameRaw)
         m_decoder->DiscardFrame(m_frameRaw);
 
+    if (m_frameYUVSNORM)
+        delete m_frameYUVSNORM;
     if (m_frameYUV)
         delete m_frameYUV;
     if (m_wavelet)

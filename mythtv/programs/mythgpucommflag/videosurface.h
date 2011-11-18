@@ -24,6 +24,7 @@ typedef enum {
     kSurfaceVDPAURender,
     kSurfaceWavelet,
     kSurfaceYUV,
+    kSurfaceYUV2,
     kSurfaceRGB
 } VideoSurfaceType;
 
@@ -36,7 +37,7 @@ class VideoSurface
                  uint32_t height);
     ~VideoSurface();
     void Bind(void);
-    void Dump(QString basename);
+    void Dump(QString basename, int framenum);
 
     VideoSurfaceType    m_type;
     uint                m_id;
@@ -50,7 +51,8 @@ class VideoSurface
     GLuint              m_glVDPAUTex[4];
     GLuint              m_glOpenCLTex[4];
     GLuint              m_glFBO[4];
-    cl_mem              m_clBuffer[4];
+    cl_mem             *m_clBuffer;
+    int                 m_bufCount;
     bool                m_valid;
 };
 

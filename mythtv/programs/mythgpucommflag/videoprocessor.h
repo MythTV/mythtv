@@ -50,8 +50,12 @@ void OpenCLCombineYUV(OpenCLDevice *dev, VideoSurface *frame,
                       VideoSurface *yuvframe);
 void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
                    VideoSurface *wavelet);
+void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,
+                          VideoSurface *frame);
 void OpenCLYUVToRGB(OpenCLDevice *dev, VideoSurface *yuvframe,
                     VideoSurface *rgbframe);
+void OpenCLYUVToSNORM(OpenCLDevice *dev, VideoSurface *inframe,
+                      VideoSurface *outframe);
 
 #endif
 

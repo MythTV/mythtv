@@ -21,6 +21,7 @@ class VideoPacket
     AVFrame *m_frameIn;
     VideoSurface *m_frameRaw;
     VideoSurface *m_frameYUV;
+    VideoSurface *m_frameYUVSNORM;
     VideoSurface *m_wavelet;
 };
 

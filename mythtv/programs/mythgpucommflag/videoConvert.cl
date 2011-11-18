@@ -14,10 +14,32 @@ void videoCombineYUV(__read_only image2d_t Y, __read_only image2d_t UV,
     val.x  = read_imagef(Y,  sampler, (int2)(x, y)).x;
     val.yz = read_imagef(UV, sampler, (int2)(x / 2, y / 2)).xy;
     val.yz -= 0.5;  // VDPAU->OpenGL->OpenCL packs as CL_UNORM_8, need SNORM
+    val.yz *= 2.0;
     val.w  = 1.0;
 
     write_imagef(YUV, (int2)(x, y), val);
 }
+
+// Convert the YUV for use with SNORM buffers (for dumping)
+__kernel
+void videoYUVToSNORM(__read_only image2d_t in, __write_only image2d_t out)
+{
+    int x = get_global_id(0);
+    int y = get_global_id(1);
+    const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE |
+                              CLK_ADDRESS_CLAMP_TO_EDGE |
+                              CLK_FILTER_NEAREST;
+
+    float4 val;
+
+    val = read_imagef(in,  sampler, (int2)(x, y));
+    val.x -= 0.5;
+    val.x *= 2.0;
+    val.w  = 1.0;
+
+    write_imagef(out, (int2)(x, y), val);
+}
+
 
 // Convert Packed YUV into RGB
 __kernel

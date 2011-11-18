@@ -181,8 +181,6 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         return;
 
     VideoPacket *videoFrame = NULL;
-    VideoPacket *gpuWavelet = NULL;
-    static bool dumped = false;
     static uint64_t count = 0;
 
     // Push YUV frame to GPU/CPU Processing memory
@@ -191,17 +189,22 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         // Push frame to the GPU via OpenGL/OpenCL
         videoFrame = new VideoPacket(m_decoder, &mpa_pic);
         count++;
-        if (!dumped && count == 100 && videoFrame)
+        if ((count <= 100) && videoFrame)
         {
-            videoFrame->m_frameRaw->Dump("frame");
-            videoFrame->m_frameYUV->Dump("yuv");
-            videoFrame->m_wavelet->Dump("wavelet");
+            videoFrame->m_frameRaw->Dump("frame", count);
+            videoFrame->m_frameYUVSNORM->Dump("yuv", count);
+            videoFrame->m_wavelet->Dump("wavelet", count);
             VideoSurface rgb(m_dev, kSurfaceRGB,
                              videoFrame->m_frameRaw->m_width,
                              videoFrame->m_frameRaw->m_height);
             OpenCLYUVToRGB(m_dev, videoFrame->m_frameYUV, &rgb);
-            rgb.Dump("rgb");
-            dumped = true;
+            rgb.Dump("rgb", count);
+
+            VideoSurface yuv(m_dev, kSurfaceYUV2,
+                             videoFrame->m_frameRaw->m_width,
+                             videoFrame->m_frameRaw->m_height);
+            OpenCLWaveletInverse(m_dev, videoFrame->m_wavelet, &yuv);
+            yuv.Dump("unwavelet", count);
         }
     }
 
@@ -235,7 +238,6 @@ void VideoConsumer::ProcessPacket(Packet *packet)
     {
         // Free the frame in GPU/CPU memory if not needed
         delete videoFrame;
-        delete gpuWavelet;
     }
 }
 
