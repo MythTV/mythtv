@@ -83,7 +83,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     // Check set dirty status
     bool NeedsRedraw(void) const;
     void ResetNeedsRedraw(void);
-    void SetRedraw();
+    void SetRedraw(void);
 
     void SetChildNeedsRedraw(MythUIType *child);
 
@@ -202,6 +202,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     bool m_HasFocus;
     bool m_CanHaveFocus;
     bool m_Enabled;
+    bool m_EnableInitiator;
     bool m_Initiator;
     bool m_Vanish;
     bool m_Vanished;

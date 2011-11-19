@@ -46,6 +46,7 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
     m_extraLeading = 0;
     m_lineHeight = 0;
     m_textCursor = -1;
+    m_EnableInitiator = true;
 
     m_FontStates.insert("default", MythFontProperties());
     *m_Font = m_FontStates["default"];
@@ -82,6 +83,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
     m_extraLeading = 0;
     m_lineHeight = 0;
     m_textCursor = -1;
+    m_EnableInitiator = true;
 
     SetArea(displayRect);
     m_FontStates.insert("default", font);
@@ -638,6 +640,9 @@ void MythUIText::FillCutMessage(void)
     }
     else
     {
+        LOG(VB_GUI, LOG_DEBUG, QString("FillCutmessage '%1'")
+            .arg(m_CutMessage));
+
         QStringList templist;
         QStringList::iterator it;
 
@@ -748,7 +753,7 @@ void MythUIText::FillCutMessage(void)
         min_rect.moveBottom(m_Area.y() + m_Area.height());
     }
 
-    m_Initiator = true;
+    m_Initiator = m_EnableInitiator;
     if (m_MinSize.isValid())
     {
         // Record the minimal area needed for the message.

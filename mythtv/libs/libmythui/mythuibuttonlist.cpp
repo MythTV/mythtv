@@ -458,9 +458,10 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
 
                     LOG(VB_GUI, LOG_DEBUG,
                         QString("Added button item %1 "
-                                "r.width %2 height %3 total width %4+%5")
+                                "R.width %2 height %3 total width %4+%5"
+                                " (max %6)")
                         .arg(last_item).arg(width).arg(height)
-                        .arg(left_width).arg(right_width));
+                        .arg(left_width).arg(right_width).arg(max_width));
                 }
             }
             else
@@ -529,9 +530,10 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
 
                     LOG(VB_GUI, LOG_DEBUG,
                         QString("Added button item %1 "
-                                "l.width %2 height %3 total width %4+%5")
+                                "L.width %2 height %3 total width %4+%5"
+                                " (max %6)")
                         .arg(first_item).arg(width).arg(height)
-                        .arg(left_width).arg(right_width));
+                        .arg(left_width).arg(right_width).arg(max_width));
                 }
             }
             else

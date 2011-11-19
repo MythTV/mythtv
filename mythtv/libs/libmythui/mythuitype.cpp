@@ -33,6 +33,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
 
     m_Visible = true;
     m_Enabled = true;
+    m_EnableInitiator = false;
     m_Initiator = false;
     m_Vanish = false;
     m_Vanished = false;
@@ -1045,6 +1046,7 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_focusOrder = base->m_focusOrder;
 
     SetArea(base->m_Area);
+    m_EnableInitiator = base->m_EnableInitiator;
     m_MinSize = base->m_MinSize;
     m_Vanish = base->m_Vanish;
     m_Vanished = false;
@@ -1103,7 +1105,7 @@ bool MythUIType::ParseElement(
     {
         // Use parsePoint so percentages can be used
         if (element.hasAttribute("initiator"))
-            m_Initiator = parseBool(element.attribute("initiator"));
+            m_EnableInitiator = parseBool(element.attribute("initiator"));
 
         if (element.hasAttribute("vanish"))
             m_Vanish = parseBool(element.attribute("vanish"));

@@ -190,6 +190,7 @@ MythUIImage::MythUIImage(const QString &filepattern,
     m_HighNum = high;
 
     m_Delay = delayms;
+    m_EnableInitiator = true;
 
     d = new MythUIImagePrivate(this);
 
@@ -206,6 +207,7 @@ MythUIImage::MythUIImage(const QString &filename, MythUIType *parent,
     m_LowNum = 0;
     m_HighNum = 0;
     m_Delay = -1;
+    m_EnableInitiator = true;
 
     d = new MythUIImagePrivate(this);
 
@@ -218,6 +220,7 @@ MythUIImage::MythUIImage(MythUIType *parent, const QString &name)
     m_LowNum = 0;
     m_HighNum = 0;
     m_Delay = -1;
+    m_EnableInitiator = true;
 
     d = new MythUIImagePrivate(this);
 
@@ -600,6 +603,8 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 {
     d->m_UpdateLock.lockForRead();
 
+    m_Initiator = m_EnableInitiator;
+
     QSize bForceSize = m_ForceSize;
     QString bFilename = m_Filename;
     bFilename.detach();
@@ -611,6 +616,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
     if (bFilename.isEmpty())
     {
         Clear();
+        SetMinArea(QRect());
         SetRedraw();
 
         return false;
@@ -672,6 +678,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
              (!GetMythUI()->LoadCacheImage(filename, imagelabel,
                                            GetPainter(), cacheMode))))
         {
+            SetMinArea(QRect());
             LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
                 QString("Load(), spawning thread to load '%1'").arg(filename));
             ImageLoadThread *bImgThread = new ImageLoadThread(
@@ -713,12 +720,17 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                     d->m_UpdateLock.lockForWrite();
                     m_LastDisplay = QTime::currentTime();
                     d->m_UpdateLock.unlock();
+
+                    QRect rect(GetFullArea());
+                    rect.setSize(image->size());
+                    SetMinArea(rect);
                 }
                 else
                 {
                     m_ImagesLock.lock();
                     m_Images[j] = NULL;
                     m_ImagesLock.unlock();
+                    SetMinArea(QRect());
                 }
             }
         }
@@ -802,6 +814,10 @@ MythImage *MythUIImage::LoadImage(
         if (m_isReflected)
             image->setIsReflected(true);
 
+        QRect rect(GetFullArea());
+        rect.setSize(image->size());
+        SetMinArea(rect);
+
         bFoundInCache = true;
     }
     else
@@ -819,7 +835,13 @@ MythImage *MythUIImage::LoadImage(
         else
             ok = image->Load(filename);
 
-        if (!ok)
+        if (ok)
+        {
+            QRect rect(GetFullArea());
+            rect.setSize(image->size());
+            SetMinArea(rect);
+        }
+        else
         {
             image->DownRef();
 
@@ -828,6 +850,8 @@ MythImage *MythUIImage::LoadImage(
             m_loadingImagesCond.wakeAll();
             m_loadingImagesLock.unlock();
 
+            m_Initiator = m_EnableInitiator;
+            SetMinArea(QRect());
             return NULL;
         }
     }
@@ -885,6 +909,8 @@ MythImage *MythUIImage::LoadImage(
         m_loadingImagesCond.wakeAll();
         m_loadingImagesLock.unlock();
 
+        m_Initiator = m_EnableInitiator;
+        SetMinArea(QRect());
         return NULL;
     }
 
@@ -1084,7 +1110,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             }
         }
 
-        QRect area = GetFullArea().toQRect();
+        QRect area = GetArea().toQRect();
         area.translate(xoffset, yoffset);
 
         int alpha = CalcAlpha(alphaMod);
