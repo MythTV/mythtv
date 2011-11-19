@@ -74,8 +74,8 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void StopCycling();
 
     int GetJustification(void);
-    void SetCutDown(bool cut);
-    bool GetCutDown(void) const { return m_Cutdown; }
+    void SetCutDown(Qt::TextElideMode mode);
+    Qt::TextElideMode GetCutDown(void) const { return m_Cutdown; }
     void SetMultiLine(bool multiline);
     bool GetMultiLine(void) const { return m_MultiLine; }
 
@@ -113,7 +113,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     bool m_usingAltArea;
 #endif
     bool m_ShrinkNarrow;
-    bool m_Cutdown;
+    Qt::TextElideMode m_Cutdown;
     bool m_MultiLine;
     int  m_Leading;
     int  m_extraLeading;

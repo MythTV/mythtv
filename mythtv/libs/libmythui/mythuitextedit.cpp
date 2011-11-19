@@ -182,7 +182,7 @@ void MythUITextEdit::SetInitialStates()
 
     if (m_backgroundState && !m_backgroundState->DisplayState("active"))
         LOG(VB_GENERAL, LOG_ERR, LOC + "active state doesn't exist");
-    m_Text->SetCutDown(false);
+    m_Text->SetCutDown(Qt::ElideNone);
 
     QFontMetrics fm(m_Text->GetFontProperties()->face());
     int height = fm.height();

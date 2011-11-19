@@ -25,7 +25,7 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
       m_drawRect(),                                  m_cursorPos(-1, -1),
       m_Message(""),                                 m_CutMessage(""),
       m_DefaultMessage(""),                          m_TemplateText(""),
-      m_Cutdown(true),
+      m_Cutdown(Qt::ElideRight),
       m_Font(new MythFontProperties()),              m_colorCycling(false),
       m_startColor(),                                m_endColor(),
       m_numSteps(0),                                 m_curStep(0),
@@ -62,7 +62,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
       m_drawRect(displayRect),        m_cursorPos(-1, -1),
       m_Message(text.trimmed()),
       m_CutMessage(""),               m_DefaultMessage(text),
-      m_Cutdown(true),                m_Font(new MythFontProperties()),
+      m_Cutdown(Qt::ElideRight),      m_Font(new MythFontProperties()),
       m_colorCycling(false),          m_startColor(),
       m_endColor(),                   m_numSteps(0),
       m_curStep(0),
@@ -265,17 +265,17 @@ int MythUIText::GetJustification(void)
     return m_Justification;
 }
 
-void MythUIText::SetCutDown(bool cut)
+void MythUIText::SetCutDown(Qt::TextElideMode mode)
 {
-    if (cut != m_Cutdown)
+    if (mode != m_Cutdown)
     {
-        m_Cutdown = cut;
+        m_Cutdown = mode;
         if (m_scrolling && m_Cutdown)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("'%1': <scroll> and <cutdown> are "
                                              "not combinable.")
                 .arg(objectName()));
-            m_Cutdown = false;
+            m_Cutdown = Qt::ElideNone;
         }
         if (!m_Message.isEmpty())
         {
@@ -394,10 +394,10 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
 
         if (!m_MultiLine && line.textLength() < paragraph.size())
         {
-            if (m_Cutdown)
+            if (m_Cutdown != Qt::ElideNone)
             {
                 QFontMetrics fm(GetFontProperties()->face());
-                paragraph = fm.elidedText(paragraph, Qt::ElideRight, width);
+                paragraph = fm.elidedText(paragraph, m_Cutdown, width);
                 return false;
             }
             // If text does not fit, then expand so canvas size is correct
@@ -419,7 +419,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
                     .arg(height)
                     .arg(m_Area.height()));
 
-                if (m_Cutdown)
+                if (m_Cutdown != Qt::ElideNone)
                 {
                     QFontMetrics fm(GetFontProperties()->face());
                     QString cut_line = fm.elidedText(paragraph.mid(last_line),
@@ -499,8 +499,8 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
     int      best_width, too_narrow, last_width = -1;
     int      num_lines, line_height;
     int      attempt;
-    bool     cutdown = m_Cutdown;
-    m_Cutdown = false;
+    Qt::TextElideMode cutdown = m_Cutdown;
+    m_Cutdown = Qt::ElideNone;
 
     line_height = m_Leading + m_lineHeight;
     width = m_Area.width() / 2.0;
@@ -1074,7 +1074,16 @@ bool MythUIText::ParseElement(
     }
     else if (element.tagName() == "cutdown")
     {
-        SetCutDown(parseBool(element));
+        QString mode = getFirstText(element).toLower();
+
+        if (mode == "left")
+            SetCutDown(Qt::ElideLeft);
+        else if (mode == "middle")
+            SetCutDown(Qt::ElideMiddle);
+        else if (mode == "right" || parseBool(element))
+            SetCutDown(Qt::ElideRight);
+        else
+            SetCutDown(Qt::ElideNone);
     }
     else if (element.tagName() == "multiline")
     {
@@ -1242,11 +1251,11 @@ void MythUIText::CreateCopy(MythUIType *parent)
 
 void MythUIText::Finalize(void)
 {
-    if (m_scrolling && m_Cutdown)
+    if (m_scrolling && m_Cutdown != Qt::ElideNone)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("'%1': <scroll> and <cutdown> are "
                                          "not combinable.").arg(objectName()));
-        m_Cutdown = false;
+        m_Cutdown = Qt::ElideNone;
     }
     FillCutMessage();
 }
