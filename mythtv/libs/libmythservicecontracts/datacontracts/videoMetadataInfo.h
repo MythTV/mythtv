@@ -36,7 +36,7 @@ namespace DTC
 class SERVICE_PUBLIC VideoMetadataInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.01" );
+    Q_CLASSINFO( "version"    , "1.02" );
 
     Q_PROPERTY( int             Id              READ Id               WRITE setId             )
     Q_PROPERTY( QString         Title           READ Title            WRITE setTitle          )
@@ -60,7 +60,7 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     Q_PROPERTY( bool            Processed       READ Processed        WRITE setProcessed      )
     Q_PROPERTY( QString         FileName        READ FileName         WRITE setFileName       )
     Q_PROPERTY( QString         Hash            READ Hash             WRITE setHash           )
-    Q_PROPERTY( QString         Host            READ Host             WRITE setHost           )
+    Q_PROPERTY( QString         HostName        READ HostName         WRITE setHostName       )
     Q_PROPERTY( QString         Coverart        READ Coverart         WRITE setCoverart       )
     Q_PROPERTY( QString         Fanart          READ Fanart           WRITE setFanart         )
     Q_PROPERTY( QString         Banner          READ Banner           WRITE setBanner         )
@@ -89,7 +89,7 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     PROPERTYIMP    ( bool       , Processed      )
     PROPERTYIMP    ( QString    , FileName       )
     PROPERTYIMP    ( QString    , Hash           )
-    PROPERTYIMP    ( QString    , Host           )
+    PROPERTYIMP    ( QString    , HostName       )
     PROPERTYIMP    ( QString    , Coverart       )
     PROPERTYIMP    ( QString    , Fanart         )
     PROPERTYIMP    ( QString    , Banner         )

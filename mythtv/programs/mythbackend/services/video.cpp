@@ -96,7 +96,7 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( bool bDescending,
             pVideoMetadataInfo->setProcessed(metadata->GetProcessed());
             pVideoMetadataInfo->setFileName(metadata->GetFilename());
             pVideoMetadataInfo->setHash(metadata->GetHash());
-            pVideoMetadataInfo->setHost(metadata->GetHost());
+            pVideoMetadataInfo->setHostName(metadata->GetHost());
             pVideoMetadataInfo->setCoverart(metadata->GetCoverFile());
             pVideoMetadataInfo->setFanart(metadata->GetFanart());
             pVideoMetadataInfo->setBanner(metadata->GetBanner());
@@ -392,7 +392,7 @@ DTC::VideoMetadataInfo* Video::GetInfoFromMetadata(
         pVideoMetadataInfo->setProcessed(metadata->GetProcessed());
         pVideoMetadataInfo->setFileName(metadata->GetFilename());
         pVideoMetadataInfo->setHash(metadata->GetHash());
-        pVideoMetadataInfo->setHost(metadata->GetHost());
+        pVideoMetadataInfo->setHostName(metadata->GetHost());
         pVideoMetadataInfo->setCoverart(metadata->GetCoverFile());
         pVideoMetadataInfo->setFanart(metadata->GetFanart());
         pVideoMetadataInfo->setBanner(metadata->GetBanner());

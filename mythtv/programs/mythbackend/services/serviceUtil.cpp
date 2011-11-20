@@ -59,7 +59,7 @@ void FillProgramInfo( DTC::Program *pProgram,
         pProgram->setLastModified( pInfo->GetLastModifiedTime() );
         pProgram->setProgramFlags( pInfo->GetProgramFlags()     );
         pProgram->setFileName    ( pInfo->GetPathname()         );
-        pProgram->setHostname    ( pInfo->GetHostname()         );
+        pProgram->setHostName    ( pInfo->GetHostname()         );
 
         if (pInfo->GetOriginalAirDate().isValid())
             pProgram->setAirdate( pInfo->GetOriginalAirDate() );
@@ -96,13 +96,14 @@ void FillProgramInfo( DTC::Program *pProgram,
 
         if (bDetails)
         {
-            pRecording->setRecordId ( pInfo->GetRecordingRuleID()       );
-            pRecording->setRecGroup ( pInfo->GetRecordingGroup()        );
-            pRecording->setPlayGroup( pInfo->GetPlaybackGroup()         );
-            pRecording->setRecType  ( pInfo->GetRecordingRuleType()     );
-            pRecording->setDupInType( pInfo->GetDuplicateCheckSource()  );
-            pRecording->setDupMethod( pInfo->GetDuplicateCheckMethod()  );
-            pRecording->setEncoderId( pInfo->GetCardID()                );
+            pRecording->setRecordId    ( pInfo->GetRecordingRuleID()      );
+            pRecording->setRecGroup    ( pInfo->GetRecordingGroup()       );
+            pRecording->setPlayGroup   ( pInfo->GetPlaybackGroup()        );
+            pRecording->setStorageGroup( pInfo->GetStorageGroup()         );
+            pRecording->setRecType     ( pInfo->GetRecordingRuleType()    );
+            pRecording->setDupInType   ( pInfo->GetDuplicateCheckSource() );
+            pRecording->setDupMethod   ( pInfo->GetDuplicateCheckMethod() );
+            pRecording->setEncoderId   ( pInfo->GetCardID()               );
 
             const RecordingInfo ri(*pInfo);
             pRecording->setProfile( ri.GetProgramRecordingProfile() );
