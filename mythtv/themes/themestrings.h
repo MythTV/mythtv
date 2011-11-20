@@ -882,4 +882,5 @@ void strings_null() {
     ThemeUI::tr("This theme breaks away from many convetions. It uses squirrly fonts!");
     ThemeUI::tr("blootube-ng is a theme based on the original blootube-wide by Justin Hornsby (justin.hornsby@gmail.com) which uses very large graphics associated with every menu entry. All changes where made to bring this theme forward to MythTV 0.24.");
     ThemeUI::tr("Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme.");
+    ThemeUI::tr("There is/are %n recording(s) in this display group", 0, 1);
 }
