@@ -58,6 +58,7 @@ void FillProgramInfo( DTC::Program *pProgram,
         pProgram->setFileSize    ( pInfo->GetFilesize()         );
         pProgram->setLastModified( pInfo->GetLastModifiedTime() );
         pProgram->setProgramFlags( pInfo->GetProgramFlags()     );
+        pProgram->setFileName    ( pInfo->GetPathname()         );
         pProgram->setHostname    ( pInfo->GetHostname()         );
 
         if (pInfo->GetOriginalAirDate().isValid())

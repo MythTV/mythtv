@@ -39,7 +39,7 @@ class Program;
 class SERVICE_PUBLIC ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.04" );
+    Q_CLASSINFO( "version", "1.05" );
 
     // We need to know the type that will ultimately be contained in 
     // any QVariantList or QVariantMap.  We do his by specifying
@@ -181,6 +181,7 @@ class SERVICE_PUBLIC Program : public QObject
     Q_PROPERTY( qlonglong   FileSize     READ FileSize     WRITE setFileSize     DESIGNABLE SerializeDetails )
     Q_PROPERTY( QDateTime   LastModified READ LastModified WRITE setLastModified DESIGNABLE SerializeDetails )
     Q_PROPERTY( int         ProgramFlags READ ProgramFlags WRITE setProgramFlags DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     FileName     READ FileName     WRITE setFileName     DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     Hostname     READ Hostname     WRITE setHostname     DESIGNABLE SerializeDetails )
     Q_PROPERTY( QDate       Airdate      READ Airdate      WRITE setAirdate      DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     Description  READ Description  WRITE setDescription  DESIGNABLE SerializeDetails )
@@ -208,6 +209,7 @@ class SERVICE_PUBLIC Program : public QObject
     PROPERTYIMP    ( int         , VideoProps   )
     PROPERTYIMP    ( int         , AudioProps   )
     PROPERTYIMP    ( int         , SubProps     )
+    PROPERTYIMP    ( QString     , FileName     )
     PROPERTYIMP    ( QString     , Hostname     )
     PROPERTYIMP    ( QDate       , Airdate      )
     PROPERTYIMP    ( QString     , Description  )
@@ -281,6 +283,7 @@ class SERVICE_PUBLIC Program : public QObject
             m_VideoProps        = src.m_VideoProps;
             m_AudioProps        = src.m_AudioProps;
             m_SubProps          = src.m_SubProps;
+            m_FileName          = src.m_FileName;
             m_Hostname          = src.m_Hostname;
             m_Airdate           = src.m_Airdate;
             m_Description       = src.m_Description;
