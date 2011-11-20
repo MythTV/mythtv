@@ -14,8 +14,6 @@
 #define ACTION_PAUSE         "PAUSE"
 #define ACTION_CHANNELUP     "CHANNELUP"
 #define ACTION_CHANNELDOWN   "CHANNELDOWN"
-#define ACTION_SEEKRWND      "SEEKRWND"
-#define ACTION_SEEKFFWD      "SEEKFFWD"
 
 #define ACTION_TOGGLERECORD       "TOGGLERECORD"
 #define ACTION_TOGGLEFAV          "TOGGLEFAV"
@@ -27,12 +25,16 @@
 #define ACTION_FINDER            "FINDER"
 #define ACTION_TOGGLESLEEP       QString("TOGGLESLEEP")
 #define ACTION_PLAY              "PLAY"
-#define ACTION_JUMPPREV          "JUMPPREV"
-#define ACTION_JUMPREC           QString("JUMPREC")
 #define ACTION_VIEWSCHEDULED     "VIEWSCHEDULED"
 #define ACTION_SIGNALMON         "SIGNALMON"
 
 /* Navigation */
+#define ACTION_JUMPPREV             "JUMPPREV"
+#define ACTION_JUMPREC              QString("JUMPREC")
+#define ACTION_SEEKABSOLUTE         "SEEKABSOLUTE"
+#define ACTION_SEEKARB              "ARBSEEK"
+#define ACTION_SEEKRWND             "SEEKRWND"
+#define ACTION_SEEKFFWD             "SEEKFFWD"
 #define ACTION_JUMPFFWD             "JUMPFFWD"
 #define ACTION_JUMPRWND             "JUMPRWND"
 #define ACTION_JUMPBKMRK            "JUMPBKMRK"

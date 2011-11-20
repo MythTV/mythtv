@@ -507,8 +507,10 @@ void TV::InitKeys(void)
             "Fast Forward"), "Right");
     REG_KEY("TV Playback", ACTION_SEEKRWND, QT_TRANSLATE_NOOP("MythControls",
             "Rewind"), "Left");
-    REG_KEY("TV Playback", "ARBSEEK", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_SEEKARB, QT_TRANSLATE_NOOP("MythControls",
             "Arbitrary Seek"), "*");
+    REG_KEY("TV Playback", ACTION_SEEKABSOLUTE, QT_TRANSLATE_NOOP("MythControls",
+            "Seek to a position in seconds"), "");
     REG_KEY("TV Playback", ACTION_CHANNELUP, QT_TRANSLATE_NOOP("MythControls",
             "Channel up"), "Up");
     REG_KEY("TV Playback", ACTION_CHANNELDOWN, QT_TRANSLATE_NOOP("MythControls",
@@ -3957,7 +3959,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         if (!msg.isEmpty())
             SetOSDMessage(ctx, msg);
     }
-    else if (has_action("ARBSEEK", actions) && !isDVD)
+    else if (has_action(ACTION_SEEKARB, actions) && !isDVD)
     {
         if (asInputMode)
         {
@@ -4659,10 +4661,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         else if ((tokens[2] == "POSITION") && (tokens.size() == 4) &&
                  (tokens[3].contains(QRegExp("^\\d+$"))))
         {
-            long long rel_frame = tokens[3].toInt();
-            rel_frame -= (long long) (fplay * (1.0 /
-                                      ctx->player->GetFrameRate()));
-            DoSeek(ctx, rel_frame, tr("Jump To"));
+            DoSeekAbsolute(ctx, tokens[3].toInt());
         }
     }
     else if (tokens.size() >= 3 && tokens[1] == "VOLUME")
@@ -5773,6 +5772,19 @@ void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg)
     }
 }
 
+void TV::DoSeekAbsolute(PlayerContext *ctx, long long seconds)
+{
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (!ctx->player)
+    {
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        return;
+    }
+    seconds -= (ctx->player->GetFramesPlayed() - 1) / ctx->player->GetFrameRate();
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    DoSeek(ctx, seconds, tr("Jump To"));
+}
+
 void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence)
 {
     bool ok = false;
@@ -5787,7 +5799,7 @@ void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence)
         DoSeek(ctx, time, tr("Jump Ahead"));
     else if (whence == ARBSEEK_REWIND)
         DoSeek(ctx, -time, tr("Jump Back"));
-    else
+    else if (whence == ARBSEEK_END)
     {
         ctx->LockDeletePlayer(__FILE__, __LINE__);
         if (!ctx->player)
@@ -5795,15 +5807,13 @@ void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence)
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
             return;
         }
-        if (whence == ARBSEEK_END)
-            time = (ctx->player->CalcMaxFFTime(LONG_MAX, false) /
-                    ctx->player->GetFrameRate()) - time;
-        else
-            time = time - (ctx->player->GetFramesPlayed() - 1) /
-                    ctx->player->GetFrameRate();
+        time = (ctx->player->CalcMaxFFTime(LONG_MAX, false) /
+                ctx->player->GetFrameRate()) - time;
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         DoSeek(ctx, time, tr("Jump To"));
     }
+    else
+        DoSeekAbsolute(ctx, time);
 }
 
 void TV::NormalSpeed(PlayerContext *ctx)
@@ -8387,6 +8397,8 @@ void TV::customEvent(QEvent *e)
             DoSwitchTitle(ctx, value - 1);
         else if (message == ACTION_SWITCHANGLE)
             DoSwitchAngle(ctx, value);
+        else if (message == ACTION_SEEKABSOLUTE)
+            DoSeekAbsolute(ctx, value);
         ReturnPlayerLock(ctx);
     }
 

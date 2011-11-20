@@ -394,6 +394,7 @@ class MTV_PUBLIC TV : public QObject
         ARBSEEK_FORWARD,
         ARBSEEK_END
     };
+    void DoSeekAbsolute(PlayerContext *ctx, long long seconds);
     void DoArbSeek(PlayerContext*, ArbSeekWhence whence);
     void DoJumpFFWD(PlayerContext *ctx);
     void DoJumpRWND(PlayerContext *ctx);
