@@ -47,7 +47,7 @@ class Video : public VideoServices
 
         DTC::VideoMetadataInfo*   GetVideo           ( int      Id               );
 
-        DTC::VideoMetadataInfo*   GetVideoByFilename ( const QString  &Filename  );
+        DTC::VideoMetadataInfo*   GetVideoByFileName ( const QString  &FileName  );
 
         DTC::VideoLookupList*     LookupVideo        ( const QString    &Title,
                                                        const QString    &Subtitle,
@@ -58,8 +58,8 @@ class Video : public VideoServices
 
         bool                      RemoveVideoFromDB  ( int      Id               );
 
-        bool                      AddVideo           ( const QString  &Filename,
-                                                       const QString  &Host      );
+        bool                      AddVideo           ( const QString  &FileName,
+                                                       const QString  &HostName  );
 
         /* Bluray Methods */
 
@@ -112,9 +112,9 @@ class ScriptableVideo : public QObject
             return m_obj.GetVideo( Id );
         }
 
-        QObject* GetVideoByFilename( const QString    &Filename  )
+        QObject* GetVideoByFileName( const QString    &FileName  )
         {
-            return m_obj.GetVideoByFilename( Filename );
+            return m_obj.GetVideoByFileName( FileName );
         }
 
         QObject* LookupVideo( const QString    &Title,
@@ -133,10 +133,10 @@ class ScriptableVideo : public QObject
             return m_obj.RemoveVideoFromDB( Id );
         }
 
-        bool AddVideo( const QString  &Filename,
-                       const QString  &Host      )
+        bool AddVideo( const QString  &FileName,
+                       const QString  &HostName  )
         {
-            return m_obj.AddVideo( Filename, Host );
+            return m_obj.AddVideo( FileName, HostName );
         }
 };
 

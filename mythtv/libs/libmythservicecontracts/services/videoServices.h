@@ -78,7 +78,7 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 
         virtual DTC::VideoMetadataInfo*     GetVideo           ( int              Id         ) = 0;
 
-        virtual DTC::VideoMetadataInfo*     GetVideoByFilename ( const QString    &Filename  ) = 0;
+        virtual DTC::VideoMetadataInfo*     GetVideoByFileName ( const QString    &FileName  ) = 0;
 
         virtual DTC::VideoLookupList*       LookupVideo        ( const QString    &Title,
                                                                  const QString    &Subtitle,
@@ -89,8 +89,8 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 
         virtual bool                        RemoveVideoFromDB  ( int              Id         ) = 0;
 
-        virtual bool                        AddVideo           ( const QString    &Filename,
-                                                                 const QString    &Host      ) = 0;
+        virtual bool                        AddVideo           ( const QString    &FileName,
+                                                                 const QString    &HostName  ) = 0;
 
         // Bluray Metadata
 

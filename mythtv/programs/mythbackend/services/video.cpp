@@ -151,13 +151,13 @@ DTC::VideoMetadataInfo* Video::GetVideo( int Id )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::VideoMetadataInfo* Video::GetVideoByFilename( const QString &Filename )
+DTC::VideoMetadataInfo* Video::GetVideoByFileName( const QString &FileName )
 {
     VideoMetadataListManager::metadata_list videolist;
     VideoMetadataListManager::loadAllFromDatabase(videolist);
     VideoMetadataListManager *mlm = new VideoMetadataListManager();
     mlm->setList(videolist);
-    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byFilename(Filename);
+    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byFilename(FileName);
 
     if ( !metadata )
         throw( QString( "No metadata found for selected filename!." ));
@@ -307,23 +307,23 @@ bool Video::RemoveVideoFromDB( int Id )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Video::AddVideo( const QString &sFilename,
-                      const QString &sHost     )
+bool Video::AddVideo( const QString &sFileName,
+                      const QString &sHostName )
 {
-    if ( sHost.isEmpty() )
+    if ( sHostName.isEmpty() )
         throw( QString( "Host not provided! Local storage is deprecated and "
                         "is not supported by the API." ));
 
-    if ( sFilename.isEmpty() ||
-        (sFilename.contains("/../")) ||
-        (sFilename.startsWith("../")) )
+    if ( sFileName.isEmpty() ||
+        (sFileName.contains("/../")) ||
+        (sFileName.startsWith("../")) )
     {
         throw( QString( "Filename not provided, or fails sanity checks!" ));
     }
 
-    StorageGroup sgroup("Videos", sHost);
+    StorageGroup sgroup("Videos", sHostName);
 
-    QString fullname = sgroup.FindFile(sFilename);
+    QString fullname = sgroup.FindFile(sFileName);
 
     if ( !QFile::exists(fullname) )
         throw( QString( "Provided filename does not exist!" ));
@@ -337,23 +337,23 @@ bool Video::AddVideo( const QString &sFilename,
         hash = "";
     }
 
-    VideoMetadata newFile(sFilename, hash,
+    VideoMetadata newFile(sFileName, hash,
                           VIDEO_TRAILER_DEFAULT,
                           VIDEO_COVERFILE_DEFAULT,
                           VIDEO_SCREENSHOT_DEFAULT,
                           VIDEO_BANNER_DEFAULT,
                           VIDEO_FANART_DEFAULT,
-                          VideoMetadata::FilenameToMeta(sFilename, 1),
-                          VideoMetadata::FilenameToMeta(sFilename, 4),
+                          VideoMetadata::FilenameToMeta(sFileName, 1),
+                          VideoMetadata::FilenameToMeta(sFileName, 4),
                           QString(), VIDEO_YEAR_DEFAULT,
                           QDate::fromString("0000-00-00","YYYY-MM-DD"),
                           VIDEO_INETREF_DEFAULT, QString(),
                           VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
                           0.0, VIDEO_RATING_DEFAULT, 0,
-                          VideoMetadata::FilenameToMeta(sFilename, 2).toInt(),
-                          VideoMetadata::FilenameToMeta(sFilename, 3).toInt(),
+                          VideoMetadata::FilenameToMeta(sFileName, 2).toInt(),
+                          VideoMetadata::FilenameToMeta(sFileName, 3).toInt(),
                           QDate::currentDate(), 0, ParentalLevel::plLowest);
-    newFile.SetHost(sHost);
+    newFile.SetHost(sHostName);
     newFile.SaveToDatabase();
 
     return true;
