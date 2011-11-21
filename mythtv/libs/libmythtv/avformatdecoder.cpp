@@ -1768,14 +1768,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
 
+                // ffmpeg does not return a bitrate for several codecs and
+                // formats. Forcing it to 500000 ensures the ringbuffer does not
+                // use optimisations for low bitrate (audio and data) streams.
                 if (enc->bit_rate == 0)
-                    unknownbitrate = true;
-
-                // HACK -- begin
-                // ffmpeg is unable to compute H.264 bitrates in mpegts?
-                if (CODEC_IS_H264(enc->codec_id) && enc->bit_rate == 0)
+                {
                     enc->bit_rate = 500000;
-                // HACK -- end
+                    unknownbitrate = true;
+                }
 
                 StreamInfo si(i, 0, 0, 0, 0);
                 tracks[kTrackTypeVideo].push_back(si);
