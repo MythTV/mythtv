@@ -70,7 +70,10 @@ class CECAdapterPriv
     static QStringList GetDeviceList(void)
     {
         QStringList results;
-        ICECAdapter *adapter = LoadLibCec("MythTV");
+        cec_device_type_list list;
+        list.Clear();
+        list.Add(CEC_DEVICE_TYPE_PLAYBACK_DEVICE);
+        ICECAdapter *adapter = LibCecInit("MythTV", list);
         if (!adapter)
             return results;
         cec_adapter *devices = new cec_adapter[MAX_CEC_DEVICES];
@@ -116,7 +119,10 @@ class CECAdapterPriv
         }
 
         // create adapter interface
-        adapter = LoadLibCec("MythTV", defaultDeviceID, defaultHDMIPort);
+        cec_device_type_list list;
+        list.Clear();
+        list.Add(CEC_DEVICE_TYPE_PLAYBACK_DEVICE);
+        adapter = LibCecInit("MythTV", list);
 
         if (!adapter)
         {
@@ -173,8 +179,20 @@ class CECAdapterPriv
 
         LOG(VB_GENERAL, LOG_INFO, LOC + "Opened CEC device.");
 
-        // turn on tv and switch input (if configured)
+        // turn on tv (if configured)
         powerOnTV = powerOnTVOnStart;
+        HandleActions();
+
+        // get the vendor ID (for non-standard implementations)
+        adapter->GetDeviceVendorId(CECDEVICE_TV);
+
+        // set the physical address
+        adapter->SetPhysicalAddress(defaultHDMIPort);
+
+        // set the logical address
+        adapter->SetLogicalAddress(defaultDeviceID);
+
+        // switch input (if configured)
         switchInput = true;
         HandleActions();
 
