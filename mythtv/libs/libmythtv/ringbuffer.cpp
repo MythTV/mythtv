@@ -384,7 +384,7 @@ void RingBuffer::CalcReadAheadThresh(void)
     {
         if (low_buffers)
         {
-            LOG(VB_FILE, LOG_INFO, LOC +
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 "Buffering optimisations disabled.");
         }
         low_buffers = false;
@@ -809,7 +809,7 @@ void RingBuffer::run(void)
 
                 if (readtimeavg < 150 && 
                     (uint)readblocksize < (BUFFER_SIZE_MINIMUM >>2) &&
-                    readblocksize >= CHUNK)
+                    readblocksize >= CHUNK /* low_buffers */)
                 {
                     int old_block_size = readblocksize;
                     readblocksize = 3 * readblocksize / 2;
