@@ -26,7 +26,9 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
     memset(m_clBuffer, 0, m_bufCount * sizeof(cl_mem));
     m_render.surface = m_vdpSurface;
 
-    char *zeros = new char[m_width*m_height/2];
+    m_realWidth = m_width;
+    m_realHeight = m_height / 2;
+    char *zeros = new char[m_realWidth*m_realHeight];
 
     glGenTextures(4, m_glVDPAUTex);
     glGenTextures(4, m_glOpenCLTex);
@@ -65,8 +67,8 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
 
         glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0,
                      (i < 2) ? GL_RED : GL_RG,
-                     (i < 2) ? m_width : m_width / 2,
-                     (i < 2) ? m_height / 2 : m_height / 4,
+                     (i < 2) ? m_realWidth : m_realWidth / 2,
+                     (i < 2) ? m_realHeight : m_realHeight / 2,
                      0, 
                      (i < 2) ? GL_RED : GL_RG,
                      GL_UNSIGNED_BYTE, 
@@ -108,17 +110,30 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
     cl_image_format format;
     uint32_t bufWidth;
     uint32_t bufHeight;
+    uint32_t temp = 0;
 
     m_bufCount = 2;
+    bufWidth = m_width;
+    bufHeight = m_height / 2;
 
     switch (m_type)
     {
         case kSurfaceWavelet:
         case kSurfaceYUV2:
-        case kSurfaceYUV:
             format.image_channel_data_type = CL_SNORM_INT8;
             m_bufCount = 4;
             break;
+        case kSurfaceLogoROI:
+            bufHeight /= 2;
+            temp = (m_height / 3) * 4;
+            bufWidth = m_width - (temp / 2);
+        case kSurfaceYUV:
+            format.image_channel_data_type = CL_SNORM_INT8;
+            break;
+        case kSurfaceLogoRGB:
+            bufHeight /= 2;
+            temp = (m_height / 3) * 4;
+            bufWidth = m_width - (temp / 2);
         case kSurfaceRGB:
             format.image_channel_data_type = CL_UNORM_INT8;
             break;
@@ -126,12 +141,13 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
             return;
     }
 
+    m_realWidth = bufWidth;
+    m_realHeight = bufHeight;
+
     m_clBuffer = new cl_mem[m_bufCount];
     memset(m_clBuffer, 0, m_bufCount * sizeof(cl_mem));
 
     format.image_channel_order = CL_RGBA;
-    bufWidth = m_width;
-    bufHeight = m_height / 2;
 
     for (int i = 0; i < m_bufCount; i++)
     {
@@ -178,8 +194,8 @@ void VideoSurface::Bind(void)
         for (int j = 0; j < 2; j++)
         {
             GLenum bufnum = GL_COLOR_ATTACHMENT0_EXT + j;
-            uint32_t width  = (i < 1) ? m_width : m_width / 2;
-            uint32_t height = (i < 1) ? m_height / 2 : m_height / 4; 
+            uint32_t width  = (i < 1) ? m_realWidth : m_realWidth / 2;
+            uint32_t height = (i < 1) ? m_realHeight : m_realHeight / 2; 
 
             glReadBuffer(bufnum);
             glDrawBuffer(bufnum);
@@ -208,6 +224,8 @@ void VideoSurface::Dump(QString basename, int framenum)
             break;
         case kSurfaceYUV:
         case kSurfaceRGB:
+        case kSurfaceLogoROI:
+        case kSurfaceLogoRGB:
             extension = "ppm";
             break;
         default:

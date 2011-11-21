@@ -25,7 +25,9 @@ typedef enum {
     kSurfaceWavelet,
     kSurfaceYUV,
     kSurfaceYUV2,
-    kSurfaceRGB
+    kSurfaceRGB,
+    kSurfaceLogoROI,
+    kSurfaceLogoRGB
 } VideoSurfaceType;
 
 class VideoSurface
@@ -44,6 +46,8 @@ class VideoSurface
     OpenCLDevice       *m_dev;
     uint32_t            m_width;
     uint32_t            m_height;
+    uint32_t            m_realWidth;
+    uint32_t            m_realHeight;
     PixelFormat         m_pixFmt;
     VdpVideoSurface     m_vdpSurface;
     vdpau_render_state  m_render;

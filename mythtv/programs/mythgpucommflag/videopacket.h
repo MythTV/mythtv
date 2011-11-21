@@ -14,9 +14,10 @@ extern "C" {
 class VideoPacket
 {
   public:
-    VideoPacket(VideoDecoder *decoder, AVFrame *frame);
+    VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num);
     ~VideoPacket();
 
+    uint64_t m_num;
     VideoDecoder *m_decoder;
     AVFrame *m_frameIn;
     VideoSurface *m_frameRaw;

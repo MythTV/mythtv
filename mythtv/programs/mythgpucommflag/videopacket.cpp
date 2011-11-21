@@ -13,8 +13,8 @@ extern "C" {
 
 VideoPacketMap videoPacketMap;
 
-VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame) :
-    m_decoder(decoder), m_frameIn(frame)
+VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num) :
+    m_num(num), m_decoder(decoder), m_frameIn(frame)
 {
     m_frameRaw = m_decoder->DecodeFrame(frame);
 

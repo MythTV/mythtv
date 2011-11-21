@@ -56,6 +56,20 @@ void OpenCLYUVToRGB(OpenCLDevice *dev, VideoSurface *yuvframe,
                     VideoSurface *rgbframe);
 void OpenCLYUVToSNORM(OpenCLDevice *dev, VideoSurface *inframe,
                       VideoSurface *outframe);
+void OpenCLYUVFromSNORM(OpenCLDevice *dev, VideoSurface *inframe,
+                        VideoSurface *outframe);
+void OpenCLZeroRegion(OpenCLDevice *dev, VideoSurface *inframe,
+                      VideoSurface *outframe, int x1, int y1, int x2, int y2);
+void OpenCLThreshSat(OpenCLDevice *dev, VideoSurface *inframe,
+                     VideoSurface *outframe, int threshold);
+void OpenCLCopyLogoROI(OpenCLDevice *dev, VideoSurface *inframe,
+                       VideoSurface *outframe, int roiWidth, int roiHeight);
+void OpenCLLogoMSE(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
+                   VideoSurface *out);
+void OpenCLInvert(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out);
+void OpenCLMultiply(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
+                    VideoSurface *out);
+void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out);
 
 #endif
 

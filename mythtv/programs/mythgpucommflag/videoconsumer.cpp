@@ -187,13 +187,13 @@ void VideoConsumer::ProcessPacket(Packet *packet)
     if (m_dev)
     {
         // Push frame to the GPU via OpenGL/OpenCL
-        videoFrame = new VideoPacket(m_decoder, &mpa_pic);
         count++;
+        videoFrame = new VideoPacket(m_decoder, &mpa_pic, count);
         if ((count <= 100) && videoFrame)
         {
-            videoFrame->m_frameRaw->Dump("frame", count);
-            videoFrame->m_frameYUVSNORM->Dump("yuv", count);
-            videoFrame->m_wavelet->Dump("wavelet", count);
+            // videoFrame->m_frameRaw->Dump("frame", count);
+            // videoFrame->m_frameYUVSNORM->Dump("yuv", count);
+            // videoFrame->m_wavelet->Dump("wavelet", count);
             VideoSurface rgb(m_dev, kSurfaceRGB,
                              videoFrame->m_frameRaw->m_width,
                              videoFrame->m_frameRaw->m_height);
@@ -204,7 +204,13 @@ void VideoConsumer::ProcessPacket(Packet *packet)
                              videoFrame->m_frameRaw->m_width,
                              videoFrame->m_frameRaw->m_height);
             OpenCLWaveletInverse(m_dev, videoFrame->m_wavelet, &yuv);
-            yuv.Dump("unwavelet", count);
+            // yuv.Dump("unwaveletYUV", count);
+            VideoSurface yuv2(m_dev, kSurfaceYUV,
+                              videoFrame->m_frameRaw->m_width,
+                              videoFrame->m_frameRaw->m_height);
+            OpenCLYUVFromSNORM(m_dev, &yuv, &yuv2);
+            OpenCLYUVToRGB(m_dev, &yuv2, &rgb);
+            rgb.Dump("unwaveletRGB", count);
         }
     }
 
