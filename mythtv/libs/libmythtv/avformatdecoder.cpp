@@ -975,7 +975,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (!livetv && !ringBuffer->IsDisc())
     {
-        av_estimate_timings(ic, 0);
         // generate timings based on the video stream to avoid bogus ffmpeg
         // values for duration and bitrate
         av_update_stream_timings_video(ic);
