@@ -1592,7 +1592,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
-        if (pmt.StreamType(i) != 6)
+        if (pmt.StreamType(i) != StreamID::PrivData)
             continue;
 
         const desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
