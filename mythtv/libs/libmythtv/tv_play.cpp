@@ -1370,6 +1370,7 @@ void TV::GetStatus(void)
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     osdInfo info;
     ctx->CalcPlayerSliderPosition(info);
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
         if (!info.text["totalchapters"].isEmpty())
@@ -1421,6 +1422,7 @@ void TV::GetStatus(void)
             }
         }
     }
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     ReturnPlayerLock(ctx);
 
