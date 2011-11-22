@@ -3302,11 +3302,12 @@ bool TV::eventFilter(QObject *o, QEvent *e)
 {
     // We want to intercept all resize events sent to the main window
     if ((e->type() == QEvent::Resize))
-        return (GetMythMainWindow()!=o)?false:event(e);
+        return (GetMythMainWindow()!= o) ? false : event(e);
 
-    // We want to intercept all KeyPress events unless ignoreKeyPresses is set
+    // Intercept keypress events unless they need to be handled by a main UI
+    // screen (e.g. GuideGrid, ProgramFinder)
     if (QEvent::KeyPress == e->type())
-        return ignoreKeyPresses?false:event(e);
+        return ignoreKeyPresses ? false : event(e);
 
     if (e->type() == MythEvent::MythEventMessage ||
         e->type() == MythEvent::MythUserMessage  ||
