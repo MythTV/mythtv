@@ -112,6 +112,17 @@ bool Frontend::IsValidAction(const QString &Action)
     if (gActionList.contains(Action))
         return true;
 
+    // TODO There must be a better way to do this
+    if (Action.startsWith("SELECTSUBTITLE_") ||
+        Action.startsWith("SELECTTTC_")      ||
+        Action.startsWith("SELECTCC608_")    ||
+        Action.startsWith("SELECTCC708_")    ||
+        Action.startsWith("SELECTRAWREXT_")  ||
+        Action.startsWith("SELECTAUDIO_"))
+    {
+        return true;
+    }
+
     LOG(VB_GENERAL, LOG_ERR, LOC + QString("Action '%1'' is invalid.")
         .arg(Action));
     return false;

@@ -12,13 +12,19 @@ namespace DTC
         Q_CLASSINFO("version", "1.0");
 
         Q_CLASSINFO("State_type", "QString");
-        Q_CLASSINFO("ChapterTimes_type", "Chapter")
+        Q_CLASSINFO("ChapterTimes_type", "Chapter");
+        Q_CLASSINFO("SubtitleTracks_type", "Track");
+        Q_CLASSINFO("AudioTracks_type", "Track");
 
         Q_PROPERTY(QVariantMap State READ State DESIGNABLE true)
         Q_PROPERTY(QVariantList ChapterTimes READ ChapterTimes DESIGNABLE true)
+        Q_PROPERTY(QVariantMap SubtitleTracks READ SubtitleTracks DESIGNABLE true)
+        Q_PROPERTY(QVariantMap AudioTracks READ AudioTracks DESIGNABLE true)
 
         PROPERTYIMP_RO_REF(QVariantMap, State)
         PROPERTYIMP_RO_REF(QVariantList, ChapterTimes)
+        PROPERTYIMP_RO_REF(QVariantMap, SubtitleTracks)
+        PROPERTYIMP_RO_REF(QVariantMap, AudioTracks)
 
       public:
         static void InitializeCustomTypes()
@@ -39,7 +45,10 @@ namespace DTC
 
         void Copy(const FrontendStatus &src)
         {
-            m_State = src.m_State;
+            m_State          = src.m_State;
+            m_ChapterTimes   = src.m_ChapterTimes;
+            m_SubtitleTracks = src.m_SubtitleTracks;
+            m_AudioTracks    = src.m_AudioTracks;
         }
 
         void Process(void)
@@ -49,6 +58,20 @@ namespace DTC
                 if (m_State["chaptertimes"].type() == QVariant::List)
                     m_ChapterTimes = m_State["chaptertimes"].toList();
                 m_State.remove("chaptertimes");
+            }
+
+            if (m_State.contains("subtitletracks"))
+            {
+                if (m_State["subtitletracks"].type() == QVariant::Map)
+                    m_SubtitleTracks = m_State["subtitletracks"].toMap();
+                m_State.remove("subtitletracks");
+            }
+
+            if (m_State.contains("audiotracks"))
+            {
+                if (m_State["audiotracks"].type() == QVariant::Map)
+                    m_AudioTracks = m_State["audiotracks"].toMap();
+                m_State.remove("audiotracks");
             }
         }
     };

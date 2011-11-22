@@ -1383,6 +1383,37 @@ void TV::GetStatus(void)
             status.insert("chaptertimes", var);
         }
 
+        QVariantMap tracks;
+
+        QStringList list = ctx->player->GetTracks(kTrackTypeSubtitle);
+        for (int i = 0; i < list.size(); i++)
+            tracks.insert("SELECTSUBTITLE_" + QString::number(i), list[i]);
+        list = ctx->player->GetTracks(kTrackTypeTeletextCaptions);
+        for (int i = 0; i < list.size(); i++)
+            tracks.insert("SELECTTTC_" + QString::number(i), list[i]);
+        list = ctx->player->GetTracks(kTrackTypeCC708);
+        for (int i = 0; i < list.size(); i++)
+            tracks.insert("SELECTCC708_" + QString::number(i), list[i]);
+        list = ctx->player->GetTracks(kTrackTypeCC608);
+        for (int i = 0; i < list.size(); i++)
+            tracks.insert("SELECTCC608_" + QString::number(i), list[i]);
+        list = ctx->player->GetTracks(kTrackTypeRawText);
+        for (int i = 0; i < list.size(); i++)
+            tracks.insert("SELECTRAWTEXT_" + QString::number(i), list[i]);
+
+        status.insert("totalsubtitletracks", tracks.size());
+        if (!tracks.isEmpty())
+            status.insert("subtitletracks", tracks);
+
+        tracks.clear();
+        list = ctx->player->GetTracks(kTrackTypeAudio);
+        for (int i = 0; i < list.size(); i++)
+            tracks.insert("SELECTAUDIO_" + QString::number(i), list[i]);
+
+        status.insert("totalaudiotracks", tracks.size());
+        if (!tracks.isEmpty())
+            status.insert("audiotracks", tracks);
+
         status.insert("playspeed", ctx->player->GetPlaySpeed());
         status.insert("audiosyncoffset", (long long)ctx->player->GetAudioTimecodeOffset());
         if (ctx->player->GetAudio()->ControlsVolume())
@@ -10406,7 +10437,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
         backaction = "MAIN";
         currenttext = tr("Subtitles");
 
-        if (have_subs &&enabled)
+        if (have_subs && enabled)
             osd->DialogAddButton(tr("Disable Subtitles"), ACTION_DISABLESUBS);
         else if (have_subs && !enabled)
             osd->DialogAddButton(tr("Enable Subtitles"), ACTION_ENABLESUBS);
