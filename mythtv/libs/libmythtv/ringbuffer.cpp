@@ -1364,6 +1364,9 @@ QString RingBuffer::GetStorageRate(void)
 
 QString RingBuffer::GetAvailableBuffer(void)
 {
+    if (type == kRingBuffer_DVD || type == kRingBuffer_BD)
+        return "N/A";
+
     int avail = (rbwpos >= rbrpos) ? rbwpos - rbrpos : bufferSize - rbrpos + rbwpos;
     return QString("%1%").arg((int)(((float)avail / (float)bufferSize) * 100.0));
 }
