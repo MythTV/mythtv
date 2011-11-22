@@ -43,7 +43,7 @@ class MTV_PUBLIC OneSubtitle
 
     OneSubtitle() :
         start_time(),
-        length(-1),
+        length(500), /* default to 500 milliseconds */
         is_text(true),
         text(),
         img_shift(0, 0)
@@ -135,8 +135,9 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 
     void Ingest708Captions(void);
     void Ingest708Caption(uint streamId, uint serviceIdx, uint windowIdx,
+                          uint start_row, uint start_column,
                           const vector<CC708String*> &content);
-    void Process708Captions(void);
+    void Process708Captions(uint flags);
 
     void IngestTeletext(void);
     void ProcessTeletext(void);
@@ -154,7 +155,15 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 
     /// Keeps cc708 windows (1-8) for all streams & services
     /// (which ids are the keys).
-    QHash<uint, QMap<int, QStringList> > m_cc708_windows;
+    class Window
+    {
+      public:
+        uint row;
+        uint column;
+        QStringList text;
+    };
+    typedef QHash<uint, QMap<int, Window> > WindowsOnService;
+    QHash<uint, WindowsOnService > m_cc708_windows;
 
     /// Keeps track for decoding time to make timestamps for subtitles.
     int64_t m_curTime;

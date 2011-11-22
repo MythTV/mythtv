@@ -77,7 +77,7 @@ void MythCCExtractorPlayer::OnGotNewFrame(void)
     }
 
     Ingest608Captions();  Process608Captions(kProcessNormal);
-    Ingest708Captions();  Process708Captions();
+    Ingest708Captions();  Process708Captions(kProcessNormal);
     IngestTeletext();     ProcessTeletext();
     IngestDVBSubtitles(); ProcessDVBSubtitles(kProcessNormal);
 }
@@ -184,6 +184,7 @@ bool MythCCExtractorPlayer::run(void)
     }
 
     Process608Captions(kProcessFinalize);
+    Process708Captions(kProcessFinalize);
     ProcessDVBSubtitles(kProcessFinalize);
 
     SetPlaying(false);
@@ -393,10 +394,13 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
             for (uint windowIdx = 0; windowIdx < 8; ++windowIdx)
             {
                 CC708Window &win = service->windows[windowIdx];
-                if (win.changed && win.visible)
+                if (win.changed)
                 {
-                    vector<CC708String*> strings = win.GetStrings();
-                    Ingest708Caption(it.key(), serviceIdx, windowIdx, strings);
+                    vector<CC708String*> strings;
+                    if (win.visible)
+                        strings = win.GetStrings();
+                    Ingest708Caption(it.key(), serviceIdx, windowIdx,
+                                     win.pen.row, win.pen.column, strings);
                     while (!strings.empty())
                     {
                         delete strings.back();
@@ -411,7 +415,8 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
 
 void MythCCExtractorPlayer::Ingest708Caption(
     uint streamId, uint serviceIdx,
-    uint windowIdx, const vector<CC708String*> &content)
+    uint windowIdx, uint start_row, uint start_column,
+    const vector<CC708String*> &content)
 {
     bool empty = true;
     QStringList winContent;
@@ -425,23 +430,44 @@ void MythCCExtractorPlayer::Ingest708Caption(
         empty &= tmp.isEmpty();
     }
 
-    if (empty)
-        return;
+    QMap<int, Window> &cc708win = m_cc708_windows[streamId][serviceIdx];
+    cc708win[windowIdx].row = start_row;
+    cc708win[windowIdx].column = start_column;
+    cc708win[windowIdx].text = winContent;
 
-    uint key = streamId << 8 | serviceIdx;
-    QMap<int, QStringList> &cc708win = m_cc708_windows[key];
-    cc708win[windowIdx] = winContent;
+    if (empty)
+    {
+        if (!m_cc708_info[streamId].subs[serviceIdx].empty())
+        {
+            OneSubtitle &back = m_cc708_info[streamId].subs[serviceIdx].back();
+            back.length = m_curTime - back.start_time;
+        }
+        return;
+    }
+
+    QMap<uint, QStringList> orderedContent;
+    QMap<int, Window>::const_iterator ccIt = cc708win.begin();
+    for (; ccIt != cc708win.end() ; ++ccIt)
+    {
+        uint idx = (*ccIt).row * 1000 + (*ccIt).column;
+        for (QStringList::const_iterator sit = (*ccIt).text.begin();
+             sit != (*ccIt).text.end(); ++sit)
+        {
+            orderedContent[idx] += (*sit);
+        }
+    }
 
     QStringList screenContent;
-    QMap<int, QStringList>::const_iterator ccIt = cc708win.begin();
-    for (; ccIt != cc708win.end() ; ++ccIt)
-        screenContent += *ccIt;
-
+    for (QMap<uint, QStringList>::const_iterator oit = orderedContent.begin();
+         oit != orderedContent.end(); ++oit)
+    {
+        screenContent += *oit;
+    }
     IngestSubtitle(m_cc708_info[streamId].subs[serviceIdx], screenContent);
 }
 
 // Note: GetCaptionLanguage() will not return valid if there are multiple videos
-void MythCCExtractorPlayer::Process708Captions(void)
+void MythCCExtractorPlayer::Process708Captions(uint flags)
 {
     int i = 0;
     CC708Info::iterator cc708it = m_cc708_info.begin();
@@ -456,6 +482,8 @@ void MythCCExtractorPlayer::Process708Captions(void)
         {
             if ((*it).empty())
                 continue; // Skip empty subtitle streams.
+            if (((kProcessFinalize & flags) == 0) && ((*it).size() <= 1))
+                continue; // Leave one caption behind so it can be amended
 
             int idx = it.key();
 
@@ -486,7 +514,7 @@ void MythCCExtractorPlayer::Process708Captions(void)
                 continue;
             }
 
-            while (!(*it).empty())
+            while ((*it).size() > ((kProcessFinalize & flags) ? 0 : 1))
             {
                 (*cc708it).srtwriters[idx]->AddSubtitle(
                     (*it).front(), ++(*cc708it).subs_num[idx]);
