@@ -58,6 +58,8 @@ MythCCExtractorPlayer::MythCCExtractorPlayer(
         comps.removeLast();
     m_workingDir = QDir(QFileInfo(m_fileName).path());
     m_baseName = comps.join(".");
+
+    SetNullVideo();
 }
 
 /**
