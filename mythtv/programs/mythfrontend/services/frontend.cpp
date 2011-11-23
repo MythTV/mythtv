@@ -117,7 +117,7 @@ bool Frontend::IsValidAction(const QString &Action)
         Action.startsWith("SELECTTTC_")      ||
         Action.startsWith("SELECTCC608_")    ||
         Action.startsWith("SELECTCC708_")    ||
-        Action.startsWith("SELECTRAWREXT_")  ||
+        Action.startsWith("SELECTRAWTEXT_")  ||
         Action.startsWith("SELECTAUDIO_"))
     {
         return true;
