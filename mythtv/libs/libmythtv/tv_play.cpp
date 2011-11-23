@@ -595,8 +595,12 @@ void TV::InitKeys(void)
             "Toggle ATSC CC"), "");
     REG_KEY("TV Playback", "TOGGLETTM", QT_TRANSLATE_NOOP("MythControls",
             "Toggle Teletext Menu"), "");
-    REG_KEY("TV Playback", "TOGGLETEXT", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_TOGGLEEXTTEXT, QT_TRANSLATE_NOOP("MythControls",
             "Toggle External Subtitles"), "");
+    REG_KEY("TV Playback", ACTION_ENABLEEXTTEXT, QT_TRANSLATE_NOOP("MythControls",
+            "Enable External Subtitles"), "");
+    REG_KEY("TV Playback", ACTION_DISABLEEXTTEXT, QT_TRANSLATE_NOOP("MythControls",
+            "Disable External Subtitles"), "");
     REG_KEY("TV Playback", "TOGGLERAWTEXT", QT_TRANSLATE_NOOP("MythControls",
             "Toggle Text Subtitles"), "");
 
@@ -3414,10 +3418,20 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
 
     bool handled = false;
 
-    if (action == "TOGGLETEXT")
+    if (action == ACTION_TOGGLEEXTTEXT)
     {
         handled = true;
         ctx->player->ToggleCaptions(kTrackTypeTextSubtitle);
+    }
+    else if (ACTION_ENABLEEXTTEXT == action)
+    {
+        handled = true;
+        ctx->player->EnableCaptions(kDisplayTextSubtitle);
+    }
+    else if (ACTION_DISABLEEXTTEXT == action)
+    {
+        handled = true;
+        ctx->player->DisableCaptions(kDisplayTextSubtitle);
     }
     else if (ACTION_ENABLEFORCEDSUBS == action)
     {
@@ -10378,7 +10392,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
                               QString category, const QString selected,
                               QString &currenttext, QString &backaction)
 {
-    // uint capmode  = 0;
+    uint capmode  = 0;
     QStringList av_tracks;
     QStringList cc708_tracks;
     QStringList cc608_tracks;
@@ -10396,7 +10410,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
-        // capmode      = ctx->player->GetCaptionMode();
+        capmode      = ctx->player->GetCaptionMode();
         enabled      = ctx->player->GetCaptionsEnabled();
         havetext     = ctx->player->HasTextSubtitles();
         forcedon     = ctx->player->GetAllowForcedSubtitles();
@@ -10500,7 +10514,18 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
         backaction = "SUBTITLES";
         currenttext = tr("Text Subtitles");
         if (havetext)
-            osd->DialogAddButton(tr("Toggle External Subtitles"), "TOGGLETEXT");
+        {
+            if (capmode == kDisplayTextSubtitle)
+            {
+                osd->DialogAddButton(tr("Disable External Subtitles"),
+                                     ACTION_DISABLEEXTTEXT);
+            }
+            else
+            {
+                osd->DialogAddButton(tr("Enable External Subtitles"),
+                                     ACTION_ENABLEEXTTEXT);
+            }
+        }
         if (!text_tracks.empty())
         {
             for (uint i = 0; i < (uint)text_tracks.size(); i++)
