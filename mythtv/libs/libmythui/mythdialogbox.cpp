@@ -546,7 +546,7 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
 {
     QString                  LOC = "ShowOkPopup('" + message + "') - ";
     MythConfirmationDialog  *pop;
-    static MythScreenStack  *stk = NULL;
+    MythScreenStack         *stk = NULL;
 
 
     if (!stk)
