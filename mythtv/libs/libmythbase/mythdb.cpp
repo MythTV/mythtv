@@ -866,74 +866,83 @@ void MythDB::ActivateSettingsCache(bool activate)
     ClearSettingsCache();
 }
 
-bool MythDB::LoadDatabaseParamsFromDisk(
-    DatabaseParams &params, bool sanitize)
+bool MythDB::LoadDatabaseParamsFromDisk(DatabaseParams &params)
 {
     Settings settings;
-    if (settings.LoadSettingsFiles(
+    if (!settings.LoadSettingsFiles(
             "mysql.txt", GetInstallPrefix(), GetConfDir()))
     {
-        params.dbHostName = settings.GetSetting("DBHostName");
-        params.dbHostPing = settings.GetSetting("DBHostPing") != "no";
-        params.dbPort     = settings.GetNumSetting("DBPort", 3306);
-        params.dbUserName = settings.GetSetting("DBUserName");
-        params.dbPassword = settings.GetSetting("DBPassword");
-        params.dbName     = settings.GetSetting("DBName");
-        params.dbType     = settings.GetSetting("DBType");
-
-        params.localHostName = settings.GetSetting("LocalHostName");
-        params.localEnabled  = !params.localHostName.isEmpty();
-
-        params.wolReconnect  =
-            settings.GetNumSetting("WOLsqlReconnectWaitTime");
-        params.wolEnabled = params.wolReconnect > 0;
-
-        params.wolRetry   = settings.GetNumSetting("WOLsqlConnectRetry");
-        params.wolCommand = settings.GetSetting("WOLsqlCommand");
-    }
-    else if (sanitize)
-    {
         LOG(VB_GENERAL, LOG_ERR, "Unable to read configuration file mysql.txt");
-
-        // Sensible connection defaults.
-        params.dbHostName    = "localhost";
-        params.dbHostPing    = true;
-        params.dbPort        = 3306;
-        params.dbUserName    = "mythtv";
-        params.dbPassword    = "mythtv";
-        params.dbName        = "mythconverg";
-        params.dbType        = "QMYSQL";
-        params.localEnabled  = false;
-        params.localHostName = "my-unique-identifier-goes-here";
-        params.wolEnabled    = false;
-        params.wolReconnect  = 0;
-        params.wolRetry      = 5;
-        params.wolCommand    = "echo 'WOLsqlServerCommand not set'";
-    }
-    else
-    {
         return false;
     }
 
+    params.dbHostName = settings.GetSetting("DBHostName");
+    params.dbHostPing = settings.GetSetting("DBHostPing") != "no";
+    params.dbPort     = settings.GetNumSetting("DBPort", 3306);
+    params.dbUserName = settings.GetSetting("DBUserName");
+    params.dbPassword = settings.GetSetting("DBPassword");
+    params.dbName     = settings.GetSetting("DBName");
+    params.dbType     = settings.GetSetting("DBType");
+
+    params.localHostName = settings.GetSetting("LocalHostName");
+    params.localEnabled  = !params.localHostName.isEmpty();
+
+    params.wolReconnect  =
+        settings.GetNumSetting("WOLsqlReconnectWaitTime");
+    params.wolEnabled = params.wolReconnect > 0;
+
+    params.wolRetry   = settings.GetNumSetting("WOLsqlConnectRetry");
+    params.wolCommand = settings.GetSetting("WOLsqlCommand");
+
+    return ValidateDatabaseParams(params, "mysql.txt");
+}
+
+bool MythDB::ValidateDatabaseParams(
+    const DatabaseParams &params, const QString &source)
+{
     // Print some warnings if things look fishy..
+    QString msg = QString(" is not set in %1").arg(source);
 
     if (params.dbHostName.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "DBHostName is not set in mysql.txt");
-        LOG(VB_GENERAL, LOG_ERR, "Assuming localhost");
+        LOG(VB_GENERAL, LOG_ERR, "DBHostName" + msg);
+        return false;
     }
     if (params.dbUserName.isEmpty())
-        LOG(VB_GENERAL, LOG_ERR, "DBUserName is not set in mysql.txt");
+    {
+        LOG(VB_GENERAL, LOG_ERR, "DBUserName" + msg);
+        return false;
+    }
     if (params.dbPassword.isEmpty())
-        LOG(VB_GENERAL, LOG_ERR, "DBPassword is not set in mysql.txt");
+    {
+        LOG(VB_GENERAL, LOG_ERR, "DBPassword" + msg);
+        return false;
+    }
     if (params.dbName.isEmpty())
-        LOG(VB_GENERAL, LOG_ERR, "DBName is not set in mysql.txt");
-
-    // If sanitize set, replace empty dbHostName with "localhost"
-    if (sanitize && params.dbHostName.isEmpty())
-        params.dbHostName = "localhost";
+    {
+        LOG(VB_GENERAL, LOG_ERR, "DBName" + msg);
+        return false;
+    }
 
     return true;
+}
+
+// Sensible connection defaults.
+void MythDB::LoadDefaultDatabaseParams(DatabaseParams &params)
+{
+    params.dbHostName    = "localhost";
+    params.dbHostPing    = true;
+    params.dbPort        = 3306;
+    params.dbUserName    = "mythtv";
+    params.dbPassword    = "mythtv";
+    params.dbName        = "mythconverg";
+    params.dbType        = "QMYSQL";
+    params.localEnabled  = false;
+    params.localHostName = "my-unique-identifier-goes-here";
+    params.wolEnabled    = false;
+    params.wolReconnect  = 0;
+    params.wolRetry      = 5;
+    params.wolCommand    = "echo 'WOLsqlServerCommand not set'";
 }
 
 bool MythDB::SaveDatabaseParamsToDisk(
