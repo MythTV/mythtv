@@ -30,6 +30,9 @@ using namespace std;
 #include "avformatdecoder.h"
 #include "srtwriter.h"
 
+
+const int OneSubtitle::kDefaultLength = 750; /* ms */
+
 SRTStuff::~SRTStuff()
 {
     while (!srtwriters.empty())
@@ -374,6 +377,9 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
 
             while ((*it).size() > ((kProcessFinalize & flags) ? 0 : 1))
             {
+                if ((*it).front().length <= 0)
+                    (*it).front().length = OneSubtitle::kDefaultLength;
+
                 (*cc608it).srtwriters[idx]->AddSubtitle(
                     (*it).front(), ++(*cc608it).subs_num[idx]);
                 (*it).pop_front();
@@ -436,16 +442,6 @@ void MythCCExtractorPlayer::Ingest708Caption(
     cc708win[windowIdx].row = start_row;
     cc708win[windowIdx].column = start_column;
     cc708win[windowIdx].text = winContent;
-
-    if (empty)
-    {
-        if (!m_cc708_info[streamId].subs[serviceIdx].empty())
-        {
-            OneSubtitle &back = m_cc708_info[streamId].subs[serviceIdx].back();
-            back.length = m_curTime - back.start_time;
-        }
-        return;
-    }
 
     QMap<uint, QStringList> orderedContent;
     QMap<int, Window>::const_iterator ccIt = cc708win.begin();
@@ -518,6 +514,9 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
 
             while ((*it).size() > ((kProcessFinalize & flags) ? 0 : 1))
             {
+                if ((*it).front().length <= 0)
+                    (*it).front().length = OneSubtitle::kDefaultLength;
+
                 (*cc708it).srtwriters[idx]->AddSubtitle(
                     (*it).front(), ++(*cc708it).subs_num[idx]);
                 (*it).pop_front();
@@ -603,6 +602,9 @@ void MythCCExtractorPlayer::ProcessTeletext(void)
 
             while (!(*it).empty())
             {
+                if ((*it).front().length <= 0)
+                    (*it).front().length = OneSubtitle::kDefaultLength;
+
                 (*ttxit).srtwriters[page]->AddSubtitle(
                     (*it).front(), ++(*ttxit).subs_num[page]);
                 (*it).pop_front();
@@ -735,6 +737,9 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
         QDir stream_dir(m_workingDir.filePath(dir_name));
         while (subs.size() > ((kProcessFinalize & flags) ? 0 : 1))
         {
+            if (subs.front().length <= 0)
+                subs.front().length = OneSubtitle::kDefaultLength;
+
             const OneSubtitle &sub = subs.front();
             int64_t end_time = sub.start_time + sub.length;
             const QString file_name =

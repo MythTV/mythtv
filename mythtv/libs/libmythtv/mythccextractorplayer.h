@@ -31,7 +31,7 @@ class MTV_PUBLIC OneSubtitle
     /// Time we have to start showing subtitle, msec.
     int64_t start_time;
     /// Time we have to show subtitle, msec.
-    int64_t length;
+    int length;
     /// Is this a text subtitle.
     bool is_text;
     /// Lines of text of subtitles.
@@ -43,11 +43,13 @@ class MTV_PUBLIC OneSubtitle
 
     OneSubtitle() :
         start_time(),
-        length(500), /* default to 500 milliseconds */
+        length(-1),
         is_text(true),
         text(),
         img_shift(0, 0)
     {}
+
+    static const int kDefaultLength;
 };
 
 /// Key is a CC number (1-4), values are the subtitles in chrono order.
