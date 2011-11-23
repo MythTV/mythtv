@@ -3416,46 +3416,24 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
         return false;
     }
 
-    bool handled = false;
+    bool handled = true;
 
     if (action == ACTION_TOGGLEEXTTEXT)
-    {
-        handled = true;
         ctx->player->ToggleCaptions(kTrackTypeTextSubtitle);
-    }
     else if (ACTION_ENABLEEXTTEXT == action)
-    {
-        handled = true;
         ctx->player->EnableCaptions(kDisplayTextSubtitle);
-    }
     else if (ACTION_DISABLEEXTTEXT == action)
-    {
-        handled = true;
         ctx->player->DisableCaptions(kDisplayTextSubtitle);
-    }
     else if (ACTION_ENABLEFORCEDSUBS == action)
-    {
-        handled = true;
         ctx->player->SetAllowForcedSubtitles(true);
-    }
     else if (ACTION_DISABLEFORCEDSUBS == action)
-    {
-        handled = true;
         ctx->player->SetAllowForcedSubtitles(false);
-    }
     else if (action == ACTION_ENABLESUBS)
-    {
-        handled = true;
         ctx->player->SetCaptionsEnabled(true, true);
-    }
     else if (action == ACTION_DISABLESUBS)
-    {
-        handled = true;
         ctx->player->SetCaptionsEnabled(false, true);
-    }
     else if (action == ACTION_TOGGLESUBS && !browsehelper->IsBrowsing())
     {
-        handled = true;
         if (ccInputMode)
         {
             bool valid = false;
@@ -3500,41 +3478,34 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
     {
         int type = to_track_type(action.mid(6));
         if (type == kTrackTypeTeletextMenu)
-        {
-            handled = true;
             ctx->player->EnableTeletext();
-        }
         else if (type >= kTrackTypeSubtitle)
-        {
-            handled = true;
             ctx->player->ToggleCaptions(type);
-        }
+        else
+            handled = false;
     }
     else if (action.left(6) == "SELECT")
     {
         int type = to_track_type(action.mid(6));
         int num = action.section("_", -1).toInt();
         if (type >= kTrackTypeAudio)
-        {
-            handled = true;
             ctx->player->SetTrack(type, num);
-        }
+        else
+            handled = false;
     }
     else if (action.left(4) == "NEXT" || action.left(4) == "PREV")
     {
         int dir = (action.left(4) == "NEXT") ? +1 : -1;
         int type = to_track_type(action.mid(4));
         if (type >= kTrackTypeAudio)
-        {
-            handled = true;
             ctx->player->ChangeTrack(type, dir);
-        }
         else if (action.right(2) == "CC")
-        {
-            handled = true;
             ctx->player->ChangeCaptionTrack(dir);
-        }
+        else
+            handled = false;
     }
+    else
+        handled = false;
 
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
