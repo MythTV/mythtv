@@ -1404,6 +1404,8 @@ void TV::GetStatus(void)
         list = ctx->player->GetTracks(kTrackTypeRawText);
         for (int i = 0; i < list.size(); i++)
             tracks.insert("SELECTRAWTEXT_" + QString::number(i), list[i]);
+        if (ctx->player->HasTextSubtitles())
+            tracks.insert(ACTION_ENABLEEXTTEXT, tr("External Subtitles"));
 
         status.insert("totalsubtitletracks", tracks.size());
         if (!tracks.isEmpty())
