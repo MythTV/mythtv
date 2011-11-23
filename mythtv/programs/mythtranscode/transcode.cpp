@@ -198,7 +198,20 @@ class AudioReencodeBuffer : public AudioOutput
         // Do nothing
         return kMuteOff;
     }
+
+    virtual bool IsUpmixing(void)
+    {
+        // Do nothing
+        return false;
+    }
+
     virtual bool ToggleUpmix(void)
+    {
+        // Do nothing
+        return false;
+    }
+
+    virtual bool CanUpmix(void)
     {
         // Do nothing
         return false;
