@@ -3605,13 +3605,9 @@ void ProgramInfo::SaveResolution(uint64_t frame, uint width, uint height)
         MythDB::DBError("Resolution insert", query);
 }
 
-#undef NDEBUG
-#include <cassert>
-
 static uint load_markup_datum(
     MarkTypes type, uint chanid, const QDateTime &recstartts)
 {
-    assert(0);
     QString qstr = QString(
         "SELECT recordedmarkup.data "
         "FROM recordedmarkup "
