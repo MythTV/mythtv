@@ -354,12 +354,30 @@ int64_t AudioPlayer::GetAudioTime(void)
     return m_audioOutput->GetAudiotime();
 }
 
-bool AudioPlayer::ToggleUpmix(void)
+bool AudioPlayer::IsUpmixing(void)
 {
     if (!m_audioOutput)
         return false;
     QMutexLocker lock(&m_lock);
-    return m_audioOutput->ToggleUpmix();
+    return m_audioOutput->IsUpmixing();
+}
+
+bool AudioPlayer::EnableUpmix(bool enable, bool toggle)
+{
+    if (!m_audioOutput)
+        return false;
+    QMutexLocker lock(&m_lock);
+    if (toggle || (enable != IsUpmixing()))
+        return m_audioOutput->ToggleUpmix();
+    return enable;
+}
+
+bool AudioPlayer::CanUpmix(void)
+{
+    if (!m_audioOutput)
+        return false;
+    QMutexLocker lock(&m_lock);
+    return m_audioOutput->CanUpmix();
 }
 
 void AudioPlayer::SetStretchFactor(float factor)

@@ -406,7 +406,7 @@ class MTV_PUBLIC TV : public QObject
     void SetFFRew(PlayerContext*, int index);
 
     // Private audio methods
-    void ToggleUpmix(PlayerContext*);
+    void EnableUpmix(PlayerContext*, bool enable, bool toggle = false);
     void ChangeAudioSync(PlayerContext*, int dir, int newsync = -9999);
     bool AudioSyncHandleAction(PlayerContext*, const QStringList &actions);
     void PauseAudioUntilBuffered(PlayerContext *ctx);

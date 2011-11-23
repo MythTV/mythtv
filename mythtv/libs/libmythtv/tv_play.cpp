@@ -4177,6 +4177,10 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
 
         SetActive(ctx, 0, false);
     }
+    else if (has_action(ACTION_ENABLEUPMIX, actions))
+        EnableUpmix(ctx, true);
+    else if (has_action(ACTION_DISABLEUPMIX, actions))
+        EnableUpmix(ctx, false);
     else if (has_action(ACTION_VOLUMEDOWN, actions))
         ChangeVolume(ctx, false);
     else if (has_action(ACTION_VOLUMEUP, actions))
@@ -4278,7 +4282,7 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
     else if (has_action("TOGGLESTRETCH", actions))
         ToggleTimeStretch(ctx);
     else if (has_action(ACTION_TOGGLEUPMIX, actions))
-        ToggleUpmix(ctx);
+        EnableUpmix(ctx, false, true);
     else if (has_action(ACTION_TOGGLESLEEP, actions))
         ToggleSleepTimer(ctx);
     else if (has_action(ACTION_TOGGLERECORD, actions) && islivetv)
@@ -8047,18 +8051,23 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
     SetSpeedChangeTimer(0, __LINE__);
 }
 
-void TV::ToggleUpmix(PlayerContext *ctx)
+void TV::EnableUpmix(PlayerContext *ctx, bool enable, bool toggle)
 {
     if (!ctx->player || !ctx->player->HasAudioOut())
         return;
     QString text;
-    if (ctx->player->GetAudio()->ToggleUpmix())
-        text = tr("Upmixer On");
+
+    bool enabled = false;
+
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (toggle)
+        enabled = ctx->player->GetAudio()->EnableUpmix(false, true);
     else
-        text = tr("Upmixer Off");
+        enabled = ctx->player->GetAudio()->EnableUpmix(enable);
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!browsehelper->IsBrowsing())
-        SetOSDMessage(ctx, text);
+        SetOSDMessage(ctx, enabled ? tr("Upmixer On") : tr("Upmixer Off"));
 }
 
 // dir in 10ms jumps
@@ -9802,8 +9811,10 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         SetManualZoom(actx, true, tr("Zoom Mode ON"));
     else if (action == "TOGGLESTRETCH")
         ToggleTimeStretch(actx);
-    else if (action == ACTION_TOGGLEUPMIX)
-        ToggleUpmix(actx);
+    else if (action == ACTION_ENABLEUPMIX)
+        EnableUpmix(actx, true);
+    else if (action == ACTION_DISABLEUPMIX)
+        EnableUpmix(actx, false);
     else if (action.left(13) == "ADJUSTSTRETCH")
     {
         bool floatRead;
@@ -10106,6 +10117,8 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
     bool avsync = true;
     bool visual = false;
     bool active = false;
+    bool upmixing = false;
+    bool canupmix = false;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
@@ -10116,6 +10129,8 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
             curtrack = (uint) ctx->player->GetTrack(kTrackTypeAudio);
         avsync = (ctx->player->GetTrackCount(kTrackTypeVideo) > 0) &&
                   !tracks.empty();
+        upmixing = ctx->player->GetAudio()->IsUpmixing();
+        canupmix = ctx->player->GetAudio()->CanUpmix();
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -10150,7 +10165,20 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
             osd->DialogAddButton(tr("Disable Visualisation"),
                                  ACTION_DISABLEVISUALISATION);
         }
-        osd->DialogAddButton(tr("Toggle Audio Upmixer"), ACTION_TOGGLEUPMIX);
+        if (canupmix)
+        {
+            if (upmixing)
+            {
+                osd->DialogAddButton(tr("Disable Audio Upmixer"),
+                                     ACTION_DISABLEUPMIX);
+            }
+            else
+            {
+                osd->DialogAddButton(tr("Enable Audio Upmixer"),
+                                     ACTION_ENABLEUPMIX);
+            }
+        }
+
     }
     else if (category == "AUDIOTRACKS")
     {
