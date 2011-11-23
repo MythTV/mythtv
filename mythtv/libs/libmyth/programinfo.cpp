@@ -3605,9 +3605,13 @@ void ProgramInfo::SaveResolution(uint64_t frame, uint width, uint height)
         MythDB::DBError("Resolution insert", query);
 }
 
+#undef NDEBUG
+#include <cassert>
+
 static uint load_markup_datum(
     MarkTypes type, uint chanid, const QDateTime &recstartts)
 {
+    assert(0);
     QString qstr = QString(
         "SELECT recordedmarkup.data "
         "FROM recordedmarkup "
@@ -3672,6 +3676,8 @@ uint ProgramInfo::QueryAverageFrameRate(void) const
  */
 int64_t ProgramInfo::QueryTotalDuration(void) const
 {
+    if (gCoreContext->IsDatabaseIgnored())
+        return 0LL;
     int64_t msec = load_markup_datum(MARK_DURATION_MS, chanid, recstartts);
     return msec * 1000;
 }
