@@ -598,7 +598,7 @@ bool ImportIconsWizard::search(const QString& strParam)
                                 .arg(escape_csv(entry2.strNetworkId))
                                 .arg(escape_csv(entry2.strServiceId));
 
-    QString str = wget(url,"s="+strParam1+"csv="+channelcsv);
+    QString str = wget(url,"s="+strParam1+"&csv="+channelcsv);
     m_listSearch.clear();
     m_iconsList->Reset();
 
