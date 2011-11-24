@@ -619,6 +619,20 @@ void MythPlayer::ReinitVideo(void)
             return;
         }
 
+        // the display refresh rate may have been changed by VideoOutput
+        if (videosync)
+        {
+            int ri = MythDisplay::GetDisplayInfo(frame_interval).Rate();
+            if (ri != videosync->getRefreshInterval())
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    QString("Refresh rate has changed from %1 to %2")
+                    .arg(videosync->getRefreshInterval())
+                    .arg(ri));
+                videosync->setRefreshInterval(ri);
+             }
+        }
+
         if (osd)
             osd->SetPainter(videoOutput->GetOSDPainter());
         ReinitOSD();
