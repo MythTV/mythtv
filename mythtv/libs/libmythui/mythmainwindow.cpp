@@ -183,7 +183,10 @@ class MythMainWindowPrivate
 
         m_udpListener(NULL),
 
-        m_pendingUpdate(false)
+        m_pendingUpdate(false),
+        
+        idleTimer(NULL),
+        standby(false)
     {
     }
 
@@ -270,6 +273,9 @@ class MythMainWindowPrivate
     MythUDPListener *m_udpListener;
 
     bool m_pendingUpdate;
+    
+    QTimer *idleTimer;
+    bool standby;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -490,6 +496,13 @@ MythMainWindow::MythMainWindow(const bool useDB)
     connect(this, SIGNAL(signalRemoteScreenShot(QString,int,int)),
             this, SLOT(doRemoteScreenShot(QString,int,int)),
             Qt::BlockingQueuedConnection);
+    
+    int idletime = gCoreContext->GetNumSetting("FrontendIdleTimeout", 30);
+    d->idleTimer = new QTimer(this);
+    d->idleTimer->setSingleShot(true);
+    d->idleTimer->setInterval(1000 * 60 * idletime); // 30 minutes
+    connect(d->idleTimer, SIGNAL(timeout()), SLOT(IdleTimeout()));
+    d->idleTimer->start();
 }
 
 MythMainWindow::~MythMainWindow()
@@ -1915,6 +1928,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
     {
         case QEvent::KeyPress:
         {
+            ResetIdleTimer();
             QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
 
             // Work around weird GCC run-time bug. Only manifest on Mac OS X
@@ -1950,6 +1964,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         }
         case QEvent::MouseButtonPress:
         {
+            ResetIdleTimer();
             ShowMouseCursor(true);
             if (!d->gesture.recording())
             {
@@ -1965,6 +1980,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         }
         case QEvent::MouseButtonRelease:
         {
+            ResetIdleTimer();
             ShowMouseCursor(true);
             if (d->gestureTimer->isActive())
                 d->gestureTimer->stop();
@@ -2046,6 +2062,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         }
         case QEvent::MouseMove:
         {
+            ResetIdleTimer();
             ShowMouseCursor(true);
             if (d->gesture.recording())
             {
@@ -2060,6 +2077,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         }
         case QEvent::Wheel:
         {
+            ResetIdleTimer();
             ShowMouseCursor(true);
             QWheelEvent* qmw = dynamic_cast<QWheelEvent*>(e);
             int delta = qmw->delta();
@@ -2525,5 +2543,51 @@ void MythMainWindow::HideMouseTimeout(void)
 {
     ShowMouseCursor(false);
 }
+
+void MythMainWindow::ResetIdleTimer(void)
+{
+    // If the timer isn't active then it's been paused
+    if (!d->idleTimer->isActive() && !d->standby)
+        return;
+
+    if (d->standby)
+        ExitStandby();
+    
+    d->idleTimer->start();
+}
+
+void MythMainWindow::PauseIdleTimer(bool pause)
+{
+    if (pause)
+        d->idleTimer->stop();
+    else
+        d->idleTimer->start();
+    
+    ResetIdleTimer();
+}
+
+void MythMainWindow::IdleTimeout(void)
+{
+    EnterStandby();
+}
+
+void MythMainWindow::EnterStandby()
+{
+    int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout");
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode after "
+                                        "%1 minutes of inactivity")
+                                        .arg(idletimeout));
+    JumpTo("Main Menu");
+    d->standby = true;
+    gCoreContext->AllowShutdown();
+}
+
+void MythMainWindow::ExitStandby()
+{
+    LOG(VB_GENERAL, LOG_NOTICE, "Leaving standby mode");
+    d->standby = false;
+    gCoreContext->BlockShutdown();
+}
+
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
