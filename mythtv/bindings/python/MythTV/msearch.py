@@ -121,7 +121,7 @@ class MSearch( object ):
         location = []
         for res in self.search(timeout, \
                 'urn:schemas-upnp-org:device:MediaRenderer:1'):
-            if 'MythTv' not in res['server']:
+            if 'MythTV' not in res['server']:
                 continue
             if res['location'] not in location:
                 location.append(res['location'])
