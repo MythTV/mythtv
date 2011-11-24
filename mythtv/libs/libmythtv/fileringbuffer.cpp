@@ -611,11 +611,16 @@ long long FileRingBuffer::Seek(long long pos, int whence, bool has_lock)
                         .arg(internalreadpos).arg(ignorereadpos).arg(ret));
                 ignorereadpos = -1;
             }
+            // if we are seeking forward we may now be too close to the
+            // end, so we need to recheck if reads are allowed.
+            if (readpos > new_pos)
+            {
+                ateof = false;
+                readsallowed = false;
+            }
             readpos = new_pos;
             poslock.unlock();
             generalWait.wakeAll();
-            ateof = false;
-            readsallowed = false;
             if (!has_lock)
                 rwlock.unlock();
             return new_pos;
