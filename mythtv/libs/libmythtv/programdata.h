@@ -71,23 +71,23 @@ class MTV_PUBLIC DBEvent
 {
   public:
     DBEvent(uint _listingsource) :
-        title(QString::null),
-        subtitle(QString::null),
-        description(QString::null),
-        category(QString::null),
+        title(QString("")),
+        subtitle(QString("")),
+        description(QString("")),
+        category(QString("")),
         /*starttime, endtime,*/
         airdate(0),
         credits(NULL),
         partnumber(0),
         parttotal(0),
-        syndicatedepisodenumber(QString::null),
+        syndicatedepisodenumber(QString("")),
         subtitleType(0),
         audioProps(0),
         videoProps(0),
         stars(0.0),
         categoryType(0/*kCategoryNone*/),
-        seriesId(QString::null),
-        programId(QString::null),
+        seriesId(QString("")),
+        programId(QString("")),
         previouslyshown(false),
         listingsource(_listingsource) {}
 
