@@ -78,7 +78,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 
     void SetOption(const QString &name, int value);
     void SetOption(const QString &name, const QString &value)
-                  { RecorderBase::SetOption(name, value); }
+        { V4LRecorder::SetOption(name, value); }
 
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
