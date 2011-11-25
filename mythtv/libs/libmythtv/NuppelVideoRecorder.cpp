@@ -2653,7 +2653,7 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
 void NuppelVideoRecorder::FormatTT(struct VBIData*) {}
 #endif // USING_V4L2
 
-void NuppelVideoRecorder::FormatCC(struct cc *cc)
+void NuppelVideoRecorder::FormatCC(uint code1, uint code2)
 {
     struct timeval tnow;
     gettimeofday (&tnow, &tzone);
@@ -2663,7 +2663,7 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc)
     int tc = (tnow.tv_sec - stm.tv_sec) * 1000 +
              tnow.tv_usec / 1000 - stm.tv_usec / 1000;
 
-    ccd->FormatCC(tc, cc->code1, cc->code2);
+    ccd->FormatCC(tc, code1, code2);
 }
 
 void NuppelVideoRecorder::AddTextData(unsigned char *buf, int len,

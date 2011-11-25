@@ -157,7 +157,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     void DoMJPEG(void);
 
     virtual void FormatTT(struct VBIData*); // RecorderBase
-    virtual void FormatCC(struct cc*); // RecorderBase
+    virtual void FormatCC(uint code1, uint code2); // RecorderBase
     virtual void AddTextData(unsigned char*,int,int64_t,char); // CC608Decoder
 
     void UpdateResolutions(void);
