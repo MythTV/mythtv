@@ -1956,6 +1956,7 @@ void NuppelVideoRecorder::KillChildren(void)
         vbi_thread->wait();
         delete vbi_thread;
         vbi_thread = NULL;
+        CloseVBIDevice();
     }
 }
 
