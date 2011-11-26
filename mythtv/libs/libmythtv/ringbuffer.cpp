@@ -18,6 +18,7 @@
 #include "threadedfilewriter.h"
 #include "fileringbuffer.h"
 #include "streamingringbuffer.h"
+#include "dvdstream.h"
 #include "livetvchain.h"
 #include "mythcontext.h"
 #include "ringbuffer.h"
@@ -170,6 +171,17 @@ RingBuffer *RingBuffer::Create(
         LOG(VB_PLAYBACK, LOG_INFO, "Trying BD at " + lfilename);
 
         return new BDRingBuffer(lfilename);
+    }
+
+    if (!mythurl && dvdext)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, "ISO image at " + lfilename);
+        return new DVDStream(lfilename);
+    }
+    if (!mythurl && lower.endsWith(".vob") && lfilename.contains("/VIDEO_TS/"))
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, "DVD VOB at " + lfilename);
+        return new DVDStream(lfilename);
     }
 
     return new FileRingBuffer(
