@@ -1,3 +1,6 @@
 mythgpucommflag
 out/
 core
+*.cvp
+*.csv
+*.trc
