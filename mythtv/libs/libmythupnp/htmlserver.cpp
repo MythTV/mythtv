@@ -32,8 +32,10 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HtmlServerExtension::HtmlServerExtension( const QString sSharePath)
-  : HttpServerExtension( "Html" , sSharePath)
+HtmlServerExtension::HtmlServerExtension( const QString sSharePath,
+                                          const QString sApplicationPrefix)
+  : HttpServerExtension( "Html" , sSharePath),
+    m_IndexFilename(sApplicationPrefix + "index")
 {
     // Cache the absolute path for the share directory.
 
@@ -77,12 +79,12 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
 
         if (oInfo.isDir())
         {
-            QString sIndexFileName = oInfo.filePath() + "index.qsp";
+            QString sIndexFileName = oInfo.filePath() + m_IndexFilename + ".qsp";
 
             if (QFile::exists( sIndexFileName ))
                 oInfo.setFile( sIndexFileName );
             else 
-                oInfo.setFile( oInfo.filePath() + "index.html" );
+                oInfo.setFile( oInfo.filePath() + m_IndexFilename + ".html" );
         }
 
         if (oInfo.exists() == true )
