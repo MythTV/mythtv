@@ -33,6 +33,7 @@
 #include "previewgenerator.h"
 #include "backendutil.h"
 #include "httprequest.h"
+#include "serviceUtil.h"
 #include "util.h"
 #include "mythdownloadmanager.h"
 #include "metadataimagehelper.h"
@@ -269,42 +270,11 @@ DTC::ArtworkInfoList* Content::GetRecordingArtworkList( int              nChanId
 DTC::ArtworkInfoList* Content::GetProgramArtworkList( const QString &sInetref,
                                                       int            nSeason  )
 {
-    ArtworkMap map = GetArtwork(sInetref, nSeason);
+    DTC::ArtworkInfoList *pArtwork = new DTC::ArtworkInfoList();
 
-    DTC::ArtworkInfoList *pInfos = new DTC::ArtworkInfoList();
+    FillArtworkInfoList (pArtwork, sInetref, nSeason);
 
-    for (ArtworkMap::const_iterator i = map.begin();
-         i != map.end(); ++i)
-    {
-        DTC::ArtworkInfo *pArtInfo = pInfos->AddNewArtworkInfo();
-        pArtInfo->setFileName(i.value().url);
-        switch (i.key())
-        {
-            case kArtworkFanart:
-                pArtInfo->setStorageGroup("Fanart");
-                pArtInfo->setType("fanart");
-                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Fanart")
-                              .arg(QUrl(i.value().url).path()));
-                break;
-            case kArtworkBanner:
-                pArtInfo->setStorageGroup("Banners");
-                pArtInfo->setType("banner");
-                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Fanart")
-                              .arg(QUrl(i.value().url).path()));
-                break;
-            case kArtworkCoverart:
-            default:
-                pArtInfo->setStorageGroup("Coverart");
-                pArtInfo->setType("coverart");
-                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Fanart")
-                              .arg(QUrl(i.value().url).path()));
-                break;
-        }
-    }
-    return pInfos;
+    return pArtwork;
 }
 /////////////////////////////////////////////////////////////////////////////
 //
