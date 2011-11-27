@@ -4,12 +4,12 @@
 <context>
     <name>ArchiveFileSelector</name>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="203"/>
+        <location filename="../mytharchive/importnative.cpp" line="211"/>
         <source>Find File To Import</source>
         <translation>Finn fil som skal importeres</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="262"/>
+        <location filename="../mytharchive/importnative.cpp" line="270"/>
         <source>The selected item is not a valid archive file!</source>
         <translation>Det valgte elementet er ikke en gyld arkivfil!</translation>
     </message>
@@ -17,27 +17,27 @@
 <context>
     <name>ExportNative</name>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="376"/>
+        <location filename="../mytharchive/exportnative.cpp" line="401"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="217"/>
+        <location filename="../mytharchive/exportnative.cpp" line="242"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Du må legge til minst ett element for å arkivere!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="375"/>
+        <location filename="../mytharchive/exportnative.cpp" line="400"/>
         <source>Remove Item</source>
         <translation>Fjern element</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="508"/>
+        <location filename="../mytharchive/exportnative.cpp" line="537"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Du har ingen videoer!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="368"/>
+        <location filename="../mytharchive/exportnative.cpp" line="393"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
@@ -45,22 +45,22 @@
 <context>
     <name>FileSelector</name>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="314"/>
+        <location filename="../mytharchive/fileselector.cpp" line="321"/>
         <source>The selected item is not a directory!</source>
         <translation>Det valgte element er ikke en katalog!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="74"/>
+        <location filename="../mytharchive/fileselector.cpp" line="81"/>
         <source>Find File</source>
         <translation>Finn fil</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="77"/>
+        <location filename="../mytharchive/fileselector.cpp" line="84"/>
         <source>Find Directory</source>
         <translation>Finn mappe</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="80"/>
+        <location filename="../mytharchive/fileselector.cpp" line="87"/>
         <source>Find Files</source>
         <translation>Finn filer</translation>
     </message>
@@ -68,32 +68,32 @@
 <context>
     <name>ImportNative</name>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="403"/>
+        <location filename="../mytharchive/importnative.cpp" line="430"/>
         <source>You need to select a valid chanID!</source>
         <translation>Du må velge en gydlig kanal-id!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="433"/>
+        <location filename="../mytharchive/importnative.cpp" line="465"/>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
         <translation>Klarte ikke importere arkivet; en feil oppsetod ved kjøring av «mytharchivehelper»</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="563"/>
+        <location filename="../mytharchive/importnative.cpp" line="595"/>
         <source>Select a ChanID</source>
         <translation>Velg en kanal-id</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="589"/>
+        <location filename="../mytharchive/importnative.cpp" line="621"/>
         <source>Select a ChanNo</source>
         <translation>Velg et kanalnr</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="615"/>
+        <location filename="../mytharchive/importnative.cpp" line="647"/>
         <source>Select a Channel Name</source>
         <translation>Velg et kanalnavn</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="641"/>
+        <location filename="../mytharchive/importnative.cpp" line="673"/>
         <source>Select a Callsign</source>
         <translation>Velg et kanaltegn</translation>
     </message>
@@ -101,32 +101,32 @@
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="304"/>
+        <location filename="../mytharchive/logviewer.cpp" line="319"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="302"/>
+        <location filename="../mytharchive/logviewer.cpp" line="317"/>
         <source>Show Progress Log</source>
         <translation>Vis fremdriftslogg</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="303"/>
+        <location filename="../mytharchive/logviewer.cpp" line="318"/>
         <source>Show Full Log</source>
         <translation>Vis hele loggen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="298"/>
+        <location filename="../mytharchive/logviewer.cpp" line="313"/>
         <source>Don&apos;t Auto Update</source>
         <translation>Ikke oppdater automatisk</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="300"/>
+        <location filename="../mytharchive/logviewer.cpp" line="315"/>
         <source>Auto Update</source>
         <translation>Oppdater automatisk</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="290"/>
+        <location filename="../mytharchive/logviewer.cpp" line="305"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
@@ -134,80 +134,80 @@
 <context>
     <name>MythBurn</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="814"/>
+        <location filename="../mytharchive/mythburn.cpp" line="826"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="332"/>
-        <location filename="../mytharchive/mythburn.cpp" line="452"/>
+        <location filename="../mytharchive/mythburn.cpp" line="344"/>
+        <location filename="../mytharchive/mythburn.cpp" line="464"/>
         <source>Using Cutlist</source>
         <translation>Bruker kuttliste</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="337"/>
-        <location filename="../mytharchive/mythburn.cpp" line="457"/>
+        <location filename="../mytharchive/mythburn.cpp" line="349"/>
+        <location filename="../mytharchive/mythburn.cpp" line="469"/>
         <source>Not Using Cutlist</source>
         <translation>Bruker ikke kuttliste</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="343"/>
-        <location filename="../mytharchive/mythburn.cpp" line="463"/>
+        <location filename="../mytharchive/mythburn.cpp" line="355"/>
+        <location filename="../mytharchive/mythburn.cpp" line="475"/>
         <source>No Cut List</source>
         <translation>Ingen kuttliste</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="354"/>
+        <location filename="../mytharchive/mythburn.cpp" line="366"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Du må legge til minst ett element for å arkivere!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="400"/>
+        <location filename="../mytharchive/mythburn.cpp" line="412"/>
         <source>Retrieving File Information. Please Wait...</source>
         <translation>Henter filinformasjon. Vennligst vent...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="466"/>
+        <location filename="../mytharchive/mythburn.cpp" line="478"/>
         <source>Encoder: </source>
         <translation>Koder: </translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="803"/>
+        <location filename="../mytharchive/mythburn.cpp" line="815"/>
         <source>Don&apos;t Use Cutlist</source>
         <translation>Ikke bruk kuttliste</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="806"/>
+        <location filename="../mytharchive/mythburn.cpp" line="818"/>
         <source>Use Cutlist</source>
         <translation>Bruk kuttliste</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="810"/>
+        <location filename="../mytharchive/mythburn.cpp" line="822"/>
         <source>Remove Item</source>
         <translation>Fjern element</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="811"/>
+        <location filename="../mytharchive/mythburn.cpp" line="823"/>
         <source>Edit Details</source>
         <translation>Rediger detaljer</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="812"/>
+        <location filename="../mytharchive/mythburn.cpp" line="824"/>
         <source>Change Encoding Profile</source>
         <translation>Endre kodingsprofil</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="813"/>
+        <location filename="../mytharchive/mythburn.cpp" line="825"/>
         <source>Edit Thumbnails</source>
         <translation>Rediger miniatyrbilder</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="949"/>
+        <location filename="../mytharchive/mythburn.cpp" line="962"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Klarte ikke lage DVD&apos;en; en feil oppstod under kjøringen av skriptene</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="792"/>
+        <location filename="../mytharchive/mythburn.cpp" line="804"/>
         <source>Menu</source>
         <translation>meny</translation>
     </message>
@@ -215,37 +215,37 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="295"/>
+        <location filename="../mytharchive/main.cpp" line="299"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Slå av/på bruk av kuttliste for valgt program</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="298"/>
+        <location filename="../mytharchive/main.cpp" line="302"/>
         <source>Create DVD</source>
         <translation>Lag DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="300"/>
+        <location filename="../mytharchive/main.cpp" line="304"/>
         <source>Create Archive</source>
         <translation>Lag arkiv</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="302"/>
+        <location filename="../mytharchive/main.cpp" line="306"/>
         <source>Import Archive</source>
         <translation>Importer arkiv</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="304"/>
+        <location filename="../mytharchive/main.cpp" line="308"/>
         <source>View Archive Log</source>
         <translation>Vis arkivlogg</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="306"/>
+        <location filename="../mytharchive/main.cpp" line="310"/>
         <source>Play Created DVD</source>
         <translation>Spill DVD som er laget</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="308"/>
+        <location filename="../mytharchive/main.cpp" line="312"/>
         <source>Burn DVD</source>
         <translation>Brenn DVD</translation>
     </message>
@@ -373,7 +373,7 @@
         <translation>Eksterne kommandoer for Myth-arkiv (2)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="162"/>
+        <location filename="../mytharchive/logviewer.cpp" line="177"/>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
         <translation>Bakgrunnslagingen har blitt bedt om å stoppe. 
@@ -575,80 +575,80 @@ Dette kan ta et par minutter.</translation>
         <translation>DVD menyinstillinger</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="75"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="79"/>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
         <translation>Kan ikke finne arbeidskatalog for Myth-arkiv.
 Har du satt opp riktig katalog in instillingene?</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="471"/>
+        <location filename="../mytharchive/exportnative.cpp" line="501"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>Klarte ikke lage DVD&apos;en; en feil oppstod under kjøringen av skriptene</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="38"/>
+        <location filename="../mytharchive/logviewer.cpp" line="39"/>
         <source>Cannot find any logs to show!</source>
         <translation>Kan ikke finne noen logger å vise!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="90"/>
+        <location filename="../mytharchive/main.cpp" line="93"/>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
         <translation>Fant en låsfil men prosessen som eier denne kjører ikke!
 Fjerner gammel låsfil.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="207"/>
+        <location filename="../mytharchive/main.cpp" line="211"/>
         <source>Last run did not create a playable DVD.</source>
         <translation>Forrige kjøring produserte ikke en spillbar DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="213"/>
+        <location filename="../mytharchive/main.cpp" line="217"/>
         <source>Last run failed to create a DVD.</source>
         <translation>Forrige kjøring klarte ikke å lage en DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="992"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1005"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Du har ingen videoer!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1131"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1152"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation>Kan ikke brenne en DVD.
 Forrige kjøring kunne ikke lage en DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1138"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1159"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation>Sett i en tom DVD og velg et alternativ under.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1137"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1149"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1158"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1170"/>
         <source>Burn DVD</source>
         <translation>Brenn DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1150"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1171"/>
         <source>Burn DVD Rewritable</source>
         <translation>Brenn DVD Rewritable</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1151"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1172"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation>Brenn DVD Rewritable (Tving Sletting)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1152"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1173"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1202"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1229"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Det var ikke mulig å kjøre mytharchivehelper for å brenne en DVD.</translation>
     </message>
@@ -656,39 +656,45 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>RecordingSelector</name>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="199"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="131"/>
+        <source>Retrieving Recording List.
+Please Wait...</source>
+        <translation>Henter opptaksliste.
+Vennligst vent...</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/recordingselector.cpp" line="211"/>
         <source>Clear All</source>
         <translation>Avmerk alle</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="200"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="212"/>
         <source>Select All</source>
         <translation>Velg alle</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="201"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="213"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="99"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="405"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="477"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="111"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="417"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="490"/>
         <source>All Recordings</source>
         <translation>Alle opptak</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="119"/>
         <source>Retrieving Recording List. Please Wait...</source>
-        <translation>Henter opptaksliste. Vennligst vent...</translation>
+        <translation type="obsolete">Henter opptaksliste. Vennligst vent...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="143"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="155"/>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
         <translation>Enter har du ingen opptak eller så er ikke opptakene tilgjengelig lokalt!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="192"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="204"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
@@ -696,48 +702,48 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>SelectDestination</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="30"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="34"/>
         <source>Single Layer DVD</source>
         <translation>Enkeltlags DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="31"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
         <source>Single Layer DVD (4482Mb)</source>
         <translation>Enkeltlags DVD (4482Mb)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="34"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="38"/>
         <source>Dual Layer DVD</source>
         <translation>Dobbeltlags DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
         <source>Dual Layer DVD (8964Mb)</source>
         <translation>Dobbeltlags DVD (8964Mb)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="38"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="42"/>
         <source>DVD +/- RW</source>
         <translation>DVD +/- RW</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="43"/>
         <source>Rewritable DVD</source>
         <translation>Rewritable DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="42"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="46"/>
         <source>File</source>
         <translation>Fil</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="43"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="47"/>
         <source>Any file accessable from your filesystem.</source>
         <translation>Enhver fil tilgjengelig i ditt filsystem.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/selectdestination.cpp" line="274"/>
-        <location filename="../mytharchive/selectdestination.cpp" line="330"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="294"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="350"/>
         <source>Unknown</source>
         <translation>Ukjent</translation>
     </message>
@@ -750,7 +756,7 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Velg destinasjon</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="70"/>
         <source>description goes here.</source>
         <translation>beskrivelse her.</translation>
     </message>
@@ -770,17 +776,17 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Brenn til DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Force Overwrite of DVD-RW Media</source>
         <translation>Tving overskriving av DVD RW medie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Select Recordings</source>
         <translation>Velg opptak</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Show Recordings</source>
         <translation>Vis opptak</translation>
     </message>
@@ -790,32 +796,32 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Filfinner</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="76"/>
         <source>Select Videos</source>
         <translation>Velg videoer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Video Category</source>
         <translation>Videokategori</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="78"/>
         <source>title goes here</source>
         <translation>tittel her</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="90"/>
         <source>x.xx Gb</source>
         <translation>x.xx Gb</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="79"/>
         <source>PL:</source>
         <translation>PL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="80"/>
         <source>1</source>
         <translation>1</translation>
     </message>
@@ -830,161 +836,172 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Loggviser</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Change Encoding Profile</source>
         <translation>Endre kodingsprofil</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="32"/>
         <source>DVD Menu Theme</source>
         <translation>DVD menytema</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Select a theme</source>
         <translation>Velg et tema</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Intro</source>
         <translation>Intro</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Main Menu</source>
         <translation>Hovedmeny</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Chapter Menu</source>
         <translation>Kapittelmeny</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Details</source>
         <translation>Detaljer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Select Archive Items</source>
         <translation>Velg arkivelementer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="41"/>
         <source>No files are selected for archive</source>
         <translation>Ingen filer er valgt for arkivet</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Archive Item Details</source>
         <translation>Detaljer for arkivelement</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Title:</source>
         <translation>Tittel:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Subtitle:</source>
         <translation>Undertekst:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Start Date:</source>
         <translation>Startdato:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Time:</source>
         <translation>Tid:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Description:</source>
         <translation>Beskrivelse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Thumb Image Selector</source>
         <translation>velger for miniatyrbilde</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Current Position</source>
         <translation>Gjeldende posisjon</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="53"/>
         <source>0:00:00.00</source>
         <translation>0:00:00.00</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Seek Amount</source>
         <translation>Søkemengde</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Frame</source>
         <translation>Ramme</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="57"/>
+        <source>Up Level</source>
+        <translation>Opp et nivå</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="82"/>
         <source>xxxxx MB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="83"/>
         <source>0 MB</source>
         <translation></translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="84"/>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation type="obsolete">sep 13, 2004 11:00 pm (1h 15m)</translation>
+        <translation>13 sept, 2004 11:00 (1t 15min)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="85"/>
+        <source>x.xx GB</source>
+        <translation>x.xx GB</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="86"/>
         <source>File Finder To Import</source>
         <translation>Filfinner for importering</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Start Time:</source>
         <translation>Starttid:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Select Associated Channel</source>
         <translation>Velg assosiert kanal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Archived Channel</source>
         <translation>Arkivert kanal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Chan. ID:</source>
         <translation>Kanal ID:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Chan. No:</source>
         <translation>Kanal Nr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Callsign:</source>
         <translation>Kallesignal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Name:</source>
         <translation>Navn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Local Channel</source>
         <translation>Lokal kanal</translation>
     </message>
@@ -1009,42 +1026,42 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>En profil med utvidet avspillingstid som gir omtrent 6 timer med video på en enkeltlags DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Create DVD</source>
         <translation>Lag DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Create Archive</source>
         <translation>Lag arkiv</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Encode Video File</source>
         <translation>Kod videofil</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Import Archive</source>
         <translation>Importer arkiv</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Archive Utilities</source>
         <translation>Arkiv-verktøy</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Show Log Viewer</source>
         <translation>Vis loggviser</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="98"/>
         <source>Play Created DVD</source>
         <translation>Spill DVD som er laget</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="99"/>
         <source>Burn DVD</source>
         <translation>Brenn DVD</translation>
     </message>
@@ -1134,92 +1151,92 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Avslutt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="72"/>
         <source>0.00 GB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="77"/>
         <source>Video Category:</source>
         <translation>Videokategori:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Ok</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="31"/>
         <source>12.34 GB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Choose the appearance of your DVD.</source>
         <translation>Velg utseende for DVDen din.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Theme:</source>
         <translation>Tema:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Select the recordings and videos you wish to save.</source>
         <translation>Velg hvilke opptak og videoer du vil lagre.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Add Recording</source>
         <translation>Legg til opptak</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Add Video</source>
         <translation>Legg til video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Add File</source>
         <translation>Legg til fil</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Save</source>
         <translation>Lagre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Find</source>
         <translation>Finn</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="68"/>
         <source>Prev</source>
         <translation>Forrige</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Search Channel</source>
         <translation>Søk i kanal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Search Callsign</source>
         <translation>Søk i kallesignal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Search Name</source>
         <translation>Søk i navn</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Finish</source>
         <translation>Fullfør</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Add video</source>
         <translation>Legg til video</translation>
     </message>
@@ -1227,22 +1244,22 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="915"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="941"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="913"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="939"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Avslutt, og lagre miniatyrbildene</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="914"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="940"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Avslutt, Ikke lagre miniatyrbildene</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="906"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="932"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
@@ -1250,33 +1267,37 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="150"/>
+        <location filename="../mytharchive/videoselector.cpp" line="158"/>
         <source>Clear All</source>
         <translation>Velg ingen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="151"/>
+        <location filename="../mytharchive/videoselector.cpp" line="159"/>
         <source>Select All</source>
         <translation>Velg alle</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="152"/>
+        <location filename="../mytharchive/videoselector.cpp" line="160"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="350"/>
-        <location filename="../mytharchive/videoselector.cpp" line="481"/>
+        <location filename="../mytharchive/videoselector.cpp" line="358"/>
+        <location filename="../mytharchive/videoselector.cpp" line="491"/>
         <source>All Videos</source>
         <translation>Alle videoer</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="577"/>
-        <source>Parental Pin:</source>
-        <translation>Forelder-pin:</translation>
+        <location filename="../mytharchive/videoselector.cpp" line="548"/>
+        <source>You need to enter a valid password for this parental level</source>
+        <translation>Du må angi et gyldig passord for dette foreldrenivået</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="143"/>
+        <source>Parental Pin:</source>
+        <translation type="obsolete">Forelder-pin:</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/videoselector.cpp" line="151"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
