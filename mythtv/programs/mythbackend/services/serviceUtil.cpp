@@ -19,11 +19,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <QUrl>
+
 #include "serviceUtil.h"
 
 #include "programinfo.h"
 #include "recordinginfo.h"
 #include "channelutil.h"
+#include "metadataimagehelper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -108,6 +111,14 @@ void FillProgramInfo( DTC::Program *pProgram,
             const RecordingInfo ri(*pInfo);
             pRecording->setProfile( ri.GetProgramRecordingProfile() );
         }
+    }
+
+    if (!pInfo->GetInetRef().isEmpty() )
+    {
+        pProgram->setSerializeArtwork( true );
+
+        FillArtworkInfoList( pProgram->Artwork(), pInfo->GetInetRef(),
+                             pInfo->GetSeason());
     }
 }
 
@@ -202,3 +213,43 @@ void FillRecRuleInfo( DTC::RecRule  *pRecRule,
     pRecRule->setLastDeleted    (  pRule->m_lastDeleted       );
     pRecRule->setAverageDelay   (  pRule->m_averageDelay      );
 }
+
+void FillArtworkInfoList( DTC::ArtworkInfoList *pArtworkInfoList,
+                          const QString        &sInetref,
+                          uint                  nSeason )
+{
+    ArtworkMap map = GetArtwork(sInetref, nSeason);
+
+    for (ArtworkMap::const_iterator i = map.begin();
+         i != map.end(); ++i)
+    {
+        DTC::ArtworkInfo *pArtInfo = pArtworkInfoList->AddNewArtworkInfo();
+        pArtInfo->setFileName(i.value().url);
+        switch (i.key())
+        {
+            case kArtworkFanart:
+                pArtInfo->setStorageGroup("Fanart");
+                pArtInfo->setType("fanart");
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                              "&FileName=%2").arg("Fanart")
+                              .arg(QUrl(i.value().url).path()));
+                break;
+            case kArtworkBanner:
+                pArtInfo->setStorageGroup("Banners");
+                pArtInfo->setType("banner");
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                              "&FileName=%2").arg("Fanart")
+                              .arg(QUrl(i.value().url).path()));
+                break;
+            case kArtworkCoverart:
+            default:
+                pArtInfo->setStorageGroup("Coverart");
+                pArtInfo->setType("coverart");
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                              "&FileName=%2").arg("Fanart")
+                              .arg(QUrl(i.value().url).path()));
+                break;
+        }
+    }
+}
+

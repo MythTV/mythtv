@@ -29,6 +29,7 @@
 #include "datacontracthelper.h"
 
 #include "recording.h"
+#include "artworkInfoList.h"
 
 namespace DTC
 {
@@ -161,7 +162,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 class SERVICE_PUBLIC Program : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.1" );
+    Q_CLASSINFO( "version"    , "1.11" );
     Q_CLASSINFO( "defaultProp", "Description" );
 
     Q_PROPERTY( QDateTime   StartTime    READ StartTime    WRITE setStartTime )
@@ -191,6 +192,7 @@ class SERVICE_PUBLIC Program : public QObject
 
     Q_PROPERTY( QObject*    Channel      READ Channel   DESIGNABLE SerializeChannel )
     Q_PROPERTY( QObject*    Recording    READ Recording DESIGNABLE SerializeRecording )
+    Q_PROPERTY( QObject*    Artwork      READ Artwork   DESIGNABLE SerializeArtwork )
 
     PROPERTYIMP    ( QDateTime   , StartTime    )
     PROPERTYIMP    ( QDateTime   , EndTime      )
@@ -217,13 +219,15 @@ class SERVICE_PUBLIC Program : public QObject
     PROPERTYIMP    ( int         , Season       )
     PROPERTYIMP    ( int         , Episode      )
 
-    PROPERTYIMP_PTR( ChannelInfo  , Channel     )
-    PROPERTYIMP_PTR( RecordingInfo, Recording   )
+    PROPERTYIMP_PTR( ChannelInfo    , Channel     )
+    PROPERTYIMP_PTR( RecordingInfo  , Recording   )
+    PROPERTYIMP_PTR( ArtworkInfoList, Artwork     )
 
     // Used only by Serializer
     PROPERTYIMP( bool, SerializeDetails )
     PROPERTYIMP( bool, SerializeChannel )
     PROPERTYIMP( bool, SerializeRecording )
+    PROPERTYIMP( bool, SerializeArtwork )
 
     public:
 
@@ -237,6 +241,9 @@ class SERVICE_PUBLIC Program : public QObject
 
             if (QMetaType::type( "DTC::RecordingInfo" ) == 0)
                 RecordingInfo::InitializeCustomTypes();
+
+            if (QMetaType::type( "DTC::ArtworkInfoList" ) == 0)
+                ArtworkInfoList::InitializeCustomTypes();
         }
 
     public:
@@ -254,9 +261,11 @@ class SERVICE_PUBLIC Program : public QObject
               m_Episode             ( 0      ),
               m_Channel             ( NULL   ),
               m_Recording           ( NULL   ),
+              m_Artwork             ( NULL   ),
               m_SerializeDetails    ( true   ),
               m_SerializeChannel    ( true   ),
-              m_SerializeRecording  ( true   )
+              m_SerializeRecording  ( true   ),
+              m_SerializeArtwork    ( true   )
         {
         }
         
@@ -293,12 +302,16 @@ class SERVICE_PUBLIC Program : public QObject
             m_SerializeDetails  = src.m_SerializeDetails;
             m_SerializeChannel  = src.m_SerializeChannel;    
             m_SerializeRecording= src.m_SerializeRecording;  
+            m_SerializeArtwork  = src.m_SerializeArtwork;
 
             if ( src.m_Channel != NULL)
                 Channel()->Copy( src.m_Channel );
 
             if ( src.m_Recording != NULL)
                 Recording()->Copy( src.m_Recording );
+
+            if ( src.m_Artwork != NULL)
+                Artwork()->Copy( src.m_Artwork );
         }
 
 };
