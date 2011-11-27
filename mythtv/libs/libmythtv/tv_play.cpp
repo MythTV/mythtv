@@ -7081,23 +7081,20 @@ bool TV::ClearOSD(const PlayerContext *ctx)
 void TV::ToggleOSD(PlayerContext *ctx, bool includeStatusOSD)
 {
     OSD *osd = GetOSDLock(ctx);
-    bool hideAll    = false;
-    bool showStatus = false;
-    if (ContextIsPaused(ctx, __FILE__, __LINE__) || !osd)
+    if (!osd)
     {
         ReturnOSDLock(ctx, osd);
         return;
     }
-    bool is_status_disp          = osd->IsWindowVisible("osd_status");
-    bool has_prog_info           = osd->HasWindow("program_info");
-    bool is_prog_info_disp       = osd->IsWindowVisible("program_info");
+
+    bool hideAll    = false;
+    bool showStatus = false;
+    bool paused     = ContextIsPaused(ctx, __FILE__, __LINE__);
+    bool is_status_disp    = osd->IsWindowVisible("osd_status");
+    bool has_prog_info     = osd->HasWindow("program_info");
+    bool is_prog_info_disp = osd->IsWindowVisible("program_info");
 
     ReturnOSDLock(ctx, osd);
-
-    ctx->LockPlayingInfo(__FILE__, __LINE__);
-    QString desc  = ctx->playingInfo->GetDescription();
-    QString title = ctx->playingInfo->GetTitle();
-    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     if (is_status_disp)
     {
@@ -7106,7 +7103,7 @@ void TV::ToggleOSD(PlayerContext *ctx, bool includeStatusOSD)
         else
             hideAll = true;
     }
-    else if (is_prog_info_disp)
+    else if (is_prog_info_disp && !paused)
     {
         hideAll = true;
     }
@@ -7133,9 +7130,9 @@ void TV::ToggleOSD(PlayerContext *ctx, bool includeStatusOSD)
         osdInfo info;
         if (ctx->CalcPlayerSliderPosition(info))
         {
-            info.text["title"] = tr("Position");
+            info.text["title"] = paused ? tr("Paused") : tr("Position");
             UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default,
-                            kOSDTimeout_Med);
+                            paused ? kOSDTimeout_None : kOSDTimeout_Med);
             SetUpdateOSDPosition(true);
         }
         else
