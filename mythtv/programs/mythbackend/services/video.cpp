@@ -49,12 +49,12 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( bool bDescending,
                                                  int nCount       )
 {
     VideoMetadataListManager::metadata_list videolist;
-    VideoMetadataListManager::loadAllFromDatabase(videolist);
+    QString sql = "ORDER BY intid";
+    if (bDescending)
+        sql += " DESC";
+    VideoMetadataListManager::loadAllFromDatabase(videolist, sql);
 
     std::vector<VideoMetadataListManager::VideoMetadataPtr> videos(videolist.begin(), videolist.end());
-
-    if (bDescending)
-        std::reverse(videos.begin(), videos.end());
 
     // ----------------------------------------------------------------------
     // Build Response
