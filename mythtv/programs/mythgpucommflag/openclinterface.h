@@ -89,6 +89,9 @@ class OpenCLDevice
     OpenCLDeviceSpecific *m_vendorSpecific;
     cl_uint m_vectorWidth[6]; // char, short, int, long, float, double
 
+    size_t m_workGroupSizeX;
+    size_t m_workGroupSizeY;
+
     bool m_float64;
     bool m_opengl;
 };
@@ -171,6 +174,7 @@ typedef QPointer<OpenCLBuffers> OpenCLBufferPtr;
 
 const char *openCLErrorString(cl_int error);
 const char *openCLImageFormatString(cl_uint uiImageFormat);
+unsigned int nextPow2(unsigned int x);
 
 #endif
 

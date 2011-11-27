@@ -57,9 +57,9 @@ void audioVolumeLevelStats64(__global long4  *resultsIn,
         if (resGlbl.w <= 0)
             resGlbl.w = 1;
 
-        double4 fResIn = convert_double(resIn);
-        double4 fIntSt = convert_double(intSt);
-        double4 fResGl = convert_double(resGlbl);
+        double4 fResIn = convert_double4(resIn);
+        double4 fIntSt = convert_double4(intSt);
+        double4 fResGl = convert_double4(resGlbl);
 
         /*
           * fltStats.x = windowRMS

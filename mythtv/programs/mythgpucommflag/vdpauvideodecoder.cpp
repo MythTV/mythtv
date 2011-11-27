@@ -286,7 +286,8 @@ void VDPAUVideoDecoder::Shutdown(void)
     if (vdp_decoder_destroy && m_decoder)
         vdp_decoder_destroy(m_decoder);
 
-    glVDPAUFiniNV();
+    if (GLEW_NV_vdpau_interop)
+        glVDPAUFiniNV();
 
     if (vdp_device_destroy && m_device)
         vdp_device_destroy(m_device);

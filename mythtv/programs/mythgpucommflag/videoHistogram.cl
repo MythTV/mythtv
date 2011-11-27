@@ -32,8 +32,8 @@ void videoHistogram64(__read_only image2d_t fTop, __read_only image2d_t fBot,
     {
         float4 pixelT = read_imagef(fTop, sampler, (int2)(x, y));
         float4 pixelB = read_imagef(fBot, sampler, (int2)(x, y));
-        uint4 offsetT = convert_int((pixelT + 1.0) / HIST_CHUNK) - 1;
-        uint4 offsetB = convert_int((pixelB + 1.0) / HIST_CHUNK) - 1;
+        uint4 offsetT = convert_uint4((pixelT + 1.0) / HIST_CHUNK) - 1;
+        uint4 offsetB = convert_uint4((pixelB + 1.0) / HIST_CHUNK) - 1;
 
         atom_inc( &localHistY[offsetT.x] );
         atom_inc( &localHistU[offsetT.y] );

@@ -31,7 +31,6 @@ void InitOpenCLVideoProcessors(void)
 #define PAD_VALUE(x,y)  (((x) + (y) - 1) & ~((y) - 1))
 
 #define KERNEL_WAVELET_CL "videoWavelet.cl"
-#define KERNEL_WAVELET_WORKSIZE 32
 void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
                    VideoSurface *wavelet)
 {
@@ -55,12 +54,11 @@ void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
     // Setup the kernel arguments, first level
     int totDims[2] = { wavelet->m_realWidth, wavelet->m_realHeight };
     int useDims[2] = { wavelet->m_realWidth / 2, wavelet->m_realHeight / 2 };
-    int widthR  = PAD_VALUE(totDims[0], KERNEL_WAVELET_WORKSIZE);
-    int heightR = PAD_VALUE(totDims[1], KERNEL_WAVELET_WORKSIZE);
+    int widthR  = PAD_VALUE(totDims[0], dev->m_workGroupSizeX);
+    int heightR = PAD_VALUE(totDims[1], dev->m_workGroupSizeY);
 
     size_t globalWorkDims[2] = { widthR, heightR };
-    size_t localWorkDims[2]  = { KERNEL_WAVELET_WORKSIZE,
-                                 KERNEL_WAVELET_WORKSIZE };
+    size_t localWorkDims[2]  = { dev->m_workGroupSizeX, dev->m_workGroupSizeY };
 
     for (int i = 0; i < 2; i++)
     {
@@ -143,16 +141,15 @@ void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,
     // Setup the kernel arguments, first level
     int totDims[2] = { wavelet->m_realWidth, wavelet->m_realHeight };
     int useDims[2] = { wavelet->m_realWidth / 2, wavelet->m_realHeight / 2 };
-    int widthR  = PAD_VALUE(totDims[0], KERNEL_WAVELET_WORKSIZE);
-    int heightR = PAD_VALUE(totDims[1], KERNEL_WAVELET_WORKSIZE);
+    int widthR  = PAD_VALUE(totDims[0], dev->m_workGroupSizeX);
+    int heightR = PAD_VALUE(totDims[1], dev->m_workGroupSizeY);
     LOG(VB_GPUVIDEO, LOG_INFO,
         QString("totDims: %1x%2, useDims: %3x%4 workDims: %5x%6")
         .arg(totDims[0]) .arg(totDims[1]) .arg(useDims[0]) .arg(useDims[1])
         .arg(widthR) .arg(heightR));
 
     size_t globalWorkDims[2] = { widthR, heightR };
-    size_t localWorkDims[2]  = { KERNEL_WAVELET_WORKSIZE,
-                                 KERNEL_WAVELET_WORKSIZE };
+    size_t localWorkDims[2]  = { dev->m_workGroupSizeX, dev->m_workGroupSizeY };
 
     for (int i = 0; i < 2; i++)
     {
@@ -889,14 +886,13 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
 
     // Setup the kernel arguments
     int totDims[2] = { in->m_realWidth, in->m_realHeight };
-    int widthR  = PAD_VALUE(totDims[0], KERNEL_WAVELET_WORKSIZE);
-    int heightR = PAD_VALUE(totDims[1], KERNEL_WAVELET_WORKSIZE);
+    int widthR  = PAD_VALUE(totDims[0], dev->m_workGroupSizeX);
+    int heightR = PAD_VALUE(totDims[1], dev->m_workGroupSizeY);
 
     size_t globalWorkDims[2] = { widthR, heightR };
-    size_t localWorkDims[2]  = { KERNEL_WAVELET_WORKSIZE,
-                                 KERNEL_WAVELET_WORKSIZE };
-    size_t reduceWorkDims[2] = { widthR / KERNEL_WAVELET_WORKSIZE,
-                                 heightR / KERNEL_WAVELET_WORKSIZE };
+    size_t localWorkDims[2]  = { dev->m_workGroupSizeX, dev->m_workGroupSizeY };
+    size_t reduceWorkDims[2] = { widthR  / dev->m_workGroupSizeX,
+                                 heightR / dev->m_workGroupSizeY };
     size_t histcount = 64 * reduceWorkDims[0] * reduceWorkDims[1];
 
     static OpenCLBufferPtr memBufs = NULL;

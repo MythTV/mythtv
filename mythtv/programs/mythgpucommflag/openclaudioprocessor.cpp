@@ -12,7 +12,6 @@
 #endif
 
 // Prototypes
-unsigned int nextPow2(unsigned int x);
 void OpenCLVolumeLevelCleanup(cl_mem **bufs);
 FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                int count, int64_t pts, int rate);
@@ -28,25 +27,6 @@ void InitOpenCLAudioProcessors(void)
 {
     openCLAudioProcessorList =
         new AudioProcessorList(openCLAudioProcessorInit);
-}
-
-unsigned int nextPow2( unsigned int x )
-{
-    unsigned int y;
-    int bits;
-
-    if (x == 0)
-        return 0;
-
-    --x;
-
-    for (bits = 1, y = x >> bits; y != 0 && bits <= 32; y = x >> bits)
-    {
-        x |= y;
-        bits <<= 1;
-    }
-
-    return ++x;
 }
 
 

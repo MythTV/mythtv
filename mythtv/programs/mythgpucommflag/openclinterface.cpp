@@ -7,6 +7,7 @@
 #include <sstream>
 #include <fstream>
 #include <strings.h>
+#include <math.h>
 
 #include "mythlogging.h"
 
@@ -330,6 +331,9 @@ OpenCLDevice::OpenCLDevice(cl_device_id device, bool needOpenGL) :
     clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_GROUP_SIZE,
                     sizeof(m_maxWorkGroupSize), &m_maxWorkGroupSize, NULL);
 
+    m_workGroupSizeX = nextPow2((unsigned int)sqrt((double)m_maxWorkGroupSize));
+    m_workGroupSizeY = m_maxWorkGroupSize / m_workGroupSizeY;
+
     // CL_DEVICE_MAX_CLOCK_FREQUENCY
     clGetDeviceInfo(device, CL_DEVICE_MAX_CLOCK_FREQUENCY,
                     sizeof(m_maxClockFrequency), &m_maxClockFrequency, NULL);
@@ -505,8 +509,9 @@ OpenCLDevice::~OpenCLDevice()
 
 uint64_t OpenCLDevice::GetHash(void)
 {
-    uint64_t value = ((uint64_t)m_maxComputeUnits)   << 48 |
-                     ((uint64_t)m_globalMemSize)     << 32 |
+    uint64_t value = ((uint64_t)m_deviceType)        << 48 |
+                     ((uint64_t)m_maxComputeUnits)   << 32 |
+                     ((uint64_t)m_globalMemSize)     << 16 |
                      ((uint64_t)m_maxClockFrequency);
     return (uint64_t)~value;
 }
@@ -553,6 +558,9 @@ void OpenCLDevice::Display(void)
     
     LOG(VB_GPU, LOG_INFO, QString("OpenCL Max Work Group Size: %1")
         .arg(m_maxWorkGroupSize));
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Calculated Work Group Size: %1x%2")
+        .arg(m_workGroupSizeX) .arg(m_workGroupSizeY));
+
     LOG(VB_GPU, LOG_INFO, QString("OpenCL Device Max Clock Freq: %1 MHz")
         .arg(m_maxClockFrequency));
     LOG(VB_GPU, LOG_INFO, QString("OpenCL Address Bits: %1")
@@ -957,6 +965,26 @@ const char *openCLImageFormatString(cl_uint uiImageFormat)
         default:                    return "Unknown";
     }
 }
+
+unsigned int nextPow2( unsigned int x )
+{
+    unsigned int y;
+    int bits;
+
+    if (x == 0)
+        return 0;
+
+    --x;
+
+    for (bits = 1, y = x >> bits; y != 0 && bits <= 32; y = x >> bits)
+    {
+        x |= y;
+        bits <<= 1;
+    }
+
+    return ++x;
+}
+
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
