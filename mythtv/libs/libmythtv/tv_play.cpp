@@ -2661,7 +2661,7 @@ void TV::timerEvent(QTimerEvent *te)
 
     if (!netCmd.isEmpty())
     {
-        PlayerContext *actx = GetPlayerWriteLock(-1, __FILE__, __LINE__);
+        PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         ProcessNetworkControlCommand(actx, netCmd);
         ReturnPlayerLock(actx);
         handled = true;
@@ -3387,7 +3387,7 @@ bool TV::event(QEvent *e)
     if (QEvent::KeyPress == e->type())
     {
         bool handled = false;
-        PlayerContext *actx = GetPlayerWriteLock(-1, __FILE__, __LINE__);
+        PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         if (actx->HasPlayer())
             handled = ProcessKeypress(actx, (QKeyEvent *)e);
         ReturnPlayerLock(actx);
@@ -8399,7 +8399,7 @@ void TV::customEvent(QEvent *e)
 
     if (me->ExtraDataCount() == 1)
     {
-        PlayerContext *ctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
+        PlayerContext *ctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         int value = me->ExtraData(0).toInt();
         if (message == ACTION_SETVOLUME)
             ChangeVolume(ctx, false, value);
@@ -8434,7 +8434,7 @@ void TV::customEvent(QEvent *e)
 
     if (message == ACTION_SCREENSHOT)
     {
-        PlayerContext *mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
+        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         int width = 0;
         int height = 0;
         QString filename;
