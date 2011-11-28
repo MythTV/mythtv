@@ -65,10 +65,6 @@ class Video : public VideoServices
 
         DTC::BlurayInfo*          GetBluray          ( const QString  &Path      );
 
-    private:
-
-        DTC::VideoMetadataInfo*   GetInfoFromMetadata(
-                             VideoMetadataListManager::VideoMetadataPtr metadata );
 };
 
 // --------------------------------------------------------------------------
