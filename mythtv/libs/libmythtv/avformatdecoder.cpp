@@ -3982,7 +3982,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     int ret             = 0;
     int data_size       = 0;
     bool firstloop      = true;
-    int frames          = -1;
+    int decoded_size    = -1;
 
     avcodeclock->lock();
     int audIdx = selectedTrack[kTrackTypeAudio].av_stream_index;
@@ -4044,9 +4044,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
             ret = avcodec_decode_audio3(ctx, audioSamples,
                                         &data_size, &tmp_pkt);
-            frames = data_size /
-                (ctx->channels *
-                 av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
+            decoded_size = data_size;
             already_decoded = true;
             reselectAudioTrack |= ctx->channels;
         }
@@ -4089,12 +4087,10 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
                     ret = avcodec_decode_audio3(ctx, audioSamples, &data_size,
                                                 &tmp_pkt);
-                    frames = data_size /
-                        (ctx->channels *
-                         av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
+                    decoded_size = data_size;
                 }
                 else
-                    frames = -1;
+                    decoded_size = -1;
             }
             memcpy(audioSamples, tmp_pkt.data, tmp_pkt.size);
             data_size = tmp_pkt.size;
@@ -4117,9 +4113,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
                 ret = avcodec_decode_audio3(ctx, audioSamples, &data_size,
                                             &tmp_pkt);
-                frames = data_size /
-                    (ctx->channels *
-                     av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
+                decoded_size = data_size;
             }
 
             // When decoding some audio streams the number of
@@ -4156,6 +4150,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             extract_mono_channel(audSubIdx, &audioOut,
                                  (char *)audioSamples, data_size);
 
+        int frames = (ctx->channels <= 0 || decoded_size < 0) ? -1 :
+            decoded_size / (ctx->channels *
+                            av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
         m_audio->AddAudioData((char *)audioSamples, data_size, temppts, frames);
         if (audioOut.do_passthru && !m_audio->NeedDecodingBeforePassthrough())
         {
