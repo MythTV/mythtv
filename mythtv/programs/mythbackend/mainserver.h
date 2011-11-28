@@ -272,7 +272,7 @@ class MainServer : public QObject, public MythSocketCBs
     vector<FileTransfer *> fileTransferList;
 
     QMutex masterFreeSpaceListLock;
-    FreeSpaceUpdater *masterFreeSpaceListUpdater;
+    FreeSpaceUpdater * volatile masterFreeSpaceListUpdater;
     QWaitCondition masterFreeSpaceListWait;
     QStringList masterFreeSpaceList;
 
