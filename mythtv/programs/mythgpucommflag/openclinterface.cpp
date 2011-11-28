@@ -332,7 +332,7 @@ OpenCLDevice::OpenCLDevice(cl_device_id device, bool needOpenGL) :
                     sizeof(m_maxWorkGroupSize), &m_maxWorkGroupSize, NULL);
 
     m_workGroupSizeX = nextPow2((unsigned int)sqrt((double)m_maxWorkGroupSize));
-    m_workGroupSizeY = m_maxWorkGroupSize / m_workGroupSizeY;
+    m_workGroupSizeY = m_maxWorkGroupSize / m_workGroupSizeX;
 
     // CL_DEVICE_MAX_CLOCK_FREQUENCY
     clGetDeviceInfo(device, CL_DEVICE_MAX_CLOCK_FREQUENCY,

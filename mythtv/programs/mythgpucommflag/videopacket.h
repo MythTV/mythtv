@@ -24,6 +24,7 @@ class VideoPacket
     VideoSurface *m_frameYUV;
     VideoSurface *m_frameYUVSNORM;
     VideoSurface *m_wavelet;
+    uint32_t      m_histogram[64 * 4];
 };
 
 class VideoPacketMap : public QMap<void *, VideoPacket *>

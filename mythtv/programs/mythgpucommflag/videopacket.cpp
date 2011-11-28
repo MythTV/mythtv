@@ -37,6 +37,8 @@ VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num) :
                                   m_frameRaw->m_width, m_frameRaw->m_height);
     OpenCLWavelet(dev, m_frameYUVSNORM, m_wavelet);
 
+    OpenCLHistogram64(dev, m_frameYUVSNORM, m_histogram);
+
     videoPacketMap.Add(m_frameIn, this);
 }
 
