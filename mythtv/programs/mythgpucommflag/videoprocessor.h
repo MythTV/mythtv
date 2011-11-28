@@ -48,6 +48,8 @@ void InitSoftwareVideoProcessors(void);
 void SoftwareWavelet(AVFrame *frame, AVFrame *wavelet);
 void OpenCLCombineYUV(OpenCLDevice *dev, VideoSurface *frame,
                       VideoSurface *yuvframe);
+void OpenCLCombineFFMpegYUV(OpenCLDevice *dev, VideoSurface *frame,
+                            VideoSurface *yuvframe);
 void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
                    VideoSurface *wavelet);
 void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,

@@ -20,6 +20,46 @@ void videoCombineYUV(__read_only image2d_t Y, __read_only image2d_t UV,
     write_imagef(YUV, (int2)(x, y), val);
 }
 
+// Pack the YUV420P planes into one image, split into two fields
+__kernel
+void videoCombineFFMpegYUV(__read_only image2d_t in,
+                           __write_only image2d_t top,
+                           __write_only image2d_t bot)
+{
+    int x = get_global_id(0);
+    int y = get_global_id(1);
+    const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE |
+                              CLK_ADDRESS_CLAMP_TO_EDGE |
+                              CLK_FILTER_NEAREST;
+
+    float4 val;
+
+    int maxx = get_global_size(0);
+    int maxy = get_global_size(1);
+
+    int pixnumy  = x + (y * maxx);
+    int pixnumuv = (x / 2) + ((y / 2) * (maxx / 2));
+    int xuv = pixnumuv % maxx;
+    int yuv = pixnumuv / maxx;
+
+    int2 ypos = (int2)(x, y);
+    int2 upos = (int2)(xuv, maxy + yuv);
+    int2 vpos = (int2)(xuv, (maxy * 5) / 4 + yuv);
+
+    val.x = read_imagef(in, sampler, ypos).x;
+    val.y = read_imagef(in, sampler, upos).x;
+    val.z = read_imagef(in, sampler, vpos).x;
+    val.yz -= 0.5;  // FFMpeg packs as CL_UNORM_8, need SNORM
+    val.yz *= 2.0;
+    val.w  = 1.0;
+
+    if (y % 2)
+        write_imagef(bot, (int2)(x, y / 2), val);
+    else
+        write_imagef(top, (int2)(x, y / 2), val);
+}
+
+
 // Convert the YUV for use with SNORM buffers (for dumping)
 __kernel
 void videoYUVToSNORM(__read_only image2d_t in, __write_only image2d_t out)

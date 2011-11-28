@@ -13,7 +13,8 @@
 VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
                            uint id, VdpVideoSurface vdpSurface) : 
     m_type(kSurfaceVDPAURender), m_id(id), m_dev(dev), m_width(width),
-    m_height(height), m_vdpSurface(vdpSurface), m_bufCount(4), m_valid(false)
+    m_height(height), m_vdpSurface(vdpSurface), m_buf(NULL), m_bufCount(4),
+    m_valid(false)
 {
     memset(&m_render, 0, sizeof(m_render));
     m_clBuffer = new cl_mem[m_bufCount];
@@ -98,7 +99,8 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
 
 VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
                            uint32_t width, uint32_t height) :
-    m_type(type), m_id(0), m_dev(dev), m_width(width), m_height(height)
+    m_type(type), m_id(0), m_dev(dev), m_width(width), m_height(height),
+    m_buf(NULL)
 {
     int ciErrNum;
     cl_image_format format;
@@ -110,8 +112,28 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
     bufWidth = m_width;
     bufHeight = m_height / 2;
 
+    format.image_channel_order = CL_RGBA;
+
     switch (m_type)
     {
+        case kSurfaceFFMpegRender:
+            // Gonna pack all 3 planes into one buffer
+            format.image_channel_order = CL_R;
+            format.image_channel_data_type = CL_UNORM_INT8;
+
+            bufHeight += m_height;
+            m_bufCount = 1;
+
+            m_buf = new unsigned char[bufWidth * bufHeight];
+
+            m_offsets[0] = 0;
+            m_offsets[1] = m_width * m_height;
+            m_offsets[2] = m_offsets[1] + (m_width * m_height) / 4;
+
+            m_pitches[0] = m_width;
+            m_pitches[1] = m_width / 2;
+            m_pitches[2] = m_width / 2;
+            break;
         case kSurfaceWavelet:
         case kSurfaceYUV2:
             format.image_channel_data_type = CL_SNORM_INT8;
@@ -140,8 +162,6 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
 
     m_clBuffer = new cl_mem[m_bufCount];
     memset(m_clBuffer, 0, m_bufCount * sizeof(cl_mem));
-
-    format.image_channel_order = CL_RGBA;
 
     for (int i = 0; i < m_bufCount; i++)
     {
@@ -173,6 +193,9 @@ VideoSurface::~VideoSurface()
 
     if (m_id)
         glVDPAUUnregisterSurfaceNV(m_glSurface);
+
+    if (m_buf)
+        delete [] m_buf;
 }
 
 void VideoSurface::Bind(void)
@@ -211,6 +234,9 @@ void VideoSurface::Dump(QString basename, int framenum)
     switch (m_type)
     {
         case kSurfaceVDPAURender:
+            break;
+        case kSurfaceFFMpegRender:
+            extension = "pgm";
             break;
         case kSurfaceWavelet:
         case kSurfaceYUV2:

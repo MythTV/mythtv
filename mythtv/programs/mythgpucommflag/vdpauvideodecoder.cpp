@@ -301,7 +301,7 @@ void VDPAUVideoDecoder::Shutdown(void)
 
 void VDPAUVideoDecoder::SetCodec(AVCodec *codec)
 {
-    bool m_useCPU = false;
+    m_useCPU = false;
     uint stream_type = mpeg_version(codec->id);
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1));
     m_useCPU |= !codec_is_vdpau_hw(test_cid);
@@ -415,7 +415,7 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 
 void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 {
-    if (pic->type != FF_BUFFER_TYPE_USER);
+    if (pic->type != FF_BUFFER_TYPE_USER)
         return;
 
 #ifdef USING_VDPAU

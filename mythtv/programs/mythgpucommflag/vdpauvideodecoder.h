@@ -16,17 +16,14 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-typedef QHash<uint, VideoSurface *> VDPAUSurfaceHash;
 typedef QHash<VdpVideoSurface, uint> VDPAUSurfaceRevHash;
-typedef QList<uint> VDPAUSurfaceList;
 
 class VDPAUVideoDecoder : public VideoDecoder
 {
   public:
     VDPAUVideoDecoder(OpenCLDevice *dev) : VideoDecoder(dev, false),
         m_display(NULL), m_errorState(kError_None), m_pixFmt(PIX_FMT_NONE),
-        m_nextId(1), m_decoderBufferSize(0), m_processBufferSize(0),
-        m_decoderInit(false) {};
+        m_processBufferSize(0), m_decoderInit(false) {};
 
     ~VDPAUVideoDecoder() { Shutdown(); };
     const char *Name(void) { return "VDPAU"; };
@@ -52,20 +49,11 @@ class VDPAUVideoDecoder : public VideoDecoder
     VideoErrorState m_errorState;
     PixelFormat m_pixFmt;
 
-    VDPAUSurfaceHash m_videoSurfaces;
     VDPAUSurfaceRevHash m_reverseSurfaces;
 
-    VDPAUSurfaceList m_usedSurfaces;
-    VDPAUSurfaceList m_unusedSurfaces;
-
     QMutex m_lock;
-    QMutex m_renderLock;
     QMutex m_decodeLock;
 
-    QMutex m_idLock;
-    uint32_t m_nextId;
-
-    int m_decoderBufferSize;
     int m_processBufferSize;
 
     bool m_accelMpeg4;

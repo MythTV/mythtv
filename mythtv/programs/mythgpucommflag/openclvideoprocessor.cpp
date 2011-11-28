@@ -267,6 +267,59 @@ void OpenCLCombineYUV(OpenCLDevice *dev, VideoSurface *frame,
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL CombineYUV Done");
 }
 
+void OpenCLCombineFFMpegYUV(OpenCLDevice *dev, VideoSurface *frame,
+                            VideoSurface *yuvframe)
+{
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL CombineFFMpegYUV");
+
+    static OpenCLKernelDef kern[] = {
+        { NULL, "videoCombineFFMpegYUV", KERNEL_CONVERT_CL }
+    };
+    static int kernCount = sizeof(kern)/sizeof(kern[0]);
+
+    int ciErrNum;
+
+    cl_kernel kernel;
+
+    if (!dev->OpenCLLoadKernels(kern, kernCount, NULL))
+        return;
+
+    // Make sure previous commands are finished
+    clFinish(dev->m_commandQ);
+
+    // Setup the kernel arguments
+    int width   = frame->m_width;
+    int height  = frame->m_height;
+
+    size_t globalWorkDims[2] = { width, height };
+
+    kernel = kern[0].kernel->m_kernel;
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem),
+                               &frame->m_clBuffer[0]);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
+                               &yuvframe->m_clBuffer[0]);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem),
+                               &yuvframe->m_clBuffer[1]);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 2, NULL,
+                                      globalWorkDims, NULL, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
+        return;
+    }
+
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL CombineFFMpegYUV Done");
+}
+
 void OpenCLYUVToRGB(OpenCLDevice *dev, VideoSurface *yuvframe,
                     VideoSurface *rgbframe)
 {

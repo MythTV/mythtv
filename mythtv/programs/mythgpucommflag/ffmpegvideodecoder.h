@@ -19,7 +19,9 @@ class FFMpegVideoDecoder : public VideoDecoder
     VideoSurface *DecodeFrame(AVFrame *frame);
     void DiscardFrame(VideoSurface *frame);
     void Shutdown(void);
-    void SetCodec(AVCodec *codec) { m_codecId = codec->id; };
+    void SetCodec(AVCodec *codec) { m_codecId = codec->id; m_codec = codec; };
+    uint CreateVideoSurface(uint32_t width, uint32_t height,
+                            VdpChromaType type = VDP_CHROMA_TYPE_420);
 };
 
 int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);

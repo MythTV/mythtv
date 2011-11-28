@@ -2,6 +2,8 @@
 #include <QMutex>
 #include <QMutexLocker>
 
+#include <strings.h>
+
 #include "mythlogging.h"
 #include "videodecoder.h"
 #include "videopacket.h"
@@ -22,7 +24,10 @@ VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num) :
 
     m_frameYUV = new VideoSurface(m_frameRaw->m_dev, kSurfaceYUV,
                                   m_frameRaw->m_width, m_frameRaw->m_height);
-    OpenCLCombineYUV(dev, m_frameRaw, m_frameYUV);
+    if (!strcmp(m_decoder->Name(), "FFMpeg"))
+        OpenCLCombineFFMpegYUV(dev, m_frameRaw, m_frameYUV);
+    else
+        OpenCLCombineYUV(dev, m_frameRaw, m_frameYUV);
 
     m_frameYUVSNORM = new VideoSurface(m_frameRaw->m_dev, kSurfaceYUV,
                                        m_frameRaw->m_width,

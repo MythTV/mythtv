@@ -116,6 +116,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
     AVPacket *pkt = packet->m_pkt;
     QMutex   *avcodeclock = packet->m_mutex;
     AVCodecContext *ac = curstream->codec;
+    int retcode = 0;
 
     if (!m_opened)
     {
@@ -148,9 +149,10 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         }
         m_codec = m_decoder->m_codec;
 
-        if (avcodec_open(m_context, m_codec) < 0)
+        if ((retcode = avcodec_open(m_context, m_codec)) < 0)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Can't open video codec!");
+            LOG(VB_GENERAL, LOG_ERR, QString("Can't open video codec (%1): %2")
+                .arg(m_codec->name) .arg(retcode));
             return;
         }
 
@@ -188,12 +190,13 @@ void VideoConsumer::ProcessPacket(Packet *packet)
     // Push YUV frame to GPU/CPU Processing memory
     if (m_dev)
     {
-        // Push frame to the GPU via OpenGL/OpenCL
+        // Push frame to the GPU via OpenCL
         count++;
-        LOG(VB_GENERAL, LOG_INFO, "About to transfer OpenGL->OpenCL");
+        LOG(VB_GENERAL, LOG_INFO, "About to transfer frame to OpenCL");
         videoFrame = new VideoPacket(m_decoder, &mpa_pic, count);
-        LOG(VB_GENERAL, LOG_INFO, "Finished transferring OpenGL->OpenCL");
+        LOG(VB_GENERAL, LOG_INFO, "Finished transferring frame to OpenCL");
 
+#define DEBUG_VIDEO
 #ifdef DEBUG_VIDEO
         if ((count <= 100) && videoFrame)
         {
@@ -308,7 +311,7 @@ void VideoConsumer::InitVideoCodec(void)
             .arg(ff_codec_id_string(m_context->codec_id)));
     }
 
-    if (m_specialDecode)
+    if (0 && m_specialDecode)
     {
         m_context->flags2 |= CODEC_FLAG2_FAST;
 
