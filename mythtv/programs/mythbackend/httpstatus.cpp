@@ -138,12 +138,19 @@ void HttpStatus::GetStatusXML( HTTPRequest *pRequest )
 {
     QDomDocument doc( "Status" );
 
+    // UTF-8 is the default, but good practice to specify it anyway
+    QDomProcessingInstruction encoding =
+        doc.createProcessingInstruction("xml",
+                                        "version=\"1.0\" encoding=\"UTF-8\"");
+    doc.appendChild(encoding);
+
     FillStatusXML( &doc );
 
     pRequest->m_eResponseType   = ResponseTypeXML;
     pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
 
     QTextStream stream( &pRequest->m_response );
+    stream.setCodec("UTF-8");	// Otherwise locale default is used.
     stream << doc.toString();
 }
 
