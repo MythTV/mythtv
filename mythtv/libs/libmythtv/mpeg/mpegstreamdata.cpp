@@ -1001,40 +1001,34 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     if (!ok)
         return false;
 
-    if (!tspacket.Scrambled() && tspacket.HasPayload())
+    if (tspacket.Scrambled())
+        return true;
+
+    if (IsVideoPID(tspacket.PID()))
     {
-        if (IsVideoPID(tspacket.PID()))
-        {
-            for (uint j = 0; j < _ts_av_listeners.size(); j++)
-                _ts_av_listeners[j]->ProcessVideoTSPacket(tspacket);
+        for (uint j = 0; j < _ts_av_listeners.size(); j++)
+            _ts_av_listeners[j]->ProcessVideoTSPacket(tspacket);
 
-            return true;
-        }
-
-        if (IsAudioPID(tspacket.PID()))
-        {
-            for (uint j = 0; j < _ts_av_listeners.size(); j++)
-                _ts_av_listeners[j]->ProcessAudioTSPacket(tspacket);
-
-            return true;
-        }
-
-        if (IsWritingPID(tspacket.PID()) && _ts_writing_listeners.size())
-        {
-            for (uint j = 0; j < _ts_writing_listeners.size(); j++)
-                _ts_writing_listeners[j]->ProcessTSPacket(tspacket);
-        }
-
-        if (IsListeningPID(tspacket.PID()))
-        {
-            HandleTSTables(&tspacket);
-        }
+        return true;
     }
-    else if (!tspacket.Scrambled() && IsWritingPID(tspacket.PID()))
+
+    if (IsAudioPID(tspacket.PID()))
     {
-        // PCRPID and other streams we're writing may not have payload...
+        for (uint j = 0; j < _ts_av_listeners.size(); j++)
+            _ts_av_listeners[j]->ProcessAudioTSPacket(tspacket);
+
+        return true;
+    }
+
+    if (IsWritingPID(tspacket.PID()))
+    {
         for (uint j = 0; j < _ts_writing_listeners.size(); j++)
             _ts_writing_listeners[j]->ProcessTSPacket(tspacket);
+    }
+
+    if (IsListeningPID(tspacket.PID()) && tspacket.HasPayload())
+    {
+        HandleTSTables(&tspacket);
     }
 
     return true;
