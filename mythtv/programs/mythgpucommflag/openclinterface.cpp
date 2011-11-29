@@ -2,7 +2,10 @@
 #include <QStringList>
 #include <QMap>
 #include <QFile>
+#include <QDir>
 #include <QByteArray>
+#include <QRegExp>
+#include <QCryptographicHash>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -10,6 +13,7 @@
 #include <math.h>
 
 #include "mythlogging.h"
+#include "mythdirs.h"
 
 #include <CL/opencl.h>
 #include "openclinterface.h"
@@ -239,15 +243,18 @@ OpenCLDevice::OpenCLDevice(cl_device_id device, bool needOpenGL) :
         if (!openGLInitialize())
         {
             LOG(VB_GENERAL, LOG_ERR, "Could not open OpenGL Context!");
-            return;
         }
-
-        cl_context_properties openGLProps[] = {
-            CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(), 
-            CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
-            0 };
-        m_props = new cl_context_properties[5];
-        memcpy(m_props, openGLProps, sizeof(openGLProps));
+        else
+        {
+            cl_context_properties openGLProps[] = {
+                CL_GL_CONTEXT_KHR,
+                (cl_context_properties)glXGetCurrentContext(), 
+                CL_GLX_DISPLAY_KHR,
+                (cl_context_properties)glXGetCurrentDisplay(),
+                0 };
+            m_props = new cl_context_properties[5];
+            memcpy(m_props, openGLProps, sizeof(openGLProps));
+        }
     }
 
     // Create a context for the device
@@ -707,51 +714,143 @@ int OpenCLDeviceNvidiaSpecific::ConvertSMVer2Cores(int major, int minor)
 }
 
 OpenCLKernel *OpenCLKernel::Create(OpenCLDevice *device, QString entry,
-                                          QString filename)
+                                   QString filename)
 {
-    QFile file(filename);
+    QString fullFilename = QString("%1/mythgpucommflag/%2") .arg(GetShareDir())
+                               .arg(filename);
+    QFile file(fullFilename);
 
+    filename.detach();
     entry.detach();
 
     LOG(VB_GENERAL, LOG_INFO, QString("Loading OpenCL kernel %1 from %2")
         .arg(entry) .arg(filename));
 
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Create(%1): Could not open program file: %2")
-            .arg(entry) .arg(filename));
-        return NULL;
-    }
-
-    QByteArray programText = file.readAll();
-    const char *programChar = programText.constData();
-    file.close();
-
+    cl_program program;
     cl_int ciErrNum;
-    cl_program program = clCreateProgramWithSource(device->m_context, 1,
-                                                   &programChar, NULL,
-                                                   &ciErrNum);
-    if (ciErrNum != CL_SUCCESS)
+
+    bool mapRead = false;
+    if (device->m_programMap.contains(filename))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Create(%1): Error %2 trying to create program from source")
-            .arg(entry) .arg(ciErrNum));
-        return NULL;
+        program = device->m_programMap.value(filename);
+        LOG(VB_GENERAL, LOG_INFO, "Cached in program map");
+        mapRead = true;
     }
 
-    ciErrNum = clBuildProgram(program, 1, &device->m_deviceId, NULL, NULL,
-                              NULL);
-    if (ciErrNum != CL_SUCCESS)
+    if (!mapRead)
     {
-        // Get the build errors
-        char buildLog[16384];
-        clGetProgramBuildInfo(program, device->m_deviceId, CL_PROGRAM_BUILD_LOG,
-                              sizeof(buildLog), buildLog, NULL);
-        LOG(VB_GENERAL, LOG_ERR, QString("Create(%1): Error %2 in kernel: %3")
-            .arg(entry) .arg(ciErrNum) .arg(buildLog));
-        clReleaseProgram(program);
-        return NULL;
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Create(%1): Could not open program file: %2")
+                .arg(entry) .arg(filename));
+            return NULL;
+        }
+
+        QByteArray programText = file.readAll();
+        const char *programChar = programText.constData();
+        file.close();
+
+        QCryptographicHash hash(QCryptographicHash::Sha1);
+        hash.addData(device->m_name.toLocal8Bit());
+        hash.addData(programText);
+        QByteArray sha1(hash.result());
+        QByteArray sha1hex(sha1.toHex());
+
+        bool sha1read = false;
+        QString cacheFilename = OpenCLKernel::GetCacheFilename(device,
+                                                               filename);
+        QFile hashfile(cacheFilename + ".sha1");
+        QByteArray sha1cache;
+
+        if (hashfile.open(QIODevice::ReadOnly))
+        {
+            sha1cache = hashfile.readAll();
+            hashfile.close();
+            sha1read = true;
+        }
+
+        bool cacheRead = false;
+
+        if (sha1read && sha1hex == sha1cache)
+        {
+            // Don't compile from source.
+            QFile cachefile(cacheFilename);
+            if (cachefile.open(QIODevice::ReadOnly))
+            {
+                size_t binsize = cachefile.size();
+                unsigned char *programBinary = new unsigned char[binsize];
+                cachefile.read((char *)programBinary, binsize);
+                cachefile.close();
+                cacheRead = true;
+
+                LOG(VB_GENERAL, LOG_INFO, QString("Loading from cache file %1")
+                    .arg(cacheFilename));
+            
+                cl_int binStatus;
+
+                program = clCreateProgramWithBinary(device->m_context, 1, 
+                                       &device->m_deviceId, &binsize,
+                                       (const unsigned char **)&programBinary,
+                                       &binStatus, &ciErrNum);
+
+                delete [] programBinary;
+
+                if (ciErrNum != CL_SUCCESS)
+                {
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Error loading binary program %1: %2 (%3)")
+                        .arg(filename) .arg(ciErrNum)
+                        .arg(openCLErrorString(ciErrNum)));
+                    return NULL;
+                }
+
+                if (binStatus != CL_SUCCESS)
+                {
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Binary program %1 invalid for device: %2 (%3)")
+                        .arg(filename) .arg(binStatus)
+                        .arg(openCLErrorString(binStatus)));
+                    return NULL;
+                }
+            }
+        }
+
+        if (!cacheRead)
+        {
+            program = clCreateProgramWithSource(device->m_context, 1,
+                                                &programChar, NULL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS)
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Create(%1): Error creating from source: %2 (%3)")
+                    .arg(entry) .arg(ciErrNum)
+                    .arg(openCLErrorString(ciErrNum)));
+                return NULL;
+            }
+        }
+
+        ciErrNum = clBuildProgram(program, 1, &device->m_deviceId, NULL, NULL,
+                                  NULL);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            // Get the build errors
+            char buildLog[16384];
+            clGetProgramBuildInfo(program, device->m_deviceId,
+                                  CL_PROGRAM_BUILD_LOG,
+                                  sizeof(buildLog), buildLog, NULL);
+            LOG(VB_GENERAL, LOG_ERR, 
+                QString("Create(%1): Error in kernel: %2 (%3): %4")
+                .arg(entry) .arg(ciErrNum) .arg(openCLErrorString(ciErrNum))
+                .arg(buildLog));
+            clReleaseProgram(program);
+            return NULL;
+        }
+
+        if (!cacheRead)
+            OpenCLKernel::SaveProgram(device, program, programText, filename);
+
+        device->m_programMap.insert(filename, program);
     }
 
     const char *entryPt = entry.toLocal8Bit().constData();
@@ -765,7 +864,128 @@ OpenCLKernel *OpenCLKernel::Create(OpenCLDevice *device, QString entry,
     }
 
     OpenCLKernel *newKernel = new OpenCLKernel(device, entry, program, kernel);
+
     return newKernel;
+}
+
+bool OpenCLKernel::SaveProgram(OpenCLDevice *dev, cl_program program,
+                               QByteArray &source, QString filename)
+{
+    cl_int ciErrNum;
+    cl_uint numDevices = 0;
+
+    ciErrNum = clGetProgramInfo(program, CL_PROGRAM_NUM_DEVICES,
+                                sizeof(cl_uint), &numDevices, NULL);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error getting program device count: %1 (%2)")
+            .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
+        return false;
+    }
+
+    cl_device_id *devices = new cl_device_id[numDevices];
+    ciErrNum = clGetProgramInfo(program, CL_PROGRAM_DEVICES,
+                                sizeof(cl_device_id) * numDevices, devices,
+                                NULL);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error getting program devices: %1 (%2)")
+            .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
+        delete [] devices;
+        return false;
+    }
+
+    size_t *programBinarySizes = new size_t[numDevices];
+    ciErrNum = clGetProgramInfo(program, CL_PROGRAM_BINARY_SIZES,
+                                sizeof(size_t) * numDevices, programBinarySizes,
+                                NULL);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error getting program binary sizes: %1 (%2)")
+            .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
+        delete [] devices;
+        delete [] programBinarySizes;
+        return false;
+    }
+
+    unsigned char **programBinaries = new unsigned char *[numDevices];
+    for (cl_uint i = 0; i < numDevices; i++)
+    {
+        programBinaries[i] = new unsigned char[programBinarySizes[i]];
+    }
+    ciErrNum = clGetProgramInfo(program, CL_PROGRAM_BINARIES,
+                                sizeof(unsigned char *) * numDevices,
+                                programBinaries, NULL);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error getting program binaries: %1 (%2)")
+            .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
+        delete [] devices;
+        delete [] programBinarySizes;
+        for (cl_uint i = 0; i < numDevices; i++)
+        {
+            delete [] programBinaries[i];
+        }
+        delete [] programBinaries;
+        return false;
+    }
+
+    QString cacheFilename = OpenCLKernel::GetCacheFilename(dev, filename);
+
+    for (cl_uint i = 0; i < numDevices; i++)
+    {
+        if (devices[i] == dev->m_deviceId)
+        {
+            QFile file(cacheFilename);
+            file.open(QIODevice::WriteOnly);
+            file.write((const char *)programBinaries[i], programBinarySizes[i]);
+            file.close();
+
+            QCryptographicHash hash(QCryptographicHash::Sha1);
+            hash.addData(dev->m_name.toLocal8Bit());
+            hash.addData(source);
+            QByteArray sha1(hash.result());
+
+            QFile hashfile(cacheFilename + ".sha1");
+            hashfile.open(QIODevice::WriteOnly);
+            hashfile.write(sha1.toHex());
+            hashfile.close();
+            break;
+        }
+    }
+
+    delete [] devices;
+    delete [] programBinarySizes;
+    for (cl_uint i = 0; i < numDevices; i++)
+    {
+        delete [] programBinaries[i];
+    }
+    delete [] programBinaries;
+    return true;
+}
+
+QString OpenCLKernel::GetCacheFilename(OpenCLDevice *dev, QString filename)
+{
+    QString cachedir = GetConfDir() + "/mythgpucommflag";
+
+    QDir qdir(cachedir);
+    if (!qdir.exists())
+        qdir.mkpath(cachedir);
+
+    QString gpuName(dev->m_name);
+    gpuName.replace(QRegExp("[ /;:'\"]"), "_");
+    QString cacheFilename = QString("%1/%2-%3.bin") .arg(cachedir)
+                                .arg(gpuName) .arg(filename);
+
+    return cacheFilename;
 }
 
 OpenCLKernel::~OpenCLKernel()

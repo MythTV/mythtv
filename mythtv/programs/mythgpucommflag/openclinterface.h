@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QObject>
 #include <QPointer>
+#include <QByteArray>
 
 typedef enum {
     kOpenCLDeviceUnknown     = 0x0000,
@@ -30,6 +31,7 @@ typedef enum {
 class OpenCLDeviceSpecific;
 class OpenCLKernel;
 typedef QMap<QString, OpenCLKernel *> OpenCLKernelMap;
+typedef QMap<QString, cl_program> OpenCLProgramMap;
 
 typedef struct {
     OpenCLKernel *kernel;
@@ -65,6 +67,7 @@ class OpenCLDevice
     QString m_openclCVersion;
     OpenCLDeviceType m_deviceType;
     OpenCLKernelMap  m_kernelMap;
+    OpenCLProgramMap m_programMap;
 
     cl_uint m_maxComputeUnits;
     size_t m_maxWorkItemSizes[3];
@@ -147,6 +150,9 @@ class OpenCLKernel
         m_device(device), m_name(name), m_program(program), m_kernel(kernel) {};
     ~OpenCLKernel();
 
+    static QString GetCacheFilename(OpenCLDevice *dev, QString filename);
+    static bool SaveProgram(OpenCLDevice *dev, cl_program program,
+                            QByteArray &source, QString cacheFilename);
     static OpenCLKernel *Create(OpenCLDevice *device, QString entry,
                                 QString filename);
 

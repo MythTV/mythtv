@@ -7,6 +7,11 @@ CONFIG += thread
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
+clfiles.path = $${PREFIX}/share/mythtv/mythgpucommflag/
+clfiles.files = audioVolumeLevel64.cl audioVolumeLevel.cl videoConvert.cl
+clfiles.files += videoHistogram.cl videoInverse.cl videoWavelet.cl
+INSTALLS += clfiles
+
 QMAKE_CLEAN += $(TARGET)
 
 # For NVIDIA SDK
