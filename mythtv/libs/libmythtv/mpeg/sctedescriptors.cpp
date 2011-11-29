@@ -2,7 +2,7 @@
 /**
  *   SCTE Descriptors.
  *   Copyright (c) 2011, Digital Nirvana, Inc.
- *   Author: Daniel Kristjansson
+ *   Authors: Daniel Kristjansson, Sergey Staroletov
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -20,6 +20,24 @@
  */
 
 #include "sctedescriptors.h"
+#include "dvbdescriptors.h" // for dvb_decode_text()
+
+QString SCTEComponentNameDescriptor::NameString(uint i) const
+{
+    return dvb_decode_text(&_data[loc(i) + 4], StringLength(i));
+}
+
+QString SCTEComponentNameDescriptor::toString(void) const
+{
+    QString ret =  QString("ComponentNameDescriptor: StringCount(%1)")
+        .arg(StringCount());
+    for (uint i = 0; i < StringCount(); ++i)
+    {
+        ret += QString(" Language(%1) Name(%2)")
+            .arg(LanguageString(i)).arg(NameString(i));
+    }
+    return ret;
+}
 
 QString CueIdentifierDescriptor::CueStreamTypeString(void) const
 {
