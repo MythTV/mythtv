@@ -69,7 +69,7 @@ static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
     vdp_st = vdp_get_proc_address(m_device, (FUNC_ID), (void **)&(PROC)); \
     CHECK_ST
 
-#define MIN_REFERENCE_FRAMES 2
+#define MIN_REFERENCE_FRAMES 8
 #define MAX_REFERENCE_FRAMES 16
 
 #define CHECK_ERROR(Loc) \
@@ -174,6 +174,7 @@ bool openGLInitialize(void)
 {
     // initialize GLUT 
     QString x11display = MythUIHelper::GetX11Display();
+    x11display.detach();
     int argc = 3;
     const char *argv[] = { "client", "-display", NULL };
     argv[2] = x11display.toLocal8Bit().constData();
@@ -377,6 +378,7 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
         int created = 0;
         for (int i = 0; i < MIN_REFERENCE_FRAMES; i++)
         {
+            LOG(VB_GENERAL, LOG_INFO, QString("Adding buffer %1").arg(i));
             uint tmp = nd->CreateVideoSurface(nd->m_width, nd->m_height);
             if (tmp)
             {
@@ -416,7 +418,10 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 {
     if (pic->type != FF_BUFFER_TYPE_USER)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Pic type %1").arg(pic->type));
         return;
+    }
 
 #ifdef USING_VDPAU
     struct vdpau_render_state *render =

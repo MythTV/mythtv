@@ -160,20 +160,23 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
     m_realWidth = bufWidth;
     m_realHeight = bufHeight;
 
-    m_clBuffer = new cl_mem[m_bufCount];
-    memset(m_clBuffer, 0, m_bufCount * sizeof(cl_mem));
-
-    for (int i = 0; i < m_bufCount; i++)
+    if (m_dev)
     {
-        m_clBuffer[i] = clCreateImage2D(m_dev->m_context, CL_MEM_READ_WRITE,
-                                        &format, bufWidth, bufHeight, 0,
-                                        NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS)
+        m_clBuffer = new cl_mem[m_bufCount];
+        memset(m_clBuffer, 0, m_bufCount * sizeof(cl_mem));
+
+        for (int i = 0; i < m_bufCount; i++)
         {
-            LOG(VB_GPU, LOG_ERR,
-                QString("VDPAU: OpenCL Image Create #%1 failed: %2 (%3)")
-                .arg(i) .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
-            return;
+            m_clBuffer[i] = clCreateImage2D(m_dev->m_context, CL_MEM_READ_WRITE,
+                                            &format, bufWidth, bufHeight, 0,
+                                            NULL, &ciErrNum);
+            if (ciErrNum != CL_SUCCESS)
+            {
+                LOG(VB_GPU, LOG_ERR,
+                    QString("VDPAU: OpenCL Image Create #%1 failed: %2 (%3)")
+                    .arg(i) .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
+                return;
+            }
         }
     }
     m_valid = true;
