@@ -42,7 +42,7 @@ class MHDLADisplay;
 
 // Asynchronous event data.
 class MHAsynchEvent {
-public:
+  public:
     MHRoot *pEventSource;
     enum EventType eventType;
     MHUnion eventData;
@@ -52,7 +52,7 @@ public:
 // The UK MHEG profile says we shouldn't store type information.  That complicates
 // the code so for the moment we do.
 class MHPSEntry {
-public:
+  public:
     MHPSEntry() {}
     MHOctetString m_FileName;
     MHOwnPtrSequence <MHUnion> m_Data;
@@ -60,7 +60,7 @@ public:
 
 // Entry in the pending external content list.
 class MHExternContent {
-public:
+  public:
     QString m_FileName;
     MHIngredient *m_pRequester; 
     QTime m_time;
@@ -69,7 +69,7 @@ public:
 class MHInteractible;
 
 class MHEngine: public MHEG {
-public:
+  public:
     MHEngine(MHContext *context);
     virtual ~MHEngine();
 
@@ -161,7 +161,7 @@ public:
     int GetTuneInfo() { return CurrentApp() ? CurrentApp()->m_tuneinfo : 0; }
     void SetTuneInfo(int tuneinfo) { if (CurrentApp()) CurrentApp()->m_tuneinfo = tuneinfo; }
 
-protected:
+  protected:
     void CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un);
     MHGroup *ParseProgram(QByteArray &text);
     void DrawRegion(QRegion toDraw, int nStackPos);

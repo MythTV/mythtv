@@ -26,6 +26,7 @@ using namespace std;
 #include <QStringList>
 #include <QTimerEvent>
 #include <QRunnable>
+#include <QtGlobal>
 #include <QSet>
 
 // MythTV headers
@@ -207,6 +208,8 @@ void MThread::RunProlog(void)
     }
     setTerminationEnabled(false);
     threadRegister(m_thread->objectName());
+    qsrand(QDateTime::currentDateTime().toTime_t() ^
+           QTime::currentTime().msec());
     m_prolog_executed = true;
 }
 

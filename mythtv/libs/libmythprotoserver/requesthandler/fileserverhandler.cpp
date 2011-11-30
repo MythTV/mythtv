@@ -156,23 +156,17 @@ QString FileServerHandler::LocalFilePath(const QUrl &url,
 
 void FileServerHandler::RunDeleteThread(void)
 {
-    if (deletethread == NULL)
+    if (deletethread != NULL)
     {
-        deletethread = new DeleteThread();
-        connect(deletethread, SIGNAL(unlinkFailed(QString)),
-                this, SIGNAL(unlinkFailed(QString)));
-        connect(deletethread, SIGNAL(fileUnlinked(QString)),
-                this, SIGNAL(fileUnlinked(QString)));
-        connect(deletethread->qthread(), SIGNAL(finished()),
-                this, SLOT(deleteThreadTerminated()));
-        deletethread->start();
-    }
-}
+        if (deletethread->isRunning())
+            return
 
-void FileServerHandler::deleteThreadTerminated(void)
-{
-    delete deletethread;
-    deletethread = NULL;
+        delete deletethread;
+        deletethread = NULL;
+    }
+
+    deletethread = new DeleteThread();
+    deletethread->start();
 }
 
 bool FileServerHandler::HandleAnnounce(MythSocket *socket,
@@ -730,7 +724,7 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
 
 bool FileServerHandler::DeleteFile(QString filename, QString storagegroup)
 {
-    return HandleDeleteFile(NULL, filename, storagegroup);
+    return HandleDeleteFile( (SocketHandler *)NULL, filename, storagegroup);
 }
 
 bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
@@ -793,6 +787,12 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
     }
 
     return true;
+}
+
+bool FileServerHandler::HandleDeleteFile(DeleteHandler *handler)
+{
+    RunDeleteThread();
+    return deletethread->AddFile(handler);
 }
 
 bool FileServerHandler::HandleGetFileList(SocketHandler *socket,

@@ -26,7 +26,6 @@ public:
 private:
     void blur_8(unsigned char *ptr, int w, int h, int bpl);
 
-    void generate_intense(void);
     void generate_cmap(unsigned int color);
     void generate_phongdat(void);
 
@@ -44,7 +43,10 @@ private:
     SDL_Surface *surface;
 
     unsigned int m_color;
-    unsigned int m_x, m_y, m_width, m_height;
+    unsigned int m_x;
+    unsigned int m_y;
+    unsigned int m_width;
+    unsigned int m_height;
     unsigned int m_phongrad;
 
     bool color_cycle;
@@ -55,11 +57,22 @@ private:
 
     vector<vector<unsigned char> > phongdat;
     unsigned char *rgb_buf;
-    double intense1[256], intense2[256];
+    double intense1[256];
+    double intense2[256];
 
-    int iangle, ixo, iyo, ixd, iyd, ilx, ily;
-    int was_moving, was_color;
-    double ih, is, iv, isd;
+    int iangle;
+    int ixo;
+    int iyo;
+    int ixd;
+    int iyd;
+    int ilx;
+    int ily;
+    int was_moving;
+    int was_color;
+    double ih;
+    double is;
+    double iv;
+    double isd;
     int ihd;
     unsigned int icolor;
 };

@@ -21,6 +21,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "dbutil.h"
 #include "exitcodes.h"
+#include "compat.h"
 
 #include <stdlib.h>
 #define SYSLOG_NAMES
@@ -51,12 +52,6 @@ extern "C" {
 #include <mach/mach.h>
 #endif
 
-#ifdef _WIN32
-#define PREFIX64 "I64"
-#else
-#define PREFIX64 "ll"
-#endif
-
 QMutex                  loggerListMutex;
 QList<LoggerBase *>     loggerList;
 
@@ -74,10 +69,6 @@ LoggerThread           *logThread = NULL;
 bool                    logThreadFinished = false;
 bool                    debugRegistration = false;
 
-#ifdef _WIN32
-QMutex                  localtimeMutex;
-#endif
-
 typedef struct {
     bool    propagate;
     int     quiet;
@@ -90,7 +81,7 @@ LogPropagateOpts        logPropagateOpts;
 QString                 logPropagateArgs;
 
 #define TIMESTAMP_MAX 30
-#define MAX_STRING_LENGTH 2048
+#define MAX_STRING_LENGTH (LOGLINE_MAX+120)
 
 LogLevel_t logLevel = (LogLevel_t)LOG_INFO;
 
@@ -201,7 +192,7 @@ LoggerBase::~LoggerBase()
 
     QList<LoggerBase *>::iterator it;
 
-    for(it = loggerList.begin(); it != loggerList.end(); it++)
+    for (it = loggerList.begin(); it != loggerList.end(); ++it)
     {
         if( *it == this )
         {
@@ -274,7 +265,6 @@ bool FileLogger::logmsg(LoggingItem *item)
     char                timestamp[TIMESTAMP_MAX];
     char               *threadName = NULL;
     pid_t               pid = getpid();
-    pid_t               tid = 0;
 
     if (!m_opened || m_quiet || (m_progress && item->level > LOG_ERR))
         return false;
@@ -309,7 +299,7 @@ bool FileLogger::logmsg(LoggingItem *item)
     else
     {
         threadName = getThreadName(item);
-        tid = getThreadTid(item);
+        pid_t tid = getThreadTid(item);
 
         if( tid )
             snprintf( line, MAX_STRING_LENGTH, 
@@ -353,8 +343,8 @@ SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility),
     openlog( m_application, LOG_NDELAY | LOG_PID, facility );
     m_opened = true;
 
-    for( name = &facilitynames[0];
-         name->c_name && name->c_val != facility; name++ );
+    for (name = &facilitynames[0];
+         name->c_name && name->c_val != facility; name++);
 
     LOG(VB_GENERAL, LOG_INFO, QString("Added syslogging to facility %1")
              .arg(name->c_name));
@@ -502,9 +492,7 @@ DBLoggerThread::DBLoggerThread(DatabaseLogger *logger) :
     MThread("DBLogger"),
     m_logger(logger),
     m_queue(new QQueue<LoggingItem *>),
-    m_waitNotEmpty(new QWaitCondition()),
-    m_waitEmpty(new QWaitCondition()),
-    aborted(false)
+    m_wait(new QWaitCondition()), aborted(false)
 {
 }
 
@@ -517,75 +505,79 @@ DBLoggerThread::~DBLoggerThread()
     while (!m_queue->empty())
         deleteItem(m_queue->dequeue());
     delete m_queue;
-    delete m_waitNotEmpty;
-    delete m_waitEmpty;
+    delete m_wait;
     m_queue = NULL;
-    m_waitNotEmpty = NULL;
-    m_waitEmpty = NULL;
+    m_wait = NULL;
 }
 
 void DBLoggerThread::run(void)
 {
     RunProlog();
 
-    QMutexLocker qLock(&m_queueMutex);
-
     // Wait a bit before we start logging to the DB..  If we wait too long,
     // then short-running tasks (like mythpreviewgen) will not log to the db
     // at all, and that's undesirable.
-    while (!m_logger->isDatabaseReady() && !gCoreContext && !aborted)
-        m_waitNotEmpty->wait(qLock.mutex(), 100);
-
-    // We want the query to be out of scope before the RunEpilog() so shutdown
-    // occurs correctly as otherwise the connection appears still in use, and
-    // we get a qWarning on shutdown.
-    MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
-    m_logger->prepare(*query);
-
-    while (!aborted || !m_queue->isEmpty())
+    bool ready = false;
+    while ( !aborted && ( !gCoreContext || !ready ) )
     {
-        if (m_queue->isEmpty())
+        ready = m_logger->isDatabaseReady();
+
+        // Don't delay if aborted was set while we were checking database ready
+        if (!ready && !aborted && !gCoreContext)
         {
-            m_waitEmpty->wakeAll();
-            m_waitNotEmpty->wait(qLock.mutex(), 100);
-            continue;
+            QMutexLocker qLock(&m_queueMutex);
+            m_wait->wait(qLock.mutex(), 100);
         }
-
-        LoggingItem *item = m_queue->dequeue();
-        if (!item)
-            continue;
-
-        qLock.unlock();
-
-        if (item->message[0] != '\0')
-        {
-            if (!m_logger->logqmsg(*query, item))
-            {
-                qLock.relock();
-                m_queue->prepend(item);
-                m_waitNotEmpty->wait(qLock.mutex(), 100);
-                delete query;
-                query = new MSqlQuery(MSqlQuery::InitCon());
-                m_logger->prepare(*query);
-                continue;
-            }
-        }
-        else
-        {
-            deleteItem(item);
-        }
-
-        qLock.relock();
     }
 
-    delete query;
+    if (ready)
+    {
+        // We want the query to be out of scope before the RunEpilog() so
+        // shutdown occurs correctly as otherwise the connection appears still
+        // in use, and we get a qWarning on shutdown.
+        MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
+        m_logger->prepare(*query);
 
-    while (!m_queue->empty())
-        deleteItem(m_queue->dequeue());
+        QMutexLocker qLock(&m_queueMutex);
+        while (!aborted || !m_queue->isEmpty())
+        {
+            if (m_queue->isEmpty())
+            {
+                m_wait->wait(qLock.mutex(), 100);
+                continue;
+            }
 
-    m_waitEmpty->wakeAll();
+            LoggingItem *item = m_queue->dequeue();
+            if (!item)
+                continue;
 
-    qLock.unlock();
+            qLock.unlock();
+
+            if (item->message[0] != '\0')
+            {
+                if (!m_logger->logqmsg(*query, item))
+                {
+                    qLock.relock();
+                    m_queue->prepend(item);
+                    m_wait->wait(qLock.mutex(), 100);
+                    delete query;
+                    query = new MSqlQuery(MSqlQuery::InitCon());
+                    m_logger->prepare(*query);
+                    continue;
+                }
+            }
+            else
+            {
+                deleteItem(item);
+            }
+
+            qLock.relock();
+        }
+
+        delete query;
+
+        qLock.unlock();
+    }
 
     RunEpilog();
 }
@@ -593,23 +585,8 @@ void DBLoggerThread::run(void)
 void DBLoggerThread::stop(void)
 {
     QMutexLocker qLock(&m_queueMutex);
-    flush(1000);
     aborted = true;
-    m_waitNotEmpty->wakeAll();
-}
-
-bool DBLoggerThread::flush(int timeoutMS)
-{
-    QTime t;
-    t.start();
-    while (!aborted && m_queue->isEmpty() && t.elapsed() < timeoutMS)
-    {
-        m_waitNotEmpty->wakeAll();
-        int left = timeoutMS - t.elapsed();
-        if (left > 0)
-            m_waitEmpty->wait(&m_queueMutex, left);
-    }
-    return m_queue->isEmpty();
+    m_wait->wakeAll();
 }
 
 bool DatabaseLogger::isDatabaseReady()
@@ -699,12 +676,12 @@ int64_t getThreadTid( LoggingItem *item )
 
 void setThreadTid( LoggingItem *item )
 {
-    int64_t tid = 0;
-
     QMutexLocker locker(&logThreadTidMutex);
 
     if( ! logThreadTidHash.contains(item->threadId) )
     {
+        int64_t tid = 0;
+
 #if defined(linux)
         tid = (int64_t)syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
@@ -743,7 +720,7 @@ LoggerThread::~LoggerThread()
 
     QList<LoggerBase *>::iterator it;
 
-    for(it = loggerList.begin(); it != loggerList.end(); it++)
+    for (it = loggerList.begin(); it != loggerList.end(); ++it)
     {
         (*it)->deleteLater();
     }
@@ -779,8 +756,6 @@ void LoggerThread::run(void)
     }
 
     logThreadFinished = true;
-
-    m_waitEmpty->wakeAll();
 
     qLock.unlock();
 
@@ -942,15 +917,7 @@ void LogTimeStamp( struct tm *tm, uint32_t *usec )
     *usec = time.msec() * 1000;
 #endif
 
-#ifndef _WIN32
     localtime_r(&epoch, tm);
-#else
-    {
-        QMutexLocker timeLock(&localtimeMutex);
-        struct tm *tmp = localtime(&epoch);
-        memcpy(tm, tmp, sizeof(struct tm));
-    }
-#endif
 }
 
 void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
@@ -1006,7 +973,7 @@ void logSighup( int signum, siginfo_t *info, void *secret )
     QMutexLocker locker(&loggerListMutex);
 
     QList<LoggerBase *>::iterator it;
-    for(it = loggerList.begin(); it != loggerList.end(); it++)
+    for (it = loggerList.begin(); it != loggerList.end(); ++it)
     {
         (*it)->reopen();
     }
@@ -1037,9 +1004,9 @@ void logPropagateCalc(void)
     {
         CODE *syslogname;
 
-        for( syslogname = &facilitynames[0];
+        for (syslogname = &facilitynames[0];
              (syslogname->c_name &&
-              syslogname->c_val != logPropagateOpts.facility); syslogname++ );
+              syslogname->c_val != logPropagateOpts.facility); syslogname++);
 
         logPropagateArgs += QString(" --syslog %1").arg(syslogname->c_name);
     }
@@ -1183,8 +1150,8 @@ int syslogGetFacility(QString facility)
     int i;
     char *string = (char *)facility.toLocal8Bit().constData();
 
-    for( i = 0, name = &facilitynames[0];
-         name->c_name && strcmp(name->c_name, string); i++, name++ );
+    for (i = 0, name = &facilitynames[0];
+         name->c_name && strcmp(name->c_name, string); i++, name++);
 
     return( name->c_val );
 #endif
@@ -1200,8 +1167,8 @@ LogLevel_t logLevelGet(QString level)
         locker.relock();
     }
 
-    for( LoglevelMap::iterator it = loglevelMap.begin();
-         it != loglevelMap.end(); it++)
+    for (LoglevelMap::iterator it = loglevelMap.begin();
+         it != loglevelMap.end(); ++it)
     {
         LoglevelDef *item = (*it);
         if ( item->name == level.toLower() )
@@ -1303,12 +1270,12 @@ void verboseHelp()
     cerr << endl <<
       "The default for this program appears to be: '-v " <<
       m_verbose.toLocal8Bit().constData() << "'\n\n"
-      "Most options are additive except for none, and all.\n"
+      "Most options are additive except for 'none' and 'all'.\n"
       "These two are semi-exclusive and take precedence over any\n"
-      "prior options given.  You can however use something like\n"
-      "'-v none,jobqueue' to get only JobQueue related messages\n"
+      "other options.  However, you may use something like\n"
+      "'-v none,jobqueue' to receive only JobQueue related messages\n"
       "and override the default verbosity level.\n\n"
-      "The additive options may also be subtracted from 'all' by \n"
+      "Additive options may also be subtracted from 'all' by\n"
       "prefixing them with 'no', so you may use '-v all,nodatabase'\n"
       "to view all but database debug messages.\n\n"
       "Some debug levels may not apply to this program.\n\n";

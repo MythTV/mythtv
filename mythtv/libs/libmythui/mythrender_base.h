@@ -23,7 +23,7 @@ class MythRender
         UpRef();
     }
 
-    bool IsShared(void)
+    bool IsShared(void) const
     {
         return m_refCount > 1;
     }
@@ -48,7 +48,7 @@ class MythRender
         m_refLock.unlock();
    }
 
-    RenderType Type(void)       { return m_type;    }
+    RenderType Type(void) const { return m_type;    }
     bool  IsErrored(void) const { return m_errored; }
     QSize GetSize(void) const   { return m_size;    }
     virtual void Release(void)  { }

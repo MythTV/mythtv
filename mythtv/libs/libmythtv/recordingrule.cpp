@@ -11,7 +11,12 @@
 #include "scheduledrecording.h" // For signalChange()
 #include "playgroup.h" // For GetInitialName()
 #include "recordingprofile.h" // For constants
-#include <util.h>
+#include "util.h"
+
+static inline QString null_to_empty(const QString &str)
+{
+    return str.isEmpty() ? "" : str;
+}
 
 RecordingRule::RecordingRule()
   : m_recordID(-1), m_parentRecID(0),
@@ -22,7 +27,7 @@ RecordingRule::RecordingRule()
     m_startdate(),
     m_endtime(),
     m_enddate(),
-    m_inetref(""), // String could be null when we trying to insert into DB
+    m_inetref(), // String could be null when we trying to insert into DB
     m_channelid(0),
     m_findday(-1),
     m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
@@ -105,7 +110,7 @@ bool RecordingRule::Load()
         m_dupMethod = static_cast<RecordingDupMethodType>
                                                 (query.value(6).toInt());
         m_dupIn = static_cast<RecordingDupInType>(query.value(7).toInt());
-        m_filter = query.value(43).toUInt();
+        m_filter = query.value(47).toUInt();
         m_isInactive = query.value(8).toBool();
         // Storage
         m_recProfile = query.value(9).toString();
@@ -345,10 +350,10 @@ bool RecordingRule::Save(bool sendSig)
     query.bindValue(":DUPIN", m_dupIn);
     query.bindValue(":FILTER", m_filter);
     query.bindValue(":INACTIVE", m_isInactive);
-    query.bindValue(":RECPROFILE", m_recProfile);
-    query.bindValue(":RECGROUP", m_recGroup);
-    query.bindValue(":STORAGEGROUP", m_storageGroup);
-    query.bindValue(":PLAYGROUP", m_playGroup);
+    query.bindValue(":RECPROFILE", null_to_empty(m_recProfile));
+    query.bindValue(":RECGROUP", null_to_empty(m_recGroup));
+    query.bindValue(":STORAGEGROUP", null_to_empty(m_storageGroup));
+    query.bindValue(":PLAYGROUP", null_to_empty(m_playGroup));
     query.bindValue(":AUTOEXPIRE", m_autoExpire);
     query.bindValue(":MAXEPISODES", m_maxEpisodes);
     query.bindValue(":MAXNEWEST", m_maxNewest);
@@ -362,20 +367,20 @@ bool RecordingRule::Save(bool sendSig)
     query.bindValue(":AUTOMETADATA", m_autoMetadataLookup);
     query.bindValue(":PARENTID", m_parentRecID);
     query.bindValue(":TITLE", m_title);
-    query.bindValue(":SUBTITLE", m_subtitle);
-    query.bindValue(":DESCRIPTION", m_description);
+    query.bindValue(":SUBTITLE", null_to_empty(m_subtitle));
+    query.bindValue(":DESCRIPTION", null_to_empty(m_description));
     query.bindValue(":SEASON", m_season);
     query.bindValue(":EPISODE", m_episode);
-    query.bindValue(":CATEGORY", m_category);
+    query.bindValue(":CATEGORY", null_to_empty(m_category));
     query.bindValue(":STARTTIME", m_starttime);
     query.bindValue(":STARTDATE", m_startdate);
     query.bindValue(":ENDTIME", m_endtime);
     query.bindValue(":ENDDATE", m_enddate);
-    query.bindValue(":SERIESID", m_seriesid);
-    query.bindValue(":PROGRAMID", m_programid);
-    query.bindValue(":INETREF", m_inetref);
+    query.bindValue(":SERIESID", null_to_empty(m_seriesid));
+    query.bindValue(":PROGRAMID", null_to_empty(m_programid));
+    query.bindValue(":INETREF", null_to_empty(m_inetref));
     query.bindValue(":CHANID", m_channelid);
-    query.bindValue(":STATION", m_station);
+    query.bindValue(":STATION", null_to_empty(m_station));
     query.bindValue(":FINDDAY", m_findday);
     query.bindValue(":FINDTIME", m_findtime);
     query.bindValue(":FINDID", m_findid);
@@ -614,7 +619,7 @@ void RecordingRule::AssignProgramInfo()
         }
     }
     m_category = m_progInfo->GetCategory();
-    m_inetref = "";
+    m_inetref = m_progInfo->GetInetRef();
 }
 
 unsigned RecordingRule::GetDefaultFilter(void)

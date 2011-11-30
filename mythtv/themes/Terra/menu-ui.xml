@@ -233,6 +233,11 @@
                                 <filename>watermarks/appearance.png</filename>
                             </imagetype>
                         </state>
+                        <state name="SETTINGS_AUDIOGENERAL" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/audio.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="SCREENSETUPWIZARD" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/screen_setup.png</filename>

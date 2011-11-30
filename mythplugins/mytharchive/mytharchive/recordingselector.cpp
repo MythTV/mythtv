@@ -49,12 +49,22 @@ class GetRecordingListThread : public MThread
     RecordingSelector *m_parent;
 };
 
-RecordingSelector::RecordingSelector(MythScreenStack *parent,
-                                     QList<ArchiveItem *> *archiveList)
-                  : MythScreenType(parent, "RecordingSelector")
+RecordingSelector::RecordingSelector(
+    MythScreenStack *parent, QList<ArchiveItem *> *archiveList) :
+    MythScreenType(parent, "RecordingSelector"),
+    m_archiveList(archiveList),
+    m_recordingList(NULL),
+    m_recordingButtonList(NULL),
+    m_okButton(NULL),
+    m_cancelButton(NULL),
+    m_categorySelector(NULL),
+    m_titleText(NULL),
+    m_datetimeText(NULL),
+    m_filesizeText(NULL),
+    m_descriptionText(NULL),
+    m_previewImage(NULL),
+    m_cutlistImage(NULL)
 {
-    m_archiveList = archiveList;
-    m_recordingList = NULL;
 }
 
 RecordingSelector::~RecordingSelector(void)
@@ -63,8 +73,7 @@ RecordingSelector::~RecordingSelector(void)
         delete m_recordingList;
 
     while (!m_selectedList.isEmpty())
-         delete m_selectedList.takeFirst();
-    m_selectedList.clear();
+        delete m_selectedList.takeFirst();
 }
 
 bool RecordingSelector::Create(void)
@@ -212,7 +221,7 @@ void RecordingSelector::selectAll()
 
     ProgramInfo *p;
     vector<ProgramInfo *>::iterator i = m_recordingList->begin();
-    for ( ; i != m_recordingList->end(); i++)
+    for ( ; i != m_recordingList->end(); ++i)
     {
         p = *i;
         m_selectedList.append(p);
@@ -402,7 +411,7 @@ void RecordingSelector::updateRecordingList(void)
     {
         ProgramInfo *p;
         vector<ProgramInfo *>::iterator i = m_recordingList->begin();
-        for ( ; i != m_recordingList->end(); i++)
+        for ( ; i != m_recordingList->end(); ++i)
         {
             p = *i;
 
@@ -443,7 +452,7 @@ void RecordingSelector::getRecordingList(void)
     if (m_recordingList && !m_recordingList->empty())
     {
         vector<ProgramInfo *>::iterator i = m_recordingList->begin();
-        for ( ; i != m_recordingList->end(); i++)
+        for ( ; i != m_recordingList->end(); ++i)
         {
             p = *i;
 
@@ -455,7 +464,7 @@ void RecordingSelector::getRecordingList(void)
                             "isn't available locally - %1")
                         .arg(p->GetPlaybackURL(false, true)));
                 i = m_recordingList->erase(i);
-                i--;
+                --i;
                 continue;
             }
 
@@ -464,7 +473,7 @@ void RecordingSelector::getRecordingList(void)
                 p->GetRecordingGroup() == "Deleted")
             {
                 i = m_recordingList->erase(i);
-                i--;
+                --i;
                 continue;
             }
 

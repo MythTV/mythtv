@@ -176,6 +176,11 @@ class AvFormatDecoder : public DecoderBase
     virtual bool SetAudioByComponentTag(int tag);
     virtual bool SetVideoByComponentTag(int tag);
 
+    // Stream language info
+    virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
+    virtual int GetCaptionLanguage(TrackTypes trackType, int service_num);
+    virtual int GetAudioLanguage(uint audio_index, uint stream_index);
+
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
@@ -231,7 +236,7 @@ class AvFormatDecoder : public DecoderBase
     void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames);
 
     inline bool DecoderWillDownmix(const AVCodecContext *ctx);
-    bool DoPassThrough(const AVCodecContext *ctx);
+    bool DoPassThrough(const AVCodecContext *ctx, bool withProfile=true);
     bool SetupAudioStream(void);
     void SetupAudioStreamSubIndexes(int streamIndex);
     void RemoveAudioStreams();
@@ -240,15 +245,16 @@ class AvFormatDecoder : public DecoderBase
     /// Called for key frame packets.
     void HandleGopStart(AVPacket *pkt, bool can_reliably_parse_keyframes);
 
-    bool GenerateDummyVideoFrame(void);
+    bool GenerateDummyVideoFrames(void);
     bool HasVideo(const AVFormatContext *ic);
     float normalized_fps(AVStream *stream, AVCodecContext *enc);
     void av_update_stream_timings_video(AVFormatContext *ic);
 
+    virtual void UpdateFramesPlayed(void);
+    virtual bool DoRewindSeek(long long desiredFrame);
+    virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
     virtual void StreamChangeCheck(void) { }
     virtual void PostProcessTracks(void) { }
-    virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
-    virtual int GetAudioLanguage(uint audio_index, uint stream_index);
 
     PrivateDecoder *private_dec;
 
@@ -280,9 +286,10 @@ class AvFormatDecoder : public DecoderBase
 
     int prevgoppos;
 
-    bool gotvideo;
-
-    // from full GetFrame implementation
+    // GetFrame
+    bool gotVideoFrame;
+    bool hasVideo;
+    bool needDummyVideoFrames;
     bool skipaudio;
     bool allowedquit;
 
@@ -343,8 +350,6 @@ class AvFormatDecoder : public DecoderBase
     // Audio
     short int        *audioSamples;
     bool              disable_passthru;
-
-    VideoFrame       *dummy_frame;
 
     AudioInfo         audioIn;
     AudioInfo         audioOut;

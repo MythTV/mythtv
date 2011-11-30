@@ -286,7 +286,7 @@ bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input)
 
     QStringList::const_iterator it = strlist.begin();
     bool state = (*it).toInt();
-    it++;
+    ++it;
     if (!busy_input.FromStringList(it, strlist.end()))
         state = true; // if there was an error pretend that the input is busy.
 

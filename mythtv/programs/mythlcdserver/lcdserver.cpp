@@ -397,7 +397,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
         else
         {
             LOG(VB_GENERAL, LOG_ERR,
-                "LCDServer: bad align in SWITCH_TO_GENERIC command: " + 
+                "LCDServer: bad align in SWITCH_TO_GENERIC command: " +
                 tokens[x + 1]);
             sendMessage(socket, "HUH?");
             return;
@@ -574,7 +574,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
             return;
         }
 
-        items.append(LCDMenuItem(selected, checked, text, indent));
+        items.append(LCDMenuItem(selected, checked, text, indent, scrollable));
     }
 
     if (m_lcd)
@@ -634,7 +634,7 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QTcpSocket *socket
     bool busy = tokens[1].toInt(&bOK);
     if (!bOK)
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             QString("LCDServer: bad bool value in SET_GENERIC_PROGRESS "
                     "command: %1 %2").arg(tokens[1]).arg(tokens[2]));
         sendMessage(socket, "HUH?");
@@ -643,7 +643,7 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QTcpSocket *socket
     float progress = tokens[2].toFloat(&bOK);
     if (!bOK)
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             QString("LCDServer: bad float value in SET_GENERIC_PROGRESS "
                     "command: %1").arg(tokens[2]));
         sendMessage(socket, "HUH?");
@@ -707,7 +707,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
     {
         if (tokens.count () != 3)
         {
-            LOG(VB_GENERAL, LOG_ERR, 
+            LOG(VB_GENERAL, LOG_ERR,
                 "LCDServer: missing argument for SET_MUSIC_PROP SHUFFLE "
                 "command: " + flat);
             sendMessage(socket, "HUH?");
@@ -717,7 +717,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
         int state = tokens[2].toInt (&bOk);
         if (!bOk)
         {
-            LOG(VB_GENERAL, LOG_ERR, 
+            LOG(VB_GENERAL, LOG_ERR,
                 "LCDServer: bad argument for SET_MUSIC_PROP SHUFFLE "
                 "command: " + tokens[2]);
             sendMessage(socket, "HUH?");
@@ -751,7 +751,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             "LCDServer: bad argument for SET_MUSIC_PROP command: " + tokens[1]);
         sendMessage(socket, "HUH?");
         return;

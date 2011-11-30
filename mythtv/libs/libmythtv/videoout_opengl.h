@@ -10,7 +10,7 @@ class VideoOutputOpenGL : public VideoOutput
 {
   public:
     static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
-    VideoOutputOpenGL();
+    VideoOutputOpenGL(const QString &profile = QString());
     virtual ~VideoOutputOpenGL();
 
     virtual bool Init(int width, int height, float aspect,
@@ -27,7 +27,7 @@ class VideoOutputOpenGL : public VideoOutput
     virtual bool InputChanged(const QSize &input_size, float aspect,
                               MythCodecID  av_codec_id, void *codec_private,
                               bool &aspect_only);
-    virtual void UpdatePauseFrame(void);
+    virtual void UpdatePauseFrame(int64_t &disp_timecode);
     void DrawUnusedRects(bool) { }
     void Zoom(ZoomDirection direction);
     void MoveResize(void);
@@ -80,6 +80,7 @@ class VideoOutputOpenGL : public VideoOutput
 
     MythOpenGLPainter *gl_painter;
     bool               gl_created_painter;
+    bool               gl_opengl_lite;
 };
 
 #endif

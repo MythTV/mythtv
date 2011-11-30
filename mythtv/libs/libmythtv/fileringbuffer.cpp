@@ -162,7 +162,7 @@ static QString local_sub_filename(QFileInfo &fileInfo)
 
         QMutexLocker locker(&RingBuffer::subExtLock);
         QStringList::const_iterator eit = RingBuffer::subExt.begin();
-        for (; eit != RingBuffer::subExt.end(); eit++)
+        for (; eit != RingBuffer::subExt.end(); ++eit)
             el += findBaseName + *eit;
     }
 
@@ -328,7 +328,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             {
                 QMutexLocker locker(&subExtLock);
                 QStringList::const_iterator eit = subExt.begin();
-                for (; eit != subExt.end(); eit++)
+                for (; eit != subExt.end(); ++eit)
                     auxFiles += baseName + *eit;
             }
         }
@@ -364,6 +364,35 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     rwlock.unlock();
 
     return ok;
+}
+
+bool FileRingBuffer::ReOpen(QString newFilename)
+{
+    if (!writemode)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Tried to ReOpen a read only file.");
+        return false;
+    }
+
+    bool result = false;
+
+    rwlock.lockForWrite();
+
+    if (tfw && tfw->ReOpen(newFilename))
+        result = true;
+    else if (remotefile && remotefile->ReOpen(newFilename))
+        result = true;
+
+    if (result)
+    {
+        filename = newFilename;
+        poslock.lockForWrite();
+        writepos = 0;
+        poslock.unlock();
+    }
+
+    rwlock.unlock();
+    return result;
 }
 
 bool FileRingBuffer::IsOpen(void) const
@@ -611,11 +640,16 @@ long long FileRingBuffer::Seek(long long pos, int whence, bool has_lock)
                         .arg(internalreadpos).arg(ignorereadpos).arg(ret));
                 ignorereadpos = -1;
             }
+            // if we are seeking forward we may now be too close to the
+            // end, so we need to recheck if reads are allowed.
+            if (new_pos > readpos)
+            {
+                ateof = false;
+                readsallowed = false;
+            }
             readpos = new_pos;
             poslock.unlock();
             generalWait.wakeAll();
-            ateof = false;
-            readsallowed = false;
             if (!has_lock)
                 rwlock.unlock();
             return new_pos;

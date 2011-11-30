@@ -1,3 +1,4 @@
+#include "mythlogging.h"
 #include "subtitlereader.h"
 
 SubtitleReader::SubtitleReader()
@@ -28,18 +29,49 @@ void SubtitleReader::EnableRawTextSubtitles(bool enable)
     m_RawTextSubtitlesEnabled = enable;
 }
 
-void SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle,
-                                   bool fix_position)
+bool SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle,
+                                   bool fix_position,
+                                   bool allow_forced)
 {
-    if (!m_AVSubtitlesEnabled)
+    bool enableforced = false;
+    if (!m_AVSubtitlesEnabled && !subtitle.forced)
     {
         FreeAVSubtitle(subtitle);
-        return;
+        return enableforced;
     }
+
+    if (!m_AVSubtitlesEnabled && subtitle.forced)
+    {
+        if (!allow_forced)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO,
+                "SubtitleReader: Ignoring forced AV subtitle.");
+            FreeAVSubtitle(subtitle);
+            return enableforced;
+        }
+        LOG(VB_PLAYBACK, LOG_INFO,
+            "SubtitleReader: Allowing forced AV subtitle.");
+        enableforced = true;
+    }
+
+    bool clearsubs = false;
     m_AVSubtitles.lock.lock();
     m_AVSubtitles.fixPosition = fix_position;
     m_AVSubtitles.buffers.push_back(subtitle);
+    // in case forced subtitles aren't displayed, avoid leaking by
+    // manually clearing the subtitles
+    if (m_AVSubtitles.buffers.size() > 20)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "SubtitleReader: >20 AVSubtitles queued - clearing.");
+        clearsubs = true;
+    }
     m_AVSubtitles.lock.unlock();
+
+    if (clearsubs)
+        ClearAVSubtitles();
+
+    return enableforced;
 }
 
 void SubtitleReader::ClearAVSubtitles(void)

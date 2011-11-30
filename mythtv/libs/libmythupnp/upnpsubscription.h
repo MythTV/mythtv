@@ -6,21 +6,6 @@
 
 class Subscription;
 
-class UPNP_PUBLIC MythInfoMapEvent : public MythEvent
-{
-  public:
-    MythInfoMapEvent(const QString &lmessage,
-                     const QHash<QString,QString> &linfoMap)
-      : MythEvent(lmessage), infoMap(linfoMap) { }
-
-    virtual MythInfoMapEvent *clone() const
-        { return new MythInfoMapEvent(Message(), infoMap); }
-    const QHash<QString,QString>* InfoMap(void) { return &infoMap; }
-
-  private:
-    QHash<QString,QString> infoMap;
-};
-
 class UPNP_PUBLIC UPNPSubscription : public HttpServerExtension, public MythObservable
 {
   public:

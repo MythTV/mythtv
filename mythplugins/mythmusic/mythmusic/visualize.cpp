@@ -212,7 +212,7 @@ bool Spectrum::process(VisualNode *node)
 
         if (magR != 1 || magL != 1)
         {
-            allZero = FALSE;
+            allZero = false;
         }
 
         magnitudesp[i] = magL;
@@ -509,9 +509,9 @@ static class BlankFactory : public VisFactory
     }
 }BlankFactory;
 
-Squares::Squares()
+Squares::Squares() :
+    size(0,0), pParent(NULL), fake_height(0), number_of_squares(16)
 {
-    number_of_squares = 16;
     fake_height = number_of_squares * analyzerBarWidth;
 }
 
@@ -912,7 +912,7 @@ bool Gears::process(VisualNode *node)
 
         if (magR != 1 || magL != 1)
         {
-            allZero = FALSE;
+            allZero = false;
         }
 
         magnitudesp[i] = magL;

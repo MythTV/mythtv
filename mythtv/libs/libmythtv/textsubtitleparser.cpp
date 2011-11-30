@@ -66,7 +66,7 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
     if (nextSubPos != m_subtitles.begin())
     {
         TextSubtitleList::const_iterator currentSubPos = nextSubPos;
-        currentSubPos--;
+        --currentSubPos;
 
         const text_subtitle_t &sub = *currentSubPos;
         if (sub.start <= timecode && sub.end >= timecode)

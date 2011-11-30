@@ -2,6 +2,7 @@
 #define MYTHUI_TEXT_H_
 
 // QT headers
+#include <QTextLayout>
 #include <QColor>
 
 // Mythdb headers
@@ -42,9 +43,12 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetTemplateText(const QString &text) { m_TemplateText = text; }
     QString GetTemplateText(void) const { return m_TemplateText; }
 
+#if 0 // Not currently used
     void UseAlternateArea(bool useAlt);
+#endif
 
     virtual void Pulse(void);
+    QPoint CursorPosition(int text_offset);
 
     // StorageUser
     void SetDBValue(const QString &text) { SetText(text); }
@@ -70,8 +74,8 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void StopCycling();
 
     int GetJustification(void);
-    void SetCutDown(bool cut);
-    bool GetCutDown(void) const { return m_Cutdown; }
+    void SetCutDown(Qt::TextElideMode mode);
+    Qt::TextElideMode GetCutDown(void) const { return m_Cutdown; }
     void SetMultiLine(bool multiline);
     bool GetMultiLine(void) const { return m_MultiLine; }
 
@@ -79,30 +83,44 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetPosition(const MythPoint &pos);
     MythRect GetDrawRect(void) { return m_drawRect; }
 
-    void SetDrawRectSize(const int width, const int height);
-    void SetDrawRectPosition(const int x, const int y);
-    void MoveDrawRect(const int x, const int y);
+    void SetCanvasPosition(int x, int y);
+    void ShiftCanvas(int x, int y);
 
-    bool MakeNarrow(QRect &min_rect);
-    bool MakeShort(QRect &min_rect);
-    void FillCutMessage(bool reset_size = false);
-    QString cutDown(const QString &data, MythFontProperties *font,
-                    bool multiline = false);
+    bool Layout(QString & paragraph, QTextLayout *layout,
+		bool & overflow, qreal width, qreal & height,
+		qreal & last_line_width, QRectF & min_rect, int & num_lines);
+    bool LayoutParagraphs(const QStringList & paragraphs,
+			  const QTextOption & textoption,
+			  qreal width, qreal & height, QRectF & min_rect,
+			  qreal & last_line_width, int & num_lines);
+    bool GetNarrowWidth(const QStringList & paragraphs,
+			const QTextOption & textoption, qreal & width);
+    void FillCutMessage(void);
 
     int m_Justification;
     MythRect m_OrigDisplayRect;
     MythRect m_AltDisplayRect;
+    MythRect m_Canvas;
     MythRect m_drawRect;
+    QPoint   m_cursorPos;
 
     QString m_Message;
     QString m_CutMessage;
     QString m_DefaultMessage;
     QString m_TemplateText;
 
+#if 0 // Not currently used
     bool m_usingAltArea;
+#endif
     bool m_ShrinkNarrow;
-    bool m_Cutdown;
+    Qt::TextElideMode m_Cutdown;
     bool m_MultiLine;
+    int  m_Leading;
+    int  m_extraLeading;
+    int  m_lineHeight;
+    int  m_textCursor;
+
+    QVector<QTextLayout *> m_Layouts;
 
     MythFontProperties* m_Font;
     QMap<QString, MythFontProperties> m_FontStates;
@@ -113,8 +131,13 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     float curR, curG, curB;
     float incR, incG, incB;
 
-    enum ScrollDir {ScrollLeft, ScrollRight, ScrollUp, ScrollDown};
+    enum Constants {ScrollBounceDelay = 250};
+    enum ScrollDir {ScrollNone, ScrollLeft, ScrollRight, ScrollUp, ScrollDown,
+                    ScrollHorizontal, ScrollVertical};
 
+    int  m_scrollPause;
+    int  m_scrollOffset;
+    bool m_scrollBounce;
     bool m_scrolling;
     ScrollDir m_scrollDirection;
 

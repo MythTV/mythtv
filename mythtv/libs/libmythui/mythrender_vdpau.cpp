@@ -158,7 +158,7 @@ class VDPAUOutputSurface : public VDPAUResource
 class VDPAUVideoSurface : public VDPAUResource
 {
   public:
-    VDPAUVideoSurface()
+    VDPAUVideoSurface() : m_needs_reset(false), m_owner(NULL)
     {
         memset(&m_render, 0, sizeof(struct vdpau_render_state));
     }
@@ -207,7 +207,12 @@ class VDPAUDecoder : public VDPAUResource
 class VDPAUVideoMixer : public VDPAUResource
 {
   public:
-    VDPAUVideoMixer() {}
+    VDPAUVideoMixer() :
+        m_layers(0), m_features(0),
+        m_noise_reduction(NULL), m_sharpness(NULL),
+        m_skip_chroma(NULL), m_background(NULL)
+    {
+    }
     VDPAUVideoMixer(uint id, QSize size, uint layers, uint features,
                     VdpChromaType type)
      : VDPAUResource(id, size), m_layers(layers), m_features(features),

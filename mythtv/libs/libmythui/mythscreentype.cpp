@@ -5,6 +5,7 @@
 #include <QDomDocument>
 #include <QRunnable>
 
+#include "mythcorecontext.h"
 #include "mythobservable.h"
 #include "mthreadpool.h"
 
@@ -49,6 +50,9 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
 
     // Can be overridden, of course, but default to full sized.
     m_Area = GetMythMainWindow()->GetUIScreenRect();
+
+//    gCoreContext->SendSystemEvent(
+//        QString("SCREEN_TYPE CREATED %1").arg(name));
 }
 
 MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
@@ -66,10 +70,16 @@ MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
     m_IsInitialized = false;
 
     m_Area = GetMythMainWindow()->GetUIScreenRect();
+
+//    gCoreContext->SendSystemEvent(
+//        QString("SCREEN_TYPE CREATED %1").arg(name));
 }
 
 MythScreenType::~MythScreenType()
 {
+//    gCoreContext->SendSystemEvent(
+//        QString("SCREEN_TYPE DESTROYED %1").arg(objectName()));
+
     m_CurrentFocusWidget = NULL;
     emit Exiting();
 }
@@ -260,7 +270,16 @@ bool MythScreenType::Create(void)
     return true;
 }
 
-// This method should only load data, it should never perform UI routines
+/**
+ * \brief Load data which will ultimately be displayed on-screen or used to
+ *        determine what appears on-screen (See Warning)
+ *
+ * \warning This method should only load data, it should NEVER perform UI
+ *          routines or segfaults WILL result. This includes assinging data to
+ *          any widgets, calling methods on a widget or anything else which
+ *          triggers redraws. The safest and recommended approach is to avoid
+ *          any interaction with a libmythui class or class member.
+ */
 void MythScreenType::Load(void)
 {
     // Virtual
@@ -329,6 +348,9 @@ void MythScreenType::ResetBusyPopup(void)
         m_BusyPopup->Reset();
 }
 
+/**
+ * \brief Has Init() been called on this screen?
+ */
 bool MythScreenType::IsInitialized(void) const
 {
     return m_IsInitialized;
@@ -341,6 +363,13 @@ void MythScreenType::doInit(void)
     m_IsInitialized = true;
 }
 
+/**
+ * \brief Used after calling Load() to assign data to widgets and other UI
+ *        initilisation which is prohibited in Load()
+ *
+ * \warning Do NOT confuse this with Load(), they serve very different purposes
+ *          and most often both should be used when creating a new screen.
+ */
 void MythScreenType::Init(void)
 {
     // Virtual
@@ -440,16 +469,13 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
         else if (action == "MENU")
             ShowMenu();
         else if (action.startsWith("SYSEVENT"))
-        {
-            MythEvent me(QString("GLOBAL_SYSTEM_EVENT KEY_%1")
-                                 .arg(action.mid(8)));
-            QCoreApplication::postEvent(
-                GetMythMainWindow()->GetSystemEventHandler(), me.clone());
-        }
+            gCoreContext->SendSystemEvent(QString("KEY_%1").arg(action.mid(8)));
         else if (action == ACTION_SCREENSHOT)
-        {
             GetMythMainWindow()->ScreenShot();
-        }
+        else if (action == ACTION_TVPOWERON)
+            GetMythMainWindow()->HandleTVPower(true);
+        else if (action == ACTION_TVPOWEROFF)
+            GetMythMainWindow()->HandleTVPower(false);
         else
             handled = false;
     }

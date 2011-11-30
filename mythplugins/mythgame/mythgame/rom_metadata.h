@@ -8,7 +8,7 @@
 
 class RomData
 {
-public:
+  public:
     RomData(QString lgenre = "", QString lyear = "",
             QString lcountry = "", QString lgamename = "",
             QString ldescription = "", QString lpublisher = "",
@@ -33,7 +33,7 @@ public:
     QString Platform() const { return platform; }
     QString Version() const { return version; }
 
-private:
+  private:
     QString genre;
     QString year;
     QString country;

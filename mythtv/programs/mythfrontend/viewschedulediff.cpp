@@ -19,14 +19,12 @@
 
 ViewScheduleDiff::ViewScheduleDiff(MythScreenStack *parent, QString altTable,
                                    int recordidDiff, QString title)
-        : MythScreenType(parent, "ViewScheduleDiff")
+        : MythScreenType(parent, "ViewScheduleDiff"),
+            m_inEvent(false), m_inFill(false),
+            m_altTable(altTable), m_title(title),
+            m_conflictList(NULL), m_titleText(NULL),
+            m_noChangesText(NULL), m_recordid(recordidDiff)
 {
-    m_altTable = altTable;
-    m_recordid = recordidDiff;
-    m_title = title;
-
-    m_inEvent = false;
-    m_inFill = false;
 }
 
 ViewScheduleDiff::~ViewScheduleDiff()

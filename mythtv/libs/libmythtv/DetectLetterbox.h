@@ -12,7 +12,7 @@ public:
     DetectLetterbox(MythPlayer* const player);
     ~DetectLetterbox();
     void SetDetectLetterbox(bool detect);
-    bool GetDetectLetterbox();
+    bool GetDetectLetterbox() const;
     void Detect(VideoFrame *frame);
     void SwitchTo(VideoFrame *frame);
 

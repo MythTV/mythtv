@@ -210,11 +210,13 @@ SOURCES += teletextdecoder.cpp      teletextreader.cpp vbilut.cpp
 HEADERS += mpeg/tspacket.h          mpeg/pespacket.h
 HEADERS += mpeg/mpegtables.h        mpeg/atsctables.h
 HEADERS += mpeg/dvbtables.h         mpeg/premieretables.h
+HEADERS += mpeg/sctetables.h
 HEADERS += mpeg/mpegstreamdata.h    mpeg/atscstreamdata.h
 HEADERS += mpeg/dvbstreamdata.h     mpeg/scanstreamdata.h
 HEADERS += mpeg/mpegdescriptors.h   mpeg/atscdescriptors.h
-HEADERS += mpeg/dvbdescriptors.h    mpeg/dishdescriptors.h
-HEADERS += mpeg/premieredescriptors.h
+HEADERS += mpeg/sctedescriptors.h   mpeg/dvbdescriptors.h
+HEADERS += mpeg/splicedescriptors.h 
+HEADERS += mpeg/dishdescriptors.h   mpeg/premieredescriptors.h
 HEADERS += mpeg/atsc_huffman.h
 HEADERS += mpeg/freesat_huffman.h   mpeg/freesat_tables.h
 HEADERS += mpeg/iso6937tables.h
@@ -224,11 +226,13 @@ HEADERS += mpeg/H264Parser.h
 SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
 SOURCES += mpeg/mpegtables.cpp      mpeg/atsctables.cpp
 SOURCES += mpeg/dvbtables.cpp       mpeg/premieretables.cpp
+SOURCES += mpeg/sctetables.cpp
 SOURCES += mpeg/mpegstreamdata.cpp  mpeg/atscstreamdata.cpp
 SOURCES += mpeg/dvbstreamdata.cpp   mpeg/scanstreamdata.cpp
 SOURCES += mpeg/mpegdescriptors.cpp mpeg/atscdescriptors.cpp
-SOURCES += mpeg/dvbdescriptors.cpp  mpeg/dishdescriptors.cpp
-SOURCES += mpeg/premieredescriptors.cpp
+SOURCES += mpeg/dvbdescriptors.cpp  mpeg/sctedescriptors.cpp
+SOURCES += mpeg/splicedescriptors.cpp
+SOURCES += mpeg/dishdescriptors.cpp mpeg/premieredescriptors.cpp
 SOURCES += mpeg/atsc_huffman.cpp
 SOURCES += mpeg/freesat_huffman.cpp
 SOURCES += mpeg/iso6937tables.cpp
@@ -248,6 +252,10 @@ SOURCES += dtvconfparser.cpp        dtvconfparserhelpers.cpp
 
 HEADERS += channelscan/scaninfo.h   channelscan/channelimporter.h
 SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
+
+# subtitles: srt
+HEADERS += srtwriter.h
+SOURCES += srtwriter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
@@ -560,6 +568,20 @@ using_backend {
         SOURCES *= streamhandler.cpp
 
         DEFINES += USING_HDHOMERUN
+    }
+
+    # Support for Ceton
+    using_ceton {
+        # MythTV Ceton glue
+        HEADERS += cetonsignalmonitor.h   cetonchannel.h
+        HEADERS += cetonrecorder.h        cetonstreamhandler.h
+        HEADERS += cetonrtp.h             cetonrtsp.h
+
+        SOURCES += cetonsignalmonitor.cpp cetonchannel.cpp
+        SOURCES += cetonrecorder.cpp      cetonstreamhandler.cpp
+        SOURCES += cetonrtp.cpp           cetonrtsp.cpp
+
+        DEFINES += USING_CETON
     }
 
     # Support for PVR-150/250/350/500, etc. on Linux

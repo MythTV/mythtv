@@ -39,7 +39,7 @@
  *  \param parent Pointer to the screen stack
  *  \param name The name of the window
  */
-MythNews::MythNews(MythScreenStack *parent, QString name) :
+MythNews::MythNews(MythScreenStack *parent, const QString &name) :
     MythScreenType(parent, name),
     m_lock(QMutex::Recursive)
 {
@@ -444,7 +444,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
         }
     }
 
-    if (m_updatedText) 
+    if (m_updatedText)
     {
 
         if (site)
@@ -665,7 +665,7 @@ void MythNews::slotProgressCancelled(void)
     m_abortHttp = true;
 }
 
-void MythNews::createProgress(QString title)
+void MythNews::createProgress(const QString &title)
 {
     QMutexLocker locker(&m_lock);
 
@@ -688,21 +688,21 @@ void MythNews::createProgress(QString title)
     }
 }
 
-bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
+bool MythNews::getHttpFile(const QString &sFilename, const QString &cmdURL)
 {
     QMutexLocker locker(&m_lock);
 
     int redirectCount = 0;
-    int timeoutCount = 0;
     QByteArray data(0);
     bool res = false;
     m_httpGrabber = NULL;
-    QString hostname = "";
+    QString hostname;
+    QString fileUrl = cmdURL;
 
     createProgress(QObject::tr("Downloading media..."));
     while (1)
     {
-        QUrl qurl(cmdURL);
+        QUrl qurl(fileUrl);
         if (hostname.isEmpty())
             hostname = qurl.host();  // hold onto original host
 
@@ -744,10 +744,9 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
         if (!m_httpGrabber->getRedirectedURL().isEmpty())
         {
             if (redirectCount++ < 3)
-                cmdURL = m_httpGrabber->getRedirectedURL();
+                fileUrl = m_httpGrabber->getRedirectedURL();
 
             // Try again
-            timeoutCount = 0;
             continue;
         }
 

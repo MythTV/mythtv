@@ -31,7 +31,7 @@
 
 class MHStream : public MHPresentable  
 {
-public:
+  public:
     MHStream();
     virtual const char *ClassName() { return "Stream"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
@@ -44,7 +44,7 @@ public:
     virtual void ContentPreparation(MHEngine *engine);
 
     virtual MHRoot *FindByObjectNo(int n);
-protected:
+  protected:
     MHOwnPtrSequence <MHPresentable> m_Multiplex;
     enum Storage { ST_Mem = 1, ST_Stream = 2 } m_nStorage;
     int         m_nLooping;
@@ -53,7 +53,7 @@ protected:
 
 class MHAudio : public MHPresentable  
 {
-public:
+  public:
     MHAudio();
     virtual const char *ClassName() { return "Audio"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
@@ -66,7 +66,7 @@ public:
     virtual void BeginPlaying(MHEngine *engine);
     virtual void StopPlaying(MHEngine *engine);
 
-protected:
+  protected:
     int m_nComponentTag;
     int m_nOriginalVol;
 
@@ -76,7 +76,7 @@ protected:
 
 class MHVideo : public MHVisible  
 {
-public:
+  public:
     MHVideo();
     virtual const char *ClassName() { return "Video"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
@@ -101,7 +101,7 @@ public:
     virtual void BeginPlaying(MHEngine *engine);
     virtual void StopPlaying(MHEngine *engine);
 
-protected:
+  protected:
     int m_nComponentTag;
     enum Termination { VI_Freeze = 1, VI_Disappear } m_Termination;
     // Added in UK MHEG
@@ -115,7 +115,7 @@ protected:
 // Real-time graphics - not needed for UK MHEG.
 class MHRTGraphics : public MHVisible  
 {
-public:
+  public:
     MHRTGraphics();
     virtual const char *ClassName() { return "RTGraphics"; }
     virtual ~MHRTGraphics();
@@ -126,7 +126,7 @@ public:
 
 
 class MHScaleVideo: public MHActionIntInt {
-public:
+  public:
     MHScaleVideo(): MHActionIntInt(":ScaleVideo") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) { pTarget->ScaleVideo(nArg1, nArg2, engine); }
 };
@@ -134,14 +134,14 @@ public:
 // Actions added in the UK MHEG profile.
 class MHSetVideoDecodeOffset: public MHActionIntInt
 {
-public:
+  public:
     MHSetVideoDecodeOffset(): MHActionIntInt(":SetVideoDecodeOffset") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) { pTarget->SetVideoDecodeOffset(nArg1, nArg2, engine); }
 };
 
 class MHGetVideoDecodeOffset: public MHActionObjectRef2
 {
-public:
+  public:
     MHGetVideoDecodeOffset(): MHActionObjectRef2(":GetVideoDecodeOffset")  {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) { pTarget->GetVideoDecodeOffset(pArg1, pArg2, engine); }
 };

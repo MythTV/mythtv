@@ -429,7 +429,7 @@ void ZMClient::deleteEventList(vector<Event*> *eventList)
     QStringList strList("DELETE_EVENT_LIST");
     int count = 0;
     vector<Event*>::iterator it;
-    for (it = eventList->begin(); it != eventList->end(); it++)
+    for (it = eventList->begin(); it != eventList->end(); ++it)
     {
         strList << QString::number((*it)->eventID);
 

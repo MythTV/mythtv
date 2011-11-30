@@ -71,23 +71,23 @@ class MTV_PUBLIC DBEvent
 {
   public:
     DBEvent(uint _listingsource) :
-        title(QString::null),
-        subtitle(QString::null),
-        description(QString::null),
-        category(QString::null),
+        title(),
+        subtitle(),
+        description(),
+        category(),
         /*starttime, endtime,*/
         airdate(0),
         credits(NULL),
         partnumber(0),
         parttotal(0),
-        syndicatedepisodenumber(QString::null),
+        syndicatedepisodenumber(),
         subtitleType(0),
         audioProps(0),
         videoProps(0),
         stars(0.0),
         categoryType(0/*kCategoryNone*/),
-        seriesId(QString::null),
-        programId(QString::null),
+        seriesId(),
+        programId(),
         previouslyshown(false),
         listingsource(_listingsource) {}
 
@@ -108,7 +108,7 @@ class MTV_PUBLIC DBEvent
         airdate(0),
         credits(NULL),
         partnumber(0),           parttotal(0),
-        syndicatedepisodenumber(QString("")),
+        syndicatedepisodenumber(),
         subtitleType(_subtitleType),
         audioProps(_audioProps), videoProps(_videoProps),
         stars(_stars),
@@ -199,9 +199,9 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
                unsigned char    _subtitleType,
                unsigned char    _audioProps,
                unsigned char    _videoProps) :
-        DBEvent(_title, QString(""), _desc, QString(""), 0/*kCategoryNone*/,
+        DBEvent(_title, QString(), _desc, QString(), 0/*kCategoryNone*/,
                 _start, _end, _subtitleType, _audioProps, _videoProps,
-                0.0, QString(""), QString(""), kListingSourceEIT),
+                0.0, QString(), QString(), kListingSourceEIT),
         chanid(_chanid), fixup(_fixup)
     {
     }

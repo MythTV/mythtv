@@ -381,7 +381,7 @@ bool VBI608Extractor::ExtractCC34(const unsigned char *buf, uint width)
     return false;
 }
 
-uint VBI608Extractor::FillCCData(uint8_t cc_data[8])
+uint VBI608Extractor::FillCCData(uint8_t cc_data[8]) const
 {
     uint cc_count = 0;
     if (code[0] != UINT16_MAX)

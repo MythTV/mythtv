@@ -47,11 +47,11 @@ void MetaIO::readFromFilename(const QString &filename,
     QStringList::iterator fmt_it = fmt_list.begin();
 
     // go through loop once to get minimum part number
-    for (; fmt_it != fmt_list.end(); fmt_it++, part_num--) {}
+    for (; fmt_it != fmt_list.end(); ++fmt_it, --part_num) {}
 
     // reset to go through loop for real
     fmt_it = fmt_list.begin();
-    for(; fmt_it != fmt_list.end(); fmt_it++, part_num++)
+    for(; fmt_it != fmt_list.end(); ++fmt_it, ++part_num)
     {
         QString part_str = lfilename.section( "/", part_num, part_num);
 

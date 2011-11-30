@@ -41,7 +41,7 @@ LayerSet::LayerSet(const QString &name) :
 LayerSet::~LayerSet()
 {
     vector<UIType *>::iterator i = allTypes->begin();
-    for (; i != allTypes->end(); i++)
+    for (; i != allTypes->end(); ++i)
     {
         UIType *type = (*i);
         if (type)
@@ -81,7 +81,7 @@ void LayerSet::Draw(QPainter *dr, int drawlayer, int context)
   if (m_context == context || m_context == -1)
   {
     vector<UIType *>::iterator i = allTypes->begin();
-    for (; i != allTypes->end(); i++)
+    for (; i != allTypes->end(); ++i)
     {
         if (m_debug)
             LOG(VB_GENERAL, LOG_DEBUG, "-LayerSet::Draw");
@@ -96,7 +96,7 @@ void LayerSet::DrawRegion(QPainter *dr, QRect &area, int drawlayer, int context)
   if (m_context == context || m_context == -1)
   {
     vector<UIType *>::iterator i = allTypes->begin();
-    for (; i != allTypes->end(); i++)
+    for (; i != allTypes->end(); ++i)
     {
         if (m_debug)
             LOG(VB_GENERAL, LOG_DEBUG, "-LayerSet::DrawRegion");
@@ -109,7 +109,7 @@ void LayerSet::DrawRegion(QPainter *dr, QRect &area, int drawlayer, int context)
 void LayerSet::ClearAllText(void)
 {
     vector<UIType *>::iterator i = allTypes->begin();
-    for (; i != allTypes->end(); i++)
+    for (; i != allTypes->end(); ++i)
     {
         UIType *type = (*i);
         if (UITextType *item = dynamic_cast<UITextType *>(type))
@@ -124,7 +124,7 @@ void LayerSet::ClearAllText(void)
 void LayerSet::SetText(QHash<QString, QString> &infoMap)
 {
     vector<UIType *>::iterator i = allTypes->begin();
-    for (; i != allTypes->end(); i++)
+    for (; i != allTypes->end(); ++i)
     {
         UIType *type = (*i);
         if (UITextType *item = dynamic_cast<UITextType *>(type))
@@ -170,7 +170,7 @@ void LayerSet::SetText(QHash<QString, QString> &infoMap)
 void LayerSet::UseAlternateArea(bool useAlt)
 {
     vector<UIType *>::iterator i = allTypes->begin();
-    for (; i != allTypes->end(); i++)
+    for (; i != allTypes->end(); ++i)
     {
         UIType *type = (*i);
         if (UITextType *item = dynamic_cast<UITextType *>(type))
@@ -181,7 +181,7 @@ void LayerSet::UseAlternateArea(bool useAlt)
 void LayerSet::SetDrawFontShadow(bool state)
 {
     vector<UIType *>::iterator i = allTypes->begin();
-    for (; i != allTypes->end(); i++)
+    for (; i != allTypes->end(); ++i)
     {
         UIType *type = (*i);
         type->SetDrawFontShadow(state);
@@ -3699,13 +3699,8 @@ void UIKeyboardType::insertChar(QString c)
         }
         else
         {
-#ifdef QT3_SUPPORT
-            QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, 0, 0, c, false,
-                                           c.length());
-#else // if !QT3_SUPPORT
             QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier,
                                            c, false, c.length());
-#endif //!QT3_SUPPORT
             QCoreApplication::postEvent(m_parentEdit, key);
         }
     }
@@ -3732,16 +3727,10 @@ void UIKeyboardType::insertChar(QString c)
                     }
                     else
                     {
-#ifdef QT3_SUPPORT
-                        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, 0,
-                                                       0, comps[i][2], false,
-                                                       comps[i][2].length());
-#else // if !QT3_SUPPORT
                         QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0,
                                                        Qt::NoModifier,
                                                        comps[i][2], false,
                                                        comps[i][2].length());
-#endif // !QT3_SUPPORT
                         QCoreApplication::postEvent(m_parentEdit, key);
                     }
 

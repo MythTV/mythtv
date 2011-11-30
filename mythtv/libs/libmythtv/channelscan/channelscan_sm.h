@@ -100,7 +100,7 @@ class ChannelScanSM : public MPEGStreamListener,
     void StopScanner(void);
 
     bool ScanTransports(
-        int src, const QString std, const QString mod, const QString table,
+        int src, const QString &std, const QString &mod, const QString &table,
         const QString &table_start = QString::null,
         const QString &table_end   = QString::null);
     bool ScanTransportsStartingOn(

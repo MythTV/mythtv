@@ -475,7 +475,7 @@ static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
                     vct[i]->Descriptors(j), vct[i]->DescriptorsLength(j),
                     DescriptorID::caption_service);
 
-                if (ldesc.size())
+                if (!ldesc.empty())
                     desc.insert(desc.end(), ldesc.begin(), ldesc.end());
             }
         }
@@ -487,7 +487,7 @@ static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
                 vct[i]->GlobalDescriptorsLength(),
                 DescriptorID::caption_service);
 
-            if (vdesc.size())
+            if (!vdesc.empty())
                 desc.insert(desc.end(), vdesc.begin(), vdesc.end());
         }
     }
@@ -533,7 +533,7 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
             desc_list_t vdesc = extract_atsc_desc(
                 tvct, cvct, pmt.ProgramNumber());
 
-            if (vdesc.size())
+            if (!vdesc.empty())
                 gdesc.insert(gdesc.end(), vdesc.begin(), vdesc.end());
         }
     }
@@ -746,6 +746,17 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
             return true;
         }
+        case TableID::SITscte:
+        {
+            SpliceInformationTable sit(psip);
+
+            _listener_lock.lock();
+            for (uint i = 0; i < _mpeg_listeners.size(); i++)
+                _mpeg_listeners[i]->HandleSplice(&sit);
+            _listener_lock.unlock();
+
+            return true;
+        }
     }
     return false;
 }
@@ -867,17 +878,20 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
     if (!psip)
        return;
 
-    // Don't do the usual checks on TDT - it has no CRC, etc...
-    if (TableID::TDT == psip->TableID())
+    // drop stuffing packets
+    if ((TableID::ST       == psip->TableID()) ||
+        (TableID::STUFFING == psip->TableID()))
+    {
+        LOG(VB_RECORD, LOG_DEBUG, "Dropping Stuffing table");
+        DONE_WITH_PES_PACKET();
+    }
+
+    // Don't do validation on tables withotu CRC
+    if (!psip->HasCRC())
     {
         HandleTables(tspacket->PID(), *psip);
         DONE_WITH_PES_PACKET();
     }
-
-    // drop stuffing packets
-    if ((TableID::ST       == psip->TableID()) ||
-        (TableID::STUFFING == psip->TableID()))
-        DONE_WITH_PES_PACKET();
 
     // Validate PSIP
     // but don't validate PMT/PAT if our driver has the PMT/PAT CRC bug.
@@ -892,8 +906,13 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
         DONE_WITH_PES_PACKET();
     }
 
-    if (!psip->IsCurrent()) // we don't cache the next table, for now
+    if (TableID::MGT <= psip->TableID() && psip->TableID() <= TableID::STT &&
+        !psip->IsCurrent())
+    { // we don't cache the next table, for now
+        LOG(VB_RECORD, LOG_DEBUG, QString("Table not current 0x%1")
+            .arg(psip->TableID(),2,16,QChar('0')));
         DONE_WITH_PES_PACKET();
+    }
 
     if (tspacket->Scrambled())
     { // scrambled! ATSC, DVB require tables not to be scrambled
@@ -904,7 +923,8 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 
     if (!psip->VerifyPSIP(!_have_CRC_bug))
     {
-        LOG(VB_RECORD, LOG_ERR, "PSIP table is invalid");
+        LOG(VB_RECORD, LOG_ERR, QString("PSIP table 0x%1 is invalid")
+            .arg(psip->TableID(),2,16,QChar('0')));
         DONE_WITH_PES_PACKET();
     }
 
@@ -979,40 +999,34 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     if (!ok)
         return false;
 
-    if (!tspacket.Scrambled() && tspacket.HasPayload())
+    if (tspacket.Scrambled())
+        return true;
+
+    if (IsVideoPID(tspacket.PID()))
     {
-        if (IsVideoPID(tspacket.PID()))
-        {
-            for (uint j = 0; j < _ts_av_listeners.size(); j++)
-                _ts_av_listeners[j]->ProcessVideoTSPacket(tspacket);
+        for (uint j = 0; j < _ts_av_listeners.size(); j++)
+            _ts_av_listeners[j]->ProcessVideoTSPacket(tspacket);
 
-            return true;
-        }
-
-        if (IsAudioPID(tspacket.PID()))
-        {
-            for (uint j = 0; j < _ts_av_listeners.size(); j++)
-                _ts_av_listeners[j]->ProcessAudioTSPacket(tspacket);
-
-            return true;
-        }
-
-        if (IsWritingPID(tspacket.PID()) && _ts_writing_listeners.size())
-        {
-            for (uint j = 0; j < _ts_writing_listeners.size(); j++)
-                _ts_writing_listeners[j]->ProcessTSPacket(tspacket);
-        }
-
-        if (IsListeningPID(tspacket.PID()))
-        {
-            HandleTSTables(&tspacket);
-        }
+        return true;
     }
-    else if (!tspacket.Scrambled() && IsWritingPID(tspacket.PID()))
+
+    if (IsAudioPID(tspacket.PID()))
     {
-        // PCRPID and other streams we're writing may not have payload...
+        for (uint j = 0; j < _ts_av_listeners.size(); j++)
+            _ts_av_listeners[j]->ProcessAudioTSPacket(tspacket);
+
+        return true;
+    }
+
+    if (IsWritingPID(tspacket.PID()))
+    {
         for (uint j = 0; j < _ts_writing_listeners.size(); j++)
             _ts_writing_listeners[j]->ProcessTSPacket(tspacket);
+    }
+
+    if (IsListeningPID(tspacket.PID()) && tspacket.HasPayload())
+    {
+        HandleTSTables(&tspacket);
     }
 
     return true;

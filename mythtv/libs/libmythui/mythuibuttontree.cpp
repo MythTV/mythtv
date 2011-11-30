@@ -138,8 +138,8 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
         {
             m_activeList = list;
             list->SetActive(true);
-            emit itemSelected(list->GetItemCurrent());
             DoSetCurrentNode(selectedNode);
+            emit itemSelected(list->GetItemCurrent());
         }
 
         listid++;
@@ -236,6 +236,7 @@ bool MythUIButtonTree::AssignTree(MythGenericTree *tree)
     // as though the parent nodes do not exist
     m_depthOffset = m_rootNode->currentDepth();
     SetTreeState(true);
+    emit rootChanged(m_rootNode);
 
     return true;
 }
@@ -253,6 +254,7 @@ void MythUIButtonTree::Reset(void)
     m_active = true;
 
     SetTreeState(true);
+    emit rootChanged(m_rootNode);
 
     MythUIType::Reset();
 }
@@ -593,7 +595,7 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
 
         if (m_activeList && m_activeList->m_layout == MythUIButtonList::LayoutGrid)
         {
-            if (action == "SELECT" && m_currentNode->childCount() > 0)
+            if (action == "SELECT" && m_currentNode->visibleChildCount() > 0)
             {
                 SwitchList(true);
             }
@@ -606,11 +608,11 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
         }
         else
         {
-            if (action == "RIGHT")
+            if (action == "RIGHT" && m_currentNode->visibleChildCount() > 0)
             {
                 SwitchList(true);
             }
-            else if (action == "LEFT")
+            else if (action == "LEFT" && !(m_currentDepth == 0 && m_activeListID == 0))
             {
                 SwitchList(false);
             }

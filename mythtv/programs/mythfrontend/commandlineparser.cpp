@@ -12,10 +12,10 @@ MythFrontendCommandLineParser::MythFrontendCommandLineParser() :
 
 void MythFrontendCommandLineParser::LoadArguments(void)
 {
-    allowArgs();
     addHelp();
     addVersion();
-    addWindowed(false);
+    addWindowed();
+    addMouse();
     addSettingsOverride();
     addGeometry();
     addDisplay();
@@ -27,7 +27,17 @@ void MythFrontendCommandLineParser::LoadArguments(void)
     add(QStringList( QStringList() << "-p" << "--prompt" ), "prompt", false,
         "Always prompt for backend selection.", "");
     add(QStringList( QStringList() << "-d" << "--disable-autodiscovery" ),
-        "noautodiscovery", false, "Prevent frontend from using UPnP autodiscovery.", "");
+        "noautodiscovery", false,
+        "Prevent frontend from using UPnP autodiscovery.", "");
+
+    add("--jumppoint", "jumppoint", "",
+        "Start the frontend at specified jump point.", "")
+            ->SetGroup("Startup Behavior");
+    add("--runplugin", "runplugin", "",
+        "Start the frontend within specified plugin.", "")
+            ->SetGroup("Startup Behavior")
+            ->SetBlocks("jumppoint");
+        
 }
 
 QString MythFrontendCommandLineParser::GetHelpHeader(void) const

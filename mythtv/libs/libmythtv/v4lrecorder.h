@@ -20,7 +20,7 @@ struct VBIData
 };
 
 /// Abstract base class for Video4Linux based recorders.
-class MPUBLIC V4LRecorder : public DTVRecorder
+class MTV_PUBLIC V4LRecorder : public DTVRecorder
 {
     friend class VBIThread;
   public:

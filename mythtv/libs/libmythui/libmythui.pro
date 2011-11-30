@@ -30,7 +30,7 @@ HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
 HEADERS += mythdisplay.h mythuivideo.h mythudplistener.h
-HEADERS += mythuiexp.h
+HEADERS += mythuiexp.h mythuisimpletext.h mythuistatetracker.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp
@@ -48,6 +48,7 @@ SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
 SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
 SOURCES += mythfontmanager.cpp mythuieditbar.cpp
 SOURCES += mythdisplay.cpp mythuivideo.cpp mythudplistener.cpp
+SOURCES += mythuisimpletext.cpp mythuistatetracker.cpp
 
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
@@ -64,7 +65,8 @@ inc.files += mythuiprogressbar.h mythuiwebbrowser.h mythuiutils.h
 inc.files += x11colors.h mythgenerictree.h mythuibuttontree.h
 inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 inc.files += mythuieditbar.h mythuifilebrowser.h mythuivideo.h
-inc.files += mythuiexp.h mythuiactions.h
+inc.files += mythuiexp.h mythuisimpletext.h mythuiactions.h
+inc.files += mythuistatetracker.h
 
 INSTALLS += inc
 
@@ -114,6 +116,12 @@ using_lirc {
     DEFINES += USE_LIRC
     HEADERS += lirc.h   lircevent.h   lirc_client.h
     SOURCES += lirc.cpp lircevent.cpp lirc_client.c
+}
+
+using_libcec {
+    DEFINES += USING_LIBCEC
+    HEADERS += cecadapter.h
+    SOURCES += cecadapter.cpp
 }
 
 using_xrandr {

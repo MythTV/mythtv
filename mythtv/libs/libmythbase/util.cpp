@@ -34,11 +34,12 @@ using namespace std;
 #endif
 
 // Qt headers
+#include <QReadWriteLock>
+#include <QNetworkProxy>
+#include <QFileInfo>
 #include <QFile>
 #include <QDir>
-#include <QFileInfo>
 #include <QUrl>
-#include <QNetworkProxy>
 
 // Myth headers
 #include "mythcorecontext.h"
@@ -270,7 +271,7 @@ static QString findZoneinfoFile(QString zoneinfo_file_path,
     QFileInfo zoneinfo_file_info(zoneinfo_file_path);
 
     for (QFileInfoList::const_iterator it = dirlist.begin();
-         it != dirlist.end(); it++)
+         it != dirlist.end(); ++it)
     {
         info = *it;
          // Skip '.' and '..' and other files starting with "." and
@@ -1587,6 +1588,32 @@ void wrapList(QStringList &list, int width)
             list.insert(i+1, string.mid(left.size()).trimmed());
         }
     }
+}
+
+QString xml_indent(uint level)
+{
+    static QReadWriteLock rw_lock;
+    static QMap<uint,QString> cache;
+
+    rw_lock.lockForRead();
+    QMap<uint,QString>::const_iterator it = cache.find(level);
+    if (it != cache.end())
+    {
+        QString tmp = *it;
+        rw_lock.unlock();
+        return tmp;
+    }
+    rw_lock.unlock();
+
+    QString ret = "";
+    for (uint i = 0; i < level; i++)
+        ret += "    ";
+
+    rw_lock.lockForWrite();
+    cache[level] = ret;
+    rw_lock.unlock();
+
+    return ret;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

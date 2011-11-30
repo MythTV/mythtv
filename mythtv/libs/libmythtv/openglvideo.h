@@ -46,8 +46,8 @@ class OpenGLVideo
               bool viewport_control,  QString options,
               bool hwaccel);
 
-    uint GetInputTexture(void);
-    uint GetTextureType(void);
+    uint GetInputTexture(void) const;
+    uint GetTextureType(void) const;
     void SetInputUpdated(void);
     void UpdateInputFrame(const VideoFrame *frame, bool soft_bob = false);
 
@@ -130,5 +130,6 @@ class OpenGLVideo
     OpenGLFilterType defaultUpsize;
     uint           gl_features;
     uint           videoTextureType;
+    bool           preferYCBCR;
 };
 #endif // _OPENGL_VIDEO_H__

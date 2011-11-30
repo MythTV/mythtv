@@ -124,6 +124,13 @@ void VideoVisualSpectrum::Draw(const QRect &area, MythPainter *painter,
     DrawPriv(painter, device);
 }
 
+void VideoVisualSpectrum::prepare(void)
+{
+    for (int i = 0; i < m_magnitudes.size(); i++)
+        m_magnitudes[i] = 0.0;
+    VideoVisual::prepare();
+}
+
 void VideoVisualSpectrum::DrawPriv(MythPainter *painter, QPaintDevice* device)
 {
     static const QBrush brush(QColor(0, 0, 200, 180));

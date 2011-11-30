@@ -66,7 +66,8 @@ int pgm_read(unsigned char *buf, int width, int height, const char *filename)
         return -1;
     }
 
-    if ((nn = fscanf(fp, "P5\n%d %d\n%d\n", &fwidth, &fheight, &maxgray)) != 3)
+    if ((nn = fscanf(fp, "P5\n%20d %20d\n%20d\n",
+                     &fwidth, &fheight, &maxgray)) != 3)
     {
         LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_read fscanf %1 failed: %2")
                 .arg(filename).arg(strerror(errno)));

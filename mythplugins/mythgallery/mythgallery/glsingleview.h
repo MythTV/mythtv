@@ -2,8 +2,8 @@
  * File  : glsingleview.h
  * Author: Renchi Raju <renchi@pooh.tam.uiuc.edu>
  * Date  : 2004-01-13
- * Description : 
- * 
+ * Description :
+ *
  * Copyright 2004 by Renchi Raju
 
  * This program is free software; you can redistribute it
@@ -11,18 +11,17 @@
  * Public License as published bythe Free Software Foundation;
  * either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * ============================================================ */
 
 #ifndef GLSINGLEVIEW_H
 #define GLSINGLEVIEW_H
 #ifdef USING_OPENGL
-
 
 // MythTV plugin headers
 #include <mythdialogs.h>
@@ -35,6 +34,9 @@
 #include "sequence.h"
 #include "gltexture.h"
 
+// QT headers
+#include <QGLWidget>
+
 class QImage;
 class QTimer;
 
@@ -43,14 +45,14 @@ class KenBurnsImageLoader;
 
 class GLSDialog : public MythDialog
 {
-  public:  
+  public:
     GLSDialog(const ThumbList& itemList,
               int *pos, int slideShow, int sortOrder,
               MythMainWindow *parent, const char *name="GLSDialog");
 
   protected:
     void closeEvent(QCloseEvent *e);
-    
+
   private:
     GLSingleView *m_view;
 };
@@ -67,7 +69,7 @@ class GLSingleView : public QGLWidget, public ImageView
     void CleanUp(void);
     void Ready(){m_effect_kenBurns_image_ready = true;}
     void LoadImage(QImage image, QSize origSize);
-    
+
 
   protected:
     void initializeGL(void);
@@ -106,11 +108,11 @@ class GLSingleView : public QGLWidget, public ImageView
     void EffectFlutter(void);
     void EffectCube(void);
     void EffectKenBurns(void);
-  
+
   private:
     float FindMaxScale(float x_loc, float y_loc);
     void FindRandXY(float &x_loc, float &y_loc);
-    
+
   private slots:
     void SlideTimeout(void);
 
@@ -129,7 +131,7 @@ class GLSingleView : public QGLWidget, public ImageView
 
     // Info variables
     GLuint        m_texInfo;
-    
+
     // Common effect state variables
     int           m_effect_rotate_direction;
     MythTimer     m_effect_frame_time;
@@ -153,7 +155,7 @@ class GLSingleView : public QGLWidget, public ImageView
     ThumbItem     *m_effect_kenBurns_item;
     bool          m_effect_kenBurns_initialized;
     bool          m_effect_kenBurns_new_image_started;
-    
+
 };
 
 class KenBurnsImageLoader : public MThread

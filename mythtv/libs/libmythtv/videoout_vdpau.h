@@ -46,7 +46,7 @@ class VideoOutputVDPAU : public VideoOutput
     void StopEmbedding(void);
     void MoveResizeWindow(QRect new_rect);
     void DrawUnusedRects(bool sync = true);
-    void UpdatePauseFrame(void);
+    void UpdatePauseFrame(int64_t &disp_timecode);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
     void InitPictureAttributes(void);
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
@@ -68,6 +68,7 @@ class VideoOutputVDPAU : public VideoOutput
         { return VideoOutput::CanVisualise(audio, m_render);       }
     virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
         { return VideoOutput::SetupVisualisation(audio, m_render); }
+    virtual void ClearDummyFrame(VideoFrame* frame);
 
   private:
     virtual bool hasFullScreenOSD(void) const { return true; }

@@ -28,7 +28,8 @@ ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
     m_url("http://services.mythtv.org/channel-icon/"), m_progressDialog(NULL),
     m_iconsList(NULL),             m_manualEdit(NULL),
     m_nameText(NULL),              m_manualButton(NULL),
-    m_skipButton(NULL),            m_statusText(NULL)
+    m_skipButton(NULL),            m_statusText(NULL),
+    m_preview(NULL),               m_previewtitle(NULL)
 {
     m_strChannelname.detach();
     LOG(VB_GENERAL, LOG_INFO,
@@ -60,7 +61,7 @@ bool ImportIconsWizard::Create()
     if (!initialLoad(m_strChannelname))
         return false;
 
-    
+
     bool foundtheme = false;
 
     // Load the theme for this screen
@@ -100,7 +101,7 @@ bool ImportIconsWizard::Create()
             SLOT(menuSelection(MythUIButtonListItem *)));
     connect(m_iconsList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             SLOT(itemChanged(MythUIButtonListItem *)));
-            
+
     BuildFocusList();
 
     enableControls(STATE_NORMAL);
@@ -462,60 +463,42 @@ QString ImportIconsWizard::escape_csv(const QString& str)
     return "\""+str2+"\"";
 }
 
-QStringList ImportIconsWizard::extract_csv(const QString& strLine)
+QStringList ImportIconsWizard::extract_csv(const QString &line)
 {
     QStringList ret;
-    //Clean up the line and split out the fields
-    QString str = strLine;
-
-    int pos = 0;
-    bool fFinish = false;
-    while(!fFinish)
+    QString str;
+    bool in_comment = false;
+    bool in_escape = false;
+    int comma_count = 0;
+    for (int i = 0; i < line.length(); i++)
     {
-        str = str.trimmed();
-        while(!fFinish)
+        QChar cur = line[i];
+        if (in_escape)
         {
-            QString strLeft;
-            switch (str.at(pos).unicode())
-            {
-            case '\\':
-                if (pos>=1)
-                    str.left(pos-1)+str.mid(pos+1);
-                else
-                    str=str.mid(pos+1);
-                pos+=2;
-                if (pos > str.length())
-                {
-                    strLeft = str.left(pos);
-                    if (strLeft.startsWith("\"") && strLeft.endsWith("\""))
-                        strLeft=strLeft.mid(1,strLeft.length()-2);
-                    ret.append(strLeft);
-                    fFinish = true;
-                }
-                break;
-            case ',':
-                strLeft = str.left(pos);
-                if (strLeft.startsWith("\"") && strLeft.endsWith("\""))
-                    strLeft=strLeft.mid(1,strLeft.length()-2);
-                ret.append(strLeft);
-                if ((pos+1) > str.length())
-                   fFinish = true;
-                str=str.mid(pos+1);
-                pos=0;
-                break;
-            default:
-                pos++;
-                if (pos >= str.length())
-                {
-                    strLeft = str.left(pos);
-                    if (strLeft.startsWith("\"") && strLeft.endsWith("\""))
-                        strLeft=strLeft.mid(1,strLeft.length()-2);
-                    ret.append(strLeft);
-                    fFinish = true;
-                }
-            }
+            str += cur;
+            in_escape = false;
+        }
+        else if (cur == '"')
+        {
+            in_comment = !in_comment;
+        }
+        else if (cur == '\\')
+        {
+            in_escape = true;
+        }
+        else if (!in_comment && (cur == ','))
+        {
+            ret += str;
+            str.clear();
+            ++comma_count;
+        }
+        else
+        {
+            str += cur;
         }
     }
+    if (comma_count)
+        ret += str;
 
     // This is just to avoid segfaulting, we should add some error recovery
     while (ret.size() < 5)
@@ -547,7 +530,7 @@ bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& loca
     QFileInfo file(m_strChannelDir+filename);
 
     bool fRet;
-    // Since DNS for lyngsat-logos.com times out, set a 20s timeout 
+    // Since DNS for lyngsat-logos.com times out, set a 20s timeout
     if (!file.exists())
         fRet = HttpComms::getHttpFile(file.absoluteFilePath(),iconUrl,20000);
     else
@@ -615,7 +598,7 @@ bool ImportIconsWizard::search(const QString& strParam)
                                 .arg(escape_csv(entry2.strNetworkId))
                                 .arg(escape_csv(entry2.strServiceId));
 
-    QString str = wget(url,"s="+strParam1+"csv="+channelcsv);
+    QString str = wget(url,"s="+strParam1+"&csv="+channelcsv);
     m_listSearch.clear();
     m_iconsList->Reset();
 
@@ -703,9 +686,9 @@ bool ImportIconsWizard::search(const QString& strParam)
                 iconfile = m_tmpDir.absoluteFilePath(iconfile);
                 QString iconname = entry.strName;
                 bool haveIcon = true;
-                // Since DNS for lyngsat-logos.com times out, set a 20s timeout 
+                // Since DNS for lyngsat-logos.com times out, set a 20s timeout
                 if (!QFile(iconfile).exists())
-                    haveIcon = HttpComms::getHttpFile(iconfile, entry.strLogo, 
+                    haveIcon = HttpComms::getHttpFile(iconfile, entry.strLogo,
                                                       20000);
 
                 if (haveIcon)

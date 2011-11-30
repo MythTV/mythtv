@@ -124,6 +124,8 @@ extern LIBTYPE int hdhomerun_device_get_tuner_program(struct hdhomerun_device_t 
 extern LIBTYPE int hdhomerun_device_get_tuner_target(struct hdhomerun_device_t *hd, char **ptarget);
 extern LIBTYPE int hdhomerun_device_get_tuner_plotsample(struct hdhomerun_device_t *hd, struct hdhomerun_plotsample_t **psamples, size_t *pcount);
 extern LIBTYPE int hdhomerun_device_get_tuner_lockkey_owner(struct hdhomerun_device_t *hd, char **powner);
+extern LIBTYPE int hdhomerun_device_get_oob_status(struct hdhomerun_device_t *hd, char **pstatus_str, struct hdhomerun_tuner_status_t *status);
+extern LIBTYPE int hdhomerun_device_get_oob_plotsample(struct hdhomerun_device_t *hd, struct hdhomerun_plotsample_t **psamples, size_t *pcount);
 extern LIBTYPE int hdhomerun_device_get_ir_target(struct hdhomerun_device_t *hd, char **ptarget);
 extern LIBTYPE int hdhomerun_device_get_lineup_location(struct hdhomerun_device_t *hd, char **plocation);
 extern LIBTYPE int hdhomerun_device_get_version(struct hdhomerun_device_t *hd, char **pversion_str, uint32_t *pversion_num);

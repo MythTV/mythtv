@@ -377,13 +377,14 @@ class VideoListImp
 
     void refreshList(bool filebrowser, const ParentalLevel &parental_level,
                      bool flatlist, int group_type);
+    bool refreshNode(MythGenericTree *node);
 
     unsigned int count() const
     {
         return m_metadata_view_flat.size();
     }
 
-    const VideoFilterSettings &getCurrentVideoFilter()
+    const VideoFilterSettings &getCurrentVideoFilter() const
     {
         return m_video_filter;
     }
@@ -497,12 +498,17 @@ void VideoList::refreshList(bool filebrowser,
     m_imp->refreshList(filebrowser, parental_level, flat_list, group_type);
 }
 
+bool VideoList::refreshNode(MythGenericTree *node)
+{
+    return m_imp->refreshNode(node);
+}
+
 unsigned int VideoList::count() const
 {
     return m_imp->count();
 }
 
-const VideoFilterSettings &VideoList::getCurrentVideoFilter()
+const VideoFilterSettings &VideoList::getCurrentVideoFilter() const
 {
     return m_imp->getCurrentVideoFilter();
 }
@@ -556,6 +562,13 @@ VideoListImp::VideoListImp() : m_metadata_view_tree("", "top"),
 void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
                                       bool include_updirs)
 {
+    if (src->DataIsValid())
+    {
+        dst->setInt(kDynamicSubFolder);
+        dst->SetData(src->GetData());
+        return;
+    }
+
     for (meta_dir_node::const_dir_iterator dir = src->dirs_begin();
          dir != src->dirs_end(); ++dir)
     {
@@ -615,7 +628,7 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
 //      If false, the hierarchy present on the filesystem or in the database
 //      is preserved. In this mode, both sub-dirs and updirs are present.
 MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
-                                          int group_type, 
+                                          int group_type,
                                           const ParentalLevel &parental_level,
                                           bool include_updirs)
 {
@@ -641,6 +654,29 @@ MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
     return video_tree_root.get();
 }
 
+bool VideoListImp::refreshNode(MythGenericTree *node)
+{
+    if (!node)
+        return false;
+
+    // node->GetData() provides information on how/where to refresh the
+    // data for this node
+
+    QVariant data = node->GetData();
+    if (!data.isValid())
+        return false;
+
+    // currently only UPNPScanner can refresh data
+    if (UPNPScanner::Instance() && UPNPScanner::Instance()->GetMetadata(data))
+    {
+        // force a refresh
+        m_metadata_list_type = VideoListImp::ltNone;
+        return true;
+    }
+
+    return false;
+}
+
 void VideoListImp::refreshList(bool filebrowser,
                                const ParentalLevel &parental_level,
                                bool flat_list, int group_type)
@@ -648,26 +684,26 @@ void VideoListImp::refreshList(bool filebrowser,
 
     m_video_filter.setParentalLevel(parental_level.GetLevel());
 
-    if (filebrowser) 
-    { 
-        fillMetadata(ltFileSystem); 
+    if (filebrowser)
+    {
+        fillMetadata(ltFileSystem);
     }
-    else 
-    { 
-        switch (group_type) 
-        { 
-            case VideoDialog::BRS_FOLDER: 
-                fillMetadata(ltDBMetadata); 
-                LOG(VB_GENERAL, LOG_DEBUG, "Using Folder mode"); 
-                break; 
-            case VideoDialog::BRS_GENRE: 
-                fillMetadata(ltDBGenreGroup); 
-                LOG(VB_GENERAL, LOG_DEBUG, "Using Genre mode"); 
-                break; 
+    else
+    {
+        switch (group_type)
+        {
+            case VideoDialog::BRS_FOLDER:
+                fillMetadata(ltDBMetadata);
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Folder mode");
+                break;
+            case VideoDialog::BRS_GENRE:
+                fillMetadata(ltDBGenreGroup);
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Genre mode");
+                break;
             case VideoDialog::BRS_CATEGORY:
                 fillMetadata(ltDBCategoryGroup);
-                LOG(VB_GENERAL, LOG_DEBUG, "Using Category mode"); 
-                break; 
+                LOG(VB_GENERAL, LOG_DEBUG, "Using Category mode");
+                break;
             case VideoDialog::BRS_YEAR:
                 fillMetadata(ltDBYearGroup);
                 LOG(VB_GENERAL, LOG_DEBUG, "Using Year mode");
@@ -699,8 +735,8 @@ void VideoListImp::refreshList(bool filebrowser,
             default:
                 fillMetadata(ltDBMetadata);
                 break;
-        } 
-    } 
+        }
+    }
     update_meta_view(flat_list);
 }
 
@@ -731,16 +767,16 @@ void VideoListImp::fillMetadata(metadata_list_type whence)
 
         switch (whence)
         {
-            case ltFileSystem:  
-                buildFsysList(); 
-                break; 
-            case ltDBMetadata: 
-                buildDbList(); 
+            case ltFileSystem:
+                buildFsysList();
+                break;
+            case ltDBMetadata:
+                buildDbList();
                 break;
             case ltTVMetadata:
                 buildTVList();
                 break;
-            case ltDBGenreGroup: 
+            case ltDBGenreGroup:
             case ltDBCategoryGroup:
             case ltDBYearGroup:
             case ltDBDirectorGroup:
@@ -748,65 +784,66 @@ void VideoListImp::fillMetadata(metadata_list_type whence)
             case ltDBCastGroup:
             case ltDBUserRatingGroup:
             case ltDBInsertDateGroup:
-                buildGroupList(whence); 
-                break; 
-            case ltNone: 
-                break;  
+                buildGroupList(whence);
+                break;
+            case ltNone:
+                break;
         }
     }
 }
 
-void VideoListImp::buildGroupList(metadata_list_type whence) 
-{ 
-    metadata_list ml; 
-    VideoMetadataListManager::loadAllFromDatabase(ml); 
-    m_metadata.setList(ml); 
- 
-    metadata_view_list mlist; 
-    mlist.reserve(m_metadata.getList().size()); 
+void VideoListImp::buildGroupList(metadata_list_type whence)
+{
+    metadata_list ml;
+    VideoMetadataListManager::loadAllFromDatabase(ml);
+    m_metadata.setList(ml);
 
-    std::back_insert_iterator<metadata_view_list> mli(mlist); 
-    std::transform(m_metadata.getList().begin(), m_metadata.getList().end(), 
-                   mli, to_metadata_ptr()); 
+    metadata_view_list mlist;
+    mlist.reserve(m_metadata.getList().size());
 
-    metadata_path_sort mps(true); 
-    std::sort(mlist.begin(), mlist.end(), mps); 
+    std::back_insert_iterator<metadata_view_list> mli(mlist);
+    std::transform(m_metadata.getList().begin(), m_metadata.getList().end(),
+                   mli, to_metadata_ptr());
 
-    typedef std::map<QString, meta_dir_node *> group_to_node_map; 
-    group_to_node_map gtnm; 
+    metadata_path_sort mps(true);
+    std::sort(mlist.begin(), mlist.end(), mps);
 
-    meta_dir_node *video_root = &m_metadata_tree; 
+    typedef std::map<QString, meta_dir_node *> group_to_node_map;
+    group_to_node_map gtnm;
 
-    smart_dir_node sdn = video_root->addSubDir("All"); 
-    meta_dir_node* all_group_node = sdn.get(); 
+    meta_dir_node *video_root = &m_metadata_tree;
 
-    for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p) 
-    { 
-        VideoMetadata *data = *p; 
+    smart_dir_node sdn = video_root->addSubDir("All");
+    meta_dir_node* all_group_node = sdn.get();
 
-        all_group_node->addEntry(smart_meta_node(new meta_data_node(data))); 
- 
-        std::vector <QString> groups; 
+    for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p)
+    {
+        VideoMetadata *data = *p;
 
-        switch (whence) 
+        all_group_node->addEntry(smart_meta_node(new meta_data_node(data)));
+
+        std::vector <QString> groups;
+
+        switch (whence)
         {
-            case ltDBGenreGroup: 
-            { 
-                std::vector <std::pair <int, QString> > genres = data->GetGenres(); 
+            case ltDBGenreGroup:
+            {
+                std::vector <std::pair <int, QString> > genres =
+                    data->GetGenres();
 
-                for (std::vector <std::pair <int, QString> >::iterator i =  
-                                         genres.begin(); i != genres.end(); i++) 
-                { 
-                    std::pair <int, QString> item = *i; 
-                    groups.push_back(item.second); 
-                } 
-                break; 
-            } 
-            case ltDBCategoryGroup: 
-            { 
-                groups.push_back(data->GetCategory()); 
-                break; 
-            } 
+                for (std::vector <std::pair <int, QString> >::iterator i =
+                         genres.begin(); i != genres.end(); ++i)
+                {
+                    std::pair <int, QString> item = *i;
+                    groups.push_back(item.second);
+                }
+                break;
+            }
+            case ltDBCategoryGroup:
+            {
+                groups.push_back(data->GetCategory());
+                break;
+            }
             case ltDBYearGroup:
             {
                 groups.push_back(QString::number(data->GetYear()));
@@ -827,7 +864,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
                 std::vector <std::pair <int, QString> > cast = data->GetCast();
 
                 for (std::vector <std::pair <int, QString> >::iterator i =
-                                         cast.begin(); i != cast.end(); i++)
+                         cast.begin(); i != cast.end(); ++i)
                 {
                     std::pair <int, QString> item = *i;
                     groups.push_back(item.second);
@@ -848,44 +885,44 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
                 groups.push_back(tmp);
                 break;
             }
-            default: 
-            { 
-                LOG(VB_GENERAL, LOG_ERR, "Invalid type of grouping"); 
-                break; 
-            } 
-        } 
+            default:
+            {
+                LOG(VB_GENERAL, LOG_ERR, "Invalid type of grouping");
+                break;
+            }
+        }
 
-        if (groups.size() == 0) 
-        { 
-            meta_dir_node *group_node = gtnm["Unknown"]; 
+        if (groups.empty())
+        {
+            meta_dir_node *group_node = gtnm["Unknown"];
 
-            if (group_node == NULL) 
-            { 
-                smart_dir_node sdn = video_root->addSubDir("Unknown"); 
-                group_node = sdn.get(); 
-                gtnm["Unknown"] = group_node; 
-            } 
+            if (group_node == NULL)
+            {
+                smart_dir_node sdn = video_root->addSubDir("Unknown");
+                group_node = sdn.get();
+                gtnm["Unknown"] = group_node;
+            }
 
-            group_node->addEntry(smart_meta_node(new meta_data_node(data))); 
-        } 
- 
-        for (std::vector <QString>::iterator i = groups.begin();  
-                                                         i != groups.end(); i++) 
-        { 
-            QString item = *i; 
- 
-            meta_dir_node *group_node = gtnm[item]; 
- 
-            if (group_node == NULL) 
-            { 
-                smart_dir_node sdn = video_root->addSubDir(item); 
-                group_node = sdn.get(); 
-                gtnm[item] = group_node; 
-            } 
- 
-            group_node->addEntry(smart_meta_node(new meta_data_node(data))); 
-        } 
-    } 
+            group_node->addEntry(smart_meta_node(new meta_data_node(data)));
+        }
+
+        for (std::vector <QString>::iterator i = groups.begin();
+             i != groups.end(); ++i)
+        {
+            QString item = *i;
+
+            meta_dir_node *group_node = gtnm[item];
+
+            if (group_node == NULL)
+            {
+                smart_dir_node sdn = video_root->addSubDir(item);
+                group_node = sdn.get();
+                gtnm[item] = group_node;
+            }
+
+            group_node->addEntry(smart_meta_node(new meta_data_node(data)));
+        }
+    }
 }
 
 void VideoListImp::buildTVList()
@@ -934,7 +971,7 @@ void VideoListImp::buildTVList()
             movie_node->addEntry(smart_meta_node(new meta_data_node(data)));
     }
 }
- 
+
 void VideoListImp::buildDbList()
 {
     metadata_list ml;
@@ -1054,10 +1091,6 @@ void VideoListImp::buildFsysList()
     //  Fill metadata from directory structure
     //
 
-    // if available, start a UPnP MediaServer update first
-    if (UPNPScanner::Instance())
-        UPNPScanner::Instance()->StartFullScan();
-
     typedef std::vector<std::pair<QString, QString> > node_to_path_list;
 
     node_to_path_list node_paths;
@@ -1125,7 +1158,7 @@ void VideoListImp::buildFsysList()
 
     // retrieve any MediaServer data that may be available
     if (UPNPScanner::Instance())
-        UPNPScanner::Instance()->GetMetadata(&ml, &m_metadata_tree);
+        UPNPScanner::Instance()->GetInitialMetadata(&ml, &m_metadata_tree);
 
     // See if we can find this filename in DB
     if (m_LoadMetaData)
@@ -1169,7 +1202,8 @@ static void copy_filtered_tree(meta_dir_node &dst, meta_dir_node &src,
         smart_dir_node sdn = dst.addSubDir((*dir)->getPath(),
                                            (*dir)->getName(),
                                            (*dir)->GetHost(),
-                                           (*dir)->GetPrefix());
+                                           (*dir)->GetPrefix(),
+                                           (*dir)->GetData());
         copy_filtered_tree(*sdn, *(dir->get()), filter);
     }
 }

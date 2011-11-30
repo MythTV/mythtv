@@ -75,7 +75,8 @@ VAProfile preferredProfile(MythCodecID codec)
 class VAAPIDisplay
 {
   protected:
-    VAAPIDisplay() : m_va_disp(NULL), m_x_disp(NULL), m_ref_count(0) { }
+    VAAPIDisplay() : m_va_disp(NULL), m_x_disp(NULL), m_display(NULL),
+                     m_ref_count(0), m_driver(QString()) { }
   public:
    ~VAAPIDisplay()
     {
@@ -109,7 +110,7 @@ class VAAPIDisplay
             return false;
         }
         gl->makeCurrent();
-        display = glXGetCurrentDisplay();
+        m_display = glXGetCurrentDisplay();
         gl->doneCurrent();
 
         m_x_disp = OpenMythXDisplay();
@@ -120,7 +121,7 @@ class VAAPIDisplay
         int major_ver, minor_ver;
 
         //m_va_disp = vaGetDisplayGLX(m_x_disp->GetDisplay());
-        m_va_disp = vaGetDisplayGLX(display);
+        m_va_disp = vaGetDisplayGLX(m_display);
 
         if (!m_va_disp)
         {
@@ -132,14 +133,16 @@ class VAAPIDisplay
         va_status = vaInitialize(m_va_disp, &major_ver, &minor_ver);
         CHECK_ST;
 
+        if (ok)
+            m_driver = vaQueryVendorString(m_va_disp);
+
         static bool debugged = false;
         if (ok && !debugged)
         {
             debugged = true;
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Version: %1.%2")
                                         .arg(major_ver).arg(minor_ver));
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Vendor : %1")
-                                        .arg(vaQueryVendorString(m_va_disp)));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Driver : %1").arg(m_driver));
         }
         if (ok)
         {
@@ -170,6 +173,13 @@ class VAAPIDisplay
         m_x_disp->Unlock();
     }
 
+    QString GetDriver(void)
+    {
+        QString ret = m_driver;
+        m_driver.detach();
+        return ret;
+    }
+
     static VAAPIDisplay* GetDisplay(void)
     {
         if (gVAAPIDisplay)
@@ -190,8 +200,9 @@ class VAAPIDisplay
     static VAAPIDisplay *gVAAPIDisplay;
     void                *m_va_disp;
     MythXDisplay        *m_x_disp;
-    Display             *display;
+    Display             *m_display;
     int                  m_ref_count;
+    QString              m_driver;
 };
 
 VAAPIDisplay* VAAPIDisplay::gVAAPIDisplay = NULL;
@@ -212,11 +223,12 @@ bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
 
 VAAPIContext::VAAPIContext(MythCodecID codec)
   : m_codec(codec),
+    m_display(NULL),
     m_vaProfile(VAProfileMPEG2Main)/* ?? */,
     m_vaEntrypoint(VAEntrypointEncSlice),
     m_pix_fmt(PIX_FMT_YUV420P), m_numSurfaces(NUM_VAAPI_BUFFERS),
     m_surfaces(NULL), m_surfaceData(NULL), m_pictureAttributes(NULL),
-    m_pictureAttributeCount(0)
+    m_pictureAttributeCount(0), m_hueBase(0)
 {
     memset(&m_ctx, 0, sizeof(vaapi_context));
 }
@@ -277,6 +289,10 @@ bool VAAPIContext::CreateDisplay(QSize size)
             QString("Created context (%1x%2->%3x%4)")
             .arg(size.width()).arg(size.height())
             .arg(m_size.width()).arg(m_size.height()));
+    // ATI hue adjustment
+    if (m_display)
+        m_hueBase = VideoOutput::CalcHueBase(m_display->GetDriver());
+
     return ok;
 }
 
@@ -352,6 +368,7 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute attribute, int newValue)
     if (!m_display->m_va_disp)
         return newValue;
 
+    int adj = 0;
     VADisplayAttribType attrib = VADisplayAttribBrightness;
     switch (attribute)
     {
@@ -363,6 +380,7 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute attribute, int newValue)
             break;
         case kPictureAttribute_Hue:
             attrib = VADisplayAttribHue;
+            adj = m_hueBase;
             break;
         case kPictureAttribute_Colour:
             attrib = VADisplayAttribSaturation;
@@ -378,7 +396,7 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute attribute, int newValue)
         {
             int min = m_pictureAttributes[i].min_value;
             int max = m_pictureAttributes[i].max_value;
-            int val = min + (int)(((float)newValue / 100.0) * (max - min));
+            int val = min + (int)(((float)((newValue + adj) % 100) / 100.0) * (max - min));
             m_pictureAttributes[i].value = val;
             found = true;
             break;
@@ -506,7 +524,7 @@ bool VAAPIContext::InitBuffers(void)
 {
     if (!m_ctx.display)
         return false;
-        
+
     MythXLocker locker(m_display->m_x_disp);
     m_surfaces    = new VASurfaceID[m_numSurfaces];
     m_surfaceData = new vaapi_surface[m_numSurfaces];
@@ -603,18 +621,16 @@ bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
         return false;
 
     int field = VA_FRAME_PICTURE;
-    //if (scan == kScan_Interlaced)
-    //    field = VA_TOP_FIELD;
-    //else if (scan == kScan_Intr2ndField)
-    //    field = VA_BOTTOM_FIELD;
+    if (scan == kScan_Interlaced)
+        field = VA_TOP_FIELD;
+    else if (scan == kScan_Intr2ndField)
+        field = VA_BOTTOM_FIELD;
 
-    //INIT_ST;
-    //va_status = vaSyncSurface(m_ctx.display, surf->m_id);
-    //CHECK_ST;
-
+    m_display->m_x_disp->Lock();
     INIT_ST;
     va_status = vaCopySurfaceGLX(m_ctx.display, glx_surface, surf->m_id, field);
     CHECK_ST;
+    m_display->m_x_disp->Unlock();
     return true;
 }
 
@@ -623,6 +639,7 @@ void* VAAPIContext::GetGLXSurface(uint texture, uint texture_type)
     if (m_glxSurfaces.contains(texture))
         return m_glxSurfaces.value(texture);
 
+    MythXLocker locker(m_display->m_x_disp);
     void *glx_surface = NULL;
     INIT_ST;
     va_status = vaCreateSurfaceGLX(m_ctx.display, texture_type,
@@ -646,7 +663,7 @@ void VAAPIContext::ClearGLXSurfaces(void)
     if (!m_display)
         return;
 
-    m_display->m_x_disp->Lock();
+    MythXLocker locker(m_display->m_x_disp);
     INIT_ST;
     foreach (void* surface, m_glxSurfaces)
     {
@@ -654,5 +671,4 @@ void VAAPIContext::ClearGLXSurfaces(void)
         CHECK_ST;
     }
     m_glxSurfaces.clear();
-    m_display->m_x_disp->Unlock();
 }

@@ -142,7 +142,7 @@ void DTVRecorder::FinishRecording(void)
 {
     if (ringBuffer)
     {
-        if (_payload_buffer.size())
+        if (!_payload_buffer.empty())
         {
             ringBuffer->Write(&_payload_buffer[0], _payload_buffer.size());
             _payload_buffer.clear();

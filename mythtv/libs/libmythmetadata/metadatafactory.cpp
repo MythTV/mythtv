@@ -241,8 +241,9 @@ void MetadataFactory::OnMultiResult(MetadataLookupList list)
     if (!list.size())
         return;
 
-    QCoreApplication::postEvent(m_parent,
-        new MetadataFactoryMultiResult(list));
+    if (m_parent)
+        QCoreApplication::postEvent(m_parent,
+            new MetadataFactoryMultiResult(list));
 }
 
 void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
@@ -299,7 +300,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
     {
         if (m_scanning)
             OnVideoResult(lookup);
-        else
+        else if (m_parent)
             QCoreApplication::postEvent(m_parent,
                 new MetadataFactorySingleResult(lookup));
     }
@@ -310,8 +311,9 @@ void MetadataFactory::OnNoResult(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    QCoreApplication::postEvent(m_parent,
-        new MetadataFactoryNoResult(lookup));
+    if (m_parent)
+        QCoreApplication::postEvent(m_parent,
+            new MetadataFactoryNoResult(lookup));
 }
 
 void MetadataFactory::OnImageResult(MetadataLookup *lookup)
@@ -319,8 +321,9 @@ void MetadataFactory::OnImageResult(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    QCoreApplication::postEvent(m_parent,
-        new MetadataFactorySingleResult(lookup));
+    if (m_parent)
+        QCoreApplication::postEvent(m_parent,
+            new MetadataFactorySingleResult(lookup));
 }
 
 void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
@@ -463,7 +466,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     metadata->SetProcessed(true);
     metadata->UpdateDatabase();
 
-    if (gCoreContext->HasGUI())
+    if (gCoreContext->HasGUI() && m_parent)
     {
         QCoreApplication::postEvent(m_parent,
             new MetadataFactorySingleResult(lookup));
@@ -549,9 +552,10 @@ void MetadataFactory::customEvent(QEvent *levent)
                 .arg(additions.count()).arg(moves.count())
                 .arg(deletions.count()));
 
-            QCoreApplication::postEvent(m_parent,
-                new MetadataFactoryVideoChanges(additions, moves,
-                                                deletions));
+            if (m_parent)
+                QCoreApplication::postEvent(m_parent,
+                    new MetadataFactoryVideoChanges(additions, moves,
+                                                    deletions));
         }
         else
         {

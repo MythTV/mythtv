@@ -524,7 +524,7 @@ void PlayerContext::PushPreviousChannel(void)
 
     // This method builds the stack of previous channels
     QString curChan = tvchain->GetChannelName(-1);
-    if (prevChan.size() == 0 ||
+    if (prevChan.empty() ||
         curChan != prevChan[prevChan.size() - 1])
     {
         QString chan = curChan;

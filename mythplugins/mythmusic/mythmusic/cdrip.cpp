@@ -143,9 +143,8 @@ static long int getSectorCount (QString &cddevice, int tracknum)
     return 0;
 }
 
-static void paranoia_cb(long inpos, int function)
+static void paranoia_cb(long /*inpos*/, int /*function*/)
 {
-    inpos = inpos; function = function;
 }
 
 CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
@@ -467,12 +466,36 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Ripper::Ripper(MythScreenStack *parent, QString device)
-       : MythScreenType(parent, "ripcd"),
-         m_ejectThread(NULL), m_scanThread(NULL)
-{
-    m_CDdevice = device;
+Ripper::Ripper(MythScreenStack *parent, QString device) :
+    MythScreenType(parent, "ripcd"),
+    m_decoder(NULL),
 
+    m_artistEdit(NULL),
+    m_albumEdit(NULL),
+    m_genreEdit(NULL),
+    m_yearEdit(NULL),
+
+    m_compilationCheck(NULL),
+
+    m_trackList(NULL),
+    m_qualityList(NULL),
+
+    m_switchTitleArtist(NULL),
+    m_scanButton(NULL),
+    m_ripButton(NULL),
+    m_searchArtistButton(NULL),
+    m_searchAlbumButton(NULL),
+    m_searchGenreButton(NULL),
+
+    m_tracks(new QVector<RipTrack*>),
+
+    m_somethingwasripped(false),
+    m_mediaMonitorActive(false),
+
+    m_CDdevice(device),
+
+    m_ejectThread(NULL), m_scanThread(NULL)
+{
 #ifndef _WIN32
     // if the MediaMonitor is running stop it
     m_mediaMonitorActive = false;
@@ -483,12 +506,6 @@ Ripper::Ripper(MythScreenStack *parent, QString device)
         mon->StopMonitoring();
     }
 #endif
-
-    // Set this to false so we can tell if the ripper has done anything
-    // (i.e. we can tell if the user quit prior to ripping)
-    m_somethingwasripped = false;
-    m_decoder = NULL;
-    m_tracks = new QVector<RipTrack*>;
 }
 
 Ripper::~Ripper(void)
@@ -1529,7 +1546,10 @@ bool RipStatus::keyPressEvent(QKeyEvent *event)
 
 void RipStatus::customEvent(QEvent *event)
 {
-    RipStatusEvent *rse = (RipStatusEvent *)event;
+    RipStatusEvent *rse = dynamic_cast<RipStatusEvent *> (event);
+
+    if (!rse)
+        return;
 
     if (event->type() == RipStatusEvent::kTrackTextEvent)
     {

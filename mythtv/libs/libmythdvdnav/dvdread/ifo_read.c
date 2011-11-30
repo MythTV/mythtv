@@ -1139,9 +1139,9 @@ void ifoFree_TT_SRPT(ifo_handle_t *ifofile) {
 
 
 int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
-  vts_ptt_srpt_t *vts_ptt_srpt;
+  vts_ptt_srpt_t *vts_ptt_srpt = NULL;
   int info_length, i, j;
-  uint32_t *data;
+  uint32_t *data = NULL;
 
   if(!ifofile)
     return 0;
@@ -1156,16 +1156,16 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
                    ifofile->vtsi_mat->vts_ptt_srpt * DVD_BLOCK_LEN))
     return 0;
 
-  vts_ptt_srpt = (vts_ptt_srpt_t *)malloc(sizeof(vts_ptt_srpt_t));
+  vts_ptt_srpt = malloc(sizeof(vts_ptt_srpt_t));
   if(!vts_ptt_srpt)
     return 0;
 
+  vts_ptt_srpt->title = NULL;
   ifofile->vts_ptt_srpt = vts_ptt_srpt;
 
   if(!(DVDReadBytes(ifofile->file, vts_ptt_srpt, VTS_PTT_SRPT_SIZE))) {
     fprintf(stderr, "libdvdread: Unable to read PTT search table.\n");
-    free(vts_ptt_srpt);
-    return 0;
+    goto fail;
   }
 
   B2N_16(vts_ptt_srpt->nr_of_srpts);
@@ -1176,21 +1176,19 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
   CHECK_VALUE(vts_ptt_srpt->nr_of_srpts < 100); /* ?? */
 
   info_length = vts_ptt_srpt->last_byte + 1 - VTS_PTT_SRPT_SIZE;
+  data = malloc(info_length);
+  if(!data)
+    goto fail;
 
-  data = (uint32_t *)malloc(info_length);
-  if(!data) {
-    free(vts_ptt_srpt);
-    ifofile->vts_ptt_srpt = 0;
-    return 0;
-  }
   if(!(DVDReadBytes(ifofile->file, data, info_length))) {
     fprintf(stderr, "libdvdread: Unable to read PTT search table.\n");
-    free(vts_ptt_srpt);
-    free(data);
-    ifofile->vts_ptt_srpt = 0;
-    return 0;
+    goto fail;
   }
 
+  if(vts_ptt_srpt->nr_of_srpts > info_length / sizeof(*data)) {
+    fprintf(stderr, "libdvdread: PTT search table too small.\n");
+    goto fail;
+  }
   for(i = 0; i < vts_ptt_srpt->nr_of_srpts; i++) {
     B2N_32(data[i]);
     /* assert(data[i] + sizeof(ptt_info_t) <= vts_ptt_srpt->last_byte + 1);
@@ -1203,22 +1201,21 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
   vts_ptt_srpt->ttu_offset = data;
 
   vts_ptt_srpt->title = malloc(vts_ptt_srpt->nr_of_srpts * sizeof(ttu_t));
-  if(!vts_ptt_srpt->title) {
-    free(vts_ptt_srpt);
-    free(data);
-    ifofile->vts_ptt_srpt = 0;
-    return 0;
-  }
+  if(!vts_ptt_srpt->title)
+    goto fail;
+
   for(i = 0; i < vts_ptt_srpt->nr_of_srpts; i++) {
     int n;
     if(i < vts_ptt_srpt->nr_of_srpts - 1)
       n = (data[i+1] - data[i]);
     else
       n = (vts_ptt_srpt->last_byte + 1 - data[i]);
+
     /* assert(n > 0 && (n % 4) == 0);
        Magic Knight Rayearth Daybreak is mastered very strange and has
        Titles with 0 PTTs. */
     if(n < 0) n = 0;
+
     CHECK_VALUE(n % 4 == 0);
 
     vts_ptt_srpt->title[i].nr_of_ptts = n / 4;
@@ -1226,10 +1223,8 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
     if(!vts_ptt_srpt->title[i].ptt) {
       for(n = 0; n < i; n++)
         free(vts_ptt_srpt->title[n].ptt);
-      free(vts_ptt_srpt);
-      free(data);
-      ifofile->vts_ptt_srpt = 0;
-      return 0;
+
+      goto fail;
     }
     for(j = 0; j < vts_ptt_srpt->title[i].nr_of_ptts; j++) {
       /* The assert placed here because of Magic Knight Rayearth Daybreak */
@@ -1259,6 +1254,13 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
   }
 
   return 1;
+
+fail:
+  free(data);
+  ifofile->vts_ptt_srpt = 0;
+  free(vts_ptt_srpt->title);
+  free(vts_ptt_srpt);
+  return 0;
 }
 
 

@@ -288,7 +288,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
     {
         if (gCoreContext->ConnectToMasterServer())
         {
-            RemoteSendMessage(eventString);
+            gCoreContext->SendMessage(eventString);
             return GENERIC_EXIT_OK;
         }
         return GENERIC_EXIT_NO_MYTHCONTEXT;
@@ -301,7 +301,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
             QString message = "SET_VERBOSE ";
             message += cmdline.toString("setverbose");
 
-            RemoteSendMessage(message);
+            gCoreContext->SendMessage(message);
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Sent '%1' message").arg(message));
             return GENERIC_EXIT_OK;
@@ -321,7 +321,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
             QString message = "SET_LOG_LEVEL ";
             message += cmdline.toString("setloglevel");
 
-            RemoteSendMessage(message);
+            gCoreContext->SendMessage(message);
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Sent '%1' message").arg(message));
             return GENERIC_EXIT_OK;
@@ -338,7 +338,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
     {
         if (gCoreContext->ConnectToMasterServer())
         {
-            RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+            gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
             LOG(VB_GENERAL, LOG_INFO, "Sent CLEAR_SETTINGS_CACHE message");
             return GENERIC_EXIT_OK;
         }
@@ -529,6 +529,10 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
+    ///////////////////////////////////////////////////////////////////////
+    // Don't listen to console input
+    close(0);
+
     MythTranslation::load("mythfrontend");
 
     if (!ismaster)
@@ -646,7 +650,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     StorageGroup::CheckAllStorageGroupDirs();
 
     if (gCoreContext->IsMasterBackend())
-        SendMythSystemEvent("MASTER_STARTED");
+        gCoreContext->SendSystemEvent("MASTER_STARTED");
 
     ///////////////////////////////
     ///////////////////////////////
@@ -656,7 +660,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     if (gCoreContext->IsMasterBackend())
     {
-        SendMythSystemEvent("MASTER_SHUTDOWN");
+        gCoreContext->SendSystemEvent("MASTER_SHUTDOWN");
         qApp->processEvents();
     }
 

@@ -34,7 +34,6 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-    m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
 
     m_searchType(kNoSearch),
 
@@ -84,7 +83,6 @@ ProgLister::ProgLister(
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-    m_channelFormat(gCoreContext->GetSetting("ChannelFormat", "<num> <sign>")),
 
     m_searchType(kNoSearch),
 
@@ -280,71 +278,51 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
 
 void ProgLister::ShowMenu(void)
 {
-    QString label = tr("Options");
+    MythMenu *sortMenu = new MythMenu(tr("Sort Options"), this, "sortmenu");
+    sortMenu->AddItem(tr("Reverse Sort Order"));
+    sortMenu->AddItem(tr("Sort By Title"));
+    sortMenu->AddItem(tr("Sort By Time"));
+    sortMenu->AddItem(tr("Cancel"));
 
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(
-        label, popupStack, "menuPopup");
-
-    if (!menuPopup->Create())
-    {
-        delete menuPopup;
-        return;
-    }
-
-    menuPopup->SetReturnEvent(this, "menu");
+    MythMenu *menu = new MythMenu(tr("Options"), this, "menu");
 
     if (m_type != plPreviouslyRecorded)
     {
-        menuPopup->AddButton(tr("Choose Search Phrase..."),
-                             SLOT(ShowChooseViewMenu()));
+        menu->AddItem(tr("Choose Search Phrase..."), SLOT(ShowChooseViewMenu()));
     }
 
-    menuPopup->AddButton(tr("Sort"), SLOT(ShowSortMenu()), true);
+    menu->AddItem(tr("Sort"), NULL, sortMenu);
 
     if (m_type != plPreviouslyRecorded)
-        menuPopup->AddButton(tr("Record"), SLOT(RecordSelected()));
+        menu->AddItem(tr("Record"), SLOT(RecordSelected()));
 
-    menuPopup->AddButton(tr("Edit Schedule"),   SLOT(EditScheduled()));
-    menuPopup->AddButton(tr("Program Details"), SLOT(ShowDetails()));
-    menuPopup->AddButton(tr("Upcoming"),        SLOT(ShowUpcoming()));
-    menuPopup->AddButton(tr("Custom Edit"),     SLOT(EditCustom()));
+    menu->AddItem(tr("Edit Schedule"),   SLOT(EditScheduled()));
+    menu->AddItem(tr("Program Details"), SLOT(ShowDetails()));
+    menu->AddItem(tr("Upcoming"),        SLOT(ShowUpcoming()));
+    menu->AddItem(tr("Custom Edit"),     SLOT(EditCustom()));
 
     ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
     if (m_type != plPreviouslyRecorded)
     {
         if (pi && pi->GetRecordingRuleID())
-            menuPopup->AddButton(tr("Delete Rule"), SLOT(ShowDeleteRuleMenu()));
+            menu->AddItem(tr("Delete Rule"), SLOT(ShowDeleteRuleMenu()));
     }
     else
     {
-        menuPopup->AddButton(
+        menu->AddItem(
             tr("Delete Episode"), SLOT(ShowDeleteOldEpisodeMenu()));
     }
 
-    menuPopup->AddButton(tr("Cancel"));
+    menu->AddItem(tr("Cancel"));
 
-    popupStack->AddScreen(menuPopup);
-}
-
-void ProgLister::ShowSortMenu(void)
-{
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(
-        tr("Sort Options"), popupStack, "menuPopup");
+    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
 
     if (!menuPopup->Create())
     {
         delete menuPopup;
         return;
     }
-
-    menuPopup->SetReturnEvent(this, "sortmenu");
-
-    menuPopup->AddButton(tr("Reverse Sort Order"));
-    menuPopup->AddButton(tr("Sort By Title"));
-    menuPopup->AddButton(tr("Sort By Time"));
-    menuPopup->AddButton(tr("Cancel"));
 
     popupStack->AddScreen(menuPopup);
 }
@@ -744,27 +722,23 @@ void ProgLister::ShowOldRecordedMenu(void)
                              "delete any recordings.");
 
     QString title = tr("Previously Recorded");
+
+    MythMenu *menu = new MythMenu(title, message, this, "deletemenu");
+    if (pi->IsDuplicate())
+        menu->AddItem(tr("Allow this episode to re-record"));
+    else
+        menu->AddItem(tr("Never record this episode"));
+    menu->AddItem(tr("Remove this episode from the list"));
+    menu->AddItem(tr("Remove all episodes for this title"));
+    menu->AddItem(tr("Cancel"));
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    MythDialogBox *menuPopup = new MythDialogBox(
-        title, message, mainStack, "deletepopup", true);
+    MythDialogBox *menuPopup = new MythDialogBox(menu, mainStack, "deletepopup", true);
 
     if (menuPopup->Create())
-    {
-        menuPopup->SetReturnEvent(this, "deletemenu");
-        if (pi->IsDuplicate())
-            menuPopup->AddButton(tr("Allow this episode to re-record"));
-        else
-            menuPopup->AddButton(tr("Never record this episode"));
-        menuPopup->AddButton(tr("Remove this episode from the list"));
-        menuPopup->AddButton(tr("Remove all episodes for this title"));
-        menuPopup->AddButton(tr("Cancel"));
-
         mainStack->AddScreen(menuPopup);
-    }
     else
-    {
         delete menuPopup;
-    }
 }
 
 void ProgLister::ShowUpcoming(void)
@@ -787,7 +761,7 @@ void ProgLister::FillViewList(const QString &view)
 
         for (uint i = 0; i < channels.size(); ++i)
         {
-            QString chantext = channels[i].GetFormatted(m_channelFormat);
+            QString chantext = channels[i].GetFormatted(DBChannel::kChannelShort);
 
             m_viewList.push_back(QString::number(channels[i].chanid));
             m_viewTextList.push_back(chantext);
@@ -798,7 +772,8 @@ void ProgLister::FillViewList(const QString &view)
     }
     else if (m_type == plCategory) // list by category
     {
-        QString startstr = m_startTime.toString("yyyy-MM-ddThh:mm:50");
+        QDateTime query_starttime = m_startTime.addSecs(50 -
+                m_startTime.time().second());
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT g1.genre, g2.genre "
                       "FROM program "
@@ -810,7 +785,7 @@ void ProgLister::FillViewList(const QString &view)
                       "  g1.starttime = g2.starttime "
                       "WHERE program.endtime > :PGILSTART "
                       "GROUP BY g1.genre, g2.genre;");
-        query.bindValue(":PGILSTART", startstr);
+        query.bindValue(":PGILSTART", query_starttime);
 
         m_useGenres = false;
 
@@ -848,7 +823,7 @@ void ProgLister::FillViewList(const QString &view)
                           "FROM program "
                           "WHERE program.endtime > :PGILSTART "
                           "GROUP BY category");
-            query.bindValue(":PGILSTART", startstr);
+            query.bindValue(":PGILSTART", query_starttime);
 
             if (query.exec())
             {
@@ -1132,13 +1107,13 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
 
     bool oneChanid = false;
     QString where;
-    QString startstr = m_startTime.toString("yyyy-MM-ddThh:mm:50");
     QString qphrase = m_viewList[m_curView];
 
     MSqlBindings bindings;
 
     if (m_type != plPreviouslyRecorded)
-        bindings[":PGILSTART"] = startstr;
+        bindings[":PGILSTART"] =
+            m_startTime.addSecs(50 - m_startTime.time().second());
 
     if (m_type == plTitle) // per title listings
     {
@@ -1294,7 +1269,9 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plTime) // list by time
     {
-        bindings[":PGILSEARCHTIME1"] = m_searchTime;
+        QDateTime searchTime(m_searchTime);
+        searchTime.setTime(QTime(searchTime.time().hour(), 0, 0));
+        bindings[":PGILSEARCHTIME1"] = searchTime;
         where = "WHERE channel.visible = 1 "
             "  AND program.starttime >= :PGILSEARCHTIME1 ";
         if (m_titleSort)
@@ -1359,10 +1336,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         selected = *selectedP;
         selectedP = &selected;
     }
-    int selectedOffset = 
-        m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
 
-    m_progList->Reset();
     m_itemList.clear();
 
     if (m_type == plPreviouslyRecorded)
@@ -1398,7 +1372,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
                 if ((*it)->sortTitle != curtitle)
                 {
                     curtitle = (*it)->sortTitle;
-                    it++;
+                    ++it;
                 }
                 else
                 {
@@ -1412,7 +1386,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         SortList(GetSortBy(), m_reverseSort);
 
     if (updateDisp)
-        UpdateDisplay(selectedP, selectedOffset);
+        UpdateDisplay(selectedP);
 }
 
 ProgLister::SortBy ProgLister::GetSortBy(void) const
@@ -1459,8 +1433,13 @@ void ProgLister::ClearCurrentProgramInfo(void)
         m_positionText->Reset();
 }
 
-void ProgLister::UpdateDisplay(void)
+void ProgLister::UpdateDisplay(const ProgramInfo *selected)
 {
+    int offset = 0;
+
+    if (selected)
+        offset = m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
+
     m_progList->Reset();
 
     if (m_messageText)
@@ -1472,16 +1451,14 @@ void ProgLister::UpdateDisplay(void)
         m_curviewText->SetText(m_viewTextList[m_curView]);
 
     UpdateButtonList();
+
+    if (selected)
+        RestoreSelection(selected, offset);
 }
 
-void ProgLister::UpdateDisplay(const ProgramInfo *selected, int selectedOffset)
+void ProgLister::RestoreSelection(const ProgramInfo *selected,
+                                  int selectedOffset)
 {
-    UpdateDisplay();
-
-    if (!selected)
-        return;
-
-    // Restore selection
     plCompare *comp;
     if (!m_titleSort)
         comp = new plTimeSort();

@@ -80,10 +80,57 @@ QString CardUtil::GetScanableCardTypes(void)
     cardTypes += "'ASI'";
 #endif
 
+#ifdef USING_CETON
+    if (!cardTypes.isEmpty())
+        cardTypes += ",";
+    cardTypes += "'CETON'";
+#endif // USING_CETON
+
     if (cardTypes.isEmpty())
         cardTypes = "'DUMMY'";
 
     return QString("(%1)").arg(cardTypes);
+}
+
+bool CardUtil::IsCableCardPresent(uint cardid,
+                                  const QString &cardType)
+{
+    if (cardType == "HDHOMERUN")
+    {
+#ifdef USING_HDHOMERUN
+        hdhomerun_device_t *hdhr;
+        hdhomerun_tuner_status_t status;
+        QString device = GetVideoDevice(cardid);
+        hdhr = hdhomerun_device_create_from_str(device.toAscii(), NULL);
+        if (!hdhr)
+            return false;
+
+        int oob = -1;
+        oob = hdhomerun_device_get_oob_status(hdhr, NULL, &status);
+
+        // if no OOB tuner, oob will be < 1.  If no CC present, OOB
+        // status will be "none."
+        if (oob > 0 && (strncmp(status.channel, "none", 4) != 0))
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Cardutil: HDHomeRun Cablecard Present.");
+            return true;
+        }
+        else
+#endif
+            return false;
+    }
+    else if (cardType == "CETON")
+    {
+#ifdef USING_CETON
+        // TODO FIXME implement detection of Cablecard presence
+        LOG(VB_GENERAL, LOG_INFO, "Cardutil: TODO Ceton Is Cablecard Present?");
+        return true;
+#else
+        return false;
+#endif
+    }
+    else
+        return false;
 }
 
 bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
@@ -323,6 +370,14 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
         }
     }
 #endif // USING_HDHOMERUN
+#ifdef USING_CETON
+    else if (rawtype.toUpper() == "CETON")
+    {
+        // TODO implement CETON probing.
+        LOG(VB_GENERAL, LOG_INFO, "CardUtil::ProbeVideoDevices: "
+            "TODO Probe Ceton devices");
+    }
+#endif // USING_CETON
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Raw Type: '%1' is not supported")
@@ -451,10 +506,8 @@ QString CardUtil::ProbeSubTypeName(uint cardid)
     return ProbeDVBType(device);
 }
 
-/** \fn CardUtil::IsDVBCardType(const QString)
- *  \brief Returns true iff the card_type is one of the DVB types.
- */
-bool CardUtil::IsDVBCardType(const QString card_type)
+/// \brief Returns true iff the card_type is one of the DVB types.
+bool CardUtil::IsDVBCardType(const QString &card_type)
 {
     QString ct = card_type.toUpper();
     return (ct == "DVB") || (ct == "QAM") || (ct == "QPSK") ||
@@ -501,6 +554,48 @@ bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
         return true;
 
     MythDB::DBError("CardUtil::set_on_source", query);
+    return false;
+}
+
+QString get_on_inputid(const QString &to_get, uint inputid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        QString("SELECT %1 ").arg(to_get) +
+        "FROM cardinput "
+        "WHERE cardinput.cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
+
+    if (!query.exec())
+        MythDB::DBError("CardUtil::get_on_inputid", query);
+    else if (query.next())
+        return query.value(0).toString();
+
+    return QString::null;
+}
+
+bool set_on_input(const QString &to_set, uint inputid, const QString value)
+{
+    QString tmp = get_on_inputid("cardinput.cardinputid", inputid);
+    if (tmp.isEmpty())
+        return false;
+
+    bool ok;
+    uint input_cardinputid = tmp.toUInt(&ok);
+    if (!ok)
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        QString("UPDATE cardinput SET %1 = :VALUE ").arg(to_set) +
+        "WHERE cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", input_cardinputid);
+    query.bindValue(":VALUE",  value);
+
+    if (query.exec())
+        return true;
+
+    MythDB::DBError("CardUtil::set_on_input", query);
     return false;
 }
 
@@ -892,6 +987,40 @@ vector<uint> CardUtil::GetCloneCardIDs(uint cardid)
     return list;
 }
 
+QString CardUtil::GetFirewireChangerNode(uint inputid)
+{
+    QString fwnode;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT changer_device "
+                  "FROM cardinput WHERE cardinputid = :INPUTID ");
+    query.bindValue(":CARDID", inputid);
+
+    if (query.exec() && query.next())
+    {
+        fwnode = query.value(0).toString();
+    }
+
+    return fwnode;
+}
+
+QString CardUtil::GetFirewireChangerModel(uint inputid)
+{
+    QString fwnode;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT changer_model "
+                  "FROM cardinput WHERE cardinputid = :INPUTID ");
+    query.bindValue(":CARDID", inputid);
+
+    if (query.exec() && query.next())
+    {
+        fwnode = query.value(0).toString();
+    }
+
+    return fwnode;
+}
+
 vector<uint> CardUtil::GetCardIDs(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1183,6 +1312,66 @@ vector<uint> CardUtil::GetInputIDs(uint cardid)
         list.push_back(query.value(0).toUInt());
 
     return list;
+}
+
+int CardUtil::CreateCardInput(const uint cardid,
+                              const uint sourceid,
+                              const QString &inputname,
+                              const QString &externalcommand,
+                              const QString &changer_device,
+                              const QString &changer_model,
+                              const QString &hostname,
+                              const QString &tunechan,
+                              const QString &startchan,
+                              const QString &displayname,
+                              bool          dishnet_eit,
+                              const uint recpriority,
+                              const uint quicktune)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "INSERT INTO cardinput "
+        "(cardid, sourceid, inputname, externalcommand, changer_device, "
+        "changer_model, tunechan, startchan, displayname, dishnet_eit, "
+        "recpriority, quicktune) "
+        "VALUES (:CARDID, :SOURCEID, :INPUTNAME, :EXTERNALCOMMAND, "
+        ":CHANGERDEVICE, :CHANGERMODEL, :TUNECHAN, :STARTCHAN, :DISPLAYNAME, "
+        ":DISHNETEIT, :RECPRIORITY, :QUICKTUNE ) ");
+
+    query.bindValue(":CARDID", cardid);
+    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":INPUTNAME", inputname);
+    query.bindValue(":EXTERNALCOMMAND", externalcommand);
+    query.bindValue(":CHANGERDEVICE", changer_device);
+    query.bindValue(":CHANGERMODEL", changer_model);
+    query.bindValue(":TUNECHAN", tunechan);
+    query.bindValue(":STARTCHAN", startchan);
+    query.bindValue(":DISPLAYNAME", displayname.isNull() ? "" : displayname);
+    query.bindValue(":DISHNETEIT", dishnet_eit);
+    query.bindValue(":RECPRIORITY", recpriority);
+    query.bindValue(":QUICKTUNE", quicktune);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateCardInput", query);
+        return -1;
+    }
+
+    query.prepare("SELECT MAX(cardinputid) FROM cardinput");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateCardInput maxinput", query);
+        return -1;
+    }
+
+    uint inputid = -1;
+
+    if (query.next())
+        inputid = query.value(0).toUInt();
+
+    return inputid;
 }
 
 bool CardUtil::DeleteInput(uint inputid)
@@ -1903,6 +2092,97 @@ void CardUtil::GetCardInputs(
         }
     }
 #endif // USING_DVB
+}
+
+int CardUtil::CreateCaptureCard(const QString &videodevice,
+                                 const QString &audiodevice,
+                                 const QString &vbidevice,
+                                 const QString &cardtype,
+                                 const QString &defaultinput,
+                                 const uint audioratelimit,
+                                 const QString &hostname,
+                                 const uint dvb_swfilter,
+                                 const uint dvb_sat_type,
+                                 bool       dvb_wait_for_seqstart,
+                                 bool       skipbtaudio,
+                                 bool       dvb_on_demand,
+                                 const uint dvb_diseqc_type,
+                                 const uint firewire_speed,
+                                 const QString &firewire_model,
+                                 const uint firewire_connection,
+                                 const uint signal_timeout,
+                                 const uint channel_timeout,
+                                 const uint dvb_tuning_delay,
+                                 const uint contrast,
+                                 const uint brightness,
+                                 const uint colour,
+                                 const uint hue,
+                                 const uint diseqcid,
+                                 bool       dvb_eitscan)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "INSERT INTO capturecard "
+        "(videodevice, audiodevice, vbidevice, cardtype, defaultinput, "
+        "audioratelimit, hostname, dvb_swfilter, dvb_sat_type, "
+        "dvb_wait_for_seqstart, skipbtaudio, dvb_on_demand, dvb_diseqc_type, "
+        "firewire_speed, firewire_model, firewire_connection, signal_timeout, "
+        "channel_timeout, dvb_tuning_delay, contrast, brightness, colour, "
+        "hue, diseqcid, dvb_eitscan) "
+        "VALUES (:VIDEODEVICE, :AUDIODEVICE, :VBIDEVICE, :CARDTYPE, "
+        ":DEFAULTINPUT, :AUDIORATELIMIT, :HOSTNAME, :DVBSWFILTER, :DVBSATTYPE, "
+        ":DVBWAITFORSEQSTART, :SKIPBTAUDIO, :DVBONDEMAND, :DVBDISEQCTYPE, "
+        ":FIREWIRESPEED, :FIREWIREMODEL, :FIREWIRECONNECTION, :SIGNALTIMEOUT, "
+        ":CHANNELTIMEOUT, :DVBTUNINGDELAY, :CONTRAST, :BRIGHTNESS, :COLOUR, "
+        ":HUE, :DISEQCID, :DVBEITSCAN ) ");
+
+    query.bindValue(":VIDEODEVICE", videodevice);
+    query.bindValue(":AUDIODEVICE", audiodevice);
+    query.bindValue(":VBIDEVICE", vbidevice);
+    query.bindValue(":CARDTYPE", cardtype);
+    query.bindValue(":DEFAULTINPUT", defaultinput);
+    query.bindValue(":AUDIORATELIMIT", audioratelimit);
+    query.bindValue(":HOSTNAME", hostname);
+    query.bindValue(":DVBSWFILTER", dvb_swfilter);
+    query.bindValue(":DVBSATTYPE", dvb_sat_type);
+    query.bindValue(":DVBWAITFORSEQSTART", dvb_wait_for_seqstart);
+    query.bindValue(":SKIPBTAUDIO", skipbtaudio);
+    query.bindValue(":DVBONDEMAND", dvb_on_demand);
+    query.bindValue(":DVBDISEQCTYPE", dvb_diseqc_type);
+    query.bindValue(":FIREWIRESPEED", firewire_speed);
+    query.bindValue(":FIREWIREMODEL", firewire_model);
+    query.bindValue(":FIREWIRECONNECTION", firewire_connection);
+    query.bindValue(":SIGNALTIMEOUT", signal_timeout);
+    query.bindValue(":CHANNELTIMEOUT", channel_timeout);
+    query.bindValue(":DVBTUNINGDELAY", dvb_tuning_delay);
+    query.bindValue(":CONTRAST", contrast);
+    query.bindValue(":BRIGHTNESS", brightness);
+    query.bindValue(":COLOUR", colour);
+    query.bindValue(":HUE", hue);
+    query.bindValue(":DISEQCID", diseqcid);
+    query.bindValue(":DVBEITSCAN", dvb_eitscan);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateCaptureCard", query);
+        return -1;
+    }
+
+    query.prepare("SELECT MAX(cardid) FROM capturecard");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateCaptureCard maxcard", query);
+        return -1;
+    }
+
+    uint cardid = -1;
+
+    if (query.next())
+        cardid = query.value(0).toUInt();
+
+    return cardid;
 }
 
 bool CardUtil::DeleteCard(uint cardid)

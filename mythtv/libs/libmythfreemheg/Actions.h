@@ -27,7 +27,7 @@ class MHElemAction;
 
 class MHActionSequence: public MHOwnPtrSequence<MHElemAction>
 {
-public:
+  public:
     MHActionSequence() {}
     virtual ~MHActionSequence() {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);

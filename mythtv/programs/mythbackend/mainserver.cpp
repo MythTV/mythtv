@@ -1365,8 +1365,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         sockListLock.unlock();
 
         if (eventsMode != kPBSEvents_None && commands[2] != "tzcheck")
-            SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
-                                        .arg(commands[2]));
+            gCoreContext->SendSystemEvent(
+                QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
     if (commands[1] == "MediaServer")
     {
@@ -1386,8 +1386,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         playbackList.push_back(pbs);
         sockListLock.unlock();
 
-        SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
-                                .arg(commands[2]));
+        gCoreContext->SendSystemEvent(
+            QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
     else if (commands[1] == "SlaveBackend")
     {
@@ -1454,8 +1454,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         autoexpireUpdateTimer->start(1000);
 
-        SendMythSystemEvent(QString("SLAVE_CONNECTED HOSTNAME %1")
-                                    .arg(commands[2]));
+        gCoreContext->SendSystemEvent(
+            QString("SLAVE_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
     else if (commands[1] == "FileTransfer")
     {
@@ -1874,7 +1874,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     // sleep a little to let frontends reload the recordings list
     // after deleting a recording, then we can hammer the DB and filesystem
     sleep(3);
-    usleep(rand()%2000);
+    usleep(random()%2000);
 
     deletelock.lock();
 
@@ -1882,7 +1882,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         .arg(ds->m_chanid)
         .arg(ds->m_recstartts.toString(Qt::ISODate));
 
-    QString name = QString("deleteThread%1%2").arg(getpid()).arg(rand());
+    QString name = QString("deleteThread%1%2").arg(getpid()).arg(random());
     QFile checkFile(ds->m_filename);
 
     if (!MSqlQuery::testDBConnection())
@@ -2107,7 +2107,7 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     // Notify the frontend so it can requery for Free Space
     QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
         .arg(ds->m_chanid).arg(ds->m_recstartts.toString(Qt::ISODate));
-    RemoteSendEvent(MythEvent(msg));
+    gCoreContext->SendEvent(MythEvent(msg));
 
     // sleep a little to let frontends reload the recordings list
     sleep(3);
@@ -2621,9 +2621,10 @@ void MainServer::DoHandleDeleteRecording(
     // Tell MythTV frontends that the recording list needs to be updated.
     if (fileExists || !recinfo.GetFilesize() || forceMetadataDelete)
     {
-        SendMythSystemEvent(QString("REC_DELETED CHANID %1 STARTTIME %2")
-                            .arg(recinfo.GetChanID())
-                            .arg(recinfo.GetRecordingStartTime(MythDate::ISODate)));
+        gCoreContext->SendSystemEvent(
+            QString("REC_DELETED CHANID %1 STARTTIME %2")
+            .arg(recinfo.GetChanID())
+            .arg(recinfo.GetRecordingStartTime(MythDate::ISODate)));
 
         recinfo.SendDeletedEvent();
     }
@@ -4455,7 +4456,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         fsInfo.setPath(*(it++));
         fsInfo.setLocal((*(it++)).toInt() > 0);
         fsInfo.setFSysID(-1);
-        it++;   // Without this, the strlist gets out of whack
+        ++it;   // Without this, the strlist gets out of whack
         fsInfo.setGroupID((*(it++)).toInt());
         fsInfo.setBlockSize((*(it++)).toInt());
         fsInfo.setTotalSpace((*(it++)).toLongLong());
@@ -4550,7 +4551,7 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos)
         fsInfo.setPath(*(it++));
         fsInfo.setLocal((*(it++)).toInt() > 0);
         fsInfo.setFSysID(-1);
-        it++;
+        ++it;
         fsInfo.setGroupID((*(it++)).toInt());
         fsInfo.setBlockSize((*(it++)).toInt());
         fsInfo.setTotalSpace((*(it++)).toLongLong());
@@ -5017,6 +5018,10 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
         retlist << QString::number(isopen);
     }
+    else if (command == "REOPEN")
+    {
+        retlist << QString::number(ft->ReOpen(slist[2]));
+    }
     else if (command == "DONE")
     {
         ft->Stop();
@@ -5315,23 +5320,23 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (token.toLower() == "do_not_care")
     {
         token = QString("%1:%2")
-            .arg(pginfo.MakeUniqueKey()).arg(rand());
+            .arg(pginfo.MakeUniqueKey()).arg(random());
     }
     if (it != slist.end())
-        (time_fmt_sec = ((*it).toLower() == "s")), it++;
+        (time_fmt_sec = ((*it).toLower() == "s")), ++it;
     if (it != slist.end())
-        (time = (*it).toLongLong()), it++;
+        (time = (*it).toLongLong()), ++it;
     if (it != slist.end())
-        (outputfile = *it), it++;
+        (outputfile = *it), ++it;
     outputfile = (outputfile == "<EMPTY>") ? QString::null : outputfile;
     if (it != slist.end())
     {
-        width = (*it).toInt(&ok); it++;
+        width = (*it).toInt(&ok); ++it;
         width = (ok) ? width : -1;
     }
     if (it != slist.end())
     {
-        height = (*it).toInt(&ok); it++;
+        height = (*it).toInt(&ok); ++it;
         height = (ok) ? height : -1;
         has_extra_data = true;
     }
@@ -5698,13 +5703,15 @@ void MainServer::connectionClosed(MythSocket *socket)
                 MythEvent me2("RECORDING_LIST_CHANGE");
                 gCoreContext->dispatch(me2);
 
-                SendMythSystemEvent(QString("SLAVE_DISCONNECTED HOSTNAME %1")
-                                    .arg(pbs->getHostname()));
+                gCoreContext->SendSystemEvent(
+                    QString("SLAVE_DISCONNECTED HOSTNAME %1")
+                            .arg(pbs->getHostname()));
             }
             else if (ismaster && pbs->getHostname() != "tzcheck")
             {
-                SendMythSystemEvent(QString("CLIENT_DISCONNECTED HOSTNAME %1")
-                                    .arg(pbs->getHostname()));
+                gCoreContext->SendSystemEvent(
+                    QString("CLIENT_DISCONNECTED HOSTNAME %1")
+                            .arg(pbs->getHostname()));
             }
 
             LiveTVChain *chain;

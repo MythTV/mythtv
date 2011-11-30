@@ -145,7 +145,7 @@ ifs_update (guint32 * data, guint32 * back, int width, int height,
 		if (((col[VERT] > 32) && (col[ROUGE] < col[VERT] + 40)
 				 && (col[VERT] < col[ROUGE] + 20) && (col[BLEU] < 64)
 				 && (RAND () % 20 == 0)) && (justChanged < 0)) {
-			mode = RAND () % 3 ? MOD_FEU : MOD_MERVER;
+			mode = (RAND () % 3) ? MOD_FEU : MOD_MERVER;
 			justChanged = 250;
 		}
 	}
@@ -197,7 +197,7 @@ ifs_update (guint32 * data, guint32 * back, int width, int height,
 		if (((col[VERT] > 32) && (col[ROUGE] < col[VERT] + 40)
 				 && (col[VERT] < col[ROUGE] + 20) && (col[BLEU] < 64)
 				 && (RAND () % 20 == 0)) && (justChanged < 0)) {
-			mode = RAND () % 3 ? MOD_FEU : MOD_MER;
+			mode = (RAND () % 3) ? MOD_FEU : MOD_MER;
 			justChanged = 250;
 		}
 	}
@@ -256,7 +256,7 @@ ifs_update (guint32 * data, guint32 * back, int width, int height,
 		if (((col[ROUGE] < 64) && (col[VERT] > 32) && (col[VERT] < col[BLEU])
 				 && (col[BLEU] > 32)
 				 && (RAND () % 20 == 0)) && (justChanged < 0)) {
-			mode = RAND () % 2 ? MOD_MER : MOD_MERVER;
+			mode = (RAND () % 2) ? MOD_MER : MOD_MERVER;
 			justChanged = 250;
 		}
 	}

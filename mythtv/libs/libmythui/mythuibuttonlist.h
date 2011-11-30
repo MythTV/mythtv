@@ -128,6 +128,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
                         MoveMid, MoveByAmount };
+    enum LayoutType  { LayoutVertical, LayoutHorizontal, LayoutGrid };
 
     void SetDrawFromBottom(bool draw);
 
@@ -151,6 +152,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     uint ItemWidth(void);
     uint ItemHeight(void);
+    LayoutType GetLayout() const { return m_layout; }
 
     bool MoveItemUpDown(MythUIButtonListItem *item, bool up);
 
@@ -188,7 +190,6 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
   protected:
     enum ScrollStyle { ScrollFree, ScrollCenter, ScrollGroupCenter };
-    enum LayoutType  { LayoutVertical, LayoutHorizontal, LayoutGrid };
     enum ArrangeType { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack };
     enum WrapStyle   { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems,
                        WrapFlowing };
@@ -208,7 +209,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
                                int & selectedIdx, int & button_shift);
     bool DistributeRow(int & first_button, int & last_button,
                        int & first_item, int & last_item,
-                       int & selected_column,
+                       int & selected_column, int & skip_cols,
                        bool grow_left, bool grow_right,
                        int ** col_widths, int & row_height,
                        int total_height, int split_height,
@@ -216,7 +217,8 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     bool DistributeCols(int & first_button, int & last_button,
                         int & first_item, int & last_item,
                         int & selected_column, int & selected_row,
-                        int ** col_widths, QList<int> & row_heights,
+                        int & skip_cols, int ** col_widths,
+			QList<int> & row_heights,
                         int & top_height, int & bottom_height,
                         bool & wrapped);
     bool DistributeButtons(void);
@@ -279,6 +281,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     QVector<MythUIStateType *> m_ButtonList;
     QMap<int, MythUIButtonListItem *> m_ButtonToItem;
+    QHash<QString, QString> m_actionRemap;
 
     bool m_initialized;
     bool m_needsUpdate;

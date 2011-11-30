@@ -52,6 +52,7 @@ typedef struct VideoFrame_
     int top_field_first; // 1 if top field is first.
     int repeat_pict;
     int forcekey; // hardware encoded .nuv
+    int dummy;
 
     int pitches[3]; // Y, U, & V pitches
     int offsets[3]; // Y, U, & V offsets
@@ -69,7 +70,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         const int *p = 0,
                         const int *o = 0,
                         float _aspect = -1.0f, double _rate = -1.0f) MUNUSED;
-static inline void clear(VideoFrame *vf) MUNUSED;
+static inline void clear(VideoFrame *vf);
 static inline bool compatible(const VideoFrame *a,
                               const VideoFrame *b) MUNUSED;
 static inline int  bitsperpixel(VideoFrameType type);
@@ -98,6 +99,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->top_field_first  = 1;
     vf->repeat_pict      = 0;
     vf->forcekey         = 0;
+    vf->dummy            = 0;
     vf->pix_fmt          = 0;
 
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
@@ -179,6 +181,10 @@ static inline void copy(VideoFrame *dst, const VideoFrame *src)
     VideoFrameType codec = dst->codec;
     if (dst->codec != src->codec)
         return;
+
+    dst->interlaced_frame = src->interlaced_frame;
+    dst->repeat_pict      = src->repeat_pict;
+    dst->top_field_first  = src->top_field_first;
 
     if (FMT_YV12 == codec)
     {

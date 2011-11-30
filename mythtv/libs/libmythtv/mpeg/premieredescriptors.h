@@ -5,18 +5,27 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+// C++ headers
+#include <vector>
+using namespace std;
+
+// Qt headers
 #include <QString>
 #include <QDateTime>
 
+// MythTV headers
 #include "mpegdescriptors.h"
 
 class PremiereContentTransmissionDescriptor : public MPEGDescriptor
 {
   public:
-    PremiereContentTransmissionDescriptor(const unsigned char* data) : MPEGDescriptor(data)
+    PremiereContentTransmissionDescriptor(
+        const unsigned char *data, int len = 300) :
+        MPEGDescriptor(
+            data, len, PrivateDescriptorID::premiere_content_transmission)
     {
-        Parse();
-//        assert(DescriptorID::transmission == DescriptorTag());
+        if (_data && !Parse())
+            _data = NULL;
     }
 
     // descriptor_tag           8   0.0
@@ -42,11 +51,8 @@ class PremiereContentTransmissionDescriptor : public MPEGDescriptor
 
     QDateTime StartTimeUTC(uint i) const;
 
-    QString toString() const
-        { return QString("PremiereContentTransmissionDescriptor(stub)"); }
-
   private:
-    void Parse(void);
+    virtual bool Parse(void);
 
     uint                                 _transmission_count;
     mutable vector<const uint8_t*> _date_ptrs;

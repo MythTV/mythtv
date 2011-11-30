@@ -19,14 +19,14 @@ class MBASE_PUBLIC LCDMenuItem
 {
   public:
     LCDMenuItem(bool item_selected, CHECKED_STATE item_checked,
-                QString item_name, unsigned int item_indent  = 0)
+                QString item_name, unsigned int item_indent  = 0,
+                bool item_scroll = false)
     {
         selected = item_selected;
         checked = item_checked;
         name = item_name;
-        scroll = false;
+        scroll = item_scroll;
         indent = item_indent;
-        scroll = false;
         scrollPosition = indent;
     }
 
@@ -217,13 +217,11 @@ class MBASE_PUBLIC LCD : public QObject, public MythSocketCBs
 
     // When playing music, switch to this and give artist and track name
     //
-    // Note: the use of switchToMusic and setLevels is discouraged, because it
+    // Note: the use of switchToMusic is discouraged, because it
     // has become obvious that most LCD devices cannot handle communications
     // fast enough to make them useful.
-    void switchToMusic(const QString &artist, const QString &album, const QString &track);
-
-    // You can set 10 (or less) equalizer values here (between 0.0 and 1.0)
-    void setLevels(int numbLevels, float *values);
+    void switchToMusic(const QString &artist, const QString &album,
+                       const QString &track);
 
     // For Live TV, supply the channel number, program title and subtitle
     //

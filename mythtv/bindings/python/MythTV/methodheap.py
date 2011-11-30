@@ -393,7 +393,7 @@ class BEEventMonitor( BECache ):
     def eventMonitor(self, event=None):
         if event is None:
             return re.compile('BACKEND_MESSAGE')
-        self.log(MythLog.ALL-MythLog.EXTRA, event)
+        self.log(MythLog.ALL, MythLog.INFO, event)
 
 class MythSystemEvent( BECache ):
     class systemeventhandler( object ):
@@ -611,7 +611,6 @@ class Frontend( FEConnection ):
 class MythDB( DBCache ):
     __doc__ = DBCache.__doc__+"""
         obj.searchRecorded()    - return a list of matching Recorded objects
-        obj.getRecorded()       - return a single matching Recorded object
         obj.searchOldRecorded() - return a list of matching
                                   OldRecorded objects
         obj.searchJobs()        - return a list of matching Job objects
@@ -619,7 +618,6 @@ class MythDB( DBCache ):
         obj.searchRecord()      - return a list of matching Record rules
         obj.getFrontends()      - return a list of available Frontends
         obj.getFrontend()       - return a single Frontend object
-        obj.getChannels()       - return a list of all channels
     """
 
 
@@ -658,6 +656,7 @@ class MythDB( DBCache ):
                           init.Join(table='people',
                                     tableto='recordedcredits',
                                     fields=('person',)))
+            return None
 
         # local table matches
         if key in ('title','subtitle','chanid',
@@ -669,26 +668,26 @@ class MythDB( DBCache ):
 
         # time matches
         if key in ('starttime','endtime','progstart','progend'):
-            return ('recorded.%s=%%s' % key, datetime.duck(value), 0)
+            return ('recorded.%s=?' % key, datetime.duck(value), 0)
 
         if key == 'olderthan':
-            return ('recorded.starttime<%s', datetime.duck(value), 0)
+            return ('recorded.starttime<?', datetime.duck(value), 0)
         if key == 'newerthan':
-            return ('recorded.starttime>%s', datetime.duck(value), 0)
+            return ('recorded.starttime>?', datetime.duck(value), 0)
 
         # recordedprogram matches
         if key in ('category_type','airdate','stereo','subtitled','hdtv',
                     'closecaptioned','partnumber','parttotal','seriesid',
                     'showtype','syndicatedepisodenumber','programid',
                     'manualid','generic'):
-            return ('recordedprogram.%s=%%s' % key, value, 1)
+            return ('recordedprogram.%s=?' % key, value, 1)
 
         if key == 'cast':
             return ('people.name', 'recordedcredits', 4, 1)
 
         if key == 'livetv':
             if (value is None) or (value == False):
-                return ('recorded.recgroup!=%s', 'LiveTV', 0)
+                return ('recorded.recgroup!=?', 'LiveTV', 0)
             return ()
 
         return None
@@ -707,15 +706,16 @@ class MythDB( DBCache ):
         if init:
             init.table = 'oldrecorded'
             init.handler = OldRecorded
+            return None
 
         if key in ('title','subtitle','chanid',
                         'category','seriesid','programid','station',
                         'duplicate','generic','recstatus','inetref',
                         'season','episode'):
-            return ('oldrecorded.%s=%%s' % key, value, 0)
+            return ('oldrecorded.%s=?' % key, value, 0)
                 # time matches
         if key in ('starttime','endtime'):
-            return ('oldrecorded.%s=%%s' % key, datetime.duck(value), 0)
+            return ('oldrecorded.%s=?' % key, datetime.duck(value), 0)
         return None
 
     @databaseSearch
@@ -736,15 +736,16 @@ class MythDB( DBCache ):
                                     tableto='recordedartwork',
                                     fieldsfrom=('inetref','season','hostname'),
                                     fieldsto=('inetref','season','host')),)
+            return None
 
         if key in ('inetref', 'season', 'host'):
-            return ('recordedartwork.%s=%%s' % key, value, 0)
+            return ('recordedartwork.%s=?' % key, value, 0)
 
         if key in ('chanid', 'title', 'subtitle'):
-            return ('recorded.%s=%%s' % key, value, 1)
+            return ('recorded.%s=?' % key, value, 1)
 
         if key == 'starttime':
-            return ('recorded.%s=%%s' % key, datetime.duck(value), 1)
+            return ('recorded.%s=?' % key, datetime.duck(value), 1)
 
         return None
 
@@ -763,20 +764,21 @@ class MythDB( DBCache ):
             init.joins = (init.Join(table='recorded',
                                     tableto='jobqueue',
                                     fields=('chanid','starttime')),)
+            return None
 
         if key in ('chanid','type','status','hostname'):
-            return ('jobqueue.%s=%%s' % key, value, 0)
+            return ('jobqueue.%s=?' % key, value, 0)
         if key in ('title','subtitle'):
-            return ('recorded.%s=%%s' % key, value, 1)
+            return ('recorded.%s=?' % key, value, 1)
         if key == 'flags':
-            return ('jobqueue.flags&%s', value, 0)
+            return ('jobqueue.flags&?', value, 0)
 
         if key == 'starttime':
-            return ('jobqueue.starttime=%s', datetime.duck(value), 0)
+            return ('jobqueue.starttime=?', datetime.duck(value), 0)
         if key == 'olderthan':
-            return ('jobqueue.inserttime>%s', datetime.duck(value), 0)
+            return ('jobqueue.inserttime>?', datetime.duck(value), 0)
         if key == 'newerthan':
-            return ('jobqueue.inserttime<%s', datetime.duck(value), 0)
+            return ('jobqueue.inserttime<?', datetime.duck(value), 0)
         return None
 
     @databaseSearch
@@ -791,7 +793,12 @@ class MythDB( DBCache ):
             partnumber, parttotal,  seriesid,   originalairdate,
             showtype,   programid,  generic,    syndicatedepisodenumber,
             ondate,     cast,       startbefore,startafter
-            endbefore,  endafter
+            endbefore,  endafter,   dayofweek,  weekday
+            first,      last,       callsign,   commfree
+            channelgroup,           videosource,
+            genre,      rating,     cast,       fuzzytitle
+            fuzzysubtitle,          fuzzydescription,
+            fuzzyprogramid,         beforedate, afterdate,
         """
         if init:
             init.table = 'program'
@@ -801,28 +808,81 @@ class MythDB( DBCache ):
                                     fields=('chanid','starttime')),
                           init.Join(table='people',
                                     tableto='credits',
-                                    fields=('person',)))
+                                    fields=('person',)),
+                          init.Join(table='channel',
+                                    tableto='program',
+                                    fields=('chanid',)),
+                          init.Join(table='channelgroup',
+                                    tableto='program',
+                                    fields=('chanid',)),
+                          init.Join(table='channelgroupnames',
+                                    tableto='channelgroup',
+                                    fields=('grpid',)),
+                          init.Join(table='videosource',
+                                    tableto='channel',
+                                    fields=('sourceid',)),
+                          init.Join(table='programgenres',
+                                    tableto='program',
+                                    fields=('chanid','starttime')),
+                          init.Join(table='programrating',
+                                    tableto='program',
+                                    fields=('chanid','starttime')))
+            return None
 
         if key in ('chanid','title','subtitle',
                         'category','airdate','stars','previouslyshown','stereo',
                         'subtitled','hdtv','closecaptioned','partnumber',
                         'parttotal','seriesid','originalairdate','showtype',
-                        'syndicatedepisodenumber','programid','generic'):
-            return ('%s=%%s' % key, value, 0)
+                        'syndicatedepisodenumber','programid','generic',
+                        'category_type'):
+            return ('program.%s=?' % key, value, 0)
         if key in ('starttime','endtime'):
-            return ('%s=%%s' % key, datetime.duck(value), 0)
-        if key == 'ondate':
-            return ('DATE(starttime)=%s', value, 0)
+            return ('program.%s=?' % key, datetime.duck(value), 0)
+        if key == 'dayofweek':
+            return ('DAYNAME(program.starttime)=?', value, 0)
+        if key == 'weekday':
+            return ('WEEKDAY(program.starttime)<?', 5, 0)
+        if key in ('first', 'last'):
+            return ('program.%s=?' % key, 1, 0)
+
+        if key == 'callsign':
+            return ('channel.callsign=?', value, 4)
+        if key == 'commfree':
+            return ('channel.commmethod=?', -2, 4)
+        if key == 'channelgroup':
+            return ('channelgroupnames.name=?', value, 24)
+        if key == 'videosource':
+            try:
+                value = int(value)
+                return ('channel.sourceid=?', value, 4)
+            except:
+                return ('videosource.name=?', value, 36)
+        if key == 'genre':
+            return ('programgenres.genre=?', value, 64)
+        if key == 'rating':
+            return ('programrating.rating=?', value, 128)
         if key == 'cast':
             return ('people.name', 'credits', 2, 0)
+
+        if key.startswith('fuzzy'):
+            if key[5:] in ('title', 'subtitle', 'description', 'programid'):
+                return ('program.%s LIKE ?' % key[5:], '%'+value+'%', 0)
+            if key[5:] == 'callsign':
+                return ('channel.callsign LIKE ?', '%'+value+'%', 4)
+        if key.endswith('date'):
+            prefix = {'on':'=', 'before':'<', 'after':'>'}
+            if key[:-4] in prefix:
+                return ('DATE(program.starttime){0}?'.format(prefix[key[:-4]]),
+                        value, 0)
+
         if key == 'startbefore':
-            return ('starttime<%s', datetime.duck(value), 0)
+            return ('program.starttime<?', datetime.duck(value), 0)
         if key == 'startafter':
-            return ('starttime>%s', datetime.duck(value), 0)
+            return ('program.starttime>?', datetime.duck(value), 0)
         if key == 'endbefore':
-            return ('endtime<%s', datetime.duck(value), 0)
+            return ('program.endtime<?', datetime.duck(value), 0)
         if key == 'endafter':
-            return ('endtime>%s', datetime.duck(value), 0)
+            return ('program.endtime>?', datetime.duck(value), 0)
         return None
 
     def makePowerRule(self, ruletitle='unnamed (Power Search', 
@@ -847,11 +907,12 @@ class MythDB( DBCache ):
         if init:
             init.table = 'record'
             init.handler = Record
+            return None
 
         if key in ('type','chanid','starttime','startdate','endtime','enddate',
                         'title','subtitle','category','profile','recgroup',
                         'station','seriesid','programid','playgroup','inetref'):
-            return ('%s=%%s' % key, value, 0)
+            return ('%s=?' % key, value, 0)
         return None
 
     @databaseSearch
@@ -869,23 +930,24 @@ class MythDB( DBCache ):
         if init:
             init.table = 'internetcontentarticles'
             init.handler = InternetContentArticles
+            return None
 
         if key in ('feedtitle','title','subtitle','season','episode','url',
                         'type','author','rating','player','width','height',
                         'language','podcast','downloadable', 'description'):
-            return ('%s=%%s' % key, value, 0)
+            return ('%s=?' % key, value, 0)
         if key == 'ondate':
-            return ('DATE(date)=%s', value, 0)
+            return ('DATE(date)=?', value, 0)
         if key == 'olderthan':
-            return ('date>%s', value, 0)
+            return ('date>?', value, 0)
         if key == 'newerthan':
-            return ('date<%s', value, 0)
+            return ('date<?', value, 0)
         if key == 'longerthan':
-            return ('time<%s', value, 0)
+            return ('time<?', value, 0)
         if key == 'shorterthan':
-            return ('time>%s', value, 0)
+            return ('time>?', value, 0)
         if key == 'country':
-            return ('countries LIKE %s', '%%%s%%' % value, 0)
+            return ('countries LIKE ?', '%'+value+'%', 0)
 
     def getFrontends(self):
         """
@@ -984,10 +1046,11 @@ class MythDB( DBCache ):
                                     tableto='videometadata',
                                     fieldsfrom=('intid',),
                                     fieldsto=('category',)))
+            return None
 
         if key in ('title','subtitle','season','episode','host',
                         'director','year'):
-            return('videometadata.%s=%%s' % key, value, 0)
+            return('videometadata.%s=?' % key, value, 0)
         vidref = {'cast':(2,0), 'genre':(8,2), 'country':(32,4)}
         if key in vidref:
             return ('video%s.%s' % (key,key),
@@ -995,15 +1058,15 @@ class MythDB( DBCache ):
                     vidref[key][0],
                     vidref[key][1])
         if key == 'category':
-            return ('videocategory.%s=%%s' % key, value, 64)
+            return ('videocategory.%s=?' % key, value, 64)
         if key == 'exactfile':
-            return ('videometadata.filename=%s', value, 0)
+            return ('videometadata.filename=?', value, 0)
         if key == 'file':
-            return ('videometadata.filename LIKE %s', '%'+value, 0)
+            return ('videometadata.filename LIKE ?', '%'+value, 0)
         if key == 'insertedbefore':
-            return ('videometadata.insertdate<%s', value, 0)
+            return ('videometadata.insertdate<?', value, 0)
         if key == 'insertedafter':
-            return ('videometadata.insertdate>%s', value, 0)
+            return ('videometadata.insertdate>?', value, 0)
         return None
 
 class MythVideo( MythDB ):

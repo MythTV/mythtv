@@ -8,6 +8,17 @@
 #include <QHash>
 #include <QMutex>
 
+#define GL_GLEXT_PROTOTYPES
+
+#ifdef USING_X11
+#define GLX_GLXEXT_PROTOTYPES
+#define XMD_H 1
+#ifndef GL_ES_VERSION_2_0
+#include <GL/gl.h>
+#endif
+#undef GLX_ARB_get_proc_address
+#endif // USING_X11
+
 #ifdef _WIN32
 #include <GL/glext.h>
 #endif
@@ -22,15 +33,6 @@
 #include "mythrender_base.h"
 #include "mythrender_opengl_defs.h"
 
-#ifdef GL_ES_VERSION_2_0
-#define GL_BGRA  GL_RGBA
-#define GL_RGBA8 GL_RGBA
-#define GL_TEXTURE_1D 0x0
-static inline const char* gluErrorString(int ) { return NULL; }
-static inline void glTexImage1D(GLenum, GLint, GLint, GLsizei, GLint,
-                                GLenum, GLenum, const GLvoid*) { };
-#endif
-
 typedef enum
 {
     kGLFeatNone    = 0x0000,
@@ -43,15 +45,16 @@ typedef enum
     kGLAppleFence  = 0x0040,
     kGLMesaYCbCr   = 0x0080,
     kGLAppleYCbCr  = 0x0100,
-    kGLAppleRGB422 = 0x0200,
-    kGLMipMaps     = 0x0400,
-    kGLSL          = 0x0800,
-    kGLVertexArray = 0x1000,
-    kGLExtVBO      = 0x2000,
-    kGLMaxFeat     = 0x4000,
+    kGLMipMaps     = 0x0200,
+    kGLSL          = 0x0400,
+    kGLVertexArray = 0x0800,
+    kGLExtVBO      = 0x1000,
+    kGLMaxFeat     = 0x2000,
 } GLFeatures;
 
+#define MYTHTV_UYVY 0x8A1F
 #define TEX_OFFSET 8
+
 class MythGLTexture
 {
   public:
@@ -98,7 +101,7 @@ class MUI_PUBLIC OpenGLLocker
 class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 {
   public:
-    static MythRenderOpenGL* Create(const QGLFormat& format,
+    static MythRenderOpenGL* Create(const QString &painter,
                                     QPaintDevice* device = NULL);
 
     MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
@@ -235,6 +238,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     QList<uint64_t>         m_vertexExpiry;
     QMap<uint64_t,GLuint>   m_cachedVBOS;
     QList<uint64_t>         m_vboExpiry;
+
+    // 1D Textures (not available on GL ES 2.0)
+    MYTH_GLTEXIMAGE1DPROC                m_glTexImage1D;
 
     // Multi-texturing
     MYTH_GLACTIVETEXTUREPROC             m_glActiveTexture;

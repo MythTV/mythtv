@@ -5,14 +5,15 @@
 
 #include "atscstreamdata.h"
 #include "dvbstreamdata.h"
+#include "mythtvexp.h"
 
-class ScanStreamData :
+class MTV_PUBLIC ScanStreamData :
     public virtual MPEGStreamData,
     public ATSCStreamData,
     public DVBStreamData
 {
   public:
-    ScanStreamData();
+    ScanStreamData(bool no_default_pid = false);
     virtual ~ScanStreamData();
 
     bool IsRedundant(uint pid, const PSIPTable&) const;
@@ -34,6 +35,7 @@ class ScanStreamData :
     virtual bool DeleteCachedTable(PSIPTable *psip) const;
     /// listen for addiotional Freesat service information
     int dvb_uk_freesat_si;
+    bool m_no_default_pid;
 };
 
 inline void ScanStreamData::SetFreesatAdditionalSI(bool freesat_si)

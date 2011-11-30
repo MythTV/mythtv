@@ -18,7 +18,7 @@
 class PlayListFileEntry
 {
   public:
-    PlayListFileEntry(void) {}
+    PlayListFileEntry(void) : m_length(0) {}
     ~PlayListFileEntry(void) {}
 
     QString File(void) { return m_file; }

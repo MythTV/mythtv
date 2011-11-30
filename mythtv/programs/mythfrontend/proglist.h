@@ -40,7 +40,7 @@ class ProgLister : public ScheduleCommon
   public:
     ProgLister(MythScreenStack *parent, ProgListType pltype,
                const QString &view, const QString &from);
-    explicit ProgLister(MythScreenStack *parent, uint recid = 0, 
+    explicit ProgLister(MythScreenStack *parent, uint recid = 0,
                         const QString &title = QString());
     ~ProgLister();
 
@@ -64,7 +64,6 @@ class ProgLister : public ScheduleCommon
 
     void ShowDetails(void)   { ScheduleCommon::ShowDetails(GetCurrent());   }
     void ShowUpcoming(void);
-    void ShowSortMenu(void);
     void ShowDeleteRuleMenu(void);
     void ShowDeleteOldEpisodeMenu(void);
     void ShowChooseViewMenu(void);
@@ -76,8 +75,8 @@ class ProgLister : public ScheduleCommon
     void FillItemList(bool restorePosition, bool updateDisp = true);
 
     void ClearCurrentProgramInfo(void);
-    void UpdateDisplay(void);
-    void UpdateDisplay(const ProgramInfo *selected, int selectedOffset);
+    void UpdateDisplay(const ProgramInfo *selected = NULL);
+    void RestoreSelection(const ProgramInfo *selected, int selectedOffset);
     void UpdateButtonList(void);
     void UpdateKeywordInDB(const QString &text, const QString &oldValue);
 
@@ -107,7 +106,6 @@ class ProgLister : public ScheduleCommon
     QDateTime         m_startTime;
     QDateTime         m_searchTime;
     QString           m_channelOrdering;
-    QString           m_channelFormat;
 
     RecSearchType     m_searchType;
 

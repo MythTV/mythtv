@@ -127,11 +127,7 @@ int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythgame", libversion,
                                     MYTH_BINARY_VERSION))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("libmythgame.so/main.o: binary version mismatch"));
         return -1;
-    }
 
     gCoreContext->ActivateSettingsCache(false);
     if (!UpgradeGameDatabaseSchema())

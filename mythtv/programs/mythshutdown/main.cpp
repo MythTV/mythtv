@@ -176,7 +176,7 @@ static int unlockShutdown()
         MythDB::DBError("unlockShutdown -- unlock", query);
 
     // tell the master BE to reset its idle time
-    RemoteSendMessage("RESET_IDLETIME");
+    gCoreContext->SendMessage("RESET_IDLETIME");
 
     return 0;
 }
@@ -798,7 +798,7 @@ int main(int argc, char **argv)
     else if (cmdline.toBool("unlock"))
         res = unlockShutdown();
     else if (cmdline.toBool("check"))
-        res = checkOKShutdown((bool)(cmdline.toInt("status") == 1));
+        res = checkOKShutdown((bool)(cmdline.toInt("check") == 1));
     else if (cmdline.toBool("setschedwakeup"))
         res = setScheduledWakeupTime();
     else if (cmdline.toBool("startup"))
@@ -809,7 +809,7 @@ int main(int argc, char **argv)
         res = getStatus((bool)(cmdline.toInt("status") == 1));
     else if (cmdline.toBool("setwakeup"))
         res = setWakeupTime(cmdline.toString("setwakeup"));
-    else if (cmdline.toBool("check"))
+    else if (cmdline.toBool("safeshutdown"))
     { 
         res = checkOKShutdown(true);
         if (res == 0)

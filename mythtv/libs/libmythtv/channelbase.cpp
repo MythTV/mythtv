@@ -17,8 +17,15 @@ using namespace std;
 #include <QCoreApplication>
 
 // MythTV headers
+#ifdef USING_OSX_FIREWIRE
+#include "darwinfirewiredevice.h"
+#endif
+#ifdef USING_LINUX_FIREWIRE
+#include "linuxfirewiredevice.h"
+#endif
 #include "firewirechannel.h"
 #include "mythcorecontext.h"
+#include "cetonchannel.h"
 #include "dummychannel.h"
 #include "tvremoteutil.h"
 #include "channelutil.h"
@@ -95,7 +102,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
         DBChanList channels = GetChannels(*it);
 
         DBChanList::const_iterator cit = channels.begin();
-        for (; cit != channels.end(); cit++)
+        for (; cit != channels.end(); ++cit)
         {
             if ((*cit).channum == startchannel &&
                 IsTunable(*it, startchannel))
@@ -108,7 +115,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             }
         }
 
-        it++;
+        ++it;
         it = (it == inputs.end()) ? inputs.begin() : it;
         if (it == start)
             break;
@@ -155,7 +162,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             }
         }
 
-        it++;
+        ++it;
         it = (it == inputs.end()) ? inputs.begin() : it;
         if (it == start)
             break;
@@ -694,14 +701,75 @@ void ChannelBase::HandleScript(const QString &freqid)
     }
     else
     {
-        ok = ChangeExternalChannel((*it)->externalChanger, freqid);
-        if (!ok)
+        if ((*it)->externalChanger.toLower() == "internal")
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Can not execute channel changer.");
-            m_system_status = 2; // failed
+            ok = ChangeInternalChannel(freqid, (*it)->inputid);
+            if (!ok)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Can not execute internal channel "
+                    "changer.");
+                m_system_status = 2; // failed
+            }
+            else
+                m_system_status = 3; // success
+
             HandleScriptEnd(ok);
         }
+        else
+        {
+            ok = ChangeExternalChannel((*it)->externalChanger, freqid);
+            if (!ok)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Can not execute channel changer.");
+                m_system_status = 2; // failed
+                HandleScriptEnd(ok);
+            }
+        }
     }
+}
+
+bool ChannelBase::ChangeInternalChannel(const QString &freqid,
+                                        uint inputid)
+{
+#ifdef USING_FIREWIRE
+    FirewireDevice *device = NULL;
+    QString fwnode = CardUtil::GetFirewireChangerNode(inputid);
+    uint64_t guid = string_to_guid(fwnode);
+    QString fwmodel = CardUtil::GetFirewireChangerModel(inputid);
+
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Internal channel change to %1 "
+            "on inputid %2, GUID %3 (%4)").arg(freqid).arg(inputid)
+            .arg(fwnode).arg(fwmodel));
+
+#ifdef USING_LINUX_FIREWIRE
+    device = new LinuxFirewireDevice(
+        guid, 0, 100, 1);
+#endif // USING_LINUX_FIREWIRE
+
+#ifdef USING_OSX_FIREWIRE
+    device = new DarwinFirewireDevice(guid, 0, 100);
+#endif // USING_OSX_FIREWIRE
+
+    if (!device)
+        return false;
+
+    if (!device->OpenPort())
+        return false;
+
+    if (!device->SetChannel(fwmodel, 0, freqid.toUInt()))
+    {
+        device->ClosePort();
+        delete device;
+        device = NULL;
+        return false;
+    }
+
+    device->ClosePort();
+    delete device;
+    device = NULL;
+    return true;
+#endif
+    return false;
 }
 
 /// \note m_system_lock must be held when this is called
@@ -1141,6 +1209,12 @@ ChannelBase *ChannelBase::CreateChannel(
     {
 #ifdef USING_ASI
         channel = new ASIChannel(tvrec, genOpt.videodev);
+#endif
+    }
+    else if (genOpt.cardtype == "CETON")
+    {
+#ifdef USING_CETON
+        channel = new CetonChannel(tvrec, genOpt.videodev);
 #endif
     }
     else if (CardUtil::IsV4L(genOpt.cardtype))

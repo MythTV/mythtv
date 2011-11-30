@@ -152,7 +152,7 @@ class VideoOutput
     virtual long long GetFramesPlayed(void) { return framesPlayed; };
 
     /// \brief Returns true if a fatal error has been encountered.
-    bool IsErrored() { return errorState != kError_None; }
+    bool IsErrored() const { return errorState != kError_None; }
     /// \brief Returns error type
     VideoErrorState GetError(void) const { return errorState; }
     // Video Buffer Management
@@ -201,7 +201,9 @@ class VideoOutput
     /// \brief Releases all frames not being actively displayed from any queue
     ///        onto the queue of frames ready for decoding onto.
     virtual void DiscardFrames(bool kf) { vbuffers.DiscardFrames(kf); }
-
+    /// \brief Clears the frame to black. Subclasses may choose
+    ///        to mark the frame as a dummy and act appropriately
+    virtual void ClearDummyFrame(VideoFrame* frame);
     virtual void CheckFrameStates(void) { }
 
     /// \bug not implemented correctly. vpos is not updated.
@@ -215,7 +217,7 @@ class VideoOutput
     QString GetFrameStatus(void) const { return vbuffers.GetStatus(); }
 
     /// \brief Updates frame displayed when video is paused.
-    virtual void UpdatePauseFrame(void) = 0;
+    virtual void UpdatePauseFrame(int64_t &disp_timecode) = 0;
 
     /// \brief Tells the player to resize the video frame (used for ITV)
     void SetVideoResize(const QRect &videoRect);
@@ -244,11 +246,14 @@ class VideoOutput
     QRect   GetSafeRect(void);
 
     // Visualisations
-    bool ToggleVisualisation(AudioPlayer *audio);
+    bool EnableVisualisation(AudioPlayer *audio, bool enable);
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render);
     virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render);
+    VideoVisual* GetVisualisation(void) { return m_visual; }
     void DestroyVisualisation(void);
 
+    // Hue adjustment for certain vendors (mostly ATI)
+    static int CalcHueBase(const QString &adaptor_name);
 
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,

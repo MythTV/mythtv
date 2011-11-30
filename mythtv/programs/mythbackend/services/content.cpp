@@ -33,6 +33,7 @@
 #include "previewgenerator.h"
 #include "backendutil.h"
 #include "httprequest.h"
+#include "serviceUtil.h"
 #include "util.h"
 #include "mythdownloadmanager.h"
 #include "metadataimagehelper.h"
@@ -255,6 +256,30 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::ArtworkInfoList* Content::GetRecordingArtworkList( int              nChanId,
+                                                        const QDateTime &dStartTime  )
+{
+    if (nChanId <= 0 || !dStartTime.isValid())
+        throw( QString("Channel ID or StartTime appears invalid."));
+
+    ProgramInfo pInfo = ProgramInfo(nChanId, dStartTime);
+
+    return GetProgramArtworkList(pInfo.GetInetRef(), pInfo.GetSeason());
+}
+
+DTC::ArtworkInfoList* Content::GetProgramArtworkList( const QString &sInetref,
+                                                      int            nSeason  )
+{
+    DTC::ArtworkInfoList *pArtwork = new DTC::ArtworkInfoList();
+
+    FillArtworkInfoList (pArtwork, sInetref, nSeason);
+
+    return pArtwork;
+}
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QFileInfo Content::GetVideoArtwork( const QString &sType,
                                     int nId, int nWidth, int nHeight )
 {
@@ -396,8 +421,8 @@ QFileInfo Content::GetAlbumArt( int nId, int nWidth, int nHeight )
 
 QFileInfo Content::GetPreviewImage(        int        nChanId,
                                      const QDateTime &dtStartTime,
-                                           int        nWidth,    
-                                           int        nHeight,   
+                                           int        nWidth,
+                                           int        nHeight,
                                            int        nSecsIn )
 {
     if (!dtStartTime.isValid())
@@ -524,13 +549,19 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
         return QFileInfo( sNewFileName );
     }
 
-    QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
-                                Qt::SmoothTransformation);
+    PreviewGenerator *previewgen = new PreviewGenerator( &pginfo,
+                                                         QString(),
+                                                         PreviewGenerator::kLocal);
+    previewgen->SetPreviewTimeAsSeconds( nSecsIn             );
+    previewgen->SetOutputFilename      ( sNewFileName        );
+    previewgen->SetOutputSize          (QSize(nWidth,nHeight));
 
-    QByteArray fname = sNewFileName.toAscii();
-    img.save( fname.constData(), "PNG" );
+    bool ok = previewgen->Run();
 
-    makeFileAccessible(fname.constData());
+    previewgen->deleteLater();
+
+    if (!ok)
+        return QFileInfo();
 
     delete pImage;
 

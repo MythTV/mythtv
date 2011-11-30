@@ -48,6 +48,7 @@
 
 #ifdef USING_MINGW
 #include <unistd.h>       // for usleep()
+#include <time.h>
 #include <sys/time.h>
 #endif
 
@@ -119,11 +120,9 @@ typedef unsigned int uint;
 #endif
 
 #if defined(__cplusplus) && defined(USING_MINGW)
-inline int random(void)
-{
-    srand(GetTickCount());
-    return rand() << 20 ^ rand() << 10 ^ rand();
-}
+#include <QtGlobal>
+static inline void srandom(unsigned int seed) { qsrand(seed); }
+static inline long int random(void) { return qrand(); }
 #endif // USING_MINGW
 
 #if defined(__cplusplus) && defined(USING_MINGW)
@@ -240,6 +239,39 @@ inline const char *dlerror(void)
 #define setuid(x)
 #endif // USING_MINGW
 
+#if defined(USING_MINGW) && !defined(gmtime_r)
+// FFmpeg libs already have a workaround, use it if the headers are included,
+// use this otherwise.
+static inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
+{
+    // this is safe on windows, where gmtime uses a thread local variable.
+    // using _gmtime_s() would be better, but needs to be tested on windows.
+    struct tm *tmp = gmtime(timep);
+    if (tmp)
+    {
+        *result = *tmp;
+        return result;
+    }
+    return NULL;
+}
+#endif 
+
+#if defined(USING_MINGW) && !defined(localtime_r)
+// FFmpeg libs already have a workaround, use it if the headers are included,
+// use this otherwise.
+static inline struct tm *localtime_r(const time_t *timep, struct tm *result)
+{
+    // this is safe, windows uses a thread local variable for localtime().
+    if (timep && result)
+    {
+        struct tm *win_tmp = localtime(timep);
+        memcpy(result, win_tmp, sizeof(struct tm));
+        return result;
+    }
+    return NULL;
+}
+#endif
+
 #ifdef USING_MINGW
 #define    timeradd(a, b, result)                       \
   do {                                                  \
@@ -314,6 +346,12 @@ inline const char *dlerror(void)
 #ifdef USING_MINGW
 #define fseeko(stream, offset, whence) fseeko64(stream, offset, whence)
 #define ftello(stream) ftello64(stream)
+#endif
+
+#ifdef _WIN32
+#define PREFIX64 "I64"
+#else
+#define PREFIX64 "ll"
 #endif
 
 #endif // __COMPAT_H__

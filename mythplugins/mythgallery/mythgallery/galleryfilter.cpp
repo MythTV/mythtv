@@ -83,7 +83,7 @@ bool GalleryFilter::TestFilter(const QString& dir, const GalleryFilter& flt,
         splitFD = flt.getDirFilter().split(":");
 
     for (QFileInfoList::const_iterator it = list.begin();
-         it != list.end(); it++)
+         it != list.end(); ++it)
     {
         fi = &(*it);
         if (fi->fileName() == "." || fi->fileName() == "..")

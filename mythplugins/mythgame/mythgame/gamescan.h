@@ -86,7 +86,6 @@ class GameScanner : public QObject
 
   private:
     GameScannerThread  *m_scanThread;
-    bool                m_cancel;
 };
 
 #endif

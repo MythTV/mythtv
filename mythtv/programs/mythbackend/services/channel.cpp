@@ -32,6 +32,8 @@
 #include "mythcorecontext.h"
 #include "channelutil.h"
 #include "sourceutil.h"
+#include "cardutil.h"
+#include "datadirect.h"
 
 #include "serviceUtil.h"
 
@@ -219,22 +221,22 @@ bool Channel::UpdateDBChannel( uint          MplexID,
     return bResult;
 }
 
-bool Channel::CreateDBChannel( uint          MplexID,
-                               uint          SourceID,
-                               uint          ChannelID,
-                               const QString &CallSign,
-                               const QString &ChannelName,
-                               const QString &ChannelNumber,
-                               uint          ServiceID,
-                               uint          ATSCMajorChannel,
-                               uint          ATSCMinorChannel,
-                               bool          UseEIT,
-                               bool          visible,
-                               const QString &FrequencyID,
-                               const QString &Icon,
-                               const QString &Format,
-                               const QString &XMLTVID,
-                               const QString &DefaultAuthority )
+bool Channel::AddDBChannel( uint          MplexID,
+                            uint          SourceID,
+                            uint          ChannelID,
+                            const QString &CallSign,
+                            const QString &ChannelName,
+                            const QString &ChannelNumber,
+                            uint          ServiceID,
+                            uint          ATSCMajorChannel,
+                            uint          ATSCMinorChannel,
+                            bool          UseEIT,
+                            bool          visible,
+                            const QString &FrequencyID,
+                            const QString &Icon,
+                            const QString &Format,
+                            const QString &XMLTVID,
+                            const QString &DefaultAuthority )
 {
     bool bResult = false;
 
@@ -247,7 +249,7 @@ bool Channel::CreateDBChannel( uint          MplexID,
     return bResult;
 }
 
-bool Channel::DeleteDBChannel( uint nChannelID )
+bool Channel::RemoveDBChannel( uint nChannelID )
 {
     bool bResult = false;
 
@@ -386,21 +388,32 @@ bool Channel::UpdateVideoSource( uint nSourceId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Channel::CreateVideoSource( const QString &sSourceName,
-                                 const QString &sGrabber,
-                                 const QString &sUserId,
-                                 const QString &sFreqTable,
-                                 const QString &sLineupId,
-                                 const QString &sPassword,
-                                 bool          bUseEIT,
-                                 const QString &sConfigPath,
-                                 int           nNITId )
+int  Channel::AddVideoSource( const QString &sSourceName,
+                              const QString &sGrabber,
+                              const QString &sUserId,
+                              const QString &sFreqTable,
+                              const QString &sLineupId,
+                              const QString &sPassword,
+                              bool          bUseEIT,
+                              const QString &sConfigPath,
+                              int           nNITId )
+{
+    int nResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
+                                       sLineupId, sPassword, bUseEIT, sConfigPath,
+                                       nNITId);
+
+    return nResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Channel::RemoveVideoSource( uint nSourceID )
 {
     bool bResult = false;
 
-    bResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
-                                       sLineupId, sPassword, bUseEIT, sConfigPath,
-                                       nNITId);
+    bResult = SourceUtil::DeleteSource( nSourceID );
 
     return bResult;
 }
@@ -409,13 +422,70 @@ bool Channel::CreateVideoSource( const QString &sSourceName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Channel::DeleteVideoSource( uint nSourceID )
+DTC::LineupList* Channel::GetDDLineupList( const QString &sSource,
+                                           const QString &sUserId,
+                                           const QString &sPassword )
 {
-    bool bResult = false;
+    int source = 0;
 
-    bResult = SourceUtil::DeleteSource( nSourceID );
+    DTC::LineupList *pLineups = new DTC::LineupList();
 
-    return bResult;
+    if (sSource.toLower() == "schedulesdirect1" ||
+        sSource.toLower() == "schedulesdirect" ||
+        sSource.isEmpty())
+    {
+        source = 1;
+        DataDirectProcessor ddp(source, sUserId, sPassword);
+        if (!ddp.GrabLineupsOnly())
+        {
+            throw( QString("Unable to grab lineups. Check info."));
+        }
+        const DDLineupList lineups = ddp.GetLineups();
+
+        DDLineupList::const_iterator it;
+        for (it = lineups.begin(); it != lineups.end(); ++it)
+        {
+            DTC::Lineup *pLineup = pLineups->AddNewLineup();
+
+            pLineup->setLineupId((*it).lineupid);
+            pLineup->setName((*it).name);
+            pLineup->setDisplayName((*it).displayname);
+            pLineup->setType((*it).type);
+            pLineup->setPostal((*it).postal);
+            pLineup->setDevice((*it).device);
+        }
+    }
+
+    return pLineups;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+int Channel::FetchChannelsFromSource( const uint nSourceId,
+                                      const uint nCardId,
+                                      bool       bWaitForFinish )
+{
+    if ( nSourceId < 1 || nCardId < 1)
+        throw( QString("A source ID and card ID are both required."));
+
+    int nResult = 0;
+
+    QString cardtype = CardUtil::GetRawCardType(nCardId);
+
+    if (!CardUtil::IsUnscanable(cardtype) &&
+        !CardUtil::IsEncoder(cardtype))
+    {
+        throw( QString("This device is incompatible with channel fetching.") );
+    }
+
+    SourceUtil::UpdateChannelsFromListings(nSourceId, cardtype, bWaitForFinish);
+
+    if (bWaitForFinish)
+        nResult = SourceUtil::GetChannelCount(nSourceId);
+
+    return nResult;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -579,7 +649,7 @@ DTC::VideoMultiplex* Channel::GetVideoMultiplex( int nMplexID )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QStringList Channel::GetXMLTVIds( int SourceID )
+QStringList Channel::GetXMLTVIdList( int SourceID )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -591,7 +661,7 @@ QStringList Channel::GetXMLTVIds( int SourceID )
 
     if (!query.exec())
     {
-        MythDB::DBError("MythAPI::GetXMLTVIds()", query);
+        MythDB::DBError("MythAPI::GetXMLTVIdList()", query);
 
         throw( QString( "Database Error executing query." ));
     }

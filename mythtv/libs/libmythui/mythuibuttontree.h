@@ -48,6 +48,7 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
     void itemClicked(MythUIButtonListItem* item);
     void itemVisible(MythUIButtonListItem* item);
     void nodeChanged(MythGenericTree* node);
+    void rootChanged(MythGenericTree* node);
 
   protected:
     virtual bool ParseElement(

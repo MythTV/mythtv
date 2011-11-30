@@ -70,5 +70,4 @@ void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
             QCoreApplication::postEvent(mainWindow, new LircKeycodeEvent(
                 QEvent::KeyRelease, keycode, Qt::NoModifier, code, code));
     }
-  
 }

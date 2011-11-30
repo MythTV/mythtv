@@ -55,11 +55,13 @@
       <ul class="acitem collapsible">
         <li><a href='#'><i18n>WSDL Links</i18n></a>
           <ul class="acitem">
-            <li class="indent1"><a href='/Myth/wsdl'><i18n>Myth Service</i18n></a></li>
-            <li class="indent1"><a href='/Guide/wsdl'><i18n>Guide Service</i18n></a></li>
-            <li class="indent1"><a href='/Dvr/wsdl'><i18n>DVR Service</i18n></a></li>
-            <li class="indent1"><a href='/Content/wsdl'><i18n>Content Service</i18n></a></li>
+            <li class="indent1"><a href='/Capture/wsdl'><i18n>Capture Card Service</i18n></a></li>
             <li class="indent1"><a href='/Channel/wsdl'><i18n>Channel Service</i18n></a></li>
+            <li class="indent1"><a href='/Content/wsdl'><i18n>Content Service</i18n></a></li>
+            <li class="indent1"><a href='/Dvr/wsdl'><i18n>DVR Service</i18n></a></li>
+            <li class="indent1"><a href='/Guide/wsdl'><i18n>Guide Service</i18n></a></li>
+            <li class="indent1"><a href='/Myth/wsdl'><i18n>Myth Service</i18n></a></li>
+            <li class="indent1"><a href='/Video/wsdl'><i18n>Video Library Service</i18n></a></li>
           </ul>
         </li>
         <li><a href='#'><i18n>Server Side Scripting</i18n></a>

@@ -194,7 +194,7 @@ void VideoOutputNull::DrawUnusedRects(bool)
 {
 }
 
-void VideoOutputNull::UpdatePauseFrame(void)
+void VideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&global_lock);
 
@@ -213,6 +213,8 @@ void VideoOutputNull::UpdatePauseFrame(void)
         vbuffers.GetScratchFrame()->frameNumber = framesPlayed - 1;
         CopyFrame(&av_pause_frame, vbuffers.GetScratchFrame());
     }
+
+    disp_timecode = av_pause_frame.disp_timecode;
 }
 
 void VideoOutputNull::ProcessFrame(VideoFrame *frame, OSD *osd,

@@ -201,9 +201,6 @@ class SignalMonitor : protected MThread
     bool         eit_scan;
     QString      error;
 
-    MythTimer    m_channelTimer;
-    int          m_channelTimeout;
-
     SignalMonitorValue signalLock;
     SignalMonitorValue signalStrength;
     SignalMonitorValue scriptStatus;

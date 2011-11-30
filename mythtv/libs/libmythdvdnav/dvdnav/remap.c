@@ -26,7 +26,7 @@
 
 #ifndef _MSC_VER
 #include <sys/param.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
 #else
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 255

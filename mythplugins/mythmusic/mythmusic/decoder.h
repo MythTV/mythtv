@@ -100,7 +100,7 @@ class Decoder : public MThread, public MythObservable
     static bool supports(const QString &);
     static void registerFactory(DecoderFactory *);
     static Decoder *create(const QString &, QIODevice *, AudioOutput *,
-                           bool = FALSE);
+                           bool = false);
     static void SetLocationFormatUseTags(void);
 
   protected:

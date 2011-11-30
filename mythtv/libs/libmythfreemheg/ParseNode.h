@@ -29,7 +29,7 @@ class MHGroup;
 
 // Abstract base class for the text and binary parsers.
 class MHParseBase {
-public:
+  public:
     virtual ~MHParseBase() {}
     virtual MHParseNode *Parse() = 0;
 };
@@ -37,11 +37,11 @@ public:
 // Element of the parse tree, basically a piece of the program.
 class MHParseNode  
 {
-public:
+  public:
     enum NodeType { PNTagged, PNBool, PNInt, PNEnum, PNString, PNNull, PNSeq };
-protected:
+  protected:
     MHParseNode(enum NodeType nt): m_nNodeType(nt) {}
-public:
+  public:
     virtual ~MHParseNode() {}
     enum NodeType m_nNodeType;
 
@@ -72,7 +72,7 @@ public:
 // Sequence of parse nodes.
 class MHParseSequence: public MHParseNode, public MHOwnPtrSequence<MHParseNode>
 {
-public:
+  public:
     MHParseSequence(): MHParseNode(PNSeq) {}
     void PrintUnbracketed(int nTabs);
 };
@@ -81,7 +81,7 @@ public:
 // to this class.  We will make derived classes in due course.
 class MHPTagged: public MHParseNode
 {
-public:
+  public:
     MHPTagged(int nTag);
     void AddArg(MHParseNode *pNode);
 
@@ -92,46 +92,46 @@ public:
 // Primitive integer value.
 class MHPInt: public MHParseNode
 {
-public:
+  public:
     MHPInt(int v): MHParseNode(PNInt), m_Value(v) {}
 
-public:
+  public:
     int m_Value;
 };
 
 // Enumerated type - treat much as integer
 class MHPEnum: public MHParseNode
 {
-public:
+  public:
     MHPEnum(int v): MHParseNode(PNEnum), m_Value(v) {}
-public:
+  public:
     int m_Value;
 };
 
 // Primitive boolean value
 class MHPBool: public MHParseNode
 {
-public:
+  public:
     MHPBool(bool v): MHParseNode(PNBool),  m_Value(v) {}
 
-public:
+  public:
     bool m_Value;
 };
 
 // Primitive string value
 class MHPString: public MHParseNode
 {
-public:
+  public:
     MHPString(MHOctetString &pSrc): MHParseNode(PNString) { m_Value.Copy(pSrc); }
 
-public:
+  public:
     MHOctetString m_Value;
 };
 
 // ASN1 NULL value.
 class MHPNull: public MHParseNode
 {
-public:
+  public:
     MHPNull(): MHParseNode(PNNull) {}
 };
 

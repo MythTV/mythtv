@@ -2,6 +2,7 @@
 // Own header
 #include "mythsystem.h"
 #include "system-unix.h"
+#include "util.h"
 
 // compat header
 #include "compat.h"
@@ -76,7 +77,7 @@ void ShutdownMythSystem(void)
 
 MythSystemIOHandler::MythSystemIOHandler(bool read) :
     MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
-    m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
+    m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()), m_maxfd(-1),
     m_read(read)
 {
 }
@@ -100,7 +101,10 @@ void MythSystemIOHandler::run(void)
 
         while( run_system )
         {
-            usleep(10000); // ~100x per second, for ~3MBps throughput
+            struct timespec ts;
+            ts.tv_sec = 0;
+            ts.tv_nsec = 10*1000*1000;  // 10ms
+            nanosleep(&ts, NULL); // ~100x per second, for ~3MBps throughput
             m_pLock.lock();
             if( m_pMap.isEmpty() )
             {
@@ -261,7 +265,10 @@ void MythSystemManager::run(void)
     // exit during shutdown.
     while( run_system )
     {
-        usleep(100000); // sleep 100ms
+        struct timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 100 * 1000 * 1000; // 100ms
+        nanosleep(&ts, NULL); // sleep 100ms
 
         // check for any running processes
         m_mapLock.lock();
@@ -450,7 +457,11 @@ void MythSystemSignalManager::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
     while( run_system )
     {
-        usleep(50000); // sleep 50ms
+        struct timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 50 * 1000 * 1000; // 50ms
+        nanosleep(&ts, NULL); // sleep 50ms
+
         while( run_system )
         {
             // handle cleanup and signalling for closed processes
@@ -652,9 +663,9 @@ void MythSystemUnix::Fork(time_t timeout)
     int i;
     QStringList::const_iterator it;
 
-    for( i = 0, it = args.constBegin(); it != args.constEnd(); it++, i++ )
+    for (i = 0, it = args.constBegin(); it != args.constEnd(); ++it)
     {
-        cmdargs[i] = strdup( it->toUtf8().constData() );
+        cmdargs[i++] = strdup(it->toUtf8().constData());
     }
     cmdargs[i] = NULL;
 
@@ -665,6 +676,9 @@ void MythSystemUnix::Fork(time_t timeout)
 
     // check before fork to avoid QString use in child
     bool setpgidsetting = GetSetting("SetPGID");
+
+    int niceval = m_parent->GetNice();
+    int ioprioval = m_parent->GetIOPrio();
 
     /* Do this before forking in case the child miserably fails */
     m_timeout = timeout;
@@ -790,6 +804,12 @@ void MythSystemUnix::Fork(time_t timeout)
                  << "setpgid() failed: "
                  << strerror(errno) << endl;
         }
+
+        /* Set nice and ioprio values if non-default */
+        if (niceval)
+            myth_nice(niceval);
+        if (ioprioval)
+            myth_ioprio(ioprioval);
 
         /* run command */
         if( execv(command, cmdargs) < 0 )

@@ -168,7 +168,7 @@ void VideoSelector::selectAll()
 
     VideoInfo *v;
     vector<VideoInfo *>::iterator i = m_videoList->begin();
-    for ( ; i != m_videoList->end(); i++)
+    for ( ; i != m_videoList->end(); ++i)
     {
         v = *i;
         m_selectedList.append(v);
@@ -350,7 +350,7 @@ void VideoSelector::updateVideoList(void)
     {
         VideoInfo *v;
         vector<VideoInfo *>::iterator i = m_videoList->begin();
-        for ( ; i != m_videoList->end(); i++)
+        for ( ; i != m_videoList->end(); ++i)
         {
             v = *i;
 
@@ -469,7 +469,7 @@ void VideoSelector::getVideoList(void)
     if (m_videoList && !m_videoList->empty())
     {
         vector<VideoInfo *>::iterator i = m_videoList->begin();
-        for ( ; i != m_videoList->end(); i++)
+        for ( ; i != m_videoList->end(); ++i)
         {
             v = *i;
 

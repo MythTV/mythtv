@@ -31,7 +31,8 @@
 #define LOC QString("ASIRec(%1): ").arg(tvrec->GetCaptureCardNum())
 
 ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
-    DTVRecorder(rec), m_channel(channel), m_stream_handler(NULL)
+    DTVRecorder(rec), m_channel(channel), m_stream_handler(NULL),
+    m_record_mpts(false)
 {
     SetStreamData(new MPEGStreamData(-1,false));
     if (channel->GetProgramNumber() < 0 || !channel->GetMinorChannel())

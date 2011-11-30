@@ -31,7 +31,7 @@ class MythNewsConfigPriv
 
 // ---------------------------------------------------
 
-MythNewsConfig::MythNewsConfig(MythScreenStack *parent, const QString name)
+MythNewsConfig::MythNewsConfig(MythScreenStack *parent, const QString &name)
     : MythScreenType(parent, name),
       m_lock(QMutex::Recursive),
       m_priv(new MythNewsConfigPriv), m_categoriesList(NULL),
@@ -82,7 +82,7 @@ void MythNewsConfig::populateSites(void)
     m_priv->categoryList.clear();
 
     QDomNodeList catList =
-        domDoc.elementsByTagName(QString::fromLatin1("category"));
+        domDoc.elementsByTagName(QString::fromUtf8("category"));
 
     QDomNode catNode;
     QDomNode siteNode;
@@ -126,7 +126,7 @@ bool MythNewsConfig::Create(void)
     if (!foundtheme)
         return false;
 
-    bool err = false; 
+    bool err = false;
     UIUtilE::Assign(this, m_categoriesList, "category", &err);
     UIUtilE::Assign(this, m_siteList, "sites", &err);
     UIUtilW::Assign(this, m_helpText, "help", &err);

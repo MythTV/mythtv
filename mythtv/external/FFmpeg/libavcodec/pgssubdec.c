@@ -47,6 +47,7 @@ typedef struct PGSSubPresentation {
     int y;
     int id_number;
     int object_number;
+    int object_forced;
 } PGSSubPresentation;
 
 typedef struct PGSSubPicture {
@@ -305,12 +306,16 @@ static void parse_presentation_segment(AVCodecContext *avctx,
         return;
 
     /*
-     * Skip 4 bytes of unknown:
+     * Skip 3 bytes of unknown:
      *     object_id_ref (2 bytes),
      *     window_id_ref,
+     */
+    buf += 3;
+
+    /*
      *     composition_flag (0x80 - object cropped, 0x40 - object forced)
      */
-    buf += 4;
+    ctx->presentation.object_forced = (bytestream_get_byte(&buf) & 0x40) >> 6;
 
     x = bytestream_get_be16(&buf);
     y = bytestream_get_be16(&buf);
@@ -362,6 +367,7 @@ static int display_end_segment(AVCodecContext *avctx, void *data,
     // Note that this may be wrong for more complex subtitles.
     if (!ctx->presentation.object_number)
         return 1;
+    sub->forced             = ctx->presentation.object_forced;
     sub->start_display_time = 0;
     sub->end_display_time   = 20000;
     sub->format             = 0;

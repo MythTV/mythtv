@@ -37,19 +37,17 @@ class MythUIButtonListItem;
 
 class FileSelector : public MythScreenType
 {
-
-  Q_OBJECT
+    Q_OBJECT
 
   public:
+    FileSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList,
+                 FSTYPE type, const QString &startDir, const QString &filemask);
+    ~FileSelector();
 
-      FileSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList,
-                   FSTYPE type, const QString &startDir, const QString &filemask);
-      ~FileSelector();
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *e);
 
-      bool Create(void);
-      bool keyPressEvent(QKeyEvent *e);
-
-      QString getSelected(void);
+    QString getSelected(void);
 
   signals:
     void haveResult(bool ok);            // used in FSTYPE_FILELIST mode

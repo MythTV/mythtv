@@ -4,12 +4,15 @@
 #include "atsctables.h"
 #include "dvbtables.h"
 
-ScanStreamData::ScanStreamData()
-    : MPEGStreamData(-1, true),
-      ATSCStreamData(-1,-1, true),
-      DVBStreamData(0, 0, -1, true),
-      dvb_uk_freesat_si(false)
+ScanStreamData::ScanStreamData(bool no_default_pid) :
+    MPEGStreamData(-1, true),
+    ATSCStreamData(-1,-1, true),
+    DVBStreamData(0, 0, -1, true),
+    dvb_uk_freesat_si(false),
+    m_no_default_pid(no_default_pid)
 {
+    if (m_no_default_pid)
+        _pids_listening.clear();
 }
 
 ScanStreamData::~ScanStreamData() { ; }
@@ -43,6 +46,12 @@ void ScanStreamData::Reset(void)
     MPEGStreamData::Reset(-1);
     ATSCStreamData::Reset(-1,-1);
     DVBStreamData::Reset(0,0,-1);
+
+    if (m_no_default_pid)
+    {
+        _pids_listening.clear();
+        return;
+    }
 
     AddListeningPID(MPEG_PAT_PID);
     AddListeningPID(ATSC_PSIP_PID);
@@ -80,8 +89,7 @@ QString ScanStreamData::GetSIStandard(QString guess) const
         for (uint i = 0; i < descs.size(); i++)
         {
             RegistrationDescriptor reg(descs[i]);
-            if (reg.FormatIdentifierString() == "CUEI" ||
-                reg.FormatIdentifierString() == "SCTE")
+            if (reg.FormatIdentifierString() == "SCTE")
                 return "opencable";
         }
     }

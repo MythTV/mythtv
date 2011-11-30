@@ -317,13 +317,16 @@ void Playlist::moveTrackUpDown(bool flag, Track *the_track)
     changed = true; //  This playlist is now different than Database
 }
 
-Playlist::Playlist(AllMusic *all_music_ptr)
+Playlist::Playlist(AllMusic *all_music_ptr) :
+    playlistid(0),
+    name(QObject::tr("oops")),
+    all_available_music(all_music_ptr),
+    parent(NULL),
+    changed(false),
+    progress(NULL),
+    proc(NULL),
+    procExitVal(0)
 {
-    //  fallback values
-    playlistid = 0;
-    name = QObject::tr("oops");
-    all_available_music = all_music_ptr;
-    changed = false;
 }
 
 void Playlist::putYourselfOnTheListView(UIListGenericTree *a_listviewitem)
@@ -514,9 +517,9 @@ void Playlist::fillSongsFromSonglist(bool filter)
 
     QStringList list = raw_songlist.split(",", QString::SkipEmptyParts);
     QStringList::iterator it = list.begin();
-    for (; it != list.end(); it++)
+    for (; it != list.end(); ++it)
     {
-        an_int = QString(*it).toInt();
+        an_int = (*it).toInt();
         if (an_int != 0)
         {
             if (filter)
@@ -634,10 +637,10 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
             raw_songlist.clear();
             bool bFound = false;
 
-            for (; it != list.end(); it++)
+            for (; it != list.end(); ++it)
             {
-                int an_int = QString(*it).toInt();
-                raw_songlist += "," + QString(*it);
+                int an_int = (*it).toInt();
+                raw_songlist += "," + *it;
                 if (!bFound && an_int == currentTrackID)
                 {
                     bFound = true;
@@ -796,9 +799,9 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
     int length = 0, songcount = 0, playtime = 0, an_int;
     QStringList list = raw_songlist.split(",", QString::SkipEmptyParts);
     QStringList::iterator it = list.begin();
-    for (; it != list.end(); it++)
+    for (; it != list.end(); ++it)
     {
-        an_int = QString(*it).toInt();
+        an_int = (*it).toInt();
         if (an_int != 0)
         {
             songcount++;
@@ -880,10 +883,10 @@ QString Playlist::removeDuplicateTracks(const QString &new_songlist)
     QStringList::iterator it = newList.begin();
     QString songlist;
 
-    for (; it != newList.end(); it++)
+    for (; it != newList.end(); ++it)
     {
-        if (curList.find(QString(*it)) == curList.end())
-            songlist += "," + QString(*it);
+        if (curList.find(*it) == curList.end())
+            songlist += "," + *it;
     }
     songlist.remove(0, 1);
     return songlist;
@@ -960,7 +963,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
     }
     // populate the sort id into the album map
     uint32_t album_count = 1;
-    for (Ialbum = album_map.begin(); Ialbum != album_map.end(); Ialbum++)
+    for (Ialbum = album_map.begin(); Ialbum != album_map.end(); ++Ialbum)
     {
         Ialbum->second = album_count;
         album_count++;
@@ -968,7 +971,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
 
     // populate the sort id into the artist map
     uint32_t count = 1;
-    for (Iartist = artist_map.begin(); Iartist != artist_map.end(); Iartist++)
+    for (Iartist = artist_map.begin(); Iartist != artist_map.end(); ++Iartist)
     {
         Iartist->second = count;
         count++;
@@ -1005,7 +1008,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                     ++a_counter;
                     added_node->setAttribute(0, 1);
                     added_node->setAttribute(1, a_counter); //  regular order
-                    added_node->setAttribute(2, rand()); //  random order
+                    added_node->setAttribute(2, random()); //  random order
 
                     //
                     //  Compute "intelligent" weighting
@@ -1032,7 +1035,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                     double rating_value =  (RatingWeight * ratingValue +
                                             PlayCountWeight * playcountValue +
                                             LastPlayWeight * lastplayValue +
-                                            RandomWeight * (double)rand() /
+                                            RandomWeight * (double)random() /
                                             (RAND_MAX + 1.0));
                     uint32_t integer_rating = (int) (4000001 -
                                                      rating_value * 10000);
@@ -1107,8 +1110,8 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                 ++a_counter;
                 added_node->setAttribute(0, 1);
                 added_node->setAttribute(1, a_counter); //  regular order
-                added_node->setAttribute(2, rand()); //  random order
-                added_node->setAttribute(3, rand()); //  "intelligent" order
+                added_node->setAttribute(2, random()); //  random order
+                added_node->setAttribute(3, random()); //  "intelligent" order
             }
         }
     }

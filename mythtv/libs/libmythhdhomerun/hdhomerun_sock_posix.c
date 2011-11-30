@@ -236,8 +236,11 @@ uint32_t hdhomerun_sock_getaddrinfo_addr(hdhomerun_sock_t sock, const char *name
 	return addr;
 }
 
-bool_t hdhomerun_sock_bind(hdhomerun_sock_t sock, uint32_t local_addr, uint16_t local_port)
+bool_t hdhomerun_sock_bind(hdhomerun_sock_t sock, uint32_t local_addr, uint16_t local_port, bool_t allow_reuse)
 {
+	int sock_opt = allow_reuse;
+	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *)&sock_opt, sizeof(sock_opt));
+
 	struct sockaddr_in sock_addr;
 	memset(&sock_addr, 0, sizeof(sock_addr));
 	sock_addr.sin_family = AF_INET;

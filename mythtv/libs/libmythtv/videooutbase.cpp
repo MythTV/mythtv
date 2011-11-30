@@ -187,8 +187,8 @@ VideoOutput *VideoOutput::Create(
 #endif // Q_OS_MACX
 
 #ifdef USING_OPENGL_VIDEO
-        if (renderer == "opengl")
-            vo = new VideoOutputOpenGL();
+        if (renderer.contains("opengl"))
+            vo = new VideoOutputOpenGL(renderer);
 #endif // USING_OPENGL_VIDEO
 
 #ifdef USING_VDPAU
@@ -971,17 +971,17 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
         return;
 
     const float video_aspect           = window.GetVideoAspect();
-    const QRect display_video_rect     = window.GetDisplayVideoRect();
-    const QRect video_rect             = window.GetVideoRect();
-    const QRect display_visible_rect   = window.GetDisplayVisibleRect();
-    const QSize video_disp_dim         = window.GetVideoDispDim();
+//     const QRect display_video_rect     = window.GetDisplayVideoRect();
+//     const QRect video_rect             = window.GetVideoRect();
+//     const QRect display_visible_rect   = window.GetDisplayVisibleRect();
+//     const QSize video_disp_dim         = window.GetVideoDispDim();
 
     int pipw, piph;
     VideoFrame *pipimage       = pipplayer->GetCurrentFrame(pipw, piph);
     const bool  pipActive      = pipplayer->IsPIPActive();
     const bool  pipVisible     = pipplayer->IsPIPVisible();
     const float pipVideoAspect = pipplayer->GetVideoAspect();
-    const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
+//     const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
 
     // If PiP is not initialized to values we like, silently ignore the frame.
     if ((video_aspect <= 0) || (pipVideoAspect <= 0) ||
@@ -1213,6 +1213,15 @@ void VideoOutput::ShutdownVideoResize(void)
     vsz_enabled      = false;
 }
 
+void VideoOutput::ClearDummyFrame(VideoFrame *frame)
+{
+    // used by render devices to ignore frame rendering
+    if (frame)
+        frame->dummy = 1;
+    // will only clear frame in main memory
+    clear(frame);
+}
+
 void VideoOutput::SetVideoResize(const QRect &videoRect)
 {
     if (!videoRect.isValid()    ||
@@ -1342,9 +1351,9 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     return show;
 }
 
-bool VideoOutput::ToggleVisualisation(AudioPlayer *audio)
+bool VideoOutput::EnableVisualisation(AudioPlayer *audio, bool enable)
 {
-    if (m_visual)
+    if (!enable)
     {
         DestroyVisualisation();
         return false;
@@ -1384,6 +1393,7 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
         return;
 
     to->frameNumber = from->frameNumber;
+    to->disp_timecode = from->disp_timecode;
 
     // guaranteed to be correct sizes.
     if (from->size == to->size)
@@ -1729,4 +1739,22 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
             .arg(window.GetDisplayDim().width())
             .arg(window.GetDisplayDim().height())
             .arg(window.GetDisplayAspect()));
+}
+
+int VideoOutput::CalcHueBase(const QString &adaptor_name)
+{
+    // XVideo adjustments
+    if ((adaptor_name == "ATI Radeon Video Overlay") ||
+        (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
+        (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */) ||
+        (adaptor_name == "SIS 300/315/330 series Video Overlay"))
+    {
+        return 50;
+    }
+
+    // VAAPI
+    if (adaptor_name.toLower().contains("xvba"))
+        return 50;
+
+    return 0; //< nVidia normal
 }

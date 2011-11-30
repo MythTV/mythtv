@@ -338,7 +338,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
     if (token.isEmpty())
     {
         token = QString("%1:%2")
-            .arg(programInfo.MakeUniqueKey()).arg(rand());
+            .arg(programInfo.MakeUniqueKey()).arg(random());
     }
     strlist.push_back(token);
     programInfo.ToStringList(strlist);

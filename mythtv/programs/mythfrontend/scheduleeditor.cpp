@@ -49,6 +49,7 @@ static QString fs2(QT_TRANSLATE_NOOP("SchedFilterEditor", "First showing"));
 static QString fs3(QT_TRANSLATE_NOOP("SchedFilterEditor", "Primetime"));
 static QString fs4(QT_TRANSLATE_NOOP("SchedFilterEditor", "Commercial free"));
 static QString fs5(QT_TRANSLATE_NOOP("SchedFilterEditor", "High definition"));
+static QString fs6(QT_TRANSLATE_NOOP("SchedFilterEditor", "This Episode"));
 
 void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 {
@@ -621,23 +622,11 @@ void SchedOptEditor::Load()
                                 "only"),
                              ENUM_TO_QVARIANT(kDupsInOldRecorded));
 
-    if (!m_filtersButton)
+    if (gCoreContext->GetNumSetting("HaveRepeats", 0))
     {
         new MythUIButtonListItem(m_dupscopeList,
-                                tr("Exclude unidentified episodes"),
-                                ENUM_TO_QVARIANT(kDupsExGeneric | kDupsInAll));
-        if (gCoreContext->GetNumSetting("HaveRepeats", 0))
-        {
-            new MythUIButtonListItem(m_dupscopeList,
-                                    tr("Exclude old episodes"),
-                                    ENUM_TO_QVARIANT(kDupsExRepeats | kDupsInAll));
-            new MythUIButtonListItem(m_dupscopeList,
-                                    tr("Record new episodes only"),
-                                    ENUM_TO_QVARIANT(kDupsNewEpi | kDupsInAll));
-            new MythUIButtonListItem(m_dupscopeList,
-                                    tr("Record new episode first showings"),
-                                    ENUM_TO_QVARIANT(kDupsFirstNew | kDupsInAll));
-        }
+                                 tr("Record new episodes only"),
+                                 ENUM_TO_QVARIANT(kDupsNewEpi | kDupsInAll));
     }
 
     m_dupscopeList->SetValueByData(ENUM_TO_QVARIANT(m_recordingRule->m_dupIn));
@@ -781,14 +770,9 @@ void SchedFilterEditor::Load()
             button = new MythUIButtonListItem(m_filtersList, description,
                                               filterid);
             button->setCheckable(true);
-            if (m_recordingRule->IsLoaded())
-                button->setChecked(m_recordingRule->m_filter & (1 << filterid) ?
-                                   MythUIButtonListItem::FullChecked :
-                                   MythUIButtonListItem::NotChecked);
-            else
-                button->setChecked(filter_default ?
-                                   MythUIButtonListItem::FullChecked :
-                                   MythUIButtonListItem::NotChecked);
+            button->setChecked(m_recordingRule->m_filter & (1 << filterid) ?
+                               MythUIButtonListItem::FullChecked :
+                               MythUIButtonListItem::NotChecked);
         }
     }
 

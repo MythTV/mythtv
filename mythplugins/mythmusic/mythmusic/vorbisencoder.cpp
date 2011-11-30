@@ -34,15 +34,14 @@ static int write_page(ogg_page *page, FILE *fp)
 }
 
 VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
-                             Metadata *metadata)
-              : Encoder(outfile, qualitylevel, metadata), m_metadata(metadata)
+                             Metadata *metadata) :
+    Encoder(outfile, qualitylevel, metadata),
+    packetsdone(0),
+    eos(0),
+    bytes_written(0L),
+    m_metadata(metadata)
 {
-    int result;
-
     vorbis_comment_init(&vc);
-
-    packetsdone = 0;
-    bytes_written = 0;
 
     vorbis_info_init(&vi);
 
@@ -66,9 +65,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
     vorbis_analysis_init(&vd, &vi);
     vorbis_block_init(&vd, &vb);
 
-    srand(time(NULL));
-    
-    ogg_stream_init(&os, rand());
+    ogg_stream_init(&os, random());
 
     ogg_packet header_main;
     ogg_packet header_comments;
@@ -81,6 +78,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
     ogg_stream_packetin(&os, &header_comments);
     ogg_stream_packetin(&os, &header_codebooks);
 
+    int result;
     while ((result = ogg_stream_flush(&os, &og)))
     {
         if (!result || !m_out)

@@ -6,7 +6,8 @@ enum TreeNodeType {
     kSubFolder = -1,
     kUpFolder = -2,
     kRootNode = -3,
-    kNoFilesFound = -4
+    kNoFilesFound = -4,
+    kDynamicSubFolder = -5,
 };
 
 // Tree node attribute index
@@ -32,10 +33,11 @@ class VideoList
 
     void refreshList(bool filebrowser, const ParentalLevel &parental_level,
                      bool flatlist, int group_type);
+    bool refreshNode(MythGenericTree *node);
 
     unsigned int count() const;
 
-    const VideoFilterSettings &getCurrentVideoFilter();
+    const VideoFilterSettings &getCurrentVideoFilter() const;
     void setCurrentVideoFilter(const VideoFilterSettings &filter);
 
     // returns the number of videos matched by this filter

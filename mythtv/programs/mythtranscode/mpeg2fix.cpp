@@ -274,28 +274,26 @@ MPEG2fixup::~MPEG2fixup()
     mpeg2_close(header_decoder);
     mpeg2_close(img_decoder);
 
-
     if (inputFC)
         av_close_input_file(inputFC);
 
     MPEG2frame *tmpFrame;
-    int max_frames = 0;
 
-    max_frames += vFrame.count();
     while (vFrame.count())
     {
         tmpFrame = vFrame.takeFirst();
         delete tmpFrame;
     }
+
     while (vSecondary.count())
     {
         tmpFrame = vSecondary.takeFirst();
         delete tmpFrame;
     }
+
     for (FrameMap::Iterator it = aFrame.begin(); it != aFrame.end(); it++)
     {
         FrameList *af = (*it);
-        max_frames += af->count();
         while (af->count())
         {
             tmpFrame = af->takeFirst();
@@ -303,7 +301,7 @@ MPEG2fixup::~MPEG2fixup()
         }
         delete af;
     }
-    max_frames += framePool.count();
+
     while (framePool.count())
         delete framePool.dequeue();
 }

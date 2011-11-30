@@ -1972,7 +1972,7 @@ void TVRec::TeardownSignalMonitor()
     {
         pid_cache_t pid_cache;
         GetPidsToCache(dtvMon, pid_cache);
-        if (pid_cache.size())
+        if (!pid_cache.empty())
             dtvChan->SaveCachedPids(pid_cache);
     }
 
@@ -2257,7 +2257,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     is_complete_valid_channel_on_rec = 0;
     needed_spacer = "";
 
-    if (fchanid.size() == 0)
+    if (fchanid.empty())
         return false;
 
     if (fchanid.size() == 1) // Unique channel...

@@ -49,6 +49,11 @@ extern "C" {
 #   include "asichannel.h"
 #endif
 
+#ifdef USING_CETON
+#   include "cetonsignalmonitor.h"
+#   include "cetonchannel.h"
+#endif
+
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
     QString("SM(%1)::%2: %3").arg(channel->GetDevice()).arg(FUNC).arg(MSG))
@@ -117,6 +122,15 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     }
 #endif
 
+#ifdef USING_CETON
+    if (cardtype.toUpper() == "CETON")
+    {
+        CetonChannel *cetonchan = dynamic_cast<CetonChannel*>(channel);
+        if (cetonchan)
+            signalMonitor = new CetonSignalMonitor(db_cardnum, cetonchan);
+    }
+#endif
+
 #ifdef USING_IPTV
     if (cardtype.toUpper() == "FREEBOX")
     {
@@ -175,11 +189,11 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
                              uint64_t wait_for_mask)
     : MThread("SignalMonitor"),
-      channel(_channel),
+      channel(_channel),               pParent(NULL),
       capturecardnum(_capturecardnum), flags(wait_for_mask),
       update_rate(25),                 minimum_update_rate(5),
       update_done(false),              notify_frontend(true),
-      eit_scan(false),
+      tablemon(false),                 eit_scan(false),                
       signalLock    (QObject::tr("Signal Lock"),  "slock",
                      1, true, 0,   1, 0),
       signalStrength(QObject::tr("Signal Power"), "signal",

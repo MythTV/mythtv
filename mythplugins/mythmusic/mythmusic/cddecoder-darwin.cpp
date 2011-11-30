@@ -21,11 +21,26 @@ using namespace std;
 #include <httpcomms.h>
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
-                     AudioOutput *o)
-         : Decoder(d, i, o)
+                     AudioOutput *o) :
+    Decoder(d, i, o),
+    inited(false),   user_stop(false),
+    devicename(""),
+    m_diskID(0),     m_firstTrack(0),
+    m_lastTrack(0),  m_leadout(0),
+    m_lengthInSecs(0.0),
+    stat(0),         output_buf(NULL),
+    output_at(0),    bks(0),
+    bksFrames(0),    decodeBytes(0),
+    finish(false),
+    freq(0),         bitrate(0),
+    chan(0),
+    totalTime(0.0),  seekTime(-1.0),
+    settracknum(-1), tracknum(0),
+    start(0),        end(0),
+    curpos(0)
 {
-    filename = file;
-    inited = FALSE;
+    setObjectName("CdDecoder");
+    setFilename(file);
 }
 
 CdDecoder::~CdDecoder(void)
@@ -206,7 +221,7 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
     QString cddb = HttpComms::getHttp(URL2);
 
 #if 0
-    LOG(VB_MEDIA, LOG_INFO, "CDDB lookup: " + URL);
+    LOG(VB_MEDIA, LOG_INFO, "CDDB lookup: " + URL2);
     LOG(VB_MEDIA, LOG_INFO, "...returned: " + cddb);
 #endif
     //
@@ -219,12 +234,24 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
     // We should check for errors here, and possibly do a CDDB lookup
     // (telnet 8880) if it failed, but Nigel is feeling lazy.
 
-    if (stat == 211)  // Multiple matches
+    if (stat == 210 || stat == 211)  // Multiple matches
     {
+        // e.g. 210 Found exact matches, list follows (until terminating `.')
+        //      folk 9c09590b Michael W Smith / Stand
+        //      misc 9c09590b Michael W. Smith / Stand
+        //      rock 9c09590b Michael W. Smith / Stand
+        //      classical 9c09590b Michael W. Smith / Stand
+        //      .
         // TODO
         // Parse disks, put up dialog box, select disk, prune cddb to selected
         LOG(VB_MEDIA, LOG_INFO,
             "Multiple CDDB matches. Please implement this code");
+
+        // For now, we just choose the first match.
+        //int EOL = cddb.indexOf('\n');
+        cddb.remove(0, cddb.indexOf('\n'));
+        LOG(VB_MEDIA, LOG_INFO, "String now: " + cddb);
+        stat = 200;
     }
 
     if (stat == 200)  // One unique match

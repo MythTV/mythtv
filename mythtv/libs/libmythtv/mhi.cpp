@@ -56,7 +56,7 @@ MHIContext::MHIContext(InteractiveTV *parent)
       m_updated(false),
       m_displayWidth(StdDisplayWidth), m_displayHeight(StdDisplayHeight),
       m_face_loaded(false), m_engineThread(NULL), m_currentChannel(-1),
-      m_currentStream(-1),  m_isLive(false),      m_currentCard(0),
+      m_currentStream(-1),  m_isLive(false),      m_currentSource(-1),
       m_audioTag(-1),       m_videoTag(-1),
       m_lastNbiVersion(NBI_VERSION_UNSET),
       m_videoRect(0, 0, StdDisplayWidth, StdDisplayHeight),
@@ -156,14 +156,14 @@ void MHIContext::StopEngine(void)
 
 
 // Start or restart the MHEG engine.
-void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
+void MHIContext::Restart(uint chanid, uint sourceid, bool isLive)
 {
     int tuneinfo = m_tuneinfo.isEmpty() ? 0 : m_tuneinfo.takeFirst();
 
-    LOG(VB_MHEG, LOG_INFO, QString("[mhi] Restart ch=%1 card=%2 live=%3 tuneinfo=0x%4")
-        .arg((int)chanid).arg((int)cardid).arg(isLive).arg(tuneinfo,0,16));
+    LOG(VB_MHEG, LOG_INFO, QString("[mhi] Restart ch=%1 source=%2 live=%3 tuneinfo=0x%4")
+        .arg((int)chanid).arg((int)sourceid).arg(isLive).arg(tuneinfo,0,16));
 
-    m_currentCard = cardid;
+    m_currentSource = sourceid;
     m_currentStream = (chanid) ? (int)chanid : -1;
     if (!(tuneinfo & kTuneKeepChnl))
         m_currentChannel = m_currentStream;
@@ -650,18 +650,16 @@ int MHIContext::GetChannelIndex(const QString &str)
         int serviceID = list[2].toInt(&ok, 16);
         if (!ok)
             break;
-        // We only return channels that match the current capture card.
+        // We only return channels that match the current capture source.
         if (list[1].isEmpty()) // TransportID is not specified
         {
             query.prepare(
                 "SELECT chanid "
-                "FROM channel, dtv_multiplex, cardinput, capturecard "
+                "FROM channel, dtv_multiplex "
                 "WHERE networkid        = :NETID AND"
                 "      channel.mplexid  = dtv_multiplex.mplexid AND "
                 "      serviceid        = :SERVICEID AND "
-                "      channel.sourceid = cardinput.sourceid AND "
-                "      cardinput.cardid = capturecard.cardid AND "
-                "      cardinput.cardid = :CARDID");
+                "      channel.sourceid = :SOURCEID");
         }
         else
         {
@@ -670,19 +668,17 @@ int MHIContext::GetChannelIndex(const QString &str)
                 break;
             query.prepare(
                 "SELECT chanid "
-                "FROM channel, dtv_multiplex, cardinput, capturecard "
+                "FROM channel, dtv_multiplex "
                 "WHERE networkid        = :NETID AND"
                 "      channel.mplexid  = dtv_multiplex.mplexid AND "
                 "      serviceid        = :SERVICEID AND "
                 "      transportid      = :TRANSID AND "
-                "      channel.sourceid = cardinput.sourceid AND "
-                "      cardinput.cardid = capturecard.cardid AND "
-                "      cardinput.cardid = :CARDID");
+                "      channel.sourceid = :SOURCEID");
             query.bindValue(":TRANSID", transportID);
         }
         query.bindValue(":NETID", netID);
         query.bindValue(":SERVICEID", serviceID);
-        query.bindValue(":CARDID", m_currentCard);
+        query.bindValue(":SOURCEID", m_currentSource);
         if (query.exec() && query.isActive() && query.next())
             nResult = query.value(0).toInt();
     }
@@ -695,13 +691,11 @@ int MHIContext::GetChannelIndex(const QString &str)
             break;
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT chanid "
-                      "FROM channel, cardinput, capturecard "
+                      "FROM channel "
                       "WHERE channum = :CHAN AND "
-                      "      channel.sourceid = cardinput.sourceid AND "
-                      "      cardinput.cardid = capturecard.cardid AND "
-                      "      cardinput.cardid = :CARDID");
+                      "      channel.sourceid = :SOURCEID");
         query.bindValue(":CHAN", channelNo);
-        query.bindValue(":CARDID", m_currentCard);
+        query.bindValue(":SOURCEID", m_currentSource);
         if (query.exec() && query.isActive() && query.next())
             nResult = query.value(0).toInt();
     }

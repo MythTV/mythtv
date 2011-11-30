@@ -252,6 +252,8 @@ void MythRenderOpenGL2::InitProcs(void)
 {
     MythRenderOpenGL::InitProcs();
 
+    // GLSL version
+    m_GLSLVersion = "#version 110\n";
     m_qualifiers = QString();
 
     m_glCreateShader = (MYTH_GLCREATESHADERPROC)
@@ -496,12 +498,21 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
                                           const QPen &linePen, int alpha)
 {
     int rad = cornerRadius;
+    if ((area.width() / 2) < rad)
+        rad = area.width() / 2;
+
+    if ((area.height() / 2) < rad)
+        rad = area.height() / 2;
     int dia = rad * 2;
 
-    QRect tl(area.left(), area.top(), rad, rad);
-    QRect tr(area.left() + area.width() - rad, area.top(), rad, rad);
-    QRect bl(area.left(), area.top() + area.height() - rad, rad, rad);
-    QRect br(area.left() + area.width() - rad, area.top() + area.height() - rad, rad, rad);
+    int lineWidth = linePen.width();
+    QRect r(area.left() + lineWidth, area.top() + lineWidth,
+            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
+
+    QRect tl(r.left(),  r.top(), rad, rad);
+    QRect tr(r.left() + r.width() - rad, r.top(), rad, rad);
+    QRect bl(r.left(),  r.top() + r.height() - rad, rad, rad);
+    QRect br(r.left() + r.width() - rad, r.top() + r.height() - rad, rad, rad);
 
     SetBlend(true);
     DisableTextures();
@@ -569,9 +580,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Fill the remaining areas
-        QRect main(area.left() + rad, area.top(), area.width() - dia, area.height());
-        QRect left(area.left(), area.top() + rad, rad, area.height() - dia);
-        QRect right(area.left() + area.width() - rad, area.top() + rad, rad, area.height() - dia);
+        QRect main(r.left() + rad, r.top(), r.width() - dia, r.height());
+        QRect left(r.left(), r.top() + rad, rad, r.height() - dia);
+        QRect right(r.left() + r.width() - rad, r.top() + rad, rad, r.height() - dia);
 
         EnableShaderObject(fill);
         SetShaderParams(fill, &m_projection[0][0], "u_projection");
@@ -609,8 +620,8 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
                           (linePen.color().alpha() / 255.0) * (alpha / 255.0));
 
         // Set the radius and width
-        m_parameters[0][2] = rad - linePen.width() / 2.0 + 0.5;
-        m_parameters[0][3] = linePen.width() / 2.0 + 0.25;
+        m_parameters[0][2] = rad - lineWidth / 2.0 + 0.5;
+        m_parameters[0][3] = lineWidth / 2.0 + 0.25;
 
         // Enable the edge shader
         SetShaderParams(edge, &m_projection[0][0], "u_projection");
@@ -657,12 +668,12 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         // Vertical lines
         SetShaderParams(vline, &m_projection[0][0], "u_projection");
-        m_parameters[0][1] = linePen.width() / 2.0;
-        QRect vl(area.left(), area.top() + rad,
-                 linePen.width(), area.height() - dia);
+        m_parameters[0][1] = lineWidth / 2.0;
+        QRect vl(r.left(), r.top() + rad,
+                 lineWidth, r.height() - dia);
 
         // Draw the left line segment
-        m_parameters[0][0] = vl.left() + linePen.width();
+        m_parameters[0][0] = vl.left() + lineWidth;
         SetShaderParams(vline, &m_parameters[0][0], "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, vl);
         m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
@@ -671,7 +682,7 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the right line segment
-        vl.translate(area.width() - linePen.width(), 0);
+        vl.translate(r.width() - lineWidth, 0);
         m_parameters[0][0] = vl.left();
         SetShaderParams(vline, &m_parameters[0][0], "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, vl);
@@ -682,11 +693,11 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         // Horizontal lines
         SetShaderParams(hline, &m_projection[0][0], "u_projection");
-        QRect hl(area.left() + rad, area.top(),
-                 area.width() - dia, linePen.width());
+        QRect hl(r.left() + rad, r.top(),
+                 r.width() - dia, lineWidth);
 
         // Draw the top line segment
-        m_parameters[0][0] = hl.top() + linePen.width();
+        m_parameters[0][0] = hl.top() + lineWidth;
         SetShaderParams(hline, &m_parameters[0][0], "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, hl);
         m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
@@ -695,7 +706,7 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom line segment
-        hl.translate(0, area.height() - linePen.width());
+        hl.translate(0, r.height() - lineWidth);
         m_parameters[0][0] = hl.top();
         SetShaderParams(hline, &m_parameters[0][0], "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, hl);
@@ -804,7 +815,6 @@ bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
 
 void MythRenderOpenGL2::OptimiseShaderSource(QString &source)
 {
-    QString version = "#version 100\n";
     QString extensions = "";
     QString sampler = "sampler2D";
     QString texture = "texture2D";
@@ -818,7 +828,7 @@ void MythRenderOpenGL2::OptimiseShaderSource(QString &source)
 
     source.replace("GLSL_SAMPLER", sampler);
     source.replace("GLSL_TEXTURE", texture);
-    source.replace("GLSL_DEFINES", version + extensions + m_qualifiers);
+    source.replace("GLSL_DEFINES", m_GLSLVersion + extensions + m_qualifiers);
 
     LOG(VB_GENERAL, LOG_DEBUG, "\n" + source);
 }

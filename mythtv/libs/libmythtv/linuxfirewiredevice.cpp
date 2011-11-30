@@ -116,7 +116,7 @@ static void remove_handle(raw1394handle_t handle)
 const uint LinuxFirewireDevice::kBroadcastChannel    = 63;
 const uint LinuxFirewireDevice::kConnectionP2P       = 0;
 const uint LinuxFirewireDevice::kConnectionBroadcast = 1;
-const uint LinuxFirewireDevice::kMaxBufferedPackets  = 2000;
+const uint LinuxFirewireDevice::kMaxBufferedPackets  = 4 * 1024 * 1024 / 188;
 
 // callback function for libiec61883
 int linux_firewire_device_tspacket_handler(

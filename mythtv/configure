@@ -105,9 +105,13 @@ Advanced options (experts only):
   --enable-valgrind        disables timeouts for valgrind memory debugging
   --disable-lirc           disable lirc support (Infrared Remotes)
   --disable-joystick-menu  disable joystick menu
+  --disable-libcec         disable libCEC device support
+  --libcec-path=HDRLOC     location of directory containing
+                           cec.h [$libcec_path_default]
   --disable-firewire       disable support for FireWire cable boxes
   --disable-iptv           disable support for recording RTSP/UDP/RTP streams
   --disable-hdhomerun      disable support for HDHomeRun boxes
+  --disable-ceton          disable support for Ceton cards
   --disable-v4l2           disable Video4Linux support
   --disable-ivtv           disable ivtv support (PVR-x50) req. v4l2 support
   --disable-hdpvr          disable HD-PVR support
@@ -1341,11 +1345,13 @@ MYTHTV_CONFIG_LIST='
     firewire
     frontend
     hdhomerun
+    ceton
     hdpvr
     iptv
     ivtv
     asi
     joystick_menu
+    libcec
     libfftw3
     libmpeg2external
     libxml2
@@ -1353,8 +1359,9 @@ MYTHTV_CONFIG_LIST='
     lirc
     mheg
     opengl_video
-    qtdbus
     qtwebkit
+    qtscript
+    qtdbus
     quartz_video
     v4l2
     v4l1
@@ -1427,6 +1434,7 @@ PATHS_LIST='
     datadir
     dvb_path
     incdir
+    libcec_path
     libdir
     mandir
     prefix
@@ -1767,6 +1775,7 @@ iptv_deps="backend"
 ivtv_deps="backend v4l2"
 hdpvr_deps="backend v4l2"
 hdhomerun_deps="backend"
+ceton_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 mythtranscode_deps="backend frontend"
 opengl_deps_any="agl_h GL_gl_h GLES2_gl2_h darwin windows x11"
@@ -1979,12 +1988,14 @@ enable ffmpeg_pthreads
 enable firewire
 enable frontend
 enable hdhomerun
+enable ceton
 enable hdpvr
 enable iptv
 enable ivtv
 enable asi
 enable lamemp3
 enable libass
+enable libcec
 enable libxml2
 enable libudf
 enable lirc
@@ -2005,6 +2016,7 @@ disable indevs
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
 x11_path_default="${sysroot}/usr/X11R6/include"
+libcec_path_default="${sysroot}/usr/include/libcec"
 libxml2_path_default="${sysroot}/usr/include/libxml2"
 
 # configurable options
@@ -3162,6 +3174,7 @@ EOF
         disable bindings_php
         disable dv1394
         disable dvb
+        disable ceton
         enable  memalign_hack
         disable mythtranscode
         disable network
@@ -3174,6 +3187,7 @@ EOF
         disable v4l2
         enable  windows
         disable x11
+        disable qtdbus
         ###### Standard ffmpeg configure stuff follows:
         disable ffserver
         SLIBPREF="libmyth"
@@ -3746,7 +3760,7 @@ enabled mlib       && require  mediaLib mlib_types.h mlib_VectorSub_S16_U8_Mod -
 if enabled libmpeg2external; then
     check_lib mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external
     if disabled libmpeg2external; then
-        die "Warning! No suiteable external libmpeg2 found, use internal copy."
+        die "Warning! No suitable external libmpeg2 found, use internal copy."
     fi
     disable mythtranscode
 fi
@@ -4031,29 +4045,52 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
 
 # Qt dependency checks
-qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
-qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
+if test $target_os = mingw32 ; then
+    qt_inc="-I`cd $(${qmake} -query QT_INSTALL_HEADERS); pwd`"
+    qt_libs="-L`cd $(${qmake} -query QT_INSTALL_LIBS) ; pwd`"
+else
+    qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
+    qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
+fi
 
-if $(pkg-config --atleast-version 4.6.0 QtWebKit) ; then
+if $(pkg-config --exists QtWebKit) ; then
     enable qtwebkit
 else
     check_cxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
-#if QT_VERSION < 0x040600
-die
-#endif
+int main(void){ return 0; }
 EOF
 fi
 
 enabled qtwebkit || die "Error! QtWebkit headers not found"
 
+if $(pkg-config --exists QtScript) ; then
+    enable qtscript
+else
+    check_cxx ${qt_inc} <<EOF && enable qtscript
+#include <QtScript/QtScript>
+int main(void){ return 0; }
+EOF
+fi
+
+enabled qtscript || die "Error! QtScript headers not found"
+
 # Check if Qt was built with DBus support:
-check_ld_cxx ${qt_inc} ${qt_inc}/QtDBus ${qt_libs} -lQtDBus <<EOF && enable qtdbus
-#include <QtDBus>
-int main(void){
-    return (long) QDBusConnection::disconnectFromBus;
+if ! disabled qtdbus; then
+    if $(pkg-config --exists QtDBus) ; then
+        enable qtdbus
+    else
+        check_cxx ${qt_inc} <<EOF && enable qtdbus
+#include <QtDBus/QtDBus>
+#include <QtDBus/QDBusInterface>
+int main(void)
+{
+    QDBusInterface test("org.kde.test", "/test", "org.kde.blah");
+    return 0;
 }
 EOF
+    fi
+fi
 
 if enabled firewire; then
     fwlibs=""
@@ -4079,6 +4116,19 @@ enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3
 
 # ass_flush_events was added in 0.9.10
 enabled libass && check_lib2 ass/ass.h ass_flush_events -lass || disable libass
+
+enabled libcec && check_cxx -I"$libcec_path" <<EOF || { echolog "libCEC support needs libcec >= 1" && disable libcec; }
+#include <libcec/cec.h>
+#include <iostream>
+using namespace std;
+using namespace CEC;
+#include <libcec/cecloader.h>
+int main(void) {
+    if (CEC_LIB_VERSION_MAJOR < 1)
+        return 0;
+    return (long) LoadLibCec;
+}
+EOF
 
 if enabled libxml2 ; then
    if pkg-config --exists libxml-2.0 ; then
@@ -4412,6 +4462,7 @@ if enabled frontend; then
   echo "# Input Support"
   echo "Joystick menu             ${joystick_menu-no}"
   echo "lirc support              ${lirc-no}"
+  echo "libCEC device support     ${libcec-no} [$libcec_path]"
   if test x"$target_os" = x"darwin" ; then
     echo "Apple Remote              ${appleremote-no}"
   fi
@@ -4465,6 +4516,7 @@ if enabled backend; then
   echo "DVB support               ${dvb-no} [$dvb_path]"
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
+  echo "Ceton support             ${ceton-no}"
   echo "IPTV support              ${iptv-no}"
   echo "ASI support               ${asi-no}"
 fi
@@ -4803,6 +4855,11 @@ fi
 
 if enabled dvb; then
   append CONFIG_INCLUDEPATH "$dvb_path"
+fi
+
+if enabled libcec; then
+  append CONFIG_DEFINES "using_libcec"
+  append CONFIG_INCLUDEPATH "$libcec_path"
 fi
 
 if enabled libxml2; then

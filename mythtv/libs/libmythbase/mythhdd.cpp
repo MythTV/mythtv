@@ -1,4 +1,5 @@
 #include "mythhdd.h"
+#include "mythlogging.h"
 
 /** \fn MythHDD::Get(QObject*, const char*, bool, bool)
  *  \brief Helper function used to create a new instance
@@ -22,7 +23,8 @@ MythHDD::MythHDD(QObject *par, const char *DevicePath,
                  bool SuperMount, bool AllowEject)
     : MythMediaDevice(par, DevicePath, SuperMount, AllowEject)
 {
-    m_Status = MEDIASTAT_UNPLUGGED;
+    LOG(VB_MEDIA, LOG_INFO, "MythHDD::MythHDD " + m_DevicePath);
+    m_Status = MEDIASTAT_NOTMOUNTED;
     m_MediaType = MEDIATYPE_DATA;       // default type is data
 }
 
@@ -38,30 +40,35 @@ MythMediaStatus MythHDD::checkMedia(void)
         m_VolumeID = m_MountPath;
 
         // device is mounted, trigger event
+        if (MEDIASTAT_MOUNTED != m_Status)
+            m_Status = MEDIASTAT_NOTMOUNTED;
         return setStatus(MEDIASTAT_MOUNTED);
     }
 
     // device is not mounted
-    if (m_Status == MEDIASTAT_UNPLUGGED)
+    switch (m_Status)
     {
+    case MEDIASTAT_NOTMOUNTED:
         // a removable device was just plugged in try to mount it.
-        mount();
-        if (isMounted())
+        LOG(VB_MEDIA, LOG_INFO, "MythHDD::checkMedia try mounting " + m_DevicePath);
+        if (mount())
         {
             m_Status = MEDIASTAT_NOTMOUNTED;
             return setStatus(MEDIASTAT_MOUNTED);
         }
-        else
-            return setStatus(MEDIASTAT_NOTMOUNTED);
-    }
-    else if (m_Status == MEDIASTAT_MOUNTED)
-    {
+        return m_Status;
+    case MEDIASTAT_MOUNTED:
         // device was mounted and someone unmounted it.
         return m_Status = setStatus(MEDIASTAT_NOTMOUNTED);
-    }
-    else
-    {
+    default:
         // leave device state as is
         return m_Status;
     }
+}
+
+//virtual
+MythMediaError MythHDD::eject(bool)
+{
+    setStatus(MEDIASTAT_UNPLUGGED);
+    return MEDIAERR_UNSUPPORTED;
 }

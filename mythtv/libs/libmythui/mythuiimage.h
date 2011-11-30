@@ -47,7 +47,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     /** Should not be used unless absolutely necessary since it bypasses the
      *   image caching and threaded loaded mechanisms.
      */
-    void SetImages(QVector<MythImage *> &images);
+    void SetImages(QVector<MythImage *> *images);
 
     void SetDelay(int delayms);
     void SetDelays(QVector<int> delays);
@@ -68,7 +68,9 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     MythImage* LoadImage(MythImageReader &imageReader, const QString &imFile,
                          QSize bForceSize, int cacheMode);
     bool LoadAnimatedImage(MythImageReader &imageReader, const QString &imFile,
-                           QSize bForceSize, int mode);
+                           QSize bForceSize, int mode,
+                           QVector<MythImage *> *images = NULL,
+                           QVector<int> *delays = NULL);
     void customEvent(QEvent *event);
 
     virtual bool ParseElement(

@@ -224,35 +224,6 @@ vector<uint> RemoteRequestFreeRecorderList(void)
     return list;
 }
 
-void RemoteSendMessage(const QString &message)
-{
-    if (gCoreContext->IsBackend())
-    {
-        gCoreContext->dispatch(MythEvent(message));
-        return;
-    }
-
-    QStringList strlist( "MESSAGE" );
-    strlist << message;
-
-    gCoreContext->SendReceiveStringList(strlist);
-}
-
-void RemoteSendEvent(const MythEvent &event)
-{
-    if (gCoreContext->IsBackend())
-    {
-        gCoreContext->dispatch(event);
-        return;
-    }
-
-    QStringList strlist( "MESSAGE" );
-    strlist << event.Message();
-    strlist << event.ExtraDataList();
-
-    gCoreContext->SendReceiveStringList(strlist);
-}
-
 QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
 {
     QStringList strlist( "QUERY_PIXMAP_LASTMODIFIED" );
@@ -576,7 +547,7 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
     vector<ProgramInfo *>::iterator it = info->begin();
     // make sure whatever RemoteGetRecordingList() returned
     // only has rsRecording shows
-    for ( ; it != info->end(); it++)
+    for ( ; it != info->end(); ++it)
     {
         p = *it;
         if (p->GetRecordingStatus() == rsRecording ||

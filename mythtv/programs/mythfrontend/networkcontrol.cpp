@@ -325,7 +325,7 @@ void NetworkControl::deleteClient(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + "Client Socket disconnected");
     QMutexLocker locker(&clientLock);
 
-    SendMythSystemEvent("NET_CTRL_DISCONNECTED");
+    gCoreContext->SendSystemEvent("NET_CTRL_DISCONNECTED");
 
     QList<NetworkControlClient *>::const_iterator it;
     for (it = clients.begin(); it != clients.end(); ++it)
@@ -359,7 +359,7 @@ void NetworkControl::newConnection()
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection established."));
 
-    SendMythSystemEvent("NET_CTRL_CONNECTED");
+    gCoreContext->SendSystemEvent("NET_CTRL_CONNECTED");
 
     QTcpSocket           *client = this->nextPendingConnection();
     NetworkControlClient *ncc = new NetworkControlClient(client);
@@ -1234,6 +1234,11 @@ void NetworkControl::notifyDataAvailable(void)
 void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
                                        QString &reply)
 {
+    if (!clients.contains(ncc))
+        // NetworkControl instance is unaware of control client
+        // assume connection to client has been terminated and bail
+        return;
+
     QRegExp crlfRegEx("\r\n$");
     QRegExp crlfcrlfRegEx("\r\n.*\r\n");
 

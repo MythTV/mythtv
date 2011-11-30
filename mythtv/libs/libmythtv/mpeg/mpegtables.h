@@ -4,8 +4,10 @@
 #define _MPEG_TABLES_H_
 
 #include <cassert>
-#include "pespacket.h"
 #include "mpegdescriptors.h"
+#include "pespacket.h"
+#include "mythtvexp.h"
+#include "util.h" // for xml_indent
 
 /** \file mpegtables.h
  *  \code
@@ -20,10 +22,19 @@
  *  \endcode
  */
 
+/** Seconds between start of GPS time and the start of UNIX time.
+ *  i.e. from Jan 1st, 1970 UTC to Jan 6th, 1980 UTC
+ */
+#define GPS_EPOCH 315964800
+
+/** Leap seconds as of Jan 1st, 2006. */
+#define GPS_LEAP_SECONDS 14
+
+
 /** \class PESStreamID
  *  \brief Contains a listing of PES Stream ID's for various PES Packet types.
  */
-class PESStreamID
+class MTV_PUBLIC PESStreamID
 {
   public:
     enum
@@ -88,7 +99,7 @@ class PESStreamID
  *   This is used by the Program Map Table (PMT), and often used by other
  *   tables, such as the DVB SDT table.
  */
-class StreamID
+class MTV_PUBLIC StreamID
 {
   public:
     enum
@@ -136,6 +147,8 @@ class StreamID
 
         MPEG2IPMP      = 0x1a, ///< ISO 13818-10 Digital Restrictions Mangment
         MPEG2IPMP2     = 0x7f, ///< ISO 13818-10 Digital Restrictions Mangment
+
+        Splice         = 0x86, ///< ANSI/SCTE 35 2007 
 
         // special id's, not actually ID's but can be used in FindPIDs
         AnyMask        = 0xFFFF0000,
@@ -200,6 +213,8 @@ enum
 
     ATSC_PSIP_PID = 0x1ffb,
 
+    SCTE_PSIP_PID = 0x1ffc,
+
     // UK Freesat PIDs: SDTo/BAT, longterm EIT, shortterm EIT
     FREESAT_SI_PID     = 0x0f01,
     FREESAT_EIT_PID    = 0x0f02,
@@ -209,7 +224,7 @@ enum
 /** \class TableID
  *  \brief Contains listing of Table ID's for various tables (PAT=0,PMT=2,etc).
  */
-class TableID
+class MTV_PUBLIC TableID
 {
   public:
     enum
@@ -257,29 +272,37 @@ class TableID
         ARIBbeg  = 0x80,
         ARIBend  = 0x8f,
 
-        // SCTE
+        // SCTE 57 -- old depreciated standard
         PIM      = 0xC0, // Program Information Message (57 2003) PMT PID
         PNM      = 0xC1, // Program Name Message (57 2003) PMT PID
-        NIM      = 0xC2, // Network Information Message (57 2003)
-                         // on Network PID (per PAT)
-        NITscte  = 0xC2, // Network Information Table (NIT) (65 2002) on 0x1FFC
-        NTM      = 0xC3, // Network Text Message (57 2003) on 0x1FFC
-                         // (terrestrial only, Map Name Table only) or
-                         // Network PID (per PAT)
-        NTT      = 0xC3, // Network Text Table (NTT) (65 2002) on 0x1FFC
-        VCM      = 0xC4, // Virtual Channel Message (57 2003) on 0x1FFC
-                         // (terrestrial only) or Network PID (per PAT)
-        SVCTscte = 0xC4, // Short Virtual Channel Table (65 2002) on 0x1FFC
-        STM      = 0xC5, // System Time Message (57 2003)
-                         // on Network PID (per PAT)
-        STTscte  = 0xC5, // System Time Table (STT) (65 2002) on 0x1FFC
-        SM       = 0xC6, // subtitle_message (27 2003)
-        MGTscte  = 0xC7, // Master Guide Table (57 2003) on 0x1ffc
-        LVCT     = 0xC9, // Long-form Virtual Channel Table (57 2003) on 0x1ffc
-        RRTscte  = 0xCA, // Region Rating Table (57 2003) on 0x1ffc
+        // The PIM and PNM do not have SCTE 65 equivalents.
 
+        // Under SCTE 57 -- NIM, NTM, VCM, and STM were carried on the
+        // network PID (Table ID 0x0) as defined in the PAT, but under
+        // SCTE 65 the equivalent tables are carried on 0x1FFC
+
+        NIM      = 0xC2, // Network Information Message (57 2003)
+        NTM      = 0xC3, // Network Text Message (57 2003)
+        // The NTM is like the SCTE 65 NTT table, except that it
+        // carries more subtable types and the id for the source name
+        // subtable they both share is type 5 rather than 6 which can
+        // cause calimity if not dealt with properly.
+        VCM      = 0xC4, // Virtual Channel Message (57 2003)
+        STM      = 0xC5, // System Time Message (57 2003)
+
+        // SCTE 65 -- Current US Cable TV standard
+        NITscte  = 0xC2, // Network Information Table (NIT) (65 2002) on 0x1FFC
+        NTT      = 0xC3, // Network Text Table (NTT) (65 2002) on 0x1FFC
+        SVCTscte = 0xC4, // Short Virtual Channel Table (65 2002) on 0x1FFC
+        STTscte  = 0xC5, // System Time Table (STT) (65 2002) on 0x1FFC
+
+        // Other SCTE
+        SM       = 0xC6, // subtitle_message (27 2003)
         CEA      = 0xD8, // Cable Emergency Alert (18 2002)
         ADET     = 0xD9, // Aggregate Data Event Table (80 2002)
+
+        // SCTE 35
+        SITscte  = 0xFC, // SCTE 35 Splice Info Table (Cueing messages)
 
         // ATSC Conditional Access (A/70)
         ECM0     = 0x80,
@@ -304,8 +327,8 @@ class TableID
         DCCT     = 0xD3, // Directed Channel Change Table A/57 on 0x1ffb
         DCCSCT   = 0xD4, // DCC Selection Code Table A/57 on 0x1ffb
         SITatsc  = 0xD5, // Selection Information Table (EIA-775.2 2000)
-        AEIT     = 0xD6, // Aggregate Event Information Table A/81
-        AETT     = 0xD7, // Aggregate Extended Text Table A/81
+        AEIT     = 0xD6, // Aggregate Event Information Table A/81, SCTE 65
+        AETT     = 0xD7, // Aggregate Extended Text Table A/81, SCTE 65
         SVCT     = 0xDA, // Satellite VCT A/81
 
         SRM      = 0xE0, // System Renewability Message (ATSC TSG-717r0)
@@ -330,7 +353,7 @@ class TableID
  *  \brief A PSIP table is a special type of PES packet containing an
  *         MPEG, ATSC, or DVB table.
  */
-class PSIPTable : public PESPacket
+class MTV_PUBLIC PSIPTable : public PESPacket
 {
   private:
     // creates non-clone version, for View
@@ -366,7 +389,7 @@ class PSIPTable : public PESPacket
     // table_id             8       0.0       0
     uint TableID(void) const { return StreamID(); }
 
-    // section_syntax_ind   1       1.0       8   should always be 1
+    // section_syntax_ind   1       1.0       8   ATSC -- should always be 1
     bool SectionSyntaxIndicator(void) const { return pesdata()[1] & 0x80; }
     // private_indicator    1       1.1       9
     bool PrivateIndicator(void) const { return pesdata()[1] & 0x40; }
@@ -376,6 +399,9 @@ class PSIPTable : public PESPacket
     // adds 3 to the total section length to account for 3 bytes
     // before the end of the section length field.
     uint SectionLength(void) const { return Length() + 3; }
+
+    ////////////////////////////////////////////////////////////
+    // Things below this line may not apply to SCTE/DVB tables.
 
     // table_id_extension  16       3.0      24   table dependent
     uint TableIDExtension(void) const
@@ -399,9 +425,9 @@ class PSIPTable : public PESPacket
     // last_section_number  8       7.0      56
     uint LastSection(void) const { return pesdata()[7]; }
 
-    // this is only for real ATSC PSIP tables, not similar MPEG2 tables
+    // Protocol Version for ATSC PSIP tables
     // protocol_version     8       8.0      64   should always be 0 for now
-    uint ProtocolVersion(void) const { return pesdata()[8]; }
+    uint ATSCProtocolVersion(void) const { return pesdata()[8]; }
 
     // PSIP_table_data      x       8.0      72 (incl. protocolVersion)
     const unsigned char* psipdata(void) const
@@ -426,21 +452,26 @@ class PSIPTable : public PESPacket
     void SetSection(uint num) { pesdata()[6] = num; }
     void SetLastSection(uint num) { pesdata()[7] = num; }
 
-    // only for real ATSC PSIP tables, not similar MPEG2 tables
-    void SetProtocolVersion(int ver) { pesdata()[8] = ver; }
+    // Only for real ATSC PSIP tables.
+    void SetATSCProtocolVersion(int ver) { pesdata()[8] = ver; }
 
     bool HasCRC(void) const;
+    bool HasSectionNumber(void) const;
 
     bool VerifyPSIP(bool verify_crc) const;
 
-    const QString toString(void) const;
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
 
     static const uint PSIP_OFFSET = 8; // general PSIP header offset
+
+  protected:
+    QString XMLValues(uint indent_level) const;
 };
 
 /** \class ProgramAssociationTable
  *  \brief The Program Association Table lists all the programs
- *         in a stream, and is alwyas found on PID 0.
+ *         in a stream, and is always found on PID 0.
  *
  *   Based on info in this table and the ProgramMapTable
  *   for the program we are interested in we should
@@ -456,7 +487,7 @@ class PSIPTable : public PESPacket
  *  \sa ProgramMapTable
  */
 
-class ProgramAssociationTable : public PSIPTable
+class MTV_PUBLIC ProgramAssociationTable : public PSIPTable
 {
   public:
     ProgramAssociationTable(const ProgramAssociationTable& table)
@@ -518,7 +549,8 @@ class ProgramAssociationTable : public PSIPTable
         return 0;
     }
 
-    const QString toString(void) const;
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
 
   private:
     static ProgramAssociationTable* CreateBlank(bool smallPacket = true);
@@ -529,7 +561,7 @@ class ProgramAssociationTable : public PSIPTable
  *         to various PID's which describe the multimedia contents of the
  *         program.
  */
-class ProgramMapTable : public PSIPTable
+class MTV_PUBLIC ProgramMapTable : public PSIPTable
 {
   public:
 
@@ -644,7 +676,8 @@ class ProgramMapTable : public PSIPTable
     void AppendStream(uint pid, uint type, unsigned char* si = 0, uint il = 0);
 
     void Parse(void) const;
-    const QString toString(void) const;
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
     // unsafe sets
   private:
     void SetStreamInfoLength(uint i, uint length)
@@ -682,7 +715,7 @@ class ProgramMapTable : public PSIPTable
  *  \brief The CAT is used to transmit additional ConditionalAccessDescriptor
  *         instances, in addition to the ones in the PMTs.
  */
-class ConditionalAccessTable : public PSIPTable
+class MTV_PUBLIC ConditionalAccessTable : public PSIPTable
 {
   public:
     ConditionalAccessTable(const PSIPTable &table) : PSIPTable(table)
@@ -709,7 +742,324 @@ class ConditionalAccessTable : public PSIPTable
         { return SectionLength() - PSIP_OFFSET; }
     const unsigned char *Descriptors(void) const { return psipdata(); }
 
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
+
     // CRC_32 32 rpchof
+};
+
+class MTV_PUBLIC SpliceTimeView
+{
+  public:
+    SpliceTimeView(const unsigned char *data) : _data(data) { }
+    //   time_specified_flag    1  0.0
+    bool IsTimeSpecified(void) const { return _data[0] & 0x80; }
+    //   if (time_specified_flag == 1)
+    //     reserved             6  0.1
+    //     pts_time            33  0.6
+    uint64_t PTSTime(void) const
+    {
+        return ((uint64_t(_data[0] & 0x1) << 32) |
+                (uint64_t(_data[1])       << 24) |
+                (uint64_t(_data[2])       << 16) |
+                (uint64_t(_data[3])       <<  8) |
+                (uint64_t(_data[4])));
+    }
+    //   else
+    //     reserved             7  0.1
+    // }
+    virtual QString toString(int64_t first, int64_t last) const;
+    virtual QString toStringXML(
+        uint indent_level, int64_t first, int64_t last) const;
+
+    uint size(void) const { return IsTimeSpecified() ? 1 : 5; }
+  private:
+    const unsigned char *_data;
+};
+
+class MTV_PUBLIC SpliceScheduleView
+{
+  public:
+    SpliceScheduleView(const vector<const unsigned char*> &ptrs0,
+                       const vector<const unsigned char*> &ptrs1) :
+        _ptrs0(ptrs0), _ptrs1(ptrs1)
+    {
+    }
+    //   splice_count           8  14.0
+    uint SpliceCount(void) const { return min(_ptrs0.size(), _ptrs1.size()); }
+
+    //   splice_event_id       32  0.0 + _ptrs0[i]
+    uint SpliceEventID(uint i) const
+    {
+        return ((_ptrs0[i][0] << 24) | (_ptrs0[i][1] << 16) |
+                (_ptrs0[i][2] <<  8) | (_ptrs0[i][3]));
+    }
+    //   splice_event_cancel_indicator 1 4.0 + _ptrs0[i]
+    //   reserved               7   4.1 + _ptrs0[i]
+    //   if (splice_event_cancel_indicator == ‘0’) {
+    //     out_of_network_indicator 1 5.0 + _ptrs0[i]
+    //     program_splice_flag  1 5.1 + _ptrs0[i]
+    //     duration_flag        1 5.2 + _ptrs0[i]
+    //     reserved             5 5.3 + _ptrs0[i]
+    //     if (program_splice_flag == ‘1’) 
+    //       utc_splice_time   32 6.0 + _ptrs0[i]
+    //     else {
+    //       component_count    8 6.0 + _ptrs0[i]
+    //       for(j = 0; j < component_count; j++) {
+    //         component_tag    8 7.0 + _ptrs0[i]+j*5
+    //         utc_splice_time 32 8.0 + _ptrs0[i]+j*5
+    //       }
+    //     }
+    //     if (duration_flag) {
+    //       auto_return        1 0.0 + _ptrs1[i]
+    //       reserved           6 0.1 + _ptrs1[i]
+    //       duration          33 0.7 + _ptrs1[i]
+    //     }
+    //     unique_program_id   16 0.0 + _ptrs1[i] + (duration_flag)?5:0
+    //     avail_num            8 2.0 + _ptrs1[i] + (duration_flag)?5:0
+    //     avails_expected      8 3.0 + _ptrs1[i] + (duration_flag)?5:0
+    //   }
+
+  private:
+    vector<const unsigned char*> _ptrs0;
+    vector<const unsigned char*> _ptrs1;    
+};
+
+class MTV_PUBLIC SpliceInsertView
+{
+  public:
+    SpliceInsertView(const vector<const unsigned char*> &ptrs0,
+                     const vector<const unsigned char*> &ptrs1) :
+        _ptrs0(ptrs0), _ptrs1(ptrs1)
+    {
+    }
+
+    //   splice_event_id       32   0.0 + _ptrs1[0]
+    uint SpliceEventID(void) const
+    {
+        return ((_ptrs1[0][0] << 24) | (_ptrs1[0][1] << 16) |
+                (_ptrs1[0][2] <<  8) | (_ptrs1[0][3]));
+    }
+    //   splice_event_cancel    1    4.0 + _ptrs1[0]
+    bool IsSpliceEventCancel(void) const { return _ptrs1[0][4] & 0x80; }
+    //   reserved               7    4.1 + _ptrs1[0]
+    //   if (splice_event_cancel_indicator == 0) {
+    //     out_of_network_flag  1    5.0 + _ptrs1[0]
+    bool IsOutOfNetwork(void) const { return _ptrs1[0][5] & 0x80; }
+    //     program_splice_flag  1    5.1 + _ptrs1[0]
+    bool IsProgramSplice(void) const { return _ptrs1[0][5] & 0x40; }
+    //     duration_flag        1    5.2 + _ptrs1[0]
+    bool IsDuration(void) const { return _ptrs1[0][5] & 0x20; }
+    //     splice_immediate_flag 1   5.3 + _ptrs1[0]
+    bool IsSpliceImmediate(void) const { return _ptrs1[0][5] & 0x20; }
+    //     reserved             4    5.4 + _ptrs1[0]
+    //     if ((program_splice_flag == 1) && (splice_immediate_flag == ‘0’))
+    //       splice_time()   8-38    6.0 + _ptrs1[0]
+    SpliceTimeView SpliceTime(void) const
+        { return SpliceTimeView(_ptrs1[0]+6); }
+    //     if (program_splice_flag == 0) {
+    //       component_count    8    6.0 + _ptrs1[0]
+    //       for (i = 0; i < component_count; i++) {
+    //         component_tag    8    0.0 + _ptrs0[i]
+    //         if (splice_immediate_flag == ‘0’)
+    //           splice_time() 8-38  1.0 + _ptrs0[i]
+    //       }
+    //     }
+    //     if (duration_flag == ‘1’)
+    //       auto_return        1    0.0 + _ptrs1[1]
+    //       reserved           6    0.1 + _ptrs1[1]
+    //       duration          33    0.7 + _ptrs1[1]
+    //     unique_program_id   16    0.0 + _ptrs1[2]
+    uint UniqueProgramID(void) const
+        { return (_ptrs1[2][0]<<8) | _ptrs1[2][1]; }
+    //     avail_num            8    2.0 + _ptrs1[2]
+    uint AvailNum(void) const { return _ptrs1[2][2]; }
+    //     avails_expected      8    3.0 + _ptrs1[2]
+    uint AvailsExpected(void) const { return _ptrs1[2][3]; }
+    //   }
+
+    virtual QString toString(int64_t first, int64_t last) const;
+    virtual QString toStringXML(
+        uint indent_level, int64_t first, int64_t last) const;
+
+  private:
+    vector<const unsigned char*> _ptrs0;
+    vector<const unsigned char*> _ptrs1;
+};
+
+class MTV_PUBLIC SpliceInformationTable : public PSIPTable
+{
+  public:
+    SpliceInformationTable(const SpliceInformationTable &table) :
+        PSIPTable(table), _epilog(NULL)
+    {
+        assert(TableID::SITscte == TableID());
+        Parse();
+    }
+    SpliceInformationTable(const PSIPTable &table) :
+        PSIPTable(table), _epilog(NULL)
+    {
+        assert(TableID::SITscte == TableID());
+        Parse();
+    }
+    ~SpliceInformationTable() { ; }
+
+    // ANCE/SCTE 35 2007
+    //       Name             bits  loc  expected value
+    // table_id                 8   0.0       0xFC
+    // section_syntax_indicator 1   1.0          1
+    // private_indicator        1   1.1          0
+    // reserved                 2   1.2          3
+    // section_length          12   1.4
+    // ^^^ All above this line provided by PSIPTable
+    // protocol_version         8   3.0          0
+    uint SpliceProtocolVersion(void) const { return pesdata()[3]; }
+    void SetSpliceProtocolVersion(uint ver) { pesdata()[3] = ver; }
+    // encrypted_packet         1   4.0
+    bool IsEncryptedPacket(void) const { return pesdata()[4] & 0x80; }
+    void SetEncryptedPacket(bool val)
+    {
+        pesdata()[4] = (pesdata()[4] & ~0x80) | ((val) ? 0x80 : 0);
+    }
+    // encryption_algorithm     6   4.1
+    enum
+    {
+        kNoEncryption = 0,
+        kECB          = 1, // DES - ECB mode, FIPS PUB 81 (8 byte blocks)
+        kCBC          = 2, // DES - CBC mode, FIPS PUB 81 (8 byte blocks)
+        k3DES         = 3, // 3 DES - TDEA, FIPS PUB 46-3 (8 byte blocks)
+        // values 4-31 are reserved for future extension
+        // values 32-63 are user private
+    };
+    uint EncryptionAlgorithm(void) const { return (pesdata()[4] >> 1) & 0x3f; }
+    QString EncryptionAlgorithmString(void) const;
+    void SetEncryptionAlgorithm(uint val)
+    {
+        pesdata()[4] &= 0x81;
+        pesdata()[4] |= ((val&0x3f) << 1);
+    }
+    // pts_adjustment          33   4.7
+    uint64_t PTSAdjustment(void) const
+    {
+        return ((uint64_t(pesdata()[4] & 0x1) << 32) |
+                (uint64_t(pesdata()[5])       << 24) |
+                (uint64_t(pesdata()[6])       << 16) |
+                (uint64_t(pesdata()[7])       <<  8) |
+                (uint64_t(pesdata()[8])));
+    }
+    void SetPTSAdjustment(uint64_t val)
+    {
+        pesdata()[4] &= ~0x1;
+        pesdata()[4] |= (val>>32) & 0x1;
+        pesdata()[5] = ((val>>24) & 0xff);
+        pesdata()[6] = ((val>>16) & 0xff);
+        pesdata()[7] = ((val>>8 ) & 0xff);
+        pesdata()[8] = ((val    ) & 0xff);
+    }
+    // cw_index (enc key)       8   9.0
+    uint CodeWordIndex(void) const { return pesdata()[9]; }
+    void SetCodeWordIndex(uint val) { pesdata()[9] = val; }
+    // reserved                12  10.0
+    // splice_command_length   12  11.4
+    uint SpliceCommandLength(void) const
+    {
+        return ((pesdata()[11] & 0xf) << 8) | pesdata()[12];
+    }
+    void SetSpliceCommandLength(uint len)
+    {
+        pesdata()[11] &= ~0xf;
+        pesdata()[11] |= (len >> 8) & 0xf;
+        pesdata()[12] = len & 0xff;
+    }
+    // splice_command_type      8  13.0
+    enum {
+        kSCTNull                 = 0x00,
+        kSCTReserved0            = 0x01,
+        kSCTReserved1            = 0x02,
+        kSCTReserved2            = 0x03,
+        kSCTSpliceSchedule       = 0x04,
+        kSCTSpliceInsert         = 0x05,
+        kSCTTimeSignal           = 0x06,
+        kSCTBandwidthReservation = 0x07,
+        // 0x08-0xfe reserved
+        kSCTPrivateCommand       = 0xff,
+    };
+    uint SpliceCommandType(void) const { return pesdata()[13]; }
+    QString SpliceCommandTypeString(void) const;
+    void SetSpliceCommandType(uint type) { pesdata()[13] = type & 0xff; }
+
+    // ALL BELOW THIS LINE OTHER THAN CRC_32 ARE ENCRYPTED IF FLAG SET
+
+    //////////// SPLICE NULL ////////////
+
+    // nothing here, info in descriptors
+
+    //////////// SPLICE SCHEDULE ////////////
+
+    // if (splice_command_type == 0x04) splice_schedule()
+    SpliceScheduleView SpliceSchedule(void) const
+        { return SpliceScheduleView(_ptrs0, _ptrs1); }
+
+    //////////// SPLICE INSERT ////////////
+
+    // if (splice_command_type == 0x05) splice_insert()
+    SpliceInsertView SpliceInsert(void) const
+        { return SpliceInsertView(_ptrs0, _ptrs1); }
+
+    //////////// TIME SIGNAL ////////////
+
+    // if (splice_command_type == 0x06) splice_time()
+    SpliceTimeView TimeSignal(void) const
+        { return SpliceTimeView(pesdata()+14); }
+
+    //////////// BANDWIDTH RESERVATION ////////////
+
+    // nothing here, info in descriptors
+
+    //////////// PRIVATE COMMAND ////////////
+
+    // if (splice_command_type == 0xff) private_command()
+    //   identifier            32  14.0
+    //   for (i = 0; i < N; i++)
+    //     private_byte         8  ??.0
+    //
+
+    //////////////////////////////////////////////////////////////
+    // NOTE: Aside from CRC's we can not interpret things below
+    // this comment with private or reserved commands.
+
+    // descriptor_loop_length  16   0.0 + _epilog
+    uint SpliceDescriptorsLength(uint i) const
+    {
+        return (_epilog[0] << 8) | _epilog[1];
+    }
+
+    // for (i = 0; i < ? ; i++)
+    //   splice_descriptor()   ??   ??.?
+    const unsigned char *SpliceDescriptors(void) const
+    {
+        return (_epilog) ? _epilog + 2 : NULL;
+    }
+    // for (i = 0; i < ?; i++)
+    //   alignment_stuffing     8   ??.0
+    // if (encrypted_packet())
+    //    E_CRC_32             32   ??.0
+    // CRC_32                  32   ??.0
+
+    SpliceInformationTable *GetDecrypted(const QString &codeWord) const;
+    bool Parse(void);
+
+    virtual QString toString(void) const { return toString(-1LL, -1LL); }
+    virtual QString toStringXML(uint indent_level) const
+        { return toStringXML(indent_level, -1LL, -1LL); }
+
+    QString toString(int64_t first, int64_t last) const;
+    QString toStringXML(uint indent_level, int64_t first, int64_t last) const;
+
+  private:
+    vector<const unsigned char*> _ptrs0;
+    vector<const unsigned char*> _ptrs1;
+    const unsigned char *_epilog;
 };
 
 /** \class AdaptationFieldControl
@@ -721,7 +1071,7 @@ class ConditionalAccessTable : public PSIPTable
  *   currently just passed through the MythTV recorders to the recorded
  *   stream.
  */
-class AdaptationFieldControl
+class MTV_PUBLIC AdaptationFieldControl
 {
   public:
     AdaptationFieldControl(const unsigned char* packet) : _data(packet) { ; }

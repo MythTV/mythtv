@@ -2,8 +2,8 @@
  * File  : glsingleview.cpp
  * Author: Renchi Raju <renchi@pooh.tam.uiuc.edu>
  * Date  : 2004-01-13
- * Description : 
- * 
+ * Description :
+ *
  * Copyright 2004 by Renchi Raju
  *
  * This program is free software; you can redistribute it
@@ -18,6 +18,9 @@
  * GNU General Public License for more details.
  *
  * ============================================================ */
+
+// Include own header first to catch missing includes
+#include "glsingleview.h"
 
 // ANSI C headers
 #include <cmath>
@@ -40,8 +43,6 @@ using namespace std;
 #include "mythlogging.h"
 
 // MythGallery headers
-#include "config.h"
-#include "glsingleview.h"
 #include "galleryutil.h"
 
 #define LOC QString("GLView: ")
@@ -466,7 +467,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             m_source_x = 0;
             m_source_y = 0;
             SetZoom(1.0f);
-            
+
             int a = m_tex1First ? 0 : 1;
             m_texItem[a].ScaleTo(m_screenSize, m_scaleMax);
         }
@@ -810,7 +811,7 @@ void GLSingleView::EffectRotate(void)
     }
 
     if (m_effect_current_frame == 0)
-        m_effect_rotate_direction = (int)((2.0*rand()/(RAND_MAX+1.0)));
+        m_effect_rotate_direction = (int)((2.0*random()/(RAND_MAX+1.0)));
 
     float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
@@ -840,7 +841,7 @@ void GLSingleView::EffectBend(void)
     }
 
     if (m_effect_current_frame == 0)
-        m_effect_rotate_direction = (int)((2.0f*rand()/(RAND_MAX+1.0f)));
+        m_effect_rotate_direction = (int)((2.0f*random()/(RAND_MAX+1.0f)));
 
     float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
@@ -890,7 +891,7 @@ void GLSingleView::EffectInOut(void)
 
     if (m_effect_current_frame == 0)
     {
-        m_effect_rotate_direction = 1 + (int)((4.0f*rand()/(RAND_MAX+1.0f)));
+        m_effect_rotate_direction = 1 + (int)((4.0f*random()/(RAND_MAX+1.0f)));
     }
 
     int  texnum  = m_texCur;
@@ -929,7 +930,7 @@ void GLSingleView::EffectSlide(void)
     }
 
     if (m_effect_current_frame == 0)
-        m_effect_rotate_direction = 1 + (int)((4.0f * rand() / (RAND_MAX + 1.0f)));
+        m_effect_rotate_direction = 1 + (int)((4.0f * random() / (RAND_MAX + 1.0f)));
 
     m_texItem[m_texCur].MakeQuad();
 
@@ -1067,10 +1068,10 @@ void GLSingleView::EffectCube(void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    float PI = 4.0f * atan(1.0f);
+//    float PI = 4.0f * atan(1.0f);
     float znear = 3.0f;
-    float theta = 2.0f * atan2(2.0f / 2.0f, znear);
-    theta = theta * 180.0f/PI;
+//     float theta = 2.0f * atan2(2.0f / 2.0f, znear);
+//     theta = theta * 180.0f/PI;
 
     glFrustum(-1.0f, 1.0f, -1.0f, 1.0f, znear - 0.01f, 10.0f);
 
@@ -1231,10 +1232,10 @@ void GLSingleView::EffectKenBurns(void)
     float scale_max, x_loc, y_loc;
     float scale_factor = 0;
 
-    //initialize effect   
+    //initialize effect
     if (!m_effect_kenBurns_initialized)
     {
-                
+
         m_effect_kenBurns_initialized = !m_effect_kenBurns_initialized;
         m_effect_kenBurns_item = NULL;
         // Need to load images in the background to keep effect smooth
@@ -1246,7 +1247,7 @@ void GLSingleView::EffectKenBurns(void)
         // Since first two images are preloaded, hardcode  them to zoom in
         m_effect_kenBurns_projection[0] = 1;
         m_effect_kenBurns_projection[1] = 1;
-        m_effect_kenBurns_image_timeout = m_effect_transition_timeout + 
+        m_effect_kenBurns_image_timeout = m_effect_transition_timeout +
                 (m_effect_transition_timeout * trans_pct);
     }
 
@@ -1256,7 +1257,7 @@ void GLSingleView::EffectKenBurns(void)
         m_tex1First = !m_tex1First;
         m_texCur      = (m_texCur) ? 0 : 1;
         m_effect_current_frame  = 0;
-        m_effect_frame_time.restart(); 
+        m_effect_frame_time.restart();
 
         m_effect_kenBurns_image_ready = false;
 
@@ -1294,32 +1295,33 @@ void GLSingleView::EffectKenBurns(void)
     //progress faster initially then slowing down- this is needed to ensure images zoom faster than they pan and
     //therefore stay completely on the screen
     s[m_texCur] = sqrt(elapsed[m_texCur]) / sqrt(m_effect_kenBurns_image_timeout);
-    s[m_texCur ? 0 : 1] = sqrt(elapsed[m_texCur ? 0 : 1]) / sqrt(m_effect_kenBurns_image_timeout); 
-    
+    s[m_texCur ? 0 : 1] = sqrt(elapsed[m_texCur ? 0 : 1]) / sqrt(m_effect_kenBurns_image_timeout);
+
     effect_pct = m_effect_frame_time.elapsed() *  m_effect_transition_timeout_inv;
 
     // Load new image if its ready
-    if (effect_pct > single_image_pct && m_effect_kenBurns_image_ready) 
+    if (effect_pct > single_image_pct && m_effect_kenBurns_image_ready)
     {
         if (!m_effect_kenBurns_new_image_started)
-        {             
+        {
             if (m_effect_kenBurns_item) //Do not create textures for first two images, since they are preloaded
             {
                 m_texItem[!m_tex1First].SetItem(m_effect_kenBurns_item, m_effect_kenBurns_orig_image_size);
                 m_texItem[!m_tex1First].ScaleTo(m_screenSize, m_scaleMax);
                 m_texItem[!m_tex1First].Init(m_effect_kenBurns_image);
                 UpdateLCD(m_effect_kenBurns_item);
-                
-                //choose the location and projection (zoom in or out) randomly
-                FindRandXY(m_effect_kenBurns_location_x[m_texCur], m_effect_kenBurns_location_y[m_texCur]);
-                m_effect_kenBurns_projection[m_texCur] = 1 + (int)((2.0f * rand() / (RAND_MAX + 1.0f))); 
 
-            } 
+                //choose the location and projection (zoom in or out) randomly
+                FindRandXY(m_effect_kenBurns_location_x[m_texCur],
+                           m_effect_kenBurns_location_y[m_texCur]);
+                m_effect_kenBurns_projection[m_texCur] =
+                    1 + (int)((2.0f * random() / (RAND_MAX + 1.0f))); 
+            }
             else  //No item, must be 1 of the first two preloaded items
             {
                 //start at random location and zoom out to face in center
                 FindRandXY(m_effect_kenBurns_location_x[m_texCur], m_effect_kenBurns_location_y[m_texCur]);
-                m_effect_kenBurns_projection[m_texCur] = 1; 
+                m_effect_kenBurns_projection[m_texCur] = 1;
             }
 
             m_effect_kenBurns_image_time[m_texCur].restart();
@@ -1328,60 +1330,60 @@ void GLSingleView::EffectKenBurns(void)
         if (m_effect_kenBurns_projection[m_texCur] == 1) // Zoom in image
         {
             // Start in center and pan out
-            x_loc = m_effect_kenBurns_location_x[m_texCur] * t[m_texCur]; 
-            y_loc = m_effect_kenBurns_location_y[m_texCur] * t[m_texCur];         
+            x_loc = m_effect_kenBurns_location_x[m_texCur] * t[m_texCur];
+            y_loc = m_effect_kenBurns_location_y[m_texCur] * t[m_texCur];
             scale_max = FindMaxScale(x_loc,y_loc);
-            scale_factor =     1.0f + (scale_max * s[m_texCur]); 
+            scale_factor =     1.0f + (scale_max * s[m_texCur]);
         }
         else // Zoom out image
         {
             // Start at random location and pan to center
-            x_loc = m_effect_kenBurns_location_x[m_texCur] -  m_effect_kenBurns_location_x[m_texCur] * t[m_texCur]; 
+            x_loc = m_effect_kenBurns_location_x[m_texCur] -  m_effect_kenBurns_location_x[m_texCur] * t[m_texCur];
             y_loc = m_effect_kenBurns_location_y[m_texCur] -  m_effect_kenBurns_location_y[m_texCur] * t[m_texCur];
             scale_max = FindMaxScale(x_loc,y_loc);
             scale_factor =     1.0f + scale_max -  (scale_max * t[m_texCur]);
-        } 
+        }
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glTranslatef(x_loc, y_loc, 0.0f);
 
-        m_texItem[m_texCur].MakeQuad((effect_pct-single_image_pct)*4, scale_factor); 
+        m_texItem[m_texCur].MakeQuad((effect_pct-single_image_pct)*4, scale_factor);
     }
-   
+
     //Load old picture
     if (m_effect_kenBurns_projection[m_texCur ? 0 : 1] == 1)// Zoom in image
     {
-        x_loc = m_effect_kenBurns_location_x[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1]; 
+        x_loc = m_effect_kenBurns_location_x[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
         y_loc = m_effect_kenBurns_location_y[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
         scale_max = FindMaxScale(x_loc,y_loc);
         scale_factor =     1.0f + (scale_max * s[m_texCur ? 0 : 1]);
     }
     else // Zoom out image
     {
-        x_loc = m_effect_kenBurns_location_x[m_texCur ? 0 : 1] -  
-            m_effect_kenBurns_location_x[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1]; 
-        y_loc = m_effect_kenBurns_location_y[m_texCur ? 0 : 1] -  
+        x_loc = m_effect_kenBurns_location_x[m_texCur ? 0 : 1] -
+            m_effect_kenBurns_location_x[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
+        y_loc = m_effect_kenBurns_location_y[m_texCur ? 0 : 1] -
             m_effect_kenBurns_location_y[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
         scale_max = FindMaxScale(x_loc,y_loc);
         scale_factor =     1.0f + scale_max -  (scale_max * t[m_texCur ? 0 : 1]);
-    } 
+    }
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(x_loc, y_loc, 0.0f);
 
-    if (effect_pct<= single_image_pct) 
+    if (effect_pct<= single_image_pct)
     {
         m_effect_kenBurns_new_image_started=false;
         m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f, scale_factor); //
     }
     else // Fade out image
     {
-        m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f - ((effect_pct-single_image_pct)*4), scale_factor); 
+        m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f - ((effect_pct-single_image_pct)*4), scale_factor);
 
     }
-    
+
     m_effect_current_frame++;
 }
 
@@ -1509,21 +1511,24 @@ float GLSingleView::FindMaxScale(float x_loc, float y_loc)
 
 void GLSingleView::FindRandXY(float &x_loc, float &y_loc)
 {
-    x_loc = (0.5 * rand() / (RAND_MAX + 1.0f)) + 0.25;  //Random number between .25 and .75
-    if ((int)(2.0 * rand() / (RAND_MAX + 1.0f)) == 0)
+    // Random number between .25 and .75
+    x_loc = (0.5 * random() / (RAND_MAX + 1.0f)) + 0.25;
+    if ((int)(2.0 * random() / (RAND_MAX + 1.0f)) == 0)
         x_loc = -1 * x_loc;
-    y_loc = (0.5 * rand() / (RAND_MAX + 1.0f)) + 0.25;  //Random number between .25 and .75
-    if ((int)(2.0 * rand() / (RAND_MAX + 1.0f)) == 0)
-        y_loc = -1 * y_loc;   
+    // Random number between .25 and .75
+    y_loc = (0.5 * random() / (RAND_MAX + 1.0f)) + 0.25;
+    if ((int)(2.0 * random() / (RAND_MAX + 1.0f)) == 0)
+        y_loc = -1 * y_loc;
 }
 
-KenBurnsImageLoader::KenBurnsImageLoader(
-    GLSingleView *singleView, ThumbList &itemList,
-    QSize texSize, QSize screenSize) :
+KenBurnsImageLoader::KenBurnsImageLoader(GLSingleView *singleView,
+                                         ThumbList &itemList,
+                                         QSize texSize, QSize screenSize) :
     MThread("KenBurnsImageLoader"),
     m_singleView(singleView),
     m_itemList(itemList),
     m_pos(0),
+    m_tex1First(false),
     m_screenSize(screenSize),
     m_texSize(texSize)
 {
@@ -1534,7 +1539,7 @@ void KenBurnsImageLoader::Initialize(int pos)
     m_pos = pos;
 }
 
-void KenBurnsImageLoader::run() 
+void KenBurnsImageLoader::run()
 {
     RunProlog();
     ThumbItem *item = m_itemList.at(m_pos);
@@ -1551,7 +1556,11 @@ void KenBurnsImageLoader::run()
         return;
     }
 
-    m_singleView->LoadImage(QGLWidget::convertToGLFormat(image.scaled(m_texSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)), image.size());   
+    image = image.scaled(m_texSize, Qt::IgnoreAspectRatio,
+                         Qt::SmoothTransformation);
+    QImage glimage = QGLWidget::convertToGLFormat(image);
+
+    m_singleView->LoadImage(glimage, glimage.size());
     m_singleView->Ready();
 
     RunEpilog();

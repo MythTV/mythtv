@@ -44,25 +44,36 @@ using namespace std;
 MythBurn::MythBurn(MythScreenStack   *parent,
                    MythScreenType    *destinationScreen,
                    MythScreenType    *themeScreen,
-                   ArchiveDestination archiveDestination, QString name)
-         :MythScreenType(parent, name)
+                   ArchiveDestination archiveDestination, QString name) :
+    MythScreenType(parent, name),
+    m_destinationScreen(destinationScreen),
+    m_themeScreen(themeScreen),
+    m_archiveDestination(archiveDestination),
+    m_bCreateISO(false),
+    m_bDoBurn(false),
+    m_bEraseDvdRw(false),
+    m_saveFilename(""),
+    m_theme(),
+    m_moveMode(false),
+    m_nextButton(NULL),
+    m_prevButton(NULL),
+    m_cancelButton(NULL),
+    m_archiveButtonList(NULL),
+    m_nofilesText(NULL),
+    m_addrecordingButton(NULL),
+    m_addvideoButton(NULL),
+    m_addfileButton(NULL),
+    m_sizeBar(NULL),
+    m_maxsizeText(NULL),
+    m_minsizeText(NULL),
+    m_currentsizeErrorText(NULL),
+    m_currentsizeText(NULL)
 {
-    m_destinationScreen = destinationScreen;
-    m_themeScreen = themeScreen;
-    m_archiveDestination = archiveDestination;
-
     // remove any old thumb images
     QString thumbDir = getTempDirectory() + "/config/thumbs";
     QDir dir(thumbDir);
     if (dir.exists() && !MythRemoveDirectory(dir))
         LOG(VB_GENERAL, LOG_ERR, "MythBurn: Failed to clear thumb directory");
-
-    m_bCreateISO = false;
-    m_bDoBurn = false;
-    m_bEraseDvdRw = false;
-    m_saveFilename = "";
-
-    m_moveMode = false;
 }
 
 MythBurn::~MythBurn(void)
@@ -1035,12 +1046,20 @@ void MythBurn::itemClicked(MythUIButtonListItem *item)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ProfileDialog::ProfileDialog(MythScreenStack *parent, ArchiveItem *archiveItem,
-                             QList<EncoderProfile *> profileList)
-              : MythScreenType(parent, "functionpopup")
+ProfileDialog::ProfileDialog(
+    MythScreenStack *parent, ArchiveItem *archiveItem,
+    QList<EncoderProfile *> profileList) :
+    MythScreenType(parent, "functionpopup"),
+    m_archiveItem(archiveItem),
+    m_profileList(profileList),
+    m_captionText(NULL),
+    m_descriptionText(NULL),
+    m_oldSizeText(NULL),
+    m_newSizeText(NULL),
+    m_profile_list(NULL),
+    m_enabledCheck(NULL),
+    m_okButton(NULL)
 {
-    m_archiveItem = archiveItem;
-    m_profileList = profileList;
 }
 
 bool ProfileDialog::Create()

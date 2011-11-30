@@ -228,11 +228,11 @@ int VideoOutputOpenGLVAAPI::SetPictureAttribute(PictureAttribute attribute,
     return VideoOutput::SetPictureAttribute(attribute, val);
 }
 
-void VideoOutputOpenGLVAAPI::UpdatePauseFrame(void)
+void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
 {
     if (codec_is_std(video_codec_id))
     {
-        VideoOutputOpenGLVAAPI::UpdatePauseFrame();
+        VideoOutputOpenGL::UpdatePauseFrame(disp_timecode);
         return;
     }
 
@@ -241,6 +241,7 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(void)
     {
         VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
         m_pauseBuffer = frame->buf;
+        disp_timecode = frame->disp_timecode;
     }
     else
         LOG(VB_PLAYBACK, LOG_WARNING, LOC +

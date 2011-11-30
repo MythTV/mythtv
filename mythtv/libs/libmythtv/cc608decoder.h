@@ -63,6 +63,8 @@ class CC608Decoder
     /// \return Services seen in last few seconds as specified.
     void GetServices(uint seconds, bool[4]) const;
 
+    static QString ToASCII(const QString &cc608, bool suppress_unknown);
+
   private:
     QChar CharCC(int code) const { return stdchar[code]; }
     void ResetCC(int mode);
@@ -114,6 +116,8 @@ class CC608Decoder
 
     // temporary buffer
     unsigned char *rbuf;
+    int last_format_tc[2];
+    int last_format_data[2];
 
     // VPS data
     char            vps_pr_label[20];

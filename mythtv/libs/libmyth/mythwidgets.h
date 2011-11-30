@@ -282,23 +282,22 @@ class MPUBLIC MythPushButton : public QPushButton
     Q_OBJECT
 
   public:
-    MythPushButton(QWidget *parent, const char *name = "MythPushButton",
-                   bool aa = false)
-        : QPushButton(parent), arrowAccel(aa)
+    MythPushButton(QWidget *parent, const char *name = "MythPushButton")
+        : QPushButton(parent)
     {
         setObjectName(name);
         setCheckable(false);
     }
 
-    MythPushButton(const QString &text, QWidget *parent, bool aa = false)
-        : QPushButton(text, parent), arrowAccel(aa)
+    MythPushButton(const QString &text, QWidget *parent)
+        : QPushButton(text, parent)
     {
         setObjectName("MythPushButton");
         setCheckable(false);
     }
 
     MythPushButton(const QString &ontext, const QString &offtext,
-                   QWidget *parent, bool isOn = true, bool aa = false);
+                   QWidget *parent, bool isOn = true);
 
     void setHelpText(const QString &help);
 
@@ -319,7 +318,6 @@ class MPUBLIC MythPushButton : public QPushButton
     QString helptext;
     QString onText;
     QString offText;
-    bool arrowAccel;
 
     QStringList keyPressActions;
 };

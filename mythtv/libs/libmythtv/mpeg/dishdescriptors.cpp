@@ -160,9 +160,9 @@ QDate DishEventTagsDescriptor::originalairdate(void) const
     return originalairdate;
 }
 
-QMutex            DishEventMPAADescriptor::mpaaRatingsLock;
-map<uint,QString> DishEventMPAADescriptor::mpaaRatingsDesc;
-bool              DishEventMPAADescriptor::mpaaRatingsExists = false;
+QMutex             DishEventMPAADescriptor::mpaaRatingsLock;
+QMap<uint,QString> DishEventMPAADescriptor::mpaaRatingsDesc;
+bool               DishEventMPAADescriptor::mpaaRatingsExists = false;
 
 float DishEventMPAADescriptor::stars(void) const
 {
@@ -187,13 +187,9 @@ QString DishEventMPAADescriptor::rating(void) const
 
     QMutexLocker locker(&mpaaRatingsLock);
 
-    map<uint,QString>::const_iterator it = mpaaRatingsDesc.find(rating_raw());
+    QMap<uint,QString>::const_iterator it = mpaaRatingsDesc.find(rating_raw());
     if (it != mpaaRatingsDesc.end())
-    {
-        QString ret = (*it).second;
-        ret.detach();
-        return ret;
-    }
+        return *it;
 
     // Found nothing? Just return empty string.
     return "";
@@ -239,9 +235,9 @@ void DishEventMPAADescriptor::Init(void)
     mpaaRatingsExists = true;
 }
 
-QMutex            DishEventVCHIPDescriptor::vchipRatingsLock;
-map<uint,QString> DishEventVCHIPDescriptor::vchipRatingsDesc;
-bool              DishEventVCHIPDescriptor::vchipRatingsExists = false;
+QMutex             DishEventVCHIPDescriptor::vchipRatingsLock;
+QMap<uint,QString> DishEventVCHIPDescriptor::vchipRatingsDesc;
+bool               DishEventVCHIPDescriptor::vchipRatingsExists = false;
 
 QString DishEventVCHIPDescriptor::rating(void) const
 {
@@ -250,13 +246,9 @@ QString DishEventVCHIPDescriptor::rating(void) const
 
     QMutexLocker locker(&vchipRatingsLock);
 
-    map<uint,QString>::const_iterator it = vchipRatingsDesc.find(rating_raw());
+    QMap<uint,QString>::const_iterator it = vchipRatingsDesc.find(rating_raw());
     if (it != vchipRatingsDesc.end())
-    {
-        QString ret = (*it).second;
-        ret.detach();
-        return ret;
-    }
+        return *it;
 
     // Found nothing? Just return empty string.
     return "";
@@ -298,16 +290,17 @@ void DishEventVCHIPDescriptor::Init(void)
     vchipRatingsExists = true;
 }
 
-QMutex            DishContentDescriptor::categoryLock;
-map<uint,QString> DishContentDescriptor::themeDesc;
-map<uint,QString> DishContentDescriptor::categoryDesc;
-bool              DishContentDescriptor::categoriesExists = false;
+QMap<uint,QString> DishContentDescriptor::themeDesc;
+QMap<uint,QString> DishContentDescriptor::dishCategoryDesc;
+volatile bool      DishContentDescriptor::dishCategoryDescExists = false;
 
 QString dish_theme_type_to_string(uint theme_type)
 {
-    static const char *themes[] =
-        { "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
-          "Series/Special", "Music/Art", "Religious", "Off-Air" };
+    static const char *themes[kThemeLast] =
+    {
+        "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
+        "Series/Special", "Music/Art", "Religious", "Off-Air"
+    };
 
     if ((theme_type > kThemeNone) && (theme_type < kThemeLast))
         return QString(themes[theme_type]);
@@ -317,9 +310,11 @@ QString dish_theme_type_to_string(uint theme_type)
 
 DishThemeType string_to_dish_theme_type(const QString &theme_type)
 {
-    static const char *themes[] =
-        { "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
-          "Series/Special", "Music/Art", "Religious", "Off-Air" };
+    static const char *themes[kThemeLast] =
+    {
+        "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
+        "Series/Special", "Music/Art", "Religious", "Off-Air"
+    };
 
     for (uint i = 1; i < 10; i++)
         if (theme_type == themes[i])
@@ -330,15 +325,15 @@ DishThemeType string_to_dish_theme_type(const QString &theme_type)
 
 DishThemeType DishContentDescriptor::GetTheme(void) const
 {
-    if (!categoriesExists)
+    if (!dishCategoryDescExists)
         Init();
 
-    if (Nibble1() == 0x00)
+    if (Nibble1(0) == 0x00)
         return kThemeOffAir;
 
-    map<uint,QString>::const_iterator it = themeDesc.find(Nibble2());
+    QMap<uint,QString>::const_iterator it = themeDesc.find(Nibble2(0));
     if (it != themeDesc.end())
-        return string_to_dish_theme_type((*it).second);
+        return string_to_dish_theme_type(*it);
 
     // Found nothing? Just return empty string.
     return kThemeNone;
@@ -346,42 +341,35 @@ DishThemeType DishContentDescriptor::GetTheme(void) const
 
 QString DishContentDescriptor::GetCategory(void) const
 {
-    if (!categoriesExists)
+    if (!dishCategoryDescExists)
         Init();
 
     QMutexLocker locker(&categoryLock);
 
     // Try to get detailed description
-    map<uint,QString>::const_iterator it = categoryDesc.find(UserNibble());
-    if (it != categoryDesc.end())
-    {
-        QString ret = (*it).second;
-        ret.detach();
-        return ret;
-    }
+    QMap<uint,QString>::const_iterator it =
+        dishCategoryDesc.find(UserNibble(0));
+    if (it != dishCategoryDesc.end())
+        return *it;
 
     // Fallback to just the theme
     QString theme = dish_theme_type_to_string(GetTheme());
 
-    if (theme != "")
-        return theme;
-
-    // Found nothing? Just return empty string.
-    return "";
+    return theme;
 }
 
 QString DishContentDescriptor::toString() const
 {
-    QString tmp("");
-    tmp += GetTheme() + " : " + GetCategory();
-    return tmp;
+    return QString("%1 : %2").arg(int(GetTheme())).arg(GetCategory());
 }
 
 void DishContentDescriptor::Init(void)
 {
+    ContentDescriptor::Init();
+
     QMutexLocker locker(&categoryLock);
 
-    if (categoriesExists)
+    if (dishCategoryDescExists)
         return;
 
     // Dish/BEV "Themes"
@@ -395,163 +383,163 @@ void DishContentDescriptor::Init(void)
     themeDesc[kThemeReligious] = "Religious";
 
     // Dish/BEV categories
-    categoryDesc[0x01] = "Action";
-    categoryDesc[0x02] = "Adults only";
-    categoryDesc[0x03] = "Adventure";
-    categoryDesc[0x04] = "Animals";
-    categoryDesc[0x05] = "Animated";
-    categoryDesc[0x07] = "Anthology";
-    categoryDesc[0x08] = "Art";
-    categoryDesc[0x09] = "Auto";
-    categoryDesc[0x0a] = "Awards";
-    categoryDesc[0x0b] = "Ballet";
-    categoryDesc[0x0c] = "Baseball";
-    categoryDesc[0x0d] = "Basketball";
-    categoryDesc[0x11] = "Biography";
-    categoryDesc[0x12] = "Boat";
-    categoryDesc[0x14] = "Bowling";
-    categoryDesc[0x15] = "Boxing";
-    categoryDesc[0x16] = "Bus./financial";
-    categoryDesc[0x1a] = "Children";
-    categoryDesc[0x1b] = "Children-special";
-    categoryDesc[0x1c] = "Children-news";
-    categoryDesc[0x1d] = "Children-music";
-    categoryDesc[0x1f] = "Collectibles";
-    categoryDesc[0x20] = "Comedy";
-    categoryDesc[0x21] = "Comedy-drama";
-    categoryDesc[0x22] = "Computers";
-    categoryDesc[0x23] = "Cooking";
-    categoryDesc[0x24] = "Crime";
-    categoryDesc[0x25] = "Crime drama";
-    categoryDesc[0x27] = "Dance";
-    categoryDesc[0x29] = "Docudrama";
-    categoryDesc[0x2a] = "Documentary";
-    categoryDesc[0x2b] = "Drama";
-    categoryDesc[0x2c] = "Educational";
-    categoryDesc[0x2f] = "Excercise";
-    categoryDesc[0x31] = "Fantasy";
-    categoryDesc[0x32] = "Fasion";
-    categoryDesc[0x34] = "Fishing";
-    categoryDesc[0x35] = "Football";
-    categoryDesc[0x36] = "French";
-    categoryDesc[0x37] = "Fundraiser";
-    categoryDesc[0x38] = "Game show";
-    categoryDesc[0x39] = "Golf";
-    categoryDesc[0x3a] = "Gymnastics";
-    categoryDesc[0x3b] = "Health";
-    categoryDesc[0x3c] = "History";
-    categoryDesc[0x3d] = "Historical drama";
-    categoryDesc[0x3e] = "Hockey";
-    categoryDesc[0x3f] = "Holiday";
-    categoryDesc[0x40] = "Holiday-children";
-    categoryDesc[0x41] = "Holiday-children special";
-    categoryDesc[0x44] = "Holiday special";
-    categoryDesc[0x45] = "Horror";
-    categoryDesc[0x46] = "Horse racing";
-    categoryDesc[0x47] = "House/garden";
-    categoryDesc[0x49] = "How-to";
-    categoryDesc[0x4b] = "Interview";
-    categoryDesc[0x4d] = "Lacrosse";
-    categoryDesc[0x4f] = "Martial Arts";
-    categoryDesc[0x50] = "Medical";
-    categoryDesc[0x51] = "Miniseries";
-    categoryDesc[0x52] = "Motorsports";
-    categoryDesc[0x53] = "Motorcycle";
-    categoryDesc[0x54] = "Music";
-    categoryDesc[0x55] = "Music special";
-    categoryDesc[0x56] = "Music talk";
-    categoryDesc[0x57] = "Musical";
-    categoryDesc[0x58] = "Musical comedy";
-    categoryDesc[0x5a] = "Mystery";
-    categoryDesc[0x5b] = "Nature";
-    categoryDesc[0x5c] = "News";
-    categoryDesc[0x5f] = "Opera";
-    categoryDesc[0x60] = "Outdoors";
-    categoryDesc[0x63] = "Public affairs";
-    categoryDesc[0x66] = "Reality";
-    categoryDesc[0x67] = "Religious";
-    categoryDesc[0x68] = "Rodeo";
-    categoryDesc[0x69] = "Romance";
-    categoryDesc[0x6a] = "Romance-comedy";
-    categoryDesc[0x6b] = "Rugby";
-    categoryDesc[0x6c] = "Running";
-    categoryDesc[0x6e] = "Science";
-    categoryDesc[0x6f] = "Science fiction";
-    categoryDesc[0x70] = "Self improvement";
-    categoryDesc[0x71] = "Shopping";
-    categoryDesc[0x74] = "Skiing";
-    categoryDesc[0x77] = "Soap";
-    categoryDesc[0x7b] = "Soccor";
-    categoryDesc[0x7c] = "Softball";
-    categoryDesc[0x7d] = "Spanish";
-    categoryDesc[0x7e] = "Special";
-    categoryDesc[0x81] = "Sports non-event";
-    categoryDesc[0x82] = "Sports talk";
-    categoryDesc[0x83] = "Suspense";
-    categoryDesc[0x85] = "Swimming";
-    categoryDesc[0x86] = "Talk";
-    categoryDesc[0x87] = "Tennis";
-    categoryDesc[0x89] = "Track/field";
-    categoryDesc[0x8a] = "Travel";
-    categoryDesc[0x8b] = "Variety";
-    categoryDesc[0x8c] = "Volleyball";
-    categoryDesc[0x8d] = "War";
-    categoryDesc[0x8e] = "Watersports";
-    categoryDesc[0x8f] = "Weather";
-    categoryDesc[0x90] = "Western";
-    categoryDesc[0x92] = "Wrestling";
-    categoryDesc[0x93] = "Yoga";
-    categoryDesc[0x94] = "Agriculture";
-    categoryDesc[0x95] = "Anime";
-    categoryDesc[0x97] = "Arm Wrestling";
-    categoryDesc[0x98] = "Arts/crafts";
-    categoryDesc[0x99] = "Auction";
-    categoryDesc[0x9a] = "Auto racing";
-    categoryDesc[0x9b] = "Air racing";
-    categoryDesc[0x9c] = "Badminton";
-    categoryDesc[0xa0] = "Bicycle racing";
-    categoryDesc[0xa1] = "Boat Racing";
-    categoryDesc[0xa6] = "Community";
-    categoryDesc[0xa7] = "Consumer";
-    categoryDesc[0xaa] = "Debate";
-    categoryDesc[0xac] = "Dog show";
-    categoryDesc[0xad] = "Drag racing";
-    categoryDesc[0xae] = "Entertainment";
-    categoryDesc[0xaf] = "Environment";
-    categoryDesc[0xb0] = "Equestrian";
-    categoryDesc[0xb3] = "Field hockey";
-    categoryDesc[0xb5] = "Football";
-    categoryDesc[0xb6] = "Gay/lesbian";
-    categoryDesc[0xb7] = "Handball";
-    categoryDesc[0xb8] = "Home improvement";
-    categoryDesc[0xb9] = "Hunting";
-    categoryDesc[0xbb] = "Hydroplane racing";
-    categoryDesc[0xc1] = "Law";
-    categoryDesc[0xc3] = "Motorcycle racing";
-    categoryDesc[0xc5] = "Newsmagazine";
-    categoryDesc[0xc7] = "Paranormal";
-    categoryDesc[0xc8] = "Parenting";
-    categoryDesc[0xca] = "Performing arts";
-    categoryDesc[0xcc] = "Politics";
-    categoryDesc[0xcf] = "Pro wrestling";
-    categoryDesc[0xd3] = "Sailing";
-    categoryDesc[0xd4] = "Shooting";
-    categoryDesc[0xd5] = "Sitcom";
-    categoryDesc[0xd6] = "Skateboarding";
-    categoryDesc[0xd9] = "Snowboarding";
-    categoryDesc[0xdd] = "Standup";
-    categoryDesc[0xdf] = "Surfing";
-    categoryDesc[0xe0] = "Tennis";
-    categoryDesc[0xe1] = "Triathlon";
-    categoryDesc[0xe6] = "Card games";
-    categoryDesc[0xe7] = "Poker";
-    categoryDesc[0xea] = "Military";
-    categoryDesc[0xeb] = "Technology";
-    categoryDesc[0xec] = "Mixed martial arts";
-    categoryDesc[0xed] = "Action sports";
-    categoryDesc[0xff] = "Dish Network";
+    dishCategoryDesc[0x01] = "Action";
+    dishCategoryDesc[0x02] = "Adults only";
+    dishCategoryDesc[0x03] = "Adventure";
+    dishCategoryDesc[0x04] = "Animals";
+    dishCategoryDesc[0x05] = "Animated";
+    dishCategoryDesc[0x07] = "Anthology";
+    dishCategoryDesc[0x08] = "Art";
+    dishCategoryDesc[0x09] = "Auto";
+    dishCategoryDesc[0x0a] = "Awards";
+    dishCategoryDesc[0x0b] = "Ballet";
+    dishCategoryDesc[0x0c] = "Baseball";
+    dishCategoryDesc[0x0d] = "Basketball";
+    dishCategoryDesc[0x11] = "Biography";
+    dishCategoryDesc[0x12] = "Boat";
+    dishCategoryDesc[0x14] = "Bowling";
+    dishCategoryDesc[0x15] = "Boxing";
+    dishCategoryDesc[0x16] = "Bus./financial";
+    dishCategoryDesc[0x1a] = "Children";
+    dishCategoryDesc[0x1b] = "Children-special";
+    dishCategoryDesc[0x1c] = "Children-news";
+    dishCategoryDesc[0x1d] = "Children-music";
+    dishCategoryDesc[0x1f] = "Collectibles";
+    dishCategoryDesc[0x20] = "Comedy";
+    dishCategoryDesc[0x21] = "Comedy-drama";
+    dishCategoryDesc[0x22] = "Computers";
+    dishCategoryDesc[0x23] = "Cooking";
+    dishCategoryDesc[0x24] = "Crime";
+    dishCategoryDesc[0x25] = "Crime drama";
+    dishCategoryDesc[0x27] = "Dance";
+    dishCategoryDesc[0x29] = "Docudrama";
+    dishCategoryDesc[0x2a] = "Documentary";
+    dishCategoryDesc[0x2b] = "Drama";
+    dishCategoryDesc[0x2c] = "Educational";
+    dishCategoryDesc[0x2f] = "Excercise";
+    dishCategoryDesc[0x31] = "Fantasy";
+    dishCategoryDesc[0x32] = "Fasion";
+    dishCategoryDesc[0x34] = "Fishing";
+    dishCategoryDesc[0x35] = "Football";
+    dishCategoryDesc[0x36] = "French";
+    dishCategoryDesc[0x37] = "Fundraiser";
+    dishCategoryDesc[0x38] = "Game show";
+    dishCategoryDesc[0x39] = "Golf";
+    dishCategoryDesc[0x3a] = "Gymnastics";
+    dishCategoryDesc[0x3b] = "Health";
+    dishCategoryDesc[0x3c] = "History";
+    dishCategoryDesc[0x3d] = "Historical drama";
+    dishCategoryDesc[0x3e] = "Hockey";
+    dishCategoryDesc[0x3f] = "Holiday";
+    dishCategoryDesc[0x40] = "Holiday-children";
+    dishCategoryDesc[0x41] = "Holiday-children special";
+    dishCategoryDesc[0x44] = "Holiday special";
+    dishCategoryDesc[0x45] = "Horror";
+    dishCategoryDesc[0x46] = "Horse racing";
+    dishCategoryDesc[0x47] = "House/garden";
+    dishCategoryDesc[0x49] = "How-to";
+    dishCategoryDesc[0x4b] = "Interview";
+    dishCategoryDesc[0x4d] = "Lacrosse";
+    dishCategoryDesc[0x4f] = "Martial Arts";
+    dishCategoryDesc[0x50] = "Medical";
+    dishCategoryDesc[0x51] = "Miniseries";
+    dishCategoryDesc[0x52] = "Motorsports";
+    dishCategoryDesc[0x53] = "Motorcycle";
+    dishCategoryDesc[0x54] = "Music";
+    dishCategoryDesc[0x55] = "Music special";
+    dishCategoryDesc[0x56] = "Music talk";
+    dishCategoryDesc[0x57] = "Musical";
+    dishCategoryDesc[0x58] = "Musical comedy";
+    dishCategoryDesc[0x5a] = "Mystery";
+    dishCategoryDesc[0x5b] = "Nature";
+    dishCategoryDesc[0x5c] = "News";
+    dishCategoryDesc[0x5f] = "Opera";
+    dishCategoryDesc[0x60] = "Outdoors";
+    dishCategoryDesc[0x63] = "Public affairs";
+    dishCategoryDesc[0x66] = "Reality";
+    dishCategoryDesc[0x67] = "Religious";
+    dishCategoryDesc[0x68] = "Rodeo";
+    dishCategoryDesc[0x69] = "Romance";
+    dishCategoryDesc[0x6a] = "Romance-comedy";
+    dishCategoryDesc[0x6b] = "Rugby";
+    dishCategoryDesc[0x6c] = "Running";
+    dishCategoryDesc[0x6e] = "Science";
+    dishCategoryDesc[0x6f] = "Science fiction";
+    dishCategoryDesc[0x70] = "Self improvement";
+    dishCategoryDesc[0x71] = "Shopping";
+    dishCategoryDesc[0x74] = "Skiing";
+    dishCategoryDesc[0x77] = "Soap";
+    dishCategoryDesc[0x7b] = "Soccor";
+    dishCategoryDesc[0x7c] = "Softball";
+    dishCategoryDesc[0x7d] = "Spanish";
+    dishCategoryDesc[0x7e] = "Special";
+    dishCategoryDesc[0x81] = "Sports non-event";
+    dishCategoryDesc[0x82] = "Sports talk";
+    dishCategoryDesc[0x83] = "Suspense";
+    dishCategoryDesc[0x85] = "Swimming";
+    dishCategoryDesc[0x86] = "Talk";
+    dishCategoryDesc[0x87] = "Tennis";
+    dishCategoryDesc[0x89] = "Track/field";
+    dishCategoryDesc[0x8a] = "Travel";
+    dishCategoryDesc[0x8b] = "Variety";
+    dishCategoryDesc[0x8c] = "Volleyball";
+    dishCategoryDesc[0x8d] = "War";
+    dishCategoryDesc[0x8e] = "Watersports";
+    dishCategoryDesc[0x8f] = "Weather";
+    dishCategoryDesc[0x90] = "Western";
+    dishCategoryDesc[0x92] = "Wrestling";
+    dishCategoryDesc[0x93] = "Yoga";
+    dishCategoryDesc[0x94] = "Agriculture";
+    dishCategoryDesc[0x95] = "Anime";
+    dishCategoryDesc[0x97] = "Arm Wrestling";
+    dishCategoryDesc[0x98] = "Arts/crafts";
+    dishCategoryDesc[0x99] = "Auction";
+    dishCategoryDesc[0x9a] = "Auto racing";
+    dishCategoryDesc[0x9b] = "Air racing";
+    dishCategoryDesc[0x9c] = "Badminton";
+    dishCategoryDesc[0xa0] = "Bicycle racing";
+    dishCategoryDesc[0xa1] = "Boat Racing";
+    dishCategoryDesc[0xa6] = "Community";
+    dishCategoryDesc[0xa7] = "Consumer";
+    dishCategoryDesc[0xaa] = "Debate";
+    dishCategoryDesc[0xac] = "Dog show";
+    dishCategoryDesc[0xad] = "Drag racing";
+    dishCategoryDesc[0xae] = "Entertainment";
+    dishCategoryDesc[0xaf] = "Environment";
+    dishCategoryDesc[0xb0] = "Equestrian";
+    dishCategoryDesc[0xb3] = "Field hockey";
+    dishCategoryDesc[0xb5] = "Football";
+    dishCategoryDesc[0xb6] = "Gay/lesbian";
+    dishCategoryDesc[0xb7] = "Handball";
+    dishCategoryDesc[0xb8] = "Home improvement";
+    dishCategoryDesc[0xb9] = "Hunting";
+    dishCategoryDesc[0xbb] = "Hydroplane racing";
+    dishCategoryDesc[0xc1] = "Law";
+    dishCategoryDesc[0xc3] = "Motorcycle racing";
+    dishCategoryDesc[0xc5] = "Newsmagazine";
+    dishCategoryDesc[0xc7] = "Paranormal";
+    dishCategoryDesc[0xc8] = "Parenting";
+    dishCategoryDesc[0xca] = "Performing arts";
+    dishCategoryDesc[0xcc] = "Politics";
+    dishCategoryDesc[0xcf] = "Pro wrestling";
+    dishCategoryDesc[0xd3] = "Sailing";
+    dishCategoryDesc[0xd4] = "Shooting";
+    dishCategoryDesc[0xd5] = "Sitcom";
+    dishCategoryDesc[0xd6] = "Skateboarding";
+    dishCategoryDesc[0xd9] = "Snowboarding";
+    dishCategoryDesc[0xdd] = "Standup";
+    dishCategoryDesc[0xdf] = "Surfing";
+    dishCategoryDesc[0xe0] = "Tennis";
+    dishCategoryDesc[0xe1] = "Triathlon";
+    dishCategoryDesc[0xe6] = "Card games";
+    dishCategoryDesc[0xe7] = "Poker";
+    dishCategoryDesc[0xea] = "Military";
+    dishCategoryDesc[0xeb] = "Technology";
+    dishCategoryDesc[0xec] = "Mixed martial arts";
+    dishCategoryDesc[0xed] = "Action sports";
+    dishCategoryDesc[0xff] = "Dish Network";
 
-    categoriesExists = true;
+    dishCategoryDescExists = true;
 }
 
 

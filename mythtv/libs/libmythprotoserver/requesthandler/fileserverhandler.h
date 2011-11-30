@@ -10,6 +10,7 @@ using namespace std;
 #include "mythprotoserverexp.h"
 
 #include "sockethandler/filetransfer.h"
+#include "requesthandler/fileserverutil.h"
 
 class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
 {
@@ -30,14 +31,6 @@ class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
     QList<FileSystemInfo> QueryFileSystems(void);
     QList<FileSystemInfo> QueryAllFileSystems(void);
 
-  signals:
-    void unlinkFailed(QString path);
-    void fileUnlinked(QString path);
-
-  protected slots:
-    void deleteThreadTerminated(void);
-//    void deferredDeleteSlot(void);
-
   private:
     bool HandleQueryFreeSpace(SocketHandler *socket);
     bool HandleQueryFreeSpaceList(SocketHandler *socket);
@@ -49,9 +42,8 @@ class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
     bool HandleDeleteFile(SocketHandler *socket, QStringList &slist);
     bool HandleDeleteFile(SocketHandler *socket, QString filename,
                           QString storagegroup);
-    bool HandleDeleteFile(QString filename, QString storagegroup)
-                        { return HandleDeleteFile((SocketHandler*)NULL,
-                                                  filename, storagegroup); }
+    bool HandleDeleteFile(QString filename, QString storagegroup);
+    bool HandleDeleteFile(DeleteHandler *handler);
     
     bool HandleGetFileList(SocketHandler *socket, QStringList &slist);
     bool HandleFileQuery(SocketHandler *socket, QStringList &slist);

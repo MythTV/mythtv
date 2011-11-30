@@ -743,15 +743,6 @@ LCD::~LCD()
     }
 }
 
-// this does nothing
-void LCD::setLevels(int numbLevels, float *values)
-{
-    numbLevels = numbLevels;
-    values = values;
-
-    LOG(VB_GENERAL, LOG_DEBUG, LOC + "setLevels");
-}
-
 QString LCD::quotedString(const QString &s)
 {
     QString sRes = s;

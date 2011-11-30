@@ -375,7 +375,7 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
     ZeroMemory(&d3dpp, sizeof(D3DPRESENT_PARAMETERS));
     d3dpp.BackBufferFormat       = m_adaptor_fmt;
     d3dpp.hDeviceWindow          = window;
-    d3dpp.Windowed               = TRUE;
+    d3dpp.Windowed               = true;
     d3dpp.BackBufferWidth        = size.width();
     d3dpp.BackBufferHeight       = size.height();
     d3dpp.BackBufferCount        = 1;

@@ -144,7 +144,7 @@ void ProgramInfoCache::Refresh(void)
     for (; it != m_cache.end(); it = nit)
     {
         nit = it;
-        nit++;
+        ++nit;
 
         if (it->second->GetAvailableStatus() == asDeleted)
         {

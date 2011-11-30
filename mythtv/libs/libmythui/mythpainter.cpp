@@ -110,6 +110,37 @@ void MythPainter::DrawText(const QRect &r, const QString &msg,
     DrawImage(destRect, im, srcRect, alpha);
 }
 
+void MythPainter::DrawTextLayout(const QRect & canvasRect,
+                                 const LayoutVector & layouts,
+                                 const FormatVector & formats,
+                                 const MythFontProperties & font, int alpha,
+                                 const QRect & destRect)
+{
+    if (canvasRect.isNull())
+        return;
+
+    QRect      canvas(canvasRect);
+    QRect      dest(destRect);
+
+    MythImage *im = GetImageFromTextLayout(layouts, formats, font,
+                                           canvas, dest);
+    if (!im)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("MythPainter::DrawTextLayout: "
+                                             "Unable to create image."));
+        return;
+    }
+    if (im->isNull())
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, QString("MythPainter::DrawTextLayout: "
+                                           "Rendered image is null."));
+        return;
+    }
+
+    QRect srcRect(0, 0, dest.width(), dest.height());
+    DrawImage(dest, im, srcRect, alpha);
+}
+
 void MythPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
                            const QPen &linePen, int alpha)
 {
@@ -285,6 +316,107 @@ MythImage *MythPainter::GetImageFromString(const QString &msg,
     if (im)
     {
         DrawTextPriv(im, msg, flags, r, font);
+        m_SoftwareCacheSize += im->bytesPerLine() * im->height();
+        m_StringToImageMap[incoming] = im;
+        m_StringExpireList.push_back(incoming);
+        ExpireImages(m_MaxSoftwareCacheSize);
+    }
+    return im;
+}
+
+MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
+                                               const FormatVector &formats,
+                                               const MythFontProperties &font,
+                                               QRect &canvas, QRect &dest)
+{
+    LayoutVector::const_iterator Ipara;
+
+    QString incoming = QString::number(canvas.x()) +
+                       QString::number(canvas.y()) +
+                       QString::number(canvas.width()) +
+                       QString::number(canvas.height()) +
+                       QString::number(dest.width()) +
+                       QString::number(dest.height()) +
+                       font.GetHash();
+
+    for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
+        incoming += (*Ipara)->text();
+
+    if (m_StringToImageMap.contains(incoming))
+    {
+        m_StringExpireList.remove(incoming);
+        m_StringExpireList.push_back(incoming);
+        return m_StringToImageMap[incoming];
+    }
+
+    if (font.hasShadow())
+    {
+        QPoint drawOffset;
+        QPoint shadowOffset;
+        QColor shadowColor;
+        int    shadowAlpha;
+
+        font.GetOffset(drawOffset);
+        font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
+
+        canvas.setX(canvas.x() - drawOffset.x());
+        canvas.setWidth(canvas.width() + shadowOffset.x());
+        canvas.setY(canvas.y() - drawOffset.y());
+        canvas.setHeight(canvas.height() + shadowOffset.y());
+    }
+
+    MythImage *im = GetFormatImage();
+    if (im)
+    {
+        QImage pm(canvas.size(), QImage::Format_ARGB32_Premultiplied);
+        pm.fill(0);
+
+        QPainter painter(&pm);
+        if (!painter.isActive())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "MythPainter::GetImageFromTextLayout: "
+                "Invalid canvas.");
+            return im;
+        }
+
+        QRect    clip;
+        clip.setSize(canvas.size());
+
+        QFont tmpfont = font.face();
+        tmpfont.setStyleStrategy(QFont::OpenGLCompatible);
+        painter.setFont(tmpfont);
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        if (font.hasShadow())
+        {
+            QRect  shadowRect;
+            QPoint drawOffset;
+            QPoint shadowOffset;
+            QColor shadowColor;
+            int    shadowAlpha;
+
+            font.GetOffset(drawOffset);
+            font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
+            shadowColor.setAlpha(shadowAlpha);
+
+            shadowRect = canvas;
+            shadowRect.translate(shadowOffset.x() + drawOffset.x(),
+                                 shadowOffset.y() + drawOffset.y());
+
+            painter.setPen(shadowColor);
+            for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
+                (*Ipara)->draw(&painter, shadowRect.topLeft(), formats, clip);
+        }
+
+        painter.setPen(QPen(font.GetBrush(), 0));
+        for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
+            (*Ipara)->draw(&painter, canvas.topLeft(), formats, clip);
+
+        painter.end();
+
+        pm.setOffset(canvas.topLeft());
+        im->Assign(pm.copy(0, 0, dest.width(), dest.height()));
+
         m_SoftwareCacheSize += im->bytesPerLine() * im->height();
         m_StringToImageMap[incoming] = im;
         m_StringExpireList.push_back(incoming);

@@ -511,6 +511,10 @@ ProgramInfo::ProgramInfo(
     bool commfree,
     bool repeat,
 
+    uint _videoproperties,
+    uint _audioproperties,
+    uint _subtitleType,
+
     const ProgramList &schedList, bool oneChanid) :
     title(_title),
     subtitle(_subtitle),
@@ -565,7 +569,7 @@ ProgramInfo::ProgramInfo(
     findid(_findid),
 
     programflags(FL_NONE),
-    properties(0),
+    properties((_subtitleType<<11) | (_videoproperties<<6) | _audioproperties),
     year(_year),
 
     recstatus(_recstatus),
@@ -767,7 +771,8 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
                          int _season, int _episode,
                          const QString &_inetref,
                          uint _length_in_minutes,
-                         uint _year) :
+                         uint _year,
+                         const QString &_programid) :
     positionMapDBReplacement(NULL)
 {
     clear();
@@ -807,6 +812,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     episode = _episode;
     inetref = _inetref;
     title = _title;
+    programid = _programid;
 }
 
 ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
@@ -1396,6 +1402,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["recstartdate"] = MythDate::toString(recstartts, kDateShort);
         progMap["recendtime"] = MythDate::toString(recendts, kTime);
         progMap["recenddate"] = MythDate::toString(recendts, kDateShort);
+        progMap["startts"] = QString::number(startts.toTime_t());
+        progMap["endts"]   = QString::number(endts.toTime_t());
     }
 
     using namespace MythDate;
@@ -3669,6 +3677,8 @@ uint ProgramInfo::QueryAverageFrameRate(void) const
  */
 int64_t ProgramInfo::QueryTotalDuration(void) const
 {
+    if (gCoreContext->IsDatabaseIgnored())
+        return 0LL;
     int64_t msec = load_markup_datum(MARK_DURATION_MS, chanid, recstartts);
     return msec * 1000;
 }
@@ -4380,7 +4390,8 @@ static bool FromProgramQuery(
         "    program.airdate, program.stars, program.originalairdate, "
         "    program.category_type, oldrecstatus.recordid, "
         "    oldrecstatus.rectype, oldrecstatus.recstatus, "
-        "    oldrecstatus.findid "
+        "    oldrecstatus.findid, program.videoprop+0, program.audioprop+0, "
+        "    program.subtitletypes+0 "
         "FROM program "
         "LEFT JOIN channel ON program.chanid = channel.chanid "
         "LEFT JOIN oldrecorded AS oldrecstatus ON "
@@ -4468,6 +4479,9 @@ bool LoadFromProgram(
 
                 query.value(11).toInt() == COMM_DETECT_COMMFREE, // commfree
                 query.value(10).toInt(), // repeat
+                query.value(23).toInt(), // videoprop
+                query.value(24).toInt(), // audioprop
+                query.value(25).toInt(), // subtitletypes
 
                 schedList, oneChanid));
     }

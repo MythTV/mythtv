@@ -40,7 +40,6 @@ class LCDProcClient : public QObject
     void setMusicProgress(QString time, float generic_progress);
     void setMusicRepeat(int repeat);
     void setMusicShuffle(int shuffle);
-    void setLevels(int numbLevels, float *values);
     void switchToChannel(QString channum = "", QString title = "", 
                          QString subtitle = "");
     void setChannelProgress(const QString &time, float percentViewed);

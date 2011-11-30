@@ -162,7 +162,7 @@ void RawSettingsEditor::Save(void)
     }
 
     if (changed && (!gCoreContext->IsMasterHost() || gCoreContext->BackendIsRunning()))
-        RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+        gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
 
     Close();
 }

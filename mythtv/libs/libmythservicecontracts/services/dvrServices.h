@@ -28,6 +28,7 @@
 
 #include "datacontracts/programList.h"
 #include "datacontracts/encoderList.h"
+#include "datacontracts/recRuleList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -48,7 +49,12 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.3" );
+    Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
+    Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
+    Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
+    Q_CLASSINFO( "EnableRecordSchedule_Method",                 "POST" )
+    Q_CLASSINFO( "DisableRecordSchedule_Method",                "POST" )
 
     public:
 
@@ -59,18 +65,54 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         {
             DTC::ProgramList::InitializeCustomTypes();
             DTC::EncoderList::InitializeCustomTypes();
+            DTC::RecRuleList::InitializeCustomTypes();
         }
 
     public slots:
 
-        virtual DTC::ProgramList*  GetExpiring        ( int              StartIndex, 
-                                                        int              Count      ) = 0;
+        virtual DTC::ProgramList*  GetExpiringList       ( int              StartIndex, 
+                                                           int              Count      ) = 0;
 
-        virtual DTC::ProgramList* GetRecorded         ( bool             Descending,
-                                                        int              StartIndex,
-                                                        int              Count      ) = 0;
+        virtual DTC::ProgramList*  GetRecordedList       ( bool             Descending,
+                                                           int              StartIndex,
+                                                           int              Count      ) = 0;
 
-        virtual DTC::EncoderList*  Encoders           ( ) = 0;
+        virtual DTC::ProgramList*  GetFilteredRecordedList ( bool             Descending,
+                                                             int              StartIndex,
+                                                             int              Count,
+                                                             const QString   &TitleRegEx,
+                                                             const QString   &RecGroup,
+                                                             const QString   &StorageGroup ) = 0;
+
+        virtual DTC::Program*      GetRecorded           ( int              ChanId,
+                                                            const QDateTime &StartTime  ) = 0;
+
+        virtual bool               RemoveRecorded        ( int              ChanId,
+                                                           const QDateTime &StartTime  ) = 0;
+
+        virtual DTC::ProgramList*  GetConflictList       ( int              StartIndex,
+                                                           int              Count      ) = 0;
+
+        virtual DTC::ProgramList*  GetUpcomingList       ( int              StartIndex,
+                                                           int              Count,
+                                                           bool             ShowAll    ) = 0;
+
+        virtual DTC::EncoderList*  GetEncoderList        ( ) = 0;
+
+        // Recording Rules
+
+//        virtual bool               AddRecordSchedule  ( ) = 0;
+
+        virtual bool               RemoveRecordSchedule  ( uint             RecordId   ) = 0;
+
+        virtual DTC::RecRuleList*  GetRecordScheduleList ( int              StartIndex,
+                                                           int              Count      ) = 0;
+
+        virtual DTC::RecRule*      GetRecordSchedule     ( uint             RecordId   ) = 0;
+
+        virtual bool               EnableRecordSchedule  ( uint             RecordId   ) = 0;
+
+        virtual bool               DisableRecordSchedule ( uint             RecordId   ) = 0;
 
 };
 

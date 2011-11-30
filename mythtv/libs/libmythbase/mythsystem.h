@@ -50,6 +50,8 @@ class MBASE_PUBLIC MythSystem : public QObject
         void SetCommand(const QString &, uint);
         void SetCommand(const QString &, const QStringList &, uint);
         void SetDirectory(const QString &);
+        bool SetNice(int nice);
+        bool SetIOPrio(int prio);
 
         void Run(time_t timeout = 0);
         uint Wait(time_t timeout = 0);
@@ -91,6 +93,9 @@ class MBASE_PUBLIC MythSystem : public QObject
         QStringList &GetArgs()       { return m_args; };
         void SetArgs(QStringList &args)  { m_args = args; };
 
+        int GetNice()                { return m_nice; };
+        int GetIOPrio()              { return m_ioprio; };
+
         QBuffer *GetBuffer(int index) { return &m_stdbuff[index]; };
 
         void Unlock() { m_semReady.release(1); };
@@ -117,6 +122,9 @@ class MBASE_PUBLIC MythSystem : public QObject
         QString     m_logcmd;
         QStringList m_args;
         QString     m_directory;
+
+        int         m_nice;
+        int         m_ioprio;
 
         Setting_t   m_settings;
         QBuffer     m_stdbuff[3];

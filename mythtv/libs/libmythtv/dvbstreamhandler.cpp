@@ -360,14 +360,14 @@ static pid_list_t::iterator find(
     pid_list_t::iterator end, bool find_open)
 {
     pid_list_t::iterator it;
-    for (it = begin; it != end; it++)
+    for (it = begin; it != end; ++it)
     {
         PIDInfoMap::const_iterator mit = map.find(*it);
         if ((mit != map.end()) && ((*mit)->IsOpen() == find_open))
             return it;
     }
 
-    for (it = list.begin(); it != begin; it++)
+    for (it = list.begin(); it != begin; ++it)
     {
         PIDInfoMap::const_iterator mit = map.find(*it);
         if ((mit != map.end()) && ((*mit)->IsOpen() == find_open))

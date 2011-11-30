@@ -77,8 +77,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
    ~NuppelVideoRecorder();
 
     void SetOption(const QString &name, int value);
-    void SetOption(const QString &name, const QString &value)
-                  { RecorderBase::SetOption(name, value); }
+    void SetOption(const QString &name, const QString &value);
 
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
@@ -157,7 +156,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     void DoMJPEG(void);
 
     virtual void FormatTT(struct VBIData*); // RecorderBase
-    virtual void FormatCC(struct cc*); // RecorderBase
+    virtual void FormatCC(uint code1, uint code2); // RecorderBase
     virtual void AddTextData(unsigned char*,int,int64_t,char); // CC608Decoder
 
     void UpdateResolutions(void);

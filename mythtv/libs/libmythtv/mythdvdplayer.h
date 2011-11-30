@@ -19,6 +19,8 @@ class MythDVDPlayer : public MythPlayer
 
     // Gets
     virtual uint64_t GetBookmark(void);
+    virtual  int64_t GetSecondsPlayed(void);
+    virtual  int64_t GetTotalSeconds(void) const;
 
     // DVD public stuff
     virtual bool GoToMenu(QString str);
@@ -74,7 +76,6 @@ class MythDVDPlayer : public MythPlayer
 
     // Complicated gets
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
-    virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
 
     // Seek stuff
     virtual bool FastForward(float seconds);

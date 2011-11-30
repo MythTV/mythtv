@@ -390,6 +390,18 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD *osd,
     ShowPIPs(frame, pipPlayers);
 }
 
+void VideoOutputVDPAU::ClearDummyFrame(VideoFrame *frame)
+{
+    if (frame && m_render && !codec_is_std(video_codec_id))
+    {
+        struct vdpau_render_state *render =
+            (struct vdpau_render_state *)frame->buf;
+        if (render)
+            m_render->ClearVideoSurface(render->surface);
+    }
+    VideoOutput::ClearDummyFrame(frame);
+}
+
 void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
                                     OSD *osd)
 {
@@ -408,6 +420,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     }
 
     bool new_frame = false;
+    bool dummy     = false;
     if (frame)
     {
         // FIXME for 0.23. This should be triggered from AFD by a seek
@@ -415,10 +428,12 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
             ClearReferenceFrames();
         new_frame = (framesPlayed != frame->frameNumber + 1);
         framesPlayed = frame->frameNumber + 1;
+        dummy = frame->dummy;
     }
 
     uint video_surface = m_video_surfaces[0];
-    bool deint = (m_deinterlacing && m_need_deintrefs && frame);
+    bool deint = (m_deinterlacing && m_need_deintrefs &&
+                  frame && !dummy);
 
     if (deint)
     {
@@ -436,7 +451,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
             return;
         video_surface = m_render->GetSurfaceOwner(render->surface);
     }
-    else if (new_frame && frame)
+    else if (new_frame && frame && !dummy)
     {
         // FIXME - reference frames for software decode
         if (deint)
@@ -497,7 +512,9 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
                               vsz_enabled ? vsz_desired_display_rect :
                                             window.GetDisplayVideoRect(),
                               m_pip_ready ? m_pip_layer : 0, 0))
+    {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "Prepare frame failed.");
+    }
 
     if (m_visual)
         m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, NULL);
@@ -791,7 +808,7 @@ void VideoOutputVDPAU::DrawUnusedRects(bool sync)
     m_lock.unlock();
 }
 
-void VideoOutputVDPAU::UpdatePauseFrame(void)
+void VideoOutputVDPAU::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&m_lock);
 
@@ -803,6 +820,7 @@ void VideoOutputVDPAU::UpdatePauseFrame(void)
     if (vbuffers.size(kVideoBuffer_used) && m_render)
     {
         VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+        disp_timecode = frame->disp_timecode;
         if (codec_is_std(video_codec_id))
         {
             m_pause_surface = m_video_surfaces[0];

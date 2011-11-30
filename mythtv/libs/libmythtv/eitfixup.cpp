@@ -332,7 +332,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
 
     // See if a year is present as (xxxx)
     position = event.description.indexOf(m_bellYear);
-    if (position != -1 && event.category != "")
+    if (position != -1 && !event.category.isEmpty())
     {
         tmp = "";
         // Parse out the year
@@ -352,7 +352,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
             QStringList actors =
                 tmp.split(m_bellActors, QString::SkipEmptyParts);
             QStringList::const_iterator it = actors.begin();
-            for (; it != actors.end(); it++)
+            for (; it != actors.end(); ++it)
                 event.AddPerson(DBPerson::kActor, *it);
         }
         // Remove the year and actors from the description
@@ -1107,12 +1107,12 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
         QStringList datelist = tmpRerun2.capturedTexts();
         int day   = datelist[1].toInt();
         int month = datelist[2].toInt();
-        int year;
+        //int year;
 
-        if (datelist[3].length() > 0)
-            year = datelist[3].toInt();
-        else
-            year = event.starttime.date().year();
+        //if (datelist[3].length() > 0)
+        //    year = datelist[3].toInt();
+        //else
+        //    year = event.starttime.date().year();
 
         if (day > 0 && month > 0)
         {
@@ -1149,7 +1149,6 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
 {
     const uint SUBTITLE_PCT     = 60; // % of description to allow subtitle to
     const uint SUBTITLE_MAX_LEN = 128;// max length of subtitle field in db.
-    bool       dd               = false;
     int        position;
     QRegExp    tmpExp1;
 
@@ -1215,7 +1214,6 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
     if ((position > 0) && (position > (int) (event.description.length() - 7)))
     {
         event.audioProps |= AUD_DOLBY;
-        dd = true;
         event.description.replace(m_mcaDD, "");
     }
 
@@ -1261,7 +1259,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
             const QStringList actors = tmpExp1.cap(2).split(
                 m_mcaActorsSeparator, QString::SkipEmptyParts);
             QStringList::const_iterator it = actors.begin();
-            for (; it != actors.end(); it++)
+            for (; it != actors.end(); ++it)
                 event.AddPerson(DBPerson::kActor, (*it).trimmed());
             event.description = tmpExp1.cap(1).trimmed();
         }
@@ -1424,7 +1422,7 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
         const QStringList actors = tmpInfos.cap(4).split(
             ", ", QString::SkipEmptyParts);
         QStringList::const_iterator it = actors.begin();
-        for (; it != actors.end(); it++)
+        for (; it != actors.end(); ++it)
             event.AddPerson(DBPerson::kActor, *it);
         event.description = event.description.replace(tmpInfos.cap(0), "");
     }
@@ -1598,8 +1596,8 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         const QStringList actors =
             tmpActorsString.split(", ", QString::SkipEmptyParts);
         QStringList::const_iterator it = actors.begin();
-        for (; it != actors.end(); it++)
-                event.AddPerson(DBPerson::kActor, *it);
+        for (; it != actors.end(); ++it)
+            event.AddPerson(DBPerson::kActor, *it);
         fullinfo = fullinfo.replace(tmpActors.cap(0), "");
     }
 
@@ -1613,8 +1611,8 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         const QStringList host =
             tmpPresString.split(m_nlPersSeparator, QString::SkipEmptyParts);
         QStringList::const_iterator it = host.begin();
-        for (; it != host.end(); it++)
-                event.AddPerson(DBPerson::kPresenter, *it);
+        for (; it != host.end(); ++it)
+            event.AddPerson(DBPerson::kPresenter, *it);
         fullinfo = fullinfo.replace(tmpPres.cap(0), "");
     }
 

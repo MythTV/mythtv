@@ -186,6 +186,37 @@ bool RemoteFile::Open(void)
     return true;
 }
 
+bool RemoteFile::ReOpen(QString newFilename)
+{
+    lock.lock();
+    if (!sock)
+    {
+        LOG(VB_NETWORK, LOG_ERR, "RemoteFile::ReOpen(): Called with no socket");
+        return false;
+    }
+
+    if (!sock->isOpen() || sock->error())
+        return false;
+
+    if (!controlSock->isOpen() || controlSock->error())
+        return false;
+
+    QStringList strlist( QString(query).arg(recordernum) );
+    strlist << "REOPEN";
+    strlist << newFilename;
+
+    controlSock->writeStringList(strlist);
+    controlSock->readStringList(strlist);
+
+    lock.unlock();
+
+    bool retval = false;
+    if (!strlist.empty())
+        retval = strlist[0].toInt();
+
+    return retval;
+}
+
 void RemoteFile::Close(void)
 {
     if (!controlSock)
@@ -385,8 +416,12 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     controlSock->readStringList(strlist);
     lock.unlock();
 
-    long long retval = strlist[0].toLongLong();
-    readposition = retval;
+    long long retval = -1;
+    if (!strlist.empty())
+    {
+        retval = strlist[0].toLongLong();
+        readposition = retval;
+    }
 
     Reset();
 

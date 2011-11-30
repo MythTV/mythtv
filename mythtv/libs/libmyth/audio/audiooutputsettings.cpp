@@ -85,7 +85,7 @@ bool AudioOutputSettings::IsSupportedRate(int rate)
 
     vector<int>::iterator it;
 
-    for (it = m_rates.begin(); it != m_rates.end(); it++)
+    for (it = m_rates.begin(); it != m_rates.end(); ++it)
         if (*it == rate)
             return true;
 
@@ -107,7 +107,7 @@ int AudioOutputSettings::NearestSupportedRate(int rate)
     vector<int>::iterator it;
 
     // Assume rates vector is sorted
-    for (it = m_rates.begin(); it != m_rates.end(); it++)
+    for (it = m_rates.begin(); it != m_rates.end(); ++it)
     {
         if (*it >= rate)
             return *it;
@@ -129,6 +129,8 @@ AudioFormat AudioOutputSettings::GetNextFormat()
 
 void AudioOutputSettings::AddSupportedFormat(AudioFormat format)
 {
+    LOG(VB_AUDIO, LOG_INFO, LOC + 
+        QString("Format %1 is supported").arg(FormatToString(format)));
     m_formats.push_back(format);
 }
 
@@ -139,7 +141,7 @@ bool AudioOutputSettings::IsSupportedFormat(AudioFormat format)
 
     vector<AudioFormat>::iterator it;
 
-    for (it = m_formats.begin(); it != m_formats.end(); it++)
+    for (it = m_formats.begin(); it != m_formats.end(); ++it)
         if (*it == format)
             return true;
 
@@ -211,7 +213,7 @@ bool AudioOutputSettings::IsSupportedChannels(int channels)
 
     vector<int>::iterator it;
 
-    for (it = m_channels.begin(); it != m_channels.end(); it++)
+    for (it = m_channels.begin(); it != m_channels.end(); ++it)
         if (*it == channels)
             return true;
 
@@ -244,8 +246,10 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
 
     for (it = m_channels.rbegin();
          it != m_channels.rend() && *it >= channels;
-         it++)
+         ++it)
+    {
         m_channels.pop_back();
+    }
     m_channels.push_back(channels);
 }
 
@@ -448,6 +452,9 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
                     log = "DTS 96/24";
                     break;
                 case FF_PROFILE_DTS_HD_HRA:
+                    samplerate = 192000;
+                    log = "DTS-HD High-Res";
+                    break;
                 case FF_PROFILE_DTS_HD_MA:
                     samplerate = 192000;
                     if (canDTSHDMA)

@@ -28,8 +28,6 @@ using namespace std;
 #include "channelutil.h"
 #include "hdhrstreamhandler.h"
 
-#define DEBUG_PID_FILTERS
-
 #define LOC     QString("HDHRChan(%1): ").arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)

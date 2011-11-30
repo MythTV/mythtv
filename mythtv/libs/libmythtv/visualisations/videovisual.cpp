@@ -13,8 +13,10 @@
 
 bool VideoVisual::CanVisualise(AudioPlayer *audio, MythRender *render)
 {
+    if (!audio)
+        return false;
 #ifdef FFTW3_SUPPORT
-    if (render && audio->GetNumChannels() == 2)
+    if (render && (audio->GetNumChannels() == 2 || audio->GetNumChannels() == 1))
         return true;
 #endif
     return false;

@@ -189,7 +189,6 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     struct rtframeheader frameheader;
     long long startpos = 0;
     int foundit = 0;
-    char ftype;
     char *space;
 
     if (!ReadFileheader(&fileheader))
@@ -283,7 +282,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if ((video_height & 1) == 1)
     {
         video_height--;
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             QString("Incompatible video height, reducing to %1")
                 .arg( video_height));
     }
@@ -537,7 +536,6 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     while (!foundit)
     {
-        ftype = ' ';
         if (frameheader.frametype == 'S')
         {
             if (frameheader.comptype == 'A')
@@ -1131,7 +1129,8 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             else if (frameheader.comptype == 'V')
             {
                 lastKey = frameheader.timecode;
-                framesPlayed = frameheader.timecode - 1;
+                framesPlayed = (frameheader.timecode > 0 ?
+                                frameheader.timecode - 1 : 0);
 
                 if (!hasFullPositionMap)
                 {
@@ -1195,6 +1194,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
             buf->aspect = current_aspect;
             buf->frameNumber = framesPlayed;
+            buf->dummy = 0;
             GetPlayer()->ReleaseNextVideoFrame(buf, frameheader.timecode);
 
             // We need to make the frame available ourselves

@@ -54,16 +54,17 @@ class StreamInfo
         av_stream_index(-1), av_substream_index(-1),
         language(-2), language_index(0),
         stream_id(-1), easy_reader(false),
-        wide_aspect_ratio(false), orig_num_channels(2) {}
-    StreamInfo(int a, int b, uint c, int d, int e, bool f = false, bool g = false) :
+        wide_aspect_ratio(false), orig_num_channels(2), forced(false) {}
+    StreamInfo(int a, int b, uint c, int d, int e, bool f = false, 
+               bool g = false, bool h = false) :
         av_stream_index(a), av_substream_index(-1),
         language(b), language_index(c), stream_id(d),
-        easy_reader(f), wide_aspect_ratio(g), orig_num_channels(e) {}
+        easy_reader(f), wide_aspect_ratio(g), orig_num_channels(e), forced(h) {}
     StreamInfo(int a, int b, uint c, int d, int e, int f,
-               bool g = false, bool h = false) :
+               bool g = false, bool h = false, bool i = false) :
         av_stream_index(a), av_substream_index(e),
         language(b), language_index(c), stream_id(d),
-        easy_reader(g), wide_aspect_ratio(h), orig_num_channels(f) {}
+        easy_reader(g), wide_aspect_ratio(h), orig_num_channels(f), forced(i) {}
 
   public:
     int  av_stream_index;
@@ -75,6 +76,7 @@ class StreamInfo
     bool easy_reader;
     bool wide_aspect_ratio;
     int  orig_num_channels;
+    bool forced;
 
     bool operator<(const StreamInfo& b) const
     {
@@ -96,7 +98,7 @@ class DecoderBase
                          int testbufsize = kDecoderProbeBufferSize) = 0;
 
     virtual void SetEof(bool eof)  { ateof = eof;  }
-    bool         GetEof(void)      { return ateof; }
+    bool         GetEof(void) const { return ateof; }
 
     void setExactSeeks(bool exact) { exactseeks = exact; }
     bool getExactSeeks(void) const { return exactseeks;  }
@@ -168,13 +170,6 @@ class DecoderBase
     bool GetWaitForChange(void) const;
     void SetReadAdjust(long long adjust);
 
-    // DVD public stuff
-    long long DVDFindPosition(long long desiredFrame);
-    void UpdateDVDFramesPlayed(void);
-
-    long long BDFindPosition(long long desiredFrame);
-    void UpdateBDFramesPlayed(void);
-
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     void SetDecodeAllSubtitles(bool val) { decodeAllSubtitles = val; }
     virtual QStringList GetTracks(uint type) const;
@@ -214,8 +209,8 @@ class DecoderBase
 
     void FileChanged(void);
 
-    bool DoRewindSeek(long long desiredFrame);
-    void DoFastForwardSeek(long long desiredFrame, bool &needflush);
+    virtual bool DoRewindSeek(long long desiredFrame);
+    virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
 
     long long ConditionallyUpdatePosMap(long long desiredFrame);
     long long GetLastFrameInPosMap(void) const;

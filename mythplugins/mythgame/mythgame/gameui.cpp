@@ -42,8 +42,16 @@ class GameTreeInfo
 Q_DECLARE_METATYPE(GameTreeInfo *)
 
 GameUI::GameUI(MythScreenStack *parent)
-       : MythScreenType(parent, "GameUI"), m_busyPopup(0),
-         m_scanner(NULL)
+       : MythScreenType(parent, "GameUI"),
+            m_showHashed(false), m_gameShowFileName(0),
+            m_gameTree(NULL), m_favouriteNode(NULL),
+            m_busyPopup(0),
+            m_gameUITree(NULL), m_gameTitleText(NULL),
+            m_gameSystemText(NULL), m_gameYearText(NULL),
+            m_gameGenreText(NULL), m_gamePlotText(NULL),
+            m_gameFavouriteState(NULL), m_gameImage(NULL),
+            m_fanartImage(NULL), m_boxImage(NULL),
+            m_scanner(NULL)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 

@@ -138,12 +138,19 @@ void HttpStatus::GetStatusXML( HTTPRequest *pRequest )
 {
     QDomDocument doc( "Status" );
 
+    // UTF-8 is the default, but good practice to specify it anyway
+    QDomProcessingInstruction encoding =
+        doc.createProcessingInstruction("xml",
+                                        "version=\"1.0\" encoding=\"UTF-8\"");
+    doc.appendChild(encoding);
+
     FillStatusXML( &doc );
 
     pRequest->m_eResponseType   = ResponseTypeXML;
     pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
 
     QTextStream stream( &pRequest->m_response );
+    stream.setCodec("UTF-8");	// Otherwise locale default is used.
     stream << doc.toString();
 }
 
@@ -215,7 +222,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             else
                 encoder.setAttribute("hostname", elink->GetHostName());
 
-            encoder.setAttribute("devlabel", 
+            encoder.setAttribute("devlabel",
                           CardUtil::GetDeviceLabel(elink->GetCardID()) );
 
             if (elink->IsConnected())
@@ -451,8 +458,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         directory  = *(sit++);
         isLocalstr = *(sit++);
         fsID       = *(sit++);
-        sit++; // ignore dirID
-        sit++; // ignore blocksize
+        ++sit; // ignore dirID
+        ++sit; // ignore blocksize
         iTotal     = (*(sit++)).toLongLong();
         iUsed      = (*(sit++)).toLongLong();;
         iAvail     = iTotal - iUsed;
@@ -572,10 +579,10 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                         "status information script: %1").arg(info_script));
             return;
         }
-    
+
         QByteArray input = ms.ReadAll();
 
-        QStringList output = QString(input).split('\n', 
+        QStringList output = QString(input).split('\n',
                                                   QString::SkipEmptyParts);
 
         QStringList::iterator iter;
@@ -643,14 +650,12 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
        << "<div class=\"status\">\r\n"
        << "  <h1 class=\"status\">MythTV Status</h1>\r\n";
 
-    int nNumEncoders = 0;
-
     // encoder information ---------------------
 
     QDomNode node = docElem.namedItem( "Encoders" );
 
     if (!node.isNull())
-        nNumEncoders = PrintEncoderStatus( os, node.toElement() );
+        PrintEncoderStatus( os, node.toElement() );
 
     // upcoming shows --------------------------
 
@@ -733,7 +738,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 
                 QString sDevlabel = e.attribute( "devlabel", "[ UNKNOWN ]");
 
-                os << "    Encoder " << sCardId << " " << sDevlabel 
+                os << "    Encoder " << sCardId << " " << sDevlabel
                    << " is " << sIsLocal << " on " << sHostName;
 
                 if ((sIsLocal == "remote") && !bConnected)

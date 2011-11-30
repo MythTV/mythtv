@@ -142,7 +142,7 @@ void EITScanner::run(void)
 
             activeScanNextTrig = MythDate::current()
                 .addSecs(activeScanTrigTime);
-            activeScanNextChan++;
+            ++activeScanNextChan;
 
             // 24 hours ago
             eitHelper->PruneEITCache(activeScanNextTrig.toTime_t() - 86400);

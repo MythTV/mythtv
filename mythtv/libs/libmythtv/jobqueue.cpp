@@ -558,6 +558,9 @@ bool JobQueue::QueueJob(int jobType, uint chanid, const QDateTime &recstartts,
         chanidInt = chanid;
     }
 
+    if (host.isNull())
+        host = QString("");
+
     query.prepare("INSERT INTO jobqueue (chanid, starttime, inserttime, type, "
                   "status, statustime, schedruntime, hostname, args, comment, "
                   "flags) "
@@ -1621,7 +1624,7 @@ void JobQueue::CleanupOldJobsInQueue()
 void JobQueue::ProcessJob(JobQueueEntry job)
 {
     int jobID = job.id;
-    QString name = QString("jobqueue%1%2").arg(jobID).arg(rand());
+    QString name = QString("jobqueue%1%2").arg(jobID).arg(random());
 
     if (!MSqlQuery::testDBConnection())
     {
@@ -1775,6 +1778,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
         tmpInfo->SubstituteMatches(command);
 
         command.replace("%VERBOSELEVEL%", QString("%1").arg(verboseMask));
+        command.replace("%VERBOSEMODE%", QString("%1").arg(logPropagateArgs));
 
         uint transcoder = tmpInfo->QueryTranscoderID();
         command.replace("%TRANSPROFILE%",

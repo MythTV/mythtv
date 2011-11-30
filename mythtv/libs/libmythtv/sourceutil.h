@@ -28,16 +28,17 @@ class MTV_PUBLIC SourceUtil
     static bool    IsProperlyConnected(uint sourceid, bool strict = false);
     static bool    IsEncoder(uint sourceid, bool strict = false);
     static bool    IsUnscanable(uint sourceid);
+    static bool    IsCableCardPresent(uint sourceid);
     static bool    IsAnySourceScanable(void);
     static bool    UpdateChannelsFromListings(
-        uint sourceid, QString cardtype = QString::null);
+        uint sourceid, QString cardtype = QString::null, bool wait = false);
 
     static bool    UpdateSource( uint sourceid, QString sourcename,
                                  QString grabber, QString userid,
                                  QString freqtable, QString lineupid,
                                  QString password, bool useeit,
                                  QString configpath, int nitid);
-    static bool    CreateSource( QString sourcename,
+    static int     CreateSource( QString sourcename,
                                  QString grabber, QString userid,
                                  QString freqtable, QString lineupid,
                                  QString password, bool useeit,

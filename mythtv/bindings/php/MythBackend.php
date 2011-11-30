@@ -11,8 +11,8 @@ class MythBackend {
 
 // MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 // and should be the current MythTV protocol version.
-    static $protocol_version        = '69';
-    static $protocol_token          = '63835135';
+    static $protocol_version        = '70';
+    static $protocol_token          = '53153836';
 
 // The character string used by the backend to separate records
     static $backend_separator       = '[]:[]';
@@ -212,15 +212,44 @@ class MythBackend {
         return false;
     }
 
+
+/**
+ * Request something from the backend's HTTP API and return it
+ * as JSON. This is just syntactic sugar for httpRequest
+/**/
+   public function httpRequestAsJson($path, $args = array(), $opts = null) {
+       if (!$opts) {
+           $opts = array();
+       }
+
+       if (!$opts['http']) {
+           $opts['http'] = array();
+       }
+
+       if (!$opts['http']['method']) {
+           $opts['http']['method'] = "GET";
+       }
+
+       $opts['http']['header'] = "Accept: application/json\r\n";
+       
+       return $this->httpRequest($path, $args, $opts);
+   }
+
 /**
  * Request something from the backend's HTTP API
 /**/
-    public function httpRequest($path, $args = array()) {
+    public function httpRequest($path, $args = array(), $opts = null) {
         $url = "http://{$this->ip}:{$this->port_http}/{$path}?";
         foreach ($args as $key => $value) {
             $url .= urlencode($key).'='.urlencode($value).'&';
         }
-        return @file_get_contents($url);
+
+        if (!$opts) {
+            return @file_get_contents($url);
+        } else {
+            $context = stream_context_create($opts);
+            return @file_get_contents($url, false, $context);
+        }
     }
 
 }

@@ -1721,17 +1721,6 @@ static HostLineEdit *ScreenShotPath()
     return ge;
 }
 
-static HostCheckBox *UseArrowAccels()
-{
-    HostCheckBox *gc = new HostCheckBox("UseArrowAccels");
-    gc->setLabel(QObject::tr("Use arrow key accelerators"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, arrow key accelerators will "
-                    "be used, with LEFT performing an exit action and "
-                    "RIGHT selecting the current item."));
-    return gc;
-}
-
 static HostLineEdit *SetupPinCode()
 {
     HostLineEdit *ge = new HostLineEdit("SetupPinCode");
@@ -2003,10 +1992,10 @@ static HostRefreshRateComboBox *TVVidModeRefreshRate(int idx=-1)
 {
     QString dhelp = QObject::tr("Default refresh rate "
                                 "when watching a video. "
-                                "Leave at \"Any\" to automatically use the best available");
+                                "Leave at \"Auto\" to automatically use the best available");
     QString ohelp = QObject::tr("Refresh rate when watching a "
                                 "video at a specific resolution. "
-                                "Leave at \"Any\" to automatically use the best available");
+                                "Leave at \"Auto\" to automatically use the best available");
     QString qstr = (idx<0) ? "TVVidModeRefreshRate" :
         QString("TVVidModeRefreshRate%1").arg(idx);
     HostRefreshRateComboBox *gc = new HostRefreshRateComboBox(qstr);
@@ -2823,7 +2812,7 @@ static HostSpinBox *PlaybackWLMaxAge()
 
 static HostSpinBox *PlaybackWLBlackOut()
 {
-    HostSpinBox *gs = new HostSpinBox("PlaybackWLBlackOut", 1, 5, 1);
+    HostSpinBox *gs = new HostSpinBox("PlaybackWLBlackOut", 0, 5, 1);
     gs->setLabel(QObject::tr("Days to exclude weekly episodes after delete"));
     gs->setValue(2);
     gs->setHelpText(QObject::tr("When an episode is deleted or marked as "
@@ -3292,7 +3281,6 @@ MainGeneralSettings::MainGeneralSettings()
     VerticalConfigurationGroup *general =
         new VerticalConfigurationGroup(false, true, false, false);
     general->setLabel(QObject::tr("General"));
-    general->addChild(UseArrowAccels());
     general->addChild(UseVirtualKeyboard());
     general->addChild(ScreenShotPath());
     addChild(general);
@@ -3664,7 +3652,7 @@ AppearanceSettings::AppearanceSettings()
 
 #if defined(USING_XRANDR) || CONFIG_DARWIN
     const vector<DisplayResScreen> scr = GetVideoModes();
-    if (scr.size())
+    if (!scr.empty())
         addChild(new VideoModeSettings());
 #endif
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);

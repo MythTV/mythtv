@@ -278,6 +278,14 @@ class MiroInterpreter(cmd.Cmd):
                 if hasattr(it.get_parent(), u'url'):
                     if filetypes.is_torrent_filename(it.get_parent().url):
                         continue
+
+                # Any item without a proper file name needs to be removed as Miro metadata is corrupt
+                if it.get_filename() == None:
+                    it.expire()
+                    self.statistics[u'Miro_videos_deleted']+=1
+                    logging.info(u'Unwatched video (%s) has been removed from Miro as item had no valid file name' % it.get_title())
+                    continue
+
                 self.printItems(it)
                 self.videofiles.append(self._get_item_dict(it))
             if self.verbose:
@@ -304,6 +312,14 @@ class MiroInterpreter(cmd.Cmd):
                 if hasattr(it.get_parent(), u'url'):
                     if filetypes.is_torrent_filename(it.get_parent().url):
                         continue
+
+                # Any item without a proper file name needs to be removed as Miro metadata is corrupt
+                if it.get_filename() == None:
+                    it.expire()
+                    self.statistics[u'Miro_videos_deleted']+=1
+                    logging.info(u'Watched video (%s) has been removed from Miro as item had no valid file name' % it.get_title())
+                    continue
+
                 self.printItems(it)
                 self.videofiles.append(self._get_item_dict(it))
             if self.verbose:
@@ -436,7 +452,7 @@ class MiroInterpreter(cmd.Cmd):
             title = title.replace(u'"', u'')	# These characters mess with filenames
             title = title.replace(u"'", u'')	# These characters mess with filenames
 
-        item_dict =  {u'feed_id': it.feed_id, u'parent_id': it.parent_id, u'isContainerItem': it.isContainerItem, u'seen': it.seen, u'autoDownloaded': it.autoDownloaded, u'pendingManualDL': it.pendingManualDL, u'downloadedTime': it.downloadedTime, u'watchedTime': it.watchedTime, u'pendingReason': it.pendingReason, u'title': title,  u'expired': it.expired, u'keep': it.keep, u'videoFilename': it.get_filename(), u'eligibleForAutoDownload': it.eligibleForAutoDownload, u'duration': it.duration, u'screenshot': it.screenshot, u'resumeTime': it.resumeTime, u'channelTitle': channel_title, u'description': it.get_description(), u'size': it._get_size(), u'releasedate': it.get_release_date(), u'length': it.get_duration_value(), u'channel_icon': channel_icon, u'item_icon': item_icon_filename, u'inetref': u'', u'season': 0, u'episode': 0,}
+        item_dict =  {u'feed_id': it.feed_id, u'parent_id': it.parent_id, u'isContainerItem': it.isContainerItem, u'seen': it.seen, u'autoDownloaded': it.autoDownloaded, u'pendingManualDL': it.pendingManualDL, u'downloadedTime': it.downloadedTime, u'watchedTime': it.watchedTime, u'pendingReason': it.pendingReason, u'title': title,  u'expired': it.expired, u'keep': it.keep, u'videoFilename': it.get_filename(), u'eligibleForAutoDownload': it.eligibleForAutoDownload, u'duration': it.duration, u'screenshot': it.screenshot, u'resumeTime': it.resumeTime, u'channelTitle': channel_title, u'description': it.get_description(), u'size': it._get_size(), u'releasedate': it.get_release_date(), u'length': it.get_duration_value(), u'channel_icon': channel_icon, u'item_icon': item_icon_filename, u'inetref': u'', u'season': 1, u'episode': 1,}
 
         if not item_dict[u'screenshot']:
             if item_dict[u'item_icon']:
