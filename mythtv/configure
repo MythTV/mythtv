@@ -3174,6 +3174,7 @@ EOF
         disable bindings_php
         disable dv1394
         disable dvb
+        disable ceton
         enable  memalign_hack
         disable mythtranscode
         disable network
