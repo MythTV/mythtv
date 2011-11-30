@@ -14,11 +14,14 @@
 // Prototypes
 FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
                               AVFrame *wavelet);
+FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
+                                     AVFrame *wavelet);
 
 VideoProcessorList *openCLVideoProcessorList;
 
 VideoProcessorInit openCLVideoProcessorInit[] = {
     { "Edge Detect", OpenCLEdgeDetect },
+    { "Scene Change Detect", OpenCLSceneChangeDetect },
     { "", NULL }
 };
 
@@ -1107,9 +1110,9 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
         return;
     }
 
-    static bool dumped = false;
+    static int dump = 2;
 
-    if (!dumped)
+    if (dump)
     {
         uint32_t totY = 0;
         uint32_t totU = 0;
@@ -1129,11 +1132,149 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
         }
         LOG(VB_GENERAL, LOG_INFO, QString("Total: Y = %1, U = %2, V = %3")
             .arg(totY) .arg(totU) .arg(totV));
-        dumped = true;
+        dump--;
     }
 
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Histogram64 Done");
 }
+
+#define KERNEL_CROSS_CORRELATE_CL "videoXCorrelate.cl"
+
+void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
+                          VideoHistogram *current, uint64_t *results)
+{
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Cross Correlate");
+
+    static OpenCLKernelDef kern[] = {
+        { NULL, "videoCrossCorrelation", KERNEL_CROSS_CORRELATE_CL }
+    };
+    static int kernCount = sizeof(kern)/sizeof(kern[0]);
+
+    int ciErrNum;
+
+    cl_kernel kernel;
+
+    if (!dev->OpenCLLoadKernels(kern, kernCount, NULL))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "WTF");
+        return;
+    }
+
+    // Make sure previous commands are finished
+    clFinish(dev->m_commandQ);
+
+    // Setup the kernel arguments
+    int bins = prev->m_binCount;
+
+    size_t globalWorkDim = bins;
+
+    static OpenCLBufferPtr memBufs = NULL;
+
+    if (!memBufs)
+    { 
+        memBufs = new OpenCLBuffers(3);
+        if (!memBufs)
+        {
+            LOG(VB_GPU, LOG_ERR, "Out of memory allocating OpenCL buffers");
+            return;
+        }
+
+        memBufs->m_bufs[0] = clCreateBuffer(dev->m_context,
+                                            CL_MEM_READ_ONLY |
+                                            CL_MEM_COPY_HOST_PTR,
+                                            sizeof(cl_uint4) * bins,
+                                            prev->m_bins, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating previous histogram")
+                .arg(ciErrNum));
+            delete memBufs;
+            return;
+        }
+
+        memBufs->m_bufs[1] = clCreateBuffer(dev->m_context,
+                                            CL_MEM_READ_ONLY |
+                                            CL_MEM_COPY_HOST_PTR,
+                                            sizeof(cl_uint4) * bins,
+                                            current->m_bins, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating current histogram")
+                .arg(ciErrNum));
+            delete memBufs;
+            return;
+        }
+
+        memBufs->m_bufs[2] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
+                                            sizeof(cl_ulong4) * bins,
+                                            NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating results")
+                .arg(ciErrNum));
+            delete memBufs;
+            return;
+        }
+    }
+
+    // for cross-correlate
+    kernel = kern[0].kernel->m_kernel;
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &memBufs->m_bufs[0]);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &memBufs->m_bufs[1]);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memBufs->m_bufs[2]);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
+        delete memBufs;
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 1, NULL,
+                                      &globalWorkDim, &globalWorkDim,
+                                      0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR,
+            QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
+        delete memBufs;
+        return;
+    }
+
+    // Read back the results (finally!)
+    ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[2],
+                                    CL_TRUE, 0, bins * sizeof(cl_ulong4),
+                                    results, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
+            .arg(ciErrNum));
+        delete memBufs;
+        return;
+    }
+
+    static bool dumped = false;
+
+    if (!dumped)
+    {
+        for (int i = 0; i < bins; i++)
+        {
+            int index = 4 * i;
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Index %1 (%2-%3): Y = %4, U = %5, V = %6")
+                .arg(i) .arg(4 * i) .arg((4 * (i + 1)) - 1)
+                .arg(results[index]) .arg(results[index + 1])
+                .arg(results[index + 2]));
+        }
+        dumped = true;
+    }
+
+    delete memBufs;
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Cross Correlate Done");
+}
+
 
 // Processors
 
@@ -1202,6 +1343,7 @@ FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
     // Store the combined frame for next time
     logoROI = edgeROI;
 
+#ifdef DEBUG_VIDEO
     if (videoPacket->m_num <= 100)
     {
         // Convert to RGB to display for debugging
@@ -1210,11 +1352,44 @@ FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
         OpenCLYUVToRGB(dev, &edge, &edgeRGB);
         edgeRGB.Dump("edgeRGB", videoPacket->m_num);
     }
+#endif
 
     LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Edge Detect");
     return NULL;
 }
 
+
+FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
+                                     AVFrame *wavelet)
+{
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Scene Change Detect");
+
+    VideoPacket *videoPacket = videoPacketMap.Lookup(frame);
+    if (!videoPacket)
+    {
+        LOG(VB_GPU, LOG_ERR, "Video packet not in map");
+        return NULL;
+    }
+
+    (void)wavelet;
+
+    if (videoPacket->m_prevHistogram)
+    {
+        int bins = videoPacket->m_prevHistogram->m_binCount;
+
+        uint64_t *results = new uint64_t[4 * bins];
+
+        // Calculate the cross-correlation between previous and current
+        // color histograms
+        OpenCLCrossCorrelate(dev, videoPacket->m_prevHistogram,
+                             videoPacket->m_histogram, results);
+
+        delete [] results;
+    }
+
+    LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Scene Change Detect");
+    return NULL;
+}
 
 
 /*

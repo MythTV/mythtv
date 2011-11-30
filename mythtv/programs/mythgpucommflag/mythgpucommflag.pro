@@ -10,6 +10,7 @@ INSTALLS = target
 clfiles.path = $${PREFIX}/share/mythtv/mythgpucommflag/
 clfiles.files = audioVolumeLevel64.cl audioVolumeLevel.cl videoConvert.cl
 clfiles.files += videoHistogram.cl videoInverse.cl videoWavelet.cl
+clfiles.files += videoXCorrelate.cl
 INSTALLS += clfiles
 
 QMAKE_CLEAN += $(TARGET)
