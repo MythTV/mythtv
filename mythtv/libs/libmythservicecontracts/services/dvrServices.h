@@ -77,6 +77,13 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            int              StartIndex,
                                                            int              Count      ) = 0;
 
+        virtual DTC::ProgramList*  GetFilteredRecordedList ( bool             Descending,
+                                                             int              StartIndex,
+                                                             int              Count,
+                                                             const QString   &TitleRegEx,
+                                                             const QString   &RecGroup,
+                                                             const QString   &StorageGroup ) = 0;
+
         virtual DTC::Program*      GetRecorded           ( int              ChanId,
                                                             const QDateTime &StartTime  ) = 0;
 

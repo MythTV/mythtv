@@ -20,6 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <QMap>
+#include <QRegExp>
 
 #include "dvr.h"
 
@@ -44,6 +45,17 @@ extern AutoExpire  *expirer;
 DTC::ProgramList* Dvr::GetRecordedList( bool bDescending,
                                         int  nStartIndex,
                                         int  nCount      )
+{
+    return GetFilteredRecordedList( bDescending, nStartIndex, nCount,
+                                    QString(), QString(), QString() );
+}
+
+DTC::ProgramList* Dvr::GetFilteredRecordedList( bool           bDescending,
+                                                int            nStartIndex,
+                                                int            nCount,
+                                                const QString &sTitleRegEx,
+                                                const QString &sRecGroup,
+                                                const QString &sStorageGroup )
 {
     QMap< QString, ProgramInfo* > recMap;
 
@@ -71,25 +83,64 @@ DTC::ProgramList* Dvr::GetRecordedList( bool bDescending,
     // ----------------------------------------------------------------------
 
     DTC::ProgramList *pPrograms = new DTC::ProgramList();
+    int nAvailable = 0;
 
-    nStartIndex   = min( nStartIndex, (int)progList.size() );
-    nCount        = (nCount > 0) ? min( nCount, (int)progList.size() ) : progList.size();
-    int nEndIndex = min((nStartIndex + nCount), (int)progList.size() );
-
-    for( int n = nStartIndex; n < nEndIndex; n++)
+    if ((sTitleRegEx.isEmpty()) &&
+        (sRecGroup.isEmpty()) &&
+        (sStorageGroup.isEmpty()))
     {
-        ProgramInfo *pInfo = progList[ n ];
+        nStartIndex   = min( nStartIndex, (int)progList.size() );
+        nCount        = (nCount > 0) ? min( nCount, (int)progList.size() ) : progList.size();
+        int nEndIndex = min((nStartIndex + nCount), (int)progList.size() );
+        nCount        = nEndIndex - nStartIndex;
 
-        DTC::Program *pProgram = pPrograms->AddNewProgram();
+        nAvailable = progList.size();
 
-        FillProgramInfo( pProgram, pInfo, true );
+        for( int n = nStartIndex; n < nEndIndex; n++)
+        {
+            ProgramInfo *pInfo = progList[ n ];
+            DTC::Program *pProgram = pPrograms->AddNewProgram();
+
+            FillProgramInfo( pProgram, pInfo, true );
+        }
+    }
+    else
+    {
+        int nMax      = nCount;
+
+        nAvailable = 0;
+        nCount = 0;
+
+        QRegExp rTitleRegEx        = QRegExp(sTitleRegEx, Qt::CaseInsensitive);
+
+        for( unsigned int n = 0; n < progList.size(); n++)
+        {
+            ProgramInfo *pInfo = progList[ n ];
+
+            if ((!sTitleRegEx.isEmpty() && !pInfo->GetTitle().contains(rTitleRegEx)) ||
+                (!sRecGroup.isEmpty() && sRecGroup != pInfo->GetRecordingGroup()) ||
+                (!sStorageGroup.isEmpty() && sStorageGroup != pInfo->GetStorageGroup()))
+                continue;
+
+            ++nAvailable;
+
+            if ((nAvailable < nStartIndex) ||
+                (nCount >= nMax))
+                continue;
+
+            ++nCount;
+
+            DTC::Program *pProgram = pPrograms->AddNewProgram();
+
+            FillProgramInfo( pProgram, pInfo, true );
+        }
     }
 
     // ----------------------------------------------------------------------
 
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );
-    pPrograms->setTotalAvailable( progList.size() );
+    pPrograms->setTotalAvailable( nAvailable      );
     pPrograms->setAsOf          ( QDateTime::currentDateTime() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );

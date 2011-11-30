@@ -73,36 +73,7 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( bool bDescending,
         VideoMetadataListManager::VideoMetadataPtr metadata = videos[n];
 
         if (metadata)
-        {
-            pVideoMetadataInfo->setId(metadata->GetID());
-            pVideoMetadataInfo->setTitle(metadata->GetTitle());
-            pVideoMetadataInfo->setSubTitle(metadata->GetSubtitle());
-            pVideoMetadataInfo->setTagline(metadata->GetTagline());
-            pVideoMetadataInfo->setDirector(metadata->GetDirector());
-            pVideoMetadataInfo->setStudio(metadata->GetStudio());
-            pVideoMetadataInfo->setDescription(metadata->GetPlot());
-            pVideoMetadataInfo->setCertification(metadata->GetRating());
-            pVideoMetadataInfo->setInetref(metadata->GetInetRef());
-            pVideoMetadataInfo->setHomePage(metadata->GetHomepage());
-            pVideoMetadataInfo->setReleaseDate(QDateTime(metadata->GetReleaseDate()));
-            pVideoMetadataInfo->setAddDate(QDateTime(metadata->GetInsertdate()));
-            pVideoMetadataInfo->setUserRating(metadata->GetUserRating());
-            pVideoMetadataInfo->setLength(metadata->GetLength());
-            pVideoMetadataInfo->setSeason(metadata->GetSeason());
-            pVideoMetadataInfo->setEpisode(metadata->GetEpisode());
-            pVideoMetadataInfo->setParentalLevel(metadata->GetShowLevel());
-            pVideoMetadataInfo->setVisible(metadata->GetBrowse());
-            pVideoMetadataInfo->setWatched(metadata->GetWatched());
-            pVideoMetadataInfo->setProcessed(metadata->GetProcessed());
-            pVideoMetadataInfo->setFileName(metadata->GetFilename());
-            pVideoMetadataInfo->setHash(metadata->GetHash());
-            pVideoMetadataInfo->setHostName(metadata->GetHost());
-            pVideoMetadataInfo->setCoverart(metadata->GetCoverFile());
-            pVideoMetadataInfo->setFanart(metadata->GetFanart());
-            pVideoMetadataInfo->setBanner(metadata->GetBanner());
-            pVideoMetadataInfo->setScreenshot(metadata->GetScreenshot());
-            pVideoMetadataInfo->setTrailer(metadata->GetTrailer());
-        }
+            FillVideoMetadataInfo ( pVideoMetadataInfo, metadata, true );
     }
 
     int curPage = 0, totalPages = 0;
@@ -142,7 +113,9 @@ DTC::VideoMetadataInfo* Video::GetVideo( int Id )
     if ( !metadata )
         throw( QString( "No metadata found for selected ID!." ));
 
-    DTC::VideoMetadataInfo *pVideoMetadataInfo = GetInfoFromMetadata(metadata);
+    DTC::VideoMetadataInfo *pVideoMetadataInfo = new DTC::VideoMetadataInfo();
+
+    FillVideoMetadataInfo ( pVideoMetadataInfo, metadata, true );
 
     return pVideoMetadataInfo;
 }
@@ -162,7 +135,9 @@ DTC::VideoMetadataInfo* Video::GetVideoByFileName( const QString &FileName )
     if ( !metadata )
         throw( QString( "No metadata found for selected filename!." ));
 
-    DTC::VideoMetadataInfo *pVideoMetadataInfo = GetInfoFromMetadata(metadata);
+    DTC::VideoMetadataInfo *pVideoMetadataInfo = new DTC::VideoMetadataInfo();
+
+    FillVideoMetadataInfo ( pVideoMetadataInfo, metadata, true );
 
     delete mlm;
 
@@ -363,46 +338,6 @@ bool Video::AddVideo( const QString &sFileName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::VideoMetadataInfo* Video::GetInfoFromMetadata(
-                      VideoMetadataListManager::VideoMetadataPtr metadata)
-{
-    DTC::VideoMetadataInfo *pVideoMetadataInfo = new DTC::VideoMetadataInfo();
-
-    if (metadata)
-    {
-        pVideoMetadataInfo->setId(metadata->GetID());
-        pVideoMetadataInfo->setTitle(metadata->GetTitle());
-        pVideoMetadataInfo->setSubTitle(metadata->GetSubtitle());
-        pVideoMetadataInfo->setTagline(metadata->GetTagline());
-        pVideoMetadataInfo->setDirector(metadata->GetDirector());
-        pVideoMetadataInfo->setStudio(metadata->GetStudio());
-        pVideoMetadataInfo->setDescription(metadata->GetPlot());
-        pVideoMetadataInfo->setCertification(metadata->GetRating());
-        pVideoMetadataInfo->setInetref(metadata->GetInetRef());
-        pVideoMetadataInfo->setHomePage(metadata->GetHomepage());
-        pVideoMetadataInfo->setReleaseDate(QDateTime(metadata->GetReleaseDate()));
-        pVideoMetadataInfo->setAddDate(QDateTime(metadata->GetInsertdate()));
-        pVideoMetadataInfo->setUserRating(metadata->GetUserRating());
-        pVideoMetadataInfo->setLength(metadata->GetLength());
-        pVideoMetadataInfo->setSeason(metadata->GetSeason());
-        pVideoMetadataInfo->setEpisode(metadata->GetEpisode());
-        pVideoMetadataInfo->setParentalLevel(metadata->GetShowLevel());
-        pVideoMetadataInfo->setVisible(metadata->GetBrowse());
-        pVideoMetadataInfo->setWatched(metadata->GetWatched());
-        pVideoMetadataInfo->setProcessed(metadata->GetProcessed());
-        pVideoMetadataInfo->setFileName(metadata->GetFilename());
-        pVideoMetadataInfo->setHash(metadata->GetHash());
-        pVideoMetadataInfo->setHostName(metadata->GetHost());
-        pVideoMetadataInfo->setCoverart(metadata->GetCoverFile());
-        pVideoMetadataInfo->setFanart(metadata->GetFanart());
-        pVideoMetadataInfo->setBanner(metadata->GetBanner());
-        pVideoMetadataInfo->setScreenshot(metadata->GetScreenshot());
-        pVideoMetadataInfo->setTrailer(metadata->GetTrailer());
-    }
-
-    return pVideoMetadataInfo;
-}
-
 DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
 {
     QString path = sPath;
@@ -454,3 +389,7 @@ DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
 
     return pBlurayInfo;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////

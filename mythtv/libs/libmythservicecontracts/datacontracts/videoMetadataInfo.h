@@ -27,6 +27,7 @@
 
 #include "serviceexp.h"
 #include "datacontracthelper.h"
+#include "artworkInfoList.h"
 
 namespace DTC
 {
@@ -36,7 +37,7 @@ namespace DTC
 class SERVICE_PUBLIC VideoMetadataInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.02" );
+    Q_CLASSINFO( "version"    , "1.10" );
 
     Q_PROPERTY( int             Id              READ Id               WRITE setId             )
     Q_PROPERTY( QString         Title           READ Title            WRITE setTitle          )
@@ -67,6 +68,8 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     Q_PROPERTY( QString         Screenshot      READ Screenshot       WRITE setScreenshot     )
     Q_PROPERTY( QString         Trailer         READ Trailer          WRITE setTrailer        )
 
+    Q_PROPERTY( QObject*        Artwork         READ Artwork     DESIGNABLE SerializeArtwork  )
+
     PROPERTYIMP    ( int        , Id             )
     PROPERTYIMP    ( QString    , Title          )
     PROPERTYIMP    ( QString    , SubTitle       )
@@ -96,19 +99,35 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     PROPERTYIMP    ( QString    , Screenshot     )
     PROPERTYIMP    ( QString    , Trailer        )
 
+    PROPERTYIMP_PTR( ArtworkInfoList, Artwork    )
+    PROPERTYIMP    ( bool      , SerializeArtwork)
+
     public:
 
         static void InitializeCustomTypes()
         {
             qRegisterMetaType< VideoMetadataInfo  >();
             qRegisterMetaType< VideoMetadataInfo* >();
+
+            if (QMetaType::type( "DTC::ArtworkInfoList" ) == 0)
+                ArtworkInfoList::InitializeCustomTypes();
         }
 
     public:
 
         VideoMetadataInfo(QObject *parent = 0)
                         : QObject         ( parent ),
-                          m_Id            ( 0      )
+                          m_Id            ( 0      ),
+                          m_UserRating    ( 0      ),
+                          m_Length        ( 0      ),
+                          m_Season        ( 0      ),
+                          m_Episode       ( 0      ),
+                          m_ParentalLevel ( 0      ),
+                          m_Visible       ( false  ),
+                          m_Watched       ( false  ),
+                          m_Processed     ( false  ),
+                          m_Artwork       ( NULL   ),
+                          m_SerializeArtwork( true )
         {
         }
 
@@ -119,7 +138,11 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
 
         void Copy( const VideoMetadataInfo &src )
         {
-            m_Id            = src.m_Id            ;
+            m_Id               = src.m_Id;
+            m_SerializeArtwork = src.m_SerializeArtwork;
+
+            if ( src.m_Artwork != NULL)
+                Artwork()->Copy( src.m_Artwork );
         }
 };
 

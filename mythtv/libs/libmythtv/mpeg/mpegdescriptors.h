@@ -135,9 +135,6 @@ class DescriptorID
         // ATSC
         atsc_stuffing               = 0x80,
         ac3_audio_stream            = 0x81, /* partial */
-        scte_frame_rate             = 0x82,
-        scte_extended_video         = 0x83,
-        scte_component_name         = 0x84,
         atsc_program_identifier     = 0x85,
         caption_service             = 0x86, /* implemented */
         content_advisory            = 0x87,
@@ -145,7 +142,13 @@ class DescriptorID
         atsc_descriptor_tag         = 0x89,
 
         // SCTE
+        scte_frame_rate             = 0x82, /* implemented, also ATSC */
+        scte_extended_video         = 0x83, /* implemented, also ATSC */
+        scte_component_name         = 0x84, /* implemented, also ATSC */
         scte_cue_identifier         = 0x8A, /* implemented */
+        scte_frequency_spec         = 0x90, /* implemented */
+        scte_modulation_params      = 0x91, /* implemented */
+        scte_transport_stream_id    = 0x92, /* implemented */
         scte_revision_detection     = 0x93, /* implemented */
 
         // ATSC

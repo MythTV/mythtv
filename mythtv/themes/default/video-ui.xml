@@ -1335,7 +1335,7 @@
         </textarea>
 
         <textarea name="autometa_text" from="basetextarea">
-            <area>285,170,400,40</area>
+            <area>285,170,500,40</area>
             <value>Perform metadata update after video scan</value>
         </textarea>
 

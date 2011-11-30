@@ -43,6 +43,13 @@ class Dvr : public DvrServices
                                                 int              StartIndex,
                                                 int              Count      );
 
+        DTC::ProgramList* GetFilteredRecordedList ( bool             Descending,
+                                                    int              StartIndex,
+                                                    int              Count,
+                                                    const QString   &TitleRegEx,
+                                                    const QString   &RecGroup,
+                                                    const QString   &StorageGroup );
+
         DTC::Program*     GetRecorded         ( int              ChanId,
                                                 const QDateTime &StartTime  );
 
@@ -112,6 +119,18 @@ class ScriptableDvr : public QObject
                                        int              Count      )
         {
             return m_obj.GetRecordedList( Descending, StartIndex, Count );
+        }
+
+        QObject* GetFilteredRecordedList ( bool             Descending,
+                                           int              StartIndex,
+                                           int              Count,
+                                           const QString   &TitleRegEx,
+                                           const QString   &RecGroup,
+                                           const QString   &StorageGroup)
+        {
+            return m_obj.GetFilteredRecordedList( Descending, StartIndex, Count,
+                                                  TitleRegEx, RecGroup,
+                                                  StorageGroup);
         }
 
         QObject* GetRecorded         ( int              ChanId,

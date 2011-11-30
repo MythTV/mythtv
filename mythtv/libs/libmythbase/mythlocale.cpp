@@ -106,7 +106,7 @@ bool MythLocale::LoadDefaultsFromXML(void)
         return false;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, QString("Reading locale defaults from %1")
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Reading locale defaults from %1")
                                                         .arg(file.fileName()));
 
     if (!doc.setContent(&file))
