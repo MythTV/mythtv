@@ -5022,6 +5022,10 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
         retlist << QString::number(isopen);
     }
+    else if (command == "REOPEN")
+    {
+        retlist << QString::number(ft->ReOpen(slist[2]));
+    }
     else if (command == "DONE")
     {
         ft->Stop();

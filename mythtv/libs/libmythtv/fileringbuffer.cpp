@@ -366,6 +366,35 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     return ok;
 }
 
+bool FileRingBuffer::ReOpen(QString newFilename)
+{
+    if (!writemode)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Tried to ReOpen a read only file.");
+        return false;
+    }
+
+    bool result = false;
+
+    rwlock.lockForWrite();
+
+    if (tfw && tfw->ReOpen(newFilename))
+        result = true;
+    else if (remotefile && remotefile->ReOpen(newFilename))
+        result = true;
+
+    if (result)
+    {
+        filename = newFilename;
+        poslock.lockForWrite();
+        writepos = 0;
+        poslock.unlock();
+    }
+
+    rwlock.unlock();
+    return result;
+}
+
 bool FileRingBuffer::IsOpen(void) const
 {
     rwlock.lockForRead();

@@ -14,6 +14,7 @@ class MTV_PUBLIC FileRingBuffer : public RingBuffer
     // General Commands
     virtual bool OpenFile(const QString &lfilename,
                           uint retry_ms = kDefaultOpenTimeout);
+    virtual bool ReOpen(QString newFilename = "");
     virtual long long Seek(long long pos, int whence, bool has_lock);
 
   protected:

@@ -22,6 +22,7 @@ class MBASE_PUBLIC RemoteFile
    ~RemoteFile();
 
     bool Open();
+    bool ReOpen(QString newFilename);
     void Close(void);
 
     long long Seek(long long pos, int whence, long long curpos = -1);
