@@ -4,6 +4,7 @@
 #include <QHash>
 #include <QList>
 
+#include "referencecounter.h"
 #include "openclinterface.h"
 
 #include <dlfcn.h>
@@ -28,7 +29,7 @@ typedef enum {
     kSurfaceLogoRGB
 } VideoSurfaceType;
 
-class VideoSurface
+class VideoSurface : public ReferenceCounter
 {
   public:
     VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height, uint id,
@@ -69,6 +70,16 @@ class VideoSurface
 
 typedef QHash<uint, VideoSurface *> VideoSurfaceHash;
 typedef QList<uint> VideoSurfaceList;
+
+class VideoHistogram : public ReferenceCounter
+{
+  public:
+    VideoHistogram(int binCount = 64);
+    ~VideoHistogram(void);
+
+    int m_binCount;
+    uint32_t *m_bins;
+};
 
 
 #endif

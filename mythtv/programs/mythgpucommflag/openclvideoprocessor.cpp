@@ -917,7 +917,7 @@ void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
 
 #define KERNEL_HISTOGRAM_CL "videoHistogram.cl"
 
-void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
+void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
 {
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Histogram64");
 
@@ -938,6 +938,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
     clFinish(dev->m_commandQ);
 
     // Setup the kernel arguments
+    int bins = out->m_binCount;
     int totDims[2] = { in->m_realWidth, in->m_realHeight };
     int widthR  = PAD_VALUE(totDims[0], dev->m_workGroupSizeX);
     int heightR = PAD_VALUE(totDims[1], dev->m_workGroupSizeY);
@@ -946,8 +947,8 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
     size_t localWorkDims[2]  = { dev->m_workGroupSizeX, dev->m_workGroupSizeY };
     size_t reduceWorkDims[2] = { widthR  / dev->m_workGroupSizeX,
                                  heightR / dev->m_workGroupSizeY };
-    size_t histcount = 64 * reduceWorkDims[0] * reduceWorkDims[1];
-    size_t histcount2 = 64 * reduceWorkDims[1];
+    size_t histcount = bins * reduceWorkDims[0] * reduceWorkDims[1];
+    size_t histcount2 = bins * reduceWorkDims[1];
 
     static OpenCLBufferPtr memBufs = NULL;
 
@@ -983,7 +984,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
         }
 
         memBufs->m_bufs[2] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
-                                            sizeof(cl_uint4) * 64,
+                                            sizeof(cl_uint4) * bins,
                                             NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
@@ -1003,7 +1004,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
                                &in->m_clBuffer[0]);
     ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
                                &in->m_clBuffer[1]);
-    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_uint) * 64 * 3, NULL);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_uint) * bins * 3, NULL);
     ciErrNum |= clSetKernelArg(kernel, 3, sizeof(cl_mem), &memBufs->m_bufs[0]);
     ciErrNum |= clSetKernelArg(kernel, 4, sizeof(cl_int2), totDims);
 
@@ -1039,7 +1040,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
         .arg(reduceWorkDims[1]));
     kernel = kern[1].kernel->m_kernel;
     ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &memBufs->m_bufs[0]);
-    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_uint) * 64 * 3, NULL);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_uint) * bins * 3, NULL);
     ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memBufs->m_bufs[1]);
 
     if (ciErrNum != CL_SUCCESS)
@@ -1071,7 +1072,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
 
     kernel = kern[1].kernel->m_kernel;
     ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &memBufs->m_bufs[1]);
-    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_uint) * 64 * 3, NULL);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_uint) * bins * 3, NULL);
     ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memBufs->m_bufs[2]);
 
     if (ciErrNum != CL_SUCCESS)
@@ -1096,8 +1097,8 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
 
     // Read back the results (finally!)
     ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[2],
-                                    CL_TRUE, 0, 64 * sizeof(cl_uint4),
-                                    out, 0, NULL, NULL);
+                                    CL_TRUE, 0, bins * sizeof(cl_uint4),
+                                    out->m_bins, 0, NULL, NULL);
     if (ciErrNum != CL_SUCCESS)
     {
         LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
@@ -1114,19 +1115,19 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
         uint32_t totU = 0;
         uint32_t totV = 0;
 
-        for (int i = 0; i < 64; i++)
+        for (int i = 0; i < bins; i++)
         {
             int index = 4 * i;
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Index %1 (%2-%3): Y = %4, U = %5, V = %6")
                 .arg(i) .arg(4 * i) .arg((4 * (i + 1)) - 1)
-                .arg(out[index]) .arg(out[index + 1])
-                .arg(out[index + 2]));
-            totY += out[index];
-            totU += out[index + 1];
-            totV += out[index + 2];
+                .arg(out->m_bins[index]) .arg(out->m_bins[index + 1])
+                .arg(out->m_bins[index + 2]));
+            totY += out->m_bins[index];
+            totU += out->m_bins[index + 1];
+            totV += out->m_bins[index + 2];
         }
-        LOG(VB_GENERAL, LOG_INFO, QString("Total: Y = %1, U = %2, V = %6")
+        LOG(VB_GENERAL, LOG_INFO, QString("Total: Y = %1, U = %2, V = %3")
             .arg(totY) .arg(totU) .arg(totV));
         dumped = true;
     }

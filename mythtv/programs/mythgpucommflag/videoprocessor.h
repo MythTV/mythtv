@@ -72,7 +72,8 @@ void OpenCLInvert(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out);
 void OpenCLMultiply(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
                     VideoSurface *out);
 void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out);
-void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out);
+void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in,
+                       VideoHistogram *out);
 
 #endif
 

@@ -14,7 +14,9 @@ extern "C" {
 class VideoPacket
 {
   public:
-    VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num);
+    VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
+                VideoSurface *prevYUV, VideoSurface *prevWavelet,
+                VideoHistogram *prevHistogram);
     ~VideoPacket();
 
     uint64_t m_num;
@@ -24,7 +26,11 @@ class VideoPacket
     VideoSurface *m_frameYUV;
     VideoSurface *m_frameYUVSNORM;
     VideoSurface *m_wavelet;
-    uint32_t      m_histogram[64 * 4];
+    VideoHistogram *m_histogram;
+
+    VideoSurface *m_prevFrameYUVSNORM;
+    VideoSurface *m_prevWavelet;
+    VideoHistogram *m_prevHistogram;
 };
 
 class VideoPacketMap : public QMap<void *, VideoPacket *>

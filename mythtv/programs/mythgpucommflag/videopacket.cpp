@@ -15,8 +15,12 @@ extern "C" {
 
 VideoPacketMap videoPacketMap;
 
-VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num) :
-    m_num(num), m_decoder(decoder), m_frameIn(frame)
+VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
+                         VideoSurface *prevYUV, VideoSurface *prevWavelet,
+                         VideoHistogram *prevHistogram) :
+    m_num(num), m_decoder(decoder), m_frameIn(frame),
+    m_prevFrameYUVSNORM(prevYUV), m_prevWavelet(prevWavelet),
+    m_prevHistogram(prevHistogram)
 {
     m_frameRaw = m_decoder->DecodeFrame(frame);
 
@@ -37,6 +41,7 @@ VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num) :
                                   m_frameRaw->m_width, m_frameRaw->m_height);
     OpenCLWavelet(dev, m_frameYUVSNORM, m_wavelet);
 
+    m_histogram = new VideoHistogram(64);
     OpenCLHistogram64(dev, m_frameYUVSNORM, m_histogram);
 
     videoPacketMap.Add(m_frameIn, this);
@@ -46,15 +51,25 @@ VideoPacket::~VideoPacket()
 {
     videoPacketMap.Remove(m_frameIn);
 
+    // These don't get deleted
     if (m_decoder && m_frameRaw)
         m_decoder->DiscardFrame(m_frameRaw);
 
+    // These are deleted once all users are done with them
     if (m_frameYUVSNORM)
-        delete m_frameYUVSNORM;
+        m_frameYUVSNORM->DownRef();
     if (m_frameYUV)
-        delete m_frameYUV;
+        m_frameYUV->DownRef();
     if (m_wavelet)
-        delete m_wavelet;
+        m_wavelet->DownRef();
+    if (m_histogram)
+        m_histogram->DownRef();
+    if (m_prevFrameYUVSNORM)
+        m_prevFrameYUVSNORM->DownRef();
+    if (m_prevWavelet)
+        m_prevWavelet->DownRef();
+    if (m_prevHistogram)
+        m_prevHistogram->DownRef();
 }
 
 

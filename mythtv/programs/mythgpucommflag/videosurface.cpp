@@ -326,6 +326,17 @@ void VideoSurface::Dump(QString basename, int framenum)
     }
 }
 
+VideoHistogram::VideoHistogram(int binCount) : m_binCount(binCount)
+{
+    m_bins = new uint32_t[4 * m_binCount];
+}
+
+VideoHistogram::~VideoHistogram(void)
+{
+    delete [] m_bins;
+}
+
+
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
  */
