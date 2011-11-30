@@ -444,6 +444,27 @@ class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
     HDHomeRunDeviceList    devicelist;
 };
 
+
+class CetonDeviceID;
+class CetonSetting;
+class CetonConfigurationGroup : public VerticalConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    CetonConfigurationGroup(CaptureCard &parent);
+
+  private:
+    CaptureCard         &parent;
+    TransLabelSetting   *desc;
+    CetonDeviceID       *deviceid;
+    CetonSetting        *ip;
+    CetonSetting        *card;
+    CetonSetting        *tuner;
+};
+
+
+
 class V4LConfigurationGroup : public VerticalConfigurationGroup
 {
     Q_OBJECT
@@ -924,6 +945,48 @@ class HDHomeRunDeviceID : public LabelSetting, public CaptureCardDBStorage
     QString _ip;
     QString _tuner;
     QString _overridedeviceid;
+};
+
+class CetonSetting : public TransLineEditSetting
+{
+    Q_OBJECT
+
+  public:
+    CetonSetting(const char* label, const char* helptext);
+
+  signals:
+    void NewValue(const QString&);
+
+  public slots:
+    void UpdateDevices(const QString&);
+    void LoadValue(const QString&);
+};
+
+class CetonDeviceID : public LabelSetting, public CaptureCardDBStorage
+{
+    Q_OBJECT
+
+  public:
+    CetonDeviceID(const CaptureCard &parent);
+
+    virtual void Load(void);
+    void UpdateValues();
+
+  signals:
+    void LoadedIP(const QString&);
+    void LoadedCard(const QString&);
+    void LoadedTuner(const QString&);
+
+
+  public slots:
+    void SetIP(const QString&);
+    void SetCard(const QString&);
+    void SetTuner(const QString&);
+
+  private:
+    QString _ip;
+    QString _card;
+    QString _tuner;
 };
 
 #endif

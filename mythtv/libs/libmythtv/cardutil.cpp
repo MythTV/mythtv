@@ -80,6 +80,12 @@ QString CardUtil::GetScanableCardTypes(void)
     cardTypes += "'ASI'";
 #endif
 
+#ifdef USING_CETON
+    if (!cardTypes.isEmpty())
+        cardTypes += ",";
+    cardTypes += "'CETON'";
+#endif // USING_CETON
+
     if (cardTypes.isEmpty())
         cardTypes = "'DUMMY'";
 
@@ -112,6 +118,16 @@ bool CardUtil::IsCableCardPresent(uint cardid,
         else
 #endif
             return false;
+    }
+    else if (cardType == "CETON")
+    {
+#ifdef USING_CETON
+        // TODO FIXME implement detection of Cablecard presence
+        LOG(VB_GENERAL, LOG_INFO, "Cardutil: TODO Ceton Is Cablecard Present?");
+        return true;
+#else
+        return false;
+#endif
     }
     else
         return false;
@@ -354,6 +370,14 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
         }
     }
 #endif // USING_HDHOMERUN
+#ifdef USING_CETON
+    else if (rawtype.toUpper() == "CETON")
+    {
+        // TODO implement CETON probing.
+        LOG(VB_GENERAL, LOG_INFO, "CardUtil::ProbeVideoDevices: "
+            "TODO Probe Ceton devices");
+    }
+#endif // USING_CETON
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Raw Type: '%1' is not supported")

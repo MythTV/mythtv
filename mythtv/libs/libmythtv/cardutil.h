@@ -65,6 +65,7 @@ class MTV_PUBLIC CardUtil
         IMPORT    = 14,
         DEMO      = 15,
         ASI       = 16,
+        CETON     = 17,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -103,6 +104,8 @@ class MTV_PUBLIC CardUtil
             return DEMO;
         if ("ASI" == name)
             return ASI;
+        if ("CETON" == name)
+            return CETON;
         return ERROR_UNKNOWN;
     }
 
@@ -112,7 +115,7 @@ class MTV_PUBLIC CardUtil
             (rawtype != "DVB")       && (rawtype != "FIREWIRE") &&
             (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX")  &&
             (rawtype != "IMPORT")    && (rawtype != "DEMO")     &&
-            (rawtype != "ASI");
+            (rawtype != "ASI")       && (rawtype != "CETON");
     }
 
     static bool         IsV4L(const QString &rawtype)
@@ -158,7 +161,7 @@ class MTV_PUBLIC CardUtil
     {
         return
             (rawtype == "DVB")       || (rawtype == "HDHOMERUN") ||
-            (rawtype == "ASI");
+            (rawtype == "ASI")       || (rawtype == "CETON");
     }
 
     static bool         IsTuningAnalog(const QString &rawtype)
@@ -178,7 +181,8 @@ class MTV_PUBLIC CardUtil
         return
             (rawtype == "FIREWIRE")  || (rawtype == "HDHOMERUN") ||
             (rawtype == "FREEBOX")   || (rawtype == "ASI")       ||
-            (rawtype == "IMPORT")    || (rawtype == "DEMO");
+            (rawtype == "IMPORT")    || (rawtype == "DEMO")      ||
+            (rawtype == "CETON");
     }
 
     // Card creation and deletion

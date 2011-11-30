@@ -5590,7 +5590,6 @@ NULL
             return false;
     }
 
-
     if (dbver == "1269")
     {
         const char *updates[] = {
@@ -5920,6 +5919,69 @@ NULL
 };
 
         if (!performActualUpdate(updates, "1285", dbver))
+            return false;
+    }
+
+    if (dbver == "1285")
+    {
+        const char *updates[] = {
+"DELETE FROM profilegroups WHERE id >= 17;",
+"DELETE FROM recordingprofiles WHERE profilegroup >= 17;",
+"INSERT INTO profilegroups SET id = '17', name = 'Ceton Recorder',"
+" cardtype = 'CETON', is_default = 1;",
+"INSERT INTO recordingprofiles SET name = \"Default\", profilegroup = 17;",
+"INSERT INTO recordingprofiles SET name = \"Live TV\", profilegroup = 17;",
+"INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = 17;",
+"INSERT INTO recordingprofiles SET name = \"Low Quality\", profilegroup = 17;",
+NULL
+};
+        if (!performActualUpdate(updates, "1286", dbver))
+            return false;
+    }
+
+    if (dbver == "1286")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT cardid, videodevice "
+                      "FROM capturecard "
+                      "WHERE cardtype='CETON'");
+        if (!query.exec())
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "Unable to query capturecard table for upgrade to 1287.");
+            return false;
+        }
+
+        MSqlQuery update(MSqlQuery::InitCon());
+        update.prepare("UPDATE capturecard SET videodevice=:VIDDEV "
+                       "WHERE cardid=:CARDID");
+        while (query.next())
+        {
+            uint cardid = query.value(0).toUInt();
+            QString videodevice = query.value(1).toString();
+            QStringList parts = videodevice.split("-");
+            if (parts.size() != 2)
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Unable to parse videodevice in upgrade to 1287.");
+                return false;
+            }
+            if (parts[1].contains("."))
+                continue; // already in new format, skip it..
+
+            int input = max(parts[1].toInt() - 1, 0);
+            videodevice = parts[0] + QString("-0.%1").arg(input);
+            update.bindValue(":CARDID", cardid);
+            update.bindValue(":VIDDEV", videodevice);
+            if (!update.exec())
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Failed to update videodevice in upgrade to 1287.");
+                return false;
+            }
+        }
+
+        if (!UpdateDBVersionNumber("1287", dbver))
             return false;
     }
 

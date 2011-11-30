@@ -570,6 +570,20 @@ using_backend {
         DEFINES += USING_HDHOMERUN
     }
 
+    # Support for Ceton
+    using_ceton {
+        # MythTV Ceton glue
+        HEADERS += cetonsignalmonitor.h   cetonchannel.h
+        HEADERS += cetonrecorder.h        cetonstreamhandler.h
+        HEADERS += cetonrtp.h             cetonrtsp.h
+
+        SOURCES += cetonsignalmonitor.cpp cetonchannel.cpp
+        SOURCES += cetonrecorder.cpp      cetonstreamhandler.cpp
+        SOURCES += cetonrtp.cpp           cetonrtsp.cpp
+
+        DEFINES += USING_CETON
+    }
+
     # Support for PVR-150/250/350/500, etc. on Linux
     using_ivtv:HEADERS += mpegrecorder.h
     using_ivtv:SOURCES += mpegrecorder.cpp

@@ -34,6 +34,7 @@ class DTVRecorder;
 class DVBRecorder;
 class HDHRRecorder;
 class ASIRecorder;
+class CetonRecorder;
 
 class SignalMonitor;
 class DTVSignalMonitor;
@@ -44,6 +45,7 @@ class DVBChannel;
 class FirewireChannel;
 class V4LChannel;
 class HDHRChannel;
+class CetonChannel;
 
 class MPEGStreamData;
 class ProgramMapTable;

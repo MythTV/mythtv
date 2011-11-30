@@ -1970,6 +1970,129 @@ void HDHomeRunConfigurationGroup::HDHomeRunExtraPanel(void)
     parent.SetInstanceCount(acw.GetInstanceCount());
 }
 
+// -----------------------
+// Ceton Configuration
+// -----------------------
+
+CetonSetting::CetonSetting(const char* label, const char* helptext)
+{
+    setLabel(QObject::tr(label));
+    setHelpText(tr(helptext));
+    connect(this, SIGNAL(valueChanged( const QString&)),
+            this, SLOT(  UpdateDevices(const QString&)));
+}
+
+void CetonSetting::UpdateDevices(const QString &v)
+{
+    if (isEnabled())
+        emit NewValue(v);
+}
+
+void CetonSetting::LoadValue(const QString &value)
+{
+    setValue(value);
+}
+
+CetonDeviceID::CetonDeviceID(const CaptureCard &parent) :
+    LabelSetting(this),
+    CaptureCardDBStorage(this, parent, "videodevice"),
+    _ip(), _card(), _tuner()
+{
+    setLabel(tr("Device ID"));
+    setHelpText(tr("Device ID of Ceton device"));
+}
+
+void CetonDeviceID::SetIP(const QString &ip)
+{
+    QString regexp = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){4}$";
+    if (QRegExp(regexp).exactMatch(ip + "."))
+    {
+        _ip = ip;
+        setValue(QString("%1-%2.%3").arg(_ip).arg(_card).arg(_tuner));
+    }
+}
+
+void CetonDeviceID::SetCard(const QString &card)
+{
+    if (QRegExp("^(\\d|RTP)$").exactMatch(card))
+    {
+        _card = card;
+        setValue(QString("%1-%2.%3").arg(_ip).arg(_card).arg(_tuner));
+    }
+}
+
+void CetonDeviceID::SetTuner(const QString &tuner)
+{
+    if (QRegExp("^\\d$").exactMatch(tuner))
+    {
+        _tuner = tuner;
+        setValue(QString("%1-%2.%3").arg(_ip).arg(_card).arg(_tuner));
+    }
+}
+
+void CetonDeviceID::Load(void)
+{
+    CaptureCardDBStorage::Load();
+    UpdateValues();
+}
+
+void CetonDeviceID::UpdateValues(void)
+{
+    QRegExp newstyle("^([0-9.]+)-(\\d|RTP)\\.(\\d)$");
+    if (newstyle.exactMatch(getValue()))
+    {
+        emit LoadedIP(newstyle.cap(1));
+        emit LoadedCard(newstyle.cap(2));
+        emit LoadedTuner(newstyle.cap(3));
+    }
+}
+
+CetonConfigurationGroup::CetonConfigurationGroup
+        (CaptureCard& a_parent) :
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent)
+{
+    setUseLabel(false);
+
+    deviceid     = new CetonDeviceID(parent);
+    desc         = new TransLabelSetting();
+    desc->setLabel(tr("Description"));
+    ip    = new CetonSetting(
+        "IP Address",
+        "IP Address of the Ceton device (192.168.200.1 by default)");
+    card  = new CetonSetting(
+        "Card Number",
+        "Number of the installed Ceton card. Use 0 if only 1 Ceton card is "
+        "installed in your system. Use the value RTP if this is a Ceton "
+        "card installed in a remote system");
+    tuner = new CetonSetting(
+        "Tuner",
+        "Number of the tuner on the Ceton device (first tuner is number 0)");
+
+    addChild(ip);
+    addChild(card);
+    addChild(tuner);
+    addChild(deviceid);
+    addChild(desc);
+
+    addChild(new SingleCardInput(parent));
+
+    connect(ip,       SIGNAL(NewValue(const QString&)),
+            deviceid, SLOT(  SetIP(const QString&)));
+    connect(card,     SIGNAL(NewValue(const QString&)),
+            deviceid, SLOT(  SetCard(const QString&)));
+    connect(tuner,    SIGNAL(NewValue(const QString&)),
+            deviceid, SLOT(  SetTuner(const QString&)));
+
+    connect(deviceid, SIGNAL(LoadedIP(const QString&)),
+            ip,       SLOT(  LoadValue(const QString&)));
+    connect(deviceid, SIGNAL(LoadedCard(const QString&)),
+            card,     SLOT(  LoadValue(const QString&)));
+    connect(deviceid, SIGNAL(LoadedTuner(const QString&)),
+            tuner,    SLOT(  LoadValue(const QString&)));
+
+};
+
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent),
@@ -2208,6 +2331,10 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     addTarget("ASI",       new ASIConfigurationGroup(parent));
 #endif // USING_ASI
 
+#ifdef USING_CETON
+    addTarget("CETON",     new CetonConfigurationGroup(parent));
+#endif // USING_CETON
+
     // for testing without any actual tuner hardware:
     addTarget("IMPORT",    new ImportConfigurationGroup(parent));
     addTarget("DEMO",      new DemoConfigurationGroup(parent));
@@ -2415,6 +2542,11 @@ void CardType::fillSelections(SelectSetting* setting)
 #ifdef USING_ASI
     setting->addSelection(QObject::tr("DVEO ASI recorder"), "ASI");
 #endif
+
+#ifdef USING_CETON
+    setting->addSelection(
+        QObject::tr("Ceton Cablecard tuner "), "CETON");
+#endif // USING_CETON
 
     setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
     setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");

@@ -8,11 +8,13 @@ using namespace std;
 #include "recordingprofile.h"
 #include "firewirechannel.h"
 #include "importrecorder.h"
+#include "cetonrecorder.h"
 #include "dummychannel.h"
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
 #include "mpegrecorder.h"
 #include "recorderbase.h"
+#include "cetonchannel.h"
 #include "asirecorder.h"
 #include "dvbrecorder.h"
 #include "hdhrchannel.h"
@@ -493,6 +495,14 @@ RecorderBase *RecorderBase::CreateRecorder(
             tvrec, dynamic_cast<HDHRChannel*>(channel));
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
 #endif // USING_HDHOMERUN
+    }
+    else if (genOpt.cardtype == "CETON")
+    {
+#ifdef USING_CETON
+        recorder = new CetonRecorder(
+            tvrec, dynamic_cast<CetonChannel*>(channel));
+        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+#endif // USING_CETON
     }
     else if (genOpt.cardtype == "DVB")
     {

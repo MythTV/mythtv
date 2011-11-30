@@ -111,6 +111,7 @@ Advanced options (experts only):
   --disable-firewire       disable support for FireWire cable boxes
   --disable-iptv           disable support for recording RTSP/UDP/RTP streams
   --disable-hdhomerun      disable support for HDHomeRun boxes
+  --disable-ceton          disable support for Ceton cards
   --disable-v4l2           disable Video4Linux support
   --disable-ivtv           disable ivtv support (PVR-x50) req. v4l2 support
   --disable-hdpvr          disable HD-PVR support
@@ -1344,6 +1345,7 @@ MYTHTV_CONFIG_LIST='
     firewire
     frontend
     hdhomerun
+    ceton
     hdpvr
     iptv
     ivtv
@@ -1773,6 +1775,7 @@ iptv_deps="backend"
 ivtv_deps="backend v4l2"
 hdpvr_deps="backend v4l2"
 hdhomerun_deps="backend"
+ceton_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 mythtranscode_deps="backend frontend"
 opengl_deps_any="agl_h GL_gl_h GLES2_gl2_h darwin windows x11"
@@ -1985,6 +1988,7 @@ enable ffmpeg_pthreads
 enable firewire
 enable frontend
 enable hdhomerun
+enable ceton
 enable hdpvr
 enable iptv
 enable ivtv
@@ -4511,6 +4515,7 @@ if enabled backend; then
   echo "DVB support               ${dvb-no} [$dvb_path]"
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
+  echo "Ceton support             ${ceton-no}"
   echo "IPTV support              ${iptv-no}"
   echo "ASI support               ${asi-no}"
 fi
