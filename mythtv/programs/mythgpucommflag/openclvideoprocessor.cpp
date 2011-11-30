@@ -925,8 +925,9 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Histogram64");
 
     static OpenCLKernelDef kern[] = {
-        { NULL, "videoHistogram64",     KERNEL_HISTOGRAM_CL },
-        { NULL, "videoHistogramReduce", KERNEL_HISTOGRAM_CL }
+        { NULL, "videoHistogram64",        KERNEL_HISTOGRAM_CL },
+        { NULL, "videoHistogramReduce",    KERNEL_HISTOGRAM_CL },
+        { NULL, "videoHistogramNormalize", KERNEL_HISTOGRAM_CL }
     };
     static int kernCount = sizeof(kern)/sizeof(kern[0]);
 
@@ -941,8 +942,9 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
     clFinish(dev->m_commandQ);
 
     // Setup the kernel arguments
-    int bins = out->m_binCount;
+    size_t bins = out->m_binCount;
     int totDims[2] = { in->m_realWidth, in->m_realHeight };
+    uint32_t pixelCount = totDims[0] * totDims[1] * 2;
     int widthR  = PAD_VALUE(totDims[0], dev->m_workGroupSizeX);
     int heightR = PAD_VALUE(totDims[1], dev->m_workGroupSizeY);
 
@@ -950,7 +952,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
     size_t localWorkDims[2]  = { dev->m_workGroupSizeX, dev->m_workGroupSizeY };
     size_t reduceWorkDims[2] = { widthR  / dev->m_workGroupSizeX,
                                  heightR / dev->m_workGroupSizeY };
-    size_t histcount = bins * reduceWorkDims[0] * reduceWorkDims[1];
+    size_t histcount  = bins * reduceWorkDims[0] * reduceWorkDims[1];
     size_t histcount2 = bins * reduceWorkDims[1];
 
     static OpenCLBufferPtr memBufs = NULL;
@@ -965,7 +967,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
         }
 
         memBufs->m_bufs[0] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
-                                            sizeof(cl_uint4) * histcount,
+                                            sizeof(cl_uint) * histcount,
                                             NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
@@ -976,7 +978,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
         }
 
         memBufs->m_bufs[1] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
-                                            sizeof(cl_uint4) * histcount2,
+                                            sizeof(cl_uint) * histcount2,
                                             NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
@@ -987,11 +989,11 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
         }
 
         memBufs->m_bufs[2] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
-                                            sizeof(cl_uint4) * bins,
+                                            sizeof(cl_uint) * bins,
                                             NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating histogram")
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating histogram column")
                 .arg(ciErrNum));
             delete memBufs;
             return;
@@ -1007,7 +1009,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
                                &in->m_clBuffer[0]);
     ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
                                &in->m_clBuffer[1]);
-    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_uint) * bins * 3, NULL);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_uint) * bins, NULL);
     ciErrNum |= clSetKernelArg(kernel, 3, sizeof(cl_mem), &memBufs->m_bufs[0]);
     ciErrNum |= clSetKernelArg(kernel, 4, sizeof(cl_int2), totDims);
 
@@ -1043,7 +1045,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
         .arg(reduceWorkDims[1]));
     kernel = kern[1].kernel->m_kernel;
     ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &memBufs->m_bufs[0]);
-    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_uint) * bins * 3, NULL);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_uint) * bins, NULL);
     ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memBufs->m_bufs[1]);
 
     if (ciErrNum != CL_SUCCESS)
@@ -1060,7 +1062,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
     {
         LOG(VB_GPU, LOG_ERR,
             QString("Error running kernel %1: %2 (%3)")
-            .arg(kern[0].entry) .arg(ciErrNum)
+            .arg(kern[1].entry) .arg(ciErrNum)
             .arg(openCLErrorString(ciErrNum)));
         delete memBufs;
         return;
@@ -1075,7 +1077,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
 
     kernel = kern[1].kernel->m_kernel;
     ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &memBufs->m_bufs[1]);
-    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_uint) * bins * 3, NULL);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_uint) * bins, NULL);
     ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memBufs->m_bufs[2]);
 
     if (ciErrNum != CL_SUCCESS)
@@ -1092,20 +1094,32 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
     {
         LOG(VB_GPU, LOG_ERR,
             QString("Error running kernel %1: %2 (%3)")
-            .arg(kern[0].entry) .arg(ciErrNum)
+            .arg(kern[1].entry) .arg(ciErrNum)
             .arg(openCLErrorString(ciErrNum)));
         delete memBufs;
         return;
     }
 
-    // Read back the results (finally!)
-    ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[2],
-                                    CL_TRUE, 0, bins * sizeof(cl_uint4),
-                                    out->m_bins, 0, NULL, NULL);
+    kernel = kern[2].kernel->m_kernel;
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &memBufs->m_bufs[2]);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_uint), &pixelCount);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &out->m_buf);
+
     if (ciErrNum != CL_SUCCESS)
     {
-        LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
-            .arg(ciErrNum));
+        LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
+        delete memBufs;
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 1, NULL,
+                                      &bins, NULL, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR,
+            QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[2].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
         delete memBufs;
         return;
     }
@@ -1114,24 +1128,36 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
 
     if (dump)
     {
-        uint32_t totY = 0;
-        uint32_t totU = 0;
-        uint32_t totV = 0;
+        float *outBins = new float[bins];
 
-        for (int i = 0; i < bins; i++)
+        // Read back the results (finally!)
+        ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, out->m_buf,
+                                        CL_TRUE, 0, bins * sizeof(cl_float),
+                                        outBins, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS)
         {
-            int index = 4 * i;
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("Index %1 (%2-%3): Y = %4, U = %5, V = %6")
-                .arg(i) .arg(4 * i) .arg((4 * (i + 1)) - 1)
-                .arg(out->m_bins[index]) .arg(out->m_bins[index + 1])
-                .arg(out->m_bins[index + 2]));
-            totY += out->m_bins[index];
-            totU += out->m_bins[index + 1];
-            totV += out->m_bins[index + 2];
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
+                .arg(ciErrNum));
+            delete [] outBins;
+            delete memBufs;
+            return;
         }
-        LOG(VB_GENERAL, LOG_INFO, QString("Total: Y = %1, U = %2, V = %3")
-            .arg(totY) .arg(totU) .arg(totV));
+
+        float tot = 0.0;
+
+        for (size_t i = 0; i < bins; i++)
+        {
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Index %1 (%2-%3): Count = %4")
+                .arg(i) .arg(4 * i) .arg((4 * (i + 1)) - 1)
+                .arg(outBins[i]));
+            tot += outBins[i];
+        }
+
+        LOG(VB_GENERAL, LOG_INFO, QString("Total: Count = %1")
+            .arg(tot));
+
+        delete [] outBins;
         dump--;
     }
 
@@ -1141,7 +1167,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
 #define KERNEL_CROSS_CORRELATE_CL "videoXCorrelate.cl"
 
 void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
-                          VideoHistogram *current, uint64_t *results)
+                          VideoHistogram *current, float *results)
 {
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Cross Correlate");
 
@@ -1155,10 +1181,7 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
     cl_kernel kernel;
 
     if (!dev->OpenCLLoadKernels(kern, kernCount, NULL))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "WTF");
         return;
-    }
 
     // Make sure previous commands are finished
     clFinish(dev->m_commandQ);
@@ -1172,41 +1195,15 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
 
     if (!memBufs)
     { 
-        memBufs = new OpenCLBuffers(3);
+        memBufs = new OpenCLBuffers(1);
         if (!memBufs)
         {
             LOG(VB_GPU, LOG_ERR, "Out of memory allocating OpenCL buffers");
             return;
         }
 
-        memBufs->m_bufs[0] = clCreateBuffer(dev->m_context,
-                                            CL_MEM_READ_ONLY |
-                                            CL_MEM_COPY_HOST_PTR,
-                                            sizeof(cl_uint4) * bins,
-                                            prev->m_bins, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS)
-        {
-            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating previous histogram")
-                .arg(ciErrNum));
-            delete memBufs;
-            return;
-        }
-
-        memBufs->m_bufs[1] = clCreateBuffer(dev->m_context,
-                                            CL_MEM_READ_ONLY |
-                                            CL_MEM_COPY_HOST_PTR,
-                                            sizeof(cl_uint4) * bins,
-                                            current->m_bins, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS)
-        {
-            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating current histogram")
-                .arg(ciErrNum));
-            delete memBufs;
-            return;
-        }
-
-        memBufs->m_bufs[2] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
-                                            sizeof(cl_ulong4) * bins,
+        memBufs->m_bufs[0] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
+                                            sizeof(cl_float) * bins,
                                             NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
@@ -1219,9 +1216,9 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
 
     // for cross-correlate
     kernel = kern[0].kernel->m_kernel;
-    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &memBufs->m_bufs[0]);
-    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &memBufs->m_bufs[1]);
-    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memBufs->m_bufs[2]);
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &prev->m_buf);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &current->m_buf);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memBufs->m_bufs[0]);
 
     if (ciErrNum != CL_SUCCESS)
     {
@@ -1244,8 +1241,8 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
     }
 
     // Read back the results (finally!)
-    ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[2],
-                                    CL_TRUE, 0, bins * sizeof(cl_ulong4),
+    ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[0],
+                                    CL_TRUE, 0, bins * sizeof(cl_float),
                                     results, 0, NULL, NULL);
     if (ciErrNum != CL_SUCCESS)
     {
@@ -1261,12 +1258,9 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
     {
         for (int i = 0; i < bins; i++)
         {
-            int index = 4 * i;
             LOG(VB_GENERAL, LOG_INFO,
-                QString("Index %1 (%2-%3): Y = %4, U = %5, V = %6")
-                .arg(i) .arg(4 * i) .arg((4 * (i + 1)) - 1)
-                .arg(results[index]) .arg(results[index + 1])
-                .arg(results[index + 2]));
+                QString("Delay %1: Value = %4")
+                .arg(i) .arg(results[i]));
         }
         dumped = true;
     }
@@ -1377,7 +1371,7 @@ FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
     {
         int bins = videoPacket->m_prevHistogram->m_binCount;
 
-        uint64_t *results = new uint64_t[4 * bins];
+        float *results = new float[bins];
 
         // Calculate the cross-correlation between previous and current
         // color histograms

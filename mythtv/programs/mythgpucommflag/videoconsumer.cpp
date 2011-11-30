@@ -207,11 +207,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
             videoFrame->m_frameRaw->Dump("frame", count);
             videoFrame->m_frameYUVSNORM->Dump("yuv", count);
             videoFrame->m_wavelet->Dump("wavelet", count);
-            VideoSurface rgb(m_dev, kSurfaceRGB,
-                             videoFrame->m_frameRaw->m_width,
-                             videoFrame->m_frameRaw->m_height);
-            OpenCLYUVToRGB(m_dev, videoFrame->m_frameYUV, &rgb);
-            rgb.Dump("rgb", count);
+            videoFrame->m_frameRGBDump("rgb", count);
 
             VideoSurface yuv(m_dev, kSurfaceYUV2,
                              videoFrame->m_frameRaw->m_width,

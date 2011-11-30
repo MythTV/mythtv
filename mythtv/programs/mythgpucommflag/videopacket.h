@@ -25,6 +25,7 @@ class VideoPacket
     VideoSurface *m_frameRaw;
     VideoSurface *m_frameYUV;
     VideoSurface *m_frameYUVSNORM;
+    VideoSurface *m_frameRGB;
     VideoSurface *m_wavelet;
     VideoHistogram *m_histogram;
 

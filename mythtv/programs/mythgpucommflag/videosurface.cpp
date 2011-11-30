@@ -326,14 +326,27 @@ void VideoSurface::Dump(QString basename, int framenum)
     }
 }
 
-VideoHistogram::VideoHistogram(int binCount) : m_binCount(binCount)
+VideoHistogram::VideoHistogram(OpenCLDevice *dev, int binCount) :
+    m_dev(dev), m_binCount(binCount)
 {
-    m_bins = new uint32_t[4 * m_binCount];
+    if (dev)
+    {
+        cl_int ciErrNum;
+
+        m_buf = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
+                               sizeof(cl_float) * m_binCount, NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error creating histogram: %1 (%2)")
+                .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
+        }
+    }
 }
 
 VideoHistogram::~VideoHistogram(void)
 {
-    delete [] m_bins;
+    if (m_buf)
+        clReleaseMemObject(m_buf);
 }
 
 

@@ -25,24 +25,26 @@ VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
     m_frameRaw = m_decoder->DecodeFrame(frame);
 
     OpenCLDevice *dev = m_frameRaw->m_dev;
+    uint32_t height   = m_frameRaw->m_height;
+    uint32_t width    = m_frameRaw->m_width;
 
-    m_frameYUV = new VideoSurface(m_frameRaw->m_dev, kSurfaceYUV,
-                                  m_frameRaw->m_width, m_frameRaw->m_height);
+    m_frameYUV = new VideoSurface(dev, kSurfaceYUV, width, height);
     if (!strcmp(m_decoder->Name(), "FFMpeg"))
         OpenCLCombineFFMpegYUV(dev, m_frameRaw, m_frameYUV);
     else
         OpenCLCombineYUV(dev, m_frameRaw, m_frameYUV);
 
-    m_frameYUVSNORM = new VideoSurface(m_frameRaw->m_dev, kSurfaceYUV,
-                                       m_frameRaw->m_width,
-                                       m_frameRaw->m_height);
+    m_frameRGB = new VideoSurface(dev, kSurfaceRGB, width, height);
+    OpenCLYUVToRGB(dev, m_frameYUV, m_frameRGB);
+
+    m_frameYUVSNORM = new VideoSurface(dev, kSurfaceYUV, width, height);
     OpenCLYUVToSNORM(dev, m_frameYUV, m_frameYUVSNORM);
-    m_wavelet  = new VideoSurface(m_frameRaw->m_dev, kSurfaceWavelet,
-                                  m_frameRaw->m_width, m_frameRaw->m_height);
+
+    m_wavelet  = new VideoSurface(dev, kSurfaceWavelet, width, height);
     OpenCLWavelet(dev, m_frameYUVSNORM, m_wavelet);
 
-    m_histogram = new VideoHistogram(64);
-    OpenCLHistogram64(dev, m_frameYUVSNORM, m_histogram);
+    m_histogram = new VideoHistogram(dev, 64);
+    OpenCLHistogram64(dev, m_frameRGB, m_histogram);
 
     videoPacketMap.Add(m_frameIn, this);
 }
@@ -60,6 +62,8 @@ VideoPacket::~VideoPacket()
         m_frameYUVSNORM->DownRef();
     if (m_frameYUV)
         m_frameYUV->DownRef();
+    if (m_frameRGB)
+        m_frameRGB->DownRef();
     if (m_wavelet)
         m_wavelet->DownRef();
     if (m_histogram)
