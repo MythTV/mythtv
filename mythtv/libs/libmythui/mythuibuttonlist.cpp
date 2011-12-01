@@ -2178,27 +2178,27 @@ void MythUIButtonList::Init()
 
     m_buttontemplate->SetVisible(false);
 
+    MythRect buttonItemArea;
+
+    MythUIGroup *buttonActiveState = dynamic_cast<MythUIGroup *>
+                                     (m_buttontemplate->GetState("active"));
+
+    if (buttonActiveState)
+        buttonItemArea = buttonActiveState->GetArea();
+    else
+        buttonItemArea = m_buttontemplate->GetArea();
+
+    buttonItemArea.CalculateArea(m_contentsRect);
+
+    m_itemHeight = buttonItemArea.height();
+    m_itemWidth = buttonItemArea.width();
+
+    /*
+     * If fixed spacing is defined, then use the "active" state size
+     * to predictively determine the position of each button.
+     */
     if (m_arrange == ArrangeFixed)
     {
-
-        /*
-         * If fixed spacing is defined, then use the "active" state size
-         * to predictively determine the position of each button.
-         */
-        MythRect buttonItemArea;
-
-        MythUIGroup *buttonActiveState = dynamic_cast<MythUIGroup *>
-                                         (m_buttontemplate->GetState("active"));
-
-        if (buttonActiveState)
-            buttonItemArea = buttonActiveState->GetArea();
-        else
-            buttonItemArea = m_buttontemplate->GetArea();
-
-        buttonItemArea.CalculateArea(m_contentsRect);
-
-        m_itemHeight = buttonItemArea.height();
-        m_itemWidth = buttonItemArea.width();
 
         CalculateVisibleItems();
 
@@ -2222,29 +2222,29 @@ void MythUIButtonList::Init()
 
             m_ButtonList.push_back(button);
         }
-
-        // The following is pretty much a hack for the benefit of MythGallery
-        // it scales images based on the button size and we need to give it the
-        // largest button state so that the images are not too small
-        // This can be removed once the disk based image caching is added to
-        // mythui, since the mythgallery thumbnail generator can be ditched.
-        MythUIGroup *buttonSelectedState = dynamic_cast<MythUIGroup *>
-                                           (m_buttontemplate->GetState("selected"));
-
-        if (buttonSelectedState)
-        {
-            MythRect itemArea = buttonSelectedState->GetArea();
-            itemArea.CalculateArea(m_contentsRect);
-
-            if (m_itemHeight < itemArea.height())
-                m_itemHeight = itemArea.height();
-
-            if (m_itemWidth < itemArea.width())
-                m_itemWidth = itemArea.width();
-        }
-
-        // End Hack
     }
+
+    // The following is pretty much a hack for the benefit of MythGallery
+    // it scales images based on the button size and we need to give it the
+    // largest button state so that the images are not too small
+    // This can be removed once the disk based image caching is added to
+    // mythui, since the mythgallery thumbnail generator can be ditched.
+    MythUIGroup *buttonSelectedState = dynamic_cast<MythUIGroup *>
+                                       (m_buttontemplate->GetState("selected"));
+
+    if (buttonSelectedState)
+    {
+        MythRect itemArea = buttonSelectedState->GetArea();
+        itemArea.CalculateArea(m_contentsRect);
+
+        if (m_itemHeight < itemArea.height())
+            m_itemHeight = itemArea.height();
+
+        if (m_itemWidth < itemArea.width())
+            m_itemWidth = itemArea.width();
+    }
+
+    // End Hack
 
     m_initialized = true;
 }
