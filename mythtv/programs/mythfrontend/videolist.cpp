@@ -7,7 +7,6 @@
 #include <QList>
 
 #include "mythcontext.h"
-#include "mythmediamonitor.h"
 #include "util.h"
 
 #include "mythgenerictree.h"
@@ -1108,37 +1107,6 @@ void VideoListImp::buildFsysList()
     {
         node_paths.push_back(
                 node_to_path_list::value_type(QObject::tr("videos"), dirs[0]));
-    }
-
-    //
-    // See if there are removable media available, so we can add them
-    // to the tree.
-    //
-    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-    if (mon)
-    {
-        QList <MythMediaDevice*> medias = mon->GetMedias(MEDIATYPE_DATA);
-
-        for (QList <MythMediaDevice*>::Iterator itr = medias.begin();
-             itr != medias.end(); ++itr)
-        {
-            MythMediaDevice *pDev = *itr;
-            if (mon->ValidateAndLock(pDev))
-            {
-                QString path = pDev->getMountPath();
-                if (path.length())
-                {
-                    LOG(VB_GENERAL, LOG_INFO,
-                        QString("Video: Adding MediaMonitor device: %1")
-                            .arg(path));
-                    node_paths.push_back(node_to_path_list::
-                                         value_type(path_to_node_name(path),
-                                                    path));
-                }
-
-                mon->Unlock(pDev);
-            }
-        }
     }
 
     //

@@ -147,9 +147,11 @@ Advanced options (experts only):
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
 
-mythffmpeg options (These only affect the internal ffmpeg binary, not MythTV):
+External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
+  --enable-libfaac         enable AAC encoding vic libfaac [no]
   --enable-libx264         enable H.264 encoding via x264 [no]
+  --enable-libvpx          enable VP8 encoding via libvpx [no]
   --enable-libxvid         enable Xvid encoding via xvidcore,
                            native MPEG-4/Xvid encoder exists [no]
 EOF
@@ -4575,10 +4577,12 @@ echo "bindings_python           ${bindings_python-no}"
 echo "bindings_php              ${bindings_php-no}"
 echo ""
 
-echo "# mythffmpeg Options"
+echo "# External Codec Options"
 echo "mp3lame                   ${libmp3lame-no}"
+echo "faac                      ${libfaac-no}"
 echo "xvid                      ${libxvid-no}"
 echo "x264                      ${libx264-no}"
+echo "vpx                       ${libvpx-no}"
 echo ""
 
 MYTH_CONFIG_H=libs/libmythbase/mythconfig.h
