@@ -449,6 +449,7 @@ Transcode::Transcode(ProgramInfo *pginfo) :
     recorderOptions(""),
     avfMode(false),
     hlsMode(false),                 hlsStreamID(-1),
+    hlsDisableAudioOnly(false),
     hlsMaxSegments(0),
     cmdContainer("mpegts"),         cmdAudioCodec("libmp3lame"),
     cmdVideoCodec("libx264"),
@@ -873,7 +874,8 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
 
             avfw->SetKeyFrameDist(90);
-            avfw2->SetKeyFrameDist(90);
+            if (avfw2)
+                avfw2->SetKeyFrameDist(90);
 
             hls->AddSegment();
             avfw->SetFilename(hls->GetCurrentFilename());

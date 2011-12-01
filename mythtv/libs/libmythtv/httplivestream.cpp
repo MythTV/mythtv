@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QIODevice>
@@ -139,6 +140,15 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
 
     m_outDir = gCoreContext->GetSetting("HTTPLiveStreamDir", defaultDir);
 
+    QDir outDir(m_outDir);
+
+    if (!outDir.exists() && !outDir.mkdir(m_outDir))
+    {
+        LOG(VB_RECORD, LOG_ERR, "Unable to create HTTP Live Stream output "
+            "directory, Live Stream will not be created");
+        return;
+    }
+
     AddStream();
 }
 
@@ -161,6 +171,9 @@ HTTPLiveStream::~HTTPLiveStream()
 
 bool HTTPLiveStream::InitForWrite(void)
 {
+    if (m_streamid == -1)
+        return false;
+
     m_writing = true;
 
     WriteHTML();
@@ -296,12 +309,18 @@ bool HTTPLiveStream::AddSegment(void)
 
 QString HTTPLiveStream::GetHTMLPageName(void)
 {
+    if (m_streamid == -1)
+        return QString();
+
     QString outFile = m_outDir + "/" + m_outBase + ".html";
     return outFile;
 }
 
 bool HTTPLiveStream::WriteHTML(void)
 {
+    if (m_streamid == -1)
+        return false;
+
     QString outFile = m_outDir + "/" + m_outBase + ".html";
     QFile file(outFile);
 
@@ -344,12 +363,18 @@ bool HTTPLiveStream::WriteHTML(void)
 
 QString HTTPLiveStream::GetMetaPlaylistName(void)
 {
+    if (m_streamid == -1)
+        return QString();
+
     QString outFile = m_outDir + "/" + m_outBase + ".m3u8";
     return outFile;
 }
 
 bool HTTPLiveStream::WriteMetaPlaylist(void)
 {
+    if (m_streamid == -1)
+        return false;
+
     QString outFile = m_outDir + "/" + m_outBase + ".m3u8";
     QFile file(outFile);
 
@@ -389,6 +414,9 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
 
 QString HTTPLiveStream::GetPlaylistName(bool audioOnly)
 {
+    if (m_streamid == -1)
+        return QString();
+
     if (audioOnly && m_audioOutFile.isEmpty())
         return QString();
 
@@ -399,6 +427,9 @@ QString HTTPLiveStream::GetPlaylistName(bool audioOnly)
 
 bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
 {
+    if (m_streamid == -1)
+        return false;
+
     QString base = audioOnly ? m_audioOutFile : m_outFile;
     QString outFile = m_outDir + "/" + base + ".m3u8";
     QString tmpFile = m_outDir + "/" + base + ".m3u8.tmp";
@@ -451,6 +482,9 @@ bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
 
 bool HTTPLiveStream::SaveSegmentInfo(void)
 {
+    if (m_streamid == -1)
+        return false;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "UPDATE livestream "
@@ -474,6 +508,9 @@ bool HTTPLiveStream::SaveSegmentInfo(void)
 bool HTTPLiveStream::UpdateSizeInfo(uint16_t width, uint16_t height,
                                     uint16_t srcwidth, uint16_t srcheight)
 {
+    if (m_streamid == -1)
+        return false;
+
     QFileInfo finfo(m_sourceFile);
     QString newOutBase = finfo.fileName() +
         QString(".%1x%2_%3kV_%4kA").arg(width).arg(height)
@@ -536,6 +573,9 @@ bool HTTPLiveStream::UpdateSizeInfo(uint16_t width, uint16_t height,
 
 bool HTTPLiveStream::UpdateStatus(HTTPLiveStreamStatus status)
 {
+    if (m_streamid == -1)
+        return false;
+
     if ((m_status == kHLSStatusStopping) &&
         (status == kHLSStatusRunning))
     {
@@ -566,6 +606,9 @@ bool HTTPLiveStream::UpdateStatus(HTTPLiveStreamStatus status)
 
 bool HTTPLiveStream::UpdateStatusMessage(QString message)
 {
+    if (m_streamid == -1)
+        return false;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "UPDATE livestream "
@@ -588,6 +631,9 @@ bool HTTPLiveStream::UpdateStatusMessage(QString message)
 
 bool HTTPLiveStream::UpdatePercentComplete(int percent)
 {
+    if (m_streamid == -1)
+        return false;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "UPDATE livestream "
@@ -626,6 +672,9 @@ QString HTTPLiveStream::StatusToString(HTTPLiveStreamStatus status)
 
 bool HTTPLiveStream::LoadFromDB(void)
 {
+    if (m_streamid == -1)
+        return false;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT width, height, bitrate, audiobitrate, segmentsize, "
@@ -687,6 +736,9 @@ bool HTTPLiveStream::LoadFromDB(void)
 
 HTTPLiveStreamStatus HTTPLiveStream::GetDBStatus(void)
 {
+    if (m_streamid == -1)
+        return kHLSStatusUndefined;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT status FROM livestream "
@@ -706,6 +758,9 @@ HTTPLiveStreamStatus HTTPLiveStream::GetDBStatus(void)
 
 bool HTTPLiveStream::CheckStop(void)
 {
+    if (m_streamid == -1)
+        return false;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT status FROM livestream "
