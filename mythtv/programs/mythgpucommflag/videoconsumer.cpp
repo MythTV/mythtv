@@ -200,15 +200,15 @@ void VideoConsumer::ProcessPacket(Packet *packet)
                                      prevWavelet, prevHistogram);
         LOG(VB_GENERAL, LOG_INFO, "Finished transferring frame to OpenCL");
 
-#define DEBUG_VIDEO
 #ifdef DEBUG_VIDEO
-        if ((count <= 100) && videoFrame)
+        if ((count == 1000 || count == 45000) && videoFrame)
         {
             videoFrame->m_frameRaw->Dump("frame", count);
             videoFrame->m_frameYUVSNORM->Dump("yuv", count);
             videoFrame->m_wavelet->Dump("wavelet", count);
-            videoFrame->m_frameRGBDump("rgb", count);
+            videoFrame->m_frameRGB->Dump("rgb", count);
 
+#if 0
             VideoSurface yuv(m_dev, kSurfaceYUV2,
                              videoFrame->m_frameRaw->m_width,
                              videoFrame->m_frameRaw->m_height);
@@ -220,6 +220,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
             OpenCLYUVFromSNORM(m_dev, &yuv, &yuv2);
             OpenCLYUVToRGB(m_dev, &yuv2, &rgb);
             rgb.Dump("unwaveletRGB", count);
+#endif
         }
 #endif
     }

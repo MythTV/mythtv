@@ -334,7 +334,8 @@ VideoHistogram::VideoHistogram(OpenCLDevice *dev, int binCount) :
         cl_int ciErrNum;
 
         m_buf = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
-                               sizeof(cl_float) * m_binCount, NULL, &ciErrNum);
+                               sizeof(cl_float) * m_binCount,
+                               NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GPU, LOG_ERR, QString("Error creating histogram: %1 (%2)")

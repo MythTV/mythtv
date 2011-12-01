@@ -1,3 +1,4 @@
+#include <QFile>
 #include <QMap>
 #include <strings.h>
 
@@ -1000,6 +1001,8 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
         }
     }
 
+    VideoSurface binned(dev, kSurfaceRGB, in->m_width, in->m_height);
+
     // for histogram64
     LOG(VB_GPUVIDEO, LOG_INFO, QString("Histogram64: %1x%2 -> %3x%4")
         .arg(totDims[0]) .arg(totDims[1]) .arg(reduceWorkDims[0])
@@ -1009,9 +1012,11 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
                                &in->m_clBuffer[0]);
     ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
                                &in->m_clBuffer[1]);
-    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_uint) * bins, NULL);
-    ciErrNum |= clSetKernelArg(kernel, 3, sizeof(cl_mem), &memBufs->m_bufs[0]);
-    ciErrNum |= clSetKernelArg(kernel, 4, sizeof(cl_int2), totDims);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem),
+                               &binned.m_clBuffer[0]);
+    ciErrNum |= clSetKernelArg(kernel, 3, sizeof(cl_uint) * bins, NULL);
+    ciErrNum |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &memBufs->m_bufs[0]);
+    ciErrNum |= clSetKernelArg(kernel, 5, sizeof(cl_int2), totDims);
 
     if (ciErrNum != CL_SUCCESS)
     {
@@ -1126,13 +1131,14 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
 
     static int dump = 2;
 
-    if (dump)
+    if (1 || dump)
     {
         float *outBins = new float[bins];
 
         // Read back the results (finally!)
         ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, out->m_buf,
-                                        CL_TRUE, 0, bins * sizeof(cl_float),
+                                        CL_TRUE, 0,
+                                        bins * sizeof(cl_float),
                                         outBins, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
@@ -1143,19 +1149,48 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
             return;
         }
 
+        static int frameNum = 0;
+
+#define DEBUG_VIDEO
+#ifdef DEBUG_VIDEO
+        in->Dump("rgb", frameNum);
+        binned.Dump("binned", frameNum);
+#undef DEBUG_VIDEO
+#endif
+
+#if 0
         float tot = 0.0;
+#endif
+
+        QString filename = QString("out/histogram-%1.gnuplot").arg(frameNum++);
+        QFile outfile(filename);
+        outfile.open(QIODevice::WriteOnly);
 
         for (size_t i = 0; i < bins; i++)
         {
+#if 0
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Index %1 (%2-%3): Count = %4")
                 .arg(i) .arg(4 * i) .arg((4 * (i + 1)) - 1)
                 .arg(outBins[i]));
             tot += outBins[i];
+#endif
+            QString line = QString("%1 %2\n").arg(i) .arg(outBins[i]);
+            outfile.write(line.toLocal8Bit());
         }
+        outfile.close();
 
+#if 0
         LOG(VB_GENERAL, LOG_INFO, QString("Total: Count = %1")
             .arg(tot));
+#endif
+
+        QFile accumfile("out/histogram0.gnuplot");
+        accumfile.open(QIODevice::Append);
+        QString line = QString("%1 %2\n").arg(frameNum-1) .arg(outBins[0]);
+        accumfile.write(line.toLocal8Bit());
+        accumfile.close();
+
 
         delete [] outBins;
         dump--;
@@ -1189,7 +1224,7 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
     // Setup the kernel arguments
     int bins = prev->m_binCount;
 
-    size_t globalWorkDim = bins;
+    size_t globalWorkDim = (2 * bins) - 1;
 
     static OpenCLBufferPtr memBufs = NULL;
 
@@ -1203,7 +1238,7 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
         }
 
         memBufs->m_bufs[0] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
-                                            sizeof(cl_float) * bins,
+                                            sizeof(cl_float) * globalWorkDim,
                                             NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
@@ -1242,7 +1277,8 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
 
     // Read back the results (finally!)
     ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[0],
-                                    CL_TRUE, 0, bins * sizeof(cl_float),
+                                    CL_TRUE, 0,
+                                    globalWorkDim * sizeof(cl_float),
                                     results, 0, NULL, NULL);
     if (ciErrNum != CL_SUCCESS)
     {
@@ -1254,14 +1290,34 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
 
     static bool dumped = false;
 
-    if (!dumped)
+    if (1 || !dumped)
     {
-        for (int i = 0; i < bins; i++)
+        static int frameNum = 1;
+
+        QString filename = QString("out/correlate-%1.gnuplot").arg(frameNum++);
+        QFile outfile(filename);
+        outfile.open(QIODevice::WriteOnly);
+
+        for (int i = 1 - bins; i < bins; i++)
         {
+#if 0
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Delay %1: Value = %4")
-                .arg(i) .arg(results[i]));
+                .arg(i) .arg(results[i + bins - 1]));
+#endif
+            QString line = QString("%1 %2\n").arg(i) .arg(results[i + bins -1]);
+            outfile.write(line.toLocal8Bit());
+
         }
+
+        outfile.close();
+
+        QFile accumfile("out/correlation0.gnuplot");
+        accumfile.open(QIODevice::Append);
+        QString line = QString("%1 %2\n").arg(frameNum-1) .arg(results[bins-1]);
+        accumfile.write(line.toLocal8Bit());
+        accumfile.close();
+
         dumped = true;
     }
 
@@ -1371,7 +1427,7 @@ FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
     {
         int bins = videoPacket->m_prevHistogram->m_binCount;
 
-        float *results = new float[bins];
+        float *results = new float[(2 * bins) - 1];
 
         // Calculate the cross-correlation between previous and current
         // color histograms

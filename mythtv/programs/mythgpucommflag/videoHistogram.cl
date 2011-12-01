@@ -2,6 +2,7 @@
 #pragma OPENCL EXTENSION cl_khr_local_int32_base_atomics : enable
 __kernel
 void videoHistogram64(__read_only image2d_t fTop, __read_only image2d_t fBot,
+                      __write_only image2d_t fBin,
                       __local uint *histLoc, __global uint *histOut,
                       int2 total)
 {
@@ -37,6 +38,11 @@ void videoHistogram64(__read_only image2d_t fTop, __read_only image2d_t fBot,
 
         atom_inc( histLoc + indexT );
         atom_inc( histLoc + indexB );
+
+        uint4 binint = offsetT << 6;
+        float4 binned = convert_float4(binint) / 255.0;
+        binned.w = 1.0;
+        write_imagef(fBin, (int2)(x, y), binned);
     }
 
     barrier(CLK_LOCAL_MEM_FENCE);
