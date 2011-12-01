@@ -1778,6 +1778,7 @@ void Scheduler::run(void)
     int       wakeThreshold   = 300;
     int       idleTimeoutSecs = 0;
     int       idleWaitForRecordingTime = 15; // in minutes
+    int       tuningTimeout   = 180; // in seconds
     bool      blockShutdown   =
         gCoreContext->GetNumSetting("blockSDWUwithoutClient", 1);
     bool      firstRun        = true;
@@ -1840,6 +1841,8 @@ void Scheduler::run(void)
                     gCoreContext->GetNumSetting("idleTimeoutSecs", 0);
                 idleWaitForRecordingTime =
                     gCoreContext->GetNumSetting("idleWaitForRecordingTime", 15);
+                tuningTimeout =
+                    gCoreContext->GetNumSetting("tuningTimeout", 180);
             }
             int e = t.elapsed();
             if (e > 0)
@@ -1892,7 +1895,10 @@ void Scheduler::run(void)
         // & handle rsTuning updates
         bool done = false;
         for (RecIter it = startIter; it != reclist.end() && !done; ++it)
-            done = HandleRecording(**it, statuschanged, prerollseconds);
+        {
+            done = HandleRecording(
+                **it, statuschanged, prerollseconds, tuningTimeout);
+        }
 
         /// Wake any slave backends that need waking
         curtime = QDateTime::currentDateTime();
@@ -2252,11 +2258,12 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 }
 
 bool Scheduler::HandleRecording(
-    RecordingInfo &ri, bool &statuschanged, int prerollseconds)
+    RecordingInfo &ri, bool &statuschanged,
+    int prerollseconds, int tuningTimeout)
 {
     if (ri.GetRecordingStatus() == rsTuning)
     {
-        HandleTuning(ri, statuschanged);
+        HandleTuning(ri, statuschanged, tuningTimeout);
         return false;
     }
 
@@ -2469,7 +2476,8 @@ void Scheduler::HandleRecordingStatusChange(
     }
 }
 
-void Scheduler::HandleTuning(RecordingInfo &ri, bool &statuschanged)
+void Scheduler::HandleTuning(
+    RecordingInfo &ri, bool &statuschanged, int tuningTimeout)
 {
     if (rsTuning != ri.GetRecordingStatus())
         return;
@@ -2483,7 +2491,7 @@ void Scheduler::HandleTuning(RecordingInfo &ri, bool &statuschanged)
             .arg(ri.GetCardID()).arg(ri.GetTitle());
         LOG(VB_GENERAL, LOG_ERR, LOC + msg);
     }
-    else
+    else if (tuningTimeout > 0)
     {
         recStatus = (*tvit)->GetRecordingStatus();
         if (rsTuning == recStatus)
@@ -2492,10 +2500,14 @@ void Scheduler::HandleTuning(RecordingInfo &ri, bool &statuschanged)
             // started give up on it so the scheduler can try to
             // find another broadcast of the same material.
             QDateTime curtime = QDateTime::currentDateTime();
-            if ((ri.GetRecordingStartTime().secsTo(curtime) > 180) &&
-                (ri.GetScheduledStartTime().secsTo(curtime) > 180))
+            if ((ri.GetRecordingStartTime().secsTo(curtime) > tuningTimeout) &&
+                (ri.GetScheduledStartTime().secsTo(curtime) > tuningTimeout))
             {
                 recStatus = rsFailed;
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Canceling recording since tuning timeout, "
+                            "%1 seconds, has been exceeded.")
+                    .arg(tuningTimeout));
             }
         }
     }
