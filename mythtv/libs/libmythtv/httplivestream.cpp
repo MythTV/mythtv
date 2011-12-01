@@ -130,15 +130,16 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
     else
         m_relativeURL = m_outBase + ".m3u8";
 
-    QStringList groupDirs =
-        StorageGroup::getGroupDirs("Streaming", gCoreContext->GetHostName());
+    StorageGroup sgroup("Streaming", gCoreContext->GetHostName());
+    QStringList groupDirs = sgroup.GetDirList();
 
     QString defaultDir = GetConfDir() + "/tmp/hls";
 
     if (!groupDirs.isEmpty())
         defaultDir = groupDirs[0];
 
-    m_outDir = gCoreContext->GetSetting("HTTPLiveStreamDir", defaultDir);
+    // m_outDir = gCoreContext->GetSetting("HTTPLiveStreamDir", defaultDir);
+    m_outDir = defaultDir;
 
     QDir outDir(m_outDir);
 
