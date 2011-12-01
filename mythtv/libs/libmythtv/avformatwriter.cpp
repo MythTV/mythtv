@@ -320,7 +320,7 @@ bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
     int csize = 0;
 
 #if HAVE_BIGENDIAN
-    int sample_cnt = m_audioBufferSize / m_audioBytesPerSample;
+    int sample_cnt = m_audioFrameSize / m_audioBytesPerSample;
     bswap_16_buf((short int*) buf, sample_cnt, m_audioChannels);
 #endif
 
@@ -533,10 +533,12 @@ AVStream* AVFormatWriter::AddAudioStream(void)
     c->codec_type = AVMEDIA_TYPE_AUDIO;
 
     c->sample_fmt = AV_SAMPLE_FMT_S16;
+    m_audioBytesPerSample = m_audioChannels * 2;
 
     c->bit_rate = m_audioBitrate;
     c->sample_rate = m_audioSampleRate;
     c->channels = m_audioChannels;
+
 
     // c->flags |= CODEC_FLAG_QSCALE; // VBR
     // c->global_quality = blah;
