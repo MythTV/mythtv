@@ -483,10 +483,16 @@ void UPNPScanner::Stop(void)
 
     // cleanup the network
     foreach (QNetworkReply *reply, m_descriptionRequests)
+    {
         reply->abort();
+        delete reply;
+    }
     m_descriptionRequests.clear();
     foreach (QNetworkReply *reply, m_browseRequests)
+    {
         reply->abort();
+        delete reply;
+    }
     m_browseRequests.clear();
     delete m_network;
     m_network = NULL;
