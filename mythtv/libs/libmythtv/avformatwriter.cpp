@@ -24,15 +24,10 @@
 #include "NuppelVideoRecorder.h"
 #include "avformatwriter.h"
 
-#ifdef __linux__
-#  include <byteswap.h> /* bswap_16|32|64 */
-#elif defined __APPLE__
-#  include <libkern/OSByteOrder.h>
-#  define bswap_16(x) OSSwapInt16(x)
-#  define bswap_32(x) OSSwapInt32(x)
-#  define bswap_64(x) OSSwapInt64(x)
-#else
-#  error Byte swapping functions not defined for this platform
+#if HAVE_BIGENDIAN
+extern "C" {
+#include "byteswap.h"
+}
 #endif
 
 #define LOC QString("AVFW(%1): ").arg(m_filename)
@@ -309,13 +304,24 @@ bool AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     return true;
 }
 
+#if HAVE_BIGENDIAN
+static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
+    __attribute__ ((unused)); /* <- suppress compiler warning */
+
+static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
+{
+    for (int i = 0; i < audio_channels * buf_cnt; i++)
+        buf[i] = bswap_16(buf[i]);
+}
+#endif
+
 bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
 {
     int csize = 0;
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     int sample_cnt = m_audioBufferSize / m_audioBytesPerSample;
-    bswap_16_buf((short int*) buf, sample_cnt, audioChannels);
+    bswap_16_buf((short int*) buf, sample_cnt, m_audioChannels);
 #endif
 
     {
