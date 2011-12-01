@@ -7,7 +7,6 @@
 #include <QList>
 
 #include "mythcontext.h"
-#include "mythmediamonitor.h"
 #include "util.h"
 
 #include "mythgenerictree.h"
