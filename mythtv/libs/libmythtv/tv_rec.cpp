@@ -149,9 +149,7 @@ bool TVRec::Init(void)
     if (!GetDevices(cardid, genOpt, dvbOpt, fwOpt))
         return false;
 
-    pendingRecLock.lock();
-    m_recStatus = rsUnknown;
-    pendingRecLock.unlock();
+    SetRecordingStatus(rsUnknown, __LINE__);
 
     // configure the Channel instance
     QString startchannel = GetStartChannel(cardid, genOpt.defaultinput);
@@ -410,9 +408,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     QMutexLocker lock(&stateChangeLock);
     QString msg("");
 
-    pendingRecLock.lock();
-    m_recStatus = rsAborted;
-    pendingRecLock.unlock();
+    SetRecordingStatus(rsAborted, __LINE__);
 
     // Flush out any pending state changes
     WaitForEventThreadSleep();
@@ -441,8 +437,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
         ClearFlags(kFlagCancelNextRecording);
 
-        QMutexLocker locker(&pendingRecLock);
-        m_recStatus = rsRecording;
+        SetRecordingStatus(rsRecording, __LINE__);
         return rsRecording;
     }
 
@@ -567,9 +562,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
             // Make sure scheduler is allowed to end this recording
             ClearFlags(kFlagCancelNextRecording);
 
-            pendingRecLock.lock();
-            m_recStatus = rsRecording;
-            pendingRecLock.unlock();
+            SetRecordingStatus(rsRecording, __LINE__);
         }
         else
         {
@@ -600,18 +593,14 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         // Make sure scheduler is allowed to end this recording
         ClearFlags(kFlagCancelNextRecording);
 
-        pendingRecLock.lock();
-        m_recStatus = rsTuning;
-        pendingRecLock.unlock();
+        SetRecordingStatus(rsTuning, __LINE__);
         ChangeState(kState_RecordingOnly);
     }
     else if (!cancelNext && (GetState() == kState_WatchingLiveTV))
     {
         SetPseudoLiveTVRecording(new ProgramInfo(*rcinfo));
         recordEndTime = GetRecordEndTime(rcinfo);
-        pendingRecLock.lock();
-        m_recStatus = rsRecording;
-        pendingRecLock.unlock();
+        SetRecordingStatus(rsRecording, __LINE__);
 
         // We want the frontend to change channel for recording
         // and disable the UI for channel change, PiP, etc.
@@ -632,17 +621,13 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         if (cancelNext)
         {
             msg += "But a user has canceled this recording";
-            pendingRecLock.lock();
-            m_recStatus = rsCancelled;
-            pendingRecLock.unlock();
+            SetRecordingStatus(rsCancelled, __LINE__);
         }
         else
         {
             msg += QString("But the current state is: %1")
                 .arg(StateToString(internalState));
-            pendingRecLock.lock();
-            m_recStatus = rsTunerBusy;
-            pendingRecLock.unlock();
+            SetRecordingStatus(rsTunerBusy, __LINE__);
         }
 
         if (curRecording && internalState == kState_RecordingOnly)
@@ -667,11 +652,12 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
             (curRecording->GetRecordingStatus() == rsFailed) &&
             (m_recStatus == rsRecording || m_recStatus == rsTuning))
         {
-            m_recStatus = rsFailed;
+            SetRecordingStatus(rsFailed, __LINE__, true);
         }
+        return m_recStatus;
     }
 
-    return m_recStatus;
+    return GetRecordingStatus();
 }
 
 RecStatusType TVRec::GetRecordingStatus(void) const
@@ -680,6 +666,29 @@ RecStatusType TVRec::GetRecordingStatus(void) const
     return m_recStatus;
 }
 
+void TVRec::SetRecordingStatus(
+    RecStatusType new_status, int line, bool have_lock)
+{
+    RecStatusType old_status;
+    if (have_lock)
+    {
+        old_status = m_recStatus;
+        m_recStatus = new_status;
+    }
+    else
+    {
+        pendingRecLock.lock();
+        old_status = m_recStatus;
+        m_recStatus = new_status;
+        pendingRecLock.unlock();
+    }
+
+    LOG(VB_RECORD, LOG_DEBUG, LOC +
+        QString("SetRecordingStatus(%1->%2) on line %3")
+        .arg(toString(old_status, kSingleRecord))
+        .arg(toString(new_status, kSingleRecord))
+        .arg(line));
+}
 
 /** \fn TVRec::StopRecording(bool killFile)
  *  \brief Changes from a recording state to kState_None.
@@ -697,9 +706,7 @@ void TVRec::StopRecording(bool killFile)
         WaitForEventThreadSleep();
         ClearFlags(kFlagCancelNextRecording|kFlagKillRec);
 
-        pendingRecLock.lock();
-        m_recStatus = rsUnknown;
-        pendingRecLock.unlock();
+        SetRecordingStatus(rsUnknown, __LINE__);
     }
 }
 
@@ -3774,9 +3781,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         return NULL;
     }
 
-    pendingRecLock.lock();
-    m_recStatus = newRecStatus;
-    pendingRecLock.unlock();
+    SetRecordingStatus(newRecStatus, __LINE__);
 
     if (curRecording)
     {
@@ -3785,7 +3790,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
                     .arg(curRecording->GetCardID())
                     .arg(curRecording->GetChanID())
                     .arg(curRecording->GetScheduledStartTime(ISODate))
-                    .arg(m_recStatus)
+                    .arg(newRecStatus)
                     .arg(curRecording->GetRecordingEndTime(ISODate)));
         gCoreContext->dispatch(me);
     }

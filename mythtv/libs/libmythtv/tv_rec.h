@@ -313,6 +313,9 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void CheckForRecGroupChange(void);
     void NotifySchedulerOfRecording(RecordingInfo*);
 
+    void SetRecordingStatus(
+        RecStatusType new_status, int line, bool have_lock = false);
+
     // Various components TVRec coordinates
     RecorderBase     *recorder;
     ChannelBase      *channel;
