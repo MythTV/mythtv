@@ -5,7 +5,7 @@
 
 #include "frame.h"
 
-class FileWriterBase
+class MTV_PUBLIC FileWriterBase
 {
  public:
                  FileWriterBase();

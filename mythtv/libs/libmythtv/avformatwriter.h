@@ -10,7 +10,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-class AVFormatWriter : public FileWriterBase
+class MTV_PUBLIC AVFormatWriter : public FileWriterBase
 {
   public:
     AVFormatWriter();

@@ -19,7 +19,7 @@ typedef enum {
 } HTTPLiveStreamStatus;
 
 
-class HTTPLiveStream
+class MTV_PUBLIC HTTPLiveStream
 {
  public:
     HTTPLiveStream(QString srcFile, uint16_t width = 640, uint16_t height = 480,
