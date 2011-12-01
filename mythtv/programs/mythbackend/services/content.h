@@ -81,6 +81,31 @@ class Content : public ContentServices
         bool                DownloadFile        ( const QString   &URL,
                                                   const QString   &StorageGroup );
 
+        // HTTP Live Streaming
+        DTC::LiveStreamInfo     *AddLiveStream          ( const QString   &StorageGroup,
+                                                          const QString   &FileName,
+                                                          const QString   &HostName,
+                                                          const QString   &MaxSegments,
+                                                          const QString   &Width,
+                                                          const QString   &Height,
+                                                          const QString   &Bitrate,
+                                                          const QString   &AudioBitrate,
+                                                          const QString   &SampleRate );
+
+        DTC::LiveStreamInfo     *AddRecordingLiveStream ( int              ChanId,
+                                                          const QDateTime &StartTime,
+                                                          const QString   &MaxSegments,
+                                                          const QString   &Width,
+                                                          const QString   &Height,
+                                                          const QString   &Bitrate,
+                                                          const QString   &AudioBitrate,
+                                                          const QString   &SampleRate );
+
+        DTC::LiveStreamInfo     *GetLiveStream          ( int Id );
+        DTC::LiveStreamInfoList *GetLiveStreamList      ( void );
+
+        DTC::LiveStreamInfo     *StopLiveStream         ( int Id );
+        bool                     RemoveLiveStream       ( int Id );
 };
 
 Q_SCRIPT_DECLARE_QMETAOBJECT( Content, QObject*);

@@ -37,6 +37,7 @@ HEADERS += datacontracts/captureCardList.h       datacontracts/recRule.h
 HEADERS += datacontracts/recRuleList.h           datacontracts/artworkInfo.h
 HEADERS += datacontracts/artworkInfoList.h       datacontracts/frontendStatus.h
 HEADERS += datacontracts/frontendActionList.h
+HEADERS += datacontracts/liveStreamInfo.h        datacontracts/liveStreamInfoList.h
 
 SOURCES += service.cpp
 
@@ -73,6 +74,7 @@ incDatacontracts.files += datacontracts/captureCard.h         datacontracts/capt
 incDatacontracts.files += datacontracts/recRule.h             datacontracts/recRuleList.h
 incDatacontracts.files += datacontracts/artworkInfo.h         datacontracts/artworkInfoList.h
 incDatacontracts.files += datacontracts/frontendStatus.h      datacontracts/frontendActionList.h
+incDatacontracts.files += datacontracts/liveStreamInfo.h      datacontracts/liveStreamInfoList.h
 
 INSTALLS += inc incServices incDatacontracts
 

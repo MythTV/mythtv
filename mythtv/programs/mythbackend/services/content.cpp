@@ -37,6 +37,7 @@
 #include "util.h"
 #include "mythdownloadmanager.h"
 #include "metadataimagehelper.h"
+#include "httplivestream.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -706,6 +707,10 @@ QFileInfo Content::GetVideo( int nId )
     return QFileInfo( sFileName );
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QString Content::GetHash( const QString &sStorageGroup,
                           const QString &sFileName )
 {
@@ -734,6 +739,10 @@ QString Content::GetHash( const QString &sStorageGroup,
 
     return hash;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
 
 bool Content::DownloadFile( const QString &sURL, const QString &sStorageGroup )
 {
@@ -768,3 +777,246 @@ bool Content::DownloadFile( const QString &sURL, const QString &sStorageGroup )
     return false;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::LiveStreamInfo *Content::AddLiveStream( const QString   &sStorageGroup,
+                                             const QString   &sFileName,
+                                             const QString   &sHostName,
+                                             const QString   &sMaxSegments,
+                                             const QString   &sWidth,
+                                             const QString   &sHeight,
+                                             const QString   &sBitrate,
+                                             const QString   &sAudioBitrate,
+                                             const QString   &sSampleRate )
+{
+    QString sGroup = sStorageGroup;
+
+    if (sGroup.isEmpty())
+    {
+        LOG(VB_UPNP, LOG_WARNING,
+            "AddLiveStream - StorageGroup missing... using 'Default'");
+        sGroup = "Default";
+    }
+
+    if (sFileName.isEmpty())
+    {
+        QString sMsg ( "AddLiveStream - FileName missing." );
+
+        LOG(VB_UPNP, LOG_ERR, sMsg);
+
+        throw sMsg;
+    }
+
+    // ------------------------------------------------------------------
+    // Search for the filename
+    // ------------------------------------------------------------------
+
+    QString sFullFileName;
+    if (sHostName.isEmpty() || sHostName == gCoreContext->GetHostName())
+    {
+        StorageGroup storage( sGroup );
+        sFullFileName = storage.FindFile( sFileName );
+
+        if (sFullFileName.isEmpty())
+        {
+            LOG(VB_UPNP, LOG_ERR,
+                QString("AddLiveStream - Unable to find %1.").arg(sFileName));
+
+            return NULL;
+        }
+    }
+    else
+    {
+        sFullFileName =
+            gCoreContext->GenMythURL(sHostName, 0, sFileName, sStorageGroup);
+    }
+
+    uint16_t nWidth        = 480;
+    uint16_t nHeight       = 0;
+    uint32_t nBitrate      = 800000;
+    uint32_t nAudioBitrate = 64000;
+    uint16_t nMaxSegments  = 0;
+    uint16_t nSampleRate   = -1;
+
+    bool     ok = false;
+    uint32_t value = 0;
+
+    if (!sWidth.isEmpty())
+    {
+        value = sWidth.toUInt(&ok);
+        if (ok)
+            nWidth = value;
+    }
+
+    if (!sHeight.isEmpty())
+    {
+        value = sHeight.toUInt(&ok);
+        if (ok)
+            nHeight = value;
+    }
+
+    if (!sBitrate.isEmpty())
+    {
+        value = sBitrate.toUInt(&ok);
+        if (ok)
+            nBitrate = value;
+    }
+
+    if (!sAudioBitrate.isEmpty())
+    {
+        value = sAudioBitrate.toUInt(&ok);
+        if (ok)
+            nAudioBitrate = value;
+    }
+
+    if (!sMaxSegments.isEmpty())
+    {
+        value = sMaxSegments.toUInt(&ok);
+        if (ok)
+            nMaxSegments = value;
+    }
+
+    if (!sSampleRate.isEmpty())
+    {
+        value = sSampleRate.toUInt(&ok);
+        if (ok)
+            nSampleRate = value;
+    }
+
+    HTTPLiveStream *hls = new
+        HTTPLiveStream(sFullFileName, nWidth, nHeight, nBitrate, nAudioBitrate,
+                       nMaxSegments, 10, 32000, nSampleRate);
+
+    if (!hls)
+    {
+        LOG(VB_UPNP, LOG_ERR,
+            "AddLiveStream - Unable to create HTTPLiveStream.");
+        return NULL;
+    }
+
+    DTC::LiveStreamInfo *lsInfo = hls->StartStream();
+
+    delete hls;
+
+    return lsInfo;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Content::RemoveLiveStream( int nId )
+{
+    return HTTPLiveStream::RemoveStream(nId);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::LiveStreamInfo *Content::StopLiveStream( int nId )
+{
+    return HTTPLiveStream::StopStream(nId);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::LiveStreamInfo *Content::GetLiveStream( int nId )
+{
+    HTTPLiveStream *hls = new HTTPLiveStream(nId);
+
+    if (!hls)
+    {
+        LOG( VB_UPNP, LOG_ERR,
+             QString("GetLiveStream - for stream id %1 failed").arg( nId ));
+        return NULL;
+    }
+
+    DTC::LiveStreamInfo *hlsInfo = hls->GetLiveStreamInfo();
+    if (!hlsInfo)
+    {
+        LOG( VB_UPNP, LOG_ERR,
+             QString("HLS::GetLiveStreamInfo - for stream id %1 failed")
+                     .arg( nId ));
+        return NULL;
+    }
+
+    delete hls;
+    return hlsInfo;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+DTC::LiveStreamInfoList *Content::GetLiveStreamList( void )
+{
+    return HTTPLiveStream::GetLiveStreamInfoList();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+DTC::LiveStreamInfo *Content::AddRecordingLiveStream( int              nChanId,
+                                                      const QDateTime &dtStartTime,
+                                                      const QString   &sMaxSegments,
+                                                      const QString   &sWidth,
+                                                      const QString   &sHeight,
+                                                      const QString   &sBitrate,
+                                                      const QString   &sAudioBitrate,
+                                                      const QString   &sSampleRate )
+{
+    if (!dtStartTime.isValid())
+        throw( "StartTime is invalid" );
+
+    // ------------------------------------------------------------------
+    // Read Recording From Database
+    // ------------------------------------------------------------------
+
+    ProgramInfo pginfo( (uint)nChanId, dtStartTime );
+
+    if (!pginfo.GetChanID())
+    {
+        LOG( VB_UPNP, LOG_ERR, QString("AddRecordingLiveStream - for %1, %2 failed")
+                                    .arg( nChanId )
+                                    .arg( dtStartTime.toString() ));
+        return NULL;
+    }
+
+    if ( pginfo.GetHostname() != gCoreContext->GetHostName())
+    {
+        // We only handle requests for local resources
+
+        QString sMsg =
+            QString("GetRecording: Wrong Host '%1' request from '%2'.")
+                          .arg( gCoreContext->GetHostName())
+                          .arg( pginfo.GetHostname() );
+
+        LOG(VB_UPNP, LOG_ERR, sMsg);
+
+        throw HttpRedirectException( pginfo.GetHostname() );
+    }
+
+    QString sFileName( GetPlaybackURL(&pginfo) );
+
+    // ----------------------------------------------------------------------
+    // check to see if the file exists
+    // ----------------------------------------------------------------------
+
+    if (!QFile::exists( sFileName ))
+    {
+        LOG( VB_UPNP, LOG_ERR, QString("AddRecordingLiveStream - for %1, %2 failed")
+                                    .arg( nChanId )
+                                    .arg( dtStartTime.toString() ));
+        return NULL;
+    }
+
+    QFileInfo fInfo( sFileName );
+
+    return AddLiveStream( pginfo.GetStorageGroup(), fInfo.fileName(),
+                          pginfo.GetHostname(), sMaxSegments, sWidth,
+                          sHeight, sBitrate, sAudioBitrate, sSampleRate );
+}

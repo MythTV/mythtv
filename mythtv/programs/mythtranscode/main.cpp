@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
         useCutlist = true;
         if (!cmdline.toString("usecutlist").isEmpty())
         {
-            if (!cmdline.toBool("inputfile"))
+            if (!cmdline.toBool("inputfile") && !cmdline.toBool("hls"))
             {
                 cerr << "External cutlists are only allowed when using" << endl
                      << "the --infile option." << endl;
@@ -356,13 +356,14 @@ int main(int argc, char *argv[])
         }
     }
 
-    if ((!found_infile && !(found_chanid && found_starttime)) ||
-        (found_infile && (found_chanid || found_starttime)) )
+    if (((!found_infile && !(found_chanid && found_starttime)) ||
+         (found_infile && (found_chanid || found_starttime))) &&
+        (!cmdline.toBool("hls")))
     {
          cerr << "Must specify -i OR -c AND -s options!" << endl;
          return GENERIC_EXIT_INVALID_CMDLINE;
     }
-    if (isVideo && !found_infile)
+    if (isVideo && !found_infile && !cmdline.toBool("hls"))
     {
          cerr << "Must specify --infile to use --video" << endl;
          return GENERIC_EXIT_INVALID_CMDLINE;
@@ -408,7 +409,11 @@ int main(int argc, char *argv[])
     }
 
     ProgramInfo *pginfo = NULL;
-    if (isVideo)
+    if (cmdline.toBool("hls"))
+    {
+        pginfo = new ProgramInfo();
+    }
+    else if (isVideo)
     {
         // We want the absolute file path for the filemarkup table
         QFileInfo inf(infile);
@@ -456,7 +461,7 @@ int main(int argc, char *argv[])
     }
 
     if (infile.left(7) == "myth://" && (outfile.isEmpty() || outfile != "-") &&
-        fifodir.isEmpty())
+        fifodir.isEmpty() && !cmdline.toBool("hls") && !cmdline.toBool("avf"))
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Attempted to transcode %1. Mythtranscode is currently "
@@ -474,7 +479,11 @@ int main(int argc, char *argv[])
 
     if (!build_index)
     {
-        if (fifodir.isEmpty())
+        if (cmdline.toBool("hlsstreamid"))
+            LOG(VB_GENERAL, LOG_NOTICE,
+                QString("Transcoding HTTP Live Stream ID %1")
+                        .arg(cmdline.toInt("hlsstreamid")));
+        else if (fifodir.isEmpty())
             LOG(VB_GENERAL, LOG_NOTICE, QString("Transcoding from %1 to %2")
                     .arg(infile).arg(outfile));
         else
@@ -482,12 +491,47 @@ int main(int argc, char *argv[])
                     .arg(infile));
     }
 
+    if (cmdline.toBool("avf"))
+    {
+        transcode->SetAVFMode();
+
+        if (cmdline.toBool("container"))
+            transcode->SetCMDContainer(cmdline.toString("container"));
+        if (cmdline.toBool("acodec"))
+            transcode->SetCMDAudioCodec(cmdline.toString("acodec"));
+        if (cmdline.toBool("vcodec"))
+            transcode->SetCMDVideoCodec(cmdline.toString("vcodec"));
+    }
+    else if (cmdline.toBool("hls"))
+    {
+        transcode->SetHLSMode();
+
+        if (cmdline.toBool("hlsstreamid"))
+            transcode->SetHLSStreamID(cmdline.toInt("hlsstreamid"));
+        if (cmdline.toBool("maxsegments"))
+            transcode->SetHLSMaxSegments(cmdline.toInt("maxsegments"));
+        if (cmdline.toBool("noaudioonly"))
+            transcode->DisableAudioOnlyHLS();
+    }
+
+    if (cmdline.toBool("avf") || cmdline.toBool("hls"))
+    {
+        if (cmdline.toBool("width"))
+            transcode->SetCMDWidth(cmdline.toInt("width"));
+        if (cmdline.toBool("height"))
+            transcode->SetCMDHeight(cmdline.toInt("height"));
+        if (cmdline.toBool("bitrate"))
+            transcode->SetCMDBitrate(cmdline.toInt("bitrate") * 1000);
+        if (cmdline.toBool("audiobitrate"))
+            transcode->SetCMDAudioBitrate(cmdline.toInt("audiobitrate") * 1000);
+    }
+
     if (showprogress)
         transcode->ShowProgress(true);
     if (!recorderOptions.isEmpty())
         transcode->SetRecorderOptions(recorderOptions);
     int result = 0;
-    if (!mpeg2 && !build_index)
+    if ((!mpeg2 && !build_index) || cmdline.toBool("hls"))
     {
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,

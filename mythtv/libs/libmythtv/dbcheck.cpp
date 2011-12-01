@@ -5985,6 +5985,43 @@ NULL
             return false;
     }
 
+    if (dbver == "1287")
+    {
+        const char *updates[] = {
+"CREATE TABLE IF NOT EXISTS livestream ( "
+"    id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY, "
+"    width INT UNSIGNED NOT NULL, "
+"    height INT UNSIGNED NOT NULL, "
+"    bitrate INT UNSIGNED NOT NULL, "
+"    audiobitrate INT UNSIGNED NOT NULL, "
+"    samplerate INT UNSIGNED NOT NULL, "
+"    audioonlybitrate INT UNSIGNED NOT NULL, "
+"    segmentsize INT UNSIGNED NOT NULL DEFAULT 10, "
+"    maxsegments INT UNSIGNED NOT NULL DEFAULT 0, "
+"    startsegment INT UNSIGNED NOT NULL DEFAULT 0, "
+"    currentsegment INT UNSIGNED NOT NULL DEFAULT 0, "
+"    segmentcount INT UNSIGNED NOT NULL DEFAULT 0, "
+"    percentcomplete INT UNSIGNED NOT NULL DEFAULT 0, "
+"    created DATETIME NOT NULL, "
+"    lastmodified DATETIME NOT NULL, "
+"    relativeurl VARCHAR(512) NOT NULL, "
+"    fullurl VARCHAR(1024) NOT NULL, "
+"    status INT UNSIGNED NOT NULL DEFAULT 0, "
+"    statusmessage VARCHAR(256) NOT NULL, "
+"    sourcefile VARCHAR(512) NOT NULL, "
+"    sourcehost VARCHAR(64) NOT NULL, "
+"    sourcewidth INT UNSIGNED NOT NULL DEFAULT 0, "
+"    sourceheight INT UNSIGNED NOT NULL DEFAULT 0, "
+"    outdir VARCHAR(256) NOT NULL, "
+"    outbase VARCHAR(128) NOT NULL "
+") ENGINE=MyISAM DEFAULT CHARSET=utf8; ",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1288", dbver))
+            return false;
+    }
+
     return true;
 }
 

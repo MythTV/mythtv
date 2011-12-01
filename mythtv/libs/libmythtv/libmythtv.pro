@@ -35,6 +35,7 @@ DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 DEPENDPATH  += ../libmythbase ../libmythui
 DEPENDPATH  += ../libmythupnp
+DEPENDPATH  += ../libmythservicecontracts
 
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../../external/FFmpeg
@@ -201,6 +202,14 @@ SOURCES += diseqc.cpp               diseqcsettings.cpp
 # Listings downloading classes
 HEADERS += datadirect.h
 SOURCES += datadirect.cpp
+
+# File Writer classes
+HEADERS += filewriterbase.h         avformatwriter.h
+SOURCES += filewriterbase.cpp       avformatwriter.cpp
+
+# HTTP Live Streaming
+HEADERS += httplivestream.h
+SOURCES += httplivestream.cpp
 
 # Teletext stuff
 HEADERS += teletextdecoder.h        teletextreader.h   vbilut.h
