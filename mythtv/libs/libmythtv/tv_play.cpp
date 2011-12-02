@@ -1388,25 +1388,70 @@ void TV::GetStatus(void)
             status.insert("chaptertimes", var);
         }
 
+        uint capmode = ctx->player->GetCaptionMode();
         QVariantMap tracks;
 
         QStringList list = ctx->player->GetTracks(kTrackTypeSubtitle);
+        int currenttrack = -1;
+        if (!list.isEmpty() && (kDisplayAVSubtitle == capmode))
+            currenttrack = ctx->player->GetTrack(kTrackTypeSubtitle);
         for (int i = 0; i < list.size(); i++)
+        {
+            if (i == currenttrack)
+                status.insert("currentsubtitletrack", list[i]);
             tracks.insert("SELECTSUBTITLE_" + QString::number(i), list[i]);
+        }
+
         list = ctx->player->GetTracks(kTrackTypeTeletextCaptions);
+        currenttrack = -1;
+        if (!list.isEmpty() && (kDisplayTeletextCaptions == capmode))
+            currenttrack = ctx->player->GetTrack(kTrackTypeTeletextCaptions);
         for (int i = 0; i < list.size(); i++)
+        {
+            if (i == currenttrack)
+                status.insert("currentsubtitletrack", list[i]);
             tracks.insert("SELECTTTC_" + QString::number(i), list[i]);
+        }
+
         list = ctx->player->GetTracks(kTrackTypeCC708);
+        currenttrack = -1;
+        if (!list.isEmpty() && (kDisplayCC708 == capmode))
+            currenttrack = ctx->player->GetTrack(kTrackTypeCC708);
         for (int i = 0; i < list.size(); i++)
+        {
+            if (i == currenttrack)
+                status.insert("currentsubtitletrack", list[i]);
             tracks.insert("SELECTCC708_" + QString::number(i), list[i]);
+        }
+
         list = ctx->player->GetTracks(kTrackTypeCC608);
+        currenttrack = -1;
+        if (!list.isEmpty() && (kDisplayCC608 == capmode))
+            currenttrack = ctx->player->GetTrack(kTrackTypeCC608);
         for (int i = 0; i < list.size(); i++)
+        {
+            if (i == currenttrack)
+                status.insert("currentsubtitletrack", list[i]);
             tracks.insert("SELECTCC608_" + QString::number(i), list[i]);
+        }
+
         list = ctx->player->GetTracks(kTrackTypeRawText);
+        currenttrack = -1;
+        if (!list.isEmpty() && (kDisplayRawTextSubtitle == capmode))
+            currenttrack = ctx->player->GetTrack(kTrackTypeRawText);
         for (int i = 0; i < list.size(); i++)
+        {
+            if (i == currenttrack)
+                status.insert("currentsubtitletrack", list[i]);
             tracks.insert("SELECTRAWTEXT_" + QString::number(i), list[i]);
+        }
+
         if (ctx->player->HasTextSubtitles())
+        {
+            if (kDisplayTextSubtitle == capmode)
+                status.insert("currentsubtitletrack", tr("External Subtitles"));
             tracks.insert(ACTION_ENABLEEXTTEXT, tr("External Subtitles"));
+        }
 
         status.insert("totalsubtitletracks", tracks.size());
         if (!tracks.isEmpty())
