@@ -317,7 +317,7 @@ dvdnav_status_t dvdnav_sector_search(dvdnav_t *this,
   }
 
   if(found) {
-    int32_t vobu;
+    uint32_t vobu;
 #ifdef LOG_DEBUG
     fprintf(MSG_OUT, "libdvdnav: Seeking to cell %i from choice of %i to %i\n",
 	    cell_nr, first_cell_nr, last_cell_nr);
