@@ -129,12 +129,15 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
 DVDRingBuffer::~DVDRingBuffer()
 {
     CloseDVD();
+    m_menuBtnLock.lock();
     ClearMenuSPUParameters();
+    m_menuBtnLock.unlock();
     ClearChapterCache();
 }
 
 void DVDRingBuffer::CloseDVD(void)
 {
+    rwlock.lockForWrite();
     if (m_dvdnav)
     {
         SetDVDSpeed(-1);
@@ -143,13 +146,16 @@ void DVDRingBuffer::CloseDVD(void)
     }
     m_gotStop = false;
     m_audioStreamsChanged = true;
+    rwlock.unlock();
 }
 
 void DVDRingBuffer::ClearChapterCache(void)
 {
+    rwlock.lockForWrite();
     foreach (QList<uint64_t> chapters, m_chapterMap)
         chapters.clear();
     m_chapterMap.clear();
+    rwlock.unlock();
 }
 
 long long DVDRingBuffer::Seek(long long pos, int whence, bool has_lock)
@@ -306,7 +312,11 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     rwlock.lockForWrite();
 
     if (m_dvdnav)
+    {
+        rwlock.unlock();
         CloseDVD();
+        rwlock.lockForWrite();
+    }
 
     safefilename = lfilename;
     filename = lfilename;
