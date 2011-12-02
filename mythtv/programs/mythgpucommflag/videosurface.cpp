@@ -1,4 +1,9 @@
 #include <QFile>
+#include <QImage>
+#include <QImageWriter>
+#include <QVector>
+#include <QRgb>
+#include <QColor>
 
 #include <strings.h>
 
@@ -112,7 +117,8 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
     bufWidth = m_width;
     bufHeight = m_height / 2;
 
-    format.image_channel_order = CL_RGBA;
+    // For ease of use with QImage
+    format.image_channel_order = CL_BGRA;
 
     switch (m_type)
     {
@@ -232,28 +238,7 @@ void VideoSurface::Bind(void)
 void VideoSurface::Dump(QString basename, int framenum)
 {
     cl_int ciErrNum;
-    QString extension;
-
-    switch (m_type)
-    {
-        case kSurfaceVDPAURender:
-            break;
-        case kSurfaceFFMpegRender:
-            extension = "pgm";
-            break;
-        case kSurfaceWavelet:
-        case kSurfaceYUV2:
-            extension = "ppm";
-            break;
-        case kSurfaceYUV:
-        case kSurfaceRGB:
-        case kSurfaceLogoROI:
-        case kSurfaceLogoRGB:
-            extension = "ppm";
-            break;
-        default:
-            return;
-    }
+    QString extension("png");
 
     for (int i = 0; i < m_bufCount; i++)
     {
@@ -291,7 +276,7 @@ void VideoSurface::Dump(QString basename, int framenum)
         if (m_type == kSurfaceVDPAURender)
         {
             if (elemSize == 1)
-                extension = "pgm";
+                extension = "png";
             else
                 extension = "bin";
         }
@@ -303,22 +288,21 @@ void VideoSurface::Dump(QString basename, int framenum)
 
         if (elemSize == 4)
         {
-            QString line = QString("P6\n%1 %2\n255\n").arg(width).arg(height);
-            file.write(line.toLocal8Bit().constData());
-            for(int j = 0; j < (int)(width * height * elemSize); j += elemSize)
-            {
-                file.write(&buf[j], 3);
-            }
+            QImage image((const uchar *)buf, width, height,
+                         QImage::Format_RGB32);
+            image.save(&file, extension.toLocal8Bit().constData());
         }
-        else
+        else if (elemSize == 1)
         {
-            if (elemSize == 1)
-            {
-                QString line = QString("P5\n%1 %2\n255\n") .arg(width)
-                    .arg(height);
-                file.write(line.toLocal8Bit().constData());
-            }
-            file.write(buf, pitch*height);
+            QImage image((const uchar *)buf, width, height,
+                         QImage::Format_Indexed8);
+            QVector<QRgb> colorTable;
+            for (int i = 0; i < 256; i++)
+                colorTable.push_back(QColor(i, i, i).rgb());
+            image.setColorTable(colorTable);
+            image.save(&file, extension.toLocal8Bit().constData());
+        } else {
+            file.write(buf, pitch * height);
         }
         file.close();
 
@@ -326,8 +310,8 @@ void VideoSurface::Dump(QString basename, int framenum)
     }
 }
 
-VideoHistogram::VideoHistogram(OpenCLDevice *dev, int binCount) :
-    m_dev(dev), m_binCount(binCount)
+VideoHistogram::VideoHistogram(OpenCLDevice *dev, int binCount, int offset) :
+    m_dev(dev), m_binCount(binCount), m_offset(offset)
 {
     if (dev)
     {
@@ -348,6 +332,50 @@ VideoHistogram::~VideoHistogram(void)
 {
     if (m_buf)
         clReleaseMemObject(m_buf);
+}
+
+// Makes gnuplot plt files.
+void VideoHistogram::Dump(QString basename, int framenum)
+{
+    float *outBins = new float[m_binCount];
+    cl_int ciErrNum;
+
+    if (m_dev)
+    {
+        // Read back the results (finally!)
+        ciErrNum  = clEnqueueReadBuffer(m_dev->m_commandQ, m_buf,
+                                        CL_TRUE, 0,
+                                        m_binCount * sizeof(cl_float),
+                                        outBins, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
+                .arg(ciErrNum));
+            delete [] outBins;
+            return;
+        }
+
+        QString filename = QString("out/%1-%2.plt").arg(basename).arg(framenum);
+        QFile outfile(filename);
+        outfile.open(QIODevice::WriteOnly);
+
+        for (int i = m_offset; i < m_binCount + m_offset; i++)
+        {
+            QString line = QString("%1 %2\n").arg(i) .arg(outBins[i]);
+            outfile.write(line.toLocal8Bit());
+        }
+        outfile.close();
+
+        filename = QString("out/%1-cum-0.plt").arg(basename);
+        QFile accumfile(filename);
+        accumfile.open(QIODevice::Append);
+        QString line = QString("%1 %2\n").arg(framenum)
+                           .arg(outBins[0 - m_offset]);
+        accumfile.write(line.toLocal8Bit());
+        accumfile.close();
+
+        delete [] outBins;
+    }
 }
 
 

@@ -49,7 +49,7 @@ VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
 
     if (m_prevHistogram)
     {
-        m_correlation = new VideoHistogram(dev, 127);
+        m_correlation = new VideoHistogram(dev, 127, -63);
         OpenCLCrossCorrelate(dev, m_prevHistogram, m_histogram, m_correlation);
     }
     else

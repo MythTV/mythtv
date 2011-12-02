@@ -74,11 +74,13 @@ typedef QList<uint> VideoSurfaceList;
 class VideoHistogram : public ReferenceCounter
 {
   public:
-    VideoHistogram(OpenCLDevice *dev, int binCount = 64);
+    VideoHistogram(OpenCLDevice *dev, int binCount = 64, int offset = 0);
     ~VideoHistogram(void);
+    void Dump(QString basename, int framenum);
 
     OpenCLDevice *m_dev;
     int m_binCount;
+    int m_offset;
     cl_mem m_buf;
 };
 

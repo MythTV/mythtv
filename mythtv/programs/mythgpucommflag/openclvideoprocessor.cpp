@@ -1137,21 +1137,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
 
     if (1 || dump)
     {
-        float *outBins = new float[bins];
-
-        // Read back the results (finally!)
-        ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, out->m_buf,
-                                        CL_TRUE, 0,
-                                        bins * sizeof(cl_float),
-                                        outBins, 0, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS)
-        {
-            LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
-                .arg(ciErrNum));
-            delete [] outBins;
-            delete memBufs;
-            return;
-        }
+        out->Dump("histogram", frameNum++);
 
 #define DEBUG_VIDEO
 #ifdef DEBUG_VIDEO
@@ -1159,42 +1145,6 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
         binned.Dump("binned", frameNum);
 #undef DEBUG_VIDEO
 #endif
-
-#if 0
-        float tot = 0.0;
-#endif
-
-        QString filename = QString("out/histogram-%1.gnuplot").arg(frameNum++);
-        QFile outfile(filename);
-        outfile.open(QIODevice::WriteOnly);
-
-        for (size_t i = 0; i < bins; i++)
-        {
-#if 0
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("Index %1 (%2-%3): Count = %4")
-                .arg(i) .arg(4 * i) .arg((4 * (i + 1)) - 1)
-                .arg(outBins[i]));
-            tot += outBins[i];
-#endif
-            QString line = QString("%1 %2\n").arg(i) .arg(outBins[i]);
-            outfile.write(line.toLocal8Bit());
-        }
-        outfile.close();
-
-#if 0
-        LOG(VB_GENERAL, LOG_INFO, QString("Total: Count = %1")
-            .arg(tot));
-#endif
-
-        QFile accumfile("out/histogram0.gnuplot");
-        accumfile.open(QIODevice::Append);
-        QString line = QString("%1 %2\n").arg(frameNum-1) .arg(outBins[0]);
-        accumfile.write(line.toLocal8Bit());
-        accumfile.close();
-
-
-        delete [] outBins;
         dump--;
     }
 #undef DEBUG_HISTOGRAM
@@ -1261,46 +1211,7 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
 
     if (1 || !dumped)
     {
-        float *results = new float[globalWorkDim];
-
-        // Read back the results (finally!)
-        ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, correlation->m_buf,
-                                        CL_TRUE, 0,
-                                        globalWorkDim * sizeof(cl_float),
-                                        results, 0, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS)
-        {
-            LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
-                .arg(ciErrNum));
-            return;
-        }
-
-        QString filename = QString("out/correlate-%1.gnuplot").arg(frameNum++);
-        QFile outfile(filename);
-        outfile.open(QIODevice::WriteOnly);
-
-        for (int i = 1 - bins; i < bins; i++)
-        {
-#if 0
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("Delay %1: Value = %4")
-                .arg(i) .arg(results[i + bins - 1]));
-#endif
-            QString line = QString("%1 %2\n").arg(i) .arg(results[i + bins -1]);
-            outfile.write(line.toLocal8Bit());
-
-        }
-
-        outfile.close();
-
-        QFile accumfile("out/correlation0.gnuplot");
-        accumfile.open(QIODevice::Append);
-        QString line = QString("%1 %2\n").arg(frameNum-1) .arg(results[bins-1]);
-        accumfile.write(line.toLocal8Bit());
-        accumfile.close();
-
-        delete [] results;
-
+        correlation->Dump("correlate", frameNum++);
         dumped = true;
     }
 #undef DEBUG_HISTOGRAM
@@ -1362,43 +1273,7 @@ void OpenCLDiffCorrelation(OpenCLDevice *dev, VideoHistogram *prev,
 
     if (1 || !dumped)
     {
-        int globalWorkDim = delta->m_binCount;
-        int bins = (globalWorkDim + 1) / 2;
-        float *results = new float[globalWorkDim];
-
-        // Read back the results (finally!)
-        ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, delta->m_buf,
-                                        CL_TRUE, 0,
-                                        globalWorkDim * sizeof(cl_float),
-                                        results, 0, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS)
-        {
-            LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
-                .arg(ciErrNum));
-            return;
-        }
-
-        QString filename = QString("out/deltacorrelate-%1.gnuplot")
-                               .arg(frameNum++);
-        QFile outfile(filename);
-        outfile.open(QIODevice::WriteOnly);
-
-        for (int i = 1 - bins; i < bins; i++)
-        {
-            QString line = QString("%1 %2\n").arg(i) .arg(results[i + bins -1]);
-            outfile.write(line.toLocal8Bit());
-        }
-
-        outfile.close();
-
-        QFile accumfile("out/deltacorrelation0.gnuplot");
-        accumfile.open(QIODevice::Append);
-        QString line = QString("%1 %2\n").arg(frameNum-1) .arg(results[bins-1]);
-        accumfile.write(line.toLocal8Bit());
-        accumfile.close();
-
-        delete [] results;
-
+        delta->Dump("delta", frameNum++);
         dumped = true;
     }
 #undef DEBUG_HISTOGRAM
@@ -1507,7 +1382,7 @@ FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
 
     if (videoPacket->m_prevCorrelation)
     {
-        VideoHistogram deltaCorrelation(dev, 127);
+        VideoHistogram deltaCorrelation(dev, 127, -63);
 
         OpenCLDiffCorrelation(dev, videoPacket->m_prevCorrelation,
                               videoPacket->m_correlation, &deltaCorrelation);
