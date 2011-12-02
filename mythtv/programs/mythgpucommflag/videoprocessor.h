@@ -75,7 +75,9 @@ void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out);
 void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in,
                        VideoHistogram *out);
 void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
-                          VideoHistogram *current, float *results);
+                          VideoHistogram *current, VideoHistogram *correlation);
+void OpenCLDiffCorrelation(OpenCLDevice *dev, VideoHistogram *prev,
+                           VideoHistogram *current, VideoHistogram *delta);
 
 #endif
 

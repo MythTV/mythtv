@@ -189,6 +189,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
     static VideoSurface *prevYUV = NULL;
     static VideoSurface *prevWavelet = NULL;
     static VideoHistogram *prevHistogram = NULL;
+    static VideoHistogram *prevCorrelation = NULL;
 
     // Push YUV frame to GPU/CPU Processing memory
     if (m_dev)
@@ -197,7 +198,8 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         count++;
         LOG(VB_GENERAL, LOG_INFO, "About to transfer frame to OpenCL");
         videoFrame = new VideoPacket(m_decoder, &mpa_pic, count, prevYUV,
-                                     prevWavelet, prevHistogram);
+                                     prevWavelet, prevHistogram,
+                                     prevCorrelation);
         LOG(VB_GENERAL, LOG_INFO, "Finished transferring frame to OpenCL");
 
 #ifdef DEBUG_VIDEO
@@ -260,6 +262,9 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         prevWavelet->UpRef();
         prevHistogram = videoFrame->m_histogram;
         prevHistogram->UpRef();
+        prevCorrelation = videoFrame->m_correlation;
+        if (prevCorrelation)
+            prevCorrelation->UpRef();
         delete videoFrame;
     }
 }

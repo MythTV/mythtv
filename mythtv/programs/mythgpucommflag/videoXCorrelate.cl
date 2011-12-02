@@ -24,6 +24,17 @@ void videoCrossCorrelation(__global float *a, __global float *b,
     out[l] = locData;
 }
 
+__kernel
+void videoDiffCorrelation(__global float *a, __global float *b,
+                          __global float *out)
+{
+    int x = get_global_id(0);           // eg. 0-63
+
+    // current - previous
+    out[x] = b[x] - a[x];
+}
+
+
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4:filetype=c
  */

@@ -1130,6 +1130,10 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
     }
 
     static int dump = 2;
+    static int frameNum = 0;
+
+#define DEBUG_HISTOGRAM
+#ifdef DEBUG_HISTOGRAM
 
     if (1 || dump)
     {
@@ -1148,8 +1152,6 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
             delete memBufs;
             return;
         }
-
-        static int frameNum = 0;
 
 #define DEBUG_VIDEO
 #ifdef DEBUG_VIDEO
@@ -1195,6 +1197,8 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
         delete [] outBins;
         dump--;
     }
+#undef DEBUG_HISTOGRAM
+#endif
 
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Histogram64 Done");
 }
@@ -1202,7 +1206,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
 #define KERNEL_CROSS_CORRELATE_CL "videoXCorrelate.cl"
 
 void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
-                          VideoHistogram *current, float *results)
+                          VideoHistogram *current, VideoHistogram *correlation)
 {
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Cross Correlate");
 
@@ -1226,39 +1230,15 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
 
     size_t globalWorkDim = (2 * bins) - 1;
 
-    static OpenCLBufferPtr memBufs = NULL;
-
-    if (!memBufs)
-    { 
-        memBufs = new OpenCLBuffers(1);
-        if (!memBufs)
-        {
-            LOG(VB_GPU, LOG_ERR, "Out of memory allocating OpenCL buffers");
-            return;
-        }
-
-        memBufs->m_bufs[0] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
-                                            sizeof(cl_float) * globalWorkDim,
-                                            NULL, &ciErrNum);
-        if (ciErrNum != CL_SUCCESS)
-        {
-            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating results")
-                .arg(ciErrNum));
-            delete memBufs;
-            return;
-        }
-    }
-
     // for cross-correlate
     kernel = kern[0].kernel->m_kernel;
     ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &prev->m_buf);
     ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &current->m_buf);
-    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memBufs->m_bufs[0]);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &correlation->m_buf);
 
     if (ciErrNum != CL_SUCCESS)
     {
         LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
-        delete memBufs;
         return;
     }
 
@@ -1271,28 +1251,29 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
             QString("Error running kernel %1: %2 (%3)")
             .arg(kern[0].entry) .arg(ciErrNum)
             .arg(openCLErrorString(ciErrNum)));
-        delete memBufs;
         return;
     }
 
-    // Read back the results (finally!)
-    ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[0],
-                                    CL_TRUE, 0,
-                                    globalWorkDim * sizeof(cl_float),
-                                    results, 0, NULL, NULL);
-    if (ciErrNum != CL_SUCCESS)
-    {
-        LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
-            .arg(ciErrNum));
-        delete memBufs;
-        return;
-    }
-
+#define DEBUG_HISTOGRAM
+#ifdef DEBUG_HISTOGRAM
     static bool dumped = false;
+    static int frameNum = 1;
 
     if (1 || !dumped)
     {
-        static int frameNum = 1;
+        float *results = new float[globalWorkDim];
+
+        // Read back the results (finally!)
+        ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, correlation->m_buf,
+                                        CL_TRUE, 0,
+                                        globalWorkDim * sizeof(cl_float),
+                                        results, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
+                .arg(ciErrNum));
+            return;
+        }
 
         QString filename = QString("out/correlate-%1.gnuplot").arg(frameNum++);
         QFile outfile(filename);
@@ -1318,11 +1299,112 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
         accumfile.write(line.toLocal8Bit());
         accumfile.close();
 
+        delete [] results;
+
         dumped = true;
     }
+#undef DEBUG_HISTOGRAM
+#endif
 
-    delete memBufs;
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Cross Correlate Done");
+}
+
+void OpenCLDiffCorrelation(OpenCLDevice *dev, VideoHistogram *prev,
+                           VideoHistogram *current, VideoHistogram *delta)
+{
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Diff Correlate");
+
+    static OpenCLKernelDef kern[] = {
+        { NULL, "videoDiffCorrelation", KERNEL_CROSS_CORRELATE_CL }
+    };
+    static int kernCount = sizeof(kern)/sizeof(kern[0]);
+
+    int ciErrNum;
+
+    cl_kernel kernel;
+
+    if (!dev->OpenCLLoadKernels(kern, kernCount, NULL))
+        return;
+
+    // Make sure previous commands are finished
+    clFinish(dev->m_commandQ);
+
+    // Setup the kernel arguments
+    size_t bins = prev->m_binCount;
+
+    // for cross-correlate
+    kernel = kern[0].kernel->m_kernel;
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &prev->m_buf);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &current->m_buf);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &delta->m_buf);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 1, NULL,
+                                      &bins, NULL, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR,
+            QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
+        return;
+    }
+
+#define DEBUG_HISTOGRAM
+#ifdef DEBUG_HISTOGRAM
+    static bool dumped = false;
+    static int frameNum = 1;
+
+    if (1 || !dumped)
+    {
+        int globalWorkDim = delta->m_binCount;
+        int bins = (globalWorkDim + 1) / 2;
+        float *results = new float[globalWorkDim];
+
+        // Read back the results (finally!)
+        ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, delta->m_buf,
+                                        CL_TRUE, 0,
+                                        globalWorkDim * sizeof(cl_float),
+                                        results, 0, NULL, NULL);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
+                .arg(ciErrNum));
+            return;
+        }
+
+        QString filename = QString("out/deltacorrelate-%1.gnuplot")
+                               .arg(frameNum++);
+        QFile outfile(filename);
+        outfile.open(QIODevice::WriteOnly);
+
+        for (int i = 1 - bins; i < bins; i++)
+        {
+            QString line = QString("%1 %2\n").arg(i) .arg(results[i + bins -1]);
+            outfile.write(line.toLocal8Bit());
+        }
+
+        outfile.close();
+
+        QFile accumfile("out/deltacorrelation0.gnuplot");
+        accumfile.open(QIODevice::Append);
+        QString line = QString("%1 %2\n").arg(frameNum-1) .arg(results[bins-1]);
+        accumfile.write(line.toLocal8Bit());
+        accumfile.close();
+
+        delete [] results;
+
+        dumped = true;
+    }
+#undef DEBUG_HISTOGRAM
+#endif
+
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Diff Correlate Done");
 }
 
 
@@ -1423,19 +1505,16 @@ FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
 
     (void)wavelet;
 
-    if (videoPacket->m_prevHistogram)
+    if (videoPacket->m_prevCorrelation)
     {
-        int bins = videoPacket->m_prevHistogram->m_binCount;
+        VideoHistogram deltaCorrelation(dev, 127);
 
-        float *results = new float[(2 * bins) - 1];
+        OpenCLDiffCorrelation(dev, videoPacket->m_prevCorrelation,
+                              videoPacket->m_correlation, &deltaCorrelation);
 
-        // Calculate the cross-correlation between previous and current
-        // color histograms
-        OpenCLCrossCorrelate(dev, videoPacket->m_prevHistogram,
-                             videoPacket->m_histogram, results);
-
-        delete [] results;
+        // Threshhold
     }
+
 
     LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Scene Change Detect");
     return NULL;

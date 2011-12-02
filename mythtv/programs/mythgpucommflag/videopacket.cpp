@@ -17,10 +17,11 @@ VideoPacketMap videoPacketMap;
 
 VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
                          VideoSurface *prevYUV, VideoSurface *prevWavelet,
-                         VideoHistogram *prevHistogram) :
+                         VideoHistogram *prevHistogram,
+                         VideoHistogram *prevCorrelation) :
     m_num(num), m_decoder(decoder), m_frameIn(frame),
     m_prevFrameYUVSNORM(prevYUV), m_prevWavelet(prevWavelet),
-    m_prevHistogram(prevHistogram)
+    m_prevHistogram(prevHistogram), m_prevCorrelation(prevCorrelation)
 {
     m_frameRaw = m_decoder->DecodeFrame(frame);
 
@@ -46,6 +47,16 @@ VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
     m_histogram = new VideoHistogram(dev, 64);
     OpenCLHistogram64(dev, m_frameRGB, m_histogram);
 
+    if (m_prevHistogram)
+    {
+        m_correlation = new VideoHistogram(dev, 127);
+        OpenCLCrossCorrelate(dev, m_prevHistogram, m_histogram, m_correlation);
+    }
+    else
+    {
+        m_correlation = NULL;
+    }
+
     videoPacketMap.Add(m_frameIn, this);
 }
 
@@ -68,12 +79,17 @@ VideoPacket::~VideoPacket()
         m_wavelet->DownRef();
     if (m_histogram)
         m_histogram->DownRef();
+    if (m_correlation)
+        m_correlation->DownRef();
+
     if (m_prevFrameYUVSNORM)
         m_prevFrameYUVSNORM->DownRef();
     if (m_prevWavelet)
         m_prevWavelet->DownRef();
     if (m_prevHistogram)
         m_prevHistogram->DownRef();
+    if (m_prevCorrelation)
+        m_prevCorrelation->DownRef();
 }
 
 

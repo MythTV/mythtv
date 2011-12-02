@@ -16,7 +16,7 @@ class VideoPacket
   public:
     VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
                 VideoSurface *prevYUV, VideoSurface *prevWavelet,
-                VideoHistogram *prevHistogram);
+                VideoHistogram *prevHistogram, VideoHistogram *prevCorrelation);
     ~VideoPacket();
 
     uint64_t m_num;
@@ -28,10 +28,12 @@ class VideoPacket
     VideoSurface *m_frameRGB;
     VideoSurface *m_wavelet;
     VideoHistogram *m_histogram;
+    VideoHistogram *m_correlation;
 
     VideoSurface *m_prevFrameYUVSNORM;
     VideoSurface *m_prevWavelet;
     VideoHistogram *m_prevHistogram;
+    VideoHistogram *m_prevCorrelation;
 };
 
 class VideoPacketMap : public QMap<void *, VideoPacket *>
