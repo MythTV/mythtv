@@ -156,10 +156,6 @@ void DTVRecorder::FinishRecording(void)
             curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
         SavePositionMap(true);
     }
-//     positionMapLock.lock();
-//     positionMap.clear();
-//     positionMapDelta.clear();
-//     positionMapLock.unlock();
 }
 
 void DTVRecorder::ResetForNewFile(void)
