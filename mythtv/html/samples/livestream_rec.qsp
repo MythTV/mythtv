@@ -25,7 +25,7 @@ function UTCDateString(str)
    {
      return n<10 ? '0'+n : n
    }
-   d = new Date(str);
+   d = new Date(str + 'Z');
    return d.getUTCFullYear()+'-'
     + pad(d.getUTCMonth()+1)+'-'
     + pad(d.getUTCDate())+'T'
@@ -191,7 +191,7 @@ function listFiles() {
 
         $.each(data.ProgramList.Programs, function(i, value) {
             str +=
-                '<input type=radio Name="ChanId" Value="' + value.Channel.ChanId + '&StartTime=' + UTCDateString(value.StartTime) + '">&nbsp;' +
+                '<input type=radio Name="ChanId" Value="' + value.Channel.ChanId + '&StartTime=' + UTCDateString(value.Recording.StartTs) + '">&nbsp;' +
                 readableDate(value.StartTime) + ' - ' + value.Title + ' - ' + value.SubTitle + '<br>';
         });
         str += "</form>";
