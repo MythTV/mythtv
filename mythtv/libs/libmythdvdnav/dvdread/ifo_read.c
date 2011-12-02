@@ -1291,7 +1291,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
   if(!ifofile->vmgi_mat)
     return 0;
 
-  if(ifofile->vmgi_mat->ptl_mait == 0)
+  if(ifofile->vmgi_mat->ptl_mait == NULL)
     return 1;
 
   if(!DVDFileSeek_(ifofile->file, ifofile->vmgi_mat->ptl_mait * DVD_BLOCK_LEN))
@@ -1305,7 +1305,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
 
   if(!(DVDReadBytes(ifofile->file, ptl_mait, PTL_MAIT_SIZE))) {
     free(ptl_mait);
-    ifofile->ptl_mait = 0;
+    ifofile->ptl_mait = NULL;
     return 0;
   }
 
@@ -1324,7 +1324,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
   ptl_mait->countries = (ptl_mait_country_t *)malloc(info_length);
   if(!ptl_mait->countries) {
     free(ptl_mait);
-    ifofile->ptl_mait = 0;
+    ifofile->ptl_mait = NULL;
     return 0;
   }
   for(i = 0; i < ptl_mait->nr_of_countries; i++) {
@@ -1336,7 +1336,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
       fprintf(stderr, "libdvdread: Unable to read PTL_MAIT.\n");
       free(ptl_mait->countries);
       free(ptl_mait);
-      ifofile->ptl_mait = 0;
+      ifofile->ptl_mait = NULL;
       return 0;
     }
   }
@@ -1415,7 +1415,7 @@ void ifoFree_PTL_MAIT(ifo_handle_t *ifofile) {
     }
     free(ifofile->ptl_mait->countries);
     free(ifofile->ptl_mait);
-    ifofile->ptl_mait = 0;
+    ifofile->ptl_mait = NULL;
   }
 }
 
@@ -1896,6 +1896,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
         ifoFree_PGC(pgcit->pgci_srp[j].pgc);
         free(pgcit->pgci_srp[j].pgc);
       }
+      free(pgcit->pgci_srp[i].pgc);
       goto fail;
     }
   }
@@ -1911,7 +1912,10 @@ static void ifoFree_PGCIT_internal(pgcit_t *pgcit) {
   if(pgcit) {
     int i;
     for(i = 0; i < pgcit->nr_of_pgci_srp; i++)
+    {
       ifoFree_PGC(pgcit->pgci_srp[i].pgc);
+      free(pgcit->pgci_srp[i].pgc);
+    }
     free(pgcit->pgci_srp);
   }
 }
