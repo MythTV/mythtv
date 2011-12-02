@@ -1459,8 +1459,13 @@ void TV::GetStatus(void)
 
         tracks.clear();
         list = ctx->player->GetTracks(kTrackTypeAudio);
+        currenttrack = ctx->player->GetTrack(kTrackTypeAudio);
         for (int i = 0; i < list.size(); i++)
+        {
+            if (i == currenttrack)
+                status.insert("currentaudiotrack", list[i]);
             tracks.insert("SELECTAUDIO_" + QString::number(i), list[i]);
+        }
 
         status.insert("totalaudiotracks", tracks.size());
         if (!tracks.isEmpty())
