@@ -49,6 +49,7 @@ RecorderBase::RecorderBase(TVRec *rec)
       nextRingBuffer(NULL),     nextRecording(NULL),
       positionMapType(MARK_GOP_BYFRAME)
 {
+    ClearStatistics();
     QMutexLocker locker(avcodeclock);
     avcodec_init(); // init CRC's
 }
@@ -297,11 +298,14 @@ void RecorderBase::CheckForRingBufferSwitch(void)
 {
     nextRingBufferLock.lock();
 
-    bool rb_changed = false;
+    RecordingQuality *recq = NULL;
 
     if (nextRingBuffer)
     {
         FinishRecording();
+
+        recq = GetRecordingQuality();
+
         ResetForNewFile();
 
         m_videoAspect = m_videoWidth = m_videoHeight = 0;
@@ -313,14 +317,28 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         nextRingBuffer = NULL;
         nextRecording = NULL;
 
-        rb_changed = true;
-
         StartNewFile();
     }
     nextRingBufferLock.unlock();
 
-    if (rb_changed && tvrec)
-        tvrec->RingBufferChanged(ringBuffer, curRecording);
+    if (recq && tvrec)
+        tvrec->RingBufferChanged(ringBuffer, curRecording, recq);
+}
+
+void RecorderBase::ClearStatistics(void)
+{
+    QMutexLocker locker(&statisticsLock);
+    timeOfFirstData = QDateTime();
+    timeOfLatestData = QDateTime();
+    recordingGaps.clear();
+}
+
+RecordingQuality *RecorderBase::GetRecordingQuality(void) const
+{
+    QMutexLocker locker(&statisticsLock);
+    return new RecordingQuality(
+        curRecording, recordingGaps,
+        timeOfFirstData, timeOfLatestData);
 }
 
 int64_t RecorderBase::GetKeyframePosition(uint64_t desired) const

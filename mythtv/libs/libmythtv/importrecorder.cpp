@@ -79,8 +79,6 @@ void ImportRecorder::run(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- begin");
 
-    _continuity_error_count = 0;
-
     {
         QMutexLocker locker(&pauseLock);
         request_recording = true;
@@ -146,6 +144,8 @@ bool ImportRecorder::Open(void)
         LOG(VB_RECORD, LOG_ERR, LOC + "no current recording!");
         return false;
     }
+
+    ResetForNewFile();
 
     QString fn = curRecording->GetPathname();
 

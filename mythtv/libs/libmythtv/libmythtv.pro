@@ -480,10 +480,10 @@ using_backend {
     # TVRec & Recorder base classes
     HEADERS += tv_rec.h
     HEADERS += recorderbase.h              DeviceReadBuffer.h
-    HEADERS += dtvrecorder.h
+    HEADERS += dtvrecorder.h               recordingquality.h
     SOURCES += tv_rec.cpp
     SOURCES += recorderbase.cpp            DeviceReadBuffer.cpp
-    SOURCES += dtvrecorder.cpp
+    SOURCES += dtvrecorder.cpp             recordingquality.cpp
 
     # Import recorder
     HEADERS += importrecorder.h

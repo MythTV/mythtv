@@ -27,9 +27,7 @@ bool CetonRecorder::Open(void)
         return true;
     }
 
-    memset(_stream_id,  0, sizeof(_stream_id));
-    memset(_pid_status, 0, sizeof(_pid_status));
-    memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
+    ResetForNewFile();
 
     _stream_handler = CetonStreamHandler::Get(_channel->GetDevice());
 
@@ -59,8 +57,6 @@ void CetonRecorder::run(void)
         LOG(VB_GENERAL, LOG_ERR, LOC + _error);
         return;
     }
-
-    _continuity_error_count = 0;
 
     {
         QMutexLocker locker(&pauseLock);
