@@ -305,7 +305,7 @@ dvdnav_status_t dvdnav_sector_search(dvdnav_t *this,
     cell =  &(state->pgc->cell_playback[cell_nr-1]);
     if(cell->block_type == BLOCK_TYPE_ANGLE_BLOCK && cell->block_mode != BLOCK_MODE_FIRST_CELL)
       continue;
-    length += cell->last_sector - cell->first_sector + 1;
+    length = cell->last_sector - cell->first_sector + 1;
     if (target >= length) {
       target -= length;
     } else {
