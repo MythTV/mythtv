@@ -59,7 +59,7 @@
                     month_names[program.StartTime.getMonth()],
                     program.StartTime.getDate(), startTime);
 %>
-                <img title="<%= title %>" alt="<%= desc %>" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId %>&Height=300&StartTime=<%=ISODateString( program.Recording.StartTs ) %>"/>
+                <img title="<%= title %>" alt="<%= desc %>" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId %>&Height=300&StartTime=<%=UTCDateString( program.Recording.StartTs ) %>"/>
 <%
             } 
 %>
@@ -128,7 +128,23 @@ function ISODateString(d)
    + pad(d.getDate())+'T'
    + pad(d.getHours())+':'
    + pad(d.getMinutes())+':'
-   + pad(d.getSeconds())
+   + pad(d.getSeconds())+'Z'
+}
+%>
+
+<%
+function UTCDateString(d)
+{
+  function pad(n)
+  {
+    return n<10 ? '0'+n : n
+  }
+  return d.getUTCFullYear()+'-'
+   + pad(d.getUTCMonth()+1)+'-'
+   + pad(d.getUTCDate())+'T'
+   + pad(d.getUTCHours())+':'
+   + pad(d.getUTCMinutes())+':'
+   + pad(d.getUTCSeconds())+'Z'
 }
 %>
 

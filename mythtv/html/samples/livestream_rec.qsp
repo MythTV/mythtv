@@ -19,8 +19,31 @@ function emptyCell() {
     return "<td>&nbsp;</td>";
 }
 
-function readableDate(str) {
-    return str.replace( /T..:..:..$/g, '' );
+function UTCDateString(str)
+{
+   function pad(n)
+   {
+     return n<10 ? '0'+n : n
+   }
+   d = new Date(str);
+   return d.getUTCFullYear()+'-'
+    + pad(d.getUTCMonth()+1)+'-'
+    + pad(d.getUTCDate())+'T'
+    + pad(d.getUTCHours())+':'
+    + pad(d.getUTCMinutes())+':'
+    + pad(d.getUTCSeconds());
+}
+
+function readableDate(str)
+{
+    function pad(n)
+    {
+        return n<10 ? '0'+n : n
+      }
+   d = new Date(str + 'Z');
+    return d.getFullYear()+'-'
+     + pad(d.getMonth()+1)+'-'
+     + pad(d.getDate());
 }
 
 function playStreamLink(url) {
@@ -168,7 +191,7 @@ function listFiles() {
 
         $.each(data.ProgramList.Programs, function(i, value) {
             str +=
-                '<input type=radio Name="ChanId" Value="' + value.Channel.ChanId + '&StartTime=' + value.StartTime + '">&nbsp;' +
+                '<input type=radio Name="ChanId" Value="' + value.Channel.ChanId + '&StartTime=' + UTCDateString(value.StartTime) + '">&nbsp;' +
                 readableDate(value.StartTime) + ' - ' + value.Title + ' - ' + value.SubTitle + '<br>';
         });
         str += "</form>";
@@ -197,4 +220,3 @@ function listFiles() {
 
 </body>
 </html>
-

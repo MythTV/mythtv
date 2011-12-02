@@ -25,6 +25,7 @@
 
 #include <QTextCodec>
 #include <QVariant>
+#include <QDateTime>
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -155,6 +156,12 @@ void JSONSerializer::RenderValue( const QVariant &vValue )
         case QVariant::List:        RenderList      ( vValue.toList()       );  break;
         case QVariant::StringList:  RenderStringList( vValue.toStringList() );  break;
         case QVariant::Map:         RenderMap       ( vValue.toMap()        );  break;
+        case QVariant::DateTime:
+        {
+            m_Stream << "\"" << Encode( vValue.toDateTime().toUTC()
+                     .toString(Qt::ISODate) ) << "\"";
+            break;
+        }
         default:
         {
             m_Stream << "\"" << Encode( vValue.toString() ) << "\"";
