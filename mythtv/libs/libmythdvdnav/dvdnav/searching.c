@@ -159,6 +159,7 @@ dvdnav_status_t dvdnav_absolute_time_search(dvdnav_t *this,
   }
 
 
+  this->cur_cell_time = 0;
   if (this->pgc_based) {
     first_cell_nr = 1;
     last_cell_nr = state->pgc->nr_of_cells;
@@ -172,13 +173,11 @@ dvdnav_status_t dvdnav_absolute_time_search(dvdnav_t *this,
       last_cell_nr = state->pgc->nr_of_cells;
   }
 
-  this->cur_cell_time = 0;
-
   found = 0;
   for(cell_nr = first_cell_nr; (cell_nr <= last_cell_nr) && !found; cell_nr ++) {
     cell =  &(state->pgc->cell_playback[cell_nr-1]);
     if(cell->block_type == BLOCK_TYPE_ANGLE_BLOCK && cell->block_mode != BLOCK_MODE_FIRST_CELL)
-       continue;
+      continue;
     cell_length = dvdnav_convert_time(&cell->playback_time);
     length += cell_length;
     if (target <= length) {
@@ -193,7 +192,6 @@ dvdnav_status_t dvdnav_absolute_time_search(dvdnav_t *this,
     }
     prev_length = length;
   }
-
 
   if(found) {
     uint32_t vobu;
