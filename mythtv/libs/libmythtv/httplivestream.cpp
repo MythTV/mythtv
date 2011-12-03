@@ -960,15 +960,21 @@ DTC::LiveStreamInfo *HTTPLiveStream::GetLiveStreamInfo(
     return info;
 }
 
-DTC::LiveStreamInfoList *HTTPLiveStream::GetLiveStreamInfoList(void)
+DTC::LiveStreamInfoList *HTTPLiveStream::GetLiveStreamInfoList(const QString &FileName)
 {
     DTC::LiveStreamInfoList *infoList = new DTC::LiveStreamInfoList();
 
+    QString sql = "SELECT id FROM livestream ";
+
+    if (!FileName.isEmpty())
+        sql += "WHERE sourcefile LIKE :FILENAME ";
+
+    sql += "ORDER BY lastmodified DESC;";
+
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT id "
-        "FROM livestream "
-        "ORDER BY lastmodified DESC;");
+    query.prepare(sql);
+    if (!FileName.isEmpty())
+        query.bindValue(":FILENAME", QString("%%1%").arg(FileName));
 
     if (!query.exec())
     {

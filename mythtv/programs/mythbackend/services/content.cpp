@@ -963,6 +963,15 @@ DTC::LiveStreamInfoList *Content::GetLiveStreamList( void )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::LiveStreamInfoList *Content::GetFilteredLiveStreamList( const QString   &FileName )
+{
+    return HTTPLiveStream::GetLiveStreamInfoList(FileName);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::LiveStreamInfo *Content::AddRecordingLiveStream( int              nChanId,
                                                       const QDateTime &dtStartTime,
                                                       const QString   &sMaxSegments,

@@ -109,8 +109,9 @@ class Content : public ContentServices
                                                           const QString   &AudioBitrate,
                                                           const QString   &SampleRate );
 
-        DTC::LiveStreamInfo     *GetLiveStream          ( int Id );
-        DTC::LiveStreamInfoList *GetLiveStreamList      ( void );
+        DTC::LiveStreamInfo     *GetLiveStream            ( int Id );
+        DTC::LiveStreamInfoList *GetLiveStreamList        ( void );
+        DTC::LiveStreamInfoList *GetFilteredLiveStreamList( const QString &FileName );
 
         DTC::LiveStreamInfo     *StopLiveStream         ( int Id );
         bool                     RemoveLiveStream       ( int Id );
