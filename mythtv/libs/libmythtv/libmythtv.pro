@@ -590,6 +590,9 @@ using_backend {
         SOURCES += cetonrecorder.cpp      cetonstreamhandler.cpp
         SOURCES += cetonrtp.cpp           cetonrtsp.cpp
 
+        HEADERS *= streamhandler.h
+        SOURCES *= streamhandler.cpp
+
         DEFINES += USING_CETON
     }
 
