@@ -101,6 +101,14 @@ class Content : public ContentServices
                                                           const QString   &AudioBitrate,
                                                           const QString   &SampleRate );
 
+        DTC::LiveStreamInfo     *AddVideoLiveStream     ( int              Id,
+                                                          const QString   &MaxSegments,
+                                                          const QString   &Width,
+                                                          const QString   &Height,
+                                                          const QString   &Bitrate,
+                                                          const QString   &AudioBitrate,
+                                                          const QString   &SampleRate );
+
         DTC::LiveStreamInfo     *GetLiveStream          ( int Id );
         DTC::LiveStreamInfoList *GetLiveStreamList      ( void );
 

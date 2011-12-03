@@ -132,6 +132,14 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
                                                                   const QString   &AudioBitrate,
                                                                   const QString   &SampleRate ) = 0;
 
+        virtual DTC::LiveStreamInfo     *AddVideoLiveStream     ( int              Id,
+                                                                  const QString   &MaxSegments,
+                                                                  const QString   &Width,
+                                                                  const QString   &Height,
+                                                                  const QString   &Bitrate,
+                                                                  const QString   &AudioBitrate,
+                                                                  const QString   &SampleRate ) = 0;
+
         virtual DTC::LiveStreamInfo     *GetLiveStream          ( int Id ) = 0;
         virtual DTC::LiveStreamInfoList *GetLiveStreamList      ( void ) = 0;
 
