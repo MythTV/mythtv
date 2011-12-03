@@ -15,6 +15,10 @@
 
 #include <CL/opencl.h>
 
+#ifndef MIN
+#define MIN(x,y)    ((x) < (y) ? (x) : (y))
+#endif
+
 VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
                            uint id, VdpVideoSurface vdpSurface) : 
     m_type(kSurfaceVDPAURender), m_id(id), m_dev(dev), m_width(width),
@@ -235,12 +239,16 @@ void VideoSurface::Bind(void)
     glVDPAUUnmapSurfacesNV(1, &m_glSurface);
 }
 
-void VideoSurface::Dump(QString basename, int framenum)
+void VideoSurface::Dump(QString basename, int framenum, int limit)
 {
     cl_int ciErrNum;
     QString extension("png");
+    int count = m_bufCount;
 
-    for (int i = 0; i < m_bufCount; i++)
+    if (limit)
+        count = MIN(count, limit);
+
+    for (int i = 0; i < count; i++)
     {
         cl_image_format format;
 
@@ -335,42 +343,66 @@ VideoHistogram::~VideoHistogram(void)
 }
 
 // Makes gnuplot plt files.
-void VideoHistogram::Dump(QString basename, int framenum)
+void VideoHistogram::Dump(QString basename, int framenum, bool summaryOnly)
 {
-    float *outBins = new float[m_binCount];
+    float *outBins;
     cl_int ciErrNum;
+    QString filename;
+    int zeroOffset = 0 - m_offset;
 
     if (m_dev)
     {
-        // Read back the results (finally!)
-        ciErrNum  = clEnqueueReadBuffer(m_dev->m_commandQ, m_buf,
-                                        CL_TRUE, 0,
-                                        m_binCount * sizeof(cl_float),
-                                        outBins, 0, NULL, NULL);
-        if (ciErrNum != CL_SUCCESS)
+        outBins = new float[m_binCount];
+        if (!summaryOnly)
         {
-            LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
-                .arg(ciErrNum));
-            delete [] outBins;
-            return;
+            ciErrNum  = clEnqueueReadBuffer(m_dev->m_commandQ, m_buf,
+                                            CL_TRUE, 0,
+                                            m_binCount * sizeof(cl_float),
+                                            outBins, 0, NULL, NULL);
+            if (ciErrNum != CL_SUCCESS)
+            {
+                LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
+                    .arg(ciErrNum));
+                delete [] outBins;
+                return;
+            }
+
+            filename = QString("out/%1-%2.plt").arg(basename).arg(framenum);
+            QFile outfile(filename);
+            outfile.open(QIODevice::WriteOnly);
+
+            for (int i = m_offset; i < m_binCount + m_offset; i++)
+            {
+                QString line = QString("%1 %2\n").arg(i) .arg(outBins[i]);
+                outfile.write(line.toLocal8Bit());
+            }
+            outfile.close();
         }
-
-        QString filename = QString("out/%1-%2.plt").arg(basename).arg(framenum);
-        QFile outfile(filename);
-        outfile.open(QIODevice::WriteOnly);
-
-        for (int i = m_offset; i < m_binCount + m_offset; i++)
+        else
         {
-            QString line = QString("%1 %2\n").arg(i) .arg(outBins[i]);
-            outfile.write(line.toLocal8Bit());
+            outBins = new float[1];
+
+            ciErrNum  = clEnqueueReadBuffer(m_dev->m_commandQ, m_buf,
+                                            CL_TRUE,
+                                            zeroOffset * sizeof(cl_float),
+                                            sizeof(cl_float),
+                                            outBins, 0, NULL, NULL);
+            if (ciErrNum != CL_SUCCESS)
+            {
+                LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
+                    .arg(ciErrNum));
+                delete [] outBins;
+                return;
+            }
+            
+            zeroOffset = 0;
         }
-        outfile.close();
 
         filename = QString("out/%1-cum-0.plt").arg(basename);
         QFile accumfile(filename);
         accumfile.open(QIODevice::Append);
         QString line = QString("%1 %2\n").arg(framenum)
-                           .arg(outBins[0 - m_offset]);
+                           .arg(outBins[zeroOffset]);
         accumfile.write(line.toLocal8Bit());
         accumfile.close();
 

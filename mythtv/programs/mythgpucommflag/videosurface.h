@@ -38,7 +38,7 @@ class VideoSurface : public ReferenceCounter
                  uint32_t height);
     ~VideoSurface();
     void Bind(void);
-    void Dump(QString basename, int framenum);
+    void Dump(QString basename, int framenum, int limit = 0);
 
     VideoSurfaceType    m_type;
     uint                m_id;
@@ -76,7 +76,7 @@ class VideoHistogram : public ReferenceCounter
   public:
     VideoHistogram(OpenCLDevice *dev, int binCount = 64, int offset = 0);
     ~VideoHistogram(void);
-    void Dump(QString basename, int framenum);
+    void Dump(QString basename, int framenum, bool summaryOnly = true);
 
     OpenCLDevice *m_dev;
     int m_binCount;

@@ -109,6 +109,32 @@ void videoHistogramNormalize(__global uint *histIn, uint pixelCount,
 }
 
 
+#define BLANK_FRAME_THRESH 0.90
+__kernel
+void videoBlankFrame(__global float *histogram, __local int *locRes,
+                     __global int *result)
+{
+    int x = get_global_id(0);
+    int maxX = get_global_size(0);
+
+    locRes[x] = min(convert_int(histogram[x] / BLANK_FRAME_THRESH), 1);
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    if (x == 0)
+    {
+        int total = 0;
+
+        for (int i = 0; i < maxX; i++)
+        {
+            total += locRes[i];
+        }
+
+        result[0] = total;
+    }
+}
+
+
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4:filetype=c
  */

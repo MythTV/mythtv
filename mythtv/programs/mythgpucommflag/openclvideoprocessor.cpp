@@ -17,10 +17,13 @@ FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
                               AVFrame *wavelet);
 FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
                                      AVFrame *wavelet);
+FlagResults *OpenCLBlankFrameDetect(OpenCLDevice *dev, AVFrame *frame,
+                                    AVFrame *wavelet);
 
 VideoProcessorList *openCLVideoProcessorList;
 
 VideoProcessorInit openCLVideoProcessorInit[] = {
+    { "Blank Frame Detect", OpenCLBlankFrameDetect },
     { "Edge Detect", OpenCLEdgeDetect },
     { "Scene Change Detect", OpenCLSceneChangeDetect },
     { "", NULL }
@@ -1132,17 +1135,16 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, VideoHistogram *out)
     static int dump = 2;
     static int frameNum = 0;
 
-#define DEBUG_HISTOGRAM
+#define DEBUG_HISTOGRAM true
 #ifdef DEBUG_HISTOGRAM
 
     if (1 || dump)
     {
-        out->Dump("histogram", frameNum++);
+        out->Dump("histogram", frameNum++, DEBUG_HISTOGRAM);
 
-#define DEBUG_VIDEO
 #ifdef DEBUG_VIDEO
-        in->Dump("rgb", frameNum);
-        binned.Dump("binned", frameNum);
+        in->Dump("rgb", frameNum, 1);
+        binned.Dump("binned", frameNum, 1);
 #undef DEBUG_VIDEO
 #endif
         dump--;
@@ -1204,14 +1206,14 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
         return;
     }
 
-#define DEBUG_HISTOGRAM
+#define DEBUG_HISTOGRAM true
 #ifdef DEBUG_HISTOGRAM
     static bool dumped = false;
     static int frameNum = 1;
 
     if (1 || !dumped)
     {
-        correlation->Dump("correlate", frameNum++);
+        correlation->Dump("correlate", frameNum++, DEBUG_HISTOGRAM);
         dumped = true;
     }
 #undef DEBUG_HISTOGRAM
@@ -1266,14 +1268,14 @@ void OpenCLDiffCorrelation(OpenCLDevice *dev, VideoHistogram *prev,
         return;
     }
 
-#define DEBUG_HISTOGRAM
+#define DEBUG_HISTOGRAM true
 #ifdef DEBUG_HISTOGRAM
     static bool dumped = false;
     static int frameNum = 1;
 
     if (1 || !dumped)
     {
-        delta->Dump("delta", frameNum++);
+        delta->Dump("delta", frameNum++, DEBUG_HISTOGRAM);
         dumped = true;
     }
 #undef DEBUG_HISTOGRAM
@@ -1282,6 +1284,176 @@ void OpenCLDiffCorrelation(OpenCLDevice *dev, VideoHistogram *prev,
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Diff Correlate Done");
 }
 
+void OpenCLThreshDiff0(OpenCLDevice *dev, VideoHistogram *delta, bool *found)
+{
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Threshold Diff 0 Start");
+
+    static OpenCLKernelDef kern[] = {
+        { NULL, "videoThreshDiff0", KERNEL_CROSS_CORRELATE_CL }
+    };
+    static int kernCount = sizeof(kern)/sizeof(kern[0]);
+
+    int ciErrNum;
+
+    cl_kernel kernel;
+
+    if (!dev->OpenCLLoadKernels(kern, kernCount, NULL))
+        return;
+
+    // Make sure previous commands are finished
+    clFinish(dev->m_commandQ);
+
+    // Setup the kernel arguments
+    size_t workSize = 1;
+
+    static OpenCLBufferPtr memBufs = NULL;
+
+    if (!memBufs)
+    { 
+        memBufs = new OpenCLBuffers(1);
+        if (!memBufs)
+        {
+            LOG(VB_GPU, LOG_ERR, "Out of memory allocating OpenCL buffers");
+            return;
+        }
+
+        memBufs->m_bufs[0] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
+                                            sizeof(cl_int), NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating result buffer")
+                .arg(ciErrNum));
+            delete memBufs;
+            return;
+        }
+    }
+
+    kernel = kern[0].kernel->m_kernel;
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &delta->m_buf);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &memBufs->m_bufs[0]);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
+        delete memBufs;
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 1, NULL,
+                                      &workSize, NULL, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR,
+            QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
+        delete memBufs;
+        return;
+    }
+
+    int resultInt;
+
+    ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[0],
+                                    CL_TRUE, 0, sizeof(cl_int),
+                                    &resultInt, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
+            .arg(ciErrNum));
+        delete memBufs;
+        return;
+    }
+
+    *found = (resultInt != 0);
+
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Threshold Diff 0 Done");
+}
+
+void OpenCLBlankFrame(OpenCLDevice *dev, VideoHistogram *hist, bool *found)
+{
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Blank Frame Start");
+
+    static OpenCLKernelDef kern[] = {
+        { NULL, "videoBlankFrame", KERNEL_HISTOGRAM_CL }
+    };
+    static int kernCount = sizeof(kern)/sizeof(kern[0]);
+
+    int ciErrNum;
+
+    cl_kernel kernel;
+
+    if (!dev->OpenCLLoadKernels(kern, kernCount, NULL))
+        return;
+
+    // Make sure previous commands are finished
+    clFinish(dev->m_commandQ);
+
+    // Setup the kernel arguments
+    size_t workSize = hist->m_binCount;
+
+    static OpenCLBufferPtr memBufs = NULL;
+
+    if (!memBufs)
+    { 
+        memBufs = new OpenCLBuffers(1);
+        if (!memBufs)
+        {
+            LOG(VB_GPU, LOG_ERR, "Out of memory allocating OpenCL buffers");
+            return;
+        }
+
+        memBufs->m_bufs[0] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
+                                            sizeof(cl_int), NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating result buffer")
+                .arg(ciErrNum));
+            delete memBufs;
+            return;
+        }
+    }
+
+    kernel = kern[0].kernel->m_kernel;
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &hist->m_buf);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_int) * workSize, NULL);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memBufs->m_bufs[0]);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
+        delete memBufs;
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 1, NULL,
+                                      &workSize, NULL, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR,
+            QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
+        delete memBufs;
+        return;
+    }
+
+    int resultInt;
+
+    ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[0],
+                                    CL_TRUE, 0, sizeof(cl_int),
+                                    &resultInt, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
+            .arg(ciErrNum));
+        delete memBufs;
+        return;
+    }
+
+    *found = (resultInt != 0);
+
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Blank Frame Done");
+}
 
 // Processors
 
@@ -1359,6 +1531,7 @@ FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
         OpenCLYUVToRGB(dev, &edge, &edgeRGB);
         edgeRGB.Dump("edgeRGB", videoPacket->m_num);
     }
+#undef DEBUG_VIDEO
 #endif
 
     LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Edge Detect");
@@ -1378,6 +1551,8 @@ FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
         return NULL;
     }
 
+    static int frameNum = 0;
+    FlagResults *results = NULL;
     (void)wavelet;
 
     if (videoPacket->m_prevCorrelation)
@@ -1387,13 +1562,70 @@ FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
         OpenCLDiffCorrelation(dev, videoPacket->m_prevCorrelation,
                               videoPacket->m_correlation, &deltaCorrelation);
 
+        bool found;
         // Threshhold
+        OpenCLThreshDiff0(dev, &deltaCorrelation, &found);
+
+        if (found)
+        {
+#define DEBUG_VIDEO
+#ifdef DEBUG_VIDEO
+            videoPacket->m_prevFrameRGB->Dump("rgb", frameNum-1, 1);
+            videoPacket->m_frameRGB->Dump("rgb", frameNum, 1);
+#undef DEBUG_VIDEO
+#endif
+
+            FlagFindingsList *list = new FlagFindingsList();
+            FlagFindings *finding = 
+                new FlagFindings(kFindingVideoSceneChange, true);
+            list->append(finding);
+
+            results = new FlagResults(list);
+        }
     }
 
+    frameNum++;
 
     LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Scene Change Detect");
-    return NULL;
+    return results;
 }
+
+
+FlagResults *OpenCLBlankFrameDetect(OpenCLDevice *dev, AVFrame *frame,
+                                    AVFrame *wavelet)
+{
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Blank Frame Detect");
+
+    VideoPacket *videoPacket = videoPacketMap.Lookup(frame);
+    if (!videoPacket)
+    {
+        LOG(VB_GPU, LOG_ERR, "Video packet not in map");
+        return NULL;
+    }
+
+    FlagResults *results = NULL;
+    (void)wavelet;
+
+    bool found;
+    // Threshhold
+    OpenCLBlankFrame(dev, videoPacket->m_histogram, &found);
+
+    if (found)
+    {
+        FlagFindingsList *list = new FlagFindingsList();
+        FlagFindings *finding = 
+            new FlagFindings(kFindingVideoBlankFrame, true);
+        list->append(finding);
+
+        results = new FlagResults(list);
+
+        videoPacket->m_blank = true;
+    }
+
+    LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Blank Frame Detect");
+    return results;
+}
+
 
 
 /*

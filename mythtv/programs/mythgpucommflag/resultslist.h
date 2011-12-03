@@ -10,6 +10,10 @@ extern "C" {
 typedef enum {
     kFindingAudioHigh,
     kFindingAudioLow,
+    kFindingVideoBlankFrame,
+    kFindingVideoSceneChange,
+    kFindingVideoAspectChange,
+    kFindingVideoLogoChange
 } FlagFindingsType;
 
 class FlagFindings

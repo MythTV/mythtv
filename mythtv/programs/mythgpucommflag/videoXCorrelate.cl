@@ -34,6 +34,14 @@ void videoDiffCorrelation(__global float *a, __global float *b,
     out[x] = b[x] - a[x];
 }
 
+#define SCENE_CHANGE_THRESH 0.01
+__kernel
+void videoThreshDiff0(__global float *a, __global int *b)
+{
+    // Read the "0" bin, (from -63 .. 63)
+    b[0] = min(convert_int(fabs(a[63]) / SCENE_CHANGE_THRESH), 1);
+}
+
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4:filetype=c

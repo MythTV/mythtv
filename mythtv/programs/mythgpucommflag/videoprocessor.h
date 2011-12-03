@@ -78,6 +78,8 @@ void OpenCLCrossCorrelate(OpenCLDevice *dev, VideoHistogram *prev,
                           VideoHistogram *current, VideoHistogram *correlation);
 void OpenCLDiffCorrelation(OpenCLDevice *dev, VideoHistogram *prev,
                            VideoHistogram *current, VideoHistogram *delta);
+void OpenCLThreshDiff0(OpenCLDevice *dev, VideoHistogram *delta, bool *found);
+void OpenCLBlankFrame(OpenCLDevice *dev, VideoHistogram *hist, bool *found);
 
 #endif
 

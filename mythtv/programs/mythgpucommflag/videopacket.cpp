@@ -16,12 +16,14 @@ extern "C" {
 VideoPacketMap videoPacketMap;
 
 VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
-                         VideoSurface *prevYUV, VideoSurface *prevWavelet,
+                         VideoSurface *prevYUV, VideoSurface *prevRGB,
+                         VideoSurface *prevWavelet,
                          VideoHistogram *prevHistogram,
                          VideoHistogram *prevCorrelation) :
     m_num(num), m_decoder(decoder), m_frameIn(frame),
-    m_prevFrameYUVSNORM(prevYUV), m_prevWavelet(prevWavelet),
-    m_prevHistogram(prevHistogram), m_prevCorrelation(prevCorrelation)
+    m_prevFrameYUVSNORM(prevYUV), m_prevFrameRGB(prevRGB),
+    m_prevWavelet(prevWavelet), m_prevHistogram(prevHistogram),
+    m_prevCorrelation(prevCorrelation), m_blank(false)
 {
     m_frameRaw = m_decoder->DecodeFrame(frame);
 
@@ -84,6 +86,8 @@ VideoPacket::~VideoPacket()
 
     if (m_prevFrameYUVSNORM)
         m_prevFrameYUVSNORM->DownRef();
+    if (m_prevFrameRGB)
+        m_prevFrameRGB->DownRef();
     if (m_prevWavelet)
         m_prevWavelet->DownRef();
     if (m_prevHistogram)

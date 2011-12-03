@@ -187,6 +187,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
     VideoPacket *videoFrame = NULL;
     static uint64_t count = 0;
     static VideoSurface *prevYUV = NULL;
+    static VideoSurface *prevRGB = NULL;
     static VideoSurface *prevWavelet = NULL;
     static VideoHistogram *prevHistogram = NULL;
     static VideoHistogram *prevCorrelation = NULL;
@@ -198,7 +199,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         count++;
         LOG(VB_GENERAL, LOG_INFO, "About to transfer frame to OpenCL");
         videoFrame = new VideoPacket(m_decoder, &mpa_pic, count, prevYUV,
-                                     prevWavelet, prevHistogram,
+                                     prevRGB, prevWavelet, prevHistogram,
                                      prevCorrelation);
         LOG(VB_GENERAL, LOG_INFO, "Finished transferring frame to OpenCL");
 
@@ -224,6 +225,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
             rgb.Dump("unwaveletRGB", count);
 #endif
         }
+#undef DEBUG_VIDEO
 #endif
     }
 
@@ -258,6 +260,8 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         // Free the frame in GPU/CPU memory if not needed
         prevYUV = videoFrame->m_frameYUVSNORM;
         prevYUV->UpRef();
+        prevRGB = videoFrame->m_frameRGB;
+        prevRGB->UpRef();
         prevWavelet = videoFrame->m_wavelet;
         prevWavelet->UpRef();
         prevHistogram = videoFrame->m_histogram;
