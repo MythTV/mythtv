@@ -6,12 +6,14 @@
 #include <QColor>
 
 #include <strings.h>
+#include <stdlib.h>
 
 #include "mythlogging.h"
 #include "openclinterface.h"
 #include "videosurface.h"
 #include "vdpauvideodecoder.h"
 #include "openglsupport.h"
+#include "videoprocessor.h"
 
 #include <CL/opencl.h>
 
@@ -183,7 +185,7 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
             if (ciErrNum != CL_SUCCESS)
             {
                 LOG(VB_GPU, LOG_ERR,
-                    QString("VDPAU: OpenCL Image Create #%1 failed: %2 (%3)")
+                    QString("OpenCL Image Create #%1 failed: %2 (%3)")
                     .arg(i) .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
                 return;
             }
@@ -410,6 +412,75 @@ void VideoHistogram::Dump(QString basename, int framenum, bool summaryOnly)
     }
 }
 
+VideoAspect::VideoAspect(OpenCLDevice *dev, VideoSurface *rgb)
+{
+    uint32_t topL[2];
+    uint32_t botR[2];
+
+    if (dev)
+        OpenCLVideoAspect(dev, rgb, topL, botR);
+
+    m_xTL = topL[0];
+    m_yTL = topL[1];
+    m_xBR = botR[0];
+    m_yBR = botR[1];
+}
+
+VideoAspect::VideoAspect(uint32_t *topL, uint32_t *botR) :
+    m_xTL(topL[0]), m_yTL(topL[1]), m_xBR(botR[0]), m_yBR(botR[1])
+{
+}
+
+float VideoAspect::Ratio(uint32_t width, uint32_t height) const
+{
+    if (!width && !height)
+    {
+        width = Width();
+        height = Height();
+    }
+
+    return float(width) / float(height);
+}
+
+float VideoAspect::NearestRatio(uint32_t width, uint32_t height) const
+{
+    float ratio = Ratio(width, height);
+    static const float ratios[] = { 1.0, 4.0/3.0, 16.0/9.0, 1.85 };
+    static const int ratioCount = sizeof(ratios) / sizeof(ratios[0]);
+    float mindiff = 1e35;
+    int minindex = -1;
+
+    for (int i = 0; i < ratioCount; i++)
+    {
+        float diff = fabs(ratio - ratios[i]);
+        if (diff < mindiff)
+        {
+            mindiff = diff;
+            minindex = i;
+        }
+    }
+
+    return ratios[minindex];
+}
+
+#define ASPECT_MATCH_THRESH 64
+bool VideoAspect::Compare(const uint32_t* topL, const uint32_t *botR) const
+{
+    uint32_t width = botR[0] - topL[0] + 1;
+    uint32_t height = botR[1] - topL[1] + 1;
+    if (NearestRatio() != VideoAspect::NearestRatio(width, height))
+        return false;
+
+    return (abs(width - Width()) < ASPECT_MATCH_THRESH);
+}
+
+bool VideoAspect::Compare(const VideoAspect *other) const
+{
+    if (NearestRatio() != other->NearestRatio())
+        return false;
+
+    return (abs(other->Width() - Width()) < ASPECT_MATCH_THRESH);
+}
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

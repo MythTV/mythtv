@@ -84,6 +84,24 @@ class VideoHistogram : public ReferenceCounter
     cl_mem m_buf;
 };
 
+class VideoAspect : public ReferenceCounter
+{
+  public:
+    VideoAspect(OpenCLDevice *dev, VideoSurface *rgb);
+    VideoAspect(uint32_t *topL, uint32_t *botR);
+    ~VideoAspect(void) {};
+    bool Compare(const uint32_t* topL, const uint32_t *botR) const;
+    bool Compare(const VideoAspect* other) const;
+    uint32_t Width(void) const { return m_xBR - m_xTL + 1; };
+    uint32_t Height(void) const { return (m_yBR - m_yTL + 1) * 2; };
+    float Ratio(uint32_t width = 0, uint32_t height = 0) const;
+    float NearestRatio(uint32_t width = 0, uint32_t height = 0) const;
+
+    uint32_t m_xTL;
+    uint32_t m_yTL;
+    uint32_t m_xBR;
+    uint32_t m_yBR;
+};
 
 #endif
 

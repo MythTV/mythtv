@@ -19,11 +19,13 @@ VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
                          VideoSurface *prevYUV, VideoSurface *prevRGB,
                          VideoSurface *prevWavelet,
                          VideoHistogram *prevHistogram,
-                         VideoHistogram *prevCorrelation) :
-    m_num(num), m_decoder(decoder), m_frameIn(frame),
-    m_prevFrameYUVSNORM(prevYUV), m_prevFrameRGB(prevRGB),
+                         VideoHistogram *prevCorrelation,
+                         VideoAspect *prevAspect) :
+    m_num(num), m_decoder(decoder), m_frameIn(frame), m_aspect(NULL),
+    m_croppedYUV(NULL), m_croppedRGB(NULL),
+    m_prevFrameYUV(prevYUV), m_prevFrameRGB(prevRGB),
     m_prevWavelet(prevWavelet), m_prevHistogram(prevHistogram),
-    m_prevCorrelation(prevCorrelation), m_blank(false)
+    m_prevCorrelation(prevCorrelation), m_prevAspect(prevAspect), m_blank(false)
 {
     m_frameRaw = m_decoder->DecodeFrame(frame);
 
@@ -46,8 +48,17 @@ VideoPacket::VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
     m_wavelet  = new VideoSurface(dev, kSurfaceWavelet, width, height);
     OpenCLWavelet(dev, m_frameYUVSNORM, m_wavelet);
 
+    m_aspect     = new VideoAspect(dev, m_frameRGB);
+    m_croppedRGB = new VideoSurface(dev, kSurfaceRGB, m_aspect->Width(),
+                                    m_aspect->Height());
+    OpenCLCrop(dev, m_frameRGB, m_croppedRGB, m_aspect);
+
+    m_croppedYUV = new VideoSurface(dev, kSurfaceYUV, m_aspect->Width(),
+                                    m_aspect->Height());
+    OpenCLCrop(dev, m_frameYUVSNORM, m_croppedYUV, m_aspect);
+
     m_histogram = new VideoHistogram(dev, 64);
-    OpenCLHistogram64(dev, m_frameRGB, m_histogram);
+    OpenCLHistogram64(dev, m_croppedRGB, m_histogram);
 
     if (m_prevHistogram)
     {
@@ -83,9 +94,15 @@ VideoPacket::~VideoPacket()
         m_histogram->DownRef();
     if (m_correlation)
         m_correlation->DownRef();
+    if (m_aspect)
+        m_aspect->DownRef();
+    if (m_croppedRGB)
+        m_croppedRGB->DownRef();
+    if (m_croppedYUV)
+        m_croppedYUV->DownRef();
 
-    if (m_prevFrameYUVSNORM)
-        m_prevFrameYUVSNORM->DownRef();
+    if (m_prevFrameYUV)
+        m_prevFrameYUV->DownRef();
     if (m_prevFrameRGB)
         m_prevFrameRGB->DownRef();
     if (m_prevWavelet)
@@ -94,6 +111,8 @@ VideoPacket::~VideoPacket()
         m_prevHistogram->DownRef();
     if (m_prevCorrelation)
         m_prevCorrelation->DownRef();
+    if (m_prevAspect)
+        m_prevAspect->DownRef();
 }
 
 

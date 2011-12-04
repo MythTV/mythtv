@@ -80,6 +80,10 @@ void OpenCLDiffCorrelation(OpenCLDevice *dev, VideoHistogram *prev,
                            VideoHistogram *current, VideoHistogram *delta);
 void OpenCLThreshDiff0(OpenCLDevice *dev, VideoHistogram *delta, bool *found);
 void OpenCLBlankFrame(OpenCLDevice *dev, VideoHistogram *hist, bool *found);
+void OpenCLVideoAspect(OpenCLDevice *dev, VideoSurface *rgb,
+                       uint32_t *topL, uint32_t *botR);
+void OpenCLCrop(OpenCLDevice *dev, VideoSurface *src, VideoSurface *dst,
+                VideoAspect *aspect);
 
 #endif
 

@@ -34,7 +34,7 @@ void videoDiffCorrelation(__global float *a, __global float *b,
     out[x] = b[x] - a[x];
 }
 
-#define SCENE_CHANGE_THRESH 0.01
+#define SCENE_CHANGE_THRESH 0.1
 __kernel
 void videoThreshDiff0(__global float *a, __global int *b)
 {

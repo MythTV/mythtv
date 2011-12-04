@@ -17,7 +17,7 @@ class VideoPacket
     VideoPacket(VideoDecoder *decoder, AVFrame *frame, int num,
                 VideoSurface *prevYUV, VideoSurface *prevRGB,
                 VideoSurface *prevWavelet, VideoHistogram *prevHistogram,
-                VideoHistogram *prevCorrelation);
+                VideoHistogram *prevCorrelation, VideoAspect *prevAspect);
     ~VideoPacket();
 
     uint64_t m_num;
@@ -32,12 +32,16 @@ class VideoPacket
     VideoSurface *m_wavelet;
     VideoHistogram *m_histogram;
     VideoHistogram *m_correlation;
+    VideoAspect *m_aspect;
+    VideoSurface *m_croppedYUV;
+    VideoSurface *m_croppedRGB;
 
-    VideoSurface *m_prevFrameYUVSNORM;
+    VideoSurface *m_prevFrameYUV;
     VideoSurface *m_prevFrameRGB;
     VideoSurface *m_prevWavelet;
     VideoHistogram *m_prevHistogram;
     VideoHistogram *m_prevCorrelation;
+    VideoAspect *m_prevAspect;
 
     bool m_blank;
 };
