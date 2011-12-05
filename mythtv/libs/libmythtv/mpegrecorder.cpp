@@ -940,6 +940,7 @@ void MpegRecorder::run(void)
     {
         QMutexLocker locker(&pauseLock);
         request_recording = true;
+        request_helper = true;
         recording = true;
         recordingWait.wakeAll();
     }
@@ -1152,6 +1153,19 @@ void MpegRecorder::run(void)
 
     StopEncoding(readfd);
 
+    {
+        QMutexLocker locker(&pauseLock);
+        request_helper = false;
+    }
+
+    if (vbi_thread)
+    {
+        vbi_thread->wait();
+        delete vbi_thread;
+        vbi_thread = NULL;
+        CloseVBIDevice();
+    }
+
     FinishRecording();
 
     delete[] buffer;
@@ -1164,6 +1178,7 @@ void MpegRecorder::run(void)
     }
 
     QMutexLocker locker(&pauseLock);
+    request_recording = false;
     recording = false;
     recordingWait.wakeAll();
 }

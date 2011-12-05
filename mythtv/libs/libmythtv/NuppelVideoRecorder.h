@@ -86,13 +86,11 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
  
     void Initialize(void);
     void run(void);
-    void StopRecording(void); 
     
     virtual void Pause(bool clear = true);
     virtual bool IsPaused(bool holding_lock = false) const;
  
     bool IsRecording(void);
-    bool IsErrored(void);
 
     long long GetFramesWritten(void); 
 
@@ -142,7 +140,6 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 
     bool MJPEGInit(void);
  
-    bool SpawnChildren(void);
     void KillChildren(void);
     
     void BufferIt(unsigned char *buf, int len = -1, bool forcekey = false);
@@ -160,8 +157,6 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     virtual void AddTextData(unsigned char*,int,int64_t,char); // CC608Decoder
 
     void UpdateResolutions(void);
-    
-    bool encoding;
     
     int fd; // v4l input file handle
     signed char *strm;
@@ -224,13 +219,10 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     struct timeval stm;
     struct timezone tzone;
 
-    volatile bool childrenLive;
-
     NVRWriteThread *write_thread;
     NVRAudioThread *audio_thread;
 
     bool recording;
-    bool errored;
 
     int keyframedist;
     vector<struct seektable_entry> *seektable;
