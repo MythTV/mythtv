@@ -1335,6 +1335,29 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
     return ok;
 }
 
+bool MythRenderVDPAU::DrawLayer(uint id, uint target)
+{
+    {
+        LOCK_RENDER
+        CHECK_STATUS(false)
+
+        if (!m_layers.contains(id))
+            return false;
+        if (!target)
+            target = m_surfaces[m_surface];
+        if (!m_outputSurfaces.contains(target))
+            return false;
+    }
+
+    INIT_ST
+    vdp_st = vdp_output_surface_render_output_surface(
+                m_outputSurfaces[target].m_id, (m_layers[id].m_layer.destination_rect),
+                m_layers[id].m_layer.source_surface, (m_layers[id].m_layer.source_rect),
+                NULL, &vdpblend, VDP_OUTPUT_SURFACE_RENDER_ROTATE_0);
+    CHECK_ST
+    return ok;
+}
+
 int MythRenderVDPAU::GetBitmapSize(uint id)
 {
     if (!m_bitmapSurfaces.contains(id))
@@ -1357,7 +1380,7 @@ void* MythRenderVDPAU::GetRender(uint id)
 uint MythRenderVDPAU::GetSurfaceOwner(VdpVideoSurface surface)
 {
     LOCK_RENDER
-    CHECK_STATUS(NULL)
+    CHECK_STATUS(0)
 
     if (!m_videoSurfaceHash.contains(surface))
         return 0;
@@ -1475,6 +1498,8 @@ bool MythRenderVDPAU::GetProcs(void)
         vdp_output_surface_get_parameters);
     GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_GET_BITS_NATIVE,
         vdp_output_surface_get_bits_native);
+    GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_RENDER_OUTPUT_SURFACE,
+        vdp_output_surface_render_output_surface);
     GET_PROC(VDP_FUNC_ID_VIDEO_MIXER_CREATE, vdp_video_mixer_create);
     GET_PROC(VDP_FUNC_ID_VIDEO_MIXER_SET_FEATURE_ENABLES,
         vdp_video_mixer_set_feature_enables);
@@ -1703,6 +1728,7 @@ void MythRenderVDPAU::ResetProcs(void)
     vdp_output_surface_render_bitmap_surface = NULL;
     vdp_output_surface_get_parameters = NULL;
     vdp_output_surface_get_bits_native = NULL;
+    vdp_output_surface_render_output_surface = NULL;
     vdp_video_mixer_create = NULL;
     vdp_video_mixer_set_feature_enables = NULL;
     vdp_video_mixer_destroy = NULL;

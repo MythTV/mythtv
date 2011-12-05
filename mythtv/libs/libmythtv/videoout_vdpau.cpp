@@ -504,18 +504,27 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     if (size != m_render->GetSize())
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unexpected display size.");
 
-    if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
-                              deint ? &m_reference_frames : NULL,
-                              scan == kScan_Interlaced,
-                              window.GetVideoRect(),
-                              QRect(QPoint(0,0), size),
-                              vsz_enabled ? vsz_desired_display_rect :
-                                            window.GetDisplayVideoRect(),
-                              m_pip_ready ? m_pip_layer : 0, 0))
+    if (dummy)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Prepare frame failed.");
+        m_render->DrawBitmap(0, 0, NULL, NULL, 255, 0, 0, 0);
+    }
+    else
+    {
+        if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
+                                  deint ? &m_reference_frames : NULL,
+                                  scan == kScan_Interlaced,
+                                  window.GetVideoRect(),
+                                  QRect(QPoint(0,0), size),
+                                  vsz_enabled ? vsz_desired_display_rect :
+                                                window.GetDisplayVideoRect(),
+                                  0, 0))
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Prepare frame failed.");
+        }
     }
 
+    if (m_pip_ready)
+        m_render->DrawLayer(m_pip_layer, 0);
     if (m_visual)
         m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, NULL);
 

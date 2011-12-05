@@ -117,6 +117,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     bool DrawBitmap(uint id, uint target, const QRect *src,
                     const QRect *dst, int alpha = 0, int red = 0,
                     int blue = 0, int green = 0, bool blend = false);
+    bool DrawLayer(uint id, uint target);
 
     int   GetBitmapSize(uint id);
     void* GetRender(uint id);
@@ -193,6 +194,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     VdpOutputSurfaceRenderBitmapSurface *vdp_output_surface_render_bitmap_surface;
     VdpOutputSurfaceGetParameters   *vdp_output_surface_get_parameters;
     VdpOutputSurfaceGetBitsNative   *vdp_output_surface_get_bits_native;
+    VdpOutputSurfaceRenderOutputSurface *vdp_output_surface_render_output_surface;
     VdpVideoMixerCreate             *vdp_video_mixer_create;
     VdpVideoMixerSetFeatureEnables  *vdp_video_mixer_set_feature_enables;
     VdpVideoMixerDestroy            *vdp_video_mixer_destroy;
