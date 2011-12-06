@@ -552,7 +552,7 @@ bool FillData::Run(SourceList &sourcelist)
 
         query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
-                      "AND manualid = 0;");
+                      "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", (*it).id);
 
         if (query.exec() && query.size() > 0)
@@ -962,7 +962,7 @@ bool FillData::Run(SourceList &sourcelist)
 
         query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
-                      "AND manualid = 0;");
+                      "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", (*it).id);
 
         if (query.exec() && query.size() > 0)
