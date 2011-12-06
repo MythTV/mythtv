@@ -9259,6 +9259,8 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
                              "DIALOG_CUTPOINT_CLEARMAP_0");
         osd->DialogAddButton(QObject::tr("Reverse Cuts"),
                              "DIALOG_CUTPOINT_INVERTMAP_0");
+        osd->DialogAddButton(QObject::tr("Load Detected Commercials"),
+                             "DIALOG_CUTPOINT_LOADCOMMSKIP_0");
         osd->DialogAddButton(QObject::tr("Undo Changes"),
                              "DIALOG_CUTPOINT_REVERT_0");
         osd->DialogAddButton(QObject::tr("Exit Without Saving"),
