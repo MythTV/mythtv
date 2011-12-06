@@ -36,6 +36,7 @@ using namespace std;
 
 // Qt includes
 #include <QObject>
+#include <QMutexLocker>
 
 // MythTV includes - General
 #include "channelscan_sm.h"
@@ -741,6 +742,8 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
 
 bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 {
+    QMutexLocker locker(&m_mutex);
+
     if (current == scanTransports.end())
         return true;
 
