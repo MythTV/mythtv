@@ -6096,8 +6096,8 @@ void MainServer::reconnectTimeout(void)
         !masterServerSock->readStringList(strlist) ||
         strlist.empty() || strlist[0] == "ERROR")
     {
+        masterServerSock->Unlock(); // DownRef will delete socket...
         masterServerSock->DownRef();
-        masterServerSock->Unlock();
         masterServerSock = NULL;
         if (strlist.empty())
         {
