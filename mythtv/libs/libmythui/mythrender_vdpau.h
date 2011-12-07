@@ -65,6 +65,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     void SetPreempted(void)        { m_preempted = true; }
 
     bool Create(const QSize &size, WId window, uint colorkey = VDPAU_COLORKEY);
+    bool CreateDecodeOnly(void);
     bool WasPreempted(void);
     bool SetColorKey(uint color);
     void WaitForFlip(void);

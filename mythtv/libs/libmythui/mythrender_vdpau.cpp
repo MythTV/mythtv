@@ -340,6 +340,24 @@ bool MythRenderVDPAU::CreateDummy(void)
     return ok;
 }
 
+bool MythRenderVDPAU::CreateDecodeOnly(void)
+{
+    LOCK_ALL
+
+    bool ok = true;
+    m_display = OpenMythXDisplay();
+    CREATE_CHECK(m_display != NULL,  "Invalid display")
+    CREATE_CHECK(CreateDevice(),     "No VDPAU device")
+    CREATE_CHECK(GetProcs(),         "No VDPAU procedures")
+    CREATE_CHECK(RegisterCallback(), "No callback")
+    CREATE_CHECK(CheckHardwareSupport(), "")
+
+    if (!ok)
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create dummy device.");
+
+    return ok;
+}
+
 bool MythRenderVDPAU::Create(const QSize &size, WId window, uint colorkey)
 {
     LOCK_ALL
@@ -356,7 +374,7 @@ bool MythRenderVDPAU::Create(const QSize &size, WId window, uint colorkey)
 
     CREATE_CHECK(!m_size.isEmpty(), "Invalid size")
     CREATE_CHECK(m_display != NULL, "Invalid display")
-    CREATE_CHECK(window >0, "Invalid window")
+    CREATE_CHECK(m_window > 0, "Invalid window")
     CREATE_CHECK(m_display->CreateGC(m_window), "No GC")
     CREATE_CHECK(CreateDevice(), "No VDPAU device")
     CREATE_CHECK(GetProcs(), "No VDPAU procedures")
@@ -394,6 +412,9 @@ bool MythRenderVDPAU::SetColorKey(uint colorkey)
     LOCK_RENDER
     CHECK_STATUS(false)
     INIT_ST
+
+    if (!m_flipQueue)
+        return false;
 
     m_colorKey = colorkey;
     if (m_display && (m_display->GetDepth() < 24))
@@ -464,7 +485,7 @@ void MythRenderVDPAU::SyncDisplay(void)
 void MythRenderVDPAU::DrawDisplayRect(const QRect &rect, bool use_colorkey)
 {
     LOCK_RENDER
-    if (!m_display)
+    if (!m_display || !m_window)
         return;
 
     uint color = use_colorkey ? m_colorKey : m_display->GetBlack();
@@ -475,7 +496,7 @@ void MythRenderVDPAU::DrawDisplayRect(const QRect &rect, bool use_colorkey)
 void MythRenderVDPAU::MoveResizeWin(QRect &rect)
 {
     LOCK_RENDER
-    if (m_display)
+    if (m_display && m_window)
         m_display->MoveResizeWin(m_window, rect);
 }
 
@@ -1554,6 +1575,9 @@ bool MythRenderVDPAU::GetProcs(void)
 bool MythRenderVDPAU::CreatePresentationQueue(void)
 {
     MythXLocker locker(m_display);
+    if (!m_device || !m_window)
+        return false;
+
     m_surface = 0;
     INIT_ST
     vdp_st = vdp_presentation_queue_target_create_x11(m_device, m_window,
@@ -1908,8 +1932,8 @@ void MythRenderVDPAU::Preempted(void)
     ResetProcs();
     bool ok = CreateDevice();
     if (ok) ok = GetProcs();
-    if (ok) ok = CreatePresentationQueue();
-    if (ok) ok = SetColorKey(m_colorKey);
+    if (ok && m_window) ok = CreatePresentationQueue();
+    if (ok && m_window) ok = SetColorKey(m_colorKey);
     if (ok) ok = RegisterCallback();
 
     if (ok && m_outputSurfaces.size())
@@ -2001,7 +2025,7 @@ void MythRenderVDPAU::Preempted(void)
 
     m_preempted  = false;
     m_recreating = false;
-    m_flipReady = true;
+    m_flipReady = m_flipQueue;
     m_recreated = true;
 }
 
