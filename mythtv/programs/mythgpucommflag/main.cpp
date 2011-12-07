@@ -2,6 +2,8 @@
 using namespace std;
 
 #include <QApplication>
+#include <QDesktopWidget>
+#include <QX11Info>
 
 #include "exitcodes.h"
 #include "mythcontext.h"
@@ -22,6 +24,9 @@ using namespace std;
 #include "videoconsumer.h"
 
 #define LOC      QString("MythGPUCommFlag: ")
+
+Display *mythDisplay = NULL;
+int mythScreen = 0;
 
 namespace
 {
@@ -143,9 +148,20 @@ int main(int argc, char **argv)
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
-    if (useX && !cmdline.toString("display").isEmpty())
+    QString display(cmdline.toString("display"));
+    display.detach();
+
+    if (useX)
     {
-        MythUIHelper::SetX11Display(cmdline.toString("display"));
+        QDesktopWidget *desktop = app.desktop();
+        QX11Info info = desktop->x11Info();
+
+        mythDisplay = info.display();
+        mythScreen  = info.screen();
+
+        // Since NULL video output somehow needs the display.
+        if (!display.isEmpty())
+            MythUIHelper::SetX11Display(display);
     }
 
     if (!useX)

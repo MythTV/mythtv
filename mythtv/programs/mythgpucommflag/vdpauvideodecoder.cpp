@@ -25,6 +25,8 @@ extern "C" {
 
 #include <CL/opencl.h>
 
+extern Display *mythDisplay;
+extern int mythScreen;
 
 static const char* dummy_get_error_string(VdpStatus status);
 
@@ -82,18 +84,16 @@ static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
 
 bool VDPAUVideoDecoder::Initialize(void)
 {
-    m_display = OpenMythXDisplay();
-    if (!m_display)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Can't open X display");
-        return false;
-    }
+    m_device = NULL;
+    m_decoder = NULL;
+
+    LOG(VB_GENERAL, LOG_INFO, QString("VDPAU: Using display %1")
+        .arg(DisplayString(mythDisplay)));
 
     INIT_ST;
 
     vdp_get_error_string = &dummy_get_error_string;
-    vdp_st = vdp_device_create_x11(m_display->GetDisplay(),
-                                   m_display->GetScreen(), &m_device,
+    vdp_st = vdp_device_create_x11(mythDisplay, mythScreen, &m_device,
                                    &vdp_get_proc_address);
     if (vdp_st != VDP_STATUS_OK)
     {
@@ -173,11 +173,12 @@ bool VDPAUVideoDecoder::Initialize(void)
 bool openGLInitialize(void)
 {
     // initialize GLUT 
-    QString x11display = MythUIHelper::GetX11Display();
-    x11display.detach();
+    char *x11display = DisplayString(mythDisplay);
+    LOG(VB_GENERAL, LOG_INFO, QString("OpenGL: Display: %1").arg(x11display));
+
     int argc = 3;
     const char *argv[] = { "client", "-display", NULL };
-    argv[2] = x11display.toLocal8Bit().constData();
+    argv[2] = x11display;
 
     glutInit(&argc, (char **)argv);
     // glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
