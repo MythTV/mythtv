@@ -117,7 +117,8 @@ typedef QHash<uint, SubtitleReader*> SubtitleReaders;
 class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 {
   public:
-    MythCCExtractorPlayer(bool showProgress, const QString &fileName);
+    MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
+                          const QString &fileName);
     ~MythCCExtractorPlayer() {}
 
     bool run(void);

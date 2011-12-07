@@ -47,8 +47,8 @@ TeletextStuff::~TeletextStuff() { delete reader; }
 DVBSubStuff::~DVBSubStuff() { delete reader; }
 
 MythCCExtractorPlayer::MythCCExtractorPlayer(
-    bool showProgress, const QString &fileName) :
-    MythPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull)),
+    PlayerFlags flags, bool showProgress, const QString &fileName) :
+    MythPlayer(flags),
     m_curTime(0),
     m_curTimeShift(-1),
     m_myFramesPlayed(0),

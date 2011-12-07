@@ -26,8 +26,7 @@ const uint PlayerContext::kMaxChannelHistory = 30;
 
 PlayerContext::PlayerContext(const QString &inUseID) :
     recUsage(inUseID), player(NULL), playerUnsafe(false), recorder(NULL),
-    tvchain(NULL), buffer(NULL), playingInfo(NULL),
-    playingLen(0), specialDecode(kAVSpecialDecode_None),
+    tvchain(NULL), buffer(NULL), playingInfo(NULL), playingLen(0),
     nohardwaredecoders(false), last_cardid(-1),
     // Fast forward state
     ff_rew_state(0), ff_rew_index(0), ff_rew_speed(0),

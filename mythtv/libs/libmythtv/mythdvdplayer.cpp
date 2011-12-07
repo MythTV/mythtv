@@ -686,9 +686,6 @@ void MythDVDPlayer::CreateDecoder(char *testbuf, int testreadsize)
                                       testreadsize))
     {
         SetDecoder(new AvFormatDecoderDVD(this, *player_ctx->playingInfo,
-                                          FlagIsSet(kVideoIsNull),
-                                          FlagIsSet(kDecodeAllowEXT),
-                                          !FlagIsSet(kDecodeAllowGPU),
-                                          player_ctx->GetSpecialDecode()));
+                                          playerFlags));
     }
 }

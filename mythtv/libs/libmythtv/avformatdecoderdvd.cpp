@@ -5,11 +5,8 @@
 #define LOC QString("AFD_DVD: ")
 
 AvFormatDecoderDVD::AvFormatDecoderDVD(
-    MythPlayer *parent, const ProgramInfo &pginfo,
-    bool use_null_video_out, bool allow_private_decode,
-    bool no_hardware_decode, AVSpecialDecode av_special_decode)
-  : AvFormatDecoder(parent, pginfo, use_null_video_out, allow_private_decode,
-                    no_hardware_decode, av_special_decode)
+    MythPlayer *parent, const ProgramInfo &pginfo, PlayerFlags flags)
+  : AvFormatDecoder(parent, pginfo, flags)
 {
 }
 
