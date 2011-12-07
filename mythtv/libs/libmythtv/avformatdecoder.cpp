@@ -1839,7 +1839,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     MythCodecID vaapi_mcid;
                     PixelFormat pix_fmt = PIX_FMT_YUV420P;
                     vaapi_mcid = VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
-                            width, height, mpeg_version(enc->codec_id),
+                            width, height, dec, mpeg_version(enc->codec_id),
                             !FlagIsSet(kDecodeAllowGPU), pix_fmt);
 
                     if (vaapi_mcid >= video_codec_id)
