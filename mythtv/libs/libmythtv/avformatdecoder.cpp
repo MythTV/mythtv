@@ -1896,8 +1896,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (selectedTrack[kTrackTypeVideo].av_stream_index < 0)
                     selectedTrack[kTrackTypeVideo] = si;
 
-                if (!FlagIsSet(kVideoIsNull) &&
-                   (selectedTrack[kTrackTypeVideo].av_stream_index == (int) i))
+                // Use a PrivateDecoder if allowed in playerFlags AND matched
+                // via the decoder name
+                if (selectedTrack[kTrackTypeVideo].av_stream_index == (int) i)
                 {
                     private_dec = PrivateDecoder::Create(dec, playerFlags, enc);
                     if (private_dec)
