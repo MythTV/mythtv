@@ -1857,7 +1857,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     MythCodecID dxva2_mcid;
                     PixelFormat pix_fmt = PIX_FMT_YUV420P;
                     dxva2_mcid = VideoOutputD3D::GetBestSupportedCodec(
-                        width, height, mpeg_version(enc->codec_id),
+                        width, height, dec, mpeg_version(enc->codec_id),
                         !FlagIsSet(kDecodeAllowGPU), pix_fmt);
 
                     if (dxva2_mcid >= video_codec_id)

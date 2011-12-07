@@ -696,21 +696,17 @@ bool VideoOutputD3D::ApproveDeintFilter(const QString& filtername) const
 }
 
 MythCodecID VideoOutputD3D::GetBestSupportedCodec(
-    uint width,       uint height,
+    uint width,       uint height, const QString &decoder,
     uint stream_type, bool no_acceleration,
     PixelFormat &pix_fmt)
 {
 #ifdef USING_DXVA2
     QSize size(width, height);
     bool use_cpu = no_acceleration;
-    VideoDisplayProfile vdp;
-    vdp.SetInput(size);
-    QString dec = vdp.GetDecoder();
-
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_DXVA2 + (stream_type - 1));
     use_cpu |= !codec_is_dxva2_hw(test_cid);
     pix_fmt = PIX_FMT_DXVA2_VLD;
-    if ((dec == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
+    if ((decoder == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
         return test_cid;
 #endif
     return (MythCodecID)(kCodec_MPEG1 + (stream_type - 1));

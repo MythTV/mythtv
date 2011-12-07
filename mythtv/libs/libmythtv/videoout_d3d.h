@@ -43,6 +43,7 @@ class VideoOutputD3D : public VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
+                                             const QString &decoder,
                                              uint stream_type,
                                              bool no_acceleration,
                                              PixelFormat &pix_fmt);
