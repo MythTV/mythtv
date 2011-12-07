@@ -1,3 +1,5 @@
+#include <strings.h>
+
 #include "mythlogging.h"
 #include "packetqueue.h"
 #include "resultslist.h"
@@ -41,6 +43,12 @@ void AudioConsumer::ProcessPacket(Packet *packet)
         m_codec = avcodec_find_decoder(curstream->codec->codec_id);
         if (avcodec_open(m_context, m_codec) < 0)
             return;
+
+        m_stream = curstream;
+
+        memcpy(&m_timebase, &curstream->time_base, sizeof(m_timebase));
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Audio: num = %1, den = %2")
+            .arg(m_timebase.num) .arg(m_timebase.den));
         m_opened = true;
     }
 
@@ -109,7 +117,7 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
     LOG(VB_GENERAL, LOG_INFO, QString("Audio Frame: %1 samples (%2 size)")
         .arg(frames).arg(size));
 
-    uint64_t duration = (uint64_t)((double)(frames * 1000) / rate);
+    int duration = (int)((double)(frames * 1000000) / (rate * 1.0));
     AudioPacket *audioPacket = NULL;
 
     // Push PCM frame to GPU/CPU Processing memory
@@ -132,9 +140,12 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
         // Toss the results onto the results list
         if (result)
         {
+            static AVRational realTimeBase = { 1, 1000 };
             LOG(VB_GENERAL, LOG_INFO, "Audio Finding found");
-            result->m_pts = pts;
+            pts = av_rescale_q(pts, realTimeBase, m_timebase);
+            result->m_timestamp = NormalizeTimecode(pts);;
             result->m_duration = duration;
+            LOG(VB_GENERAL, LOG_INFO, result->toString());
             m_outL->append(result);
         }
     }
@@ -145,6 +156,7 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
         delete audioPacket;
     }
 }
+
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

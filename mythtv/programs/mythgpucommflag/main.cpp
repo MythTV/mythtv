@@ -4,6 +4,7 @@ using namespace std;
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QX11Info>
+#include <QFile>
 
 #include "exitcodes.h"
 #include "mythcontext.h"
@@ -307,6 +308,9 @@ int main(int argc, char **argv)
     ResultsList audioMarks;
     ResultsList videoMarks;
 
+    // Initialize the findings map
+    FindingsInitialize();
+
     // Create consumer threads
     AudioConsumer *audioThread = new AudioConsumer(&audioQ, &audioMarks,
                                                    devices[1]);
@@ -337,6 +341,15 @@ int main(int argc, char **argv)
 
     LOG(VB_GENERAL, LOG_INFO, QString("audioMarks: %1, videoMarks: %2")
         .arg(audioMarks.size()) .arg(videoMarks.size()));
+
+    // Dump results to an output file
+    QFile dump("out/results");
+    dump.open(QIODevice::WriteOnly);
+    QString audioDump = audioMarks.toString("Audio markings");
+    QString videoDump = videoMarks.toString("Video markings");
+    dump.write(audioDump.toAscii());
+    dump.write(videoDump.toAscii());
+    dump.close();
 
     // Loop:
         // Summarize the various criteria to get commercial flag map

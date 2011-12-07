@@ -2,25 +2,20 @@
 #define _RESULTSLIST_H
 
 #include <QList>
+#include <QMap>
 
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-typedef enum {
-    kFindingAudioHigh,
-    kFindingAudioLow,
-    kFindingVideoBlankFrame,
-    kFindingVideoSceneChange,
-    kFindingVideoAspectChange,
-    kFindingVideoLogoChange
-} FlagFindingsType;
+#include "findingdefs.h"
 
 class FlagFindings
 {
   public:
     FlagFindings(int type, int64_t value) : m_type(type), m_value(value) {};
     ~FlagFindings() {};
+    QString toString(void);
 
     int m_type;
     int64_t m_value;
@@ -34,28 +29,28 @@ class FlagResults
     FlagResults(AVPacket *pkt, FlagFindingsList *list) : m_findings(list)
     {
         m_valid = (pkt != NULL);
-        if (m_valid)
-        {
-            m_pts = pkt->pts;
-            m_dts = pkt->dts;
-            m_duration = pkt->duration;
-            m_pos = pkt->pos;
-        }
     }
 
     FlagResults(FlagFindingsList *list) : m_findings(list) {};
     ~FlagResults() { delete m_findings; };
+    QString toString(void);
 
     bool    m_valid;
-    int64_t m_pts;
-    int64_t m_dts;
+    int64_t m_timestamp;
     int     m_duration;
-    int64_t m_pos;
 
     FlagFindingsList *m_findings;
 };
 
-typedef QList<FlagResults *> ResultsList;
+class ResultsList : public QList<FlagResults *>
+{
+  public:
+    QString toString(QString title);
+};
+
+typedef QMap<int, QString> FlagFindingsMap;
+
+void FindingsInitialize(void);
 
 #endif
 

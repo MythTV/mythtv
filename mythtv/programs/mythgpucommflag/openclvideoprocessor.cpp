@@ -2100,7 +2100,6 @@ FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
 
         if (found)
         {
-#define DEBUG_VIDEO
 #ifdef DEBUG_VIDEO
             videoPacket->m_prevFrameRGB->Dump("rgb", frameNum-1, 1);
             videoPacket->m_croppedRGB->Dump("rgb", frameNum, 1);

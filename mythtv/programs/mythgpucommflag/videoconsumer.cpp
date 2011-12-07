@@ -1,4 +1,5 @@
 #include <QMutexLocker>
+#include <strings.h>
 
 #include "mythcorecontext.h"
 #include "mythlogging.h"
@@ -124,6 +125,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
 
         m_decoder->SetSize(ac->width, ac->height);
         m_decoder->SetCodec(ac->codec);
+        m_stream = curstream;
 
         if (m_decoder->m_useCPU && !m_decoder->m_isCPU)
         {
@@ -145,7 +147,6 @@ void VideoConsumer::ProcessPacket(Packet *packet)
 
             m_decoder->SetSize(ac->width, ac->height);
             m_decoder->SetCodec(ac->codec);
-
         }
         m_codec = m_decoder->m_codec;
 
@@ -155,6 +156,10 @@ void VideoConsumer::ProcessPacket(Packet *packet)
                 .arg(m_codec->name) .arg(retcode));
             return;
         }
+
+        memcpy(&m_timebase, &curstream->time_base, sizeof(m_timebase));
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Video: num = %1, den = %2")
+            .arg(m_timebase.num) .arg(m_timebase.den));
 
         InitVideoCodec();
 
@@ -250,8 +255,9 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         if (result)
         {
             LOG(VB_GENERAL, LOG_INFO, "Video Finding found");
-            result->m_pts = pkt->pts;
-            result->m_duration = pkt->duration;
+            result->m_timestamp = NormalizeTimecode(pkt->pts);
+            result->m_duration = NormalizeDuration(pkt->duration);
+            LOG(VB_GENERAL, LOG_INFO, result->toString());
             m_outL->append(result);
         }
     }
@@ -362,7 +368,6 @@ void VideoConsumer::InitVideoCodec(void)
         }
     }
 }
-
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
