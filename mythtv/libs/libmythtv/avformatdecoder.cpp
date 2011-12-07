@@ -1825,7 +1825,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 #ifdef USING_VDPAU
                     MythCodecID vdpau_mcid;
                     vdpau_mcid = VideoOutputVDPAU::GetBestSupportedCodec(
-                        width, height,
+                        width, height, dec,
                         mpeg_version(enc->codec_id),
                         !FlagIsSet(kDecodeAllowGPU));
 
