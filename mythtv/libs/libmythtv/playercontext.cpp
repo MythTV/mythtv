@@ -783,14 +783,6 @@ QString PlayerContext::GetPlayMessage(void) const
             mesg += QString(" %1x").arg(ts_normal);
     }
 
-    if (0)
-    {
-        QMutexLocker locker(&deletePlayerLock);
-        FrameScanType scan = player->GetScanType();
-        if (is_progressive(scan) || is_interlaced(scan))
-            mesg += " (" + toString(scan, true) + ")";
-    }
-
     return mesg;
 }
 
