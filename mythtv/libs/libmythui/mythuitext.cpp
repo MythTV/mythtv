@@ -419,6 +419,8 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
                     .arg(height)
                     .arg(m_Area.height()));
 
+                if (!m_MultiLine)
+                    m_drawRect.setHeight(height);
                 if (m_Cutdown != Qt::ElideNone)
                 {
                     QFontMetrics fm(GetFontProperties()->face());
