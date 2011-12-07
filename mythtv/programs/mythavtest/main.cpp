@@ -54,7 +54,7 @@ class VideoPerformanceTest
             LOG(VB_GENERAL, LOG_INFO, "Will attempt to disable sync-to-vblank.");
 
         RingBuffer *rb  = RingBuffer::Create(file, false, true, 2000);
-        MythPlayer  *mp  = new MythPlayer(true);
+        MythPlayer  *mp  = new MythPlayer(kAudioMuted);
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
         mp->GetAudio()->SetNoAudio();
         ctx = new PlayerContext("VideoPerformanceTest");

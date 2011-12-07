@@ -8,7 +8,7 @@
 class MythDVDPlayer : public MythPlayer
 {
   public:
-    MythDVDPlayer(bool muted = false);
+    MythDVDPlayer(PlayerFlags flags = kNoFlags);
 
     // Decoder stuff..
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
@@ -90,8 +90,7 @@ class MythDVDPlayer : public MythPlayer
     virtual int  SetTrack(uint type, int trackNo);
 
     // Private decoder stuff
-    virtual void CreateDecoder(char *testbuf, int testreadsize,
-                               bool allow_libmpeg2, bool no_accel);
+    virtual void CreateDecoder(char *testbuf, int testreadsize);
 
     // Private chapter stuff
     virtual bool DoJumpChapter(int chapter);

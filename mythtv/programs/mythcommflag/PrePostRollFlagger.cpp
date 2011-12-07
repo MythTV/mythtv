@@ -31,8 +31,6 @@ void PrePostRollFlagger::Init()
 
 bool PrePostRollFlagger::go()
 {
-    player->SetNullVideo();
-
     int secsSince = 0;
     int requiredBuffer = 120;
     int requiredHeadStart = requiredBuffer;

@@ -106,7 +106,8 @@ void ImportRecorder::run(void)
     // build seek table
     if (_import_fd && IsRecordingRequested() && !IsErrored())
     {
-        MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
+        MythCommFlagPlayer *cfp =
+            new MythCommFlagPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull));
         RingBuffer *rb = RingBuffer::Create(
             ringBuffer->GetFilename(), false, true, 6000);
 

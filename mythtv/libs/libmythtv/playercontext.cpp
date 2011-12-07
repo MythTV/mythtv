@@ -384,16 +384,18 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
         return false;
     }
 
+    uint playerflags = kDecodeAllowEXT; // allow VDA etc for normal playback
+    playerflags |= muted              ? kAudioMuted : kNoFlags;
+    playerflags |= useNullVideo       ? kVideoIsNull : kNoFlags;
+    playerflags |= nohardwaredecoders ? kNoFlags : kDecodeAllowGPU;
+
     MythPlayer *player = NULL;
     if (kState_WatchingBD  == desiredState)
-        player = new MythBDPlayer(muted);
+        player = new MythBDPlayer((PlayerFlags)playerflags);
     else if (kState_WatchingDVD == desiredState)
-        player = new MythDVDPlayer(muted);
+        player = new MythDVDPlayer((PlayerFlags)playerflags);
     else
-        player = new MythPlayer(muted);
-
-    if (nohardwaredecoders)
-        player->DisableHardwareDecoders();
+        player = new MythPlayer((PlayerFlags)playerflags);
 
     QString passthru_device = 
         gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
@@ -406,9 +408,6 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
                         gCoreContext->GetNumSetting("AudioSampleRate", 44100));
     audio->SetStretchFactor(ts_normal);
     player->SetLength(playingLen);
-
-    if (useNullVideo)
-        player->SetNullVideo();
 
     player->SetVideoFilters((useNullVideo) ? "onefield" : "");
 

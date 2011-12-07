@@ -641,13 +641,12 @@ int Transcode::TranscodeFile(const QString &inputname,
     else
         inRingBuffer = RingBuffer::Create(inputname, false, false);
 
-    player = new MythPlayer();
+    player = new MythPlayer(kVideoIsNull);
 
     player_ctx = new PlayerContext(kTranscoderInUseID);
     player_ctx->SetPlayingInfo(m_proginfo);
     player_ctx->SetRingBuffer(inRingBuffer);
     player_ctx->SetPlayer(player);
-    player->SetNullVideo();
     player->SetPlayerInfo(NULL, NULL, true, player_ctx);
 
     if (showprogress)
@@ -661,7 +660,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     player->GetAudio()->SetAudioOutput(audioOutput);
     player->SetTranscoding(true);
 
-    if (player->OpenFile(false) < 0)
+    if (player->OpenFile() < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, error opening file.");
         if (player_ctx)

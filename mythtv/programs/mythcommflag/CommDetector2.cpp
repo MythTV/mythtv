@@ -539,8 +539,6 @@ bool CommDetector2::go(void)
 {
     int minlag = 7; // seconds
 
-    player->SetNullVideo();
-
     if (player->OpenFile() < 0)
         return false;
 

@@ -868,8 +868,8 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         }
     }
 
-    MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
-
+    MythCommFlagPlayer *cfp =
+            new MythCommFlagPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull));
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
 
     AVSpecialDecode sp = (AVSpecialDecode)
@@ -1025,7 +1025,8 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
-    MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
+    MythCommFlagPlayer *cfp =
+            new MythCommFlagPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull));
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
     ctx->SetSpecialDecode(kAVSpecialDecode_NoDecode);
     ctx->SetPlayingInfo(pginfo);

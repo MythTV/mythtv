@@ -289,8 +289,6 @@ void ClassicCommDetector::deleteLater(void)
 
 bool ClassicCommDetector::go()
 {
-    player->SetNullVideo();
-
     int secsSince = 0;
     int requiredBuffer = 30;
     int requiredHeadStart = requiredBuffer;

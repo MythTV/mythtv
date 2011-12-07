@@ -7,8 +7,8 @@
 
 #define LOC      QString("DVDPlayer: ")
 
-MythDVDPlayer::MythDVDPlayer(bool muted)
-  : MythPlayer(muted), m_buttonVersion(0),
+MythDVDPlayer::MythDVDPlayer(PlayerFlags flags)
+  : MythPlayer(flags), m_buttonVersion(0),
     dvd_stillframe_showing(false),
     m_initial_title(-1), m_initial_audio_track(-1),
     m_initial_subtitle_track(-1),
@@ -680,15 +680,15 @@ void MythDVDPlayer::StillFrameCheck(void)
     }
 }
 
-void MythDVDPlayer::CreateDecoder(char *testbuf, int testreadsize,
-                                  bool allow_libmpeg2, bool no_accel)
+void MythDVDPlayer::CreateDecoder(char *testbuf, int testreadsize)
 {
     if (AvFormatDecoderDVD::CanHandle(testbuf, player_ctx->buffer->GetFilename(),
-                                     testreadsize))
+                                      testreadsize))
     {
         SetDecoder(new AvFormatDecoderDVD(this, *player_ctx->playingInfo,
-                                         using_null_videoout,
-                                         allow_libmpeg2, no_accel,
-                                         player_ctx->GetSpecialDecode()));
+                                          FlagIsSet(kVideoIsNull),
+                                          FlagIsSet(kDecodeAllowEXT),
+                                          !FlagIsSet(kDecodeAllowGPU),
+                                          player_ctx->GetSpecialDecode()));
     }
 }
