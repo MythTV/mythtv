@@ -58,7 +58,7 @@ class PrivateDecoderVDA : public PrivateDecoder
     virtual ~PrivateDecoderVDA();
     virtual QString GetName(void) { return "vda"; }
     virtual bool Init(const QString &decoder,
-                      bool no_hardware_decode,
+                      PlayerFlags flags,
                       AVCodecContext *avctx);
     virtual bool Reset(void);
     virtual int  GetFrame(AVStream *stream,

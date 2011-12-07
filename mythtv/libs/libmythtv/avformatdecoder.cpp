@@ -1896,11 +1896,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (selectedTrack[kTrackTypeVideo].av_stream_index < 0)
                     selectedTrack[kTrackTypeVideo] = si;
 
-                if (!FlagIsSet(kVideoIsNull) && FlagIsSet(kDecodeAllowEXT) &&
+                if (!FlagIsSet(kVideoIsNull) &&
                    (selectedTrack[kTrackTypeVideo].av_stream_index == (int) i))
                 {
-                    private_dec = PrivateDecoder::Create(
-                                    dec, !FlagIsSet(kDecodeAllowGPU), enc);
+                    private_dec = PrivateDecoder::Create(dec, playerFlags, enc);
                     if (private_dec)
                         thread_count = 1;
                 }
