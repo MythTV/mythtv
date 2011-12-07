@@ -35,8 +35,11 @@
 #define CHECK_STATUS(arg1) \
   if (m_preempted) \
   { \
-      LOCK_ALL \
+      m_render_lock.lock(); \
+      m_decode_lock.lock(); \
       Preempted(); \
+      m_decode_lock.unlock(); \
+      m_render_lock.unlock(); \
   } \
   if (m_errored) \
       return arg1;
@@ -409,8 +412,8 @@ bool MythRenderVDPAU::WasPreempted(void)
 
 bool MythRenderVDPAU::SetColorKey(uint colorkey)
 {
-    LOCK_RENDER
     CHECK_STATUS(false)
+    LOCK_RENDER
     INIT_ST
 
     if (!m_flipQueue)
@@ -437,8 +440,8 @@ void MythRenderVDPAU::WaitForFlip(void)
 
     VdpOutputSurface surface = 0;
     {
-        LOCK_RENDER
         CHECK_STATUS()
+        LOCK_RENDER
         if (m_surface >= (uint)m_surfaces.size())
             return;
         surface = m_outputSurfaces[m_surfaces[m_surface]].m_id;
@@ -459,8 +462,8 @@ void MythRenderVDPAU::Flip(void)
 
     VdpOutputSurface surface = 0;
     {
-        LOCK_RENDER
         CHECK_STATUS()
+        LOCK_RENDER
         if (m_surface >= (uint)m_surfaces.size())
             return;
         surface = m_outputSurfaces[m_surfaces[m_surface]].m_id;
@@ -502,9 +505,8 @@ void MythRenderVDPAU::MoveResizeWin(QRect &rect)
 
 bool MythRenderVDPAU::GetScreenShot(int width, int height, QString filename)
 {
-    LOCK_RENDER
     CHECK_STATUS(false)
-
+    LOCK_RENDER
     if (m_surface >= (uint)m_surfaces.size())
         return false;
 
@@ -551,9 +553,8 @@ bool MythRenderVDPAU::GetScreenShot(int width, int height, QString filename)
 
 void MythRenderVDPAU::CheckOutputSurfaces(void)
 {
-    LOCK_RENDER
     CHECK_STATUS()
-
+    LOCK_RENDER
     int need = MAX_OUTPUT_SURFACES;
     int have = m_surfaces.size();
     int created = 0;
@@ -582,8 +583,8 @@ void MythRenderVDPAU::CheckOutputSurfaces(void)
 uint MythRenderVDPAU::CreateOutputSurface(const QSize &size, VdpRGBAFormat fmt,
                                           uint existing)
 {
-    LOCK_RENDER
     CHECK_STATUS(0)
+    LOCK_RENDER
     INIT_ST
 
     if ((existing && !m_outputSurfaces.contains(existing)) || size.isEmpty())
@@ -625,8 +626,8 @@ uint MythRenderVDPAU::CreateOutputSurface(const QSize &size, VdpRGBAFormat fmt,
 uint MythRenderVDPAU::CreateVideoSurface(const QSize &size, VdpChromaType type,
                                          uint existing)
 {
-    LOCK_RENDER
     CHECK_STATUS(0)
+    LOCK_RENDER
     INIT_ST
 
     if ((existing && !m_videoSurfaces.contains(existing)) || size.isEmpty())
@@ -669,8 +670,8 @@ uint MythRenderVDPAU::CreateVideoSurface(const QSize &size, VdpChromaType type,
 uint MythRenderVDPAU::CreateBitmapSurface(const QSize &size, VdpRGBAFormat fmt,
                                           uint existing)
 {
-    LOCK_RENDER
     CHECK_STATUS(0)
+    LOCK_RENDER
     INIT_ST
 
     if ((existing && !m_bitmapSurfaces.contains(existing)) || size.isEmpty())
@@ -712,8 +713,8 @@ uint MythRenderVDPAU::CreateDecoder(const QSize &size,
                                     VdpDecoderProfile profile,
                                     uint references, uint existing)
 {
-    LOCK_DECODE
     CHECK_STATUS(0)
+    LOCK_DECODE
     INIT_ST
 
     if ((existing && !m_decoders.contains(existing)) || size.isEmpty() ||
@@ -756,8 +757,8 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
                                        uint features, VdpChromaType type,
                                        uint existing)
 {
-    LOCK_RENDER
     CHECK_STATUS(0)
+    LOCK_RENDER
     INIT_ST
 
     if ((existing && !m_videoMixers.contains(existing)) || size.isEmpty())
@@ -887,8 +888,8 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
 uint MythRenderVDPAU::CreateLayer(uint surface, const QRect *src,
                                   const QRect *dst)
 {
-    LOCK_RENDER
     CHECK_STATUS(0)
+    LOCK_RENDER
 
     if (!m_outputSurfaces.contains(surface))
         return 0;
@@ -913,8 +914,8 @@ void MythRenderVDPAU::DestroyOutputSurface(uint id)
     if (!vdp_output_surface_destroy)
         return;
 
-    LOCK_RENDER
     CHECK_STATUS()
+    LOCK_RENDER
     INIT_ST
 
     if (!m_outputSurfaces.contains(id))
@@ -927,8 +928,8 @@ void MythRenderVDPAU::DestroyOutputSurface(uint id)
 
 void MythRenderVDPAU::DestroyVideoSurface(uint id)
 {
-    LOCK_RENDER
     CHECK_STATUS()
+    LOCK_RENDER
     INIT_ST
 
     if (!m_videoSurfaces.contains(id))
@@ -942,8 +943,8 @@ void MythRenderVDPAU::DestroyVideoSurface(uint id)
 
 void MythRenderVDPAU::DestroyBitmapSurface(uint id)
 {
-    LOCK_RENDER
     CHECK_STATUS()
+    LOCK_RENDER
     INIT_ST
 
     if (!m_bitmapSurfaces.contains(id))
@@ -956,8 +957,8 @@ void MythRenderVDPAU::DestroyBitmapSurface(uint id)
 
 void MythRenderVDPAU::DestroyDecoder(uint id)
 {
-    LOCK_DECODE
     CHECK_STATUS()
+    LOCK_DECODE
     INIT_ST
 
     if (!m_decoders.contains(id))
@@ -970,8 +971,8 @@ void MythRenderVDPAU::DestroyDecoder(uint id)
 
 void MythRenderVDPAU::DestroyVideoMixer(uint id)
 {
-    LOCK_RENDER
     CHECK_STATUS()
+    LOCK_RENDER
     INIT_ST
 
     if (!m_videoMixers.contains(id))
@@ -984,8 +985,8 @@ void MythRenderVDPAU::DestroyVideoMixer(uint id)
 
 void MythRenderVDPAU::DestroyLayer(uint id)
 {
-    LOCK_RENDER
     CHECK_STATUS()
+    LOCK_RENDER
 
     if (!m_layers.contains(id))
         return;
@@ -1013,8 +1014,8 @@ bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
     VdpVideoMixer   mixer = 0;
 
     {
-        LOCK_RENDER
         CHECK_STATUS(false)
+        LOCK_RENDER
 
         if (!out_surface)
             out_surface = m_surfaces[m_surface];
@@ -1120,8 +1121,8 @@ bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
 
 bool MythRenderVDPAU::SetDeinterlacing(uint id, uint deinterlacers)
 {
-    LOCK_RENDER
     CHECK_STATUS(false)
+    LOCK_RENDER
 
     if (!m_videoMixers.contains(id))
         return false;
@@ -1139,8 +1140,8 @@ bool MythRenderVDPAU::SetDeinterlacing(uint id, uint deinterlacers)
 
 bool MythRenderVDPAU::ChangeVideoMixerFeatures(uint id, uint features)
 {
-    LOCK_RENDER
     CHECK_STATUS(false)
+    LOCK_RENDER
 
     if (!m_videoMixers.contains(id))
         return false;
@@ -1155,8 +1156,8 @@ bool MythRenderVDPAU::ChangeVideoMixerFeatures(uint id, uint features)
 
 void MythRenderVDPAU::SetCSCMatrix(uint id, void* vals)
 {
-    LOCK_RENDER
     CHECK_STATUS();
+    LOCK_RENDER
 
     if (!m_videoMixers.contains(id))
         return;
@@ -1170,8 +1171,8 @@ void MythRenderVDPAU::SetCSCMatrix(uint id, void* vals)
 
 int MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
 {
-    LOCK_RENDER
     CHECK_STATUS(false);
+    LOCK_RENDER
 
     if (!m_videoMixers.contains(id) || attrib > kVDPAttribCSCEnd)
         return -1;
@@ -1203,8 +1204,8 @@ int MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
 
 bool MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, float value)
 {
-    LOCK_RENDER
     CHECK_STATUS(false);
+    LOCK_RENDER
 
     if (!m_videoMixers.contains(id) || attrib < kVDPAttribFiltersStart)
         return false;
@@ -1236,8 +1237,8 @@ bool MythRenderVDPAU::UploadBitmap(uint id, void* const plane[1], uint32_t pitch
 {
     VdpBitmapSurface bitmap = 0;
     {
-        LOCK_RENDER
         CHECK_STATUS(false)
+        LOCK_RENDER
         if (!m_bitmapSurfaces.contains(id))
             return false;
         bitmap = m_bitmapSurfaces[id].m_id;
@@ -1267,8 +1268,8 @@ bool MythRenderVDPAU::UploadYUVFrame(uint id, void* const planes[3],
 
     VdpVideoSurface surface = 0;
     {
-        LOCK_RENDER
         CHECK_STATUS(false)
+        LOCK_RENDER
         if (!m_videoSurfaces.contains(id))
             return false;
         surface = m_videoSurfaces[id].m_id;
@@ -1290,8 +1291,8 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
     uint bitmap = VDP_INVALID_HANDLE;
     VdpOutputSurface surface = VDP_INVALID_HANDLE;
     {
-        LOCK_RENDER
         CHECK_STATUS(false)
+        LOCK_RENDER
 
         if (!target)
             target = m_surfaces[m_surface];
@@ -1359,8 +1360,8 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
 bool MythRenderVDPAU::DrawLayer(uint id, uint target)
 {
     {
-        LOCK_RENDER
         CHECK_STATUS(false)
+        LOCK_RENDER
 
         if (!m_layers.contains(id))
             return false;
@@ -1389,8 +1390,8 @@ int MythRenderVDPAU::GetBitmapSize(uint id)
 
 void* MythRenderVDPAU::GetRender(uint id)
 {
-    LOCK_RENDER
     CHECK_STATUS(NULL)
+    LOCK_RENDER
 
     if (!m_videoSurfaces.contains(id))
         return NULL;
@@ -1400,8 +1401,8 @@ void* MythRenderVDPAU::GetRender(uint id)
 
 uint MythRenderVDPAU::GetSurfaceOwner(VdpVideoSurface surface)
 {
-    LOCK_RENDER
     CHECK_STATUS(0)
+    LOCK_RENDER
 
     if (!m_videoSurfaceHash.contains(surface))
         return 0;
@@ -1412,8 +1413,8 @@ uint MythRenderVDPAU::GetSurfaceOwner(VdpVideoSurface surface)
 void MythRenderVDPAU::ClearVideoSurface(uint id)
 {
     CHECK_VIDEO_SURFACES()
-    LOCK_RENDER
     CHECK_STATUS()
+    LOCK_RENDER
     INIT_ST
 
     if (!m_videoSurfaces.contains(id))
@@ -1452,8 +1453,8 @@ void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render)
     VdpDecoder decoder = 0;
 
     {
-        LOCK_DECODE
         CHECK_STATUS()
+        LOCK_DECODE
         if (!m_decoders.contains(id))
             return;
         decoder = m_decoders[id].m_id;
