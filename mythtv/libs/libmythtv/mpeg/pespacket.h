@@ -205,7 +205,7 @@ class PESPacket
     /// Decode Time Stamp, present if HasDTS() is true
     uint64_t DTS(void) const
     {
-        int i = 6+5;
+        int i = 6+(HasPTS()?5:0);
         return
             (uint64_t(_pesdata[i+0] & 0x0e) << 29) |
             (uint64_t(_pesdata[i+1]       ) << 22) |
