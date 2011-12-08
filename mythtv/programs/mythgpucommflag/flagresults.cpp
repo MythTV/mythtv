@@ -49,14 +49,14 @@ QString FlagResults::toString(void)
     return str;
 }
 
-QString ResultsList::toString(QString title)
+QString ResultsMap::toString(QString title)
 {
-    ResultsList::iterator it;
+    ResultsMap::iterator it;
     QString str = QString("-----------------------------\n%1\n\n").arg(title);
 
     for (it = begin(); it != end(); ++it)
     {
-        FlagResults *results = *it;
+        FlagResults *results = it.value();
         str += results->toString();
     }
     return str;

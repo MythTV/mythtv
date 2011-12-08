@@ -305,8 +305,8 @@ int main(int argc, char **argv)
     // Create input and output queues
     PacketQueue audioQ(2048);
     PacketQueue videoQ(2048);
-    ResultsList audioMarks;
-    ResultsList videoMarks;
+    ResultsMap audioMarks;
+    ResultsMap videoMarks;
 
     // Initialize the findings map
     FindingsInitialize();

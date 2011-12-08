@@ -42,7 +42,7 @@ class FlagResults
     FlagFindingsList *m_findings;
 };
 
-class ResultsList : public QList<FlagResults *>
+class ResultsMap : public QMap<int64_t, FlagResults *>
 {
   public:
     QString toString(QString title);

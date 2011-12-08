@@ -11,7 +11,7 @@
 class AudioConsumer : public QueueConsumer
 {
   public:
-    AudioConsumer(PacketQueue *inQ, ResultsList *outL, OpenCLDevice *dev);
+    AudioConsumer(PacketQueue *inQ, ResultsMap *outMap, OpenCLDevice *dev);
     ~AudioConsumer() { av_free(m_audioSamples); };
     bool Initialize(void) { return true; };
     void ProcessPacket(Packet *packet);

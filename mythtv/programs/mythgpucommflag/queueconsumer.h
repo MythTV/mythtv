@@ -9,11 +9,11 @@
 class QueueConsumer : public MThread
 {
   public:
-    QueueConsumer(PacketQueue *inQ, ResultsList *outL, OpenCLDevice *dev,
+    QueueConsumer(PacketQueue *inQ, ResultsMap *outMap, OpenCLDevice *dev,
                   QString name) : 
-        MThread(name), m_name(name), m_inQ(inQ), m_outL(outL), m_done(false),
-        m_dev(dev), m_context(NULL), m_codec(NULL), m_stream(NULL),
-        m_opened(false) {};
+        MThread(name), m_name(name), m_inQ(inQ), m_outMap(outMap),
+        m_done(false), m_dev(dev), m_context(NULL), m_codec(NULL),
+        m_stream(NULL), m_opened(false) {};
     ~QueueConsumer() {};
     virtual bool Initialize(void) = 0;
     virtual void ProcessPacket(Packet *packet) = 0;
@@ -25,7 +25,7 @@ class QueueConsumer : public MThread
   protected:
     QString m_name;
     PacketQueue *m_inQ;
-    ResultsList *m_outL;
+    ResultsMap *m_outMap;
     bool m_done;
     OpenCLDevice *m_dev;
     AVCodecContext *m_context;

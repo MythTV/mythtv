@@ -12,7 +12,7 @@
 class VideoConsumer : public QueueConsumer
 {
   public:
-    VideoConsumer(PacketQueue *inQ, ResultsList *outL, OpenCLDevice *dev);
+    VideoConsumer(PacketQueue *inQ, ResultsMap *outMap, OpenCLDevice *dev);
     ~VideoConsumer() { if (m_decoder) delete m_decoder; };
     bool Initialize(void);
     void ProcessPacket(Packet *packet);

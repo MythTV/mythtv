@@ -21,9 +21,9 @@ extern "C" {
 #include "vdpauvideodecoder.h"
 #include "ffmpegvideodecoder.h"
 
-VideoConsumer::VideoConsumer(PacketQueue *inQ, ResultsList *outL,
+VideoConsumer::VideoConsumer(PacketQueue *inQ, ResultsMap *outMap,
                              OpenCLDevice *dev) : 
-    QueueConsumer(inQ, outL, dev, "VideoConsumer"), m_useX(false),
+    QueueConsumer(inQ, outMap, dev, "VideoConsumer"), m_useX(false),
     m_decoder(NULL)
 {
     InitVideoProcessors();
@@ -258,7 +258,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
             result->m_timestamp = NormalizeTimecode(pkt->pts);
             result->m_duration = NormalizeDuration(pkt->duration);
             LOG(VB_GENERAL, LOG_INFO, result->toString());
-            m_outL->append(result);
+            m_outMap->insertMulti(result->m_timestamp, result);
         }
     }
 

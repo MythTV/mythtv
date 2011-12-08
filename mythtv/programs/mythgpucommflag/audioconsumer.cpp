@@ -13,9 +13,9 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-AudioConsumer::AudioConsumer(PacketQueue *inQ, ResultsList *outL,
+AudioConsumer::AudioConsumer(PacketQueue *inQ, ResultsMap *outMap,
                              OpenCLDevice *dev) : 
-    QueueConsumer(inQ, outL, dev, "AudioConsumer") 
+    QueueConsumer(inQ, outMap, dev, "AudioConsumer") 
 {
     m_audioSamples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
                                            sizeof(int32_t));
@@ -146,7 +146,7 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
             result->m_timestamp = NormalizeTimecode(pts);;
             result->m_duration = duration;
             LOG(VB_GENERAL, LOG_INFO, result->toString());
-            m_outL->append(result);
+            m_outMap->insertMulti(result->m_timestamp, result);
         }
     }
 
