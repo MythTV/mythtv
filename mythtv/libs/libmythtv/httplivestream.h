@@ -45,8 +45,10 @@ class MTV_PUBLIC HTTPLiveStream
     QString  GetPlaylistName(bool audioOnly = false);
     uint16_t GetSegmentSize(void) { return m_segmentSize; }
     QString  GetFilename(uint16_t segmentNumber = 0, bool fileOnly = false,
-                         bool audioOnly = false);
-    QString  GetCurrentFilename(bool audioOnly = false);
+                         bool audioOnly = false, bool encoded = false);
+    QString  GetCurrentFilename(bool audioOnly = false, bool encoded = false);
+
+    void SetOutputVars(void);
 
     HTTPLiveStreamStatus GetDBStatus(void);
 
@@ -85,8 +87,11 @@ class MTV_PUBLIC HTTPLiveStream
     uint16_t    m_sourceHeight;
     QString     m_outDir;
     QString     m_outBase;
+    QString     m_outBaseEncoded;
     QString     m_outFile;
+    QString     m_outFileEncoded;
     QString     m_audioOutFile;
+    QString     m_audioOutFileEncoded;
     uint16_t    m_segmentSize;
     uint16_t    m_segmentFrames;
     uint16_t    m_maxSegments;
@@ -94,6 +99,7 @@ class MTV_PUBLIC HTTPLiveStream
     uint16_t    m_startSegment;
     uint16_t    m_curSegment;
     QString     m_httpPrefix;
+    QString     m_httpPrefixRel;
     uint16_t    m_height;
     uint16_t    m_width;
     uint32_t    m_bitrate;

@@ -785,12 +785,12 @@ bool Content::DownloadFile( const QString &sURL, const QString &sStorageGroup )
 DTC::LiveStreamInfo *Content::AddLiveStream( const QString   &sStorageGroup,
                                              const QString   &sFileName,
                                              const QString   &sHostName,
-                                             const QString   &sMaxSegments,
-                                             const QString   &sWidth,
-                                             const QString   &sHeight,
-                                             const QString   &sBitrate,
-                                             const QString   &sAudioBitrate,
-                                             const QString   &sSampleRate )
+                                             int              nMaxSegments,
+                                             int              nWidth,
+                                             int              nHeight,
+                                             int              nBitrate,
+                                             int              nAudioBitrate,
+                                             int              nSampleRate )
 {
     QString sGroup = sStorageGroup;
 
@@ -832,58 +832,6 @@ DTC::LiveStreamInfo *Content::AddLiveStream( const QString   &sStorageGroup,
     {
         sFullFileName =
             gCoreContext->GenMythURL(sHostName, 0, sFileName, sStorageGroup);
-    }
-
-    uint16_t nWidth        = 480;
-    uint16_t nHeight       = 0;
-    uint32_t nBitrate      = 800000;
-    uint32_t nAudioBitrate = 64000;
-    uint16_t nMaxSegments  = 0;
-    uint16_t nSampleRate   = -1;
-
-    bool     ok = false;
-    uint32_t value = 0;
-
-    if (!sWidth.isEmpty())
-    {
-        value = sWidth.toUInt(&ok);
-        if (ok)
-            nWidth = value;
-    }
-
-    if (!sHeight.isEmpty())
-    {
-        value = sHeight.toUInt(&ok);
-        if (ok)
-            nHeight = value;
-    }
-
-    if (!sBitrate.isEmpty())
-    {
-        value = sBitrate.toUInt(&ok);
-        if (ok)
-            nBitrate = value;
-    }
-
-    if (!sAudioBitrate.isEmpty())
-    {
-        value = sAudioBitrate.toUInt(&ok);
-        if (ok)
-            nAudioBitrate = value;
-    }
-
-    if (!sMaxSegments.isEmpty())
-    {
-        value = sMaxSegments.toUInt(&ok);
-        if (ok)
-            nMaxSegments = value;
-    }
-
-    if (!sSampleRate.isEmpty())
-    {
-        value = sSampleRate.toUInt(&ok);
-        if (ok)
-            nSampleRate = value;
     }
 
     HTTPLiveStream *hls = new
@@ -974,12 +922,12 @@ DTC::LiveStreamInfoList *Content::GetFilteredLiveStreamList( const QString   &Fi
 
 DTC::LiveStreamInfo *Content::AddRecordingLiveStream( int              nChanId,
                                                       const QDateTime &dtStartTime,
-                                                      const QString   &sMaxSegments,
-                                                      const QString   &sWidth,
-                                                      const QString   &sHeight,
-                                                      const QString   &sBitrate,
-                                                      const QString   &sAudioBitrate,
-                                                      const QString   &sSampleRate )
+                                                      int              nMaxSegments,
+                                                      int              nWidth,
+                                                      int              nHeight,
+                                                      int              nBitrate,
+                                                      int              nAudioBitrate,
+                                                      int              nSampleRate )
 {
     if (!dtStartTime.isValid())
         throw( "StartTime is invalid" );
@@ -1029,21 +977,21 @@ DTC::LiveStreamInfo *Content::AddRecordingLiveStream( int              nChanId,
     QFileInfo fInfo( sFileName );
 
     return AddLiveStream( pginfo.GetStorageGroup(), fInfo.fileName(),
-                          pginfo.GetHostname(), sMaxSegments, sWidth,
-                          sHeight, sBitrate, sAudioBitrate, sSampleRate );
+                          pginfo.GetHostname(), nMaxSegments, nWidth,
+                          nHeight, nBitrate, nAudioBitrate, nSampleRate );
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::LiveStreamInfo *Content::AddVideoLiveStream( int              nId,
-                                                  const QString   &sMaxSegments,
-                                                  const QString   &sWidth,
-                                                  const QString   &sHeight,
-                                                  const QString   &sBitrate,
-                                                  const QString   &sAudioBitrate,
-                                                  const QString   &sSampleRate )
+DTC::LiveStreamInfo *Content::AddVideoLiveStream( int nId,
+                                                  int nMaxSegments,
+                                                  int nWidth,
+                                                  int nHeight,
+                                                  int nBitrate,
+                                                  int nAudioBitrate,
+                                                  int nSampleRate )
 {
     if (nId < 0)
         throw( "Id is invalid" );
@@ -1088,7 +1036,6 @@ DTC::LiveStreamInfo *Content::AddVideoLiveStream( int              nId,
     QFileInfo fInfo( sFileName );
 
     return AddLiveStream( "Videos", fInfo.fileName(),
-                          metadata->GetHost(), sMaxSegments, sWidth,
-                          sHeight, sBitrate, sAudioBitrate, sSampleRate );
-
+                          metadata->GetHost(), nMaxSegments, nWidth,
+                          nHeight, nBitrate, nAudioBitrate, nSampleRate );
 }

@@ -762,24 +762,20 @@ int Transcode::TranscodeFile(const QString &inputname,
         newHeight = cmdHeight;
 
         int actualHeight = (video_height == 1088 ? 1080 : video_height);
-        float newAspect = 1.0 * video_width / actualHeight;
-
-        if (newAspect < 1.3)
-            newAspect = video_aspect;
 
         // If height or width are 0, then we need to calculate them
         if (newHeight == 0 && newWidth > 0)
-            newHeight = (int)(1.0 * newWidth / newAspect);
+            newHeight = (int)(1.0 * newWidth / video_aspect);
         else if (newWidth == 0 && newHeight > 0)
-            newWidth = (int)(1.0 * newHeight * newAspect);
+            newWidth = (int)(1.0 * newHeight * video_aspect);
         else if (newWidth == 0 && newHeight == 0)
         {
             newHeight = 480;
-            newWidth = (int)(1.0 * 480 * newAspect);
+            newWidth = (int)(1.0 * 480 * video_aspect);
             if (newWidth > 640)
             {
                 newWidth = 640;
-                newHeight = (int)(1.0 * 640 / newAspect);
+                newHeight = (int)(1.0 * 640 / video_aspect);
             }
         }
 
@@ -787,7 +783,6 @@ int Transcode::TranscodeFile(const QString &inputname,
         newHeight = (newHeight + 15) & ~0xF;
         newWidth  = (newWidth  + 15) & ~0xF;
 
-        LOG(VB_RECORD, LOG_ERR, "Configuring AVFormatWriter");
         avfw = new AVFormatWriter();
         if (!avfw)
         {
@@ -801,7 +796,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         avfw->SetVideoBitrate(cmdBitrate);
         avfw->SetHeight(newHeight);
         avfw->SetWidth(newWidth);
-        avfw->SetAspect(player->GetVideoAspect());
+        avfw->SetAspect(video_aspect);
         avfw->SetAudioBitrate(cmdAudioBitrate);
         avfw->SetAudioChannels(arb->channels);
         avfw->SetAudioBits(16);
@@ -849,8 +844,14 @@ int Transcode::TranscodeFile(const QString &inputname,
             hls->UpdateStatus(kHLSStatusStarting);
             hls->UpdateSizeInfo(newWidth, newHeight, video_width, video_height);
 
-            if (hlsStreamID != -1)
-                hls->InitForWrite();
+            if ((hlsStreamID != -1) &&
+                (!hls->InitForWrite()))
+            {
+                LOG(VB_GENERAL, LOG_ERR, "hls->InitForWrite() failed");
+                if (player_ctx)
+                    delete player_ctx;
+                return REENCODE_ERROR;
+            }
 
             if (video_frame_rate > 30)
             {
@@ -890,13 +891,15 @@ int Transcode::TranscodeFile(const QString &inputname,
             avfw->SetFramerate(video_frame_rate);
         }
 
-        avfw->SetThreadCount(2);
+        avfw->SetThreadCount(
+            gCoreContext->GetNumSetting("HTTPLiveStreamThreads", 2));
+
         if (avfw2)
             avfw2->SetThreadCount(1);
 
         if (!avfw->Init())
         {
-            LOG(VB_RECORD, LOG_ERR, "avfw->Init() failed");
+            LOG(VB_GENERAL, LOG_ERR, "avfw->Init() failed");
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_ERROR;
@@ -904,7 +907,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         if (!avfw->OpenFile())
         {
-            LOG(VB_RECORD, LOG_ERR, "avfw->OpenFile() failed");
+            LOG(VB_GENERAL, LOG_ERR, "avfw->OpenFile() failed");
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_ERROR;
@@ -912,7 +915,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         if (avfw2 && !avfw2->Init())
         {
-            LOG(VB_RECORD, LOG_ERR, "avfw2->Init() failed");
+            LOG(VB_GENERAL, LOG_ERR, "avfw2->Init() failed");
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_ERROR;
@@ -920,7 +923,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         if (avfw2 && !avfw2->OpenFile())
         {
-            LOG(VB_RECORD, LOG_ERR, "avfw2->OpenFile() failed");
+            LOG(VB_GENERAL, LOG_ERR, "avfw2->OpenFile() failed");
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_ERROR;
@@ -1221,7 +1224,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         LOG(VB_GENERAL, LOG_INFO,
             QString("FifoVideoHeight %1").arg(video_height));
         LOG(VB_GENERAL, LOG_INFO,
-            QString("FifoVideoAspectRatio %1").arg(player->GetVideoAspect()));
+            QString("FifoVideoAspectRatio %1").arg(video_aspect));
         LOG(VB_GENERAL, LOG_INFO,
             QString("FifoVideoFrameRate %1").arg(video_frame_rate));
         LOG(VB_GENERAL, LOG_INFO,

@@ -123,6 +123,8 @@ class DecoderBase
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 
+    float GetVideoAspect(void) const { return current_aspect; }
+
     virtual int64_t NormalizeVideoTimecode(int64_t timecode) { return timecode; }
 
     virtual bool isLastFrameKey() = 0;

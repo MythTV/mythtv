@@ -85,29 +85,29 @@ class Content : public ContentServices
         DTC::LiveStreamInfo     *AddLiveStream          ( const QString   &StorageGroup,
                                                           const QString   &FileName,
                                                           const QString   &HostName,
-                                                          const QString   &MaxSegments,
-                                                          const QString   &Width,
-                                                          const QString   &Height,
-                                                          const QString   &Bitrate,
-                                                          const QString   &AudioBitrate,
-                                                          const QString   &SampleRate );
+                                                          int              MaxSegments,
+                                                          int              Width,
+                                                          int              Height,
+                                                          int              Bitrate,
+                                                          int              AudioBitrate,
+                                                          int              SampleRate );
 
         DTC::LiveStreamInfo     *AddRecordingLiveStream ( int              ChanId,
                                                           const QDateTime &StartTime,
-                                                          const QString   &MaxSegments,
-                                                          const QString   &Width,
-                                                          const QString   &Height,
-                                                          const QString   &Bitrate,
-                                                          const QString   &AudioBitrate,
-                                                          const QString   &SampleRate );
+                                                          int              MaxSegments,
+                                                          int              Width,
+                                                          int              Height,
+                                                          int              Bitrate,
+                                                          int              AudioBitrate,
+                                                          int              SampleRate );
 
         DTC::LiveStreamInfo     *AddVideoLiveStream     ( int              Id,
-                                                          const QString   &MaxSegments,
-                                                          const QString   &Width,
-                                                          const QString   &Height,
-                                                          const QString   &Bitrate,
-                                                          const QString   &AudioBitrate,
-                                                          const QString   &SampleRate );
+                                                          int              MaxSegments,
+                                                          int              Width,
+                                                          int              Height,
+                                                          int              Bitrate,
+                                                          int              AudioBitrate,
+                                                          int              SampleRate );
 
         DTC::LiveStreamInfo     *GetLiveStream            ( int Id );
         DTC::LiveStreamInfoList *GetLiveStreamList        ( void );

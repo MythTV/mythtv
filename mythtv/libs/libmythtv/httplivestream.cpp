@@ -26,6 +26,7 @@
 #include <QFileInfo>
 #include <QIODevice>
 #include <QRunnable>
+#include <QUrl>
 
 #include "mythcorecontext.h"
 #include "mythdirs.h"
@@ -105,41 +106,40 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
     m_percentComplete(0),
     m_status(kHLSStatusUndefined)
 {
+    if ((m_width == 0) && (m_height == 0))
+        m_width = 640;
+
+    if (m_bitrate == 0)
+        m_bitrate = 800000;
+
+    if (m_audioBitrate == 0)
+        m_audioBitrate = 64000;
+
+    if (m_segmentSize == 0)
+        m_segmentSize = 10;
+
+    if (m_audioOnlyBitrate == 0)
+        m_audioOnlyBitrate = 32000;
+
     m_sourceHost = gCoreContext->GetHostName();
 
     QFileInfo finfo(m_sourceFile);
     m_outBase = finfo.fileName() +
         QString(".%1x%2_%3kV_%4kA").arg(m_width).arg(m_height)
                 .arg(m_bitrate/1000).arg(m_audioBitrate/1000);
-    m_outFile = m_outBase + ".av";
 
-    if (m_audioOnlyBitrate)
-        m_audioOutFile = m_outBase +
-            QString(".ao_%1kA").arg(m_audioOnlyBitrate/1000);
+    SetOutputVars();
 
-    m_httpPrefix = gCoreContext->GetSetting("HTTPLiveStreamPrefix", QString(
-        "http://%1:%2/Content/GetFile?StorageGroup=Streaming&FileName=")
-        .arg(gCoreContext->GetSetting("MasterServerIP"))
-        .arg(gCoreContext->GetSetting("BackendStatusPort")));
-
-    m_fullURL = m_httpPrefix + m_outBase + ".m3u8";
-
-    if (m_fullURL.contains("/Content/GetFile"))
-        m_relativeURL = "/Content/GetFile?StorageGroup=Streaming&FileName=" +
-            m_outBase + ".m3u8";
-    else
-        m_relativeURL = m_outBase + ".m3u8";
+    m_fullURL     = m_httpPrefix + m_outBase + ".m3u8";
+    m_relativeURL = m_httpPrefixRel + m_outBase + ".m3u8";
 
     StorageGroup sgroup("Streaming", gCoreContext->GetHostName());
     QStringList groupDirs = sgroup.GetDirList();
 
-    QString defaultDir = GetConfDir() + "/tmp/hls";
+    m_outDir = GetConfDir() + "/tmp/hls";
 
     if (!groupDirs.isEmpty())
-        defaultDir = groupDirs[0];
-
-    // m_outDir = gCoreContext->GetSetting("HTTPLiveStreamDir", defaultDir);
-    m_outDir = defaultDir;
+        m_outDir = groupDirs[0];
 
     QDir outDir(m_outDir);
 
@@ -172,24 +172,28 @@ HTTPLiveStream::~HTTPLiveStream()
 
 bool HTTPLiveStream::InitForWrite(void)
 {
-    if (m_streamid == -1)
+    if ((m_streamid == -1) ||
+        (!WriteHTML()) ||
+        (!WriteMetaPlaylist()) ||
+        (!UpdateStatus(kHLSStatusStarting)) ||
+        (!UpdateStatusMessage("Transcode Starting")))
         return false;
 
     m_writing = true;
-
-    WriteHTML();
-    WriteMetaPlaylist();
-
-    UpdateStatus(kHLSStatusStarting);
-    UpdateStatusMessage("Transcode Starting");
 
     return true;
 }
 
 QString HTTPLiveStream::GetFilename(uint16_t segmentNumber, bool fileOnly,
-                                    bool audioOnly)
+                                    bool audioOnly, bool encoded)
 {
-    QString filename = audioOnly ? m_audioOutFile : m_outFile;
+    QString filename;
+
+    if (encoded)
+        filename = audioOnly ? m_audioOutFileEncoded : m_outFileEncoded;
+    else
+        filename = audioOnly ? m_audioOutFile : m_outFile;
+
     filename += ".%1.ts";
 
     if (!fileOnly)
@@ -197,20 +201,29 @@ QString HTTPLiveStream::GetFilename(uint16_t segmentNumber, bool fileOnly,
 
     if (segmentNumber)
         return filename.arg(segmentNumber, 6, 10, QChar('0'));
-    else
-        return filename.arg(1, 6, 10, QChar('0'));
 
-    return filename;
+    return filename.arg(1, 6, 10, QChar('0'));
 }
 
-QString HTTPLiveStream::GetCurrentFilename(bool audioOnly)
+QString HTTPLiveStream::GetCurrentFilename(bool audioOnly, bool encoded)
 {
-    return GetFilename(m_curSegment, false, audioOnly);
+    return GetFilename(m_curSegment, false, audioOnly, encoded);
 }
 
 int HTTPLiveStream::AddStream(void)
 {
     m_status = kHLSStatusQueued;
+
+    QString tmpBase = QString("");
+    QString tmpFullURL = QString("");
+    QString tmpRelURL = QString("");
+
+    if (m_width && m_height)
+    {
+        tmpBase = m_outBase;
+        tmpFullURL = m_fullURL;
+        tmpRelURL = m_relativeURL;
+    }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -236,8 +249,8 @@ int HTTPLiveStream::AddStream(void)
     query.bindValue(":MAXSEGMENTS", m_maxSegments);
     query.bindValue(":CREATED", m_created);
     query.bindValue(":LASTMODIFIED", m_lastModified);
-    query.bindValue(":RELATIVEURL", m_relativeURL);
-    query.bindValue(":FULLURL", m_fullURL);
+    query.bindValue(":RELATIVEURL", tmpRelURL);
+    query.bindValue(":FULLURL", tmpFullURL);
     query.bindValue(":STATUS", (int)m_status);
     query.bindValue(":STATUSMESSAGE",
         QString("Waiting for mythtranscode startup."));
@@ -246,7 +259,7 @@ int HTTPLiveStream::AddStream(void)
     query.bindValue(":SOURCEWIDTH", 0);
     query.bindValue(":SOURCEHEIGHT", 0);
     query.bindValue(":OUTDIR", m_outDir);
-    query.bindValue(":OUTBASE", m_outBase);
+    query.bindValue(":OUTBASE", tmpBase);
     query.bindValue(":AUDIOONLYBITRATE", m_audioOnlyBitrate);
     query.bindValue(":SAMPLERATE", m_sampleRate);
 
@@ -256,19 +269,13 @@ int HTTPLiveStream::AddStream(void)
         return -1;
     }
 
-    query.prepare(
-        "SELECT id "
-        "FROM livestream "
-        "WHERE outbase = :OUTBASE;");
-    query.bindValue(":OUTBASE", m_outBase);
-
-    if (!query.exec() || !query.next())
+    if (!query.exec("SELECT LAST_INSERT_ID()") || !query.next())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to query LiveStream streamid.");
         return -1;
     }
 
-    m_streamid = query.value(0).toInt();
+    m_streamid = query.value(0).toUInt();
 
     return m_streamid;
 }
@@ -331,31 +338,21 @@ bool HTTPLiveStream::WriteHTML(void)
         return false;
     }
 
-    file.write(
-        "<html>\n"
-        "  <head>\n");
     file.write(QString(
-        "    <title>%1</title>\n").arg(m_sourceFile).toAscii().constData());
-    file.write(
+        "<html>\n"
+        "  <head>\n"
+        "    <title>%1</title>\n"
         "  </head>\n"
         "  <body style='background-color:#FFFFFF;'>\n"
         "    <center>\n"
-        "      <video controls>\n");
-
-    if (m_fullURL.contains("/Content/GetFile"))
-        file.write(QString(
-        "        <source src='/Content/GetFile?StorageGroup=Streaming&FileName=%1.m3u8' />\n")
-                           .arg(m_outBase).toAscii().constData());
-    else
-        file.write(QString(
-        "        <source src='%1.m3u8' />\n")
-                           .arg(m_outBase).toAscii().constData());
-
-    file.write(
+        "      <video controls>\n"
+        "        <source src='%2%3.m3u8' />\n"
         "      </video>\n"
         "    </center>\n"
         "  </body>\n"
-        "</html>\n");
+        "</html>\n"
+        ).arg(m_sourceFile).arg(m_httpPrefixRel).arg(m_outBaseEncoded)
+         .toAscii());
 
     file.close();
 
@@ -376,7 +373,7 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
     if (m_streamid == -1)
         return false;
 
-    QString outFile = m_outDir + "/" + m_outBase + ".m3u8";
+    QString outFile = GetMetaPlaylistName();
     QFile file(outFile);
 
     if (!file.open(QIODevice::WriteOnly))
@@ -385,27 +382,20 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
         return false;
     }
 
-    file.write("#EXTM3U\n");
-    file.write(QString("#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n")
-               .arg((int)((m_bitrate + m_audioBitrate) * 1.1)).toAscii());
-
-    if (m_fullURL.contains("/Content/GetFile"))
-        file.write(QString(
-            "/Content/GetFile?StorageGroup=Streaming&FileName=%1.m3u8\n")
-            .arg(m_outFile).toAscii());
-    else
-        file.write(QString("%1.m3u8\n").arg(m_outFile).toAscii());
+    file.write(QString(
+        "#EXTM3U\n"
+        "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n"
+        "%2%3.m3u8\n"
+        ).arg((int)((m_bitrate + m_audioBitrate) * 1.1))
+         .arg(m_httpPrefixRel).arg(m_outFileEncoded).toAscii());
 
     if (m_audioOnlyBitrate)
     {
-        file.write(QString("#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n")
-                   .arg((int)((m_audioOnlyBitrate) * 1.1)).toAscii());
-        if (m_fullURL.contains("/Content/GetFile"))
-            file.write(QString(
-                "/Content/GetFile?StorageGroup=Streaming&FileName=%1.m3u8\n")
-                .arg(m_audioOutFile).toAscii());
-        else
-            file.write(QString("%1.m3u8\n").arg(m_audioOutFile).toAscii());
+        file.write(QString(
+            "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n"
+            "%2%3.m3u8\n"
+            ).arg((int)((m_audioOnlyBitrate) * 1.1)).arg(m_httpPrefixRel)
+             .arg(m_audioOutFileEncoded).toAscii());
     }
 
     file.close();
@@ -431,9 +421,8 @@ bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
     if (m_streamid == -1)
         return false;
 
-    QString base = audioOnly ? m_audioOutFile : m_outFile;
-    QString outFile = m_outDir + "/" + base + ".m3u8";
-    QString tmpFile = m_outDir + "/" + base + ".m3u8.tmp";
+    QString outFile = GetPlaylistName(audioOnly);
+    QString tmpFile = outFile + ".tmp";
 
     QFile file(tmpFile);
 
@@ -443,11 +432,11 @@ bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
         return false;
     }
 
-    file.write("#EXTM3U\n");
-    file.write(QString("#EXT-X-TARGETDURATION:%1\n")
-                       .arg(m_segmentSize).toAscii());
-    file.write(QString("#EXT-X-MEDIA-SEQUENCE:%1\n")
-                       .arg(m_startSegment).toAscii());
+    file.write(QString(
+        "#EXTM3U\n"
+        "#EXT-X-TARGETDURATION:%1\n"
+        "#EXT-X-MEDIA-SEQUENCE:%2\n"
+        ).arg(m_segmentSize).arg(m_startSegment).toAscii());
 
     if (writeEndTag)
         file.write("#EXT-X-ENDLIST\n");
@@ -462,14 +451,11 @@ bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
 
     while (i < tmpSegCount)
     {
-        file.write(QString("#EXTINF:%1\n").arg(m_segmentSize).toAscii());
-        if (m_fullURL.contains("/Content/GetFile"))
-            file.write(QString(
-                "/Content/GetFile?StorageGroup=Streaming&FileName=%1\n")
-                .arg(GetFilename(segmentid + i, true, audioOnly)).toAscii());
-        else
-            file.write(QString("%1\n")
-                .arg(GetFilename(segmentid + i, true, audioOnly)).toAscii());
+        file.write(QString(
+            "#EXTINF:%1\n"
+            "%2%3\n"
+            ).arg(m_segmentSize).arg(m_httpPrefixRel)
+             .arg(GetFilename(segmentid + i, true, audioOnly, true)).toAscii());
 
         ++i;
     }
@@ -558,16 +544,7 @@ bool HTTPLiveStream::UpdateSizeInfo(uint16_t width, uint16_t height,
     m_fullURL = newFullURL;
     m_relativeURL = newRelativeURL;
 
-    m_outFile = m_outBase + ".av";
-
-    if (m_audioOnlyBitrate)
-        m_audioOutFile = m_outBase +
-            QString(".ao_%1kA").arg(m_audioOnlyBitrate/1000);
-
-    m_httpPrefix = gCoreContext->GetSetting("HTTPLiveStreamPrefix", QString(
-        "http://%1:%2/Content/GetFile?StorageGroup=Streaming&FileName=")
-        .arg(gCoreContext->GetSetting("MasterServerIP"))
-        .arg(gCoreContext->GetSetting("BackendStatusPort")));
+    SetOutputVars();
 
     return true;
 }
@@ -721,18 +698,37 @@ bool HTTPLiveStream::LoadFromDB(void)
     m_audioOnlyBitrate   = query.value(22).toUInt();
     m_sampleRate         = query.value(23).toUInt();
 
+    SetOutputVars();
+
+    return true;
+}
+
+void HTTPLiveStream::SetOutputVars(void)
+{
+    m_outBaseEncoded = QString(QUrl::toPercentEncoding(m_outBase, "", " "));
+
+    m_outFile        = m_outBase + ".av";
+    m_outFileEncoded = m_outBaseEncoded + ".av";
+
+    if (m_audioOnlyBitrate)
+    {
+        m_audioOutFile = m_outBase +
+            QString(".ao_%1kA").arg(m_audioOnlyBitrate/1000);
+        m_audioOutFileEncoded = m_outBaseEncoded +
+            QString(".ao_%1kA").arg(m_audioOnlyBitrate/1000);
+    }
+
     m_httpPrefix = gCoreContext->GetSetting("HTTPLiveStreamPrefix", QString(
         "http://%1:%2/Content/GetFile?StorageGroup=Streaming&FileName=")
         .arg(gCoreContext->GetSetting("MasterServerIP"))
         .arg(gCoreContext->GetSetting("BackendStatusPort")));
 
-    m_outFile = m_outBase + ".av";
-
-    if (m_audioOnlyBitrate)
-        m_audioOutFile = m_outBase +
-            QString(".ao_%1kA").arg(m_audioOnlyBitrate/1000);
-
-    return true;
+    if (!gCoreContext->GetSetting("HTTPLiveStreamPrefixRel").isEmpty())
+        m_httpPrefixRel = gCoreContext->GetSetting("HTTPLiveStreamPrefixRel");
+    else if (m_httpPrefix.contains("/Content/GetFile"))
+        m_httpPrefixRel = "/Content/GetFile?StorageGroup=Streaming&FileName=";
+    else
+        m_httpPrefixRel = "";
 }
 
 HTTPLiveStreamStatus HTTPLiveStream::GetDBStatus(void)
@@ -820,7 +816,6 @@ bool HTTPLiveStream::RemoveStream(int id)
         return false;
     }
 
-    QString outDir = gCoreContext->GetSetting("HTTPLiveStreamDir", "/tmp");
     HTTPLiveStream *hls = new HTTPLiveStream(id);
 
     if (hls->GetDBStatus() == kHLSStatusRunning) {
