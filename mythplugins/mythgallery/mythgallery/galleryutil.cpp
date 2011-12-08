@@ -19,6 +19,7 @@
 // qt
 #include <QDir>
 #include <QApplication>
+#include <QImageReader>
 
 // myth
 #include <mythcontext.h>
@@ -54,13 +55,11 @@ static bool FileDelete(const QFileInfo &file);
 QStringList GalleryUtil::GetImageFilter(void)
 {
     QStringList filt;
-    filt.push_back("*.jpg");
-    filt.push_back("*.jpeg");
-    filt.push_back("*.png");
+
+    Q_FOREACH(QByteArray format, QImageReader::supportedImageFormats())
+        filt.push_back("*." + format);
+
     filt.push_back("*.tif");
-    filt.push_back("*.tiff");
-    filt.push_back("*.bmp");
-    filt.push_back("*.gif");
 
 #ifdef DCRAW_SUPPORT
     filt << DcrawFormats::getFilters();
@@ -73,6 +72,9 @@ QStringList GalleryUtil::GetMovieFilter(void)
 {
     QStringList filt;
     filt.push_back("*.avi");
+    filt.push_back("*.bin");
+    filt.push_back("*.iso");
+    filt.push_back("*.img");
     filt.push_back("*.mpg");
     filt.push_back("*.mp4");
     filt.push_back("*.mpeg");
