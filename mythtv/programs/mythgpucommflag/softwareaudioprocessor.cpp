@@ -1,7 +1,7 @@
 #include <math.h>
 
 #include "mythlogging.h"
-#include "resultslist.h"
+#include "flagresults.h"
 #include "audioprocessor.h"
 
 #ifndef MAX

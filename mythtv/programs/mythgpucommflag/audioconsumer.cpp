@@ -2,7 +2,7 @@
 
 #include "mythlogging.h"
 #include "packetqueue.h"
-#include "resultslist.h"
+#include "flagresults.h"
 #include "audiopacket.h"
 #include "audioconsumer.h"
 #include "audioprocessor.h"

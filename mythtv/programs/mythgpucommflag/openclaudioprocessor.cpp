@@ -2,7 +2,7 @@
 #include <strings.h>
 
 #include "mythlogging.h"
-#include "resultslist.h"
+#include "flagresults.h"
 #include "openclinterface.h"
 #include "audioprocessor.h"
 #include "audiopacket.h"

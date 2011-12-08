@@ -3,7 +3,7 @@
 #include <strings.h>
 
 #include "mythlogging.h"
-#include "resultslist.h"
+#include "flagresults.h"
 #include "openclinterface.h"
 #include "videoprocessor.h"
 #include "videopacket.h"

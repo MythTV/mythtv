@@ -4,7 +4,7 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "packetqueue.h"
-#include "resultslist.h"
+#include "flagresults.h"
 #include "videoconsumer.h"
 #include "mythxdisplay.h"
 #include "videoouttypes.h"

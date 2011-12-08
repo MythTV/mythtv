@@ -5,7 +5,7 @@
 
 #include "queueconsumer.h"
 #include "packetqueue.h"
-#include "resultslist.h"
+#include "flagresults.h"
 #include "audioprocessor.h"
 
 class AudioConsumer : public QueueConsumer

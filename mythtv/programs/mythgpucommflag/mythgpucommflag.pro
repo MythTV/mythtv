@@ -31,7 +31,7 @@ LIBS += -lOpenCL -lglut -lGLEW
 HEADERS += commandlineparser.h
 HEADERS += openclinterface.h openglsupport.h
 HEADERS += packetqueue.h
-HEADERS += resultslist.h findingdefs.h
+HEADERS += flagresults.h findingdefs.h
 HEADERS += gpuplayer.h
 HEADERS += queueconsumer.h audioconsumer.h videoconsumer.h
 HEADERS += audioprocessor.h videoprocessor.h
@@ -40,7 +40,7 @@ HEADERS += videodecoder.h vdpauvideodecoder.h ffmpegvideodecoder.h
 
 SOURCES += main.cpp commandlineparser.cpp
 SOURCES += openclinterface.cpp
-SOURCES += packetqueue.cpp resultslist.cpp
+SOURCES += packetqueue.cpp flagresults.cpp
 SOURCES += gpuplayer.cpp
 SOURCES += queueconsumer.cpp audioconsumer.cpp videoconsumer.cpp
 SOURCES += audioprocessor.cpp videoprocessor.cpp

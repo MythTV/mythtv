@@ -5,7 +5,7 @@
 #include <QString>
 
 #include "openclinterface.h"
-#include "resultslist.h"
+#include "flagresults.h"
 
 typedef FlagResults *(*AudioProcessorFunc)(OpenCLDevice *, int16_t *, int, int,
                                            int64_t, int);

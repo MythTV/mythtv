@@ -1,5 +1,5 @@
-#ifndef _RESULTSLIST_H
-#define _RESULTSLIST_H
+#ifndef _FLAGRESULTS_H
+#define _FLAGRESULTS_H
 
 #include <QList>
 #include <QMap>

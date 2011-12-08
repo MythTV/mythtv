@@ -20,7 +20,7 @@ using namespace std;
 
 #include "openclinterface.h"
 #include "packetqueue.h"
-#include "resultslist.h"
+#include "flagresults.h"
 #include "audioconsumer.h"
 #include "videoconsumer.h"
 

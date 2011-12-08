@@ -2,7 +2,7 @@
 #define _QUEUECONSUMER_H
 
 #include "packetqueue.h"
-#include "resultslist.h"
+#include "flagresults.h"
 #include "mthread.h"
 #include "openclinterface.h"
 

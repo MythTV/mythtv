@@ -3,7 +3,7 @@
 
 #include "queueconsumer.h"
 #include "packetqueue.h"
-#include "resultslist.h"
+#include "flagresults.h"
 #include "mythxdisplay.h"
 #include "videodecoder.h"
 #include "videoouttypes.h"

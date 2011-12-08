@@ -1,6 +1,6 @@
 #include "mythlogging.h"
 #include "packetqueue.h"
-#include "resultslist.h"
+#include "flagresults.h"
 #include "queueconsumer.h"
 
 extern "C" {

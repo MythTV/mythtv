@@ -2,7 +2,7 @@
 #include <QMap>
 #include <QString>
 
-#include "resultslist.h"
+#include "flagresults.h"
 #include "mythlogging.h"
 
 FlagFindingsMap findingsMap;
