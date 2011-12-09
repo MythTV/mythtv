@@ -4507,7 +4507,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
         NormalSpeed(ctx);
         StopFFRew(ctx);
         SetBookmark(ctx);
-        ShowOSDPromptDeleteRecording(ctx, tr("Delete this recording?"));
+        ShowOSDPromptDeleteRecording(ctx, tr("Are you sure you want to delete:"));
     }
     else if (has_action(ACTION_JUMPTODVDROOTMENU, actions) && isdisc)
     {
@@ -11987,7 +11987,7 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
                                  "DIALOG_VIDEOEXIT_DELETEANDRERECORD_0");
             osd->DialogAddButton(tr("Yes, delete it"),
                                  "DIALOG_VIDEOEXIT_JUSTDELETE_0");
-            osd->DialogAddButton(tr("No, keep it, I changed my mind"),
+            osd->DialogAddButton(tr("No, keep it"),
                                  ACTION_STOP, false, true);
             if (!paused)
                 osd->DialogBack("", "DIALOG_PLAY_0_0", true);
@@ -12028,7 +12028,7 @@ bool TV::HandleOSDVideoExit(PlayerContext *ctx, QString action)
     else if (action == "CONFIRMDELETE")
     {
         hide = false;
-        ShowOSDPromptDeleteRecording(ctx, tr("Delete this recording?"),
+        ShowOSDPromptDeleteRecording(ctx, tr("Are you sure you want to delete:"),
                                      true);
     }
     else if (action == "SAVEPOSITIONANDEXIT" && bookmark_ok)
