@@ -8,9 +8,10 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 clfiles.path = $${PREFIX}/share/mythtv/mythgpucommflag/
-clfiles.files = audioVolumeLevel64.cl audioVolumeLevel.cl videoConvert.cl
-clfiles.files += videoHistogram.cl videoInverse.cl videoWavelet.cl
-clfiles.files += videoXCorrelate.cl videoAspect.cl
+clfiles.files  = kernels/audioVolumeLevel64.cl kernels/audioVolumeLevel.cl
+clfiles.files += kernels/videoConvert.cl kernels/videoWavelet.cl
+clfiles.files += kernels/videoHistogram.cl kernels/videoInverse.cl
+clfiles.files += kernels/videoXCorrelate.cl kernels/videoAspect.cl
 INSTALLS += clfiles
 
 QMAKE_CLEAN += $(TARGET)
@@ -18,12 +19,12 @@ QMAKE_CLEAN += $(TARGET)
 # For NVIDIA SDK
 SDK = /opt/NVIDIA_GPU_Computing_SDK
 INCLUDEPATH += $$SDK/OpenCL/common/inc
-LIBPATH += $$SDK/OpenCL/common/lib
+QMAKE_LIBDIR += $$SDK/OpenCL/common/lib
 
 # For AMD SDK
 #SDK = /opt/AMDAPP
 #INCLUDEPATH += $$SDK/include
-#LIBPATH += $$SDK/lib/x86_64
+#QMAKE_LIBDIR += $$SDK/lib/x86_64
 
 LIBS += -lOpenCL -lglut -lGLEW
 
