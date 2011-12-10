@@ -13,7 +13,7 @@ class VideoConsumer : public QueueConsumer
 {
   public:
     VideoConsumer(PacketQueue *inQ, ResultsMap *outMap, OpenCLDevice *dev);
-    ~VideoConsumer() { if (m_decoder) delete m_decoder; };
+    ~VideoConsumer();
     bool Initialize(void);
     void ProcessPacket(Packet *packet);
     void EnableX(void)  { m_useX = true; };

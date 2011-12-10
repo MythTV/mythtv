@@ -114,10 +114,6 @@ static bool DoesFileExist(ProgramInfo *program_info)
 
 int main(int argc, char **argv)
 {
-#if 0
-    setenv("__GL_NO_DSO_FINALIZER", "1", true);
-#endif
-
     // Parse commandline
     if (!cmdline.Parse(argc, argv))
     {
@@ -345,21 +341,20 @@ int main(int argc, char **argv)
     delete ctx;
     delete audioThread;
     delete videoThread;
-    delete devices[0];
-    delete devices[1];
 
     LOG(VB_GENERAL, LOG_INFO, QString("audioMarks: %1, videoMarks: %2")
         .arg(audioMarks.size()) .arg(videoMarks.size()));
 
     // Combine results maps into one map
-    ResultsMap findings(audioMarks);
-    findings.unite(videoMarks);
+    ResultsMap mergedMarks(audioMarks);
+    mergedMarks.unite(videoMarks);
+    ResultsMap *findings = mergedMarks.Compress(videoMarks.GetDuration());
 
     // Dump results to an output file
     QString audioDump = audioMarks.toString("Audio markings");
     QString videoDump = videoMarks.toString("Video markings");
-    QString mergedDump = findings.toString("Merged markings");
-    QString mergedPlot = findings.toGnuplot();
+    QString mergedDump = findings->toString("Merged markings");
+    QString mergedPlot = findings->toGnuplot();
 
     QFile dump("out/results");
     dump.open(QIODevice::WriteOnly);
@@ -383,9 +378,7 @@ int main(int argc, char **argv)
 
     // Send map to the db
 
-#if 0
-    unsetenv("__GL_NO_DSO_FINALIZER");
-#endif
+    delete findings;
     return(GENERIC_EXIT_OK);
 }
 

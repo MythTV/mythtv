@@ -12,7 +12,7 @@ class AudioConsumer : public QueueConsumer
 {
   public:
     AudioConsumer(PacketQueue *inQ, ResultsMap *outMap, OpenCLDevice *dev);
-    ~AudioConsumer() { av_free(m_audioSamples); };
+    ~AudioConsumer();
     bool Initialize(void) { return true; };
     void ProcessPacket(Packet *packet);
     void ProcessFrame(int16_t *samples, int size, int frames, int64_t pts,

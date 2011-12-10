@@ -14,33 +14,34 @@ class FlagFindings
 {
   public:
     FlagFindings(int type, int64_t value) : m_type(type), m_value(value) {};
+    FlagFindings(FlagFindings *other) : m_type(other->m_type),
+        m_value(other->m_value), m_offset(other->m_offset) {};
     ~FlagFindings() {};
     QString toString(void);
-
-    int m_type;
-    int64_t m_value;
-};
-
-typedef QList<FlagFindings *> FlagFindingsList;
-
-class FlagResults
-{
-  public:
-    FlagResults(AVPacket *pkt, FlagFindingsList *list) : m_findings(list)
-    {
-        m_valid = (pkt != NULL);
-    }
-
-    FlagResults(FlagFindingsList *list) : m_findings(list) {};
-    ~FlagResults() { delete m_findings; };
-    QString toString(void);
     QString toGnuplot(void);
+    void SetTiming(int64_t timestamp, int duration, int frameDuration,
+                   int offset = 0);
 
-    bool    m_valid;
+    int     m_type;
+    int64_t m_value;
+
     int64_t m_timestamp;
     int     m_duration;
+    int     m_frameDuration;
+    int     m_offset;       // Offset within video frame
+};
 
-    FlagFindingsList *m_findings;
+class ResultsMap;
+class FlagResults : public QList<FlagFindings *>
+{
+  public:
+    FlagResults() {};
+    ~FlagResults() {};
+
+    static FlagResults *Create(ResultsMap *map, int64_t timestamp);
+
+    QString toString(void);
+    QString toGnuplot(void);
 };
 
 class ResultsMap : public QMap<int64_t, FlagResults *>
@@ -48,6 +49,8 @@ class ResultsMap : public QMap<int64_t, FlagResults *>
   public:
     QString toString(QString title);
     QString toGnuplot(void);
+    ResultsMap *Compress(int frameDuration);
+    int64_t GetDuration(void);
 };
 
 typedef QMap<int, QString> FlagFindingsMap;

@@ -13,14 +13,14 @@
 #endif
 
 // Prototypes
-FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
-                              AVFrame *wavelet);
-FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
-                                     AVFrame *wavelet);
-FlagResults *OpenCLBlankFrameDetect(OpenCLDevice *dev, AVFrame *frame,
-                                    AVFrame *wavelet);
-FlagResults *OpenCLAspectChangeDetect(OpenCLDevice *dev, AVFrame *frame,
+FlagFindings *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
+                               AVFrame *wavelet);
+FlagFindings *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
                                       AVFrame *wavelet);
+FlagFindings *OpenCLBlankFrameDetect(OpenCLDevice *dev, AVFrame *frame,
+                                     AVFrame *wavelet);
+FlagFindings *OpenCLAspectChangeDetect(OpenCLDevice *dev, AVFrame *frame,
+                                       AVFrame *wavelet);
 
 VideoProcessorList *openCLVideoProcessorList;
 
@@ -1989,8 +1989,8 @@ void OpenCLCrop(OpenCLDevice *dev, VideoSurface *src, VideoSurface *dst,
 
 // Processors
 
-FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
-                              AVFrame *wavelet)
+FlagFindings *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
+                               AVFrame *wavelet)
 {
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Edge Detect");
 
@@ -2071,8 +2071,8 @@ FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
 }
 
 
-FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
-                                     AVFrame *wavelet)
+FlagFindings *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
+                                      AVFrame *wavelet)
 {
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Scene Change Detect");
 
@@ -2084,7 +2084,7 @@ FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
     }
 
     static int frameNum = 0;
-    FlagResults *results = NULL;
+    FlagFindings *findings = NULL;
     (void)wavelet;
 
     if (videoPacket->m_prevCorrelation)
@@ -2106,24 +2106,19 @@ FlagResults *OpenCLSceneChangeDetect(OpenCLDevice *dev, AVFrame *frame,
 #undef DEBUG_VIDEO
 #endif
 
-            FlagFindingsList *list = new FlagFindingsList();
-            FlagFindings *finding = 
-                new FlagFindings(kFindingVideoSceneChange, true);
-            list->append(finding);
-
-            results = new FlagResults(list);
+            findings = new FlagFindings(kFindingVideoSceneChange, true);
         }
     }
 
     frameNum++;
 
     LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Scene Change Detect");
-    return results;
+    return findings;
 }
 
 
-FlagResults *OpenCLBlankFrameDetect(OpenCLDevice *dev, AVFrame *frame,
-                                    AVFrame *wavelet)
+FlagFindings *OpenCLBlankFrameDetect(OpenCLDevice *dev, AVFrame *frame,
+                                     AVFrame *wavelet)
 {
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Blank Frame Detect");
 
@@ -2134,7 +2129,7 @@ FlagResults *OpenCLBlankFrameDetect(OpenCLDevice *dev, AVFrame *frame,
         return NULL;
     }
 
-    FlagResults *results = NULL;
+    FlagFindings *findings = NULL;
     (void)wavelet;
 
     bool found;
@@ -2143,22 +2138,16 @@ FlagResults *OpenCLBlankFrameDetect(OpenCLDevice *dev, AVFrame *frame,
 
     if (found)
     {
-        FlagFindingsList *list = new FlagFindingsList();
-        FlagFindings *finding = 
-            new FlagFindings(kFindingVideoBlankFrame, true);
-        list->append(finding);
-
-        results = new FlagResults(list);
-
+        findings = new FlagFindings(kFindingVideoBlankFrame, true);
         videoPacket->m_blank = true;
     }
 
     LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Blank Frame Detect");
-    return results;
+    return findings;
 }
 
-FlagResults *OpenCLAspectChangeDetect(OpenCLDevice *dev, AVFrame *frame,
-                                      AVFrame *wavelet)
+FlagFindings *OpenCLAspectChangeDetect(OpenCLDevice *dev, AVFrame *frame,
+                                       AVFrame *wavelet)
 {
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Aspect Change Detect");
 
@@ -2169,7 +2158,7 @@ FlagResults *OpenCLAspectChangeDetect(OpenCLDevice *dev, AVFrame *frame,
         return NULL;
     }
 
-    FlagResults *results = NULL;
+    FlagFindings *findings = NULL;
     (void)wavelet;
 
     if (videoPacket->m_blank)
@@ -2193,16 +2182,11 @@ FlagResults *OpenCLAspectChangeDetect(OpenCLDevice *dev, AVFrame *frame,
             .arg(videoPacket->m_aspect->Height())
             .arg(videoPacket->m_aspect->NearestRatio()));
 
-        FlagFindingsList *list = new FlagFindingsList();
-        FlagFindings *finding = 
-            new FlagFindings(kFindingVideoAspectChange, true);
-        list->append(finding);
-
-        results = new FlagResults(list);
+        findings = new FlagFindings(kFindingVideoAspectChange, true);
     }
 
     LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Aspect Change Detect");
-    return results;
+    return findings;
 }
 
 

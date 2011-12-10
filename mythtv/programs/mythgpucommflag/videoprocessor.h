@@ -12,8 +12,8 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-typedef FlagResults *(*VideoProcessorFunc)(OpenCLDevice *, AVFrame *frame,
-                                           AVFrame *wavelet);
+typedef FlagFindings *(*VideoProcessorFunc)(OpenCLDevice *, AVFrame *frame,
+                                            AVFrame *wavelet);
 
 typedef struct {
     QString name;

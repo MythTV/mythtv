@@ -13,8 +13,8 @@
 
 // Prototypes
 void OpenCLVolumeLevelCleanup(cl_mem **bufs);
-FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
-                               int count, int64_t pts, int rate);
+FlagFindings *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
+                                int count, int64_t pts, int rate);
 
 AudioProcessorList *openCLAudioProcessorList;
 
@@ -32,8 +32,8 @@ void InitOpenCLAudioProcessors(void)
 
 #define KERNEL_VOLUME_CL "audioVolumeLevel.cl"
 #define KERNEL_VOLUME_64_CL "audioVolumeLevel64.cl"
-FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
-                               int count, int64_t pts, int rate)
+FlagFindings *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
+                                int count, int64_t pts, int rate)
 {
     LOG(VB_GPUAUDIO, LOG_INFO, "OpenCL Volume Level");
 
@@ -306,21 +306,14 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
         .arg(intStats[2]) .arg(intStats[3]));
 #endif
 
-    FlagFindings *finding = NULL;
+    FlagFindings *findings = NULL;
 
     if (deltaRMSdB >= 6.0)
-        finding = new FlagFindings(kFindingAudioHigh, true);
+        findings = new FlagFindings(kFindingAudioHigh, true);
     else if (deltaRMSdB <= -12.0)
-        finding = new FlagFindings(kFindingAudioLow, true);
+        findings = new FlagFindings(kFindingAudioLow, true);
 
-    if (!finding)
-        return NULL;
-
-    FlagFindingsList *findings = new FlagFindingsList();
-    findings->append(finding);
-    FlagResults *results = new FlagResults(findings);
-
-    return results;
+    return findings;
 }
 
 

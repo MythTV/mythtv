@@ -27,6 +27,13 @@ AudioConsumer::AudioConsumer(PacketQueue *inQ, ResultsMap *outMap,
 
     m_context = avcodec_alloc_context();
 }
+    
+AudioConsumer::~AudioConsumer()
+{
+    av_free(m_audioSamples);
+    if (m_dev)
+        delete m_dev;
+};
 
 void AudioConsumer::ProcessPacket(Packet *packet)
 {
@@ -137,19 +144,19 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
         AudioProcessor *proc = *it;
 
         // Run the routine in GPU/CPU & pull results
-        FlagResults *result = proc->m_func(m_dev, samples, size, frames, pts,
-                                           rate);
+        FlagFindings *findings = proc->m_func(m_dev, samples, size, frames, pts,
+                                              rate);
 
         // Toss the results onto the results list
-        if (result)
+        if (findings)
         {
             static const AVRational realTimeBase = { 1, 1000 };
             LOG(VB_GENERAL, LOG_INFO, "Audio Finding found");
             pts = av_rescale_q(pts, realTimeBase, m_timebase);
-            result->m_timestamp = NormalizeTimecode(pts);;
-            result->m_duration = duration;
-            LOG(VB_GENERAL, LOG_INFO, result->toString());
-            m_outMap->insertMulti(result->m_timestamp, result);
+            int64_t timestamp = NormalizeTimecode(pts);
+            FlagResults *result = FlagResults::Create(m_outMap, timestamp);
+            findings->SetTiming(timestamp, duration, duration, 0);
+            result->append(findings);
         }
     }
 

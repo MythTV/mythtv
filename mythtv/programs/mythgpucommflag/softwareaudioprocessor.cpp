@@ -9,8 +9,8 @@
 #endif
 
 // Prototypes
-FlagResults *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
-                                 int count, int64_t pts, int rate);
+FlagFindings *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
+                                  int count, int64_t pts, int rate);
 
 AudioProcessorList *softwareAudioProcessorList;
 
@@ -26,8 +26,8 @@ void InitSoftwareAudioProcessors(void)
 }
 
 #define MAX_ACCUM (((uint64_t)(~1)) - (0xFFFFLL * 0xFFFFLL))
-FlagResults *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
-                                 int count, int64_t pts, int rate)
+FlagFindings *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
+                                  int count, int64_t pts, int rate)
 {
     static uint64_t accumSRMS = 0;
     static int accumSRMSShift = 0;
@@ -142,21 +142,14 @@ FlagResults *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
         .arg(maxsample) .arg(DNRdB) .arg(overallDC));
 #endif
 
-    FlagFindings *finding = NULL;
+    FlagFindings *findings = NULL;
 
     if (deltaRMSdB >= 6.0)
-        finding = new FlagFindings(kFindingAudioHigh, true);
+        findings = new FlagFindings(kFindingAudioHigh, true);
     else if (deltaRMSdB <= -12.0)
-        finding = new FlagFindings(kFindingAudioLow, true);
+        findings = new FlagFindings(kFindingAudioLow, true);
 
-    if (!finding)
-        return NULL;
-
-    FlagFindingsList *findings = new FlagFindingsList();
-    findings->append(finding);
-    FlagResults *results = new FlagResults(findings);
-
-    return results;
+    return findings;
 }
 
 /*

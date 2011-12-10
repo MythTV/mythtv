@@ -46,6 +46,14 @@ VideoConsumer::VideoConsumer(PacketQueue *inQ, ResultsMap *outMap,
     m_context = avcodec_alloc_context();
 }
 
+VideoConsumer::~VideoConsumer()
+{
+    if (m_decoder)
+        delete m_decoder;
+    if (m_dev)
+        delete m_dev;
+}
+
 bool VideoConsumer::Initialize(void)
 {
     m_decoder = NULL;
@@ -265,16 +273,17 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         VideoProcessor *proc = *it;
 
         // Run the routine in GPU/CPU & pull results
-        FlagResults *result = proc->m_func(m_dev, &mpa_pic, wavelet);
+        FlagFindings *finding = proc->m_func(m_dev, &mpa_pic, wavelet);
 
         // Toss the results onto the results list
-        if (result)
+        if (finding)
         {
             LOG(VB_GENERAL, LOG_INFO, "Video Finding found");
-            result->m_timestamp = NormalizeTimecode(pkt->pts);
-            result->m_duration = NormalizeDuration(pkt->duration);
-            LOG(VB_GENERAL, LOG_INFO, result->toString());
-            m_outMap->insertMulti(result->m_timestamp, result);
+            int64_t timestamp = NormalizeTimecode(pkt->pts);
+            int duration = NormalizeDuration(pkt->duration);
+            FlagResults *result = FlagResults::Create(m_outMap, timestamp);
+            finding->SetTiming(timestamp, duration, duration, 0);
+            result->append(finding);
         }
     }
 
