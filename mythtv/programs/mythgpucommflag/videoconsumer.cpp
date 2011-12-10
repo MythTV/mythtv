@@ -113,6 +113,29 @@ void VideoConsumer::ProcessPacket(Packet *packet)
 {
     LOG(VB_GENERAL, LOG_INFO, "Video Frame");
 
+    static uint64_t count = 0;
+    static VideoSurface *prevYUV = NULL;
+    static VideoSurface *prevRGB = NULL;
+    static VideoSurface *prevWavelet = NULL;
+    static VideoHistogram *prevHistogram = NULL;
+    static VideoHistogram *prevCorrelation = NULL;
+    static VideoAspect *prevAspect = NULL;
+
+    if (!packet)
+    {
+        if (prevYUV)
+            prevYUV->DownRef();
+        if (prevRGB)
+            prevRGB->DownRef();
+        if (prevWavelet)
+            prevWavelet->DownRef();
+        if (prevCorrelation)
+            prevCorrelation->DownRef();
+        if (prevAspect)
+            prevAspect->DownRef();
+        return;
+    }
+
     AVStream *curstream = packet->m_stream;
     AVPacket *pkt = packet->m_pkt;
     QMutex   *avcodeclock = packet->m_mutex;
@@ -190,13 +213,6 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         return;
 
     VideoPacket *videoFrame = NULL;
-    static uint64_t count = 0;
-    static VideoSurface *prevYUV = NULL;
-    static VideoSurface *prevRGB = NULL;
-    static VideoSurface *prevWavelet = NULL;
-    static VideoHistogram *prevHistogram = NULL;
-    static VideoHistogram *prevCorrelation = NULL;
-    static VideoAspect *prevAspect = NULL;
 
     // Push YUV frame to GPU/CPU Processing memory
     if (m_dev)

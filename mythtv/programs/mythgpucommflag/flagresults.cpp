@@ -49,6 +49,20 @@ QString FlagResults::toString(void)
     return str;
 }
 
+QString FlagResults::toGnuplot(void)
+{
+    FlagFindingsList::iterator it;
+    QString str("");
+
+    for (it = m_findings->begin(); it != m_findings->end(); ++it)
+    {
+        FlagFindings *finding = *it;
+        str += QString("%1 %2 %3\n") .arg(m_timestamp)
+            .arg(m_timestamp + m_duration - 1) .arg(finding->m_type + 1);
+    }
+    return str;
+}
+
 QString ResultsMap::toString(QString title)
 {
     ResultsMap::iterator it;
@@ -62,6 +76,18 @@ QString ResultsMap::toString(QString title)
     return str;
 }
 
+QString ResultsMap::toGnuplot(void)
+{
+    ResultsMap::iterator it;
+    QString str("");
+
+    for (it = begin(); it != end(); ++it)
+    {
+        FlagResults *results = it.value();
+        str += results->toGnuplot();
+    }
+    return str;
+}
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
  */

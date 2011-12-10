@@ -30,8 +30,17 @@ typedef enum {
 
 class OpenCLDeviceSpecific;
 class OpenCLKernel;
-typedef QMap<QString, OpenCLKernel *> OpenCLKernelMap;
-typedef QMap<QString, cl_program> OpenCLProgramMap;
+class OpenCLKernelMap : public QMap<QString, OpenCLKernel *>
+{
+  public:
+    void Empty(void);
+};
+
+class OpenCLProgramMap : public QMap<QString, cl_program>
+{
+  public:
+    void Empty(void);
+};
 
 typedef struct {
     OpenCLKernel *kernel;

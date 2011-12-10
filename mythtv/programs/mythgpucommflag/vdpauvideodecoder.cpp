@@ -27,6 +27,7 @@ extern "C" {
 
 extern Display *mythDisplay;
 extern int mythScreen;
+int glutWindow = 0;
 
 static const char* dummy_get_error_string(VdpStatus status);
 
@@ -182,8 +183,7 @@ bool openGLInitialize(void)
 
     glutInit(&argc, (char **)argv);
     // glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-    int glutWindow = glutCreateWindow("OpenCL/GL Interop");
-    (void)glutWindow;
+    glutWindow = glutCreateWindow("OpenCL/GL Interop");
 
     LOG(VB_GENERAL, LOG_INFO, QString("VDPAU: OpenGL Version %1")
         .arg((char *)glGetString(GL_VERSION)));
@@ -293,6 +293,9 @@ void VDPAUVideoDecoder::Shutdown(void)
 
     if (vdp_device_destroy && m_device)
         vdp_device_destroy(m_device);
+
+    if (glutWindow)
+        glutDestroyWindow(glutWindow);
 
     if (m_display)
     {

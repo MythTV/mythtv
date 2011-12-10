@@ -34,6 +34,7 @@ class FlagResults
     FlagResults(FlagFindingsList *list) : m_findings(list) {};
     ~FlagResults() { delete m_findings; };
     QString toString(void);
+    QString toGnuplot(void);
 
     bool    m_valid;
     int64_t m_timestamp;
@@ -46,6 +47,7 @@ class ResultsMap : public QMap<int64_t, FlagResults *>
 {
   public:
     QString toString(QString title);
+    QString toGnuplot(void);
 };
 
 typedef QMap<int, QString> FlagFindingsMap;

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdlib.h>
 using namespace std;
 
 #include <QApplication>
@@ -113,6 +114,10 @@ static bool DoesFileExist(ProgramInfo *program_info)
 
 int main(int argc, char **argv)
 {
+#if 0
+    setenv("__GL_NO_DSO_FINALIZER", "1", true);
+#endif
+
     // Parse commandline
     if (!cmdline.Parse(argc, argv))
     {
@@ -338,24 +343,49 @@ int main(int argc, char **argv)
 
     // Close file
     delete ctx;
+    delete audioThread;
+    delete videoThread;
+    delete devices[0];
+    delete devices[1];
 
     LOG(VB_GENERAL, LOG_INFO, QString("audioMarks: %1, videoMarks: %2")
         .arg(audioMarks.size()) .arg(videoMarks.size()));
 
+    // Combine results maps into one map
+    ResultsMap findings(audioMarks);
+    findings.unite(videoMarks);
+
     // Dump results to an output file
-    QFile dump("out/results");
-    dump.open(QIODevice::WriteOnly);
     QString audioDump = audioMarks.toString("Audio markings");
     QString videoDump = videoMarks.toString("Video markings");
+    QString mergedDump = findings.toString("Merged markings");
+    QString mergedPlot = findings.toGnuplot();
+
+    QFile dump("out/results");
+    dump.open(QIODevice::WriteOnly);
     dump.write(audioDump.toAscii());
     dump.write(videoDump.toAscii());
     dump.close();
 
+    dump.setFileName("out/merged-results");
+    dump.open(QIODevice::WriteOnly);
+    dump.write(mergedDump.toAscii());
+    dump.close();
+
+    dump.setFileName("out/merged.plt");
+    dump.open(QIODevice::WriteOnly);
+    dump.write(mergedPlot.toAscii());
+    dump.close();
+    
+    
     // Loop:
         // Summarize the various criteria to get commercial flag map
 
     // Send map to the db
-    
+
+#if 0
+    unsetenv("__GL_NO_DSO_FINALIZER");
+#endif
     return(GENERIC_EXIT_OK);
 }
 

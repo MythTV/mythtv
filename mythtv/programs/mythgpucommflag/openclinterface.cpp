@@ -512,6 +512,12 @@ OpenCLDevice::~OpenCLDevice()
         delete [] m_props;
         m_props = NULL;
     }
+
+    m_kernelMap.Empty();
+    m_programMap.Empty();
+
+    clReleaseCommandQueue(m_commandQ);
+    clReleaseContext(m_context);
 }
 
 uint64_t OpenCLDevice::GetHash(void)
@@ -991,7 +997,6 @@ QString OpenCLKernel::GetCacheFilename(OpenCLDevice *dev, QString filename)
 OpenCLKernel::~OpenCLKernel()
 {
     clReleaseKernel(m_kernel);
-    clReleaseProgram(m_program);
 }
 
 OpenCLBuffers::OpenCLBuffers(int count) : m_count(count)
@@ -1205,6 +1210,26 @@ unsigned int nextPow2( unsigned int x )
     return ++x;
 }
 
+void OpenCLKernelMap::Empty(void)
+{
+    OpenCLKernelMap::iterator it;
+
+    for (it = begin(); it != end(); it = erase(it))
+    {
+        delete it.value();
+    }
+}
+
+void OpenCLProgramMap::Empty(void)
+{
+    OpenCLProgramMap::iterator it;
+
+    for (it = begin(); it != end(); it = erase(it))
+    {
+        cl_program prog = it.value();
+        clReleaseProgram(prog);
+    }
+}
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

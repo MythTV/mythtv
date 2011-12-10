@@ -32,6 +32,9 @@ void AudioConsumer::ProcessPacket(Packet *packet)
 {
     LOG(VB_GENERAL, LOG_INFO, "Audio Packet");
 
+    if (!packet)
+        return;
+
     // Decode the packet to PCM
     AVStream *curstream = packet->m_stream;
     AVPacket *pkt = packet->m_pkt;
@@ -140,7 +143,7 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
         // Toss the results onto the results list
         if (result)
         {
-            static AVRational realTimeBase = { 1, 1000 };
+            static const AVRational realTimeBase = { 1, 1000 };
             LOG(VB_GENERAL, LOG_INFO, "Audio Finding found");
             pts = av_rescale_q(pts, realTimeBase, m_timebase);
             result->m_timestamp = NormalizeTimecode(pts);;

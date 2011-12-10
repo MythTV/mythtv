@@ -31,6 +31,9 @@ void QueueConsumer::run(void)
         delete packet;
     }
 
+    // Allow the inner code to clear out "previous" frame info
+    ProcessPacket(NULL);
+
     LOG(VB_GENERAL, LOG_INFO, QString("Ending %1").arg(m_name));
     RunEpilog();
 }
