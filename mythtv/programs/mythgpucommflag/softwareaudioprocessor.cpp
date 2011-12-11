@@ -16,6 +16,7 @@ AudioProcessorList *softwareAudioProcessorList;
 
 AudioProcessorInit softwareAudioProcessorInit[] = {
     { "Volume Level", SoftwareVolumeLevel },
+    { "Channel Count", CommonChannelCount },
     { "", NULL }
 };
 
@@ -41,9 +42,7 @@ FlagFindings *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     int channels = size / count / sizeof(int16_t);
     int sampleCount = count * channels;
 
-#if 0
-    LOG(VB_GENERAL, LOG_INFO, "Software Volume Level");
-#endif
+    LOG(VB_GPUAUDIO, LOG_INFO, "Software Volume Level");
 
     // Accumulate this frame's partial squared RMS
     for (int i = 0; i < sampleCount; i++)
@@ -64,7 +63,7 @@ FlagFindings *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     }
 
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, 
+    LOG(VB_GPUAUDIO, LOG_DEBUG, 
         QString("accum: %1, accumShift: %2, sampleCount: %3")
         .arg(accum) .arg(accumShift) .arg(sampleCount));
 #endif
@@ -77,7 +76,7 @@ FlagFindings *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
 
     float windowRMSdB = 20.0 * log10((double)windowRMS / 32767.0);
     int64_t windowDC = accumWindowDC / sampleCount;
-    LOG(VB_GENERAL, LOG_INFO, QString("Window DC: %1").arg(windowDC));
+    LOG(VB_GPUAUDIO, LOG_INFO, QString("Window DC: %1").arg(windowDC));
 
     // Check overall SRMS for potential overflow
     if (accumSRMS >= MAX_ACCUM)
@@ -106,7 +105,7 @@ FlagFindings *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     int64_t overallDC = accumDC / (int64_t)accumSample;
 
 #if 0
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GPUAUDIO, LOG_INFO,
         QString("accumDC: %1  accumSample: %2  overallDC: %3")
         .arg(accumDC) .arg(accumSample) .arg(overallDC));
 #endif
@@ -118,7 +117,7 @@ FlagFindings *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     float DNRdB = 20.0 * log10((double)maxsample / (double) windowRMS);
 
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG,
+    LOG(VB_GPUAUDIO, LOG_DEBUG,
         QString("accumSRMS: %1, accumSRMSShift: %2, accumSample: %3")
         .arg(accumSRMS) .arg(accumSRMSShift) .arg(accumSample));
 #endif
@@ -134,21 +133,23 @@ FlagFindings *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     float deltaRMSdB = windowRMSdB - overallRMSdB;
 
 #if 1
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GPUAUDIO, LOG_INFO,
         QString("Window RMS: %1 (%2 dB), Overall RMS: %3 (%4 dB), Delta: %5 dB")
         .arg(windowRMS) .arg(windowRMSdB) .arg(overallRMS) .arg(overallRMSdB)
         .arg(deltaRMSdB));
-    LOG(VB_GENERAL, LOG_INFO, QString("Peak: %1  DNR: %2 dB  (DC: %3)")
+    LOG(VB_GPUAUDIO, LOG_INFO, QString("Peak: %1  DNR: %2 dB  (DC: %3)")
         .arg(maxsample) .arg(DNRdB) .arg(overallDC));
 #endif
 
     FlagFindings *findings = NULL;
+    int64_t delta = (int64_t)(deltaRMSdB * 100.0);
 
     if (deltaRMSdB >= 6.0)
-        findings = new FlagFindings(kFindingAudioHigh, true);
+        findings = new FlagFindings(kFindingAudioHigh, delta);
     else if (deltaRMSdB <= -12.0)
-        findings = new FlagFindings(kFindingAudioLow, true);
+        findings = new FlagFindings(kFindingAudioLow, delta);
 
+    LOG(VB_GPUAUDIO, LOG_INFO, "Done Software Volume Level");
     return findings;
 }
 

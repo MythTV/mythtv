@@ -302,7 +302,8 @@ void VideoConsumer::ProcessPacket(Packet *packet)
         if (prevCorrelation)
             prevCorrelation->UpRef();
         prevAspect = videoFrame->m_aspect;
-        prevAspect->UpRef();
+        if (prevAspect)
+            prevAspect->UpRef();
         delete videoFrame;
     }
 }

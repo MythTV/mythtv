@@ -40,6 +40,9 @@ void InitAudioProcessors(void);
 void InitOpenCLAudioProcessors(void);
 void InitSoftwareAudioProcessors(void);
 
+FlagFindings *CommonChannelCount(OpenCLDevice *dev, int16_t *samples, int size,
+                                 int count, int64_t pts, int rate);
+
 #endif
 
 /*

@@ -20,6 +20,7 @@ AudioProcessorList *openCLAudioProcessorList;
 
 AudioProcessorInit openCLAudioProcessorInit[] = {
     { "Volume Level", OpenCLVolumeLevel },
+    { "Channel Count", CommonChannelCount },
     { "", NULL }
 };
 
@@ -307,12 +308,14 @@ FlagFindings *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
 #endif
 
     FlagFindings *findings = NULL;
+    int64_t delta = (int64_t)(deltaRMSdB * 100.0);
 
     if (deltaRMSdB >= 6.0)
-        findings = new FlagFindings(kFindingAudioHigh, true);
+        findings = new FlagFindings(kFindingAudioHigh, delta);
     else if (deltaRMSdB <= -12.0)
-        findings = new FlagFindings(kFindingAudioLow, true);
+        findings = new FlagFindings(kFindingAudioLow, delta);
 
+    LOG(VB_GPUAUDIO, LOG_INFO, "Done OpenCL Volume Level");
     return findings;
 }
 

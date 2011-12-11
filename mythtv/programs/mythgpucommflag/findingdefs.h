@@ -34,10 +34,11 @@
 FINDINGS_PREAMBLE
 FINDINGS_MAP(kFindingAudioHigh,         0, "Audio more than 6dB above average")
 FINDINGS_MAP(kFindingAudioLow,          1, "Audio more than 12dB below average")
-FINDINGS_MAP(kFindingVideoBlankFrame,   2, "Blank video frame")
-FINDINGS_MAP(kFindingVideoSceneChange,  3, "Video scene change")
-FINDINGS_MAP(kFindingVideoAspectChange, 4, "Video aspect ratio change")
-FINDINGS_MAP(kFindingVideoLogoChange,   5, "Video logo presence change")
+FINDINGS_MAP(kFindingAudioChannelCount, 2, "Audio channel count change")
+FINDINGS_MAP(kFindingVideoBlankFrame,   3, "Blank video frame")
+FINDINGS_MAP(kFindingVideoSceneChange,  4, "Video scene change")
+FINDINGS_MAP(kFindingVideoAspectChange, 5, "Video aspect ratio change")
+FINDINGS_MAP(kFindingVideoLogoChange,   6, "Video logo presence change")
 FINDINGS_POSTAMBLE
 
 #endif

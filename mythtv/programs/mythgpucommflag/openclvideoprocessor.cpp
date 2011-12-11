@@ -2173,7 +2173,7 @@ FlagFindings *OpenCLAspectChangeDetect(OpenCLDevice *dev, AVFrame *frame,
     if (videoPacket->m_prevAspect &&
         !videoPacket->m_aspect->Compare(videoPacket->m_prevAspect))
     {
-        LOG(VB_GENERAL, LOG_INFO,
+        LOG(VB_GPUVIDEO, LOG_INFO,
             QString("Aspect changed from %1x%2 (%3) to %4x%5 (%6)")
             .arg(videoPacket->m_prevAspect->Width())
             .arg(videoPacket->m_prevAspect->Height())
@@ -2182,7 +2182,9 @@ FlagFindings *OpenCLAspectChangeDetect(OpenCLDevice *dev, AVFrame *frame,
             .arg(videoPacket->m_aspect->Height())
             .arg(videoPacket->m_aspect->NearestRatio()));
 
-        findings = new FlagFindings(kFindingVideoAspectChange, true);
+        int64_t ratio = (int64_t)(videoPacket->m_aspect->NearestRatio() *
+                                  1000000.0);
+        findings = new FlagFindings(kFindingVideoAspectChange, ratio);
     }
 
     LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Aspect Change Detect");

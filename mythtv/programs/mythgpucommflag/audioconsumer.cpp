@@ -167,7 +167,6 @@ void AudioConsumer::ProcessFrame(int16_t *samples, int size, int frames,
     }
 }
 
-
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
  */
