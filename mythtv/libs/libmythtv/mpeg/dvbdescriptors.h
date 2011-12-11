@@ -1738,7 +1738,6 @@ class TeletextDescriptor : public MPEGDescriptor
     uint TeletextPageNum(uint i) const
         { return _data[6 + (i*5)]; }
     // }                           5.0
-    QString toString(void) const;
 };
 
 class TimeShiftedEventDescriptor : public MPEGDescriptor
