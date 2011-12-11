@@ -63,13 +63,14 @@ QString entryToString(VAEntrypoint entry)
 
 VAProfile preferredProfile(MythCodecID codec)
 {
-    // FIXME handle unsupported codecs properly
     if (kCodec_H263_VAAPI  == codec) return VAProfileMPEG4AdvancedSimple;
     if (kCodec_MPEG4_VAAPI == codec) return VAProfileMPEG4AdvancedSimple;
     if (kCodec_H264_VAAPI  == codec) return VAProfileH264High;
     if (kCodec_VC1_VAAPI   == codec) return VAProfileVC1Advanced;
     if (kCodec_WMV3_VAAPI  == codec) return VAProfileVC1Main;
-    return VAProfileMPEG2Main;
+    if (kCodec_MPEG2_VAAPI == codec) return VAProfileMPEG2Main;
+    if (kCodec_MPEG1_VAAPI == codec) return VAProfileMPEG2Main;
+    return VAProfileMPEG2Simple; // error
 }
 
 class VAAPIDisplay
@@ -443,7 +444,13 @@ bool VAAPIContext::InitProfiles(void)
     MythXLocker locker(m_display->m_x_disp);
     int max_profiles, max_entrypoints;
     VAProfile profile_wanted = preferredProfile(m_codec);
-    VAProfile profile_found  = VAProfileMPEG2Main;   // FIXME
+    if (profile_wanted == VAProfileMPEG2Simple)
+    {
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Codec is not supported.");
+        return false;
+    }
+
+    VAProfile profile_found  = VAProfileMPEG2Simple; // unsupported value
     VAEntrypoint entry_found = VAEntrypointEncSlice; // unsupported value
 
     max_profiles          = vaMaxNumProfiles(m_ctx.display);
