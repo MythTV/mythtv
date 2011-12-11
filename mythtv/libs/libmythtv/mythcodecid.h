@@ -79,6 +79,8 @@ typedef enum
                               (id != kCodec_VP8_VDPAU))
 #define codec_is_vaapi(id)    (id > kCodec_VAAPI_BEGIN) &&\
                               (id < kCodec_VAAPI_END)
+#define codec_is_vaapi_hw(id) (codec_is_vaapi(id) &&\
+                              (id != kCodec_VP8_VAAPI))
 #define codec_is_dxva2(id)    (id > kCodec_DXVA2_BEGIN) &&\
                               (id < kCodec_DXVA2_END)
 #define codec_is_dxva2_hw(id) (codec_is_dxva2(id) &&\

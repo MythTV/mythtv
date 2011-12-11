@@ -438,7 +438,7 @@ bool VAAPIContext::InitDisplay(void)
 
 bool VAAPIContext::InitProfiles(void)
 {
-    if (!(codec_is_vaapi(m_codec)) || !m_ctx.display)
+    if (!(codec_is_vaapi_hw(m_codec)) || !m_ctx.display)
         return false;
 
     MythXLocker locker(m_display->m_x_disp);
