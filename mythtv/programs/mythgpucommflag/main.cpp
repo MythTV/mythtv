@@ -348,13 +348,20 @@ int main(int argc, char **argv)
     // Combine results maps into one map
     ResultsMap mergedMarks(audioMarks);
     mergedMarks.unite(videoMarks);
-    ResultsMap *findings = mergedMarks.Compress(videoMarks.GetDuration());
+
+    ResultsMap *findings = mergedMarks.Normalize(videoMarks.GetFrameDuration());
+    ResultsTypeMap *typeMap = findings->RemapByType();
 
     // Dump results to an output file
     QString audioDump = audioMarks.toString("Audio markings");
     QString videoDump = videoMarks.toString("Video markings");
     QString mergedDump = findings->toString("Merged markings");
+    QString remapDump = typeMap->toString();
     QString mergedPlot = findings->toGnuplot();
+
+    // To avoid double deletion of the static maps.
+    audioMarks.clear();
+    videoMarks.clear();
 
     QFile dump("out/results");
     dump.open(QIODevice::WriteOnly);
@@ -367,6 +374,11 @@ int main(int argc, char **argv)
     dump.write(mergedDump.toAscii());
     dump.close();
 
+    dump.setFileName("out/remapped-results");
+    dump.open(QIODevice::WriteOnly);
+    dump.write(remapDump.toAscii());
+    dump.close();
+
     dump.setFileName("out/merged.plt");
     dump.open(QIODevice::WriteOnly);
     dump.write(mergedPlot.toAscii());
@@ -374,7 +386,31 @@ int main(int argc, char **argv)
     
     
     // Loop:
-        // Summarize the various criteria to get commercial flag map
+    ResultsMap *blanks = typeMap->value((int)kFindingVideoBlankFrame, NULL);
+    if (blanks)
+    {
+        ResultsMap::iterator it;
+        for (it = blanks->begin(); it != blanks->end(); ++it)
+        {
+            FlagResults *blankResult = it.value();
+            FlagResults::iterator it2;
+            for (it2 = blankResult->begin(); it2 != blankResult->end(); ++it2)
+            {
+                FlagFindings *blankFinding = *it2;
+                FlagResults *timeResult =
+                    typeMap->FindingsAtTime(blankFinding->GetAbsStart(),
+                                            blankFinding->GetAbsEnd(),
+                                            blankFinding->m_frameDuration);
+                if (timeResult)
+                {
+                    LOG(VB_GENERAL, LOG_INFO, timeResult->toString());
+                    delete timeResult;
+                }
+            }
+        }
+
+        delete blanks;
+    }
 
     // Send map to the db
 

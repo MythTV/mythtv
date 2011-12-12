@@ -63,6 +63,17 @@ void FlagFindings::SetTiming(int64_t timestamp, int duration, int frameDuration,
     m_offset = offset;
 }
 
+FlagResults::~FlagResults()
+{
+    FlagResults::iterator it;
+    for (it = begin(); it != end(); )
+    {
+        FlagFindings *finding = *it;
+        it = erase(it);
+        delete finding;
+    }
+}
+
 QString FlagResults::toString(void)
 {
     FlagResults::iterator it;
@@ -93,7 +104,9 @@ QString FlagResults::toGnuplot(void)
 FlagResults *FlagResults::Create(ResultsMap *map, int64_t timestamp)
 {
     FlagResults *results;
-    if (map->contains(timestamp))
+    if (!map)
+        results = new FlagResults;
+    else if (map->contains(timestamp))
         results = map->value(timestamp);
     else
     {
@@ -102,6 +115,17 @@ FlagResults *FlagResults::Create(ResultsMap *map, int64_t timestamp)
     }
 
     return results;
+}
+
+ResultsMap::~ResultsMap()
+{
+    ResultsMap::iterator it;
+    for (it = begin(); it != end(); ++it)
+    {
+        FlagResults *result = it.value();
+        delete result;
+    }
+    clear();
 }
 
 QString ResultsMap::toString(QString title)
@@ -130,7 +154,7 @@ QString ResultsMap::toGnuplot(void)
     return str;
 }
 
-ResultsMap *ResultsMap::Compress(int frameDuration)
+ResultsMap *ResultsMap::Normalize(int frameDuration)
 {
     if (frameDuration == 0)
         return NULL;
@@ -149,9 +173,9 @@ ResultsMap *ResultsMap::Compress(int frameDuration)
         int remainDuration = oldFinding->m_duration;
         int64_t timestamp = oldFinding->m_timestamp / frameDuration;
         int offset = oldFinding->m_timestamp - (timestamp * frameDuration);
-        int duration = MIN(remainDuration, frameDuration - offset);
 
         do {
+            int duration = MIN(remainDuration, frameDuration - offset);
             for (it2 = oldResults->begin(); it2 != oldResults->end(); ++it2)
             {
                 FlagResults *results = FlagResults::Create(newMap, timestamp);
@@ -163,15 +187,14 @@ ResultsMap *ResultsMap::Compress(int frameDuration)
             }
 
             remainDuration -= duration;
-            duration = MIN(frameDuration, remainDuration);
             offset = 0;
             timestamp++;
-        } while (remainDuration);
+        } while (remainDuration > 0);
     }
     return newMap;
 }
 
-int64_t ResultsMap::GetDuration(void)
+int64_t ResultsMap::GetFrameDuration(void)
 {
     ResultsMap::iterator it = begin();
     if (it == end())
@@ -184,6 +207,163 @@ int64_t ResultsMap::GetDuration(void)
 
     FlagFindings *finding = *it2;
     return finding->m_frameDuration;
+}
+
+void ResultsMap::Compress(void)
+{
+    FlagFindings *prev = NULL;
+    ResultsMap::iterator it;
+    
+    for (it = begin(); it != end(); )
+    {
+        FlagResults *results = it.value();
+        FlagResults::iterator it2;
+        for (it2 = results->begin(); it2 != results->end(); )
+        {
+            FlagFindings *finding = *it2;
+            if (prev && abs(prev->GetAbsEnd() - finding->GetAbsStart()) < 10)
+            {
+                prev->m_duration += finding->m_duration;
+                it2 = results->erase(it2);
+                delete finding;
+            }
+            else
+            {
+                prev = finding;
+                ++it2;
+            }
+        }
+
+        if (!results->isEmpty())
+        {
+            ++it;
+        }
+        else
+        {
+            it = erase(it);
+            delete results;
+        }
+    }
+}
+
+ResultsTypeMap::~ResultsTypeMap()
+{
+    ResultsTypeMap::iterator it;
+    for (it = begin(); it != end(); )
+    {
+        ResultsMap *map = it.value();
+        it = erase(it);
+        delete map;
+    }
+}
+
+ResultsTypeMap *ResultsMap::RemapByType(void)
+{
+    ResultsTypeMap *newMap = new ResultsTypeMap;
+    ResultsMap::iterator it;
+    
+    for (it = begin(); it != end(); ++it)
+    {
+        ResultsMap *map;
+        FlagResults *result = it.value();
+        FlagResults::iterator it2;
+
+        for (it2 = result->begin(); it2 != result->end(); ++it2)
+        {
+            FlagFindings *finding = *it2;
+
+            if (newMap->contains(finding->m_type))
+                map = newMap->value(finding->m_type);
+            else
+            {
+                map = new ResultsMap;
+                newMap->insert(finding->m_type, map);
+            }
+
+            FlagResults *newResult =
+                FlagResults::Create(map, finding->m_timestamp);
+            FlagFindings *newFinding = new FlagFindings(finding);
+            newResult->append(newFinding);
+        }
+    }
+
+    ResultsTypeMap::iterator it2;
+    for (it2 = newMap->begin(); it2 != newMap->end(); ++it2)
+    {
+        ResultsMap *map = it2.value();
+        map->Compress();
+    }
+    return newMap;
+}
+
+QString ResultsTypeMap::toString(void)
+{
+    QString str("");
+    ResultsTypeMap::iterator it;
+    
+    for (it = begin(); it != end(); ++it)
+    {
+        ResultsMap *map = it.value();
+        QString title = QString("Results Type %1").arg(it.key());
+        str += map->toString(title);
+    }
+    return str;
+}
+
+FlagResults *ResultsTypeMap::FindingsAtTime(int64_t timestart, int64_t timeend,
+                                            int duration)
+{
+    int64_t framenum = timestart / duration;
+    FlagResults *newResult = FlagResults::Create(NULL, framenum);
+    ResultsTypeMap::iterator it;
+    
+    for (it = begin(); it != end(); ++it)
+    {
+        ResultsMap *map = it.value();
+        ResultsMap::iterator it2 = map->lowerBound(framenum);
+        ResultsMap::iterator it2end = map->upperBound(framenum);
+
+        if (it2 == map->end())
+        {
+            --it2;
+        }
+
+        FlagResults *result = it2.value();
+        if (result->first()->m_timestamp > framenum)
+        {
+            if (it2 == map->begin())
+                continue;
+            --it2;
+        }
+
+        for ( ; it2 != it2end; ++it2 )
+        {
+            result = it2.value();
+            FlagResults::iterator it3;
+
+            for (it3 = result->begin(); it3 != result->end(); ++it3)
+            {
+                FlagFindings *finding = *it3;
+                if ((finding->GetAbsStart() < timestart &&
+                     finding->GetAbsEnd()   < timestart) ||
+                    (finding->GetAbsStart() > timeend &&
+                     finding->GetAbsEnd()   > timeend))
+                {
+                    continue;
+                }
+
+                FlagFindings *newFinding = new FlagFindings(finding);
+                newResult->append(newFinding);
+            }
+        }
+    }
+
+    if (newResult->isEmpty())
+    {
+        delete newResult;
+        return NULL;
+    }
+    return newResult;
 }
 
 /*

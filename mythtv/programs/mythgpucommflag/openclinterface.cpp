@@ -1212,23 +1212,30 @@ unsigned int nextPow2( unsigned int x )
 
 void OpenCLKernelMap::Empty(void)
 {
+#if 0
     OpenCLKernelMap::iterator it;
 
-    for (it = begin(); it != end(); it = erase(it))
+    for (it = begin(); it != end(); )
     {
-        delete it.value();
+        OpenCLKernel *kernel = it.value();
+        delete kernel;
     }
+#endif
+    clear();
 }
 
 void OpenCLProgramMap::Empty(void)
 {
+#if 0
     OpenCLProgramMap::iterator it;
 
-    for (it = begin(); it != end(); it = erase(it))
+    for (it = begin(); it != end(); )
     {
         cl_program prog = it.value();
         clReleaseProgram(prog);
     }
+#endif
+    clear();
 }
 
 /*
