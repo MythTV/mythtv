@@ -6,7 +6,6 @@
 #include <stdint.h>
 #include <cstdio>
 #include <cstdlib>
-#include <cassert>
 #include <cerrno>
 #include <ctime>
 #include <cmath>
@@ -446,7 +445,6 @@ bool MythPlayer::IsPlaying(uint wait_in_msec, bool wait_for) const
 
 bool MythPlayer::InitVideo(void)
 {
-    assert(player_ctx);
     if (!player_ctx)
         return false;
 
@@ -916,7 +914,6 @@ int MythPlayer::OpenFile(uint retries)
 
     isDummy = false;
 
-    assert(player_ctx);
     if (!player_ctx || !player_ctx->buffer)
         return -1;
 
