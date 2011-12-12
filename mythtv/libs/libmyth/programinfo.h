@@ -441,9 +441,12 @@ class MPUBLIC ProgramInfo
     bool IsDeletePending(void)  const
         { return programflags & FL_DELETEPENDING; }
 
-    uint GetSubtitleType(void)    const { return (properties >> 11) & 0x0F; }
-    uint GetVideoProperties(void) const { return (properties >> 6)  & 0x1F; }
-    uint GetAudioProperties(void) const { return (properties >> 0)  & 0x3F; }
+    uint GetSubtitleType(void)    const
+        { return (properties&kSubtitlePropertyMask)>>kSubtitlePropertyOffset; }
+    uint GetVideoProperties(void) const
+        { return (properties & kVideoPropertyMask) >> kVideoPropertyOffset; }
+    uint GetAudioProperties(void) const
+        { return (properties & kAudioPropertyMask) >> kAudioPropertyOffset; }
 
     typedef enum
     {

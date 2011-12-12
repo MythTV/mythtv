@@ -349,7 +349,9 @@ ProgramInfo::ProgramInfo(
     findid(_findid),
 
     programflags(_programflags),
-    properties((_subtitleType<<11) | (_videoproperties<<6) | _audioproperties),
+    properties((_subtitleType    << kSubtitlePropertyOffset) |
+               (_videoproperties << kVideoPropertyOffset)    |
+               (_audioproperties << kAudioPropertyOffset)),
     year(_year),
 
     recstatus(_recstatus),
@@ -569,7 +571,9 @@ ProgramInfo::ProgramInfo(
     findid(_findid),
 
     programflags(FL_NONE),
-    properties((_subtitleType<<11) | (_videoproperties<<6) | _audioproperties),
+    properties((_subtitleType    << kSubtitlePropertyOffset) |
+               (_videoproperties << kVideoPropertyOffset)    |
+               (_audioproperties << kAudioPropertyOffset)),
     year(_year),
 
     recstatus(_recstatus),
@@ -1302,7 +1306,9 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(audioproperties);   // 40
     INT_FROM_LIST(videoproperties);   // 41
     INT_FROM_LIST(subtitleType);      // 42
-    properties = (subtitleType<<11) | (videoproperties<<6) | audioproperties;
+    properties = ((subtitleType    << kSubtitlePropertyOffset) |
+                  (videoproperties << kVideoPropertyOffset)    |
+                  (audioproperties << kAudioPropertyOffset));
 
     INT_FROM_LIST(year);              // 43
 
@@ -1800,9 +1806,9 @@ bool ProgramInfo::LoadProgramFromRecorded(
              (programflags & FL_REALLYEDITING) ||
              (programflags & FL_COMMPROCESSING));
 
-    properties = ((query.value(44).toUInt()<<11) |
-                  (query.value(43).toUInt()<<6) |
-                  query.value(42).toUInt());
+    properties = ((query.value(44).toUInt() << kSubtitlePropertyOffset) |
+                  (query.value(43).toUInt() << kVideoPropertyOffset)    |
+                  (query.value(42).toUInt() << kAudioPropertyOffset));
     // ancillary data -- end
 
     if (originalAirDate.isValid() && originalAirDate < QDate(1940, 1, 1))
@@ -3703,10 +3709,10 @@ void ProgramInfo::SaveResolutionProperty(VideoProperty vid_flags)
     query.exec();
 
     uint videoproperties = GetVideoProperties();
-    videoproperties &= (uint16_t) ~(VID_1080|VID_720);
-    videoproperties |= (uint16_t) vid_flags;
-    properties &= ~(0x1F<<6);
-    properties |= videoproperties<<6;
+    videoproperties &= ~(VID_1080|VID_720);
+    videoproperties |= vid_flags;
+    properties &= ~kVideoPropertyMask;
+    properties |= videoproperties << kVideoPropertyOffset;
 
     SendUpdateEvent();
 }
