@@ -6022,6 +6022,16 @@ NULL
             return false;
     }
 
+    if (dbver == "1288")
+    {
+        const char *updates[] = {
+"ALTER TABLE recordedprogram CHANGE COLUMN videoprop videoprop "
+"    SET('HDTV', 'WIDESCREEN', 'AVC', '720', '1080', 'DAMAGED') NOT NULL; ",
+NULL
+};
+        if (!performActualUpdate(updates, "1289", dbver))
+            return false;
+    }
     return true;
 }
 

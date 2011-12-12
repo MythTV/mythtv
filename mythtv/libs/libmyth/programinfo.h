@@ -552,7 +552,7 @@ class MPUBLIC ProgramInfo
     void SaveFrameRate(uint64_t frame, uint framerate);
     void SaveTotalDuration(int64_t duration);
     void SaveTotalFrames(int64_t frames);
-    void SaveResolutionProperty(VideoProperty vid_flags);
+    void SaveVideoProperties(uint mask, uint video_property_flags);
     void SaveMarkupFlag(MarkTypes type) const;
     void ClearMarkupFlag(MarkTypes type) const { ClearMarkupMap(type); }
     void UpdateLastDelete(bool setTime) const;

@@ -877,9 +877,10 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
 
     // Get the width and set the videoprops
     uint avg_height = curRec->QueryAverageHeight();
-    curRec->SaveResolutionProperty(
-        (avg_height > 1000) ? VID_1080 :
-        ((avg_height > 700) ? VID_720 : VID_UNKNOWN));
+    curRec->SaveVideoProperties(
+        VID_1080 | VID_720 | VID_DAMAGED,
+        ((avg_height > 1000) ? VID_1080 : ((avg_height > 700) ? VID_720 : 0)) |
+        ((is_good&&false) ? 0 : VID_DAMAGED));
 
     // Make sure really short recordings have positive run time.
     if (curRec->GetRecordingEndTime() <= curRec->GetRecordingStartTime())

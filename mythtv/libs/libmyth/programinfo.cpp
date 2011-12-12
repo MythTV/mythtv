@@ -3693,23 +3693,27 @@ int64_t ProgramInfo::QueryTotalFrames(void) const
     return frames;
 }
 
-void ProgramInfo::SaveResolutionProperty(VideoProperty vid_flags)
+void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
 {
     MSqlQuery query(MSqlQuery::InitCon());
+
+    LOG(VB_RECORD, LOG_INFO,
+        QString("SaveVideoProperties(0x%1, 0x%2)")
+        .arg(mask,2,16,QChar('0')).arg(vid_flags,2,16,QChar('0')));
 
     query.prepare(
         "UPDATE recordedprogram "
         "SET videoprop = ((videoprop+0) & :OTHERFLAGS) | :FLAGS "
         "WHERE chanid = :CHANID AND starttime = :STARTTIME");
 
-    query.bindValue(":OTHERFLAGS", ~(VID_1080|VID_720));
+    query.bindValue(":OTHERFLAGS", ~mask);
     query.bindValue(":FLAGS",      vid_flags);
     query.bindValue(":CHANID",     chanid);
     query.bindValue(":STARTTIME",  startts);
     query.exec();
 
     uint videoproperties = GetVideoProperties();
-    videoproperties &= ~(VID_1080|VID_720);
+    videoproperties &= ~mask;
     videoproperties |= vid_flags;
     properties &= ~kVideoPropertyMask;
     properties |= videoproperties << kVideoPropertyOffset;

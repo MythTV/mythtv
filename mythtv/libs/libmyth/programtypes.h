@@ -177,10 +177,11 @@ typedef enum VideoProps {
     VID_AVC           = 0x04,
     VID_720           = 0x08,
     VID_1080          = 0x10,
-} VideoProperty; // has 5 bits in ProgramInfo::properties
-#define kVideoPropertyBits 5
+    VID_DAMAGED       = 0x20,
+} VideoProperty; // has 6 bits in ProgramInfo::properties
+#define kVideoPropertyBits 6
 #define kVideoPropertyOffset kAudioPropertyBits
-#define kVideoPropertyMask (0x1f<<kVideoPropertyOffset)
+#define kVideoPropertyMask (0x3f<<kVideoPropertyOffset)
 
 /// if SubtitleTypes changes, the audioprop column in program and
 /// recordedprogram has to changed accordingly

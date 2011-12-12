@@ -269,6 +269,9 @@ static QString extract_main_state(const ProgramInfo &pginfo, const TV *player)
         state = "disabled";
     }
 
+    if (state == "normal" && (pginfo.GetVideoProperties() & VID_DAMAGED))
+        state = "warning";
+
     return state;
 }
 
@@ -1094,6 +1097,28 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     if (iconState && !haveIcon)
         iconState->Reset();
 
+    iconMap.clear();
+    iconMap["damaged"] = VID_DAMAGED;
+
+    iconState = dynamic_cast<MythUIStateType *>(GetChild("videoquality"));
+    haveIcon = false;
+    if (pginfo && iconState)
+    {
+        for (it = iconMap.begin(); it != iconMap.end(); ++it)
+        {
+            if (pginfo->GetVideoProperties() & (*it))
+            {
+                if (iconState->DisplayState(it.key()))
+                {
+                    haveIcon = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (iconState && !haveIcon)
+        iconState->Reset();
     iconMap.clear();
     iconMap["deafsigned"] = SUB_SIGNED;
     iconMap["onscreensub"] = SUB_ONSCREEN;
