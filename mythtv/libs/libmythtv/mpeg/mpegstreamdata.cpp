@@ -963,27 +963,36 @@ int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
     int pos = 0;
     bool resync = false;
 
-    while (pos + 187 < len) // while we have a whole packet left
+    while (pos + TSPacket::kSize <= len) // while we have a whole packet left
     {
         if (buffer[pos] != SYNC_BYTE || resync)
         {
             int newpos = ResyncStream(buffer, pos+1, len);
+            LOG(VB_RECORD, LOG_DEBUG, QString("Resyncing @ %1+1 w/len %2 -> %3")
+                .arg(pos).arg(len).arg(newpos));
             if (newpos == -1)
                 return len - pos;
             if (newpos == -2)
                 return TSPacket::kSize;
-
             pos = newpos;
         }
 
         const TSPacket *pkt = reinterpret_cast<const TSPacket*>(&buffer[pos]);
-        if (ProcessTSPacket(*pkt))
+        pos += TSPacket::kSize; // Advance to next TS packet
+        resync = false;
+        if (!ProcessTSPacket(*pkt))
         {
-            pos += TSPacket::kSize; // Advance to next TS packet
-            resync = false;
+            if (pos + TSPacket::kSize > len)
+                continue;
+            if (buffer[pos] != SYNC_BYTE)
+            {
+                // if ProcessTSPacket fails, and we don't appear to be
+                // in sync on the next packet, then resync. Otherwise
+                // just process the next packet normally.
+                pos -= TSPacket::kSize;
+                resync = true;
+            }
         }
-        else // Let it resync in case of dropped bytes
-            resync = true;
     }
 
     return len - pos;
