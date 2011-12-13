@@ -51,7 +51,8 @@ class VideoOutput
     static VideoOutput *Create(
         const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
         PIPState pipState,      const QSize &video_dim,    float video_aspect,
-        WId win_id,             const QRect &display_rect, float video_prate);
+        QWidget *parentwidget,  const QRect &embed_rect,   float video_prate,
+        uint playerFlags);
 
     VideoOutput();
     virtual ~VideoOutput();

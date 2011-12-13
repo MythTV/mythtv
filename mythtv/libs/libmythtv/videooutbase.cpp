@@ -105,10 +105,53 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 VideoOutput *VideoOutput::Create(
     const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
     PIPState pipState,      const QSize &video_dim,    float video_aspect,
-    WId win_id,             const QRect &display_rect, float video_prate)
+    QWidget *parentwidget,  const QRect &embed_rect, float video_prate,
+    uint playerFlags)
 {
     (void) codec_priv;
 
+    // dummy video classes (pip, transcode, commflag etc)
+    if (playerFlags & kVideoIsNull)
+    {
+        VideoOutput *vo = new VideoOutputNull();
+        if (vo)
+        {
+            if (vo->Init(video_dim.width(), video_dim.height(),
+                         video_aspect, 0, QRect(), codec_id))
+            {
+                return vo;
+            }
+            else
+                delete vo;
+        }
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to create null video out");
+        return NULL;
+    }
+
+    // ensure we have a window to display into
+    QWidget *widget = parentwidget;
+    MythMainWindow *window = GetMythMainWindow();
+    if (!widget && window)
+        widget = window->findChild<QWidget*>("video playback window");
+
+    if (!widget)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No window for video output.");
+        return NULL;
+    }
+
+    if (!widget->winId())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No window for video output.");
+        return NULL;
+    }
+
+    // determine the display rectangle
+    QRect display_rect = QRect(0, 0, widget->width(), widget->height());
+    if (pipState == kPIPStandAlone)
+        display_rect = embed_rect;
+
+    // select the best available output
     QStringList renderers;
 
 #ifdef USING_MINGW
@@ -212,8 +255,9 @@ VideoOutput *VideoOutput::Create(
             vo->SetVideoFrameRate(video_prate);
             if (vo->Init(
                     video_dim.width(), video_dim.height(), video_aspect,
-                    win_id, display_rect, codec_id))
+                    widget->winId(), display_rect, codec_id))
             {
+                vo->SetVideoScalingAllowed(true);
                 return vo;
             }
 
