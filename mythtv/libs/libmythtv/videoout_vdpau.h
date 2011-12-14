@@ -5,7 +5,6 @@
 #include "videooutbase.h"
 #include "mythrender_vdpau.h"
 
-class VDPAUContext;
 class MythVDPAUPainter;
 class OSD;
 
