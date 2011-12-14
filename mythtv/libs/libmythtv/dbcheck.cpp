@@ -6032,6 +6032,22 @@ NULL
         if (!performActualUpdate(updates, "1289", dbver))
             return false;
     }
+
+    if (dbver == "1289")
+    {
+        const char *updates[] = {
+"DROP TABLE IF EXISTS netvisionrssitems;",
+"DROP TABLE IF EXISTS netvisionsearchgrabbers;",
+"DROP TABLE IF EXISTS netvisionsites;",
+"DROP TABLE IF EXISTS netvisiontreegrabbers;",
+"DROP TABLE IF EXISTS netvisiontreeitems;",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1290", dbver))
+            return false;
+    }
+
     return true;
 }
 
