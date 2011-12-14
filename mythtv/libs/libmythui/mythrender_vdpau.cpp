@@ -1283,6 +1283,28 @@ bool MythRenderVDPAU::UploadYUVFrame(uint id, void* const planes[3],
     return ok;
 }
 
+bool MythRenderVDPAU::DownloadYUVFrame(uint id, void *const planes[3],
+                                       uint32_t pitches[3])
+{
+    CHECK_VIDEO_SURFACES(false)
+
+    VdpVideoSurface surface = 0;
+    {
+        CHECK_STATUS(false)
+        LOCK_RENDER
+        if (!m_videoSurfaces.contains(id))
+            return false;
+        surface = m_videoSurfaces[id].m_id;
+    }
+
+    INIT_ST
+    vdp_st = vdp_video_surface_get_bits_y_cb_cr(surface,
+                                                VDP_YCBCR_FORMAT_YV12,
+                                                planes, pitches);
+    CHECK_ST
+    return ok;
+}
+
 bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
                                  const QRect *src, const QRect *dst,
                                  int alpha, int red, int green, int blue,
@@ -1410,6 +1432,33 @@ uint MythRenderVDPAU::GetSurfaceOwner(VdpVideoSurface surface)
     return m_videoSurfaceHash[surface];
 }
 
+QSize MythRenderVDPAU::GetSurfaceSize(uint id)
+{
+    QSize size = QSize(0,0);
+    CHECK_STATUS(size)
+    LOCK_RENDER
+
+    if (!m_videoSurfaces.contains(id))
+        return size;
+
+    uint width = 0;
+    uint height = 0;
+    VdpChromaType dummy;
+
+    INIT_ST
+    vdp_st = vdp_video_surface_get_parameters(m_videoSurfaces[id].m_id,
+                                              &dummy, &width, &height);
+    CHECK_ST
+    if (!ok)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve surface size.");
+        return size;
+    }
+
+    size = QSize(width, height);
+    return size;
+}
+
 void MythRenderVDPAU::ClearVideoSurface(uint id)
 {
     CHECK_VIDEO_SURFACES()
@@ -1512,6 +1561,10 @@ bool MythRenderVDPAU::GetProcs(void)
     GET_PROC(VDP_FUNC_ID_VIDEO_SURFACE_DESTROY, vdp_video_surface_destroy);
     GET_PROC(VDP_FUNC_ID_VIDEO_SURFACE_PUT_BITS_Y_CB_CR,
         vdp_video_surface_put_bits_y_cb_cr);
+    GET_PROC(VDP_FUNC_ID_VIDEO_SURFACE_GET_PARAMETERS,
+        vdp_video_surface_get_parameters);
+    GET_PROC(VDP_FUNC_ID_VIDEO_SURFACE_GET_BITS_Y_CB_CR,
+        vdp_video_surface_get_bits_y_cb_cr);
     GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_CREATE,  vdp_output_surface_create);
     GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_DESTROY, vdp_output_surface_destroy);
     GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_RENDER_BITMAP_SURFACE,
@@ -1747,6 +1800,8 @@ void MythRenderVDPAU::ResetProcs(void)
     vdp_video_surface_create = NULL;
     vdp_video_surface_destroy = NULL;
     vdp_video_surface_put_bits_y_cb_cr = NULL;
+    vdp_video_surface_get_parameters = NULL;
+    vdp_video_surface_get_bits_y_cb_cr = NULL;
     vdp_output_surface_put_bits_native = NULL;
     vdp_output_surface_create = NULL;
     vdp_output_surface_destroy = NULL;
