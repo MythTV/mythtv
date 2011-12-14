@@ -248,8 +248,6 @@ class MTV_PUBLIC MythPlayer
     void DeLimboFrame(VideoFrame *frame);
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
-    void ReleaseNextVideoFrame(void)
-        { videoOutput->ReleaseFrame(GetNextVideoFrame()); }
     void ReleaseCurrentFrame(VideoFrame *frame);
     void ClearDummyVideoFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
