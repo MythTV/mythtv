@@ -1810,7 +1810,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (version)
                     video_codec_id = (MythCodecID)(kCodec_MPEG1 + version - 1);
 
-                if (!FlagIsSet(kVideoIsNull) && version)
+                if (version)
                 {
 #if defined(USING_VDPAU)
                     // HACK -- begin
