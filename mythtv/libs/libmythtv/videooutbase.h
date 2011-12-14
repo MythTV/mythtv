@@ -208,11 +208,13 @@ class VideoOutput
     virtual void CheckFrameStates(void) { }
 
     /// \bug not implemented correctly. vpos is not updated.
-    VideoFrame *GetLastDecodedFrame(void) { return vbuffers.GetLastDecodedFrame(); }
+    virtual VideoFrame *GetLastDecodedFrame(void)
+        { return vbuffers.GetLastDecodedFrame(); }
 
     /// \brief Returns frame from the head of the ready to be displayed queue,
     ///        if StartDisplayingFrame has been called.
-    VideoFrame *GetLastShownFrame(void)  { return vbuffers.GetLastShownFrame(); }
+    virtual VideoFrame *GetLastShownFrame(void)
+        { return vbuffers.GetLastShownFrame(); }
 
     /// \brief Returns string with status of each frame for debugging.
     QString GetFrameStatus(void) const { return vbuffers.GetStatus(); }
