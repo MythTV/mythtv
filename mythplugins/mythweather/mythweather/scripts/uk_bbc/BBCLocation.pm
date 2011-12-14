@@ -140,8 +140,6 @@ sub get_results {
 
         $url =~ s/^\/weather\///;
         $outhash->{$url} = $loc;
-
-        print "$url"."::$loc\n";
     }
 }
 
