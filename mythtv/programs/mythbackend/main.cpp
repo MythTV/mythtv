@@ -94,6 +94,10 @@ int main(int argc, char **argv)
     if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
         return retval;
 
+    if (daemonize)
+        // Don't listen to console input if daemonized
+        close(0);
+
     CleanupGuard callCleanup(cleanup);
     signal(SIGINT, qt_exit);
     signal(SIGTERM, qt_exit);
