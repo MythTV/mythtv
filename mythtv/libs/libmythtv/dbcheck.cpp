@@ -6048,6 +6048,27 @@ NULL
             return false;
     }
 
+    if (dbver == "1290")
+    {
+        const char *updates[] = {
+"ALTER TABLE logging "
+" ALTER COLUMN host SET DEFAULT '', "
+" ALTER COLUMN application SET DEFAULT '', "
+" ALTER COLUMN pid SET DEFAULT '0', "
+" ALTER COLUMN thread SET DEFAULT '', "
+" ALTER COLUMN level SET DEFAULT '0';",
+"ALTER TABLE logging "
+" ADD COLUMN tid INT(11) NOT NULL DEFAULT '0' AFTER pid, "
+" ADD COLUMN filename VARCHAR(255) NOT NULL DEFAULT '' AFTER thread, "
+" ADD COLUMN line INT(11) NOT NULL DEFAULT '0' AFTER filename, "
+" ADD COLUMN function VARCHAR(255) NOT NULL DEFAULT '' AFTER line;",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1291", dbver))
+            return false;
+    }
+
     return true;
 }
 

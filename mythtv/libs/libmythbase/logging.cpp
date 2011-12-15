@@ -376,8 +376,10 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
 {
     m_query = QString(
         "INSERT INTO %1 "
-        "    (host, application, pid, thread, msgtime, level, message) "
-        "VALUES (:HOST, :APP, :PID, :THREAD, :MSGTIME, :LEVEL, :MESSAGE)")
+        "    (host, application, pid, tid, thread, filename, "
+        "     line, function, msgtime, level, message) "
+        "VALUES (:HOST, :APP, :PID, :TID, :THREAD, :FILENAME, "
+        "        :LINE, :FUNCTION, :MSGTIME, :LEVEL, :MESSAGE)")
         .arg(m_handle.string);
 
     LOG(VB_GENERAL, LOG_INFO, 
@@ -450,11 +452,16 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
 {
     char        timestamp[TIMESTAMP_MAX];
     char       *threadName = getThreadName(item);
+    pid_t       tid        = getThreadTid(item);
 
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
               (const struct tm *)&item->tm );
 
+    query.bindValue(":TID",         tid);
     query.bindValue(":THREAD",      threadName);
+    query.bindValue(":FILENAME",    item->file);
+    query.bindValue(":LINE",        item->line);
+    query.bindValue(":FUNCTION",    item->function);
     query.bindValue(":MSGTIME",     timestamp);
     query.bindValue(":LEVEL",       item->level);
     query.bindValue(":MESSAGE",     item->message);
