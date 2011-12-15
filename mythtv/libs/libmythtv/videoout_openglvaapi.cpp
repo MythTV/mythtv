@@ -124,7 +124,7 @@ bool VideoOutputOpenGLVAAPI::CreateVAAPIContext(QSize size)
     if (m_ctx)
         DeleteVAAPIContext();
 
-    m_ctx = new VAAPIContext(video_codec_id);
+    m_ctx = new VAAPIContext(kVADisplayGLX, video_codec_id);
     if (m_ctx && m_ctx->CreateDisplay(size) && m_ctx->CreateBuffers())
     {
         int num_buffers = m_ctx->GetNumBuffers();

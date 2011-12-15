@@ -4,6 +4,7 @@
 extern "C" {
 #include "libavcodec/vaapi.h"
 }
+#include "va/va_x11.h"
 #include "va/va_glx.h"
 #include "videocolourspace.h"
 
@@ -15,12 +16,18 @@ struct vaapi_surface
 class VAAPIDisplay;
 class OpenGLVideo;
 
+enum VAAPIDisplayType
+{
+    kVADisplayX11,
+    kVADisplayGLX,
+};
+
 class VAAPIContext
 {
   public:
     static bool IsFormatAccelerated(QSize size, MythCodecID codec,
                                     PixelFormat &pix_fmt);
-    VAAPIContext(MythCodecID codec);
+    VAAPIContext(VAAPIDisplayType display_type, MythCodecID codec);
    ~VAAPIContext();
 
     bool  CreateDisplay(QSize size);
@@ -43,6 +50,7 @@ class VAAPIContext
     void InitPictureAttributes(VideoColourSpace &colourspace);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
 
+    VAAPIDisplayType m_dispType;
     vaapi_context  m_ctx;
     MythCodecID    m_codec;
     QSize          m_size;

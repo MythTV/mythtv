@@ -76,8 +76,10 @@ VAProfile preferredProfile(MythCodecID codec)
 class VAAPIDisplay
 {
   protected:
-    VAAPIDisplay() : m_va_disp(NULL), m_x_disp(NULL), m_display(NULL),
-                     m_ref_count(0), m_driver(QString()) { }
+    VAAPIDisplay(VAAPIDisplayType display_type)
+      : m_va_disp_type(display_type),
+        m_va_disp(NULL), m_x_disp(NULL),
+        m_ref_count(0), m_driver(QString()) { }
   public:
    ~VAAPIDisplay()
     {
@@ -96,33 +98,37 @@ class VAAPIDisplay
 
     bool Create(void)
     {
-        MythMainWindow *mw = GetMythMainWindow();
-        if (!mw)
-            return false;
-
-        MythRenderOpenGL *gl =
-            static_cast<MythRenderOpenGL*>(mw->GetRenderDevice());
-
-        if (!gl)
-        {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                QString("Failed to get OpenGL context - you must use the "
-                        "OpenGL UI painter for VAAPI support."));
-            return false;
-        }
-        gl->makeCurrent();
-        m_display = glXGetCurrentDisplay();
-        gl->doneCurrent();
-
         m_x_disp = OpenMythXDisplay();
         if (!m_x_disp)
             return false;
 
         MythXLocker locker(m_x_disp);
-        int major_ver, minor_ver;
 
-        //m_va_disp = vaGetDisplayGLX(m_x_disp->GetDisplay());
-        m_va_disp = vaGetDisplayGLX(m_display);
+        if (m_va_disp_type == kVADisplayGLX)
+        {
+            MythMainWindow *mw = GetMythMainWindow();
+            if (!mw)
+                return false;
+            MythRenderOpenGL *gl =
+                static_cast<MythRenderOpenGL*>(mw->GetRenderDevice());
+            if (!gl)
+            {
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    QString("Failed to get OpenGL context - you must use the "
+                            "OpenGL UI painter for VAAPI GLX support."));
+                return false;
+            }
+
+            gl->makeCurrent();
+            Display *display = glXGetCurrentDisplay();
+            gl->doneCurrent();
+
+            m_va_disp = vaGetDisplayGLX(display);
+        }
+        else
+        {
+            m_va_disp = vaGetDisplay(m_x_disp->GetDisplay());
+        }
 
         if (!m_va_disp)
         {
@@ -130,6 +136,7 @@ class VAAPIDisplay
             return false;
         }
 
+        int major_ver, minor_ver;
         INIT_ST;
         va_status = vaInitialize(m_va_disp, &major_ver, &minor_ver);
         CHECK_ST;
@@ -148,7 +155,9 @@ class VAAPIDisplay
         if (ok)
         {
             UpRef();
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created VAAPI GLX display");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Created VAAPI %1 display")
+                .arg(m_va_disp_type == kVADisplayGLX ? "GLX" : "X11"));
         }
         return ok;
     }
@@ -181,15 +190,21 @@ class VAAPIDisplay
         return ret;
     }
 
-    static VAAPIDisplay* GetDisplay(void)
+    static VAAPIDisplay* GetDisplay(VAAPIDisplayType display_type)
     {
         if (gVAAPIDisplay)
         {
+            if (gVAAPIDisplay->m_va_disp_type != display_type)
+            {
+                LOG(VB_GENERAL, LOG_ERR, "Already have a VAAPI display "
+                    "of a different type - aborting");
+                return NULL;
+            }
             gVAAPIDisplay->UpRef();
             return gVAAPIDisplay;
         }
 
-        gVAAPIDisplay = new VAAPIDisplay();
+        gVAAPIDisplay = new VAAPIDisplay(display_type);
         if (gVAAPIDisplay && gVAAPIDisplay->Create())
             return gVAAPIDisplay;
 
@@ -199,9 +214,9 @@ class VAAPIDisplay
     }
 
     static VAAPIDisplay *gVAAPIDisplay;
+    VAAPIDisplayType     m_va_disp_type;
     void                *m_va_disp;
     MythXDisplay        *m_x_disp;
-    Display             *m_display;
     int                  m_ref_count;
     QString              m_driver;
 };
@@ -212,7 +227,7 @@ bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
                                        PixelFormat &pix_fmt)
 {
     bool result = false;
-    VAAPIContext *ctx = new VAAPIContext(codec);
+    VAAPIContext *ctx = new VAAPIContext(kVADisplayX11, codec);
     if (ctx && ctx->CreateDisplay(size))
     {
         pix_fmt = ctx->GetPixelFormat();
@@ -222,8 +237,10 @@ bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
     return result;
 }
 
-VAAPIContext::VAAPIContext(MythCodecID codec)
-  : m_codec(codec),
+VAAPIContext::VAAPIContext(VAAPIDisplayType display_type,
+                           MythCodecID codec)
+  : m_dispType(display_type),
+    m_codec(codec),
     m_display(NULL),
     m_vaProfile(VAProfileMPEG2Main)/* ?? */,
     m_vaEntrypoint(VAEntrypointEncSlice),
@@ -280,7 +297,7 @@ bool VAAPIContext::CreateDisplay(QSize size)
 {
     m_size = size;
     bool ok = true;
-    m_display = VAAPIDisplay::GetDisplay();
+    m_display = VAAPIDisplay::GetDisplay(m_dispType);
     CREATE_CHECK(!m_size.isEmpty(), "Invalid size");
     CREATE_CHECK(m_display != NULL, "Invalid display");
     CREATE_CHECK(InitDisplay(),     "Invalid VADisplay");
@@ -619,7 +636,7 @@ uint8_t* VAAPIContext::GetSurfaceIDPointer(void* buf)
 bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
                                         uint texture_type, FrameScanType scan)
 {
-    if (!buf)
+    if (!buf || (m_dispType != kVADisplayGLX))
         return false;
 
     const vaapi_surface *surf = (vaapi_surface*)buf;
@@ -643,6 +660,9 @@ bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
 
 void* VAAPIContext::GetGLXSurface(uint texture, uint texture_type)
 {
+    if (m_dispType != kVADisplayGLX)
+        return NULL;
+
     if (m_glxSurfaces.contains(texture))
         return m_glxSurfaces.value(texture);
 
@@ -667,7 +687,7 @@ void* VAAPIContext::GetGLXSurface(uint texture, uint texture_type)
 
 void VAAPIContext::ClearGLXSurfaces(void)
 {
-    if (!m_display)
+    if (!m_display || (m_dispType != kVADisplayGLX))
         return;
 
     MythXLocker locker(m_display->m_x_disp);
