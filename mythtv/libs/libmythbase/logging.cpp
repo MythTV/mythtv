@@ -614,7 +614,7 @@ bool DatabaseLogger::isDatabaseReady()
 }
 
 /**
- *  \brief Checks whether table exists
+ *  \brief Checks whether table exists and is ready for writing
  *
  *  \param  table  The name of the table to check (without schema name)
  *  \return true if table exists in schema or false if not
@@ -625,15 +625,18 @@ bool DatabaseLogger::tableExists(const QString &table)
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
-        QString sql = "SELECT INFORMATION_SCHEMA.TABLES.TABLE_NAME "
-                      "  FROM INFORMATION_SCHEMA.TABLES "
-                      " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA = "
+        QString sql = "SELECT INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME "
+                      "  FROM INFORMATION_SCHEMA.COLUMNS "
+                      " WHERE INFORMATION_SCHEMA.COLUMNS.TABLE_SCHEMA = "
                       "       DATABASE() "
-                      "   AND INFORMATION_SCHEMA.TABLES.TABLE_NAME = "
-                      "       :TABLENAME ;";
+                      "   AND INFORMATION_SCHEMA.COLUMNS.TABLE_NAME = "
+                      "       :TABLENAME "
+                      "   AND INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME = "
+                      "       :COLUMNNAME;";
         if (query.prepare(sql))
         {
             query.bindValue(":TABLENAME", table);
+            query.bindValue(":COLUMNNAME", "function");
             if (query.exec() && query.next())
                 result = true;
         }
