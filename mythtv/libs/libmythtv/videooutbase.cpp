@@ -34,6 +34,7 @@
 
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
+#include "videoout_nullvdpau.h"
 #endif
 
 #ifdef USING_VAAPI
@@ -90,6 +91,7 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 
 #ifdef USING_VDPAU
     VideoOutputVDPAU::GetRenderOptions(opts);
+    VideoOutputNullVDPAU::GetRenderOptions(opts);
 #endif // USING_VDPAU
 
 #ifdef USING_VAAPI
@@ -109,11 +111,36 @@ VideoOutput *VideoOutput::Create(
     uint playerFlags)
 {
     (void) codec_priv;
+    QStringList renderers;
 
     // dummy video classes (pip, transcode, commflag etc)
     if (playerFlags & kVideoIsNull)
     {
-        VideoOutput *vo = new VideoOutputNull();
+        VideoOutput *vo = NULL;
+        if (playerFlags & kDecodeAllowGPU)
+        {
+#ifdef USING_VDPAU
+            renderers = VideoOutputNullVDPAU::GetAllowedRenderers(codec_id);
+            if (renderers.contains("nullvdpau"))
+                vo = new VideoOutputNullVDPAU();
+            if (vo)
+            {
+                if (vo->Init(video_dim.width(), video_dim.height(),
+                             video_aspect, 0, QRect(), codec_id))
+                {
+                    return vo;
+                }
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to create null VDPAU video out");
+                delete vo;
+                vo = NULL;
+            }
+#endif // USING_VDPAU
+        }
+
+        if (!vo)
+            vo = new VideoOutputNull();
+
         if (vo)
         {
             if (vo->Init(video_dim.width(), video_dim.height(),
@@ -124,7 +151,7 @@ VideoOutput *VideoOutput::Create(
             else
                 delete vo;
         }
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to create null video out");
+        LOG(VB_GENERAL, LOG_CRIT, LOC + "Failed to create null video out");
         return NULL;
     }
 
@@ -152,7 +179,6 @@ VideoOutput *VideoOutput::Create(
         display_rect = embed_rect;
 
     // select the best available output
-    QStringList renderers;
 
 #ifdef USING_MINGW
     renderers += VideoOutputD3D::GetAllowedRenderers(codec_id, video_dim);
