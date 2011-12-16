@@ -880,7 +880,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     curRec->SaveVideoProperties(
         VID_1080 | VID_720 | VID_DAMAGED,
         ((avg_height > 1000) ? VID_1080 : ((avg_height > 700) ? VID_720 : 0)) |
-        ((is_good&&false) ? 0 : VID_DAMAGED));
+        ((is_good) ? 0 : VID_DAMAGED));
 
     // Make sure really short recordings have positive run time.
     if (curRec->GetRecordingEndTime() <= curRec->GetRecordingStartTime())
