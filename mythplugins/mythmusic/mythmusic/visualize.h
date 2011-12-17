@@ -82,6 +82,50 @@ class Spectrum : public VisualBase
 #endif
 };
 
+class Piano : public VisualBase
+{
+    // This class draws bars (up and down)
+    // based on the magnitudes at piano pitch
+    // frequencies in the audio data.
+
+#define PIANO_N 88
+#define piano_audio float
+	
+  public:
+    Piano();
+    virtual ~Piano();
+
+    virtual void resize(const QSize &size);
+    bool process(VisualNode *node);
+    virtual bool draw(QPainter *p, const QColor &back = Qt::black);
+    void handleKeyPress(const QString &action) {(void) action;}
+
+  protected:
+    inline double clamp(double cur, double max, double min);
+
+    QColor startColor, targetColor;
+    vector<QRect> rects;
+    vector<double> magnitudes;
+    QSize size;
+    LogScale scale;
+    double scaleFactor, falloff;
+    int analyzerBarWidth;
+
+    piano_audio *goertzel_coeff;
+    piano_audio *audio_data;
+  
+/*
+#ifdef FFTW3_SUPPORT
+    fftw_plan lplan, rplan;
+    myth_fftw_float *lin, *rin;
+    myth_fftw_complex *lout, *rout;
+#elif FFTW2_SUPPORT
+    rfftw_plan plan;
+    fftw_real *lin, *rin, *lout, *rout;
+#endif
+*/
+};
+
 class AlbumArt : public VisualBase
 {
   public:

@@ -306,6 +306,230 @@ static class SpectrumFactory : public VisFactory
     }
 }SpectrumFactory;
 
+Piano::Piano()
+    : goertzel_coeff(NULL), audio_data(NULL)
+/*
+#if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
+    : lin(NULL), rin(NULL), lout(NULL), rout(NULL)
+#endif
+*/
+{
+    // Setup the "magical" audio coefficients
+    // required by the Goetzel Algorithm
+    analyzerBarWidth = 6;
+    scaleFactor = 2.0;
+    falloff = 3.0;
+    fps = 20;
+
+    goertzel_coeff =  (piano_audio *) malloc(sizeof(piano_audio)*PIANO_N); 
+    audio_data= (piano_audio *) malloc(sizeof(piano_audio) * FFTW_N);
+ 
+    double sample_rate = 44100.0;
+    double concert_A   =   440.0;
+    double semi_tone   = pow(2.0, 1.0/12.0);
+    
+    /* Lowest note on piano is 4 octaves below concert A */
+    double bottom_A = concert_A / 2.0/ 2.0/ 2.0/ 2.0; 
+ 
+    unsigned int i;
+    double current_freq=bottom_A;
+    for(i=0; i < PIANO_N; i++)
+    {
+        /*
+         coeff = 2 * math.cos(2*math.pi*target/sample_rate)
+        */
+        goertzel_coeff[i] = (float)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
+        current_freq *= semi_tone;
+    }
+
+    startColor = QColor(0,0,255);
+    targetColor = QColor(255,0,0); 
+}
+
+Piano::~Piano()
+{
+    if (goertzel_coeff) 
+        free(goertzel_coeff);
+    if (audio_data) 
+        free(audio_data);
+}
+
+void Piano::resize(const QSize &newsize)
+{
+    // Just change internal data about the
+    // size of the pixmap to be drawn (ie. the
+    // size of the screen) and the logically
+    // ensuing number of up/down bars to hold
+    // the audio magnitudes
+
+    size = newsize;
+
+    scale.setMax(192, size.width() / analyzerBarWidth);
+
+    rects.resize( scale.range() );
+    unsigned int i = 0;
+    int w = 0;
+    for (; i < rects.size(); i++, w += analyzerBarWidth)
+    {
+        rects[i].setRect(w, size.height() / 2, analyzerBarWidth - 1, 1);
+    }
+
+    unsigned int os = magnitudes.size();
+    magnitudes.resize( scale.range() * 2 );
+    for (; os < magnitudes.size(); os++)
+    {
+        magnitudes[os] = 0.0;
+    }
+
+    //scaleFactor = double( size.height() / 2 ) / log( (double)(FFTW_N) );
+    scaleFactor = double( size.height() / 2 ) ; //  End result 0<x<1
+}
+
+bool Piano::process(VisualNode *node)
+{
+    // Take a bunch of data in *node
+    // and break it down into spectrum
+    // values
+    bool allZero = TRUE;
+ 
+    uint i, n, key;
+ 
+    QRect *rectsp = rects.data();
+    double *magnitudesp = magnitudes.data();
+ 
+    piano_audio q0, q1, q2, coeff, magnitude2;
+    double magnitude_av, samples_plus_1;
+
+    if (node) 
+    {
+        n = node->length;
+        if(node->right) // Preprocess the data into a combined middle channel, if we have stereo data
+        {
+            for(i=0; i<n; i++) 
+            {
+                audio_data[i] = (piano_audio)((node->left[i] + (piano_audio)node->right[i]) / 2);
+            }
+        }
+        else // This is only one channel of data
+        {
+            for(i=0; i<n; i++) 
+            {
+                audio_data[i] = (piano_audio)node->left[i];
+            }
+        }
+    } 
+    else
+        n = 0;
+
+    samples_plus_1 = n + 1;
+    for(key=0; key<PIANO_N; key++) 
+    {
+        coeff = goertzel_coeff[key];
+        q2=0;
+        q1=0;
+     
+        for(i=0; i<n; i++) 
+        {
+            q0 = coeff * q1 - q2 + audio_data[i]; 
+            q2=q1;
+            q1=q0;
+        }
+        magnitude2 = q1*q1 + q2*q2 - q1*q2*coeff;
+        if(magnitude2>0.01f) 
+        {
+            allZero = FALSE;
+        }
+        if(key<rects.size()) 
+        {
+            magnitude_av = sqrt(magnitude2)/samples_plus_1; // Should be 0<magnitude_av<1
+            magnitude_av /= 32768.0;   // Convert short to [-1,+1] 
+         
+            magnitude_av *= 8.0; // Enlargement factor (arbitrary)
+         
+            magnitudesp[key] = magnitude_av; // Store this for later : We'll do the colours from this...
+            rectsp[key].setTop( size.height() * (1.0-magnitude_av)/2.0 );
+            rectsp[key].setBottom( size.height() * (1.0+magnitude_av)/2.0 );
+        }
+    }
+
+    return allZero;
+}
+
+double Piano::clamp(double cur, double max, double min)
+{
+    if (cur > max)
+        cur = max;
+    if (cur < min)
+        cur = min;
+    return cur;
+}
+
+bool Piano::draw(QPainter *p, const QColor &back)
+{
+    // This draws on a pixmap owned by MainVisual.
+    //
+    // In other words, this is not a Qt Widget, it
+    // just uses some Qt methods to draw on a pixmap.
+    // MainVisual then bitblts that onto the screen.
+
+    QRect *rectsp = rects.data();
+    double r, g, b, per;
+
+    p->fillRect(0, 0, size.width(), size.height(), back);
+    for (uint i = 0; i < rects.size(); i++)
+    {
+        per = double( rectsp[i].height() - 2 ) / double( size.height() );
+
+        per = clamp(per, 1.0, 0.0);        
+                
+        r = startColor.red() + 
+            (targetColor.red() - startColor.red()) * (per * per);
+        g = startColor.green() + 
+            (targetColor.green() - startColor.green()) * (per * per);
+        b = startColor.blue() + 
+            (targetColor.blue() - startColor.blue()) * (per * per);
+
+        r = clamp(r, 255.0, 0.0);
+        g = clamp(g, 255.0, 0.0);
+        b = clamp(b, 255.0, 0.0);
+                
+        if(rectsp[i].height() > 4)
+            p->fillRect(rectsp[i], QColor(int(r), int(g), int(b)));
+    }
+
+    if(1) 
+    {
+        drawWarning(p, back, size,
+                QObject::tr("Piano Visualization Message") + "\n" + 
+                QObject::tr("Are you sane running this code?"));
+    }
+    return true;
+}
+
+static class PianoFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const
+    {
+        static QString name("Piano");
+        return name;
+    }
+
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
+
+    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)winid;
+        (void)pluginName;
+        return new Piano();
+    }
+}PianoFactory;
+
 AlbumArt::AlbumArt(void)
 {
     findFrontCover();
