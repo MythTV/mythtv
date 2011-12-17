@@ -307,49 +307,73 @@ static class SpectrumFactory : public VisFactory
 }SpectrumFactory;
 
 Piano::Piano()
-    : goertzel_coeff(NULL), audio_data(NULL)
-/*
-#if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
-    : lin(NULL), rin(NULL), lout(NULL), rout(NULL)
-#endif
-*/
+    : piano_data(NULL), audio_data(NULL)
 {
     // Setup the "magical" audio coefficients
     // required by the Goetzel Algorithm
-    analyzerBarWidth = 6;
-    scaleFactor = 2.0;
-    falloff = 3.0;
-    fps = 20;
-
-    goertzel_coeff =  (piano_audio *) malloc(sizeof(piano_audio)*PIANO_N); 
+    //analyzerBarWidth = 6;
+    //scaleFactor = 2.0;
+    //falloff = 3.0;
+    
+    piano_data =  (piano_key_data *) malloc(sizeof(piano_key_data)*PIANO_N); 
     audio_data= (piano_audio *) malloc(sizeof(piano_audio) * FFTW_N);
  
     double sample_rate = 44100.0;
+    //double sample_rate = 48000.0;
+	
+    fps = 100;// This needs to be set so as to capture all the audio chunks...
+    int fps_display=20;  // Target display fps is 20 per second
+    chunks_per_displayed_frame = fps/fps_display; 
+
+    chunk_counter=0;  // This counts up.  When it gets >= chunks_per_displayed_frame, we actually display the data, and reset the counter
+	
     double concert_A   =   440.0;
     double semi_tone   = pow(2.0, 1.0/12.0);
     
     /* Lowest note on piano is 4 octaves below concert A */
-    double bottom_A = concert_A / 2.0/ 2.0/ 2.0/ 2.0; 
+    double bottom_A = concert_A / 2.0 / 2.0 / 2.0 / 2.0; 
  
-    unsigned int i;
-    double current_freq=bottom_A;
-    for(i=0; i < PIANO_N; i++)
+    unsigned int key;
+    double current_freq=bottom_A, samples_required;
+    for(key=0; key < PIANO_N; key++)
     {
         /*
          coeff = 2 * math.cos(2*math.pi*target/sample_rate)
         */
-        goertzel_coeff[i] = (float)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
+	    
+	// This is constant through time
+        piano_data[key].coeff = (goertzel_data)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
+	    
+	// These get updated continously, and must be stored between chunks of audio data
+	piano_data[key].q2=(goertzel_data)0.0;
+	piano_data[key].q1=(goertzel_data)0.0;
+	    
+	samples_required = sample_rate/current_freq * 20.0; // Want 20 whole cycles of the current waveform at least
+	if( samples_required > sample_rate/4.0) { // For the really low notes, 4 updates a second is good enough...
+	    samples_required = sample_rate/4.0;	
+	}
+	if( samples_required < sample_rate/(double)fps_display*0.75) { // For the high notes, use as many samples as we need in a display_fps
+	    samples_required = sample_rate/(double)fps_display*0.75;	
+	}
+	piano_data[key].samples_process_before_display_update = (int)samples_required;
+	piano_data[key].samples_processed = 0;
+	
+	piano_data[key].is_black_note=false; // Will be put right in .resize()
+	
         current_freq *= semi_tone;
     }
 
-    startColor = QColor(0,0,255);
-    targetColor = QColor(255,0,0); 
+    whiteStartColor = QColor(245,245,245);
+    whiteTargetColor = QColor(255,10,10); 
+    
+    blackStartColor = QColor(10,10,10);
+    blackTargetColor = QColor(10,10,255); 
 }
 
 Piano::~Piano()
 {
-    if (goertzel_coeff) 
-        free(goertzel_coeff);
+    if (piano_data) 
+        free(piano_data);
     if (audio_data) 
         free(audio_data);
 }
@@ -364,25 +388,78 @@ void Piano::resize(const QSize &newsize)
 
     size = newsize;
 
-    scale.setMax(192, size.width() / analyzerBarWidth);
+    // There are 88-36=52 white notes on piano keyboard
+    double key_unit_size = (double)size.width() / 54.0;  // One white key extra spacing, if possible
+    if (key_unit_size < 10.0) // Keys have to be at least this many pixels wide
+        key_unit_size = 10.0;
+    
+    double white_width_pct = .8;
+    double black_width_pct = .6;
+    double black_offset_pct = .05;
+    
+    double white_height_pct = 6;
+    double black_height_pct = 4;
 
-    rects.resize( scale.range() );
-    unsigned int i = 0;
-    int w = 0;
-    for (; i < rects.size(); i++, w += analyzerBarWidth)
+    // This is the starting position of the keyboard (may be beyond LHS) 
+    // - actually position of C below bottom A (will be added to...).  This is 4 octaves below middle C.
+    double left =  (double)size.width() / 2.0 - (4.0*7.0 + 3.5)*key_unit_size; // The extra 3.5 centers 'F' inthe middle of the screen
+    double top_of_keys = (double)size.height() / 2.0 - key_unit_size * white_height_pct / 2.0; // Vertically center keys
+    
+    double width, height, center, offset;
+
+    rects.resize( PIANO_N );
+
+    unsigned int key;
+    int note;
+    bool is_black=false;
+    for (key=0; key < PIANO_N; key++)
     {
-        rects[i].setRect(w, size.height() / 2, analyzerBarWidth - 1, 1);
+	note=((int)key - 3 + 12) % 12;  // This means that C=0, C#=1, D=2, etc (since lowest note is bottom A)
+	if(note==0) // If we're on a 'C', move the left 'cursor' over an octave
+	{
+		left += key_unit_size*7.0;
+	}
+	
+	center=0.0; 
+	offset=0.0;     
+	is_black=false;
+	    
+	switch(note) {
+		case 0:  center=0.5; break;
+		case 1:  center=1.0; is_black=true; offset=-1; break;
+		case 2:  center=1.5; break;
+		case 3:  center=2.0; is_black=true; offset=+1; break;
+		case 4:  center=2.5; break;
+		case 5:  center=3.5; break;
+		case 6:  center=4.0; is_black=true; offset=-2; break;
+		case 7:  center=4.5; break;
+		case 8:  center=5.0; is_black=true; offset=0; break;
+		case 9:  center=5.5; break;
+		case 10: center=6.0; is_black=true; offset=+2; break;
+		case 11: center=6.5; break;
+	}
+	piano_data[key].is_black_note=is_black;
+	
+	width=(is_black?black_width_pct:white_width_pct)*key_unit_size;
+	height=(is_black?black_height_pct:white_height_pct)*key_unit_size;
+	
+        rects[key].setRect(
+	 left + center*key_unit_size //  Basic position of left side of key
+	        - width/2.0  // Less half the width  
+		+(is_black?(offset*black_offset_pct*key_unit_size):0.0), // And jiggle the positions of the black keys for aethetic reasons
+	 top_of_keys, // top
+	 width, // width
+	 height // height
+	);
     }
 
-    unsigned int os = magnitudes.size();
-    magnitudes.resize( scale.range() * 2 );
-    for (; os < magnitudes.size(); os++)
+    magnitude.resize( PIANO_N );
+    for (key=0; key < (uint)magnitude.size(); key++)
     {
-        magnitudes[os] = 0.0;
+        magnitude[key] = 0.0;
     }
 
-    //scaleFactor = double( size.height() / 2 ) / log( (double)(FFTW_N) );
-    scaleFactor = double( size.height() / 2 ) ; //  End result 0<x<1
+    return;
 }
 
 bool Piano::process(VisualNode *node)
@@ -394,11 +471,17 @@ bool Piano::process(VisualNode *node)
  
     uint i, n, key;
  
-    QRect *rectsp = rects.data();
-    double *magnitudesp = magnitudes.data();
+    double *magnitudep = magnitude.data();
  
-    piano_audio q0, q1, q2, coeff, magnitude2;
-    double magnitude_av, samples_plus_1;
+    goertzel_data q0, q1, q2, coeff;
+    goertzel_data magnitude2;
+    piano_audio short_to_bounded = 32768.0;
+    double magnitude_av;
+    int n_samples;
+	
+    // We were just called : Even though the data node may be empty, we count it towards a seen chunk,
+    // since the fps_display depends on multiples of the fps we requested (even if some of those calls were unnecessary/overzealous)
+    chunk_counter++;
 
     if (node) 
     {
@@ -407,26 +490,28 @@ bool Piano::process(VisualNode *node)
         {
             for(i=0; i<n; i++) 
             {
-                audio_data[i] = (piano_audio)((node->left[i] + (piano_audio)node->right[i]) / 2);
+                audio_data[i] = (piano_audio)(((piano_audio)node->left[i] + (piano_audio)node->right[i]) / 2.0 / short_to_bounded);
             }
         }
         else // This is only one channel of data
         {
             for(i=0; i<n; i++) 
             {
-                audio_data[i] = (piano_audio)node->left[i];
+                audio_data[i] = (piano_audio)node->left[i] / short_to_bounded;
             }
         }
     } 
     else
-        n = 0;
-
-    samples_plus_1 = n + 1;
+    {
+	return allZero; // Nothing to see here... 
+    }
+    
     for(key=0; key<PIANO_N; key++) 
     {
-        coeff = goertzel_coeff[key];
-        q2=0;
-        q1=0;
+        coeff = piano_data[key].coeff;
+	    
+        q2=piano_data[key].q2;
+        q1=piano_data[key].q1;
      
         for(i=0; i<n; i++) 
         {
@@ -434,22 +519,35 @@ bool Piano::process(VisualNode *node)
             q2=q1;
             q1=q0;
         }
-        magnitude2 = q1*q1 + q2*q2 - q1*q2*coeff;
-        if(magnitude2>0.01f) 
-        {
-            allZero = FALSE;
-        }
-        if(key<rects.size()) 
-        {
-            magnitude_av = sqrt(magnitude2)/samples_plus_1; // Should be 0<magnitude_av<1
-            magnitude_av /= 32768.0;   // Convert short to [-1,+1] 
-         
-            magnitude_av *= 8.0; // Enlargement factor (arbitrary)
-         
-            magnitudesp[key] = magnitude_av; // Store this for later : We'll do the colours from this...
-            rectsp[key].setTop( size.height() * (1.0-magnitude_av)/2.0 );
-            rectsp[key].setBottom( size.height() * (1.0+magnitude_av)/2.0 );
-        }
+        piano_data[key].q2=q2;
+        piano_data[key].q1=q1;
+	
+	piano_data[key].samples_processed += n;
+	
+	n_samples = piano_data[key].samples_processed;
+	
+	// Only do this update if we've processed enough chunks for this key...
+	if(n_samples > piano_data[key].samples_process_before_display_update) 
+	{
+		magnitude2 = q1*q1 + q2*q2 - q1*q2*coeff;
+		if(magnitude2>0.01f) 
+		{
+		    allZero = FALSE;
+		}
+		if(key<magnitude.size()) 
+		{
+		    magnitude_av = sqrt(magnitude2)/n_samples; // Should be 0<magnitude_av<.5
+		    // magnitude_av /= 32768.0;   // Convert short to [-1,+1] 
+		 
+		    magnitude_av *= 64.0; // Enlargement factor (arbitrary)
+		 
+		    magnitudep[key] = (double)magnitude_av; // Store this for later : We'll do the colours from this...
+		}
+		
+		piano_data[key].samples_processed=0; // Reset the counts, now that we've set the magnitude...
+		piano_data[key].q1=(goertzel_data)0.0;
+		piano_data[key].q2=(goertzel_data)0.0;
+	}
     }
 
     return allZero;
@@ -472,32 +570,61 @@ bool Piano::draw(QPainter *p, const QColor &back)
     // just uses some Qt methods to draw on a pixmap.
     // MainVisual then bitblts that onto the screen.
 
+    if(chunk_counter<chunks_per_displayed_frame)
+    {
+	    return false; // Don't do a display update this time
+    }
+    chunk_counter=0; // Reset the counter, we're doing a display...
+    
     QRect *rectsp = rects.data();
+    double *magnitudep = magnitude.data();
+    
+    unsigned int key;
     double r, g, b, per;
 
     p->fillRect(0, 0, size.width(), size.height(), back);
-    for (uint i = 0; i < rects.size(); i++)
+	
+    // Deal with all the white keys first
+    for (key = 0; key < (uint)rects.size(); key++)
     {
-        per = double( rectsp[i].height() - 2 ) / double( size.height() );
-
+	if(piano_data[key].is_black_note)
+		continue;
+	
+	per = magnitudep[key];
         per = clamp(per, 1.0, 0.0);        
                 
-        r = startColor.red() + 
-            (targetColor.red() - startColor.red()) * (per * per);
-        g = startColor.green() + 
-            (targetColor.green() - startColor.green()) * (per * per);
-        b = startColor.blue() + 
-            (targetColor.blue() - startColor.blue()) * (per * per);
+        r = whiteStartColor.red() + (whiteTargetColor.red() - whiteStartColor.red()) * per;
+        g = whiteStartColor.green() + (whiteTargetColor.green() - whiteStartColor.green()) * per;
+        b = whiteStartColor.blue() + (whiteTargetColor.blue() - whiteStartColor.blue()) * per;
 
         r = clamp(r, 255.0, 0.0);
         g = clamp(g, 255.0, 0.0);
         b = clamp(b, 255.0, 0.0);
                 
-        if(rectsp[i].height() > 4)
-            p->fillRect(rectsp[i], QColor(int(r), int(g), int(b)));
+	p->fillRect(rectsp[key], QColor(int(r), int(g), int(b)));
+    }
+    
+    // Then overlay the black keys
+    for (key = 0; key < (uint)rects.size(); key++)
+    {
+	if( ! piano_data[key].is_black_note)
+		continue;
+	
+	per = magnitudep[key];
+        per = clamp(per, 1.0, 0.0);        
+                
+        r = blackStartColor.red() + (blackTargetColor.red() - blackStartColor.red()) * per;
+        g = blackStartColor.green() + (blackTargetColor.green() - blackStartColor.green()) * per;
+        b = blackStartColor.blue() + (blackTargetColor.blue() - blackStartColor.blue()) * per;
+
+        r = clamp(r, 255.0, 0.0);
+        g = clamp(g, 255.0, 0.0);
+        b = clamp(b, 255.0, 0.0);
+                
+	p->fillRect(rectsp[key], QColor(int(r), int(g), int(b)));
     }
 
-    if(1) 
+    if(0) 
     {
         drawWarning(p, back, size,
                 QObject::tr("Piano Visualization Message") + "\n" + 

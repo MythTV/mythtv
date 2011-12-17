@@ -90,6 +90,17 @@ class Piano : public VisualBase
 
 #define PIANO_N 88
 #define piano_audio float
+#define goertzel_data float
+
+typedef struct piano_key_data {
+	goertzel_data q1, q2, coeff;
+	
+	int samples_processed;
+	int samples_process_before_display_update;
+	
+	//int x, y, width, height;  // These are just constructed in .resize() as rects (below)
+	bool is_black_note; // These are painted on top of white notes, and have different colouring
+} piano_key_data;
 	
   public:
     Piano();
@@ -103,27 +114,22 @@ class Piano : public VisualBase
   protected:
     inline double clamp(double cur, double max, double min);
 
-    QColor startColor, targetColor;
+    QColor whiteStartColor, whiteTargetColor, blackStartColor, blackTargetColor;
+  
     vector<QRect> rects;
-    vector<double> magnitudes;
     QSize size;
-    LogScale scale;
-    double scaleFactor, falloff;
-    int analyzerBarWidth;
+  
+    //LogScale scale;
+    //double scaleFactor, falloff;
+    //int analyzerBarWidth;
+  
+    int chunks_per_displayed_frame;
+    int chunk_counter;
 
-    piano_audio *goertzel_coeff;
+    piano_key_data *piano_data;
     piano_audio *audio_data;
   
-/*
-#ifdef FFTW3_SUPPORT
-    fftw_plan lplan, rplan;
-    myth_fftw_float *lin, *rin;
-    myth_fftw_complex *lout, *rout;
-#elif FFTW2_SUPPORT
-    rfftw_plan plan;
-    fftw_real *lin, *rin, *lout, *rout;
-#endif
-*/
+    vector<double> magnitude;
 };
 
 class AlbumArt : public VisualBase
