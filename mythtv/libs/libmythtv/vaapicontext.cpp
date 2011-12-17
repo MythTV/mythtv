@@ -5,6 +5,7 @@
 #include "frame.h"
 #include "vaapicontext.h"
 #include "mythmainwindow.h"
+#include "myth_imgconvert.h"
 
 #define LOC QString("VAAPI: ")
 #define ERR QString("VAAPI Error: ")
@@ -249,6 +250,8 @@ VAAPIContext::VAAPIContext(VAAPIDisplayType display_type,
     m_pictureAttributeCount(0), m_hueBase(0)
 {
     memset(&m_ctx, 0, sizeof(vaapi_context));
+    memset(&m_image, 0, sizeof(m_image));
+    m_image.image_id = VA_INVALID_ID;
 }
 
 VAAPIContext::~VAAPIContext()
@@ -262,6 +265,12 @@ VAAPIContext::~VAAPIContext()
         m_display->m_x_disp->Lock();
 
         INIT_ST;
+
+        if (m_image.image_id != VA_INVALID_ID)
+        {
+            va_status = vaDestroyImage(m_ctx.display, m_image.image_id);
+            CHECK_ST;
+        }
         if (m_ctx.context_id)
         {
             va_status = vaDestroyContext(m_ctx.display, m_ctx.context_id);
@@ -631,6 +640,134 @@ uint8_t* VAAPIContext::GetSurfaceIDPointer(void* buf)
     va_status = vaSyncSurface(m_ctx.display, surf->m_id);
     CHECK_ST;
     return (uint8_t*)(uintptr_t)surf->m_id;
+}
+
+bool VAAPIContext::InitImage(const void *buf)
+{
+    if (!buf)
+        return false;
+    if (!m_dispType == kVADisplayX11)
+        return true;
+
+    int num_formats = 0;
+    int max_formats = vaMaxNumImageFormats(m_ctx.display);
+    VAImageFormat *formats = new VAImageFormat[max_formats];
+
+    INIT_ST;
+    va_status = vaQueryImageFormats(m_ctx.display, formats, &num_formats);
+    CHECK_ST;
+
+    const vaapi_surface *surf = (vaapi_surface*)buf;
+    for (int i = 0; i < num_formats; i++)
+    {
+        if(formats[i].fourcc == VA_FOURCC('Y','V','1','2') ||
+           formats[i].fourcc == VA_FOURCC('I','4','2','0') ||
+           formats[i].fourcc == VA_FOURCC('N','V','1','2'))
+        {
+            if (vaCreateImage(m_ctx.display, &formats[i],
+                              m_size.width(), m_size.height(), &m_image))
+            {
+                m_image.image_id = VA_INVALID_ID;
+                continue;
+            }
+
+            if (vaGetImage(m_ctx.display, surf->m_id, 0, 0,
+                           m_size.width(), m_size.height(), m_image.image_id))
+            {
+                vaDestroyImage(m_ctx.display, m_image.image_id);
+                m_image.image_id = VA_INVALID_ID;
+                continue;
+            }
+            break;
+        }
+    }
+
+    delete [] formats;
+
+    if (m_image.image_id == VA_INVALID_ID)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create software image.");
+        return false;
+    }
+
+    LOG(VB_GENERAL, LOG_DEBUG,
+        LOC + QString("InitImage: id %1, width %2 height %3 "
+                      "format %4")
+        .arg(m_image.image_id).arg(m_image.width).arg(m_image.height)
+        .arg(m_image.format.fourcc));
+
+    return true;
+}
+
+bool VAAPIContext::CopySurfaceToFrame(VideoFrame *frame, const void *buf)
+{
+    MythXLocker locker(m_display->m_x_disp);
+
+    if (m_image.image_id == VA_INVALID_ID)
+        InitImage(buf);
+
+    if (!frame || !buf || (m_dispType != kVADisplayX11) ||
+        m_image.image_id == VA_INVALID_ID)
+        return false;
+
+    const vaapi_surface *surf = (vaapi_surface*)buf;
+
+    INIT_ST;
+    va_status = vaSyncSurface(m_ctx.display, surf->m_id);
+    CHECK_ST;
+
+    va_status = vaGetImage(m_ctx.display, surf->m_id, 0, 0,
+                           m_size.width(), m_size.height(), m_image.image_id);
+    CHECK_ST;
+
+    if (ok)
+    {
+        void* source = NULL;
+        if (vaMapBuffer(m_ctx.display, m_image.buf, &source))
+            return false;
+
+        if (m_image.format.fourcc == VA_FOURCC('Y','V','1','2') ||
+            m_image.format.fourcc == VA_FOURCC('I','4','2','0'))
+        {
+            bool swap = m_image.format.fourcc == VA_FOURCC('I','4','2','0');
+            VideoFrame src;
+            init(&src, FMT_YV12, (unsigned char*)source, m_image.width,
+                 m_image.height, m_image.data_size, NULL,
+                 NULL, frame->aspect, frame->frame_rate);
+            src.pitches[0] = m_image.pitches[0];
+            src.pitches[1] = m_image.pitches[swap ? 2 : 1];
+            src.pitches[2] = m_image.pitches[swap ? 1 : 2];
+            src.offsets[0] = m_image.offsets[0];
+            src.offsets[1] = m_image.offsets[swap ? 2 : 1];
+            src.offsets[2] = m_image.offsets[swap ? 1 : 2];
+            copy(frame, &src);
+        }
+        else if (m_image.format.fourcc == VA_FOURCC('N','V','1','2'))
+        {
+            AVPicture img_in, img_out;
+            avpicture_fill(&img_out, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
+                           frame->width, frame->height);
+            avpicture_fill(&img_in, (uint8_t *)source, PIX_FMT_NV12,
+                           m_image.width, m_image.height);
+            myth_sws_img_convert(&img_out, PIX_FMT_YUV420P,
+                                 &img_in, PIX_FMT_NV12,
+                                 frame->width, frame->height);
+            // Is this needed? Is it safe?
+            frame->pitches[0] = img_out.linesize[0];
+            frame->pitches[1] = img_out.linesize[1];
+            frame->pitches[2] = img_out.linesize[2];
+            frame->offsets[0] = 0;
+            frame->offsets[1] = img_out.data[1] - img_out.data[0];
+            frame->offsets[2] = img_out.data[2] - img_out.data[0];
+        }
+        if (vaUnmapBuffer(m_ctx.display, m_image.buf))
+            return false;
+    }
+
+    if (ok)
+        return true;
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get image");
+    return false;
 }
 
 bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,

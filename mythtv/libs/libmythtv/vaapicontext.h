@@ -38,6 +38,10 @@ class VAAPIContext
     int   GetNumBuffers(void)        { return m_numSurfaces; }
     PixelFormat GetPixelFormat(void) { return m_pix_fmt;     }
 
+    // X11 display
+    bool  CopySurfaceToFrame(VideoFrame *frame, const void *buf);
+    bool  InitImage(const void *buf);
+    // GLX display
     bool  CopySurfaceToTexture(const void* buf, uint texture,
                                uint texture_type, FrameScanType scan);
     void* GetGLXSurface(uint texture, uint texture_type);
@@ -65,6 +69,7 @@ class VAAPIContext
     VADisplayAttribute* m_pictureAttributes;
     int            m_pictureAttributeCount;
     int            m_hueBase;
+    VAImage        m_image;
 };
 
 #endif // VAAPICONTEXT_H
