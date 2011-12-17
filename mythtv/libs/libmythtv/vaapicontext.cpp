@@ -729,7 +729,7 @@ bool VAAPIContext::CopySurfaceToFrame(VideoFrame *frame, const void *buf)
         if (m_image.format.fourcc == VA_FOURCC('Y','V','1','2') ||
             m_image.format.fourcc == VA_FOURCC('I','4','2','0'))
         {
-            bool swap = m_image.format.fourcc == VA_FOURCC('I','4','2','0');
+            bool swap = m_image.format.fourcc == VA_FOURCC('Y','V','1','2');
             VideoFrame src;
             init(&src, FMT_YV12, (unsigned char*)source, m_image.width,
                  m_image.height, m_image.data_size, NULL,
