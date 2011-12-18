@@ -94,10 +94,14 @@ class Piano : public VisualBase
 #define piano_audio float
 #define goertzel_data float
 
+#define PIANO_RMS_NEGLIGIBLE .001
+#define PIANO_SPECTRUM_SMOOTHING 0.95
 #define PIANO_MIN_VOL -10
+#define PIANO_KEYPRESS_TOO_LIGHT .2
 
 typedef struct piano_key_data {
 	goertzel_data q1, q2, coeff, magnitude;
+	goertzel_data max_magnitude_seen;
 	
 	// This keeps track of the samples processed for each note
 	// Low notes require a lot of samples to be correctly identified
@@ -126,7 +130,8 @@ typedef struct piano_key_data {
   protected:
 	inline double clamp(double cur, double max, double min);
 	bool process_all_types(VisualNode *node, bool this_will_be_displayed);
-  
+    void zero_analysis(void);
+
 	QColor whiteStartColor, whiteTargetColor, blackStartColor, blackTargetColor;
   
 	vector<QRect> rects;

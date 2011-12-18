@@ -315,7 +315,9 @@ Piano::Piano()
 	//analyzerBarWidth = 6;
 	//scaleFactor = 2.0;
 	//falloff = 3.0;
-	
+
+	LOG(VB_GENERAL, LOG_INFO, QString("Piano : Being Initialised"));
+
 	piano_data =  (piano_key_data *) malloc(sizeof(piano_key_data) * PIANO_N); 
 	audio_data= (piano_audio *) malloc(sizeof(piano_audio) * PIANO_AUDIO_SIZE);
  
@@ -337,11 +339,6 @@ Piano::Piano()
 		// This is constant through time
 		piano_data[key].coeff = (goertzel_data)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
 		
-		// These get updated continously, and must be stored between chunks of audio data
-		piano_data[key].q2=(goertzel_data)0.0;
-		piano_data[key].q1=(goertzel_data)0.0;
-		piano_data[key].magnitude=(goertzel_data)0.0;
-			
 		samples_required = sample_rate/current_freq * 20.0; // Want 20 whole cycles of the current waveform at least
 		if( samples_required > sample_rate/4.0) { // For the really low notes, 4 updates a second is good enough...
 			samples_required = sample_rate/4.0;	
@@ -350,14 +347,12 @@ Piano::Piano()
 			samples_required = sample_rate/(double)fps*0.75;	
 		}
 		piano_data[key].samples_process_before_display_update = (int)samples_required;
-		piano_data[key].samples_processed = 0;
-		
 		piano_data[key].is_black_note=false; // Will be put right in .resize()
 	
 		current_freq *= semi_tone;
 	}
-
-	offset_processed = 0;  
+	
+	zero_analysis();
 	
 	whiteStartColor = QColor(245,245,245);
 	whiteTargetColor = Qt::red;
@@ -375,6 +370,24 @@ Piano::~Piano()
 		free(audio_data);
 }
 
+void Piano::zero_analysis(void)
+{
+	unsigned int key;	
+	for(key=0; key < PIANO_N; key++)
+	{
+		// These get updated continously, and must be stored between chunks of audio data
+		piano_data[key].q2=(goertzel_data)0.0f;
+		piano_data[key].q1=(goertzel_data)0.0f;
+		piano_data[key].magnitude=(goertzel_data)0.0f;
+		piano_data[key].max_magnitude_seen=(goertzel_data)(PIANO_RMS_NEGLIGIBLE*PIANO_RMS_NEGLIGIBLE); // This is a guess - will be quickly overwritten
+			
+		piano_data[key].samples_processed = 0;
+	}
+	offset_processed = 0;  
+	
+	return;
+}
+
 void Piano::resize(const QSize &newsize)
 {
 	// Just change internal data about the
@@ -384,6 +397,10 @@ void Piano::resize(const QSize &newsize)
 	// the audio magnitudes
 
 	size = newsize;
+	
+	LOG(VB_GENERAL, LOG_INFO, QString("Piano : Being Resized"));
+	
+	zero_analysis();
 
 	// There are 88-36=52 white notes on piano keyboard
 	double key_unit_size = (double)size.width() / 54.0;  // One white key extra spacing, if possible
@@ -465,7 +482,8 @@ unsigned long Piano::getDesiredSamples(void)
 	//   typical observed values are 882 - 
 	//   12.5 chunks of data per second from 44100Hz signal : Sampled at 50Hz, lots of 4, see :
 	//   mythtv/libs/libmyth/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
-	return (unsigned long )PIANO_AUDIO_SIZE;  // Maximum we can be given
+	//   See : mythtv/mythplugins/mythmusic/mythmusic/avfdecoder.cpp "20ms worth"
+	return (unsigned long) PIANO_AUDIO_SIZE;  // Maximum we can be given
 }
 	
 bool Piano::process_undisplayed(VisualNode *node)
@@ -476,7 +494,7 @@ bool Piano::process_undisplayed(VisualNode *node)
 	
 bool Piano::process(VisualNode *node)
 {
-	LOG(VB_GENERAL, LOG_INFO, QString("Piano : Processing node for DISPLAY"));
+	//LOG(VB_GENERAL, LOG_INFO, QString("Piano : Processing node for DISPLAY"));
 	return process_all_types(node, true);
 }
 
@@ -496,25 +514,27 @@ bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
 	
 	if (node) 
 	{
+		// Detect start of new song (current node more than 10s earlier than already seen)
+		if(node->offset + 10000 < offset_processed) 
+		{
+			LOG(VB_GENERAL, LOG_INFO, QString("Piano : Node offset=%1 too far backwards : NEW SONG").arg(node->offset));
+			// zero out all the analysis
+			zero_analysis();
+		}
+		
+		// Check whether we've seen this node (more recently than 10secs ago)
 		if(node->offset <= offset_processed) 
 		{
-			// We've already seen this node
 			//LOG(VB_GENERAL, LOG_INFO, QString("Piano : Already seen node offset=%1, returning without processing").arg(node->offset));
-			return this_will_be_displayed; // Nothing to see here - pretend it wasn't all zero... 
+			return allZero; // Nothing to see here - the server can stop if it wants to
 		}
 	}
 		
 	if (node) 
 	{
+		//LOG(VB_GENERAL, LOG_INFO, QString("Piano : Processing node offset=%1, size=%2").arg(node->offset).arg(node->length));
+		
 		n = node->length;
-		
-		LOG(VB_GENERAL, LOG_INFO, QString("Piano : Processing node offset=%1, size=%2").arg(node->offset).arg(node->length));
-		
-		//if(n != FFTW_N) 
-		//{
-		//	LOG(VB_GENERAL, LOG_ERR, QString("Piano : Chunk of data different is size than expected (%1 != %2)").arg(n, FFTW_N));
-		//	//n=FFTW_N;
-		//}
 		
 		if(node->right) // Preprocess the data into a combined middle channel, if we have stereo data
 		{
@@ -534,7 +554,7 @@ bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
 	else
 	{
 		//LOG(VB_GENERAL, LOG_INFO, QString("Hit an empty node, and returning empty-handed"));
-		return allZero; // Nothing to see here... 
+		return allZero; // Nothing to see here - the server can stop if it wants to
 	}
 	
 	for(key=0; key<PIANO_N; key++) 
@@ -561,16 +581,15 @@ bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
 		if(n_samples > piano_data[key].samples_process_before_display_update) 
 		{
 			magnitude2 = q1*q1 + q2*q2 - q1*q2*coeff;
-			if(magnitude2>(goertzel_data)0.01) 
-			{
-				allZero = FALSE;
-			}
 			
-			if(false)
+			if(false) // This is RMS of signal
 			{
 			    magnitude_av = sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
 			}
-			magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
+			if(true) // This is pure magnitude of signal
+			{
+				magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
+			}
 			
 			if(false) // Take logs everywhere, and shift up to [0, ??] 
 			{
@@ -590,9 +609,19 @@ bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
 				}
 			}
 			
+			if(magnitude_av>(goertzel_data)0.01) 
+			{
+				allZero = FALSE;
+			}
+			
 			//magnitude_av *= 64.0; // Enlargement factor (arbitrary)
 			 
 			piano_data[key].magnitude = magnitude_av; // Store this for later : We'll do the colours from this...
+			
+			if( piano_data[key].max_magnitude_seen < magnitude_av) 
+			{
+				piano_data[key].max_magnitude_seen=magnitude_av;
+			}
 			//LOG(VB_GENERAL, LOG_INFO, QString("Piano : Updated Key %1 from %2 samples, magnitude=%3").arg(key).arg(n_samples).arg(magnitude_av));
 			
 			piano_data[key].samples_processed=0; // Reset the counts, now that we've set the magnitude...
@@ -631,14 +660,52 @@ bool Piano::draw(QPainter *p, const QColor &back)
 
 	p->fillRect(0, 0, size.width(), size.height(), back);
 
+	// Protect maximum array length
 	if(n>(uint)rects.size())
 		n=(uint)rects.size();
 	
-	// Set a minimum, to prevent divide-by-zero (and also all-pressed when music very quiet)
-	double magnitude_max=0.0000005, mag; 
+	
+	// Sweep up across the keys, making sure the max_magnitude_seen is at minimum X% of its neighbours
+	double mag=PIANO_RMS_NEGLIGIBLE; 
 	for (key = 0; key < n; key++)
 	{
-		mag = piano_data[key].magnitude;
+		if(piano_data[key].max_magnitude_seen < mag)
+		{
+			// Spread the previous value to this key
+			piano_data[key].max_magnitude_seen = mag;
+		}
+		else
+		{
+			// This key has seen better peaks, use this for the next one
+			mag = piano_data[key].max_magnitude_seen;
+		}
+		mag *= PIANO_SPECTRUM_SMOOTHING;
+	}
+	
+	// Similarly, down, making sure the max_magnitude_seen is at minimum X% of its neighbours
+	mag=PIANO_RMS_NEGLIGIBLE; 
+	for (int key_i = n-1; key_i >=0; key_i--)
+	{
+		key = key_i; // Wow, this is to avoid a zany error for ((unsigned)0)-- 
+		if(piano_data[key].max_magnitude_seen < mag)
+		{
+			// Spread the previous value to this key
+			piano_data[key].max_magnitude_seen = mag;
+		}
+		else
+		{
+			// This key has seen better peaks, use this for the next one
+			mag = piano_data[key].max_magnitude_seen;
+		}
+		mag *= PIANO_SPECTRUM_SMOOTHING;
+	}
+	
+	// Now find the key that has been hit the hardest relative to its experience, and renormalize...
+	// Set a minimum, to prevent divide-by-zero (and also all-pressed when music very quiet)
+	double magnitude_max=PIANO_RMS_NEGLIGIBLE;
+	for (key = 0; key < n; key++)
+	{
+		mag = piano_data[key].magnitude / piano_data[key].max_magnitude_seen;
 		if(magnitude_max < mag)
 			magnitude_max = mag;
 		
@@ -652,11 +719,11 @@ bool Piano::draw(QPainter *p, const QColor &back)
 			continue;
 		
 		per = magnitudep[key]/magnitude_max;
-		//per = clamp(per, 1.0, 0.0);        // By construction, this is unnecessary
-		if(per<.1)
-			per=0.0; // Clamp to zero for lightly detected keys
+		per = clamp(per, 1.0, 0.0);        // By construction, this should be unnecessary
 		
-		//LOG(VB_GENERAL, LOG_INFO, QString("Piano : Display key %1, magnitude=%2").arg(key).arg(per*100.0));		
+		if(per<PIANO_KEYPRESS_TOO_LIGHT)
+			per=0.0; // Clamp to zero for lightly detected keys
+		LOG(VB_GENERAL, LOG_INFO, QString("Piano : Display key %1, magnitude=%2, seen=%3").arg(key).arg(per*100.0).arg(piano_data[key].max_magnitude_seen));		
 		
 		r = whiteStartColor.red() + (whiteTargetColor.red() - whiteStartColor.red()) * per;
 		g = whiteStartColor.green() + (whiteTargetColor.green() - whiteStartColor.green()) * per;
@@ -672,8 +739,9 @@ bool Piano::draw(QPainter *p, const QColor &back)
 			continue;
 		
 		per = magnitudep[key]/magnitude_max;
-		//per = clamp(per, 1.0, 0.0);        
-		if(per<.1)
+		per = clamp(per, 1.0, 0.0);        // By construction, this should be unnecessary
+		
+		if(per<PIANO_KEYPRESS_TOO_LIGHT)
 			per=0.0; // Clamp to zero for lightly detected keys
 				
 		r = blackStartColor.red() + (blackTargetColor.red() - blackStartColor.red()) * per;
