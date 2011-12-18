@@ -89,8 +89,8 @@ class Piano : public VisualBase
 	// frequencies in the audio data.
 
 #define PIANO_AUDIO_SIZE 4096
-
 #define PIANO_N 88
+	
 #define piano_audio float
 #define goertzel_data float
 

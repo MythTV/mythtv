@@ -312,17 +312,13 @@ Piano::Piano()
 {
 	// Setup the "magical" audio coefficients
 	// required by the Goetzel Algorithm
-	//analyzerBarWidth = 6;
-	//scaleFactor = 2.0;
-	//falloff = 3.0;
 
-	LOG(VB_GENERAL, LOG_INFO, QString("Piano : Being Initialised"));
+	// LOG(VB_GENERAL, LOG_INFO, QString("Piano : Being Initialised"));
 
 	piano_data =  (piano_key_data *) malloc(sizeof(piano_key_data) * PIANO_N); 
 	audio_data= (piano_audio *) malloc(sizeof(piano_audio) * PIANO_AUDIO_SIZE);
  
-	double sample_rate = 44100.0;
-	//double sample_rate = 48000.0;
+	double sample_rate = 44100.0;  // TODO : This should be obtained from gPlayer (likely candidate...)
 	
 	fps = 20; // This is the display frequency.   We're capturing all audio chunks by defining .process_undisplayed() though.
 	
@@ -356,7 +352,6 @@ Piano::Piano()
 	
 	whiteStartColor = QColor(245,245,245);
 	whiteTargetColor = Qt::red;
-	//whiteTargetColor = QColor(10,255,255);  // yellow?
 	
 	blackStartColor = QColor(10,10,10);
 	blackTargetColor = Qt::red;
@@ -398,7 +393,7 @@ void Piano::resize(const QSize &newsize)
 
 	size = newsize;
 	
-	LOG(VB_GENERAL, LOG_INFO, QString("Piano : Being Resized"));
+	//LOG(VB_GENERAL, LOG_INFO, QString("Piano : Being Resized"));
 	
 	zero_analysis();
 
@@ -500,9 +495,8 @@ bool Piano::process(VisualNode *node)
 
 bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
 {
-	// Take a bunch of data in *node
-	// and break it down into spectrum
-	// values
+	// Take a bunch of data in *node and break it down into piano key spectrum values
+	// NB: Remember the state data between calls, so as to accumulate more accurate results. 
 	bool allZero = TRUE;
  
 	uint i, n, key;
@@ -517,8 +511,7 @@ bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
 		// Detect start of new song (current node more than 10s earlier than already seen)
 		if(node->offset + 10000 < offset_processed) 
 		{
-			LOG(VB_GENERAL, LOG_INFO, QString("Piano : Node offset=%1 too far backwards : NEW SONG").arg(node->offset));
-			// zero out all the analysis
+			//LOG(VB_GENERAL, LOG_INFO, QString("Piano : Node offset=%1 too far backwards : NEW SONG").arg(node->offset));
 			zero_analysis();
 		}
 		
@@ -533,7 +526,6 @@ bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
 	if (node) 
 	{
 		//LOG(VB_GENERAL, LOG_INFO, QString("Piano : Processing node offset=%1, size=%2").arg(node->offset).arg(node->length));
-		
 		n = node->length;
 		
 		if(node->right) // Preprocess the data into a combined middle channel, if we have stereo data
@@ -613,11 +605,8 @@ bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
 			{
 				allZero = FALSE;
 			}
-			
-			//magnitude_av *= 64.0; // Enlargement factor (arbitrary)
 			 
 			piano_data[key].magnitude = magnitude_av; // Store this for later : We'll do the colours from this...
-			
 			if( piano_data[key].max_magnitude_seen < magnitude_av) 
 			{
 				piano_data[key].max_magnitude_seen=magnitude_av;
@@ -663,7 +652,6 @@ bool Piano::draw(QPainter *p, const QColor &back)
 	// Protect maximum array length
 	if(n>(uint)rects.size())
 		n=(uint)rects.size();
-	
 	
 	// Sweep up across the keys, making sure the max_magnitude_seen is at minimum X% of its neighbours
 	double mag=PIANO_RMS_NEGLIGIBLE; 
@@ -723,7 +711,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
 		
 		if(per<PIANO_KEYPRESS_TOO_LIGHT)
 			per=0.0; // Clamp to zero for lightly detected keys
-		LOG(VB_GENERAL, LOG_INFO, QString("Piano : Display key %1, magnitude=%2, seen=%3").arg(key).arg(per*100.0).arg(piano_data[key].max_magnitude_seen));		
+		//LOG(VB_GENERAL, LOG_INFO, QString("Piano : Display key %1, magnitude=%2, seen=%3").arg(key).arg(per*100.0).arg(piano_data[key].max_magnitude_seen));		
 		
 		r = whiteStartColor.red() + (whiteTargetColor.red() - whiteStartColor.red()) * per;
 		g = whiteStartColor.green() + (whiteTargetColor.green() - whiteStartColor.green()) * per;
