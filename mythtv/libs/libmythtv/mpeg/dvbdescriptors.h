@@ -1384,6 +1384,7 @@ class ServiceDescriptorMapping
         kServiceTypeHDTV                     = 0x11,
         kServiceTypeAdvancedCodecSDDigitalTelevision       = 0x16,
         kServiceTypeAdvancedCodecHDDigitalTelevision       = 0x19,
+        kServiceTypeAdvancedCodecFrameCompatiblePlanoStereoscopicHDTelevisionService = 0x1c,
         kServiceTypeEchoStarTV1              = 0x91,
         kServiceTypeEchoStarTV2              = 0x9a,
         kServiceTypeEchoStarTV3              = 0xa4,
@@ -1429,7 +1430,8 @@ class ServiceDescriptorMapping
     {
         return
             (ServiceType() == kServiceTypeHDTV) ||
-            (ServiceType() == kServiceTypeAdvancedCodecHDDigitalTelevision);
+            (ServiceType() == kServiceTypeAdvancedCodecHDDigitalTelevision) ||
+            (ServiceType() == kServiceTypeAdvancedCodecFrameCompatiblePlanoStereoscopicHDTelevisionService);
     }
     bool IsTeletext(void) const
     {
