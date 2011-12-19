@@ -344,6 +344,8 @@ class AVCVideoDescriptor : public MPEGDescriptor
     bool AVCStill(void)           const { return _data[5]&0x80; }
     // AVC_24_hour_picture_flag 1   5.1
     bool AVC24HourPicture(void)   const { return _data[5]&0x40; }
+    bool FramePackingSEINotPresentFlag(void)
+                                  const { return _data[5]&0x20; }
     // reserved 6 bslbf
     QString toString() const;
 };

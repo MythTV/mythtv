@@ -582,8 +582,9 @@ QString ISO639LanguageDescriptor::toString() const
 QString AVCVideoDescriptor::toString() const
 {
     return QString("AVC Video: IDC prof(%1) IDC level(%2) sets(%3%4%5) "
-                   "compat(%6) still(%7) 24hr(%8)")
+                   "compat(%6) still(%7) 24hr(%8) FramePacking(%9)")
         .arg(ProfileIDC()).arg(LevelIDC())
         .arg(ConstaintSet0()).arg(ConstaintSet1()).arg(ConstaintSet2())
-        .arg(AVCCompatible()).arg(AVCStill()).arg(AVC24HourPicture());
+        .arg(AVCCompatible()).arg(AVCStill()).arg(AVC24HourPicture())
+        .arg(FramePackingSEINotPresentFlag());
 }
