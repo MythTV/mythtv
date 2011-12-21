@@ -330,7 +330,7 @@ static QDateTime ts_to_qdatetime(
     uint64_t pts, uint64_t pts_first, QDateTime &pts_first_dt)
 {
     if (pts < pts_first)
-        pts += 0x1FFFFFFFF;
+        pts += 0x1FFFFFFFFLL;
     QDateTime dt = pts_first_dt;
     return dt.addMSecs((pts - pts_first)/90);
 }
