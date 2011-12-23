@@ -306,12 +306,18 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
             if (!changed || !textlist)
                 break;
 
+            if (streamRawIdx < 0)
+                continue;
+
             textlist->lock.lock();
 
             const int ccIdx = ccIndexTbl[min(streamRawIdx,6)];
 
             if (ccIdx >= 4)
+            {
+                textlist->lock.unlock();
                 continue;
+            }
 
             QStringList content;
             vector<CC608Text*>::iterator bit = textlist->buffers.begin();
