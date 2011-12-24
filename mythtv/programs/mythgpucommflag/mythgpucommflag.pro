@@ -9,13 +9,16 @@ INSTALLS = target
 
 QMAKE_CLEAN += $(TARGET)
 
+# For NVIDIA SDK
 SDK = /opt/NVIDIA_GPU_Computing_SDK
-INCLUDEPATH += $$SDK/shared/inc $$SDK/OpenCL/common/inc
-#INCLUDEPATH += $$SDK/OpenCL/common/inc
-LIBPATH += $$SDK/shared/lib $$SDK/shared/lib/linux
+INCLUDEPATH += $$SDK/OpenCL/common/inc
 LIBPATH += $$SDK/OpenCL/common/lib
 
-#LIBS += -lOpenCL -loclUtil_x86_64 -lshrutil_x86_64 -lglut -lGLEW
+# For AMD SDK
+#SDK = /opt/AMDAPP
+#INCLUDEPATH += $$SDK/include
+#LIBPATH += $$SDK/lib/x86_64
+
 LIBS += -lOpenCL -lglut -lGLEW
 
 # Input
