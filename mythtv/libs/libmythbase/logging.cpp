@@ -1273,6 +1273,8 @@ void verboseHelp()
     {
         VerboseDef *item = vit.value();
         QString name = QString("  %1").arg(item->name, -15, ' ');
+        if (item->helpText.isEmpty())
+            continue;
         cerr << name.toLocal8Bit().constData() << " - " << 
                 item->helpText.toLocal8Bit().constData() << endl;
     }
