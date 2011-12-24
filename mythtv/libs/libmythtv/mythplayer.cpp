@@ -850,17 +850,16 @@ void MythPlayer::OpenDummy(void)
 
 void MythPlayer::CreateDecoder(char *testbuf, int testreadsize)
 {
-    if (player_ctx->GetSpecialDecode() == kAVSpecialDecode_GPUDecode)
+    if (FlagIsSet(kDecodeGPUCommflag))
     {
-        player_ctx->SetSpecialDecode(kAVSpecialDecode_NoDecode);
+        playerFlags = (PlayerFlags)((uint32_t)playerFlags &
+                                    ~(uint32_t)kDecodeGPUCommflag);
         if (GPUAvDecoder::CanHandle(testbuf,
                                     player_ctx->buffer->GetFilename(),
                                     testreadsize))
         {
             SetDecoder(new GPUAvDecoder(this, *player_ctx->playingInfo,
-                                        using_null_videoout,
-                                        allow_libmpeg2, no_accel,
-                                        player_ctx->GetSpecialDecode()));
+                                        playerFlags));
         }
     }
     else if (NuppelDecoder::CanHandle(testbuf, testreadsize))

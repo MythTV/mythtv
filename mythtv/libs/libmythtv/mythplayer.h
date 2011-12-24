@@ -92,6 +92,7 @@ enum PlayerFlags
     kDecodeAllowGPU       = 0x000040, // VDPAU, VAAPI, DXVA2
     kDecodeAllowEXT       = 0x000080, // VDA, CrystalHD
     kVideoIsNull          = 0x000100,
+    kDecodeGPUCommflag    = 0x000200, // (temporary) for mythgpucommflag
     kAudioMuted           = 0x010000,
 };
 

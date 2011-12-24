@@ -253,12 +253,8 @@ void GPUAvDecoder::GetDecoders(render_opts &opts)
     PrivateDecoder::GetDecoders(opts);
 }
 
-GPUAvDecoder::GPUAvDecoder(MythPlayer *parent,
-                                 const ProgramInfo &pginfo,
-                                 bool use_null_videoout,
-                                 bool allow_private_decode,
-                                 bool no_hardware_decode,
-                                 AVSpecialDecode special_decoding)
+GPUAvDecoder::GPUAvDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
+                           PlayerFlags flags)
     : DecoderBase(parent, pginfo),
       private_dec(NULL),
       is_db_ignored(gCoreContext->IsDatabaseIgnored()),
@@ -283,11 +279,8 @@ GPUAvDecoder::GPUAvDecoder(MythPlayer *parent,
       pts_detected(false),
       reordered_pts_detected(false),
       pts_selected(true),
-      using_null_videoout(use_null_videoout),
+      playerFlags(flags),
       video_codec_id(kCodec_NONE),
-      no_hardware_decoders(no_hardware_decode),
-      allow_private_decoders(allow_private_decode),
-      special_decode(special_decoding),
       maxkeyframedist(-1),
       // Closed Caption & Teletext decoders
       ignore_scte(false),
@@ -322,8 +315,8 @@ GPUAvDecoder::GPUAvDecoder(MythPlayer *parent,
     audioIn.sample_size = -32; // force SetupAudioStream to run once
     itv = m_parent->GetInteractiveTV();
 
-    LOG(VB_COMMFLAG, LOG_INFO, LOC + QString("Special Decode Flags: 0x%1")
-        .arg(special_decode, 0, 16));
+    LOG(VB_COMMFLAG, LOG_INFO, LOC + QString("Player Flags: 0x%1")
+        .arg(playerFlags, 0, 16));
 }
 
 GPUAvDecoder::~GPUAvDecoder()
@@ -1152,33 +1145,33 @@ void GPUAvDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                 "codec %2").arg(enc->pix_fmt)
             .arg(ff_codec_id_string(enc->codec_id)));
 
-    if (special_decode)
+    if (playerFlags)
     {
         enc->flags2 |= CODEC_FLAG2_FAST;
 
-        if ((CODEC_ID_MPEG2VIDEO == codec->id) ||
-            (CODEC_ID_MPEG1VIDEO == codec->id))
+        if ((codec->id == CODEC_ID_MPEG2VIDEO) ||
+            (codec->id == CODEC_ID_MPEG1VIDEO))
         {
-            if (special_decode & kAVSpecialDecode_FewBlocks)
+            if (FlagIsSet(kDecodeFewBlocks))
             {
                 uint total_blocks = (enc->height+15) / 16;
                 enc->skip_top     = (total_blocks+3) / 4;
                 enc->skip_bottom  = (total_blocks+3) / 4;
             }
 
-            if (special_decode & kAVSpecialDecode_LowRes)
+            if (FlagIsSet(kDecodeLowRes))
                 enc->lowres = 2; // 1 = 1/2 size, 2 = 1/4 size
         }
-        else if (CODEC_ID_H264 == codec->id)
+        else if (codec->id == CODEC_ID_H264)
         {
-            if (special_decode & kAVSpecialDecode_NoLoopFilter)
+            if (FlagIsSet(kDecodeNoLoopFilter))
             {
                 enc->flags &= ~CODEC_FLAG_LOOP_FILTER;
                 enc->skip_loop_filter = AVDISCARD_ALL;
             }
         }
 
-        if (special_decode & kAVSpecialDecode_NoDecode)
+        if (FlagIsSet(kDecodeNoDecode))
         {
             enc->skip_idct = AVDISCARD_ALL;
         }
@@ -1602,7 +1595,7 @@ int GPUAvDecoder::ScanStreams(bool novideo)
                 if (version)
                     video_codec_id = (MythCodecID)(kCodec_MPEG1 + version - 1);
 
-                if (!using_null_videoout && version)
+                if (!FlagIsSet(kVideoIsNull) && version)
                 {
 #if defined(USING_VDPAU)
                     // HACK -- begin
@@ -1610,15 +1603,15 @@ int GPUAvDecoder::ScanStreams(bool novideo)
                     // Needed for broken transmitters which mark
                     // MPEG2 streams as MPEG1 streams, and should
                     // be harmless for unbroken ones.
-                    if (CODEC_ID_MPEG1VIDEO == enc->codec_id)
+                    if (enc->codec_id == CODEC_ID_MPEG1VIDEO)
                         enc->codec_id = CODEC_ID_MPEG2VIDEO;
                     // HACK -- end
 #endif // USING_VDPAU
 #ifdef USING_VDPAU
                     MythCodecID vdpau_mcid;
                     vdpau_mcid = VideoOutputVDPAU::GetBestSupportedCodec(
-                        width, height,
-                        mpeg_version(enc->codec_id), no_hardware_decoders);
+                        width, height, dec, mpeg_version(enc->codec_id),
+                        !FlagIsSet(kDecodeAllowGPU));
 
                     if (vdpau_mcid >= video_codec_id)
                     {
@@ -1631,7 +1624,7 @@ int GPUAvDecoder::ScanStreams(bool novideo)
                     PixelFormat pix_fmt = PIX_FMT_YUV420P;
                     vaapi_mcid = VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
                             width, height, mpeg_version(enc->codec_id),
-                            no_hardware_decoders, pix_fmt);
+                            !FlagIsSet(kDecodeAllowGPU), pix_fmt);
 
                     if (vaapi_mcid >= video_codec_id)
                     {
@@ -1687,11 +1680,9 @@ int GPUAvDecoder::ScanStreams(bool novideo)
                 if (selectedTrack[kTrackTypeVideo].av_stream_index < 0)
                     selectedTrack[kTrackTypeVideo] = si;
 
-                if (!using_null_videoout && allow_private_decoders &&
-                   (selectedTrack[kTrackTypeVideo].av_stream_index == (int) i))
+                if (selectedTrack[kTrackTypeVideo].av_stream_index == (int) i)
                 {
-                    private_dec = PrivateDecoder::Create(
-                                            dec, no_hardware_decoders, enc);
+                    private_dec = PrivateDecoder::Create(dec, playerFlags, enc);
                     if (private_dec)
                         thread_count = 1;
                 }
@@ -1699,7 +1690,7 @@ int GPUAvDecoder::ScanStreams(bool novideo)
                 if (!codec_is_std(video_codec_id))
                     thread_count = 1;
 
-                if (special_decode & kAVSpecialDecode_SingleThreaded)
+                if (FlagIsSet(kDecodeSingleThreaded))
                     thread_count = 1;
 
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
