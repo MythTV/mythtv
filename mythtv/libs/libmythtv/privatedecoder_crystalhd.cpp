@@ -87,12 +87,11 @@ PrivateDecoderCrystalHD::~PrivateDecoderCrystalHD()
 }
 
 bool PrivateDecoderCrystalHD::Init(const QString &decoder,
-                                   bool no_hardware_decode,
+                                   PlayerFlags flags,
                                    AVCodecContext *avctx)
 {
-    if ((decoder != "crystalhd") || no_hardware_decode || !avctx)
-        return false;
-    if (getenv("NO_CRYSTALHD"))
+    if ((decoder != "crystalhd") || !(flags & kDecodeAllowEXT) ||
+        !avctx || getenv("NO_CRYSTALHD"))
         return false;
 
     static bool debugged = false;

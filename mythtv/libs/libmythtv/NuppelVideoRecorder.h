@@ -77,8 +77,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
    ~NuppelVideoRecorder();
 
     void SetOption(const QString &name, int value);
-    void SetOption(const QString &name, const QString &value)
-                  { RecorderBase::SetOption(name, value); }
+    void SetOption(const QString &name, const QString &value);
 
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
@@ -87,13 +86,11 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
  
     void Initialize(void);
     void run(void);
-    void StopRecording(void); 
     
     virtual void Pause(bool clear = true);
     virtual bool IsPaused(bool holding_lock = false) const;
  
     bool IsRecording(void);
-    bool IsErrored(void);
 
     long long GetFramesWritten(void); 
 
@@ -143,7 +140,6 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 
     bool MJPEGInit(void);
  
-    bool SpawnChildren(void);
     void KillChildren(void);
     
     void BufferIt(unsigned char *buf, int len = -1, bool forcekey = false);
@@ -157,12 +153,10 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     void DoMJPEG(void);
 
     virtual void FormatTT(struct VBIData*); // RecorderBase
-    virtual void FormatCC(struct cc*); // RecorderBase
+    virtual void FormatCC(uint code1, uint code2); // RecorderBase
     virtual void AddTextData(unsigned char*,int,int64_t,char); // CC608Decoder
 
     void UpdateResolutions(void);
-    
-    bool encoding;
     
     int fd; // v4l input file handle
     signed char *strm;
@@ -225,13 +219,10 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     struct timeval stm;
     struct timezone tzone;
 
-    volatile bool childrenLive;
-
     NVRWriteThread *write_thread;
     NVRAudioThread *audio_thread;
 
     bool recording;
-    bool errored;
 
     int keyframedist;
     vector<struct seektable_entry> *seektable;

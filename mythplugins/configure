@@ -460,6 +460,7 @@ if ! disabled weather; then
     check_pl_lib "DateTime::Format::ISO8601" ||
         disable_weather "DateTime::Format::ISO8601"
     check_pl_lib "SOAP::Lite"  || disable_weather "SOAP::Lite"
+    check_pl_lib "JSON"  || disable_weather "JSON"
 fi
 
 if test "$dcraw" != "no" ; then

@@ -51,7 +51,8 @@ class VideoOutput
     static VideoOutput *Create(
         const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
         PIPState pipState,      const QSize &video_dim,    float video_aspect,
-        WId win_id,             const QRect &display_rect, float video_prate);
+        QWidget *parentwidget,  const QRect &embed_rect,   float video_prate,
+        uint playerFlags);
 
     VideoOutput();
     virtual ~VideoOutput();
@@ -207,17 +208,19 @@ class VideoOutput
     virtual void CheckFrameStates(void) { }
 
     /// \bug not implemented correctly. vpos is not updated.
-    VideoFrame *GetLastDecodedFrame(void) { return vbuffers.GetLastDecodedFrame(); }
+    virtual VideoFrame *GetLastDecodedFrame(void)
+        { return vbuffers.GetLastDecodedFrame(); }
 
     /// \brief Returns frame from the head of the ready to be displayed queue,
     ///        if StartDisplayingFrame has been called.
-    VideoFrame *GetLastShownFrame(void)  { return vbuffers.GetLastShownFrame(); }
+    virtual VideoFrame *GetLastShownFrame(void)
+        { return vbuffers.GetLastShownFrame(); }
 
     /// \brief Returns string with status of each frame for debugging.
     QString GetFrameStatus(void) const { return vbuffers.GetStatus(); }
 
     /// \brief Updates frame displayed when video is paused.
-    virtual void UpdatePauseFrame(void) = 0;
+    virtual void UpdatePauseFrame(int64_t &disp_timecode) = 0;
 
     /// \brief Tells the player to resize the video frame (used for ITV)
     void SetVideoResize(const QRect &videoRect);

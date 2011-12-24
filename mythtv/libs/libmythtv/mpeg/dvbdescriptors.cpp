@@ -232,6 +232,45 @@ MythCategoryType ContentDescriptor::GetMythCategory(uint i) const
     return kCategoryTVShow;
 }
 
+const char *linkage_types[] =
+{
+    "Reserved(0x00)",
+    "Information Service",
+    "EPG Service",
+    "CA Replacement Service",
+    "TS Containing Complete Network/Bouquet SI",
+    "Service Replacement Service",
+    "Data Broadcast Service",
+    "RCS Map",
+    "Mobile Hand-Over",
+    "System Software Update Service",
+    "TS Containing SSU, BAT or NIT",
+    "IP/MAC Notification Service",
+    "TS Containing INT, BAT or NIT",
+    "Event Linkage",
+};
+
+
+QString LinkageDescriptor::LinkageTypeString(void) const
+{
+    if (LinkageType() < (sizeof(linkage_types) / sizeof(const char*)))
+        return QString(linkage_types[LinkageType()]);
+    if ((LinkageType() <= 0x7f) || (LinkageType() == 0x7f))
+        return QString("Reserved(0x%1)").arg(LinkageType(),2,16,QChar('0'));
+    return QString("User Defined(0x%1)").arg(LinkageType(),2,16,QChar('0'));
+}
+
+QString LinkageDescriptor::MobileHandOverTypeString(void) const
+{
+    if (kHandOverIdentical == MobileHandOverType())
+        return "Hand-Over to an Identical Service";
+    if (kHandOverLocalVariation == MobileHandOverType())
+        return "Hand-Over to a Local Variation";
+    if (kHandOverAssociatedService == MobileHandOverType())
+        return "Hand-over to an Associated Service";
+    return "Reserved";
+}
+
 QString ContentDescriptor::GetDescription(uint i) const
 {
     if (!categoryDescExists)
@@ -456,4 +495,90 @@ QString UKChannelListDescriptor::toString() const
     }
     return ret;
 }
+
+QString CAIdentifierDescriptor::toString(void) const
+{
+    QString ret = QString("CAIdentifierDescriptor ");
+    for (uint i = 0; i < CASystemCount(); ++i)
+    {
+        ret += QString("ca_system_id(0x%1) ")
+            .arg(CASystemId(i), 0, 16);
+    }
+    return ret;
+}
+
+QString DataBroadcastDescriptor::toString(void) const
+{
+    QString ret = QString("DataBroadcastDescriptor: "
+                                "data_broadcast_id(%1) "
+                                "component_tag(%1) ")
+            .arg(DataBroadcastId(), 0, 10)
+            .arg(DataComponentTag(), 0, 10);
+
+    ret += QString("selector(0x ");
+    for (uint i = 0; i < SelectorLength(); i++)
+        ret += QString("%1 ").arg(Selector()[i], 0, 16);
+    ret += ") ";
+    
+    ret += QString("ISO_639_language_code(%1) ")
+        .arg(LanguageString());
+
+    ret += QString("text(%1) ") + QString(Text());
+
+    return ret;
+}
+
+QString LocalTimeOffsetDescriptor::toString(void) const
+{
+    QString ret = QString("LocalTimeOffsetDescriptor ");
+    uint count = Count();
+    for (uint i = 0; i < count; ++i)
+    {
+        ret += QString("country_code(%1) country_region_id(0x%2) "
+                       "local_time_offset_with_polarity(%3) "
+                       "time_of_change(TODO)")
+            .arg(CountryCodeString(i))
+            .arg(CountryRegionId(i), 0, 16)
+            .arg(LocalTimeOffsetWithPolarity(i));
+        // TODO add time of change
+    }
+    return ret;
+}
+
+QString NVODReferenceDescriptor::toString(void) const
+{
+    QString ret = QString("NVODReferenceDescriptor ");
+    for (uint i = 0; i < Count(); ++i)
+    {
+        ret += QString("transport_stream_id(0x%1) original_network_id(0x%2) "
+                       "service_id(0x%3) ")
+            .arg(TransportStreamId(i), 0, 16)
+            .arg(OriginalNetworkId(i), 0, 16)
+            .arg(ServiceId(i), 0, 16);
+    }
+    return ret;
+}
+
+QString PartialTransportStreamDescriptor::toString(void) const
+{
+    return QString("PartialTransportStreamDescriptor peak_rate(%1) "
+                   "min_overall_smooth_rate(%2) max_overall_smooth_buf(3)")
+        .arg(PeakRate()).arg(SmoothRate()).arg(SmoothBuf());
+}
+
+QString AC3Descriptor::toString(void) const
+{
+    QString ret = QString("AC3DescriptorDescriptor ");
+    if (HasComponentType())
+        ret += QString("component_type(%1) ")
+        .arg(ComponentType(), 0, 10);
+    if (HasBSID())
+        ret += QString("bsid(0x%1) ").arg(BSID(),0,16);
+    if (HasMainID())
+        ret += QString("mainid(0x%1) ").arg(MainID(),0,16);
+    if (HasASVC())
+        ret += QString("asvc(%1) ").arg(ASVC());
+    return ret;
+}
+
 

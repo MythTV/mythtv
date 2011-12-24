@@ -540,21 +540,6 @@ long long DecoderBase::GetKey(const PosMapEntry &e) const
 
 bool DecoderBase::DoRewindSeek(long long desiredFrame)
 {
-    if (ringBuffer->IsDVD())
-    {
-        long long pos = DVDFindPosition(desiredFrame);
-        ringBuffer->Seek(pos, SEEK_SET);
-        lastKey = desiredFrame + 1;
-        return true;
-    }
-    else if (ringBuffer->IsBD())
-    {
-        long long pos = BDFindPosition(desiredFrame);
-        ringBuffer->Seek(pos, SEEK_SET);
-        lastKey = desiredFrame + 1;
-        return true;
-    }
-
     ConditionallyUpdatePosMap(desiredFrame);
 
     if (!GetPositionMapSize())
@@ -766,27 +751,6 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
  */
 void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 {
-    if (ringBuffer->IsDVD())
-    {
-        long long pos = DVDFindPosition(desiredFrame);
-        ringBuffer->Seek(pos,SEEK_SET);
-        needflush    = true;
-        lastKey      = desiredFrame+1;
-        framesPlayed = lastKey;
-        framesRead   = lastKey;
-        return;
-    }
-    else if (ringBuffer->IsBD())
-    {
-        long long pos = BDFindPosition(desiredFrame);
-        ringBuffer->Seek(pos,SEEK_SET);
-        needflush    = true;
-        lastKey      = desiredFrame+1;
-        framesPlayed = lastKey;
-        framesRead   = lastKey;
-        return;
-    }
-
     int pre_idx, post_idx;
     FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
 
@@ -840,86 +804,6 @@ void DecoderBase::SetWaitForChange(void)
 bool DecoderBase::GetWaitForChange(void) const
 {
     return waitingForChange;
-}
-
-long long DecoderBase::DVDFindPosition(long long desiredFrame)
-{
-    if (!ringBuffer->IsDVD())
-        return 0;
-    int diffTime = 0;
-    long long desiredTimePos;
-    int ffrewSkip = 1;
-    int current_speed = 0;
-    if (m_parent)
-    {
-        ffrewSkip = m_parent->GetFFRewSkip();
-        current_speed = (int)m_parent->GetNextPlaySpeed();
-    }
-
-    if (ffrewSkip == 1)
-    {
-        diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
-        desiredTimePos = ringBuffer->DVD()->GetCurrentTime() +
-                        diffTime;
-        if (diffTime <= 0)
-            desiredTimePos--;
-        else
-            desiredTimePos++;
-
-        if (desiredTimePos < 0)
-            desiredTimePos = 0;
-        return (desiredTimePos * 90000LL);
-    }
-    return current_speed;
-}
-
-long long DecoderBase::BDFindPosition(long long desiredFrame)
-{
-    if (!ringBuffer->IsBD())
-        return 0;
-    int diffTime = 0;
-    long long desiredTimePos;
-    int ffrewSkip = 1;
-    int current_speed = 0;
-    if (m_parent)
-    {
-        ffrewSkip = m_parent->GetFFRewSkip();
-        current_speed = (int)m_parent->GetNextPlaySpeed();
-    }
-
-    if (ffrewSkip == 1)
-    {
-        diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
-        desiredTimePos = ringBuffer->BD()->GetCurrentTime() +
-                        diffTime;
-        if (diffTime <= 0)
-            desiredTimePos--;
-        else
-            desiredTimePos++;
-
-        if (desiredTimePos < 0)
-            desiredTimePos = 0;
-        return (desiredFrame * 90000LL / fps);
-    }
-    return current_speed;
-}
-
-void DecoderBase::UpdateDVDFramesPlayed(void)
-{
-    if (!ringBuffer->IsDVD())
-        return;
-    long long currentpos = (long long)(ringBuffer->DVD()->GetCurrentTime() * fps);
-    framesPlayed = framesRead = currentpos ;
-    m_parent->SetFramesPlayed(currentpos + 1);
-}
-
-void DecoderBase::UpdateBDFramesPlayed(void)
-{
-    if (!ringBuffer->IsBD())
-        return;
-    long long currentpos = (long long)(ringBuffer->BD()->GetCurrentTime() * fps);
-    framesPlayed = framesRead = currentpos ;
-    m_parent->SetFramesPlayed(currentpos + 1);
 }
 
 QStringList DecoderBase::GetTracks(uint type) const

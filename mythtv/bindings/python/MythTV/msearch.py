@@ -30,7 +30,7 @@ class MSearch( object ):
                     port += 1
                 else:
                     raise MythError(MythError.SOCKET, e)
-        self.log(MythLog.UPNP|MythLog.SOCKET,
+        self.log(MythLog.DEBUG, MythLog.UPNP|MythLog.SOCKET,
                     'Port %d opened for UPnP search.' % port)
         self.sock.setblocking(0.1)
 
@@ -49,7 +49,7 @@ class MSearch( object ):
                 content-length,   request,   date,   usn,    location,
                 cache-control,    server,    ext,    st
         """
-        self.log(MythLog.UPNP, 'running UPnP search')
+        self.log(MythLog.DEBUG, MythLog.UPNP, 'running UPnP search')
         sock = self.sock
         sreq = '\r\n'.join(['M-SEARCH * HTTP/1.1',
                             'HOST: %s:%s' % self.addr,
@@ -121,7 +121,7 @@ class MSearch( object ):
         location = []
         for res in self.search(timeout, \
                 'urn:schemas-upnp-org:device:MediaRenderer:1'):
-            if 'MythTv' not in res['server']:
+            if 'MythTV' not in res['server']:
                 continue
             if res['location'] not in location:
                 location.append(res['location'])

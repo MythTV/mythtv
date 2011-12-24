@@ -529,10 +529,6 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
-    ///////////////////////////////////////////////////////////////////////
-    // Don't listen to console input
-    close(0);
-
     MythTranslation::load("mythfrontend");
 
     if (!ismaster)

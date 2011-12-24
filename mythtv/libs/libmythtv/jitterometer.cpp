@@ -50,8 +50,7 @@ void Jitterometer::SetNumCycles(int cycles)
 {
     num_cycles = cycles;
     times.resize(num_cycles);
-    if (count >= num_cycles)
-        count = num_cycles - 1;
+    count = 0;
 }
 
 bool Jitterometer::RecordCycleTime()
@@ -114,10 +113,10 @@ bool Jitterometer::RecordEndTime()
         if (!lastcpustats.isEmpty())
             extra = QString("CPUs: ") + lastcpustats;
 
-        LOG(VB_PLAYBACK, LOG_INFO,
-            name + QString("Mean: %1 Std.Dev: %2 fps: %3 ")
-                .arg((int)mean).arg((int)standard_deviation)
-                .arg(last_fps, 0, 'f', 2) + extra);
+        LOG(VB_GENERAL, LOG_INFO,
+            name + QString("FPS: %1 Mean: %2 Std.Dev: %3 ")
+                .arg(last_fps, 7, 'f', 2).arg((int)mean, 5)
+                .arg((int)standard_deviation, 5) + extra);
 
         count = 0;
         return true;

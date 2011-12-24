@@ -80,10 +80,11 @@ class VideoPlayHandleMedia : public VideoPlayProc
     VideoPlayHandleMedia(const QString &handler, const QString &mrl,
             const QString &plot, const QString &title, const QString &subtitle,
             const QString &director, int season, int episode, const QString &inetref,
-            int length, const QString &year) :
+            int length, const QString &year, const QString &id) :
         m_handler(handler), m_mrl(mrl), m_plot(plot), m_title(title),
         m_subtitle(subtitle), m_director(director), m_season(season),
-        m_episode(episode), m_inetref(inetref), m_length(length), m_year(year)
+        m_episode(episode), m_inetref(inetref), m_length(length), m_year(year),
+        m_id(id)
     {
     }
 
@@ -92,17 +93,17 @@ class VideoPlayHandleMedia : public VideoPlayProc
             const QString &mrl, const QString &plot, const QString &title,
             const QString &subtitle, const QString &director,
             int season, int episode, const QString &inetref,
-            int length, const QString &year)
+            int length, const QString &year, const QString &id)
     {
         return new VideoPlayHandleMedia(handler, mrl, plot, title, subtitle,
-                director, season, episode, inetref, length, year);
+                director, season, episode, inetref, length, year, id);
     }
 
     bool Play() const
     {
         return GetMythMainWindow()->HandleMedia(m_handler, m_mrl,
                 m_plot, m_title, m_subtitle, m_director, m_season,
-                m_episode, m_inetref, m_length, m_year);
+                m_episode, m_inetref, m_length, m_year, m_id);
     }
 
     QString GetCommandDisplayName() const
@@ -127,6 +128,7 @@ class VideoPlayHandleMedia : public VideoPlayProc
     QString m_inetref;
     int m_length;
     QString m_year;
+    QString m_id;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -216,7 +218,8 @@ class VideoPlayerCommandPrivate
                         item->GetTitle(), item->GetSubtitle(),
                         item->GetDirector(), item->GetSeason(),
                         item->GetEpisode(), item->GetInetRef(),
-                        item->GetLength(), QString::number(item->GetYear()));
+                        item->GetLength(), QString::number(item->GetYear()),
+                        QString::number(item->GetID()));
             }
             else
             {
@@ -244,7 +247,8 @@ class VideoPlayerCommandPrivate
                         item->GetTitle(), item->GetSubtitle(),
                         item->GetDirector(), item->GetSeason(),
                         item->GetEpisode(), item->GetInetRef(),
-                        item->GetLength(), QString::number(item->GetYear()));
+                        item->GetLength(), QString::number(item->GetYear()),
+                        QString::number(item->GetID()));
             }
             else
             {
@@ -290,6 +294,7 @@ class VideoPlayerCommandPrivate
         QString inetref;
         int length = 0;
         QString year = QString::number(VIDEO_YEAR_DEFAULT);
+        QString id;
 
         if (extraData)
         {
@@ -302,10 +307,11 @@ class VideoPlayerCommandPrivate
             inetref = extraData->GetInetRef();
             length = extraData->GetLength();
             year = QString::number(extraData->GetYear());
+            id = QString::number(extraData->GetID());
         }
 
         AddPlayer(play_command, filename, plot, title, subtitle, director,
-                                season, episode, inetref, length, year);
+                                season, episode, inetref, length, year, id);
     }
 
     void ClearPlayerList()
@@ -338,11 +344,11 @@ class VideoPlayerCommandPrivate
     void AddPlayer(const QString &player, const QString &filename,
             const QString &plot, const QString &title, const QString &subtitle,
             const QString &director, int season, int episode, const QString &inetref,
-            int length, const QString &year)
+            int length, const QString &year, const QString &id)
     {
         m_player_procs.push_back(VideoPlayHandleMedia::Create(player, filename,
                         plot, title, subtitle, director, season, episode, inetref,
-                        length, year));
+                        length, year, id));
         m_player_procs.push_back(VideoPlayMythSystem::Create(player, filename));
     }
 

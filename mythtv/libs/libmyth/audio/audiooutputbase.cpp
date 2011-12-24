@@ -369,6 +369,14 @@ float AudioOutputBase::GetStretchFactor(void) const
 }
 
 /**
+ * Source is currently being upmixed
+ */
+bool AudioOutputBase::IsUpmixing(void)
+{
+    return needs_upmix && upmixer;
+}
+
+/**
  * Toggle between stereo and upmixed 5.1 if the source material is stereo
  */
 bool AudioOutputBase::ToggleUpmix(void)
@@ -383,6 +391,15 @@ bool AudioOutputBase::ToggleUpmix(void)
                                  source_samplerate, passthru);
     Reconfigure(settings);
     return configured_channels == max_channels;
+}
+
+/**
+ * Upmixing of the current source is available if requested
+ */
+bool AudioOutputBase::CanUpmix(void)
+{
+    return needs_upmix && IS_VALID_UPMIX_CHANNEL(source_channels) &&
+           configured_channels > 2;
 }
 
 /*

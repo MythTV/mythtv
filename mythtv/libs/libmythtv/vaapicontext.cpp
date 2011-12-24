@@ -5,6 +5,7 @@
 #include "frame.h"
 #include "vaapicontext.h"
 #include "mythmainwindow.h"
+#include "myth_imgconvert.h"
 
 #define LOC QString("VAAPI: ")
 #define ERR QString("VAAPI Error: ")
@@ -63,20 +64,23 @@ QString entryToString(VAEntrypoint entry)
 
 VAProfile preferredProfile(MythCodecID codec)
 {
-    // FIXME handle unsupported codecs properly
     if (kCodec_H263_VAAPI  == codec) return VAProfileMPEG4AdvancedSimple;
     if (kCodec_MPEG4_VAAPI == codec) return VAProfileMPEG4AdvancedSimple;
     if (kCodec_H264_VAAPI  == codec) return VAProfileH264High;
     if (kCodec_VC1_VAAPI   == codec) return VAProfileVC1Advanced;
     if (kCodec_WMV3_VAAPI  == codec) return VAProfileVC1Main;
-    return VAProfileMPEG2Main;
+    if (kCodec_MPEG2_VAAPI == codec) return VAProfileMPEG2Main;
+    if (kCodec_MPEG1_VAAPI == codec) return VAProfileMPEG2Main;
+    return VAProfileMPEG2Simple; // error
 }
 
 class VAAPIDisplay
 {
   protected:
-    VAAPIDisplay() : m_va_disp(NULL), m_x_disp(NULL), m_display(NULL),
-                     m_ref_count(0), m_driver(QString()) { }
+    VAAPIDisplay(VAAPIDisplayType display_type)
+      : m_va_disp_type(display_type),
+        m_va_disp(NULL), m_x_disp(NULL),
+        m_ref_count(0), m_driver(QString()) { }
   public:
    ~VAAPIDisplay()
     {
@@ -95,33 +99,37 @@ class VAAPIDisplay
 
     bool Create(void)
     {
-        MythMainWindow *mw = GetMythMainWindow();
-        if (!mw)
-            return false;
-
-        MythRenderOpenGL *gl =
-            static_cast<MythRenderOpenGL*>(mw->GetRenderDevice());
-
-        if (!gl)
-        {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                QString("Failed to get OpenGL context - you must use the "
-                        "OpenGL UI painter for VAAPI support."));
-            return false;
-        }
-        gl->makeCurrent();
-        m_display = glXGetCurrentDisplay();
-        gl->doneCurrent();
-
         m_x_disp = OpenMythXDisplay();
         if (!m_x_disp)
             return false;
 
         MythXLocker locker(m_x_disp);
-        int major_ver, minor_ver;
 
-        //m_va_disp = vaGetDisplayGLX(m_x_disp->GetDisplay());
-        m_va_disp = vaGetDisplayGLX(m_display);
+        if (m_va_disp_type == kVADisplayGLX)
+        {
+            MythMainWindow *mw = GetMythMainWindow();
+            if (!mw)
+                return false;
+            MythRenderOpenGL *gl =
+                static_cast<MythRenderOpenGL*>(mw->GetRenderDevice());
+            if (!gl)
+            {
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    QString("Failed to get OpenGL context - you must use the "
+                            "OpenGL UI painter for VAAPI GLX support."));
+                return false;
+            }
+
+            gl->makeCurrent();
+            Display *display = glXGetCurrentDisplay();
+            gl->doneCurrent();
+
+            m_va_disp = vaGetDisplayGLX(display);
+        }
+        else
+        {
+            m_va_disp = vaGetDisplay(m_x_disp->GetDisplay());
+        }
 
         if (!m_va_disp)
         {
@@ -129,6 +137,7 @@ class VAAPIDisplay
             return false;
         }
 
+        int major_ver, minor_ver;
         INIT_ST;
         va_status = vaInitialize(m_va_disp, &major_ver, &minor_ver);
         CHECK_ST;
@@ -147,7 +156,9 @@ class VAAPIDisplay
         if (ok)
         {
             UpRef();
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created VAAPI GLX display");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Created VAAPI %1 display")
+                .arg(m_va_disp_type == kVADisplayGLX ? "GLX" : "X11"));
         }
         return ok;
     }
@@ -180,15 +191,21 @@ class VAAPIDisplay
         return ret;
     }
 
-    static VAAPIDisplay* GetDisplay(void)
+    static VAAPIDisplay* GetDisplay(VAAPIDisplayType display_type)
     {
         if (gVAAPIDisplay)
         {
+            if (gVAAPIDisplay->m_va_disp_type != display_type)
+            {
+                LOG(VB_GENERAL, LOG_ERR, "Already have a VAAPI display "
+                    "of a different type - aborting");
+                return NULL;
+            }
             gVAAPIDisplay->UpRef();
             return gVAAPIDisplay;
         }
 
-        gVAAPIDisplay = new VAAPIDisplay();
+        gVAAPIDisplay = new VAAPIDisplay(display_type);
         if (gVAAPIDisplay && gVAAPIDisplay->Create())
             return gVAAPIDisplay;
 
@@ -198,9 +215,9 @@ class VAAPIDisplay
     }
 
     static VAAPIDisplay *gVAAPIDisplay;
+    VAAPIDisplayType     m_va_disp_type;
     void                *m_va_disp;
     MythXDisplay        *m_x_disp;
-    Display             *m_display;
     int                  m_ref_count;
     QString              m_driver;
 };
@@ -211,7 +228,7 @@ bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
                                        PixelFormat &pix_fmt)
 {
     bool result = false;
-    VAAPIContext *ctx = new VAAPIContext(codec);
+    VAAPIContext *ctx = new VAAPIContext(kVADisplayX11, codec);
     if (ctx && ctx->CreateDisplay(size))
     {
         pix_fmt = ctx->GetPixelFormat();
@@ -221,8 +238,10 @@ bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
     return result;
 }
 
-VAAPIContext::VAAPIContext(MythCodecID codec)
-  : m_codec(codec),
+VAAPIContext::VAAPIContext(VAAPIDisplayType display_type,
+                           MythCodecID codec)
+  : m_dispType(display_type),
+    m_codec(codec),
     m_display(NULL),
     m_vaProfile(VAProfileMPEG2Main)/* ?? */,
     m_vaEntrypoint(VAEntrypointEncSlice),
@@ -231,6 +250,8 @@ VAAPIContext::VAAPIContext(MythCodecID codec)
     m_pictureAttributeCount(0), m_hueBase(0)
 {
     memset(&m_ctx, 0, sizeof(vaapi_context));
+    memset(&m_image, 0, sizeof(m_image));
+    m_image.image_id = VA_INVALID_ID;
 }
 
 VAAPIContext::~VAAPIContext()
@@ -244,6 +265,12 @@ VAAPIContext::~VAAPIContext()
         m_display->m_x_disp->Lock();
 
         INIT_ST;
+
+        if (m_image.image_id != VA_INVALID_ID)
+        {
+            va_status = vaDestroyImage(m_ctx.display, m_image.image_id);
+            CHECK_ST;
+        }
         if (m_ctx.context_id)
         {
             va_status = vaDestroyContext(m_ctx.display, m_ctx.context_id);
@@ -279,7 +306,7 @@ bool VAAPIContext::CreateDisplay(QSize size)
 {
     m_size = size;
     bool ok = true;
-    m_display = VAAPIDisplay::GetDisplay();
+    m_display = VAAPIDisplay::GetDisplay(m_dispType);
     CREATE_CHECK(!m_size.isEmpty(), "Invalid size");
     CREATE_CHECK(m_display != NULL, "Invalid display");
     CREATE_CHECK(InitDisplay(),     "Invalid VADisplay");
@@ -437,13 +464,19 @@ bool VAAPIContext::InitDisplay(void)
 
 bool VAAPIContext::InitProfiles(void)
 {
-    if (!(codec_is_vaapi(m_codec)) || !m_ctx.display)
+    if (!(codec_is_vaapi_hw(m_codec)) || !m_ctx.display)
         return false;
 
     MythXLocker locker(m_display->m_x_disp);
     int max_profiles, max_entrypoints;
     VAProfile profile_wanted = preferredProfile(m_codec);
-    VAProfile profile_found  = VAProfileMPEG2Main;   // FIXME
+    if (profile_wanted == VAProfileMPEG2Simple)
+    {
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Codec is not supported.");
+        return false;
+    }
+
+    VAProfile profile_found  = VAProfileMPEG2Simple; // unsupported value
     VAEntrypoint entry_found = VAEntrypointEncSlice; // unsupported value
 
     max_profiles          = vaMaxNumProfiles(m_ctx.display);
@@ -609,10 +642,138 @@ uint8_t* VAAPIContext::GetSurfaceIDPointer(void* buf)
     return (uint8_t*)(uintptr_t)surf->m_id;
 }
 
+bool VAAPIContext::InitImage(const void *buf)
+{
+    if (!buf)
+        return false;
+    if (!m_dispType == kVADisplayX11)
+        return true;
+
+    int num_formats = 0;
+    int max_formats = vaMaxNumImageFormats(m_ctx.display);
+    VAImageFormat *formats = new VAImageFormat[max_formats];
+
+    INIT_ST;
+    va_status = vaQueryImageFormats(m_ctx.display, formats, &num_formats);
+    CHECK_ST;
+
+    const vaapi_surface *surf = (vaapi_surface*)buf;
+    for (int i = 0; i < num_formats; i++)
+    {
+        if(formats[i].fourcc == VA_FOURCC('Y','V','1','2') ||
+           formats[i].fourcc == VA_FOURCC('I','4','2','0') ||
+           formats[i].fourcc == VA_FOURCC('N','V','1','2'))
+        {
+            if (vaCreateImage(m_ctx.display, &formats[i],
+                              m_size.width(), m_size.height(), &m_image))
+            {
+                m_image.image_id = VA_INVALID_ID;
+                continue;
+            }
+
+            if (vaGetImage(m_ctx.display, surf->m_id, 0, 0,
+                           m_size.width(), m_size.height(), m_image.image_id))
+            {
+                vaDestroyImage(m_ctx.display, m_image.image_id);
+                m_image.image_id = VA_INVALID_ID;
+                continue;
+            }
+            break;
+        }
+    }
+
+    delete [] formats;
+
+    if (m_image.image_id == VA_INVALID_ID)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create software image.");
+        return false;
+    }
+
+    LOG(VB_GENERAL, LOG_DEBUG,
+        LOC + QString("InitImage: id %1, width %2 height %3 "
+                      "format %4")
+        .arg(m_image.image_id).arg(m_image.width).arg(m_image.height)
+        .arg(m_image.format.fourcc));
+
+    return true;
+}
+
+bool VAAPIContext::CopySurfaceToFrame(VideoFrame *frame, const void *buf)
+{
+    MythXLocker locker(m_display->m_x_disp);
+
+    if (m_image.image_id == VA_INVALID_ID)
+        InitImage(buf);
+
+    if (!frame || !buf || (m_dispType != kVADisplayX11) ||
+        m_image.image_id == VA_INVALID_ID)
+        return false;
+
+    const vaapi_surface *surf = (vaapi_surface*)buf;
+
+    INIT_ST;
+    va_status = vaSyncSurface(m_ctx.display, surf->m_id);
+    CHECK_ST;
+
+    va_status = vaGetImage(m_ctx.display, surf->m_id, 0, 0,
+                           m_size.width(), m_size.height(), m_image.image_id);
+    CHECK_ST;
+
+    if (ok)
+    {
+        void* source = NULL;
+        if (vaMapBuffer(m_ctx.display, m_image.buf, &source))
+            return false;
+
+        if (m_image.format.fourcc == VA_FOURCC('Y','V','1','2') ||
+            m_image.format.fourcc == VA_FOURCC('I','4','2','0'))
+        {
+            bool swap = m_image.format.fourcc == VA_FOURCC('Y','V','1','2');
+            VideoFrame src;
+            init(&src, FMT_YV12, (unsigned char*)source, m_image.width,
+                 m_image.height, m_image.data_size, NULL,
+                 NULL, frame->aspect, frame->frame_rate);
+            src.pitches[0] = m_image.pitches[0];
+            src.pitches[1] = m_image.pitches[swap ? 2 : 1];
+            src.pitches[2] = m_image.pitches[swap ? 1 : 2];
+            src.offsets[0] = m_image.offsets[0];
+            src.offsets[1] = m_image.offsets[swap ? 2 : 1];
+            src.offsets[2] = m_image.offsets[swap ? 1 : 2];
+            copy(frame, &src);
+        }
+        else if (m_image.format.fourcc == VA_FOURCC('N','V','1','2'))
+        {
+            AVPicture img_in, img_out;
+            avpicture_fill(&img_out, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
+                           frame->width, frame->height);
+            avpicture_fill(&img_in, (uint8_t *)source, PIX_FMT_NV12,
+                           m_image.width, m_image.height);
+            myth_sws_img_convert(&img_out, PIX_FMT_YUV420P,
+                                 &img_in, PIX_FMT_NV12,
+                                 frame->width, frame->height);
+            // Is this needed? Is it safe?
+            frame->pitches[0] = img_out.linesize[0];
+            frame->pitches[1] = img_out.linesize[1];
+            frame->pitches[2] = img_out.linesize[2];
+            frame->offsets[0] = 0;
+            frame->offsets[1] = img_out.data[1] - img_out.data[0];
+            frame->offsets[2] = img_out.data[2] - img_out.data[0];
+        }
+        if (vaUnmapBuffer(m_ctx.display, m_image.buf))
+            return false;
+    }
+
+    if (ok)
+        return true;
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get image");
+    return false;
+}
+
 bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
                                         uint texture_type, FrameScanType scan)
 {
-    if (!buf)
+    if (!buf || (m_dispType != kVADisplayGLX))
         return false;
 
     const vaapi_surface *surf = (vaapi_surface*)buf;
@@ -636,6 +797,9 @@ bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
 
 void* VAAPIContext::GetGLXSurface(uint texture, uint texture_type)
 {
+    if (m_dispType != kVADisplayGLX)
+        return NULL;
+
     if (m_glxSurfaces.contains(texture))
         return m_glxSurfaces.value(texture);
 
@@ -660,7 +824,7 @@ void* VAAPIContext::GetGLXSurface(uint texture, uint texture_type)
 
 void VAAPIContext::ClearGLXSurfaces(void)
 {
-    if (!m_display)
+    if (!m_display || (m_dispType != kVADisplayGLX))
         return;
 
     MythXLocker locker(m_display->m_x_disp);

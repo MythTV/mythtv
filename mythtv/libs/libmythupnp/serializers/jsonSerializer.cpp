@@ -25,6 +25,7 @@
 
 #include <QTextCodec>
 #include <QVariant>
+#include <QDateTime>
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -155,6 +156,12 @@ void JSONSerializer::RenderValue( const QVariant &vValue )
         case QVariant::List:        RenderList      ( vValue.toList()       );  break;
         case QVariant::StringList:  RenderStringList( vValue.toStringList() );  break;
         case QVariant::Map:         RenderMap       ( vValue.toMap()        );  break;
+        case QVariant::DateTime:
+        {
+            m_Stream << "\"" << Encode( vValue.toDateTime().toUTC()
+                     .toString(Qt::ISODate) ) << "\"";
+            break;
+        }
         default:
         {
             m_Stream << "\"" << Encode( vValue.toString() ) << "\"";
@@ -221,7 +228,7 @@ void JSONSerializer::RenderMap( const QVariantMap &map )
 {
     bool bFirst = true;
 
-    m_Stream << "[";
+    m_Stream << "{";
 
     QMapIterator< QString, QVariant > it( map );
 
@@ -234,11 +241,11 @@ void JSONSerializer::RenderMap( const QVariantMap &map )
         else
             m_Stream << ",";
 
-        m_Stream << "{ \"key\": \"" << it.key() << "\", \"Value\": \"";
-        m_Stream << Encode( it.value().toString() ) << "\"}";
+        m_Stream << "\"" << it.key() << "\":";
+        m_Stream << "\"" << Encode( it.value().toString() ) << "\"";
     }
 
-    m_Stream << "]";
+    m_Stream << "}";
 }
 
 //////////////////////////////////////////////////////////////////////////////

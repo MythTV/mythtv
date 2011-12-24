@@ -3,6 +3,7 @@
 
 #include <QVector>
 #include <QFile>
+#include "mythtvexp.h"
 
 /* Jitterometer usage. There are 2 ways to use this:
 ------------------------------------------------------------------
@@ -33,7 +34,7 @@
       }
 */
 
-class Jitterometer
+class MTV_PUBLIC Jitterometer
 {
   public:
     Jitterometer(const QString &nname, int num_cycles = 0);

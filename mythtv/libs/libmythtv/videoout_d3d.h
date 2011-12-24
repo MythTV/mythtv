@@ -34,7 +34,7 @@ class VideoOutputD3D : public VideoOutput
                       void        *codec_private,
                       bool        &aspect_only);
     void MoveResizeWindow(QRect new_rect) {;}
-    void UpdatePauseFrame(void);
+    void UpdatePauseFrame(int64_t &disp_timecode);
     void DrawUnusedRects(bool) {;}
     void Zoom(ZoomDirection direction);
     void EmbedInWidget(const QRect &rect);
@@ -43,6 +43,7 @@ class VideoOutputD3D : public VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
+                                             const QString &decoder,
                                              uint stream_type,
                                              bool no_acceleration,
                                              PixelFormat &pix_fmt);

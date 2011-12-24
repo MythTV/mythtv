@@ -35,6 +35,7 @@ DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 DEPENDPATH  += ../libmythbase ../libmythui
 DEPENDPATH  += ../libmythupnp
+DEPENDPATH  += ../libmythservicecontracts
 
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../../external/FFmpeg
@@ -202,6 +203,14 @@ SOURCES += diseqc.cpp               diseqcsettings.cpp
 HEADERS += datadirect.h
 SOURCES += datadirect.cpp
 
+# File Writer classes
+HEADERS += filewriterbase.h         avformatwriter.h
+SOURCES += filewriterbase.cpp       avformatwriter.cpp
+
+# HTTP Live Streaming
+HEADERS += httplivestream.h
+SOURCES += httplivestream.cpp
+
 # Teletext stuff
 HEADERS += teletextdecoder.h        teletextreader.h   vbilut.h
 SOURCES += teletextdecoder.cpp      teletextreader.cpp vbilut.cpp
@@ -252,6 +261,10 @@ SOURCES += dtvconfparser.cpp        dtvconfparserhelpers.cpp
 
 HEADERS += channelscan/scaninfo.h   channelscan/channelimporter.h
 SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
+
+# subtitles: srt
+HEADERS += srtwriter.h
+SOURCES += srtwriter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
@@ -360,8 +373,8 @@ using_frontend {
 
     using_vdpau {
         DEFINES += USING_VDPAU
-        HEADERS += videoout_vdpau.h
-        SOURCES += videoout_vdpau.cpp
+        HEADERS += videoout_vdpau.h   videoout_nullvdpau.h
+        SOURCES += videoout_vdpau.cpp videoout_nullvdpau.cpp
         LIBS += -lvdpau
     }
 
@@ -469,10 +482,10 @@ using_backend {
     # TVRec & Recorder base classes
     HEADERS += tv_rec.h
     HEADERS += recorderbase.h              DeviceReadBuffer.h
-    HEADERS += dtvrecorder.h
+    HEADERS += dtvrecorder.h               recordingquality.h
     SOURCES += tv_rec.cpp
     SOURCES += recorderbase.cpp            DeviceReadBuffer.cpp
-    SOURCES += dtvrecorder.cpp
+    SOURCES += dtvrecorder.cpp             recordingquality.cpp
 
     # Import recorder
     HEADERS += importrecorder.h
@@ -566,6 +579,23 @@ using_backend {
         SOURCES *= streamhandler.cpp
 
         DEFINES += USING_HDHOMERUN
+    }
+
+    # Support for Ceton
+    using_ceton {
+        # MythTV Ceton glue
+        HEADERS += cetonsignalmonitor.h   cetonchannel.h
+        HEADERS += cetonrecorder.h        cetonstreamhandler.h
+        HEADERS += cetonrtp.h             cetonrtsp.h
+
+        SOURCES += cetonsignalmonitor.cpp cetonchannel.cpp
+        SOURCES += cetonrecorder.cpp      cetonstreamhandler.cpp
+        SOURCES += cetonrtp.cpp           cetonrtsp.cpp
+
+        HEADERS *= streamhandler.h
+        SOURCES *= streamhandler.cpp
+
+        DEFINES += USING_CETON
     }
 
     # Support for PVR-150/250/350/500, etc. on Linux

@@ -5022,6 +5022,10 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
         retlist << QString::number(isopen);
     }
+    else if (command == "REOPEN")
+    {
+        retlist << QString::number(ft->ReOpen(slist[2]));
+    }
     else if (command == "DONE")
     {
         ft->Stop();
@@ -6092,8 +6096,8 @@ void MainServer::reconnectTimeout(void)
         !masterServerSock->readStringList(strlist) ||
         strlist.empty() || strlist[0] == "ERROR")
     {
+        masterServerSock->Unlock(); // DownRef will delete socket...
         masterServerSock->DownRef();
-        masterServerSock->Unlock();
         masterServerSock = NULL;
         if (strlist.empty())
         {

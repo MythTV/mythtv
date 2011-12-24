@@ -221,22 +221,22 @@ bool Channel::UpdateDBChannel( uint          MplexID,
     return bResult;
 }
 
-bool Channel::CreateDBChannel( uint          MplexID,
-                               uint          SourceID,
-                               uint          ChannelID,
-                               const QString &CallSign,
-                               const QString &ChannelName,
-                               const QString &ChannelNumber,
-                               uint          ServiceID,
-                               uint          ATSCMajorChannel,
-                               uint          ATSCMinorChannel,
-                               bool          UseEIT,
-                               bool          visible,
-                               const QString &FrequencyID,
-                               const QString &Icon,
-                               const QString &Format,
-                               const QString &XMLTVID,
-                               const QString &DefaultAuthority )
+bool Channel::AddDBChannel( uint          MplexID,
+                            uint          SourceID,
+                            uint          ChannelID,
+                            const QString &CallSign,
+                            const QString &ChannelName,
+                            const QString &ChannelNumber,
+                            uint          ServiceID,
+                            uint          ATSCMajorChannel,
+                            uint          ATSCMinorChannel,
+                            bool          UseEIT,
+                            bool          visible,
+                            const QString &FrequencyID,
+                            const QString &Icon,
+                            const QString &Format,
+                            const QString &XMLTVID,
+                            const QString &DefaultAuthority )
 {
     bool bResult = false;
 
@@ -249,7 +249,7 @@ bool Channel::CreateDBChannel( uint          MplexID,
     return bResult;
 }
 
-bool Channel::DeleteDBChannel( uint nChannelID )
+bool Channel::RemoveDBChannel( uint nChannelID )
 {
     bool bResult = false;
 
@@ -388,15 +388,15 @@ bool Channel::UpdateVideoSource( uint nSourceId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int  Channel::CreateVideoSource( const QString &sSourceName,
-                                 const QString &sGrabber,
-                                 const QString &sUserId,
-                                 const QString &sFreqTable,
-                                 const QString &sLineupId,
-                                 const QString &sPassword,
-                                 bool          bUseEIT,
-                                 const QString &sConfigPath,
-                                 int           nNITId )
+int  Channel::AddVideoSource( const QString &sSourceName,
+                              const QString &sGrabber,
+                              const QString &sUserId,
+                              const QString &sFreqTable,
+                              const QString &sLineupId,
+                              const QString &sPassword,
+                              bool          bUseEIT,
+                              const QString &sConfigPath,
+                              int           nNITId )
 {
     int nResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
                                        sLineupId, sPassword, bUseEIT, sConfigPath,
@@ -409,7 +409,7 @@ int  Channel::CreateVideoSource( const QString &sSourceName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Channel::DeleteVideoSource( uint nSourceID )
+bool Channel::RemoveVideoSource( uint nSourceID )
 {
     bool bResult = false;
 
@@ -422,9 +422,9 @@ bool Channel::DeleteVideoSource( uint nSourceID )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::LineupList* Channel::GetDDLineups( const QString &sSource,
-                                        const QString &sUserId,
-                                        const QString &sPassword )
+DTC::LineupList* Channel::GetDDLineupList( const QString &sSource,
+                                           const QString &sUserId,
+                                           const QString &sPassword )
 {
     int source = 0;
 
@@ -649,7 +649,7 @@ DTC::VideoMultiplex* Channel::GetVideoMultiplex( int nMplexID )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QStringList Channel::GetXMLTVIds( int SourceID )
+QStringList Channel::GetXMLTVIdList( int SourceID )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -661,7 +661,7 @@ QStringList Channel::GetXMLTVIds( int SourceID )
 
     if (!query.exec())
     {
-        MythDB::DBError("MythAPI::GetXMLTVIds()", query);
+        MythDB::DBError("MythAPI::GetXMLTVIdList()", query);
 
         throw( QString( "Database Error executing query." ));
     }

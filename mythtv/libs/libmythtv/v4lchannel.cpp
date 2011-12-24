@@ -99,6 +99,9 @@ bool V4LChannel::Open(void)
     has_tuner      = !!(capabilities & V4L2_CAP_TUNER);
     has_sliced_vbi = !!(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE);
 
+    if (driver_name == "bttv")
+        has_stream_io = false; // driver workaround, see #9825
+
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Device name '%1' driver '%2'.")
             .arg(device_name).arg(driver_name));
 

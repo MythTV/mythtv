@@ -22,6 +22,7 @@
 #define _SPLICE_DESCRIPTOR_H_
 
 #include "splicedescriptors.h"
+#include "util.h" // for xml_indent
 
 desc_list_t SpliceDescriptor::Parse(
     const unsigned char *data, uint len)
@@ -146,20 +147,12 @@ QString SpliceDescriptor::toString(void) const
     return str;
 }
 
-static inline QString indent(uint level)
-{
-    QString ret;
-    for (uint i = 0; i < level; i++)
-        ret += "  ";
-    return ret;
-}
-
 /// Returns XML representation of string the TS Reader XML format.
 /// When possible matching http://www.tsreader.com/tsreader/text-export.html
 QString SpliceDescriptor::toStringXML(uint level) const
 {
-    QString indent_0 = indent(level);
-    QString indent_1 = indent(level+1);
+    QString indent_0 = xml_indent(level);
+    QString indent_1 = xml_indent(level+1);
     QString str;
 
     str += indent_0 + "<DESCRIPTOR namespace=\"splice\">\n";

@@ -803,7 +803,7 @@ void HostRefreshRateComboBox::ChangeResolution(const QString& resolution)
     clearSelections();
 
     const vector<double> list = GetRefreshRates(resolution);
-    addSelection(QObject::tr("Any"), "0");
+    addSelection(QObject::tr("Auto"), "0");
     int hz50 = -1, hz60 = -1;
     for (uint i=0; i<list.size(); ++i)
     {

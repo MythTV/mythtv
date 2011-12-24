@@ -51,8 +51,8 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
     // Can be overridden, of course, but default to full sized.
     m_Area = GetMythMainWindow()->GetUIScreenRect();
 
-    gCoreContext->SendSystemEvent(
-        QString("SCREEN_TYPE CREATED %1").arg(name));
+//    gCoreContext->SendSystemEvent(
+//        QString("SCREEN_TYPE CREATED %1").arg(name));
 }
 
 MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
@@ -71,14 +71,14 @@ MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
 
     m_Area = GetMythMainWindow()->GetUIScreenRect();
 
-    gCoreContext->SendSystemEvent(
-        QString("SCREEN_TYPE CREATED %1").arg(name));
+//    gCoreContext->SendSystemEvent(
+//        QString("SCREEN_TYPE CREATED %1").arg(name));
 }
 
 MythScreenType::~MythScreenType()
 {
-    gCoreContext->SendSystemEvent(
-        QString("SCREEN_TYPE DESTROYED %1").arg(objectName()));
+//    gCoreContext->SendSystemEvent(
+//        QString("SCREEN_TYPE DESTROYED %1").arg(objectName()));
 
     m_CurrentFocusWidget = NULL;
     emit Exiting();
@@ -471,9 +471,11 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
         else if (action.startsWith("SYSEVENT"))
             gCoreContext->SendSystemEvent(QString("KEY_%1").arg(action.mid(8)));
         else if (action == ACTION_SCREENSHOT)
-        {
             GetMythMainWindow()->ScreenShot();
-        }
+        else if (action == ACTION_TVPOWERON)
+            GetMythMainWindow()->HandleTVPower(true);
+        else if (action == ACTION_TVPOWEROFF)
+            GetMythMainWindow()->HandleTVPower(false);
         else
             handled = false;
     }

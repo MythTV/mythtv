@@ -10,19 +10,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-// OpenGL headers
-#define GL_GLEXT_PROTOTYPES
-#ifdef USING_X11
-#define GLX_GLXEXT_PROTOTYPES
-#define XMD_H 1
-#ifndef GL_ES_VERSION_2_0
-#include <GL/gl.h>
-#endif
-#undef GLX_ARB_get_proc_address
-#endif // USING_X11
-
 #define LOC QString("GLVid: ")
-
 #define COLOUR_UNIFORM "m_colourMatrix"
 
 class OpenGLFilter
@@ -86,7 +74,8 @@ OpenGLVideo::OpenGLVideo() :
     inputUpdated(false),      refsNeeded(0),
     textureRects(false),      textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
-    gl_features(0),           videoTextureType(GL_BGRA)
+    gl_features(0),           videoTextureType(GL_BGRA),
+    preferYCBCR(false)
 {
 }
 
@@ -162,6 +151,10 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     currentFrameNum       = -1;
     inputUpdated          = false;
 
+    // OpenGL-Lite - use implementation specific extensions for updating frames
+    if (options.contains("preferycbcr"))
+        preferYCBCR = true;
+
     // Set OpenGL feature support
     gl_features = gl_context->GetFeatures();
 
@@ -171,30 +164,37 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     SetViewPort(display_visible_rect.size());
 
     bool shaders = (gl_features & kGLExtFragProg) || (gl_features & kGLSL);
+    bool fbos    = gl_features & kGLExtFBufObj;
+    bool uyvy    = !getenv("OPENGL_NOUYVY");
+    bool ycbcr   = (gl_features & kGLMesaYCbCr) || (gl_features & kGLAppleYCbCr);
+
+    // warn about the lite profile when it offers no benefit
+    if (!ycbcr && preferYCBCR)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "You have selected the opengl-lite profile but no required OpenGL "
+            "extensions are available.");
+    }
 
     // decide on best video input texture format
     videoTextureType = GL_BGRA;
     if (hw_accel)
-    {
         videoTextureType = GL_RGBA;
-    }
-    //else if (shaders && (gl_features & kGLAppleRGB422))
-    //{
-    //    videoTextureType = GL_RGB_422_APPLE;
-    //}
-    else if (!shaders && (gl_features & kGLMesaYCbCr))
+    else if ((shaders && fbos && uyvy) && !(ycbcr && preferYCBCR))
+        videoTextureType = MYTHTV_UYVY;
+    else if ((!shaders || preferYCBCR) && (gl_features & kGLMesaYCbCr))
         videoTextureType = GL_YCBCR_MESA;
-    else if (!shaders && (gl_features & kGLAppleYCbCr))
+    else if ((!shaders || preferYCBCR) && (gl_features & kGLAppleYCbCr))
         videoTextureType = GL_YCBCR_422_APPLE;
 
     // colourspace adjustments require shaders to operate on YUV textures
-    if ((GL_BGRA != videoTextureType) && (GL_RGB_422_APPLE != videoTextureType))
+    if ((GL_BGRA != videoTextureType) && (MYTHTV_UYVY != videoTextureType))
         colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
 
     // turn on bicubic filtering
     if (options.contains("openglbicubic"))
     {
-        if (shaders && (gl_features & kGLExtFBufObj))
+        if (shaders && fbos)
             defaultUpsize = kGLFilterBicubic;
         else
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
@@ -212,7 +212,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     GLuint tex = CreateVideoTexture(video_dim, inputTextureSize);
     bool    ok = false;
 
-    if ((GL_BGRA == videoTextureType) || (GL_RGB_422_APPLE == videoTextureType))
+    if ((GL_BGRA == videoTextureType) || (MYTHTV_UYVY == videoTextureType))
         ok = tex && AddFilter(kGLFilterYUV2RGB);
     else
         ok = tex && AddFilter(kGLFilterResize);
@@ -220,16 +220,16 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     if (ok)
     {
         if (GL_RGBA == videoTextureType)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using raw RGBA input textures.");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Using raw RGBA input textures.");
         else if ((GL_YCBCR_MESA == videoTextureType) ||
                  (GL_YCBCR_422_APPLE == videoTextureType))
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 "Using YCbCr->BGRA input textures.");
-        else if (GL_RGB_422_APPLE == videoTextureType)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                "Using Apple YCbCr input textures.");
+        else if (MYTHTV_UYVY == videoTextureType)
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                "Using custom UYVY input textures.");
         else
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 "Using plain BGRA input textures.");
         inputTextures.push_back(tex);
     }
@@ -287,11 +287,16 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
     bool resize_down = (video_disp_dim.height() > display_video_rect.height()) &&
                         deinterlacing && allow;
 
+    // UYVY packed pixels must be sampled exactly and any overscan settings will
+    // break sampling - so always force an extra stage
+    resize_down |= videoTextureType == MYTHTV_UYVY;
+
     if (resize_up && (defaultUpsize == kGLFilterBicubic))
     {
         RemoveFilter(kGLFilterResize);
         filters.erase(kGLFilterResize);
         AddFilter(kGLFilterBicubic);
+        OptimiseFilters();
         return;
     }
 
@@ -300,12 +305,12 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
         RemoveFilter(kGLFilterBicubic);
         filters.erase(kGLFilterBicubic);
         AddFilter(kGLFilterResize);
+        OptimiseFilters();
         return;
     }
 
     RemoveFilter(kGLFilterBicubic);
     filters.erase(kGLFilterBicubic);
-
     OptimiseFilters();
 }
 
@@ -380,15 +385,15 @@ bool OpenGLVideo::OptimiseFilters(void)
 
 void OpenGLVideo::SetFiltering(void)
 {
-    // filter settings included for performance only
-    // no (obvious) quality improvement over GL_LINEAR throughout
-    if (filters.empty() || filters.size() == 1)
+    if (filters.size() < 2)
     {
         SetTextureFilters(&inputTextures, GL_LINEAR, GL_CLAMP_TO_EDGE);
+        SetTextureFilters(&referenceTextures, GL_LINEAR, GL_CLAMP_TO_EDGE);
         return;
     }
 
     SetTextureFilters(&inputTextures, GL_NEAREST, GL_CLAMP_TO_EDGE);
+    SetTextureFilters(&referenceTextures, GL_NEAREST, GL_CLAMP_TO_EDGE);
 
     glfilt_map_t::reverse_iterator rit;
     int last_filter = 0;
@@ -725,9 +730,10 @@ uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
                                             GL_UNSIGNED_SHORT_8_8_MESA,
                                             GL_YCBCR_422_APPLE, GL_RGBA);
     }
-    else if (GL_RGB_422_APPLE == videoTextureType)
+    else if (MYTHTV_UYVY == videoTextureType)
     {
-        tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
+        QSize fix(size.width() / 2, size.height());
+        tmp_tex = gl_context->CreateTexture(fix, use_pbo, textureType,
                                             GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA);
     }
     else
@@ -802,16 +808,19 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
     if (!buf)
         return;
 
-    if (!filters.count(kGLFilterYUV2RGB))
+    if (!filters.count(kGLFilterYUV2RGB) ||
+        MYTHTV_UYVY == videoTextureType)
     {
         // software conversion
         AVPicture img_in, img_out;
         PixelFormat out_fmt = PIX_FMT_BGRA;
         if ((GL_YCBCR_MESA == videoTextureType) ||
-            (GL_YCBCR_422_APPLE == videoTextureType))
+            (GL_YCBCR_422_APPLE == videoTextureType) ||
+            (MYTHTV_UYVY == videoTextureType))
         {
             out_fmt = PIX_FMT_UYVY422;
         }
+
         avpicture_fill(&img_out, (uint8_t *)buf, out_fmt,
                        frame->width, frame->height);
         avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
@@ -826,8 +835,8 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
     }
     else
     {
-        pack_yv12alpha(frame->buf, (unsigned char*)buf, frame->offsets,
-                       frame->pitches, video_dim, NULL);
+        pack_yv12progressive(frame->buf, (unsigned char*)buf, frame->offsets,
+                             frame->pitches, video_dim);
     }
 
     gl_context->UpdateTexture(inputTextures[0], buf);
@@ -892,8 +901,12 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
 
         // texture coordinates
         float trueheight = (float)(actual ? video_dim.height() :
-                                          video_disp_dim.height());
-        QRectF trect(QPoint(0, 0), QSize(video_disp_dim.width(), trueheight));
+                                            video_disp_dim.height());
+        float width = video_disp_dim.width();
+        if ((type == kGLFilterYUV2RGB) && (videoTextureType == MYTHTV_UYVY))
+            width /= 2.0f;
+
+        QRectF trect(QPoint(0, 0), QSize(width, trueheight));
 
         // only apply overscan on last filter
         if (filter->outputBuffer == kDefaultBuffer)
@@ -972,7 +985,6 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                 else
                     gl_context->SetViewPort(QRect(QPoint(), masterViewportSize));
                 break;
-
             case kFrameBufferObject:
                 if (!filter->frameBuffers.empty())
                 {
@@ -1121,23 +1133,26 @@ static const QString attrib_fast =
 "ATTRIB tex   = fragment.texcoord[0];\n"
 "PARAM yuv[3] = { program.local[0..2] };\n";
 
-static const QString var_alpha =
-"TEMP alpha;\n";
-
-static const QString tex_alpha =
-"TEX alpha, tex, texture[3], %1;\n";
-
 static const QString tex_fast =
 "TEX res, tex, texture[0], %1;\n";
 
 static const QString var_fast =
 "TEMP tmp, res;\n";
 
+static const QString var_col =
+"TEMP col;\n";
+
+static const QString select_col =
+"MUL col, tex.xxxx, %8;\n"
+"FRC col, col;\n"
+"SUB col, col, 0.5;\n"
+"CMP res, col, res.rabg, res.rgba;\n";
+
 static const QString end_fast =
 "DPH tmp.r, res.arbg, yuv[0];\n"
 "DPH tmp.g, res.arbg, yuv[1];\n"
 "DPH tmp.b, res.arbg, yuv[2];\n"
-"MOV tmp.a, res.g;\n"
+"MOV tmp.a, 1.0;\n"
 "MOV result.color, tmp;\n";
 
 static const QString var_deint =
@@ -1228,217 +1243,6 @@ static const QString kerneldeint[2] = {
 + field_calc + deint_end_bot
 };
 
-static const QString yadif_setup =
-"TEMP a,b,c,e,f,g,h,j,k,l;\n"
-"TEMP a1,b1,f1,g1,h1,i1,j1,l1,m1,n1;\n"
-"ALIAS d1 = f;\n"
-"ALIAS k1 = g;\n"
-"ALIAS c1 = prev;\n"
-"ALIAS e1 = mov;\n"
-"ALIAS p0 = res;\n"
-"ALIAS p1 = c;\n"
-"ALIAS p3 = h;\n"
-"ALIAS spred1 = a;\n"
-"ALIAS spred2 = b;\n"
-"ALIAS spred3 = c;\n"
-"ALIAS spred4 = e;\n"
-"ALIAS spred5 = f;\n"
-"ALIAS sscore = g;\n"
-"ALIAS score1 = h;\n"
-"ALIAS score2 = j;\n"
-"ALIAS score3 = k;\n"
-"ALIAS score4 = l;\n"
-"ALIAS if1 = a1;\n"
-"ALIAS if2 = b1;\n"
-"TEMP p2, p4;\n"
-"ALIAS diff1 = a;\n"
-"ALIAS diff2 = b;\n"
-"TEMP diff0;\n";
-
-static const QString yadif_spatial_sample =
-"ADD tmp, tex, {%5, %3, 0.0, 0.0};\n"
-"TEX e1, tmp, texture[1], %1;\n"
-"ADD tmp, tmp, {%5, 0.0, 0.0, 0.0};\n"
-"TEX f1, tmp, texture[1], %1;\n"
-"ADD tmp, tmp, {%5, 0.0, 0.0, 0.0};\n"
-"TEX g1, tmp, texture[1], %1;\n"
-"SUB tmp, tmp, {0.0, %4, 0.0, 0.0};\n"
-"TEX n1, tmp, texture[1], %1;\n"
-"SUB tmp, tmp, {%5, 0.0, 0.0, 0.0};\n"
-"TEX m1, tmp, texture[1], %1;\n"
-"SUB tmp, tmp, {%5, 0.0, 0.0, 0.0};\n"
-"TEX l1, tmp, texture[1], %1;\n"
-
-"SUB tmp, tex, {%5, %3, 0.0, 0.0};\n"
-"TEX j1, tmp, texture[1], %1;\n"
-"SUB tmp, tmp, {%5, 0.0, 0.0, 0.0};\n"
-"TEX i1, tmp, texture[1], %1;\n"
-"SUB tmp, tmp, {%5, 0.0, 0.0, 0.0};\n"
-"TEX h1, tmp, texture[1], %1;\n"
-"ADD tmp, tmp, {0.0, %4, 0.0, 0.0};\n"
-"TEX a1, tmp, texture[1], %1;\n"
-"ADD tmp, tmp, {%5, 0.0, 0.0, 0.0};\n"
-"TEX b1, tmp, texture[1], %1;\n"
-"ADD tmp, tmp, {%5, 0.0, 0.0, 0.0};\n"
-"TEX c1, tmp, texture[1], %1;\n";
-
-static const QString yadif_calc =
-"LRP p0, 0.5, c, h;\n"
-"MOV p1, f;\n"
-"LRP p2, 0.5, d, i;\n"
-"MOV p3, g;\n"
-"LRP p4, 0.5, e, j;\n"
-
-"SUB diff0, d, i;\n"
-"ABS diff0, diff0;\n"
-"SUB tmp, a, f;\n"
-"ABS tmp, tmp;\n"
-"SUB diff1, b, g;\n"
-"ABS diff1, diff1;\n"
-"LRP diff1, 0.5, diff1, tmp;\n"
-"SUB tmp, k, f;\n"
-"ABS tmp, tmp;\n"
-"SUB diff2, g, l;\n"
-"ABS diff2, diff2;\n"
-"LRP diff2, 0.5, diff2, tmp;\n"
-"MAX diff0, diff0, diff1;\n"
-"MAX diff0, diff0, diff2;\n"
-
-// mode < 2
-"SUB tmp, p0, p1;\n"
-"SUB other, p4, p3;\n"
-"MIN spred1, tmp, other;\n"
-"MAX spred2, tmp, other;\n"
-"SUB tmp, p2, p1;\n"
-"SUB other, p2, p3;\n"
-"MAX spred1, spred1, tmp;\n"
-"MAX spred1, spred1, other;\n"
-"MIN spred2, spred2, tmp;\n"
-"MIN spred2, spred2, other;\n"
-"MAX spred1, spred2, -spred1;\n"
-"MAX diff0, diff0, spred1;\n"
-
-// spatial prediction
-"LRP spred1, 0.5, d1, k1;\n"
-"LRP spred2, 0.5, c1, l1;\n"
-"LRP spred3, 0.5, b1, m1;\n"
-"LRP spred4, 0.5, e1, j1;\n"
-"LRP spred5, 0.5, f1, i1;\n"
-
-"SUB sscore, c1, j1;\n"
-"ABS sscore, sscore;\n"
-"SUB tmp, d1, k1;\n"
-"ABS tmp, tmp;\n"
-"ADD sscore, sscore, tmp;\n"
-"SUB tmp, e1, l1;\n"
-"ABS tmp, tmp;\n"
-"ADD sscore, sscore, tmp;\n"
-"SUB sscore, sscore, 1.0;\n"
-
-"SUB score1, b1, k1;\n"
-"ABS score1, score1;\n"
-"SUB tmp, c1, l1;\n"
-"ABS tmp, tmp;\n"
-"ADD score1, score1, tmp;\n"
-"SUB tmp, d1, m1;\n"
-"ABS tmp, tmp;\n"
-"ADD score1, score1, tmp;\n"
-
-"SUB score2, a1, l1;\n"
-"ABS score2, score2;\n"
-"SUB tmp, b1, m1;\n"
-"ABS tmp, tmp;\n"
-"ADD score2, score2, tmp;\n"
-"SUB tmp, c1, n1;\n"
-"ABS tmp, tmp;\n"
-"ADD score2, score2, tmp;\n"
-
-"SUB score3, d1, i1;\n"
-"ABS score3, score3;\n"
-"SUB tmp, e1, j1;\n"
-"ABS tmp, tmp;\n"
-"ADD score3, score3, tmp;\n"
-"SUB tmp, f1, k1;\n"
-"ABS tmp, tmp;\n"
-"ADD score3, score3, tmp;\n"
-
-"SUB score4, e1, h1;\n"
-"ABS score4, score4;\n"
-"SUB tmp, f1, i1;\n"
-"ABS tmp, tmp;\n"
-"ADD score4, score4, tmp;\n"
-"SUB tmp, g1, j1;\n"
-"ABS tmp, tmp;\n"
-"ADD score4, score4, tmp;\n"
-"SUB if1, sscore, score1;\n"
-"SUB if2, score1, score2;\n"
-"CMP if2, if1, -1.0, if2;\n"
-"CMP spred1, if1, spred1, spred2;\n"
-"CMP spred1, if2, spred1, spred3;\n"
-"CMP sscore, if1, sscore, score1;\n"
-"CMP sscore, if2, sscore, score2;\n"
-"SUB if1, sscore, score3;\n"
-"SUB if2, score3, score4;\n"
-"CMP if2, if1, -1.0, if2;\n"
-"CMP spred1, if1, spred1, spred4;\n"
-"CMP spred1, if2, spred1, spred5;\n"
-"ADD spred4, p2, diff0;\n"
-"SUB spred5, p2, diff0;\n"
-"SUB if1, spred4, spred1;\n"
-"SUB if2, spred1, spred5;\n"
-"CMP spred1, if1, spred4, spred1;\n"
-"CMP spred1, if2, spred5, spred1;\n";
-
-static const QString yadif[2] = {
-yadif_setup +
-"TEMP d;\n"
-"ALIAS i = current;\n"
-"TEX current, tex, texture[1], %1;\n"
-"TEX d, tex, texture[2], %1;\n"
-"ADD tmp, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX a, tmp, texture[2], %1;\n"
-"TEX f, tmp, texture[1], %1;\n"
-"TEX k, tmp, texture[0], %1;\n"
-"ADD tmp, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX c, tmp, texture[2], %1;\n"
-"TEX h, tmp, texture[1], %1;\n"
-"SUB tmp, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX b, tmp, texture[2], %1;\n"
-"TEX g, tmp, texture[1], %1;\n"
-"TEX l, tmp, texture[0], %1;\n"
-"SUB tmp, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX e, tmp, texture[2], %1;\n"
-"TEX j, tmp, texture[1], %1;\n"
-+ yadif_spatial_sample
-+ yadif_calc
-+ field_calc +
-"CMP res, prev, current, spred1;\n"
-,
-yadif_setup +
-"TEMP i;\n"
-"ALIAS d = current;\n"
-"TEX current, tex, texture[1], %1;\n"
-"TEX i, tex, texture[0], %1;\n"
-"ADD tmp, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX a, tmp, texture[2], %1;\n"
-"TEX f, tmp, texture[1], %1;\n"
-"TEX k, tmp, texture[0], %1;\n"
-"ADD tmp, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX c, tmp, texture[1], %1;\n"
-"TEX h, tmp, texture[0], %1;\n"
-"SUB tmp, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX b, tmp, texture[2], %1;\n"
-"TEX g, tmp, texture[1], %1;\n"
-"TEX l, tmp, texture[0], %1;\n"
-"SUB tmp, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX e, tmp, texture[1], %1;\n"
-"TEX j, tmp, texture[0], %1;\n"
-+ yadif_spatial_sample
-+ yadif_calc
-+ field_calc +
-"CMP res, prev, spred1, current;\n"
-};
-
 static const QString bicubic =
 "TEMP coord, coord2, cdelta, parmx, parmy, a, b, c, d;\n"
 "MAD coord.xy, fragment.texcoord[0], {%6, %7}, {0.5, 0.5};\n"
@@ -1468,6 +1272,7 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
         case kGLFilterYUV2RGB:
         {
             bool need_tex = true;
+            bool packed = MYTHTV_UYVY == videoTextureType;
             QString deint_bit = "";
             if (deint != "")
             {
@@ -1492,12 +1297,6 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
                     deint_bit = kerneldeint[tmp_field];
                     if (!tmp_field) { need_tex = false; }
                 }
-                else if (deint == "openglyadif" ||
-                         deint == "opengldoublerateyadif")
-                {
-                    deint_bit = yadif[tmp_field];
-                    need_tex = false;
-                }
                 else
                 {
                     LOG(VB_PLAYBACK, LOG_ERR, LOC +
@@ -1507,8 +1306,10 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
 
             ret += attrib_fast;
             ret += (deint != "") ? var_deint : "";
+            ret += packed ? var_col : "";
             ret += var_fast + (need_tex ? tex_fast : "");
             ret += deint_bit;
+            ret += packed ? select_col : "";
             ret += end_fast;
         }
             break;
@@ -1548,6 +1349,7 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
 
     float lineHeight = 1.0f;
     float colWidth   = 1.0f;
+    float yselect    = 1.0f;
     QSize fb_size = GetTextureSize(video_disp_dim);
 
     if (!textureRects &&
@@ -1555,6 +1357,7 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     {
         lineHeight /= inputTextureSize.height();
         colWidth   /= inputTextureSize.width();
+        yselect    /= ((float)inputTextureSize.width() / 2.0f);
     }
 
     float fieldSize = 1.0f / (lineHeight * 2.0);
@@ -1565,6 +1368,7 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     string.replace("%5", QString::number(colWidth, 'f', 8));
     string.replace("%6", QString::number((float)fb_size.width(), 'f', 1));
     string.replace("%7", QString::number((float)fb_size.height(), 'f', 1));
+    string.replace("%8", QString::number(1.0f / yselect, 'f', 8));
 
     string.replace("COLOUR_UNIFORM", COLOUR_UNIFORM);
 }
@@ -1580,6 +1384,10 @@ static const QString YUV2RGBVertexShader =
 "    v_texcoord0 = a_texcoord0;\n"
 "}\n";
 
+static const QString SelectColumn =
+"    if (fract(v_texcoord0.x * %8) < 0.5)\n"
+"        yuva = yuva.rabg;\n";
+
 static const QString YUV2RGBFragmentShader =
 "GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
@@ -1588,8 +1396,8 @@ static const QString YUV2RGBFragmentShader =
 "void main(void)\n"
 "{\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
-"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "}\n";
 
 static const QString OneFieldShader[2] = {
@@ -1601,8 +1409,8 @@ static const QString OneFieldShader[2] = {
 "{\n"
 "    vec2 field   = vec2(0.0, step(0.5, fract(v_texcoord0.y * %2)) * %3);\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0 + field);\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
-"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
 "GLSL_DEFINES"
@@ -1611,10 +1419,10 @@ static const QString OneFieldShader[2] = {
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    vec2 field   = vec2(0.0, step(0.5, 1 - fract(v_texcoord0.y * %2)) * %3);\n"
+"    vec2 field   = vec2(0.0, step(0.5, 1.0 - fract(v_texcoord0.y * %2)) * %3);\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0 + field);\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
-"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
@@ -1631,8 +1439,8 @@ static const QString LinearBlendShader[2] = {
 "    vec4 below = GLSL_TEXTURE(s_texture0, v_texcoord0 - line);\n"
 "    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
-"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
 "GLSL_DEFINES"
@@ -1647,8 +1455,8 @@ static const QString LinearBlendShader[2] = {
 "    vec4 below = GLSL_TEXTURE(s_texture0, v_texcoord0 - line);\n"
 "    if (fract(v_texcoord0.y * %2) < 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
-"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
@@ -1660,18 +1468,18 @@ static const QString KernelShader[2] = {
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n"
-"    vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture1, v_texcoord0);\n"
-"    vec4 line0   = GLSL_TEXTURE(s_texture1, twoup);\n"
-"    vec4 line1   = GLSL_TEXTURE(s_texture1, v_texcoord0 - vec2(0.0, %3));\n"
-"    vec4 line3   = GLSL_TEXTURE(s_texture1, v_texcoord0 + vec2(0.0, %3));\n"
-"    vec4 line4   = GLSL_TEXTURE(s_texture1, twodown);\n"
-"    vec4 line00  = GLSL_TEXTURE(s_texture2, twoup);\n"
-"    vec4 line20  = GLSL_TEXTURE(s_texture2, v_texcoord0);\n"
-"    vec4 line40  = GLSL_TEXTURE(s_texture2, twodown);\n"
 "    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
 "    {\n"
+"        vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n"
+"        vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n"
+"        vec4 line0   = GLSL_TEXTURE(s_texture1, twoup);\n"
+"        vec4 line1   = GLSL_TEXTURE(s_texture1, v_texcoord0 - vec2(0.0, %3));\n"
+"        vec4 line3   = GLSL_TEXTURE(s_texture1, v_texcoord0 + vec2(0.0, %3));\n"
+"        vec4 line4   = GLSL_TEXTURE(s_texture1, twodown);\n"
+"        vec4 line00  = GLSL_TEXTURE(s_texture2, twoup);\n"
+"        vec4 line20  = GLSL_TEXTURE(s_texture2, v_texcoord0);\n"
+"        vec4 line40  = GLSL_TEXTURE(s_texture2, twodown);\n"
 "        yuva = (yuva   * 0.125);\n"
 "        yuva = (line20 * 0.125) + yuva;\n"
 "        yuva = (line1  * 0.5) + yuva;\n"
@@ -1681,8 +1489,8 @@ static const QString KernelShader[2] = {
 "        yuva = (line00 * -0.0625) + yuva;\n"
 "        yuva = (line40 * -0.0625) + yuva;\n"
 "    }\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
-"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
 "GLSL_DEFINES"
@@ -1692,18 +1500,18 @@ static const QString KernelShader[2] = {
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n"
-"    vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture1, v_texcoord0);\n"
-"    vec4 line0   = GLSL_TEXTURE(s_texture1, twoup);\n"
-"    vec4 line1   = GLSL_TEXTURE(s_texture1, v_texcoord0 - vec2(0.0, %3));\n"
-"    vec4 line3   = GLSL_TEXTURE(s_texture1, v_texcoord0 + vec2(0.0, %3));\n"
-"    vec4 line4   = GLSL_TEXTURE(s_texture1, twodown);\n"
-"    vec4 line00  = GLSL_TEXTURE(s_texture0, twoup);\n"
-"    vec4 line20  = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"    vec4 line40  = GLSL_TEXTURE(s_texture0, twodown);\n"
 "    if (fract(v_texcoord0.y * %2) < 0.5)\n"
 "    {\n"
+"        vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n"
+"        vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n"
+"        vec4 line0   = GLSL_TEXTURE(s_texture1, twoup);\n"
+"        vec4 line1   = GLSL_TEXTURE(s_texture1, v_texcoord0 - vec2(0.0, %3));\n"
+"        vec4 line3   = GLSL_TEXTURE(s_texture1, v_texcoord0 + vec2(0.0, %3));\n"
+"        vec4 line4   = GLSL_TEXTURE(s_texture1, twodown);\n"
+"        vec4 line00  = GLSL_TEXTURE(s_texture0, twoup);\n"
+"        vec4 line20  = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
+"        vec4 line40  = GLSL_TEXTURE(s_texture0, twodown);\n"
 "        yuva = (yuva   * 0.125);\n"
 "        yuva = (line20 * 0.125) + yuva;\n"
 "        yuva = (line1  * 0.5) + yuva;\n"
@@ -1713,8 +1521,8 @@ static const QString KernelShader[2] = {
 "        yuva = (line00 * -0.0625) + yuva;\n"
 "        yuva = (line40 * -0.0625) + yuva;\n"
 "    }\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
-"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
@@ -1765,6 +1573,9 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                 fragment = KernelShader[bottom];
             else
                 fragment = YUV2RGBFragmentShader;
+
+            fragment.replace("SELECT_COLUMN", MYTHTV_UYVY == videoTextureType ?
+                                              SelectColumn : "");
             break;
         }
         case kGLFilterNone:

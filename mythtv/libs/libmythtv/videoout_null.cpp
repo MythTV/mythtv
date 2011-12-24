@@ -137,6 +137,14 @@ bool VideoOutputNull::Init(int width, int height, float aspect, WId winid,
     if ((width <= 0) || (height <= 0))
         return false;
 
+    if (!codec_is_std(codec_id))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Cannot create VideoOutputNull for codec %1")
+            .arg(toString(codec_id)));
+        return false;
+    }
+
     QMutexLocker locker(&global_lock);
 
     VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
@@ -194,7 +202,7 @@ void VideoOutputNull::DrawUnusedRects(bool)
 {
 }
 
-void VideoOutputNull::UpdatePauseFrame(void)
+void VideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&global_lock);
 
@@ -213,6 +221,8 @@ void VideoOutputNull::UpdatePauseFrame(void)
         vbuffers.GetScratchFrame()->frameNumber = framesPlayed - 1;
         CopyFrame(&av_pause_frame, vbuffers.GetScratchFrame());
     }
+
+    disp_timecode = av_pause_frame.disp_timecode;
 }
 
 void VideoOutputNull::ProcessFrame(VideoFrame *frame, OSD *osd,

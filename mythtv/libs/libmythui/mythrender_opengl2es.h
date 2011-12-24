@@ -24,38 +24,67 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
         m_qualifiers = "precision mediump float;\n";
 
         // Default OpenGL ES 2.0
-        m_glCreateShader     = (MYTH_GLCREATESHADERPROC)glCreateShader;
-        m_glShaderSource     = (MYTH_GLSHADERSOURCEPROC)glShaderSource;
-        m_glCompileShader    = (MYTH_GLCOMPILESHADERPROC)glCompileShader;
-        m_glAttachShader     = (MYTH_GLATTACHSHADERPROC)glAttachShader;
-        m_glGetShaderiv      = (MYTH_GLGETSHADERIVPROC)glGetShaderiv;
-        m_glGetShaderInfoLog = (MYTH_GLGETSHADERINFOLOGPROC)glGetShaderInfoLog;
-        m_glDetachShader     = (MYTH_GLDETACHSHADERPROC)glDetachShader;
-        m_glDeleteShader     = (MYTH_GLDELETESHADERPROC)glDeleteShader;
+        m_glCreateShader     = (MYTH_GLCREATESHADERPROC)
+                                    GetProcAddress("glCreateShader");
+        m_glShaderSource     = (MYTH_GLSHADERSOURCEPROC)
+                                    GetProcAddress("glShaderSource");
+        m_glCompileShader    = (MYTH_GLCOMPILESHADERPROC)
+                                    GetProcAddress("glCompileShader");
+        m_glAttachShader     = (MYTH_GLATTACHSHADERPROC)
+                                    GetProcAddress("glAttachShader");
+        m_glGetShaderiv      = (MYTH_GLGETSHADERIVPROC)
+                                    GetProcAddress("glGetShaderiv");
+        m_glGetShaderInfoLog = (MYTH_GLGETSHADERINFOLOGPROC)
+                                    GetProcAddress("glGetShaderInfoLog");
+        m_glDetachShader     = (MYTH_GLDETACHSHADERPROC)
+                                    GetProcAddress("glDetachShader");
+        m_glDeleteShader     = (MYTH_GLDELETESHADERPROC)
+                                    GetProcAddress("glDeleteShader");
 
-        m_glDeleteProgram     = (MYTH_GLDELETEPROGRAMPROC)glDeleteProgram;
-        m_glCreateProgram     = (MYTH_GLCREATEPROGRAMPROC)glCreateProgram;
-        m_glLinkProgram       = (MYTH_GLLINKPROGRAMPROC)glLinkProgram;
-        m_glUseProgram        = (MYTH_GLUSEPROGRAMPROC)glUseProgram;
-        m_glGetProgramInfoLog = (MYTH_GLGETPROGRAMINFOLOGPROC)glGetProgramInfoLog;
-        m_glGetProgramiv      = (MYTH_GLGETPROGRAMIVPROC)glGetProgramiv;
+        m_glDeleteProgram     = (MYTH_GLDELETEPROGRAMPROC)
+                                    GetProcAddress("glDeleteProgram");
+        m_glCreateProgram     = (MYTH_GLCREATEPROGRAMPROC)
+                                    GetProcAddress("glCreateProgram");
+        m_glLinkProgram       = (MYTH_GLLINKPROGRAMPROC)
+                                    GetProcAddress("glLinkProgram");
+        m_glUseProgram        = (MYTH_GLUSEPROGRAMPROC)
+                                    GetProcAddress("glUseProgram");
+        m_glGetProgramInfoLog = (MYTH_GLGETPROGRAMINFOLOGPROC)
+                                    GetProcAddress("glGetProgramInfoLog");
+        m_glGetProgramiv      = (MYTH_GLGETPROGRAMIVPROC)
+                                    GetProcAddress("glGetProgramiv");
 
-        m_glGetUniformLocation  = (MYTH_GLGETUNIFORMLOCATIONPROC)glGetUniformLocation;
-        m_glUniform4f           = (MYTH_GLUNIFORM4FPROC)glUniform4f;
-        m_glUniformMatrix4fv    = (MYTH_GLUNIFORMMATRIX4FVPROC)glUniformMatrix4fv;
-        m_glVertexAttribPointer = (MYTH_GLVERTEXATTRIBPOINTERPROC)glVertexAttribPointer;
+        m_glGetUniformLocation  = (MYTH_GLGETUNIFORMLOCATIONPROC)
+                                    GetProcAddress("glGetUniformLocation");
+        m_glUniform4f           = (MYTH_GLUNIFORM4FPROC)
+                                    GetProcAddress("glUniform4f");
+        m_glUniformMatrix4fv    = (MYTH_GLUNIFORMMATRIX4FVPROC)
+                                    GetProcAddress("glUniformMatrix4fv");
+        m_glVertexAttribPointer = (MYTH_GLVERTEXATTRIBPOINTERPROC)
+                                    GetProcAddress("glVertexAttribPointer");
 
-        m_glEnableVertexAttribArray  = (MYTH_GLENABLEVERTEXATTRIBARRAYPROC)glEnableVertexAttribArray;
-        m_glDisableVertexAttribArray = (MYTH_GLDISABLEVERTEXATTRIBARRAYPROC)glDisableVertexAttribArray;
-        m_glBindAttribLocation       = (MYTH_GLBINDATTRIBLOCATIONPROC)glBindAttribLocation;
-        m_glVertexAttrib4f           = (MYTH_GLVERTEXATTRIB4FPROC)glVertexAttrib4f;
+        m_glEnableVertexAttribArray  =
+                        (MYTH_GLENABLEVERTEXATTRIBARRAYPROC)
+                        GetProcAddress("glEnableVertexAttribArray");
+        m_glDisableVertexAttribArray =
+                        (MYTH_GLDISABLEVERTEXATTRIBARRAYPROC)
+                        GetProcAddress("glDisableVertexAttribArray");
+        m_glBindAttribLocation = (MYTH_GLBINDATTRIBLOCATIONPROC)
+                        GetProcAddress("glBindAttribLocation");
+        m_glVertexAttrib4f = (MYTH_GLVERTEXATTRIB4FPROC)
+                        GetProcAddress("glVertexAttrib4f");
 
-        m_glGenBuffers    = (MYTH_GLGENBUFFERSPROC)glGenBuffers;
-        m_glBindBuffer    = (MYTH_GLBINDBUFFERPROC)glBindBuffer;
-        m_glDeleteBuffers = (MYTH_GLDELETEBUFFERSPROC)glDeleteBuffers;
-        m_glBufferData    = (MYTH_GLBUFFERDATAPROC)glBufferData;
+        m_glGenBuffers    = (MYTH_GLGENBUFFERSPROC)
+                             GetProcAddress("glGenBuffers");
+        m_glBindBuffer    = (MYTH_GLBINDBUFFERPROC)
+                             GetProcAddress("glBindBuffer");
+        m_glDeleteBuffers = (MYTH_GLDELETEBUFFERSPROC)
+                             GetProcAddress("glDeleteBuffers");
+        m_glBufferData    = (MYTH_GLBUFFERDATAPROC)
+                             GetProcAddress("glBufferData");
 
-        m_glActiveTexture = (MYTH_GLACTIVETEXTUREPROC)glActiveTexture;
+        m_glActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
+                             GetProcAddress("glActiveTexture");
 
         // GL_OES_framebuffer_object - should be core?
         m_glGenFramebuffers = (MYTH_GLGENFRAMEBUFFERSPROC)

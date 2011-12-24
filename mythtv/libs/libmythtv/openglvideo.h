@@ -130,5 +130,6 @@ class OpenGLVideo
     OpenGLFilterType defaultUpsize;
     uint           gl_features;
     uint           videoTextureType;
+    bool           preferYCBCR;
 };
 #endif // _OPENGL_VIDEO_H__

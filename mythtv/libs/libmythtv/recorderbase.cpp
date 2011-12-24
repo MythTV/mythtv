@@ -8,11 +8,13 @@ using namespace std;
 #include "recordingprofile.h"
 #include "firewirechannel.h"
 #include "importrecorder.h"
+#include "cetonrecorder.h"
 #include "dummychannel.h"
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
 #include "mpegrecorder.h"
 #include "recorderbase.h"
+#include "cetonchannel.h"
 #include "asirecorder.h"
 #include "dvbrecorder.h"
 #include "hdhrchannel.h"
@@ -47,6 +49,7 @@ RecorderBase::RecorderBase(TVRec *rec)
       nextRingBuffer(NULL),     nextRecording(NULL),
       positionMapType(MARK_GOP_BYFRAME)
 {
+    ClearStatistics();
     QMutexLocker locker(avcodeclock);
     avcodec_init(); // init CRC's
 }
@@ -295,11 +298,14 @@ void RecorderBase::CheckForRingBufferSwitch(void)
 {
     nextRingBufferLock.lock();
 
-    bool rb_changed = false;
+    RecordingQuality *recq = NULL;
 
     if (nextRingBuffer)
     {
         FinishRecording();
+
+        recq = GetRecordingQuality();
+
         ResetForNewFile();
 
         m_videoAspect = m_videoWidth = m_videoHeight = 0;
@@ -311,14 +317,28 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         nextRingBuffer = NULL;
         nextRecording = NULL;
 
-        rb_changed = true;
-
         StartNewFile();
     }
     nextRingBufferLock.unlock();
 
-    if (rb_changed && tvrec)
-        tvrec->RingBufferChanged(ringBuffer, curRecording);
+    if (recq && tvrec)
+        tvrec->RingBufferChanged(ringBuffer, curRecording, recq);
+}
+
+void RecorderBase::ClearStatistics(void)
+{
+    QMutexLocker locker(&statisticsLock);
+    timeOfFirstData = QDateTime();
+    timeOfLatestData = QDateTime();
+    recordingGaps.clear();
+}
+
+RecordingQuality *RecorderBase::GetRecordingQuality(void) const
+{
+    QMutexLocker locker(&statisticsLock);
+    return new RecordingQuality(
+        curRecording, recordingGaps,
+        timeOfFirstData, timeOfLatestData);
 }
 
 int64_t RecorderBase::GetKeyframePosition(uint64_t desired) const
@@ -493,6 +513,14 @@ RecorderBase *RecorderBase::CreateRecorder(
             tvrec, dynamic_cast<HDHRChannel*>(channel));
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
 #endif // USING_HDHOMERUN
+    }
+    else if (genOpt.cardtype == "CETON")
+    {
+#ifdef USING_CETON
+        recorder = new CetonRecorder(
+            tvrec, dynamic_cast<CetonChannel*>(channel));
+        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+#endif // USING_CETON
     }
     else if (genOpt.cardtype == "DVB")
     {

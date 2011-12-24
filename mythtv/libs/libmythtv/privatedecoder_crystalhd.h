@@ -54,7 +54,7 @@ class PrivateDecoderCrystalHD : public PrivateDecoder
     virtual ~PrivateDecoderCrystalHD();
     virtual QString GetName(void) { return QString("crystalhd"); }
     virtual bool Init(const QString &decoder,
-                      bool no_hardware_decode,
+                      PlayerFlags flags,
                       AVCodecContext *avctx);
     virtual bool Reset(void);
     virtual int  GetFrame(AVStream *stream,

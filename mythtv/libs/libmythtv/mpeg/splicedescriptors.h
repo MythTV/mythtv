@@ -161,6 +161,7 @@ class SegmentationDescriptor : SpliceDescriptor
     SegmentationDescriptor(const unsigned char *data, int len = 300) :
         SpliceDescriptor(data, len, SpliceDescriptorID::segmentation)
     {
+        _ptrs[2] = _ptrs[1] = _ptrs[0] = NULL;
         if (_data && !Parse())
             _data = NULL;
     }

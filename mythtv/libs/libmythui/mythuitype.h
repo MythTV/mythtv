@@ -83,7 +83,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     // Check set dirty status
     bool NeedsRedraw(void) const;
     void ResetNeedsRedraw(void);
-    void SetRedraw();
+    void SetRedraw(void);
 
     void SetChildNeedsRedraw(MythUIType *child);
 
@@ -111,12 +111,14 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     virtual void SetMinSize(const MythPoint &size);
     virtual QSize GetMinSize(void) const;
     virtual void SetArea(const MythRect &rect);
-    virtual void AdjustMinArea(int delta_x, int delta_y);
+    virtual void AdjustMinArea(int delta_x, int delta_y,
+			       int delta_w, int delta_h);
     virtual void VanishSibling(void);
     virtual void SetMinAreaParent(MythRect actual_area, MythRect full_area,
-                                  const MythUIType *child);
-    virtual void SetMinArea(const QSize &size);
+                                  MythUIType *child);
+    virtual void SetMinArea(const MythRect & rect);
     virtual MythRect GetArea(void) const;
+    virtual MythRect GetFullArea(void) const;
     virtual void RecalculateArea(bool recurse = true);
     void ExpandArea(const MythRect &rect);
 
@@ -200,6 +202,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     bool m_HasFocus;
     bool m_CanHaveFocus;
     bool m_Enabled;
+    bool m_EnableInitiator;
     bool m_Initiator;
     bool m_Vanish;
     bool m_Vanished;
@@ -209,7 +212,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     MythRect m_Area;
     MythRect m_MinArea;
     MythPoint m_MinSize;
-    QSize m_NormalSize;
+//    QSize m_NormalSize;
 
     QRegion m_DirtyRegion;
     bool m_NeedsRedraw;

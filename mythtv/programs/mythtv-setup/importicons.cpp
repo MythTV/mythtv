@@ -463,60 +463,42 @@ QString ImportIconsWizard::escape_csv(const QString& str)
     return "\""+str2+"\"";
 }
 
-QStringList ImportIconsWizard::extract_csv(const QString& strLine)
+QStringList ImportIconsWizard::extract_csv(const QString &line)
 {
     QStringList ret;
-    //Clean up the line and split out the fields
-    QString str = strLine;
-
-    int pos = 0;
-    bool fFinish = false;
-    while(!fFinish)
+    QString str;
+    bool in_comment = false;
+    bool in_escape = false;
+    int comma_count = 0;
+    for (int i = 0; i < line.length(); i++)
     {
-        str = str.trimmed();
-        while(!fFinish)
+        QChar cur = line[i];
+        if (in_escape)
         {
-            QString strLeft;
-            switch (str.at(pos).unicode())
-            {
-            case '\\':
-                if (pos>=1)
-                    str.left(pos-1)+str.mid(pos+1);
-                else
-                    str=str.mid(pos+1);
-                pos+=2;
-                if (pos > str.length())
-                {
-                    strLeft = str.left(pos);
-                    if (strLeft.startsWith("\"") && strLeft.endsWith("\""))
-                        strLeft=strLeft.mid(1,strLeft.length()-2);
-                    ret.append(strLeft);
-                    fFinish = true;
-                }
-                break;
-            case ',':
-                strLeft = str.left(pos);
-                if (strLeft.startsWith("\"") && strLeft.endsWith("\""))
-                    strLeft=strLeft.mid(1,strLeft.length()-2);
-                ret.append(strLeft);
-                if ((pos+1) > str.length())
-                   fFinish = true;
-                str=str.mid(pos+1);
-                pos=0;
-                break;
-            default:
-                pos++;
-                if (pos >= str.length())
-                {
-                    strLeft = str.left(pos);
-                    if (strLeft.startsWith("\"") && strLeft.endsWith("\""))
-                        strLeft=strLeft.mid(1,strLeft.length()-2);
-                    ret.append(strLeft);
-                    fFinish = true;
-                }
-            }
+            str += cur;
+            in_escape = false;
+        }
+        else if (cur == '"')
+        {
+            in_comment = !in_comment;
+        }
+        else if (cur == '\\')
+        {
+            in_escape = true;
+        }
+        else if (!in_comment && (cur == ','))
+        {
+            ret += str;
+            str.clear();
+            ++comma_count;
+        }
+        else
+        {
+            str += cur;
         }
     }
+    if (comma_count)
+        ret += str;
 
     // This is just to avoid segfaulting, we should add some error recovery
     while (ret.size() < 5)
@@ -616,7 +598,7 @@ bool ImportIconsWizard::search(const QString& strParam)
                                 .arg(escape_csv(entry2.strNetworkId))
                                 .arg(escape_csv(entry2.strServiceId));
 
-    QString str = wget(url,"s="+strParam1+"csv="+channelcsv);
+    QString str = wget(url,"s="+strParam1+"&csv="+channelcsv);
     m_listSearch.clear();
     m_iconsList->Reset();
 

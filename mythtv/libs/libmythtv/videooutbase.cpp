@@ -34,6 +34,7 @@
 
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
+#include "videoout_nullvdpau.h"
 #endif
 
 #ifdef USING_VAAPI
@@ -90,6 +91,7 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 
 #ifdef USING_VDPAU
     VideoOutputVDPAU::GetRenderOptions(opts);
+    VideoOutputNullVDPAU::GetRenderOptions(opts);
 #endif // USING_VDPAU
 
 #ifdef USING_VAAPI
@@ -105,11 +107,78 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 VideoOutput *VideoOutput::Create(
     const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
     PIPState pipState,      const QSize &video_dim,    float video_aspect,
-    WId win_id,             const QRect &display_rect, float video_prate)
+    QWidget *parentwidget,  const QRect &embed_rect, float video_prate,
+    uint playerFlags)
 {
     (void) codec_priv;
-
     QStringList renderers;
+
+    // dummy video classes (pip, transcode, commflag etc)
+    if (playerFlags & kVideoIsNull)
+    {
+        VideoOutput *vo = NULL;
+        if (playerFlags & kDecodeAllowGPU)
+        {
+#ifdef USING_VDPAU
+            renderers = VideoOutputNullVDPAU::GetAllowedRenderers(codec_id);
+            if (renderers.contains("nullvdpau"))
+                vo = new VideoOutputNullVDPAU();
+            if (vo)
+            {
+                if (vo->Init(video_dim.width(), video_dim.height(),
+                             video_aspect, 0, QRect(), codec_id))
+                {
+                    return vo;
+                }
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to create null VDPAU video out");
+                delete vo;
+                vo = NULL;
+            }
+#endif // USING_VDPAU
+        }
+
+        if (!vo)
+            vo = new VideoOutputNull();
+
+        if (vo)
+        {
+            if (vo->Init(video_dim.width(), video_dim.height(),
+                         video_aspect, 0, QRect(), codec_id))
+            {
+                return vo;
+            }
+            else
+                delete vo;
+        }
+        LOG(VB_GENERAL, LOG_CRIT, LOC + "Failed to create null video out");
+        return NULL;
+    }
+
+    // ensure we have a window to display into
+    QWidget *widget = parentwidget;
+    MythMainWindow *window = GetMythMainWindow();
+    if (!widget && window)
+        widget = window->findChild<QWidget*>("video playback window");
+
+    if (!widget)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No window for video output.");
+        return NULL;
+    }
+
+    if (!widget->winId())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No window for video output.");
+        return NULL;
+    }
+
+    // determine the display rectangle
+    QRect display_rect = QRect(0, 0, widget->width(), widget->height());
+    if (pipState == kPIPStandAlone)
+        display_rect = embed_rect;
+
+    // select the best available output
 
 #ifdef USING_MINGW
     renderers += VideoOutputD3D::GetAllowedRenderers(codec_id, video_dim);
@@ -187,8 +256,8 @@ VideoOutput *VideoOutput::Create(
 #endif // Q_OS_MACX
 
 #ifdef USING_OPENGL_VIDEO
-        if (renderer == "opengl")
-            vo = new VideoOutputOpenGL();
+        if (renderer.contains("opengl"))
+            vo = new VideoOutputOpenGL(renderer);
 #endif // USING_OPENGL_VIDEO
 
 #ifdef USING_VDPAU
@@ -212,8 +281,9 @@ VideoOutput *VideoOutput::Create(
             vo->SetVideoFrameRate(video_prate);
             if (vo->Init(
                     video_dim.width(), video_dim.height(), video_aspect,
-                    win_id, display_rect, codec_id))
+                    widget->winId(), display_rect, codec_id))
             {
+                vo->SetVideoScalingAllowed(true);
                 return vo;
             }
 
@@ -1393,6 +1463,7 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
         return;
 
     to->frameNumber = from->frameNumber;
+    to->disp_timecode = from->disp_timecode;
 
     // guaranteed to be correct sizes.
     if (from->size == to->size)

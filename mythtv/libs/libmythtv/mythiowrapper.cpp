@@ -170,7 +170,7 @@ int mythfile_open(const char *pathname, int flags)
         RingBuffer *rb = NULL;
         RemoteFile *rf = NULL;
 
-        if ((fileinfo.st_size < 51200) &&
+        if ((fileinfo.st_size < 512) &&
             (fileinfo.st_mtime < (time(NULL) - 300)))
         {
             if (flags & O_WRONLY)

@@ -132,7 +132,9 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual int readOutputData(unsigned char *read_buffer,
                                int max_length) = 0;
 
+    virtual bool IsUpmixing(void) = 0;
     virtual bool ToggleUpmix(void) = 0;
+    virtual bool CanUpmix(void) = 0;
     bool PulseStatus(void) { return pulsewassuspended; }
 
   protected:

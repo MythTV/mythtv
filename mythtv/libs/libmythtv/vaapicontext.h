@@ -4,6 +4,7 @@
 extern "C" {
 #include "libavcodec/vaapi.h"
 }
+#include "va/va_x11.h"
 #include "va/va_glx.h"
 #include "videocolourspace.h"
 
@@ -15,12 +16,18 @@ struct vaapi_surface
 class VAAPIDisplay;
 class OpenGLVideo;
 
+enum VAAPIDisplayType
+{
+    kVADisplayX11,
+    kVADisplayGLX,
+};
+
 class VAAPIContext
 {
   public:
     static bool IsFormatAccelerated(QSize size, MythCodecID codec,
                                     PixelFormat &pix_fmt);
-    VAAPIContext(MythCodecID codec);
+    VAAPIContext(VAAPIDisplayType display_type, MythCodecID codec);
    ~VAAPIContext();
 
     bool  CreateDisplay(QSize size);
@@ -31,6 +38,10 @@ class VAAPIContext
     int   GetNumBuffers(void)        { return m_numSurfaces; }
     PixelFormat GetPixelFormat(void) { return m_pix_fmt;     }
 
+    // X11 display
+    bool  CopySurfaceToFrame(VideoFrame *frame, const void *buf);
+    bool  InitImage(const void *buf);
+    // GLX display
     bool  CopySurfaceToTexture(const void* buf, uint texture,
                                uint texture_type, FrameScanType scan);
     void* GetGLXSurface(uint texture, uint texture_type);
@@ -43,6 +54,7 @@ class VAAPIContext
     void InitPictureAttributes(VideoColourSpace &colourspace);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
 
+    VAAPIDisplayType m_dispType;
     vaapi_context  m_ctx;
     MythCodecID    m_codec;
     QSize          m_size;
@@ -57,6 +69,7 @@ class VAAPIContext
     VADisplayAttribute* m_pictureAttributes;
     int            m_pictureAttributeCount;
     int            m_hueBase;
+    VAImage        m_image;
 };
 
 #endif // VAAPICONTEXT_H

@@ -1746,7 +1746,7 @@ void VideoOutputXv::VideoAspectRatioChanged(float aspect)
     VideoOutput::VideoAspectRatioChanged(aspect);
 }
 
-void VideoOutputXv::UpdatePauseFrame(void)
+void VideoOutputXv::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&global_lock);
 
@@ -1772,6 +1772,8 @@ void VideoOutputXv::UpdatePauseFrame(void)
             vbuffers.GetScratchFrame()->frameNumber = framesPlayed - 1;
             CopyFrame(&av_pause_frame, vbuffers.GetScratchFrame());
         }
+
+        disp_timecode = av_pause_frame.disp_timecode;
     }
 }
 

@@ -424,7 +424,7 @@ void VideoOutputD3D::Zoom(ZoomDirection direction)
     MoveResize();
 }
 
-void VideoOutputD3D::UpdatePauseFrame(void)
+void VideoOutputD3D::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&m_lock);
     VideoFrame *used_frame = vbuffers.head(kVideoBuffer_used);
@@ -434,10 +434,17 @@ void VideoOutputD3D::UpdatePauseFrame(void)
         if (!used_frame)
             used_frame = vbuffers.GetScratchFrame();
         CopyFrame(&m_pauseFrame, used_frame);
+        disp_timecode = m_pauseFrame.disp_timecode;
     }
     else if (codec_is_dxva2(video_codec_id))
     {
-        m_pause_surface = used_frame->buf;
+        if (used_frame)
+        {
+            m_pause_surface = used_frame->buf;
+            disp_timecode = used_frame->disp_timecode;
+        }
+        else
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Failed to update pause frame");
     }
 }
 
@@ -689,21 +696,17 @@ bool VideoOutputD3D::ApproveDeintFilter(const QString& filtername) const
 }
 
 MythCodecID VideoOutputD3D::GetBestSupportedCodec(
-    uint width,       uint height,
+    uint width,       uint height, const QString &decoder,
     uint stream_type, bool no_acceleration,
     PixelFormat &pix_fmt)
 {
 #ifdef USING_DXVA2
     QSize size(width, height);
     bool use_cpu = no_acceleration;
-    VideoDisplayProfile vdp;
-    vdp.SetInput(size);
-    QString dec = vdp.GetDecoder();
-
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_DXVA2 + (stream_type - 1));
     use_cpu |= !codec_is_dxva2_hw(test_cid);
     pix_fmt = PIX_FMT_DXVA2_VLD;
-    if ((dec == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
+    if ((decoder == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
         return test_cid;
 #endif
     return (MythCodecID)(kCodec_MPEG1 + (stream_type - 1));

@@ -366,6 +366,35 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     return ok;
 }
 
+bool FileRingBuffer::ReOpen(QString newFilename)
+{
+    if (!writemode)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Tried to ReOpen a read only file.");
+        return false;
+    }
+
+    bool result = false;
+
+    rwlock.lockForWrite();
+
+    if (tfw && tfw->ReOpen(newFilename))
+        result = true;
+    else if (remotefile && remotefile->ReOpen(newFilename))
+        result = true;
+
+    if (result)
+    {
+        filename = newFilename;
+        poslock.lockForWrite();
+        writepos = 0;
+        poslock.unlock();
+    }
+
+    rwlock.unlock();
+    return result;
+}
+
 bool FileRingBuffer::IsOpen(void) const
 {
     rwlock.lockForRead();
@@ -611,11 +640,16 @@ long long FileRingBuffer::Seek(long long pos, int whence, bool has_lock)
                         .arg(internalreadpos).arg(ignorereadpos).arg(ret));
                 ignorereadpos = -1;
             }
+            // if we are seeking forward we may now be too close to the
+            // end, so we need to recheck if reads are allowed.
+            if (new_pos > readpos)
+            {
+                ateof = false;
+                readsallowed = false;
+            }
             readpos = new_pos;
             poslock.unlock();
             generalWait.wakeAll();
-            ateof = false;
-            readsallowed = false;
             if (!has_lock)
                 rwlock.unlock();
             return new_pos;

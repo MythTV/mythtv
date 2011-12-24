@@ -25,6 +25,8 @@
 #include <mythprogressdialog.h>
 #include <mythdialogbox.h>
 #include <mythlogging.h>
+#include <util.h>
+#include <netutils.h>
 
 // mytharchive
 #include "recordingselector.h"
@@ -92,12 +94,12 @@ bool RecordingSelector::Create(void)
     UIUtilE::Assign(this, m_categorySelector, "category_selector", &err);
     UIUtilE::Assign(this, m_recordingButtonList, "recordinglist", &err);
 
-    UIUtilE::Assign(this, m_titleText, "progtitle", &err);
-    UIUtilE::Assign(this, m_datetimeText, "progdatetime", &err);
-    UIUtilE::Assign(this, m_descriptionText, "progdescription", &err);
-    UIUtilE::Assign(this, m_filesizeText, "filesize", &err);
-    UIUtilE::Assign(this, m_previewImage, "preview_image", &err);
-    UIUtilE::Assign(this, m_cutlistImage, "cutlist_image", &err);
+    UIUtilW::Assign(this, m_titleText, "progtitle", &err);
+    UIUtilW::Assign(this, m_datetimeText, "progdatetime", &err);
+    UIUtilW::Assign(this, m_descriptionText, "progdescription", &err);
+    UIUtilW::Assign(this, m_filesizeText, "filesize", &err);
+    UIUtilW::Assign(this, m_previewImage, "preview_image", &err);
+    UIUtilW::Assign(this, m_cutlistImage, "cutlist_image", &err);
 
     if (err)
     {
@@ -117,7 +119,8 @@ bool RecordingSelector::Create(void)
     connect(m_recordingButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             this, SLOT(toggleSelected(MythUIButtonListItem *)));
 
-    m_cutlistImage->Hide();
+    if (m_cutlistImage)
+        m_cutlistImage->Hide();
 
     BuildFocusList();
 
@@ -429,6 +432,51 @@ void RecordingSelector::updateRecordingList(void)
                 {
                     item->setChecked(MythUIButtonListItem::NotChecked);
                 }
+
+                QString title = p->GetTitle();
+                QString subtitle = p->GetSubtitle();
+
+                QDateTime recstartts = p->GetScheduledStartTime();
+                QDateTime recendts   = p->GetScheduledEndTime();
+
+                QString timedate = QString("%1 - %2")
+                                   .arg(MythDateTimeToString
+                                        (recstartts, kDateTimeFull))
+                                   .arg(MythDateTimeToString(recendts, kTime));
+
+                uint season = p->GetSeason();
+                uint episode = p->GetEpisode();
+                QString seasone, seasonx;
+
+                if (season && episode)
+                {
+                    seasone = QString("s%1e%2")
+                                .arg(GetDisplaySeasonEpisode(season, 2))
+                                .arg(GetDisplaySeasonEpisode(episode, 2));
+                    seasonx = QString("%1x%2")
+                              .arg(GetDisplaySeasonEpisode(season, 1))
+                              .arg(GetDisplaySeasonEpisode(episode, 2));
+                }
+
+                item->SetText(title, "title");
+                item->SetText(subtitle, "subtitle");
+                if (subtitle.isEmpty())
+                    item->SetText(title, "titlesubtitle");
+                else
+                    item->SetText(title + " - \"" + subtitle + '"',
+                                  "titlesubtitle");
+
+                item->SetText(timedate, "timedate");
+                item->SetText(p->GetDescription(), "description");
+                item->SetText(formatSize(p->GetFilesize() / 1024),
+                              "filesize_str");
+
+                item->SetText(QString::number(season), "season");
+                item->SetText(QString::number(episode), "episode");
+                item->SetText(seasonx, "00x00");
+                item->SetText(seasone, "s00e00");
+
+                item->DisplayState(p->HasCutlist() ? "yes" : "no", "cutlist");
 
                 item->SetData(qVariantFromValue(p));
             }

@@ -43,7 +43,9 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetTemplateText(const QString &text) { m_TemplateText = text; }
     QString GetTemplateText(void) const { return m_TemplateText; }
 
+#if 0 // Not currently used
     void UseAlternateArea(bool useAlt);
+#endif
 
     virtual void Pulse(void);
     QPoint CursorPosition(int text_offset);
@@ -72,8 +74,8 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void StopCycling();
 
     int GetJustification(void);
-    void SetCutDown(bool cut);
-    bool GetCutDown(void) const { return m_Cutdown; }
+    void SetCutDown(Qt::TextElideMode mode);
+    Qt::TextElideMode GetCutDown(void) const { return m_Cutdown; }
     void SetMultiLine(bool multiline);
     bool GetMultiLine(void) const { return m_MultiLine; }
 
@@ -93,7 +95,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
 			  qreal & last_line_width, int & num_lines);
     bool GetNarrowWidth(const QStringList & paragraphs,
 			const QTextOption & textoption, qreal & width);
-    void FillCutMessage(bool reset_size = false);
+    void FillCutMessage(void);
 
     int m_Justification;
     MythRect m_OrigDisplayRect;
@@ -107,9 +109,11 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     QString m_DefaultMessage;
     QString m_TemplateText;
 
+#if 0 // Not currently used
     bool m_usingAltArea;
+#endif
     bool m_ShrinkNarrow;
-    bool m_Cutdown;
+    Qt::TextElideMode m_Cutdown;
     bool m_MultiLine;
     int  m_Leading;
     int  m_extraLeading;
@@ -127,8 +131,13 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     float curR, curG, curB;
     float incR, incG, incB;
 
-    enum ScrollDir {ScrollLeft, ScrollRight, ScrollUp, ScrollDown};
+    enum Constants {ScrollBounceDelay = 250};
+    enum ScrollDir {ScrollNone, ScrollLeft, ScrollRight, ScrollUp, ScrollDown,
+                    ScrollHorizontal, ScrollVertical};
 
+    int  m_scrollPause;
+    int  m_scrollOffset;
+    bool m_scrollBounce;
     bool m_scrolling;
     ScrollDir m_scrollDirection;
 

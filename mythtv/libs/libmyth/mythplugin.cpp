@@ -19,8 +19,8 @@
 
 using namespace std;
 
-MythPlugin::MythPlugin(const QString &libname)
-          : QLibrary(libname)
+MythPlugin::MythPlugin(const QString &libname, const QString &plugname)
+          : QLibrary(libname), m_plugName(plugname)
 {
     enabled = true;
     position = 0;
@@ -178,7 +178,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
 
     if (!m_dict[newname])
     {
-        m_dict.insert(newname, new MythPlugin(newname));
+        m_dict.insert(newname, new MythPlugin(newname, plugname));
     }
 
     int result = m_dict[newname]->init(MYTH_BINARY_VERSION);
@@ -316,5 +316,14 @@ void MythPluginManager::DestroyAllPlugins(void)
     moduleMap.clear();
     menuPluginMap.clear();
     menuPluginList.clear();
+}
+
+QStringList MythPluginManager::EnumeratePlugins(void)
+{
+    QStringList ret;
+    QHash<QString, MythPlugin*>::const_iterator it = m_dict.begin();
+    for (; it != m_dict.end(); ++it)
+        ret << (*it)->getName();
+    return ret;
 }
 

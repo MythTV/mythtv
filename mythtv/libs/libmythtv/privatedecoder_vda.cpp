@@ -134,11 +134,11 @@ PrivateDecoderVDA::~PrivateDecoderVDA()
 }
 
 bool PrivateDecoderVDA::Init(const QString &decoder,
-                             bool no_hardware_decode,
+                             PlayerFlags flags,
                              AVCodecContext *avctx)
 {
     if ((decoder != "vda") || (avctx->codec_id != CODEC_ID_H264) ||
-        no_hardware_decode || !avctx)
+        !(flags & kDecodeAllowEXT) || !avctx)
         return false;
 
     m_lib = VDALibrary::GetVDALibrary();

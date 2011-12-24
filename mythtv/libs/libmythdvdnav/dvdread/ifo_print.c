@@ -1129,7 +1129,6 @@ void ifo_print(dvd_reader_t *dvd, int title) {
       printf("No Text Data Manager Information present\n");
     }
 
-
     printf("\nMenu Cell Address table\n");
     printf(  "-----------------\n");
     if(ifohandle->menu_c_adt) {

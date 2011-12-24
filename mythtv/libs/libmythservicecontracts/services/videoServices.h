@@ -52,7 +52,7 @@
 class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.02" );
+    Q_CLASSINFO( "version"    , "1.1" );
     Q_CLASSINFO( "RemoveVideoFromDB_Method",           "POST" )
     Q_CLASSINFO( "AddVideo_Method",                    "POST" )
 
@@ -72,15 +72,15 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 
         // Video Metadata
 
-        virtual DTC::VideoMetadataInfoList* GetVideos          ( bool             Descending,
+        virtual DTC::VideoMetadataInfoList* GetVideoList       ( bool             Descending,
                                                                  int              StartIndex,
                                                                  int              Count      ) = 0;
 
-        virtual DTC::VideoMetadataInfo*     GetVideoById       ( int              Id         ) = 0;
+        virtual DTC::VideoMetadataInfo*     GetVideo           ( int              Id         ) = 0;
 
-        virtual DTC::VideoMetadataInfo*     GetVideoByFilename ( const QString    &Filename  ) = 0;
+        virtual DTC::VideoMetadataInfo*     GetVideoByFileName ( const QString    &FileName  ) = 0;
 
-        virtual DTC::VideoLookupList*   LookupVideo        ( const QString    &Title,
+        virtual DTC::VideoLookupList*       LookupVideo        ( const QString    &Title,
                                                                  const QString    &Subtitle,
                                                                  const QString    &Inetref,
                                                                  int              Season,
@@ -89,8 +89,8 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 
         virtual bool                        RemoveVideoFromDB  ( int              Id         ) = 0;
 
-        virtual bool                        AddVideo           ( const QString    &Filename,
-                                                                 const QString    &Host      ) = 0;
+        virtual bool                        AddVideo           ( const QString    &FileName,
+                                                                 const QString    &HostName  ) = 0;
 
         // Bluray Metadata
 

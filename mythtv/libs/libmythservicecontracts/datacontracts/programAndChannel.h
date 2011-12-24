@@ -29,6 +29,7 @@
 #include "datacontracthelper.h"
 
 #include "recording.h"
+#include "artworkInfoList.h"
 
 namespace DTC
 {
@@ -39,7 +40,7 @@ class Program;
 class SERVICE_PUBLIC ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.02" );
+    Q_CLASSINFO( "version", "1.06" );
 
     // We need to know the type that will ultimately be contained in 
     // any QVariantList or QVariantMap.  We do his by specifying
@@ -161,7 +162,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 class SERVICE_PUBLIC Program : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.1" );
+    Q_CLASSINFO( "version"    , "1.11" );
     Q_CLASSINFO( "defaultProp", "Description" );
 
     Q_PROPERTY( QDateTime   StartTime    READ StartTime    WRITE setStartTime )
@@ -171,6 +172,9 @@ class SERVICE_PUBLIC Program : public QObject
     Q_PROPERTY( QString     Category     READ Category     WRITE setCategory  )
     Q_PROPERTY( QString     CatType      READ CatType      WRITE setCatType   )
     Q_PROPERTY( bool        Repeat       READ Repeat       WRITE setRepeat    )
+    Q_PROPERTY( int         VideoProps   READ VideoProps   WRITE setVideoProps)
+    Q_PROPERTY( int         AudioProps   READ AudioProps   WRITE setAudioProps)
+    Q_PROPERTY( int         SubProps     READ SubProps     WRITE setSubProps  )
 
     Q_PROPERTY( QString     SeriesId     READ SeriesId     WRITE setSeriesId     DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     ProgramId    READ ProgramId    WRITE setProgramId    DESIGNABLE SerializeDetails )
@@ -178,7 +182,8 @@ class SERVICE_PUBLIC Program : public QObject
     Q_PROPERTY( qlonglong   FileSize     READ FileSize     WRITE setFileSize     DESIGNABLE SerializeDetails )
     Q_PROPERTY( QDateTime   LastModified READ LastModified WRITE setLastModified DESIGNABLE SerializeDetails )
     Q_PROPERTY( int         ProgramFlags READ ProgramFlags WRITE setProgramFlags DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString     Hostname     READ Hostname     WRITE setHostname     DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     FileName     READ FileName     WRITE setFileName     DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     HostName     READ HostName     WRITE setHostName     DESIGNABLE SerializeDetails )
     Q_PROPERTY( QDate       Airdate      READ Airdate      WRITE setAirdate      DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     Description  READ Description  WRITE setDescription  DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     Inetref      READ Inetref      WRITE setInetref      DESIGNABLE SerializeDetails )
@@ -187,6 +192,7 @@ class SERVICE_PUBLIC Program : public QObject
 
     Q_PROPERTY( QObject*    Channel      READ Channel   DESIGNABLE SerializeChannel )
     Q_PROPERTY( QObject*    Recording    READ Recording DESIGNABLE SerializeRecording )
+    Q_PROPERTY( QObject*    Artwork      READ Artwork   DESIGNABLE SerializeArtwork )
 
     PROPERTYIMP    ( QDateTime   , StartTime    )
     PROPERTYIMP    ( QDateTime   , EndTime      )
@@ -202,20 +208,26 @@ class SERVICE_PUBLIC Program : public QObject
     PROPERTYIMP    ( qlonglong   , FileSize     )
     PROPERTYIMP    ( QDateTime   , LastModified )
     PROPERTYIMP    ( int         , ProgramFlags )
-    PROPERTYIMP    ( QString     , Hostname     )
+    PROPERTYIMP    ( int         , VideoProps   )
+    PROPERTYIMP    ( int         , AudioProps   )
+    PROPERTYIMP    ( int         , SubProps     )
+    PROPERTYIMP    ( QString     , FileName     )
+    PROPERTYIMP    ( QString     , HostName     )
     PROPERTYIMP    ( QDate       , Airdate      )
     PROPERTYIMP    ( QString     , Description  )
     PROPERTYIMP    ( QString     , Inetref      )
     PROPERTYIMP    ( int         , Season       )
     PROPERTYIMP    ( int         , Episode      )
 
-    PROPERTYIMP_PTR( ChannelInfo  , Channel     )
-    PROPERTYIMP_PTR( RecordingInfo, Recording   )
+    PROPERTYIMP_PTR( ChannelInfo    , Channel     )
+    PROPERTYIMP_PTR( RecordingInfo  , Recording   )
+    PROPERTYIMP_PTR( ArtworkInfoList, Artwork     )
 
     // Used only by Serializer
     PROPERTYIMP( bool, SerializeDetails )
     PROPERTYIMP( bool, SerializeChannel )
     PROPERTYIMP( bool, SerializeRecording )
+    PROPERTYIMP( bool, SerializeArtwork )
 
     public:
 
@@ -229,6 +241,9 @@ class SERVICE_PUBLIC Program : public QObject
 
             if (QMetaType::type( "DTC::RecordingInfo" ) == 0)
                 RecordingInfo::InitializeCustomTypes();
+
+            if (QMetaType::type( "DTC::ArtworkInfoList" ) == 0)
+                ArtworkInfoList::InitializeCustomTypes();
         }
 
     public:
@@ -239,13 +254,18 @@ class SERVICE_PUBLIC Program : public QObject
               m_Stars               ( 0      ),
               m_FileSize            ( 0      ),
               m_ProgramFlags        ( 0      ),
+              m_VideoProps          ( 0      ),
+              m_AudioProps          ( 0      ),
+              m_SubProps            ( 0      ),
               m_Season              ( 0      ),
               m_Episode             ( 0      ),
               m_Channel             ( NULL   ),
               m_Recording           ( NULL   ),
+              m_Artwork             ( NULL   ),
               m_SerializeDetails    ( true   ),
               m_SerializeChannel    ( true   ),
-              m_SerializeRecording  ( true   )
+              m_SerializeRecording  ( true   ),
+              m_SerializeArtwork    ( true   )
         {
         }
         
@@ -269,7 +289,11 @@ class SERVICE_PUBLIC Program : public QObject
             m_FileSize          = src.m_FileSize;
             m_LastModified      = src.m_LastModified;
             m_ProgramFlags      = src.m_ProgramFlags;
-            m_Hostname          = src.m_Hostname;
+            m_VideoProps        = src.m_VideoProps;
+            m_AudioProps        = src.m_AudioProps;
+            m_SubProps          = src.m_SubProps;
+            m_FileName          = src.m_FileName;
+            m_HostName          = src.m_HostName;
             m_Airdate           = src.m_Airdate;
             m_Description       = src.m_Description;
             m_Inetref           = src.m_Inetref;
@@ -278,12 +302,16 @@ class SERVICE_PUBLIC Program : public QObject
             m_SerializeDetails  = src.m_SerializeDetails;
             m_SerializeChannel  = src.m_SerializeChannel;    
             m_SerializeRecording= src.m_SerializeRecording;  
+            m_SerializeArtwork  = src.m_SerializeArtwork;
 
             if ( src.m_Channel != NULL)
                 Channel()->Copy( src.m_Channel );
 
             if ( src.m_Recording != NULL)
                 Recording()->Copy( src.m_Recording );
+
+            if ( src.m_Artwork != NULL)
+                Artwork()->Copy( src.m_Artwork );
         }
 
 };

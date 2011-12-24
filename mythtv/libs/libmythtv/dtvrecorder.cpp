@@ -73,15 +73,14 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _input_pmt(NULL),
     _has_no_av(false),
     // statistics
+    _use_pts(false),
     _packet_count(0),
     _continuity_error_count(0),
     _frames_seen_count(0),          _frames_written_count(0)
 {
     SetPositionMapType(MARK_GOP_BYFRAME);
     _payload_buffer.reserve(TSPacket::kSize * (50 + 1));
-    memset(_stream_id, 0, sizeof(_stream_id));
-    memset(_pid_status, 0, sizeof(_pid_status));
-    memset(_continuity_counter, 0, sizeof(_continuity_counter));
+    ResetForNewFile();
 }
 
 DTVRecorder::~DTVRecorder()
@@ -156,10 +155,6 @@ void DTVRecorder::FinishRecording(void)
             curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
         SavePositionMap(true);
     }
-//     positionMapLock.lock();
-//     positionMap.clear();
-//     positionMapDelta.clear();
-//     positionMapLock.unlock();
 }
 
 void DTVRecorder::ResetForNewFile(void)
@@ -191,15 +186,30 @@ void DTVRecorder::ResetForNewFile(void)
     memset(_pid_status, 0, sizeof(_pid_status));
     memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
 
-    _packet_count               = 0;
-    _continuity_error_count     = 0;
-    _frames_seen_count          = 0;
-    _frames_written_count       = 0;
     _pes_synced                 = false;
     //_seen_sps
     positionMap.clear();
     positionMapDelta.clear();
     _payload_buffer.clear();
+
+    locker.unlock();
+    ClearStatistics();
+}
+
+void DTVRecorder::ClearStatistics(void)
+{
+    RecorderBase::ClearStatistics();
+
+    memset(_ts_count, 0, sizeof(_ts_count));
+    for (int i = 0; i < 256; i++)
+        _ts_last[i] = -1LL;
+    for (int i = 0; i < 256; i++)
+        _ts_first[i] = -1LL;
+    //_ts_first_dt -- doesn't need to be cleared only used if _ts_first>=0
+    _packet_count.fetchAndStoreRelaxed(0);
+    _continuity_error_count.fetchAndStoreRelaxed(0);
+    _frames_seen_count          = 0;
+    _frames_written_count       = 0;
 }
 
 // documented in recorderbase.h
@@ -252,6 +262,19 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
     if (_wait_for_keyframe_option && _first_keyframe<0)
         return;
 
+    if (!timeOfFirstData.isValid() && curRecording)
+    {
+        QMutexLocker locker(&statisticsLock);
+        timeOfFirstData = mythCurrentDateTime();
+    }
+
+    uint64_t now = mythCurrentDateTime().toTime_t();
+    if (!timeOfLatestData.isValid() || (now - timeOfLatestData.toTime_t() >= 5))
+    {
+        QMutexLocker locker(&statisticsLock);
+        timeOfLatestData = mythCurrentDateTime();
+    }
+
     // Do we have to buffer the packet for exact keyframe detection?
     if (_buffer_packets)
     {
@@ -272,6 +295,44 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
 
     if (ringBuffer)
         ringBuffer->Write(tspacket.data(), TSPacket::kSize);
+}
+
+enum { kExtractPTS, kExtractDTS };
+static int64_t extract_timestamp(
+    const uint8_t *bufptr, int bytes_left, int pts_or_dts)
+{
+    if (bytes_left < 4)
+        return -1LL;
+
+    bool has_pts = bufptr[3] & 0x80;
+    int offset = 5;
+    if (((kExtractPTS == pts_or_dts) && !has_pts) || (offset + 5 > bytes_left))
+        return -1LL;
+
+    bool has_dts = bufptr[3] & 0x40;
+    if (kExtractDTS == pts_or_dts)
+    {
+        if (!has_dts)
+            return -1LL;
+        offset += has_pts ? 5 : 0;
+        if (offset + 5 > bytes_left)
+            return -1LL;
+    }
+
+    return ((uint64_t(bufptr[offset+0] & 0x0e) << 29) |
+            (uint64_t(bufptr[offset+1]       ) << 22) |
+            (uint64_t(bufptr[offset+2] & 0xfe) << 14) |
+            (uint64_t(bufptr[offset+3]       ) <<  7) |
+            (uint64_t(bufptr[offset+4] & 0xfe) >>  1));
+}
+
+static QDateTime ts_to_qdatetime(
+    uint64_t pts, uint64_t pts_first, QDateTime &pts_first_dt)
+{
+    if (pts < pts_first)
+        pts += 0x1FFFFFFFFLL;
+    QDateTime dt = pts_first_dt;
+    return dt.addMSecs((pts - pts_first)/90);
 }
 
 static const uint frameRateMap[16] = {
@@ -416,6 +477,15 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
                     }
                 }
             }
+            if ((stream_id >= PESStreamID::MPEGVideoStreamBegin) &&
+                (stream_id <= PESStreamID::MPEGVideoStreamEnd))
+            {
+                int64_t pts = extract_timestamp(
+                    bufptr, bytes_left, kExtractPTS);
+                int64_t dts = extract_timestamp(
+                    bufptr, bytes_left, kExtractPTS);
+                HandleTimestamps(stream_id, pts, dts);
+            }
         }
     }
 
@@ -465,6 +535,72 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     }
 
     return hasKeyFrame || (_payload_buffer.size() >= (188*50));
+}
+
+void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
+{
+    if (pts < 0)
+    {
+        _ts_last[stream_id] = -1;
+        return;
+    }
+
+    if ((dts < 0) && !_use_pts)
+    {
+        _ts_last[stream_id] = -1;
+        _use_pts = true;
+        LOG(VB_RECORD, LOG_DEBUG,
+            "Switching from dts tracking to pts tracking." +
+            QString("TS count is %1").arg(_ts_count[stream_id]));
+    }
+
+    int64_t ts = dts;
+    int64_t gap_threshold = 90000; // 1 second
+    if (_use_pts)
+    {
+        ts = dts;
+        gap_threshold = 2*90000; // two seconds, compensate for GOP ordering
+    }
+
+    if (_ts_last[stream_id] >= 0)
+    {
+        int64_t diff = ts - _ts_last[stream_id];
+        if ((diff < 0) && (diff < (10 * -90000)))
+            diff += 0x1ffffffffLL;
+        if (diff < 0)
+            diff = -diff;
+        if (diff > gap_threshold)
+        {
+            QMutexLocker locker(&statisticsLock);
+            recordingGaps.push_back(
+                RecordingGap(
+                    ts_to_qdatetime(
+                        _ts_last[stream_id], _ts_first[stream_id],
+                        _ts_first_dt[stream_id]),
+                    ts_to_qdatetime(
+                        ts, _ts_first[stream_id], _ts_first_dt[stream_id])));
+            LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Inserted gap %1 dur %2")
+                .arg(recordingGaps.back().toString()).arg(diff/90000.0));
+        }
+    }
+
+    _ts_last[stream_id] = ts;
+
+    if (_ts_count[stream_id] < 30)
+    {
+        if (!_ts_count[stream_id])
+        {
+            _ts_first[stream_id] = ts;
+            _ts_first_dt[stream_id] = mythCurrentDateTime();
+        }
+        else if (ts < _ts_first[stream_id])
+        {
+            _ts_first[stream_id] = ts;
+            _ts_first_dt[stream_id] = mythCurrentDateTime();
+        }
+    }
+
+    _ts_count[stream_id]++;
 }
 
 bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
@@ -1074,14 +1210,14 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
     const uint pid = tspacket.PID();
 
     if (pid != 0x1fff)
-        _packet_count++;
+        _packet_count.fetchAndAddAcquire(1);
 
     // Check continuity counter
     uint old_cnt = _continuity_counter[pid];
     if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
     {
-        _continuity_error_count++;
-        double erate = _continuity_error_count * 100.0 / _packet_count;
+        int v = _continuity_error_count.fetchAndAddRelaxed(1) + 1;
+        double erate = v * 100.0 / _packet_count.fetchAndAddRelaxed(0);
         LOG(VB_RECORD, LOG_WARNING, LOC +
             QString("PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
                 .arg(pid,0,16).arg(old_cnt,2)
@@ -1146,14 +1282,14 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
     const uint pid = tspacket.PID();
 
     if (pid != 0x1fff)
-        _packet_count++;
+        _packet_count.fetchAndAddAcquire(1);
 
     // Check continuity counter
     uint old_cnt = _continuity_counter[pid];
     if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
     {
-        _continuity_error_count++;
-        double erate = _continuity_error_count * 100.0 / _packet_count;
+        int v = _continuity_error_count.fetchAndAddRelaxed(1) + 1;
+        double erate = v * 100.0 / _packet_count.fetchAndAddRelaxed(0);
         LOG(VB_RECORD, LOG_WARNING, LOC +
             QString("A/V PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
                 .arg(pid,0,16).arg(old_cnt).arg(tspacket.ContinuityCounter())
@@ -1180,6 +1316,15 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
     BufferedWrite(tspacket);
 
     return true;
+}
+
+RecordingQuality *DTVRecorder::GetRecordingQuality(void) const
+{
+    RecordingQuality *recq = RecorderBase::GetRecordingQuality();
+    recq->AddTSStatistics(
+        _continuity_error_count.fetchAndAddRelaxed(0),
+        _packet_count.fetchAndAddRelaxed(0));
+    return recq;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

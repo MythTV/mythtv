@@ -71,6 +71,32 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     filename.detach();
 }
 
+/** \fn ThreadedFileWriter::ReOpen(QString)
+ *  \brief Reopens the file we are writing to or opens a new file
+ *  \return true if we successfully open the file.
+ *
+ *  \param newFilename optional name of new file to open
+ */
+bool ThreadedFileWriter::ReOpen(QString newFilename)
+{
+    Flush();
+
+    buflock.lock();
+
+    if (fd >= 0)
+    {
+        close(fd);
+        fd = -1;
+    }
+
+    if (!newFilename.isEmpty())
+        filename = newFilename;
+
+    buflock.unlock();
+
+    return Open();
+}
+
 /** \fn ThreadedFileWriter::Open(void)
  *  \brief Opens the file we will be writing to.
  *  \return true if we successfully open the file.
@@ -100,10 +126,17 @@ bool ThreadedFileWriter::Open(void)
 #ifdef USING_MINGW
         _setmode(fd, _O_BINARY);
 #endif
-        writeThread = new TFWWriteThread(this);
-        writeThread->start();
-        syncThread = new TFWSyncThread(this);
-        syncThread->start();
+        if (!writeThread)
+        {
+            writeThread = new TFWWriteThread(this);
+            writeThread->start();
+        }
+
+        if (!syncThread)
+        {
+            syncThread = new TFWSyncThread(this);
+            syncThread->start();
+        }
 
         return true;
     }
@@ -384,6 +417,13 @@ void ThreadedFileWriter::DiskLoop(void)
         if (!flush && (mwte < 250) && (totalBufferUse < kMinWriteSize))
         {
             bufferHasData.wait(locker.mutex(), 250 - mwte);
+            TrimEmptyBuffers();
+            continue;
+        }
+
+        if (fd == -1)
+        {
+            bufferHasData.wait(locker.mutex(), 200);
             TrimEmptyBuffers();
             continue;
         }

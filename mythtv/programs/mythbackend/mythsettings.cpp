@@ -474,13 +474,12 @@ QString StringListToJSON(const QString &key,
     return result;
 }
 
-QMap<QString,QString> GetConfigFileSettingValues()
+QMap<QString,QString> GetConfigFileSettingValues(void)
 {
     QMap<QString,QString> map;
     DatabaseParams params;
-    bool ok = MythDB::LoadDatabaseParamsFromDisk(params, true);
-    if (!ok)
-        return map;
+    if (!MythDB::LoadDatabaseParamsFromDisk(params))
+        MythDB::LoadDefaultDatabaseParams(params);
 
     map["dbHostName"]           = params.dbHostName;
     map["dbPort"]               = QString::number(params.dbPort);

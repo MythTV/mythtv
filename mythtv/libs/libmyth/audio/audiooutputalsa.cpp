@@ -430,7 +430,9 @@ bool AudioOutputALSA::OpenDevice()
             return false;
     }
 
-    buffer_time = 500000; // buffer 0.5s worth of samples
+    // buffer 0.5s worth of samples
+    buffer_time = gCoreContext->GetNumSetting("ALSABufferOverride", 500) * 1000;
+
     period_time = 4;      // aim for an interrupt every (1/4th of buffer_time)
 
     err = SetParameters(pcm_handle, format, channels, samplerate,

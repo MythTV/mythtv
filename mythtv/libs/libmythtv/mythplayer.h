@@ -80,6 +80,23 @@ enum
     kDisplayTeletextMenu        = 0x100,
 };
 
+enum PlayerFlags
+{
+    kNoFlags              = 0x000000,
+    kDecodeLowRes         = 0x000001,
+    kDecodeSingleThreaded = 0x000002,
+    kDecodeFewBlocks      = 0x000004,
+    kDecodeNoLoopFilter   = 0x000008,
+    kDecodeNoDecode       = 0x000010,
+    kDecodeDisallowCPU    = 0x000020, // NB CPU always available by default
+    kDecodeAllowGPU       = 0x000040, // VDPAU, VAAPI, DXVA2
+    kDecodeAllowEXT       = 0x000080, // VDA, CrystalHD
+    kVideoIsNull          = 0x000100,
+    kAudioMuted           = 0x010000,
+};
+
+#define FlagIsSet(arg) (playerFlags & arg)
+
 class DecoderThread : public MThread
 {
   public:
@@ -107,22 +124,22 @@ class MTV_PUBLIC MythPlayer
     friend class SubtitleScreen;
     friend class InteractiveScreen;
     friend class BDOverlayScreen;
+    friend class VideoPerformanceTest;
     // TODO remove these
     friend class TV;
     friend class Transcode;
 
   public:
-    MythPlayer(bool muted = false);
+    MythPlayer(PlayerFlags flags = kNoFlags);
     virtual ~MythPlayer();
 
     // Initialisation
-    virtual int OpenFile(uint retries = 4, bool allow_libmpeg2 = true);
+    virtual int OpenFile(uint retries = 4);
     bool InitVideo(void);
 
     // Public Sets
     void SetPlayerInfo(TV *tv, QWidget *widget, bool frame_exact_seek,
                        PlayerContext *ctx);
-    void SetNullVideo(void)                   { using_null_videoout = true; }
     void SetExactSeeks(bool exact)            { exactseeks = exact; }
     void SetLength(int len)                   { totalLength = len; }
     void SetFramesPlayed(uint64_t played);
@@ -148,7 +165,8 @@ class MTV_PUBLIC MythPlayer
     float   GetVideoAspect(void) const        { return video_aspect; }
     float   GetFrameRate(void) const          { return video_frame_rate; }
     void    GetPlaybackData(InfoMap &infoMap);
-    bool    IsAudioNeeded(void) { return !using_null_videoout && player_ctx->IsAudioNeeded(); }
+    bool    IsAudioNeeded(void)
+        { return !(FlagIsSet(kVideoIsNull)) && player_ctx->IsAudioNeeded(); }
     uint    GetVolume(void) { return audio.GetVolume(); }
     int     GetSecondsBehind(void) const;
     int     GetFreeVideoFrames(void) const;
@@ -164,6 +182,8 @@ class MTV_PUBLIC MythPlayer
     int     GetLength(void) const             { return totalLength; }
     uint64_t GetTotalFrameCount(void) const   { return totalFrames; }
     uint64_t GetFramesPlayed(void) const      { return framesPlayed; }
+    virtual  int64_t GetSecondsPlayed(void);
+    virtual  int64_t GetTotalSeconds(void) const;
     virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const
@@ -190,7 +210,7 @@ class MTV_PUBLIC MythPlayer
     bool    IsPIPVisible(void) const          { return pip_visible; }
     bool    IsMuted(void)                     { return audio.IsMuted(); }
     bool    PlayerControlsVolume(void) const  { return audio.ControlsVolume(); }
-    bool    UsingNullVideo(void) const { return using_null_videoout; }
+    bool    UsingNullVideo(void) const { return FlagIsSet(kVideoIsNull); }
     bool    HasTVChainNext(void) const;
     bool    CanSupportDoubleRate(void);
     bool    GetScreenShot(int width = 0, int height = 0, QString filename = "");
@@ -228,8 +248,6 @@ class MTV_PUBLIC MythPlayer
     void DeLimboFrame(VideoFrame *frame);
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
-    void ReleaseNextVideoFrame(void)
-        { videoOutput->ReleaseFrame(GetNextVideoFrame()); }
     void ReleaseCurrentFrame(VideoFrame *frame);
     void ClearDummyVideoFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
@@ -318,7 +336,6 @@ class MTV_PUBLIC MythPlayer
     virtual void SetBookmark(bool clear = false);
     bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout);
     bool RemovePIPPlayer(MythPlayer *pip, uint timeout);
-    void DisableHardwareDecoders(void)        { no_hardware_decoders = true; }
     void NextScanType(void)
         { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
     void SetScanType(FrameScanType);
@@ -335,6 +352,7 @@ class MTV_PUBLIC MythPlayer
 
     // Audio Sets
     uint AdjustVolume(int change)           { return audio.AdjustVolume(change); }
+    uint SetVolume(int newvolume)           { return audio.SetVolume(newvolume); }
     bool SetMuted(bool mute)                { return audio.SetMuted(mute);       }
     MuteState SetMuteState(MuteState state) { return audio.SetMuteState(state);  }
     MuteState IncrMuteState(void)           { return audio.IncrMuteState();      }
@@ -387,6 +405,7 @@ class MTV_PUBLIC MythPlayer
     virtual bool PrebufferEnoughFrames(int min_buffers = 0);
     void         SetBuffering(bool new_buffering);
     void         RefreshPauseFrame(void);
+    void         CheckAspectRatio(VideoFrame* frame);
     virtual void DisplayPauseFrame(void);
     virtual void DisplayNormalFrame(bool check_prebuffer = true);
     virtual void PreProcessNormalFrame(void);
@@ -459,7 +478,7 @@ class MTV_PUBLIC MythPlayer
     void SetTeletextPage(uint page);
 
     // Time Code adjustment stuff
-    int64_t AdjustAudioTimecodeOffset(int64_t v);
+    int64_t AdjustAudioTimecodeOffset(int64_t v, int newsync = -9999);
     int64_t GetAudioTimecodeOffset(void) const
         { return tc_wrap[TC_AUDIO]; }
 
@@ -488,8 +507,7 @@ class MTV_PUBLIC MythPlayer
     void UnpauseBuffer(void);
 
     // Private decoder stuff
-    virtual void CreateDecoder(char *testbuf, int testreadsize,
-                               bool allow_libmpeg2, bool no_accel);
+    virtual void CreateDecoder(char *testbuf, int testreadsize);
     void  SetDecoder(DecoderBase *dec);
     /// Returns the stream decoder currently in use.
     const DecoderBase *GetDecoder(void) const { return decoder; }
@@ -536,17 +554,14 @@ class MTV_PUBLIC MythPlayer
     void  SwitchToProgram(void);
     void  JumpToProgram(void);
 
-    void calcSliderPosPriv(osdInfo &info, bool paddedFields,
-                           int playbackLen, float secsplayed, bool islive);
-
   protected:
+    PlayerFlags    playerFlags;
     DecoderBase   *decoder;
     QMutex         decoder_change_lock;
     VideoOutput   *videoOutput;
     PlayerContext *player_ctx;
     DecoderThread *decoderThread;
     QThread       *playerThread;
-    bool           no_hardware_decoders;
 
     // Window stuff
     QWidget *parentWidget;
@@ -583,7 +598,6 @@ class MTV_PUBLIC MythPlayer
     bool     m_deint_possible;
     bool     livetv;
     bool     watchingrecording;
-    bool     using_null_videoout;
     bool     transcoding;
     bool     hasFullPositionMap;
     mutable bool     limitKeyRepeat;

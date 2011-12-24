@@ -68,6 +68,7 @@ void StorageGroup::StaticInit(void)
     m_builtinGroups["ChannelIcons"] = GetConfDir() + "/ChannelIcons";
     m_builtinGroups["Themes"] = GetConfDir() + "/themes";
     m_builtinGroups["Temp"] = GetConfDir() + "/tmp";
+    m_builtinGroups["Streaming"] = GetConfDir() + "/tmp/hls";
 
     QMap<QString, QString>::iterator it = m_builtinGroups.begin();
     for (; it != m_builtinGroups.end(); ++it)
@@ -554,7 +555,7 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname,
         if (testdir.exists())
         {
             if (dirlist && !dirlist->contains(testdir.absolutePath()))
-                dirlist->prepend(testdir.absolutePath());
+                (*dirlist) << testdir.absolutePath();
             found = true;
         }
     }

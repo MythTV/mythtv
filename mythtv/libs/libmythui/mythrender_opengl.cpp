@@ -153,7 +153,6 @@ void MythRenderOpenGL::SetViewPort(const QRect &rect)
 {
     if (rect == m_viewport)
         return;
-
     makeCurrent();
     m_viewport = rect;
     glViewport(m_viewport.left(), m_viewport.top(),
@@ -880,9 +879,6 @@ bool MythRenderOpenGL::InitFeatures(void)
     if (m_extensions.contains("GL_MESA_ycbcr_texture") && ycbcrtextures)
         m_exts_supported += kGLMesaYCbCr;
 
-    if (m_extensions.contains("GL_APPLE_rgb_422") && ycbcrtextures)
-        m_exts_supported += kGLAppleRGB422;
-
     if (m_extensions.contains("GL_APPLE_ycbcr_422") && ycbcrtextures)
         m_exts_supported += kGLAppleYCbCr;
 
@@ -1275,7 +1271,7 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
         bpp = 4;
     }
     else if (fmt == GL_YCBCR_MESA || fmt == GL_YCBCR_422_APPLE ||
-             fmt == GL_RGB_422_APPLE)
+             fmt == MYTHTV_UYVY)
     {
         bpp = 2;
     }

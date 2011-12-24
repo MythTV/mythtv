@@ -28,8 +28,10 @@ FirewireRecorder::~FirewireRecorder()
 bool FirewireRecorder::Open(void)
 {
     if (!isopen)
+    {
         isopen = channel->GetFirewireDevice()->OpenPort();
-
+        ResetForNewFile();
+    }
     return isopen;
 }
 
@@ -62,8 +64,6 @@ void FirewireRecorder::run(void)
         LOG(VB_GENERAL, LOG_ERR, LOC + _error);
         return;
     }
-
-    _continuity_error_count = 0;
 
     {
         QMutexLocker locker(&pauseLock);

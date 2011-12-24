@@ -145,10 +145,10 @@ void MythUITextEdit::Finalize()
     SetInitialStates();
 
     // Give it something to chew on, so it can position the initial
-    // cursor in the right place
-    SetText(".", false);
+    // cursor in the right place.  Toggle text, to force an area recalc.
+    m_Text->SetText(".");
+    m_Text->SetText("");
     m_cursorImage->SetPosition(m_Text->CursorPosition(0));
-    SetText("", false);
 }
 
 void MythUITextEdit::SetInitialStates()
@@ -182,14 +182,14 @@ void MythUITextEdit::SetInitialStates()
 
     if (m_backgroundState && !m_backgroundState->DisplayState("active"))
         LOG(VB_GENERAL, LOG_ERR, LOC + "active state doesn't exist");
-    m_Text->SetCutDown(false);
+    m_Text->SetCutDown(Qt::ElideNone);
 
     QFontMetrics fm(m_Text->GetFontProperties()->face());
     int height = fm.height();
 
     if (height > 0)
     {
-        MythRect imageArea = m_cursorImage->GetArea();
+        MythRect imageArea = m_cursorImage->GetFullArea();
         int width = int(((float)height / (float)imageArea.height())
                         * (float)imageArea.width());
 

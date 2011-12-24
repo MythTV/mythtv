@@ -689,7 +689,44 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
 
     return success;
 }
-    
+
+/** \fn MythDownloadManager::cancelDownload(const QString &)
+ *  \brief Cancel a queued or current download.
+ *  \param url for download to cancel
+ */
+void MythDownloadManager::cancelDownload(const QString &url)
+{
+    QMutexLocker locker(m_infoLock);
+    MythDownloadInfo *dlInfo;
+
+    QMutableListIterator<MythDownloadInfo*> lit(m_downloadQueue);
+    while (lit.hasNext())
+    {
+        lit.next();
+        dlInfo = lit.value();
+        if (dlInfo->m_url == url)
+        {
+            // this shouldn't happen
+            if (dlInfo->m_reply)
+                dlInfo->m_reply->abort();
+            lit.remove();
+            delete dlInfo;
+        }
+    }
+
+    if (m_downloadInfos.contains(url))
+    {
+        dlInfo = m_downloadInfos[url];
+        if (dlInfo->m_reply)
+        {
+            m_downloadReplies.remove(dlInfo->m_reply);
+            dlInfo->m_reply->abort();
+        }
+        m_downloadInfos.remove(url);
+        delete dlInfo;
+    }
+}
+
 /** \fn MythDownloadManager::removeListener(QObject *caller)
  *  \brief Disconnects the specify caller from any existing
  *         MythDownloadInfo instances.
@@ -705,7 +742,11 @@ void MythDownloadManager::removeListener(QObject *caller)
     {
         dlInfo = *lit;
         if (dlInfo->m_caller == caller)
-            dlInfo->m_caller = NULL;
+        {
+            dlInfo->m_caller  = NULL;
+            dlInfo->m_outFile = QString();
+            dlInfo->m_data    = NULL;
+        }
     }
 
     QMap <QString, MythDownloadInfo*>::iterator mit = m_downloadInfos.begin();
@@ -713,7 +754,11 @@ void MythDownloadManager::removeListener(QObject *caller)
     {
         dlInfo = mit.value();
         if (dlInfo->m_caller == caller)
-            dlInfo->m_caller = NULL;
+        {
+            dlInfo->m_caller  = NULL;
+            dlInfo->m_outFile = QString();
+            dlInfo->m_data    = NULL;
+        }
     }
 }
 

@@ -1648,7 +1648,7 @@ void VideoOutputQuartz::DrawUnusedRects(bool)
 {
 }
 
-void VideoOutputQuartz::UpdatePauseFrame(void)
+void VideoOutputQuartz::UpdatePauseFrame(int64_t &disp_timecode)
 {
     if (!pauseFrame.buf)
     {
@@ -1659,9 +1659,11 @@ void VideoOutputQuartz::UpdatePauseFrame(void)
     VideoFrame *pauseb = vbuffers.GetScratchFrame();
     VideoFrame *pauseu = vbuffers.head(kVideoBuffer_used);
     if (pauseu)
-        memcpy(pauseFrame.buf, pauseu->buf, pauseu->size);
+        CopyFrame(&pauseFrame, pauseu);
     else
-        memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
+        CopyFrame(&pauseFrame, pauseb);
+
+    disp_timecode = pauseFrame.disp_timecode;
 }
 
 /**

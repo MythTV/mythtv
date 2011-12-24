@@ -8,6 +8,7 @@ using namespace std;
 
 #include "atscstreamdata.h"
 #include "atsctables.h"
+#include "sctetables.h"
 #include "ringbuffer.h"
 #include "eithelper.h"
 
@@ -40,6 +41,7 @@ ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
       _desired_minor_channel(desiredMinorChannel)
 {
     AddListeningPID(ATSC_PSIP_PID);
+    AddListeningPID(SCTE_PSIP_PID);
 }
 
 ATSCStreamData::~ATSCStreamData()
@@ -50,6 +52,9 @@ ATSCStreamData::~ATSCStreamData()
     _atsc_main_listeners.clear();
     _atsc_aux_listeners.clear();
     _atsc_eit_listeners.clear();
+
+    _scte_main_listeners.clear();
+    _atsc81_eit_listeners.clear();
 }
 
 void ATSCStreamData::SetDesiredChannel(int major, int minor)
@@ -175,6 +180,9 @@ bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
     if (TableID::STT == table_id)
         return false; // each SystemTimeTable matters
 
+    if (TableID::STTscte == table_id)
+        return false; // each SCTESystemTimeTable matters
+
     if (TableID::MGT == table_id)
         return VersionMGT() == version;
 
@@ -189,9 +197,15 @@ bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
     }
 
     if (TableID::RRT == table_id)
-        return true; // we ignore RatingRegionTables
+        return VersionRRT(psip.TableIDExtension()) == version;
 
-    return false;
+    if (TableID::PIM == table_id)
+        return true; // ignore these messages..
+
+    if (TableID::PNM == table_id)
+        return true; // ignore these messages..
+
+     return false;
 }
 
 bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
@@ -261,6 +275,8 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::RRT:
         {
+            uint region = psip.TableIDExtension();
+            SetVersionRRT(region, version);
             RatingRegionTable rrt(psip);
             QMutexLocker locker(&_listener_lock);
             for (uint i = 0; i < _atsc_aux_listeners.size(); i++)
@@ -344,6 +360,106 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
             return true;
         }
+
+        // ATSC A/81 & SCTE 65 tables
+        case TableID::AEIT:
+        {
+            AggregateEventInformationTable aeit(psip);
+
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _atsc81_eit_listeners.size(); i++)
+                _atsc81_eit_listeners[i]->HandleAEIT(pid, &aeit);
+
+            return true;
+        }
+        case TableID::AETT:
+        {
+            AggregateExtendedTextTable aett(psip);
+
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _atsc81_eit_listeners.size(); i++)
+                _atsc81_eit_listeners[i]->HandleAETT(pid, &aett);
+
+            return true;
+        }
+
+        // SCTE 65 tables
+        case TableID::NITscte:
+        {
+            SCTENetworkInformationTable nit(psip);
+            
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _scte_main_listeners.size(); i++)
+                _scte_main_listeners[i]->HandleNIT(&nit);
+
+            return true;
+        }
+        case TableID::NTT:
+        {
+            NetworkTextTable ntt(psip);
+            
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _scte_main_listeners.size(); i++)
+                _scte_main_listeners[i]->HandleNTT(&ntt);
+
+            return true;
+        }
+        case TableID::SVCTscte:
+        {
+            ShortVirtualChannelTable svct(psip);
+
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _scte_main_listeners.size(); i++)
+                _scte_main_listeners[i]->HandleSVCT(&svct);
+
+            return true;
+        }
+        case TableID::STTscte:
+        {
+            SCTESystemTimeTable stt(psip);
+            
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _scte_main_listeners.size(); i++)
+                _scte_main_listeners[i]->HandleSTT(&stt);
+
+            return true;
+        }
+
+        // SCTE 57 table -- SCTE 65 standard supercedes this
+        case TableID::PIM:
+        {
+            ProgramInformationMessageTable pim(psip);
+            
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _scte_main_listeners.size(); i++)
+                _scte_main_listeners[i]->HandlePIM(&pim);
+
+            return true;
+        }
+        // SCTE 57 table -- SCTE 65 standard supercedes this
+        case TableID::PNM:
+        {
+            ProgramNameMessageTable pnm(psip);
+            
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _scte_main_listeners.size(); i++)
+                _scte_main_listeners[i]->HandlePNM(&pnm);
+
+            return true;
+        }
+
+        // SCTE 80
+        case TableID::ADET:
+        {
+            AggregateDataEventTable adet(psip);
+            
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _scte_main_listeners.size(); i++)
+                _scte_main_listeners[i]->HandleADET(&adet);
+
+            return true;
+        }
+
         case TableID::NIT:
         case TableID::NITo:
         case TableID::SDT:
@@ -355,17 +471,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             // All DVB specific tables, not handled here
             return false;
         }
-        case TableID::PIM:
-        case TableID::PNM:
-        case TableID::NIM:
-        case TableID::NTM:
-        case TableID::VCM:
-        case TableID::STM:
-        case TableID::SM:
-        {
-            // SCTE Specific tables, not handled here
-            return false;
-        }
+
         default:
         {
             LOG(VB_RECORD, LOG_ERR,
@@ -845,6 +951,33 @@ void ATSCStreamData::RemoveATSCMainListener(ATSCMainStreamListener *val)
     }
 }
 
+void ATSCStreamData::AddSCTEMainListener(SCTEMainStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    scte_main_listener_vec_t::iterator it = _scte_main_listeners.begin();
+    for (; it != _scte_main_listeners.end(); ++it)
+        if (((void*)val) == ((void*)*it))
+            return;
+
+    _scte_main_listeners.push_back(val);
+}
+
+void ATSCStreamData::RemoveSCTEMainListener(SCTEMainStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    scte_main_listener_vec_t::iterator it = _scte_main_listeners.begin();
+    for (; it != _scte_main_listeners.end(); ++it)
+    {
+        if (((void*)val) == ((void*)*it))
+        {
+            _scte_main_listeners.erase(it);
+            return;
+        }
+    }
+}
+
 void ATSCStreamData::AddATSCAuxListener(ATSCAuxStreamListener *val)
 {
     QMutexLocker locker(&_listener_lock);
@@ -894,6 +1027,33 @@ void ATSCStreamData::RemoveATSCEITListener(ATSCEITStreamListener *val)
         if (((void*)val) == ((void*)*it))
         {
             _atsc_eit_listeners.erase(it);
+            return;
+        }
+    }
+}
+
+void ATSCStreamData::AddATSC81EITListener(ATSC81EITStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    atsc81_eit_listener_vec_t::iterator it = _atsc81_eit_listeners.begin();
+    for (; it != _atsc81_eit_listeners.end(); ++it)
+        if (((void*)val) == ((void*)*it))
+            return;
+
+    _atsc81_eit_listeners.push_back(val);
+}
+
+void ATSCStreamData::RemoveATSC81EITListener(ATSC81EITStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    atsc81_eit_listener_vec_t::iterator it = _atsc81_eit_listeners.begin();
+    for (; it != _atsc81_eit_listeners.end(); ++it)
+    {
+        if (((void*)val) == ((void*)*it))
+        {
+            _atsc81_eit_listeners.erase(it);
             return;
         }
     }

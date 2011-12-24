@@ -62,6 +62,10 @@ SOURCES += videoplayersettings.cpp      videodlg.cpp
 SOURCES += videoglobalsettings.cpp      upnpscanner.cpp
 SOURCES += commandlineparser.cpp
 
+HEADERS += serviceHosts/frontendServiceHost.h
+HEADERS += services/frontend.h
+SOURCES += services/frontend.cpp
+
 macx {
     mac_bundle {
         CONFIG -= console  # Force behaviour of producing .app bundle

@@ -48,9 +48,12 @@ class MTV_PUBLIC AudioPlayer
     int   GetSampleRate(void)   const { return m_samplerate;    }
     uint  GetVolume(void);
     uint  AdjustVolume(int change);
+    uint  SetVolume(int newvolume);
     float GetStretchFactor(void) const { return m_stretchfactor; }
     void  SetStretchFactor(float factor);
-    bool  ToggleUpmix(void);
+    bool  IsUpmixing(void);
+    bool  EnableUpmix(bool enable, bool toggle = false);
+    bool  CanUpmix(void);
     bool  CanPassthrough(int samplerate, int channels, int codec, int profile);
     bool  CanDownmix(void);
     bool  CanAC3(void);

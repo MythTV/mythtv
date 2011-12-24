@@ -64,7 +64,7 @@ class VideoOutputXv : public VideoOutput
     void StopEmbedding(void);
     void MoveResizeWindow(QRect new_rect);
     void DrawUnusedRects(bool sync = true);
-    void UpdatePauseFrame(void);
+    virtual void UpdatePauseFrame(int64_t &default_tc);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
     void InitPictureAttributes(void);
 

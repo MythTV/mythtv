@@ -139,11 +139,11 @@ static float GetATVversion()
 
     sysctlbyname("hw.model", &hw_model, &len, NULL, 0);
 
+    float  version = 0.0;
     if ( strstr(hw_model,"AppleTV1,1") )
     {
         FILE  *inpipe;
         char   linebuf[1000];
-        float  version = 0.0;
 
         // Find the build version of the AppleTV OS
         inpipe = popen("sw_vers -buildVersion", "r");
@@ -160,10 +160,9 @@ static float GetATVversion()
                 version = 2.3;
 
             pclose(inpipe);
-
-            return version;
         }
     }
+    return version;
 }
 
 // protected

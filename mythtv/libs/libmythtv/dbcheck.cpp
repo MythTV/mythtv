@@ -5590,7 +5590,6 @@ NULL
             return false;
     }
 
-
     if (dbver == "1269")
     {
         const char *updates[] = {
@@ -5892,6 +5891,181 @@ NULL
 };
 
         if (!performActualUpdate(updates, "1283", dbver))
+            return false;
+    }
+
+    if (dbver == "1283")
+    {
+        const char *updates[] = {
+"UPDATE record SET filter = filter | 1 WHERE record.dupin & 0x20",
+"UPDATE record SET filter = filter | 2 WHERE record.dupin & 0x40",
+"UPDATE record SET filter = filter | 5 WHERE record.dupin & 0x80",
+"UPDATE record SET dupin = dupin & ~0xe0",
+"INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (6, 'This Episode', '(program.programid <> '''' AND program.programid = RECTABLE.programid) OR (program.programid = '''' AND program.subtitle = RECTABLE.subtitle AND program.description = RECTABLE.description)', 0);",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1284", dbver))
+            return false;
+    }
+
+    if (dbver == "1284")
+    {
+        const char *updates[] = {
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (6, 'This Episode', '(RECTABLE.programid <> '''' AND program.programid = RECTABLE.programid) OR (RECTABLE.programid = '''' AND program.subtitle = RECTABLE.subtitle AND program.description = RECTABLE.description)', 0);",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1285", dbver))
+            return false;
+    }
+
+    if (dbver == "1285")
+    {
+        const char *updates[] = {
+"DELETE FROM profilegroups WHERE id >= 17;",
+"DELETE FROM recordingprofiles WHERE profilegroup >= 17;",
+"INSERT INTO profilegroups SET id = '17', name = 'Ceton Recorder',"
+" cardtype = 'CETON', is_default = 1;",
+"INSERT INTO recordingprofiles SET name = \"Default\", profilegroup = 17;",
+"INSERT INTO recordingprofiles SET name = \"Live TV\", profilegroup = 17;",
+"INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = 17;",
+"INSERT INTO recordingprofiles SET name = \"Low Quality\", profilegroup = 17;",
+NULL
+};
+        if (!performActualUpdate(updates, "1286", dbver))
+            return false;
+    }
+
+    if (dbver == "1286")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT cardid, videodevice "
+                      "FROM capturecard "
+                      "WHERE cardtype='CETON'");
+        if (!query.exec())
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "Unable to query capturecard table for upgrade to 1287.");
+            return false;
+        }
+
+        MSqlQuery update(MSqlQuery::InitCon());
+        update.prepare("UPDATE capturecard SET videodevice=:VIDDEV "
+                       "WHERE cardid=:CARDID");
+        while (query.next())
+        {
+            uint cardid = query.value(0).toUInt();
+            QString videodevice = query.value(1).toString();
+            QStringList parts = videodevice.split("-");
+            if (parts.size() != 2)
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Unable to parse videodevice in upgrade to 1287.");
+                return false;
+            }
+            if (parts[1].contains("."))
+                continue; // already in new format, skip it..
+
+            int input = max(parts[1].toInt() - 1, 0);
+            videodevice = parts[0] + QString("-0.%1").arg(input);
+            update.bindValue(":CARDID", cardid);
+            update.bindValue(":VIDDEV", videodevice);
+            if (!update.exec())
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Failed to update videodevice in upgrade to 1287.");
+                return false;
+            }
+        }
+
+        if (!UpdateDBVersionNumber("1287", dbver))
+            return false;
+    }
+
+    if (dbver == "1287")
+    {
+        const char *updates[] = {
+"CREATE TABLE IF NOT EXISTS livestream ( "
+"    id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY, "
+"    width INT UNSIGNED NOT NULL, "
+"    height INT UNSIGNED NOT NULL, "
+"    bitrate INT UNSIGNED NOT NULL, "
+"    audiobitrate INT UNSIGNED NOT NULL, "
+"    samplerate INT UNSIGNED NOT NULL, "
+"    audioonlybitrate INT UNSIGNED NOT NULL, "
+"    segmentsize INT UNSIGNED NOT NULL DEFAULT 10, "
+"    maxsegments INT UNSIGNED NOT NULL DEFAULT 0, "
+"    startsegment INT UNSIGNED NOT NULL DEFAULT 0, "
+"    currentsegment INT UNSIGNED NOT NULL DEFAULT 0, "
+"    segmentcount INT UNSIGNED NOT NULL DEFAULT 0, "
+"    percentcomplete INT UNSIGNED NOT NULL DEFAULT 0, "
+"    created DATETIME NOT NULL, "
+"    lastmodified DATETIME NOT NULL, "
+"    relativeurl VARCHAR(512) NOT NULL, "
+"    fullurl VARCHAR(1024) NOT NULL, "
+"    status INT UNSIGNED NOT NULL DEFAULT 0, "
+"    statusmessage VARCHAR(256) NOT NULL, "
+"    sourcefile VARCHAR(512) NOT NULL, "
+"    sourcehost VARCHAR(64) NOT NULL, "
+"    sourcewidth INT UNSIGNED NOT NULL DEFAULT 0, "
+"    sourceheight INT UNSIGNED NOT NULL DEFAULT 0, "
+"    outdir VARCHAR(256) NOT NULL, "
+"    outbase VARCHAR(128) NOT NULL "
+") ENGINE=MyISAM DEFAULT CHARSET=utf8; ",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1288", dbver))
+            return false;
+    }
+
+    if (dbver == "1288")
+    {
+        const char *updates[] = {
+"ALTER TABLE recordedprogram CHANGE COLUMN videoprop videoprop "
+"    SET('HDTV', 'WIDESCREEN', 'AVC', '720', '1080', 'DAMAGED') NOT NULL; ",
+NULL
+};
+        if (!performActualUpdate(updates, "1289", dbver))
+            return false;
+    }
+
+    if (dbver == "1289")
+    {
+        const char *updates[] = {
+"DROP TABLE IF EXISTS netvisionrssitems;",
+"DROP TABLE IF EXISTS netvisionsearchgrabbers;",
+"DROP TABLE IF EXISTS netvisionsites;",
+"DROP TABLE IF EXISTS netvisiontreegrabbers;",
+"DROP TABLE IF EXISTS netvisiontreeitems;",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1290", dbver))
+            return false;
+    }
+
+    if (dbver == "1290")
+    {
+        const char *updates[] = {
+"ALTER TABLE logging "
+" ALTER COLUMN host SET DEFAULT '', "
+" ALTER COLUMN application SET DEFAULT '', "
+" ALTER COLUMN pid SET DEFAULT '0', "
+" ALTER COLUMN thread SET DEFAULT '', "
+" ALTER COLUMN level SET DEFAULT '0';",
+"ALTER TABLE logging "
+" ADD COLUMN tid INT(11) NOT NULL DEFAULT '0' AFTER pid, "
+" ADD COLUMN filename VARCHAR(255) NOT NULL DEFAULT '' AFTER thread, "
+" ADD COLUMN line INT(11) NOT NULL DEFAULT '0' AFTER filename, "
+" ADD COLUMN function VARCHAR(255) NOT NULL DEFAULT '' AFTER line;",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1291", dbver))
             return false;
     }
 

@@ -222,16 +222,18 @@ class Metadata( DictData ):
 
     def _process(self, xml):
         for element in xml.getchildren():
-            if element.tag in self:
-                if (element.text == '') or (element.text is None):
-                    self[element.tag] = None
-                else:
-                    self[element.tag] = \
-                            self._trans[self._global_type[element.tag]]\
-                                (element.text)
-            if element.tag in self._groups:
-                self.__dict__[element.tag] = \
-                    getattr(self, element.tag.capitalize())(element)
+            try:
+                if element.tag in self:
+                    if (element.text == '') or (element.text is None):
+                        self[element.tag] = None
+                    else:
+                        self[element.tag] = \
+                                self._trans[self._global_type[element.tag]]\
+                                    (element.text)
+                elif element.tag in self._groups:
+                    self.__dict__[element.tag] = \
+                        getattr(self, element.tag.capitalize())(element)
+            except: pass
 
     def toXML(self):
         eroot = etree.Element('item')

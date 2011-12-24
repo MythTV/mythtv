@@ -78,6 +78,17 @@ bool FileTransfer::isOpen(void)
     return false;
 }
 
+bool FileTransfer::ReOpen(QString newFilename)
+{
+    if (!writemode)
+        return false;
+
+    if (rbuffer)
+        return rbuffer->ReOpen(newFilename);
+
+    return false;
+}
+
 void FileTransfer::Stop(void)
 {
     if (readthreadlive)

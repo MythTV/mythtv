@@ -73,7 +73,9 @@ class AudioOutputBase : public AudioOutput, public MThread
     virtual bool CanPassthrough(int samplerate, int channels,
                                 int codec, int profile) const;
     virtual bool CanDownmix(void) const { return true; };
+    virtual bool IsUpmixing(void);
     virtual bool ToggleUpmix(void);
+    virtual bool CanUpmix(void);
 
     virtual void Reset(void);
 

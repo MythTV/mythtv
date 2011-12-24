@@ -29,10 +29,7 @@ typedef enum RecordingDupInTypes
     kDupsInRecorded     = 0x01,
     kDupsInOldRecorded  = 0x02,
     kDupsInAll          = 0x0F,
-    kDupsNewEpi         = 0x10,
-    kDupsExRepeats      = 0x20,
-    kDupsExGeneric      = 0x40,
-    kDupsFirstNew       = 0x80
+    kDupsNewEpi         = 0x10
 } RecordingDupInType; // note stored in uin8_t in ProgramInfo
 
 

@@ -8,7 +8,7 @@
 class MythDVDPlayer : public MythPlayer
 {
   public:
-    MythDVDPlayer(bool muted = false);
+    MythDVDPlayer(PlayerFlags flags = kNoFlags);
 
     // Decoder stuff..
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
@@ -19,6 +19,8 @@ class MythDVDPlayer : public MythPlayer
 
     // Gets
     virtual uint64_t GetBookmark(void);
+    virtual  int64_t GetSecondsPlayed(void);
+    virtual  int64_t GetTotalSeconds(void) const;
 
     // DVD public stuff
     virtual bool GoToMenu(QString str);
@@ -74,7 +76,6 @@ class MythDVDPlayer : public MythPlayer
 
     // Complicated gets
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
-    virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
 
     // Seek stuff
     virtual bool FastForward(float seconds);
@@ -89,8 +90,7 @@ class MythDVDPlayer : public MythPlayer
     virtual int  SetTrack(uint type, int trackNo);
 
     // Private decoder stuff
-    virtual void CreateDecoder(char *testbuf, int testreadsize,
-                               bool allow_libmpeg2, bool no_accel);
+    virtual void CreateDecoder(char *testbuf, int testreadsize);
 
     // Private chapter stuff
     virtual bool DoJumpChapter(int chapter);

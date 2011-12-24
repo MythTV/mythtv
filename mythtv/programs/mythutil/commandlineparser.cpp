@@ -126,6 +126,8 @@ void MythUtilCommandLineParser::LoadArguments(void)
         ->SetChildOf("pidfilter");
     add("--noautopts", "noautopts", false, "Disables PTS discovery", "")
         ->SetChildOf("pidprinter");
+    add("--xml", "xml", false, "Enables XML output of PSIP", "")
+        ->SetChildOf("pidprinter");
 
     // messageutils.cpp
     add("--udpport", "udpport", 6948, "(optional) UDP Port to send to", "")
