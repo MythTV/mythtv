@@ -8,13 +8,7 @@
 #include "vdpauvideodecoder.h"
 #include "openglsupport.h"
 
-#ifdef MAX
-#undef MAX
-#endif
-#ifdef MIN
-#undef MIN
-#endif
-#include <oclUtils.h>
+#include <CL/opencl.h>
 
 VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
                            uint id, VdpVideoSurface vdpSurface) : 
@@ -93,7 +87,7 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
         {
             LOG(VB_GPU, LOG_ERR,
                 QString("VDPAU: OpenCL binding #%1 failed: %2 (%3)")
-                .arg(i) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+                .arg(i) .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
             return;
         }
     }
@@ -158,7 +152,7 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
         {
             LOG(VB_GPU, LOG_ERR,
                 QString("VDPAU: OpenCL Image Create #%1 failed: %2 (%3)")
-                .arg(i) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+                .arg(i) .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
             return;
         }
     }
@@ -240,8 +234,8 @@ void VideoSurface::Dump(QString basename, int framenum)
                                   sizeof(format), &format, NULL);
         LOG(VB_GPUVIDEO, LOG_INFO,
             QString("Buffer %1: Format - Order %2, Type %3")
-            .arg(i) .arg(oclImageFormatString(format.image_channel_order))
-            .arg(oclImageFormatString(format.image_channel_data_type)));
+            .arg(i) .arg(openCLImageFormatString(format.image_channel_order))
+            .arg(openCLImageFormatString(format.image_channel_data_type)));
 
         size_t elemSize, pitch, width, height;
         ciErrNum = clGetImageInfo(m_clBuffer[i], CL_IMAGE_ELEMENT_SIZE,

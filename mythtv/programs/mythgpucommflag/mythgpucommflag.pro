@@ -15,7 +15,8 @@ INCLUDEPATH += $$SDK/shared/inc $$SDK/OpenCL/common/inc
 LIBPATH += $$SDK/shared/lib $$SDK/shared/lib/linux
 LIBPATH += $$SDK/OpenCL/common/lib
 
-LIBS += -lOpenCL -loclUtil_x86_64 -lshrutil_x86_64 -lglut -lGLEW
+#LIBS += -lOpenCL -loclUtil_x86_64 -lshrutil_x86_64 -lglut -lGLEW
+LIBS += -lOpenCL -lglut -lGLEW
 
 # Input
 HEADERS += commandlineparser.h

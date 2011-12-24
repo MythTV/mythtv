@@ -86,7 +86,7 @@ void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
         {
             LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)));
+                .arg(openCLErrorString(ciErrNum)));
             return;
         }
 
@@ -112,7 +112,7 @@ void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
         {
             LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)));
+                .arg(openCLErrorString(ciErrNum)));
             return;
         }
     }
@@ -178,7 +178,7 @@ void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,
         {
             LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)));
+                .arg(openCLErrorString(ciErrNum)));
             return;
         }
 
@@ -204,7 +204,7 @@ void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,
         {
             LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)));
+                .arg(openCLErrorString(ciErrNum)));
             return;
         }
     }
@@ -262,7 +262,7 @@ void OpenCLCombineYUV(OpenCLDevice *dev, VideoSurface *frame,
         {
             LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)));
+                .arg(openCLErrorString(ciErrNum)));
             return;
         }
     }
@@ -317,7 +317,7 @@ void OpenCLYUVToRGB(OpenCLDevice *dev, VideoSurface *yuvframe,
         {
             LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)));
+                .arg(openCLErrorString(ciErrNum)));
             return;
         }
     }
@@ -374,9 +374,9 @@ void OpenCLYUVToSNORM(OpenCLDevice *dev, VideoSurface *inframe,
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GPU, LOG_ERR,
-                QString("Error running kernel %1: %2 (%3), $%4")
+                QString("Error running kernel %1: %2 (%3), #%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)) .arg(i));
+                .arg(openCLErrorString(ciErrNum)) .arg(i));
             return;
         }
     }
@@ -434,9 +434,9 @@ void OpenCLYUVFromSNORM(OpenCLDevice *dev, VideoSurface *inframe,
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GPU, LOG_ERR,
-                QString("Error running kernel %1: %2 (%3), $%4")
+                QString("Error running kernel %1: %2 (%3), #%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)) .arg(i));
+                .arg(openCLErrorString(ciErrNum)) .arg(i));
             return;
         }
     }
@@ -492,7 +492,7 @@ void OpenCLZeroRegion(OpenCLDevice *dev, VideoSurface *inframe,
         {
             LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)));
+                .arg(openCLErrorString(ciErrNum)));
             return;
         }
     }
@@ -554,9 +554,9 @@ void OpenCLCopyLogoROI(OpenCLDevice *dev, VideoSurface *inframe,
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GPU, LOG_ERR,
-                QString("Error running kernel %1: %2 (%3), $%4")
+                QString("Error running kernel %1: %2 (%3), #%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)) .arg(i));
+                .arg(openCLErrorString(ciErrNum)) .arg(i));
             return;
         }
     }
@@ -616,9 +616,9 @@ void OpenCLThreshSat(OpenCLDevice *dev, VideoSurface *inframe,
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GPU, LOG_ERR,
-                QString("Error running kernel %1: %2 (%3), $%4")
+                QString("Error running kernel %1: %2 (%3), #%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)) .arg(i));
+                .arg(openCLErrorString(ciErrNum)) .arg(i));
             return;
         }
     }
@@ -677,9 +677,9 @@ void OpenCLLogoMSE(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GPU, LOG_ERR,
-                QString("Error running kernel %1: %2 (%3), $%4")
+                QString("Error running kernel %1: %2 (%3), #%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)) .arg(i));
+                .arg(openCLErrorString(ciErrNum)) .arg(i));
             return;
         }
     }
@@ -736,9 +736,9 @@ void OpenCLInvert(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GPU, LOG_ERR,
-                QString("Error running kernel %1: %2 (%3), $%4")
+                QString("Error running kernel %1: %2 (%3), #%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)) .arg(i));
+                .arg(openCLErrorString(ciErrNum)) .arg(i));
             return;
         }
     }
@@ -797,9 +797,9 @@ void OpenCLMultiply(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GPU, LOG_ERR,
-                QString("Error running kernel %1: %2 (%3), $%4")
+                QString("Error running kernel %1: %2 (%3), #%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)) .arg(i));
+                .arg(openCLErrorString(ciErrNum)) .arg(i));
             return;
         }
     }
@@ -855,9 +855,9 @@ void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
         if (ciErrNum != CL_SUCCESS)
         {
             LOG(VB_GPU, LOG_ERR,
-                QString("Error running kernel %1: %2 (%3), $%4")
+                QString("Error running kernel %1: %2 (%3), #%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
-                .arg(oclErrorString(ciErrNum)) .arg(i));
+                .arg(openCLErrorString(ciErrNum)) .arg(i));
             return;
         }
     }
@@ -902,7 +902,7 @@ void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
     static OpenCLBufferPtr memBufs = NULL;
 
     if (!memBufs)
-    {
+    { 
         memBufs = new OpenCLBuffers(2);
         if (!memBufs)
         {

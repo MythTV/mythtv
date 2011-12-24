@@ -1,14 +1,7 @@
 #ifndef _openclinterface_h
 #define _openclinterface_h
 
-#ifdef MAX
-#undef MAX
-#endif
-#ifdef MIN
-#undef MIN
-#endif
-
-#include <oclUtils.h>
+#include <CL/opencl.h>
 #include <QString>
 #include <QStringList>
 #include <QList>
@@ -114,6 +107,7 @@ class OpenCLDeviceNvidiaSpecific : public OpenCLDeviceSpecific
     OpenCLDeviceNvidiaSpecific(OpenCLDevice *parent);
     ~OpenCLDeviceNvidiaSpecific() {};
     void Display(void);
+    int ConvertSMVer2Cores(int major, int minor);
 
 //  protected:
     cl_uint m_computeCapMajor;
@@ -174,6 +168,9 @@ class OpenCLBuffers : public QObject
 };
 
 typedef QPointer<OpenCLBuffers> OpenCLBufferPtr;
+
+const char *openCLErrorString(cl_int error);
+const char *openCLImageFormatString(cl_uint uiImageFormat);
 
 #endif
 

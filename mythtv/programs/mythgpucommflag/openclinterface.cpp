@@ -9,18 +9,14 @@
 #include <strings.h>
 
 #include "mythlogging.h"
-#ifdef MAX
-#undef MAX
-#endif
-#ifdef MIN
-#undef MIN
-#endif
-#include <oclUtils.h>
+
+#include <CL/opencl.h>
 #include "openclinterface.h"
 #include "openglsupport.h"
 
 void openCLDisplayImageFormats(cl_context context);
 void openCLPrintDevInfo(cl_device_id device);
+cl_int openCLGetPlatformID(cl_platform_id* clSelectedPlatformID);
 
 cl_platform_id clSelectedPlatformID = NULL; 
 
@@ -31,11 +27,11 @@ OpenCLDeviceMap::OpenCLDeviceMap(void)
     m_valid = false;
 
     // Get OpenCL platform ID for NVIDIA if avaiable, otherwise default
-    cl_int ciErrNum = oclGetPlatformID (&clSelectedPlatformID);
+    cl_int ciErrNum = openCLGetPlatformID(&clSelectedPlatformID);
     if (ciErrNum != CL_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("OpenCL Error # %1 (%2)")
-            .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+            .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
         return;
     }
 
@@ -62,10 +58,6 @@ OpenCLDeviceMap::OpenCLDeviceMap(void)
     } 
 
     LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Version: %1") .arg(cBuffer));
-
-    // Log OpenCL SDK Revision # 
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL SDK Revision: %1")
-        .arg(OCL_SDKREVISION));
 
     // Get and log OpenCL device info 
     cl_uint ciDeviceCount;
@@ -152,10 +144,10 @@ void openCLDisplayImageFormats(cl_context context)
     {  
         LOG(VB_GENERAL, LOG_INFO, QString("%1%2%3")
             .arg(i + 1, -6)
-            .arg(oclImageFormatString(ImageFormats[i].
-                                      image_channel_order), -16) 
-            .arg(oclImageFormatString(ImageFormats[i].
-                                   image_channel_data_type), -22));
+            .arg(openCLImageFormatString(ImageFormats[i].
+                                         image_channel_order), -16) 
+            .arg(openCLImageFormatString(ImageFormats[i].
+                                         image_channel_data_type), -22));
     }
     delete [] ImageFormats;
 
@@ -180,10 +172,10 @@ void openCLDisplayImageFormats(cl_context context)
     {  
         LOG(VB_GENERAL, LOG_INFO, QString("%1%2%3")
             .arg(i + 1, -6)
-            .arg(oclImageFormatString(ImageFormats[i].
-                                      image_channel_order), -16)
-            .arg(oclImageFormatString(ImageFormats[i].
-                                   image_channel_data_type), -22));
+            .arg(openCLImageFormatString(ImageFormats[i].
+                                         image_channel_order), -16)
+            .arg(openCLImageFormatString(ImageFormats[i].
+                                         image_channel_data_type), -22));
     }
     delete [] ImageFormats;
 }
@@ -689,6 +681,23 @@ void OpenCLDeviceNvidiaSpecific::Display(void)
         .arg(m_integratedMem ? "yes" : "no"));
 }
 
+// Adapted from the NVIDIA GPY Computing SDK shrUtils.h
+int OpenCLDeviceNvidiaSpecific::ConvertSMVer2Cores(int major, int minor)
+{
+    if (major == 1 && minor >= 0 && minor <= 3)
+        return 8;
+
+    if (major == 2 && minor == 0)
+        return 32;
+
+    if (major == 2 && minor == 1)
+        return 48;
+
+	LOG(VB_GENERAL, LOG_ERR, QString("Unknown SM version %d.%d!")
+        .arg(major) .arg(minor));
+	return -1;
+}
+
 OpenCLKernel *OpenCLKernel::Create(OpenCLDevice *device, QString entry,
                                           QString filename)
 {
@@ -742,7 +751,7 @@ OpenCLKernel *OpenCLKernel::Create(OpenCLDevice *device, QString entry,
     if (!kernel)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Error creating kernel %1: %2 (%3)")
-            .arg(entryPt) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+            .arg(entryPt) .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
         clReleaseProgram(program);
         return NULL;
     }
@@ -772,6 +781,181 @@ OpenCLBuffers::~OpenCLBuffers()
         if (m_bufs[i])
             clReleaseMemObject(m_bufs[i]);
     delete [] m_bufs;
+}
+
+cl_int openCLGetPlatformID(cl_platform_id* clSelectedPlatformID)
+{
+    char chBuffer[1024];
+    cl_uint num_platforms; 
+    cl_platform_id* clPlatformIDs;
+    cl_int ciErrNum;
+    *clSelectedPlatformID = NULL;
+
+    // Get OpenCL platform count
+    ciErrNum = clGetPlatformIDs (0, NULL, &num_platforms);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Error %1 in clGetPlatformIDs")
+            .arg(ciErrNum));
+        return -1000;
+    }
+
+    if (num_platforms == 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "No OpenCL platform found!");
+        return -2000;
+    }
+
+    // if there's a platform or more, make space for ID's
+    clPlatformIDs = new cl_platform_id[num_platforms];
+    if (!clPlatformIDs)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "Failed to allocate memory for cl_platform IDs!");
+        return -3000;
+    }
+
+    // get platform info for each platform and trap the NVIDIA platform if found
+    ciErrNum = clGetPlatformIDs (num_platforms, clPlatformIDs, NULL);
+    for(cl_uint i = 0; i < num_platforms; ++i)
+    {
+        ciErrNum = clGetPlatformInfo (clPlatformIDs[i], CL_PLATFORM_NAME, 1024,
+                                      &chBuffer, NULL);
+        if(ciErrNum == CL_SUCCESS)
+        {
+            if(strstr(chBuffer, "NVIDIA") != NULL)
+            {
+                *clSelectedPlatformID = clPlatformIDs[i];
+                break;
+            }
+        }
+    }
+
+    // default to zeroeth platform if NVIDIA not found
+    if(*clSelectedPlatformID == NULL)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "NVIDIA OpenCL platform not found - "
+            "defaulting to first platform!");
+        *clSelectedPlatformID = clPlatformIDs[0];
+    }
+
+    delete [] clPlatformIDs;
+    return CL_SUCCESS;
+}
+
+const char *openCLErrorString(cl_int error)
+{
+    static const char* errorString[] = {
+        "CL_SUCCESS",
+        "CL_DEVICE_NOT_FOUND",
+        "CL_DEVICE_NOT_AVAILABLE",
+        "CL_COMPILER_NOT_AVAILABLE",
+        "CL_MEM_OBJECT_ALLOCATION_FAILURE",
+        "CL_OUT_OF_RESOURCES",
+        "CL_OUT_OF_HOST_MEMORY",
+        "CL_PROFILING_INFO_NOT_AVAILABLE",
+        "CL_MEM_COPY_OVERLAP",
+        "CL_IMAGE_FORMAT_MISMATCH",
+        "CL_IMAGE_FORMAT_NOT_SUPPORTED",
+        "CL_BUILD_PROGRAM_FAILURE",
+        "CL_MAP_FAILURE",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "CL_INVALID_VALUE",
+        "CL_INVALID_DEVICE_TYPE",
+        "CL_INVALID_PLATFORM",
+        "CL_INVALID_DEVICE",
+        "CL_INVALID_CONTEXT",
+        "CL_INVALID_QUEUE_PROPERTIES",
+        "CL_INVALID_COMMAND_QUEUE",
+        "CL_INVALID_HOST_PTR",
+        "CL_INVALID_MEM_OBJECT",
+        "CL_INVALID_IMAGE_FORMAT_DESCRIPTOR",
+        "CL_INVALID_IMAGE_SIZE",
+        "CL_INVALID_SAMPLER",
+        "CL_INVALID_BINARY",
+        "CL_INVALID_BUILD_OPTIONS",
+        "CL_INVALID_PROGRAM",
+        "CL_INVALID_PROGRAM_EXECUTABLE",
+        "CL_INVALID_KERNEL_NAME",
+        "CL_INVALID_KERNEL_DEFINITION",
+        "CL_INVALID_KERNEL",
+        "CL_INVALID_ARG_INDEX",
+        "CL_INVALID_ARG_VALUE",
+        "CL_INVALID_ARG_SIZE",
+        "CL_INVALID_KERNEL_ARGS",
+        "CL_INVALID_WORK_DIMENSION",
+        "CL_INVALID_WORK_GROUP_SIZE",
+        "CL_INVALID_WORK_ITEM_SIZE",
+        "CL_INVALID_GLOBAL_OFFSET",
+        "CL_INVALID_EVENT_WAIT_LIST",
+        "CL_INVALID_EVENT",
+        "CL_INVALID_OPERATION",
+        "CL_INVALID_GL_OBJECT",
+        "CL_INVALID_BUFFER_SIZE",
+        "CL_INVALID_MIP_LEVEL",
+        "CL_INVALID_GLOBAL_WORK_SIZE",
+    };
+
+    const int errorCount = sizeof(errorString) / sizeof(errorString[0]);
+
+    const int index = -error;
+
+    return (index >= 0 && index < errorCount) ? errorString[index] :
+           "Unspecified Error";
+}
+
+const char *openCLImageFormatString(cl_uint uiImageFormat)
+{
+    switch (uiImageFormat)
+    {
+        // cl_channel_order 
+        case CL_R:                  return "CL_R";
+        case CL_A:                  return "CL_A";
+        case CL_RG:                 return "CL_RG";
+        case CL_RA:                 return "CL_RA";
+        case CL_RGB:                return "CL_RGB";
+        case CL_RGBA:               return "CL_RGBA";  
+        case CL_BGRA:               return "CL_BGRA";  
+        case CL_ARGB:               return "CL_ARGB";  
+        case CL_INTENSITY:          return "CL_INTENSITY";  
+        case CL_LUMINANCE:          return "CL_LUMINANCE";  
+
+        // cl_channel_type 
+        case CL_SNORM_INT8:          return "CL_SNORM_INT8";
+        case CL_SNORM_INT16:        return "CL_SNORM_INT16";
+        case CL_UNORM_INT8:         return "CL_UNORM_INT8";
+        case CL_UNORM_INT16:        return "CL_UNORM_INT16";
+        case CL_UNORM_SHORT_565:    return "CL_UNORM_SHORT_565";
+        case CL_UNORM_SHORT_555:    return "CL_UNORM_SHORT_555";
+        case CL_UNORM_INT_101010:   return "CL_UNORM_INT_101010";
+        case CL_SIGNED_INT8:        return "CL_SIGNED_INT8";
+        case CL_SIGNED_INT16:       return "CL_SIGNED_INT16";
+        case CL_SIGNED_INT32:       return "CL_SIGNED_INT32";
+        case CL_UNSIGNED_INT8:      return "CL_UNSIGNED_INT8";
+        case CL_UNSIGNED_INT16:     return "CL_UNSIGNED_INT16";
+        case CL_UNSIGNED_INT32:     return "CL_UNSIGNED_INT32";
+        case CL_HALF_FLOAT:         return "CL_HALF_FLOAT";
+        case CL_FLOAT:              return "CL_FLOAT";
+
+        // unknown constant
+        default:                    return "Unknown";
+    }
 }
 
 /*

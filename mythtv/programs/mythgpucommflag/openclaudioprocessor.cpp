@@ -7,6 +7,10 @@
 #include "audioprocessor.h"
 #include "audiopacket.h"
 
+#ifndef MIN
+#define MIN(x,y) ((x) < (y) ? (x) : (y))
+#endif
+
 // Prototypes
 unsigned int nextPow2(unsigned int x);
 void OpenCLVolumeLevelCleanup(cl_mem **bufs);
@@ -259,7 +263,8 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     if (ciErrNum != CL_SUCCESS)
     {
         LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
-            .arg(kern[0].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+            .arg(kern[0].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
         delete memBufs;
         return NULL;
     }
@@ -273,7 +278,8 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     if (ciErrNum != CL_SUCCESS)
     {
         LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
-            .arg(kern[1].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+            .arg(kern[1].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
         delete memBufs;
         return NULL;
     }
@@ -285,7 +291,8 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     if (ciErrNum != CL_SUCCESS)
     {
         LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
-            .arg(kern[2].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+            .arg(kern[2].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
         delete memBufs;
         return NULL;
     }

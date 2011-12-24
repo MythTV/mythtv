@@ -4,6 +4,10 @@
 #include "resultslist.h"
 #include "audioprocessor.h"
 
+#ifndef MAX
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif
+
 // Prototypes
 FlagResults *SoftwareVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                  int count, int64_t pts, int rate);

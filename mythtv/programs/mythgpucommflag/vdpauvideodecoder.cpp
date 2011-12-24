@@ -23,13 +23,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-#ifdef MAX
-#undef MAX
-#endif
-#ifdef MIN
-#undef MIN
-#endif
-#include <oclUtils.h>
+#include <CL/opencl.h>
 
 
 static const char* dummy_get_error_string(VdpStatus status);
@@ -420,7 +414,8 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 
 void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 {
-    assert(pic->type == FF_BUFFER_TYPE_USER);
+    if (pic->type != FF_BUFFER_TYPE_USER);
+        return;
 
 #ifdef USING_VDPAU
     struct vdpau_render_state *render =

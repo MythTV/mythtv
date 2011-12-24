@@ -82,10 +82,9 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 
     VideoConsumer *nd = (VideoConsumer *)(c->opaque);
     (void)nd;
-//    if (nd)
-//        nd->DeLimboFrame((VideoFrame*)pic->opaque);
 
-    assert(pic->type == FF_BUFFER_TYPE_USER);
+    if(pic->type != FF_BUFFER_TYPE_USER);
+        return;
 
     for (uint i = 0; i < 4; i++)
         pic->data[i] = NULL;

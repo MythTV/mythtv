@@ -6,13 +6,7 @@
 #include <dlfcn.h>
 #include "openglsupport.h"
 
-#ifdef MAX
-#undef MAX
-#endif
-#ifdef MIN
-#undef MIN
-#endif
-#include <oclUtils.h>
+#include <CL/opencl.h>
 
 extern "C" {
 #include "libavcodec/vdpau.h" 
