@@ -170,7 +170,9 @@ void VideoConsumer::ProcessPacket(Packet *packet)
     AVFrame *wavelet = NULL;
     avcodec_get_frame_defaults(&mpa_pic);
     int gotpicture = 0;
+    LOG(VB_GENERAL, LOG_INFO, "About to decode packet");
     int ret = avcodec_decode_video2(m_context, &mpa_pic, &gotpicture, pkt);
+    LOG(VB_GENERAL, LOG_INFO, "Finished decoding packet");
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, "Video: Unknown decoding error");
@@ -188,12 +190,16 @@ void VideoConsumer::ProcessPacket(Packet *packet)
     {
         // Push frame to the GPU via OpenGL/OpenCL
         count++;
+        LOG(VB_GENERAL, LOG_INFO, "About to transfer OpenGL->OpenCL");
         videoFrame = new VideoPacket(m_decoder, &mpa_pic, count);
+        LOG(VB_GENERAL, LOG_INFO, "Finished transferring OpenGL->OpenCL");
+
+#ifdef DEBUG_VIDEO
         if ((count <= 100) && videoFrame)
         {
-            // videoFrame->m_frameRaw->Dump("frame", count);
-            // videoFrame->m_frameYUVSNORM->Dump("yuv", count);
-            // videoFrame->m_wavelet->Dump("wavelet", count);
+            videoFrame->m_frameRaw->Dump("frame", count);
+            videoFrame->m_frameYUVSNORM->Dump("yuv", count);
+            videoFrame->m_wavelet->Dump("wavelet", count);
             VideoSurface rgb(m_dev, kSurfaceRGB,
                              videoFrame->m_frameRaw->m_width,
                              videoFrame->m_frameRaw->m_height);
@@ -204,7 +210,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
                              videoFrame->m_frameRaw->m_width,
                              videoFrame->m_frameRaw->m_height);
             OpenCLWaveletInverse(m_dev, videoFrame->m_wavelet, &yuv);
-            // yuv.Dump("unwaveletYUV", count);
+            yuv.Dump("unwaveletYUV", count);
             VideoSurface yuv2(m_dev, kSurfaceYUV,
                               videoFrame->m_frameRaw->m_width,
                               videoFrame->m_frameRaw->m_height);
@@ -212,6 +218,7 @@ void VideoConsumer::ProcessPacket(Packet *packet)
             OpenCLYUVToRGB(m_dev, &yuv2, &rgb);
             rgb.Dump("unwaveletRGB", count);
         }
+#endif
     }
 
     // Get wavelet from the frame (one level)

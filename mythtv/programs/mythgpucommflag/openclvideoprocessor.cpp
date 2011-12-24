@@ -35,7 +35,7 @@ void InitOpenCLVideoProcessors(void)
 void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
                    VideoSurface *wavelet)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Wavelet");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Wavelet");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoWavelet", KERNEL_WAVELET_CL }
@@ -75,7 +75,7 @@ void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+            LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
             return;
         }
 
@@ -84,7 +84,7 @@ void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
                                           0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)));
             return;
@@ -101,7 +101,7 @@ void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+            LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
             return;
         }
 
@@ -110,20 +110,20 @@ void OpenCLWavelet(OpenCLDevice *dev, VideoSurface *frame,
                                           0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)));
             return;
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Wavelet Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Wavelet Done");
 }
 
 void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,
                           VideoSurface *frame)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Wavelet Inverse");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Wavelet Inverse");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoWaveletInverse", KERNEL_WAVELET_CL }
@@ -145,7 +145,7 @@ void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,
     int useDims[2] = { wavelet->m_realWidth / 2, wavelet->m_realHeight / 2 };
     int widthR  = PAD_VALUE(totDims[0], KERNEL_WAVELET_WORKSIZE);
     int heightR = PAD_VALUE(totDims[1], KERNEL_WAVELET_WORKSIZE);
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GPUVIDEO, LOG_INFO,
         QString("totDims: %1x%2, useDims: %3x%4 workDims: %5x%6")
         .arg(totDims[0]) .arg(totDims[1]) .arg(useDims[0]) .arg(useDims[1])
         .arg(widthR) .arg(heightR));
@@ -167,7 +167,7 @@ void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+            LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
             return;
         }
 
@@ -176,7 +176,7 @@ void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,
                                           0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)));
             return;
@@ -193,7 +193,7 @@ void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+            LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
             return;
         }
 
@@ -202,21 +202,21 @@ void OpenCLWaveletInverse(OpenCLDevice *dev, VideoSurface *wavelet,
                                           0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)));
             return;
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Wavelet Inverse Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Wavelet Inverse Done");
 }
 
 #define KERNEL_CONVERT_CL "videoConvert.cl"
 void OpenCLCombineYUV(OpenCLDevice *dev, VideoSurface *frame,
                       VideoSurface *yuvframe)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL CombineYUV");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL CombineYUV");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoCombineYUV",     KERNEL_CONVERT_CL }
@@ -252,7 +252,7 @@ void OpenCLCombineYUV(OpenCLDevice *dev, VideoSurface *frame,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+            LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
             return;
         }
 
@@ -260,20 +260,20 @@ void OpenCLCombineYUV(OpenCLDevice *dev, VideoSurface *frame,
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)));
             return;
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL CombineYUV Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL CombineYUV Done");
 }
 
 void OpenCLYUVToRGB(OpenCLDevice *dev, VideoSurface *yuvframe,
                     VideoSurface *rgbframe)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL YUVToRGB");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL YUVToRGB");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoYUVToRGB",     KERNEL_CONVERT_CL }
@@ -307,7 +307,7 @@ void OpenCLYUVToRGB(OpenCLDevice *dev, VideoSurface *yuvframe,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+            LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
             return;
         }
 
@@ -315,20 +315,20 @@ void OpenCLYUVToRGB(OpenCLDevice *dev, VideoSurface *yuvframe,
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)));
             return;
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL YUVToRGB Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL YUVToRGB Done");
 }
 
 void OpenCLYUVToSNORM(OpenCLDevice *dev, VideoSurface *inframe,
                       VideoSurface *outframe)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL YUVToSNORM");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL YUVToSNORM");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoYUVToSNORM",     KERNEL_CONVERT_CL }
@@ -363,7 +363,7 @@ void OpenCLYUVToSNORM(OpenCLDevice *dev, VideoSurface *inframe,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error setting kernel arguments, #%1")
                 .arg(i));
             return;
@@ -373,7 +373,7 @@ void OpenCLYUVToSNORM(OpenCLDevice *dev, VideoSurface *inframe,
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error running kernel %1: %2 (%3), $%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)) .arg(i));
@@ -381,14 +381,14 @@ void OpenCLYUVToSNORM(OpenCLDevice *dev, VideoSurface *inframe,
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL YUVToSNORM Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL YUVToSNORM Done");
 }
 
 
 void OpenCLYUVFromSNORM(OpenCLDevice *dev, VideoSurface *inframe,
                         VideoSurface *outframe)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL YUVFromSNORM");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL YUVFromSNORM");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoYUVFromSNORM",     KERNEL_CONVERT_CL }
@@ -423,7 +423,7 @@ void OpenCLYUVFromSNORM(OpenCLDevice *dev, VideoSurface *inframe,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error setting kernel arguments, #%1")
                 .arg(i));
             return;
@@ -433,7 +433,7 @@ void OpenCLYUVFromSNORM(OpenCLDevice *dev, VideoSurface *inframe,
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error running kernel %1: %2 (%3), $%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)) .arg(i));
@@ -441,13 +441,13 @@ void OpenCLYUVFromSNORM(OpenCLDevice *dev, VideoSurface *inframe,
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL YUVFromSNORM Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL YUVFromSNORM Done");
 }
 
 void OpenCLZeroRegion(OpenCLDevice *dev, VideoSurface *inframe,
                       VideoSurface *outframe, int x1, int y1, int x2, int y2)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL ZeroRegion");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL ZeroRegion");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoZeroRegion", KERNEL_CONVERT_CL }
@@ -482,7 +482,7 @@ void OpenCLZeroRegion(OpenCLDevice *dev, VideoSurface *inframe,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+            LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
             return;
         }
 
@@ -490,21 +490,21 @@ void OpenCLZeroRegion(OpenCLDevice *dev, VideoSurface *inframe,
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+            LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)));
             return;
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL ZeroRegion Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL ZeroRegion Done");
 }
 
 
 void OpenCLCopyLogoROI(OpenCLDevice *dev, VideoSurface *inframe,
                        VideoSurface *outframe, int roiWidth, int roiHeight)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL CopyLogoROI");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL CopyLogoROI");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoCopyLogoROI",     KERNEL_CONVERT_CL }
@@ -543,7 +543,7 @@ void OpenCLCopyLogoROI(OpenCLDevice *dev, VideoSurface *inframe,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error setting kernel arguments, #%1")
                 .arg(i));
             return;
@@ -553,7 +553,7 @@ void OpenCLCopyLogoROI(OpenCLDevice *dev, VideoSurface *inframe,
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error running kernel %1: %2 (%3), $%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)) .arg(i));
@@ -561,7 +561,7 @@ void OpenCLCopyLogoROI(OpenCLDevice *dev, VideoSurface *inframe,
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL CopyLogoROI Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL CopyLogoROI Done");
 }
 
 
@@ -569,7 +569,7 @@ void OpenCLCopyLogoROI(OpenCLDevice *dev, VideoSurface *inframe,
 void OpenCLThreshSat(OpenCLDevice *dev, VideoSurface *inframe,
                      VideoSurface *outframe, int threshold)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL ThreshSat");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL ThreshSat");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoThreshSaturate",     KERNEL_CONVERT_CL }
@@ -605,7 +605,7 @@ void OpenCLThreshSat(OpenCLDevice *dev, VideoSurface *inframe,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error setting kernel arguments, #%1")
                 .arg(i));
             return;
@@ -615,7 +615,7 @@ void OpenCLThreshSat(OpenCLDevice *dev, VideoSurface *inframe,
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error running kernel %1: %2 (%3), $%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)) .arg(i));
@@ -623,13 +623,13 @@ void OpenCLThreshSat(OpenCLDevice *dev, VideoSurface *inframe,
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL ThreshSat Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL ThreshSat Done");
 }
 
 void OpenCLLogoMSE(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
                    VideoSurface *out)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL LogoMSE");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL LogoMSE");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoLogoMSE",     KERNEL_CONVERT_CL }
@@ -666,7 +666,7 @@ void OpenCLLogoMSE(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error setting kernel arguments, #%1")
                 .arg(i));
             return;
@@ -676,7 +676,7 @@ void OpenCLLogoMSE(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error running kernel %1: %2 (%3), $%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)) .arg(i));
@@ -684,13 +684,13 @@ void OpenCLLogoMSE(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL LogoMSE Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL LogoMSE Done");
 }
 
 #define KERNEL_INVERT_CL "videoInverse.cl"
 void OpenCLInvert(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Invert");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Invert");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoInvert",     KERNEL_INVERT_CL }
@@ -725,7 +725,7 @@ void OpenCLInvert(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error setting kernel arguments, #%1")
                 .arg(i));
             return;
@@ -735,7 +735,7 @@ void OpenCLInvert(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error running kernel %1: %2 (%3), $%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)) .arg(i));
@@ -743,13 +743,13 @@ void OpenCLInvert(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Invert Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Invert Done");
 }
 
 void OpenCLMultiply(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
                     VideoSurface *out)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Multiply");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Multiply");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoMultiply",     KERNEL_CONVERT_CL }
@@ -786,7 +786,7 @@ void OpenCLMultiply(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error setting kernel arguments, #%1")
                 .arg(i));
             return;
@@ -796,7 +796,7 @@ void OpenCLMultiply(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error running kernel %1: %2 (%3), $%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)) .arg(i));
@@ -804,12 +804,12 @@ void OpenCLMultiply(OpenCLDevice *dev, VideoSurface *ref, VideoSurface *in,
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Multiply Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Multiply Done");
 }
 
 void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Dilate3x3");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Dilate3x3");
 
     static OpenCLKernelDef kern[] = {
         { NULL, "videoDilate3x3",     KERNEL_CONVERT_CL }
@@ -844,7 +844,7 @@ void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error setting kernel arguments, #%1")
                 .arg(i));
             return;
@@ -854,7 +854,7 @@ void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
                                           globalWorkDims, NULL, 0, NULL, NULL);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("Error running kernel %1: %2 (%3), $%4")
                 .arg(kern[0].entry) .arg(ciErrNum)
                 .arg(oclErrorString(ciErrNum)) .arg(i));
@@ -862,7 +862,7 @@ void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Dilate3x3 Done");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Dilate3x3 Done");
 }
 
 // Processors
@@ -870,12 +870,12 @@ void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
 FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
                               AVFrame *wavelet)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Edge Detect");
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Edge Detect");
 
     VideoPacket *videoPacket = videoPacketMap.Lookup(frame);
     if (!videoPacket)
     {
-        LOG(VB_GENERAL, LOG_ERR, "packet not in map");
+        LOG(VB_GPU, LOG_ERR, "Video packet not in map");
         return NULL;
     }
 
@@ -932,13 +932,16 @@ FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,
     // Store the combined frame for next time
     logoROI = edgeROI;
 
-    // Convert to RGB to display for debugging
-    VideoSurface edgeRGB(dev, kSurfaceLogoRGB, surfWidth, surfHeight);
-    OpenCLYUVFromSNORM(dev, logoROI, &edge);
-    OpenCLYUVToRGB(dev, &edge, &edgeRGB);
-    edgeRGB.Dump("edgeRGB", videoPacket->m_num);
+    if (videoPacket->m_num <= 100)
+    {
+        // Convert to RGB to display for debugging
+        VideoSurface edgeRGB(dev, kSurfaceLogoRGB, surfWidth, surfHeight);
+        OpenCLYUVFromSNORM(dev, logoROI, &edge);
+        OpenCLYUVToRGB(dev, &edge, &edgeRGB);
+        edgeRGB.Dump("edgeRGB", videoPacket->m_num);
+    }
 
-    LOG(VB_GENERAL, LOG_INFO, "Done OpenCL Edge Detect");
+    LOG(VB_GPUVIDEO, LOG_INFO, "Done OpenCL Edge Detect");
     return NULL;
 }
 

@@ -524,7 +524,7 @@ void OpenCLDevice::Display(void)
     if (!m_valid)
         return;
 
-    LOG(VB_GENERAL, LOG_INFO, "------------------------------------------");
+    LOG(VB_GPU, LOG_INFO, "------------------------------------------");
     LOG(VB_GENERAL, LOG_INFO, "OpenCL Device Name: " + m_name);
     LOG(VB_GENERAL, LOG_INFO, "OpenCL Vendor: " + m_vendor);
     LOG(VB_GENERAL, LOG_INFO, "OpenCL Driver Version: " + m_driverVersion);
@@ -551,48 +551,48 @@ void OpenCLDevice::Display(void)
         break;
     }
     
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Max Compute Units: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Max Compute Units: %1")
         .arg(m_maxComputeUnits));
 
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GPU, LOG_INFO,
         QString("OpenCL Max Work Item Sizes: %1 / %2 / %3")
         .arg(m_maxWorkItemSizes[0]) .arg(m_maxWorkItemSizes[1])
         .arg(m_maxWorkItemSizes[2]));
     
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Max Work Group Size: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Max Work Group Size: %1")
         .arg(m_maxWorkGroupSize));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Device Max Clock Freq: %1 MHz")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Device Max Clock Freq: %1 MHz")
         .arg(m_maxClockFrequency));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Address Bits: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Address Bits: %1")
         .arg(m_addressBits));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Max Memory Alloc Size: %1 MByte")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Max Memory Alloc Size: %1 MByte")
         .arg(m_maxMemAllocSize));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Global Memory Size: %1 MByte")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Global Memory Size: %1 MByte")
         .arg(m_globalMemSize));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Error Correction Support: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Error Correction Support: %1")
         .arg(m_errCorrection ? "yes" : "no"));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Local Memory Type: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Local Memory Type: %1")
         .arg(m_memType == kOpenCLMemLocal ? "local" : "global"));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Local Memory Size: %1 KByte")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Local Memory Size: %1 KByte")
         .arg(m_localMemSize));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Max Const Buffer Size: %1 KByte")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Max Const Buffer Size: %1 KByte")
         .arg(m_maxConstBufSize));
 
     if( m_queueProperties & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE )
-        LOG(VB_GENERAL, LOG_INFO, "OpenCL Device Queue Properties: "
-                                  "CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE");    
+        LOG(VB_GPU, LOG_INFO, "OpenCL Device Queue Properties: "
+                              "CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE");    
     if( m_queueProperties & CL_QUEUE_PROFILING_ENABLE )
-        LOG(VB_GENERAL, LOG_INFO, "OpenCL Device Queue Properties: "
-                                  "CL_QUEUE_PROFILING_ENABLE");
+        LOG(VB_GPU, LOG_INFO, "OpenCL Device Queue Properties: "
+                              "CL_QUEUE_PROFILING_ENABLE");
 
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Image Support: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Image Support: %1")
         .arg(m_imageSupport ? "yes" : "no"));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Max Read Image Args: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Max Read Image Args: %1")
         .arg(m_maxReadImageArgs));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Max Write Image Args: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Max Write Image Args: %1")
         .arg(m_maxWriteImageArgs));
 
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GPU, LOG_INFO,
         QString("CL_DEVICE_SINGLE_FP_CONFIG: %1%2%3%4%5%6")
         .arg(m_fpConfig & CL_FP_DENORM ? "denorms " : "")
         .arg(m_fpConfig & CL_FP_INF_NAN ? "INF-quietNaNs " : "")
@@ -601,9 +601,9 @@ void OpenCLDevice::Display(void)
         .arg(m_fpConfig & CL_FP_ROUND_TO_INF ? "round-to-inf " : "")
         .arg(m_fpConfig & CL_FP_FMA ? "fma " : ""));
     
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL 2D Max Dims:  %1x%2")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL 2D Max Dims:  %1x%2")
         .arg(m_max2DImageSize[0]) .arg(m_max2DImageSize[1]));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL 3D Max Dims:  %1x%2x%3")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL 3D Max Dims:  %1x%2x%3")
         .arg(m_max3DImageSize[0]) .arg(m_max3DImageSize[1]) 
         .arg(m_max3DImageSize[2]));
 
@@ -611,18 +611,18 @@ void OpenCLDevice::Display(void)
     {
         for (QStringList::iterator it = m_extensions.begin();
              it != m_extensions.end(); ++it)
-            LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Extension: %1").arg(*it));
+            LOG(VB_GPU, LOG_INFO, QString("OpenCL Extension: %1").arg(*it));
     }
     else 
     {
-        LOG(VB_GENERAL, LOG_INFO, "OpenCL Extension: None");
+        LOG(VB_GPU, LOG_INFO, "OpenCL Extension: None");
     }
 
     if (m_vendorSpecific)
         m_vendorSpecific->Display();
 
     // CL_DEVICE_PREFERRED_VECTOR_WIDTH_<type>
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GPU, LOG_INFO,
         QString("OpenCL Preferred Vector Widths: CHAR %1, SHORT %2, INT %3, "
                 "LONG %4, FLOAT %5, DOUBLE %6")
         .arg(m_vectorWidth[0]) .arg(m_vectorWidth[1]) .arg(m_vectorWidth[2])
@@ -671,21 +671,21 @@ OpenCLDeviceNvidiaSpecific::OpenCLDeviceNvidiaSpecific(OpenCLDevice *parent) :
 
 void OpenCLDeviceNvidiaSpecific::Display(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL CUDA Capabilites: %1.%2")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL CUDA Capabilites: %1.%2")
         .arg(m_computeCapMajor) .arg(m_computeCapMinor));
 
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Multiprocessor Count: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Multiprocessor Count: %1")
         .arg(m_multiprocessors));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL CUDA Core Count: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL CUDA Core Count: %1")
         .arg(m_cudaCores));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Registers per Block: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Registers per Block: %1")
         .arg(m_regsPerBlock));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Warp Size: %1").arg(m_warpSize));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL GPU Overlap: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Warp Size: %1").arg(m_warpSize));
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL GPU Overlap: %1")
         .arg(m_gpuOverlap ? "yes" : "no"));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Kernel Exec Timeout: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Kernel Exec Timeout: %1")
         .arg(m_kernelExecTimeout ? "yes" : "no"));
-    LOG(VB_GENERAL, LOG_INFO, QString("OpenCL Integrated Memory: %1")
+    LOG(VB_GPU, LOG_INFO, QString("OpenCL Integrated Memory: %1")
         .arg(m_integratedMem ? "yes" : "no"));
 }
 

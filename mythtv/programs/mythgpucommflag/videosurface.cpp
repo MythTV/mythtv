@@ -91,7 +91,7 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, uint32_t width, uint32_t height,
                                     m_glOpenCLTex[i], &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("VDPAU: OpenCL binding #%1 failed: %2 (%3)")
                 .arg(i) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
             return;
@@ -156,7 +156,7 @@ VideoSurface::VideoSurface(OpenCLDevice *dev, VideoSurfaceType type,
                                         NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GPU, LOG_ERR,
                 QString("VDPAU: OpenCL Image Create #%1 failed: %2 (%3)")
                 .arg(i) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
             return;
@@ -238,7 +238,7 @@ void VideoSurface::Dump(QString basename, int framenum)
 
         ciErrNum = clGetImageInfo(m_clBuffer[i], CL_IMAGE_FORMAT,
                                   sizeof(format), &format, NULL);
-        LOG(VB_GENERAL, LOG_INFO,
+        LOG(VB_GPUVIDEO, LOG_INFO,
             QString("Buffer %1: Format - Order %2, Type %3")
             .arg(i) .arg(oclImageFormatString(format.image_channel_order))
             .arg(oclImageFormatString(format.image_channel_data_type)));
@@ -246,17 +246,17 @@ void VideoSurface::Dump(QString basename, int framenum)
         size_t elemSize, pitch, width, height;
         ciErrNum = clGetImageInfo(m_clBuffer[i], CL_IMAGE_ELEMENT_SIZE,
                                   sizeof(elemSize), &elemSize, NULL);
-        LOG(VB_GENERAL, LOG_INFO, QString("Element Size: %1") .arg(elemSize));
+        LOG(VB_GPUVIDEO, LOG_INFO, QString("Element Size: %1") .arg(elemSize));
 
         ciErrNum = clGetImageInfo(m_clBuffer[i], CL_IMAGE_ROW_PITCH,
                                   sizeof(pitch), &pitch, NULL);
-        LOG(VB_GENERAL, LOG_INFO, QString("Row Pitch: %1") .arg(pitch));
+        LOG(VB_GPUVIDEO, LOG_INFO, QString("Row Pitch: %1") .arg(pitch));
 
         ciErrNum = clGetImageInfo(m_clBuffer[i], CL_IMAGE_WIDTH,
                                   sizeof(width), &width, NULL);
         ciErrNum = clGetImageInfo(m_clBuffer[i], CL_IMAGE_HEIGHT,
                                   sizeof(height), &height, NULL);
-        LOG(VB_GENERAL, LOG_INFO, QString("Pixels: %1x%2") .arg(width)
+        LOG(VB_GPUVIDEO, LOG_INFO, QString("Pixels: %1x%2") .arg(width)
             .arg(height));
 
         char *buf = new char[pitch*height];
@@ -274,7 +274,7 @@ void VideoSurface::Dump(QString basename, int framenum)
         }
         QString filename = QString("out/%1%2-%3.%4") .arg(basename) .arg(i)
             .arg(framenum) .arg(extension);
-        LOG(VB_GENERAL, LOG_INFO, QString("Saving to %1").arg(filename));
+        LOG(VB_GPUVIDEO, LOG_INFO, QString("Saving to %1").arg(filename));
         QFile file(filename);
         file.open(QIODevice::WriteOnly);
 

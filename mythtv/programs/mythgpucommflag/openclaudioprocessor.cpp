@@ -51,12 +51,12 @@ unsigned int nextPow2( unsigned int x )
 FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                int count, int64_t pts, int rate)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OpenCL Volume Level");
+    LOG(VB_GPUAUDIO, LOG_INFO, "OpenCL Volume Level");
 
     AudioPacket *audioPacket = audioPacketMap.Lookup(samples);
     if (!audioPacket)
     {
-        LOG(VB_GENERAL, LOG_ERR, "packet not in map");
+        LOG(VB_GPU, LOG_ERR, "Audio packet not in map");
         return NULL;
     }
 
@@ -101,13 +101,13 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     {
         if (dev->m_float64)
         {
-            LOG(VB_GENERAL, LOG_INFO, "Using 64bit float kernels");
+            LOG(VB_GPUAUDIO, LOG_INFO, "Using 64bit float kernels");
             kern = kern64;
             kernCount = kern64Count;
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, "Using 32bit float kernels");
+            LOG(VB_GPUAUDIO, LOG_INFO, "Using 32bit float kernels");
             kern = kern32;
             kernCount = kern32Count;
         }
@@ -133,7 +133,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
         memBufs = new OpenCLBuffers(5);
         if (!memBufs)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Out of memory allocating OpenCL buffers");
+            LOG(VB_GPU, LOG_ERR, "Out of memory allocating OpenCL buffers");
             return NULL;
         }
 
@@ -144,7 +144,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                             NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error %1 creating windowData")
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating windowData")
                 .arg(ciErrNum));
             delete memBufs;
             return NULL;
@@ -156,7 +156,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                             NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error %1 creating reduceData")
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating reduceData")
                 .arg(ciErrNum));
             delete memBufs;
             return NULL;
@@ -169,7 +169,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                             globalResults, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error %1 creating globalData")
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating globalData")
                 .arg(ciErrNum));
             delete memBufs;
             return NULL;
@@ -181,7 +181,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                             NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error %1 creating intStatsData")
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating intStatsData")
                 .arg(ciErrNum));
             delete memBufs;
             return NULL;
@@ -193,7 +193,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                             NULL, &ciErrNum);
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error %1 creating fltStatsData")
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating fltStatsData")
                 .arg(ciErrNum));
             delete memBufs;
             return NULL;
@@ -228,7 +228,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
 
         if (ciErrNum != CL_SUCCESS)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+            LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
             delete memBufs;
             return NULL;
         }
@@ -246,7 +246,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
 
     if (ciErrNum != CL_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Error setting kernel arguments");
+        LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
         delete memBufs;
         return NULL;
     }
@@ -258,7 +258,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                       workDims, NULL, 0, NULL, NULL);
     if (ciErrNum != CL_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+        LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
             .arg(kern[0].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
         delete memBufs;
         return NULL;
@@ -272,7 +272,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                       0, NULL, NULL);
     if (ciErrNum != CL_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+        LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
             .arg(kern[1].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
         delete memBufs;
         return NULL;
@@ -284,7 +284,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
                                       &globalWorkDims, NULL, 0, NULL, NULL);
     if (ciErrNum != CL_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
+        LOG(VB_GPU, LOG_ERR, QString("Error running kernel %1: %2 (%3)")
             .arg(kern[2].entry) .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
         delete memBufs;
         return NULL;
@@ -303,7 +303,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
 
     if (ciErrNum != CL_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Error %1 reading results data 3")
+        LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data 3")
             .arg(ciErrNum));
         return NULL;
     }
@@ -311,7 +311,7 @@ FlagResults *OpenCLVolumeLevel(OpenCLDevice *dev, int16_t *samples, int size,
     float deltaRMSdB = floatStats[0] - floatStats[1];
 
 #if 1
-    LOG(VB_GENERAL, LOG_INFO,
+    LOG(VB_GPUAUDIO, LOG_INFO,
         QString("Window RMS: %1 dB, Overall RMS: %2 dB, Delta: %3 dB")
         .arg(floatStats[0]) .arg(floatStats[1]) .arg(deltaRMSdB) +
         QString("  Peak: %1 dB  DNR: %2 dB  (DC: %3) Shift: %4")
