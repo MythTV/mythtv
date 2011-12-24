@@ -295,9 +295,8 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
-    GPUPlayer *cfp = new GPUPlayer();
+    GPUPlayer *cfp = new GPUPlayer(kDecodeGPUCommflag);
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
-    ctx->SetSpecialDecode(kAVSpecialDecode_GPUDecode);
     ctx->SetPlayingInfo(&pginfo);
     ctx->SetRingBuffer(rb);
     ctx->SetPlayer(cfp);

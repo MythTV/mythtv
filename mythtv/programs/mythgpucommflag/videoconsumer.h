@@ -9,6 +9,17 @@
 #include "videoouttypes.h"
 #include "videoprocessor.h"
 
+// These seem to be defined above, then redefined below.  Curses!
+#undef CursorShape
+#undef None
+#undef Unsorted
+#undef Status
+#undef Bool
+#undef FocusIn
+#undef FocusOut
+#undef FontChange
+#include "mythplayer.h"
+
 class VideoConsumer : public QueueConsumer
 {
   public:
@@ -21,7 +32,7 @@ class VideoConsumer : public QueueConsumer
 
     bool m_useX;
     VideoDecoder *m_decoder;
-    AVSpecialDecode m_specialDecode;
+    PlayerFlags m_playerFlags;
     VideoProcessorList *m_proclist;
 };
 

@@ -50,7 +50,6 @@ SOURCES += openclvideoprocessor.cpp softwarevideoprocessor.cpp
 SOURCES += audiopacket.cpp videopacket.cpp videosurface.cpp
 SOURCES += vdpauvideodecoder.cpp ffmpegvideodecoder.cpp
 
-#The following line was inserted by qt3to4
 QT += xml sql network
 
 using_x11:DEFINES += USING_X11

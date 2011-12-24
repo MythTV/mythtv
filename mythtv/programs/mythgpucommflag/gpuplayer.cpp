@@ -30,7 +30,7 @@ bool GPUPlayer::ProcessFile(bool showPercentage, StatusCallback StatusCB,
 
     killdecoder = false;
     framesPlayed = 0;
-    using_null_videoout = true;
+    playerFlags = (PlayerFlags)((uint32_t)playerFlags | kVideoIsNull);
 
     if (OpenFile() < 0)
         return false;

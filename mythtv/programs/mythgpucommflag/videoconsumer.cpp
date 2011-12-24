@@ -32,16 +32,15 @@ VideoConsumer::VideoConsumer(PacketQueue *inQ, ResultsMap *outMap,
     else
         m_proclist = softwareVideoProcessorList;
 
-    m_specialDecode = (AVSpecialDecode)(kAVSpecialDecode_LowRes         |
-                                        kAVSpecialDecode_SingleThreaded |
-                                        kAVSpecialDecode_NoLoopFilter);
+    m_playerFlags = (PlayerFlags)(kDecodeLowRes | kDecodeSingleThreaded |
+                                  kDecodeNoLoopFilter);
 
     int x = gCoreContext->GetNumSetting("CommFlagFast", 0);
     LOG(VB_GENERAL, LOG_INFO, QString("CommFlagFast: %1").arg(x));
     if (x == 0)
-        m_specialDecode = kAVSpecialDecode_None;
-    LOG(VB_COMMFLAG, LOG_INFO, QString("Special Decode Flags: 0x%1")
-        .arg(m_specialDecode, 0, 16));
+        m_playerFlags = kNoFlags;
+    LOG(VB_COMMFLAG, LOG_INFO, QString("Player Flags: 0x%1")
+        .arg(m_playerFlags, 0, 16));
 
     m_context = avcodec_alloc_context();
 }
@@ -362,33 +361,33 @@ void VideoConsumer::InitVideoCodec(void)
             .arg(ff_codec_id_string(m_context->codec_id)));
     }
 
-    if (0 && m_specialDecode)
+    if (0 && m_playerFlags)
     {
         m_context->flags2 |= CODEC_FLAG2_FAST;
 
         if (m_codec->id == CODEC_ID_MPEG2VIDEO ||
             m_codec->id == CODEC_ID_MPEG1VIDEO)
         {
-            if (m_specialDecode & kAVSpecialDecode_FewBlocks)
+            if (m_playerFlags & kDecodeFewBlocks)
             {
                 uint total_blocks = (m_context->height+15) / 16;
                 m_context->skip_top     = (total_blocks+3) / 4;
                 m_context->skip_bottom  = (total_blocks+3) / 4;
             }
 
-            if (m_specialDecode & kAVSpecialDecode_LowRes)
+            if (m_playerFlags & kDecodeLowRes)
                 m_context->lowres = 2; // 1 = 1/2 size, 2 = 1/4 size
         }
         else if (m_codec->id == CODEC_ID_H264)
         {
-            if (m_specialDecode & kAVSpecialDecode_NoLoopFilter)
+            if (m_playerFlags & kDecodeNoLoopFilter)
             {
                 m_context->flags &= ~CODEC_FLAG_LOOP_FILTER;
                 m_context->skip_loop_filter = AVDISCARD_ALL;
             }
         }
 
-        if (m_specialDecode & kAVSpecialDecode_NoDecode)
+        if (m_playerFlags & kDecodeNoDecode)
         {
             m_context->skip_idct = AVDISCARD_ALL;
         }

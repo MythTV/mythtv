@@ -7,7 +7,7 @@
 class MTV_PUBLIC GPUPlayer : public MythPlayer
 {
   public:
-    GPUPlayer(bool muted = false) : MythPlayer(muted) { };
+    GPUPlayer(PlayerFlags flags = kNoFlags) : MythPlayer(flags) { };
     bool ProcessFile(bool showPercentage, StatusCallback StatusCB,
                      void *cbData, PacketQueue *audioQ, PacketQueue *videoQ);
 };
