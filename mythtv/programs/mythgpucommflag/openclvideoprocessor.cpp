@@ -865,6 +865,149 @@ void OpenCLDilate3x3(OpenCLDevice *dev, VideoSurface *in, VideoSurface *out)
     LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Dilate3x3 Done");
 }
 
+#define KERNEL_HISTOGRAM_CL "videoHistogram.cl"
+
+void OpenCLHistogram64(OpenCLDevice *dev, VideoSurface *in, uint32_t *out)
+{
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Histogram64");
+
+    static OpenCLKernelDef kern[] = {
+        { NULL, "videoHistogram64",     KERNEL_CONVERT_CL },
+        { NULL, "videoHistogramReduce", KERNEL_CONVERT_CL }
+    };
+    static int kernCount = sizeof(kern)/sizeof(kern[0]);
+
+    int ciErrNum;
+
+    cl_kernel kernel;
+
+    if (!dev->OpenCLLoadKernels(kern, kernCount, NULL))
+        return;
+
+    // Make sure previous commands are finished
+    clFinish(dev->m_commandQ);
+
+    // Setup the kernel arguments
+    int totDims[2] = { in->m_realWidth, in->m_realHeight };
+    int widthR  = PAD_VALUE(totDims[0], KERNEL_WAVELET_WORKSIZE);
+    int heightR = PAD_VALUE(totDims[1], KERNEL_WAVELET_WORKSIZE);
+
+    size_t globalWorkDims[2] = { widthR, heightR };
+    size_t localWorkDims[2]  = { KERNEL_WAVELET_WORKSIZE,
+                                 KERNEL_WAVELET_WORKSIZE };
+    size_t reduceWorkDims[2] = { widthR / KERNEL_WAVELET_WORKSIZE,
+                                 heightR / KERNEL_WAVELET_WORKSIZE };
+    size_t histcount = 64 * reduceWorkDims[0] * reduceWorkDims[1];
+
+    static OpenCLBufferPtr memBufs = NULL;
+
+    if (!memBufs)
+    {
+        memBufs = new OpenCLBuffers(2);
+        if (!memBufs)
+        {
+            LOG(VB_GPU, LOG_ERR, "Out of memory allocating OpenCL buffers");
+            return;
+        }
+
+        memBufs->m_bufs[0] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
+                                            sizeof(cl_uint4) * histcount,
+                                            NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating histogram")
+                .arg(ciErrNum));
+            delete memBufs;
+            return;
+        }
+
+        memBufs->m_bufs[1] = clCreateBuffer(dev->m_context, CL_MEM_READ_WRITE,
+                                            sizeof(cl_uint4) * 64,
+                                            NULL, &ciErrNum);
+        if (ciErrNum != CL_SUCCESS)
+        {
+            LOG(VB_GPU, LOG_ERR, QString("Error %1 creating histogram(top)")
+                .arg(ciErrNum));
+            delete memBufs;
+            return;
+        }
+    }
+
+    // for histogram64
+    kernel = kern[0].kernel->m_kernel;
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem),
+                               &in->m_clBuffer[0]);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem),
+                               &in->m_clBuffer[1]);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), memBufs->m_bufs[0]);
+    ciErrNum |= clSetKernelArg(kernel, 3, sizeof(cl_uint2), totDims);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
+        delete memBufs;
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 2, NULL,
+                                      globalWorkDims, localWorkDims, 0,
+                                      NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR,
+            QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
+        delete memBufs;
+        return;
+    }
+
+    // for histogramReduce
+    globalWorkDims[0] = (reduceWorkDims[0] + 1) / 2;
+    globalWorkDims[1] = (reduceWorkDims[1] + 1) / 2;
+
+    kernel = kern[1].kernel->m_kernel;
+    ciErrNum  = clSetKernelArg(kernel, 0, sizeof(cl_mem), memBufs->m_bufs[0]);
+    ciErrNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), memBufs->m_bufs[1]);
+    ciErrNum |= clSetKernelArg(kernel, 2, sizeof(cl_uint2), reduceWorkDims);
+
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, "Error setting kernel arguments");
+        delete memBufs;
+        return;
+    }
+
+    ciErrNum = clEnqueueNDRangeKernel(dev->m_commandQ, kernel, 2, NULL,
+                                      globalWorkDims, localWorkDims, 0,
+                                      NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR,
+            QString("Error running kernel %1: %2 (%3)")
+            .arg(kern[0].entry) .arg(ciErrNum)
+            .arg(openCLErrorString(ciErrNum)));
+        delete memBufs;
+        return;
+    }
+
+    // Read back the results (finally!)
+    ciErrNum  = clEnqueueReadBuffer(dev->m_commandQ, memBufs->m_bufs[1],
+                                    CL_TRUE, 0, 64 * sizeof(cl_uint4),
+                                    out, 0, NULL, NULL);
+    if (ciErrNum != CL_SUCCESS)
+    {
+        LOG(VB_GPU, LOG_ERR, QString("Error %1 reading results data")
+            .arg(ciErrNum));
+        delete memBufs;
+        return;
+    }
+
+    delete memBufs;
+
+    LOG(VB_GPUVIDEO, LOG_INFO, "OpenCL Histogram64 Done");
+}
+
 // Processors
 
 FlagResults *OpenCLEdgeDetect(OpenCLDevice *dev, AVFrame *frame,

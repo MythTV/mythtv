@@ -254,7 +254,7 @@ VideoSurface *VDPAUVideoDecoder::DecodeFrame(AVFrame *frame)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("VDPAU: OpenCL acquire failed: %2 (%3)")
-            .arg(ciErrNum) .arg(oclErrorString(ciErrNum)));
+            .arg(ciErrNum) .arg(openCLErrorString(ciErrNum)));
         return NULL;
     }
 
