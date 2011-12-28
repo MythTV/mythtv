@@ -2652,11 +2652,13 @@ int main(int argc, char **argv)
     // Don't listen to console input
     close(0);
 
-    CleanupGuard callCleanup(cleanup);
+    //CleanupGuard callCleanup(cleanup);
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
+        delete gContext;
+        gContext = NULL;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -2814,6 +2816,9 @@ int main(int argc, char **argv)
     }
     else
         cmdline.PrintHelp();
+
+    delete gContext;
+    gContext = NULL;
 
     exit(res);
 }
