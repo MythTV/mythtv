@@ -25,6 +25,10 @@
 #include <sys/stat.h>
 #include <sys/shm.h>
 
+#if _POSIX_MAPPED_FILES > 0L
+#include <sys/mman.h>
+#endif
+
 #ifdef linux
 #  include <sys/vfs.h>
 #  include <sys/statvfs.h>
@@ -216,6 +220,13 @@ ZMServer::ZMServer(int sock, bool debug)
     {
         snprintf(buf, sizeof(buf), "0x%x", (unsigned int)m_shmKey);
         cout << "Shared memory key is: " << buf << endl;
+    }
+
+    // get the MMAP path
+    m_mmapPath = getZMSetting("ZM_PATH_MAP");
+    if (m_debug)
+    {
+        cout << "Memory path directory is: " << m_mmapPath << endl;
     }
 
     // get the event filename format
@@ -1301,7 +1312,7 @@ void ZMServer::getMonitorList(void)
 
 void ZMServer::initMonitor(MONITOR *monitor)
 {
-    void *shm_ptr;
+    void *shm_ptr = NULL;
 
     monitor->shared_data = NULL;
     monitor->shared_images = NULL;
@@ -1324,35 +1335,69 @@ void ZMServer::initMonitor(MONITOR *monitor)
             ((monitor->image_buffer_count) * (sizeof(struct timeval))) +
             ((monitor->image_buffer_count) * monitor->frame_size);
 
-    int shmid;
 
-    if ((shmid = shmget((m_shmKey & 0xffffff00) | monitor->mon_id,
-         shared_data_size, SHM_R)) == -1)
+#if _POSIX_MAPPED_FILES > 0L
+    /*
+     * Try to open the mmap file first if the architecture supports it.
+     * Otherwise, legacy shared memory will be used below.
+     */
+    stringstream mmap_filename;
+    mmap_filename << m_mmapPath << "/zm.mmap." << monitor->mon_id;
+
+    int mapFile = open(mmap_filename.str().c_str(), O_RDONLY, 0x0);
+    if (mapFile >= 0)
     {
-        cout << "Failed to shmget for monitor: " << monitor->mon_id << endl;
-        monitor->status = "Error";
-        switch(errno)
+        if (m_debug)
+            cout << "Opened mmap file: " << mmap_filename << endl;
+
+        shm_ptr = mmap(NULL, shared_data_size, PROT_READ,
+                                            MAP_SHARED, mapFile, 0x0);
+        if (shm_ptr == NULL)
         {
-            case EACCES: cout << "EACCES - no rights to access segment\n"; break;
-            case EEXIST: cout << "EEXIST - segment already exists\n"; break;
-            case EINVAL: cout << "EINVAL - size < SHMMIN or size > SHMMAX\n"; break;
-            case ENFILE: cout << "ENFILE - limit on open files has been reached\n"; break;
-            case ENOENT: cout << "ENOENT - no segment exists for the given key\n"; break;
-            case ENOMEM: cout << "ENOMEM - couldn't reserve memory for segment\n"; break;
-            case ENOSPC: cout << "ENOSPC - shmmni or shmall limit reached\n"; break;
+            cout << "Failed to map shared memory from file [" << 
+                mmap_filename << "] " <<
+                "for monitor: " << 
+                monitor->mon_id << 
+                endl;
+            monitor->status = "Error";
+            return;
         }
-
-        return;
     }
-
-    shm_ptr = shmat(shmid, 0, SHM_RDONLY);
-
+#endif
 
     if (shm_ptr == NULL)
     {
-        cout << "Failed to shmat for monitor: " << monitor->mon_id << endl;
-        monitor->status = "Error";
-        return;
+        // fail back to shmget() functionality if mapping memory above failed.
+        int shmid;
+
+        if ((shmid = shmget((m_shmKey & 0xffffff00) | monitor->mon_id,
+             shared_data_size, SHM_R)) == -1)
+        {
+            cout << "Failed to shmget for monitor: " << monitor->mon_id << endl;
+            monitor->status = "Error";
+            switch(errno)
+            {
+                case EACCES: cout << "EACCES - no rights to access segment\n"; break;
+                case EEXIST: cout << "EEXIST - segment already exists\n"; break;
+                case EINVAL: cout << "EINVAL - size < SHMMIN or size > SHMMAX\n"; break;
+                case ENFILE: cout << "ENFILE - limit on open files has been reached\n"; break;
+                case ENOENT: cout << "ENOENT - no segment exists for the given key\n"; break;
+                case ENOMEM: cout << "ENOMEM - couldn't reserve memory for segment\n"; break;
+                case ENOSPC: cout << "ENOSPC - shmmni or shmall limit reached\n"; break;
+            }
+
+            return;
+        }
+
+        shm_ptr = shmat(shmid, 0, SHM_RDONLY);
+
+
+        if (shm_ptr == NULL)
+        {
+            cout << "Failed to shmat for monitor: " << monitor->mon_id << endl;
+            monitor->status = "Error";
+            return;
+        }
     }
 
     monitor->shared_data = (SharedData*)shm_ptr;
