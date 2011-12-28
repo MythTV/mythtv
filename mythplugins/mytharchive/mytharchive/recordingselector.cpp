@@ -500,19 +500,6 @@ void RecordingSelector::getRecordingList(void)
         for ( ; i != m_recordingList->end(); ++i)
         {
             p = *i;
-
-            // we can't handle recordings that have to be streamed to us
-            if (p->GetPlaybackURL(false, true).startsWith("myth://"))
-            {
-                LOG(VB_FILE, LOG_ERR,
-                    QString("MythArchive cannot handle this file because it "
-                            "isn't available locally - %1")
-                        .arg(p->GetPlaybackURL(false, true)));
-                i = m_recordingList->erase(i);
-                --i;
-                continue;
-            }
-
             // ignore live tv and deleted recordings
             if (p->GetRecordingGroup() == "LiveTV" ||
                 p->GetRecordingGroup() == "Deleted")

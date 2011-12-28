@@ -442,7 +442,11 @@ void MythBurn::updateArchiveList(void)
 
             // get duration of this file
             if (a->duration == 0)
-                getFileDetails(a);
+            {
+                if (!getFileDetails(a))
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("MythBurn: failed to get file details for: %1").arg(a->filename));
+             }
 
             // get default encoding profile if needed
 

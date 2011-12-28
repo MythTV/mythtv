@@ -223,7 +223,7 @@ static void runTestDVD(void)
     if (tempDir == "")
         return;
 
-    QString filename = tempDir + "work/dvd/";
+    QString filename = tempDir + "work/dvd";
     QString command = gCoreContext->GetSetting("MythArchiveDVDPlayerCmd", "");
 
     if ((command.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
