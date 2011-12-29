@@ -497,7 +497,10 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
                                           const QBrush &fillBrush,
                                           const QPen &linePen, int alpha)
 {
-    int rad = cornerRadius;
+    int lineWidth = linePen.width();
+    int halfline  = lineWidth / 2;
+    int rad = cornerRadius - halfline;
+
     if ((area.width() / 2) < rad)
         rad = area.width() / 2;
 
@@ -505,9 +508,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         rad = area.height() / 2;
     int dia = rad * 2;
 
-    int lineWidth = linePen.width();
-    QRect r(area.left() + lineWidth, area.top() + lineWidth,
-            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
+
+    QRect r(area.left() + halfline, area.top() + halfline,
+            area.width() - (halfline * 2), area.height() - (halfline * 2));
 
     QRect tl(r.left(),  r.top(), rad, rad);
     QRect tr(r.left() + r.width() - rad, r.top(), rad, rad);
@@ -620,8 +623,8 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
                           (linePen.color().alpha() / 255.0) * (alpha / 255.0));
 
         // Set the radius and width
-        m_parameters[0][2] = rad - lineWidth / 2.0 + 0.5;
-        m_parameters[0][3] = lineWidth / 2.0 + 0.25;
+        m_parameters[0][2] = rad - lineWidth / 2.0;
+        m_parameters[0][3] = lineWidth / 2.0;
 
         // Enable the edge shader
         SetShaderParams(edge, &m_projection[0][0], "u_projection");
