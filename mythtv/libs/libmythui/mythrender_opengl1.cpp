@@ -266,7 +266,7 @@ uint MythRenderOpenGL1::CreateHelperTexture(void)
 
     EnableTextures(tmp_tex);
     glBindTexture(m_textures[tmp_tex].m_type, tmp_tex);
-    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA16, width, 0, GL_RGBA, GL_FLOAT, buf);
+    m_glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA16, width, 0, GL_RGBA, GL_FLOAT, buf);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Created bicubic helper texture (%1 samples)") .arg(width));
@@ -365,6 +365,7 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
 {
     SetBlend(true);
     DisableTextures();
+    EnableShaderObject(0);
     glEnableClientState(GL_VERTEX_ARRAY);
 
     int lineWidth = linePen.width();
@@ -373,8 +374,10 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
 
     if (fillBrush.style() != Qt::NoBrush)
     {
+        int a = 255 * (((float)alpha / 255.0f) *
+                       ((float)fillBrush.color().alpha() / 255.0f));
         SetColor(fillBrush.color().red(), fillBrush.color().green(),
-                 fillBrush.color().blue(), fillBrush.color().alpha());
+                 fillBrush.color().blue(), a);
         GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, r);
         glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -382,8 +385,10 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
 
     if (linePen.style() != Qt::NoPen)
     {
+        int a = 255 * (((float)alpha / 255.0f) *
+                       ((float)fillBrush.color().alpha() / 255.0f));
         SetColor(linePen.color().red(), linePen.color().green(),
-                 linePen.color().blue(), linePen.color().alpha());
+                 linePen.color().blue(), a);
         glLineWidth(linePen.width());
         GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, r);
         glVertexPointer(2, GL_FLOAT, 0, vertices);
