@@ -82,6 +82,69 @@ class Spectrum : public VisualBase
 #endif
 };
 
+class Piano : public VisualBase
+{
+    // This class draws bars (up and down)
+    // based on the magnitudes at piano pitch
+    // frequencies in the audio data.
+
+#define PIANO_AUDIO_SIZE 4096
+#define PIANO_N 88
+
+#define piano_audio float
+#define goertzel_data float
+
+#define PIANO_RMS_NEGLIGIBLE .001
+#define PIANO_SPECTRUM_SMOOTHING 0.95
+#define PIANO_MIN_VOL -10
+#define PIANO_KEYPRESS_TOO_LIGHT .2
+
+typedef struct piano_key_data {
+    goertzel_data q1, q2, coeff, magnitude;
+    goertzel_data max_magnitude_seen;
+
+    // This keeps track of the samples processed for each note
+    // Low notes require a lot of samples to be correctly identified
+    // Higher ones are displayed quicker
+    int samples_processed;
+    int samples_process_before_display_update;
+
+    bool is_black_note; // These are painted on top of white notes, and have different colouring
+} piano_key_data;
+
+  public:
+    Piano();
+    virtual ~Piano();
+
+    virtual void resize(const QSize &size);
+
+    bool process(VisualNode *node);
+
+    // These functions are new, since we need to inspect all the data
+    bool processUndisplayed(VisualNode *node);
+    unsigned long getDesiredSamples(void);
+
+    virtual bool draw(QPainter *p, const QColor &back = Qt::black);
+    void handleKeyPress(const QString &action) {(void) action;}
+
+  protected:
+    inline double clamp(double cur, double max, double min);
+    bool process_all_types(VisualNode *node, bool this_will_be_displayed);
+    void zero_analysis(void);
+
+    QColor whiteStartColor, whiteTargetColor, blackStartColor, blackTargetColor;
+
+    vector<QRect> rects;
+    QSize size;
+
+    unsigned long offset_processed;
+
+    piano_key_data *piano_data;
+    piano_audio *audio_data;
+
+    vector<double> magnitude;
+};
+
 class AlbumArt : public VisualBase
 {
   public:
