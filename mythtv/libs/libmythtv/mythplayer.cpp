@@ -2176,6 +2176,25 @@ void MythPlayer::EnableFrameRateMonitor(bool enable)
     output_jmeter->SetNumCycles(rate);
 }
 
+void MythPlayer::ForceDeinterlacer(const QString &override)
+{
+    if (!videoOutput)
+        return;
+
+    bool normal = play_speed > 0.99f && play_speed < 1.01f && normal_speed;
+    videofiltersLock.lock();
+
+    m_double_framerate =
+         videoOutput->SetupDeinterlace(true, override) &&
+         videoOutput->NeedsDoubleFramerate();
+    m_double_process = videoOutput->IsExtraProcessingRequired();
+
+    if ((m_double_framerate && !CanSupportDoubleRate()) || !normal)
+        FallbackDeint();
+
+    videofiltersLock.unlock();
+}
+
 void MythPlayer::VideoStart(void)
 {
     if (!FlagIsSet(kVideoIsNull) && !player_ctx->IsPIP())

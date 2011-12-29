@@ -158,6 +158,7 @@ class MTV_PUBLIC MythPlayer
     void SetDuration(int duration);
     void SetVideoResize(const QRect &videoRect);
     void EnableFrameRateMonitor(bool enable = false);
+    void ForceDeinterlacer(const QString &override = QString());
 
     // Gets
     QSize   GetVideoBufferSize(void) const    { return video_dim; }

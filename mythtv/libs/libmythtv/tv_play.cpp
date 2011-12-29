@@ -10369,14 +10369,12 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
         osd->DialogAddButton(tr("Video Scan"),
                              "DIALOG_MENU_VIDEOSCAN_0", true,
                              selected == "VIDEOSCAN");
-        /*
         if (kScan_Progressive != scan_type)
         {
             osd->DialogAddButton(tr("Deinterlacer"),
                                  "DIALOG_MENU_DEINTERLACER_0", true,
                                  selected == "DEINTERLACER");
         }
-        */
         backaction = "VIDEO";
         currenttext = tr("Advanced");
     }
@@ -11302,8 +11300,8 @@ void TV::HandleDeinterlacer(PlayerContext *ctx, const QString &action)
 
     QString deint = action.mid(13);
     ctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (ctx->player && ctx->player->GetVideoOutput())
-        ctx->player->GetVideoOutput()->SetupDeinterlace(true, deint);
+    if (ctx->player)
+        ctx->player->ForceDeinterlacer(deint);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
