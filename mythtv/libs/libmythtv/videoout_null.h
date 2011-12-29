@@ -36,6 +36,8 @@ class VideoOutputNull : public VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     void MoveResizeWindow(QRect ) {;}
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                    const QString &name) { return false; }
 
   private:
     QMutex     global_lock;

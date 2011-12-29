@@ -42,8 +42,8 @@ class VideoOutputNullVAAPI : public VideoOutput
     virtual void MoveResizeWindow(QRect )                 {;}
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
         { return false; }
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
-        { return false; }
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                    const QString &name) { return false; }
     virtual MythPainter *GetOSDPainter(void) { return NULL; }
     virtual VideoFrame *GetLastDecodedFrame(void);
     virtual VideoFrame *GetLastShownFrame(void);
