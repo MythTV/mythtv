@@ -32,6 +32,8 @@ class InfoWidget;
 class Metadata;
 class MainVisual;
 
+#define SAMPLES_DEFAULT_SIZE 512
+
 class VisualNode
 {
 public:
@@ -60,10 +62,20 @@ class VisualBase
 
     // return true if the output should stop
     virtual bool process( VisualNode *node ) = 0;
+
+    // this is called on nodes that will not be displayed :: Not needed for most visualizations
+    // (i.e. between the displayed frames, if you need the whole audio stream)
+    virtual bool processUndisplayed( VisualNode * )
+    {
+        return true; // By default this does nothing : Ignore the in-between chunks of audio data
+    };
+
     virtual bool draw( QPainter *, const QColor & ) = 0;
     virtual void resize( const QSize &size ) = 0;
     virtual void handleKeyPress(const QString &action) = 0;
     virtual int getDesiredFPS(void) { return fps; }
+    // Override this if you need the potential of capturing more data than the default
+    virtual unsigned long getDesiredSamples(void) { return SAMPLES_DEFAULT_SIZE; }
     void drawWarning(QPainter *, const QColor &, const QSize &, QString);
 
   protected:
@@ -133,6 +145,7 @@ private:
     QList<VisualNode*> nodes;
     bool playing;
     int fps;
+    unsigned long samples;
     QTimer *timer;
     QTimer *bannerTimer;
     InfoWidget* info_widget;
