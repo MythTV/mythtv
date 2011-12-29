@@ -876,7 +876,8 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
 
 void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                                bool softwareDeinterlacing,
-                               long long frame, bool draw_border)
+                               long long frame, StereoscopicMode stereo,
+                               bool draw_border)
 {
     if (inputTextures.empty() || filters.empty())
         return;
@@ -938,6 +939,17 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                 trect.setBottom((trueheight / 2) + (trect.bottom() / 2));
                 trect.adjust(0, -bob, 0, -bob);
             }
+        }
+
+        // discard stereoscopic fields
+        if (filter->outputBuffer == kDefaultBuffer)
+        {
+            if (kStereoscopicModeSideBySideDiscard == stereo)
+                trect = QRectF(trect.left() / 2.0f,  trect.top(),
+                               trect.width() / 2.0f, trect.height());
+            if (kStereoscopicModeTopAndBottomDiscard == stereo)
+                trect = QRectF(trect.left(),  trect.top() / 2.0f,
+                               trect.width(), trect.height() / 2.0f);
         }
 
         // vertex coordinates

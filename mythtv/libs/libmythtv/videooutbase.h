@@ -262,6 +262,11 @@ class VideoOutput
     // Hue adjustment for certain vendors (mostly ATI)
     static int CalcHueBase(const QString &adaptor_name);
 
+    // 3D TV
+    virtual bool StereoscopicModesAllowed(void)     { return false;    }
+    void SetStereoscopicMode(StereoscopicMode mode) { m_stereo = mode; }
+    StereoscopicMode GetStereoscopicMode(void)      { return m_stereo; }
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,
@@ -343,6 +348,9 @@ class VideoOutput
 
     // Visualisation
     VideoVisual     *m_visual;
+
+    // 3D TV mode
+    StereoscopicMode m_stereo;
 };
 
 #endif

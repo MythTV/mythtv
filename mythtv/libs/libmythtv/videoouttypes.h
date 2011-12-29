@@ -105,6 +105,33 @@ typedef enum PictureAttributeSupported
     kPictureAttributeSupported_Volume       = 0x20,
 } PictureAttributeSupported;
 
+typedef enum StereoscopicMode
+{
+    kStereoscopicModeNone,
+    kStereoscopicModeSideBySide,
+    kStereoscopicModeSideBySideDiscard,
+    kStereoscopicModeTopAndBottom,
+    kStereoscopicModeTopAndBottomDiscard,
+} StereoscopicMode;
+
+inline QString StereoscopictoString(StereoscopicMode mode)
+{
+    switch (mode)
+    {
+        case kStereoscopicModeNone:
+            return QObject::tr("3D Off");
+        case kStereoscopicModeSideBySide:
+            return QObject::tr("3D Side by Side");
+        case kStereoscopicModeSideBySideDiscard:
+            return QObject::tr("3D Discard Side by Side");
+        case kStereoscopicModeTopAndBottom:
+            return QObject::tr("3D Top and Bottom");
+        case kStereoscopicModeTopAndBottomDiscard:
+            return QObject::tr("3D Discard Top and Bottom");
+    }
+    return QObject::tr("Unknown");
+}
+
 typedef enum VideoErrorState
 {
     kError_None            = 0x00,

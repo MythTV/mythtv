@@ -52,8 +52,12 @@ class VideoOutputOpenGL : public VideoOutput
 
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
         { return VideoOutput::CanVisualise(audio, gl_context);       }
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
-        { return VideoOutput::SetupVisualisation(audio, gl_context); }
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                    const QString &name)
+        { return VideoOutput::SetupVisualisation(audio, gl_context, name); }
+    virtual QStringList GetVisualiserList(void);
+
+    virtual bool StereoscopicModesAllowed(void) { return true; }
 
   protected:
     bool CreateCPUResources(void);

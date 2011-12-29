@@ -528,23 +528,55 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         gl_context->SetBackground(0, 0, 0, 255);
     gl_context->ClearFramebuffer();
 
-    MythMainWindow *mwnd = GetMythMainWindow();
-    if (gl_context->IsShared() && mwnd && window.IsEmbedding())
+    // stereoscopic views
+    QRect main   = gl_context->GetViewPort();
+    QRect first  = main;
+    QRect second = main;
+    bool twopass = (m_stereo == kStereoscopicModeSideBySide) ||
+                   (m_stereo == kStereoscopicModeTopAndBottom);
+
+    if (kStereoscopicModeSideBySide == m_stereo)
     {
-        if (mwnd->GetPaintWindow())
-            mwnd->GetPaintWindow()->setMask(QRegion());
-        mwnd->draw();
+        first  = QRect(main.left() / 2,  main.top(),
+                       main.width() / 2, main.height());
+        second = first.translated(main.width() / 2, 0);
+    }
+    else if (kStereoscopicModeTopAndBottom == m_stereo)
+    {
+        first  = QRect(main.left(),  main.top() / 2,
+                       main.width(), main.height() / 2);
+        second = first.translated(0, main.height() / 2);
     }
 
+    // main UI when embedded
+    MythMainWindow *mwnd = GetMythMainWindow();
+    if (gl_context->IsShared() && mwnd && mwnd->GetPaintWindow() &&
+        window.IsEmbedding())
+    {
+        if (twopass)
+            gl_context->SetViewPort(first, true);
+        mwnd->GetPaintWindow()->setMask(QRegion());
+        mwnd->draw();
+        if (twopass)
+        {
+            gl_context->SetViewPort(second, true);
+            mwnd->GetPaintWindow()->setMask(QRegion());
+            mwnd->draw();
+            gl_context->SetViewPort(main, true);
+        }
+    }
+
+    // video
     if (gl_videochain && !buffer->dummy)
     {
         gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
                                                   window.GetDisplayVideoRect(),
                                     window.GetVideoRect());
         gl_videochain->PrepareFrame(buffer->top_field_first, t,
-                                    m_deinterlacing, framesPlayed);
+                                    m_deinterlacing, framesPlayed, m_stereo);
     }
 
+    // PiPs/PBPs
     if (gl_pipchains.size())
     {
         QMap<MythPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();
@@ -553,17 +585,50 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
             if (gl_pip_ready[it.key()])
             {
                 bool active = gl_pipchain_active == *it;
+                if (twopass)
+                    gl_context->SetViewPort(first, true);
                 (*it)->PrepareFrame(buffer->top_field_first, t,
-                                    m_deinterlacing, framesPlayed, active);
+                                    m_deinterlacing, framesPlayed,
+                                    kStereoscopicModeNone, active);
+                if (twopass)
+                {
+                    gl_context->SetViewPort(second, true);
+                    (*it)->PrepareFrame(buffer->top_field_first, t,
+                                    m_deinterlacing, framesPlayed,
+                                    kStereoscopicModeNone, active);
+                    gl_context->SetViewPort(main);
+                }
             }
         }
     }
 
+    // visualisation
     if (m_visual && gl_painter && !window.IsEmbedding())
+    {
+        if (twopass)
+            gl_context->SetViewPort(first, true);
         m_visual->Draw(GetTotalOSDBounds(), gl_painter, NULL);
+        if (twopass)
+        {
+            gl_context->SetViewPort(second, true);
+            m_visual->Draw(GetTotalOSDBounds(), gl_painter, NULL);
+            gl_context->SetViewPort(main);
+        }
+    }
 
+    // OSD
     if (osd && gl_painter && !window.IsEmbedding())
+    {
+        if (twopass)
+            gl_context->SetViewPort(first, true);
         osd->DrawDirect(gl_painter, GetTotalOSDBounds().size(), true);
+        if (twopass)
+        {
+            gl_context->SetViewPort(second, true);
+            osd->DrawDirect(gl_painter, GetTotalOSDBounds().size(), true);
+            gl_context->SetViewPort(main);
+        }
+    }
 
     gl_context->Flush(false);
 
@@ -892,4 +957,11 @@ bool VideoOutputOpenGL::ApproveDeintFilter(const QString& filtername) const
         return true;
 
     return VideoOutput::ApproveDeintFilter(filtername);
+}
+
+QStringList VideoOutputOpenGL::GetVisualiserList(void)
+{
+    if (gl_context)
+        return VideoVisual::GetVisualiserList(gl_context->Type());
+    return VideoOutput::GetVisualiserList();
 }

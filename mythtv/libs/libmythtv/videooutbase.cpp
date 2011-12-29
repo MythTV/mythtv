@@ -408,7 +408,10 @@ VideoOutput::VideoOutput() :
     osd_painter(NULL),                  osd_image(NULL),
 
     // Visualisation
-    m_visual(NULL)
+    m_visual(NULL),
+
+    // 3D TV
+    m_stereo(kStereoscopicModeNone)
 {
     memset(&pip_tmp_image, 0, sizeof(pip_tmp_image));
     db_display_dim = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
