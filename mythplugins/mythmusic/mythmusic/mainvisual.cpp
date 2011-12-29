@@ -78,7 +78,7 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 }
 
 MainVisual::MainVisual(QWidget *parent, const char *name)
-    : QWidget(parent), vis(0), playing(false), fps(20),
+    : QWidget(parent), vis(0), playing(false), fps(20), samples(SAMPLES_DEFAULT_SIZE), 
       timer (0), bannerTimer(0), info_widget(0)
 {
     setObjectName(name);
@@ -144,6 +144,7 @@ void MainVisual::setVisual(const QString &name)
             vis = pVisFactory->create(this, (long int) winId(), pluginName);
             vis->resize(size());
             fps = vis->getDesiredFPS();
+            samples = vis->getDesiredSamples();
             break;
         }
     }
@@ -163,44 +164,49 @@ void MainVisual::prepare()
     }
 }
 
+// This is called via : mythtv/libs/libmyth/output.cpp :: OutputListeners::dispatchVisual
+//    from : mythtv/libs/libmyth/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
 // Caller holds mutex() lock
-void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int p)
+void MainVisual::add(uchar *buffer, unsigned long b_len, unsigned long timecode, int source_channels, int bits_per_sample)
 {
-    long len = b_len, cnt;
+    unsigned long len = b_len, cnt;
     short *l = 0, *r = 0;
 
-    len /= c;
-    len /= (p / 8);
+    // len is length of buffer in fully converted samples 
+    len /= source_channels;
+    len /= (bits_per_sample / 8);
 
-#define SAMPLES 512
-    if (len > SAMPLES)
-        len = SAMPLES;
+    //LOG(VB_GENERAL, LOG_INFO, QString("MainVisual : add(samples=%1, timecode=%2)").arg(len).arg(timecode));
+
+// #define SAMPLES 512 // Now a member variable
+    if (len > samples)
+        len = samples;
 
     cnt = len;
 
-    if (c == 2)
+    if (source_channels == 2)
     {
         l = new short[len];
         r = new short[len];
 
-        if (p == 8)
-            stereo16_from_stereopcm8(l, r, b, cnt);
-        else if (p == 16)
-            stereo16_from_stereopcm16(l, r, (short *) b, cnt);
+        if (bits_per_sample == 8)
+            stereo16_from_stereopcm8(l, r, buffer, cnt);
+        else if (bits_per_sample == 16)
+            stereo16_from_stereopcm16(l, r, (short *) buffer, cnt);
     }
-    else if (c == 1)
+    else if (source_channels == 1)
     {
         l = new short[len];
 
-        if (p == 8)
-            mono16_from_monopcm8(l, b, cnt);
-        else if (p == 16)
-            mono16_from_monopcm16(l, (short *) b, cnt);
+        if (bits_per_sample == 8)
+            mono16_from_monopcm8(l, buffer, cnt);
+        else if (bits_per_sample == 16)
+            mono16_from_monopcm16(l, (short *) buffer, cnt);
     }
     else
         len = 0;
 
-    nodes.append(new VisualNode(l, r, len, w));
+    nodes.append(new VisualNode(l, r, len, timecode));
 }
 
 void MainVisual::timeout()
@@ -219,6 +225,12 @@ void MainVisual::timeout()
             if ((int64_t)n->offset > synctime)
                 break;
             nodes.pop_front();
+        
+            if (vis) 
+            {
+                //LOG(VB_GENERAL, LOG_INFO, QString("Discarding node data at %1").arg(synctime));
+                vis->process_undisplayed(node);
+            }
 
             delete node;
             node = n;
@@ -233,7 +245,7 @@ void MainVisual::timeout()
         stop = vis->process(node);
         QPainter p(&pixmap);
         if (vis->draw(&p, Qt::black))
-            update();
+            update();  // This implictly picks up the data in pixmap, filled in by draw
     }
 
     if (!playing && stop)
@@ -519,7 +531,7 @@ bool StereoScope::process( VisualNode *node )
 
     if (node) {
         double index = 0;
-        double const step = (double)SAMPLES / size.width();
+        double const step = (double)SAMPLES_DEFAULT_SIZE / size.width();
         for ( int i = 0; i < size.width(); i++) {
             unsigned long indexTo = (unsigned long)(index + step);
             if (indexTo == (unsigned long)(index))
@@ -722,7 +734,7 @@ bool MonoScope::process( VisualNode *node )
     if (node)
     {
         double index = 0;
-        double const step = (double)SAMPLES / size.width();
+        double const step = (double)SAMPLES_DEFAULT_SIZE / size.width();
         for (int i = 0; i < size.width(); i++)
         {
             unsigned long indexTo = (unsigned long)(index + step);
