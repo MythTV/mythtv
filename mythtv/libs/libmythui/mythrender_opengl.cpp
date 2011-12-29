@@ -149,7 +149,7 @@ void MythRenderOpenGL::MoveResizeWindow(const QRect &rect)
         parent->setGeometry(rect);
 }
 
-void MythRenderOpenGL::SetViewPort(const QRect &rect)
+void MythRenderOpenGL::SetViewPort(const QRect &rect, bool viewportonly)
 {
     if (rect == m_viewport)
         return;
@@ -157,7 +157,8 @@ void MythRenderOpenGL::SetViewPort(const QRect &rect)
     m_viewport = rect;
     glViewport(m_viewport.left(), m_viewport.top(),
                m_viewport.width(), m_viewport.height());
-    SetMatrixView();
+    if (!viewportonly)
+        SetMatrixView();
     doneCurrent();
 }
 

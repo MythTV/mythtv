@@ -120,7 +120,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     bool  IsRecommendedRenderer(void);
 
     void  MoveResizeWindow(const QRect &rect);
-    void  SetViewPort(const QRect &rect);
+    void  SetViewPort(const QRect &rect, bool viewportonly = false);
+    QRect GetViewPort(void) { return m_viewport; }
     void  Flush(bool use_fence);
     void  SetBlend(bool enable);
     virtual void SetColor(int r, int g, int b, int a) { }
