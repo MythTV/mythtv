@@ -60,8 +60,9 @@ class VideoOutputD3D : public VideoOutput
 
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
         { return VideoOutput::CanVisualise(audio, (MythRender*)m_render); }
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
-        { return VideoOutput::SetupVisualisation(audio, (MythRender*)m_render); }
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                    const QString &name)
+        { return VideoOutput::SetupVisualisation(audio, (MythRender*)m_render, name); }
 
   private:
     void TearDown(void);

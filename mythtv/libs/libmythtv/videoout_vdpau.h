@@ -66,8 +66,9 @@ class VideoOutputVDPAU : public VideoOutput
 
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
         { return VideoOutput::CanVisualise(audio, m_render);       }
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
-        { return VideoOutput::SetupVisualisation(audio, m_render); }
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                    const QString &name)
+        { return VideoOutput::SetupVisualisation(audio, m_render, name); }
     virtual void ClearDummyFrame(VideoFrame* frame);
 
   private:
