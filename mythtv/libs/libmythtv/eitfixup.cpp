@@ -56,6 +56,7 @@ EITFixUp::EITFixUp()
       m_ukExclusionFromSubtitle("(starring|stars\\s|drama|series|sitcom)",Qt::CaseInsensitive),
       m_ukCompleteDots("^\\.\\.+$"),
       m_ukAllNew("All New To 4Music!\\s?"),
+      m_ukQuotedSubtitle("(?:^')([\\w\\s\\-,]+)(?:\\.' )"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -543,7 +544,7 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
     QStringList strListColon = event.description.split(":");
     QStringList strListEnd;
 
-    bool fColon = false;
+    bool fColon = false, fQuotedSubtitle = false;
     int nPosition1;
     QString strEnd;
     if (strListColon.count()>1)
@@ -605,10 +606,17 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
              fColon = true;
          }
     }
+    QRegExp tmpQuotedSubtitle = m_ukQuotedSubtitle;
+    if (tmpQuotedSubtitle.indexIn(event.description) != -1)
+    {
+        event.subtitle = tmpQuotedSubtitle.cap(1);
+        event.description.remove(m_ukQuotedSubtitle);
+        fQuotedSubtitle = true;
+    }
     QStringList strListPeriod;
     QStringList strListQuestion;
     QStringList strListExcl;
-    if (!fColon)
+    if (!(fColon || fQuotedSubtitle))
     {
         strListPeriod = event.description.split(".");
         if (strListPeriod.count() >1)

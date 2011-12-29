@@ -134,6 +134,7 @@ class EITFixUp
     const QRegExp m_ukYearColon;
     const QRegExp m_ukExclusionFromSubtitle;
     const QRegExp m_ukCompleteDots;
+    const QRegExp m_ukQuotedSubtitle;
     const QRegExp m_ukAllNew;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
