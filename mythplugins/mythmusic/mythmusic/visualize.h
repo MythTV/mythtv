@@ -121,7 +121,7 @@ typedef struct piano_key_data {
     bool process(VisualNode *node);
 
     // These functions are new, since we need to inspect all the data
-    bool process_undisplayed(VisualNode *node);
+    bool processUndisplayed(VisualNode *node);
     unsigned long getDesiredSamples(void);
 
     virtual bool draw(QPainter *p, const QColor &back = Qt::black);

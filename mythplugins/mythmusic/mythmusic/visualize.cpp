@@ -320,7 +320,7 @@ Piano::Piano()
 
     double sample_rate = 44100.0;  // TODO : This should be obtained from gPlayer (likely candidate...)
 
-    fps = 20; // This is the display frequency.   We're capturing all audio chunks by defining .process_undisplayed() though.
+    fps = 20; // This is the display frequency.   We're capturing all audio chunks by defining .processUndisplayed() though.
 
     double concert_A   =   440.0;
     double semi_tone   = pow(2.0, 1.0/12.0);
@@ -486,7 +486,7 @@ unsigned long Piano::getDesiredSamples(void)
     return (unsigned long) PIANO_AUDIO_SIZE;  // Maximum we can be given
 }
 
-bool Piano::process_undisplayed(VisualNode *node)
+bool Piano::processUndisplayed(VisualNode *node)
 {
     //LOG(VB_GENERAL, LOG_INFO, QString("Piano : Processing undisplayed node"));
     return process_all_types(node, false);
