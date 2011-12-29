@@ -4371,16 +4371,21 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
     return handled;
 }
 
-void TV::EnableVisualisation(const PlayerContext *ctx, bool enable, bool toggle)
+void TV::EnableVisualisation(const PlayerContext *ctx, bool enable,
+                            bool toggle, const QString &action)
 {
+    QString visualiser = QString("");
+    if (action.startsWith("VISUALISER"))
+        visualiser = action.mid(11);
+
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player && ctx->player->CanVisualise())
     {
-        bool want = enable;
-        if (toggle)
+        bool want = enable || !visualiser.isEmpty();
+        if (toggle && visualiser.isEmpty())
             want = !ctx->player->IsVisualising();
-        bool on = ctx->player->EnableVisualisation(want);
-        SetOSDMessage(ctx, on ? tr("Visualisation On") :
+        bool on = ctx->player->EnableVisualisation(want, visualiser);
+        SetOSDMessage(ctx, on ? ctx->player->GetVisualiserName() :
                                 tr("Visualisation Off"));
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -10001,6 +10006,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         EditSchedule(actx, kScheduledRecording);
     else if (action == ACTION_VIEWSCHEDULED)
         EditSchedule(actx, kViewSchedule);
+    else if (action.startsWith("VISUALISER"))
+        EnableVisualisation(actx, true, false, action);
     else if (HandleJumpToProgramAction(actx, QStringList(action)))
     {
     }
@@ -10166,14 +10173,14 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
     uint curtrack = ~0;
     bool avsync = true;
     bool visual = false;
-    bool active = false;
+    QString active = QString("");
     bool upmixing = false;
     bool canupmix = false;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
         visual = ctx->player->CanVisualise();
-        active = ctx->player->IsVisualising();
+        active = ctx->player->GetVisualiserName();
         tracks = ctx->player->GetTracks(kTrackTypeAudio);
         if (!tracks.empty())
             curtrack = (uint) ctx->player->GetTrack(kTrackTypeAudio);
@@ -10205,16 +10212,13 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
         }
         if (avsync)
             osd->DialogAddButton(tr("Adjust Audio Sync"), ACTION_TOGGELAUDIOSYNC);
-        if (visual && !active)
+        if (visual)
         {
-            osd->DialogAddButton(tr("Enable Visualisation"),
-                                 ACTION_ENABLEVISUALISATION);
+            osd->DialogAddButton(tr("Visualisation"),
+                                 "DIALOG_MENU_VISUALISATIONS_0", true,
+                                 selected == "VISUALISATIONS");
         }
-        if (visual && active)
-        {
-            osd->DialogAddButton(tr("Disable Visualisation"),
-                                 ACTION_DISABLEVISUALISATION);
-        }
+
         if (canupmix)
         {
             if (upmixing)
@@ -10239,6 +10243,25 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
             osd->DialogAddButton(tracks[i],
                                  "SELECTAUDIO_" + QString::number(i),
                                  false, i == curtrack);
+        }
+    }
+    else if (category == "VISUALISATIONS")
+    {
+        backaction = "AUDIO";
+        currenttext = tr("Visualisation");
+        osd->DialogAddButton(tr("None"),
+                             ACTION_DISABLEVISUALISATION, false,
+                             active.isEmpty());
+        QStringList visualisers;
+        ctx->LockDeletePlayer(__FILE__, __LINE__);
+        if (ctx->player)
+            visualisers = ctx->player->GetVisualiserList();
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        for (int i = 0; i < visualisers.size(); i++)
+        {
+            osd->DialogAddButton(visualisers[i],
+                "VISUALISER_" + visualisers[i], false,
+                active == visualisers[i]);
         }
     }
 }

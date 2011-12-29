@@ -45,3 +45,25 @@ bool VideoVisualCircles::InitialisePriv(void)
         QString("Initialised Circles with %1 circles.") .arg(m_scale.range()));
     return true;
 }
+
+static class VideoVisualCirclesFactory : public VideoVisualFactory
+{
+  public:
+    const QString &name(void) const
+    {
+        static QString name("Circles");
+        return name;
+    }
+
+    VideoVisual *Create(AudioPlayer *audio,
+                        MythRender  *render) const
+    {
+        return new VideoVisualCircles(audio, render);
+    }
+
+    virtual bool SupportedRenderer(RenderType type)
+    {
+        return (type == kRenderOpenGL2 ||
+                type == kRenderOpenGL2ES);
+    }
+} VideoVisualCirclesFactory;

@@ -4897,10 +4897,24 @@ bool MythPlayer::IsVisualising(void)
     return false;
 }
 
-bool MythPlayer::EnableVisualisation(bool enable)
+QString MythPlayer::GetVisualiserName(void)
 {
     if (videoOutput)
-        return videoOutput->EnableVisualisation(&audio, enable);
+        return videoOutput->GetVisualiserName();
+    return false;
+}
+
+QStringList MythPlayer::GetVisualiserList(void)
+{
+    if (videoOutput)
+        return videoOutput->GetVisualiserList();
+    return QStringList();
+}
+
+bool MythPlayer::EnableVisualisation(bool enable, const QString &name)
+{
+    if (videoOutput)
+        return videoOutput->EnableVisualisation(&audio, enable, name);
     return false;
 }
 

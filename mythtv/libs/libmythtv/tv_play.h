@@ -496,7 +496,8 @@ class MTV_PUBLIC TV : public QObject
 
     // Sundry on screen
     void ITVRestart(PlayerContext*, bool isLive);
-    void EnableVisualisation(const PlayerContext*, bool enable, bool toggle = false);
+    void EnableVisualisation(const PlayerContext*, bool enable, bool toggle = false,
+                             const QString &action = QString(""));
 
     // Manual zoom mode
     void SetManualZoom(const PlayerContext *, bool enabled, QString msg);

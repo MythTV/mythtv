@@ -1420,14 +1420,15 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     return show;
 }
 
-bool VideoOutput::EnableVisualisation(AudioPlayer *audio, bool enable)
+bool VideoOutput::EnableVisualisation(AudioPlayer *audio, bool enable,
+                                      const QString &name)
 {
     if (!enable)
     {
         DestroyVisualisation();
         return false;
     }
-    return SetupVisualisation(audio, NULL);
+    return SetupVisualisation(audio, NULL, name);
 }
 
 bool VideoOutput::CanVisualise(AudioPlayer *audio, MythRender *render)
@@ -1435,11 +1436,24 @@ bool VideoOutput::CanVisualise(AudioPlayer *audio, MythRender *render)
     return VideoVisual::CanVisualise(audio, render);
 }
 
-bool VideoOutput::SetupVisualisation(AudioPlayer *audio, MythRender *render)
+bool VideoOutput::SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                     const QString &name)
 {
     DestroyVisualisation();
-    m_visual = VideoVisual::Create(audio, render);
+    m_visual = VideoVisual::Create(name, audio, render);
     return m_visual;
+}
+
+QString VideoOutput::GetVisualiserName(void)
+{
+    if (m_visual)
+        return m_visual->Name();
+    return QString("");
+}
+
+QStringList VideoOutput::GetVisualiserList(void)
+{
+    return QStringList();
 }
 
 void VideoOutput::DestroyVisualisation(void)

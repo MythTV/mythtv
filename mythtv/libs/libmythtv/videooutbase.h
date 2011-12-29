@@ -249,10 +249,14 @@ class VideoOutput
     QRect   GetSafeRect(void);
 
     // Visualisations
-    bool EnableVisualisation(AudioPlayer *audio, bool enable);
+    bool EnableVisualisation(AudioPlayer *audio, bool enable,
+                             const QString &name = QString(""));
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render);
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render);
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                    const QString &name);
     VideoVisual* GetVisualisation(void) { return m_visual; }
+    QString GetVisualiserName(void);
+    virtual QStringList GetVisualiserList(void);
     void DestroyVisualisation(void);
 
     // Hue adjustment for certain vendors (mostly ATI)
