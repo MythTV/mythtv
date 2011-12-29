@@ -358,7 +358,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         if (oldsafe != m_safeArea)
         {
             changed = true;
-            int height = (m_safeArea.height() * m_textFontZoom) / 1800;
+            int height = (m_safeArea.height() * m_textFontZoom) / 2000;
             gTextSubFont->GetFace()->setPixelSize(height);
             gTextSubFont->GetFace()->setItalic(false);
             gTextSubFont->GetFace()->setUnderline(false);
@@ -445,7 +445,7 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
         m_safeArea = m_player->GetVideoOutput()->GetSafeRect();
         if (oldsafe != m_safeArea)
         {
-            int height = (m_safeArea.height() * m_textFontZoom) / 1800;
+            int height = (m_safeArea.height() * m_textFontZoom) / 2000;
             gTextSubFont->GetFace()->setPixelSize(height);
             gTextSubFont->GetFace()->setItalic(false);
             gTextSubFont->GetFace()->setUnderline(false);
@@ -719,7 +719,8 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     bool teletextmode = (*i)->teletextmode;
     int xscale = teletextmode ? 40 : 36;
     int yscale = teletextmode ? 25 : 17;
-    gTextSubFont->GetFace()->setPixelSize(m_safeArea.height() / (yscale * 1.2));
+    gTextSubFont->GetFace()->setPixelSize(m_safeArea.height() /
+                                          (yscale * 1.1765f));
     QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
 
     for (; i != textlist->buffers.end(); ++i)
