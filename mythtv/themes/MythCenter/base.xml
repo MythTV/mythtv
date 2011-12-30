@@ -263,10 +263,13 @@
                     <cornerradius>4</cornerradius>
                 </shape>
             </state>
-            <state name="selectedinactive" from="selectedactive">
+
+            <state name="selectedinactive" from="active">
                 <shape name="selectbar">
-                    <line color="#00FF00" alpha="50" width="1" />
-                    <fill color="#43b038" alpha="30" />
+                    <area>5,-4,750,29</area>
+                    <type>roundbox</type>
+                    <line color="#00FF00" alpha="100" width="1" />
+                    <fill color="#43b038" alpha="50" />
                     <cornerradius>4</cornerradius>
                 </shape>
             </state>
