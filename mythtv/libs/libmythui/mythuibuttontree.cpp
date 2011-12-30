@@ -367,6 +367,12 @@ bool MythUIButtonTree::SetCurrentNode(MythGenericTree *node)
     return SetNodeByString(route);
 }
 
+void MythUIButtonTree::ShowSearchDialog(void)
+{
+    if (m_activeList)
+        m_activeList->ShowSearchDialog();
+}
+
 bool MythUIButtonTree::DoSetCurrentNode(MythGenericTree *node)
 {
     if (node)

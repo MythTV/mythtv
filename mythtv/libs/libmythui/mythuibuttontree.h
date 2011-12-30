@@ -28,6 +28,7 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
     bool SetNodeByString(QStringList route);
     bool SetNodeById(QList<int> route);
     bool SetCurrentNode(MythGenericTree *node);
+    void ShowSearchDialog(void);
     MythGenericTree* GetCurrentNode(void) const { return m_currentNode; }
 
     void SetActive(bool active);
