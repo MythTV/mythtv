@@ -422,7 +422,7 @@ namespace
             else
                 VideoPlayerCommand::PlayerFor(item.get()).Play();
 
-            if (item->GetChildID() > 0)
+            if (item->GetChildID() > 0 && video_list.byID(item->GetChildID()))
                 item = video_list.byID(item->GetChildID());
             else
                 break;
