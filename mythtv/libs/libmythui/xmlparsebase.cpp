@@ -695,12 +695,16 @@ bool XMLParseBase::doLoad(const QString &windowname,
             if (onlywindows && e.tagName() == "window")
             {
                 QString name = e.attribute("name", "");
+                QString include = e.attribute("include", "");
                 if (name.isEmpty())
                 {
                     VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, e,
                                 "Window needs a name");
                     return false;
                 }
+
+                if (!include.isEmpty())
+                    LoadBaseTheme(include);
 
                 if (name == windowname)
                 {
