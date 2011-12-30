@@ -2390,34 +2390,8 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SEARCH")
         {
-            MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-            SearchButtonListDialog *dlg = new SearchButtonListDialog(popupStack, "MythSearchListDialog", this, "");
-
-            if (dlg->Create())
-            {
-                if (m_searchPosition.x() != -2 || m_searchPosition.y() != -2)
-                {
-                    int x = m_searchPosition.x();
-                    int y = m_searchPosition.y();
-                    QRect screenArea = GetMythMainWindow()->GetUIScreenRect();
-                    QRect dialogArea = dlg->GetArea();
-
-                    if (x == -1)
-                        x = (screenArea.width() - dialogArea.width()) / 2;
-
-                    if (y == -1)
-                        y = (screenArea.height() - dialogArea.height()) / 2;
-
-                    dlg->SetPosition(x, y);
-                }
-
-                popupStack->AddScreen(dlg);
-            }
-            else
-                delete dlg;
+            ShowSearchDialog();
         }
-
         else
             handled = false;
     }
@@ -2787,6 +2761,36 @@ void MythUIButtonList::updateLCD(void)
 
     if (!menuItems.isEmpty())
         lcddev->switchToMenu(menuItems, m_lcdTitle);
+}
+
+void MythUIButtonList::ShowSearchDialog(void)
+{
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    SearchButtonListDialog *dlg = new SearchButtonListDialog(popupStack, "MythSearchListDialog", this, "");
+
+    if (dlg->Create())
+    {
+        if (m_searchPosition.x() != -2 || m_searchPosition.y() != -2)
+        {
+            int x = m_searchPosition.x();
+            int y = m_searchPosition.y();
+            QRect screenArea = GetMythMainWindow()->GetUIScreenRect();
+            QRect dialogArea = dlg->GetArea();
+
+            if (x == -1)
+                x = (screenArea.width() - dialogArea.width()) / 2;
+
+            if (y == -1)
+                y = (screenArea.height() - dialogArea.height()) / 2;
+
+            dlg->SetPosition(x, y);
+        }
+
+        popupStack->AddScreen(dlg);
+    }
+    else
+        delete dlg;
 }
 
 bool MythUIButtonList::Find(const QString &searchStr, bool startsWith)

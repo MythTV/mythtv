@@ -175,6 +175,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     void updateLCD(void);
 
     void SetSearchFields(const QString &fields) { m_searchFields = fields; }
+    void ShowSearchDialog(void);
     bool Find(const QString &searchStr, bool startsWith = false);
     bool FindNext(void);
     bool FindPrev(void);
