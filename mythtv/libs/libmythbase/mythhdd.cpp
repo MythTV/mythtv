@@ -52,22 +52,23 @@ MythMediaStatus MythHDD::checkMedia(void)
     // device is not mounted
     switch (m_Status)
     {
-    case MEDIASTAT_NOTMOUNTED:
-        // a removable device was just plugged in try to mount it.
-        LOG(VB_MEDIA, LOG_INFO, "MythHDD::checkMedia try mounting " + m_DevicePath);
+        case MEDIASTAT_NOTMOUNTED:
+            // a removable device was just plugged in try to mount it.
+            LOG(VB_MEDIA, LOG_INFO, "MythHDD::checkMedia try mounting " +
+                m_DevicePath);
 
-        if (mount())
-            return setStatus(MEDIASTAT_MOUNTED);
+            if (mount())
+                return setStatus(MEDIASTAT_MOUNTED);
 
-        return setStatus(MEDIASTAT_ERROR);
+            return setStatus(MEDIASTAT_ERROR);
 
-    case MEDIASTAT_MOUNTED:
-        // device was mounted and someone unmounted it.
-        return setStatus(MEDIASTAT_NOTMOUNTED);
+        case MEDIASTAT_MOUNTED:
+            // device was mounted and someone unmounted it.
+            return setStatus(MEDIASTAT_NOTMOUNTED);
 
-    default:
-        // leave device state as is
-        return m_Status;
+        default:
+            // leave device state as is
+            return m_Status;
     }
 }
 
