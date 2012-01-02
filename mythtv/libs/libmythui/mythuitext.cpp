@@ -1243,6 +1243,7 @@ void MythUIText::CopyFrom(MythUIType *base)
     m_textCase = text->m_textCase;
 
     MythUIType::CopyFrom(base);
+    FillCutMessage();
 }
 
 void MythUIText::CreateCopy(MythUIType *parent)
