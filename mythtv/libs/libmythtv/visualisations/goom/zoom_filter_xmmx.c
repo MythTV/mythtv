@@ -1,4 +1,4 @@
-#include <mythtv/mythconfig.h>
+#include "mythconfig.h"
 
 /* Prototypes to keep gcc from spewing warnings */
 void    zoom_filter_xmmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
