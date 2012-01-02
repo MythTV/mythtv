@@ -4901,7 +4901,7 @@ QString MythPlayer::GetVisualiserName(void)
 {
     if (videoOutput)
         return videoOutput->GetVisualiserName();
-    return false;
+    return QString("");
 }
 
 QStringList MythPlayer::GetVisualiserList(void)
