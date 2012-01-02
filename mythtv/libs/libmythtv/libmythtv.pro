@@ -350,6 +350,18 @@ using_frontend {
     SOURCES += videocolourspace.cpp
     SOURCES += videovisual.cpp
 
+   using_opengl {
+        # Goom
+        HEADERS += goom/filters.h goom/goomconfig.h goom/goom_core.h goom/graphic.h
+        HEADERS += goom/ifs.h goom/lines.h goom/drawmethods.h
+        HEADERS += goom/mmx.h goom/mathtools.h goom/tentacle3d.h goom/v3d.h
+        HEADERS += videovisualgoom.h
+        SOURCES += goom/filters.c goom/goom_core.c goom/graphic.c goom/tentacle3d.c
+        SOURCES += goom/ifs.c goom/ifs_display.c goom/lines.c goom/surf3d.c
+        SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c
+        SOURCES += videovisualgoom.cpp
+    }
+
     using_libfftw3 {
         DEFINES += FFTW3_SUPPORT
         HEADERS += videovisualspectrum.h
