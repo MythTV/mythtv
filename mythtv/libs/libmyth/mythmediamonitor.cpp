@@ -57,6 +57,7 @@ void MonitorThread::run(void)
 ////////////////////////////////////////////////////////////////////////
 // MediaMonitor
 
+#define MONITOR_INTERVAL 5000
 
 MediaMonitor* MediaMonitor::GetMediaMonitor(void)
 {
@@ -64,12 +65,12 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
         return c_monitor;
 
 #ifdef USING_DARWIN_DA
-    c_monitor = new MediaMonitorDarwin(NULL, 500, true);
+    c_monitor = new MediaMonitorDarwin(NULL, MONITOR_INTERVAL, true);
 #else
   #if CONFIG_CYGWIN || defined(_WIN32)
-    c_monitor = new MediaMonitorWindows(NULL, 500, true);
+    c_monitor = new MediaMonitorWindows(NULL, MONITOR_INTERVAL, true);
   #else
-    c_monitor = new MediaMonitorUnix(NULL, 500, true);
+    c_monitor = new MediaMonitorUnix(NULL, MONITOR_INTERVAL, true);
   #endif
 #endif
 
