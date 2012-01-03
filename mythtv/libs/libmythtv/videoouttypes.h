@@ -119,15 +119,15 @@ inline QString StereoscopictoString(StereoscopicMode mode)
     switch (mode)
     {
         case kStereoscopicModeNone:
-            return QObject::tr("3D Off");
+            return QObject::tr("No 3D");
         case kStereoscopicModeSideBySide:
             return QObject::tr("3D Side by Side");
         case kStereoscopicModeSideBySideDiscard:
-            return QObject::tr("3D Discard Side by Side");
+            return QObject::tr("Discard 3D Side by Side");
         case kStereoscopicModeTopAndBottom:
             return QObject::tr("3D Top and Bottom");
         case kStereoscopicModeTopAndBottomDiscard:
-            return QObject::tr("3D Discard Top and Bottom");
+            return QObject::tr("Discard 3D Top and Bottom");
     }
     return QObject::tr("Unknown");
 }
