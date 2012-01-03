@@ -1899,7 +1899,7 @@ BLOCKQUOTE
 # default parameters
 pre_logfile="config.ep"
 logfile="$pre_logfile"
-compile_type="release"
+compile_type="profile"
 
 # installation paths
 prefix_default="/usr/local"
