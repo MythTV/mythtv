@@ -26,6 +26,7 @@
 #include <QDir>
 #include <QEvent>
 #include <QImageReader>
+#include <QSet>
 
 // myth
 #include <mythuihelper.h>
@@ -41,6 +42,11 @@
 #include "mythsystem.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
+
+#ifdef DCRAW_SUPPORT
+#include "../dcrawplugin/dcrawformats.h"
+#include "../dcrawplugin/dcrawhandler.h"
+#endif // DCRAW_SUPPORT
 
 #ifdef EXIF_SUPPORT
 #include <libexif/exif-data.h>
@@ -335,6 +341,27 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
             return;
 #endif
 
+#ifdef DCRAW_SUPPORT
+        QString extension = fi.suffix();
+        QSet<QString> dcrawFormats = DcrawFormats::getFormats();
+        int rotateAngle;
+
+        if (dcrawFormats.contains(extension) &&
+            (rotateAngle = DcrawHandler::loadThumbnail(&image,
+                                               fi.absoluteFilePath())) != -1 &&
+            image.width() > m_width && image.height() > m_height)
+        {
+            if (rotateAngle != 0)
+            {
+                QMatrix matrix;
+                matrix.rotate(rotateAngle);
+                image = image.transformed(matrix);
+            }
+
+            return;
+        }
+#endif
+
         image.load(fi.absoluteFilePath());
     }
 }
@@ -373,3 +400,7 @@ QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
 
     return aPath;
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

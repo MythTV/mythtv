@@ -45,7 +45,7 @@ QStringList DcrawFormats::getFilters()
 {
     QSet<QString> formats(getFormats());
     QStringList filters;
-    for (QSet<QString>::const_iterator i(formats.begin()); i != formats.end(); ++i)
+    for (QSet<QString>::iterator i = formats.begin(); i != formats.end(); ++i)
         filters << ("*." + *i);
     return filters;
 }
