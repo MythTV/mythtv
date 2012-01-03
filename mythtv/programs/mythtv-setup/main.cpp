@@ -230,7 +230,6 @@ int main(int argc, char *argv[])
     uint    scanCardId = 0;
     QString scanTableName = "atsc-vsb8-us";
     QString scanInputName = "";
-    bool    use_display = true;
 
     MythTVSetupCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -251,6 +250,13 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
+    bool quiet = false, use_display = true;
+    if (cmdline.toBool("scan"))
+    {
+        quiet = true;
+        use_display = false;
+    }
+
     CleanupGuard callCleanup(cleanup);
 
 #ifdef Q_WS_MACX
@@ -265,13 +271,6 @@ int main(int argc, char *argv[])
         display = cmdline.toString("display");
     if (cmdline.toBool("geometry"))
         geometry = cmdline.toString("geometry");
-
-    bool quiet = false;
-    if (cmdline.toBool("scan"))
-    {
-        quiet = true;
-        use_display = false;
-    }
 
     int retval;
     QString mask("general");
