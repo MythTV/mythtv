@@ -147,7 +147,7 @@ long GalleryUtil::GetNaturalRotation(const unsigned char *buffer, int size)
 #else
     // Shut the compiler up about the unused argument
     (void)buffer;
-    (void)length;
+    (void)size;
 #endif
 
     return rotateAngle;
