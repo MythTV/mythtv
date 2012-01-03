@@ -281,6 +281,8 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
 
 void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 {
+    static int sequence = 0;
+
     if (GalleryUtil::IsMovie(fi.filePath()))
     {
         bool thumbnailCreated = false;
@@ -297,14 +299,21 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 
         if (tmpDir.exists())
         {
-            QString cmd = "mplayer -nosound -frames 1 -vo png:z=6 \"" +
-                          fi.absoluteFilePath() + "\"";
-            MythSystem ms(cmd, kMSRunShell);
+            QString thumbFile = QString("%1.png")
+                .arg(++sequence,8,10,QChar('0'));
+
+            QString cmd = "mythpreviewgen";
+            QStringList args;
+            args << logPropagateArgs.split(" ", QString::SkipEmptyParts);
+            args << "--infile" << '"' + fi.absoluteFilePath() + '"';
+            args << "--outfile" << '"' + tmpDir.filePath(thumbFile) + '"';
+
+            MythSystem ms(cmd, args, kMSRunShell);
             ms.SetDirectory(tmpDir.absolutePath());
             ms.Run();
             if (ms.Wait() == GENERIC_EXIT_OK)
             {
-                QFileInfo thumb(tmpDir.filePath("00000001.png"));
+                QFileInfo thumb(tmpDir.filePath(thumbFile));
                 if (thumb.exists())
                 {
                     QImage img(thumb.absoluteFilePath());
