@@ -1196,7 +1196,8 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
     metadataMap["length"] = GetDisplayLength(GetLength());
     metadataMap["year"] = GetDisplayYear(GetYear());
 
-    metadataMap["releasedate"] = MythDateToString(GetReleaseDate(), kDateFull);
+    metadataMap["releasedate"] = MythDateToString(GetReleaseDate(), kDateFull |
+                                                                    kAddYear);
 
     metadataMap["userrating"] = GetDisplayUserRating(GetUserRating());
     metadataMap["season"] = GetDisplaySeasonEpisode(GetSeason(), 1);
@@ -1221,7 +1222,8 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
 
     metadataMap["videolevel"] = ParentalLevelToState(GetShowLevel());
 
-    metadataMap["insertdate"] = MythDateToString(GetInsertdate(), kDateFull);
+    metadataMap["insertdate"] = MythDateToString(GetInsertdate(), kDateFull |
+                                                                  kAddYear);
     metadataMap["inetref"] = GetInetRef();
     metadataMap["homepage"] = GetHomepage();
     metadataMap["child_id"] = QString::number(GetChildID());
