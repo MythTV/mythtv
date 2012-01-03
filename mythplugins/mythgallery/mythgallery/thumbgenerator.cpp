@@ -52,7 +52,7 @@ QEvent::Type ThumbGenEvent::kEventType =
 
 ThumbGenerator::ThumbGenerator(QObject *parent, int w, int h) :
     MThread("ThumbGenerator"), m_parent(parent),
-    m_isGallery(false), m_width(w), m_height(h)
+    m_isGallery(false), m_width(w), m_height(h), m_cancel(false)
 {
 }
 
@@ -89,6 +89,7 @@ void ThumbGenerator::cancel()
 {
     m_mutex.lock();
     m_fileList.clear();
+    m_cancel = true;
     m_mutex.unlock();
 }
 
@@ -96,9 +97,9 @@ void ThumbGenerator::run()
 {
     RunProlog();
 
-    while (moreWork())
+    m_cancel = false;
+    while (moreWork() && !m_cancel)
     {
-
         QString file, dir;
         bool    isGallery;
 
@@ -119,7 +120,6 @@ void ThumbGenerator::run()
 
         if (isGallery)
         {
-
             if (fileInfo.isDir())
                 isGallery = checkGalleryDir(fileInfo);
             else
@@ -128,7 +128,6 @@ void ThumbGenerator::run()
 
         if (!isGallery)
         {
-
             QString cachePath = QString("%1%2.jpg").arg(getThumbcacheDir(dir))
                                                    .arg(file);
             QFileInfo cacheInfo(cachePath);
@@ -238,50 +237,39 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
     dir.setFilter(QDir::Files);
 
     QFileInfoList list = dir.entryInfoList();
-    QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *f;
 
-    bool found = false;
-    while (it != list.end())
+    for (QFileInfoList::const_iterator it = list.begin();
+         it != list.end() && !m_cancel; ++it)
     {
-        f = &(*it);
+        const QFileInfo *f = &(*it);
         QImageReader testread(f->absoluteFilePath());
         if (testread.canRead())
         {
-            found = true;
-            break;
-        }
-        ++it;
-    }
-
-    if (found)
-    {
-        loadFile(image, *f);
-        return;
-    }
-    else
-    {
-        // if we didn't find the image yet
-        // go into subdirs and keep looking
-        dir.setFilter(QDir::Dirs);
-        QFileInfoList dirlist = dir.entryInfoList();
-        if (dirlist.isEmpty())
+            loadFile(image, *f);
             return;
-
-        QFileInfoList::const_iterator it = dirlist.begin();
-        const QFileInfo *f;
-
-        while (it != dirlist.end() && image.isNull() )
-        {
-
-            f = &(*it);
-            ++it;
-
-            if (f->fileName() == "." || f->fileName() == "..")
-                continue;
-
-            loadDir(image, *f);
         }
+    }
+
+    // If we are supposed to cancel, don't recurse into subdirs, just quit
+    if (m_cancel)
+        return;
+
+    // if we didn't find the image yet
+    // go into subdirs and keep looking
+    dir.setFilter(QDir::Dirs);
+    QFileInfoList dirlist = dir.entryInfoList();
+    if (dirlist.isEmpty())
+        return;
+
+    for (QFileInfoList::const_iterator it = dirlist.begin();
+         it != dirlist.end() && image.isNull() && !m_cancel; ++it)
+    {
+        const QFileInfo *f = &(*it);
+
+        if (f->fileName() == "." || f->fileName() == "..")
+            continue;
+
+        loadDir(image, *f);
     }
 }
 
@@ -357,28 +345,28 @@ QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
     QString galleryDir = gCoreContext->GetSetting("GalleryDir");
 
     // For directory "/my/images/january", this function either returns
-    // "/my/images/january/.thumbcache" or "~/.mythtv/mythgallery/january/.thumbcache"
+    // "/my/images/january/.thumbcache" or
+    // "~/.mythtv/mythgallery/january/.thumbcache"
     QString aPath = inDir + QString("/.thumbcache/");
     QDir dir(aPath);
     if (gCoreContext->GetNumSetting("GalleryThumbnailLocation") &&
-        !dir.exists() &&
-        inDir.startsWith(galleryDir))
+        !dir.exists() && inDir.startsWith(galleryDir))
     {
         dir.mkpath(aPath);
     }
 
     if (!gCoreContext->GetNumSetting("GalleryThumbnailLocation") ||
-        !dir.exists() ||
-        !inDir.startsWith(galleryDir))
+        !dir.exists() || !inDir.startsWith(galleryDir))
     {
         // Arrive here if storing thumbs in home dir,
         // OR failed to create thumb dir in gallery pics location
         int prefixLen = galleryDir.length();
         QString location = "";
         if (prefixLen < inDir.length())
-            location = QString("%1/").arg(inDir.right(inDir.length() - prefixLen));
+            location = QString("%1/")
+                           .arg(inDir.right(inDir.length() - prefixLen));
         aPath = QString("%1/MythGallery/%2").arg(GetConfDir())
-                        .arg(location);
+                    .arg(location);
         dir.setPath(aPath);
         dir.mkpath(aPath);
     }
