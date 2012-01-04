@@ -399,42 +399,4 @@ class MPUBLIC MythThemedDialog : public MythDialog
     QRect redrawRect;
 };
 
-/*!
- * \deprecated Due for removal, use libmythui's MythUISearchDialog instead
- */
-class MPUBLIC MythSearchDialog: public MythPopupBox
-{
-    Q_OBJECT
-
-  public:
-
-    MythSearchDialog(MythMainWindow *parent,
-                     const char     *name = "MythSearchDialog");
-
-  public:
-    void setCaption(QString text);
-    void setSearchText(QString text);
-    void setItems(QStringList items);
-    QString getResult(void);
-
-  public slots:
-    virtual void deleteLater(void);
-
-  protected slots:
-    void searchTextChanged(void);
-
-  protected:
-    void Teardown(void);
-    ~MythSearchDialog(); // use deleteLater() instead for thread safety
-    void keyPressEvent(QKeyEvent *e);
-
-  private:
-
-    QLabel              *caption;
-    MythRemoteLineEdit  *editor;
-    MythListBox         *listbox;
-    QAbstractButton     *ok_button;
-    QAbstractButton     *cancel_button;
-};
-
 #endif
