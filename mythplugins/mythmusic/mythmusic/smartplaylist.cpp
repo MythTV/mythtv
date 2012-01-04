@@ -26,8 +26,6 @@ using namespace std;
 #include "smartplaylist.h"
 #include "metadata.h"
 #include "musiccommon.h"
-#include </media/src/mythtv-git-music/mythtv/mythtv/libs/libmythtv/lzoconf.h>
-
 
 struct SmartPLField
 {
