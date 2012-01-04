@@ -19,14 +19,13 @@ HEADERS += audio/audiooutputdigitalencoder.h audio/spdifencoder.h
 HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
 HEADERS += backendselect.h dbsettings.h dialogbox.h
 HEADERS += generictree.h langsettings.h
-HEADERS += managedlist.h mythconfigdialogs.h mythconfiggroups.h
+HEADERS += mythconfigdialogs.h mythconfiggroups.h
 HEADERS += mythcontext.h mythdialogs.h
 HEADERS += mythevent.h mythexp.h mythmediamonitor.h
 HEADERS += mythplugin.h mythpluginapi.h
 HEADERS += mythwidgets.h mythwizard.h schemawizard.h
 HEADERS += output.h
 HEADERS += settings.h
-HEADERS += uilistbtntype.h uitypes.h
 HEADERS += volumebase.h visual.h xmlparse.h
 HEADERS += storagegroupeditor.h
 HEADERS += mythterminal.h
@@ -38,25 +37,24 @@ HEADERS += mythrssmanager.h       netgrabbermanager.h
 HEADERS += rssparse.h             netutils.h
 
 # remove when everything is switched to mythui
-HEADERS += virtualkeyboard_qt.h
+HEADERS += virtualkeyboard_qt.h uitypes.h xmlparse.h
 
 SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
 SOURCES += audio/spdifencoder.cpp audio/audiooutputdigitalencoder.cpp
 SOURCES += audio/audiooutputnull.cpp
 SOURCES += audio/audiooutpututil.cpp audio/audiooutputdownmix.cpp
 SOURCES += audio/audiosettings.cpp audio/audiooutputsettings.cpp audio/pink.c
-SOURCES += volumebase.cpp xmlparse.cpp
+SOURCES += volumebase.cpp 
 
 SOURCES += backendselect.cpp dbsettings.cpp dialogbox.cpp
 SOURCES += generictree.cpp langsettings.cpp
-SOURCES += managedlist.cpp mythconfigdialogs.cpp mythconfiggroups.cpp
+SOURCES += mythconfigdialogs.cpp mythconfiggroups.cpp
 SOURCES += mythcontext.cpp mythdialogs.cpp
 SOURCES += mythmediamonitor.cpp
 SOURCES += mythplugin.cpp
 SOURCES += mythwidgets.cpp mythwizard.cpp schemawizard.cpp
 SOURCES += output.cpp
 SOURCES += settings.cpp
-SOURCES += uilistbtntype.cpp uitypes.cpp
 SOURCES += storagegroupeditor.cpp
 SOURCES += mythterminal.cpp
 SOURCES += remoteutil.cpp
@@ -67,7 +65,7 @@ SOURCES += mythrssmanager.cpp     netgrabbermanager.cpp
 SOURCES += rssparse.cpp           netutils.cpp
 
 # remove when everything is switched to mythui
-SOURCES += virtualkeyboard_qt.cpp
+SOURCES += virtualkeyboard_qt.cpp uitypes.cpp xmlparse.cpp
 
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
@@ -101,11 +99,11 @@ POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h mythcontext.h
 inc.files += mythwidgets.h remotefile.h oldsettings.h volumecontrol.h
-inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
+inc.files += settings.h uitypes.h  mythplugin.h mythdialogs.h
 inc.files += audio/audiooutput.h audio/audiosettings.h
 inc.files += audio/audiooutputsettings.h
 inc.files += inetcomms.h mythwizard.h schemawizard.h
-inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
+inc.files += generictree.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h
 inc.files += mythexp.h mythpluginapi.h storagegroupeditor.h
 inc.files += mythconfigdialogs.h mythconfiggroups.h
@@ -116,7 +114,7 @@ inc.files += mythrssmanager.h     netgrabbermanager.h
 inc.files += rssparse.h           netutils.h
 
 # remove when everything is switched to mythui
-inc.files += virtualkeyboard_qt.h
+inc.files += virtualkeyboard_qt.h xmlparse.h 
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth

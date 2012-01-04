@@ -22,7 +22,6 @@ using namespace std;
 #endif
 
 #include "uitypes.h"
-#include "uilistbtntype.h"
 #include "xmlparse.h"
 #include "mythdialogs.h"
 #include "lcddevice.h"
@@ -1571,58 +1570,6 @@ void MythThemedDialog::setCurrentFocusWidget(UIType* widget)
     widget_with_current_focus->takeFocus();
 }
 
-UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(
-    const QString &name)
-{
-    return GetUIType<UIManagedTreeListType>(this, name);
-}
-
-UITextType* MythThemedDialog::getUITextType(const QString &name)
-{
-    return GetUIType<UITextType>(this, name);
-}
-
-UIPushButtonType* MythThemedDialog::getUIPushButtonType(const QString &name)
-{
-    return GetUIType<UIPushButtonType>(this, name);
-}
-
-UITextButtonType* MythThemedDialog::getUITextButtonType(const QString &name)
-{
-    return GetUIType<UITextButtonType>(this, name);
-}
-
-UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(
-    const QString &name)
-{
-    return GetUIType<UIRepeatedImageType>(this, name);
-}
-
-UIBlackHoleType* MythThemedDialog::getUIBlackHoleType(const QString &name)
-{
-    return GetUIType<UIBlackHoleType>(this, name);
-}
-
-UIImageType* MythThemedDialog::getUIImageType(const QString &name)
-{
-    return GetUIType<UIImageType>(this, name);
-}
-
-UIStatusBarType* MythThemedDialog::getUIStatusBarType(const QString &name)
-{
-    return GetUIType<UIStatusBarType>(this, name);
-}
-
-UIListBtnType* MythThemedDialog::getUIListBtnType(const QString &name)
-{
-    return GetUIType<UIListBtnType>(this, name);
-}
-
-UIListTreeType* MythThemedDialog::getUIListTreeType(const QString &name)
-{
-    return GetUIType<UIListTreeType>(this, name);
-}
-
 UIKeyboardType *MythThemedDialog::getUIKeyboardType(const QString &name)
 {
     return GetUIType<UIKeyboardType>(this, name);
@@ -1777,3 +1724,5 @@ void MythSearchDialog::Teardown(void)
     ok_button     = NULL; // deleted by Qt
     cancel_button = NULL; // deleted by Qt
 }
+
+

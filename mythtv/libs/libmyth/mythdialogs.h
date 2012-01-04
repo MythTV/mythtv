@@ -11,35 +11,22 @@
 #include <QList>
 
 #include "mythexp.h"
-
+#include "mythmainwindow.h"
 #include <vector>
 using namespace std;
 
-class XMLParse;
-class UIType;
-class UIManagedTreeListType;
-class UITextType;
-class UIPushButtonType;
-class UITextButtonType;
-class UIRepeatedImageType;
-class UIBlackHoleType;
-class UIImageType;
-class UIStatusBarType;
-class UIListBtnType;
-class UIListTreeType;
-class UIKeyboardType;
-class LayerSet;
 class GenericTree;
 class MythMediaDevice;
 class MythLineEdit;
 class MythRemoteLineEdit;
 class MythListBox;
 struct fontProp;
-class MythMainWindow;
 class QVBoxLayout;
 class QProgressBar;
-
-#include "mythmainwindow.h"
+class UIType;
+class UIKeyboardType;
+class LayerSet;
+class XMLParse;
 
 typedef enum DialogCode
 {
@@ -362,16 +349,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     UIType *getCurrentFocusWidget();
     void setCurrentFocusWidget(UIType *widget);
 
-    UIManagedTreeListType *getUIManagedTreeListType(const QString &name);
-    UITextType *getUITextType(const QString &name);
-    UIPushButtonType *getUIPushButtonType(const QString &name);
-    UITextButtonType *getUITextButtonType(const QString &name);
-    UIRepeatedImageType *getUIRepeatedImageType(const QString &name);
-    UIBlackHoleType *getUIBlackHoleType(const QString &name);
-    UIImageType *getUIImageType(const QString &name);
-    UIStatusBarType *getUIStatusBarType(const QString &name);
-    UIListBtnType *getUIListBtnType(const QString &name);
-    UIListTreeType *getUIListTreeType(const QString &name);
     UIKeyboardType *getUIKeyboardType(const QString &name);
 
     LayerSet* getContainer(const QString &name);

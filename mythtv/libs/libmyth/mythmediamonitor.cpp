@@ -22,6 +22,7 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "util.h"
 #include "mythlogging.h"
+#include "mythmainwindow.h"
 
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h"

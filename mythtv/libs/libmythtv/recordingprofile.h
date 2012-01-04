@@ -109,8 +109,6 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
     static QMap<int, QString> listProfiles(int group);
     static void fillSelections(SelectSetting* setting,
                                int group, bool foldautodetect = false);
-    static void fillSelections(SelectManagedListItem* setting,
-                               int group);
 
     // constants
     static const uint TranscoderAutodetect = 0; ///< sentinel value

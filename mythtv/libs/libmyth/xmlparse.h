@@ -4,6 +4,8 @@
 #include <QDomDocument>
 #include <QString>
 #include <QRect>
+//#include "mythexp.h"
+#include "uitypes.h"
 
 class MythUIHelper;
 
@@ -28,18 +30,6 @@ class MPUBLIC XMLParse
     QRect parseRect(QString);
     void parsePopup(QDomElement &);
     void parseContainer(QDomElement &, QString &, int &, QRect &);
-    void parseListArea(LayerSet *, QDomElement &);
-    bool parseDefaultCategoryColors(QMap<QString, QString> &catColors);
-    void parseManagedTreeList(LayerSet *, QDomElement &);
-    void parseTextArea(LayerSet *, QDomElement &);
-    void parseStatusBar(LayerSet *, QDomElement &);
-    void parseImage(LayerSet *, QDomElement &);
-    void parseRepeatedImage(LayerSet *, QDomElement &);
-    void parsePushButton(LayerSet *, QDomElement &);
-    void parseTextButton(LayerSet *, QDomElement &);
-    void parseBlackHole(LayerSet *, QDomElement &);
-    void parseListBtnArea(LayerSet *, QDomElement &);
-    void parseListTreeArea(LayerSet *, QDomElement &);
     void parseKeyboard(LayerSet *, QDomElement &);
     void parseKey(LayerSet *, QDomElement &);
 
