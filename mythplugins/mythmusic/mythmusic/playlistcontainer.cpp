@@ -38,21 +38,19 @@ void PlaylistContainer::addCDTrack(int track)
 
 void PlaylistContainer::removeCDTrack(int track)
 {
-    cd_playlist.remove(track);
+    cd_playlist.removeAll(track);
 }
 
 bool PlaylistContainer::checkCDTrack(int track)
 {
-    list<int>::const_iterator it =
-        find(cd_playlist.begin(), cd_playlist.end(), track);
-    return it != cd_playlist.end();
+    return cd_playlist.contains(track);
 }
 
 PlaylistContainer::PlaylistContainer(
     AllMusic *all_music, const QString &host_name) :
     active_playlist(NULL),      backup_playlist(NULL),
     all_other_playlists(NULL),  all_available_music(all_music),
-    active_widget(NULL),        pending_writeback_index(-1),
+    pending_writeback_index(-1),
 
     playlists_loader(new PlaylistLoadingThread(this, all_music)),
     done_loading(false),        my_host(host_name),
@@ -75,6 +73,8 @@ PlaylistContainer::~PlaylistContainer()
         delete active_playlist;
     if (backup_playlist)
         delete backup_playlist;
+    if (stream_playlist)
+        delete stream_playlist;
     if (all_other_playlists)
     {
         while (!all_other_playlists->empty())
@@ -98,21 +98,24 @@ void PlaylistContainer::FillIntelliWeights(int &rating, int &playcount,
 void PlaylistContainer::load()
 {
     done_loading = false;
-    active_playlist = new Playlist(all_available_music);
+    active_playlist = new Playlist();
     active_playlist->setParent(this);
 
-    backup_playlist = new Playlist(all_available_music);
+    backup_playlist = new Playlist();
     backup_playlist->setParent(this);
 
-    all_other_playlists = new list<Playlist*>;
+    stream_playlist = new Playlist();
+    stream_playlist->setParent(this);
+
+    all_other_playlists = new QList<Playlist*>;
 
     cd_playlist.clear();
 
     active_playlist->loadPlaylist("default_playlist_storage", my_host);
-    active_playlist->fillSongsFromSonglist(false);
 
     backup_playlist->loadPlaylist("backup_playlist_storage", my_host);
-    backup_playlist->fillSongsFromSonglist(false);
+
+    stream_playlist->loadPlaylist("stream_playlist", my_host);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT playlist_id FROM music_playlists "
@@ -132,11 +135,10 @@ void PlaylistContainer::load()
     {
         while (query.next())
         {
-            Playlist *temp_playlist = new Playlist(all_available_music);
+            Playlist *temp_playlist = new Playlist();
             //  No, we don't destruct this ...
             temp_playlist->setParent(this);
             temp_playlist->loadPlaylistByID(query.value(0).toInt(), my_host);
-            temp_playlist->fillSongsFromSonglist(false);
             all_other_playlists->push_back(temp_playlist);
             //  ... cause it's sitting on this PtrList
         }
@@ -154,7 +156,7 @@ void PlaylistContainer::describeYourself(void) const
 {
     //    Debugging
     active_playlist->describeYourself();
-    list<Playlist*>::const_iterator it = all_other_playlists->begin();
+    QList<Playlist*>::const_iterator it = all_other_playlists->begin();
     for (; it != all_other_playlists->end(); ++it)
         (*it)->describeYourself();
 }
@@ -169,7 +171,7 @@ Playlist *PlaylistContainer::getPlaylist(int id)
         return active_playlist;
     }
 
-    list<Playlist*>::iterator it = all_other_playlists->begin();
+    QList<Playlist*>::iterator it = all_other_playlists->begin();
     for (; it != all_other_playlists->end(); ++it)
     {
         if ((*it)->getID() == id)
@@ -181,77 +183,29 @@ Playlist *PlaylistContainer::getPlaylist(int id)
     return NULL;
 }
 
-GenericTree* PlaylistContainer::writeTree(GenericTree *tree_to_write_to)
+Playlist *PlaylistContainer::getPlaylist(const QString &name)
 {
-    all_available_music->writeTree(tree_to_write_to);
+    //  return a pointer to a playlist
+    //  by name;
 
-    GenericTree *sub_node
-        = tree_to_write_to->addNode(QObject::tr("All My Playlists"), 1);
-    sub_node->setAttribute(0, 1);
-    sub_node->setAttribute(1, 1);
-    sub_node->setAttribute(2, 1);
-    sub_node->setAttribute(3, 1);
-
-    GenericTree *subsub_node
-        = sub_node->addNode(QObject::tr("Active Play Queue"), 0);
-    subsub_node->setAttribute(0, 0);
-    subsub_node->setAttribute(1, 0);
-    subsub_node->setAttribute(2, random());
-    subsub_node->setAttribute(3, random());
-
-    active_playlist->writeTree(subsub_node, 0);
-
-    int a_counter = 0;
-
-    //
-    //  Write the CD playlist (if there's anything in it)
-    //
-
-/*
-    if (cd_playlist.count() > 0)
-    {
-        ++a_counter;
-        QString a_string = QObject::tr("CD: ");
-        a_string += all_available_music->getCDTitle();
-        GenericTree *cd_node = sub_node->addNode(a_string, 0);
-        cd_node->setAttribute(0, 0);
-        cd_node->setAttribute(1, a_counter);
-        cd_node->setAttribute(2, random());
-        cd_node->setAttribute(3, random());
-    }
-*/
-
-    //
-    //  Write the other playlists
-    //
-
-    list<Playlist*>::const_iterator it = all_other_playlists->begin();
+    QList<Playlist*>::iterator it = all_other_playlists->begin();
     for (; it != all_other_playlists->end(); ++it)
     {
-        ++a_counter;
-        GenericTree *new_node = sub_node->addNode((*it)->getName(), (*it)->getID());
-        new_node->setAttribute(0, 0);
-        new_node->setAttribute(1, a_counter);
-        new_node->setAttribute(2, random());
-        new_node->setAttribute(3, random());
-        (*it)->writeTree(new_node, 0);
+        if ((*it)->getName() == name)
+            return *it;
     }
 
-    GenericTree* active_playlist_node = subsub_node->findLeaf();
-    if (!active_playlist_node) active_playlist_node = subsub_node;
-    return active_playlist_node;
+    LOG(VB_GENERAL, LOG_ERR, QString("getPlaylistName() called with unknown name: %1").arg(name));
+    return NULL;
 }
 
 void PlaylistContainer::save(void)
 {
-    list<Playlist*>::const_iterator it = all_other_playlists->begin();
+    QList<Playlist*>::const_iterator it = all_other_playlists->begin();
     for (; it != all_other_playlists->end(); ++it)
     {
         if ((*it)->hasChanged())
-        {
-            (*it)->fillSonglistFromSongs();
             (*it)->savePlaylist((*it)->getName(), my_host);
-        }
     }
 
     active_playlist->savePlaylist("default_playlist_storage", my_host);
@@ -260,22 +214,18 @@ void PlaylistContainer::save(void)
 
 void PlaylistContainer::createNewPlaylist(QString name)
 {
-    Playlist *new_list = new Playlist(all_available_music);
+    Playlist *new_list = new Playlist();
     new_list->setParent(this);
 
     //  Need to touch the database to get persistent ID
     new_list->savePlaylist(name, my_host);
     new_list->Changed();
     all_other_playlists->push_back(new_list);
-    //if (my_widget)
-    //{
-    //    new_list->putYourselfOnTheListView(my_widget);
-    //}
 }
 
 void PlaylistContainer::copyNewPlaylist(QString name)
 {
-    Playlist *new_list = new Playlist(all_available_music);
+    Playlist *new_list = new Playlist();
     new_list->setParent(this);
 
     //  Need to touch the database to get persistent ID
@@ -284,21 +234,6 @@ void PlaylistContainer::copyNewPlaylist(QString name)
     all_other_playlists->push_back(new_list);
     active_playlist->copyTracks(new_list, false);
     pending_writeback_index = 0;
-    active_widget->setText(QObject::tr("Active Play Queue"));
-    active_playlist->removeAllTracks();
-    active_playlist->addTrack(new_list->getID() * -1, true, false);
-}
-
-void PlaylistContainer::setActiveWidget(PlaylistTitle *widget)
-{
-    active_widget = widget;
-    if (active_widget && pending_writeback_index > 0)
-    {
-        bool bad = false;
-        QString newlabel = QString(QObject::tr("Active Play Queue (%1)"))
-                           .arg(getPlaylistName(pending_writeback_index, bad));
-        active_widget->setText(newlabel);
-    }
 }
 
 void PlaylistContainer::popBackPlaylist()
@@ -316,7 +251,6 @@ void PlaylistContainer::popBackPlaylist()
     active_playlist->removeAllTracks();
     backup_playlist->copyTracks(active_playlist, true);
     pending_writeback_index = 0;
-    active_widget->setText(QObject::tr("Active Play Queue"));
 
     active_playlist->Changed();
     backup_playlist->Changed();
@@ -328,13 +262,7 @@ void PlaylistContainer::copyToActive(int index)
     active_playlist->copyTracks(backup_playlist, false);
 
     pending_writeback_index = index;
-    if (active_widget)
-    {
-        bool bad = false;
-        QString newlabel = QString(QObject::tr("Active Play Queue (%1)"))
-            .arg(getPlaylistName(index, bad));
-        active_widget->setText(newlabel);
-    }
+
     active_playlist->removeAllTracks();
     Playlist *copy_from = getPlaylist(index);
     if (!copy_from)
@@ -357,12 +285,6 @@ void PlaylistContainer::renamePlaylist(int index, QString new_name)
     {
         list_to_rename->setName(new_name);
         list_to_rename->Changed();
-        if (list_to_rename->getID() == pending_writeback_index)
-        {
-            QString newlabel = QString(QObject::tr("Active Play Queue (%1)"))
-                .arg(new_name);
-            active_widget->setText(newlabel);
-        }
     }
 }
 
@@ -382,13 +304,13 @@ void PlaylistContainer::deletePlaylist(int kill_me)
     if (kill_me == pending_writeback_index)
         popBackPlaylist();
 
-    active_playlist->removeTrack(kill_me * -1, false);
+    active_playlist->removeTrack(kill_me * -1);
 
-    list<Playlist*>::iterator it = all_other_playlists->begin();
+    QList<Playlist*>::iterator it = all_other_playlists->begin();
     for (; it != all_other_playlists->end(); ++it)
     {
         if ((*it) != list_to_kill)
-            (*it)->removeTrack(kill_me * -1, false);
+            (*it)->removeTrack(kill_me * -1);
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -400,7 +322,7 @@ void PlaylistContainer::deletePlaylist(int kill_me)
         MythDB::DBError("playlist delete", query);
     }
     list_to_kill->removeAllTracks();
-    all_other_playlists->remove(list_to_kill);
+    all_other_playlists->removeAll(list_to_kill);
 }
 
 
@@ -413,8 +335,8 @@ QString PlaylistContainer::getPlaylistName(int index, bool &reference)
             return active_playlist->getName();
         }
 
-        list<Playlist*>::reverse_iterator it = all_other_playlists->rbegin();
-        for (; it != all_other_playlists->rend(); ++it)
+        QList<Playlist*>::iterator it = all_other_playlists->begin();
+        for (; it != all_other_playlists->end(); ++it)
         {
             if ((*it)->getID() == index)
                 return (*it)->getName();
@@ -428,96 +350,21 @@ QString PlaylistContainer::getPlaylistName(int index, bool &reference)
     return QObject::tr("Something is Wrong");
 }
 
-void PlaylistContainer::showRelevantPlaylists(TreeCheckItem *alllists)
-{
-    QString templevel, temptitle;
-    int id;
-    //  Deleting anything that's there
-    while (alllists->childCount() > 0)
-    {
-        UIListGenericTree *first_child;
-        first_child = (UIListGenericTree *)(alllists->getChildAt(0));
-        {
-            first_child->RemoveFromParent();
-            //delete first_child;  Deleted by GenericTree.
-        }
-    }
-
-    //  Add everything but the current playlist
-    list<Playlist*>::iterator it = all_other_playlists->begin();
-    for (; it != all_other_playlists->end(); ++it)
-    {
-        id = (*it)->getID() * -1 ;
-        temptitle = (*it)->getName();
-        templevel = "playlist";
-
-        TreeCheckItem *some_item = new TreeCheckItem(alllists, temptitle,
-                                                     templevel, id);
-
-        some_item->setCheckable(true);
-        some_item->setActive(true);
-
-        if ((*it)->containsReference(pending_writeback_index, 0) ||
-            (id * -1) == pending_writeback_index)
-        {
-            some_item->setCheckable(false);
-            some_item->setActive(false);
-        }
-
-        (*it)->putYourselfOnTheListView(some_item);
-    }
-
-    if (alllists->childCount() == 0)
-        alllists->setCheckable(false);
-    else
-        alllists->setCheckable(true);
-}
-
-void PlaylistContainer::refreshRelevantPlaylists(TreeCheckItem *alllists)
-{
-    if (alllists->childCount() == 0)
-    {
-        alllists->setCheckable(false);
-        return;
-    }
-
-    UIListGenericTree *walker = (UIListGenericTree *)(alllists->getChildAt(0));
-    while (walker)
-    {
-        if (TreeCheckItem *check_item = dynamic_cast<TreeCheckItem*>(walker))
-        {
-            int id = check_item->getID() * -1;
-            Playlist *check_playlist = getPlaylist(id);
-            if ((check_playlist &&
-                check_playlist->containsReference(pending_writeback_index, 0))
-               || id == pending_writeback_index)
-            {
-                check_item->setCheckable(false);
-                check_item->setActive(false);
-            }
-            else
-            {
-                check_item->setCheckable(true);
-                check_item->setActive(true);
-            }
-        }
-        walker = (UIListGenericTree *)(walker->nextSibling(1));
-    }
-
-    alllists->setCheckable(true);
-}
 
 void PlaylistContainer::postLoad()
 {
+    //FIXME remove this and the other post load stuff?
+
     //  Now that everything is loaded, we need to recheck all
     //  tracks and update those that refer to a playlist
-
+#if 0
     active_playlist->postLoad();
     backup_playlist->postLoad();
 
-    list<Playlist*>::iterator it = all_other_playlists->begin();
+    QList<Playlist*>::iterator it = all_other_playlists->begin();
     for (; it != all_other_playlists->end(); ++it)
         (*it)->postLoad();
+#endif
 }
 
 bool PlaylistContainer::pendingWriteback()
@@ -537,7 +384,7 @@ bool PlaylistContainer::nameIsUnique(QString a_name, int which_id)
     if (a_name == "backup_playlist_storage")
         return false;
 
-    list<Playlist*>::iterator it = all_other_playlists->begin();
+    QList<Playlist*>::iterator it = all_other_playlists->begin();
     for (; it != all_other_playlists->end(); ++it)
     {
         if ((*it)->getName() == a_name && (*it)->getID() != which_id)
@@ -545,6 +392,19 @@ bool PlaylistContainer::nameIsUnique(QString a_name, int which_id)
     }
 
     return true;
+}
+
+QStringList PlaylistContainer::getPlaylistNames(void)
+{
+    QStringList res;
+
+    QList<Playlist*>::iterator it = all_other_playlists->begin();
+    for (; it != all_other_playlists->end(); ++it)
+    {
+        res.append((*it)->getName());
+    }
+
+    return res;
 }
 
 bool PlaylistContainer::cleanOutThreads()
@@ -564,6 +424,5 @@ void PlaylistContainer::clearActive()
     backup_playlist->Changed();
     active_playlist->Changed();
     pending_writeback_index = 0;
-    active_widget->setText(QObject::tr("Active Play Queue"));
 }
 

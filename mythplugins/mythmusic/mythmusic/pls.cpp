@@ -7,7 +7,6 @@
 */
 
 // c
-//#include <assert.h>
 //#include "iostream"
 #include <string>
 
@@ -15,6 +14,7 @@
 #include <QPair>
 #include <QList>
 #include <QMap>
+#include <QStringList>
 
 // mythtv
 #include <mythlogging.h>
@@ -201,10 +201,22 @@ PlayListFile::~PlayListFile(void)
     clear();
 }
 
-int PlayListFile::parse(PlayListFile *pls, QTextStream *stream)
+int PlayListFile::parse(PlayListFile *pls, QTextStream *stream, const QString &extension)
+{
+    int result = 0;
+
+    if (extension == "pls")
+        result = PlayListFile::parsePLS(pls, stream);
+    else if (extension == "m3u")
+        result = PlayListFile::parseM3U(pls, stream);
+
+    return result;
+}
+
+int PlayListFile::parsePLS(PlayListFile *pls, QTextStream *stream)
 {
     int parsed = 0;
-    QString d = stream->read();
+    QString d = stream->readAll();
     CfgReader cfg;
     cfg.parse(d.toAscii(), d.length());
 
@@ -232,4 +244,37 @@ int PlayListFile::parse(PlayListFile *pls, QTextStream *stream)
     return parsed;
 }
 
+#define M3U_HEADER  "#EXTM3U"
+#define M3U_INFO    "#EXTINF"
 
+int PlayListFile::parseM3U(PlayListFile *pls, QTextStream *stream)
+{
+    QString data = stream->readAll();
+    QStringList lines = data.split("\r\n");
+
+    QStringList::iterator it;
+    for (it = lines.begin(); it != lines.end(); ++it)
+    {
+        // ignore empty lines
+        if (it->isEmpty())
+            continue;
+
+        // ignore the M3U header
+        if (it->startsWith(M3U_HEADER))
+            continue;
+
+        // for now ignore M3U info lines
+        if (it->startsWith(M3U_INFO))
+            continue;
+
+        // add to the playlist
+        PlayListFileEntry *e = new PlayListFileEntry();
+        e->setFile(*it);
+        e->setTitle(*it);
+        e->setLength(-1);
+
+        pls->add(e);
+    }
+
+    return pls->size();
+}

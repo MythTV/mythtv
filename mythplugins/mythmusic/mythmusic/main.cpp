@@ -26,14 +26,15 @@
 // MythMusic headers
 #include "decoder.h"
 #include "metadata.h"
-#include "databasebox.h"
-#include "playbackbox.h"
+#include "playlisteditorview.h"
+#include "playlistview.h"
 #include "playlistcontainer.h"
 #include "globalsettings.h"
 #include "dbcheck.h"
 #include "filescanner.h"
 #include "musicplayer.h"
 #include "config.h"
+#include "mainvisual.h"
 #ifndef USING_MINGW
 #include "cdrip.h"
 #include "importmusic.h"
@@ -213,18 +214,15 @@ static void loadMusic()
     else
         busy = NULL;
 
-    QString paths = gCoreContext->GetSetting("TreeLevels");
-
     // Set the various track formatting modes
     Metadata::setArtistAndTrackFormats();
 
-    AllMusic *all_music = new AllMusic(paths, startdir);
+    AllMusic *all_music = new AllMusic(startdir);
 
     //  Load all playlists into RAM (once!)
     PlaylistContainer *all_playlists = new PlaylistContainer(
             all_music, gCoreContext->GetHostName());
 
-    gMusicData->paths = paths;
     gMusicData->startdir = startdir;
     gMusicData->all_playlists = all_playlists;
     gMusicData->all_music = all_music;
@@ -237,7 +235,7 @@ static void loadMusic()
     }
     gMusicData->all_playlists->postLoad();
 
-    gPlayer->constructPlaylist();
+    gPlayer->loadPlaylist();
 
     if (busy)
         busy->Close();
@@ -247,24 +245,30 @@ static void loadMusic()
 static void startPlayback(void)
 {
     loadMusic();
-    PlaybackBoxMusic *pbb;
-    pbb = new PlaybackBoxMusic(GetMythMainWindow(),
-                               "music_play", "music-", chooseCD(), "music_playback");
-    pbb->exec();
-    qApp->processEvents();
 
-    delete pbb;
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    PlaylistView *view = new PlaylistView(mainStack);
+
+    if (view->Create())
+        mainStack->AddScreen(view);
+    else
+        delete view;
 }
 
 static void startDatabaseTree(void)
 {
     loadMusic();
-    DatabaseBox *dbbox = new DatabaseBox(GetMythMainWindow(),
-                         chooseCD(), "music_select", "music-", "music database");
-    dbbox->exec();
-    delete dbbox;
 
-    gPlayer->constructPlaylist();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    QString lastView = gCoreContext->GetSetting("MusicPlaylistEditorView", "tree");
+    PlaylistEditorView *view = new PlaylistEditorView(mainStack, lastView);
+
+    if (view->Create())
+        mainStack->AddScreen(view);
+    else
+        delete view;
 }
 
 static void startRipper(void)
@@ -349,6 +353,11 @@ static void MusicCallback(void *data, QString &selection)
         gCoreContext->ActivateSettingsCache(false);
         MusicPlayerSettings settings;
         settings.exec();
+
+        // reload the list of visualizers incase they've been changed
+        MainVisual::visualizers = MainVisual::Visualizations(false);
+        MainVisual::currentVisualizer = 0;
+
         gCoreContext->ActivateSettingsCache(true);
 
         gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED")));
@@ -452,6 +461,16 @@ static void showMiniPlayer(void)
 
 static void handleMedia(MythMediaDevice *cd)
 {
+    // if the music player is already playing ignore the event
+    if (gPlayer->isPlaying())
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "Got a media changed event but ignoring since "
+                                      "the music player is already playing");
+        return;
+    }
+    else
+         LOG(VB_GENERAL, LOG_NOTICE, "Got a media changed event");
+
     // Note that we should deal with other disks that may contain music.
     // e.g. MEDIATYPE_MMUSIC or MEDIATYPE_MIXED
 
@@ -560,7 +579,13 @@ static void setupKeys(void)
         "Increase Play Speed"),   "W");
     REG_KEY("Music", "SPEEDDOWN",  QT_TRANSLATE_NOOP("MythControls",
         "Decrease Play Speed"),   "X");
+    REG_KEY("Music", "MARK",       QT_TRANSLATE_NOOP("MythControls",
+        "Toggle track selection"), "T");
 
+
+// FIXME need to find a way to stop the media monitor jumping to the main menu before
+// calling the handler
+#if 0
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythMusic Media Handler 1/2"), "", "", handleMedia,
         MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
@@ -569,6 +594,7 @@ static void setupKeys(void)
         MEDIATYPE_MMUSIC, "mp3,mp2,ogg,oga,flac,wma,wav,ac3,"
                           "oma,omg,atp,ra,dts,aac,m4a,aa3,tta,"
                           "mka,aiff,swa,wv");
+#endif
 }
 
 int mythplugin_init(const char *libversion)
@@ -618,7 +644,6 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    gMusicData->paths = gCoreContext->GetSetting("TreeLevels");
     gMusicData->startdir = gCoreContext->GetSetting("MusicLocation");
     gMusicData->startdir = QDir::cleanPath(gMusicData->startdir);
 
@@ -650,7 +675,7 @@ void mythplugin_destroy(void)
         SavePending(x);
     }
 
-    gPlayer->deleteLater();
+    delete gPlayer;
 
     delete gMusicData;
 }

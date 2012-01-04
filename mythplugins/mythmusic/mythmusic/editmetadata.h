@@ -7,9 +7,6 @@ using namespace std;
 #include <mythscreentype.h>
 #include "metadata.h"
 
-class Metadata;
-class AlbumArtImages;
-class AlbumArtImage;
 class MythUIStateType;
 class MythUIImage;
 class MythUIButton;
@@ -96,7 +93,6 @@ class EditMetadataDialog : public EditMetadataCommon
   private:
     void showMenu(void);
     void fillWidgets(void);
-    QString findIcon(const QString &type, const QString &name);
 
     void updateArtistImage(void);
     void updateAlbumImage(void);

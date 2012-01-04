@@ -23,6 +23,7 @@ using namespace std;
 // MythTV
 #include <mythdbcon.h>
 #include <mythcontext.h>
+#include <mythuihelper.h>
 
 // mythmusic
 #include "mainvisual.h"
@@ -32,9 +33,556 @@ using namespace std;
 #include "metadata.h"
 #include "musicplayer.h"
 
-
 #define FFTW_N 512
 // static_assert(FFTW_N==SAMPLES_DEFAULT_SIZE)
+
+
+VisFactory* VisFactory::g_pVisFactories = 0;
+
+VisualBase::VisualBase(bool screensaverenable)
+    : m_fps(20), m_xscreensaverenable(screensaverenable)
+{
+    if (!m_xscreensaverenable)
+        GetMythUI()->DoDisableScreensaver();
+}
+
+VisualBase::~VisualBase()
+{
+    //
+    //    This is only here so
+    //    that derived classes
+    //    can destruct properly
+    //
+    if (!m_xscreensaverenable)
+        GetMythUI()->DoRestoreScreensaver();
+}
+
+
+void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, QString warning)
+{
+    p->fillRect(0, 0, size.width(), size.height(), back);
+    p->setPen(Qt::white);
+    p->setFont(GetMythUI()->GetMediumFont());
+
+    QFontMetrics fm(p->font());
+    int width = fm.width(warning);
+    int height = fm.height() * (warning.contains("\n") ? 2 : 1);
+    int x = size.width() / 2 - width / 2;
+    int y = size.height() / 2 - height / 2;
+
+    for (int offset = 0; offset < height; offset += fm.height()) {
+        QString l = warning.left(warning.indexOf("\n"));
+        p->drawText(x, y + offset, width, height, Qt::AlignCenter, l);
+        warning.remove(0, l.length () + 1);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// LogScale
+
+LogScale::LogScale(int maxscale, int maxrange)
+    : indices(0), s(0), r(0)
+{
+    setMax(maxscale, maxrange);
+}
+
+LogScale::~LogScale()
+{
+    if (indices)
+        delete [] indices;
+}
+
+void LogScale::setMax(int maxscale, int maxrange)
+{
+    if (maxscale == 0 || maxrange == 0)
+        return;
+
+    s = maxscale;
+    r = maxrange;
+
+    if (indices)
+        delete [] indices;
+
+    double alpha;
+    int i, scaled;
+    long double domain = (long double) maxscale;
+    long double range  = (long double) maxrange;
+    long double x  = 1.0;
+    long double dx = 1.0;
+    long double y  = 0.0;
+    long double yy = 0.0;
+    long double t  = 0.0;
+    long double e4 = 1.0E-8;
+
+    indices = new int[maxrange];
+    for (i = 0; i < maxrange; i++)
+        indices[i] = 0;
+
+    // initialize log scale
+    for (uint i=0; i<10000 && (std::abs(dx) > e4); i++)
+    {
+        t = std::log((domain + x) / x);
+        y = (x * t) - range;
+        yy = t - (domain / (x + domain));
+        dx = y / yy;
+        x -= dx;
+    }
+
+    alpha = x;
+    for (i = 1; i < (int) domain; i++)
+    {
+        scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
+        if (scaled < 1)
+            scaled = 1;
+        if (indices[scaled - 1] < i)
+            indices[scaled - 1] = i;
+    }
+}
+
+int LogScale::operator[](int index)
+{
+    return indices[index];
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// StereoScope
+
+#define RUBBERBAND 0
+#define TWOCOLOUR 0
+StereoScope::StereoScope() :
+    startColor(Qt::green), targetColor(Qt::red),
+    rubberband(RUBBERBAND), falloff(1.0)
+{
+    m_fps = 45;
+}
+
+StereoScope::~StereoScope()
+{
+}
+
+void StereoScope::resize( const QSize &newsize )
+{
+    size = newsize;
+
+    uint os = magnitudes.size();
+    magnitudes.resize( size.width() * 2 );
+    for ( ; os < magnitudes.size(); os++ )
+        magnitudes[os] = 0.0;
+}
+
+bool StereoScope::process( VisualNode *node )
+{
+    bool allZero = true;
+
+
+    if (node) 
+    {
+        double index = 0;
+        double const step = (double)SAMPLES_DEFAULT_SIZE / size.width();
+        for ( int i = 0; i < size.width(); i++) 
+        {
+            unsigned long indexTo = (unsigned long)(index + step);
+            if (indexTo == (unsigned long)(index))
+                indexTo = (unsigned long)(index + 1);
+
+            double valL = 0, valR = 0;
+#if RUBBERBAND
+            if ( rubberband ) {
+                valL = magnitudes[ i ];
+                valR = magnitudes[ i + size.width() ];
+                if (valL < 0.) {
+                    valL += falloff;
+                    if ( valL > 0. )
+                        valL = 0.;
+                }
+                else
+                {
+                    valL -= falloff;
+                    if ( valL < 0. )
+                        valL = 0.;
+                }
+                if (valR < 0.) 
+                {
+                    valR += falloff;
+                    if ( valR > 0. )
+                        valR = 0.;
+                } 
+                else 
+                {
+                    valR -= falloff;
+                    if ( valR < 0. )
+                        valR = 0.;
+                }
+            }
+#endif
+            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->length; s++) 
+            {
+                double tmpL = ( ( node->left ?
+                       double( node->left[s] ) : 0.) *
+                     double( size.height() / 4 ) ) / 32768.;
+                double tmpR = ( ( node->right ?
+                       double( node->right[s]) : 0.) *
+                     double( size.height() / 4 ) ) / 32768.;
+                if (tmpL > 0)
+                    valL = (tmpL > valL) ? tmpL : valL;
+                else
+                    valL = (tmpL < valL) ? tmpL : valL;
+                if (tmpR > 0)
+                    valR = (tmpR > valR) ? tmpR : valR;
+                else
+                    valR = (tmpR < valR) ? tmpR : valR;
+            }
+
+            if (valL != 0. || valR != 0.)
+                allZero = false;
+
+            magnitudes[ i ] = valL;
+            magnitudes[ i + size.width() ] = valR;
+
+            index = index + step;
+        }
+#if RUBBERBAND
+    } 
+    else if (rubberband) 
+    {
+        for ( int i = 0; i < size.width(); i++) 
+        {
+            double valL = magnitudes[ i ];
+            if (valL < 0) {
+                valL += 2;
+                if (valL > 0.)
+                    valL = 0.;
+            } else {
+                valL -= 2;
+                if (valL < 0.)
+                    valL = 0.;
+            }
+
+            double valR = magnitudes[ i + size.width() ];
+            if (valR < 0.) {
+                valR += falloff;
+                if (valR > 0.)
+                    valR = 0.;
+            }
+            else
+            {
+                valR -= falloff;
+                if (valR < 0.)
+                    valR = 0.;
+            }
+
+            if (valL != 0. || valR != 0.)
+                allZero = false;
+
+            magnitudes[ i ] = valL;
+            magnitudes[ i + size.width() ] = valR;
+        }
+#endif
+    } 
+    else 
+    {
+        for ( int i = 0; (unsigned) i < magnitudes.size(); i++ )
+            magnitudes[ i ] = 0.;
+    }
+
+    return allZero;
+}
+
+bool StereoScope::draw( QPainter *p, const QColor &back )
+{
+    p->fillRect(0, 0, size.width(), size.height(), back);
+    for ( int i = 1; i < size.width(); i++ ) 
+    {
+#if TWOCOLOUR
+    double r, g, b, per;
+
+    // left
+    per = double( magnitudes[ i ] * 2 ) /
+          double( size.height() / 4 );
+    if (per < 0.0)
+        per = -per;
+    if (per > 1.0)
+        per = 1.0;
+    else if (per < 0.0)
+        per = 0.0;
+
+    r = startColor.red() + (targetColor.red() -
+                startColor.red()) * (per * per);
+    g = startColor.green() + (targetColor.green() -
+                  startColor.green()) * (per * per);
+    b = startColor.blue() + (targetColor.blue() -
+                 startColor.blue()) * (per * per);
+
+    if (r > 255.0)
+        r = 255.0;
+    else if (r < 0.0)
+        r = 0;
+
+    if (g > 255.0)
+        g = 255.0;
+    else if (g < 0.0)
+        g = 0;
+
+    if (b > 255.0)
+        b = 255.0;
+    else if (b < 0.0)
+        b = 0;
+
+    p->setPen( QColor( int(r), int(g), int(b) ) );
+#else
+    p->setPen(Qt::red);
+#endif
+    p->drawLine( i - 1, (int)((size.height() / 4) + magnitudes[i - 1]),
+             i, (int)((size.height() / 4) + magnitudes[i]));
+
+#if TWOCOLOUR
+    // right
+    per = double( magnitudes[ i + size.width() ] * 2 ) /
+          double( size.height() / 4 );
+    if (per < 0.0)
+        per = -per;
+    if (per > 1.0)
+        per = 1.0;
+    else if (per < 0.0)
+        per = 0.0;
+
+    r = startColor.red() + (targetColor.red() -
+                startColor.red()) * (per * per);
+    g = startColor.green() + (targetColor.green() -
+                  startColor.green()) * (per * per);
+    b = startColor.blue() + (targetColor.blue() -
+                 startColor.blue()) * (per * per);
+
+    if (r > 255.0)
+        r = 255.0;
+    else if (r < 0.0)
+        r = 0;
+
+    if (g > 255.0)
+        g = 255.0;
+    else if (g < 0.0)
+        g = 0;
+
+    if (b > 255.0)
+        b = 255.0;
+    else if (b < 0.0)
+        b = 0;
+
+    p->setPen( QColor( int(r), int(g), int(b) ) );
+#else
+    p->setPen(Qt::red);
+#endif
+    p->drawLine( i - 1, (int)((size.height() * 3 / 4) +
+             magnitudes[i + size.width() - 1]),
+             i, (int)((size.height() * 3 / 4) +
+                     magnitudes[i + size.width()]));
+    }
+
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// MonoScope
+
+MonoScope::MonoScope()
+{
+}
+
+MonoScope::~MonoScope()
+{
+}
+
+bool MonoScope::process( VisualNode *node )
+{
+    bool allZero = true;
+
+    if (node)
+    {
+        double index = 0;
+        double const step = (double)SAMPLES_DEFAULT_SIZE / size.width();
+        for (int i = 0; i < size.width(); i++)
+        {
+            unsigned long indexTo = (unsigned long)(index + step);
+            if (indexTo == (unsigned long)index)
+                indexTo = (unsigned long)(index + 1);
+
+            double val = 0;
+#if RUBBERBAND
+            if ( rubberband )
+            {
+                val = magnitudes[ i ];
+                if (val < 0.)
+                {
+                    val += falloff;
+                    if ( val > 0. )
+                    {
+                        val = 0.;
+                    }
+                }
+                else
+                {
+                    val -= falloff;
+                    if ( val < 0. )
+                    {
+                        val = 0.;
+                    }
+                }
+            }
+#endif
+            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->length; s++)
+            {
+                double tmp = ( double( node->left[s] ) +
+                        (node->right ? double( node->right[s] ) : 0) *
+                        double( size.height() / 2 ) ) / 65536.;
+                if (tmp > 0)
+                {
+                    val = (tmp > val) ? tmp : val;
+                }
+                else
+                {
+                    val = (tmp < val) ? tmp : val;
+                }
+            }
+
+            if ( val != 0. )
+            {
+                allZero = false;
+            }
+            magnitudes[ i ] = val;
+            index = index + step;
+        }
+    }
+#if RUBBERBAND
+    else if (rubberband)
+    {
+        for (int i = 0; i < size.width(); i++) {
+            double val = magnitudes[ i ];
+            if (val < 0) {
+                val += 2;
+                if (val > 0.)
+                    val = 0.;
+            } else {
+                val -= 2;
+                if (val < 0.)
+                    val = 0.;
+            }
+
+            if ( val != 0. )
+                allZero = false;
+            magnitudes[ i ] = val;
+        }
+    }
+#endif
+    else
+    {
+        for (int i = 0; i < size.width(); i++ )
+            magnitudes[ i ] = 0.;
+    }
+
+    return allZero;
+}
+
+bool MonoScope::draw( QPainter *p, const QColor &back )
+{
+    p->fillRect( 0, 0, size.width(), size.height(), back );
+    for ( int i = 1; i < size.width(); i++ ) {
+#if TWOCOLOUR
+        double r, g, b, per;
+
+        per = double( magnitudes[ i ] ) /
+              double( size.height() / 4 );
+        if (per < 0.0)
+            per = -per;
+        if (per > 1.0)
+            per = 1.0;
+        else if (per < 0.0)
+            per = 0.0;
+
+        r = startColor.red() + (targetColor.red() -
+                                startColor.red()) * (per * per);
+        g = startColor.green() + (targetColor.green() -
+                                  startColor.green()) * (per * per);
+        b = startColor.blue() + (targetColor.blue() -
+                                 startColor.blue()) * (per * per);
+
+        if (r > 255.0)
+            r = 255.0;
+        else if (r < 0.0)
+            r = 0;
+
+        if (g > 255.0)
+            g = 255.0;
+        else if (g < 0.0)
+            g = 0;
+
+        if (b > 255.0)
+            b = 255.0;
+        else if (b < 0.0)
+            b = 0;
+
+        p->setPen(QColor(int(r), int(g), int(b)));
+#else
+        p->setPen(Qt::red);
+#endif
+        p->drawLine( i - 1, (int)(size.height() / 2 + magnitudes[ i - 1 ]),
+                     i, (int)(size.height() / 2 + magnitudes[ i ] ));
+    }
+
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// StereoScopeFactory
+
+static class StereoScopeFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const
+    {
+        static QString name("StereoScope");
+        return name;
+    }
+
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
+
+    VisualBase *create(MainVisual *parent, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)pluginName;
+        return new StereoScope();
+    }
+}StereoScopeFactory;
+
+
+///////////////////////////////////////////////////////////////////////////////
+// MonoScopeFactory
+
+static class MonoScopeFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const
+    {
+        static QString name("MonoScope");
+        return name;
+    }
+
+    uint plugins(QStringList *list) const
+    {
+        *list << name();
+        return 1;
+    }
+
+    VisualBase *create(MainVisual *parent, const QString &pluginName) const
+    {
+        (void)parent;
+        (void)pluginName;
+        return new MonoScope();
+    }
+}MonoScopeFactory;
 
 Spectrum::Spectrum()
 #if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
@@ -45,24 +593,36 @@ Spectrum::Spectrum()
     // provided by the Fast Fourier Transforms library
     analyzerBarWidth = 6;
     scaleFactor = 2.0;
-    falloff = 3.0;
-    fps = 20;
-        
+    falloff = 10.0;
+    m_fps = 15;
+
 #ifdef FFTW3_SUPPORT
     lin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
+    memset(lin, 0, sizeof(myth_fftw_float)*FFTW_N);
+
     rin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    lout = (myth_fftw_complex*)
-        av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
-    rout = (myth_fftw_complex*)
-        av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+    memset(rin, 0, sizeof(myth_fftw_float)*FFTW_N);
+
+    lout = (myth_fftw_complex*) av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+    memset(lout, 0, sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+
+    rout = (myth_fftw_complex*) av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+    memset(rout, 0, sizeof(myth_fftw_complex)*(FFTW_N/2+1));
 
     lplan = fftw_plan_dft_r2c_1d(FFTW_N, lin, (myth_fftw_complex_cast*)lout, FFTW_MEASURE);
     rplan = fftw_plan_dft_r2c_1d(FFTW_N, rin, (myth_fftw_complex_cast*)rout, FFTW_MEASURE);
 #elif FFTW2_SUPPORT
     lin = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N);
+    memset(lin, 0, sizeof(fftw_real)*FFTW_N);
+
     rin = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N);
+    memset(rin, 0, sizeof(fftw_real)*FFTW_N);
+
     lout = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N*2);
+    memset(lout, 0, sizeof(fftw_real)*FFTW_N*2);
+
     rout = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N*2);
+    memset(rout, 0, sizeof(fftw_real)*FFTW_N*2);
 
     plan = rfftw_create_plan(FFTW_N, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
 #endif // FFTW2_SUPPORT
@@ -102,8 +662,10 @@ void Spectrum::resize(const QSize &newsize)
     size = newsize;
 
     analyzerBarWidth = size.width() / 64;
+
     if (analyzerBarWidth < 6)
         analyzerBarWidth = 6;
+
     scale.setMax(192, size.width() / analyzerBarWidth);
 
     rects.resize( scale.range() );
@@ -161,8 +723,9 @@ bool Spectrum::process(VisualNode *node)
 #endif
 
     index = 1;
-    for (i = 0; i < (uint)rects.size(); i++, w += analyzerBarWidth)
-    {        
+
+    for (i = 0; (int)i < rects.size(); i++, w += analyzerBarWidth)
+    {
 #ifdef FFTW3_SUPPORT
         magL = (log(sq(real(lout[index])) + sq(real(lout[FFTW_N - index]))) - 22.0) * 
                scaleFactor;
@@ -218,7 +781,6 @@ bool Spectrum::process(VisualNode *node)
 
         magnitudesp[i] = magL;
         magnitudesp[i + scale.range()] = magR;
- 
         rectsp[i].setTop( size.height() / 2 - int( magL ) );
         rectsp[i].setBottom( size.height() / 2 + int( magR ) );
 
@@ -256,8 +818,8 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     {
         per = double( rectsp[i].height() - 2 ) / double( size.height() );
 
-        per = clamp(per, 1.0, 0.0);        
-                
+        per = clamp(per, 1.0, 0.0);
+
         r = startColor.red() + 
             (targetColor.red() - startColor.red()) * (per * per);
         g = startColor.green() + 
@@ -268,7 +830,7 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
         r = clamp(r, 255.0, 0.0);
         g = clamp(g, 255.0, 0.0);
         b = clamp(b, 255.0, 0.0);
-                
+
         if(rectsp[i].height() > 4)
             p->fillRect(rectsp[i], QColor(int(r), int(g), int(b)));
     }
@@ -298,10 +860,9 @@ static class SpectrumFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    VisualBase *create(MainVisual *parent, const QString &pluginName) const
     {
         (void)parent;
-        (void)winid;
         (void)pluginName;
         return new Spectrum();
     }
@@ -320,7 +881,7 @@ Piano::Piano()
 
     double sample_rate = 44100.0;  // TODO : This should be obtained from gPlayer (likely candidate...)
 
-    fps = 20; // This is the display frequency.   We're capturing all audio chunks by defining .processUndisplayed() though.
+    m_fps = 20; // This is the display frequency.   We're capturing all audio chunks by defining .process_undisplayed() though.
 
     double concert_A   =   440.0;
     double semi_tone   = pow(2.0, 1.0/12.0);
@@ -341,9 +902,9 @@ Piano::Piano()
             // For the really low notes, 4 updates a second is good enough...
             samples_required = sample_rate/4.0;
         }
-        if (samples_required < sample_rate/(double)fps*0.75)
+        if (samples_required < sample_rate/(double)m_fps * 0.75)
         {   // For the high notes, use as many samples as we need in a display_fps
-            samples_required = sample_rate/(double)fps*0.75;
+            samples_required = sample_rate/(double)m_fps * 0.75;
         }
         piano_data[key].samples_process_before_display_update = (int)samples_required;
         piano_data[key].is_black_note = false; // Will be put right in .resize()
@@ -494,8 +1055,10 @@ bool Piano::processUndisplayed(VisualNode *node)
 
 bool Piano::process(VisualNode *node)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Processing node for DISPLAY"));
-    return process_all_types(node, true);
+    //LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Processing node for DISPLAY"));
+//    return process_all_types(node, true);
+    process_all_types(node, true);
+    return false;
 }
 
 bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
@@ -532,7 +1095,7 @@ bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
 
     if (node)
     {
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Processing node offset=%1, size=%2").arg(node->offset).arg(node->length));
+        //LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Processing node offset=%1, size=%2").arg(node->offset).arg(node->length));
         n = node->length;
 
         if (node->right) // Preprocess the data into a combined middle channel, if we have stereo data
@@ -772,10 +1335,9 @@ static class PianoFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    VisualBase *create(MainVisual *parent, const QString &pluginName) const
     {
         (void)parent;
-        (void)winid;
         (void)pluginName;
         return new Piano();
     }
@@ -785,26 +1347,53 @@ AlbumArt::AlbumArt(void)
 {
     findFrontCover();
 
+    m_lastCycle = QDateTime::currentDateTime();
+
     if (gPlayer->getDecoder())
         m_filename = gPlayer->getDecoder()->getFilename();
 
-    fps = 1;
+    m_fps = 1;
 }
 
 void AlbumArt::findFrontCover(void)
 {
     // if a front cover image is available show that first
-    AlbumArtImages albumArt(gPlayer->getCurrentMetadata());
-    if (albumArt.getImage(IT_FRONTCOVER))
+    AlbumArtImages *albumArt = gPlayer->getCurrentMetadata()->getAlbumArtImages();
+    if (albumArt->getImage(IT_FRONTCOVER))
         m_currImageType = IT_FRONTCOVER;
     else
     {
         // not available so just show the first image available
-        if (albumArt.getImageCount() > 0)
-            m_currImageType = albumArt.getImageAt(0)->imageType;
+        if (albumArt->getImageCount() > 0)
+            m_currImageType = albumArt->getImageAt(0)->imageType;
         else
             m_currImageType = IT_UNKNOWN;
     }
+}
+
+bool AlbumArt::cycleImage(void)
+{
+    AlbumArtImages *albumArt = gPlayer->getCurrentMetadata()->getAlbumArtImages();
+    int newType = m_currImageType;
+
+    if (albumArt->getImageCount() > 0)
+    {
+        do
+        {
+            newType++;
+            if (newType == IT_LAST)
+                newType = IT_UNKNOWN;
+        } while (!albumArt->getImage((ImageType) newType));
+    }
+
+    if (newType != m_currImageType)
+    {
+        m_currImageType = (ImageType) newType;
+        m_lastCycle = QDateTime::currentDateTime();
+        return true;
+    }
+
+    return false;
 }
 
 AlbumArt::~AlbumArt()
@@ -818,8 +1407,8 @@ void AlbumArt::resize(const QSize &newsize)
 
 bool AlbumArt::process(VisualNode *node)
 {
-    node = node;
-    return true;
+    (void) node;
+    return false;
 }
 
 void AlbumArt::handleKeyPress(const QString &action)
@@ -850,16 +1439,24 @@ void AlbumArt::handleKeyPress(const QString &action)
     }
 }
 
+/// this is the time an image is shown in the albumart visualizer
+#define ALBUMARTCYCLETIME 10
+
 bool AlbumArt::needsUpdate() 
 {
-    if (m_cursize != m_size)
-        return true;
-
-    if (m_filename != gPlayer->getDecoder()->getFilename()) 
+    // if the track has changed we need to update the image
+    if (m_currentMetadata != gPlayer->getCurrentMetadata())
     {
-        m_filename = gPlayer->getDecoder()->getFilename();
+        m_currentMetadata = gPlayer->getCurrentMetadata();
         findFrontCover();
         return true;
+    }
+
+    // if it's time to cycle to the next image we need to update the image
+    if (m_lastCycle.addSecs(ALBUMARTCYCLETIME) < QDateTime::currentDateTime())
+    {
+        if (cycleImage())
+            return true;
     }
 
     return false;
@@ -867,10 +1464,6 @@ bool AlbumArt::needsUpdate()
 
 bool AlbumArt::draw(QPainter *p, const QColor &back)
 {
-    if (!gPlayer->getDecoder())
-        return false;
-
-    // If the directory has changed (new album) or the size, reload
     if (needsUpdate())
     {
         QImage art;
@@ -922,10 +1515,9 @@ static class AlbumArtFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    VisualBase *create(MainVisual *parent, const QString &pluginName) const
     {
         (void) parent;
-        (void)winid;
         (void)pluginName;
         return new AlbumArt();
     }
@@ -934,7 +1526,7 @@ static class AlbumArtFactory : public VisFactory
 Blank::Blank()
     : VisualBase(true)
 {
-    fps = 20;
+    m_fps = 20;
 }
 
 Blank::~Blank()
@@ -975,10 +1567,9 @@ static class BlankFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    VisualBase *create(MainVisual *parent, const QString &pluginName) const
     {
         (void)parent;
-        (void)winid;
         (void)pluginName;
         return new Blank();
     }
@@ -1074,15 +1665,14 @@ static class SquaresFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    VisualBase *create(MainVisual *parent, const QString &pluginName) const
     {
         (void)parent;
-        (void)winid;
         (void)pluginName;
         return new Squares();
     }
 }SquaresFactory;
-
+#if 0
 #ifdef OPENGL_SUPPORT
 
 //        Need this for the Gears Object (below)
@@ -1523,9 +2113,8 @@ static class GearsFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    VisualBase *create(MainVisual *parent,  const QString &pluginName) const
     {
-        (void)winid;
         (void)pluginName;
         return new Gears(parent);
     }
@@ -1533,3 +2122,4 @@ static class GearsFactory : public VisFactory
 
 
 #endif
+#endif 

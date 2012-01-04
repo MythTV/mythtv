@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QFile>
 #include <QList>
+#include <QDir>
 
 // mythtv
 #include <mythcontext.h>
@@ -38,6 +39,7 @@ QEvent::Type MusicPlayerEvent::MetadataChangedEvent = (QEvent::Type) QEvent::reg
 QEvent::Type MusicPlayerEvent::TrackStatsChangedEvent = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MusicPlayerEvent::AlbumArtChangedEvent = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MusicPlayerEvent::CDChangedEvent = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MusicPlayerEvent::PlaylistChangedEvent = (QEvent::Type) QEvent::registerEventType();
 
 MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     :QObject(parent)
@@ -47,13 +49,19 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     m_CDdevice = dev;
     m_output = NULL;
     m_decoderHandler = NULL;
+    m_cdWatcher = NULL;
+    m_currentPlaylist = NULL;
+    m_currentTrack = -1;
 
-    m_playlistTree = NULL;
-    m_currentNode = NULL;
+    m_currentTime = 0;
+    m_lastTrackStart = 0;
+
     m_currentMetadata = NULL;
+    m_oneshotMetadata = NULL;
 
     m_isAutoplay = false;
     m_isPlaying = false;
+    m_isStreaming = false;
     m_canShowPlayer = true;
     m_wasPlaying = true;
     m_updatedLastplay = false;
@@ -88,16 +96,31 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     else
         m_resumeMode = RESUME_EXACT;
 
-    m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay",
-                                              LASTPLAY_DELAY);
+    m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
 
     m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
+
+    //  Do we check the CD?
+    bool checkCD = gCoreContext->GetNumSetting("AutoLookupCD");
+    if (checkCD)
+    {
+        m_cdWatcher = new CDWatcherThread(m_CDdevice);
+        // don't start the cd watcher here 
+        // since the playlists haven't been loaded yet
+    }
 
     gCoreContext->addListener(this);
 }
 
 MusicPlayer::~MusicPlayer()
 {
+    if (m_cdWatcher)
+    {
+        m_cdWatcher->stop();
+        m_cdWatcher->wait();
+        delete m_cdWatcher;
+    }
+
     if (!hasClient())
         savePosition();
 
@@ -105,14 +128,17 @@ MusicPlayer::~MusicPlayer()
 
     stop(true);
 
-    if (m_playlistTree)
-        delete m_playlistTree;
-
     if (m_decoderHandler)
     {
         m_decoderHandler->removeListener(this);
         m_decoderHandler->deleteLater();
         m_decoderHandler = NULL;
+    }
+
+    if (m_oneshotMetadata)
+    {
+        delete m_oneshotMetadata;
+        m_oneshotMetadata = NULL;
     }
 
     if (m_shuffleMode == SHUFFLE_INTELLIGENT)
@@ -171,7 +197,7 @@ void MusicPlayer::removeListener(QObject *listener)
 
 void MusicPlayer::addVisual(MainVisual *visual)
 {
-    if (visual)
+    if (visual && !m_visualisers.contains(visual))
     {
         if (m_output)
         {
@@ -197,11 +223,19 @@ void MusicPlayer::removeVisual(MainVisual *visual)
     }
 }
 
-void MusicPlayer::playFile(const Metadata &meta)
+// this stops playing the playlist and plays the file pointed to by mdata
+void MusicPlayer::playFile(const Metadata &mdata)
 {
-    m_currentMetadata = new Metadata(meta);
+    if (m_oneshotMetadata)
+    {
+        delete m_oneshotMetadata;
+        m_oneshotMetadata = NULL;
+    }
+
+    m_oneshotMetadata = new Metadata();
+    *m_oneshotMetadata = mdata;
+
     play();
-    m_currentNode = NULL;
 }
 
 void MusicPlayer::stop(bool stopAll)
@@ -280,24 +314,14 @@ void MusicPlayer::play(void)
         setupDecoderHandler();
 
     getDecoderHandler()->start(meta);
+
+    m_isStreaming = (meta->Format() == "cast");
 }
 
 void MusicPlayer::stopDecoder(void)
 {
-    if (m_currentMetadata)
-    {
-        if (m_currentMetadata->hasChanged())
-        {
-            m_currentMetadata->persist();
-            if (getDecoder())
-                getDecoder()->commitVolatileMetadata(m_currentMetadata);
-        }
-    }
-
     if (getDecoderHandler())
         getDecoderHandler()->stop();
-
-    m_currentMetadata = NULL;
 }
 
 bool MusicPlayer::openOutputDevice(void)
@@ -344,6 +368,7 @@ bool MusicPlayer::openOutputDevice(void)
 
     // add any visuals to the audio output
     QSet<QObject*>::const_iterator it = m_visualisers.begin();
+
     for (; it != m_visualisers.end() ; ++it)
     {
         m_output->addVisual((MythTV::Visual*)(*it));
@@ -362,36 +387,35 @@ bool MusicPlayer::openOutputDevice(void)
 
 void MusicPlayer::next(void)
 {
-    if (!m_currentNode)
+    int currentTrack = m_currentTrack;
+
+    if (!m_currentPlaylist)
         return;
 
-    GenericTree *node =
-        m_currentNode->nextSibling(1, ((int) m_shuffleMode) + 1);
-
-    if (node)
-        m_currentNode = node;
+    if (m_oneshotMetadata)
+    {
+        delete m_oneshotMetadata;
+        m_oneshotMetadata = NULL;
+    }
     else
+        currentTrack++;
+
+    if (currentTrack >= m_currentPlaylist->getSongs().size())
     {
         if (m_repeatMode == REPEAT_ALL)
         {
             // start playing again from first track
-            GenericTree *parent = m_currentNode->getParent();
-            if (parent)
-            {
-                node = parent->getChildAt(0, ((int) m_shuffleMode) + 1);
-                if (node)
-                    m_currentNode = node;
-                else
-                    return; // stop()
-            }
-            else
-                return; // stop()
+            currentTrack = 0;
         }
         else
-            return; // stop()
+        {
+            stop();
+            return;
+        }
     }
 
-    m_currentMetadata = gMusicData->all_music->getMetadata(node->getInt());
+    changeCurrentTrack(currentTrack);
+
     if (m_currentMetadata)
         play();
     else
@@ -400,15 +424,23 @@ void MusicPlayer::next(void)
 
 void MusicPlayer::previous(void)
 {
-    if (!m_currentNode)
+    int currentTrack = m_currentTrack;
+
+    if (!m_currentPlaylist)
         return;
 
-    GenericTree *node
-        = m_currentNode->prevSibling(1, ((int) m_shuffleMode) + 1);
-    if (node)
+    if (m_oneshotMetadata)
     {
-        m_currentNode = node;
-        m_currentMetadata = gMusicData->all_music->getMetadata(node->getInt());
+        delete m_oneshotMetadata;
+        m_oneshotMetadata = NULL;
+    }
+    else
+        currentTrack--;
+
+    if (currentTrack >= 0)
+    {
+        changeCurrentTrack(currentTrack);
+
         if (m_currentMetadata)
             play();
         else
@@ -423,11 +455,16 @@ void MusicPlayer::previous(void)
 
 void MusicPlayer::nextAuto(void)
 {
-    if (!m_isAutoplay)
+    if (!m_currentPlaylist)
         return;
 
-    if (!m_currentNode)
+    if (m_oneshotMetadata)
+    {
+        delete m_oneshotMetadata;
+        m_oneshotMetadata = NULL;
+        play();
         return;
+    }
 
     if (m_repeatMode == REPEAT_TRACK)
     {
@@ -440,7 +477,8 @@ void MusicPlayer::nextAuto(void)
             next();
     }
 
-    if (m_canShowPlayer && m_autoShowPlayer)
+    // if we don't already have a gui attached show the miniplayer if configured to do so
+    if (m_isAutoplay && m_canShowPlayer && m_autoShowPlayer)
     {
         MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
@@ -456,14 +494,16 @@ void MusicPlayer::nextAuto(void)
 
 void MusicPlayer::customEvent(QEvent *event)
 {
+    // handle decoderHandler events
     if (event->type() == DecoderHandlerEvent::Ready)
     {
         decoderHandlerReady();
     }
-    else if (event->type() == DecoderEvent::Decoding)
+    else if (event->type() == DecoderHandlerEvent::OperationStart)
     {
-        if (getCurrentMetadata())
-            m_displayMetadata = *getCurrentMetadata();
+    }
+    else if (event->type() == DecoderHandlerEvent::OperationStop)
+    {
     }
     else if (event->type() == DecoderHandlerEvent::Info)
     {
@@ -473,11 +513,48 @@ void MusicPlayer::customEvent(QEvent *event)
         m_displayMetadata.setArtist("");
         m_displayMetadata.setTitle(*dxe->getMessage());
     }
+    else if (event->type() == DecoderHandlerEvent::Error)
+    {
+    }
     else if (event->type() == DecoderHandlerEvent::Meta)
     {
-        DecoderHandlerEvent *dxe = (DecoderHandlerEvent*)event;
-        m_displayMetadata = *dxe->getMetadata();
+        DecoderHandlerEvent *dhe = (DecoderHandlerEvent*)(event);
+        Metadata mdata(*dhe->getMetadata());
+
+        if (!m_playedList.isEmpty())
+            m_playedList.last().setLength((m_currentTime - m_lastTrackStart) * 1000);
+        m_lastTrackStart = m_currentTime;
+
+        mdata.setTrack(m_playedList.count() + 1);
+
+        m_playedList.append(mdata);
+        m_currentMetadata = &m_playedList.last();
+
+        if (m_isAutoplay && m_canShowPlayer && m_autoShowPlayer)
+        {
+            MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+            MiniPlayer *miniplayer = new MiniPlayer(popupStack);
+
+            if (miniplayer->Create())
+                popupStack->AddScreen(miniplayer);
+            else
+                delete miniplayer;
+        }
+
+        // tell any listeners we've started playing a new track
+        MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, -1);
+        dispatch(me);
     }
+
+    // handle decoder events
+    else if (event->type() == DecoderEvent::Decoding)
+    {
+        if (getCurrentMetadata())
+            m_displayMetadata = *getCurrentMetadata();
+    }
+
+    // handle MythEvent events
     else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent*) event;
@@ -681,203 +758,133 @@ void MusicPlayer::customEvent(QEvent *event)
             MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentTrack);
             dispatch(me);
         }
-
-        if (m_isAutoplay)
-            nextAuto();
+        nextAuto();
+    }
+    else if (event->type() == DecoderEvent::Stopped)
+    {
     }
 
     QObject::customEvent(event);
 }
 
-QString MusicPlayer::getFilenameFromID(int id)
+void MusicPlayer::switchPlayMode(bool playStreams)
 {
-    QString filename;
+    savePosition();
 
-    if (id > 0)
-    {
-        QString aquery = "SELECT CONCAT_WS('/', "
-            "music_directories.path, music_songs.filename) AS filename "
-            "FROM music_songs "
-            "LEFT JOIN music_directories"
-            " ON music_songs.directory_id=music_directories.directory_id "
-            "WHERE music_songs.song_id = :ID";
+    m_isStreaming = playStreams;
 
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(aquery);
-        query.bindValue(":ID", id);
-        if (!query.exec() || query.size() < 1)
-            MythDB::DBError("get filename", query);
-
-        if (query.isActive() && query.size() > 0)
-        {
-            query.first();
-            filename = query.value(0).toString();
-            if (!filename.contains("://"))
-                filename = Metadata::GetStartdir() + filename;
-        }
-    }
-    else
-    {
-        // cd track
-        CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(getDecoder());
-        if (cddecoder)
-        {
-            Metadata *meta = cddecoder->getMetadata(-id);
-            if (meta)
-                filename = meta->Filename();
-        }
-    }
-    return filename;
+    loadPlaylist();
 }
 
 void MusicPlayer::loadPlaylist(void)
 {
-    // wait for loading to complete
-    while (!gMusicData->all_playlists->doneLoading() || !gMusicData->all_music->doneLoading())
+    if (m_isStreaming)
     {
-        usleep(500);
-    }
+        m_currentPlaylist  = gMusicData->all_playlists->getStreamPlaylist();
 
-    m_currentPlaylist  = gMusicData->all_playlists->getActive();
-    setCurrentTrackPos(0);
-}
-
-void MusicPlayer::setCurrentNode(GenericTree *node)
-{
-    m_currentNode = node;
-    refreshMetadata();
-}
-
-GenericTree *MusicPlayer::constructPlaylist(void)
-{
-    QString position;
-
-    if (m_playlistTree)
-    {
-        position = getRouteToCurrent();
-        delete m_playlistTree;
-    }
-
-    m_playlistTree = new GenericTree(tr("playlist root"), 0);
-    m_playlistTree->setAttribute(0, 0);
-    m_playlistTree->setAttribute(1, 0);
-    m_playlistTree->setAttribute(2, 0);
-    m_playlistTree->setAttribute(3, 0);
-    m_playlistTree->setAttribute(4, 0);
-
-    GenericTree *active_playlist_node =
-            gMusicData->all_playlists->writeTree(m_playlistTree);
-
-    if (!position.isEmpty()) //|| m_currentNode == NULL)
-        restorePosition(position);
-
-    m_currentPlaylist  = gMusicData->all_playlists->getActive();
-
-    return active_playlist_node;
-}
-
-QString MusicPlayer::getRouteToCurrent(void)
-{
-    QStringList route;
-
-    if (m_currentNode)
-    {
-        GenericTree *climber = m_currentNode;
-
-        route.push_front(QString::number(climber->getInt()));
-        while((climber = climber->getParent()))
+        if (getResumeMode() > MusicPlayer::RESUME_OFF)
         {
-            route.push_front(QString::number(climber->getInt()));
+            int bookmark = gCoreContext->GetNumSetting("MusicStreamBookmark", 0);
+            if (bookmark < 0 || bookmark >= m_currentPlaylist->getSongs().size())
+                bookmark = 0;
+
+            m_currentTrack = bookmark;
         }
-    }
-    return route.join(",");
-}
+        else
+            m_currentTrack = 0;
 
-void MusicPlayer::setCurrentTrackPos(int pos)
-{
-    if (pos < 0 || pos >= m_currentPlaylist->getSongs().size())
-        return;
-
-    m_currentTrack = pos;
-
-    m_currentMetadata = gMusicData->all_music->getMetadata(m_currentPlaylist->getSongAt(m_currentTrack)->getValue());
-    play();
-}
-
-void MusicPlayer::savePosition(void)
-{
-    if (m_resumeMode != RESUME_OFF)
-    {
-        gCoreContext->SaveSetting("MusicBookmark", getRouteToCurrent());
-        if (m_resumeMode == RESUME_EXACT)
-            gCoreContext->SaveSetting("MusicBookmarkPosition", m_currentTime);
-    }
-}
-
-#if 0
-void MusicPlayer::savePosition(void)
-{
-    if (m_resumeMode != RESUME_OFF)
-    {
-        gContext->SaveSetting("MusicBookmark", m_currentTrack);
-        if (m_resumeMode == RESUME_EXACT)
-        gContext->SaveSetting("MusicBookmarkPosition", m_currentTime);
-    }
-}
-#endif
-
-void MusicPlayer::restorePosition(const QString &position)
-{
-    QList<int> branches_to_current_node;
-
-    if (!position.isEmpty())
-    {
-        QStringList list = position.split(",", QString::SkipEmptyParts);
-
-        for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
-            branches_to_current_node.append((*it).toInt());
-
-        //try to restore the position
-        m_currentNode = m_playlistTree->findNode(branches_to_current_node);
-        if (m_currentNode)
-            return;
-    }
-
-    // failed to find the position so go to the first track in the playlist
-    branches_to_current_node.clear();
-    branches_to_current_node.append(0);
-    branches_to_current_node.append(1);
-    branches_to_current_node.append(0);
-    m_currentNode = m_playlistTree->findNode(branches_to_current_node);
-    if (m_currentNode)
-    {
-        m_currentNode = m_currentNode->getChildAt(0, -1);
-        if (m_currentNode)
-        {
-            m_currentMetadata = gMusicData->all_music->getMetadata(m_currentNode->getInt());
-            play();
-        }
-    }
-}
-
-void MusicPlayer::restorePosition(int position)
-{
-    if (position < 0 || position >= m_currentPlaylist->getSongs().size())
-    {
-        // cannot find the track so move to first track
-        m_currentTrack = 0;
+        setShuffleMode(SHUFFLE_OFF);
     }
     else
     {
-        m_currentTrack = position;
+        m_currentPlaylist  = gMusicData->all_playlists->getActive();
+
+        if (getResumeMode() > MusicPlayer::RESUME_OFF)
+        {
+            int bookmark = gCoreContext->GetNumSetting("MusicBookmark", 0);
+            if (bookmark < 0 || bookmark >= m_currentPlaylist->getSongs().size())
+                bookmark = 0;
+
+            m_currentTrack = bookmark;
+        }
+        else
+            m_currentTrack = 0;
     }
 
-    Track *track = m_currentPlaylist->getSongAt(m_currentTrack);
+    // now we have the playlist loaded we can start the cd watcher
+    if (m_cdWatcher)
+        m_cdWatcher->start();
+}
 
-    if (track)
-        m_currentMetadata = gMusicData->all_music->getMetadata(track->getValue());
+void MusicPlayer::moveTrackUpDown(bool moveUp, int whichTrack)
+{
+    if (moveUp && whichTrack <= 0)
+        return;
+
+    if (!moveUp && whichTrack >=  m_currentPlaylist->getSongs().size() - 1)
+        return;
+
+    Metadata *currTrack = m_currentPlaylist->getSongs().at(m_currentTrack);
+
+    m_currentPlaylist->moveTrackUpDown(moveUp, whichTrack);
+
+    m_currentTrack = m_currentPlaylist->getSongs().indexOf(currTrack);
+}
+
+bool MusicPlayer::setCurrentTrackPos(int pos)
+{
+    changeCurrentTrack(pos);
+
+    if (!m_currentMetadata)
+    {
+        stop();
+        return false;
+    }
 
     play();
+
+    return true;
+}
+
+void MusicPlayer::savePosition(void)
+{
+    if (m_isStreaming || !m_currentMetadata)
+    {
+        // FIXME
+        gCoreContext->SaveSetting("MusicBookmark", -1);
+        gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
+    }
+    else
+    {
+        gCoreContext->SaveSetting("MusicBookmark", m_currentMetadata->ID());
+        gCoreContext->SaveSetting("MusicBookmarkPosition", m_currentTime);
+    }
+}
+
+void MusicPlayer::restorePosition(void)
+{
+    m_currentTrack = 0;
+    uint trackID = 0;
+
+    if (gPlayer->getResumeMode() > MusicPlayer::RESUME_OFF)
+        trackID = gCoreContext->GetNumSetting("MusicBookmark", 0);
+
+    for (int x = 0; x < m_currentPlaylist->getSongs().size(); x++)
+    {
+        if (m_currentPlaylist->getSongs().at(x)->ID() == trackID)
+        {
+            m_currentTrack = x;
+            m_currentMetadata = m_currentPlaylist->getSongAt(x);
+        }
+    }
+
+    if (m_currentMetadata)
+    {
+        play();
+
+        if (gPlayer->getResumeMode() == MusicPlayer::RESUME_EXACT)
+            seek(gCoreContext->GetNumSetting("MusicBookmarkPosition", 0));
+    }
 }
 
 void MusicPlayer::seek(int pos)
@@ -907,25 +914,77 @@ void MusicPlayer::showMiniPlayer(void)
     }
 }
 
+/// change the current track to the given track
+void MusicPlayer::changeCurrentTrack(int trackNo)
+{
+    if (!m_currentPlaylist)
+        return;
+
+    // check to see if we need to save the current tracks volatile  metadata (playcount, last played etc)
+    updateVolatileMetadata();
+
+    m_currentTrack = trackNo;
+
+    // sanity check the current track
+    if (m_currentTrack < 0 || m_currentTrack > m_currentPlaylist->getSongs().size())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MusicPlayer: asked to set the current track to an invalid track no. %1")
+            .arg(trackNo));
+        m_currentTrack = 0;
+        m_currentMetadata = NULL;
+        return;
+    }
+
+    m_currentMetadata = m_currentPlaylist->getSongAt(m_currentTrack);
+}
+
+/// get the metadata for the current track in the playlist
 Metadata *MusicPlayer::getCurrentMetadata(void)
 {
+    if (m_oneshotMetadata)
+        return m_oneshotMetadata;
+
     if (m_currentMetadata)
         return m_currentMetadata;
 
-    if (!m_currentNode)
+    if (!m_currentPlaylist || !m_currentPlaylist->getSongAt(m_currentTrack))
         return NULL;
 
-    m_currentMetadata = gMusicData->all_music->getMetadata(m_currentNode->getInt());
+    m_currentMetadata = m_currentPlaylist->getSongAt(m_currentTrack);
 
     return m_currentMetadata;
 }
 
-void MusicPlayer::refreshMetadata(void)
+/// get the metadata for the next track in the playlist
+Metadata *MusicPlayer::getNextMetadata(void)
 {
-    if (m_currentMetadata)
-        m_currentMetadata = NULL;
+    if (m_isStreaming)
+        return NULL;
 
-    getCurrentMetadata();
+    if (m_oneshotMetadata)
+        return m_currentMetadata;
+
+    if (!m_currentPlaylist || !m_currentPlaylist->getSongAt(m_currentTrack))
+        return NULL;
+
+    if (m_repeatMode == REPEAT_TRACK)
+        return getCurrentMetadata();
+
+    // if we are not playing the last track then just return the next track
+    if (m_currentTrack < m_currentPlaylist->getSongs().size() - 1)
+        return m_currentPlaylist->getSongAt(m_currentTrack + 1);
+    else
+    {
+        // if we are playing the last track then we need to take the 
+        // repeat mode into account
+        if (m_repeatMode == REPEAT_ALL)
+            return m_currentPlaylist->getSongAt(0);
+        else
+            return NULL;
+    }
+
+    return NULL;
 }
 
 MusicPlayer::RepeatMode MusicPlayer::toggleRepeatMode(void)
@@ -973,19 +1032,60 @@ MusicPlayer::ShuffleMode MusicPlayer::toggleShuffleMode(void)
             break;
     }
 
+    setShuffleMode(m_shuffleMode);
+
     return m_shuffleMode;
+}
+
+void MusicPlayer::setShuffleMode(ShuffleMode mode) 
+{
+    int curTrackID = -1;
+    if (getCurrentMetadata())
+        curTrackID = getCurrentMetadata()->ID();
+
+    m_shuffleMode = mode;
+
+    if (m_currentPlaylist)
+        m_currentPlaylist->shuffleTracks(m_shuffleMode);
+
+    if (curTrackID != -1)
+    {
+        for (int x = 0; x < getPlaylist()->getSongs().size(); x++)
+        {
+            Metadata *mdata = getPlaylist()->getSongs().at(x);
+            if (mdata && mdata->ID() == (Metadata::IdType) curTrackID)
+            {
+                m_currentTrack = x;
+                break;
+            }
+        }
+    }
 }
 
 void MusicPlayer::updateLastplay()
 {
-    if (m_currentMetadata)
+    if (!m_isStreaming && m_currentMetadata)
     {
         m_currentMetadata->incPlayCount();
         m_currentMetadata->setLastPlay();
-        sendTrackStatsChangedEvent(m_currentMetadata->ID());
     }
 
     m_updatedLastplay = true;
+}
+
+void MusicPlayer::updateVolatileMetadata(void)
+{
+    if (!m_isStreaming && m_currentMetadata && getDecoder())
+    {
+        if (m_currentMetadata->hasChanged())
+        {
+            m_currentMetadata->persist();
+            if (getDecoder())
+                getDecoder()->commitVolatileMetadata(m_currentMetadata);
+
+            sendTrackStatsChangedEvent(m_currentMetadata->ID());
+        }
+    }
 }
 
 void MusicPlayer::setSpeed(float newspeed)
@@ -1086,7 +1186,7 @@ MuteState MusicPlayer::getMuteState(void) const
 {
     if (m_output)
         return m_output->GetMuteState();
-    return kMuteAll;
+    return kMuteOff;
 }
 
 void MusicPlayer::toMap(QHash<QString, QString> &map)
@@ -1098,14 +1198,22 @@ void MusicPlayer::toMap(QHash<QString, QString> &map)
     map["mute"] = isMuted() ? tr("Muted") : "";
 }
 
-void MusicPlayer::playlistChanged(int trackID, bool deleted)
+void MusicPlayer::activePlaylistChanged(int trackID, bool deleted)
 {
     if (trackID == -1)
     {
-        // all tracks were removed
-        stop();
-        MusicPlayerEvent me(MusicPlayerEvent::AllTracksRemovedEvent, 0);
-        dispatch(me);
+        if (deleted)
+        {
+            // all tracks were removed
+            stop(true);
+            MusicPlayerEvent me(MusicPlayerEvent::AllTracksRemovedEvent, 0);
+            dispatch(me);
+        }
+        else
+        {
+            MusicPlayerEvent me(MusicPlayerEvent::TrackAddedEvent, trackID);
+            dispatch(me);
+        }
     }
     else
     {
@@ -1122,7 +1230,13 @@ void MusicPlayer::playlistChanged(int trackID, bool deleted)
     }
 }
 
-void MusicPlayer::setupDecoderHandler()
+void MusicPlayer::playlistChanged(int playlistID)
+{
+    MusicPlayerEvent me(MusicPlayerEvent::PlaylistChangedEvent, playlistID);
+    dispatch(me);
+}
+
+void MusicPlayer::setupDecoderHandler(void)
 {
     m_decoderHandler = new DecoderHandler();
     m_decoderHandler->addListener(this);
@@ -1196,6 +1310,132 @@ void MusicPlayer::decoderHandlerReady(void)
     }
 
     // tell any listeners we've started playing a new track
-    MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentNode ? m_currentNode->getInt() : -1);
+    MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentTrack);
     dispatch(me);
+}
+
+void MusicPlayer::removeTrack(int trackID)
+{
+    Metadata *mdata = gMusicData->all_music->getMetadata(trackID);
+    if (mdata)
+    {
+        int trackPos = gPlayer->getPlaylist()->getSongs().indexOf(mdata);
+        if (m_currentTrack > 0 && m_currentTrack >= trackPos)
+            m_currentTrack--;
+
+        getPlaylist()->removeTrack(trackID);
+    }
+}
+
+void MusicPlayer::addTrack(int trackID, bool updateUI)
+{
+    getPlaylist()->addTrack(trackID, updateUI);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+CDWatcherThread::CDWatcherThread(const QString &dev)
+{
+    m_cdDevice = dev;
+    m_cdStatusChanged = false;
+    m_stopped = false;
+}
+
+void CDWatcherThread::run()
+{
+#ifndef USING_MINGW
+    while (!m_stopped)
+    {
+        // lock all_music and cd_status_changed while running thread
+        QMutexLocker locker(getLock());
+
+        m_cdStatusChanged = false;
+
+        CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+        decoder->setDevice(m_cdDevice);
+        int numTracks = decoder->getNumCDAudioTracks();
+        bool redo = false;
+
+        if (numTracks != gMusicData->all_music->getCDTrackCount())
+        {
+            m_cdStatusChanged = true;
+            LOG(VB_GENERAL, LOG_NOTICE, QString("CD status has changed."));
+        }
+
+        if (numTracks == 0)
+        {
+            // No CD, or no recognizable CD
+            gMusicData->all_music->clearCDData();
+            gMusicData->all_playlists->clearCDList();
+        }
+        else if (numTracks > 0)
+        {
+            // Check the last track to see if it's changed
+            Metadata *checker = decoder->getLastMetadata();
+            if (checker)
+            {
+                if (!gMusicData->all_music->checkCDTrack(checker))
+                {
+                    redo = true;
+                    m_cdStatusChanged = true;
+                    gMusicData->all_music->clearCDData();
+                    gMusicData->all_playlists->clearCDList();
+                }
+                else
+                    m_cdStatusChanged = false;
+                delete checker;
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, "The cddecoder said it had audio tracks, "
+                                         "but it won't tell me about them");
+            }
+        }
+
+        int tracks = decoder->getNumTracks();
+        bool setTitle = false;
+
+        for (int actual_tracknum = 1;
+            redo && actual_tracknum <= tracks; actual_tracknum++)
+        {
+            Metadata *track = decoder->getMetadata(actual_tracknum);
+            if (track)
+            {
+                gMusicData->all_music->addCDTrack(*track);
+
+                if (!setTitle)
+                {
+
+                    QString parenttitle = " ";
+                    if (track->FormatArtist().length() > 0)
+                    {
+                        parenttitle += track->FormatArtist();
+                        parenttitle += " ~ ";
+                    }
+
+                    if (track->Album().length() > 0)
+                        parenttitle += track->Album();
+                    else
+                    {
+                        parenttitle = " " + QObject::tr("Unknown");
+                        LOG(VB_GENERAL, LOG_INFO, "Couldn't find your "
+                        " CD. It may not be in the freedb database.\n"
+                        "    More likely, however, is that you need to delete\n"
+                        "    ~/.cddb and ~/.cdserverrc and restart mythmusic.");
+                    }
+                    gMusicData->all_music->setCDTitle(parenttitle);
+                    setTitle = true;
+                }
+                delete track;
+            }
+        }
+
+        delete decoder;
+
+        if (m_cdStatusChanged)
+            gPlayer->sendCDChangedEvent();
+
+        usleep(1000000);
+    }
+#endif // USING_MINGW
 }

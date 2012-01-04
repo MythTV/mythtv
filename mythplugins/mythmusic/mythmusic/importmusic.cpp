@@ -1027,7 +1027,7 @@ void ImportCoverArtDialog::scanDirectory()
     QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
                                               "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
-    QFileInfoList list = d.entryInfoList(nameFilter);
+    QFileInfoList list = d.entryInfoList(nameFilter.split(";"));
     if (list.isEmpty())
         return;
 

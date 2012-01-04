@@ -14,20 +14,10 @@
 using namespace std;
 
 // Qt
-#include <QResizeEvent>
-#include <QPaintEvent>
-#include <QHideEvent>
 #include <QPainter>
-#include <QCursor>
-#include <QPixmap>
-#include <QEvent>
-#include <QMutexLocker>
 
 // mythtv
-#include <audiooutput.h>
-#include <mythcontext.h>
-#include <mythdialogs.h>
-#include <mythuihelper.h>
+#include <mythuivideo.h>
 
 // mythmusic
 #include "visualize.h"
@@ -38,84 +28,65 @@ using namespace std;
 // fast inlines
 #include "inlines.h"
 
-VisFactory* VisFactory::g_pVisFactories = 0;
 
-VisualBase::VisualBase(bool screensaverenable)
-    : fps(20), xscreensaverenable(screensaverenable)
+///////////////////////////////////////////////////////////////////////////////
+// MainVisual
+
+QStringList MainVisual::visualizers = MainVisual::Visualizations(false);
+int MainVisual::currentVisualizer = gCoreContext->GetNumSetting("MusicLastVisualizer", 0);
+
+MainVisual::MainVisual(MythUIVideo *visualiser)
+    : QObject(NULL), MythTV::Visual(), m_visualiserVideo(visualiser),
+      m_vis(NULL), m_playing(false), m_fps(20), m_samples(SAMPLES_DEFAULT_SIZE),
+      m_updateTimer(NULL)
 {
-    if (!xscreensaverenable)
-        GetMythUI()->DoDisableScreensaver();
-}
+    setObjectName("MainVisual");
 
-VisualBase::~VisualBase()
-{
-    //
-    //    This is only here so
-    //    that derived classes
-    //    can destruct properly
-    //
-    if (!xscreensaverenable)
-        GetMythUI()->DoRestoreScreensaver();
-}
+    resize(m_visualiserVideo->GetArea().size());
 
-void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, QString warning)
-{
-    p->fillRect(0, 0, size.width(), size.height(), back);
-    p->setPen(Qt::white);
-    p->setFont(GetMythUI()->GetMediumFont());
-
-    QFontMetrics fm(p->font());
-    int width = fm.width(warning);
-    int height = fm.height() * (warning.contains("\n") ? 2 : 1);
-    int x = size.width() / 2 - width / 2;
-    int y = size.height() / 2 - height / 2;
-
-    for (int offset = 0; offset < height; offset += fm.height()) {
-        QString l = warning.left(warning.indexOf("\n"));
-        p->drawText(x, y + offset, width, height, Qt::AlignCenter, l);
-        warning.remove(0, l.length () + 1);
-    }
-}
-
-MainVisual::MainVisual(QWidget *parent, const char *name)
-    : QWidget(parent), vis(0), playing(false), fps(20), samples(SAMPLES_DEFAULT_SIZE),
-      timer (0), bannerTimer(0), info_widget(0)
-{
-    setObjectName(name);
-    int screenwidth = 0, screenheight = 0;
-    float wmult = 0, hmult = 0;
-
-    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, parent->width(), parent->height());
-
-    setFont(GetMythUI()->GetBigFont());
-    setCursor(QCursor(Qt::BlankCursor));
-
-    info_widget = new InfoWidget(this);
-
-    bannerTimer = new QTimer(this);
-    connect(bannerTimer, SIGNAL(timeout()), this, SLOT(bannerTimeout()));
-
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
-    timer->start(1000 / fps);
+    m_updateTimer = new QTimer(this);
+    m_updateTimer->setInterval(1000 / m_fps);
+    m_updateTimer->setSingleShot(true);
+    connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
 MainVisual::~MainVisual()
 {
-    delete vis;
-    delete info_widget;
-    delete timer;
-    delete bannerTimer;
+    if (m_vis)
+        delete m_vis;
 
-    while (!nodes.empty())
-        delete nodes.takeLast();
+    delete m_updateTimer;
+
+    while (!m_nodes.empty())
+        delete m_nodes.takeLast();
+
+    gCoreContext->SaveSetting("MusicLastVisualizer", currentVisualizer);
+}
+
+void MainVisual::stop(void)
+{
+    m_updateTimer->stop();
+
+    if (m_vis)
+    {
+        delete m_vis;
+        m_vis = NULL;
+    }
 }
 
 void MainVisual::setVisual(const QString &name)
 {
-    pixmap.fill(Qt::black);
+    int index = visualizers.indexOf(name);
+
+    if (index == -1)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("MainVisual: visualizer %1 not found!").arg(name));
+        return;
+    }
+
+    currentVisualizer = index;
+
+    m_pixmap.fill(m_visualiserVideo->GetBackgroundColor());
 
     QString visName, pluginName;
 
@@ -130,10 +101,12 @@ void MainVisual::setVisual(const QString &name)
         pluginName.clear();
     }
 
-    if (vis)
+    m_updateTimer->stop();
+
+    if (m_vis)
     {
-        delete vis;
-        vis = NULL;
+        delete m_vis;
+        m_vis = NULL;
     }
 
     for (const VisFactory* pVisFactory = VisFactory::VisFactories();
@@ -141,27 +114,23 @@ void MainVisual::setVisual(const QString &name)
     {
         if (pVisFactory->name() == visName)
         {
-            vis = pVisFactory->create(this, (long int) winId(), pluginName);
-            vis->resize(size());
-            fps = vis->getDesiredFPS();
-            samples = vis->getDesiredSamples();
+            m_vis = pVisFactory->create(this, pluginName);
+            m_vis->resize(m_visualiserVideo->GetArea().size());
+            m_fps = m_vis->getDesiredFPS();
+            m_samples = m_vis->getDesiredSamples();
             break;
         }
     }
 
     // force an update
-    timer->stop();
-    timer->start( 1000 / fps );
+    m_updateTimer->start(1000 / m_fps);
 }
 
 // Caller holds mutex() lock
 void MainVisual::prepare()
 {
-    while (!nodes.empty())
-    {
-        delete nodes.back();
-        nodes.pop_back();
-    }
+    while (!m_nodes.empty())
+        delete m_nodes.takeLast();
 }
 
 // This is called via : mythtv/libs/libmyth/output.cpp :: OutputListeners::dispatchVisual
@@ -176,8 +145,8 @@ void MainVisual::add(uchar *buffer, unsigned long b_len, unsigned long timecode,
     len /= source_channels;
     len /= (bits_per_sample / 8);
 
-    if (len > samples)
-        len = samples;
+    if (len > m_samples)
+        len = m_samples;
 
     cnt = len;
 
@@ -203,67 +172,54 @@ void MainVisual::add(uchar *buffer, unsigned long b_len, unsigned long timecode,
     else
         len = 0;
 
-    nodes.append(new VisualNode(l, r, len, timecode));
+    m_nodes.append(new VisualNode(l, r, len, timecode));
 }
 
 void MainVisual::timeout()
 {
-    if (parent() != GetMythMainWindow()->currentWidget())
-        return;
-
-    VisualNode *node = 0;
-    if (playing && gPlayer->getOutput())
+    VisualNode *node = NULL;
+    if (m_playing && gPlayer->getOutput())
     {
-        int64_t synctime = gPlayer->getOutput()->GetAudiotime();
         QMutexLocker locker(mutex());
-        while (!nodes.empty())
+        int64_t timestamp = gPlayer->getOutput()->GetAudiotime();
+        while (m_nodes.size() > 1)
         {
-            VisualNode *n = nodes.front();
-            if ((int64_t)n->offset > synctime)
+            if ((int64_t)m_nodes.first()->offset > timestamp)
                 break;
-            nodes.pop_front();
 
-            if (vis)
-                vis->processUndisplayed(node);
+            if (m_vis)
+                m_vis->processUndisplayed(node);
 
-            delete node;
-            node = n;
+            delete m_nodes.first();
+            m_nodes.removeFirst();
         }
-        if (node)
-            nodes.push_front(node);
+
+        if (!m_nodes.isEmpty())
+            node = m_nodes.first();
     }
 
     bool stop = true;
-    if (vis)
+    if (m_vis)
+        stop = m_vis->process(node);
+
+    if (m_vis && !stop)
     {
-        stop = vis->process(node);
-        QPainter p(&pixmap);
-        if (vis->draw(&p, Qt::black))
-            update();  // This implictly picks up the data in pixmap, filled in by draw
+        QPainter p(&m_pixmap);
+        if (m_vis->draw(&p, m_visualiserVideo->GetBackgroundColor()))
+            m_visualiserVideo->UpdateFrame(&m_pixmap);
     }
 
-    if (!playing && stop)
-        timer->stop();
+    if (m_playing && !stop)
+        m_updateTimer->start();
 }
 
-void MainVisual::paintEvent(QPaintEvent *)
+void MainVisual::resize(const QSize &size)
 {
-    bitBlt(this, 0, 0, &pixmap);
-}
+    m_pixmap = QPixmap(size);
+    m_pixmap.fill(m_visualiserVideo->GetBackgroundColor());
 
-void MainVisual::resizeEvent( QResizeEvent *event )
-{
-    pixmap.resize(event->size());
-    pixmap.fill(backgroundColor());
-    QWidget::resizeEvent( event );
-
-    if ( vis )
-        vis->resize( size() );
-
-    info_widget->setDisplayRect(QRect((int)(pixmap.width() * 0.1),
-                                      (int)(pixmap.height() * 0.75),
-                                      (int)(pixmap.width() * 0.8),
-                                      (int)(pixmap.height() * 0.18)));
+    if (m_vis)
+        m_vis->resize(size);
 }
 
 void MainVisual::customEvent(QEvent *event)
@@ -273,706 +229,42 @@ void MainVisual::customEvent(QEvent *event)
         (event->type() == OutputEvent::Buffering) ||
         (event->type() == OutputEvent::Paused))
     {
-        playing = true;
-
-        if (!timer->isActive())
-            timer->start(1000 / fps);
+        m_playing = true;
+        if (!m_updateTimer->isActive())
+            m_updateTimer->start();
     }
     else if ((event->type() == OutputEvent::Stopped) ||
              (event->type() == OutputEvent::Error))
     {
-        playing = false;
+        m_playing = false;
     }
-}
-
-void MainVisual::hideEvent(QHideEvent *e)
-{
-    delete vis;
-    vis = 0;
-    emit hidingVisualization();
-    QWidget::hideEvent(e);
-}
-
-void MainVisual::showBanner(const QString &text, int showTime)
-{
-    bannerTimer->start(showTime);
-    info_widget->showInformation(text);
-}
-
-void MainVisual::showBanner(Metadata *metadata, bool fullScreen, int visMode, int showTime)
-{
-    bannerTimer->start(showTime);
-    info_widget->showMetadata(metadata, fullScreen, visMode);
-}
-
-void MainVisual::hideBanner(void)
-{
-    bannerTimer->stop();
-    info_widget->showInformation("");
-}
-
-void MainVisual::bannerTimeout(void)
-{
-    hideBanner();
 }
 
 // static member function
-QStringList MainVisual::Visualizations()
+QStringList MainVisual::Visualizations(bool showall)
 {
+    // TODO remove this once the visualiser selector is reinstated
+    showall = true;
+
     QStringList visualizations;
-    for (const VisFactory* pVisFactory = VisFactory::VisFactories();
-         pVisFactory; pVisFactory = pVisFactory->next())
+
+    if (showall)
     {
-        pVisFactory->plugins(&visualizations);
+        for (const VisFactory* pVisFactory = VisFactory::VisFactories();
+            pVisFactory; pVisFactory = pVisFactory->next())
+        {
+            pVisFactory->plugins(&visualizations);
+        }
+
+        visualizations.sort();
+
+        return visualizations;
     }
+
+    visualizations = gCoreContext->GetSetting("VisualMode").split(';', QString::SkipEmptyParts);
+
+    if (!visualizations.count())
+        visualizations.push_front("Blank");
 
     return visualizations;
 }
-
-InfoWidget::InfoWidget(QWidget *parent)
-    : QWidget( parent)
-{
-    hide();
-}
-
-void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
-{
-    if (!mdata)
-        return;
-
-    QString  text = "\"" + mdata->Title() + "\"\n" +  mdata->Artist() + "\n" + mdata->Album();
-
-    QImage albumArt;
-    QString imageFilename = mdata->getAlbumArtFile();
-    if (!imageFilename.isEmpty())
-        albumArt.load(imageFilename);
-
-    if (text == info)
-        return;
-
-    info = text;
-    if (info.isEmpty())
-    {
-        hide();
-        return;
-    }
-
-    // only show the banner in embeded mode if asked to...
-    if (visMode != 2 && !fullScreen)
-    {
-        hide();
-        return;
-    }
-
-    // ...and only then when we have an album art image to show
-    if (visMode != 2 && fullScreen && albumArt.isNull())
-    {
-        hide();
-        return;
-    }
-
-    if (fullScreen && ! albumArt.isNull())
-    {
-        resize(parentWidget()->width(), parentWidget()->height());
-        move(0, 0);
-    }
-    else
-    {
-        resize(displayRect.width(), displayRect.height());
-        move(displayRect.x(), displayRect.y());
-    }
-
-    info_pixmap = QPixmap(width(), height());
-    QPainter p(&info_pixmap);
-
-    int indent = int(info_pixmap.width() * 0.02);
-
-    p.setFont(GetMythUI()->GetMediumFont());
-
-    QFontMetrics fm(p.font());
-    int textWidth = fm.width(info);
-    int textHeight = fm.height() * (info.contains("\n") ? 2 : 1);
-    int x = indent;
-    int y = indent;
-
-    if (fullScreen && ! albumArt.isNull())
-    {
-        p.fillRect(0, 0, info_pixmap.width(), info_pixmap.height(), QColor ("black"));
-
-        // draw the albumArt image
-        QImage image(albumArt);
-        image = image.scaled(width(), height(),
-                Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        p.drawImage(QPoint(width() / 2 - image.width() / 2, height() / 2 - image.height() / 2), image);
-
-        x += displayRect.x();
-        y += displayRect.y();
-        // only show the text box if the visualiser is actually fullscreen
-        if (visMode == 2)
-            p.fillRect(displayRect, QColor ("darkblue"));
-    }
-    else
-    {
-        p.fillRect(0, 0, info_pixmap.width(), info_pixmap.height(), QColor ("darkblue"));
-
-        if (! albumArt.isNull())
-        {
-            // draw the albumArt image
-
-            QImage image(albumArt);
-            image = image.scaled(height(), height(),
-                Qt::KeepAspectRatio, Qt::SmoothTransformation);
-            p.drawImage(QPoint(0, 0), image);
-            x += height();
-        }
-    }
-
-    // only show the text if the visualiser is in fullscreen mode
-    if (!fullScreen || visMode == 2)
-    {
-        QString info_copy = info;
-        for (int offset = 0; offset < textHeight; offset += fm.height())
-        {
-            QString l = info_copy.left(info_copy.indexOf("\n"));
-            p.setPen(Qt::black);
-            p.drawText(x + 2, y + offset + 2, textWidth, textHeight, Qt::AlignLeft, l);
-            p.setPen(Qt::white);
-            p.drawText(x, y + offset, textWidth, textHeight, Qt::AlignLeft, l);
-            info_copy.remove(0, l.length () + 1);
-        }
-    }
-
-    show();
-    repaint();
-}
-
-void InfoWidget::showInformation(const QString &text)
-{
-    if (text == info)
-        return;
-
-    info = text;
-    if (info.isEmpty())
-    {
-        hide();
-        return;
-    }
-
-    resize(displayRect.width(), displayRect.height());
-    move(displayRect.x(), displayRect.y());
-
-    info_pixmap = QPixmap(width(), height());
-    QPainter p(&info_pixmap);
-
-    int indent = int(info_pixmap.width() * 0.02);
-
-    p.setFont(GetMythUI()->GetMediumFont());
-
-    QFontMetrics fm(p.font());
-    int textWidth = fm.width(info);
-    int textHeight = fm.height() * (info.contains("\n") ? 2 : 1);
-    int x = indent;
-    int y = indent;
-
-    p.fillRect(0, 0, info_pixmap.width(), info_pixmap.height(), QColor ("darkblue"));
-
-    QString info_copy = info;
-    for (int offset = 0; offset < textHeight; offset += fm.height())
-    {
-        QString l = info_copy.left(info_copy.indexOf("\n"));
-        p.setPen(Qt::black);
-        p.drawText(x + 2, y + offset + 2, textWidth, textHeight, Qt::AlignLeft, l);
-        p.setPen(Qt::white);
-        p.drawText(x, y + offset, textWidth, textHeight, Qt::AlignLeft, l);
-        info_copy.remove(0, l.length () + 1);
-    }
-
-    show();
-    repaint();
-}
-
-void InfoWidget::paintEvent( QPaintEvent * )
-{
-    bitBlt(this, 0, 0, &info_pixmap);
-}
-
-#define RUBBERBAND 0
-#define TWOCOLOUR 0
-StereoScope::StereoScope() :
-    startColor(Qt::green), targetColor(Qt::red),
-    rubberband(RUBBERBAND), falloff(1.0)
-{
-    fps = 45;
-}
-
-StereoScope::~StereoScope()
-{
-}
-
-void StereoScope::resize( const QSize &newsize )
-{
-    size = newsize;
-
-    uint os = magnitudes.size();
-    magnitudes.resize( size.width() * 2 );
-    for ( ; os < magnitudes.size(); os++ )
-        magnitudes[os] = 0.0;
-}
-
-bool StereoScope::process( VisualNode *node )
-{
-    bool allZero = true;
-
-    if (node) {
-        double index = 0;
-        double const step = (double)SAMPLES_DEFAULT_SIZE / size.width();
-        for ( int i = 0; i < size.width(); i++) {
-            unsigned long indexTo = (unsigned long)(index + step);
-            if (indexTo == (unsigned long)(index))
-                indexTo = (unsigned long)(index + 1);
-
-            double valL = 0, valR = 0;
-#if RUBBERBAND
-            if ( rubberband ) {
-                valL = magnitudes[ i ];
-                valR = magnitudes[ i + size.width() ];
-                if (valL < 0.) {
-                    valL += falloff;
-                    if ( valL > 0. )
-                        valL = 0.;
-                } else {
-                    valL -= falloff;
-                    if ( valL < 0. )
-                        valL = 0.;
-                }
-                if (valR < 0.) {
-                    valR += falloff;
-                    if ( valR > 0. )
-                        valR = 0.;
-                } else {
-                    valR -= falloff;
-                    if ( valR < 0. )
-                        valR = 0.;
-                }
-            }
-#endif
-            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->length; s++) {
-                double tmpL = ( ( node->left ?
-                       double( node->left[s] ) : 0.) *
-                     double( size.height() / 4 ) ) / 32768.;
-                double tmpR = ( ( node->right ?
-                       double( node->right[s]) : 0.) *
-                     double( size.height() / 4 ) ) / 32768.;
-                if (tmpL > 0)
-                    valL = (tmpL > valL) ? tmpL : valL;
-                else
-                    valL = (tmpL < valL) ? tmpL : valL;
-                if (tmpR > 0)
-                    valR = (tmpR > valR) ? tmpR : valR;
-                else
-                    valR = (tmpR < valR) ? tmpR : valR;
-            }
-
-            if (valL != 0. || valR != 0.)
-                allZero = false;
-
-            magnitudes[ i ] = valL;
-            magnitudes[ i + size.width() ] = valR;
-
-            index = index + step;
-        }
-#if RUBBERBAND
-    } else if (rubberband) {
-        for ( int i = 0; i < size.width(); i++) {
-            double valL = magnitudes[ i ];
-            if (valL < 0) {
-                valL += 2;
-                if (valL > 0.)
-                    valL = 0.;
-            } else {
-                valL -= 2;
-                if (valL < 0.)
-                    valL = 0.;
-            }
-
-            double valR = magnitudes[ i + size.width() ];
-            if (valR < 0.) {
-                valR += falloff;
-                if (valR > 0.)
-                    valR = 0.;
-            } else {
-                valR -= falloff;
-                if (valR < 0.)
-                    valR = 0.;
-            }
-
-            if (valL != 0. || valR != 0.)
-                allZero = false;
-
-            magnitudes[ i ] = valL;
-            magnitudes[ i + size.width() ] = valR;
-        }
-#endif
-    } else {
-        for ( int i = 0; (unsigned) i < magnitudes.size(); i++ )
-            magnitudes[ i ] = 0.;
-    }
-
-    return allZero;
-}
-
-bool StereoScope::draw( QPainter *p, const QColor &back )
-{
-    p->fillRect(0, 0, size.width(), size.height(), back);
-    for ( int i = 1; i < size.width(); i++ ) {
-#if TWOCOLOUR
-    double r, g, b, per;
-
-    // left
-    per = double( magnitudes[ i ] * 2 ) /
-          double( size.height() / 4 );
-    if (per < 0.0)
-        per = -per;
-    if (per > 1.0)
-        per = 1.0;
-    else if (per < 0.0)
-        per = 0.0;
-
-    r = startColor.red() + (targetColor.red() -
-                startColor.red()) * (per * per);
-    g = startColor.green() + (targetColor.green() -
-                  startColor.green()) * (per * per);
-    b = startColor.blue() + (targetColor.blue() -
-                 startColor.blue()) * (per * per);
-
-    if (r > 255.0)
-        r = 255.0;
-    else if (r < 0.0)
-        r = 0;
-
-    if (g > 255.0)
-        g = 255.0;
-    else if (g < 0.0)
-        g = 0;
-
-    if (b > 255.0)
-        b = 255.0;
-    else if (b < 0.0)
-        b = 0;
-
-    p->setPen( QColor( int(r), int(g), int(b) ) );
-#else
-    p->setPen(Qt::red);
-#endif
-    p->drawLine( i - 1, (int)((size.height() / 4) + magnitudes[i - 1]),
-             i, (int)((size.height() / 4) + magnitudes[i]));
-
-#if TWOCOLOUR
-    // right
-    per = double( magnitudes[ i + size.width() ] * 2 ) /
-          double( size.height() / 4 );
-    if (per < 0.0)
-        per = -per;
-    if (per > 1.0)
-        per = 1.0;
-    else if (per < 0.0)
-        per = 0.0;
-
-    r = startColor.red() + (targetColor.red() -
-                startColor.red()) * (per * per);
-    g = startColor.green() + (targetColor.green() -
-                  startColor.green()) * (per * per);
-    b = startColor.blue() + (targetColor.blue() -
-                 startColor.blue()) * (per * per);
-
-    if (r > 255.0)
-        r = 255.0;
-    else if (r < 0.0)
-        r = 0;
-
-    if (g > 255.0)
-        g = 255.0;
-    else if (g < 0.0)
-        g = 0;
-
-    if (b > 255.0)
-        b = 255.0;
-    else if (b < 0.0)
-        b = 0;
-
-    p->setPen( QColor( int(r), int(g), int(b) ) );
-#else
-    p->setPen(Qt::red);
-#endif
-    p->drawLine( i - 1, (int)((size.height() * 3 / 4) +
-             magnitudes[i + size.width() - 1]),
-             i, (int)((size.height() * 3 / 4) +
-                     magnitudes[i + size.width()]));
-    }
-
-    return true;
-}
-
-MonoScope::MonoScope()
-{
-}
-
-MonoScope::~MonoScope()
-{
-}
-
-bool MonoScope::process( VisualNode *node )
-{
-    bool allZero = true;
-
-    if (node)
-    {
-        double index = 0;
-        double const step = (double)SAMPLES_DEFAULT_SIZE / size.width();
-        for (int i = 0; i < size.width(); i++)
-        {
-            unsigned long indexTo = (unsigned long)(index + step);
-            if (indexTo == (unsigned long)index)
-                indexTo = (unsigned long)(index + 1);
-
-            double val = 0;
-#if RUBBERBAND
-            if ( rubberband )
-            {
-                val = magnitudes[ i ];
-                if (val < 0.)
-                {
-                    val += falloff;
-                    if ( val > 0. )
-                    {
-                        val = 0.;
-                    }
-                }
-                else
-                {
-                    val -= falloff;
-                    if ( val < 0. )
-                    {
-                        val = 0.;
-                    }
-                }
-            }
-#endif
-            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->length; s++)
-            {
-                double tmp = ( double( node->left[s] ) +
-                        (node->right ? double( node->right[s] ) : 0) *
-                        double( size.height() / 2 ) ) / 65536.;
-                if (tmp > 0)
-                {
-                    val = (tmp > val) ? tmp : val;
-                }
-                else
-                {
-                    val = (tmp < val) ? tmp : val;
-                }
-            }
-
-            if ( val != 0. )
-            {
-                allZero = false;
-            }
-            magnitudes[ i ] = val;
-            index = index + step;
-        }
-    }
-#if RUBBERBAND
-    else if (rubberband)
-    {
-        for (int i = 0; i < size.width(); i++) {
-            double val = magnitudes[ i ];
-            if (val < 0) {
-                val += 2;
-                if (val > 0.)
-                    val = 0.;
-            } else {
-                val -= 2;
-                if (val < 0.)
-                    val = 0.;
-            }
-
-            if ( val != 0. )
-                allZero = false;
-            magnitudes[ i ] = val;
-        }
-    }
-#endif
-    else
-    {
-        for (int i = 0; i < size.width(); i++ )
-            magnitudes[ i ] = 0.;
-    }
-
-    return allZero;
-}
-
-bool MonoScope::draw( QPainter *p, const QColor &back )
-{
-    p->fillRect( 0, 0, size.width(), size.height(), back );
-    for ( int i = 1; i < size.width(); i++ ) {
-#if TWOCOLOUR
-        double r, g, b, per;
-
-        per = double( magnitudes[ i ] ) /
-              double( size.height() / 4 );
-        if (per < 0.0)
-            per = -per;
-        if (per > 1.0)
-            per = 1.0;
-        else if (per < 0.0)
-            per = 0.0;
-
-        r = startColor.red() + (targetColor.red() -
-                                startColor.red()) * (per * per);
-        g = startColor.green() + (targetColor.green() -
-                                  startColor.green()) * (per * per);
-        b = startColor.blue() + (targetColor.blue() -
-                                 startColor.blue()) * (per * per);
-
-        if (r > 255.0)
-            r = 255.0;
-        else if (r < 0.0)
-            r = 0;
-
-        if (g > 255.0)
-            g = 255.0;
-        else if (g < 0.0)
-            g = 0;
-
-        if (b > 255.0)
-            b = 255.0;
-        else if (b < 0.0)
-            b = 0;
-
-        p->setPen(QColor(int(r), int(g), int(b)));
-#else
-        p->setPen(Qt::red);
-#endif
-        p->drawLine( i - 1, (int)(size.height() / 2 + magnitudes[ i - 1 ]),
-                     i, (int)(size.height() / 2 + magnitudes[ i ] ));
-    }
-
-    return true;
-}
-
-static class StereoScopeFactory : public VisFactory
-{
-  public:
-    const QString &name(void) const
-    {
-        static QString name("StereoScope");
-        return name;
-    }
-
-    uint plugins(QStringList *list) const
-    {
-        *list << name();
-        return 1;
-    }
-
-    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
-    {
-        (void)parent;
-        (void)winid;
-        (void)pluginName;
-        return new StereoScope();
-    }
-}StereoScopeFactory;
-
-
-static class MonoScopeFactory : public VisFactory
-{
-  public:
-    const QString &name(void) const
-    {
-        static QString name("MonoScope");
-        return name;
-    }
-
-    uint plugins(QStringList *list) const
-    {
-        *list << name();
-        return 1;
-    }
-
-    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
-    {
-        (void)parent;
-        (void)winid;
-        (void)pluginName;
-        return new MonoScope();
-    }
-}MonoScopeFactory;
-
-LogScale::LogScale(int maxscale, int maxrange)
-    : indices(0), s(0), r(0)
-{
-    setMax(maxscale, maxrange);
-}
-
-
-LogScale::~LogScale()
-{
-    if (indices)
-        delete [] indices;
-}
-
-
-void LogScale::setMax(int maxscale, int maxrange)
-{
-    if (maxscale == 0 || maxrange == 0)
-        return;
-
-    s = maxscale;
-    r = maxrange;
-
-    if (indices)
-        delete [] indices;
-
-    double alpha;
-    int i, scaled;
-    long double domain = (long double) maxscale;
-    long double range  = (long double) maxrange;
-    long double x  = 1.0;
-    long double dx = 1.0;
-    long double y  = 0.0;
-    long double yy = 0.0;
-    long double t  = 0.0;
-    long double e4 = 1.0E-8;
-
-    indices = new int[maxrange];
-    for (i = 0; i < maxrange; i++)
-        indices[i] = 0;
-
-    // initialize log scale
-    for (uint i=0; i<10000 && (std::abs(dx) > e4); i++)
-    {
-        t = std::log((domain + x) / x);
-        y = (x * t) - range;
-        yy = t - (domain / (x + domain));
-        dx = y / yy;
-        x -= dx;
-    }
-
-    alpha = x;
-    for (i = 1; i < (int) domain; i++)
-    {
-        scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
-        if (scaled < 1)
-            scaled = 1;
-        if (indices[scaled - 1] < i)
-            indices[scaled - 1] = i;
-    }
-}
-
-
-int LogScale::operator[](int index)
-{
-    return indices[index];
-}
-

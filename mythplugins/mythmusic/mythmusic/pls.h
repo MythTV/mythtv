@@ -35,7 +35,7 @@ class PlayListFileEntry
     int     m_length;
 };
 
-/** \brief Class for containing the info of a pls file
+/** \brief Class for containing the info of a pls or m3u file
  */
 class PlayListFile
 {
@@ -52,7 +52,7 @@ class PlayListFile
     */
     int size(void) const { return m_entries.count(); }
 
-    /** \brief Get a pls file entry
+    /** \brief Get a file entry
         \param i which entry to get, between 0 and the value returned by calling \p PlayListParser::size
         \returns a pointer to a \p PlayListEntry
     */
@@ -85,11 +85,27 @@ class PlayListFile
             delete m_entries.takeFirst();
     }
 
+    /** \brief Parse a pls or m3u playlist file.
+        \param pls the \p PlaylistFile to add the entries to
+        \param stream the playlist file in a \p QTextStream
+        \param extension the file extension of the original playlist file
+        \returns the number of entries parsed 
+    */
+    static int parse(PlayListFile *pls, QTextStream *stream, const QString &extension);
+
     /** \brief Parse a pls file.
+        \param pls the \p PlaylistFile to add the entries to
         \param stream the playlist file in a \p QTextStream
         \returns the number of entries parsed 
     */
-    static int parse(PlayListFile *pls, QTextStream *stream);
+    static int parsePLS(PlayListFile *pls, QTextStream *stream);
+
+    /** \brief Parse a m3u file.
+        \param pls the \p PlaylistFile to add the entries to
+        \param stream the playlist file in a \p QTextStream
+        \returns the number of entries parsed 
+    */
+    static int parseM3U(PlayListFile *pls, QTextStream *stream);
 
   private:
     QList<PlayListFileEntry*> m_entries;
