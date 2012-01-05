@@ -217,6 +217,13 @@ bool MusicCommon::CreateCommon(void)
 
         m_currentVisual = MainVisual::currentVisualizer;
 
+        // sanity check
+        if (m_currentVisual >= m_visualModes.count())
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("MusicCommon: Got a bad saved visualizer: %1").arg(m_currentVisual));
+            m_currentVisual = 0;
+        }
+
         QString visual_delay = gCoreContext->GetSetting("VisualModeDelay");
         bool delayOK;
         m_visualModeDelay = visual_delay.toInt(&delayOK);
