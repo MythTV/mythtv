@@ -432,6 +432,7 @@ MythConfirmationDialog::MythConfirmationDialog(MythScreenStack *parent,
                                                bool showCancel)
                        : MythScreenType(parent, "mythconfirmpopup")
 {
+    m_messageText = NULL;
     m_message = message;
     m_showCancel = showCancel;
 
@@ -444,12 +445,11 @@ bool MythConfirmationDialog::Create(void)
     if (!CopyWindowFromBase("MythConfirmationDialog", this))
         return false;
 
-    MythUIText *messageText = NULL;
     MythUIButton *okButton = NULL;
     MythUIButton *cancelButton = NULL;
 
     bool err = false;
-    UIUtilE::Assign(this, messageText, "message", &err);
+    UIUtilE::Assign(this, m_messageText, "message", &err);
     UIUtilE::Assign(this, okButton, "ok", &err);
     UIUtilE::Assign(this, cancelButton, "cancel", &err);
 
@@ -468,7 +468,7 @@ bool MythConfirmationDialog::Create(void)
 
     connect(okButton, SIGNAL(Clicked()), SLOT(Confirm()));
 
-    messageText->SetText(m_message);
+    m_messageText->SetText(m_message);
 
     BuildFocusList();
 
@@ -501,6 +501,13 @@ bool MythConfirmationDialog::keyPressEvent(QKeyEvent *event)
         handled = true;
 
     return handled;
+}
+
+void MythConfirmationDialog::SetMessage(const QString &message)
+{
+    m_message = message;
+    if (m_messageText)
+        m_messageText->SetText(m_message);
 }
 
 void MythConfirmationDialog::SetReturnEvent(QObject *retobject,
