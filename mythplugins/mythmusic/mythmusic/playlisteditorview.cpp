@@ -92,6 +92,7 @@ PlaylistEditorView::PlaylistEditorView(MythScreenStack *parent, const QString &l
          :MusicCommon(parent, "playlisteditorview")
 {
     m_rootNode = NULL;
+    m_playlistTree = NULL;
 
     m_layout = layout;
     m_restorePosition = restorePosition;
