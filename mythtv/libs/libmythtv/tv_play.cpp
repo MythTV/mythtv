@@ -8434,10 +8434,21 @@ void TV::customEvent(QEvent *e)
         if (message.isEmpty())
             return;
 
+        uint timeout = 0;
+        if (me->ExtraDataCount() == 1)
+        {
+            uint t = me->ExtraData(0).toUInt();
+            if (t > 0 && t < 1000)
+                timeout = t * 1000;
+        }
+
+        if (timeout > 0)
+            message += " (%d)";
+
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         OSD *osd = GetOSDLock(mctx);
         if (osd)
-            osd->DialogShow(OSD_DLG_CONFIRM, message);
+            osd->DialogShow(OSD_DLG_CONFIRM, message, timeout);
         ReturnOSDLock(mctx, osd);
         ReturnPlayerLock(mctx);
 

@@ -19,7 +19,8 @@ class SERVICE_PUBLIC FrontendServices : public Service
 
   public slots:
     virtual DTC::FrontendStatus* GetStatus(void) = 0;
-    virtual bool                 SendMessage(const QString &Message) = 0;
+    virtual bool                 SendMessage(const QString &Message,
+                                             uint Timeout) = 0;
     virtual bool                 SendAction(const QString &Action,
                                             const QString &Value,
                                             uint Width, uint Height) = 0;

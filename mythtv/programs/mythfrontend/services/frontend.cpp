@@ -24,13 +24,17 @@ DTC::FrontendStatus* Frontend::GetStatus(void)
     return status;
 }
 
-bool Frontend::SendMessage(const QString &Message)
+bool Frontend::SendMessage(const QString &Message, uint Timeout)
 {
     if (Message.isEmpty())
         return false;
 
+    QStringList data;
+    if (Timeout > 0 && Timeout < 1000)
+        data << QString::number(Timeout);
     qApp->postEvent(GetMythMainWindow(),
-                    new MythEvent(MythEvent::MythUserMessage, Message));
+                    new MythEvent(MythEvent::MythUserMessage, Message,
+                    data));
     return true;
 }
 
