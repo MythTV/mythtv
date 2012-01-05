@@ -215,7 +215,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
     // Used to update database with recording info
     void StartedRecording(QString ext);
-    void FinishedRecording(bool prematurestop);
+    void FinishedRecording(bool allowReRecord);
     void UpdateRecordingEnd(void);//pi
     void ReactivateRecording(void);//pi
     void ApplyRecordRecID(void);//pi
