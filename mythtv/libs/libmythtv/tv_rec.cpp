@@ -912,7 +912,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
 
     // store recording in recorded table
     if (recgrp != "LiveTV")
-        curRec->FinishedRecording(is_good);
+        curRec->FinishedRecording(!is_good);
 
     // send out REC_FINISHED message
     SendMythSystemRecEvent("REC_FINISHED", curRecording);

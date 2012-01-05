@@ -6069,6 +6069,19 @@ NULL
             return false;
     }
 
+    if (dbver == "1291")
+    {
+        const char *updates[] = {
+"UPDATE recorded r, recordedprogram rp SET r.duplicate=0 "
+"   WHERE r.chanid=rp.chanid AND r.progstart=rp.starttime AND "
+"      FIND_IN_SET('DAMAGED', rp.videoprop);",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1292", dbver))
+            return false;
+    }
+
     return true;
 }
 

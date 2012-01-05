@@ -1067,12 +1067,12 @@ bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
     return ok;
 }
 
-/** \fn RecordingInfo::FinishedRecording(bool prematurestop)
+/** \fn RecordingInfo::FinishedRecording(bool allowReRecord)
  *  \brief If not a premature stop, adds program to history of recorded
  *         programs.
  *  \param prematurestop If true, we only fetch the recording status.
  */
-void RecordingInfo::FinishedRecording(bool prematurestop)
+void RecordingInfo::FinishedRecording(bool allowReRecord)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE recorded SET endtime = :ENDTIME, "
@@ -1082,13 +1082,13 @@ void RecordingInfo::FinishedRecording(bool prematurestop)
     query.bindValue(":ENDTIME", recendts);
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
-    query.bindValue(":DUPLICATE", !prematurestop);
+    query.bindValue(":DUPLICATE", !allowReRecord);
 
     if (!query.exec())
         MythDB::DBError("FinishedRecording update", query);
 
     GetProgramRecordingStatus();
-    if (!prematurestop)
+    if (!allowReRecord)
     {
         recstatus = rsRecorded;
 
