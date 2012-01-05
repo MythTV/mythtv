@@ -1101,8 +1101,11 @@ void PlaylistEditorView::restoreTreePosition(const QStringList &route)
 
 void PlaylistEditorView::saveTreePosition(void)
 {
-    QString route = m_playlistTree->GetCurrentNode()->getRouteByString().join("\n");
-    gCoreContext->SaveSetting("MusicTreeLastActive", route);
+    if (m_playlistTree)
+    {
+        QString route = m_playlistTree->GetCurrentNode()->getRouteByString().join("\n");
+        gCoreContext->SaveSetting("MusicTreeLastActive", route);
+    }
 }
 
 void PlaylistEditorView::smartPLChanged(const QString &category, const QString &name)
