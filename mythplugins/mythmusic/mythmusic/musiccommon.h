@@ -75,8 +75,8 @@ class MPUBLIC MusicCommon : public MythScreenType
     void seek(int);
     void stopAll(void);
     void changeRating(bool increase);
-    void editPlaylist(void);
-    void nextAuto(void);
+//    void editPlaylist(void);
+//    void nextAuto(void);
 
     void searchButtonList(void);
     MythMenu* createMainMenu(void);

@@ -94,7 +94,7 @@ class SmartPlaylistEditor : public MythScreenType
 
     void titleChanged(void);
     void updateMatches(void);
-    void categoryClicked(void);
+//    void categoryClicked(void);
     void saveClicked(void);
     void showResultsClicked(void);
 
@@ -105,7 +105,7 @@ class SmartPlaylistEditor : public MythScreenType
     void startDeleteCategory(const QString &category);
     void renameCategory(const QString &category);
 
-    void categoryEditChanged(void);    
+//    void categoryEditChanged(void);    
     void orderByClicked(void);
 
     void editCriteria(void);
