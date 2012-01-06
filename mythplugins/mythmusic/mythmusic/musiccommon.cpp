@@ -204,6 +204,12 @@ bool MusicCommon::CreateCommon(void)
         updateUIPlaylist();
     }
 
+    if (m_visualizerVideo && m_visualModes.count() == 0)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("MusicCommon: Theme has a visualiser but none found - disabling"));
+        m_visualizerVideo = NULL;
+    }
+
     if (m_visualizerVideo)
     {
         // Warm up the visualizer
