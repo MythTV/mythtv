@@ -386,7 +386,7 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
     if (linePen.style() != Qt::NoPen)
     {
         int a = 255 * (((float)alpha / 255.0f) *
-                       ((float)fillBrush.color().alpha() / 255.0f));
+                       ((float)linePen.color().alpha() / 255.0f));
         SetColor(linePen.color().red(), linePen.color().green(),
                  linePen.color().blue(), a);
         glLineWidth(linePen.width());
