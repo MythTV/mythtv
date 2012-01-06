@@ -105,6 +105,33 @@ typedef enum PictureAttributeSupported
     kPictureAttributeSupported_Volume       = 0x20,
 } PictureAttributeSupported;
 
+typedef enum StereoscopicMode
+{
+    kStereoscopicModeNone,
+    kStereoscopicModeSideBySide,
+    kStereoscopicModeSideBySideDiscard,
+    kStereoscopicModeTopAndBottom,
+    kStereoscopicModeTopAndBottomDiscard,
+} StereoscopicMode;
+
+inline QString StereoscopictoString(StereoscopicMode mode)
+{
+    switch (mode)
+    {
+        case kStereoscopicModeNone:
+            return QObject::tr("No 3D");
+        case kStereoscopicModeSideBySide:
+            return QObject::tr("3D Side by Side");
+        case kStereoscopicModeSideBySideDiscard:
+            return QObject::tr("Discard 3D Side by Side");
+        case kStereoscopicModeTopAndBottom:
+            return QObject::tr("3D Top and Bottom");
+        case kStereoscopicModeTopAndBottomDiscard:
+            return QObject::tr("Discard 3D Top and Bottom");
+    }
+    return QObject::tr("Unknown");
+}
+
 typedef enum VideoErrorState
 {
     kError_None            = 0x00,
@@ -112,16 +139,6 @@ typedef enum VideoErrorState
     kError_Decode          = 0x02, // VDPAU decoder error
     kError_Switch_Renderer = 0x04, // Current renderer is not preferred choice
 } VideoErrorState;
-
-typedef enum AVSpecialDecode
-{
-    kAVSpecialDecode_None           = 0x00,
-    kAVSpecialDecode_LowRes         = 0x01,
-    kAVSpecialDecode_SingleThreaded = 0x02,
-    kAVSpecialDecode_FewBlocks      = 0x04,
-    kAVSpecialDecode_NoLoopFilter   = 0x08,
-    kAVSpecialDecode_NoDecode       = 0x10,
-} AVSpecialDecode;
 
 inline bool is_interlaced(FrameScanType scan)
 {

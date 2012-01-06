@@ -85,7 +85,8 @@ private:
     bool processed;             // whether processing is enabled for latency calc
     int processed_size;                 // amount processed
     SurroundMode surround_mode;         // 1 of 3 surround modes supported
+    int latency_frames;                 // number of frames of incurred latency
+    int channels;
 };
 
 #endif
-

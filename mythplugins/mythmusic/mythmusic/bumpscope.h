@@ -7,15 +7,12 @@
 #include <vector>
 using namespace std;
 
-#ifdef SDL_SUPPORT
-#include <SDL.h>
-
 #define MAX_PHONGRES 1024
 
 class BumpScope : public VisualBase
 {
 public:
-    BumpScope(long int winid);
+    BumpScope();
     virtual ~BumpScope();
 
     void resize(const QSize &size);
@@ -38,9 +35,9 @@ private:
     void rgb_to_hsv(unsigned int color, double *h, double *s, double *v);
     void hsv_to_rgb(double h, double s, double v, unsigned int *color);
 
-    QSize size;
+    QImage *m_image;
 
-    SDL_Surface *surface;
+    QSize m_size;
 
     unsigned int m_color;
     unsigned int m_x;
@@ -49,35 +46,33 @@ private:
     unsigned int m_height;
     unsigned int m_phongrad;
 
-    bool color_cycle;
-    bool moving_light;
-    bool diamond;
+    bool m_color_cycle;
+    bool m_moving_light;
+    bool m_diamond;
 
-    int bpl;
+    int m_bpl;
 
-    vector<vector<unsigned char> > phongdat;
-    unsigned char *rgb_buf;
-    double intense1[256];
-    double intense2[256];
+    vector<vector<unsigned char> > m_phongdat;
+    unsigned char *m_rgb_buf;
+    double m_intense1[256];
+    double m_intense2[256];
 
-    int iangle;
-    int ixo;
-    int iyo;
-    int ixd;
-    int iyd;
-    int ilx;
-    int ily;
-    int was_moving;
-    int was_color;
-    double ih;
-    double is;
-    double iv;
-    double isd;
-    int ihd;
-    unsigned int icolor;
+    int m_iangle;
+    int m_ixo;
+    int m_iyo;
+    int m_ixd;
+    int m_iyd;
+    int m_ilx;
+    int m_ily;
+    int m_was_moving;
+    int m_was_color;
+    double m_ih;
+    double m_is;
+    double m_iv;
+    double m_isd;
+    int m_ihd;
+    unsigned int m_icolor;
 };
 
 
 #endif
-
-#endif // __mainvisual_h

@@ -1,3 +1,25 @@
+/* -*- Mode: c++ -*-
+*
+* Class CommandLineArg
+* Class MythCommandLineParser
+*
+* Copyright (C) Raymond Wagner 2011
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
+
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
@@ -51,7 +73,11 @@ const int kEnd          = 0,
 const char* NamedOptType(int type);
 bool openPidfile(ofstream &pidfs, const QString &pidfile);
 bool setUser(const QString &username);
+int GetTermWidth(void);
 
+/** \fn GetTermWidth(void)
+ *  \brief returns terminal width, or 79 on error
+ */
 int GetTermWidth(void)
 {
 #ifdef _WIN32
@@ -66,6 +92,9 @@ int GetTermWidth(void)
 #endif
 }
 
+/** \fn NamedOptType
+ *  \brief Return character string describing type of result from parser pass
+ */
 const char* NamedOptType(int type)
 {
     switch (type)
@@ -96,30 +125,68 @@ const char* NamedOptType(int type)
     }
 }
 
+/** \class CommandLineArg
+ *  \brief Definition for a single command line option
+ *
+ *  This class contains instructions for the command line parser about what
+ *  options to process from the command line. Each instance can correspond
+ *  to multiple argument keywords, and stores a default value, whether it
+ *  has been supplied, help text, and optional interdependencies with other
+ *  CommandLineArgs.
+ */
+
+/** \brief Default constructor for CommandLineArg class
+ *
+ *  This constructor is for use with command line parser, defining an option
+ *  that can be used on the command line, and should be reported in --help
+ *  printouts
+ */
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
                    QVariant def, QString help, QString longhelp) :
     ReferenceCounter(), m_given(false), m_name(name), m_group(""),
-    m_type(type), m_default(def), m_help(help), m_longhelp(longhelp)
+    m_deprecated(""), m_type(type), m_default(def), m_help(help),
+    m_longhelp(longhelp)
 {
 }
 
+/** \brief Reduced constructor for CommandLineArg class
+ *
+ *  This constructor is for internal use within the command line parser. It
+ *  is intended for use in supplementary data storage for information not
+ *  supplied directly on the command line.
+ */
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
   : ReferenceCounter(), m_given(false), m_name(name), m_group(""),
-    m_type(type), m_default(def)
+    m_deprecated(""), m_type(type), m_default(def)
 {
 }
 
+/** \brief Dummy constructor for CommandLineArg class
+ *
+ *  This constructor is for internal use within the command line parser. It
+ *  is used as a placeholder for defining relations between different command
+ *  line arguments, and is reconciled with the proper argument of the same
+ *  name prior to parsing inputs.
+ */
 CommandLineArg::CommandLineArg(QString name) :
-    ReferenceCounter(), m_given(false), m_name(name), 
+    ReferenceCounter(), m_given(false), m_name(name), m_deprecated(""),
     m_type(QVariant::Invalid)
 {
 }
 
+/** \brief Return string containing all possible keyword triggers for this
+ *         argument
+ */
 QString CommandLineArg::GetKeywordString(void) const
 {
+    // this may cause problems if the terminal is too narrow, or if too
+    // many keywords for the same argument are used
     return m_keywords.join(" OR ");
 }
 
+/** \brief Return length of full keyword string for use in determining indent
+ *         of help text
+ */
 int CommandLineArg::GetKeywordLength(void) const
 {
     int len = GetKeywordString().length();
@@ -131,6 +198,21 @@ int CommandLineArg::GetKeywordLength(void) const
     return len;
 }
 
+/** \brief Return string containing help text with desired offset
+ *
+ *  This function returns a string containing all usable keywords and the
+ *  shortened help text, for use with the general help printout showing all
+ *  options. It automatically accounts for terminal width, and wraps the text
+ *  accordingly.
+ *
+ *  The group option acts as a filter, only returning text if the argument is
+ *  part of the group the parser is currently printing options for.
+ *
+ *  Child arguments will not produce help text on their own, but only indented
+ *  beneath each of the marked parent arguments. The force option specifies
+ *  that the function is being called by the parent argument, and help should
+ *  be output.
+ */
 QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
 {
     QString helpstr;
@@ -150,9 +232,14 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
         // to a parent option
         return helpstr;
 
+    if (!m_deprecated.isEmpty())
+        // option is marked as deprecated, do not show
+        return helpstr;
+
     QString pad;
     pad.fill(' ', off);
 
+    // print the first line with the available keywords
     QStringList hlist = m_help.split('\n');
     wrapList(hlist, termwidth-off);
     if (!m_parents.isEmpty())
@@ -160,10 +247,12 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
     msg << GetKeywordString().leftJustified(off, ' ') 
         << hlist[0] << endl;
 
+    // print remaining lines with necessary padding
     QStringList::const_iterator i1;
     for (i1 = hlist.begin() + 1; i1 != hlist.end(); ++i1)
         msg << pad << *i1 << endl;
 
+    // loop through any child arguments to print underneath
     QList<CommandLineArg*>::const_iterator i2;
     for (i2 = m_children.begin(); i2 != m_children.end(); ++i2)
         msg << (*i2)->GetHelpString(off, group, true);
@@ -172,22 +261,39 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
     return helpstr;
 }
 
+/** \brief Return string containing extended help text
+ *
+ *  This function returns a longer version of the help text than that provided
+ *  with the list of arguments, intended for more detailed, specific
+ *  information. This also documents the type of argument it takes, default
+ *  value, and any relational dependencies with other arguments it might have.
+ */
 QString CommandLineArg::GetLongHelpString(QString keyword) const
 {
     QString helpstr;
     QTextStream msg(&helpstr, QIODevice::WriteOnly);
     int termwidth = GetTermWidth();
 
+    // help called for an argument that is not me, this should not happen
     if (!m_keywords.contains(keyword))
         return helpstr;
+
+    // argument has been marked as deprecated, so warn user of such
+    if (!m_deprecated.isEmpty())
+        cerr << QString("****************************************************\n"
+                        " WARNING: %1 has been deprecated\n"
+                        "          %2\n"
+                        "****************************************************\n\n")
+                    .arg(keyword).arg(m_deprecated)
+                    .toLocal8Bit().constData();
 
     msg << "Option:      " << keyword << endl << endl;
 
     bool first = true;
 
+    // print all related keywords, padding for multiples
     QStringList::const_iterator i1;
-    i1 = m_keywords.begin();
-    while (i1 != m_keywords.end())
+    for (i1 = m_keywords.begin(); i1 != m_keywords.end(); ++i1)
     {
         if (*i1 != keyword)
         {
@@ -199,9 +305,9 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
             else
                 msg << "             " << *i1 << endl;
         }
-        i1++;
     }
 
+    // print type and default for the stored value
     msg << "Type:        " << QVariant::typeToName(m_type) << endl;
     if (m_default.canConvert(QVariant::String))
         msg << "Default:     " << m_default.toString() << endl;
@@ -213,12 +319,14 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
         help = m_longhelp.split("\n");
     wrapList(help, termwidth-13);
 
+    // print description, wrapping and padding as necessary
     msg << "Description: " << help[0] << endl;
     for (i1 = help.begin() + 1; i1 != help.end(); ++i1)
         msg << "             " << *i1 << endl;
 
     QList<CommandLineArg*>::const_iterator i2;
 
+    // loop through the four relation types and print
     if (!m_parents.isEmpty())
     {
         msg << endl << "Can be used in combination with:" << endl;
@@ -259,6 +367,12 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     return helpstr;
 }
 
+/** \brief Set option as provided on command line with no value
+ *
+ *  This specifies that an option is given, but there is no corresponding
+ *  value, meaning this can only be used on a boolean, integer, and string
+ *  arguments. All other will return false.
+ */
 bool CommandLineArg::Set(QString opt)
 {
     m_usedKeyword = opt;
@@ -290,6 +404,8 @@ bool CommandLineArg::Set(QString opt)
     return true;
 }
 
+/** \brief Set option as provided on command line with value
+ */
 bool CommandLineArg::Set(QString opt, QString val)
 {
     QStringList slist;
@@ -371,12 +487,16 @@ bool CommandLineArg::Set(QString opt, QString val)
     return true;
 }
 
+/** \brief Set argument as parent of given child
+ */
 CommandLineArg* CommandLineArg::SetParentOf(QString opt)
 {
     m_children << new CommandLineArg(opt);
     return this;
 }
 
+/** \brief Set argument as parent of multiple children
+ */
 CommandLineArg* CommandLineArg::SetParentOf(QStringList opts)
 {
     QStringList::const_iterator i = opts.begin();
@@ -385,12 +505,34 @@ CommandLineArg* CommandLineArg::SetParentOf(QStringList opts)
     return this;
 }
 
+/** \brief Set argument as child of given parent
+ */
+CommandLineArg* CommandLineArg::SetParent(QString opt)
+{
+    m_parents << new CommandLineArg(opt);
+    return this;
+}
+
+/** \brief Set argument as child of multiple parents
+ */
+CommandLineArg* CommandLineArg::SetParent(QStringList opts)
+{
+    QStringList::const_iterator i = opts.begin();
+    for (; i != opts.end(); ++i)
+        m_parents << new CommandLineArg(*i);
+    return this;
+}
+
+/** \brief Set argument as child of given parent
+ */
 CommandLineArg* CommandLineArg::SetChildOf(QString opt)
 {
     m_parents << new CommandLineArg(opt);
     return this;
 }
 
+/** \brief Set argument as child of multiple parents
+ */
 CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
 {
     QStringList::const_iterator i = opts.begin();
@@ -399,6 +541,48 @@ CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
     return this;
 }
 
+/** \brief Set argument as parent of given child
+ */
+CommandLineArg* CommandLineArg::SetChild(QString opt)
+{
+    m_children << new CommandLineArg(opt);
+    return this;
+}
+
+/** \brief Set argument as parent of multiple children
+ */
+CommandLineArg* CommandLineArg::SetChild(QStringList opts)
+{
+    QStringList::const_iterator i = opts.begin();
+    for (; i != opts.end(); ++i)
+        m_children << new CommandLineArg(*i);
+    return this;
+}
+
+/** \brief Set argument as parent of given child and mark as required
+ */
+CommandLineArg* CommandLineArg::SetRequiredChild(QString opt)
+{
+    m_children << new CommandLineArg(opt);
+    m_requires << new CommandLineArg(opt);
+    return this;
+}
+
+/** \brief Set argument as parent of multiple children and mark as required
+ */
+CommandLineArg* CommandLineArg::SetRequiredChild(QStringList opts)
+{
+    QStringList::const_iterator i = opts.begin();
+    for (; i != opts.end(); ++i)
+    {
+        m_children << new CommandLineArg(*i);
+        m_requires << new CommandLineArg(*i);
+    }
+    return this;
+}
+
+/** \brief Set argument as child required by given parent
+ */
 CommandLineArg* CommandLineArg::SetRequiredChildOf(QString opt)
 {
     m_parents << new CommandLineArg(opt);
@@ -406,6 +590,8 @@ CommandLineArg* CommandLineArg::SetRequiredChildOf(QString opt)
     return this;
 }
 
+/** \brief Set argument as child required by multiple parents
+ */
 CommandLineArg* CommandLineArg::SetRequiredChildOf(QStringList opts)
 {
     QStringList::const_iterator i = opts.begin();
@@ -417,12 +603,16 @@ CommandLineArg* CommandLineArg::SetRequiredChildOf(QStringList opts)
     return this;
 }
 
+/** \brief Set argument as requiring given option
+ */
 CommandLineArg* CommandLineArg::SetRequires(QString opt)
 {
     m_requires << new CommandLineArg(opt);
     return this;
 }
 
+/** \brief Set argument as requiring multiple options
+ */
 CommandLineArg* CommandLineArg::SetRequires(QStringList opts)
 {
     QStringList::const_iterator i = opts.begin();
@@ -431,12 +621,16 @@ CommandLineArg* CommandLineArg::SetRequires(QStringList opts)
     return this;
 }
 
+/** \brief Set argument as incompatible with given option
+ */
 CommandLineArg* CommandLineArg::SetBlocks(QString opt)
 {
     m_blocks << new CommandLineArg(opt);
     return this;
 }
 
+/** \brief Set argument as incompatible with multiple options
+ */
 CommandLineArg* CommandLineArg::SetBlocks(QStringList opts)
 {
     QStringList::const_iterator i = opts.begin();
@@ -445,6 +639,21 @@ CommandLineArg* CommandLineArg::SetBlocks(QStringList opts)
     return this;
 }
 
+/** \brief Set option as deprecated
+ */
+CommandLineArg* CommandLineArg::SetDeprecated(QString depstr)
+{
+    if (depstr.isEmpty())
+        depstr = "and will be removed in a future version.";
+    m_deprecated = depstr;
+    return this;
+}
+
+/** \brief Internal use, set argument as parent of given child
+ *
+ *  This option is intended for internal use only, as part of reconciling
+ *  dummy options with their matched real counterparts.
+ */
 void CommandLineArg::SetParentOf(CommandLineArg *other, bool forward)
 {
     int i;
@@ -469,6 +678,11 @@ void CommandLineArg::SetParentOf(CommandLineArg *other, bool forward)
         other->SetChildOf(this, false);
 }
 
+/** \brief Internal use, set argument as child of given parent
+ *
+ *  This option is intended for internal use only, as part of reconciling
+ *  dummy options with their matched real counterparts.
+ */
 void CommandLineArg::SetChildOf(CommandLineArg *other, bool forward)
 {
     int i;
@@ -493,6 +707,11 @@ void CommandLineArg::SetChildOf(CommandLineArg *other, bool forward)
         other->SetParentOf(this, false);
 }
 
+/** \brief Internal use, set argument as requiring given option
+ *
+ *  This option is intended for internal use only, as part of reconciling
+ *  dummy options with their matched real counterparts.
+ */
 void CommandLineArg::SetRequires(CommandLineArg *other, bool forward)
 {
     int i;
@@ -518,6 +737,11 @@ void CommandLineArg::SetRequires(CommandLineArg *other, bool forward)
 //        other->SetRequires(this, false);
 }
 
+/** \brief Internal use, set argument as incompatible with given option
+ *
+ *  This option is intended for internal use only, as part of reconciling
+ *  dummy options with their matched real counterparts.
+ */
 void CommandLineArg::SetBlocks(CommandLineArg *other, bool forward)
 {
     int i;
@@ -542,6 +766,8 @@ void CommandLineArg::SetBlocks(CommandLineArg *other, bool forward)
         other->SetBlocks(this, false);
 }
 
+/** \brief Mark a list of arguments as mutually exclusive
+ */
 void CommandLineArg::AllowOneOf(QList<CommandLineArg*> args)
 {
     // TODO: blocks do not get set properly if multiple dummy arguments
@@ -565,6 +791,11 @@ void CommandLineArg::AllowOneOf(QList<CommandLineArg*> args)
     }
 }
 
+/** \brief Return the longest keyword for the argument
+ *
+ *  This is used to determine which keyword to use when listing relations to
+ *  other options. The longest keyword is presumed to be the most descriptive.
+ */
 QString CommandLineArg::GetPreferredKeyword(void) const
 {
     QStringList::const_iterator it;
@@ -584,6 +815,9 @@ QString CommandLineArg::GetPreferredKeyword(void) const
     return preferred;
 }
 
+/** \brief Test all related arguments to make sure specified requirements are
+ *         fulfilled
+ */
 bool CommandLineArg::TestLinks(void) const
 {
     if (!m_given)
@@ -650,6 +884,8 @@ bool CommandLineArg::TestLinks(void) const
     return true;
 }
 
+/** \brief Clear out references to other arguments in preparation for deletion
+ */
 void CommandLineArg::CleanupLinks(void)
 {
     // clear out interdependent pointers in preparation for deletion
@@ -669,6 +905,8 @@ void CommandLineArg::CleanupLinks(void)
         m_requiredby.takeFirst()->DownRef();
 }
 
+/** \brief Internal use. Print processed input in verbose mode.
+ */
 void CommandLineArg::PrintVerbose(void) const
 {
     if (!m_given)
@@ -725,7 +963,7 @@ void CommandLineArg::PrintVerbose(void) const
         tmpmap = m_stored.toMap();
         first = true;
 
-        for (it = tmpmap.begin(); it != tmpmap.end(); it++)
+        for (it = tmpmap.begin(); it != tmpmap.end(); ++it)
         {
             if (first)
                 first = false;
@@ -752,6 +990,18 @@ void CommandLineArg::PrintVerbose(void) const
     }
 }
 
+/** \class MythCommandLineParser
+ *  \brief Parent class for defining application command line parsers
+ *
+ *  This class provides a generic interface for defining and parsing available
+ *  command line options. Options can be provided manually using the add()
+ *  method, or one of several canned add*() methods. Once defined, the command
+ *  line is parsed using the Parse() method, and results are available through
+ *  Qt standard to<Type>() methods.
+ */
+
+/** \brief Default constructor for MythCommandLineArg class
+ */
 MythCommandLineParser::MythCommandLineParser(QString appname) :
     m_appname(appname), m_passthroughActive(false),
     m_overridesImported(false), m_verbose(false)
@@ -786,6 +1036,36 @@ MythCommandLineParser::~MythCommandLineParser()
     }
 }
 
+/** \brief Add a new command line argument
+ *
+ *  This is the primary method for adding new arguments for processing. There
+ *  are several overloaded convenience methods that tie into this, allowing
+ *  it to be called with fewer inputs.
+ *
+ *  arglist  - list of arguments to allow use of on the command line
+ *  name     - internal name to be used when pulling processed data out
+ *  type     - type of variable to be processed
+ *  def      - default value to provide if one is not supplied or option is
+ *             not used
+ *  help     - short help text, displayed when printing all available options
+ *             with '--help'
+ *             if this is empty, the argument will not be shown
+ *  longhelp - extended help text, displayed when help about a specific option
+ *             is requested using '--help <option>'
+ *
+ *  Allowed types are:
+ *    Bool          - set to value, or default if value is not provided
+ *    String        - set to value, or default if value is not provided
+ *    Int           - set to value, or behaves as counter for multiple uses if
+ *                    value is not provided
+ *    UInt
+ *    LongLong
+ *    Double
+ *    DateTime      - accepts ISO8601 and Myth's flattened version
+ *    StringList    - accepts multiple uses, appended as individual strings
+ *    Map           - accepts multiple pairs, in the syntax "key=value"
+ *    Size          - accepts size in the syntax "XxY"
+ */
 CommandLineArg* MythCommandLineParser::add(QStringList arglist,
         QString name, QVariant::Type type, QVariant def,
         QString help, QString longhelp)
@@ -818,7 +1098,9 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
     return arg;
 }
 
-void MythCommandLineParser::PrintVersion(void)
+/** \brief Print application version information
+ */
+void MythCommandLineParser::PrintVersion(void) const
 {
     cout << "Please attach all output as a file in bug reports." << endl;
     cout << "MythTV Version : " << MYTH_SOURCE_VERSION << endl;
@@ -832,12 +1114,19 @@ void MythCommandLineParser::PrintVersion(void)
 #endif
 }
 
-void MythCommandLineParser::PrintHelp(void)
+/** \brief Print command line option help
+ */
+void MythCommandLineParser::PrintHelp(void) const
 {
     QString help = GetHelpString();
     cerr << help.toLocal8Bit().constData();
 }
 
+/** \brief Generate command line option help text
+ *
+ *  Generates generic help or specific help, depending on whether a value
+ *  was provided to the --help option
+ */
 QString MythCommandLineParser::GetHelpString(void) const
 {
     QString helpstr;
@@ -847,15 +1136,15 @@ QString MythCommandLineParser::GetHelpString(void) const
         .arg(m_appname).arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION);
     msg << versionStr << endl;
 
-    QString descr = GetHelpHeader();
-    if (descr.size() > 0)
-        msg << endl << descr << endl << endl;
-
     if (toString("showhelp").isEmpty())
     {
         // build generic help text
-        //msg << "Valid options are: " << endl;
 
+        QString descr = GetHelpHeader();
+        if (descr.size() > 0)
+            msg << endl << descr << endl << endl;
+
+        // loop through registered arguments to populate list of groups
         QStringList groups("");
         int maxlen = 0;
         QMap<QString, CommandLineArg*>::const_iterator i1;
@@ -866,6 +1155,8 @@ QString MythCommandLineParser::GetHelpString(void) const
                 groups << (*i1)->m_group;
         }
 
+        // loop through list of groups and print help string for each
+        // arguments will filter themselves if they are not in the group
         maxlen += 4;
         QStringList::const_iterator i2;
         for (i2 = groups.begin(); i2 != groups.end(); ++i2)
@@ -899,6 +1190,8 @@ QString MythCommandLineParser::GetHelpString(void) const
     return helpstr;
 }
 
+/** \brief Internal use. Pull next key/value pair from argv.
+ */
 int MythCommandLineParser::getOpt(int argc, const char * const * argv,
                                     int &argpos, QString &opt, QString &val)
 {
@@ -977,16 +1270,24 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
 
 }
 
+/** \brief Loop through argv and populate arguments with values
+ *
+ *  This should not be called until all arguments are added to the parser.
+ *  This returns false if the parser hits an argument it is not designed
+ *  to handle.
+ */
 bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 {
     int res;
     QString opt, val;
     CommandLineArg *argdef;
 
+    // loop through command line arguments until all are spent
     QMap<QString, CommandLineArg>::const_iterator i;
     for (int argpos = 1; argpos < argc; ++argpos)
     {
 
+        // pull next option
         res = getOpt(argc, argv, argpos, opt, val);
 
         if (m_verbose)
@@ -994,27 +1295,38 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                  << "opt:  " << opt.toLocal8Bit().constData() << endl
                  << "val:  " << val.toLocal8Bit().constData() << endl << endl;
 
+        // '--' found on command line, enable passthrough mode
         if (res == kPassthrough && !m_namedArgs.contains("_passthrough"))
         {
             cerr << "Received '--' but passthrough has not been enabled" << endl;
             return false;
         }
 
+        // end of options found, terminate loop
         if (res == kEnd)
             break;
+
+        // GetOpt pulled an empty option, this shouldnt happen by ignore
+        // it and continue
         else if (res == kEmpty)
             continue;
+
+        // more than one equal found in key/value pair, fault out
         else if (res == kInvalid)
         {
             cerr << "Invalid option received:" << endl << "    "
                  << opt.toLocal8Bit().constData();
             return false;
         }
+
+        // passthrough is active, so add the data to the stringlist
         else if (m_passthroughActive)
         {
             m_namedArgs["_passthrough"]->Set("", val);
             continue;
         }
+
+        // argument with no preceeding '-' encountered, add to stringlist
         else if (res == kArg)
         {
             if (!m_namedArgs.contains("_args"))
@@ -1069,15 +1381,26 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         else
             argdef = m_optionedArgs[opt];
 
+        // argument has been marked as deprecated, warn user
+        if (!argdef->m_deprecated.isEmpty())
+            cerr << QString("****************************************************\n"
+                            " WARNING: %1 has been deprecated\n"
+                            "          %2\n"
+                            "****************************************************\n\n")
+                        .arg(opt).arg(argdef->m_deprecated)
+                        .toLocal8Bit().constData();
+
         if (m_verbose)
             cerr << "name: " << argdef->GetName().toLocal8Bit().constData()
                  << endl;
 
+        // argument is keyword only, no value
         if (res == kOptOnly)
         {
             if (!argdef->Set(opt))
                 return false;
         }
+        // argument has keyword and value
         else if (res == kOptVal)
         {
             if (!argdef->Set(opt, val))
@@ -1119,6 +1442,9 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
     return ReconcileLinks();
 }
 
+/** \brief Replace dummy arguments used to define interdependency with pointers
+ *  to their real counterparts.
+ */
 bool MythCommandLineParser::ReconcileLinks(void)
 {
     QList<CommandLineArg*> links;
@@ -1234,7 +1560,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
         {
             if ((*i2)->m_type != QVariant::Invalid)
             {
-                i2++;
+                ++i2;
                 continue; // already handled
             }
 
@@ -1252,7 +1578,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
                             .toLocal8Bit().constData()
                      << endl;
             (*i1)->SetBlocks(m_namedArgs[(*i2)->m_name]);
-            i2++;
+            ++i2;
         }
     }
 
@@ -1265,6 +1591,9 @@ bool MythCommandLineParser::ReconcileLinks(void)
     return true;
 }
 
+/** \brief Returned stored QVariant for given argument, or default value
+ *  if not used
+ */
 QVariant MythCommandLineParser::operator[](const QString &name)
 {
     QVariant var("");
@@ -1281,16 +1610,36 @@ QVariant MythCommandLineParser::operator[](const QString &name)
     return var;
 }
 
+/** \brief Return list of additional values provided on the command line
+ *  independent of any keyword.
+ */
 QStringList MythCommandLineParser::GetArgs(void) const
 {
     return toStringList("_args");
 }
 
+/** \brief Return map of additional key/value pairs provided on the command
+ *  line independent of any registered argument.
+ */
+QMap<QString,QString> MythCommandLineParser::GetExtra(void) const
+{
+    return toMap("_extra");
+}
+
+/** \brief Return any text supplied on the command line after a bare '--'
+ */
 QString MythCommandLineParser::GetPassthrough(void) const
 {
     return toStringList("_passthrough").join(" ");
 }
 
+/** \brief Return map of key/value pairs provided to override database options
+ *
+ *  This method is used for the -O/--override-setting options, as well as the
+ *  specific arguments to override the window border and mouse cursor. On its
+ *  first use, this method will also read in any addition settings provided in
+ *  the --override-settings-file
+ */
 QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
 {
     QMap<QString,QString> smap = toMap("overridesettings");
@@ -1370,6 +1719,12 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
     return smap;
 }
 
+/** \brief Returns stored QVariant as a boolean
+ *
+ *  If the stored value is of type boolean, this will return the actual
+ *  stored or default value. For all other types, this will return whether
+ *  the argument was supplied on the command line or not.
+ */
 bool MythCommandLineParser::toBool(QString key) const
 {
     if (!m_namedArgs.contains(key))
@@ -1390,6 +1745,9 @@ bool MythCommandLineParser::toBool(QString key) const
     return false;
 }
 
+/** \brief Returns stored QVariant as an integer, falling to default
+ *  if not provided
+ */
 int MythCommandLineParser::toInt(QString key) const
 {
     int val = 0;
@@ -1412,6 +1770,9 @@ int MythCommandLineParser::toInt(QString key) const
     return val;
 }
 
+/** \brief Returns stored QVariant as an unsigned integer, falling to
+ *  default if not provided
+ */
 uint MythCommandLineParser::toUInt(QString key) const
 {
     uint val = 0;
@@ -1434,6 +1795,9 @@ uint MythCommandLineParser::toUInt(QString key) const
     return val;
 }
 
+/** \brief Returns stored QVariant as a long integer, falling to
+ *  default if not provided
+ */
 long long MythCommandLineParser::toLongLong(QString key) const
 {
     long long val = 0;
@@ -1456,6 +1820,9 @@ long long MythCommandLineParser::toLongLong(QString key) const
     return val;
 }
 
+/** \brief Returns stored QVariant as double floating point value, falling
+ *  to default if not provided
+ */
 double MythCommandLineParser::toDouble(QString key) const
 {
     double val = 0.0;
@@ -1478,6 +1845,9 @@ double MythCommandLineParser::toDouble(QString key) const
     return val;
 }
 
+/** \brief Returns stored QVariant as a QSize value, falling
+ *  to default if not provided
+ */
 QSize MythCommandLineParser::toSize(QString key) const
 {
     QSize val(0,0);
@@ -1500,6 +1870,9 @@ QSize MythCommandLineParser::toSize(QString key) const
     return val;
 }
 
+/** \brief Returns stored QVariant as a QString, falling
+ *  to default if not provided
+ */
 QString MythCommandLineParser::toString(QString key) const
 {
     QString val("");
@@ -1522,6 +1895,10 @@ QString MythCommandLineParser::toString(QString key) const
     return val;
 }
 
+/** \brief Returns stored QVariant as a QStringList, falling to default
+ *  if not provided. Optional separator can be specified to split result
+ *  if stored value is a QString.
+ */
 QStringList MythCommandLineParser::toStringList(QString key, QString sep) const
 {
     QVariant varval;
@@ -1544,6 +1921,9 @@ QStringList MythCommandLineParser::toStringList(QString key, QString sep) const
     return val;
 }
 
+/** \brief Returns stored QVariant as a QMap, falling
+ *  to default if not provided
+ */
 QMap<QString,QString> MythCommandLineParser::toMap(QString key) const
 {
     QMap<QString, QString> val;
@@ -1571,6 +1951,9 @@ QMap<QString,QString> MythCommandLineParser::toMap(QString key) const
     return val;
 }
 
+/** \brief Returns stored QVariant as a QDateTime, falling
+ *  to default if not provided
+ */
 QDateTime MythCommandLineParser::toDateTime(QString key) const
 {
     QDateTime val;
@@ -1593,6 +1976,9 @@ QDateTime MythCommandLineParser::toDateTime(QString key) const
     return val;
 }
 
+/** \brief Specify that parser should allow and collect values provided
+ *  independent of any keyword
+ */
 void MythCommandLineParser::allowArgs(bool allow)
 {
     if (m_namedArgs.contains("_args"))
@@ -1608,6 +1994,9 @@ void MythCommandLineParser::allowArgs(bool allow)
     m_namedArgs["_args"] = arg;
 }
 
+/** \brief Specify that parser should allow and collect additional key/value
+ *  pairs not explicitly defined for processing
+ */
 void MythCommandLineParser::allowExtras(bool allow)
 {
     if (m_namedArgs.contains("_extra"))
@@ -1624,6 +2013,9 @@ void MythCommandLineParser::allowExtras(bool allow)
     m_namedArgs["_extra"] = arg;
 }
 
+/** \brief Specify that parser should allow a bare '--', and collect all
+ *  subsequent text as a QString
+ */
 void MythCommandLineParser::allowPassthrough(bool allow)
 {
     if (m_namedArgs.contains("_passthrough"))
@@ -1639,6 +2031,8 @@ void MythCommandLineParser::allowPassthrough(bool allow)
     m_namedArgs["_passthrough"] = arg;
 }
 
+/** \brief Canned argument definition for --help
+ */
 void MythCommandLineParser::addHelp(void)
 {
     add(QStringList( QStringList() << "-h" << "--help" << "--usage" ),
@@ -1649,6 +2043,8 @@ void MythCommandLineParser::addHelp(void)
             "option.");
 }
 
+/** \brief Canned argument definition for --version
+ */
 void MythCommandLineParser::addVersion(void)
 {
     add("--version", "showversion", false, "Display version information.",
@@ -1657,11 +2053,13 @@ void MythCommandLineParser::addVersion(void)
             "and compiled options.");
 }
 
+/** \brief Canned argument definition for --windowed and -no-windowed
+ */
 void MythCommandLineParser::addWindowed(void)
 {
     add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
             "notwindowed", false, 
-            "Prevent application from running in window.", "")
+            "Prevent application from running in a window.", "")
         ->SetBlocks("windowed")
         ->SetGroup("User Interface");
 
@@ -1670,6 +2068,8 @@ void MythCommandLineParser::addWindowed(void)
         ->SetGroup("User Interface");
 }
 
+/** \brief Canned argument definition for --mouse-cursor and --no-mouse-cursor
+ */
 void MythCommandLineParser::addMouse(void)
 {
     add("--mouse-cursor", "mousecursor", false,
@@ -1682,6 +2082,8 @@ void MythCommandLineParser::addMouse(void)
         ->SetGroup("User Interface");
 }
 
+/** \brief Canned argument definition for --daemon
+ */
 void MythCommandLineParser::addDaemon(void)
 {
     add(QStringList( QStringList() << "-d" << "--daemon" ), "daemon", false,
@@ -1691,6 +2093,9 @@ void MythCommandLineParser::addDaemon(void)
             " --logpath --pidfile --user");
 }
 
+/** \brief Canned argument definition for --override-setting and
+ *  --override-settings-file
+ */
 void MythCommandLineParser::addSettingsOverride(void)
 {
     add(QStringList( QStringList() << "-O" << "--override-setting" ),
@@ -1705,6 +2110,8 @@ void MythCommandLineParser::addSettingsOverride(void)
             "loaded for setting overrides.", "");
 }
 
+/** \brief Canned argument definition for --chanid and --starttime
+ */
 void MythCommandLineParser::addRecording(void)
 {
     add("--chanid", "chanid", 0U,
@@ -1715,6 +2122,8 @@ void MythCommandLineParser::addRecording(void)
             "Specify start time of recording to operate on.", "");
 }
 
+/** \brief Canned argument definition for --geometry
+ */
 void MythCommandLineParser::addGeometry(void)
 {
     add(QStringList( QStringList() << "-geometry" << "--geometry" ), "geometry",
@@ -1722,6 +2131,8 @@ void MythCommandLineParser::addGeometry(void)
         ->SetGroup("User Interface");
 }
 
+/** \brief Canned argument definition for -display. Only works on X11 systems.
+ */
 void MythCommandLineParser::addDisplay(void)
 {
 #ifdef CONFIG_X11
@@ -1730,11 +2141,17 @@ void MythCommandLineParser::addDisplay(void)
 #endif
 }
 
+/** \brief Canned argument definition for --noupnp
+ */
 void MythCommandLineParser::addUPnP(void)
 {
     add("--noupnp", "noupnp", false, "Disable use of UPnP.", "");
 }
 
+/** \brief Canned argument definition for all logging options, including
+ *  --verbose, --logfile, --logpath, --quiet, --loglevel, --syslog
+ *  and --nodblog
+ */
 void MythCommandLineParser::addLogging(
     const QString &defaultVerbosity, LogLevel_t defaultLogLevel)
 {
@@ -1776,12 +2193,14 @@ void MythCommandLineParser::addLogging(
                 ->SetGroup("Logging");
     add("--syslog", "syslog", "none", 
         "Set the syslog logging facility.\nSet to \"none\" to disable, "
-        "defaults to none", "")
+        "defaults to none.", "")
                 ->SetGroup("Logging");
     add("--nodblog", "nodblog", false, "Disable database logging.", "")
                 ->SetGroup("Logging");
 }
 
+/** \brief Canned argument definition for --pidfile
+ */
 void MythCommandLineParser::addPIDFile(void)
 {
     add(QStringList( QStringList() << "-p" << "--pidfile" ), "pidfile", "",
@@ -1792,6 +2211,8 @@ void MythCommandLineParser::addPIDFile(void)
             "to send a HUP signal to process to have it re-open files.");
 }
 
+/** \brief Canned argument definition for --jobid
+ */
 void MythCommandLineParser::addJob(void)
 {
     add(QStringList( QStringList() << "-j" << "--jobid" ), "jobid", 0, "",
@@ -1800,6 +2221,18 @@ void MythCommandLineParser::addJob(void)
             "ability to update runtime status in the database.");
 }
 
+/** \brief Canned argument definition for --infile and --outfile
+ */
+void MythCommandLineParser::addInFile(bool addOutFile)
+{
+    add("--infile", "infile", "", "Input file URI", "");
+    if (addOutFile)
+        add("--outfile", "outfile", "", "Output file URI", "");
+}
+
+/** \brief Helper utility for logging interface to pull path to log file
+ *  from --logfile, or generate one from --logpath
+ */
 QString MythCommandLineParser::GetLogFilePath(void)
 {
     QString logfile = toString("logpath");
@@ -1834,6 +2267,8 @@ QString MythCommandLineParser::GetLogFilePath(void)
     return toString("filepath");
 }
 
+/** \brief Helper utility for logging interface to return syslog facility
+ */
 int MythCommandLineParser::GetSyslogFacility(void)
 {
     QString setting = toString("syslog").toLower();
@@ -1843,6 +2278,8 @@ int MythCommandLineParser::GetSyslogFacility(void)
     return syslogGetFacility(setting);
 }
 
+/** \brief Helper utility for logging interface to filtering level
+ */
 LogLevel_t MythCommandLineParser::GetLogLevel(void)
 {
     QString setting = toString("loglevel");
@@ -1857,6 +2294,10 @@ LogLevel_t MythCommandLineParser::GetLogLevel(void)
     return level;
 }
 
+/** \brief Set a new stored value for an existing argument definition, or
+ *  spawn a new definition store value in. Argument is subsequently marked
+ *  as being provided on the command line.
+ */
 bool MythCommandLineParser::SetValue(const QString &key, QVariant value)
 {
     CommandLineArg *arg;
@@ -1878,6 +2319,8 @@ bool MythCommandLineParser::SetValue(const QString &key, QVariant value)
     return true;
 }
 
+/** \brief Read in logging options and initialize the logging interface
+ */
 int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
 {
     int err = 0;
@@ -1895,10 +2338,12 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     else if (toBool("verboseint"))
         verboseMask = toUInt("verboseint");
 
+    verboseMask |= VB_STDIO|VB_FLUSH;
+
     int quiet = toUInt("quiet");
     if (max(quiet, (int)progress) > 1)
     {
-        verboseMask = VB_NONE;
+        verboseMask = VB_NONE|VB_FLUSH;
         verboseArgParse("none");
     }
 
@@ -1926,10 +2371,14 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     return GENERIC_EXIT_OK;
 }
 
-// WARNING: this must not be called until after MythContext is initialized
+/** \brief Apply all overrides to the global context
+ *
+ *  WARNING: this must not be called until after MythContext is initialized
+ */
 void MythCommandLineParser::ApplySettingsOverride(void)
 {
-    cerr << "Applying settings override" << endl;
+    if (m_verbose)
+        cerr << "Applying settings override" << endl;
 
     QMap<QString, QString> override = GetSettingsOverride();
     if (override.size())
@@ -1959,6 +2408,8 @@ bool openPidfile(ofstream &pidfs, const QString &pidfile)
     return true;
 }
 
+/** \brief Drop permissions to the specified user
+ */
 bool setUser(const QString &username)
 {
     if (username.isEmpty())
@@ -2026,6 +2477,8 @@ bool setUser(const QString &username)
 }
 
 
+/** \brief Fork application into background, and detatch from terminal
+ */
 int MythCommandLineParser::Daemonize(void)
 {
     ofstream pidfs;

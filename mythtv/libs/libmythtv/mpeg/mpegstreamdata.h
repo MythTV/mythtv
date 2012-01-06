@@ -17,6 +17,7 @@ using namespace std;
 #include "util.h"
 #include "streamlisteners.h"
 #include "eitscanner.h"
+#include "mythtvexp.h"
 
 class EITHelper;
 class PSIPTable;
@@ -54,7 +55,7 @@ typedef enum
     kEncEncrypted = 2,
 } CryptStatus;
 
-class CryptInfo
+class MTV_PUBLIC CryptInfo
 {
   public:
     CryptInfo() :
@@ -83,7 +84,7 @@ typedef enum
 } PIDPriority;
 typedef QMap<uint, PIDPriority> pid_map_t;
 
-class MPEGStreamData : public EITSource
+class MTV_PUBLIC MPEGStreamData : public EITSource
 {
   public:
     MPEGStreamData(int desiredProgram, bool cacheTables);

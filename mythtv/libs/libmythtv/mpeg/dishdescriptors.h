@@ -3,26 +3,22 @@
 #ifndef _DISH_DESCRIPTORS_H_
 #define _DISH_DESCRIPTORS_H_
 
-#include <cassert>
-#include <map>
-
-#include <qmutex.h>
 #include <QString>
+#include <QMutex>
 #include <QDate>
+#include <QMap>
 
 #include "atscdescriptors.h"
+#include "dvbdescriptors.h"
 
 class DishEventMPAADescriptor : public MPEGDescriptor
 {
   public:
-    DishEventMPAADescriptor(const unsigned char* data)
-        : MPEGDescriptor(data)
-    {
+    DishEventMPAADescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::dish_event_mpaa) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x89
-        assert(DescriptorID::dish_event_mpaa == DescriptorTag());
     // descriptor_length        8   1.0
-    }
     // stars                    3   2.0
     uint stars_raw(void) const { return (_data[2] & 0xe0) >> 0x05; }
     float stars(void) const;
@@ -39,22 +35,19 @@ class DishEventMPAADescriptor : public MPEGDescriptor
     static void Init(void);
 
   private:
-    static QMutex            mpaaRatingsLock;
-    static map<uint,QString> mpaaRatingsDesc;
-    static bool              mpaaRatingsExists;
+    static QMutex             mpaaRatingsLock;
+    static QMap<uint,QString> mpaaRatingsDesc;
+    static bool               mpaaRatingsExists;
 };
 
 class DishEventVCHIPDescriptor : public MPEGDescriptor
 {
   public:
-    DishEventVCHIPDescriptor(const unsigned char* data)
-        : MPEGDescriptor(data)
-    {
+    DishEventVCHIPDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::dish_event_vchip) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x95
-        assert(DescriptorID::dish_event_vchip == DescriptorTag());
     // descriptor_length        8   1.0
-    }
     // rating                   8   2.0
     uint rating_raw(void) const { return _data[2]; }
     QString rating(void) const;
@@ -67,22 +60,19 @@ class DishEventVCHIPDescriptor : public MPEGDescriptor
     static void Init(void);
 
   private:
-    static QMutex            vchipRatingsLock;
-    static map<uint,QString> vchipRatingsDesc;
-    static bool              vchipRatingsExists;
+    static QMutex             vchipRatingsLock;
+    static QMap<uint,QString> vchipRatingsDesc;
+    static bool               vchipRatingsExists;
 };
 
 class DishEventNameDescriptor : public MPEGDescriptor
 {
   public:
-    DishEventNameDescriptor(const unsigned char* data)
-        : MPEGDescriptor(data)
-    {
+    DishEventNameDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::dish_event_name) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x91
-        assert(DescriptorID::dish_event_name == DescriptorTag());
     // descriptor_length        8   1.0
-    }
     // unknown                  8   2.0
     // event_name            dlen-1 3.0
     bool HasName(void) const { return DescriptorLength() > 1; }
@@ -92,14 +82,12 @@ class DishEventNameDescriptor : public MPEGDescriptor
 class DishEventDescriptionDescriptor : public MPEGDescriptor
 {
   public:
-    DishEventDescriptionDescriptor(const unsigned char* data)
-        : MPEGDescriptor(data)
-    {
+    DishEventDescriptionDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(
+            data, len, PrivateDescriptorID::dish_event_description) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x92
-        assert(DescriptorID::dish_event_description == DescriptorTag());
     // descriptor_length        8   1.0
-    }
     // unknown                 8/16 2.0
     // event_name            dlen-2 3.0/4.0
     const unsigned char *DescriptionRaw(void) const;
@@ -111,14 +99,12 @@ class DishEventDescriptionDescriptor : public MPEGDescriptor
 class DishEventPropertiesDescriptor : public MPEGDescriptor
 {
   public:
-    DishEventPropertiesDescriptor(const unsigned char* data)
-        : MPEGDescriptor(data)
-    {
+    DishEventPropertiesDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(
+            data, len, PrivateDescriptorID::dish_event_properties) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x94
-        assert(DescriptorID::dish_event_properties == DescriptorTag());
     // descriptor_length        8   1.0
-    }
     // unknown                  8   2.0
     // event_name            dlen-1 3.0
     bool HasProperties(void) const { return DescriptorLength() > 1; }
@@ -137,14 +123,11 @@ class DishEventPropertiesDescriptor : public MPEGDescriptor
 class DishEventTagsDescriptor : public MPEGDescriptor
 {
   public:
-    DishEventTagsDescriptor(const unsigned char* data)
-        : MPEGDescriptor(data)
-    {
+    DishEventTagsDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::dish_event_tags) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x96
-        assert(DescriptorID::dish_event_tags == DescriptorTag());
     // descriptor_length        8   1.0
-    }
     // seriesid                 64  2.0
     QString seriesid(void) const;
     QString programid(void) const;
@@ -169,30 +152,11 @@ typedef enum
 QString dish_theme_type_to_string(uint category_type);
 DishThemeType string_to_dish_theme_type(const QString &type);
 
-class DishContentDescriptor : public MPEGDescriptor
+class DishContentDescriptor : public ContentDescriptor
 {
   public:
-    DishContentDescriptor(const unsigned char* data) : MPEGDescriptor(data)
-    {
-    //       Name             bits  loc  expected value
-    // descriptor_tag           8   0.0       0x54
-        assert(DescriptorID::content == DescriptorTag());
-    // descriptor_length        8   1.0
-    }
-
-    //   content_nibble_level_1 4   0.0
-    uint Nibble1(void)       const { return _data[2] >> 4; }
-    //   content_nibble_level_2 4   0.4
-    uint Nibble2(void)       const { return _data[2] & 0xf; }
-
-    uint Nibble(void)        const { return _data[2]; }
-
-    //   user_nibble            4   1.0
-    uint UserNibble1(void)   const { return _data[3] >> 4; }
-    //   user_nibble            4   1.4
-    uint UserNibble2(void)   const { return _data[3] & 0xf; }
-    uint UserNibble(void)    const { return _data[3]; }
-    // }                            2.0
+    DishContentDescriptor(const unsigned char *data, int len = 300) :
+        ContentDescriptor(data, len) { }
 
     DishThemeType GetTheme(void) const;
     QString GetCategory(void) const;
@@ -202,10 +166,9 @@ class DishContentDescriptor : public MPEGDescriptor
     static void Init(void);
 
   private:
-    static QMutex            categoryLock;
-    static map<uint,QString> themeDesc;
-    static map<uint,QString> categoryDesc;
-    static bool              categoriesExists;
+    static QMap<uint,QString> themeDesc;
+    static QMap<uint,QString> dishCategoryDesc;
+    static volatile bool      dishCategoryDescExists;
 };
 
 #endif // _DISH_DESCRIPTORS_H_

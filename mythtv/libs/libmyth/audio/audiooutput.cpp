@@ -21,13 +21,13 @@ using namespace std;
 #ifdef USING_OSS
 #include "audiooutputoss.h"
 #endif
-#ifdef USE_ALSA
+#ifdef USING_ALSA
 #include "audiooutputalsa.h"
 #endif
 #if CONFIG_DARWIN
 #include "audiooutputca.h"
 #endif
-#ifdef USE_JACK
+#ifdef USING_JACK
 #include "audiooutputjack.h"
 #endif
 #ifdef USING_PULSEOUTPUT
@@ -107,7 +107,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     if (willsuspendpa)
     {
         bool ispulse = false;
-#ifdef USE_ALSA
+#ifdef USING_ALSA
         // Check if using ALSA, that the device doesn't contain the word
         // "pulse" in its hint
         if (main_device.startsWith("ALSA:"))
@@ -141,7 +141,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 
     if (main_device.startsWith("ALSA:"))
     {
-#ifdef USE_ALSA
+#ifdef USING_ALSA
         settings.TrimDeviceType();
         ret = new AudioOutputALSA(settings);
 #else
@@ -151,7 +151,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     }
     else if (main_device.startsWith("JACK:"))
     {
-#ifdef USE_JACK
+#ifdef USING_JACK
         settings.TrimDeviceType();
         ret = new AudioOutputJACK(settings);
 #else
@@ -352,7 +352,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     bool pasuspended = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
 #endif
 
-#ifdef USE_ALSA
+#ifdef USING_ALSA
     QMap<QString, QString> *alsadevs = AudioOutputALSA::GetDevices("pcm");
 
     if (!alsadevs->empty())
@@ -392,7 +392,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 #endif
 #ifdef USING_JACK
     {
-        QString name = "JACK:output";
+        QString name = "JACK:";
         QString desc = "Use JACK default sound server.";
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)

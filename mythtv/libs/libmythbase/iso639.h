@@ -53,6 +53,13 @@ static inline QString iso639_key_to_str3(int code)
     return QString(str);
 }
 
+/// Returns true if the key is 0, 0xFFFFFF, or 'und'
+static inline bool iso639_is_key_undefined(int code)
+{
+    int bits = code & 0xFFFFFF;
+    return (0 == bits) || (0xFFFFFF == bits) || (0x756E64 == bits);
+}
+
 static inline int iso639_str3_to_key(const unsigned char *iso639_2)
 {
     return (iso639_2[0]<<16)|(iso639_2[1]<<8)|iso639_2[2];

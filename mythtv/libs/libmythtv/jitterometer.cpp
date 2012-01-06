@@ -12,7 +12,7 @@ Jitterometer::Jitterometer(const QString &nname, int ncycles)
   : count(0), num_cycles(ncycles), starttime_valid(0), last_fps(0),
     last_sd(0), name(nname), cpustat(NULL), laststats(NULL)
 {
-    times = (unsigned*) malloc(num_cycles * sizeof(unsigned));
+    times.resize(num_cycles);
     memset(&starttime, 0, sizeof(struct timeval));
 
     if (name.isEmpty())
@@ -44,14 +44,13 @@ Jitterometer::~Jitterometer()
         cpustat->close();
     delete cpustat;
     delete [] laststats;
-
-    free(times);
 }
 
 void Jitterometer::SetNumCycles(int cycles)
 {
     num_cycles = cycles;
-    times = (unsigned*) realloc(times, num_cycles * sizeof(unsigned));
+    times.resize(num_cycles);
+    count = 0;
 }
 
 bool Jitterometer::RecordCycleTime()
@@ -114,10 +113,10 @@ bool Jitterometer::RecordEndTime()
         if (!lastcpustats.isEmpty())
             extra = QString("CPUs: ") + lastcpustats;
 
-        LOG(VB_PLAYBACK, LOG_INFO,
-            name + QString("Mean: %1 Std.Dev: %2 fps: %3 ")
-                .arg((int)mean).arg((int)standard_deviation)
-                .arg(last_fps, 0, 'f', 2) + extra);
+        LOG(VB_GENERAL, LOG_INFO,
+            name + QString("FPS: %1 Mean: %2 Std.Dev: %3 ")
+                .arg(last_fps, 7, 'f', 2).arg((int)mean, 5)
+                .arg((int)standard_deviation, 5) + extra);
 
         count = 0;
         return true;

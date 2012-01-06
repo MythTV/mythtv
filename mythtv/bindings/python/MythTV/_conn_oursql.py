@@ -14,7 +14,7 @@ if __version__ < ('0','9','3'):
 __version__ = tuple(['oursql']+__version__)
 
 def dbconnect(dbconn, log):
-    log(MythLog.DATABASE|MythLog.EXTRA,
+    log(MythLog.DATABASE, MythLog.INFO,
                     'Spawning new database connection')
     db = oursql.connect(        dbconn['DBHostName'],
                                 dbconn['DBUserName'],
@@ -34,7 +34,8 @@ class LoggedCursor( oursql.Cursor ):
     log = None
 
     def log_query(self, query, args):
-        self.log(self.log.DATABASE, ' '.join(query.split()), str(args))
+        self.log(self.log.DATABASE, MythLog.DEBUG,
+                 ' '.join(query.split()), str(args))
 
     def _sanitize(self, query): return query.replace('%s', '?')
 

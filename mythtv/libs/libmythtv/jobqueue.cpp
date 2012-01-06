@@ -1775,6 +1775,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
         tmpInfo->SubstituteMatches(command);
 
         command.replace("%VERBOSELEVEL%", QString("%1").arg(verboseMask));
+        command.replace("%VERBOSEMODE%", QString("%1").arg(logPropagateArgs));
 
         uint transcoder = tmpInfo->QueryTranscoderID();
         command.replace("%TRANSPROFILE%",

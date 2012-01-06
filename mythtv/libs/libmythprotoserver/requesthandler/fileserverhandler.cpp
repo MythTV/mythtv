@@ -792,7 +792,7 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
 bool FileServerHandler::HandleDeleteFile(DeleteHandler *handler)
 {
     RunDeleteThread();
-    deletethread->AddFile(handler);
+    return deletethread->AddFile(handler);
 }
 
 bool FileServerHandler::HandleGetFileList(SocketHandler *socket,

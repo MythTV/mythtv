@@ -85,8 +85,10 @@ class MBASE_PUBLIC MythDB
     static QString toCommaList(const QMap<QString, QVariant> &bindings,
                                uint indent = 0, uint softMaxColumn = 80);
 
-    static bool LoadDatabaseParamsFromDisk(
-        DatabaseParams &params, bool sanitize);
+    static bool LoadDatabaseParamsFromDisk(DatabaseParams &params);
+    static bool ValidateDatabaseParams(
+        const DatabaseParams &params, const QString &source);
+    static void LoadDefaultDatabaseParams(DatabaseParams &params);
     static bool SaveDatabaseParamsToDisk(
         const DatabaseParams &params, const QString &confdir, bool overwrite);
 

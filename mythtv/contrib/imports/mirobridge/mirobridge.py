@@ -396,7 +396,6 @@ try:
     mythbeconn = None
     try:
         #Create an instance of each: MythDB, MythVideo
-        MythLog._setlevel('important,general')
         mythdb = MythDB()
     except MythError, e:
         print u'\n! Warning - %s' % e.args[0]

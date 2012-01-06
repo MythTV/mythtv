@@ -65,7 +65,7 @@ class MythContextPrivate : public QObject
     void TempMainWindow(bool languagePrompt = true);
     void EndTempWindow(void);
 
-    void LoadDatabaseSettings(void);
+    bool LoadDatabaseSettings(void);
 
     bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(void);
@@ -331,15 +331,14 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
     // The two bool. args actually form a Yes/Maybe/No (A tristate bool :-)
     bool manualSelect = prompt && !noPrompt;
 
-    // In addition to the UI chooser, we can also try to autoconfigure
-    bool autoSelect = !manualSelect;
-
     QString failure;
 
-
     // 1. Load either mysql.txt, or use sensible "localhost" defaults:
-    LoadDatabaseSettings();
+    bool loaded = LoadDatabaseSettings();
 
+    // In addition to the UI chooser, we can also try to autoSelect later,
+    // but only if we're not doing manualSelect and there was no mysql.txt
+    bool autoSelect = !manualSelect && !loaded;
 
     // 2. If the user isn't forcing up the chooser UI, look for a default
     //    backend in config.xml, then test DB settings we've got so far:
@@ -440,14 +439,27 @@ NoDBfound:
     return false;
 }
 
-/**
- * Load database and host settings from mysql.txt, or set some defaults
- *
- * \returns true if mysql.txt was parsed
+/** Load database and host settings from mysql.txt or config.xml,
+ *  or set some defaults.
+ *  \return true if mysql.txt or config.xml was parsed
  */
-void MythContextPrivate::LoadDatabaseSettings(void)
+bool MythContextPrivate::LoadDatabaseSettings(void)
 {
-    gCoreContext->GetDB()->LoadDatabaseParamsFromDisk(m_DBparams, true);
+    bool ok = MythDB::LoadDatabaseParamsFromDisk(m_DBparams);
+    if (!ok)
+    {
+        XmlConfiguration cfg("config.xml");
+        MythDB::LoadDefaultDatabaseParams(m_DBparams);
+        m_DBparams.dbHostName = cfg.GetValue(kDefaultBE + "DBHostName", "");
+        m_DBparams.dbUserName = cfg.GetValue(kDefaultBE + "DBUserName", "");
+        m_DBparams.dbPassword = cfg.GetValue(kDefaultBE + "DBPassword", "");
+        m_DBparams.dbName     = cfg.GetValue(kDefaultBE + "DBName", "");
+        m_DBparams.dbPort     = cfg.GetValue(kDefaultBE + "DBPort", 0);
+        ok = MythDB::ValidateDatabaseParams(m_DBparams, "config.xml");
+    }
+    if (!ok)
+        MythDB::LoadDefaultDatabaseParams(m_DBparams);
+
     gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
 
     QString hostname = m_DBparams.localHostName;
@@ -468,6 +480,8 @@ void MythContextPrivate::LoadDatabaseSettings(void)
     LOG(VB_GENERAL, LOG_INFO, QString("Using localhost value of %1")
             .arg(hostname));
     gCoreContext->SetLocalHostname(hostname);
+
+    return ok;
 }
 
 bool MythContextPrivate::PromptForDatabaseParams(const QString &error)

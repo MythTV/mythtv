@@ -267,7 +267,7 @@ class MiroInterpreter(cmd.Cmd):
                 print u"-" * 70
             for item in views.watchableItems:
                 # Skip any audio file as MythTV Internal player may abort the MythTV Frontend on a MP3
-                if not item.isVideo: 
+                if not item.isVideo:
                     continue
                 state = item.get_state()
                 if not state == u'newly-downloaded':
@@ -295,7 +295,7 @@ class MiroInterpreter(cmd.Cmd):
                 print "-" * 70
             for item in views.watchableItems:
                 # Skip any audio file as MythTV Internal player may abort the MythTV Frontend on a MP3
-                if not item.isVideo: 
+                if not item.isVideo:
                     continue
                 state = item.get_state()
                 if state == u'newly-downloaded':
@@ -362,7 +362,7 @@ class MiroInterpreter(cmd.Cmd):
             """ Using ImageMagick's utility 'identify'. Decide whether the screen shot is worth using.
             >>> useImageMagick('identify screenshot.jpg')
             >>> Example returned information "rose.jpg JPEG 640x480 DirectClass 87kb 0.050u 0:01"
-            >>> u'' if the screenshot quality is too low 
+            >>> u'' if the screenshot quality is too low
             >>> screenshot if the quality is good enough to use
             """
             if not self.imagemagick: # If imagemagick is not installed do not bother checking
@@ -407,7 +407,7 @@ class MiroInterpreter(cmd.Cmd):
             title = title.replace(u'"', u'')	# These characters mess with filenames
             title = title.replace(u"'", u'')	# These characters mess with filenames
 
-        item_dict =  {u'feed_id': item.feed_id, u'parent_id': item.parent_id, u'isContainerItem': item.isContainerItem, u'isVideo': item.isVideo, u'seen': item.seen, u'autoDownloaded': item.autoDownloaded, u'pendingManualDL': item.pendingManualDL, u'downloadedTime': item.downloadedTime, u'watchedTime': item.watchedTime, u'pendingReason': item.pendingReason, u'title': title,  u'expired': item.expired, u'keep': item.keep, u'videoFilename': item.get_filename(), u'eligibleForAutoDownload': item.eligibleForAutoDownload, u'duration': item.duration, u'screenshot': item.screenshot, u'resized_screenshots': item.resized_screenshots, u'resumeTime': item.resumeTime, u'channelTitle': channel_title, u'description': item.get_description(), u'size': item._get_size(), u'releasedate': item.get_release_date_obj(), u'length': item.get_duration_value(), u'channel_icon': channel_icon, u'item_icon': item_icon_filename, u'inetref': u'', u'season': 0, u'episode': 0,}
+        item_dict =  {u'feed_id': item.feed_id, u'parent_id': item.parent_id, u'isContainerItem': item.isContainerItem, u'isVideo': item.isVideo, u'seen': item.seen, u'autoDownloaded': item.autoDownloaded, u'pendingManualDL': item.pendingManualDL, u'downloadedTime': item.downloadedTime, u'watchedTime': item.watchedTime, u'pendingReason': item.pendingReason, u'title': title,  u'expired': item.expired, u'keep': item.keep, u'videoFilename': item.get_filename(), u'eligibleForAutoDownload': item.eligibleForAutoDownload, u'duration': item.duration, u'screenshot': item.screenshot, u'resized_screenshots': item.resized_screenshots, u'resumeTime': item.resumeTime, u'channelTitle': channel_title, u'description': item.get_description(), u'size': item._get_size(), u'releasedate': item.get_release_date_obj(), u'length': item.get_duration_value(), u'channel_icon': channel_icon, u'item_icon': item_icon_filename, u'inetref': u'', u'season': 1, u'episode': 1,}
 
         if not item_dict[u'screenshot']:
             if item_dict[u'item_icon']:

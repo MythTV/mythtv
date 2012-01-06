@@ -42,16 +42,31 @@ OpenGLLocker::~OpenGLLocker()
         m_render->doneCurrent();
 }
 
-MythRenderOpenGL* MythRenderOpenGL::Create(const QGLFormat& format, QPaintDevice* device)
+MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
+                                           QPaintDevice* device)
 {
+    QGLFormat format;
+    format.setDepth(false);
+
+#if defined(Q_WS_MAC)
+    format.setSwapInterval(1);
+#endif
+
 #ifdef USING_OPENGLES
     if (device)
         return new MythRenderOpenGL2ES(format, device);
     return new MythRenderOpenGL2ES(format);
 #else
+    if (painter.contains("opengl2"))
+    {
+        if (device)
+            return new MythRenderOpenGL2(format, device);
+        return new MythRenderOpenGL2(format);
+    }
     if (device)
         return new MythRenderOpenGL1(format, device);
     return new MythRenderOpenGL1(format);
+
 #endif
 }
 
@@ -134,16 +149,16 @@ void MythRenderOpenGL::MoveResizeWindow(const QRect &rect)
         parent->setGeometry(rect);
 }
 
-void MythRenderOpenGL::SetViewPort(const QRect &rect)
+void MythRenderOpenGL::SetViewPort(const QRect &rect, bool viewportonly)
 {
     if (rect == m_viewport)
         return;
-
     makeCurrent();
     m_viewport = rect;
     glViewport(m_viewport.left(), m_viewport.top(),
                m_viewport.width(), m_viewport.height());
-    SetMatrixView();
+    if (!viewportonly)
+        SetMatrixView();
     doneCurrent();
 }
 
@@ -560,7 +575,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
                 "Frame buffer incomplete_DRAW_BUFFER");
             break;
         case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + 
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 "Frame buffer incomplete_READ_BUFFER");
             break;
         case GL_FRAMEBUFFER_UNSUPPORTED:
@@ -693,6 +708,8 @@ void MythRenderOpenGL::InitProcs(void)
 {
     m_extensions = (reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
 
+    m_glTexImage1D = (MYTH_GLTEXIMAGE1DPROC)
+        GetProcAddress("glTexImage1D");
     m_glActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
         GetProcAddress("glActiveTexture");
     m_glMapBuffer = (MYTH_GLMAPBUFFERPROC)
@@ -863,9 +880,6 @@ bool MythRenderOpenGL::InitFeatures(void)
     if (m_extensions.contains("GL_MESA_ycbcr_texture") && ycbcrtextures)
         m_exts_supported += kGLMesaYCbCr;
 
-    if (m_extensions.contains("GL_APPLE_rgb_422") && ycbcrtextures)
-        m_exts_supported += kGLAppleRGB422;
-
     if (m_extensions.contains("GL_APPLE_ycbcr_422") && ycbcrtextures)
         m_exts_supported += kGLAppleYCbCr;
 
@@ -926,6 +940,7 @@ void MythRenderOpenGL::ResetProcs(void)
 {
     m_extensions = QString();
 
+    m_glTexImage1D = NULL;
     m_glActiveTexture = NULL;
     m_glMapBuffer = NULL;
     m_glBindBuffer = NULL;
@@ -1229,11 +1244,12 @@ bool MythRenderOpenGL::ClearTexture(uint tex)
 
     memset(scratch, 0, tmp_size);
 
-    if (m_textures[tex].m_type == GL_TEXTURE_1D)
+    if ((m_textures[tex].m_type == GL_TEXTURE_1D) && m_glTexImage1D)
     {
-        glTexImage1D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
-                     size.width(), 0, m_textures[tex].m_data_fmt ,
-                     m_textures[tex].m_data_type, scratch);
+        m_glTexImage1D(m_textures[tex].m_type, 0,
+                       m_textures[tex].m_internal_fmt,
+                       size.width(), 0, m_textures[tex].m_data_fmt,
+                       m_textures[tex].m_data_type, scratch);
     }
     else
     {
@@ -1256,7 +1272,7 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
         bpp = 4;
     }
     else if (fmt == GL_YCBCR_MESA || fmt == GL_YCBCR_422_APPLE ||
-             fmt == GL_RGB_422_APPLE)
+             fmt == MYTHTV_UYVY)
     {
         bpp = 2;
     }

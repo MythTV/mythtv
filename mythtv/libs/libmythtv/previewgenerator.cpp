@@ -803,7 +803,7 @@ char *PreviewGenerator::GetScreenGrab(
     PlayerContext *ctx = new PlayerContext(kPreviewGeneratorInUseID);
     ctx->SetRingBuffer(rbuf);
     ctx->SetPlayingInfo(&pginfo);
-    ctx->SetPlayer(new MythPlayer());
+    ctx->SetPlayer(new MythPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull)));
     ctx->player->SetPlayerInfo(NULL, NULL, true, ctx);
 
     if (time_in_secs)

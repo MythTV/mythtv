@@ -129,6 +129,8 @@ void DecoderIOFactoryFile::start(void)
     doConnectDecoder(getUrl().toLocalFile());
 }
 
+/**********************************************************************/
+
 DecoderIOFactoryUrl::DecoderIOFactoryUrl(DecoderHandler *parent) : DecoderIOFactory(parent)
 {
     m_accessManager = new QNetworkAccessManager(this);
@@ -193,7 +195,7 @@ void DecoderIOFactoryUrl::replyFinished(QNetworkReply *reply)
     {
         LOG(VB_PLAYBACK, LOG_INFO,
             QString("DecoderIOFactory: Got redirected to %1")
-                .arg(possibleRedirectUrl));
+                .arg(possibleRedirectUrl.toString()));
 
         m_redirectCount++;
 
@@ -240,7 +242,7 @@ void DecoderIOFactoryUrl::readyRead(void)
 
 void DecoderIOFactoryUrl::doStart(void)
 {
-    doConnectDecoder(getUrl());
+    doConnectDecoder(getUrl().toString());
     m_started = true;
 }
 
@@ -381,7 +383,7 @@ void DecoderHandler::stop(void)
     if (m_decoder)
     {
         m_decoder->wait();
-        delete m_decoder->input();
+        //delete m_decoder->input(); // TODO: need to sort out who is responsible for the input
         delete m_decoder;
         m_decoder = NULL;
     }
@@ -406,7 +408,7 @@ bool DecoderHandler::createPlaylist(const QUrl &url)
     QString extension = QFileInfo(url.path()).suffix();
     LOG(VB_NETWORK, LOG_INFO,
         QString("File %1 has extension %2")
-            .arg(url.fileName()).arg(extension));
+            .arg(QFileInfo(url.path()).fileName()).arg(extension));
 
     if (extension == "pls" || extension == "m3u")
     {
@@ -439,7 +441,9 @@ bool DecoderHandler::createPlaylistFromFile(const QUrl &url)
     f.open(QIODevice::ReadOnly);
     QTextStream stream(&f);
 
-    if (PlayListFile::parse(&m_playlist, &stream) < 0) 
+    QString extension = QFileInfo(url.path()).suffix().toLower();
+
+    if (PlayListFile::parse(&m_playlist, &stream, extension) <= 0)
         return false;
 
     return m_playlist.size() > 0;
@@ -454,14 +458,20 @@ bool DecoderHandler::createPlaylistFromRemoteUrl(const QUrl &url)
 
     QByteArray data;
 
-    if (!GetMythDownloadManager()->download(url, &data))
+    if (!GetMythDownloadManager()->download(url.toString(), &data))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("DecoderHandler:: Failed to download playlist from: %1").arg(url.toString()));
+        doOperationStop();
         return false;
+    }
 
     doOperationStop();
 
     QTextStream stream(&data, QIODevice::ReadOnly);
 
-    bool result = PlayListFile::parse(&m_playlist, &stream) > 0;
+    QString extension = QFileInfo(url.path()).suffix().toLower();
+
+    bool result = PlayListFile::parse(&m_playlist, &stream, extension) > 0;
 
     return result;
 }

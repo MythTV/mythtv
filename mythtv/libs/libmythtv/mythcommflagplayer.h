@@ -6,7 +6,7 @@
 class MTV_PUBLIC MythCommFlagPlayer : public MythPlayer
 {
   public:
-    MythCommFlagPlayer(bool muted = false) : MythPlayer(muted) { }
+    MythCommFlagPlayer(PlayerFlags flags = kNoFlags) : MythPlayer(flags) { }
     bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL,
                           void* cbData = NULL);
 };

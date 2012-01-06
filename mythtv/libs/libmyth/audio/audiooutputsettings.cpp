@@ -129,6 +129,8 @@ AudioFormat AudioOutputSettings::GetNextFormat()
 
 void AudioOutputSettings::AddSupportedFormat(AudioFormat format)
 {
+    LOG(VB_AUDIO, LOG_INFO, LOC + 
+        QString("Format %1 is supported").arg(FormatToString(format)));
     m_formats.push_back(format);
 }
 
@@ -450,6 +452,9 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
                     log = "DTS 96/24";
                     break;
                 case FF_PROFILE_DTS_HD_HRA:
+                    samplerate = 192000;
+                    log = "DTS-HD High-Res";
+                    break;
                 case FF_PROFILE_DTS_HD_MA:
                     samplerate = 192000;
                     if (canDTSHDMA)

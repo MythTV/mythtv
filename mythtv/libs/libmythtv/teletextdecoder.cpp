@@ -43,7 +43,7 @@ using namespace std;
  */
 void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
 {
-    int err = 0, latin1 = -1, zahl1, pagenum, subpagenum, lang, flags;
+    int err = 0, latin1 = -1, pagenum, subpagenum, lang, flags;
     uint magazine, packet, header;
 
     if (!m_teletext_reader)
@@ -67,7 +67,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
 
         case VBI_DVB:
         case VBI_DVB_SUBTITLE:
-            zahl1 = hamm84(buf,&err) * 16 + hamm84(buf+1,&err);
+            // zahl1 = hamm84(buf,&err) * 16 + hamm84(buf+1,&err);
 
             magazine = 0;
             if (buf[0] & 0x40)

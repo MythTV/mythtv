@@ -116,7 +116,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 
         virtual bool                SendMessage         ( const QString &Message,
                                                           const QString &Address,
-                                                          int   udpPort ) = 0;
+                                                          int   udpPort,
+                                                          int   Timeout ) = 0;
 
         virtual bool                BackupDatabase      ( void ) = 0;
 

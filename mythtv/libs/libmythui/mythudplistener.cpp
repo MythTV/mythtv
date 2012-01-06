@@ -97,6 +97,9 @@ void MythUDPListener::Process(const QByteArray &buf)
         }
     }
 
+    QString msg  = QString("");
+    uint timeout = 0;
+
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
     {
@@ -104,13 +107,9 @@ void MythUDPListener::Process(const QByteArray &buf)
         if (!e.isNull())
         {
             if (e.tagName() == "text")
-            {
-                QString msg = e.text();
-                LOG(VB_GENERAL, LOG_INFO, msg);
-                MythMainWindow *window = GetMythMainWindow();
-                MythEvent* me = new MythEvent(MythEvent::MythUserMessage, msg);
-                qApp->postEvent(window, me);
-            }
+                msg = e.text();
+            else if (e.tagName() == "timeout")
+                timeout = e.text().toUInt();
             else
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unknown element: %1")
@@ -119,5 +118,18 @@ void MythUDPListener::Process(const QByteArray &buf)
             }
         }
         n = n.nextSibling();
+    }
+
+    if (!msg.isEmpty())
+    {
+        if (timeout < 0 || timeout > 1000)
+            timeout = 0;
+        LOG(VB_GENERAL, LOG_INFO, QString("Received message '%1', timeout %2")
+            .arg(msg).arg(timeout));
+        QStringList args;
+        args << QString::number(timeout);
+        MythMainWindow *window = GetMythMainWindow();
+        MythEvent* me = new MythEvent(MythEvent::MythUserMessage, msg, args);
+        qApp->postEvent(window, me);
     }
 }

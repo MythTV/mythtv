@@ -106,17 +106,35 @@ VideoMetadataListManager::~VideoMetadataListManager()
     delete m_imp;
 }
 
-void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items)
+VideoMetadataListManager::VideoMetadataPtr
+VideoMetadataListManager::loadOneFromDatabase(uint id)
+{
+    QString sql = QString("WHERE intid = %1 LIMIT 1").arg(id);
+    metadata_list item;
+    loadAllFromDatabase(item, sql);
+    if (item.size() > 0)
+    {
+        return item.front();
+    }
+
+    return VideoMetadataPtr(new VideoMetadata());
+}
+
+void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items,
+                                                   const QString &sql)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.setForwardOnly(true);
-    const QString BaseMetadataQuery(
+    QString BaseMetadataQuery(
         "SELECT title, director, studio, plot, rating, year, releasedate,"
         "userrating, length, filename, hash, showlevel, "
         "coverfile, inetref, homepage, childid, browse, watched, "
         "playcommand, category, intid, trailer, screenshot, banner, fanart, "
         "subtitle, tagline, season, episode, host, insertdate, processed "
-        " FROM videometadata");
+        " FROM videometadata ");
+
+    if (!sql.isEmpty())
+        BaseMetadataQuery.append(sql);
 
     query.prepare(BaseMetadataQuery);
 
@@ -226,16 +244,13 @@ VideoMetadata* meta_data_node::getData()
 
 meta_dir_node::meta_dir_node(const QString &path, const QString &name,
                             meta_dir_node *parent, bool is_path_root,
-                            const QString &host, const QString &prefix)
-  : meta_node(parent, is_path_root), m_path(path), m_name(name)
+                            const QString &host, const QString &prefix,
+                            const QVariant &data)
+  : meta_node(parent, is_path_root), m_path(path), m_name(name),
+    m_host(host), m_prefix(prefix), m_data(data)
 {
     if (!name.length())
-    {
         m_name = path;
-    }
-
-    m_host = host;
-    m_prefix = prefix;
 }
 
 void meta_dir_node::setName(const QString &name)
@@ -278,12 +293,28 @@ void meta_dir_node::setPath(const QString &path)
     m_path = path;
 }
 
+void meta_dir_node::SetData(const QVariant &data)
+{
+    m_data = data;
+}
+
+const QVariant &meta_dir_node::GetData() const
+{
+    return m_data;
+}
+
+bool meta_dir_node::DataIsValid() const
+{
+    return m_data.isValid();
+}
+
 smart_dir_node meta_dir_node::addSubDir(const QString &subdir,
                                         const QString &name,
                                         const QString &host,
-                                        const QString &prefix)
+                                        const QString &prefix,
+                                        const QVariant &data)
 {
-    return getSubDir(subdir, name, true, host, prefix);
+    return getSubDir(subdir, name, true, host, prefix, data);
 }
 
 void meta_dir_node::addSubDir(const smart_dir_node &subdir)
@@ -295,7 +326,8 @@ smart_dir_node meta_dir_node::getSubDir(const QString &subdir,
                                         const QString &name,
                                         bool create,
                                         const QString &host,
-                                        const QString &prefix)
+                                        const QString &prefix,
+                                        const QVariant &data)
 {
     for (meta_dir_list::const_iterator p = m_subdirs.begin();
     p != m_subdirs.end(); ++p)
@@ -308,7 +340,8 @@ smart_dir_node meta_dir_node::getSubDir(const QString &subdir,
 
     if (create)
     {
-        smart_dir_node node(new meta_dir_node(subdir, name, this, false ,host, prefix));
+        smart_dir_node node(new meta_dir_node(subdir, name, this, false,
+                                              host, prefix, data));
         m_subdirs.push_back(node);
         return node;
     }

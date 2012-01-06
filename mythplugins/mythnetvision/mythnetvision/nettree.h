@@ -128,8 +128,8 @@ class NetTree : public MythScreenType
     void doDownloadAndPlay(void);
     void doPlayVideo(QString filename);
     void showMenu(void);
-    void showViewMenu(void);
-    void showManageMenu(void);
+    MythMenu* createShowViewMenu(void);
+    MythMenu* createShowManageMenu(void);
     void runTreeEditor(void);
     void runRSSEditor(void);
     void loadData(void);

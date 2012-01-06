@@ -57,9 +57,9 @@ class SystemEventThread : public QRunnable
         if (m_event.isEmpty()) 
             return;
 
-        RemoteSendMessage(QString("SYSTEM_EVENT_RESULT %1 SENDER %2 RESULT %3")
-                                  .arg(m_event).arg(gCoreContext->GetHostName())
-                                  .arg(result));
+        gCoreContext->SendMessage(
+            QString("SYSTEM_EVENT_RESULT %1 SENDER %2 RESULT %3")
+                    .arg(m_event).arg(gCoreContext->GetHostName()).arg(result));
     }
 
   private:
@@ -129,6 +129,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
         // Check for some token names that we substitute one for one as
         // %MATCH% type variables.
         if ((*it == "CARDID") ||
+            (*it == "RECSTATUS") ||
             (*it == "HOSTNAME") ||
             (*it == "SECS") ||
             (*it == "SENDER") ||
@@ -265,8 +266,8 @@ void MythSystemEventHandler::customEvent(QEvent *e)
         // the master backend as regular SYSTEM_EVENT messages.
         if (msg.startsWith("GLOBAL_SYSTEM_EVENT "))
         {
-            RemoteSendMessage(msg.mid(7) + QString(" SENDER %1")
-                              .arg(gCoreContext->GetHostName()));
+            gCoreContext->SendMessage(msg.mid(7) +
+                QString(" SENDER %1").arg(gCoreContext->GetHostName()));
             return;
         }
 
@@ -311,29 +312,21 @@ void MythSystemEventHandler::customEvent(QEvent *e)
 
 /****************************************************************************/
 
-/** \fn SendMythSystemEvent(const QString msg)
- *  \brief Send the given message as a System Event
- *  \param msg Const QString to send as a System Event
- */
-void SendMythSystemEvent(const QString msg)
-{
-    RemoteSendMessage(QString("SYSTEM_EVENT %1 SENDER %2")
-                              .arg(msg).arg(gCoreContext->GetHostName()));
-}
-
 /** \fn SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
  *  \brief Sends a System Event for an in-progress recording
- *  \sa SendMythSystemEvent(const QString msg)
+ *  \sa MythCoreContext::SendSystemEvent(const QString msg)
  *  \param msg    Const QString to send as a System Event
  *  \param pginfo Pointer to a RecordingInfo containing info on a recording
  */
 void SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
 {
     if (pginfo)
-        SendMythSystemEvent(QString("%1 CARDID %2 CHANID %3 STARTTIME %4")
-                            .arg(msg).arg(pginfo->GetCardID())
-                            .arg(pginfo->GetChanID())
-                            .arg(pginfo->GetRecordingStartTime(ISODate)));
+        gCoreContext->SendSystemEvent(
+            QString("%1 CARDID %2 CHANID %3 STARTTIME %4 RECSTATUS %5")
+                    .arg(msg).arg(pginfo->GetCardID())
+                    .arg(pginfo->GetChanID())
+                    .arg(pginfo->GetRecordingStartTime(ISODate))
+                    .arg(pginfo->GetRecordingStatus()));
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + "SendMythSystemRecEvent() called with "
                                        "empty RecordingInfo");
@@ -341,14 +334,14 @@ void SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
 
 /** \fn SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
  *  \brief Sends a System Event for a previously recorded program
- *  \sa SendMythSystemEvent(const QString msg)
+ *  \sa MythCoreContext::SendSystemEvent(const QString msg)
  *  \param msg    Const QString to send as a System Event
  *  \param pginfo Pointer to a RecordingInfo containing info on a recording
  */
 void SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
 {
     if (pginfo)
-        SendMythSystemEvent(
+        gCoreContext->SendSystemEvent(
             QString("%1 HOSTNAME %2 CHANID %3 STARTTIME %4")
                     .arg(msg).arg(gCoreContext->GetHostName())
                     .arg(pginfo->GetChanID())
@@ -356,20 +349,6 @@ void SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + "SendMythSystemPlayEvent() called with "
                                        "empty ProgramInfo");
-}
-
-/** \fn SendMythSystemHostEvent(const QString msg, const QString &hostname,
-                                const QString args)
- *  \brief Sends a System Event to a specific host
- *  \param msg      Const QString to send as a System Event
- *  \param hostname Const QString to send the event to
- *  \param args     Const QString containing other info to send in the event
- */
-void SendMythSystemHostEvent(const QString msg, const QString &hostname,
-                             const QString args)
-{
-    SendMythSystemEvent(QString("%1 HOST %2 %3")
-                                .arg(msg).arg(hostname).arg(args));
 }
 
 /****************************************************************************/
@@ -413,6 +392,7 @@ MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
     m_settings["EventCmdMythfilldatabaseRan"]  = tr("mythfilldatabase ran");
     m_settings["EventCmdSchedulerRan"]         = tr("Scheduler ran");
     m_settings["EventCmdSettingsCacheCleared"] = tr("Settings cache cleared");
+    m_settings["EventCmdScreenType"]           = tr("Screen created or destroyed");
     m_settings["EventCmdKey01"]                = tr("Keystroke event #1");
     m_settings["EventCmdKey02"]                = tr("Keystroke event #2");
     m_settings["EventCmdKey03"]                = tr("Keystroke event #3");

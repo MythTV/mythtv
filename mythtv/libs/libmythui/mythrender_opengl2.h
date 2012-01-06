@@ -74,6 +74,7 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     float m_rotate[4][4];
     float m_parameters[4][4];
     QString m_qualifiers;
+    QString m_GLSLVersion;
 
     // Procs
     MYTH_GLGETSHADERIVPROC               m_glGetShaderiv;

@@ -175,13 +175,15 @@ void MultipleStringStructure::Parse(void) const
     }
 }
 
-void CaptionServiceDescriptor::Parse(void) const
+bool CaptionServiceDescriptor::Parse(void)
 {
     _ptrs.clear();
     _ptrs[Index(0,-1)] = _data+3;
 
     for (uint i = 0; i < ServicesCount(); i++)
         _ptrs[Index(i+1,-1)] = Offset(i,-1) + 6;
+
+    return true;
 }
 
 QString CaptionServiceDescriptor::toString(void) const
@@ -205,7 +207,7 @@ QString CaptionServiceDescriptor::toString(void) const
     return str;
 }
 
-void ContentAdvisoryDescriptor::Parse(void) const
+bool ContentAdvisoryDescriptor::Parse(void)
 {
     _ptrs.clear();
     _ptrs[Index(0,-1)] = _data + 2;
@@ -220,6 +222,8 @@ void ContentAdvisoryDescriptor::Parse(void) const
         uint len = RatingDescriptionLength(i);
         _ptrs[Index(i+1,-1)] = tmp + len;
     }
+
+    return true;
 }
 
 QString ContentAdvisoryDescriptor::toString() const
@@ -319,17 +323,6 @@ QString AudioStreamDescriptor::toString() const
         str.append(QString("text(%1)").arg(Text()));
     }
     return str;
-}
-
-/** \fn ExtendedChannelNameDescriptor::ExtendedChannelNameDescriptor(const unsigned char*)
- *  \brief Creates a new ExtendedChannelNameDescriptor.
- *
- *  \param data the raw data representing this descriptor
- */
-ExtendedChannelNameDescriptor::ExtendedChannelNameDescriptor(
-    const unsigned char *data) : MPEGDescriptor(data)
-{
-    assert(DescriptorTag() == DescriptorID::extended_channel_name);
 }
 
 /** \fn ExtendedChannelNameDescriptor::LongChannelName(void) const

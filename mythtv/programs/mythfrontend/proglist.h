@@ -64,7 +64,6 @@ class ProgLister : public ScheduleCommon
 
     void ShowDetails(void)   { ScheduleCommon::ShowDetails(GetCurrent());   }
     void ShowUpcoming(void);
-    void ShowSortMenu(void);
     void ShowDeleteRuleMenu(void);
     void ShowDeleteOldEpisodeMenu(void);
     void ShowChooseViewMenu(void);
@@ -76,8 +75,8 @@ class ProgLister : public ScheduleCommon
     void FillItemList(bool restorePosition, bool updateDisp = true);
 
     void ClearCurrentProgramInfo(void);
-    void UpdateDisplay(void);
-    void UpdateDisplay(const ProgramInfo *selected, int selectedOffset);
+    void UpdateDisplay(const ProgramInfo *selected = NULL);
+    void RestoreSelection(const ProgramInfo *selected, int selectedOffset);
     void UpdateButtonList(void);
     void UpdateKeywordInDB(const QString &text, const QString &oldValue);
 

@@ -359,19 +359,42 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
     volume = min(100, volume);
     volume = max(0, volume);
 
-    uint32_t sink_index = pa_stream_get_device_index(pstream);
-    pa_threaded_mainloop_lock(mainloop);
-    pa_operation *op =
-        pa_context_set_sink_volume_by_index(pcontext, sink_index,
-                                            &volume_control,
-                                            OpCompletionCallback, this);
-    pa_threaded_mainloop_unlock(mainloop);
-    if (op)
-        pa_operation_unref(op);
+    if (gCoreContext->GetSetting("MixerControl", "PCM").toLower() == "pcm")
+    {
+        uint32_t stream_index = pa_stream_get_index(pstream);
+        pa_threaded_mainloop_lock(mainloop);
+        pa_operation *op =
+            pa_context_set_sink_input_volume(pcontext, stream_index,
+                                             &volume_control,
+                                             OpCompletionCallback, this);
+        pa_threaded_mainloop_unlock(mainloop);
+        if (op)
+            pa_operation_unref(op);
+        else
+            VBERROR(fn_log_tag +
+                    QString("set stream volume operation failed, stream %1, "
+                            "error %2 ")
+                    .arg(stream_index)
+                    .arg(pa_strerror(pa_context_errno(pcontext))));
+    }
     else
-        VBERROR(fn_log_tag +
-                QString("set sink volume operation failed, sink %1, error %2 ")
-                .arg(sink_index).arg(pa_strerror(pa_context_errno(pcontext))));
+    {
+        uint32_t sink_index = pa_stream_get_device_index(pstream);
+        pa_threaded_mainloop_lock(mainloop);
+        pa_operation *op =
+            pa_context_set_sink_volume_by_index(pcontext, sink_index,
+                                                &volume_control,
+                                                OpCompletionCallback, this);
+        pa_threaded_mainloop_unlock(mainloop);
+        if (op)
+            pa_operation_unref(op);
+        else
+            VBERROR(fn_log_tag +
+                    QString("set sink volume operation failed, sink %1, "
+                            "error %2 ")
+                    .arg(sink_index)
+                    .arg(pa_strerror(pa_context_errno(pcontext))));
+    }
 }
 
 void AudioOutputPulseAudio::Drain(void)
@@ -397,7 +420,18 @@ bool AudioOutputPulseAudio::ContextConnect(void)
         pcontext = NULL;
         return false;
     }
-    pcontext = pa_context_new(pa_threaded_mainloop_get_api(mainloop), "MythTV");
+    pa_proplist *proplist = pa_proplist_new();
+    if (!proplist)
+    {
+        VBERROR(fn_log_tag + QString("failed to create new proplist"));
+        return false;
+    }
+    pa_proplist_sets(proplist, PA_PROP_APPLICATION_NAME, "MythTV");
+    pa_proplist_sets(proplist, PA_PROP_APPLICATION_ICON_NAME, "mythtv");
+    pa_proplist_sets(proplist, PA_PROP_MEDIA_ROLE, "video");
+    pcontext =
+        pa_context_new_with_proplist(pa_threaded_mainloop_get_api(mainloop),
+                                     "MythTV", proplist);
     if (!pcontext)
     {
         VBERROR(fn_log_tag + "failed to acquire new context");
@@ -503,8 +537,17 @@ char *AudioOutputPulseAudio::ChooseHost(void)
 
 bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
 {
-    pstream = pa_stream_new(pcontext, "MythTV playback", &sample_spec,
-                            &channel_map);
+    QString fn_log_tag = "ConnectPlaybackStream, ";
+    pa_proplist *proplist = pa_proplist_new();
+    if (!proplist)
+    {
+        VBERROR(fn_log_tag + QString("failed to create new proplist"));
+        return false;
+    }
+    pa_proplist_sets(proplist, PA_PROP_MEDIA_ROLE, "video");
+    pstream =
+        pa_stream_new_with_proplist(pcontext, "MythTV playback", &sample_spec,
+                                    &channel_map, proplist);
     if (!pstream)
     {
         VBERROR("failed to create new playback stream");

@@ -60,7 +60,7 @@ struct hdhomerun_video_sock_t {
 
 static THREAD_FUNC_PREFIX hdhomerun_video_thread_execute(void *arg);
 
-struct hdhomerun_video_sock_t *hdhomerun_video_create(uint16_t listen_port, size_t buffer_size, struct hdhomerun_debug_t *dbg)
+struct hdhomerun_video_sock_t *hdhomerun_video_create(uint16_t listen_port, bool_t allow_port_reuse, size_t buffer_size, struct hdhomerun_debug_t *dbg)
 {
 	/* Create object. */
 	struct hdhomerun_video_sock_t *vs = (struct hdhomerun_video_sock_t *)calloc(1, sizeof(struct hdhomerun_video_sock_t));
@@ -103,7 +103,7 @@ struct hdhomerun_video_sock_t *hdhomerun_video_create(uint16_t listen_port, size
 	setsockopt(vs->sock, SOL_SOCKET, SO_RCVBUF, (char *)&rx_size, sizeof(rx_size));
 
 	/* Bind socket. */
-	if (!hdhomerun_sock_bind(vs->sock, INADDR_ANY, listen_port)) {
+	if (!hdhomerun_sock_bind(vs->sock, INADDR_ANY, listen_port, allow_port_reuse)) {
 		hdhomerun_debug_printf(dbg, "hdhomerun_video_create: failed to bind socket (port %u)\n", listen_port);
 		goto error;
 	}

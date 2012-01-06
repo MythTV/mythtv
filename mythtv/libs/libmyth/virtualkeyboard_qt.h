@@ -2,8 +2,11 @@
 #define VIRTUALKEYBOARDQT_H_
 
 #include "mythdialogs.h"
+#include "mythexp.h"
+#include "mythmainwindow.h"
 
 class QKeyEvent;
+class UIKeyboardType;
 
 /// Preferred position to place virtual keyboard popup.
 enum PopupPositionQt 

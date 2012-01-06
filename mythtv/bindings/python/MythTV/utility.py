@@ -44,21 +44,21 @@ class SchemaUpdate( object ):
             while True:
                 
                 newschema = getattr(self, 'up%d' % schema)()
-                self.log(MythLog.DATABASE,
+                self.log(MythLog.GENERAL, MythLog.INFO,
                          'successfully updated from %d to %d' %\
                                 (schema, newschema))
                 schema = newschema
                 self.db.settings.NULL[self._schema_name] = schema
 
         except AttributeError, e:
-            self.log(MythLog.DATABASE|MythLog.IMPORTANT,
+            self.log(MythLog.GENERAL, MythLog.CRIT,
                      'failed at %d' % schema, 'no handler method')
             raise MythDBError('Schema update failed, ' 
                     "SchemaUpdate has no function 'up%s'" % schema)
 
         except StopIteration:
             if schema != origschema:
-                self.log(MythLog.DATABASE,
+                self.log(MythLog.GENERAL, MythLog.NOTICE,
                          '%s update complete' % self._schema_name)
             pass
 
@@ -646,14 +646,14 @@ class deadlinesocket( socket.socket ):
         """
         size = int(self.dlrecv(8, flags, deadline))
         data = self.dlrecv(size, flags, deadline)
-        self.log(MythLog.SOCKET|MythLog.NETWORK, \
+        self.log(MythLog.SOCKET|MythLog.NETWORK, MythLog.DEBUG, \
                             'read <-- %d' % size, data)
         return data
 
     def sendheader(self, data, flags=0):
         """Send data, prepending the length in the first 8 bytes."""
         try:
-            self.log(MythLog.SOCKET|MythLog.NETWORK, \
+            self.log(MythLog.SOCKET|MythLog.NETWORK, MythLog.DEBUG, \
                                 'write --> %d' % len(data), data)
             data = '%-8d%s' % (len(data), data)
             self.send(data, flags)

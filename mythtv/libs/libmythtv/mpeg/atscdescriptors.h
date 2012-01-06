@@ -3,7 +3,6 @@
 #ifndef _ATSC_DESCRIPTORS_H_
 #define _ATSC_DESCRIPTORS_H_
 
-#include <cassert>
 #include <vector>
 using namespace std;
 
@@ -19,7 +18,7 @@ typedef QMap<int, const unsigned char*> IntToBuf;
 class MultipleStringStructure
 {
   public:
-    MultipleStringStructure(const unsigned char* data) : _data(data)
+    MultipleStringStructure(const unsigned char *data) : _data(data)
     {
         Parse();
     }
@@ -64,29 +63,28 @@ class MultipleStringStructure
     QString toString() const;
 
   private:
-    static QString Uncompressed(const unsigned char* buf, int len, int mode);
+    static QString Uncompressed(const unsigned char *buf, int len, int mode);
     static uint Index(int i, int j) { return (i<<8)|(j&0xff); }
-    const unsigned char* Offset(int i, int j) const
+    const unsigned char *Offset(int i, int j) const
         { return _ptrs[Index(i,j)]; }
 
   private:
-    const unsigned char* _data;
+    const unsigned char *_data;
     mutable IntToBuf _ptrs;
 };
 
 class CaptionServiceDescriptor : public MPEGDescriptor
 {
   public:
-    CaptionServiceDescriptor(const unsigned char* data) :
-        MPEGDescriptor(data)
+    CaptionServiceDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::caption_service)
     {
+        if (_data && !Parse())
+            _data = NULL;
+    }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x86
-        assert(DescriptorID::caption_service == DescriptorTag());
-        Parse();
     // descriptor_length        8   1.0
-    }
-
     // reserved                 3   2.0       0x07
     // number_of_services       5   2.3
     uint ServicesCount() const { return _data[2]&0x1f; }
@@ -121,31 +119,30 @@ class CaptionServiceDescriptor : public MPEGDescriptor
         { return bool(((Offset(i,-1)[4])>>6) & 1); }
     //   reserved              14  4.2      0x3fff
     //}                            6.0
-    void Parse(void) const;
+    bool Parse(void);
     QString toString() const;
 
   private:
     int Index(int i, int j) const { return (i<<8) | (j & 0xff); }
-    const unsigned char* Offset(int i, int j) const
+    const unsigned char *Offset(int i, int j) const
         { return _ptrs[Index(i,j)]; }
 
   private:
-    mutable IntToBuf _ptrs;
+    IntToBuf _ptrs;
 };
 
 class ContentAdvisoryDescriptor : public MPEGDescriptor
 {
-    mutable IntToBuf _ptrs;
   public:
-    ContentAdvisoryDescriptor(const unsigned char* data) :
-        MPEGDescriptor(data)
+    ContentAdvisoryDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::content_advisory)
     {
+        if (_data && !Parse())
+            _data = NULL;
+    }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x87
-        assert(DescriptorID::content_advisory == DescriptorTag());
-        Parse();
     // descriptor_length        8   1.0
-    }
     // reserved                 2   2.0       0x03
     // rating_region_count      6   2.2
     uint RatingRegionCount(void) const { return _data[2] & 0x3f; }
@@ -171,55 +168,60 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     //   rating_desc_text         x+2+(rated_dimensions*2)+1.0
     const MultipleStringStructure RatingDescription(uint i) const
     {
-        const unsigned char* data = Offset(i,-1) + 3 + (RatedDimensions(i)<<1);
+        const unsigned char *data = Offset(i,-1) + 3 + (RatedDimensions(i)<<1);
         return MultipleStringStructure(data);
     }
     // }
 
-    void Parse(void) const;
+    bool Parse(void);
     QString toString() const;
   protected:
     int Index(int i, int j) const { return (i<<8)|(j&0xff); }
-    const unsigned char* Offset(int i, int j) const {
-        return _ptrs[Index(i,j)];
+    const unsigned char *Offset(int i, int j) const
+    {
+        IntToBuf::const_iterator it = _ptrs.find(Index(i,j));
+        return (it != _ptrs.end()) ? *it : NULL;
     }
+    IntToBuf _ptrs;
 };
 
-class ComponentNameDescriptor : public MPEGDescriptor {
+class ComponentNameDescriptor : public MPEGDescriptor
+{
   public:
-    ComponentNameDescriptor(const unsigned char* data) :
-        MPEGDescriptor(data) {
-        assert(0xA3==DescriptorTag());
+    ComponentNameDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::component_name)
+    {
     }
-    const MultipleStringStructure ComponentNameStrings() const {
+    const MultipleStringStructure ComponentNameStrings() const
+    {
         return MultipleStringStructure(_data+2);
     }
-    QString toString() const {
-        return QString("Component Name Descriptor  %1").
-            arg(ComponentNameStrings().toString());
+    QString toString() const
+    {
+        return QString("Component Name Descriptor %1")
+            .arg(ComponentNameStrings().toString());
     }
 };
 
 
 // a_52a.pdf p120, Table A2
-class AudioStreamDescriptor : public MPEGDescriptor {
+class AudioStreamDescriptor : public MPEGDescriptor
+{
   public:
-    AudioStreamDescriptor(const unsigned char* data) :
-        MPEGDescriptor(data) {
-// descriptor_tag   The value for the AC-3 descriptor tag is 0x81.
-        assert(DescriptorID::ac3_audio_stream == DescriptorTag());
-    }
+    AudioStreamDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::ac3_audio_stream) { }
+    // descriptor_tag                        8   0.0   0x81
     // sample_rate_code                      3   2.0
-    uint SampleRateCode() const { return (_data[2]>>5)&7; }
-    QString SampleRateCodeString() const;
+    uint SampleRateCode(void) const { return (_data[2]>>5)&7; }
+    QString SampleRateCodeString(void) const;
     // bsid                                  5   2.3
-    uint bsid() const { return _data[2]&0x1f; }
+    uint bsid(void) const { return _data[2]&0x1f; }
     // bit_rate_code                         6   3.0
-    uint BitRateCode() const { return (_data[3]>>2)&0x3f; }
-    QString BitRateCodeString() const;
+    uint BitRateCode(void) const { return (_data[3]>>2)&0x3f; }
+    QString BitRateCodeString(void) const;
     // surround_mode                         2   3.6
-    uint SurroundMode() const { return _data[3]&3; }
-    QString SurroundModeString() const;
+    uint SurroundMode(void) const { return _data[3]&3; }
+    QString SurroundModeString(void) const;
     /*
       000 Major ?
       001 Major ?
@@ -227,37 +229,40 @@ class AudioStreamDescriptor : public MPEGDescriptor {
       111 Karaoke Mode if acmod >= 0x2. a_52a.pdf p130
     */
     // bsmod                                 3   4.0
-    uint BasicServiceMode() const { return (_data[4]>>5)&7; }
+    uint BasicServiceMode(void) const { return (_data[4]>>5)&7; }
     // num_channels                          4   4.3
-    uint Channels() const { return (_data[4]>>1)&0xf; }
-    QString ChannelsString() const;
+    uint Channels(void) const { return (_data[4]>>1)&0xf; }
+    QString ChannelsString(void) const;
 
     // full service that can be presented alone to listener?
     // full_svc                              1   4.7
-    bool FullService() const { return bool((_data[4])&1); }
+    bool FullService(void) const { return bool((_data[4])&1); }
 
     // langcod                               8   5.0
     // ignore for language specification
-    uint LanguageCode() const { return _data[5]; }
+    uint LanguageCode(void) const { return _data[5]; }
     // if(num_channels==0) /* 1+1 mode */
     //   langcod2                            8   6.0
     // ignore for language specification
-    uint LanguageCode2() const { return _data[6]; }
+    uint LanguageCode2(void) const { return _data[6]; }
 
     // if(bsmod<2) {
     //  mainid                               3   7.0/6.0
-    uint MainID() const {
+    uint MainID(void) const
+    {
         return _data[(Channels()==0)?7:6]>>5;
     }
     //  reserved                             5   7.3/6.3
-    //uint reserved() const { return _data[7]&0x1f; }
+    //uint reserved(void) const { return _data[7]&0x1f; }
     // } else asvcflags                      8   7.0/6.0
-    uint AServiceFlags() const {
+    uint AServiceFlags(void) const
+    {
         return _data[(Channels()==0)?7:6];
     }
 
     // textlen                               7   8.0/7.0
-    uint TextLength() const {
+    uint TextLength(void) const
+    {
         return _data[(Channels()==0)?8:7]>>1;
     }
 
@@ -265,16 +270,19 @@ class AudioStreamDescriptor : public MPEGDescriptor {
        using the ISO Latin-1 alphabet (ISO 8859-1). If this bit is a 0,
        the text is encoded with 2-byte unicode characters. */
     // text_code 1 bslbf
-    bool IsTextLatin1() const {
+    bool IsTextLatin1(void) const
+    {
         return bool(_data[(Channels()==0)?8:7]&1);
     }
     // for(i=0; i<M; i++) {
     //        text[i] 8 bslbf
     // }
-    QString Text() const { // TODO
+    QString Text(void) const
+    { // TODO
 #if 0
-        char* tmp = new char[TextLength()+2];
-        if (IsTextLatin1()) {
+        char *tmp = new char[TextLength()+2];
+        if (IsTextLatin1())
+        {
             memcpy(tmp, &_data[(Channels()==0)?9:8], TextLength());
             tmp[TextLength()]=0;
             for (uint i=0; i<TextLength(); i++)
@@ -282,9 +290,11 @@ class AudioStreamDescriptor : public MPEGDescriptor {
             QString str(tmp);
             delete[] tmp;
             return str;
-        } else {
+        }
+        else
+        {
             QString str; int len = TextLength();
-            const unsigned char* buf = (&_data[(Channels()==0)?9:8]);
+            const unsigned char *buf = (&_data[(Channels()==0)?9:8]);
             const unsigned short* ustr =
                 reinterpret_cast<const unsigned short*>(buf);
             for (int j=0; j<(len>>1); j++)
@@ -305,12 +315,11 @@ class AudioStreamDescriptor : public MPEGDescriptor {
  *   This is something like an ISBN for %TV shows.
  *   See also: a_57a.pdf page6 Tables 6.1, 6.2, and 7.1
  */
-class ContentIdentifierDescriptor : public MPEGDescriptor {
-    ContentIdentifierDescriptor(const unsigned char* data) :
-        MPEGDescriptor(data) {
+class ContentIdentifierDescriptor : public MPEGDescriptor
+{
+    ContentIdentifierDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::atsc_content_identifier) { }
     // descriptor_tag                        8   0.0  0xB6
-        assert(0xB6==DescriptorTag());
-    }
     // descriptor_length                     8   1.0
     // content_ID_structure
     //   ID_system                           8   2.0
@@ -319,8 +328,6 @@ class ContentIdentifierDescriptor : public MPEGDescriptor {
     //        0x02-0xFF ATSC Reserved
     //   ID_length                           8   3.0
     //   content_identifier                  v   4.0
-
-    QString toString() const { return QString("ContentIdentifierDescriptor(stub)"); }
 };
 
 /**
@@ -333,10 +340,10 @@ class ContentIdentifierDescriptor : public MPEGDescriptor {
 class ExtendedChannelNameDescriptor : public MPEGDescriptor
 {
   public:
-    ExtendedChannelNameDescriptor(const unsigned char *data);
+    ExtendedChannelNameDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::extended_channel_name) { }
     MultipleStringStructure LongChannelName(void) const;
     QString LongChannelNameString(void) const;
-
     QString toString() const;
 };
 

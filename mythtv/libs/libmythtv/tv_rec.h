@@ -34,6 +34,7 @@ class DTVRecorder;
 class DVBRecorder;
 class HDHRRecorder;
 class ASIRecorder;
+class CetonRecorder;
 
 class SignalMonitor;
 class DTVSignalMonitor;
@@ -44,9 +45,11 @@ class DVBChannel;
 class FirewireChannel;
 class V4LChannel;
 class HDHRChannel;
+class CetonChannel;
 
 class MPEGStreamData;
 class ProgramMapTable;
+class RecordingQuality;
 
 class GeneralDBOptions
 {
@@ -223,7 +226,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
-    void RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo);
+    void RingBufferChanged(RingBuffer*, ProgramInfo*, RecordingQuality*);
     void RecorderPaused(void);
 
     void SetNextLiveTVDir(QString dir);
@@ -254,7 +257,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     static QString GetStartChannel(uint cardid, const QString &defaultinput);
 
-    void TeardownRecorder(bool killFile = false);
+    void TeardownRecorder(uint request_flags);
     DTVRecorder  *GetDTVRecorder(void);
 
     bool CreateChannel(const QString &startChanNum,
@@ -306,10 +309,13 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     RecordingInfo *SwitchRecordingRingBuffer(const RecordingInfo &rcinfo);
 
     void StartedRecording(RecordingInfo*);
-    void FinishedRecording(RecordingInfo*);
+    void FinishedRecording(RecordingInfo*, RecordingQuality*);
     QDateTime GetRecordEndTime(const ProgramInfo*) const;
     void CheckForRecGroupChange(void);
     void NotifySchedulerOfRecording(RecordingInfo*);
+
+    void SetRecordingStatus(
+        RecStatusType new_status, int line, bool have_lock = false);
 
     // Various components TVRec coordinates
     RecorderBase     *recorder;

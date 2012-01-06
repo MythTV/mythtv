@@ -14,6 +14,7 @@
 
 #define ARROWIMAGESIZE 4
 #define RECSTATUSSIZE  8
+#define MAX_DISPLAY_CHANS 40
 
 class MythFontProperties;
 

@@ -626,7 +626,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
 
     assert(pkt_size<127);
 
-    while (pkt_buf[off] && off<pkt_size)
+    while (off < pkt_size && pkt_buf[off])
     { // service_block
         int block_size = pkt_buf[off] & 0x1f;
         service_number = (pkt_buf[off]>>5) & 0x7;

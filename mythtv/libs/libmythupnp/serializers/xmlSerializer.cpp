@@ -24,6 +24,7 @@
 #include "xmlSerializer.h"
 
 #include <QMetaClassInfo>
+#include <QDateTime>
 
 // --------------------------------------------------------------------------
 // This version should be bumped if the serializer code is changed in a way
@@ -173,6 +174,13 @@ void XmlSerializer::RenderValue( const QString &sName, const QVariant &vValue )
         case QVariant::Map:
         {
             RenderMap( sName, vValue.toMap() );
+            break;
+        }
+
+        case QVariant::DateTime:
+        {
+            m_pXmlWriter->writeCharacters( vValue.toDateTime().toUTC()
+                                               .toString(Qt::ISODate) );
             break;
         }
 

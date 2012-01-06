@@ -2,6 +2,7 @@
 // Own header
 #include "mythsystem.h"
 #include "system-unix.h"
+#include "util.h"
 
 // compat header
 #include "compat.h"
@@ -300,6 +301,17 @@ void MythSystemManager::run(void)
             // pop exited process off managed list, add to cleanup list
             ms = m_pMap.take(pid);
             m_mapLock.unlock();
+
+            // Occasionally, the caller has deleted the structure from under
+            // our feet.  If so, just log and move on.
+            if (!ms)
+            {
+                LOG(VB_SYSTEM, LOG_ERR,
+                    QString("Structure for child PID %1 already deleted!")
+                    .arg(pid));
+                continue;
+            }
+
             msList.append(ms);
 
             // handle normal exit
@@ -314,14 +326,14 @@ void MythSystemManager::run(void)
             }
 
             // handle forced exit
-            else if( WIFSIGNALED(status) && 
-                     ms->GetStatus() != GENERIC_EXIT_TIMEOUT )
+            else if( WIFSIGNALED(status) )
             {
                 // Don't override a timed out process which gets killed, but
                 // otherwise set the return status appropriately
-                int sig = WTERMSIG(status);
-                ms->SetStatus( GENERIC_EXIT_KILLED );
+                if (ms->GetStatus() != GENERIC_EXIT_TIMEOUT)
+                    ms->SetStatus( GENERIC_EXIT_KILLED );
 
+                int sig = WTERMSIG(status);
                 LOG(VB_SYSTEM, LOG_INFO,
                     QString("Managed child (PID: %1) has signalled! "
                             "command=%2, status=%3, result=%4, signal=%5")
@@ -676,6 +688,9 @@ void MythSystemUnix::Fork(time_t timeout)
     // check before fork to avoid QString use in child
     bool setpgidsetting = GetSetting("SetPGID");
 
+    int niceval = m_parent->GetNice();
+    int ioprioval = m_parent->GetIOPrio();
+
     /* Do this before forking in case the child miserably fails */
     m_timeout = timeout;
     if( timeout )
@@ -800,6 +815,12 @@ void MythSystemUnix::Fork(time_t timeout)
                  << "setpgid() failed: "
                  << strerror(errno) << endl;
         }
+
+        /* Set nice and ioprio values if non-default */
+        if (niceval)
+            myth_nice(niceval);
+        if (ioprioval)
+            myth_ioprio(ioprioval);
 
         /* run command */
         if( execv(command, cmdargs) < 0 )

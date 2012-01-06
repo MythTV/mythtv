@@ -17,6 +17,7 @@
 #include <IOKit/firewire/IOFireWireLibIsoch.h>
 #include <IOKit/firewire/IOFireWireFamilyCommon.h>
 #include <IOKit/avc/IOFireWireAVCLib.h>
+#include <CoreServices/CoreServices.h>   // for EndianU32_BtoN() etc.
 
 // Std C++ headers
 #include <algorithm>
@@ -375,6 +376,7 @@ int DarwinFirewireDevice::GetMaxSpeed(void)
         uint32_t val;
         int ret = (*fw_handle)->ReadQuadlet(
             fw_handle, dev, &addr, (UInt32*) &val, false, 0);
+        val = EndianU32_BtoN(val);
 
         return (ret == kIOReturnSuccess) ? (int)((val>>30) & 0x3) : -1;
     }
@@ -400,6 +402,7 @@ bool DarwinFirewireDevice::IsSTBStreaming(uint *fw_channel)
     uint32_t val;
     int ret = (*fw_handle)->ReadQuadlet(
         fw_handle, dev, &addr, (UInt32*) &val, false, 0);
+    val = EndianU32_BtoN(val);
 
     if (ret != kIOReturnSuccess)
         return false;
@@ -714,6 +717,7 @@ bool DarwinFirewireDevice::UpdatePlugRegisterPrivate(
     {
         return false;
     }
+    old_plug_val = EndianU32_BtoN(old_plug_val);
 
     int old_plug_cnt = (old_plug_val >> 24) & 0x3f;
     int old_fw_chan  = (old_plug_val >> 16) & 0x3f;
@@ -757,6 +761,9 @@ bool DarwinFirewireDevice::UpdatePlugRegisterPrivate(
 
     new_plug_val &= ~(0x03<<14);
     new_plug_val |= (new_speed & 0x03) << 14;
+
+    old_plug_val = EndianU32_NtoB(old_plug_val); 
+    new_plug_val = EndianU32_NtoB(new_plug_val);
 
     return (kIOReturnSuccess == (*fw_handle)->CompareSwap(
                 fw_handle, dev, &addr, old_plug_val, new_plug_val, false, 0));

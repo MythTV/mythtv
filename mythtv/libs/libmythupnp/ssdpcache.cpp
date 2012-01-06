@@ -202,7 +202,7 @@ QTextStream &SSDPCacheEntries::OutputXML(
            << "' url='" << (*it)->m_sLocation << "' />" << endl;
 
         if (pnEntryCount != NULL)
-            *pnEntryCount++;
+            (*pnEntryCount)++;
     }
 
     return os;
@@ -555,7 +555,7 @@ QTextStream &SSDPCache::OutputXML(
             os << "</Device>" << endl;
 
             if (pnDevCount != NULL)
-                *pnDevCount++;
+                (*pnDevCount)++;
         }
     }
     os << flush;

@@ -68,13 +68,13 @@ class DBData( DictData, MythSchema ):
         if cls._table is None:
             # pull table name from class name
             cls._table = cls.__name__.lower()
-            log(log.DATABASE|log.EXTRA,
+            log(log.DATABASE, log.DEBUG,
                 'set _table to %s' % cls._table)
 
         if cls._logmodule is None:
             # pull log module from class name
             cls._logmodule = 'Python %s' % cls.__name__
-            log(log.DATABASE|log.EXTRA,
+            log(log.DATABASE, log.DEBUG,
                 'set _logmodule to %s' % cls._logmodule)
 
         if cls._field_order == []:
@@ -90,14 +90,14 @@ class DBData( DictData, MythSchema ):
                                             % cls._table)
                     cls._key = [k[4] for k in sorted(cursor.fetchall(),
                                                      key=lambda x: x[3])]
-                log(log.DATABASE|log.EXTRA,
+                log(log.DATABASE, log.DEBUG,
                     'set _key to %s' % str(cls._key))
             gen = lambda j,s,l: j.join([s % k for k in l])
             cls._where = gen(' AND ', '%s=?', cls._key)
             cls._setwheredat = gen('', 'self.%s,', cls._key)
-            log(log.DATABASE|log.EXTRA,
+            log(log.DATABASE, log.DEBUG,
                 'set _where to %s' % cls._where)
-            log(log.DATABASE|log.EXTRA,
+            log(log.DATABASE, log.DEBUG,
                 'set _setwheredat to %s' % cls._setwheredat)
 
         # class has been processed, turn method into no-op
@@ -926,12 +926,12 @@ class DBCache( MythSchema ):
         self.settings = None
         if db is not None:
             # load existing database connection
-            self.log(MythLog.DATABASE|MythLog.EXTRA,
+            self.log(MythLog.DATABASE, MythLog.DEBUG,
                             "Loading existing connection", db.ident)
             dbconn.update(db.dbconn)
         if args is not None:
             # load user defined arguments (takes dict, or key/value tuple)
-            self.log(MythLog.DATABASE, "Loading user settings")
+            self.log(MythLog.DATABASE, MythLog.INFO, "Loading user settings")
             dbconn.update(args)
         if 'SecurityPin' not in dbconn:
             dbconn['SecurityPin'] = 0
@@ -955,7 +955,7 @@ class DBCache( MythSchema ):
                 dbconn.update(self._readXML(conffile))
 
                 if self._check_dbconn(dbconn):
-                    self.log(MythLog.DATABASE,
+                    self.log(MythLog.DATABASE, MythLog.INFO,
                            "Using connection settings from %s" % conffile)
                     break
             else:
@@ -1077,7 +1077,7 @@ class DBCache( MythSchema ):
 
         if local != sver:
             if update is None:
-                self.log(MythLog.DATABASE|MythLog.IMPORTANT,
+                self.log(MythLog.GENERAL, MythLog.ERR,
                     "%s schema mismatch: we speak %d but database speaks %s" \
                     % (name, local, sver))
                 self.db = None
@@ -1087,6 +1087,16 @@ class DBCache( MythSchema ):
 
     def gethostname(self):
         return self.dbconn['LocalHostName']
+
+    def getMasterBackend(self):
+        ip = self.settings.NULL.MasterServerIP
+        with self as cursor:
+            if cursor.execute("""SELECT hostname FROM settings
+                                     WHERE value='BackendServerIP'
+                                     AND data=?""", [ip]) == 0:
+                # no match found
+                raise MythDBError(MythError.DB_SETTING, 'BackendServerIP', ip)
+            return cursor.fetchone()[0]
 
     def getStorageGroup(self, groupname=None, hostname=None):
         """

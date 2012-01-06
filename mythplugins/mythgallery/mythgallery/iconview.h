@@ -77,10 +77,10 @@ class IconView : public MythScreenType
     bool HandleImageSelect(const QString &action);
 
     void HandleMainMenu(void);
-    void HandleSubMenuMetadata(void);
-    void HandleSubMenuMark(void);
+    MythMenu* CreateMetadataMenu(void);
+    MythMenu*  CreateMarkingMenu(void);
     void HandleSubMenuFilter(void);
-    void HandleSubMenuFile(void);
+    MythMenu*  CreateFileMenu(void);
 
   private slots:
     void HandleRotateCW(void);

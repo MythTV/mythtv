@@ -36,7 +36,8 @@ class MBASE_PUBLIC DBUtil
     QString GetDBMSVersion(void);
     int CompareDBMSVersion(int major, int minor=0, int point=0);
 
-    MythDBBackupStatus BackupDB(QString &filename);
+    MythDBBackupStatus BackupDB(QString &filename,
+                                bool disableRotation = false);
     static bool CheckTables(const bool repair = false,
                             const QString options = "QUICK");
     static bool RepairTables(const QStringList &tables);
@@ -66,7 +67,8 @@ class MBASE_PUBLIC DBUtil
                                  QString extension = ".sql");
     QString GetBackupDirectory();
 
-    bool DoBackup(const QString &backupScript, QString &filename);
+    bool DoBackup(const QString &backupScript, QString &filename,
+                  bool disableRotation = false);
     bool DoBackup(QString &filename);
 
     QString m_versionString;

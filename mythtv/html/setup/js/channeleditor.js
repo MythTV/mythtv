@@ -196,9 +196,9 @@ function saveChannelEdits() {
     var sourceid = $("#channelDetailSettingSourceId").html();
     var chanid = $("#channelDetailSettingChanId").html()
 
-    var callsign = $("#channelDetailSettingCallSign").val();
-    var channelname = $("#channelDetailSettingChannelName").val();
-    var channum =  $("#channelDetailSettingChanNum").val();
+    var callsign = $.trim($("#channelDetailSettingCallSign").val());
+    var channelname = $.trim($("#channelDetailSettingChannelName").val());
+    var channum =  $.trim($("#channelDetailSettingChanNum").val());
     var serviceid =  $("#channelDetailSettingServiceId").val();
     var atscmajorchannel =  $("#channelDetailSettingATSCMajorChannel").val();
     var atscminorchannel =  $("#channelDetailSettingATSCMinorChannel").val();
@@ -391,7 +391,7 @@ function deleteSelectedChannel() {
         for (var i = len - 1; i >= 0; i--) {
             var chanid = rowArray[i];
             if ($("#channels").jqGrid('delRowData', chanid)) {
-                $.post("/Channel/DeleteDBChannel",
+                $.post("/Channel/RemoveDBChannel",
                 { ChannelID: chanid },
                 function(data) {
                     if (data.bool == "true") {
@@ -459,7 +459,7 @@ function initXMLTVIdList() {
     var ids = new Array();
     var x = 0;
     $.ajaxSetup({ async: false });
-    $.post("/Channel/GetXMLTVIds", { SourceID : sourceid }, function(data) {
+    $.post("/Channel/GetXMLTVIdList", { SourceID : sourceid }, function(data) {
        $.each(data.QStringList, function(i, value) {
             ids[x] = value;
             x++;

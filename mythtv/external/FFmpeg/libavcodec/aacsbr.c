@@ -32,9 +32,12 @@
 #include "aacsbrdata.h"
 #include "fft.h"
 #include "aacps.h"
+#include "libavutil/libm.h"
+#include "libavutil/avassert.h"
 
 #include <stdint.h>
 #include <float.h>
+#include <math.h>
 
 #define ENVELOPE_ADJUSTMENT_OFFSET 2
 #define NOISE_FLOOR_OFFSET 6.0f
@@ -127,11 +130,13 @@ av_cold void ff_aac_sbr_init(void)
 
 av_cold void ff_aac_sbr_ctx_init(SpectralBandReplication *sbr)
 {
+    if(sbr->mdct.mdct_bits)
+        return;
     sbr->kx[0] = sbr->kx[1] = 32; //Typo in spec, kx' inits to 32
     sbr->data[0].e_a[1] = sbr->data[1].e_a[1] = -1;
     sbr->data[0].synthesis_filterbank_samples_offset = SBR_SYNTHESIS_BUF_SIZE - (1280 - 128);
     sbr->data[1].synthesis_filterbank_samples_offset = SBR_SYNTHESIS_BUF_SIZE - (1280 - 128);
-    ff_mdct_init(&sbr->mdct, 7, 1, 1.0/64);
+    ff_mdct_init(&sbr->mdct,     7, 1, 1.0 / 64.0);
     ff_mdct_init(&sbr->mdct_ana, 7, 1, -2.0);
     ff_ps_ctx_init(&sbr->ps);
 }
@@ -1155,7 +1160,7 @@ static void sbr_qmf_analysis(DSPContext *dsp, FFTContext *mdct, const float *in,
         }
         z[64+63] = z[32];
 
-        ff_imdct_half(mdct, z, z+64);
+        mdct->imdct_half(mdct, z, z+64);
         for (k = 0; k < 32; k++) {
             W[1][i][k][0] = -z[63-k];
             W[1][i][k][1] = z[k];
@@ -1190,7 +1195,7 @@ static void sbr_qmf_synthesis(DSPContext *dsp, FFTContext *mdct,
                 X[0][i][   n] = -X[0][i][n];
                 X[0][i][32+n] =  X[1][i][31-n];
             }
-            ff_imdct_half(mdct, mdct_buf[0], X[0][i]);
+            mdct->imdct_half(mdct, mdct_buf[0], X[0][i]);
             for (n = 0; n < 32; n++) {
                 v[     n] =  mdct_buf[0][63 - 2*n];
                 v[63 - n] = -mdct_buf[0][62 - 2*n];
@@ -1199,8 +1204,8 @@ static void sbr_qmf_synthesis(DSPContext *dsp, FFTContext *mdct,
             for (n = 1; n < 64; n+=2) {
                 X[1][i][n] = -X[1][i][n];
             }
-            ff_imdct_half(mdct, mdct_buf[0], X[0][i]);
-            ff_imdct_half(mdct, mdct_buf[1], X[1][i]);
+            mdct->imdct_half(mdct, mdct_buf[0], X[0][i]);
+            mdct->imdct_half(mdct, mdct_buf[1], X[1][i]);
             for (n = 0; n < 64; n++) {
                 v[      n] = -mdct_buf[0][63 -   n] + mdct_buf[1][  n    ];
                 v[127 - n] =  mdct_buf[0][63 -   n] + mdct_buf[1][  n    ];
@@ -1450,6 +1455,7 @@ static void sbr_mapping(AACContext *ac, SpectralBandReplication *sbr,
         uint16_t *table = ch_data->bs_freq_res[e + 1] ? sbr->f_tablehigh : sbr->f_tablelow;
         int k;
 
+        av_assert0(sbr->kx[1] <= table[0]);
         for (i = 0; i < ilim; i++)
             for (m = table[i]; m < table[i + 1]; m++)
                 sbr->e_origmapped[e][m - sbr->kx[1]] = ch_data->env_facs[e+1][i];

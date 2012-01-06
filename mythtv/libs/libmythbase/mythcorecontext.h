@@ -28,6 +28,7 @@
 #define MYTH_APPNAME_MYTHAVTEST "mythavtest"
 #define MYTH_APPNAME_MYTHMEDIASERVER "mythmediaserver"
 #define MYTH_APPNAME_MYTHMETADATALOOKUP "mythmetadatalookup"
+#define MYTH_APPNAME_MYTHUTIL "mythutil"
 
 class MDBManager;
 class MythCoreContextPrivate;
@@ -57,7 +58,8 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void SetEventSocket(MythSocket *eventSock);
     void SetScheduler(MythScheduler *sched);
 
-    bool ConnectToMasterServer(bool blockingClient = true);
+    bool ConnectToMasterServer(bool blockingClient = true,
+                               bool openEventSocket = true);
 
     MythSocket *ConnectCommandSocket(const QString &hostname, int  port,
                                      const QString &announcement,
@@ -101,6 +103,11 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 
     bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false,
                                bool block = true);
+    void SendMessage(const QString &message);
+    void SendEvent(const MythEvent &event);
+    void SendSystemEvent(const QString msg);
+    void SendHostSystemEvent(const QString msg, const QString &hostname,
+                             const QString args);
 
     void SetGUIObject(QObject *gui);
     QObject *GetGUIObject(void);

@@ -151,7 +151,7 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
 
     QImage tx = QGLWidget::convertToGLFormat(*im);
     GLuint tx_id =
-        realRender->CreateTexture(tx.size(),false, 0,
+        realRender->CreateTexture(tx.size(), false, 0,
                                   GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8,
                                   GL_LINEAR_MIPMAP_LINEAR);
 

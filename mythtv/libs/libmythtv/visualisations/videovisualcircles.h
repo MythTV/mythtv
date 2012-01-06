@@ -7,6 +7,7 @@ class VideoVisualCircles : public VideoVisualSpectrum
 {
   public:
     VideoVisualCircles(AudioPlayer *audio, MythRender *render);
+    virtual QString Name(void) { return "Circles"; }
 
   protected:
     virtual bool InitialisePriv(void);

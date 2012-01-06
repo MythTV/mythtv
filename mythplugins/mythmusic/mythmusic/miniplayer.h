@@ -22,7 +22,7 @@ class MPUBLIC MiniPlayer : public MusicCommon
     void timerTimeout(void);
 
   private:
-    QTimer       *m_displayTimer;
+    QTimer *m_displayTimer;
 };
 
 #endif

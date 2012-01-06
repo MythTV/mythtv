@@ -164,7 +164,7 @@ bool avfDecoder::initialize()
 
         // probe the stream
         AVProbeData probe_data;
-        probe_data.filename = filename;
+        probe_data.filename = filename.toLocal8Bit().constData();
         probe_data.buf_size = min(BUFFER_SIZE, (int) input()->bytesAvailable());
         probe_data.buf = m_buffer;
         input()->read((char*)probe_data.buf, probe_data.buf_size);

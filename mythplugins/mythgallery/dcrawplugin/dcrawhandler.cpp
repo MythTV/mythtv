@@ -9,8 +9,11 @@
 #include <QImage>
 #include <QIODevice>
 #include <QString>
+
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include "../mythgallery/galleryutil.h"
+#include "mythlogging.h"
 
 namespace
 {
@@ -74,3 +77,36 @@ bool DcrawHandler::read(QImage *image)
     return loaded;
 }
 
+int DcrawHandler::loadThumbnail(QImage *image, QString fileName)
+{
+    QStringList arguments;
+    arguments << "-e" << "-c";
+    arguments << "'" + fileName + "'";
+
+    uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
+    MythSystem ms("dcraw", arguments, flags);
+    ms.Run();
+    if (ms.Wait() != GENERIC_EXIT_OK)
+        return -1;
+
+    QByteArray buffer = ms.ReadAll();
+    if (buffer.isEmpty())
+        return -1;
+
+    if (!image->loadFromData(buffer, "JPG"))
+        return -1;
+
+    int rotateAngle = 0;
+
+#ifdef EXIF_SUPPORT
+    const unsigned char *buf = (const unsigned char *)buffer.constData();
+    int size = buffer.size();
+    rotateAngle = GalleryUtil::GetNaturalRotation(buf, size);
+#endif
+
+    return rotateAngle;
+}
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

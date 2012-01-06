@@ -23,14 +23,9 @@
 #include "genres.h"
 #include "metaio.h"
 #include "musicplayer.h"
+#include "musicutils.h"
 
 #include "editmetadata.h"
-
-static inline QString fixFileToken(QString token)
-{
-    token.replace(QRegExp("(/|\\\\|:|\'|\"|\\?|\\|)"), QString("_"));
-    return token;
-}
 
 // these need to be static so both screens can pick them up
 bool EditMetadataCommon::metadataOnly = false;
@@ -401,24 +396,6 @@ bool EditMetadataDialog::Create(void)
     return true;
 }
 
-QString EditMetadataDialog::findIcon(const QString &type, const QString &name)
-{
-    QString cleanName = fixFileToken(name);
-    QString file = GetConfDir() + QString("/MythMusic/Icons/%1/%2").arg(type).arg(cleanName);
-
-    if (QFile::exists(file + ".jpg"))
-        return file + ".jpg";
-
-    if (QFile::exists(file + ".jpeg"))
-        return file + ".jpeg";
-
-    if (QFile::exists(file + ".png"))
-        return file + ".png";
-
-    return QString();
-
-}
-
 void EditMetadataDialog::fillWidgets()
 {
     m_compArtistEdit->SetText(m_metadata->CompilationArtist());
@@ -520,7 +497,7 @@ void EditMetadataDialog::showMenu(void )
     menu->AddButton(tr("Search Internet For Artist Image"));
     menu->AddButton(tr("Search Internet For Album Image"));
     menu->AddButton(tr("Search Internet For Genre Image"));
-
+    menu->AddButton(tr("Check Track Length"));
     menu->AddButton(tr("Cancel"));
 
     popupStack->AddScreen(menu);
@@ -750,7 +727,7 @@ void EditMetadataDialog::searchForGenreImages(void)
 
     QUrl url("http://www.flickr.com/search/groups/?w=908425%40N22&m=pool&q=" + genre, QUrl::TolerantMode);
 
-    QString cleanName = fixFileToken(m_metadata->Genre().toLower());
+    QString cleanName = fixFilename(m_metadata->Genre().toLower());
     QString file = GetConfDir() + QString("/MythMusic/Icons/%1/%2.jpg").arg("genre").arg(cleanName);
 
     QFileInfo fi(file);
@@ -765,7 +742,7 @@ void EditMetadataDialog::searchForArtistImages(void)
 
     QUrl url("http://www.google.co.uk/images?q=" + artist, QUrl::TolerantMode);
 
-    QString cleanName = fixFileToken(m_metadata->Artist().toLower());
+    QString cleanName = fixFilename(m_metadata->Artist().toLower());
     QString file = GetConfDir() + QString("/MythMusic/Icons/%1/%2.jpg").arg("artist").arg(cleanName);
 
     QFileInfo fi(file);
@@ -804,6 +781,31 @@ void EditMetadataDialog::customEvent(QEvent *event)
             {
                 updateMetadata();
                 searchForAlbumImages();
+            }
+            else if (resulttext == tr("Check Track Length"))
+            {
+                int length = calcTrackLength(m_metadata->Filename());
+
+                if (length != m_metadata->Length() / 1000)
+                {
+                    int oldLength = m_metadata->Length() / 1000;
+
+                    // save the new length to our working copy of the metadata
+                    m_metadata->setLength(length * 1000);
+
+                    // save the new length to the source copy of the metadata
+                    m_sourceMetadata->setLength(length * 1000);
+                    m_sourceMetadata->dumpToDatabase();
+
+                    // this will update any track lengths displayed on screen
+                    gPlayer->sendMetadataChangedEvent(m_sourceMetadata->ID());
+
+                    // this will force the playlist stats to update
+                    MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, gPlayer->getCurrentTrackPos());
+                    gPlayer->dispatch(me);
+
+                    ShowOkPopup(QString("Updated track length to %1 seconds\nwas %2 seconds").arg(length).arg(oldLength));
+                }
             }
         }
     }
@@ -1031,6 +1033,7 @@ void EditAlbumartDialog::showTypeMenu(bool changeType)
     menu->AddButton(m_albumArt->getTypeName(IT_BACKCOVER),  qVariantFromValue((int)IT_BACKCOVER),  false, (imageType == IT_BACKCOVER));
     menu->AddButton(m_albumArt->getTypeName(IT_CD),         qVariantFromValue((int)IT_CD),         false, (imageType == IT_CD));
     menu->AddButton(m_albumArt->getTypeName(IT_INLAY),      qVariantFromValue((int)IT_INLAY),      false, (imageType == IT_INLAY));
+    menu->AddButton(m_albumArt->getTypeName(IT_ARTIST),     qVariantFromValue((int)IT_ARTIST),     false, (imageType == IT_ARTIST));
 
     popupStack->AddScreen(menu);
 }

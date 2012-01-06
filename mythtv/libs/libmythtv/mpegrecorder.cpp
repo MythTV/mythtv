@@ -894,9 +894,7 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
 
 bool MpegRecorder::Open(void)
 {
-    memset(_stream_id,  0, sizeof(_stream_id));
-    memset(_pid_status, 0, sizeof(_pid_status));
-    memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
+    ResetForNewFile();
     return (deviceIsMpegFile) ? OpenMpegFileAsInput() : OpenV4L2DeviceAsInput();
 }
 
@@ -914,11 +912,6 @@ void MpegRecorder::run(void)
     // HACK. FreeBSD PVR150/500 driver doesn't currently support select()
     has_select = false;
 #endif
-
-    _continuity_error_count = 0;
-    _start_code = 0xffffffff;
-    _last_gop_seen = 0;
-    _frames_written_count = 0;
 
     if (driver == "hdpvr")
     {
@@ -940,6 +933,7 @@ void MpegRecorder::run(void)
     {
         QMutexLocker locker(&pauseLock);
         request_recording = true;
+        request_helper = true;
         recording = true;
         recordingWait.wakeAll();
     }
@@ -1152,6 +1146,19 @@ void MpegRecorder::run(void)
 
     StopEncoding(readfd);
 
+    {
+        QMutexLocker locker(&pauseLock);
+        request_helper = false;
+    }
+
+    if (vbi_thread)
+    {
+        vbi_thread->wait();
+        delete vbi_thread;
+        vbi_thread = NULL;
+        CloseVBIDevice();
+    }
+
     FinishRecording();
 
     delete[] buffer;
@@ -1164,6 +1171,7 @@ void MpegRecorder::run(void)
     }
 
     QMutexLocker locker(&pauseLock);
+    request_recording = false;
     recording = false;
     recordingWait.wakeAll();
 }

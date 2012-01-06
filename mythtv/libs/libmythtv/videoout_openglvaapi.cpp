@@ -124,7 +124,7 @@ bool VideoOutputOpenGLVAAPI::CreateVAAPIContext(QSize size)
     if (m_ctx)
         DeleteVAAPIContext();
 
-    m_ctx = new VAAPIContext(video_codec_id);
+    m_ctx = new VAAPIContext(kVADisplayGLX, video_codec_id);
     if (m_ctx && m_ctx->CreateDisplay(size) && m_ctx->CreateBuffers())
     {
         int num_buffers = m_ctx->GetNumBuffers();
@@ -228,11 +228,11 @@ int VideoOutputOpenGLVAAPI::SetPictureAttribute(PictureAttribute attribute,
     return VideoOutput::SetPictureAttribute(attribute, val);
 }
 
-void VideoOutputOpenGLVAAPI::UpdatePauseFrame(void)
+void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
 {
     if (codec_is_std(video_codec_id))
     {
-        VideoOutputOpenGLVAAPI::UpdatePauseFrame();
+        VideoOutputOpenGL::UpdatePauseFrame(disp_timecode);
         return;
     }
 
@@ -241,6 +241,7 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(void)
     {
         VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
         m_pauseBuffer = frame->buf;
+        disp_timecode = frame->disp_timecode;
     }
     else
         LOG(VB_PLAYBACK, LOG_WARNING, LOC +
@@ -282,19 +283,15 @@ QStringList VideoOutputOpenGLVAAPI::GetAllowedRenderers(
 }
 
 MythCodecID VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
-    uint width,       uint height,
+    uint width,       uint height, const QString &decoder,
     uint stream_type, bool no_acceleration,
     PixelFormat &pix_fmt)
 {
     QSize size(width, height);
     bool use_cpu = no_acceleration;
-    VideoDisplayProfile vdp;
-    vdp.SetInput(size);
-    QString dec = vdp.GetDecoder();
-
     PixelFormat fmt = PIX_FMT_YUV420P;
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VAAPI + (stream_type - 1));
-    if (codec_is_vaapi(test_cid) && dec == "vaapi" && !getenv("NO_VAAPI"))
+    if (codec_is_vaapi(test_cid) && decoder == "vaapi" && !getenv("NO_VAAPI"))
         use_cpu |= !VAAPIContext::IsFormatAccelerated(size, test_cid, fmt);
     else
         use_cpu = true;

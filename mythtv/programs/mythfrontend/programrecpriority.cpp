@@ -1115,26 +1115,26 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
             int progRecPriority = pgRecInfo->GetRecordingPriority();
             int autorecpri = pgRecInfo->autoRecPriority;
             int finalRecPriority = progRecPriority +
-                                    autorecpri +
-                                    pgRecInfo->recTypeRecPriority;
+                                   autorecpri +
+                                   pgRecInfo->recTypeRecPriority;
 
             item->SetText(QString::number(progRecPriority), "progpriority");
-            item->SetText(QString::number(finalRecPriority), "finalpriority");
 
-            if (m_recPriorityText)
-            {
-                QString msg = QString::number(progRecPriority);
-
-                if(autorecpri != 0)
-                    msg += tr(" + %1 automatic priority (%2hr)")
+            QString msg = QString::number(progRecPriority);
+            if(autorecpri != 0)
+                msg += tr(" + %1 automatic priority (%2hr)")
                                 .arg(autorecpri).arg(pgRecInfo->avg_delay);
+            item->SetText(msg, "recpriority");
+            if (m_recPriorityText)
                 m_recPriorityText->SetText(msg);
-            }
 
+            item->SetText(QString::number(progRecPriority +
+                                          autorecpri), "recpriorityB");
             if (m_recPriorityBText)
                 m_recPriorityBText->SetText(QString::number(progRecPriority +
                                                             autorecpri));
 
+            item->SetText(QString::number(finalRecPriority), "finalpriority");
             if (m_finalPriorityText)
                 m_finalPriorityText->SetText(QString::number(finalRecPriority));
         }
@@ -1405,9 +1405,10 @@ void ProgramRecPriority::UpdateList()
                                                 qVariantFromValue(progInfo));
 
         int progRecPriority = progInfo->GetRecordingPriority();
+        int autorecpri = progInfo->autoRecPriority;
         int finalRecPriority = progRecPriority +
-                                progInfo->autoRecPriority +
-                                progInfo->recTypeRecPriority;
+                               autorecpri +
+                               progInfo->recTypeRecPriority;
 
         if ((progInfo->rectype == kSingleRecord ||
                 progInfo->rectype == kOverrideRecord ||
@@ -1431,13 +1432,51 @@ void ProgramRecPriority::UpdateList()
             state = "normal";
         else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
             state = "running";
+        else
+            state = "warning";
 
         InfoMap infoMap;
         progInfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 
+        QString subtitle;
+        if (progInfo->subtitle != "(null)" &&
+            (progInfo->rectype == kSingleRecord ||
+             progInfo->rectype == kOverrideRecord ||
+             progInfo->rectype == kDontRecord))
+        {
+            subtitle = progInfo->subtitle;
+        }
+
+        QString matchInfo;
+        if (progInfo->GetRecordingStatus() == rsInactive)
+        {
+            matchInfo = QString("%1 %2")
+                        .arg(m_listMatch[progInfo->GetRecordingRuleID()])
+                        .arg(toString(progInfo->GetRecordingStatus(),
+                                      progInfo->GetRecordingRuleType()));
+        }
+        else
+            matchInfo = QString(tr("Recording %1 of %2"))
+                        .arg(m_recMatch[progInfo->GetRecordingRuleID()])
+                        .arg(m_listMatch[progInfo->GetRecordingRuleID()]);
+
+        subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
+        item->SetText(subtitle, "scheduleinfo", state);
+
         item->SetText(QString::number(progRecPriority), "progpriority", state);
-        item->SetText(QString::number(finalRecPriority), "finalpriority", state);
+        item->SetText(QString::number(finalRecPriority),
+                      "finalpriority", state);
+
+        QString msg = QString::number(progRecPriority);
+        if(autorecpri != 0)
+            msg += tr(" + %1 automatic priority (%2hr)")
+                   .arg(autorecpri).arg(progInfo->avg_delay);
+        item->SetText(msg, "recpriority", state);
+        item->SetText(QString::number(progRecPriority + autorecpri),
+                      "recpriorityB", state);
+        item->SetText(QString::number(progInfo->recTypeRecPriority),
+                      "rectypepriority", state);
 
         QString tempDateTime = MythDateTimeToString(progInfo->last_record,
                                                     kDateTimeFull | kSimplify |

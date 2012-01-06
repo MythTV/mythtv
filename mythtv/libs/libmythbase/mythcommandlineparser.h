@@ -36,18 +36,30 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 
     bool            Set(QString opt);
     bool            Set(QString opt, QString val);
-    void            Set(QVariant val)               { m_stored = val; }
+    void            Set(QVariant val)               { m_stored = val;
+                                                      m_given = true; }
 
+    CommandLineArg* SetParent(QString opt);
+    CommandLineArg* SetParent(QStringList opts);
     CommandLineArg* SetParentOf(QString opt);
     CommandLineArg* SetParentOf(QStringList opts);
+
+    CommandLineArg* SetChild(QString opt);
+    CommandLineArg* SetChild(QStringList opt);
     CommandLineArg* SetChildOf(QString opt);
     CommandLineArg* SetChildOf(QStringList opts);
+
+    CommandLineArg* SetRequiredChild(QString opt);
+    CommandLineArg* SetRequiredChild(QStringList opt);
     CommandLineArg* SetRequiredChildOf(QString opt);
     CommandLineArg* SetRequiredChildOf(QStringList opt);
+
     CommandLineArg* SetRequires(QString opt);
     CommandLineArg* SetRequires(QStringList opts);
     CommandLineArg* SetBlocks(QString opt);
     CommandLineArg* SetBlocks(QStringList opts);
+
+    CommandLineArg* SetDeprecated(QString depstr = "");
 
     static void     AllowOneOf(QList<CommandLineArg*> args);
 
@@ -70,6 +82,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     bool                    m_given;
     QString                 m_name;
     QString                 m_group;
+    QString                 m_deprecated;
     QVariant::Type          m_type;
     QVariant                m_default;
     QVariant                m_stored;
@@ -94,8 +107,8 @@ class MBASE_PUBLIC MythCommandLineParser
    ~MythCommandLineParser();
 
     virtual void LoadArguments(void) {};
-    void PrintVersion(void);
-    void PrintHelp(void);
+    void PrintVersion(void) const;
+    void PrintHelp(void) const;
     QString GetHelpString(void) const;
     virtual QString GetHelpHeader(void) const { return ""; }
 
@@ -215,6 +228,7 @@ class MBASE_PUBLIC MythCommandLineParser
 
     QVariant                operator[](const QString &name);
     QStringList             GetArgs(void) const;
+    QMap<QString,QString>   GetExtra(void) const;
     QString                 GetPassthrough(void) const;
     QMap<QString,QString>   GetSettingsOverride(void);
     QString                 GetLogFilePath(void);
@@ -257,6 +271,7 @@ class MBASE_PUBLIC MythCommandLineParser
                     LogLevel_t defaultLogLevel = LOG_INFO);
     void addPIDFile(void);
     void addJob(void);
+    void addInFile(bool addOutFile = false);
 
   private:
     int getOpt(int argc, const char * const * argv, int &argpos,

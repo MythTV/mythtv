@@ -35,6 +35,7 @@ DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 DEPENDPATH  += ../libmythbase ../libmythui
 DEPENDPATH  += ../libmythupnp
+DEPENDPATH  += ../libmythservicecontracts
 
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../../external/FFmpeg
@@ -202,6 +203,14 @@ SOURCES += diseqc.cpp               diseqcsettings.cpp
 HEADERS += datadirect.h
 SOURCES += datadirect.cpp
 
+# File Writer classes
+HEADERS += filewriterbase.h         avformatwriter.h
+SOURCES += filewriterbase.cpp       avformatwriter.cpp
+
+# HTTP Live Streaming
+HEADERS += httplivestream.h
+SOURCES += httplivestream.cpp
+
 # Teletext stuff
 HEADERS += teletextdecoder.h        teletextreader.h   vbilut.h
 SOURCES += teletextdecoder.cpp      teletextreader.cpp vbilut.cpp
@@ -210,11 +219,13 @@ SOURCES += teletextdecoder.cpp      teletextreader.cpp vbilut.cpp
 HEADERS += mpeg/tspacket.h          mpeg/pespacket.h
 HEADERS += mpeg/mpegtables.h        mpeg/atsctables.h
 HEADERS += mpeg/dvbtables.h         mpeg/premieretables.h
+HEADERS += mpeg/sctetables.h
 HEADERS += mpeg/mpegstreamdata.h    mpeg/atscstreamdata.h
 HEADERS += mpeg/dvbstreamdata.h     mpeg/scanstreamdata.h
 HEADERS += mpeg/mpegdescriptors.h   mpeg/atscdescriptors.h
-HEADERS += mpeg/dvbdescriptors.h    mpeg/dishdescriptors.h
-HEADERS += mpeg/premieredescriptors.h
+HEADERS += mpeg/sctedescriptors.h   mpeg/dvbdescriptors.h
+HEADERS += mpeg/splicedescriptors.h 
+HEADERS += mpeg/dishdescriptors.h   mpeg/premieredescriptors.h
 HEADERS += mpeg/atsc_huffman.h
 HEADERS += mpeg/freesat_huffman.h   mpeg/freesat_tables.h
 HEADERS += mpeg/iso6937tables.h
@@ -224,11 +235,13 @@ HEADERS += mpeg/H264Parser.h
 SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
 SOURCES += mpeg/mpegtables.cpp      mpeg/atsctables.cpp
 SOURCES += mpeg/dvbtables.cpp       mpeg/premieretables.cpp
+SOURCES += mpeg/sctetables.cpp
 SOURCES += mpeg/mpegstreamdata.cpp  mpeg/atscstreamdata.cpp
 SOURCES += mpeg/dvbstreamdata.cpp   mpeg/scanstreamdata.cpp
 SOURCES += mpeg/mpegdescriptors.cpp mpeg/atscdescriptors.cpp
-SOURCES += mpeg/dvbdescriptors.cpp  mpeg/dishdescriptors.cpp
-SOURCES += mpeg/premieredescriptors.cpp
+SOURCES += mpeg/dvbdescriptors.cpp  mpeg/sctedescriptors.cpp
+SOURCES += mpeg/splicedescriptors.cpp
+SOURCES += mpeg/dishdescriptors.cpp mpeg/premieredescriptors.cpp
 SOURCES += mpeg/atsc_huffman.cpp
 SOURCES += mpeg/freesat_huffman.cpp
 SOURCES += mpeg/iso6937tables.cpp
@@ -248,6 +261,10 @@ SOURCES += dtvconfparser.cpp        dtvconfparserhelpers.cpp
 
 HEADERS += channelscan/scaninfo.h   channelscan/channelimporter.h
 SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
+
+# subtitles: srt
+HEADERS += srtwriter.h
+SOURCES += srtwriter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
@@ -333,6 +350,18 @@ using_frontend {
     SOURCES += videocolourspace.cpp
     SOURCES += videovisual.cpp
 
+   using_opengl {
+        # Goom
+        HEADERS += goom/filters.h goom/goomconfig.h goom/goom_core.h goom/graphic.h
+        HEADERS += goom/ifs.h goom/lines.h goom/drawmethods.h
+        HEADERS += goom/mmx.h goom/mathtools.h goom/tentacle3d.h goom/v3d.h
+        HEADERS += videovisualgoom.h
+        SOURCES += goom/filters.c goom/goom_core.c goom/graphic.c goom/tentacle3d.c
+        SOURCES += goom/ifs.c goom/ifs_display.c goom/lines.c goom/surf3d.c
+        SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c
+        SOURCES += videovisualgoom.cpp
+    }
+
     using_libfftw3 {
         DEFINES += FFTW3_SUPPORT
         HEADERS += videovisualspectrum.h
@@ -354,8 +383,8 @@ using_frontend {
 
     using_vdpau {
         DEFINES += USING_VDPAU
-        HEADERS += videoout_vdpau.h
-        SOURCES += videoout_vdpau.cpp
+        HEADERS += videoout_vdpau.h   videoout_nullvdpau.h
+        SOURCES += videoout_vdpau.cpp videoout_nullvdpau.cpp
         LIBS += -lvdpau
     }
 
@@ -371,10 +400,14 @@ using_frontend {
     using_opengl_video:HEADERS += openglvideo.h   videoout_opengl.h
     using_opengl_video:SOURCES += openglvideo.cpp videoout_opengl.cpp
 
-    using_vaapi: DEFINES += USING_VAAPI
-    using_vaapi: DEFINES += vaapicontext.h   videoout_openglvaapi.h
-    using_vaapi: SOURCES += vaapicontext.cpp videoout_openglvaapi.cpp
-    using_vaapi: LIBS    += -lva -lva-x11 -lva-glx
+    using_vaapi {
+        DEFINES += USING_VAAPI
+        HEADERS += vaapicontext.h   videoout_nullvaapi.h
+        SOURCES += vaapicontext.cpp videoout_nullvaapi.cpp
+        LIBS    += -lva -lva-x11 -lva-glx
+        using_opengl_video:HEADERS += videoout_openglvaapi.h
+        using_opengl_video:SOURCES += videoout_openglvaapi.cpp
+    }
 
     # Misc. frontend
     HEADERS += DetectLetterbox.h
@@ -463,10 +496,10 @@ using_backend {
     # TVRec & Recorder base classes
     HEADERS += tv_rec.h
     HEADERS += recorderbase.h              DeviceReadBuffer.h
-    HEADERS += dtvrecorder.h
+    HEADERS += dtvrecorder.h               recordingquality.h
     SOURCES += tv_rec.cpp
     SOURCES += recorderbase.cpp            DeviceReadBuffer.cpp
-    SOURCES += dtvrecorder.cpp
+    SOURCES += dtvrecorder.cpp             recordingquality.cpp
 
     # Import recorder
     HEADERS += importrecorder.h
@@ -560,6 +593,23 @@ using_backend {
         SOURCES *= streamhandler.cpp
 
         DEFINES += USING_HDHOMERUN
+    }
+
+    # Support for Ceton
+    using_ceton {
+        # MythTV Ceton glue
+        HEADERS += cetonsignalmonitor.h   cetonchannel.h
+        HEADERS += cetonrecorder.h        cetonstreamhandler.h
+        HEADERS += cetonrtp.h             cetonrtsp.h
+
+        SOURCES += cetonsignalmonitor.cpp cetonchannel.cpp
+        SOURCES += cetonrecorder.cpp      cetonstreamhandler.cpp
+        SOURCES += cetonrtp.cpp           cetonrtsp.cpp
+
+        HEADERS *= streamhandler.h
+        SOURCES *= streamhandler.cpp
+
+        DEFINES += USING_CETON
     }
 
     # Support for PVR-150/250/350/500, etc. on Linux

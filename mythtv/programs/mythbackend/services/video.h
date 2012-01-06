@@ -41,13 +41,13 @@ class Video : public VideoServices
 
         /* Video Metadata Methods */
 
-        DTC::VideoMetadataInfoList*  GetVideos       ( bool     Descending,
+        DTC::VideoMetadataInfoList*  GetVideoList    ( bool     Descending,
                                                        int      StartIndex,
                                                        int      Count            );
 
-        DTC::VideoMetadataInfo*   GetVideoById       ( int      Id               );
+        DTC::VideoMetadataInfo*   GetVideo           ( int      Id               );
 
-        DTC::VideoMetadataInfo*   GetVideoByFilename ( const QString  &Filename  );
+        DTC::VideoMetadataInfo*   GetVideoByFileName ( const QString  &FileName  );
 
         DTC::VideoLookupList*     LookupVideo        ( const QString    &Title,
                                                        const QString    &Subtitle,
@@ -58,17 +58,13 @@ class Video : public VideoServices
 
         bool                      RemoveVideoFromDB  ( int      Id               );
 
-        bool                      AddVideo           ( const QString  &Filename,
-                                                       const QString  &Host      );
+        bool                      AddVideo           ( const QString  &FileName,
+                                                       const QString  &HostName  );
 
         /* Bluray Methods */
 
         DTC::BlurayInfo*          GetBluray          ( const QString  &Path      );
 
-    private:
-
-        DTC::VideoMetadataInfo*   GetInfoFromMetadata(
-                             VideoMetadataListManager::VideoMetadataPtr metadata );
 };
 
 // --------------------------------------------------------------------------
@@ -100,21 +96,21 @@ class ScriptableVideo : public QObject
 
     public slots:
 
-        QObject* GetVideos(          bool             Descending,
+        QObject* GetVideoList(          bool             Descending,
                                      int              StartIndex,
                                      int              Count      )
         {
-            return m_obj.GetVideos( Descending, StartIndex, Count );
+            return m_obj.GetVideoList( Descending, StartIndex, Count );
         }
 
-        QObject* GetVideoById(       int              Id         )
+        QObject* GetVideo(       int              Id         )
         {
-            return m_obj.GetVideoById( Id );
+            return m_obj.GetVideo( Id );
         }
 
-        QObject* GetVideoByFilename( const QString    &Filename  )
+        QObject* GetVideoByFileName( const QString    &FileName  )
         {
-            return m_obj.GetVideoByFilename( Filename );
+            return m_obj.GetVideoByFileName( FileName );
         }
 
         QObject* LookupVideo( const QString    &Title,
@@ -133,10 +129,10 @@ class ScriptableVideo : public QObject
             return m_obj.RemoveVideoFromDB( Id );
         }
 
-        bool AddVideo( const QString  &Filename,
-                       const QString  &Host      )
+        bool AddVideo( const QString  &FileName,
+                       const QString  &HostName  )
         {
-            return m_obj.AddVideo( Filename, Host );
+            return m_obj.AddVideo( FileName, HostName );
         }
 };
 

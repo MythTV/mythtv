@@ -53,8 +53,8 @@ bool BaseRequestHandler::HandleAnnounce(MythSocket *socket,
                                     .arg(commands[1]));
     LOG(VB_GENERAL, LOG_NOTICE, QString("adding: %1 as a client (events: %2)")
                                .arg(commands[2]).arg(eventlevel));
-    SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
-                                    .arg(commands[2]));
+    gCoreContext->SendSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
+                                  .arg(commands[2]));
 
     return true;
 }

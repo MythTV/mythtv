@@ -232,6 +232,12 @@ void MythRenderOpenGL1::SetShaderParams(uint obj, void* vals,
 
 uint MythRenderOpenGL1::CreateHelperTexture(void)
 {
+    if (!m_glTexImage1D)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "glTexImage1D not available.");
+        return 0;
+    }
+
     makeCurrent();
 
     uint width = m_max_tex_size;
@@ -260,7 +266,7 @@ uint MythRenderOpenGL1::CreateHelperTexture(void)
 
     EnableTextures(tmp_tex);
     glBindTexture(m_textures[tmp_tex].m_type, tmp_tex);
-    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA16, width, 0, GL_RGBA, GL_FLOAT, buf);
+    m_glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA16, width, 0, GL_RGBA, GL_FLOAT, buf);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Created bicubic helper texture (%1 samples)") .arg(width));
@@ -359,23 +365,32 @@ void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
 {
     SetBlend(true);
     DisableTextures();
+    EnableShaderObject(0);
     glEnableClientState(GL_VERTEX_ARRAY);
+
+    int lineWidth = linePen.width();
+    QRect r(area.left() + lineWidth, area.top() + lineWidth,
+            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
 
     if (fillBrush.style() != Qt::NoBrush)
     {
+        int a = 255 * (((float)alpha / 255.0f) *
+                       ((float)fillBrush.color().alpha() / 255.0f));
         SetColor(fillBrush.color().red(), fillBrush.color().green(),
-                 fillBrush.color().blue(), fillBrush.color().alpha());
-        GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, area);
+                 fillBrush.color().blue(), a);
+        GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, r);
         glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
     if (linePen.style() != Qt::NoPen)
     {
+        int a = 255 * (((float)alpha / 255.0f) *
+                       ((float)linePen.color().alpha() / 255.0f));
         SetColor(linePen.color().red(), linePen.color().green(),
-                 linePen.color().blue(), linePen.color().alpha());
+                 linePen.color().blue(), a);
         glLineWidth(linePen.width());
-        GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, area);
+        GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, r);
         glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
     }

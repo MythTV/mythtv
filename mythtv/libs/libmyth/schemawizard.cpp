@@ -92,7 +92,7 @@ MythDBBackupStatus SchemaUpgradeWizard::BackupDB(void)
         return kDB_Backup_Empty_DB;
     }
 
-    backupStatus = DBUtil::BackupDB(m_backupResult);
+    backupStatus = DBUtil::BackupDB(m_backupResult, true);
 
     return backupStatus;
 }

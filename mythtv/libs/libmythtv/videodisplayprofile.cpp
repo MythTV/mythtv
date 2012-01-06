@@ -728,10 +728,6 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
         return QObject::tr("Linear blend (2x, HW)");
     else if ("opengldoubleratefieldorder" == short_name)
         return QObject::tr("Interlaced (2x, HW)");
-    else if ("opengldoublerateyadif" == short_name)
-        return QObject::tr("Yadif (2x, HW)");
-    else if ("openglyadif" == short_name)
-        return QObject::tr("Yadif (HW)");
     else if ("vdpauonefield" == short_name)
         return QObject::tr("One Field (1x, HW)");
     else if ("vdpaubobdeint" == short_name)
@@ -1167,10 +1163,15 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
     {
         msg = QObject::tr(
             "This video renderer uses OpenGL for scaling and color conversion "
-            "and can offer limited picture contols. This requires a faster "
-            "GPU than XVideo. Also, when enabled, picture controls consume "
-            "additional resources.");
+            "with full picture contols. The GPU can be used for deinterlacing. "
+            "This requires a faster GPU than XVideo.");
     }
+
+    if (renderer == "opengl-lite")
+        msg = QObject::tr(
+            "This video renderer uses OpenGL for scaling and color conversion. "
+            "It uses faster OpenGL functionality when available but at the "
+            "expense of picture controls and GPU based deinterlacing.");
 
     if (renderer == "vdpau")
     {
@@ -1286,8 +1287,6 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kLinearBlendMsg + " " + kUsingGPU;
     else if (deint == "openglkerneldeint")
         msg = kKernelMsg + " " + kUsingGPU;
-    else if (deint == "openglyadif")
-        msg = kYadifMsg + " " + kUsingGPU;
     else if (deint == "opengldoubleratelinearblend")
         msg = kLinearBlendMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
     else if (deint == "opengldoubleratekerneldeint")
@@ -1304,8 +1303,6 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kYadifMsg + " " +  kDoubleRateMsg;
     else if (deint == "fieldorderdoubleprocessdeint")
         msg = kFieldOrderMsg + " " +  kDoubleRateMsg;
-    else if (deint == "opengldoublerateyadif")
-        msg = kYadifMsg + " " +  kDoubleRateMsg + " " +  kUsingGPU;
     else if (deint == "vdpauonefield")
         msg = kOneFieldMsg + " " + kUsingGPU;
     else if (deint == "vdpaubobdeint")

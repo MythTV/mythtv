@@ -156,10 +156,10 @@ void VideoScannerThread::run()
 
         MythEvent me("VIDEO_LIST_CHANGE", slist);
 
-        RemoteSendEvent(me);
+        gCoreContext->SendEvent(me);
     }
     else
-        RemoteSendMessage("VIDEO_LIST_NO_CHANGE");
+        gCoreContext->SendMessage("VIDEO_LIST_NO_CHANGE");
 
     RunEpilog();
 }

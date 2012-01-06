@@ -555,7 +555,8 @@ jack_client_t* AudioOutputJACK::_jack_client_open(void)
 {
     jack_client_t* client = NULL;
     QString client_name = QString("mythtv_%1").arg(getpid());
-    jack_options_t open_options = JackNullOption;
+    jack_options_t open_options =
+        (jack_options_t)(JackUseExactName | JackNoStartServer);
     jack_status_t open_status;
 
     client = jack_client_open(client_name.toAscii().constData(),
@@ -567,23 +568,21 @@ jack_client_t* AudioOutputJACK::_jack_client_open(void)
 const char** AudioOutputJACK::_jack_get_ports(void)
 {
     const char **matching_ports = NULL;
-    unsigned long port_flags=JackPortIsPhysical;
-    QString port_name;
+    unsigned long port_flags=JackPortIsInput;
+    const char *port_name = NULL;
 
     // Have we been given a target port to connect to
     if (!main_device.isEmpty())
     {
-        port_flags = 0;
-        port_name = main_device;
+        port_name = main_device.toAscii().constData();
     }
     else
     {
-        port_flags=JackPortIsPhysical;
+        port_flags |= JackPortIsPhysical;
     }
 
     // list matching ports
-    matching_ports = jack_get_ports(client, port_name.toAscii().constData(),
-                                    NULL, port_flags);
+    matching_ports = jack_get_ports(client, port_name, NULL, port_flags);
     return matching_ports;
 }
 

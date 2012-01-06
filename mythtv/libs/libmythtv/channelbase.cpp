@@ -25,6 +25,7 @@ using namespace std;
 #endif
 #include "firewirechannel.h"
 #include "mythcorecontext.h"
+#include "cetonchannel.h"
 #include "dummychannel.h"
 #include "tvremoteutil.h"
 #include "channelutil.h"
@@ -1208,6 +1209,12 @@ ChannelBase *ChannelBase::CreateChannel(
     {
 #ifdef USING_ASI
         channel = new ASIChannel(tvrec, genOpt.videodev);
+#endif
+    }
+    else if (genOpt.cardtype == "CETON")
+    {
+#ifdef USING_CETON
+        channel = new CetonChannel(tvrec, genOpt.videodev);
 #endif
     }
     else if (CardUtil::IsV4L(genOpt.cardtype))

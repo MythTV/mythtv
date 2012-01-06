@@ -60,7 +60,7 @@ void CC708Reader::DefineWindow(
     int row_lock,         int column_lock,
     int pen_style,        int window_style)
 {
-    if (parent->GetDecoder())
+    if (parent && parent->GetDecoder())
     {
         StreamInfo si(-1, 0, 0, service_num, false, false);
         parent->GetDecoder()->InsertTrack(kTrackTypeCC708, si);

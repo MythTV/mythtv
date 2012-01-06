@@ -23,8 +23,10 @@ void MythBackendCommandLineParser::LoadArguments(void)
     CommandLineArg::AllowOneOf(QList<CommandLineArg*>()
          << add("--printsched", "printsched", false,
                 "Print upcoming list of scheduled recordings.", "")
+//                    ->SetDeprecated("use mythutil instead")
          << add("--testsched", "testsched", false,
                 "do some scheduler testing.", "")
+//                    ->SetDeprecated("use mythutil instead")
          << add("--resched", "resched", false,
                 "Trigger a run of the recording scheduler on the existing "
                 "master backend.",
@@ -32,6 +34,7 @@ void MythBackendCommandLineParser::LoadArguments(void)
                 "a run of the recording scheduler. The call will return "
                 "immediately, however the scheduler run may take several "
                 "seconds to a minute or longer to complete.")
+                    ->SetDeprecated("use mythutil instead")
          << add("--scanvideos", "scanvideos", false,
                 "Trigger a rescan of media content in MythVideo.",
                 "This command will connect to the master backend and trigger "
@@ -41,10 +44,13 @@ void MythBackendCommandLineParser::LoadArguments(void)
                 "content it has to hash, and how quickly the scanner can "
                 "access those files to do so. If enabled, this will also "
                 "trigger the bulk metadata scanner upon completion.")
+                    ->SetDeprecated("use mythutil instead")
          << add("--event", "event", "",
                 "Send a backend event test message.", "")
+                    ->SetDeprecated("use mythutil instead")
          << add("--systemevent", "systemevent", "",
                 "Send a backend SYSTEM_EVENT test message.", "")
+                    ->SetDeprecated("use mythutil instead")
          << add("--clearcache", "clearcache", false,
                 "Trigger a cache clear on all connected MythTV systems.",
                 "This command will connect to the master backend and trigger "
@@ -52,12 +58,17 @@ void MythBackendCommandLineParser::LoadArguments(void)
                 "all other connected programs. This event will clear the "
                 "local database settings cache used by each program, causing "
                 "options to be re-read from the database upon next use.")
+                    ->SetDeprecated("use mythutil instead")
          << add("--printexpire", "printexpire", "ALL",
                 "Print upcoming list of recordings to be expired.", "")
+//                    ->SetDeprecated("use mythutil instead")
          << add("--setverbose", "setverbose", "",
                 "Change debug mask of the existing master backend.", "")
+//                    ->SetDeprecated("use mythutil instead")
          << add("--setloglevel", "setloglevel", "",
-                "Change logging level of the existing master backend.", "") );
+                "Change logging level of the existing master backend.", "")
+//                    ->SetDeprecated("use mythutil instead");
+    );
 
     add("--nosched", "nosched", false, "",
             "Intended for debugging use only, disable the scheduler "

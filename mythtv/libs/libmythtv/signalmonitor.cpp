@@ -49,6 +49,11 @@ extern "C" {
 #   include "asichannel.h"
 #endif
 
+#ifdef USING_CETON
+#   include "cetonsignalmonitor.h"
+#   include "cetonchannel.h"
+#endif
+
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
     QString("SM(%1)::%2: %3").arg(channel->GetDevice()).arg(FUNC).arg(MSG))
@@ -114,6 +119,15 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
         HDHRChannel *hdhrc = dynamic_cast<HDHRChannel*>(channel);
         if (hdhrc)
             signalMonitor = new HDHRSignalMonitor(db_cardnum, hdhrc);
+    }
+#endif
+
+#ifdef USING_CETON
+    if (cardtype.toUpper() == "CETON")
+    {
+        CetonChannel *cetonchan = dynamic_cast<CetonChannel*>(channel);
+        if (cetonchan)
+            signalMonitor = new CetonSignalMonitor(db_cardnum, cetonchan);
     }
 #endif
 

@@ -1,21 +1,25 @@
-// MythMusic
-#include "metaioid3.h"
-#include "metadata.h"
+#include <set>
+
+// qt
+#include <QBuffer>
 
 // Libmythbase
 #include <mythlogging.h>
-#include <set>
 
 // Taglib
 #include <flacfile.h>
 #include <mpegfile.h>
+
+// MythMusic
+#include "metaioid3.h"
+#include "metadata.h"
+#include "musicutils.h"
 
 const String email = "music@mythtv.org";  // TODO username/ip/hostname?
 
 MetaIOID3::MetaIOID3(void)
     : MetaIOTagLib(),
         m_file(NULL), m_fileType(kMPEG)
-        
 {
 }
 
@@ -32,13 +36,11 @@ MetaIOID3::~MetaIOID3(void)
 */
 bool MetaIOID3::OpenFile(const QString &filename, bool forWriting)
 {
-    
-
     // Check if file is already opened
     if (m_file && (m_filename == filename) &&
         (!forWriting || !m_file->readOnly()))
         return true;
-    
+
     if (m_file)
     {
         LOG(VB_FILE, LOG_DEBUG,
@@ -47,22 +49,22 @@ bool MetaIOID3::OpenFile(const QString &filename, bool forWriting)
                                     .arg(filename)
                                     .arg(m_fileType));
     }
-    
+
     // If a file is open but it's not the requested file then close it first
     if (m_file)
         CloseFile();
- 
+
     m_filename = filename;
-    
+
     QString extension = m_filename.section('.', -1);
-    
+
     if (extension.toLower() == "flac")
         m_fileType = kFLAC;
     else if (extension.toLower() == "mp3")
         m_fileType = kMPEG;
     else
         return false;
-    
+
     QByteArray fname = m_filename.toLocal8Bit();
     // Open the file
     switch (m_fileType)
@@ -98,7 +100,7 @@ bool MetaIOID3::SaveFile()
         return false;
 
     bool retval = m_file->save();
-    
+
     return retval;
 }
 
@@ -314,16 +316,28 @@ Metadata *MetaIOID3::read(const QString &filename)
     // e.g. Lame under certain circumstances will always write a length of
     // 27 hours
 
+    // Length
+    if (!tag->frameListMap()["TLEN"].isEmpty())
+    {
+        int length = tag->frameListMap()["TLEN"].front()->toString().toInt();
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MetaIOID3::read: Length for '%1' from tag is '%2'\n").arg(filename).arg(length));
+    }
+
     metadata->setCompilation(compilation);
+
     metadata->setLength(getTrackLength(m_file));
-    
+
+    LOG(VB_GENERAL, LOG_ERR,
+            QString("MetaIOID3::read: Length for '%1' from properties is '%2'\n").arg(filename).arg(metadata->Length()));
+
     return metadata;
 }
 
 /*!
  * \brief Read the albumart image from the file
  *
- * \param filename The filename for which we want to find the length.
+ * \param filename The filename for which we want to find the albumart.
  * \param type The type of image we want - front/back etc
  * \returns A pointer to a QImage owned by the caller or NULL if not found.
  */
@@ -351,6 +365,9 @@ QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
         case IT_INLAY :
             apicType = AttachedPictureFrame::LeafletPage;
             break;
+        case IT_ARTIST :
+            apicType = AttachedPictureFrame::Artist;
+            break;
         default:
             return picture;
     }
@@ -370,7 +387,7 @@ QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
                 if (frame && frame->type() == apicType)
                 {
                     picture->loadFromData((const uchar *)frame->picture().data(),
-                                          frame->picture().size());
+                                         frame->picture().size());
                     return picture;
                 }
             }
@@ -405,10 +422,10 @@ AlbumArtList MetaIOID3::getAlbumArtList(const QString &filename)
 }
 
 /*!
- * \brief Read the albumart image from the file
+ * \brief Read the albumart images from the file
  *
  * \param tag The ID3v2 tag object in which to look for Album Art
- * \returns A QValueList containing a list of AlbumArtImage structs
+ * \returns A QList containing a list of AlbumArtImage's
  *          with the type and description of the APIC tag.
  */
 AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
@@ -465,6 +482,10 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
                 case AttachedPictureFrame::LeafletPage :
                     art->imageType = IT_INLAY;
                     art->filename = QString("inlay") + ext;
+                    break;
+                case AttachedPictureFrame::Artist :
+                    art->imageType = IT_ARTIST;
+                    art->filename = QString("artist") + ext;
                     break;
                 case AttachedPictureFrame::Other :
                     art->imageType = IT_UNKNOWN;
@@ -560,6 +581,9 @@ bool MetaIOID3::writeAlbumArt(const QString &filename,
         case IT_INLAY:
             type = AttachedPictureFrame::LeafletPage;
             break;
+        case IT_ARTIST:
+            type = AttachedPictureFrame::Artist;
+            break;
         default:
             type = AttachedPictureFrame::Other;
             break;
@@ -626,6 +650,9 @@ bool MetaIOID3::removeAlbumArt(const QString &filename,
         case IT_INLAY:
             type = AttachedPictureFrame::LeafletPage;
             break;
+        case IT_ARTIST:
+            type = AttachedPictureFrame::Artist;
+            break;
         default:
             type = AttachedPictureFrame::Other;
             break;
@@ -677,6 +704,9 @@ bool MetaIOID3::changeImageType(const QString &filename,
         case IT_INLAY:
             type = AttachedPictureFrame::LeafletPage;
             break;
+        case IT_ARTIST:
+            type = AttachedPictureFrame::Artist;
+            break;
         default:
             type = AttachedPictureFrame::Other;
             break;
@@ -709,6 +739,9 @@ bool MetaIOID3::changeImageType(const QString &filename,
             break;
         case IT_INLAY:
             apic->setType(AttachedPictureFrame::LeafletPage);
+            break;
+        case IT_ARTIST:
+            apic->setType(AttachedPictureFrame::Artist);
             break;
         default:
             apic->setType(AttachedPictureFrame::Other);
@@ -830,15 +863,15 @@ bool MetaIOID3::TagExists(const QString &filename)
 {
     if (!OpenFile(filename))
         return false;
-    
+
     TagLib::ID3v1::Tag *v1_tag = GetID3v1Tag();
     TagLib::ID3v2::Tag *v2_tag = GetID3v2Tag();
-    
+
     bool retval = false;
-    
+
     if ((v2_tag && !v2_tag->isEmpty()) ||
         (v1_tag && !v1_tag->isEmpty()))
         retval = true;
-    
+
     return retval;
 }

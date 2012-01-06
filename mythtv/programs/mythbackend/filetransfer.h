@@ -29,6 +29,7 @@ class FileTransfer
     MythSocket *getSocket() { return sock; }
 
     bool isOpen(void);
+    bool ReOpen(QString newFilename = "");
 
     void Stop(void);
 

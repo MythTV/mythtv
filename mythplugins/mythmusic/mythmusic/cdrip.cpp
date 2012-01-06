@@ -1328,66 +1328,79 @@ void Ripper::updateTrackList(void)
 
 void Ripper::searchArtist()
 {
-    QString s;
+    QString msg = tr("Select an Artist");
+    QStringList searchList = Metadata::fillFieldList("artist");
 
-    m_searchList = Metadata::fillFieldList("artist");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
 
-    s = m_artistEdit->GetText();
-    if (showList(tr("Select an Artist"), s))
+    if (!searchDlg->Create())
     {
-        m_artistEdit->SetText(s);
+        delete searchDlg;
+        return;
     }
+
+    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setArtist(QString)));
+
+    popupStack->AddScreen(searchDlg);
+}
+
+void Ripper::setArtist(QString artist)
+{
+    m_artistEdit->SetText(artist);
 }
 
 void Ripper::searchAlbum()
 {
-    QString s;
+    QString msg = tr("Select an Album");
+    QStringList searchList = Metadata::fillFieldList("album");
 
-    m_searchList = Metadata::fillFieldList("album");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
 
-    s = m_albumEdit->GetText();
-    if (showList(tr("Select an Album"), s))
+    if (!searchDlg->Create())
     {
-        m_albumEdit->SetText(s);
+        delete searchDlg;
+        return;
     }
+
+    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setAlbum(QString)));
+
+    popupStack->AddScreen(searchDlg);
+}
+
+void Ripper::setAlbum(QString album)
+{
+    m_albumEdit->SetText(album);
 }
 
 void Ripper::searchGenre()
 {
-    QString s;
-
+    QString msg = tr("Select a Genre");
+    QStringList searchList = Metadata::fillFieldList("genre");
     // load genre list
     m_searchList.clear();
     for (int x = 0; x < genre_table_size; x++)
         m_searchList.push_back(QString(genre_table[x]));
     m_searchList.sort();
 
-    s = m_genreEdit->GetText();
-    if (showList(tr("Select a Genre"), s))
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
+
+    if (!searchDlg->Create())
     {
-        m_genreEdit->SetText(s);
+        delete searchDlg;
+        return;
     }
+
+    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setGenre(QString)));
+
+    popupStack->AddScreen(searchDlg);
 }
 
-bool Ripper::showList(QString caption, QString &value)
+void Ripper::setGenre(QString genre)
 {
-    bool res = false;
-
-    MythSearchDialog *searchDialog
-        = new MythSearchDialog(GetMythMainWindow(), "");
-    searchDialog->setCaption(caption);
-    searchDialog->setSearchText(value);
-    searchDialog->setItems(m_searchList);
-    DialogCode rescode = searchDialog->ExecPopupAtXY(-1, 8);
-    if (kDialogCodeRejected != rescode)
-    {
-        value = searchDialog->getResult();
-        res = true;
-    }
-
-    searchDialog->deleteLater();
-
-    return res;
+    m_genreEdit->SetText(genre);
 }
 
 void Ripper::showEditMetadataDialog(MythUIButtonListItem *item)

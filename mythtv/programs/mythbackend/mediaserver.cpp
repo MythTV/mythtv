@@ -26,6 +26,7 @@
 #include "serviceHosts/dvrServiceHost.h"
 #include "serviceHosts/channelServiceHost.h"
 #include "serviceHosts/videoServiceHost.h"
+#include "serviceHosts/captureServiceHost.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -114,6 +115,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     m_pHttpServer->RegisterExtension( new DvrServiceHost    ( m_sSharePath ));
     m_pHttpServer->RegisterExtension( new ChannelServiceHost( m_sSharePath ));
     m_pHttpServer->RegisterExtension( new VideoServiceHost  ( m_sSharePath ));
+    m_pHttpServer->RegisterExtension( new CaptureServiceHost( m_sSharePath ));
 
     QString sIP = g_pConfig->GetValue( "BackendServerIP"  , ""   );
     if (sIP.isEmpty())
@@ -148,6 +150,8 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
          pEngine->scriptValueFromQMetaObject< ScriptableChannel >() );
      pEngine->globalObject().setProperty("Video"  ,
          pEngine->scriptValueFromQMetaObject< ScriptableVideo   >() );
+     pEngine->globalObject().setProperty("Capture"  ,
+         pEngine->scriptValueFromQMetaObject< ScriptableCapture   >() );
 
     // ------------------------------------------------------------------
 

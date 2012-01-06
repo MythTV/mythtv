@@ -1,4 +1,3 @@
-
 // c/c++
 #include <vector>
 #include <utility>
@@ -16,9 +15,6 @@
 #include <QKeyEvent>
 #include <QEvent>
 #include <QStringList>
-#include <Q3HBoxLayout>
-#include <Q3VBoxLayout>
-#include <Q3Header>
 
 // mythtv
 #include <mythcontext.h>
@@ -28,7 +24,6 @@
 // mythmusic
 #include "globalsettings.h"
 #include "mainvisual.h"
-#include "mythlistview-qt3.h"
 
 // General Settings
 
@@ -54,13 +49,19 @@ static HostComboBox *MusicAudioDevice()
     gc->addSelection(QObject::tr("default"), "default");
     QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
     gc->fillSelectionsFromDir(dev);
-    dev.setNameFilter("adsp*");
+    QStringList filters("adsp*");
+    dev.setNameFilters(filters);
     gc->fillSelectionsFromDir(dev);
 
-    dev.setNameFilter("dsp*");
+    filters.clear();
+    filters.append("dsp*");
+    dev.setNameFilters(filters);
     dev.setPath("/dev/sound");
     gc->fillSelectionsFromDir(dev);
-    dev.setNameFilter("adsp*");
+    
+    filters.clear();
+    filters.append("adsp*");
+    dev.setNameFilters(filters);
     gc->fillSelectionsFromDir(dev);
     gc->setHelpText(QObject::tr("Audio Device used for playback. 'default' will use the device specified in MythTV"));
     return gc;
@@ -431,16 +432,6 @@ static HostCheckBox *VisualCycleOnSongChange()
     return gc;
 };
 
-static HostCheckBox *ShowAlbumArtOnSongChange()
-{
-    HostCheckBox *gc = new HostCheckBox("VisualAlbumArtOnSongChange");
-    gc->setLabel(QObject::tr("Show Album Art at the start of each song"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("When the song changes and the new song has an album art "
-                                "image display it in the visualizer for a short period."));
-    return gc;
-};
-
 static HostCheckBox *VisualRandomize()
 {
     HostCheckBox *gc = new HostCheckBox("VisualRandomize");
@@ -475,26 +466,6 @@ static HostSpinBox *VisualScaleHeight()
     return gc;
 };
 
-static HostLineEdit *VisualizationMode()
-{
-    HostLineEdit *gc = new HostLineEdit("VisualMode");
-    gc->setLabel(QObject::tr("Visualizations"));
-    gc->setRO();
-    gc->setValue("Blank");
-    gc->setHelpText(QObject::tr("List of visualizations to use during playback. "
-                                "Click the button below to edit this list"));
-
-    return gc;
-};
-
-static TransButtonSetting *EditVisualizationModes()
-{
-    TransButtonSetting *gc = new TransButtonSetting();
-    gc->setLabel(QObject::tr("Edit Visualizations"));
-    gc->setHelpText(QObject::tr("Edit the list of visualizations to use during playback."));
-
-    return gc;
-}
 // CD Writer Settings
 
 static HostCheckBox *CDWriterEnabled()
@@ -620,32 +591,13 @@ MusicPlayerSettings::MusicPlayerSettings(void)
     VerticalConfigurationGroup* playersettings3 = new VerticalConfigurationGroup(false);
     playersettings3->setLabel(QObject::tr("Visualization Settings"));
 
-    visModesEdit = VisualizationMode();
-    playersettings3->addChild(visModesEdit);
-
-    TransButtonSetting *button = EditVisualizationModes();
-    playersettings3->addChild(button);
-    connect(button, SIGNAL(pressed()), SLOT(showVisEditor()));
-
     playersettings3->addChild(VisualCycleOnSongChange());
-    playersettings3->addChild(ShowAlbumArtOnSongChange());
     playersettings3->addChild(VisualRandomize());
     playersettings3->addChild(VisualModeDelay());
     playersettings3->addChild(VisualScaleWidth());
     playersettings3->addChild(VisualScaleHeight());
     addChild(playersettings3);
 }
-
-void MusicPlayerSettings::showVisEditor(void)
-{
-    VisualizationsEditor *dialog = new VisualizationsEditor(visModesEdit->getValue(),
-            GetMythMainWindow(), "viseditor");
-    if (kDialogCodeAccepted == dialog->exec())
-        visModesEdit->setValue(dialog->getSelectedModes());
-
-    delete dialog;
-}
-
 
 MusicRipperSettings::MusicRipperSettings(void)
 {
@@ -664,338 +616,4 @@ MusicRipperSettings::MusicRipperSettings(void)
     encodersettings->addChild(DefaultRipQuality());
     encodersettings->addChild(Mp3UseVBR());
     addChild(encodersettings);
-}
-
-/*
----------------------------------------------------------------------
-*/
-
-VisualizationsEditor::VisualizationsEditor(const QString &currentSelection,
-                                           MythMainWindow *parent, const char *name)
-    : MythDialog(parent, name)
-{
-    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(20 * wmult));
-    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    // Window title
-    QString message = tr("Visualizations");
-    QLabel *label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    QFont font = label->font();
-    font.setPointSize(int (font.pointSize() * 1.5));
-    font.setBold(true);
-    label->setFont(font);
-    label->setPaletteForegroundColor(QColor("yellow"));
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
-
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-    label = new QLabel(tr("Selected Visualizations"), this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
-    hbox->addWidget(label);
-
-    label = new QLabel(tr("Available Visualizations"), this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
-    hbox->addWidget(label);
-
-    // selected listview
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-    selectedList = new Q3MythListView(this);
-    selectedList->addColumn(tr("Name"));
-    selectedList->addColumn(tr("Provider"));
-    selectedList->setSorting(-1);         // disable sorting
-    selectedList->setSelectionMode(Q3ListView::Single);
-    connect(selectedList, SIGNAL(currentChanged(Q3ListViewItem *)),
-            this, SLOT(selectedChanged(Q3ListViewItem *)));
-    connect(selectedList, SIGNAL(spacePressed(Q3ListViewItem *)),
-            this, SLOT(selectedOnSelect(Q3ListViewItem *)));
-    connect(selectedList, SIGNAL(returnPressed(Q3ListViewItem *)),
-            this, SLOT(selectedOnSelect(Q3ListViewItem *)));
-    selectedList->installEventFilter(this);
-    hbox->addWidget(selectedList);
-
-    // available listview
-    availableList = new Q3MythListView(this);
-    availableList->addColumn(tr("Name"));
-    availableList->addColumn(tr("Provider"));
-    availableList->setSorting(0);
-    connect(availableList, SIGNAL(currentChanged(Q3ListViewItem *)),
-            this, SLOT(availableChanged(Q3ListViewItem *)));
-    connect(availableList, SIGNAL(spacePressed(Q3ListViewItem *)),
-            this, SLOT(availableOnSelect(Q3ListViewItem *)));
-    connect(availableList, SIGNAL(returnPressed(Q3ListViewItem *)),
-            this, SLOT(availableOnSelect(Q3ListViewItem *)));
-    availableList->installEventFilter(this);
-
-    hbox->addWidget(availableList);
-
-
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-    MythPushButton *button = new MythPushButton( this, "Program" );
-    button->setBackgroundOrigin(WindowOrigin);
-    button->setText( tr( "Move Up" ) );
-    button->setEnabled(true);
-    connect(button, SIGNAL(clicked()), this, SLOT(upClicked()));
-    hbox->addWidget(button);
-
-    button = new MythPushButton( this, "Program" );
-    button->setBackgroundOrigin(WindowOrigin);
-    button->setText( tr( "Move Down" ) );
-    button->setEnabled(true);
-    connect(button, SIGNAL(clicked()), this, SLOT(downClicked()));
-    hbox->addWidget(button);
-
-    // fake labels used as spacers
-    label = new QLabel(" ", this);
-    label->setBackgroundOrigin(WindowOrigin);
-    hbox->addWidget(label);
-
-    label = new QLabel(" ", this);
-    label->setBackgroundOrigin(WindowOrigin);
-    hbox->addWidget(label);
-
-
-    //OK Button
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-    button = new MythPushButton( this, "Program" );
-    button->setBackgroundOrigin(WindowOrigin);
-    button->setText( tr( "OK" ) );
-    button->setEnabled(true);
-    hbox->addWidget(button);
-    connect(button, SIGNAL(clicked()), this, SLOT(okClicked()));
-
-    //Cancel Button
-    button = new MythPushButton( this, "Program" );
-    button->setBackgroundOrigin(WindowOrigin);
-    button->setText( tr( "Cancel" ) );
-    button->setEnabled(true);
-    hbox->addWidget(button);
-    connect(button, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-
-    availableList->setFocus();
-
-    fillWidgets(currentSelection);
-}
-
-void VisualizationsEditor::fillWidgets(const QString &currentSelection)
-{
-    Q3ListViewItem *item;
-    QStringList currentList = QStringList::split(";", currentSelection);
-    QStringList visualizations = MainVisual::Visualizations();
-    visualizations.sort();
-
-    item = NULL;
-    for (int i = 0; i < currentList.size(); i++)
-    {
-        // check the visualizer is supported
-        if (visualizations.find(currentList[i]) != visualizations.end())
-        {
-            QString visName, pluginName;
-
-            if (currentList[i].contains("-"))
-            {
-                pluginName = currentList[i].section('-', 0, 0);
-                visName = currentList[i].section('-', 1, 1);
-            }
-            else
-            {
-                visName = currentList[i];
-                pluginName = "MythMusic";
-            }
-
-            item = new Q3ListViewItem(selectedList, item, visName, pluginName);
-        }
-        else
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("'%1' is not in the list of supported visualizers")
-                    .arg(currentList[i]));
-    }
-
-    item = NULL;
-    for (int i = 0; i < visualizations.size(); i++)
-    {
-        if (currentList.find(visualizations[i]) == currentList.end())
-        {
-            QString visName, pluginName;
-
-            if (visualizations[i].contains("-"))
-            {
-                pluginName = visualizations[i].section('-', 0, 0);
-                visName = visualizations[i].section('-', 1, 1);
-            }
-            else
-            {
-                visName = visualizations[i];
-                pluginName = "MythMusic";
-            }
-
-            item = new Q3ListViewItem(availableList, item, visName, pluginName);
-        }
-    }
-
-    if (selectedList->lastItem())
-    {
-        selectedList->setCurrentItem(selectedList->lastItem());
-        selectedList->setSelected(selectedList->lastItem(), true);
-    }
-
-    if (availableList->firstChild())
-    {
-        availableList->setCurrentItem(availableList->firstChild());
-        availableList->setSelected(availableList->firstChild(), true);
-    }
-}
-
-VisualizationsEditor::~VisualizationsEditor()
-{
-}
-
-void VisualizationsEditor::okClicked(void)
-{
-    accept();
-}
-
-void VisualizationsEditor::cancelClicked(void)
-{
-    reject();
-}
-
-void VisualizationsEditor::upClicked(void)
-{
-    Q3ListViewItem *item = selectedList->currentItem();
-
-    if (item)
-    {
-        Q3ListViewItem *itemAbove = item->itemAbove();
-        if (itemAbove)
-            itemAbove = itemAbove->itemAbove();
-
-        if (itemAbove)
-            item->moveItem(itemAbove);
-        else
-        {
-            selectedList->takeItem(item);
-            selectedList->insertItem(item);
-            selectedList->setSelected(item, true);
-        }
-
-        selectedList->ensureItemVisible(item);
-    }
-}
-
-void VisualizationsEditor::downClicked(void)
-{
-    Q3ListViewItem *item = selectedList->currentItem();
-
-    if (item)
-    {
-        Q3ListViewItem *itemBelow = item->itemBelow();
-        if (itemBelow)
-        {
-            item->moveItem(itemBelow);
-            selectedList->ensureItemVisible(item);
-        }
-    }
-}
-
-QString VisualizationsEditor::getSelectedModes(void)
-{
-    QString res;
-
-    Q3ListViewItem *item = selectedList->firstChild();
-
-    while (item)
-    {
-        if (!res.isEmpty())
-            res += ";";
-
-        if (item->text(1) == "MythMusic")
-            res += item->text(0);
-        else
-            res += item->text(1) + "-" + item->text(0);
-
-        item = item->nextSibling();
-    }
-
-    return res;
-}
-
-void VisualizationsEditor::selectedChanged(Q3ListViewItem *item)
-{
-    if (item)
-        item->setSelected(true);
-}
-
-void VisualizationsEditor::availableChanged(Q3ListViewItem *item)
-{
-    if (item)
-        item->setSelected(true);
-}
-
-void VisualizationsEditor::availableOnSelect(Q3ListViewItem *item)
-{
-    if (item)
-    {
-        Q3ListViewItem *currItem = selectedList->currentItem();
-        if (!currItem)
-            currItem = selectedList->lastItem();
-
-        availableList->takeItem(item);
-        selectedList->insertItem(item);
-        if (currItem)
-            item->moveItem(currItem);
-        selectedList->setSelected(item, true);
-        selectedList->ensureItemVisible(item);
-    }
-}
-
-void VisualizationsEditor::selectedOnSelect(Q3ListViewItem *item)
-{
-    if (item)
-    {
-        selectedList->takeItem(item);
-        availableList->insertItem(item);
-    }
-}
-
-bool VisualizationsEditor::eventFilter(QObject *obj, QEvent *e)
-{
-    if (obj == selectedList || obj == availableList)
-    {
-        if (e->type() == QEvent::KeyPress)
-        {
-            QKeyEvent *k = (QKeyEvent *) e;
-            if (handleKeyPress(k))
-                return true;
-        }
-    }
-
-    return false;
-}
-
-bool VisualizationsEditor::handleKeyPress(QKeyEvent *e)
-{
-    bool handled = false;
-    QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
-
-    for (int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
-
-        if (action == "LEFT")
-        {
-            handled = true;
-            focusNextPrevChild(false);
-        }
-        else if (action == "RIGHT")
-        {
-            handled = true;
-            focusNextPrevChild(true);
-        }
-    }
-
-    return handled;
 }

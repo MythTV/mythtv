@@ -478,7 +478,7 @@ static void commDetectorGotNewCommercialBreakList(void)
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("mythcommflag sending update: %1").arg(message));
 
-    RemoteSendMessage(message);
+    gCoreContext->SendMessage(message);
 }
 
 static void incomingCustomEvent(QEvent* e)
@@ -574,7 +574,7 @@ static int DoFlagCommercials(
             "mythcommflag sending COMMFLAG_START notification");
         QString message = "COMMFLAG_START ";
         message += program_info->MakeUniqueKey();
-        RemoteSendMessage(message);
+        gCoreContext->SendMessage(message);
     }
 
     bool result = commDetector->go();
@@ -868,24 +868,20 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         }
     }
 
-    MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
-
-    PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
-
-    AVSpecialDecode sp = (AVSpecialDecode)
-        (kAVSpecialDecode_LowRes         |
-         kAVSpecialDecode_SingleThreaded |
-         kAVSpecialDecode_NoLoopFilter);
-
+    PlayerFlags flags = (PlayerFlags)(kAudioMuted   |
+                                      kVideoIsNull  |
+                                      kDecodeLowRes |
+                                      kDecodeSingleThreaded |
+                                      kDecodeNoLoopFilter);
     /* blank detector needs to be only sample center for this optimization. */
     if ((COMM_DETECT_BLANKS  == commDetectMethod) ||
         (COMM_DETECT_2_BLANK == commDetectMethod))
     {
-        sp = (AVSpecialDecode) (sp | kAVSpecialDecode_FewBlocks);
+        flags = (PlayerFlags) (flags | kDecodeFewBlocks);
     }
 
-    ctx->SetSpecialDecode(sp);
-
+    MythCommFlagPlayer *cfp = new MythCommFlagPlayer(flags);
+    PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
@@ -1006,7 +1002,7 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
         // assume file is in Video storage group on local backend
         // and try again
 
-        filename = QString("myth://Video@%1/%2")
+        filename = QString("myth://Videos@%1/%2")
                             .arg(gCoreContext->GetHostName()).arg(filename);
         pginfo->SetPathname(filename);
         if (!DoesFileExist(pginfo))
@@ -1025,9 +1021,9 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
-    MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
+    MythCommFlagPlayer *cfp = new MythCommFlagPlayer(
+                (PlayerFlags)(kAudioMuted | kVideoIsNull | kDecodeNoDecode));
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
-    ctx->SetSpecialDecode(kAVSpecialDecode_NoDecode);
     ctx->SetPlayingInfo(pginfo);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);

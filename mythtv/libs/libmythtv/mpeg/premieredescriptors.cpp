@@ -3,7 +3,7 @@
 #include "premieredescriptors.h"
 #include "dvbdescriptors.h"
 
-void PremiereContentTransmissionDescriptor::Parse(void)
+bool PremiereContentTransmissionDescriptor::Parse(void)
 {
     _transmission_count = 0;
     _date_ptrs.clear();
@@ -20,6 +20,7 @@ void PremiereContentTransmissionDescriptor::Parse(void)
         }
         dataptr += 3 + starttime_no;
     }
+    return true;
 }
 
 

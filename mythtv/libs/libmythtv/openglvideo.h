@@ -65,7 +65,8 @@ class OpenGLVideo
 
     void PrepareFrame(bool topfieldfirst, FrameScanType scan,
                       bool softwareDeinterlacing,
-                      long long frame, bool draw_border = false);
+                      long long frame, StereoscopicMode stereo,
+                      bool draw_border = false);
 
     void  SetMasterViewport(QSize size)   { masterViewportSize = size; }
     QSize GetViewPort(void)         const { return viewportSize; }
@@ -130,5 +131,6 @@ class OpenGLVideo
     OpenGLFilterType defaultUpsize;
     uint           gl_features;
     uint           videoTextureType;
+    bool           preferYCBCR;
 };
 #endif // _OPENGL_VIDEO_H__

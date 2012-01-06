@@ -28,7 +28,7 @@ class VideoOutputNull : public VideoOutput
     void EmbedInWidget(const QRect &rect);
     void StopEmbedding(void);
     void DrawUnusedRects(bool sync = true);
-    void UpdatePauseFrame(void);
+    void UpdatePauseFrame(int64_t &disp_timecode);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,
@@ -36,6 +36,8 @@ class VideoOutputNull : public VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     void MoveResizeWindow(QRect ) {;}
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                    const QString &name) { return false; }
 
   private:
     QMutex     global_lock;

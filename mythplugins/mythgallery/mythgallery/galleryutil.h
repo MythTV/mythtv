@@ -40,6 +40,7 @@ class GalleryUtil
 
     static bool IsImage(const QString &filePath);
     static bool IsMovie(const QString &filePath);
+    static long GetNaturalRotation(const unsigned char *buffer, int size);
     static long GetNaturalRotation(const QString &filePath);
 
     static QString GetCaption(const QString &filePath);
@@ -65,6 +66,7 @@ class GalleryUtil
     static bool DeleteDirectory(const QFileInfo &dir);
     static bool RenameDirectory(const QString &currDir, const QString &oldName, 
                                 const QString &newName);
+    static long GetNaturalRotation(void *exifData);
 };
 
 #endif /* GALLERYUTIL_H */

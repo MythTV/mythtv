@@ -66,7 +66,6 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
     killdecoder = false;
     framesPlayed = 0;
-    using_null_videoout = true;
 
     // clear out any existing seektables
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);

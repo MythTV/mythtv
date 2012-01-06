@@ -27,6 +27,7 @@ using namespace std;
 #define LOC      QString("DownloadManager: ")
 
 MythDownloadManager *downloadManager = NULL;
+QMutex               dmCreateLock;
 
 /*!
 * \class MythDownloadInfo
@@ -134,21 +135,30 @@ void ShutdownMythDownloadManager(void)
  */
 MythDownloadManager *GetMythDownloadManager(void)
 {
-    if (!downloadManager)
-    {
-        downloadManager = new MythDownloadManager();
-        downloadManager->start();
-        while (!downloadManager->getQueueThread())
-            usleep(10000);
+    if (downloadManager)
+        return downloadManager;
 
-        downloadManager->moveToThread(downloadManager->getQueueThread());
-        downloadManager->setRunThread();
+    QMutexLocker locker(&dmCreateLock);
 
-        while (!downloadManager->isRunning())
-            usleep(10000);
+    // Check once more in case the download manager was created
+    // while we were securing the lock.
+    if (downloadManager)
+        return downloadManager;
 
-        atexit(ShutdownMythDownloadManager);
-    }
+    MythDownloadManager *tmpDLM = new MythDownloadManager();
+    tmpDLM->start();
+    while (!tmpDLM->getQueueThread())
+        usleep(10000);
+
+    tmpDLM->moveToThread(tmpDLM->getQueueThread());
+    tmpDLM->setRunThread();
+
+    while (!tmpDLM->isRunning())
+        usleep(10000);
+
+    downloadManager = tmpDLM;
+
+    atexit(ShutdownMythDownloadManager);
 
     return downloadManager;
 }
@@ -679,7 +689,44 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
 
     return success;
 }
-    
+
+/** \fn MythDownloadManager::cancelDownload(const QString &)
+ *  \brief Cancel a queued or current download.
+ *  \param url for download to cancel
+ */
+void MythDownloadManager::cancelDownload(const QString &url)
+{
+    QMutexLocker locker(m_infoLock);
+    MythDownloadInfo *dlInfo;
+
+    QMutableListIterator<MythDownloadInfo*> lit(m_downloadQueue);
+    while (lit.hasNext())
+    {
+        lit.next();
+        dlInfo = lit.value();
+        if (dlInfo->m_url == url)
+        {
+            // this shouldn't happen
+            if (dlInfo->m_reply)
+                dlInfo->m_reply->abort();
+            lit.remove();
+            delete dlInfo;
+        }
+    }
+
+    if (m_downloadInfos.contains(url))
+    {
+        dlInfo = m_downloadInfos[url];
+        if (dlInfo->m_reply)
+        {
+            m_downloadReplies.remove(dlInfo->m_reply);
+            dlInfo->m_reply->abort();
+        }
+        m_downloadInfos.remove(url);
+        delete dlInfo;
+    }
+}
+
 /** \fn MythDownloadManager::removeListener(QObject *caller)
  *  \brief Disconnects the specify caller from any existing
  *         MythDownloadInfo instances.
@@ -695,7 +742,11 @@ void MythDownloadManager::removeListener(QObject *caller)
     {
         dlInfo = *lit;
         if (dlInfo->m_caller == caller)
-            dlInfo->m_caller = NULL;
+        {
+            dlInfo->m_caller  = NULL;
+            dlInfo->m_outFile = QString();
+            dlInfo->m_data    = NULL;
+        }
     }
 
     QMap <QString, MythDownloadInfo*>::iterator mit = m_downloadInfos.begin();
@@ -703,7 +754,11 @@ void MythDownloadManager::removeListener(QObject *caller)
     {
         dlInfo = mit.value();
         if (dlInfo->m_caller == caller)
-            dlInfo->m_caller = NULL;
+        {
+            dlInfo->m_caller  = NULL;
+            dlInfo->m_outFile = QString();
+            dlInfo->m_data    = NULL;
+        }
     }
 }
 
@@ -1039,7 +1094,10 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
     QDateTime result;
 
     QDateTime now = QDateTime::currentDateTime();
+
+    m_infoLock->lock();
     QNetworkCacheMetaData urlData = m_manager->cache()->metaData(QUrl(url));
+    m_infoLock->unlock();
 
     if (urlData.isValid())
     {

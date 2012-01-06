@@ -432,6 +432,12 @@ MythImageReader::MythImageReader(const QString &fileName)
     }
     else if (!m_fileName.isEmpty())
     {
+        if (!m_fileName.startsWith("/") && !QFile::exists(m_fileName))
+        {
+            QString tmpFile = GetMythUI()->GetThemeDir() + '/' + m_fileName;
+            if (QFile::exists(tmpFile))
+                m_fileName = tmpFile;
+        }
         setFileName(m_fileName);
     }
 }

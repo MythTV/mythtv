@@ -58,9 +58,9 @@ QString  HttpServer::s_platform;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HttpServer::HttpServer() :
+HttpServer::HttpServer(const QString sApplicationPrefix) :
     QTcpServer(), m_sSharePath(GetShareDir()),
-    m_pHtmlServer(new HtmlServerExtension(m_sSharePath)),
+    m_pHtmlServer(new HtmlServerExtension(m_sSharePath, sApplicationPrefix)),
     m_threadPool("HttpServerPool"), m_running(true)
 {
     setMaxPendingConnections(20);

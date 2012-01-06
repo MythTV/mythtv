@@ -36,7 +36,7 @@ namespace DTC
 class SERVICE_PUBLIC ArtworkItem : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.01" );
 
     Q_PROPERTY( QString         Type            READ Type             WRITE setType           )
     Q_PROPERTY( QString         Url             READ Url              WRITE setUrl            )
@@ -97,7 +97,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
     Q_PROPERTY( QString         Tagline         READ Tagline          WRITE setTagline        )
     Q_PROPERTY( QString         Description     READ Description      WRITE setDescription    )
     Q_PROPERTY( QString         Certification   READ Certification    WRITE setCertification  )
-    Q_PROPERTY( QString         InetRef         READ InetRef          WRITE setInetRef        )
+    Q_PROPERTY( QString         Inetref         READ Inetref          WRITE setInetref        )
     Q_PROPERTY( QString         HomePage        READ HomePage         WRITE setHomePage       )
     Q_PROPERTY( QDateTime       ReleaseDate     READ ReleaseDate      WRITE setReleaseDate    )
     Q_PROPERTY( float           UserRating      READ UserRating       WRITE setUserRating     )
@@ -120,7 +120,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
     PROPERTYIMP    ( QString    , Tagline        )
     PROPERTYIMP    ( QString    , Description    )
     PROPERTYIMP    ( QString    , Certification  )
-    PROPERTYIMP    ( QString    , InetRef        )
+    PROPERTYIMP    ( QString    , Inetref        )
     PROPERTYIMP    ( QString    , HomePage       )
     PROPERTYIMP    ( QDateTime  , ReleaseDate    )
     PROPERTYIMP    ( float      , UserRating     )
@@ -167,7 +167,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
             m_Tagline          = src.m_Tagline          ;
             m_Description      = src.m_Description      ;
             m_Certification    = src.m_Certification    ;
-            m_InetRef          = src.m_InetRef          ;
+            m_Inetref          = src.m_Inetref          ;
             m_HomePage         = src.m_HomePage         ;
             m_ReleaseDate      = src.m_ReleaseDate      ;
             m_UserRating       = src.m_UserRating       ;

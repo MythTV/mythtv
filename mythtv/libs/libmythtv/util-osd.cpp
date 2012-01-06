@@ -288,12 +288,11 @@ void inline c_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
 void yuv888_to_i44(unsigned char *dest, MythImage *osd_image, QSize dst_size,
                    int left, int top, int right, int bottom, bool ifirst)
 {
-    int width, height, ashift, amask, ishift, imask, src_wrap, dst_wrap;
+    int width, ashift, amask, ishift, imask, src_wrap, dst_wrap;
     unsigned char *src, *alpha, *dst;
     const unsigned char *dmp;
 
     width  = right - left;
-    height = bottom - top;
     ashift = ifirst ? 0 : 4;
     amask  = ifirst ? 0x0f : 0xf0;
     ishift = ifirst ? 4 : 0;

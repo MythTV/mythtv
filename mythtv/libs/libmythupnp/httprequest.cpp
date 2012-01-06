@@ -88,7 +88,6 @@ static MIMETypes g_MIMETypes[] =
     { "mpg2", "video/mpeg"                 },
     { "mpeg", "video/mpeg"                 },
     { "mpeg2","video/mpeg"                 },
-    { "ts"  , "video/mpegts"               },
     { "vob" , "video/mpeg"                 },
     { "asf" , "video/x-ms-asf"             },
     { "nuv" , "video/nupplevideo"          },
@@ -106,6 +105,9 @@ static MIMETypes g_MIMETypes[] =
     // Similarly, this could be audio/flac or application/flac:
     { "flac", "audio/x-flac"               },
     { "m4a" , "audio/x-m4a"                },
+    // HTTP Live Streaming
+    { "m3u8", "application/x-mpegurl"      },
+    { "ts"  , "video/mp2t"                 },
 };
 
 static const char *Static401Error = 

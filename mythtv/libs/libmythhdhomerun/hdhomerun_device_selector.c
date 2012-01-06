@@ -281,7 +281,7 @@ static bool_t hdhomerun_device_selector_choose_test(struct hdhomerun_device_sele
 		return FALSE;
 	}
 
-	bool_t inuse = (hdhomerun_sock_bind(test_sock, INADDR_ANY, (uint16_t)target_port) == FALSE);
+	bool_t inuse = (hdhomerun_sock_bind(test_sock, INADDR_ANY, (uint16_t)target_port, FALSE) == FALSE);
 	hdhomerun_sock_destroy(test_sock);
 
 	if (inuse) {

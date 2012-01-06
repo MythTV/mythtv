@@ -11,8 +11,9 @@ AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
     m_stretchfactor(1.0f),m_passthru(false),
     m_lock(QMutex::Recursive), m_muted_on_creation(muted),
     m_main_device(QString::null), m_passthru_device(QString::null),
-    m_no_audio_in(false), m_no_audio_out(false)
+    m_no_audio_in(false), m_no_audio_out(false), m_controls_volume(true)
 {
+    m_controls_volume = gCoreContext->GetNumSetting("MythControlsVolume", 1);
 }
 
 AudioPlayer::~AudioPlayer()
@@ -69,6 +70,16 @@ void AudioPlayer::RemoveVisuals(void)
         m_audioOutput->removeVisual(m_visuals[i]);
 }
 
+void AudioPlayer::ResetVisuals(void)
+{
+    if (!m_audioOutput)
+        return;
+
+    QMutexLocker lock(&m_lock);
+    for (uint i = 0; i < m_visuals.size(); i++)
+        m_visuals[i]->prepare();
+}
+
 void AudioPlayer::Reset(void)
 {
     if (!m_audioOutput)
@@ -112,13 +123,12 @@ QString AudioPlayer::ReinitAudio(void)
     if (want_audio && !m_audioOutput)
     {
         // AudioOutput has never been created and we will want audio
-        bool setVolume = gCoreContext->GetNumSetting("MythControlsVolume", 1);
         AudioSettings aos = AudioSettings(m_main_device,
                                           m_passthru_device,
                                           m_format, m_channels,
                                           m_codec, m_samplerate,
                                           AUDIOOUTPUT_VIDEO,
-                                          setVolume, m_passthru);
+                                          m_controls_volume, m_passthru);
         if (m_no_audio_in)
             aos.init = false;
 
@@ -163,6 +173,8 @@ QString AudioPlayer::ReinitAudio(void)
         SetMuteState(kMuteAll);
         m_muted_on_creation = false;
     }
+
+    ResetVisuals();
 
     return errMsg;
 }
@@ -257,6 +269,8 @@ void AudioPlayer::SetAudioParams(AudioFormat format, int orig_channels,
     m_samplerate    = samplerate;
     m_passthru      = passthru;
     m_codec_profile = codec_profile;
+
+    ResetVisuals();
 }
 
 void AudioPlayer::SetEffDsp(int dsprate)
@@ -323,6 +337,15 @@ uint AudioPlayer::AdjustVolume(int change)
     return GetVolume();
 }
 
+uint AudioPlayer::SetVolume(int newvolume)
+{
+    if (!m_audioOutput || m_no_audio_out)
+        return GetVolume();
+    QMutexLocker lock(&m_lock);
+    m_audioOutput->SetCurrentVolume(newvolume);
+    return GetVolume();
+}
+
 int64_t AudioPlayer::GetAudioTime(void)
 {
     if (!m_audioOutput || m_no_audio_out)
@@ -331,12 +354,30 @@ int64_t AudioPlayer::GetAudioTime(void)
     return m_audioOutput->GetAudiotime();
 }
 
-bool AudioPlayer::ToggleUpmix(void)
+bool AudioPlayer::IsUpmixing(void)
 {
     if (!m_audioOutput)
         return false;
     QMutexLocker lock(&m_lock);
-    return m_audioOutput->ToggleUpmix();
+    return m_audioOutput->IsUpmixing();
+}
+
+bool AudioPlayer::EnableUpmix(bool enable, bool toggle)
+{
+    if (!m_audioOutput)
+        return false;
+    QMutexLocker lock(&m_lock);
+    if (toggle || (enable != IsUpmixing()))
+        return m_audioOutput->ToggleUpmix();
+    return enable;
+}
+
+bool AudioPlayer::CanUpmix(void)
+{
+    if (!m_audioOutput)
+        return false;
+    QMutexLocker lock(&m_lock);
+    return m_audioOutput->CanUpmix();
 }
 
 void AudioPlayer::SetStretchFactor(float factor)

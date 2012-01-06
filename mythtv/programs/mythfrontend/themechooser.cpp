@@ -794,7 +794,7 @@ void ThemeChooser::customEvent(QEvent *e)
             QString event = QString("THEME_INSTALLED PATH %1")
                                     .arg(GetConfDir() + "/themes/" +
                                          m_downloadTheme->GetDirectoryName());
-            SendMythSystemEvent(event);
+            gCoreContext->SendSystemEvent(event);
 
             gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
             GetMythMainWindow()->JumpTo("Reload Theme");

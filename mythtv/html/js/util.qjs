@@ -179,9 +179,10 @@ function sendMessage() {
     var message = $("#message").val();
     var address = $("#address").val();
     var port    = $("#port").val();
+    var timeout = $("#timeout").val();
 
     $.post("/Myth/SendMessage",
-        { Message: message, Address: address, udpPort: port },
+        { Message: message, Address: address, udpPort: port, Timeout: timeout },
         function(data) {
             result = 1;
         }).error(function(data) {

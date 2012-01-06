@@ -1,6 +1,27 @@
+/*
+Copyright (C) 2010-2011 Jean-Yves Avenard
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "audiooutputbase.h"
 #include "audiooutputdownmix.h"
 
 #include "string.h"
+
+#define LOC QString("Downmixer: ")
 
 /*
  SMPTE channel layout
@@ -20,10 +41,11 @@
  2F2-LFE        L   R   LFE  LS   RS
  3F2            L   R   C    LS   RS
  3F2-LFE        L   R   C    LFE  LS   RS
- 3F4            L   R   C    Rls  Rrs  LS   RS
+ 3F3R-LFE       L   R   C    LFE  BC   LS   RS
  3F4-LFE        L   R   C    LFE  Rls  Rrs  LS   RS
  */
 
+static const float m6db = 0.5;
 static const float m3db = 0.7071067811865476f;           // 3dB  = SQRT(2)
 static const float mm3db = -0.7071067811865476f;         // -3dB = SQRT(1/2)
 static const float msqrt_1_3 = -0.577350269189626f;      // -SQRT(1/3)
@@ -80,15 +102,15 @@ static const float stereo_matrix[8][8][2] =
         { msqrt_1_3,       sqrt_2_3 },          // RS
     },
 
-// 3F4R   L                R
+// 3F3R.1 L                R
     {
         { 1,               0 },                 // L
         { 0,               1 },                 // R
         { m3db,            m3db },              // C
-        { sqrt_2_3by3db,   msqrt_1_3bym3db },   // Rls
-        { msqrt_1_3bym3db, sqrt_2_3by3db },     // Rrs
-        { sqrt_2_3by3db,   msqrt_1_3bym3db },   // LS
-        { msqrt_1_3bym3db, sqrt_2_3by3db },     // RS
+        { 0,               0 },                 // LFE
+        { m6db,            m6db },              // Cs
+        { sqrt_2_3,        msqrt_1_3 },         // LS
+        { msqrt_1_3,       sqrt_2_3 },          // RS
     },
 
 // 3F4R.1 L                R
@@ -104,26 +126,37 @@ static const float stereo_matrix[8][8][2] =
     }
 };
 
-static const float s51_matrix[2][8][6] =
-{ 
-    // 3F4R in -> 3F2R.1 out
-    // L  R  C  LFE      LS       RS
+static const float s51_matrix[3][8][6] =
+{
+    // 3F2R.1 in -> 3F2R.1 out
+    // L  R  C  LFE         LS       RS
     {
         { 1, 0, 0, 0,       0,       0 },     // L
         { 0, 1, 0, 0,       0,       0 },     // R
         { 0, 0, 1, 0,       0,       0 },     // C
-        { 0, 0, 0, 0,       m3db,    0 },     // Rls
-        { 0, 0, 0, 0,       0,       m3db },  // Rrs
-        { 0, 0, 0, 0,       m3db,    0 },     // LS
-        { 0, 0, 0, 0,       0,       m3db },  // RS
+        { 0, 0, 0, 1,       0,       0 },     // LFE
+        { 0, 0, 0, 0,       1,       0 },     // LS
+        { 0, 0, 0, 0,       0,       1 },     // RS
+    },
+    // 3F3R.1 in -> 3F2R.1 out
+    // Used coefficient found at http://www.yamahaproaudio.com/training/self_training/data/smqr_en.pdf
+    // L  R  C  LFE         LS       RS
+    {
+        { 1, 0, 0, 0,       0,       0 },     // L
+        { 0, 1, 0, 0,       0,       0 },     // R
+        { 0, 0, 1, 0,       0,       0 },     // C
+        { 0, 0, 0, 1,       0,       0 },     // LFE
+        { 0, 0, 0, 0,       m3db,    m3db },  // Cs
+        { 0, 0, 0, 0,       1,       0 },     // LS
+        { 0, 0, 0, 0,       0,       1 },     // RS
     },
     // 3F4R.1 -> 3F2R.1 out
-    // L  R  C  LFE      LS       RS
+    // L  R  C  LFE         LS       RS
     {
         { 1, 0, 0, 0,       0,       0 },     // L
         { 0, 1, 0, 0,       0,       0 },     // R
         { 0, 0, 1, 0,       0,       0 },     // C
-        { 0, 0, 0, 1,       0,       1 },     // LFE
+        { 0, 0, 0, 1,       0,       0 },     // LFE
         { 0, 0, 0, 0,       m3db,    0 },     // Rls
         { 0, 0, 0, 0,       0,       m3db },  // Rrs
         { 0, 0, 0, 0,       m3db,    0 },     // LS
@@ -134,9 +167,11 @@ static const float s51_matrix[2][8][6] =
 int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
                                       float *dst, float *src, int frames)
 {
-    if (channels_in <= channels_out)
+    if (channels_in < channels_out)
         return -1;
 
+    //VBAUDIO(LOC + QString("Downmixing %1 frames (in:%2 out:%3)")
+    //    .arg(frames).arg(channels_in).arg(channels_out));
     if (channels_out == 2)
     {
         float tmp;
@@ -155,21 +190,18 @@ int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
     }
     else if (channels_out == 6)
     {
-        int lensamples = channels_in - 4;
-        int lenbytes = lensamples * sizeof(float);
+        float tmp;
+        int index = channels_in - 6;
         for (int n=0; n < frames; n++)
         {
-            memcpy(dst, src, lenbytes);
-            src += lensamples;
-            dst += 4;
-            //read value first, as src and dst can overlap
-            float ls = src[0];
-            float rs = src[1];
-            float rls = src[2];
-            float rrs = src[3];
-            *dst++ = ls * m3db + rls * m3db;    // LS = LS*-3dB + Rls*-3dB
-            *dst++ = rs * m3db + rrs * m3db;    // RS = RS*-3dB + Rrs*-3dB
-            src += 4;
+            for (int i=0; i < channels_out; i++)
+            {
+                tmp = 0.0f;
+                for (int j=0; j < channels_in; j++)
+                    tmp += src[j] * s51_matrix[index][j][i];
+                *dst++ = tmp;
+            }
+            src += channels_in;
         }
     }
     else

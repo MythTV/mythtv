@@ -24,9 +24,9 @@ class TeletextScreen: public MythScreenType
     void SetPage(int page, int subpage);
     void SetDisplaying(bool display);
     void Reset(void);
+    void ClearScreen(void);
 
   private:
-    void CleanUp();
     void OptimiseDisplayedArea(void);
     QImage* GetRowImage(int row, QRect &rect);
     void SetForegroundColor(int color);

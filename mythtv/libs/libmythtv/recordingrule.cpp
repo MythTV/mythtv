@@ -27,7 +27,7 @@ RecordingRule::RecordingRule()
     m_startdate(QDate::currentDate()),
     m_endtime(QTime::currentTime()),
     m_enddate(QDate::currentDate()),
-    m_inetref(""), // String could be null when we trying to insert into DB
+    m_inetref(), // String could be null when we trying to insert into DB
     m_channelid(0),
     m_findday(-1),
     m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
@@ -107,7 +107,7 @@ bool RecordingRule::Load()
         m_dupMethod = static_cast<RecordingDupMethodType>
                                                 (query.value(6).toInt());
         m_dupIn = static_cast<RecordingDupInType>(query.value(7).toInt());
-        m_filter = query.value(43).toUInt();
+        m_filter = query.value(47).toUInt();
         m_isInactive = query.value(8).toBool();
         // Storage
         m_recProfile = query.value(9).toString();
@@ -608,7 +608,7 @@ void RecordingRule::AssignProgramInfo()
         }
     }
     m_category = m_progInfo->GetCategory();
-    m_inetref = "";
+    m_inetref = m_progInfo->GetInetRef();
 }
 
 unsigned RecordingRule::GetDefaultFilter(void)
