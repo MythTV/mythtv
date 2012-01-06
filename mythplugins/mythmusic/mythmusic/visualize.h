@@ -279,7 +279,6 @@ class AlbumArt : public VisualBase
     bool cycleImage(void);
 
     QSize m_size, m_cursize;
-    QString m_filename;
     ImageType m_currImageType;
     QImage m_image;
 

@@ -1349,14 +1349,14 @@ AlbumArt::AlbumArt(void)
 
     m_lastCycle = QDateTime::currentDateTime();
 
-    if (gPlayer->getDecoder())
-        m_filename = gPlayer->getDecoder()->getFilename();
-
     m_fps = 1;
 }
 
 void AlbumArt::findFrontCover(void)
 {
+    if (!gPlayer->getCurrentMetadata())
+        return;
+
     // if a front cover image is available show that first
     AlbumArtImages *albumArt = gPlayer->getCurrentMetadata()->getAlbumArtImages();
     if (albumArt->getImage(IT_FRONTCOVER))
@@ -1373,6 +1373,9 @@ void AlbumArt::findFrontCover(void)
 
 bool AlbumArt::cycleImage(void)
 {
+    if (!gPlayer->getCurrentMetadata())
+        return false;
+
     AlbumArtImages *albumArt = gPlayer->getCurrentMetadata()->getAlbumArtImages();
     int newType = m_currImageType;
 
@@ -1415,26 +1418,29 @@ void AlbumArt::handleKeyPress(const QString &action)
 {
     if (action == "SELECT")
     {
-        AlbumArtImages albumArt(gPlayer->getCurrentMetadata());
-        int newType = m_currImageType;
-
-        if (albumArt.getImageCount() > 0)
+        if (gPlayer->getCurrentMetadata())
         {
-            newType++;
+            AlbumArtImages albumArt(gPlayer->getCurrentMetadata());
+            int newType = m_currImageType;
 
-            while (!albumArt.getImage((ImageType) newType))
+            if (albumArt.getImageCount() > 0)
             {
                 newType++;
-                if (newType == IT_LAST)
-                    newType = IT_UNKNOWN;
-            }
-        }
 
-        if (newType != m_currImageType)
-        {
-            m_currImageType = (ImageType) newType;
-            // force an update
-            m_cursize = QSize(0, 0);
+                while (!albumArt.getImage((ImageType) newType))
+                {
+                    newType++;
+                    if (newType == IT_LAST)
+                        newType = IT_UNKNOWN;
+                }
+            }
+
+            if (newType != m_currImageType)
+            {
+                m_currImageType = (ImageType) newType;
+                // force an update
+                m_cursize = QSize(0, 0);
+            }
         }
     }
 }
@@ -1445,7 +1451,7 @@ void AlbumArt::handleKeyPress(const QString &action)
 bool AlbumArt::needsUpdate() 
 {
     // if the track has changed we need to update the image
-    if (m_currentMetadata != gPlayer->getCurrentMetadata())
+    if (gPlayer->getCurrentMetadata() && m_currentMetadata != gPlayer->getCurrentMetadata())
     {
         m_currentMetadata = gPlayer->getCurrentMetadata();
         findFrontCover();
