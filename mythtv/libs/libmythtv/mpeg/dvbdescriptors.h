@@ -396,7 +396,7 @@ class ComponentDescriptor : public MPEGDescriptor
         if (0x1 == StreamContent())
             return MPEG2Properties();
         if (0x5 == StreamContent())
-            return VID_AVC || AVCProperties();
+            return VID_AVC | AVCProperties();
 
         return VID_UNKNOWN;
     }
