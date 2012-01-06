@@ -75,7 +75,8 @@ class Myth : public MythServices
 
         bool                SendMessage         ( const QString &Message,
                                                   const QString &Address,
-                                                  int   udpPort);
+                                                  int   udpPort,
+                                                  int   Timeout);
 
         bool                BackupDatabase      ( void );
 
@@ -178,9 +179,10 @@ class ScriptableMyth : public QObject
 
         bool SendMessage( const QString &Message,
                           const QString &Address,
-                          int   udpPort)
+                          int   udpPort,
+                          int   Timeout)
         {
-            return m_obj.SendMessage( Message, Address, udpPort );
+            return m_obj.SendMessage( Message, Address, udpPort, Timeout );
         }
 
         bool BackupDatabase( void )
