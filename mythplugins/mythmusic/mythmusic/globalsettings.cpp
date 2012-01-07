@@ -58,7 +58,7 @@ static HostComboBox *MusicAudioDevice()
     dev.setNameFilters(filters);
     dev.setPath("/dev/sound");
     gc->fillSelectionsFromDir(dev);
-    
+
     filters.clear();
     filters.append("adsp*");
     dev.setNameFilters(filters);
@@ -319,16 +319,6 @@ static HostSpinBox *SetRandomWeight()
     return gc;
 };
 
-static HostSpinBox *SetSearchMaxResultsReturned()
-{
-    HostSpinBox *gc = new HostSpinBox("MaxSearchResults", 0, 20000, 100);
-    gc->setLabel(QObject::tr("Maximum Search Results"));
-    gc->setValue(300);
-    gc->setHelpText(QObject::tr("Used to limit the number of results "
-                    "returned when using the search feature."));
-    return gc;
-};
-
 static HostComboBox *ArtistTreeGroups()
 {
     HostComboBox *gc = new HostComboBox("ArtistTreeGroups");
@@ -340,36 +330,6 @@ static HostComboBox *ArtistTreeGroups()
                                 " tree.  Few gives 'A B C D' as per the old behaviour,"
                                 " average gives two letters per group, many gives one"
                                 " letter per group."));
-    return gc;
-};
-
-static HostCheckBox *UseShowRatings()
-{
-    HostCheckBox *gc = new HostCheckBox("MusicShowRatings");
-    gc->setLabel(QObject::tr("Show Song Ratings"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Show song ratings on the playback screen."));
-    return gc;
-};
-
-static HostCheckBox *UseListShuffled()
-{
-    HostCheckBox *gc = new HostCheckBox("ListAsShuffled");
-    gc->setLabel(QObject::tr("List as Shuffled"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("List songs on the playback screen "
-                    "in the order they will be played."));
-    return gc;
-};
-
-static HostCheckBox *UseShowWholeTree()
-{
-    HostCheckBox *gc = new HostCheckBox("ShowWholeTree");
-    gc->setLabel(QObject::tr("Show entire music tree"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If selected, you can navigate your entire "
-                    "music tree from the playing screen. N.B. Does not work "
-                    "with accelerated buttons disabled"));
     return gc;
 };
 
@@ -574,10 +534,6 @@ MusicPlayerSettings::MusicPlayerSettings(void)
     playersettings->addChild(PlayMode());
     playersettings->addChild(ResumeMode());
     playersettings->addChild(ExitAction());
-    playersettings->addChild(SetSearchMaxResultsReturned());
-    playersettings->addChild(UseShowRatings());
-    playersettings->addChild(UseShowWholeTree());
-    playersettings->addChild(UseListShuffled());
     addChild(playersettings);
 
     VerticalConfigurationGroup* playersettings2 = new VerticalConfigurationGroup(false);
