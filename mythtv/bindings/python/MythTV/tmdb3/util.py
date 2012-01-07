@@ -44,6 +44,21 @@ class PagedList( list ):
         for i in range(len(self)):
             yield self[i]
 
+class PagedList( list ):
+    """Temporary list-like object to deal with bug in the search API."""
+    def _getpage(self, page):
+        raise NotImplementedError("PagedList._getpage() must be provided "+\
+                                  "by subclass")
+    def __init__(self, iterable, perpage=20):
+        l = 0
+        page = 1
+        self._perpage = perpage
+        super(PagedList, self).__init__(iterable)
+        while len(self) >= (l+perpage):
+            l = len(self)
+            page += 1
+            self.extend(self._getpage(page))
+
 class Poller( object ):
     def __init__(self, func, lookup, inst=None):
         self.func = func

@@ -118,9 +118,6 @@ status_handlers = {
    16: TMDBError('Device Denied'),
    17: TMDBError('Session Denied')}
 
-
-
-
 def handle_status(data, query):
     status = status_handlers[data.get('status_code', 1)]
     if status is not None:
