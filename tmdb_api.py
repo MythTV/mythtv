@@ -25,6 +25,7 @@ http://help.themoviedb.org/kb/api/about-3"""
 __version__="v0.1.0"
 # 0.1.0 Initial development
 
+from request import set_key, Request
 from util import PagedList, Datapoint, Datalist, Datadict, Element
 from tmdb_exceptions import *
 
@@ -35,67 +36,11 @@ import datetime
 
 DEBUG = False
 
-def set_key(key):
-    """
-    Specify the API key to use retrieving data from themoviedb.org. This
-    key must be set before any calls will function.
-    """
-    # MythTV key: c27cb71cff5bd76e1a7a009380562c62
-    if len(key) != 32:
-        raise TMDBKeyInvalid("Specified API key must be 128-bit hex")
-    try:
-        int(key, 16)
-    except:
-        raise TMDBKeyInvalid("Specified API key must be 128-bit hex")
-    Request._api_key = key
-
-class Request( urllib2.Request ):
-    _api_key = None
-    _base_url = "http://api.themoviedb.org/3/"
-
-    @property
-    def api_key(self):
-        if self._api_key is None:
-            raise TMDBKeyMissing("API key must be specified before "+\
-                                 "requests can be made")
-        return self._api_key
-
-    def __init__(self, url, **kwargs):
-        """Return a request object, using specified API path and arguments."""
-        kwargs['api_key'] = self.api_key
-
-        url = self._base_url + url.lstrip('/') + '?' + urllib.urlencode(kwargs)
-        urllib2.Request.__init__(self, url)
-        self.add_header('Accept', 'application/json')
-
-    def open(self):
-        try:
-            if DEBUG:
-                print 'loading '+self.get_full_url()
-            return urllib2.urlopen(self)
-        except urllib2.HTTPError, e:
-            raise TMDBHTTPError(str(e))
-
-    def read(self):
-        return self.open().read()
-
-    def readJSON(self):
-        data = json.load(self.open())
-        if 'status_code' in data:
-            if data['status_code'] == 7:
-                raise TMDBKeyInvalid(data['status_message'])
-        if DEBUG:
-            import pprint
-            pprint.PrettyPrinter().pprint(data)
-        return data
-
-class Configuration( object ):
-    _data = {}
-    def __init__(self):
-        if len(self._data) == 0:
-            self._data.update(Request('configuration').readJSON())
-    def get(self, key):
-        return self._data.get(key)
+class Configuration( Element ):
+    def _poller(self):
+        return Request('configuration').readJSON()
+    images = Datapoint('images', poller=_poller)
+Configuration = Configuration()
 
 def searchMovie(query, language='en-US'):
     res = Request('search/movie', query=query, language=language)
@@ -133,7 +78,7 @@ class Image( Element ):
     def geturl(self, size='original'):
         if size not in self.sizes():
             raise TMDBImageSizeError
-        url = Configuration().get('images')['base_url'].rstrip('/')
+        url = Configuration.images['base_url'].rstrip('/')
         return url+'/{0}/{1}'.format(size, self.filename)
 
     def __repr__(self):
@@ -141,13 +86,13 @@ class Image( Element ):
 
 class Backdrop( Image ):
     def sizes(self):
-        return Configuration().get('images')['backdrop_sizes']
+        return Configuration.images['backdrop_sizes']
 class Poster( Image ):
     def sizes(self):
-        return Configuration().get('images')['poster_sizes']
+        return Configuration.images['poster_sizes']
 class Profile( Image ):
     def sizes(self):
-        return Configuration().get('images')['profile_sizes']
+        return Configuration.images['profile_sizes']
 
 class AlternateTitle( Element ):
     country     = Datapoint('iso_3166_1')
