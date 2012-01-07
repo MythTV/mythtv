@@ -43,8 +43,8 @@ class Configuration( Element ):
 Configuration = Configuration()
 
 def searchMovie(query, language='en-US'):
-    res = Request('search/movie', query=query, language=language)
-    return SearchResults(query, language, res.readJSON())
+    return SearchResults(
+                Request('search/movie', query=query, language=language))
 
 class SearchResults( PagedList ):
     """Stores a list of search matches."""
@@ -52,18 +52,17 @@ class SearchResults( PagedList ):
     def _process(data):
         for item in data['results']:
             yield Movie(raw=item)
-    def _getpage(self, page):
-        res = Request('search/movie', query=self.query,
-                      language=self.language, page=page)
-        return list(self._process(res.readJSON()))
 
-    def __init__(self, query, language, data):
-        self.query = query
-        self.language = language
-        super(SearchResults, self).__init__(self._process(data),
-                                            data['total_results'], 20)
+    def _getpage(self, page):
+        self.request = self.request.new(page=page)
+        return list(self._process(self.request.readJSON()))
+
+    def __init__(self, request):
+        self.request = request
+        super(SearchResults, self).__init__(self._process(request.readJSON()), 20)
+
     def __repr__(self):
-        return u"<Search Results: {0}>".format(self.query)
+        return u"<Search Results: {0}>".format(self.request._kwargs['query'])
 
 class Image( Element ):
     filename        = Datapoint('file_path', initarg=1, handler=lambda x: x.lstrip('/'))
