@@ -41,6 +41,13 @@ typedef enum
     kVDPFeatHQScaling = 0x20,
 } VDPAUFeatures;
 
+typedef enum
+{
+    kVDPBlendNormal = 0,
+    kVDPBlendPiP    = 1,
+    kVDPBlendNull   = 2,
+} VDPBlendType;
+
 class VDPAUOutputSurface;
 class VDPAUVideoSurface;
 class VDPAUBitmapSurface;
@@ -117,8 +124,8 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     bool UploadYUVFrame(uint id, void* const planes[3], uint32_t pitches[3]);
     bool DownloadYUVFrame(uint id, void* const planes[3], uint32_t pitches[3]);
     bool DrawBitmap(uint id, uint target, const QRect *src,
-                    const QRect *dst, int alpha = 0, int red = 0,
-                    int blue = 0, int green = 0, bool blend = false);
+                    const QRect *dst, VDPBlendType blendi = kVDPBlendNormal,
+                    int alpha = 0, int red = 0, int blue = 0, int green = 0);
     bool DrawLayer(uint id, uint target);
 
     int   GetBitmapSize(uint id);

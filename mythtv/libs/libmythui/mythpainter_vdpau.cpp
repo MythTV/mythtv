@@ -138,7 +138,8 @@ void MythVDPAUPainter::DrawImage(const QRect &r, MythImage *im,
 {
     if (m_render)
         m_render->DrawBitmap(GetTextureFromCache(im), m_target,
-                             &src, &r /*dst*/, alpha, 255, 255, 255);
+                             &src, &r /*dst*/, kVDPBlendNormal,
+                             alpha, 255, 255, 255);
 }
 
 void MythVDPAUPainter::DeleteFormatImagePriv(MythImage *im)
