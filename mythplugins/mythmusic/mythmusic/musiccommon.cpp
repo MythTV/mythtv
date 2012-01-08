@@ -204,6 +204,8 @@ bool MusicCommon::CreateCommon(void)
         updateUIPlaylist();
     }
 
+    m_visualModes = MainVisual::Visualizations(true);
+
     if (m_visualizerVideo && m_visualModes.count() == 0)
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("MusicCommon: Theme has a visualiser but none found - disabling"));
@@ -216,8 +218,6 @@ bool MusicCommon::CreateCommon(void)
         m_mainvisual = new MainVisual(m_visualizerVideo);
 
         m_fullscreenBlank = false;
-
-        m_visualModes = MainVisual::visualizers;
 
         m_randomVisualizer = gCoreContext->GetNumSetting("VisualRandomize", 0);
 
