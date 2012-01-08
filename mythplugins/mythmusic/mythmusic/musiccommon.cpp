@@ -2125,7 +2125,7 @@ MythMenu* MusicCommon::createShuffleMenu(void)
     MythMenu *menu = new MythMenu(label, this, "shufflemenu");
 
     menu->AddItem(tr("None"),   qVariantFromValue((int)MusicPlayer::SHUFFLE_OFF));
-    menu->AddItem(tr("Randon"), qVariantFromValue((int)MusicPlayer::SHUFFLE_RANDOM));
+    menu->AddItem(tr("Random"), qVariantFromValue((int)MusicPlayer::SHUFFLE_RANDOM));
     menu->AddItem(tr("Smart"),  qVariantFromValue((int)MusicPlayer::SHUFFLE_INTELLIGENT));
     menu->AddItem(tr("Album"),  qVariantFromValue((int)MusicPlayer::SHUFFLE_ALBUM));
     menu->AddItem(tr("Artist"), qVariantFromValue((int)MusicPlayer::SHUFFLE_ARTIST));
