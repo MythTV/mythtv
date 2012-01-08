@@ -69,6 +69,7 @@ Metadata& Metadata::operator=(const Metadata &rhs)
     m_genre = rhs.m_genre;
     m_year = rhs.m_year;
     m_tracknum = rhs.m_tracknum;
+    m_trackCount = rhs.m_trackCount;
     m_length = rhs.m_length;
     m_rating = rhs.m_rating;
     m_lastplay = rhs.m_lastplay;
@@ -190,7 +191,8 @@ bool Metadata::isInDatabase()
     "music_albums.album_name, music_songs.name, music_genres.genre, "
     "music_songs.year, music_songs.track, music_songs.length, "
     "music_songs.song_id, music_songs.rating, music_songs.numplays, "
-    "music_songs.lastplay, music_albums.compilation, music_songs.format "
+    "music_songs.lastplay, music_albums.compilation, music_songs.format, "
+    "music_songs.track_count "
     "FROM music_songs "
     "LEFT JOIN music_directories "
     "ON music_songs.directory_id=music_directories.directory_id "
@@ -222,6 +224,7 @@ bool Metadata::isInDatabase()
         m_lastplay = query.value(11).toDateTime();
         m_compilation = (query.value(12).toInt() > 0);
         m_format = query.value(13).toString();
+        m_trackCount = query.value(14).toInt();
 
         retval = true;
     }
@@ -476,6 +479,7 @@ void Metadata::dumpToDatabase()
     query.bindValue(":ALBUMID", m_albumid);
     query.bindValue(":COMPILATION", m_compilation);
     query.bindValue(":YEAR", m_year);
+    query.bindValue(":TRACKCOUNT", m_trackCount);
 
     if (!query.exec() || !query.isActive())
     {
@@ -643,6 +647,8 @@ void Metadata::setField(const QString &field, const QString &data)
         m_year = data.toInt();
     else if (field == "tracknum")
         m_tracknum = data.toInt();
+    else if (field == "trackcount")
+        m_trackCount = data.toInt();
     else if (field == "length")
         m_length = data.toInt();
     else if (field == "compilation")
@@ -682,6 +688,7 @@ void Metadata::toMap(MetadataMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "title"] = m_title;
     metadataMap[prefix + "formattitle"] = FormatTitle();
     metadataMap[prefix + "tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
+    metadataMap[prefix + "albumtracks"] = (m_trackCount > 0 ? QString("%1").arg(m_trackCount) : "");
     metadataMap[prefix + "genre"] = m_genre;
     metadataMap[prefix + "year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
 

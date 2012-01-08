@@ -95,6 +95,7 @@ class Metadata
                    m_format(lformat),
                    m_year(lyear),
                    m_tracknum(ltracknum),
+                   m_trackCount(0),
                    m_length(llength),
                    m_rating(lrating),
                    m_directoryid(-1),
@@ -171,6 +172,9 @@ class Metadata
 
     int Track() const { return m_tracknum; }
     void setTrack(int ltrack) { m_tracknum = ltrack; }
+
+    int GetAlbumTracks() const { return m_trackCount; }
+    void setAlbumTracks(int labumtracks) { m_trackCount = labumtracks; }
 
     int Length() const { return m_length; }
     void setLength(int llength) { m_length = llength; }
@@ -255,6 +259,7 @@ class Metadata
     QString m_format;
     int m_year;
     int m_tracknum;
+    int m_trackCount;
     int m_length;
     int m_rating;
     int m_directoryid;
@@ -341,7 +346,7 @@ class AllMusic
     bool        doneLoading() {return m_done_loading;}
     bool        cleanOutThreads();
 
-    MetadataPtrList *getAllMetadata(void) { return &m_all_music; } 
+    MetadataPtrList *getAllMetadata(void) { return &m_all_music; }
 
     bool isValidID(int an_id);
 
