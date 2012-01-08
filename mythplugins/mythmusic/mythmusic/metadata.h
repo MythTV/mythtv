@@ -173,8 +173,8 @@ class Metadata
     int Track() const { return m_tracknum; }
     void setTrack(int ltrack) { m_tracknum = ltrack; }
 
-    int GetAlbumTracks() const { return m_trackCount; }
-    void setAlbumTracks(int labumtracks) { m_trackCount = labumtracks; }
+    int GetTrackCount() const { return m_trackCount; }
+    void setTrackCount(int ltrackcount) { m_trackCount = ltrackcount; }
 
     int Length() const { return m_length; }
     void setLength(int llength) { m_length = llength; }

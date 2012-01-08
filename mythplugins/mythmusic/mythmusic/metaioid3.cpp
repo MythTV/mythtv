@@ -328,6 +328,17 @@ Metadata *MetaIOID3::read(const QString &filename)
 
     metadata->setLength(getTrackLength(m_file));
 
+    // The number of tracks on the album, if supplied
+    if (!tag->frameListMap()["TRCK"].isEmpty())
+    {
+        QString trackFrame = TStringToQString(
+                                tag->frameListMap()["TRCK"].front()->toString())
+                                    .trimmed();
+        int trackCount = trackFrame.section('/', -1).toInt();
+        if (trackCount > 0)
+            metadata->setTrackCount(trackCount);
+    }
+
     LOG(VB_FILE, LOG_DEBUG,
             QString("MetaIOID3::read: Length for '%1' from properties is '%2'\n").arg(filename).arg(metadata->Length()));
 
