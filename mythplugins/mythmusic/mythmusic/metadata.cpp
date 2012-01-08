@@ -462,6 +462,8 @@ void Metadata::dumpToDatabase()
     else
         query.bindValue(":ID", m_id);
 
+    query.bindValue(":TRACKCOUNT", m_trackCount);
+
     if (!query.exec())
         MythDB::DBError("Metadata::dumpToDatabase - updating music_songs",
                         query);
@@ -479,7 +481,6 @@ void Metadata::dumpToDatabase()
     query.bindValue(":ALBUMID", m_albumid);
     query.bindValue(":COMPILATION", m_compilation);
     query.bindValue(":YEAR", m_year);
-    query.bindValue(":TRACKCOUNT", m_trackCount);
 
     if (!query.exec() || !query.isActive())
     {
