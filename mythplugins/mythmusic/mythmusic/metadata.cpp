@@ -414,13 +414,13 @@ void Metadata::dumpToDatabase()
                    " artist_id, album_id,  name,         genre_id,"
                    " year,      track,     length,       filename,"
                    " rating,    format,    date_entered, date_modified,"
-                   " numplays) "
+                   " numplays,  track_count) "
                    "VALUES ( "
                    " :DIRECTORY, "
                    " :ARTIST,   :ALBUM,    :TITLE,       :GENRE,"
                    " :YEAR,     :TRACKNUM, :LENGTH,      :FILENAME,"
                    " :RATING,   :FORMAT,   :DATE_ADD,    :DATE_MOD,"
-                   " :PLAYCOUNT );";
+                   " :PLAYCOUNT,:TRACKCOUNT );";
     }
     else
     {
@@ -438,6 +438,7 @@ void Metadata::dumpToDatabase()
                    ", format = :FORMAT"
                    ", date_modified = :DATE_MOD "
                    ", numplays = :PLAYCOUNT "
+                   ", track_count = :TRACKCOUNT "
                    "WHERE song_id= :ID ;";
     }
 
