@@ -1296,3 +1296,10 @@ bool VideoOutputVDPAU::GetScreenShot(int width, int height, QString filename)
         return m_render->GetScreenShot(width, height, filename);
     return false;
 }
+
+QStringList VideoOutputVDPAU::GetVisualiserList(void)
+{
+    if (m_render)
+        return VideoVisual::GetVisualiserList(m_render->Type());
+    return VideoOutput::GetVisualiserList();
+}

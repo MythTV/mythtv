@@ -69,6 +69,7 @@ class VideoOutputVDPAU : public VideoOutput
     virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
                                     const QString &name)
         { return VideoOutput::SetupVisualisation(audio, m_render, name); }
+    virtual QStringList GetVisualiserList(void);
     virtual void ClearDummyFrame(VideoFrame* frame);
 
   private:
