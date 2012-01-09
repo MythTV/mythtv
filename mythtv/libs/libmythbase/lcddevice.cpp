@@ -169,9 +169,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
             if (socket)
                 socket->DownRef();
 
-            socket = new MythSocket();
-            socket->setCallbacks(this);
-
+            socket = new MythSocket(-1, this);
             if (socket->connect(hostname, port))
             {
                 lcd_ready = false;
