@@ -62,6 +62,7 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
    byteBCDH2int(k) * 1000       + byteBCDL2int(k) * 100     + \
    byteBCDH2int(l) * 10         + byteBCDL2int(l))
 
+// DVB Bluebook A038 (Sept 2011) p 77
 class NetworkNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -79,6 +80,7 @@ class NetworkNameDescriptor : public MPEGDescriptor
         { return QString("NetworkNameDescriptor: ")+Name(); }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 63
 class LinkageDescriptor : public MPEGDescriptor
 {
   public:
@@ -198,6 +200,7 @@ class LinkageDescriptor : public MPEGDescriptor
     uint m_offset;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 38
 class AdaptationFieldDataDescriptor : public MPEGDescriptor
 {
   public:
@@ -216,6 +219,7 @@ class AdaptationFieldDataDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 38
 class AncillaryDataDescriptor : public MPEGDescriptor
 {
   public:
@@ -234,6 +238,7 @@ class AncillaryDataDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 39
 class AnnouncementSupportDescriptor : public MPEGDescriptor
 {
   public:
@@ -258,6 +263,7 @@ class AnnouncementSupportDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 41
 class BouquetNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -279,6 +285,7 @@ class BouquetNameDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 41
 class CAIdentifierDescriptor : public MPEGDescriptor
 {
   public:
@@ -296,6 +303,7 @@ class CAIdentifierDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 42
 class CellFrequencyLinkDescriptor : public MPEGDescriptor
 {
   public:
@@ -317,6 +325,7 @@ class CellFrequencyLinkDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 42
 class CellListDescriptor : public MPEGDescriptor
 {
   public:
@@ -344,6 +353,7 @@ class CellListDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 44
 class ComponentDescriptor : public MPEGDescriptor
 {
   public:
@@ -558,6 +568,7 @@ typedef enum
 MTV_PUBLIC QString myth_category_type_to_string(uint category_type);
 MTV_PUBLIC MythCategoryType string_to_myth_category_type(const QString &type);
 
+// DVB Bluebook A038 (Sept 2011) p 46
 class ContentDescriptor : public MPEGDescriptor
 {
   public:
@@ -597,6 +608,7 @@ class ContentDescriptor : public MPEGDescriptor
     static volatile bool      categoryDescExists;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 49
 class CountryAvailabilityDescriptor : public MPEGDescriptor
 {
   public:
@@ -633,6 +645,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 50
 class DataBroadcastDescriptor : public MPEGDescriptor
 {
   public:
@@ -673,6 +686,7 @@ class DataBroadcastDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 51
 class DataBroadcastIdDescriptor : public MPEGDescriptor
 {
   public:
@@ -688,6 +702,7 @@ class DataBroadcastIdDescriptor : public MPEGDescriptor
     // { id_selector_byte       8 }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 51
 class CableDeliverySystemDescriptor : public MPEGDescriptor
 {
   public:
@@ -764,6 +779,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 53
 class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
 {
   public:
@@ -873,6 +889,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 55
 class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
 {
   public:
@@ -1013,6 +1030,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 58
 class DSNGDescriptor : public MPEGDescriptor
 {
   public:
@@ -1024,6 +1042,7 @@ class DSNGDescriptor : public MPEGDescriptor
     // for (i=0;i<N;i++) { byte 8 }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 58
 class ExtendedEventDescriptor : public MPEGDescriptor
 {
   public:
@@ -1071,6 +1090,7 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     // HACK end -- Pro7Sat is missing encoding
 };
 
+// DVB Bluebook A038 (Sept 2011) p 60
 class FrequencyListDescriptor : public MPEGDescriptor
 {
   public:
@@ -1113,6 +1133,7 @@ class FrequencyListDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 70
 // ETSI EN 300 468 p 58
 class LocalTimeOffsetDescriptor : public MPEGDescriptor
 {
@@ -1157,6 +1178,7 @@ class LocalTimeOffsetDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 71
 class MosaicDescriptor : public MPEGDescriptor
 {
   public:
@@ -1208,6 +1230,7 @@ class MosaicDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 74
 class MultilingualBouquetNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -1226,6 +1249,7 @@ class MultilingualBouquetNameDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 75
 class MultilingualNetworkNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -1246,6 +1270,7 @@ class MultilingualNetworkNameDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 76
 class MultilingualServiceNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -1266,6 +1291,7 @@ class MultilingualServiceNameDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 76
 class NVODReferenceDescriptor : public MPEGDescriptor
 {
   public:
@@ -1291,6 +1317,7 @@ class NVODReferenceDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 78
 class ParentalRatingDescriptor : public MPEGDescriptor
 {
   public:
@@ -1308,6 +1335,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 78 (see also ETSI EN 300 231 PDC)
 class PDCDescriptor : public MPEGDescriptor
 {
   public:
@@ -1328,6 +1356,7 @@ class PDCDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 79 (see also ETSI TS 101 162)
 class PrivateDataSpecifierDescriptor : public MPEGDescriptor
 {
   public:
@@ -1340,6 +1369,7 @@ class PrivateDataSpecifierDescriptor : public MPEGDescriptor
     // private_data_specifier  32   2.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 79
 class ScramblingDescriptor : public MPEGDescriptor
 {
   public:
@@ -1443,6 +1473,7 @@ class ServiceDescriptorMapping
     uint m_serviceid;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 80
 class ServiceDescriptor : public MPEGDescriptor
 {
   public:
@@ -1493,6 +1524,7 @@ class ServiceDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 82
 class ServiceAvailabilityDescriptor : public MPEGDescriptor
 {
   public:
@@ -1507,6 +1539,7 @@ class ServiceAvailabilityDescriptor : public MPEGDescriptor
     // for (i=0;i<N;i++) { cell_id 16 }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 82
 class ServiceListDescriptor : public MPEGDescriptor
 {
   public:
@@ -1542,6 +1575,7 @@ class ServiceListDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 82
 class ServiceMoveDescriptor : public MPEGDescriptor
 {
   public:
@@ -1556,6 +1590,7 @@ class ServiceMoveDescriptor : public MPEGDescriptor
     // new_service_id          16   6.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 83
 class ShortEventDescriptor : public MPEGDescriptor
 {
   public:
@@ -1607,6 +1642,7 @@ class ShortEventDescriptor : public MPEGDescriptor
         { return LanguageString() + " : " + EventName() + " : " + Text(); }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 84
 class ShortSmoothingBufferDescriptor : public MPEGDescriptor
 {
   public:
@@ -1622,6 +1658,7 @@ class ShortSmoothingBufferDescriptor : public MPEGDescriptor
     // { DVB_reserved           8 }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 85
 /// This is used to label streams so the can be treated differently,
 /// for instance each stream may get it's own cueing instructions.
 class StreamIdentifierDescriptor : public MPEGDescriptor
@@ -1642,6 +1679,24 @@ class StreamIdentifierDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 86
+class StuffingDescriptor : public MPEGDescriptor
+{
+  public:
+    StuffingDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::dvb_stuffing) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x42
+    // descriptor_length        8   1.0
+    // stuffing_byte            *   2.0
+    QString toString(void) const
+    {
+        return QString("Stuffing Descriptor (0x42) length(%1)")
+            .arg(DescriptorLength());
+    }
+};
+
+// DVB Bluebook A038 (Sept 2011) p 86
 class SubtitlingDescriptor : public MPEGDescriptor
 {
   public:
@@ -1676,6 +1731,7 @@ class SubtitlingDescriptor : public MPEGDescriptor
     // }                            8.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 87
 class TelephoneDescriptor : public MPEGDescriptor
 {
   public:
@@ -1708,6 +1764,7 @@ class TelephoneDescriptor : public MPEGDescriptor
     //   { core_number_char 8 }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 88
 class TeletextDescriptor : public MPEGDescriptor
 {
   public:
@@ -1742,6 +1799,7 @@ class TeletextDescriptor : public MPEGDescriptor
     // }                           5.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 89
 class TimeShiftedEventDescriptor : public MPEGDescriptor
 {
   public:
@@ -1755,6 +1813,7 @@ class TimeShiftedEventDescriptor : public MPEGDescriptor
     // reference_event_id      16   4.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 90
 class TimeShiftedServiceDescriptor : public MPEGDescriptor
 {
   public:
@@ -1767,6 +1826,7 @@ class TimeShiftedServiceDescriptor : public MPEGDescriptor
     // reference_service_id    16   2.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 90
 class TransportStreamDescriptor : public MPEGDescriptor
 {
   public:
@@ -1783,6 +1843,7 @@ class TransportStreamDescriptor : public MPEGDescriptor
         { return QString("TransportStreamDescriptor data(%1)").arg(Data()); }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 91
 class VBIDataDescriptor : public MPEGDescriptor
 {
   public:
@@ -1812,6 +1873,7 @@ class VBIDataDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 92
 class VBITeletextDescriptor : public MPEGDescriptor
 {
   public:
@@ -1830,6 +1892,7 @@ class VBITeletextDescriptor : public MPEGDescriptor
     // }                            5.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 119
 class PartialTransportStreamDescriptor : public MPEGDescriptor
 {
   public:
@@ -1941,6 +2004,7 @@ class UKChannelListDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// ETSI TS 102 323 (TV Anytime)
 class DVBContentIdentifierDescriptor : public MPEGDescriptor
 {
   public:
@@ -1961,6 +2025,7 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
     }
 };
 
+// ETSI TS 102 323 (TV Anytime)
 class DefaultAuthorityDescriptor : public MPEGDescriptor
 {
   public:
