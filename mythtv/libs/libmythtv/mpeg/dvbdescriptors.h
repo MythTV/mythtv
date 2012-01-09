@@ -1642,6 +1642,24 @@ class StreamIdentifierDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 86
+class StuffingDescriptor : public MPEGDescriptor
+{
+  public:
+    StuffingDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::dvb_stuffing) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x42
+    // descriptor_length        8   1.0
+    // stuffing_byte            *   2.0
+    QString toString(void) const
+    {
+        return QString("Stuffing Descriptor (0x42) length(%1)")
+            .arg(DescriptorLength());
+    }
+};
+
+// DVB Bluebook A038 (Sept 2011) p 86
 class SubtitlingDescriptor : public MPEGDescriptor
 {
   public:
