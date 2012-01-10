@@ -1043,7 +1043,7 @@ void AllMusic::resync()
                      "music_songs.track, music_songs.length, music_songs.directory_id, "
                      "CONCAT_WS('/', music_directories.path, music_songs.filename) AS filename, "
                      "music_songs.rating, music_songs.numplays, music_songs.lastplay, music_songs.date_entered, "
-                     "music_albums.compilation, music_songs.format "
+                     "music_albums.compilation, music_songs.format, music_songs.track_count "
                      "FROM music_songs "
                      "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
                      "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
@@ -1094,6 +1094,7 @@ void AllMusic::resync()
                 mdata->setDirectoryId(query.value(11).toInt());
                 mdata->setArtistId(query.value(1).toInt());
                 mdata->setAlbumId(query.value(4).toInt());
+                mdata->setTrackCount(query.value(19).toInt());
 
                 //  Don't delete mdata, as PtrList now owns it
                 m_all_music.append(mdata);
