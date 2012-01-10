@@ -180,7 +180,7 @@ class Metadata
     void setLength(int llength) { m_length = llength; }
 
     int Playcount() const { return m_playcount; }
-    void setPlaycount(int lplaycount) { m_tempplaycount = lplaycount; }
+    void setPlaycount(int lplaycount) { m_playcount = lplaycount; }
 
     IdType ID() const { return m_id; }
     void setID(IdType lid) { m_id = lid; }
