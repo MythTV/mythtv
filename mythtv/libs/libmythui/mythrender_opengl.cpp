@@ -14,6 +14,8 @@ using namespace std;
 #include "mythrender_opengl1.h"
 #endif
 
+#include "util-nvctrl.h"
+
 static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
 
 static inline int __glCheck__(const QString &loc, const char* fileName, int n)
@@ -48,9 +50,32 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
     QGLFormat format;
     format.setDepth(false);
 
+    bool setswapinterval = false;
+    int synctovblank = CheckNVOpenGLSyncToVBlank();
+
+    if (synctovblank < 0)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Could not determine whether Sync "
+                                           "to VBlank is enabled.");
+    }
+    else if (synctovblank == 0)
+    {
+        // currently only Linux NVidia is supported and there is no way of
+        // forcing sync to vblank after the app has started. util-nvctrl will
+        // warn the user and offer advice on settings.
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Sync to VBlank is enabled (good!)");
+    }
+
 #if defined(Q_WS_MAC)
-    format.setSwapInterval(1);
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Forcing swap interval for OS X.");
+    setswapinterval = true;
 #endif
+
+    if (setswapinterval)
+        format.setSwapInterval(1);
 
 #ifdef USING_OPENGLES
     if (device)
