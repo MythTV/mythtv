@@ -16,7 +16,9 @@
 #include "libmythnvctrl/NVCtrl.h"
 #include "libmythnvctrl/NVCtrlLib.h"
 
+#ifdef USING_XRANDR
 #include "DisplayResX.h"
+#endif
 
 static unsigned int display_device_mask(char *str);
 static void parse_mode_string(char *modeString, char **modeName, int *mask);
@@ -77,6 +79,8 @@ int CheckNVOpenGLSyncToVBlank(void)
 
 int GetNvidiaRates(t_screenrate& screenmap)
 {
+#ifdef USING_XRANDR
+
     MythXDisplay *d = OpenMythXDisplay();
     if (!d)
     {
@@ -323,7 +327,9 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
     delete d;
     return 1;
-
+#else // USING_XRANDR
+    return -1;
+#endif
 }
 
 /*

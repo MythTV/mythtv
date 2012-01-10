@@ -14,7 +14,9 @@ using namespace std;
 #include "mythrender_opengl1.h"
 #endif
 
+#ifdef USING_X11
 #include "util-nvctrl.h"
+#endif
 
 static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
 
@@ -51,7 +53,11 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
     format.setDepth(false);
 
     bool setswapinterval = false;
-    int synctovblank = CheckNVOpenGLSyncToVBlank();
+    int synctovblank = -1;
+
+#ifdef USING_X11
+    synctovblank = CheckNVOpenGLSyncToVBlank();
+#endif
 
     if (synctovblank < 0)
     {
