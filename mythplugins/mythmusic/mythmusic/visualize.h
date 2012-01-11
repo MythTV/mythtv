@@ -19,7 +19,6 @@
 #include <visual.h>
 
 // MythMusic headers
-//#include "mainvisual.h"
 #include "metadata.h"
 #include "constants.h"
 #include "config.h"
@@ -41,11 +40,6 @@ extern "C" {
 #include <fftw.h>
 #endif
 }
-
-//#ifdef OPENGL_SUPPORT
-//#include <QGLWidget>
-//#include "mainvisual.h"
-//#endif
 
 #define SAMPLES_DEFAULT_SIZE 512
 
@@ -93,7 +87,7 @@ class VisualBase
     virtual int getDesiredFPS(void) { return m_fps; }
     // Override this if you need the potential of capturing more data than the default
     virtual unsigned long getDesiredSamples(void) { return SAMPLES_DEFAULT_SIZE; }
-    void drawWarning(QPainter *, const QColor &, const QSize &, QString);
+    void drawWarning(QPainter *p, const QColor &back, const QSize &color, QString warning, int fontsize = 28);
 
   protected:
     int m_fps;

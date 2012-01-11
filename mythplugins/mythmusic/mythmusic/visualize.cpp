@@ -58,23 +58,15 @@ VisualBase::~VisualBase()
 }
 
 
-void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, QString warning)
+void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, QString warning, int fontSize)
 {
     p->fillRect(0, 0, size.width(), size.height(), back);
     p->setPen(Qt::white);
-    p->setFont(GetMythUI()->GetMediumFont());
+    QFont font = GetMythUI()->GetMediumFont();
+    font.setPointSizeF(fontSize * (size.width() / 800.0));
+    p->setFont(font);
 
-    QFontMetrics fm(p->font());
-    int width = fm.width(warning);
-    int height = fm.height() * (warning.contains("\n") ? 2 : 1);
-    int x = size.width() / 2 - width / 2;
-    int y = size.height() / 2 - height / 2;
-
-    for (int offset = 0; offset < height; offset += fm.height()) {
-        QString l = warning.left(warning.indexOf("\n"));
-        p->drawText(x, y + offset, width, height, Qt::AlignCenter, l);
-        warning.remove(0, l.length () + 1);
-    }
+    p->drawText(0, 0, size.width(), size.height(), Qt::AlignVCenter | Qt::AlignHCenter | Qt::TextWordWrap, warning);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1492,7 +1484,7 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
 
     if (m_image.isNull()) 
     {
-        drawWarning(p, back, m_size, QObject::tr("?"));
+        drawWarning(p, back, m_size, QObject::tr("?"), 100);
         return true;
     }
 
