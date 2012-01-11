@@ -288,7 +288,8 @@ QString CardUtil::ProbeDVBType(const QString &device)
     if (err < 0)
     {
         close(fd_frontend);
-        VERBOSE(VB_IMPORTANT, "FE_GET_INFO ioctl failed (" + dvbdev + ").");
+        VERBOSE(VB_IMPORTANT, QString("FE_GET_INFO ioctl failed (%1)")
+                                         .arg(dvbdev) + ENO);
         return ret;
     }
     close(fd_frontend);

@@ -11,6 +11,7 @@ use Getopt::Std;
 use URI::Escape;
 use XML::XPath;
 use XML::XPath::XMLParser;
+use JSON;
 use DateTime::Format::ISO8601;
 use POSIX qw(strftime);
 use File::Path;
@@ -18,7 +19,7 @@ use File::Path;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D); 
 
 my $name = 'yrno-XML';
-my $version = 0.1;
+my $version = 0.2;
 my $author = 'Gavin Hurlbut';
 my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 15*60;
@@ -54,7 +55,7 @@ if (!-d $logdir) {
     mkpath( $logdir, {mode => 0755} );
 }
 
-getopts('Tvtlu:d:');
+getopts('Tvtlu:d:D');
 
 if (defined $opt_v) {
     print "$name,$version,$author,$email\n";
@@ -79,18 +80,24 @@ if (!-d $dir) {
 if (defined $opt_l) {
     my $search = uri_escape(shift);
     log_print( $logdir, "-l $search\n" ); 
-    my $base_url = 'http://www.yr.no/soek.aspx?sted=';
+    my $base_url = 'http://www.yr.no/_/websvc/jsonforslagsboks.aspx?'
+                 . 's1t=&s1i=&s2t=&s2i=&s=';
 
-    my $xp = getCachedXML($base_url . $search, $dir, $search . ".html",
+    my $response = getCachedJSON($base_url . $search, $dir, $search . ".json",
                           $updateTimeout, $logdir);
 
-    my $nodeset = $xp->find('//td[@class="place"]/a');
-    foreach my $node ($nodeset->get_nodelist) {
-        my $loc = $node->getAttribute("href");
-	$loc =~ s/^\/place\///;
-	$loc =~ s/\/$//;
-        print $loc . "::" . $node->string_value . "\n";
+    my @cities = @{$$response[1]};
+    if (@cities) {
+        foreach my $city (@cities) {
+            my ($cityName, $url, $location, $country) = @{$city};
+
+            $url =~ s/^\/place\///;
+            $url =~ s/\/$//;
+
+            print $url . "::" . "$cityName, $location, $country\n";
+        }
     }
+
     exit 0;
 }
 
@@ -248,7 +255,7 @@ sub getCachedXML {
             die $response->status_line;
         }
 
-        open OF, ">$cachefile" or die "Can't open $cachefile: $!\n";
+        open OF, ">:utf8", $cachefile or die "Can't open $cachefile: $!\n";
         print OF $response->content;
         close OF;
     }
@@ -256,6 +263,43 @@ sub getCachedXML {
     $xp = XML::XPath->new(filename => $cachefile);
 
     return $xp;
+}
+
+sub getCachedJSON {
+    my ($url, $dir, $file, $timeout, $logdir) = @_;
+
+    my $cachefile = "$dir/$file";
+    my $xp;
+
+    my $now = time();
+
+    if( (-e $cachefile) and ((stat($cachefile))[9] >= ($now - $timeout)) ) {
+        # File cache is still recent.
+        log_print( $logdir, "cached in $cachefile\n" );
+    } else {
+        log_print( $logdir, "$url\ncaching to $cachefile\n" );
+        my $accept = "application/json, text/javascript, */*; q=0.01";
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+        $ua->default_header('Accept' => $accept);
+        $ua->default_header('Accept-Language' => "en");
+
+        my $response = $ua->get($url);
+        if ( !$response->is_success ) {
+            die $response->status_line;
+        }
+
+        open OF, ">:utf8", $cachefile or die "Can't open $cachefile: $!\n";
+        print OF $response->content;
+        close OF;
+    }
+
+    open IF, "<:utf8", $cachefile or die "Can't open $cachefile: $!\n";
+    my $content = do { local $/; <IF>; };
+    close IF;
+
+    return decode_json($content);
 }
 
 sub convert_temp {

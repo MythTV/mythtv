@@ -105,7 +105,7 @@
             <area>15,95,120,30</area>
             <font>baseextralarge</font>
             <align>hcenter</align>
-            <value>%CHANNUM%</value>
+            <template>%CHANNUM%</template>
         </textarea>
 
         <imagetype name="iconpath">
@@ -229,7 +229,7 @@
             <area>15,95,120,30</area>
             <font>baseextralarge</font>
             <align>hcenter</align>
-            <value>%CHANNUM%</value>
+            <template>%CHANNUM%</template>
         </textarea>
 
         <imagetype name="iconpath">
