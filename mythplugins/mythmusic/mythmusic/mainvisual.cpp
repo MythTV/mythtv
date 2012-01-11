@@ -52,10 +52,11 @@ MainVisual::MainVisual(MythUIVideo *visualiser)
 
 MainVisual::~MainVisual()
 {
+    m_updateTimer->stop();
+    delete m_updateTimer;
+
     if (m_vis)
         delete m_vis;
-
-    delete m_updateTimer;
 
     while (!m_nodes.empty())
         delete m_nodes.takeLast();
@@ -76,6 +77,8 @@ void MainVisual::stop(void)
 
 void MainVisual::setVisual(const QString &name)
 {
+    m_updateTimer->stop();
+
     int index = visualizers.indexOf(name);
 
     if (index == -1)
@@ -101,8 +104,6 @@ void MainVisual::setVisual(const QString &name)
         pluginName.clear();
     }
 
-    m_updateTimer->stop();
-
     if (m_vis)
     {
         delete m_vis;
@@ -118,6 +119,10 @@ void MainVisual::setVisual(const QString &name)
             m_vis->resize(m_visualiserVideo->GetArea().size());
             m_fps = m_vis->getDesiredFPS();
             m_samples = m_vis->getDesiredSamples();
+
+            QMutexLocker locker(mutex());
+            prepare();
+
             break;
         }
     }

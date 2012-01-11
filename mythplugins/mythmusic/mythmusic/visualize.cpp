@@ -705,10 +705,12 @@ bool Spectrum::process(VisualNode *node)
     if (node) 
     {
         i = node->length;
-        fast_real_set_from_short(lin, node->left, node->length);
+        if (i > FFTW_N)
+            i = FFTW_N;
+        fast_real_set_from_short(lin, node->left, i);
         if (node->right)
-            fast_real_set_from_short(rin, node->right, node->length);
-    } 
+            fast_real_set_from_short(rin, node->right, i);
+    }
     else
         i = 0;
 
