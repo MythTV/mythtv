@@ -132,8 +132,7 @@ static inline void mono16_from_monopcm16(register short *l,
     }
 }
 
-#if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
-
+#if FFTW3_SUPPORT
 static inline void fast_short_set(register short *p,
 				  short v,
 				  long c)
@@ -216,7 +215,6 @@ static inline void fast_reals_set(register fftw_real *p1,
 	}
     }
 }
-
-#endif //defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
+#endif // FFTW3_SUPPORT
 
 #endif // INLINES_H

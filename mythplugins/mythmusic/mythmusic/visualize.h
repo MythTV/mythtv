@@ -35,9 +35,6 @@ extern "C" {
 #elif (myth_fftw_float == float)
 #define myth_fftw_complex_cast fftwf_complex
 #endif
-#elif    FFTW2_SUPPORT
-#include <rfftw.h>
-#include <fftw.h>
 #endif
 }
 
@@ -157,6 +154,7 @@ class LogScale
     int s, r;
 };
 
+#ifdef FFTW3_SUPPORT
 class Spectrum : public VisualBase
 {
     // This class draws bars (up and down)
@@ -183,15 +181,30 @@ class Spectrum : public VisualBase
     double scaleFactor, falloff;
     int analyzerBarWidth;
 
-#ifdef FFTW3_SUPPORT
     fftw_plan lplan, rplan;
     myth_fftw_float *lin, *rin;
     myth_fftw_complex *lout, *rout;
-#elif FFTW2_SUPPORT
-    rfftw_plan plan;
-    fftw_real *lin, *rin, *lout, *rout;
-#endif
 };
+
+class Squares : public Spectrum
+{
+  public:
+    Squares();
+    virtual ~Squares();
+
+    void resize (const QSize &newsize);
+    bool draw(QPainter *p, const QColor &back = Qt::black);
+    void handleKeyPress(const QString &action) {(void) action;}
+
+  private:
+    void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
+    QSize size;
+    MainVisual *pParent;
+    int fake_height;
+    int number_of_squares;
+};
+
+#endif // FFTW3_SUPPORT
 
 class Piano : public VisualBase
 {
@@ -296,66 +309,4 @@ class Blank : public VisualBase
     QSize size;
 };
 
-class Squares : public Spectrum
-{
-  public:
-    Squares();
-    virtual ~Squares();
-
-    void resize (const QSize &newsize);
-    bool draw(QPainter *p, const QColor &back = Qt::black);
-    void handleKeyPress(const QString &action) {(void) action;}
-
-  private:
-    void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
-    QSize size;
-    MainVisual *pParent;
-    int fake_height;
-    int number_of_squares;
-};
-#if 0
-#ifdef OPENGL_SUPPORT
-
-class Gears : public QGLWidget, public VisualBase
-{
-    // Draws some OpenGL gears and manipulates
-    // them based on audio data
-  public:
-    Gears(QWidget *parent = 0, const char * = 0);
-    virtual ~Gears();
-
-    void resize(const QSize &size);
-    bool process(VisualNode *node);
-    bool draw(QPainter *p, const QColor &back);
-    void handleKeyPress(const QString &action) {(void) action;}
-
-  protected:
-    void initializeGL();
-    void resizeGL( int, int );
-    void paintGL();
-    void drawTheGears();
-        
-  private:
-    QColor startColor, targetColor;
-    QVector<QRect> rects;
-    QVector<double> magnitudes;
-    QSize size;
-    LogScale scale;
-    double scaleFactor, falloff;
-    int analyzerBarWidth;
-    GLfloat angle, view_roty;
-
-#ifdef FFTW3_SUPPORT
-    fftw_plan lplan, rplan;
-    myth_fftw_float *lin, *rin;
-    myth_fftw_complex *lout, *rout;
-#elif FFTW2_SUPPORT
-    rfftw_plan plan;
-    fftw_real *lin, *rin, *lout, *rout;
-#endif
-};
-
-
-#endif // opengl_support	
-#endif
 #endif // __visualize_h
