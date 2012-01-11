@@ -19,7 +19,6 @@
 #include <visual.h>
 
 // MythMusic headers
-//#include "mainvisual.h"
 #include "metadata.h"
 #include "constants.h"
 #include "config.h"
@@ -36,16 +35,8 @@ extern "C" {
 #elif (myth_fftw_float == float)
 #define myth_fftw_complex_cast fftwf_complex
 #endif
-#elif    FFTW2_SUPPORT
-#include <rfftw.h>
-#include <fftw.h>
 #endif
 }
-
-//#ifdef OPENGL_SUPPORT
-//#include <QGLWidget>
-//#include "mainvisual.h"
-//#endif
 
 #define SAMPLES_DEFAULT_SIZE 512
 
@@ -93,7 +84,7 @@ class VisualBase
     virtual int getDesiredFPS(void) { return m_fps; }
     // Override this if you need the potential of capturing more data than the default
     virtual unsigned long getDesiredSamples(void) { return SAMPLES_DEFAULT_SIZE; }
-    void drawWarning(QPainter *, const QColor &, const QSize &, QString);
+    void drawWarning(QPainter *p, const QColor &back, const QSize &color, QString warning, int fontsize = 28);
 
   protected:
     int m_fps;
@@ -163,6 +154,7 @@ class LogScale
     int s, r;
 };
 
+#ifdef FFTW3_SUPPORT
 class Spectrum : public VisualBase
 {
     // This class draws bars (up and down)
@@ -189,15 +181,30 @@ class Spectrum : public VisualBase
     double scaleFactor, falloff;
     int analyzerBarWidth;
 
-#ifdef FFTW3_SUPPORT
     fftw_plan lplan, rplan;
     myth_fftw_float *lin, *rin;
     myth_fftw_complex *lout, *rout;
-#elif FFTW2_SUPPORT
-    rfftw_plan plan;
-    fftw_real *lin, *rin, *lout, *rout;
-#endif
 };
+
+class Squares : public Spectrum
+{
+  public:
+    Squares();
+    virtual ~Squares();
+
+    void resize (const QSize &newsize);
+    bool draw(QPainter *p, const QColor &back = Qt::black);
+    void handleKeyPress(const QString &action) {(void) action;}
+
+  private:
+    void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
+    QSize size;
+    MainVisual *pParent;
+    int fake_height;
+    int number_of_squares;
+};
+
+#endif // FFTW3_SUPPORT
 
 class Piano : public VisualBase
 {
@@ -279,7 +286,6 @@ class AlbumArt : public VisualBase
     bool cycleImage(void);
 
     QSize m_size, m_cursize;
-    QString m_filename;
     ImageType m_currImageType;
     QImage m_image;
 
@@ -303,66 +309,4 @@ class Blank : public VisualBase
     QSize size;
 };
 
-class Squares : public Spectrum
-{
-  public:
-    Squares();
-    virtual ~Squares();
-
-    void resize (const QSize &newsize);
-    bool draw(QPainter *p, const QColor &back = Qt::black);
-    void handleKeyPress(const QString &action) {(void) action;}
-
-  private:
-    void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
-    QSize size;
-    MainVisual *pParent;
-    int fake_height;
-    int number_of_squares;
-};
-#if 0
-#ifdef OPENGL_SUPPORT
-
-class Gears : public QGLWidget, public VisualBase
-{
-    // Draws some OpenGL gears and manipulates
-    // them based on audio data
-  public:
-    Gears(QWidget *parent = 0, const char * = 0);
-    virtual ~Gears();
-
-    void resize(const QSize &size);
-    bool process(VisualNode *node);
-    bool draw(QPainter *p, const QColor &back);
-    void handleKeyPress(const QString &action) {(void) action;}
-
-  protected:
-    void initializeGL();
-    void resizeGL( int, int );
-    void paintGL();
-    void drawTheGears();
-        
-  private:
-    QColor startColor, targetColor;
-    QVector<QRect> rects;
-    QVector<double> magnitudes;
-    QSize size;
-    LogScale scale;
-    double scaleFactor, falloff;
-    int analyzerBarWidth;
-    GLfloat angle, view_roty;
-
-#ifdef FFTW3_SUPPORT
-    fftw_plan lplan, rplan;
-    myth_fftw_float *lin, *rin;
-    myth_fftw_complex *lout, *rout;
-#elif FFTW2_SUPPORT
-    rfftw_plan plan;
-    fftw_real *lin, *rin, *lout, *rout;
-#endif
-};
-
-
-#endif // opengl_support	
-#endif
 #endif // __visualize_h

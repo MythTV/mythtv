@@ -350,7 +350,7 @@ using_frontend {
     SOURCES += videocolourspace.cpp
     SOURCES += videovisual.cpp
 
-   using_opengl {
+   using_opengl | using_vdpau {
         # Goom
         HEADERS += goom/filters.h goom/goomconfig.h goom/goom_core.h goom/graphic.h
         HEADERS += goom/ifs.h goom/lines.h goom/drawmethods.h

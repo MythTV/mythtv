@@ -1,8 +1,13 @@
 #include "mythlogging.h"
 
 #include "mythmainwindow.h"
+
 #ifdef USING_OPENGL
 #include "mythrender_opengl.h"
+#endif
+
+#ifdef USING_VDPAU
+#include "mythrender_vdpau.h"
 #endif
 
 extern "C" {
@@ -13,7 +18,7 @@ extern "C" {
 #include "videovisualgoom.h"
 
 VideoVisualGoom::VideoVisualGoom(AudioPlayer *audio, MythRender *render, bool hd)
-  : VideoVisual(audio, render), m_buffer(NULL), m_surface(NULL), m_hd(hd)
+  : VideoVisual(audio, render), m_buffer(NULL), m_surface(0), m_hd(hd)
 {
     int max_width  = m_hd ? 1200 : 600;
     int max_height = m_hd ? 800  : 400;
@@ -39,6 +44,18 @@ VideoVisualGoom::~VideoVisualGoom()
                     static_cast<MythRenderOpenGL*>(m_render);
         if (glrender)
             glrender->DeleteTexture(m_surface);
+        m_surface = 0;
+    }
+#endif
+
+#ifdef USING_VDPAU
+    if (m_surface && m_render &&
+       (m_render->Type() == kRenderVDPAU))
+    {
+        MythRenderVDPAU *render =
+                    static_cast<MythRenderVDPAU*>(m_render);
+        if (render)
+            render->DestroyBitmapSurface(m_surface);
         m_surface = 0;
     }
 #endif
@@ -107,6 +124,30 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter *painter,
             QRectF dst(area);
             glrender->DrawBitmap(&m_surface, 1, 0, &src, &dst, 0);
         }
+        return;
+    }
+#endif
+
+#ifdef USING_VDPAU
+    if (m_render->Type() == kRenderVDPAU)
+    {
+        MythRenderVDPAU *render =
+                    static_cast<MythRenderVDPAU*>(m_render);
+
+        if (!m_surface && render)
+            m_surface = render->CreateBitmapSurface(m_area.size());
+
+        if (m_surface && render && m_buffer)
+        {
+            if (m_buffer != last)
+            {
+                void    *plane[1] = { m_buffer };
+                uint32_t pitch[1] = { m_area.width() * 4 };
+                render->UploadBitmap(m_surface, plane, pitch);
+            }
+            render->DrawBitmap(m_surface, 0, NULL, NULL, kVDPBlendNull, 255, 255, 255, 255);
+        }
+        return;
     }
 #endif
 }
@@ -128,7 +169,8 @@ static class VideoVisualGoomFactory : public VideoVisualFactory
 
     virtual bool SupportedRenderer(RenderType type)
     {
-        return (type == kRenderOpenGL1 ||
+        return (type == kRenderVDPAU   ||
+                type == kRenderOpenGL1 ||
                 type == kRenderOpenGL2 ||
                 type == kRenderOpenGL2ES);
     }
@@ -151,7 +193,8 @@ static class VideoVisualGoomHDFactory : public VideoVisualFactory
 
     virtual bool SupportedRenderer(RenderType type)
     {
-        return (type == kRenderOpenGL1 ||
+        return (type == kRenderVDPAU   ||
+                type == kRenderOpenGL1 ||
                 type == kRenderOpenGL2 ||
                 type == kRenderOpenGL2ES);
     }

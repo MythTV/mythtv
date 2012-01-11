@@ -12,6 +12,7 @@
 #include <mythdownloadmanager.h>
 #include <mythdirs.h>
 #include <mythlogging.h>
+#include <compat.h> // For random() on MINGW32
 
 // mythmusic
 #include "decoderhandler.h"

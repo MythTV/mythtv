@@ -34,7 +34,8 @@ class DeviceReadBuffer : protected MThread
 {
   public:
     DeviceReadBuffer(DeviceReaderCB *callback,
-                     bool use_poll = true);
+                     bool use_poll = true,
+                     bool error_exit_on_poll_timeout = true);
    ~DeviceReadBuffer();
 
     bool Setup(const QString &streamName,
@@ -95,6 +96,7 @@ class DeviceReadBuffer : protected MThread
     bool             request_pause;
     bool             paused;
     bool             using_poll;
+    bool             poll_timeout_is_error;
     uint             max_poll_wait;
 
     size_t           size;

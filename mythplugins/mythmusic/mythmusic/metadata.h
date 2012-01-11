@@ -95,6 +95,7 @@ class Metadata
                    m_format(lformat),
                    m_year(lyear),
                    m_tracknum(ltracknum),
+                   m_trackCount(0),
                    m_length(llength),
                    m_rating(lrating),
                    m_directoryid(-1),
@@ -172,11 +173,14 @@ class Metadata
     int Track() const { return m_tracknum; }
     void setTrack(int ltrack) { m_tracknum = ltrack; }
 
+    int GetTrackCount() const { return m_trackCount; }
+    void setTrackCount(int ltrackcount) { m_trackCount = ltrackcount; }
+
     int Length() const { return m_length; }
     void setLength(int llength) { m_length = llength; }
 
     int Playcount() const { return m_playcount; }
-    void setPlaycount(int lplaycount) { m_tempplaycount = lplaycount; }
+    void setPlaycount(int lplaycount) { m_playcount = lplaycount; }
 
     IdType ID() const { return m_id; }
     void setID(IdType lid) { m_id = lid; }
@@ -255,6 +259,7 @@ class Metadata
     QString m_format;
     int m_year;
     int m_tracknum;
+    int m_trackCount;
     int m_length;
     int m_rating;
     int m_directoryid;
@@ -341,7 +346,7 @@ class AllMusic
     bool        doneLoading() {return m_done_loading;}
     bool        cleanOutThreads();
 
-    MetadataPtrList *getAllMetadata(void) { return &m_all_music; } 
+    MetadataPtrList *getAllMetadata(void) { return &m_all_music; }
 
     bool isValidID(int an_id);
 

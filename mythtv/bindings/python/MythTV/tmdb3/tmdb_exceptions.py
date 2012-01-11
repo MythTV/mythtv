@@ -18,11 +18,20 @@ class TMDBKeyMissing( TMDBKeyError ):
 class TMDBKeyInvalid( TMDBKeyError ):
     pass
 
+class TMDBKeyRevoked( TMDBKeyInvalid ):
+    pass
+
 class TMDBRequestError( TMDBError ):
+    pass
+
+class TMDBPagingIssue( TMDBRequestError ):
     pass
 
 class TMDBImageSizeError( TMDBError ):
     pass
 
 class TMDBHTTPError( TMDBError ):
+    pass
+
+class TMDBOffline( TMDBError ):
     pass

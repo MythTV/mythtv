@@ -147,7 +147,10 @@ MythDialogBox::MythDialogBox(MythMenu *menu, MythScreenStack *parent, const char
 MythDialogBox::~MythDialogBox(void)
 {
     if (m_menu)
+    {
         delete m_menu;
+        m_menu = NULL;
+    }
 }
 
 bool MythDialogBox::Create(void)

@@ -86,6 +86,11 @@ using_x11 {
     DEFINES += USING_X11
     HEADERS += screensaver-x11.h
     SOURCES += screensaver-x11.cpp
+    # Add nvidia XV-EXTENSION support
+    HEADERS += util-nvctrl.h
+    SOURCES += util-nvctrl.cpp
+    LIBS += -L../libmythnvctrl -lmythnvctrl-$${LIBVERSION}
+    POST_TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
 }
 
 macx {
@@ -128,10 +133,6 @@ using_xrandr {
     DEFINES += USING_XRANDR
     HEADERS += DisplayResX.h
     SOURCES += DisplayResX.cpp
-    # Add nvidia XV-EXTENSION support
-    SOURCES += util-nvctrl.cpp
-    LIBS += -L../libmythnvctrl -lmythnvctrl-$${LIBVERSION}
-    POST_TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
 }
 
 cygwin:DEFINES += _WIN32

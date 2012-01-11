@@ -93,58 +93,6 @@ bool Goom::draw(QPainter *p, const QColor &back)
     if (!m_buffer)
         return true;
 
-#if 0
-    if (scalew != 1 || scaleh != 1)
-    {
-        register int *d = (int*)surface->pixels;
-        register int *s = (int*)buffer;
-
-        int sw = (size.width() / scalew) << 2;
-        int sw2 = surface->pitch;
-        int swd = sw2 - sw * scalew;
-
-        long fin = (long)s;
-        long fd = (long)d + (sw2 * size.height());
-
-        while ((long)d < fd) {
-            fin += sw;
-            if (scalew == 2)
-            {
-                while ((long)s < fin) {
-                    register long col = *(s++);
-                    *(d++) = col; *(d++) = col;
-                } 
-            }
-            else
-            {
-                while ((long)s < fin) {
-                    register long col = *(s++);
-                    *(d++) = col;
-                }
-            }
-            d = (int*)((char*)d + swd);
-
-            if (scaleh == 2)
-            {
-                memcpy(d, ((char*)d) - sw2, sw2);
-                d = (int*)((char*)d + sw2);
-            }
-        }
-    }
-    else
-    {
-        SDL_Surface *tmpsurf = SDL_CreateRGBSurfaceFrom(buffer, size.width(),
-                                                        size.height(), 32, 
-                                                        size.width() * 4,
-                                                        0x00ff0000, 0x0000ff00,
-                                                        0x000000ff, 0x00000000);
-        SDL_BlitSurface(tmpsurf, NULL, surface, NULL);
-        SDL_FreeSurface(tmpsurf);
-    }
-
-    SDL_UnlockSurface(surface);
-    SDL_Flip(surface);
-#endif
     QImage *image = new QImage((uchar*) m_buffer,  m_size.width(), m_size.height(), m_size.width() * 4, QImage::Format_ARGB32);
 
     p->drawImage(0, 0, *image);
@@ -154,7 +102,6 @@ bool Goom::draw(QPainter *p, const QColor &back)
     return true;
 }
 
-//#if 0
 static class GoomFactory : public VisFactory
 {
   public:
@@ -177,4 +124,3 @@ static class GoomFactory : public VisFactory
         return new Goom();
     }
 }GoomFactory;
-//#endif

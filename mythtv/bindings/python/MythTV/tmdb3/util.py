@@ -44,19 +44,44 @@ class PagedList( list ):
         for i in range(len(self)):
             yield self[i]
 
+class PagedList( list ):
+    """Temporary list-like object to deal with bug in the search API."""
+    def _getpage(self, page):
+        raise NotImplementedError("PagedList._getpage() must be provided "+\
+                                  "by subclass")
+    def __init__(self, iterable, perpage=20):
+        l = 0
+        page = 1
+        self._perpage = perpage
+        super(PagedList, self).__init__(iterable)
+        while len(self) >= (l+perpage):
+            l = len(self)
+            page += 1
+            self.extend(self._getpage(page))
+
 class Poller( object ):
+    """
+    Wrapper for an optional callable to populate an Element derived class
+    with raw data, or data from a Request.
+    """
     def __init__(self, func, lookup, inst=None):
         self.func = func
         self.lookup = lookup
         self.inst = inst
         if func:
+            # with function, this allows polling data from the API
             self.__doc__ = func.__doc__
             self.__name__ = func.__name__
             self.__module__ = func.__module__
         else:
+            # without function, this is just a dummy poller used for applying
+            # raw data to a new Element class with the lookup table
             self.__name__ = '_populate'
 
     def __get__(self, inst, owner):
+        # normal decorator stuff
+        # return self for a class
+        # return instantiated copy of self for an object
         if inst is None:
             return self
         func = None
@@ -65,20 +90,48 @@ class Poller( object ):
         return self.__class__(func, self.lookup, inst)
 
     def __call__(self):
-        data = None
-        if self.func:
-            data = self.func()
-        self.apply(data)
+        # retrieve data from callable function, and apply
+        if not callable(self.func):
+            raise RuntimeError('Poller object called without a source function')
+        self.apply(self.func())
 
     def apply(self, data, set_nones=True):
+        # apply data directly, bypassing callable function
         for k,v in self.lookup.items():
             if k in data:
                 setattr(self.inst, v, data[k])
             elif set_nones:
                 setattr(self.inst, v, None)
+            # else leave attribute empty, allowing it to later trigger a poll
+            # to get data if requested. this is intended for use when
+            # initializing a class with raw data
 
 class Data( object ):
+    """
+    Basic response definition class
+    This maps to a single key in a JSON dictionary received from the API
+    """
     def __init__(self, field, initarg=None, handler=None, poller=None, raw=True):
+        """
+        This defines how the dictionary value is to be processed by the poller
+            field   -- defines the dictionary key that filters what data this uses
+            initarg -- (optional) specifies that this field must be supplied when
+                       creating a new instance of the Element class this definition
+                       is mapped to. Takes an integer for the order it should be
+                       used in the input arguments
+            handler -- (optional) callable used to process the received value
+                       before being stored in the Element object.
+            poller  -- (optional) callable to be used if data is requested and
+                       this value has not yet been defined. the callable should
+                       return a dictionary of data from a JSON query. many
+                       definitions may share a single poller, which will be
+                       and the data used to populate all referenced definitions
+                       based off their defined field
+            raw     -- (optional) if the specified handler is an Element class,
+                       the data will be passed into it using the 'raw' keyword
+                       attribute.  setting this to false will force the data to
+                       instead be passed in as the first argument
+        """
         self.field = field
         self.initarg = initarg
         self.poller = poller
@@ -100,6 +153,7 @@ class Data( object ):
         inst._data[self.field] = value
 
     def sethandler(self, handler):
+        # ensure handler is always callable, even for passthrough data
         if handler is None:
             self.handler = lambda x: x
         elif isinstance(handler, ElementType) and self.raw:
@@ -111,7 +165,31 @@ class Datapoint( Data ):
     pass
 
 class Datalist( Data ):
+    """
+    Response definition class for list data
+    This maps to a key in a JSON dictionary storing a list of data
+    """
     def __init__(self, field, handler=None, poller=None, sort=None, raw=True):
+        """
+        This defines how the dictionary value is to be processed by the poller
+            field   -- defines the dictionary key that filters what data this uses
+            handler -- (optional) callable used to process the received value
+                       before being stored in the Element object.
+            poller  -- (optional) callable to be used if data is requested and
+                       this value has not yet been defined. the callable should
+                       return a dictionary of data from a JSON query. many
+                       definitions may share a single poller, which will be
+                       and the data used to populate all referenced definitions
+                       based off their defined field
+            sort    -- (optional) name of attribute in resultant data to be used
+                       to sort the list after processing. this effectively
+                       a handler be defined to process the data into something
+                       that has attributes
+            raw     -- (optional) if the specified handler is an Element class,
+                       the data will be passed into it using the 'raw' keyword
+                       attribute.  setting this to false will force the data to
+                       instead be passed in as the first argument
+        """
         super(Datalist, self).__init__(field, None, handler, poller, raw)
         self.sort = sort
     def __set__(self, inst, value):
@@ -124,7 +202,33 @@ class Datalist( Data ):
         inst._data[self.field] = data
 
 class Datadict( Data ):
+    """
+    Response definition class for dictionary data
+    This maps to a key in a JSON dictionary storing a dictionary of data
+    """
     def __init__(self, field, handler=None, poller=None, raw=True, key=None, attr=None):
+        """
+        This defines how the dictionary value is to be processed by the poller
+            field   -- defines the dictionary key that filters what data this uses
+            handler -- (optional) callable used to process the received value
+                       before being stored in the Element object.
+            poller  -- (optional) callable to be used if data is requested and
+                       this value has not yet been defined. the callable should
+                       return a dictionary of data from a JSON query. many
+                       definitions may share a single poller, which will be
+                       and the data used to populate all referenced definitions
+                       based off their defined field
+            key     -- (optional) name of key in resultant data to be used as
+                       the key in the stored dictionary. if this is not the
+                       field name from the source data is used instead
+            attr    -- (optional) name of attribute in resultant data to be used
+                       as the key in the stored dictionary. if this is not
+                       the field name from the source data is used instead
+            raw     -- (optional) if the specified handler is an Element class,
+                       the data will be passed into it using the 'raw' keyword
+                       attribute.  setting this to false will force the data to
+                       instead be passed in as the first argument
+        """
         if key and attr:
             raise TypeError("`key` and `attr` cannot both be defined")
         super(Datadict, self).__init__(field, None, handler, poller, raw)
@@ -144,7 +248,15 @@ class Datadict( Data ):
         inst._data[self.field] = data
 
 class ElementType( type ):
+    """
+    MetaClass used to pre-process Element-derived classes and set up the
+    Data definitions
+    """
     def __new__(mcs, name, bases, attrs):
+        # any Data object defined in parent classes must be copied and
+        # processed in this class to function properly
+        # scan through available bases for all such definitions and insert
+        # a copy into this class's attributes
         for base in bases:
             if isinstance(base, mcs):
                 for k, attr in base.__dict__.items():
@@ -153,48 +265,66 @@ class ElementType( type ):
                         attr.poller = attr.poller.func
                         attrs[k] = attr
 
-        _populate = []
-        pollers = {attrs.get('_populate',None):_populate}
-        args = []
-        for n,attr in attrs.items():
+        # collect list of Data attributes for processing
+        pollers = {}
+        initargs = []
+        for n, attr in attrs.items():
             if isinstance(attr, Data):
                 attr.name = n
                 if attr.initarg:
-                    args.append(attr)
+                    # handler is specified as an argument for manual use
+                    initargs.append(attr)
+
+                # collect list of pollers, and attributes set to use them
                 if attr.poller:
-                    if attr.poller not in pollers:
-                        pollers[attr.poller] = []
-                    pollers[attr.poller].append(attr)
+                    pn = attr.poller.__name__
                 else:
-                    _populate.append(attr)
+                    # use a dummy poller if none is specified
+                    pn = '_populate'
+                if pn not in pollers:
+                    pollers[pn] = []
+                pollers[pn].append(attr)
+
+#        if len(initargs) and not hasattr(attrs, '_populate'):
+#            raise SyntaxError('Initial args cannot be defined without a '+\
+#                              '{0}._populate() method'.format(name))
+
+        # wrap all collected pollers
         for poller, atrs in pollers.items():
+            # build lookup map for translation between key names
             lookup = dict([(a.field, a.name) for a in atrs])
-            poller = Poller(poller, lookup)
+            # wrap poller, and insert back in attribute database
+            poller = Poller(attrs.get(poller, None), lookup)
             attrs[poller.__name__] = poller
+            # apply wrapped poller back into linked attributes
             for a in atrs:
                 a.poller = poller
 
-        cls = type.__new__(mcs, name, bases, attrs)
-        cls._InitArgs = tuple([a.name for a in sorted(args, key=lambda x: x.initarg)])
-        return cls
+        # build sorted list of arguments used for intialization
+        attrs['_InitArgs'] = tuple([a.name for a in \
+                                sorted(initargs, key=lambda x: x.initarg)])
+        return type.__new__(mcs, name, bases, attrs)
 
     def __call__(cls, *args, **kwargs):
         obj = cls.__new__(cls)
         obj._data = {}
         if 'raw' in kwargs:
+            # if 'raw' keyword is supplied, create populate object manually
             if len(args) != 0:
                 raise TypeError('__init__() takes exactly 2 arguments (1 given)')
             obj._populate.apply(kwargs['raw'], False)
         else:
+            # if not, the number of input arguments must exactly match that
+            # defined by the Data definitions
             if len(args) != len(cls._InitArgs):
                 raise TypeError('__init__() takes exactly {0} arguments ({1} given)'\
                             .format(len(cls._InitArgs)+1), len(args)+1)
             for a,v in zip(cls._InitArgs, args):
                 setattr(obj, a, v)
 
+        obj.__init__()
         return obj
 
 class Element( object ):
     __metaclass__ = ElementType
-#    def __new__(cls, *args, **kwargs):
-        
+

@@ -69,7 +69,7 @@ class DescriptorID
         // DVB
         network_name                = 0x40, /* implemented */
         service_list                = 0x41, /* implemented */
-        dvb_stuffing                = 0x42,
+        dvb_stuffing                = 0x42, /* implemented */
         satellite_delivery_system   = 0x43, /* implemented */
         cable_delivery_system       = 0x44, /* implemented */
         vbi_data                    = 0x45, /* partial */

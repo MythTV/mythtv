@@ -384,17 +384,6 @@ if ! disabled fftw; then
     fi
 fi
 
-if ! disabled fftw; then
-    disable fftw_lib
-    if has_library libfftw ; then
-        if has_library librfftw ; then
-            if has_header fftw.h ; then
-                enable fftw_lib
-            fi
-        fi
-    fi
-fi
-
 if test "$exif" != "no" ; then
     exif="no"
     if has_library libexif ; then
@@ -783,10 +772,6 @@ if test "$music" = "yes" ; then
         echo "#define FFTW3_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "LIBS += -lfftw3 -lm" >> \
              ./mythmusic/mythmusic/config.pro
-    elif enabled fftw_lib; then
-        echo "        FFTW v.2       support will be included in MythMusic"
-        echo "#define FFTW2_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
-        echo "LIBS += -lrfftw -lfftw" >> ./mythmusic/mythmusic/config.pro
     else
         echo "        FFTW           support will not be included in MythMusic"
     fi

@@ -106,7 +106,7 @@ void CdDecoder::commitMetadata(Metadata *mdata)
 
 bool CdDecoderFactory::supports(const QString &source) const
 {
-    return (source.right(extension().length()).lower() == extension());
+    return (source.right(extension().length()).toLower() == extension());
 }
 
 const QString &CdDecoderFactory::extension() const

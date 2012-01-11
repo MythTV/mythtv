@@ -63,7 +63,7 @@
   if (m_reset_video_surfaces) \
       return arg1;
 
-static const VdpOutputSurfaceRenderBlendState vdpblend =
+static const VdpOutputSurfaceRenderBlendState VDPBlends[3] = {
 {
     VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_SRC_ALPHA,
@@ -72,9 +72,7 @@ static const VdpOutputSurfaceRenderBlendState vdpblend =
     VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
-};
-
-static const VdpOutputSurfaceRenderBlendState pipblend =
+},
 {
     VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ZERO,
@@ -83,7 +81,16 @@ static const VdpOutputSurfaceRenderBlendState pipblend =
     VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ZERO,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
-};
+},
+{
+    VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
+    VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ONE,
+    VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ZERO,
+    VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ONE,
+    VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ZERO,
+    VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
+    VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
+}};
 
 class VDPAUColor
 {
@@ -1307,8 +1314,8 @@ bool MythRenderVDPAU::DownloadYUVFrame(uint id, void *const planes[3],
 
 bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
                                  const QRect *src, const QRect *dst,
-                                 int alpha, int red, int green, int blue,
-                                 bool blend)
+                                 VDPBlendType blend,
+                                 int alpha, int red, int green, int blue)
 {
     uint bitmap = VDP_INVALID_HANDLE;
     VdpOutputSurface surface = VDP_INVALID_HANDLE;
@@ -1357,8 +1364,7 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
     }
 
     VdpColor color;
-    bool nullblend = (red == 0 && green == 0 && blue == 0 && alpha == 0);
-    if (!nullblend)
+    if (!(red == 0 && green == 0 && blue == 0 && alpha == 0))
     {
         color.red   = red   / 255.0f;
         color.green = green / 255.0f;
@@ -1366,14 +1372,11 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
         color.alpha = alpha / 255.0f;
     }
 
-    const VdpOutputSurfaceRenderBlendState *bs =
-        nullblend ? NULL :(blend ? &pipblend : &vdpblend);
-
     INIT_ST
     vdp_st = vdp_output_surface_render_bitmap_surface(
                 surface,
                 dst ? &vdest : NULL, bitmap, src ? &vsrc  : NULL,
-                alpha >= 0 ? &color : NULL, bs,
+                alpha >= 0 ? &color : NULL, &VDPBlends[blend],
                 VDP_OUTPUT_SURFACE_RENDER_ROTATE_0);
     CHECK_ST
     return ok;
@@ -1397,7 +1400,7 @@ bool MythRenderVDPAU::DrawLayer(uint id, uint target)
     vdp_st = vdp_output_surface_render_output_surface(
                 m_outputSurfaces[target].m_id, (m_layers[id].m_layer.destination_rect),
                 m_layers[id].m_layer.source_surface, (m_layers[id].m_layer.source_rect),
-                NULL, &vdpblend, VDP_OUTPUT_SURFACE_RENDER_ROTATE_0);
+                NULL, &VDPBlends[kVDPBlendNormal], VDP_OUTPUT_SURFACE_RENDER_ROTATE_0);
     CHECK_ST
     return ok;
 }

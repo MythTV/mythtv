@@ -506,7 +506,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
 
     if (dummy)
     {
-        m_render->DrawBitmap(0, 0, NULL, NULL, 255, 0, 0, 0);
+        m_render->DrawBitmap(0, 0, NULL, NULL, kVDPBlendNormal, 255);
     }
     else
     {
@@ -1129,7 +1129,8 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
             QRect rect = GetPIPRect(loc, pipplayer);
 
             if (!m_pip_ready)
-                m_render->DrawBitmap(0, m_pip_surface, NULL, NULL, 0, 0, 0, 0);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, NULL,
+                                     kVDPBlendNull);
 
             uint32_t pitches[] = {
                 pipimage->pitches[0],
@@ -1150,7 +1151,7 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
                                        QRect(QPoint(0,0), pipVideoDim),
                                        rect, rect);
             ok &= m_render->DrawBitmap(0, m_pip_surface, NULL, &rect,
-                                       255, 0, 0, 0, true);
+                                       kVDPBlendPiP, 255);
 
             if (pipActive)
             {
@@ -1163,10 +1164,10 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
                                 QSize(rect.width(), 10));
                 QRect r = QRect(QPoint(rect.x() + rect.width(), rect.y() -10),
                                 QSize(10, rect.height() + 20));
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &l, 255, 127);
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &t, 255, 127);
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &b, 255, 127);
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &r, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &l, kVDPBlendNormal, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &t, kVDPBlendNormal, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &b, kVDPBlendNormal, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &r, kVDPBlendNormal, 255, 127);
             }
 
             m_pip_ready = ok;
@@ -1294,4 +1295,11 @@ bool VideoOutputVDPAU::GetScreenShot(int width, int height, QString filename)
     if (m_render)
         return m_render->GetScreenShot(width, height, filename);
     return false;
+}
+
+QStringList VideoOutputVDPAU::GetVisualiserList(void)
+{
+    if (m_render)
+        return VideoVisual::GetVisualiserList(m_render->Type());
+    return VideoOutput::GetVisualiserList();
 }
