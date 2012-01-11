@@ -685,7 +685,7 @@ bool Spectrum::process(VisualNode *node)
     // Take a bunch of data in *node
     // and break it down into spectrum
     // values
-    bool allZero = TRUE;
+    bool allZero = true;
     // Don't do any real processing if libfftw isn't available
 #if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
     uint i;
@@ -783,7 +783,8 @@ bool Spectrum::process(VisualNode *node)
 #else
     node = node;
 #endif
-    return allZero;
+
+    return false;
 }
 
 double Spectrum::clamp(double cur, double max, double min)
@@ -1542,7 +1543,7 @@ void Blank::resize(const QSize &newsize)
 bool Blank::process(VisualNode *node)
 {
     node = node; // Sometimes I hate -Wall
-    return true;
+    return false;
 }
 
 bool Blank::draw(QPainter *p, const QColor &back)
