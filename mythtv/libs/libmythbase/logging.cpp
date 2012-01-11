@@ -524,20 +524,16 @@ void DBLoggerThread::run(void)
     // Wait a bit before we start logging to the DB..  If we wait too long,
     // then short-running tasks (like mythpreviewgen) will not log to the db
     // at all, and that's undesirable.
-    bool ready = false;
-    while ( !aborted && ( !gCoreContext || !ready ) )
+    while (true)
     {
-        ready = m_logger->isDatabaseReady();
+        if ((aborted || (gCoreContext && m_logger->isDatabaseReady())))
+            break;
 
-        // Don't delay if aborted was set while we were checking database ready
-        if (!ready && !aborted && !gCoreContext)
-        {
-            QMutexLocker qLock(&m_queueMutex);
-            m_wait->wait(qLock.mutex(), 100);
-        }
+        QMutexLocker locker(&m_queueMutex);
+        m_wait->wait(locker.mutex(), 100);
     }
 
-    if (ready)
+    if (!aborted)
     {
         // We want the query to be out of scope before the RunEpilog() so
         // shutdown occurs correctly as otherwise the connection appears still
