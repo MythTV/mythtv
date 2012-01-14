@@ -281,13 +281,14 @@ static void startRipper(void)
     Ripper *rip = new Ripper(mainStack, chooseCD());
 
     if (rip->Create())
+    {
         mainStack->AddScreen(rip);
-    else
-        delete rip;
-
-    QObject::connect(rip, SIGNAL(ripFinished()),
+        QObject::connect(rip, SIGNAL(ripFinished()),
                      gMusicData, SLOT(reloadMusic()),
                      Qt::QueuedConnection);
+    }
+    else
+        delete rip;
 #endif
 }
 
@@ -301,13 +302,14 @@ static void startImport(void)
     ImportMusicDialog *import = new ImportMusicDialog(mainStack);
 
     if (import->Create())
+    {
         mainStack->AddScreen(import);
+        QObject::connect(import, SIGNAL(importFinished()),
+                gMusicData, SLOT(reloadMusic()),
+                Qt::QueuedConnection);
+    }
     else
         delete import;
-
-    QObject::connect(import, SIGNAL(importFinished()),
-                     gMusicData, SLOT(reloadMusic()),
-                     Qt::QueuedConnection);
 #endif
 }
 
