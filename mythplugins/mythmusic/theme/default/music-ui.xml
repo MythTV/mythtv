@@ -977,72 +977,72 @@
      <window name="smartplaylisteditor">
 
         <textarea name="title" from="basetextarea">
-            <area>15,5,800,50</area>
+            <area>15,5,600,40</area>
             <font>baselarge</font>
             <value>Smart Playlist Editor</value>
         </textarea>
 
         <textarea name="categorylbl"  from="basetextarea">
-            <area>20,60,170,50</area>
+            <area>20,50,170,50</area>
             <align>right,vcenter</align>
             <value>Category:</value>
         </textarea>
 
         <buttonlist name="categoryselector" from="basewideselector">
-            <position>200,60</position>
+            <position>200,50</position>
         </buttonlist>
 
 
         <button name="categorybutton" from="basesearchbutton">
-            <position>900,65</position>
+            <position>610,55</position>
         </button>
 
         <textarea name="titlelbl"  from="categorylbl">
-            <position>20,110</position>
+            <position>20,100</position>
             <value>Title:</value>
         </textarea>
 
         <textedit name="titleedit" from="basetextedit">
-            <area>200,110,675,50</area>
+            <area>200,100,675,50</area>
         </textedit>
 
         <shape name="tracklist_background" from="basebackground">
-            <area>15,180,1250,320</area>
+            <area>15,160,770,280</area>
             <fill color="#000000" alpha="50" />
         </shape>
  
         <textarea name="matchlbl"  from="categorylbl">
-            <position>20,200</position>
+            <position>20,180</position>
             <value>Match</value>
         </textarea>
 
         <buttonlist name="matchselector" from="baseselector">
-            <position>200,205</position>
+            <position>200,185</position>
         </buttonlist>
 
         <textarea name="match2lbl"  from="categorylbl">
-            <area>330,200,400,50</area>
+            <area>330,180,400,50</area>
             <value>Of The Following Conditions</value>
         </textarea>
 
         <buttonlist name="criterialist" from="basebuttonlist2">
-            <area>200,270,800,210</area>
+            <area>25,240,750,210</area>
             <spacing>0</spacing>
             <layout>vertical</layout>
             <arrange>stack</arrange>
             <showarrow>no</showarrow>
-            <buttonarea>0,0,800,190</buttonarea>
+            <buttonarea>0,0,750,190</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,800,46</area>
+                    <area>0,0,750,40</area>
 
                     <imagetype name="buttonimage">
-                        <area>5,5,36,36</area>
+                        <area>3,3,34,34</area>
                         <filename>mm_nothumb.png</filename>
                     </imagetype>
 
                     <textarea name="buttontext">
-                        <area>50,0,750,46</area>
+                        <area>50,0,700,40</area>
                         <align>left,vcenter</align>
                         <font>basesmall</font>
                     </textarea>
@@ -1050,61 +1050,61 @@
                 </state>
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
-                        <area>0,0,800,46</area>
+                        <area>0,0,750,40</area>
                     </shape>
                     <imagetype name="buttonimage">
-                        <area>5,5,36,36</area>
+                        <area>3,3,34,34</area>
                         <filename>mm_nothumb.png</filename>
                     </imagetype>
                     <textarea name="buttontext">
-                        <area>50,0,750,46</area>
+                        <area>50,0,700,40</area>
                         <align>left,vcenter</align>
                         <font>basesmall</font>
                     </textarea>
                 </state>
                 <state name="selectedinactive" from="active">
                     <shape name="selectbar">
-                        <area>0,0,800,46</area>
+                        <area>0,0,750,40</area>
                     </shape>
                     <imagetype name="buttonimage">
-                        <area>5,5,36,36</area>
+                        <area>3,3,34,34</area>
                         <filename>mm_nothumb.png</filename>
                     </imagetype>
                     <textarea name="buttontext">
-                        <area>50,0,750,46</area>
+                        <area>50,0,700,40</area>
                         <align>left,vcenter</align>
                         <font>basesmall</font>
                     </textarea>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>720,200</position>
+                <position>690,170</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>760,200</position>
+                <position>720,170</position>
             </statetype>
         </buttonlist>
 
         <textarea name="orderbylbl"  from="categorylbl">
-            <position>20,540</position>
+            <position>20,450</position>
             <value>Order By:</value>
         </textarea>
 
         <buttonlist name="orderbyselector" from="basewideselector">
-            <position>200,540</position>
+            <position>200,450</position>
         </buttonlist>
 
         <button name="orderbybutton" from="basesearchbutton">
-            <area>900,545,32,32</area>
+            <area>610,455,32,32</area>
         </button>
 
         <textarea name="matcheslbl"  from="categorylbl">
-            <position>20,590</position>
+            <position>20,500</position>
             <value>Matches:</value>
         </textarea>
 
         <shape name="matchesbackground">
-            <area>200,593,100,40</area>
+            <area>200,503,100,40</area>
             <type>roundbox</type>
             <line color="#000000" alpha="100" width="1" />
             <fill color="#000000" alpha="50" />
@@ -1112,33 +1112,33 @@
         </shape>
 
         <textarea name="matchestext"  from="basetextarea">
-            <area>200,600,100,30</area>
+            <area>200,510,100,30</area>
             <align>allcenter</align>
         </textarea>
 
         <textarea name="limitlbl"  from="categorylbl">
-            <position>310,590</position>
+            <position>310,500</position>
             <value>Limit:</value>
         </textarea>
 
         <spinbox name="limitspin" from="basespinbox">
-            <position>490,595</position>
+            <position>490,505</position>
             <!--<template type="zero">No Limit</template> -->
         </spinbox>
 
         <!-- Push buttons -->
         <button name="cancelbutton" from="basebutton">
-            <position>100,660</position>
+            <position>50,550</position>
             <value>Cancel</value>
         </button>
 
         <button name="showresultsbutton" from="basewidebutton">
-            <position>490,660</position>
+            <position>250,550</position>
             <value>Show Results</value>
         </button>
 
         <button name="savebutton" from="basebutton">
-            <position>1020,660</position>
+            <position>590,550</position>
             <value>Save</value>
         </button>
 
@@ -1160,11 +1160,11 @@
             <value>Edit Criteria</value>
         </textarea>
 
-        <buttonlist name="fieldselector" from="basemediumselector">
+        <buttonlist name="fieldselector" from="basewideselector">
             <position>40,60</position>
         </buttonlist>
 
-        <buttonlist name="operatorselector" from="basemediumselector">
+        <buttonlist name="operatorselector" from="basewideselector">
             <position>40,130</position>
         </buttonlist>
 
@@ -1172,7 +1172,7 @@
             <position>40,200</position>
         </textedit>
 
-        <buttonlist name="value1selector" from="basemediumselector">
+        <buttonlist name="value1selector" from="basewideselector">
             <position>40,203</position>
         </buttonlist>
 
@@ -1194,7 +1194,7 @@
             <position>40,270</position>
         </textedit>
 
-        <buttonlist name="value2selector" from="basemediumselector">
+        <buttonlist name="value2selector" from="basewideselector">
             <position>40,273</position>
         </buttonlist>
 
@@ -1452,49 +1452,49 @@
             </statetype>
         </buttonlist>
 
-        <buttonlist name="fieldselector" from="baseselector">
-            <area>20,230,420,44</area>
+        <buttonlist name="fieldselector" from="basewideselector">
+            <area>30,230,420,44</area>
         </buttonlist>
 
 
         <!-- Push buttons -->
         <button name="addbutton" from="basebutton">
-            <area>20,280,200,44</area>
+            <area>50,280,200,44</area>
             <value>Add</value>
         </button>
 
         <button name="deletebutton" from="addbutton">
-            <position>240,280</position>
+            <position>260,280</position>
             <value>Delete</value>
         </button>
 
         <button name="moveupbutton" from="addbutton">
-            <position>20,330</position>
+            <position>50,330</position>
             <value>Move Up</value>
         </button>
 
         <button name="movedownbutton" from="addbutton">
-            <position>240,330</position>
+            <position>260,330</position>
             <value>Move Down</value>
         </button>
 
         <button name="ascendingbutton" from="addbutton">
-            <position>20,380</position>
+            <position>50,380</position>
             <value>Ascending</value>
         </button>
 
         <button name="descendingbutton" from="addbutton">
-            <position>240,380</position>
+            <position>260,380</position>
             <value>Descending</value>
         </button>
 
         <button name="cancelbutton" from="addbutton">
-            <position>20,430</position>
+            <position>50,430</position>
             <value>Cancel</value>
         </button>
 
         <button name="okbutton" from="addbutton">
-            <position>240,430</position>
+            <position>260,430</position>
             <value>Save</value>
         </button>
 
@@ -1503,72 +1503,72 @@
    <!-- shows some information for the currently selected or playing track -->
     <window name="smartplresultviewer">
         <textarea name="title" from="basetextarea">
-            <area>15,5,800,50</area>
+            <area>15,5,600,50</area>
             <font>baselarge</font>
             <value>Smart Playlist Result Viewer</value>
         </textarea>
 
          <!-- optional - shows current position in the list eg '1 of 123' -->
         <textarea name="position" from="basetextarea">
-            <area>1050,15,200,40</area>
+            <area>580,15,200,40</area>
             <align>right,vcenter</align>
             <font>basemedium</font>
         </textarea>
 
         <shape name="tracklist_background" from="basebackground">
-            <area>15,50,1250,655</area>
+            <area>15,50,770,535</area>
             <fill color="#000000" alpha="50" />
         </shape>
 
         <buttonlist name="tracklist" from="basebuttonlist2">
-            <area>30,60,1220,650</area>
+            <area>30,60,740,500</area>
             <spacing>2</spacing>
             <layout>vertical</layout>
             <arrange>stack</arrange>
             <showarrow>no</showarrow>
-            <buttonarea>0,0,1220,650</buttonarea>
+            <buttonarea>0,0,740,530</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,100%,46</area>
+                    <area>0,0,100%,40</area>
 
                     <imagetype name="buttonimage">
-                        <area>5,5,36,36</area>
+                        <area>3,3,34,34</area>
                         <filename>mm_nothumb.png</filename>
                     </imagetype>
 
                     <textarea name="title">
-                        <area>50,0,1040,46</area>
+                        <area>50,0,600,40</area>
                         <align>left,vcenter</align>
                         <font>basesmall</font>
                         <template>%TITLE% by %ARTIST% on %ALBUM%</template>
                     </textarea>
 
                     <textarea name="length">
-                        <area>1110,0,100,46</area>
+                        <area>630,0,100,40</area>
                         <align>right,vcenter</align>
                         <font>basesmall</font>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
                     <imagetype name="buttonimage">
-                        <area>5,5,36,36</area>
+                        <area>3,3,34,34</area>
                         <filename>mm_nothumb.png</filename>
                     </imagetype>
                     <shape name="selectbar">
-                        <area>0,0,1220,46</area>
+                        <area>0,0,740,40</area>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active">
                     <shape name="selectbar">
-                        <area>0,0,1220,46</area>
+                        <area>0,0,740,40</area>
                     </shape>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>1160,620</position>
+                <position>680,500</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>1190,620</position>
+                <position>710,500</position>
             </statetype>
         </buttonlist>
 
