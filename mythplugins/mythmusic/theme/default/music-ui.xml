@@ -230,17 +230,17 @@
     <window name="visualizerview">
 
         <video name="visualizer">
-            <area>0,0,1280,720,</area>
+            <area>0,0,800,600,</area>
         </video>
 
     </window>
 
     <!-- used in the visualiser screen to show some track details after a track change -->
     <window name="trackinfo_popup">
-        <area>-1,500,1000,190</area>
+        <area>-1,380,750,190</area>
 
         <shape name="background" from="basebackground">
-            <area>0,0,1000,190</area>
+            <area>0,0,750,190</area>
             <type>roundbox</type>
             <fill color="#303030" alpha="100" />
             <line color="#FFFFFF" alpha="50" width="2" />
@@ -253,17 +253,17 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>180,15,415,34</area>
+            <area>180,15,550,34</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="artist" from="basetextarea">
-            <area>180,50,415,35</area>
+            <area>180,50,550,35</area>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="album" from="basetextarea">
-            <area>180,80,415,35</area>
+            <area>180,80,550,35</area>
             <font>basemedium</font>
         </textarea>
 
@@ -277,7 +277,7 @@
         </textarea>
 -->
         <textarea name="nexttitle" from="basetextarea">
-            <area>180,145,800,25</area>
+            <area>180,145,550,25</area>
             <template>Next: %NEXTTITLE% by %NEXTARTIST%</template>
         </textarea>
 
