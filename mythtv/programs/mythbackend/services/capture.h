@@ -90,7 +90,9 @@ class Capture : public CaptureServices
                                                          const QString &DisplayName,
                                                          bool          DishnetEIT,
                                                          const uint RecPriority,
-                                                         const uint Quicktune);
+                                                         const uint Quicktune,
+                                                         const uint SchedOrder,
+                                                         const uint LiveTVOrder);
 
         bool                        UpdateCardInput    ( int              CardInputId,
                                                          const QString    &Setting,

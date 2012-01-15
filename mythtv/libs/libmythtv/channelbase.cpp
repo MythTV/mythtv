@@ -592,7 +592,7 @@ vector<InputInfo> ChannelBase::GetFreeInputs(
             info.inputid, groupids, excluded_cardids,
             busygrp, busyrec, busyin, info.mplexid);
 
-        if (!is_busy_grp)
+        if (!is_busy_grp && info.livetvorder)
             new_list.push_back(info);
     }
 
@@ -921,7 +921,7 @@ bool ChannelBase::InitializeInputs(void)
         "SELECT cardinputid, "
         "       inputname,   startchan, "
         "       tunechan,    externalcommand, "
-        "       sourceid "
+        "       sourceid,    livetvorder "
         "FROM cardinput "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
@@ -953,8 +953,8 @@ bool ChannelBase::InitializeInputs(void)
             query.value(1).toString(), query.value(2).toString(),
             query.value(3).toString(), query.value(4).toString(),
             sourceid,                  cardid,
-            query.value(0).toUInt(),   0,
-            channels);
+            query.value(0).toUInt(),   query.value(5).toUInt(),
+            0,                         channels);
 
         if (!IsExternalChannelChangeSupported() &&
             !m_inputs[query.value(0).toUInt()]->externalChanger.isEmpty())

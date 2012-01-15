@@ -778,7 +778,8 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
         query.prepare(
             "SELECT sourceid,        inputname,       externalcommand, "
             "       tunechan,        startchan,       displayname,     "
-            "       dishnet_eit,     recpriority,     quicktune        "
+            "       dishnet_eit,     recpriority,     quicktune,       "
+            "       schedorder,      livetvorder                       "
             "FROM cardinput "
             "WHERE cardinputid = :INPUTID");
         query.bindValue(":INPUTID", src_inputs[i]);
@@ -821,10 +822,12 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    displayname     = :V5, "
                 "    dishnet_eit     = :V6, "
                 "    recpriority     = :V7, "
-                "    quicktune       = :V8 "
+                "    quicktune       = :V8, "
+                "    schedorder      = :V9, "
+                "    livetvorder     = :V10 "
                 "WHERE cardinputid = :INPUTID");
 
-            for (uint j = 0; j < 9; j++)
+            for (uint j = 0; j < 11; j++)
             {
                 query2.bindValue(QString(":V%1").arg(j),
                                  query.value(j).toString());
@@ -1169,7 +1172,7 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT inputname, sourceid, cardid "
+    query.prepare("SELECT inputname, sourceid, cardid, livetvorder "
                   "FROM cardinput "
                   "WHERE cardinputid = :INPUTID");
     query.bindValue(":INPUTID", input.inputid);
@@ -1186,6 +1189,7 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
     input.name     = query.value(0).toString();
     input.sourceid = query.value(1).toUInt();
     input.cardid   = query.value(2).toUInt();
+    input.livetvorder = query.value(3).toUInt();
 
     if (groupids)
         *groupids = GetInputGroups(input.inputid);
@@ -1195,14 +1199,14 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
 
 uint CardUtil::GetCardID(uint inputid)
 {
-    InputInfo info(QString::null, 0, inputid, 0, 0);
+    InputInfo info(QString::null, 0, inputid, 0, 0, 0);
     GetInputInfo(info);
     return info.cardid;
 }
 
 QString CardUtil::GetInputName(uint inputid)
 {
-    InputInfo info(QString::null, 0, inputid, 0, 0);
+    InputInfo info(QString::null, 0, inputid, 0, 0, 0);
     GetInputInfo(info);
     return info.name;
 }
@@ -1327,7 +1331,9 @@ int CardUtil::CreateCardInput(const uint cardid,
                               const QString &displayname,
                               bool          dishnet_eit,
                               const uint recpriority,
-                              const uint quicktune)
+                              const uint quicktune,
+                              const uint schedorder,
+                              const uint livetvorder)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1335,10 +1341,10 @@ int CardUtil::CreateCardInput(const uint cardid,
         "INSERT INTO cardinput "
         "(cardid, sourceid, inputname, externalcommand, changer_device, "
         "changer_model, tunechan, startchan, displayname, dishnet_eit, "
-        "recpriority, quicktune) "
+        "recpriority, quicktune, schedorder, livetvorder) "
         "VALUES (:CARDID, :SOURCEID, :INPUTNAME, :EXTERNALCOMMAND, "
         ":CHANGERDEVICE, :CHANGERMODEL, :TUNECHAN, :STARTCHAN, :DISPLAYNAME, "
-        ":DISHNETEIT, :RECPRIORITY, :QUICKTUNE ) ");
+        ":DISHNETEIT, :RECPRIORITY, :QUICKTUNE, :SCHEDORDER, :LIVETVORDER ) ");
 
     query.bindValue(":CARDID", cardid);
     query.bindValue(":SOURCEID", sourceid);
@@ -1352,6 +1358,8 @@ int CardUtil::CreateCardInput(const uint cardid,
     query.bindValue(":DISHNETEIT", dishnet_eit);
     query.bindValue(":RECPRIORITY", recpriority);
     query.bindValue(":QUICKTUNE", quicktune);
+    query.bindValue(":SCHEDORDER", schedorder);
+    query.bindValue(":LIVETVORDER", livetvorder);
 
     if (!query.exec())
     {

@@ -339,6 +339,9 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
             return a->GetRecordingStartTime() < b->GetRecordingStartTime();
     }
 
+    if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
+        return a->GetRecordingPriority2() < b->GetRecordingPriority2();
+
     if (a->GetInputID() != b->GetInputID())
         return a->GetInputID() < b->GetInputID();
 
@@ -1417,6 +1420,7 @@ void Scheduler::PruneRedundants(void)
             !lastp->IsSameTimeslot(*p))
         {
             lastp = p;
+            lastp->SetRecordingPriority2(0);
             ++i;
         }
         else
@@ -3769,7 +3773,7 @@ void Scheduler::AddNewRecords(void)
         "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//40-42
         "    capturecard.hostname, recordmatch.oldrecstatus, "
         "                                           RECTABLE.avg_delay, "//43-45
-        "    oldrecstatus.future, "                                      //46
+        "    oldrecstatus.future, cardinput.schedorder, "                //46-47
         + pwrpri + QString(
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
@@ -3874,6 +3878,7 @@ void Scheduler::AddNewRecords(void)
             result.value(39).toUInt(),//videoproperties
             result.value(41).toUInt(),//audioproperties
             result.value(46).toInt());//future
+        p->SetRecordingPriority2(result.value(47).toInt()); // schedorder
 
         if (!p->future && !p->IsReactivated() &&
             p->oldrecstatus != rsAborted &&
@@ -3890,7 +3895,7 @@ void Scheduler::AddNewRecords(void)
 
         p->SetRecordingPriority(
             p->GetRecordingPriority() + recTypeRecPriorityMap[p->GetRecordingRuleType()] +
-            result.value(47).toInt() +
+            result.value(48).toInt() +
             ((autopriority) ?
              autopriority - (result.value(45).toInt() * autostrata / 200) : 0));
 
@@ -3920,7 +3925,8 @@ void Scheduler::AddNewRecords(void)
 
         RecStatusType newrecstatus = p->GetRecordingStatus();
         // Check for rsOffLine
-        if ((doRun || specsched) && !cardMap.contains(p->GetCardID()))
+        if ((doRun || specsched) && 
+            (!cardMap.contains(p->GetCardID()) || !p->GetRecordingPriority2()))
             newrecstatus = rsOffLine;
 
         // Check for rsTooManyRecordings

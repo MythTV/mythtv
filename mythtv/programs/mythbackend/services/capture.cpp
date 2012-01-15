@@ -283,7 +283,9 @@ int Capture::AddCardInput       ( const uint nCardId,
                                   const QString &sDisplayName,
                                   bool          bDishnetEIT,
                                   const uint nRecPriority,
-                                  const uint nQuicktune)
+                                  const uint nQuicktune,
+                                  const uint nSchedOrder,
+                                  const uint nLiveTVOrder)
 {
     if ( nCardId < 1 || nSourceId < 1 || sInputName.isEmpty() )
         throw( QString( "This API requires at least a card ID, a source ID, "
@@ -292,7 +294,8 @@ int Capture::AddCardInput       ( const uint nCardId,
     int nResult = CardUtil::CreateCardInput(nCardId, nSourceId, sInputName,
                       sExternalCommand, sChangerDevice, sChangerModel,
                       sHostName, sTuneChan, sStartChan, sDisplayName,
-                      bDishnetEIT, nRecPriority, nQuicktune);
+                      bDishnetEIT, nRecPriority, nQuicktune, nSchedOrder, 
+                      nLiveTVOrder);
 
     return nResult;
 }

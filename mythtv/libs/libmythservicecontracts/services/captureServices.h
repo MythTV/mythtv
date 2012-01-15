@@ -51,7 +51,7 @@
 class SERVICE_PUBLIC CaptureServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.2" );
+    Q_CLASSINFO( "version"    , "1.3" );
     Q_CLASSINFO( "RemoveCaptureCard_Method",                 "POST" )
     Q_CLASSINFO( "AddCaptureCard_Method",                    "POST" )
     Q_CLASSINFO( "UpdateCaptureCard_Method",                 "POST" )
@@ -125,7 +125,9 @@ class SERVICE_PUBLIC CaptureServices : public Service
                                                                  const QString &DisplayName,
                                                                  bool          DishnetEIT,
                                                                  const uint RecPriority,
-                                                                 const uint Quicktune) = 0;
+                                                                 const uint Quicktune,
+                                                                 const uint SchedOrder,
+                                                                 const uint LiveTVOrder) = 0;
 
         virtual bool                        UpdateCardInput    ( int              CardInputId,
                                                                  const QString    &Setting,

@@ -2855,6 +2855,42 @@ class InputPriority : public SpinBoxSetting, public CardInputDBStorage
     };
 };
 
+class ScheduleOrder : public SpinBoxSetting, public CardInputDBStorage
+{
+  public:
+    ScheduleOrder(const CardInput &parent, int _value) :
+        SpinBoxSetting(this, 0, 99, 1),
+        CardInputDBStorage(this, parent, "schedorder")
+    {
+        setLabel(QObject::tr("Schedule order"));
+        setValue(_value);
+        setHelpText(QObject::tr("If priorities and other factors are equal "
+                                "the scheduler will choose the available "
+                                "input with the lowest, non-zero value.  "
+                                "Setting this value to zero will make the "
+                                "input unavailable to the scheduler."));
+    };
+};
+
+class LiveTVOrder : public SpinBoxSetting, public CardInputDBStorage
+{
+  public:
+    LiveTVOrder(const CardInput &parent, int _value) :
+        SpinBoxSetting(this, 0, 99, 1),
+        CardInputDBStorage(this, parent, "livetvorder")
+    {
+        setLabel(QObject::tr("Live TV order"));
+        setValue(_value);
+        setHelpText(QObject::tr("When entering Live TV, the available, local "
+                                "input with the lowest, non-zero value will "
+                                "be used.  If no local inputs are available, "
+                                "the available, remote input with the lowest, "
+                                "non-zero value will be used.  "
+                                "Setting this value to zero will make the "
+                                "input unavailable to live TV."));
+    };
+};
+
 class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
 {
   public:
@@ -2943,6 +2979,8 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
 
     interact->setLabel(QObject::tr("Interactions between inputs"));
     interact->addChild(new InputPriority(*this));
+    interact->addChild(new ScheduleOrder(*this, _cardid));
+    interact->addChild(new LiveTVOrder(*this, _cardid));
 
     TransButtonSetting *ingrpbtn = new TransButtonSetting("newgroup");
     ingrpbtn->setLabel(QObject::tr("Create a New Input Group"));

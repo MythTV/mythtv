@@ -6082,6 +6082,28 @@ NULL
             return false;
     }
 
+    if (dbver == "1292")
+    {
+        const char *updates[] = {
+"ALTER TABLE cardinput "
+"  ADD COLUMN schedorder INT(10) UNSIGNED NOT NULL DEFAULT '0', "
+"  ADD COLUMN livetvorder INT(10) UNSIGNED NOT NULL DEFAULT '0';",
+"UPDATE cardinput SET schedorder = cardinputid;",
+"UPDATE cardinput SET livetvorder = cardid;",
+NULL
+};
+
+        if (gCoreContext->GetNumSetting("LastFreeCard", 0))
+        {
+            updates[2] = 
+                "UPDATE cardinput SET livetvorder = "
+                "  (SELECT MAX(cardid) FROM capturecard) - cardid + 1;";
+        }
+
+        if (!performActualUpdate(updates, "1293", dbver))
+            return false;
+    }
+
     return true;
 }
 

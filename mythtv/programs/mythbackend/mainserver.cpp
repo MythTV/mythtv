@@ -3494,47 +3494,44 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 
     EncoderLink *encoder = NULL;
     QString enchost;
-
-    bool lastcard = false;
-
-    if (gCoreContext->GetSetting("LastFreeCard", "0") == "1")
-        lastcard = true;
+    QString besthost;
+    uint bestorder = 0;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
 
-        if (!lastcard)
-        {
-            if (elink->IsLocal())
-                enchost = gCoreContext->GetHostName();
-            else
-                enchost = elink->GetHostName();
+        if (elink->IsLocal())
+            enchost = gCoreContext->GetHostName();
+        else
+            enchost = elink->GetHostName();
 
-            if (enchost == pbshost && elink->IsConnected() &&
-                !elink->IsTunerLocked() &&
-                !elink->GetFreeInputs(excluded_cardids).empty())
-            {
-                encoder = elink;
-                retval = iter.key();
-                LOG(VB_RECORD, LOG_INFO, QString("Card %1 is local.")
-                        .arg(iter.key()));
-                break;
-            }
-        }
-
-        if ((retval == -1 || lastcard) && elink->IsConnected() &&
-            !elink->IsTunerLocked() &&
-            !elink->GetFreeInputs(excluded_cardids).empty())
-        {
-            encoder = elink;
-            retval = iter.key();
-        }
         LOG(VB_RECORD, LOG_INFO, 
             QString("Checking card %1. Best card so far %2")
-                .arg(iter.key()).arg(retval));
+            .arg(iter.key()).arg(retval));
+
+        if (!elink->IsConnected() || elink->IsTunerLocked() ||
+            (besthost == pbshost && enchost != pbshost))
+            continue;
+
+        vector<InputInfo> inputs = elink->GetFreeInputs(excluded_cardids);
+
+        for (uint i = 0; i < inputs.size(); ++i)
+        {
+            if (!encoder || inputs[i].livetvorder < bestorder || 
+                (besthost != pbshost && enchost == pbshost))
+            {
+                retval = iter.key();
+                encoder = elink;
+                bestorder = inputs[i].livetvorder;
+                besthost = enchost;
+            }
+        }
     }
+
+    LOG(VB_RECORD, LOG_INFO, 
+        QString("Best card is %1").arg(retval));
 
     strlist << QString::number(retval);
 

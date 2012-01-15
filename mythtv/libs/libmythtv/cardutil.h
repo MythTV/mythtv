@@ -275,7 +275,9 @@ class MTV_PUBLIC CardUtil
                                          const QString &displayname,
                                          bool  dishnet_eit,
                                          const uint recpriority,
-                                         const uint quicktune);
+                                         const uint quicktune,
+                                         const uint schedorder,
+                                         const uint livetvorder);
 
     static bool         DeleteInput(uint inputid);
 
