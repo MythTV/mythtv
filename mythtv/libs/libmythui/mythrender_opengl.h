@@ -33,6 +33,8 @@
 #include "mythrender_base.h"
 #include "mythrender_opengl_defs.h"
 
+#include "mythuianimation.h"
+
 typedef enum
 {
     kGLFeatNone    = 0x0000,
@@ -122,6 +124,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     void  MoveResizeWindow(const QRect &rect);
     void  SetViewPort(const QRect &rect, bool viewportonly = false);
     QRect GetViewPort(void) { return m_viewport; }
+    virtual void  PushTransformation(const UIEffects &fx, QPointF &center) = 0;
+    virtual void  PopTransformation(void) = 0;
     void  Flush(bool use_fence);
     void  SetBlend(bool enable);
     virtual void SetColor(int r, int g, int b, int a) { }

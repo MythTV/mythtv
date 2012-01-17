@@ -34,6 +34,9 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
                                const QBrush &fillBrush, const QPen &linePen,
                                int alpha);
 
+    virtual void PushTransformation(const UIEffects &fx, QPointF center = QPointF());
+    virtual void PopTransformation(void);
+
   protected:
     virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }
     virtual void DeleteFormatImagePriv(MythImage *im);

@@ -3,6 +3,67 @@
 
 #define LOC QString("OpenGL2: ")
 
+class GLMatrix
+{
+  public:
+    GLMatrix()
+    {
+        setToIdentity();
+    }
+
+    void setToIdentity(void)
+    {
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                m[i][j] = (i == j) ? 1.0f : 0.0f;
+    }
+
+    void rotate(int degrees)
+    {
+        float rotation = degrees * (M_PI / 180.0);
+        GLMatrix rotate;
+        rotate.m[0][0] = rotate.m[1][1] = cos(rotation);
+        rotate.m[0][1] = sin(rotation);
+        rotate.m[1][0] = -rotate.m[0][1];
+        this->operator *=(rotate);
+    }
+
+    void scale(float horizontal, float vertical)
+    {
+        GLMatrix scale;
+        scale.m[0][0] = horizontal;
+        scale.m[1][1] = vertical;
+        this->operator *=(scale);
+    }
+
+    void translate(float x, float y)
+    {
+        GLMatrix translate;
+        translate.m[3][0] = x;
+        translate.m[3][1] = y;
+        this->operator *=(translate);
+    }
+
+    GLMatrix & operator*=(const GLMatrix &r)
+    {
+        for (int i = 0; i < 4; i++)
+            product(i, r);
+        return *this;
+    }
+
+    void product(int row, const GLMatrix &r)
+    {
+        float t0, t1, t2, t3;
+        t0 = m[row][0] * r.m[0][0] + m[row][1] * r.m[1][0] + m[row][2] * r.m[2][0] + m[row][3] * r.m[3][0];
+        t1 = m[row][0] * r.m[0][1] + m[row][1] * r.m[1][1] + m[row][2] * r.m[2][1] + m[row][3] * r.m[3][1];
+        t2 = m[row][0] * r.m[0][2] + m[row][1] * r.m[1][2] + m[row][2] * r.m[2][2] + m[row][3] * r.m[3][2];
+        t3 = m[row][0] * r.m[0][3] + m[row][1] * r.m[1][3] + m[row][2] * r.m[2][3] + m[row][3] * r.m[3][3];
+        m[row][0] = t0; m[row][1] = t1; m[row][2] = t2; m[row][3] = t3;
+    }
+
+    float m[4][4];
+};
+
 #define VERTEX_INDEX  0
 #define COLOR_INDEX   1
 #define TEXTURE_INDEX 2
@@ -21,8 +82,9 @@ static const QString kDefaultVertexShader =
 "varying   vec4 v_color;\n"
 "varying   vec2 v_texcoord0;\n"
 "uniform   mat4 u_projection;\n"
+"uniform   mat4 u_transform;\n"
 "void main() {\n"
-"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
+"    gl_Position = u_projection * u_transform * vec4(a_position, 0.0, 1.0);\n"
 "    v_texcoord0 = a_texcoord0;\n"
 "    v_color     = a_color;\n"
 "}\n";
@@ -43,8 +105,9 @@ static const QString kSimpleVertexShader =
 "attribute vec4 a_color;\n"
 "varying   vec4 v_color;\n"
 "uniform   mat4 u_projection;\n"
+"uniform   mat4 u_transform;\n"
 "void main() {\n"
-"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
+"    gl_Position = u_projection * u_transform * vec4(a_position, 0.0, 1.0);\n"
 "    v_color     = a_color;\n"
 "}\n";
 
@@ -63,8 +126,9 @@ static const QString kDrawVertexShader =
 "varying   vec4 v_color;\n"
 "varying   vec2 v_position;\n"
 "uniform   mat4 u_projection;\n"
+"uniform   mat4 u_transform;\n"
 "void main() {\n"
-"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
+"    gl_Position = u_projection * u_transform * vec4(a_position, 0.0, 1.0);\n"
 "    v_color     = a_color;\n"
 "    v_position  = a_position;\n"
 "}\n";
@@ -167,11 +231,11 @@ void MythRenderOpenGL2::ResetVars(void)
 {
     MythRenderOpenGL::ResetVars();
     memset(m_projection, 0, sizeof(m_projection));
-    memset(m_scale, 0, sizeof(m_scale));
-    memset(m_rotate, 0, sizeof(m_rotate));
     memset(m_parameters, 0, sizeof(m_parameters));
     memset(m_shaders, 0, sizeof(m_shaders));
     m_active_obj = 0;
+    m_transforms.clear();
+    m_transforms.push(GLMatrix());
 }
 
 void MythRenderOpenGL2::ResetProcs(void)
@@ -402,6 +466,7 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint tex, const QRect *src,
 
     EnableShaderObject(prog);
     SetShaderParams(prog, &m_projection[0][0], "u_projection");
+    SetShaderParams(prog, &m_transforms.top().m[0][0], "u_transform");
     SetBlend(true);
 
     EnableTextures(tex);
@@ -448,6 +513,7 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint *textures, uint texture_count,
 
     EnableShaderObject(prog);
     SetShaderParams(prog, &m_projection[0][0], "u_projection");
+    SetShaderParams(prog, &m_transforms.top().m[0][0], "u_transform");
     SetBlend(false);
 
     EnableTextures(first);
@@ -541,6 +607,7 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         // Enable the Circle shader
         SetShaderParams(elip, &m_projection[0][0], "u_projection");
+        SetShaderParams(elip, &m_transforms.top().m[0][0], "u_transform");
 
         // Draw the top left segment
         m_parameters[0][0] = tl.left() + rad;
@@ -589,6 +656,7 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         EnableShaderObject(fill);
         SetShaderParams(fill, &m_projection[0][0], "u_projection");
+        SetShaderParams(fill, &m_transforms.top().m[0][0], "u_transform");
 
         GetCachedVBO(GL_TRIANGLE_STRIP, main);
         m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
@@ -628,6 +696,7 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         // Enable the edge shader
         SetShaderParams(edge, &m_projection[0][0], "u_projection");
+        SetShaderParams(edge, &m_transforms.top().m[0][0], "u_transform");
 
         // Draw the top left edge segment
         m_parameters[0][0] = tl.left() + rad;
@@ -671,6 +740,8 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         // Vertical lines
         SetShaderParams(vline, &m_projection[0][0], "u_projection");
+        SetShaderParams(vline, &m_transforms.top().m[0][0], "u_transform");
+
         m_parameters[0][1] = lineWidth / 2.0;
         QRect vl(r.left(), r.top() + rad,
                  lineWidth, r.height() - dia);
@@ -696,6 +767,7 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         // Horizontal lines
         SetShaderParams(hline, &m_projection[0][0], "u_projection");
+        SetShaderParams(hline, &m_transforms.top().m[0][0], "u_transform");
         QRect hl(r.left() + rad, r.top(),
                  r.width() - dia, lineWidth);
 
@@ -861,20 +933,22 @@ void MythRenderOpenGL2::SetMatrixView(void)
     m_projection[3][3] = 1.0;
 }
 
-void MythRenderOpenGL2::SetRotation(int degrees)
+void MythRenderOpenGL2::PushTransformation(const UIEffects &fx, QPointF &center)
 {
-    float rotation = degrees * (M_PI / 180.0);
-    m_rotate[0][0] = m_rotate[1][1] = cos(rotation);
-    m_rotate[1][0] = sin(rotation);
-    m_rotate[0][1] = -m_rotate[1][0];
-    m_rotate[2][2] = m_rotate[3][3] = 1.0;
+    GLMatrix newtop = m_transforms.top();
+    if (fx.hzoom != 1.0 || fx.vzoom != 1.0 || fx.angle != 0.0)
+    {
+        newtop.translate(-center.x(), -center.y());
+        newtop.scale(fx.hzoom, fx.vzoom);
+        newtop.rotate(fx.angle);
+        newtop.translate(center.x(), center.y());
+    }
+    m_transforms.push(newtop);
 }
 
-void MythRenderOpenGL2::SetScaling(int horizontal, int vertical)
+void MythRenderOpenGL2::PopTransformation(void)
 {
-    m_scale[0][0] = horizontal / 100.0;
-    m_scale[1][1] = vertical   / 100.0;
-    m_scale[2][2] = m_scale[3][3] = 1.0;
+    m_transforms.pop();
 }
 
 void MythRenderOpenGL2::DeleteShaders(void)

@@ -19,6 +19,10 @@ class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
 
     virtual uint CreateHelperTexture(void);
 
+    virtual void  PushTransformation(const UIEffects &fx, QPointF &center);
+    virtual void  PopTransformation(void);
+
+
   protected:
     virtual ~MythRenderOpenGL1();
     virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,

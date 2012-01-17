@@ -41,7 +41,6 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_Area = MythRect(0, 0, 0, 0);
     m_MinArea = MythRect(0, 0, 0, 0);
     m_NeedsRedraw = false;
-    m_Alpha = 255;
     m_AlphaChangeMode = m_AlphaChange = m_AlphaMin = 0;
     m_AlphaMax = 255;
     m_Moving = false;
@@ -71,6 +70,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
 MythUIType::~MythUIType()
 {
     delete m_Fonts;
+    qDeleteAll(m_animations);
 }
 
 /**
@@ -272,6 +272,16 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
     return NULL;
 }
 
+void MythUIType::ActivateAnimations(MythUIAnimation::Trigger trigger)
+{
+    foreach (MythUIAnimation* animation, m_animations)
+        if (animation->GetTrigger() == trigger)
+            animation->Activate();
+
+    foreach (MythUIType* uiType, m_ChildrenList)
+        uiType->ActivateAnimations(trigger);
+}
+
 bool MythUIType::NeedsRedraw(void) const
 {
     return m_NeedsRedraw;
@@ -402,16 +412,16 @@ void MythUIType::HandleAlphaPulse(void)
     if (m_AlphaChangeMode == 0)
         return;
 
-    m_Alpha += m_AlphaChange;
+    m_Effects.alpha += m_AlphaChange;
 
-    if (m_Alpha > m_AlphaMax)
-        m_Alpha = m_AlphaMax;
+    if (m_Effects.alpha > m_AlphaMax)
+        m_Effects.alpha = m_AlphaMax;
 
-    if (m_Alpha < m_AlphaMin)
-        m_Alpha = m_AlphaMin;
+    if (m_Effects.alpha < m_AlphaMin)
+        m_Effects.alpha = m_AlphaMin;
 
     // Reached limits so change direction
-    if (m_Alpha == m_AlphaMax || m_Alpha == m_AlphaMin)
+    if (m_Effects.alpha == m_AlphaMax || m_Effects.alpha == m_AlphaMin)
     {
         if (m_AlphaChangeMode == 2)
         {
@@ -441,6 +451,10 @@ void MythUIType::Pulse(void)
     HandleMovementPulse();
     HandleAlphaPulse();
 
+    QList<MythUIAnimation*>::Iterator i;
+    for (i = m_animations.begin(); i != m_animations.end(); ++i)
+        (*i)->IncrementCurrentTime();
+
     QList<MythUIType *>::Iterator it;
 
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
@@ -449,7 +463,7 @@ void MythUIType::Pulse(void)
 
 int MythUIType::CalcAlpha(int alphamod)
 {
-    return (int)(m_Alpha * (alphamod / 255.0));
+    return (int)(m_Effects.alpha * (alphamod / 255.0));
 }
 
 void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
@@ -469,6 +483,8 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
 
     if (!realArea.intersects(clipRect))
         return;
+
+    p->PushTransformation(m_Effects, m_Effects.GetCentre(m_Area, xoffset, yoffset));
 
     DrawSelf(p, xoffset, yoffset, alphaMod, clipRect);
 
@@ -494,6 +510,8 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
             p->DrawText(realArea, objectName(), 0, font, 255, realArea);
         }
     }
+
+    p->PopTransformation();
 }
 
 void MythUIType::SetPosition(int x, int y)
@@ -894,25 +912,54 @@ void MythUIType::AdjustAlpha(int mode, int alphachange, int minalpha,
     m_AlphaMin = minalpha;
     m_AlphaMax = maxalpha;
 
-    if (m_Alpha > m_AlphaMax)
-        m_Alpha = m_AlphaMax;
+    if (m_Effects.alpha > m_AlphaMax)
+        m_Effects.alpha = m_AlphaMax;
 
-    if (m_Alpha < m_AlphaMin)
-        m_Alpha = m_AlphaMin;
+    if (m_Effects.alpha < m_AlphaMin)
+        m_Effects.alpha = m_AlphaMin;
 }
 
 void MythUIType::SetAlpha(int newalpha)
 {
-    if (m_Alpha == newalpha)
+    if (m_Effects.alpha == newalpha)
         return;
 
-    m_Alpha = newalpha;
+    m_Effects.alpha = newalpha;
     SetRedraw();
 }
 
 int MythUIType::GetAlpha(void) const
 {
-    return m_Alpha;
+    return m_Effects.alpha;
+}
+
+void MythUIType::SetCentre(UIEffects::Centre centre)
+{
+    m_Effects.centre = centre;
+}
+
+void MythUIType::SetZoom(float zoom)
+{
+    SetHorizontalZoom(zoom);
+    SetVerticalZoom(zoom);
+}
+
+void MythUIType::SetHorizontalZoom(float zoom)
+{
+    m_Effects.hzoom = zoom;
+    SetRedraw();
+}
+
+void MythUIType::SetVerticalZoom(float zoom)
+{
+    m_Effects.vzoom = zoom;
+    SetRedraw();
+}
+
+void MythUIType::SetAngle(float angle)
+{
+    m_Effects.angle = angle;
+    SetRedraw();
 }
 
 /** \brief Key event handler
@@ -1052,7 +1099,7 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_MinSize = base->m_MinSize;
     m_Vanish = base->m_Vanish;
     m_Vanished = false;
-    m_Alpha = base->m_Alpha;
+    m_Effects = base->m_Effects;
     m_AlphaChangeMode = base->m_AlphaChangeMode;
     m_AlphaChange = base->m_AlphaChange;
     m_AlphaMin = base->m_AlphaMin;
@@ -1062,6 +1109,14 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_XYDestination = base->m_XYDestination;
     m_XYSpeed = base->m_XYSpeed;
     m_deferload = base->m_deferload;
+
+    QList<MythUIAnimation*>::Iterator i;
+    for (i = base->m_animations.begin(); i != base->m_animations.end(); ++i)
+    {
+        MythUIAnimation* animation = new MythUIAnimation(this);
+        animation->CopyFrom(*i);
+        m_animations.push_back(animation);
+    }
 
     QList<MythUIType *>::Iterator it;
 
@@ -1116,17 +1171,17 @@ bool MythUIType::ParseElement(
     }
     else if (element.tagName() == "alpha")
     {
-        m_Alpha = getFirstText(element).toInt();
+        m_Effects.alpha = getFirstText(element).toInt();
         m_AlphaChangeMode = 0;
     }
     else if (element.tagName() == "alphapulse")
     {
         m_AlphaChangeMode = 2;
         m_AlphaMin = element.attribute("min", "0").toInt();
-        m_Alpha = m_AlphaMax = element.attribute("max", "255").toInt();
+        m_Effects.alpha = m_AlphaMax = element.attribute("max", "255").toInt();
 
         if (m_AlphaMax > 255)
-            m_Alpha = m_AlphaMax = 255;
+            m_Effects.alpha = m_AlphaMax = 255;
 
         if (m_AlphaMin < 0)
             m_AlphaMin = 0;
@@ -1145,6 +1200,10 @@ bool MythUIType::ParseElement(
     else if (element.tagName() == "helptext")
     {
         m_helptext = getFirstText(element);
+    }
+    else if (element.tagName() == "animation")
+    {
+        MythUIAnimation::ParseElement(element, this);
     }
     else
         return false;

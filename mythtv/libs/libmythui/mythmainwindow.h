@@ -105,6 +105,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     QRect GetUIScreenRect();
     void  SetUIScreenRect(QRect &rect);
 
+    int GetDrawInterval() const;
     int NormalizeFontSize(int pointSize);
     MythRect NormRect(const MythRect &rect);
     QPoint NormPoint(const QPoint &point);

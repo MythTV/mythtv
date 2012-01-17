@@ -1,6 +1,8 @@
 #ifndef MYTHRENDEROPENGL2_H
 #define MYTHRENDEROPENGL2_H
 
+#include <QStack>
+
 #include "mythrender_opengl.h"
 #include "mythrender_opengl_defs2.h"
 
@@ -16,6 +18,7 @@ typedef enum
 } DefaultShaders;
 
 class MythGLShaderObject;
+class GLMatrix;
 
 class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
 {
@@ -30,6 +33,9 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     virtual void SetShaderParams(uint obj, void* vals, const char* uniform);
 
     virtual bool RectanglesAreAccelerated(void) { return true; }
+
+    virtual void  PushTransformation(const UIEffects &fx, QPointF &center) ;
+    virtual void  PopTransformation(void);
 
   protected:
     virtual ~MythRenderOpenGL2();
@@ -54,8 +60,6 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     virtual void DeleteOpenGLResources(void);
     virtual void SetMatrixView(void);
 
-    void SetScaling(int horizontal, int vertical);
-    void SetRotation(int degrees);
     void CreateDefaultShaders(void);
     void DeleteDefaultShaders(void);
     uint CreateShader(int type, const QString &source);
@@ -70,8 +74,7 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     // State
     uint  m_active_obj;
     float m_projection[4][4];
-    float m_scale[4][4];
-    float m_rotate[4][4];
+    QStack<GLMatrix> m_transforms;
     float m_parameters[4][4];
     QString m_qualifiers;
     QString m_GLSLVersion;

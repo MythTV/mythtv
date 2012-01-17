@@ -158,6 +158,7 @@ class MythMainWindowPrivate
 
         sysEventHandler(NULL),
 
+        drawInterval(1000 / 70),
         drawTimer(NULL),
         mainStack(NULL),
 
@@ -235,6 +236,7 @@ class MythMainWindowPrivate
 
     QObject *sysEventHandler;
 
+    int drawInterval;
     MythSignalingTimer *drawTimer;
     QVector<MythScreenStack *> stackList;
     MythScreenStack *mainStack;
@@ -479,7 +481,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     connect(d->hideMouseTimer, SIGNAL(timeout()), SLOT(HideMouseTimeout()));
 
     d->drawTimer = new MythSignalingTimer(this, SLOT(animate()));
-    d->drawTimer->start(1000 / 70);
+    d->drawTimer->start(d->drawInterval);
 
     d->AllowInput = true;
 
@@ -2454,6 +2456,11 @@ QRect MythMainWindow::GetUIScreenRect(void)
 void MythMainWindow::SetUIScreenRect(QRect &rect)
 {
     d->uiScreenRect = rect;
+}
+
+int MythMainWindow::GetDrawInterval() const
+{
+    return d->drawInterval;
 }
 
 void MythMainWindow::StartLIRC(void)

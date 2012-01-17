@@ -21,6 +21,7 @@ class QColor;
 
 class MythFontProperties;
 class MythImage;
+class UIEffects;
 
 typedef QVector<QTextLayout *>            LayoutVector;
 typedef QVector<QTextLayout::FormatRange> FormatVector;
@@ -66,6 +67,9 @@ class MUI_PUBLIC MythPainter
                                int alpha);
     virtual void DrawEllipse(const QRect &area, const QBrush &fillBrush,
                              const QPen &linePen, int alpha);
+
+    virtual void PushTransformation(const UIEffects &zoom, QPointF center = QPointF()) { }
+    virtual void PopTransformation(void) { }
 
     MythImage *GetFormatImage();
     void DeleteFormatImage(MythImage *im);
