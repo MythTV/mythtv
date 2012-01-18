@@ -806,15 +806,15 @@ void TV::InitKeys(void)
             QT_TRANSLATE_NOOP("MythControls", "Toggle OSD playback information"), "");
 
     /* 3D/Frame compatible/Stereoscopic TV */
-    REG_KEY("TV_PLAYBACK", ACTION_3DNONE,
+    REG_KEY("TV PLAYBACK", ACTION_3DNONE,
             QT_TRANSLATE_NOOP("MythControls", "No 3D"), "");
-    REG_KEY("TV_PLAYBACK", ACTION_3DSIDEBYSIDE,
+    REG_KEY("TV PLAYBACK", ACTION_3DSIDEBYSIDE,
             QT_TRANSLATE_NOOP("MythControls", "3D Side by Side"), "");
-    REG_KEY("TV_PLAYBACK", ACTION_3DSIDEBYSIDEDISCARD,
+    REG_KEY("TV PLAYBACK", ACTION_3DSIDEBYSIDEDISCARD,
             QT_TRANSLATE_NOOP("MythControls", "Discard 3D Side by Side"), "");
-    REG_KEY("TV_PLAYBACK", ACTION_3DTOPANDBOTTOM,
+    REG_KEY("TV PLAYBACK", ACTION_3DTOPANDBOTTOM,
             QT_TRANSLATE_NOOP("MythControls", "3D Top and Bottom"), "");
-    REG_KEY("TV_PLAYBACK", ACTION_3DTOPANDBOTTOMDISCARD,
+    REG_KEY("TV PLAYBACK", ACTION_3DTOPANDBOTTOMDISCARD,
             QT_TRANSLATE_NOOP("MythControls", "Discard 3D Top and Bottom"), "");
 
 /*
