@@ -37,16 +37,16 @@ import datetime
 DEBUG = False
 
 class Configuration( Element ):
-    def _poller(self):
+    images = Datapoint('images')
+    def _populate(self):
         return Request('configuration').readJSON()
-    images = Datapoint('images', poller=_poller)
 Configuration = Configuration()
 
 def searchMovie(query, language='en-US'):
-    return SearchResults(
+    return MovieSearchResults(
                 Request('search/movie', query=query, language=language))
 
-class SearchResults( PagedList ):
+class MovieSearchResults( PagedList ):
     """Stores a list of search matches."""
     @staticmethod
     def _process(data):
@@ -59,7 +59,27 @@ class SearchResults( PagedList ):
 
     def __init__(self, request):
         self.request = request
-        super(SearchResults, self).__init__(self._process(request.readJSON()), 20)
+        super(MovieSearchResults, self).__init__(self._process(request.readJSON()), 20)
+
+    def __repr__(self):
+        return u"<Search Results: {0}>".format(self.request._kwargs['query'])
+
+def searchPerson(query):
+    return PeopleSearchResults(Request('search/person', query=query))
+
+class PeopleSearchResults( PagedList ):
+    @staticmethod
+    def _process(data):
+        for item in data['results']:
+            yield Person(raw=item)
+
+    def _getpage(self, page):
+        self.request = self.request.new(page=page)
+        return list(self._process(self.request.readJSON()))
+
+    def __init__(self, request):
+        self.request = request
+        super(PeopleSearchResults, self).__init__(self._process(request.readJSON()), 20)
 
     def __repr__(self):
         return u"<Search Results: {0}>".format(self.request._kwargs['query'])
@@ -97,23 +117,44 @@ class AlternateTitle( Element ):
     country     = Datapoint('iso_3166_1')
     title       = Datapoint('title')
 
-class Cast( Element ):
-    id          = Datapoint('id')
-    character   = Datapoint('character')
+class Person( Element ):
+    id          = Datapoint('id', initarg=1)
     name        = Datapoint('name')
+    biography   = Datapoint('biography')
+    dayofbirth  = Datapoint('birthday', default=None, handler=lambda x: \
+                                         datetime.datetime.strptime(x, '%Y-%m-%d'))
+    dayofdeath  = Datapoint('deathday', default=None, handler=lambda x: \
+                                         datetime.datetime.strptime(x, '%Y-%m-%d'))
+    homepage    = Datapoint('homepage')
+    birthplace  = Datapoint('place_of_birth')
     profile     = Datapoint('profile_path', handler=Profile, raw=False)
+
+    def __repr__(self):
+        return u"<{0} '{1.name}' at {2}>".\
+                        format(self.__class__.__name__, self, hex(id(self)))
+
+    def _populate(self):
+        return Request('person/{0}'.format(self.id)).readJSON()
+    def _populate_credits(self):
+        return Request('person/{0}/credits'.format(self.id)).readJSON()
+    def _populate_images(self):
+        return Request('person/{0}/images'.format(self.id)).readJSON()
+
+    roles       = Datalist('cast', handler=lambda x: ReverseCast(raw=x), poller=_populate_credits)
+    crew        = Datalist('crew', handler=lambda x: ReverseCrew(raw=x), poller=_populate_credits)
+    profiles    = Datalist('profiles', handler=Profile, poller=_populate_images)
+
+class Cast( Person ):
+    character   = Datapoint('character')
     order       = Datapoint('order')
 
     def __repr__(self):
         return u"<{0} '{1.name}' as '{1.character}' at {2}>".\
                         format(self.__class__.__name__, self, hex(id(self)))
 
-class Crew( Element ):
-    id          = Datapoint('id')
-    name        = Datapoint('name')
+class Crew( Person ):
     job         = Datapoint('job')
     department  = Datapoint('department')
-    profile     = Datapoint('profile_path', handler=Profile, raw=False)
 
     def __repr__(self):
         return u"<{0.__class__.__name__} '{1.name}','{1.job}'>".format(self)
@@ -160,6 +201,12 @@ class Language( Element ):
     name    = Datapoint('name')
 
 class Movie( Element ):
+    @classmethod
+    def latest(cls):
+        req = Request('latest/movie')
+        req.lifetime = 600
+        return cls(raw=req.readJSON())
+
     id              = Datapoint('id', initarg=1)
     title           = Datapoint('title')
     originaltitle   = Datapoint('original_title')
@@ -181,7 +228,7 @@ class Movie( Element ):
     votes           = Datapoint('vote_count')
 
     adult       = Datapoint('adult')
-    collection  = Datapoint('belongs_to_collection')#, handler=Collection)
+    collection  = Datapoint('belongs_to_collection', handler=lambda x: Collection(raw=x))
     genres      = Datalist('genres', handler=Genre)
     studios     = Datalist('production_companies', handler=Studio)
     countries   = Datalist('production_countries', handler=Country)
@@ -190,7 +237,7 @@ class Movie( Element ):
     def _populate(self):
         return Request('movie/{0}'.format(self.id)).readJSON()
     def _populate_titles(self):
-        return Request('movie/{0}/alternate_titles'.format(self.id)).readJSON()
+        return Request('movie/{0}/alternative_titles'.format(self.id)).readJSON()
     def _populate_cast(self):
         return Request('movie/{0}/casts'.format(self.id)).readJSON()
     def _populate_images(self):
@@ -226,6 +273,35 @@ class Movie( Element ):
             s = u"{0} ({1})".format(s, self.releasedate.year)
         return u"<{0} {1}>".format(self.__class__.__name__, s).encode('utf-8')
 
+class ReverseCast( Movie ):
+    character   = Datapoint('character')
+
+    def __repr__(self):
+        if self.title is not None:
+            s = u"'{0}'".format(self.title)
+        elif self.originaltitle is not None:
+            s = u"'{0}'".format(self.originaltitle)
+        else:
+            s = u"'No Title'"
+        if self.releasedate:
+            s = u"{0} ({1})".format(s, self.releasedate.year)
+        return u"<{0.__class__.__name__} '{0.character}' on {1}>".format(self, s).encode('utf-8')
+
+class ReverseCrew( Movie ):
+    department  = Datapoint('department')
+    job         = Datapoint('job')
+
+    def __repr__(self):
+        if self.title is not None:
+            s = u"'{0}'".format(self.title)
+        elif self.originaltitle is not None:
+            s = u"'{0}'".format(self.originaltitle)
+        else:
+            s = u"'No Title'"
+        if self.releasedate:
+            s = u"{0} ({1})".format(s, self.releasedate.year)
+        return u"<{0.__class__.__name__} '{0.job}' for {1}>".format(self, s).encode('utf-8')
+
 class Collection( Element ):
     id       = Datapoint('id', initarg=1)
     name     = Datapoint('name')
@@ -236,11 +312,13 @@ class Collection( Element ):
     def _populate(self):
         return Request('collection/{0}'.format(self.id)).readJSON()
 
-Movie.collection.sethandler(Collection)
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}'>".format(self).encode('utf-8')
+        return u"<{0} {1}>".format(self.__class__.__name__, s).encode('utf-8')
 
 if __name__ == '__main__':
     set_key('c27cb71cff5bd76e1a7a009380562c62')
-#    DEBUG = True
+    DEBUG = False
 
     banner = 'tmdb_api interactive shell.'
     import code
