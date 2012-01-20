@@ -162,7 +162,7 @@ Ignore at your own peril.
 <eps file="add.eps" height="1cm">
 <img src="add.png">
 <caption>
-Feature that has been added to SVN (subversion, a revision control system)
+Feature that has been added to git (a distributed version control system)
 but is not available in the current release.
 </caption>
 </figure>
@@ -202,8 +202,8 @@ seems to be ignoring you.
 
 <sect1>Bug database
 <p>If you feel you need to contribute to a bug database, use the MythTV bug
-ticketing system at <url url="http://svn.mythtv.org/trac"
-name="http://svn.mythtv.org/trac">.
+ticketing system at <url url="http://code.mythtv.org/trac"
+name="http://code.mythtv.org/trac">.
 
 Good entries will contain the following:
 <enum>
@@ -236,7 +236,7 @@ grammatical or spelling error, or if the wording of something is just plain
 confusing.
 
 If you'd like to make a new contribution, create a ticket at <url
-url="http://svn.mythtv.org/trac" name="http://svn.mythtv.org/trac"> and
+url="http://code.mythtv.org/trac" name="http://code.mythtv.org/trac"> and
 click "New Ticket".  The type should be set to "patch" and the owner set to
 "rkulagow" to ensure that I see your contribution.
 
@@ -814,7 +814,7 @@ and executing:
 <sect>System Configuration Requirements for Compiling MythTV. <label
 id="Setting_up_paths">
 <p>Before you compile MythTV from the current source tarball or from
-<bf>subversion</bf>, you may need to modify your system configuration in a
+<bf>git</bf>, you may need to modify your system configuration in a
 few ways.
 
 In general, if you install MythTV from pre-packaged binaries for your Linux
@@ -918,18 +918,18 @@ tarball is a static file and won't include any fixes for issues discovered
 after the tarball was created.
 
 The recommended solution is to download the source using
-<bf>subversion</bf> to ensure that you've got the latest fixes.
+<bf>git</bf> to ensure that you've got the latest fixes.
 
-When using subversion, there are some other choices that need to be made:
+When using git, there are some other choices that need to be made:
 <itemize>
-<item>Do you want to run the stable release of MythTV?  If yes, download from the "release-0-23-fixes" branch.
+<item>Do you want to run the stable release of MythTV?  If yes, use "git checkout 0.24"
 <item>Do you want to run the absolute latest developer code?  If yes, you <em>must</em>
 join the <url url="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"
 name="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"> and <url
 url="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"
 name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists to
 keep up to date with the current status of the code.  Code obtained from
-subversion has no guarantees regarding stability, etc.  The latest code will be in "trunk".
+git has no guarantees regarding stability, etc.  The latest code will be in "master".
 </itemize>
 
 If you are in North America you will use the Schedules Direct grabber which is
@@ -957,35 +957,32 @@ program.
 
 <label id="manually_building_mythtv">
 <sect1>Manually building MythTV
-<p>If you are going to use <bf>subversion</bf>, execute the following
-instructions to obtain the latest <em>trunk</em> version of MythTV.
-
-To use the <em>release</em> version, you can execute the following.  You are
-strongly encouraged to use the release version.
+<p>If you are going to use <bf>git</bf>, execute the following
+instructions to obtain the latest version of MythTV.
 
 <tscreen><verb>
-$ svn co http://svn.mythtv.org/svn/branches/release-0-23-fixes/ mythtv-0.23
-$ cd mythtv-0.23
+$ git clone https://github.com/MythTV/mythtv.git
 </verb></tscreen>
 
-To download trunk:
+To use the <em>release</em> version, you can execute the following after
+completing the previous command.  You are strongly encouraged to use the
+release version.
 
 <tscreen><verb>
-$ svn co http://svn.mythtv.org/svn/trunk/ mythtv-trunk
-$ cd mythtv-trunk
+$ git checkout 0.24
 </verb></tscreen>
 
-<bf>NOTE</bf>:  Using a svn version of the code allows you to stay
-up-to-date with changes.  So, if there's an update to the 0.23 release and
-you originally obtained it using svn, you could enter the
-mythtv-0.23 directory and type "svn up", which will update your copy
+<bf>NOTE</bf>:  Using a git version of the code allows you to stay
+up-to-date with changes.  So, if there's an update to the 0.24 release and
+you originally obtained it using git, you could enter the
+mythtv directory and type "git pull", which will update your copy
 with the fixed version from the website.  You would then recompile and
-install the updated 0.23 code.
+install the updated 0.24 code.
 
 If you are using the tarball, then unpack it:
 <tscreen><verb>
-$ tar -xjf mythtv-0.23.tar.bz2
-$ cd mythtv-0.23
+$ tar -xjf mythtv-0.24.tar.bz2
+$ cd mythtv-0.24
 $ ./configure
 </verb></tscreen>
 
