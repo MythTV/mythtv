@@ -6468,7 +6468,6 @@ void TV::SwitchCards(PlayerContext *ctx,
         {
             if (!channum.isEmpty())
                 CardUtil::SetStartChannel(cardinputid, channum);
-            CardUtil::SetStartInput(cardid, inputname);
         }
         else
         {

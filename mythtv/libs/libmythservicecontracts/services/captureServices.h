@@ -51,7 +51,7 @@
 class SERVICE_PUBLIC CaptureServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.3" );
+    Q_CLASSINFO( "version"    , "1.4" );
     Q_CLASSINFO( "RemoveCaptureCard_Method",                 "POST" )
     Q_CLASSINFO( "AddCaptureCard_Method",                    "POST" )
     Q_CLASSINFO( "UpdateCaptureCard_Method",                 "POST" )
@@ -83,7 +83,6 @@ class SERVICE_PUBLIC CaptureServices : public Service
                                                                  const QString    &AudioDevice,
                                                                  const QString    &VBIDevice,
                                                                  const QString    &CardType,
-                                                                 const QString    &DefaultInput,
                                                                  const uint       AudioRateLimit,
                                                                  const QString    &HostName,
                                                                  const uint       DVBSWFilter,

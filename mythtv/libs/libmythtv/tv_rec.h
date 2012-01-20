@@ -56,7 +56,7 @@ class GeneralDBOptions
   public:
     GeneralDBOptions() :
         videodev(""),         vbidev(""),
-        audiodev(""),         defaultinput("Television"),
+        audiodev(""),
         cardtype("V4L"),
         audiosamplerate(-1),  skip_btaudio(false),
         signal_timeout(1000), channel_timeout(3000),
@@ -65,7 +65,6 @@ class GeneralDBOptions
     QString videodev;
     QString vbidev;
     QString audiodev;
-    QString defaultinput;
     QString cardtype;
     int     audiosamplerate;
     bool    skip_btaudio;
@@ -255,7 +254,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
                            DVBDBOptions       &dvb_opts,
                            FireWireDBOptions  &firewire_opts);
 
-    static QString GetStartChannel(uint cardid, const QString &defaultinput);
+    static QString GetStartChannel(uint cardid, const QString &startinput);
 
     void TeardownRecorder(uint request_flags);
     DTVRecorder  *GetDTVRecorder(void);

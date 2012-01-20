@@ -704,7 +704,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
     }
 
     query.prepare(
-        "SELECT videodevice,           cardtype,       defaultinput,     "
+        "SELECT videodevice,           cardtype,                         "
         "       hostname,              signal_timeout, channel_timeout,  "
         "       dvb_wait_for_seqstart, dvb_on_demand,  dvb_tuning_delay, "
         "       dvb_diseqc_type,       diseqcid,       dvb_eitscan "
@@ -728,16 +728,15 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
         "UPDATE capturecard "
         "SET videodevice           = :V0, "
         "    cardtype              = :V1, "
-        "    defaultinput          = :V2, "
-        "    hostname              = :V3, "
-        "    signal_timeout        = :V4, "
-        "    channel_timeout       = :V5, "
-        "    dvb_wait_for_seqstart = :V6, "
-        "    dvb_on_demand         = :V7, "
-        "    dvb_tuning_delay      = :V8, "
-        "    dvb_diseqc_type       = :V9, "
-        "    diseqcid              = :V10,"
-        "    dvb_eitscan           = :V11 "
+        "    hostname              = :V2, "
+        "    signal_timeout        = :V3, "
+        "    channel_timeout       = :V4, "
+        "    dvb_wait_for_seqstart = :V5, "
+        "    dvb_on_demand         = :V6, "
+        "    dvb_tuning_delay      = :V7, "
+        "    dvb_diseqc_type       = :V8, "
+        "    diseqcid              = :V9,"
+        "    dvb_eitscan           = :V10 "
         "WHERE cardid = :CARDID");
     for (uint i = 0; i < 12; i++)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
@@ -1092,40 +1091,24 @@ bool CardUtil::SetStartChannel(uint cardinputid, const QString &channum)
     return true;
 }
 
-bool CardUtil::SetStartInput(uint cardid, const QString &inputname)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE capturecard "
-                  "SET defaultinput = :INNAME "
-                  "WHERE cardid = :CARDID");
-    query.bindValue(":INNAME", inputname);
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("set_startinput", query);
-        return false;
-    }
-
-    return true;
-}
-
-/** \fn CardUtil::GetDefaultInput(uint)
- *  \brief Returns the default input for the card
+/** \fn CardUtil::GetStartInput(uint)
+ *  \brief Returns the start input for the card
  *  \param nCardID card id to check
- *  \return the default input
+ *  \return the start input
  */
-QString CardUtil::GetDefaultInput(uint nCardID)
+QString CardUtil::GetStartInput(uint nCardID)
 {
     QString str = QString::null;
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT defaultinput "
-                  "FROM capturecard "
-                  "WHERE capturecard.cardid = :CARDID");
+    query.prepare("SELECT inputname "
+                  "FROM cardinput "
+                  "WHERE cardinput.cardid = :CARDID " 
+                  "ORDER BY livetvorder = 0, livetvorder, cardinputid "
+                  "LIMIT 1");
     query.bindValue(":CARDID", nCardID);
 
     if (!query.exec() || !query.isActive())
-        MythDB::DBError("CardUtil::GetDefaultInput()", query);
+        MythDB::DBError("CardUtil::GetStartInput()", query);
     else if (query.next())
         str = query.value(0).toString();
 
@@ -2107,7 +2090,6 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
                                  const QString &audiodevice,
                                  const QString &vbidevice,
                                  const QString &cardtype,
-                                 const QString &defaultinput,
                                  const uint audioratelimit,
                                  const QString &hostname,
                                  const uint dvb_swfilter,
@@ -2133,14 +2115,14 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
 
     query.prepare(
         "INSERT INTO capturecard "
-        "(videodevice, audiodevice, vbidevice, cardtype, defaultinput, "
+        "(videodevice, audiodevice, vbidevice, cardtype, "
         "audioratelimit, hostname, dvb_swfilter, dvb_sat_type, "
         "dvb_wait_for_seqstart, skipbtaudio, dvb_on_demand, dvb_diseqc_type, "
         "firewire_speed, firewire_model, firewire_connection, signal_timeout, "
         "channel_timeout, dvb_tuning_delay, contrast, brightness, colour, "
         "hue, diseqcid, dvb_eitscan) "
         "VALUES (:VIDEODEVICE, :AUDIODEVICE, :VBIDEVICE, :CARDTYPE, "
-        ":DEFAULTINPUT, :AUDIORATELIMIT, :HOSTNAME, :DVBSWFILTER, :DVBSATTYPE, "
+        ":AUDIORATELIMIT, :HOSTNAME, :DVBSWFILTER, :DVBSATTYPE, "
         ":DVBWAITFORSEQSTART, :SKIPBTAUDIO, :DVBONDEMAND, :DVBDISEQCTYPE, "
         ":FIREWIRESPEED, :FIREWIREMODEL, :FIREWIRECONNECTION, :SIGNALTIMEOUT, "
         ":CHANNELTIMEOUT, :DVBTUNINGDELAY, :CONTRAST, :BRIGHTNESS, :COLOUR, "
@@ -2150,7 +2132,6 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
     query.bindValue(":AUDIODEVICE", audiodevice);
     query.bindValue(":VBIDEVICE", vbidevice);
     query.bindValue(":CARDTYPE", cardtype);
-    query.bindValue(":DEFAULTINPUT", defaultinput);
     query.bindValue(":AUDIORATELIMIT", audioratelimit);
     query.bindValue(":HOSTNAME", hostname);
     query.bindValue(":DVBSWFILTER", dvb_swfilter);

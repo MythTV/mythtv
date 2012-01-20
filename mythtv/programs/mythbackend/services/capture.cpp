@@ -47,7 +47,7 @@ DTC::CaptureCardList* Capture::GetCaptureCardList( const QString &sHostName,
                        "Capture Cards."));
 
     QString str = "SELECT cardid, videodevice, audiodevice, vbidevice, "
-                  "cardtype, defaultinput, audioratelimit, hostname, "
+                  "cardtype, audioratelimit, hostname, "
                   "dvb_swfilter, dvb_sat_type, dvb_wait_for_seqstart, "
                   "skipbtaudio, dvb_on_demand, dvb_diseqc_type, "
                   "firewire_speed, firewire_model, firewire_connection, "
@@ -92,27 +92,26 @@ DTC::CaptureCardList* Capture::GetCaptureCardList( const QString &sHostName,
         pCaptureCard->setAudioDevice       ( query.value(2).toString()    );
         pCaptureCard->setVBIDevice         ( query.value(3).toString()    );
         pCaptureCard->setCardType          ( query.value(4).toString()    );
-        pCaptureCard->setDefaultInput      ( query.value(5).toString()    );
-        pCaptureCard->setAudioRateLimit    ( query.value(6).toUInt()      );
-        pCaptureCard->setHostName          ( query.value(7).toString()    );
-        pCaptureCard->setDVBSWFilter       ( query.value(8).toUInt()      );
-        pCaptureCard->setDVBSatType        ( query.value(9).toUInt()      );
-        pCaptureCard->setDVBWaitForSeqStart( query.value(10).toBool()     );
-        pCaptureCard->setSkipBTAudio       ( query.value(11).toBool()     );
-        pCaptureCard->setDVBOnDemand       ( query.value(12).toBool()     );
-        pCaptureCard->setDVBDiSEqCType     ( query.value(13).toUInt()     );
-        pCaptureCard->setFirewireSpeed     ( query.value(14).toUInt()     );
-        pCaptureCard->setFirewireModel     ( query.value(15).toString()   );
-        pCaptureCard->setFirewireConnection( query.value(16).toUInt()     );
-        pCaptureCard->setSignalTimeout     ( query.value(17).toUInt()     );
-        pCaptureCard->setChannelTimeout    ( query.value(18).toUInt()     );
-        pCaptureCard->setDVBTuningDelay    ( query.value(19).toUInt()     );
-        pCaptureCard->setContrast          ( query.value(20).toUInt()     );
-        pCaptureCard->setBrightness        ( query.value(21).toUInt()     );
-        pCaptureCard->setColour            ( query.value(22).toUInt()     );
-        pCaptureCard->setHue               ( query.value(23).toUInt()     );
-        pCaptureCard->setDiSEqCId          ( query.value(24).toUInt()     );
-        pCaptureCard->setDVBEITScan        ( query.value(25).toBool()     );
+        pCaptureCard->setAudioRateLimit    ( query.value(5).toUInt()      );
+        pCaptureCard->setHostName          ( query.value(6).toString()    );
+        pCaptureCard->setDVBSWFilter       ( query.value(7).toUInt()      );
+        pCaptureCard->setDVBSatType        ( query.value(8).toUInt()      );
+        pCaptureCard->setDVBWaitForSeqStart( query.value(9).toBool()     );
+        pCaptureCard->setSkipBTAudio       ( query.value(10).toBool()     );
+        pCaptureCard->setDVBOnDemand       ( query.value(11).toBool()     );
+        pCaptureCard->setDVBDiSEqCType     ( query.value(12).toUInt()     );
+        pCaptureCard->setFirewireSpeed     ( query.value(13).toUInt()     );
+        pCaptureCard->setFirewireModel     ( query.value(14).toString()   );
+        pCaptureCard->setFirewireConnection( query.value(15).toUInt()     );
+        pCaptureCard->setSignalTimeout     ( query.value(16).toUInt()     );
+        pCaptureCard->setChannelTimeout    ( query.value(17).toUInt()     );
+        pCaptureCard->setDVBTuningDelay    ( query.value(18).toUInt()     );
+        pCaptureCard->setContrast          ( query.value(19).toUInt()     );
+        pCaptureCard->setBrightness        ( query.value(20).toUInt()     );
+        pCaptureCard->setColour            ( query.value(21).toUInt()     );
+        pCaptureCard->setHue               ( query.value(22).toUInt()     );
+        pCaptureCard->setDiSEqCId          ( query.value(23).toUInt()     );
+        pCaptureCard->setDVBEITScan        ( query.value(24).toBool()     );
     }
 
     return pList;
@@ -134,7 +133,7 @@ DTC::CaptureCard* Capture::GetCaptureCard( int nCardId )
                        "Capture Cards."));
 
     QString str = "SELECT cardid, videodevice, audiodevice, vbidevice, "
-                  "cardtype, defaultinput, audioratelimit, hostname, "
+                  "cardtype, audioratelimit, hostname, "
                   "dvb_swfilter, dvb_sat_type, dvb_wait_for_seqstart, "
                   "skipbtaudio, dvb_on_demand, dvb_diseqc_type, "
                   "firewire_speed, firewire_model, firewire_connection, "
@@ -160,27 +159,26 @@ DTC::CaptureCard* Capture::GetCaptureCard( int nCardId )
         pCaptureCard->setAudioDevice       ( query.value(2).toString()    );
         pCaptureCard->setVBIDevice         ( query.value(3).toString()    );
         pCaptureCard->setCardType          ( query.value(4).toString()    );
-        pCaptureCard->setDefaultInput      ( query.value(5).toString()    );
-        pCaptureCard->setAudioRateLimit    ( query.value(6).toUInt()      );
-        pCaptureCard->setHostName          ( query.value(7).toString()    );
-        pCaptureCard->setDVBSWFilter       ( query.value(8).toUInt()      );
-        pCaptureCard->setDVBSatType        ( query.value(9).toUInt()      );
-        pCaptureCard->setDVBWaitForSeqStart( query.value(10).toBool()     );
-        pCaptureCard->setSkipBTAudio       ( query.value(11).toBool()     );
-        pCaptureCard->setDVBOnDemand       ( query.value(12).toBool()     );
-        pCaptureCard->setDVBDiSEqCType     ( query.value(13).toUInt()     );
-        pCaptureCard->setFirewireSpeed     ( query.value(14).toUInt()     );
-        pCaptureCard->setFirewireModel     ( query.value(15).toString()   );
-        pCaptureCard->setFirewireConnection( query.value(16).toUInt()     );
-        pCaptureCard->setSignalTimeout     ( query.value(17).toUInt()     );
-        pCaptureCard->setChannelTimeout    ( query.value(18).toUInt()     );
-        pCaptureCard->setDVBTuningDelay    ( query.value(19).toUInt()     );
-        pCaptureCard->setContrast          ( query.value(20).toUInt()     );
-        pCaptureCard->setBrightness        ( query.value(21).toUInt()     );
-        pCaptureCard->setColour            ( query.value(22).toUInt()     );
-        pCaptureCard->setHue               ( query.value(23).toUInt()     );
-        pCaptureCard->setDiSEqCId          ( query.value(24).toUInt()     );
-        pCaptureCard->setDVBEITScan        ( query.value(25).toBool()     );
+        pCaptureCard->setAudioRateLimit    ( query.value(5).toUInt()      );
+        pCaptureCard->setHostName          ( query.value(6).toString()    );
+        pCaptureCard->setDVBSWFilter       ( query.value(7).toUInt()      );
+        pCaptureCard->setDVBSatType        ( query.value(8).toUInt()      );
+        pCaptureCard->setDVBWaitForSeqStart( query.value(9).toBool()     );
+        pCaptureCard->setSkipBTAudio       ( query.value(10).toBool()     );
+        pCaptureCard->setDVBOnDemand       ( query.value(11).toBool()     );
+        pCaptureCard->setDVBDiSEqCType     ( query.value(12).toUInt()     );
+        pCaptureCard->setFirewireSpeed     ( query.value(13).toUInt()     );
+        pCaptureCard->setFirewireModel     ( query.value(14).toString()   );
+        pCaptureCard->setFirewireConnection( query.value(15).toUInt()     );
+        pCaptureCard->setSignalTimeout     ( query.value(16).toUInt()     );
+        pCaptureCard->setChannelTimeout    ( query.value(17).toUInt()     );
+        pCaptureCard->setDVBTuningDelay    ( query.value(18).toUInt()     );
+        pCaptureCard->setContrast          ( query.value(19).toUInt()     );
+        pCaptureCard->setBrightness        ( query.value(20).toUInt()     );
+        pCaptureCard->setColour            ( query.value(21).toUInt()     );
+        pCaptureCard->setHue               ( query.value(22).toUInt()     );
+        pCaptureCard->setDiSEqCId          ( query.value(23).toUInt()     );
+        pCaptureCard->setDVBEITScan        ( query.value(24).toBool()     );
     }
 
     return pCaptureCard;
@@ -208,7 +206,6 @@ int Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                                   const QString    &sAudioDevice,
                                   const QString    &sVBIDevice,
                                   const QString    &sCardType,
-                                  const QString    &sDefaultInput,
                                   const uint       nAudioRateLimit,
                                   const QString    &sHostName,
                                   const uint       nDVBSWFilter,
@@ -230,13 +227,12 @@ int Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                                   const uint       nDiSEqCId,
                                   bool             bDVBEITScan)
 {
-    if ( sVideoDevice.isEmpty() || sCardType.isEmpty() || sHostName.isEmpty() ||
-         sDefaultInput.isEmpty() )
+    if ( sVideoDevice.isEmpty() || sCardType.isEmpty() || sHostName.isEmpty() )
         throw( QString( "This API requires at least a video device node, a card type, "
-                        "a default input, and a hostname." ));
+                        "and a hostname." ));
 
     int nResult = CardUtil::CreateCaptureCard(sVideoDevice, sAudioDevice,
-                      sVBIDevice, sCardType, sDefaultInput, nAudioRateLimit,
+                      sVBIDevice, sCardType, nAudioRateLimit,
                       sHostName, nDVBSWFilter, nDVBSatType, bDVBWaitForSeqStart,
                       bSkipBTAudio, bDVBOnDemand, nDVBDiSEqCType, nFirewireSpeed,
                       sFirewireModel, nFirewireConnection, nSignalTimeout,

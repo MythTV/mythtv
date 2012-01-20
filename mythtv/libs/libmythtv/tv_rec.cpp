@@ -152,7 +152,8 @@ bool TVRec::Init(void)
     SetRecordingStatus(rsUnknown, __LINE__);
 
     // configure the Channel instance
-    QString startchannel = GetStartChannel(cardid, genOpt.defaultinput);
+    QString startchannel = GetStartChannel(cardid, 
+                                           CardUtil::GetStartInput(cardid));
     if (!CreateChannel(startchannel, true))
         return false;
 
@@ -1539,7 +1540,7 @@ bool TVRec::GetDevices(uint cardid,
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT videodevice,      vbidevice,           audiodevice,     "
-        "       audioratelimit,   defaultinput,        cardtype,        "
+        "       audioratelimit,   cardtype,        "
         "       skipbtaudio,      signal_timeout,      channel_timeout, "
         "       dvb_wait_for_seqstart, "
         ""
@@ -1577,16 +1578,12 @@ bool TVRec::GetDevices(uint cardid,
 
     test = query.value(4).toString();
     if (test != QString::null)
-        gen_opts.defaultinput = test;
-
-    test = query.value(5).toString();
-    if (test != QString::null)
         gen_opts.cardtype = test;
 
-    gen_opts.skip_btaudio = query.value(6).toUInt();
+    gen_opts.skip_btaudio = query.value(5).toUInt();
 
-    gen_opts.signal_timeout  = (uint) max(query.value(7).toInt(), 0);
-    gen_opts.channel_timeout = (uint) max(query.value(8).toInt(), 0);
+    gen_opts.signal_timeout  = (uint) max(query.value(6).toInt(), 0);
+    gen_opts.channel_timeout = (uint) max(query.value(7).toInt(), 0);
 
     // We should have at least 100 ms to acquire tables...
     int table_timeout = ((int)gen_opts.channel_timeout -
@@ -1594,10 +1591,10 @@ bool TVRec::GetDevices(uint cardid,
     if (table_timeout < 100)
         gen_opts.channel_timeout = gen_opts.signal_timeout + 2500;
 
-    gen_opts.wait_for_seqstart = query.value(9).toUInt();
+    gen_opts.wait_for_seqstart = query.value(8).toUInt();
 
     // DVB options
-    uint dvboff = 10;
+    uint dvboff = 9;
     dvb_opts.dvb_on_demand    = query.value(dvboff + 0).toUInt();
     dvb_opts.dvb_tuning_delay = query.value(dvboff + 1).toUInt();
     dvb_opts.dvb_eitscan      = query.value(dvboff + 2).toUInt();
@@ -1615,7 +1612,7 @@ bool TVRec::GetDevices(uint cardid,
     return true;
 }
 
-QString TVRec::GetStartChannel(uint cardid, const QString &defaultinput)
+QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
 {
     QString startchan = QString::null;
 
@@ -1627,7 +1624,7 @@ QString TVRec::GetStartChannel(uint cardid, const QString &defaultinput)
         "WHERE cardinput.cardid   = :CARDID    AND "
         "      inputname          = :INPUTNAME");
     query.bindValue(":CARDID",    cardid);
-    query.bindValue(":INPUTNAME", defaultinput);
+    query.bindValue(":INPUTNAME", startinput);
 
     if (!query.exec() || !query.isActive())
     {
@@ -1654,7 +1651,7 @@ QString TVRec::GetStartChannel(uint cardid, const QString &defaultinput)
         "      capturecard.cardid = :CARDID AND "
         "      inputname          = :INPUTNAME");
     query.bindValue(":CARDID",    cardid);
-    query.bindValue(":INPUTNAME", defaultinput);
+    query.bindValue(":INPUTNAME", startinput);
 
     if (!query.exec() || !query.isActive())
     {
@@ -3295,7 +3292,7 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
             channum = LiveTVStartChannel;
         else
         {
-            input   = genOpt.defaultinput;
+            input   = CardUtil::GetStartInput(cardid);
             channum = GetStartChannel(cardid, input);
         }
     }
@@ -3542,7 +3539,6 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         channel = NULL;
 
         GetDevices(newCardID, genOpt, dvbOpt, fwOpt);
-        genOpt.defaultinput = inputname;
         CreateChannel(channum, false);
     }
 

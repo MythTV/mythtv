@@ -107,8 +107,7 @@ class ChannelBase
 
     /// Saves current channel as the default channel for the current input.
     virtual void StoreInputChannels(void)
-        { StoreInputChannels(m_inputs);
-          StoreDefaultInput(GetCardID(), GetCurrentInput()); }
+        { StoreInputChannels(m_inputs); }
 
     // Picture attribute settings
     virtual bool InitPictureAttributes(void) { return false; }
@@ -139,11 +138,10 @@ class ChannelBase
     virtual bool IsInputAvailable(
         int inputNum, uint &mplexid_restriction) const;
 
-    int GetDefaultInput(uint cardid);
+    int GetStartInput(uint cardid);
     void ClearInputMap(void);
 
     static void StoreInputChannels(const InputMap&);
-    static void StoreDefaultInput(uint cardid, const QString &input);
 
   protected:
     bool KillScript(void);

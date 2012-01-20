@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
         okCardID &= !inputnames.empty();
 
         if (scanInputName.isEmpty())
-            scanInputName = CardUtil::GetDefaultInput(scanCardId);
+            scanInputName = CardUtil::GetStartInput(scanCardId);
 
         bool okInputName = inputnames.contains(scanInputName);
 

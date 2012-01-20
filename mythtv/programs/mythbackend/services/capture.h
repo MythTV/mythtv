@@ -48,7 +48,6 @@ class Capture : public CaptureServices
                                                          const QString    &AudioDevice,
                                                          const QString    &VBIDevice,
                                                          const QString    &CardType,
-                                                         const QString    &DefaultInput,
                                                          const uint       AudioRateLimit,
                                                          const QString    &HostName,
                                                          const uint       DVBSWFilter,
@@ -138,7 +137,6 @@ class ScriptableCapture : public QObject
                                                          const QString    &AudioDevice,
                                                          const QString    &VBIDevice,
                                                          const QString    &CardType,
-                                                         const QString    &DefaultInput,
                                                          const uint       AudioRateLimit,
                                                          const QString    &HostName,
                                                          const uint       DVBSWFilter,
@@ -161,7 +159,7 @@ class ScriptableCapture : public QObject
                                                          bool             DVBEITScan)
         {
             return m_obj.AddCaptureCard( VideoDevice, AudioDevice, VBIDevice, CardType,
-                                DefaultInput, AudioRateLimit, HostName, DVBSWFilter,
+                                AudioRateLimit, HostName, DVBSWFilter,
                                 DVBSatType, DVBWaitForSeqStart, SkipBTAudio, DVBOnDemand,
                                 DVBDiSEqCType, FirewireSpeed, FirewireModel, FirewireConnection,
                                 SignalTimeout, ChannelTimeout, DVBTuningDelay, Contrast, Brightness,

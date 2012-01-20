@@ -133,13 +133,6 @@ as the Plextor ConvertX.
 The 'hostname' field is another important field for all cards
 as it specifies which backend the capture card is connected to.
 
-The 'defaultinput' field is a another important field for all
-cards except "FIREWIRE", "FREEBOX", "HDHOMERUN", and "IMPORT" cards.
-It specifies which
-input of the card to use. This does not have to mean a specific
-physical input, but may also indicate a different use for the
-same physical input.
-
 The 'signal_timeout' and 'channel_timeout' indicate in
 milliseconds how long it should take to get a signal and
 channel lock respectively.
