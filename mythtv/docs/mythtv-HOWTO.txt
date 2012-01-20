@@ -13,7 +13,6 @@
   Table of Contents
 
 
-
   1. First things first.
      1.1 What is MythTV?
      1.2 QuickStart
@@ -335,12 +334,13 @@
 
 
          NNOOTTEE: Please note that I, Robert Kulagowski, am _N_O_T the
-  author/programmer of the MythTV application! I can not give you
+  author/programmer of the MythTV application! I cannot give you
   personalized installation support. If you are having issues installing
   MythTV you should examine the archives, or post your question to the
   MythTV-users mailing list. If you send me "Does MythTV work with 'X'"?
   messages - I will simply instruct you to ask your question on the
   mythtv-users mailing list.
+
   11..11..  WWhhaatt iiss MMyytthhTTVV??
 
   MythTV is a GPL licensed suite of programs that allow you to build the
@@ -392,20 +392,18 @@
 
   +o  MythBrowser, a web browser
 
-  +o  MythFlix, a Netflix module
-
-  +o  MythGallery, a picture-viewing application
+  +o  MythGallery, a photo-viewing application
 
   +o  MythGame
 
-  +o  MythMusic, a music playing / ripping application which supports MP3
-     and FLAC
+  +o  MythMusic, a music playing / ripping application
+
+  +o  MythNetVision, an internet video browser and viewer
 
   +o  MythNews, a RSS news grabber
 
   +o  MythVideo, DVD ripper and a media-viewer for content not created
      within MythTV
-
 
   +o  MythWeather
 
@@ -427,9 +425,6 @@
 
   See http://www.minimyth.org <http://www.minimyth.org> for a small
   MythTV distribution which can be booted over a network.
-
-  See http://wilsonet.com/mythtv/ <http://wilsonet.com/mythtv/> for
-  instructions tailored to RedHat's Fedora Core distribution.
 
   See http://www.mythbuntu.org/ <http://www.mythbuntu.org/> for a
   distribution using a customized Ubuntu.
@@ -498,7 +493,7 @@
 
 
 
-  Feature that has been added to SVN (subversion, a revision control system)
+  Feature that has been added to git (a distributed version control system)
   but is not available in the current release.
 
   11..77..  MMaaiilliinngg lliissttss // ggeettttiinngg hheellpp
@@ -535,8 +530,8 @@
   11..99..  BBuugg ddaattaabbaassee
 
   If you feel you need to contribute to a bug database, use the MythTV
-  bug ticketing system at http://svn.mythtv.org/trac
-  <http://svn.mythtv.org/trac>.
+  bug ticketing system at http://code.mythtv.org/trac
+  <http://code.mythtv.org/trac>.
 
   Good entries will contain the following:
 
@@ -576,8 +571,8 @@
   plain confusing.
 
   If you'd like to make a new contribution, create a ticket at
-  http://svn.mythtv.org/trac <http://svn.mythtv.org/trac> and click "New
-  Ticket". The type should be set to "patch" and the owner set to
+  http://code.mythtv.org/trac <http://code.mythtv.org/trac> and click
+  "New Ticket". The type should be set to "patch" and the owner set to
   "rkulagow" to ensure that I see your contribution.
 
   Please send it as either SGML or as plain text. _N_O _H_T_M_L. The source
@@ -592,8 +587,6 @@
 
   To create the actual patch, run ddiiffff --uu oorriiggffiilleennaammee nneewwffiillee >>
   ddoocc..ppaattcchh and attach your contribution to the trac ticket.
-
-
 
   22..  IInnttrroodduuccttiioonn..
 
@@ -854,7 +847,6 @@
   <http://www.linuxtv.org/wiki/index.php/Main_Page> for more
   information.
 
-
   In the United States, you may use a card such as the TwinHan to obtain
   unencrypted Free-To-Air satellite channels. See
   http://www.lyngsat.com/ <http://www.lyngsat.com/> for the types of
@@ -1046,8 +1038,6 @@
   feature and it provides an API for offloading MPEG-2 and H.264 to the
   GPU.
 
-
-
   33..11..1133..  EExxtteerrnnaall AAddaapptteerrss
 
   External adapters convert standard VGA output to a form suitable for
@@ -1105,8 +1095,6 @@
   perform any additional configuration steps in this HOWTO. The next
   logical step is ``configuring MySQL'', which you may or may not have
   to perform. See your package documentation.
-
-
 
   33..22..11..11..  RReedd HHaatt LLiinnuuxx // FFeeddoorraa CCoorree // MMyytthhDDoorraa
 
@@ -1206,9 +1194,8 @@
 
   44..  SSyysstteemm CCoonnffiigguurraattiioonn RReeqquuiirreemmeennttss ffoorr CCoommppiilliinngg MMyytthhTTVV..
 
-  Before you compile MythTV from the current source tarball or from
-  ssuubbvveerrssiioonn, you may need to modify your system configuration in a few
-  ways.
+  Before you compile MythTV from the current source tarball or from ggiitt,
+  you may need to modify your system configuration in a few ways.
 
   In general, if you install MythTV from pre-packaged binaries for your
   Linux distribution/version, you don't need to be too concerned about
@@ -1233,8 +1220,6 @@
   may have to adjust by hand before you compile MythTV.
 
   The reference compilation system for MythTV is Ubuntu.
-
-
 
   44..22..  SShhaarreedd--LLiibbrraarryy rreeqquuiirreemmeennttss ffoorr MMyytthhTTVV
 
@@ -1299,12 +1284,13 @@
 
   Open a shell and execute the following:
 
-  $ echo $PATH
-  /usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt4/bin:/home/mythtv/bin:
-  $ echo $QTDIR
-  /usr/lib/qt4
-  $ which qmake
-  /usr/bin/qmake
+
+       $ echo $PATH
+       /usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt4/bin:/home/mythtv/bin:
+       $ echo $QTDIR
+       /usr/lib/qt4
+       $ which qmake
+       /usr/bin/qmake
 
 
 
@@ -1326,14 +1312,13 @@
   static file and won't include any fixes for issues discovered after
   the tarball was created.
 
-  The recommended solution is to download the source using ssuubbvveerrssiioonn to
-  ensure that you've got the latest fixes.
+  The recommended solution is to download the source using ggiitt to ensure
+  that you've got the latest fixes.
 
-  When using subversion, there are some other choices that need to be
-  made:
+  When using git, there are some other choices that need to be made:
 
-  +o  Do you want to run the stable release of MythTV? If yes, download
-     from the "release-0-23-fixes" branch.
+  +o  Do you want to run the stable release of MythTV? If yes, use "git
+     checkout 0.24"
 
   +o  Do you want to run the absolute latest developer code? If yes, you
      _m_u_s_t join the http://www.mythtv.org/mailman/listinfo/mythtv-
@@ -1341,8 +1326,8 @@
      and http://www.mythtv.org/mailman/listinfo/mythtv-dev/
      <http://www.mythtv.org/mailman/listinfo/mythtv-dev/> mailing lists
      to keep up to date with the current status of the code. Code
-     obtained from subversion has no guarantees regarding stability,
-     etc. The latest code will be in "trunk".
+     obtained from git has no guarantees regarding stability, etc. The
+     latest code will be in "master".
 
   If you are in North America you will use the Schedules Direct grabber
   which is built-in to MythTV. You _d_o _n_o_t need to install XMLTV (so you
@@ -1363,7 +1348,6 @@
   account. Go to http://www.schedulesdirect.org
   <http://www.schedulesdirect.org> and click on the "Membership" link.
 
-
   Once you've read and agreed to the Subscriber Agreement, Terms of Use
   and Privacy Policy proceed to the lineup choices and configure your
   account for your particular location and the channels that you have.
@@ -1372,40 +1356,37 @@
 
   55..22..  MMaannuuaallllyy bbuuiillddiinngg MMyytthhTTVV
 
-  If you are going to use ssuubbvveerrssiioonn, execute the following instructions
-  to obtain the latest _t_r_u_n_k version of MythTV.
-
-  To use the _r_e_l_e_a_s_e version, you can execute the following. You are
-  strongly encouraged to use the release version.
+  If you are going to use ggiitt, execute the following instructions to
+  obtain the latest version of MythTV.
 
 
 
-       $ svn co http://svn.mythtv.org/svn/branches/release-0-23-fixes/ mythtv-0.23
-       $ cd mythtv-0.23
+       $ git clone https://github.com/MythTV/mythtv.git
 
 
 
-  To download trunk:
+  To use the _r_e_l_e_a_s_e version, you can execute the following after
+  completing the previous command. You are strongly encouraged to use
+  the release version.
 
 
 
-       $ svn co http://svn.mythtv.org/svn/trunk/ mythtv-trunk
-       $ cd mythtv-trunk
+       $ git checkout 0.24
 
 
 
-  NNOOTTEE: Using a svn version of the code allows you to stay up-to-date
-  with changes. So, if there's an update to the 0.23 release and you
-  originally obtained it using svn, you could enter the mythtv-0.23
-  directory and type "svn up", which will update your copy with the
-  fixed version from the website. You would then recompile and install
-  the updated 0.23 code.
+  NNOOTTEE: Using a git version of the code allows you to stay up-to-date
+  with changes. So, if there's an update to the 0.24 release and you
+  originally obtained it using git, you could enter the mythtv directory
+  and type "git pull", which will update your copy with the fixed
+  version from the website. You would then recompile and install the
+  updated 0.24 code.
 
   If you are using the tarball, then unpack it:
 
 
-       $ tar -xjf mythtv-0.23.tar.bz2
-       $ cd mythtv-0.23
+       $ tar -xjf mythtv-0.24.tar.bz2
+       $ cd mythtv-0.24
        $ ./configure
 
 
@@ -1484,7 +1465,8 @@
   ffrroonntteenndd will be in the audio group you can get the GUID of a named
   group like so:
 
-  $ grep audio /etc/group
+
+       $ grep audio /etc/group
 
 
 
@@ -1544,8 +1526,6 @@
   Run the mythfrontend program on your frontend machine, and a "Database
   Configuration" screen should appear.  Set the "Host name" field to
   point to your Master backend's IP address.
-
-
 
   66..  MMyySSQQLL..
 
@@ -1607,6 +1587,7 @@
 
        $ su
        # mysql < /usr/share/mythtv/database/mc.sql
+
 
 
        NNOOTTEE: It is good practice to set a root password for MySQL.
@@ -1714,18 +1695,18 @@
 
   The lircd.conf file can have multiple remote controls defined.
 
-  The second part is lircrc, which takes the name of the button which
+  The second part is ~/.lircrc, which takes the name of the button which
   was pressed ("ChannelUp") in the above example, and associates that to
   an action to be performed by a program using the remote control. So in
   MythTV, ChannelUp means one thing, while in mmppllaayyeerr it means something
-  different. lircrc gives you the flexibility of taking the name of the
-  button and having it perform different actions depending on which
+  different. ~/.lircrc gives you the flexibility of taking the name of
+  the button and having it perform different actions depending on which
   program you're using at the time.
 
   NNOOTTEE: The definitions in lircd.conf come from the user community, and
   there is no standard for the common button names. One lircd.conf file
   may contain a definition for a button called "ChannelUp", while
-  another may contain a definition for "Chan+". Your lircrc file must
+  another may contain a definition for "Chan+". Your ~/.lircrc file must
   therefore be configured appropriately, or it won't work.
 
   Look for pre-made lircd.conf configuration files at
@@ -1734,6 +1715,7 @@
   remotes either on the website or on your system, download or copy the
   file, name it lircd.conf and put it in your /etc directory. If you
   couldn't find your remote, you must make your own lircd.conf file.
+
   To make your own lircd.conf file
 
 
@@ -1768,21 +1750,26 @@
   used to control MythTV. MythTV now includes native support for lirc
   and can interact directly with it.
 
+  Example ~/.lircrc files for configuring remote controls for MythTV are
+  available in the LIRC Configuration Files
+  <http://www.mythtv.org/wiki/Category:LIRC_Configuration_Files>
+  category of the MythTV wiki. There are also many pages providing
+  details for specific remote controls in the Remote Controls
+  <http://www.mythtv.org/wiki/Category:Remote_Controls> category of the
+  wiki.
+
+  After browsing the available configuration files, you may copy/paste
+  the desired configuration information into ~/.lircrc or download it
+  from the wiki.
 
 
-       $ cd mythtv/contrib/config_files/lirc
-       $ cp lircrc.example ~/.lircrc
+       $ mythwikiscripts
 
 
 
-  or
+  Follow the on-screen prompts to download the configuration file.
 
-
-       $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
-
-
-
-  if you've got a Pinnacle Studio PCTV remote.
+  Once you've put the desired configuration into ~/.lircrc, test it.
 
 
        $ irw
@@ -1812,12 +1799,13 @@
 
   88..11..  AAddddiittiioonnaall iinnffoorrmmaattiioonn ffoorr lliirrcc
 
-  Take a look at the lircrc.example files in the contrib/configfiles/
-  directory. In my case, (Pinnacle Studio card) the channel up and down
-  functions weren't working, due to the fact that the button names were
-  different than the default lircrc.example file that came with MythTV.
+  Take a look at the example ~/.lircrc files in the MythTV wiki
+  <http://www.mythtv.org/wiki/Category:LIRC_Configuration_Files>. In my
+  case, (Pinnacle Studio card) the channel up and down functions weren't
+  working, due to the fact that the button names were different from the
+  example ~/.lircrc I used to start my configuration.
 
-  The lircrc.example file has this:
+  The example file had this:
 
 
        begin
@@ -1847,33 +1835,32 @@
   /home/[yourusername]/.lircrc file:
 
 
+       begin
+           prog = irxevent
+           button = channel+
+           repeat = 3
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = channel+
-      repeat = 3
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = channel-
-      repeat = 3
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel-
+           repeat = 3
+           config = Key Down CurrentWindow
+       end
 
 
 
   which took care of basic functionality. Because the PCTV Studio remote
-  has additional buttons, look at the contrib/config_files/lirc/lir-
-  crc.example.pinnaclestudiopctv for an example of how to define addi-
-  tional buttons, and how to debug potential button name conflicts
-  between the lircrc.example file and how yyoouurr remote defines the button
-  names.
+  has additional buttons, look at the lircrc - Pinnacle Studio PCTV
+  <http://www.mythtv.org/wiki/Lircrc_-_Pinnacle_Studio_PCTV> page for an
+  example of how to define additional buttons, and how to debug poten-
+  tial button name conflicts between your ~/.lircrc file and how yyoouurr
+  remote defines the button names.
 
   By examining the button names defined in /etc/lircd.conf and using the
   iirrww program to make sure that your remote is working, you can create
-  the appropriate mappings in .lircrc to get excellent remote
+  the appropriate mappings in ~/.lircrc to get excellent remote
   functionality with MythTV.
 
   Note the rreeppeeaatt == parameter. This informs the irxevent program to pass
@@ -2101,6 +2088,7 @@
 
   If you wish to continue using the XMLTV grabber, then move to the
   Zip/postal code field and put in the appropriate value.
+
   If you're outside of North America, then some manual interaction will
   be required with XMLTV. You may need to switch from the MythTV setup
   program to the console it was run on to interact with XMLTV.
@@ -2164,6 +2152,9 @@
   press RETURN to go back to the Input Connections screen.  You would
   then finish associating the video sources to any other hardware
   devices you have available.
+
+
+
      NNOOTTEE: Don't add a video source to a hardware input if you don't
   actually have anything connected there. For example, adding "Cable" to
   the Tuner and to the Composite inputs without having something
@@ -2292,7 +2283,6 @@
 
   +o  More Free Space over Less Free Space
 
-
   The 'business' of a filesystem is determined by weights. The following
   weights are added to a filesystem if it is in use for the following
   things:
@@ -2357,21 +2347,22 @@
 
   As of MythTV v0.23, the available options are:
 
-  $ mythbackend --help
-  Valid options are:
-  -h or --help                   List valid command line parameters
-  -l or --logfile filename       Writes STDERR and STDOUT messages to filename
-  -p or --pidfile filename       Write PID of mythbackend to filename
-  -d or --daemon                 Runs mythbackend as a daemon
-  -v or --verbose debug-level    Use '-v help' for level info
-  --printexpire                  List of auto-expire programs
-  --printsched                   Upcoming scheduled programs
-  --testsched                    Test run scheduler (ignore existing schedule)
-  --resched                      Force the scheduler to update
-  --nosched                      Do not perform any scheduling
-  --nojobqueue                   Do not start the JobQueue
-  --noautoexpire                 Do not start the AutoExpire thread
-  --version                      Version information
+
+       $ mythbackend --help
+       Valid options are:
+       -h or --help                   List valid command line parameters
+       -l or --logfile filename       Writes STDERR and STDOUT messages to filename
+       -p or --pidfile filename       Write PID of mythbackend to filename
+       -d or --daemon                 Runs mythbackend as a daemon
+       -v or --verbose debug-level    Use '-v help' for level info
+       --printexpire                  List of auto-expire programs
+       --printsched                   Upcoming scheduled programs
+       --testsched                    Test run scheduler (ignore existing schedule)
+       --resched                      Force the scheduler to update
+       --nosched                      Do not perform any scheduling
+       --nojobqueue                   Do not start the JobQueue
+       --noautoexpire                 Do not start the AutoExpire thread
+       --version                      Version information
 
 
 
@@ -2479,10 +2470,13 @@
        $ mkdir ~/.mythtv/channels
        $ ./channel_icons.pl --find-missing --rescan
 
+
+
   If you do not have XMLTV software installed and do not want to install
   it for the sake of this minor task, there is a generic
-  contrib/master_iconmap.xml which you can copy and use but this may not
-  be as complete as using the specific information for your service.
+  contrib/icons/master_iconmap/master_iconmap.xml which you can copy and
+  use but this may not be as complete as using the specific information
+  for your service.
 
   Once you have an iconmap.xml file, add the icon information to your
   database and grab any new icons with the command:
@@ -2802,6 +2796,7 @@
 
   +o  HDTV - pcHDTV cards; see http://pchdtv.com <http://pchdtv.com> and
      the Air2PC-ATSC-PCI
+
   +o  H.264 - HD PVR
 
   +o  DVB - cards supporting DVB; see http://linuxtv.org
@@ -2866,7 +2861,6 @@
   customizing to allow for more precise control over what quality is
   used for a given program.
 
-
   Selecting a profile will allow you to adjust the relevant options for
   that card. The most significant setting is the recording resolution,
   but you can also choose encoding format, audio format, and tweak other
@@ -2906,28 +2900,6 @@
 
 
   1111..11..22..  WWaattcchhiinngg TTVV oorr aa rreeccoorrddiinngg
-
-
-  1111..11..33..  WWaattcchhiinngg TTVV oonnllyy
-
-
-  G     rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
-  H     Channel history. Each repeat steps back through the previous channels.
-  O     Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
-  Y     switch between multiple capture cards.  NNOOTTEE: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
-
-
-  1111..11..44..  LLiivveeTTVV BBrroowwssee MMooddee
-
-
-  1111..11..55..  PPllaayybbaacckk RReeccoorrddiinngg ZZoooomm MMooddee
-
-
-  1111..11..66..  IIff yyoouu hhaavvee ttwwoo oorr mmoorree ttuunneerr ccaarrddss
-
-
-  1111..11..77..  WWaattcchhiinngg aa rreeccoorrddiinngg oonnllyy
-
 
 
   Up or down     keys change the channel
@@ -2986,11 +2958,17 @@
        Right     advance 1 frame
            >     advance 1 second
 
-  1111..11..88..  EEPPGG
+
+  1111..11..33..  WWaattcchhiinngg TTVV oonnllyy
 
 
-  1111..11..99..  SSeettttiinngg PPrrooggrraamm oorr CChhaannnneell RReeccoorrddiinngg PPrriioorriittiieess
+  G     rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
+  H     Channel history. Each repeat steps back through the previous channels.
+  O     Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
+  Y     switch between multiple capture cards.  NNOOTTEE: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
 
+
+  1111..11..44..  LLiivveeTTVV BBrroowwssee MMooddee
 
 
          Left     browse program prior to current listed program
@@ -3004,6 +2982,9 @@
         ESC/O     Exit Browse mode
 
 
+  1111..11..55..  PPllaayybbaacckk RReeccoorrddiinngg ZZoooomm MMooddee
+
+
          Left     Move video to Left
         Right     Move video to Right
            Up     Move video Up
@@ -3014,16 +2995,22 @@
           ESC     Exit Zoom mode and return to original size
 
 
+  1111..11..66..  IIff yyoouu hhaavvee ttwwoo oorr mmoorree ttuunneerr ccaarrddss
+
+
   V     toggle Picture-in-picture on or off
   B     toggles the window focus (lets you change channels on the PiP window)
   N     swaps the two channels by changing channels on both cards
+
+
+  1111..11..77..  WWaattcchhiinngg aa rreeccoorrddiinngg oonnllyy
 
 
       Space/Enter     set a bookmark at that point. Next time you start the recording, you will automatically jump forward to this point and clear the bookmark.
                 X     queues the current recording for transcoding
                 O     brings up menu to allow toggling settings such as Commercial Auto-Skip, Auto-Expire, etc.
                 D     exits the current recording and displays the Delete menu
-           E or M     enters/exits edit mode.
+                E     enters/exits edit mode.
 
 
                       IInn eeddiitt mmooddee
@@ -3031,10 +3018,16 @@
           Up/Down     alter the amount of time you jump forward and backward. Increments are: nearest cutpoint, nearest video keyframe, 1 frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes, and 10 minutes.
   PageUp/PageDown     move forward and backward to the nearest cut point
            < or >     move forward or backward by 10 times the normal jump amount
-      Space/Enter     allows you to set or delete a cut point
-                Z     loads the commercial skip list (if one exists) into the cutlist
-           C or Q     clear all cut points in the cutlist
-                I     Inverts the cutlist
+                M     shows a menu allowing you to add, move, or delete a cut or to save or revert changes
+      Space/Enter     adds a cut or, if in a cut area, prompts for action
+                D     deletes the cut
+                Z     loads the commercial skip list (if one exists) into the cut list
+           C or Q     clear all cut points in the cut list
+                I     inverts the cut list
+           Escape     prompts whether to save or cancel changes and allows exit
+
+
+  1111..11..88..  EEPPGG
 
 
            Arrows     are used to move the highlighted program point around
@@ -3053,8 +3046,8 @@
                 ?     mark/unmark the current channel as a "favorite"
            / or 4     toggle the guide listing between all channels and filtered "favorites"
 
-  1111..11..1100..  VViieewwiinngg SScchheedduulleedd RReeccoorrddiinnggss//RReessoollvviinngg CCoonnfflliiccttss
 
+  1111..11..99..  SSeettttiinngg PPrrooggrraamm oorr CChhaannnneell RReeccoorrddiinngg PPrriioorriittiieess
 
 
                    Right     increases priority value
@@ -3066,11 +3059,15 @@
                      ESC     commits changes and exits
 
 
+  1111..11..1100..  VViieewwiinngg SScchheedduulleedd RReeccoorrddiinnggss//RReessoollvviinngg CCoonnfflliiccttss
+
+
                     1     show all recordings
                     2     show only important recordings
              Home/End     toggle show showing all/important
                     I     edit recording options
           Space/Enter     resolve conflict or override
+
 
   1111..11..1111..  VViieewwiinngg SSeeaarrcchh LLiissttiinnggss
 
@@ -3121,8 +3118,6 @@
   more keys then you can access all of the features. With only 16 keys
   most features are usable.
 
-
-
       REMOTE CONTROL     LIRC KEYSTROKE     FUNCTION
                0 - 9     0 - 9              channel selection, EPG navigation, ff/rew speed setting (with stickykeys)
           Left Arrow     Left               scroll left, rewind
@@ -3135,6 +3130,7 @@
                Pause     p                  Pause
          Other key 1     i                  Information
          Other key 2     c                  Change tuner card input
+
 
   1111..22..  UUssiinngg tthheemmeess wwiitthh MMyytthhTTVV
 
@@ -3167,9 +3163,11 @@
 
   However, there is not cchhaannggeecchhaannnneell program per-se, because this is
   going to be dependent on what sort of external tuner you have. Look in
-  the contrib/channel_changers directory for a number of programs and
-  scripts which may be used to change channels. Once you find one which
-  works, copy it to /usr/local/bin/changechannel.
+  the Channel Change Scripts
+  <http://www.mythtv.org/wiki/Category:Channel_Change_Scripts> category
+  of the MythTV wiki for a number of programs and scripts which may be
+  used to change channels. Once you find one which works, copy it to
+  /usr/local/bin/changechannel.
 
   Feel free to browse some of what sort of hardware is available at
   http://store.snapstream.com/accessories.html
@@ -3318,7 +3316,6 @@
   and nc (netcat) on the Master backend. I use some little bash scripts
   to make my DSL router wakeup my mythbox if required.
 
-
   Replace $SERVER and $PORT with your own settings!  On my Master
   backend I have a script that gets called as 'setwakeuptime command'
   which looks like the following:
@@ -3381,6 +3378,8 @@
        #now set the atjob
        echo -e "$WAKECMD" | at $date ;
 
+
+
   SSEECCUURRIITTYY WWAARRNNIINNGG: Be sure to secure $SERVER:$PORT from untrusted net-
   works, because this allows 3rd parties to run arbitrary code on your
   server!
@@ -3421,38 +3420,38 @@
 
 
 
-  $ telnet basement 6546
-  Connected to basement.
-  Escape character is '^]'.
-  MythFrontend Network Control
-  Type 'help' for usage information
-  ---------------------------------
-  # help
-  Valid Commands:
-  ---------------
-  jump               - Jump to a specified location in Myth
-  key                - Send a keypress to the program
-  play               - Playback related commands
-  query              - Queries
-  exit               - Exit Network Control
+       $ telnet basement 6546
+       Connected to basement.
+       Escape character is '^]'.
+       MythFrontend Network Control
+       Type 'help' for usage information
+       ---------------------------------
+       # help
+       Valid Commands:
+       ---------------
+       jump               - Jump to a specified location in Myth
+       key                - Send a keypress to the program
+       play               - Playback related commands
+       query              - Queries
+       exit               - Exit Network Control
 
-  Type 'help COMMANDNAME' for help on any specific command.
+       Type 'help COMMANDNAME' for help on any specific command.
 
-  # help jump
-  Usage: jump JUMPPOINT
+       # help jump
+       Usage: jump JUMPPOINT
 
-  Where JUMPPOINT is one of the following:
-  channelpriorities    - Channel Recording Priorities
-  channelrecpriority   - Channel Recording Priorities
-  deletebox            - TV Recording Deletion
-  deleterecordings     - TV Recording Deletion
-  guidegrid            - Program Guide
-  livetv               - Live TV
-  livetvinguide        - Live TV In Guide
-  mainmenu             - Main Menu
-  ...snip...
-  # exit
-  $
+       Where JUMPPOINT is one of the following:
+       channelpriorities    - Channel Recording Priorities
+       channelrecpriority   - Channel Recording Priorities
+       deletebox            - TV Recording Deletion
+       deleterecordings     - TV Recording Deletion
+       guidegrid            - Program Guide
+       livetv               - Live TV
+       livetvinguide        - Live TV In Guide
+       mainmenu             - Main Menu
+       ...snip...
+       # exit
+       $
 
 
 
@@ -3617,7 +3616,6 @@
 
   Singles will record without regard to duplicate matching.
 
-
   The standard recurring methods of All, Channel, Weekly and Daily use
   the descriptive information in the TV listings to try to record only
   one showing of each unique episode. However, This goal is sometimes
@@ -3664,7 +3662,7 @@
 
 
   +o  Currently recording beats not currently recording -- A recording in
-     progress can not be moved to another input or time so it "wins" its
+     progress cannot be moved to another input or time so it "wins" its
      current timeslot.
 
   +o  Single, Daily, or Weekly rules with no match are marked Not Listed
@@ -3672,7 +3670,7 @@
      the listings have changed, they are added to the schedule and
      marked to indicate that they will not record.
 
-  +o  Rules that could record beat rules that can not record a showing --
+  +o  Rules that could record beat rules that cannot record a showing --
      If two rules match the same showing of a program, a rule marked as
      inactive or a showing marked as a repeat, for example, yield to the
      other rule.
@@ -3747,8 +3745,6 @@
   unattended. It will also be easy to see that shows have been marked to
   record at a later time.  You can then decide for yourself when you
   would prefer to record the first showing by clicking "Record anyway".
-
-
 
   1122..22..66..  CCoonnttrroolllliinngg YYoouurr SScchheedduullee
 
@@ -3879,8 +3875,6 @@
   recordings are deleted first. The "Lowest Priority First" method
   chooses to expire the lowest-priority recordings first.
 
-
-
   1122..33..66..  EEppiissooddee LLiimmiitt
 
   An episode limit can also be configured to limit the maximum number of
@@ -3947,6 +3941,7 @@
 
   +o  %PROGSTARTISO%, %PROGENDISO% - the recording's start and end time
      in ISO 8601 format.
+
   1122..55..  AAddvvaanncceedd RReeccoorrddiinngg OOppttiioonnss
 
   1122..55..11..  CCrreeaattiinngg PPoowweerr SSeeaarrcchh rruulleess wwiitthh CCuussttoomm RReeccoorrdd
@@ -4012,6 +4007,8 @@
   Press ESC to go back to the Custom Record page. Move to the example
   selector then press the right or left arrows until you find "Only in
   primetime". Click "Add this example clause". You should now see:
+
+
                    program.title = 'Nova'
                    AND HOUR(program.starttime) >= 19
                    AND HOUR(program.starttime) < 23
@@ -4139,10 +4136,9 @@
   available by using a MySQL client program:
 
 
-
-  $ mysql -u mythtv -pmythtv mythconverg
-  mysql> describe program;
-  mysql> describe channel;
+       $ mysql -u mythtv -pmythtv mythconverg
+       mysql> describe program;
+       mysql> describe channel;
 
 
 
@@ -4205,6 +4201,8 @@
      This information is organized in "sets" and the MySQL function
      FIND_IN_SET() can be used to test for any of these flags. For
      example:
+
+
        FIND_IN_SET('SURROUND', program.audioprop) > 0
 
 
@@ -4261,20 +4259,20 @@
 
 
 
-  |
-  |   coax +--------------+ firewire    ------------------+
-  |     .-=|Cable Provider|=------------=| Card 1 input 1 | HDTV
-  |     |  |HD/Cable STB  |=--.          +-----||||||||||||
-  |     |  +--------------+   | s-video ------------------+
-  |     |                     `---------=|        input 2 | Digital
-  |wall |               coax             | Card 2         |
-  |=---=^=------------------------------=|        input 3 | Cable
-  |                                      +-----||||||||||||
+       |
+       |   coax +--------------+ firewire    ------------------+
+       |     .-=|Cable Provider|=------------=| Card 1 input 1 | HDTV
+       |     |  |HD/Cable STB  |=--.          +-----||||||||||||
+       |     |  +--------------+   | s-video ------------------+
+       |     |                     `---------=|        input 2 | Digital
+       |wall |               coax             | Card 2         |
+       |=---=^=------------------------------=|        input 3 | Cable
+       |                                      +-----||||||||||||
 
 
 
   Input 1 and input 2 receive content from the same set top box and the
-  channels can not be tuned independently. Therefore only one of these
+  channels cannot be tuned independently. Therefore only one of these
   two inputs should be used at any given time. The solution is to create
   an "Input Group" with mmyytthhttvv--sseettuupp in "Input connections". Including
   these two inputs in the same Input Group will tell the scheduler that
@@ -4326,6 +4324,7 @@
   scheduler will then know that any program on one of the channels from
   the "Cable" source could be recorded by either card from the card's
   tuner input.
+
   You need to create a different video source for each provider or
   service that has a different set of channels. Each input with a
   connection to that service should be associated with the video source
@@ -4450,10 +4449,10 @@
 
 
 
-   Time  Title     Priority  Card  Status
-   8:00  The Apprentice  +3  1     Will Record
-   8:00  Who Cares       -2  2     Will Record
-  11:00  Who Cares       -2  1     Earlier Showing
+        Time  Title     Priority  Card  Status
+        8:00  The Apprentice  +3  1     Will Record
+        8:00  Who Cares       -2  2     Will Record
+       11:00  Who Cares       -2  1     Earlier Showing
 
 
 
@@ -4620,48 +4619,48 @@
 
 
 
-  $ tar -xjf mythplugins-0.23.tar.bz2
-  $ cd mythplugins-0.23
-  $ ./configure --help
+       $ tar -xjf mythplugins-0.23.tar.bz2
+       $ cd mythplugins-0.23
+       $ ./configure --help
 
-  Usage:   configure [options]
-  Options: [defaults in brackets after descriptions]
-  NB:      all --enable-* options can be reversed with --disable-*
+       Usage:   configure [options]
+       Options: [defaults in brackets after descriptions]
+       NB:      all --enable-* options can be reversed with --disable-*
 
-  Generic options:
-    --help                   print this message
-    --enable-all             Enable all options
-    --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
+       Generic options:
+         --help                   print this message
+         --enable-all             Enable all options
+         --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
 
-  MythBrowser related options:
-    --enable-mythbrowser     build the mythbrowser plugin [default=yes]
+       MythBrowser related options:
+         --enable-mythbrowser     build the mythbrowser plugin [default=yes]
 
-  MythDVD related options:
-    --enable-mythdvd         build the mythdvd plugin [default=yes]
-    --enable-transcode       enable DVD ripping and transcoding [default=no]
-    --enable-vcd             enable VCD playing [default=no]
+       MythDVD related options:
+         --enable-mythdvd         build the mythdvd plugin [default=yes]
+         --enable-transcode       enable DVD ripping and transcoding [default=no]
+         --enable-vcd             enable VCD playing [default=no]
 
-  MythGallery related options:
-    --enable-mythgallery     build the mythgallery plugin [default=yes]
-    --enable-exif            enable reading of EXIF headers [default=no]
+       MythGallery related options:
+         --enable-mythgallery     build the mythgallery plugin [default=yes]
+         --enable-exif            enable reading of EXIF headers [default=no]
 
-  MythGame related options:
-    --enable-mythgame        build the mythgame plugin [default=yes]
+       MythGame related options:
+         --enable-mythgame        build the mythgame plugin [default=yes]
 
-  MythMusic related options:
-    --enable-mythmusic       build the mythmusic plugin [default=yes]
-    --enable-fftw            enable fftw visualizers [default=no]
-    --enable-sdl             use SDL for the synaesthesia output [default=no]
-    --enable-aac             enable AAC/MP4 audio file decompression [default=no]
+       MythMusic related options:
+         --enable-mythmusic       build the mythmusic plugin [default=yes]
+         --enable-fftw            enable fftw visualizers [default=no]
+         --enable-sdl             use SDL for the synaesthesia output [default=no]
+         --enable-aac             enable AAC/MP4 audio file decompression [default=no]
 
-  MythNews related options:
-    --enable-mythnews        build the mythnews plugin [default=yes]
+       MythNews related options:
+         --enable-mythnews        build the mythnews plugin [default=yes]
 
-  MythVideo related options:
-    --enable-mythvideo       build the mythvideo plugin [default=yes]
+       MythVideo related options:
+         --enable-mythvideo       build the mythvideo plugin [default=yes]
 
-  MythWeather related options:
-    --enable-mythweather     build the mythweather plugin [default=yes]
+       MythWeather related options:
+         --enable-mythweather     build the mythweather plugin [default=yes]
 
 
 
@@ -4683,14 +4682,14 @@
 
 
 
-  $ cd ~/mythplugins-0.23
-  $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
-  $ qmake mythplugins.pro
-  $ make
-  $ su -
-  # make install
-  # exit
-  $
+       $ cd ~/mythplugins-0.23
+       $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
+       $ qmake mythplugins.pro
+       $ make
+       $ su -
+       # make install
+       # exit
+       $
 
 
 
@@ -4741,7 +4740,6 @@
 
   By default, MythWeb uses an Apache .htaccess file to restrict access
   to the website and to configure some variables.
-
 
   To create the password file for Apache (if your system doesn't already
   have one), you could do something like this:
@@ -4933,6 +4931,7 @@
   to use in /usr/local/share/xmame: hiscore, roms, and snaps.
 
 
+
        $ mkdir -p /usr/local/share/xmame/{highscore,roms,snaps}
 
 
@@ -4992,6 +4991,7 @@
        (enter password)
        # mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.103.x11
        # exit
+
 
 
   NNOOTTEE: Depending on how you compiled xxmmaammee, you may have xxmmaammee..XX1111,
@@ -5121,6 +5121,8 @@
        File Extensions:                                (List of all file extension to be used for this emulator. Blank menas any file under the Rom Path)
        [] Allow games to span multiple roms/disks      (will treat game.1.rom game.2.rom game.3.rom as one game)
 
+
+
   1166..66..  HHiinnttss::
 
 
@@ -5184,13 +5186,13 @@
 
 
 
-  $ tar -xzf taglib-1.4.tar.gz
-  $ cd taglib-1.4
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
+       $ tar -xzf taglib-1.4.tar.gz
+       $ cd taglib-1.4
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
 
 
 
@@ -5245,6 +5247,7 @@
        # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
        # exit
        $
+
 
 
   1177..22..  MMaannddrriivvaa
@@ -5432,7 +5435,6 @@
 
   Q: How do I delete an item from a playlist?  A: Highlight the item in
   the selection tree and hit the "d" key.
-
 
   Q: How do I rearrange the songs in my playlist?  A: Highlight a song
   and hit the "space" bar, the song will now have pair of red arrows in
@@ -5623,6 +5625,8 @@
   This indicates that mtd is ready for use. Once you've successfully
   tested mtd in the foreground, type CCTTRRLL--CC to stop mtd. You may then
   start it as a background (daemon) process.
+
+
        $ mtd -d
 
 
@@ -5686,6 +5690,7 @@
        # ln -sf linux-g++ default
 
 
+
   and then restart the compile,
 
   or
@@ -5747,16 +5752,16 @@
 
 
 
-  handle SIGPIPE nostop noprint
-  handle SIG33 nostop noprint
-  set logging on
-  set pagination off
-  set breakpoint pending on
-  break qFatal
-  set args -l myth.log -v record,channel,siparser
-  run
-  thread apply all bt full
-  set logging off
+       handle SIGPIPE nostop noprint
+       handle SIG33 nostop noprint
+       set logging on
+       set pagination off
+       set breakpoint pending on
+       break qFatal
+       set args -l myth.log -v record,channel,siparser
+       run
+       thread apply all bt full
+       set logging off
 
 
 
@@ -5821,11 +5826,11 @@
 
   2222..22..44..  MMyytthhTTVV iiss ccrraasshhiinngg yyoouurr ssyysstteemm
 
-  When run as a non-privileged user, MythTV _c_a_n _n_o_t crash your system.
-  If your system is crashing when you run MythTV, then you have some
-  issue with the drivers for your capture card or other hardware, or the
-  CPU fan has fallen off/broken and your system is overheating when
-  asked to perform a CPU intensive task like encoding video.
+  When run as a non-privileged user, MythTV _c_a_n_n_o_t crash your system. If
+  your system is crashing when you run MythTV, then you have some issue
+  with the drivers for your capture card or other hardware, or the CPU
+  fan has fallen off/broken and your system is overheating when asked to
+  perform a CPU intensive task like encoding video.
 
   If you are running as root, which is ssttrroonnggllyy ddiissccoouurraaggeedd, it is
   possible that your system may crash due to the real-time thread using
@@ -6002,7 +6007,7 @@
   You may also combine the command to turn off DPMS and the screensaver:
 
 
-  $ xset -dpms s off
+       $ xset -dpms s off
 
 
 
@@ -6047,7 +6052,7 @@
   audio subsystem and failing. You may or may not receive error messages
   indicating that the source of the error is the audio subsystem.
 
-  You can not use xxaawwttvv to determine if your audio is working correctly,
+  You cannot use xxaawwttvv to determine if your audio is working correctly,
   since xxaawwttvv is simply using the analog sound patched through line-in
   to line-out. It doesn't need to digitize the sound unless you are
   using the recording function.
@@ -6314,11 +6319,16 @@
        $ cat audout > audio.raw &
        $ cat vidout > video.yuv
 
+
+
   2233..22..  UUssiinngg aa ddiiffffeerreenntt wwiinnddooww mmaannaaggeerr
 
   MythTV is not dependent on any particular window manager. If you wish
-  to run a lightweight window manager, the contrib/configfiles/
-  directory has an example of a .twmrc and .fvwmrc file you may use.
+  to run a lightweight window manager, the Window Manager Configuration
+  Files
+  <http://www.mythtv.org/wiki/Category:Window_Manager_Configuration_Files>
+  category of the MythTV wiki has an example of a .twmrc and .fvwmrc
+  file you may use.
 
   2233..33..  WWhhaatt ccaappttuurree rreessoolluuttiioonn sshhoouulldd II uussee?? HHooww ddooeess vviiddeeoo wwoorrkk??
 
@@ -6441,8 +6451,6 @@
   resolutions'' used. However, during playback, the "W" key can to used
   to correct differences between 16:9 and 4:3.
 
-
-
   2233..44..33..  OOvveerrssccaann DDiimmeennssiioonnss
 
   Because picture edges can be ragged and screen edges aren't straight,
@@ -6458,7 +6466,7 @@
   there will be black borders around the edges of the X desktop, MythTV
   GUI and TV playback.
 
-  MythTV has settings for "Overscan" in Setup->Playback. These can not,
+  MythTV has settings for "Overscan" in Setup->Playback. These cannot,
   and do not, cause the image to display beyond the edge of the X
   display area. The purpose of these settings are to cut off rough edges
   and to expand the image so that objects will appear to be the same
@@ -6505,6 +6513,8 @@
 
        $ mythconverg_restore.pl --filename mythconverg-1214-20091010150513.sql.gz \
                                 --drop_database --create_database
+
+
 
   For more information on usage and details of the restore script, see
   the help output:
@@ -6577,38 +6587,19 @@
   longer be included in your download.
 
   If you are using a grabber from XMLTV, comment out the channel from
-  the ~/.mythtv/<sourcename>.xmltv file by inserting the word "not "
-  (including the space) in front of the unwanted entry. This will
-  prevent xxmmllttvv from grabbing future listings.
+  the ~/.mythtv/<sourcename>.xmltv file appropriately for your XMLTV
+  grabber. Some grabbers do this by inserting "# " (including the space)
+  in front of the unwanted entry (for example, change "channel=<name>"
+  to "# channel=<name>") and others by changing the "=" to a "!" in the
+  unwanted entry (for example, change "channel=<name>" to
+  "channel!<name>").  This will prevent xxmmllttvv from grabbing future
+  listings.
 
-  Next, delete the unwanted item from the channel table so that it will
-  not appear in the EPG or when changing channels. To delete the data
-  from the database we need to perform some steps. First, assuming that
-  HBO is channel 15, we need to find out the internal chanid used by
-  MySQL:
-
-
-       $ mysql -u root mythconverg
-       mysql> select chanid from channel where channum=15;
-       +--------+
-       | chanid |
-       +--------+
-       |   1015 |
-       +--------+
-       1 row in set (0.00 sec)
-       mysql> delete from channel where chanid = 1015;
-
-
-
-  Old program data will be removed over the course of a week. However,
-  you may want to immediately delete any current program listings for
-  the channel that has been removed:
-
-
-       $ mysql -u root mythconverg
-       mysql> delete from program where chanid = 1015;
-
-
+  Next, either delete the unwanted channel or mark it as not visible
+  using mythtv-setup's channel editor, so that it will not appear in the
+  EPG or when changing channels. If you delete the channel, it may be
+  added back on a future scan. If you mark it as not visible, it will be
+  left not visible on future scans.
 
   2233..88..  NNFFSS
 
@@ -6690,33 +6681,43 @@
 
   2233..1100..  AAuuttoommaattiiccaallllyy ssttaarrttiinngg mmyytthhbbaacckkeenndd aatt ssyysstteemm bboooott ttiimmee
 
+  There are several example start scripts in the Startup Scripts
+  <http://www.mythtv.org/wiki/Category:Startup_Scripts> category of the
+  MythTV wiki.
+
   2233..1100..11..  RReedd HHaatt AAnndd MMaannddrriivvaa
 
-  Here's a method for automatically starting mythbackend submitted by
-  Mike Thomson (mailto:linux@m-thomson.net <mailto:linux@m-thomson.net>)
-  and Stu Tomlinson (mailto:stu@nosnilmot.com
-  <mailto:stu@nosnilmot.com>).
-  Copy the files from the MythTV contrib directory or from Mike's web
-  site (http://m-thomson.net/mythtv/ <http://m-thomson.net/mythtv/>) as
-  follows:
+  Here's a method for automatically starting mythbackend on Fedora.
 
-  etc.rc.d.init.mythbackend should be made executable and copied to
-  /etc/rc.d/init.d/:
+  Copy the files from the Fedora init.d mythbackend
+  <http://www.mythtv.org/wiki/Fedora_init.d_mythbackend> page of the
+  MythTV wiki as follows:
 
 
-       $ cd contrib
+
+       $ mythwikiscripts
+
+
+
+  and follow the on-screen prompts to download Fedora - mythbackend
+  init, choosing to save the files to temporary files /tmp/syscon-
+  fig.mythbackend and /tmp/init.mythbackend.
+
+  /tmp/init.mythbackend should be made executable and copied to
+  /etc/rc.d/init.d/
+
+
        $ su
-       # chmod a+x etc.rc.d.init.d.mythbackend
-       # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+       # chmod a+x /tmp/init.mythbackend
+       # cp /tmp/init.mythbackend /etc/rc.d/init.d/mythbackend
 
 
 
-  etc.sysconfig.mythbackend should be copied to /etc/sysconfig/:
+  /tmp/sysconfig.mythbackend should be copied to /etc/sysconfig/:
 
 
-       $ cd contrib
        $ su
-       # cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+       # cp /tmp/sysconfig.mythbackend /etc/sysconfig/mythbackend
 
 
 
@@ -6751,15 +6752,14 @@
   follows:
 
 
-
-  $ su
-  # mkdir /var/log/mythtv
-  # chown root:mythtv /var/log/mythtv
-  # chmod 0775 /var/log/mythtv
-  # exit
-  $ ls -ld /var/log/mythtv
-  drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
-  $
+       $ su
+       # mkdir /var/log/mythtv
+       # chown root:mythtv /var/log/mythtv
+       # chmod 0775 /var/log/mythtv
+       # exit
+       $ ls -ld /var/log/mythtv
+       drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+       $
 
 
 
@@ -6835,13 +6835,23 @@
 
 
 
-  A copy of the above has been included in the contrib/ directory. You
-  may add it by typing:
+  A copy of the above has been included in the Mandriva Security Package
+  Configuration
+  <http://www.mythtv.org/wiki/Mandriva_Security_Package_Configuration>
+  page on the MythTV wiki.  You may add it by typing:
 
 
-       $ cd contrib
+       $ mythwikiscripts
+
+
+
+  and follow the on-screen prompts to download msec Configuration File
+  to a temporary file /tmp/msec.perm.local.
+
+
+
        $ su
-       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+       # cat /tmp/msec.perm.local >> /etc/security/msec/perm.local
        # exit
 
 
@@ -6935,15 +6945,13 @@
   you to view content even if the slave backend that recorded a program
   is not available.
 
-
-
   2233..1122..  UUssiinngg tthhee ttrraannssccooddeerr
 
   MythTV's built-in transcoder re-encodes recordings from one codec to
   another. The transcoder has three primary uses; it can transcode
   MPEG-2 files captured using a hardware encoder (PVR cards, DVB cards,
   ATSC HD, etc.) to MPEG-4, it can be used to transcode RTjpeg files
-  (usually only used on systems that can not real-time encode to MPEG-4
+  (usually only used on systems that cannot real-time encode to MPEG-4
   using a framegrabber) to MPEG-4, and finally it can be used to remove
   commercials from a MPEG-2 file while leaving the file in MPEG-2
   format.
@@ -6967,7 +6975,7 @@
   +o  Automatically transcode the file once it has completed recording.
 
   +o  Manually choosing to transcode a recording, usually after importing
-     a cutlist or manually marking commercials to be removed.
+     a cut list or manually marking commercials to be removed.
 
   The second method can be used on files that have already been
   transcoded (or files which were are already in the desired format), so
@@ -7068,7 +7076,6 @@
   your DVB card, it will get transcoded. When it plays on a channel
   available via your PVR card, it won't be.
 
-
   2233..1122..44..  MMaannuuaall TTrraannssccooddiinngg
 
   Manually transcoding is activated while watching a show by hitting
@@ -7131,6 +7138,8 @@
        $ su
        # /etc/init.d/mythbackend stop
 
+
+
   2. Change the hostname.
 
   For Red Hat and derived distributions, edit the /etc/sysconfig/network
@@ -7189,8 +7198,6 @@
   6. Quit and restart all frontends.
 
   2233..1144..  CCaann II rruunn MMyytthhTTVV oonn mmyy TTiiVVoo??
-
-
 
   2233..1155..  CCaann II rruunn MMyytthhTTVV oonn mmyy RReeppllaayyTTVV??
 
@@ -7256,7 +7263,6 @@
   2233..1199..  WWhhaatt ddoo tthhee iiccoonnss oonn tthhee WWaattcchh RReeccoorrddiinnggss ssccrreeeenn mmeeaann??
 
   Press "1" or F1 to get a popup.
-
 
   2233..2200..  WWhhaatt ddoo tthhee lleetttteerrss mmeeaann wwhheenn II cchhaannggee cchhaannnneellss??
 
@@ -7365,8 +7371,12 @@
      it on. Stating that you have a Tivo may help; the Tivo has a
      direct-connect capability.
 
-  3. Use a firewire connection. There is a 6200ch.c in the MythTV
-     contrib directory which may work for you.
+  3. Use a firewire connection. There are firewire channel change
+     scripts and firewire priming scripts in the Channel_Change_Scripts
+     <http://www.mythtv.org/wiki/Category:Channel_Change_Scripts> and
+     Firewire Priming Scripts
+     <http://www.mythtv.org/wiki/Category:Firewire_Priming_Scripts>
+     categories of the MythTV wiki.
 
   2233..2233..  CCoonnffiigguurriinngg oonnee mmaacchhiinnee ttoo ffllaagg aallll ccoommmmeerrcciiaallss
 
@@ -7388,7 +7398,6 @@
   up.
 
   On the faster machine:
-
 
   Start the mmyytthhttvv--sseettuupp program. Advance through the pages until you
   get to the Job Queue page. Ensure that "Allow Commercial Detection
@@ -7455,6 +7464,8 @@
 
 
        # mkfs.ext3 -T largefile4 /dev/hdb1
+
+
 
   This example assumes that /dev/hdb1 has already been created using
   ffddiisskk. If you're using LVM, /dev/hdb1 may be something like
@@ -7575,22 +7586,21 @@
   retrieval is working:
 
 
-
-  2007-08-25 15:04:32.437 New DB DataDirect connection
-  2007-08-25 15:04:32.437 Connected to database 'mythconverg' at host: localhost
-  2007-08-25 15:04:32.447 DataDirect: Your subscription expires on 11/23/2007 01:12:10 PM
-  2007-08-25 15:04:32.622 New DB connection, total: 3
-  2007-08-25 15:04:32.622 Connected to database 'mythconverg' at host: localhost
-  2007-08-25 15:04:32.623 sourceid 2 has lineup type: CableDigital
-  2007-08-25 15:04:33.418 DataDirect: Adding channel 41 'AMC' (AMC).
-  2007-08-25 15:04:33.422 DataDirect: Adding channel 32 'A & E Network' (AETV).
-  2007-08-25 15:04:33.425 DataDirect: Adding channel 66 'Black Entertainment Television' (BET).
-  2007-08-25 15:04:33.427 DataDirect: Adding channel 180 'Bravo' (BRAVO).
-  2007-08-25 15:04:33.430 DataDirect: Adding channel 51 'ABC Family' (FAM).
-  2007-08-25 15:04:33.432 DataDirect: Adding channel 146 'Country Music Television' (CMTV).
-  2007-08-25 15:04:33.435 DataDirect: Adding channel 39 'CNBC' (CNBC).
-  2007-08-25 15:04:33.437 DataDirect: Adding channel 36 'Cable News Network' (CNN).
-  2007-08-25 15:04:33.440 DataDirect: Adding channel 35 'CNN Headline News' (CNNH).
+       2007-08-25 15:04:32.437 New DB DataDirect connection
+       2007-08-25 15:04:32.437 Connected to database 'mythconverg' at host: localhost
+       2007-08-25 15:04:32.447 DataDirect: Your subscription expires on 11/23/2007 01:12:10 PM
+       2007-08-25 15:04:32.622 New DB connection, total: 3
+       2007-08-25 15:04:32.622 Connected to database 'mythconverg' at host: localhost
+       2007-08-25 15:04:32.623 sourceid 2 has lineup type: CableDigital
+       2007-08-25 15:04:33.418 DataDirect: Adding channel 41 'AMC' (AMC).
+       2007-08-25 15:04:33.422 DataDirect: Adding channel 32 'A & E Network' (AETV).
+       2007-08-25 15:04:33.425 DataDirect: Adding channel 66 'Black Entertainment Television' (BET).
+       2007-08-25 15:04:33.427 DataDirect: Adding channel 180 'Bravo' (BRAVO).
+       2007-08-25 15:04:33.430 DataDirect: Adding channel 51 'ABC Family' (FAM).
+       2007-08-25 15:04:33.432 DataDirect: Adding channel 146 'Country Music Television' (CMTV).
+       2007-08-25 15:04:33.435 DataDirect: Adding channel 39 'CNBC' (CNBC).
+       2007-08-25 15:04:33.437 DataDirect: Adding channel 36 'Cable News Network' (CNN).
+       2007-08-25 15:04:33.440 DataDirect: Adding channel 35 'CNN Headline News' (CNNH).
 
 
 
@@ -7639,4 +7649,6 @@
 
   then press the TAB key until you reach Finish, then press ENTER to
   save.  You can then press ESC until you return to the main screen.
+
+
 
