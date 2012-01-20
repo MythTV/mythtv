@@ -5755,33 +5755,18 @@ modify your lineup. Uncheck the boxes for any unwanted channels, and they
 will no longer be included in your download.
 
 If you are using a grabber from XMLTV, comment out the channel from the
-<tt>~/.mythtv/&lt;sourcename&gt;.xmltv</tt> file by inserting the word "not
-" (including the space) in front of the unwanted entry. This will prevent
-<bf>xmltv</bf> from grabbing future listings.
+<tt>~/.mythtv/&lt;sourcename&gt;.xmltv</tt> file appropriately for your XMLTV
+grabber. Some grabbers do this by inserting "# " (including the space) in front
+of the unwanted entry (for example, change "channel=&lt;name&gt;" to "#
+channel=&lt;name&gt;") and others by changing the "=" to a "!" in the unwanted
+entry (for example, change "channel=&lt;name&gt;" to "channel!&lt;name&gt;").
+This will prevent <bf>xmltv</bf> from grabbing future listings.
 
-Next, delete the unwanted item from the channel table so that it will not
-appear in the EPG or when changing channels.  To delete the data from the
-database we need to perform some steps.  First, assuming that HBO is channel
-15, we need to find out the internal <tt>chanid</tt> used by MySQL:
-<tscreen><verb>
-$ mysql -u root mythconverg
-mysql> select chanid from channel where channum=15;
-+--------+
-| chanid |
-+--------+
-|   1015 |
-+--------+
-1 row in set (0.00 sec)
-mysql> delete from channel where chanid = 1015;
-</verb></tscreen>
-
-Old program data will be removed over the course of a week. However, you may
-want to immediately delete any current program listings for the channel that
-has been removed:
-<tscreen><verb>
-$ mysql -u root mythconverg
-mysql> delete from program where chanid = 1015;
-</verb></tscreen>
+Next, either delete the unwanted channel or mark it as not visible using
+mythtv-setup's channel editor, so that it will not appear in the EPG or when
+changing channels.  If you delete the channel, it may be added back on a future
+scan. If you mark it as not visible, it will be left not visible on future
+scans.
 
 <sect1>NFS
 <p>You may want to use a central server to store your files.
