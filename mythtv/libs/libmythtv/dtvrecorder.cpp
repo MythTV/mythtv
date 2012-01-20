@@ -55,6 +55,9 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _last_keyframe_seen(0),
     _audio_bytes_remaining(0),      _video_bytes_remaining(0),
     _other_bytes_remaining(0),
+    // MPEG2 parser information
+    _progressive_sequence(0),
+    _repeat_pict(0),
     // H.264 support
     _pes_synced(false),
     _seen_sps(false),
@@ -185,6 +188,9 @@ void DTVRecorder::ResetForNewFile(void)
     memset(_stream_id,  0, sizeof(_stream_id));
     memset(_pid_status, 0, sizeof(_pid_status));
     memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
+
+    _progressive_sequence       = 0;
+    _repeat_pict                = 0;
 
     _pes_synced                 = false;
     //_seen_sps
@@ -400,10 +406,9 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     //   (there are others that we don't care about)
     const uint8_t *bufptr = tspacket->data() + tspacket->AFCOffset();
     const uint8_t *bufend = tspacket->data() + TSPacket::kSize;
-    int progressive_sequence = 0;
     int ext_type, bytes_left;
     int picture_structure, top_field_first, repeat_first_field, progressive_frame;
-    int repeat_pict = 0;
+    _repeat_pict = 0;
 
     while (bufptr < bufend)
     {
@@ -445,7 +450,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
                     case 0x1: /* sequence extension */
                         if (bytes_left >= 6)
                         {
-                            progressive_sequence = bufptr[1] & (1 << 3);
+                            _progressive_sequence = bufptr[1] & (1 << 3);
                         }
                         break;
                     case 0x8: /* picture coding extension */
@@ -457,19 +462,19 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
                             progressive_frame = bufptr[4] & (1 << 7);
 
                             /* check if we must repeat the frame */
-                            repeat_pict = 1;
+                            _repeat_pict = 1;
                             if (repeat_first_field) 
                             {
-                                if (progressive_sequence)
+                                if (_progressive_sequence)
                                 {
                                     if (top_field_first)
-                                        repeat_pict = 5;
+                                        _repeat_pict = 5;
                                     else
-                                        repeat_pict = 3;
+                                        _repeat_pict = 3;
                                 }
                                 else if (progressive_frame) 
                                 {
-                                    repeat_pict = 2;
+                                    _repeat_pict = 2;
                                 }
                             }
                         }
