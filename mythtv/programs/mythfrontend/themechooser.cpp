@@ -916,7 +916,9 @@ void ThemeUpdateChecker::checkForUpdate(void)
         QString remoteThemeDir =
             gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
                                      0,
-                                     QString("%1/%2").arg(m_mythVersion).arg(GetMythUI()->GetThemeName()),
+                                     QString("remotethemes/%1/%2")
+                                             .arg(m_mythVersion)
+                                             .arg(GetMythUI()->GetThemeName()),
                                      "Temp");
 
         QString infoXML = remoteThemeDir;
