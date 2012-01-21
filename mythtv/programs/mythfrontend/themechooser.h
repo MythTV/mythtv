@@ -78,6 +78,7 @@ class ThemeChooser : public MythScreenType
 
     QFileInfoList     m_infoList;
     bool              m_refreshDownloadableThemes;
+    QString           m_userThemeDir;
 
     QMap<QString, ThemeInfo*>  m_themeNameInfos;
     QMap<QString, ThemeInfo*>  m_themeFileNameInfos;

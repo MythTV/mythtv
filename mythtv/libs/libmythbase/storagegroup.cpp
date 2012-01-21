@@ -185,6 +185,20 @@ void StorageGroup::Init(const QString group, const QString hostname,
     }
 }
 
+QString StorageGroup::GetFirstDir(bool appendSlash) const
+{
+    if (m_dirlist.isEmpty())
+        return QString();
+
+    QString tmp = m_dirlist[0];
+    tmp.detach();
+
+    if (appendSlash)
+        tmp += "/";
+
+    return tmp;
+}
+
 QStringList StorageGroup::GetDirFileList(QString dir, QString base,
                                          bool recursive)
 {
