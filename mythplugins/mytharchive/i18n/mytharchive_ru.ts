@@ -137,19 +137,19 @@
         <location filename="../mytharchive/mythburn.cpp" line="333"/>
         <location filename="../mytharchive/mythburn.cpp" line="453"/>
         <source>Using Cutlist</source>
-        <translation type="unfinished">Используется список пропускаемых областей</translation>
+        <translation>Используется список вырезок</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="338"/>
         <location filename="../mytharchive/mythburn.cpp" line="458"/>
         <source>Not Using Cutlist</source>
-        <translation type="unfinished">Не используется список пропускаемых областей</translation>
+        <translation>Не используется список вырезок</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="344"/>
         <location filename="../mytharchive/mythburn.cpp" line="464"/>
         <source>No Cut List</source>
-        <translation type="unfinished">Нет списка пропускаемых областей</translation>
+        <translation>Нет списка вырезок</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="355"/>
@@ -174,12 +174,12 @@
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="804"/>
         <source>Don&apos;t Use Cutlist</source>
-        <translation type="unfinished">Не использовать список пропускаемых областей</translation>
+        <translation>Не использовать список вырезок</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="807"/>
         <source>Use Cutlist</source>
-        <translation type="unfinished">Использовать список пропускаемых областей</translation>
+        <translation>Использовать список вырезок</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="811"/>
@@ -217,7 +217,7 @@
     <message>
         <location filename="../mytharchive/main.cpp" line="295"/>
         <source>Toggle use cut list state for selected program</source>
-        <translation type="unfinished">Переключить использование списка пропускаемых областей для выбранной программы</translation>
+        <translation>Переключить использование списка вырезок для выбранной программы</translation>
     </message>
     <message>
         <location filename="../mytharchive/main.cpp" line="298"/>
@@ -268,12 +268,13 @@
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="18"/>
         <source>MythArchive Temp Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Временный каталог MythArchive</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="28"/>
         <source>MythArchive Share Directory</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Общедоступный каталог MythArchive</translatorcomment>
+        <translation>Временный каталог MythArchive</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="30"/>
@@ -288,12 +289,12 @@
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="41"/>
         <source>Video format for DVD recordings, PAL or NTSC.</source>
-        <translation type="unfinished">Формат видео для записи DVD, PAL или NTSC.</translation>
+        <translation>Формат видео для записи DVD: PAL или NTSC.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="48"/>
         <source>File Selector Filter</source>
-        <translation type="unfinished">Фильтр селектора файлов</translation>
+        <translation>Фильтр селектора файлов</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="50"/>
@@ -343,12 +344,12 @@
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="98"/>
         <source>Copy remote files</source>
-        <translation type="unfinished">Копировать удаленные файлы</translation>
+        <translation>Копировать удаленные файлы</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="100"/>
         <source>If set files on remote filesystems will be copied over to the local filesystem before processing. Speeds processing and reduces bandwidth on the network</source>
-        <translation type="unfinished"></translation>
+        <translation>Если установлено, то перед обработкой файлы, расположенные на удаленных файловых системах, будут скопированы на локальную ФС. Это ускоряет обработку и оптимизирует использование полосы пропускания сети</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="109"/>
@@ -358,7 +359,7 @@
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="111"/>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
-        <translation type="unfinished">Если установлено, файлы mpeg2 всегда будут обработаны mythtranscode чтобы устранить любые ошибки. Может помочь исправить некоторые проблемы с аудио. Игнорируется, если установлено &quot;Использовать ProjectX&quot;.</translation>
+        <translation>Если установлено, файлы mpeg2 всегда будут обработаны mythtranscode для устранению каких-либо ошибок. Может помочь исправить некоторые проблемы с аудио. Игнорируется, если установлено &quot;Использовать ProjectX&quot;.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="120"/>
@@ -403,12 +404,12 @@
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="164"/>
         <source>Chapter Menu Aspect Ratio</source>
-        <translation type="unfinished">Соотношение сторон меню разделов</translation>
+        <translation>Соотношение сторон меню разделов</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="169"/>
         <source>Aspect ratio to use when creating the chapter menu. Video means use the same aspect ratio as the associated video.</source>
-        <translation type="unfinished">Соотношение сторон используемое при создании меню разделов. Видео значит использовать то же соотношение сторон что и ассоциированное видео.</translation>
+        <translation type="unfinished">Соотношение сторон используемое при создании меню разделов. Значение &quot;Видео&quot; означает использование того же соотношения сторон что и ассоциированное видео.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="177"/>
@@ -604,7 +605,7 @@ Have you set the correct path in the settings?</source>
         <location filename="../mytharchive/logviewer.cpp" line="164"/>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
-        <translation type="unfinished">Фоновое создание приостановилось.
+        <translation type="unfinished">Фоновое создание запросило остановку.
 Это может занять несколько минут.</translation>
     </message>
     <message>
@@ -622,7 +623,7 @@ Removing stale lock file.</source>
     <message>
         <location filename="../mytharchive/main.cpp" line="213"/>
         <source>Last run failed to create a DVD.</source>
-        <translation type="unfinished">Произошел сбой при последнем выполнении создания DVD.</translation>
+        <translation>Произошел сбой при последнем выполнении создания DVD.</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="994"/>
@@ -795,7 +796,7 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>Select Destination</source>
-        <translation type="unfinished">Выберите назначение</translation>
+        <translation>Выберите назначение</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
@@ -845,12 +846,12 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>Previous</source>
-        <translation type="unfinished">Предыдущий</translation>
+        <translation>Предыдущий</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>Next</source>
-        <translation type="unfinished">Следующий</translation>
+        <translation>Следующий</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
@@ -961,13 +962,13 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="78"/>
         <source>title goes here</source>
-        <translation type="unfinished">заголовок располагается здесь</translation>
+        <translation>заголовок располагается здесь</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>x.xx GB</source>
         <oldsource>x.xx Gb</oldsource>
-        <translation type="unfinished">x.xx Гб</translation>
+        <translation>x.xx Гб</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="79"/>
@@ -982,18 +983,18 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="90"/>
         <source>x.xx Gb</source>
-        <translation type="unfinished">x.xx Гб</translation>
+        <translation>x.xx Гб</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Change Encoding Profile</source>
-        <translation type="unfinished">Изменить профиль кодирования</translation>
+        <translation>Изменить профиль кодирования</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>12.34 GB</source>
         <oldsource>12.34GB</oldsource>
-        <translation type="unfinished">12.34 Гб</translation>
+        <translation>12.34 Гб</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
@@ -1113,7 +1114,7 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>Frame</source>
-        <translation type="unfinished">Кадр</translation>
+        <translation>Кадр</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
@@ -1168,12 +1169,12 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="58"/>
         <source>Select Associated Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выбрать ассоциированный канал</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="59"/>
         <source>Archived Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Архивированный канал</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
@@ -1198,7 +1199,7 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="64"/>
         <source>Local Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Локальный канал</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="65"/>

@@ -27,53 +27,53 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="455"/>
+        <location filename="../mythnews/mythnews.cpp" line="452"/>
         <source>Updated</source>
         <translation>Обновлено</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="462"/>
+        <location filename="../mythnews/mythnews.cpp" line="459"/>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="936"/>
+        <location filename="../mythnews/mythnews.cpp" line="933"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="932"/>
+        <location filename="../mythnews/mythnews.cpp" line="929"/>
         <source>Edit News Site</source>
         <translation>Изменить сайт</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="125"/>
+        <location filename="../mythnews/mythnews.cpp" line="122"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>Вы не настроили MythNews для использования хотя бы одного сайта.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="473"/>
-        <location filename="../mythnews/mythnews.cpp" line="732"/>
+        <location filename="../mythnews/mythnews.cpp" line="470"/>
+        <location filename="../mythnews/mythnews.cpp" line="729"/>
         <source>%1 of %2 (%3 percent)</source>
         <translation>%1 из %2 (%3 процентов)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="805"/>
+        <location filename="../mythnews/mythnews.cpp" line="801"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Не задана команда браузера! MythNews требует чтобы был установлен плагин MythBrowser.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="933"/>
+        <location filename="../mythnews/mythnews.cpp" line="930"/>
         <source>Add News Site</source>
         <translation>Добавить сайт</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="935"/>
+        <location filename="../mythnews/mythnews.cpp" line="932"/>
         <source>Delete News Site</source>
         <translation>Удалить сайт</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="918"/>
+        <location filename="../mythnews/mythnews.cpp" line="915"/>
         <source>Options</source>
         <translation>Параметры</translation>
     </message>
@@ -163,7 +163,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="705"/>
+        <location filename="../mythnews/mythnews.cpp" line="702"/>
         <source>Downloading media...</source>
         <translation>Загружаются медиа...</translation>
     </message>
