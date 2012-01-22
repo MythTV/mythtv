@@ -103,7 +103,7 @@ class VideoPlayHandleMedia : public VideoPlayProc
     {
         return GetMythMainWindow()->HandleMedia(m_handler, m_mrl,
                 m_plot, m_title, m_subtitle, m_director, m_season,
-                m_episode, m_inetref, m_length, m_year, m_id);
+                m_episode, m_inetref, m_length, m_year, m_id, true);
     }
 
     QString GetCommandDisplayName() const
@@ -202,7 +202,7 @@ class VideoPlayerCommandPrivate
     {
         if (item)
         {
-            QString play_command = 
+            QString play_command =
                    gCoreContext->GetSetting("mythvideo.VideoAlternatePlayer");
             QString filename;
 

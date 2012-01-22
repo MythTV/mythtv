@@ -21,7 +21,7 @@ using namespace std;
 
 static int handleMedia(const QString &url, const QString &directory, const QString &filename,
                        const QString &, const QString &, int, int, const QString &, int,
-                       const QString &, const QString &)
+                       const QString &, const QString &, bool)
 {
     if (url.isEmpty())
     {
