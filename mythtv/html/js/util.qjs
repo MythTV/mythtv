@@ -44,6 +44,30 @@ function putSetting(hostname, key, value) {
     return result;
 }
 
+function installPackage(packageName) {
+    var result = 0;
+
+    setStatusMessage("<i18n>Installing</i18n> " + packageName);
+
+    $.ajaxSetup({ async: false });
+    $.post("/Config/InstallPackage",
+        { package: packageName },
+        function(data) {
+            if (data.Result == "true") {
+                result = 1;
+            }
+        });
+    $.ajaxSetup({ async: true });
+
+    if (result) {
+        setStatusMessage("<i18n>Package installed</i18n>");
+    } else {
+        setErrorMessage("<i18n>Unable to install package.</i18n>");
+    }
+
+    return result;
+}
+
 function loadDiv(divName, contentURL, jsURL) {
     divName = "#" + divName;
     

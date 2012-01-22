@@ -69,6 +69,7 @@ void StorageGroup::StaticInit(void)
     m_builtinGroups["Themes"] = GetConfDir() + "/themes";
     m_builtinGroups["Temp"] = GetConfDir() + "/tmp";
     m_builtinGroups["Streaming"] = GetConfDir() + "/tmp/hls";
+    m_builtinGroups["3rdParty"] = GetConfDir() + "/3rdParty";
 
     QMap<QString, QString>::iterator it = m_builtinGroups.begin();
     for (; it != m_builtinGroups.end(); ++it)
