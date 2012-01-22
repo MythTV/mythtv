@@ -41,7 +41,6 @@
 #include "playbackboxlistitem.h"
 #include "customedit.h"
 #include "proglist.h"
-#include <external/FFmpeg/libavcodec/x86/mmx.h>
 
 #define LOC      QString("PlaybackBox: ")
 #define LOC_WARN QString("PlaybackBox Warning: ")
