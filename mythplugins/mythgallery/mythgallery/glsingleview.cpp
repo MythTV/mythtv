@@ -207,21 +207,8 @@ void GLSingleView::paintGL(void)
         {
             m_movieState = 2;
             ThumbItem* item = m_itemList.at(m_pos);
-            QString cmd = gCoreContext->GetSetting("GalleryMoviePlayerCmd");
 
-            if ((cmd.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
-                (cmd.length() < 1))
-            {
-                cmd = "Internal";
-                GetMythMainWindow()->HandleMedia(cmd, item->GetPath());
-            }
-            else
-            {
-                QString path = QString("\"%1\"").arg(item->GetPath());
-
-                cmd.replace("%s", path);
-                myth_system(cmd);
-            }
+            GalleryUtil::PlayVideo(item->GetPath());
 
             if (!m_slideshow_running)
             {
@@ -1315,7 +1302,7 @@ void GLSingleView::EffectKenBurns(void)
                 FindRandXY(m_effect_kenBurns_location_x[m_texCur],
                            m_effect_kenBurns_location_y[m_texCur]);
                 m_effect_kenBurns_projection[m_texCur] =
-                    1 + (int)((2.0f * random() / (RAND_MAX + 1.0f))); 
+                    1 + (int)((2.0f * random() / (RAND_MAX + 1.0f)));
             }
             else  //No item, must be 1 of the first two preloaded items
             {

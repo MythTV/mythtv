@@ -182,21 +182,8 @@ void SingleView::paintEvent(QPaintEvent *)
         {
             m_movieState = 2;
             ThumbItem *item = m_itemList.at(m_pos);
-            QString cmd = gCoreContext->GetSetting("GalleryMoviePlayerCmd");
 
-            if ((cmd.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
-                (cmd.length() < 1))
-            {
-                cmd = "Internal";
-                GetMythMainWindow()->HandleMedia(cmd, item->GetPath());
-            }
-            else
-            {
-                QString path = QString("\"%1\"").arg(item->GetPath());
-
-                cmd.replace("%s", path);
-                myth_system(cmd);
-            }
+            GalleryUtil::PlayVideo(item->GetPath());
 
             if (!m_slideshow_running)
             {
