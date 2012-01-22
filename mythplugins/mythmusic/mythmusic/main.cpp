@@ -356,10 +356,6 @@ static void MusicCallback(void *data, QString &selection)
         MusicPlayerSettings settings;
         settings.exec();
 
-        // reload the list of visualizers incase they've been changed
-        MainVisual::visualizers = MainVisual::Visualizations(false);
-        MainVisual::currentVisualizer = 0;
-
         gCoreContext->ActivateSettingsCache(true);
 
         gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED")));
