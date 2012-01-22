@@ -35,7 +35,7 @@ class MainVisual :  public QObject, public MythTV::Visual
     Q_OBJECT
 
   public:
-    MainVisual(MythUIVideo *visualiser);
+    MainVisual(MythUIVideo *visualizer);
     virtual ~MainVisual();
 
     VisualBase *visual(void) const { return m_vis; }
@@ -53,19 +53,17 @@ class MainVisual :  public QObject, public MythTV::Visual
     void setFrameRate(int newfps);
     int frameRate(void) const { return m_fps; }
 
-    static QStringList Visualizations(bool showall = true);
+    QStringList getVisualizations(void) { return m_visualizers; }
 
-    /// list of visualizers (chosen by the user)
-    static QStringList visualizers;
-
-    /// index of the current visualizer
-    static int currentVisualizer;
+    int getCurrentVisual(void) { return m_currentVisualizer; }
 
   public slots:
     void timeout();
 
   private:
-    MythUIVideo *m_visualiserVideo;
+    MythUIVideo *m_visualizerVideo;
+    QStringList m_visualizers;
+    int m_currentVisualizer;
     VisualBase *m_vis;
     QPixmap m_pixmap;
     QList<VisualNode*> m_nodes;

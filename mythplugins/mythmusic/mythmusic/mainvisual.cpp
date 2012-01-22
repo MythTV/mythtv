@@ -32,17 +32,23 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 // MainVisual
 
-QStringList MainVisual::visualizers = MainVisual::Visualizations(false);
-int MainVisual::currentVisualizer = gCoreContext->GetNumSetting("MusicLastVisualizer", 0);
-
-MainVisual::MainVisual(MythUIVideo *visualiser)
-    : QObject(NULL), MythTV::Visual(), m_visualiserVideo(visualiser),
+MainVisual::MainVisual(MythUIVideo *visualizer)
+    : QObject(NULL), MythTV::Visual(), m_visualizerVideo(visualizer),
       m_vis(NULL), m_playing(false), m_fps(20), m_samples(SAMPLES_DEFAULT_SIZE),
       m_updateTimer(NULL)
 {
     setObjectName("MainVisual");
 
-    resize(m_visualiserVideo->GetArea().size());
+    for (const VisFactory* pVisFactory = VisFactory::VisFactories();
+        pVisFactory; pVisFactory = pVisFactory->next())
+    {
+        pVisFactory->plugins(&m_visualizers);
+    }
+    m_visualizers.sort();
+
+    m_currentVisualizer = gCoreContext->GetNumSetting("MusicLastVisualizer", 0);
+
+    resize(m_visualizerVideo->GetArea().size());
 
     m_updateTimer = new QTimer(this);
     m_updateTimer->setInterval(1000 / m_fps);
@@ -61,7 +67,7 @@ MainVisual::~MainVisual()
     while (!m_nodes.empty())
         delete m_nodes.takeLast();
 
-    gCoreContext->SaveSetting("MusicLastVisualizer", currentVisualizer);
+    gCoreContext->SaveSetting("MusicLastVisualizer", m_currentVisualizer);
 }
 
 void MainVisual::stop(void)
@@ -79,7 +85,7 @@ void MainVisual::setVisual(const QString &name)
 {
     m_updateTimer->stop();
 
-    int index = visualizers.indexOf(name);
+    int index = m_visualizers.indexOf(name);
 
     if (index == -1)
     {
@@ -87,9 +93,9 @@ void MainVisual::setVisual(const QString &name)
         return;
     }
 
-    currentVisualizer = index;
+    m_currentVisualizer = index;
 
-    m_pixmap.fill(m_visualiserVideo->GetBackgroundColor());
+    m_pixmap.fill(m_visualizerVideo->GetBackgroundColor());
 
     QString visName, pluginName;
 
@@ -116,7 +122,7 @@ void MainVisual::setVisual(const QString &name)
         if (pVisFactory->name() == visName)
         {
             m_vis = pVisFactory->create(this, pluginName);
-            m_vis->resize(m_visualiserVideo->GetArea().size());
+            m_vis->resize(m_visualizerVideo->GetArea().size());
             m_fps = m_vis->getDesiredFPS();
             m_samples = m_vis->getDesiredSamples();
 
@@ -210,8 +216,8 @@ void MainVisual::timeout()
     if (m_vis && !stop)
     {
         QPainter p(&m_pixmap);
-        if (m_vis->draw(&p, m_visualiserVideo->GetBackgroundColor()))
-            m_visualiserVideo->UpdateFrame(&m_pixmap);
+        if (m_vis->draw(&p, m_visualizerVideo->GetBackgroundColor()))
+            m_visualizerVideo->UpdateFrame(&m_pixmap);
     }
 
     if (m_playing && !stop)
@@ -221,7 +227,7 @@ void MainVisual::timeout()
 void MainVisual::resize(const QSize &size)
 {
     m_pixmap = QPixmap(size);
-    m_pixmap.fill(m_visualiserVideo->GetBackgroundColor());
+    m_pixmap.fill(m_visualizerVideo->GetBackgroundColor());
 
     if (m_vis)
         m_vis->resize(size);
@@ -243,33 +249,4 @@ void MainVisual::customEvent(QEvent *event)
     {
         m_playing = false;
     }
-}
-
-// static member function
-QStringList MainVisual::Visualizations(bool showall)
-{
-    // TODO remove this once the visualiser selector is reinstated
-    showall = true;
-
-    QStringList visualizations;
-
-    if (showall)
-    {
-        for (const VisFactory* pVisFactory = VisFactory::VisFactories();
-            pVisFactory; pVisFactory = pVisFactory->next())
-        {
-            pVisFactory->plugins(&visualizations);
-        }
-
-        visualizations.sort();
-
-        return visualizations;
-    }
-
-    visualizations = gCoreContext->GetSetting("VisualMode").split(';', QString::SkipEmptyParts);
-
-    if (!visualizations.count())
-        visualizations.push_front("Blank");
-
-    return visualizations;
 }
