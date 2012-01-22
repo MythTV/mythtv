@@ -66,6 +66,13 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
     }
 }
 
+void CC708Decoder::decode_cc_null(void)
+{
+    if (partialPacket.size && reader)
+        parse_cc_packet(reader, &partialPacket, last_seen);
+    partialPacket.size = 0;
+}
+
 void CC708Decoder::services(uint seconds, bool seen[64]) const
 {
     time_t now = time(NULL);
