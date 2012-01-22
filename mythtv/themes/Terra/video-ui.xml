@@ -562,6 +562,19 @@
                         </state>
                     </statetype>
 
+                    <statetype name="watchedstate">
+                        <position>140,255</position>
+                        <state name="yes">
+                            <imagetype name="overlay">
+                                <filename>recordings/statusoverlay.png</filename>
+                            </imagetype>
+                            <imagetype name="watchedimage">
+                                <position>2,8</position>
+                                <filename>shared/watched.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+
                     <textarea name="childcount" from="basetextarea">
                         <area>160,290,35,20</area>
                         <font>basesmallbrown</font>
@@ -633,16 +646,17 @@
         </textarea>
 
         <textarea name="year" from="basetextarea">
-            <area>48,284,290,30</area>
+            <area>48,284,200,25</area>
         </textarea>
 
-        <textarea name="##x##" from="basetextarea">
-            <area>540,284,200,30</area>
-            <align>center</align>
+        <textarea name="season" from="basetextarea">
+            <area>440,284,400,25</area>
+            <align>hcenter</align>
+            <template>%Season - |SEASON| %% Episode - |EPISODE| %</template>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>430,284,800,30</area>
+            <area>850,284,380,25</area>
             <align>right</align>
         </textarea>
 
@@ -690,10 +704,25 @@
                             </imagetype>
                         </state>
                     </statetype>
+
+                    <statetype name="watchedstate">
+                        <position>150,110</position>
+                        <state name="yes">
+                            <imagetype name="overlay">
+                                <filename>recordings/statusoverlay.png</filename>
+                            </imagetype>
+                            <imagetype name="watchedimage">
+                                <position>2,8</position>
+                                <filename>shared/watched.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+
                     <textarea name="buttontext" from="basetextarea">
                         <area>8,155,183,50</area>
                         <align>hcenter,vcenter</align>
                         <multiline>true</multiline>
+                        <template>%TITLE%</template>
                     </textarea>
                     <textarea name="childcount" from="basetextarea">
                         <area>144,118,35,20</area>
@@ -746,12 +775,12 @@
         </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>48,497,590,35</area>
+            <area>48,497,570,35</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="subtitle" from="basetextarea">
-            <area>600,497,590,35</area>
+            <area>620,497,570,35</area>
             <align>right</align>
             <font>baselarge</font>
         </textarea>
@@ -761,22 +790,28 @@
         </statetype>
 
         <textarea name="description" from="basetextarea">
-            <area>48,535,1182,110</area>
+            <area>48,540,1182,100</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="year" from="basetextarea">
-            <area>48,650,290,30</area>
+            <area>48,650,200,25</area>
         </textarea>
 
-        <textarea name="runtime" from="basetextarea">
-            <area>540,650,200,30</area>
+<!--        <textarea name="runtime" from="basetextarea">
+            <area>250,650,600,30</area>
             <align>left</align>
+        </textarea>
+-->
+        <textarea name="season" from="basetextarea">
+            <area>440,650,400,25</area>
+            <align>hcenter</align>
+            <template>%Season - |SEASON| %% Episode - |EPISODE| %</template>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>430,650,800,30</area>
+            <area>850,650,380,25</area>
             <align>right</align>
         </textarea>
 
