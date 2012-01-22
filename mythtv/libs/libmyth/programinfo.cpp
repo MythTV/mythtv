@@ -1358,9 +1358,6 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["description"] = description;
 
-    progMap["season"] = GetDisplaySeasonEpisode(season, 1);
-    progMap["episode"] = GetDisplaySeasonEpisode(episode, 1);
-
     if (season > 0 || episode > 0)
     {
         progMap["season"] = GetDisplaySeasonEpisode(season, 1);
