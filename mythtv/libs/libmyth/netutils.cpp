@@ -9,10 +9,15 @@
 
 QString GetDisplaySeasonEpisode(int seasEp, int digits)
 {
-    QString seasEpNum = QString::number(seasEp);
+    QString seasEpNum;
 
-    if (digits == 2 && seasEpNum.size() < 2)
-        seasEpNum.prepend("0");
+    if (seasEp > 0)
+    {
+        seasEpNum = QString::number(seasEp);
+
+        if (digits == 2 && seasEpNum.size() < 2)
+            seasEpNum.prepend("0");
+    }
 
     return seasEpNum;
 }
@@ -48,7 +53,7 @@ bool findSearchGrabberInDB(const QString& commandline,
     query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     query.bindValue(":TYPE", type);
-    if (!query.exec() || !query.isActive()) 
+    if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("Search find in db", query);
         return false;

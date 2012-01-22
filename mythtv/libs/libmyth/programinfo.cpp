@@ -1358,11 +1358,11 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["description"] = description;
 
-    if (season > 0 || episode > 0)
-    {
-        progMap["season"] = QString::number(season);
-        progMap["episode"] = QString::number(episode);
+    progMap["season"] = GetDisplaySeasonEpisode(season, 1);
+    progMap["episode"] = GetDisplaySeasonEpisode(episode, 1);
 
+    if (season > 0 && episode > 0)
+    {
         progMap["s00e00"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
                                              (GetSeason(), 2))
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
@@ -2031,7 +2031,7 @@ void ProgramInfo::SetAvailableStatus(
 {
     if (status != availableStatus)
     {
-        LOG(VB_GUI, LOG_INFO, 
+        LOG(VB_GUI, LOG_INFO,
                  toString(kTitleSubtitle) + QString(": %1 -> %2")
                      .arg(::toString((AvailableStatusType)availableStatus))
                      .arg(::toString(status)));
@@ -2097,7 +2097,7 @@ QString ProgramInfo::QueryBasename(void) const
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, 
+        LOG(VB_GENERAL, LOG_INFO,
                  QString("QueryBasename found no entry for %1 @ %2")
                      .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
     }

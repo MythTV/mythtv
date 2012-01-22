@@ -4688,19 +4688,25 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         if (!newSubtitle.trimmed().isEmpty())
             tempSubTitle = QString("%1 - \"%2\"")
                             .arg(tempSubTitle).arg(newSubtitle);
-        QString seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                                             (newSeason, 2))
-                        .arg(GetDisplaySeasonEpisode(newEpisode, 2));
-        QString seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
-                                             (newSeason, 1))
-                        .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+
+        QString seasone;
+        QString seasonx;
+        if (newSeason > 0)
+        {
+            seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                                                (newSeason, 2))
+                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+            seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
+                                                (newSeason, 1))
+                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+        }
 
         item->SetText(tempSubTitle, "titlesubtitle");
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
         item->SetText(newInetref, "inetref");
-        item->SetText(QString::number(newSeason), "season");
-        item->SetText(QString::number(newEpisode), "episode");
+        item->SetText(GetDisplaySeasonEpisode(newSeason, 1), "season");
+        item->SetText(GetDisplaySeasonEpisode(newEpisode, 1), "episode");
         item->SetText(seasonx, "00x00");
         item->SetText(seasone, "s00e00");
         if (newDescription != NULL)
