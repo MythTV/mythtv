@@ -910,10 +910,13 @@ void StoreOptEditor::Load()
         while (query.next())
         {
             value = query.value(0).toString();
-            groups += value;
 
-            if (value == "Default")
-                foundDefault = true;
+            if (value != "Deleted")
+            {
+                groups += value;
+                if (value == "Default")
+                    foundDefault = true;
+            }
         }
     }
 
