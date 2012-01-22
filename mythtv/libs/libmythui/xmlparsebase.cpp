@@ -131,7 +131,7 @@ MythRect XMLParseBase::parseRect(QDomElement &element, bool normalize)
 
 int XMLParseBase::parseAlignment(const QString &text)
 {
-    int alignment = 0;
+    int alignment = Qt::AlignLeft | Qt::AlignTop;
 
     QStringList values = text.split(',');
 
@@ -145,24 +145,45 @@ int XMLParseBase::parseAlignment(const QString &text)
 
         if (align == "center" || align == "allcenter")
         {
+            alignment &= ~(Qt::AlignHorizontal_Mask | Qt::AlignVertical_Mask);
             alignment |= Qt::AlignCenter;
             break;
         }
         else if (align == "justify")
+        {
+            alignment &= ~Qt::AlignHorizontal_Mask;
             alignment |= Qt::AlignJustify;
+        }
         else if (align == "left")
+        {
+            alignment &= ~Qt::AlignHorizontal_Mask;
             alignment |= Qt::AlignLeft;
+        }
         else if (align == "hcenter")
+        {
+            alignment &= ~Qt::AlignHorizontal_Mask;
             alignment |= Qt::AlignHCenter;
+        }
         else if (align == "right")
+        {
+            alignment &= ~Qt::AlignHorizontal_Mask;
             alignment |= Qt::AlignRight;
+        }
         else if (align == "top")
+        {
+            alignment &= ~Qt::AlignVertical_Mask;
             alignment |= Qt::AlignTop;
+        }
         else if (align == "vcenter")
+        {
+            alignment &= ~Qt::AlignVertical_Mask;
             alignment |= Qt::AlignVCenter;
+        }
         else if (align == "bottom")
+        {
+            alignment &= ~Qt::AlignVertical_Mask;
             alignment |= Qt::AlignBottom;
-
+        }
     }
 
     return alignment;
