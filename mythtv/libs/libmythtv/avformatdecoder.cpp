@@ -2577,13 +2577,18 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len)
     {
         uint cc_code  = buf[2+(cur*3)];
         bool cc_valid = cc_code & 0x04;
-        if (!cc_valid)
-            continue;
 
         uint data1    = buf[3+(cur*3)];
         uint data2    = buf[4+(cur*3)];
         uint data     = (data2 << 8) | data1;
         uint cc_type  = cc_code & 0x03;
+
+        if (!cc_valid)
+        {
+            if (cc_type >= 0x2)
+                ccd708->decode_cc_null();
+            continue;
+        }
 
         if (cc_type <= 0x1) // EIA-608 field-1/2
         {
