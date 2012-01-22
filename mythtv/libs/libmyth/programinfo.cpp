@@ -1361,8 +1361,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["season"] = GetDisplaySeasonEpisode(season, 1);
     progMap["episode"] = GetDisplaySeasonEpisode(episode, 1);
 
-    if (season > 0 && episode > 0)
+    if (season > 0 || episode > 0)
     {
+        progMap["season"] = GetDisplaySeasonEpisode(season, 1);
+        progMap["episode"] = GetDisplaySeasonEpisode(episode, 1);
         progMap["s00e00"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
                                              (GetSeason(), 2))
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
@@ -1370,6 +1372,12 @@ void ProgramInfo::ToMap(InfoMap &progMap,
                                              (GetSeason(), 1))
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
     }
+    else
+    {
+        progMap["season"] = progMap["episode"] = "";
+        progMap["s00e00"] = progMap["00x00"] = "";
+    }
+
     progMap["category"] = category;
     progMap["callsign"] = chansign;
     progMap["commfree"] = (programflags & FL_CHANCOMMFREE) ? 1 : 0;

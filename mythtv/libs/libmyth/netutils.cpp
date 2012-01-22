@@ -11,7 +11,7 @@ QString GetDisplaySeasonEpisode(int seasEp, int digits)
 {
     QString seasEpNum;
 
-    if (seasEp > 0)
+    if (seasEp > -1)
     {
         seasEpNum = QString::number(seasEp);
 

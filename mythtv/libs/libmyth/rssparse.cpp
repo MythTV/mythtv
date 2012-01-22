@@ -145,12 +145,11 @@ void ResultItem::toMap(MetadataMap &metadataMap)
     metadataMap["language"] = m_language;
     metadataMap["countries"] = m_countries.join(", ");
 
-    metadataMap["season"] = GetDisplaySeasonEpisode(m_season, 1);
-    metadataMap["episode"] = GetDisplaySeasonEpisode(m_episode, 1);
 
-    if (m_season > 0 && m_episode > 0)
+    if (m_season > 0 || m_episode > 0)
     {
-
+        metadataMap["season"] = GetDisplaySeasonEpisode(m_season, 1);
+        metadataMap["episode"] = GetDisplaySeasonEpisode(m_episode, 1);
         metadataMap["s##e##"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
                                  (m_season, 2)).arg(
                                  GetDisplaySeasonEpisode(m_episode, 2));
@@ -160,6 +159,8 @@ void ResultItem::toMap(MetadataMap &metadataMap)
     }
     else
     {
+        metadataMap["season"] = QString();
+        metadataMap["episode"] = QString();
         metadataMap["s##e##"] = QString();
         metadataMap["##x##"] = QString();
     }

@@ -41,6 +41,7 @@
 #include "playbackboxlistitem.h"
 #include "customedit.h"
 #include "proglist.h"
+#include <external/FFmpeg/libavcodec/x86/mmx.h>
 
 #define LOC      QString("PlaybackBox: ")
 #define LOC_WARN QString("PlaybackBox Warning: ")
@@ -4691,8 +4692,12 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
 
         QString seasone;
         QString seasonx;
-        if (newSeason > 0)
+        QString season;
+        QString episode;
+        if (newSeason > 0 || newEpisode > 0)
         {
+            season = GetDisplaySeasonEpisode(newSeason, 1);
+            episode = GetDisplaySeasonEpisode(newEpisode, 1);
             seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
                                                 (newSeason, 2))
                             .arg(GetDisplaySeasonEpisode(newEpisode, 2));
@@ -4705,10 +4710,10 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
         item->SetText(newInetref, "inetref");
-        item->SetText(GetDisplaySeasonEpisode(newSeason, 1), "season");
-        item->SetText(GetDisplaySeasonEpisode(newEpisode, 1), "episode");
         item->SetText(seasonx, "00x00");
         item->SetText(seasone, "s00e00");
+        item->SetText(season, "season");
+        item->SetText(episode, "episode");
         if (newDescription != NULL)
             item->SetText(newDescription, "description");
     }
