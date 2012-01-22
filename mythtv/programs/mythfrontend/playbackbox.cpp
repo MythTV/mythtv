@@ -1224,6 +1224,9 @@ void PlaybackBox::UpdateUIRecGroupList(void)
         QString tmp = (key == "All Programs") ? "All" : key;
         QString name = ProgramInfo::i18n(tmp);
 
+        if (m_recGroups.size() == 2 && key == "Default")
+            continue;  // All and Default will be the same, so only show All
+
         MythUIButtonListItem *item = new MythUIButtonListItem(
             m_recgroupList, name, qVariantFromValue(key));
 
