@@ -1,0 +1,102 @@
+#include <QSocketNotifier>
+#include <QtEndian>
+#include "mythlogging.h"
+#include "bonjourregister.h"
+
+#define LOC QString("Bonjour: ")
+
+BonjourRegister::BonjourRegister(QObject *parent)
+  : QObject(parent), m_dnssref(0), m_socket(NULL)
+{
+}
+
+BonjourRegister::~BonjourRegister()
+{
+    if (m_socket)
+        m_socket->setEnabled(false);
+
+    if (m_dnssref)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "De-registering service.");
+        DNSServiceRefDeallocate(m_dnssref);
+    }
+    m_dnssref = 0;
+
+    m_socket->deleteLater();
+    m_socket = NULL;
+}
+
+bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
+                              const QByteArray &name, const QByteArray &txt)
+{
+    if (m_dnssref)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Service already registered.");
+        return true;
+    }
+
+    uint16_t qport = qToBigEndian(port);
+    DNSServiceErrorType res =
+        DNSServiceRegister(&m_dnssref, 0, 0, (const char*)name.data(),
+                           (const char*)type.data(),
+                           NULL, 0, qport, txt.size(), (void*)txt.data(),
+                           BonjourCallback, this);
+
+    if (kDNSServiceErr_NoError != res)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error: %1").arg(res));
+    }
+    else
+    {
+        int fd = DNSServiceRefSockFD(m_dnssref);
+        if (fd != -1)
+        {
+            m_socket = new QSocketNotifier(fd, QSocketNotifier::Read, this);
+            m_socket->setEnabled(true);
+            connect(m_socket, SIGNAL(activated(int)),
+                    this, SLOT(socketReadyRead()));
+            return true;
+        }
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
+    return false;
+}
+
+
+void BonjourRegister::socketReadyRead()
+{
+    DNSServiceErrorType res = DNSServiceProcessResult(m_dnssref);
+    if (kDNSServiceErr_NoError != res)
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Read Error: %1").arg(res));
+}
+
+
+void BonjourRegister::BonjourCallback(DNSServiceRef ref, DNSServiceFlags flags,
+                                      DNSServiceErrorType errorcode,
+                                      const char *name, const char *type,
+                                      const char *domain, void *object)
+{
+    (void)ref;
+    (void)flags;
+
+    BonjourRegister *bonjour = static_cast<BonjourRegister *>(object);
+    if (kDNSServiceErr_NoError != errorcode)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Callback Error: %1")
+            .arg(errorcode));
+    }
+    else if (bonjour)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Service registration complete: name '%1' type '%2' domain: '%3'")
+            .arg(QString::fromUtf8(name)).arg(QString::fromUtf8(type))
+            .arg(QString::fromUtf8(domain)));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("BonjourCallback for unknown object."));
+    }
+}
+

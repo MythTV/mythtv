@@ -138,6 +138,7 @@ Advanced options (experts only):
   --libxml2-path=HDRLOC    location of directory containing
                            'libxml/parser.h', not the
                            directory with parser.h [$libxml2_path_default]
+  --disable-libdns-sd      disable DNS Service Discovery (Bonjour/Zeroconf/Avahi)
 
   --with-bindings=LIST     install the bindings specified in the
                            comma-separated list
@@ -1354,6 +1355,7 @@ MYTHTV_CONFIG_LIST='
     asi
     joystick_menu
     libcec
+    libdns_sd
     libfftw3
     libmpeg2external
     libxml2
@@ -1998,6 +2000,7 @@ enable asi
 enable lamemp3
 enable libass
 enable libcec
+enable libdns_sd
 enable libxml2
 enable libudf
 enable lirc
@@ -4138,6 +4141,8 @@ int main(void) {
 EOF
 fi
 
+enabled libdns_sd && check_lib dns_sd.h DNSServiceRegister -ldns_sd || disable libdns_sd
+
 if enabled libxml2 ; then
    if pkg-config --exists libxml-2.0 ; then
         libxml2_path=`pkg-config --cflags-only-I libxml-2.0|sed -n "s/-I\([^ ]*\) *$/\1/p"`
@@ -4569,6 +4574,7 @@ echo "multi threaded libavcodec ${threads-no}"
 if enabled frontend; then
   echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
 fi
+echo "libdns_sd (Bonjour)       ${libdns_sd-no}"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "OpenGL ES 2.0             ${opengles-no}"
@@ -4877,6 +4883,10 @@ if enabled libxml2; then
     append CONFIG_INCLUDEPATH "$libxml2_path"
     append CCONFIG "using_libxml2"
   fi
+fi
+
+if enabled libdns_sd; then
+  append CONFIG_DEFINES "using_libdns_sd"
 fi
 
 if enabled libudf; then
