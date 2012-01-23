@@ -176,39 +176,36 @@ SingleView::~SingleView()
 
 void SingleView::paintEvent(QPaintEvent *)
 {
-    if (m_movieState > 0)
+    if (1 == m_movieState)
     {
-        if (m_movieState == 1)
-        {
-            m_movieState = 2;
-            ThumbItem *item = m_itemList.at(m_pos);
+        m_movieState = 2;
 
+        ThumbItem *item = m_itemList.at(m_pos);
+
+        if (item)
             GalleryUtil::PlayVideo(item->GetPath());
 
-            if (!m_slideshow_running)
-            {
-                if (item)
-                {
-                    QImage image;
-                    GetScreenShot(image, item);
-                    if (image.isNull())
-                        return;
+        if (!m_slideshow_running && item)
+        {
+            QImage image;
+            GetScreenShot(image, item);
+            if (image.isNull())
+                return;
 
-                    image = image.scaled(800, 600);
+            image = image.scaled(800, 600);
 
-                    // overlay "Press SELECT to play again" text
-                    QPainter p(&image);
-                    QRect rect = QRect(20, image.height() - 100, image.width() - 40, 80);
-                    p.fillRect(rect, QBrush(QColor(0,0,0,100)));
-                    p.setFont(QFont("Arial", 25, QFont::Bold));
-                    p.setPen(QColor(255,255,255));
-                    p.drawText(rect, Qt::AlignCenter, tr("Press SELECT to play again"));
-                    p.end();
+            // overlay "Press SELECT to play again" text
+            QPainter p(&image);
+            QRect rect = QRect(20, image.height() - 100,
+                               image.width() - 40, 80);
+            p.fillRect(rect, QBrush(QColor(0,0,0,100)));
+            p.setFont(QFont("Arial", 25, QFont::Bold));
+            p.setPen(QColor(255,255,255));
+            p.drawText(rect, Qt::AlignCenter, tr("Press SELECT to play again"));
+            p.end();
 
-                    m_image = image;
-                    SetZoom(1.0);
-                }
-            }
+            m_image = image;
+            SetZoom(1.0);
         }
     }
 
