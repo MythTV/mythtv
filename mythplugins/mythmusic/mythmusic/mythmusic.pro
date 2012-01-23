@@ -30,7 +30,7 @@ HEADERS += decoder.h flacencoder.h mainvisual.h
 HEADERS += metadata.h playlist.h polygon.h
 HEADERS += streaminput.h synaesthesia.h encoder.h visualize.h avfdecoder.h
 HEADERS += vorbisencoder.h polygon.h
-HEADERS += bumpscope.h globalsettings.h lameencoder.h dbcheck.h
+HEADERS += bumpscope.h lameencoder.h dbcheck.h
 HEADERS += metaio.h metaiotaglib.h
 HEADERS += metaioflacvorbis.h metaioavfcomment.h metaiomp4.h
 HEADERS += metaiowavpack.h metaioid3.h metaiooggvorbis.h
@@ -44,13 +44,15 @@ HEADERS += playlistcontainer.h
 HEADERS += musiccommon.h decoderhandler.h pls.h shoutcast.h
 HEADERS += playlistview.h playlisteditorview.h 
 HEADERS += visualizerview.h searchview.h musicutils.h
+HEADERS += generalsettings.h visualizationsettings.h
+HEADERS += importsettings.h playersettings.h ratingsettings.h
 
 SOURCES += cddecoder.cpp cdrip.cpp decoder.cpp
 SOURCES += flacencoder.cpp main.cpp
 SOURCES += mainvisual.cpp metadata.cpp playlist.cpp
 SOURCES += streaminput.cpp encoder.cpp dbcheck.cpp
 SOURCES += synaesthesia.cpp lameencoder.cpp
-SOURCES += vorbisencoder.cpp visualize.cpp bumpscope.cpp globalsettings.cpp
+SOURCES += vorbisencoder.cpp visualize.cpp bumpscope.cpp
 SOURCES += genres.cpp
 SOURCES += metaio.cpp metaiotaglib.cpp
 SOURCES += metaioflacvorbis.cpp metaioavfcomment.cpp metaiomp4.cpp
@@ -65,6 +67,8 @@ SOURCES += playlistcontainer.cpp
 SOURCES += musiccommon.cpp decoderhandler.cpp pls.cpp shoutcast.cpp
 SOURCES += playlistview.cpp playlisteditorview.cpp 
 SOURCES += visualizerview.cpp searchview.cpp musicutils.cpp
+SOURCES += generalsettings.cpp visualizationsettings.cpp
+SOURCES += importsettings.cpp playersettings.cpp ratingsettings.cpp
 
 macx {
     SOURCES -= cddecoder.cpp
