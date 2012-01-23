@@ -30,6 +30,7 @@
 #include "mythnews.h"
 #include "mythnewseditor.h"
 #include "newsdbutil.h"
+#include "mythnewsconfig.h"
 
 #define LOC      QString("MythNews: ")
 #define LOC_WARN QString("MythNews, Warning: ")
@@ -880,6 +881,22 @@ void MythNews::ShowEditDialog(bool edit)
         delete mythnewseditor;
 }
 
+void MythNews::ShowFeedManager()
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythNewsConfig *mythnewsconfig = new MythNewsConfig(mainStack,
+                                                        "mythnewsconfig");
+
+    if (mythnewsconfig->Create())
+    {
+        connect(mythnewsconfig, SIGNAL(Exiting()), SLOT(loadSites()));
+        mainStack->AddScreen(mythnewsconfig);
+    }
+    else
+        delete mythnewsconfig;
+}
+
 void MythNews::ShowMenu(void)
 {
     QMutexLocker locker(&m_lock);
@@ -897,12 +914,13 @@ void MythNews::ShowMenu(void)
 
         m_menuPopup->SetReturnEvent(this, "options");
 
+        m_menuPopup->AddButton(tr("Manage Feeds"));
+        m_menuPopup->AddButton(tr("Add Feed"));
         if (m_NewsSites.size() > 0)
-            m_menuPopup->AddButton(tr("Edit News Site"));
-        m_menuPopup->AddButton(tr("Add News Site"));
-        if (m_NewsSites.size() > 0)
-            m_menuPopup->AddButton(tr("Delete News Site"));
-        m_menuPopup->AddButton(tr("Cancel"));
+        {
+            m_menuPopup->AddButton(tr("Edit Feed"));
+            m_menuPopup->AddButton(tr("Delete Feed"));
+        }
     }
     else
     {
@@ -954,10 +972,12 @@ void MythNews::customEvent(QEvent *event)
             if (m_NewsSites.size() > 0)
             {
                 if (buttonnum == 0)
-                    ShowEditDialog(true);
+                    ShowFeedManager();
                 else if (buttonnum == 1)
                     ShowEditDialog(false);
                 else if (buttonnum == 2)
+                    ShowEditDialog(true);
+                else if (buttonnum == 3)
                     deleteNewsSite();
             }
             else
