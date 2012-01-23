@@ -15,7 +15,6 @@
 #include <vector>
 using namespace std;
 
-class GenericTree;
 class MythMediaDevice;
 class MythLineEdit;
 class MythRemoteLineEdit;
