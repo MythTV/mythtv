@@ -875,7 +875,7 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
     QString sFilename(fileprefix + "/newstempfile");
 
     if (getHttpFile(sFilename, cmdURL))
-        playVideo(sFilename);
+        playVideo(sFilename, article);
 }
 
 void MythNews::ShowEditDialog(bool edit)
@@ -957,25 +957,12 @@ void MythNews::deleteNewsSite(void)
 }
 
 // does not need locking
-void MythNews::playVideo(const QString &filename)
+void MythNews::playVideo(const QString &filename, const NewsArticle &article)
 {
-    QString command_string = gCoreContext->GetSetting("VideoDefaultPlayer");
-
     sendPlaybackStart();
 
-    if ((command_string.indexOf("Internal", 0, Qt::CaseInsensitive) > -1) ||
-        (command_string.length() < 1))
-    {
-        command_string = "Internal";
-        GetMythMainWindow()->HandleMedia(command_string, filename);
-    }
-    else
-    {
-        if (command_string.contains("%s"))
-            command_string = command_string.replace("%s", filename);
-
-        myth_system(command_string);
-    }
+    GetMythMainWindow()->HandleMedia("Internal", filename, article.title(),
+                                     article.description());
 
     sendPlaybackEnd();
 }
