@@ -750,6 +750,12 @@ bool MythNews::getHttpFile(const QString &sFilename, const QString &cmdURL)
             continue;
         }
 
+        if (m_httpGrabber->getStatusCode() > 400)
+        {
+            // Error, request failed
+            break;
+        }
+
         data = m_httpGrabber->getRawData();
 
         if (data.size() > 0)
