@@ -4885,10 +4885,6 @@ if enabled libxml2; then
   fi
 fi
 
-if enabled libdns_sd; then
-  append CONFIG_DEFINES "using_libdns_sd"
-fi
-
 if enabled libudf; then
   append CCONFIG "using_libudf"
 fi
