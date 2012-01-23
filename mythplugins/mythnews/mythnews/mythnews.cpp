@@ -832,40 +832,6 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
 
     QString cmdURL(article.enclosure());
 
-    // Handle special cases for media here
-    // YouTube: Fetch the mediaURL page and parse out the video URL
-    if (cmdURL.contains("youtube.com"))
-    {
-        cmdURL = QString(article.mediaURL());
-        QString mediaPage = HttpComms::getHttp(cmdURL, 0, 1, 2);
-        if (!mediaPage.isEmpty())
-        {
-            // If this breaks in the future, we are building the URL
-            // to download a video.  At this time, this requires
-            // the video_id and the t argument
-            // from the source HTML of the page
-            int playerPos = mediaPage.indexOf("swfArgs") + 7;
-
-            int tArgStart = mediaPage.indexOf("\"t\": \"",
-                                              playerPos) + 6;
-            int tArgEnd = mediaPage.indexOf("\"", tArgStart);
-            QString tArgString = mediaPage.mid(tArgStart,
-                                               tArgEnd - tArgStart);
-
-            int vidStart = mediaPage.indexOf("\"video_id\": \"",
-                                             playerPos) + 13;
-            int vidEnd = mediaPage.indexOf("\"", vidStart);
-            QString vidString = mediaPage.mid(vidStart,
-                                              vidEnd - vidStart);
-
-            cmdURL = QString("http://youtube.com/get_video.php"
-                             "?video_id=%2&t=%1")
-                .arg(tArgString).arg(vidString);
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("VideoURL '%1'")
-                    .arg(cmdURL));
-        }
-    }
-
     QString fileprefix = GetConfDir();
 
     QDir dir(fileprefix);
