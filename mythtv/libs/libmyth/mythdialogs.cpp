@@ -951,70 +951,6 @@ void MythProgressDialog::setTotalSteps(int totalSteps)
         steps = 1;
 }
 
-MythBusyDialog::MythBusyDialog(const QString &title, bool cancelButton,
-                               const QObject *target, const char *slot)
-    : MythProgressDialog(title, 0,
-                         cancelButton, target, slot),
-                         timer(NULL)
-{
-    setObjectName("MythBusyDialog");
-}
-
-MythBusyDialog::~MythBusyDialog()
-{
-    Teardown();
-}
-
-void MythBusyDialog::deleteLater(void)
-{
-    Teardown();
-    MythProgressDialog::deleteLater();
-}
-
-void MythBusyDialog::Teardown(void)
-{
-    if (timer)
-    {
-        timer->disconnect();
-        timer = NULL;
-    }
-}
-
-void MythBusyDialog::start(int interval)
-{
-    if (!timer)
-        timer = new QTimer(this);
-
-    connect(timer, SIGNAL(timeout()),
-            this,  SLOT  (timeout()));
-
-    timer->start(interval);
-}
-
-void MythBusyDialog::Close(void)
-{
-    if (timer)
-    {
-        timer->disconnect();
-        timer = NULL;
-    }
-
-    MythProgressDialog::Close();
-}
-
-void MythBusyDialog::setProgress(void)
-{
-    progress->setValue(progress->value() + 10);
-    qApp->processEvents();
-    if (LCD *lcddev = LCD::Get())
-        lcddev->setGenericBusy();
-}
-
-void MythBusyDialog::timeout(void)
-{
-    setProgress();
-}
-
 MythThemedDialog::MythThemedDialog(MythMainWindow *parent,
                                    const QString  &window_name,
                                    const QString  &theme_filename,
@@ -1172,10 +1108,6 @@ void MythThemedDialog::loadWindow(QDomElement &element)
             {
                 parseContainer(e);
             }
-            else if (e.tagName() == "popup")
-            {
-                parsePopup(e);
-            }
             else
             {
                 LOG(VB_GENERAL, LOG_ALERT,
@@ -1218,16 +1150,6 @@ void MythThemedDialog::parseFont(QDomElement &element)
     //
 
     theme->parseFont(element);
-}
-
-void MythThemedDialog::parsePopup(QDomElement &element)
-{
-    //
-    //  theme doesn't know how to do this yet
-    //
-    element = element;
-    LOG(VB_GENERAL, LOG_ALERT,
-             "MythThemedDialog cannot parse popups yet - ignoring");
 }
 
 void MythThemedDialog::initForeground()

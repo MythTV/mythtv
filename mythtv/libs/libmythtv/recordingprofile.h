@@ -13,8 +13,6 @@ class RecordingProfile;
 class VideoCompressionSettings;
 class AudioCompressionSettings;
 
-class SelectManagedListItem;
-
 // A parameter associated with the profile itself
 class RecordingProfileStorage : public SimpleDBStorage
 {
