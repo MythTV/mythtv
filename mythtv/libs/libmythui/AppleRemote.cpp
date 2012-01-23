@@ -142,11 +142,9 @@ static float GetATVversion()
     float  version = 0.0;
     if ( strstr(hw_model,"AppleTV1,1") )
     {
-        FILE  *inpipe;
-        char   linebuf[1000];
-
         // Find the build version of the AppleTV OS
-        inpipe = popen("sw_vers -buildVersion", "r");
+        FILE *inpipe = popen("sw_vers -buildVersion", "r");
+        char linebuf[1000];
         if (inpipe && fgets(linebuf, sizeof(linebuf) - 1, inpipe) )
         {
             if (     strstr(linebuf,"8N5107") ) version = 1.0;
@@ -158,9 +156,9 @@ static float GetATVversion()
             else if (strstr(linebuf,"8N5622") ) version = 2.2;
             else
                 version = 2.3;
-
-            pclose(inpipe);
         }
+        if (inpipe)
+            pclose(inpipe);
     }
     return version;
 }
