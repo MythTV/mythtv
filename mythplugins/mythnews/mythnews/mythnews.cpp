@@ -967,8 +967,8 @@ void MythNews::playVideo(const QString &filename, const NewsArticle &article)
 {
     sendPlaybackStart();
 
-    GetMythMainWindow()->HandleMedia("Internal", filename, article.title(),
-                                     article.description());
+    GetMythMainWindow()->HandleMedia("Internal", filename,
+                                     article.description(), article.title());
 
     sendPlaybackEnd();
 }
