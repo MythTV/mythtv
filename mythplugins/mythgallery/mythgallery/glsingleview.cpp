@@ -201,44 +201,44 @@ void GLSingleView::resizeGL(int w, int h)
 
 void GLSingleView::paintGL(void)
 {
-    if (m_movieState > 0)
+    if (1 == m_movieState)
     {
-        if (m_movieState == 1)
-        {
-            m_movieState = 2;
-            ThumbItem* item = m_itemList.at(m_pos);
+        m_movieState = 2;
 
+        ThumbItem *item = m_itemList.at(m_pos);
+
+        if (item)
             GalleryUtil::PlayVideo(item->GetPath());
 
-            if (!m_slideshow_running)
-            {
-                if (item)
-                {
-                    QImage image;
-                    GetScreenShot(image, item);
-                    if (image.isNull())
-                        return;
+        if (!m_slideshow_running && item)
+        {
+            QImage image;
+            GetScreenShot(image, item);
+            if (image.isNull())
+                return;
 
-                    image = image.scaled(800, 600);
+            image = image.scaled(800, 600);
 
-                    // overlay "Press SELECT to play again" text
-                    QPainter p(&image);
-                    QRect rect = QRect(20, image.height() - 100, image.width() - 40, 80);
-                    p.fillRect(rect, QBrush(QColor(0,0,0,100)));
-                    p.setFont(QFont("Arial", 25, QFont::Bold));
-                    p.setPen(QColor(255,255,255));
-                    p.drawText(rect, Qt::AlignCenter, tr("Press SELECT to play again"));
-                    p.end();
+            // overlay "Press SELECT to play again" text
+            QPainter p(&image);
+            QRect rect = QRect(20, image.height() - 100,
+                               image.width() - 40, 80);
+            p.fillRect(rect, QBrush(QColor(0,0,0,100)));
+            p.setFont(QFont("Arial", 25, QFont::Bold));
+            p.setPen(QColor(255,255,255));
+            p.drawText(rect, Qt::AlignCenter, tr("Press SELECT to play again"));
+            p.end();
 
-                    m_texSize = QSize(GetNearestGLTextureSize(image.size().width()),
-                                      GetNearestGLTextureSize(image.size().height()));
-                    int a = m_tex1First ? 0 : 1;
-                    m_texItem[a].SetItem(item, image.size());
-                    m_texItem[a].ScaleTo(m_screenSize, m_scaleMax);
-                    m_texItem[a].Init(convertToGLFormat(
-                        image.scaled(m_texSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)));
-                }
-            }
+            m_texSize = QSize(
+                GetNearestGLTextureSize(image.size().width()),
+                GetNearestGLTextureSize(image.size().height()));
+            int a = m_tex1First ? 0 : 1;
+            m_texItem[a].SetItem(item, image.size());
+            m_texItem[a].ScaleTo(m_screenSize, m_scaleMax);
+            m_texItem[a].Init(convertToGLFormat(
+                                  image.scaled(m_texSize,
+                                               Qt::IgnoreAspectRatio,
+                                               Qt::SmoothTransformation)));
         }
     }
 
