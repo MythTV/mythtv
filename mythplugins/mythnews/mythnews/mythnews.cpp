@@ -719,12 +719,12 @@ bool MythNews::getHttpFile(const QString &sFilename, const QString &cmdURL)
 
         while ((!m_httpGrabber->isDone()) && (!m_abortHttp))
         {
-            int total = m_httpGrabber->getTotal();
-            m_progressPopup->SetTotal(total);
             int progress = m_httpGrabber->getProgress();
-            m_progressPopup->SetProgress(progress);
+            int total = m_httpGrabber->getTotal();
             if ((progress > 0) && (total > 0) && (progress < total))
             {
+                m_progressPopup->SetTotal(total);
+                m_progressPopup->SetProgress(progress);
                 float fProgress = (float)progress/total;
                 QString text = tr("%1 of %2 (%3 percent)")
                         .arg(formatSize(progress, 2))
