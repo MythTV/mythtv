@@ -68,7 +68,7 @@ class MUI_PUBLIC MythPainter
     virtual void DrawEllipse(const QRect &area, const QBrush &fillBrush,
                              const QPen &linePen, int alpha);
 
-    virtual void PushTransformation(const UIEffects &zoom, QPointF center = QPointF()) { }
+    virtual void PushTransformation(const UIEffects &zoom, QPointF center = QPointF());
     virtual void PopTransformation(void) { }
 
     MythImage *GetFormatImage();

@@ -166,6 +166,12 @@ void MythPainter::DrawEllipse(const QRect &area, const QBrush &fillBrush,
         DrawImage(area.x(), area.y(), im, alpha);
 }
 
+void MythPainter::PushTransformation(const UIEffects &zoom, QPointF center)
+{
+    (void)zoom;
+    (void)center;
+}
+
 void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
                                const QRect &r, const MythFontProperties &font)
 {
