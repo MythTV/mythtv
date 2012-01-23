@@ -831,24 +831,7 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
         }
     }
 
-    QString cmdURL(article.enclosure());
-
-    QString fileprefix = GetConfDir();
-
-    QDir dir(fileprefix);
-    if (!dir.exists())
-        dir.mkdir(fileprefix);
-
-    fileprefix += "/MythNews";
-
-    dir = QDir(fileprefix);
-    if (!dir.exists())
-        dir.mkdir(fileprefix);
-
-    QString sFilename(fileprefix + "/newstempfile");
-
-    if (getHttpFile(sFilename, cmdURL))
-        playVideo(sFilename, article);
+    playVideo(article);
 }
 
 void MythNews::ShowEditDialog(bool edit)
@@ -947,11 +930,11 @@ void MythNews::deleteNewsSite(void)
 }
 
 // does not need locking
-void MythNews::playVideo(const QString &filename, const NewsArticle &article)
+void MythNews::playVideo(const NewsArticle &article)
 {
     sendPlaybackStart();
 
-    GetMythMainWindow()->HandleMedia("Internal", filename,
+    GetMythMainWindow()->HandleMedia("Internal", article.enclosure(),
                                      article.description(), article.title());
 
     sendPlaybackEnd();

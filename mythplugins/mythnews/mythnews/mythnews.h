@@ -41,7 +41,7 @@ class MythNews : public MythScreenType
     bool getHttpFile(const QString &sFilename, const QString &cmdURL);
     void createProgress(const QString &title);
     QString formatSize(long long bytes, int prec);
-    void playVideo(const QString &filename, const NewsArticle &article);
+    void playVideo(const NewsArticle &article);
 
     // menu stuff
     void ShowMenu(void);
