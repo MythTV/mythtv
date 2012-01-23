@@ -858,27 +858,16 @@ static void PrintReportMap(ostream &out,
     FrameAnalyzer::FrameMap::const_iterator it = frameMap.begin();
     for (; it != frameMap.end(); ++it)
     {
-        QString tmp = "";
-        long long   bb, ee, len;
-
         /*
          * QMap'd as 0-based index, but display as 1-based index to match "Edit
          * Recording" OSD.
          */
-        bb = it.key() + 1;
-        if (*it)
-        {
-            ee = bb + *it;
-            len = ee - bb;
-            tmp = QString("%1: %2").arg(bb, 10).arg(ee - 1, 10);
-        }
-        else
-        {
-            tmp = QString("%1: %2").arg(bb, 10).arg(0, 10);
-        }
 
-        QByteArray atmp = tmp.toAscii();
-        out << atmp.constData() << "\n";
+        long long bb = it.key() + 1;
+        long long ee = (*it) ? (bb + *it) : 1;
+        QString tmp = QString("%1: %2").arg(bb, 10).arg(ee - 1, 10);
+
+        out << qPrintable(tmp) << "\n";
     }
     out << flush;
 }
