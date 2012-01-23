@@ -721,7 +721,7 @@ bool MythNews::getHttpFile(const QString &sFilename, const QString &cmdURL)
         {
             int progress = m_httpGrabber->getProgress();
             int total = m_httpGrabber->getTotal();
-            if ((progress > 0) && (total > 0) && (progress < total))
+            if ((progress > 0) && (total > 5120) && (progress < total)) // Ignore total less than 5kb as we're probably looking at a redirect page or similar
             {
                 m_progressPopup->SetTotal(total);
                 m_progressPopup->SetProgress(progress);
