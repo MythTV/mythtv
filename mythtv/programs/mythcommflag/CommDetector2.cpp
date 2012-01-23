@@ -77,45 +77,39 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
 }
 
 bool MythPlayerInited(FrameAnalyzerItem &pass,
-                             FrameAnalyzerItem &finishedAnalyzers,
-                             FrameAnalyzerItem &deadAnalyzers,
-                             MythPlayer *player,
-                             long long nframes)
+                      FrameAnalyzerItem &finishedAnalyzers,
+                      FrameAnalyzerItem &deadAnalyzers,
+                      MythPlayer *player,
+                      long long nframes)
 {
-    FrameAnalyzerItem::iterator iifa = pass.begin();
-    FrameAnalyzerItem::iterator jjfa = iifa;
-    for ( ; iifa != pass.end(); iifa = jjfa)
+    FrameAnalyzerItem::iterator it = pass.begin();
+    while (it != pass.end())
     {
-        FrameAnalyzer *fa = *iifa;
-        ++jjfa;
-
         FrameAnalyzer::analyzeFrameResult ares =
-            fa->MythPlayerInited(player, nframes);
+            (*it)->MythPlayerInited(player, nframes);
 
-        if (ares == FrameAnalyzer::ANALYZE_OK ||
-            ares == FrameAnalyzer::ANALYZE_ERROR)
+        if ((FrameAnalyzer::ANALYZE_OK    == ares) ||
+            (FrameAnalyzer::ANALYZE_ERROR == ares))
         {
-            continue;
+            ++it;
         }
-
-        if (ares == FrameAnalyzer::ANALYZE_FINISHED)
+        else if (FrameAnalyzer::ANALYZE_FINISHED == ares)
         {
-            jjfa = pass.erase(iifa);
-            finishedAnalyzers.push_back(fa);
-            continue;
+            finishedAnalyzers.push_back(*it);
+            it = pass.erase(it);
         }
-
-        if (ares == FrameAnalyzer::ANALYZE_FATAL)
+        else if (FrameAnalyzer::ANALYZE_FATAL == ares)
         {
-            jjfa = pass.erase(iifa);
-            deadAnalyzers.push_back(fa);
-            continue;
+            deadAnalyzers.push_back(*it);
+            it = pass.erase(it);
         }
-
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Unexpected return value from %1::MythPlayerInited: %2")
-                .arg(fa->name()).arg(ares));
-        return false;
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Unexpected return value from %1::MythPlayerInited: %2")
+                .arg((*it)->name()).arg(ares));
+            return false;
+        }
     }
 
     return true;
@@ -127,47 +121,38 @@ long long processFrame(FrameAnalyzerItem &pass,
                        const VideoFrame *frame,
                        long long frameno)
 {
-    FrameAnalyzerItem::iterator iifa = pass.begin();
-    FrameAnalyzerItem::iterator jjfa = iifa;
-
     long long nextFrame;
     long long minNextFrame = FrameAnalyzer::ANYFRAME;
 
-    for ( ; iifa != pass.end(); iifa = jjfa)
+    FrameAnalyzerItem::iterator it = pass.begin();
+    while (it != pass.end())
     {
-        FrameAnalyzer *fa = *iifa;
-        ++jjfa;
-
         FrameAnalyzer::analyzeFrameResult ares =
-            fa->analyzeFrame(frame, frameno, &nextFrame);
+            (*it)->analyzeFrame(frame, frameno, &nextFrame);
 
-        if (ares == FrameAnalyzer::ANALYZE_OK ||
-            ares == FrameAnalyzer::ANALYZE_ERROR)
+        if ((FrameAnalyzer::ANALYZE_OK == ares) ||
+            (FrameAnalyzer::ANALYZE_ERROR == ares))
         {
             minNextFrame = std::min(minNextFrame, nextFrame);
-            continue;
+            ++it;
         }
-
-        if (ares == FrameAnalyzer::ANALYZE_FINISHED)
+        else if (ares == FrameAnalyzer::ANALYZE_FINISHED)
         {
-            jjfa = pass.erase(iifa);
-            finishedAnalyzers.push_back(fa);
-            continue;
+            finishedAnalyzers.push_back(*it);
+            it = pass.erase(it);
         }
-
-        if (ares == FrameAnalyzer::ANALYZE_FATAL)
+        else
         {
-            jjfa = pass.erase(iifa);
-            deadAnalyzers.push_back(fa);
-            continue;
+            if (ares != FrameAnalyzer::ANALYZE_FATAL)
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Unexpected return value from %1::analyzeFrame: %2")
+                    .arg((*it)->name()).arg(ares));
+            }
+
+            deadAnalyzers.push_back(*it);
+            it = pass.erase(it);
         }
-
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Unexpected return value from %1::analyzeFrame: %2")
-                .arg(fa->name()).arg(ares));
-
-        jjfa = pass.erase(iifa);
-        deadAnalyzers.push_back(fa);
     }
 
     if (minNextFrame == FrameAnalyzer::ANYFRAME)
