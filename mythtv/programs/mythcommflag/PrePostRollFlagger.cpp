@@ -94,8 +94,6 @@ bool PrePostRollFlagger::go()
         cerr.flush();
     }
 
-
-    float flagFPS;
     float aspect = player->GetVideoAspect();
 
     SetVideoParams(aspect);
@@ -196,10 +194,7 @@ bool PrePostRollFlagger::go()
     {
         float elapsed = flagTime.elapsed() / 1000.0;
 
-        if (elapsed)
-            flagFPS = framesProcessed / elapsed;
-        else
-            flagFPS = 0.0;
+        //float flagFPS = (elapsed > 0.0f) ? (framesProcessed / elapsed) : 0.0f;
 
         if (myTotalFrames)
             cerr << "\b\b\b\b\b\b      \b\b\b\b\b\b";
