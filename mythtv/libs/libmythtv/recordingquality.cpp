@@ -29,7 +29,7 @@ RecordingQuality::RecordingQuality(
         if (start < first.GetEnd())
             first = RecordingGap(start, first.GetEnd());
         else
-            m_recording_gaps.erase(m_recording_gaps.begin());
+            m_recording_gaps.pop_front();
     }
 
     // trim end
@@ -38,10 +38,10 @@ RecordingQuality::RecordingQuality(
            m_recording_gaps.back().GetEnd() > end)
     {
         RecordingGap &back = m_recording_gaps.back();
-        if (end < back.GetEnd())
-            back = RecordingGap(end, back.GetEnd());
+        if (back.GetStart() < end)
+            back = RecordingGap(back.GetStart(), end);
         else
-            m_recording_gaps.erase(m_recording_gaps.begin());
+            m_recording_gaps.pop_back();
     }
 
     // account for late start
