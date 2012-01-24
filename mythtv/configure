@@ -4146,7 +4146,9 @@ fi
 
 enabled libcrypto && check_lib openssl/rsa.h RSA_new -lcrypto || disable libcrypto
 
-enabled libdns_sd && check_lib dns_sd.h DNSServiceRegister -ldns_sd || disable libdns_sd
+if test $target_os != darwin ; then
+    enabled libdns_sd && check_lib dns_sd.h DNSServiceRegister -ldns_sd || disable libdns_sd
+fi
 
 if enabled libxml2 ; then
    if pkg-config --exists libxml-2.0 ; then

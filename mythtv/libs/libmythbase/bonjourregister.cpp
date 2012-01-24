@@ -1,5 +1,8 @@
 #include <QSocketNotifier>
 #include <QtEndian>
+
+#include <stdlib.h>
+
 #include "mythlogging.h"
 #include "bonjourregister.h"
 

@@ -414,7 +414,7 @@ using_frontend {
     SOURCES += DetectLetterbox.cpp
 
     using_libdns_sd {
-        LIBS += -ldns_sd
+        !macx: LIBS += -ldns_sd
         using_libcrypto: HEADERS += mythraopdevice.h   mythraopconnection.h
         using_libcrypto: SOURCES += mythraopdevice.cpp mythraopconnection.cpp
         using_libcrypto: LIBS    += -lcrypto
