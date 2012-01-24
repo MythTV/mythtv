@@ -139,6 +139,7 @@ Advanced options (experts only):
                            'libxml/parser.h', not the
                            directory with parser.h [$libxml2_path_default]
   --disable-libdns-sd      disable DNS Service Discovery (Bonjour/Zeroconf/Avahi)
+  --disable-libcrypto      disable use of the OpenSSL cryptographic library
 
   --with-bindings=LIST     install the bindings specified in the
                            comma-separated list
@@ -1355,6 +1356,7 @@ MYTHTV_CONFIG_LIST='
     asi
     joystick_menu
     libcec
+    libcrypto
     libdns_sd
     libfftw3
     libmpeg2external
@@ -2000,6 +2002,7 @@ enable asi
 enable lamemp3
 enable libass
 enable libcec
+enable libcrypto
 enable libdns_sd
 enable libxml2
 enable libudf
@@ -4141,6 +4144,8 @@ int main(void) {
 EOF
 fi
 
+enabled libcrypto && check_lib openssl/rsa.h RSA_new -lcrypto || disable libcrypto
+
 enabled libdns_sd && check_lib dns_sd.h DNSServiceRegister -ldns_sd || disable libdns_sd
 
 if enabled libxml2 ; then
@@ -4575,6 +4580,7 @@ if enabled frontend; then
   echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
 fi
 echo "libdns_sd (Bonjour)       ${libdns_sd-no}"
+echo "libcrypto                 ${libcrypto-no}"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "OpenGL ES 2.0             ${opengles-no}"

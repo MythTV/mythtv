@@ -85,6 +85,9 @@ using namespace std;
 #include "videometadatasettings.h"
 #include "videolist.h"
 
+#ifdef USING_RAOP
+#include "mythraopdevice.h"
+#endif
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -216,6 +219,10 @@ namespace
 
     void cleanup()
     {
+#ifdef USING_RAOP
+        MythRAOPDevice::Cleanup();
+#endif
+
         delete exitPopup;
         exitPopup = NULL;
 
@@ -1539,6 +1546,10 @@ int main(int argc, char **argv)
     }
 
     setuid(getuid());
+
+#ifdef USING_RAOP
+    MythRAOPDevice::Create();
+#endif
 
     LCD::SetupLCD();
     if (LCD *lcd = LCD::Get())
