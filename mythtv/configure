@@ -4125,12 +4125,8 @@ enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3
 # ass_flush_events was added in 0.9.10
 enabled libass && check_lib2 ass/ass.h ass_flush_events -lass || disable libass
 
-if ! check_header ${libcec_path}/libcec/cec.h; then
-    disable libcec;
-fi
-
 if enabled libcec ; then
-    check_cxx -I"$libcec_path" <<EOF || { echolog "libCEC support needs libcec >= 1" && disable libcec; }
+    check_cxx -I"$libcec_path" <<EOF || { disable libcec; }
 #include <libcec/cec.h>
 #include <iostream>
 using namespace std;
