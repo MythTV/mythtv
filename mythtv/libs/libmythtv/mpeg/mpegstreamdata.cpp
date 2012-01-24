@@ -791,14 +791,14 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
         // After 400ms emit error if we haven't found correct PAT.
         LOG(VB_GENERAL, LOG_ERR,
             "ProcessPAT: Program not found in PAT. "
-            "\n\t\t\tRescan your transports.");
+            "Rescan your transports.");
 
         send_single_program = CreatePATSingleProgram(*pat);
     }
     else if (foundProgram)
     {
         if (_invalid_pat_seen)
-            LOG(VB_RECORD, LOG_INFO, 
+            LOG(VB_RECORD, LOG_INFO,
                 "ProcessPAT: Good PAT seen after a bad PAT");
 
         _invalid_pat_seen = false;

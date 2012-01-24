@@ -319,7 +319,7 @@ void MythRAOPConnection::ProcessSyncPacket(const QByteArray &buf, uint64_t timen
 
     if (m_audio)
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC +
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Sync packet: Timestamp: %1 Current Audio ts: %2 (avsync %3ms) "
                     "Latency: audio %4 queue %5 total %6ms <-> target %7ms")
             .arg(m_lastSyncTimestamp).arg(m_audio->GetAudiotime()).arg(averageav, 0)
