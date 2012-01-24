@@ -116,7 +116,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     virtual QSize GetMinSize(void) const;
     virtual void SetArea(const MythRect &rect);
     virtual void AdjustMinArea(int delta_x, int delta_y,
-			       int delta_w, int delta_h);
+                               int delta_w, int delta_h);
     virtual void VanishSibling(void);
     virtual void SetMinAreaParent(MythRect actual_area, MythRect full_area,
                                   MythUIType *child);
