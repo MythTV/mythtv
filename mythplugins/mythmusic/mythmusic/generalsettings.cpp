@@ -104,8 +104,7 @@ void GeneralSettings::slotSave(void)
     if (!dir.endsWith("/"))
         dir += "/";
 
-    gCoreContext->GetSetting("MusicLocation", dir);
-
+    gCoreContext->SaveSetting("MusicLocation", dir);
     gCoreContext->SaveSetting("CDDevice", m_musicCDDevice->GetText());
     gCoreContext->SaveSetting("MusicAudioDevice", m_musicAudioDevice->GetText());
     gCoreContext->SaveSetting("NonID3FileNameFormat", m_nonID3FileNameFormat->GetText());
