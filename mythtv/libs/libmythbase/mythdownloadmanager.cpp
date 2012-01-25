@@ -21,6 +21,7 @@
 
 #include "mythdownloadmanager.h"
 #include "mythlogging.h"
+#include <QUrl>
 
 using namespace std;
 
@@ -58,7 +59,7 @@ class MythDownloadInfo
     {
         m_url.detach();
         m_outFile.detach();
-    }       
+    }
 
     QString          m_url;
     QUrl             m_redirectedTo;
@@ -575,7 +576,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
     QUrl qurl(dlInfo->m_url);
     QNetworkRequest request;
-    
+
     if (dlInfo->m_request)
     {
         request = *dlInfo->m_request;
@@ -590,26 +591,39 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
         // Prefer the in-cache item if one exists and it is less than 60
         // seconds old and has not expired in the last 10 seconds.
         QDateTime now = QDateTime::currentDateTime();
+
+        // Handle redirects, we want the metadata of the file headers
+        QString redirectLoc;
+        while (!(redirectLoc = getHeader(qurl, "Location")).isNull())
+        {
+            qurl.setUrl(redirectLoc);
+        }
+
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Checking cache for %1")
+                                                    .arg(qurl.toString()));
+
         QNetworkCacheMetaData urlData = m_manager->cache()->metaData(qurl);
         if ((urlData.isValid()) &&
             ((!urlData.expirationDate().isValid()) ||
              (urlData.expirationDate().secsTo(now) < 10)))
         {
-            QNetworkCacheMetaData::RawHeaderList headers =
-                urlData.rawHeaders();
-            bool found = false;
-            QNetworkCacheMetaData::RawHeaderList::iterator it
-                = headers.begin();
-            for (; !found && it != headers.end(); ++it)
+            QString dateString = getHeader(urlData, "Date");
+
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Finding date header for %1")
+                                                    .arg(qurl.toString()));
+
+            if (!dateString.isNull())
             {
-                if ((*it).first == "Date")
+                LOG(VB_GENERAL, LOG_DEBUG, QString("DATE is %1")
+                                                    .arg(dateString));
+                QDateTime loadDate = QDateTime::fromString(dateString,
+                                                           dateFormat);
+                loadDate.setTimeSpec(Qt::UTC);
+                if (loadDate.secsTo(now) < 720)
                 {
-                    found = true;
-                    QDateTime loadDate =
-                       QDateTime::fromString((*it).second, dateFormat);
-                    loadDate.setTimeSpec(Qt::UTC);
-                    if (loadDate.secsTo(now) < 60)
-                        dlInfo->m_preferCache = true;
+                    dlInfo->m_preferCache = true;
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("Prefering cache for %1")
+                                                    .arg(qurl.toString()));
                 }
             }
         }
@@ -632,7 +646,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
             SLOT(downloadError(QNetworkReply::NetworkError)));
     connect(dlInfo->m_reply, SIGNAL(downloadProgress(qint64, qint64)),
-            this, SLOT(downloadProgress(qint64, qint64))); 
+            this, SLOT(downloadProgress(qint64, qint64)));
 }
 
 /** \fn MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo,
@@ -837,6 +851,7 @@ void MythDownloadManager::downloadFinished(QNetworkReply* reply)
  */
 void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 {
+    static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
     QNetworkReply *reply = dlInfo->m_reply;
 
     if (reply)
@@ -873,7 +888,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
                 SLOT(downloadError(QNetworkReply::NetworkError)));
         connect(dlInfo->m_reply, SIGNAL(downloadProgress(qint64, qint64)),
-                this, SLOT(downloadProgress(qint64, qint64))); 
+                this, SLOT(downloadProgress(qint64, qint64)));
 
         m_downloadReplies.remove(reply);
         reply->deleteLater();
@@ -882,6 +897,29 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
     {
         LOG(VB_FILE, LOG_DEBUG, QString("downloadFinished(%1): COMPLETE: %2")
                 .arg((long long)dlInfo).arg(dlInfo->m_url));
+
+        // HACK Insert a Date header into the cached metadata if one doesn't already
+        // exist
+        QUrl fileUrl = dlInfo->m_url;
+        QString redirectLoc;
+        while (!(redirectLoc = getHeader(fileUrl, "Location")).isNull())
+        {
+            fileUrl.setUrl(redirectLoc);
+        }
+
+        QNetworkCacheMetaData urlData = m_manager->cache()->metaData(fileUrl);
+        if (getHeader(urlData, "Date").isNull())
+        {
+            QNetworkCacheMetaData::RawHeaderList headers = urlData.rawHeaders();
+            QNetworkCacheMetaData::RawHeader newheader;
+            QDateTime now = QDateTime::currentDateTime().toUTC();
+            newheader = QNetworkCacheMetaData::RawHeader("Date",
+                                        now.toString(dateFormat).toAscii());
+            headers.append(newheader);
+            urlData.setRawHeaders(headers);
+            m_manager->cache()->updateMetaData(urlData);
+        }
+        // End HACK
 
         dlInfo->m_redirectedTo.clear();
 
@@ -987,7 +1025,7 @@ void MythDownloadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTot
 
     dlInfo->m_lastStat = QDateTime::currentDateTime();
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + 
+    LOG(VB_FILE, LOG_DEBUG, LOC +
         QString("downloadProgress: %1 to %2 is at %3 of %4 bytes downloaded")
             .arg(dlInfo->m_url).arg(dlInfo->m_outFile)
             .arg(bytesReceived).arg(bytesTotal));
@@ -1110,23 +1148,17 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
             // If the last modification date is older than 60 seconds, and
             // we loaded the page over 60 seconds ago, then redownload the
             // page to re-verify it's last modified date.
-            QNetworkCacheMetaData::RawHeaderList headers =
-                urlData.rawHeaders();
-            bool found = false;
-            QNetworkCacheMetaData::RawHeaderList::iterator it
-                = headers.begin();
-            for (; !found && it != headers.end(); ++it)
+            QString date = getHeader(urlData, "Date");
+
+            if (!date.isNull())
             {
-                if ((*it).first == "Date")
-                {
-                    found = true;
-                    QDateTime loadDate =
-                       QDateTime::fromString((*it).second, dateFormat);
-                    loadDate.setTimeSpec(Qt::UTC);
-                    if (loadDate.secsTo(now) <= 60)
-                        result = urlData.lastModified();
-                }
+                QDateTime loadDate =
+                    QDateTime::fromString(date, dateFormat);
+                loadDate.setTimeSpec(Qt::UTC);
+                if (loadDate.secsTo(now) <= 60)
+                    result = urlData.lastModified();
             }
+
         }
     }
 
@@ -1149,6 +1181,25 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
 
     return result;
 }
+
+QString MythDownloadManager::getHeader(const QNetworkCacheMetaData &cacheData,
+                                       const QString& header)
+{
+    QNetworkCacheMetaData::RawHeaderList headers = cacheData.rawHeaders();
+    bool found = false;
+    QNetworkCacheMetaData::RawHeaderList::iterator it = headers.begin();
+    for (; !found && it != headers.end(); ++it)
+    {
+        if (QString((*it).first) == header)
+        {
+            found = true;
+            return QString((*it).second);
+        }
+    }
+
+    return QString::null;
+}
+
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 

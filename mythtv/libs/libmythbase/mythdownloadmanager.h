@@ -8,6 +8,7 @@
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QWaitCondition>
+#include <QString>
 
 #include "mythbaseexp.h"
 #include "mthread.h"
@@ -59,6 +60,8 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 
     QNetworkCookieJar *getCookieJar(void) { return m_manager->cookieJar(); }
     void setCookieJar(QNetworkCookieJar *cookieJar) { m_manager->setCookieJar(cookieJar); }
+    QString getHeader(const QUrl &url, const QString &header) { return getHeader(m_manager->cache()->metaData(url), header); }
+    QString getHeader(const QNetworkCacheMetaData &cacheData, const QString &header);
 
   private slots:
     // QNetworkAccessManager signals
