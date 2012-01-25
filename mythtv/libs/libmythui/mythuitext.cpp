@@ -397,7 +397,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
             if (m_Cutdown != Qt::ElideNone)
             {
                 QFontMetrics fm(GetFontProperties()->face());
-                paragraph = fm.elidedText(paragraph, m_Cutdown, width);
+                paragraph = fm.elidedText(paragraph, m_Cutdown, width - 1);
                 return false;
             }
             // If text does not fit, then expand so canvas size is correct
@@ -425,7 +425,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
                 {
                     QFontMetrics fm(GetFontProperties()->face());
                     QString cut_line = fm.elidedText(paragraph.mid(last_line),
-                                                     Qt::ElideRight, width);
+                                                     Qt::ElideRight, width - 1);
                     paragraph = paragraph.left(last_line) + cut_line;
                     if (last_line == 0)
                         min_rect |= line.naturalTextRect();
