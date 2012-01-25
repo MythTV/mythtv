@@ -431,7 +431,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     }
     else
     {
-        VERBOSE_XML(VB_GENERAL, LOG_DEBUG, filename, element,
+        VERBOSE_XML(VB_GUI, LOG_DEBUG, filename, element,
                     QString("loaded '%1'").arg(fi.family()));
     }
 
