@@ -376,7 +376,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
 bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
                         bool & overflow, qreal width, qreal & height,
-                        qreal & last_line_width,
+                        bool force, qreal & last_line_width,
                         QRectF & min_rect, int & num_lines)
 {
     int last_line = 0;
@@ -392,12 +392,13 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
         // Try "visible" width first, so alignment works
         line.setLineWidth(width);
 
-        if (!m_MultiLine && line.textLength() < paragraph.size())
+        if (!force && !m_MultiLine && line.textLength() < paragraph.size())
         {
             if (m_Cutdown != Qt::ElideNone)
             {
                 QFontMetrics fm(GetFontProperties()->face());
-                paragraph = fm.elidedText(paragraph, m_Cutdown, width - 1);
+                paragraph = fm.elidedText(paragraph, m_Cutdown,
+                                          width - fm.averageCharWidth());
                 return false;
             }
             // If text does not fit, then expand so canvas size is correct
@@ -424,8 +425,10 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
                 if (m_Cutdown != Qt::ElideNone)
                 {
                     QFontMetrics fm(GetFontProperties()->face());
-                    QString cut_line = fm.elidedText(paragraph.mid(last_line),
-                                                     Qt::ElideRight, width - 1);
+                    QString cut_line = fm.elidedText
+                                       (paragraph.mid(last_line),
+                                        Qt::ElideRight,
+                                        width - fm.averageCharWidth());
                     paragraph = paragraph.left(last_line) + cut_line;
                     if (last_line == 0)
                         min_rect |= line.naturalTextRect();
@@ -477,13 +480,13 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
         para = *Ipara;
         saved_height = height;
         saved_rect = min_rect;
-        if (!Layout(para, layout, overflow, width, height,
+        if (!Layout(para, layout, overflow, width, height, false,
                     last_line_width, min_rect, num_lines))
         {
             // Again, with cut down
             min_rect = saved_rect;
             height = saved_height;
-            Layout(para, layout, overflow, width, height,
+            Layout(para, layout, overflow, width, height, true,
                    last_line_width, min_rect, num_lines);
             break;
         }
