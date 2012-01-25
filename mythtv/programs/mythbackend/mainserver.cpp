@@ -3494,7 +3494,6 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 
     EncoderLink *encoder = NULL;
     QString enchost;
-    QString besthost;
     uint bestorder = 0;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
@@ -3511,21 +3510,18 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
             QString("Checking card %1. Best card so far %2")
             .arg(iter.key()).arg(retval));
 
-        if (!elink->IsConnected() || elink->IsTunerLocked() ||
-            (besthost == pbshost && enchost != pbshost))
+        if (!elink->IsConnected() || elink->IsTunerLocked())
             continue;
 
         vector<InputInfo> inputs = elink->GetFreeInputs(excluded_cardids);
 
         for (uint i = 0; i < inputs.size(); ++i)
         {
-            if (!encoder || inputs[i].livetvorder < bestorder || 
-                (besthost != pbshost && enchost == pbshost))
+            if (!encoder || inputs[i].livetvorder < bestorder)
             {
                 retval = iter.key();
                 encoder = elink;
                 bestorder = inputs[i].livetvorder;
-                besthost = enchost;
             }
         }
     }
