@@ -251,8 +251,13 @@ void MythDownloadManager::run(void)
         if (!m_downloadQueue.isEmpty())
         {
             MythDownloadInfo *dlInfo = m_downloadQueue.front();
-            QUrl qurl(dlInfo->m_url);
+
             m_downloadQueue.pop_front();
+
+            if (!dlInfo)
+                continue;
+
+            QUrl qurl(dlInfo->m_url);
             if (m_downloadInfos.contains(qurl.toString()))
             {
                 // Push request to the end of the queue to let others process.
@@ -448,6 +453,7 @@ QNetworkReply *MythDownloadManager::download(const QString &url,
         dlInfo->m_reply = NULL;
 
     delete dlInfo;
+    dlInfo = NULL;
 
     if (ok && reply)
         return reply;
@@ -573,6 +579,9 @@ void MythDownloadManager::downloadRemoteFile(MythDownloadInfo *dlInfo)
  */
 void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
 {
+    if (!dlInfo)
+        return;
+
     static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
     QUrl qurl(dlInfo->m_url);
     QNetworkRequest request;
@@ -659,6 +668,9 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
  */
 bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
 {
+    if (!dlInfo)
+        return false;
+
     dlInfo->m_syncMode = true;
 
     m_infoLock->lock();
@@ -697,7 +709,10 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
             dlInfo->m_reply->abort();
     }
     else if (deleteInfo)
+    {
         delete dlInfo;
+        dlInfo = NULL;
+    }
 
     m_infoLock->unlock();
 
@@ -725,6 +740,7 @@ void MythDownloadManager::cancelDownload(const QString &url)
                 dlInfo->m_reply->abort();
             lit.remove();
             delete dlInfo;
+            dlInfo = NULL;
         }
     }
 
@@ -738,6 +754,7 @@ void MythDownloadManager::cancelDownload(const QString &url)
         }
         m_downloadInfos.remove(url);
         delete dlInfo;
+        dlInfo = NULL;
     }
 }
 
@@ -851,6 +868,9 @@ void MythDownloadManager::downloadFinished(QNetworkReply* reply)
  */
 void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 {
+    if (!dlInfo)
+        return;
+
     static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
     QNetworkReply *reply = dlInfo->m_reply;
 
@@ -994,6 +1014,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
             }
 
             delete dlInfo;
+            dlInfo = NULL;
         }
 
         m_queueWaitCond.wakeAll();
