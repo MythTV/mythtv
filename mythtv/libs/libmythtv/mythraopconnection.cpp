@@ -287,7 +287,7 @@ void MythRAOPConnection::ExpireResendRequests(uint64_t timenow)
     if (!m_resends.size())
         return;
 
-    uint64_t too_old = timenow - 250;
+    uint64_t too_old = timenow - 500;
     QMutableMapIterator<uint16_t,uint64_t> it(m_resends);
     while (it.hasNext())
     {
@@ -679,7 +679,7 @@ void MythRAOPConnection::FinishResponse(QTextStream *stream, QTcpSocket *socket,
          .arg(socket->flush()));
 }
 
-static const QString kPrivateKey =
+static const QByteArray kPrivateKey =
 "-----BEGIN RSA PRIVATE KEY-----\n"
 "MIIEpQIBAAKCAQEA59dE8qLieItsH1WgjrcFRKj6eUWqi+bGLOX1HL3U3GhC/j0Qg90u3sG/1CUt\n"
 "wC5vOYvfDmFI6oSFXi5ELabWJmT2dKHzBJKa3k9ok+8t9ucRqMd6DZHJ2YCCLlDRKSKv6kDqnw4U\n"
@@ -712,7 +712,7 @@ RSA* MythRAOPConnection::LoadKey(void)
     if (g_rsa)
         return g_rsa;
 
-    BIO *bio = BIO_new_mem_buf((void*)kPrivateKey.toUtf8().data(), -1);
+    BIO *bio = BIO_new_mem_buf((void*)kPrivateKey.data(), -1);
     g_rsa = PEM_read_bio_RSAPrivateKey(bio, NULL, NULL, NULL);
     BIO_free(bio);
     if (g_rsa)
@@ -827,6 +827,15 @@ bool MythRAOPConnection::OpenAudioDevice(void)
     if (!m_audio)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to open audio device. Going silent...");
+        CloseAudioDevice();
+        return false;
+    }
+
+    QString error = m_audio->GetError();
+    if (!error.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Audio not initialised. Message was '%1'")
+            .arg(error));
         CloseAudioDevice();
         return false;
     }
