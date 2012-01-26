@@ -1155,11 +1155,8 @@ void MusicCommon::customEvent(QEvent *event)
 
         LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*aoe->errorMessage()));
-        //TODO change to mythui
-        MythPopupBox::showOkPopup(GetMythMainWindow(),
-                                    statusString,
-                                    QString("MythMusic has encountered the following error:\n%1")
-                                    .arg(*aoe->errorMessage()));
+        ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
+                    .arg(*aoe->errorMessage()));
         stopAll();
     }
     else if (event->type() == OutputEvent::Stopped)
