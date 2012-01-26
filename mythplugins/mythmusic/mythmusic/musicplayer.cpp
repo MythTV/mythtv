@@ -12,6 +12,7 @@
 #include <mythcontext.h>
 #include <audiooutput.h>
 #include <mythdb.h>
+#include <mythdialogbox.h>
 
 // mythmusic
 #include "musicplayer.h"
@@ -699,12 +700,9 @@ void MusicPlayer::customEvent(QEvent *event)
 
             LOG(VB_GENERAL, LOG_ERR, QString("Output Error - %1")
                     .arg(*aoe->errorMessage()));
-            MythPopupBox::showOkPopup(
-                GetMythMainWindow(),
-                "Output Error:",
-                QString("MythMusic has encountered"
-                        " the following error:\n%1")
-                .arg(*aoe->errorMessage()));
+
+            ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
+                    .arg(*aoe->errorMessage()));
             stop(true);
         }
         else if (event->type() == DecoderEvent::Error)
@@ -717,10 +715,8 @@ void MusicPlayer::customEvent(QEvent *event)
 
             LOG(VB_GENERAL, LOG_ERR, QString("Decoder Error - %1")
                     .arg(*dxe->errorMessage()));
-            MythPopupBox::showOkPopup(
-                GetMythMainWindow(), "Decoder Error",
-                QString("MythMusic has encountered the following error:\n%1")
-                .arg(*dxe->errorMessage()));
+            ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
+                    .arg(*dxe->errorMessage()));
         }
     }
 
