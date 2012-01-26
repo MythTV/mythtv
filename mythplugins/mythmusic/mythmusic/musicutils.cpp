@@ -15,6 +15,7 @@ extern "C" {
 }
 
 // mythmusic
+#include "metadata.h"
 #include "musicutils.h"
 
 static QRegExp badChars = QRegExp("(/|\\\\|:|\'|\"|\\?|\\|)");
@@ -46,12 +47,10 @@ QString findIcon(const QString &type, const QString &name)
     return QString();
 }
 
+//TODO this needs updating to also use storage groups
 uint calcTrackLength(const QString &musicFile)
 {
-    LOG(VB_GENERAL, LOG_INFO,  "**calcTrackLength - start");
     const char *type = NULL;
-
-//    av_register_all();
 
     AVFormatContext *inputFC = NULL;
     AVInputFormat *fmt = NULL;
@@ -126,8 +125,6 @@ uint calcTrackLength(const QString &musicFile)
     // Close input file
     av_close_input_file(inputFC);
     inputFC = NULL;
-
-    LOG(VB_GENERAL, LOG_INFO,  "**calcTrackLength - end");
 
     return duration;
 }

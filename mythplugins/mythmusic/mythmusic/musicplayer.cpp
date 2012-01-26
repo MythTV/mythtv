@@ -688,7 +688,7 @@ void MusicPlayer::customEvent(QEvent *event)
             if (!startdir.endsWith("/"))
                 startdir += "/";
 
-            Metadata::SetStartdir(startdir);
+            gMusicData->musicDir = startdir;
         }
     }
 

@@ -410,10 +410,10 @@ void ImportMusicDialog::addPressed()
         saveFilename += "." + fi.suffix();
 
         // copy the file to the new location
-        if (!copyFile(meta->Filename(), saveFilename))
+        if (!copyFile(meta->Filename(), gMusicData->musicDir + saveFilename))
         {
             ShowOkPopup(tr("Copy Failed\nCould not copy file to: %1")
-                                                        .arg(saveFilename));
+                                                        .arg(gMusicData->musicDir + saveFilename));
             return;
         }
 
@@ -422,7 +422,7 @@ void ImportMusicDialog::addPressed()
         // do we need to update the tags?
         if (m_tracks->at(m_currentTrack)->metadataHasChanged)
         {
-            Decoder *decoder = Decoder::create(saveFilename, NULL, NULL, true);
+            Decoder *decoder = Decoder::create(gMusicData->musicDir + saveFilename, NULL, NULL, true);
             if (decoder)
             {
                 decoder->commitMetadata(meta);
@@ -1063,7 +1063,7 @@ void ImportCoverArtDialog::updateStatus()
         m_coverartImage->SetFilename(m_filelist[m_currentFile]);
         m_coverartImage->Load();
 
-        QString saveFilename = Ripper::filenameFromMetadata(m_metadata, false);
+        QString saveFilename = gMusicData->musicDir + Ripper::filenameFromMetadata(m_metadata, false);
         QFileInfo fi(saveFilename);
         QString saveDir = fi.absolutePath();
 

@@ -195,14 +195,14 @@ static void loadMusic()
     if (!startdir.isEmpty() && !startdir.endsWith("/"))
         startdir += "/";
 
-    Metadata::SetStartdir(startdir);
+    gMusicData->musicDir = startdir;
 
     Decoder::SetLocationFormatUseTags();
 
     // Only search music files if a directory was specified & there
     // is no data in the database yet (first run).  Otherwise, user
     // can choose "Setup" option from the menu to force it.
-    if (!startdir.isEmpty() && !musicdata_exists)
+    if (!gMusicData->musicDir.isEmpty() && !musicdata_exists)
     {
         FileScanner *fscan = new FileScanner();
         fscan->SearchDir(startdir);
@@ -222,13 +222,12 @@ static void loadMusic()
     // Set the various track formatting modes
     Metadata::setArtistAndTrackFormats();
 
-    AllMusic *all_music = new AllMusic(startdir);
+    AllMusic *all_music = new AllMusic();
 
     //  Load all playlists into RAM (once!)
     PlaylistContainer *all_playlists = new PlaylistContainer(
             all_music, gCoreContext->GetHostName());
 
-    gMusicData->startdir = startdir;
     gMusicData->all_playlists = all_playlists;
     gMusicData->all_music = all_music;
     gMusicData->initialized = true;
@@ -337,11 +336,11 @@ static void MusicCallback(void *data, QString &selection)
     }
     else if (sel == "settings_scan")
     {
-        if ("" != gMusicData->startdir)
+        if ("" != gMusicData->musicDir)
         {
             loadMusic();
             FileScanner *fscan = new FileScanner();
-            fscan->SearchDir(gMusicData->startdir);
+            fscan->SearchDir(gMusicData->musicDir);
             gMusicData->reloadMusic();
             delete fscan;
         }
@@ -469,10 +468,10 @@ static void runScan(void)
 {
     loadMusic();
 
-    if ("" != gMusicData->startdir)
+    if ("" != gMusicData->musicDir)
     {
         FileScanner *fscan = new FileScanner();
-        fscan->SearchDir(gMusicData->startdir);
+        fscan->SearchDir(gMusicData->musicDir);
         gMusicData->reloadMusic();
         delete fscan;
     }
@@ -661,14 +660,6 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    gMusicData->startdir = gCoreContext->GetSetting("MusicLocation");
-    gMusicData->startdir = QDir::cleanPath(gMusicData->startdir);
-
-    if (!gMusicData->startdir.isEmpty() && !gMusicData->startdir.endsWith("/"))
-        gMusicData->startdir += "/";
-
-    Metadata::SetStartdir(gMusicData->startdir);
-
     Decoder::SetLocationFormatUseTags();
 
     return runMenu("music_settings.xml");

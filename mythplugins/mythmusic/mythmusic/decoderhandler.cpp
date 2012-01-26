@@ -124,8 +124,10 @@ QIODevice* DecoderIOFactoryFile::takeInput(void)
 void DecoderIOFactoryFile::start(void)
 {
     QString sourcename = getMetadata().Filename();
+
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("DecoderIOFactory: Opening Local File %1").arg(sourcename));
+
     m_input = new QFile(sourcename);
     doConnectDecoder(getUrl().toLocalFile());
 }
@@ -538,12 +540,12 @@ void DecoderHandler::createIOFactory(const QUrl &url)
     if (haveIOFactory()) 
         deleteIOFactory();
 
-    if (url.scheme() == "file" || QFileInfo(url.toString()).isAbsolute() || url.toString().endsWith(".cda"))
-        m_io_factory = new DecoderIOFactoryFile(this);
-    else if (m_meta && m_meta->Format() == "cast")
+    if (m_meta && m_meta->Format() == "cast")
         m_io_factory = new DecoderIOFactoryShoutCast(this);
-    else
+    else if (url.scheme() == "http")
         m_io_factory = new DecoderIOFactoryUrl(this);
+    else
+        m_io_factory = new DecoderIOFactoryFile(this);
 }
 
 void DecoderHandler::deleteIOFactory(void)

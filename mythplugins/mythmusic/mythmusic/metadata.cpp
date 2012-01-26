@@ -92,13 +92,6 @@ Metadata& Metadata::operator=(const Metadata &rhs)
     return *this;
 }
 
-QString Metadata::m_startdir;
-
-void Metadata::SetStartdir(const QString &dir)
-{
-    Metadata::m_startdir = dir;
-}
-
 void Metadata::persist()
 {
     if (m_id < 1)
@@ -177,13 +170,8 @@ bool Metadata::isInDatabase()
 {
     bool retval = false;
 
-    QString sqlfilepath(m_filename);
-    if (!sqlfilepath.contains("://"))
-    {
-        sqlfilepath.remove(0, m_startdir.length());
-    }
-    QString sqldir = sqlfilepath.section( '/', 0, -2);
-    QString sqlfilename =sqlfilepath.section( '/', -1 ) ;
+    QString sqldir = m_filename.section('/', 0, -2);
+    QString sqlfilename = m_filename.section('/', -1);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT music_artists.artist_name, "
@@ -234,13 +222,8 @@ bool Metadata::isInDatabase()
 
 void Metadata::dumpToDatabase()
 {
-    QString sqlfilepath(m_filename);
-    if (!sqlfilepath.contains("://"))
-    {
-        sqlfilepath.remove(0, m_startdir.length());
-    }
-    QString sqldir = sqlfilepath.section( '/', 0, -2);
-    QString sqlfilename = sqlfilepath.section( '/', -1 ) ;
+    QString sqldir = m_filename.section('/', 0, -2);
+    QString sqlfilename = m_filename.section('/', -1);
 
     checkEmptyFields();
 
@@ -630,6 +613,32 @@ QString Metadata::FormatTitle()
     return m_formattedtitle;
 }
 
+QString Metadata::Filename(bool find) const
+{
+    // if not asked to find the file just return the raw filename from the DB
+    if (find == false)
+        return m_filename;
+
+    // check for http urls etc
+    if (m_filename.contains("://"))
+        return m_filename;
+
+    // first check to see if the filename is complete
+    if (QFile::exists(m_filename))
+        return m_filename;
+
+    // next try appending the start directory
+    if (QFile::exists(gMusicData->musicDir + m_filename))
+        return gMusicData->musicDir + m_filename;
+
+    // maybe it's in our 'Music' storage group
+    //TODO add storage group lookup here
+
+    // not found
+    LOG(VB_GENERAL, LOG_ERR, QString("Metadata: Asked to get the filename for a track but no file found: %1")
+                                     .arg(m_filename));
+    return QString();
+}
 
 void Metadata::setField(const QString &field, const QString &data)
 {
@@ -713,7 +722,8 @@ void Metadata::toMap(MetadataMap &metadataMap, const QString &prefix)
                                               kDateFull | kSimplify | kAddYear);
 
     metadataMap[prefix + "playcount"] = QString::number(m_playcount);
-    metadataMap[prefix + "filename"] = m_filename;
+    // FIXME we should use Filename() here but that will slow things down because of the hunt for the file
+    metadataMap[prefix + "filename"] = gMusicData->musicDir + m_filename;
 }
 
 void Metadata::decRating()
@@ -854,7 +864,8 @@ QString Metadata::getAlbumArtFile(void)
                 if (albumart_image->embedded && getTagger()->supportsEmbeddedImages())
                 {
                     // image is embedded try to extract it from the tag and cache it for latter
-                    QImage *image = getTagger()->getAlbumArt(m_filename, albumart_image->imageType);
+                    QImage *image = getTagger()->getAlbumArt(Filename(),
+                                                             albumart_image->imageType);
                     if (image)
                     {
                         image->save(res);
@@ -923,7 +934,7 @@ MetaIO* Metadata::getTagger(void)
         return &metaIOOggVorbis;
     else if (extension == "flac")
     {
-        if (metaIOID3.TagExists(m_filename))
+        if (metaIOID3.TagExists(Filename()))
             return &metaIOID3;
         else
             return &metaIOFLACVorbis;
@@ -952,10 +963,9 @@ void MetadataLoadingThread::run()
     RunEpilog();
 }
 
-AllMusic::AllMusic(QString a_startdir) :
+AllMusic::AllMusic(void) :
     m_numPcs(0),
     m_numLoaded(0),
-    m_startdir(a_startdir),
     m_metadata_loader(NULL),
     m_done_loading(false),
     m_last_listed(-1),
@@ -1070,8 +1080,6 @@ void AllMusic::resync()
             if (!music_map.contains(id))
             {
                 filename = query.value(12).toString();
-                if (!filename.contains("://"))
-                    filename = m_startdir + filename;
 
                 Metadata *mdata = new Metadata(
                     filename,
@@ -1272,9 +1280,8 @@ void AlbumArtImages::findImages(void)
         if (trackid == 0)
             return;
 
-        QFileInfo fi(m_parent->Filename());
-        QString dir = fi.absolutePath();
-        dir.remove(0, Metadata::GetStartdir().length());
+        QFileInfo fi(m_parent->Filename(false));
+        QString dir = fi.path();
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT albumart_id, CONCAT_WS('/', music_directories.path, "
@@ -1299,7 +1306,7 @@ void AlbumArtImages::findImages(void)
                 if (embedded)
                     image->filename = GetConfDir() + "/MythMusic/AlbumArt/" + query.value(1).toString();
                 else
-                    image->filename = Metadata::GetStartdir() + query.value(1).toString();
+                    image->filename = gMusicData->musicDir + query.value(1).toString();
 
                 image->imageType = (ImageType) query.value(3).toInt();
                 image->embedded = embedded;

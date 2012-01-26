@@ -277,20 +277,20 @@ void CDRipperThread::run(void)
                     if (encodertype == "mp3")
                     {
                         outfile += ".mp3";
-                        encoder.reset(new LameEncoder(outfile, m_quality,
+                        encoder.reset(new LameEncoder(gMusicData->musicDir + outfile, m_quality,
                                                       titleTrack, mp3usevbr));
                     }
                     else // ogg
                     {
                         outfile += ".ogg";
-                        encoder.reset(new VorbisEncoder(outfile, m_quality,
+                        encoder.reset(new VorbisEncoder(gMusicData->musicDir + outfile, m_quality,
                                                         titleTrack));
                     }
                 }
                 else
                 {
                     outfile += ".flac";
-                    encoder.reset(new FlacEncoder(outfile, m_quality,
+                    encoder.reset(new FlacEncoder(gMusicData->musicDir + outfile, m_quality,
                                                   titleTrack));
                 }
 
@@ -894,11 +894,7 @@ void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
         QString filename = query.value(1).toString();
 
         // delete file
-        QString musicdir = gCoreContext->GetSetting("MusicLocation");
-        musicdir = QDir::cleanPath(musicdir);
-        if (!musicdir.endsWith("/"))
-            musicdir += "/";
-        QFile::remove(musicdir + filename);
+        QFile::remove(gMusicData->musicDir + filename);
 
         // remove database entry
         MSqlQuery deleteQuery(MSqlQuery::InitCon());
@@ -914,12 +910,7 @@ void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
 // if createDir is true then the directory structure will be created
 QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
 {
-    QString musicdir = gCoreContext->GetSetting("MusicLocation");
-    musicdir = QDir::cleanPath(musicdir);
-    if (!musicdir.endsWith("/"))
-        musicdir += "/";
-
-    QDir directoryQD(musicdir);
+    QDir directoryQD(gMusicData->musicDir);
     QString filename;
     QString fntempl = gCoreContext->GetSetting("FilenameTemplate");
     bool no_ws = gCoreContext->GetNumSetting("NoWhitespace", 0);
@@ -968,27 +959,22 @@ QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
     if (no_ws)
         filename.replace(rx_ws, "_");
 
-    if (filename == musicdir || filename.length() > FILENAME_MAX)
+
+    if (filename == "" || filename.length() > FILENAME_MAX)
     {
         QString tempstr = QString::number(track->Track(), 10);
         tempstr += " - " + track->FormatTitle();
-        filename = musicdir + fixFileToken(tempstr);
+        filename = fixFileToken(tempstr);
         LOG(VB_GENERAL, LOG_ERR, "Invalid file storage definition.");
     }
 
-    QStringList directoryList = filename.split("/");
-    for (int i = 0; i < (directoryList.size() - 1); i++)
+    if (createDir)
     {
-        musicdir += "/" + directoryList[i];
-        if (createDir)
-        {
-            umask(002);
-            directoryQD.mkdir(musicdir);
-            directoryQD.cd(musicdir);
-        }
+        QFileInfo fi(filename);
+        if (!directoryQD.mkpath(gMusicData->musicDir + fi.path()))
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Ripper: Failed to create directory path: '%1'").arg(gMusicData->musicDir + filename));
     }
-
-    filename = QDir::cleanPath(musicdir) + "/" + directoryList.last();
 
     return filename;
 }
