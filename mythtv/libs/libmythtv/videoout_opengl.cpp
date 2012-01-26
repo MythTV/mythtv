@@ -638,7 +638,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
 
 void VideoOutputOpenGL::Show(FrameScanType scan)
 {
-    QMutexLocker locker(&gl_context_lock);
+    OpenGLLocker ctx_lock(gl_context);
     if (IsErrored())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "IsErrored() is true in Show()");
