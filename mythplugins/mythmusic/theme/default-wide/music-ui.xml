@@ -388,6 +388,262 @@
 
     </window>
 
+    <!-- This screen allows you to rip tracks from cd's -->
+    <window name="cdripper">
+
+        <!-- Labels -->
+
+        <group name="topgroup" >
+            <area>80,20,930,280</area>
+
+            <textarea name="quality_label">
+                <area>0,0,270,50</area>
+                <font>basemedium</font>
+                <value>Quality:</value>
+                <align>right,vcenter</align>
+            </textarea>
+
+            <textarea name="artist_label" from="quality_label">
+                <position>0,55</position>
+                <value>Artist:</value>
+            </textarea>
+
+            <textarea name="album_label" from="quality_label">
+                <position>0,110</position>
+                <value>Album:</value>
+            </textarea>
+
+            <textarea name="genre_text" from="quality_label">
+                <position>0,165</position>
+                <value>Genre:</value>
+            </textarea>
+
+            <textarea name="comp_label" from="quality_label">
+                <position>375,220</position>
+                <value>Multi-Artist:</value>
+            </textarea>
+
+            <textarea name="year_label" from="quality_label">
+                <position>0,222</position>
+                <value>Year:</value>
+            </textarea>
+
+            <!-- edits -->
+
+            <buttonlist name="quality" from="baseselector">
+                <position>280,5</position>
+            </buttonlist>
+
+            <textedit name="artist" from="basetextedit">
+                <position>280,55</position>
+            </textedit>
+
+            <button name="searchartist" from="basesearchbutton">
+                <position>665,62</position>
+            </button>
+
+            <textedit name="album" from="basetextedit">
+                <position>280,110</position>
+            </textedit>
+
+            <button name="searchalbum" from="basesearchbutton">
+                <position>665,117</position>
+            </button>
+
+            <textedit name="genre" from="basetextedit">
+                <position>280,165</position>
+            </textedit>
+
+            <button name="searchgenre" from="basesearchbutton">
+                <position>665,172</position>
+            </button>
+
+            <textedit name="year" from="basetextedit">
+                <area>280,222,100,50</area>
+            </textedit>
+
+            <checkbox name="compilation" from="basecheckbox">
+                <position>665,230</position>
+            </checkbox>
+
+            <button name="switch" from="basebutton">
+                <area>725,225,200,45</area>
+                <value>Switch Titles</value>
+            </button>
+
+        </group>
+
+        <textarea name="track_label" from="basetextarea">
+            <area>60,310,100,30</area>
+            <value>Track</value>
+            <align>left,bottom</align>
+        </textarea>
+
+        <textarea name="title_label" from="track_label">
+            <area>160,310,300,30</area>
+            <value>Title</value>
+        </textarea>
+
+        <textarea name="list_artist_label" from="track_label">
+            <area>690,310,300,30</area>
+            <value>Artist</value>
+        </textarea>
+
+        <textarea name="length_label" from="track_label">
+            <area>1110,310,100,30</area>
+            <align>right,bottom</align>
+            <value>Length</value>
+        </textarea>
+
+        <shape name="trackbg" from="basebackground">
+            <area>40,340,1200,300</area>
+        </shape>
+
+        <buttonlist name="tracks" from="basebuttonlist2">
+            <area>60,360,1160,270</area>
+            <buttonarea>0,0,1160,250</buttonarea>
+            <spacing>0</spacing>
+            <layout>vertical</layout>
+            <showarrow>no</showarrow>
+            <searchposition>-1,410</searchposition>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,35</area>
+                    <statetype name="buttoncheck">
+                        <position>10,8</position>
+                        <state type="off">
+                            <imagetype name="checkoff">
+                                <filename>lb-check-empty.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="half">
+                            <imagetype name="checkhalf">
+                                <filename>lb-check-half.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="full">
+                            <imagetype name="checkfull">
+                                <filename>lb-check-full.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="track" from="buttontext">
+                        <align>left,vcenter</align>
+                        <area>40,0,45,35</area>
+                    </textarea>
+                    <textarea name="title" from="track">
+                        <area>100,0,520,35</area>
+                    </textarea>
+                    <textarea name="artist" from="track">
+                        <area>630,0,420,35</area>
+                    </textarea>
+                    <textarea name="length" from="track">
+                        <area>1060,0,90,35</area>
+                        <align>right,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="selectbar">
+                        <area>0,0,1160,35</area>
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="selectbar">
+                        <area>0,0,1160,35</area>
+                    </shape>
+                </state>
+            </statetype>
+
+            <statetype name="upscrollarrow">
+                <position>1095,250</position>
+            </statetype>
+
+            <statetype name="downscrollarrow">
+                <position>1130,250</position>
+            </statetype>
+        </buttonlist>
+
+        <!-- Buttons -->
+
+        <button name="scan" from="basebutton">
+            <position>480,650</position>
+            <value>Scan CD</value>
+        </button>
+
+        <button name="rip" from="basebutton">
+            <position>650,650</position>
+            <value>Rip CD</value>
+        </button>
+    </window>
+
+    <!-- This screen shows the track ripping status -->
+    <window name="ripstatus">
+
+        <imagetype name="banner">
+            <filename>mm_rip_banner.png</filename>
+            <position>580,90</position>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>15,5,800,40</area>
+            <font>baselarge</font>
+            <value>Rip CD</value>
+        </textarea>
+
+        <group name="progress_group">
+            <position>290,140</position>
+
+            <imagetype name="progress_background">
+                <filename>mm_rip_background.png</filename>
+                <area>0,0,700,500</area>
+            </imagetype>
+
+            <textarea name="overall_label" from="basetextarea">
+                <area>30,40,630,40</area>
+                <value>Importing CD</value>
+            </textarea>
+
+            <textarea name="overall" from="overall_label">
+                <position>30,85</position>
+                <align>hcenter</align>
+            </textarea>
+
+            <textarea name="track_label" from="overall_label">
+                <position>30,250</position>
+                <value>Encoding Track</value>
+            </textarea>
+
+            <textarea name="track" from="overall">
+                <position>30,295</position>
+            </textarea>
+
+            <textarea name="status" from="overall">
+                <position>30,440</position>
+            </textarea>
+
+            <progressbar name="overall_progress" from="baseprogressbar">
+                <position>82,120</position>
+            </progressbar>
+
+            <textarea name="overallpct" from="basetextarea">
+                <area>82,160,536,30</area>
+                <align>hcenter</align>
+            </textarea>
+
+            <progressbar name="track_progress" from="baseprogressbar">
+                <position>82,330</position>
+            </progressbar>
+
+            <textarea name="trackpct" from="basetextarea">
+                <area>82,370,536,30</area>
+                <align>hcenter</align>
+            </textarea>
+
+        </group>
+
+    </window>
+
+
     <window name="import_music">
 
         <shape name="bgimage1">
