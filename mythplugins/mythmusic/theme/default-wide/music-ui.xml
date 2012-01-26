@@ -591,7 +591,7 @@
         </textarea>
 
         <group name="progress_group">
-            <position>290,140</position>
+            <area>290,140,700,500</area>
 
             <imagetype name="progress_background">
                 <filename>mm_rip_background.png</filename>
