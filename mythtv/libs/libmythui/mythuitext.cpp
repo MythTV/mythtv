@@ -346,6 +346,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     FormatVector formats;
     QRect drawrect = m_drawRect.toQRect();
     drawrect.translate(xoffset, yoffset);
+    QRect canvas = m_Canvas.toQRect();
 
     int alpha = CalcAlpha(alphaMod);
 
@@ -360,17 +361,50 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                                         outlineAlpha);
         outlineColor.setAlpha(outlineAlpha);
 
+        MythPoint  outline(outlineSize, outlineSize);
+        outline.NormPoint(); // scale it to screen resolution
+
         QPen pen;
         pen.setBrush(outlineColor);
-        pen.setWidth(outlineSize);
+        pen.setWidth(outline.x());
 
         range.start = 0;
         range.length = m_CutMessage.size();
         range.format.setTextOutline(pen);
         formats.push_back(range);
+
+        drawrect.setX(drawrect.x() - outline.x());
+        drawrect.setWidth(drawrect.width() + outline.x());
+        drawrect.setY(drawrect.y() - outline.y());
+        drawrect.setHeight(drawrect.height() + outline.y());
+
+        /* Canvas pos is where the view port (drawrect) pulls from, so
+         * it needs moved to the right for the left edge to be picked up*/
+        canvas.setX(canvas.x() + outline.x());
+        canvas.setWidth(canvas.width() + (outline.x() * 2));
+        canvas.setY(canvas.y() + outline.y());
+        canvas.setHeight(canvas.height() + (outline.y() * 2));
     }
 
-    p->DrawTextLayout(m_Canvas, m_Layouts, formats,
+    if (GetFontProperties()->hasShadow())
+    {
+        QPoint shadowOffset;
+        QColor shadowColor;
+        int    shadowAlpha;
+
+        GetFontProperties()->GetShadow(shadowOffset, shadowColor, shadowAlpha);
+
+        MythPoint  shadow(shadowOffset);
+        shadow.NormPoint(); // scale it to screen resolution
+
+        drawrect.setWidth(drawrect.width() + shadow.x());
+        drawrect.setHeight(drawrect.height() + shadow.y());
+
+        canvas.setWidth(canvas.width() + shadow.x());
+        canvas.setHeight(canvas.height() + shadow.y());
+    }
+
+    p->DrawTextLayout(canvas, m_Layouts, formats,
                       *GetFontProperties(), alpha, drawrect);
 }
 
