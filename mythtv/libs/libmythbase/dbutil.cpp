@@ -177,7 +177,7 @@ bool DBUtil::IsBackupInProgress(void)
     return false;
 }
 
-/** \fn DBUtil::BackupDB(QString&)
+/** \fn DBUtil::BackupDB(QString&, bool)
  *  \brief Requests a backup of the database.
  *
  *   If the DatabaseBackupScript exists in the ShareDir, it will be executed.
@@ -192,8 +192,17 @@ bool DBUtil::IsBackupInProgress(void)
  *
  *   Care should be taken in calling this function.  It has the potential to
  *   corrupt in-progress recordings or interfere with playback.
+ *
+ *   The disableRotation argument should be used only for automatic backups
+ *   when users could lose important backup files due to a failure loop--for
+ *   example, a DB upgrade failure and a distro start script that keeps
+ *   restarting mythbackend even when it exits with an error status.
+ *
+ *  \param filename        Used to return the name of the resulting backup file
+ *  \param disableRotation Disable backup rotation
+ *  \return                MythDBBackupStatus indicating the result
  */
-MythDBBackupStatus DBUtil::BackupDB(QString &filename)
+MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
 {
     filename = QString();
 
@@ -235,7 +244,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename)
 
     if (!backupScript.isEmpty())
     {
-        result = DoBackup(backupScript, filename);
+        result = DoBackup(backupScript, filename, disableRotation);
         if (!result)
             LOG(VB_GENERAL, LOG_CRIT, "Script-based database backup failed. "
                                       "Retrying with internal backup.");
@@ -558,7 +567,8 @@ bool DBUtil::CreateTemporaryDBConf(
  *   This function executes the specified backup script to create a database
  *   backup.  This is the preferred approach for creating the backup.
  */
-bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
+bool DBUtil::DoBackup(const QString &backupScript, QString &filename,
+                      bool disableRotation)
 {
     DatabaseParams dbParams = gCoreContext->GetDatabaseParams();
     QString     dbSchemaVer = gCoreContext->GetSetting("DBSchemaVer");
@@ -566,12 +576,11 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
     QString  backupFilename = CreateBackupFilename(dbParams.dbName + "-" +
                                                    dbSchemaVer, ".sql");
     QString      scriptArgs = gCoreContext->GetSetting("BackupDBScriptArgs");
-    QString rotate = "rotate=-1";
-    if (!scriptArgs.isEmpty())
+    QString rotate = "";
+    if (disableRotation)
     {
-        scriptArgs.prepend(" ");
-        if (scriptArgs.contains("rotate", Qt::CaseInsensitive))
-            rotate = "";
+        if (!(scriptArgs.contains("rotate", Qt::CaseInsensitive)))
+            rotate = "rotate=-1";
     }
 
 
@@ -592,7 +601,8 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
     LOG(VB_GENERAL, LOG_ERR, QString("Backing up database with script: '%1'")
             .arg(backupScript));
 
-    QString command = backupScript + scriptArgs + " " + tempDatabaseConfFile;
+    QString command = backupScript + " " + scriptArgs + " " +
+                      tempDatabaseConfFile;
     uint status = myth_system(command, kMSDontBlockInputDevs|kMSAnonLog);
 
     if (hastemp)

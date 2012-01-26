@@ -277,20 +277,20 @@ void CDRipperThread::run(void)
                     if (encodertype == "mp3")
                     {
                         outfile += ".mp3";
-                        encoder.reset(new LameEncoder(outfile, m_quality,
+                        encoder.reset(new LameEncoder(gMusicData->musicDir + outfile, m_quality,
                                                       titleTrack, mp3usevbr));
                     }
                     else // ogg
                     {
                         outfile += ".ogg";
-                        encoder.reset(new VorbisEncoder(outfile, m_quality,
+                        encoder.reset(new VorbisEncoder(gMusicData->musicDir + outfile, m_quality,
                                                         titleTrack));
                     }
                 }
                 else
                 {
                     outfile += ".flac";
-                    encoder.reset(new FlacEncoder(outfile, m_quality,
+                    encoder.reset(new FlacEncoder(gMusicData->musicDir + outfile, m_quality,
                                                   titleTrack));
                 }
 
@@ -856,12 +856,15 @@ bool Ripper::isNewTune(const QString& artist,
 void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString queryString("SELECT song_id, filename "
+    QString queryString("SELECT song_id, "
+            "CONCAT_WS('/', music_directories.path, music_songs.filename) AS filename "
             "FROM music_songs "
             "LEFT JOIN music_artists"
             " ON music_songs.artist_id=music_artists.artist_id "
             "LEFT JOIN music_albums"
             " ON music_songs.album_id=music_albums.album_id "
+            "LEFT JOIN music_directories "
+            " ON music_songs.directory_id=music_directories.directory_id "
             "WHERE artist_name REGEXP \'");
     QString token = artist;
     token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"),
@@ -891,11 +894,7 @@ void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
         QString filename = query.value(1).toString();
 
         // delete file
-        QString musicdir = gCoreContext->GetSetting("MusicLocation");
-        musicdir = QDir::cleanPath(musicdir);
-        if (!musicdir.endsWith("/"))
-            musicdir += "/";
-        QFile::remove(musicdir + filename);
+        QFile::remove(gMusicData->musicDir + filename);
 
         // remove database entry
         MSqlQuery deleteQuery(MSqlQuery::InitCon());
@@ -911,12 +910,7 @@ void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
 // if createDir is true then the directory structure will be created
 QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
 {
-    QString musicdir = gCoreContext->GetSetting("MusicLocation");
-    musicdir = QDir::cleanPath(musicdir);
-    if (!musicdir.endsWith("/"))
-        musicdir += "/";
-
-    QDir directoryQD(musicdir);
+    QDir directoryQD(gMusicData->musicDir);
     QString filename;
     QString fntempl = gCoreContext->GetSetting("FilenameTemplate");
     bool no_ws = gCoreContext->GetNumSetting("NoWhitespace", 0);
@@ -965,27 +959,22 @@ QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
     if (no_ws)
         filename.replace(rx_ws, "_");
 
-    if (filename == musicdir || filename.length() > FILENAME_MAX)
+
+    if (filename == "" || filename.length() > FILENAME_MAX)
     {
         QString tempstr = QString::number(track->Track(), 10);
         tempstr += " - " + track->FormatTitle();
-        filename = musicdir + fixFileToken(tempstr);
+        filename = fixFileToken(tempstr);
         LOG(VB_GENERAL, LOG_ERR, "Invalid file storage definition.");
     }
 
-    QStringList directoryList = filename.split("/");
-    for (int i = 0; i < (directoryList.size() - 1); i++)
+    if (createDir)
     {
-        musicdir += "/" + directoryList[i];
-        if (createDir)
-        {
-            umask(002);
-            directoryQD.mkdir(musicdir);
-            directoryQD.cd(musicdir);
-        }
+        QFileInfo fi(filename);
+        if (!directoryQD.mkpath(gMusicData->musicDir + fi.path()))
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Ripper: Failed to create directory path: '%1'").arg(gMusicData->musicDir + filename));
     }
-
-    filename = QDir::cleanPath(musicdir) + "/" + directoryList.last();
 
     return filename;
 }
@@ -1328,66 +1317,79 @@ void Ripper::updateTrackList(void)
 
 void Ripper::searchArtist()
 {
-    QString s;
+    QString msg = tr("Select an Artist");
+    QStringList searchList = Metadata::fillFieldList("artist");
 
-    m_searchList = Metadata::fillFieldList("artist");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
 
-    s = m_artistEdit->GetText();
-    if (showList(tr("Select an Artist"), s))
+    if (!searchDlg->Create())
     {
-        m_artistEdit->SetText(s);
+        delete searchDlg;
+        return;
     }
+
+    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setArtist(QString)));
+
+    popupStack->AddScreen(searchDlg);
+}
+
+void Ripper::setArtist(QString artist)
+{
+    m_artistEdit->SetText(artist);
 }
 
 void Ripper::searchAlbum()
 {
-    QString s;
+    QString msg = tr("Select an Album");
+    QStringList searchList = Metadata::fillFieldList("album");
 
-    m_searchList = Metadata::fillFieldList("album");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
 
-    s = m_albumEdit->GetText();
-    if (showList(tr("Select an Album"), s))
+    if (!searchDlg->Create())
     {
-        m_albumEdit->SetText(s);
+        delete searchDlg;
+        return;
     }
+
+    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setAlbum(QString)));
+
+    popupStack->AddScreen(searchDlg);
+}
+
+void Ripper::setAlbum(QString album)
+{
+    m_albumEdit->SetText(album);
 }
 
 void Ripper::searchGenre()
 {
-    QString s;
-
+    QString msg = tr("Select a Genre");
+    QStringList searchList = Metadata::fillFieldList("genre");
     // load genre list
     m_searchList.clear();
     for (int x = 0; x < genre_table_size; x++)
         m_searchList.push_back(QString(genre_table[x]));
     m_searchList.sort();
 
-    s = m_genreEdit->GetText();
-    if (showList(tr("Select a Genre"), s))
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
+
+    if (!searchDlg->Create())
     {
-        m_genreEdit->SetText(s);
+        delete searchDlg;
+        return;
     }
+
+    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setGenre(QString)));
+
+    popupStack->AddScreen(searchDlg);
 }
 
-bool Ripper::showList(QString caption, QString &value)
+void Ripper::setGenre(QString genre)
 {
-    bool res = false;
-
-    MythSearchDialog *searchDialog
-        = new MythSearchDialog(GetMythMainWindow(), "");
-    searchDialog->setCaption(caption);
-    searchDialog->setSearchText(value);
-    searchDialog->setItems(m_searchList);
-    DialogCode rescode = searchDialog->ExecPopupAtXY(-1, 8);
-    if (kDialogCodeRejected != rescode)
-    {
-        value = searchDialog->getResult();
-        res = true;
-    }
-
-    searchDialog->deleteLater();
-
-    return res;
+    m_genreEdit->SetText(genre);
 }
 
 void Ripper::showEditMetadataDialog(MythUIButtonListItem *item)

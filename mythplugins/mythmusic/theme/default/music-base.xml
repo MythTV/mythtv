@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
+<mythuitheme>
+
+    <!-- moving track statetype -->
+    <statetype name="basemovingtracksstate">
+        <position>1220,380</position>
+        <state name="off"></state>
+        <state name="on">
+            <imagetype name="statusimage">
+                <filename>mm_updown.png</filename>
+            </imagetype>
+        </state>
+    </statetype>
+
+    <!-- current playlist button list -->
+    <buttonlist name="basecurrentplaylist" from="basebuttonlist2">
+        <area>30,15,750,310</area>
+        <spacing>0</spacing>
+        <layout>vertical</layout>
+        <arrange>stack</arrange>
+        <showarrow>no</showarrow>
+        <buttonarea>0,0,750,280</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,100%,40</area>
+
+                <imagetype name="buttonimage">
+                    <area>3,3,34,34</area>
+                    <filename>mm_nothumb.png</filename>
+                </imagetype>
+
+                <statetype name="playstate">
+                    <position>720,8</position>
+                    <state name="default">
+                    </state>
+                    <state name="playing">
+                        <imagetype name="animation">
+                            <position>0,0</position>
+                            <filepattern low="1" high="8">mm_playing_%1.png</filepattern>
+                            <delay>160</delay>
+                        </imagetype>
+                    </state>
+                    <state name="paused">
+                        <imagetype name="animation">
+                            <position>5,5</position>
+                            <filename>mm_pauseicon.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="stopped">
+                        <imagetype name="animation">
+                            <position>5,5</position>
+                            <filename>mm_stopicon.png</filename>
+                        </imagetype>
+                    </state>
+                </statetype>
+
+                <statetype name="movestate">
+                    <position>725,13</position>
+                    <state name="off"></state>
+                    <state name="on">
+                        <imagetype name="statusimage">
+                            <filename>mm_updown.png</filename>
+                        </imagetype>
+                    </state>
+                </statetype>
+
+                <textarea name="title" from="buttontext">
+                    <area>48,0,654,40</area>
+                    <align>left,vcenter</align>
+                    <font>basesmall</font>
+                    <template>%TITLE% by %ARTIST% on %ALBUM%</template>
+                </textarea>
+
+            </state>
+            <state name="selectedactive" from="active">
+                <imagetype name="buttonimage">
+                    <area>3,3,34,34</area>
+                    <filename>mm_nothumb.png</filename>
+                </imagetype>
+                <shape name="selectbar">
+                    <area>0,0,750,40</area>
+                </shape>
+            </state>
+            <state name="selectedinactive" from="active">
+                <shape name="selectbar">
+                    <area>0,0,750,40</area>
+                </shape>
+            </state>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>690,282</position>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>720,282</position>
+        </statetype>
+    </buttonlist>
+
+    <!-- playlist progress bar  -->
+    <progressbar name="baseplaylistprogress">
+        <position>40,395</position>
+        <layout>horizontal</layout>
+        <style>reveal</style>
+        <imagetype name="background">
+            <filename>mm_progress-bg.png</filename>
+        </imagetype>
+        <imagetype name="progressimage">
+            <filename>mm_progress-fg.png</filename>
+        </imagetype>
+    </progressbar>
+
+    <!-- repeat statetype -->
+    <statetype name="baserepeatstate">
+        <area>700,390,250,35</area>
+        <state name="off">
+            <textarea name="repeattext" from="basetextarea">
+                <area>0,0,250,35</area>
+                <font>basesmall</font>
+                <value>Repeat Mode: Off</value>
+            </textarea>
+        </state>
+        <state name="track">
+            <textarea name="repeattext" from="basetextarea">
+                <area>0,0,250,35</area>
+                <font>basesmall</font>
+                <value>Repeat Mode: Track</value>
+            </textarea>
+        </state>
+        <state name="all">
+            <textarea name="repeattext" from="basetextarea">
+                <area>0,0,250,35</area>
+                <font>basesmall</font>
+                <value>Repeat Mode: All</value>
+            </textarea>
+        </state>
+    </statetype>
+
+    <!-- shuffle statetype -->
+    <statetype name="baseshufflestate">
+        <area>970,390,300,35</area>
+        <state name="off">
+            <textarea name="shuffletext" from="basetextarea">
+                <area>0,0,300,35</area>
+                <font>basesmall</font>
+                <value>Shuffle Mode: Off</value>
+            </textarea>
+        </state>
+        <state name="random">
+            <textarea name="shuffletext" from="basetextarea">
+                <area>0,0,300,35</area>
+                <font>basesmall</font>
+                <value>Shuffle Mode: Random</value>
+            </textarea>
+        </state>
+        <state name="intelligent">
+            <textarea name="shuffletext" from="basetextarea">
+                <area>0,0,300,35</area>
+                <font>basesmall</font>
+                <value>Shuffle Mode: Intelligent</value>
+            </textarea>
+        </state>
+        <state name="album">
+            <textarea name="shuffletext" from="basetextarea">
+                <area>0,0,300,35</area>
+                <font>basesmall</font>
+                <value>Shuffle Mode: Album</value>
+            </textarea>
+        </state>
+        <state name="artist">
+            <textarea name="shuffletext" from="basetextarea">
+                <area>0,0,300,35</area>
+                <font>basesmall</font>
+                <value>Shuffle Mode: Artist</value>
+            </textarea>
+        </state>
+    </statetype>
+
+    <!-- track progress bar -->
+    <progressbar name="basetrackprogress">
+        <position>230,670</position>
+        <layout>horizontal</layout>
+        <style>reveal</style>
+        <imagetype name="background">
+            <filename>mm_progress-bg.png</filename>
+        </imagetype>
+        <imagetype name="progressimage">
+            <filename>mm_progress-fg.png</filename>
+        </imagetype>
+    </progressbar>
+
+    <!-- mute statetype -->
+    <statetype name="basemutestate">
+        <position>30,670</position>
+        <state name="off">
+            <imagetype name="statusimage">
+                <filename>mm_volume.png</filename>
+            </imagetype>
+        </state>
+        <state name="on">
+            <imagetype name="statusimage">
+                <filename>mm_volume_muted.png</filename>
+            </imagetype>
+        </state>
+    </statetype>
+
+    <!-- volume text -->
+    <textarea name="basevolume" from="basetextarea">
+        <area>70,667,250,25</area>
+        <font>basesmall</font>
+        <template>%VOLUMEPERCENT% %|(MUTE|)%</template>
+    </textarea>
+
+    <buttonlist name="basetreebuttonlist" from="basebuttonlist">
+        <searchposition>-1,295</searchposition>
+    </buttonlist>
+
+    <buttonlist name="basegallerybuttonlist">
+        <area>0,0,770,280</area>
+        <layout>grid</layout>
+        <spacing>5</spacing>
+        <searchposition>-1,295</searchposition>
+        <buttonarea>0,0,770,240</buttonarea>
+        <statetype name="buttonitem">
+            <area>0,0,181,115</area>
+            <state name="active">
+                <shape name="buttonbackground">
+                    <area>0,0,181,115</area>
+                    <type>roundbox</type> 
+                    <cornerradius>3</cornerradius>
+                    <fill style="gradient">
+                        <gradient start="#e8e262" end="#fe9735" alpha="50"/>
+                    </fill>
+                </shape>
+
+                <imagetype name="buttonimage">
+                    <area>50,5,80,80</area>
+                </imagetype>
+
+                <statetype name="buttoncheck">
+                    <position>145,60</position>
+                    <showempty>yes</showempty>
+                    <state type="full">
+                        <imagetype name="marked">
+                            <filename>playlist_yes.png</filename>
+                        </imagetype>
+                    </state>
+                </statetype>
+
+                <textarea name="buttontext" from="basetextarea">
+                    <area>5,84,171,30</area>
+                    <align>hcenter,bottom</align>
+                    <font>basesmall</font>
+                </textarea>
+            </state>
+            <state name="selectedactive" from="active">
+                <shape name="buttonbackground">
+                    <area>0,0,181,115</area>
+                    <type>roundbox</type> 
+                    <cornerradius>3</cornerradius>
+                    <fill style="gradient">
+                        <gradient start="#e8e262" end="#fe9735" alpha="255" />
+                    </fill>
+                </shape>
+                <textarea name="buttontext">
+                    <font>basesmall</font>
+                </textarea>
+            </state>
+            <state name="selectedinactive" from="active">
+                <shape name="buttonbackground">
+                    <area>0,0,181,115</area>
+                    <type>roundbox</type> 
+                    <cornerradius>3</cornerradius>
+                    <fill style="gradient">
+                        <gradient start="#e8e262" end="#fe9735" alpha="150" />
+                    </fill>
+                </shape>
+
+                <textarea name="buttontext">
+                    <font>basesmallgrey</font>
+                </textarea>
+            </state>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>240,270</position>
+            <state type="on">
+                <imagetype name="upon">
+                    <filename>up_arrow.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>456,270</position>
+            <state type="on">
+                <imagetype name="dnon">
+                    <filename>down_arrow.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </buttonlist>
+
+    <group name="baseinfopanel">
+        <area>0,340,800,260</area>
+
+        <shape name="track_info_background" from="basebackground">
+            <area>15,0,770,215</area>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>185,15,400,34</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="artist" from="basetextarea">
+            <area>185,55,430,34</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="album" from="basetextarea">
+            <area>185,90,430,34</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <statetype name="ratingstate" from="baseratingstate">
+            <position>185,125</position>
+        </statetype>
+
+        <progressbar name="progress" from="basetrackprogress">
+            <position>185,180</position>
+        </progressbar>
+
+        <textarea name="time" from="basetextarea">
+            <area>185,155,185,35</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <statetype name="trackstate">
+            <position>600,175</position>
+            <state name="playing">
+                <imagetype name="playicon">
+                    <filename>mm_playicon.png</filename>
+                </imagetype>
+            </state>
+            <state name="paused">
+                <position>0,4</position>
+                <imagetype name="pauseicon">
+                    <filename>mm_pauseicon.png</filename>
+                </imagetype>
+            </state>
+            <state name="stopped">
+                <position>0,4</position>
+                <imagetype name="stopicon">
+                    <filename>mm_stopicon.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <imagetype name="visualizer_border">
+            <filename>mm_blackhole_border.png</filename>
+            <area>632,19,132,132,</area>
+        </imagetype>
+
+        <video name="visualizer">
+            <area>635,23,126,125,</area>
+        </video>
+
+        <textarea name="visualizername" from="basetextarea">
+            <area>635,150,126,35</area>
+            <font>basesmall</font>
+            <align>center</align>
+        </textarea>
+
+        <statetype name="mutestate" from="basemutestate">
+            <position>30,185</position>
+        </statetype>
+
+        <textarea name="volume" from="basevolume">
+            <position>70,185</position>
+        </textarea>
+
+        <imagetype name="mm_blackhole_border">
+            <filename>mm_blackhole_border.png</filename>
+            <area>32,19,132,132</area>
+        </imagetype>
+
+        <imagetype name="coverart">
+            <filename>mm_nothumb.png</filename>
+            <area>35,23,126,125</area>
+        </imagetype>
+
+
+    </group>
+
+    <group name="baseplayliststatusgroup">
+        <textarea name="playlistposition" from="basetextarea">
+            <area>30,0,170,30</area>
+            <font>basesmall</font>
+            <align>left,top</align>
+        </textarea>
+
+        <textarea name="playlisttime" from="basetextarea">
+            <area>200,0,230,30</area>
+            <font>basesmall</font>
+            <align>right,top</align>
+        </textarea>
+
+        <progressbar name="playlistprogress" from="baseplaylistprogress">
+            <position>30,30</position>
+        </progressbar>
+
+        <statetype name="shufflestate" from="baseshufflestate">
+            <position>500,25</position>
+        </statetype>
+    </group>
+
+    <group name="basesmallinfopanel">
+        <shape name="trackinfo_background" from="basebackground">
+            <area>15,0,770,50</area>
+            <fill color="#000000" alpha="50" />
+        </shape>
+
+        <imagetype name="coverart">
+            <filename>mm_nothumb.png</filename>
+            <area>30,5,40,40</area>
+        </imagetype>
+
+        <statetype name="trackstate">
+            <position>80,12</position>
+            <state name="playing">
+                <imagetype name="playicon">
+                    <filename>mm_playicon.png</filename>
+                </imagetype>
+            </state>
+            <state name="paused">
+                <position>0,4</position>
+                <imagetype name="pauseicon">
+                    <filename>mm_pauseicon.png</filename>
+                </imagetype>
+            </state>
+            <state name="stopped">
+                <position>0,4</position>
+                <imagetype name="stopicon">
+                    <filename>mm_stopicon.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>100,10,520,34</area>
+            <font>basesmall</font>
+            <align>left,vcenter</align>
+            <template>%TITLE% by %ARTIST% on %ALBUM%</template>
+        </textarea>
+
+        <textarea name="time" from="basetextarea">
+            <area>620,10,155,34</area>
+            <align>right,vcenter</align>
+            <font>basesmall</font>
+        </textarea>
+    </group>
+
+    <group name="baseplaylistpanel">
+        <shape name="playlist_background" from="basebackground">
+            <area>15,0,770,235</area>
+            <fill color="#000000" alpha="50" />
+        </shape>
+
+        <buttonlist name="currentplaylist" from="basecurrentplaylist">
+            <area>25,15,750,210</area>
+            <buttonarea>0,0,750,190</buttonarea>
+            <searchposition>-1,140</searchposition>
+            <statetype name="upscrollarrow">
+                <position>680,155</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>710,155</position>
+            </statetype>
+        </buttonlist>
+
+        <group name="playliststatuspanel" from="baseplayliststatusgroup">
+            <position>0,180</position>
+        </group>
+    </group>
+
+</mythuitheme>

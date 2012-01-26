@@ -6,7 +6,7 @@
 class MythBDPlayer : public MythPlayer
 {
   public:
-    MythBDPlayer(bool muted = false);
+    MythBDPlayer(PlayerFlags flags = kNoFlags);
     virtual bool    GoToMenu(QString str);
     virtual int     GetNumChapters(void);
     virtual int     GetCurrentChapter(void);
@@ -42,8 +42,7 @@ class MythBDPlayer : public MythPlayer
     virtual void PreProcessNormalFrame(void);
 
     // Private decoder stuff
-    virtual void CreateDecoder(char *testbuf, int testreadsize,
-                               bool allow_libmpeg2, bool no_accel);
+    virtual void CreateDecoder(char *testbuf, int testreadsize);
 
     // Non-const gets
     // Disable screen grabs for Bluray

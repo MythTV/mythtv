@@ -78,6 +78,11 @@
         </li>
       </ul>
     </li>
+    <li><a href='#'><i18n>3rd Party Software</i18n></a>
+      <ul class="acitem collapsible">
+        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/3rdParty/jwplayer.qsp')"><i18n>JW Player&trade;</i18n></a></li>
+      </ul>
+    </li>
   </ul>
   <br>
   <center><a class='menuitem' href='http://www.mythtv.org'>www.mythtv.org</a></center>

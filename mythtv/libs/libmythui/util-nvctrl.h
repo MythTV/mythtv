@@ -9,5 +9,6 @@ using namespace std;
 typedef map<unsigned int, double> t_screenrate;
 
 int GetNvidiaRates(t_screenrate& screenmap);
+int CheckNVOpenGLSyncToVBlank(void);
 
 #endif

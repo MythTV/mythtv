@@ -166,6 +166,12 @@ void MythPainter::DrawEllipse(const QRect &area, const QBrush &fillBrush,
         DrawImage(area.x(), area.y(), im, alpha);
 }
 
+void MythPainter::PushTransformation(const UIEffects &zoom, QPointF center)
+{
+    (void)zoom;
+    (void)center;
+}
+
 void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
                                const QRect &r, const MythFontProperties &font)
 {
@@ -349,22 +355,6 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
         return m_StringToImageMap[incoming];
     }
 
-    if (font.hasShadow())
-    {
-        QPoint drawOffset;
-        QPoint shadowOffset;
-        QColor shadowColor;
-        int    shadowAlpha;
-
-        font.GetOffset(drawOffset);
-        font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
-
-        canvas.setX(canvas.x() - drawOffset.x());
-        canvas.setWidth(canvas.width() + shadowOffset.x());
-        canvas.setY(canvas.y() - drawOffset.y());
-        canvas.setHeight(canvas.height() + shadowOffset.y());
-    }
-
     MythImage *im = GetFormatImage();
     if (im)
     {
@@ -390,18 +380,18 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
         if (font.hasShadow())
         {
             QRect  shadowRect;
-            QPoint drawOffset;
             QPoint shadowOffset;
             QColor shadowColor;
             int    shadowAlpha;
 
-            font.GetOffset(drawOffset);
             font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
             shadowColor.setAlpha(shadowAlpha);
 
+            MythPoint  shadow(shadowOffset);
+            shadow.NormPoint(); // scale it to screen resolution
+
             shadowRect = canvas;
-            shadowRect.translate(shadowOffset.x() + drawOffset.x(),
-                                 shadowOffset.y() + drawOffset.y());
+            shadowRect.translate(shadow.x(), shadow.y());
 
             painter.setPen(shadowColor);
             for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)

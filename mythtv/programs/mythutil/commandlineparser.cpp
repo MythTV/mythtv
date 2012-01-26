@@ -11,46 +11,60 @@ MythUtilCommandLineParser::MythUtilCommandLineParser() :
 void MythUtilCommandLineParser::LoadArguments(void)
 {
     CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
+        // fileutils.cpp
         << add("--copyfile", "copyfile", false,
                 "Copy a MythTV Storage Group file", "")
                 ->SetGroup("File")
+                ->SetRequiredChild(QStringList("infile") << "outfile")
+
+        // mpegutils.cpp
+        << add("--pidcounter", "pidcounter", false,
+                "Count pids in a MythTV Storage Group file", "")
+                ->SetGroup("MPEG-TS")
+                ->SetRequiredChild("infile")
+        << add("--pidfilter", "pidfilter", false,
+                "Filter pids in a MythTV Storage Group file", "")
+                ->SetGroup("MPEG-TS")
+                ->SetRequiredChild(QStringList("infile") << "outfile")
+        << add("--pidprinter", "pidprinter", false,
+                "Print PSIP pids in a MythTV Storage Group file", "")
+                ->SetGroup("MPEG-TS")
+                ->SetRequiredChild("infile")
+                ->SetChild("outfile")
+
+        // markuputils.cpp
         << add("--gencutlist", "gencutlist", false,
                 "Copy the commercial skip list to the cutlist.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequires("chanid")
-                ->SetRequires("starttime")
+                ->SetRequiredChild(QStringList("chanid") << "starttime")
         << add("--getcutlist", "getcutlist", false,
                 "Display the current cutlist.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequires("chanid")
-                ->SetRequires("starttime")
+                ->SetRequiredChild(QStringList("chanid") << "starttime")
         << add("--setcutlist", "setcutlist", "",
                 "Set a new cutlist in the form:\n"
                 "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequires("chanid")
-                ->SetRequires("starttime")
+                ->SetRequiredChild(QStringList("chanid") << "starttime")
         << add("--clearcutlist", "clearcutlist", false,
                 "Clear the cutlist.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequires("chanid")
-                ->SetRequires("starttime")
+                ->SetRequiredChild(QStringList("chanid") << "starttime")
         << add("--getskiplist", "getskiplist", false,
                 "Display the current commercial skip list.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequires("chanid")
-                ->SetRequires("starttime")
+                ->SetRequiredChild(QStringList("chanid") << "starttime")
         << add("--setskiplist", "setskiplist", "",
                 "Set a new commercial skip list in the form:\n"
                 "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequires("chanid")
-                ->SetRequires("starttime")
+                ->SetRequiredChild(QStringList("chanid") << "starttime")
         << add("--clearskiplist", "clearskiplist", false,
                 "Clear the commercial skip list.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequires("chanid")
-                ->SetRequires("starttime")
+                ->SetRequiredChild(QStringList("chanid") << "starttime")
+
+        // backendutils.cpp
         << add("--resched", "resched", false,
                 "Trigger a run of the recording scheduler on the existing "
                 "master backend.",
@@ -82,6 +96,8 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "local database settings cache used by each program, causing "
                 "options to be re-read from the database upon next use.")
                 ->SetGroup("Backend")
+
+        // jobutils.cpp
         << add("--queuejob", "queuejob", "",
                 "Insert a new job into the JobQueue.",
                 "Schedule the specified job type (transcode, commflag, "
@@ -90,6 +106,8 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 ->SetGroup("JobQueue")
                 ->SetRequires("chanid")
                 ->SetRequires("starttime")
+
+        // messageutils.cpp
         << add("--message", "message", false,
                 "Display a message on a frontend", "")
                 ->SetGroup("Messaging")
@@ -98,11 +116,20 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 ->SetGroup("Messaging")
         );
 
-    add("--srcfile", "srcfile", "", "Source file URI", "")
-        ->SetRequiredChildOf("copyfile");
-    add("--destfile", "destfile", "", "Destination file URI", "")
-        ->SetRequiredChildOf("copyfile");
+    // mpegutils.cpp
+    add("--pids", "pids", "", "Pids to process", "")
+        ->SetRequiredChildOf("pidfilter")
+        ->SetRequiredChildOf("pidprinter");
+    add("--ptspids", "ptspids", "", "Pids to extract PTS from", "");
+    add("--packetsize", "packetsize", 188, "TS Packet Size", "")
+        ->SetChildOf("pidcounter")
+        ->SetChildOf("pidfilter");
+    add("--noautopts", "noautopts", false, "Disables PTS discovery", "")
+        ->SetChildOf("pidprinter");
+    add("--xml", "xml", false, "Enables XML output of PSIP", "")
+        ->SetChildOf("pidprinter");
 
+    // messageutils.cpp
     add("--udpport", "udpport", 6948, "(optional) UDP Port to send to", "")
         ->SetChildOf("message");
     add("--bcastaddr", "bcastaddr", "127.0.0.1", "(optional) IP address to send to", "")
@@ -110,6 +137,8 @@ void MythUtilCommandLineParser::LoadArguments(void)
 
     // Generic Options used by more than one utility
     addRecording();
+    addInFile(true);
+    addSettingsOverride();
     addHelp();
     addVersion();
     addLogging();

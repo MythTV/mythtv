@@ -41,6 +41,13 @@ typedef enum
     kVDPFeatHQScaling = 0x20,
 } VDPAUFeatures;
 
+typedef enum
+{
+    kVDPBlendNormal = 0,
+    kVDPBlendPiP    = 1,
+    kVDPBlendNull   = 2,
+} VDPBlendType;
+
 class VDPAUOutputSurface;
 class VDPAUVideoSurface;
 class VDPAUBitmapSurface;
@@ -65,6 +72,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     void SetPreempted(void)        { m_preempted = true; }
 
     bool Create(const QSize &size, WId window, uint colorkey = VDPAU_COLORKEY);
+    bool CreateDecodeOnly(void);
     bool WasPreempted(void);
     bool SetColorKey(uint color);
     void WaitForFlip(void);
@@ -114,13 +122,16 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     bool UploadBitmap(uint id, void* const plane[1], uint32_t pitch[1]);
     bool UploadMythImage(uint id, MythImage *image);
     bool UploadYUVFrame(uint id, void* const planes[3], uint32_t pitches[3]);
+    bool DownloadYUVFrame(uint id, void* const planes[3], uint32_t pitches[3]);
     bool DrawBitmap(uint id, uint target, const QRect *src,
-                    const QRect *dst, int alpha = 0, int red = 0,
-                    int blue = 0, int green = 0, bool blend = false);
+                    const QRect *dst, VDPBlendType blendi = kVDPBlendNormal,
+                    int alpha = 0, int red = 0, int blue = 0, int green = 0);
+    bool DrawLayer(uint id, uint target);
 
     int   GetBitmapSize(uint id);
     void* GetRender(uint id);
     uint  GetSurfaceOwner(VdpVideoSurface surface);
+    QSize GetSurfaceSize(uint id);
     void  ClearVideoSurface(uint id);
     void  ChangeVideoSurfaceOwner(uint id);
 
@@ -187,12 +198,15 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     VdpVideoSurfaceCreate           *vdp_video_surface_create;
     VdpVideoSurfaceDestroy          *vdp_video_surface_destroy;
     VdpVideoSurfaceGetBitsYCbCr     *vdp_video_surface_put_bits_y_cb_cr;
+    VdpVideoSurfaceGetParameters    *vdp_video_surface_get_parameters;
+    VdpVideoSurfacePutBitsYCbCr     *vdp_video_surface_get_bits_y_cb_cr;
     VdpOutputSurfacePutBitsNative   *vdp_output_surface_put_bits_native;
     VdpOutputSurfaceCreate          *vdp_output_surface_create;
     VdpOutputSurfaceDestroy         *vdp_output_surface_destroy;
     VdpOutputSurfaceRenderBitmapSurface *vdp_output_surface_render_bitmap_surface;
     VdpOutputSurfaceGetParameters   *vdp_output_surface_get_parameters;
     VdpOutputSurfaceGetBitsNative   *vdp_output_surface_get_bits_native;
+    VdpOutputSurfaceRenderOutputSurface *vdp_output_surface_render_output_surface;
     VdpVideoMixerCreate             *vdp_video_mixer_create;
     VdpVideoMixerSetFeatureEnables  *vdp_video_mixer_set_feature_enables;
     VdpVideoMixerDestroy            *vdp_video_mixer_destroy;

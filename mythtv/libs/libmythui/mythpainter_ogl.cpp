@@ -192,8 +192,7 @@ void MythOpenGLPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
                                  const QPen &linePen, int alpha)
 {
     if ((fillBrush.style() == Qt::SolidPattern ||
-         fillBrush.style() == Qt::NoBrush) &&
-        (realRender && realRender->RectanglesAreAccelerated()))
+         fillBrush.style() == Qt::NoBrush) && realRender)
     {
         realRender->DrawRect(area, fillBrush, linePen, alpha);
         return;
@@ -227,4 +226,16 @@ void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *im)
         m_ImageIntMap.remove(im);
         m_ImageExpireList.remove(im);
     }
+}
+
+void MythOpenGLPainter::PushTransformation(const UIEffects &fx, QPointF center)
+{
+    if (realRender)
+        realRender->PushTransformation(fx, center);
+}
+
+void MythOpenGLPainter::PopTransformation(void)
+{
+    if (realRender)
+        realRender->PopTransformation();
 }

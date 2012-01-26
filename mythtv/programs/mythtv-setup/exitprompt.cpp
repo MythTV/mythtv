@@ -136,7 +136,7 @@ void ExitPrompter::quit()
         // No need to run this if the backend has just restarted
         if (gCoreContext->BackendIsRunning())
         {
-            RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+            gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
         }
     }
 

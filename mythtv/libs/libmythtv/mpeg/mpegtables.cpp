@@ -5,6 +5,7 @@
 #include "atscdescriptors.h"
 #include "mythlogging.h"
 #include "mpegtables.h"
+#include "util.h" // for xml_indent
 
 const unsigned char DEFAULT_PAT_HEADER[8] =
 {
@@ -51,10 +52,15 @@ uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
     if (MPEGDescriptor::Find(desc, DescriptorID::ac3))
         return AC3Audio;
 
-    const unsigned char* d = NULL;
-    QString reg("");
-    if ((d = MPEGDescriptor::Find(desc, DescriptorID::registration)))
-        reg = RegistrationDescriptor(d,300).FormatIdentifierString();
+    QString reg;
+    const unsigned char *d = MPEGDescriptor::Find(
+        desc, DescriptorID::registration);
+    if (d)
+    {
+        RegistrationDescriptor rd(d);
+        if (rd.IsValid())
+            reg = rd.FormatIdentifierString();
+    }
 
     if (reg == "DTS1")
         return DTSAudio;
@@ -120,8 +126,16 @@ bool PSIPTable::HasCRC(void) const
             break;
 
         // SCTE
+        case TableID::NITscte:
+        case TableID::NTT:
+        case TableID::SVCTscte:
+        case TableID::STTscte:
         case TableID::SITscte:
             has_crc = true;
+            break;
+        case TableID::ADET:
+            has_crc = false;
+            break;
 
         // ATSC
         case TableID::MGT:
@@ -166,6 +180,32 @@ bool PSIPTable::HasCRC(void) const
     }
 
     return has_crc;
+}
+
+bool PSIPTable::HasSectionNumber(void) const
+{
+    bool has_sn = false;
+    switch (TableID())
+    {
+        // MPEG
+        case TableID::PAT:
+        case TableID::CAT:
+        case TableID::PMT:
+        // ATSC
+        case TableID::MGT:
+        case TableID::TVCT:
+        case TableID::CVCT:
+        case TableID::RRT:
+        case TableID::EIT:
+        case TableID::ETT:
+        case TableID::STT:
+        case TableID::DET:
+        case TableID::DST:
+            has_sn = true;
+            break;
+    }
+
+    return has_sn;
 }
 
 bool PSIPTable::VerifyPSIP(bool verify_crc) const
@@ -681,7 +721,7 @@ uint ProgramMapTable::FindUnusedPID(uint desired_pid)
     return desired_pid & 0x1fff;
 }
 
-const QString PSIPTable::toString() const
+QString PSIPTable::toString(void) const
 {
     QString str;
     str.append(QString(" PSIP tableID(0x%1) length(%2) extension(0x%3)\n")
@@ -691,23 +731,59 @@ const QString PSIPTable::toString() const
                        "section(%3) last_section(%4)\n")
                .arg(Version()).arg(IsCurrent())
                .arg(Section()).arg(LastSection()));
-    //str.append(QString("   protocol ver: "<<protocolVersion()<<endl;
+    if ((TableID() >= TableID::MGT) && (TableID() <= TableID::SRM))
+    {
+        str.append(QString("      atsc_protocol_version(%1)\n")
+                   .arg(ATSCProtocolVersion()));
+    }
     return str;
 }
 
-const QString ProgramAssociationTable::toString() const
+QString PSIPTable::toStringXML(uint indent_level) const
+{
+    QString indent = xml_indent(indent_level);
+    return indent + "<PSIPSection " + XMLValues(indent_level + 1) + " />";
+}
+
+QString PSIPTable::XMLValues(uint indent_level) const
+{
+    QString indent = xml_indent(indent_level);
+
+    QString str = QString(
+        "table_id=\"0x%1\" length=\"%2\"")
+        .arg(TableID(), 2, 16, QChar('0'))
+        .arg(Length());
+
+    if (HasSectionNumber())
+    {
+        str += QString(" section=\"%4\" last_section=\"%5\"")
+            .arg(Section()).arg(LastSection());
+    }
+
+    if ((TableID() >= TableID::MGT) && (TableID() <= TableID::SRM))
+    {
+        str += QString("\n%1version=\"%2\" current=\"%3\" "
+                       "protocol_version=\"%4\" extension=\"0x%5\"")
+            .arg(indent)
+            .arg(Version()).arg(xml_bool_to_string(IsCurrent()))
+            .arg(ATSCProtocolVersion())
+            .arg(TableIDExtension(), 0, 16);
+    }
+
+    return str;
+}
+
+QString ProgramAssociationTable::toString(void) const
 {
     QString str;
-    str.append(QString("Program Association Table\n"));
-    str.append(static_cast<const PSIPTable*>(this)->toString());
-    str.append(QString("         tsid: %1\n").arg(TransportStreamID()));
-    str.append(QString(" programCount: %1\n").arg(ProgramCount()));
+    str.append(QString("Program Association Section\n"));
+    str.append(PSIPTable::toString());
+    str.append(QString("      tsid(%1) ").arg(TransportStreamID()));
+    str.append(QString("programCount(%1)\n").arg(ProgramCount()));
 
     uint cnt0 = 0, cnt1fff = 0;
     for (uint i = 0; i < ProgramCount(); i++)
     {
-        const unsigned char* p = psipdata() + (i<<2);
-
         if (0x1fff == ProgramPID(i))
         {
             cnt1fff++;
@@ -720,52 +796,127 @@ const QString ProgramAssociationTable::toString() const
             continue;
         }
 
-        str.append(QString("  program number %1").arg(ProgramNumber(i),5)).
-            append(QString(" has PID 0x%1   data ").arg(ProgramPID(i),4,16)).
-            append(QString(" 0x%1 0x%2").arg(p[0],2,16).arg(p[1],2,16)).
-            append(QString(" 0x%1 0x%2\n").arg(p[2],2,16).arg(p[3],2,16));
+        str += QString("  program number %1 has PID 0x%2\n")
+            .arg(ProgramNumber(i),5)
+            .arg(ProgramPID(i),4,16,QChar('0'));
     }
 
     if (cnt0 || cnt1fff)
     {
-        str.append(QString("  also contains %1 + %2 dummy programs\n")
-                   .arg(cnt0).arg(cnt1fff));
+        str.append(QString("  also contains %1 dummy programs\n")
+                   .arg(cnt0 + cnt1fff));
     }
 
     return str;
 }
 
-const QString ProgramMapTable::toString() const
+QString ProgramAssociationTable::toStringXML(uint indent_level) const
+{
+    QString indent_0 = xml_indent(indent_level);
+    QString indent_1 = xml_indent(indent_level + 1);
+
+    QString str = QString(
+        "%1<ProgramAssociationSection tsid=\"0x%2\" program_count=\"%3\""
+        "\n%4%5>\n")
+        .arg(indent_0)
+        .arg(TransportStreamID(),4,16,QChar('0'))
+        .arg(ProgramCount())
+        .arg(indent_1)
+        .arg(PSIPTable::XMLValues(indent_level + 1));
+
+    for (uint i = 0; i < ProgramCount(); i++)
+    {
+        bool dummy = (0x1fff == ProgramPID(i)) || (0x0 == ProgramPID(i));
+        str += QString("%1<Program number=\"%2\" pid=\"0x%3\" %4/>\n")
+            .arg(indent_1)
+            .arg(ProgramNumber(i))
+            .arg(ProgramPID(i),4,16,QChar('0'))
+            .arg(dummy ? "comment=\"Dummy Program\" " : "");
+    }
+
+    return str + indent_0 + "</ProgramAssociationSection>";
+}
+
+QString ProgramMapTable::toString(void) const
 {
     QString str =
-        QString("Program Map Table ver(%1) pid(0x%2) pnum(%3) len(%4)\n")
-        .arg(Version()).arg(tsheader()->PID(), 0, 16)
-        .arg(ProgramNumber()).arg(Length());
+        QString("Program Map Section"
+                "\n%1"
+                "      pnum(%2) pid(0x%3)\n")
+        .arg(PSIPTable::toString())
+        .arg(ProgramNumber())
+        .arg(tsheader()->PID(),0,16);
 
-    if (0 != StreamCount())
+    vector<const unsigned char*> desc =
+        MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
+    for (uint i = 0; i < desc.size(); i++)
     {
-        vector<const unsigned char*> desc =
-            MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
-        for (uint i=0; i<desc.size(); i++)
-            str.append(QString("  %1\n")
-                       .arg(MPEGDescriptor(desc[i], 300).toString()));
+        str.append(QString("  %1\n")
+                   .arg(MPEGDescriptor(desc[i], 300).toString()));
     }
-    str.append("\n");
+
     for (uint i = 0; i < StreamCount(); i++)
     {
-        str.append(QString(" Stream #%1 pid(0x%2) type(%3  0x%4)\n")
+        str.append(QString("  Stream #%1 pid(0x%2) type(0x%3 %4)\n")
                    .arg(i).arg(StreamPID(i), 0, 16)
-                   .arg(StreamTypeString(i)).arg(StreamType(i), 0, 16));
-        if (0 != StreamInfoLength(i))
+                   .arg(StreamType(i), 2, 16, QChar('0'))
+                   .arg(StreamTypeString(i)));
+        vector<const unsigned char*> desc =
+            MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
+        for (uint i = 0; i < desc.size(); i++)
         {
-            vector<const unsigned char*> desc =
-                MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
-            for (uint i=0; i<desc.size(); i++)
-                str.append(QString("  %1\n")
-                           .arg(MPEGDescriptor(desc[i], 300).toString()));
+            str.append(QString("    %1\n")
+                       .arg(MPEGDescriptor(desc[i], 300).toString()));
         }
     }
     return str;
+}
+
+QString ProgramMapTable::toStringXML(uint indent_level) const
+{
+    QString indent_0 = xml_indent(indent_level);
+    QString indent_1 = xml_indent(indent_level + 1);
+
+    QString str = QString(
+        "%1<ProgramMapSection pcr_pid=\"0x%2\" program_number=\"%3\"\n"
+        "%4program_info_length=\"%5\" stream_count=\"%7\"%8>\n")
+        .arg(indent_0)
+        .arg(PCRPID(),0,16)
+        .arg(ProgramNumber())
+        .arg(indent_1)
+        .arg(ProgramInfoLength())
+        .arg(PSIPTable::XMLValues(indent_level + 1));
+
+    vector<const unsigned char*> gdesc =
+        MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
+    for (uint i = 0; i < gdesc.size(); i++)
+    {
+        str += MPEGDescriptor(gdesc[i], 300)
+            .toStringXML(indent_level + 1) + "\n";
+    }
+
+    for (uint i = 0; i < StreamCount(); i++)
+    {
+        str += QString("%1<Stream pid=\"0x%2\" type=\"0x%3\" "
+                       "type_desc=\"%4\" stream_info_length=\"%5\"")
+            .arg(indent_1)
+            .arg(StreamPID(i),2,16,QChar('0'))
+            .arg(StreamType(i),2,16,QChar('0'))
+            .arg(StreamTypeString(i))
+            .arg(StreamInfoLength(i));
+        vector<const unsigned char*> ldesc =
+            MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
+        str += (ldesc.empty()) ? " />\n" : ">\n";
+        for (uint i = 0; i < ldesc.size(); i++)
+        {
+            str += MPEGDescriptor(ldesc[i], 300)
+                .toStringXML(indent_level + 2) + "\n";
+        }
+        if (!ldesc.empty())
+            str += indent_1 + "</Stream>\n";
+    }
+
+    return str + indent_0 + "</ProgramMapSection>";
 }
 
 const char *StreamID::toString(uint streamID)
@@ -948,6 +1099,103 @@ QString ProgramMapTable::StreamDescription(uint i, QString sistandard) const
     return desc;
 }
 
+QString ConditionalAccessTable::toString(void) const
+{
+    QString str =
+        QString("Condiditional Access Section %1")
+        .arg(PSIPTable::toString());
+    
+    vector<const unsigned char*> gdesc =
+        MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
+    for (uint i = 0; i < gdesc.size(); i++)
+        str += "  " + MPEGDescriptor(gdesc[i], 300).toString() + "\n";
+
+    str += "\n";
+
+    return str;
+}
+
+QString ConditionalAccessTable::toStringXML(uint indent_level) const
+{
+    QString indent_0 = xml_indent(indent_level);
+
+    QString str =
+        QString("%1<ConditionalAccessSection %3")
+        .arg(indent_0)
+        .arg(PSIPTable::XMLValues(indent_level + 1));
+
+    vector<const unsigned char*> gdesc =
+        MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
+    str += (gdesc.empty()) ? " />\n" : ">\n";
+    for (uint i = 0; i < gdesc.size(); i++)
+    {
+        str += MPEGDescriptor(gdesc[i], 300)
+            .toStringXML(indent_level + 1) + "\n";
+    }
+    if (!gdesc.empty())
+        str += indent_0 + "</ConditionalAccessSection>\n";
+
+    return str;
+}
+
+QString SpliceTimeView::toString(int64_t first, int64_t last) const
+{
+    if (!IsTimeSpecified())
+        return QString("splice_time(N/A)");
+
+    int64_t abs_pts_time = PTSTime();
+    if ((first > 0) && (last > 0))
+    {
+        int64_t elapsed = abs_pts_time - first;
+        elapsed = (elapsed < 0) ? elapsed + 0x1000000000LL : elapsed;
+        QTime abs = QTime(0,0,0,0).addMSecs(elapsed/90);
+
+        elapsed = abs_pts_time - last; /* rel_pts_time */
+        elapsed = (elapsed < 0) ? elapsed + 0x1000000000LL : elapsed;
+        QTime rel = QTime(0,0,0,0).addMSecs(elapsed/90);
+
+        return QString("splice_time(pts: %1 abs: %2, rel: +%3)")
+            .arg(abs_pts_time)
+            .arg(abs.toString("hh:mm:ss.zzz"))
+            .arg(rel.toString("hh:mm:ss.zzz"));
+    }
+
+    return QString("splice_time(pts: %1)").arg(abs_pts_time);
+}
+
+QString SpliceTimeView::toStringXML(
+    uint indent_level, int64_t first, int64_t last) const
+{
+    QString indent = xml_indent(indent_level);
+
+    if (!IsTimeSpecified())
+        return indent + "<SpliceTime />";
+
+    int64_t abs_pts_time = PTSTime();
+
+    QString abs_str;
+    if (first > 0)
+    {
+        int64_t elapsed = abs_pts_time - first;
+        elapsed = (elapsed < 0) ? elapsed + 0x1000000000LL : elapsed;
+        QTime abs = QTime(0,0,0,0).addMSecs(elapsed/90);
+        abs_str = QString("absolute=\"%1\" ")
+            .arg(abs.toString("hh:mm:ss.zzz"));
+    }
+
+    QString rel_str;
+    if (last > 0)
+    {
+        int64_t elapsed = abs_pts_time - last; /* rel_pts_time */
+        elapsed = (elapsed < 0) ? elapsed + 0x1000000000LL : elapsed;
+        QTime rel = QTime(0,0,0,0).addMSecs(elapsed/90);
+        rel_str = QString("relative=\"+%1\" ")
+            .arg(rel.toString("hh:mm:ss.zzz"));
+    }
+
+    return QString("%1<SpliceTime pts=\"%2\" %3%4/>")
+        .arg(indent).arg(abs_pts_time).arg(abs_str).arg(rel_str);
+}
 
 /// \brief Returns decrypted version of this packet.
 SpliceInformationTable *SpliceInformationTable::GetDecrypted(
@@ -1086,10 +1334,10 @@ QString SpliceInformationTable::SpliceCommandTypeString(void) const
     };
 }
 
-QString SpliceInformationTable::toString(void) const
+QString SpliceInformationTable::toString(int64_t first, int64_t last) const
 {
     QString str =
-        QString("SpliceInformationTable enc_alg(%1) pts_adj(%2)")
+        QString("SpliceInformationSection enc_alg(%1) pts_adj(%2)")
         .arg(IsEncryptedPacket()?EncryptionAlgorithmString():"None")
         .arg(PTSAdjustment());
     str += IsEncryptedPacket() ? QString(" cw_index(%1)") : QString("");
@@ -1097,13 +1345,131 @@ QString SpliceInformationTable::toString(void) const
         .arg(SpliceCommandLength())
         .arg(SpliceCommandTypeString());
 
-    // TODO the actual meat
+    if (IsEncryptedPacket())
+        return str;
+
+    switch (SpliceCommandType())
+    {
+        case kSCTSpliceSchedule:
+            break;
+        case kSCTSpliceInsert:
+        {
+            str += "\n  " + SpliceInsert().toString(first, last);
+            break;
+        }
+        case kSCTTimeSignal:
+            break;
+    }
 
     return str;
 }
 
-QString SpliceInformationTable::toStringXML(void) const
+QString SpliceInsertView::toString(int64_t first, int64_t last) const
 {
-    // TODO
-    return "<SpliceInformationTable></SpliceInformationTable>";
+    QString str = 
+        QString("eventid(0x%1) cancel(%2) "
+                "out_of_network(%3) program_splice(%4) "
+                "duration(%5) immediate(%6)\n  ")
+        .arg(SpliceEventID(),0,16)
+        .arg(IsSpliceEventCancel()?"yes":"no")
+        .arg(IsOutOfNetwork()?"yes":"no")
+        .arg(IsProgramSplice()?"yes":"no")
+        .arg(IsDuration()?"yes":"no")
+        .arg(IsSpliceImmediate()?"yes":"no");
+
+    if (IsProgramSplice() && !IsSpliceImmediate())
+        str += SpliceTime().toString(first, last);
+
+    str += QString(" unique_program_id(%1)")
+        .arg(UniqueProgramID());
+
+    str += QString(" avail(%1/%2)")
+        .arg(AvailNum()).arg(AvailsExpected());
+
+    return str;
+}
+
+QString SpliceInformationTable::toStringXML(
+    uint indent_level, int64_t first, int64_t last) const
+{
+    QString indent = xml_indent(indent_level);
+
+    QString cap_time = "";
+    if (first >= 0)
+    {
+        cap_time = QString("pts=\"%1\" ").arg(first);
+        if (last >= 0) 
+        {
+            QTime abs = QTime(0,0,0,0).addMSecs((last - first)/90);
+            cap_time += QString("capture_time=\"%1\" ")
+                .arg(abs.toString("hh:mm:ss.zzz"));
+        }
+    }
+
+    QString str = QString(
+        "%1<SpliceInformationSection %2 encryption_algorithm=\"%3\" "
+        "pts_adjustment=\"%4\" code_word_index=\"%5\" command_type=\"%6\">\n")
+        .arg(indent)
+        .arg(cap_time)
+        .arg(EncryptionAlgorithmString())
+        .arg(PTSAdjustment())
+        .arg(CodeWordIndex())
+        .arg(SpliceCommandTypeString());
+
+    if (IsEncryptedPacket())
+        return str + indent + "</SpliceInformationSection>";
+
+    switch (SpliceCommandType())
+    {
+        case kSCTSpliceSchedule:
+            break;
+        case kSCTSpliceInsert:
+        {
+            str += SpliceInsert().toStringXML(indent_level + 1, first, last);
+            str += "\n";
+            break;
+        }
+        case kSCTTimeSignal:
+            break;
+    }
+
+    str += indent + "</SpliceInformationSection>";
+    return str;
+}
+
+QString SpliceInsertView::toStringXML(
+    uint indent_level, int64_t first, int64_t last) const
+{
+    QString indent_0 = xml_indent(indent_level);
+    QString indent_1 = xml_indent(indent_level + 1);
+    QString str = QString(
+        "%1<SpliceInsert eventid=\"0x%2\" cancel=\"%3\"\n")
+        .arg(indent_0)
+        .arg(SpliceEventID(),0,16)
+        .arg(xml_bool_to_string(IsSpliceEventCancel()));
+
+    str += QString(
+        "%1out_of_network=\"%2\" program_splice=\"%3\" duration=\"%4\"\n")
+        .arg(indent_1)
+        .arg(xml_bool_to_string(IsOutOfNetwork()))
+        .arg(xml_bool_to_string(IsProgramSplice()))
+        .arg(xml_bool_to_string(IsDuration()));
+
+    str += QString(
+        "%1immediate=\"%2\" unique_program_id=\"%3\"\n"
+        "%4avail_num=\"%5\" avails_expected=\"%6\">\n")
+        .arg(indent_1)
+        .arg(xml_bool_to_string(IsSpliceImmediate()))
+        .arg(UniqueProgramID())
+        .arg(indent_1)
+        .arg(AvailNum())
+        .arg(AvailsExpected());
+    
+    if (IsProgramSplice() && !IsSpliceImmediate())
+    {
+        str += SpliceTime().toStringXML(indent_level + 1, first, last) + "\n";
+    }
+
+    str += indent_0 + "</SpliceInsert>";
+    return str;
 }

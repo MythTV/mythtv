@@ -1,0 +1,49 @@
+<h3>JW Player&trade; by LongTail Video</h3>
+<a href='http://www.longtailvideo.com/players/'>JW Player&trade;</a>
+is a Flash &amp; HTML5 Video Player for FLV, H.264, MP3 and YouTube Videos.<br>
+<a href='http://www.mythtv.org'>MythTV</a> uses JW Player via MythWeb and
+the mythbackend webserver to allow HTTP Live Streaming playback of
+recordings and videos.<br>
+<br>
+<h3>Installation Process</h3>
+The 'Install JW Player' button will download and install a ZIP archive containing JW Player<br>
+and the JW Player adaptiveProvider.swf plugin to support HTTP Live Streaming playback.<br>
+<!--
+You do not have to install the ZIP file on your MythWeb server, MythWeb will access<br>
+these files via the mythbackend webserver.<br>
+-->
+<br>
+<h3>Licensing</h3>
+The player is licensed under a
+<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons License</a>.<br>
+A JW Player license is required if you are using this product for one of the following reasons:<br>
+<li>You are a business / corporation, etc.</li>
+<li>You are running ads on your site</li>
+<li>You want to remove the JW Watermark in the video player</li>
+<br>
+If you are unsure whether you need to purchase a license, please <a href="http://www.longtailvideo.com/support/contact-us">contact LongTail Video</a>.<br>
+
+<%
+    var content = new Content();
+
+    var hash = content.GetHash("3rdParty", "JW_Player/player.swf");
+
+    if (hash == "")
+    {
+%>
+<h3>JW Player&trade; is <b>not</b> installed.</h3>
+<input type=button value='Install JW Player' onClick='installPackage("jwplayer.zip"); loadContent("/3rdParty/jwplayer.qsp");'><br>
+<%
+    }
+    else
+    {
+%>
+<h3>JW Player&trade; is installed.</h3>
+<input type=button value='Re-Install JW Player' onClick='installPackage("jwplayer.zip"); loadContent("/3rdParty/jwplayer.qsp");'><br>
+<%
+    }
+%>
+
+<!--
+<input type=button value='Test JW Player installation' onClick='alert("Testing JW Player");'><br>
+-->

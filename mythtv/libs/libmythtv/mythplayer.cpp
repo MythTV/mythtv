@@ -6,7 +6,6 @@
 #include <stdint.h>
 #include <cstdio>
 #include <cstdlib>
-#include <cassert>
 #include <cerrno>
 #include <ctime>
 #include <cmath>
@@ -118,11 +117,11 @@ static const int toTrackType(int type)
     return 0;
 }
 
-MythPlayer::MythPlayer(bool muted)
-    : decoder(NULL),                decoder_change_lock(QMutex::Recursive),
+MythPlayer::MythPlayer(PlayerFlags flags)
+    : playerFlags(flags),
+      decoder(NULL),                decoder_change_lock(QMutex::Recursive),
       videoOutput(NULL),            player_ctx(NULL),
       decoderThread(NULL),          playerThread(NULL),
-      no_hardware_decoders(false),
       // Window stuff
       parentWidget(NULL), embedding(false), embedRect(QRect()),
       // State
@@ -135,7 +134,7 @@ MythPlayer::MythPlayer(bool muted)
       m_double_framerate(false),    m_double_process(false),
       m_deint_possible(true),
       livetv(false),
-      watchingrecording(false),     using_null_videoout(false),
+      watchingrecording(false),
       transcoding(false),
       hasFullPositionMap(false),    limitKeyRepeat(false),
       errorMsg(QString::null),      errorType(kError_None),
@@ -167,6 +166,8 @@ MythPlayer::MythPlayer(bool muted)
       ttPageNum(0x888),
       // Support for captions, teletext, etc. decoded by libav
       textDesired(false), enableCaptions(false), disableCaptions(false),
+      enableForcedSubtitles(false), disableForcedSubtitles(false),
+      allowForcedSubtitles(true),
       // CC608/708
       db_prefer708(true), cc608(this), cc708(this),
       // MHEG/MHI Interactive TV visible in OSD
@@ -176,7 +177,7 @@ MythPlayer::MythPlayer(bool muted)
       // OSD stuff
       osd(NULL), reinit_osd(false), osdLock(QMutex::Recursive),
       // Audio
-      audio(this, muted),
+      audio(this, (flags & kAudioMuted)),
       // Picture-in-Picture stuff
       pip_active(false),            pip_visible(true),
       // Filters
@@ -226,6 +227,7 @@ MythPlayer::MythPlayer(bool muted)
     endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
     pip_default_loc    = (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
     tc_wrap[TC_AUDIO]  = gCoreContext->GetNumSetting("AudioSyncOffset", 0);
+    allowForcedSubtitles = gCoreContext->GetNumSetting("AllowForcedSubtitles", 1);
 
     // Get VBI page number
     QString mypage = gCoreContext->GetSetting("VBIpageNr", "888");
@@ -347,9 +349,9 @@ bool MythPlayer::Pause(void)
     PauseBuffer();
     allpaused = decoderPaused && videoPaused && bufferPaused;
     {
-        if (using_null_videoout && decoder)
+        if (FlagIsSet(kVideoIsNull) && decoder)
             decoder->UpdateFramesPlayed();
-        else if (videoOutput && !using_null_videoout)
+        else if (videoOutput && !FlagIsSet(kVideoIsNull))
             framesPlayed = videoOutput->GetFramesPlayed();
     }
     pauseLock.unlock();
@@ -443,72 +445,25 @@ bool MythPlayer::IsPlaying(uint wait_in_msec, bool wait_for) const
 
 bool MythPlayer::InitVideo(void)
 {
-    assert(player_ctx);
     if (!player_ctx)
         return false;
 
     PIPState pipState = player_ctx->GetPIPState();
 
-    if (using_null_videoout && decoder)
+    if (!decoder)
     {
-        MythCodecID codec = decoder->GetVideoCodecID();
-        videoOutput = new VideoOutputNull();
-        if (!videoOutput->Init(video_disp_dim.width(), video_disp_dim.height(),
-                               video_aspect, 0, QRect(), codec))
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to create null video out");
-            SetErrored(QObject::tr("Unable to create null video out"));
-            return false;
-        }
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Cannot create a video renderer without a decoder.");
+        return false;
     }
-    else
-    {
-        QWidget *widget = parentWidget;
 
-        if (!widget)
-        {
-            MythMainWindow *window = GetMythMainWindow();
-
-            widget = window->findChild<QWidget*>("video playback window");
-
-            if (!widget)
-            {
-                LOG(VB_GENERAL, LOG_ERR, "Couldn't find 'tv playback' widget");
-                widget = window->currentWidget();
-            }
-        }
-
-        if (!widget)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Couldn't find 'tv playback' widget. "
-                                     "Current widget doesn't exist. Exiting..");
-            SetErrored(QObject::tr("'tv playback' widget missing."));
-            return false;
-        }
-
-        QRect display_rect;
-        if (pipState == kPIPStandAlone)
-            display_rect = embedRect;
-        else
-            display_rect = QRect(0, 0, widget->width(), widget->height());
-
-        if (decoder)
-        {
-            videoOutput = VideoOutput::Create(
-                decoder->GetCodecDecoderName(),
-                decoder->GetVideoCodecID(),
-                decoder->GetVideoCodecPrivate(),
-                pipState,
-                video_disp_dim, video_aspect,
-                widget->winId(), display_rect, video_frame_rate);
-        }
-
-        if (videoOutput)
-        {
-            videoOutput->SetVideoScalingAllowed(true);
-            CheckExtraAudioDecode();
-        }
-    }
+    videoOutput = VideoOutput::Create(
+                    decoder->GetCodecDecoderName(),
+                    decoder->GetVideoCodecID(),
+                    decoder->GetVideoCodecPrivate(),
+                    pipState, video_disp_dim, video_aspect,
+                    parentWidget, embedRect,
+                    video_frame_rate, (uint)playerFlags);
 
     if (!videoOutput)
     {
@@ -517,6 +472,8 @@ bool MythPlayer::InitVideo(void)
         SetErrored(QObject::tr("Failed to initialize video output"));
         return false;
     }
+
+    CheckExtraAudioDecode();
 
     if (embedding && pipState == kPIPOff)
         videoOutput->EmbedInWidget(embedRect);
@@ -528,7 +485,7 @@ bool MythPlayer::InitVideo(void)
 
 void MythPlayer::CheckExtraAudioDecode(void)
 {
-    if (using_null_videoout)
+    if (FlagIsSet(kVideoIsNull))
         return;
 
     bool force = false;
@@ -545,7 +502,7 @@ void MythPlayer::CheckExtraAudioDecode(void)
 
 void MythPlayer::ReinitOSD(void)
 {
-    if (videoOutput && !using_null_videoout)
+    if (videoOutput && !FlagIsSet(kVideoIsNull))
     {
         osdLock.lock();
         if (!is_current_thread(playerThread))
@@ -614,6 +571,20 @@ void MythPlayer::ReinitVideo(void)
                 "Failed to Reinitialize Video. Exiting..");
             SetErrored(QObject::tr("Failed to reinitialize video output"));
             return;
+        }
+
+        // the display refresh rate may have been changed by VideoOutput
+        if (videosync)
+        {
+            int ri = MythDisplay::GetDisplayInfo(frame_interval).Rate();
+            if (ri != videosync->getRefreshInterval())
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    QString("Refresh rate has changed from %1 to %2")
+                    .arg(videosync->getRefreshInterval())
+                    .arg(ri));
+                videosync->setRefreshInterval(ri);
+             }
         }
 
         if (osd)
@@ -875,8 +846,7 @@ void MythPlayer::OpenDummy(void)
     SetDecoder(dec);
 }
 
-void MythPlayer::CreateDecoder(char *testbuf, int testreadsize,
-                               bool allow_libmpeg2, bool no_accel)
+void MythPlayer::CreateDecoder(char *testbuf, int testreadsize)
 {
     if (NuppelDecoder::CanHandle(testbuf, testreadsize))
         SetDecoder(new NuppelDecoder(this, *player_ctx->playingInfo));
@@ -885,17 +855,21 @@ void MythPlayer::CreateDecoder(char *testbuf, int testreadsize,
                                         testreadsize))
     {
         SetDecoder(new AvFormatDecoder(this, *player_ctx->playingInfo,
-                                       using_null_videoout,
-                                       allow_libmpeg2, no_accel,
-                                       player_ctx->GetSpecialDecode()));
+                                       playerFlags));
     }
 }
 
-int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
+int MythPlayer::OpenFile(uint retries)
 {
+    // Disable hardware acceleration for second PBP
+    if ((player_ctx->IsPBP() && !player_ctx->IsPrimaryPBP()) &&
+        FlagIsSet(kDecodeAllowGPU))
+    {
+        playerFlags = (PlayerFlags)(playerFlags - kDecodeAllowGPU);
+    }
+
     isDummy = false;
 
-    assert(player_ctx);
     if (!player_ctx || !player_ctx->buffer)
         return -1;
 
@@ -939,9 +913,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
         }
 
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-        bool noaccel = no_hardware_decoders ||
-                       (player_ctx->IsPBP() && !player_ctx->IsPrimaryPBP());
-        CreateDecoder(testbuf, testreadsize, allow_libmpeg2, noaccel);
+        CreateDecoder(testbuf, testreadsize);
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         if (decoder || (bigTimer.elapsed() > timeout))
             break;
@@ -1025,7 +997,7 @@ void MythPlayer::SetVideoFilters(const QString &override)
     videoFiltersOverride.detach();
 
     videoFiltersForProgram = player_ctx->GetFilters(
-                             (using_null_videoout) ? "onefield" : "");
+                             (FlagIsSet(kVideoIsNull)) ? "onefield" : "");
 }
 
 void MythPlayer::InitFilters(void)
@@ -1084,6 +1056,16 @@ void MythPlayer::InitFilters(void)
             .arg(filters).arg((uint64_t)videoFilters,0,16));
 }
 
+/** \fn MythPlayer::GetFreeVideoFrames(void)
+ *  \brief Returns the number of frames available for decoding onto.
+ */
+int MythPlayer::GetFreeVideoFrames(void) const
+{
+    if (videoOutput)
+        return videoOutput->FreeVideoFrames();
+    return 0;
+}
+
 /** \fn MythPlayer::GetNextVideoFrame(bool)
  *  \brief Removes a frame from the available queue for decoding onto.
  *
@@ -1119,6 +1101,15 @@ void MythPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
         videoOutput->ReleaseFrame(buffer);
 
     detect_letter_box->Detect(buffer);
+}
+
+/** \fn MythPlayer::ClearDummyVideoFrame(VideoFrame*)
+ *  \brief Instructs VideoOutput to clear the frame to black.
+ */
+void MythPlayer::ClearDummyVideoFrame(VideoFrame *frame)
+{
+    if (videoOutput)
+        videoOutput->ClearDummyFrame(frame);
 }
 
 /** \fn MythPlayer::DiscardVideoFrame(VideoFrame*)
@@ -1447,6 +1438,18 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
     }
 }
 
+bool MythPlayer::GetCaptionsEnabled(void)
+{
+    return (kDisplayNUVTeletextCaptions == textDisplayMode) ||
+           (kDisplayTeletextCaptions    == textDisplayMode) ||
+           (kDisplayAVSubtitle          == textDisplayMode) ||
+           (kDisplayCC608               == textDisplayMode) ||
+           (kDisplayCC708               == textDisplayMode) ||
+           (kDisplayTextSubtitle        == textDisplayMode) ||
+           (kDisplayRawTextSubtitle     == textDisplayMode) ||
+           (kDisplayTeletextMenu        == textDisplayMode);
+}
+
 QStringList MythPlayer::GetTracks(uint type)
 {
     if (decoder)
@@ -1515,6 +1518,50 @@ void MythPlayer::EnableSubtitles(bool enable)
         enableCaptions = true;
     else
         disableCaptions = true;
+}
+
+void MythPlayer::EnableForcedSubtitles(bool enable)
+{
+    if (enable)
+        enableForcedSubtitles = true;
+    else
+        disableForcedSubtitles = true;
+}
+
+void MythPlayer::SetAllowForcedSubtitles(bool allow)
+{
+    bool old = allowForcedSubtitles;
+    allowForcedSubtitles = allow;
+    SetOSDMessage(allowForcedSubtitles ?
+                      QObject::tr("Forced Subtitles On") :
+                      QObject::tr("Forced Subtitles Off"),
+                  kOSDTimeout_Med);
+    if (old != allowForcedSubtitles)
+    {
+        gCoreContext->SaveSetting("AllowForcedSubtitles",
+                                  allowForcedSubtitles);
+    }
+}
+
+void MythPlayer::DoDisableForcedSubtitles(void)
+{
+    disableForcedSubtitles = false;
+    osdLock.lock();
+    if (osd)
+        osd->DisableForcedSubtitles();
+    osdLock.unlock();
+}
+
+void MythPlayer::DoEnableForcedSubtitles(void)
+{
+    enableForcedSubtitles = false;
+    if (!allowForcedSubtitles)
+        return;
+
+    osdLock.lock();
+    if (osd)
+        osd->EnableSubtitles(kDisplayAVSubtitle, true /*forced only*/);
+    osdLock.unlock();
 }
 
 int MythPlayer::GetTrack(uint type)
@@ -1649,7 +1696,7 @@ void MythPlayer::InitAVSync(void)
 
     refreshrate = MythDisplay::GetDisplayInfo(frame_interval).Rate();
 
-    if (!using_null_videoout)
+    if (!FlagIsSet(kVideoIsNull))
     {
         QString timing_type = videosync->getName();
 
@@ -1760,7 +1807,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
             avsync_audiopaused = true;
         }
     }
-    else if (!using_null_videoout)
+    else if (!FlagIsSet(kVideoIsNull))
     {
         // if we get here, we're actually going to do video output
         osdLock.lock();
@@ -1926,7 +1973,7 @@ void MythPlayer::RefreshPauseFrame(void)
     {
         if (videoOutput->ValidVideoFrames())
         {
-            videoOutput->UpdatePauseFrame();
+            videoOutput->UpdatePauseFrame(disp_timecode);
             needNewPauseFrame = false;
         }
         else
@@ -2031,6 +2078,25 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     return true;
 }
 
+void MythPlayer::CheckAspectRatio(VideoFrame* frame)
+{
+    if (!frame)
+        return;
+
+    if (!qFuzzyCompare(frame->aspect, video_aspect) && frame->aspect > 0.0f)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Video Aspect ratio changed from %1 to %2")
+            .arg(video_aspect).arg(frame->aspect));
+        video_aspect = frame->aspect;
+        if (videoOutput)
+        {
+            videoOutput->VideoAspectRatioChanged(video_aspect);
+            ReinitOSD();
+        }
+    }
+}
+
 void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 {
     if (allpaused || (check_prebuffer && !PrebufferEnoughFrames()))
@@ -2044,21 +2110,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     VideoFrame *frame = videoOutput->GetLastShownFrame();
 
     // Check aspect ratio
-    if (frame)
-    {
-        if (!qFuzzyCompare(frame->aspect, video_aspect) && frame->aspect > 0.0f)
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Video Aspect ratio changed from %1 to %2")
-                    .arg(video_aspect).arg(frame->aspect));
-            video_aspect = frame->aspect;
-            if (videoOutput)
-            {
-                videoOutput->VideoAspectRatioChanged(video_aspect);
-                ReinitOSD();
-            }
-        }
-    }
+    CheckAspectRatio(frame);
 
     // Player specific processing (dvd, bd, mheg etc)
     PreProcessNormalFrame();
@@ -2122,9 +2174,28 @@ void MythPlayer::EnableFrameRateMonitor(bool enable)
     output_jmeter->SetNumCycles(rate);
 }
 
+void MythPlayer::ForceDeinterlacer(const QString &override)
+{
+    if (!videoOutput)
+        return;
+
+    bool normal = play_speed > 0.99f && play_speed < 1.01f && normal_speed;
+    videofiltersLock.lock();
+
+    m_double_framerate =
+         videoOutput->SetupDeinterlace(true, override) &&
+         videoOutput->NeedsDoubleFramerate();
+    m_double_process = videoOutput->IsExtraProcessingRequired();
+
+    if ((m_double_framerate && !CanSupportDoubleRate()) || !normal)
+        FallbackDeint();
+
+    videofiltersLock.unlock();
+}
+
 void MythPlayer::VideoStart(void)
 {
-    if (!using_null_videoout && !player_ctx->IsPIP())
+    if (!FlagIsSet(kVideoIsNull) && !player_ctx->IsPIP())
     {
         QRect visible, total;
         float aspect, scaling;
@@ -2174,11 +2245,11 @@ void MythPlayer::VideoStart(void)
     m_double_framerate = false;
     m_scan_tracker     = 2;
 
-    if (player_ctx->IsPIP() && using_null_videoout)
+    if (player_ctx->IsPIP() && FlagIsSet(kVideoIsNull))
     {
         videosync = new DummyVideoSync(videoOutput, fr_int, 0, false);
     }
-    else if (using_null_videoout)
+    else if (FlagIsSet(kVideoIsNull))
     {
         videosync = new USleepVideoSync(videoOutput, fr_int, 0, false);
     }
@@ -2229,7 +2300,7 @@ bool MythPlayer::VideoLoop(void)
     else
         DisplayNormalFrame();
 
-    if (using_null_videoout && decoder)
+    if (FlagIsSet(kVideoIsNull) && decoder)
         decoder->UpdateFramesPlayed();
     else
         framesPlayed = videoOutput->GetFramesPlayed();
@@ -2584,6 +2655,12 @@ void MythPlayer::EventLoop(void)
     if (disableCaptions)
         SetCaptionsEnabled(false, false);
 
+    // enable/disable forced subtitles if signalled by the decoder
+    if (enableForcedSubtitles)
+        DoEnableForcedSubtitles();
+    if (disableForcedSubtitles)
+        DoDisableForcedSubtitles();
+
     // reset the scan (and hence deinterlacers) if triggered by the decoder
     if (resetScan != kScan_Ignore)
         SetScanType(resetScan);
@@ -2726,7 +2803,7 @@ void MythPlayer::EventLoop(void)
             message += player_ctx->playingInfo->GetChanID() + " " +
                    player_ctx->playingInfo->MakeUniqueKey();
             player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-            RemoteSendMessage(message);
+            gCoreContext->SendMessage(message);
         }
         else
         {
@@ -2848,6 +2925,7 @@ void MythPlayer::DecoderStart(bool start_paused)
 
 void MythPlayer::DecoderEnd(void)
 {
+    PauseDecoder();
     SetPlaying(false);
     killdecoder = true;
     int tries = 0;
@@ -2965,8 +3043,7 @@ void MythPlayer::DecoderLoop(bool pause)
     }
 
     // Clear any wait conditions
-    PauseDecoder();
-    UnpauseDecoder();
+    DecoderPauseCheck();
     decoderSeek = -1;
 }
 
@@ -3115,9 +3192,12 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
     return kPIP_END;
 }
 
-int64_t MythPlayer::AdjustAudioTimecodeOffset(int64_t v)
+int64_t MythPlayer::AdjustAudioTimecodeOffset(int64_t v, int newsync)
 {
-    tc_wrap[TC_AUDIO] += v;
+    if ((newsync >= -1000) && (newsync <= 1000))
+        tc_wrap[TC_AUDIO] = newsync;
+    else
+        tc_wrap[TC_AUDIO] += v;
     gCoreContext->SaveSetting("AudioSyncOffset", tc_wrap[TC_AUDIO]);
     return tc_wrap[TC_AUDIO];
 }
@@ -3990,9 +4070,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
     memset(&orig,   0, sizeof(AVPicture));
     memset(&retbuf, 0, sizeof(AVPicture));
 
-    using_null_videoout = true;
-
-    if (OpenFile(0, false) < 0)
+    if (OpenFile(0) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not open file for preview.");
         return NULL;
@@ -4323,7 +4401,19 @@ bool MythPlayer::TranscodeGetNextFrame(
     }
     if (GetEof())
       return false;
-    is_key = decoder->isLastFrameKey();
+    is_key = decoder->IsLastFrameKey();
+
+    videofiltersLock.lock();
+    if (videoFilters)
+    {
+        FrameScanType ps = m_scan;
+        if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
+            ps = kScan_Progressive;
+
+        videoFilters->ProcessFrame(videoOutput->GetLastDecodedFrame(), ps);
+    }
+    videofiltersLock.unlock();
+
     return true;
 }
 
@@ -4422,21 +4512,36 @@ int MythPlayer::GetSecondsBehind(void) const
     return (int)((float)(written - played) / video_frame_rate);
 }
 
+int64_t MythPlayer::GetSecondsPlayed(void)
+{
+    return decoder->IsCodecMPEG() ?
+                (disp_timecode / 1000.f) :
+                (framesPlayed / video_frame_rate);
+}
+
+int64_t MythPlayer::GetTotalSeconds(void) const
+{
+    return totalDuration;
+}
+
 void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
 {
     if (!decoder)
         return;
 
     bool islive = false;
-    int chapter = GetCurrentChapter() + 1;
-    int title = GetCurrentTitle() + 1;
-    info.text.insert("chapteridx", chapter ? QString().number(chapter) : QString());
-    info.text.insert("titleidx", title ? QString().number(title) : QString());
+    info.text.insert("chapteridx",    QString());
+    info.text.insert("totalchapters", QString());
+    info.text.insert("titleidx",      QString());
+    info.text.insert("totaltitles",   QString());
+    info.text.insert("angleidx",      QString());
+    info.text.insert("totalangles",   QString());
     info.values.insert("position",   0);
     info.values.insert("progbefore", 0);
     info.values.insert("progafter",  0);
 
-    int playbackLen = totalDuration;
+    int playbackLen = GetTotalSeconds();
+    float secsplayed = (float)GetSecondsPlayed();
 
     if (totalDuration == 0 || decoder->GetCodecDecoderName() == "nuppel")
         playbackLen = totalLength;
@@ -4456,21 +4561,38 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
                    video_frame_rate));
         islive = true;
     }
+    else
+    {
+        int chapter  = GetCurrentChapter();
+        int chapters = GetNumChapters();
+        if (chapter && chapters > 1)
+        {
+            info.text["chapteridx"] = QString::number(chapter + 1);
+            info.text["totalchapters"] =  QString::number(chapters);
+        }
 
-    float secsplayed = decoder->isCodecMPEG() ?
-        (float)(disp_timecode / 1000.f) :
-        (float)(framesPlayed / video_frame_rate);
+        int title  = GetCurrentTitle();
+        int titles = GetNumTitles();
+        if (title && titles > 1)
+        {
+            info.text["titleidx"] = QString::number(title + 1);
+            info.text["totaltitles"] = QString::number(titles);
+        }
 
-    calcSliderPosPriv(info, paddedFields, playbackLen, secsplayed, islive);
-}
+        int angle  = GetCurrentAngle();
+        int angles = GetNumAngles();
+        if (angle && angles > 1)
+        {
+            info.text["angleidx"] = QString::number(angle + 1);
+            info.text["totalangles"] = QString::number(angles);
+        }
+    }
 
-void MythPlayer::calcSliderPosPriv(osdInfo &info, bool paddedFields,
-                                   int playbackLen, float secsplayed,
-                                   bool islive)
-{
     playbackLen = max(playbackLen, 1);
     secsplayed  = min((float)playbackLen, max(secsplayed, 0.0f));
 
+    info.values.insert("secondsplayed", (int)secsplayed);
+    info.values.insert("totalseconds", playbackLen);
     info.values["position"] = (int)(1000.0f * (secsplayed / (float)playbackLen));
 
     int phours = (int)secsplayed / 3600;
@@ -4766,10 +4888,31 @@ bool MythPlayer::CanVisualise(void)
     return false;
 }
 
-bool MythPlayer::ToggleVisualisation(void)
+bool MythPlayer::IsVisualising(void)
 {
     if (videoOutput)
-        return videoOutput->ToggleVisualisation(&audio);
+        return videoOutput->GetVisualisation();
+    return false;
+}
+
+QString MythPlayer::GetVisualiserName(void)
+{
+    if (videoOutput)
+        return videoOutput->GetVisualiserName();
+    return QString("");
+}
+
+QStringList MythPlayer::GetVisualiserList(void)
+{
+    if (videoOutput)
+        return videoOutput->GetVisualiserList();
+    return QStringList();
+}
+
+bool MythPlayer::EnableVisualisation(bool enable, const QString &name)
+{
+    if (videoOutput)
+        return videoOutput->EnableVisualisation(&audio, enable, name);
     return false;
 }
 

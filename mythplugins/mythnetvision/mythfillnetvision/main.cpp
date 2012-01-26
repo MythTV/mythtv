@@ -16,6 +16,7 @@ using namespace std;
 #include <mythversion.h>
 #include <remoteutil.h>
 #include <util.h>
+#include <netutils.h>
 #include <mythtranslation.h>
 #include <mythconfig.h>
 #include <netgrabbermanager.h>
@@ -135,7 +136,7 @@ int main(int argc, char *argv[])
         treeloop.exec();
     }
 
-    if (refreshall || refreshrss)
+    if ((refreshall || refreshrss) && findAllDBRSS().count())
     {
         QEventLoop rssloop;
 

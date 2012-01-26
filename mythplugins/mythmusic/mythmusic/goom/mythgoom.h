@@ -6,13 +6,10 @@
 
 using namespace std;
 
-#ifdef SDL_SUPPORT
-#include <SDL.h>
-
 class Goom : public VisualBase
 {
 public:
-    Goom(long int winid);
+    Goom(void);
     virtual ~Goom();
 
     void resize(const QSize &size);
@@ -21,14 +18,10 @@ public:
     void handleKeyPress(const QString &action) {(void) action;}
 
 private:
-    QSize size;
+    QSize m_size;
 
-    SDL_Surface *surface;
-
-    unsigned int *buffer;
-    int scalew, scaleh;
+    unsigned int *m_buffer;
+    int m_scalew, m_scaleh;
 };
-
-#endif //SDL_SUPPORT
 
 #endif //MYTHGOOM

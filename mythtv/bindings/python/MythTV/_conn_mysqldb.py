@@ -14,7 +14,7 @@ if (MySQLdb.version_info < (1,2,3)) and (sys.version_info >= (2,7)):
 __version__ = tuple(['MySQLdb']+list(MySQLdb.version_info))
 
 def dbconnect(dbconn, log):
-    log(MythLog.DATABASE|MythLog.EXTRA,
+    log(MythLog.DATABASE, MythLog.INFO,
                     'Spawning new database connection')
     db = MySQLdb.connect(  user=   dbconn['DBUserName'],
                            host=   dbconn['DBHostName'],
@@ -44,7 +44,8 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
     def _sanitize(self, query): return query.replace('?', '%s')
 
     def log_query(self, query, args):
-        self.log(self.log.DATABASE, ' '.join(query.split()), str(args))
+        self.log(self.log.DATABASE, MythLog.DEBUG, 
+                 ' '.join(query.split()), str(args))
 
     def execute(self, query, args=None):
         """

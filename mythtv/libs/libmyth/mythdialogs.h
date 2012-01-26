@@ -11,35 +11,21 @@
 #include <QList>
 
 #include "mythexp.h"
-
+#include "mythmainwindow.h"
 #include <vector>
 using namespace std;
 
-class XMLParse;
-class UIType;
-class UIManagedTreeListType;
-class UITextType;
-class UIPushButtonType;
-class UITextButtonType;
-class UIRepeatedImageType;
-class UIBlackHoleType;
-class UIImageType;
-class UIStatusBarType;
-class UIListBtnType;
-class UIListTreeType;
-class UIKeyboardType;
-class LayerSet;
-class GenericTree;
 class MythMediaDevice;
 class MythLineEdit;
 class MythRemoteLineEdit;
 class MythListBox;
 struct fontProp;
-class MythMainWindow;
 class QVBoxLayout;
 class QProgressBar;
-
-#include "mythmainwindow.h"
+class UIType;
+class UIKeyboardType;
+class LayerSet;
+class XMLParse;
 
 typedef enum DialogCode
 {
@@ -213,9 +199,6 @@ class MPUBLIC MythPopupBox : public MythDialog
  *  perform and the possibility of calling the \p setProgress call at
  *  the end of each step.
  *
- *  If you do not know the number of steps, use \p MythBusyDialog
- *  instead.
- *
  *  The dialog widget also updates the LCD display if present.
  *
  * \deprecated Due for removal, use libmythui's MythUIProgressDialog instead
@@ -274,69 +257,11 @@ class MPUBLIC MythProgressDialog: public MythDialog
     int m_totalSteps;
 };
 
-/** MythDialog box that displays a busy spinner-style dialog box to
-    indicate the program is busy, but that the number of steps needed
-    is unknown.
-
-    Ie. used by MythMusic when scanning the filesystem for musicfiles.
-
- \deprecated Due for removal, use libmythui's MythUIBusyDialog instead
- */
-class MPUBLIC MythBusyDialog : public MythProgressDialog
-{
-    Q_OBJECT
-
-  public:
-    /** \brief Create the busy indicator.
-
-        Creates the dialog widget and sets up the timer that causes
-        the widget to indicate progress every 100msec;
-
-        \param title the title to appear in the progress bar dialog
-        \param cancelButton display cancel button
-        \param target target for cancel signal
-        \param slot slot for cancel signal
-        \deprecated Due for removal, use libmythui's MythUIBusyDialog instead
-     */
-    MythBusyDialog(const QString &title,
-                   bool cancelButton = false,
-                   const QObject * target = NULL,
-                   const char * slot = NULL);
-
-    /** \brief Setup a timer to 'move' the spinner
-
-        This will create a \p QTimer object that will update the
-        spinner ever \p interval msecs.
-
-        \param interval msecs between movement, default is 100
-    */
-    void start(int interval = 100);
-
-    /** \brief Close the dialog.
-
-        This will close the dialog and stop the timer.
-    */
-    void Close();
-
-  public slots:
-    virtual void deleteLater(void);
-
-  protected slots:
-    void setProgress();
-    void timeout();
-
-  protected:
-    void Teardown(void);
-    ~MythBusyDialog();
-
-  private:
-    QTimer *timer;
-};
 
 /*!
  * \deprecated Due for removal, use libmythui's MythScreenType instead
  */
-class MPUBLIC MythThemedDialog : public MythDialog
+class MythThemedDialog : public MythDialog
 {
     Q_OBJECT
 
@@ -354,7 +279,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     virtual void loadWindow(QDomElement &);
     virtual void parseContainer(QDomElement &);
     virtual void parseFont(QDomElement &);
-    virtual void parsePopup(QDomElement &);
     bool buildFocusList();
 
     UIType *getUIObject(const QString &name);
@@ -362,16 +286,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     UIType *getCurrentFocusWidget();
     void setCurrentFocusWidget(UIType *widget);
 
-    UIManagedTreeListType *getUIManagedTreeListType(const QString &name);
-    UITextType *getUITextType(const QString &name);
-    UIPushButtonType *getUIPushButtonType(const QString &name);
-    UITextButtonType *getUITextButtonType(const QString &name);
-    UIRepeatedImageType *getUIRepeatedImageType(const QString &name);
-    UIBlackHoleType *getUIBlackHoleType(const QString &name);
-    UIImageType *getUIImageType(const QString &name);
-    UIStatusBarType *getUIStatusBarType(const QString &name);
-    UIListBtnType *getUIListBtnType(const QString &name);
-    UIListTreeType *getUIListTreeType(const QString &name);
     UIKeyboardType *getUIKeyboardType(const QString &name);
 
     LayerSet* getContainer(const QString &name);
@@ -420,44 +334,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     vector<UIType*>   focus_taking_widgets;
 
     QRect redrawRect;
-};
-
-/*!
- * \deprecated Due for removal, use libmythui's MythUISearchDialog instead
- */
-class MPUBLIC MythSearchDialog: public MythPopupBox
-{
-    Q_OBJECT
-
-  public:
-
-    MythSearchDialog(MythMainWindow *parent,
-                     const char     *name = "MythSearchDialog");
-
-  public:
-    void setCaption(QString text);
-    void setSearchText(QString text);
-    void setItems(QStringList items);
-    QString getResult(void);
-
-  public slots:
-    virtual void deleteLater(void);
-
-  protected slots:
-    void searchTextChanged(void);
-
-  protected:
-    void Teardown(void);
-    ~MythSearchDialog(); // use deleteLater() instead for thread safety
-    void keyPressEvent(QKeyEvent *e);
-
-  private:
-
-    QLabel              *caption;
-    MythRemoteLineEdit  *editor;
-    MythListBox         *listbox;
-    QAbstractButton     *ok_button;
-    QAbstractButton     *cancel_button;
 };
 
 #endif

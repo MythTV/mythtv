@@ -41,9 +41,11 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
 
         QString             m_sAbsoluteSharePath;
         ServerSideScripting m_Scripting;
+        QString             m_IndexFilename;
 
     public:
-                 HtmlServerExtension( const QString sSharePath);
+                 HtmlServerExtension( const QString sSharePath,
+                                      const QString sApplicationPrefix);
         virtual ~HtmlServerExtension( );
 
         // Special case, this extension is called if no other extension

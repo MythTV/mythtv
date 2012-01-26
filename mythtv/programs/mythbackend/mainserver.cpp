@@ -1365,8 +1365,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         sockListLock.unlock();
 
         if (eventsMode != kPBSEvents_None && commands[2] != "tzcheck")
-            SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
-                                        .arg(commands[2]));
+            gCoreContext->SendSystemEvent(
+                QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
     if (commands[1] == "MediaServer")
     {
@@ -1386,8 +1386,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         playbackList.push_back(pbs);
         sockListLock.unlock();
 
-        SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
-                                .arg(commands[2]));
+        gCoreContext->SendSystemEvent(
+            QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
     else if (commands[1] == "SlaveBackend")
     {
@@ -1454,8 +1454,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         autoexpireUpdateTimer->start(1000);
 
-        SendMythSystemEvent(QString("SLAVE_CONNECTED HOSTNAME %1")
-                                    .arg(commands[2]));
+        gCoreContext->SendSystemEvent(
+            QString("SLAVE_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
     else if (commands[1] == "FileTransfer")
     {
@@ -2107,7 +2107,7 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     // Notify the frontend so it can requery for Free Space
     QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
         .arg(ds->m_chanid).arg(ds->m_recstartts.toString(Qt::ISODate));
-    RemoteSendEvent(MythEvent(msg));
+    gCoreContext->SendEvent(MythEvent(msg));
 
     // sleep a little to let frontends reload the recordings list
     sleep(3);
@@ -2621,9 +2621,10 @@ void MainServer::DoHandleDeleteRecording(
     // Tell MythTV frontends that the recording list needs to be updated.
     if (fileExists || !recinfo.GetFilesize() || forceMetadataDelete)
     {
-        SendMythSystemEvent(QString("REC_DELETED CHANID %1 STARTTIME %2")
-                            .arg(recinfo.GetChanID())
-                            .arg(recinfo.GetRecordingStartTime(ISODate)));
+        gCoreContext->SendSystemEvent(
+            QString("REC_DELETED CHANID %1 STARTTIME %2")
+                    .arg(recinfo.GetChanID())
+                    .arg(recinfo.GetRecordingStartTime(ISODate)));
 
         recinfo.SendDeletedEvent();
     }
@@ -3493,47 +3494,40 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 
     EncoderLink *encoder = NULL;
     QString enchost;
-
-    bool lastcard = false;
-
-    if (gCoreContext->GetSetting("LastFreeCard", "0") == "1")
-        lastcard = true;
+    uint bestorder = 0;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
 
-        if (!lastcard)
-        {
-            if (elink->IsLocal())
-                enchost = gCoreContext->GetHostName();
-            else
-                enchost = elink->GetHostName();
+        if (elink->IsLocal())
+            enchost = gCoreContext->GetHostName();
+        else
+            enchost = elink->GetHostName();
 
-            if (enchost == pbshost && elink->IsConnected() &&
-                !elink->IsTunerLocked() &&
-                !elink->GetFreeInputs(excluded_cardids).empty())
-            {
-                encoder = elink;
-                retval = iter.key();
-                LOG(VB_RECORD, LOG_INFO, QString("Card %1 is local.")
-                        .arg(iter.key()));
-                break;
-            }
-        }
-
-        if ((retval == -1 || lastcard) && elink->IsConnected() &&
-            !elink->IsTunerLocked() &&
-            !elink->GetFreeInputs(excluded_cardids).empty())
-        {
-            encoder = elink;
-            retval = iter.key();
-        }
         LOG(VB_RECORD, LOG_INFO, 
             QString("Checking card %1. Best card so far %2")
-                .arg(iter.key()).arg(retval));
+            .arg(iter.key()).arg(retval));
+
+        if (!elink->IsConnected() || elink->IsTunerLocked())
+            continue;
+
+        vector<InputInfo> inputs = elink->GetFreeInputs(excluded_cardids);
+
+        for (uint i = 0; i < inputs.size(); ++i)
+        {
+            if (!encoder || inputs[i].livetvorder < bestorder)
+            {
+                retval = iter.key();
+                encoder = elink;
+                bestorder = inputs[i].livetvorder;
+            }
+        }
     }
+
+    LOG(VB_RECORD, LOG_INFO, 
+        QString("Best card is %1").arg(retval));
 
     strlist << QString::number(retval);
 
@@ -4315,7 +4309,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                        bool allHosts)
 {
     QString allHostList = gCoreContext->GetHostName();
-    long long totalKB = -1, usedKB = -1;
+    int64_t totalKB = -1, usedKB = -1;
     QMap <QString, bool>foundDirs;
     QString driveKey;
     QString localStr = "1";
@@ -4466,8 +4460,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     strlist.clear();
 
     // Consolidate hosts sharing storage
-    size_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
-    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
+    int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
+    maxWriteFiveSec = max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     QList<FileSystemInfo>::iterator it1, it2;
     int bSize = 32;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
@@ -4484,15 +4478,15 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
             bSize = max(32, max(it1->getBlockSize(), it2->getBlockSize()) / 1024);
-            long long diffSize = it1->getTotalSpace() - it2->getTotalSpace();
-            long long diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
+            int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
+            int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
             if (diffSize < 0)
                 diffSize = 0 - diffSize;
             if (diffUsed < 0)
                 diffUsed = 0 - diffUsed;
 
             if (it2->getFSysID() == -1 && (diffSize <= bSize) && 
-                ((size_t)diffUsed <= maxWriteFiveSec))
+                (diffUsed <= maxWriteFiveSec))
             {
                 if (!it1->getHostname().contains(it2->getHostname()))
                     it1->setHostname(it1->getHostname() + "," + it2->getHostname());
@@ -5020,6 +5014,10 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         bool isopen = ft->isOpen();
 
         retlist << QString::number(isopen);
+    }
+    else if (command == "REOPEN")
+    {
+        retlist << QString::number(ft->ReOpen(slist[2]));
     }
     else if (command == "DONE")
     {
@@ -5702,13 +5700,15 @@ void MainServer::connectionClosed(MythSocket *socket)
                 MythEvent me2("RECORDING_LIST_CHANGE");
                 gCoreContext->dispatch(me2);
 
-                SendMythSystemEvent(QString("SLAVE_DISCONNECTED HOSTNAME %1")
-                                    .arg(pbs->getHostname()));
+                gCoreContext->SendSystemEvent(
+                    QString("SLAVE_DISCONNECTED HOSTNAME %1")
+                            .arg(pbs->getHostname()));
             }
             else if (ismaster && pbs->getHostname() != "tzcheck")
             {
-                SendMythSystemEvent(QString("CLIENT_DISCONNECTED HOSTNAME %1")
-                                    .arg(pbs->getHostname()));
+                gCoreContext->SendSystemEvent(
+                    QString("CLIENT_DISCONNECTED HOSTNAME %1")
+                            .arg(pbs->getHostname()));
             }
 
             LiveTVChain *chain;
@@ -6089,8 +6089,8 @@ void MainServer::reconnectTimeout(void)
         !masterServerSock->readStringList(strlist) ||
         strlist.empty() || strlist[0] == "ERROR")
     {
+        masterServerSock->Unlock(); // DownRef will delete socket...
         masterServerSock->DownRef();
-        masterServerSock->Unlock();
         masterServerSock = NULL;
         if (strlist.empty())
         {

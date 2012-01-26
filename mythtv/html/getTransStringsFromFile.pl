@@ -42,6 +42,6 @@ foreach my $line ( @lines ) {
 if (scalar(keys %strings)) {
     print "    /* $baseFile */\n";
     foreach my $string ( sort keys %strings ) {
-        print "    QObject::tr(\"" . $string . "\"),\n";
+        print "    HtmlUI::tr(\"" . $string . "\"),\n";
     }
 }

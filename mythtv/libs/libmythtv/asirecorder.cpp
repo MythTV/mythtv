@@ -79,8 +79,6 @@ void ASIRecorder::run(void)
         return;        
     }
 
-    _continuity_error_count = 0;
-
     {
         QMutexLocker locker(&pauseLock);
         request_recording = true;
@@ -163,10 +161,7 @@ bool ASIRecorder::Open(void)
         return true;
     }
 
-    memset(_stream_id,  0, sizeof(_stream_id));
-    memset(_pid_status, 0, sizeof(_pid_status));
-    memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
-    _continuity_error_count = 0;
+    ResetForNewFile();
 
     m_stream_handler = ASIStreamHandler::Get(m_channel->GetDevice());
 

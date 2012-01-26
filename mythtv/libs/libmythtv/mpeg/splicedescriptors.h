@@ -48,8 +48,6 @@ class SpliceDescriptor
     {
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
             _data = NULL;
-        else if (!Parse())
-            _data = NULL;
     }
     SpliceDescriptor(const unsigned char *data,
                      int len, uint tag) : _data(data)
@@ -57,8 +55,6 @@ class SpliceDescriptor
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
             _data = NULL;
         else if (DescriptorTag() != tag)
-            _data = NULL;
-        else if (!Parse())
             _data = NULL;
     }
     virtual ~SpliceDescriptor(void) {}
@@ -163,7 +159,12 @@ class SegmentationDescriptor : SpliceDescriptor
 {
   public:
     SegmentationDescriptor(const unsigned char *data, int len = 300) :
-        SpliceDescriptor(data, len, SpliceDescriptorID::segmentation) { }
+        SpliceDescriptor(data, len, SpliceDescriptorID::segmentation)
+    {
+        _ptrs[2] = _ptrs[1] = _ptrs[0] = NULL;
+        if (_data && !Parse())
+            _data = NULL;
+    }
 
     //       Name             bits  loc  expected value
     // splice_descriptor_tag    8   0.0  0x01

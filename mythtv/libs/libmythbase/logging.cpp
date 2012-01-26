@@ -81,7 +81,7 @@ LogPropagateOpts        logPropagateOpts;
 QString                 logPropagateArgs;
 
 #define TIMESTAMP_MAX 30
-#define MAX_STRING_LENGTH 2048
+#define MAX_STRING_LENGTH (LOGLINE_MAX+120)
 
 LogLevel_t logLevel = (LogLevel_t)LOG_INFO;
 
@@ -376,8 +376,10 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
 {
     m_query = QString(
         "INSERT INTO %1 "
-        "    (host, application, pid, thread, msgtime, level, message) "
-        "VALUES (:HOST, :APP, :PID, :THREAD, :MSGTIME, :LEVEL, :MESSAGE)")
+        "    (host, application, pid, tid, thread, filename, "
+        "     line, function, msgtime, level, message) "
+        "VALUES (:HOST, :APP, :PID, :TID, :THREAD, :FILENAME, "
+        "        :LINE, :FUNCTION, :MSGTIME, :LEVEL, :MESSAGE)")
         .arg(m_handle.string);
 
     LOG(VB_GENERAL, LOG_INFO, 
@@ -450,11 +452,16 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
 {
     char        timestamp[TIMESTAMP_MAX];
     char       *threadName = getThreadName(item);
+    pid_t       tid        = getThreadTid(item);
 
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
               (const struct tm *)&item->tm );
 
+    query.bindValue(":TID",         tid);
     query.bindValue(":THREAD",      threadName);
+    query.bindValue(":FILENAME",    item->file);
+    query.bindValue(":LINE",        item->line);
+    query.bindValue(":FUNCTION",    item->function);
     query.bindValue(":MSGTIME",     timestamp);
     query.bindValue(":LEVEL",       item->level);
     query.bindValue(":MESSAGE",     item->message);
@@ -517,64 +524,63 @@ void DBLoggerThread::run(void)
     // Wait a bit before we start logging to the DB..  If we wait too long,
     // then short-running tasks (like mythpreviewgen) will not log to the db
     // at all, and that's undesirable.
-    bool ready = false;
-    while (!gCoreContext && !aborted && !ready)
+    while (true)
     {
-        ready = m_logger->isDatabaseReady();
+        if ((aborted || (gCoreContext && m_logger->isDatabaseReady())))
+            break;
 
-        // Don't delay if aborted was set while we were checking database ready
-        if (!ready && !aborted && !gCoreContext)
-        {
-            QMutexLocker qLock(&m_queueMutex);
-            m_wait->wait(qLock.mutex(), 100);
-        }
+        QMutexLocker locker(&m_queueMutex);
+        m_wait->wait(locker.mutex(), 100);
     }
 
-    // We want the query to be out of scope before the RunEpilog() so shutdown
-    // occurs correctly as otherwise the connection appears still in use, and
-    // we get a qWarning on shutdown.
-    MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
-    m_logger->prepare(*query);
-
-    QMutexLocker qLock(&m_queueMutex);
-    while (!aborted || !m_queue->isEmpty())
+    if (!aborted)
     {
-        if (m_queue->isEmpty())
+        // We want the query to be out of scope before the RunEpilog() so
+        // shutdown occurs correctly as otherwise the connection appears still
+        // in use, and we get a qWarning on shutdown.
+        MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
+        m_logger->prepare(*query);
+
+        QMutexLocker qLock(&m_queueMutex);
+        while (!aborted || !m_queue->isEmpty())
         {
-            m_wait->wait(qLock.mutex(), 100);
-            continue;
-        }
-
-        LoggingItem *item = m_queue->dequeue();
-        if (!item)
-            continue;
-
-        qLock.unlock();
-
-        if (item->message[0] != '\0')
-        {
-            if (!m_logger->logqmsg(*query, item))
+            if (m_queue->isEmpty())
             {
-                qLock.relock();
-                m_queue->prepend(item);
                 m_wait->wait(qLock.mutex(), 100);
-                delete query;
-                query = new MSqlQuery(MSqlQuery::InitCon());
-                m_logger->prepare(*query);
                 continue;
             }
-        }
-        else
-        {
-            deleteItem(item);
+
+            LoggingItem *item = m_queue->dequeue();
+            if (!item)
+                continue;
+
+            qLock.unlock();
+
+            if (item->message[0] != '\0')
+            {
+                if (!m_logger->logqmsg(*query, item))
+                {
+                    qLock.relock();
+                    m_queue->prepend(item);
+                    m_wait->wait(qLock.mutex(), 100);
+                    delete query;
+                    query = new MSqlQuery(MSqlQuery::InitCon());
+                    m_logger->prepare(*query);
+                    continue;
+                }
+            }
+            else
+            {
+                deleteItem(item);
+            }
+
+            qLock.relock();
         }
 
-        qLock.relock();
+        delete query;
+
+        qLock.unlock();
     }
-
-    delete query;
-
-    qLock.unlock();
 
     RunEpilog();
 }
@@ -604,7 +610,7 @@ bool DatabaseLogger::isDatabaseReady()
 }
 
 /**
- *  \brief Checks whether table exists
+ *  \brief Checks whether table exists and is ready for writing
  *
  *  \param  table  The name of the table to check (without schema name)
  *  \return true if table exists in schema or false if not
@@ -615,15 +621,18 @@ bool DatabaseLogger::tableExists(const QString &table)
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
-        QString sql = "SELECT INFORMATION_SCHEMA.TABLES.TABLE_NAME "
-                      "  FROM INFORMATION_SCHEMA.TABLES "
-                      " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA = "
+        QString sql = "SELECT INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME "
+                      "  FROM INFORMATION_SCHEMA.COLUMNS "
+                      " WHERE INFORMATION_SCHEMA.COLUMNS.TABLE_SCHEMA = "
                       "       DATABASE() "
-                      "   AND INFORMATION_SCHEMA.TABLES.TABLE_NAME = "
-                      "       :TABLENAME ;";
+                      "   AND INFORMATION_SCHEMA.COLUMNS.TABLE_NAME = "
+                      "       :TABLENAME "
+                      "   AND INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME = "
+                      "       :COLUMNNAME;";
         if (query.prepare(sql))
         {
             query.bindValue(":TABLENAME", table);
+            query.bindValue(":COLUMNNAME", "function");
             if (query.exec() && query.next())
                 result = true;
         }
@@ -1260,6 +1269,8 @@ void verboseHelp()
     {
         VerboseDef *item = vit.value();
         QString name = QString("  %1").arg(item->name, -15, ' ');
+        if (item->helpText.isEmpty())
+            continue;
         cerr << name.toLocal8Bit().constData() << " - " << 
                 item->helpText.toLocal8Bit().constData() << endl;
     }

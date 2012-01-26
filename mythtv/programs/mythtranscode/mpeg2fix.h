@@ -191,25 +191,25 @@ class MPEG2fixup
     void InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
                          int64_t &PTSdiscrep, int numframes, bool fix);
     void SetFrameNum(uint8_t *ptr, int num);
-    int GetFrameNum(MPEG2frame *frame)
+    static int GetFrameNum(const MPEG2frame *frame)
     {
         return frame->mpeg2_pic.temporal_reference;
     }
-    int GetFrameTypeN(MPEG2frame *frame)
+    static int GetFrameTypeN(const MPEG2frame *frame)
     {
         return frame->mpeg2_pic.flags & PIC_MASK_CODING_TYPE;
     }
-    char GetFrameTypeT(MPEG2frame *frame)
+    static char GetFrameTypeT(const MPEG2frame *frame)
     {
         int type = GetFrameTypeN(frame);
         return (type == 1 ? 'I' :
                 (type == 2 ? 'P' : (type == 3 ? 'B' : 'X')));
     }
-    int GetNbFields(MPEG2frame *frame)
+    static int GetNbFields(const MPEG2frame *frame)
     {
         return frame->mpeg2_pic.nb_fields;
     }
-    int GetStreamType(int id)
+    int GetStreamType(int id) const
     {
         return (inputFC->streams[id]->codec->codec_id == CODEC_ID_AC3) ?
                CODEC_ID_AC3 : CODEC_ID_MP2;

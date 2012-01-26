@@ -339,6 +339,9 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
             return a->GetRecordingStartTime() < b->GetRecordingStartTime();
     }
 
+    if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
+        return a->GetRecordingPriority2() < b->GetRecordingPriority2();
+
     if (a->GetInputID() != b->GetInputID())
         return a->GetInputID() < b->GetInputID();
 
@@ -1417,6 +1420,7 @@ void Scheduler::PruneRedundants(void)
             !lastp->IsSameTimeslot(*p))
         {
             lastp = p;
+            lastp->SetRecordingPriority2(0);
             ++i;
         }
         else
@@ -1778,6 +1782,7 @@ void Scheduler::run(void)
     int       wakeThreshold   = 300;
     int       idleTimeoutSecs = 0;
     int       idleWaitForRecordingTime = 15; // in minutes
+    int       tuningTimeout   = 180; // in seconds
     bool      blockShutdown   =
         gCoreContext->GetNumSetting("blockSDWUwithoutClient", 1);
     bool      firstRun        = true;
@@ -1840,6 +1845,8 @@ void Scheduler::run(void)
                     gCoreContext->GetNumSetting("idleTimeoutSecs", 0);
                 idleWaitForRecordingTime =
                     gCoreContext->GetNumSetting("idleWaitForRecordingTime", 15);
+                tuningTimeout =
+                    gCoreContext->GetNumSetting("tuningTimeout", 180);
             }
             int e = t.elapsed();
             if (e > 0)
@@ -1892,7 +1899,10 @@ void Scheduler::run(void)
         // & handle rsTuning updates
         bool done = false;
         for (RecIter it = startIter; it != reclist.end() && !done; ++it)
-            done = HandleRecording(**it, statuschanged, prerollseconds);
+        {
+            done = HandleRecording(
+                **it, statuschanged, prerollseconds, tuningTimeout);
+        }
 
         /// Wake any slave backends that need waking
         curtime = QDateTime::currentDateTime();
@@ -2092,7 +2102,7 @@ bool Scheduler::HandleReschedule(void)
         p->future = false;
     }
 
-    SendMythSystemEvent("SCHEDULER_RAN");
+    gCoreContext->SendSystemEvent("SCHEDULER_RAN");
 
     return true;
 }
@@ -2252,11 +2262,12 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 }
 
 bool Scheduler::HandleRecording(
-    RecordingInfo &ri, bool &statuschanged, int prerollseconds)
+    RecordingInfo &ri, bool &statuschanged,
+    int prerollseconds, int tuningTimeout)
 {
     if (ri.GetRecordingStatus() == rsTuning)
     {
-        HandleTuning(ri, statuschanged);
+        HandleTuning(ri, statuschanged, tuningTimeout);
         return false;
     }
 
@@ -2469,7 +2480,8 @@ void Scheduler::HandleRecordingStatusChange(
     }
 }
 
-void Scheduler::HandleTuning(RecordingInfo &ri, bool &statuschanged)
+void Scheduler::HandleTuning(
+    RecordingInfo &ri, bool &statuschanged, int tuningTimeout)
 {
     if (rsTuning != ri.GetRecordingStatus())
         return;
@@ -2483,7 +2495,7 @@ void Scheduler::HandleTuning(RecordingInfo &ri, bool &statuschanged)
             .arg(ri.GetCardID()).arg(ri.GetTitle());
         LOG(VB_GENERAL, LOG_ERR, LOC + msg);
     }
-    else
+    else if (tuningTimeout > 0)
     {
         recStatus = (*tvit)->GetRecordingStatus();
         if (rsTuning == recStatus)
@@ -2492,10 +2504,14 @@ void Scheduler::HandleTuning(RecordingInfo &ri, bool &statuschanged)
             // started give up on it so the scheduler can try to
             // find another broadcast of the same material.
             QDateTime curtime = QDateTime::currentDateTime();
-            if ((ri.GetRecordingStartTime().secsTo(curtime) > 180) &&
-                (ri.GetScheduledStartTime().secsTo(curtime) > 180))
+            if ((ri.GetRecordingStartTime().secsTo(curtime) > tuningTimeout) &&
+                (ri.GetScheduledStartTime().secsTo(curtime) > tuningTimeout))
             {
                 recStatus = rsFailed;
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Canceling recording since tuning timeout, "
+                            "%1 seconds, has been exceeded.")
+                    .arg(tuningTimeout));
             }
         }
     }
@@ -3345,11 +3361,6 @@ void Scheduler::UpdateMatches(int recordid) {
 "FROM (RECTABLE, program INNER JOIN channel "
 "      ON channel.chanid = program.chanid) ") + fromclauses[clause] + QString(
 " WHERE ") + whereclauses[clause] +
-    QString(" AND (NOT ((RECTABLE.dupin & %1) AND program.previouslyshown)) "
-            " AND (NOT ((RECTABLE.dupin & %2) AND program.generic > 0)) "
-            " AND (NOT ((RECTABLE.dupin & %3) AND (program.previouslyshown "
-            "                                      OR program.first = 0))) ")
-            .arg(kDupsExRepeats).arg(kDupsExGeneric).arg(kDupsFirstNew) +
     QString(" AND channel.visible = 1 ") +
     filterClause + QString(" AND "
 
@@ -3762,7 +3773,7 @@ void Scheduler::AddNewRecords(void)
         "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//40-42
         "    capturecard.hostname, recordmatch.oldrecstatus, "
         "                                           RECTABLE.avg_delay, "//43-45
-        "    oldrecstatus.future, "                                      //46
+        "    oldrecstatus.future, cardinput.schedorder, "                //46-47
         + pwrpri + QString(
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
@@ -3867,6 +3878,7 @@ void Scheduler::AddNewRecords(void)
             result.value(39).toUInt(),//videoproperties
             result.value(41).toUInt(),//audioproperties
             result.value(46).toInt());//future
+        p->SetRecordingPriority2(result.value(47).toInt()); // schedorder
 
         if (!p->future && !p->IsReactivated() &&
             p->oldrecstatus != rsAborted &&
@@ -3883,7 +3895,7 @@ void Scheduler::AddNewRecords(void)
 
         p->SetRecordingPriority(
             p->GetRecordingPriority() + recTypeRecPriorityMap[p->GetRecordingRuleType()] +
-            result.value(47).toInt() +
+            result.value(48).toInt() +
             ((autopriority) ?
              autopriority - (result.value(45).toInt() * autostrata / 200) : 0));
 
@@ -3913,7 +3925,8 @@ void Scheduler::AddNewRecords(void)
 
         RecStatusType newrecstatus = p->GetRecordingStatus();
         // Check for rsOffLine
-        if ((doRun || specsched) && !cardMap.contains(p->GetCardID()))
+        if ((doRun || specsched) && 
+            (!cardMap.contains(p->GetCardID()) || !p->GetRecordingPriority2()))
             newrecstatus = rsOffLine;
 
         // Check for rsTooManyRecordings

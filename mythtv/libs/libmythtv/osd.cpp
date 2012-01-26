@@ -738,12 +738,20 @@ void OSD::CheckExpiry(void)
         {
             if (!m_PulsedDialogText.isEmpty() && now > m_NextPulseUpdate)
             {
-                QString replace = QObject::tr("%n second(s)", NULL,
-                                              now.secsTo(it.value()));
                 QString newtext = m_PulsedDialogText;
                 MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
                 if (dialog)
+                {
+                    QString replace = QObject::tr("%n second(s)", NULL,
+                                                  now.secsTo(it.value()));
                     dialog->SetText(newtext.replace("%d", replace));
+                }
+                MythConfirmationDialog *cdialog = dynamic_cast<MythConfirmationDialog*>(m_Dialog);
+                if (cdialog)
+                {
+                    QString replace = QString::number(now.secsTo(it.value()));
+                    cdialog->SetMessage(newtext.replace("%d", replace));
+                }
                 m_NextPulseUpdate = now.addSecs(1);
             }
         }
@@ -1150,11 +1158,20 @@ SubtitleScreen* OSD::InitSubtitles(void)
     return sub;
 }
 
-void OSD::EnableSubtitles(int type)
+void OSD::EnableSubtitles(int type, bool forced_only)
 {
     SubtitleScreen *sub = InitSubtitles();
     if (sub)
-        sub->EnableSubtitles(type);
+        sub->EnableSubtitles(type, forced_only);
+}
+
+void OSD::DisableForcedSubtitles(void)
+{
+    if (!HasWindow(OSD_WIN_SUBTITLE))
+        return;
+
+    SubtitleScreen *sub = InitSubtitles();
+    sub->DisableForcedSubtitles();
 }
 
 void OSD::ClearSubtitles(void)

@@ -868,9 +868,10 @@ static int createCode2ToCode3Map(QMap<int, int>& codemap) {
     functionality.
 */
 
-static CodeToNameMap createLanguageMap(void)
+typedef QMap<QString, QString> ISO639ToNameMap;
+static ISO639ToNameMap createLanguageMap(void)
 {
-    CodeToNameMap map;
+    ISO639ToNameMap map;
     map["af"] = QString::fromUtf8("Afrikaans");
     map["am"] = QString::fromUtf8("አማርኛ");
     map["ar"] = QString::fromUtf8("العربية");
@@ -948,7 +949,7 @@ static CodeToNameMap createLanguageMap(void)
     return map;
 }
 
-static CodeToNameMap gLanguageMap;
+static ISO639ToNameMap gLanguageMap;
 
 QString GetISO639LanguageName(QString iso639_1)
 {

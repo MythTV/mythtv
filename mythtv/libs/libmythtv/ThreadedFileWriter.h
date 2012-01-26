@@ -46,6 +46,7 @@ class ThreadedFileWriter
     ~ThreadedFileWriter();
 
     bool Open(void);
+    bool ReOpen(QString newFilename = "");
 
     long long Seek(long long pos, int whence);
     uint Write(const void *data, uint count);

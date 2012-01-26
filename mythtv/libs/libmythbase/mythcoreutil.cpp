@@ -36,12 +36,12 @@
  *          or -1 if it does not succeed.
  *  \param file_on_disk file on the file system we wish to stat.
  */
-long long getDiskSpace(const QString &file_on_disk,
-                       long long &total, long long &used)
+int64_t getDiskSpace(const QString &file_on_disk,
+                     int64_t &total, int64_t &used)
 {
     struct statfs statbuf;
     memset(&statbuf, 0, sizeof(statbuf));
-    long long freespace = -1;
+    int64_t freespace = -1;
     QByteArray cstr = file_on_disk.toLocal8Bit();
 
     total = used = -1;

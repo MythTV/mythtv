@@ -895,6 +895,7 @@ void *dfd_controller_thunk(void *param)
     threadRegister("DarwinController");
     ((DarwinFirewireDevice*)param)->RunController();
     threadDeregister();
+    return NULL;
 }
 
 void dfd_update_device_list_item(

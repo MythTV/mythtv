@@ -134,7 +134,7 @@ class DBLoggerThread : public MThread
         QMutex m_queueMutex;
         QQueue<LoggingItem *> *m_queue;
         QWaitCondition *m_wait; // protected by m_queueMutex
-        bool aborted; // protected by m_queueMutex
+        volatile bool aborted; // protected by m_queueMutex
 };
 
 #endif

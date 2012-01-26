@@ -973,24 +973,6 @@ class SkipBtAudio : public CheckBoxSetting, public CaptureCardDBStorage
    };
 };
 
-class DVBInput : public ComboBoxSetting, public CaptureCardDBStorage
-{
-  public:
-    DVBInput(const CaptureCard &parent) :
-        ComboBoxSetting(this),
-        CaptureCardDBStorage(this, parent, "defaultinput")
-    {
-        setLabel(QObject::tr("Default input"));
-        fillSelections(false);
-    }
-
-    void fillSelections(bool diseqc)
-    {
-        clearSelections();
-        addSelection((diseqc) ? "DVBInput #1" : "DVBInput");
-    }
-};
-
 class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
@@ -1278,7 +1260,6 @@ class FirewireConfigurationGroup : public VerticalConfigurationGroup
 
         addChild(new SignalTimeout(parent, 2000, 1000));
         addChild(new ChannelTimeout(parent, 9000, 1750));
-        addChild(new SingleCardInput(parent));
 
         model->SetGUID(dev->getValue());
         desc->SetGUID(dev->getValue());
@@ -1574,7 +1555,6 @@ class IPTVConfigurationGroup : public VerticalConfigurationGroup
         setUseLabel(false);
         addChild(new IPTVHost(parent));
         addChild(new ChannelTimeout(parent, 3000, 1750));
-        addChild(new SingleCardInput(parent));
         addChild(new EmptyAudioDevice(parent));
         addChild(new EmptyVBIDevice(parent));
     };
@@ -1668,16 +1648,13 @@ ASIConfigurationGroup::ASIConfigurationGroup(CaptureCard& a_parent):
     parent(a_parent),
     device(new ASIDevice(parent)),
     cardinfo(new TransLabelSetting()),
-    input(new TunerCardInput(parent, device->getValue(), "ASI")),
     instances(new InstanceCount(parent))
 {
     addChild(device);
     addChild(new EmptyAudioDevice(parent));
     addChild(new EmptyVBIDevice(parent));
     addChild(cardinfo);
-    addChild(input);
     addChild(instances);
-    input->setVisible(false);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
@@ -1712,7 +1689,6 @@ void ASIConfigurationGroup::probeCard(const QString &device)
         return;
     }
     cardinfo->setValue(tr("Valid DVEO ASI card"));
-    input->fillSelections(device);
 #else
     cardinfo->setValue(QString("Not compiled with ASI support"));
 #endif
@@ -1824,8 +1800,6 @@ HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
     addChild(desc);
     addChild(cardip);
     addChild(cardtuner);
-
-    addChild(new SingleCardInput(parent));
 
     TransButtonSetting *buttonRecOpt = new TransButtonSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));
@@ -1970,11 +1944,131 @@ void HDHomeRunConfigurationGroup::HDHomeRunExtraPanel(void)
     parent.SetInstanceCount(acw.GetInstanceCount());
 }
 
+// -----------------------
+// Ceton Configuration
+// -----------------------
+
+CetonSetting::CetonSetting(const char* label, const char* helptext)
+{
+    setLabel(QObject::tr(label));
+    setHelpText(tr(helptext));
+    connect(this, SIGNAL(valueChanged( const QString&)),
+            this, SLOT(  UpdateDevices(const QString&)));
+}
+
+void CetonSetting::UpdateDevices(const QString &v)
+{
+    if (isEnabled())
+        emit NewValue(v);
+}
+
+void CetonSetting::LoadValue(const QString &value)
+{
+    setValue(value);
+}
+
+CetonDeviceID::CetonDeviceID(const CaptureCard &parent) :
+    LabelSetting(this),
+    CaptureCardDBStorage(this, parent, "videodevice"),
+    _ip(), _card(), _tuner()
+{
+    setLabel(tr("Device ID"));
+    setHelpText(tr("Device ID of Ceton device"));
+}
+
+void CetonDeviceID::SetIP(const QString &ip)
+{
+    QString regexp = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){4}$";
+    if (QRegExp(regexp).exactMatch(ip + "."))
+    {
+        _ip = ip;
+        setValue(QString("%1-%2.%3").arg(_ip).arg(_card).arg(_tuner));
+    }
+}
+
+void CetonDeviceID::SetCard(const QString &card)
+{
+    if (QRegExp("^(\\d|RTP)$").exactMatch(card))
+    {
+        _card = card;
+        setValue(QString("%1-%2.%3").arg(_ip).arg(_card).arg(_tuner));
+    }
+}
+
+void CetonDeviceID::SetTuner(const QString &tuner)
+{
+    if (QRegExp("^\\d$").exactMatch(tuner))
+    {
+        _tuner = tuner;
+        setValue(QString("%1-%2.%3").arg(_ip).arg(_card).arg(_tuner));
+    }
+}
+
+void CetonDeviceID::Load(void)
+{
+    CaptureCardDBStorage::Load();
+    UpdateValues();
+}
+
+void CetonDeviceID::UpdateValues(void)
+{
+    QRegExp newstyle("^([0-9.]+)-(\\d|RTP)\\.(\\d)$");
+    if (newstyle.exactMatch(getValue()))
+    {
+        emit LoadedIP(newstyle.cap(1));
+        emit LoadedCard(newstyle.cap(2));
+        emit LoadedTuner(newstyle.cap(3));
+    }
+}
+
+CetonConfigurationGroup::CetonConfigurationGroup
+        (CaptureCard& a_parent) :
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent)
+{
+    setUseLabel(false);
+
+    deviceid     = new CetonDeviceID(parent);
+    desc         = new TransLabelSetting();
+    desc->setLabel(tr("Description"));
+    ip    = new CetonSetting(
+        "IP Address",
+        "IP Address of the Ceton device (192.168.200.1 by default)");
+    card  = new CetonSetting(
+        "Card Number",
+        "Number of the installed Ceton card. Use 0 if only 1 Ceton card is "
+        "installed in your system. Use the value RTP if this is a Ceton "
+        "card installed in a remote system");
+    tuner = new CetonSetting(
+        "Tuner",
+        "Number of the tuner on the Ceton device (first tuner is number 0)");
+
+    addChild(ip);
+    addChild(card);
+    addChild(tuner);
+    addChild(deviceid);
+    addChild(desc);
+
+    connect(ip,       SIGNAL(NewValue(const QString&)),
+            deviceid, SLOT(  SetIP(const QString&)));
+    connect(card,     SIGNAL(NewValue(const QString&)),
+            deviceid, SLOT(  SetCard(const QString&)));
+    connect(tuner,    SIGNAL(NewValue(const QString&)),
+            deviceid, SLOT(  SetTuner(const QString&)));
+
+    connect(deviceid, SIGNAL(LoadedIP(const QString&)),
+            ip,       SLOT(  LoadValue(const QString&)));
+    connect(deviceid, SIGNAL(LoadedCard(const QString&)),
+            card,     SLOT(  LoadValue(const QString&)));
+    connect(deviceid, SIGNAL(LoadedTuner(const QString&)),
+            tuner,    SLOT(  LoadValue(const QString&)));
+
+};
+
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent),
-    cardinfo(new TransLabelSetting()),  vbidev(new VBIDevice(parent)),
-    input(new TunerCardInput(parent))
+    cardinfo(new TransLabelSetting()),  vbidev(new VBIDevice(parent))
 {
     QString drv = "(?!ivtv|hdpvr|(saa7164(.*)))";
     VideoDevice *device = new VideoDevice(parent, 0, 15, QString::null, drv);
@@ -1990,7 +2084,6 @@ V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
     addChild(vbidev);
     addChild(new AudioDevice(parent));
     addChild(audgrp);
-    addChild(input);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
@@ -2015,7 +2108,6 @@ void V4LConfigurationGroup::probeCard(const QString &device)
 
     cardinfo->setValue(ci);
     vbidev->setFilter(cn, dn);
-    input->fillSelections(device);
 }
 
 
@@ -2023,8 +2115,7 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent),
     device(NULL), vbidevice(NULL),
-    cardinfo(new TransLabelSetting()),
-    input(new TunerCardInput(parent))
+    cardinfo(new TransLabelSetting())
 {
     QString drv = "ivtv|(saa7164(.*))";
     device    = new VideoDevice(parent, 0, 15, QString::null, drv);
@@ -2036,7 +2127,6 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent) :
     addChild(device);
     addChild(vbidevice);
     addChild(cardinfo);
-    addChild(input);
     addChild(new ChannelTimeout(parent, 12000, 2000));
 
     connect(device, SIGNAL(valueChanged(const QString&)),
@@ -2063,7 +2153,6 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
     cardinfo->setValue(ci);
     vbidevice->setVisible(dn!="ivtv");
     vbidevice->setFilter(cn, dn);
-    input->fillSelections(device);
 }
 
 DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent) :
@@ -2126,7 +2215,6 @@ void DemoConfigurationGroup::probeCard(const QString &device)
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent), cardinfo(new TransLabelSetting()),
-    videoinput(new TunerCardInput(parent)),
     audioinput(new TunerCardAudioInput(parent, QString::null, "HDPVR"))
 {
     VideoDevice *device =
@@ -2138,7 +2226,6 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent) :
     addChild(new EmptyAudioDevice(parent));
     addChild(new EmptyVBIDevice(parent));
     addChild(cardinfo);
-    addChild(videoinput);
     addChild(audioinput);
     addChild(new ChannelTimeout(parent, 12000, 2000));
 
@@ -2163,7 +2250,6 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
     }
 
     cardinfo->setValue(ci);
-    videoinput->fillSelections(device);
     audioinput->fillSelections(device);
 }
 
@@ -2207,6 +2293,10 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 #ifdef USING_ASI
     addTarget("ASI",       new ASIConfigurationGroup(parent));
 #endif // USING_ASI
+
+#ifdef USING_CETON
+    addTarget("CETON",     new CetonConfigurationGroup(parent));
+#endif // USING_CETON
 
     // for testing without any actual tuner hardware:
     addTarget("IMPORT",    new ImportConfigurationGroup(parent));
@@ -2415,6 +2505,11 @@ void CardType::fillSelections(SelectSetting* setting)
 #ifdef USING_ASI
     setting->addSelection(QObject::tr("DVEO ASI recorder"), "ASI");
 #endif
+
+#ifdef USING_CETON
+    setting->addSelection(
+        QObject::tr("Ceton Cablecard tuner "), "CETON");
+#endif // USING_CETON
 
     setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
     setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");
@@ -2723,6 +2818,42 @@ class InputPriority : public SpinBoxSetting, public CardInputDBStorage
     };
 };
 
+class ScheduleOrder : public SpinBoxSetting, public CardInputDBStorage
+{
+  public:
+    ScheduleOrder(const CardInput &parent, int _value) :
+        SpinBoxSetting(this, 0, 99, 1),
+        CardInputDBStorage(this, parent, "schedorder")
+    {
+        setLabel(QObject::tr("Schedule order"));
+        setValue(_value);
+        setHelpText(QObject::tr("If priorities and other factors are equal "
+                                "the scheduler will choose the available "
+                                "input with the lowest, non-zero value.  "
+                                "Setting this value to zero will make the "
+                                "input unavailable to the scheduler."));
+    };
+};
+
+class LiveTVOrder : public SpinBoxSetting, public CardInputDBStorage
+{
+  public:
+    LiveTVOrder(const CardInput &parent, int _value) :
+        SpinBoxSetting(this, 0, 99, 1),
+        CardInputDBStorage(this, parent, "livetvorder")
+    {
+        setLabel(QObject::tr("Live TV order"));
+        setValue(_value);
+        setHelpText(QObject::tr("When entering Live TV, the available, local "
+                                "input with the lowest, non-zero value will "
+                                "be used.  If no local inputs are available, "
+                                "the available, remote input with the lowest, "
+                                "non-zero value will be used.  "
+                                "Setting this value to zero will make the "
+                                "input unavailable to live TV."));
+    };
+};
+
 class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
 {
   public:
@@ -2811,6 +2942,8 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
 
     interact->setLabel(QObject::tr("Interactions between inputs"));
     interact->addChild(new InputPriority(*this));
+    interact->addChild(new ScheduleOrder(*this, _cardid));
+    interact->addChild(new LiveTVOrder(*this, _cardid));
 
     TransButtonSetting *ingrpbtn = new TransButtonSetting("newgroup");
     ingrpbtn->setLabel(QObject::tr("Create a New Input Group"));
@@ -3574,35 +3707,6 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
 #endif
 }
 
-TunerCardInput::TunerCardInput(const CaptureCard &parent,
-                               QString dev, QString type) :
-    ComboBoxSetting(this), CaptureCardDBStorage(this, parent, "defaultinput"),
-    last_device(dev), last_cardtype(type), last_diseqct(-1)
-{
-    setLabel(QObject::tr("Default input"));
-    int cardid = parent.getCardID();
-    if (cardid <= 0)
-        return;
-
-    last_cardtype = CardUtil::GetRawCardType(cardid);
-    last_device   = CardUtil::GetVideoDevice(cardid);
-}
-
-void TunerCardInput::fillSelections(const QString& device)
-{
-    clearSelections();
-
-    if (device.isEmpty())
-        return;
-
-    last_device = device;
-    QStringList inputs =
-        CardUtil::ProbeVideoInputs(device, last_cardtype);
-
-    for (QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i)
-        addSelection(*i);
-}
-
 TunerCardAudioInput::TunerCardAudioInput(const CaptureCard &parent,
                                          QString dev, QString type) :
     ComboBoxSetting(this), CaptureCardDBStorage(this, parent, "audiodevice"),
@@ -3708,10 +3812,6 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     diseqc_btn->setVisible(false);
     addChild(diseqc_cfg);
 
-    defaultinput = new DVBInput(parent);
-    addChild(defaultinput);
-    defaultinput->setVisible(false);
-
     tuning_delay = new DVBTuningDelay(parent);
     addChild(tuning_delay);
     tuning_delay->setVisible(false);
@@ -3739,14 +3839,12 @@ void DVBConfigurationGroup::DiSEqCPanel()
 
     DTVDeviceTreeWizard diseqcWiz(*diseqc_tree);
     diseqcWiz.exec();
-    defaultinput->fillSelections(diseqc_tree->IsInNeedOfConf());
 }
 
 void DVBConfigurationGroup::Load(void)
 {
     VerticalConfigurationGroup::Load();
     diseqc_tree->Load(parent.getCardID());
-    defaultinput->fillSelections(diseqc_tree->IsInNeedOfConf());
     if (cardtype->getValue() == "DVB-S" ||
         cardtype->getValue() == "DVB-S2" ||
         DiSEqCDevTree::Exists(parent.getCardID()))

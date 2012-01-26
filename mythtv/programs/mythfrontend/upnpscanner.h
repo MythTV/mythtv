@@ -26,6 +26,7 @@ class MediaServerItem
       : m_id(id), m_parentid(parent), m_name(name), m_url(url),
         m_scanned(false) { }
     QString NextUnbrowsed(void);
+    MediaServerItem* Find(QString &id);
     bool Add(MediaServerItem &item);
     void Reset(void);
 
@@ -48,8 +49,11 @@ class UPNPScanner : public QObject
     static UPNPScanner* Instance(UPNPSubscription *sub = NULL);
 
     void StartFullScan(void);
+    void GetInitialMetadata(VideoMetadataListManager::metadata_list* list,
+                            meta_dir_node *node);
     void GetMetadata(VideoMetadataListManager::metadata_list* list,
                      meta_dir_node *node);
+    bool GetMetadata(QVariant &data);
     QMap<QString,QString> ServerList(void);
 
   protected:
@@ -76,7 +80,8 @@ class UPNPScanner : public QObject
 
     // xml parsing of browse requests
     void ParseBrowse(const QUrl &url, QNetworkReply *reply);
-    void FindItems(const QDomNode &n, MediaServerItem &content);
+    void FindItems(const QDomNode &n, MediaServerItem &content,
+                   bool &resetparent);
     QDomDocument* FindResult(const QDomNode &n, uint &num,
                              uint &total, uint &updateid);
 
@@ -90,7 +95,7 @@ class UPNPScanner : public QObject
                       QString &eventURL);
 
     // convert MediaServerItems to video metadata
-    void GetServerContent(MediaServerItem *content,
+    void GetServerContent(QString &usn, MediaServerItem *content,
                           VideoMetadataListManager::metadata_list* list,
                           meta_dir_node *node);
 
@@ -116,6 +121,7 @@ class UPNPScanner : public QObject
     int     m_masterPort;
 
     bool    m_scanComplete;
+    bool    m_fullscan;
 };
 
 #endif // UPNPSCANNER_H

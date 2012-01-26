@@ -65,6 +65,7 @@ class MTV_PUBLIC CardUtil
         IMPORT    = 14,
         DEMO      = 15,
         ASI       = 16,
+        CETON     = 17,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -103,6 +104,8 @@ class MTV_PUBLIC CardUtil
             return DEMO;
         if ("ASI" == name)
             return ASI;
+        if ("CETON" == name)
+            return CETON;
         return ERROR_UNKNOWN;
     }
 
@@ -112,7 +115,7 @@ class MTV_PUBLIC CardUtil
             (rawtype != "DVB")       && (rawtype != "FIREWIRE") &&
             (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX")  &&
             (rawtype != "IMPORT")    && (rawtype != "DEMO")     &&
-            (rawtype != "ASI");
+            (rawtype != "ASI")       && (rawtype != "CETON");
     }
 
     static bool         IsV4L(const QString &rawtype)
@@ -158,7 +161,7 @@ class MTV_PUBLIC CardUtil
     {
         return
             (rawtype == "DVB")       || (rawtype == "HDHOMERUN") ||
-            (rawtype == "ASI");
+            (rawtype == "ASI")       || (rawtype == "CETON");
     }
 
     static bool         IsTuningAnalog(const QString &rawtype)
@@ -178,7 +181,8 @@ class MTV_PUBLIC CardUtil
         return
             (rawtype == "FIREWIRE")  || (rawtype == "HDHOMERUN") ||
             (rawtype == "FREEBOX")   || (rawtype == "ASI")       ||
-            (rawtype == "IMPORT")    || (rawtype == "DEMO");
+            (rawtype == "IMPORT")    || (rawtype == "DEMO")      ||
+            (rawtype == "CETON");
     }
 
     // Card creation and deletion
@@ -187,7 +191,6 @@ class MTV_PUBLIC CardUtil
                                           const QString &audiodevice,
                                           const QString &vbidevice,
                                           const QString &cardtype,
-                                          const QString &defaultinput,
                                           const uint audioratelimit,
                                           const QString &hostname,
                                           const uint dvb_swfilter,
@@ -255,8 +258,6 @@ class MTV_PUBLIC CardUtil
                                        QString &inputname);
     static bool         SetStartChannel(uint cardinputid,
                                         const QString &channum);
-    static bool         SetStartInput(uint cardid,
-                                      const QString &inputname);
 
     // Input creation and deletion
     static int           CreateCardInput(const uint cardid,
@@ -271,14 +272,16 @@ class MTV_PUBLIC CardUtil
                                          const QString &displayname,
                                          bool  dishnet_eit,
                                          const uint recpriority,
-                                         const uint quicktune);
+                                         const uint quicktune,
+                                         const uint schedorder,
+                                         const uint livetvorder);
 
     static bool         DeleteInput(uint inputid);
 
     // Other input functions
 
     static vector<uint> GetCardIDs(uint sourceid);
-    static QString      GetDefaultInput(uint cardid);
+    static QString      GetStartInput(uint cardid);
     static QStringList  GetInputNames(uint cardid, uint sourceid = 0);
     static bool         GetInputInfo(InputInfo &info,
                                      vector<uint> *groupids = NULL);

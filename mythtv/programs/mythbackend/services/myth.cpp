@@ -585,16 +585,21 @@ bool Myth::TestDBSettings( const QString &sHostName,
 
 bool Myth::SendMessage( const QString &sMessage,
                         const QString &sAddress,
-                        int   udpPort)
+                        int   udpPort,
+                        int   Timeout)
 {
     bool bResult = false;
 
     if (sMessage.isEmpty())
         return bResult;
 
+    if (Timeout < 0 || Timeout > 999)
+        Timeout = 0;
+
     QString xmlMessage =
         "<mythmessage version=\"1\">\n"
         "  <text>" + sMessage + "</text>\n"
+        "  <timeout>" + QString::number(Timeout) + "</timeout>\n"
         "</mythmessage>";
 
     QHostAddress address = QHostAddress::Broadcast;

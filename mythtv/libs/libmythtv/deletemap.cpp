@@ -57,13 +57,13 @@ bool DeleteMap::Redo(void)
     return true;
 }
 
-QString DeleteMap::GetUndoMessage(void)
+QString DeleteMap::GetUndoMessage(void) const
 {
     return (HasUndo() ? m_undoStack[m_undoStackPointer].message :
             QObject::tr("(Nothing to undo)"));
 }
 
-QString DeleteMap::GetRedoMessage(void)
+QString DeleteMap::GetRedoMessage(void) const
 {
     return (HasRedo() ? m_undoStack[m_undoStackPointer + 1].message :
             QObject::tr("(Nothing to redo)"));
@@ -192,7 +192,7 @@ void DeleteMap::SetFileEditing(PlayerContext *ctx, bool edit)
 }
 
 /// Determines whether the file is currently in edit mode.
-bool DeleteMap::IsFileEditing(PlayerContext *ctx)
+bool DeleteMap::IsFileEditing(const PlayerContext *ctx)
 {
     bool result = false;
     if (ctx)
@@ -205,7 +205,7 @@ bool DeleteMap::IsFileEditing(PlayerContext *ctx)
     return result;
 }
 
-bool DeleteMap::IsEmpty(void)
+bool DeleteMap::IsEmpty(void) const
 {
     return m_deleteMap.empty();
 }
@@ -512,12 +512,12 @@ MarkTypes DeleteMap::Delete(uint64_t frame)
  * \brief Returns true if the given frame is deemed to be within a region
  *        that should be cut.
  */
-bool DeleteMap::IsInDelete(uint64_t frame)
+bool DeleteMap::IsInDelete(uint64_t frame) const
 {
     if (m_deleteMap.isEmpty())
         return false;
 
-    frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
+    frm_dir_map_t::const_iterator it = m_deleteMap.find(frame);
     if (it != m_deleteMap.end())
         return true;
 
@@ -539,12 +539,12 @@ bool DeleteMap::IsInDelete(uint64_t frame)
 /**
  * \brief Returns true if the given frame is a temporary/placeholder mark
  */
-bool DeleteMap::IsTemporaryMark(uint64_t frame)
+bool DeleteMap::IsTemporaryMark(uint64_t frame) const
 {
     if (m_deleteMap.isEmpty())
         return false;
 
-    frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
+    frm_dir_map_t::const_iterator it = m_deleteMap.find(frame);
     return (it != m_deleteMap.end()) && (MARK_PLACEHOLDER == it.value());
 }
 
@@ -552,10 +552,11 @@ bool DeleteMap::IsTemporaryMark(uint64_t frame)
  * \brief Returns the next or previous mark. If these do not exist, returns
  *        either zero (the first frame) or total (the last frame).
  */
-uint64_t DeleteMap::GetNearestMark(uint64_t frame, uint64_t total, bool right)
+uint64_t DeleteMap::GetNearestMark(
+    uint64_t frame, uint64_t total, bool right) const
 {
     uint64_t result;
-    frm_dir_map_t::Iterator it = m_deleteMap.begin();
+    frm_dir_map_t::const_iterator it = m_deleteMap.begin();
     if (right)
     {
         result = total;
@@ -579,11 +580,11 @@ uint64_t DeleteMap::GetNearestMark(uint64_t frame, uint64_t total, bool right)
 /**
  * \brief Returns true if a temporary placeholder mark is defined.
  */
-bool DeleteMap::HasTemporaryMark(void)
+bool DeleteMap::HasTemporaryMark(void) const
 {
     if (!m_deleteMap.isEmpty())
     {
-        frm_dir_map_t::Iterator it = m_deleteMap.begin();
+        frm_dir_map_t::const_iterator it = m_deleteMap.begin();
         for ( ; it != m_deleteMap.end(); ++it)
             if (MARK_PLACEHOLDER == it.value())
                 return true;
@@ -667,7 +668,8 @@ void DeleteMap::LoadCommBreakMap(uint64_t total, frm_dir_map_t &map)
 }
 
 /// Loads the delete map from the database.
-void DeleteMap::LoadMap(uint64_t total, PlayerContext *ctx, QString undoMessage)
+void DeleteMap::LoadMap(
+    uint64_t total, const PlayerContext *ctx, QString undoMessage)
 {
     if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
@@ -683,7 +685,7 @@ void DeleteMap::LoadMap(uint64_t total, PlayerContext *ctx, QString undoMessage)
 
 /// Returns true if an auto-save map was loaded.
 /// Does nothing and returns false if not.
-bool DeleteMap::LoadAutoSaveMap(uint64_t total, PlayerContext *ctx)
+bool DeleteMap::LoadAutoSaveMap(uint64_t total, const PlayerContext *ctx)
 {
     if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return false;
@@ -780,13 +782,13 @@ bool DeleteMap::TrackerWantsToJump(uint64_t frame, uint64_t total, uint64_t &to)
  * \brief Returns the number of the last frame in the video that is not in a
  *        cut sequence.
  */
-uint64_t DeleteMap::GetLastFrame(uint64_t total)
+uint64_t DeleteMap::GetLastFrame(uint64_t total) const
 {
     uint64_t result = total;
     if (IsEmpty())
         return result;
 
-    frm_dir_map_t::Iterator it = m_deleteMap.end();
+    frm_dir_map_t::const_iterator it = m_deleteMap.end();
     --it;
 
     if (it.value() == MARK_CUT_START)
@@ -797,7 +799,7 @@ uint64_t DeleteMap::GetLastFrame(uint64_t total)
 /**
  * \brief Compares the current cut list with the saved cut list
  */
-bool DeleteMap::IsSaved(PlayerContext *ctx)
+bool DeleteMap::IsSaved(const PlayerContext *ctx) const
 {
     if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return true;

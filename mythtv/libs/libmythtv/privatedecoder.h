@@ -9,19 +9,20 @@ extern "C" {
 
 #include "videodisplayprofile.h"
 #include "mythcodecid.h"
+#include "mythplayer.h"
 
 class PrivateDecoder
 {
   public:
     static void GetDecoders(render_opts &opts);
     static PrivateDecoder* Create(const QString &decoder,
-                                  bool no_hardware_decode,
+                                  PlayerFlags flags,
                                   AVCodecContext *avctx);
     PrivateDecoder() { }
     virtual ~PrivateDecoder() { }
     virtual QString GetName(void) = 0;
     virtual bool Init(const QString &decoder,
-                      bool no_hardware_decode,
+                      PlayerFlags flags,
                       AVCodecContext *avctx) = 0;
     virtual bool Reset(void) = 0;
     virtual int  GetFrame(AVStream *stream,

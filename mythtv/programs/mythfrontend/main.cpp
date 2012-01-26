@@ -85,6 +85,9 @@ using namespace std;
 #include "videometadatasettings.h"
 #include "videolist.h"
 
+#ifdef USING_RAOP
+#include "mythraopdevice.h"
+#endif
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -216,6 +219,10 @@ namespace
 
     void cleanup()
     {
+#ifdef USING_RAOP
+        MythRAOPDevice::Cleanup();
+#endif
+
         delete exitPopup;
         exitPopup = NULL;
 
@@ -647,7 +654,8 @@ static void playDisc()
 
         QString filename = QString("bd:/%1/").arg(bluray_mountpoint);
 
-        GetMythMainWindow()->HandleMedia("Internal", filename);
+        GetMythMainWindow()->HandleMedia("Internal", filename, "", "", "", "",
+                                         0, 0, "", 0, "", "", true);
 
         GetMythUI()->RemoveCurrentLocation();
     }
@@ -677,7 +685,8 @@ static void playDisc()
             filename += dvd_device;
 
             command_string = "Internal";
-            GetMythMainWindow()->HandleMedia(command_string, filename);
+            GetMythMainWindow()->HandleMedia(command_string, filename, "", "",
+                                             "", "", 0, 0, "", 0, "", "", true);
             GetMythUI()->RemoveCurrentLocation();
 
             return;
@@ -1007,7 +1016,7 @@ static void TVMenuCallback(void *data, QString &selection)
         GetMythUI()->RemoveCurrentLocation();
 
         gCoreContext->ActivateSettingsCache(true);
-        RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+        gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
 
         if (sel == "settings general" ||
             sel == "settings generalrecpriorities")
@@ -1085,7 +1094,8 @@ static void WriteDefaults()
 static int internal_play_media(const QString &mrl, const QString &plot,
                         const QString &title, const QString &subtitle,
                         const QString &director, int season, int episode,
-                        const QString &inetref, int lenMins, const QString &year)
+                        const QString &inetref, int lenMins, const QString &year,
+                        const QString &id, const bool useBookmark)
 {
     int res = -1;
 
@@ -1105,7 +1115,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
     ProgramInfo *pginfo = new ProgramInfo(
         mrl, plot, title, subtitle, director, season, episode,
-        inetref, lenMins, (year.toUInt()) ? year.toUInt() : 1900);
+        inetref, lenMins, (year.toUInt()) ? year.toUInt() : 1900,
+        id);
 
     pginfo->SetProgramInfoType(pginfo->DiscoverProgramInfoType());
 
@@ -1140,7 +1151,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     else if (pginfo->IsVideo())
         pos = pginfo->QueryBookmark();
 
-    if (pos > 0)
+    if (useBookmark && pos > 0)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         BookmarkDialog *bookmarkdialog = new BookmarkDialog(pginfo, mainStack);
@@ -1153,7 +1164,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     }
     else
     {
-        TV::StartTV(pginfo, kStartTVNoFlags);
+        TV::StartTV(pginfo, kStartTVNoFlags | kStartTVIgnoreBookmark);
 
         res = 0;
 
@@ -1395,7 +1406,7 @@ static void resetAllKeys(void)
 
 static void signal_USR1_handler(int){
       LOG(VB_GENERAL, LOG_NOTICE, "SIGUSR1 received, reloading theme");
-      RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+      gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
       gCoreContext->ActivateSettingsCache(false);
       GetMythMainWindow()->JumpTo("Reload Theme");
       gCoreContext->ActivateSettingsCache(true);
@@ -1463,19 +1474,11 @@ int main(int argc, char **argv)
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
 
-    QString pluginname;
-
-    QFileInfo finfo(qApp->argv()[0]);
-    QString binname = finfo.baseName();
-
     int retval;
     if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
         return retval;
 
     bool ResetSettings = false;
-
-    if (binname.toLower() != "mythfrontend")
-        pluginname = binname;
 
     if (cmdline.toBool("prompt"))
         bPromptForBackend = true;
@@ -1524,9 +1527,6 @@ int main(int argc, char **argv)
     if (cmdline.toBool("reset"))
         ResetSettings = true;
 
-    if (cmdline.GetArgs().size() >= 1)
-        pluginname = cmdline.GetArgs()[0];
-
     QString fileprefix = GetConfDir();
 
     QDir dir(fileprefix);
@@ -1546,6 +1546,10 @@ int main(int argc, char **argv)
     }
 
     setuid(getuid());
+
+#ifdef USING_RAOP
+    MythRAOPDevice::Create();
+#endif
 
     LCD::SetupLCD();
     if (LCD *lcd = LCD::Get())
@@ -1614,19 +1618,6 @@ int main(int argc, char **argv)
     pmanager = new MythPluginManager();
     gContext->SetPluginManager(pmanager);
 
-    if (pluginname.size())
-    {
-        if (pmanager->run_plugin(pluginname) ||
-            pmanager->run_plugin("myth" + pluginname))
-        {
-            qApp->exec();
-
-            return GENERIC_EXIT_OK;
-        }
-        else
-            return GENERIC_EXIT_INVALID_CMDLINE;
-    }
-
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)
     {
@@ -1673,12 +1664,48 @@ int main(int argc, char **argv)
         themeUpdateChecker = new ThemeUpdateChecker();
 
     MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
-    GetMythMainWindow()->RegisterSystemEventHandler(sysEventHandler);
 
     BackendConnectionManager bcm;
 
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kRemote, 50, 60);
+
+    if (cmdline.toBool("runplugin"))
+    {
+        QStringList plugins = pmanager->EnumeratePlugins();
+
+        if (plugins.contains(cmdline.toString("runplugin")))
+            pmanager->run_plugin(cmdline.toString("runplugin"));
+        else if (plugins.contains("myth" + cmdline.toString("runplugin")))
+            pmanager->run_plugin("myth" + cmdline.toString("runplugin"));
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Invalid plugin name supplied on command line: '%1'")
+                    .arg(cmdline.toString("runplugin")));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Available plugins: %1")
+                    .arg(plugins.join(", ")));
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
+    else if (cmdline.toBool("jumppoint"))
+    {
+        MythMainWindow *mmw = GetMythMainWindow();
+
+        if (mmw->DestinationExists(cmdline.toString("jumppoint")))
+            mmw->JumpTo(cmdline.toString("jumppoint"));
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Invalid jump point supplied on the command line: %1")
+                    .arg(cmdline.toString("jumppoint")));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Available jump points: %2")
+                    .arg(mmw->EnumerateDestinations().join(", ")));
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
 
     int ret = qApp->exec();
 

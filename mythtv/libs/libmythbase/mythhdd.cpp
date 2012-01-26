@@ -33,6 +33,9 @@ MythHDD::MythHDD(QObject *par, const char *DevicePath,
  */
 MythMediaStatus MythHDD::checkMedia(void)
 {
+    if (m_Status == MEDIASTAT_ERROR)
+        return m_Status;
+
     if (isMounted())
     {
         // A lazy way to present volume name for the user to eject.
@@ -40,29 +43,32 @@ MythMediaStatus MythHDD::checkMedia(void)
         m_VolumeID = m_MountPath;
 
         // device is mounted, trigger event
-        if (MEDIASTAT_MOUNTED != m_Status)
+        if (m_Status != MEDIASTAT_MOUNTED)
             m_Status = MEDIASTAT_NOTMOUNTED;
+
         return setStatus(MEDIASTAT_MOUNTED);
     }
 
     // device is not mounted
     switch (m_Status)
     {
-    case MEDIASTAT_NOTMOUNTED:
-        // a removable device was just plugged in try to mount it.
-        LOG(VB_MEDIA, LOG_INFO, "MythHDD::checkMedia try mounting " + m_DevicePath);
-        if (mount())
-        {
-            m_Status = MEDIASTAT_NOTMOUNTED;
-            return setStatus(MEDIASTAT_MOUNTED);
-        }
-        return m_Status;
-    case MEDIASTAT_MOUNTED:
-        // device was mounted and someone unmounted it.
-        return m_Status = setStatus(MEDIASTAT_NOTMOUNTED);
-    default:
-        // leave device state as is
-        return m_Status;
+        case MEDIASTAT_NOTMOUNTED:
+            // a removable device was just plugged in try to mount it.
+            LOG(VB_MEDIA, LOG_INFO, "MythHDD::checkMedia try mounting " +
+                m_DevicePath);
+
+            if (mount())
+                return setStatus(MEDIASTAT_MOUNTED);
+
+            return setStatus(MEDIASTAT_ERROR);
+
+        case MEDIASTAT_MOUNTED:
+            // device was mounted and someone unmounted it.
+            return setStatus(MEDIASTAT_NOTMOUNTED);
+
+        default:
+            // leave device state as is
+            return m_Status;
     }
 }
 

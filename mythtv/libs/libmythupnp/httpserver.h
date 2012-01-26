@@ -109,7 +109,7 @@ class UPNP_PUBLIC HttpServer : public QTcpServer
     static QString          s_platform;
 
   public:
-    HttpServer();
+    HttpServer(const QString sApplicationPrefix = QString(""));
     virtual ~HttpServer();
 
     void RegisterExtension(HttpServerExtension*);

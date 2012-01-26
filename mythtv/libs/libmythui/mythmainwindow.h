@@ -18,7 +18,7 @@ class MythMediaDevice;
 #define REG_JUMPEX(a, b, c, d, e) GetMythMainWindow()->RegisterJump(a, b, c, d, e)
 #define REG_MEDIAPLAYER(a,b,c) GetMythMainWindow()->RegisterMediaPlugin(a, b, c)
 
-typedef int (*MediaPlayCallback)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &);
+typedef int (*MediaPlayCallback)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &, const QString &, bool);
 
 class MythMainWindowPrivate;
 
@@ -71,17 +71,17 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void RegisterMediaPlugin(const QString &name, const QString &desc,
                              MediaPlayCallback fn);
 
-    void RegisterSystemEventHandler(QObject *eventHandler);
-    QObject *GetSystemEventHandler(void);
-
     bool HandleMedia(const QString& handler, const QString& mrl,
                      const QString& plot="", const QString& title="",
                      const QString& subtitle="", const QString& director="",
                      int season=0, int episode=0, const QString& inetref="",
-                     int lenMins=120, const QString& year="1895");
+                     int lenMins=120, const QString& year="1895",
+                     const QString &id="", bool useBookmarks = false);
+    void HandleTVPower(bool poweron);
 
     void JumpTo(const QString &destination, bool pop = true);
     bool DestinationExists(const QString &destination) const;
+    QStringList EnumerateDestinations(void) const;
 
     bool IsExitingToMain(void) const;
 
@@ -105,6 +105,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     QRect GetUIScreenRect();
     void  SetUIScreenRect(QRect &rect);
 
+    int GetDrawInterval() const;
     int NormalizeFontSize(int pointSize);
     MythRect NormRect(const MythRect &rect);
     QPoint NormPoint(const QPoint &point);

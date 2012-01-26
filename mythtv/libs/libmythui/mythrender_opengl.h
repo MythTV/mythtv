@@ -8,6 +8,17 @@
 #include <QHash>
 #include <QMutex>
 
+#define GL_GLEXT_PROTOTYPES
+
+#ifdef USING_X11
+#define GLX_GLXEXT_PROTOTYPES
+#define XMD_H 1
+#ifndef GL_ES_VERSION_2_0
+#include <GL/gl.h>
+#endif
+#undef GLX_ARB_get_proc_address
+#endif // USING_X11
+
 #ifdef _WIN32
 #include <GL/glext.h>
 #endif
@@ -22,6 +33,8 @@
 #include "mythrender_base.h"
 #include "mythrender_opengl_defs.h"
 
+#include "mythuianimation.h"
+
 typedef enum
 {
     kGLFeatNone    = 0x0000,
@@ -34,15 +47,16 @@ typedef enum
     kGLAppleFence  = 0x0040,
     kGLMesaYCbCr   = 0x0080,
     kGLAppleYCbCr  = 0x0100,
-    kGLAppleRGB422 = 0x0200,
-    kGLMipMaps     = 0x0400,
-    kGLSL          = 0x0800,
-    kGLVertexArray = 0x1000,
-    kGLExtVBO      = 0x2000,
-    kGLMaxFeat     = 0x4000,
+    kGLMipMaps     = 0x0200,
+    kGLSL          = 0x0400,
+    kGLVertexArray = 0x0800,
+    kGLExtVBO      = 0x1000,
+    kGLMaxFeat     = 0x2000,
 } GLFeatures;
 
+#define MYTHTV_UYVY 0x8A1F
 #define TEX_OFFSET 8
+
 class MythGLTexture
 {
   public:
@@ -89,7 +103,8 @@ class MUI_PUBLIC OpenGLLocker
 class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 {
   public:
-    static MythRenderOpenGL* Create(QPaintDevice* device = NULL);
+    static MythRenderOpenGL* Create(const QString &painter,
+                                    QPaintDevice* device = NULL);
 
     MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
                      RenderType type = kRenderUnknown);
@@ -107,7 +122,10 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     bool  IsRecommendedRenderer(void);
 
     void  MoveResizeWindow(const QRect &rect);
-    void  SetViewPort(const QRect &rect);
+    void  SetViewPort(const QRect &rect, bool viewportonly = false);
+    QRect GetViewPort(void) { return m_viewport; }
+    virtual void  PushTransformation(const UIEffects &fx, QPointF &center) = 0;
+    virtual void  PopTransformation(void) = 0;
     void  Flush(bool use_fence);
     void  SetBlend(bool enable);
     virtual void SetColor(int r, int g, int b, int a) { }

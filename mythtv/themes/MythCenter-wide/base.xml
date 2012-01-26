@@ -300,8 +300,6 @@
                     <align>vcenter</align>
                 </textarea>
             </state>
-            <state name="selectedinactive" from="active" />
-<!--
             <state name="selectedinactive" from="active" >
                <shape name="selectbar">
                     <area>28,0,1144,30</area>
@@ -311,7 +309,6 @@
                     <cornerradius>4</cornerradius>
                 </shape>
             </state>
--->
         </statetype>
         <statetype name="upscrollarrow">
             <position>1190,6</position>

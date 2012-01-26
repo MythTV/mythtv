@@ -22,7 +22,6 @@ using namespace std;
 #endif
 
 #include "uitypes.h"
-#include "uilistbtntype.h"
 #include "xmlparse.h"
 #include "mythdialogs.h"
 #include "lcddevice.h"
@@ -952,70 +951,6 @@ void MythProgressDialog::setTotalSteps(int totalSteps)
         steps = 1;
 }
 
-MythBusyDialog::MythBusyDialog(const QString &title, bool cancelButton,
-                               const QObject *target, const char *slot)
-    : MythProgressDialog(title, 0,
-                         cancelButton, target, slot),
-                         timer(NULL)
-{
-    setObjectName("MythBusyDialog");
-}
-
-MythBusyDialog::~MythBusyDialog()
-{
-    Teardown();
-}
-
-void MythBusyDialog::deleteLater(void)
-{
-    Teardown();
-    MythProgressDialog::deleteLater();
-}
-
-void MythBusyDialog::Teardown(void)
-{
-    if (timer)
-    {
-        timer->disconnect();
-        timer = NULL;
-    }
-}
-
-void MythBusyDialog::start(int interval)
-{
-    if (!timer)
-        timer = new QTimer(this);
-
-    connect(timer, SIGNAL(timeout()),
-            this,  SLOT  (timeout()));
-
-    timer->start(interval);
-}
-
-void MythBusyDialog::Close(void)
-{
-    if (timer)
-    {
-        timer->disconnect();
-        timer = NULL;
-    }
-
-    MythProgressDialog::Close();
-}
-
-void MythBusyDialog::setProgress(void)
-{
-    progress->setValue(progress->value() + 10);
-    qApp->processEvents();
-    if (LCD *lcddev = LCD::Get())
-        lcddev->setGenericBusy();
-}
-
-void MythBusyDialog::timeout(void)
-{
-    setProgress();
-}
-
 MythThemedDialog::MythThemedDialog(MythMainWindow *parent,
                                    const QString  &window_name,
                                    const QString  &theme_filename,
@@ -1040,12 +975,12 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent,
     }
 }
 
-MythThemedDialog::MythThemedDialog(MythMainWindow *parent, const char* name,
-                                   bool setsize)
-                : MythDialog(parent, name, setsize)
+MythThemedDialog::MythThemedDialog(
+    MythMainWindow *parent, const char* name, bool setsize) :
+    MythDialog(parent, name, setsize), widget_with_current_focus(NULL),
+    theme(NULL), context(-1)
 {
     setNoErase();
-    theme = NULL;
 }
 
 bool MythThemedDialog::loadThemedWindow(QString window_name,
@@ -1173,10 +1108,6 @@ void MythThemedDialog::loadWindow(QDomElement &element)
             {
                 parseContainer(e);
             }
-            else if (e.tagName() == "popup")
-            {
-                parsePopup(e);
-            }
             else
             {
                 LOG(VB_GENERAL, LOG_ALERT,
@@ -1219,16 +1150,6 @@ void MythThemedDialog::parseFont(QDomElement &element)
     //
 
     theme->parseFont(element);
-}
-
-void MythThemedDialog::parsePopup(QDomElement &element)
-{
-    //
-    //  theme doesn't know how to do this yet
-    //
-    element = element;
-    LOG(VB_GENERAL, LOG_ALERT,
-             "MythThemedDialog cannot parse popups yet - ignoring");
 }
 
 void MythThemedDialog::initForeground()
@@ -1571,58 +1492,6 @@ void MythThemedDialog::setCurrentFocusWidget(UIType* widget)
     widget_with_current_focus->takeFocus();
 }
 
-UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(
-    const QString &name)
-{
-    return GetUIType<UIManagedTreeListType>(this, name);
-}
-
-UITextType* MythThemedDialog::getUITextType(const QString &name)
-{
-    return GetUIType<UITextType>(this, name);
-}
-
-UIPushButtonType* MythThemedDialog::getUIPushButtonType(const QString &name)
-{
-    return GetUIType<UIPushButtonType>(this, name);
-}
-
-UITextButtonType* MythThemedDialog::getUITextButtonType(const QString &name)
-{
-    return GetUIType<UITextButtonType>(this, name);
-}
-
-UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(
-    const QString &name)
-{
-    return GetUIType<UIRepeatedImageType>(this, name);
-}
-
-UIBlackHoleType* MythThemedDialog::getUIBlackHoleType(const QString &name)
-{
-    return GetUIType<UIBlackHoleType>(this, name);
-}
-
-UIImageType* MythThemedDialog::getUIImageType(const QString &name)
-{
-    return GetUIType<UIImageType>(this, name);
-}
-
-UIStatusBarType* MythThemedDialog::getUIStatusBarType(const QString &name)
-{
-    return GetUIType<UIStatusBarType>(this, name);
-}
-
-UIListBtnType* MythThemedDialog::getUIListBtnType(const QString &name)
-{
-    return GetUIType<UIListBtnType>(this, name);
-}
-
-UIListTreeType* MythThemedDialog::getUIListTreeType(const QString &name)
-{
-    return GetUIType<UIListTreeType>(this, name);
-}
-
 UIKeyboardType *MythThemedDialog::getUIKeyboardType(const QString &name)
 {
     return GetUIType<UIKeyboardType>(this, name);
@@ -1647,133 +1516,4 @@ fontProp* MythThemedDialog::getFont(const QString &name)
         font = theme->GetFont(name, true);
 
     return font;
-}
-
-MythSearchDialog::MythSearchDialog(MythMainWindow *parent, const char *name)
-                 :MythPopupBox(parent, name)
-{
-    // create the widgets
-    caption = addLabel(QString(""));
-
-    editor = new MythRemoteLineEdit(this);
-    connect(editor, SIGNAL(textChanged()), this, SLOT(searchTextChanged()));
-    addWidget(editor);
-    editor->setFocus();
-    editor->setPopupPosition(VKQT_POSBOTTOMDIALOG);
-
-    listbox = new MythListBox(this);
-    connect(listbox, SIGNAL(accepted(int)), this, SLOT(AcceptItem(int)));
-    addWidget(listbox);
-
-    ok_button     = addButton(tr("OK"),     this, SLOT(accept()));
-    cancel_button = addButton(tr("Cancel"), this, SLOT(reject()));
-}
-
-void MythSearchDialog::keyPressEvent(QKeyEvent *e)
-{
-    bool handled = false;
-    QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
-
-    for (int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
-        if (action == "ESCAPE")
-        {
-            handled = true;
-            reject();
-        }
-        if (action == "LEFT")
-        {
-            handled = true;
-            focusNextPrevChild(false);
-        }
-        if (action == "RIGHT")
-        {
-            handled = true;
-            focusNextPrevChild(true);
-        }
-        if (action == "SELECT")
-        {
-            handled = true;
-            accept();
-        }
-    }
-
-    if (!handled)
-        MythPopupBox::keyPressEvent(e);
-}
-
-void MythSearchDialog::setCaption(QString text)
-{
-    if (caption)
-        caption->setText(text);
-}
-
-void MythSearchDialog::setSearchText(QString text)
-{
-    if (editor)
-    {
-        editor->clear();
-        editor->insertPlainText(text);
-    }
-}
-
-void MythSearchDialog::searchTextChanged(void)
-{
-    if (listbox && editor)
-    {
-        listbox->setCurrentItem(editor->text(), false,  true);
-        listbox->setTopRow(listbox->currentRow());
-    }
-}
-
-QString MythSearchDialog::getResult(void)
-{
-    if (listbox)
-        return listbox->currentText();
-
-    // Don't return QString::null, might cause segfaults due to
-    // code that doesn't check the return value...
-    return "";
-}
-
-void MythSearchDialog::setItems(QStringList items)
-{
-    if (listbox)
-    {
-        listbox->insertStringList(items);
-        searchTextChanged();
-    }
-}
-
-MythSearchDialog::~MythSearchDialog()
-{
-    Teardown();
-}
-
-void MythSearchDialog::deleteLater(void)
-{
-    Teardown();
-    MythPopupBox::deleteLater();
-}
-
-void MythSearchDialog::Teardown(void)
-{
-    caption       = NULL; // deleted by Qt
-
-    if (editor)
-    {
-        editor->disconnect();
-        editor    = NULL; // deleted by Qt
-    }
-
-    if (listbox)
-    {
-        listbox->disconnect();
-        listbox   = NULL; // deleted by Qt
-    }
-
-    ok_button     = NULL; // deleted by Qt
-    cancel_button = NULL; // deleted by Qt
 }

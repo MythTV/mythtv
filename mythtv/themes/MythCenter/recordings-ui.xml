@@ -57,7 +57,7 @@
 
         <buttonlist name="recgroups">
             <arrange>stack</arrange>
-            <area>225,17,500,55</area>
+            <area>225,15,340,35</area>
             <align>hcenter</align>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
@@ -65,25 +65,17 @@
             <buttonarea>0,0,100%,100%</buttonarea>
             <statetype name="buttonitem">
                 <state name="selectedinactive">
-                    <area>0,0,300,55</area>
-                    <shape name="recSelectedGroupShape">
-                        <area>0,0,0,0</area>
-                    </shape>
+                    <area>0,0,300,100%</area>
                     <textarea name="buttontext">
                         <area>10,2,-10,-5</area>
-                        <minsize>10%,50%</minsize>
-                        <align>allcenter</align>
+                        <align>center</align>
                         <font>basemedium</font>
                         <alpha>230</alpha>
                     </textarea>
                 </state>
                 <state name="inactive" from="selectedinactive">
-                    <shape name="recGroupShape">
-                        <area>0,0,0,0</area>
-                    </shape>
                     <textarea name="buttontext">
                         <area>0,0,0,0</area>
-                        <alpha>0</alpha>
                     </textarea>
                 </state>
             </statetype>

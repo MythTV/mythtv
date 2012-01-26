@@ -1193,6 +1193,9 @@ void NetTree::TreeRefresh()
 
 void NetTree::updateRSS()
 {
+    if (!findAllDBRSS().count())
+        return;
+
     QString title(tr("Updating RSS.  This could take a while..."));
     createBusyDialog(title);
 

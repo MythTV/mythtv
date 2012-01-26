@@ -9,7 +9,6 @@
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mythwizard.h"
-#include "managedlist.h"
 
 QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const
 {
@@ -1660,29 +1659,6 @@ QMap<int, QString> RecordingProfile::listProfiles(int group)
     } while (result.next());
 
     return profiles;
-}
-
-void RecordingProfile::fillSelections(SelectManagedListItem *setting,
-                                      int group)
-{
-    QMap<int, QString> profiles = listProfiles(group);
-    if (!group)
-    {
-        QMap<int, QString>::iterator it;
-        for (it = profiles.begin(); it != profiles.end(); ++it)
-        {
-            QString lbl = QObject::tr("Record using the \"%1\" profile")
-                .arg(it.value());
-            setting->addSelection(lbl, it.value(), false);
-        }
-        return;
-    }
-
-    QMap<int, QString>::iterator it;
-    for (it = profiles.begin(); it != profiles.end(); ++it)
-    {
-        setting->addSelection(it.value(), QString::number(it.key()), false);
-    }
 }
 
 QString RecordingProfile::groupType(void) const

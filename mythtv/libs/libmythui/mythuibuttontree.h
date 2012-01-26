@@ -28,6 +28,7 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
     bool SetNodeByString(QStringList route);
     bool SetNodeById(QList<int> route);
     bool SetCurrentNode(MythGenericTree *node);
+    void ShowSearchDialog(void);
     MythGenericTree* GetCurrentNode(void) const { return m_currentNode; }
 
     void SetActive(bool active);
@@ -48,6 +49,7 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
     void itemClicked(MythUIButtonListItem* item);
     void itemVisible(MythUIButtonListItem* item);
     void nodeChanged(MythGenericTree* node);
+    void rootChanged(MythGenericTree* node);
 
   protected:
     virtual bool ParseElement(

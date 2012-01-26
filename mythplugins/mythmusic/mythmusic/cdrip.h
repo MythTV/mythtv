@@ -108,6 +108,9 @@ class Ripper : public MythScreenType
     void searchArtist(void);
     void searchAlbum(void);
     void searchGenre(void);
+    void setArtist(QString artist);
+    void setAlbum(QString album);
+    void setGenre(QString genre);
     void RipComplete(bool result);
     void toggleTrackActive(MythUIButtonListItem *);
     void showEditMetadataDialog(MythUIButtonListItem *);
@@ -122,8 +125,6 @@ class Ripper : public MythScreenType
     void deleteTrack(QString& artist, QString& album, QString& title);
     void updateTrackList(void);
     void updateTrackLengths(void);
-
-    bool showList(QString caption, QString &value);
 
     static QString fixFileToken(QString token);
     static QString fixFileToken_sl(QString token);

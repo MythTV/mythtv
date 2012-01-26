@@ -142,8 +142,26 @@ VERBOSE_MAP(VB_DECODE,    0x800000000LLU, true,
             "MPEG2Fix Decode messages")
 VERBOSE_MAP(VB_FLUSH,     0x1000000000LLU, true,
             "")
+/* Please do not add a description for VB_FLUSH, it
+   should not be passed in via "-v". It is used to
+   flush output to the standard output from console
+   programs that have debugging enabled.
+ */
 VERBOSE_MAP(VB_STDIO,     0x2000000000LLU, true,
             "")
+/* Please do not add a description for VB_STDIO, it
+   should not be passed in via "-v". It is used to
+   send output to the standard output from console
+   programs that have debugging enabled.
+ */
+VERBOSE_MAP(VB_GPU,       0x4000000000LLU, true,
+            "GPU Commercial Flagging messages")
+VERBOSE_MAP(VB_GPUAUDIO,  0x8000000000LLU, true,
+            "GPU Audio Processing messages")
+VERBOSE_MAP(VB_GPUVIDEO,  0x10000000000LLU, true,
+            "GPU Video Processing messages")
+VERBOSE_MAP(VB_REFCOUNT,  0x20000000000LLU, true,
+            "Reference Count messages")
 VERBOSE_MAP(VB_NONE,      0x00000000, false,
             "NO debug output")
 VERBOSE_POSTAMBLE

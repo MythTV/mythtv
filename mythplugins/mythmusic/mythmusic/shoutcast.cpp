@@ -12,10 +12,12 @@
 #include <QApplication>
 #include <QRegExp>
 #include <QAbstractSocket>
+#include <QTimer>
 
 // mythtv
 #include <mythcorecontext.h>
 #include <mcodecs.h>
+#include <mythversion.h>
 
 // mythmusic
 #include "metadata.h"
@@ -28,6 +30,7 @@
 #define MAX_ALLOWED_META_SIZE 1024 * 100
 #define MAX_REDIRECTS 3
 #define PREBUFFER_SECS 5
+#define ICE_UDP_PORT 6000
 
 /****************************************************************************/
 
@@ -70,10 +73,9 @@ class ShoutCastRequest
         QString hdr;
         hdr = QString("GET %1 HTTP/1.1\r\n"
                       "Host: %2\r\n"
-                      "User-Agent: mythmusic/svn\r\n"
-                      "Keep-Alive:\r\n"
-                      "Connection: TE, Keep-Alive\r\n").arg(url.path()).arg(url.host());
-
+                      "User-Agent: MythMusic/%3\r\n"
+                      "Accept: */*\r\n")
+                      .arg(url.path()).arg(url.host().arg(MYTH_BINARY_VERSION));
         if (!url.userName().isEmpty() && !url.password().isEmpty()) 
         {
             QString authstring = url.userName() + ":" + url.password();
@@ -83,15 +85,50 @@ class ShoutCastRequest
         }
 
         hdr += QString("TE: trailers\r\n"
-                       "icy-metadata:1\r\n"
+                       "Icy-Metadata: 1\r\n"
                        "\r\n");
 
-        m_data = hdr;
+        m_data = hdr.toAscii();
     }
 
     QByteArray m_data;
 };
 
+class IceCastRequest
+{
+  public:
+    IceCastRequest(void) { }
+    IceCastRequest(const QUrl &url) { setUrl(url); }
+    ~IceCastRequest(void) { }
+    const char *data(void) { return m_data.data(); }
+    uint size(void) { return m_data.size(); }
+
+  private:
+    void setUrl(const QUrl &url)
+    {
+        QString hdr;
+        hdr = QString("GET %1 HTTP/1.1\r\n"
+                      "Host: %2\r\n"
+                      "User-Agent: MythMusic/%3\r\n"
+                      "Accept: */*\r\n")
+                      .arg(url.path()).arg(url.host()).arg(MYTH_BINARY_VERSION);
+        if (!url.userName().isEmpty() && !url.password().isEmpty()) 
+        {
+            QString authstring = url.userName() + ":" + url.password();
+            QString auth = QCodecs::base64Encode(authstring.toLocal8Bit());
+
+            hdr += "Authorization: Basic " + auth;
+        }
+
+        hdr += QString("TE: trailers\r\n"
+                       "x-audiocast-udpport: %1\r\n"
+                       "\r\n").arg(ICE_UDP_PORT);
+
+        m_data = hdr.toAscii();
+    }
+
+    QByteArray m_data;
+};
 
 /****************************************************************************/
 
@@ -102,7 +139,13 @@ class ShoutCastResponse
     ShoutCastResponse(void) { }
     ~ShoutCastResponse(void) { }
 
-    int getMetaint(void) { return getInt("icy-metaint"); }
+    int getMetaint(void)
+    {
+        if (m_data.contains("icy-metaint"))
+            return getInt("icy-metaint");
+        else
+            return -1;
+    }
     int getBitrate(void) { return getInt("icy-br"); }
     QString getGenre(void) { return getString("icy-genre"); }
     QString getName(void) { return getString("icy-name"); }
@@ -123,12 +166,12 @@ class ShoutCastResponse
 /** \brief Consume bytes and parse shoutcast header
     \returns number of bytes consumed
 */
-int ShoutCastResponse::fillResponse(const char *s, int l) 
+int ShoutCastResponse::fillResponse(const char *s, int l)
 {
     QByteArray d(s, l);
     int result = 0;
     // check each line
-    for (;;) 
+    for (;;)
     {
         int pos = d.indexOf("\r");
 
@@ -331,8 +374,7 @@ void ShoutCastIODevice::connectToUrl(const QUrl &url)
     switchToState (RESOLVING);
     setOpenMode(ReadWrite);
     open(ReadWrite);
-
-    return m_socket->connectToHost(m_url.host(), m_url.port());
+    return m_socket->connectToHost(m_url.host(), m_url.port() == -1 ? 80 : m_url.port());
 }
 
 void ShoutCastIODevice::close(void)
@@ -370,16 +412,21 @@ qint64 ShoutCastIODevice::readData(char *data, qint64 maxlen)
 
     if (m_state == STREAMING)
     {
-        // take maxlen or what ever is left till the next metadata
-        if (maxlen > m_bytesTillNextMeta)
-            maxlen = m_bytesTillNextMeta;
+        if (m_bytesTillNextMeta > 0)
+        {
+            // take maxlen or what ever is left till the next metadata
+            if (maxlen > m_bytesTillNextMeta)
+                maxlen = m_bytesTillNextMeta;
 
-        maxlen = m_buffer->read(data, maxlen);
+            maxlen = m_buffer->read(data, maxlen);
 
-        m_bytesTillNextMeta -= maxlen;
+            m_bytesTillNextMeta -= maxlen;
 
-        if (m_bytesTillNextMeta == 0)
-            switchToState(STREAMING_META);
+            if (m_bytesTillNextMeta == 0)
+                switchToState(STREAMING_META);
+        }
+        else
+            maxlen = m_buffer->read(data, maxlen);
     }
 
     if (m_state != STOPPED) 
@@ -409,7 +456,7 @@ qint64 ShoutCastIODevice::bytesAvailable(void) const
 
 void ShoutCastIODevice::socketHostFound(void)
 {
-    LOG(VB_NETWORK, LOG_ERR, "ShoutCastIODevice: Host Found");
+    LOG(VB_NETWORK, LOG_INFO, "ShoutCastIODevice: Host Found");
     switchToState(CONNECTING);
 }
 
@@ -426,6 +473,7 @@ void ShoutCastIODevice::socketConnected(void)
 
     if (written != request.size())
     {
+        LOG(VB_NETWORK, LOG_INFO, "ShoutCastIODevice: buffering write");
         m_scratchpad = QByteArray(request.data() + written, request.size() - written);
         m_scratchpad_pos = 0;
         connect(m_socket, SIGNAL (bytesWritten(qint64)), SLOT(socketBytesWritten(qint64)));
@@ -463,11 +511,11 @@ void ShoutCastIODevice::socketReadyRead(void)
     }
 
     // if we are waiting for the HEADER and we have enough data process that
-    if (m_state == READING_HEADER && m_buffer->readBufAvail() >= DecoderIOFactory::DefaultPrebufferSize) //MAX_ALLOWED_HEADER_SIZE
+    if (m_state == READING_HEADER && m_buffer->readBufAvail() >= MAX_ALLOWED_HEADER_SIZE)
     {
         if (parseHeader())
         {
-            if (m_response->isICY() && m_response->getStatus() == 200)
+            if (m_response->getStatus() == 200)
             {
                 switchToState(PLAYING);
 
@@ -477,7 +525,7 @@ void ShoutCastIODevice::socketReadyRead(void)
 
                 switchToState(STREAMING);
             }
-            else if (m_response->getStatus () == 302 || m_response->getStatus () == 301)
+            else if (m_response->getStatus() == 302 || m_response->getStatus() == 301)
             {
                 if (++m_redirects > MAX_REDIRECTS)
                 {
@@ -486,8 +534,8 @@ void ShoutCastIODevice::socketReadyRead(void)
                 }
                 else
                 {
-                    LOG(VB_NETWORK, LOG_INFO, QString("Redirect to %1")
-                            .arg(m_response->getLocation()));
+                    LOG(VB_NETWORK, LOG_INFO, QString("Redirect to %1").arg(m_response->getLocation()));
+                    m_socket->close();
                     connectToUrl(m_url);
                     return;
                 }
@@ -780,6 +828,10 @@ void DecoderIOFactoryShoutCast::periodicallyCheckBuffered(void)
         doConnectDecoder("create-mp3-decoder.mp3");
     else if (response.getContent() == "audio/aacp")
         doConnectDecoder("create-aac-decoder.m4a");
+    else if (response.getContent() == "application/ogg")
+        doConnectDecoder("create-ogg-decoder.ogg");
+    else if (response.getContent() == "audio/aac")
+        doConnectDecoder("create-aac-decoder.aac");
     else
     {
         doFailed(QObject::tr("Unsupported content type for ShoutCast stream: %1")
@@ -796,11 +848,13 @@ void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
         QString("DecoderIOFactoryShoutCast: metadata changed - %1")
             .arg(metadata));
     ShoutCastMetaParser parser;
-    parser.setMetaFormat(getMetadata().CompilationArtist());
+    // FIXME: 
+    //parser.setMetaFormat(getMetadata().CompilationArtist());
+    parser.setMetaFormat("%a - %t");
 
     ShoutCastMetaMap meta_map = parser.parseMeta(metadata);
 
-    Metadata mdata(getMetadata());
+    Metadata mdata = getMetadata();
     mdata.setTitle(meta_map["title"]);
     mdata.setArtist(meta_map["artist"]);
     mdata.setAlbum(getMetadata().Album()); // meta_map["album"]
@@ -813,7 +867,8 @@ void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
 void DecoderIOFactoryShoutCast::shoutcastChangedState(ShoutCastIODevice::State state)
 {
     LOG(VB_PLAYBACK, LOG_INFO, QString("ShoutCast changed state to %1")
-            .arg(ShoutCastIODevice::stateString (state)));
+        .arg(ShoutCastIODevice::stateString(state)));
+
     if (state == ShoutCastIODevice::RESOLVING)
         doOperationStart("Finding radio");
 
@@ -861,8 +916,11 @@ int DecoderIOFactoryShoutCast::checkResponseOK()
         return 1;
     }
 
-    if (!response.isICY() || response.getStatus() != 200)
+    if (response.getStatus() != 200)
         return -1;
+    
+//    if (!response.isICY() || response.getStatus() != 200)
+//        return -1;
 
     return 0;
 }

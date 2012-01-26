@@ -22,7 +22,7 @@ typedef enum {
 class MythPlugin : public QLibrary
 {
   public:
-    MythPlugin(const QString &);
+    MythPlugin(const QString &, const QString &);
     virtual ~MythPlugin();
 
     // This method will call the mythplugin_init() function of the library. 
@@ -48,6 +48,8 @@ class MythPlugin : public QLibrary
     int getPosition() { return position; }
     void setPosition(int pos) { position = pos; }
 
+    QString getName(void) { return m_plugName; }
+
     // mainmenu plugins, probably should separate out
 
     // setup the plugin -- returns how often (in ms) the plugin wants updated
@@ -59,6 +61,7 @@ class MythPlugin : public QLibrary
   private:
     bool enabled;
     int position;
+    QString m_plugName;
 };
 
 // this should only be instantiated through MythContext.
@@ -77,6 +80,7 @@ class MPUBLIC MythPluginManager
     MythPlugin *GetMenuPlugin(const QString &plugname);
     MythPlugin *GetMenuPluginAt(int pos);
 
+    QStringList EnumeratePlugins(void);
     void DestroyAllPlugins();
      
   private:

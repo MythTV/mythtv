@@ -157,6 +157,7 @@ class VideoDialog : public MythScreenType
     VideoMetadata *GetMetadata(MythUIButtonListItem *item);
 
     void handleDirSelect(MythGenericTree *node);
+    void handleDynamicDirSelect(MythGenericTree *node);
     bool goBack();
     void setParentalLevel(const ParentalLevel::Level &level);
     void shiftParental(int amount);

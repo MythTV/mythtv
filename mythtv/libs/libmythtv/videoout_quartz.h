@@ -40,7 +40,7 @@ class VideoOutputQuartz : public VideoOutput
     void MoveResizeWindow(QRect new_rect) {;}
     void DrawUnusedRects(bool sync = true);
 
-    void UpdatePauseFrame(void);
+    void UpdatePauseFrame(int64_t &disp_timecode);
 
     void ResizeForGui(void);
     void ResizeForVideo(uint width = 0, uint height = 0);

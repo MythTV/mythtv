@@ -24,7 +24,7 @@
 
         <buttonlist name="recgroups">
             <arrange>stack</arrange>
-            <area>364,36,820,54</area>
+            <area>364,30,634,40</area>
             <align>hcenter</align>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
@@ -32,25 +32,17 @@
             <buttonarea>0,0,100%,100%</buttonarea>
             <statetype name="buttonitem">
                 <state name="selectedinactive">
-                    <area>0,0,300,56</area>
-                    <shape name="recSelectedGroupShape">
-                        <area>0,0,0,0</area>
-                    </shape>
+                    <area>0,0,300,100%</area>
                     <textarea name="buttontext">
                         <area>10,2,-10,-5</area>
-                        <minsize>10%,50%</minsize>
-                        <align>allcenter</align>
+                        <align>center</align>
                         <font>basemedium</font>
                         <alpha>200</alpha>
                     </textarea>
                 </state>
                 <state name="inactive" from="selectedinactive">
-                    <shape name="recGroupShape">
-                        <area>0,0,0,0</area>
-                    </shape>
                     <textarea name="buttontext">
                         <area>0,0,0,0</area>
-                        <alpha>0</alpha>
                     </textarea>
                 </state>
             </statetype>
@@ -158,7 +150,11 @@
                         <state name="no" />
                     </statetype>
                 </state>
-                <state name="selectedinactive" from="active" />
+                <state name="selectedinactive" from="active">
+                    <shape name="selectbar">
+                        <area>26,0,854,30</area>
+                    </shape>
+                </state>
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>26,0,854,30</area>
@@ -481,7 +477,11 @@
                         <state name="no" />
                     </statetype>
                 </state>
-                <state name="selectedinactive" from="active" />
+                <state name="selectedinactive" from="active">
+                    <shape name="selectbar">
+                        <area>26,0,854,30</area>
+                    </shape>
+                </state>
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>26,0,854,30</area>

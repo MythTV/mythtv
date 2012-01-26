@@ -2,6 +2,7 @@
 #include "programinfoupdater.h"
 #include "mthreadpool.h"
 #include "mythlogging.h"
+#include "mythcorecontext.h"
 #include "remoteutil.h"
 #include "compat.h"
 
@@ -70,7 +71,7 @@ void ProgramInfoUpdater::run(void)
                 .arg((*ita).recstartts.toString(Qt::ISODate));
 
             workDone = true;
-            RemoteSendMessage(msg);
+            gCoreContext->SendMessage(msg);
         }
         needsAddDelete.clear();
 
@@ -96,7 +97,7 @@ void ProgramInfoUpdater::run(void)
             }
 
             workDone = true;
-            RemoteSendMessage(msg);
+            gCoreContext->SendMessage(msg);
         }
         needsUpdate.clear();
 

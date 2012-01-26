@@ -24,6 +24,7 @@
 #include "xmlSerializer.h"
 
 #include <QMetaClassInfo>
+#include <QDateTime>
 
 // --------------------------------------------------------------------------
 // This version should be bumped if the serializer code is changed in a way
@@ -121,16 +122,9 @@ void XmlSerializer::AddProperty( const QString       &sName,
                                  const QMetaObject   *pMetaParent,
                                  const QMetaProperty *pMetaProp )
 {
-    if (sName != "Description")
-    {
-        m_pXmlWriter->writeStartElement( sName );
-
-        RenderValue( GetContentName( sName, pMetaParent, pMetaProp ), vValue );
-
-        m_pXmlWriter->writeEndElement();
-    }
-    else
-        RenderValue( sName, vValue );
+    m_pXmlWriter->writeStartElement( sName );
+    RenderValue( GetContentName( sName, pMetaParent, pMetaProp ), vValue );
+    m_pXmlWriter->writeEndElement();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -173,6 +167,13 @@ void XmlSerializer::RenderValue( const QString &sName, const QVariant &vValue )
         case QVariant::Map:
         {
             RenderMap( sName, vValue.toMap() );
+            break;
+        }
+
+        case QVariant::DateTime:
+        {
+            m_pXmlWriter->writeCharacters( vValue.toDateTime().toUTC()
+                                               .toString(Qt::ISODate) );
             break;
         }
 

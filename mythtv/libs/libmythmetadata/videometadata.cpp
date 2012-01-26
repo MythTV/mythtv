@@ -661,13 +661,13 @@ void VideoMetadataImp::saveToDatabase()
         query.bindValue(":INTID", m_id);
     }
 
-    query.bindValue(":TITLE", m_title);
+    query.bindValue(":TITLE", m_title.isNull() ? "" : m_title);
     query.bindValue(":SUBTITLE", m_subtitle.isNull() ? "" : m_subtitle);
     query.bindValue(":TAGLINE", m_tagline);
-    query.bindValue(":DIRECTOR", m_director);
+    query.bindValue(":DIRECTOR", m_director.isNull() ? "" : m_director);
     query.bindValue(":STUDIO", m_studio);
     query.bindValue(":PLOT", m_plot);
-    query.bindValue(":RATING", m_rating);
+    query.bindValue(":RATING", m_rating.isNull() ? "" : m_rating);
     query.bindValue(":YEAR", m_year);
     query.bindValue(":RELEASEDATE", m_releasedate);
     query.bindValue(":USERRATING", m_userrating);
@@ -676,14 +676,14 @@ void VideoMetadataImp::saveToDatabase()
     query.bindValue(":EPISODE", m_episode);
     query.bindValue(":FILENAME", m_filename);
     query.bindValue(":HASH", m_hash);
-    query.bindValue(":TRAILER", m_trailer);
+    query.bindValue(":TRAILER", m_trailer.isNull() ? "" : m_trailer);
     query.bindValue(":SHOWLEVEL", m_showlevel);
-    query.bindValue(":COVERFILE", m_coverfile);
-    query.bindValue(":SCREENSHOT", m_screenshot);
-    query.bindValue(":BANNER", m_banner);
-    query.bindValue(":FANART", m_fanart);
-    query.bindValue(":INETREF", m_inetref);
-    query.bindValue(":HOMEPAGE", m_homepage);
+    query.bindValue(":COVERFILE", m_coverfile.isNull() ? "" : m_coverfile);
+    query.bindValue(":SCREENSHOT", m_screenshot.isNull() ? "" : m_screenshot);
+    query.bindValue(":BANNER", m_banner.isNull() ? "" : m_banner);
+    query.bindValue(":FANART", m_fanart.isNull() ? "" : m_fanart);
+    query.bindValue(":INETREF", m_inetref.isNull() ? "" : m_inetref);
+    query.bindValue(":HOMEPAGE", m_homepage.isNull() ? "" : m_homepage);
     query.bindValue(":BROWSE", m_browse);
     query.bindValue(":WATCHED", m_watched);
     query.bindValue(":HOST", m_host);
@@ -1196,14 +1196,15 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
     metadataMap["length"] = GetDisplayLength(GetLength());
     metadataMap["year"] = GetDisplayYear(GetYear());
 
-    metadataMap["releasedate"] = MythDateToString(GetReleaseDate(), kDateFull);
+    metadataMap["releasedate"] = MythDateToString(GetReleaseDate(), kDateFull |
+                                                                    kAddYear);
 
     metadataMap["userrating"] = GetDisplayUserRating(GetUserRating());
-    metadataMap["season"] = GetDisplaySeasonEpisode(GetSeason(), 1);
-    metadataMap["episode"] = GetDisplaySeasonEpisode(GetEpisode(), 1);
 
     if (GetSeason() > 0 || GetEpisode() > 0)
     {
+        metadataMap["season"] = GetDisplaySeasonEpisode(GetSeason(), 1);
+        metadataMap["episode"] = GetDisplaySeasonEpisode(GetEpisode(), 1);
         metadataMap["s##e##"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
                                              (GetSeason(), 2))
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
@@ -1212,7 +1213,10 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
     }
     else
+    {
         metadataMap["s##e##"] = metadataMap["##x##"] = QString();
+        metadataMap["season"] = metadataMap["episode"] = QString();
+    }
 
     metadataMap["trailerstate"] = TrailerToState(GetTrailer());
     metadataMap["userratingstate"] =
@@ -1221,7 +1225,8 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
 
     metadataMap["videolevel"] = ParentalLevelToState(GetShowLevel());
 
-    metadataMap["insertdate"] = MythDateToString(GetInsertdate(), kDateFull);
+    metadataMap["insertdate"] = MythDateToString(GetInsertdate(), kDateFull |
+                                                                  kAddYear);
     metadataMap["inetref"] = GetInetRef();
     metadataMap["homepage"] = GetHomepage();
     metadataMap["child_id"] = QString::number(GetChildID());

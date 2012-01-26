@@ -376,7 +376,7 @@ int main(int argc, char *argv[])
 
         query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
-                      "AND manualid = 0;");
+                      "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", fromfile_id);
 
         if (query.exec() && query.next())
@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
 
         query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
-                      "AND manualid = 0;");
+                      "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", fromfile_id);
 
         if (query.exec() && query.next())
@@ -760,9 +760,9 @@ int main(int argc, char *argv[])
     if (grab_data || mark_repeats)
         ScheduledRecording::signalChange(-1);
 
-    RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+    gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
 
-    SendMythSystemEvent("MYTHFILLDATABASE_RAN");
+    gCoreContext->SendSystemEvent("MYTHFILLDATABASE_RAN");
 
     LOG(VB_GENERAL, LOG_NOTICE, "mythfilldatabase run complete.");
 

@@ -1992,10 +1992,10 @@ static HostRefreshRateComboBox *TVVidModeRefreshRate(int idx=-1)
 {
     QString dhelp = QObject::tr("Default refresh rate "
                                 "when watching a video. "
-                                "Leave at \"Any\" to automatically use the best available");
+                                "Leave at \"Auto\" to automatically use the best available");
     QString ohelp = QObject::tr("Refresh rate when watching a "
                                 "video at a specific resolution. "
-                                "Leave at \"Any\" to automatically use the best available");
+                                "Leave at \"Auto\" to automatically use the best available");
     QString qstr = (idx<0) ? "TVVidModeRefreshRate" :
         QString("TVVidModeRefreshRate%1").arg(idx);
     HostRefreshRateComboBox *gc = new HostRefreshRateComboBox(qstr);
@@ -2245,18 +2245,6 @@ static HostComboBox *LongChannelFormat()
     gc->setHelpText(QObject::tr("Your preferred long channel format."));
     gc->setValue(2);
     return gc;
-}
-
-static GlobalCheckBox *LastFreeCard()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("LastFreeCard");
-    bc->setLabel(QObject::tr("Avoid conflicts between Live TV and "
-                 "scheduled shows"));
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("If enabled, Live TV will choose a tuner card "
-                    "that is less likely to have scheduled recordings "
-                    "rather than the best card available."));
-    return bc;
 }
 
 static GlobalCheckBox *LiveTVPriority()
@@ -3484,7 +3472,6 @@ GeneralSettings::GeneralSettings()
     general->addChild(ChannelOrdering());
     general->addChild(ChannelFormat());
     general->addChild(LongChannelFormat());
-    general->addChild(LastFreeCard());
     general->addChild(LiveTVPriority());
     addChild(general);
 

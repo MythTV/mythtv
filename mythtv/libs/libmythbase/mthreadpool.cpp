@@ -374,7 +374,8 @@ bool MThreadPool::TryStartInternal(
     if (reserved ||
         m_priv->m_running_threads.size() < m_priv->GetRealMaxThread())
     {
-        m_priv->m_reserve_thread++;
+        if (reserved)
+            m_priv->m_reserve_thread++;
         MPoolThread *thread = new MPoolThread(*this, m_priv->m_expiry_timeout);
         m_priv->m_running_threads.insert(thread);
         thread->SetRunnable(runnable, debugName, reserved);

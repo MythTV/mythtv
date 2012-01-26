@@ -15,3 +15,4 @@ SOURCES += dcrawformats.cpp
 SOURCES += dcrawhandler.cpp
 SOURCES += dcrawplugin.cpp
 
+QT += sql

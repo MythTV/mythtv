@@ -14,7 +14,9 @@ class META_PUBLIC VideoMetadataListManager
     typedef std::list<VideoMetadataPtr> metadata_list;
 
   public:
-    static void loadAllFromDatabase(metadata_list &items);
+    static VideoMetadataPtr loadOneFromDatabase(uint id);
+    static void loadAllFromDatabase(metadata_list &items,
+                                    const QString &sql = "");
 
   public:
     VideoMetadataListManager();
@@ -89,7 +91,8 @@ class META_PUBLIC meta_dir_node : public meta_node
   public:
     meta_dir_node(const QString &path, const QString &name = "",
                   meta_dir_node *parent = NULL, bool is_path_root = false,
-                  const QString &host = "", const QString &prefix = "");
+                  const QString &host = "", const QString &prefix = "",
+                  const QVariant &data = QVariant());
     meta_dir_node() : meta_node(NULL) { }
 
     void setName(const QString &name);
@@ -100,16 +103,21 @@ class META_PUBLIC meta_dir_node : public meta_node
     const QString &GetPrefix() const;
     const QString &getPath() const;
     void setPath(const QString &path);
+    void SetData(const QVariant &data);
+    const QVariant &GetData() const;
+    bool DataIsValid(void) const;
     smart_dir_node addSubDir(const QString &subdir,
                              const QString &name = "",
                              const QString &host = "",
-                             const QString &prefix = "");
+                             const QString &prefix = "",
+                             const QVariant &data = QVariant());
     void addSubDir(const smart_dir_node &subdir);
     smart_dir_node getSubDir(const QString &subdir,
                              const QString &name = "",
                              bool create = true,
                              const QString &host = "",
-                             const QString &prefix = "");
+                             const QString &prefix = "",
+                             const QVariant &data = QVariant());
     void addEntry(const smart_meta_node &entry);
     void clear();
     bool empty() const;
@@ -143,5 +151,7 @@ class META_PUBLIC meta_dir_node : public meta_node
     QString m_prefix;
     meta_dir_list m_subdirs;
     meta_data_list m_entries;
+
+    QVariant m_data;
 };
 #endif // VIDEOMETADATALISTMANAGER_H_

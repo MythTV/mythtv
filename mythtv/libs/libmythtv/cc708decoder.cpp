@@ -66,6 +66,13 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
     }
 }
 
+void CC708Decoder::decode_cc_null(void)
+{
+    if (partialPacket.size && reader)
+        parse_cc_packet(reader, &partialPacket, last_seen);
+    partialPacket.size = 0;
+}
+
 void CC708Decoder::services(uint seconds, bool seen[64]) const
 {
     time_t now = time(NULL);
@@ -407,8 +414,8 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
         int text_tag  = (blk_buf[i+1]>>4) & 0xf;
         int font_tag  = (blk_buf[i+2]   ) & 0x7;
         int edge_type = (blk_buf[i+2]>>3) & 0x7;
-        int underline = (blk_buf[i+2]>>4) & 0x1;
-        int italic    = (blk_buf[i+2]>>5) & 0x1;
+        int underline = (blk_buf[i+2]>>6) & 0x1;
+        int italic    = (blk_buf[i+2]>>7) & 0x1;
         SEND_STR;
         cc->SetPenAttributes(service_num, pen_size, offset, text_tag,
                              font_tag, edge_type, underline, italic);
@@ -626,7 +633,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
 
     assert(pkt_size<127);
 
-    while (pkt_buf[off] && off<pkt_size)
+    while (off < pkt_size && pkt_buf[off])
     { // service_block
         int block_size = pkt_buf[off] & 0x1f;
         service_number = (pkt_buf[off]>>5) & 0x7;

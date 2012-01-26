@@ -175,6 +175,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     void updateLCD(void);
 
     void SetSearchFields(const QString &fields) { m_searchFields = fields; }
+    void ShowSearchDialog(void);
     bool Find(const QString &searchStr, bool startsWith = false);
     bool FindNext(void);
     bool FindPrev(void);
@@ -209,7 +210,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
                                int & selectedIdx, int & button_shift);
     bool DistributeRow(int & first_button, int & last_button,
                        int & first_item, int & last_item,
-                       int & selected_column,
+                       int & selected_column, int & skip_cols,
                        bool grow_left, bool grow_right,
                        int ** col_widths, int & row_height,
                        int total_height, int split_height,
@@ -217,7 +218,8 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     bool DistributeCols(int & first_button, int & last_button,
                         int & first_item, int & last_item,
                         int & selected_column, int & selected_row,
-                        int ** col_widths, QList<int> & row_heights,
+                        int & skip_cols, int ** col_widths,
+			QList<int> & row_heights,
                         int & top_height, int & bottom_height,
                         bool & wrapped);
     bool DistributeButtons(void);

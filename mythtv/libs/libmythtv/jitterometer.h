@@ -1,7 +1,9 @@
 #ifndef JITTEROMETER_H
 #define JITTEROMETER_H
 
+#include <QVector>
 #include <QFile>
+#include "mythtvexp.h"
 
 /* Jitterometer usage. There are 2 ways to use this:
 ------------------------------------------------------------------
@@ -32,7 +34,7 @@
       }
 */
 
-class Jitterometer
+class MTV_PUBLIC Jitterometer
 {
   public:
     Jitterometer(const QString &nname, int num_cycles = 0);
@@ -52,7 +54,7 @@ class Jitterometer
     int num_cycles;
     struct timeval starttime;
     int starttime_valid;
-    unsigned *times; // array of cycle lengths, in uS
+    QVector<uint> times; // array of cycle lengths, in uS
     float last_fps;
     float last_sd;
     QString name;

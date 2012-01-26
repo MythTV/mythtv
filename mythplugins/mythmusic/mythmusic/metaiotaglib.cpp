@@ -1,8 +1,3 @@
-
-// Mythmusic
-#include "metaiotaglib.h"
-#include "metadata.h"
-
 // Std
 #include <cmath>
 
@@ -15,12 +10,10 @@
 #include <tstring.h>
 #include <fileref.h>
 
-/* Redefine the TString conversion macros */
-#undef QStringToTString
-#define QStringToTString(s) TagLib::String(s.toUtf8().data(), TagLib::String::UTF8)
-#undef TStringToQString
-#define TStringToQString(s) QString::fromUtf8(s.toCString(true))
-
+// Mythmusic
+#include "metaiotaglib.h"
+#include "metadata.h"
+#include "musicutils.h"
 
 MetaIOTagLib::MetaIOTagLib()
     : MetaIO()

@@ -1,13 +1,13 @@
 #! /usr/bin/perl
-
-#
-# Based on nwsxml.pl by Lucien Dunning
-#
+# vim:ts=4:sw=4:ai:et:si:sts=4
 
 use strict;
 use warnings;
 
+use utf8;
+use encoding 'utf8';
 use English;
+
 use File::Basename;
 use Cwd 'abs_path';
 use lib dirname(abs_path($0 or $PROGRAM_NAME)),
@@ -16,44 +16,60 @@ use lib dirname(abs_path($0 or $PROGRAM_NAME)),
 
 use XML::Simple;
 use LWP::Simple;
-# Ideally we would use the If-Modified-Since header
-# to reduce server load, but they ignore it
-#use HTTP::Cache::Transparent;
 use Getopt::Std;
+use File::Path;
+
 use File::Basename;
 use lib dirname($0);
 use BBCLocation;
 
-our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d);
+our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D);
 
 my $name = 'BBC-3day-XML';
-my $version = 0.2;
-my $author = 'Stuart Morgan';
-my $email = 'stuart@tase.co.uk';
+my $version = 0.3;
+my $author = 'Gavin Hurlbut / Stuart Morgan';
+my $email = 'gjhurlbu@gmail.com / stuart@tase.co.uk';
 my $updateTimeout = 360*60; # 6 Hours
 my $retrieveTimeout = 30;
 my @types = ('3dlocation', 'station_id', 'copyright', 'weather_icon',
         'date-0', 'icon-0', 'low-0', 'high-0',
         'date-1', 'icon-1', 'low-1', 'high-1',
         'date-2', 'icon-2', 'low-2', 'high-2', 'updatetime');
-my $dir = "./";
+my $dir = "/tmp/uk_bbc";
+my $logdir = "/tmp/uk_bbc";
+
+binmode(STDOUT, ":utf8");
+
+if (!-d $logdir) {
+    mkpath( $logdir, {mode => 0755} );
+}
 
 getopts('Tvtlu:d:');
 
 if (defined $opt_v) {
     print "$name,$version,$author,$email\n";
+    log_print( $logdir, "-v\n" );
     exit 0;
 }
 
 if (defined $opt_T) {
     print "$updateTimeout,$retrieveTimeout\n";
+    log_print( $logdir, "-t\n" );
     exit 0;
 }
 
-if (defined $opt_l) {
+if (defined $opt_d) {
+    $dir = $opt_d;
+}
 
+if (!-d $dir) {
+    mkpath( $dir, {mode => 0755} );
+}
+
+if (defined $opt_l) {
     my $search = shift;
-    my @results = BBCLocation::Search($search);
+    log_print( $logdir, "-l $search\n" );
+    my @results = BBCLocation::Search($search, $dir, $updateTimeout, $logdir);
     my $result;
 
     foreach (@results) {
@@ -68,13 +84,9 @@ if (defined $opt_t) {
     exit 0;
 }
 
-if (defined $opt_d) {
-    $dir = $opt_d;
-}
-
 
 # we get here, we're doing an actual retrieval, everything must be defined
-my $locid = shift;
+my $locid = BBCLocation::FindLoc(shift, $dir, $updateTimeout, $logdir);
 if (!(defined $opt_u && defined $locid && !$locid eq "")) {
     die "Invalid usage";
 }
@@ -231,4 +243,13 @@ foreach $item (@{$xml->{channel}->{item}}) {
     }
 
     $i++;
+}
+
+sub log_print {
+    return if not defined $::opt_D;
+    my $dir = shift;
+
+    open OF, ">>$dir/uk_bbc.log";
+    print OF @_;
+    close OF;
 }

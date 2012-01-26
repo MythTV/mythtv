@@ -8,6 +8,7 @@ using namespace std;
 #include <QIODevice>
 #include <QDir>
 #include <QFile>
+#include <QDomDocument>
 
 #include <mythconfig.h>   // For CONFIG_DARWIN
 #include "cddecoder.h"
@@ -19,6 +20,7 @@ using namespace std;
 #include <mythmediamonitor.h>
 #include <mythversion.h>
 #include <httpcomms.h>
+#include <util.h>
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                      AudioOutput *o) :
@@ -68,7 +70,7 @@ QString fileForTrack(QString path, uint track)
     QDir    disc(path);
     QString filename;
 
-    disc.setNameFilter(QString("%1*.aiff").arg(track));
+    disc.setNameFilters(QStringList(QString("%1*.aiff").arg(track)));
     filename = disc.entryList()[0];  // Fortunately, this seems to sort nicely
 
     if (filename.isEmpty())
@@ -221,7 +223,7 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
     QString cddb = HttpComms::getHttp(URL2);
 
 #if 0
-    LOG(VB_MEDIA, LOG_INFO, "CDDB lookup: " + URL);
+    LOG(VB_MEDIA, LOG_INFO, "CDDB lookup: " + URL2);
     LOG(VB_MEDIA, LOG_INFO, "...returned: " + cddb);
 #endif
     //
@@ -234,12 +236,24 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
     // We should check for errors here, and possibly do a CDDB lookup
     // (telnet 8880) if it failed, but Nigel is feeling lazy.
 
-    if (stat == 211)  // Multiple matches
+    if (stat == 210 || stat == 211)  // Multiple matches
     {
+        // e.g. 210 Found exact matches, list follows (until terminating `.')
+        //      folk 9c09590b Michael W Smith / Stand
+        //      misc 9c09590b Michael W. Smith / Stand
+        //      rock 9c09590b Michael W. Smith / Stand
+        //      classical 9c09590b Michael W. Smith / Stand
+        //      .
         // TODO
         // Parse disks, put up dialog box, select disk, prune cddb to selected
         LOG(VB_MEDIA, LOG_INFO,
             "Multiple CDDB matches. Please implement this code");
+
+        // For now, we just choose the first match.
+        //int EOL = cddb.indexOf('\n');
+        cddb.remove(0, cddb.indexOf('\n'));
+        LOG(VB_MEDIA, LOG_INFO, "String now: " + cddb);
+        stat = 200;
     }
 
     if (stat == 200)  // One unique match
@@ -306,7 +320,7 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
                     {
                         compn = true;  // Probably a compilation
 
-                        m->setArtist(M_QSTRING_UNICODE(art));
+                        m->setArtist(M_QSTRING_UNICODE(art.toUtf8().constData()));
                     }
                 }
                 else
@@ -326,19 +340,19 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
             if (compn)
                 m->setCompilation(true);
 
-            m->setGenre(M_QSTRING_UNICODE(genre));
+            m->setGenre(M_QSTRING_UNICODE(genre.toUtf8().constData()));
 
             if (year)
                 m->setYear(year);
 
             if (album.length())
-                m->setAlbum(M_QSTRING_UNICODE(album));
+                m->setAlbum(M_QSTRING_UNICODE(album.toUtf8().constData()));
 
             if (artist.length())
                 if (compn)
-                    m->setCompilationArtist(M_QSTRING_UNICODE(artist));
+                    m->setCompilationArtist(M_QSTRING_UNICODE(artist.toUtf8().constData()));
                 else
-                    m->setArtist(M_QSTRING_UNICODE(artist));
+                    m->setArtist(M_QSTRING_UNICODE(artist.toUtf8().constData()));
         }
     }
 }
@@ -425,7 +439,7 @@ void CdDecoder::commitMetadata(Metadata *mdata)
 
 bool CdDecoderFactory::supports(const QString &source) const
 {
-    return (source.right(extension().length()).lower() == extension());
+    return (source.right(extension().length()).toLower() == extension());
 }
 
 const QString &CdDecoderFactory::extension() const

@@ -5,7 +5,7 @@
 
 #include <cstdlib>
 #include "mythcontext.h"
-using namespace std;
+#include "mythtvexp.h"
 
 // n.b. these PID relationships are only a recommendation from ATSC,
 // but seem to be universal
@@ -20,7 +20,8 @@ using namespace std;
  *
  *  \sa TSPacket, PESPacket, HDTVRecorder
  */
-class TSHeader {
+class MTV_PUBLIC TSHeader
+{
   public:
     TSHeader()
     {
@@ -123,7 +124,7 @@ class TSHeader {
  *
  *  \sa TSHeader, PESPacket, HDTVRecorder
  */
-class TSPacket : public TSHeader
+class MTV_PUBLIC TSPacket : public TSHeader
 {
     friend class PESPacket;
   public:
@@ -189,7 +190,7 @@ class TSPacket : public TSHeader
 /** \class TSDVBEmissionPacket
  *  \brief Adds DVB forward error correction data to size of packet.
  */
-class TSDVBEmissionPacket : public TSPacket
+class MTV_PUBLIC TSDVBEmissionPacket : public TSPacket
 {
   private:
     unsigned char _tsfec[16];
@@ -198,7 +199,7 @@ class TSDVBEmissionPacket : public TSPacket
 /** \class TSISDBEmissionPacket
  *  \brief Adds ISDB forward error correction data to size of packet.
  */
-class TSISDBEmissionPacket : public TSPacket
+class MTV_PUBLIC TSISDBEmissionPacket : public TSPacket
 {
   private:
     unsigned char _tsfec[16];
@@ -207,7 +208,7 @@ class TSISDBEmissionPacket : public TSPacket
 /** \class TS8VSBEmissionPacket
  *  \brief Adds 8-VSB forward error correction data to size of packet.
  */
-class TS8VSBEmissionPacket : public TSPacket
+class MTV_PUBLIC TS8VSBEmissionPacket : public TSPacket
 {
   private:
     unsigned char _tsfec[20];

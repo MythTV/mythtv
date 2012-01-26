@@ -390,6 +390,18 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD *osd,
     ShowPIPs(frame, pipPlayers);
 }
 
+void VideoOutputVDPAU::ClearDummyFrame(VideoFrame *frame)
+{
+    if (frame && m_render && !codec_is_std(video_codec_id))
+    {
+        struct vdpau_render_state *render =
+            (struct vdpau_render_state *)frame->buf;
+        if (render)
+            m_render->ClearVideoSurface(render->surface);
+    }
+    VideoOutput::ClearDummyFrame(frame);
+}
+
 void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
                                     OSD *osd)
 {
@@ -408,6 +420,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     }
 
     bool new_frame = false;
+    bool dummy     = false;
     if (frame)
     {
         // FIXME for 0.23. This should be triggered from AFD by a seek
@@ -415,10 +428,12 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
             ClearReferenceFrames();
         new_frame = (framesPlayed != frame->frameNumber + 1);
         framesPlayed = frame->frameNumber + 1;
+        dummy = frame->dummy;
     }
 
     uint video_surface = m_video_surfaces[0];
-    bool deint = (m_deinterlacing && m_need_deintrefs && frame);
+    bool deint = (m_deinterlacing && m_need_deintrefs &&
+                  frame && !dummy);
 
     if (deint)
     {
@@ -436,7 +451,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
             return;
         video_surface = m_render->GetSurfaceOwner(render->surface);
     }
-    else if (new_frame && frame)
+    else if (new_frame && frame && !dummy)
     {
         // FIXME - reference frames for software decode
         if (deint)
@@ -489,16 +504,27 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     if (size != m_render->GetSize())
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unexpected display size.");
 
-    if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
-                              deint ? &m_reference_frames : NULL,
-                              scan == kScan_Interlaced,
-                              window.GetVideoRect(),
-                              QRect(QPoint(0,0), size),
-                              vsz_enabled ? vsz_desired_display_rect :
-                                            window.GetDisplayVideoRect(),
-                              m_pip_ready ? m_pip_layer : 0, 0))
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Prepare frame failed.");
+    if (dummy)
+    {
+        m_render->DrawBitmap(0, 0, NULL, NULL, kVDPBlendNormal, 255);
+    }
+    else
+    {
+        if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
+                                  deint ? &m_reference_frames : NULL,
+                                  scan == kScan_Interlaced,
+                                  window.GetVideoRect(),
+                                  QRect(QPoint(0,0), size),
+                                  vsz_enabled ? vsz_desired_display_rect :
+                                                window.GetDisplayVideoRect(),
+                                  0, 0))
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Prepare frame failed.");
+        }
+    }
 
+    if (m_pip_ready)
+        m_render->DrawLayer(m_pip_layer, 0);
     if (m_visual)
         m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, NULL);
 
@@ -791,7 +817,7 @@ void VideoOutputVDPAU::DrawUnusedRects(bool sync)
     m_lock.unlock();
 }
 
-void VideoOutputVDPAU::UpdatePauseFrame(void)
+void VideoOutputVDPAU::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&m_lock);
 
@@ -803,6 +829,7 @@ void VideoOutputVDPAU::UpdatePauseFrame(void)
     if (vbuffers.size(kVideoBuffer_used) && m_render)
     {
         VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+        disp_timecode = frame->disp_timecode;
         if (codec_is_std(video_codec_id))
         {
             m_pause_surface = m_video_surfaces[0];
@@ -891,13 +918,10 @@ QStringList VideoOutputVDPAU::GetAllowedRenderers(
 }
 
 MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
-    uint width,       uint height,
+    uint width, uint height, const QString &decoder,
     uint stream_type, bool no_acceleration)
 {
     bool use_cpu = no_acceleration;
-    VideoDisplayProfile vdp;
-    vdp.SetInput(QSize(width, height));
-    QString dec = vdp.GetDecoder();
 
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1));
     use_cpu |= !codec_is_vdpau_hw(test_cid);
@@ -905,7 +929,7 @@ MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
         use_cpu |= !MythRenderVDPAU::IsMPEG4Available();
     if (test_cid == kCodec_H264_VDPAU)
         use_cpu |= !MythRenderVDPAU::H264DecoderSizeSupported(width, height);
-    if ((dec != "vdpau") || getenv("NO_VDPAU") || use_cpu)
+    if ((decoder != "vdpau") || getenv("NO_VDPAU") || use_cpu)
         return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 
     return test_cid;
@@ -1105,7 +1129,8 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
             QRect rect = GetPIPRect(loc, pipplayer);
 
             if (!m_pip_ready)
-                m_render->DrawBitmap(0, m_pip_surface, NULL, NULL, 0, 0, 0, 0);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, NULL,
+                                     kVDPBlendNull);
 
             uint32_t pitches[] = {
                 pipimage->pitches[0],
@@ -1126,7 +1151,7 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
                                        QRect(QPoint(0,0), pipVideoDim),
                                        rect, rect);
             ok &= m_render->DrawBitmap(0, m_pip_surface, NULL, &rect,
-                                       255, 0, 0, 0, true);
+                                       kVDPBlendPiP, 255);
 
             if (pipActive)
             {
@@ -1139,10 +1164,10 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
                                 QSize(rect.width(), 10));
                 QRect r = QRect(QPoint(rect.x() + rect.width(), rect.y() -10),
                                 QSize(10, rect.height() + 20));
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &l, 255, 127);
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &t, 255, 127);
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &b, 255, 127);
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &r, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &l, kVDPBlendNormal, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &t, kVDPBlendNormal, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &b, kVDPBlendNormal, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &r, kVDPBlendNormal, 255, 127);
             }
 
             m_pip_ready = ok;
@@ -1270,4 +1295,11 @@ bool VideoOutputVDPAU::GetScreenShot(int width, int height, QString filename)
     if (m_render)
         return m_render->GetScreenShot(width, height, filename);
     return false;
+}
+
+QStringList VideoOutputVDPAU::GetVisualiserList(void)
+{
+    if (m_render)
+        return VideoVisual::GetVisualiserList(m_render->Type());
+    return VideoOutput::GetVisualiserList();
 }

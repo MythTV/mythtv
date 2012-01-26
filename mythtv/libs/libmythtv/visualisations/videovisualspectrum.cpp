@@ -124,6 +124,13 @@ void VideoVisualSpectrum::Draw(const QRect &area, MythPainter *painter,
     DrawPriv(painter, device);
 }
 
+void VideoVisualSpectrum::prepare(void)
+{
+    for (int i = 0; i < m_magnitudes.size(); i++)
+        m_magnitudes[i] = 0.0;
+    VideoVisual::prepare();
+}
+
 void VideoVisualSpectrum::DrawPriv(MythPainter *painter, QPaintDevice* device)
 {
     static const QBrush brush(QColor(0, 0, 200, 180));
@@ -174,3 +181,21 @@ bool VideoVisualSpectrum::InitialisePriv(void)
         QString("Initialised Spectrum with %1 bars") .arg(m_scale.range()));
     return true;
 }
+
+static class VideoVisualSpectrumFactory : public VideoVisualFactory
+{
+  public:
+    const QString &name(void) const
+    {
+        static QString name("Spectrum");
+        return name;
+    }
+
+    VideoVisual *Create(AudioPlayer *audio,
+                        MythRender  *render) const
+    {
+        return new VideoVisualSpectrum(audio, render);
+    }
+
+    virtual bool SupportedRenderer(RenderType type) { return true; }
+} VideoVisualSpectrumFactory;

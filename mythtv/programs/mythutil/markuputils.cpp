@@ -6,7 +6,7 @@
 #include "mythlogging.h"
 
 // Local includes
-#include "mythutil.h"
+#include "markuputils.h"
 
 static int GetMarkupList(const MythUtilCommandLineParser &cmdline,
                          const QString type)

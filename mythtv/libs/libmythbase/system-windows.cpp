@@ -275,6 +275,16 @@ void MythSystemManager::run(void)
         ChildListRebuild();
         m_mapLock.unlock();
 
+        // Occasionally, the caller has deleted the structure from under
+        // our feet.  If so, just log and move on.
+        if (!ms)
+        {
+            LOG(VB_SYSTEM, LOG_ERR,
+                QString("Structure for child handle %1 already deleted!")
+                .arg((long long)child));
+            continue;
+        }
+
         listLock.lock();
         msList.append(ms);
 

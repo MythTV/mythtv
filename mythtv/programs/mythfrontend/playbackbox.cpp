@@ -269,6 +269,9 @@ static QString extract_main_state(const ProgramInfo &pginfo, const TV *player)
         state = "disabled";
     }
 
+    if (state == "normal" && (pginfo.GetVideoProperties() & VID_DAMAGED))
+        state = "warning";
+
     return state;
 }
 
@@ -1095,6 +1098,28 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         iconState->Reset();
 
     iconMap.clear();
+    iconMap["damaged"] = VID_DAMAGED;
+
+    iconState = dynamic_cast<MythUIStateType *>(GetChild("videoquality"));
+    haveIcon = false;
+    if (pginfo && iconState)
+    {
+        for (it = iconMap.begin(); it != iconMap.end(); ++it)
+        {
+            if (pginfo->GetVideoProperties() & (*it))
+            {
+                if (iconState->DisplayState(it.key()))
+                {
+                    haveIcon = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (iconState && !haveIcon)
+        iconState->Reset();
+    iconMap.clear();
     iconMap["deafsigned"] = SUB_SIGNED;
     iconMap["onscreensub"] = SUB_ONSCREEN;
     iconMap["subtitles"] = SUB_NORMAL;
@@ -1198,6 +1223,9 @@ void PlaybackBox::UpdateUIRecGroupList(void)
         QString key = (*it);
         QString tmp = (key == "All Programs") ? "All" : key;
         QString name = ProgramInfo::i18n(tmp);
+
+        if (m_recGroups.size() == 2 && key == "Default")
+            continue;  // All and Default will be the same, so only show All
 
         MythUIButtonListItem *item = new MythUIButtonListItem(
             m_recgroupList, name, qVariantFromValue(key));
@@ -4663,21 +4691,31 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         if (!newSubtitle.trimmed().isEmpty())
             tempSubTitle = QString("%1 - \"%2\"")
                             .arg(tempSubTitle).arg(newSubtitle);
-        QString seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                                             (newSeason, 2))
-                        .arg(GetDisplaySeasonEpisode(newEpisode, 2));
-        QString seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
-                                             (newSeason, 1))
-                        .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+
+        QString seasone;
+        QString seasonx;
+        QString season;
+        QString episode;
+        if (newSeason > 0 || newEpisode > 0)
+        {
+            season = GetDisplaySeasonEpisode(newSeason, 1);
+            episode = GetDisplaySeasonEpisode(newEpisode, 1);
+            seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                                                (newSeason, 2))
+                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+            seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
+                                                (newSeason, 1))
+                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+        }
 
         item->SetText(tempSubTitle, "titlesubtitle");
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
         item->SetText(newInetref, "inetref");
-        item->SetText(QString::number(newSeason), "season");
-        item->SetText(QString::number(newEpisode), "episode");
         item->SetText(seasonx, "00x00");
         item->SetText(seasone, "s00e00");
+        item->SetText(season, "season");
+        item->SetText(episode, "episode");
         if (newDescription != NULL)
             item->SetText(newDescription, "description");
     }

@@ -17,6 +17,7 @@ using namespace std;
 
 // MythTV
 #include <mythcontext.h>
+#include <compat.h> // For random() on MINGW32
 
 // MythMusic
 #include "metadata.h"

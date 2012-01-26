@@ -4,8 +4,8 @@
 
 #define LOC     QString("BDPlayer: ")
 
-MythBDPlayer::MythBDPlayer(bool muted)
-  : MythPlayer(muted), m_stillFrameShowing(false)
+MythBDPlayer::MythBDPlayer(PlayerFlags flags)
+  : MythPlayer(flags), m_stillFrameShowing(false)
 {
 }
 
@@ -67,7 +67,7 @@ bool MythBDPlayer::VideoLoop(void)
     if (drain)
     {
         if (nbframes < 2 && videoOutput)
-            videoOutput->UpdatePauseFrame();
+            videoOutput->UpdatePauseFrame(disp_timecode);
 
         // if we go below the pre-buffering limit, the player will pause
         // so do this 'manually'
@@ -87,7 +87,7 @@ bool MythBDPlayer::VideoLoop(void)
     {
         if (nbframes > 1 && !m_stillFrameShowing)
         {
-            videoOutput->UpdatePauseFrame();
+            videoOutput->UpdatePauseFrame(disp_timecode);
             DisplayNormalFrame(false);
             return !IsErrored();
         }
@@ -341,15 +341,12 @@ bool MythBDPlayer::PrevAngle(void)
     return SwitchAngle(prev);
 }
 
-void MythBDPlayer::CreateDecoder(char *testbuf, int testreadsize,
-                               bool allow_libmpeg2, bool no_accel)
+void MythBDPlayer::CreateDecoder(char *testbuf, int testreadsize)
 {
     if (AvFormatDecoderBD::CanHandle(testbuf, player_ctx->buffer->GetFilename(),
                                      testreadsize))
     {
         SetDecoder(new AvFormatDecoderBD(this, *player_ctx->playingInfo,
-                                         using_null_videoout,
-                                         allow_libmpeg2, no_accel,
-                                         player_ctx->GetSpecialDecode()));
+                                         playerFlags));
     }
 }

@@ -7,6 +7,7 @@
 #include <apeitem.h>
 
 #include <mythcontext.h>
+#include "musicutils.h"
 
 MetaIOWavPack::MetaIOWavPack(void)
     : MetaIOTagLib()
@@ -27,15 +28,16 @@ TagLib::WavPack::File *MetaIOWavPack::OpenFile(const QString &filename)
 {
     QByteArray fname = filename.toLocal8Bit();
     TagLib::WavPack::File *wpfile = new TagLib::WavPack::File(fname.constData());
-    
+
     if (!wpfile->isOpen())
     {
         delete wpfile;
         wpfile = NULL;
     }
-    
+
     return wpfile;
 }
+
 
 /*!
 * \copydoc MetaIO::write()
@@ -46,18 +48,18 @@ bool MetaIOWavPack::write(const Metadata* mdata)
         return false;
 
     TagLib::WavPack::File *wpfile = OpenFile(mdata->Filename());
-    
+
     if (!wpfile)
         return false;
-    
+
     TagLib::APE::Tag *tag = wpfile->APETag();
-    
+
     if (!tag)
     {
         delete wpfile;
         return false;
     }
-    
+
     WriteGenericMetadata(tag, mdata);
 
     // Compilation Artist ("Album artist")
@@ -85,22 +87,22 @@ bool MetaIOWavPack::write(const Metadata* mdata)
 Metadata* MetaIOWavPack::read(const QString &filename)
 {
     TagLib::WavPack::File *wpfile = OpenFile(filename);
-    
+
     if (!wpfile)
         return NULL;
-    
+
     TagLib::APE::Tag *tag = wpfile->APETag();
-    
+
     if (!tag)
     {
         delete wpfile;
         return NULL;
     }
-    
+
     Metadata *metadata = new Metadata(filename);
-    
+
     ReadGenericMetadata(tag, metadata);
-    
+
     bool compilation = false;
 
     // Compilation Artist ("Album artist")
@@ -118,6 +120,6 @@ Metadata* MetaIOWavPack::read(const QString &filename)
         metadata->setLength(getTrackLength(wpfile));
     else
         delete wpfile;
-    
+
     return metadata;
 }

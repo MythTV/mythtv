@@ -112,8 +112,8 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 {
     src_in = (float *)AOALIGN(src_in_buf);
     memset(&src_data,          0, sizeof(SRC_DATA));
-    memset(src_in,             0, sizeof(float) * kAudioSRCInputSize);
-    memset(audiobuffer,        0, sizeof(char)  * kAudioRingBufferSize);
+    memset(src_in_buf,         0, sizeof(src_in_buf));
+    memset(audiobuffer,        0, sizeof(audiobuffer));
 
     // Handle override of SRC quality settings
     if (gCoreContext->GetNumSetting("SRCQualityOverride", false))
@@ -369,6 +369,14 @@ float AudioOutputBase::GetStretchFactor(void) const
 }
 
 /**
+ * Source is currently being upmixed
+ */
+bool AudioOutputBase::IsUpmixing(void)
+{
+    return needs_upmix && upmixer;
+}
+
+/**
  * Toggle between stereo and upmixed 5.1 if the source material is stereo
  */
 bool AudioOutputBase::ToggleUpmix(void)
@@ -383,6 +391,15 @@ bool AudioOutputBase::ToggleUpmix(void)
                                  source_samplerate, passthru);
     Reconfigure(settings);
     return configured_channels == max_channels;
+}
+
+/**
+ * Upmixing of the current source is available if requested
+ */
+bool AudioOutputBase::CanUpmix(void)
+{
+    return needs_upmix && IS_VALID_UPMIX_CHANNEL(source_channels) &&
+           configured_channels > 2;
 }
 
 /*

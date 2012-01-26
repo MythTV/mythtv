@@ -25,6 +25,7 @@ using namespace std;
 #endif
 #include "firewirechannel.h"
 #include "mythcorecontext.h"
+#include "cetonchannel.h"
 #include "dummychannel.h"
 #include "tvremoteutil.h"
 #include "channelutil.h"
@@ -591,7 +592,7 @@ vector<InputInfo> ChannelBase::GetFreeInputs(
             info.inputid, groupids, excluded_cardids,
             busygrp, busyrec, busyin, info.mplexid);
 
-        if (!is_busy_grp)
+        if (!is_busy_grp && info.livetvorder)
             new_list.push_back(info);
     }
 
@@ -920,7 +921,7 @@ bool ChannelBase::InitializeInputs(void)
         "SELECT cardinputid, "
         "       inputname,   startchan, "
         "       tunechan,    externalcommand, "
-        "       sourceid "
+        "       sourceid,    livetvorder "
         "FROM cardinput "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
@@ -952,8 +953,8 @@ bool ChannelBase::InitializeInputs(void)
             query.value(1).toString(), query.value(2).toString(),
             query.value(3).toString(), query.value(4).toString(),
             sourceid,                  cardid,
-            query.value(0).toUInt(),   0,
-            channels);
+            query.value(0).toUInt(),   query.value(5).toUInt(),
+            0,                         channels);
 
         if (!IsExternalChannelChangeSupported() &&
             !m_inputs[query.value(0).toUInt()]->externalChanger.isEmpty())
@@ -968,9 +969,9 @@ bool ChannelBase::InitializeInputs(void)
     }
     ChannelUtil::SortChannels(m_allchannels, order, true);
 
-    m_currentInputID = GetDefaultInput(cardid);
+    m_currentInputID = GetStartInput(cardid);
 
-    // In case that defaultinput is not set
+    // In case that initial input is not set
     if (m_currentInputID == -1)
         m_currentInputID = GetNextInputNum();
 
@@ -1039,32 +1040,13 @@ void ChannelBase::StoreInputChannels(const InputMap &inputs)
     }
 }
 
-/** \fn ChannelBase::GetDefaultInput(uint)
+/** \fn ChannelBase::GetStartInput(uint)
  *  \brief Gets the default input for the cardid
  *  \param cardid ChannelBase::GetCardID()
  */
-int ChannelBase::GetDefaultInput(uint cardid)
+int ChannelBase::GetStartInput(uint cardid)
 {
-    return GetInputByName(CardUtil::GetDefaultInput(cardid));
-}
-
-/** \fn ChannelBase::StoreDefaultInput(uint, const QString&)
- *  \brief Sets default input for the cardid
- *  \param cardid ChannelBase::GetCardID()
- *  \param input  ChannelBase::GetCurrentInput()
- */
-void ChannelBase::StoreDefaultInput(uint cardid, const QString &input)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "UPDATE capturecard "
-        "SET defaultinput = :DEFAULTINPUT "
-        "WHERE cardid = :CARDID");
-    query.bindValue(":DEFAULTINPUT", input);
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("StoreDefaultInput", query);
+    return GetInputByName(CardUtil::GetStartInput(cardid));
 }
 
 bool ChannelBase::CheckChannel(const QString &channum,
@@ -1210,6 +1192,12 @@ ChannelBase *ChannelBase::CreateChannel(
         channel = new ASIChannel(tvrec, genOpt.videodev);
 #endif
     }
+    else if (genOpt.cardtype == "CETON")
+    {
+#ifdef USING_CETON
+        channel = new CetonChannel(tvrec, genOpt.videodev);
+#endif
+    }
     else if (CardUtil::IsV4L(genOpt.cardtype))
     {
 #ifdef USING_V4L2
@@ -1242,7 +1230,8 @@ ChannelBase *ChannelBase::CreateChannel(
         return NULL;
     }
 
-    QString input = genOpt.defaultinput, channum = startchannel;
+    QString input = CardUtil::GetStartInput(tvrec->GetCaptureCardNum());
+    QString channum = startchannel;
     channel->Init(input, channum, true);
 
     if (enter_power_save_mode)

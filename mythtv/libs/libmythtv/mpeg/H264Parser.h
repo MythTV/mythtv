@@ -160,9 +160,9 @@ class H264Parser {
 
     void use_I_forKeyframes(bool val) { I_is_keyframe = val; }
 
-    uint32_t GetTimeScale(void) { return( timeScale ); }
+    uint32_t GetTimeScale(void) const { return timeScale; }
 
-    uint32_t GetUnitsInTick(void) { return( unitsInTick ); }
+    uint32_t GetUnitsInTick(void) const { return unitsInTick; }
 
   private:
     enum constants {EXTENDED_SAR = 255};

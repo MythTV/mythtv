@@ -8,8 +8,6 @@
 // Bump Scope - Visualization Plugin for XMMS
 // Copyright (C) 1999-2001 Zinx Verituse
 
-#ifdef SDL_SUPPORT
-
 #include <cmath>
 #include <cstdlib>
 
@@ -18,97 +16,83 @@ using namespace std;
 
 #include <QPainter>
 
-BumpScope::BumpScope(long int winid) :
-    size(0,0),
+BumpScope::BumpScope() :
+    m_image(NULL),
 
-    surface(NULL),
+    m_size(0,0),
 
-    m_color(0x7ACCFF),
+    m_color(0x2050FF),
     m_x(0), m_y(0), m_width(800), m_height(600),
     m_phongrad(800),
 
-    color_cycle(true),
-    moving_light(true),
-    diamond(false),
+    m_color_cycle(true),
+    m_moving_light(true),
+    m_diamond(true),
 
-    bpl(0),
+    m_bpl(0),
 
-    rgb_buf(NULL),
+    m_rgb_buf(NULL),
 
-    iangle(0), ixo(0), iyo(0), ixd(0), iyd(0), ilx(0), ily(0),
-    was_moving(0), was_color(0),
-    ih(0.0), is(0.0), iv(0.0), isd(0.0), ihd(0),
-    icolor(0)
+    m_iangle(0), m_ixo(0), m_iyo(0), m_ixd(0), m_iyd(0), m_ilx(0), m_ily(0),
+    m_was_moving(0), m_was_color(0),
+    m_ih(0.0), m_is(0.0), m_iv(0.0), m_isd(0.0), m_ihd(0),
+    m_icolor(0)
 {
-    fps = 15;
+    m_fps = 15;
 
     for (unsigned int i = 255; i > 0; i--)
     {
-        intense1[i] = cos(((double)(255 - i) * M_PI) / 512.0);
-        intense2[i] = pow(intense1[i], 250) * 150;
+        m_intense1[i] = cos(((double)(255 - i) * M_PI) / 512.0);
+        m_intense2[i] = pow(m_intense1[i], 250) * 150;
     }
-    intense1[0] = intense1[1];
-    intense2[0] = intense2[1];
-
-    static char SDL_windowhack[32];
-    sprintf(SDL_windowhack, "SDL_WINDOWID=%ld", winid);
-    putenv(SDL_windowhack);
-
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Unable to init SDL");
-        return;
-    }
-
-    SDL_ShowCursor(0);
+    m_intense1[0] = m_intense1[1];
+    m_intense2[0] = m_intense2[1];
 }
 
 BumpScope::~BumpScope()
 {
-    if (rgb_buf)
-        delete [] rgb_buf;
+    if (m_rgb_buf)
+        delete [] m_rgb_buf;
 
-    for (unsigned int i = 0; i < phongdat.size(); i++)
-        phongdat[i].resize(0);
-    phongdat.resize(0);
+    if (m_image)
+        delete m_image;
 
-    SDL_Quit();
+    for (unsigned int i = 0; i < m_phongdat.size(); i++)
+        m_phongdat[i].resize(0);
+    m_phongdat.resize(0);
 }
 
 void BumpScope::resize(const QSize &newsize)
 {
-    size = newsize;
+    m_size = newsize;
 
-    size.setHeight((size.height() / 2) * 2);
-    size.setWidth((size.width() / 4) * 4);
+    m_size.setHeight((m_size.height() / 2) * 2);
+    m_size.setWidth((m_size.width() / 4) * 4);
 
-    if (rgb_buf)
-        delete [] rgb_buf;
+    if (m_rgb_buf)
+        delete [] m_rgb_buf;
 
-    int bufsize = (size.height() + 2) * (size.width() + 2);
+    int bufsize = (m_size.height() + 2) * (m_size.width() + 2);
 
-    rgb_buf = new unsigned char[bufsize];
+    m_rgb_buf = new unsigned char[bufsize];
 
-    bpl = size.width() + 2;
+    m_bpl = m_size.width() + 2;
 
-    surface = SDL_SetVideoMode(size.width(), size.height(), 8, 0);
+    if (m_image)
+        delete m_image;
 
-    if (!surface)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Couldn't get SDL surface");
-        return;
-    }
+    m_image = new QImage(m_size.width(), m_size.height(), QImage::Format_Indexed8);
 
-    m_width = size.width();
-    m_height = size.height();
+    m_width = m_size.width();
+    m_height = m_size.height();
     m_phongrad = m_width;
 
     m_x = m_width / 2;
     m_y = m_height;
-    
-    phongdat.resize(m_phongrad * 2);
-    for (unsigned int i = 0; i < phongdat.size(); i++)
-        phongdat[i].resize(m_phongrad * 2);
+
+    m_phongdat.resize(m_phongrad * 2);
+    for (unsigned int i = 0; i < m_phongdat.size(); i++)
+        m_phongdat[i].resize(m_phongrad * 2);
 
     generate_phongdat();
     generate_cmap(m_color);
@@ -123,7 +107,7 @@ void BumpScope::blur_8(unsigned char *ptr, int w, int h, int bpl)
 
     iptr = ptr + bpl + 1;
     i = bpl * h;
- 
+
     while (i--)
     {
         sum = (iptr[-bpl] + iptr[-1] + iptr[1] + iptr[bpl]) >> 2;
@@ -135,10 +119,9 @@ void BumpScope::blur_8(unsigned char *ptr, int w, int h, int bpl)
 
 void BumpScope::generate_cmap(unsigned int color)
 {
-    SDL_Color sdlPalette[256];
     unsigned int i, red, blue, green, r, g, b;
 
-    if (surface)
+    if (m_image)
     {
         red = (unsigned int)(color / 0x10000);
         green = (unsigned int)((color % 0x10000) / 0x100);
@@ -146,26 +129,20 @@ void BumpScope::generate_cmap(unsigned int color)
 
         for (i = 255; i > 0; i--)
         {
-             r = (unsigned int)(((double)(100 * Qt::red / 255) * intense1[i] + intense2[i]));
+             r = (unsigned int)(((double)(100 * red / 255) * m_intense1[i] + m_intense2[i]));
              if (r > 255) 
                  r = 255;
-             g = (unsigned int)(((double)(100 * Qt::green / 255) * intense1[i] + intense2[i]));
+             g = (unsigned int)(((double)(100 * green / 255) * m_intense1[i] + m_intense2[i]));
              if (g > 255) 
                  g = 255;
-             b = (unsigned int)(((double)(100 * Qt::blue / 255) * intense1[i] + intense2[i]));
+             b = (unsigned int)(((double)(100 * blue / 255) * m_intense1[i] + m_intense2[i]));
              if (b > 255) 
                  b = 255;
 
-             sdlPalette[i].r = r;
-             sdlPalette[i].g = g;
-             sdlPalette[i].b = b;
+             m_image->setColor(i, qRgba(r, g, b, 255));
          }
 
-         sdlPalette[0].r = sdlPalette[1].r;
-         sdlPalette[0].g = sdlPalette[1].g;
-         sdlPalette[0].b = sdlPalette[1].b;
-
-         SDL_SetColors(surface, sdlPalette, 0, 256);
+         m_image->setColor(0, m_image->color(1));
     }
 }
 
@@ -183,14 +160,14 @@ void BumpScope::generate_phongdat(void)
             i = (double)x / ((double)m_phongrad) - 1;
             i2 = (double)y / ((double)m_phongrad) - 1;
 
-            if (diamond)
+            if (m_diamond)
                i = 1 - pow(i*i2,.75) - i*i - i2*i2;
             else
                i = 1 - i*i - i2*i2;
 
             if (i >= 0) 
             {
-                if (diamond)
+                if (m_diamond)
                     i = i*i*i * 255.0;
                 else
                     i = i*i*i * 255.0;
@@ -199,17 +176,17 @@ void BumpScope::generate_phongdat(void)
                     i = 255;
                 unsigned char uci = (unsigned char)i;
 
-                phongdat[y][x] = uci;
-                phongdat[(PHONGRES-1)-y][x] = uci;
-                phongdat[y][(PHONGRES-1)-x] = uci;
-                phongdat[(PHONGRES-1)-y][(PHONGRES-1)-x] = uci;
+                m_phongdat[y][x] = uci;
+                m_phongdat[(PHONGRES-1)-y][x] = uci;
+                m_phongdat[y][(PHONGRES-1)-x] = uci;
+                m_phongdat[(PHONGRES-1)-y][(PHONGRES-1)-x] = uci;
             } 
             else 
             {
-                phongdat[y][x] = 0;
-                phongdat[(PHONGRES-1)-y][x] = 0;
-                phongdat[y][(PHONGRES-1)-x] = 0;
-                phongdat[(PHONGRES-1)-y][(PHONGRES-1)-x] = 0;
+                m_phongdat[y][x] = 0;
+                m_phongdat[(PHONGRES-1)-y][x] = 0;
+                m_phongdat[y][(PHONGRES-1)-x] = 0;
+                m_phongdat[(PHONGRES-1)-y][(PHONGRES-1)-x] = 0;
             }
         }
     }
@@ -273,24 +250,24 @@ inline void BumpScope::draw_vert_line(unsigned char *buffer, int x, int y1,
 
     if (y1 < y2)
     {
-        p = buffer + ((y1 + 1) * bpl) + x + 1;
+        p = buffer + ((y1 + 1) * m_bpl) + x + 1;
         for (y = y1; y <= y2; y++)
         {
             *p = 0xff;
-            p += bpl;
+            p += m_bpl;
         }
     }
     else if (y2 < y1)
     {
-        p = buffer + ((y2 + 1) * bpl) + x + 1;
+        p = buffer + ((y2 + 1) * m_bpl) + x + 1;
         for (y = y2; y <= y1; y++)
         {
             *p = 0xff;
-            p += bpl;
+            p += m_bpl;
         }
     }
     else
-        buffer[((y1 + 1) * bpl) + x + 1] = 0xff;
+        buffer[((y1 + 1) * m_bpl) + x + 1] = 0xff;
 }
 
 void BumpScope::render_light(int lx, int ly)
@@ -299,18 +276,18 @@ void BumpScope::render_light(int lx, int ly)
     unsigned int PHONGRES = m_phongrad * 2;
     unsigned int i, j;
 
-    prev_y = bpl + 1;
+    prev_y = m_bpl + 1;
     out_y = 0;
-    unsigned char *outputbuf = (unsigned char *)(surface->pixels);
+    unsigned char *outputbuf = (unsigned char *)(m_image->bits());
 
     for (dy = (-ly) + (PHONGRES / 2), j = 0; j < m_height; j++, dy++,
-         prev_y += bpl - m_width)
+         prev_y += m_bpl - m_width)
     {
         for (dx = (-lx) + (PHONGRES / 2), i = 0; i < m_width; i++, dx++,
              prev_y++, out_y++)
         {
-            xp = (rgb_buf[prev_y - 1] - rgb_buf[prev_y + 1]) + dx;
-            yp = (rgb_buf[prev_y - bpl] - rgb_buf[prev_y + bpl]) + dy;
+            xp = (m_rgb_buf[prev_y - 1] - m_rgb_buf[prev_y + 1]) + dx;
+            yp = (m_rgb_buf[prev_y - m_bpl] - m_rgb_buf[prev_y + m_bpl]) + dy;
 
             if (yp < 0 || yp >= (int)PHONGRES ||
                 xp < 0 || xp >= (int)PHONGRES)
@@ -319,7 +296,7 @@ void BumpScope::render_light(int lx, int ly)
                 continue;
             }
 
-            outputbuf[out_y] = phongdat[yp][xp];
+            outputbuf[out_y] = m_phongdat[yp][xp];
         }
     }
 }
@@ -399,8 +376,8 @@ void BumpScope::hsv_to_rgb(double h, double s, double v, unsigned int *color)
 
 bool BumpScope::process(VisualNode *node)
 {
-    if (!node || node->length == 0 || !surface)
-        return true;
+    if (!node || node->length == 0 || !m_image)
+        return false;
 
     int numSamps = 512;
     if (node->length < 512)
@@ -427,157 +404,155 @@ bool BumpScope::process(VisualNode *node)
         if (y >= (int)m_height)
             y = m_height - 1;
 
-        draw_vert_line(rgb_buf, i, prev_y, y);
+        draw_vert_line(m_rgb_buf, i, prev_y, y);
         prev_y = y;
     }
 
-    blur_8(rgb_buf, m_width, m_height, bpl);
+    blur_8(m_rgb_buf, m_width, m_height, m_bpl);
+
     return false;
 }
 
 bool BumpScope::draw(QPainter *p, const QColor &back)
 {
-    (void)p;
-    (void)back;
-
-    if (!surface)
+    if (!m_image || m_image->isNull())
     {
-        LOG(VB_GENERAL, LOG_ERR, "No sdl surface");
+        LOG(VB_GENERAL, LOG_ERR, "BumpScope::draw: Bad image");
         return false;
     }
 
-    ilx = m_x;
-    ily = m_y;
+    m_ilx = m_x;
+    m_ily = m_y;
 
-    if (moving_light)
+    if (m_moving_light)
     {
-        if (!was_moving)
+        if (!m_was_moving)
         {
-            translate(ilx, ily, &ixo, &iyo, &ixd, &iyd, &iangle);
-            was_moving = 1;
+            translate(m_ilx, m_ily, &m_ixo, &m_iyo, &m_ixd, &m_iyd, &m_iangle);
+            m_was_moving = 1;
         }
- 
-        ilx = (int)(m_width / 2 + cos(iangle * (M_PI / 180.0)) * ixo);
-        ily = (int)(m_height / 2 + sin(iangle * (M_PI / 180.0)) * iyo);
- 
-        iangle += 2;
-        if (iangle >= 360)
-            iangle = 0;
 
-        ixo += ixd;
-        if ((int)ixo > ((int)m_width / 2) || (int)ixo < -((int)m_width / 2))
+        m_ilx = (int)(m_width / 2 + cos(m_iangle * (M_PI / 180.0)) * m_ixo);
+        m_ily = (int)(m_height / 2 + sin(m_iangle * (M_PI / 180.0)) * m_iyo);
+ 
+        m_iangle += 2;
+        if (m_iangle >= 360)
+            m_iangle = 0;
+
+        m_ixo += m_ixd;
+        if ((int)m_ixo > ((int)m_width / 2) || (int)m_ixo < -((int)m_width / 2))
         {
-            ixo = (ixo > 0) ? (m_width / 2) : -(m_width / 2);
+            m_ixo = (m_ixo > 0) ? (m_width / 2) : -(m_width / 2);
             if (random() & 1)
             {
-                ixd = (ixd > 0) ? -1 : 1;
-                iyd = 0;
+                m_ixd = (m_ixd > 0) ? -1 : 1;
+                m_iyd = 0;
             }
             else
             {
-                iyd = (iyd > 0) ? -1 : 1;
-                ixd = 0;
+                m_iyd = (m_iyd > 0) ? -1 : 1;
+                m_ixd = 0;
             }
         }
 
-        iyo += iyd;
-        if ((int)iyo > ((int)m_height / 2) || (int)iyo < -((int)m_height / 2))
+        m_iyo += m_iyd;
+        if ((int)m_iyo > ((int)m_height / 2) || (int)m_iyo < -((int)m_height / 2))
         {
-            iyo = (iyo > 0) ? (m_height / 2) : -(m_height / 2);
+            m_iyo = (m_iyo > 0) ? (m_height / 2) : -(m_height / 2);
             if (random() & 1)
             {
-                ixd = (ixd > 0) ? -1 : 1;
-                iyd = 0;
+                m_ixd = (m_ixd > 0) ? -1 : 1;
+                m_iyd = 0;
             }
             else
             {
-                iyd = (iyd > 0) ? -1 : 1;
-                ixd = 0;
+                m_iyd = (m_iyd > 0) ? -1 : 1;
+                m_ixd = 0;
             }
         }
     }
 
-    if (color_cycle)
+    if (m_color_cycle)
     {
-        if (!was_color)
+        if (!m_was_color)
         {
-            rgb_to_hsv(m_color, &ih, &is, &iv);
-            was_color = 1;
+            rgb_to_hsv(m_color, &m_ih, &m_is, &m_iv);
+            m_was_color = 1;
 
             if (random() & 1)
             {
-                ihd = (random() & 1) * 2 - 1;
-                isd = 0;
+                m_ihd = (random() & 1) * 2 - 1;
+                m_isd = 0;
             }
             else
             {
-                isd = 0.01 * ((random() & 1) * 2 - 1);
-                ihd = 0;
+                m_isd = 0.01 * ((random() & 1) * 2 - 1);
+                m_ihd = 0;
             }
         }
 
-        hsv_to_rgb(ih, is, iv, &icolor);
+        hsv_to_rgb(m_ih, m_is, m_iv, &m_icolor);
 
-        generate_cmap(icolor);
+        generate_cmap(m_icolor);
 
-        if (ihd)
+        if (m_ihd)
         {
-            ih += ihd;
-            if (ih >= 360)
-                ih = 0;
-            if (ih < 0)
-                ih = 359;
+            m_ih += m_ihd;
+            if (m_ih >= 360)
+                m_ih = 0;
+            if (m_ih < 0)
+                m_ih = 359;
             if ((random() % 150) == 0)
             {
                 if (random() & 1) 
                 {
-                    ihd = (random() & 1) * 2 - 1;
-                    isd = 0;
+                    m_ihd = (random() & 1) * 2 - 1;
+                    m_isd = 0;
                 }
                 else
                 {
-                    isd = 0.01 * ((random() & 1) * 2 - 1);
-                    ihd = 0;
+                    m_isd = 0.01 * ((random() & 1) * 2 - 1);
+                    m_ihd = 0;
                 }
             }
         }
         else
         {
-            is += isd;
+            m_is += m_isd;
 
-            if (is <= 0 || is >= 0.5)
+            if (m_is <= 0 || m_is >= 0.5)
             {
-                if (is < 0)
-                    is = 0;
-                if (is > 0.52)
-                    isd = -0.01;
-                else if (is == 0)
+                if (m_is < 0)
+                    m_is = 0;
+                if (m_is > 0.52)
+                    m_isd = -0.01;
+                else if (m_is == 0)
                 {
-                    ihd = random() % 360;
-                    isd = 0.01;
+                    m_ihd = random() % 360;
+                    m_isd = 0.01;
                 }
                 else
                 {
                     if (random() & 1)
                     {
-                        ihd = (random() & 1) * 2 - 1;
-                        isd = 0;
+                        m_ihd = (random() & 1) * 2 - 1;
+                        m_isd = 0;
                     }
                     else
                     {
-                        isd = 0.01 * ((random() & 1) * 2 - 1);
-                        ihd = 0;
+                        m_isd = 0.01 * ((random() & 1) * 2 - 1);
+                        m_ihd = 0;
                     }
                 }
             }
         }
     }
 
-    render_light(ilx, ily);
+    render_light(m_ilx, m_ily);
 
-    SDL_UpdateRect(surface, 0, 0, 0, 0);
+    p->drawImage(0, 0, *m_image);
 
-    return false;
+    return true;
 }
 
 static class BumpScopeFactory : public VisFactory
@@ -595,12 +570,10 @@ static class BumpScopeFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    VisualBase *create(MainVisual *parent, const QString &pluginName) const
     {
         (void)parent;
         (void)pluginName;
-        return new BumpScope(winid);
+        return new BumpScope();
     }
 }BumpScopeFactory;
-
-#endif

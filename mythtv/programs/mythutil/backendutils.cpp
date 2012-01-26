@@ -5,7 +5,7 @@
 #include "remoteutil.h"
 
 // local headers
-#include "mythutil.h"
+#include "backendutils.h"
 
 static int RawSendEvent(const QString &eventString)
 {
@@ -14,7 +14,7 @@ static int RawSendEvent(const QString &eventString)
 
     if (gCoreContext->ConnectToMasterServer(false, false))
     {
-        RemoteSendMessage(eventString);
+        gCoreContext->SendMessage(eventString);
         return GENERIC_EXIT_OK;
     }
     return GENERIC_EXIT_CONNECT_ERROR;
@@ -24,7 +24,7 @@ static int ClearSettingsCache(const MythUtilCommandLineParser &cmdline)
 {
     if (gCoreContext->ConnectToMasterServer(false, false))
     {
-        RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+        gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
         LOG(VB_GENERAL, LOG_INFO, "Sent CLEAR_SETTINGS_CACHE message");
         return GENERIC_EXIT_OK;
     }

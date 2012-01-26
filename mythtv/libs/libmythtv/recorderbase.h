@@ -5,11 +5,13 @@
 #include <stdint.h>
 
 #include <QWaitCondition>
+#include <QDateTime>
 #include <QRunnable>
 #include <QString>
 #include <QMutex>
 #include <QMap>
 
+#include "recordingquality.h"
 #include "programtypes.h" // for MarkTypes, frm_pos_map_t
 #include "mythtimer.h"
 #include "mythtvexp.h"
@@ -175,6 +177,9 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     virtual bool IsRecording(void);
     virtual bool IsRecordingRequested(void);
 
+    /// \brief Returns a report about the current recordings quality.
+    virtual RecordingQuality *GetRecordingQuality(void) const;
+
     // pausing interface
     virtual void Pause(bool clear = true);
     virtual void Unpause(void);
@@ -225,6 +230,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     virtual bool PauseAndWait(int timeout = 100);
 
     virtual void ResetForNewFile(void) = 0;
+    virtual void ClearStatistics(void);
     virtual void FinishRecording(void) = 0;
     virtual void StartNewFile(void) { }
 
@@ -291,6 +297,16 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     frm_pos_map_t  positionMap;
     frm_pos_map_t  positionMapDelta;
     MythTimer      positionMapTimer;
+
+    // Statistics
+    // Note: Once we enter RecorderBase::run(), only that thread can
+    // update these values safely. These values are read in that thread
+    // without locking and updated with the lock held. Outside that
+    // thread these values are only read, and only with the lock held.
+    mutable QMutex statisticsLock;
+    QDateTime      timeOfFirstData;
+    QDateTime      timeOfLatestData; // updated every 5 seconds
+    RecordingGaps  recordingGaps;
 };
 
 #endif

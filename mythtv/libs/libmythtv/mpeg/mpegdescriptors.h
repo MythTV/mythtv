@@ -69,7 +69,7 @@ class DescriptorID
         // DVB
         network_name                = 0x40, /* implemented */
         service_list                = 0x41, /* implemented */
-        dvb_stuffing                = 0x42,
+        dvb_stuffing                = 0x42, /* implemented */
         satellite_delivery_system   = 0x43, /* implemented */
         cable_delivery_system       = 0x44, /* implemented */
         vbi_data                    = 0x45, /* partial */
@@ -135,8 +135,6 @@ class DescriptorID
         // ATSC
         atsc_stuffing               = 0x80,
         ac3_audio_stream            = 0x81, /* partial */
-        scte_frame_rate             = 0x82,
-        scte_component_name         = 0x84,
         atsc_program_identifier     = 0x85,
         caption_service             = 0x86, /* implemented */
         content_advisory            = 0x87,
@@ -144,7 +142,14 @@ class DescriptorID
         atsc_descriptor_tag         = 0x89,
 
         // SCTE
+        scte_frame_rate             = 0x82, /* implemented, also ATSC */
+        scte_extended_video         = 0x83, /* implemented, also ATSC */
+        scte_component_name         = 0x84, /* implemented, also ATSC */
         scte_cue_identifier         = 0x8A, /* implemented */
+        scte_frequency_spec         = 0x90, /* implemented */
+        scte_modulation_params      = 0x91, /* implemented */
+        scte_transport_stream_id    = 0x92, /* implemented */
+        scte_revision_detection     = 0x93, /* implemented */
 
         // ATSC
         extended_channel_name       = 0xA0, /* implemented */
@@ -201,8 +206,6 @@ class MPEGDescriptor
     {
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
             _data = NULL;
-        else if (!Parse())
-            _data = NULL;
     }
     MPEGDescriptor(const unsigned char *data,
                    int len, uint tag) : _data(data)
@@ -210,8 +213,6 @@ class MPEGDescriptor
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
             _data = NULL;
         else if (DescriptorTag() != tag)
-            _data = NULL;
-        else if (!Parse())
             _data = NULL;
     }
     MPEGDescriptor(const unsigned char *data,
@@ -222,8 +223,6 @@ class MPEGDescriptor
         else if (DescriptorTag() != tag)
             _data = NULL;
         else if (DescriptorLength() != req_desc_len)
-            _data = NULL;
-        else if (!Parse())
             _data = NULL;
     }
     virtual ~MPEGDescriptor() {}
@@ -253,8 +252,6 @@ class MPEGDescriptor
         const desc_list_t &parsed, uint desc_tag, QMap<uint,uint> &langPref);
 
   protected:
-    virtual bool Parse(void) { return true; }
-
     const unsigned char *_data;
 };
 
@@ -263,7 +260,13 @@ class RegistrationDescriptor : public MPEGDescriptor
 {
   public:
     RegistrationDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::registration, 4) { }
+        MPEGDescriptor(data, len, DescriptorID::registration)
+    {
+        // The HD-PVR outputs a registration descriptor with a length
+        // of 8 rather than 4, so we accept any length >= 4, not just 4.
+        if (DescriptorLength() < 4)
+            _data = NULL;
+    }
 
     uint FormatIdentifier(void) const
         { return (_data[2]<<24) | (_data[3]<<16) | (_data[4]<<8) | _data[5]; }
@@ -341,6 +344,8 @@ class AVCVideoDescriptor : public MPEGDescriptor
     bool AVCStill(void)           const { return _data[5]&0x80; }
     // AVC_24_hour_picture_flag 1   5.1
     bool AVC24HourPicture(void)   const { return _data[5]&0x40; }
+    bool FramePackingSEINotPresentFlag(void)
+                                  const { return _data[5]&0x20; }
     // reserved 6 bslbf
     QString toString() const;
 };

@@ -62,6 +62,7 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 #include <fstab.h>
 #elif defined(__linux__)
 #include <mntent.h>
+#include <paths.h>
 #endif
 
 #include "dvdread/dvd_udf.h"
@@ -509,7 +510,7 @@ dvd_reader_t *DVDOpen( const char *ppath )
       fclose( mntfile );
     }
 #elif defined(__linux__)
-    mntfile = fopen( MOUNTED, "r" );
+    mntfile = fopen( _PATH_MOUNTED, "r" );
     if( mntfile ) {
       struct mntent *me;
 

@@ -461,7 +461,7 @@ void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
     // get the filename from the url if available
     QFileInfo fi(request.url().path());
     QString basename(fi.completeBaseName());
-    QString extension = fi.suffix();
+    QString extension = fi.suffix().toLower();
     QString mimetype = getReplyMimetype();
 
     // if we have a default filename use that
@@ -470,7 +470,7 @@ void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
     if (!m_parentBrowser->GetDefaultSaveFilename().isEmpty())
     {
         QFileInfo savefi(m_parentBrowser->GetDefaultSaveFilename());
-        saveBaseName = savefi.baseName();
+        saveBaseName = savefi.completeBaseName();
     }
 
     // if the filename is still empty use a default name

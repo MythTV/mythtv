@@ -106,7 +106,7 @@ bool MythUIGuideGrid::ParseElement(
     {
         m_channelCount = getFirstText(element).toInt();
         m_channelCount = max(m_channelCount, 1);
-        m_channelCount = min(m_channelCount, 12);
+        m_channelCount = min(m_channelCount, MAX_DISPLAY_CHANS);
     }
     else if (element.tagName() == "timeslots")
     {

@@ -1,0 +1,109 @@
+// Qt
+#include <QString>
+
+// MythTV
+#include <mythcorecontext.h>
+
+#include "visualizationsettings.h"
+
+VisualizationSettings::VisualizationSettings(MythScreenStack *parent, const char *name)
+    : MythScreenType(parent, name),
+    m_changeOnSongChange(NULL),
+    m_randomizeOrder(NULL),
+    m_scaleWidth(NULL),
+    m_scaleHeight(NULL),
+    m_saveButton(NULL),
+    m_cancelButton(NULL)
+{
+}
+
+VisualizationSettings::~VisualizationSettings()
+{
+
+}
+
+bool VisualizationSettings::Create()
+{
+    bool err = false;
+
+    // Load the theme for this screen
+    if (!LoadWindowFromXML("musicsettings-ui.xml", "visualizationsettings", this))
+        return false;
+
+    UIUtilE::Assign(this, m_changeOnSongChange, "cycleonsongchange", &err);
+    UIUtilE::Assign(this, m_randomizeOrder, "randomizeorder", &err);
+    UIUtilE::Assign(this, m_scaleWidth, "scalewidth", &err);
+    UIUtilE::Assign(this, m_scaleHeight, "scaleheight", &err);
+    UIUtilE::Assign(this, m_helpText, "helptext", &err);
+    UIUtilE::Assign(this, m_saveButton, "save", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
+
+    int changeOnSongChange = gCoreContext->GetNumSetting("VisualCycleOnSongChange", 0);
+    if (changeOnSongChange == 1)
+        m_changeOnSongChange->SetCheckState(MythUIStateType::Full);
+    int randomizeorder = gCoreContext->GetNumSetting("VisualRandomize", 0);
+    if (randomizeorder == 1)
+        m_randomizeOrder->SetCheckState(MythUIStateType::Full);
+
+    m_scaleWidth->SetRange(1,2,1);
+    m_scaleWidth->SetValue(gCoreContext->GetNumSetting("VisualScaleWidth"));
+    m_scaleHeight->SetRange(1,2,1);
+    m_scaleHeight->SetValue(gCoreContext->GetNumSetting("VisualScaleHeight"));
+
+    connect(m_changeOnSongChange, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    connect(m_randomizeOrder, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    connect(m_scaleWidth, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    connect(m_scaleHeight, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+
+
+    connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
+    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
+
+    BuildFocusList();
+
+    SetFocusWidget(m_cancelButton);
+
+    return true;
+}
+
+void VisualizationSettings::slotSave(void)
+{
+    int changeOnSongChange = (m_changeOnSongChange->GetCheckState() == MythUIStateType::Full) ? 1 : 0;
+    gCoreContext->SaveSetting("VisualCycleOnSongChange", changeOnSongChange);
+    int randomizeorder = (m_randomizeOrder->GetCheckState() == MythUIStateType::Full) ? 1 : 0;
+    gCoreContext->SaveSetting("VisualRandomize", randomizeorder);
+
+    gCoreContext->SaveSetting("VisualScaleWidth", m_scaleWidth->GetIntValue());
+    gCoreContext->SaveSetting("VisualScaleHeight", m_scaleHeight->GetIntValue());
+
+    Close();
+}
+
+void VisualizationSettings::slotFocusChanged(void)
+{
+    if (!m_helpText)
+        return;
+
+    QString msg = "";
+    if (GetFocusWidget() == m_changeOnSongChange)
+        msg = tr("Change the visualizer when the song changes.");
+    else if (GetFocusWidget() == m_randomizeOrder)
+        msg = tr("On changing the visualizer pick a new one at random.");
+    else if (GetFocusWidget() == m_scaleWidth)
+        msg = tr("If set to \"2\", visualizations will be "
+                 "scaled in half. Currently only used by "
+                 "the goom visualization. Reduces CPU load "
+                 "on slower machines.");
+    else if (GetFocusWidget() == m_scaleHeight)
+        msg = tr("If set to \"2\", visualizations will be "
+                 "scaled in half. Currently only used by "
+                 "the goom visualization. Reduces CPU load "
+                 "on slower machines.");
+    else if (GetFocusWidget() == m_cancelButton)
+        msg = tr("Exit without saving settings");
+    else if (GetFocusWidget() == m_saveButton)
+        msg = tr("Save settings and Exit");
+
+    m_helpText->SetText(msg);
+}
+

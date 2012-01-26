@@ -6,6 +6,7 @@
 #include "sctedescriptors.h"
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
+#include "util.h" // for xml_indent
 
 QMutex                RegistrationDescriptor::description_map_lock;
 bool                  RegistrationDescriptor::description_map_initialized = false;
@@ -51,6 +52,8 @@ desc_list_t MPEGDescriptor::ParseAndExclude(
     return tmp;
 }
 
+#include "mythlogging.h"
+
 desc_list_t MPEGDescriptor::ParseOnlyInclude(
     const unsigned char *data, uint len, int excluded_descid)
 {
@@ -68,7 +71,6 @@ desc_list_t MPEGDescriptor::ParseOnlyInclude(
             break;
         }
         off += desc.size();
-        off += desc.DescriptorLength() + 2;
     }
     return tmp;
 }
@@ -274,25 +276,32 @@ const char *descriptor_tag_strings[256] =
     /* 0x7E */ "",                      /* 0x7F */ "",
 
     /* 0x80 */ "ATSC Stuffing",         /* 0x81 */ "AC-3 Audio",
-    /* 0x82 */ "SCTE Frame Rate",       /* 0x83 */ "",
+    /* 0x82 */ "SCTE Frame Rate",       /* 0x83 */ "SCTE Extended Video",
     /* 0x84 */ "SCTE Component Name",   /* 0x85 */ "ATSC Program Identifier",
     /* 0x86 */ "Caption Service",       /* 0x87 */ "Content Advisory",
     /* 0x88 */ "ATSC CA Descriptor",    /* 0x89 */ "ATSC Descriptor Tag",
     /* 0x8A */ "SCTE CUE Identifier",   /* 0x8B */ "",
-    /* 0x8C */ "",                      /* 0x8D */ "",
+    /* 0x8C */ "TimeStamp",             /* 0x8D */ "",
     /* 0x8E */ "",                      /* 0x8F */ "",
 
-    /* 0x90-0x9F */ EMPTY_STR_16
+    /* 0x90 */ "SCTE Frequency Spec",   /* 0x91 */ "SCTE Modulation Params",
+    /* 0x92 */ "SCTE TSID",             /* 0x93 */ "SCTE Revision Detection",
+    /* 0x94 */ "SCTE Two part channel", /* 0x95 */ "SCTE Channel Properties",
+    /* 0x96 */ "SCTE Daylight Savings", /* 0x97 */ "SCTE AFD",
+    /* 0x98 */ "", /* 0x99 */ "",
+    /* 0x9A */ "", /* 0x9B */ "",
+    /* 0x9C */ "", /* 0x9D */ "",
+    /* 0x9E */ "", /* 0x9F */ "",
 
     /* 0xA0 */ "Extended Channel Name", /* 0xA1 */ "Service Location",
-    /* 0xA2 */ "ATSC Time-shifted Service", /* 0xA3 */ "Component Name",
+    /* 0xA2 */ "ATSC Time-shifted Service",/*0xA3*/"Component Name",
     /* 0xA4 */ "ATSC Data Service",     /* 0xA5 */ "ATSC PID Count",
     /* 0xA6 */ "ATSC Download",
     /* 0xA7 */ "ATSC Multiprotocol Encapsulation",
     /* 0xA8 */ "DCC Departing Request", /* 0xA9 */ "DCC Arriving Request",
-    /* 0xAA */ "Consumer Restrictions Control", /* 0xAB */ "ATSC Genre",
-    /* 0xAC */ "",                      /* 0xAD */ "ATSC Private Information",
-    /* 0xAE */ "",                      /* 0xAF */ "",
+    /* 0xAA */ "ATSC Restrictions Control",/*0xAB*/"ATSC Genre",
+    /* 0xAC */ "SCTE MAC Address List", /* 0xAD */ "ATSC Private Information",
+    /* 0xAE */ "ATSC Compatibility Wrap",/* 0xAF */"ATSC Broadcaster Policy",
 
     /* 0xB0 */ "", /* 0xB1 */ "",
     /* 0xB2 */ "", /* 0xB3 */ "",
@@ -364,84 +373,67 @@ QString MPEGDescriptor::DescriptorTagString(void) const
     return str;
 }
 
+#define SET_STRING(DESC_NAME) do { \
+    if (IsValid()) { DESC_NAME d(_data, DescriptorLength()+2); \
+    if (d.IsValid()) str = d.toString(); } } while (0)
+
 QString MPEGDescriptor::toString() const
 {
     QString str;
 
     if (DescriptorID::registration == DescriptorTag())
-        str = RegistrationDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(RegistrationDescriptor);
     else if (DescriptorID::iso_639_language == DescriptorTag())
-        str = ISO639LanguageDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ISO639LanguageDescriptor);
     else if (DescriptorID::avc_video == DescriptorTag())
-        str = AVCVideoDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(AVCVideoDescriptor);
     else if (DescriptorID::ac3_audio_stream == DescriptorTag())
-        str = AudioStreamDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(AudioStreamDescriptor);
     else if (DescriptorID::caption_service == DescriptorTag())
-        str = CaptionServiceDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(CaptionServiceDescriptor);
     else if (DescriptorID::extended_channel_name == DescriptorTag())
-        str = ExtendedChannelNameDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ExtendedChannelNameDescriptor);
     else if (DescriptorID::component_name == DescriptorTag())
-        str = ComponentNameDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ComponentNameDescriptor);
     else if (DescriptorID::conditional_access == DescriptorTag())
-        str = ConditionalAccessDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ConditionalAccessDescriptor);
     else if (DescriptorID::network_name == DescriptorTag())
-        str = NetworkNameDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(NetworkNameDescriptor);
     else if (DescriptorID::linkage == DescriptorTag())
-        str = LinkageDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(LinkageDescriptor);
     else if (DescriptorID::adaptation_field_data == DescriptorTag())
-        str = AdaptationFieldDataDescriptor(
-            _data, DescriptorLength()+2).toString();
-    else if (DescriptorID::ancillary_data == DescriptorTag())
-        str = AncillaryDataDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(AdaptationFieldDataDescriptor);
+    //else if (DescriptorID::ancillary_data == DescriptorTag())
+    //    SET_STRING(AncillaryDataDescriptor);
     else if (DescriptorID::cable_delivery_system == DescriptorTag())
-        str = CableDeliverySystemDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(CableDeliverySystemDescriptor);
     else if (DescriptorID::satellite_delivery_system == DescriptorTag())
-        str = SatelliteDeliverySystemDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(SatelliteDeliverySystemDescriptor);
     else if (DescriptorID::terrestrial_delivery_system == DescriptorTag())
-        str = TerrestrialDeliverySystemDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(TerrestrialDeliverySystemDescriptor);
     else if (DescriptorID::frequency_list == DescriptorTag())
-        str = FrequencyListDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(FrequencyListDescriptor);
     else if (DescriptorID::service == DescriptorTag())
-        str = ServiceDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ServiceDescriptor);
     else if (DescriptorID::stream_identifier == DescriptorTag())
-        str = StreamIdentifierDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(StreamIdentifierDescriptor);
     else if (DescriptorID::default_authority == DescriptorTag())
-        str = DefaultAuthorityDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(DefaultAuthorityDescriptor);
     else if (DescriptorID::bouquet_name == DescriptorTag())
-        str = BouquetNameDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(BouquetNameDescriptor);
     else if (DescriptorID::country_availability == DescriptorTag())
-        str = CountryAvailabilityDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(CountryAvailabilityDescriptor);
     else if (DescriptorID::service_list == DescriptorTag())
-        str = ServiceListDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(ServiceListDescriptor);
     else if (DescriptorID::scte_cue_identifier == DescriptorTag())
-        str = CueIdentifierDescriptor(
-            _data, DescriptorLength()+2).toString();
+        SET_STRING(CueIdentifierDescriptor);
+    else if (DescriptorID::scte_revision_detection == DescriptorTag())
+        SET_STRING(RevisionDetectionDescriptor);
     /// POSSIBLY UNSAFE ! -- begin
     else if (PrivateDescriptorID::dvb_uk_channel_list == DescriptorTag())
-        str = UKChannelListDescriptor(_data, DescriptorLength()+2).toString();
+        SET_STRING(UKChannelListDescriptor);
     /// POSSIBLY UNSAFE ! -- end
-    else
+    else if (IsValid())
     {
         str = QString("%1 Descriptor (0x%2) length(%3)")
             .arg(DescriptorTagString())
@@ -450,40 +442,40 @@ QString MPEGDescriptor::toString() const
         //for (uint i=0; i<DescriptorLength(); i++)
         //    str.append(QString(" 0x%1").arg(int(_data[i+2]), 0, 16));
     }
+    else
+    {
+        str = "Invalid Descriptor";
+    }
     return str;
-}
-
-static inline QString indent(uint level)
-{
-    QString ret;
-    for (uint i = 0; i < level; i++)
-        ret += "  ";
-    return ret;
 }
 
 /// Returns XML representation of string the TS Reader XML format.
 /// When possible matching http://www.tsreader.com/tsreader/text-export.html
 QString MPEGDescriptor::toStringXML(uint level) const
 {
-    QString indent_0 = indent(level);
-    QString indent_1 = indent(level+1);
+    QString indent_0 = xml_indent(level);
+    QString indent_1 = xml_indent(level+1);
     QString str;
 
-    str += indent_0 + "<DESCRIPTOR>\n";
-    str += indent_1 + QString("<TAG>0x%1</TAG>\n")
+    str += indent_0 + "<Descriptor>\n";
+    str += indent_1 + QString("<Tag>0x%1</Tag>\n")
         .arg(DescriptorTag(),2,16,QChar('0'));
-    str += indent_1 + QString("<DESCRIPTION>%1</DESCRIPTION>\n")
+    str += indent_1 + QString("<Description>%1</Description>\n")
         .arg(DescriptorTagString(),0,16);
 
-    str += indent_1 + "<DATA>";
+    str += indent_1 + "<Data>";
     for (uint i = 0; i < DescriptorLength(); i++)
+    {
+        if (((i%8) == 0) && i)
+            str += "\n" + indent_1 + "      ";
         str += QString("0x%1 ").arg(_data[i+2],2,16,QChar('0'));
-    str = str.trimmed();
-    str += "</DATA>\n";
+    }
 
-    str += indent_1 + "<DECODED>" + toString() + "</DECODED>";
+    str += "\n" + indent_1 + "</Data>\n";
 
-    str += indent_0 + "</DESCRIPTOR>";
+    str += indent_1 + "<Decoded>" + toString() + "</Decoded>\n";
+
+    str += indent_0 + "</Descriptor>";
 
     return str;
 }
@@ -590,8 +582,9 @@ QString ISO639LanguageDescriptor::toString() const
 QString AVCVideoDescriptor::toString() const
 {
     return QString("AVC Video: IDC prof(%1) IDC level(%2) sets(%3%4%5) "
-                   "compat(%6) still(%7) 24hr(%8)")
+                   "compat(%6) still(%7) 24hr(%8) FramePacking(%9)")
         .arg(ProfileIDC()).arg(LevelIDC())
         .arg(ConstaintSet0()).arg(ConstaintSet1()).arg(ConstaintSet2())
-        .arg(AVCCompatible()).arg(AVCStill()).arg(AVC24HourPicture());
+        .arg(AVCCompatible()).arg(AVCStill()).arg(AVC24HourPicture())
+        .arg(FramePackingSEINotPresentFlag());
 }

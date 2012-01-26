@@ -225,8 +225,8 @@ dvdnav_status_t dvdnav_part_play(dvdnav_t *this, int32_t title, int32_t part) {
   }
   if (!this->started) {
     /* don't report an error but be nice */
-  vm_start(this->vm);
-  this->started = 1;
+    vm_start(this->vm);
+    this->started = 1;
   }
   if (!this->vm->state.pgc) {
     printerr("No current PGC.");

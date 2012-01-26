@@ -30,6 +30,7 @@
 #include "mythnews.h"
 #include "mythnewseditor.h"
 #include "newsdbutil.h"
+#include "mythnewsconfig.h"
 
 #define LOC      QString("MythNews: ")
 #define LOC_WARN QString("MythNews, Warning: ")
@@ -719,12 +720,12 @@ bool MythNews::getHttpFile(const QString &sFilename, const QString &cmdURL)
 
         while ((!m_httpGrabber->isDone()) && (!m_abortHttp))
         {
-            int total = m_httpGrabber->getTotal();
-            m_progressPopup->SetTotal(total);
             int progress = m_httpGrabber->getProgress();
-            m_progressPopup->SetProgress(progress);
-            if ((progress > 0) && (total > 0) && (progress < total))
+            int total = m_httpGrabber->getTotal();
+            if ((progress > 0) && (total > 5120) && (progress < total)) // Ignore total less than 5kb as we're probably looking at a redirect page or similar
             {
+                m_progressPopup->SetTotal(total);
+                m_progressPopup->SetProgress(progress);
                 float fProgress = (float)progress/total;
                 QString text = tr("%1 of %2 (%3 percent)")
                         .arg(formatSize(progress, 2))
@@ -748,6 +749,12 @@ bool MythNews::getHttpFile(const QString &sFilename, const QString &cmdURL)
 
             // Try again
             continue;
+        }
+
+        if (m_httpGrabber->getStatusCode() > 400)
+        {
+            // Error, request failed
+            break;
         }
 
         data = m_httpGrabber->getRawData();
@@ -824,58 +831,7 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
         }
     }
 
-    QString cmdURL(article.enclosure());
-
-    // Handle special cases for media here
-    // YouTube: Fetch the mediaURL page and parse out the video URL
-    if (cmdURL.contains("youtube.com"))
-    {
-        cmdURL = QString(article.mediaURL());
-        QString mediaPage = HttpComms::getHttp(cmdURL, 0, 1, 2);
-        if (!mediaPage.isEmpty())
-        {
-            // If this breaks in the future, we are building the URL
-            // to download a video.  At this time, this requires
-            // the video_id and the t argument
-            // from the source HTML of the page
-            int playerPos = mediaPage.indexOf("swfArgs") + 7;
-
-            int tArgStart = mediaPage.indexOf("\"t\": \"",
-                                              playerPos) + 6;
-            int tArgEnd = mediaPage.indexOf("\"", tArgStart);
-            QString tArgString = mediaPage.mid(tArgStart,
-                                               tArgEnd - tArgStart);
-
-            int vidStart = mediaPage.indexOf("\"video_id\": \"",
-                                             playerPos) + 13;
-            int vidEnd = mediaPage.indexOf("\"", vidStart);
-            QString vidString = mediaPage.mid(vidStart,
-                                              vidEnd - vidStart);
-
-            cmdURL = QString("http://youtube.com/get_video.php"
-                             "?video_id=%2&t=%1")
-                .arg(tArgString).arg(vidString);
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("VideoURL '%1'")
-                    .arg(cmdURL));
-        }
-    }
-
-    QString fileprefix = GetConfDir();
-
-    QDir dir(fileprefix);
-    if (!dir.exists())
-        dir.mkdir(fileprefix);
-
-    fileprefix += "/MythNews";
-
-    dir = QDir(fileprefix);
-    if (!dir.exists())
-        dir.mkdir(fileprefix);
-
-    QString sFilename(fileprefix + "/newstempfile");
-
-    if (getHttpFile(sFilename, cmdURL))
-        playVideo(sFilename);
+    playVideo(article);
 }
 
 void MythNews::ShowEditDialog(bool edit)
@@ -908,6 +864,22 @@ void MythNews::ShowEditDialog(bool edit)
         delete mythnewseditor;
 }
 
+void MythNews::ShowFeedManager()
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythNewsConfig *mythnewsconfig = new MythNewsConfig(mainStack,
+                                                        "mythnewsconfig");
+
+    if (mythnewsconfig->Create())
+    {
+        connect(mythnewsconfig, SIGNAL(Exiting()), SLOT(loadSites()));
+        mainStack->AddScreen(mythnewsconfig);
+    }
+    else
+        delete mythnewsconfig;
+}
+
 void MythNews::ShowMenu(void)
 {
     QMutexLocker locker(&m_lock);
@@ -925,12 +897,13 @@ void MythNews::ShowMenu(void)
 
         m_menuPopup->SetReturnEvent(this, "options");
 
+        m_menuPopup->AddButton(tr("Manage Feeds"));
+        m_menuPopup->AddButton(tr("Add Feed"));
         if (m_NewsSites.size() > 0)
-            m_menuPopup->AddButton(tr("Edit News Site"));
-        m_menuPopup->AddButton(tr("Add News Site"));
-        if (m_NewsSites.size() > 0)
-            m_menuPopup->AddButton(tr("Delete News Site"));
-        m_menuPopup->AddButton(tr("Cancel"));
+        {
+            m_menuPopup->AddButton(tr("Edit Feed"));
+            m_menuPopup->AddButton(tr("Delete Feed"));
+        }
     }
     else
     {
@@ -957,25 +930,12 @@ void MythNews::deleteNewsSite(void)
 }
 
 // does not need locking
-void MythNews::playVideo(const QString &filename)
+void MythNews::playVideo(const NewsArticle &article)
 {
-    QString command_string = gCoreContext->GetSetting("VideoDefaultPlayer");
-
     sendPlaybackStart();
 
-    if ((command_string.indexOf("Internal", 0, Qt::CaseInsensitive) > -1) ||
-        (command_string.length() < 1))
-    {
-        command_string = "Internal";
-        GetMythMainWindow()->HandleMedia(command_string, filename);
-    }
-    else
-    {
-        if (command_string.contains("%s"))
-            command_string = command_string.replace("%s", filename);
-
-        myth_system(command_string);
-    }
+    GetMythMainWindow()->HandleMedia("Internal", article.enclosure(),
+                                     article.description(), article.title());
 
     sendPlaybackEnd();
 }
@@ -995,10 +955,12 @@ void MythNews::customEvent(QEvent *event)
             if (m_NewsSites.size() > 0)
             {
                 if (buttonnum == 0)
-                    ShowEditDialog(true);
+                    ShowFeedManager();
                 else if (buttonnum == 1)
                     ShowEditDialog(false);
                 else if (buttonnum == 2)
+                    ShowEditDialog(true);
+                else if (buttonnum == 3)
                     deleteNewsSite();
             }
             else

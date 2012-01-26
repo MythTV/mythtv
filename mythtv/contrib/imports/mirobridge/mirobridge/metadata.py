@@ -14,11 +14,13 @@ __author__="R.D.Vaughan"
 __purpose__='''
 This python script performs metadata/graphics functions for mirobridge.py'''
 
-__version__="v0.1.0"
+__version__="v0.2.0"
 # 0.1.0 Initial development
+# 0.2.0 Fixed unicode error
+#       Added a filter on punctuation when finding TVDB title matches
 
 # Global imports
-import os, sys, subprocess, re, glob
+import os, sys, subprocess, re, glob, string
 
 # Verify that tvdb_api.py, tvdb_ui.py and tvdb_exceptions.py are available
 try:
@@ -67,6 +69,21 @@ class OutStreamEncoder(object):
         return getattr(self.out, attr)
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+# Used for TVDB title search and matching
+def is_punct_char(char):
+    '''check if char is punctuation char
+    return True if char is punctuation
+    return False if char is not punctuation
+    '''
+    return char in string.punctuation
+
+def is_not_punct_char(char):
+    '''check if char is not punctuation char
+    return True if char is not punctuation
+    return False if chaar is punctuation
+    '''
+    return not is_punct_char(char)
 
 
 class MetaData(object):
@@ -216,25 +233,18 @@ class MetaData(object):
         (dirName, fileName) = os.path.split(fileName)
         (fileBaseName, fileExtension)=os.path.splitext(fileName)
         try:
-            fileBaseName = unicode(fileBaseName, u'utf8')
-        except (UnicodeEncodeError, TypeError):
-            pass
-        try:
-            names = os.listdir(unicode(dirName, 'utf8'))
-        except (UnicodeEncodeError, TypeError):
-            names = os.listdir(dirName)
-        for name in names: # Clean up
-            try:
-                if name.startswith(fileBaseName):
-                    try:
-                        if self.simulation:
-                            self.logger.info(u"Simulation: Remove file/symbolic link(%s)" % (u"%s/%s" % (dirName, name)))
-                        else:
-                            os.remove(u"%s/%s" % (dirName, name))
-                    except OSError:
-                        pass
-            except (UnicodeEncodeError, TypeError):
-                pass
+            results = glob.glob(u'%s/%s*' % (dirName, fileBaseName, ))
+        except (UnicodeEncodeError, UnicodeDecodeError, TypeError):
+            return
+        if len(results):
+            for result in results:
+                try:
+                    if self.simulation:
+                        self.logger.info(u"Simulation: Remove file/symbolic link(%s)" % result)
+                    else:
+                        os.remove(result)
+                except (UnicodeEncodeError, UnicodeDecodeError, TypeError, OSError):
+                    pass
         return
         # end cleanupVideoAndGraphics()
 
@@ -416,7 +426,8 @@ class MetaData(object):
             # Error communicating with thetvdb.com
             return None
 
-        if allSeries['name'] == series_name:
+        if filter(is_not_punct_char, allSeries['name'].lower()) == \
+            filter(is_not_punct_char, series_name.lower()):
             return allSeries['sid']
         return None
     # end searchTvdb

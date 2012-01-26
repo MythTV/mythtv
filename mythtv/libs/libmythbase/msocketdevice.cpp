@@ -190,12 +190,7 @@ MSocketDevice::MSocketDevice(Type type)
            this, type);
 #endif
     init();
-
-    // For the time being, if it's of type Datagram create the socket now
-    // rather than later during connect (since there wont be one with udp)
-
-    if (type == Datagram)
-        setSocket(createNewSocket(), type);
+    setSocket(createNewSocket(), type);
 }
 
 /*!

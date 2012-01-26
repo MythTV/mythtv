@@ -498,7 +498,7 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="4"/>
         <source>%DATE%, %TIME%</source>
-        <translation type="unfinished"></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>

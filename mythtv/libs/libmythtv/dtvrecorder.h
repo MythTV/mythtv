@@ -12,6 +12,7 @@
 #include <vector>
 using namespace std;
 
+#include <QAtomicInt>
 #include <QString>
 
 #include "streamlisteners.h"
@@ -54,7 +55,9 @@ class DTVRecorder :
     void SetStreamData(MPEGStreamData* sd);
     MPEGStreamData *GetStreamData(void) const { return _stream_data; }
 
-    virtual void Reset();
+    virtual void Reset(void);
+    virtual void ClearStatistics(void);
+    virtual RecordingQuality *GetRecordingQuality(void) const;
 
     // MPEG Stream Listener
     void HandlePAT(const ProgramAssociationTable*);
@@ -91,6 +94,7 @@ class DTVRecorder :
     void ResetForNewFile(void);
 
     void HandleKeyframe(uint64_t frameNum, int64_t extra = 0);
+    void HandleTimestamps(int stream_id, int64_t pts, int64_t dts);
 
     void BufferedWrite(const TSPacket &tspacket);
 
@@ -132,6 +136,10 @@ class DTVRecorder :
     unsigned int _video_bytes_remaining;
     unsigned int _other_bytes_remaining;
 
+    // MPEG2 parser information
+    int _progressive_sequence;
+    int _repeat_pict;
+
     // H.264 support
     bool _pes_synced;
     bool _seen_sps;
@@ -165,8 +173,13 @@ class DTVRecorder :
     vector<TSPacket> _scratch;
 
     // Statistics
-    mutable unsigned long long _packet_count;
-    mutable unsigned long long _continuity_error_count;
+    bool          _use_pts; // vs use dts
+    uint64_t      _ts_count[256];
+    int64_t       _ts_last[256];
+    int64_t       _ts_first[256];
+    QDateTime     _ts_first_dt[256];
+    mutable QAtomicInt _packet_count;
+    mutable QAtomicInt _continuity_error_count;
     unsigned long long _frames_seen_count;
     unsigned long long _frames_written_count;
 

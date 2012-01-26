@@ -70,7 +70,6 @@ static QStringList allowed_video_renderers(
 static void SetFromEnv(bool &useXV, bool &useShm);
 static void SetFromHW(MythXDisplay *d, Window curwin,
                       bool &useXV, bool &useShm);
-static int calc_hue_base(const QString &adaptor_name);
 
 const char *vr_str[] =
 {
@@ -612,7 +611,7 @@ bool VideoOutputXv::InitXVideo()
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("XVideo Adaptor Name: '%1'")
             .arg(adaptor_name));
 
-    xv_hue_base = calc_hue_base(adaptor_name);
+    xv_hue_base = VideoOutput::CalcHueBase(adaptor_name);
 
     bool foundimageformat = false;
     int ids[] = { GUID_YV12_PLANAR, GUID_I420_PLANAR, GUID_IYUV_PLANAR, };
@@ -1367,12 +1366,9 @@ void VideoOutputXv::PrepareFrameXv(VideoFrame *frame)
     if (!frame)
         frame = vbuffers.GetScratchFrame();
 
-    XvImage *image = NULL;
-    {
-        QMutexLocker locker(&global_lock);
-        framesPlayed = frame->frameNumber + 1;
-        image        = (XvImage*) xv_buffers[frame->buf];
-    }
+    global_lock.lock();
+    framesPlayed = frame->frameNumber + 1;
+    global_lock.unlock();
 
     if (vbuffers.GetScratchFrame() == frame)
         vbuffers.SetLastShownFrameToScratch();
@@ -1750,7 +1746,7 @@ void VideoOutputXv::VideoAspectRatioChanged(float aspect)
     VideoOutput::VideoAspectRatioChanged(aspect);
 }
 
-void VideoOutputXv::UpdatePauseFrame(void)
+void VideoOutputXv::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&global_lock);
 
@@ -1776,6 +1772,8 @@ void VideoOutputXv::UpdatePauseFrame(void)
             vbuffers.GetScratchFrame()->frameNumber = framesPlayed - 1;
             CopyFrame(&av_pause_frame, vbuffers.GetScratchFrame());
         }
+
+        disp_timecode = av_pause_frame.disp_timecode;
     }
 }
 
@@ -2089,17 +2087,4 @@ static QStringList allowed_video_renderers(
     }
 
     return list;
-}
-
-static int calc_hue_base(const QString &adaptor_name)
-{
-    if ((adaptor_name == "ATI Radeon Video Overlay") ||
-        (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
-        (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */) ||
-        (adaptor_name == "SIS 300/315/330 series Video Overlay"))
-    {
-        return 50;
-    }
-
-    return 0; //< nVidia normal
 }

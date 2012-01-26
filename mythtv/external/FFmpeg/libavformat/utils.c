@@ -2383,6 +2383,13 @@ int av_find_stream_info(AVFormatContext *ic)
                 av_log(ic, AV_LOG_DEBUG, "All info found\n");
                 break;
             }
+            /* Is this is an MHEG only stream? Then we really can stop. */
+            if (i == 1 && ic->streams[0]->codec->codec_id == CODEC_ID_DSMCC_B)
+            {
+                ret = count;
+                av_log(ic, AV_LOG_DEBUG, "All DSM info found\n");
+                break;
+            }
         }
         /* we did not get all the codec info, but we read too much data */
         if (read_size >= ic->probesize) {

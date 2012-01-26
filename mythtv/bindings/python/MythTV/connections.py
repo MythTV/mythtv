@@ -87,7 +87,7 @@ class _Connection_Pool( object ):
         try:
             conn = self._pool.pop(0)
             self._inuse[id(conn)] = conn
-            self.log(self._logmode|MythLog.EXTRA,
+            self.log(self._logmode, MythLog.DEBUG,
                         'Acquiring connection from pool')
         except IndexError:
             conn = self._connect()
@@ -99,7 +99,7 @@ class _Connection_Pool( object ):
         """
         conn = self._inuse.pop(id)
         self._pool.append(conn)
-        self.log(self._logmode|MythLog.EXTRA,
+        self.log(self._logmode, MythLog.DEBUG,
                     'Releasing connection to pool')
 
 class DBConnection( _Connection_Pool ):
@@ -120,7 +120,7 @@ class DBConnection( _Connection_Pool ):
         self.dbconn = dbconn
         self._refs = {}
 
-        self.log(MythLog.DATABASE, "Attempting connection",
+        self.log(MythLog.DATABASE, MythLog.INFO, "Attempting connection",
             '\n'.join(["'%s': '%s'" % (k,v) for k,v in dbconn.items()]))
         try:
             _Connection_Pool.__init__(self)
@@ -146,7 +146,7 @@ class DBConnection( _Connection_Pool ):
         return cursor
 
     def _callback(self, ref):
-        self.log(MythLog.DATABASE|MythLog.EXTRA, \
+        self.log(MythLog.DATABASE, MythLog.DEBUG, \
                     'database callback received',\
                      str(hex(id(ref))))
         refid = id(ref)
@@ -199,9 +199,9 @@ class BEConnection( object ):
         try:
             self.connect()
         except socket.error, e:
-            self.log.logTB(MythLog.SOCKET|MythLog.EXTRA)
+            self.log.logTB(MythLog.SOCKET)
             self.connected = False
-            self.log(MythLog.IMPORTANT|MythLog.SOCKET,
+            self.log(MythLog.GENERAL, MythLog.CRIT,
                     "Couldn't connect to backend [%s]:%d" \
                     % (self.host, self.port))
             raise MythBEError(MythError.PROTO_CONNECTION, self.host, self.port)
@@ -214,7 +214,7 @@ class BEConnection( object ):
     def connect(self):
         if self.connected:
             return
-        self.log(MythLog.SOCKET|MythLog.NETWORK,
+        self.log(MythLog.SOCKET|MythLog.NETWORK, MythLog.INFO,
                 "Connecting to backend [%s]:%d" % (self.host, self.port))
         if ':' in self.host:
             self.socket = deadlinesocket(socket.AF_INET6, socket.SOCK_STREAM)
@@ -230,7 +230,7 @@ class BEConnection( object ):
     def disconnect(self, hard=False):
         if not self.connected:
             return
-        self.log(MythLog.SOCKET|MythLog.NETWORK,
+        self.log(MythLog.SOCKET|MythLog.NETWORK, MythLog.INFO,
                 "Terminating connection to [%s]:%d" % (self.host, self.port))
         if not hard:
             self.backendCommand('DONE',0)
@@ -248,20 +248,21 @@ class BEConnection( object ):
 
         res = self.backendCommand('ANN %s %s 0' % (type, self.localname))
         if res != 'OK':
-            self.log(MythLog.IMPORTANT|MythLog.NETWORK,
+            self.log(MythLog.GENERAL, MythLog.ERR,
                             "Unexpected answer to ANN", res)
             raise MythBEError(MythError.PROTO_ANNOUNCE,
                                                 self.host, self.port, res)
         else:
-            self.log(MythLog.SOCKET,"Successfully connected to backend",
-                                        "[%s]:%d" % (self.host, self.port))
+            self.log(MythLog.SOCKET, MythLog.INFO,
+                     "Successfully connected to backend",
+                     "[%s]:%d" % (self.host, self.port))
         self.hostname = self.backendCommand('QUERY_HOSTNAME')
 
     def check_version(self):
         res = self.backendCommand('MYTH_PROTO_VERSION %s %s' \
                     % (PROTO_VERSION, PROTO_TOKEN)).split(BACKEND_SEP)
         if res[0] == 'REJECT':
-            self.log(MythLog.IMPORTANT|MythLog.NETWORK, 
+            self.log(MythLog.GENERAL, MythLog.ERR,
                             "Backend has version %s, and we speak %s" %\
                             (res[1], PROTO_VERSION))
             raise MythBEError(MythError.PROTO_MISMATCH,
@@ -358,13 +359,14 @@ class BEEventConnection( BEConnection ):
         ### NOTE: backendCommand cannot be reliably used beyond this point
         self._announced = True
         if res != 'OK':
-            self.log(MythLog.IMPORTANT|MythLog.NETWORK,
+            self.log(MythLog.GENERAL, MythLog.ERR,
                             "Unexpected answer to ANN", res)
             raise MythBEError(MythError.PROTO_ANNOUNCE,
                                                 self.host, self.port, res)
         else:
-            self.log(MythLog.SOCKET,"Successfully connected to backend",
-                                        "%s:%d" % (self.host, self.port))
+            self.log(MythLog.SOCKET, MythLog.INFO,
+                     "Successfully connected to backend",
+                     "%s:%d" % (self.host, self.port))
 
     def queueEvents(self):
         """
@@ -538,7 +540,6 @@ class FEConnection( object ):
         try:
             res = self.socket.dlexpect(prompt, deadline=deadline)
         except socket.error:
-            raise
             raise MythFEError(MythError.FE_CONNECTION, self.host, self.port)
         except KeyboardInterrupt:
             raise
@@ -604,7 +605,7 @@ class XMLConnection( object ):
             url += '?' + '&'.join(
                         ['{0}={1}'.format(k,urllib2.quote(v))
                                 for k,v in keyvars.items()])
-        self.log(self.log.NETWORK, 'Generating request', url)
+        self.log(self.log.NETWORK, self.log.DEBUG, 'Generating request', url)
         return self._Request(url)
 
     def getConnectionInfo(self, pin=0):

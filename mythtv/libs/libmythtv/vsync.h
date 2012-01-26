@@ -76,6 +76,8 @@ class VideoSync
 
     /// \brief Returns the (minimum) refresh interval of the output device.
     int getRefreshInterval(void) const { return m_refresh_interval; }
+    /// \brief Sets the refresh interval of the output device.
+    void setRefreshInterval(int ri) { m_refresh_interval = ri; }
 
     virtual void setFrameInterval(int fi) { m_frame_interval = fi; };
 

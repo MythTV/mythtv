@@ -52,6 +52,7 @@ void HttpComms::init()
     m_statusCode = 0;
     m_timer = NULL;
     m_timeout = false;
+    m_progress = m_total = 0;
 
 
     connect(http, SIGNAL(done(bool)), this, SLOT(done(bool)));
@@ -75,25 +76,25 @@ void HttpComms::request(QUrl &url, int timeoutms, bool allowGzip)
 
     header.setValue("Host", url.host());
     header.setValue("User-Agent", userAgent);
-    
+
     if (allowGzip)
         header.setValue( "Accept-Encoding", "gzip");
-    
+
     request(url, header, timeoutms);
 }
 
 
 
-void HttpComms::request(QUrl               &url, 
-                        QHttpRequestHeader &header, 
-                        int                 timeoutms, 
+void HttpComms::request(QUrl               &url,
+                        QHttpRequestHeader &header,
+                        int                 timeoutms,
                         QIODevice          *pData /* = NULL*/ )
 {
     quint16 port = 80;
 
-    if (url.port() != -1) 
+    if (url.port() != -1)
         port = url.port();
-    
+
     http->setHost(url.host(), port);
 
     m_url = url.toString();
@@ -135,7 +136,7 @@ void HttpComms::done(bool error)
 {
     if (error)
     {
-       LOG(VB_GENERAL, LOG_ERR, 
+       LOG(VB_GENERAL, LOG_ERR,
            QString("NetworkOperation Error on Finish: %1 (%2): url: '%3'")
            .arg(http->errorString()) .arg(error) .arg(m_url.toString()));
     }
@@ -286,36 +287,36 @@ void HttpComms::dataReadProgress(int done, int total)
  *   This is a synchronous function, it will block according to the vars.
  */
 QString HttpComms::getHttp(QString     &url,
-                           int          timeoutMS,    int  maxRetries, 
+                           int          timeoutMS,    int  maxRetries,
                            int          maxRedirects, bool allowGzip,
                            Credentials *webCred,      bool isInQtEventThread)
 {
     int redirectCount = 0;
     int timeoutCount = 0;
     QString res;
-    HttpComms *httpGrabber = NULL; 
+    HttpComms *httpGrabber = NULL;
     QString hostname;
 
-    while (1) 
+    while (1)
     {
         QUrl qurl(url);
         if (hostname.isEmpty())
             hostname = qurl.host();  // hold onto original host
         if (qurl.host().isEmpty())   // can occur on redirects to partial paths
             qurl.setHost(hostname);
-        
-        LOG(VB_NETWORK, LOG_DEBUG, 
+
+        LOG(VB_NETWORK, LOG_DEBUG,
             QString("getHttp: grabbing: %1").arg(qurl.toString()));
 
         delete httpGrabber;
-        
+
         httpGrabber = new HttpComms;
-        
+
         if (webCred)
             httpGrabber->setCredentials(*webCred, CRED_WEB);
-            
-        httpGrabber->request(qurl, timeoutMS, allowGzip);            
-       
+
+        httpGrabber->request(qurl, timeoutMS, allowGzip);
+
 
         while (!httpGrabber->isDone())
         {
@@ -403,21 +404,21 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
         QUrl qurl(url);
         if (hostname.isEmpty())
             hostname = qurl.host();  // hold onto original host
-        
+
         if (qurl.host().isEmpty())   // can occur on redirects to partial paths
             qurl.setHost(hostname);
-        
+
         LOG(VB_NETWORK, LOG_DEBUG, QString("getHttp: grabbing: '%1'")
                                     .arg(qurl.toString()));
 
         delete httpGrabber;
-        
+
         httpGrabber = new HttpComms;
-        
+
         if (webCred)
             httpGrabber->setCredentials(*webCred, CRED_WEB);
-            
-        httpGrabber->request(qurl, timeoutMS, allowGzip);            
+
+        httpGrabber->request(qurl, timeoutMS, allowGzip);
 
         while (!httpGrabber->isDone())
         {
@@ -525,9 +526,9 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
  *   This is a synchronous function, it will block according to the vars.
  */
 QString HttpComms::postHttp(
-    QUrl               &url, 
+    QUrl               &url,
     QHttpRequestHeader *pAddlHdr,     QIODevice *pData,
-    int                 timeoutMS,    int        maxRetries, 
+    int                 timeoutMS,    int        maxRetries,
     int                 maxRedirects, bool       allowGzip,
     Credentials        *webCred,      bool       isInQtEventThread,
     QString             userAgent)
@@ -535,7 +536,7 @@ QString HttpComms::postHttp(
     int redirectCount = 0;
     int timeoutCount = 0;
     QString res;
-    HttpComms *httpGrabber = NULL; 
+    HttpComms *httpGrabber = NULL;
     QString hostname;
 
     QHttpRequestHeader header("POST", url.path() + url.encodedQuery());
@@ -568,24 +569,24 @@ QString HttpComms::postHttp(
         }
     }
 
-    while (1) 
+    while (1)
     {
         if (hostname.isEmpty())
             hostname = url.host();  // hold onto original host
         if (url.host().isEmpty())   // can occur on redirects to partial paths
             url.setHost(hostname);
-        
+
         LOG(VB_NETWORK, LOG_DEBUG,
             QString("postHttp: grabbing: %1").arg(url.toString()));
 
         delete httpGrabber;
-        
+
         httpGrabber = new HttpComms;
-        
+
         if (webCred)
             httpGrabber->setCredentials(*webCred, CRED_WEB);
-            
-        httpGrabber->request(url, header, timeoutMS, pData );            
+
+        httpGrabber->request(url, header, timeoutMS, pData );
 
         while (!httpGrabber->isDone())
         {

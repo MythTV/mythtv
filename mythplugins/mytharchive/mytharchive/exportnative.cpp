@@ -165,7 +165,7 @@ bool ExportNative::keyPressEvent(QKeyEvent *event)
 
 void ExportNative::updateSizeBar()
 {
-    long long size = 0;
+    int64_t size = 0;
     ArchiveItem *a;
 
     for (int x = 0; x < m_archiveList.size(); x++)
@@ -450,7 +450,7 @@ void ExportNative::createConfigFile(const QString &filename)
     options.setAttribute("createiso", m_bCreateISO);
     options.setAttribute("doburn", m_bDoBurn);
     options.setAttribute("mediatype", m_archiveDestination.type);
-    options.setAttribute("dvdrsize", m_archiveDestination.freeSpace);
+    options.setAttribute("dvdrsize", (qint64)m_archiveDestination.freeSpace);
     options.setAttribute("erasedvdrw", m_bEraseDvdRw);
     options.setAttribute("savedirectory", m_saveFilename);
     job.appendChild(options);

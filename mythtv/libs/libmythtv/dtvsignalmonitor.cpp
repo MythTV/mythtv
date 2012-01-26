@@ -1,5 +1,8 @@
 #include <unistd.h>
 
+#include <algorithm> // for lower_bound
+using namespace std;
+
 #include "dtvchannel.h"
 #include "dvbchannel.h"
 #include "dtvsignalmonitor.h"
@@ -14,6 +17,24 @@
     QString("DTVSM(%1)::%2: %3").arg(channel->GetDevice()).arg(FUNC).arg(MSG))
 
 #define LOC QString("DTVSM(%1): ").arg(channel->GetDevice())
+
+// inserts tid&crc value into an ordered list
+// returns true if item is inserted
+static bool insert_crc(QList<uint64_t> &seen_crc, const PSIPTable &psip)
+{
+    uint64_t key = (((uint64_t)psip.TableID()) << 32) | psip.CRC();
+
+    QList<uint64_t>::iterator it =
+        lower_bound(seen_crc.begin(), seen_crc.end(), key);
+
+    if ((it == seen_crc.end()) || (*it != key))
+    {
+        seen_crc.insert(it, key);
+        return true;
+    }
+
+    return false;
+}
 
 /** \class DTVSignalMonitor
  *  \brief This class is intended to detect the presence of needed tables.
@@ -43,7 +64,6 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
       networkID(0), transportID(0),
       detectedNetworkID(0), detectedTransportID(0),
       programNumber(-1),
-      last_pat_crc(-1),
       ignore_encrypted(false)
 {
 }
@@ -182,7 +202,7 @@ void DTVSignalMonitor::UpdateListeningForEIT(void)
 void DTVSignalMonitor::SetChannel(int major, int minor)
 {
     DBG_SM(QString("SetChannel(%1, %2)").arg(major).arg(minor), "");
-    last_pat_crc = -1;
+    seen_table_crc.clear();
     if (GetATSCStreamData() && (majorChannel != major || minorChannel != minor))
     {
         RemoveFlags(kDTVSigMon_PATSeen   | kDTVSigMon_PATMatch |
@@ -199,7 +219,7 @@ void DTVSignalMonitor::SetChannel(int major, int minor)
 void DTVSignalMonitor::SetProgramNumber(int progNum)
 {
     DBG_SM(QString("SetProgramNumber(%1)").arg(progNum), "");
-    last_pat_crc = -1;
+    seen_table_crc.clear();
     if (programNumber != progNum)
     {
         RemoveFlags(kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
@@ -215,7 +235,7 @@ void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
 {
     DBG_SM(QString("SetDVBService(transport_id: %1, network_id: %2, "
                    "service_id: %3)").arg(tsid).arg(netid).arg(serviceid), "");
-    last_pat_crc = -1;
+    seen_table_crc.clear();
 
     if (netid == networkID && tsid == transportID &&
         serviceid == programNumber)
@@ -280,7 +300,7 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
     {
         AddFlags(kDTVSigMon_PATMatch);
         GetStreamData()->AddListeningPID(pmt_pid);
-        last_pat_crc = pat->CRC();
+        insert_crc(seen_table_crc, *pat);
         return;
     }
 
@@ -294,9 +314,8 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
         GetStreamData()->SetVersionPAT(tsid, -1,0);
         // END HACK HACK HACK
 
-        if (last_pat_crc != pat->CRC())
+        if (insert_crc(seen_table_crc, *pat))
         {
-            last_pat_crc = pat->CRC();
             QString errStr = QString("Program #%1 not found in PAT!")
                 .arg(programNumber);
             LOG(VB_GENERAL, LOG_ERR, LOC + errStr + "\n" + pat->toString());
@@ -308,7 +327,6 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
             SetProgramNumber(pat->ProgramNumber(0));
             AddFlags(kDTVSigMon_PATMatch);
             GetStreamData()->AddListeningPID(pat->ProgramPID(0));
-            last_pat_crc = pat->CRC();
         }
     }
 }
@@ -322,9 +340,12 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
 
     if (pmt->ProgramNumber() != (uint)programNumber)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Wrong PMT; pmt->pn(%1) desired(%2)")
+        if (insert_crc(seen_table_crc, *pmt))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Wrong PMT; pmt->pn(%1) desired(%2)")
                 .arg(pmt->ProgramNumber()).arg(programNumber));
+        }
         return; // Not the PMT we are looking for...
     }
 
@@ -399,10 +420,13 @@ void DTVSignalMonitor::HandleTVCT(
 
     if (idx < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Could not find channel %1_%2 in TVCT")
+        if (insert_crc(seen_table_crc, *tvct))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Could not find channel %1_%2 in TVCT")
                 .arg(majorChannel).arg(minorChannel));
-        LOG(VB_GENERAL, LOG_ERR, LOC + tvct->toString());
+            LOG(VB_GENERAL, LOG_ERR, LOC + tvct->toString());
+        }
         GetATSCStreamData()->SetVersionTVCT(tvct->TransportStreamID(),-1);
         return;
     }
@@ -421,10 +445,13 @@ void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
 
     if (idx < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Could not find channel %1_%2 in CVCT")
+        if (insert_crc(seen_table_crc, *cvct))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Could not find channel %1_%2 in CVCT")
                 .arg(majorChannel).arg(minorChannel));
-        LOG(VB_GENERAL, LOG_ERR, LOC + cvct->toString());
+            LOG(VB_GENERAL, LOG_ERR, LOC + cvct->toString());
+        }
         GetATSCStreamData()->SetVersionCVCT(cvct->TransportStreamID(),-1);
         return;
     }

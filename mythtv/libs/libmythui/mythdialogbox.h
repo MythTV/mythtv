@@ -185,6 +185,7 @@ class MUI_PUBLIC MythConfirmationDialog : public MythScreenType
     bool Create(void);
     void SetReturnEvent(QObject *retobject, const QString &resultid);
     void SetData(QVariant data) { m_resultData = data; }
+    void SetMessage(const QString &message);
 
     bool keyPressEvent(QKeyEvent *event);
 
@@ -193,6 +194,7 @@ class MUI_PUBLIC MythConfirmationDialog : public MythScreenType
 
   private:
     void sendResult(bool);
+    MythUIText *m_messageText;
     QString m_message;
     bool m_showCancel;
     QObject *m_retObject;

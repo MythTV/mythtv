@@ -5,6 +5,7 @@
 #include <QDomDocument>
 #include <QRunnable>
 
+#include "mythcorecontext.h"
 #include "mythobservable.h"
 #include "mthreadpool.h"
 
@@ -49,6 +50,9 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
 
     // Can be overridden, of course, but default to full sized.
     m_Area = GetMythMainWindow()->GetUIScreenRect();
+
+//    gCoreContext->SendSystemEvent(
+//        QString("SCREEN_TYPE CREATED %1").arg(name));
 }
 
 MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
@@ -66,10 +70,16 @@ MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
     m_IsInitialized = false;
 
     m_Area = GetMythMainWindow()->GetUIScreenRect();
+
+//    gCoreContext->SendSystemEvent(
+//        QString("SCREEN_TYPE CREATED %1").arg(name));
 }
 
 MythScreenType::~MythScreenType()
 {
+//    gCoreContext->SendSystemEvent(
+//        QString("SCREEN_TYPE DESTROYED %1").arg(objectName()));
+
     m_CurrentFocusWidget = NULL;
     emit Exiting();
 }
@@ -227,6 +237,8 @@ void MythScreenType::aboutToHide(void)
                 GetMythMainWindow()->GetPaintWindow()->setMask(m_SavedMask);
         }
     }
+
+    ActivateAnimations(MythUIAnimation::AboutToHide);
 }
 
 void MythScreenType::aboutToShow(void)
@@ -243,6 +255,8 @@ void MythScreenType::aboutToShow(void)
             GetMythMainWindow()->GetPaintWindow()->setMask(region);
         }
     }
+
+    ActivateAnimations(MythUIAnimation::AboutToShow);
 }
 
 bool MythScreenType::IsDeleting(void) const
@@ -459,16 +473,13 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
         else if (action == "MENU")
             ShowMenu();
         else if (action.startsWith("SYSEVENT"))
-        {
-            MythEvent me(QString("GLOBAL_SYSTEM_EVENT KEY_%1")
-                                 .arg(action.mid(8)));
-            QCoreApplication::postEvent(
-                GetMythMainWindow()->GetSystemEventHandler(), me.clone());
-        }
+            gCoreContext->SendSystemEvent(QString("KEY_%1").arg(action.mid(8)));
         else if (action == ACTION_SCREENSHOT)
-        {
             GetMythMainWindow()->ScreenShot();
-        }
+        else if (action == ACTION_TVPOWERON)
+            GetMythMainWindow()->HandleTVPower(true);
+        else if (action == ACTION_TVPOWEROFF)
+            GetMythMainWindow()->HandleTVPower(false);
         else
             handled = false;
     }
@@ -539,7 +550,7 @@ bool MythScreenType::ParseElement(
     }
     else
     {
-        return false;
+        return MythUIType::ParseElement(filename, element, showWarnings);
     }
 
     return true;

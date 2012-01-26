@@ -19,6 +19,8 @@
     if (++m_buttonVersion > 1024) \
         m_buttonVersion = 1;
 
+#define DVD_DRIVE_SPEED 1
+
 static const char *dvdnav_menu_table[] =
 {
     NULL,
@@ -129,12 +131,15 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
 DVDRingBuffer::~DVDRingBuffer()
 {
     CloseDVD();
+    m_menuBtnLock.lock();
     ClearMenuSPUParameters();
+    m_menuBtnLock.unlock();
     ClearChapterCache();
 }
 
 void DVDRingBuffer::CloseDVD(void)
 {
+    rwlock.lockForWrite();
     if (m_dvdnav)
     {
         SetDVDSpeed(-1);
@@ -143,13 +148,16 @@ void DVDRingBuffer::CloseDVD(void)
     }
     m_gotStop = false;
     m_audioStreamsChanged = true;
+    rwlock.unlock();
 }
 
 void DVDRingBuffer::ClearChapterCache(void)
 {
+    rwlock.lockForWrite();
     foreach (QList<uint64_t> chapters, m_chapterMap)
         chapters.clear();
     m_chapterMap.clear();
+    rwlock.unlock();
 }
 
 long long DVDRingBuffer::Seek(long long pos, int whence, bool has_lock)
@@ -203,7 +211,7 @@ long long DVDRingBuffer::Seek(long long pos, int whence, bool has_lock)
     if (ret >= 0)
     {
         readpos = ret;
-        
+
         ignorereadpos = -1;
 
         if (readaheadrunning)
@@ -244,7 +252,7 @@ long long DVDRingBuffer::Seek(long long time)
     if (m_parent)
         ffrewSkip = m_parent->GetFFRewSkip();
 
-    if (ffrewSkip != 1 && time != 0)
+    if (ffrewSkip != 1 && ffrewSkip != 0 && time != 0)
     {
         QMap<uint, uint>::const_iterator it = m_seekSpeedMap.lowerBound(labs(time));
         if (it == m_seekSpeedMap.end())
@@ -258,7 +266,7 @@ long long DVDRingBuffer::Seek(long long time)
     else
     {
         m_seektime = (uint64_t)time;
-        dvdRet = dvdnav_absolute_time_search(m_dvdnav, m_seektime, 1);
+        dvdRet = dvdnav_absolute_time_search(m_dvdnav, m_seektime, 0);
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG,
@@ -306,7 +314,11 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     rwlock.lockForWrite();
 
     if (m_dvdnav)
+    {
+        rwlock.unlock();
         CloseDVD();
+        rwlock.lockForWrite();
+    }
 
     safefilename = lfilename;
     filename = lfilename;
@@ -590,7 +602,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     dvdnav_free_cache_block(m_dvdnav, blockBuf);
 
                 // debug
-                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_BLOCK_OK");
+                LOG(VB_PLAYBACK|VB_FILE, LOG_DEBUG, LOC + "DVDNAV_BLOCK_OK");
             }
             break;
 
@@ -796,7 +808,6 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 }
 
                 // update our status
-                dvd_time_t timeFromCellStart = dsi->dsi_gi.c_eltm;
                 m_currentTime = (uint)dvdnav_get_current_time(m_dvdnav);
                 m_currentpos = GetReadPosition();
 
@@ -862,8 +873,11 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                             .arg(aspect).arg(permission));
 
                 // trigger a rescan of the audio streams
-                if (vts->old_vtsN != vts->new_vtsN)
+                if ((vts->old_vtsN != vts->new_vtsN) ||
+                    (vts->old_domain != vts->new_domain))
+                {
                     m_audioStreamsChanged = true;
+                }
 
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)
@@ -1440,7 +1454,10 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
     if (sub->num_rects > 0)
     {
         if (force_subtitle_display)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Decoded menu item");
+        {
+            sub->forced = 1;
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Decoded forced subtitle");
+        }
         return true;
     }
 fail:
@@ -1669,14 +1686,13 @@ double DVDRingBuffer::GetFrameRate(void)
     return dvdfps;
 }
 
-/** \brief set dvd speed. uses the DVDDriveSpeed Setting from the settings
+/** \brief set dvd speed. uses the constant DVD_DRIVE_SPEED
  *  table
  */
 void DVDRingBuffer::SetDVDSpeed(void)
 {
     QMutexLocker lock(&m_seekLock);
-    int dvdDriveSpeed = gCoreContext->GetNumSetting("DVDDriveSpeed", 12);
-    SetDVDSpeed(dvdDriveSpeed);
+    SetDVDSpeed(DVD_DRIVE_SPEED);
 }
 
 /** \brief set dvd speed.

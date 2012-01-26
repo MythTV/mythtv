@@ -160,18 +160,6 @@ HostComboBox *SetOnInsertDVD()
     return gc;
 }
 
-HostSlider *SetDVDDriveSpeed()
-{
-    HostSlider *gs = new HostSlider("DVDDriveSpeed", 2, 12, 2);
-    gs->setLabel(QObject::tr("DVD Drive Speed"));
-    gs->setValue(12);
-    gs->setHelpText(QObject::tr("Set DVD Drive Speed during DVD Playback. "
-                                "Speed is in multiples of 177KB/s. "
-                                "Slower speeds may reduce drive noise but in "
-                                "some cases it causes playback to stutter."));
-    return gs;
-}
-
 HostCheckBox *VideoTreeRemember()
 {
     HostCheckBox *gc = new HostCheckBox("mythvideo.VideoTreeRemember");
@@ -295,7 +283,6 @@ VideoGeneralSettings::VideoGeneralSettings()
 
     VConfigPage page2(pages, false);
     page2->addChild(SetOnInsertDVD());
-    page2->addChild(SetDVDDriveSpeed());
     page2->addChild(VideoTreeRemember());
 
     // page 3
