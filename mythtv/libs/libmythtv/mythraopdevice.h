@@ -23,6 +23,7 @@ class MTV_PUBLIC MythRAOPDevice : public QTcpServer
     static void Cleanup(void);
 
     MythRAOPDevice();
+    bool NextInAudioQueue(MythRAOPConnection* conn);
 
   private slots:
     void Start();
