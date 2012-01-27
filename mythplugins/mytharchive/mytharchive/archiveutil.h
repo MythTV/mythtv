@@ -7,6 +7,7 @@
 #ifndef ARCHIVEUTIL_H_
 #define ARCHIVEUTIL_H_
 
+#include <stdint.h>
 #include <QString>
 #include <QMetaType>
 
@@ -27,7 +28,7 @@ typedef struct ArchiveDestination
     ARCHIVEDESTINATION type;
     const char *name;
     const char *description;
-    long long freeSpace;
+    int64_t freeSpace;
 }_ArchiveDestination;
 
 extern struct ArchiveDestination ArchiveDestinations[];
@@ -57,8 +58,8 @@ typedef struct
     QString startDate;
     QString startTime;
     QString filename;
-    long long size;
-    long long newsize;
+    int64_t size;
+    int64_t newsize;
     int duration;
     int cutDuration;
     EncoderProfile *encoderProfile;
@@ -71,7 +72,7 @@ typedef struct
     QList<ThumbImage*> thumbList;
 } ArchiveItem;
 
-QString formatSize(long long sizeKB, int prec = 2);
+QString formatSize(int64_t sizeKB, int prec = 2);
 QString getTempDirectory(bool showError = false);
 void checkTempDirectory();
 bool extractDetailsFromFilename(const QString &inFile,

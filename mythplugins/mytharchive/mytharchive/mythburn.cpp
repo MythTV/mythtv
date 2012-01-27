@@ -212,7 +212,7 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
 
 void MythBurn::updateSizeBar(void)
 {
-    long long size = 0;
+    int64_t size = 0;
     ArchiveItem *a;
     for (int x = 0; x < m_archiveList.size(); x++)
     {
@@ -660,7 +660,7 @@ void MythBurn::createConfigFile(const QString &filename)
     options.setAttribute("createiso", m_bCreateISO);
     options.setAttribute("doburn", m_bDoBurn);
     options.setAttribute("mediatype", m_archiveDestination.type);
-    options.setAttribute("dvdrsize", m_archiveDestination.freeSpace);
+    options.setAttribute("dvdrsize", (qint64)m_archiveDestination.freeSpace);
     options.setAttribute("erasedvdrw", m_bEraseDvdRw);
     options.setAttribute("savefilename", m_saveFilename);
     job.appendChild(options);
@@ -776,7 +776,7 @@ void MythBurn::saveConfiguration(void)
         query.bindValue(":DESCRIPTION", a->description);
         query.bindValue(":STARTDATE", a->startDate);
         query.bindValue(":STARTTIME", a->startTime);
-        query.bindValue(":SIZE", a->size);
+        query.bindValue(":SIZE", (qint64)a->size);
         query.bindValue(":FILENAME", a->filename);
         query.bindValue(":HASCUTLIST", a->hasCutlist);
         query.bindValue(":DURATION", a->duration);

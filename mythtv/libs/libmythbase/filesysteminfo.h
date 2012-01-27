@@ -4,6 +4,8 @@
 
 using namespace std;
 
+#include <stdint.h>
+
 #include <QList>
 #include <QString>
 #include <QStringList>

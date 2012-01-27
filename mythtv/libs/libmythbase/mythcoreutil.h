@@ -1,6 +1,8 @@
 #ifndef COREUTIL_H_
 #define COREUTIL_H_
 
+#include <stdint.h>
+
 #include <QString>
 
 #include "mythbaseexp.h"

@@ -242,7 +242,7 @@ void VideoSelector::titleChanged(MythUIButtonListItem *item)
         {
             QFile file(v->filename);
             if (file.exists())
-                v->size = (unsigned long long)file.size();
+                v->size = (uint64_t)file.size();
             else
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("VideoSelector: Cannot find file: %1")
