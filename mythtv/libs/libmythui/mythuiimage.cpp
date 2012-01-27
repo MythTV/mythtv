@@ -26,7 +26,6 @@
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 #include "mythscreentype.h"
-#include <X11/Xproto.h>
 
 class ImageLoadThread;
 
