@@ -370,6 +370,10 @@ QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
         title = lookup->GetTitle();
         if (title.contains("/"))
             title.replace("/", "-");
+        if (title.contains("?"))
+            title.replace("?", "");
+        if (title.contains("*"))
+            title.replace("*", "");
         inter = QString(" Season %1").arg(QString::number(season));
         if (type == kArtworkScreenshot)
             inter += QString("x%1").arg(QString::number(episode));
