@@ -679,9 +679,6 @@ void MythUIText::FillCutMessage(void)
     }
     else
     {
-        LOG(VB_GUI, LOG_DEBUG, QString("FillCutmessage '%1'")
-            .arg(m_CutMessage));
-
         QStringList templist;
         QStringList::iterator it;
 
