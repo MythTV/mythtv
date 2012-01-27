@@ -747,7 +747,8 @@ int Transcode::TranscodeFile(const QString &inputname,
            "will treat it as such.");
     }
 
-    float video_aspect = player->GetVideoAspect();
+    DecoderBase* dec = player->GetDecoder();
+    float video_aspect = dec ? dec->GetVideoAspect() : 4.0f / 3.0f;
     float video_frame_rate = player->GetFrameRate();
     int newWidth = video_width;
     int newHeight = video_height;

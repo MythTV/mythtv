@@ -953,8 +953,6 @@ int MythPlayer::OpenFile(uint retries)
         player_ctx->buffer, no_video_decode, testbuf, testreadsize);
     delete[] testbuf;
 
-    video_aspect = decoder->GetVideoAspect();
-
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Couldn't open decoder for: %1")
