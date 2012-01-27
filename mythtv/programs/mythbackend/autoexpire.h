@@ -72,7 +72,7 @@ class AutoExpire : public QObject
     void CalcParams(void);
     void PrintExpireList(QString expHost = "ALL");
 
-    size_t GetDesiredSpace(int fsID) const;
+    uint64_t GetDesiredSpace(int fsID) const;
 
     void GetAllExpiring(QStringList &strList);
     void GetAllExpiring(pginfolist_t &list);

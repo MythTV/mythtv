@@ -4309,7 +4309,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                        bool allHosts)
 {
     QString allHostList = gCoreContext->GetHostName();
-    long long totalKB = -1, usedKB = -1;
+    int64_t totalKB = -1, usedKB = -1;
     QMap <QString, bool>foundDirs;
     QString driveKey;
     QString localStr = "1";
@@ -4460,8 +4460,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     strlist.clear();
 
     // Consolidate hosts sharing storage
-    size_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
-    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
+    int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
+    maxWriteFiveSec = max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     QList<FileSystemInfo>::iterator it1, it2;
     int bSize = 32;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
@@ -4478,15 +4478,15 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
             bSize = max(32, max(it1->getBlockSize(), it2->getBlockSize()) / 1024);
-            long long diffSize = it1->getTotalSpace() - it2->getTotalSpace();
-            long long diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
+            int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
+            int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
             if (diffSize < 0)
                 diffSize = 0 - diffSize;
             if (diffUsed < 0)
                 diffUsed = 0 - diffUsed;
 
             if (it2->getFSysID() == -1 && (diffSize <= bSize) && 
-                ((size_t)diffUsed <= maxWriteFiveSec))
+                (diffUsed <= maxWriteFiveSec))
             {
                 if (!it1->getHostname().contains(it2->getHostname()))
                     it1->setHostname(it1->getHostname() + "," + it2->getHostname());
