@@ -112,8 +112,8 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 {
     src_in = (float *)AOALIGN(src_in_buf);
     memset(&src_data,          0, sizeof(SRC_DATA));
-    memset(src_in,             0, sizeof(float) * kAudioSRCInputSize);
-    memset(audiobuffer,        0, sizeof(char)  * kAudioRingBufferSize);
+    memset(src_in_buf,         0, sizeof(src_in_buf));
+    memset(audiobuffer,        0, sizeof(audiobuffer));
 
     // Handle override of SRC quality settings
     if (gCoreContext->GetNumSetting("SRCQualityOverride", false))

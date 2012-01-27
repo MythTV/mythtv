@@ -21,7 +21,8 @@ CetonRTSP::CetonRTSP(const QString &ip, uint tuner, ushort port) :
     _port(port),
     _tuner(tuner),
     _sequenceNumber(0),
-    _sessionNumber(0)
+    _sessionNumber(0),
+    _responseCode(-1)
 {
     _requestUrl = QString("rtsp://%1:%2/cetonmpeg%3")
         .arg(ip).arg(port).arg(tuner);

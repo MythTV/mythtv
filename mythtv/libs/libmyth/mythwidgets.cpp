@@ -1344,7 +1344,7 @@ void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive,
 void MythListBox::HandleItemSelectionChanged(void)
 {
     QList<QListWidgetItem*> items = QListWidget::selectedItems();
-    int row = index(items);
+    int row = getIndex(items);
     if (row >= 0)
         emit highlighted(row);
 }
@@ -1520,7 +1520,7 @@ void MythListBox::changeItem(const QString &new_text, uint row)
         widget->setText(new_text);
 }
 
-int MythListBox::index(const QList<QListWidgetItem*> &list)
+int MythListBox::getIndex(const QList<QListWidgetItem*> &list)
 {
     return (list.empty()) ? -1 : row(list[0]);
 }

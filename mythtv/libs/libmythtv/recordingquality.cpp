@@ -13,6 +13,7 @@ static double score_gaps(const ProgramInfo*, const RecordingGaps&);
 RecordingQuality::RecordingQuality(
     const ProgramInfo *pi, const RecordingGaps &rg,
     const QDateTime &first, const QDateTime &latest) :
+    m_continuity_error_count(0), m_packet_count(0),
     m_overall_score(1.0), m_recording_gaps(rg)
 {
     if (!pi)

@@ -975,12 +975,12 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent,
     }
 }
 
-MythThemedDialog::MythThemedDialog(MythMainWindow *parent, const char* name,
-                                   bool setsize)
-                : MythDialog(parent, name, setsize)
+MythThemedDialog::MythThemedDialog(
+    MythMainWindow *parent, const char* name, bool setsize) :
+    MythDialog(parent, name, setsize), widget_with_current_focus(NULL),
+    theme(NULL), context(-1)
 {
     setNoErase();
-    theme = NULL;
 }
 
 bool MythThemedDialog::loadThemedWindow(QString window_name,

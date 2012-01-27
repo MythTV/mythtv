@@ -23,7 +23,8 @@ RSA* MythRAOPConnection::g_rsa = NULL;
 
 MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
                                        QByteArray id, int port)
-  : QObject(parent), m_watchdogTimer(NULL), m_socket(socket), m_hardwareId(id),
+  : QObject(parent), m_watchdogTimer(NULL), m_socket(socket),
+    m_textStream(NULL), m_hardwareId(id),
     m_dataPort(port), m_dataSocket(NULL),
     m_clientControlSocket(NULL), m_clientControlPort(0),
     m_audio(NULL), m_codec(NULL), m_codeccontext(NULL),
