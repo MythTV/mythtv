@@ -5,13 +5,59 @@
 #include <QHash>
 #include <QMutex>
 #include <QWaitCondition>
+#include <QVector>
+#include <QPair>
 
 #include "mythuitype.h"
+#include "mythuihelper.h"
 #include "mythimage.h"
 
 class MythUIImagePrivate;
 class MythScreenType;
 class ImageLoadThread;
+
+/*!
+ * \class ImageLoader
+ */
+class ImageProperties
+{
+  public:
+    ImageProperties();
+    ImageProperties(const ImageProperties& other);
+   ~ImageProperties();
+
+    ImageProperties &operator=(const ImageProperties &other);
+
+    void SetMaskImage(MythImage* image);
+    MythImage* GetMaskImage() { return maskImage; }
+
+    QString filename;
+
+    MythRect cropRect;
+    QSize forceSize;
+
+    bool preserveAspect;
+    bool isGreyscale;
+    bool isReflected;
+    bool isMasked;
+
+    ReflectAxis reflectAxis;
+    int reflectScale;
+    int reflectLength;
+    int reflectShear;
+    int reflectSpacing;
+
+    QString cacheKey;
+
+  private:
+    void Init(void);
+    void Copy(const ImageProperties &other);
+
+    MythImage *maskImage;
+};
+
+typedef QPair<MythImage *, int> AnimationFrame;
+typedef QVector<AnimationFrame> AnimationFrames;
 
 /**
  * \class MythUIImage
@@ -65,12 +111,8 @@ class MUI_PUBLIC MythUIImage : public MythUIType
 
     void Init(void);
     void Clear(void);
-    MythImage* LoadImage(MythImageReader &imageReader, const QString &imFile,
-                         QSize bForceSize, int cacheMode);
-    bool LoadAnimatedImage(MythImageReader &imageReader, const QString &imFile,
-                           QSize bForceSize, int mode,
-                           QVector<MythImage *> *images = NULL,
-                           QVector<int> *delays = NULL);
+
+    void SetAnimationFrames(AnimationFrames frames);
     void customEvent(QEvent *event);
 
     virtual bool ParseElement(
@@ -86,22 +128,12 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     void SetCropRect(int x, int y, int width, int height);
     void SetCropRect(const MythRect &rect);
 
-    QString GenImageLabel(const QString &filename, int w, int h) const;
-    QString GenImageLabel(int w, int h) const;
-
     QString m_Filename;
     QString m_OrigFilename;
 
     QHash<int, MythImage *> m_Images;
     QHash<int, int>         m_Delays;
     QMutex                  m_ImagesLock;
-
-    static QHash<QString, MythUIImage *> m_loadingImages;
-    static QMutex                        m_loadingImagesLock;
-    static QWaitCondition                m_loadingImagesCond;
-
-    MythRect m_cropRect;
-    QSize m_ForceSize;
 
     int m_Delay;
     int m_LowNum;
@@ -112,19 +144,9 @@ class MUI_PUBLIC MythUIImage : public MythUIType
 
     bool m_NeedLoad;
 
-    bool m_isReflected;
-    ReflectAxis m_reflectAxis;
-    int  m_reflectShear;
-    int  m_reflectScale;
-    int  m_reflectLength;
-    int  m_reflectSpacing;
+    ImageProperties m_imageProperties;
 
-    MythImage *m_maskImage;
-    bool m_isMasked;
-
-    bool m_preserveAspect;
-
-    bool m_isGreyscale;
+    int m_runningThreads;
 
     MythUIImagePrivate *d;
 
@@ -133,12 +155,15 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     bool m_animationReverse;
     bool m_animatedImage;
 
+    friend class MythUIImagePrivate;
     friend class MythThemeBase;
     friend class MythUIButtonListItem;
     friend class MythUIProgressBar;
     friend class MythUIEditBar;
     friend class MythUITextEdit;
     friend class ImageLoadThread;
+
+    Q_DISABLE_COPY(MythUIImage)
 };
 
 #endif
