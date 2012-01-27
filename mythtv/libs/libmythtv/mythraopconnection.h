@@ -28,16 +28,18 @@ class MythRAOPConnection : public QObject
     Q_OBJECT
 
   public:
-    MythRAOPConnection(QTcpSocket* socket, QByteArray id, int port);
+    MythRAOPConnection(QObject *parent, QTcpSocket* socket, QByteArray id, int port);
    ~MythRAOPConnection();
     bool Init(void);
     QTcpSocket* GetSocket()   { return m_socket;   }
     int         GetDataPort() { return m_dataPort; }
+    bool        HasAudio()    { return m_audio;    }
 
   public slots:
     void readClient(void);
     void udpDataReady(void);
     void timeout(void);
+    void audioRetry(void);
 
   private:
     uint64_t FramesToMs(uint64_t timestamp);
@@ -57,6 +59,8 @@ class MythRAOPConnection : public QObject
     void    DestroyDecoder(void);
     bool    OpenAudioDevice(void);
     void    CloseAudioDevice(void);
+    void    StartAudioTimer(void);
+    void    StopAudioTimer(void);
 
     QTimer         *m_watchdogTimer;
     // comms socket
@@ -94,6 +98,8 @@ class MythRAOPConnection : public QObject
     uint64_t        m_latencyQueued;
     uint64_t        m_latencyCounter;
     int64_t         m_avSync;
+    // audio retry timer
+    QTimer         *m_audioTimer;
 };
 
 #endif // MYTHRAOPCONNECTION_H

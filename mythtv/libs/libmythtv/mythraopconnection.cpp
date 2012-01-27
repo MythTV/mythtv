@@ -21,19 +21,24 @@
 
 RSA* MythRAOPConnection::g_rsa = NULL;
 
-MythRAOPConnection::MythRAOPConnection(QTcpSocket *socket, QByteArray id, int port)
-  : m_watchdogTimer(NULL), m_socket(socket), m_hardwareId(id), m_dataPort(port),
-    m_dataSocket(NULL), m_clientControlSocket(NULL), m_clientControlPort(0),
+MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
+                                       QByteArray id, int port)
+  : QObject(parent), m_watchdogTimer(NULL), m_socket(socket), m_hardwareId(id),
+    m_dataPort(port), m_dataSocket(NULL),
+    m_clientControlSocket(NULL), m_clientControlPort(0),
     m_audio(NULL), m_codec(NULL), m_codeccontext(NULL),
     m_sampleRate(DEFAULT_SAMPLE_RATE), m_allowVolumeControl(true),
     m_seenPacket(false), m_lastPacketSequence(0), m_lastPacketTimestamp(0),
     m_lastSyncTime(0), m_lastSyncTimestamp(0), m_lastLatency(0), m_latencyAudio(0),
-    m_latencyQueued(0), m_latencyCounter(0), m_avSync(0)
+    m_latencyQueued(0), m_latencyCounter(0), m_avSync(0), m_audioTimer(NULL)
 {
 }
 
 MythRAOPConnection::~MythRAOPConnection()
 {
+    // delete audio timer
+    StopAudioTimer();
+
     // stop and delete watchdog timer
     if (m_watchdogTimer)
         m_watchdogTimer->stop();
@@ -397,6 +402,19 @@ void MythRAOPConnection::timeout(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Closing connection after inactivity.");
     m_socket->disconnectFromHost();
+}
+
+void MythRAOPConnection::audioRetry(void)
+{
+    if (!m_audio)
+    {
+        MythRAOPDevice* p = (MythRAOPDevice*)parent();
+        if (p && p->NextInAudioQueue(this) && OpenAudioDevice())
+            CreateDecoder();
+    }
+
+    if (m_audio && m_codec && m_codeccontext)
+        StopAudioTimer();
 }
 
 void MythRAOPConnection::readClient(void)
@@ -828,6 +846,7 @@ bool MythRAOPConnection::OpenAudioDevice(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to open audio device. Going silent...");
         CloseAudioDevice();
+        StartAudioTimer();
         return false;
     }
 
@@ -837,9 +856,11 @@ bool MythRAOPConnection::OpenAudioDevice(void)
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Audio not initialised. Message was '%1'")
             .arg(error));
         CloseAudioDevice();
+        StartAudioTimer();
         return false;
     }
 
+    StopAudioTimer();
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "Opened audio device.");
     return true;
 }
@@ -848,4 +869,22 @@ void MythRAOPConnection::CloseAudioDevice(void)
 {
     delete m_audio;
     m_audio = NULL;
+}
+
+void MythRAOPConnection::StartAudioTimer(void)
+{
+    if (m_audioTimer)
+        return;
+
+    m_audioTimer = new QTimer();
+    connect(m_audioTimer, SIGNAL(timeout()), this, SLOT(audioRetry()));
+    m_audioTimer->start(5000);
+}
+
+void MythRAOPConnection::StopAudioTimer(void)
+{
+    if (m_audioTimer)
+        m_audioTimer->stop();
+    delete m_audioTimer;
+    m_audioTimer = NULL;
 }

@@ -178,6 +178,16 @@ void MythRAOPDevice::Start(void)
     return;
 }
 
+bool MythRAOPDevice::NextInAudioQueue(MythRAOPConnection *conn)
+{
+    QMutexLocker locker(m_lock);
+    QList<MythRAOPConnection *>::iterator it;
+    for (it = m_clients.begin(); it != m_clients.end(); ++it)
+        if (!(*it)->HasAudio())
+            return conn == (*it);
+    return true;
+}
+
 void MythRAOPDevice::newConnection(void)
 {
     QMutexLocker locker(m_lock);
@@ -202,7 +212,7 @@ void MythRAOPDevice::newConnection(void)
     }
 
     MythRAOPConnection *obj =
-            new MythRAOPConnection(client, m_hardwareId, port);
+            new MythRAOPConnection(this, client, m_hardwareId, port);
     if (obj->Init())
     {
         m_clients.append(obj);
