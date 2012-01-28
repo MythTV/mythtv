@@ -1172,6 +1172,13 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
     QNetworkCacheMetaData urlData = m_manager->cache()->metaData(QUrl(url));
     m_infoLock->unlock();
 
+    // Deal with redirects, we want the cached data for the final url
+    QString redirectLoc;
+    while (!(redirectLoc = getHeader(urlData, "Location")).isNull())
+    {
+        urlData.setUrl(redirectLoc);
+    }
+
     if (urlData.isValid() &&
         ((!urlData.expirationDate().isValid()) ||
          (urlData.expirationDate().secsTo(now) < 0)))
