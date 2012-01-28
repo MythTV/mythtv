@@ -47,8 +47,6 @@ class ImageProperties
     int reflectShear;
     int reflectSpacing;
 
-    QString cacheKey;
-
   private:
     void Init(void);
     void Copy(const ImageProperties &other);
