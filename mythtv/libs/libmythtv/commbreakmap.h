@@ -12,21 +12,21 @@ class CommBreakMap
   public:
     CommBreakMap(void);
 
-    bool HasMap(void) { return hascommbreaktable; }
+    bool HasMap(void) const { return hascommbreaktable; }
 
-    CommSkipMode GetAutoCommercialSkip(void);
+    CommSkipMode GetAutoCommercialSkip(void) const;
     void SetAutoCommercialSkip(CommSkipMode autoskip, uint64_t framesPlayed);
 
-    int  GetSkipCommercials(void) { return skipcommercials; }
+    int  GetSkipCommercials(void) const { return skipcommercials; }
     void SkipCommercials(int direction);
 
     void ResetLastSkip(void);
     void SetTracker(uint64_t framesPlayed);
-    void GetMap(frm_dir_map_t &map);
+    void GetMap(frm_dir_map_t &map) const;
     void SetMap(const frm_dir_map_t &newMap, uint64_t framesPlayed);
     void LoadMap(PlayerContext *player_ctx, uint64_t framesPlayed);
 
-    bool IsInCommBreak(uint64_t frameNumber);
+    bool IsInCommBreak(uint64_t frameNumber) const;
     bool AutoCommercialSkip(uint64_t &jumpToFrame, uint64_t framesPlayed,
                             double video_frame_rate, uint64_t totalFrames,
                             QString &comm_msg);
