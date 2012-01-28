@@ -263,9 +263,9 @@ class VideoOutput
     static int CalcHueBase(const QString &adaptor_name);
 
     // 3D TV
-    virtual bool StereoscopicModesAllowed(void)     { return false;    }
+    virtual bool StereoscopicModesAllowed(void) const { return false; }
     void SetStereoscopicMode(StereoscopicMode mode) { m_stereo = mode; }
-    StereoscopicMode GetStereoscopicMode(void)      { return m_stereo; }
+    StereoscopicMode GetStereoscopicMode(void) const { return m_stereo; }
 
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,

@@ -57,7 +57,7 @@ class VideoOutputOpenGL : public VideoOutput
         { return VideoOutput::SetupVisualisation(audio, gl_context, name); }
     virtual QStringList GetVisualiserList(void);
 
-    virtual bool StereoscopicModesAllowed(void) { return true; }
+    virtual bool StereoscopicModesAllowed(void) const { return true; }
 
   protected:
     bool CreateCPUResources(void);
