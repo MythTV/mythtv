@@ -2135,7 +2135,7 @@ void MythCommandLineParser::addGeometry(void)
  */
 void MythCommandLineParser::addDisplay(void)
 {
-#ifdef CONFIG_X11
+#ifdef USING_X11
     add("-display", "display", "", "Specify X server to use.", "")
         ->SetGroup("User Interface");
 #endif

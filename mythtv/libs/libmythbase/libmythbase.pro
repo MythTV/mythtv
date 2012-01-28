@@ -112,6 +112,8 @@ using_libudf {
     LIBS += -ludf
 }
 
+using_x11:DEFINES += USING_X11
+
 mingw:LIBS += -lws2_32
 
 QT += xml sql network
