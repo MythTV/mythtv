@@ -1198,8 +1198,7 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     keyPressActions.clear();
 
-    handled = GetMythMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
-                                                     actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     if (!handled && !actions.isEmpty())
     {
