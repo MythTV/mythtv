@@ -41,9 +41,9 @@ class MTV_PUBLIC FileWriterBase
     void SetThreadCount(int count)      { m_encodingThreadCount = count; }
     void SetTimecodeOffset(long long o) { m_startingTimecodeOffset = o; }
 
-    long long GetFramesWritten(void)    { return m_framesWritten; }
-    long long GetTimecodeOffset(void)   { return m_startingTimecodeOffset; }
-    int       GetAudioFrameSize(void)   { return m_audioFrameSize; }
+    long long GetFramesWritten(void)  const { return m_framesWritten; }
+    long long GetTimecodeOffset(void) const { return m_startingTimecodeOffset; }
+    int       GetAudioFrameSize(void) const { return m_audioFrameSize; }
 
  protected:
     QString     m_filename;

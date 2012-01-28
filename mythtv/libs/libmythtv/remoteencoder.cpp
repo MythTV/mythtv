@@ -58,12 +58,12 @@ bool RemoteEncoder::Setup(void)
     return controlSock;
 }
 
-bool RemoteEncoder::IsValidRecorder(void)
+bool RemoteEncoder::IsValidRecorder(void) const
 {
     return (recordernum >= 0);
 }
 
-int RemoteEncoder::GetRecorderNumber(void)
+int RemoteEncoder::GetRecorderNumber(void) const
 {
     return recordernum;
 }
