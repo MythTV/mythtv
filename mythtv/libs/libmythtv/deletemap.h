@@ -24,25 +24,26 @@ class DeleteMap
     void SetPlayerContext(PlayerContext *ctx) { m_ctx = ctx; }
     bool HandleAction(QString &action, uint64_t frame, uint64_t played,
                       uint64_t total, double rate);
-    int  GetSeekAmount(void) { return m_seekamount; }
+    int  GetSeekAmount(void) const { return m_seekamount; }
     void UpdateSeekAmount(int change, double framerate);
     void SetSeekAmount(int amount) { m_seekamount = amount; }
 
     void UpdateOSD(uint64_t frame, uint64_t total, double frame_rate,
                    PlayerContext *ctx, OSD *osd);
 
-    bool IsEditing(void) { return m_editing; }
+    bool IsEditing(void) const { return m_editing; }
     void SetEditing(bool edit, OSD *osd = NULL);
     void SetFileEditing(PlayerContext *ctx, bool edit);
-    bool IsFileEditing(PlayerContext *ctx);
-    bool IsEmpty(void);
-    bool IsSaved(PlayerContext *ctx);
+    static bool IsFileEditing(const PlayerContext *ctx);
+    bool IsEmpty(void) const;
+    bool IsSaved(const PlayerContext *ctx) const;
 
     void SetMap(const frm_dir_map_t &map);
     void LoadCommBreakMap(uint64_t total, frm_dir_map_t &map);
     void SaveMap(uint64_t total, PlayerContext *ctx, bool isAutoSave = false);
-    void LoadMap(uint64_t total, PlayerContext *ctx, QString undoMessage = "");
-    bool LoadAutoSaveMap(uint64_t total, PlayerContext *ctx);
+    void LoadMap(uint64_t total, const PlayerContext *ctx,
+                 QString undoMessage = "");
+    bool LoadAutoSaveMap(uint64_t total, const PlayerContext *ctx);
     void CleanMap(uint64_t total);
 
     void Clear(QString undoMessage = "");
@@ -54,21 +55,22 @@ class DeleteMap
     void MoveRelative(uint64_t frame, uint64_t total, bool right);
     void Move(uint64_t frame, uint64_t to, uint64_t total);
 
-    bool     IsInDelete(uint64_t frame);
-    uint64_t GetNearestMark(uint64_t frame, uint64_t total, bool right);
-    bool     IsTemporaryMark(uint64_t frame);
-    bool     HasTemporaryMark(void);
-    uint64_t GetLastFrame(uint64_t total);
+    bool     IsInDelete(uint64_t frame) const;
+    uint64_t GetNearestMark(uint64_t frame, uint64_t total, bool right) const;
+    bool     IsTemporaryMark(uint64_t frame) const;
+    bool     HasTemporaryMark(void) const;
+    uint64_t GetLastFrame(uint64_t total) const;
 
     void TrackerReset(uint64_t frame, uint64_t total);
     bool TrackerWantsToJump(uint64_t frame, uint64_t total, uint64_t &to);
 
     bool Undo(void);
     bool Redo(void);
-    bool HasUndo(void) { return m_undoStackPointer > 0; }
-    bool HasRedo(void) { return m_undoStackPointer < m_undoStack.size() - 1; }
-    QString GetUndoMessage(void);
-    QString GetRedoMessage(void);
+    bool HasUndo(void) const { return m_undoStackPointer > 0; }
+    bool HasRedo(void) const
+        { return m_undoStackPointer < m_undoStack.size() - 1; }
+    QString GetUndoMessage(void) const;
+    QString GetRedoMessage(void) const;
 
   private:
     void Add(uint64_t frame, MarkTypes type);
