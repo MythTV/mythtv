@@ -158,6 +158,18 @@ class ImageLoader
         m_loadingImagesLock.unlock();
     }
 
+    static bool SupportsAnimation(const QString &filename)
+    {
+        QString extension = filename.section('.', -1);
+        if (!filename.startsWith("myth://") &&
+            (extension == "gif" ||
+             extension == "apng" ||
+             extension == "mng"))
+            return true;
+
+        return false;
+    }
+
     /**
     *  \brief Generates a unique identifying string for this image which is used
     *         as a key in the image cache.
@@ -198,8 +210,7 @@ class ImageLoader
         return imagelabel;
     }
 
-    static MythImage *LoadImage(MythImageReader &imageReader,
-                                MythPainter *painter,
+    static MythImage *LoadImage(MythPainter *painter,
                                  // Must be a copy for thread safety
                                 ImageProperties imProps,
                                 ImageCacheMode cacheMode,
@@ -207,7 +218,8 @@ class ImageLoader
                                  // replaced by generating a unique value for
                                  // each MythUIImage object?
                                 const MythUIImage *parent,
-                                bool &aborted)
+                                bool &aborted,
+                                MythImageReader *imageReader = NULL)
     {
         QString cacheKey = GenImageLabel(imProps);
         if (!PreLoad(cacheKey, parent))
@@ -236,7 +248,7 @@ class ImageLoader
             bForceResize = true;
         }
 
-        if (!imageReader.supportsAnimation())
+        if (!imageReader)
         {
             image = GetMythUI()->LoadCacheImage(filename, cacheKey,
                                                 painter, cacheMode);
@@ -266,7 +278,7 @@ class ImageLoader
             image->UpRef();
             bool ok = false;
 
-            if (imageReader.supportsAnimation())
+            if (imageReader)
                 ok = image->Load(imageReader);
             else
                 ok = image->Load(filename);
@@ -313,7 +325,7 @@ class ImageLoader
             if (imProps.isGreyscale)
                 image->ToGreyscale();
 
-            if (!imageReader.supportsAnimation())
+            if (!imageReader)
                 GetMythUI()->CacheImage(cacheKey, image);
         }
 
@@ -335,8 +347,7 @@ class ImageLoader
         return image;
     }
 
-    static AnimationFrames *LoadAnimatedImage(MythImageReader &imageReader,
-                                              MythPainter *painter,
+    static AnimationFrames *LoadAnimatedImage(MythPainter *painter,
                                                // Must be a copy for thread safety
                                               ImageProperties imProps,
                                               ImageCacheMode cacheMode,
@@ -350,25 +361,29 @@ class ImageLoader
         QString frameFilename;
         int imageCount = 1;
 
+        MythImageReader *imageReader = new MythImageReader(filename);
+
         AnimationFrames *images = new AnimationFrames();
 
-        while (imageReader.canRead() && !aborted)
+        while (imageReader->canRead() && !aborted)
         {
             frameFilename = filename.arg(imageCount);
 
             ImageProperties frameProps = imProps;
             frameProps.filename = frameFilename;
 
-            MythImage *im = ImageLoader::LoadImage(imageReader, painter,
-                                                   frameProps, cacheMode,
-                                                   parent, aborted);
+            MythImage *im = ImageLoader::LoadImage(painter, frameProps,
+                                                   cacheMode, parent, aborted,
+                                                   imageReader);
 
             if (!im)
                 aborted = true;
 
-            images->append(AnimationFrame(im, imageReader.nextImageDelay()));
+            images->append(AnimationFrame(im, imageReader->nextImageDelay()));
             imageCount++;
         }
+
+        delete imageReader;
 
         return images;
     }
@@ -446,20 +461,15 @@ class ImageLoadThread : public QRunnable
     {
         threadRegister("ImageLoad");
         bool aborted = false;
-        QString tmpFilename;
+        QString filename =  m_imageProperties.filename;
 
-        if (!(m_imageProperties.filename.startsWith("myth://")))
-            tmpFilename = m_imageProperties.filename;
-
-        QString cacheKey = ImageLoader::GenImageLabel(m_imageProperties);
-
-        MythImageReader imageReader(tmpFilename);
-
-        if (imageReader.supportsAnimation())
+        // NOTE Do NOT use MythImageReader::supportsAnimation here, it defeats
+        // the point of caching remote images
+        if (ImageLoader::SupportsAnimation(filename))
         {
              AnimationFrames *frames;
 
-             frames = ImageLoader::LoadAnimatedImage(imageReader, m_painter,
+             frames = ImageLoader::LoadAnimatedImage(m_painter,
                                                      m_imageProperties,
                                                      m_cacheMode, m_parent,
                                                      aborted);
@@ -472,7 +482,7 @@ class ImageLoadThread : public QRunnable
         }
         else
         {
-            MythImage *image = ImageLoader::LoadImage(imageReader, m_painter,
+            MythImage *image = ImageLoader::LoadImage(m_painter,
                                                       m_imageProperties,
                                                       m_cacheMode, m_parent,
                                                       aborted);
@@ -999,20 +1009,13 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             // Perform a blocking load
             LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
                 QString("Load(), loading '%1' in foreground").arg(filename));
-            QString tmpFilename;
             bool aborted = false;
 
-            if (!(filename.startsWith("myth://")))
-                tmpFilename = filename;
-
-            MythImageReader imageReader(tmpFilename);
-
-            if (imageReader.supportsAnimation())
+            if (ImageLoader::SupportsAnimation(filename))
             {
                 AnimationFrames *myFrames;
 
-                myFrames = ImageLoader::LoadAnimatedImage(imageReader,
-                                        GetPainter(), imProps,
+                myFrames = ImageLoader::LoadAnimatedImage(GetPainter(), imProps,
                                         static_cast<ImageCacheMode>(cacheMode2),
                                         this, aborted);
 
@@ -1030,7 +1033,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             {
                 MythImage *image = NULL;
 
-                image = ImageLoader::LoadImage(imageReader, GetPainter(),
+                image = ImageLoader::LoadImage(GetPainter(),
                                                imProps,
                                                static_cast<ImageCacheMode>(cacheMode2),
                                                this, aborted);

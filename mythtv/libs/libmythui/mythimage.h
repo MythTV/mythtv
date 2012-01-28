@@ -51,7 +51,7 @@ class MUI_PUBLIC MythImage : public QImage
     void Assign(const QImage &img);
     void Assign(const QPixmap &pix);
 
-    bool Load(MythImageReader &reader);
+    bool Load(MythImageReader *reader);
     bool Load(const QString &filename, bool scale = true);
 
     void Resize(const QSize &newSize, bool preserveAspect = false);
