@@ -593,8 +593,8 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
 
     if (!dlInfo->m_reload)
     {
-        // Prefer the in-cache item if one exists and it is less than 60
-        // seconds old and has not expired in the last 10 seconds.
+        // Prefer the in-cache item if one exists and it is less than 5 minutes
+        // old and it will not expire in the next 10 seconds
         QDateTime now = QDateTime::currentDateTime();
 
         // Handle redirects, we want the metadata of the file headers
@@ -604,7 +604,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
             qurl.setUrl(redirectLoc);
         }
 
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Checking cache for %1")
+        LOG(VB_NETWORK, LOG_DEBUG, QString("Checking cache for %1")
                                                     .arg(qurl.toString()));
 
         QNetworkCacheMetaData urlData = m_manager->cache()->metaData(qurl);
@@ -614,20 +614,15 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
         {
             QString dateString = getHeader(urlData, "Date");
 
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Finding date header for %1")
-                                                    .arg(qurl.toString()));
-
             if (!dateString.isNull())
             {
-                LOG(VB_GENERAL, LOG_DEBUG, QString("DATE is %1")
-                                                    .arg(dateString));
                 QDateTime loadDate = QDateTime::fromString(dateString,
                                                            dateFormat);
                 loadDate.setTimeSpec(Qt::UTC);
-                if (loadDate.secsTo(now) < 720)
+                if (loadDate.secsTo(now) <= 720)
                 {
                     dlInfo->m_preferCache = true;
-                    LOG(VB_GENERAL, LOG_DEBUG, QString("Prefering cache for %1")
+                    LOG(VB_NETWORK, LOG_DEBUG, QString("Prefering cache for %1")
                                                     .arg(qurl.toString()));
                 }
             }
@@ -1162,6 +1157,11 @@ bool MythDownloadManager::saveFile(const QString &outFile,
  */
 QDateTime MythDownloadManager::GetLastModified(const QString &url)
 {
+    // If the header has not expired and
+    // the last modification date is less than 30 minutes old or if
+    // the cache object is less than 5 minutes old,
+    // then use the cached header otherwise redownload the header
+
     static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1')").arg(url));
     QDateTime result;
@@ -1172,28 +1172,27 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
     QNetworkCacheMetaData urlData = m_manager->cache()->metaData(QUrl(url));
     m_infoLock->unlock();
 
-    if (urlData.isValid())
+    if (urlData.isValid() &&
+        ((!urlData.expirationDate().isValid()) ||
+         (urlData.expirationDate().secsTo(now) < 0)))
     {
-        if (urlData.lastModified().secsTo(now) <= 60)
+        if (urlData.lastModified().secsTo(now) <= 1800)
         {
             result = urlData.lastModified();
         }
         else
         {
-            // If the last modification date is older than 60 seconds, and
-            // we loaded the page over 60 seconds ago, then redownload the
-            // page to re-verify it's last modified date.
             QString date = getHeader(urlData, "Date");
-
             if (!date.isNull())
             {
                 QDateTime loadDate =
                     QDateTime::fromString(date, dateFormat);
                 loadDate.setTimeSpec(Qt::UTC);
-                if (loadDate.secsTo(now) <= 60)
+                if (loadDate.secsTo(now) <= 720)
+                {
                     result = urlData.lastModified();
+                }
             }
-
         }
     }
 
