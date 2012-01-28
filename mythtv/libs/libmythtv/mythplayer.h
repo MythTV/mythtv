@@ -278,8 +278,12 @@ class MTV_PUBLIC MythPlayer
     void TracksChanged(uint trackType);
     void EnableSubtitles(bool enable);
     void EnableForcedSubtitles(bool enable);
+    // How to handle forced Subtitles (i.e. when in a movie someone speaks
+    // in a different language than the rest of the movie, subtitles are
+    // forced on even if the user doesn't have them turned on.)
+    // These two functions are not thread-safe (UI thread use only).
     void SetAllowForcedSubtitles(bool allow);
-    bool GetAllowForcedSubtitles(void) { return allowForcedSubtitles; }
+    bool GetAllowForcedSubtitles(void) const { return allowForcedSubtitles; }
 
     // Public MHEG/MHI stream selection
     bool SetAudioByComponentTag(int tag);
