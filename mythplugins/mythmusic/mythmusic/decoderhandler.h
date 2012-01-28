@@ -17,7 +17,6 @@
 // mythmusic
 #include "metadata.h"
 #include "pls.h"
-#include </media/src/mythtv-git-clean/mythtv/mythtv/libs/libmythtv/lzoconf.h>
 
 class MusicBuffer;
 class RemoteFile;
