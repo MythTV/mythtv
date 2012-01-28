@@ -683,6 +683,11 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
     return list;
 }
 
+MythPainter *VideoOutputD3D::GetOSDPainter(void)
+{
+    return m_osd_painter;
+}
+
 bool VideoOutputD3D::ApproveDeintFilter(const QString& filtername) const
 {
     if (codec_is_std(video_codec_id))

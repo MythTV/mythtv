@@ -828,9 +828,11 @@ void AvFormatDecoder::InitByteContext(void)
     ic->pb->is_streamed = streamed;
 }
 
-extern "C" void HandleStreamChange(void* data)
+extern "C" void HandleStreamChange(void *data)
 {
-    AvFormatDecoder* decoder = (AvFormatDecoder*) data;
+    AvFormatDecoder *decoder =
+        reinterpret_cast<AvFormatDecoder*>(data);
+
     int cnt = decoder->ic->nb_streams;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -842,9 +844,11 @@ extern "C" void HandleStreamChange(void* data)
     decoder->ScanStreams(false);
 }
 
-extern "C" void HandleDVDStreamChange(void* data)
+extern "C" void HandleDVDStreamChange(void *data)
 {
-    AvFormatDecoder* decoder = (AvFormatDecoder*) data;
+    AvFormatDecoder *decoder =
+        reinterpret_cast<AvFormatDecoder*>(data);
+
     int cnt = decoder->ic->nb_streams;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -856,9 +860,10 @@ extern "C" void HandleDVDStreamChange(void* data)
     decoder->ScanStreams(true);
 }
 
-extern "C" void HandleBDStreamChange(void* data)
+extern "C" void HandleBDStreamChange(void *data)
 {
-    AvFormatDecoder* decoder = (AvFormatDecoder*) data;
+    AvFormatDecoder *decoder =
+        reinterpret_cast<AvFormatDecoder*>(data);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "resetting");
 

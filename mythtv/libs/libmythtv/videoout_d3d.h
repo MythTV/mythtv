@@ -53,7 +53,7 @@ class VideoOutputD3D : public VideoOutput
                  PIPLocation  loc);
     void RemovePIP(MythPlayer *pipplayer);
     bool IsPIPSupported(void) const { return true; }
-    virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
+    virtual MythPainter *GetOSDPainter(void);
     bool hasHWAcceleration(void) const { return !codec_is_std(video_codec_id); }
     virtual bool ApproveDeintFilter(const QString& filtername) const;
     virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id);

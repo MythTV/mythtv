@@ -1414,7 +1414,7 @@ void MPEGStreamData::ReturnCachedTable(const PSIPTable *psip) const
         psip_refcnt_map_t::iterator it;
         it = _cached_slated_for_deletion.find(psip);
         if (it != _cached_slated_for_deletion.end())
-            DeleteCachedTable((PSIPTable*)psip);
+            DeleteCachedTable(const_cast<PSIPTable*>(psip));
     }
 }
 

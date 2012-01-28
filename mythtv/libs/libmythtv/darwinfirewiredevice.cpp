@@ -890,10 +890,10 @@ void DarwinFirewireDevice::HandleDeviceChange(uint messageType)
 
 // Various message callbacks.
 
-void *dfd_controller_thunk(void *param)
+void *dfd_controller_thunk(void *callback_data)
 {
     threadRegister("DarwinController");
-    ((DarwinFirewireDevice*)param)->RunController();
+    reinterpret_cast<DarwinFirewireDevice*>(callback_data)->RunController();
     threadDeregister();
     return NULL;
 }
@@ -906,7 +906,8 @@ void dfd_update_device_list_item(
 
 int dfd_no_data_notification(void *callback_data)
 {
-    ((DarwinFirewireDevice*)callback_data)->ProcessNoDataMessage();
+    reinterpret_cast<DarwinFirewireDevice*>(callback_data)->
+        ProcessNoDataMessage();
 
     return kIOReturnSuccess;
 }
@@ -914,14 +915,16 @@ int dfd_no_data_notification(void *callback_data)
 void dfd_stream_msg(long unsigned int msg, long unsigned int param1,
                     long unsigned int param2, void *callback_data)
 {
-    ((DarwinFirewireDevice*)callback_data)->
+    reinterpret_cast<DarwinFirewireDevice*>(callback_data)->
         ProcessStreamingMessage(msg, param1, param2);
 }
 
 int dfd_tspacket_handler(uint tsPacketCount, uint32_t **ppBuf,
                          void *callback_data)
 {
-    DarwinFirewireDevice *fw = (DarwinFirewireDevice*) callback_data;
+    DarwinFirewireDevice *fw =
+        reinterpret_cast<DarwinFirewireDevice*>(callback_data);
+
     if (!fw)
         return kIOReturnBadArgument;
 
@@ -940,7 +943,7 @@ static IOReturn dfd_tspacket_handler_thunk(
 
 static void dfd_update_device_list(void *dfd, io_iterator_t deviter)
 {
-    DarwinFirewireDevice *dev = (DarwinFirewireDevice*) dfd;
+    DarwinFirewireDevice *dev = reinterpret_cast<DarwinFirewireDevice*>(dfd);
 
     io_object_t it = NULL;
     while ((it = IOIteratorNext(deviter)))
