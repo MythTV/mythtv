@@ -38,10 +38,10 @@ class MythDownloadInfo
   public:
     MythDownloadInfo() :
         m_request(NULL),         m_reply(NULL),       m_data(NULL),
-        m_caller(NULL),          m_post(false),       m_reload(false),
-        m_preferCache(false),    m_syncMode(false),   m_processReply(true),
-        m_done(false),           m_bytesReceived(0),  m_bytesTotal(0),
-        m_lastStat(QDateTime::currentDateTime()),
+        m_caller(NULL),          m_requestType(kRequestGet),
+        m_reload(false),         m_preferCache(false),m_syncMode(false),
+        m_processReply(true),    m_done(false),       m_bytesReceived(0),
+        m_bytesTotal(0),         m_lastStat(QDateTime::currentDateTime()),
         m_errorCode(QNetworkReply::NoError)
     {
         qRegisterMetaType<QNetworkReply::NetworkError>("QNetworkReply::NetworkError");
@@ -69,7 +69,7 @@ class MythDownloadInfo
     QByteArray      *m_data;
     QByteArray       m_privData;
     QObject         *m_caller;
-    bool             m_post;
+    MRequestType     m_requestType;
     bool             m_reload;
     bool             m_preferCache;
     bool             m_syncMode;
@@ -284,22 +284,20 @@ void MythDownloadManager::run(void)
     RunEpilog();
 }
 
-/** \fn MythDownloadManager::queueItem(const QString &url, QNetworkRequest *req,
-                                       const QString &dest, QByteArray *data,
-                                       QObject *caller, const bool post,
-                                       const bool reload)
+/**
  *  \brief Adds a request to the download queue.
  *  \param url      URI to download.
  *  \param req      QNetworkRequest to queue
  *  \param dest     Destination filename.
  *  \param data     Location of data for request
  *  \param caller   QObject to receive event notifications.
- *  \param post     Issue a POST request instead of a GET
+ *  \param reqType  Issue a POST/GET/HEAD request
+ *  \
  *  \param reload   Force reloading of the URL
  */
 void MythDownloadManager::queueItem(const QString &url, QNetworkRequest *req,
                                     const QString &dest, QByteArray *data,
-                                    QObject *caller, const bool post,
+                                    QObject *caller, const MRequestType reqType,
                                     const bool reload)
 {
     MythDownloadInfo *dlInfo = new MythDownloadInfo;
@@ -309,7 +307,7 @@ void MythDownloadManager::queueItem(const QString &url, QNetworkRequest *req,
     dlInfo->m_outFile = dest;
     dlInfo->m_data    = data;
     dlInfo->m_caller  = caller;
-    dlInfo->m_post    = post;
+    dlInfo->m_requestType = reqType;
     dlInfo->m_reload  = reload;
 
     dlInfo->detach();
@@ -319,21 +317,19 @@ void MythDownloadManager::queueItem(const QString &url, QNetworkRequest *req,
     m_queueWaitCond.wakeAll();
 }
 
-/** \fn MythDownloadManager::processItem(const QString &url,
-                                         QNetworkRequest *req,
-                                         const QString &dest, QByteArray *data,
-                                         const bool post, const bool reload)
+/**
  *  \brief Processes a network request immediately and waits for a response.
  *  \param url      URI to download.
  *  \param req      QNetworkRequest to queue
  *  \param dest     Destination filename.
  *  \param data     Location of data for request
- *  \param post     Issue a POST request instead of a GET
+ *  \param reqType  Issue a POST/GET/HEAD request
  *  \param reload   Force reloading of the URL
  */
 bool MythDownloadManager::processItem(const QString &url, QNetworkRequest *req,
                                       const QString &dest, QByteArray *data,
-                                      const bool post, const bool reload)
+                                      const MRequestType reqType,
+                                      const bool reload)
 {
     MythDownloadInfo *dlInfo = new MythDownloadInfo;
 
@@ -341,7 +337,7 @@ bool MythDownloadManager::processItem(const QString &url, QNetworkRequest *req,
     dlInfo->m_request  = req;
     dlInfo->m_outFile  = dest;
     dlInfo->m_data     = data;
-    dlInfo->m_post     = post;
+    dlInfo->m_requestType = reqType;
     dlInfo->m_reload   = reload;
     dlInfo->m_syncMode = true;
 
@@ -376,7 +372,7 @@ void MythDownloadManager::queueDownload(const QString &url,
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("queueDownload('%1', '%2', %3)")
             .arg(url).arg(dest).arg((long long)caller));
 
-    queueItem(url, NULL, dest, NULL, caller, false, reload);
+    queueItem(url, NULL, dest, NULL, caller, kRequestGet, reload);
 }
 
 /** \fn MythDownloadManager::queueDownload(QNetworkRequest &request,
@@ -410,7 +406,7 @@ void MythDownloadManager::queueDownload(QNetworkRequest *req,
 bool MythDownloadManager::download(const QString &url, const QString &dest,
                                    const bool reload)
 {
-    return processItem(url, NULL, dest, NULL, false, reload);
+    return processItem(url, NULL, dest, NULL, kRequestGet, reload);
 }
 
 /** \fn MythDownloadManager::download(const QString &url,
@@ -425,7 +421,7 @@ bool MythDownloadManager::download(const QString &url, const QString &dest,
 bool MythDownloadManager::download(const QString &url, QByteArray *data,
                                    const bool reload)
 {
-    return processItem(url, NULL, QString(), data, false, reload);
+    return processItem(url, NULL, QString(), data, kRequestGet, reload);
 }
 
 /** \fn MythDownloadManager::download(const QString &url,
@@ -495,7 +491,7 @@ void MythDownloadManager::queuePost(const QString &url,
         return;
     }
 
-    queueItem(url, NULL, QString(), data, caller, true);
+    queueItem(url, NULL, QString(), data, caller, kRequestPost);
 }
 
 /** \fn MythDownloadManager::queuePost(QNetworkRequest *req,
@@ -519,7 +515,7 @@ void MythDownloadManager::queuePost(QNetworkRequest *req,
         return;
     }
 
-    queueItem(req->url().toString(), req, QString(), data, caller, true);
+    queueItem(req->url().toString(), req, QString(), data, caller, kRequestPost);
 }
 
 /** \fn MythDownloadManager::post(const QString &url, QByteArray *data)
@@ -539,7 +535,7 @@ bool MythDownloadManager::post(const QString &url, QByteArray *data)
         return false;
     }
 
-    return processItem(url, NULL, QString(), data, true);
+    return processItem(url, NULL, QString(), data, kRequestPost);
 }
 
 /** \fn MythDownloadManager::post(QNetworkRequest *req, QByteArray *data)
@@ -559,7 +555,7 @@ bool MythDownloadManager::post(QNetworkRequest *req, QByteArray *data)
         return false;
     }
 
-    return processItem(req->url().toString(), req, QString(), data, true);
+    return processItem(req->url().toString(), req, QString(), data, kRequestPost);
 }
 
 /** \fn MythDownloadManager::downloadRemoteFile(MythDownloadInfo *dlInfo)
@@ -645,10 +641,19 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     request.setRawHeader("User-Agent",
                          "MythDownloadManager v" MYTH_BINARY_VERSION);
 
-    if (dlInfo->m_post)
-        dlInfo->m_reply = m_manager->post(request, *dlInfo->m_data);
-    else
-        dlInfo->m_reply = m_manager->get(request);
+    switch (dlInfo->m_requestType)
+    {
+        case kRequestPost :
+            dlInfo->m_reply = m_manager->post(request, *dlInfo->m_data);
+            break;
+        case kRequestHead :
+            dlInfo->m_reply = m_manager->head(request);
+            break;
+        case kRequestGet :
+        default:
+            dlInfo->m_reply = m_manager->get(request);
+            break;
+    }
 
     m_downloadReplies[dlInfo->m_reply] = dlInfo;
 
@@ -898,10 +903,19 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         request.setRawHeader("User-Agent",
                              "MythDownloadManager v" MYTH_BINARY_VERSION);
 
-        if (dlInfo->m_post)
-            dlInfo->m_reply = m_manager->post(request, *dlInfo->m_data);
-        else
-            dlInfo->m_reply = m_manager->get(request);
+        switch (dlInfo->m_requestType)
+        {
+            case kRequestPost :
+                dlInfo->m_reply = m_manager->post(request, *dlInfo->m_data);
+                break;
+            case kRequestHead :
+                dlInfo->m_reply = m_manager->head(request);
+                break;
+            case kRequestGet :
+            default:
+                dlInfo->m_reply = m_manager->get(request);
+                break;
+        }
 
         m_downloadReplies[dlInfo->m_reply] = dlInfo;
 
@@ -1188,6 +1202,8 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
         MythDownloadInfo *dlInfo = new MythDownloadInfo;
         dlInfo->m_url      = url;
         dlInfo->m_syncMode = true;
+        // Head request, we only want to inspect the headers
+        dlInfo->m_requestType = kRequestHead;
 
         if (downloadNow(dlInfo, false) && dlInfo->m_reply)
         {
@@ -1199,6 +1215,9 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
 
         delete dlInfo;
     }
+
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1'): Result %2")
+                                            .arg(url).arg(result.toString()));
 
     return result;
 }

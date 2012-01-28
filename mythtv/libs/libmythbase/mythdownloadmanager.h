@@ -18,6 +18,9 @@ class RemoteFileDownloadThread;
 
 void ShutdownMythDownloadManager(void);
 
+// TODO : Overlap/Clash with RequestType in libupnp/httprequest.h
+typedef enum MRequestType {kRequestGet, kRequestHead, kRequestPost} MRequestType;
+
 class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 {
     Q_OBJECT
@@ -78,11 +81,13 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     // Helper methods for initializing and performing requests
     void queueItem(const QString &url, QNetworkRequest *req,
                    const QString &dest, QByteArray *data, QObject *caller,
-                   const bool post = false, const bool reload = false);
+                   const MRequestType reqType = kRequestGet,
+                   const bool reload = false);
 
     bool processItem(const QString &url, QNetworkRequest *req,
                      const QString &dest, QByteArray *data,
-                     const bool post = false, const bool reload = false);
+                     const MRequestType reqType = kRequestGet,
+                     const bool reload = false);
 
     void downloadRemoteFile(MythDownloadInfo *dlInfo);
     void downloadQNetworkRequest(MythDownloadInfo *dlInfo);
