@@ -32,7 +32,7 @@ void DeleteMap::Push(QString undoMessage)
         m_undoStack.pop_back();
     m_undoStack.append(entry);
     m_undoStackPointer ++;
-    SaveMap(0, m_ctx, true);
+    SaveMap(0, true);
 }
 
 bool DeleteMap::Undo(void)
@@ -42,7 +42,7 @@ bool DeleteMap::Undo(void)
     m_undoStackPointer --;
     m_deleteMap = m_undoStack[m_undoStackPointer].deleteMap;
     m_changed = true;
-    SaveMap(0, m_ctx, true);
+    SaveMap(0, true);
     return true;
 }
 
@@ -53,7 +53,7 @@ bool DeleteMap::Redo(void)
     m_undoStackPointer ++;
     m_deleteMap = m_undoStack[m_undoStackPointer].deleteMap;
     m_changed = true;
-    SaveMap(0, m_ctx, true);
+    SaveMap(0, true);
     return true;
 }
 
@@ -132,18 +132,18 @@ void DeleteMap::UpdateSeekAmount(int change, double framerate)
  *        are only refreshed if the deleteMap has been updated.
  */
 void DeleteMap::UpdateOSD(uint64_t frame, uint64_t total, double frame_rate,
-                          PlayerContext *ctx, OSD *osd)
+                          OSD *osd)
 {
-    if (!osd || !ctx)
+    if (!osd || !m_ctx)
         return;
     CleanMap(total);
 
     InfoMap infoMap;
-    ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (ctx->playingInfo)
-        ctx->playingInfo->ToMap(infoMap);
+    m_ctx->LockPlayingInfo(__FILE__, __LINE__);
+    if (m_ctx->playingInfo)
+        m_ctx->playingInfo->ToMap(infoMap);
     infoMap.detach();
-    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     int secs   = (int)(frame / frame_rate);
     int frames = frame - (int)(secs * frame_rate);
@@ -180,27 +180,27 @@ void DeleteMap::SetEditing(bool edit, OSD *osd)
 }
 
 /// Update the editing status in the file's ProgramInfo.
-void DeleteMap::SetFileEditing(PlayerContext *ctx, bool edit)
+void DeleteMap::SetFileEditing(bool edit)
 {
-    if (ctx)
+    if (m_ctx)
     {
-        ctx->LockPlayingInfo(__FILE__, __LINE__);
-        if (ctx->playingInfo)
-            ctx->playingInfo->SetEditing(edit);
-        ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+        m_ctx->LockPlayingInfo(__FILE__, __LINE__);
+        if (m_ctx->playingInfo)
+            m_ctx->playingInfo->SetEditing(edit);
+        m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
 }
 
 /// Determines whether the file is currently in edit mode.
-bool DeleteMap::IsFileEditing(const PlayerContext *ctx)
+bool DeleteMap::IsFileEditing(void)
 {
     bool result = false;
-    if (ctx)
+    if (m_ctx)
     {
-        ctx->LockPlayingInfo(__FILE__, __LINE__);
-        if (ctx->playingInfo)
-            result = ctx->playingInfo->QueryIsEditing();
-        ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+        m_ctx->LockPlayingInfo(__FILE__, __LINE__);
+        if (m_ctx->playingInfo)
+            result = m_ctx->playingInfo->QueryIsEditing();
+        m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
     return result;
 }
@@ -668,16 +668,15 @@ void DeleteMap::LoadCommBreakMap(uint64_t total, frm_dir_map_t &map)
 }
 
 /// Loads the delete map from the database.
-void DeleteMap::LoadMap(
-    uint64_t total, const PlayerContext *ctx, QString undoMessage)
+void DeleteMap::LoadMap(uint64_t total, QString undoMessage)
 {
-    if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
+    if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
 
     Clear();
-    ctx->LockPlayingInfo(__FILE__, __LINE__);
-    ctx->playingInfo->QueryCutList(m_deleteMap);
-    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    m_ctx->LockPlayingInfo(__FILE__, __LINE__);
+    m_ctx->playingInfo->QueryCutList(m_deleteMap);
+    m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     CleanMap(total);
     if (!undoMessage.isEmpty())
         Push(undoMessage);
@@ -685,16 +684,16 @@ void DeleteMap::LoadMap(
 
 /// Returns true if an auto-save map was loaded.
 /// Does nothing and returns false if not.
-bool DeleteMap::LoadAutoSaveMap(uint64_t total, const PlayerContext *ctx)
+bool DeleteMap::LoadAutoSaveMap(uint64_t total)
 {
-    if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
+    if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return false;
 
     frm_dir_map_t tmpDeleteMap = m_deleteMap;
     Clear();
-    ctx->LockPlayingInfo(__FILE__, __LINE__);
-    bool result = ctx->playingInfo->QueryCutList(m_deleteMap, true);
-    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    m_ctx->LockPlayingInfo(__FILE__, __LINE__);
+    bool result = m_ctx->playingInfo->QueryCutList(m_deleteMap, true);
+    m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     CleanMap(total);
     if (result)
         Push(QObject::tr("Load Auto-saved Cuts"));
@@ -705,9 +704,9 @@ bool DeleteMap::LoadAutoSaveMap(uint64_t total, const PlayerContext *ctx)
 }
 
 /// Saves the delete map to the database.
-void DeleteMap::SaveMap(uint64_t total, PlayerContext *ctx, bool isAutoSave)
+void DeleteMap::SaveMap(uint64_t total, bool isAutoSave)
 {
-    if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
+    if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
 
     if (!isAutoSave)
@@ -726,10 +725,10 @@ void DeleteMap::SaveMap(uint64_t total, PlayerContext *ctx, bool isAutoSave)
 
         CleanMap(total);
     }
-    ctx->LockPlayingInfo(__FILE__, __LINE__);
-    ctx->playingInfo->SaveMarkupFlag(MARK_UPDATED_CUT);
-    ctx->playingInfo->SaveCutList(m_deleteMap, isAutoSave);
-    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    m_ctx->LockPlayingInfo(__FILE__, __LINE__);
+    m_ctx->playingInfo->SaveMarkupFlag(MARK_UPDATED_CUT);
+    m_ctx->playingInfo->SaveCutList(m_deleteMap, isAutoSave);
+    m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
 /**
@@ -799,16 +798,16 @@ uint64_t DeleteMap::GetLastFrame(uint64_t total) const
 /**
  * \brief Compares the current cut list with the saved cut list
  */
-bool DeleteMap::IsSaved(const PlayerContext *ctx) const
+bool DeleteMap::IsSaved(void) const
 {
-    if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
+    if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return true;
 
     frm_dir_map_t currentMap(m_deleteMap);
     frm_dir_map_t savedMap;
-    ctx->LockPlayingInfo(__FILE__, __LINE__);
-    ctx->playingInfo->QueryCutList(savedMap);
-    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    m_ctx->LockPlayingInfo(__FILE__, __LINE__);
+    m_ctx->playingInfo->QueryCutList(savedMap);
+    m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     // Remove temporary placeholder marks from currentMap
     QMutableMapIterator<uint64_t, MarkTypes> it(currentMap);

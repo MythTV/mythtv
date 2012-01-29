@@ -965,7 +965,7 @@ int MythPlayer::OpenFile(uint retries)
     if (ret > 0)
     {
         hasFullPositionMap = true;
-        deleteMap.LoadMap(totalFrames, player_ctx);
+        deleteMap.LoadMap(totalFrames);
         deleteMap.TrackerReset(0, totalFrames);
     }
 
@@ -2675,7 +2675,7 @@ void MythPlayer::EventLoop(void)
             forcePositionMapSync = true;
             osdLock.lock();
             deleteMap.UpdateOSD(framesPlayed, totalFrames, video_frame_rate,
-                                player_ctx, osd);
+                                osd);
             osdLock.unlock();
             editUpdateTimer.start();
         }
@@ -3700,7 +3700,7 @@ bool MythPlayer::EnableEdit(void)
         return false;
     }
 
-    if (deleteMap.IsFileEditing(player_ctx))
+    if (deleteMap.IsFileEditing())
         return false;
 
     QMutexLocker locker(&osdLock);
@@ -3714,7 +3714,7 @@ bool MythPlayer::EnableEdit(void)
     ResetCaptions();
     osd->HideAll();
 
-    bool loadedAutoSave = deleteMap.LoadAutoSaveMap(totalFrames, player_ctx);
+    bool loadedAutoSave = deleteMap.LoadAutoSaveMap(totalFrames);
     if (loadedAutoSave)
     {
         SetOSDMessage(QObject::tr("Using previously auto-saved cuts"),
@@ -3722,9 +3722,8 @@ bool MythPlayer::EnableEdit(void)
     }
 
     deleteMap.UpdateSeekAmount(0, video_frame_rate);
-    deleteMap.UpdateOSD(framesPlayed, totalFrames, video_frame_rate,
-                        player_ctx, osd);
-    deleteMap.SetFileEditing(player_ctx, true);
+    deleteMap.UpdateOSD(framesPlayed, totalFrames, video_frame_rate, osd);
+    deleteMap.SetFileEditing(true);
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo)
         player_ctx->playingInfo->SaveEditing(true);
@@ -3742,11 +3741,11 @@ void MythPlayer::DisableEdit(bool save)
 
     deleteMap.SetEditing(false, osd);
     if (!save)
-        deleteMap.LoadMap(totalFrames, player_ctx);
+        deleteMap.LoadMap(totalFrames);
     // Unconditionally save to remove temporary marks from the DB.
     deleteMap.SaveMap(totalFrames, player_ctx);
     deleteMap.TrackerReset(framesPlayed, totalFrames);
-    deleteMap.SetFileEditing(player_ctx, false);
+    deleteMap.SetFileEditing(false);
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo)
         player_ctx->playingInfo->SaveEditing(false);
@@ -3845,8 +3844,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         }
         else if (action == "REVERT")
         {
-            deleteMap.LoadMap(totalFrames, player_ctx,
-                              QObject::tr("Undo Changes"));
+            deleteMap.LoadMap(totalFrames, QObject::tr("Undo Changes"));
             refresh = true;
         }
         else if (action == "REVERTEXIT")
@@ -3894,7 +3892,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         if (osd)
         {
             deleteMap.UpdateOSD(framesPlayed, totalFrames, video_frame_rate,
-                                player_ctx, osd);
+                                osd);
         }
         osdLock.unlock();
     }
@@ -4201,7 +4199,7 @@ void MythPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
         else
         {
             uint64_t oldnumber = number;
-            deleteMap.LoadMap(totalFrames, player_ctx);
+            deleteMap.LoadMap(totalFrames);
             commBreakMap.LoadMap(player_ctx, framesPlayed);
 
             bool started_in_break_map = false;

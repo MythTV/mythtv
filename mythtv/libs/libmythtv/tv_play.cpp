@@ -3644,7 +3644,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
             }
             if (has_action("ESCAPE", actions))
             {
-                if (!actx->player->IsCutListSaved(actx))
+                if (!actx->player->IsCutListSaved())
                     ShowOSDCutpoint(actx, "EXIT_EDIT_MODE");
                 else
                 {
