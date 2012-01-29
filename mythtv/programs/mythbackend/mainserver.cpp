@@ -674,6 +674,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleFreeTuner(tokens[1].toInt(), pbs);
     }
+    else if (command == "QUERY_ACTIVE_BACKENDS")
+    {
+        HandleActiveBackendsQuery(pbs);
+    }
     else if (command == "QUERY_IS_ACTIVE_BACKEND")
     {
         if (tokens.size() != 1)
@@ -4242,6 +4246,30 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     }
 
     SendResponse(pbssock, retlist);
+}
+
+void MainServer::HandleActiveBackendsQuery(QPlaybackSock *pbs)
+{
+    QStringList retlist;
+    retlist << gCoreContext->GetHostName();
+
+    {
+        QString hostname;
+        QReadLocker rlock(&sockListLock);
+        vector<PlaybackSock*>::iterator it;
+        for (it = playbackList.begin(); it != playbackList.end(); ++it)
+        {
+            if ((*it)->isSlaveBackend())
+            {
+                hostname = (*it)->getHostname();
+                if (!retlist.contains(hostname))
+                    retlist << hostname;
+            }
+        }
+    }
+
+    retlist.push_front(QString::number(retlist.size()));
+    SendResponse(pbs->getSocket(), retlist);
 }
 
 void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
