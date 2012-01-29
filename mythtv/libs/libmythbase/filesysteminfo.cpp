@@ -86,7 +86,7 @@ void FileSystemInfo::clone(const FileSystemInfo &other)
     m_blksize = other.m_blksize;
     m_total = other.m_total;
     m_used = other.m_used;
-    m_weight = other.m_weight
+    m_weight = other.m_weight;
 }
 
 FileSystemInfo &FileSystemInfo::operator=(const FileSystemInfo &other)
