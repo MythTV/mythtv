@@ -619,6 +619,10 @@ QString Metadata::Filename(bool find) const
     if (find == false)
         return m_filename;
 
+    // check for a cd track
+    if (m_filename.endsWith(".cda"))
+        return m_filename;
+
     // check for http urls etc
     if (m_filename.contains("://"))
         return m_filename;
