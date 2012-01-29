@@ -48,7 +48,7 @@ using namespace std;
 
 FileSystemInfo::FileSystemInfo(void) :
     m_hostname(""), m_path(""), m_local(false), m_fsid(-1),
-    m_grpid(-1), m_blksize(4096), m_total(0), m_used(0)
+    m_grpid(-1), m_blksize(4096), m_total(0), m_used(0), m_weight(0)
 {
 }
 
@@ -60,7 +60,8 @@ FileSystemInfo::FileSystemInfo(const FileSystemInfo &other)
 FileSystemInfo::FileSystemInfo(QString hostname, QString path, bool local,
         int fsid, int groupid, int blksize, int64_t total, int64_t used) :
     m_hostname(hostname), m_path(path), m_local(local), m_fsid(fsid),
-    m_grpid(groupid), m_blksize(blksize), m_total(total), m_used(used)
+    m_grpid(groupid), m_blksize(blksize), m_total(total), m_used(used),
+    m_weight(0)
 {
 }
 
@@ -85,6 +86,7 @@ void FileSystemInfo::clone(const FileSystemInfo &other)
     m_blksize = other.m_blksize;
     m_total = other.m_total;
     m_used = other.m_used;
+    m_weight = other.m_weight
 }
 
 FileSystemInfo &FileSystemInfo::operator=(const FileSystemInfo &other)
@@ -103,6 +105,7 @@ void FileSystemInfo::clear(void)
     m_blksize   = 4096;
     m_total     = 0;
     m_used      = 0;
+    m_weight    = 0;
 }
 
 bool FileSystemInfo::ToStringList(QStringList &list) const
@@ -139,6 +142,8 @@ bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(m_blksize);
     INT_FROM_LIST(m_total);
     INT_FROM_LIST(m_used);
+
+    m_weight = 0;
 
     return true;
 }
