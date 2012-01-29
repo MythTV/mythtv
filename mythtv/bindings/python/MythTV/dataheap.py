@@ -37,12 +37,9 @@ class Artwork( unicode ):
         self.imagetype = imagetype
         self.parent = parent
 
-        s = u''
         if parent:
-            if parent[attr] is not None:
-                s = parent[attr]
             self.hostname = parent.get('hostname', parent.get('host', None))
-        super(Artwork, self).__init__(s)
+        super(Artwork, self).__init__()
 
     def __repr__(self):
         return u"<{0.imagetype} '{0}'>".format(self)
