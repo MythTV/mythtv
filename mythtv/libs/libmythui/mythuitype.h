@@ -148,6 +148,10 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void SetHelpText(const QString &text) { m_helptext = text; }
     QString GetHelpText(void) const { return m_helptext; }
 
+    void SetXMLLocation(const QString &filename, int where)
+    { m_xmlLocation = QString("%1:%2").arg(filename).arg(where); }
+    QString GetXMLLocation(void) const { return m_xmlLocation; }
+
     bool IsDeferredLoading(bool recurse = false) const;
     void SetDeferLoad(bool defer) { m_deferload = defer; }
     virtual void LoadNow(void);
@@ -245,6 +249,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
     QList<MythUIAnimation*> m_animations;
     QString m_helptext;
+    QString m_xmlLocation;
 
     bool m_deferload;
 

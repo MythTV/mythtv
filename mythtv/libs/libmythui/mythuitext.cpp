@@ -272,9 +272,9 @@ void MythUIText::SetCutDown(Qt::TextElideMode mode)
         m_Cutdown = mode;
         if (m_scrolling && m_Cutdown)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("'%1': <scroll> and <cutdown> are "
-                                             "not combinable.")
-                .arg(objectName()));
+            LOG(VB_GENERAL, LOG_ERR, QString("'%1' (%2): <scroll> and "
+                                             "<cutdown> are not combinable.")
+                .arg(objectName()).arg(GetXMLLocation()));
             m_Cutdown = Qt::ElideNone;
         }
         if (!m_Message.isEmpty())
@@ -417,6 +417,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
 
     layout->setText(paragraph);
     layout->beginLayout();
+    num_lines = 0;
     for (;;)
     {
         QTextLine line = layout->createLine();
@@ -426,9 +427,9 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
         // Try "visible" width first, so alignment works
         line.setLineWidth(width);
 
-        if (!force && !m_MultiLine && line.textLength() < paragraph.size())
+        if (!m_MultiLine && line.textLength() < paragraph.size())
         {
-            if (m_Cutdown != Qt::ElideNone)
+            if (!force && m_Cutdown != Qt::ElideNone)
             {
                 QFontMetrics fm(GetFontProperties()->face());
                 paragraph = fm.elidedText(paragraph, m_Cutdown,
@@ -446,10 +447,11 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
         {
             if (height > m_Area.height())
             {
-                LOG(VB_GUI, m_MultiLine ? LOG_DEBUG : LOG_NOTICE,
-                    QString("'%1': height overflow. line height %2 "
-                            "paragraph height %3, area height %4")
+                LOG(VB_GUI, num_lines ? LOG_DEBUG : LOG_NOTICE,
+                    QString("'%1' (%2): height overflow. line height %3 "
+                            "paragraph height %4, area height %5")
                     .arg(objectName())
+                    .arg(GetXMLLocation())
                     .arg(line.height())
                     .arg(height)
                     .arg(m_Area.height()));
@@ -552,7 +554,6 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
 
         m_drawRect.setWidth(0);
         height = 0;
-        num_lines = 0;
 
         LayoutParagraphs(paragraphs, textoption, width, height,
                          min_rect, last_line_width, num_lines);
@@ -1182,7 +1183,9 @@ bool MythUIText::ParseElement(
                 else
                 {
                     m_scrollDirection = ScrollNone;
-                    LOG(VB_GENERAL, LOG_ERR, "Invalid scroll attribute");
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("'%1' (%2) Invalid scroll attribute")
+                        .arg(objectName()).arg(GetXMLLocation()));
                 }
             }
 
@@ -1226,7 +1229,10 @@ void MythUIText::CopyFrom(MythUIType *base)
 
     if (!text)
     {
-        LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("'%1' (%2) ERROR, bad parsing '%3' (%4)")
+            .arg(objectName()).arg(GetXMLLocation())
+            .arg(base->objectName()).arg(base->GetXMLLocation()));
         return;
     }
 
@@ -1290,8 +1296,9 @@ void MythUIText::Finalize(void)
 {
     if (m_scrolling && m_Cutdown != Qt::ElideNone)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("'%1': <scroll> and <cutdown> are "
-                                         "not combinable.").arg(objectName()));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("'%1' (%2): <scroll> and <cutdown> are not combinable.")
+            .arg(objectName()).arg(GetXMLLocation()));
         m_Cutdown = Qt::ElideNone;
     }
     FillCutMessage();

@@ -1396,7 +1396,10 @@ void MythUIImage::CopyFrom(MythUIType *base)
 
     if (!im)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "bad parsing");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("'%1' (%2) ERROR, bad parsing '%3' (%4)")
+            .arg(objectName()).arg(GetXMLLocation())
+            .arg(base->objectName()).arg(base->GetXMLLocation()));
         d->m_UpdateLock.unlock();
         return;
     }

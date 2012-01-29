@@ -529,6 +529,9 @@ MythUIType *XMLParseBase::ParseUIType(
             uitype->CopyFrom(base);
     }
 
+    QFileInfo fi(filename);
+    uitype->SetXMLLocation(fi.fileName(), element.lineNumber());
+
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {

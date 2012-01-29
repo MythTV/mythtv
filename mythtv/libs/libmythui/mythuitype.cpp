@@ -1087,6 +1087,7 @@ int MythUIType::NormY(const int y)
  */
 void MythUIType::CopyFrom(MythUIType *base)
 {
+    m_xmlLocation = base->m_xmlLocation;
     m_Visible = base->m_Visible;
     m_Enabled = base->m_Enabled;
     m_CanHaveFocus = base->m_CanHaveFocus;
