@@ -111,8 +111,8 @@ class Scheduler : public MThread, public MythScheduler
     bool FindNextConflict(const RecList &cardlist,
                           const RecordingInfo *p, RecConstIter &iter,
                           int openEnd = 0) const;
-    const RecordingInfo *FindConflict(const RecordingInfo *p, int openEnd = 0)
-        const;
+    const RecordingInfo *FindConflict(const QMap<int, RecList> &reclists,
+                                    const RecordingInfo *p, int openEnd = 0) const;
     void MarkOtherShowings(RecordingInfo *p);
     void MarkShowingsList(RecList &showinglist, RecordingInfo *p);
     void BackupRecStatus(void);
@@ -174,7 +174,7 @@ class Scheduler : public MThread, public MythScheduler
     RecList reclist;
     RecList worklist;
     RecList retrylist;
-    RecList conflictlist;
+    QMap<int, RecList> cardlistmap;
     QMap<int, RecList> recordidlistmap;
     QMap<QString, RecList> titlelistmap;
     InputGroupMap igrp;
