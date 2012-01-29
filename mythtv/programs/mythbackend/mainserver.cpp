@@ -4248,7 +4248,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     SendResponse(pbssock, retlist);
 }
 
-void MainServer::HandleActiveBackendsQuery(QPlaybackSock *pbs)
+void MainServer::HandleActiveBackendsQuery(PlaybackSock *pbs)
 {
     QStringList retlist;
     retlist << gCoreContext->GetHostName();
