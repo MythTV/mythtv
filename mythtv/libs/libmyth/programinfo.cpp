@@ -1883,12 +1883,6 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
         (recordid == other.recordid || recordid == other.parentid))
            return true;
 
-    if (title.toLower() != other.title.toLower())
-        return false;
-
-    if (findid && findid == other.findid)
-        return true;
-
     if (dupmethod & kDupCheckNone)
         return false;
 
@@ -1900,6 +1894,9 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 
     if (!programid.isEmpty() && !other.programid.isEmpty())
         return programid == other.programid;
+
+    if (title.toLower() != other.title.toLower())
+        return false;
 
     if ((dupmethod & kDupCheckSub) &&
         ((subtitle.isEmpty()) ||
