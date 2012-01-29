@@ -192,7 +192,7 @@ bool PrePostRollFlagger::go()
 
     if (showProgress)
     {
-        float elapsed = flagTime.elapsed() / 1000.0;
+        //float elapsed = flagTime.elapsed() / 1000.0;
 
         //float flagFPS = (elapsed > 0.0f) ? (framesProcessed / elapsed) : 0.0f;
 

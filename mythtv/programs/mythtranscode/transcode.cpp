@@ -762,7 +762,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         newWidth = cmdWidth;
         newHeight = cmdHeight;
 
-        int actualHeight = (video_height == 1088 ? 1080 : video_height);
+        // int actualHeight = (video_height == 1088 ? 1080 : video_height);
 
         // If height or width are 0, then we need to calculate them
         if (newHeight == 0 && newWidth > 0)
