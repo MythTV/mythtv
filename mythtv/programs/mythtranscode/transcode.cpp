@@ -332,12 +332,8 @@ private:
     };
 
 public:
-    Cutter()
-    {
-        active = false;
-        videoFramesToCut = 0;
-        audioFramesToCut = 0;
-    }
+    Cutter() : active(false), videoFramesToCut(0), audioFramesToCut(0),
+        audioFramesPerVideoFrame(0.0) {};
 
     void SetCutList(frm_dir_map_t &deleteMap)
     {
@@ -379,7 +375,7 @@ public:
         tracker.SetMap(remainingCutList);
     }
 
-    frm_dir_map_t AdjustedCutList()
+    frm_dir_map_t AdjustedCutList() const
     {
         return foreshortenedCutList;
     }
