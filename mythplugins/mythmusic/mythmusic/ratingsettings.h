@@ -20,13 +20,11 @@ private:
     MythUISpinBox      *m_playCountWeight;
     MythUISpinBox      *m_lastPlayWeight;
     MythUISpinBox      *m_randomWeight;
-    MythUIText         *m_helpText;
     MythUIButton       *m_saveButton;
     MythUIButton       *m_cancelButton;
 
 private slots:
     void slotSave(void);
-    void slotFocusChanged(void);
 };
 
 #endif // RATINGSETTINGS_H

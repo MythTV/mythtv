@@ -34,7 +34,6 @@ bool PlayerSettings::Create()
     UIUtilE::Assign(this, m_exitAction, "exitaction", &err);
     UIUtilE::Assign(this, m_autoLookupCD, "autolookupcd", &err);
     UIUtilE::Assign(this, m_autoPlayCD, "autoplaycd", &err);
-    UIUtilE::Assign(this, m_helpText, "helptext", &err);
     UIUtilE::Assign(this, m_saveButton, "save", &err);
     UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
 
@@ -61,10 +60,18 @@ bool PlayerSettings::Create()
     if (loadAutoPlayCD == 1)
         m_autoLookupCD->SetCheckState(MythUIStateType::Full);
 
-    connect(m_resumeMode,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_exitAction,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_autoLookupCD,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_autoPlayCD,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    m_resumeMode->SetHelpText(tr("Resume playback at either the beginning of the "
+                 "active play queue, the beginning of the last track, "
+                 "an exact point within the last track."));
+    m_exitAction->SetHelpText(tr("Specify what action to take when exiting mythmusic plugin."));
+    m_autoLookupCD->SetHelpText(tr("Automatically lookup an audio CD if it is "
+                 "present and show its information in the "
+                 "Music Selection Tree."));
+    m_autoPlayCD->SetHelpText(tr("Automatically put a new CD on the "
+                 "playlist and start playing the CD."));
+    m_cancelButton->SetHelpText(tr("Exit without saving settings"));
+    m_saveButton->SetHelpText(tr("Save settings and Exit"));
+
     connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
 
@@ -85,34 +92,4 @@ void PlayerSettings::slotSave(void)
 
     Close();
 }
-
-void PlayerSettings::slotFocusChanged(void)
-{
-    if (!m_helpText)
-        return;
-
-    QString msg = "";
-    if (GetFocusWidget() == m_resumeMode)
-        msg = tr("Resume playback at either the beginning of the "
-                 "active play queue, the beginning of the last track, "
-                 "an exact point within the last track.");
-    else if (GetFocusWidget() == m_exitAction)
-        msg = tr("Specify what action to take when exiting mythmusic plugin.");
-    else if (GetFocusWidget() == m_autoLookupCD)
-        msg = tr("Automatically lookup an audio CD if it is "
-                 "present and show its information in the "
-                 "Music Selection Tree.");
-    else if (GetFocusWidget() == m_autoPlayCD)
-        msg = tr("Automatically put a new CD on the "
-                 "playlist and start playing the CD.");
-    else if (GetFocusWidget() == m_cancelButton)
-        msg = tr("Exit without saving settings");
-    else if (GetFocusWidget() == m_saveButton)
-        msg = tr("Save settings and Exit");
-
-    m_helpText->SetText(msg);
-}
-
-
-
 

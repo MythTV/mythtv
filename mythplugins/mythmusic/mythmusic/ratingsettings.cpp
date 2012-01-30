@@ -8,12 +8,9 @@
 
 RatingSettings::RatingSettings(MythScreenStack *parent, const char *name)
         : MythScreenType(parent, name),
-        m_ratingWeight(NULL),
-        m_playCountWeight(NULL),
-        m_lastPlayWeight(NULL),
-        m_randomWeight(NULL),
-        m_saveButton(NULL),
-        m_cancelButton(NULL)
+        m_ratingWeight(NULL), m_playCountWeight(NULL),
+        m_lastPlayWeight(NULL), m_randomWeight(NULL),
+        m_saveButton(NULL), m_cancelButton(NULL)
 {
 }
 
@@ -34,7 +31,6 @@ bool RatingSettings::Create()
     m_playCountWeight = dynamic_cast<MythUISpinBox *> (GetChild("playcountweight"));
     m_lastPlayWeight = dynamic_cast<MythUISpinBox *> (GetChild("lastplayweight"));
     m_randomWeight = dynamic_cast<MythUISpinBox *> (GetChild("randomweight"));
-    m_helpText = dynamic_cast<MythUIText *> (GetChild("helptext"));
     m_saveButton = dynamic_cast<MythUIButton *> (GetChild("save"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
@@ -53,10 +49,25 @@ bool RatingSettings::Create()
     m_randomWeight->SetRange(0,100,1);
     m_randomWeight->SetValue(gCoreContext->GetNumSetting("IntelliRandomWeight"));
 
-    connect(m_ratingWeight,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_playCountWeight,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_lastPlayWeight,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_randomWeight,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    m_ratingWeight->SetHelpText(tr("Used in \"Smart\" Shuffle mode. "
+                 "This weighting affects how much strength is "
+                 "given to your rating of a given track when "
+                 "ordering a group of songs."));
+    m_playCountWeight->SetHelpText(tr("Used in \"Smart\" Shuffle mode. "
+                 "This weighting affects how much strength is "
+                 "given to how many times a given track has been "
+                 "played when ordering a group of songs."));
+    m_lastPlayWeight->SetHelpText(tr("Used in \"Smart\" Shuffle mode. "
+                 "This weighting affects how much strength is "
+                 "given to how long it has been since a given "
+                 "track was played when ordering a group of songs."));
+    m_randomWeight->SetHelpText(tr("Used in \"Smart\" Shuffle mode. "
+                 "This weighting affects how much strength is "
+                 "given to good old (peudo-)randomness "
+                 "when ordering a group of songs."));
+    m_cancelButton->SetHelpText(tr("Exit without saving settings"));
+    m_saveButton->SetHelpText(tr("Save settings and Exit"));
+
     connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
 
@@ -75,37 +86,4 @@ void RatingSettings::slotSave(void)
     Close();
 }
 
-void RatingSettings::slotFocusChanged(void)
-{
-    if (!m_helpText)
-        return;
-
-    QString msg = "";
-    if (GetFocusWidget() == m_ratingWeight)
-        msg = tr("Used in \"Smart\" Shuffle mode. "
-                 "This weighting affects how much strength is "
-                 "given to your rating of a given track when "
-                 "ordering a group of songs.");
-    else if (GetFocusWidget() == m_playCountWeight)
-        msg = tr("Used in \"Smart\" Shuffle mode. "
-                 "This weighting affects how much strength is "
-                 "given to how many times a given track has been "
-                 "played when ordering a group of songs.");
-    else if (GetFocusWidget() == m_lastPlayWeight)
-        msg = tr("Used in \"Smart\" Shuffle mode. "
-                 "This weighting affects how much strength is "
-                 "given to how long it has been since a given "
-                 "track was played when ordering a group of songs.");
-    else if (GetFocusWidget() == m_randomWeight)
-        msg = tr("Used in \"Smart\" Shuffle mode. "
-                 "This weighting affects how much strength is "
-                 "given to good old (peudo-)randomness "
-                 "when ordering a group of songs.");
-    else if (GetFocusWidget() == m_cancelButton)
-        msg = tr("Exit without saving settings");
-    else if (GetFocusWidget() == m_saveButton)
-        msg = tr("Save settings and Exit");
-
-    m_helpText->SetText(msg);
-}
 

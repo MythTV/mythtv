@@ -21,13 +21,11 @@ private:
     MythUIButtonList   *m_exitAction;
     MythUICheckBox     *m_autoLookupCD;
     MythUICheckBox     *m_autoPlayCD;
-    MythUIText         *m_helpText;
     MythUIButton       *m_saveButton;
     MythUIButton       *m_cancelButton;
 
 private slots:
     void slotSave(void);
-    void slotFocusChanged(void);
 
 };
 
