@@ -42,7 +42,7 @@ using namespace std;
 
 class AudioReencodeBuffer : public AudioOutput
 {
- public:
+  public:
     AudioReencodeBuffer(AudioFormat audio_format, int audio_channels,
                         bool passthru)
     {
@@ -134,7 +134,8 @@ class AudioReencodeBuffer : public AudioOutput
                 inputOffset += copyLen;
 
                 ab[ab_count-1].len  += copyLen;
-                ab[ab_count-1].time += (copyLen / bytes_per_frame / (eff_audiorate / 1000));
+                ab[ab_count-1].time += (copyLen / bytes_per_frame /
+                                        (eff_audiorate / 1000));
                 audiobuffer_len   += copyLen;
             }
 
@@ -144,11 +145,12 @@ class AudioReencodeBuffer : public AudioOutput
                 if (copyLen > (len - inputOffset))
                     copyLen = (len - inputOffset);
 
-                memcpy(audiobuffer + audiobuffer_len, (char *)buffer + inputOffset,
-                       copyLen);
+                memcpy(audiobuffer + audiobuffer_len,
+                       (char *)buffer + inputOffset, copyLen);
                 inputOffset += copyLen;
 
-                last_audiotime = timecode + ((inputOffset / bytes_per_frame) / (eff_audiorate / 1000));
+                last_audiotime = timecode + ((inputOffset / bytes_per_frame) /
+                                             (eff_audiorate / 1000));
 
                 ab[ab_count].len = copyLen;
                 ab[ab_count].offset = audiobuffer_len;
@@ -306,7 +308,7 @@ class AudioReencodeBuffer : public AudioOutput
     long long last_audiotime;
     bool                m_passthru;
     int                 m_audioFrameSize;
-private:
+  private:
     bool                m_initpassthru;
 };
 
@@ -317,7 +319,7 @@ private:
 // the remaining part by discarding data.
 class Cutter
 {
-private:
+  private:
     bool          active;
     frm_dir_map_t foreshortenedCutList;
     DeleteMap     tracker;
@@ -331,7 +333,7 @@ private:
         MINCUT     = 20
     };
 
-public:
+  public:
     Cutter() : active(false), videoFramesToCut(0), audioFramesToCut(0),
         audioFramesPerVideoFrame(0.0) {};
 
@@ -356,11 +358,14 @@ public:
                     break;
 
                 case MARK_CUT_END:
-                    leadinLength = min((int64_t)(it.key() - start), (int64_t)MAXLEADIN);
+                    leadinLength = min((int64_t)(it.key() - start),
+                                       (int64_t)MAXLEADIN);
                     if (leadinLength >= MINCUT)
                     {
-                        foreshortenedCutList[it.key() - leadinLength + 2] = MARK_CUT_END;
-                        remainingCutList[it.key() - leadinLength + 1] = MARK_CUT_START;
+                        foreshortenedCutList[it.key() - leadinLength + 2] =
+                            MARK_CUT_END;
+                        remainingCutList[it.key() - leadinLength + 1] =
+                            MARK_CUT_START;
                         remainingCutList[it.key()] = MARK_CUT_END;
                     }
                     else
@@ -398,14 +403,20 @@ public:
             {
                 uint64_t jumpTo = 0;
 
-                if (tracker.TrackerWantsToJump(currentFrame, totalFrames, jumpTo))
+                if (tracker.TrackerWantsToJump(currentFrame, totalFrames,
+                                               jumpTo))
                 {
-                    // Reset the tracker and work out how much video and audio to drop
+                    // Reset the tracker and work out how much video and audio
+                    // to drop
                     tracker.TrackerReset(jumpTo, totalFrames);
                     videoFramesToCut = jumpTo - currentFrame;
-                    audioFramesToCut += (int64_t)(videoFramesToCut * audioFramesPerVideoFrame + 0.5);
-                    LOG(VB_GENERAL, LOG_INFO, QString("Clean cut: discarding frame from %1 to %2: vid %3 aud %4")
-                            .arg((long)currentFrame).arg((long)jumpTo).arg((long)videoFramesToCut)
+                    audioFramesToCut += (int64_t)(videoFramesToCut *
+                                        audioFramesPerVideoFrame + 0.5);
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("Clean cut: discarding frame from %1 to %2: "
+                                "vid %3 aud %4")
+                        .arg((long)currentFrame).arg((long)jumpTo)
+                        .arg((long)videoFramesToCut)
                         .arg((long)audioFramesToCut));
                 }
             }
@@ -424,8 +435,9 @@ public:
             videoFramesToCut--;
 
             if(videoFramesToCut == 0)
-                LOG(VB_GENERAL, LOG_INFO, QString("Clean cut: end of video cut; audio frames left to cut %1")
-                        .arg((long)audioFramesToCut));
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Clean cut: end of video cut; audio frames left "
+                            "to cut %1") .arg((long)audioFramesToCut));
 
             return true;
         }
@@ -443,19 +455,21 @@ public:
             // so gets us closer to zero left to drop
             audioFramesToCut -= frames;
             if(audioFramesToCut == 0)
-                LOG(VB_GENERAL, LOG_INFO, QString("Clean cut: end of audio cut; vidio frames left to cut %1")
-                        .arg((long)videoFramesToCut));
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Clean cut: end of audio cut; vidio frames left "
+                            "to cut %1") .arg((long)videoFramesToCut));
             return true;
         }
         else
         {
-            // Don't drop this packet even though we still have frames to cut, because
-            // doing so would put us further out. Instead, inflate the callers record
-            // of how many audio frames have been output.
+            // Don't drop this packet even though we still have frames to cut,
+            // because doing so would put us further out. Instead, inflate the 
+            // callers record of how many audio frames have been output.
             *totalAudio += audioFramesToCut;
             audioFramesToCut = 0;
-            LOG(VB_GENERAL, LOG_INFO, QString("Clean cut: end of audio cut; vidio frames left to cut %1")
-                    .arg((long)videoFramesToCut));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Clean cut: end of audio cut; vidio frames left to "
+                        "cut %1") .arg((long)videoFramesToCut));
             return false;
         }
     }
@@ -512,7 +526,7 @@ class TranscodeFrameQueue : public QRunnable
 
     }
 
-   ~TranscodeFrameQueue()
+    ~TranscodeFrameQueue()
     {
         m_runThread = false;
         m_frameWaitCond.wakeAll();
@@ -765,8 +779,8 @@ static int get_int_option(RecordingProfile &profile, const QString &name)
 static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
                                int timecode, int pagenr)
 {
-  NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)ptr;
-  nvr->WriteText(buf, len, timecode, pagenr);
+    NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)ptr;
+    nvr->WriteText(buf, len, timecode, pagenr);
 }
 
 int Transcode::TranscodeFile(const QString &inputname,
@@ -946,6 +960,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         newWidth = cmdWidth;
         newHeight = cmdHeight;
 
+        // TODO: is this necessary?  It got commented out, but may still be
+        // needed.
         // int actualHeight = (video_height == 1088 ? 1080 : video_height);
 
         // If height or width are 0, then we need to calculate them
@@ -1022,7 +1038,8 @@ int Transcode::TranscodeFile(const QString &inputname,
             //avfw->SetAudioCodec("libfaac");
 
             if (hlsStreamID == -1)
-                hls = new HTTPLiveStream(inputname, newWidth, newHeight, cmdBitrate,
+                hls = new HTTPLiveStream(inputname, newWidth, newHeight,
+                                         cmdBitrate,
                                          cmdAudioBitrate, hlsMaxSegments,
                                          segmentSize, audioOnlyBitrate);
 
@@ -1116,7 +1133,8 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         arb->m_audioFrameSize = avfw->GetAudioFrameSize() * arb->channels * 2;
 
-        player->SetVideoFilters(gCoreContext->GetSetting("HTTPLiveStreamFilters"));
+        player->SetVideoFilters(
+            gCoreContext->GetSetting("HTTPLiveStreamFilters"));
     }
     else if (fifodir.isEmpty())
     {
@@ -1525,7 +1543,8 @@ int Transcode::TranscodeFile(const QString &inputname,
     if (hls)
         hls->UpdateStatus(kHLSStatusRunning);
 
-    while ((!stopSignalled) && (lastDecode = frameQueue->GetFrame(did_ff, is_key)))
+    while ((!stopSignalled) &&
+           (lastDecode = frameQueue->GetFrame(did_ff, is_key)))
     {
         if (first_loop)
         {
@@ -1610,7 +1629,8 @@ int Transcode::TranscodeFile(const QString &inputname,
 #endif
             if (arb->audiobuffer_len)
             {
-                if (!cutter.InhibitUseAudioFrames(arb->audiobuffer_frames, &totalAudio))
+                if (!cutter.InhibitUseAudioFrames(arb->audiobuffer_frames,
+                                                  &totalAudio))
                     fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
             }
 
@@ -1674,7 +1694,8 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                     //need to correct the frame# and timecode here
                     // Question:  Is it necessary to change the timecodes?
-                    long sync_offset = player->UpdateStoredFrameNum(curFrameNum);
+                    long sync_offset;
+                    sync_offset = player->UpdateStoredFrameNum(curFrameNum);
                     nvr->UpdateSeekTable(num_keyframes, sync_offset);
                     ReencoderAddKFA(curFrameNum, lastKeyFrame, num_keyframes);
                     num_keyframes++;
@@ -1896,8 +1917,8 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
 
             if (!avfMode)
-                player->GetCC608Reader()->TranscodeWriteText(&TranscodeWriteText,
-                                                             (void *)(nvr));
+                player->GetCC608Reader()->
+                    TranscodeWriteText(&TranscodeWriteText, (void *)(nvr));
             lasttimecode = frame.timecode;
             frame.timecode -= timecodeOffset;
 
