@@ -39,16 +39,12 @@
 #include "visualizationsettings.h"
 #include "importsettings.h"
 #include "ratingsettings.h"
-
-#ifndef USING_MINGW
-#include "cdrip.h"
 #include "importmusic.h"
+
+#ifdef HAVE_CDIO
+#include "cdrip.h"
 #endif
 
-// System header (relies on config.h define)
-#ifdef HAVE_CDAUDIO
-#include <cdaudio.h>
-#endif
 
 // This stores the last MythMediaDevice that was detected:
 QString gCDdevice;
@@ -66,43 +62,6 @@ static QString chooseCD(void)
 #endif
 
     return MediaMonitor::defaultCDdevice();
-}
-
-static void CheckFreeDBServerFile(void)
-{
-    QString homeDir = QDir::home().path();
-
-    if (homeDir.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "main.o: You don't have a HOME environment "
-                                 "variable. CD lookup will almost certainly "
-                                 "not work.");
-        return;
-    }
-
-    QString filename = homeDir + "/.cdserverrc";
-    QFile file(filename);
-
-    if (!file.exists())
-    {
-#ifdef HAVE_CDAUDIO
-        struct cddb_conf cddbconf;
-        struct cddb_serverlist list;
-        struct cddb_host proxy_host;
-
-        memset(&cddbconf, 0, sizeof(cddbconf));
-
-        cddbconf.conf_access = CDDB_ACCESS_REMOTE;
-        list.list_len = 1;
-        strncpy(list.list_host[0].host_server.server_name,
-                "freedb.freedb.org", 256);
-        strncpy(list.list_host[0].host_addressing, "~cddb/cddb.cgi", 256);
-        list.list_host[0].host_server.server_port = 80;
-        list.list_host[0].host_protocol = CDDB_MODE_HTTP;
-
-        cddb_write_serverlist(cddbconf, list, proxy_host.host_server);
-#endif
-    }
 }
 
 static void SavePending(int pending)
@@ -175,8 +134,6 @@ static void loadMusic()
     // only do this once
     if (gMusicData->initialized)
         return;
-
-    CheckFreeDBServerFile();
 
     MSqlQuery count_query(MSqlQuery::InitCon());
 
@@ -279,7 +236,7 @@ static void startRipper(void)
 {
     loadMusic();
 
-#ifndef USING_MINGW
+#if defined HAVE_CDIO
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     Ripper *rip = new Ripper(mainStack, chooseCD());
@@ -300,7 +257,6 @@ static void startImport(void)
 {
     loadMusic();
 
-#ifndef USING_MINGW
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     ImportMusicDialog *import = new ImportMusicDialog(mainStack);
@@ -314,7 +270,6 @@ static void startImport(void)
     }
     else
         delete import;
-#endif
 }
 
 static void MusicCallback(void *data, QString &selection)
@@ -448,7 +403,7 @@ static void runRipCD(void)
 {
     loadMusic();
 
-#ifndef USING_MINGW
+#if defined HAVE_CDIO
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     Ripper *rip = new Ripper(mainStack, chooseCD());

@@ -35,10 +35,6 @@ using namespace std;
 #include "editmetadata.h"
 #include "playlist.h"
 
-#ifndef USING_MINGW
-#include "cddecoder.h"
-#endif // USING_MINGW
-
 #include "musiccommon.h"
 #include "playlistview.h"
 #include "playlisteditorview.h"

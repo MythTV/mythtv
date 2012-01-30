@@ -18,7 +18,9 @@
 #include "musicplayer.h"
 #include "decoder.h"
 #include "decoderhandler.h"
+#ifdef HAVE_CDIO
 #include "cddecoder.h"
+#endif
 #include "constants.h"
 #include "mainvisual.h"
 #include "miniplayer.h"
@@ -1253,9 +1255,11 @@ void MusicPlayer::decoderHandlerReady(void)
     LOG(VB_PLAYBACK, LOG_INFO, QString ("decoder handler is ready, decoding %1")
             .arg(getDecoder()->getFilename()));
 
+#ifdef HAVE_CDIO
     CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(getDecoder());
     if (cddecoder)
         cddecoder->setDevice(m_CDdevice);
+#endif
 
     getDecoder()->setOutput(m_output);
     //getDecoder()-> setBlockSize(2 * 1024);
@@ -1339,7 +1343,7 @@ CDWatcherThread::CDWatcherThread(const QString &dev)
 
 void CDWatcherThread::run()
 {
-#ifndef USING_MINGW
+#ifdef HAVE_CDIO
     while (!m_stopped)
     {
         // lock all_music and cd_status_changed while running thread
@@ -1433,5 +1437,5 @@ void CDWatcherThread::run()
 
         usleep(1000000);
     }
-#endif // USING_MINGW
+#endif // HAVE_CDIO
 }
