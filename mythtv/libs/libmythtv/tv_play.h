@@ -148,18 +148,11 @@ class MTV_PUBLIC TV : public QObject
 
     Q_OBJECT
   public:
-    /// \brief Helper class for Sleep Timer code.
-    class SleepTimerInfo
-    {
-      public:
-        SleepTimerInfo(QString str, unsigned long secs)
-            : dispString(str), seconds(secs) { ; }
-        QString   dispString;
-        unsigned long seconds;
-    };
-
-    TV(void);
-   ~TV();
+    // Check whether we already have a TV object
+    static bool    IsTVRunning(void);
+    // Start media playback
+    static bool    StartTV(ProgramInfo *tvrec = NULL,
+                        uint flags = kStartTVNoFlags);
 
     // Public event handling
     bool event(QEvent *e);
@@ -175,10 +168,18 @@ class MTV_PUBLIC TV : public QObject
     // static functions
     static void InitKeys(void);
     static void ReloadKeys(void);
-    static bool StartTV(ProgramInfo *tvrec = NULL,
-                        uint flags = kStartTVNoFlags);
     static void SetFuncPtr(const char *, void *);
     static int  ConfiguredTunerCards(void);
+
+    /// \brief Helper class for Sleep Timer code.
+    class SleepTimerInfo
+    {
+      public:
+        SleepTimerInfo(QString str, unsigned long secs)
+            : dispString(str), seconds(secs) { ; }
+        QString   dispString;
+        unsigned long seconds;
+    };
 
   public slots:
     void HandleOSDClosed(int osdType);
@@ -196,6 +197,13 @@ class MTV_PUBLIC TV : public QObject
     static EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr;
 
   private:
+    TV();
+   ~TV();
+    static TV*     GetTV(void);
+    static void    ReleaseTV(TV* tv);
+    static QMutex *gTVLock;
+    static TV     *gTV;
+
     // Private initialisation
     bool Init(bool createWindow = true);
     void InitFromDB(void);

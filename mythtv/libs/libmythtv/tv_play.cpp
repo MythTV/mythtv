@@ -235,16 +235,53 @@ static void multi_lock(QMutex *mutex0, ...)
     }
 }
 
+QMutex* TV::gTVLock = new QMutex();
+TV*     TV::gTV     = NULL;
+
+bool TV::IsTVRunning(void)
+{
+    QMutexLocker locker(gTVLock);
+    return gTV;
+}
+
+TV* TV::GetTV(void)
+{
+    QMutexLocker locker(gTVLock);
+    if (gTV)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Already have a TV object.");
+        return NULL;
+    }
+    gTV = new TV();
+    return gTV;
+}
+
+void TV::ReleaseTV(TV* tv)
+{
+    QMutexLocker locker(gTVLock);
+    if (!tv || !gTV || (gTV != tv))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "ReleaseTV - programmer error.");
+        return;
+    }
+
+    delete gTV;
+    gTV = NULL;
+}
+
 /**
  * \brief returns true if the recording completed when exiting.
  */
 bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 {
+    TV *tv = GetTV();
+    if (!tv)
+        return false;
+
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV() -- begin");
     bool startInGuide = flags & kStartTVInGuide;
     bool inPlaylist = flags & kStartTVInPlayList;
     bool initByNetworkCommand = flags & kStartTVByNetworkCommand;
-    TV *tv = new TV();
     bool quitAll = false;
     bool showDialogs = true;
     bool playCompleted = false;
@@ -262,7 +299,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     if (!tv->Init())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed initializing TV");
-        delete tv;
+        ReleaseTV(tv);
         delete curProgram;
         return false;
     }
@@ -375,7 +412,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     bool allowrerecord = tv->getAllowRerecord();
     bool deleterecording = tv->requestDelete;
 
-    delete tv;
+    ReleaseTV(tv);
 
     if (curProgram)
     {
@@ -856,7 +893,6 @@ void TV::ReloadKeys(void)
     mainWindow->ClearKeyContext("Teletext Menu");
     InitKeys();
 }
-
 
 /** \fn TV::TV(void)
  *  \sa Init(void)
