@@ -186,7 +186,7 @@ class Metadata
     void setID(IdType lid) { m_id = lid; }
     void setRepo(RepoType repo) { m_id = (m_id & METADATA_ID_MASK) | (repo << METADATA_REPO_SHIFT); }
 
-    bool isCDTrack(void) { return ID_TO_REPO(m_id) == RT_CD; }
+    bool isCDTrack(void) const { return ID_TO_REPO(m_id) == RT_CD; }
 
     QString Filename(bool find = true) const;
     void setFilename(const QString &lfilename) { m_filename = lfilename; }
@@ -335,11 +335,11 @@ class AllMusic
     void        addCDTrack(const Metadata &the_track);
     bool        checkCDTrack(Metadata *the_track);
     Metadata*   getCDMetadata(int m_the_track);
-    QString     getCDTitle(void) { return m_cdTitle; }
+    QString     getCDTitle(void) const { return m_cdTitle; }
     void        setCDTitle(const QString &a_title) { m_cdTitle = a_title; }
-    int         getCDTrackCount(void) { return m_cdData.count(); }
+    int         getCDTrackCount(void) const { return m_cdData.count(); }
 
-    bool        doneLoading() {return m_done_loading;}
+    bool        doneLoading() const { return m_done_loading; }
     bool        cleanOutThreads();
 
     MetadataPtrList *getAllMetadata(void) { return &m_all_music; }
