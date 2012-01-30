@@ -91,10 +91,6 @@ class Ripper : public MythScreenType
     void scanCD(void);
     void ejectCD(void);
 
-    static QString filenameFromMetadata(Metadata *track, bool createDir = true);
-    static bool isNewTune(const QString &artist,
-                          const QString &album, const QString &title);
-
   protected slots:
     void startRipper(void);
     void startScanCD(void);
@@ -125,9 +121,6 @@ class Ripper : public MythScreenType
     void deleteTrack(QString& artist, QString& album, QString& title);
     void updateTrackList(void);
     void updateTrackLengths(void);
-
-    static QString fixFileToken(QString token);
-    static QString fixFileToken_sl(QString token);
 
     CdDecoder           *m_decoder;
 
