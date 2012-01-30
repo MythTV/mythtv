@@ -137,7 +137,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
                 QMetaType::destroy( types[ nIdx ], param[ nIdx ] );
         }
     }
-    catch(QString sMsg)
+    catch (QString &sMsg)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MethodInfo::Invoke - An Exception Occurred: %1")
@@ -146,14 +146,14 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
         if  ((types[ 0 ] != 0) && (param[ 0 ] != NULL ))
             QMetaType::destroy( types[ 0 ], param[ 0 ] );
 
-        throw sMsg;
+        throw;
     }
-    catch(HttpRedirectException ex)
+    catch (HttpRedirectException &ex)
     {
         bExceptionThrown = true;
         exception = ex;
     }
-    catch(...)
+    catch (...)
     {
         LOG(VB_GENERAL, LOG_INFO,
             "MethodInfo::Invoke - An Exception Occurred" );
@@ -376,12 +376,12 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                 UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
         }
     }
-    catch( HttpRedirectException ex )
+    catch (HttpRedirectException &ex)
     {
         UPnp::FormatRedirectResponse( pRequest, ex.hostName );
         bHandled = true;
     }
-    catch( HttpException ex )
+    catch (HttpException &ex)
     {
         LOG(VB_GENERAL, LOG_ERR, ex.msg);
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.msg );
@@ -389,14 +389,14 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
         bHandled = true;
 
     }
-    catch( QString sMsg )
+    catch (QString &sMsg)
     {
         LOG(VB_GENERAL, LOG_ERR, sMsg);
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, sMsg );
 
         bHandled = true;
     }
-    catch( ... )
+    catch ( ...)
     {
         QString sMsg( "ServiceHost::ProcessRequest - Unexpected Exception" );
 
