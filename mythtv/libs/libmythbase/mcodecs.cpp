@@ -974,27 +974,27 @@ void QMD5::transform( const unsigned char block[64] )
     memset ( static_cast<void *>(x), 0, sizeof(x) );
 }
 
-inline quint32 QMD5::rotate_left (quint32 x, quint32 n) const
+inline quint32 QMD5::rotate_left (quint32 x, quint32 n)
 {
     return (x << n) | (x >> (32-n))  ;
 }
 
-inline quint32 QMD5::F (quint32 x, quint32 y, quint32 z) const
+inline quint32 QMD5::F (quint32 x, quint32 y, quint32 z)
 {
     return (x & y) | (~x & z);
 }
 
-inline quint32 QMD5::G (quint32 x, quint32 y, quint32 z) const
+inline quint32 QMD5::G (quint32 x, quint32 y, quint32 z)
 {
     return (x & z) | (y & ~z);
 }
 
-inline quint32 QMD5::H (quint32 x, quint32 y, quint32 z) const
+inline quint32 QMD5::H (quint32 x, quint32 y, quint32 z)
 {
     return x ^ y ^ z;
 }
 
-inline quint32 QMD5::I (quint32 x, quint32 y, quint32 z) const
+inline quint32 QMD5::I (quint32 x, quint32 y, quint32 z)
 {
     return y ^ (x | ~z);
 }

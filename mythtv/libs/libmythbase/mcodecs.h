@@ -447,19 +447,19 @@ private:
   void encode( unsigned char* output, quint32 *in, quint32 len );
   void decode( quint32 *output, const unsigned char* in, quint32 len );
 
-  quint32 rotate_left( quint32 x, quint32 n ) const;
-  quint32 F( quint32 x, quint32 y, quint32 z ) const;
-  quint32 G( quint32 x, quint32 y, quint32 z ) const;
-  quint32 H( quint32 x, quint32 y, quint32 z ) const;
-  quint32 I( quint32 x, quint32 y, quint32 z ) const;
-  void FF( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
-               quint32  s, quint32 ac );
-  void GG( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
-                quint32 s, quint32 ac );
-  void HH( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
-                quint32 s, quint32 ac );
-  void II( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
-             quint32 s, quint32 ac );
+  static quint32 rotate_left( quint32 x, quint32 n );
+  static quint32 F( quint32 x, quint32 y, quint32 z );
+  static quint32 G( quint32 x, quint32 y, quint32 z );
+  static quint32 H( quint32 x, quint32 y, quint32 z );
+  static quint32 I( quint32 x, quint32 y, quint32 z );
+  static void FF( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
+                  quint32  s, quint32 ac );
+  static void GG( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
+                  quint32 s, quint32 ac );
+  static void HH( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
+                  quint32 s, quint32 ac );
+  static void II( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
+                  quint32 s, quint32 ac );
 
 private:
   quint32 m_state[4];
