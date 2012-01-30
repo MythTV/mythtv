@@ -8427,7 +8427,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == MythEvent::MythUserMessage)
     {
-        MythEvent *me = (MythEvent *)e;
+        MythEvent *me = reinterpret_cast<MythEvent*>(e);
         QString message = me->Message();
 
         if (message.isEmpty())
@@ -8456,7 +8456,8 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == MythEvent::kUpdateBrowseInfoEventType)
     {
-        UpdateBrowseInfoEvent *b = (UpdateBrowseInfoEvent*)e;
+        UpdateBrowseInfoEvent *b =
+            reinterpret_cast<UpdateBrowseInfoEvent*>(e);
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         OSD *osd = GetOSDLock(mctx);
         if (osd)
@@ -8471,7 +8472,8 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent *)e;
+        DialogCompletionEvent *dce =
+            reinterpret_cast<DialogCompletionEvent*>(e);
         OSDDialogEvent(dce->GetResult(), dce->GetResultText(),
                        dce->GetData().toString());
         return;
@@ -8479,7 +8481,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == OSDHideEvent::kEventType)
     {
-        OSDHideEvent *ce = (OSDHideEvent *)e;
+        OSDHideEvent *ce = reinterpret_cast<OSDHideEvent*>(e);
         HandleOSDClosed(ce->GetFunctionalType());
         return;
     }
@@ -8488,7 +8490,7 @@ void TV::customEvent(QEvent *e)
         return;
 
     uint cardnum   = 0;
-    MythEvent *me = (MythEvent *)e;
+    MythEvent *me = reinterpret_cast<MythEvent*>(e);
     QString message = me->Message();
 
     // TODO Go through these and make sure they make sense...
