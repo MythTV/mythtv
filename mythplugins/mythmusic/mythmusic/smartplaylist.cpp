@@ -371,15 +371,15 @@ QString SmartPLCriteriaRow::toString(void)
 
 SmartPlaylistEditor::SmartPlaylistEditor(MythScreenStack *parent)
               : MythScreenType(parent, "smartplaylisteditor"),
-            matchesCount(0), bNewPlaylist(false), bPlaylistIsValid(false),
-            m_categorySelector(NULL), m_categoryButton(NULL),
-            m_titleEdit(NULL), m_matchSelector(NULL),
-            m_criteriaList(NULL), m_orderBySelector(NULL),
-            m_orderByButton(NULL), m_matchesText(NULL),
-            m_limitSpin(NULL), m_cancelButton(NULL),
-            m_saveButton(NULL), m_showResultsButton(NULL)
+                m_tempCriteriaRow(NULL), m_matchesCount(0),
+                m_newPlaylist(false), m_playlistIsValid(false),
+                m_categorySelector(NULL), m_categoryButton(NULL),
+                m_titleEdit(NULL), m_matchSelector(NULL),
+                m_criteriaList(NULL), m_orderBySelector(NULL),
+                m_orderByButton(NULL), m_matchesText(NULL),
+                m_limitSpin(NULL), m_cancelButton(NULL),
+                m_saveButton(NULL), m_showResultsButton(NULL)
 {
-    m_tempCriteriaRow = NULL;
 }
 
 SmartPlaylistEditor::~SmartPlaylistEditor(void)
@@ -725,7 +725,7 @@ void SmartPlaylistEditor::showCriteriaMenu(void)
 
 void SmartPlaylistEditor::titleChanged(void)
 {
-    m_saveButton->SetEnabled((bPlaylistIsValid && !m_titleEdit->GetText().isEmpty()));
+    m_saveButton->SetEnabled((m_playlistIsValid && !m_titleEdit->GetText().isEmpty()));
 }
 
 void SmartPlaylistEditor::updateMatches(void)
@@ -742,18 +742,18 @@ void SmartPlaylistEditor::updateMatches(void)
 
     sql += getWhereClause();
 
-    matchesCount = 0;
+    m_matchesCount = 0;
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.exec(sql))
         MythDB::DBError("SmartPlaylistEditor::updateMatches", query);
     else if (query.next())
-        matchesCount = query.value(0).toInt();
+        m_matchesCount = query.value(0).toInt();
 
-    m_matchesText->SetText(QString::number(matchesCount));
+    m_matchesText->SetText(QString::number(m_matchesCount));
 
-    bPlaylistIsValid = (matchesCount > 0);
-    m_showResultsButton->SetEnabled((matchesCount > 0));
+    m_playlistIsValid = (m_matchesCount > 0);
+    m_showResultsButton->SetEnabled((m_matchesCount > 0));
     titleChanged();
 }
 
@@ -771,8 +771,8 @@ void SmartPlaylistEditor::saveClicked(void)
     int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
 
     // easier to delete any existing smartplaylist and recreate a new one
-    if (!bNewPlaylist)
-        SmartPlaylistEditor::deleteSmartPlaylist(originalCategory, originalName);
+    if (!m_newPlaylist)
+        SmartPlaylistEditor::deleteSmartPlaylist(m_originalCategory, m_originalName);
     else
         SmartPlaylistEditor::deleteSmartPlaylist(category, name);
 
@@ -831,19 +831,19 @@ void SmartPlaylistEditor::newSmartPlaylist(QString category)
 {
     m_categorySelector->SetValue(category);
     m_titleEdit->SetText("");
-    originalCategory = category;
-    originalName.clear();
+    m_originalCategory = category;
+    m_originalName.clear();
 
-    bNewPlaylist = true;
+    m_newPlaylist = true;
 
     updateMatches();
 }
 
 void SmartPlaylistEditor::editSmartPlaylist(QString category, QString name)
 {
-    originalCategory = category;
-    originalName = name;
-    bNewPlaylist = false;
+    m_originalCategory = category;
+    m_originalName = name;
+    m_newPlaylist = false;
     loadFromDatabase(category, name);
     updateMatches();
 }
@@ -990,8 +990,8 @@ void SmartPlaylistEditor::renameCategory(const QString &category)
     if (!query.exec())
         MythDB::DBError("Rename smartplaylist", query);
 
-    if (!bNewPlaylist)
-        originalCategory = m_categorySelector->GetValue();
+    if (!m_newPlaylist)
+        m_originalCategory = m_categorySelector->GetValue();
 
     getSmartPlaylistCategories();
     m_categorySelector->SetValue(category);

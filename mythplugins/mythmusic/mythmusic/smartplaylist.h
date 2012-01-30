@@ -122,10 +122,11 @@ class SmartPlaylistEditor : public MythScreenType
     QList<SmartPLCriteriaRow*> m_criteriaRows;
     SmartPLCriteriaRow* m_tempCriteriaRow;
 
-    int matchesCount;
-    bool bNewPlaylist;
-    bool bPlaylistIsValid;
-    QString originalCategory, originalName;
+    int m_matchesCount;
+    bool m_newPlaylist;
+    bool m_playlistIsValid;
+    QString m_originalCategory;
+    QString m_originalName;
 
     // gui stuff
     MythUIButtonList *m_categorySelector;
