@@ -13,13 +13,13 @@
 class GeneralSettings : public MythScreenType
 {
     Q_OBJECT
-public:
+  public:
     GeneralSettings(MythScreenStack *parent, const char *name = 0);
     ~GeneralSettings();
 
     bool Create(void);
 
-private:
+  private:
     MythUITextEdit     *m_musicLocation;
     MythUITextEdit     *m_musicAudioDevice;
     MythUICheckBox     *m_musicDefaultUpmix;
@@ -28,13 +28,11 @@ private:
     MythUICheckBox     *m_ignoreID3Tags;
     MythUIButtonList   *m_tagEncoding;
     MythUICheckBox     *m_allowTagWriting;
-    MythUIText         *m_helpText;
     MythUIButton       *m_saveButton;
     MythUIButton       *m_cancelButton;
 
-private slots:
+  private slots:
     void slotSave(void);
-    void slotFocusChanged(void);
 
 };
 

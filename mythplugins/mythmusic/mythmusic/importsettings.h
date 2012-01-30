@@ -11,14 +11,14 @@
 class ImportSettings : public MythScreenType
 {
     Q_OBJECT
-public:
+  public:
     ImportSettings(MythScreenStack *parent, const char *name = 0);
     ~ImportSettings();
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
-private:
+  private:
     MythUIButtonList   *m_paranoiaLevel;
     MythUITextEdit     *m_filenameTemplate;
     MythUICheckBox     *m_noWhitespace;
@@ -27,13 +27,11 @@ private:
     MythUIButtonList   *m_encoderType;
     MythUIButtonList   *m_defaultRipQuality;
     MythUICheckBox     *m_mp3UseVBR;
-    MythUIText         *m_helpText;
     MythUIButton       *m_saveButton;
     MythUIButton       *m_cancelButton;
 
-private slots:
+  private slots:
     void slotSave(void);
-    void slotFocusChanged(void);
 
 };
 

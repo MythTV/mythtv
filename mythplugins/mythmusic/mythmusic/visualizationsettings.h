@@ -20,13 +20,11 @@ private:
     MythUICheckBox     *m_randomizeOrder;
     MythUISpinBox      *m_scaleWidth;
     MythUISpinBox      *m_scaleHeight;
-    MythUIText         *m_helpText;
     MythUIButton       *m_saveButton;
     MythUIButton       *m_cancelButton;
 
 private slots:
     void slotSave(void);
-    void slotFocusChanged(void);
 };
 
 #endif // VISUALIZATIONSETTINGS_H

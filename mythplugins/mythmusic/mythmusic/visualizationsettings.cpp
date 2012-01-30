@@ -34,7 +34,6 @@ bool VisualizationSettings::Create()
     UIUtilE::Assign(this, m_randomizeOrder, "randomizeorder", &err);
     UIUtilE::Assign(this, m_scaleWidth, "scalewidth", &err);
     UIUtilE::Assign(this, m_scaleHeight, "scaleheight", &err);
-    UIUtilE::Assign(this, m_helpText, "helptext", &err);
     UIUtilE::Assign(this, m_saveButton, "save", &err);
     UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
 
@@ -50,11 +49,18 @@ bool VisualizationSettings::Create()
     m_scaleHeight->SetRange(1,2,1);
     m_scaleHeight->SetValue(gCoreContext->GetNumSetting("VisualScaleHeight"));
 
-    connect(m_changeOnSongChange, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_randomizeOrder, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_scaleWidth, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_scaleHeight, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-
+    m_changeOnSongChange->SetHelpText(tr("Change the visualizer when the song changes."));
+    m_randomizeOrder->SetHelpText(tr("On changing the visualizer pick a new one at random."));
+    m_scaleWidth->SetHelpText(tr("If set to \"2\", visualizations will be "
+                 "scaled in half. Currently only used by "
+                 "the goom visualization. Reduces CPU load "
+                 "on slower machines."));
+    m_scaleHeight->SetHelpText(tr("If set to \"2\", visualizations will be "
+                 "scaled in half. Currently only used by "
+                 "the goom visualization. Reduces CPU load "
+                 "on slower machines."));
+    m_cancelButton->SetHelpText(tr("Exit without saving settings"));
+    m_saveButton->SetHelpText(tr("Save settings and Exit"));
 
     connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
@@ -78,32 +84,3 @@ void VisualizationSettings::slotSave(void)
 
     Close();
 }
-
-void VisualizationSettings::slotFocusChanged(void)
-{
-    if (!m_helpText)
-        return;
-
-    QString msg = "";
-    if (GetFocusWidget() == m_changeOnSongChange)
-        msg = tr("Change the visualizer when the song changes.");
-    else if (GetFocusWidget() == m_randomizeOrder)
-        msg = tr("On changing the visualizer pick a new one at random.");
-    else if (GetFocusWidget() == m_scaleWidth)
-        msg = tr("If set to \"2\", visualizations will be "
-                 "scaled in half. Currently only used by "
-                 "the goom visualization. Reduces CPU load "
-                 "on slower machines.");
-    else if (GetFocusWidget() == m_scaleHeight)
-        msg = tr("If set to \"2\", visualizations will be "
-                 "scaled in half. Currently only used by "
-                 "the goom visualization. Reduces CPU load "
-                 "on slower machines.");
-    else if (GetFocusWidget() == m_cancelButton)
-        msg = tr("Exit without saving settings");
-    else if (GetFocusWidget() == m_saveButton)
-        msg = tr("Save settings and Exit");
-
-    m_helpText->SetText(msg);
-}
-

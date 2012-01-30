@@ -16,7 +16,6 @@ ImportSettings::ImportSettings(MythScreenStack *parent, const char *name)
         m_encoderType(NULL),
         m_defaultRipQuality(NULL),
         m_mp3UseVBR(NULL),
-        m_helpText(NULL),
         m_saveButton(NULL),
         m_cancelButton(NULL)
 {
@@ -43,7 +42,6 @@ bool ImportSettings::Create()
     UIUtilE::Assign(this, m_encoderType, "encodertype", &err);
     UIUtilE::Assign(this, m_defaultRipQuality, "defaultripquality", &err);
     UIUtilE::Assign(this, m_mp3UseVBR, "mp3usevbr", &err);
-    UIUtilE::Assign(this, m_helpText, "helptext", &err);
     UIUtilE::Assign(this, m_saveButton, "save", &err);
     UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
 
@@ -85,14 +83,28 @@ bool ImportSettings::Create()
 
     connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
-    connect(m_paranoiaLevel,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_filenameTemplate,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_noWhitespace,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_postCDRipScript,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_ejectCD,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_encoderType,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_defaultRipQuality,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_mp3UseVBR,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+
+    m_paranoiaLevel->SetHelpText(tr("Paranoia level of the CD ripper. Set to "
+                 "faster if you're not concerned about "
+                 "possible errors in the audio."));
+    m_filenameTemplate->SetHelpText(tr("Defines the location/name for new "
+                 "songs. Valid tokens are:\n"
+                 "GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR"));
+    m_noWhitespace->SetHelpText(tr("If set, whitespace characters in filenames "
+                 "will be replaced with underscore characters."));
+    m_postCDRipScript->SetHelpText(tr("If present this script will be executed "
+                 "after a CD Rip is completed."));
+    m_ejectCD->SetHelpText(tr("If set, the CD tray will automatically open "
+                 "after the CD has been ripped."));
+    m_encoderType->SetHelpText(tr("Audio encoder to use for CD ripping. "
+                 "Note that the quality level 'Perfect' "
+                 "will use the FLAC encoder."));
+    m_defaultRipQuality->SetHelpText(tr("Default quality for new CD rips."));
+    m_mp3UseVBR->SetHelpText(tr("If set, the MP3 encoder will use variable "
+                 "bitrates (VBR) except for the low quality setting. "
+                 "The Ogg encoder will always use variable bitrates."));
+    m_cancelButton->SetHelpText(tr("Exit without saving settings"));
+    m_saveButton->SetHelpText(tr("Save settings and Exit"));
 
     BuildFocusList();
 
@@ -133,44 +145,3 @@ void ImportSettings::slotSave(void)
 
     Close();
 }
-
-void ImportSettings::slotFocusChanged(void)
-{
-    if (!m_helpText)
-        return;
-
-    QString msg = "";
-    if (GetFocusWidget() == m_paranoiaLevel)
-        msg = tr("Paranoia level of the CD ripper. Set to "
-                 "faster if you're not concerned about "
-                 "possible errors in the audio.");
-    else if (GetFocusWidget() == m_filenameTemplate)
-        msg = tr("Defines the location/name for new songs. Valid tokens are:\n"
-                 "GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR");
-    else if (GetFocusWidget() == m_noWhitespace)
-        msg = tr("If set, whitespace characters in filenames "
-                 "will be replaced with underscore characters.");
-    else if (GetFocusWidget() == m_postCDRipScript)
-        msg = tr("If present this script will be executed "
-                 "after a CD Rip is completed.");
-    else if (GetFocusWidget() == m_ejectCD)
-        msg = tr("If set, the CD tray will automatically open "
-                 "after the CD has been ripped.");
-    else if (GetFocusWidget() == m_encoderType)
-        msg = tr("Audio encoder to use for CD ripping. "
-                 "Note that the quality level 'Perfect' "
-                 "will use the FLAC encoder.");
-    else if (GetFocusWidget() == m_defaultRipQuality)
-        msg = tr("Default quality for new CD rips.");
-    else if (GetFocusWidget() == m_mp3UseVBR)
-        msg = tr("If set, the MP3 encoder will use variable "
-                 "bitrates (VBR) except for the low quality setting. "
-                 "The Ogg encoder will always use variable bitrates.");
-    else if (GetFocusWidget() == m_cancelButton)
-        msg = tr("Exit without saving settings");
-    else if (GetFocusWidget() == m_saveButton)
-        msg = tr("Save settings and Exit");
-
-    m_helpText->SetText(msg);
-}
-
