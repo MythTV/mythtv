@@ -3159,19 +3159,19 @@ void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark)
     ctx->UnlockDeletePlayer(__FILE__, line);
 }
 
-void TV::SetExitPlayer(bool set_it, bool wants_to) const
+void TV::SetExitPlayer(bool set_it, bool wants_to)
 {
     QMutexLocker locker(&timerIdLock);
     if (set_it)
     {
         wantsToQuit = wants_to;
         if (!exitPlayerTimerId)
-            exitPlayerTimerId = ((TV*)this)->StartTimer(1, __LINE__);
+            exitPlayerTimerId = StartTimer(1, __LINE__);
     }
     else
     {
         if (exitPlayerTimerId)
-            ((TV*)this)->KillTimer(exitPlayerTimerId);
+            KillTimer(exitPlayerTimerId);
         exitPlayerTimerId = 0;
         wantsToQuit = wants_to;
     }

@@ -303,7 +303,7 @@ class MTV_PUBLIC TV : public QObject
                                        const ProgramInfo &);
     void PrepareToExitPlayer(PlayerContext*, int line,
                              bool bookmark = true);
-    void SetExitPlayer(bool set_it, bool wants_to) const;
+    void SetExitPlayer(bool set_it, bool wants_to);
 
     bool RequestNextRecorder(PlayerContext *, bool);
     void DeleteRecorder();
