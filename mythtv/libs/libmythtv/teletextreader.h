@@ -1,3 +1,5 @@
+// -*- Mode: c++ -*-
+
 #ifndef TELETEXTREADER_H
 #define TELETEXTREADER_H
 
@@ -105,13 +107,18 @@ class TeletextReader
 
     const TeletextSubPage *FindSubPage(int page, int subpage, int dir=0) const
         { return FindSubPageInternal(page, subpage, dir); }
-    TeletextSubPage       *FindSubPage(int page, int subpage, int dir = 0)
-        { return (TeletextSubPage*) FindSubPageInternal(page, subpage, dir); }
 
-    const TeletextPage    *FindPage(int page, int dir = 0) const
-        { return (TeletextPage*) FindPageInternal(page, dir); }
-    TeletextPage          *FindPage(int page, int dir = 0)
-        { return (TeletextPage*) FindPageInternal(page, dir); }
+    TeletextSubPage *FindSubPage(int page, int subpage, int dir = 0)
+    {
+        return const_cast<TeletextSubPage*>
+            (FindSubPageInternal(page, subpage, dir));
+    }
+
+    const TeletextPage *FindPage(int page, int dir = 0) const
+        { return FindPageInternal(page, dir); }
+
+    TeletextPage *FindPage(int page, int dir = 0)
+        { return const_cast<TeletextPage*>(FindPageInternal(page, dir)); }
 
     const TeletextSubPage *FindSubPageInternal(int,int,int) const;
     const TeletextPage    *FindPageInternal(int,int) const;
