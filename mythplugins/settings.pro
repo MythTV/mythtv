@@ -10,7 +10,7 @@ LIBS *= -L$${SYSROOT}$${PREFIX}/$${LIBDIRNAME}
 
 isEmpty(TARGET_OS) : win32 {
     CONFIG += mingw
-    DEFINES += USING_MINGW
+    DEFINES += USING_MINGW WIN32_LEAN_AND_MEAN NOMINMAX
     # Qt4 creates separate compile directories by default. This disables:
     CONFIG -= debug_and_release debug_and_release_target
     # Some shared libs we depend on are installed here:

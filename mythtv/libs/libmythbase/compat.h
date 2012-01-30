@@ -48,6 +48,7 @@
 
 #ifdef USING_MINGW
 #include <unistd.h>       // for usleep()
+#include <stdlib.h>       // for rand()
 #include <time.h>
 #include <sys/time.h>
 #endif
