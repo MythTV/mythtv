@@ -162,6 +162,7 @@ int main(int argc, char *argv[])
     bool build_index = false, fifosync = false;
     bool mpeg2 = false;
     bool fifo_info = false;
+    bool cleanCut = false;
     QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap;
@@ -294,6 +295,8 @@ int main(int argc, char *argv[])
         deleteMap[999999999] = MARK_CUT_END;
     }
 
+    if (cmdline.toBool("cleancut"))
+        cleanCut = true;
 
     if (cmdline.toBool("allkeys"))
         keyframesonly = true;
@@ -392,6 +395,16 @@ int main(int argc, char *argv[])
     if (fifo_info && !fifodir.isEmpty())
     {
         cerr << "Cannot specify both --fifodir and --fifoinfo" << endl;
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+    if (cleanCut && fifodir.isEmpty() && !fifo_info)
+    {
+        cerr << "Clean cutting works only in fifodir mode" << endl;
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+    if (cleanCut && !useCutlist)
+    {
+        cerr << "--cleancut is pointless without --honorcutlist" << endl;
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
@@ -536,7 +549,7 @@ int main(int argc, char *argv[])
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,
                                           (fifosync || keyframesonly), jobID,
-                                          fifodir, fifo_info, deleteMap,
+                                          fifodir, fifo_info, cleanCut, deleteMap,
                                           AudioTrackNo, passthru);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");

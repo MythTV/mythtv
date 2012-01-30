@@ -309,6 +309,192 @@ private:
     bool                m_initpassthru;
 };
 
+// Cutter object is used in performing clean cutting. The
+// act of cutting is shared between the player and the
+// transcode loop. The player performs the initial part
+// of the cut by seeking, and the transcode loop handles
+// the remaining part by discarding data.
+class Cutter
+{
+private:
+    bool          active;
+    frm_dir_map_t foreshortenedCutList;
+    DeleteMap     tracker;
+    int64_t       totalFrames;
+    int64_t       videoFramesToCut;
+    int64_t       audioFramesToCut;
+    float         audioFramesPerVideoFrame;
+    enum
+    {
+        MAXLEADIN  = 200,
+        MINCUT     = 20
+    };
+
+public:
+    Cutter()
+    {
+        active = false;
+        videoFramesToCut = 0;
+        audioFramesToCut = 0;
+    }
+
+    void SetCutList(frm_dir_map_t &deleteMap)
+    {
+        // Break each cut into two parts, the first for
+        // the player and the second for the transcode loop.
+        frm_dir_map_t           remainingCutList;
+        frm_dir_map_t::Iterator it;
+        int64_t                 start = 0;
+        int64_t                 leadinLength;
+
+        foreshortenedCutList.clear();
+
+        for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
+        {
+            switch(it.value())
+            {
+                case MARK_CUT_START:
+                    foreshortenedCutList[it.key()] = MARK_CUT_START;
+                    start = it.key();
+                    break;
+
+                case MARK_CUT_END:
+                    leadinLength = min((int64_t)(it.key() - start), (int64_t)MAXLEADIN);
+                    if (leadinLength >= MINCUT)
+                    {
+                        foreshortenedCutList[it.key() - leadinLength + 2] = MARK_CUT_END;
+                        remainingCutList[it.key() - leadinLength + 1] = MARK_CUT_START;
+                        remainingCutList[it.key()] = MARK_CUT_END;
+                    }
+                    else
+                    {
+                        // Cut too short to use new method.
+                        foreshortenedCutList[it.key()] = MARK_CUT_END;
+                    }
+                    break;
+            }
+        }
+
+        tracker.SetMap(remainingCutList);
+    }
+
+    frm_dir_map_t AdjustedCutList()
+    {
+        return foreshortenedCutList;
+    }
+
+    void Activate(float v2a, int64_t total)
+    {
+        active = true;
+        audioFramesPerVideoFrame = v2a;
+        totalFrames = total;
+        videoFramesToCut = 0;
+        audioFramesToCut = 0;
+        tracker.TrackerReset(0, totalFrames);
+    }
+
+    void NewFrame(int64_t currentFrame)
+    {
+        if (active)
+        {
+            if (videoFramesToCut == 0)
+            {
+                uint64_t jumpTo = 0;
+
+                if (tracker.TrackerWantsToJump(currentFrame, totalFrames, jumpTo))
+                {
+                    // Reset the tracker and work out how much video and audio to drop
+                    tracker.TrackerReset(jumpTo, totalFrames);
+                    videoFramesToCut = jumpTo - currentFrame;
+                    audioFramesToCut += (int64_t)(videoFramesToCut * audioFramesPerVideoFrame + 0.5);
+                    LOG(VB_GENERAL, LOG_INFO, QString("Clean cut: discarding frame from %1 to %2: vid %3 aud %4")
+                            .arg((long)currentFrame).arg((long)jumpTo).arg((long)videoFramesToCut)
+                        .arg((long)audioFramesToCut));
+                }
+            }
+        }
+    }
+
+    bool InhibitUseVideoFrame()
+    {
+        if (videoFramesToCut == 0)
+        {
+            return false;
+        }
+        else
+        {
+            // We are inside a cut. Inhibit use of this frame
+            videoFramesToCut--;
+
+            if(videoFramesToCut == 0)
+                LOG(VB_GENERAL, LOG_INFO, QString("Clean cut: end of video cut; audio frames left to cut %1")
+                        .arg((long)audioFramesToCut));
+
+            return true;
+        }
+    }
+
+    bool InhibitUseAudioFrames(int64_t frames, long *totalAudio)
+    {
+        if (audioFramesToCut == 0)
+        {
+            return false;
+        }
+        else if (abs(audioFramesToCut - frames) < audioFramesToCut)
+        {
+            // Drop the packet containing these frames if doing
+            // so gets us closer to zero left to drop
+            audioFramesToCut -= frames;
+            if(audioFramesToCut == 0)
+                LOG(VB_GENERAL, LOG_INFO, QString("Clean cut: end of audio cut; vidio frames left to cut %1")
+                        .arg((long)videoFramesToCut));
+            return true;
+        }
+        else
+        {
+            // Don't drop this packet even though we still have frames to cut, because
+            // doing so would put us further out. Instead, inflate the callers record
+            // of how many audio frames have been output.
+            *totalAudio += audioFramesToCut;
+            audioFramesToCut = 0;
+            LOG(VB_GENERAL, LOG_INFO, QString("Clean cut: end of audio cut; vidio frames left to cut %1")
+                    .arg((long)videoFramesToCut));
+            return false;
+        }
+    }
+
+    bool InhibitDummyFrame()
+    {
+        if (audioFramesToCut > 0)
+        {
+            // If the cutter is in the process of dropping audio then
+            // it is better to drop more audio rather than insert a dummy frame
+            audioFramesToCut += (int64_t)(audioFramesPerVideoFrame + 0.5);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    bool InhibitDropFrame()
+    {
+        if (audioFramesToCut > (int64_t)(audioFramesPerVideoFrame + 0.5))
+        {
+            // If the cutter is in the process of dropping audio and the
+            // amount to drop is sufficient then we can drop less
+            // audio rather than drop a frame
+            audioFramesToCut -= (int64_t)(audioFramesPerVideoFrame + 0.5);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+};
+
 typedef struct transcodeFrameInfo
 {
     VideoFrame *frame;
@@ -591,7 +777,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                              const QString &profileName,
                              bool honorCutList, bool framecontrol,
                              int jobID, QString fifodir,
-                             bool fifo_info,
+                             bool fifo_info, bool cleanCut,
                              frm_dir_map_t &deleteMap,
                              int AudioTrackNo,
                              bool passthru)
@@ -599,6 +785,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
     int audioFrame = 0;
+    Cutter cutter;
     AVFormatWriter *avfw = NULL;
     AVFormatWriter *avfw2 = NULL;
     HTTPLiveStream *hls = NULL;
@@ -1159,7 +1346,22 @@ int Transcode::TranscodeFile(const QString &inputname,
     }
 
     if (deleteMap.size() > 0)
-        player->SetCutList(deleteMap);
+    {
+        if (cleanCut)
+        {
+            // Have the player seek only part of the way
+            // through a cut, and then use the cutter to
+            // discard the rest
+            cutter.SetCutList(deleteMap);
+
+            player->SetCutList(cutter.AdjustedCutList());
+        }
+        else
+        {
+            // Have the player apply the cut list
+            player->SetCutList(deleteMap);
+        }
+    }
 
     player->InitForTranscode(copyaudio, copyvideo);
     if (player->IsErrored())
@@ -1317,6 +1519,9 @@ int Transcode::TranscodeFile(const QString &inputname,
     QTime flagTime;
     flagTime.start();
 
+    if (cleanCut)
+        cutter.Activate(vidFrameTime * rateTimeConv, total_frame_count);
+
     bool stopSignalled = false;
     VideoFrame *lastDecode = NULL;
 
@@ -1332,6 +1537,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
 
         float new_aspect = lastDecode->aspect;
+
+        cutter.NewFrame(lastDecode->frameNumber);
 
         frame.timecode = lastDecode->timecode;
 
@@ -1373,12 +1580,15 @@ int Transcode::TranscodeFile(const QString &inputname,
                     int count = 0;
                     while (delta > vidFrameTime)
                     {
-                        fifow->FIFOWrite(0, frame.buf, vidSize);
+                        if (!cutter.InhibitDummyFrame())
+                            fifow->FIFOWrite(0, frame.buf, vidSize);
+
                         count++;
                         delta -= (int)vidFrameTime;
                     }
                     QString msg = QString("Added %1 blank video frames")
                                   .arg(count);
+                    LOG(VB_GENERAL, LOG_INFO, msg);
                     curFrameNum += count;
                     dropvideo = 0;
                     wait_recover = 0;
@@ -1402,18 +1612,29 @@ int Transcode::TranscodeFile(const QString &inputname,
                     .arg(delta));
 #endif
             if (arb->audiobuffer_len)
-                fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
+            {
+                if (!cutter.InhibitUseAudioFrames(arb->audiobuffer_frames, &totalAudio))
+                    fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
+            }
+
             if (dropvideo < 0)
             {
+                if (cutter.InhibitDropFrame())
+                    fifow->FIFOWrite(0, frame.buf, vidSize);
+
                 dropvideo++;
                 curFrameNum--;
             }
             else
             {
-                fifow->FIFOWrite(0, frame.buf, vidSize);
+                if (!cutter.InhibitUseVideoFrame())
+                    fifow->FIFOWrite(0, frame.buf, vidSize);
+
                 if (dropvideo)
                 {
-                    fifow->FIFOWrite(0, frame.buf, vidSize);
+                    if (!cutter.InhibitDummyFrame())
+                        fifow->FIFOWrite(0, frame.buf, vidSize);
+
                     curFrameNum++;
                     dropvideo--;
                 }
