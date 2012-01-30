@@ -805,7 +805,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     bool is_good = true;
     if (recq)
     {
-        LOG((recq->IsDamaged()) ? VB_RECORD : VB_GENERAL, LOG_INFO,
+        LOG((recq->IsDamaged()) ? VB_GENERAL : VB_RECORD, LOG_INFO,
             QString("TVRec::FinishedRecording(%1) %2 recq:%3\n")
             .arg(curRec->GetTitle())
             .arg((recq->IsDamaged()) ? "damaged" : "good")
