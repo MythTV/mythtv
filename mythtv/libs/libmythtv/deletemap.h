@@ -1,8 +1,10 @@
 #ifndef DELETEMAP_H
 #define DELETEMAP_H
 
+#include "osd.h"
 #include "programinfo.h"
 #include "playercontext.h"
+#include "mythtvexp.h"
 
 class DeleteMap;
 
@@ -14,7 +16,7 @@ typedef struct DeleteMapUndoEntry
     DeleteMapUndoEntry(void);
 } DeleteMapUndoEntry;
 
-class DeleteMap
+class MTV_PUBLIC DeleteMap
 {
   public:
     DeleteMap(): m_editing(false),   m_nextCutStart(0), m_changed(true),

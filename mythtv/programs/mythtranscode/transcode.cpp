@@ -17,6 +17,7 @@
 #include "jobqueue.h"
 #include "exitcodes.h"
 #include "mthreadpool.h"
+#include "deletemap.h"
 
 #include "NuppelVideoRecorder.h"
 #include "mythplayer.h"
