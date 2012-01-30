@@ -15,9 +15,10 @@
 #include "searchview.h"
 
 SearchView::SearchView(MythScreenStack *parent)
-         :MusicCommon(parent, "searchview")
+         :MusicCommon(parent, "searchview"),
+            m_playTrack(false), m_fieldList(NULL), m_criteriaEdit(NULL),
+            m_matchesText(NULL), m_tracksList(NULL)
 {
-    m_playTrack = false;
     m_currentView = MV_SEARCH;
 }
 
@@ -71,7 +72,7 @@ bool SearchView::Create(void)
     connect(m_tracksList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(trackClicked(MythUIButtonListItem*)));
 
-    connect(m_tracksList, SIGNAL(itemVisible(MythUIButtonListItem*)), 
+    connect(m_tracksList, SIGNAL(itemVisible(MythUIButtonListItem*)),
             this, SLOT(trackVisible(MythUIButtonListItem*)));
 
     connect(m_criteriaEdit, SIGNAL(valueChanged()), this, SLOT(criteriaChanged()));
@@ -376,7 +377,7 @@ void SearchView::updateTracksList(void)
                 //TODO add tag query
             }
             case 0: // all fields
-            default: 
+            default:
             {
                 sql = "SELECT song_id "
                       "FROM music_songs "
