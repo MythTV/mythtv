@@ -8,7 +8,7 @@ extern "C" {
     extern const uint8_t *ff_find_start_code(const uint8_t * p,
                                              const uint8_t *end,
                                              uint32_t * state);
-    
+
 #include "libavcodec/avcodec.h"
 #include "libavutil/internal.h"
 #include "libavcodec/golomb.h"
@@ -102,6 +102,7 @@ H264Parser::H264Parser(void)
 
     Reset();
     I_is_keyframe = true;
+    au_contains_keyframe_message = false;
 }
 
 void H264Parser::Reset(void)
