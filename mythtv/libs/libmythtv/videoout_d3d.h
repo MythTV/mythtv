@@ -35,7 +35,7 @@ class VideoOutputD3D : public VideoOutput
                       bool        &aspect_only);
     void MoveResizeWindow(QRect new_rect) {;}
     void UpdatePauseFrame(int64_t &disp_timecode);
-    void DrawUnusedRects(bool) {;}
+    virtual void DrawUnusedRects(bool) {;} // VideoOutput
     void Zoom(ZoomDirection direction);
     void EmbedInWidget(const QRect &rect);
     void StopEmbedding(void);

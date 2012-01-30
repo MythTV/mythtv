@@ -28,7 +28,7 @@ class VideoOutputOpenGL : public VideoOutput
                               MythCodecID  av_codec_id, void *codec_private,
                               bool &aspect_only);
     virtual void UpdatePauseFrame(int64_t &disp_timecode);
-    void DrawUnusedRects(bool) { }
+    virtual void DrawUnusedRects(bool) { } // VideoOutput
     void Zoom(ZoomDirection direction);
     void MoveResize(void);
     virtual int  SetPictureAttribute(PictureAttribute attribute, int newValue);
