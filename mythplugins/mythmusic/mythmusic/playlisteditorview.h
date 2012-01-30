@@ -11,7 +11,7 @@
 #include <mythuibuttonlist.h>
 
 // mythmusic
-#include <musiccommon.h>
+#include "musiccommon.h"
 
 class MythUIButtonTree;
 class MythUIText;
@@ -34,14 +34,14 @@ class MPUBLIC MusicGenericTree : public MythGenericTree
 {
   public:
     MusicGenericTree(MusicGenericTree *parent, const QString &name,
-                     const QString &action = "", 
+                     const QString &action = "",
                      MythUIButtonListItem::CheckState state = MythUIButtonListItem::CantCheck,
                      bool showArrow = true);
     virtual ~MusicGenericTree();
 
-    QString getAction(void) { return m_action; }
+    QString getAction(void) const { return m_action; }
 
-    MythUIButtonListItem::CheckState getCheck(void) { return m_check; }
+    MythUIButtonListItem::CheckState getCheck(void) const { return m_check; }
     void setCheck(MythUIButtonListItem::CheckState state);
 
     void setDrawArrow(bool flag);
@@ -100,7 +100,7 @@ class PlaylistEditorView : public MusicCommon
 
   private:
     QString           m_layout;
-    bool              m_restorePosition; 
+    bool              m_restorePosition;
     MusicGenericTree *m_rootNode;
     MythUIButtonTree *m_playlistTree;
     MythUIText       *m_breadcrumbsText;
