@@ -3094,7 +3094,7 @@ void TV::HandleLCDVolumeTimerEvent()
     KillTimer(lcdVolumeTimerId);
 }
 
-int  TV::StartTimer(int interval, int line)
+int TV::StartTimer(int interval, int line)
 {
     int x = QObject::startTimer(interval);
     if (!x)
