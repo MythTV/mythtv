@@ -115,6 +115,7 @@ fftw
 exif
 newexif
 dcraw
+cdio
 "
 
 enable $PLUGIN_LIST $CONFIG_LIST
@@ -468,28 +469,11 @@ if test "$music" != "no" ; then
         echo "MythMusic requires FLAC."
     fi
 
-    cdaudio="no"
-    if has_header cdaudio.h && has_library libcdaudio ; then
-        cdaudio="yes"
-    fi
-
-    if test "$cdaudio" = "no" -a "$targetos" != "Darwin" -a "`echo ${targetos} | cut -c1-5`" != "MINGW"; then
-        echo "MythMusic requires libcdaudio."
-    fi
-
-    paranoia="no"
-    if has_library libcdda_paranoia && has_library libcdda_interface ; then
-        if has_header cdda_paranoia.h ; then
-            paranoia="yes"
+    if test "$cdio" != "no" ; then
+        cdio="no"
+        if has_header cdio/cdio.h && has_library libcdio && has_library libcdio_cdda && has_library libcdio_paranoia ; then
+            cdio="yes"
         fi
-        if has_header cdda/cdda_paranoia.h ; then
-            paranoia="yes"
-        fi
-    fi
-
-    if test "$paranoia" = "no" -a "$targetos" != "Darwin" -a \
-                                  "`echo ${targetos} | cut -c1-5`" != "MINGW"; then
-        echo "MythMusic requires CDDA Paranoia."
     fi
 
     mp3lame="no"
@@ -514,13 +498,7 @@ if test "$music" != "no" ; then
         echo "MythMusic requires taglib 1.6 or later."
     fi
 
-    if test "$targetos" != "Darwin" -a "`echo ${targetos} | cut -c1-5`" != "MINGW" ; then
-        if test "$cdaudio" = "no" -o "$paranoia" = "no" ; then
-            cdlibs="no"
-        fi
-    fi
-
-    if test "$vorbis" = "no" -o "$flac" = "no" -o "$mp3lame" = "no" -o "$taglib" = "no" -o "$cdlibs" = "no" ; then
+    if test "$vorbis" = "no" -o "$flac" = "no" -o "$mp3lame" = "no" -o "$taglib" = "no" ; then
         echo "Disabling MythMusic due to missing dependencies."
         music="no"
     fi
@@ -753,18 +731,13 @@ if test "$music" = "yes" ; then
       echo "#undef  HAVE_STDINT_H" >> ./mythmusic/mythmusic/config.h
     fi
 
-    if test "$cdaudio" = "yes" ; then
-      echo "#define HAVE_CDAUDIO 1" >> ./mythmusic/mythmusic/config.h
-      echo "CONFIG += cdaudio" >> ./mythmusic/mythmusic/config.pro
+    if test "$cdio" = "yes" ; then
+      echo "#define HAVE_CDIO 1" >> ./mythmusic/mythmusic/config.h
+      echo "CONFIG += cdio" >> ./mythmusic/mythmusic/config.pro
+      echo "        libcdio        support will be included in MythMusic"
     else
-      echo "#undef  HAVE_CDAUDIO" >> ./mythmusic/mythmusic/config.h
-    fi
-
-    if test "$paranoia" = "yes" ; then
-      echo "#define HAVE_PARANOIA 1" >> ./mythmusic/mythmusic/config.h
-      echo "CONFIG += paranoia" >> ./mythmusic/mythmusic/config.pro
-    else
-      echo "#undef  HAVE_PARANOIA" >> ./mythmusic/mythmusic/config.h
+      echo "#undef  HAVE_CDIO" >> ./mythmusic/mythmusic/config.h
+      echo "        libcdio        support will not be included in MythMusic"
     fi
 
     if enabled fftw_lib3; then

@@ -207,9 +207,9 @@ static void checkFactories()
     {
         factories = new QList<DecoderFactory*>;
 
-#ifndef USING_MINGW
+#ifdef HAVE_CDIO
         Decoder::registerFactory(new CdDecoderFactory);
-#endif // USING_MINGW
+#endif
         Decoder::registerFactory(new avfDecoderFactory);
     }
 }

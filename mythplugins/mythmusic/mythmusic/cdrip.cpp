@@ -6,15 +6,11 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
-// Linux C includes
 #include "config.h"
-#ifdef HAVE_CDAUDIO
-#include <cdaudio.h>
-extern "C" {
-#include <cdda_interface.h>
-#include <cdda_paranoia.h>
-}
-#endif
+#ifdef HAVE_CDIO
+# include <cdio/cdda.h>
+# include <cdio/paranoia.h>
+#endif //def HAVE_CDIO
 
 // C++ includes
 #include <iostream>
@@ -51,7 +47,9 @@ using namespace std;
 
 // MythMusic includes
 #include "cdrip.h"
+#ifdef HAVE_CDIO
 #include "cddecoder.h"
+#endif
 #include "encoder.h"
 #include "vorbisencoder.h"
 #include "lameencoder.h"
@@ -59,6 +57,17 @@ using namespace std;
 #include "genres.h"
 #include "editmetadata.h"
 #include "mythlogging.h"
+
+#ifdef HAVE_CDIO
+// libparanoia compatibility
+#ifndef cdrom_paranoia
+#define cdrom_paranoia cdrom_paranoia_t
+#endif
+
+#ifndef CD_FRAMESIZE_RAW
+# define CD_FRAMESIZE_RAW CDIO_CD_FRAMESIZE_RAW
+#endif
+#endif
 
 QEvent::Type RipStatusEvent::kTrackTextEvent =
     (QEvent::Type) QEvent::registerEventType();
@@ -113,15 +122,23 @@ void CDEjectorThread::run()
 
 static long int getSectorCount (QString &cddevice, int tracknum)
 {
-#ifdef HAVE_CDAUDIO
+#if defined HAVE_CDIO
     QByteArray devname = cddevice.toAscii();
     cdrom_drive *device = cdda_identify(devname.constData(), 0, NULL);
 
     if (!device)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error: %1('%2',track=%3) failed at cdda_identify()").
+            arg(__func__).arg(cddevice).arg(tracknum));
         return -1;
+    }
 
     if (cdda_open(device))
     {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error: %1('%2',track=%3) failed at cdda_open() - cdda not supported").
+            arg(__func__).arg(cddevice).arg(tracknum));
         cdda_close(device);
         return -1;
     }
@@ -135,6 +152,8 @@ static long int getSectorCount (QString &cddevice, int tracknum)
         cdda_close(device);
         return end - start + 1;
     }
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("Error: cdrip - cdda_track_audiop(%1) returned 0").arg(cddevice));
 
     cdda_close(device);
 #else
@@ -143,9 +162,11 @@ static long int getSectorCount (QString &cddevice, int tracknum)
     return 0;
 }
 
-static void paranoia_cb(long /*inpos*/, int /*function*/)
+#ifdef HAVE_CDIO
+static void paranoia_cb(long, paranoia_cb_mode_t)
 {
 }
+#endif
 
 CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
                                QVector<RipTrack*> *tracks, int quality) :
@@ -156,6 +177,10 @@ CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
     m_totalSectorsDone(0), m_lastTrackPct(0),
     m_lastOverallPct(0)
 {
+#ifdef WIN32 // libcdio needs the drive letter with no path
+    if (m_CDdevice.endsWith('\\'))
+        m_CDdevice.chop(1);
+#endif
 }
 
 CDRipperThread::~CDRipperThread(void)
@@ -350,7 +375,7 @@ void CDRipperThread::run(void)
 
 int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 {
-#ifdef HAVE_CDAUDIO  // && HAVE_CDPARANOIA
+#if defined HAVE_CDIO
     QByteArray devname = cddevice.toAscii();
     cdrom_drive *device = cdda_identify(devname.constData(), 0, NULL);
 
@@ -365,6 +390,9 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 
     if (cdda_open(device))
     {
+        LOG(VB_MEDIA, LOG_INFO,
+            QString("Error: %1('%2',track=%3) failed at cdda_open() - cdda not supported")
+            .arg(__func__).arg(cddevice).arg(tracknum));
         cdda_close(device);
         return -1;
     }
@@ -372,6 +400,8 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     cdda_verbose_set(device, CDDA_MESSAGE_FORGETIT, CDDA_MESSAGE_FORGETIT);
     long int start = cdda_track_firstsector(device, tracknum);
     long int end = cdda_track_lastsector(device, tracknum);
+    LOG(VB_MEDIA, LOG_INFO, QString("%1(%2,track=%3) start=%4 end=%5")
+        .arg(__func__).arg(cddevice).arg(tracknum).arg(start).arg(end));
 
     cdrom_paranoia *paranoia = paranoia_init(device);
     if (gCoreContext->GetSetting("ParanoiaLevel") == "full")
@@ -774,17 +804,12 @@ void Ripper::ScanFinished()
 
 void Ripper::scanCD(void)
 {
-#ifdef HAVE_CDAUDIO
-    QByteArray devname = m_CDdevice.toAscii();
-    int cdrom_fd = cd_init_device(const_cast<char*>(devname.constData()));
-    LOG(VB_MEDIA, LOG_INFO, "Ripper::scanCD() - dev:" + m_CDdevice);
-    if (cdrom_fd == -1)
+#ifdef HAVE_CDIO
     {
-        LOG(VB_GENERAL, LOG_ERR, "Could not open cdrom_fd: " + ENO);
-        return;
+    LOG(VB_MEDIA, LOG_INFO, QString("Ripper::%1 CD='%2'").
+        arg(__func__).arg(m_CDdevice));
+    (void)cdio_close_tray(m_CDdevice.toAscii().constData(), NULL);
     }
-    cd_close(cdrom_fd);  //Close the CD tray
-    cd_finish(cdrom_fd);
 #endif
 
     if (m_decoder)
@@ -1230,22 +1255,14 @@ void Ripper::EjectFinished()
 
 void Ripper::ejectCD()
 {
+    LOG(VB_MEDIA, LOG_INFO, __PRETTY_FUNCTION__);
     bool bEjectCD = gCoreContext->GetNumSetting("EjectCDAfterRipping",1);
     if (bEjectCD)
     {
-#ifdef HAVE_CDAUDIO
-        QByteArray devname = m_CDdevice.toAscii();
-        int cdrom_fd = cd_init_device(const_cast<char*>(devname.constData()));
-        LOG(VB_MEDIA, LOG_INFO, "Ripper::ejectCD() - dev " + m_CDdevice);
-        if (cdrom_fd != -1)
-        {
-            if (cd_eject(cdrom_fd) == -1)
-                LOG(VB_GENERAL, LOG_ERR, "Failed on cd_eject: " + ENO);
-
-            cd_finish(cdrom_fd);
-        }
-        else
-            LOG(VB_GENERAL, LOG_ERR, "Failed on cd_init_device: " + ENO);
+#ifdef HAVE_CDIO
+        LOG(VB_MEDIA, LOG_INFO, QString("Ripper::%1 '%2'").
+            arg(__func__).arg(m_CDdevice));
+        (void)cdio_eject_media_drive(m_CDdevice.toAscii().constData());
 #else
         MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
         if (mon)
