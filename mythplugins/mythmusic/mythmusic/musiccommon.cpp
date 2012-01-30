@@ -217,7 +217,7 @@ bool MusicCommon::CreateCommon(void)
         m_currentVisual = m_mainvisual->getCurrentVisual();
 
         // sanity check
-        if (m_currentVisual >= m_visualModes.count())
+        if (m_currentVisual >= static_cast<uint>(m_visualModes.count()))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("MusicCommon: Got a bad saved visualizer: %1").arg(m_currentVisual));
             m_currentVisual = 0;
