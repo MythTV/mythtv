@@ -978,7 +978,7 @@ void MythCoreContext::SendEvent(const MythEvent &event)
     SendReceiveStringList(strlist);
 }
 
-void MythCoreContext::SendSystemEvent(const QString msg)
+void MythCoreContext::SendSystemEvent(const QString &msg)
 {
     if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHTV_SETUP)
         return;
@@ -987,9 +987,9 @@ void MythCoreContext::SendSystemEvent(const QString msg)
                         .arg(msg).arg(GetHostName()));
 }
 
-void MythCoreContext::SendHostSystemEvent(const QString msg,
+void MythCoreContext::SendHostSystemEvent(const QString &msg,
                                           const QString &hostname,
-                                          const QString args)
+                                          const QString &args)
 {
     SendSystemEvent(QString("%1 HOST %2 %3").arg(msg).arg(hostname).arg(args));
 }
