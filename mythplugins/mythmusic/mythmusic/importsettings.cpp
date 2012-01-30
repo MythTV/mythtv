@@ -16,6 +16,7 @@ ImportSettings::ImportSettings(MythScreenStack *parent, const char *name)
         m_encoderType(NULL),
         m_defaultRipQuality(NULL),
         m_mp3UseVBR(NULL),
+        m_helpText(NULL),
         m_saveButton(NULL),
         m_cancelButton(NULL)
 {
