@@ -3189,6 +3189,12 @@ void MythUIButtonListItem::DisplayState(const QString &state,
         m_parent->Update();
 }
 
+void MythUIButtonListItem::SetStatesFromMap(const QMap<QString, QString> &stateMap)
+{
+    m_states.clear();
+    m_states = stateMap;
+}
+
 bool MythUIButtonListItem::checkable() const
 {
     return m_checkable;

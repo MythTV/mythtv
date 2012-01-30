@@ -78,6 +78,9 @@ class MUI_PUBLIC MythGenericTree
     void SetImage(const QString &filename, const QString &name="");
     QString GetImage(const QString &name="") const;
 
+    void DisplayState(const QString &state, const QString &name="");
+    QString GetState(const QString &name="") const;
+
     void SetData(QVariant data) { m_data = data; }
     const QVariant GetData(void) const { return m_data; }
 
