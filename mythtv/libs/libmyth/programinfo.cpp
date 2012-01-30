@@ -1883,13 +1883,10 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
         (recordid == other.recordid || recordid == other.parentid))
            return true;
 
-    if (title.toLower() != other.title.toLower())
+    if (dupmethod & kDupCheckNone)
         return false;
 
-    if (findid && findid == other.findid)
-        return true;
-
-    if (dupmethod & kDupCheckNone)
+    if (title.toLower() != other.title.toLower())
         return false;
 
     if (catType == "series")
