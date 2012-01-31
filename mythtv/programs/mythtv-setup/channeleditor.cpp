@@ -187,6 +187,8 @@ bool ChannelEditor::keyPressEvent(QKeyEvent *event)
             menu();
         else if (action == "DELETE")
             del();
+        else if (action == "EDIT")
+            edit();
         else
             handled = false;
     }
