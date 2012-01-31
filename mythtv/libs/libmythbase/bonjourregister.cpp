@@ -21,7 +21,9 @@ BonjourRegister::~BonjourRegister()
 
     if (m_dnssref)
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "De-registering service.");
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("De-registering service '%1' on '%2'")
+            .arg(m_type.data()).arg(m_name.data()));
         DNSServiceRefDeallocate(m_dnssref);
     }
     m_dnssref = 0;
@@ -96,6 +98,8 @@ void BonjourRegister::BonjourCallback(DNSServiceRef ref, DNSServiceFlags flags,
             QString("Service registration complete: name '%1' type '%2' domain: '%3'")
             .arg(QString::fromUtf8(name)).arg(QString::fromUtf8(type))
             .arg(QString::fromUtf8(domain)));
+        bonjour->m_name = name;
+        bonjour->m_type = type;
     }
     else
     {

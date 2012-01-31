@@ -17,6 +17,9 @@ class MBASE_PUBLIC BonjourRegister : public QObject
     bool Register(uint16_t port, const QByteArray &type, const QByteArray &name,
                   const QByteArray &txt);
 
+    QByteArray       m_name;
+    QByteArray       m_type;
+
   private slots:
     void socketReadyRead();
 
