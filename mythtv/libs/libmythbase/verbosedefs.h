@@ -64,9 +64,9 @@
 #endif
 
 VERBOSE_PREAMBLE
-VERBOSE_MAP(VB_ALL,       ~0LLU, false,
+VERBOSE_MAP(VB_ALL,       ~0ULL, false,
             "ALL available debug output")
-VERBOSE_MAP(VB_MOST,      0xffffffff3ffeffffLLU, false,
+VERBOSE_MAP(VB_MOST,      0xffffffff3ffeffffULL, false,
             "Most debug (nodatabase,notimestamp,noextra)")
 #if 0
 VERBOSE_MAP(VB_IMPORTANT, 0x00000001, false,
@@ -132,35 +132,35 @@ VERBOSE_MAP(VB_EXTRA,     0x40000000, true,
 #endif
 VERBOSE_MAP(VB_TIMESTAMP, 0x80000000, true,
             "Conditional data driven messages")
-VERBOSE_MAP(VB_PROCESS,   0x100000000LLU, true,
+VERBOSE_MAP(VB_PROCESS,   0x100000000ULL, true,
             "MPEG2Fix processing messages")
-VERBOSE_MAP(VB_FRAME,     0x200000000LLU, true,
+VERBOSE_MAP(VB_FRAME,     0x200000000ULL, true,
             "MPEG2Fix frame messages")
-VERBOSE_MAP(VB_RPLXQUEUE, 0x400000000LLU, true,
+VERBOSE_MAP(VB_RPLXQUEUE, 0x400000000ULL, true,
             "MPEG2Fix Replex Queue messages")
-VERBOSE_MAP(VB_DECODE,    0x800000000LLU, true,
+VERBOSE_MAP(VB_DECODE,    0x800000000ULL, true,
             "MPEG2Fix Decode messages")
-VERBOSE_MAP(VB_FLUSH,     0x1000000000LLU, true,
+VERBOSE_MAP(VB_FLUSH,     0x1000000000ULL, true,
             "")
 /* Please do not add a description for VB_FLUSH, it
    should not be passed in via "-v". It is used to
    flush output to the standard output from console
    programs that have debugging enabled.
  */
-VERBOSE_MAP(VB_STDIO,     0x2000000000LLU, true,
+VERBOSE_MAP(VB_STDIO,     0x2000000000ULL, true,
             "")
 /* Please do not add a description for VB_STDIO, it
    should not be passed in via "-v". It is used to
    send output to the standard output from console
    programs that have debugging enabled.
  */
-VERBOSE_MAP(VB_GPU,       0x4000000000LLU, true,
+VERBOSE_MAP(VB_GPU,       0x4000000000ULL, true,
             "GPU Commercial Flagging messages")
-VERBOSE_MAP(VB_GPUAUDIO,  0x8000000000LLU, true,
+VERBOSE_MAP(VB_GPUAUDIO,  0x8000000000ULL, true,
             "GPU Audio Processing messages")
-VERBOSE_MAP(VB_GPUVIDEO,  0x10000000000LLU, true,
+VERBOSE_MAP(VB_GPUVIDEO,  0x10000000000ULL, true,
             "GPU Video Processing messages")
-VERBOSE_MAP(VB_REFCOUNT,  0x20000000000LLU, true,
+VERBOSE_MAP(VB_REFCOUNT,  0x20000000000ULL, true,
             "Reference Count messages")
 VERBOSE_MAP(VB_NONE,      0x00000000, false,
             "NO debug output")
