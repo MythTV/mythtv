@@ -1191,7 +1191,10 @@ void MusicCommon::customEvent(QEvent *event)
 
         statusString = tr("Decoder error.");
 
-        DecoderEvent *dxe = (DecoderEvent *) event;
+        DecoderEvent *dxe = dynamic_cast<DecoderEvent *>(event);
+
+        if (!dxe)
+            return;
 
         LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*dxe->errorMessage()));
@@ -1444,7 +1447,11 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::TrackChangeEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         int trackNo = mpe->TrackID;
 
         if (m_currentPlaylist)
@@ -1492,7 +1499,11 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::TrackRemovedEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         int trackID = mpe->TrackID;
 
         if (m_currentPlaylist)
@@ -1527,7 +1538,11 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::TrackAddedEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         int trackID = mpe->TrackID;
 
         if (m_currentPlaylist)
@@ -1581,7 +1596,11 @@ void MusicCommon::customEvent(QEvent *event)
     else if (event->type() == MusicPlayerEvent::MetadataChangedEvent ||
              event->type() == MusicPlayerEvent::TrackStatsChangedEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         uint trackID = mpe->TrackID;
 
         if (m_currentPlaylist)
@@ -1610,7 +1629,11 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::AlbumArtChangedEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         uint trackID = mpe->TrackID;
 
         if (m_currentPlaylist)

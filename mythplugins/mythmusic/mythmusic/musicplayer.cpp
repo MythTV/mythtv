@@ -108,7 +108,7 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     if (checkCD)
     {
         m_cdWatcher = new CDWatcherThread(m_CDdevice);
-        // don't start the cd watcher here 
+        // don't start the cd watcher here
         // since the playlists haven't been loaded yet
     }
 
@@ -510,7 +510,10 @@ void MusicPlayer::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderHandlerEvent::Info)
     {
-        DecoderHandlerEvent *dxe = (DecoderHandlerEvent*)event;
+        DecoderHandlerEvent *dxe = dynamic_cast<DecoderHandlerEvent*>(event);
+        if (!dxe)
+            return;
+
         if (getCurrentMetadata())
             m_displayMetadata = *getCurrentMetadata();
         m_displayMetadata.setArtist("");
@@ -521,7 +524,10 @@ void MusicPlayer::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderHandlerEvent::Meta)
     {
-        DecoderHandlerEvent *dhe = (DecoderHandlerEvent*)(event);
+        DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
+        if (!dhe)
+            return;
+
         Metadata mdata(*dhe->getMetadata());
 
         if (!m_playedList.isEmpty())
@@ -560,7 +566,11 @@ void MusicPlayer::customEvent(QEvent *event)
     // handle MythEvent events
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent*) event;
+        MythEvent *me = dynamic_cast<MythEvent*>(event);
+
+        if (!me)
+            return;
+
         if (me->Message().left(14) == "PLAYBACK_START")
         {
             m_wasPlaying = m_isPlaying;
@@ -698,7 +708,10 @@ void MusicPlayer::customEvent(QEvent *event)
     {
         if (event->type() == OutputEvent::Error)
         {
-            OutputEvent *aoe = (OutputEvent *) event;
+            OutputEvent *aoe = dynamic_cast<OutputEvent*>(event);
+
+            if (!aoe)
+                return;
 
             LOG(VB_GENERAL, LOG_ERR, QString("Output Error - %1")
                     .arg(*aoe->errorMessage()));
@@ -713,7 +726,10 @@ void MusicPlayer::customEvent(QEvent *event)
 
             QApplication::sendPostedEvents();
 
-            DecoderEvent *dxe = (DecoderEvent *) event;
+            DecoderEvent *dxe = dynamic_cast<DecoderEvent*>(event);
+
+            if (!dxe)
+                return;
 
             LOG(VB_GENERAL, LOG_ERR, QString("Decoder Error - %1")
                     .arg(*dxe->errorMessage()));
@@ -724,7 +740,11 @@ void MusicPlayer::customEvent(QEvent *event)
 
     if (event->type() == OutputEvent::Info)
     {
-        OutputEvent *oe = (OutputEvent *) event;
+        OutputEvent *oe = dynamic_cast<OutputEvent*>(event);
+
+        if (!oe)
+            return;
+
         m_currentTime = oe->elapsedSeconds();
 
         if (!m_updatedLastplay)
@@ -974,7 +994,7 @@ Metadata *MusicPlayer::getNextMetadata(void)
         return m_currentPlaylist->getSongAt(m_currentTrack + 1);
     else
     {
-        // if we are playing the last track then we need to take the 
+        // if we are playing the last track then we need to take the
         // repeat mode into account
         if (m_repeatMode == REPEAT_ALL)
             return m_currentPlaylist->getSongAt(0);
@@ -1035,7 +1055,7 @@ MusicPlayer::ShuffleMode MusicPlayer::toggleShuffleMode(void)
     return m_shuffleMode;
 }
 
-void MusicPlayer::setShuffleMode(ShuffleMode mode) 
+void MusicPlayer::setShuffleMode(ShuffleMode mode)
 {
     int curTrackID = -1;
     if (getCurrentMetadata())
