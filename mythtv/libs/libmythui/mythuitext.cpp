@@ -270,7 +270,7 @@ void MythUIText::SetCutDown(Qt::TextElideMode mode)
     if (mode != m_Cutdown)
     {
         m_Cutdown = mode;
-        if (m_scrolling && m_Cutdown)
+        if (m_scrolling && m_Cutdown != Qt::ElideNone)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("'%1' (%2): <scroll> and "
                                              "<cutdown> are not combinable.")
