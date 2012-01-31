@@ -247,7 +247,6 @@ void MythRenderOpenGL2::ResetProcs(void)
     m_glCompileShader = NULL;
     m_glGetShaderiv = NULL;
     m_glGetShaderInfoLog = NULL;
-    m_glDeleteShader = NULL;
     m_glCreateProgram = NULL;
     m_glAttachShader = NULL;
     m_glLinkProgram = NULL;
@@ -283,7 +282,7 @@ bool MythRenderOpenGL2::InitFeatures(void)
     // These should all be present for a valid OpenGL2.0/ES installation
     if (m_glShaderSource  && m_glCreateShader &&
         m_glCompileShader && m_glGetShaderiv &&
-        m_glGetShaderInfoLog && m_glDeleteShader &&
+        m_glGetShaderInfoLog &&
         m_glCreateProgram &&
         m_glAttachShader  && m_glLinkProgram &&
         m_glUseProgram    && m_glGetProgramInfoLog &&
