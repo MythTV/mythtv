@@ -23,8 +23,7 @@ class ChannelEditor : public MythScreenType
   protected slots:
     void menu(void);
     void del(void);
-    void edit(void);
-    void edit(MythUIButtonListItem *item);
+    void edit(MythUIButtonListItem *item = NULL);
     void scan(void);
     void transportEditor(void);
     void channelIconImport(void);

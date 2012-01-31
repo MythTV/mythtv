@@ -432,15 +432,11 @@ void ChannelEditor::deleteChannels(void)
         delete dialog;
 }
 
-void ChannelEditor::edit(void)
-{
-    MythUIButtonListItem *item = m_channelList->GetItemCurrent();
-
-    edit(item);
-}
-
 void ChannelEditor::edit(MythUIButtonListItem *item)
 {
+    if (!item)
+        item = m_channelList->GetItemCurrent();
+
     if (!item)
         return;
 
