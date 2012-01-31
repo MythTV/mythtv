@@ -767,26 +767,56 @@ void MythUIText::FillCutMessage(void)
         m_drawRect.moveCenter(m_Area.center());
         min_rect.moveCenter(m_Area.center());
     }
+
     // Adjust horizontal
     if (m_Justification & Qt::AlignLeft)
     {
-        m_drawRect.moveLeft(m_Area.x());
+        // If text size is less than allowed min size, center it
+        if (m_ShrinkNarrow && m_MinSize.isValid() &&
+            min_rect.width() < m_MinSize.x())
+            m_drawRect.moveLeft(m_Area.x() +
+                                ((m_MinSize.x() - min_rect.width()) / 2));
+        else
+            m_drawRect.moveLeft(m_Area.x());
+
         min_rect.moveLeft(m_Area.x());
     }
     else if (m_Justification & Qt::AlignRight)
     {
-        m_drawRect.moveRight(m_Area.x() + m_Area.width());
+        // If text size is less than allowed min size, center it
+        if (m_ShrinkNarrow && m_MinSize.isValid() &&
+            min_rect.width() < m_MinSize.x())
+            m_drawRect.moveRight(m_Area.x() + m_Area.width() -
+                                 ((m_MinSize.x() - min_rect.width()) / 2));
+        else
+            m_drawRect.moveRight(m_Area.x() + m_Area.width());
+
         min_rect.moveRight(m_Area.x() + m_Area.width());
     }
+
     // Adjust vertical
     if (m_Justification & Qt::AlignTop)
     {
-        m_drawRect.moveTop(m_Area.y());
+        // If text size is less than allowed min size, center it
+        if (!m_ShrinkNarrow && m_MinSize.isValid() &&
+            min_rect.height() < m_MinSize.y())
+            m_drawRect.moveTop(m_Area.y() +
+                               ((m_MinSize.y() - min_rect.height()) / 2));
+        else
+            m_drawRect.moveTop(m_Area.y());
+
         min_rect.moveTop(m_Area.y());
     }
     else if (m_Justification & Qt::AlignBottom)
     {
-        m_drawRect.moveBottom(m_Area.y() + m_Area.height());
+        // If text size is less than allowed min size, center it
+        if (!m_ShrinkNarrow && m_MinSize.isValid() &&
+            min_rect.height() < m_MinSize.y())
+            m_drawRect.moveBottom(m_Area.y() + m_Area.height() -
+                                  ((m_MinSize.y() - min_rect.height()) / 2));
+        else
+            m_drawRect.moveBottom(m_Area.y() + m_Area.height());
+
         min_rect.moveBottom(m_Area.y() + m_Area.height());
     }
 
