@@ -388,9 +388,9 @@ Cddb::Album& Cddb::Album::operator =(const QString& rhs)
             else if (line.startsWith("DYEAR="))
             {
                 bool isValid = false;
-                int year = value.toInt(&isValid);
+                int value = value.toInt(&isValid);
                 if (isValid)
-                    year = year;
+                    year = value;
             }
             else if (line.startsWith("DGENRE="))
             {
