@@ -153,9 +153,6 @@ class MPUBLIC MythPopupBox : public MythDialog
                             const QString  &message,
                             QString         button_msg = QString());
 
-    static bool showOkCancelPopup(MythMainWindow *parent, QString title,
-                                  QString message, bool focusOk);
-
     static DialogCode Show2ButtonPopup(
         MythMainWindow *parent,
         const QString &title, const QString &message,

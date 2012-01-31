@@ -713,28 +713,6 @@ bool MythPopupBox::showOkPopup(
     return ret;
 }
 
-bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
-                                     QString message, bool focusOk)
-{
-    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
-
-    popup->addLabel(message, Medium, true);
-    QAbstractButton *okButton     = popup->addButton(tr("OK"),     popup, SLOT(accept()));
-    QAbstractButton *cancelButton = popup->addButton(tr("Cancel"), popup, SLOT(reject()));
-
-    if (focusOk)
-        okButton->setFocus();
-    else
-        cancelButton->setFocus();
-
-    bool ok = (Accepted == popup->ExecPopup());
-
-    popup->hide();
-    popup->deleteLater();
-
-    return ok;
-}
-
 bool MythPopupBox::showGetTextPopup(MythMainWindow *parent, QString title,
                                     QString message, QString& text)
 {
