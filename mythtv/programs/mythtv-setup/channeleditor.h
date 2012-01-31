@@ -21,8 +21,9 @@ class ChannelEditor : public MythScreenType
     void customEvent(QEvent *event);
 
   protected slots:
-    void menu();
-    void del();
+    void menu(void);
+    void del(void);
+    void edit(void);
     void edit(MythUIButtonListItem *item);
     void scan(void);
     void transportEditor(void);
