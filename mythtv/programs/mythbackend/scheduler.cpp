@@ -119,8 +119,6 @@ Scheduler::~Scheduler()
         wait();
         locker.relock();
     }
-    else
-        MSqlQuery::CloseDDCon();
 
     while (!reclist.empty())
     {
