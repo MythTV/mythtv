@@ -89,6 +89,10 @@ using namespace std;
 #include "mythraopdevice.h"
 #endif
 
+#ifdef USING_LIBDNS_SD
+#include "mythairplayserver.h"
+#endif
+
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
 
@@ -221,6 +225,10 @@ namespace
     {
 #ifdef USING_RAOP
         MythRAOPDevice::Cleanup();
+#endif
+
+#ifdef USING_LIBDNS_SD
+        MythAirplayServer::Cleanup();
 #endif
 
         delete exitPopup;
@@ -1546,6 +1554,11 @@ int main(int argc, char **argv)
     }
 
     setuid(getuid());
+
+#ifdef USING_LIBDNS_SD
+    if (getenv("MYTHTV_AIRPLAY"))
+        MythAirplayServer::Create();
+#endif
 
 #ifdef USING_RAOP
     MythRAOPDevice::Create();

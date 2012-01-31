@@ -415,6 +415,8 @@ using_frontend {
 
     using_libdns_sd {
         !macx: LIBS += -ldns_sd
+        HEADERS += mythairplayserver.h
+        SOURCES += mythairplayserver.cpp
         using_libcrypto: HEADERS += mythraopdevice.h   mythraopconnection.h
         using_libcrypto: SOURCES += mythraopdevice.cpp mythraopconnection.cpp
         using_libcrypto: LIBS    += -lcrypto
