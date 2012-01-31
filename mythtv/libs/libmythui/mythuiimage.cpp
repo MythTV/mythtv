@@ -372,9 +372,8 @@ class ImageLoader
             ImageProperties frameProps = imProps;
             frameProps.filename = frameFilename;
 
-            MythImage *im = ImageLoader::LoadImage(painter, frameProps,
-                                                   cacheMode, parent, aborted,
-                                                   imageReader);
+            MythImage *im = LoadImage(painter, frameProps, cacheMode, parent,
+                                      aborted, imageReader);
 
             if (!im)
                 aborted = true;
