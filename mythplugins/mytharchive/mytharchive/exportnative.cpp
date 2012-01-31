@@ -266,10 +266,10 @@ void ExportNative::updateArchiveList(void)
 
     if (m_archiveList.size() == 0)
     {
-        m_titleText->SetText("");
-        m_datetimeText->SetText("");
-        m_descriptionText->SetText("");
-        m_filesizeText->SetText("");
+        m_titleText->Reset();
+        m_datetimeText->Reset();
+        m_descriptionText->Reset();
+        m_filesizeText->Reset();
         m_nofilesText->Show();
     }
     else
@@ -486,14 +486,14 @@ void ExportNative::runScript()
         QFile::remove(logDir + "/mythburncancel.lck");
 
     createConfigFile(configDir + "/mydata.xml");
-    commandline = "mytharchivehelper --nativearchive --outfile " + configDir + 
+    commandline = "mytharchivehelper --nativearchive --outfile " + configDir +
                   "/mydata.xml";  // job file
     commandline += logPropagateArgs;
     if (!logPropagateQuiet())
         commandline += " --quiet";
     commandline += " > "  + logDir + "/progress.log 2>&1 &";            // Logs
 
-    uint flags = kMSRunBackground | kMSDontBlockInputDevs | 
+    uint flags = kMSRunBackground | kMSDontBlockInputDevs |
                  kMSDontDisableDrawing;
     uint retval = myth_system(commandline, flags);
     if (retval != GENERIC_EXIT_RUNNING && retval != GENERIC_EXIT_OK)

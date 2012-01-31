@@ -919,7 +919,7 @@ void MusicCommon::stop(void)
     if (m_timeText)
         m_timeText->SetText(time_string);
     if (m_infoText)
-        m_infoText->SetText("");
+        m_infoText->Reset();
 }
 
 void MusicCommon::next()
@@ -1722,9 +1722,9 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
         if (m_ratingState)
             m_ratingState->DisplayState("0");
         if (m_timeText)
-            m_timeText->SetText("");
+            m_timeText->Reset();
         if (m_infoText)
-            m_infoText->SetText("");
+            m_infoText->Reset();
         if (m_trackProgress)
             m_trackProgress->SetUsed(0);
 

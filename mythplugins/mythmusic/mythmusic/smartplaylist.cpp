@@ -830,7 +830,7 @@ void SmartPlaylistEditor::saveClicked(void)
 void SmartPlaylistEditor::newSmartPlaylist(QString category)
 {
     m_categorySelector->SetValue(category);
-    m_titleEdit->SetText("");
+    m_titleEdit->Reset();
     m_originalCategory = category;
     m_originalName.clear();
 
@@ -972,7 +972,7 @@ void SmartPlaylistEditor::startDeleteCategory(const QString &category)
     SmartPlaylistEditor::deleteCategory(category);
 #endif
     getSmartPlaylistCategories();
-    m_titleEdit->SetText("");
+    m_titleEdit->Reset();
 }
 
 void SmartPlaylistEditor::renameCategory(const QString &category)

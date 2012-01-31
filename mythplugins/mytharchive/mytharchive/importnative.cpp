@@ -239,7 +239,7 @@ bool ArchiveFileSelector::Create(void)
 
 void ArchiveFileSelector::itemSelected(MythUIButtonListItem *item)
 {
-    m_xmlFile = "";
+    m_xmlFile.clear();
 
     if (!item)
         return;
@@ -257,9 +257,9 @@ void ArchiveFileSelector::itemSelected(MythUIButtonListItem *item)
     }
     else
     {
-        m_progTitle->SetText("");
-        m_progSubtitle->SetText("");
-        m_progStartTime->SetText("");
+        m_progTitle->Reset();
+        m_progSubtitle->Reset();
+        m_progStartTime->Reset();
     }
 }
 
@@ -450,14 +450,14 @@ void ImportNative::finishedPressed()
     if (QFile::exists(logDir + "/progress.log"))
         QFile::remove(logDir + "/progress.log");
 
-    commandline = "mytharchivehelper --importarchive --infile \"" + m_xmlFile + 
+    commandline = "mytharchivehelper --importarchive --infile \"" + m_xmlFile +
                   "\" --chanid " + chanID;
     commandline += logPropagateArgs;
     if (!logPropagateQuiet())
         commandline += " --quiet";
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
-    uint flags = kMSRunBackground | kMSDontBlockInputDevs | 
+    uint flags = kMSRunBackground | kMSDontBlockInputDevs |
                  kMSDontDisableDrawing;
     uint retval = myth_system(commandline, flags);
     if (retval != GENERIC_EXIT_RUNNING && retval != GENERIC_EXIT_OK)
@@ -540,10 +540,10 @@ void ImportNative::findChannelMatch(const QString &chanID, const QString &chanNo
     }
 
     // give up
-    m_localChanID_text->SetText("");
-    m_localChanNo_text->SetText("");
-    m_localChanName_text->SetText("");
-    m_localCallsign_text->SetText("");
+    m_localChanID_text->Reset();
+    m_localChanNo_text->Reset();
+    m_localChanName_text->Reset();
+    m_localCallsign_text->Reset();
 }
 
 void ImportNative::showList(const QString &caption, QString &value,

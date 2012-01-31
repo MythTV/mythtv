@@ -386,11 +386,11 @@ void VideoSelector::updateVideoList(void)
     else
     {
         m_warningText->Show();
-        m_titleText->SetText("");
-        m_plotText->SetText("");
+        m_titleText->Reset();
+        m_plotText->Reset();
         m_coverImage->SetFilename("blank.png");
         m_coverImage->Load();
-        m_filesizeText->SetText("");
+        m_filesizeText->Reset();
     }
 }
 
