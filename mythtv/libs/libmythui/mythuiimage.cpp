@@ -33,7 +33,7 @@ class ImageLoadThread;
 
 /////////////////////////////////////////////////////
 
-ImageProperties::ImageProperties::ImageProperties()
+ImageProperties::ImageProperties()
 {
     Init();
 }
