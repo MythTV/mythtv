@@ -45,7 +45,10 @@ typedef struct
     Metadata *metadata;
     bool      active;
     int       length;
+    bool      isNew;
 } RipTrack;
+
+Q_DECLARE_METATYPE(RipTrack *)
 
 class RipStatus;
 
@@ -86,6 +89,7 @@ class Ripper : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent *);
 
     bool somethingWasRipped();
     void scanCD(void);
@@ -118,9 +122,12 @@ class Ripper : public MythScreenType
     void ripFinished(void);
 
   private:
-    void deleteTrack(QString& artist, QString& album, QString& title);
+    bool deleteExistingTrack(RipTrack *track);
+    void deleteAllExistingTracks(void);
     void updateTrackList(void);
     void updateTrackLengths(void);
+    void toggleTrackActive(RipTrack *);
+    void ShowConflictMenu(RipTrack *);
 
     CdDecoder           *m_decoder;
 
