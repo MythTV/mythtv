@@ -100,6 +100,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 
     void BlockShutdown(void);
     void AllowShutdown(void);
+    bool IsBlockingClient(void) const; ///< is this client blocking shutdown
 
     bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false,
                                bool block = true);
