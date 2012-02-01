@@ -760,7 +760,7 @@ ProgInfo &ProgInfo::operator=(const ProgInfo &other)
     if (this == &other)
         return *this;
 
-    *((DBEvent*)(this)) = other;
+    DBEvent::operator=(other);
 
     channel         = other.channel;
     startts         = other.startts;
