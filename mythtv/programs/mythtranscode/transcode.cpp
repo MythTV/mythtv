@@ -1472,6 +1472,21 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (!arb->m_passthru)
             audio_codec_name = "raw";
 
+        // If cutlist is used then get info on first uncut frame
+        if (honorCutList && fifo_info)
+        {
+            bool is_key;
+            int did_ff;
+            frm_dir_map_t::iterator dm_iter;
+            player->TranscodeGetNextFrame(dm_iter, did_ff, is_key, true);
+
+            QSize buf_size = player->GetVideoBufferSize();
+            video_width = buf_size.width();
+            video_height = buf_size.height();
+            video_aspect = player->GetVideoAspect();
+            video_frame_rate = player->GetFrameRate();
+        }
+
         // Display details of the format of the fifo data.
         LOG(VB_GENERAL, LOG_INFO,
             QString("FifoVideoWidth %1").arg(video_width));
