@@ -768,8 +768,9 @@ bool ChannelBase::ChangeInternalChannel(const QString &freqid,
     delete device;
     device = NULL;
     return true;
-#endif
+#else
     return false;
+#endif
 }
 
 /// \note m_system_lock must be held when this is called
