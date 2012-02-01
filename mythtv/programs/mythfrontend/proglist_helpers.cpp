@@ -110,7 +110,7 @@ void PhrasePopup::phraseSelected(MythUIButtonListItem *item)
         return;
 
     if (m_phraseList->GetCurrentPos() == 0)
-        m_phraseEdit->SetText("");
+        m_phraseEdit->Reset();
     else
         m_phraseEdit->SetText(item->GetText());
 
