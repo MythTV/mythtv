@@ -295,11 +295,16 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         curProgram->SetIgnoreBookmark(flags & kStartTVIgnoreBookmark);
     }
 
+    // Must be before Init() otherwise we swallow the PLAYBACK_START event
+    // with the event filter
+    sendPlaybackStart();
+
     // Initialize TV
     if (!tv->Init())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed initializing TV");
         ReleaseTV(tv);
+        sendPlaybackEnd();
         delete curProgram;
         return false;
     }
@@ -310,8 +315,6 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         if (pginfo.HasPathname() || pginfo.GetChanID())
             tv->SetLastProgram(&pginfo);
     }
-
-    sendPlaybackStart();
 
     if (curProgram)
     {
