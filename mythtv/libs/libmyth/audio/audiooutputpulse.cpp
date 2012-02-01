@@ -240,8 +240,6 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
     if (sstate == PA_STREAM_CREATING || sstate == PA_STREAM_READY)
     {
         int write_status = PA_ERR_INVALID;
-        size_t write;
-        size_t writable;
         size_t to_write = size;
         unsigned char *buf_ptr = aubuf;
         pa_context_state_t cstate;
@@ -250,39 +248,28 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
         while (to_write > 0)
         {
             write_status = 0;
-            writable = pa_stream_writable_size(pstream);
+            size_t writable = pa_stream_writable_size(pstream);
             if (writable > 0)
             {
-                write = min(to_write, writable);
+                size_t write = min(to_write, writable);
                 write_status = pa_stream_write(pstream, buf_ptr, write,
                                                NULL, 0, PA_SEEK_RELATIVE);
-                if (!write_status)
-                {
-                    buf_ptr += write;
-                    to_write -= write;
-                }
-                else
+
+                if (0 != write_status)
                     break;
+
+                buf_ptr += write;
+                to_write -= write;
             }
-            else if (writable < 0)
-                break;
-            else // writable == 0
+            else
+            {
                 pa_threaded_mainloop_wait(mainloop);
+            }
         }
         pa_threaded_mainloop_unlock(mainloop);
 
         if (to_write > 0)
         {
-            if (writable < 0)
-            {
-                cstate = pa_context_get_state(pcontext);
-                sstate = pa_stream_get_state(pstream);
-                VBERROR(fn_log_tag +
-                        QString("stream unfit for writing (writable < 0), "
-                                "context state: %1, stream state: %2")
-                        .arg(cstate,0,16).arg(sstate,0,16));
-            }
-
             if (write_status != 0)
                 VBERROR(fn_log_tag + QString("stream write failed: %1")
                                      .arg(write_status == PA_ERR_BADSTATE
