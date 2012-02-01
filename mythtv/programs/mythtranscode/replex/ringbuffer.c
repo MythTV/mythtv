@@ -125,7 +125,8 @@ int ring_peek(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 
 	unsigned int avail, pos, rest;
 
-	if (count <=0 || off+count > rbuf->size || off+count >ring_avail(rbuf)) return -1;
+	if (off+count > rbuf->size || off+count >ring_avail(rbuf))
+		return -1;
 	pos  = (rbuf->read_pos+off)%rbuf->size;
 	rest = rbuf->size - pos ;
 	avail = ring_avail(rbuf); 
@@ -157,7 +158,8 @@ int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 
 	unsigned int avail, pos, rest;
 
-	if (count <=0 || off+count > rbuf->size || off+count >ring_avail(rbuf)) return -1;
+	if (off+count > rbuf->size || off+count >ring_avail(rbuf))
+		return -1;
 	pos  = (rbuf->read_pos+off)%rbuf->size;
 	rest = rbuf->size - pos ;
 	avail = ring_avail(rbuf); 
@@ -376,7 +378,8 @@ void ring_show(ringbuffer *rbuf, unsigned int count, uint32_t off)
 
 	unsigned int avail, pos, rest;
 
-	if (count <=0 || off+count > rbuf->size || off+count >ring_avail(rbuf)) return;
+	if (off+count > rbuf->size || off+count >ring_avail(rbuf))
+		return;
 	pos  = (rbuf->read_pos+off)%rbuf->size;
 	rest = rbuf->size - pos ;
 	avail = ring_avail(rbuf); 
