@@ -7412,7 +7412,8 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
         ReturnOSDLock(ctx, osd);
 
         QMutexLocker locker(&timerIdLock);
-        signalMonitorTimerId[StartTimer(1, __LINE__)] = (PlayerContext*)(ctx);
+        signalMonitorTimerId[StartTimer(1, __LINE__)] =
+            const_cast<PlayerContext*>(ctx);
         return;
     }
     ReturnOSDLock(ctx, osd);
