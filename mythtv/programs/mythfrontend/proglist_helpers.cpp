@@ -441,7 +441,7 @@ void PowerSearchPopup::deleteClicked(void)
         m_parent->m_curView = -1;
 
     if (m_parent->m_viewList.count() < 1)
-        SetFocusWidget(m_phraseList);
+        SetFocusWidget(m_phraseEdit);
     else
         SetFocusWidget(m_phraseList);
 }
