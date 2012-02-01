@@ -932,12 +932,8 @@ void MythNews::deleteNewsSite(void)
 // does not need locking
 void MythNews::playVideo(const NewsArticle &article)
 {
-    sendPlaybackStart();
-
     GetMythMainWindow()->HandleMedia("Internal", article.enclosure(),
                                      article.description(), article.title());
-
-    sendPlaybackEnd();
 }
 
 // does not need locking
