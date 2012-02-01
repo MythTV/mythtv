@@ -82,6 +82,7 @@ using namespace std;
 #endif
 
 #define GESTURE_TIMEOUT 1000
+#define STANDBY_TIMEOUT 30 // Minutes
 
 #define LOC      QString("MythMainWindow: ")
 
@@ -502,7 +503,11 @@ MythMainWindow::MythMainWindow(const bool useDB)
     // We need to listen for playback start/end events
     gCoreContext->addListener(this);
 
-    int idletime = gCoreContext->GetNumSetting("FrontendIdleTimeout", 30);
+    int idletime = gCoreContext->GetNumSetting("FrontendIdleTimeout",
+                                               STANDBY_TIMEOUT);
+    if (idletime <= 0)
+        idletime = STANDBY_TIMEOUT;
+
     d->idleTimer = new QTimer(this);
     d->idleTimer->setSingleShot(true);
     d->idleTimer->setInterval(1000 * 60 * idletime); // 30 minutes
@@ -2592,7 +2597,8 @@ void MythMainWindow::IdleTimeout(void)
 
 void MythMainWindow::EnterStandby()
 {
-    int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout");
+    int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
+                                                  STANDBY_TIMEOUT);
     LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode after "
                                         "%1 minutes of inactivity")
                                         .arg(idletimeout));
