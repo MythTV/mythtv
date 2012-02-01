@@ -159,9 +159,6 @@ bool AudioOutputDigitalEncoder::Init(
 
 size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 {
-    size_t outsize = 0;
-    int data_size;
-
     // Check if there is enough space in incoming buffer
     int required_len = inlen + len / AudioOutputSettings::SampleSize(format) *
         AudioOutputSettings::SampleSize(FORMAT_S16);
@@ -196,10 +193,12 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 
     while (i < frames)
     {
-        outsize = avcodec_encode_audio(av_context,
-                                       (uint8_t *)m_encodebuffer,
-                                       sizeof(m_encodebuffer),
-                                       (short *)(in + i * samples_per_frame));
+        int outsize = avcodec_encode_audio(
+            av_context,
+            (uint8_t *)m_encodebuffer,
+            sizeof(m_encodebuffer),
+            (short *)(in + i * samples_per_frame));
+
         if (outsize < 0)
         {
             LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error");
@@ -228,6 +227,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
             }
             out_size = required_len;
         }
+        int data_size = 0;
         m_spdifenc->GetData((uint8_t *)out + outlen, data_size);
         outlen += data_size;
         inlen  -= samples_per_frame * sizeof(inbuf_t);
