@@ -739,8 +739,9 @@ bool VideoOutputD3D::CreateDecoder(void)
     m_decoder = new DXVA2Decoder(NUM_DXVA2_BUFS, video_codec_id,
                                  video_dim.width(), video_dim.height());
     return (m_decoder && m_decoder->Init(m_render));
-#endif
+#else
     return false;
+#endif
 }
 
 void VideoOutputD3D::DeleteDecoder(void)

@@ -1262,7 +1262,7 @@ bool IsPulseAudioRunning(void)
 {
 #ifdef USING_MINGW
     return false;
-#endif
+#else
 
 #if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -ax | grep -i pulseaudio | grep -v grep > /dev/null";
@@ -1273,6 +1273,7 @@ bool IsPulseAudioRunning(void)
     uint res = myth_system(command, kMSDontBlockInputDevs |
                                     kMSDontDisableDrawing);
     return (res == GENERIC_EXIT_OK);
+#endif // USING_MINGW
 }
 
 bool myth_nice(int val)
