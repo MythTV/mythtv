@@ -165,7 +165,7 @@ void PhrasePopup::deleteClicked(void)
     if (m_parent->m_viewList.count() < 1)
         SetFocusWidget(m_phraseEdit);
     else
-        SetFocusWidget(m_phraseEdit);
+        SetFocusWidget(m_phraseList);
 }
 
 void PhrasePopup::recordClicked(void)
