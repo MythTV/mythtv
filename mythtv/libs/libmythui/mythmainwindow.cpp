@@ -1889,20 +1889,12 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
 
 void MythMainWindow::HandleTVPower(bool poweron)
 {
-    if (poweron)
-    {
 #ifdef USING_LIBCEC
-        if (d->cecAdapter)
-            d->cecAdapter->Action(ACTION_TVPOWERON);
+    if (d->cecAdapter)
+        d->cecAdapter->Action((poweron) ? ACTION_TVPOWERON : ACTION_TVPOWEROFF);
+#else
+    (void) poweron;
 #endif
-    }
-    else
-    {
-#ifdef USING_LIBCEC
-        if (d->cecAdapter)
-            d->cecAdapter->Action(ACTION_TVPOWEROFF);
-#endif
-    }
 }
 
 void MythMainWindow::AllowInput(bool allow)
