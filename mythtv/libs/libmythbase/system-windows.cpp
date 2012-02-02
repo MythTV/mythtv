@@ -377,8 +377,8 @@ void MythSystemManager::ChildListRebuild()
         if (!new_children && m_childCount)
         {
             LOG(VB_SYSTEM, LOG_CRIT, "No memory to allocate new children");
-            m_children = NULL;
             free(m_children);
+            m_children = NULL;
             return;
         }
 
