@@ -87,7 +87,16 @@ QSize XMLParseBase::parseSize(const QString &text, bool normalize)
 {
     int x, y;
     QSize retval;
-    if (sscanf(text.toAscii().constData(), "%d,%d", &x, &y) == 2)
+
+    QStringList tmp = text.split(",");
+    bool x_ok = false, y_ok = false;
+    if (tmp.size() >= 2)
+    {
+        x = tmp[0].toInt(&x_ok);
+        y = tmp[1].toInt(&y_ok);
+    }
+
+    if (x_ok && y_ok)
     {
         if (x == -1 || y == -1)
         {
