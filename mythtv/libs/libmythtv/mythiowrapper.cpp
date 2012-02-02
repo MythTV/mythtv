@@ -525,11 +525,13 @@ char *mythdir_readdir(int dirID)
     }
     else if (m_localdirs.contains(dirID))
     {
-        struct dirent entry;
-        memset(&entry, 0, sizeof(entry));
+        int sz = offsetof(struct dirent, d_name) + NAME_MAX + 1;
+        struct dirent *entry =
+            reinterpret_cast<struct dirent*>(calloc(1, sz));
         struct dirent *r = NULL;
-        if ((0 == readdir_r(m_localdirs[dirID], &entry, &r)) && (NULL != r))
+        if ((0 == readdir_r(m_localdirs[dirID], entry, &r)) && (NULL != r))
             result = strdup(r->d_name);
+        free(entry);
     }
     m_dirWrapperLock.unlock();
 
