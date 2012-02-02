@@ -349,7 +349,7 @@ static inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #define ftello(stream) ftello64(stream)
 #endif
 
-#if defined(USING_MINGW) && !defined(NAME_MAX)
+#if defined(USING_MINGW) && !defined(FILENAME_MAX)
 #include <errno.h>
 #include <dirent.h>
 #include <string.h>
@@ -363,7 +363,7 @@ static inline int readdir_r(
     {
         int offset = offsetof(struct dirent, d_name);
         memcpy(entry, tmp, offset);
-        strncpy(entry->d_name, tmp->d_name, NAME_MAX);
+        strncpy(entry->d_name, tmp->d_name, FILENAME_MAX);
         tmp->d_name[strlen(entry->d_name)] = '\0';
         if (result)
             *result = entry;
