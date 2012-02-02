@@ -156,7 +156,8 @@ QString Jitterometer::GetCPUStat(void)
         memset(stats, 0, size);
         int num = 0;
         if (sscanf(line.constData(),
-                   "cpu%d %llu %llu %llu %llu %llu %llu %llu %llu %llu %*s\n",
+                   "cpu%30d %30llu %30llu %30llu %30llu %30llu "
+                   "%30llu %30llu %30llu %30llu %*5000s\n",
                    &num, &stats[0], &stats[1], &stats[2], &stats[3],
                    &stats[4], &stats[5], &stats[6], &stats[7], &stats[8]) >= 4)
         {

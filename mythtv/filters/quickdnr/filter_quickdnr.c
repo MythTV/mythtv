@@ -487,7 +487,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
 
     if (options)
     {
-        int ret = sscanf(options, "%u:%u:%u:%u",
+        int ret = sscanf(options, "%20u:%20u:%20u:%20u",
                          &Param1, &Param2, &Param3, &Param4);
         switch (ret)
         {
