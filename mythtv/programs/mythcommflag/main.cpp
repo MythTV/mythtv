@@ -1046,19 +1046,18 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
     ctx->SetPlayer(cfp);
     cfp->SetPlayerInfo(NULL, NULL, true, ctx);
 
-    time_t time_now;
     if (progress)
     {
-        time_now = time(NULL);
-        cerr << "Rebuild started at " << ctime(&time_now) << endl;
+        QString time = QDateTime::currentDateTime().toString(Qt::TextDate);
+        cerr << "Rebuild started at " << qPrintable(time) << endl;
     }
 
     cfp->RebuildSeekTable(progress);
 
     if (progress)
     {
-        time_now = time(NULL);
-        cerr << "Rebuild completed at " << ctime(&time_now) << endl;
+        QString time = QDateTime::currentDateTime().toString(Qt::TextDate);
+        cerr << "Rebuild completed at " << qPrintable(time) << endl;
     }
 
     delete ctx;
