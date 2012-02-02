@@ -525,7 +525,7 @@ char *mythdir_readdir(int dirID)
     }
     else if (m_localdirs.contains(dirID))
     {
-        int sz = offsetof(struct dirent, d_name) + NAME_MAX + 1;
+        int sz = offsetof(struct dirent, d_name) + FILENAME_MAX + 1;
         struct dirent *entry =
             reinterpret_cast<struct dirent*>(calloc(1, sz));
         struct dirent *r = NULL;
