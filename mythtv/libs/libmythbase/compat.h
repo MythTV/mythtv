@@ -349,7 +349,8 @@ static inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #define ftello(stream) ftello64(stream)
 #endif
 
-#if defined(USING_MINGW) && !defined(FILENAME_MAX)
+#include <stdio.h> /* for FILENAME_MAX */
+#if defined(USING_MINGW) && defined(FILENAME_MAX)
 #include <errno.h>
 #include <dirent.h>
 #include <string.h>
