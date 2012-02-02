@@ -367,9 +367,7 @@ bool AppleRemote::_createDeviceInterface(io_object_t hidDevice)
         if (plugInResult != S_OK)
             LOG(VB_GENERAL, LOG_ERR, LOC + "_createDeviceInterface() failed");
 
-        // Release
-        if (plugInInterface)
-            (*plugInInterface)->Release(plugInInterface);
+        (*plugInInterface)->Release(plugInInterface);
     }
     return hidDeviceInterface != 0;
 }
