@@ -357,7 +357,8 @@ bool AppleRemote::_createDeviceInterface(io_object_t hidDevice)
                                             kIOCFPlugInInterfaceID,
                                             &plugInInterface, &score);
 
-    if (ioReturnValue == kIOReturnSuccess)
+    if ((kIOReturnSuccess == ioReturnValue) &&
+        plugInInterface && *plugInInterface)
     {
         HRESULT plugInResult = (*plugInInterface)->QueryInterface
                                 (plugInInterface,
