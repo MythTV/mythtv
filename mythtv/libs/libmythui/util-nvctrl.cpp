@@ -332,6 +332,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
 #endif
 }
 
+#ifdef USING_XRANDR
 /*
  * display_device_mask() - given a display device name, translate to
  * the display device mask
@@ -518,3 +519,5 @@ static int modeline_is_interlaced(char *modeLine)
 {
     return (strstr(modeLine, "Interlace") != NULL);
 }
+
+#endif
