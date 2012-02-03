@@ -1392,12 +1392,11 @@ static class PianoFactory : public VisFactory
     }
 }PianoFactory;
 
-AlbumArt::AlbumArt(void)
+AlbumArt::AlbumArt(void) :
+    m_currentMetadata(NULL),
+    m_lastCycle(QDateTime::currentDateTime())
 {
     findFrontCover();
-
-    m_lastCycle = QDateTime::currentDateTime();
-
     m_fps = 1;
 }
 
