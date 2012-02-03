@@ -4,7 +4,7 @@
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="243"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="229"/>
         <source>Press SELECT to play again</source>
         <translation>Pulse SELECT para reproducir de nuevo</translation>
     </message>
@@ -405,74 +405,64 @@
         <translation>Este directorio debe existir y MythGallery necesita permiso de lectura.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="109"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="99"/>
         <source>Paths to import images from</source>
         <translation>Ruta desde donde importar imágenes</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="173"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="163"/>
         <source>Type of transition</source>
         <translation>Tipo de transición</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="196"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="186"/>
         <source>Type of background</source>
         <translation>Tipo de fondo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="211"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="201"/>
         <source>This is the number of seconds to display each picture.</source>
         <translation>Número de segundos a visualizar cada imagen.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="111"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="101"/>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
         <translation>Lista de rutas separadas por &apos;:&apos;. Si la ruta es un directorio, su contenido se copiará. Si es un programa, se ejecutará.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="188"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="178"/>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
         <translation>Tipo de transición a emplear entre imágenes en el modo de presentación.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="201"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="191"/>
         <source>This is the type of background for each picture in single view mode.</source>
         <translation>Tipo de fondo a usar para cada imagen en el modo de vista individual.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="209"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="199"/>
         <source>Slideshow Delay</source>
         <translation>Retardo en Presentación</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="131"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="121"/>
         <source>Use OpenGL transitions</source>
         <translation>Usar transiciones OpenGL</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="133"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="123"/>
         <source>Check this to enable OpenGL based slideshow transitions</source>
         <translation>Marcar para activar transiciones basadas en OpenGL</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="141"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="131"/>
         <source>Type of OpenGL transition</source>
         <translation>Tipo de transición OpenGL</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="154"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="144"/>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
         <translation>Tipo de transición OpenGL a usar entre imágenes en el modo de presentación.</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="89"/>
-        <source>Command run to display movie files</source>
-        <translation>Orden a ejecutar para mostrar películas</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="91"/>
-        <source>This command is executed whenever a movie file is selected</source>
-        <translation>Esta orden se ejecuta al seleccionar una película</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="55"/>
@@ -485,22 +475,22 @@
         <translation>Si se activa, las miniaturas se guardan en directorios &apos;.thumbcache&apos; del directorio anterior. Si no, se guardan en su directorio de inicio.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="219"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="209"/>
         <source>Recurse into directories</source>
         <translation>Entrar en subdirectorios</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="220"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="210"/>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
         <translation>Marcar para permitir a la presentación entrar en subdirectorios.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="99"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="89"/>
         <source>Overlay caption</source>
         <translation>Leyenda sobreescrita</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="101"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="91"/>
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
         <translation>Número de segundos a mostrar una leyenda sobre una foto a tamaño completo.</translation>
     </message>
@@ -535,27 +525,27 @@
         <translation>Orden de las miniaturas mostradas.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="120"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="110"/>
         <source>Automatically load MythGallery to display pictures</source>
         <translation>Cargar MythGallery automáticamente para mostrar imágenes</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="122"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="112"/>
         <source>When a new CD-Rom or removable storage device containing pictures is detected then load MythGallery to display the content.</source>
         <translation>Al detectar un nuevo CD-ROM o dispositivo de almacenamiento extraible, cargar MythGallery para mostrar el contenido.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="163"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="153"/>
         <source>Duration of OpenGL Transition (milliseconds)</source>
         <translation>Duración de la Transición OpenGL (milisegundos)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="231"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="221"/>
         <source>MythGallery Settings (Slideshow)</source>
         <translation>Configuración de MythGallery (Presentación)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="261"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="251"/>
         <source>MythGallery Settings (General)</source>
         <translation>Configuración de MythGallery (General)</translation>
     </message>
@@ -688,7 +678,7 @@ Compruebe que el directorio exista, sea legible y la configuración de MythGalle
 <context>
     <name>SingleView</name>
     <message>
-        <location filename="../mythgallery/singleview.cpp" line="218"/>
+        <location filename="../mythgallery/singleview.cpp" line="204"/>
         <source>Press SELECT to play again</source>
         <translation>Pulse SELECT para reproducir de nuevo</translation>
     </message>
