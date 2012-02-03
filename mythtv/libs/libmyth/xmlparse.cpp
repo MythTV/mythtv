@@ -396,7 +396,6 @@ void XMLParse::normalizeRect(QRect &rect)
 
 QPoint XMLParse::parsePoint(QString text)
 {
-    int x, y;
     QPoint retval(0,0);
     QStringList tmp = text.split(',', QString::SkipEmptyParts);
     bool x_ok = false, y_ok = false;
@@ -411,7 +410,6 @@ QPoint XMLParse::parsePoint(QString text)
 
 QRect XMLParse::parseRect(QString text)
 {
-    int x, y, w, h;
     bool x_ok = false, y_ok = false;
     bool w_ok = false, h_ok = false;
     QRect retval(0, 0, 0, 0);
