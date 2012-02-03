@@ -78,7 +78,7 @@ class CdDecoder : public Decoder
     bool m_finish;
     long m_freq, m_bitrate;
     int m_chan;
-    double m_totalTime, m_seekTime;
+    double m_seekTime;
 
     int m_settracknum;
     int m_tracknum;
