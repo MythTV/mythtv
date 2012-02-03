@@ -4264,29 +4264,6 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 void MythPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
                                    bool absolute)
 {
-    if (!hasFullPositionMap)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "GetScreenGrabAtFrame: Recording does not "
-            "have position map so we will be unable to grab the desired "
-            "frame.");
-        player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-        if (player_ctx->playingInfo)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Run 'mythcommflag --file %1 --rebuild' to fix.")
-                    .arg(player_ctx->playingInfo->GetBasename()));
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("If that does not work and this is a .mpg file, "
-                        "try 'mythtranscode --mpeg2 --buildindex "
-                        "--allkeys -c %1 -s %2'.")
-                .arg(player_ctx->playingInfo->GetChanID())
-                .arg(player_ctx->playingInfo->
-                     GetRecordingStartTime(MythDate::kFilename)));
-        }
-        player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-    }
-
     number = frameNum;
     if (number >= totalFrames)
     {
