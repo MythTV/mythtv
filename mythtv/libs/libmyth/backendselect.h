@@ -19,9 +19,11 @@ struct DatabaseParams;
 //       location at this moment in time
 // Some common UPnP search and XML value strings
 const QString gBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
-const QString kDefaultBE  = "UPnP/MythFrontend/DefaultBackend/";
-const QString kDefaultPIN = kDefaultBE + "SecurityPin";
-const QString kDefaultUSN = kDefaultBE + "USN";
+const QString kDefaultDB  = "Database/";
+const QString kDefaultWOL = "WakeOnLAN/";
+const QString kDefaultMFE = "UPnP/MythFrontend/DefaultBackend/";
+const QString kDefaultPIN = kDefaultMFE + "SecurityPin";
+const QString kDefaultUSN = kDefaultMFE + "USN";
 
 typedef QMap <QString, DeviceLocation*> ItemMap;
 

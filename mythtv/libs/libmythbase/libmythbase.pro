@@ -28,7 +28,7 @@ HEADERS += plist.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp
-SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp
+SOURCES += mythdbcon.cpp mythdb.cpp mythdbparams.cpp oldsettings.cpp
 SOURCES += mythobservable.cpp mythevent.cpp httpcomms.cpp mcodecs.cpp
 SOURCES += mythdirs.cpp mythsignalingtimer.cpp
 SOURCES += lcddevice.cpp mythstorage.cpp remotefile.cpp

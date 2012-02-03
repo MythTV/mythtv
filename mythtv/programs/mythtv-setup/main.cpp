@@ -348,7 +348,7 @@ int main(int argc, char *argv[])
 
     if (use_display)
     {
-        gCoreContext->SetSetting("Theme", DEFAULT_UI_THEME);
+        gCoreContext->OverrideSettingForSession("Theme", DEFAULT_UI_THEME);
         GetMythUI()->LoadQtConfig();
 
         QString fileprefix = GetConfDir();

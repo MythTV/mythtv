@@ -14,7 +14,6 @@ using namespace std;
 #include "config.h"
 #include "mythcontext.h"
 #include "exitcodes.h"
-#include "oldsettings.h"
 #include "mythmiscutil.h"
 #include "remotefile.h"
 #include "mythplugin.h"
@@ -66,6 +65,7 @@ class MythContextPrivate : public QObject
     void EndTempWindow(void);
 
     bool LoadDatabaseSettings(void);
+    bool SaveDatabaseParams(const DatabaseParams &params, bool force);
 
     bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(void);
@@ -75,7 +75,6 @@ class MythContextPrivate : public QObject
 
     int     ChooseBackend(const QString &error);
     int     UPnPautoconf(const int milliSeconds = 2000);
-    void    StoreConnectionInfo(void);
     bool    DefaultUPnP(QString &error);
     bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
 
@@ -217,6 +216,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
 MythContextPrivate::~MythContextPrivate()
 {
+    if (m_pConfig)
+        delete m_pConfig;
     if (m_ui)
         DestroyMythUI();
     if (m_sh)
@@ -240,10 +241,10 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 
     SilenceDBerrors();
 
-    gCoreContext->SetSetting("Theme", DEFAULT_UI_THEME);
+    gCoreContext->OverrideSettingForSession("Theme", DEFAULT_UI_THEME);
 #ifdef Q_WS_MACX
     // Qt 4.4 has window-focus problems
-    gCoreContext->SetSetting("RunFrontendInWindow", "1");
+    gCoreContext->OverrideSettingForSession("RunFrontendInWindow", "1");
 #endif
     GetMythUI()->LoadQtConfig();
 
@@ -261,6 +262,7 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 void MythContextPrivate::EndTempWindow(void)
 {
     DestroyMythMainWindow();
+    gCoreContext->ClearOverrideSettingForSession("Theme");
     EnableDBerrors();
 }
 
@@ -273,8 +275,7 @@ bool MythContextPrivate::Init(const bool gui,
     m_gui = gui;
 
     // We don't have a database yet, so lets use the config.xml file.
-
-    m_pConfig = UPnp::GetConfiguration();
+    m_pConfig = new XmlConfiguration("config.xml");
 
     // Creates screen saver control if we will have a GUI
     if (gui)
@@ -333,11 +334,13 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
 
     QString failure;
 
-    // 1. Load either mysql.txt, or use sensible "localhost" defaults:
+    // 1. Either load config.xml or use sensible "localhost" defaults:
     bool loaded = LoadDatabaseSettings();
+    DatabaseParams dbParamsFromFile = m_DBparams;
 
     // In addition to the UI chooser, we can also try to autoSelect later,
-    // but only if we're not doing manualSelect and there was no mysql.txt
+    // but only if we're not doing manualSelect and there was no
+    // valid config.xml
     bool autoSelect = !manualSelect && !loaded;
 
     // 2. If the user isn't forcing up the chooser UI, look for a default
@@ -424,41 +427,63 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
     }
 
 DBfound:
-#if 0
     LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - Success!");
-#endif
-    StoreConnectionInfo();
+    SaveDatabaseParams(m_DBparams,
+                       !loaded || m_DBparams.forceSave ||
+                       dbParamsFromFile != m_DBparams);
     EnableDBerrors();
     ResetDatabase();
     return true;
 
 NoDBfound:
-#if 0
     LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - failed");
-#endif
     return false;
 }
 
-/** Load database and host settings from mysql.txt or config.xml,
- *  or set some defaults.
- *  \return true if mysql.txt or config.xml was parsed
+/** Load database and host settings from config.xml, or set some defaults.
+ *  \return true if config.xml was parsed
  */
 bool MythContextPrivate::LoadDatabaseSettings(void)
 {
-    bool ok = MythDB::LoadDatabaseParamsFromDisk(m_DBparams);
-    if (!ok)
+    // try new format first
+    m_DBparams.LoadDefaults();
+
+    m_DBparams.localHostName = m_pConfig->GetValue("LocalHostName", "");
+
+    m_DBparams.dbHostName = m_pConfig->GetValue(kDefaultDB + "Host", "");
+    m_DBparams.dbUserName = m_pConfig->GetValue(kDefaultDB + "UserName", "");
+    m_DBparams.dbPassword = m_pConfig->GetValue(kDefaultDB + "Password", "");
+    m_DBparams.dbName = m_pConfig->GetValue(kDefaultDB + "DatabaseName", "");
+    m_DBparams.dbPort = m_pConfig->GetValue(kDefaultDB + "Port", 0);
+
+    m_DBparams.wolEnabled =
+        m_pConfig->GetValue(kDefaultWOL + "Enabled", false);
+    m_DBparams.wolReconnect =
+        m_pConfig->GetValue(kDefaultWOL + "SQLReconnectWaitTime", 0);
+    m_DBparams.wolRetry =
+        m_pConfig->GetValue(kDefaultWOL + "SQLConnectRetry", 0);
+    m_DBparams.wolCommand =
+        m_pConfig->GetValue(kDefaultWOL + "Command", "");
+
+    bool ok = m_DBparams.IsValid("config.xml");
+    if (!ok) // if new format fails, try legacy format
     {
-        XmlConfiguration cfg("config.xml");
-        MythDB::LoadDefaultDatabaseParams(m_DBparams);
-        m_DBparams.dbHostName = cfg.GetValue(kDefaultBE + "DBHostName", "");
-        m_DBparams.dbUserName = cfg.GetValue(kDefaultBE + "DBUserName", "");
-        m_DBparams.dbPassword = cfg.GetValue(kDefaultBE + "DBPassword", "");
-        m_DBparams.dbName     = cfg.GetValue(kDefaultBE + "DBName", "");
-        m_DBparams.dbPort     = cfg.GetValue(kDefaultBE + "DBPort", 0);
-        ok = MythDB::ValidateDatabaseParams(m_DBparams, "config.xml");
+        m_DBparams.LoadDefaults();
+        m_DBparams.dbHostName = m_pConfig->GetValue(
+            kDefaultMFE + "DBHostName", "");
+        m_DBparams.dbUserName = m_pConfig->GetValue(
+            kDefaultMFE + "DBUserName", "");
+        m_DBparams.dbPassword = m_pConfig->GetValue(
+            kDefaultMFE + "DBPassword", "");
+        m_DBparams.dbName = m_pConfig->GetValue(
+            kDefaultMFE + "DBName", "");
+        m_DBparams.dbPort = m_pConfig->GetValue(
+            kDefaultMFE + "DBPort", 0);
+        m_DBparams.forceSave = true;
+        ok = m_DBparams.IsValid("config.xml");
     }
     if (!ok)
-        MythDB::LoadDefaultDatabaseParams(m_DBparams);
+        m_DBparams.LoadDefaults();
 
     gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
 
@@ -476,12 +501,69 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
         hostname = localhostname;
         LOG(VB_GENERAL, LOG_NOTICE, "Empty LocalHostName.");
     }
+    else
+    {
+        m_DBparams.localEnabled = true;
+    }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Using localhost value of %1")
             .arg(hostname));
     gCoreContext->SetLocalHostname(hostname);
 
     return ok;
+}
+
+bool MythContextPrivate::SaveDatabaseParams(
+    const DatabaseParams &params, bool force)
+{
+    bool ret = true;
+
+    // only rewrite file if it has changed
+    if (params != m_DBparams || force)
+    {
+        m_pConfig->SetValue(
+            "LocalHostName", params.localHostName);
+
+        m_pConfig->SetValue(
+            kDefaultDB + "PingHost", params.dbHostPing);
+        m_pConfig->SetValue(
+            kDefaultDB + "Host", params.dbHostName);
+        m_pConfig->SetValue(
+            kDefaultDB + "UserName", params.dbUserName);
+        m_pConfig->SetValue(
+            kDefaultDB + "Password", params.dbPassword);
+        m_pConfig->SetValue(
+            kDefaultDB + "DatabaseName", params.dbName);
+        m_pConfig->SetValue(
+            kDefaultDB + "Port", params.dbPort);
+
+        m_pConfig->SetValue(
+            kDefaultWOL + "Enabled", params.wolEnabled);
+        m_pConfig->SetValue(
+            kDefaultWOL + "SQLReconnectWaitTime", params.wolReconnect);
+        m_pConfig->SetValue(
+            kDefaultWOL + "SQLConnectRetry", params.wolRetry);
+        m_pConfig->SetValue(
+            kDefaultWOL + "Command", params.wolCommand);
+
+        // clear out any legacy nodes..
+        m_pConfig->ClearValue(kDefaultMFE + "DBHostName");
+        m_pConfig->ClearValue(kDefaultMFE + "DBUserName");
+        m_pConfig->ClearValue(kDefaultMFE + "DBPassword");
+        m_pConfig->ClearValue(kDefaultMFE + "DBName");
+        m_pConfig->ClearValue(kDefaultMFE + "DBPort");
+
+        // actually save the file
+        m_pConfig->Save();
+
+        // Save the new settings:
+        m_DBparams = params;
+        gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
+
+        // If database has changed, force its use:
+        ResetDatabase();
+    }
+    return ret;
 }
 
 bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
@@ -706,27 +788,6 @@ int MythContextPrivate::ChooseBackend(const QString &error)
 }
 
 /**
- * Try to store the current location of this backend in config.xml
- *
- * This is intended as a last resort for future connections
- * (e.g. Perl scripts, backend not running).
- *
- * Note that the Save() may fail (e.g. non writable ~/.mythtv)
- */
-void MythContextPrivate::StoreConnectionInfo(void)
-{
-    if (!m_pConfig)
-        return;
-
-    m_pConfig->SetValue(kDefaultBE + "DBHostName", m_DBparams.dbHostName);
-    m_pConfig->SetValue(kDefaultBE + "DBUserName", m_DBparams.dbUserName);
-    m_pConfig->SetValue(kDefaultBE + "DBPassword", m_DBparams.dbPassword);
-    m_pConfig->SetValue(kDefaultBE + "DBName",     m_DBparams.dbName);
-    m_pConfig->SetValue(kDefaultBE + "DBPort",     m_DBparams.dbPort);
-    m_pConfig->Save();
-}
-
-/**
  * If there is only a single UPnP backend, use it.
  *
  * This does <i>not</i> prompt for PIN entry. If the backend requires one,
@@ -802,13 +863,9 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
  */
 bool MythContextPrivate::DefaultUPnP(QString &error)
 {
-    Configuration *pConfig = new XmlConfiguration("config.xml");
     QString            loc = "DefaultUPnP() - ";
-    QString  localHostName = pConfig->GetValue(kDefaultBE + "LocalHostName", "");
-    QString            PIN = pConfig->GetValue(kDefaultPIN, "");
-    QString            USN = pConfig->GetValue(kDefaultUSN, "");
-
-    delete pConfig;
+    QString            PIN = m_pConfig->GetValue(kDefaultPIN, "");
+    QString            USN = m_pConfig->GetValue(kDefaultUSN, "");
 
     if (USN.isEmpty())
     {
@@ -856,13 +913,6 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
 
     if (UPnPconnect(pDevLoc, PIN))
     {
-        if (localHostName.length())
-        {
-            m_DBparams.localHostName = localHostName;
-            m_DBparams.localEnabled  = true;
-            gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
-        }
-
         pDevLoc->Release();
 
         return true;
@@ -1176,38 +1226,7 @@ DatabaseParams MythContext::GetDatabaseParams(void)
 
 bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
 {
-    bool ret = true;
-    DatabaseParams cur_params = GetDatabaseParams();
-
-    // only rewrite file if it has changed
-    if (params.dbHostName   != cur_params.dbHostName          ||
-        params.dbHostPing   != cur_params.dbHostPing          ||
-        params.dbPort       != cur_params.dbPort              ||
-        params.dbUserName   != cur_params.dbUserName          ||
-        params.dbPassword   != cur_params.dbPassword          ||
-        params.dbName       != cur_params.dbName              ||
-        params.dbType       != cur_params.dbType              ||
-        params.localEnabled != cur_params.localEnabled        ||
-        params.wolEnabled   != cur_params.wolEnabled          ||
-        (params.localEnabled &&
-         (params.localHostName != cur_params.localHostName))  ||
-        (params.wolEnabled &&
-         (params.wolReconnect  != cur_params.wolReconnect ||
-          params.wolRetry      != cur_params.wolRetry     ||
-          params.wolCommand    != cur_params.wolCommand)))
-    {
-        ret = MythDB::SaveDatabaseParamsToDisk(params, GetConfDir(), true);
-        if (ret)
-        {
-            // Save the new settings:
-            d->m_DBparams = params;
-            gCoreContext->GetDB()->SetDatabaseParams(d->m_DBparams);
-
-            // If database has changed, force its use:
-            d->ResetDatabase();
-        }
-    }
-    return ret;
+    return d->SaveDatabaseParams(params, false);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
