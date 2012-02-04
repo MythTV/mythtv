@@ -723,6 +723,8 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS",
             QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
              "F");
+    REG_KEY("TV Playback", ACTION_TOGGLENIGHTMODE,
+            QT_TRANSLATE_NOOP("MythControls", "Toggle night mode"), "Ctrl+F");
     REG_KEY("TV Playback", ACTION_SETBRIGHTNESS,
             QT_TRANSLATE_NOOP("MythControls", "Set the picture brightness"), "");
     REG_KEY("TV Playback", ACTION_SETCONTRAST,
@@ -4403,6 +4405,8 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Playback);
     else if (has_action(ACTION_TOGGLESTUDIOLEVELS, actions))
         DoToggleStudioLevels(ctx);
+    else if (has_action(ACTION_TOGGLENIGHTMODE, actions))
+        DoToggleNightMode(ctx);
     else if (has_action("TOGGLESTRETCH", actions))
         ToggleTimeStretch(ctx);
     else if (has_action(ACTION_TOGGLEUPMIX, actions))
@@ -9116,6 +9120,13 @@ void TV::DoToggleStudioLevels(const PlayerContext *ctx)
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
+void TV::DoToggleNightMode(const PlayerContext *ctx)
+{
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    ctx->player->ToggleNightMode();
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+}
+
 void TV::DoTogglePictureAttribute(const PlayerContext *ctx,
                                   PictureAdjustType type)
 {
@@ -10007,6 +10018,10 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
     {
         DoToggleStudioLevels(actx);
     }
+    else if (action == ACTION_TOGGLENIGHTMODE)
+    {
+        DoToggleNightMode(actx);
+    }
     else if (action.left(12) == "TOGGLEASPECT")
     {
         ToggleAspectOverride(actx,
@@ -10483,6 +10498,10 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
                 }
             }
         }
+        osd->DialogAddButton(
+            gCoreContext->GetNumSetting("NightModeEnabled", 0) ?
+            tr("Disable Night Mode") : tr("Enable Night Mode"),
+            ACTION_TOGGLENIGHTMODE);
     }
     else if (category == "3D")
     {

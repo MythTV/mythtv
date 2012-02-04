@@ -324,6 +324,7 @@ class MTV_PUBLIC MythPlayer
 
     // Public picture controls
     void ToggleStudioLevels(void);
+    void ToggleNightMode(void);
 
     // Visualisations
     bool CanVisualise(void);
@@ -334,6 +335,9 @@ class MTV_PUBLIC MythPlayer
 
     void SaveTotalDuration(void);
     void ResetTotalDuration(void);
+
+    static const int kNightModeBrightenssAdjustment;
+    static const int kNightModeContrastAdjustment;
 
   protected:
     // Initialization

@@ -491,6 +491,7 @@ class MTV_PUBLIC TV : public QObject
     void ToggleAdjustFill(PlayerContext*,
                           AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
     void DoToggleStudioLevels(const PlayerContext *ctx);
+    void DoToggleNightMode(const PlayerContext*);
     void DoTogglePictureAttribute(const PlayerContext*,
                                   PictureAdjustType type);
     void DoChangePictureAttribute(

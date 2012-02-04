@@ -85,6 +85,9 @@ static unsigned dbg_ident(const MythPlayer*);
 #define LOC      QString("Player(%1): ").arg(dbg_ident(this),0,36)
 #define LOC_DEC  QString("Player(%1): ").arg(dbg_ident(m_mp),0,36)
 
+const int MythPlayer::kNightModeBrightenssAdjustment = 10;
+const int MythPlayer::kNightModeContrastAdjustment = 10;
+
 void DecoderThread::run(void)
 {
     RunProlog();
@@ -4876,6 +4879,47 @@ void MythPlayer::ToggleStudioLevels(void)
     videoOutput->SetPictureAttribute(kPictureAttribute_StudioLevels, val);
     QString msg = (val > 0) ? QObject::tr("Enabled Studio Levels") :
                               QObject::tr("Disabled Studio Levels");
+    SetOSDMessage(msg, kOSDTimeout_Med);
+}
+
+void MythPlayer::ToggleNightMode(void)
+{
+    if (!videoOutput)
+        return;
+
+    if (!(videoOutput->GetSupportedPictureAttributes() &
+          kPictureAttributeSupported_Brightness))
+        return;
+
+    int b = videoOutput->GetPictureAttribute(kPictureAttribute_Brightness);
+    int c = 0;
+    bool has_contrast = (videoOutput->GetSupportedPictureAttributes() &
+                         kPictureAttributeSupported_Contrast);
+    if (has_contrast)
+        c = videoOutput->GetPictureAttribute(kPictureAttribute_Contrast);
+
+    int nm = gCoreContext->GetNumSetting("NightModeEnabled", 0);
+    QString msg;
+    if (!nm)
+    {
+        msg = QObject::tr("Enabled Night Mode");
+        b -= kNightModeBrightenssAdjustment;
+        c -= kNightModeContrastAdjustment;
+    }
+    else
+    {
+        msg = QObject::tr("Disabled Night Mode");
+        b += kNightModeBrightenssAdjustment;
+        c += kNightModeContrastAdjustment;
+    }
+    b = clamp(b, 0, 100);
+    c = clamp(c, 0, 100);
+
+    gCoreContext->SaveSetting("NightModeEnabled", nm ? "0" : "1");
+    videoOutput->SetPictureAttribute(kPictureAttribute_Brightness, b);
+    if (has_contrast)
+        videoOutput->SetPictureAttribute(kPictureAttribute_Contrast, c);
+
     SetOSDMessage(msg, kOSDTimeout_Med);
 }
 
