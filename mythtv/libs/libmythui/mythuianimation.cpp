@@ -129,6 +129,8 @@ void MythUIAnimation::SetEasingCurve(const QString& curve)
     else if (curve == "OutElastic")   setEasingCurve(QEasingCurve::OutElastic);
     else if (curve == "InOutElastic") setEasingCurve(QEasingCurve::InOutElastic);
     else if (curve == "OutInElastic") setEasingCurve(QEasingCurve::OutInElastic);
+    else if (curve == "InBack")       setEasingCurve(QEasingCurve::InBack);
+    else if (curve == "OutBack")      setEasingCurve(QEasingCurve::OutBack);
     else if (curve == "InOutBack")    setEasingCurve(QEasingCurve::InOutBack);
     else if (curve == "OutInBack")    setEasingCurve(QEasingCurve::OutInBack);
     else if (curve == "InBounce")     setEasingCurve(QEasingCurve::InBounce);
