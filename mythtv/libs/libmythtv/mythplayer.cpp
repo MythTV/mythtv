@@ -3743,7 +3743,7 @@ void MythPlayer::DisableEdit(bool save)
     if (!save)
         deleteMap.LoadMap(totalFrames);
     // Unconditionally save to remove temporary marks from the DB.
-    deleteMap.SaveMap(totalFrames, player_ctx);
+    deleteMap.SaveMap(totalFrames);
     deleteMap.TrackerReset(framesPlayed, totalFrames);
     deleteMap.SetFileEditing(false);
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -3854,7 +3854,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         }
         else if (action == ACTION_SAVEMAP)
         {
-            deleteMap.SaveMap(totalFrames, player_ctx);
+            deleteMap.SaveMap(totalFrames);
             refresh = true;
         }
         else if (action == "EDIT" || action == "SAVEEXIT")
