@@ -97,6 +97,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
 
     if (doRun)
     {
+        ProgramInfo::CheckProgramIDAuthorities();
         {
             QMutexLocker locker(&schedLock);
             start(QThread::LowPriority);
@@ -424,7 +425,17 @@ void Scheduler::FillRecordListFromDB(int recordid)
         return;
     }
 
-    thequery = "ALTER TABLE recordmatch ADD INDEX (recordid);";
+    thequery = "ALTER TABLE recordmatch "
+               "  ADD UNIQUE INDEX (recordid, chanid, starttime); ";
+    query.prepare(thequery);
+    if (!query.exec())
+    {
+        MythDB::DBError("FillRecordListFromDB", query);
+        return;
+    }
+
+    thequery = "ALTER TABLE recordmatch "
+               "  ADD INDEX (chanid, starttime, manualid); ";
     query.prepare(thequery);
     if (!query.exec())
     {
@@ -3207,20 +3218,22 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         QString recidmatch = "";
         if (recordid != -1)
             recidmatch = "RECTABLE.recordid = :NRRECORDID AND ";
-        QString s = recidmatch +
+        QString s1 = recidmatch +
             "RECTABLE.search = :NRST AND "
             "program.manualid = 0 AND "
             "program.title = RECTABLE.title ";
-
-        while (1)
-        {
-            int i = s.indexOf("RECTABLE");
-            if (i == -1) break;
-            s = s.replace(i, strlen("RECTABLE"), recordTable);
-        }
+        s1.replace("RECTABLE", recordTable);
+        QString s2 = recidmatch +
+            "RECTABLE.search = :NRST AND "
+            "program.manualid = 0 AND "
+            "program.seriesid <> '' AND "
+            "program.seriesid = RECTABLE.seriesid ";
+        s2.replace("RECTABLE", recordTable);
 
         from << "";
-        where << s;
+        where << s1;
+        from << "";
+        where << s2;
         bindings[":NRST"] = kNoSearch;
         if (recordid != -1)
             bindings[":NRRECORDID"] = recordid;
@@ -3318,7 +3331,7 @@ void Scheduler::UpdateMatches(int recordid) {
     for (clause = 0; clause < fromclauses.count(); ++clause)
     {
         QString query = QString(
-"INSERT INTO recordmatch (recordid, chanid, starttime, manualid) "
+"REPLACE INTO recordmatch (recordid, chanid, starttime, manualid) "
 "SELECT RECTABLE.recordid, program.chanid, program.starttime, "
 " IF(search = %1, RECTABLE.recordid, 0) ").arg(kManualSearch) + QString(
 "FROM (RECTABLE, program INNER JOIN channel "
@@ -3636,8 +3649,13 @@ void Scheduler::AddNewRecords(void)
 "      (program.programid <> '' "
 "       AND program.programid = oldrecorded.programid) "
 "      OR "
-"      ( "
-"       (program.programid = '' OR oldrecorded.programid = '') "
+"      ( ") +
+        (ProgramInfo::UsingProgramIDAuthority() ?
+"       (program.programid = '' OR oldrecorded.programid = '' OR "
+"         LEFT(program.programid, LOCATE('/', program.programid)) <> "
+"         LEFT(oldrecorded.programid, LOCATE('/', oldrecorded.programid))) " :
+"       (program.programid = '' OR oldrecorded.programid = '') " )
+        + QString(
 "       AND "
 "       (((RECTABLE.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
 "          AND program.subtitle = oldrecorded.subtitle)) "
@@ -3669,8 +3687,13 @@ void Scheduler::AddNewRecords(void)
 "      (program.programid <> '' "
 "       AND program.programid = recorded.programid) "
 "      OR "
-"      ( "
-"       (program.programid = '' OR recorded.programid = '') "
+"      ( ") +
+        (ProgramInfo::UsingProgramIDAuthority() ?
+"       (program.programid = '' OR recorded.programid = '' OR "
+"         LEFT(program.programid, LOCATE('/', program.programid)) <> "
+"         LEFT(recorded.programid, LOCATE('/', recorded.programid))) " :
+"       (program.programid = '' OR recorded.programid = '') ")
+        + QString(
 "       AND "
 "       (((RECTABLE.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
 "          AND program.subtitle = recorded.subtitle)) "

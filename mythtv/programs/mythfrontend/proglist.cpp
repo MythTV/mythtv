@@ -25,12 +25,12 @@ using namespace std;
 #define LOC_ERR  QString("ProgLister, Error: ")
 
 ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
-                       const QString &view, const QString &from) :
+                       const QString &view, const QString &extraArg) :
     ScheduleCommon(parent, "ProgLister"),
     m_type(pltype),
     m_recid(0),
     m_title(),
-    m_addTables(from),
+    m_extraArg(extraArg),
     m_startTime(QDateTime::currentDateTime()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
@@ -79,7 +79,7 @@ ProgLister::ProgLister(
     m_type(plPreviouslyRecorded),
     m_recid(recid),
     m_title(title),
-    m_addTables(),
+    m_extraArg(),
     m_startTime(QDateTime::currentDateTime()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
@@ -1119,8 +1119,11 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     {
         where = "WHERE channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
-            "  AND program.title = :PGILPHRASE0 ";
+            "  AND (program.title = :PGILPHRASE0 OR "
+            "       (program.seriesid <> '' AND "
+            "        program.seriesid = :PGILPHRASE1)) ";
         bindings[":PGILPHRASE0"] = qphrase;
+        bindings[":PGILPHRASE1"] = m_extraArg;
     }
     else if (m_type == plNewListings) // what's new list
     {
@@ -1214,8 +1217,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > :PGILSTART "
                         "  AND ( %1 ) ").arg(qphrase);
-        if (!m_addTables.isEmpty())
-            where = m_addTables + ' ' + where;
+        if (!m_extraArg.isEmpty())
+            where = m_extraArg + ' ' + where;
     }
     else if (m_type == plChannel) // list by channel
     {

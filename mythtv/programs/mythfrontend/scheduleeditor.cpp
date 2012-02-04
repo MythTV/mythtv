@@ -46,10 +46,11 @@
 static QString fs0(QT_TRANSLATE_NOOP("SchedFilterEditor", "New episode"));
 static QString fs1(QT_TRANSLATE_NOOP("SchedFilterEditor", "Identifiable episode"));
 static QString fs2(QT_TRANSLATE_NOOP("SchedFilterEditor", "First showing"));
-static QString fs3(QT_TRANSLATE_NOOP("SchedFilterEditor", "Primetime"));
+static QString fs3(QT_TRANSLATE_NOOP("SchedFilterEditor", "Prime time"));
 static QString fs4(QT_TRANSLATE_NOOP("SchedFilterEditor", "Commercial free"));
 static QString fs5(QT_TRANSLATE_NOOP("SchedFilterEditor", "High definition"));
-static QString fs6(QT_TRANSLATE_NOOP("SchedFilterEditor", "This Episode"));
+static QString fs6(QT_TRANSLATE_NOOP("SchedFilterEditor", "This episode"));
+static QString fs7(QT_TRANSLATE_NOOP("SchedFilterEditor", "This series"));
 
 void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 {
@@ -443,7 +444,7 @@ void ScheduleEditor::showUpcomingByTitle(void)
     if (m_recordingRule->m_searchType != kNoSearch)
         title.remove(QRegExp(" \\(.*\\)$"));
 
-    ShowUpcoming(title);
+    ShowUpcoming(title, m_recordingRule->m_seriesid);
 }
 
 void ScheduleEditor::ShowPreview(void)

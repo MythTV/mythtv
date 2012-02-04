@@ -44,6 +44,7 @@ int pginfo_init_statics() { return ProgramInfo::InitStatics(); }
 QMutex ProgramInfo::staticDataLock;
 ProgramInfoUpdater *ProgramInfo::updater;
 int dummy = pginfo_init_statics();
+int ProgramInfo::usingProgIDAuth = -1;
 
 
 const QString ProgramInfo::kFromRecordedQuery =
@@ -1896,7 +1897,24 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     }
 
     if (!programid.isEmpty() && !other.programid.isEmpty())
-        return programid == other.programid;
+    {
+        // Read from database if not known yet
+        if (usingProgIDAuth < 0)
+            UsingProgramIDAuthority();
+
+        if (usingProgIDAuth)
+        {
+            int index = programid.indexOf('/');
+            int oindex = other.programid.indexOf('/');
+            if (index == oindex && (index < 0 ||
+                programid.leftRef(index) == other.programid.leftRef(oindex)))
+                return programid == other.programid;
+        }
+        else
+        {
+            return programid == other.programid;
+        }
+    }
 
     if ((dupmethod & kDupCheckSub) &&
         ((subtitle.isEmpty()) ||
@@ -1958,6 +1976,42 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
         return true;
 
     return false;
+}
+
+int ProgramInfo::UsingProgramIDAuthority(void)
+{
+    if (usingProgIDAuth < 0)
+        usingProgIDAuth = 
+            gCoreContext->GetNumSetting("UsingProgramIDAuthority", 0);
+    return usingProgIDAuth;
+}
+
+void ProgramInfo::CheckProgramIDAuthorities(void)
+{
+    QMap<QString, int> authMap;
+    char *tables[] = { "program", "recorded", "oldrecorded", NULL };
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    for (char **table = tables; *table; ++table)
+    {
+        query.prepare(QString(
+            "SELECT DISTINCT LEFT(programid, LOCATE('/', programid)) "
+            "FROM %1 WHERE programid <> ''").arg(*table));
+        if (!query.exec())
+            MythDB::DBError("CheckProgramIDAuthorities", query);
+        else
+        {
+            while (query.next())
+                authMap[query.value(0).toString()] = 1;
+        }
+    }
+
+    int numAuths = authMap.count();
+    LOG(VB_GENERAL, LOG_INFO, 
+        QString("Found %1 distinct programid authorities").arg(numAuths));
+
+    usingProgIDAuth = (numAuths > 1);
+    gCoreContext->SaveSetting("UsingProgramIDAuthority", usingProgIDAuth);
 }
 
 /** \fn ProgramInfo::CreateRecordBasename(const QString &ext) const

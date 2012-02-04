@@ -47,13 +47,14 @@ void ScheduleCommon::ShowDetails(ProgramInfo *pginfo) const
 /**
 *  \brief Show the upcoming recordings for this title
 */
-void ScheduleCommon::ShowUpcoming(const QString &title) const
+void ScheduleCommon::ShowUpcoming(const QString &title, 
+                                  const QString &seriesid) const
 {
     if (title.isEmpty())
         return;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plTitle, title, "");
+    ProgLister *pl = new ProgLister(mainStack, plTitle, title, seriesid);
     if (pl->Create())
     {
         mainStack->AddScreen(pl);
@@ -70,7 +71,7 @@ void ScheduleCommon::ShowUpcoming(ProgramInfo *pginfo) const
     if (!pginfo)
         return;
 
-    ShowUpcoming(pginfo->GetTitle());
+    ShowUpcoming(pginfo->GetTitle(), pginfo->GetSeriesID());
 }
 
 /**
@@ -85,7 +86,7 @@ void ScheduleCommon::ShowUpcomingScheduled(ProgramInfo *pginfo) const
     uint id;
 
     if ((id = ri.GetRecordingRuleID()) <= 0)
-        return ShowUpcoming(pginfo->GetTitle());
+        return ShowUpcoming(pginfo->GetTitle(), pginfo->GetSeriesID());
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plRecordid,

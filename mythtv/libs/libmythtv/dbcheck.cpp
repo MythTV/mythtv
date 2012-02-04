@@ -6107,6 +6107,23 @@ NULL
             return false;
     }
 
+    if (dbver == "1293")
+    {
+        const char *updates[] = {
+"TRUNCATE TABLE recordmatch",
+"ALTER TABLE recordmatch DROP INDEX recordid",
+"ALTER TABLE recordmatch ADD UNIQUE INDEX (recordid, chanid, starttime)",
+"UPDATE recordfilter SET description='Prime time' WHERE filterid=3",
+"UPDATE recordfilter SET description='This episode' WHERE filterid=6",
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (7, 'This series', '(RECTABLE.seriesid <> '''' AND program.seriesid = RECTABLE.seriesid)', 0);",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1294", dbver))
+            return false;
+    }
+
     return true;
 }
 

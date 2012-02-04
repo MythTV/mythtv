@@ -1067,7 +1067,8 @@ void ProgramRecPriority::upcoming(void)
         QString trimTitle = pgRecInfo->title;
         trimTitle.remove(QRegExp(" \\(.*\\)$"));
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        pl = new ProgLister(mainStack, plTitle, trimTitle, "");
+        pl = new ProgLister(mainStack, plTitle, trimTitle, 
+                            pgRecInfo->GetSeriesID());
         if (pl->Create())
             mainStack->AddScreen(pl);
         else
