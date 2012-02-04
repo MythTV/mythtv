@@ -18,7 +18,6 @@ using namespace std;
 #include "mythwidgets.h"
 #include "util.h"
 #include "mythdialogs.h"
-#include "generictree.h"
 #include "mythwidgets.h"
 #include "mythfontproperties.h"
 

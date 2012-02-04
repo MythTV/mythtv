@@ -39,7 +39,7 @@ class ChannelServiceHost : public ServiceHost
 {
     public:
 
-        ChannelServiceHost( const QString sSharePath )
+        ChannelServiceHost( const QString &sSharePath )
                 : ServiceHost( Channel::staticMetaObject, 
                                "Channel", 
                                "/Channel",

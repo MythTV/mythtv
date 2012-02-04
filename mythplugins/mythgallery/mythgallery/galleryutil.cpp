@@ -18,6 +18,7 @@
 
 // qt
 #include <QDir>
+#include <QApplication>
 
 // myth
 #include <mythcontext.h>
@@ -26,6 +27,7 @@
 #include <mythdirs.h>
 #include <mythdb.h>
 #include <mythuihelper.h>
+#include <mythmainwindow.h>
 
 // mythgallery
 #include "config.h"
@@ -141,7 +143,7 @@ long GalleryUtil::GetNaturalRotation(const unsigned char *buffer, int size)
     }
     catch (...)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + 
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "Failed to extract EXIF headers from buffer");
     }
 #else
@@ -703,6 +705,43 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
     }
 
     return true;
+}
+
+
+void GalleryUtil::PlayVideo(const QString &filename)
+{
+    // HACK begin - remove when everything is using mythui
+    vector<QWidget *> widgetList;
+    if (GetMythMainWindow()->currentWidget())
+    {
+        QWidget *widget = GetMythMainWindow()->currentWidget();
+
+        while (widget)
+        {
+            widgetList.push_back(widget);
+            GetMythMainWindow()->detach(widget);
+            widget->hide();
+            widget = GetMythMainWindow()->currentWidget();
+        }
+
+        GetMythMainWindow()->GetPaintWindow()->raise();
+        GetMythMainWindow()->GetPaintWindow()->setFocus();
+        //GetMythMainWindow()->ShowPainterWindow();
+    }
+    // HACK end
+
+    GetMythMainWindow()->HandleMedia("Internal", filename);
+
+
+    // HACK begin - remove when everything is using mythui
+    vector<QWidget*>::reverse_iterator it;
+    for (it = widgetList.rbegin(); it != widgetList.rend(); ++it)
+    {
+        GetMythMainWindow()->attach(*it);
+        (*it)->show();
+    }
+    //GetMythMainWindow()->HidePainterWindow();
+    // HACK end
 }
 
 static QFileInfo MakeUnique(const QFileInfo &dest)

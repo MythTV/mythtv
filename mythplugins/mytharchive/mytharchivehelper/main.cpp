@@ -164,11 +164,11 @@ bool NativeArchive::copyFile(const QString &source, const QString &destination)
     }
 
     // get free space available on destination
-    long long dummy;
-    long long freeSpace = getDiskSpace(destination, dummy, dummy);
+    int64_t dummy;
+    int64_t freeSpace = getDiskSpace(destination, dummy, dummy);
 
     int srcLen, destLen, percent = 0, lastPercent = 0;
-    long long  wroteSize = 0, totalSize = srcFile.size();
+    int64_t wroteSize = 0, totalSize = srcFile.size();
     char buffer[1024*1024];
 
     if (freeSpace != -1 && freeSpace < totalSize / 1024)
@@ -2032,10 +2032,10 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     return 0;
 }
 
-static long long getFrameCount(AVFormatContext *inputFC, int vid_id)
+static int64_t getFrameCount(AVFormatContext *inputFC, int vid_id)
 {
     AVPacket pkt;
-    long long count = 0;
+    int64_t count = 0;
 
     LOG(VB_JOBQUEUE, LOG_INFO, "Calculating frame count");
 
@@ -2053,7 +2053,7 @@ static long long getFrameCount(AVFormatContext *inputFC, int vid_id)
     return count;
 }
 
-static long long getCutFrames(const QString &filename, long long lastFrame)
+static int64_t getCutFrames(const QString &filename, int64_t lastFrame)
 {
     // only wont the filename
     QString basename = filename;
@@ -2118,7 +2118,7 @@ static long long getCutFrames(const QString &filename, long long lastFrame)
     return frames;
 }
 
-static long long getFrameCount(const QString &filename, float fps)
+static int64_t getFrameCount(const QString &filename, float fps)
 {
     // only wont the filename
     QString basename = filename;
@@ -2285,7 +2285,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 // video stream we use to calc the duration
                 if (duration == 0)
                 {
-                    long long frameCount = 0;
+                    int64_t frameCount = 0;
 
                     switch (lenMethod)
                     {
@@ -2298,7 +2298,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                                 root.setAttribute("duration", duration);
                                 LOG(VB_JOBQUEUE, LOG_INFO,
                                     QString("duration = %1") .arg(duration));
-                                frameCount = (long long)(duration * fps);
+                                frameCount = (int64_t)(duration * fps);
                             }
                             else
                                 root.setAttribute("duration", "N/A");
@@ -2337,7 +2337,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                     }
 
                     // add duration after all cuts are removed
-                    long long cutFrames = getCutFrames(inFile, frameCount);
+                    int64_t cutFrames = getCutFrames(inFile, frameCount);
                     LOG(VB_JOBQUEUE, LOG_INFO,
                         QString("cutframes = %1").arg(cutFrames));
                     int cutduration = (int)(cutFrames / fps);

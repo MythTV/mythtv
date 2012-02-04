@@ -1290,6 +1290,11 @@ void VideoOutputVDPAU::ParseOptions(void)
     }
 }
 
+MythPainter *VideoOutputVDPAU::GetOSDPainter(void)
+{
+    return m_osd_painter;
+}
+
 bool VideoOutputVDPAU::GetScreenShot(int width, int height, QString filename)
 {
     if (m_render)

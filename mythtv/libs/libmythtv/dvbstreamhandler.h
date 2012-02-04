@@ -18,8 +18,6 @@ class DTVSignalMonitor;
 class DVBChannel;
 class DeviceReadBuffer;
 
-typedef QMap<uint,int> FilterMap;
-
 //#define RETUNE_TIMEOUT 5000
 
 class DVBPIDInfo : public PIDInfo

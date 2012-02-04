@@ -32,25 +32,26 @@ class MTV_PUBLIC HTTPLiveStream
     bool InitForWrite(void);
     bool LoadFromDB(void);
 
-    int      GetStreamID(void) { return m_streamid; }
-    uint16_t GetWidth(void) { return m_width; }
-    uint16_t GetHeight(void) { return m_height; }
-    uint32_t GetBitrate(void) { return m_bitrate; }
-    uint32_t GetAudioBitrate(void) { return m_audioBitrate; }
-    uint32_t GetAudioOnlyBitrate(void) { return m_audioOnlyBitrate; }
-    uint16_t GetMaxSegments(void) { return m_maxSegments; }
-    QString  GetSourceFile(void) { return m_sourceFile; }
-    QString  GetHTMLPageName(void);
-    QString  GetMetaPlaylistName(void);
-    QString  GetPlaylistName(bool audioOnly = false);
-    uint16_t GetSegmentSize(void) { return m_segmentSize; }
+    int      GetStreamID(void) const { return m_streamid; }
+    uint16_t GetWidth(void) const { return m_width; }
+    uint16_t GetHeight(void) const { return m_height; }
+    uint32_t GetBitrate(void) const { return m_bitrate; }
+    uint32_t GetAudioBitrate(void) const { return m_audioBitrate; }
+    uint32_t GetAudioOnlyBitrate(void) const { return m_audioOnlyBitrate; }
+    uint16_t GetMaxSegments(void) const { return m_maxSegments; }
+    QString  GetSourceFile(void) const { return m_sourceFile; }
+    QString  GetHTMLPageName(void) const;
+    QString  GetMetaPlaylistName(void) const;
+    QString  GetPlaylistName(bool audioOnly = false) const;
+    uint16_t GetSegmentSize(void) const { return m_segmentSize; }
     QString  GetFilename(uint16_t segmentNumber = 0, bool fileOnly = false,
-                         bool audioOnly = false, bool encoded = false);
-    QString  GetCurrentFilename(bool audioOnly = false, bool encoded = false);
+                         bool audioOnly = false, bool encoded = false) const;
+    QString  GetCurrentFilename(
+        bool audioOnly = false, bool encoded = false) const;
 
     void SetOutputVars(void);
 
-    HTTPLiveStreamStatus GetDBStatus(void);
+    HTTPLiveStreamStatus GetDBStatus(void) const;
 
     int      AddStream(void);
     bool     AddSegment(void);

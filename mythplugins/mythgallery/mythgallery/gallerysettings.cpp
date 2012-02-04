@@ -83,16 +83,6 @@ static HostComboBox *MythGallerySortOrder()
     return gc;
 };
 
-static HostLineEdit *MythGalleryMoviePlayerCmd()
-{
-    HostLineEdit *gc = new HostLineEdit("GalleryMoviePlayerCmd");
-    gc->setLabel(QObject::tr("Command run to display movie files"));
-    gc->setValue("mplayer -fs %s");
-    gc->setHelpText(QObject::tr("This command is executed whenever a movie "
-                    "file is selected"));
-    return gc;
-};
-
 static HostSpinBox *MythGalleryOverlayCaption()
 {
     HostSpinBox *gc = new HostSpinBox("GalleryOverlayCaption", 0, 600, 1);
@@ -264,7 +254,6 @@ GallerySettings::GallerySettings()
     general->addChild(MythGallerySortOrder());
     general->addChild(MythGalleryImportDirs());
     general->addChild(MythGalleryAutoLoad());
-    general->addChild(MythGalleryMoviePlayerCmd());
     general->addChild(MythGalleryFilter());
     general->addChild(MythGalleryFilterType());
     addChild(general);

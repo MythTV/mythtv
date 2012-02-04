@@ -394,7 +394,7 @@ class MPUBLIC MythListBox: public QListWidget
     void insertStringList(const QStringList&);
     void removeRow(uint row);
     void changeItem(const QString&, uint row);
-    int  index(const QList<QListWidgetItem*>&);
+    int  getIndex(const QList<QListWidgetItem*>&);
     QList<QListWidgetItem*> findItems(
         const QString &text, Qt::MatchFlags flags = Qt::MatchStartsWith) const
     {

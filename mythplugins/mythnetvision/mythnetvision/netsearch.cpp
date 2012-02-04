@@ -328,7 +328,7 @@ void NetSearch::doSearch()
         m_siteList->GetItemAt(i)->SetText("", "count");
 
     if (m_pageText)
-        m_pageText->SetText("");
+        m_pageText->Reset();
 
     m_pagenum = 1;
     m_maxpage = 1;

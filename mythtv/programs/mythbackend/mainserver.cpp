@@ -674,6 +674,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleFreeTuner(tokens[1].toInt(), pbs);
     }
+    else if (command == "QUERY_ACTIVE_BACKENDS")
+    {
+        HandleActiveBackendsQuery(pbs);
+    }
     else if (command == "QUERY_IS_ACTIVE_BACKEND")
     {
         if (tokens.size() != 1)
@@ -3494,47 +3498,40 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 
     EncoderLink *encoder = NULL;
     QString enchost;
-
-    bool lastcard = false;
-
-    if (gCoreContext->GetSetting("LastFreeCard", "0") == "1")
-        lastcard = true;
+    uint bestorder = 0;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
 
-        if (!lastcard)
-        {
-            if (elink->IsLocal())
-                enchost = gCoreContext->GetHostName();
-            else
-                enchost = elink->GetHostName();
+        if (elink->IsLocal())
+            enchost = gCoreContext->GetHostName();
+        else
+            enchost = elink->GetHostName();
 
-            if (enchost == pbshost && elink->IsConnected() &&
-                !elink->IsTunerLocked() &&
-                !elink->GetFreeInputs(excluded_cardids).empty())
-            {
-                encoder = elink;
-                retval = iter.key();
-                LOG(VB_RECORD, LOG_INFO, QString("Card %1 is local.")
-                        .arg(iter.key()));
-                break;
-            }
-        }
-
-        if ((retval == -1 || lastcard) && elink->IsConnected() &&
-            !elink->IsTunerLocked() &&
-            !elink->GetFreeInputs(excluded_cardids).empty())
-        {
-            encoder = elink;
-            retval = iter.key();
-        }
         LOG(VB_RECORD, LOG_INFO, 
             QString("Checking card %1. Best card so far %2")
-                .arg(iter.key()).arg(retval));
+            .arg(iter.key()).arg(retval));
+
+        if (!elink->IsConnected() || elink->IsTunerLocked())
+            continue;
+
+        vector<InputInfo> inputs = elink->GetFreeInputs(excluded_cardids);
+
+        for (uint i = 0; i < inputs.size(); ++i)
+        {
+            if (!encoder || inputs[i].livetvorder < bestorder)
+            {
+                retval = iter.key();
+                encoder = elink;
+                bestorder = inputs[i].livetvorder;
+            }
+        }
     }
+
+    LOG(VB_RECORD, LOG_INFO, 
+        QString("Best card is %1").arg(retval));
 
     strlist << QString::number(retval);
 
@@ -4251,6 +4248,30 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     SendResponse(pbssock, retlist);
 }
 
+void MainServer::HandleActiveBackendsQuery(PlaybackSock *pbs)
+{
+    QStringList retlist;
+    retlist << gCoreContext->GetHostName();
+
+    {
+        QString hostname;
+        QReadLocker rlock(&sockListLock);
+        vector<PlaybackSock*>::iterator it;
+        for (it = playbackList.begin(); it != playbackList.end(); ++it)
+        {
+            if ((*it)->isSlaveBackend())
+            {
+                hostname = (*it)->getHostname();
+                if (!retlist.contains(hostname))
+                    retlist << hostname;
+            }
+        }
+    }
+
+    retlist.push_front(QString::number(retlist.size()));
+    SendResponse(pbs->getSocket(), retlist);
+}
+
 void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
                                             PlaybackSock *pbs)
 {
@@ -4316,7 +4337,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                        bool allHosts)
 {
     QString allHostList = gCoreContext->GetHostName();
-    long long totalKB = -1, usedKB = -1;
+    int64_t totalKB = -1, usedKB = -1;
     QMap <QString, bool>foundDirs;
     QString driveKey;
     QString localStr = "1";
@@ -4467,8 +4488,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     strlist.clear();
 
     // Consolidate hosts sharing storage
-    size_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
-    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
+    int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
+    maxWriteFiveSec = max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     QList<FileSystemInfo>::iterator it1, it2;
     int bSize = 32;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
@@ -4485,15 +4506,15 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
             bSize = max(32, max(it1->getBlockSize(), it2->getBlockSize()) / 1024);
-            long long diffSize = it1->getTotalSpace() - it2->getTotalSpace();
-            long long diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
+            int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
+            int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
             if (diffSize < 0)
                 diffSize = 0 - diffSize;
             if (diffUsed < 0)
                 diffUsed = 0 - diffUsed;
 
             if (it2->getFSysID() == -1 && (diffSize <= bSize) && 
-                ((size_t)diffUsed <= maxWriteFiveSec))
+                (diffUsed <= maxWriteFiveSec))
             {
                 if (!it1->getHostname().contains(it2->getHostname()))
                     it1->setHostname(it1->getHostname() + "," + it2->getHostname());

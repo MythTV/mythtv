@@ -111,7 +111,7 @@ class Data( object ):
     Basic response definition class
     This maps to a single key in a JSON dictionary received from the API
     """
-    def __init__(self, field, initarg=None, handler=None, poller=None, raw=True):
+    def __init__(self, field, initarg=None, handler=None, poller=None, raw=True, default=u''):
         """
         This defines how the dictionary value is to be processed by the poller
             field   -- defines the dictionary key that filters what data this uses
@@ -136,6 +136,7 @@ class Data( object ):
         self.initarg = initarg
         self.poller = poller
         self.raw = raw
+        self.default = default
         self.sethandler(handler)
 
     def __get__(self, inst, owner):
@@ -150,6 +151,8 @@ class Data( object ):
     def __set__(self, inst, value):
         if value:
             value = self.handler(value)
+        else:
+            value = self.default
         inst._data[self.field] = value
 
     def sethandler(self, handler):
@@ -253,52 +256,66 @@ class ElementType( type ):
     Data definitions
     """
     def __new__(mcs, name, bases, attrs):
-        # any Data object defined in parent classes must be copied and
-        # processed in this class to function properly
+        # any Data or Poller object defined in parent classes must be cloned
+        # and processed in this class to function properly
         # scan through available bases for all such definitions and insert
         # a copy into this class's attributes
-        for base in bases:
+        # run in reverse order so higher priority values overwrite lower ones
+        data = {}
+        pollers = {'_populate':None}
+
+
+        for base in reversed(bases):
             if isinstance(base, mcs):
                 for k, attr in base.__dict__.items():
-                    if (k not in attrs) and isinstance(attr, Data):
+                    if isinstance(attr, Data):
+                        # extract copies of each defined Data element from
+                        # parent classes
                         attr = copy(attr)
                         attr.poller = attr.poller.func
-                        attrs[k] = attr
-
-        # collect list of Data attributes for processing
-        pollers = {}
-        initargs = []
-        for n, attr in attrs.items():
+                        data[k] = attr
+                    elif isinstance(attr, Poller):
+                        # extract copies of each defined Poller function
+                        # from parent classes
+                        pollers[k] = attr.func
+        for k,attr in attrs.items():
             if isinstance(attr, Data):
-                attr.name = n
-                if attr.initarg:
-                    # handler is specified as an argument for manual use
-                    initargs.append(attr)
+                data[k] = attr
+        if '_populate' in attrs:
+            pollers['_populate'] = attrs['_populate']
 
-                # collect list of pollers, and attributes set to use them
-                if attr.poller:
-                    pn = attr.poller.__name__
-                else:
-                    # use a dummy poller if none is specified
-                    pn = '_populate'
+        # process all defined Data attribues, testing for use as an initial
+        # argument, and building a list of what Pollers are used to populate
+        # which Data points
+        pollermap = dict([(k,[]) for k in pollers])
+        initargs = []
+        for k,v in data.items():
+            v.name = k
+            if v.initarg:
+                initargs.append(v)
+            if v.poller:
+                pn = v.poller.__name__
+                if pn not in pollermap:
+                    pollermap[pn] = []
                 if pn not in pollers:
-                    pollers[pn] = []
-                pollers[pn].append(attr)
+                    pollers[pn] = v.poller
+                pollermap[pn].append(v)
+            else:
+                pollermap['_populate'].append(v)
 
-#        if len(initargs) and not hasattr(attrs, '_populate'):
-#            raise SyntaxError('Initial args cannot be defined without a '+\
-#                              '{0}._populate() method'.format(name))
-
-        # wrap all collected pollers
-        for poller, atrs in pollers.items():
-            # build lookup map for translation between key names
-            lookup = dict([(a.field, a.name) for a in atrs])
-            # wrap poller, and insert back in attribute database
-            poller = Poller(attrs.get(poller, None), lookup)
-            attrs[poller.__name__] = poller
-            # apply wrapped poller back into linked attributes
-            for a in atrs:
-                a.poller = poller
+        # wrap each used poller function with a Poller class, and push into
+        # the new class attributes
+        for k,v in pollermap.items():
+            if len(v) == 0:
+                continue
+            lookup = dict([(attr.field, attr.name) for attr in v])
+            poller = Poller(pollers[k], lookup)
+            attrs[k] = poller
+            # backfill wrapped Poller into each mapped Data object, and ensure
+            # the data elements are defined for this new class
+            for attr in v:
+                attr.poller = poller
+                attrs[attr.name] = attr
 
         # build sorted list of arguments used for intialization
         attrs['_InitArgs'] = tuple([a.name for a in \

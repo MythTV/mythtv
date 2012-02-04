@@ -20,12 +20,14 @@
 #include "DisplayResX.h"
 #endif
 
+#ifdef USING_XRANDR
 static unsigned int display_device_mask(char *str);
 static void parse_mode_string(char *modeString, char **modeName, int *mask);
 static char *find_modeline(char *modeString, char *pModeLines,
                            int ModeLineLen);
 static int extract_id_string(char *str);
 static int modeline_is_interlaced(char *modeLine);
+#endif
 
 #define LOC QString("NVCtrl: ")
 
@@ -332,6 +334,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
 #endif
 }
 
+#ifdef USING_XRANDR
 /*
  * display_device_mask() - given a display device name, translate to
  * the display device mask
@@ -518,3 +521,5 @@ static int modeline_is_interlaced(char *modeLine)
 {
     return (strstr(modeLine, "Interlace") != NULL);
 }
+
+#endif

@@ -13,6 +13,8 @@
 #include <mythdirs.h>
 #include <mythlogging.h>
 #include <compat.h> // For random() on MINGW32
+#include <remotefile.h>
+#include <mythcorecontext.h>
 
 // mythmusic
 #include "decoderhandler.h"
@@ -124,10 +126,41 @@ QIODevice* DecoderIOFactoryFile::takeInput(void)
 void DecoderIOFactoryFile::start(void)
 {
     QString sourcename = getMetadata().Filename();
+
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("DecoderIOFactory: Opening Local File %1").arg(sourcename));
+
     m_input = new QFile(sourcename);
     doConnectDecoder(getUrl().toLocalFile());
+}
+
+/**********************************************************************/
+
+DecoderIOFactorySG::DecoderIOFactorySG(DecoderHandler *parent)
+    : DecoderIOFactory(parent), m_input(NULL)
+{
+}
+
+DecoderIOFactorySG::~DecoderIOFactorySG(void)
+{
+    if (m_input)
+        delete m_input;
+}
+
+QIODevice* DecoderIOFactorySG::takeInput(void)
+{
+    QIODevice *result = m_input;
+    m_input = NULL;
+    return result;
+}
+
+void DecoderIOFactorySG::start(void)
+{
+    QString url = getUrl().toString();
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("DecoderIOFactorySG: Opening Myth URL %1").arg(url));
+    m_input = new MusicSGIODevice(url);
+    doConnectDecoder(getUrl().path());
 }
 
 /**********************************************************************/
@@ -535,15 +568,17 @@ void DecoderHandler::doOperationStop(void)
 
 void DecoderHandler::createIOFactory(const QUrl &url)
 {
-    if (haveIOFactory()) 
+    if (haveIOFactory())
         deleteIOFactory();
 
-    if (url.scheme() == "file" || QFileInfo(url.toString()).isAbsolute() || url.toString().endsWith(".cda"))
-        m_io_factory = new DecoderIOFactoryFile(this);
+    if (url.scheme() == "myth")
+        m_io_factory = new DecoderIOFactorySG(this);
     else if (m_meta && m_meta->Format() == "cast")
         m_io_factory = new DecoderIOFactoryShoutCast(this);
-    else
+    else if (url.scheme() == "http")
         m_io_factory = new DecoderIOFactoryUrl(this);
+    else
+        m_io_factory = new DecoderIOFactoryFile(this);
 }
 
 void DecoderHandler::deleteIOFactory(void)
@@ -672,6 +707,77 @@ int MusicIODevice::putch(int)
 }
 
 int MusicIODevice::ungetch(int)
+{
+    assert(0);
+    return -1;
+}
+
+/**********************************************************************/
+
+MusicSGIODevice::MusicSGIODevice(const QString &url)
+{
+    m_remotefile = new RemoteFile(url);
+    m_remotefile->Open();
+
+    setOpenMode(ReadWrite);
+}
+
+MusicSGIODevice::~MusicSGIODevice(void)
+{
+    m_remotefile->Close();
+    delete m_remotefile;
+}
+
+bool MusicSGIODevice::open(int)
+{
+    return true;
+}
+
+bool MusicSGIODevice::seek(qint64 pos)
+{
+    long int newPos = -1;
+
+    if (m_remotefile)
+        newPos = m_remotefile->Seek(pos, 0);
+
+    return (newPos == pos);
+}
+
+qint64 MusicSGIODevice::size(void) const
+{
+    return m_remotefile->GetFileSize();
+}
+
+qint64 MusicSGIODevice::readData(char *data, qint64 maxlen)
+{
+    qint64 res = m_remotefile->Read(data, maxlen);
+    return res;
+}
+
+qint64 MusicSGIODevice::writeData(const char *data, qint64 sz)
+{
+    m_remotefile->Write(data, sz);
+    return sz;
+}
+
+qint64 MusicSGIODevice::bytesAvailable(void) const
+{
+    return m_remotefile->GetFileSize();
+}
+
+int MusicSGIODevice::getch(void)
+{
+    assert(0);
+    return -1;
+}
+
+int MusicSGIODevice::putch(int)
+{
+    assert(0);
+    return -1;
+}
+
+int MusicSGIODevice::ungetch(int)
 {
     assert(0);
     return -1;

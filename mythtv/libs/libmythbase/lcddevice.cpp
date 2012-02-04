@@ -476,7 +476,7 @@ void LCD::setTunerLEDs(enum LCDTunerSet tuner, bool on)
     sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
 }
 
-void LCD::setChannelProgress(const QString time, float value)
+void LCD::setChannelProgress(const QString &time, float value)
 {
     if (!lcd_ready || !lcd_showchannel)
         return;

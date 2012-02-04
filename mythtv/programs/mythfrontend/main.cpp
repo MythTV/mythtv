@@ -85,6 +85,13 @@ using namespace std;
 #include "videometadatasettings.h"
 #include "videolist.h"
 
+#ifdef USING_RAOP
+#include "mythraopdevice.h"
+#endif
+
+#ifdef USING_LIBDNS_SD
+#include "mythairplayserver.h"
+#endif
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -216,6 +223,14 @@ namespace
 
     void cleanup()
     {
+#ifdef USING_RAOP
+        MythRAOPDevice::Cleanup();
+#endif
+
+#ifdef USING_LIBDNS_SD
+        MythAirplayServer::Cleanup();
+#endif
+
         delete exitPopup;
         exitPopup = NULL;
 
@@ -647,7 +662,8 @@ static void playDisc()
 
         QString filename = QString("bd:/%1/").arg(bluray_mountpoint);
 
-        GetMythMainWindow()->HandleMedia("Internal", filename);
+        GetMythMainWindow()->HandleMedia("Internal", filename, "", "", "", "",
+                                         0, 0, "", 0, "", "", true);
 
         GetMythUI()->RemoveCurrentLocation();
     }
@@ -677,7 +693,8 @@ static void playDisc()
             filename += dvd_device;
 
             command_string = "Internal";
-            GetMythMainWindow()->HandleMedia(command_string, filename);
+            GetMythMainWindow()->HandleMedia(command_string, filename, "", "",
+                                             "", "", 0, 0, "", 0, "", "", true);
             GetMythUI()->RemoveCurrentLocation();
 
             return;
@@ -1086,7 +1103,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
                         const QString &title, const QString &subtitle,
                         const QString &director, int season, int episode,
                         const QString &inetref, int lenMins, const QString &year,
-                        const QString &id)
+                        const QString &id, const bool useBookmark)
 {
     int res = -1;
 
@@ -1142,7 +1159,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     else if (pginfo->IsVideo())
         pos = pginfo->QueryBookmark();
 
-    if (pos > 0)
+    if (useBookmark && pos > 0)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         BookmarkDialog *bookmarkdialog = new BookmarkDialog(pginfo, mainStack);
@@ -1155,7 +1172,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     }
     else
     {
-        TV::StartTV(pginfo, kStartTVNoFlags);
+        TV::StartTV(pginfo, kStartTVNoFlags | kStartTVIgnoreBookmark);
 
         res = 0;
 
@@ -1537,6 +1554,15 @@ int main(int argc, char **argv)
     }
 
     setuid(getuid());
+
+#ifdef USING_LIBDNS_SD
+    if (getenv("MYTHTV_AIRPLAY"))
+        MythAirplayServer::Create();
+#endif
+
+#ifdef USING_RAOP
+    MythRAOPDevice::Create();
+#endif
 
     LCD::SetupLCD();
     if (LCD *lcd = LCD::Get())

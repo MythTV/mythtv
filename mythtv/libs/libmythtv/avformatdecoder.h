@@ -116,9 +116,10 @@ class AvFormatDecoder : public DecoderBase
 
     virtual bool GetFrame(DecodeType); // DecoderBase
 
-    bool isLastFrameKey(void) { return false; }
+    virtual bool IsLastFrameKey(void) const { return false; } // DecoderBase
 
-    bool isCodecMPEG(void) { return codec_is_mpeg; }
+    virtual bool IsCodecMPEG(void) const
+        { return codec_is_mpeg; } // DecoderBase
 
     /// This is a No-op for this class.
     void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)

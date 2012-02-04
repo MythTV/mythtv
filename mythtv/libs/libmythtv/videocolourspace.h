@@ -35,12 +35,12 @@ class VideoColourSpace
     VideoColourSpace(VideoCStd colour_std = kCSTD_ITUR_BT_601);
    ~VideoColourSpace() { }
 
-    PictureAttributeSupported SupportedAttributes(void)
+    PictureAttributeSupported SupportedAttributes(void) const
         { return m_supported_attributes; }
     void  SetSupportedAttributes(PictureAttributeSupported supported);
 
     void* GetMatrix(void)  { return &m_matrix.m; }
-    bool  HasChanged(void) { return m_changed;   }
+    bool  HasChanged(void) const { return m_changed;   }
 
     int   GetPictureAttribute(PictureAttribute attribute);
     int   SetPictureAttribute(PictureAttribute attribute, int value);

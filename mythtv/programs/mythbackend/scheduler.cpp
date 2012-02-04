@@ -339,6 +339,9 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
             return a->GetRecordingStartTime() < b->GetRecordingStartTime();
     }
 
+    if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
+        return a->GetRecordingPriority2() < b->GetRecordingPriority2();
+
     if (a->GetInputID() != b->GetInputID())
         return a->GetInputID() < b->GetInputID();
 
@@ -874,7 +877,7 @@ void Scheduler::BuildListMaps(void)
             p->GetRecordingStatus() == rsWillRecord ||
             p->GetRecordingStatus() == rsUnknown)
         {
-            cardlistmap[p->GetCardID()].push_back(p);
+            conflictlist.push_back(p);
             titlelistmap[p->GetTitle()].push_back(p);
             recordidlistmap[p->GetRecordingRuleID()].push_back(p);
         }
@@ -883,7 +886,7 @@ void Scheduler::BuildListMaps(void)
 
 void Scheduler::ClearListMaps(void)
 {
-    cardlistmap.clear();
+    conflictlist.clear();
     titlelistmap.clear();
     recordidlistmap.clear();
     cache_is_same_program.clear();
@@ -925,7 +928,7 @@ bool Scheduler::FindNextConflict(
         if (debugConflicts)
             msg = QString("comparing with '%1' ").arg(q->GetTitle());
 
-        if (p->GetCardID() != 0 && (p->GetCardID() != q->GetCardID()) &&
+        if (p->GetCardID() != q->GetCardID() &&
             !igrp.GetSharedInputGroup(p->GetInputID(), q->GetInputID()))
         {
             if (debugConflicts)
@@ -968,8 +971,7 @@ bool Scheduler::FindNextConflict(
 
         // if two inputs are in the same input group we have a conflict
         // unless the programs are on the same multiplex.
-        if (p->GetCardID() && (p->GetCardID() != q->GetCardID()) &&
-            igrp.GetSharedInputGroup(p->GetInputID(), q->GetInputID()))
+        if (p->GetCardID() != q->GetCardID())
         {
             uint p_mplexid = p->QueryMplexID();
             if (p_mplexid && (p_mplexid == q->QueryMplexID()))
@@ -989,33 +991,21 @@ bool Scheduler::FindNextConflict(
 }
 
 const RecordingInfo *Scheduler::FindConflict(
-    const QMap<int, RecList> &reclists,
     const RecordingInfo        *p,
     int openend) const
 {
-    QMap<int, RecList>::const_iterator it = reclists.begin();
-    for (; it != reclists.end(); ++it)
-    {
-        if (debugConflicts)
-            LOG(VB_SCHEDULE, LOG_INFO,
-                QString("Checking '%1' for conflicts on cardid %2")
-                    .arg(p->GetTitle()).arg(it.key()));
-
-        const RecList &cardlist = *it;
-        RecConstIter k = cardlist.begin();
-        if (FindNextConflict(cardlist, p, k, openend))
-        {
-            return *k;
-        }
-    }
+    RecConstIter k = conflictlist.begin();
+    if (FindNextConflict(conflictlist, p, k, openend))
+        return *k;
 
     return NULL;
 }
 
 void Scheduler::MarkOtherShowings(RecordingInfo *p)
 {
-    RecList *showinglist = &titlelistmap[p->GetTitle()];
+    RecList *showinglist;
 
+    showinglist = &titlelistmap[p->GetTitle()];
     MarkShowingsList(*showinglist, p);
 
     if (p->GetRecordingRuleType() == kFindOneRecord ||
@@ -1025,8 +1015,7 @@ void Scheduler::MarkOtherShowings(RecordingInfo *p)
         showinglist = &recordidlistmap[p->GetRecordingRuleID()];
         MarkShowingsList(*showinglist, p);
     }
-
-    if (p->GetRecordingRuleType() == kOverrideRecord && p->GetFindID())
+    else if (p->GetRecordingRuleType() == kOverrideRecord && p->GetFindID())
     {
         showinglist = &recordidlistmap[p->GetParentRecordingRuleID()];
         MarkShowingsList(*showinglist, p);
@@ -1089,12 +1078,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
         p->GetRecordingStatus() == rsTuning)
         return false;
 
-    RecList *showinglist = &titlelistmap[p->GetTitle()];
-
-    if (p->GetRecordingRuleType() == kFindOneRecord ||
-        p->GetRecordingRuleType() == kFindDailyRecord ||
-        p->GetRecordingRuleType() == kFindWeeklyRecord)
-        showinglist = &recordidlistmap[p->GetRecordingRuleID()];
+    RecList *showinglist = &recordidlistmap[p->GetRecordingRuleID()];
 
     RecStatusType oldstatus = p->GetRecordingStatus();
     p->SetRecordingStatus(rsLaterShowing);
@@ -1160,7 +1144,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
             }
         }
 
-        const RecordingInfo *conflict = FindConflict(cardlistmap, q);
+        const RecordingInfo *conflict = FindConflict(q);
         if (conflict)
         {
             PrintRec(conflict, "        !");
@@ -1246,8 +1230,7 @@ void Scheduler::SchedNewRecords(void)
             MarkOtherShowings(p);
         else if (p->GetRecordingStatus() == rsUnknown)
         {
-            const RecordingInfo *conflict = FindConflict(cardlistmap, p,
-                                                         openEnd);
+            const RecordingInfo *conflict = FindConflict(p, openEnd);
             if (!conflict)
             {
                 p->SetRecordingStatus(rsWillRecord);
@@ -1298,16 +1281,8 @@ void Scheduler::MoveHigherRecords(bool move_this)
         p->SetRecordingStatus(rsWillRecord);
         MarkOtherShowings(p);
 
-        RecList cardlist;
-        QMap<int, RecList>::const_iterator it = cardlistmap.begin();
-        for (; it != cardlistmap.end(); ++it)
-        {
-            RecConstIter it2 = (*it).begin();
-            for (; it2 != (*it).end(); ++it2)
-                cardlist.push_back(*it2);
-        }
-        RecConstIter k = cardlist.begin();
-        for ( ; FindNextConflict(cardlist, p, k ); ++k)
+        RecConstIter k = conflictlist.begin();
+        for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
             if (!TryAnotherShowing(*k, true))
             {
@@ -1337,17 +1312,8 @@ void Scheduler::MoveHigherRecords(bool move_this)
         if (move_this)
             MarkOtherShowings(p);
 
-        RecList cardlist;
-        QMap<int, RecList>::const_iterator it = cardlistmap.begin();
-        for (; it != cardlistmap.end(); ++it)
-        {
-            RecConstIter it2 = (*it).begin();
-            for (; it2 != (*it).end(); ++it2)
-                cardlist.push_back(*it2);
-        }
-
-        RecConstIter k = cardlist.begin();
-        for ( ; FindNextConflict(cardlist, p, k); ++k)
+        RecConstIter k = conflictlist.begin();
+        for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
             if ((p->GetRecordingPriority() < (*k)->GetRecordingPriority() &&
                  !schedMoveHigher && move_this) ||
@@ -1417,6 +1383,7 @@ void Scheduler::PruneRedundants(void)
             !lastp->IsSameTimeslot(*p))
         {
             lastp = p;
+            lastp->SetRecordingPriority2(0);
             ++i;
         }
         else
@@ -3662,18 +3629,14 @@ void Scheduler::AddNewRecords(void)
 "  ( "
 "    RECTABLE.dupmethod > 1 AND "
 "    oldrecorded.duplicate <> 0 AND "
-"    program.title = oldrecorded.title "
+"    program.title = oldrecorded.title AND "
+"    program.generic = 0 "
 "     AND "
 "     ( "
-"      (program.programid <> '' AND program.generic = 0 "
+"      (program.programid <> '' "
 "       AND program.programid = oldrecorded.programid) "
 "      OR "
-"      (oldrecorded.findid <> 0 AND "
-"        oldrecorded.findid = ") + progfindid + QString(") "
-"      OR "
 "      ( "
-"       program.generic = 0 "
-"       AND "
 "       (program.programid = '' OR oldrecorded.programid = '') "
 "       AND "
 "       (((RECTABLE.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
@@ -3699,18 +3662,14 @@ void Scheduler::AddNewRecords(void)
 "    RECTABLE.dupmethod > 1 AND "
 "    recorded.duplicate <> 0 AND "
 "    program.title = recorded.title AND "
+"    program.generic = 0 AND "
 "    recorded.recgroup NOT IN ('LiveTV','Deleted') "
 "     AND "
 "     ( "
-"      (program.programid <> '' AND program.generic = 0 "
+"      (program.programid <> '' "
 "       AND program.programid = recorded.programid) "
 "      OR "
-"      (recorded.findid <> 0 AND "
-"        recorded.findid = ") + progfindid + QString(") "
-"      OR "
 "      ( "
-"       program.generic = 0 "
-"       AND "
 "       (program.programid = '' OR recorded.programid = '') "
 "       AND "
 "       (((RECTABLE.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
@@ -3769,7 +3728,7 @@ void Scheduler::AddNewRecords(void)
         "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//40-42
         "    capturecard.hostname, recordmatch.oldrecstatus, "
         "                                           RECTABLE.avg_delay, "//43-45
-        "    oldrecstatus.future, "                                      //46
+        "    oldrecstatus.future, cardinput.schedorder, "                //46-47
         + pwrpri + QString(
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
@@ -3874,6 +3833,7 @@ void Scheduler::AddNewRecords(void)
             result.value(39).toUInt(),//videoproperties
             result.value(41).toUInt(),//audioproperties
             result.value(46).toInt());//future
+        p->SetRecordingPriority2(result.value(47).toInt()); // schedorder
 
         if (!p->future && !p->IsReactivated() &&
             p->oldrecstatus != rsAborted &&
@@ -3890,7 +3850,7 @@ void Scheduler::AddNewRecords(void)
 
         p->SetRecordingPriority(
             p->GetRecordingPriority() + recTypeRecPriorityMap[p->GetRecordingRuleType()] +
-            result.value(47).toInt() +
+            result.value(48).toInt() +
             ((autopriority) ?
              autopriority - (result.value(45).toInt() * autostrata / 200) : 0));
 
@@ -3920,7 +3880,8 @@ void Scheduler::AddNewRecords(void)
 
         RecStatusType newrecstatus = p->GetRecordingStatus();
         // Check for rsOffLine
-        if ((doRun || specsched) && !cardMap.contains(p->GetCardID()))
+        if ((doRun || specsched) && 
+            (!cardMap.contains(p->GetCardID()) || !p->GetRecordingPriority2()))
             newrecstatus = rsOffLine;
 
         // Check for rsTooManyRecordings

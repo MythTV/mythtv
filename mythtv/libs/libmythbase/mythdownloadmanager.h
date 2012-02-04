@@ -8,6 +8,7 @@
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QWaitCondition>
+#include <QString>
 
 #include "mythbaseexp.h"
 #include "mthread.h"
@@ -16,6 +17,9 @@ class MythDownloadInfo;
 class RemoteFileDownloadThread;
 
 void ShutdownMythDownloadManager(void);
+
+// TODO : Overlap/Clash with RequestType in libupnp/httprequest.h
+typedef enum MRequestType {kRequestGet, kRequestHead, kRequestPost} MRequestType;
 
 class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 {
@@ -59,6 +63,8 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 
     QNetworkCookieJar *getCookieJar(void) { return m_manager->cookieJar(); }
     void setCookieJar(QNetworkCookieJar *cookieJar) { m_manager->setCookieJar(cookieJar); }
+    QString getHeader(const QUrl &url, const QString &header) { return getHeader(m_manager->cache()->metaData(url), header); }
+    QString getHeader(const QNetworkCacheMetaData &cacheData, const QString &header);
 
   private slots:
     // QNetworkAccessManager signals
@@ -75,11 +81,13 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     // Helper methods for initializing and performing requests
     void queueItem(const QString &url, QNetworkRequest *req,
                    const QString &dest, QByteArray *data, QObject *caller,
-                   const bool post = false, const bool reload = false);
+                   const MRequestType reqType = kRequestGet,
+                   const bool reload = false);
 
     bool processItem(const QString &url, QNetworkRequest *req,
                      const QString &dest, QByteArray *data,
-                     const bool post = false, const bool reload = false);
+                     const MRequestType reqType = kRequestGet,
+                     const bool reload = false);
 
     void downloadRemoteFile(MythDownloadInfo *dlInfo);
     void downloadQNetworkRequest(MythDownloadInfo *dlInfo);

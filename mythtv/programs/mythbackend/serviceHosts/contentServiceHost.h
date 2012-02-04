@@ -39,7 +39,7 @@ class ContentServiceHost : public ServiceHost
 {
     public:
 
-        ContentServiceHost( const QString sSharePath )
+        ContentServiceHost( const QString &sSharePath )
              : ServiceHost( Content::staticMetaObject, 
                             "Content", 
                             "/Content",

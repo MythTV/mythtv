@@ -760,7 +760,7 @@ ProgInfo &ProgInfo::operator=(const ProgInfo &other)
     if (this == &other)
         return *this;
 
-    *((DBEvent*)(this)) = other;
+    DBEvent::operator=(other);
 
     channel         = other.channel;
     startts         = other.startts;
@@ -1022,9 +1022,6 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
             else if (!(*cur)->description.isEmpty() &&
                      (*it)->description.isEmpty())
                 tokeep = cur, todelete = it;
-            else if (!(*it)->description.isEmpty() &&
-                     (*cur)->description.isEmpty())
-                tokeep = it, todelete = cur;
             else
                 tokeep = it, todelete = cur;
 

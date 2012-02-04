@@ -39,7 +39,7 @@ class GuideServiceHost : public ServiceHost
 {
     public:
 
-        GuideServiceHost( const QString sSharePath )
+        GuideServiceHost( const QString &sSharePath )
                 : ServiceHost( Guide::staticMetaObject, 
                                "Guide", 
                                "/Guide",

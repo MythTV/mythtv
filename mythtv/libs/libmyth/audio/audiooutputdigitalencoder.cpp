@@ -159,9 +159,6 @@ bool AudioOutputDigitalEncoder::Init(
 
 size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 {
-    size_t outsize = 0;
-    int data_size;
-
     // Check if there is enough space in incoming buffer
     int required_len = inlen + len / AudioOutputSettings::SampleSize(format) *
         AudioOutputSettings::SampleSize(FORMAT_S16);
@@ -171,13 +168,18 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         LOG(VB_AUDIO, LOG_INFO, LOC +
             QString("low mem, reallocating in buffer from %1 to %2")
                 .arg(in_size) .arg(required_len));
-        if (!(in = (inbuf_t *)realloc(in, in_size, required_len)))
+        inbuf_t *tmp = reinterpret_cast<inbuf_t*>
+            (realloc(in, in_size, required_len));
+        if (!tmp)
         {
+            free(in);
+            in = NULL;
             in_size = 0;
             LOG(VB_AUDIO, LOG_ERR, LOC +
                 "AC-3 encode error, insufficient memory");
             return outlen;
         }
+        in = tmp;
         in_size = required_len;
     }
     if (format != FORMAT_S16)
@@ -196,10 +198,12 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 
     while (i < frames)
     {
-        outsize = avcodec_encode_audio(av_context,
-                                       (uint8_t *)m_encodebuffer,
-                                       sizeof(m_encodebuffer),
-                                       (short *)(in + i * samples_per_frame));
+        int outsize = avcodec_encode_audio(
+            av_context,
+            (uint8_t *)m_encodebuffer,
+            sizeof(m_encodebuffer),
+            (short *)(in + i * samples_per_frame));
+
         if (outsize < 0)
         {
             LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error");
@@ -219,15 +223,21 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
             LOG(VB_AUDIO, LOG_WARNING, LOC +
                 QString("low mem, reallocating out buffer from %1 to %2")
                     .arg(out_size) .arg(required_len));
-            if (!(out = (outbuf_t *)realloc(out, out_size, required_len)))
+            outbuf_t *tmp = reinterpret_cast<outbuf_t*>
+                (realloc(out, out_size, required_len));
+            if (!tmp)
             {
+                free(out);
+                out = NULL;
                 out_size = 0;
                 LOG(VB_AUDIO, LOG_ERR, LOC +
                     "AC-3 encode error, insufficient memory");
                 return outlen;
             }
+            out = tmp;
             out_size = required_len;
         }
+        int data_size = 0;
         m_spdifenc->GetData((uint8_t *)out + outlen, data_size);
         outlen += data_size;
         inlen  -= samples_per_frame * sizeof(inbuf_t);

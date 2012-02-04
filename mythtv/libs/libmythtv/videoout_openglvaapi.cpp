@@ -22,7 +22,7 @@ void VideoOutputOpenGLVAAPI::GetRenderOptions(render_opts &opts)
     (*opts.safe_renderers)["dummy"].append("openglvaapi");
     (*opts.safe_renderers)["nuppel"].append("openglvaapi");
 
-    opts.priorities->insert("openglvaapi", 120);
+    opts.priorities->insert("openglvaapi", 110);
 }
 
 VideoOutputOpenGLVAAPI::VideoOutputOpenGLVAAPI()

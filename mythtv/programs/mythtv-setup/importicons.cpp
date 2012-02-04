@@ -579,8 +579,6 @@ bool ImportIconsWizard::lookup(const QString& strParam)
 
 bool ImportIconsWizard::search(const QString& strParam)
 {
-    if (m_progressDialog)
-        return false;
 
     QString strParam1 = QUrl::toPercentEncoding(strParam);
     bool retVal = false;
@@ -597,6 +595,11 @@ bool ImportIconsWizard::search(const QString& strParam)
                                 .arg(escape_csv(entry2.strAtscMinorChan))
                                 .arg(escape_csv(entry2.strNetworkId))
                                 .arg(escape_csv(entry2.strServiceId));
+
+    QString message = QObject::tr("Searching for icons for channel %1")
+                                                    .arg(entry2.strName);
+
+    OpenBusyPopup(message);
 
     QString str = wget(url,"s="+strParam1+"&csv="+channelcsv);
     m_listSearch.clear();
@@ -626,27 +629,6 @@ bool ImportIconsWizard::search(const QString& strParam)
             while (strSplit.size() > 18*3) strSplit.removeLast();
         }
         // HACK HACK HACK -- end
-
-        MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-        QString message = QObject::tr("Searching for icons for channel %1")
-                                                        .arg(entry2.strName);
-        m_progressDialog = new MythUIProgressDialog(message,
-                                                        popupStack,
-                                                        "iconsearchdialog");
-
-        if (m_progressDialog->Create())
-        {
-            popupStack->AddScreen(m_progressDialog, false);
-            m_progressDialog->SetTotal(strSplit.size());
-        }
-        else
-        {
-            delete m_progressDialog;
-            m_progressDialog = NULL;
-        }
-
-        qApp->processEvents();
 
         QString prevIconName;
         int namei = 1;
@@ -682,34 +664,19 @@ bool ImportIconsWizard::search(const QString& strParam)
                     namei=1;
                 }
 
-                QString iconfile = entry.strLogo.section('/', -1);
-                iconfile = m_tmpDir.absoluteFilePath(iconfile);
                 QString iconname = entry.strName;
-                bool haveIcon = true;
-                // Since DNS for lyngsat-logos.com times out, set a 20s timeout
-                if (!QFile(iconfile).exists())
-                    haveIcon = HttpComms::getHttpFile(iconfile, entry.strLogo,
-                                                      20000);
 
-                if (haveIcon)
-                {
-                    item->SetImage(iconfile, "icon");
-                    item->SetText(iconname, "iconname");
-                }
+                item->SetImage(entry.strLogo, "icon", false);
+                item->SetText(iconname, "iconname");
+
                 prevIconName = entry.strName;
-                if (m_progressDialog)
-                    m_progressDialog->SetProgress(x+1);
-                qApp->processEvents();
             }
         }
-        if (m_progressDialog)
-        {
-            m_progressDialog->Close();
-            m_progressDialog = NULL;
-        }
+
         retVal = true;
     }
     enableControls(STATE_NORMAL, retVal);
+    CloseBusyPopup();
     return retVal;
 }
 

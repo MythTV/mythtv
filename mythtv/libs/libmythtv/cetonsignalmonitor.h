@@ -15,8 +15,6 @@
 class CetonChannel;
 class CetonStreamHandler;
 
-typedef QMap<uint,int> FilterMap;
-
 class CetonSignalMonitor: public DTVSignalMonitor
 {
   public:

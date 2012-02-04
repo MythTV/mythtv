@@ -1731,13 +1731,16 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
     // Move colon separated category from program-titles into description
     // Have seen "NRK2s historiekveld: Film: bla-bla"
     tmpExp1 =  m_noNRKCategories;
-    while (((position = tmpExp1.indexIn(event.title)) != -1) && (tmpExp1.cap(2).length() > 1)){
+    while (((position = tmpExp1.indexIn(event.title)) != -1) &&
+           (tmpExp1.cap(2).length() > 1))
+    {
         event.title  = tmpExp1.cap(2);
         event.description = "(" + tmpExp1.cap(1) + ") " + event.description;
     }
     // Remove season premiere markings
     tmpExp1 = m_noPremiere;
-    if ((position = tmpExp1.indexIn(event.title)) >=3){
+    if ((position = tmpExp1.indexIn(event.title)) >=3)
+    {
         event.title.remove(m_noPremiere);
     }
     // Try to find colon-delimited subtitle in title, only tested for NRK channels
@@ -1753,7 +1756,9 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
             {
                 event.title    = tmpExp1.cap(1);
                 event.subtitle = tmpExp1.cap(2);
-            } else if (event.subtitle == tmpExp1.cap(2)) {
+            }
+            else if (event.subtitle == tmpExp1.cap(2))
+            {
                 event.title    = tmpExp1.cap(1);
             }
         }

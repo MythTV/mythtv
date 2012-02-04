@@ -29,7 +29,6 @@ class DummyChannel : public ChannelBase
     // Sets
     bool SetChannelByString(const QString &chan)
         { m_curchannelname = chan; return true; }
-    void SetExternalChanger(void) { return; }
 
     // Gets
     bool    IsOpen(void)             const { return true; }

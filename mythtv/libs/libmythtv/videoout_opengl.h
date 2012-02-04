@@ -28,7 +28,7 @@ class VideoOutputOpenGL : public VideoOutput
                               MythCodecID  av_codec_id, void *codec_private,
                               bool &aspect_only);
     virtual void UpdatePauseFrame(int64_t &disp_timecode);
-    void DrawUnusedRects(bool) { }
+    virtual void DrawUnusedRects(bool) { } // VideoOutput
     void Zoom(ZoomDirection direction);
     void MoveResize(void);
     virtual int  SetPictureAttribute(PictureAttribute attribute, int newValue);
@@ -48,7 +48,7 @@ class VideoOutputOpenGL : public VideoOutput
     virtual bool IsPIPSupported(void) const   { return true; }
     virtual bool hasFullScreenOSD(void) const { return true; }
     virtual bool ApproveDeintFilter(const QString& filtername) const;
-    virtual MythPainter *GetOSDPainter(void)  { return (MythPainter*)gl_painter; }
+    virtual MythPainter *GetOSDPainter(void)  { return gl_painter; }
 
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
         { return VideoOutput::CanVisualise(audio, gl_context);       }
@@ -57,7 +57,7 @@ class VideoOutputOpenGL : public VideoOutput
         { return VideoOutput::SetupVisualisation(audio, gl_context, name); }
     virtual QStringList GetVisualiserList(void);
 
-    virtual bool StereoscopicModesAllowed(void) { return true; }
+    virtual bool StereoscopicModesAllowed(void) const { return true; }
 
   protected:
     bool CreateCPUResources(void);

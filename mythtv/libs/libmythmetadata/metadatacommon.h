@@ -81,27 +81,27 @@ class META_PUBLIC MetadataLookup : public QObject
         bool handleimages,
         bool allowoverwrites,
         bool preferdvdorder,
-        QString host,
-        QString filename,
-        QString title,
-        const QStringList categories,
+        const QString &host,
+        const QString &filename,
+        const QString &title,
+        const QStringList &categories,
         const float userrating,
-        const QString language,
-        QString subtitle,
-        const QString tagline,
-        const QString description,
+        const QString &language,
+        const QString &subtitle,
+        const QString &tagline,
+        const QString &description,
         uint season,
         uint episode,
         const uint chanid,
-        const QString channum,
-        const QString chansign,
-        const QString channame,
-        const QString chanplaybackfilters,
-        const QString recgroup,
-        const QString playgroup,
-        const QString seriesid,
-        const QString programid,
-        const QString storagegroup,
+        const QString &channum,
+        const QString &chansign,
+        const QString &channame,
+        const QString &chanplaybackfilters,
+        const QString &recgroup,
+        const QString &playgroup,
+        const QString &seriesid,
+        const QString &programid,
+        const QString &storagegroup,
         const QDateTime startts,
         const QDateTime endts,
         const QDateTime recstartts,
@@ -110,26 +110,26 @@ class META_PUBLIC MetadataLookup : public QObject
         const uint audioproperties,
         const uint videoproperties,
         const uint subtitletype,
-        const QString certification,
-        const QStringList countries,
+        const QString &certification,
+        const QStringList &countries,
         const uint popularity,
         const uint budget,
         const uint revenue,
-        QString album,
+        const QString &album,
         uint tracknum,
-        QString system,
+        const QString &system,
         const uint year,
         const QDate releasedate,
         const QDateTime lastupdated,
         const uint runtime,
         const uint runtimesecs,
-        QString inetref,
-        QString tmsref,
-        QString imdb,
+        const QString &inetref,
+        const QString &tmsref,
+        const QString &imdb,
         const PeopleMap people,
-        const QStringList studios,
-        const QString homepage,
-        const QString trailerURL,
+        const QStringList &studios,
+        const QString &homepage,
+        const QString &trailerURL,
         const ArtworkMap artwork,
         DownloadMap downloads);
 
@@ -143,23 +143,23 @@ class META_PUBLIC MetadataLookup : public QObject
         bool handleimages,
         bool allowoverwrites,
         bool preferdvdorder,
-        QString host,
-        QString filename,
-        QString title,
-        const QStringList categories,
+        const QString &host,
+        const QString &filename,
+        const QString &title,
+        const QStringList &categories,
         const float userrating,
-        QString subtitle,
-        const QString description,
+        const QString &subtitle,
+        const QString &description,
         uint chanid,
-        const QString channum,
-        const QString chansign,
-        const QString channame,
-        const QString chanplaybackfilters,
-        const QString recgroup,
-        const QString playgroup,
-        const QString seriesid,
-        const QString programid,
-        const QString storagegroup,
+        const QString &channum,
+        const QString &chansign,
+        const QString &channame,
+        const QString &chanplaybackfilters,
+        const QString &recgroup,
+        const QString &playgroup,
+        const QString &seriesid,
+        const QString &programid,
+        const QString &storagegroup,
         const QDateTime startts,
         const QDateTime endts,
         const QDateTime recstartts,
@@ -184,24 +184,24 @@ class META_PUBLIC MetadataLookup : public QObject
         bool handleimages,
         bool allowoverwrites,
         bool preferdvdorder,
-        QString host,
-        QString filename,
-        QString title,
-        const QStringList categories,
+        const QString &host,
+        const QString &filename,
+        const QString &title,
+        const QStringList &categories,
         const float userrating,
-        QString subtitle,
-        const QString tagline,
-        const QString description,
+        const QString &subtitle,
+        const QString &tagline,
+        const QString &description,
         uint season,
         uint episode,
-        const QString certification,
+        const QString &certification,
         const uint year,
         const QDate releasedate,
         const uint runtime,
         const uint runtimesecs,
-        QString inetref,
+        const QString &inetref,
         const PeopleMap people,
-        const QString trailerURL,
+        const QString &trailerURL,
         const ArtworkMap artwork,
         DownloadMap downloads);
 
@@ -223,28 +223,28 @@ class META_PUBLIC MetadataLookup : public QObject
     // Sets for image download handling
     void SetHandleImages(bool handle) { m_handleimages = handle; };
     void SetAllowOverwrites(bool allow) { m_allowoverwrites = allow; };
-    void SetHost(QString host) { m_host = host; };
+    void SetHost(const QString &host) { m_host = host; };
     void SetDownloads(ArtworkMap map) { m_downloads = map; };
 
     // General Sets
-    void SetTitle(QString title) { m_title = title; };
-    void SetFilename(QString filename) { m_filename = filename; };
+    void SetTitle(const QString &title) { m_title = title; };
+    void SetFilename(const QString &filename) { m_filename = filename; };
 
     // General Sets - Video
-    void SetSubtitle(QString subtitle) { m_subtitle = subtitle; };
+    void SetSubtitle(const QString &subtitle) { m_subtitle = subtitle; };
     void SetSeason(uint season) { m_season = season; };
     void SetEpisode(uint episode) { m_episode = episode; };
-    void SetInetref(QString inetref) { m_inetref = inetref; };
-    void SetTMSref(QString tmsref) { m_tmsref = tmsref; };
+    void SetInetref(const QString &inetref) { m_inetref = inetref; };
+    void SetTMSref(const QString &tmsref) { m_tmsref = tmsref; };
     void SetPreferDVDOrdering(bool preferdvdorder)
                              { m_dvdorder = preferdvdorder; };
 
     // General Sets - Music
-    void SetAlbum(QString album) { m_album = album; };
+    void SetAlbum(const QString &album) { m_album = album; };
     void SetTrack(uint track) { m_tracknum = track; };
 
     // General Sets - Games
-    void SetSystem(QString system) { m_system = system; };
+    void SetSystem(const QString &system) { m_system = system; };
 
     // GETS
 
@@ -464,23 +464,23 @@ class META_PUBLIC MetaGrabberScript : public QObject
     ~MetaGrabberScript();
 
     MetaGrabberScript(
-        const QString name,
-        const QString author,
-        const QString thumbnail,
-        const QString command,
+        const QString &name,
+        const QString &author,
+        const QString &thumbnail,
+        const QString &command,
         const GrabberType type,
-        const QString typestring,
-        const QString description,
+        const QString &typestring,
+        const QString &description,
         const float version);
 
-    const QString GetName() { return m_name; };
-    const QString GetAuthor() { return m_author; };
-    const QString GetThumbnail() { return m_thumbnail; };
-    const QString GetCommand() { return m_command; };
-    GrabberType GetType() { return m_type; };
-    const QString GetTypeString() { return m_typestring; };
-    const QString GetDescription() { return m_description; };
-    float GetVersion() { return m_version; };
+    QString GetName(void) const { return m_name; };
+    QString GetAuthor(void) const { return m_author; };
+    QString GetThumbnail(void) const { return m_thumbnail; };
+    QString GetCommand(void) const { return m_command; };
+    GrabberType GetType(void) const { return m_type; };
+    QString GetTypeString(void) const { return m_typestring; };
+    QString GetDescription(void) const { return m_description; };
+    float GetVersion(void) const { return m_version; };
 
     void toMap(MetadataMap &metadataMap);
 

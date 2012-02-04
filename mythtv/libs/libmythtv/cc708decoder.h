@@ -32,6 +32,7 @@ class CC708Decoder
    ~CC708Decoder() {}
 
     void decode_cc_data(uint cc_type, uint data1, uint data2);
+    void decode_cc_null(void);
 
     /// \return Services seen in last few seconds as specified.
     void services(uint seconds, bool[64]) const;

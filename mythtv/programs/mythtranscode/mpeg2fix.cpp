@@ -1770,9 +1770,15 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
 
     for (i = rangelist.begin(); i != rangelist.end(); ++i)
     {
-        long long start = 0, end = 0;
-        QByteArray tmp = (*i).toAscii();
-        if (sscanf(tmp.constData(), "%lld - %lld", &start, &end) == 2)
+        QStringList tmp = (*i).split(" - ");
+        long long start, end;
+        bool ok[2] = { false, false, };
+        if (tmp.size() >= 2)
+        {
+            start = tmp[0].toLongLong(&ok[0]);
+            end = tmp[1].toLongLong(&ok[1]);
+        }
+        if (ok[0] && ok[1])
         {
             if (start == 0)
             {

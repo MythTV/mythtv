@@ -974,7 +974,9 @@ const LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void) const
 int linux_firewire_device_tspacket_handler(
     unsigned char *tspacket, int len, uint dropped, void *callback_data)
 {
-    LinuxFirewireDevice *fw = (LinuxFirewireDevice*) callback_data;
+    LinuxFirewireDevice *fw =
+        reinterpret_cast<LinuxFirewireDevice*>(callback_data);
+
     if (!fw)
         return 0;
 

@@ -39,7 +39,7 @@ class VideoServiceHost : public ServiceHost
 {
     public:
 
-        VideoServiceHost( const QString sSharePath )
+        VideoServiceHost( const QString &sSharePath )
                 : ServiceHost( Video::staticMetaObject,
                                "Video",
                                "/Video",

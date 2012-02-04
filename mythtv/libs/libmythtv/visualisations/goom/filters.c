@@ -720,12 +720,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 #endif
 
 #ifdef POWERPC
-	if (useAltivec)
-{
-            ppc_zoom (expix1, expix2, prevX, prevY, brutS, brutD, buffratio,precalCoef);
-}
-	else
-            ppc_zoom (expix1, expix2, prevX, prevY, brutS, brutD, buffratio,precalCoef);
+	ppc_zoom (expix1, expix2, prevX, prevY, brutS, brutD, buffratio,precalCoef);
 #endif
 #else
 	c_zoom (expix1, expix2, prevX, prevY, brutS, brutD);

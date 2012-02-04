@@ -35,7 +35,7 @@ class VideoOutputD3D : public VideoOutput
                       bool        &aspect_only);
     void MoveResizeWindow(QRect new_rect) {;}
     void UpdatePauseFrame(int64_t &disp_timecode);
-    void DrawUnusedRects(bool) {;}
+    virtual void DrawUnusedRects(bool) {;} // VideoOutput
     void Zoom(ZoomDirection direction);
     void EmbedInWidget(const QRect &rect);
     void StopEmbedding(void);
@@ -53,7 +53,7 @@ class VideoOutputD3D : public VideoOutput
                  PIPLocation  loc);
     void RemovePIP(MythPlayer *pipplayer);
     bool IsPIPSupported(void) const { return true; }
-    virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
+    virtual MythPainter *GetOSDPainter(void);
     bool hasHWAcceleration(void) const { return !codec_is_std(video_codec_id); }
     virtual bool ApproveDeintFilter(const QString& filtername) const;
     virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id);

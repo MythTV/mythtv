@@ -381,7 +381,7 @@ void IconView::UpdateText(MythUIButtonListItem *item)
     if (!item)
     {
         if (m_positionText)
-            m_positionText->SetText("");
+            m_positionText->Reset();
         return;
     }
 

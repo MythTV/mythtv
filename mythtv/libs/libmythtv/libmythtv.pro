@@ -413,6 +413,15 @@ using_frontend {
     HEADERS += DetectLetterbox.h
     SOURCES += DetectLetterbox.cpp
 
+    using_libdns_sd {
+        !macx: LIBS += -ldns_sd
+        HEADERS += mythairplayserver.h
+        SOURCES += mythairplayserver.cpp
+        using_libcrypto: HEADERS += mythraopdevice.h   mythraopconnection.h
+        using_libcrypto: SOURCES += mythraopdevice.cpp mythraopconnection.cpp
+        using_libcrypto: LIBS    += -lcrypto
+    }
+
     using_mheg {
         # DSMCC stuff
         HEADERS += dsmcc.h                  dsmcccache.h

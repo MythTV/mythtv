@@ -126,8 +126,8 @@ class OSD
 
     bool    Init(const QRect &rect, float font_aspect);
     void    SetPainter(MythPainter *painter);
-    QRect   Bounds(void) { return m_Rect; }
-    int     GetFontStretch(void) { return m_fontStretch; }
+    QRect   Bounds(void) const { return m_Rect; }
+    int     GetFontStretch(void) const { return m_fontStretch; }
     void    OverrideUIScale(void);
     void    RevertUIScale(void);
     bool    Reinit(const QRect &rect, float font_aspect);

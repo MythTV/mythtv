@@ -2170,9 +2170,9 @@ void MythUIButtonList::Init()
 
     if (!m_buttontemplate)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Statetype buttonitem is required in "
-                                         "mythuibuttonlist: %1")
-            .arg(objectName()));
+        LOG(VB_GENERAL, LOG_ERR, QString("(%1) Statetype buttonitem is "
+                                         "required in mythuibuttonlist: %2")
+            .arg(GetXMLLocation()).arg(objectName()));
         return;
     }
 
@@ -3187,6 +3187,12 @@ void MythUIButtonListItem::DisplayState(const QString &state,
 
     if (m_parent && do_update)
         m_parent->Update();
+}
+
+void MythUIButtonListItem::SetStatesFromMap(const QMap<QString, QString> &stateMap)
+{
+    m_states.clear();
+    m_states = stateMap;
 }
 
 bool MythUIButtonListItem::checkable() const

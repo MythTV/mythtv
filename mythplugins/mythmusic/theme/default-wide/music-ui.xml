@@ -3,9 +3,6 @@
 
 <mythuitheme>
 
-    <!-- FIXME:  check if this can be remove now -->
-    <include>music-base.xml</include>
-
     <window name="albumart_browser">
 
         <textarea name="heading" from="basetextarea">
@@ -391,474 +388,261 @@
 
     </window>
 
-    <window name="lyricsview">
+    <!-- This screen allows you to rip tracks from cd's -->
+    <window name="cdripper">
 
-        <shape name="playlist_background" from="basebackground">
-            <area>15,15,1250,410</area>
+        <!-- Labels -->
+
+        <group name="topgroup" >
+            <area>80,20,930,280</area>
+
+            <textarea name="quality_label">
+                <area>0,0,270,50</area>
+                <font>basemedium</font>
+                <value>Quality:</value>
+                <align>right,vcenter</align>
+            </textarea>
+
+            <textarea name="artist_label" from="quality_label">
+                <position>0,55</position>
+                <value>Artist:</value>
+            </textarea>
+
+            <textarea name="album_label" from="quality_label">
+                <position>0,110</position>
+                <value>Album:</value>
+            </textarea>
+
+            <textarea name="genre_text" from="quality_label">
+                <position>0,165</position>
+                <value>Genre:</value>
+            </textarea>
+
+            <textarea name="comp_label" from="quality_label">
+                <position>375,220</position>
+                <value>Multi-Artist:</value>
+            </textarea>
+
+            <textarea name="year_label" from="quality_label">
+                <position>0,222</position>
+                <value>Year:</value>
+            </textarea>
+
+            <!-- edits -->
+
+            <buttonlist name="quality" from="baseselector">
+                <position>280,5</position>
+            </buttonlist>
+
+            <textedit name="artist" from="basetextedit">
+                <position>280,55</position>
+            </textedit>
+
+            <button name="searchartist" from="basesearchbutton">
+                <position>665,62</position>
+            </button>
+
+            <textedit name="album" from="basetextedit">
+                <position>280,110</position>
+            </textedit>
+
+            <button name="searchalbum" from="basesearchbutton">
+                <position>665,117</position>
+            </button>
+
+            <textedit name="genre" from="basetextedit">
+                <position>280,165</position>
+            </textedit>
+
+            <button name="searchgenre" from="basesearchbutton">
+                <position>665,172</position>
+            </button>
+
+            <textedit name="year" from="basetextedit">
+                <area>280,222,100,50</area>
+            </textedit>
+
+            <checkbox name="compilation" from="basecheckbox">
+                <position>665,230</position>
+            </checkbox>
+
+            <button name="switch" from="basebutton">
+                <area>725,225,200,45</area>
+                <value>Switch Titles</value>
+            </button>
+
+        </group>
+
+        <textarea name="track_label" from="basetextarea">
+            <area>60,310,100,30</area>
+            <value>Track</value>
+            <align>left,bottom</align>
+        </textarea>
+
+        <textarea name="title_label" from="track_label">
+            <area>160,310,300,30</area>
+            <value>Title</value>
+        </textarea>
+
+        <textarea name="list_artist_label" from="track_label">
+            <area>690,310,300,30</area>
+            <value>Artist</value>
+        </textarea>
+
+        <textarea name="length_label" from="track_label">
+            <area>1110,310,100,30</area>
+            <align>right,bottom</align>
+            <value>Length</value>
+        </textarea>
+
+        <shape name="trackbg" from="basebackground">
+            <area>40,340,1200,300</area>
         </shape>
 
-        <shape name="track_info_background" from="basebackground">
-            <area>15,440,1250,260</area>
-        </shape>
+        <buttonlist name="tracks" from="basebuttonlist2">
+            <area>60,360,1160,270</area>
+            <buttonarea>0,0,1160,250</buttonarea>
+            <spacing>0</spacing>
+            <layout>vertical</layout>
+            <showarrow>no</showarrow>
+            <searchposition>-1,410</searchposition>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,35</area>
+                    <statetype name="buttoncheck">
+                        <position>10,8</position>
+                        <state type="off">
+                            <imagetype name="checkoff">
+                                <filename>lb-check-empty.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="half">
+                            <imagetype name="checkhalf">
+                                <filename>lb-check-half.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="full">
+                            <imagetype name="checkfull">
+                                <filename>lb-check-full.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="track" from="buttontext">
+                        <align>left,vcenter</align>
+                        <area>40,0,45,35</area>
+                    </textarea>
+                    <textarea name="title" from="track">
+                        <area>100,0,520,35</area>
+                    </textarea>
+                    <textarea name="artist" from="track">
+                        <area>630,0,420,35</area>
+                    </textarea>
+                    <textarea name="length" from="track">
+                        <area>1060,0,90,35</area>
+                        <align>right,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="selectbar">
+                        <area>0,0,1160,35</area>
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="selectbar">
+                        <area>0,0,1160,35</area>
+                    </shape>
+                </state>
+            </statetype>
 
-        <webbrowser name="lyrics_browser">
-            <area>20,20,1240,400</area>
-            <zoom>1.0</zoom>
-            <background color="black" alpha="1" />
-        </webbrowser>
+            <statetype name="upscrollarrow">
+                <position>1095,250</position>
+            </statetype>
 
-        <statetype name="loading_state">
-            <position>587,167</position>
-            <state name="off"></state>
-            <state name="on">
-                <imagetype name="loadinganimation">
-                    <position>0,0</position>
-                    <filepattern low="0" high="24">busyimages/%1.png</filepattern>
-                    <delay>150</delay>
-                </imagetype>
-            </state>
-        </statetype>
+            <statetype name="downscrollarrow">
+                <position>1130,250</position>
+            </statetype>
+        </buttonlist>
 
-        <group name="infopanel" from="baseinfopanel">
-            <area>0,440,1250,260</area>
+        <!-- Buttons -->
+
+        <button name="scan" from="basebutton">
+            <position>480,650</position>
+            <value>Scan CD</value>
+        </button>
+
+        <button name="rip" from="basebutton">
+            <position>650,650</position>
+            <value>Rip CD</value>
+        </button>
+    </window>
+
+    <!-- This screen shows the track ripping status -->
+    <window name="ripstatus">
+
+        <imagetype name="banner">
+            <filename>mm_rip_banner.png</filename>
+            <position>580,90</position>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>15,5,800,40</area>
+            <font>baselarge</font>
+            <value>Rip CD</value>
+        </textarea>
+
+        <group name="progress_group">
+            <area>290,140,700,500</area>
+
+            <imagetype name="progress_background">
+                <filename>mm_rip_background.png</filename>
+                <area>0,0,700,500</area>
+            </imagetype>
+
+            <textarea name="overall_label" from="basetextarea">
+                <area>30,40,630,40</area>
+                <value>Importing CD</value>
+            </textarea>
+
+            <textarea name="overall" from="overall_label">
+                <position>30,85</position>
+                <align>hcenter</align>
+            </textarea>
+
+            <textarea name="track_label" from="overall_label">
+                <position>30,250</position>
+                <value>Encoding Track</value>
+            </textarea>
+
+            <textarea name="track" from="overall">
+                <position>30,295</position>
+            </textarea>
+
+            <textarea name="status" from="overall">
+                <position>30,440</position>
+            </textarea>
+
+            <progressbar name="overall_progress" from="baseprogressbar">
+                <position>82,120</position>
+            </progressbar>
+
+            <textarea name="overallpct" from="basetextarea">
+                <area>82,160,536,30</area>
+                <align>hcenter</align>
+            </textarea>
+
+            <progressbar name="track_progress" from="baseprogressbar">
+                <position>82,330</position>
+            </progressbar>
+
+            <textarea name="trackpct" from="basetextarea">
+                <area>82,370,536,30</area>
+                <align>hcenter</align>
+            </textarea>
+
         </group>
 
     </window>
 
-    <window name="streamview">
-
-        <shape name="playlist_background" from="basebackground">
-            <area>15,15,1250,410</area>
-        </shape>
-
-        <shape name="track_info_background" from="basebackground">
-            <area>15,440,1250,260</area>
-        </shape>
-
-        <buttonlist name="playedtrackslist" from="basebuttonlist2">
-            <area>35,20,1225,340</area>
-            <spacing>0</spacing>
-            <layout>vertical</layout>
-            <arrange>stack</arrange>
-            <showarrow>no</showarrow>
-            <buttonarea>0,0,1225,340</buttonarea>
-            <statetype name="buttonitem">
-                <state name="active">
-                    <area>0,0,100%,46</area>
-
-                    <imagetype name="buttonimage">
-                        <area>5,5,36,36</area>
-                        <filename>mm_icecast.png</filename>
-                    </imagetype>
-
-                    <statetype name="playstate">
-                        <position>1170,10</position>
-                        <state name="playing">
-                            <imagetype name="animation">
-                                <position>0,0</position>
-                                <filepattern low="1" high="8">mm_playing_%1.png</filepattern>
-                                <delay>160</delay>
-                            </imagetype>
-                        </state>
-                    </statetype>
-
-                    <textarea name="title" from="buttontext">
-                        <area>150,0,600,46</area>
-                        <align>left,vcenter</align>
-                        <font>basesmall</font>
-                    </textarea>
-
-                    <textarea name="artist" from="buttontext">
-                        <area>700,0,340,46</area>
-                        <font>basesmall</font>
-                        <align>left,vcenter</align>
-                    </textarea>
-                    <textarea name="tracknum" from="artist">
-                        <area>90,0,50,46</area>
-                        <align>right,vcenter</align>
-                        <template>%1 -</template>
-                    </textarea>
-                    <textarea name="length" from="artist">
-                        <area>1040,0,120,46</area>
-                        <align>right,vcenter</align>
-                        <font>basesmall</font>
-                    </textarea>
-
-                </state>
-                <state name="selectedactive" from="active">
-                    <imagetype name="buttonimage">
-                        <area>5,5,36,36</area>
-                        <filename>mm_icecast.png</filename>
-                    </imagetype>
-                    <shape name="selectbar">
-                        <area>0,0,100%,46</area>
-                    </shape>
-                </state>
-                <state name="selectedinactive" from="active">
-                    <shape name="selectbar">
-                        <area>0,0,100%,46</area>
-                    </shape>
-                </state>
-            </statetype>
-            <statetype name="upscrollarrow">
-                <position>1140,345</position>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <position>1180,345</position>
-            </statetype>
-        </buttonlist>
-
-        <imagetype name="mm_blackhole_border">
-            <filename>mm_blackhole_border.png</filename>
-            <area>32,459,162,162</area>
-        </imagetype>
-
-        <statetype name="loading_state">
-            <position>587,167</position>
-            <state name="off"></state>
-            <state name="on">
-                <imagetype name="loadinganimation">
-                    <position>0,0</position>
-                    <filepattern low="0" high="24">busyimages/%1.png</filepattern>
-                    <delay>150</delay>
-                </imagetype>
-            </state>
-        </statetype>
-
-        <textarea name="title" from="basetextarea">
-            <area>230,455,900,34</area>
-            <font>baselarge</font>
-        </textarea>
-
-        <textarea name="artist" from="basetextarea">
-            <area>230,495,900,34</area>
-            <font>basemedium</font>
-        </textarea>
-
-        <textarea name="album" from="basetextarea">
-            <area>230,530,900,34</area>
-            <font>basemedium</font>
-        </textarea>
-
-        <textarea name="filename" from="basetextarea">
-            <font>basesmall</font>
-            <area>230,565,840,35</area>
-        </textarea>
-
-        <textarea name="time" from="basetextarea">
-            <font>basesmall</font>
-            <area>230,595,840,35</area>
-        </textarea>
-
-        <progressbar name="progress">
-            <position>230,670</position>
-            <layout>horizontal</layout>
-            <style>reveal</style>
-            <imagetype name="background">
-                <filename>mm_progress-bg.png</filename>
-            </imagetype>
-            <imagetype name="progressimage">
-                <filename>mm_progress-fg.png</filename>
-            </imagetype>
-        </progressbar>
-
-        <textarea name="bufferstatus" from="basetextarea">
-            <area>230,645,285,35</area>
-            <font>basesmall</font>
-            <value>128Kb/256Kb (50%)</value>
-        </textarea>
-
-        <imagetype name="visualizer_border">
-            <filename>mm_blackhole_border.png</filename>
-            <area>1082,459,162,162,</area>
-        </imagetype>
-
-        <video name="visualizer">
-            <area>1085,463,156,155,</area>
-        </video>
-
-        <textarea name="visualizername" from="basetextarea">
-            <area>1085,620,156,35</area>
-            <font>basesmall</font>
-            <align>center</align>
-        </textarea>
-
-        <textarea name="volume" from="basevolume">
-            <position>70,667</position>
-        </textarea>
-
-        <statetype name="mutestate" from="basemutestate">
-            <position>30,670</position>
-        </statetype>
-
-        <imagetype name="coverart">
-            <filename>mm_nothumb.png</filename>
-            <area>35,463,156,155</area>
-        </imagetype>
-
-        <button name="play" from="baseplaybutton">
-            <position>840,650</position>
-        </button>
-
-        <button name="stop" from="basestopbutton">
-            <position>885,650</position>
-        </button>
-
-    </window>
-
-    <window name="selectstreamview">
-
-        <shape name="playlist_background" from="basebackground">
-            <area>15,15,1250,410</area>
-        </shape>
-
-        <shape name="track_info_background" from="basebackground">
-            <area>15,440,1250,260</area>
-        </shape>
-
-        <buttonlist name="streamlist" from="basebuttonlist2">
-            <area>35,20,1225,340</area>
-            <spacing>0</spacing>
-            <layout>vertical</layout>
-            <arrange>stack</arrange>
-            <showarrow>no</showarrow>
-            <buttonarea>0,0,1225,340</buttonarea>
-            <statetype name="buttonitem">
-                <state name="active">
-                    <area>0,0,100%,46</area>
-
-                    <imagetype name="buttonimage">
-                        <area>5,5,36,36</area>
-                        <filename>mm_icecast.png</filename>
-                    </imagetype>
-
-                    <statetype name="playstate">
-                        <position>1170,10</position>
-                        <state name="playing">
-                            <imagetype name="animation">
-                                <position>0,0</position>
-                                <filepattern low="1" high="8">mm_playing_%1.png</filepattern>
-                                <delay>160</delay>
-                            </imagetype>
-                        </state>
-                    </statetype>
-
-                    <textarea name="station" from="buttontext">
-                        <area>150,0,600,46</area>
-                        <align>left,vcenter</align>
-                        <font>basesmall</font>
-                    </textarea>
-
-                    <textarea name="channel" from="buttontext">
-                        <area>700,0,340,46</area>
-                        <font>basesmall</font>
-                        <align>left,vcenter</align>
-                    </textarea>
-                    <textarea name="url" from="channel">
-                        <area>90,0,50,46</area>
-                        <align>left,vcenter</align>
-                    </textarea>
-                    <textarea name="genre" from="channel">
-                        <area>1040,0,120,46</area>
-                        <align>left,vcenter</align>
-                        <font>basesmall</font>
-                    </textarea>
-
-                </state>
-                <state name="selectedactive" from="active">
-                    <imagetype name="buttonimage">
-                        <area>5,5,36,36</area>
-                        <filename>mm_icecast.png</filename>
-                    </imagetype>
-                    <shape name="selectbar">
-                        <area>0,0,100%,46</area>
-                    </shape>
-                </state>
-                <state name="selectedinactive" from="active">
-                    <shape name="selectbar">
-                        <area>0,0,100%,46</area>
-                    </shape>
-                </state>
-            </statetype>
-            <statetype name="upscrollarrow">
-                <position>1140,345</position>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <position>1180,345</position>
-            </statetype>
-        </buttonlist>
-
-        <imagetype name="mm_blackhole_border">
-            <filename>mm_blackhole_border.png</filename>
-            <area>32,459,162,162</area>
-        </imagetype>
-
-        <statetype name="loading_state">
-            <position>587,167</position>
-            <state name="off"></state>
-            <state name="on">
-                <imagetype name="loadinganimation">
-                    <position>0,0</position>
-                    <filepattern low="0" high="24">busyimages/%1.png</filepattern>
-                    <delay>150</delay>
-                </imagetype>
-            </state>
-        </statetype>
-
-        <textarea name="title" from="basetextarea">
-            <area>230,455,900,34</area>
-            <font>baselarge</font>
-        </textarea>
-
-        <textarea name="artist" from="basetextarea">
-            <area>230,495,900,34</area>
-            <font>basemedium</font>
-        </textarea>
-
-        <textarea name="album" from="basetextarea">
-            <area>230,530,900,34</area>
-            <font>basemedium</font>
-        </textarea>
-
-        <textarea name="filename" from="basetextarea">
-            <font>basesmall</font>
-            <area>230,565,840,35</area>
-        </textarea>
-
-        <textarea name="time" from="basetextarea">
-            <font>basesmall</font>
-            <area>230,595,840,35</area>
-        </textarea>
-
-        <progressbar name="progress" from="basetrackprogress">
-            <position>230,670</position>
-        </progressbar>
-
-        <textarea name="bufferstatus" from="basetextarea">
-            <area>230,645,285,35</area>
-            <font>basesmall</font>
-            <value>128Kb/256Kb (50%)</value>
-        </textarea>
-
-        <imagetype name="visualizer_border">
-            <filename>mm_blackhole_border.png</filename>
-            <area>1082,459,162,162,</area>
-        </imagetype>
-
-        <video name="visualizer">
-            <area>1085,463,156,155,</area>
-        </video>
-
-        <textarea name="visualizername" from="basetextarea">
-            <area>1085,620,156,35</area>
-            <font>basesmall</font>
-            <align>center</align>
-        </textarea>
-
-        <textarea name="volume" from="basevolume">
-            <position>70,667</position>
-        </textarea>
-
-        <statetype name="mutestate" from="basemutestate">
-            <position>30,670</position>
-        </statetype>
-
-        <imagetype name="coverart">
-            <filename>mm_nothumb.png</filename>
-            <area>35,463,156,155</area>
-        </imagetype>
-
-        <button name="play" from="baseplaybutton">
-            <position>840,650</position>
-        </button>
-
-        <button name="stop" from="basestopbutton">
-            <position>885,650</position>
-        </button>
-
-    </window>
-
-    <window name="editstreampopup">
-        <area>-1,-1,500,550</area>
-
-        <imagetype name="box">
-            <area>0,0,500,550</area>
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
-
-        <textarea name="title_text" from="basetextarea">
-            <area>20,10,460,40</area>
-            <font>baselarge</font>
-            <align>hcenter,top</align>
-            <value>Add/Edit Music Stream</value>
-        </textarea>
-
-        <textarea name="stationlabel" from="basetextarea">
-            <area>60,50,460,30</area>
-            <font>basesmall</font>
-            <value>Station:</value>
-        </textarea>
-
-        <textedit name="station_edit" from="basetextedit">
-            <position>60,80</position>
-        </textedit>
-
-        <textarea name="channellabel" from="basetextarea">
-            <area>60,140,460,30</area>
-            <font>basesmall</font>
-            <value>Channel:</value>
-        </textarea>
-
-        <textedit name="channel_edit" from="basetextedit">
-            <position>60,170</position>
-        </textedit>
-
-        <textarea name="urllabel" from="basetextarea">
-            <area>60,230,320,30</area>
-            <font>basesmall</font>
-            <value>URL:</value>
-        </textarea>
-
-        <textedit name="url_edit" from="basetextedit">
-            <position>60,260</position>
-        </textedit>
-
-        <textarea name="logourllabel" from="basetextarea">
-            <area>60,290,320,30</area>
-            <font>basesmall</font>
-            <value>Logo URL:</value>
-        </textarea>
-
-        <textedit name="logourl_edit" from="basetextedit">
-            <position>60,320</position>
-        </textedit>
-
-        <textarea name="genrelabel" from="basetextarea">
-            <area>60,230,350,30</area>
-            <font>basesmall</font>
-            <value>Genre:</value>
-        </textarea>
-
-        <textedit name="genre_edit" from="basetextedit">
-            <position>60,380</position>
-        </textedit>
-
-        <textarea name="formatlabel" from="basetextarea">
-            <area>60,410,320,30</area>
-            <font>basesmall</font>
-            <value>Metadata Format:</value>
-        </textarea>
-
-        <textedit name="format_edit" from="basetextedit">
-            <position>60,440</position>
-        </textedit>
-
-        <button name="save_button" from="basebutton">
-            <position>170,490</position>
-            <value>Save</value>
-        </button>
-
-    </window>
 
     <window name="import_music">
 

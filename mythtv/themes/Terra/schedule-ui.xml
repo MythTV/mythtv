@@ -670,101 +670,97 @@
 
     <window name="custompriority">
 
-        <textarea name="pagetitle" from="basetextarea">
-            <area>40,40,760,40</area>
-            <font>baselarge</font>
+        <imagetype name="backdrop" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="pagetitle" from="baseheading">
             <value>Custom Priority Rules</value>
         </textarea>
 
-        <textarea name="ruleslabel" from="basetextarea">
-            <area>280,102,250,30</area>
-            <font>basemedium</font>
-            <align>right</align>
-            <value>Existing Rules:</value>
-        </textarea>
-
-        <buttonlist name="rules" from="basewideselector">
-            <position>540,100</position>
-        </buttonlist>
-
-        <textarea name="titlelabel" from="ruleslabel">
-            <position>280,162</position>
-            <value>Rule Name:</value>
-        </textarea>
-
-        <textedit name="title" from="basetextedit">
-            <position>540,155</position>
-        </textedit>
-
-        <textarea name="prioritylabel" from="ruleslabel">
-            <position>280,222</position>
-            <value>Priority Change:</value>
-        </textarea>
-
-        <spinbox name="priority" from="basespinbox">
-            <position>540,220</position>
-        </spinbox>
-
-        <textarea name="clauseslabel" from="ruleslabel">
-            <area>340,300,600,40</area>
-            <align>allcenter</align>
-            <value>Select a clause from the list.</value>
-        </textarea>
-
-        <buttonlist name="clauses" from="basewideselector">
-            <position>360,350</position>
-        </buttonlist>
-
-        <button name="add" from="basebutton">
-            <position>770,350</position>
-            <value>Add Clause</value>
-        </button>
-
-        <textedit name="description">
-            <area>340,400,600,100</area>
-            <statetype name="background">
-                <state name="active">
-                    <shape name="background">
-                        <area>0,0,600,100</area>
-                        <fill color="#FFFFFF" alpha="180" />
-                    </shape>
-                </state>
-                <state name="selected" from="active">
-                    <shape name="background">
-                        <fill alpha="255" />
-                    </shape>
-                </state>
-                <state name="inactive" from="active" />
-            </statetype>
-            <imagetype name="cursor">
-                <filename>controls/cursor.png</filename>
-            </imagetype>
-            <textarea name="text">
-                <area>12,13,575,75</area>
-                <font>basesmallblack</font>
-                <multiline>yes</multiline>
+        <group name="rulecontrols">
+            <area>170,90,900,200</area>
+            <textarea name="ruleslabel" from="basetextarea">
+                <area>0,0,230,35</area>
+                <font>basemedium</font>
+                <align>right,vcenter</align>
+                <value>Existing Rules:</value>
             </textarea>
-        </textedit>
 
-        <button name="cancel" from="basebutton">
-            <position>100,630</position>
-            <value>Cancel</value>
-        </button>
+            <buttonlist name="rules" from="basewideselector">
+                <position>240,0</position>
+            </buttonlist>
 
-        <button name="delete" from="basebutton">
-            <position>388,630</position>
-            <value>Delete</value>
-        </button>
+            <textarea name="titlelabel" from="ruleslabel">
+                <position>0,60</position>
+                <value>Rule Name:</value>
+            </textarea>
 
-        <button name="test" from="basebutton">
-            <position>714,630</position>
-            <value>Test</value>
-        </button>
+            <textedit name="title" from="basetextedit">
+                <position>240,55</position>
+            </textedit>
 
-        <button name="install" from="basebutton">
-            <position>1027,630</position>
-            <value>Install</value>
-        </button>
+            <textarea name="prioritylabel" from="ruleslabel">
+                <position>0,120</position>
+                <value>Priority Change:</value>
+            </textarea>
+
+            <spinbox name="priority" from="basespinbox">
+                <position>240,120</position>
+            </spinbox>
+        </group>
+
+        <group name="clausecontrols">
+            <area>190,290,900,300</area>
+
+            <textarea name="clauseslabel" from="basetextarea">
+                <area>140,0,600,40</area>
+                <align>allcenter</align>
+                <font>basemedium</font>
+                <value>Select a clause from the list.</value>
+            </textarea>
+
+            <buttonlist name="clauses" from="basewideselector">
+                <position>30,55</position>
+            </buttonlist>
+
+            <button name="add" from="basebutton">
+                <position>645,48</position>
+                <value>Add Clause</value>
+            </button>
+
+            <textedit name="description" from="basetextedit">
+                <area>130,110,637,180</area>
+                <textarea name="text">
+                    <area>8,10,621,170</area>
+                    <multiline>true</multiline>
+                </textarea>
+            </textedit>
+        </group>
+
+        <group name="buttons">
+            <area>67,610,1145,60</area>
+
+            <button name="cancel" from="basebutton">
+                <position>0,0</position>
+                <value>Cancel</value>
+            </button>
+
+            <button name="delete" from="basebutton">
+                <position>307,0</position>
+                <value>Delete</value>
+            </button>
+
+            <button name="test" from="basebutton">
+                <position>614,0</position>
+                <value>Test</value>
+            </button>
+
+            <button name="install" from="basebutton">
+                <position>921,0</position>
+                <value>Install</value>
+            </button>
+        </group>
 
     </window>
 

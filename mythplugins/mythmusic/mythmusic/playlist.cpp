@@ -169,7 +169,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             }
 
             QMultiMap<int, Metadata*>::const_iterator i = songMap.constBegin();
-            while (i != songMap.constEnd()) 
+            while (i != songMap.constEnd())
             {
                 m_shuffledSongs.append(i.value());
                 ++i;
@@ -180,12 +180,12 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
 
         case MusicPlayer::SHUFFLE_INTELLIGENT:
         {
-            int RatingWeight = 2; 
-            int PlayCountWeight = 2; 
-            int LastPlayWeight = 2; 
-            int RandomWeight = 2; 
-            m_parent->FillIntelliWeights(RatingWeight, PlayCountWeight, 
-                                         LastPlayWeight, RandomWeight); 
+            int RatingWeight = 2;
+            int PlayCountWeight = 2;
+            int LastPlayWeight = 2;
+            int RandomWeight = 2;
+            m_parent->FillIntelliWeights(RatingWeight, PlayCountWeight,
+                                         LastPlayWeight, RandomWeight);
 
             // compute max/min playcount,lastplay for this playlist
             int playcountMin = 0;
@@ -271,7 +271,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             std::map<int,uint32_t> order;
             uint32_t orderCpt = 1;
             std::map<int,double>::iterator weightIt, weightEnd;
-            while (weights.size() > 0)
+            while (!weights.empty())
             {
                 double hit = totalWeights * (double)rand() / (double)RAND_MAX;
                 weightEnd = weights.end();
@@ -297,7 +297,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
 
             // copy the shuffled tracks to the shuffled song list
             QMultiMap<int, Metadata*>::const_iterator i = songMap.constBegin();
-            while (i != songMap.constEnd()) 
+            while (i != songMap.constEnd())
             {
                 m_shuffledSongs.append(i.value());
                 ++i;
@@ -328,7 +328,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
 
             // populate the sort id into the album map
             uint32_t album_count = 1;
-            for (Ialbum = album_map.begin(); Ialbum != album_map.end(); Ialbum++)
+            for (Ialbum = album_map.begin(); Ialbum != album_map.end(); ++Ialbum)
             {
                 Ialbum->second = album_count;
                 album_count++;
@@ -364,7 +364,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
 
             // copy the shuffled tracks to the shuffled song list
             QMultiMap<int, Metadata*>::const_iterator i = songMap.constBegin();
-            while (i != songMap.constEnd()) 
+            while (i != songMap.constEnd())
             {
                 m_shuffledSongs.append(i.value());
                 ++i;
@@ -395,7 +395,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
 
             // populate the sort id into the artist map
             uint32_t artist_count = 1;
-            for (Iartist = artist_map.begin(); Iartist != artist_map.end(); Iartist++)
+            for (Iartist = artist_map.begin(); Iartist != artist_map.end(); ++Iartist)
             {
                 Iartist->second = artist_count;
                 artist_count++;
@@ -431,7 +431,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
 
             // copy the shuffled tracks to the shuffled song list
             QMultiMap<int, Metadata*>::const_iterator i = songMap.constBegin();
-            while (i != songMap.constEnd()) 
+            while (i != songMap.constEnd())
             {
                 m_shuffledSongs.append(i.value());
                 ++i;
@@ -691,7 +691,7 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
             QStringList::iterator it = list.begin();
             bool bFound = false;
             QString tempList;
-            for (; it != list.end(); it++)
+            for (; it != list.end(); ++it)
             {
                 int an_int = (*it).toInt();
                 tempList += "," + QString(*it);
@@ -756,7 +756,7 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
             QStringList::iterator it = list.begin();
             bool bFound = false;
             QString tempList;
-            for (; it != list.end(); it++)
+            for (; it != list.end(); ++it)
             {
                 int an_int = QString(*it).toInt();
                 tempList += "," + QString(*it);
@@ -1042,7 +1042,7 @@ void Playlist::cdrecordData(int fd)
         return;
 
     QByteArray buf;
-    if (fd == 1) 
+    if (fd == 1)
     {
         buf = m_proc->ReadAll();
 
@@ -1050,7 +1050,7 @@ void Playlist::cdrecordData(int fd)
         // to update the same line, so I'm splitting it on \r or \n
         // Track 01:    6 of  147 MB written (fifo 100%) [buf  99%]  16.3x.
         QString data(buf);
-        QStringList list = data.split(QRegExp("[\\r\\n]"), 
+        QStringList list = data.split(QRegExp("[\\r\\n]"),
                                       QString::SkipEmptyParts);
 
         for (int i = 0; i < list.size(); i++)
@@ -1095,7 +1095,7 @@ void Playlist::mkisofsData(int fd)
         return;
 
     QByteArray buf;
-    if (fd == 1) 
+    if (fd == 1)
         buf = m_proc->ReadAll();
     else
     {
@@ -1240,16 +1240,16 @@ int Playlist::CreateCDMP3(void)
     args << "-R";
 
     uint flags = kMSRunShell | kMSStdErr | kMSBuffered |
-                 kMSDontDisableDrawing | kMSDontBlockInputDevs | 
+                 kMSDontDisableDrawing | kMSDontBlockInputDevs |
                  kMSRunBackground;
 
     m_proc = new MythSystem(command, args, flags);
 
-    connect(m_proc, SIGNAL(readDataReady(int)), this, SLOT(mkisofsData(int)), 
+    connect(m_proc, SIGNAL(readDataReady(int)), this, SLOT(mkisofsData(int)),
             Qt::DirectConnection);
-    connect(m_proc, SIGNAL(finished()),         this, SLOT(processExit()), 
+    connect(m_proc, SIGNAL(finished()),         this, SLOT(processExit()),
             Qt::DirectConnection);
-    connect(m_proc, SIGNAL(error(uint)),        this, SLOT(processExit(uint)), 
+    connect(m_proc, SIGNAL(error(uint)),        this, SLOT(processExit(uint)),
             Qt::DirectConnection);
 
     m_procExitVal = GENERIC_EXIT_RUNNING;
@@ -1295,7 +1295,7 @@ int Playlist::CreateCDMP3(void)
                 kMSRunBackground;
 
         m_proc = new MythSystem(command, args, flags);
-        connect(m_proc, SIGNAL(readDataReady(int)), 
+        connect(m_proc, SIGNAL(readDataReady(int)),
                 this, SLOT(cdrecordData(int)), Qt::DirectConnection);
         connect(m_proc, SIGNAL(finished()),
                 this, SLOT(processExit()), Qt::DirectConnection);

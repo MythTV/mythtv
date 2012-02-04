@@ -17,6 +17,7 @@
 #include "editmetadata.h"
 #include "musicplayer.h"
 #include "metaio.h"
+#include "musicutils.h"
 
 #include <mythdialogbox.h>
 #include <mythuitext.h>
@@ -403,17 +404,17 @@ void ImportMusicDialog::addPressed()
     if (m_tracks->at(m_currentTrack)->isNewTune)
     {
         // get the save filename - this also creates the correct directory stucture
-        QString saveFilename = Ripper::filenameFromMetadata(meta);
+        QString saveFilename = filenameFromMetadata(meta);
 
         // we need to manually copy the file extension
         QFileInfo fi(meta->Filename());
         saveFilename += "." + fi.suffix();
 
         // copy the file to the new location
-        if (!copyFile(meta->Filename(), saveFilename))
+        if (!copyFile(meta->Filename(), gMusicData->musicDir + saveFilename))
         {
             ShowOkPopup(tr("Copy Failed\nCould not copy file to: %1")
-                                                        .arg(saveFilename));
+                                                        .arg(gMusicData->musicDir + saveFilename));
             return;
         }
 
@@ -422,7 +423,7 @@ void ImportMusicDialog::addPressed()
         // do we need to update the tags?
         if (m_tracks->at(m_currentTrack)->metadataHasChanged)
         {
-            Decoder *decoder = Decoder::create(saveFilename, NULL, NULL, true);
+            Decoder *decoder = Decoder::create(gMusicData->musicDir + saveFilename, NULL, NULL, true);
             if (decoder)
             {
                 decoder->commitMetadata(meta);
@@ -444,8 +445,8 @@ void ImportMusicDialog::addPressed()
 
         m_somethingWasImported = true;
 
-        m_tracks->at(m_currentTrack)->isNewTune = Ripper::isNewTune(
-                meta->Artist(), meta->Album(), meta->Title());
+        m_tracks->at(m_currentTrack)->isNewTune = 
+                isNewTune(meta->Artist(), meta->Album(), meta->Title());
 
         // update the UI
         fillWidgets();
@@ -577,8 +578,8 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
                 {
                     TrackInfo * track = new TrackInfo;
                     track->metadata = metadata;
-                    track->isNewTune = Ripper::isNewTune(metadata->Artist(),
-                            metadata->Album(), metadata->Title());
+                    track->isNewTune = isNewTune(metadata->Artist(), metadata->Album(),
+                                                 metadata->Title());
                     track->metadataHasChanged = false;
                     tracks->push_back(track);
                     m_sourceFiles.append(filename);
@@ -618,7 +619,7 @@ void ImportMusicDialog::metadataChanged(void)
     Metadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
     m_tracks->at(m_currentTrack)->metadataHasChanged = true;
     m_tracks->at(m_currentTrack)->isNewTune =
-        Ripper::isNewTune(editMeta->Artist(), editMeta->Album(), editMeta->Title());
+            isNewTune(editMeta->Artist(), editMeta->Album(), editMeta->Title());
     fillWidgets();
 }
 
@@ -714,8 +715,8 @@ void ImportMusicDialog::setArtist(void)
     Metadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setArtist(m_defaultArtist);
 
-    m_tracks->at(m_currentTrack)->isNewTune = Ripper::isNewTune(
-            data->Artist(), data->Album(), data->Title());
+    m_tracks->at(m_currentTrack)->isNewTune =
+            isNewTune(data->Artist(), data->Album(), data->Title());
 
     fillWidgets();
 }
@@ -728,8 +729,8 @@ void ImportMusicDialog::setAlbum(void)
     Metadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setAlbum(m_defaultAlbum);
 
-    m_tracks->at(m_currentTrack)->isNewTune = Ripper::isNewTune(
-            data->Artist(), data->Album(), data->Title());
+    m_tracks->at(m_currentTrack)->isNewTune = 
+            isNewTune(data->Artist(), data->Album(), data->Title());
 
     fillWidgets();
 }
@@ -1063,7 +1064,7 @@ void ImportCoverArtDialog::updateStatus()
         m_coverartImage->SetFilename(m_filelist[m_currentFile]);
         m_coverartImage->Load();
 
-        QString saveFilename = Ripper::filenameFromMetadata(m_metadata, false);
+        QString saveFilename = gMusicData->musicDir + filenameFromMetadata(m_metadata, false);
         QFileInfo fi(saveFilename);
         QString saveDir = fi.absolutePath();
 

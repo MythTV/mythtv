@@ -9,29 +9,19 @@
 
 class MythUIHelper;
 
-class MPUBLIC XMLParse
+class XMLParse
 {
   public:
     XMLParse();
    ~XMLParse();
 
+  protected:
     fontProp *GetFont(const QString &, bool checkGlobal = true);
     LayerSet *GetSet(const QString &text);
-
     void SetWMult(double wm) { wmult = wm; }
     void SetHMult(double hm) { hmult = hm; }
-    void SetFontSizeType(QString s) { fontSizeType = s; }
 
     bool LoadTheme(QDomElement &, QString, QString sf = "");
-    QString getFirstText(QDomElement &);
-    void parseFont(QDomElement &);
-    void normalizeRect(QRect &);
-    QPoint parsePoint(QString);
-    QRect parseRect(QString);
-    void parsePopup(QDomElement &);
-    void parseContainer(QDomElement &, QString &, int &, QRect &);
-    void parseKeyboard(LayerSet *, QDomElement &);
-    void parseKey(LayerSet *, QDomElement &);
 
   private:
     bool doLoadTheme(QDomElement &, QString, QString);
@@ -39,12 +29,24 @@ class MPUBLIC XMLParse
     QMap<QString, LayerSet*> layerMap;
     vector<LayerSet *> *allTypes;
 
+    QString getFirstText(QDomElement &);
+    void parseFont(QDomElement &);
+    void normalizeRect(QRect &);
+    QPoint parsePoint(QString);
+    QRect parseRect(QString);
+    void parseContainer(QDomElement &, QString &, int &, QRect &);
+    void parseKeyboard(LayerSet *, QDomElement &);
+    void parseKey(LayerSet *, QDomElement &);
+
     double wmult;
     double hmult;
 
     QString fontSizeType;
 
     MythUIHelper *ui;
+
+    friend class MythThemedDialog;
+    friend class MythDialog;
 };
 
 #endif

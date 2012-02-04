@@ -69,6 +69,7 @@ void StorageGroup::StaticInit(void)
     m_builtinGroups["Themes"] = GetConfDir() + "/themes";
     m_builtinGroups["Temp"] = GetConfDir() + "/tmp";
     m_builtinGroups["Streaming"] = GetConfDir() + "/tmp/hls";
+    m_builtinGroups["3rdParty"] = GetConfDir() + "/3rdParty";
 
     QMap<QString, QString>::iterator it = m_builtinGroups.begin();
     for (; it != m_builtinGroups.end(); ++it)
@@ -183,6 +184,20 @@ void StorageGroup::Init(const QString group, const QString hostname,
         LOG(VB_GENERAL, LOG_ERR, LOC + msg);
         m_dirlist << tmpDir;
     }
+}
+
+QString StorageGroup::GetFirstDir(bool appendSlash) const
+{
+    if (m_dirlist.isEmpty())
+        return QString();
+
+    QString tmp = m_dirlist[0];
+    tmp.detach();
+
+    if (appendSlash)
+        tmp += "/";
+
+    return tmp;
 }
 
 QStringList StorageGroup::GetDirFileList(QString dir, QString base,
@@ -640,10 +655,10 @@ QString StorageGroup::FindFileDir(QString filename)
 QString StorageGroup::FindNextDirMostFree(void)
 {
     QString nextDir;
-    long long nextDirFree = 0;
-    long long thisDirTotal;
-    long long thisDirUsed;
-    long long thisDirFree;
+    int64_t nextDirFree = 0;
+    int64_t thisDirTotal;
+    int64_t thisDirUsed;
+    int64_t thisDirFree;
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("FindNextDirMostFree: Starting"));
 

@@ -191,7 +191,6 @@ class MTV_PUBLIC CardUtil
                                           const QString &audiodevice,
                                           const QString &vbidevice,
                                           const QString &cardtype,
-                                          const QString &defaultinput,
                                           const uint audioratelimit,
                                           const QString &hostname,
                                           const uint dvb_swfilter,
@@ -259,8 +258,6 @@ class MTV_PUBLIC CardUtil
                                        QString &inputname);
     static bool         SetStartChannel(uint cardinputid,
                                         const QString &channum);
-    static bool         SetStartInput(uint cardid,
-                                      const QString &inputname);
 
     // Input creation and deletion
     static int           CreateCardInput(const uint cardid,
@@ -275,14 +272,16 @@ class MTV_PUBLIC CardUtil
                                          const QString &displayname,
                                          bool  dishnet_eit,
                                          const uint recpriority,
-                                         const uint quicktune);
+                                         const uint quicktune,
+                                         const uint schedorder,
+                                         const uint livetvorder);
 
     static bool         DeleteInput(uint inputid);
 
     // Other input functions
 
     static vector<uint> GetCardIDs(uint sourceid);
-    static QString      GetDefaultInput(uint cardid);
+    static QString      GetStartInput(uint cardid);
     static QStringList  GetInputNames(uint cardid, uint sourceid = 0);
     static bool         GetInputInfo(InputInfo &info,
                                      vector<uint> *groupids = NULL);

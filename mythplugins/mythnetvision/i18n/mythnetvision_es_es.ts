@@ -217,24 +217,24 @@
         <translation>Descargando Vídeo...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1196"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1199"/>
         <source>Updating RSS.  This could take a while...</source>
         <translation>Actualizando RSS.  Esto puede tardar un poco...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1211"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1214"/>
         <source>Updating Site Maps.  This could take a while...</source>
         <translation>Actualizando Mapas de Sitio.  Esto puede tardar un poco...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1301"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1304"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation>Descargando Vídeo...
 (%1 de %2 MB)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1327"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1330"/>
         <source>Error downloading video to backend.</source>
         <translation>Error al descargar el vídeo al servidor.</translation>
     </message>

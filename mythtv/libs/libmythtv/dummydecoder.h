@@ -19,7 +19,7 @@ class DummyDecoder : public DecoderBase
     virtual int OpenFile(RingBuffer *, bool, char *, int) { return 0; }
     virtual bool GetFrame(DecodeType) { usleep(10000); return false; }
 
-    virtual bool isLastFrameKey(void) { return true; }
+    virtual bool IsLastFrameKey(void) const { return true; } // DecoderBase
     virtual void WriteStoredData(RingBuffer *, bool, long) {}
 
     virtual long UpdateStoredFrameNum(long) { return 0; }

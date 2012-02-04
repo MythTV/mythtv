@@ -68,6 +68,7 @@ class MUI_PUBLIC MythUIButtonListItem
     QString GetImage(const QString &name="") const;
 
     void DisplayState(const QString &state, const QString &name);
+    void SetStatesFromMap(const QMap<QString, QString> &stateMap);
 
     bool checkable() const;
     void setCheckable(bool flag);

@@ -87,7 +87,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void ShiftCanvas(int x, int y);
 
     bool Layout(QString & paragraph, QTextLayout *layout,
-		bool & overflow, qreal width, qreal & height,
+		bool & overflow, qreal width, qreal & height, bool force,
 		qreal & last_line_width, QRectF & min_rect, int & num_lines);
     bool LayoutParagraphs(const QStringList & paragraphs,
 			  const QTextOption & textoption,

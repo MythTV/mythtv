@@ -19,6 +19,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 #ifndef IMN_PIM
 #include "BasicUsageEnvironment.hh"
+#include <stdlib.h> // for exit()
 #include <stdio.h>
 
 ////////// BasicUsageEnvironment //////////

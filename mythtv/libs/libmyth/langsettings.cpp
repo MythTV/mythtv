@@ -103,7 +103,7 @@ void LanguageSelection::Load(void)
              QString("System Locale (%1), Country (%2), Language (%3)")
                      .arg(localeCode).arg(countryCode).arg(langCode));
 
-    CodeToNameMap langMap = MythTranslation::getLanguages();
+    QMap<QString,QString> langMap = MythTranslation::getLanguages();
     QStringList langs = langMap.values();
     langs.sort();
     MythUIButtonListItem *item;
@@ -130,7 +130,7 @@ void LanguageSelection::Load(void)
     if (!foundLanguage)
         m_languageList->SetValueByData("en_US");
 
-    CodeToNameMap localesMap = GetISO3166EnglishCountryMap();
+    ISO3166ToNameMap localesMap = GetISO3166EnglishCountryMap();
     QStringList locales = localesMap.values();
     locales.sort();
     for (QStringList::Iterator it = locales.begin(); it != locales.end();

@@ -35,10 +35,6 @@ using namespace std;
 #include "editmetadata.h"
 #include "playlist.h"
 
-#ifndef USING_MINGW
-#include "cddecoder.h"
-#endif // USING_MINGW
-
 #include "musiccommon.h"
 #include "playlistview.h"
 #include "playlisteditorview.h"
@@ -204,27 +200,20 @@ bool MusicCommon::CreateCommon(void)
         updateUIPlaylist();
     }
 
-    m_visualModes = MainVisual::Visualizations(true);
-
-    if (m_visualizerVideo && m_visualModes.count() == 0)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, QString("MusicCommon: Theme has a visualiser but none found - disabling"));
-        m_visualizerVideo = NULL;
-    }
-
     if (m_visualizerVideo)
     {
         // Warm up the visualizer
         m_mainvisual = new MainVisual(m_visualizerVideo);
+        m_visualModes = m_mainvisual->getVisualizations();
 
         m_fullscreenBlank = false;
 
         m_randomVisualizer = gCoreContext->GetNumSetting("VisualRandomize", 0);
 
-        m_currentVisual = MainVisual::currentVisualizer;
+        m_currentVisual = m_mainvisual->getCurrentVisual();
 
         // sanity check
-        if (m_currentVisual >= m_visualModes.count())
+        if (m_currentVisual >= static_cast<uint>(m_visualModes.count()))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("MusicCommon: Got a bad saved visualizer: %1").arg(m_currentVisual));
             m_currentVisual = 0;
@@ -291,7 +280,7 @@ bool MusicCommon::CreateCommon(void)
         m_playlistProgress->SetTotal(m_playlistMaxTime);
         m_playlistProgress->SetUsed(0);
     }
- 
+
     updatePlaylistStats();
 
     return err;
@@ -930,7 +919,7 @@ void MusicCommon::stop(void)
     if (m_timeText)
         m_timeText->SetText(time_string);
     if (m_infoText)
-        m_infoText->SetText("");
+        m_infoText->Reset();
 }
 
 void MusicCommon::next()
@@ -1100,7 +1089,10 @@ void MusicCommon::customEvent(QEvent *event)
     else if (event->type() == OutputEvent::Info)
     {
 
-        OutputEvent *oe = (OutputEvent *) event;
+        OutputEvent *oe = dynamic_cast<OutputEvent *>(event);
+
+        if (!oe)
+            return;
 
         int rs;
         m_currentTime = rs = oe->elapsedSeconds();
@@ -1114,7 +1106,7 @@ void MusicCommon::customEvent(QEvent *event)
         {
             if (LCD *lcd = LCD::Get())
             {
-                float percent_heard = m_maxTime <= 0 ? 
+                float percent_heard = m_maxTime <= 0 ?
                     0.0:((float)rs / (float)curMeta->Length()) * 1000.0;
 
                 QString lcd_time_string = time_string;
@@ -1156,17 +1148,17 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == OutputEvent::Error)
     {
-        statusString = tr("Output error.");
+        OutputEvent *aoe = dynamic_cast<OutputEvent *>(event);
 
-        OutputEvent *aoe = (OutputEvent *) event;
+        if (!aoe)
+            return;
+
+        statusString = tr("Output error.");
 
         LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*aoe->errorMessage()));
-        //TODO change to mythui
-        MythPopupBox::showOkPopup(GetMythMainWindow(),
-                                    statusString,
-                                    QString("MythMusic has encountered the following error:\n%1")
-                                    .arg(*aoe->errorMessage()));
+        ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
+                    .arg(*aoe->errorMessage()));
         stopAll();
     }
     else if (event->type() == OutputEvent::Stopped)
@@ -1199,7 +1191,10 @@ void MusicCommon::customEvent(QEvent *event)
 
         statusString = tr("Decoder error.");
 
-        DecoderEvent *dxe = (DecoderEvent *) event;
+        DecoderEvent *dxe = dynamic_cast<DecoderEvent *>(event);
+
+        if (!dxe)
+            return;
 
         LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*dxe->errorMessage()));
@@ -1209,7 +1204,10 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+
+        if (!dce)
+            return;
 
         // make sure the user didn't ESCAPE out of the menu
         if (dce->GetResult() < 0)
@@ -1449,7 +1447,11 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::TrackChangeEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         int trackNo = mpe->TrackID;
 
         if (m_currentPlaylist)
@@ -1497,7 +1499,11 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::TrackRemovedEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         int trackID = mpe->TrackID;
 
         if (m_currentPlaylist)
@@ -1532,7 +1538,11 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::TrackAddedEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         int trackID = mpe->TrackID;
 
         if (m_currentPlaylist)
@@ -1586,7 +1596,11 @@ void MusicCommon::customEvent(QEvent *event)
     else if (event->type() == MusicPlayerEvent::MetadataChangedEvent ||
              event->type() == MusicPlayerEvent::TrackStatsChangedEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         uint trackID = mpe->TrackID;
 
         if (m_currentPlaylist)
@@ -1615,7 +1629,11 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::AlbumArtChangedEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         uint trackID = mpe->TrackID;
 
         if (m_currentPlaylist)
@@ -1693,7 +1711,7 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
 {
     if (!mdata)
     {
-        MetadataMap metadataMap; 
+        MetadataMap metadataMap;
         Metadata metadata;
         metadata.toMap(metadataMap);
         metadata.toMap(metadataMap, "next");
@@ -1704,9 +1722,9 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
         if (m_ratingState)
             m_ratingState->DisplayState("0");
         if (m_timeText)
-            m_timeText->SetText("");
+            m_timeText->Reset();
         if (m_infoText)
-            m_infoText->SetText("");
+            m_infoText->Reset();
         if (m_trackProgress)
             m_trackProgress->SetUsed(0);
 
@@ -1719,8 +1737,8 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
     m_maxTime = mdata->Length() / 1000;
 
     // get map for current track
-    MetadataMap metadataMap; 
-    mdata->toMap(metadataMap); 
+    MetadataMap metadataMap;
+    mdata->toMap(metadataMap);
 
     // add the map from the next track
     Metadata *nextMetadata = gPlayer->getNextMetadata();
@@ -1728,7 +1746,7 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
         nextMetadata->toMap(metadataMap, "next");
 
     // now set text using the map
-    SetTextFromMap(metadataMap); 
+    SetTextFromMap(metadataMap);
 
     if (m_coverartImage)
     {
@@ -1865,7 +1883,7 @@ void MusicCommon::updateUIPlayedList(void)
     for (int x = playedList.count(); x > 0; x--)
     {
         Metadata *mdata = &playedList[x-1];
-        MythUIButtonListItem *item = 
+        MythUIButtonListItem *item =
             new MythUIButtonListItem(m_playedTracksList, "");
 
         MetadataMap metadataMap;
@@ -2323,7 +2341,7 @@ void MusicCommon::doUpdatePlaylist(void)
     {
         // update playlist from quick playlist
         gMusicData->all_playlists->getActive()->fillSonglistFromQuery(
-                    m_whereClause, m_playlistOptions.removeDups, 
+                    m_whereClause, m_playlistOptions.removeDups,
                     m_playlistOptions.insertPLOption, curTrackID);
         m_whereClause.clear();
     }
@@ -2331,7 +2349,7 @@ void MusicCommon::doUpdatePlaylist(void)
     {
         // update playlist from song list (from the playlist editor)
         gMusicData->all_playlists->getActive()->fillSonglistFromList(
-                    m_songList, m_playlistOptions.removeDups, 
+                    m_songList, m_playlistOptions.removeDups,
                     m_playlistOptions.insertPLOption, curTrackID);
 
         m_songList.clear();

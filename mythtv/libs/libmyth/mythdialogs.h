@@ -15,7 +15,6 @@
 #include <vector>
 using namespace std;
 
-class GenericTree;
 class MythMediaDevice;
 class MythLineEdit;
 class MythRemoteLineEdit;
@@ -154,9 +153,6 @@ class MPUBLIC MythPopupBox : public MythDialog
                             const QString  &message,
                             QString         button_msg = QString());
 
-    static bool showOkCancelPopup(MythMainWindow *parent, QString title,
-                                  QString message, bool focusOk);
-
     static DialogCode Show2ButtonPopup(
         MythMainWindow *parent,
         const QString &title, const QString &message,
@@ -199,9 +195,6 @@ class MPUBLIC MythPopupBox : public MythDialog
  *  the screen. This is used when you have a known set of steps to
  *  perform and the possibility of calling the \p setProgress call at
  *  the end of each step.
- *
- *  If you do not know the number of steps, use \p MythBusyDialog
- *  instead.
  *
  *  The dialog widget also updates the LCD display if present.
  *
@@ -261,69 +254,11 @@ class MPUBLIC MythProgressDialog: public MythDialog
     int m_totalSteps;
 };
 
-/** MythDialog box that displays a busy spinner-style dialog box to
-    indicate the program is busy, but that the number of steps needed
-    is unknown.
-
-    Ie. used by MythMusic when scanning the filesystem for musicfiles.
-
- \deprecated Due for removal, use libmythui's MythUIBusyDialog instead
- */
-class MPUBLIC MythBusyDialog : public MythProgressDialog
-{
-    Q_OBJECT
-
-  public:
-    /** \brief Create the busy indicator.
-
-        Creates the dialog widget and sets up the timer that causes
-        the widget to indicate progress every 100msec;
-
-        \param title the title to appear in the progress bar dialog
-        \param cancelButton display cancel button
-        \param target target for cancel signal
-        \param slot slot for cancel signal
-        \deprecated Due for removal, use libmythui's MythUIBusyDialog instead
-     */
-    MythBusyDialog(const QString &title,
-                   bool cancelButton = false,
-                   const QObject * target = NULL,
-                   const char * slot = NULL);
-
-    /** \brief Setup a timer to 'move' the spinner
-
-        This will create a \p QTimer object that will update the
-        spinner ever \p interval msecs.
-
-        \param interval msecs between movement, default is 100
-    */
-    void start(int interval = 100);
-
-    /** \brief Close the dialog.
-
-        This will close the dialog and stop the timer.
-    */
-    void Close();
-
-  public slots:
-    virtual void deleteLater(void);
-
-  protected slots:
-    void setProgress();
-    void timeout();
-
-  protected:
-    void Teardown(void);
-    ~MythBusyDialog();
-
-  private:
-    QTimer *timer;
-};
 
 /*!
  * \deprecated Due for removal, use libmythui's MythScreenType instead
  */
-class MPUBLIC MythThemedDialog : public MythDialog
+class MythThemedDialog : public MythDialog
 {
     Q_OBJECT
 
@@ -341,7 +276,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     virtual void loadWindow(QDomElement &);
     virtual void parseContainer(QDomElement &);
     virtual void parseFont(QDomElement &);
-    virtual void parsePopup(QDomElement &);
     bool buildFocusList();
 
     UIType *getUIObject(const QString &name);

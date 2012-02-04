@@ -1200,11 +1200,11 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
                                                                     kAddYear);
 
     metadataMap["userrating"] = GetDisplayUserRating(GetUserRating());
-    metadataMap["season"] = GetDisplaySeasonEpisode(GetSeason(), 1);
-    metadataMap["episode"] = GetDisplaySeasonEpisode(GetEpisode(), 1);
 
     if (GetSeason() > 0 || GetEpisode() > 0)
     {
+        metadataMap["season"] = GetDisplaySeasonEpisode(GetSeason(), 1);
+        metadataMap["episode"] = GetDisplaySeasonEpisode(GetEpisode(), 1);
         metadataMap["s##e##"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
                                              (GetSeason(), 2))
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
@@ -1213,7 +1213,10 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
     }
     else
+    {
         metadataMap["s##e##"] = metadataMap["##x##"] = QString();
+        metadataMap["season"] = metadataMap["episode"] = QString();
+    }
 
     metadataMap["trailerstate"] = TrailerToState(GetTrailer());
     metadataMap["userratingstate"] =

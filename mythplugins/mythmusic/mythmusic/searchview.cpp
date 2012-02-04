@@ -15,9 +15,10 @@
 #include "searchview.h"
 
 SearchView::SearchView(MythScreenStack *parent)
-         :MusicCommon(parent, "searchview")
+         :MusicCommon(parent, "searchview"),
+            m_playTrack(false), m_fieldList(NULL), m_criteriaEdit(NULL),
+            m_matchesText(NULL), m_tracksList(NULL)
 {
-    m_playTrack = false;
     m_currentView = MV_SEARCH;
 }
 
@@ -71,7 +72,7 @@ bool SearchView::Create(void)
     connect(m_tracksList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(trackClicked(MythUIButtonListItem*)));
 
-    connect(m_tracksList, SIGNAL(itemVisible(MythUIButtonListItem*)), 
+    connect(m_tracksList, SIGNAL(itemVisible(MythUIButtonListItem*)),
             this, SLOT(trackVisible(MythUIButtonListItem*)));
 
     connect(m_criteriaEdit, SIGNAL(valueChanged()), this, SLOT(criteriaChanged()));
@@ -88,7 +89,11 @@ void SearchView::customEvent(QEvent *event)
     if (event->type() == MusicPlayerEvent::TrackRemovedEvent ||
         event->type() == MusicPlayerEvent::TrackAddedEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         int trackID = mpe->TrackID;
 
         for (int x = 0; x < m_tracksList->GetCount(); x++)
@@ -131,7 +136,11 @@ void SearchView::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::MetadataChangedEvent)
     {
-        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
         uint trackID = mpe->TrackID;
 
         for (int x = 0; x < m_tracksList->GetCount(); x++)
@@ -151,7 +160,10 @@ void SearchView::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent *>(event);
+
+        if (!dce)
+            return;
 
         // make sure the user didn't ESCAPE out of the menu
         if (dce->GetResult() < 0)
@@ -376,7 +388,7 @@ void SearchView::updateTracksList(void)
                 //TODO add tag query
             }
             case 0: // all fields
-            default: 
+            default:
             {
                 sql = "SELECT song_id "
                       "FROM music_songs "

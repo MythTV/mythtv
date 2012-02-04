@@ -24,7 +24,7 @@
 
 MusicGenericTree::MusicGenericTree(MusicGenericTree *parent,
                                    const QString &name, const QString &action,
-                                   MythUIButtonListItem::CheckState check, 
+                                   MythUIButtonListItem::CheckState check,
                                    bool showArrow)
                  : MythGenericTree(name)
 {
@@ -89,14 +89,11 @@ MythUIButtonListItem *MusicGenericTree::CreateListButton(MythUIButtonList *list)
 #define LOC_ERR  QString("PlaylistEditorView, Error: ")
 
 PlaylistEditorView::PlaylistEditorView(MythScreenStack *parent, const QString &layout, bool restorePosition)
-         :MusicCommon(parent, "playlisteditorview")
+         :MusicCommon(parent, "playlisteditorview"),
+            m_layout(layout), m_restorePosition(restorePosition),
+            m_rootNode(NULL), m_playlistTree(NULL), m_breadcrumbsText(NULL),
+            m_positionText(NULL)
 {
-    m_rootNode = NULL;
-    m_playlistTree = NULL;
-
-    m_layout = layout;
-    m_restorePosition = restorePosition;
-
     gCoreContext->SaveSetting("MusicPlaylistEditorView", layout);
 }
 
@@ -161,11 +158,11 @@ bool PlaylistEditorView::Create(void)
         restoreTreePosition(route);
     }
 
-    connect(m_playlistTree, SIGNAL(itemClicked(MythUIButtonListItem*)), 
+    connect(m_playlistTree, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(treeItemClicked(MythUIButtonListItem*)));
-    connect(m_playlistTree, SIGNAL(nodeChanged(MythGenericTree*)), 
+    connect(m_playlistTree, SIGNAL(nodeChanged(MythGenericTree*)),
             this, SLOT(treeNodeChanged(MythGenericTree*)));
-    connect(m_playlistTree, SIGNAL(itemVisible(MythUIButtonListItem*)), 
+    connect(m_playlistTree, SIGNAL(itemVisible(MythUIButtonListItem*)),
             this, SLOT(treeItemVisible(MythUIButtonListItem*)));
 
     BuildFocusList();
@@ -306,7 +303,7 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                         QString name = mnode->getString();
 
                         ShowOkPopup(QString("Are you sure you want to delete this Smart Playlist?\n"
-                                            "Category: %1 - Name: %2").arg(category).arg(name), 
+                                            "Category: %1 - Name: %2").arg(category).arg(name),
                                     this, SLOT(deleteSmartPlaylist(bool)), true);
                         handled = true;
                     }
@@ -315,7 +312,7 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                         QString name = mnode->getString();
 
                         ShowOkPopup(QString("Are you sure you want to delete this Playlist?\n"
-                                            "Name: %1").arg(name), 
+                                            "Name: %1").arg(name),
                                     this, SLOT(deletePlaylist(bool)), true);
                         handled = true;
                     }
@@ -723,7 +720,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             Metadata *mdata = tracks->at(x);
             if (mdata)
             {
-                QString ratingStr = tr("%n Star(s)", "", mdata->Rating()); 
+                QString ratingStr = tr("%n Star(s)", "", mdata->Rating());
                 if (map.contains(ratingStr))
                 {
                     MetadataPtrList *filteredTracks = map.value(ratingStr);
@@ -780,7 +777,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         }
 
     }
-    else if (node->getAction() == "artist" || node->getAction() == "album" || 
+    else if (node->getAction() == "artist" || node->getAction() == "album" ||
              node->getAction() == "genre" || node->getAction() == "rating" ||
              node->getAction() == "year")
     {

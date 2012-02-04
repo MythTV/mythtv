@@ -82,6 +82,7 @@ using namespace std;
 #endif
 
 #define GESTURE_TIMEOUT 1000
+#define STANDBY_TIMEOUT 30 // Minutes
 
 #define LOC      QString("MythMainWindow: ")
 
@@ -158,6 +159,7 @@ class MythMainWindowPrivate
 
         sysEventHandler(NULL),
 
+        drawInterval(1000 / 70),
         drawTimer(NULL),
         mainStack(NULL),
 
@@ -183,7 +185,10 @@ class MythMainWindowPrivate
 
         m_udpListener(NULL),
 
-        m_pendingUpdate(false)
+        m_pendingUpdate(false),
+
+        idleTimer(NULL),
+        standby(false)
     {
     }
 
@@ -235,6 +240,7 @@ class MythMainWindowPrivate
 
     QObject *sysEventHandler;
 
+    int drawInterval;
     MythSignalingTimer *drawTimer;
     QVector<MythScreenStack *> stackList;
     MythScreenStack *mainStack;
@@ -270,6 +276,9 @@ class MythMainWindowPrivate
     MythUDPListener *m_udpListener;
 
     bool m_pendingUpdate;
+
+    QTimer *idleTimer;
+    bool standby;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -479,7 +488,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     connect(d->hideMouseTimer, SIGNAL(timeout()), SLOT(HideMouseTimeout()));
 
     d->drawTimer = new MythSignalingTimer(this, SLOT(animate()));
-    d->drawTimer->start(1000 / 70);
+    d->drawTimer->start(d->drawInterval);
 
     d->AllowInput = true;
 
@@ -490,6 +499,20 @@ MythMainWindow::MythMainWindow(const bool useDB)
     connect(this, SIGNAL(signalRemoteScreenShot(QString,int,int)),
             this, SLOT(doRemoteScreenShot(QString,int,int)),
             Qt::BlockingQueuedConnection);
+
+    // We need to listen for playback start/end events
+    gCoreContext->addListener(this);
+
+    int idletime = gCoreContext->GetNumSetting("FrontendIdleTimeout",
+                                               STANDBY_TIMEOUT);
+    if (idletime <= 0)
+        idletime = STANDBY_TIMEOUT;
+
+    d->idleTimer = new QTimer(this);
+    d->idleTimer->setSingleShot(true);
+    d->idleTimer->setInterval(1000 * 60 * idletime); // 30 minutes
+    connect(d->idleTimer, SIGNAL(timeout()), SLOT(IdleTimeout()));
+    d->idleTimer->start();
 }
 
 MythMainWindow::~MythMainWindow()
@@ -1845,7 +1868,7 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
                                  const QString &director, int season,
                                  int episode, const QString &inetref,
                                  int lenMins, const QString &year,
-                                 const QString &id)
+                                 const QString &id, bool useBookmarks)
 {
     QString lhandler(handler);
     if (lhandler.isEmpty())
@@ -1855,8 +1878,9 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
     if (d->mediaPluginMap.count(lhandler))
     {
         d->mediaPluginMap[lhandler].playFn(mrl, plot, title, subtitle,
-                                          director, season, episode,
-                                          inetref, lenMins, year, id);
+                                           director, season, episode,
+                                           inetref, lenMins, year, id,
+                                           useBookmarks);
         return true;
     }
 
@@ -1865,20 +1889,12 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
 
 void MythMainWindow::HandleTVPower(bool poweron)
 {
-    if (poweron)
-    {
 #ifdef USING_LIBCEC
-        if (d->cecAdapter)
-            d->cecAdapter->Action(ACTION_TVPOWERON);
+    if (d->cecAdapter)
+        d->cecAdapter->Action((poweron) ? ACTION_TVPOWERON : ACTION_TVPOWEROFF);
+#else
+    (void) poweron;
 #endif
-    }
-    else
-    {
-#ifdef USING_LIBCEC
-        if (d->cecAdapter)
-            d->cecAdapter->Action(ACTION_TVPOWEROFF);
-#endif
-    }
 }
 
 void MythMainWindow::AllowInput(bool allow)
@@ -1915,6 +1931,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
     {
         case QEvent::KeyPress:
         {
+            ResetIdleTimer();
             QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
 
             // Work around weird GCC run-time bug. Only manifest on Mac OS X
@@ -1950,6 +1967,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         }
         case QEvent::MouseButtonPress:
         {
+            ResetIdleTimer();
             ShowMouseCursor(true);
             if (!d->gesture.recording())
             {
@@ -1965,6 +1983,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         }
         case QEvent::MouseButtonRelease:
         {
+            ResetIdleTimer();
             ShowMouseCursor(true);
             if (d->gestureTimer->isActive())
                 d->gestureTimer->stop();
@@ -2046,6 +2065,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         }
         case QEvent::MouseMove:
         {
+            ResetIdleTimer();
             ShowMouseCursor(true);
             if (d->gesture.recording())
             {
@@ -2060,6 +2080,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         }
         case QEvent::Wheel:
         {
+            ResetIdleTimer();
             ShowMouseCursor(true);
             QWheelEvent* qmw = dynamic_cast<QWheelEvent*>(e);
             int delta = qmw->delta();
@@ -2303,7 +2324,7 @@ void MythMainWindow::customEvent(QEvent *ce)
                     me->ExtraData(3), me->ExtraData(4),
                     me->ExtraData(5).toInt(), me->ExtraData(6).toInt(),
                     me->ExtraData(7), me->ExtraData(8).toInt(),
-                    me->ExtraData(9), me->ExtraData(10));
+                    me->ExtraData(9), me->ExtraData(10), true);
             else
                 LOG(VB_GENERAL, LOG_ERR, "Failed to handle media");
         }
@@ -2331,6 +2352,14 @@ void MythMainWindow::customEvent(QEvent *ce)
                  GetMythDB()->GetSetting("menutheme", "defaultmenu"));
             state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
             MythUIStateTracker::SetState(state);
+        }
+        else if (message.startsWith("PLAYBACK_START"))
+        {
+            PauseIdleTimer(true);
+        }
+        else if (message.startsWith("PLAYBACK_END"))
+        {
+            PauseIdleTimer(false);
         }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)
@@ -2456,6 +2485,11 @@ void MythMainWindow::SetUIScreenRect(QRect &rect)
     d->uiScreenRect = rect;
 }
 
+int MythMainWindow::GetDrawInterval() const
+{
+    return d->drawInterval;
+}
+
 void MythMainWindow::StartLIRC(void)
 {
 #ifdef USE_LIRC
@@ -2525,5 +2559,52 @@ void MythMainWindow::HideMouseTimeout(void)
 {
     ShowMouseCursor(false);
 }
+
+void MythMainWindow::ResetIdleTimer(void)
+{
+    // If the timer isn't active then it's been paused
+    if (!d->idleTimer->isActive() && !d->standby)
+        return;
+
+    if (d->standby)
+        ExitStandby();
+
+    d->idleTimer->start();
+}
+
+void MythMainWindow::PauseIdleTimer(bool pause)
+{
+    if (pause)
+        d->idleTimer->stop();
+    else
+        d->idleTimer->start();
+
+    ResetIdleTimer();
+}
+
+void MythMainWindow::IdleTimeout(void)
+{
+    EnterStandby();
+}
+
+void MythMainWindow::EnterStandby()
+{
+    int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
+                                                  STANDBY_TIMEOUT);
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode after "
+                                        "%1 minutes of inactivity")
+                                        .arg(idletimeout));
+    //JumpTo("Main Menu");
+    d->standby = true;
+    gCoreContext->AllowShutdown();
+}
+
+void MythMainWindow::ExitStandby()
+{
+    LOG(VB_GENERAL, LOG_NOTICE, "Leaving standby mode");
+    d->standby = false;
+    gCoreContext->BlockShutdown();
+}
+
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

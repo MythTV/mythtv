@@ -181,17 +181,17 @@ Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcad
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="65"/>
+        <location filename="../mythbrowser/main.cpp" line="66"/>
         <source>Move to next browser tab</source>
         <translation>Ir a la siguiente pestaña</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="67"/>
+        <location filename="../mythbrowser/main.cpp" line="68"/>
         <source>Move to previous browser tab</source>
         <translation>Ir a la pestaña previa</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="70"/>
+        <location filename="../mythbrowser/main.cpp" line="71"/>
         <source>Internal Web Browser</source>
         <translation>Navegador Web Interno</translation>
     </message>

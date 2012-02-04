@@ -122,16 +122,9 @@ void XmlSerializer::AddProperty( const QString       &sName,
                                  const QMetaObject   *pMetaParent,
                                  const QMetaProperty *pMetaProp )
 {
-    if (sName != "Description")
-    {
-        m_pXmlWriter->writeStartElement( sName );
-
-        RenderValue( GetContentName( sName, pMetaParent, pMetaProp ), vValue );
-
-        m_pXmlWriter->writeEndElement();
-    }
-    else
-        RenderValue( sName, vValue );
+    m_pXmlWriter->writeStartElement( sName );
+    RenderValue( GetContentName( sName, pMetaParent, pMetaProp ), vValue );
+    m_pXmlWriter->writeEndElement();
 }
 
 //////////////////////////////////////////////////////////////////////////////

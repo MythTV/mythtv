@@ -36,8 +36,6 @@ enum HDHRTuneMode {
     hdhrTuneModeVChannel
 };
 
-typedef QMap<uint,int> FilterMap;
-
 // Note : This class never uses a DRB && always uses a TS reader.
 
 // locking order

@@ -60,7 +60,7 @@ class VideoOutputVDPAU : public VideoOutput
         { return codec_is_vdpau(video_codec_id); }
     virtual bool hasHWAcceleration(void) const
         { return codec_is_vdpau(video_codec_id); }
-    virtual MythPainter* GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
+    virtual MythPainter *GetOSDPainter(void);
     virtual bool GetScreenShot(int width = 0, int height = 0,
                                QString filename = "");
 

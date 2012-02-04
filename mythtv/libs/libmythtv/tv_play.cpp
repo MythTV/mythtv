@@ -235,16 +235,53 @@ static void multi_lock(QMutex *mutex0, ...)
     }
 }
 
+QMutex* TV::gTVLock = new QMutex();
+TV*     TV::gTV     = NULL;
+
+bool TV::IsTVRunning(void)
+{
+    QMutexLocker locker(gTVLock);
+    return gTV;
+}
+
+TV* TV::GetTV(void)
+{
+    QMutexLocker locker(gTVLock);
+    if (gTV)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Already have a TV object.");
+        return NULL;
+    }
+    gTV = new TV();
+    return gTV;
+}
+
+void TV::ReleaseTV(TV* tv)
+{
+    QMutexLocker locker(gTVLock);
+    if (!tv || !gTV || (gTV != tv))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "ReleaseTV - programmer error.");
+        return;
+    }
+
+    delete gTV;
+    gTV = NULL;
+}
+
 /**
  * \brief returns true if the recording completed when exiting.
  */
 bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 {
+    TV *tv = GetTV();
+    if (!tv)
+        return false;
+
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV() -- begin");
     bool startInGuide = flags & kStartTVInGuide;
     bool inPlaylist = flags & kStartTVInPlayList;
     bool initByNetworkCommand = flags & kStartTVByNetworkCommand;
-    TV *tv = new TV();
     bool quitAll = false;
     bool showDialogs = true;
     bool playCompleted = false;
@@ -258,11 +295,16 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         curProgram->SetIgnoreBookmark(flags & kStartTVIgnoreBookmark);
     }
 
+    // Must be before Init() otherwise we swallow the PLAYBACK_START event
+    // with the event filter
+    sendPlaybackStart();
+
     // Initialize TV
     if (!tv->Init())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed initializing TV");
-        delete tv;
+        ReleaseTV(tv);
+        sendPlaybackEnd();
         delete curProgram;
         return false;
     }
@@ -273,8 +315,6 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         if (pginfo.HasPathname() || pginfo.GetChanID())
             tv->SetLastProgram(&pginfo);
     }
-
-    sendPlaybackStart();
 
     if (curProgram)
     {
@@ -375,7 +415,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     bool allowrerecord = tv->getAllowRerecord();
     bool deleterecording = tv->requestDelete;
 
-    delete tv;
+    ReleaseTV(tv);
 
     if (curProgram)
     {
@@ -806,15 +846,15 @@ void TV::InitKeys(void)
             QT_TRANSLATE_NOOP("MythControls", "Toggle OSD playback information"), "");
 
     /* 3D/Frame compatible/Stereoscopic TV */
-    REG_KEY("TV_PLAYBACK", ACTION_3DNONE,
+    REG_KEY("TV Playback", ACTION_3DNONE,
             QT_TRANSLATE_NOOP("MythControls", "No 3D"), "");
-    REG_KEY("TV_PLAYBACK", ACTION_3DSIDEBYSIDE,
+    REG_KEY("TV Playback", ACTION_3DSIDEBYSIDE,
             QT_TRANSLATE_NOOP("MythControls", "3D Side by Side"), "");
-    REG_KEY("TV_PLAYBACK", ACTION_3DSIDEBYSIDEDISCARD,
+    REG_KEY("TV Playback", ACTION_3DSIDEBYSIDEDISCARD,
             QT_TRANSLATE_NOOP("MythControls", "Discard 3D Side by Side"), "");
-    REG_KEY("TV_PLAYBACK", ACTION_3DTOPANDBOTTOM,
+    REG_KEY("TV Playback", ACTION_3DTOPANDBOTTOM,
             QT_TRANSLATE_NOOP("MythControls", "3D Top and Bottom"), "");
-    REG_KEY("TV_PLAYBACK", ACTION_3DTOPANDBOTTOMDISCARD,
+    REG_KEY("TV Playback", ACTION_3DTOPANDBOTTOMDISCARD,
             QT_TRANSLATE_NOOP("MythControls", "Discard 3D Top and Bottom"), "");
 
 /*
@@ -856,7 +896,6 @@ void TV::ReloadKeys(void)
     mainWindow->ClearKeyContext("Teletext Menu");
     InitKeys();
 }
-
 
 /** \fn TV::TV(void)
  *  \sa Init(void)
@@ -3094,7 +3133,7 @@ void TV::HandleLCDVolumeTimerEvent()
     KillTimer(lcdVolumeTimerId);
 }
 
-int  TV::StartTimer(int interval, int line)
+int TV::StartTimer(int interval, int line)
 {
     int x = QObject::startTimer(interval);
     if (!x)
@@ -3159,19 +3198,19 @@ void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark)
     ctx->UnlockDeletePlayer(__FILE__, line);
 }
 
-void TV::SetExitPlayer(bool set_it, bool wants_to) const
+void TV::SetExitPlayer(bool set_it, bool wants_to)
 {
     QMutexLocker locker(&timerIdLock);
     if (set_it)
     {
         wantsToQuit = wants_to;
         if (!exitPlayerTimerId)
-            exitPlayerTimerId = ((TV*)this)->StartTimer(1, __LINE__);
+            exitPlayerTimerId = StartTimer(1, __LINE__);
     }
     else
     {
         if (exitPlayerTimerId)
-            ((TV*)this)->KillTimer(exitPlayerTimerId);
+            KillTimer(exitPlayerTimerId);
         exitPlayerTimerId = 0;
         wantsToQuit = wants_to;
     }
@@ -3644,7 +3683,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
             }
             if (has_action("ESCAPE", actions))
             {
-                if (!actx->player->IsCutListSaved(actx))
+                if (!actx->player->IsCutListSaved())
                     ShowOSDCutpoint(actx, "EXIT_EDIT_MODE");
                 else
                 {
@@ -6468,7 +6507,6 @@ void TV::SwitchCards(PlayerContext *ctx,
         {
             if (!channum.isEmpty())
                 CardUtil::SetStartChannel(cardinputid, channum);
-            CardUtil::SetStartInput(cardid, inputname);
         }
         else
         {
@@ -7374,7 +7412,8 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
         ReturnOSDLock(ctx, osd);
 
         QMutexLocker locker(&timerIdLock);
-        signalMonitorTimerId[StartTimer(1, __LINE__)] = (PlayerContext*)(ctx);
+        signalMonitorTimerId[StartTimer(1, __LINE__)] =
+            const_cast<PlayerContext*>(ctx);
         return;
     }
     ReturnOSDLock(ctx, osd);
@@ -8428,7 +8467,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == MythEvent::MythUserMessage)
     {
-        MythEvent *me = (MythEvent *)e;
+        MythEvent *me = reinterpret_cast<MythEvent*>(e);
         QString message = me->Message();
 
         if (message.isEmpty())
@@ -8457,7 +8496,8 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == MythEvent::kUpdateBrowseInfoEventType)
     {
-        UpdateBrowseInfoEvent *b = (UpdateBrowseInfoEvent*)e;
+        UpdateBrowseInfoEvent *b =
+            reinterpret_cast<UpdateBrowseInfoEvent*>(e);
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         OSD *osd = GetOSDLock(mctx);
         if (osd)
@@ -8472,7 +8512,8 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent *)e;
+        DialogCompletionEvent *dce =
+            reinterpret_cast<DialogCompletionEvent*>(e);
         OSDDialogEvent(dce->GetResult(), dce->GetResultText(),
                        dce->GetData().toString());
         return;
@@ -8480,7 +8521,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == OSDHideEvent::kEventType)
     {
-        OSDHideEvent *ce = (OSDHideEvent *)e;
+        OSDHideEvent *ce = reinterpret_cast<OSDHideEvent*>(e);
         HandleOSDClosed(ce->GetFunctionalType());
         return;
     }
@@ -8489,7 +8530,7 @@ void TV::customEvent(QEvent *e)
         return;
 
     uint cardnum   = 0;
-    MythEvent *me = (MythEvent *)e;
+    MythEvent *me = reinterpret_cast<MythEvent*>(e);
     QString message = me->Message();
 
     // TODO Go through these and make sure they make sense...
@@ -10926,7 +10967,8 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
                     InputInfo info;
                     info.inputid = currentinputs[i];
                     if (CardUtil::GetInputInfo(info))
-                        if (!sources.contains(info.sourceid))
+                        if (!sources.contains(info.sourceid) &&
+                            info.livetvorder)
                             sources[info.sourceid] = info;
                 }
             }

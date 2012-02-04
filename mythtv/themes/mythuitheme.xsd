@@ -32,6 +32,8 @@
                 <xs:element ref="shape" />
                 <xs:element ref="guidegrid" />
                 <xs:element ref="editbar" />
+                <xs:element ref="group" />
+                <xs:element ref="video" />
             </xs:choice>
         </xs:sequence>
     </xs:group>
@@ -54,7 +56,24 @@
             </xs:element>
             <xs:element name="helptext" type="text" minOccurs="0" maxOccurs="1" />
             <xs:element name="focusorder" type="xs:integer" minOccurs="0" maxOccurs="1" />
-            <xs:element name="minsize" type="size" minOccurs="0" maxOccurs="1" />
+            <xs:element name="minsize" minOccurs="0" maxOccurs="1">
+		<xs:complexType>
+		    <xs:simpleContent>
+			<xs:extension base="size">
+			    <xs:attribute name="vanish" type="boolean" />
+			    <xs:attribute name="initiator" type="boolean" />
+			    <xs:attribute name="shrink">
+				<xs:simpleType>
+				    <xs:restriction base="xs:token">
+					<xs:enumeration value="short" />
+					<xs:enumeration value="narrow" />
+				    </xs:restriction>
+				</xs:simpleType>
+			    </xs:attribute>
+			</xs:extension>
+		    </xs:simpleContent>
+		</xs:complexType>
+	    </xs:element>
             <xs:element name="loadondemand" type="boolean" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
     </xs:group>
@@ -88,19 +107,19 @@
 
     <xs:simpleType name="area">
         <xs:restriction base="xs:string">
-            <xs:pattern value="((-?\d{1,4})|(\d{1,3}%)),((-?\d{1,4})|(\d{1,3}%)),((-?\d{1,4})|(\d{1,3}%)),((-?\d{1,4})|(\d{1,3}%))" />
+            <xs:pattern value="\s*(-?[0-9]*|\d{0,3}%([+,-]\d+)?)\s*,\s*(-?[0-9]*|\d{0,3}%([+,-]\d+)?)\s*,\s*(-?[0-9]*|\d{0,3}%([+,-]\d+)?)\s*,\s*(-?[0-9]*|\d{0,3}%([+,-]\d+)?)\s*" />
         </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="position">
         <xs:restriction base="xs:string">
-            <xs:pattern value="((-?\d{1,4})|(\d{1,3}%)),((-?\d{1,4})|(\d{1,3}%))" />
+            <xs:pattern value="(\s*(-?[0-9]*|\d{0,3}%([+,-]\d+)?))\s*,\s*((-?[0-9]*|\d{0,3}%([+,-]\d+)?))\s*" />
         </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="size">
         <xs:restriction base="xs:string">
-            <xs:pattern value="((\d{1,4})|(\d{1,3}%)),((\d{1,4})|(\d{1,3}%))" />
+            <xs:pattern value="(\s*([0-9]*|\d{0,3}%))\s*,\s*(([0-9]*|\d{0,3}%)\s*)" />
         </xs:restriction>
     </xs:simpleType>
 
@@ -131,7 +150,6 @@
         </xs:restriction>
     </xs:simpleType>
 
-
     <!-- MythUI Theme Root -->
     <xs:element name="mythuitheme">
         <xs:complexType>
@@ -159,6 +177,30 @@
                 <xs:element name="outlinecolor" type="color" minOccurs="0" maxOccurs="1" />
                 <xs:element name="outlinesize" type="xs:integer" minOccurs="0" maxOccurs="1" />
                 <xs:element name="outlinealpha" type="alpha" minOccurs="0" maxOccurs="1" />
+                <xs:element name="stretch" minOccurs="0" maxOccurs="1">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="1" />
+                            <xs:enumeration value="ultracondensed" />
+                            <xs:enumeration value="2" />
+                            <xs:enumeration value="extracondensed" />
+                            <xs:enumeration value="3" />
+                            <xs:enumeration value="condensed" />
+                            <xs:enumeration value="4" />
+                            <xs:enumeration value="semicondensed" />
+                            <xs:enumeration value="5" />
+                            <xs:enumeration value="unstretched" />
+                            <xs:enumeration value="6" />
+                            <xs:enumeration value="semiexpanded" />
+                            <xs:enumeration value="7" />
+                            <xs:enumeration value="expanded" />
+                            <xs:enumeration value="8" />
+                            <xs:enumeration value="extraexpanded" />
+                            <xs:enumeration value="9" />
+                            <xs:enumeration value="ultraexpanded" />
+			</xs:restriction>
+		    </xs:simpleType>
+		</xs:element>
                 <xs:element name="weight" minOccurs="0" maxOccurs="1">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -205,9 +247,30 @@
                 <xs:group ref="widgets" />
             </xs:choice>
             <xs:attributeGroup ref="common_attributes" />
+            <xs:attribute name="include" type="xs:string" />
         </xs:complexType>
     </xs:element>
 
+    <!-- Group Widget -->
+    <xs:element name="group">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="widget_common" />
+                <xs:group ref="widgets" />
+            </xs:choice>
+            <xs:attributeGroup ref="common_attributes" />
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Video Widget -->
+    <xs:element name="video">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="widget_common" />
+            </xs:choice>
+            <xs:attributeGroup ref="common_attributes" />
+        </xs:complexType>
+    </xs:element>
 
     <!-- Textarea Widget -->
     <xs:group name="textarea_elements">
@@ -233,7 +296,23 @@
                     </xs:simpleContent>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="cutdown" type="boolean" minOccurs="0" maxOccurs="1" />
+            <xs:element name="cutdown" minOccurs="0" maxOccurs="1">
+		<xs:simpleType>
+		    <xs:restriction base="xs:string">
+			<xs:enumeration value="true" />
+			<xs:enumeration value="false" />
+			<xs:enumeration value="1" />
+			<xs:enumeration value="0" />
+			<xs:enumeration value="yes" />
+			<xs:enumeration value="no" />
+			<xs:enumeration value="left" />
+			<xs:enumeration value="right" />
+			<xs:enumeration value="center" />
+			<xs:enumeration value="centre" />
+		    </xs:restriction>
+		</xs:simpleType>
+	    </xs:element>
+	    <xs:element name="extraleading" type="xs:integer" minOccurs="0" maxOccurs="1" />
             <xs:element name="multiline" type="boolean" minOccurs="0" maxOccurs="1" />
             <xs:element name="align" type="align" minOccurs="0" maxOccurs="1" />
             <xs:element name="colorcycle" minOccurs="0" maxOccurs="1">
@@ -252,6 +331,8 @@
                                 <xs:enumeration value="up" />
                                 <xs:enumeration value="right" />
                                 <xs:enumeration value="down" />
+                                <xs:enumeration value="horizontal" />
+                                <xs:enumeration value="vertical" />
                             </xs:restriction>
                         </xs:simpleType>
                     </xs:attribute>
@@ -347,9 +428,9 @@
                             <xs:element name="gradient" minOccurs="0" maxOccurs="1">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="stop" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:element name="stop" minOccurs="0" maxOccurs="1">
                                             <xs:complexType>
-                                                <xs:attribute name="position" type="percentage" use="required" />
+                                                <xs:attribute name="position" type="position" use="required" />
                                                 <xs:attribute name="color" type="color" use="required" />
                                                 <xs:attribute name="alpha" type="alpha" />
                                             </xs:complexType>
@@ -485,6 +566,7 @@
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
                         <xs:enumeration value="center" />
+                        <xs:enumeration value="groupcenter" />
                         <xs:enumeration value="free" />
                     </xs:restriction>
                 </xs:simpleType>
@@ -496,12 +578,15 @@
                         <xs:enumeration value="selection" />
                         <xs:enumeration value="items" />
                         <xs:enumeration value="captive" />
+                        <xs:enumeration value="flowing" />
+                        <xs:enumeration value="captive" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="showarrow" type="boolean" minOccurs="0" maxOccurs="1" />
             <xs:element name="buttonarea" type="area" minOccurs="0" maxOccurs="1" />
             <xs:element name="drawfrombottom" type="boolean" minOccurs="0" maxOccurs="1" />
+	    <xs:element name="searchposition" type="position" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
     </xs:group>
 

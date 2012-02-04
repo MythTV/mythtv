@@ -35,8 +35,8 @@ class VAAPIContext
     void* GetVideoSurface(int i);
     uint8_t* GetSurfaceIDPointer(void* buf);
     
-    int   GetNumBuffers(void)        { return m_numSurfaces; }
-    PixelFormat GetPixelFormat(void) { return m_pix_fmt;     }
+    int   GetNumBuffers(void)        const { return m_numSurfaces; }
+    PixelFormat GetPixelFormat(void) const { return m_pix_fmt;     }
 
     // X11 display
     bool  CopySurfaceToFrame(VideoFrame *frame, const void *buf);

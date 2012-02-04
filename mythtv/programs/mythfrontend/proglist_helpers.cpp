@@ -110,7 +110,7 @@ void PhrasePopup::phraseSelected(MythUIButtonListItem *item)
         return;
 
     if (m_phraseList->GetCurrentPos() == 0)
-        m_phraseEdit->SetText("");
+        m_phraseEdit->Reset();
     else
         m_phraseEdit->SetText(item->GetText());
 
@@ -165,7 +165,7 @@ void PhrasePopup::deleteClicked(void)
     if (m_parent->m_viewList.count() < 1)
         SetFocusWidget(m_phraseEdit);
     else
-        SetFocusWidget(m_phraseEdit);
+        SetFocusWidget(m_phraseList);
 }
 
 void PhrasePopup::recordClicked(void)
@@ -441,7 +441,7 @@ void PowerSearchPopup::deleteClicked(void)
         m_parent->m_curView = -1;
 
     if (m_parent->m_viewList.count() < 1)
-        SetFocusWidget(m_phraseList);
+        SetFocusWidget(m_phraseEdit);
     else
         SetFocusWidget(m_phraseList);
 }

@@ -572,7 +572,7 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
     QList<MythMediaDevice*>::iterator it = m_Devices.begin();
     for (;it != m_Devices.end(); ++it)
     {
-        if (((*it)->getMediaType() == mediatype) &&
+        if (((*it)->getMediaType() & mediatype) &&
             (((*it)->getStatus() == MEDIASTAT_USEABLE) ||
              ((*it)->getStatus() == MEDIASTAT_MOUNTED) ||
              ((*it)->getStatus() == MEDIASTAT_NOTMOUNTED)))
@@ -651,7 +651,8 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
         if (((*itr).MythMediaType & (int)pMedia->getMediaType()))
         {
             LOG(VB_GENERAL, LOG_NOTICE,
-                     "Found a handler - '" + itr.key() + "'");
+                QString("Found a handler for %1 - '%2'")
+                .arg(pMedia->MediaTypeString()) .arg(itr.key())); 
             handlers.append(*itr);
         }
         itr++;
@@ -664,7 +665,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
     }
 
 
-    // Generate a dialog, add buttons for each description,
+    // TODO - Generate a dialog, add buttons for each description,
     // if user didn't cancel, selected = handlers.at(choice);
     int selected = 0;
 
@@ -936,3 +937,7 @@ void MediaMonitor::ejectOpticalDisc()
 #endif
     }
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

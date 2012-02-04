@@ -182,8 +182,6 @@ MSocketDevice::MSocketDevice(int socket, Type type)
 MSocketDevice::MSocketDevice(Type type)
         : fd(-1), t(type), p(0), pp(0), e(NoError),
         d(new MSocketDevicePrivate(Unknown))
-
-        //  d(new MSocketDevicePrivate(IPv4))
 {
 #if defined(MSOCKETDEVICE_DEBUG)
     qDebug("MSocketDevice: Created MSocketDevice object %p, type %d",

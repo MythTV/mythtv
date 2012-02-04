@@ -23,8 +23,8 @@ class MTV_PUBLIC RemoteEncoder
    ~RemoteEncoder(void);
 
     bool Setup(void);
-    bool IsValidRecorder(void);
-    int GetRecorderNumber(void);
+    bool IsValidRecorder(void) const;
+    int GetRecorderNumber(void) const;
 
     ProgramInfo *GetRecording(void);
     bool IsRecording(bool *ok = NULL);

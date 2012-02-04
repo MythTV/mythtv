@@ -87,7 +87,16 @@ QSize XMLParseBase::parseSize(const QString &text, bool normalize)
 {
     int x, y;
     QSize retval;
-    if (sscanf(text.toAscii().constData(), "%d,%d", &x, &y) == 2)
+
+    QStringList tmp = text.split(",");
+    bool x_ok = false, y_ok = false;
+    if (tmp.size() >= 2)
+    {
+        x = tmp[0].toInt(&x_ok);
+        y = tmp[1].toInt(&y_ok);
+    }
+
+    if (x_ok && y_ok)
     {
         if (x == -1 || y == -1)
         {
@@ -131,7 +140,7 @@ MythRect XMLParseBase::parseRect(QDomElement &element, bool normalize)
 
 int XMLParseBase::parseAlignment(const QString &text)
 {
-    int alignment = 0;
+    int alignment = Qt::AlignLeft | Qt::AlignTop;
 
     QStringList values = text.split(',');
 
@@ -145,24 +154,45 @@ int XMLParseBase::parseAlignment(const QString &text)
 
         if (align == "center" || align == "allcenter")
         {
+            alignment &= ~(Qt::AlignHorizontal_Mask | Qt::AlignVertical_Mask);
             alignment |= Qt::AlignCenter;
             break;
         }
         else if (align == "justify")
+        {
+            alignment &= ~Qt::AlignHorizontal_Mask;
             alignment |= Qt::AlignJustify;
+        }
         else if (align == "left")
+        {
+            alignment &= ~Qt::AlignHorizontal_Mask;
             alignment |= Qt::AlignLeft;
+        }
         else if (align == "hcenter")
+        {
+            alignment &= ~Qt::AlignHorizontal_Mask;
             alignment |= Qt::AlignHCenter;
+        }
         else if (align == "right")
+        {
+            alignment &= ~Qt::AlignHorizontal_Mask;
             alignment |= Qt::AlignRight;
+        }
         else if (align == "top")
+        {
+            alignment &= ~Qt::AlignVertical_Mask;
             alignment |= Qt::AlignTop;
+        }
         else if (align == "vcenter")
+        {
+            alignment &= ~Qt::AlignVertical_Mask;
             alignment |= Qt::AlignVCenter;
+        }
         else if (align == "bottom")
+        {
+            alignment &= ~Qt::AlignVertical_Mask;
             alignment |= Qt::AlignBottom;
-
+        }
     }
 
     return alignment;
@@ -507,6 +537,9 @@ MythUIType *XMLParseBase::ParseUIType(
         else
             uitype->CopyFrom(base);
     }
+
+    QFileInfo fi(filename);
+    uitype->SetXMLLocation(fi.fileName(), element.lineNumber());
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())

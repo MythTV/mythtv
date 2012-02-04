@@ -26,9 +26,9 @@ enum SmartPLFieldType
 };
 
 // used by playlist.cpp
-QString getCriteriaSQL(QString fieldName, QString operatorName, 
+QString getCriteriaSQL(QString fieldName, QString operatorName,
                        QString value1, QString value2);
- 
+
 QString getSQLFieldName(QString orderBy);
 QString getOrderBySQL(QString orderByFields);
 
@@ -105,7 +105,7 @@ class SmartPlaylistEditor : public MythScreenType
     void startDeleteCategory(const QString &category);
     void renameCategory(const QString &category);
 
-//    void categoryEditChanged(void);    
+//    void categoryEditChanged(void);
     void orderByClicked(void);
 
     void editCriteria(void);
@@ -116,16 +116,17 @@ class SmartPlaylistEditor : public MythScreenType
     void orderByChanged(QString orderBy);
 
   private:
-    void getSmartPlaylistCategories(void);  
+    void getSmartPlaylistCategories(void);
     void loadFromDatabase(QString category, QString name);
 
     QList<SmartPLCriteriaRow*> m_criteriaRows;
     SmartPLCriteriaRow* m_tempCriteriaRow;
 
-    int matchesCount;
-    bool bNewPlaylist;
-    bool bPlaylistIsValid;
-    QString originalCategory, originalName;
+    int m_matchesCount;
+    bool m_newPlaylist;
+    bool m_playlistIsValid;
+    QString m_originalCategory;
+    QString m_originalName;
 
     // gui stuff
     MythUIButtonList *m_categorySelector;
@@ -232,7 +233,7 @@ class SmartPLOrderByDialog: public MythScreenType
 
   public:
 
-    SmartPLOrderByDialog(MythScreenStack *parent); 
+    SmartPLOrderByDialog(MythScreenStack *parent);
     ~SmartPLOrderByDialog();
 
     bool Create(void);
@@ -245,7 +246,7 @@ class SmartPLOrderByDialog: public MythScreenType
 
   protected slots:
     void addPressed(void);
-    void deletePressed(void);   
+    void deletePressed(void);
     void moveUpPressed(void);
     void moveDownPressed(void);
     void ascendingPressed(void);
@@ -257,7 +258,7 @@ class SmartPLOrderByDialog: public MythScreenType
   private:
     void getOrderByFields(void);
 
-    MythUIButtonList *m_fieldList;  
+    MythUIButtonList *m_fieldList;
     MythUIButtonList *m_orderSelector;
     MythUIButton     *m_addButton;
     MythUIButton     *m_deleteButton;
@@ -275,7 +276,7 @@ class SmartPLDateDialog: public MythScreenType
 
   public:
 
-    SmartPLDateDialog(MythScreenStack *parent); 
+    SmartPLDateDialog(MythScreenStack *parent);
     ~SmartPLDateDialog();
 
     bool Create(void);

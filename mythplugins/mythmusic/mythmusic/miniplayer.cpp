@@ -85,10 +85,6 @@ bool MiniPlayer::keyPressEvent(QKeyEvent *event)
         {
             Close();
         }
-        else if (action == "ESCAPE")
-        {
-            Close();
-        }
         else if (action == "MENU")
         {
             gPlayer->autoShowPlayer(!gPlayer->getAutoShowPlayer());

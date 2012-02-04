@@ -49,6 +49,7 @@ bool PlaylistContainer::checkCDTrack(int track)
 PlaylistContainer::PlaylistContainer(
     AllMusic *all_music, const QString &host_name) :
     active_playlist(NULL),      backup_playlist(NULL),
+    stream_playlist(NULL),
     all_other_playlists(NULL),  all_available_music(all_music),
     pending_writeback_index(-1),
 

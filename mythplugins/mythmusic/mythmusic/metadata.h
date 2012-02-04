@@ -186,9 +186,9 @@ class Metadata
     void setID(IdType lid) { m_id = lid; }
     void setRepo(RepoType repo) { m_id = (m_id & METADATA_ID_MASK) | (repo << METADATA_REPO_SHIFT); }
 
-    bool isCDTrack(void) { return ID_TO_REPO(m_id) == RT_CD; }
+    bool isCDTrack(void) const { return ID_TO_REPO(m_id) == RT_CD; }
 
-    QString Filename() const { return m_filename; }
+    QString Filename(bool find = true) const;
     void setFilename(const QString &lfilename) { m_filename = lfilename; }
 
     QString Format() const { return m_format; }
@@ -230,8 +230,6 @@ class Metadata
 
     // static functions
     static void setArtistAndTrackFormats();
-    static void SetStartdir(const QString &dir);
-    static QString GetStartdir() { return m_startdir; }
     static QStringList fillFieldList(QString field);
 
     // this looks for any image available - preferring a front cover if available
@@ -280,8 +278,6 @@ class Metadata
     QString  m_filename;
     bool     m_changed;
 
-    static QString m_startdir;
-
     // Various formatting strings
     static QString m_formatnormalfileartist;
     static QString m_formatnormalfiletrack;
@@ -323,7 +319,7 @@ class AllMusic
 {
   public:
 
-    AllMusic(QString a_startdir);
+    AllMusic(void);
     ~AllMusic();
 
     Metadata*   getMetadata(int an_id);
@@ -339,11 +335,11 @@ class AllMusic
     void        addCDTrack(const Metadata &the_track);
     bool        checkCDTrack(Metadata *the_track);
     Metadata*   getCDMetadata(int m_the_track);
-    QString     getCDTitle(void) { return m_cdTitle; }
+    QString     getCDTitle(void) const { return m_cdTitle; }
     void        setCDTitle(const QString &a_title) { m_cdTitle = a_title; }
-    int         getCDTrackCount(void) { return m_cdData.count(); }
+    int         getCDTrackCount(void) const { return m_cdData.count(); }
 
-    bool        doneLoading() {return m_done_loading;}
+    bool        doneLoading() const { return m_done_loading; }
     bool        cleanOutThreads();
 
     MetadataPtrList *getAllMetadata(void) { return &m_all_music; }
@@ -362,8 +358,6 @@ class AllMusic
     // cd stuff
     MetadataPtrList m_cdData; //  More than one cd player?
     QString m_cdTitle;
-
-    QString m_startdir;
 
     MetadataLoadingThread   *m_metadata_loader;
     bool                     m_done_loading;
@@ -390,7 +384,7 @@ class MusicData : public QObject
     void reloadMusic(void);
 
   public:
-    QString             startdir;
+    QString             musicDir;
     PlaylistContainer  *all_playlists;
     AllMusic           *all_music;
     bool                initialized;

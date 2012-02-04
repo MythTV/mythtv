@@ -734,6 +734,7 @@ MythUIButtonListItem *MythGenericTree::CreateListButton(MythUIButtonList *list)
     item->SetData(qVariantFromValue(this));
     item->SetTextFromMap(m_strings);
     item->SetImageFromMap(m_imageFilenames);
+    item->SetStatesFromMap(m_states);
 
     if (visibleChildCount() > 0)
         item->setDrawArrow(true);
@@ -792,6 +793,24 @@ QString MythGenericTree::GetImage(const QString &name) const
 
     QMap<QString, QString>::const_iterator it = m_imageFilenames.find(name);
     if (it != m_imageFilenames.end())
+        return *it;
+
+    return QString();
+}
+
+void MythGenericTree::DisplayState(const QString &state, const QString &name)
+{
+    if (!name.isEmpty())
+        m_states.insert(name, state);
+}
+
+QString MythGenericTree::GetState(const QString &name) const
+{
+    if (name.isEmpty())
+        return QString();
+
+    QMap<QString, QString>::const_iterator it = m_states.find(name);
+    if (it != m_states.end())
         return *it;
 
     return QString();

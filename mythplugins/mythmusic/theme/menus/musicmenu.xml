@@ -5,13 +5,13 @@
       <text>Play Music</text>
       <action>MUSIC_PLAY</action>
    </button>
-
+<!--
    <button>
       <type>STREAM_PLAY</type>
       <text>Play Streams</text>
       <action>STREAM_PLAY</action>
    </button>
-
+   -->
    <button>
       <type>MUSIC_PLAYLIST</type>
       <text>Select Music</text>

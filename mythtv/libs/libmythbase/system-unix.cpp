@@ -80,6 +80,7 @@ MythSystemIOHandler::MythSystemIOHandler(bool read) :
     m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()), m_maxfd(-1),
     m_read(read)
 {
+    m_readbuf[0] = '\0';
 }
 
 void MythSystemIOHandler::run(void)

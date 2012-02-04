@@ -32,6 +32,7 @@
 #include "remotefile.h"
 #include "mythcorecontext.h"
 #include "mthreadpool.h"
+#include "storagegroup.h"
 
 #define LOC      QString("MythUIHelper: ")
 
@@ -125,6 +126,7 @@ public:
     static int x_override, y_override, w_override, h_override;
 
     QString themecachedir;
+    QString m_userThemeDir;
 
     ScreenSaverControl *screensaver;
     bool screensaverEnabled;
@@ -191,6 +193,9 @@ void MythUIHelperPrivate::Init(void)
     GetScreenBounds();
     StoreGUIsettings();
     screenSetup = true;
+
+    StorageGroup sgroup("Themes", gCoreContext->GetHostName());
+    m_userThemeDir = sgroup.GetFirstDir(true);
 }
 
 /**
@@ -1005,7 +1010,7 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
 
     if (!themename.isEmpty())
     {
-        testdir = GetConfDir() + "/themes/" + themename;
+        testdir = d->m_userThemeDir + themename;
 
         dir.setPath(testdir);
 
@@ -1068,7 +1073,7 @@ QString MythUIHelper::FindMenuThemeDir(const QString &menuname)
     QString testdir;
     QDir dir;
 
-    testdir = GetConfDir() + "/themes/" + menuname;
+    testdir = d->m_userThemeDir + menuname;
 
     dir.setPath(testdir);
 
@@ -1140,7 +1145,7 @@ QList<ThemeInfo> MythUIHelper::GetThemes(ThemeType type)
 
     fileList.append(themeDirs.entryInfoList());
 
-    themeDirs.setPath(GetConfDir() + "/themes/");
+    themeDirs.setPath(d->m_userThemeDir);
 
     fileList.append(themeDirs.entryInfoList());
 

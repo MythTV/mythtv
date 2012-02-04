@@ -138,6 +138,8 @@ Advanced options (experts only):
   --libxml2-path=HDRLOC    location of directory containing
                            'libxml/parser.h', not the
                            directory with parser.h [$libxml2_path_default]
+  --disable-libdns-sd      disable DNS Service Discovery (Bonjour/Zeroconf/Avahi)
+  --disable-libcrypto      disable use of the OpenSSL cryptographic library
 
   --with-bindings=LIST     install the bindings specified in the
                            comma-separated list
@@ -1354,6 +1356,8 @@ MYTHTV_CONFIG_LIST='
     asi
     joystick_menu
     libcec
+    libcrypto
+    libdns_sd
     libfftw3
     libmpeg2external
     libxml2
@@ -1998,6 +2002,8 @@ enable asi
 enable lamemp3
 enable libass
 enable libcec
+enable libcrypto
+enable libdns_sd
 enable libxml2
 enable libudf
 enable lirc
@@ -4119,12 +4125,8 @@ enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3
 # ass_flush_events was added in 0.9.10
 enabled libass && check_lib2 ass/ass.h ass_flush_events -lass || disable libass
 
-if ! check_header ${libcec_path}/libcec/cec.h; then
-    disable libcec;
-fi
-
 if enabled libcec ; then
-    check_cxx -I"$libcec_path" <<EOF || { echolog "libCEC support needs libcec >= 1" && disable libcec; }
+    check_cxx -I"$libcec_path" <<EOF || { disable libcec; }
 #include <libcec/cec.h>
 #include <iostream>
 using namespace std;
@@ -4136,6 +4138,12 @@ int main(void) {
     return (long) LoadLibCec;
 }
 EOF
+fi
+
+enabled libcrypto && check_lib openssl/rsa.h RSA_new -lcrypto || disable libcrypto
+
+if test $target_os != darwin ; then
+    enabled libdns_sd && check_lib dns_sd.h DNSServiceRegister -ldns_sd || disable libdns_sd
 fi
 
 if enabled libxml2 ; then
@@ -4569,6 +4577,8 @@ echo "multi threaded libavcodec ${threads-no}"
 if enabled frontend; then
   echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
 fi
+echo "libdns_sd (Bonjour)       ${libdns_sd-no}"
+echo "libcrypto                 ${libcrypto-no}"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "OpenGL ES 2.0             ${opengles-no}"

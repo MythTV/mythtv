@@ -292,6 +292,24 @@ void MythRenderOpenGL1::SetMatrixView(void)
     glLoadIdentity();
 }
 
+void MythRenderOpenGL1::PushTransformation(const UIEffects &fx, QPointF &center)
+{
+    makeCurrent();
+    glPushMatrix();
+    glTranslatef(center.x(), center.y(), 0.0);
+    glScalef(fx.hzoom, fx.vzoom, 1.0);
+    glRotatef(fx.angle, 0, 0, 1);
+    glTranslatef(-center.x(), -center.y(), 0.0);
+    doneCurrent();
+}
+
+void MythRenderOpenGL1::PopTransformation(void)
+{
+    makeCurrent();
+    glPopMatrix();
+    doneCurrent();
+}
+
 void MythRenderOpenGL1::DeleteShaders(void)
 {
     QVector<GLuint>::iterator it;

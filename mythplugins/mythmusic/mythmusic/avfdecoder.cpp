@@ -80,10 +80,9 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     finish(false),
     freq(0),                    bitrate(0),
     m_sampleFmt(FORMAT_NONE),   m_channels(0),
-    totalTime(0.0),             seekTime(-1.0),
-    devicename(""),
+    seekTime(-1.0),             devicename(""),
     m_inputFormat(NULL),        m_inputContext(NULL),
-    m_decStream(NULL),          m_codec(NULL),
+    m_codec(NULL),
     m_audioDec(NULL),           m_inputIsFile(false),
     m_buffer(NULL),             m_byteIOContext(NULL),
     errcode(0),                 m_samples(NULL)
@@ -128,7 +127,6 @@ bool avfDecoder::initialize()
     stat = m_channels = 0;
     m_sampleFmt = FORMAT_NONE;
     seekTime = -1.0;
-    totalTime = 0.0;
 
     // give up if we dont have an audiooutput set
     if (!output())
@@ -253,9 +251,6 @@ bool avfDecoder::initialize()
         return false;
     }
 
-    if (AV_TIME_BASE > 0)
-        totalTime = (m_inputContext->duration / AV_TIME_BASE) * 1000;
-
     freq = m_audioDec->sample_rate;
     m_channels = m_audioDec->channels;
 
@@ -353,7 +348,6 @@ void avfDecoder::deinit()
         av_free(output_buf);
     output_buf = NULL;
 
-    m_decStream = NULL;
     m_codec = NULL;
     m_audioDec = NULL;
     m_inputFormat = NULL;

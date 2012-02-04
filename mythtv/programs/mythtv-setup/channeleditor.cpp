@@ -187,6 +187,8 @@ bool ChannelEditor::keyPressEvent(QKeyEvent *event)
             menu();
         else if (action == "DELETE")
             del();
+        else if (action == "EDIT")
+            edit();
         else
             handled = false;
     }
@@ -432,6 +434,9 @@ void ChannelEditor::deleteChannels(void)
 
 void ChannelEditor::edit(MythUIButtonListItem *item)
 {
+    if (!item)
+        item = m_channelList->GetItemCurrent();
+
     if (!item)
         return;
 

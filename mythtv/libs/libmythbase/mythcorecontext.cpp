@@ -77,6 +77,8 @@ class MythCoreContextPrivate : public QObject
     QString language;
 
     MythScheduler *m_scheduler;
+
+    bool m_blockingClient;
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -95,7 +97,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_database(GetMythDB()),
       m_UIThread(QThread::currentThread()),
       m_locale(NULL),
-      m_scheduler(NULL)
+      m_scheduler(NULL),
+      m_blockingClient(false)
 {
     threadRegister("CoreContext");
     srandom(QDateTime::currentDateTime().toTime_t() ^
@@ -314,6 +317,8 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
     if (!d->m_serverSock)
         return false;
 
+    d->m_blockingClient = blockingClient;
+
     if (!openEventSocket)
         return true;
 
@@ -520,6 +525,8 @@ void MythCoreContext::BlockShutdown(void)
         (d->m_eventSock->state() != MythSocket::Connected))
         return;
 
+    d->m_blockingClient = true;
+
     strlist.clear();
     strlist << "BLOCK_SHUTDOWN";
 
@@ -547,6 +554,8 @@ void MythCoreContext::AllowShutdown(void)
         (d->m_eventSock->state() != MythSocket::Connected))
         return;
 
+    d->m_blockingClient = false;
+
     strlist.clear();
     strlist << "ALLOW_SHUTDOWN";
 
@@ -556,6 +565,11 @@ void MythCoreContext::AllowShutdown(void)
     d->m_eventSock->readStringList(strlist);
 
     d->m_eventSock->Unlock();
+}
+
+bool MythCoreContext::IsBlockingClient(void) const
+{
+    return d->m_blockingClient;
 }
 
 void MythCoreContext::SetBackend(bool backend)
@@ -978,7 +992,7 @@ void MythCoreContext::SendEvent(const MythEvent &event)
     SendReceiveStringList(strlist);
 }
 
-void MythCoreContext::SendSystemEvent(const QString msg)
+void MythCoreContext::SendSystemEvent(const QString &msg)
 {
     if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHTV_SETUP)
         return;
@@ -987,9 +1001,9 @@ void MythCoreContext::SendSystemEvent(const QString msg)
                         .arg(msg).arg(GetHostName()));
 }
 
-void MythCoreContext::SendHostSystemEvent(const QString msg,
+void MythCoreContext::SendHostSystemEvent(const QString &msg,
                                           const QString &hostname,
-                                          const QString args)
+                                          const QString &args)
 {
     SendSystemEvent(QString("%1 HOST %2 %3").arg(msg).arg(hostname).arg(args));
 }

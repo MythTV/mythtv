@@ -30,7 +30,7 @@ class DTVMultiplex
 
     bool operator==(const DTVMultiplex &m) const;
 
-    void Clear(void) { DTVMultiplex mux; (*this) = mux; }
+    void Clear(void) { (*this) = DTVMultiplex(); }
 
     virtual bool FillFromDB(DTVTunerType type, uint mplexid);
 

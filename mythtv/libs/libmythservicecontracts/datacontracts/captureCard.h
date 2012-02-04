@@ -35,14 +35,13 @@ namespace DTC
 class SERVICE_PUBLIC CaptureCard : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.1" );
 
     Q_PROPERTY( uint            CardId              READ CardId             WRITE setCardId             )
     Q_PROPERTY( QString         VideoDevice         READ VideoDevice        WRITE setVideoDevice        )
     Q_PROPERTY( QString         AudioDevice         READ AudioDevice        WRITE setAudioDevice        )
     Q_PROPERTY( QString         VBIDevice           READ VBIDevice          WRITE setVBIDevice          )
     Q_PROPERTY( QString         CardType            READ CardType           WRITE setCardType           )
-    Q_PROPERTY( QString         DefaultInput        READ DefaultInput       WRITE setDefaultInput       )
     Q_PROPERTY( uint            AudioRateLimit      READ AudioRateLimit     WRITE setAudioRateLimit     )
     Q_PROPERTY( QString         HostName            READ HostName           WRITE setHostName           )
     Q_PROPERTY( uint            DVBSWFilter         READ DVBSWFilter        WRITE setDVBSWFilter        )
@@ -69,7 +68,6 @@ class SERVICE_PUBLIC CaptureCard : public QObject
     PROPERTYIMP( QString    ,     AudioDevice       )
     PROPERTYIMP( QString    ,     VBIDevice         )
     PROPERTYIMP( QString    ,     CardType          )
-    PROPERTYIMP( QString    ,     DefaultInput      )
     PROPERTYIMP( uint       ,     AudioRateLimit    )
     PROPERTYIMP( QString    ,     HostName          )
     PROPERTYIMP( uint       ,     DVBSWFilter       )
@@ -125,7 +123,6 @@ class SERVICE_PUBLIC CaptureCard : public QObject
             m_VideoDevice        = src.m_VideoDevice;
             m_AudioDevice        = src.m_AudioDevice;
             m_CardType           = src.m_CardType;
-            m_DefaultInput       = src.m_DefaultInput;
             m_AudioRateLimit     = src.m_AudioRateLimit;
             m_HostName           = src.m_HostName;
             m_DVBSWFilter        = src.m_DVBSWFilter;

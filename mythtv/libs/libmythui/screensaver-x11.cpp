@@ -30,7 +30,7 @@ class ScreenSaverX11Private
   public:
     ScreenSaverX11Private(ScreenSaverX11 *outer) :
         m_dpmsaware(false),           m_dpmsdeactivated(false),
-        m_xscreensaverRunning(false), m_gscreensaverRunning(false),
+        m_xscreensaverRunning(false),
         m_dpmsenabled(false),
         m_timeoutInterval(-1),        m_resetTimer(NULL),
         m_display(NULL)
@@ -39,9 +39,6 @@ class ScreenSaverX11Private
                            kMSProcessEvents;
         m_xscreensaverRunning =
                 myth_system("xscreensaver-command -version >&- 2>&-",
-                            flags) == 0;
-        m_gscreensaverRunning =
-                myth_system("gnome-screensaver-command --help >&- 2>&-",
                             flags) == 0;
 
         if (IsScreenSaverRunning())
@@ -52,9 +49,6 @@ class ScreenSaverX11Private
                              outer, SLOT(resetSlot()));
             if (m_xscreensaverRunning)
                 LOG(VB_GENERAL, LOG_INFO, LOC + "XScreenSaver support enabled");
-            if (m_gscreensaverRunning)
-                LOG(VB_GENERAL, LOG_INFO, LOC +
-                    "Gnome screen saver support enabled");
         }
 
         m_display = OpenMythXDisplay();
@@ -101,7 +95,7 @@ class ScreenSaverX11Private
 
     bool IsScreenSaverRunning(void) const
     {
-        return m_xscreensaverRunning || m_gscreensaverRunning;
+        return m_xscreensaverRunning;
     }
 
     bool IsDPMSEnabled(void) const { return m_dpmsenabled; }
@@ -209,15 +203,6 @@ class ScreenSaverX11Private
                             kMSDontDisableDrawing |
                             kMSRunBackground);
             }
-            if (m_gscreensaverRunning)
-            {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    "Calling gnome-screensaver-command --poke");
-                myth_system("gnome-screensaver-command --poke >&- 2>&- &",
-                            kMSDontBlockInputDevs |
-                            kMSDontDisableDrawing |
-                            kMSRunBackground);
-            }
             m_last_deactivated = current_time;
         }
     }
@@ -240,7 +225,6 @@ class ScreenSaverX11Private
     bool m_dpmsaware;
     bool m_dpmsdeactivated; ///< true if we disabled DPMS
     bool m_xscreensaverRunning;
-    bool m_gscreensaverRunning;
     BOOL m_dpmsenabled;
 
     int m_timeoutInterval;

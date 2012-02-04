@@ -18,7 +18,7 @@ class MythMediaDevice;
 #define REG_JUMPEX(a, b, c, d, e) GetMythMainWindow()->RegisterJump(a, b, c, d, e)
 #define REG_MEDIAPLAYER(a,b,c) GetMythMainWindow()->RegisterMediaPlugin(a, b, c)
 
-typedef int (*MediaPlayCallback)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &, const QString &);
+typedef int (*MediaPlayCallback)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &, const QString &, bool);
 
 class MythMainWindowPrivate;
 
@@ -76,7 +76,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
                      const QString& subtitle="", const QString& director="",
                      int season=0, int episode=0, const QString& inetref="",
                      int lenMins=120, const QString& year="1895",
-                     const QString &id="");
+                     const QString &id="", bool useBookmarks = false);
     void HandleTVPower(bool poweron);
 
     void JumpTo(const QString &destination, bool pop = true);
@@ -105,6 +105,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     QRect GetUIScreenRect();
     void  SetUIScreenRect(QRect &rect);
 
+    int GetDrawInterval() const;
     int NormalizeFontSize(int pointSize);
     MythRect NormRect(const MythRect &rect);
     QPoint NormPoint(const QPoint &point);
@@ -125,10 +126,14 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     uint PopDrawDisabled(void);
     void SetEffectsEnabled(bool enable);
     void draw(void);
+    
+    void ResetIdleTimer(void);
+    void PauseIdleTimer(bool pause);
 
   public slots:
     void mouseTimeout();
     void HideMouseTimeout();
+    void IdleTimeout();
 
   protected slots:
     void animate();
@@ -160,6 +165,9 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void LockInputDevices(bool locked);
 
     void ShowMouseCursor(bool show);
+    
+    void EnterStandby();
+    void ExitStandby();
 
     MythMainWindowPrivate *d;
 };

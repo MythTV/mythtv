@@ -142,6 +142,7 @@ class MainServer : public QObject, public MythSocketCBs
                         MythSocket *socket);
     void HandleDone(MythSocket *socket);
 
+    void HandleActiveBackendsQuery(PlaybackSock *pbs);
     void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);
     bool HandleDeleteFile(QStringList &slist, PlaybackSock *pbs);
     bool HandleDeleteFile(QString filename, QString storagegroup,

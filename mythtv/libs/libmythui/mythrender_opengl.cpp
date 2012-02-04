@@ -131,17 +131,24 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
 {
     bool recommended = true;
     OpenGLLocker locker(this);
+    QString renderer = (const char*) glGetString(GL_RENDERER);
     if (!(this->format().directRendering()))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "OpenGL is using software rendering.");
         recommended = false;
     }
-    else if (QString((const char*) glGetString(GL_RENDERER))
-             .contains("Software Rasterizer", Qt::CaseInsensitive))
+    else if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "OpenGL is using software rasterizer.");
+        recommended = false;
+    }
+    else if (renderer.contains("softpipe", Qt::CaseInsensitive))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL seems to be using software "
+            "fallback. Please check your OpenGL driver installation, "
+            "configuration, and device permissions.");
         recommended = false;
     }
     return recommended;

@@ -713,28 +713,6 @@ bool MythPopupBox::showOkPopup(
     return ret;
 }
 
-bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
-                                     QString message, bool focusOk)
-{
-    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
-
-    popup->addLabel(message, Medium, true);
-    QAbstractButton *okButton     = popup->addButton(tr("OK"),     popup, SLOT(accept()));
-    QAbstractButton *cancelButton = popup->addButton(tr("Cancel"), popup, SLOT(reject()));
-
-    if (focusOk)
-        okButton->setFocus();
-    else
-        cancelButton->setFocus();
-
-    bool ok = (Accepted == popup->ExecPopup());
-
-    popup->hide();
-    popup->deleteLater();
-
-    return ok;
-}
-
 bool MythPopupBox::showGetTextPopup(MythMainWindow *parent, QString title,
                                     QString message, QString& text)
 {
@@ -951,70 +929,6 @@ void MythProgressDialog::setTotalSteps(int totalSteps)
         steps = 1;
 }
 
-MythBusyDialog::MythBusyDialog(const QString &title, bool cancelButton,
-                               const QObject *target, const char *slot)
-    : MythProgressDialog(title, 0,
-                         cancelButton, target, slot),
-                         timer(NULL)
-{
-    setObjectName("MythBusyDialog");
-}
-
-MythBusyDialog::~MythBusyDialog()
-{
-    Teardown();
-}
-
-void MythBusyDialog::deleteLater(void)
-{
-    Teardown();
-    MythProgressDialog::deleteLater();
-}
-
-void MythBusyDialog::Teardown(void)
-{
-    if (timer)
-    {
-        timer->disconnect();
-        timer = NULL;
-    }
-}
-
-void MythBusyDialog::start(int interval)
-{
-    if (!timer)
-        timer = new QTimer(this);
-
-    connect(timer, SIGNAL(timeout()),
-            this,  SLOT  (timeout()));
-
-    timer->start(interval);
-}
-
-void MythBusyDialog::Close(void)
-{
-    if (timer)
-    {
-        timer->disconnect();
-        timer = NULL;
-    }
-
-    MythProgressDialog::Close();
-}
-
-void MythBusyDialog::setProgress(void)
-{
-    progress->setValue(progress->value() + 10);
-    qApp->processEvents();
-    if (LCD *lcddev = LCD::Get())
-        lcddev->setGenericBusy();
-}
-
-void MythBusyDialog::timeout(void)
-{
-    setProgress();
-}
-
 MythThemedDialog::MythThemedDialog(MythMainWindow *parent,
                                    const QString  &window_name,
                                    const QString  &theme_filename,
@@ -1039,12 +953,12 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent,
     }
 }
 
-MythThemedDialog::MythThemedDialog(MythMainWindow *parent, const char* name,
-                                   bool setsize)
-                : MythDialog(parent, name, setsize)
+MythThemedDialog::MythThemedDialog(
+    MythMainWindow *parent, const char* name, bool setsize) :
+    MythDialog(parent, name, setsize), widget_with_current_focus(NULL),
+    theme(NULL), context(-1)
 {
     setNoErase();
-    theme = NULL;
 }
 
 bool MythThemedDialog::loadThemedWindow(QString window_name,
@@ -1172,10 +1086,6 @@ void MythThemedDialog::loadWindow(QDomElement &element)
             {
                 parseContainer(e);
             }
-            else if (e.tagName() == "popup")
-            {
-                parsePopup(e);
-            }
             else
             {
                 LOG(VB_GENERAL, LOG_ALERT,
@@ -1218,16 +1128,6 @@ void MythThemedDialog::parseFont(QDomElement &element)
     //
 
     theme->parseFont(element);
-}
-
-void MythThemedDialog::parsePopup(QDomElement &element)
-{
-    //
-    //  theme doesn't know how to do this yet
-    //
-    element = element;
-    LOG(VB_GENERAL, LOG_ALERT,
-             "MythThemedDialog cannot parse popups yet - ignoring");
 }
 
 void MythThemedDialog::initForeground()

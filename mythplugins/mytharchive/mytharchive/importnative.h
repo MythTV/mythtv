@@ -2,6 +2,7 @@
 #define IMPORTNATIVE_H_
 
 #include <iostream>
+#include <stdint.h>
 
 // qt
 #include <QString>
@@ -21,7 +22,7 @@ typedef struct
     bool directory;
     bool selected;
     QString filename;
-    long long size;
+    int64_t size;
 } FileInfo;
 
 typedef struct

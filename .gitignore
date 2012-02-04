@@ -15,4 +15,5 @@ object_script.*
 *~
 .DS_Store
 .*.swp
-
+.pc
+patches

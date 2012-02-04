@@ -2107,7 +2107,7 @@ void VideoDialog::createOkDialog(QString title)
         m_popupStack->AddScreen(okPopup);
 }
 
-/** \fn VideoDialog::searchComplet(QString string)
+/**
  *  \brief After using incremental search, move to the selected item.
  *  \return void.
  */

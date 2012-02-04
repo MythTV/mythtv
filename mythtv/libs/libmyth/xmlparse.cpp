@@ -396,22 +396,31 @@ void XMLParse::normalizeRect(QRect &rect)
 
 QPoint XMLParse::parsePoint(QString text)
 {
-    int x, y;
-    QPoint retval(0, 0);
-    QByteArray tmp = text.toLocal8Bit();
-    if (sscanf(tmp.constData(), "%d,%d", &x, &y) == 2)
-        retval = QPoint(x, y);
+    QPoint retval(0,0);
+    QStringList tmp = text.split(',', QString::SkipEmptyParts);
+    bool x_ok = false, y_ok = false;
+    if (tmp.size() >= 2)
+    {
+        retval = QPoint(tmp[0].toInt(&x_ok), tmp[1].toInt(&y_ok));
+        if (!x_ok || !y_ok)
+            retval = QPoint(0,0);
+    }
     return retval;
 }
 
 QRect XMLParse::parseRect(QString text)
 {
-    int x, y, w, h;
+    bool x_ok = false, y_ok = false;
+    bool w_ok = false, h_ok = false;
     QRect retval(0, 0, 0, 0);
-    QByteArray tmp = text.toLocal8Bit();
-    if (sscanf(tmp.constData(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
-        retval = QRect(x, y, w, h);
-
+    QStringList tmp = text.split(',', QString::SkipEmptyParts);
+    if (tmp.size() >= 4)
+    {
+        retval = QRect(tmp[0].toInt(&x_ok), tmp[1].toInt(&y_ok),
+                       tmp[2].toInt(&w_ok), tmp[3].toInt(&h_ok));
+        if (!x_ok || !y_ok || !w_ok || !h_ok)
+            retval = QRect(0,0,0,0);
+    }
     return retval;
 }
 

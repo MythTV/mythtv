@@ -14,3 +14,9 @@ QString findIcon(const QString &type, const QString &name);
 
 /// calculate a tracks length by parsing the frames
 uint calcTrackLength(const QString &musicFile);
+
+/// create a filename using the template in the settings and a Metadata object
+QString filenameFromMetadata(Metadata *track, bool createDir = true);
+
+/// try to find a track in the db using the given artist, album and title
+bool isNewTune(const QString &artist, const QString &album, const QString &title);

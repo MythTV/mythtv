@@ -531,7 +531,12 @@ void RecordingInfo::ApplyRecordStateChange(RecordingType newstate, bool save)
     record->m_type = newstate;
 
     if (save)
-        record->Save();
+    {
+        if (newstate == kNotRecording)
+            record->Delete();
+        else
+            record->Save();
+    }
 }
 
 /** \fn RecordingInfo::ApplyRecordRecPriorityChange(int)

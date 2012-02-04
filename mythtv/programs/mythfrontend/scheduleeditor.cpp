@@ -764,7 +764,7 @@ void SchedFilterEditor::Load()
             uint32_t filterid       = query.value(0).toInt();
             QString  description    = tr(query.value(1).toString()
                                          .toUtf8().constData());
-            bool     filter_default = query.value(2).toInt();
+            // bool     filter_default = query.value(2).toInt();
 
             // Fill in list of possible filters
             button = new MythUIButtonListItem(m_filtersList, description,
@@ -910,10 +910,13 @@ void StoreOptEditor::Load()
         while (query.next())
         {
             value = query.value(0).toString();
-            groups += value;
 
-            if (value == "Default")
-                foundDefault = true;
+            if (value != "Deleted")
+            {
+                groups += value;
+                if (value == "Default")
+                    foundDefault = true;
+            }
         }
     }
 
