@@ -125,8 +125,8 @@ void CdDecoder::setDevice(const QString &dev)
     m_devicename = dev;
 #ifdef WIN32
     // libcdio needs the drive letter with no path
-    if (devicename.endsWith('\\'))
-        devicename.chop(1);
+    if (m_devicename.endsWith('\\'))
+        m_devicename.chop(1);
 #endif
 }
 
@@ -215,7 +215,7 @@ bool CdDecoder::initialize()
         return false;
     }
 
-    cdio_cddap_verbose_set(m_device, 
+    cdio_cddap_verbose_set(m_device,
         VERBOSE_LEVEL_CHECK(VB_MEDIA, LOG_ANY) ? CDDA_MESSAGE_PRINTIT :
             CDDA_MESSAGE_FORGETIT,
         VERBOSE_LEVEL_CHECK(VB_MEDIA, LOG_DEBUG) ? CDDA_MESSAGE_PRINTIT :
@@ -547,7 +547,7 @@ static Cddb::Toc& GetToc(CdIo_t *cdio, Cddb::Toc& toc)
         if (s_lastAudioLsn && lsn > s_lastAudioLsn)
             lsn = s_lastAudioLsn;
         lsn += lsn0; // lead-in
-        
+
         std::div_t d = std::div(lsn, CDIO_CD_FRAMES_PER_SEC);
         msf.f = d.rem;
         d = std::div(d.quot, 60);
