@@ -282,7 +282,10 @@ class MPUBLIC ProgramInfo
     bool IsSameTimeslot(const ProgramInfo &other) const;
     bool IsSameProgramTimeslot(const ProgramInfo &other) const;//sched only
     static int GetRecordingTypeRecPriority(RecordingType type);//sched only
-    static int UsingProgramIDAuthority(void);//sched only
+    static bool UsingProgramIDAuthority(void)
+    { 
+        return usingProgIDAuth;
+    };
     static void CheckProgramIDAuthorities(void);//sched only
 
     // Used for extending scheduled recordings
@@ -715,7 +718,7 @@ class MPUBLIC ProgramInfo
 
     static QMutex staticDataLock;
     static ProgramInfoUpdater *updater;
-    static int usingProgIDAuth;
+    static bool usingProgIDAuth;
 };
 
 Q_DECLARE_METATYPE(ProgramInfo*)

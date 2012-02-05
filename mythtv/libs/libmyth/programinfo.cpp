@@ -44,7 +44,7 @@ int pginfo_init_statics() { return ProgramInfo::InitStatics(); }
 QMutex ProgramInfo::staticDataLock;
 ProgramInfoUpdater *ProgramInfo::updater;
 int dummy = pginfo_init_statics();
-int ProgramInfo::usingProgIDAuth = -1;
+bool ProgramInfo::usingProgIDAuth = true;
 
 
 const QString ProgramInfo::kFromRecordedQuery =
@@ -1898,10 +1898,6 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 
     if (!programid.isEmpty() && !other.programid.isEmpty())
     {
-        // Read from database if not known yet
-        if (usingProgIDAuth < 0)
-            UsingProgramIDAuthority();
-
         if (usingProgIDAuth)
         {
             int index = programid.indexOf('/');
@@ -1978,14 +1974,6 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
     return false;
 }
 
-int ProgramInfo::UsingProgramIDAuthority(void)
-{
-    if (usingProgIDAuth < 0)
-        usingProgIDAuth = 
-            gCoreContext->GetNumSetting("UsingProgramIDAuthority", 0);
-    return usingProgIDAuth;
-}
-
 void ProgramInfo::CheckProgramIDAuthorities(void)
 {
     QMap<QString, int> authMap;
@@ -2011,7 +1999,6 @@ void ProgramInfo::CheckProgramIDAuthorities(void)
         QString("Found %1 distinct programid authorities").arg(numAuths));
 
     usingProgIDAuth = (numAuths > 1);
-    gCoreContext->SaveSetting("UsingProgramIDAuthority", usingProgIDAuth);
 }
 
 /** \fn ProgramInfo::CreateRecordBasename(const QString &ext) const

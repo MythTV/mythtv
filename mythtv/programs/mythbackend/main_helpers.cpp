@@ -365,6 +365,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
             cout << "Calculating Schedule from database.\n" <<
                     "Inputs, Card IDs, and Conflict info may be invalid "
                     "if you have multiple tuners.\n";
+            ProgramInfo::CheckProgramIDAuthorities();
             sched->FillRecordListFromDB();
         }
 
