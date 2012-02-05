@@ -774,8 +774,12 @@ void MythUIText::FillCutMessage(void)
         // If text size is less than allowed min size, center it
         if (m_ShrinkNarrow && m_MinSize.isValid() &&
             min_rect.width() < m_MinSize.x())
+        {
             m_drawRect.moveLeft(m_Area.x() +
-                                ((m_MinSize.x() - min_rect.width()) / 2));
+                                (((m_MinSize.x() - min_rect.width() +
+                                   fm.averageCharWidth()) / 2)));
+            min_rect.setWidth(m_MinSize.x());
+        }
         else
             m_drawRect.moveLeft(m_Area.x());
 
@@ -786,8 +790,12 @@ void MythUIText::FillCutMessage(void)
         // If text size is less than allowed min size, center it
         if (m_ShrinkNarrow && m_MinSize.isValid() &&
             min_rect.width() < m_MinSize.x())
+        {
             m_drawRect.moveRight(m_Area.x() + m_Area.width() -
-                                 ((m_MinSize.x() - min_rect.width()) / 2));
+                                (((m_MinSize.x() - min_rect.width() +
+                                   fm.averageCharWidth()) / 2)));
+            min_rect.setWidth(m_MinSize.x());
+        }
         else
             m_drawRect.moveRight(m_Area.x() + m_Area.width());
 
@@ -800,8 +808,11 @@ void MythUIText::FillCutMessage(void)
         // If text size is less than allowed min size, center it
         if (!m_ShrinkNarrow && m_MinSize.isValid() &&
             min_rect.height() < m_MinSize.y())
+        {
             m_drawRect.moveTop(m_Area.y() +
                                ((m_MinSize.y() - min_rect.height()) / 2));
+            min_rect.setHeight(m_MinSize.y());
+        }
         else
             m_drawRect.moveTop(m_Area.y());
 
@@ -812,8 +823,11 @@ void MythUIText::FillCutMessage(void)
         // If text size is less than allowed min size, center it
         if (!m_ShrinkNarrow && m_MinSize.isValid() &&
             min_rect.height() < m_MinSize.y())
+        {
             m_drawRect.moveBottom(m_Area.y() + m_Area.height() -
                                   ((m_MinSize.y() - min_rect.height()) / 2));
+            min_rect.setHeight(m_MinSize.y());
+        }
         else
             m_drawRect.moveBottom(m_Area.y() + m_Area.height());
 
