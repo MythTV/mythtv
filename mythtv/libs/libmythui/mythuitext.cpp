@@ -776,7 +776,7 @@ void MythUIText::FillCutMessage(void)
     if (m_Justification & Qt::AlignLeft)
     {
         // If text size is less than allowed min size, center it
-        if (m_ShrinkNarrow && m_MinSize.isValid() &&
+        if (m_ShrinkNarrow && m_MinSize.isValid() && min_rect.isValid() &&
             min_rect.width() < m_MinSize.x())
         {
             m_drawRect.moveLeft(m_Area.x() +
@@ -792,7 +792,7 @@ void MythUIText::FillCutMessage(void)
     else if (m_Justification & Qt::AlignRight)
     {
         // If text size is less than allowed min size, center it
-        if (m_ShrinkNarrow && m_MinSize.isValid() &&
+        if (m_ShrinkNarrow && m_MinSize.isValid() && min_rect.isValid() &&
             min_rect.width() < m_MinSize.x())
         {
             m_drawRect.moveRight(m_Area.x() + m_Area.width() -
@@ -810,7 +810,7 @@ void MythUIText::FillCutMessage(void)
     if (m_Justification & Qt::AlignTop)
     {
         // If text size is less than allowed min size, center it
-        if (!m_ShrinkNarrow && m_MinSize.isValid() &&
+        if (!m_ShrinkNarrow && m_MinSize.isValid() && min_rect.isValid() &&
             min_rect.height() < m_MinSize.y())
         {
             m_drawRect.moveTop(m_Area.y() +
@@ -825,7 +825,7 @@ void MythUIText::FillCutMessage(void)
     else if (m_Justification & Qt::AlignBottom)
     {
         // If text size is less than allowed min size, center it
-        if (!m_ShrinkNarrow && m_MinSize.isValid() &&
+        if (!m_ShrinkNarrow && m_MinSize.isValid() && min_rect.isValid() &&
             min_rect.height() < m_MinSize.y())
         {
             m_drawRect.moveBottom(m_Area.y() + m_Area.height() -
