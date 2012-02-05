@@ -27,7 +27,7 @@ BumpScope::BumpScope() :
 
     m_color_cycle(true),
     m_moving_light(true),
-    m_diamond(true),
+    //m_diamond(true),
 
     m_bpl(0),
 
@@ -130,13 +130,13 @@ void BumpScope::generate_cmap(unsigned int color)
         for (i = 255; i > 0; i--)
         {
              r = (unsigned int)(((double)(100 * red / 255) * m_intense1[i] + m_intense2[i]));
-             if (r > 255) 
+             if (r > 255)
                  r = 255;
              g = (unsigned int)(((double)(100 * green / 255) * m_intense1[i] + m_intense2[i]));
-             if (g > 255) 
+             if (g > 255)
                  g = 255;
              b = (unsigned int)(((double)(100 * blue / 255) * m_intense1[i] + m_intense2[i]));
-             if (b > 255) 
+             if (b > 255)
                  b = 255;
 
              m_image->setColor(i, qRgba(r, g, b, 255));
@@ -153,26 +153,26 @@ void BumpScope::generate_phongdat(void)
 
     unsigned int PHONGRES = m_phongrad * 2;
 
-    for (y = 0; y < m_phongrad; y++) 
+    for (y = 0; y < m_phongrad; y++)
     {
-        for (x = 0; x < m_phongrad; x++) 
+        for (x = 0; x < m_phongrad; x++)
         {
             i = (double)x / ((double)m_phongrad) - 1;
             i2 = (double)y / ((double)m_phongrad) - 1;
 
-            if (m_diamond)
+            //if (m_diamond)
                i = 1 - pow(i*i2,.75) - i*i - i2*i2;
-            else
-               i = 1 - i*i - i2*i2;
+            //else
+            //   i = 1 - i*i - i2*i2;
 
-            if (i >= 0) 
+            if (i >= 0)
             {
-                if (m_diamond)
+                //if (m_diamond)
                     i = i*i*i * 255.0;
-                else
-                    i = i*i*i * 255.0;
- 
-                if (i > 255) 
+                //else
+                //    i = i*i*i * 255.0;
+
+                if (i > 255)
                     i = 255;
                 unsigned char uci = (unsigned char)i;
 
@@ -180,8 +180,8 @@ void BumpScope::generate_phongdat(void)
                 m_phongdat[(PHONGRES-1)-y][x] = uci;
                 m_phongdat[y][(PHONGRES-1)-x] = uci;
                 m_phongdat[(PHONGRES-1)-y][(PHONGRES-1)-x] = uci;
-            } 
-            else 
+            }
+            else
             {
                 m_phongdat[y][x] = 0;
                 m_phongdat[(PHONGRES-1)-y][x] = 0;
@@ -242,7 +242,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     *xd = 0;
 }
 
-inline void BumpScope::draw_vert_line(unsigned char *buffer, int x, int y1, 
+inline void BumpScope::draw_vert_line(unsigned char *buffer, int x, int y1,
                                       int y2)
 {
     int y;
@@ -386,7 +386,7 @@ bool BumpScope::process(VisualNode *node)
     unsigned int i;
     int y, prev_y;
 
-    prev_y = (int)m_height / 2 + ((int)node->left[0] * (int)m_height) / 
+    prev_y = (int)m_height / 2 + ((int)node->left[0] * (int)m_height) /
              (int)0x10000;
 
     if (prev_y < 0)
@@ -396,7 +396,7 @@ bool BumpScope::process(VisualNode *node)
     for (i = 0; i < m_width; i++)
     {
         y = (i * numSamps) / (m_width - 1);
-        y = (int)m_height / 2 + ((int)node->left[y] * (int)m_height) / 
+        y = (int)m_height / 2 + ((int)node->left[y] * (int)m_height) /
             (int)0x10000;
 
         if (y < 0)
@@ -434,7 +434,7 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
 
         m_ilx = (int)(m_width / 2 + cos(m_iangle * (M_PI / 180.0)) * m_ixo);
         m_ily = (int)(m_height / 2 + sin(m_iangle * (M_PI / 180.0)) * m_iyo);
- 
+
         m_iangle += 2;
         if (m_iangle >= 360)
             m_iangle = 0;
@@ -504,7 +504,7 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
                 m_ih = 359;
             if ((random() % 150) == 0)
             {
-                if (random() & 1) 
+                if (random() & 1)
                 {
                     m_ihd = (random() & 1) * 2 - 1;
                     m_isd = 0;

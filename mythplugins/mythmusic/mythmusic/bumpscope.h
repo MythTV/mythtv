@@ -26,7 +26,7 @@ private:
     void generate_cmap(unsigned int color);
     void generate_phongdat(void);
 
-    void translate(int x, int y, int *xo, int *yo, int *xd, int *yd, 
+    void translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
                    int *angle);
 
     inline void draw_vert_line(unsigned char *buffer, int x, int y1, int y2);
@@ -48,7 +48,7 @@ private:
 
     bool m_color_cycle;
     bool m_moving_light;
-    bool m_diamond;
+    //bool m_diamond;
 
     int m_bpl;
 
