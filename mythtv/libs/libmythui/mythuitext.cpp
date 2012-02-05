@@ -611,8 +611,10 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
         last_width = width;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, QString("GetNarrowWidth: Gave up while trying "
-                                     "to find optimal width."));
+    LOG(VB_GENERAL, LOG_ERR, QString("'%1' (%2) GetNarrowWidth: Gave up "
+                                     "while trying to find optimal width "
+                                     "for '%3'.")
+        .arg(objectName()).arg(GetXMLLocation()).arg(m_CutMessage));
 
     width = best_width;
     m_Cutdown = cutdown;
@@ -871,8 +873,9 @@ QPoint MythUIText::CursorPosition(int text_offset)
     if (Ipara == m_Layouts.constEnd())
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("CursorPosition offset %1 not found in ANY paragraph!")
-            .arg(text_offset));
+            QString("'%1' (%2) CursorPosition offset %3 not found in "
+                    "ANY paragraph!")
+            .arg(objectName()).arg(GetXMLLocation()).arg(text_offset));
         return m_Area.topLeft().toQPoint();
     }
 
