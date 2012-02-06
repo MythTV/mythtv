@@ -963,8 +963,8 @@ int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
     int pos = 0;
     bool resync = false;
 
-    while (pos + TSPacket::kSize <= len) // while we have a whole packet left
-    {
+    while (pos + int(TSPacket::kSize) <= len)
+    { // while we have a whole packet left...
         if (buffer[pos] != SYNC_BYTE || resync)
         {
             int newpos = ResyncStream(buffer, pos+1, len);
@@ -982,7 +982,7 @@ int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
         resync = false;
         if (!ProcessTSPacket(*pkt))
         {
-            if (pos + TSPacket::kSize > len)
+            if (pos + int(TSPacket::kSize) > len)
                 continue;
             if (buffer[pos] != SYNC_BYTE)
             {

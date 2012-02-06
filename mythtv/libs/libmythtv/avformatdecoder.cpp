@@ -1024,7 +1024,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
    
     if (dur == 0)
     {
-        if ((ic->duration == AV_NOPTS_VALUE) &&
+        if ((ic->duration == (int64_t)AV_NOPTS_VALUE) &&
             (!livetv && !ringBuffer->IsDisc()))
             av_estimate_timings(ic, 0);
 
