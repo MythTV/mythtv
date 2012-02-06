@@ -1556,8 +1556,7 @@ int main(int argc, char **argv)
     setuid(getuid());
 
 #ifdef USING_LIBDNS_SD
-    if (getenv("MYTHTV_AIRPLAY"))
-        MythAirplayServer::Create();
+    MythAirplayServer::Create();
 #endif
 
 #ifdef USING_RAOP
