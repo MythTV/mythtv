@@ -1977,14 +1977,16 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 void ProgramInfo::CheckProgramIDAuthorities(void)
 {
     QMap<QString, int> authMap;
-    char *tables[] = { "program", "recorded", "oldrecorded", NULL };
+    QString tables[] = { "program", "recorded", "oldrecorded", "" };
     MSqlQuery query(MSqlQuery::InitCon());
 
-    for (char **table = tables; *table; ++table)
+    int tableIndex = 0;
+    QString table = tables[tableIndex];
+    while (!table.isEmpty())
     {
         query.prepare(QString(
             "SELECT DISTINCT LEFT(programid, LOCATE('/', programid)) "
-            "FROM %1 WHERE programid <> ''").arg(*table));
+            "FROM %1 WHERE programid <> ''").arg(table));
         if (!query.exec())
             MythDB::DBError("CheckProgramIDAuthorities", query);
         else
@@ -1992,6 +1994,8 @@ void ProgramInfo::CheckProgramIDAuthorities(void)
             while (query.next())
                 authMap[query.value(0).toString()] = 1;
         }
+        ++tableIndex;
+        table = tables[tableIndex];
     }
 
     int numAuths = authMap.count();
