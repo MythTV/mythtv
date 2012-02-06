@@ -20,6 +20,13 @@ bool MythRAOPDevice::Create(void)
 {
     QMutexLocker locker(gMythRAOPDeviceMutex);
 
+    // don't bother trying to start if there is no private key
+    if (!MythRAOPConnection::LoadKey())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Aborting startup - no key found.");
+        return false;
+    }
+
     // create the device thread
     if (!gMythRAOPDeviceThread)
         gMythRAOPDeviceThread = new MThread("RAOPDevice");

@@ -712,7 +712,8 @@ RSA* MythRAOPConnection::LoadKey(void)
 
     if ( !file )
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to read key from " + GetConfDir().toUtf8() + sName.toUtf8());
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to read key from: %1")
+            .arg(GetConfDir() + sName));
         g_rsa = NULL;
         return NULL;
     }
@@ -728,7 +729,7 @@ RSA* MythRAOPConnection::LoadKey(void)
     }
 
     g_rsa = NULL;
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load RSA private key. Playback will fail.");
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load RSA private key.");
     return NULL;
 }
 
