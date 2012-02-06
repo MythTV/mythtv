@@ -24,7 +24,7 @@
     <message>
         <location filename="../mythzoneminder/main.cpp" line="134"/>
         <source>ZoneMinder Events</source>
-        <translation>Συμβάντα ZoneMinder</translation>
+        <translation>Συμβάντα Καμερών</translation>
     </message>
 </context>
 <context>
@@ -101,7 +101,7 @@
         <location filename="themestrings.h" line="4"/>
         <source>ZoneMinder Console</source>
         <oldsource>Zone Minder Console</oldsource>
-        <translation>Κονσόλα Zone Minder</translation>
+        <translation>Διαχείριση Καμερών</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
@@ -288,17 +288,17 @@
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Show Console</source>
-        <translation>Εμφάνιση Κονσόλας</translation>
+        <translation>Διαχειριση</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>Show Live View</source>
-        <translation>Εμφάνιση Ζωντανής Λήψης</translation>
+        <translation>Ζωντανη Ληψη</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Show Events</source>
-        <translation>Εμφάνιση Συμβάντων</translation>
+        <translation>Συμβαντα</translation>
     </message>
 </context>
 <context>
