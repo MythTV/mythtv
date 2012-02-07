@@ -41,7 +41,7 @@
     $replacement = $dreplacement;
 
 # Load the cli options
-    GetOptions('link|dest|destination|path:s' => \$dest,
+    GetOptions('link|destination|path:s'      => \$dest,
                'chanid=s'                     => \$chanid,
                'starttime=s'                  => \$starttime,
                'filename=s'                   => \$filename,
@@ -50,7 +50,7 @@
                'separator=s'                  => \$separator,
                'replacement=s'                => \$replacement,
                'rename'                       => \$rename,
-               'usage|help|h'                 => \$usage,
+               'usage|help'                   => \$usage,
                'underscores'                  => \$underscores,
                'verbose'                      => \$verbose
               );
@@ -62,7 +62,9 @@ $0 usage:
 
 options:
 
---dest [destination directory]
+--link [destination directory]
+--destination [destination directory]
+--path [destination directory]
 
     Specify the directory for the links.  If no pathname is given, links will
     be created in the show_names directory inside of the current mythtv data
@@ -234,6 +236,7 @@ options:
     default:  No info printed to console
 
 --help
+--usage
 
     Show this help text.
 
