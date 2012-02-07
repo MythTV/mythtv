@@ -457,6 +457,12 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
             screenshot->Load(false);
         }
     }
+    if (map.contains("nightmode"))
+    {
+        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("nightmode"));
+        if (state)
+            state->DisplayState(map["nightmode"]);
+    }
 
     MythUIProgressBar *bar =
         dynamic_cast<MythUIProgressBar *>(win->GetChild("elapsedpercent"));

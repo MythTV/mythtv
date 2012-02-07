@@ -7325,6 +7325,10 @@ void TV::UpdateOSDProgInfo(const PlayerContext *ctx, const char *whichInfo)
     InfoMap infoMap;
     ctx->GetPlayingInfoMap(infoMap);
 
+    QString nightmode = gCoreContext->GetNumSetting("NightModeEnabled", 0)
+                            ? "yes" : "no";
+    infoMap["nightmode"] = nightmode;
+
     // Clear previous osd and add new info
     OSD *osd = GetOSDLock(ctx);
     if (osd)
@@ -7342,6 +7346,9 @@ void TV::UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
     if (osd)
     {
         osd->ResetWindow("osd_status");
+        QString nightmode = gCoreContext->GetNumSetting("NightModeEnabled", 0)
+                                ? "yes" : "no";
+        info.text.insert("nightmode", nightmode);
         osd->SetValues("osd_status", info.values, timeout);
         osd->SetText("osd_status",   info.text, timeout);
         if (type != kOSDFunctionalType_Default)
