@@ -1577,7 +1577,7 @@ void Scheduler::GetAllPending(QStringList &strList) const
 }
 
 /// Returns all scheduled programs serialized into a QStringList
-void Scheduler::GetAllScheduled(QStringList &strList) const
+void Scheduler::GetAllScheduled(QStringList &strList)
 {
     RecList schedlist;
 
@@ -4130,37 +4130,34 @@ void Scheduler::AddNotListed(void) {
  *
  *  \note Caller is responsible for deleting the RecordingInfo's returned.
  */
-void Scheduler::GetAllScheduled(RecList &proglist) const
+void Scheduler::GetAllScheduled(RecList &proglist)
 {
-    QMutexLocker locker(&schedLock); // Lock needed to access recordTable
-
     QString query = QString(
-        "SELECT RECTABLE.title,       RECTABLE.subtitle,    " //  0,1
-        "       RECTABLE.description, RECTABLE.season,      " //  2,3
-        "       RECTABLE.episode,     RECTABLE.category,    " //  4,5
-        "       RECTABLE.chanid,      channel.channum,      " //  6,7
-        "       RECTABLE.station,     channel.name,         " //  8,9
-        "       RECTABLE.recgroup,    RECTABLE.playgroup,   " // 10,11
-        "       RECTABLE.seriesid,    RECTABLE.programid,   " // 12,13
-        "       RECTABLE.inetref,     RECTABLE.recpriority, " // 14,15
-        "       RECTABLE.startdate,   RECTABLE.starttime,   " // 16,17
-        "       RECTABLE.enddate,     RECTABLE.endtime,     " // 18,19
-        "       RECTABLE.recordid,    RECTABLE.type,        " // 20,21
-        "       RECTABLE.dupin,       RECTABLE.dupmethod,   " // 22,23
-        "       RECTABLE.findid,                            " // 24
-        "       channel.commmethod                          " // 25
-        "FROM RECTABLE "
-        "LEFT JOIN channel ON channel.callsign = RECTABLE.station "
+        "SELECT record.title,       record.subtitle,    " //  0,1
+        "       record.description, record.season,      " //  2,3
+        "       record.episode,     record.category,    " //  4,5
+        "       record.chanid,      channel.channum,    " //  6,7
+        "       record.station,     channel.name,       " //  8,9
+        "       record.recgroup,    record.playgroup,   " // 10,11
+        "       record.seriesid,    record.programid,   " // 12,13
+        "       record.inetref,     record.recpriority, " // 14,15
+        "       record.startdate,   record.starttime,   " // 16,17
+        "       record.enddate,     record.endtime,     " // 18,19
+        "       record.recordid,    record.type,        " // 20,21
+        "       record.dupin,       record.dupmethod,   " // 22,23
+        "       record.findid,                          " // 24
+        "       channel.commmethod                      " // 25
+        "FROM record "
+        "LEFT JOIN channel ON channel.callsign = record.station "
         "GROUP BY recordid "
         "ORDER BY title ASC");
-    query.replace("RECTABLE", recordTable);
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(query);
 
     if (!result.exec())
     {
-        MythDB::DBError("FindAllScheduledPrograms", result);
+        MythDB::DBError("GetAllScheduled", result);
         return;
     }
 

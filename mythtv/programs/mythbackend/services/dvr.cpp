@@ -539,11 +539,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
                                               int nCount      )
 {
     RecList recList;
-    Scheduler *sched = new Scheduler(false, NULL);
-    sched->GetAllScheduled(recList);
-
-    delete sched;
-    sched = NULL;
+    Scheduler::GetAllScheduled(recList);
 
     // ----------------------------------------------------------------------
     // Build Response

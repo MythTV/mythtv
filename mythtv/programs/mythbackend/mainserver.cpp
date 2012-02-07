@@ -3200,7 +3200,7 @@ void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
     QStringList strList;
 
     if (m_sched)
-        m_sched->GetAllScheduled(strList);
+        Scheduler::GetAllScheduled(strList);
     else
         strList << QString::number(0);
 
