@@ -2697,9 +2697,9 @@ static HostCheckBox *EnableMediaMon()
     HostCheckBox *gc = new HostCheckBox("MonitorDrives");
     gc->setLabel(QObject::tr("Monitor CD/DVD") +
                  QObject::tr(" (and other removable devices)"));
-    gc->setHelpText(QObject::tr("This enables support for monitoring "
-                    "your CD/DVD drives for new disks and launching "
-                    "the proper plugin to handle them."));
+    gc->setHelpText(QObject::tr("This enables support for monitoring your "
+                    "CD/DVD drives for new disks and launching the proper "
+                    "plugin to handle them. Requires restart."));
     gc->setValue(false);
     return gc;
 }
@@ -2711,7 +2711,8 @@ static HostLineEdit *IgnoreMedia()
     ge->setValue("");
     ge->setHelpText(QObject::tr("If there are any devices that you do not want "
                                 "to be monitored, list them here with commas "
-                                "in-between. The plugins will ignore them"));
+                                "in-between. The plugins will ignore them. "
+                                "Requires restart."));
     return ge;
 }
 
