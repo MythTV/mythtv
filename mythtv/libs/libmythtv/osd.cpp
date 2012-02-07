@@ -456,33 +456,34 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
             screenshot->SetFilename(screenshotpath);
             screenshot->Load(false);
         }
-        MythUIProgressBar *bar =
-            dynamic_cast<MythUIProgressBar *>(win->GetChild("elapsedpercent"));
-        if (bar)
+    }
+
+    MythUIProgressBar *bar =
+        dynamic_cast<MythUIProgressBar *>(win->GetChild("elapsedpercent"));
+    if (bar)
+    {
+        int startts = map["startts"].toInt();
+        int endts   = map["endts"].toInt();
+        int nowts   = QDateTime::currentDateTime().toTime_t();
+        if (startts > nowts)
         {
-            int startts = map["startts"].toInt();
-            int endts   = map["endts"].toInt();
-            int nowts   = QDateTime::currentDateTime().toTime_t();
-            if (startts > nowts)
-            {
-                bar->SetUsed(0);
-            }
-            else if (endts < nowts)
-            {
-                bar->SetUsed(1000);
-            }
-            else
-            {
-                int duration = endts - startts;
-                if (duration > 0)
-                    bar->SetUsed(1000 * (nowts - startts) / duration);
-                else
-                    bar->SetUsed(0);
-            }
-            bar->SetVisible(startts > 0);
-            bar->SetStart(0);
-            bar->SetTotal(1000);
+            bar->SetUsed(0);
         }
+        else if (endts < nowts)
+        {
+            bar->SetUsed(1000);
+        }
+        else
+        {
+            int duration = endts - startts;
+            if (duration > 0)
+                bar->SetUsed(1000 * (nowts - startts) / duration);
+            else
+                bar->SetUsed(0);
+        }
+        bar->SetVisible(startts > 0);
+        bar->SetStart(0);
+        bar->SetTotal(1000);
     }
 
     win->SetVisible(true);
