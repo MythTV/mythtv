@@ -1124,63 +1124,7 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
     if (this == NULL)
         return;
 
-    QString coverfile;
-    if (IsHostSet()
-        && !GetCoverFile().startsWith("/")
-        && !GetCoverFile().isEmpty()
-        && !IsDefaultCoverFile(GetCoverFile()))
-    {
-        coverfile = generate_file_url("Coverart", GetHost(),
-                GetCoverFile());
-    }
-    else
-    {
-        coverfile = GetCoverFile();
-    }
-
-    metadataMap["coverfile"] = coverfile;
-
-    QString screenshotfile;
-    if (IsHostSet() && !GetScreenshot().startsWith("/")
-        && !GetScreenshot().isEmpty())
-    {
-        screenshotfile = generate_file_url("Screenshots",
-                GetHost(), GetScreenshot());
-    }
-    else
-    {
-        screenshotfile = GetScreenshot();
-    }
-
-    metadataMap["screenshotfile"] = screenshotfile;
-
-    QString bannerfile;
-    if (IsHostSet() && !GetBanner().startsWith("/")
-        && !GetBanner().isEmpty())
-    {
-        bannerfile = generate_file_url("Banners", GetHost(),
-                GetBanner());
-    }
-    else
-    {
-        bannerfile = GetBanner();
-    }
-
-    metadataMap["bannerfile"] = bannerfile;
-
-    QString fanartfile;
-    if (IsHostSet() && !GetFanart().startsWith("/")
-        && !GetFanart().isEmpty())
-    {
-        fanartfile = generate_file_url("Fanart", GetHost(),
-                GetFanart());
-    }
-    else
-    {
-        fanartfile = GetFanart();
-    }
-
-    metadataMap["fanartfile"] = fanartfile;
+    GetImageMap(metadataMap);
 
     metadataMap["filename"] = GetFilename();
     metadataMap["title"] = GetTitle();
@@ -1218,12 +1162,7 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
         metadataMap["season"] = metadataMap["episode"] = QString();
     }
 
-    metadataMap["trailerstate"] = TrailerToState(GetTrailer());
-    metadataMap["userratingstate"] =
-            QString::number((int)(GetUserRating()));
-    metadataMap["watchedstate"] = WatchedToState(GetWatched());
-
-    metadataMap["videolevel"] = ParentalLevelToState(GetShowLevel());
+    GetStateMap(metadataMap);
 
     metadataMap["insertdate"] = MythDateToString(GetInsertdate(), kDateFull |
                                                                   kAddYear);
@@ -1234,6 +1173,77 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
     metadataMap["watched"] = GetDisplayWatched(GetWatched());
     metadataMap["processed"] = GetDisplayProcessed(GetProcessed());
     metadataMap["category"] = GetCategory();
+}
+
+
+void VideoMetadata::GetStateMap(MetadataMap& stateMap)
+{
+    stateMap["trailerstate"] = TrailerToState(GetTrailer());
+    stateMap["userratingstate"] =
+            QString::number((int)(GetUserRating()));
+    stateMap["watchedstate"] = WatchedToState(GetWatched());
+    stateMap["videolevel"] = ParentalLevelToState(GetShowLevel());
+}
+
+void VideoMetadata::GetImageMap(MetadataMap& imageMap)
+{
+    QString coverfile;
+    if (IsHostSet()
+        && !GetCoverFile().startsWith("/")
+        && !GetCoverFile().isEmpty()
+        && !IsDefaultCoverFile(GetCoverFile()))
+    {
+        coverfile = generate_file_url("Coverart", GetHost(),
+                GetCoverFile());
+    }
+    else
+    {
+        coverfile = GetCoverFile();
+    }
+
+    imageMap["coverfile"] = coverfile;
+
+    QString screenshotfile;
+    if (IsHostSet() && !GetScreenshot().startsWith("/")
+        && !GetScreenshot().isEmpty())
+    {
+        screenshotfile = generate_file_url("Screenshots",
+                GetHost(), GetScreenshot());
+    }
+    else
+    {
+        screenshotfile = GetScreenshot();
+    }
+
+    imageMap["screenshotfile"] = screenshotfile;
+
+    QString bannerfile;
+    if (IsHostSet() && !GetBanner().startsWith("/")
+        && !GetBanner().isEmpty())
+    {
+        bannerfile = generate_file_url("Banners", GetHost(),
+                GetBanner());
+    }
+    else
+    {
+        bannerfile = GetBanner();
+    }
+
+    imageMap["bannerfile"] = bannerfile;
+
+    QString fanartfile;
+    if (IsHostSet() && !GetFanart().startsWith("/")
+        && !GetFanart().isEmpty())
+    {
+        fanartfile = generate_file_url("Fanart", GetHost(),
+                GetFanart());
+    }
+    else
+    {
+        fanartfile = GetFanart();
+    }
+
+    imageMap["fanartfile"] = fanartfile;
 }
 
 void ClearMap(MetadataMap &metadataMap)
