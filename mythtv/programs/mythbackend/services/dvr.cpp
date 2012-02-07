@@ -426,8 +426,12 @@ bool Dvr::RemoveRecordSchedule ( uint nRecordId )
 DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
                                               int nCount      )
 {
-    vector<ProgramInfo *> infoList;
-    RemoteGetAllScheduledRecordings(infoList);
+    RecList recList;
+    Scheduler *sched = new Scheduler(false, NULL);
+    sched->findAllScheduledPrograms(recList);
+
+    delete sched;
+    sched = NULL;
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -435,24 +439,21 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
 
     DTC::RecRuleList *pRecRules = new DTC::RecRuleList();
 
-    nStartIndex   = min( nStartIndex, (int)infoList.size() );
-    nCount        = (nCount > 0) ? min( nCount, (int)infoList.size() ) : infoList.size();
-    int nEndIndex = min((nStartIndex + nCount), (int)infoList.size() );
+    nStartIndex   = min( nStartIndex, (int)recList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (int)recList.size() ) : recList.size();
+    int nEndIndex = min((nStartIndex + nCount), (int)recList.size() );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
-        RecordingRule *rule = new RecordingRule();
-        ProgramInfo *pInfo = infoList[ n ];
-        rule->LoadByProgram(pInfo);
+        RecordingInfo *info = recList[n];
 
-        if (pInfo != NULL)
+        if (info != NULL)
         {
             DTC::RecRule *pRecRule = pRecRules->AddNewRecRule();
 
-            FillRecRuleInfo( pRecRule, rule );
+            FillRecRuleInfo( pRecRule, info->GetRecordingRule() );
 
-            delete rule;
-            delete pInfo;
+            delete info;
         }
     }
 
@@ -460,7 +461,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
 
     pRecRules->setStartIndex    ( nStartIndex     );
     pRecRules->setCount         ( nCount          );
-    pRecRules->setTotalAvailable( infoList.size() );
+    pRecRules->setTotalAvailable( recList.size() );
     pRecRules->setAsOf          ( QDateTime::currentDateTime() );
     pRecRules->setVersion       ( MYTH_BINARY_VERSION );
     pRecRules->setProtoVer      ( MYTH_PROTO_VERSION  );

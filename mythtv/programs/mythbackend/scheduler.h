@@ -57,6 +57,7 @@ class Scheduler : public MThread, public MythScheduler
     virtual QMap<QString,ProgramInfo*> GetRecording(void) const;
 
     void getAllScheduled(QStringList &strList);
+    void findAllScheduledPrograms(RecList &proglist);
 
     void getConflicting(RecordingInfo *pginfo, QStringList &strlist);
     void getConflicting(RecordingInfo *pginfo, RecList *retlist);
@@ -127,7 +128,6 @@ class Scheduler : public MThread, public MythScheduler
 
     bool ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp);
 
-    void findAllScheduledPrograms(RecList &proglist);
     bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                              bool &blockShutdown);
     void ShutdownServer(int prerollseconds, QDateTime &idleSince);
