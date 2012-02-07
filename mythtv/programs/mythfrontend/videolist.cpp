@@ -300,6 +300,7 @@ static MythGenericTree *AddDirNode(MythGenericTree *where_to_add,
     sub_node->setOrderingIndex(kNodeSort);
     sub_node->SetData(QVariant::fromValue(TreeNodeData(fqPath, host, prefix)));
     sub_node->SetText(name, "title");
+    sub_node->DisplayState("subfolder", "nodetype");
 
     // ...and the updir node.
     if (add_up_dirs)
@@ -309,6 +310,7 @@ static MythGenericTree *AddDirNode(MythGenericTree *where_to_add,
                                   true, false);
         up_node->setAttribute(kNodeSort, kOrderUp);
         up_node->setOrderingIndex(kNodeSort);
+        up_node->DisplayState("subfolder", "nodetype");
     }
 
     return sub_node;
