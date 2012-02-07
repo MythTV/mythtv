@@ -333,6 +333,7 @@ static int AddFileNode(MythGenericTree *where_to_add, QString name,
     QHash<QString, QString> imageMap;
     metadata->GetImageMap(imageMap);
     sub_node->SetImageFromMap(imageMap);
+    sub_node->SetImage("buttonimage", imageMap["smartimage"]);
 
     // Statetypes
     QHash<QString, QString> stateMap;

@@ -1244,6 +1244,11 @@ void VideoMetadata::GetImageMap(MetadataMap& imageMap)
     }
 
     imageMap["fanartfile"] = fanartfile;
+
+    QString smartimage = coverfile;
+    if (!screenshotfile.isEmpty () && (GetSeason() > 0 || GetEpisode() > 0))
+        smartimage = screenshotfile;
+    imageMap["smartimage"] = smartimage;
 }
 
 void ClearMap(MetadataMap &metadataMap)
