@@ -269,15 +269,17 @@
                     <statetype name="nodetype">
                         <position>550,62</position>
                         <state name="subfolder">
-                            <imagetype name="icon">
+                            <imagetype name="subicon">
                                 <area>0,0,30,30</area>
-                                <filename>mv_gallery_dir.png</filename>
-                                <preserveaspect>yes</preserveaspect>
+                                <filename>shared/directory.png</filename>
+                                <preserveaspect>true</preserveaspect>
                             </imagetype>
                         </state>
                         <state name="upfolder" from="subfolder">
-                            <imagetype name="icon">
-                                <filename>mv_gallery_dir_up.png</filename>
+                            <imagetype name="upicon">
+                                <area>14,13,10,10</area>
+                                <filename>shared/updirectory.png</filename>
+                                <preserveaspect>true</preserveaspect>
                             </imagetype>
                         </state>
                     </statetype>
@@ -302,6 +304,9 @@
                         <filename>mv_browse_nocover.png</filename>
                         <mask>video/managerpostermask.png</mask>
                     </imagetype>
+                    <statetype name="nodetype">
+                        <position>550,87</position>
+                    </statetype>
                     <textarea name="buttontext">
                         <position>100,32</position>
                     </textarea>
@@ -694,7 +699,6 @@
                         <state name="subfolder">
                             <imagetype name="icon">
                                 <filename>shared/directory.png</filename>
-                                <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                         <state name="upfolder" from="subfolder">
@@ -833,95 +837,175 @@
         </textarea>
 
         <textarea name="breadcrumbs" from="basetextarea">
-            <area>50,50,700,40</area>
+            <area>17,55,1250,30</area>
             <font>basemedium</font>
         </textarea>
 
         <buttontree name="videos">
-            <area>40,80,905,260</area>
+            <area>17,90,1250,380</area>
             <numlists>3</numlists>
             <spacing>10</spacing>
-            <buttonlist name="listtemplate" from="basebuttonlist" />
+            <buttonlist name="listtemplate">
+                <area>0,0,410,100%</area>
+                <layout>vertical</layout>
+                <spacing>5</spacing>
+                <wrapstyle>selection</wrapstyle>
+                <buttonarea>0,0,100%,355</buttonarea>
+                <statetype name="buttonitem">
+                    <state name="active">
+                        <area>0,0,100%,50</area>
+                        <shape name="buttonbackground">
+                            <area>0,0,100%,100%</area>
+                            <fill style="gradient">
+                                <gradient start="#505050" end="#000000" alpha="200" direction="vertical"  />
+                            </fill>
+                        </shape>
+                        <imagetype name="smartimage">
+                            <area>5,5,30,40</area>
+                            <preserveaspect>true</preserveaspect>
+                        </imagetype>
+                        <statetype name="nodetype">
+                            <position>5,10</position>
+                            <state name="subfolder">
+                                <imagetype name="icon">
+                                    <area>0,0,30,30</area>
+                                    <filename>shared/directory.png</filename>
+                                    <preserveaspect>true</preserveaspect>
+                                </imagetype>
+                            </state>
+                            <state name="upfolder" from="subfolder">
+                                <imagetype name="icon">
+                                    <area>10,10,10,10</area>
+                                    <filename>shared/updirectory.png</filename>
+                                    <preserveaspect>true</preserveaspect>
+                                </imagetype>
+                            </state>
+                            <state name="default">
+
+                            </state>
+                        </statetype>
+                        <textarea name="buttontext">
+                            <area>40,10,330,30</area>
+                            <font>basesmall</font>
+                            <cutdown>yes</cutdown>
+                            <align>left,vcenter</align>
+                        </textarea>
+                        <statetype name="watchedstate">
+                            <position>375,10</position>
+                            <state name="yes">
+                                <imagetype name="watchedimage">
+                                    <area>0,0,30,30</area>
+                                    <filename>shared/watched.png</filename>
+                                    <preserveaspect>true</preserveaspect>
+                                </imagetype>
+                            </state>
+                        </statetype>
+                        <imagetype name="buttonarrow">
+                            <position>390,15</position>
+                            <filename>lb-arrow.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="selectedactive" from="active">
+                        <shape name="buttonbackground">
+                            <fill style="gradient">
+                                <gradient start="#52CA38" end="#349838" alpha="255" />
+                            </fill>
+                        </shape>
+                    </state>
+                    <state name="selectedinactive" from="active">
+                        <shape name="buttonbackground">
+                            <fill style="gradient">
+                                <gradient start="#52CA38" end="#349838" alpha="100" />
+                            </fill>
+                        </shape>
+                        <textarea name="buttontext">
+                            <font>basesmallpurple</font>
+                        </textarea>
+                    </state>
+                </statetype>
+                <statetype name="upscrollarrow">
+                    <position>10,360</position>
+                    <state type="off">
+                        <imagetype name="upon">
+                            <filename>lb-uparrow-reg.png</filename>
+                        </imagetype>
+                    </state>
+                    <state type="full">
+                        <imagetype name="upoff">
+                            <filename>lb-uparrow-sel.png</filename>
+                        </imagetype>
+                    </state>
+                </statetype>
+                <statetype name="downscrollarrow">
+                    <position>40,360</position>
+                    <state type="off">
+                        <imagetype name="dnon">
+                            <filename>lb-dnarrow-reg.png</filename>
+                        </imagetype>
+                    </state>
+                    <state type="full">
+                        <imagetype name="dnoff">
+                            <filename>lb-dnarrow-sel.png</filename>
+                        </imagetype>
+                    </state>
+                </statetype>
+            </buttonlist>
         </buttontree>
 
-        <textarea name="title" from="basetextarea">
-            <area>40,360,530,40</area>
-            <font>baselarge</font>
-        </textarea>
-
-        <textarea name="director" from="basetextarea">
-            <area>50,397,450,30</area>
-        </textarea>
-
-        <textarea name="year" from="basetextarea">
-            <area>500,397,80,30</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="description" from="basetextarea">
-            <area>40,425,530,80</area>
-            <align>left,top</align>
+        <textarea name="novideos" from="basetextarea">
+            <area>50,50,700,50</area>
             <multiline>yes</multiline>
-            <cutdown>yes</cutdown>
-        </textarea>
-
-        <textarea name="novideos" from="description">
-            <align>allcenter</align>
+            <align>hcenter,vcenter</align>
             <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
-        <textarea name="cast" from="basetextarea">
-            <area>40,510,530,70</area>
-            <align>left,top</align>
-            <multiline>yes</multiline>
-            <cutdown>yes</cutdown>
+        <shape name="textbackground" from="basetextbackground">
+            <area>30,490,1222,188</area>
+            <shape name="hline2" from="hline">
+                <position>15,152</position>
+            </shape>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>48,497,570,35</area>
+            <font>baselarge</font>
         </textarea>
 
-        <textarea name="position" from="basetextarea">
-            <area>40,585,530,40</area>
-            <font>basemedium</font>
-            <align>hcenter,vcenter</align>
+        <textarea name="subtitle" from="basetextarea">
+            <area>620,497,570,35</area>
+            <align>right</align>
+            <font>baselarge</font>
         </textarea>
 
-        <imagetype name="coverart">
-            <area>624,365,140,212</area>
-            <preserveaspect>yes</preserveaspect>
-        </imagetype>
-
-        <textarea name="level_label" from="basetextarea">
-            <area>600,590,130,30</area>
-            <value>Parental Level</value>
-            <align>right,vcenter</align>
-        </textarea>
-
-        <statetype name="parentallevel">
-            <position>740,583</position>
-            <state name="None">
-                <imagetype name="icon">
-                    <filename>mv_level_none.png</filename>
-                </imagetype>
-            </state>
-            <state name="Lowest">
-                <imagetype name="icon">
-                    <filename>mv_level_lowest.png</filename>
-                </imagetype>
-            </state>
-            <state name="Low">
-                <imagetype name="icon">
-                    <filename>mv_level_low.png</filename>
-                </imagetype>
-            </state>
-            <state name="Medium">
-                <imagetype name="icon">
-                    <filename>mv_level_medium.png</filename>
-                </imagetype>
-            </state>
-            <state name="High">
-                <imagetype name="icon">
-                    <filename>mv_level_high.png</filename>
-                </imagetype>
-            </state>
+        <statetype name="userratingstate" from="baserating">
+            <position>1193,492</position>
         </statetype>
+
+        <textarea name="description" from="basetextarea">
+            <area>48,540,1182,100</area>
+            <multiline>yes</multiline>
+            <align>vcenter</align>
+        </textarea>
+
+        <textarea name="year" from="basetextarea">
+            <area>48,650,200,25</area>
+        </textarea>
+
+<!--        <textarea name="runtime" from="basetextarea">
+            <area>250,650,600,30</area>
+            <align>left</align>
+        </textarea>
+-->
+        <textarea name="season" from="basetextarea">
+            <area>440,650,400,25</area>
+            <align>hcenter</align>
+            <template>%Season - |SEASON| %% Episode - |EPISODE| %</template>
+        </textarea>
+
+        <textarea name="director" from="basetextarea">
+            <area>850,650,380,25</area>
+            <align>right</align>
+        </textarea>
     </window>
 
     <window name="file_associations">
