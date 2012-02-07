@@ -25,6 +25,7 @@
 
 #include "programinfo.h"
 #include "recordinginfo.h"
+#include "recordingtypes.h"
 #include "channelutil.h"
 #include "metadataimagehelper.h"
 
@@ -180,22 +181,22 @@ void FillRecRuleInfo( DTC::RecRule  *pRecRule,
                                              pRule->m_starttime) );
     pRecRule->setEndTime        (  QDateTime(pRule->m_enddate,
                                              pRule->m_endtime) );
-    pRecRule->setSeriesId       (  pRule->m_seriesid          );
-    pRecRule->setProgramId      (  pRule->m_programid         );
-    pRecRule->setInetref        (  pRule->m_inetref           );
-    pRecRule->setChanId         (  pRule->m_channelid         );
-    pRecRule->setCallSign       (  pRule->m_station           );
-    pRecRule->setDay            (  pRule->m_findday           );
-    pRecRule->setTime           (  pRule->m_findtime          );
-    pRecRule->setFindId         (  pRule->m_findid            );
-    pRecRule->setType           (  pRule->m_type              );
-    pRecRule->setSearchType     (  pRule->m_searchType        );
+    pRecRule->setSeriesId       (  pRule->m_seriesid              );
+    pRecRule->setProgramId      (  pRule->m_programid             );
+    pRecRule->setInetref        (  pRule->m_inetref               );
+    pRecRule->setChanId         (  pRule->m_channelid             );
+    pRecRule->setCallSign       (  pRule->m_station               );
+    pRecRule->setDay            (  pRule->m_findday               );
+    pRecRule->setTime           (  pRule->m_findtime              );
+    pRecRule->setFindId         (  pRule->m_findid                );
+    pRecRule->setType           (  toRawString(pRule->m_type)     );
+    pRecRule->setSearchType     (  toRawString(pRule->m_searchType));
     pRecRule->setRecPriority    (  pRule->m_recPriority       );
     pRecRule->setPreferredInput (  pRule->m_prefInput         );
     pRecRule->setStartOffset    (  pRule->m_startOffset       );
     pRecRule->setEndOffset      (  pRule->m_endOffset         );
-    pRecRule->setDupMethod      (  pRule->m_dupMethod         );
-    pRecRule->setDupIn          (  pRule->m_dupIn             );
+    pRecRule->setDupMethod      (  toRawString(pRule->m_dupMethod)         );
+    pRecRule->setDupIn          (  toRawString(pRule->m_dupIn)             );
     pRecRule->setFilter         (  pRule->m_filter            );
     pRecRule->setRecProfile     (  pRule->m_recProfile        );
     pRecRule->setRecGroup       (  pRule->m_recGroup          );
