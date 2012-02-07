@@ -1202,6 +1202,7 @@ void VideoMetadata::GetImageMap(MetadataMap& imageMap)
     }
 
     imageMap["coverfile"] = coverfile;
+    imageMap["coverart"] = coverfile;
 
     QString screenshotfile;
     if (IsHostSet() && !GetScreenshot().startsWith("/")
@@ -1216,6 +1217,7 @@ void VideoMetadata::GetImageMap(MetadataMap& imageMap)
     }
 
     imageMap["screenshotfile"] = screenshotfile;
+    imageMap["screenshot"] = screenshotfile;
 
     QString bannerfile;
     if (IsHostSet() && !GetBanner().startsWith("/")
@@ -1230,6 +1232,7 @@ void VideoMetadata::GetImageMap(MetadataMap& imageMap)
     }
 
     imageMap["bannerfile"] = bannerfile;
+    imageMap["banner"] = bannerfile;
 
     QString fanartfile;
     if (IsHostSet() && !GetFanart().startsWith("/")
@@ -1244,6 +1247,7 @@ void VideoMetadata::GetImageMap(MetadataMap& imageMap)
     }
 
     imageMap["fanartfile"] = fanartfile;
+    imageMap["fanart"] = fanartfile;
 
     QString smartimage = coverfile;
     if (!screenshotfile.isEmpty () && (GetSeason() > 0 || GetEpisode() > 0))
