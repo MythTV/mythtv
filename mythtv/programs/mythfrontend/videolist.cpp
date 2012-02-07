@@ -1004,77 +1004,10 @@ void VideoListImp::buildDbList()
         video_root->setName("videos");
         ptnm.insert(prefix_to_node_map::value_type(test_prefix, video_root));
     }
-
-    smart_dir_node unknown_prefix_root(new meta_dir_node("",
-                                               QObject::tr("Unknown Prefix"),
-                                               NULL, true));
-
-    smart_dir_node sg_prefix_root(new meta_dir_node("",
-                                               QObject::tr("Storage Groups"),
-                                               NULL, true));
     meta_dir_node *insert_hint = NULL;
     for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p)
     {
-        bool found_prefix = false;
-        if ((*p)->GetFilename().startsWith(test_prefix))
-        {
-            found_prefix = true;
-        }
-        else
-        {
-            for (QStringList::const_iterator prefix = dirs.begin();
-                 prefix != dirs.end(); ++prefix)
-            {
-                if ((*p)->GetFilename().startsWith(*prefix))
-                {
-                    test_prefix = *prefix;
-                    found_prefix = true;
-                    break;
-                }
-            }
-        }
-
-        if (found_prefix)
-        {
-            meta_dir_node *insert_base;
-            prefix_to_node_map::iterator np = ptnm.find(test_prefix);
-            if (np == ptnm.end())
-            {
-                smart_dir_node sdn = video_root->addSubDir(test_prefix,
-                        path_to_node_name(test_prefix), (*p)->GetHost(),
-                        (*p)->GetPrefix());
-                insert_base = sdn.get();
-                insert_base->setPathRoot();
-
-                ptnm.insert(prefix_to_node_map::value_type(test_prefix,
-                                                           insert_base));
-            }
-            else
-            {
-                insert_base = np->second;
-            }
-
-            (*p)->SetPrefix(test_prefix);
-            insert_hint = AddMetadataToDir(*p, insert_base, insert_hint);
-        }
-        else if (!found_prefix && ((*p)->IsHostSet()))
-        {
-            AddMetadataToDir(*p, sg_prefix_root.get());
-        }
-        else
-        {
-            AddMetadataToDir(*p, unknown_prefix_root.get());
-        }
-    }
-
-    if (!sg_prefix_root->empty())
-    {
-        video_root->addSubDir(sg_prefix_root);
-    }
-
-    if (!unknown_prefix_root->empty())
-    {
-        video_root->addSubDir(unknown_prefix_root);
+        AddMetadataToDir(*p, video_root);
     }
 
 //    print_dir_tree(m_metadata_tree); // AEW DEBUG
