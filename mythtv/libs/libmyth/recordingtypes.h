@@ -20,6 +20,7 @@ typedef enum RecordingTypes
     kFindWeeklyRecord
 } RecordingType; // note stored in uin8_t in ProgramInfo
 MPUBLIC QString toString(RecordingType);
+MPUBLIC QString toRawString(RecordingType);
 MPUBLIC QChar   toQChar( RecordingType);
 
 MPUBLIC int RecTypePriority(RecordingType rectype);
@@ -31,7 +32,7 @@ typedef enum RecordingDupInTypes
     kDupsInAll          = 0x0F,
     kDupsNewEpi         = 0x10
 } RecordingDupInType; // note stored in uin8_t in ProgramInfo
-
+MPUBLIC QString toRawString(RecordingDupInType);
 
 typedef enum RecordingDupMethodType
 {
@@ -41,6 +42,7 @@ typedef enum RecordingDupMethodType
     kDupCheckSubDesc  = 0x06,
     kDupCheckSubThenDesc = 0x08
 } RecordingDupMethodType; // note stored in uin8_t in ProgramInfo
+MPUBLIC QString toRawString(RecordingDupMethodType);
 
 typedef enum RecSearchTypes
 {
@@ -51,6 +53,7 @@ typedef enum RecSearchTypes
     kPeopleSearch,
     kManualSearch
 } RecSearchType;
+MPUBLIC QString toRawString(RecSearchType);
 
 #endif
 

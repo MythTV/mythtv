@@ -52,6 +52,35 @@ QString toString(RecordingType rectype)
     }
 }
 
+/// \brief Converts "rectype" into an untranslated description.
+QString toRawString(RecordingType rectype)
+{
+    switch (rectype)
+    {
+        case kSingleRecord:
+            return QString("Single Record");
+        case kTimeslotRecord:
+            return QString("Record Daily");
+        case kWeekslotRecord:
+            return QString("Record Weekly");
+        case kChannelRecord:
+            return QString("Channel Record");
+        case kAllRecord:
+            return QString("Record All");
+        case kFindOneRecord:
+            return QString("Find One");
+        case kFindDailyRecord:
+            return QString("Find Daily");
+        case kFindWeeklyRecord:
+            return QString("Find Weekly");
+        case kOverrideRecord:
+        case kDontRecord:
+            return QString("Override Recording");
+        default:
+            return QString("Not Recording");
+    }
+}
+
 /// \brief Converts "rectype" into a human readable character.
 QChar toQChar(RecordingType rectype)
 {
@@ -83,4 +112,61 @@ QChar toQChar(RecordingType rectype)
             ret = " ";
     }
     return (ret.isEmpty()) ? QChar(' ') : ret[0];
+}
+
+QString toRawString(RecordingDupInType recdupin)
+{
+    switch (recdupin)
+    {
+        case kDupsInRecorded:
+            return QString("Current Recordings");
+        case kDupsInOldRecorded:
+            return QString("Previous Recordings");
+        case kDupsInAll:
+            return QString("All Recordings");
+        case kDupsNewEpi:
+            return QString("New Episodes Only");
+        default:
+            return QString("Unknown");
+    }
+}
+
+QString toRawString(RecordingDupMethodType duptype)
+{
+    switch (duptype)
+    {
+        case kDupCheckNone:
+            return QString("None");
+        case kDupCheckSub:
+            return QString("Subtitle");
+        case kDupCheckDesc:
+            return QString("Description");
+        case kDupCheckSubDesc:
+            return QString("Subtitle and Description");
+        case kDupCheckSubThenDesc:
+            return QString("Subtitle then Description");
+        default:
+            return QString("Unknown");
+    }
+}
+
+QString toRawString(RecSearchType searchtype)
+{
+    switch (searchtype)
+    {
+        case kNoSearch:
+            return QString("None");
+        case kPowerSearch:
+            return QString("Power Search");
+        case kTitleSearch:
+            return QString("Title Search");
+        case kKeywordSearch:
+            return QString("Keyword Search");
+        case kPeopleSearch:
+            return QString("People Search");
+        case kManualSearch:
+            return QString("Manual Search");
+        default:
+            return QString("Unknown");
+    }
 }
