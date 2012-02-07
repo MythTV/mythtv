@@ -618,8 +618,6 @@ void GuideGrid::showMenu(void)
 
         menuPopup->AddButton(tr("Choose Channel Group"));
 
-        menuPopup->AddButton(tr("Cancel"));
-
         popupStack->AddScreen(menuPopup);
     }
     else
@@ -1415,18 +1413,15 @@ void GuideGrid::customEvent(QEvent *event)
         }
         else if (resultid == "channelgrouptogglemenu")
         {
-            if (resulttext != tr("Cancel"))
-            {
-                int changroupid;
-                changroupid = ChannelGroup::GetChannelGroupId(resulttext);
+            int changroupid;
+            changroupid = ChannelGroup::GetChannelGroupId(resulttext);
 
-                if (changroupid > 0)
-                    toggleChannelFavorite(changroupid);
-            }
+            if (changroupid > 0)
+                toggleChannelFavorite(changroupid);
         }
         else if (resultid == "channelgroupmenu")
         {
-            if (resulttext != tr("Cancel") && buttonnum >= 0)
+            if (buttonnum >= 0)
             {
                 int changroupid;
 
@@ -1662,8 +1657,6 @@ void GuideGrid::ChannelGroupMenu(int mode)
             for (uint i = 0; i < m_changrplist.size(); ++i)
                 menuPopup->AddButton(m_changrplist[i].name);
         }
-
-        menuPopup->AddButton(tr("Cancel"));
 
         popupStack->AddScreen(menuPopup);
     }

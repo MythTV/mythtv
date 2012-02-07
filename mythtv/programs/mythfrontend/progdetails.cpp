@@ -741,7 +741,6 @@ void ProgDetails::showMenu(void)
         menuPopup->AddButton(tr("Zoom In"));
         menuPopup->AddButton(tr("Zoom Out"));
         menuPopup->AddButton(tr("Switch Page"));
-        menuPopup->AddButton(tr("Cancel"));
 
         popupStack->AddScreen(menuPopup);
     }

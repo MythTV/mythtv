@@ -282,7 +282,6 @@ void ProgLister::ShowMenu(void)
     sortMenu->AddItem(tr("Reverse Sort Order"));
     sortMenu->AddItem(tr("Sort By Title"));
     sortMenu->AddItem(tr("Sort By Time"));
-    sortMenu->AddItem(tr("Cancel"));
 
     MythMenu *menu = new MythMenu(tr("Options"), this, "menu");
 
@@ -312,8 +311,6 @@ void ProgLister::ShowMenu(void)
         menu->AddItem(
             tr("Delete Episode"), SLOT(ShowDeleteOldEpisodeMenu()));
     }
-
-    menu->AddItem(tr("Cancel"));
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");

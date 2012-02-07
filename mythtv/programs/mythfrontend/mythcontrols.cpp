@@ -209,7 +209,6 @@ void MythControls::ActionButtonPressed()
 
         m_menuPopup->AddButton(tr("Set Binding"));
         m_menuPopup->AddButton(tr("Remove Binding"));
-        m_menuPopup->AddButton(tr("Cancel"));
     }
     else // for blank keys, no reason to ask what to do
         GrabKey();
@@ -236,7 +235,6 @@ void MythControls::ChangeView(void)
     m_menuPopup->AddButton(tr("Actions By Context"));
     m_menuPopup->AddButton(tr("Contexts By Key"));
     m_menuPopup->AddButton(tr("Keys By Context"));
-    m_menuPopup->AddButton(tr("Cancel"));
 
 }
 
@@ -258,7 +256,6 @@ void MythControls::ShowMenu()
     m_menuPopup->AddButton(tr("Save"));
     m_menuPopup->AddButton(tr("Change View"));
     m_menuPopup->AddButton(tr("Reset All Keys to Defaults"));
-    m_menuPopup->AddButton(tr("Cancel"));
 }
 
 void MythControls::Close()
