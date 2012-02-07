@@ -56,8 +56,8 @@ class Scheduler : public MThread, public MythScheduler
     virtual void GetAllPending(QStringList &strList) const;
     virtual QMap<QString,ProgramInfo*> GetRecording(void) const;
 
-    void getAllScheduled(QStringList &strList);
-    void findAllScheduledPrograms(RecList &proglist);
+    void GetAllScheduled(QStringList &strList) const;
+    void GetAllScheduled(RecList &proglist) const;
 
     void getConflicting(RecordingInfo *pginfo, QStringList &strlist);
     void getConflicting(RecordingInfo *pginfo, RecList *retlist);

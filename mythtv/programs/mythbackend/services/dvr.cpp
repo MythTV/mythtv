@@ -540,7 +540,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
 {
     RecList recList;
     Scheduler *sched = new Scheduler(false, NULL);
-    sched->findAllScheduledPrograms(recList);
+    sched->GetAllScheduled(recList);
 
     delete sched;
     sched = NULL;

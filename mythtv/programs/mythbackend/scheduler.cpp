@@ -1576,11 +1576,12 @@ void Scheduler::GetAllPending(QStringList &strList) const
     }
 }
 
-void Scheduler::getAllScheduled(QStringList &strList)
+/// Returns all scheduled programs serialized into a QStringList
+void Scheduler::GetAllScheduled(QStringList &strList) const
 {
     RecList schedlist;
 
-    findAllScheduledPrograms(schedlist);
+    GetAllScheduled(schedlist);
 
     strList << QString::number(schedlist.size());
 
@@ -4125,8 +4126,14 @@ void Scheduler::AddNotListed(void) {
         worklist.push_back(*tmp);
 }
 
-void Scheduler::findAllScheduledPrograms(RecList &proglist)
+/** \brief Returns all scheduled programs
+ *
+ *  \note Caller is responsible for deleting the RecordingInfo's returned.
+ */
+void Scheduler::GetAllScheduled(RecList &proglist) const
 {
+    QMutexLocker locker(&schedLock); // Lock needed to access recordTable
+
     QString query = QString(
         "SELECT RECTABLE.title,       RECTABLE.subtitle,    " //  0,1
         "       RECTABLE.description, RECTABLE.season,      " //  2,3
@@ -4153,7 +4160,7 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
 
     if (!result.exec())
     {
-        MythDB::DBError("findAllScheduledPrograms", result);
+        MythDB::DBError("FindAllScheduledPrograms", result);
         return;
     }
 
