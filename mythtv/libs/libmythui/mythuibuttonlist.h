@@ -64,11 +64,11 @@ class MUI_PUBLIC MythUIButtonListItem
 
     void SetImage(const QString &filename, const QString &name="",
                   bool force_reload = false);
-    void SetImageFromMap(const QMap<QString, QString> &imageMap);
+    void SetImageFromMap(const InfoMap &imageMap);
     QString GetImage(const QString &name="") const;
 
     void DisplayState(const QString &state, const QString &name);
-    void SetStatesFromMap(const QMap<QString, QString> &stateMap);
+    void SetStatesFromMap(const InfoMap &stateMap);
 
     bool checkable() const;
     void setCheckable(bool flag);
@@ -98,8 +98,8 @@ class MUI_PUBLIC MythUIButtonListItem
 
     QMap<QString, TextProperties> m_strings;
     QMap<QString, MythImage*> m_images;
-    QMap<QString, QString> m_imageFilenames;
-    QMap<QString, QString> m_states;
+    InfoMap m_imageFilenames;
+    InfoMap m_states;
 
     friend class MythUIButtonList;
     friend class MythGenericTree;
