@@ -1043,7 +1043,7 @@ void VideoDialog::Load()
 {
     reloadData();
     // We only want to prompt once, on startup, hence we this is done in Load()
-    if (m_d->m_rootNode->getInt() != kNoFilesFound)
+    if (m_d->m_rootNode->getInt() == kNoFilesFound)
         PromptToScan();
 }
 
@@ -1060,7 +1060,7 @@ void VideoDialog::refreshData()
             ParentalLevelToState(m_d->m_parentalLevel.GetLevel()));
 
     if (m_novideoText)
-        m_novideoText->SetVisible(m_d->m_rootNode->getInt() != kNoFilesFound);
+        m_novideoText->SetVisible(m_d->m_rootNode->getInt() == kNoFilesFound);
 }
 
 void VideoDialog::reloadAllData(bool dbChanged)
