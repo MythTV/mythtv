@@ -64,6 +64,7 @@ class VideoDialog : public MythScreenType
 
   protected slots:
     void Init(); /// Called after the screen is created by MythScreenStack
+    void Load(); /// Called after the screen is created by MythScreenStack
 
   private slots:
     void UpdatePosition();
@@ -110,6 +111,8 @@ class VideoDialog : public MythScreenType
     MythMenu* CreateViewMenu();
     MythMenu* CreateSettingsMenu();
     MythMenu* CreateMetadataBrowseMenu();
+
+    void PromptToScan();
 
     void ChangeFilter();
 
