@@ -43,6 +43,10 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
                        QObject *caller);
     bool download(const QString &url, const QString &dest,
                   const bool reload = false);
+    bool downloadAuth(const QString &url, const QString &dest,
+                      void (*authCallback)(QNetworkReply*, QAuthenticator*,
+                            void*),
+                      void *authArg, const bool reload);
     bool download(const QString &url, QByteArray *data,
                   const bool reload = false);
     QNetworkReply *download(const QString &url, const bool reload = false);
@@ -52,6 +56,9 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void queuePost(const QString &url, QByteArray *data, QObject *caller);
     void queuePost(QNetworkRequest *req, QByteArray *data, QObject *caller);
     bool post(const QString &url, QByteArray *data);
+    bool postAuth(const QString &url, QByteArray *data, const QString &dest,
+                  void (*authCallback)(QNetworkReply*, QAuthenticator*, void*),
+                  void *authArg);
     bool post(QNetworkRequest *req, QByteArray *data);
 
     // Cancel a download
@@ -69,6 +76,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
   private slots:
     // QNetworkAccessManager signals
     void downloadFinished(QNetworkReply* reply);
+    void authCallback(QNetworkReply *reply, QAuthenticator *authenticator);
 
     // QNetworkReply signals
     void downloadError(QNetworkReply::NetworkError errorCode);
@@ -87,7 +95,9 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     bool processItem(const QString &url, QNetworkRequest *req,
                      const QString &dest, QByteArray *data,
                      const MRequestType reqType = kRequestGet,
-                     const bool reload = false);
+                     void (*authCallback)(QNetworkReply*, QAuthenticator*,
+                                          void*) = NULL,
+                     void *authArg = NULL, const bool reload = false);
 
     void downloadRemoteFile(MythDownloadInfo *dlInfo);
     void downloadQNetworkRequest(MythDownloadInfo *dlInfo);

@@ -5,6 +5,8 @@
 #include <QDateTime>
 #include <QXmlDefaultHandler>
 #include <QMap>
+#include <QNetworkReply>
+#include <QAuthenticator>
 
 #include "mythtvexp.h"
 
@@ -302,6 +304,7 @@ class MTV_PUBLIC DataDirectProcessor
 {
 
     friend class DDStructureParser;
+    friend void authenticationCallback(QNetworkReply*, QAuthenticator*, void*);
 
   public:
     DataDirectProcessor(uint listings_provider = DD_ZAP2IT,
@@ -401,7 +404,6 @@ class MTV_PUBLIC DataDirectProcessor
     void CreateTemp(const QString &templatefilename, const QString &errmsg,
                     bool directory, QString &filename, bool &ok) const;
 
-    QString GetPostFilename(bool &ok) const;
     QString GetResultFilename(bool &ok) const;
     QString GetCookieFilename(bool &ok) const;
 
@@ -412,14 +414,14 @@ class MTV_PUBLIC DataDirectProcessor
     static bool Post(QString url, const PostList &list, QString documentFile,
                      QString inCookieFile, QString outCookieFile);
 
-    static bool DDPost(QString    url,
-                       QString    postFilename, QString   &inputFilename,
-                       QString    userid,       QString    password,
+    bool DDPost(QString    url,          QString   &inputFilename,
                        QDateTime  pstartDate,   QDateTime  pendDate,
                        QString   &err_txt);
 
 
   private:
+    void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth);
+
     uint          m_listingsProvider;
     DDProviders   m_providers;
 

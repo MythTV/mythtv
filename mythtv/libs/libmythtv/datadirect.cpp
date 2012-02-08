@@ -4,6 +4,8 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QByteArray>
+#include <QNetworkReply>
+#include <QAuthenticator>
 
 // MythTV headers
 #include "datadirect.h"
@@ -19,6 +21,7 @@
 #include "dbutil.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include "mythdownloadmanager.h"
 #include "mythtvexp.h"
 
 #define SHOW_WGET_OUTPUT 0
@@ -46,6 +49,8 @@ static uint    update_channel_basic(uint    sourceid,   bool    insert,
                                     QString xmltvid,    QString callsign,
                                     QString name,       uint    freqid,
                                     QString chan_major, QString chan_minor);
+void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth,
+                            void *arg);
 
 DataDirectStation::DataDirectStation(void) :
     stationid(""),              callsign(""),
@@ -957,89 +962,77 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
 #endif
 }
 
-bool DataDirectProcessor::DDPost(
-    QString    ddurl,
-    QString    postFilename, QString   &inputFile,
-    QString    userid,       QString    password,
-    QDateTime  pstartDate,   QDateTime  pendDate,
-    QString   &err_txt)
+void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth,
+                            void *arg)
+{
+    LOG(VB_GENERAL, LOG_DEBUG, "main callback");
+    if (!arg)
+        return;
+
+    DataDirectProcessor *dd = reinterpret_cast<DataDirectProcessor *>(arg);
+    dd->authenticationCallback(reply, auth);
+}
+
+void DataDirectProcessor::authenticationCallback(QNetworkReply *reply,
+                                                 QAuthenticator *auth)
+{
+    LOG(VB_GENERAL, LOG_DEBUG, "class callback");
+    (void)reply;
+    auth->setUser(GetUserID());
+    auth->setPassword(GetPassword());
+}
+
+bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
+                                 QDateTime  pstartDate,   QDateTime  pendDate,
+                                 QString   &err_txt)
 {
     if (!inputFile.isEmpty() && QFile(inputFile).exists())
     {
         return true;
     }
 
-    QFile postfile(postFilename);
-    if (!postfile.open(QIODevice::WriteOnly))
-    {
-        err_txt = "Unable to open post data output file.";
-        return false;
-    }
-
     QString startdatestr = pstartDate.toString(Qt::ISODate) + "Z";
     QString enddatestr = pendDate.toString(Qt::ISODate) + "Z";
-    QTextStream poststream(&postfile);
-    poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
-    poststream << "<SOAP-ENV:Envelope\n";
-    poststream <<
-        "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
-    poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
-    poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
-    poststream <<
-        "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
-    poststream << "<SOAP-ENV:Body>\n";
-    poststream << "<ns1:download  xmlns:ns1='urn:TMSWebServices'>\n";
-    poststream << "<startTime xsi:type='xsd:dateTime'>";
-    poststream << startdatestr << "</startTime>\n";
-    poststream << "<endTime xsi:type='xsd:dateTime'>";
-    poststream << enddatestr << "</endTime>\n";
-    poststream << "</ns1:download>\n";
-    poststream << "</SOAP-ENV:Body>\n";
-    poststream << "</SOAP-ENV:Envelope>\n";
-    poststream << flush;
-    postfile.close();
-
-    // Allow for single quotes in userid and password (shell escape)
-    password.replace('\'', "'\\''");
-    userid.replace('\'', "'\\''");
+    QByteArray postdata;
+    postdata  = "<?xml version='1.0' encoding='utf-8'?>\n";
+    postdata += "<SOAP-ENV:Envelope\n";
+    postdata += "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
+    postdata += "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
+    postdata += "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
+    postdata += "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
+    postdata += "<SOAP-ENV:Body>\n";
+    postdata += "<ns1:download  xmlns:ns1='urn:TMSWebServices'>\n";
+    postdata += "<startTime xsi:type='xsd:dateTime'>";
+    postdata += startdatestr;
+    postdata += "</startTime>\n";
+    postdata += "<endTime xsi:type='xsd:dateTime'>";
+    postdata += enddatestr;
+    postdata += "</endTime>\n";
+    postdata += "</ns1:download>\n";
+    postdata += "</SOAP-ENV:Body>\n";
+    postdata += "</SOAP-ENV:Envelope>\n";
 
     if (inputFile.isEmpty()) {
         inputFile = QString("/tmp/mythtv_ddp_data");
     }
 
-    QString command;
+    MythDownloadManager *manager = GetMythDownloadManager();
+
+    if (!manager->postAuth(ddurl, &postdata, inputFile, 
+                           &::authenticationCallback, this))
     {
-        QMutexLocker locker(&user_agent_lock);
-        command = QString(
-            "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
-            " %4 --user-agent='%5' --output-document=%6")
-            .arg(userid).arg(password).arg(postFilename).arg(ddurl)
-            .arg(user_agent).arg(inputFile);
+        err_txt = QString("Could not download.");
+        return false;
     }
 
-#ifdef USING_MINGW
-    // Allow for double quotes in userid and password (shell escape)
-    command.replace("\"","^\"");
-    // Replace single quotes with double-quotes
-    command.replace("'", "\"");
-    // Unescape unix-escaped single-quotes (which just became "\"")
-    command.replace("\"\\\"\"","'");
-    // gzip on win32 complains about broken pipe, so don't use it
-#else
-    // if (!SHOW_WGET_OUTPUT)
-    //    command += " 2> /dev/null ";
+    QFile file(inputFile);
+    file.open(QIODevice::WriteOnly);
+    file.write(postdata);
+    file.close();
 
+#if 0
     command += ".gz --header='Accept-Encoding:gzip'";
-#endif
 
-    if (SHOW_WGET_OUTPUT)
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + "command: " + command);
-
-    err_txt = "Returned failure";
-    if (myth_system(command, kMSAnonLog) != GENERIC_EXIT_OK)
-        return false;
-
-#ifndef USING_MINGW
     if (QFile::exists( inputFile+".gz" ))
     {
         command = QString("gzip -df %1").arg(inputFile+".gz");
@@ -1058,13 +1051,6 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     QString ddurl = m_providers[m_listingsProvider].webServiceURL;
 
     bool ok;
-    QString postFilename = GetPostFilename(ok);
-    if (!ok)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "GrabNextSuggestedTime: Creating temp post file");
-        return false;
-    }
     QString resultFilename = GetResultFilename(ok);
     if (!ok)
     {
@@ -1073,57 +1059,27 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
         return false;
     }
 
-    QFile postfile(postFilename);
-    if (!postfile.open(QIODevice::WriteOnly))
+    QByteArray postdata;
+    postdata  = "<?xml version='1.0' encoding='utf-8'?>\n";
+    postdata += "<SOAP-ENV:Envelope\n";
+    postdata += "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
+    postdata += "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
+    postdata += "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
+    postdata += "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
+    postdata += "<SOAP-ENV:Body>\n";
+    postdata += "<tms:acknowledge xmlns:tms='urn:TMSWebServices'>\n";
+    postdata += "</SOAP-ENV:Body>\n";
+    postdata += "</SOAP-ENV:Envelope>\n";
+
+    MythDownloadManager *manager = GetMythDownloadManager();
+
+    if (!manager->postAuth(ddurl, &postdata, resultFilename, 
+                           &::authenticationCallback, this))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Opening '%1'")
-                .arg(postFilename) + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "GrabNextSuggestedTime: Could not download");
         return false;
     }
-
-    QTextStream poststream(&postfile);
-    poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
-    poststream << "<SOAP-ENV:Envelope\n";
-    poststream
-        << "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
-    poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
-    poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
-    poststream
-        << "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
-    poststream << "<SOAP-ENV:Body>\n";
-    poststream << "<tms:acknowledge xmlns:tms='urn:TMSWebServices'>\n";
-    poststream << "</SOAP-ENV:Body>\n";
-    poststream << "</SOAP-ENV:Envelope>\n";
-    poststream << flush;
-    postfile.close();
-
-    QString command;
-    {
-        QMutexLocker locker(&user_agent_lock);
-        command = QString(
-            "wget --http-user='%1' --http-passwd='%2' --post-file='%3' %4 "
-            "--user-agent='%5' --output-document='%6'")
-            .arg(GetUserID().replace('\'', "'\\''"))
-            .arg(GetPassword().replace('\'', "'\\''")).arg(postFilename)
-            .arg(ddurl).arg(user_agent).arg(resultFilename);
-#ifdef USING_MINGW
-        // Allow for double quotes in userid and password (shell escape)
-        command.replace("\"","^\"");
-        // Replace single quotes with double-quotes
-        command.replace("'", "\"");
-        // Unescape unix-escaped single-quotes (which just became "\"")
-        command.replace("\"\\\"\"","'");
-#endif
-    }
-
-    if (SHOW_WGET_OUTPUT)
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + "command: " + command);
-#ifndef USING_MINGW
-    else
-        command += " 2> /dev/null ";
-#endif
-
-    myth_system(command, kMSAnonLog);
 
     QDateTime NextSuggestedTime;
     QDateTime BlockedTime;
@@ -1207,16 +1163,7 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
             inputfile = cache_dd_data;
     }
 
-    bool ok;
-    QString postFilename = GetPostFilename(ok);
-    if (!ok)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabData: Creating temp post file");
-        return false;
-    }
-
-    if (!DDPost(ddurl, postFilename, inputfile, GetUserID(), GetPassword(),
-                pstartDate, pendDate, err))
+    if (!DDPost(ddurl, inputfile, pstartDate, pendDate, err))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to get data: %1")
                 .arg(err));
@@ -1234,7 +1181,7 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
         return false;
     }
 
-    ok = true;
+    bool ok = true;
 
     DDStructureParser ddhandler(*this);
     QXmlInputSource  xmlsource;
@@ -1850,17 +1797,6 @@ QString DataDirectProcessor::CreateTempDirectory(bool *pok) const
     return m_tmpDir;
 }
 
-QString DataDirectProcessor::GetPostFilename(bool &ok) const
-{
-    ok = true;
-    if (m_tmpPostFile.isEmpty())
-    {
-        CreateTemp(m_tmpDir + "/mythtv_post_XXXXXX",
-                   "Failed to create temp post file",
-                   false, m_tmpPostFile, ok);
-    }
-    return m_tmpPostFile;
-}
 
 QString DataDirectProcessor::GetResultFilename(bool &ok) const
 {
