@@ -1042,7 +1042,7 @@ void VideoDialog::Init()
 void VideoDialog::Load()
 {
     reloadData();
-    // We only want to prompt once, on startup, hence we this is done in Load()
+    // We only want to prompt once, on startup, hence this is done in Load()
     if (m_d->m_rootNode->childCount() == 1 &&
         m_d->m_rootNode->getChildAt(0)->getInt() == kNoFilesFound)
         PromptToScan();
@@ -1067,7 +1067,7 @@ void VideoDialog::refreshData()
         m_novideoText->SetVisible(noFiles);
 }
 
-void VideoDialog::reloadAllData(bool dbChanged)
+void VideoDialog::scanFinished(bool dbChanged)
 {
     delete m_d->m_scanner;
     m_d->m_scanner = 0;
@@ -1080,6 +1080,14 @@ void VideoDialog::reloadAllData(bool dbChanged)
 
     if (m_d->m_autoMeta)
         VideoAutoSearch();
+
+    if (m_d->m_rootNode->childCount() == 1 &&
+        m_d->m_rootNode->getChildAt(0)->getInt() == kNoFilesFound)
+    {
+        QString message = tr("The video scan found no files, have you "
+                             "configured a video storage group?");
+        ShowOkPopup(message);
+    }
 }
 
 /** \fn VideoDialog::reloadData()
@@ -3735,7 +3743,7 @@ void VideoDialog::doVideoScan()
 {
     if (!m_d->m_scanner)
         m_d->m_scanner = new VideoScanner();
-    connect(m_d->m_scanner, SIGNAL(finished(bool)), SLOT(reloadAllData(bool)));
+    connect(m_d->m_scanner, SIGNAL(finished(bool)), SLOT(scanFinished(bool)));
     m_d->m_scanner->doScan(GetVideoDirs());
 }
 

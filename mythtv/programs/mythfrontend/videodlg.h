@@ -135,7 +135,7 @@ class VideoDialog : public MythScreenType
     void doVideoScan();
 
   protected slots:
-    void reloadAllData(bool);
+    void scanFinished(bool);
     void reloadData();
     void refreshData();
     void UpdateItem(MythUIButtonListItem *item);
