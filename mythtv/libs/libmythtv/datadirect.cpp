@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <zlib.h>
 
 // Qt headers
 #include <QDir>
@@ -49,6 +50,7 @@ static uint    update_channel_basic(uint    sourceid,   bool    insert,
                                     QString chan_major, QString chan_minor);
 void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth,
                             void *arg);
+QByteArray gUncompress(const QByteArray &data);
 
 DataDirectStation::DataDirectStation(void) :
     stationid(""),              callsign(""),
@@ -1012,30 +1014,24 @@ bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
         inputFile = QString("/tmp/mythtv_ddp_data");
     }
 
+    const QByteArray header = "Accept-Encoding";
+    const QByteArray value  = "gzip";
+
     MythDownloadManager *manager = GetMythDownloadManager();
 
-    if (!manager->postAuth(ddurl, &postdata, inputFile, 
-                           &::authenticationCallback, this))
+    if (!manager->postAuth(ddurl, &postdata, &::authenticationCallback, this,
+                           &header, &value))
     {
         err_txt = QString("Could not download.");
         return false;
     }
 
+    QByteArray uncompressed = gUncompress(postdata);
+
     QFile file(inputFile);
     file.open(QIODevice::WriteOnly);
-    file.write(postdata);
+    file.write(uncompressed);
     file.close();
-
-#if 0
-    command += ".gz --header='Accept-Encoding:gzip'";
-
-    if (QFile::exists( inputFile+".gz" ))
-    {
-        command = QString("gzip -df %1").arg(inputFile+".gz");
-        if (myth_system(command) != GENERIC_EXIT_OK)
-            return false;
-    }
-#endif
 
     return true;
 }
@@ -1069,8 +1065,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
 
     MythDownloadManager *manager = GetMythDownloadManager();
 
-    if (!manager->postAuth(ddurl, &postdata, resultFilename, 
-                           &::authenticationCallback, this))
+    if (!manager->postAuth(ddurl, &postdata, &::authenticationCallback, this))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "GrabNextSuggestedTime: Could not download");
@@ -2310,6 +2305,56 @@ static QString get_lineup_type(uint sourceid)
     QString ret = srcid_to_type[sourceid];
     ret.detach();
     return ret;
+}
+
+QByteArray gUncompress(const QByteArray &data)
+{
+    if (data.size() <= 4) {
+        LOG(VB_GENERAL, LOG_WARNING, "gUncompress: Input data is truncated");
+        return QByteArray();
+    }
+
+    QByteArray result;
+
+    int ret;
+    z_stream strm;
+    static const int CHUNK_SIZE = 1024;
+    char out[CHUNK_SIZE];
+
+    /* allocate inflate state */
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    strm.avail_in = data.size();
+    strm.next_in = (Bytef*)(data.data());
+
+    ret = inflateInit2(&strm, 15 +  32); // gzip decoding
+    if (ret != Z_OK)
+        return QByteArray();
+
+    // run inflate()
+    do {
+        strm.avail_out = CHUNK_SIZE;
+        strm.next_out = (Bytef*)(out);
+
+        ret = inflate(&strm, Z_NO_FLUSH);
+        Q_ASSERT(ret != Z_STREAM_ERROR);  // state not clobbered
+
+        switch (ret) {
+        case Z_NEED_DICT:
+            ret = Z_DATA_ERROR;     // and fall through
+        case Z_DATA_ERROR:
+        case Z_MEM_ERROR:
+            (void)inflateEnd(&strm);
+            return QByteArray();
+        }
+
+        result.append(out, CHUNK_SIZE - strm.avail_out);
+    } while (strm.avail_out == 0);
+
+    // clean up and return
+    inflateEnd(&strm);
+    return result;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
