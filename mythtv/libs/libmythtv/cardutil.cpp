@@ -1031,7 +1031,7 @@ vector<uint> CardUtil::GetCardIDs(uint sourceid)
     query.prepare(
         "SELECT DISTINCT cardid "
         "FROM cardinput "
-        "WHERE sourceid = :SOURCEID");
+        "WHERE sourceid = :SOURCEID OR :SOURCEID = 0");
     query.bindValue(":SOURCEID", sourceid);
 
     vector<uint> list;
@@ -1212,8 +1212,11 @@ QString CardUtil::GetStartingChannel(uint inputid)
 
 QString CardUtil::GetDisplayName(uint inputid)
 {
+    if (!inputid)
+        return QString::null;
+
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT displayname "
+    query.prepare("SELECT displayname, cardid, inputname "
                   "FROM cardinput "
                   "WHERE cardinputid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
@@ -1221,7 +1224,13 @@ QString CardUtil::GetDisplayName(uint inputid)
     if (!query.exec())
         MythDB::DBError("CardUtil::GetDisplayName(uint)", query);
     else if (query.next())
-        return query.value(0).toString();
+    {
+        QString result = query.value(0).toString();
+        if (result.isEmpty())
+            result = QString("%1: %2").arg(query.value(1).toInt())
+                                      .arg(query.value(2).toString());
+        return result;
+    }
 
     return QString::null;
 }
@@ -1286,7 +1295,7 @@ vector<uint> CardUtil::GetInputIDs(uint cardid)
     query.prepare(
         "SELECT cardinputid "
         "FROM cardinput "
-        "WHERE cardid = :CARDID");
+        "WHERE cardid = :CARDID OR :CARDID = 0");
 
     query.bindValue(":CARDID", cardid);
 
