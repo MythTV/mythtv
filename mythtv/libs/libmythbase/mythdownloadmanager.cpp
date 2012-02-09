@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QNetworkCookieJar>
 #include <QAuthenticator>
+#include <QTextStream>
 
 #include "stdlib.h"
 
@@ -1322,6 +1323,55 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
                                             .arg(url).arg(result.toString()));
 
     return result;
+}
+
+class MythCookieJar : public QNetworkCookieJar
+{
+  public:
+    void load(const QString &filename);
+    void save(const QString &filename);
+};
+
+void MythCookieJar::load(const QString &filename)
+{
+    QList<QNetworkCookie> cookieList;
+    QTextStream stream((QString *)&filename, QIODevice::ReadOnly);
+    while (!stream.atEnd())
+    {
+        QString cookie = stream.readLine();
+        cookieList << QNetworkCookie::parseCookies(cookie.toLocal8Bit());
+    }
+    
+    setAllCookies(cookieList);
+}
+
+void MythCookieJar::save(const QString &filename)
+{
+    QList<QNetworkCookie> cookieList = allCookies();
+    QTextStream stream((QString *)&filename, QIODevice::WriteOnly);
+
+    for (QList<QNetworkCookie>::iterator it = cookieList.begin();
+         it != cookieList.end(); ++it)
+    {
+        stream << (*it).toRawForm() << endl;
+    }
+}
+
+
+void MythDownloadManager::loadCookieJar(const QString &filename)
+{
+    MythCookieJar *jar = new MythCookieJar;
+    jar->load(filename);
+    m_manager->setCookieJar(jar);
+}
+
+void MythDownloadManager::saveCookieJar(const QString &filename)
+{
+    if (!m_manager->cookieJar())
+        return;
+
+    MythCookieJar *jar = static_cast<MythCookieJar *>(m_manager->cookieJar());
+    jar->save(filename);
 }
 
 QString MythDownloadManager::getHeader(const QNetworkCacheMetaData &cacheData,

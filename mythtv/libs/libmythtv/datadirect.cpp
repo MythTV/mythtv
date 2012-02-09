@@ -965,7 +965,6 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
 void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth,
                             void *arg)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, "main callback");
     if (!arg)
         return;
 
@@ -976,7 +975,6 @@ void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth,
 void DataDirectProcessor::authenticationCallback(QNetworkReply *reply,
                                                  QAuthenticator *auth)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, "class callback");
     (void)reply;
     auth->setUser(GetUserID());
     auth->setPassword(GetPassword());
@@ -1844,55 +1842,31 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
                                QString documentFile,
                                QString inCookieFile, QString outCookieFile)
 {
-    QString dfile = QString("'%1' ").arg(documentFile);
-    QString command = "wget ";
+    MythDownloadManager *manager = GetMythDownloadManager();
 
     if (!inCookieFile.isEmpty())
-        command += QString("--load-cookies=%1 ").arg(inCookieFile);
+        manager->loadCookieJar(inCookieFile);
 
-    if (!outCookieFile.isEmpty())
-    {
-        command += "--keep-session-cookies ";
-        command += QString("--save-cookies=%1 ").arg(outCookieFile);
-    }
-
-    QString post_data = "";
+    QByteArray postdata;
     for (uint i = 0; i < list.size(); i++)
     {
-        post_data += ((i) ? "&" : "") + list[i].key + "=";
-        post_data += html_escape(list[i].value);
+        postdata += ((i) ? "&" : "") + list[i].key + "=";
+        postdata += html_escape(list[i].value);
     }
 
-    if (post_data.length())
-        command += "--post-data='" + post_data + "' ";
+    if (!manager->post(url, &postdata))
+        return false;
 
-    command += url;
-    command += " ";
-
-    {
-        QMutexLocker locker(&user_agent_lock);
-        command += QString("--user-agent='%1' ").arg(user_agent);
-    }
-
-    command += "--output-document=";
-    command += (documentFile.isEmpty()) ? "- " : dfile;
-
-#ifdef USING_MINGW
-    command.replace("'", "\"");
-#endif
-
-    if (SHOW_WGET_OUTPUT)
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + "command: " + command);
-    else
-    {
-        command += (documentFile.isEmpty()) ? "&> " : "2> ";
-        command += "/dev/null ";
-    }
-
-    myth_system(command);
+    if (!outCookieFile.isEmpty())
+        manager->saveCookieJar(outCookieFile);
 
     if (documentFile.isEmpty())
         return true;
+
+    QFile file(documentFile);
+    file.open(QIODevice::WriteOnly);
+    file.write(postdata);
+    file.close();
 
     QFileInfo fi(documentFile);
     return fi.size();

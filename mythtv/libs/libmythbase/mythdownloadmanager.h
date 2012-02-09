@@ -68,8 +68,11 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void removeListener(QObject *caller);
     QDateTime GetLastModified(const QString &url);
 
+    void loadCookieJar(const QString &filename);
+    void saveCookieJar(const QString &filename);
     QNetworkCookieJar *getCookieJar(void) { return m_manager->cookieJar(); }
     void setCookieJar(QNetworkCookieJar *cookieJar) { m_manager->setCookieJar(cookieJar); }
+
     QString getHeader(const QUrl &url, const QString &header) { return getHeader(m_manager->cache()->metaData(url), header); }
     QString getHeader(const QNetworkCacheMetaData &cacheData, const QString &header);
 
