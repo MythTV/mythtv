@@ -29,6 +29,7 @@ HEADERS += servicehost.h wsdl.h htmlserver.h serverSideScripting.h
 
 HEADERS += serializers/serializer.h     serializers/xmlSerializer.h 
 HEADERS += serializers/jsonSerializer.h serializers/soapSerializer.h
+HEADERS += serializers/xmlplistSerializer.h
 
 SOURCES += mmulticastsocketdevice.cpp
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
@@ -42,6 +43,7 @@ SOURCES += servicehost.cpp wsdl.cpp upnpsubscription.cpp
 
 SOURCES += serializers/serializer.cpp     serializers/xmlSerializer.cpp
 SOURCES += serializers/jsonSerializer.cpp 
+SOURCES += serializers/xmlplistSerializer.cpp
 
 INCLUDEPATH += ../libmythbase ../libmythservicecontracts ..
 INCLUDEPATH += ./serializers

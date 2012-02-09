@@ -54,6 +54,7 @@
 #include "serializers/xmlSerializer.h"
 #include "serializers/soapSerializer.h"
 #include "serializers/jsonSerializer.h"
+#include "serializers/xmlplistSerializer.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -1414,6 +1415,8 @@ Serializer *HTTPRequest::GetSerializer()
         else if (sAccept.contains( "text/javascript", Qt::CaseInsensitive ))    
             pSerializer = (Serializer *)new JSONSerializer(&m_response,
                                                            m_sMethod);
+        else if (sAccept.contains( "text/x-apple-plist+xml", Qt::CaseInsensitive ))
+            pSerializer = (Serializer *)new XmlPListSerializer(&m_response);
     }
 
     // Default to XML
