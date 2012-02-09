@@ -24,6 +24,7 @@ HEADERS += mythmiscutil.h mythhdd.h mythcdrom.h autodeletedeque.h dbutil.h
 HEADERS += mythhttppool.h mythhttphandler.h mythdeque.h mythlogging.h
 HEADERS += mythbaseutil.h referencecounter.h version.h mythcommandlineparser.h
 HEADERS += mythscheduler.h filesysteminfo.h hardwareprofile.h serverpool.h
+HEADERS += plist.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp
@@ -38,6 +39,7 @@ SOURCES += mythhdd.cpp mythcdrom.cpp dbutil.cpp
 SOURCES += mythhttppool.cpp mythhttphandler.cpp logging.cpp
 SOURCES += referencecounter.cpp mythcommandlineparser.cpp
 SOURCES += filesysteminfo.cpp hardwareprofile.cpp serverpool.cpp
+SOURCES += plist.cpp
 
 win32:SOURCES += msocketdevice_win.cpp
 unix {
@@ -64,6 +66,7 @@ inc.files += mythtranslation.h iso639.h iso3166.h mythmedia.h mythmiscutil.h
 inc.files += mythcdrom.h autodeletedeque.h dbutil.h mythhttppool.h mythdeque.h
 inc.files += referencecounter.h mythcommandlineparser.h mthread.h mthreadpool.h
 inc.files += filesysteminfo.h hardwareprofile.h bonjourregister.h serverpool.h
+inc.files += plist.h
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmythbase
