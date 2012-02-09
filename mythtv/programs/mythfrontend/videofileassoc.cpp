@@ -158,8 +158,6 @@ namespace
     }
 }
 
-Q_DECLARE_METATYPE(UIDToFAPair);
-
 ////////////////////////////////////////////////////////////////////////
 
 class FileAssocDialogPrivate
@@ -540,3 +538,5 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
 
     BuildFocusList();
 }
+
+Q_DECLARE_METATYPE(UIDToFAPair)

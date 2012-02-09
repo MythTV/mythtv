@@ -283,7 +283,7 @@ class MPUBLIC ProgramInfo
     bool IsSameProgramTimeslot(const ProgramInfo &other) const;//sched only
     static int GetRecordingTypeRecPriority(RecordingType type);//sched only
     static bool UsingProgramIDAuthority(void)
-    { 
+    {
         return usingProgIDAuth;
     };
     static void CheckProgramIDAuthorities(void);//sched only
@@ -721,7 +721,6 @@ class MPUBLIC ProgramInfo
     static bool usingProgIDAuth;
 };
 
-Q_DECLARE_METATYPE(ProgramInfo*)
 
 MPUBLIC bool LoadFromProgram(
     ProgramList        &destination,
@@ -802,6 +801,8 @@ class MPUBLIC PMapDBReplacement
     QMutex *lock;
     QMap<MarkTypes,frm_pos_map_t> map;
 };
+
+Q_DECLARE_METATYPE(ProgramInfo*)
 
 #endif // MYTHPROGRAM_H_
 

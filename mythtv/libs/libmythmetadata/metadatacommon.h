@@ -409,7 +409,6 @@ class META_PUBLIC MetadataLookup : public QObject
     const ArtworkMap m_artwork;
     DownloadMap m_downloads;
 };
-Q_DECLARE_METATYPE(MetadataLookup*)
 
 typedef QList<MetadataLookup*> MetadataLookupList;
 
@@ -494,8 +493,10 @@ class META_PUBLIC MetaGrabberScript : public QObject
     QString m_description;
     float m_version;
 };
-Q_DECLARE_METATYPE(MetaGrabberScript*)
 
 META_PUBLIC MetaGrabberScript* ParseGrabberVersion(const QDomElement& item);
+
+Q_DECLARE_METATYPE(MetaGrabberScript*)
+Q_DECLARE_METATYPE(MetadataLookup*)
 
 #endif // METADATACOMMON_H_

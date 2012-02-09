@@ -35,7 +35,6 @@ struct LogLine {
     QString state;
 };
 
-Q_DECLARE_METATYPE(LogLine)
 
 /** \class StatusBox
  *  \brief Reports on various status items.
@@ -548,7 +547,7 @@ void StatusBox::doListingsStatus()
     mfdLastRunEnd = QDateTime::fromString(tmp, Qt::ISODate);
     tmp = gCoreContext->GetSetting("MythFillSuggestedRunTime");
     mfdNextRunStart = QDateTime::fromString(tmp, Qt::ISODate);
-    
+
     mfdLastRunStatus = gCoreContext->GetSetting("mythfilldatabaseLastRunStatus");
     DataDirectMessage = gCoreContext->GetSetting("DataDirectMessage");
 
@@ -906,13 +905,13 @@ void StatusBox::doLogEntries(void)
                         .arg(query.value(4).toString())
                         .arg(query.value(1).toString())
                         .arg(query.value(5).toString());
-            
+
             QString tmp = query.value(6).toString();
             if (!tmp.isEmpty())
                 detail.append(tmp);
             else
                 detail.append(tr("No further details"));
-            
+
             AddLogLine(line, helpmsg, detail, detail,
                        "", query.value(0).toString());
         }
@@ -1452,5 +1451,7 @@ void StatusBox::doAutoExpireList(bool updateExpList)
                    staticInfo + detailInfo);
     }
 }
+
+Q_DECLARE_METATYPE(LogLine)
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

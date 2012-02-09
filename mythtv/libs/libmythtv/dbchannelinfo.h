@@ -72,8 +72,6 @@ class MTV_PUBLIC ChannelInfo
     QString recpriority;
 };
 
-Q_DECLARE_METATYPE(ChannelInfo*)
-
 class MTV_PUBLIC PixmapChannel : public DBChannel
 {
   public:
@@ -192,5 +190,7 @@ class MTV_PUBLIC ChannelInsertInfo
     int     decryption_status;
 };
 typedef vector<ChannelInsertInfo> ChannelInsertInfoList;
+
+Q_DECLARE_METATYPE(ChannelInfo*)
 
 #endif // DB_CHANNEL_INFO_H_

@@ -236,7 +236,6 @@ class META_PUBLIC VideoMetadata
   private:
     class VideoMetadataImp *m_imp;
 };
-Q_DECLARE_METATYPE(VideoMetadata*)
 
 META_PUBLIC void ClearMap(MetadataMap &metadataMap);
 
@@ -244,5 +243,7 @@ META_PUBLIC bool operator==(const VideoMetadata &a, const VideoMetadata &b);
 META_PUBLIC bool operator!=(const VideoMetadata &a, const VideoMetadata &b);
 
 META_PUBLIC bool operator<(const VideoMetadata::SortKey &lhs, const VideoMetadata::SortKey &rhs);
+
+Q_DECLARE_METATYPE(VideoMetadata*)
 
 #endif

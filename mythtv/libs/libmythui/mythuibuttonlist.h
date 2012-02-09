@@ -305,8 +305,6 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     friend class MythUIButtonTree;
 };
 
-Q_DECLARE_METATYPE(MythUIButtonListItem *)
-
 class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
 {
     Q_OBJECT
@@ -334,5 +332,7 @@ class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
     MythUIButton      *m_nextButton;
     MythUIStateType   *m_searchState;
 };
+
+Q_DECLARE_METATYPE(MythUIButtonListItem *)
 
 #endif
