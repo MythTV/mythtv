@@ -1017,21 +1017,37 @@ bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
     const QByteArray header = "Accept-Encoding";
     const QByteArray value  = "gzip";
 
+    LOG(VB_GENERAL, LOG_INFO, "Downloading DataDirect feed");
+
     MythDownloadManager *manager = GetMythDownloadManager();
 
     if (!manager->postAuth(ddurl, &postdata, &::authenticationCallback, this,
                            &header, &value))
     {
-        err_txt = QString("Could not download.");
+        err_txt = QString("Download error");
         return false;
     }
 
+    LOG(VB_GENERAL, LOG_INFO, QString("Downloaded %1 bytes")
+        .arg(postdata.size()));
+
+    LOG(VB_GENERAL, LOG_INFO, "Uncompressing DataDirect feed");
+
     QByteArray uncompressed = gUncompress(postdata);
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Uncompressed to %1 bytes")
+        .arg(uncompressed.size()));
 
     QFile file(inputFile);
     file.open(QIODevice::WriteOnly);
     file.write(uncompressed);
     file.close();
+
+    if (uncompressed.size() == 0)
+    {
+        err_txt = QString("Error uncompressing data");
+        return false;
+    }
 
     return true;
 }
