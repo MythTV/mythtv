@@ -688,14 +688,6 @@
                placeholder_text="Enter guide data program arguments"
                help_text="Any arguments you want passed to the
                           guide data program." />
-      <setting data_type="string" value="MythFillDatabaseLog"
-               setting_type="global"
-               label="Guide data program log path"
-               default_data=""
-               placeholder_text="Enter guide data program log path"
-               help_text="File or directory to use for logging
-                          output from the guide data  program.
-                          Leave blank to disable logging." />
 
       <setting data_type="select" value="MythFillMinHour"
                label="Guide data program execution start"

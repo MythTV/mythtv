@@ -795,17 +795,6 @@ static GlobalLineEdit *MythFillDatabaseArgs()
     return be;
 }
 
-static GlobalLineEdit *MythFillDatabaseLog()
-{
-    GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabaseLog");
-    be->setLabel(QObject::tr("Guide data program log path"));
-    be->setValue("");
-    be->setHelpText(QObject::tr("File or directory to use for logging "
-                    "output from the guide data program. Leave blank "
-                    "to disable logging."));
-    return be;
-}
-
 class MythFillSettings : public TriggeredConfigurationGroup
 {
   public:
@@ -822,7 +811,6 @@ class MythFillSettings : public TriggeredConfigurationGroup
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
          settings->addChild(MythFillDatabasePath());
          settings->addChild(MythFillDatabaseArgs());
-         settings->addChild(MythFillDatabaseLog());
          settings->addChild(MythFillMinHour());
          settings->addChild(MythFillMaxHour());
          settings->addChild(MythFillGrabberSuggestsTime());

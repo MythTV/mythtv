@@ -24,8 +24,6 @@
 #include "mythdownloadmanager.h"
 #include "mythtvexp.h"
 
-#define SHOW_WGET_OUTPUT 0
-
 #define LOC QString("DataDirect: ")
 
 static QMutex  user_agent_lock;
