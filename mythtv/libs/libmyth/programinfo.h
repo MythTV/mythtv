@@ -529,6 +529,7 @@ class MPUBLIC ProgramInfo
     AutoExpireType QueryAutoExpire(void) const;
     TranscodingStatus QueryTranscodeStatus(void) const;
     bool        QueryTuningInfo(QString &channum, QString &input) const;
+    QString     QueryInputDisplayName(void) const;
     uint        QueryAverageWidth(void) const;
     uint        QueryAverageHeight(void) const;
     uint        QueryAverageFrameRate(void) const;

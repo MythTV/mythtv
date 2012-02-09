@@ -15,6 +15,7 @@
 #include "playgroup.h"
 #include "tv_play.h"
 #include "recordingprofile.h"
+#include "cardutil.h"
 
 // Libmythui
 #include "mythmainwindow.h"
@@ -561,20 +562,12 @@ void SchedOptEditor::Load()
     new MythUIButtonListItem(m_inputList, tr("Use any available input"),
                              qVariantFromValue(0));
 
-    query.prepare("SELECT cardinputid, cardid, inputname, displayname "
-                  "FROM cardinput ORDER BY cardinputid");
-
-    if (query.exec())
+    vector<uint> inputids = CardUtil::GetInputIDs(0);
+    for (uint i = 0; i < inputids.size(); ++i)
     {
-        while (query.next())
-        {
-            QString input_name = query.value(3).toString();
-            if (input_name.isEmpty())
-                input_name = QString("%1: %2").arg(query.value(1).toInt())
-                                              .arg(query.value(2).toString());
-            new MythUIButtonListItem(m_inputList, tr("Prefer input %1")
-                                        .arg(input_name), query.value(0));
-        }
+        new MythUIButtonListItem(m_inputList, tr("Prefer input %1")
+                                 .arg(CardUtil::GetDisplayName(inputids[i]))
+                                 .arg(inputids[i]));
     }
 
     m_inputList->SetValueByData(m_recordingRule->m_prefInput);

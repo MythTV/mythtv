@@ -1504,6 +1504,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["rectypestatus"] = tmp_rec;
 
     progMap["card"] = ::toString(GetRecordingStatus(), cardid);
+    progMap["input"] = ::toString(GetRecordingStatus(), inputid);
+    progMap["inputname"] = QueryInputDisplayName();
 
     progMap["recpriority"] = recpriority;
     progMap["recpriority2"] = recpriority2;
@@ -4194,6 +4196,36 @@ bool ProgramInfo::QueryTuningInfo(QString &channum, QString &input) const
         MythDB::DBError("GetChannel(ProgInfo...)", query);
         return false;
     }
+}
+
+/** \brief Returns the display name of the card input for this program.
+ *  \note Ideally this would call CardUtil::GetDisplayName(), but
+ *        that's in libmythtv.  Dupliacte code for now until a better
+ *        solution can be found.
+ */
+QString ProgramInfo::QueryInputDisplayName(void) const
+{
+    if (!inputid)
+        return QString::null;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT displayname, cardid, inputname "
+                  "FROM cardinput "
+                  "WHERE cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
+
+    if (!query.exec())
+        MythDB::DBError("ProgramInfo::GetInputDisplayName(uint)", query);
+    else if (query.next())
+    {
+        QString result = query.value(0).toString();
+        if (result.isEmpty())
+            result = QString("%1: %2").arg(query.value(1).toInt())
+                                      .arg(query.value(2).toString());
+        return result;
+    }
+
+    return QString::null;
 }
 
 static int init_tr(void)
