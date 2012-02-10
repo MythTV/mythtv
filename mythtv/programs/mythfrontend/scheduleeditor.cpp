@@ -566,8 +566,8 @@ void SchedOptEditor::Load()
     for (uint i = 0; i < inputids.size(); ++i)
     {
         new MythUIButtonListItem(m_inputList, tr("Prefer input %1")
-                                 .arg(CardUtil::GetDisplayName(inputids[i]))
-                                 .arg(inputids[i]));
+                                 .arg(CardUtil::GetDisplayName(inputids[i])),
+                                 inputids[i]);
     }
 
     m_inputList->SetValueByData(m_recordingRule->m_prefInput);
