@@ -399,8 +399,8 @@ QString MPEGDescriptor::toString() const
         SET_STRING(ConditionalAccessDescriptor);
     else if (DescriptorID::network_name == DescriptorTag())
         SET_STRING(NetworkNameDescriptor);
-    else if (DescriptorID::linkage == DescriptorTag())
-        SET_STRING(LinkageDescriptor);
+    //else if (DescriptorID::linkage == DescriptorTag())
+    //    SET_STRING(LinkageDescriptor);
     else if (DescriptorID::adaptation_field_data == DescriptorTag())
         SET_STRING(AdaptationFieldDataDescriptor);
     //else if (DescriptorID::ancillary_data == DescriptorTag())
