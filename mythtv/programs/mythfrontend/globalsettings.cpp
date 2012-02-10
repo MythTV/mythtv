@@ -1447,7 +1447,7 @@ static HostCheckBox *CCBackground()
     gc->setValue(false);
     gc->setHelpText(QObject::tr(
                         "If enabled, captions will be displayed "
-                        "as white text over a black background "
+                        "over a black background "
                         "for better contrast."));
     return gc;
 }
