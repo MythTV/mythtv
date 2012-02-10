@@ -90,6 +90,8 @@ using namespace std;
 #endif
 
 #ifdef USING_LIBDNS_SD
+#include <QScopedPointer>
+#include "bonjourregister.h"
 #include "mythairplayserver.h"
 #endif
 
@@ -1556,6 +1558,19 @@ int main(int argc, char **argv)
     setuid(getuid());
 
 #ifdef USING_LIBDNS_SD
+    // this needs to come after gCoreContext has been initialised
+    // (for hostname) - hence it is not in MediaRenderer
+    QScopedPointer<BonjourRegister> bonjour(new BonjourRegister());
+    if (bonjour.data())
+    {
+        QByteArray dummy;
+        int port = gCoreContext->GetNumSetting("UPnP/MythFrontend/ServicePort", 6547);
+        QByteArray name("Mythfrontend on ");
+        name.append(gCoreContext->GetHostName());
+        bonjour->Register(port, "_mythfrontend._tcp",
+                                 name, dummy);
+    }
+
     MythAirplayServer::Create();
 #endif
 
