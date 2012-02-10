@@ -20,6 +20,7 @@ class Frontend : public FrontendServices
     bool                 SendAction(const QString &Action,
                                     const QString &Value,
                                     uint Width, uint Height);
+    bool                 PlayVideo(const QString &Id, bool UseBookmark);
     QStringList          GetContextList(void);
     DTC::FrontendActionList* GetActionList(const QString &Context);
 

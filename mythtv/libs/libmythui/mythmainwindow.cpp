@@ -2318,13 +2318,19 @@ void MythMainWindow::customEvent(QEvent *ce)
         {
             if (me->ExtraDataCount() == 1)
                 HandleMedia("Internal", me->ExtraData(0));
-            else if (me->ExtraDataCount() == 11)
+            else if (me->ExtraDataCount() >= 11)
+            {
+                bool usebookmark = true;
+                if (me->ExtraDataCount() >= 12)
+                    usebookmark = me->ExtraData(11).toInt();
                 HandleMedia("Internal", me->ExtraData(0),
                     me->ExtraData(1), me->ExtraData(2),
                     me->ExtraData(3), me->ExtraData(4),
                     me->ExtraData(5).toInt(), me->ExtraData(6).toInt(),
                     me->ExtraData(7), me->ExtraData(8).toInt(),
-                    me->ExtraData(9), me->ExtraData(10), true);
+                    me->ExtraData(9), me->ExtraData(10),
+                    usebookmark);
+            }
             else
                 LOG(VB_GENERAL, LOG_ERR, "Failed to handle media");
         }

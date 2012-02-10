@@ -7,7 +7,11 @@
 #include "mythevent.h"
 #include "mythuistatetracker.h"
 #include "mythmainwindow.h"
-#include "tv_actions.h"
+#include "tv_play.h"
+
+#include "videometadatalistmanager.h"
+#include "videometadata.h"
+#include "videoutils.h"
 
 #include "frontend.h"
 
@@ -76,6 +80,62 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
 
     QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, Action);
     qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
+    return true;
+}
+
+bool Frontend::PlayVideo(const QString &Id, bool UseBookmark)
+{
+    if (TV::IsTVRunning())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Ignoring PlayVideo request - frontend is busy."));
+        return false;
+    }
+
+    bool ok;
+    quint64 id = Id.toUInt(&ok);
+    if (!ok)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Invalid video Id."));
+        return false;
+    }
+
+    VideoMetadataListManager::VideoMetadataPtr metadata =
+                     VideoMetadataListManager::loadOneFromDatabase(id);
+
+    if (!metadata)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Didn't find any video metadata."));
+        return false;
+    }
+
+    if (metadata->GetHost().isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("No host for video."));
+        return false;
+    }
+
+    QString mrl = generate_file_url("Videos", metadata->GetHost(),
+                                    metadata->GetFilename());
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("PlayVideo, id: %1 usebookmark: %2 url: '%3'")
+        .arg(id).arg(UseBookmark).arg(mrl));
+
+    QStringList args;
+    args <<  mrl << metadata->GetPlot() <<  metadata->GetTitle()
+         << metadata->GetSubtitle() << metadata->GetDirector()
+         << QString::number(metadata->GetSeason())
+         << QString::number(metadata->GetEpisode())
+         << metadata->GetInetRef() << QString::number(metadata->GetLength())
+         << QString::number(metadata->GetYear())
+         << QString::number(metadata->GetID())
+         << QString::number(UseBookmark);
+
+    MythEvent *me = new MythEvent(ACTION_HANDLEMEDIA, args);
+    qApp->postEvent(GetMythMainWindow(), me);
+
     return true;
 }
 
