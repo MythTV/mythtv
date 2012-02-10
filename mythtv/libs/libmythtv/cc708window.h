@@ -200,7 +200,7 @@ class MTV_PUBLIC CC708Window
     bool            exists;
     bool            changed;
 
-    static bool     forceWhiteOnBlackText;
+    static bool     forceBlackBackground;
 
     mutable QMutex  lock;
 };
