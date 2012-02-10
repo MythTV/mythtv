@@ -1,7 +1,15 @@
+// -*- Mode: c++ -*-
+
 #ifndef SUBTITLESCREEN_H
 #define SUBTITLESCREEN_H
 
+#include <QStringList>
+#include <QRegExp>
+#include <QVector>
 #include <QFont>
+#include <QHash>
+#include <QRect>
+#include <QSize>
 
 #ifdef USING_LIBASS
 extern "C" {
@@ -32,6 +40,13 @@ class SubtitleScreen : public MythScreenType
     void ExpireSubtitles(void);
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos);
 
+    void RegisterExpiration(MythUIType *shape, long long endTime)
+    {
+        m_expireTimes.insert(shape, endTime);
+    }
+
+    bool GetUseBackground(void) { return m_useBackground; }
+
     // MythScreenType methods
     virtual bool Create(void);
     virtual void Pulse(void);
@@ -41,7 +56,6 @@ class SubtitleScreen : public MythScreenType
     void DisplayAVSubtitles(void);
     void DisplayTextSubtitles(void);
     void DisplayRawTextSubtitles(void);
-    void OptimiseTextSubs(QStringList &list);
     void DrawTextSubtitles(QStringList &wrappedsubs, uint64_t start,
                            uint64_t duration);
     void DisplayCC608Subtitles(void);
@@ -83,6 +97,67 @@ class SubtitleScreen : public MythScreenType
     ASS_Track         *m_assTrack;
     uint               m_assFontCount;
 #endif // USING_LIBASS
+};
+
+class FormattedTextChunk
+{
+  public:
+    FormattedTextChunk(
+        const QString &t, bool ital, bool bold, bool uline, QColor clr) :
+        text(t), isItalic(ital), isBold(bold), isUnderline(uline), color(clr)
+    {
+    }
+    FormattedTextChunk(void) {}
+
+    QSize CalcSize(int pixelSize) const;
+    bool Split(FormattedTextChunk &newChunk);
+
+    QString text;
+    bool isItalic;
+    bool isBold;
+    bool isUnderline;
+    QColor color;
+};
+
+class FormattedTextLine
+{
+  public:
+    FormattedTextLine(int x = -1, int y = -1) : x_indent(x), y_indent(y) {}
+
+    QSize CalcSize(int pixelSize) const
+    {
+        int height = 0, width = 0;
+        QList<FormattedTextChunk>::const_iterator it;
+        for (it = chunks.constBegin(); it != chunks.constEnd(); ++it)
+        {
+            QSize tmp = (*it).CalcSize(pixelSize);
+            height = max(height, tmp.height());
+            width += tmp.width();
+        }
+        return QSize(width, height);
+    }
+
+    QList<FormattedTextChunk> chunks;
+    int x_indent; // -1 means TBD i.e. centered
+    int y_indent; // -1 means TBD i.e. relative to bottom
+};
+
+class FormattedTextSubtitle
+{
+  public:
+    FormattedTextSubtitle(const QRect &safearea) :
+        m_safeArea(safearea), m_useBackground(true) {}
+    void InitFromCC608(vector<CC608Text*> &buffers);
+    void InitFromSRT(QStringList &subs, int textFontZoom);
+    void WrapLongLines(void);
+    void Draw(SubtitleScreen *parent,
+              uint64_t start = 0, uint64_t duration = 0) const;
+
+  private:
+    QVector<FormattedTextLine> m_lines;
+    const QRect m_safeArea;
+    bool m_useBackground;
+    int m_pixelSize;
 };
 
 #endif // SUBTITLESCREEN_H
