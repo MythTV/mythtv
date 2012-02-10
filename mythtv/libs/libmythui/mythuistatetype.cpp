@@ -1,6 +1,6 @@
-
 // Own header
 #include "mythuistatetype.h"
+#include "mythuibuttonlist.h"
 
 // Qt headers
 #include <QDomDocument>
@@ -48,11 +48,7 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
     m_ObjectsByName[key] = object;
 
     MythRect objectArea = object->GetArea();
-
-    if (m_Parent)
-        objectArea.CalculateArea(m_Parent->GetFullArea());
-    else
-        objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+    objectArea.CalculateArea(m_ParentArea);
 
     ExpandArea(objectArea);
 
@@ -81,11 +77,7 @@ bool MythUIStateType::AddObject(StateType type, MythUIType *object)
     m_ObjectsByState[(int)type] = object;
 
     MythRect objectArea = object->GetArea();
-
-    if (m_Parent)
-        objectArea.CalculateArea(m_Parent->GetFullArea());
-    else
-        objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+    objectArea.CalculateArea(m_ParentArea);
 
     ExpandArea(objectArea);
 
@@ -340,5 +332,33 @@ void MythUIStateType::LoadNow(void)
 {
     if (!m_deferload)
         MythUIType::LoadNow();
+}
+
+void MythUIStateType::RecalculateArea(bool recurse)
+{
+    if (m_Parent)
+    {
+        if (objectName().startsWith("buttonlist button"))
+        {
+            MythUIButtonList *list = dynamic_cast<MythUIButtonList *>(m_Parent);
+            m_ParentArea = list->GetButtonArea();
+        }
+        else
+            m_ParentArea = m_Parent->GetFullArea();
+    }
+    else
+        m_ParentArea = GetMythMainWindow()->GetUIScreenRect();
+
+    m_Area.CalculateArea(m_ParentArea);
+
+    if (recurse)
+    {
+        QList<MythUIType *>::iterator it;
+
+        for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+        {
+            (*it)->RecalculateArea(recurse);
+        }
+    }
 }
 

@@ -142,6 +142,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     virtual int  GetIntValue() const;
     virtual QString  GetValue() const;
     QVariant GetDataValue() const;
+    MythRect GetButtonArea(void) const;
 
     void SetItemCurrent(MythUIButtonListItem* item);
     void SetItemCurrent(int pos, int topPos = -1);
@@ -239,6 +240,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     virtual void CalculateVisibleItems(void);
     virtual QPoint GetButtonPosition(int column, int row) const;
 
+    void SetButtonArea(const MythRect &rect);
     virtual bool ParseElement(
         const QString &filename, QDomElement &element, bool showWarnings);
     virtual void CopyFrom(MythUIType *base);

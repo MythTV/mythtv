@@ -1565,6 +1565,13 @@ QVariant MythUIButtonList::GetDataValue() const
     return QVariant();
 }
 
+MythRect MythUIButtonList::GetButtonArea(void) const
+{
+    if (m_contentsRect.isValid())
+        return m_contentsRect;
+    return m_Area;
+}
+
 MythUIButtonListItem *MythUIButtonList::GetItemFirst() const
 {
     if (!m_itemList.empty())
@@ -2500,6 +2507,21 @@ void MythUIButtonList::CalculateVisibleItems(void)
     m_itemsVisible = m_columns * m_rows;
 }
 
+void MythUIButtonList::SetButtonArea(const MythRect &rect)
+{
+    if (rect == m_contentsRect)
+        return;
+
+    m_contentsRect = rect;
+
+    if (m_Area.isValid())
+        m_contentsRect.CalculateArea(m_Area);
+    else if (m_Parent)
+        m_contentsRect.CalculateArea(m_Parent->GetFullArea());
+    else
+        m_contentsRect.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+}
+
 /**
  *  \copydoc MythUIType::ParseElement()
  */
@@ -2507,7 +2529,7 @@ bool MythUIButtonList::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "buttonarea")
-        m_contentsRect = parseRect(element);
+        SetButtonArea(parseRect(element));
     else if (element.tagName() == "layout")
     {
         QString layout = getFirstText(element).toLower();
