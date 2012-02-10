@@ -6,6 +6,7 @@
 #include "mythlogging.h"
 #include "mythevent.h"
 #include "mythuistatetracker.h"
+#include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "tv_play.h"
 
@@ -81,6 +82,65 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
     QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, Action);
     qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
     return true;
+}
+
+bool Frontend::PlayRecording(int ChanID, const QDateTime &StartTime)
+{
+    QDateTime starttime = StartTime;
+    starttime.setTimeSpec(Qt::UTC);
+
+    if (!starttime.isValid() || ChanID <= 0)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid parameters.");
+        return false;
+    }
+
+    if (GetMythUI()->GetCurrentLocation().toLower() == "playback")
+    {
+        QString message = QString("NETWORK_CONTROL STOP");
+        MythEvent me(message);
+        gCoreContext->dispatch(me);
+
+        QTime timer;
+        timer.start();
+        while ((timer.elapsed() < 10000) &&
+               (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
+            usleep(10000);
+    }
+
+    if (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox")
+    {
+        GetMythMainWindow()->JumpTo("TV Recording Playback");
+
+        QTime timer;
+        timer.start();
+        while ((timer.elapsed() < 10000) &&
+               (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox"))
+            usleep(10000);
+
+        timer.start();
+        while ((timer.elapsed() < 10000) &&
+               (!GetMythUI()->IsTopScreenInitialized()))
+            usleep(10000);
+    }
+
+    if (GetMythUI()->GetCurrentLocation().toLower() == "playbackbox")
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("PlayRecording, ChanID: %1 StartTime: %2")
+            .arg(ChanID).arg(starttime.toString(Qt::ISODate)));
+
+        QString message = QString("NETWORK_CONTROL PLAY PROGRAM %1 %2 %3")
+            .arg(ChanID)
+            .arg(starttime.toLocalTime().toString("yyyyMMddhhmmss"))
+            .arg("12345");
+
+        MythEvent me(message);
+        gCoreContext->dispatch(me);
+        return true;
+    }
+
+    return false;
 }
 
 bool Frontend::PlayVideo(const QString &Id, bool UseBookmark)
