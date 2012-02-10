@@ -253,7 +253,7 @@ QString MythRect::getX(void) const
     if (m_percentX > 0.0)
         stringX = QString("%1%").arg((int)(m_percentX * 100));
     else
-        stringX = QString("%1").arg(x());
+        stringX = QString("%1").arg(x() - m_offsetX);
     if (m_offsetX != 0)
     {
         if (m_offsetX > 0)
@@ -269,7 +269,7 @@ QString MythRect::getY(void) const
     if (m_percentY > 0.0)
         stringY = QString("%1%").arg((int)(m_percentY * 100));
     else
-        stringY = QString("%1").arg(y());
+        stringY = QString("%1").arg(y() - m_offsetY);
     if (m_offsetY != 0)
     {
         if (m_offsetY > 0)
@@ -285,7 +285,7 @@ QString MythRect::getWidth(void) const
     if (m_percentWidth > 0.0)
         stringWidth = QString("%1%").arg((int)(m_percentWidth * 100));
     else
-        stringWidth = QString("%1").arg(width());
+        stringWidth = QString("%1").arg(width() - m_offsetWidth);
     if (m_offsetWidth != 0)
     {
         if (m_offsetWidth > 0)
@@ -301,7 +301,7 @@ QString MythRect::getHeight(void) const
     if (m_percentHeight > 0.0)
         stringHeight = QString("%1%").arg((int)(m_percentHeight * 100));
     else
-        stringHeight = QString("%1").arg(height());
+        stringHeight = QString("%1").arg(height() - m_offsetHeight);
     if (m_offsetHeight != 0)
     {
         if (m_offsetHeight > 0)
@@ -473,7 +473,7 @@ QString MythPoint::getX(void) const
     if (m_percentX > 0.0)
         stringX = QString("%1%").arg((int)(m_percentX * 100));
     else
-        stringX = QString("%1").arg(x());
+        stringX = QString("%1").arg(x() - m_offsetX);
     if (m_offsetX != 0)
     {
         if (m_offsetX > 0)
@@ -489,7 +489,7 @@ QString MythPoint::getY(void) const
     if (m_percentY > 0.0)
         stringY = QString("%1%").arg((int)(m_percentY * 100));
     else
-        stringY = QString("%1").arg(y());
+        stringY = QString("%1").arg(y() - m_offsetY);
     if (m_offsetY != 0)
     {
         if (m_offsetY > 0)
