@@ -294,6 +294,68 @@ class MUI_PUBLIC MythUISearchDialog : public MythScreenType
     void slotUpdateList(void);
 };
 
+/**
+ * \class MythUITimeInputDialog
+ * \brief Provide a dialog for inputting a date/time or both
+ *
+ * \param message The message to display to the user explaining what you are
+ *                asking for
+ * \param startTime The date/time to start the list, defaults to now
+ */
+class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
+{
+    Q_OBJECT
+
+    // FIXME Not sure about this enum
+    enum TimeInputResolution {
+        // Date Resolution
+        kNoDate       = 0x01,
+        kYear         = 0x02,
+        kMonth        = 0x03,
+        kDay          = 0x04,
+
+        //Time Resolution
+        kNoTime       = 0x10,
+        kHours        = 0x20,
+        kMinutes      = 0x30,
+
+        // Work forward/backwards or backwards and fowards from start time
+        kFutureDates  = 0x100,
+        kPastDates    = 0x200,
+        kAllDates     = 0x300
+    };
+
+  public:
+    MythTimeInputDialog(MythScreenStack *parent, const QString &message,
+                        TimeInputResolution resolution,
+                        QDateTime startTime = QDateTime::currentDateTime(),
+                        int dayLimit = 14);
+
+    bool Create();
+    void SetReturnEvent(QObject *retobject, const QString &resultid);
+
+  signals:
+    void haveResult(QDateTime time);
+
+  private slots:
+    void okClicked(void);
+
+  private:
+    QString           m_message;
+    QDateTime         m_startTime;
+    TimeInputResolution m_resolution;
+    int               m_rangeLimit;
+    QStringList       m_list;
+    QString           m_currentValue;
+
+    MythUIButtonList *m_dateList;
+    MythUIButtonList *m_timeList;
+    MythUIButton     *m_okButton;
+
+    QObject          *m_retObject;
+    QString           m_id;
+};
+
 MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
                                              const char *slot = NULL, bool showCancel = false);
 

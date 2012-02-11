@@ -8,6 +8,7 @@
 #include <QTimer>
 
 #include "mythlogging.h"
+#include "util.h"
 
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
@@ -811,3 +812,139 @@ void MythUISearchDialog::slotUpdateList(void)
         m_matchesText->SetText(tr("%n match(es)", "", 0));
 }
 
+////////////////////////////////////////////////////////////////////////
+
+MythTimeInputDialog::MythTimeInputDialog(MythScreenStack *parent,
+                                         const QString &message,
+                                         TimeInputResolution resolution,
+                                         QDateTime startTime,
+                                         int rangeLimit)
+    : MythScreenType(parent, "timepopup"),
+        m_message(message), m_startTime(startTime), m_resolution(resolution),
+        m_rangeLimit(rangeLimit), m_dateList(NULL), m_timeList(NULL),
+        m_okButton(NULL), m_retObject(NULL)
+{
+}
+
+bool MythTimeInputDialog::Create()
+{
+    if (!CopyWindowFromBase("MythTimeInputDialog", this))
+        return false;
+
+    bool err = false;
+    UIUtilE::Assign(this, m_dateList, "dates", &err);
+    UIUtilE::Assign(this, m_timeList, "times", &err);
+    UIUtilE::Assign(this, m_okButton, "ok", &err);
+
+    if (err)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'MythTimeInputDialog'");
+        return false;
+    }
+
+    m_dateList->SetVisible(false);
+    m_timeList->SetVisible(false);
+
+    MythUIButtonListItem *item;
+    // Date
+    if (m_resolution & ~kNoDate)
+    {
+        QDate date(m_startTime.date());
+        QString text;
+        int flags;
+        for (int x = 0; x <= m_rangeLimit; x++)
+        {
+            switch (m_resolution)
+            {
+                case kDay:
+                    date.addDays(x);
+                    flags = kDateFull | kSimplify;
+                    if (m_rangeLimit >= 356)
+                        flags |= kAddYear;
+                    text = MythDateToString(date, flags);
+                    break;
+                case kMonth:
+                    date.addMonths(x);
+                    text = date.toString("MMM yyyy");
+                    break;
+                case kYear:
+                    date.addYears(x);
+                    text = date.toString("yyyy");
+                    break;
+            }
+
+            item = new MythUIButtonListItem(m_dateList, text, NULL, false);
+            item->SetData(QVariant(date));
+
+            if (m_startTime.date() == date)
+                m_dateList->SetItemCurrent(item);
+        }
+        m_dateList->SetVisible(true);
+    }
+
+    // Time
+    if (m_resolution & ~kNoTime)
+    {
+        QTime time(0,0,0);
+        QString text;
+
+        int limit = (m_resolution & kMinutes) ? (60 * 24) : 24;
+
+        for (int x = 0; x < limit; x++)
+        {
+            switch (m_resolution)
+            {
+                case kMinutes:
+                    time.addSecs(60);
+                    text = MythTimeToString(time, kTime);
+                    break;
+                case kHours:
+                    time.addSecs(60*60);
+                    text = time.toString("hh");
+                    break;
+            }
+
+            item = new MythUIButtonListItem(m_timeList, text, NULL, false);
+            item->SetData(QVariant(time));
+
+            if (time.hour() == m_startTime.time().hour())
+                m_timeList->SetItemCurrent(item);
+        }
+        m_timeList->SetVisible(true);
+    }
+
+    connect(m_okButton, SIGNAL(Clicked()), SLOT(okClicked()));
+
+    BuildFocusList();
+
+    return true;
+}
+
+void MythTimeInputDialog::SetReturnEvent(QObject* retobject,
+                                         const QString& resultid)
+{
+    m_retObject = retobject;
+    m_id = resultid;
+}
+
+void MythTimeInputDialog::okClicked(void)
+{
+    QDateTime dateTime;
+    QDate date = m_dateList->GetDataValue().toDate();
+    QTime time = m_timeList->GetDataValue().toTime();
+
+    dateTime.setDate(date);
+    dateTime.setTime(time);
+
+    emit haveResult(dateTime);
+
+    if (m_retObject)
+    {
+        QVariant data(dateTime);
+        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0, "",
+                                                               data);
+        QCoreApplication::postEvent(m_retObject, dce);
+    }
+
+    Close();
+}

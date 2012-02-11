@@ -1095,6 +1095,34 @@
 
     </window>
 
+    <window name="MythTimeInputDialog">
+        <area>-1,-1,580,165</area>
+
+        <imagetype name="box">
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>0,10,580,40</area>
+            <font>baselarge</font>
+            <align>hcenter,top</align>
+            <value>Select Time</value>
+        </textarea>
+
+        <buttonlist name="dates" from="baseselector">
+            <position>40,60</position>
+        </buttonlist>
+
+        <buttonlist name="times" from="baseselector">
+            <position>330,60</position>
+        </buttonlist>
+
+        <button name="ok" from="basebutton">
+            <position>220,115</position>
+        </button>
+
+    </window>
+
     <window name="videowindow">
 
         <shape name="shape1">
