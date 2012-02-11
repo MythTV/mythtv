@@ -349,6 +349,7 @@ void MythUIStateType::RecalculateArea(bool recurse)
     else
         m_ParentArea = GetMythMainWindow()->GetUIScreenRect();
 
+    m_Area.Reset();
     m_Area.CalculateArea(m_ParentArea);
 
     if (recurse)

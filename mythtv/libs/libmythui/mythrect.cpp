@@ -43,11 +43,16 @@ bool MythRect::operator== (const MythRect &other) const
             (QRect)(*this) == (QRect)other);
 }
 
-void MythRect::Init()
+void MythRect::Init(void)
 {
     m_needsUpdate = true;
     m_percentWidth = m_percentHeight = m_percentX = m_percentY = 0.0;
     m_offsetWidth = m_offsetHeight = m_offsetX = m_offsetY = 0;
+}
+
+void MythRect::Reset(void)
+{
+    m_parentArea.setRect(0, 0, 0, 0);
 }
 
 void MythRect::CalculateArea(const MythRect & parentArea)
@@ -56,7 +61,7 @@ void MythRect::CalculateArea(const MythRect & parentArea)
     if ((m_parentArea == area && !m_needsUpdate) || !parentArea.isValid())
         return;
 
-    m_parentArea  = area;
+    m_parentArea = area;
 
     int w = width();
     int h = height();
