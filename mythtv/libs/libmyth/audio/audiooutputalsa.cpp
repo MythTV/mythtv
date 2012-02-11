@@ -664,7 +664,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     CHECKERR(QString("Channels count %1 not available").arg(channels));
 
     /* set the stream rate */
-    if (src_quality == -1)
+    if (src_quality == QUALITY_DISABLED)
     {
         err = snd_pcm_hw_params_set_rate_resample(handle, params, 1);
         CHECKERR(QString("Resampling setup failed").arg(rate));
