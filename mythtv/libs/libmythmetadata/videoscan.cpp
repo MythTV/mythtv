@@ -213,6 +213,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
 {
     int counter = 0;
     FileCheckList::iterator iter;
+    m_offlineSGHosts.clear();
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_dbmetadata->getList().size(),
