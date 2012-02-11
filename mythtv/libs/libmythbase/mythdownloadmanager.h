@@ -19,7 +19,13 @@ class RemoteFileDownloadThread;
 void ShutdownMythDownloadManager(void);
 
 // TODO : Overlap/Clash with RequestType in libupnp/httprequest.h
-typedef enum MRequestType {kRequestGet, kRequestHead, kRequestPost} MRequestType;
+typedef enum MRequestType {
+    kRequestGet,
+    kRequestHead,
+    kRequestPost
+} MRequestType;
+
+typedef void (*AuthCallback)(QNetworkReply*, QAuthenticator*, void*);
 
 class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 {
@@ -43,26 +49,25 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
                        QObject *caller);
     bool download(const QString &url, const QString &dest,
                   const bool reload = false);
-    bool downloadAuth(const QString &url, const QString &dest,
-                      const bool reload = false,
-                      void (*authCallback)(QNetworkReply*, QAuthenticator*,
-                            void*) = NULL,
-                      void *authArg = NULL, const QByteArray *header = NULL,
-                      const QByteArray *headerVal = NULL);
     bool download(const QString &url, QByteArray *data,
                   const bool reload = false);
     QNetworkReply *download(const QString &url, const bool reload = false);
     bool download(QNetworkRequest *req, QByteArray *data);
+    bool downloadAuth(const QString &url, const QString &dest,
+                      const bool reload = false,
+                      AuthCallback authCallback = NULL,
+                      void *authArg = NULL, const QByteArray *header = NULL,
+                      const QByteArray *headerVal = NULL);
 
     // Methods to POST to a URL
     void queuePost(const QString &url, QByteArray *data, QObject *caller);
     void queuePost(QNetworkRequest *req, QByteArray *data, QObject *caller);
     bool post(const QString &url, QByteArray *data);
-    bool postAuth(const QString &url, QByteArray *data, 
-                  void (*authCallback)(QNetworkReply*, QAuthenticator*, void*),
-                  void *authArg, const QByteArray *header = NULL,
-                  const QByteArray *headerVal = NULL);
     bool post(QNetworkRequest *req, QByteArray *data);
+    bool postAuth(const QString &url, QByteArray *data, 
+                  AuthCallback authCallback, void *authArg,
+                  const QByteArray *header = NULL,
+                  const QByteArray *headerVal = NULL);
 
     // Cancel a download
     void cancelDownload(const QString &url);
@@ -102,8 +107,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
                      const QString &dest, QByteArray *data,
                      const MRequestType reqType = kRequestGet,
                      const bool reload = false,
-                     void (*authCallback)(QNetworkReply*, QAuthenticator*,
-                                          void*) = NULL,
+                     AuthCallback authCallback = NULL,
                      void *authArg = NULL, const QByteArray *header = NULL,
                      const QByteArray *headerVal = NULL);
 
