@@ -4248,26 +4248,29 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     SendResponse(pbssock, retlist);
 }
 
+void MainServer::GetActiveBackends(QStringList &hosts)
+{
+    hosts.clear();
+    hosts << gCoreContext->GetHostName();
+
+    QString hostname;
+    QReadLocker rlock(&sockListLock);
+    vector<PlaybackSock*>::iterator it;
+    for (it = playbackList.begin(); it != playbackList.end(); ++it)
+    {
+        if ((*it)->isSlaveBackend() || (*it)->isMediaServer())
+        {
+            hostname = (*it)->getHostname();
+            if (!hosts.contains(hostname))
+                hosts << hostname;
+        }
+    }
+}
+
 void MainServer::HandleActiveBackendsQuery(PlaybackSock *pbs)
 {
     QStringList retlist;
-    retlist << gCoreContext->GetHostName();
-
-    {
-        QString hostname;
-        QReadLocker rlock(&sockListLock);
-        vector<PlaybackSock*>::iterator it;
-        for (it = playbackList.begin(); it != playbackList.end(); ++it)
-        {
-            if ((*it)->isSlaveBackend())
-            {
-                hostname = (*it)->getHostname();
-                if (!retlist.contains(hostname))
-                    retlist << hostname;
-            }
-        }
-    }
-
+    GetActiveBackends(retlist);
     retlist.push_front(QString::number(retlist.size()));
     SendResponse(pbs->getSocket(), retlist);
 }
@@ -4990,7 +4993,9 @@ void MainServer::HandleScanVideos(PlaybackSock *pbs)
 
     if (metadatafactory)
     {
-        metadatafactory->VideoScan();
+        QStringList hosts;
+        GetActiveBackends(hosts);
+        metadatafactory->VideoScan(hosts);
         retlist << "OK";
     }
     else
