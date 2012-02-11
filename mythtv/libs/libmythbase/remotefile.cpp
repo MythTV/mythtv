@@ -299,6 +299,8 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
     if (!sgroup.isEmpty())
         strlist << sgroup;
 
+    gCoreContext->SendReceiveStringList(strlist);
+
     bool result = false;
     if ((strlist.size() >= 1) && strlist[0] == "1")
     {
