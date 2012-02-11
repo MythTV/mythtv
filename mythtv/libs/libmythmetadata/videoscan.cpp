@@ -88,6 +88,34 @@ VideoScannerThread::~VideoScannerThread()
     delete m_dbmetadata;
 }
 
+void VideoScannerThread::SetDirs(QStringList dirs)
+{
+    QStringList sgdirs;
+
+    QStringList::iterator iter, iter2;
+    for (iter = dirs.begin(); iter != dirs.end(); ++iter)
+    {
+        if (iter->startsWith("myth://"))
+        {
+            QUrl sgurl = *iter;
+            iter = dirs.erase(iter);
+
+            if (!sgdirs.contains(sgurl.path()))
+                sgdirs.append(sgurl.path());
+        }
+    }
+
+    for (iter = m_liveSGHosts.begin(); iter != m_liveSGHosts.end(); ++iter)
+    {
+        for (iter2 = sgdirs.begin(); iter2 != sgdirs.end(); ++iter2)
+        {
+            dirs.append(gCoreContext->GenMythURL(*iter, 0, *iter2, "Videos"));
+        }
+    }
+
+    m_directories = dirs;
+}
+
 void VideoScannerThread::run()
 {
     RunProlog();
@@ -108,7 +136,6 @@ void VideoScannerThread::run()
 
     uint counter = 0;
     FileCheckList fs_files;
-    failedSGHosts.clear();
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_directories.size(),
@@ -124,7 +151,7 @@ void VideoScannerThread::run()
                 QString host = sgurl.host();
                 QString path = sgurl.path();
 
-                failedSGHosts.append(host);
+                m_liveSGHosts.removeAll(host);
 
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("Failed to scan :%1:").arg(*iter));
@@ -213,7 +240,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
                 // cannot reach, mark it as for removal later.
                 remove.push_back(std::make_pair((*p)->GetID(), lname));
             }
-            else if (!failedSGHosts.contains(lhost))
+            else if (m_liveSGHosts.contains(lhost))
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Removing file SG(%1) :%2:")
@@ -221,9 +248,13 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
                 remove.push_back(std::make_pair((*p)->GetID(), lname));
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_WARNING,
                     QString("SG(%1) not available. Not removing file :%2:")
                         .arg(lhost).arg(lname));
+                if (!m_offlineSGHosts.contains(lhost))
+                    m_offlineSGHosts.append(lhost);
+            }
         }
         if (m_HasGUI)
             SendProgressEvent(++counter);
@@ -317,6 +348,12 @@ bool VideoScannerThread::buildFileList(const QString &directory,
                                        const QStringList &imageExtensions,
                                        FileCheckList &filelist)
 {
+    // TODO: FileCheckList is a std::map, keyed off the filename. In the event
+    // multiple backends have access to shared storage, the potential exists
+    // for files to be scanned onto the wrong host. Add in some logic to prefer
+    // the backend with the content stored in a storage group determined to be
+    // local.
+
     LOG(VB_GENERAL,LOG_INFO, QString("buildFileList directory = %1")
                                  .arg(directory));
     FileAssociations::ext_ignore_list ext_list;
@@ -376,6 +413,14 @@ void VideoScanner::doScan(const QStringList &dirs)
         m_scanThread->SetProgressDialog(progressDlg);
     }
 
+    QStringList hosts;
+    if (!RemoteGetActiveBackends(&hosts))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Could not retrieve list of "
+                            "available backends.");
+        hosts.clear();
+    }
+    m_scanThread->SetHosts(hosts);
     m_scanThread->SetDirs(dirs);
     m_scanThread->start();
 }
@@ -387,7 +432,7 @@ void VideoScanner::doScanAll()
 
 void VideoScanner::finishedScan()
 {
-    QStringList failedHosts = m_scanThread->GetFailedSGHosts();
+    QStringList failedHosts = m_scanThread->GetOfflineSGHosts();
     if (failedHosts.size() > 0)
     {
         QString msg = tr("Failed to Scan SG Video Hosts") + ":\n\n";

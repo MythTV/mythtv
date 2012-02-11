@@ -63,9 +63,10 @@ class META_PUBLIC VideoScannerThread : public MThread
     ~VideoScannerThread();
 
     void run();
-    void SetDirs(const QStringList &dirs) { m_directories = dirs; };
+    void SetDirs(QStringList dirs);
+    void SetHosts(const QStringList &hosts) { m_liveSGHosts = hosts; };
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };
-    QStringList GetFailedSGHosts(void) { return failedSGHosts; };
+    QStringList GetOfflineSGHosts(void) { return m_offlineSGHosts; };
     bool getDataChanged() { return m_DBDataChanged; };
 
     void ResetCounts() { m_addList.clear(); m_movList.clear(); m_delList.clear(); };
@@ -99,7 +100,8 @@ class META_PUBLIC VideoScannerThread : public MThread
     bool m_KeepAll;
     bool m_HasGUI;
     QStringList m_directories;
-    QStringList failedSGHosts;
+    QStringList m_liveSGHosts;
+    QStringList m_offlineSGHosts;
 
     VideoMetadataListManager *m_dbmetadata;
     MythUIProgressDialog *m_dialog;

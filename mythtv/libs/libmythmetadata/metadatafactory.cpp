@@ -6,6 +6,7 @@
 #include "videoutils.h"
 #include "mythlogging.h"
 #include "compat.h"
+#include "remoteutil.h"
 
 // Needed to perform a lookup
 #include "metadatadownload.h"
@@ -230,8 +231,25 @@ void MetadataFactory::VideoScan()
     if (IsRunning())
         return;
 
+    QStringList hosts;
+    if (!RemoteGetActiveBackends(&hosts))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Could not retrieve list of "
+                            "available backends.");
+        return;
+    }
+
+    VideoScan(hosts);
+}
+
+void MetadataFactory::VideoScan(QStringList hosts)
+{
+    if (IsRunning())
+        return;
+
     m_scanning = true;
 
+    m_videoscanner->SetHosts(hosts);
     m_videoscanner->SetDirs(GetVideoDirs());
     m_videoscanner->start();
 }
