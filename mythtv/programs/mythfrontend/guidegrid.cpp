@@ -585,38 +585,67 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
 
 void GuideGrid::showMenu(void)
 {
-    QString label = tr("Options");
+    QString label = tr("Guide Options");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
+                                                 "guideMenuPopup");
 
     if (menuPopup->Create())
     {
-        menuPopup->SetReturnEvent(this, "menu");
+        menuPopup->SetReturnEvent(this, "guidemenu");
+
+        if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
+            menuPopup->AddButton(tr("Change to Channel"));
+
+        menuPopup->AddButton(tr("Record This"));
+
+        menuPopup->AddButton(tr("Recording Options"), NULL, true);
+
+        menuPopup->AddButton(tr("Program Details"));
+
+        menuPopup->AddButton(tr("Reverse Channel Order"));
+
+        if (!m_changrplist.empty())
+        {
+            menuPopup->AddButton(tr("Choose Channel Group"));
+
+            if (m_changrpid == -1)
+                menuPopup->AddButton(tr("Add To Channel Group"), NULL, true);
+            else
+                menuPopup->AddButton(tr("Remove from Channel Group"), NULL, true);
+        }
+
+        popupStack->AddScreen(menuPopup);
+    }
+    else
+    {
+        delete menuPopup;
+    }
+}
+
+void GuideGrid::showRecordingMenu(void)
+{
+    QString label = tr("Recording Options");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
+                                                 "recMenuPopup");
+
+    if (menuPopup->Create())
+    {
+        menuPopup->SetReturnEvent(this, "recmenu");
 
         ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
 
-        if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
-            menuPopup->AddButton(tr("Change Channel"));
-        menuPopup->AddButton(tr("Record"));
         if (pginfo && pginfo->GetRecordingRuleID())
             menuPopup->AddButton(tr("Edit Recording Status"));
         menuPopup->AddButton(tr("Edit Schedule"));
-        menuPopup->AddButton(tr("Program Details"));
-        menuPopup->AddButton(tr("Upcoming"));
+        menuPopup->AddButton(tr("Show Upcoming"));
         menuPopup->AddButton(tr("Custom Edit"));
 
         if (pginfo && pginfo->GetRecordingRuleID())
             menuPopup->AddButton(tr("Delete Rule"));
-
-        menuPopup->AddButton(tr("Reverse Channel Order"));
-
-        if (m_changrpid == -1)
-            menuPopup->AddButton(tr("Add To Channel Group"));
-        else
-            menuPopup->AddButton(tr("Remove from Channel Group"));
-
-        menuPopup->AddButton(tr("Choose Channel Group"));
 
         popupStack->AddScreen(menuPopup);
     }
@@ -1357,39 +1386,19 @@ void GuideGrid::customEvent(QEvent *event)
                 delete record;
             }
         }
-        else if (resultid == "menu")
+        else if (resultid == "guidemenu")
         {
             if (resulttext == tr("Record"))
             {
                 quickRecord();
             }
-            if (resulttext == tr("Change Channel"))
+            else if (resulttext == tr("Change Channel"))
             {
                 enter();
-            }
-            if (resulttext == tr("Edit Recording Status"))
-            {
-                editRecSchedule();
-            }
-            else if (resulttext == tr("Edit Schedule"))
-            {
-                editSchedule();
             }
             else if (resulttext == tr("Program Details"))
             {
                 details();
-            }
-            else if (resulttext == tr("Upcoming"))
-            {
-                upcoming();
-            }
-            else if (resulttext == tr("Custom Edit"))
-            {
-                customEdit();
-            }
-            else if (resulttext == tr("Delete Rule"))
-            {
-                deleteRule();
             }
             else if (resulttext == tr("Reverse Channel Order"))
             {
@@ -1410,6 +1419,34 @@ void GuideGrid::customEvent(QEvent *event)
             {
                 ChannelGroupMenu(1);
             }
+            else if (resulttext == tr("Recording Options"))
+            {
+                showRecordingMenu();
+            }
+        }
+        else if (resultid == "recmenu")
+        {
+            if (resulttext == tr("Edit Recording Status"))
+            {
+                editRecSchedule();
+            }
+            else if (resulttext == tr("Edit Schedule"))
+            {
+                editSchedule();
+            }
+            else if (resulttext == tr("Upcoming"))
+            {
+                upcoming();
+            }
+            else if (resulttext == tr("Custom Edit"))
+            {
+                customEdit();
+            }
+            else if (resulttext == tr("Delete Rule"))
+            {
+                deleteRule();
+            }
+
         }
         else if (resultid == "channelgrouptogglemenu")
         {

@@ -165,6 +165,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void moveUpDown(MoveVector movement);
 
     void showMenu(void);
+    void showRecordingMenu(void);
 
     int  FindChannel(uint chanid, const QString &channum,
                      bool exact = true) const;
