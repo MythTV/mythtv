@@ -4258,7 +4258,7 @@ void MainServer::GetActiveBackends(QStringList &hosts)
     vector<PlaybackSock*>::iterator it;
     for (it = playbackList.begin(); it != playbackList.end(); ++it)
     {
-        if ((*it)->isSlaveBackend() || (*it)->isMediaServer())
+        if ((*it)->isSlaveBackend())
         {
             hostname = (*it)->getHostname();
             if (!hosts.contains(hostname))
