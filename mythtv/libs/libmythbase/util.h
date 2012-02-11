@@ -31,11 +31,11 @@ class QFile;
  enum DateTimeFormat { kDateFull = 1,
                        kDateShort = 2,
                        kTime = 4,
-                       kDateTimeFull = 5, /// KDateFull | KTime
-                       kDateTimeShort = 6, /// KDateShort | KTime
+                       kDateTimeFull = 5, ///< KDateFull | KTime
+                       kDateTimeShort = 6, ///< KDateShort | KTime
                        // 8 = Placeholder
-                       kAddYear = 16, /// Add year to string if not included
-                       kSimplify = 32 /// Show Today/Yesterday/Tomorrow instead of date
+                       kAddYear = 16, ///< Add year to string if not included
+                       kSimplify = 32 ///< Show Today/Yesterday/Tomorrow instead of date
                       };
 
  MBASE_PUBLIC  QString MythDateTimeToString(const QDateTime &datetime,
