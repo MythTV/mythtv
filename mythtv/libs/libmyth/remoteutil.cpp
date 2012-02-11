@@ -571,4 +571,19 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
     return reclist; 
 }
 
+/**
+ * \brief return list of backends currently connected to the master
+ */
+bool RemoteGetActiveBackends(QStringList *list)
+{
+    list->clear();
+    *list << "QUERY_ACTIVE_BACKENDS";
+
+    if (!gCoreContext->SendReceiveStringList(*list))
+        return false;
+
+    list->removeFirst();
+    return true;
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
