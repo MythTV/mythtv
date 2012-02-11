@@ -1571,7 +1571,8 @@ int main(int argc, char **argv)
                                  name, dummy);
     }
 
-    MythAirplayServer::Create();
+    if (getenv("MYTHTV_AIRPLAY"))
+        MythAirplayServer::Create();
 #endif
 
 #ifdef USING_RAOP
