@@ -27,6 +27,8 @@ class MythRAOPConnection : public QObject
 {
     Q_OBJECT
 
+    friend class MythRAOPDevice;
+
   public:
     MythRAOPConnection(QObject *parent, QTcpSocket* socket, QByteArray id, int port);
    ~MythRAOPConnection();
@@ -41,6 +43,9 @@ class MythRAOPConnection : public QObject
     void timeout(void);
     void audioRetry(void);
 
+  protected:
+    static RSA* LoadKey(void);
+
   private:
     uint64_t FramesToMs(uint64_t timestamp);
     void    ProcessSyncPacket(const QByteArray &buf, uint64_t timenow);
@@ -54,7 +59,6 @@ class MythRAOPConnection : public QObject
     void    FinishResponse(QTextStream *stream, QTcpSocket *socket,
                            QByteArray &option, QByteArray &cseq);
     RawHash FindTags(const QList<QByteArray> &lines);
-    static RSA* LoadKey(void);
     bool    CreateDecoder(void);
     void    DestroyDecoder(void);
     bool    OpenAudioDevice(void);
