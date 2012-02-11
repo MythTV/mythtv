@@ -28,18 +28,14 @@
 #define STST soundtouch::SAMPLETYPE
 #define AOALIGN(x) (((long)&x + 15) & ~0xf);
 
-#define QUALITY_DISABLED   -1
-#define QUALITY_LOW         0
-#define QUALITY_MEDIUM      1
-#define QUALITY_HIGH        2
-
 // 1,2,5 and 7 channels are currently valid for upmixing if required
 #define UPMIX_CHANNEL_MASK ((1<<1)|(1<<2)|(1<<5)|1<<7)
 #define IS_VALID_UPMIX_CHANNEL(ch) ((1 << (ch)) & UPMIX_CHANNEL_MASK)
 
-static const char *quality_string(int q)
+const char *AudioOutputBase::quality_string(int q)
 {
-    switch(q) {
+    switch(q)
+    {
         case QUALITY_DISABLED: return "disabled";
         case QUALITY_LOW:      return "low";
         case QUALITY_MEDIUM:   return "medium";
