@@ -108,7 +108,8 @@ $ cat vidout > video.yuv
 </H2>
 
 <P>MythTV is not dependent on any particular window manager.  If you wish to
-run a lightweight window manager, the <CODE>contrib/configfiles/</CODE> directory has an
+run a lightweight window manager, the
+<A HREF="http://www.mythtv.org/wiki/Category:Window_Manager_Configuration_Files">Window Manager Configuration Files</A> category of the MythTV wiki has an
 example of a <CODE>.twmrc</CODE> and <CODE>.fvwmrc</CODE> file you may use.</P>
 
 <H2><A NAME="capture_resolution_"></A> <A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">What capture resolution should I use?  How does video work? </A>
@@ -225,7 +226,7 @@ of the physical screen. This can only be adjusted by your tv-out device or
 by the settings for the television set. Many sets have these adjustments in
 a 'service mode'. If you cannot make these adjustments, there will be black
 borders around the edges of the X desktop, MythTV GUI and TV playback.</P>
-<P>MythTV has settings for "Overscan" in Setup->Playback. These can not, and do
+<P>MythTV has settings for "Overscan" in Setup->Playback. These cannot, and do
 not, cause the image to display beyond the edge of the X display area. The
 purpose of these settings are to cut off rough edges and to expand the image
 so that objects will appear to be the same size as a normal overscanned TV
@@ -342,37 +343,17 @@ Since you can never watch it, you want to get rid of it.</P>
 modify your lineup. Uncheck the boxes for any unwanted channels, and they
 will no longer be included in your download.</P>
 <P>If you are using a grabber from XMLTV, comment out the channel from the
-<CODE>~/.mythtv/&lt;sourcename&gt;.xmltv</CODE> file by inserting the word "not
-" (including the space) in front of the unwanted entry. This will prevent
-<B>xmltv</B> from grabbing future listings.</P>
-<P>Next, delete the unwanted item from the channel table so that it will not
-appear in the EPG or when changing channels.  To delete the data from the
-database we need to perform some steps.  First, assuming that HBO is channel
-15, we need to find out the internal <CODE>chanid</CODE> used by MySQL:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root mythconverg
-mysql> select chanid from channel where channum=15;
-+--------+
-| chanid |
-+--------+
-|   1015 |
-+--------+
-1 row in set (0.00 sec)
-mysql> delete from channel where chanid = 1015;
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Old program data will be removed over the course of a week. However, you may
-want to immediately delete any current program listings for the channel that
-has been removed:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root mythconverg
-mysql> delete from program where chanid = 1015;
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<CODE>~/.mythtv/&lt;sourcename&gt;.xmltv</CODE> file appropriately for your XMLTV
+grabber. Some grabbers do this by inserting "# " (including the space) in front
+of the unwanted entry (for example, change "channel=&lt;name&gt;" to "#
+channel=&lt;name&gt;") and others by changing the "=" to a "!" in the unwanted
+entry (for example, change "channel=&lt;name&gt;" to "channel!&lt;name&gt;").
+This will prevent <B>xmltv</B> from grabbing future listings.</P>
+<P>Next, either delete the unwanted channel or mark it as not visible using
+mythtv-setup's channel editor, so that it will not appear in the EPG or when
+changing channels.  If you delete the channel, it may be added back on a future
+scan. If you mark it as not visible, it will be left not visible on future
+scans.</P>
 
 <H2><A NAME="ss23.8">23.8</A> <A HREF="mythtv-HOWTO.html#toc23.8">NFS</A>
 </H2>
@@ -396,7 +377,7 @@ masterbackend:/var/video /var/video nfs hard,intr,nfsvers=3,actimeo=0
 </CODE></BLOCKQUOTE>
 </P>
 <P>Then run <CODE># mount -a</CODE> to re-read the file to mount the file system.</P>
-<P><B>NOTE</B>:  Previous versions of this HOWTO gave specific values for 
+<P><B>NOTE</B>:  Previous versions of this HOWTO gave specific values for
 variables like the "rsize".  Best common practice at this point is to <EM>not</EM>
 specify these and allow the server and the client to autonegotiate.</P>
 <P>In this case, the source is a machine called "masterbackend" which is
@@ -451,33 +432,39 @@ session.screen0.focusModel:     SloppyFocus
 <H2><A NAME="ss23.10">23.10</A> <A HREF="mythtv-HOWTO.html#toc23.10">Automatically starting mythbackend at system boot time</A>
 </H2>
 
+<P>There are several example start scripts in the
+<A HREF="http://www.mythtv.org/wiki/Category:Startup_Scripts">Startup Scripts</A> category of the MythTV wiki.</P>
 <H3>Red Hat And Mandriva</H3>
 
-<P>Here's a method for automatically starting mythbackend submitted by Mike
-Thomson (
-<A HREF="mailto:linux@m-thomson.net">mailto:linux@m-thomson.net</A>) and Stu Tomlinson (
-<A HREF="mailto:stu@nosnilmot.com">mailto:stu@nosnilmot.com</A>).</P>
-<P>Copy the files from the MythTV <CODE>contrib</CODE> directory or from Mike's web
-site (
-<A HREF="http://m-thomson.net/mythtv/">http://m-thomson.net/mythtv/</A>) as follows:</P>
-<P><CODE>etc.rc.d.init.mythbackend</CODE> should be made executable and copied to
-<CODE>/etc/rc.d/init.d/</CODE>:
+<P>Here's a method for automatically starting mythbackend on Fedora.</P>
+<P>Copy the files from the
+<A HREF="http://www.mythtv.org/wiki/Fedora_init.d_mythbackend">Fedora init.d mythbackend</A> page of the MythTV wiki as follows:</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd contrib
+$ mythwikiscripts
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and follow the on-screen prompts to download <CODE>Fedora - mythbackend
+init</CODE>, choosing to save the files to temporary files
+<CODE>/tmp/sysconfig.mythbackend</CODE> and <CODE>/tmp/init.mythbackend</CODE>.</P>
+<P><CODE>/tmp/init.mythbackend</CODE> should be made executable and copied to
+<CODE>/etc/rc.d/init.d/</CODE>
+<BLOCKQUOTE><CODE>
+<PRE>
 $ su
-# chmod a+x etc.rc.d.init.d.mythbackend
-# cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+# chmod a+x /tmp/init.mythbackend
+# cp /tmp/init.mythbackend /etc/rc.d/init.d/mythbackend
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><CODE>etc.sysconfig.mythbackend</CODE> should be copied to
+<P><CODE>/tmp/sysconfig.mythbackend</CODE> should be copied to
 <CODE>/etc/sysconfig/</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd contrib
 $ su
-# cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+# cp /tmp/sysconfig.mythbackend /etc/sysconfig/mythbackend
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -594,13 +581,22 @@ following:
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>A copy of the above has been included in the contrib/ directory.  You may
-add it by typing:
+<P>A copy of the above has been included in the
+<A HREF="http://www.mythtv.org/wiki/Mandriva_Security_Package_Configuration">Mandriva Security Package Configuration</A> page on the MythTV wiki.
+You may add it by typing:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd contrib
+$ mythwikiscripts
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and follow the on-screen prompts to download <CODE>msec Configuration File</CODE>
+to a temporary file <CODE>/tmp/msec.perm.local</CODE>.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
 $ su
-# cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+# cat /tmp/msec.perm.local >> /etc/security/msec/perm.local
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -702,7 +698,7 @@ content even if the slave backend that recorded a program is not available.</P>
 another.  The transcoder has three primary uses; it can transcode MPEG-2
 files captured using a hardware encoder (PVR cards, DVB cards, ATSC HD,
 etc.) to MPEG-4, it can be used to transcode RTjpeg files (usually only used
-on systems that can not real-time encode to MPEG-4 using a framegrabber) to
+on systems that cannot real-time encode to MPEG-4 using a framegrabber) to
 MPEG-4, and finally it can be used to remove commercials from a MPEG-2 file
 while leaving the file in MPEG-2 format.</P>
 <P>When MythTV transcodes a file to MPEG-4 or RTjpeg the resulting file format
@@ -724,7 +720,7 @@ A recording can be transcoded in two ways:</P>
 <LI>Automatically transcode the file once it has completed
 recording.</LI>
 <LI>Manually choosing to transcode a recording, usually after
-importing a cutlist or manually marking commercials to be
+importing a cut list or manually marking commercials to be
 removed.</LI>
 </UL>
 </P>
@@ -1083,8 +1079,10 @@ direct serial connection is more reliable than an IR blaster.  Not all STB's
 that have a Low Speed Data port have it enabled; you may need to convince
 your service provider to turn it on.  Stating that you have a Tivo may help;
 the Tivo has a direct-connect capability.</LI>
-<LI>Use a firewire connection.  There is a <CODE>6200ch.c</CODE> in the MythTV
-contrib directory which may work for you.</LI>
+<LI>Use a firewire connection.  There are firewire channel change scripts and
+firewire priming scripts in the
+<A HREF="http://www.mythtv.org/wiki/Category:Channel_Change_Scripts">Channel_Change_Scripts</A> and
+<A HREF="http://www.mythtv.org/wiki/Category:Firewire_Priming_Scripts">Firewire Priming Scripts</A> categories of the MythTV wiki.</LI>
 </OL>
 </P>
 <H2><A NAME="ss23.23">23.23</A> <A HREF="mythtv-HOWTO.html#toc23.23">Configuring one machine to flag all commercials</A>

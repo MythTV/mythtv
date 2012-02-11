@@ -16,7 +16,7 @@
 
 <P>MythTV does not have native remote control receiver and decoder software
 built-in.  Instead, remote control functions are implemented by cooperating
-with <B>lirc</B>, the Linux Infrared Remote Control program. 
+with <B>lirc</B>, the Linux Infrared Remote Control program.
 <B>lirc</B> handles the IR hardware and passes keystrokes to MythTV, which
 then acts as if the user had pressed the keys on the keyboard.  The file
 <CODE>keys.txt</CODE> describes the keys used to control MythTV.</P>
@@ -33,7 +33,7 @@ together.</P>
 receiver senses the pulses and sends them to the lirc daemon.  The lircd
 loads a file called <CODE>lircd.conf</CODE> which instructs it how interpret the
 IR pulses that it received and convert them to a human-readable name.</P>
-<P>For example, the hardware may receive pulses may correlate to "Channel Up". 
+<P>For example, the hardware may receive pulses may correlate to "Channel Up".
 The <CODE>lircd.conf</CODE> file will then contain a line that looks something
 like this:</P>
 <P>
@@ -44,18 +44,18 @@ like this:</P>
 </CODE></BLOCKQUOTE>
 </P>
 <P>The <CODE>lircd.conf</CODE> file can have multiple remote controls defined.</P>
-<P>The second part is <CODE>lircrc</CODE>, which takes the name of the button which
+<P>The second part is <CODE>~/.lircrc</CODE>, which takes the name of the button which
 was pressed ("ChannelUp") in the above example, and associates that to an
 action to be performed by a program using the remote control.  So in MythTV,
 ChannelUp means one thing, while in <B>mplayer</B> it means something
-different.  <CODE>lircrc</CODE> gives you the flexibility of taking the name of
+different.  <CODE>~/.lircrc</CODE> gives you the flexibility of taking the name of
 the button and having it perform different actions depending on which
 program you're using at the time.</P>
 <P><B>NOTE</B>:  The definitions in <CODE>lircd.conf</CODE> come from the user
 community, and there is no standard for the common button names.  One
 <CODE>lircd.conf</CODE> file may contain a definition for a button called
 "ChannelUp", while another may contain a definition for "Chan+".  Your
-<CODE>lircrc</CODE> file must therefore be configured appropriately, or it won't
+<CODE>~/.lircrc</CODE> file must therefore be configured appropriately, or it won't
 work.</P>
 <P>Look for pre-made lircd.conf configuration files at 
 <A HREF="http://lirc.sourceforge.net/remotes/">http://lirc.sourceforge.net/remotes/</A>.  If you find one of your remotes
@@ -95,22 +95,22 @@ receiver.</P>
 <P>The next step is to convert those signals into something that can be used
 to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with it.</P>
-<P>
+<P>Example <CODE>~/.lircrc</CODE> files for configuring remote controls for MythTV are
+available in the 
+<A HREF="http://www.mythtv.org/wiki/Category:LIRC_Configuration_Files">LIRC Configuration Files</A> category of the MythTV wiki.  There are also
+many pages providing details for specific remote controls in the 
+<A HREF="http://www.mythtv.org/wiki/Category:Remote_Controls">Remote Controls</A> category of the wiki.</P>
+<P>After browsing the available configuration files,
+you may copy/paste the desired configuration information into
+<CODE>~/.lircrc</CODE> or download it from the wiki.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd mythtv/contrib/config_files/lirc
-$ cp lircrc.example ~/.lircrc
+$ mythwikiscripts
 </PRE>
 </CODE></BLOCKQUOTE>
 
-or
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
-</PRE>
-</CODE></BLOCKQUOTE>
-
-if you've got a Pinnacle Studio PCTV remote.
+Follow the on-screen prompts to download the configuration file.</P>
+<P>Once you've put the desired configuration into <CODE>~/.lircrc</CODE>, test it.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ irw
@@ -141,11 +141,11 @@ control unless you're using native lirc support.</P>
 <H2><A NAME="ss8.1">8.1</A> <A HREF="mythtv-HOWTO.html#toc8.1">Additional information for lirc</A>
 </H2>
 
-<P>Take a look at the lircrc.example files in the <CODE>contrib/configfiles/</CODE>
-directory.  In my case, (Pinnacle Studio card) the channel up and down functions
-weren't working, due to the fact that the button names were different than
-the default <CODE>lircrc.example</CODE> file that came with MythTV.</P>
-<P>The <CODE>lircrc.example</CODE> file has this:
+<P>Take a look at the example <CODE>~/.lircrc</CODE> files in the 
+<A HREF="http://www.mythtv.org/wiki/Category:LIRC_Configuration_Files">MythTV wiki</A>.  In my case, (Pinnacle Studio card) the channel up and
+down functions weren't working, due to the fact that the button names were
+different from the example <CODE>~/.lircrc</CODE> I used to start my configuration.</P>
+<P>The example file had this:
 <BLOCKQUOTE><CODE>
 <PRE>
 begin
@@ -192,14 +192,14 @@ end
 </CODE></BLOCKQUOTE>
 
 which took care of basic functionality.  Because the PCTV Studio remote
-has additional buttons, look at the
-<CODE>contrib/config_files/lirc/lircrc.example.pinnaclestudiopctv</CODE> for an example of how
+has additional buttons, look at the 
+<A HREF="http://www.mythtv.org/wiki/Lircrc_-_Pinnacle_Studio_PCTV">lircrc - Pinnacle Studio PCTV</A> page for an example of how
 to define additional buttons, and how to debug potential button name
-conflicts between the <CODE>lircrc.example</CODE> file and how <B>your</B>
+conflicts between your <CODE>~/.lircrc</CODE> file and how <B>your</B>
 remote defines the button names.</P>
 <P>By examining the button names defined in <CODE>/etc/lircd.conf</CODE> and using
 the <B>irw</B> program to make sure that your remote is working, you can
-create the appropriate mappings in <CODE>.lircrc</CODE> to get excellent remote
+create the appropriate mappings in <CODE>~/.lircrc</CODE> to get excellent remote
 functionality with MythTV.</P>
 <P>Note the <B>repeat =</B> parameter.  This informs the <CODE>irxevent</CODE>
 program to pass through every third keypress.  By default, <CODE>lirc</CODE>

@@ -164,7 +164,7 @@ Space/Enter </TD><TD> set a bookmark at that point. Next time you start the&nbsp
 X </TD><TD> queues the current recording for transcoding </TD></TR><TR><TD>
 O </TD><TD> brings up menu to allow toggling settings such as Commercial&nbsp;Auto-Skip, Auto-Expire, etc. </TD></TR><TR><TD>
 D </TD><TD> exits the current recording and displays the Delete menu </TD></TR><TR><TD>
-E or M </TD><TD> enters/exits edit mode. </TD></TR><TR><TD>
+E </TD><TD> enters/exits edit mode. </TD></TR><TR><TD>
 </TD><TD> </TD></TR><TR><TD>
 </TD><TD> </TD></TR><TR><TD>
 </TD><TD> <B>In edit mode</B> </TD></TR><TR><TD>
@@ -172,10 +172,13 @@ Left/Right      </TD><TD> move forward and backward </TD></TR><TR><TD>
 Up/Down </TD><TD> alter the amount of time you jump forward and backward.&nbsp;Increments are: nearest cutpoint, nearest video keyframe, 1&nbsp;frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes,&nbsp;and 10 minutes. </TD></TR><TR><TD>
 PageUp/PageDown </TD><TD> move forward and backward to the nearest cut point </TD></TR><TR><TD>
 &lt; or > </TD><TD> move forward or backward by 10 times the normal jump amount </TD></TR><TR><TD>
-Space/Enter     </TD><TD> allows you to set or delete a cut point </TD></TR><TR><TD>
-Z </TD><TD> loads the commercial skip list (if one exists) into the cutlist </TD></TR><TR><TD>
-C or Q </TD><TD> clear all cut points in the cutlist </TD></TR><TR><TD>
-I </TD><TD> Inverts the cutlist
+M </TD><TD> shows a menu allowing you to add, move, or delete a cut&nbsp;or to save or revert changes </TD></TR><TR><TD>
+Space/Enter     </TD><TD> adds a cut or, if in a cut area, prompts for action </TD></TR><TR><TD>
+D </TD><TD> deletes the cut </TD></TR><TR><TD>
+Z </TD><TD> loads the commercial skip list (if one exists) into the cut list </TD></TR><TR><TD>
+C or Q </TD><TD> clear all cut points in the cut list </TD></TR><TR><TD>
+I </TD><TD> inverts the cut list </TD></TR><TR><TD>
+Escape </TD><TD> prompts whether to save or cancel changes and allows exit
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
@@ -333,9 +336,9 @@ should add <CODE>/usr/local/bin/changechannel</CODE> to your Input Connections i
 mythbackend configuration GUI.</P>
 <P>However, there is not <B>changechannel</B> program per-se, because this is
 going to be dependent on what sort of external tuner you have.  Look in the
-<CODE>contrib/channel_changers</CODE> directory for a number of programs and
-scripts which may be used to change channels.  Once you find one which
-works, copy it to <CODE>/usr/local/bin/changechannel</CODE>.</P>
+<A HREF="http://www.mythtv.org/wiki/Category:Channel_Change_Scripts">Channel Change Scripts</A> category of the MythTV wiki for a number of
+programs and scripts which may be used to change channels.  Once you find one
+which works, copy it to <CODE>/usr/local/bin/changechannel</CODE>.</P>
 <P>Feel free to browse some of what sort of hardware is available at 
 <A HREF="http://store.snapstream.com/accessories.html">http://store.snapstream.com/accessories.html</A>, or if you wish to
 assemble your own, rather than purchase, the following may be helpful: 

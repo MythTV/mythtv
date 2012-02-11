@@ -689,8 +689,8 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     updateIcons();
 }
 
-void PlaybackBox::UpdateUIListItem(
-    ProgramInfo *pginfo, bool force_preview_reload)
+void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo,
+                                   bool force_preview_reload)
 {
     if (!pginfo)
         return;
@@ -737,8 +737,8 @@ void PlaybackBox::SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo)
         item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
 }
 
-void PlaybackBox::UpdateUIListItem(
-    MythUIButtonListItem *item, bool is_sel, bool force_preview_reload)
+void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
+                                   bool is_sel, bool force_preview_reload)
 {
     if (!item)
         return;
@@ -3783,7 +3783,7 @@ void PlaybackBox::customEvent(QEvent *event)
             if (tokens.size() >= 4)
             {
                 chanid = tokens[2].toUInt();
-                recstartts = QDateTime::fromString(tokens[3]);
+                recstartts = QDateTime::fromString(tokens[3], Qt::ISODate);
             }
 
             if ((tokens.size() >= 2) && tokens[1] == "UPDATE")

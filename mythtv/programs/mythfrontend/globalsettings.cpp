@@ -1322,7 +1322,8 @@ static HostComboBox *MenuTheme()
     QList<ThemeInfo>::iterator it;
     for( it =  themelist.begin(); it != themelist.end(); ++it )
     {
-        gc->addSelection((*it).GetName(), (*it).GetDirectoryName());
+        gc->addSelection((*it).GetName(), (*it).GetDirectoryName(),
+                         (*it).GetDirectoryName() == "defaultmenu");
     }
 
     return gc;
