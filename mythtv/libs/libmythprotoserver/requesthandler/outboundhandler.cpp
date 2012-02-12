@@ -78,6 +78,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     handler->AllowStandardEvents(true);
     handler->AllowSystemEvents(true);
     m_parent->AddSocketHandler(handler); // register socket for reception of events
+    handler->DownRef(); // drop local instance in counter
 
     m_socket->Unlock();
     m_parent->newConnection(m_socket); // configure callbacks
