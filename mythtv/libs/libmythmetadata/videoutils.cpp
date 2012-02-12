@@ -258,3 +258,39 @@ bool isHostMaster(const QString &host)
 
     return isMaster;
 }
+
+VideoContentType ContentTypeFromString(const QString &type)
+{
+    VideoContentType ret = kContentUnknown;
+
+    if (type == "MOVIE")
+        ret = kContentMovie;
+    else if (type == "TELEVISION")
+        ret = kContentTelevision;
+    else if (type == "ADULT")
+        ret = kContentAdult;
+    else if (type == "MUSICVIDEO")
+        ret = kContentMusicVideo;
+    else if (type == "HOMEVIDEO")
+        ret = kContentHomeMovie;
+
+    return ret;
+}
+
+QString ContentTypeToString(VideoContentType type)
+{
+    QString ret = "UNKNOWN";
+
+    if (type == kContentMovie)
+        ret = "MOVIE";
+    else if (type == kContentTelevision)
+        ret = "TELEVISION";
+    else if (type == kContentAdult)
+        ret = "ADULT";
+    else if (type == kContentMusicVideo)
+        ret = "MUSICVIDEO";
+    else if (type == kContentHomeMovie)
+        ret = "HOMEVIDEO";
+
+    return ret;
+}

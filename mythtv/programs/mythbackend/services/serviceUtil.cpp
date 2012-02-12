@@ -27,6 +27,7 @@
 #include "recordinginfo.h"
 #include "recordingtypes.h"
 #include "channelutil.h"
+#include "videoutils.h"
 #include "metadataimagehelper.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -280,17 +281,21 @@ void FillVideoMetadataInfo (
     pVideoMetadataInfo->setDescription(pMetadata->GetPlot());
     pVideoMetadataInfo->setCertification(pMetadata->GetRating());
     pVideoMetadataInfo->setInetref(pMetadata->GetInetRef());
+    pVideoMetadataInfo->setCollectionref(pMetadata->GetCollectionRef());
     pVideoMetadataInfo->setHomePage(pMetadata->GetHomepage());
     pVideoMetadataInfo->setReleaseDate(QDateTime(pMetadata->GetReleaseDate()));
     pVideoMetadataInfo->setAddDate(QDateTime(pMetadata->GetInsertdate()));
     pVideoMetadataInfo->setUserRating(pMetadata->GetUserRating());
     pVideoMetadataInfo->setLength(pMetadata->GetLength());
+    pVideoMetadataInfo->setPlayCount(pMetadata->GetPlayCount());
     pVideoMetadataInfo->setSeason(pMetadata->GetSeason());
     pVideoMetadataInfo->setEpisode(pMetadata->GetEpisode());
     pVideoMetadataInfo->setParentalLevel(pMetadata->GetShowLevel());
     pVideoMetadataInfo->setVisible(pMetadata->GetBrowse());
     pVideoMetadataInfo->setWatched(pMetadata->GetWatched());
     pVideoMetadataInfo->setProcessed(pMetadata->GetProcessed());
+    pVideoMetadataInfo->setContentType(ContentTypeToString(
+                                       pMetadata->GetContentType()));
     pVideoMetadataInfo->setFileName(pMetadata->GetFilename());
     pVideoMetadataInfo->setHash(pMetadata->GetHash());
     pVideoMetadataInfo->setHostName(pMetadata->GetHost());

@@ -97,10 +97,10 @@ class VideoMetadataImp
              const QString &coverfile, const QString &screenshot, const QString &banner,
              const QString &fanart, const QString &title, const QString &subtitle,
              const QString &tagline, int year, const QDate &releasedate,
-             const QString &inetref, const QString &homepage,
+             const QString &inetref, int collectionref, const QString &homepage,
              const QString &director, const QString &studio,
              const QString &plot, float userrating,
-             const QString &rating, int length,
+             const QString &rating, int length, int playcount,
              int season, int episode, const QDate &insertdate,
              int id, ParentalLevel::Level showlevel, int categoryID,
              int childID, bool browse, bool watched,
@@ -109,18 +109,21 @@ class VideoMetadataImp
              const country_list &countries,
              const cast_list &cast,
              const QString &host = "",
-             bool processed = false) :
+             bool processed = false,
+             VideoContentType contenttype = kContentUnknown) :
         m_title(title), m_subtitle(subtitle), m_tagline(tagline),
-        m_inetref(inetref), m_homepage(homepage), m_director(director), m_studio(studio),
+        m_inetref(inetref), m_collectionref(collectionref), m_homepage(homepage),
+        m_director(director), m_studio(studio),
         m_plot(plot), m_rating(rating), m_playcommand(playcommand), m_category(category),
         m_genres(genres), m_countries(countries), m_cast(cast),
         m_filename(filename), m_hash(hash), m_trailer(trailer), m_coverfile(coverfile),
         m_screenshot(screenshot), m_banner(banner), m_fanart(fanart),
         m_host(host), m_categoryID(categoryID), m_childID(childID),
-        m_year(year), m_releasedate(releasedate), m_length(length), m_season(season),
-        m_episode(episode), m_insertdate(insertdate), m_showlevel(showlevel),
+        m_year(year), m_releasedate(releasedate), m_length(length), m_playcount(playcount),
+        m_season(season), m_episode(episode), m_insertdate(insertdate), m_showlevel(showlevel),
         m_browse(browse), m_watched(watched), m_id(id),
-        m_userrating(userrating), m_processed(processed)
+        m_userrating(userrating), m_processed(processed),
+        m_contenttype(contenttype)
     {
         VideoCategory::GetCategory().get(m_categoryID, m_category);
     }
@@ -143,6 +146,7 @@ class VideoMetadataImp
             m_subtitle = rhs.m_subtitle;
             m_tagline = rhs.m_tagline;
             m_inetref = rhs.m_inetref;
+            m_collectionref = rhs.m_collectionref;
             m_homepage = rhs.m_homepage;
             m_director = rhs.m_director;
             m_studio = rhs.m_studio;
@@ -166,6 +170,7 @@ class VideoMetadataImp
             m_year = rhs.m_year;
             m_releasedate = rhs.m_releasedate;
             m_length = rhs.m_length;
+            m_playcount = rhs.m_playcount;
             m_season = rhs.m_season;
             m_episode = rhs.m_episode;
             m_insertdate = rhs.m_insertdate;
@@ -176,6 +181,7 @@ class VideoMetadataImp
             m_userrating = rhs.m_userrating;
             m_host = rhs.m_host;
             m_processed = rhs.m_processed;
+            m_contenttype = rhs.m_contenttype;
 
             // No DB vars
             m_sort_key = rhs.m_sort_key;
@@ -212,6 +218,9 @@ class VideoMetadataImp
 
     const QString &GetInetRef() const { return m_inetref; }
     void SetInetRef(const QString &inetRef) { m_inetref = inetRef; }
+
+    int GetCollectionRef() const { return m_collectionref; }
+    void SetCollectionRef(int collectionref) { m_collectionref = collectionref; }
 
     const QString &GetHomepage() const { return m_homepage; }
     void SetHomepage(const QString &homepage) { m_homepage = homepage; }
@@ -291,6 +300,9 @@ class VideoMetadataImp
     int GetLength() const { return m_length; }
     void SetLength(int length) { m_length = length; }
 
+    unsigned int GetPlayCount() const { return m_playcount; }
+    void SetPlayCount(int playcount) { m_playcount = playcount; }
+
     int GetSeason() const { return m_season; }
     void SetSeason(int season) { m_season = season; }
 
@@ -321,6 +333,9 @@ class VideoMetadataImp
     bool GetProcessed() const { return m_processed; }
     void SetProcessed(bool processed) { m_processed = processed; }
 
+    VideoContentType GetContentType() const { return m_contenttype; }
+    void SetContentType(VideoContentType contenttype) { m_contenttype = contenttype; }
+
     ////////////////////////////////
 
     void SaveToDatabase();
@@ -349,6 +364,7 @@ class VideoMetadataImp
     QString m_subtitle;
     QString m_tagline;
     QString m_inetref;
+    int m_collectionref;
     QString m_homepage;
     QString m_director;
     QString m_studio;
@@ -373,6 +389,7 @@ class VideoMetadataImp
     int m_year;
     QDate m_releasedate;
     int m_length;
+    int m_playcount;
     int m_season;
     int m_episode;
     QDate m_insertdate;
@@ -382,6 +399,7 @@ class VideoMetadataImp
     unsigned int m_id;  // videometadata.intid
     float m_userrating;
     bool m_processed;
+    VideoContentType m_contenttype;
 
     // not in DB
     VideoMetadata::SortKey m_sort_key;
@@ -461,9 +479,9 @@ void VideoMetadataImp::Reset()
                     VIDEO_COVERFILE_DEFAULT, VIDEO_SCREENSHOT_DEFAULT, VIDEO_BANNER_DEFAULT,
                     VIDEO_FANART_DEFAULT, VideoMetadata::FilenameToMeta(m_filename, 1), QString(),
                     VideoMetadata::FilenameToMeta(m_filename, 4), VIDEO_YEAR_DEFAULT,
-                    QDate(), VIDEO_INETREF_DEFAULT, QString(), VIDEO_DIRECTOR_DEFAULT,
+                    QDate(), VIDEO_INETREF_DEFAULT, 0, QString(), VIDEO_DIRECTOR_DEFAULT,
                     QString(), VIDEO_PLOT_DEFAULT, 0.0,
-                    VIDEO_RATING_DEFAULT, 0,
+                    VIDEO_RATING_DEFAULT, 0, 0,
                     VideoMetadata::FilenameToMeta(m_filename, 2).toInt(),
                     VideoMetadata::FilenameToMeta(m_filename, 3).toInt(), QDate(), m_id,
                     ParentalLevel::plLowest, 0, -1, true, false, "", "",
@@ -552,29 +570,33 @@ void VideoMetadataImp::fromDBRow(MSqlQuery &query)
     if (m_userrating > 10.0)
         m_userrating = 10.0;
     m_length = query.value(8).toInt();
-    m_filename = query.value(9).toString();
-    m_hash = query.value(10).toString();
-    m_showlevel = ParentalLevel(query.value(11).toInt()).GetLevel();
-    m_coverfile = query.value(12).toString();
-    m_inetref = query.value(13).toString();
-    m_homepage = query.value(14).toString();
-    m_childID = query.value(15).toUInt();
-    m_browse = query.value(16).toBool();
-    m_watched = query.value(17).toBool();
-    m_playcommand = query.value(18).toString();
-    m_categoryID = query.value(19).toInt();
-    m_id = query.value(20).toInt();
-    m_trailer = query.value(21).toString();
-    m_screenshot = query.value(22).toString();
-    m_banner = query.value(23).toString();
-    m_fanart = query.value(24).toString();
-    m_subtitle = query.value(25).toString();
-    m_tagline = query.value(26).toString();
-    m_season = query.value(27).toInt();
-    m_episode = query.value(28).toInt();
-    m_host = query.value(29).toString();
-    m_insertdate = query.value(30).toDate();
-    m_processed = query.value(31).toBool();
+    m_playcount = query.value(9).toInt();
+    m_filename = query.value(10).toString();
+    m_hash = query.value(11).toString();
+    m_showlevel = ParentalLevel(query.value(12).toInt()).GetLevel();
+    m_coverfile = query.value(13).toString();
+    m_inetref = query.value(14).toString();
+    m_collectionref = query.value(15).toUInt();
+    m_homepage = query.value(16).toString();
+    m_childID = query.value(17).toUInt();
+    m_browse = query.value(18).toBool();
+    m_watched = query.value(19).toBool();
+    m_playcommand = query.value(20).toString();
+    m_categoryID = query.value(21).toInt();
+    m_id = query.value(22).toInt();
+    m_trailer = query.value(23).toString();
+    m_screenshot = query.value(24).toString();
+    m_banner = query.value(25).toString();
+    m_fanart = query.value(26).toString();
+    m_subtitle = query.value(27).toString();
+    m_tagline = query.value(28).toString();
+    m_season = query.value(29).toInt();
+    m_episode = query.value(30).toInt();
+    m_host = query.value(31).toString();
+    m_insertdate = query.value(32).toDate();
+    m_processed = query.value(33).toBool();
+
+    m_contenttype = ContentTypeFromString(query.value(34).toString());
 
     VideoCategory::GetCategory().get(m_categoryID, m_category);
 
@@ -620,6 +642,13 @@ void VideoMetadataImp::saveToDatabase()
         m_userrating = 0.0;
     if (m_releasedate.toString().isEmpty())
         m_releasedate = QDate::fromString("0000-00-00", "YYYY-MM-DD");
+    if (m_contenttype == kContentUnknown)
+    {
+        if (m_season > 0 || m_episode > 0)
+            m_contenttype = kContentTelevision;
+        else
+            m_contenttype = kContentMovie;
+    }
 
     bool inserting = m_id == 0;
 
@@ -634,11 +663,11 @@ void VideoMetadataImp::saveToDatabase()
         query.prepare("INSERT INTO videometadata (title,subtitle,tagline,director,studio,plot,"
                       "rating,year,userrating,length,season,episode,filename,hash,"
                       "showlevel,coverfile,inetref,homepage,browse,watched,trailer,"
-                      "screenshot,banner,fanart,host,processed) VALUES (:TITLE, :SUBTITLE, "
+                      "screenshot,banner,fanart,host,processed,contenttype) VALUES (:TITLE, :SUBTITLE, "
                       ":TAGLINE, :DIRECTOR, :STUDIO, :PLOT, :RATING, :YEAR, :USERRATING, "
                       ":LENGTH, :SEASON, :EPISODE, :FILENAME, :HASH, :SHOWLEVEL, "
                       ":COVERFILE, :INETREF, :HOMEPAGE, :BROWSE, :WATCHED, "
-                      ":TRAILER, :SCREENSHOT, :BANNER, :FANART, :HOST, :PROCESSED)");
+                      ":TRAILER, :SCREENSHOT, :BANNER, :FANART, :HOST, :PROCESSED, :CONTENTTYPE)");
     }
     else
     {
@@ -646,14 +675,14 @@ void VideoMetadataImp::saveToDatabase()
                       "tagline = :TAGLINE, director = :DIRECTOR, studio = :STUDIO, "
                       "plot = :PLOT, rating= :RATING, year = :YEAR, "
                       "releasedate = :RELEASEDATE, userrating = :USERRATING, "
-                      "length = :LENGTH, season = :SEASON, episode = :EPISODE, "
-                      "filename = :FILENAME, hash = :HASH, trailer = :TRAILER, "
+                      "length = :LENGTH, playcount = :PLAYCOUNT, season = :SEASON, "
+                      "episode = :EPISODE, filename = :FILENAME, hash = :HASH, trailer = :TRAILER, "
                       "showlevel = :SHOWLEVEL, coverfile = :COVERFILE, "
                       "screenshot = :SCREENSHOT, banner = :BANNER, fanart = :FANART, "
-                      "inetref = :INETREF, homepage = :HOMEPAGE, browse = :BROWSE, "
-                      "watched = :WATCHED, host = :HOST, playcommand = :PLAYCOMMAND, "
-                      "childid = :CHILDID, category = :CATEGORY, processed = :PROCESSED "
-                      " WHERE intid = :INTID");
+                      "inetref = :INETREF, collectionref = :COLLECTION, homepage = :HOMEPAGE, "
+                      "browse = :BROWSE, watched = :WATCHED, host = :HOST, playcommand = :PLAYCOMMAND, "
+                      "childid = :CHILDID, category = :CATEGORY, processed = :PROCESSED, "
+                      "contenttype = :CONTENTTYPE WHERE intid = :INTID");
 
         query.bindValue(":PLAYCOMMAND", m_playcommand);
         query.bindValue(":CHILDID", m_childID);
@@ -672,6 +701,7 @@ void VideoMetadataImp::saveToDatabase()
     query.bindValue(":RELEASEDATE", m_releasedate);
     query.bindValue(":USERRATING", m_userrating);
     query.bindValue(":LENGTH", m_length);
+    query.bindValue(":PLAYCOUNT", m_playcount);
     query.bindValue(":SEASON", m_season);
     query.bindValue(":EPISODE", m_episode);
     query.bindValue(":FILENAME", m_filename);
@@ -683,11 +713,13 @@ void VideoMetadataImp::saveToDatabase()
     query.bindValue(":BANNER", m_banner.isNull() ? "" : m_banner);
     query.bindValue(":FANART", m_fanart.isNull() ? "" : m_fanart);
     query.bindValue(":INETREF", m_inetref.isNull() ? "" : m_inetref);
+    query.bindValue(":COLLECTION", m_collectionref);
     query.bindValue(":HOMEPAGE", m_homepage.isNull() ? "" : m_homepage);
     query.bindValue(":BROWSE", m_browse);
     query.bindValue(":WATCHED", m_watched);
     query.bindValue(":HOST", m_host);
     query.bindValue(":PROCESSED", m_processed);
+    query.bindValue(":CONTENTTYPE", ContentTypeToString(m_contenttype));
 
     if (!query.exec() || !query.isActive())
     {
@@ -1074,24 +1106,25 @@ VideoMetadata::VideoMetadata(const QString &filename, const QString &hash,
              const QString &trailer, const QString &coverfile,
              const QString &screenshot, const QString &banner, const QString &fanart,
              const QString &title, const QString &subtitle, const QString &tagline,
-             int year, const QDate &releasedate, const QString &inetref,
+             int year, const QDate &releasedate, const QString &inetref, int collectionref,
              const QString &homepage, const QString &director, const QString &studio,
              const QString &plot, float userrating, const QString &rating,
-             int length, int season, int episode, const QDate &insertdate,
+             int length, int playcount, int season, int episode, const QDate &insertdate,
              int id, ParentalLevel::Level showlevel, int categoryID,
              int childID, bool browse, bool watched,
              const QString &playcommand, const QString &category,
              const genre_list &genres,
              const country_list &countries,
              const cast_list &cast,
-             const QString &host, bool processed)
+             const QString &host, bool processed,
+             VideoContentType contenttype)
 {
     m_imp = new VideoMetadataImp(filename, hash, trailer, coverfile, screenshot, banner,
                             fanart, title, subtitle, tagline, year, releasedate, inetref,
-                            homepage, director, studio, plot, userrating, rating, length,
-                            season, episode, insertdate, id, showlevel, categoryID, childID,
-                            browse, watched, playcommand, category, genres, countries, cast,
-                            host, processed);
+                            collectionref, homepage, director, studio, plot, userrating, rating,
+                            length, playcount, season, episode, insertdate, id, showlevel, categoryID,
+                            childID, browse, watched, playcommand, category, genres, countries,
+                            cast, host, processed, contenttype);
 }
 
 VideoMetadata::~VideoMetadata()
@@ -1138,6 +1171,7 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
     metadataMap["cast"] = GetDisplayCast(*this).join(", ");
     metadataMap["rating"] = GetDisplayRating(GetRating());
     metadataMap["length"] = GetDisplayLength(GetLength());
+    metadataMap["playcount"] = QString::number(GetPlayCount());
     metadataMap["year"] = GetDisplayYear(GetYear());
 
     metadataMap["releasedate"] = MythDateToString(GetReleaseDate(), kDateFull |
@@ -1273,6 +1307,7 @@ void ClearMap(MetadataMap &metadataMap)
     metadataMap["cast"] = "";
     metadataMap["rating"] = "";
     metadataMap["length"] = "";
+    metadataMap["playcount"] = "";
     metadataMap["year"] = "";
     metadataMap["releasedate"] = "";
     metadataMap["userrating"] = "";
@@ -1379,6 +1414,16 @@ void VideoMetadata::SetInetRef(const QString &inetRef)
     m_imp->SetInetRef(inetRef);
 }
 
+int VideoMetadata::GetCollectionRef() const
+{
+    return m_imp->GetCollectionRef();
+}
+
+void VideoMetadata::SetCollectionRef(int collectionref)
+{
+    m_imp->SetCollectionRef(collectionref);
+}
+
 const QString &VideoMetadata::GetHomepage() const
 {
     return m_imp->GetHomepage();
@@ -1447,6 +1492,16 @@ int VideoMetadata::GetLength() const
 void VideoMetadata::SetLength(int length)
 {
     m_imp->SetLength(length);
+}
+
+unsigned int VideoMetadata::GetPlayCount() const
+{
+    return m_imp->GetPlayCount();
+}
+
+void VideoMetadata::SetPlayCount(int count)
+{
+    m_imp->SetPlayCount(count);
 }
 
 int VideoMetadata::GetSeason() const
@@ -1527,6 +1582,16 @@ bool VideoMetadata::GetProcessed() const
 void VideoMetadata::SetProcessed(bool processed)
 {
     m_imp->SetProcessed(processed);
+}
+
+VideoContentType VideoMetadata::GetContentType() const
+{
+    return m_imp->GetContentType();
+}
+
+void VideoMetadata::SetContentType(VideoContentType contenttype)
+{
+    m_imp->SetContentType(contenttype);
 }
 
 const QString &VideoMetadata::GetPlayCommand() const
