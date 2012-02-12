@@ -37,7 +37,7 @@ namespace DTC
 class SERVICE_PUBLIC VideoMetadataInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.10" );
+    Q_CLASSINFO( "version"    , "1.20" );
 
     Q_PROPERTY( int             Id              READ Id               WRITE setId             )
     Q_PROPERTY( QString         Title           READ Title            WRITE setTitle          )
@@ -48,17 +48,20 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     Q_PROPERTY( QString         Description     READ Description      WRITE setDescription    )
     Q_PROPERTY( QString         Certification   READ Certification    WRITE setCertification  )
     Q_PROPERTY( QString         Inetref         READ Inetref          WRITE setInetref        )
+    Q_PROPERTY( int             Collectionref   READ Collectionref    WRITE setCollectionref  )
     Q_PROPERTY( QString         HomePage        READ HomePage         WRITE setHomePage       )
     Q_PROPERTY( QDateTime       ReleaseDate     READ ReleaseDate      WRITE setReleaseDate    )
     Q_PROPERTY( QDateTime       AddDate         READ AddDate          WRITE setAddDate        )
     Q_PROPERTY( float           UserRating      READ UserRating       WRITE setUserRating     )
     Q_PROPERTY( int             Length          READ Length           WRITE setLength         )
+    Q_PROPERTY( int             PlayCount       READ PlayCount        WRITE setPlayCount      )
     Q_PROPERTY( int             Season          READ Season           WRITE setSeason         )
     Q_PROPERTY( int             Episode         READ Episode          WRITE setEpisode        )
     Q_PROPERTY( int             ParentalLevel   READ ParentalLevel    WRITE setParentalLevel  )
     Q_PROPERTY( bool            Visible         READ Visible          WRITE setVisible        )
     Q_PROPERTY( bool            Watched         READ Watched          WRITE setWatched        )
     Q_PROPERTY( bool            Processed       READ Processed        WRITE setProcessed      )
+    Q_PROPERTY( QString         ContentType     READ ContentType      WRITE setContentType    )
     Q_PROPERTY( QString         FileName        READ FileName         WRITE setFileName       )
     Q_PROPERTY( QString         Hash            READ Hash             WRITE setHash           )
     Q_PROPERTY( QString         HostName        READ HostName         WRITE setHostName       )
@@ -79,17 +82,20 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     PROPERTYIMP    ( QString    , Description    )
     PROPERTYIMP    ( QString    , Certification  )
     PROPERTYIMP    ( QString    , Inetref        )
+    PROPERTYIMP    ( int        , Collectionref  )
     PROPERTYIMP    ( QString    , HomePage       )
     PROPERTYIMP    ( QDateTime  , ReleaseDate    )
     PROPERTYIMP    ( QDateTime  , AddDate        )
     PROPERTYIMP    ( float      , UserRating     )
     PROPERTYIMP    ( int        , Length         )
+    PROPERTYIMP    ( int        , PlayCount      )
     PROPERTYIMP    ( int        , Season         )
     PROPERTYIMP    ( int        , Episode        )
     PROPERTYIMP    ( int        , ParentalLevel  )
     PROPERTYIMP    ( bool       , Visible        )
     PROPERTYIMP    ( bool       , Watched        )
     PROPERTYIMP    ( bool       , Processed      )
+    PROPERTYIMP    ( QString    , ContentType    )
     PROPERTYIMP    ( QString    , FileName       )
     PROPERTYIMP    ( QString    , Hash           )
     PROPERTYIMP    ( QString    , HostName       )
@@ -118,8 +124,10 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
         VideoMetadataInfo(QObject *parent = 0)
                         : QObject         ( parent ),
                           m_Id            ( 0      ),
+                          m_Collectionref ( 0      ),
                           m_UserRating    ( 0      ),
                           m_Length        ( 0      ),
+                          m_PlayCount     ( 0      ),
                           m_Season        ( 0      ),
                           m_Episode       ( 0      ),
                           m_ParentalLevel ( 0      ),

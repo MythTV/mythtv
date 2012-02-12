@@ -29,6 +29,7 @@ struct PersonInfo
     QString url;
 };
 
+// What type of grabber script to use
 enum MetadataType {
     kMetadataVideo = 0,
     kMetadataRecording = 1,
@@ -36,6 +37,7 @@ enum MetadataType {
     kMetadataGame = 3
 };
 
+// Determines the lookup fallback strategy
 enum LookupType {
     kProbableTelevision = 0,
     kProbableGenericTelevision = 1,
@@ -43,6 +45,16 @@ enum LookupType {
     kUnknownVideo = 3,
     kProbableMusic = 4,
     kProbableGame = 5
+};
+
+// Actual type of content
+enum VideoContentType {
+    kContentMovie = 0,
+    kContentTelevision = 1,
+    kContentAdult = 2,
+    kContentMusicVideo = 3,
+    kContentHomeMovie = 4,
+    kContentUnknown = 5
 };
 
 enum PeopleType {
