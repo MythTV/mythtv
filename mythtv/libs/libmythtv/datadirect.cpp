@@ -1091,7 +1091,13 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     QDateTime NextSuggestedTime;
     QDateTime BlockedTime;
 
+    LOG(VB_GENERAL, LOG_INFO, QString("Suggested Time data: %1 bytes")
+        .arg(file.size()));
+
     QFile file(resultFilename);
+    file.open(QIODevice::WriteOnly);
+    file.write(postdata);
+    file.close();
 
     bool GotNextSuggestedTime = false;
     MUNUSED bool GotBlockedTime = false;
