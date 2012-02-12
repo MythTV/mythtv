@@ -298,7 +298,9 @@ void MythThemedMenu::ShowMenu()
 
     m_menuPopup->SetReturnEvent(this, "popmenu");
 
-    //m_menuPopup->AddButton(tr("Enter standby mode"), QVariant("standby"));
+    // HACK Implement a better check for this
+    if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
+        m_menuPopup->AddButton(tr("Enter standby mode"), QVariant("standby"));
     switch (override_menu)
     {
         case 2:
@@ -381,7 +383,8 @@ void MythThemedMenu::customEvent(QEvent *event)
             }
             else if (action == "standby")
             {
-
+                QString arg("standby_mode");
+                m_state->m_callback(m_state->m_callbackdata, arg);
             }
         }
         else if (resultid == "password")

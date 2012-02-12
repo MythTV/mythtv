@@ -78,7 +78,7 @@ void ExitPrompter::halt()
 
     /* If supported, use DBus to shutdown */
     if (ret != GENERIC_EXIT_OK && !DBusHalt())
-        myth_system("sudo /sbin/halt -p"); 
+        myth_system("sudo /sbin/halt -p");
 }
 
 static bool DBusReboot(void)
@@ -132,7 +132,7 @@ void ExitPrompter::reboot()
     {
         ret = myth_system(reboot_cmd);
         if (ret != GENERIC_EXIT_OK)
-            LOG(VB_GENERAL, LOG_ERR, 
+            LOG(VB_GENERAL, LOG_ERR,
                 "User defined RebootCommand failed, falling back to "
                 "alternative methods.");
     }
@@ -144,14 +144,14 @@ void ExitPrompter::reboot()
 
 void ExitPrompter::handleExit()
 {
-    // IsFrontendOnly() triggers a popup if there is no BE connection.
+    // HACK IsFrontendOnly() triggers a popup if there is no BE connection.
     // We really don't need that right now. This hack prevents it.
     gContext->SetDisableEventPopup(true);
 
     // first of all find out, if this is a frontend only host...
     bool frontendOnly = gCoreContext->IsFrontendOnly();
 
-    // Undo the hack, just in case we _don't_ quit:
+    // HACK Undo the hack, just in case we _don't_ quit:
     gContext->SetDisableEventPopup(false);
 
 

@@ -126,9 +126,11 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     uint PopDrawDisabled(void);
     void SetEffectsEnabled(bool enable);
     void draw(void);
-    
+
     void ResetIdleTimer(void);
     void PauseIdleTimer(bool pause);
+    void EnterStandby(bool manual = true);
+    void ExitStandby(bool manual = true);
 
   public slots:
     void mouseTimeout();
@@ -165,9 +167,6 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void LockInputDevices(bool locked);
 
     void ShowMouseCursor(bool show);
-    
-    void EnterStandby();
-    void ExitStandby();
 
     MythMainWindowPrivate *d;
 };

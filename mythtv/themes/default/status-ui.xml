@@ -93,5 +93,39 @@
 
     </window>
 
+    <window name="standbymode">
+        <textarea name="heading">
+            <area>30,10,740,40</area>
+            <font>baselarge</font>
+            <value>Frontend in standby mode</value>
+        </textarea>
+
+        <statetype name="backendstatus">
+            <area>100,270,600,40</area>
+            <state name="idle">
+                <textarea name="status">
+                    <area>0,5,600,30</area>
+                    <font>basemedium</font>
+                    <value>Backend is idle</value>
+                </textarea>
+            </state>
+            <state name="recording" from="idle">
+                <textarea name="status">
+                    <value>Backend is recording</value>
+                </textarea>
+            </state>
+            <state name="shuttingdown" from="idle">
+                <textarea name="status">
+                    <value>Backend is recording</value>
+                </textarea>
+            </state>
+            <state name="offline" from="idle">
+                <textarea name="status">
+                    <value>Backend is recording</value>
+                </textarea>
+            </state>
+        </statetype>
+    </window>
+
 </mythuitheme>
 

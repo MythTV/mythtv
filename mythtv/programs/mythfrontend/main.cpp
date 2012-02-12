@@ -56,6 +56,7 @@ using namespace std;
 #include "dbcheck.h"
 #include "mythmediamonitor.h"
 #include "statusbox.h"
+#include "idlescreen.h"
 #include "lcddevice.h"
 #include "langsettings.h"
 #include "mythtranslation.h"
@@ -93,6 +94,7 @@ using namespace std;
 #include <QScopedPointer>
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
+#include <external/FFmpeg/libavcodec/x86/mmx.h>
 #endif
 
 static ExitPrompter   *exitPopup = NULL;
@@ -588,6 +590,19 @@ static void showStatus(void)
         delete statusbox;
 }
 
+
+static void standbyScreen(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    IdleScreen *idlescreen = new IdleScreen(mainStack);
+
+    if (idlescreen->Create())
+        mainStack->AddScreen(idlescreen);
+    else
+        delete idlescreen;
+}
+
 static void RunVideoScreen(VideoDialog::DialogType type, bool fromJump = false)
 {
     QString message = QObject::tr("Loading videos ...");
@@ -1018,6 +1033,8 @@ static void TVMenuCallback(void *data, QString &selection)
         handleExit(true);
     else if (sel == "exiting_app")
         handleExit(false);
+    else if (sel == "standby_mode")
+        standbyScreen();
     else
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
 
