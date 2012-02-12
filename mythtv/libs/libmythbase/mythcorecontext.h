@@ -76,7 +76,10 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
                            uint timeout_ms = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
-    QHostAddress MythHostAddressAny(void);
+    void                ConfigureHostAddress(void);
+    QList<QHostAddress> MythHostAddress(void);
+    QList<QHostAddress> MythHostAddress4(void);
+    QList<QHostAddress> MythHostAddress6(void);
 
     QString GenMythURL(QString host = QString(), QString port = QString(),
                        QString path = QString(), QString storageGroup = QString());
@@ -144,6 +147,9 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
                             int defaultval = 0);
     double GetFloatSettingOnHost(const QString &key, const QString &host,
                                  double defaultval = 0.0);
+
+    QString GetBackendServerIP(void);
+    QString GetBackendServerIP(const QString &host);
 
     void SetSetting(const QString &key, const QString &newValue);
 

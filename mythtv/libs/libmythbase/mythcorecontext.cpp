@@ -6,7 +6,9 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QNetworkInterface>
+#include <QAbstractSocket>
 #include <QHostAddress>
+#include <QNetworkInterface>
 
 #include <cmath>
 
@@ -67,7 +69,8 @@ class MythCoreContextPrivate : public QObject
     bool           m_WOLInProgress;
 
     bool m_backend;
-    bool m_hasIPv6;
+    QList<QHostAddress> m_IPv4;
+    QList<QHostAddress> m_IPv6;
 
     MythDB *m_database;
 
@@ -93,7 +96,6 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_serverSock(NULL), m_eventSock(NULL),
       m_WOLInProgress(false),
       m_backend(false),
-      m_hasIPv6(false),
       m_database(GetMythDB()),
       m_UIThread(QThread::currentThread()),
       m_locale(NULL),
@@ -226,18 +228,7 @@ bool MythCoreContext::Init(void)
             "(such as 'en_US.UTF-8').").arg(lang_variables));
 #endif
 
-    // If any of the IPs on any interfaces look like IPv6 addresses, assume IPv6
-    // is available
-    QNetworkInterface qtinterface;
-    QList<QHostAddress> IpList = qtinterface.allAddresses();
-    for (int i = 0; i < IpList.size(); i++)
-    {
-        if (IpList.at(i).toString().contains(":"))
-        {
-            d->m_hasIPv6 = true;
-            break;
-        }
-    }
+    ConfigureHostAddress();
 
     return true;
 }
@@ -585,9 +576,10 @@ bool MythCoreContext::IsBackend(void) const
 bool MythCoreContext::IsMasterHost(void)
 {
     QString myip = GetSetting("BackendServerIP");
+    QString myip6 = GetSetting("BackendServerIP6");
     QString masterip = GetSetting("MasterServerIP");
 
-    return (masterip == myip);
+    return ((masterip == myip) || (masterip == myip6));
 }
 
 bool MythCoreContext::IsMasterBackend(void)
@@ -629,10 +621,92 @@ bool MythCoreContext::IsFrontendOnly(void)
     return !backendOnLocalhost;
 }
 
-QHostAddress MythCoreContext::MythHostAddressAny(void)
+void MythCoreContext::ConfigureHostAddress(void)
 {
-    return QHostAddress(
-        (d->m_hasIPv6) ? QHostAddress::AnyIPv6 : QHostAddress::Any);
+    // populate stored IPv4 and IPv6 addresses
+    // if address is not defined, QHostAddress will be invalid and Null
+    QHostAddress config_v4(GetSetting("BackendServerIP"));
+#if !defined(QT_NO_IPV6)
+    QHostAddress config_v6(GetSetting("BackendServerIP6"));
+#endif
+
+    // loop through all available addresses to populate lists
+    QList<QHostAddress> IPs = QNetworkInterface::allAddresses();
+    QList<QHostAddress>::const_iterator it;
+    for (it = IPs.begin(); it != IPs.end(); ++it)
+    {
+        if (d->m_IPv4.contains(*it))
+            // already defined, skip
+            continue;
+        else if (*it == QHostAddress::LocalHost)
+            // always listen on LocalHost
+            d->m_IPv4.append(*it);
+        else if (!config_v4.isNull() && (*it == config_v4))
+            // IPv4 address is defined, add it
+            d->m_IPv4.append(*it);
+        else if (config_v4.isNull() &&
+                 (it->protocol() == QAbstractSocket::IPv4Protocol))
+        {
+            // IPv4 address is not defined, populate one
+            // restrict autoconfiguration to RFC1918 private networks
+            if (it->isInSubnet(QHostAddress::parseSubnet("10.0.0.0/8")) ||
+                it->isInSubnet(QHostAddress::parseSubnet("172.16.0.0/12")) ||
+                it->isInSubnet(QHostAddress::parseSubnet("192.168.0.0/16")))
+                d->m_IPv4.append(*it);
+        }
+#if !defined(QT_NO_IPV6)
+        else if (d->m_IPv6.contains(*it))
+            // already defined, skip
+            continue;
+        else if (*it == QHostAddress::LocalHostIPv6)
+            // always listen on LocalHost
+            d->m_IPv6.append(*it);
+        else if (!config_v6.isNull() && (*it == config_v6))
+            // IPv6 address is defined, add it
+            d->m_IPv6.append(*it);
+        else if (config_v6.isNull() && 
+                 (it->protocol() == QAbstractSocket::IPv6Protocol))
+            // IPv6 address is not defined, populate one
+            // put in additional block filtering here?
+            if (!it->isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
+                d->m_IPv6.append(*it);
+#endif
+    }
+
+    if (!config_v4.isNull() && d->m_IPv4.contains(config_v4))
+    {
+        LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
+                "on %1, but address is not used on any local network "
+                "interfaces.").arg(config_v4.toString()));
+    }
+#if !defined(QT_NO_IPV6)
+
+    if (!config_v6.isNull() && d->m_IPv6.contains(config_v6))
+    {
+        LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
+                "on %1, but address is not used on any local network "
+                "interfaces.").arg(config_v6.toString()));
+    }
+#endif
+}
+
+QList<QHostAddress> MythCoreContext::MythHostAddress(void)
+{
+    QList<QHostAddress> alist(d->m_IPv4);
+    alist << d->m_IPv6;
+    return alist;
+}
+
+QList<QHostAddress> MythCoreContext::MythHostAddress4(void)
+{
+    QList<QHostAddress> alist(d->m_IPv4);
+    return alist;
+}
+
+QList<QHostAddress> MythCoreContext::MythHostAddress6(void)
+{
+    QList<QHostAddress> alist(d->m_IPv6);
+    return alist;
 }
 
 QString MythCoreContext::GenMythURL(QString host, QString port, QString path, QString storageGroup)
@@ -837,6 +911,32 @@ double MythCoreContext::GetFloatSettingOnHost(const QString &key,
                                               double defaultval)
 {
     return d->m_database->GetFloatSettingOnHost(key, host, defaultval);
+}
+
+QString MythCoreContext::GetBackendServerIP(void)
+{
+    return GetBackendServerIP(d->m_localHostname);
+}
+
+QString MythCoreContext::GetBackendServerIP(const QString &host)
+{
+#if !defined(QT_NO_IPV6)
+    // prefer IPv6 address if optional
+    if (!d->m_IPv6.empty())
+    {
+        // we have IPv6 addresses, assume we can connect to them
+        QString address = GetSettingOnHost("BackendServerIP6", host, "");
+        if (!address.isEmpty())
+            return address;
+    }
+#endif
+    // fall back to IPv4 address
+    QString address = GetSettingOnHost("BackendServerIP", host, "");
+    if (!address.isEmpty())
+        return address;
+
+    LOG(VB_GENERAL, LOG_WARNING, "No address defined for host: "+host);
+    return "";
 }
 
 void MythCoreContext::SetSetting(const QString &key, const QString &newValue)
