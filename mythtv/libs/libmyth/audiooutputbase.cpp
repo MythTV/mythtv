@@ -990,7 +990,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
         {
             AudioOutputUtil::MonoToStereo(WPOS, buffer, bdFrames);
             frames -= bdFrames;
-            off = bdFrames * source_bytes_per_frame;
+            off = bdFrames * sizeof(float); // 1 channel of floats
             org_waud = 0;
         }
         if (frames > 0)
