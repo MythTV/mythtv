@@ -25,6 +25,7 @@
 #include "controlrequesthandler.h"
 #include "requesthandler/basehandler.h"
 #include "requesthandler/fileserverhandler.h"
+#include "requesthandler/messagehandler.h"
 
 #define LOC      QString("MythMediaServer: ")
 #define LOC_WARN QString("MythMediaServer, Warning: ")
@@ -112,7 +113,7 @@ int main(int argc, char *argv[])
 
     cmdline.ApplySettingsOverride();
 
-    gCoreContext->SetBackend(false);
+    gCoreContext->SetBackend(true); // blocks the event connection
     if (!gCoreContext->ConnectToMasterServer())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to connect to master server");
@@ -140,6 +141,7 @@ int main(int argc, char *argv[])
 
     sockmanager->RegisterHandler(new BaseRequestHandler());
     sockmanager->RegisterHandler(new FileServerHandler());
+    sockmanager->RegisterHandler(new MessageHandler());
 
     ControlRequestHandler *controlRequestHandler = new ControlRequestHandler();
     sockmanager->RegisterHandler(controlRequestHandler);
