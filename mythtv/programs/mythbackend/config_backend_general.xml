@@ -15,6 +15,15 @@
          placeholder_text="Enter backend IP address"
          data_type="localipaddress" />
       <setting
+         value="BackendServerIP6" default_data="::1"
+         setting_type="host" label="Local IPv6 address"
+         help_text="Enter the IP address of this machine.
+                    Use an externally accessible address (ie, not 
+                    ::1) if you are going to be running a frontend
+                    on a different machine than this one."
+         placeholder_text="Enter backend IPv6 address"
+         data_type="localipaddress" />
+      <setting
          value="BackendServerPort" default_data="6543"
          setting_type="host" label="Port"
          placeholder_text="Enter backend server port"

@@ -539,9 +539,9 @@ int run_backend(MythBackendCommandLineParser &cmdline)
             return ret;
     }
 
-    QString myip = gCoreContext->GetSetting("BackendServerIP");
     int     port = gCoreContext->GetNumSetting("BackendServerPort", 6543);
-    if (myip.isEmpty())
+    if (gCoreContext->GetSetting("BackendServerIP").isEmpty() &&
+        gCoreContext->GetSetting("BackendServerIP6").isEmpty())
     {
         cerr << "No setting found for this machine's BackendServerIP.\n"
              << "Please run setup on this machine and modify the first page\n"

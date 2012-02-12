@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QRegExp>
 
+#include "mythcorecontext.h"
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "storagegroup.h"
@@ -988,7 +989,7 @@ int VideoMetadata::UpdateHashedDBRecord(const QString &hash,
 QString VideoMetadata::VideoFileHash(const QString &file_name,
                            const QString &host)
 {
-    if (!host.isEmpty() && !isHostMaster(host))
+    if (!host.isEmpty() && !gCoreContext->IsMasterHost(host))
     {
         QString url = generate_file_url("Videos", host, file_name);
         return RemoteFile::GetFileHash(url);

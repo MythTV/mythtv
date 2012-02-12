@@ -78,7 +78,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     if (!m_pHttpServer->isListening())
     {
         m_pHttpServer->setProxy(QNetworkProxy::NoProxy);
-        if (!m_pHttpServer->listen(gCoreContext->MythHostAddressAny(), nPort))
+        if (!m_pHttpServer->listen(gCoreContext->MythHostAddress(), nPort))
         {
             LOG(VB_GENERAL, LOG_ERR, "MediaServer::HttpServer Create Error");
             delete m_pHttpServer;

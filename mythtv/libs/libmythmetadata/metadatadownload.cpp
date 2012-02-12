@@ -656,8 +656,7 @@ QString MetadataDownload::getMXMLPath(QString filename)
     if (xmlname.startsWith("myth://"))
     {
         if (qurl.host().toLower() != gCoreContext->GetHostName().toLower() &&
-            (qurl.host() != gCoreContext->GetSettingOnHost("BackendServerIP",
-                                               gCoreContext->GetHostName())))
+            (!gCoreContext->IsThisHost(qurl.host())))
         {
             if (RemoteFile::Exists(xmlname))
                 ret = xmlname;
@@ -691,8 +690,7 @@ QString MetadataDownload::getNFOPath(QString filename)
     if (nfoname.startsWith("myth://"))
     {
         if (qurl.host().toLower() != gCoreContext->GetHostName().toLower() &&
-            (qurl.host() != gCoreContext->GetSettingOnHost("BackendServerIP",
-                                               gCoreContext->GetHostName())))
+            (!gCoreContext->IsThisHost(qurl.host())))
         {
             if (RemoteFile::Exists(nfoname))
                 ret = nfoname;

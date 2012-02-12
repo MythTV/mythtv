@@ -2247,7 +2247,7 @@ QString ProgramInfo::GetPlaybackURL(
         }
 
     // Fallback to streaming from the backend the recording was created on
-    tmpURL = gCoreContext->GenMythURL(gCoreContext->GetSettingOnHost("BackendServerIP", hostname),
+    tmpURL = gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(hostname),
                                       gCoreContext->GetSettingOnHost("BackendServerPort", hostname).toInt(),
                                       basename);
 

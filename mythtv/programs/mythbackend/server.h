@@ -1,11 +1,11 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include <QTcpServer>
+#include "serverpool.h"
 
 class MythSocket;
 
-class MythServer : public QTcpServer
+class MythServer : public ServerPool
 {
     Q_OBJECT
 
@@ -13,7 +13,7 @@ class MythServer : public QTcpServer
     void newConnect(MythSocket*);
 
   protected:
-    virtual void incomingConnection(int socket);
+    virtual void newTcpConnection(int socket);
 };
 
 

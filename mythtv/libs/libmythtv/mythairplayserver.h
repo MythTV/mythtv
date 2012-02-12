@@ -2,9 +2,9 @@
 #define MYTHAIRPLAYSERVER_H
 
 #include <QObject>
-#include <QTcpServer>
 #include <QUrl>
 
+#include "serverpool.h"
 #include "mythtvexp.h"
 
 class QMutex;
@@ -41,7 +41,7 @@ class AirplayConnection
 
 class APHTTPRequest;
 
-class MTV_PUBLIC MythAirplayServer : public QTcpServer
+class MTV_PUBLIC MythAirplayServer : public ServerPool
 {
     Q_OBJECT
 
@@ -53,7 +53,7 @@ class MTV_PUBLIC MythAirplayServer : public QTcpServer
 
   private slots:
     void Start();
-    void newConnection();
+    void newConnection(QTcpSocket *client);
     void deleteConnection();
     void read();
 

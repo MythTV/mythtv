@@ -59,7 +59,7 @@ QString  HttpServer::s_platform;
 /////////////////////////////////////////////////////////////////////////////
 
 HttpServer::HttpServer(const QString sApplicationPrefix) :
-    QTcpServer(), m_sSharePath(GetShareDir()),
+    ServerPool(), m_sSharePath(GetShareDir()),
     m_pHtmlServer(new HtmlServerExtension(m_sSharePath, sApplicationPrefix)),
     m_threadPool("HttpServerPool"), m_running(true)
 {
@@ -133,7 +133,7 @@ QScriptEngine* HttpServer::ScriptEngine()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HttpServer::incomingConnection(int nSocket)
+void HttpServer::newTcpConnection(int nSocket)
 {
     m_threadPool.startReserved(
         new HttpWorker(*this, nSocket),

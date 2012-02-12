@@ -656,8 +656,7 @@ static int transUnlink(QString filename, ProgramInfo *pginfo)
     if (pginfo != NULL && !pginfo->GetStorageGroup().isEmpty() &&
         !pginfo->GetHostname().isEmpty())
     {
-        QString ip = gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                    pginfo->GetHostname());
+        QString ip = gCoreContext->GetBackendServerIP(pginfo->GetHostname());
         QString port = gCoreContext->GetSettingOnHost("BackendServerPort",
                                                       pginfo->GetHostname());
         QString basename = filename.section('/', -1);

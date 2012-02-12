@@ -232,16 +232,13 @@ MainServer::MainServer(bool master, int port,
 
     mythserver = new MythServer();
     mythserver->setProxy(QNetworkProxy::NoProxy);
-    if (!mythserver->listen(gCoreContext->MythHostAddressAny(), port))
+    if (!mythserver->listen(gCoreContext->MythHostAddress(), port))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1. Exiting.")
-                .arg(port));
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
     }
-
     connect(mythserver, SIGNAL(newConnect(MythSocket *)),
-            SLOT(newConnection(MythSocket *)));
+            this,        SLOT(newConnection(MythSocket *)));
 
     gCoreContext->addListener(this);
 
@@ -1693,7 +1690,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QStringList outputlist(QString::number(destination.size()));
     QMap<QString, QString> backendIpMap;
     QMap<QString, QString> backendPortMap;
-    QString ip   = gCoreContext->GetSetting("BackendServerIP");
+    QString ip   = gCoreContext->GetBackendServerIP();
     QString port = gCoreContext->GetSetting("BackendServerPort");
 
     ProgramList::iterator it = destination.begin();
@@ -1849,7 +1846,7 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     if (pginfo.HasPathname())
     {
         QString lpath = GetPlaybackURL(&pginfo);
-        QString ip    = gCoreContext->GetSetting("BackendServerIP");
+        QString ip    = gCoreContext->GetBackendServerIP();
         QString port  = gCoreContext->GetSetting("BackendServerPort");
 
         if (playbackhost == gCoreContext->GetHostName())
@@ -2052,7 +2049,7 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
             QString localFile = sgroup.FindFile(basename);
 
             QString url = gCoreContext->GenMythURL(
-                                  gCoreContext->GetSettingOnHost("BackendServerIP", hostname),
+                                  gCoreContext->GetBackendServerIP(hostname),
                                   gCoreContext->GetSettingOnHost("BackendServerPort", hostname),
                                   basename,
                                   storagegroup);
@@ -3029,6 +3026,7 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("SELECT hostname FROM settings "
                            "WHERE value='BackendServerIP' "
+                              "OR value='BackendServerIP6' "
                              "AND data=:HOSTNAME;");
             query.bindValue(":HOSTNAME", hostname);
 
@@ -3273,7 +3271,8 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
             .arg(groupname).arg(host).arg(path).arg(wantHost));
 
     if ((host.toLower() == wantHost.toLower()) ||
-        (gCoreContext->GetSetting("BackendServerIP") == wantHost))
+        (gCoreContext->GetSetting("BackendServerIP") == wantHost) ||
+        (gCoreContext->GetSetting("BackendServerIP6") == wantHost))
     {
         StorageGroup sg(groupname, host);
         LOG(VB_FILE, LOG_INFO, "HandleSGGetFileList: Getting local info");
@@ -3338,7 +3337,8 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
             .arg(gCoreContext->GenMythURL(wantHost, 0, filename, groupname)));
 
     if ((wantHost.toLower() == gCoreContext->GetHostName().toLower()) ||
-        (wantHost == gCoreContext->GetSetting("BackendServerIP")))
+        (wantHost == gCoreContext->GetSetting("BackendServerIP")) ||
+        (wantHost == gCoreContext->GetSetting("BackendServerIP6")))
     {
         LOG(VB_FILE, LOG_INFO, "HandleSGFileQuery: Getting local info");
         StorageGroup sg(groupname, gCoreContext->GetHostName());
@@ -3541,14 +3541,12 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     {
         if (encoder->IsLocal())
         {
-            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetBackendServerIP();
             strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                  encoder->GetHostName(),
-                                                  "nohostname");
+            strlist << gCoreContext->GetBackendServerIP(encoder->GetHostName());
             strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
@@ -3674,14 +3672,12 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
     {
         if (encoder->IsLocal())
         {
-            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetBackendServerIP();
             strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                  encoder->GetHostName(),
-                                                  "nohostname");
+            strlist << gCoreContext->GetBackendServerIP(encoder->GetHostName());
             strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
@@ -5126,14 +5122,12 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     {
         if (encoder->IsLocal())
         {
-            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetBackendServerIP();
             strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                  encoder->GetHostName(),
-                                                  "nohostname");
+            strlist << gCoreContext->GetBackendServerIP(encoder->GetHostName());
             strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
@@ -5165,14 +5159,12 @@ void MainServer::HandleGetRecorderFromNum(QStringList &slist,
     {
         if (encoder->IsLocal())
         {
-            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetBackendServerIP();
             strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                  encoder->GetHostName(),
-                                                  "nohostname");
+            strlist << gCoreContext->GetBackendServerIP(encoder->GetHostName());
             strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
@@ -5824,7 +5816,7 @@ PlaybackSock *MainServer::GetSlaveByHostname(const QString &hostname)
         PlaybackSock *pbs = *iter;
         if (pbs->isSlaveBackend() &&
             ((pbs->getHostname().toLower() == hostname.toLower()) ||
-             (pbs->getIP() == hostname)))
+             (gCoreContext->IsThisHost(hostname, pbs->getHostname()))))
         {
             sockListLock.unlock();
             pbs->UpRef();
@@ -5850,7 +5842,7 @@ PlaybackSock *MainServer::GetMediaServerByHostname(const QString &hostname)
         PlaybackSock *pbs = *iter;
         if (pbs->isMediaServer() &&
             ((pbs->getHostname().toLower() == hostname.toLower()) ||
-             (pbs->getIP() == hostname)))
+             (gCoreContext->IsThisHost(hostname, pbs->getHostname()))))
         {
             pbs->UpRef();
             return pbs;
@@ -6119,7 +6111,7 @@ void MainServer::reconnectTimeout(void)
 
     QString str = QString("ANN SlaveBackend %1 %2")
                           .arg(gCoreContext->GetHostName())
-                          .arg(gCoreContext->GetSetting("BackendServerIP"));
+                          .arg(gCoreContext->GetBackendServerIP());
 
     masterServerSock->Lock();
 

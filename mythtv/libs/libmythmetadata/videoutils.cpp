@@ -237,28 +237,6 @@ QString WatchedToState(bool watched)
     return ret;
 }
 
-bool isHostMaster(const QString &host)
-{
-    bool isMaster = false;
-    QString masterIP = gCoreContext->GetSetting("MasterServerIP");
-    QString hostIP;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT data FROM settings WHERE "
-                  "value = 'BackendServerIP' AND "
-                  "hostname = :HOSTNAME;");
-    query.bindValue(":HOSTNAME", host);
-
-    if (query.exec() && query.next())
-    {
-        hostIP = query.value(0).toString();
-        if (hostIP == masterIP)
-            isMaster = true;
-    }
-
-    return isMaster;
-}
-
 VideoContentType ContentTypeFromString(const QString &type)
 {
     VideoContentType ret = kContentUnknown;
@@ -294,3 +272,4 @@ QString ContentTypeToString(VideoContentType type)
 
     return ret;
 }
+

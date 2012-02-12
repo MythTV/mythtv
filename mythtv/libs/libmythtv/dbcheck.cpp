@@ -6168,6 +6168,72 @@ NULL
             return false;
     }
 
+    if (dbver == "1295")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT data, hostname "
+                      "FROM settings "
+                      "WHERE value='BackendServerIP'");
+        if (!query.exec())
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "Unable to repair IP addresses for IPv4/IPv6 split.");
+            return false;
+        }
+
+        MSqlQuery update(MSqlQuery::InitCon()), insert(MSqlQuery::InitCon());
+        update.prepare("UPDATE settings "
+                          "SET data=:IP4ADDY "
+                       "WHERE value='BackendServerIP' "
+                      "AND hostname=:HOSTNAME");
+        insert.prepare("INSERT INTO settings "
+                       "SET value='BackendServerIP6',"
+                            "data=:IP6ADDY,"
+                        "hostname=:HOSTNAME");
+        while (query.next())
+        {
+            QHostAddress oldaddr(query.value(0).toString());
+            QString hostname = query.value(1).toString();
+
+            update.bindValue(":HOSTNAME", hostname);
+            insert.bindValue(":HOSTNAME", hostname);
+
+            if (oldaddr.protocol() == QAbstractSocket::IPv6Protocol)
+            {
+                update.bindValue(":IP4ADDY", "127.0.0.1");
+                insert.bindValue(":IP6ADDY", query.value(0).toString());
+                if (!update.exec() || !insert.exec())
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to separate IPv4 "
+                              "and IPv6 addresses for %1").arg(hostname));
+                    return false;
+                }
+            }
+            else if (oldaddr.protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                update.bindValue(":IP4ADDY", query.value(0).toString());
+                insert.bindValue(":IP6ADDY", "::1");
+                if (!update.exec() || !insert.exec())
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to separate IPv4 "
+                              "and IPv6 addresses for %1").arg(hostname));
+                    return false;
+                }
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_WARNING,
+                    QString("Invalid address string '%1' found on %2. "
+                            "Skipping update")
+                        .arg(query.value(0).toString()).arg(hostname));
+                return false;
+            }
+        }
+
+        if (!UpdateDBVersionNumber("1296", dbver))
+            return false;
+    }
+
     return true;
 }
 

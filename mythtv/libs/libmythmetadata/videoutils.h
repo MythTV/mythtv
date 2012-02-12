@@ -55,8 +55,6 @@ META_PUBLIC QString TrailerToState(const QString &trailerFile);
 META_PUBLIC QString ParentalLevelToState(const ParentalLevel &level);
 META_PUBLIC QString WatchedToState(bool watched);
 
-META_PUBLIC bool isHostMaster(const QString &host);
-
 META_PUBLIC VideoContentType ContentTypeFromString(const QString &type);
 META_PUBLIC QString ContentTypeToString(VideoContentType type);
 
@@ -67,7 +65,7 @@ META_PUBLIC QString ContentTypeToString(VideoContentType type);
 inline QString generate_file_url(
     const QString &storage_group, const QString &host, const QString &path)
 {
-    QString ip = gCoreContext->GetSettingOnHost("BackendServerIP", host);
+    QString ip = gCoreContext->GetBackendServerIP(host);
     uint port = gCoreContext->GetSettingOnHost("BackendServerPort",
                                                host).toUInt();
 

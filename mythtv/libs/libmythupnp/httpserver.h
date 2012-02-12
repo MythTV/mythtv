@@ -34,7 +34,6 @@
 
 // Qt headers
 #include <QReadWriteLock>
-#include <QTcpServer>
 #include <QMultiMap>
 #include <QRunnable>
 #include <QPointer>
@@ -42,6 +41,7 @@
 #include <QList>
 
 // MythTV headers
+#include "serverpool.h"
 #include "httprequest.h"
 #include "mthreadpool.h"
 #include "refcounted.h"
@@ -93,7 +93,7 @@ typedef QList<QPointer<HttpServerExtension> > HttpServerExtensionList;
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC HttpServer : public QTcpServer
+class UPNP_PUBLIC HttpServer : public ServerPool
 {
   protected:
     mutable QReadWriteLock  m_rwlock;
@@ -118,7 +118,7 @@ class UPNP_PUBLIC HttpServer : public QTcpServer
 
     QScriptEngine *ScriptEngine(void);
 
-    virtual void incomingConnection(int socket); // QTcpServer
+    virtual void newTcpConnection(int socket); // QTcpServer
 
     QString GetSharePath(void) const
     { // never modified after creation, so no need to lock

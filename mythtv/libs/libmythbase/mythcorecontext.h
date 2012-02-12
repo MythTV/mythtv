@@ -98,8 +98,12 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     bool IsFrontendOnly(void);   ///< is there a frontend, but no backend,
                                  ///  running on this host
     bool IsMasterHost(void);     ///< is this the same host as the master
+    bool IsMasterHost(const QString &host); //< is specified host the master
     bool IsMasterBackend(void);  ///< is this the actual MBE process
     bool BackendIsRunning(void); ///< a backend process is running on this host
+
+    bool IsThisHost(const QString &addr); //< is this address mapped to this host
+    bool IsThisHost(const QString &addr, const QString &host);
 
     void BlockShutdown(void);
     void AllowShutdown(void);

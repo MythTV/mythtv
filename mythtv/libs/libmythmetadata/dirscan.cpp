@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QUrl>
 
+#include "mythcorecontext.h"
 #include "dbaccess.h"
 #include "dirscan.h"
 #include "remoteutil.h"
@@ -268,7 +269,7 @@ bool ScanVideoDirectory(const QString &start_path, DirectoryHandler *handler,
         QString path = sgurl.path();
 
         if (!scan_sg_dir(path, host, path, handler, extlookup, 
-                (isHostMaster(host) &&
+                (gCoreContext->IsMasterHost(host) &&
                  (gCoreContext->GetHostName().toLower() == host.toLower()))))
         {
             LOG(VB_GENERAL, LOG_ERR, 

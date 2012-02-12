@@ -228,8 +228,6 @@ bool MythCoreContext::Init(void)
             "(such as 'en_US.UTF-8').").arg(lang_variables));
 #endif
 
-    ConfigureHostAddress();
-
     return true;
 }
 
@@ -575,11 +573,13 @@ bool MythCoreContext::IsBackend(void) const
 
 bool MythCoreContext::IsMasterHost(void)
 {
-    QString myip = GetSetting("BackendServerIP");
-    QString myip6 = GetSetting("BackendServerIP6");
-    QString masterip = GetSetting("MasterServerIP");
+    QString host = GetHostName();
+    return IsMasterHost(host);
+}
 
-    return ((masterip == myip) || (masterip == myip6));
+bool MythCoreContext::IsMasterHost(const QString &host)
+{
+    return IsThisHost(GetSetting("MasterServerIP"), host);
 }
 
 bool MythCoreContext::IsMasterBackend(void)
@@ -601,6 +601,19 @@ bool MythCoreContext::BackendIsRunning(void)
                                     kMSDontDisableDrawing |
                                     kMSProcessEvents);
     return (res == GENERIC_EXIT_OK);
+}
+
+bool MythCoreContext::IsThisHost(const QString &addr)
+{
+    return IsThisHost(addr, GetHostName());
+}
+
+bool MythCoreContext::IsThisHost(const QString &addr, const QString &host)
+{
+    QString thisip = GetSettingOnHost("BackendServerIP", host);
+    QString thisip6 = GetSettingOnHost("BackendServerIP6", host);
+
+    return ((addr == thisip) || (addr == thisip6));
 }
 
 bool MythCoreContext::IsFrontendOnly(void)
@@ -638,12 +651,20 @@ void MythCoreContext::ConfigureHostAddress(void)
         if (d->m_IPv4.contains(*it))
             // already defined, skip
             continue;
-        else if (*it == QHostAddress::LocalHost)
-            // always listen on LocalHost
-            d->m_IPv4.append(*it);
         else if (!config_v4.isNull() && (*it == config_v4))
+        {
             // IPv4 address is defined, add it
+            LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("Adding BackendServerIP to address list."));
             d->m_IPv4.append(*it);
+        }
+        else if (*it == QHostAddress::LocalHost)
+        {
+            // always listen on LocalHost
+            LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("Adding IPv4 loopback to address list."));
+            d->m_IPv4.append(*it);
+        }
         else if (config_v4.isNull() &&
                  (it->protocol() == QAbstractSocket::IPv4Protocol))
         {
@@ -652,28 +673,48 @@ void MythCoreContext::ConfigureHostAddress(void)
             if (it->isInSubnet(QHostAddress::parseSubnet("10.0.0.0/8")) ||
                 it->isInSubnet(QHostAddress::parseSubnet("172.16.0.0/12")) ||
                 it->isInSubnet(QHostAddress::parseSubnet("192.168.0.0/16")))
+            {
+                LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Adding '%1' to address list.")
+                            .arg(it->toString()));
                 d->m_IPv4.append(*it);
+            }
         }
 #if !defined(QT_NO_IPV6)
         else if (d->m_IPv6.contains(*it))
             // already defined, skip
             continue;
-        else if (*it == QHostAddress::LocalHostIPv6)
-            // always listen on LocalHost
-            d->m_IPv6.append(*it);
         else if (!config_v6.isNull() && (*it == config_v6))
+        {
             // IPv6 address is defined, add it
+            LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("Adding BackendServerIP6 to address list."));
             d->m_IPv6.append(*it);
+        }
+        else if (*it == QHostAddress::LocalHostIPv6)
+        {
+            // always listen on LocalHost
+            LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("Adding IPv6 loopback to address list."));
+            d->m_IPv6.append(*it);
+        }
         else if (config_v6.isNull() && 
                  (it->protocol() == QAbstractSocket::IPv6Protocol))
+        {
             // IPv6 address is not defined, populate one
             // put in additional block filtering here?
             if (!it->isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
+            {
+                LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Adding '%1' to address list.")
+                            .arg(it->toString()));
                 d->m_IPv6.append(*it);
+            }
+        }
 #endif
     }
 
-    if (!config_v4.isNull() && d->m_IPv4.contains(config_v4))
+    if (!config_v4.isNull() && !d->m_IPv4.contains(config_v4))
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
                 "on %1, but address is not used on any local network "
@@ -681,7 +722,7 @@ void MythCoreContext::ConfigureHostAddress(void)
     }
 #if !defined(QT_NO_IPV6)
 
-    if (!config_v6.isNull() && d->m_IPv6.contains(config_v6))
+    if (!config_v6.isNull() && !d->m_IPv6.contains(config_v6))
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
                 "on %1, but address is not used on any local network "

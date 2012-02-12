@@ -9,6 +9,7 @@
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "mythdirs.h"
+#include "serverpool.h"
 
 #include <netinet/in.h> // for ntohs
 #include "audiooutput.h"
@@ -95,8 +96,9 @@ bool MythRAOPConnection::Init(void)
     }
 
     // create the data socket
-    m_dataSocket = new QUdpSocket();
-    if (!connect(m_dataSocket, SIGNAL(readyRead()), this, SLOT(udpDataReady())))
+    m_dataSocket = new ServerPool();
+    if (!connect(m_dataSocket, SIGNAL(newDatagram(QByteArray, QHostAddress, quint16)),
+                 this,         SLOT(udpDataReady(QByteArray, QHostAddress, quint16))))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to connect data socket signal.");
         return false;
@@ -106,7 +108,7 @@ bool MythRAOPConnection::Init(void)
     int baseport = m_dataPort;
     while (m_dataPort < baseport + RAOP_PORT_RANGE)
     {
-        if (m_dataSocket->bind(gCoreContext->MythHostAddressAny(), m_dataPort))
+        if (m_dataSocket->bind(gCoreContext->MythHostAddress(), m_dataPort))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Bound to port %1 for incoming data").arg(m_dataPort));
@@ -136,13 +138,13 @@ bool MythRAOPConnection::Init(void)
     return true;
 }
 
-void MythRAOPConnection::udpDataReady()
+void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
+                                      quint16 port)
 {
-    QUdpSocket *sender = (QUdpSocket*)this->sender();
-    if (!sender)
-        return;
-
-    // get the time once
+    // get the time of day
+    // NOTE: the previous code would perform this once, and loop internally
+    //       since the new code loops externally, and this must get performed
+    //       on each pass, there may be issues
     timeval t;
     gettimeofday(&t, NULL);
     uint64_t timenow = (t.tv_sec * 1000) + (t.tv_usec / 1000);
@@ -151,104 +153,92 @@ void MythRAOPConnection::udpDataReady()
     if (m_watchdogTimer)
         m_watchdogTimer->start(10000);
 
-    // read datagrams
-    QByteArray buf;
-    while (sender->state() == QAbstractSocket::BoundState &&
-           sender->hasPendingDatagrams())
+    if (!m_audio || !m_codec || !m_codeccontext)
+        return
+
+    unsigned int type = (unsigned int)((char)(buf[1] & ~0x80));
+
+    if (type == 0x54)
+        ProcessSyncPacket(buf, timenow);
+
+    if (!(type == 0x60 || type == 0x56))
+        continue;
+
+    int offset = type == 0x60 ? 0 : 4;
+    uint16_t this_sequence  = ntohs(*(uint16_t *)(buf.data() + offset + 2));
+    uint64_t this_timestamp = FramesToMs(ntohl(*(uint64_t*)(buf.data() + offset + 4)));
+    uint16_t expected_sequence = m_lastPacketSequence + 1; // should wrap ok
+
+    // regular data packet
+    if (type == 0x60)
     {
-        buf.resize(sender->pendingDatagramSize());
-        QHostAddress peer;
-        quint16 port;
+        if (m_seenPacket && (this_sequence != expected_sequence))
+            SendResendRequest(timenow, expected_sequence, this_sequence);
 
-        sender->readDatagram(buf.data(), buf.size(),&peer, &port);
-
-        if (!m_audio || !m_codec || !m_codeccontext)
-            continue;
-
-        unsigned int type = (unsigned int)((char)(buf[1] & ~0x80));
-
-        if (type == 0x54)
-            ProcessSyncPacket(buf, timenow);
-
-        if (!(type == 0x60 || type == 0x56))
-            continue;
-
-        int offset = type == 0x60 ? 0 : 4;
-        uint16_t this_sequence  = ntohs(*(uint16_t *)(buf.data() + offset + 2));
-        uint64_t this_timestamp = FramesToMs(ntohl(*(uint64_t*)(buf.data() + offset + 4)));
-        uint16_t expected_sequence = m_lastPacketSequence + 1; // should wrap ok
-
-        // regular data packet
-        if (type == 0x60)
-        {
-            if (m_seenPacket && (this_sequence != expected_sequence))
-                SendResendRequest(timenow, expected_sequence, this_sequence);
-
-            // don't update the sequence for resends
-            m_seenPacket = true;
-            m_lastPacketSequence  = this_sequence;
-            m_lastPacketTimestamp = this_timestamp;
-        }
-
-        // resent packet
-        if (type == 0x56)
-        {
-            if (m_resends.contains(this_sequence))
-            {
-                LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Received required resend %1")
-                    .arg(this_sequence));
-                m_resends.remove(this_sequence);
-            }
-            else
-                LOG(VB_GENERAL, LOG_WARNING, LOC + "Received unexpected resent packet.");
-        }
-
-        ExpireResendRequests(timenow);
-
-        offset += 12;
-        char* data_in = buf.data() + offset;
-        int len       = buf.size() - offset;
-        if (len < 16)
-            continue;
-
-        int aeslen = len & ~0xf;
-        unsigned char iv[16];
-        unsigned char decrypted_data[MAX_PACKET_SIZE];
-        memcpy(iv, m_AESIV.data(), sizeof(iv));
-        AES_cbc_encrypt((const unsigned char*)data_in,
-                        decrypted_data, aeslen,
-                        &m_aesKey, iv, AES_DECRYPT);
-        memcpy(decrypted_data + aeslen, data_in + aeslen, len - aeslen);
-
-        AVPacket tmp_pkt;
-        memset(&tmp_pkt, 0, sizeof(tmp_pkt));
-        tmp_pkt.data = decrypted_data;
-        tmp_pkt.size = len;
-        int decoded_data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-        int16_t* samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(int32_t));
-        int used = avcodec_decode_audio3(m_codeccontext, samples,
-                                         &decoded_data_size, &tmp_pkt);
-        if (used != len)
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                QString("Decoder only used %1 of %2 bytes.").arg(used).arg(len));
-        }
-
-        if (decoded_data_size / 4 != 352)
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Decoded %1 frames (not 352)")
-                .arg(decoded_data_size / 4));
-        }
-
-        if (m_audioQueue.contains(this_timestamp))
-            LOG(VB_GENERAL, LOG_WARNING, LOC + "Duplicate packet timestamp.");
-
-        m_audioQueue.insert(this_timestamp, samples);
-
-        // N.B. Unless playback is really messed up, this should only pass through
-        // properly sequenced packets
-        ProcessAudio(timenow);
+        // don't update the sequence for resends
+        m_seenPacket = true;
+        m_lastPacketSequence  = this_sequence;
+        m_lastPacketTimestamp = this_timestamp;
     }
+
+    // resent packet
+    if (type == 0x56)
+    {
+        if (m_resends.contains(this_sequence))
+        {
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Received required resend %1")
+                .arg(this_sequence));
+            m_resends.remove(this_sequence);
+        }
+        else
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Received unexpected resent packet.");
+    }
+
+    ExpireResendRequests(timenow);
+
+    offset += 12;
+    char* data_in = buf.data() + offset;
+    int len       = buf.size() - offset;
+    if (len < 16)
+        continue;
+
+    int aeslen = len & ~0xf;
+    unsigned char iv[16];
+    unsigned char decrypted_data[MAX_PACKET_SIZE];
+    memcpy(iv, m_AESIV.data(), sizeof(iv));
+    AES_cbc_encrypt((const unsigned char*)data_in,
+                    decrypted_data, aeslen,
+                        &m_aesKey, iv, AES_DECRYPT);
+    memcpy(decrypted_data + aeslen, data_in + aeslen, len - aeslen);
+
+    AVPacket tmp_pkt;
+    memset(&tmp_pkt, 0, sizeof(tmp_pkt));
+    tmp_pkt.data = decrypted_data;
+    tmp_pkt.size = len;
+    int decoded_data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    int16_t* samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(int32_t));
+    int used = avcodec_decode_audio3(m_codeccontext, samples,
+                                     &decoded_data_size, &tmp_pkt);
+    if (used != len)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Decoder only used %1 of %2 bytes.").arg(used).arg(len));
+    }
+
+    if (decoded_data_size / 4 != 352)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Decoded %1 frames (not 352)")
+            .arg(decoded_data_size / 4));
+    }
+
+    if (m_audioQueue.contains(this_timestamp))
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Duplicate packet timestamp.");
+
+    m_audioQueue.insert(this_timestamp, samples);
+
+    // N.B. Unless playback is really messed up, this should only pass through
+    // properly sequenced packets
+    ProcessAudio(timenow);
 }
 
 uint64_t MythRAOPConnection::FramesToMs(uint64_t timestamp)
@@ -619,7 +609,7 @@ void MythRAOPConnection::ProcessRequest(const QList<QByteArray> &lines)
                 delete m_clientControlSocket;
             }
 
-            m_clientControlSocket = new QUdpSocket(this);
+            m_clientControlSocket = new ServerPool(this);
             if (!m_clientControlSocket->bind(control_port))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -631,7 +621,8 @@ void MythRAOPConnection::ProcessRequest(const QList<QByteArray> &lines)
                     QString("Bound to client control port %1").arg(control_port));
                 m_peerAddress = m_socket->peerAddress();
                 m_clientControlPort = control_port;
-                connect(m_clientControlSocket, SIGNAL(readyRead()), this, SLOT(udpDataReady()));
+                connect(m_clientControlSocket, SIGNAL(newDatagram(QByteArray, QHostAddress, quint16)),
+                        this,                  SLOT(udpDataReady(QByteArray, QHostAddress, quint16)));
             }
         }
         else

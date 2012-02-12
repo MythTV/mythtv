@@ -325,23 +325,27 @@ void MythAirplayServer::Start(void)
         return;
 
     // join the dots
-    connect(this, SIGNAL(newConnection()), this, SLOT(newConnection()));
+    connect(this, SIGNAL(newConnection(QTcpSocket*)),
+            this, SLOT(newConnection(QTcpSocket*)));
 
-    // start listening for connections (try a few ports in case the default is in use)
+    // start listening for connections
+    // try a few ports in case the default is in use
     int baseport = m_setupPort;
     while (m_setupPort < baseport + AIRPLAY_PORT_RANGE)
     {
-        if (listen(QHostAddress::Any, m_setupPort))
+        if (listen(gCoreContext->MythHostAddress(), m_setupPort))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Listening for connections on port %1").arg(m_setupPort));
+                QString("Listening for connections on port %1")
+                    .arg(m_setupPort));
             break;
         }
         m_setupPort++;
     }
 
     if (m_setupPort >= baseport + AIRPLAY_PORT_RANGE)
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find a port for incoming connections.");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Failed to find a port for incoming connections.");
 
     // announce service
     m_bonjour = new BonjourRegister(this);
@@ -376,10 +380,9 @@ void MythAirplayServer::Start(void)
     return;
 }
 
-void MythAirplayServer::newConnection(void)
+void MythAirplayServer::newConnection(QTcpSocket *client)
 {
     QMutexLocker locker(m_lock);
-    QTcpSocket *client = this->nextPendingConnection();
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection from %1:%2")
         .arg(client->peerAddress().toString()).arg(client->peerPort()));
 

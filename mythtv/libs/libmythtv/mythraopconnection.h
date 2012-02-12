@@ -20,6 +20,7 @@ class QTcpSocket;
 class QUdpSocket;
 class QTimer;
 class AudioOutput;
+class ServerPool;
 
 typedef QHash<QByteArray,QByteArray> RawHash;
 
@@ -30,7 +31,8 @@ class MythRAOPConnection : public QObject
     friend class MythRAOPDevice;
 
   public:
-    MythRAOPConnection(QObject *parent, QTcpSocket* socket, QByteArray id, int port);
+    MythRAOPConnection(QObject *parent, QTcpSocket* socket, QByteArray id,
+                       int port);
    ~MythRAOPConnection();
     bool Init(void);
     QTcpSocket* GetSocket()   { return m_socket;   }
@@ -39,7 +41,7 @@ class MythRAOPConnection : public QObject
 
   public slots:
     void readClient(void);
-    void udpDataReady(void);
+    void udpDataReady(QByteArray buf, QHostAddress peer, quint16 port);
     void timeout(void);
     void audioRetry(void);
 
@@ -49,7 +51,8 @@ class MythRAOPConnection : public QObject
   private:
     uint64_t FramesToMs(uint64_t timestamp);
     void    ProcessSyncPacket(const QByteArray &buf, uint64_t timenow);
-    void    SendResendRequest(uint64_t timenow, uint16_t expected, uint16_t got);
+    void    SendResendRequest(uint64_t timenow, uint16_t expected,
+                              uint16_t got);
     void    ExpireResendRequests(uint64_t timenow);
     int     ExpireAudio(uint64_t timestamp);
     void    ProcessAudio(uint64_t timenow);
@@ -74,8 +77,8 @@ class MythRAOPConnection : public QObject
     // incoming audio
     QHostAddress    m_peerAddress;
     int             m_dataPort;
-    QUdpSocket     *m_dataSocket;
-    QUdpSocket     *m_clientControlSocket;
+    ServerPool     *m_dataSocket;
+    ServerPool     *m_clientControlSocket;
     int             m_clientControlPort;
     QMap<uint16_t,uint64_t> m_resends;
     // crypto

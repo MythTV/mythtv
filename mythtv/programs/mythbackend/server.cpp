@@ -1,7 +1,7 @@
 #include "server.h"
 #include "mythsocket.h"
 
-void MythServer::incomingConnection(int socket)
+void MythServer::newTcpConnection(int socket)
 {
     MythSocket *s = new MythSocket(socket);
     emit newConnect(s);

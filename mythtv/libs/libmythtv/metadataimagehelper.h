@@ -48,7 +48,7 @@ MTV_PUBLIC bool SetArtwork(const QString &inetref,
 inline QString generate_myth_url(
     const QString &storage_group, const QString &host, const QString &path)
 {
-    QString ip = gCoreContext->GetSettingOnHost("BackendServerIP", host);
+    QString ip = gCoreContext->GetBackendServerIP(host);
     uint port = gCoreContext->GetSettingOnHost("BackendServerPort",
                                                host).toUInt();
 
