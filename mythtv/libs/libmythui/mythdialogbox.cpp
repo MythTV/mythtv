@@ -866,8 +866,6 @@ bool MythTimeInputDialog::Create()
             date = date.addDays(0-m_rangeLimit);
         }
 
-        LOG(VB_GENERAL, LOG_NOTICE, QString("Start DateTime %1").arg(m_startTime.toString()));
-
         QString text;
         int flags;
         bool selected = false;
@@ -881,8 +879,6 @@ bool MythTimeInputDialog::Create()
                 if (m_rangeLimit >= 356)
                     flags |= kAddYear;
                 text = MythDateToString(date, flags);
-
-                LOG(VB_GENERAL, LOG_NOTICE, QString("Start Date %1").arg(m_startTime.date().toString()));
 
                 if (date == m_startTime.date())
                     selected = true;
@@ -937,8 +933,6 @@ bool MythTimeInputDialog::Create()
             {
                 time = time.addSecs(60*60);
                 text = time.toString("hh:00");
-
-                LOG(VB_GENERAL, LOG_NOTICE, QString("Start Time %1").arg(m_startTime.time().toString()));
 
                 if (time.hour() == m_startTime.time().hour())
                     selected = true;
