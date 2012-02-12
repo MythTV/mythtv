@@ -48,7 +48,7 @@ MTV_PUBLIC InputInfo RemoteRequestBusyInputID(uint cardid);
 MTV_PUBLIC bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input);
 
 MTV_PUBLIC bool RemoteGetRecordingStatus(
-    vector<TunerStatus> *tunerList, bool list_inactive);
+    vector<TunerStatus> *tunerList = NULL, bool list_inactive = false);
 
 #endif // _TV_REMOTE_UTIL_H_
 
