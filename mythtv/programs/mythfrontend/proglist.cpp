@@ -464,7 +464,11 @@ void ProgLister::ShowChooseViewMenu(void)
                 (m_curView >= 0) ? m_viewList[m_curView] : QString());
             break;
         case plTime:
-            screen = new TimePopup(popupStack, this);
+            QString message =  tr("Start search from date and time");
+            int flags = (MythTimeInputDialog::kDay |
+                         MythTimeInputDialog::kHours |
+                         MythTimeInputDialog::kFutureDates);
+            screen = new MythTimeInputDialog(popupStack, message, flags);
             connect_string = false;
             break;
     }
