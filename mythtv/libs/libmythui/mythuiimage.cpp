@@ -533,7 +533,7 @@ MythUIImage::MythUIImage(const QString &filepattern,
     m_EnableInitiator = true;
 
     d = new MythUIImagePrivate(this);
-
+    emit DependChanged(false);
     Init();
 }
 
@@ -550,7 +550,7 @@ MythUIImage::MythUIImage(const QString &filename, MythUIType *parent,
     m_EnableInitiator = true;
 
     d = new MythUIImagePrivate(this);
-
+    emit DependChanged(false);
     Init();
 }
 
@@ -629,6 +629,7 @@ void MythUIImage::Reset(void)
             m_HighNum = 0;
             m_animatedImage = false;
         }
+	    emit DependChanged(true);
 
         d->m_UpdateLock.unlock();
         Load();
@@ -663,6 +664,10 @@ void MythUIImage::SetFilename(const QString &filename)
 {
     QWriteLocker updateLocker(&d->m_UpdateLock);
     m_imageProperties.filename = filename;
+    if (filename == m_OrigFilename)
+        emit DependChanged(true);
+    else
+        emit DependChanged(false);
 }
 
 /**
@@ -676,6 +681,10 @@ void MythUIImage::SetFilepattern(const QString &filepattern, int low,
     m_imageProperties.filename = filepattern;
     m_LowNum = low;
     m_HighNum = high;
+    if (filepattern == m_OrigFilename)
+        emit DependChanged(true);
+    else
+        emit DependChanged(false);
 }
 
 /**

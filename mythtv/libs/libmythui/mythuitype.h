@@ -166,6 +166,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void SetHorizontalZoom(float zoom);
     void SetVerticalZoom(float zoom);
     void SetAngle(float angle);
+    void SetDependIsDefault(bool isDefault);
 
   protected:
     virtual void customEvent(QEvent *);
@@ -177,6 +178,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void Hide(void);
     void Show(void);
     void Refresh(void);
+    void UpdateDependState(bool isDefault);
 
   signals:
     void RequestUpdate();
@@ -190,6 +192,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void Disabling();
     void FinishedMoving();
     void FinishedFading();
+    void DependChanged(bool isDefault);
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
@@ -220,6 +223,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     bool m_Initiator;
     bool m_Vanish;
     bool m_Vanished;
+    bool m_IsDependDefault;
 
     int m_focusOrder;
 

@@ -214,6 +214,7 @@ void MythUIStateType::Reset()
 bool MythUIStateType::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
+    QMap<QString, QString> dependsMap;
     if (element.tagName() == "showempty")
         m_ShowEmpty = parseBool(element);
     else if (element.tagName() == "state")
@@ -231,7 +232,7 @@ bool MythUIStateType::ParseElement(
         element.setAttribute("name", statename);
 
         MythUIGroup *uitype = dynamic_cast<MythUIGroup *>
-                              (ParseUIType(filename, element, "group", this, NULL, showWarnings));
+                              (ParseUIType(filename, element, "group", this, NULL, showWarnings, dependsMap));
 
         if (!type.isEmpty())
         {

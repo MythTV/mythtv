@@ -47,6 +47,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_XYDestination = QPoint(0, 0);
     m_XYSpeed = QPoint(0, 0);
     m_deferload = false;
+    m_IsDependDefault = false;
 
     m_Parent = NULL;
 
@@ -1026,9 +1027,18 @@ void MythUIType::Refresh(void)
     SetRedraw();
 }
 
+void MythUIType::UpdateDependState(bool isDefault)
+{
+    m_IsDependDefault = isDefault;
+    SetVisible(!m_IsDependDefault);
+}
+
 void MythUIType::SetVisible(bool visible)
 {
     if (visible == m_Visible)
+        return;
+
+    if (visible && m_IsDependDefault)
         return;
 
     m_Visible = visible;
@@ -1038,6 +1048,11 @@ void MythUIType::SetVisible(bool visible)
         emit Showing();
     else
         emit Hiding();
+}
+
+void MythUIType::SetDependIsDefault(bool isDefault)
+{
+    m_IsDependDefault = isDefault;
 }
 
 void MythUIType::SetEnabled(bool enable)

@@ -106,6 +106,7 @@ void MythUIText::Reset()
     {
         SetText(m_DefaultMessage);
         SetRedraw();
+        emit DependChanged(true);
     }
 
     SetFontState("default");
@@ -121,10 +122,15 @@ void MythUIText::SetText(const QString &text)
         return;
 
     if (newtext.isEmpty())
+    {
         m_Message = m_DefaultMessage;
+        emit DependChanged(true);
+    }
     else
+    {
         m_Message = newtext;
-
+        emit DependChanged(false);
+    }
     m_CutMessage.clear();
     FillCutMessage();
 
@@ -1340,6 +1346,7 @@ void MythUIText::CreateCopy(MythUIType *parent)
     MythUIText *text = new MythUIText(parent, objectName());
     text->CopyFrom(this);
 }
+
 
 void MythUIText::Finalize(void)
 {
