@@ -116,9 +116,13 @@ void GeneralSettings::slotSave(void)
     // get the starting directory from the settings and remove all multiple
     // directory separators "/" and resolves any "." or ".." in the path.
     QString dir = m_musicLocation->GetText();
-    dir = QDir::cleanPath(dir);
-    if (!dir.endsWith("/"))
-        dir += "/";
+
+    if (!dir.isEmpty())
+    {
+        dir = QDir::cleanPath(dir);
+        if (!dir.endsWith("/"))
+            dir += "/";
+    }
 
     gCoreContext->SaveSetting("MusicLocation", dir);
     gCoreContext->SaveSetting("CDDevice", m_musicCDDevice->GetText());

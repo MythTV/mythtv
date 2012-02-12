@@ -82,7 +82,7 @@ using namespace std;
 #endif
 
 #define GESTURE_TIMEOUT 1000
-#define STANDBY_TIMEOUT 30 // Minutes
+#define STANDBY_TIMEOUT 90 // Minutes
 
 #define LOC      QString("MythMainWindow: ")
 
@@ -2573,7 +2573,7 @@ void MythMainWindow::ResetIdleTimer(void)
         return;
 
     if (d->standby)
-        ExitStandby();
+        ExitStandby(false);
 
     d->idleTimer->start();
 }
@@ -2585,29 +2585,60 @@ void MythMainWindow::PauseIdleTimer(bool pause)
     else
         d->idleTimer->start();
 
-    ResetIdleTimer();
+    // ResetIdleTimer();
 }
 
 void MythMainWindow::IdleTimeout(void)
 {
-    EnterStandby();
-}
-
-void MythMainWindow::EnterStandby()
-{
-    int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
-                                                  STANDBY_TIMEOUT);
-    LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode after "
+    if (!d->standby)
+    {
+        int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
+                                                       STANDBY_TIMEOUT);
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode after "
                                         "%1 minutes of inactivity")
                                         .arg(idletimeout));
-    //JumpTo("Main Menu");
+
+        // HACK Prevent faked keypresses interrupting the transition to standby
+        PauseIdleTimer(true);
+        // HACK end
+
+        JumpTo("Main Menu");
+
+        // HACK
+        PauseIdleTimer(false);
+        // HACK end
+
+        EnterStandby(false);
+    }
+}
+
+void MythMainWindow::EnterStandby(bool manual)
+{
+    if (d->standby)
+        return;
+
+    // We've manually entered standby mode and we want to pause the timer
+    // to prevent it being Reset
+    if (manual)
+    {
+        PauseIdleTimer(true);
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode"));
+    }
+
     d->standby = true;
     gCoreContext->AllowShutdown();
 }
 
-void MythMainWindow::ExitStandby()
+void MythMainWindow::ExitStandby(bool manual)
 {
+    if (manual)
+        PauseIdleTimer(false);
+
+    if (!d->standby)
+        return;
+
     LOG(VB_GENERAL, LOG_NOTICE, "Leaving standby mode");
+
     d->standby = false;
     gCoreContext->BlockShutdown();
 }

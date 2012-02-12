@@ -1102,23 +1102,25 @@
             <filename>mythprogressdialog-background.png</filename>
         </imagetype>
 
-        <textarea name="title" from="basetextarea">
-            <area>0,10,580,40</area>
-            <font>baselarge</font>
-            <align>hcenter,top</align>
-            <value>Select Time</value>
+        <textarea name="message" from="basetextarea">
+            <area>10,8,560,50</area>
+            <font>basemedium</font>
+            <align>allcenter</align>
+            <value>Select Time &amp; Date</value>
+            <multiline>true</multiline>
         </textarea>
 
         <buttonlist name="dates" from="baseselector">
-            <position>40,60</position>
+            <position>40,65</position>
         </buttonlist>
 
         <buttonlist name="times" from="baseselector">
-            <position>330,60</position>
+            <position>330,65</position>
         </buttonlist>
 
         <button name="ok" from="basebutton">
             <position>220,115</position>
+            <value>OK</value>
         </button>
 
     </window>

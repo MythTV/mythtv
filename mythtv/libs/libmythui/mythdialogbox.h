@@ -306,18 +306,19 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
 {
     Q_OBJECT
 
+  public:
     // FIXME Not sure about this enum
     enum TimeInputResolution {
         // Date Resolution
         kNoDate       = 0x01,
         kYear         = 0x02,
-        kMonth        = 0x03,
-        kDay          = 0x04,
+        kMonth        = 0x04,
+        kDay          = 0x08,
 
-        //Time Resolution
+        // Time Resolution
         kNoTime       = 0x10,
         kHours        = 0x20,
-        kMinutes      = 0x30,
+        kMinutes      = 0x40,
 
         // Work forward/backwards or backwards and fowards from start time
         kFutureDates  = 0x100,
@@ -325,9 +326,8 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
         kAllDates     = 0x300
     };
 
-  public:
     MythTimeInputDialog(MythScreenStack *parent, const QString &message,
-                        TimeInputResolution resolution,
+                        int resolutionFlags,
                         QDateTime startTime = QDateTime::currentDateTime(),
                         int dayLimit = 14);
 
@@ -343,14 +343,13 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
   private:
     QString           m_message;
     QDateTime         m_startTime;
-    TimeInputResolution m_resolution;
+    int               m_resolution;
     int               m_rangeLimit;
     QStringList       m_list;
     QString           m_currentValue;
 
     MythUIButtonList *m_dateList;
     MythUIButtonList *m_timeList;
-    MythUIButton     *m_okButton;
 
     QObject          *m_retObject;
     QString           m_id;

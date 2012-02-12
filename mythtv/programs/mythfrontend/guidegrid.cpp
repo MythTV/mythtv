@@ -510,7 +510,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == ACTION_FINDER)
             showProgFinder();
         else if (action == "MENU")
-            showMenu();
+            ShowMenu();
         else if (action == "ESCAPE" || action == ACTION_GUIDE)
             Close();
         else if (action == ACTION_SELECT)
@@ -583,7 +583,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void GuideGrid::showMenu(void)
+void GuideGrid::ShowMenu(void)
 {
     QString label = tr("Guide Options");
 
@@ -603,6 +603,8 @@ void GuideGrid::showMenu(void)
         menuPopup->AddButton(tr("Recording Options"), NULL, true);
 
         menuPopup->AddButton(tr("Program Details"));
+
+        menuPopup->AddButton(tr("Jump to Time"), NULL, true);
 
         menuPopup->AddButton(tr("Reverse Channel Order"));
 
@@ -624,7 +626,7 @@ void GuideGrid::showMenu(void)
     }
 }
 
-void GuideGrid::showRecordingMenu(void)
+void GuideGrid::ShowRecordingMenu(void)
 {
     QString label = tr("Recording Options");
 
@@ -1421,7 +1423,11 @@ void GuideGrid::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Recording Options"))
             {
-                showRecordingMenu();
+                ShowRecordingMenu();
+            }
+            else if (resulttext == tr("Jump to Time"))
+            {
+                ShowJumpToTime();
             }
         }
         else if (resultid == "recmenu")
@@ -1478,6 +1484,11 @@ void GuideGrid::customEvent(QEvent *event)
                 if (m_changroupname)
                     m_changroupname->SetText(changrpname);
             }
+        }
+        else if (resultid == "jumptotime")
+        {
+            QDateTime datetime = dce->GetData().toDateTime();
+            moveToTime(datetime);
         }
         else
             ScheduleCommon::customEvent(event);
@@ -1892,6 +1903,20 @@ void GuideGrid::moveUpDown(MoveVector movement)
     updateChannels();
 }
 
+void GuideGrid::moveToTime(QDateTime datetime)
+{
+    if (!datetime.isValid())
+        return;
+
+    m_currentStartTime = datetime;
+
+    fillTimeInfos();
+    fillProgramInfos();
+    m_guideGrid->SetRedraw();
+    updateInfo();
+    updateDateText();
+}
+
 void GuideGrid::setStartChannel(int newStartChannel)
 {
     if (newStartChannel < 0)
@@ -2175,3 +2200,23 @@ void GuideGrid::aboutToShow(void)
 
     MythScreenType::aboutToShow();
 }
+
+void GuideGrid::ShowJumpToTime(void)
+{
+    QString message =  tr("Jump to a specific date and time in the guide");
+    int flags = (MythTimeInputDialog::kAllDates | MythTimeInputDialog::kDay |
+                 MythTimeInputDialog::kHours);
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythTimeInputDialog *timedlg = new MythTimeInputDialog(popupStack, message,
+                                                           flags);
+
+    if (timedlg->Create())
+    {
+        timedlg->SetReturnEvent(this, "jumptotime");
+        popupStack->AddScreen(timedlg);
+    }
+    else
+        delete timedlg;
+}
+
