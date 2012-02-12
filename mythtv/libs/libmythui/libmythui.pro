@@ -31,7 +31,7 @@ HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
 HEADERS += mythdisplay.h mythuivideo.h mythudplistener.h
 HEADERS += mythuiexp.h mythuisimpletext.h mythuistatetracker.h
-HEADERS += mythuianimation.h
+HEADERS += mythuianimation.h mythuiscrollbar.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp
@@ -50,8 +50,7 @@ SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
 SOURCES += mythfontmanager.cpp mythuieditbar.cpp
 SOURCES += mythdisplay.cpp mythuivideo.cpp mythudplistener.cpp
 SOURCES += mythuisimpletext.cpp mythuistatetracker.cpp
-SOURCES += mythuianimation.cpp
-
+SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
@@ -68,8 +67,7 @@ inc.files += x11colors.h mythgenerictree.h mythuibuttontree.h
 inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 inc.files += mythuieditbar.h mythuifilebrowser.h mythuivideo.h
 inc.files += mythuiexp.h mythuisimpletext.h mythuiactions.h
-inc.files += mythuistatetracker.h
-inc.files += mythuianimation.h
+inc.files += mythuistatetracker.h mythuianimation.h mythuiscrollbar.h
 
 INSTALLS += inc
 

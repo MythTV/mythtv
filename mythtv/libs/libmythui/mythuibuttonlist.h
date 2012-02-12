@@ -13,6 +13,7 @@
 #include "mythscreentype.h"
 
 class MythUIButtonList;
+class MythUIScrollBar;
 class MythUIStateType;
 
 struct TextProperties {
@@ -121,7 +122,8 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     MythUIButtonList(MythUIType *parent, const QString &name);
     MythUIButtonList(MythUIType *parent, const QString &name,
                    const QRect &area, bool showArrow = true,
-                   bool showScrollArrows = false);
+                   bool showScrollArrows = false,
+                   bool showScrollBar = false);
     ~MythUIButtonList();
 
     virtual bool keyPressEvent(QKeyEvent *);
@@ -227,6 +229,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     bool DistributeButtons(void);
     void SetPosition(void);
     void SetPositionArrowStates(void);
+    void SetScrollBarPosition(void);
     void ItemVisible(MythUIButtonListItem *item);
 
     void SetActive(bool active);
@@ -277,7 +280,9 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     bool m_active;
     bool m_showArrow;
+    bool m_showScrollBar;
 
+    MythUIScrollBar *m_scrollBar;
     MythUIStateType *m_upArrow;
     MythUIStateType *m_downArrow;
 
