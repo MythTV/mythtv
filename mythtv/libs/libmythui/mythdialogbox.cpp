@@ -6,6 +6,9 @@
 #include <QString>
 #include <QStringList>
 #include <QTimer>
+#include <QDateTime>
+#include <QDate>
+#include <QTime>
 
 #include "mythlogging.h"
 #include "util.h"
@@ -816,12 +819,13 @@ void MythUISearchDialog::slotUpdateList(void)
 
 MythTimeInputDialog::MythTimeInputDialog(MythScreenStack *parent,
                                          const QString &message,
-                                         TimeInputResolution resolution,
+                                         int resolutionFlags,
                                          QDateTime startTime,
                                          int rangeLimit)
     : MythScreenType(parent, "timepopup"),
-        m_message(message), m_startTime(startTime), m_resolution(resolution),
-        m_rangeLimit(rangeLimit), m_dateList(NULL), m_timeList(NULL),
+        m_message(message), m_startTime(startTime),
+        m_resolution(resolutionFlags), m_rangeLimit(rangeLimit),
+        m_dateList(NULL), m_timeList(NULL),
         m_okButton(NULL), m_retObject(NULL)
 {
 }
@@ -847,30 +851,57 @@ bool MythTimeInputDialog::Create()
 
     MythUIButtonListItem *item;
     // Date
-    if (m_resolution & ~kNoDate)
+    if (kNoDate != (m_resolution & 0xF))
     {
         QDate date(m_startTime.date());
+
+        int limit = 0;
+        if (m_resolution & kFutureDates)
+        {
+            limit += m_rangeLimit;
+        }
+        if (m_resolution & kPastDates)
+        {
+            limit += m_rangeLimit;
+            date = date.addDays(0-m_rangeLimit);
+        }
+
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Start DateTime %1").arg(m_startTime.toString()));
+
         QString text;
         int flags;
-        for (int x = 0; x <= m_rangeLimit; x++)
+        bool selected = false;
+        for (int x = 0; x <= limit; x++)
         {
-            switch (m_resolution)
+            selected = false;
+            if (m_resolution & kDay)
             {
-                case kDay:
-                    date.addDays(x);
-                    flags = kDateFull | kSimplify;
-                    if (m_rangeLimit >= 356)
-                        flags |= kAddYear;
-                    text = MythDateToString(date, flags);
-                    break;
-                case kMonth:
-                    date.addMonths(x);
-                    text = date.toString("MMM yyyy");
-                    break;
-                case kYear:
-                    date.addYears(x);
-                    text = date.toString("yyyy");
-                    break;
+                date = date.addDays(1);
+                flags = kDateFull | kSimplify;
+                if (m_rangeLimit >= 356)
+                    flags |= kAddYear;
+                text = MythDateToString(date, flags);
+
+                LOG(VB_GENERAL, LOG_NOTICE, QString("Start Date %1").arg(m_startTime.date().toString()));
+
+                if (date == m_startTime.date())
+                    selected = true;
+            }
+            else if (m_resolution & kMonth)
+            {
+                date = date.addMonths(1);
+                text = date.toString("MMM yyyy");
+
+                if ((date.month() == m_startTime.date().month()) &&
+                    (date.year() == m_startTime.date().year()))
+                    selected = true;
+            }
+            else if (m_resolution & kYear)
+            {
+                date = date.addYears(1);
+                text = date.toString("yyyy");
+                if (date.year() == m_startTime.date().year())
+                    selected = true;
             }
 
             item = new MythUIButtonListItem(m_dateList, text, NULL, false);
@@ -883,31 +914,40 @@ bool MythTimeInputDialog::Create()
     }
 
     // Time
-    if (m_resolution & ~kNoTime)
+    if (kNoTime != (m_resolution & 0xF0))
     {
         QTime time(0,0,0);
         QString text;
+        bool selected = false;
 
         int limit = (m_resolution & kMinutes) ? (60 * 24) : 24;
 
         for (int x = 0; x < limit; x++)
         {
-            switch (m_resolution)
+            selected = false;
+            if (m_resolution & kMinutes)
             {
-                case kMinutes:
-                    time.addSecs(60);
-                    text = MythTimeToString(time, kTime);
-                    break;
-                case kHours:
-                    time.addSecs(60*60);
-                    text = time.toString("hh");
-                    break;
+                time = time.addSecs(60);
+                text = MythTimeToString(time, kTime);
+
+                if (time == m_startTime.time())
+                    selected = true;
+            }
+            else if (m_resolution & kHours)
+            {
+                time = time.addSecs(60*60);
+                text = time.toString("hh:00");
+
+                LOG(VB_GENERAL, LOG_NOTICE, QString("Start Time %1").arg(m_startTime.time().toString()));
+
+                if (time.hour() == m_startTime.time().hour())
+                    selected = true;
             }
 
             item = new MythUIButtonListItem(m_timeList, text, NULL, false);
             item->SetData(QVariant(time));
 
-            if (time.hour() == m_startTime.time().hour())
+            if (selected)
                 m_timeList->SetItemCurrent(item);
         }
         m_timeList->SetVisible(true);
