@@ -350,7 +350,6 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
 
     MythUIButtonList *m_dateList;
     MythUIButtonList *m_timeList;
-    MythUIButton     *m_okButton;
 
     QObject          *m_retObject;
     QString           m_id;

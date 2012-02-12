@@ -825,8 +825,7 @@ MythTimeInputDialog::MythTimeInputDialog(MythScreenStack *parent,
     : MythScreenType(parent, "timepopup"),
         m_message(message), m_startTime(startTime),
         m_resolution(resolutionFlags), m_rangeLimit(rangeLimit),
-        m_dateList(NULL), m_timeList(NULL),
-        m_okButton(NULL), m_retObject(NULL)
+        m_dateList(NULL), m_timeList(NULL), m_retObject(NULL)
 {
 }
 
@@ -835,10 +834,14 @@ bool MythTimeInputDialog::Create()
     if (!CopyWindowFromBase("MythTimeInputDialog", this))
         return false;
 
+    MythUIText *messageText = NULL;
+    MythUIButton *okButton = NULL;
+
     bool err = false;
+    UIUtilE::Assign(this, messageText, "message", &err);
     UIUtilE::Assign(this, m_dateList, "dates", &err);
     UIUtilE::Assign(this, m_timeList, "times", &err);
-    UIUtilE::Assign(this, m_okButton, "ok", &err);
+    UIUtilE::Assign(this, okButton, "ok", &err);
 
     if (err)
     {
@@ -947,7 +950,10 @@ bool MythTimeInputDialog::Create()
         m_timeList->SetVisible(true);
     }
 
-    connect(m_okButton, SIGNAL(Clicked()), SLOT(okClicked()));
+    if (messageText && !m_message.isEmpty())
+        messageText->SetText(m_message);
+
+    connect(okButton, SIGNAL(Clicked()), SLOT(okClicked()));
 
     BuildFocusList();
 
