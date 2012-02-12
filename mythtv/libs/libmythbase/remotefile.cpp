@@ -90,6 +90,16 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     QStringList strlist;
 
+#ifndef IGNORE_PROTO_VER_MISMATCH
+    if (!gCoreContext->CheckProtoVersion(lsock))
+    {
+        LOG(VB_GENERAL, LOG_ERR, loc +
+            QString("Failed validation to server %1:%2").arg(host).arg(port));
+        lsock->DownRef();
+        return NULL;
+    }
+#endif
+
     if (control)
     {
         strlist.append(QString("ANN Playback %1 %2").arg(hostname).arg(false));
