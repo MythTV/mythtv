@@ -2569,7 +2569,7 @@ void MythMainWindow::HideMouseTimeout(void)
 void MythMainWindow::ResetIdleTimer(void)
 {
     // If the timer isn't active then it's been paused
-    if (!d->idleTimer->isActive() && !d->standby)
+    if (!d->idleTimer->isActive())
         return;
 
     if (d->standby)

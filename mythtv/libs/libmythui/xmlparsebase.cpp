@@ -342,7 +342,8 @@ void XMLParseBase::ClearGlobalObjectStore(void)
 void XMLParseBase::ParseChildren(const QString &filename,
                                  QDomElement &element,
                                  MythUIType *parent,
-                                 bool showWarnings)
+                                 bool showWarnings,
+                                 QMap<QString, QString> &dependsMap)
 {
     if (!parent)
     {
@@ -393,7 +394,7 @@ void XMLParseBase::ParseChildren(const QString &filename,
                      type == "editbar" ||
                      type == "video")
             {
-                ParseUIType(filename, info, type, parent, NULL, showWarnings);
+                ParseUIType(filename, info, type, parent, NULL, showWarnings, dependsMap);
             }
             else
             {
@@ -409,7 +410,8 @@ MythUIType *XMLParseBase::ParseUIType(
     QDomElement &element, const QString &type,
     MythUIType *parent,
     MythScreenType *screen,
-    bool showWarnings)
+    bool showWarnings,
+    QMap<QString, QString> &dependsMap)
 {
     QString name = element.attribute("name", "");
     if (name.isEmpty())
@@ -538,6 +540,10 @@ MythUIType *XMLParseBase::ParseUIType(
             uitype->CopyFrom(base);
     }
 
+    QString dependee = element.attribute("depends", "");
+    if (!dependee.isEmpty())
+        dependsMap.insert(name, dependee);
+
     QFileInfo fi(filename);
     uitype->SetXMLLocation(fi.fileName(), element.lineNumber());
 
@@ -584,7 +590,7 @@ MythUIType *XMLParseBase::ParseUIType(
                      info.tagName() == "video")
             {
                 ParseUIType(filename, info, info.tagName(),
-                            uitype, screen, showWarnings);
+                            uitype, screen, showWarnings, dependsMap);
             }
             else
             {
@@ -659,12 +665,13 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
 
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
     QStringList::const_iterator it = searchpath.begin();
+    QMap<QString, QString> dependsMap;
     for (; it != searchpath.end(); ++it)
     {
         QString themefile = *it + xmlfile;
         LOG(VB_GUI, LOG_INFO, LOC + "Loading window theme from " + themefile);
         if (doLoad(windowname, parent, themefile,
-                   onlyLoadWindows, showWarnings))
+                   onlyLoadWindows, showWarnings, dependsMap))
         {
             return true;
         }
@@ -685,7 +692,8 @@ bool XMLParseBase::doLoad(const QString &windowname,
                           MythUIType *parent,
                           const QString &filename,
                           bool onlywindows,
-                          bool showWarnings)
+                          bool showWarnings,
+                          QMap<QString, QString> &dependsMap)
 {
     QDomDocument doc;
     QFile f(filename);
@@ -722,7 +730,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 QString include = getFirstText(e);
 
                 if (!include.isEmpty())
-                    LoadBaseTheme(include);
+                    LoadBaseTheme(include, dependsMap);
             }
 
             if (onlywindows && e.tagName() == "window")
@@ -737,11 +745,12 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 }
 
                 if (!include.isEmpty())
-                    LoadBaseTheme(include);
+                    LoadBaseTheme(include, dependsMap);
 
                 if (name == windowname)
                 {
-                    ParseChildren(filename, e, parent, showWarnings);
+                    ParseChildren(filename, e, parent, showWarnings, dependsMap);
+                    ConnectDependants(parent, dependsMap);
                     return true;
                 }
             }
@@ -782,7 +791,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "editbar" ||
                          type == "video")
                 {
-                    ParseUIType(filename, e, type, parent, NULL, showWarnings);
+                    ParseUIType(filename, e, type, parent, NULL, showWarnings, dependsMap);
                 }
                 else
                 {
@@ -794,9 +803,30 @@ bool XMLParseBase::doLoad(const QString &windowname,
         n = n.nextSibling();
     }
 
+
+    ConnectDependants(parent, dependsMap);
     if (onlywindows)
         return false;
     return true;
+}
+
+void XMLParseBase::ConnectDependants(MythUIType * parent,
+                                     QMap<QString, QString> &dependsMap)
+{
+    QMapIterator<QString, QString> i(dependsMap);
+    while(i.hasNext())
+    {
+        i.next();
+        MythUIType *dependee = parent->GetChild(i.value());
+        MythUIType *dependant = parent->GetChild(i.key());
+
+        if (dependee && dependant)
+        {
+            QObject::connect(dependee, SIGNAL(DependChanged(bool)),
+                             dependant, SLOT(UpdateDependState(bool)));
+            dependant->UpdateDependState(true);
+        }
+    }
 }
 
 bool XMLParseBase::LoadBaseTheme(void)
@@ -806,13 +836,13 @@ bool XMLParseBase::LoadBaseTheme(void)
     bool showWarnings = true;
 
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-
+    QMap<QString, QString> dependsMap;
     QStringList::const_iterator it = searchpath.begin();
     for (; it != searchpath.end(); ++it)
     {
         QString themefile = *it + "base.xml";
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
-                   loadOnlyWindows, showWarnings))
+                   loadOnlyWindows, showWarnings, dependsMap))
         {
             LOG(VB_GUI, LOG_INFO, LOC +
                 QString("Loaded base theme from '%1'").arg(themefile));
@@ -831,7 +861,8 @@ bool XMLParseBase::LoadBaseTheme(void)
     return ok;
 }
 
-bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
+bool XMLParseBase::LoadBaseTheme(const QString &baseTheme,
+                                    QMap<QString, QString> &dependsMap)
 {
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("Asked to load base file from '%1'").arg(baseTheme));
@@ -854,7 +885,7 @@ bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
     {
         QString themefile = *it + baseTheme;
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
-                   loadOnlyWindows, showWarnings))
+                   loadOnlyWindows, showWarnings, dependsMap))
         {
             LOG(VB_GUI, LOG_INFO, LOC +
                 QString("Loaded base theme from '%1'").arg(themefile));
