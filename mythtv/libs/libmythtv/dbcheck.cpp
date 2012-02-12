@@ -6124,6 +6124,50 @@ NULL
             return false;
     }
 
+    if (dbver == "1294")
+    {
+        const char *updates[] = {
+"CREATE TABLE videocollection ("
+"  intid int(10) unsigned NOT NULL AUTO_INCREMENT,"
+"  title varchar(256) NOT NULL,"
+"  contenttype set('MOVIE', 'TELEVISION', 'ADULT', 'MUSICVIDEO', 'HOMEVIDEO') NOT NULL default '',"
+"  plot text,"
+"  network varchar(128) DEFAULT NULL,"
+"  inetref varchar(128) NOT NULL,"
+"  certification varchar(128) DEFAULT NULL,"
+"  genre int(10) unsigned DEFAULT '0',"
+"  releasedate date DEFAULT NULL,"
+"  language varchar(10) DEFAULT NULL,"
+"  status varchar(64) DEFAULT NULL,"
+"  rating float DEFAULT 0,"
+"  ratingcount int(10) DEFAULT 0,"
+"  runtime smallint(5) unsigned DEFAULT '0',"
+"  banner text,"
+"  fanart text,"
+"  coverart text,"
+"  PRIMARY KEY (intid),"
+"  KEY title (title)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE videopathinfo ("
+"  intid int(10) unsigned NOT NULL AUTO_INCREMENT,"
+"  path text,"
+"  contenttype set('MOVIE', 'TELEVISION', 'ADULT', 'MUSICVIDEO', 'HOMEVIDEO') NOT NULL default '',"
+"  collectionref int(10) default '0',"
+"  recurse tinyint(1) default '0',"
+"  PRIMARY KEY (intid)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"ALTER TABLE videometadata ADD collectionref int(10) NOT NULL DEFAULT '0' AFTER inetref;",
+"ALTER TABLE videometadata ADD playcount int(10) NOT NULL DEFAULT '0' AFTER length;",
+"ALTER TABLE videometadata ADD contenttype set('MOVIE', 'TELEVISION', 'ADULT', 'MUSICVIDEO', 'HOMEVIDEO') NOT NULL default ''",
+"UPDATE videometadata SET contenttype = 'MOVIE';",
+"UPDATE videometadata SET contenttype = 'TELEVISION' WHERE season > 0 OR episode > 0;",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1295", dbver))
+            return false;
+    }
+
     return true;
 }
 
