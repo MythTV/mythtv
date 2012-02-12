@@ -1299,6 +1299,7 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
  * \par        ANN Monitor  \e host \e wantevents
  * Register \e host as a client, and allow shutdown of the socket
  * \par        ANN SlaveBackend \e IPaddress
+ * \par        ANN MediaServer \e IPaddress
  * \par        ANN FileTransfer stringlist(\e hostname, \e filename)
  * \par        ANN FileTransfer stringlist(\e hostname, \e filename) \e useReadahead \e retries
  */
@@ -1385,6 +1386,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
                                               kPBSEvents_Normal);
+        pbs->setAsMediaServer();
         pbs->setBlockShutdown(false);
         sockListLock.lockForWrite();
         playbackList.push_back(pbs);
@@ -3016,7 +3018,7 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
     }
     else
     {
-        PlaybackSock *slave = GetSlaveByHostname(hostname);
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
         if (slave)
         {
             hash = slave->GetFileHash(filename, storageGroup);
@@ -3033,7 +3035,7 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
             if (query.exec() && query.next())
             {
                 hostname = query.value(0).toString();
-                slave = GetSlaveByHostname(hostname);
+                slave = GetMediaServerByHostname(hostname);
                 if (slave)
                 {
                     hash = slave->GetFileHash(filename, storageGroup);
@@ -3282,7 +3284,7 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
     }
     else
     {
-        PlaybackSock *slave = GetSlaveByHostname(wantHost);
+        PlaybackSock *slave = GetMediaServerByHostname(wantHost);
         if (slave)
         {
             LOG(VB_FILE, LOG_INFO, "HandleSGGetFileList: Getting remote info");
@@ -3344,7 +3346,7 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
     }
     else
     {
-        PlaybackSock *slave = GetSlaveByHostname(wantHost);
+        PlaybackSock *slave = GetMediaServerByHostname(wantHost);
         if (slave)
         {
             LOG(VB_FILE, LOG_INFO, "HandleSGFileQuery: Getting remote info");
@@ -4258,7 +4260,7 @@ void MainServer::GetActiveBackends(QStringList &hosts)
     vector<PlaybackSock*>::iterator it;
     for (it = playbackList.begin(); it != playbackList.end(); ++it)
     {
-        if ((*it)->isSlaveBackend())
+        if ((*it)->isMediaServer())
         {
             hostname = (*it)->getHostname();
             if (!hosts.contains(hostname))
@@ -4448,7 +4450,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             PlaybackSock *pbs = *pbsit;
 
             if ((pbs->IsDisconnected()) ||
-                (!pbs->isSlaveBackend()) ||
+                (!pbs->isMediaServer()) ||
                 (pbs->isLocal()) ||
                 (backendsCounted.contains(pbs->getHostname())))
                 continue;
@@ -5831,6 +5833,29 @@ PlaybackSock *MainServer::GetSlaveByHostname(const QString &hostname)
     }
 
     sockListLock.unlock();
+
+    return NULL;
+}
+
+PlaybackSock *MainServer::GetMediaServerByHostname(const QString &hostname)
+{
+    if (!ismaster)
+        return NULL;
+
+    QReadLocker rlock(&sockListLock);
+
+    vector<PlaybackSock *>::iterator iter = playbackList.begin();
+    for (; iter != playbackList.end(); ++iter)
+    {
+        PlaybackSock *pbs = *iter;
+        if (pbs->isMediaServer() &&
+            ((pbs->getHostname().toLower() == hostname.toLower()) ||
+             (pbs->getIP() == hostname)))
+        {
+            pbs->UpRef();
+            return pbs;
+        }
+    }
 
     return NULL;
 }

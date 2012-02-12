@@ -233,6 +233,7 @@ class MainServer : public QObject, public MythSocketCBs
     void getGuideDataThrough(QDateTime &GuideDataThrough);
 
     PlaybackSock *GetSlaveByHostname(const QString &hostname);
+    PlaybackSock *GetMediaServerByHostname(const QString &hostname);
     PlaybackSock *GetPlaybackBySock(MythSocket *socket);
     FileTransfer *GetFileTransferByID(int id);
     FileTransfer *GetFileTransferBySock(MythSocket *socket);
