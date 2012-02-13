@@ -2806,7 +2806,7 @@ void MainServer::HandleQueryFreeSpaceSummary(PlaybackSock *pbs)
     }
     else
     {
-        unsigned int index = strlist.size() - 2;
+        unsigned int index = (uint)(strlist.size()) - 2;
         shortlist << strlist[index++];
         shortlist << strlist[index++];
     }
