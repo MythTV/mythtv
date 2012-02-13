@@ -429,7 +429,7 @@ void MythWizard::layOutButtonRow( QHBoxLayout * layout )
     int i = d->pages.size() - 2;
     while ( !hasEarlyFinish && i >= 0 )
     {
-        hasEarlyFinish |= (d->pages[i] && d->pages[i]->finishEnabled);
+        hasEarlyFinish |= (d->pages.at(i) && d->pages.at(i)->finishEnabled);
         i--;
     }
 
@@ -455,7 +455,7 @@ void MythWizard::layOutButtonRow( QHBoxLayout * layout )
     }
     else if (d->pages.empty() ||
              d->current->finishEnabled ||
-             d->current == d->pages[d->pages.size() - 1])
+             d->current == d->pages.last())
     {
         d->nextButton->hide();
         d->finishButton->show();
@@ -468,15 +468,21 @@ void MythWizard::layOutButtonRow( QHBoxLayout * layout )
         h->addWidget( d->nextButton );
     }
 
+    if (d->pages.size() <= 1)
+        return;
+
     // if last page is disabled - show finished btn. at lastpage-1
-    i = d->pages.size()-1;
-    if (i >= 0 && !appropriate(d->pages[i]->w) &&
-        d->current == d->pages[d->pages.size() - 2])
+    if (appropriate(d->pages.last()->w))
+        return;
+
+    MythWizardPrivate::Page *keep = d->pages.takeLast();
+    if (d->current == d->pages.last())
     {
         d->nextButton->hide();
         d->finishButton->show();
         h->addWidget( d->finishButton );
     }
+    d->pages.append(keep);
 }
 
 void MythWizard::layOutTitleRow( QHBoxLayout * layout, const QString & title )
