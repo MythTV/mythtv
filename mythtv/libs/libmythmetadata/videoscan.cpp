@@ -90,28 +90,48 @@ VideoScannerThread::~VideoScannerThread()
 
 void VideoScannerThread::SetDirs(QStringList dirs)
 {
-    QStringList sgdirs;
+    QString master = gCoreContext->GetMasterHostName();
+    QStringList searchhosts, mdirs;
+    m_offlineSGHosts.clear();
 
-    QStringList::iterator iter, iter2;
-    for (iter = dirs.begin(); iter != dirs.end(); ++iter)
+    QStringList::iterator iter = dirs.begin(), iter2;
+    while ( iter != dirs.end() )
     {
         if (iter->startsWith("myth://"))
         {
             QUrl sgurl = *iter;
-            iter = dirs.erase(iter);
+            QString host = sgurl.host();
+            QString path = sgurl.path();
 
-            if (!sgdirs.contains(sgurl.path()))
-                sgdirs.append(sgurl.path());
+            if (!m_liveSGHosts.contains(host))
+            {
+                // mark host as offline to warn user
+                if (!m_offlineSGHosts.contains(host))
+                    m_offlineSGHosts.append(host);
+                // erase from directory list to skip scanning
+                iter = dirs.erase(iter);
+                continue;
+            }
+            else if ((host == master) &&  (!mdirs.contains(path)))
+                // collect paths defined on master backend so other
+                // online backends can be set to fall through to them
+                mdirs.append(path);
+            else if (!searchhosts.contains(host))
+                // mark host as having directories defined so it
+                // does not fall through to those on the master
+                searchhosts.append(host);
         }
+
+        ++iter;
     }
 
     for (iter = m_liveSGHosts.begin(); iter != m_liveSGHosts.end(); ++iter)
-    {
-        for (iter2 = sgdirs.begin(); iter2 != sgdirs.end(); ++iter2)
-        {
-            dirs.append(gCoreContext->GenMythURL(*iter, 0, *iter2, "Videos"));
-        }
-    }
+        if ((!searchhosts.contains(*iter)) && (master != *iter))
+            for (iter2 = mdirs.begin(); iter2 != mdirs.end(); ++iter2)
+                // backend is online, but has no directories listed
+                // fall back to those on the master backend
+                dirs.append(gCoreContext->GenMythURL(*iter,
+                                            0, *iter2, "Videos"));
 
     m_directories = dirs;
 }
@@ -213,7 +233,6 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
 {
     int counter = 0;
     FileCheckList::iterator iter;
-    m_offlineSGHosts.clear();
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_dbmetadata->getList().size(),
