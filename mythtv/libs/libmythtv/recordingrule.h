@@ -56,6 +56,8 @@ class MTV_PUBLIC RecordingRule
     AutoExpireType GetAutoExpire(void) const
         { return m_autoExpire ? kNormalAutoExpire : kDisableAutoExpire; }
 
+    static QString SearchTypeToString(const RecSearchType searchType);
+
     int m_recordID; /// Unique Recording Rule ID
     int m_parentRecID;
 
@@ -139,10 +141,6 @@ class MTV_PUBLIC RecordingRule
     // Pointer for ProgramInfo, exists only if we loaded from ProgramInfo in
     // the first place
     const ProgramInfo *m_progInfo;
-
-    // Internal strings for insertion into the RuleMap and display in the UI
-    QString m_searchTypeString;
-    QString m_searchFor;
 
     // Indicate that a rule has been loaded, for new rules this is still true
     // after any of the Load* methods is called
