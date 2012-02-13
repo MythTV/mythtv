@@ -154,7 +154,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
         m_watchdogTimer->start(10000);
 
     if (!m_audio || !m_codec || !m_codeccontext)
-        return
+        return;
 
     unsigned int type = (unsigned int)((char)(buf[1] & ~0x80));
 
@@ -162,7 +162,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
         ProcessSyncPacket(buf, timenow);
 
     if (!(type == 0x60 || type == 0x56))
-        continue;
+        return;
 
     int offset = type == 0x60 ? 0 : 4;
     uint16_t this_sequence  = ntohs(*(uint16_t *)(buf.data() + offset + 2));
@@ -200,7 +200,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
     char* data_in = buf.data() + offset;
     int len       = buf.size() - offset;
     if (len < 16)
-        continue;
+        return;
 
     int aeslen = len & ~0xf;
     unsigned char iv[16];
