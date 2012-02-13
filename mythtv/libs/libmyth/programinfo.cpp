@@ -1947,11 +1947,12 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
  */
 bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 {
-    if (title != other.title)
+    if (title.toLower() != other.title.toLower())
         return false;
     if (startts == other.startts &&
         (chanid == other.chanid ||
-         (!chansign.isEmpty() && chansign == other.chansign)))
+         (!chansign.isEmpty() && 
+          chansign.toLower() == other.chansign.toLower())))
         return true;
 
     return false;
@@ -1965,10 +1966,11 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
  */
 bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 {
-    if (title != other.title)
+    if (title.toLower() != other.title.toLower())
         return false;
     if ((chanid == other.chanid ||
-         (!chansign.isEmpty() && chansign == other.chansign)) &&
+         (!chansign.isEmpty() && 
+          chansign.toLower() == other.chansign.toLower())) &&
         startts < other.endts &&
         endts > other.startts)
         return true;
