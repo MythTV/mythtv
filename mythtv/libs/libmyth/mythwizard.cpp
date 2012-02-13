@@ -468,21 +468,15 @@ void MythWizard::layOutButtonRow( QHBoxLayout * layout )
         h->addWidget( d->nextButton );
     }
 
-    if (d->pages.size() <= 1)
-        return;
-
     // if last page is disabled - show finished btn. at lastpage-1
-    if (appropriate(d->pages.last()->w))
-        return;
-
-    MythWizardPrivate::Page *keep = d->pages.takeLast();
-    if (d->current == d->pages.last())
+    i = d->pages.size() - 1;
+    if (i > 0 && !appropriate(d->pages[i]->w) &&
+        d->current == d->pages[(uint)(i) - 1])
     {
         d->nextButton->hide();
         d->finishButton->show();
         h->addWidget( d->finishButton );
     }
-    d->pages.append(keep);
 }
 
 void MythWizard::layOutTitleRow( QHBoxLayout * layout, const QString & title )
