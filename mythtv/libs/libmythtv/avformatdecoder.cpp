@@ -321,9 +321,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 
     cc608_build_parity_table(cc608_parity_table);
 
-    if (gCoreContext->GetNumSetting("CCBackground", 0))
-        CC708Window::forceBlackBackground = true;
-
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("PlayerFlags: 0x%1")
         .arg(playerFlags, 0, 16));
 }

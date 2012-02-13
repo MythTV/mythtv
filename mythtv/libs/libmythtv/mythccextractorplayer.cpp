@@ -28,6 +28,7 @@ using namespace std;
 #include "teletextextractorreader.h"
 #include "mythccextractorplayer.h"
 #include "avformatdecoder.h"
+#include "subtitlescreen.h"
 #include "srtwriter.h"
 
 
@@ -319,10 +320,9 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
                 continue;
             }
 
-            QStringList content;
-            vector<CC608Text*>::iterator bit = textlist->buffers.begin();
-            for (; bit != textlist->buffers.end(); ++bit)
-                content += CC608Decoder::ToASCII((*bit)->text, true);
+            FormattedTextSubtitle fsub;
+            fsub.InitFromCC608(textlist->buffers);
+            QStringList content = fsub.ToSRT();
 
             textlist->lock.unlock();
 
@@ -411,7 +411,7 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
                     if (win.visible)
                         strings = win.GetStrings();
                     Ingest708Caption(it.key(), serviceIdx, windowIdx,
-                                     win.pen.row, win.pen.column, strings);
+                                     win.pen.row, win.pen.column, win, strings);
                     while (!strings.empty())
                     {
                         delete strings.back();
@@ -427,19 +427,12 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
 void MythCCExtractorPlayer::Ingest708Caption(
     uint streamId, uint serviceIdx,
     uint windowIdx, uint start_row, uint start_column,
+    const CC708Window &win,
     const vector<CC708String*> &content)
 {
-    bool empty = true;
-    QStringList winContent;
-
-    vector<CC708String*>::const_iterator it = content.begin();
-    for (; it != content.end(); ++it)
-    {
-        QString tmp = (*it)->str.trimmed();
-        if (!tmp.isEmpty())
-            winContent += tmp;
-        empty &= tmp.isEmpty();
-    }
+    FormattedTextSubtitle fsub;
+    fsub.InitFromCC708(win, windowIdx, content);
+    QStringList winContent = fsub.ToSRT();
 
     QMap<int, Window> &cc708win = m_cc708_windows[streamId][serviceIdx];
     cc708win[windowIdx].row = start_row;

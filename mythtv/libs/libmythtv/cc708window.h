@@ -13,6 +13,59 @@ using namespace std;
 
 #include "mythtvexp.h"
 
+extern const uint k708JustifyLeft;
+extern const uint k708JustifyRight;
+extern const uint k708JustifyCenter;
+extern const uint k708JustifyFull;
+
+extern const uint k708EffectSnap;
+extern const uint k708EffectFade;
+extern const uint k708EffectWipe;
+
+extern const uint k708BorderNone;
+extern const uint k708BorderRaised;
+extern const uint k708BorderDepressed;
+extern const uint k708BorderUniform;
+extern const uint k708BorderShadowLeft;
+extern const uint k708BorderShadowRight;
+
+extern const uint k708DirLeftToRight;
+extern const uint k708DirRightToLeft;
+extern const uint k708DirTopToBottom;
+extern const uint k708DirBottomToTop;
+
+extern const uint k708AttrSizeSmall;
+extern const uint k708AttrSizeStandard;
+extern const uint k708AttrSizeLarge;
+
+extern const uint k708AttrOffsetSubscript;
+extern const uint k708AttrOffsetNormal;
+extern const uint k708AttrOffsetSuperscript;
+
+extern const uint k708AttrFontDefault;
+extern const uint k708AttrFontMonospacedSerif;
+extern const uint k708AttrFontProportionalSerif;
+extern const uint k708AttrFontMonospacedSansSerif;
+extern const uint k708AttrFontProportionalSansSerif;
+extern const uint k708AttrFontCasual;
+extern const uint k708AttrFontCursive;
+extern const uint k708AttrFontSmallCaps;
+
+extern const uint k708AttrEdgeNone;
+extern const uint k708AttrEdgeRaised;
+extern const uint k708AttrEdgeDepressed;
+extern const uint k708AttrEdgeUniform;
+extern const uint k708AttrEdgeLeftDropShadow;
+extern const uint k708AttrEdgeRightDropShadow;
+
+extern const uint k708AttrColorBlack;
+extern const uint k708AttrColorWhite;
+
+extern const uint k708AttrOpacitySolid;
+extern const uint k708AttrOpacityFlash;
+extern const uint k708AttrOpacityTranslucent;
+extern const uint k708AttrOpacityTransparent;
+
 class CC708CharacterAttribute
 {
   public:
@@ -25,12 +78,38 @@ class CC708CharacterAttribute
     uint edge_type;
     uint underline;
     uint italics;
+    uint boldface;
 
     uint fg_color;
     uint fg_opacity;
     uint bg_color;
     uint bg_opacity;
     uint edge_color;
+
+    bool override_fg_color; // for a color not in the 6-bit palette
+    QColor actual_fg_color;
+
+    CC708CharacterAttribute(bool isItalic, bool isBold, bool isUnderline,
+                            QColor fgColor, bool hasBackground) :
+        pen_size(k708AttrSizeStandard),
+        offset(k708AttrOffsetNormal),
+        text_tag(0), // "dialog", ignored
+        font_tag(0), // system font
+        edge_type(k708AttrEdgeNone),
+        underline(isUnderline),
+        italics(isItalic),
+        boldface(isBold),
+        fg_color(k708AttrColorWhite), // will be overridden
+        fg_opacity(k708AttrOpacitySolid), // solid
+        bg_color(k708AttrColorBlack),
+        bg_opacity(hasBackground ? k708AttrOpacitySolid :
+                   k708AttrOpacityTransparent),
+        edge_color(k708AttrColorBlack),
+        override_fg_color(true),
+        actual_fg_color(fgColor)
+    {
+    }
+    CC708CharacterAttribute(void) : override_fg_color(false) {}
 
     // remove this
     uint FontIndex(void) const
@@ -41,7 +120,8 @@ class CC708CharacterAttribute
     static QColor ConvertToQColor(uint eia708color);
     QColor GetFGColor(void) const
     {
-        QColor fg = ConvertToQColor(fg_color);
+        QColor fg = (override_fg_color ?
+                     actual_fg_color : ConvertToQColor(fg_color));
         fg.setAlpha(GetFGAlpha());
         return fg;
     }
@@ -88,6 +168,7 @@ class CC708Pen
         attr.edge_type = edge_type;
         attr.underline = underline;
         attr.italics   = italics;
+        attr.boldface  = 0;
     }
   public:
     CC708CharacterAttribute attr;
@@ -200,8 +281,6 @@ class MTV_PUBLIC CC708Window
     bool            exists;
     bool            changed;
 
-    static bool     forceBlackBackground;
-
     mutable QMutex  lock;
 };
 
@@ -214,58 +293,5 @@ class CC708Service
     uint current_window;
     CC708Window windows[8];
 };
-
-extern const uint k708JustifyLeft;
-extern const uint k708JustifyRight;
-extern const uint k708JustifyCenter;
-extern const uint k708JustifyFull;
-
-extern const uint k708EffectSnap;
-extern const uint k708EffectFade;
-extern const uint k708EffectWipe;
-
-extern const uint k708BorderNone;
-extern const uint k708BorderRaised;
-extern const uint k708BorderDepressed;
-extern const uint k708BorderUniform;
-extern const uint k708BorderShadowLeft;
-extern const uint k708BorderShadowRight;
-
-extern const uint k708DirLeftToRight;
-extern const uint k708DirRightToLeft;
-extern const uint k708DirTopToBottom;
-extern const uint k708DirBottomToTop;
-
-extern const uint k708AttrSizeSmall;
-extern const uint k708AttrSizeStandard;
-extern const uint k708AttrSizeLarge;
-
-extern const uint k708AttrOffsetSubscript;
-extern const uint k708AttrOffsetNormal;
-extern const uint k708AttrOffsetSuperscript;
-
-extern const uint k708AttrFontDefault;
-extern const uint k708AttrFontMonospacedSerif;
-extern const uint k708AttrFontProportionalSerif;
-extern const uint k708AttrFontMonospacedSansSerif;
-extern const uint k708AttrFontProportionalSansSerif;
-extern const uint k708AttrFontCasual;
-extern const uint k708AttrFontCursive;
-extern const uint k708AttrFontSmallCaps;
-
-extern const uint k708AttrEdgeNone;
-extern const uint k708AttrEdgeRaised;
-extern const uint k708AttrEdgeDepressed;
-extern const uint k708AttrEdgeUniform;
-extern const uint k708AttrEdgeLeftDropShadow;
-extern const uint k708AttrEdgeRightDropShadow;
-
-extern const uint k708AttrColorBlack;
-extern const uint k708AttrColorWhite;
-
-extern const uint k708AttrOpacitySolid;
-extern const uint k708AttrOpacityFlash;
-extern const uint k708AttrOpacityTranslucent;
-extern const uint k708AttrOpacityTransparent;
 
 #endif // _CC708_WINDOW_

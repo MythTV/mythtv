@@ -14,7 +14,8 @@
 #define PAD_WIDTH  0.20
 #define PAD_HEIGHT 0.04
 
-static MythFontProperties* gTextSubFont;
+static const float LINE_SPACING = 1.1765f;
+
 static QHash<int, MythFontProperties*> gCC708Fonts;
 
 SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
@@ -26,9 +27,6 @@ SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
     m_textFontZoom(100),                    m_refreshArea(false),
     m_fontStretch(fontStretch)
 {
-    m_708fontSizes[0] = 36;
-    m_708fontSizes[1] = 45;
-    m_708fontSizes[2] = 60;
     m_removeHTML.setMinimal(true);
 
 #ifdef USING_LIBASS
@@ -346,7 +344,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
 void SubtitleScreen::DisplayTextSubtitles(void)
 {
-    if (!InitialiseFont(m_fontStretch) || !m_player || !m_subreader)
+    if (!Initialise708Fonts(m_fontStretch) || !m_player || !m_subreader)
         return;
 
     bool changed = false;
@@ -421,7 +419,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
 
 void SubtitleScreen::DisplayRawTextSubtitles(void)
 {
-    if (!InitialiseFont(m_fontStretch) || !m_player || !m_subreader)
+    if (!Initialise708Fonts(m_fontStretch) || !m_player || !m_subreader)
         return;
 
     uint64_t duration;
@@ -445,11 +443,11 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
 void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
                                        uint64_t start, uint64_t duration)
 {
-    FormattedTextSubtitle fsub(m_safeArea);
+    FormattedTextSubtitle fsub(m_safeArea, m_useBackground, this);
     fsub.InitFromSRT(wrappedsubs, m_textFontZoom);
     fsub.WrapLongLines();
-    fsub.Draw(this);
-    m_refreshArea = true;
+    fsub.Layout();
+    m_refreshArea = m_refreshArea || fsub.Draw(0, start, duration);
 }
 
 void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
@@ -583,7 +581,7 @@ static QString extract_cc608(
 
 void SubtitleScreen::DisplayCC608Subtitles(void)
 {
-    if (!InitialiseFont(m_fontStretch) || !m_608reader)
+    if (!Initialise708Fonts(m_fontStretch) || !m_608reader)
         return;
 
     bool changed = false;
@@ -619,10 +617,10 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
         return;
     }
 
-    FormattedTextSubtitle fsub(m_safeArea);
+    FormattedTextSubtitle fsub(m_safeArea, m_useBackground, this);
     fsub.InitFromCC608(textlist->buffers);
-    fsub.Draw(this);
-    m_refreshArea = true;
+    fsub.Layout();
+    m_refreshArea = m_refreshArea || fsub.Draw();
     textlist->lock.unlock();
 }
 
@@ -646,6 +644,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
             m_708fontSizes[1] = size;
             m_708fontSizes[0] = size * 32 / 42;
             m_708fontSizes[2] = size * 42 / 32;
+            m_708fontSizes[3] = 1; // just to be safe
         }
     }
     else
@@ -669,7 +668,25 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         QMutexLocker locker(&win.lock);
         vector<CC708String*> list = win.GetStrings();
         if (!list.empty())
-            Display708Strings(win, i, video_aspect, list);
+        {
+            FormattedTextSubtitle fsub(m_safeArea, m_useBackground, this);
+            fsub.InitFromCC708(win, i, list, video_aspect, m_textFontZoom);
+            fsub.Layout();
+            // Draw the window background after calculating bounding
+            // rectangle in Layout()
+            if (win.GetFillAlpha()) // TODO border?
+            {
+                QBrush fill(win.GetFillColor(), Qt::SolidPattern);
+                MythUIShape *shape =
+                    new MythUIShape(this, QString("cc708bg%1").arg(i));
+                shape->SetFillBrush(fill);
+                shape->SetArea(MythRect(fsub.m_bounds));
+                m_708imageCache[i].append(shape);
+                m_refreshArea = true;
+            }
+            m_refreshArea =
+                m_refreshArea || fsub.Draw(&m_708imageCache[i]);
+        }
         for (uint j = 0; j < list.size(); j++)
             delete list[j];
         win.changed = false;
@@ -683,193 +700,6 @@ void SubtitleScreen::Clear708Cache(int num)
         foreach(MythUIType* image, m_708imageCache[num])
             DeleteChild(image);
         m_708imageCache[num].clear();
-    }
-}
-
-void SubtitleScreen::Display708Strings(const CC708Window &win, int num,
-                                       float aspect, vector<CC708String*> &list)
-{
-    LOG(VB_VBI, LOG_INFO,LOC +
-        QString("Display Win %1, Anchor_id %2, x_anch %3, y_anch %4, "
-                "relative %5")
-            .arg(num).arg(win.anchor_point).arg(win.anchor_horizontal)
-            .arg(win.anchor_vertical).arg(win.relative_pos));
-
-    bool display = false;
-    MythFontProperties *mythfont;
-    uint max_row_width = 0;
-    uint total_height = 0;
-    uint i = 0;
-    for (uint row = 0; (row < win.true_row_count) && (i < list.size()); row++)
-    {
-        uint row_width = 0, max_row_height = 0;
-        for (; (i < list.size()) && list[i] && (list[i]->y <= row); i++)
-        {
-            if (list[i]->y < row)
-                continue;
-
-            mythfont = Get708Font(list[i]->attr);
-            if (!mythfont)
-                continue;
-
-            QString text = list[i]->str.trimmed();
-            if (!text.isEmpty())
-                display = true;
-
-            QFontMetrics font(*(mythfont->GetFace()));
-            uint height = (uint)font.height() * (1 + PAD_HEIGHT);
-
-            row_width += font.width(list[i]->str) +
-                         (font.maxWidth() * PAD_WIDTH * 2);
-            max_row_height = max(max_row_height, height);
-        }
-
-        max_row_width = max(max_row_width, row_width);
-        total_height += max_row_height;
-    }
-
-    if (!display)
-        return;
-
-    float xrange  = win.relative_pos ? 100.0f :
-                    (aspect > 1.4f) ? 210.0f : 160.0f;
-    float yrange  = win.relative_pos ? 100.0f : 75.0f;
-    float xmult   = (float)m_safeArea.width() / xrange;
-    float ymult   = (float)m_safeArea.height() / yrange;
-    uint anchor_x = (uint)(xmult * (float)win.anchor_horizontal);
-    uint anchor_y = (uint)(ymult * (float)win.anchor_vertical);
-
-    if (win.anchor_point % 3 == 1)
-        anchor_x -= (((int)max_row_width) / 2);
-    if (win.anchor_point % 3 == 2)
-        anchor_x -= (int)max_row_width;
-    if (win.anchor_point / 3 == 1)
-        anchor_y -= (((int)total_height) / 2);
-    if (win.anchor_point / 3 == 2)
-        anchor_y -= (int)total_height;
-
-    if (win.GetFillAlpha()) // TODO border?
-    {
-        QRect bg(anchor_x, anchor_y, max_row_width, total_height);
-        QBrush fill(win.GetFillColor(), Qt::SolidPattern);
-        MythUIShape *shape = new MythUIShape(this,
-                QString("cc708bg%1").arg(num));
-        shape->SetFillBrush(fill);
-        shape->SetArea(MythRect(bg));
-        m_708imageCache[num].append(shape);
-        m_refreshArea = true;
-    }
-
-    i = 0;
-    int y = anchor_y;
-    for (uint row = 0; (row < win.true_row_count) && (i < list.size()); row++)
-    {
-        uint maxheight = 0;
-        int  x = anchor_x;
-        bool first = true;
-        for (; (i < list.size()) && list[i] && (list[i]->y <= row); i++)
-        {
-            bool last = ((i + 1) == list.size());
-            if (!last)
-                last = (list[i + 1]->y > row);
-
-            QString rawstring = list[i]->str;
-            mythfont = Get708Font(list[i]->attr);
-
-            if ((list[i]->y < row) || !mythfont || rawstring.isEmpty())
-                continue;
-
-            QString trimmed = rawstring.trimmed();
-            if (!trimmed.size() && last)
-                continue;
-
-            QFontMetrics font(*(mythfont->GetFace()));
-            uint height = (uint)font.height() * (1 + PAD_HEIGHT);
-            maxheight   = max(maxheight, height);
-            uint spacewidth = font.width(QString(" "));
-            uint textwidth  = font.width(trimmed);
-
-            int leading  = 0;
-            int trailing = 0;
-            if (trimmed.size() != rawstring.size())
-            {
-                if (trimmed.size())
-                {
-                    leading  = rawstring.indexOf(trimmed.at(0));
-                    trailing = rawstring.size() - trimmed.size() - leading;
-                }
-                else
-                {
-                    leading = rawstring.size();
-                }
-                leading  *= spacewidth;
-                trailing *= spacewidth;
-            }
-
-            if (!leading)
-                textwidth += spacewidth * PAD_WIDTH;
-            if (!trailing)
-                textwidth += spacewidth * PAD_WIDTH;
-
-            bool background = list[i]->attr.GetBGAlpha();
-            QBrush bgfill = QBrush((list[i]->attr.GetBGColor(), Qt::SolidPattern));
-
-            if (leading && background && !first)
-            {
-                // draw background for leading space
-                QRect space(x, y, leading, height);
-                MythUIShape *shape = new MythUIShape(this,
-                        QString("cc708shape%1x%2lead").arg(row).arg(i));
-                shape->SetFillBrush(bgfill);
-                shape->SetArea(MythRect(space));
-                m_708imageCache[num].append(shape);
-                m_refreshArea = true;
-            }
-
-            x += leading;
-            QRect rect(x, y, textwidth, height);
-
-            if (trimmed.size() && textwidth && background)
-            {
-                MythUIShape *shape = new MythUIShape(this,
-                        QString("cc708shape%1x%2main").arg(row).arg(i));
-                shape->SetFillBrush(bgfill);
-                shape->SetArea(MythRect(rect));
-                m_708imageCache[num].append(shape);
-                m_refreshArea = true;
-            }
-
-            if (trimmed.size() && textwidth)
-            {
-                MythUISimpleText *text = new MythUISimpleText
-                                         (list[i]->str, *mythfont,
-                                          rect, Qt::AlignCenter,
-                                          (MythUIType*)this,
-                                  QString("cc708text%1x%2").arg(row).arg(i));
-                m_708imageCache[num].append(text);
-                m_refreshArea = true;
-            }
-
-            x += textwidth;
-
-            if (trailing && background && !last)
-            {
-                // draw background for trailing space
-                QRect space(x, y, trailing, height);
-                MythUIShape *shape = new MythUIShape(this,
-                        QString("cc708shape%1x%2trail").arg(row).arg(i));
-                shape->SetFillBrush(bgfill);
-                shape->SetArea(MythRect(space));
-                m_708imageCache[num].append(shape);
-                m_refreshArea = true;
-            }
-
-            x += trailing;
-            first = false;
-            LOG(VB_VBI, LOG_INFO, QString("Win %1 row %2 String '%3'")
-                .arg(num).arg(row).arg(list[i]->str));
-        }
-        y += maxheight;
     }
 }
 
@@ -904,39 +734,6 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
     }
 }
 
-bool SubtitleScreen::InitialiseFont(int fontStretch)
-{
-    static bool initialised = false;
-    QString font = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
-    if (initialised)
-    {
-        if (gTextSubFont->face().family() == font &&
-            gTextSubFont->face().stretch() == fontStretch)
-        {
-            return true;
-        }
-        delete gTextSubFont;
-    }
-
-    MythFontProperties *mythfont = new MythFontProperties();
-    if (mythfont)
-    {
-        QFont newfont(font);
-        newfont.setStretch(fontStretch);
-        font.detach();
-        mythfont->SetFace(newfont);
-        mythfont->SetOutline(true, Qt::black, 2, 255);
-        gTextSubFont = mythfont;
-    }
-    else
-        return false;
-
-    initialised = true;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Loaded main subtitle font '%1'")
-        .arg(font));
-    return true;
-}
-
 bool SubtitleScreen::Initialise708Fonts(int fontStretch)
 {
     static bool initialised = false;
@@ -950,7 +747,8 @@ bool SubtitleScreen::Initialise708Fonts(int fontStretch)
     LOG(VB_GENERAL, LOG_INFO, "Initialise708Fonts()");
 
     QStringList fonts;
-    fonts.append("Droid Sans Mono"); // default
+    QString defaultFont = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
+    fonts.append(defaultFont);       // default
     fonts.append("FreeMono");        // mono serif
     fonts.append("DejaVu Serif");    // prop serif
     fonts.append("Droid Sans Mono"); // mono sans
@@ -980,6 +778,7 @@ bool SubtitleScreen::Initialise708Fonts(int fontStretch)
 }
 
 MythFontProperties* SubtitleScreen::Get708Font(CC708CharacterAttribute attr)
+    const
 {
     MythFontProperties *mythfont = gCC708Fonts[attr.font_tag & 0x7];
     if (!mythfont)
@@ -988,6 +787,7 @@ MythFontProperties* SubtitleScreen::Get708Font(CC708CharacterAttribute attr)
     mythfont->GetFace()->setItalic(attr.italics);
     mythfont->GetFace()->setPixelSize(m_708fontSizes[attr.pen_size & 0x3]);
     mythfont->GetFace()->setUnderline(attr.underline);
+    mythfont->GetFace()->setBold(attr.boldface);
     mythfont->SetColor(attr.GetFGColor());
 
     int off = m_708fontSizes[attr.pen_size & 0x3] / 20;
@@ -1019,17 +819,12 @@ MythFontProperties* SubtitleScreen::Get708Font(CC708CharacterAttribute attr)
     return mythfont;
 }
 
-QSize FormattedTextChunk::CalcSize(int pixelSize) const
+static QString srtColorString(QColor color)
 {
-    QFont *font = gTextSubFont->GetFace();
-    font->setItalic(isItalic);
-    font->setBold(isBold);
-    font->setUnderline(isUnderline);
-    font->setPixelSize(pixelSize);
-    QFontMetrics fm(*font);
-    int width = fm.width(text) + fm.maxWidth() * PAD_WIDTH;
-    int height = fm.height() * (1 + PAD_HEIGHT);
-    return QSize(width, height);
+    return QString("#%1%2%3")
+        .arg(color.red(),   2, 16, QLatin1Char('0'))
+        .arg(color.green(), 2, 16, QLatin1Char('0'))
+        .arg(color.blue(),  2, 16, QLatin1Char('0'));
 }
 
 void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers)
@@ -1044,10 +839,12 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers)
         return;
     vector<CC608Text*>::iterator i = buffers.begin();
     bool teletextmode = (*i)->teletextmode;
-    m_useBackground = m_useBackground && !teletextmode;
+    bool useBackground = m_useBackground && !teletextmode;
     int xscale = teletextmode ? 40 : 36;
     int yscale = teletextmode ? 25 : 17;
-    m_pixelSize = m_safeArea.height() / (yscale * 1.1765f);
+    int pixelSize = m_safeArea.height() / (yscale * LINE_SPACING);
+    if (parent)
+        parent->SetFontSizes(pixelSize, pixelSize, pixelSize);
 
     for (; i != buffers.end(); ++i)
     {
@@ -1063,23 +860,64 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers)
         int orig_y = teletextmode ? cc->x : cc->y;
         int y = (int)(((float)orig_y / (float)yscale) *
                       (float)m_safeArea.height());
-        FormattedTextLine line(x, y);
+        FormattedTextLine line(x, y, orig_x, orig_y);
         for (int chunk = 0; text != QString::null; chunk++)
         {
             QString captionText =
                 extract_cc608(text, cc->teletextmode,
                               color, isItalic, isUnderline);
-            FormattedTextChunk chunk(captionText,
-                                     isItalic, isBold, isUnderline,
-                                     clr[min(max(0, color), 7)]);
+            CC708CharacterAttribute attr(isItalic, isBold, isUnderline,
+                                         clr[min(max(0, color), 7)],
+                                         useBackground);
+            FormattedTextChunk chunk(captionText, attr, parent);
             line.chunks += chunk;
             LOG(VB_VBI, LOG_INFO,
-                QString("Adding cc608 chunk: x=%1 y=%2 "
-                        "uline=%3 ital=%4 color=%5 text='%6'")
-                .arg(cc->x).arg(cc->y)
-                .arg(isUnderline).arg(isItalic).arg(color).arg(captionText));
+                QString("Adding cc608 chunk (%1,%2): %3")
+                .arg(cc->x).arg(cc->y).arg(chunk.ToLogString()));
         }
         m_lines += line;
+    }
+}
+
+void FormattedTextSubtitle::InitFromCC708(const CC708Window &win, int num,
+                                          const vector<CC708String*> &list,
+                                          float aspect,
+                                          int textFontZoom)
+{
+    LOG(VB_VBI, LOG_INFO,LOC +
+        QString("Display Win %1, Anchor_id %2, x_anch %3, y_anch %4, "
+                "relative %5")
+            .arg(num).arg(win.anchor_point).arg(win.anchor_horizontal)
+            .arg(win.anchor_vertical).arg(win.relative_pos));
+    int pixelSize = (m_safeArea.height() * textFontZoom) / 2000;
+    if (parent)
+        parent->SetFontSizes(pixelSize * 32 / 42, pixelSize, pixelSize * 42 / 32);
+
+    float xrange  = win.relative_pos ? 100.0f :
+                    (aspect > 1.4f) ? 210.0f : 160.0f;
+    float yrange  = win.relative_pos ? 100.0f : 75.0f;
+    float xmult   = (float)m_safeArea.width() / xrange;
+    float ymult   = (float)m_safeArea.height() / yrange;
+    uint anchor_x = (uint)(xmult * (float)win.anchor_horizontal);
+    uint anchor_y = (uint)(ymult * (float)win.anchor_vertical);
+    m_xAnchorPoint = win.anchor_point % 3;
+    m_yAnchorPoint = win.anchor_point / 3;
+    m_xAnchor = anchor_x;
+    m_yAnchor = anchor_y;
+
+    for (uint i = 0; i < list.size(); i++)
+    {
+        if (list[i]->y >= (uint)m_lines.size())
+            m_lines.resize(list[i]->y + 1);
+        if (m_useBackground)
+        {
+            list[i]->attr.bg_color = k708AttrColorBlack;
+            list[i]->attr.bg_opacity = k708AttrOpacitySolid;
+        }
+        FormattedTextChunk chunk(list[i]->str, list[i]->attr, parent);
+        m_lines[list[i]->y].chunks += chunk;
+        LOG(VB_VBI, LOG_INFO, QString("Adding cc708 chunk: win %1 row %2: %3")
+            .arg(num).arg(i).arg(chunk.ToLogString()));
     }
 }
 
@@ -1099,7 +937,13 @@ void FormattedTextSubtitle::InitFromSRT(QStringList &subs, int textFontZoom)
     // <font color="#xxyyzz"> - change font color
     // </font> - reset font color to white
 
-    m_pixelSize = (m_safeArea.height() * textFontZoom) / 2000;
+    int pixelSize = (m_safeArea.height() * textFontZoom) / 2000;
+    if (parent)
+        parent->SetFontSizes(pixelSize, pixelSize, pixelSize);
+    m_xAnchorPoint = 1; // center
+    m_yAnchorPoint = 2; // bottom
+    m_xAnchor = m_safeArea.width() / 2;
+    m_yAnchor = m_safeArea.height();
 
     bool isItalic = false;
     bool isBold = false;
@@ -1117,12 +961,13 @@ void FormattedTextSubtitle::InitFromSRT(QStringList &subs, int textFontZoom)
             int pos = text.indexOf(htmlTag);
             if (pos != 0) // don't add a zero-length string
             {
-                FormattedTextChunk chunk(
-                    text.left(pos), isItalic, isBold, isUnderline, color);
+                CC708CharacterAttribute attr(isItalic, isBold, isUnderline,
+                                             color, m_useBackground);
+                FormattedTextChunk chunk(text.left(pos), attr, parent);
                 line.chunks += chunk;
                 text = (pos < 0 ? "" : text.mid(pos));
-                LOG(VB_VBI, LOG_INFO, QString("Adding SRT chunk '%1'")
-                    .arg(chunk.text));
+                LOG(VB_VBI, LOG_INFO, QString("Adding SRT chunk: %1")
+                    .arg(chunk.ToLogString()));
             }
             if (pos >= 0)
             {
@@ -1171,11 +1016,9 @@ void FormattedTextSubtitle::InitFromSRT(QStringList &subs, int textFontZoom)
 
                 LOG(VB_VBI, LOG_INFO,
                     QString("SRT formatting change '%1', "
-                            "new ital=%2 bold=%3 uline=%4 color=#%5%6%7)")
+                            "new ital=%2 bold=%3 uline=%4 color=%5)")
                     .arg(html).arg(isItalic).arg(isBold).arg(isUnderline)
-                    .arg(color.red(),   2, 16, QLatin1Char('0'))
-                    .arg(color.green(), 2, 16, QLatin1Char('0'))
-                    .arg(color.blue(),  2, 16, QLatin1Char('0')));
+                    .arg(srtColorString(color)));
             }
         }
         m_lines += line;
@@ -1193,10 +1036,7 @@ bool FormattedTextChunk::Split(FormattedTextChunk &newChunk)
             QString("Failed to split chunk '%1'").arg(text));
         return false;
     }
-    newChunk.isItalic = isItalic;
-    newChunk.isBold = isBold;
-    newChunk.isUnderline = isUnderline;
-    newChunk.color = color;
+    newChunk.format = format;
     newChunk.text = text.mid(lastSpace + 1).trimmed() + ' ';
     text = text.left(lastSpace).trimmed();
     LOG(VB_VBI, LOG_INFO,
@@ -1204,17 +1044,41 @@ bool FormattedTextChunk::Split(FormattedTextChunk &newChunk)
     return true;
 }
 
+QString FormattedTextChunk::ToLogString(void) const
+{
+    QString str("");
+    str += QString("fg=%1.%2 ")
+        .arg(srtColorString(format.GetFGColor()))
+        .arg(format.GetFGAlpha());
+    str += QString("bg=%1.%2 ")
+        .arg(srtColorString(format.GetBGColor()))
+        .arg(format.GetBGAlpha());
+    str += QString("edge=%1.%2 ")
+        .arg(srtColorString(format.GetEdgeColor()))
+        .arg(format.edge_type);
+    str += QString("off=%1 pensize=%2 ")
+        .arg(format.offset)
+        .arg(format.pen_size);
+    str += QString("it=%1 ul=%2 bf=%3 ")
+        .arg(format.italics)
+        .arg(format.underline)
+        .arg(format.boldface);
+    str += QString("font=%1 ").arg(format.font_tag);
+    str += QString(" text='%1'").arg(text);
+    return str;
+}
+
 void FormattedTextSubtitle::WrapLongLines(void)
 {
     int maxWidth = m_safeArea.width();
     for (int i = 0; i < m_lines.size(); i++)
     {
-        int width = m_lines[i].CalcSize(m_pixelSize).width();
+        int width = m_lines[i].CalcSize().width();
         // Move entire chunks to the next line as necessary.  Leave at
         // least one chunk on the current line.
         while (width > maxWidth && m_lines[i].chunks.size() > 1)
         {
-            width -= m_lines[i].chunks.back().CalcSize(m_pixelSize).width();
+            width -= m_lines[i].chunks.back().CalcSize().width();
             // Make sure there's a next line to wrap into.
             if (m_lines.size() == i + 1)
                 m_lines += FormattedTextLine(m_lines[i].x_indent,
@@ -1238,70 +1102,101 @@ void FormattedTextSubtitle::WrapLongLines(void)
                     m_lines += FormattedTextLine(m_lines[i].x_indent,
                                                  m_lines[i].y_indent);
                 m_lines[i+1].chunks.prepend(newChunk);
-                width = m_lines[i].CalcSize(m_pixelSize).width();
+                width = m_lines[i].CalcSize().width();
             }
         }
     }
 }
 
-void FormattedTextSubtitle::Draw(SubtitleScreen *parent,
+// Resolves any TBD x_indent and y_indent values in FormattedTextLine
+// objects.  Calculates m_bounds.  Prunes most leading and all
+// trailing whitespace from each line so that displaying with a black
+// background doesn't look clumsy.
+void FormattedTextSubtitle::Layout(void)
+{
+    // Calculate dimensions of bounding rectangle
+    int anchor_width = 0;
+    int anchor_height = 0;
+    for (int i = 0; i < m_lines.size(); i++)
+    {
+        QSize sz = m_lines[i].CalcSize();
+        anchor_width = max(anchor_width, sz.width());
+        anchor_height += sz.height() * LINE_SPACING;
+    }
+
+    // Adjust the anchor point according to actual width and height
+    int anchor_x = m_xAnchor;
+    int anchor_y = m_yAnchor;
+    if (m_xAnchorPoint == 1)
+        anchor_x -= anchor_width / 2;
+    else if (m_xAnchorPoint == 2)
+        anchor_x -= anchor_width;
+    if (m_yAnchorPoint == 1)
+        anchor_y -= anchor_height / 2;
+    else if (m_yAnchorPoint == 2)
+        anchor_y -= anchor_height;
+
+    m_bounds = QRect(anchor_x, anchor_y, anchor_width, anchor_height);
+
+    // Fill in missing coordinates
+    int y = anchor_y;
+    for (int i = 0; i < m_lines.size(); i++)
+    {
+        if (m_lines[i].x_indent < 0)
+            m_lines[i].x_indent = anchor_x;
+        if (m_lines[i].y_indent < 0)
+            m_lines[i].y_indent = y;
+        y += m_lines[i].CalcSize().height() * LINE_SPACING;
+        // Prune leading all-whitespace chunks.
+        while (!m_lines[i].chunks.isEmpty() &&
+               m_lines[i].chunks.first().text.trimmed().isEmpty())
+        {
+            m_lines[i].x_indent +=
+                m_lines[i].chunks.first().CalcSize().width();
+            m_lines[i].chunks.removeFirst();
+        }
+        // Prune trailing all-whitespace chunks.
+        while (!m_lines[i].chunks.isEmpty() &&
+               m_lines[i].chunks.last().text.trimmed().isEmpty())
+        {
+            m_lines[i].chunks.removeLast();
+        }
+        // Trim trailing whitespace from last chunk.  (Trimming
+        // leading whitespace from all chunks is handled in the Draw()
+        // routine.)
+        if (!m_lines[i].chunks.isEmpty())
+        {
+            QString *str = &m_lines[i].chunks.last().text;
+            int idx = str->length() - 1;
+            while (idx >= 0 && str->at(idx) == ' ')
+                --idx;
+            str->truncate(idx + 1);
+        }
+    }
+}
+
+// Returns true if anything new was drawn, false if not.  The caller
+// should call SubtitleScreen::OptimiseDisplayedArea() if true is
+// returned.
+bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
                                  uint64_t start, uint64_t duration) const
 {
-    bool useBackground = m_useBackground && parent->GetUseBackground();
-    gTextSubFont->GetFace()->setPixelSize(m_pixelSize);
-    QFontMetrics font(*(gTextSubFont->GetFace()));
-    int pad_width = font.maxWidth() * PAD_WIDTH;
-    QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
+    bool result = false;
 
     for (int i = 0; i < m_lines.size(); i++)
     {
         int x = m_lines[i].x_indent, y = m_lines[i].y_indent;
-        QSize sz;
-        if ((x < 0) || (y < 0) || useBackground)
-            sz = m_lines[i].CalcSize(m_pixelSize);
-        if (x < 0) // centering
-            x = (m_safeArea.width() - sz.width()) / 2;
-        if (y < 0) // stack lines at bottom
-        {
-            y = m_safeArea.height();
-            y -= (m_lines.size() - i) * sz.height() * 1.1765f;
-        }
-
-        if (useBackground)
-        {
-            QRect bgrect(x - pad_width, y,
-                         sz.width() + pad_width, sz.height());
-            // Special case.  If the first chunk is entirely
-            // whitespace, don't put a black background behind that
-            // chunk.
-            //
-            // This often happens when a line of cc608 caption text
-            // begins with a mid-row format control like italics or a
-            // color change.  The spec says the mid-row control
-            // implies a space character, which needs to be preserved
-            // so that the rest of the text is accurately laid out.  A
-            // leading space looks clumsy against the black
-            // background, so we adjust the background accordingly.
-            if (!m_lines[i].chunks.isEmpty() &&
-                m_lines[i].chunks[0].text.trimmed().isEmpty())
-            {
-                bgrect.setLeft(
-                    bgrect.left() +
-                    m_lines[i].chunks[0].CalcSize(m_pixelSize).width());
-            }
-            MythUIShape *shape =
-                new MythUIShape(parent, QString("subbg%1_%2").arg(x).arg(y));
-            shape->SetFillBrush(bgfill);
-            shape->SetArea(MythRect(bgrect));
-            if (duration > 0)
-                parent->RegisterExpiration(shape, start + duration);
-        }
-
+        int height = m_lines[i].CalcSize().height();
         QList<FormattedTextChunk>::const_iterator chunk;
+        bool first = true;
         for (chunk = m_lines[i].chunks.constBegin();
              chunk != m_lines[i].chunks.constEnd();
              ++chunk)
         {
+            MythFontProperties *mythfont = parent->Get708Font((*chunk).format);
+            if (!mythfont)
+                continue;
+            QFontMetrics font(*(mythfont->GetFace()));
             // If the chunk starts with whitespace, the leading
             // whitespace ultimately gets lost due to the
             // text.trimmed() operation in the MythUISimpleText
@@ -1314,40 +1209,116 @@ void FormattedTextSubtitle::Draw(SubtitleScreen *parent,
                 ++count;
             }
             int x_adjust = count * font.width(" ");
-            gTextSubFont->GetFace()->setItalic((*chunk).isItalic);
-            gTextSubFont->GetFace()->setBold((*chunk).isBold);
-            gTextSubFont->GetFace()->setUnderline((*chunk).isUnderline);
-            gTextSubFont->SetColor((*chunk).color);
-            QSize chunk_sz = (*chunk).CalcSize(m_pixelSize);
+            QSize chunk_sz = (*chunk).CalcSize();
+            if ((*chunk).format.GetBGAlpha())
+            {
+                QBrush bgfill = QBrush((*chunk).format.GetBGColor());
+                QRect bgrect(x, y, chunk_sz.width(), height);
+                if (first)
+                    bgrect.setLeft(bgrect.left() + x_adjust -
+                                   font.maxWidth() * PAD_WIDTH);
+                MythUIShape *bgshape = new MythUIShape(parent,
+                        QString("subbg%1x%2@%3,%4")
+                                     .arg(chunk_sz.width())
+                                     .arg(height)
+                                     .arg(x).arg(y));
+                bgshape->SetFillBrush(bgfill);
+                bgshape->SetArea(MythRect(bgrect));
+                if (imageCache)
+                    imageCache->append(bgshape);
+                if (duration > 0)
+                    parent->RegisterExpiration(bgshape, start + duration);
+                result = true;
+            }
             QRect rect(x + x_adjust, y,
-                       chunk_sz.width() - x_adjust, chunk_sz.height());
+                       chunk_sz.width() - x_adjust, height);
 
             MythUISimpleText *text =
-                new MythUISimpleText((*chunk).text, *gTextSubFont, rect,
+                new MythUISimpleText((*chunk).text, *mythfont, rect,
                                      Qt::AlignLeft, (MythUIType*)parent,
                                      QString("subtxt%1x%2@%3,%4")
                                      .arg(chunk_sz.width())
-                                     .arg(chunk_sz.height())
+                                     .arg(height)
                                      .arg(x).arg(y));
+            if (imageCache)
+                imageCache->append(text);
             if (duration > 0)
                 parent->RegisterExpiration(text, start + duration);
+            result = true;
 
             LOG(VB_VBI, LOG_INFO,
-                QString("Drawing chunk at (%1,%2) with "
-                        "ital=%3 bold=%4 uline=%5 color=#%6%7%8 "
-                        "text='%9'")
-                .arg(x).arg(y)
-                .arg((*chunk).isItalic)
-                .arg((*chunk).isBold)
-                .arg((*chunk).isUnderline)
-                .arg((*chunk).color.red(),   2, 16, QLatin1Char('0'))
-                .arg((*chunk).color.green(), 2, 16, QLatin1Char('0'))
-                .arg((*chunk).color.blue(),  2, 16, QLatin1Char('0'))
-                .arg((*chunk).text));
+                QString("Drawing chunk at (%1,%2): %3")
+                .arg(x).arg(y).arg((*chunk).ToLogString()));
 
             x += chunk_sz.width();
+            first = false;
         }
     }
+    return result;
+}
+
+QStringList FormattedTextSubtitle::ToSRT(void) const
+{
+    QStringList result;
+    for (int i = 0; i < m_lines.size(); i++)
+    {
+        QString line;
+        if (m_lines[i].orig_x > 0)
+            line.fill(' ', m_lines[i].orig_x);
+        QList<FormattedTextChunk>::const_iterator chunk;
+        for (chunk = m_lines[i].chunks.constBegin();
+             chunk != m_lines[i].chunks.constEnd();
+             ++chunk)
+        {
+            const QString &text = (*chunk).text;
+            const CC708CharacterAttribute &attr = (*chunk).format;
+            bool isBlank = !attr.underline && text.trimmed().isEmpty();
+            if (!isBlank)
+            {
+                if (attr.boldface)
+                    line += "<b>";
+                if (attr.italics)
+                    line += "<i>";
+                if (attr.underline)
+                    line += "<u>";
+                if (attr.GetFGColor() != Qt::white)
+                    line += QString("<font color=\"%1\">")
+                        .arg(srtColorString(attr.GetFGColor()));
+            }
+            line += text;
+            if (!isBlank)
+            {
+                if (attr.GetFGColor() != Qt::white)
+                    line += QString("</font>");
+                if (attr.underline)
+                    line += "</u>";
+                if (attr.italics)
+                    line += "</i>";
+                if (attr.boldface)
+                    line += "</b>";
+            }
+        }
+        if (!line.trimmed().isEmpty())
+            result += line;
+    }
+    return result;
+}
+
+void SubtitleScreen::SetFontSizes(int small, int medium, int large)
+{
+    m_708fontSizes[k708AttrSizeSmall]    = small;
+    m_708fontSizes[k708AttrSizeStandard] = medium;
+    m_708fontSizes[k708AttrSizeLarge]    = large;
+}
+
+QSize SubtitleScreen::CalcTextSize(const QString &text,
+                                   const CC708CharacterAttribute &format) const
+{
+    QFont *font = Get708Font(format)->GetFace();
+    QFontMetrics fm(*font);
+    int width = fm.width(text) + fm.maxWidth() * PAD_WIDTH;
+    int height = fm.height() * (1 + PAD_HEIGHT);
+    return QSize(width, height);
 }
 
 #ifdef USING_LIBASS

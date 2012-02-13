@@ -106,8 +106,6 @@ const uint k708AttrOpacityFlash       = 1;
 const uint k708AttrOpacityTranslucent = 2;
 const uint k708AttrOpacityTransparent = 3;
 
-bool CC708Window::forceBlackBackground = false;
-
 CC708Window::CC708Window()
     : priority(0),              visible(0),
       anchor_point(0),          relative_pos(0),
@@ -175,14 +173,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
         for (uint i = 0; i < old_row * old_col; i++)
             new_text[i] = text[i];
         for (uint i = old_row * old_col; i < num; i++)
-        {
             new_text[i].attr = pen.attr;
-            if (forceBlackBackground)
-            {
-                new_text[i].attr.fg_opacity = k708AttrOpacityTransparent;
-                new_text[i].attr.bg_opacity = k708AttrOpacityTransparent;
-            }
-        }
         delete [] text;
         text = new_text;
     }
@@ -200,14 +191,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
         pen.column = 0;
         pen.row    = 0;
         for (uint i = 0; i < num; i++)
-        {
             text[i].attr = pen.attr;
-            if (forceBlackBackground)
-            {
-                text[i].attr.fg_opacity = k708AttrOpacityTransparent;
-                text[i].attr.bg_opacity = k708AttrOpacityTransparent;
-            }
-        }
     }
 
     exists  = true;
@@ -241,11 +225,6 @@ void CC708Window::Clear(void)
     {
         text[i].character = QChar(' ');
         text[i].attr = pen.attr;
-        if (forceBlackBackground)
-        {
-            text[i].attr.fg_opacity = k708AttrOpacityTransparent;
-            text[i].attr.bg_opacity = k708AttrOpacityTransparent;
-        }
     }
     changed = true;
 }
@@ -370,11 +349,6 @@ void CC708Window::AddChar(QChar ch)
     }
 
     GetCCChar().attr      = pen.attr;
-    if (forceBlackBackground)
-    {
-        GetCCChar().attr.bg_color   = k708AttrColorBlack;
-        GetCCChar().attr.bg_opacity = k708AttrOpacityTranslucent;
-    }
     GetCCChar().character = ch;
     int c = pen.column;
     int r = pen.row;
@@ -531,6 +505,7 @@ void CC708Pen::SetPenStyle(uint style)
     attr.font_tag   = style2font[style];
     attr.italics    = 0;
     attr.underline  = 0;
+    attr.boldface   = 0;
     attr.edge_type  = 0;
     attr.fg_color   = k708AttrColorWhite;
     attr.fg_opacity = k708AttrOpacitySolid;
@@ -538,16 +513,12 @@ void CC708Pen::SetPenStyle(uint style)
     attr.bg_opacity = (style<6) ?
         k708AttrOpacitySolid : k708AttrOpacityTransparent;
     attr.edge_color = k708AttrColorBlack;
+    attr.override_fg_color = false;
 }
 
 CC708Character::CC708Character(const CC708Window &win)
 {
     attr = win.pen.attr;
-    if (CC708Window::forceBlackBackground)
-    {
-        attr.fg_opacity = k708AttrOpacityTransparent;
-        attr.bg_opacity = k708AttrOpacityTransparent;
-    }
     character = ' ';
 }
 
