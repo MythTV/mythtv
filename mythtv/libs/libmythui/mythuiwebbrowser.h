@@ -14,7 +14,7 @@
 
 #include "mythuitype.h"
 
-
+class MythUIScrollBar;
 class MythUIWebBrowser;
 class MythUIBusyDialog;
 class MythScreenType;
@@ -132,6 +132,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 
     virtual bool keyPressEvent(QKeyEvent *event);
     virtual void Pulse(void);
+    void Scroll(int dx, int dy);
 
     QIcon GetIcon(void);
     QUrl  GetUrl(void);
@@ -188,6 +189,8 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void UpdateBuffer(void);
     void HandleMouseAction(const QString &action);
     void SetBackgroundColor(QColor color);
+    void ResetScrollBars(void);
+    void UpdateScrollBars(void);
 
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRegion);
@@ -200,6 +203,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     MythScreenType *m_parentScreen;
 
     MythWebView *m_browser;
+    MythRect     m_browserArea;
 
     MythImage   *m_image;
 
@@ -220,6 +224,11 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     QString      m_lastMouseAction;
     int          m_mouseKeyCount;
     QTime        m_lastMouseActionTime;
+
+    MythUIScrollBar *m_horizontalScrollbar;
+    MythUIScrollBar *m_verticalScrollbar;
+    MythUIAnimation  m_scrollAnimation;
+    QPoint           m_destinationScrollPos;
 };
 
 #endif

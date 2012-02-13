@@ -31,6 +31,7 @@
 #include "mythuispinbox.h"
 #include "mythuicheckbox.h"
 #include "mythuiprogressbar.h"
+#include "mythuiscrollbar.h"
 #include "mythuigroup.h"
 #include "mythuiwebbrowser.h"
 #include "mythuiguidegrid.h"
@@ -388,6 +389,7 @@ void XMLParseBase::ParseChildren(const QString &filename,
                      type == "statetype" ||
                      type == "clock" ||
                      type == "progressbar" ||
+                     type == "scrollbar" ||
                      type == "webbrowser" ||
                      type == "guidegrid" ||
                      type == "shape" ||
@@ -484,6 +486,8 @@ MythUIType *XMLParseBase::ParseUIType(
         uitype = new MythUIClock(parent, name);
     else if (type == "progressbar")
         uitype = new MythUIProgressBar(parent, name);
+    else if (type == "scrollbar")
+        uitype = new MythUIScrollBar(parent, name);
     else if (type == "webbrowser")
         uitype = new MythUIWebBrowser(parent, name);
     else if (type == "guidegrid")
@@ -583,6 +587,7 @@ MythUIType *XMLParseBase::ParseUIType(
                      info.tagName() == "statetype" ||
                      info.tagName() == "clock" ||
                      info.tagName() == "progressbar" ||
+                     info.tagName() == "scrollbar" ||
                      info.tagName() == "webbrowser" ||
                      info.tagName() == "guidegrid" ||
                      info.tagName() == "shape" ||
@@ -785,6 +790,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "window" ||
                          type == "clock" ||
                          type == "progressbar" ||
+                         type == "scrollbar" ||
                          type == "webbrowser" ||
                          type == "guidegrid" ||
                          type == "shape" ||
