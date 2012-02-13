@@ -679,6 +679,10 @@ void MythCoreContext::ConfigureHostAddress(void)
                             .arg(it->toString()));
                 d->m_IPv4.append(*it);
             }
+            else
+                LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping non-private "
+                        "address during IPv4 autoselection: %1")
+                            .arg(it->toString()));
         }
 #if !defined(QT_NO_IPV6)
         else if (d->m_IPv6.contains(*it))
@@ -710,8 +714,14 @@ void MythCoreContext::ConfigureHostAddress(void)
                             .arg(it->toString()));
                 d->m_IPv6.append(*it);
             }
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping link-local "
+                        "address during IPv6 autoselection: %1")
+                            .arg(it->toString()));
         }
 #endif
+        else
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping address: %1")
+                .arg(it->toString()));
     }
 
     if (!config_v4.isNull() && !d->m_IPv4.contains(config_v4))
