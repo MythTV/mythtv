@@ -30,6 +30,7 @@
 #include "mythversion.h"
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
+#include "mythlogging.h"
 #include "storagegroup.h"
 #include "dbutil.h"
 #include "hardwareprofile.h"
@@ -369,6 +370,135 @@ DTC::TimeZoneInfo *Myth::GetTimeZone(  )
     pResults->setCurrentDateTime( mythCurrentDateTime() );
 
     return pResults;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
+                                     const QString   &Application,
+                                     int             PID,
+                                     int             TID,
+                                     const QString   &Thread,
+                                     const QString   &Filename,
+                                     int             Line,
+                                     const QString   &Function,
+                                     const QDateTime &FromTime,
+                                     const QDateTime &ToTime,
+                                     const QString   &Level,
+                                     const QString   &MsgContains )
+{
+    DTC::LogMessageList *pList = new DTC::LogMessageList();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    // Get host name list
+    QString sql = "SELECT DISTINCT host FROM logging ORDER BY host ASC";
+    if (!query.exec(sql))
+    {
+        MythDB::DBError("Retrieving log host names", query);
+        throw( QString( "Database Error executing query." ));
+    }
+    while (query.next())
+    {
+        DTC::LabelValue *pLabelValue = pList->AddNewHostName();
+        QString availableHostName = query.value(0).toString();
+        pLabelValue->setValue   ( availableHostName );
+        pLabelValue->setActive  ( availableHostName == HostName );
+        pLabelValue->setSelected( availableHostName == HostName );
+    }
+    // Get application list
+    sql = "SELECT DISTINCT application FROM logging ORDER BY application ASC";
+    if (!query.exec(sql))
+    {
+        MythDB::DBError("Retrieving log applications", query);
+        throw( QString( "Database Error executing query." ));
+    }
+    while (query.next())
+    {
+        DTC::LabelValue *pLabelValue = pList->AddNewApplication();
+        QString availableApplication = query.value(0).toString();
+        pLabelValue->setValue   ( availableApplication );
+        pLabelValue->setActive  ( availableApplication == Application );
+        pLabelValue->setSelected( availableApplication == Application );
+    }
+
+    if (!HostName.isEmpty() && !Application.isEmpty())
+    {
+        // Get log messages
+        sql = "SELECT host, application, pid, tid, thread, filename, "
+              "       line, function, msgtime, level, message "
+              "  FROM logging "
+              " WHERE host = COALESCE(:HOSTNAME, host) "
+              "   AND application = COALESCE(:APPLICATION, application) "
+              "   AND pid = COALESCE(:PID, pid) "
+              "   AND tid = COALESCE(:TID, tid) "
+              "   AND thread = COALESCE(:THREAD, thread) "
+              "   AND filename = COALESCE(:FILENAME, filename) "
+              "   AND line = COALESCE(:LINE, line) "
+              "   AND function = COALESCE(:FUNCTION, function) "
+              "   AND msgtime >= COALESCE(:FROMTIME, msgtime) "
+              "   AND msgtime <= COALESCE(:TOTIME, msgtime) "
+              "   AND level <= COALESCE(:LEVEL, level) "
+              ;
+        if (!MsgContains.isEmpty())
+        {
+            sql.append("   AND message LIKE :MSGCONTAINS ");
+        }
+        sql.append(" ORDER BY msgtime ASC;");
+
+        query.prepare(sql);
+
+        query.bindValue(":HOSTNAME", (HostName.isEmpty()) ? QString() : HostName);
+        query.bindValue(":APPLICATION", (Application.isEmpty()) ? QString() :
+                                                                  Application);
+        query.bindValue(":PID", ( PID == 0 ) ? QVariant(QVariant::ULongLong) :
+                                               (qint64)PID);
+        query.bindValue(":TID", ( TID == 0 ) ? QVariant(QVariant::ULongLong) :
+                                               (qint64)TID);
+        query.bindValue(":THREAD", (Thread.isEmpty()) ? QString() : Thread);
+        query.bindValue(":FILENAME", (Filename.isEmpty()) ? QString() : Filename);
+        query.bindValue(":LINE", ( Line == 0 ) ? QVariant(QVariant::ULongLong) :
+                                                 (qint64)Line);
+        query.bindValue(":FUNCTION", (Function.isEmpty()) ? QString() : Function);
+        query.bindValue(":FROMTIME", (FromTime.isValid()) ? FromTime : QDateTime());
+        query.bindValue(":TOTIME", (ToTime.isValid()) ? ToTime : QDateTime());
+        query.bindValue(":LEVEL", (Level.isEmpty()) ?
+                                        QVariant(QVariant::ULongLong) :
+                                        (qint64)logLevelGet(Level));
+
+        if (!MsgContains.isEmpty())
+        {
+            query.bindValue(":MSGCONTAINS", "%" + MsgContains + "%" );
+        }
+
+        if (!query.exec())
+        {
+            MythDB::DBError("Retrieving log messages", query);
+            throw( QString( "Database Error executing query." ));
+        }
+
+        while (query.next())
+        {
+            DTC::LogMessage *pLogMessage = pList->AddNewLogMessage();
+
+            pLogMessage->setHostName( query.value(0).toString() );
+            pLogMessage->setApplication( query.value(1).toString() );
+            pLogMessage->setPID( query.value(2).toInt() );
+            pLogMessage->setTID( query.value(3).toInt() );
+            pLogMessage->setThread( query.value(4).toString() );
+            pLogMessage->setFilename( query.value(5).toString() );
+            pLogMessage->setLine( query.value(6).toInt() );
+            pLogMessage->setFunction( query.value(7).toString() );
+            pLogMessage->setTime( query.value(8).toDateTime() );
+            pLogMessage->setLevel( logLevelGetName(
+                                       (LogLevel_t)query.value(9).toInt()) );
+            pLogMessage->setMessage( query.value(10).toString() );
+        }
+    }
+
+    return pList;
 }
 
 /////////////////////////////////////////////////////////////////////////////
