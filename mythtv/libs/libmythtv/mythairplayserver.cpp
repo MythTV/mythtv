@@ -283,7 +283,7 @@ void MythAirplayServer::Cleanup(void)
 
 
 MythAirplayServer::MythAirplayServer()
-  : QTcpServer(), m_name(QString("MythTV")), m_bonjour(NULL), m_valid(false),
+  : ServerPool(), m_name(QString("MythTV")), m_bonjour(NULL), m_valid(false),
     m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5100)
 {
 }
