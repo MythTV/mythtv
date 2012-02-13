@@ -53,8 +53,6 @@ QString LookupUDN( QString sDeviceType )
 {
     QStringList sList = sDeviceType.split(':', QString::SkipEmptyParts);
     QString     sLoc  = "LookupUDN(" + sDeviceType + ')';
-    QString     sName;
-    QString     sUDN;
 
     if (sList.size() <= 2) 
     { 
@@ -63,16 +61,16 @@ QString LookupUDN( QString sDeviceType )
         return QString();
     }
 
-    sName = "UPnP/UDN/" + sList[ sList.size() - 2 ];
-    sUDN  = UPnp::GetConfiguration()->GetValue( sName, "" );
+    sList.removeLast();
+    QString sName = "UPnP/UDN/" + sList.last();
+    QString sUDN  = UPnp::GetConfiguration()->GetValue( sName, "" );
 
     LOG(VB_UPNP, LOG_INFO, sLoc + " sName=" + sName + ", sUDN=" + sUDN);
 
-    if ( sUDN.length() == 0) 
+    if (sUDN.isEmpty()) 
     {
         sUDN = QUuid::createUuid().toString();
-
-        sUDN = sUDN.mid( 1, sUDN.length() - 2);
+	sUDN.chop(2);
 
         Configuration *pConfig = UPnp::GetConfiguration();
 

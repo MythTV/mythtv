@@ -731,7 +731,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
     QString key = pRequest->m_sObjectId.section('=',1);
 
-    if (idPath.count() == 0)
+    if (idPath.isEmpty())
         return( NULL );
 
     // ----------------------------------------------------------------------
@@ -748,9 +748,9 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
         {
             if (pRequest->m_sObjectId.contains("item"))
             {
-                idPath = idPath[idPath.count() - 2].split(
-                    " ", QString::SkipEmptyParts);
-                idPath = idPath[0].split('?', QString::SkipEmptyParts);
+                idPath.removeLast();
+                idPath = idPath.last().split(" ", QString::SkipEmptyParts);
+                idPath = idPath.first().split('?', QString::SkipEmptyParts);
 
                 if (idPath[0].startsWith(QString("Id")))
                     idPath[0] = QString("item=%1")
@@ -1066,12 +1066,12 @@ UPnpCDSExtensionResults *
     //
     // ----------------------------------------------------------------------
 
-    QString sKey = idPath.last().section( '=', 1, 1 );
+    QString sKey = idPath.takeLast().section( '=', 1, 1 );
     sKey = QUrl::fromPercentEncoding(sKey.toUtf8());
 
-    if (sKey.length() > 0)
+    if (!sKey.isEmpty())
     {
-        int nNodeIdx = idPath[ idPath.count() - 2 ].toInt();
+        int nNodeIdx = idPath.takeLast().toInt();
 
         switch( pRequest->m_eBrowseFlag )
         {
