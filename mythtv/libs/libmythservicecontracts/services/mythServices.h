@@ -31,6 +31,8 @@
 #include "datacontracts/settingList.h"
 #include "datacontracts/storageGroupDirList.h"
 #include "datacontracts/timeZoneInfo.h"
+#include "datacontracts/logMessage.h"
+#include "datacontracts/logMessageList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -73,6 +75,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
             DTC::SettingList        ::InitializeCustomTypes();
             DTC::StorageGroupDirList::InitializeCustomTypes();
             DTC::TimeZoneInfo       ::InitializeCustomTypes();
+            DTC::LogMessage         ::InitializeCustomTypes();
+            DTC::LogMessageList     ::InitializeCustomTypes();
         }
 
     public slots:
@@ -95,6 +99,19 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
                                                            const QString   &HostName ) = 0;
 
         virtual DTC::TimeZoneInfo*  GetTimeZone         ( ) = 0;
+
+        virtual DTC::LogMessageList*  GetLogs ( const QString   &HostName,
+                                                const QString   &Application,
+                                                int             PID,
+                                                int             TID,
+                                                const QString   &Thread,
+                                                const QString   &Filename,
+                                                int             Line,
+                                                const QString   &Function,
+                                                const QDateTime &FromTime,
+                                                const QDateTime &ToTime,
+                                                const QString   &Level,
+                                                const QString   &MsgContains ) = 0;
 
         virtual DTC::SettingList*   GetSetting          ( const QString   &HostName,
                                                           const QString   &Key,

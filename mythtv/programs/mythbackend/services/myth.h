@@ -55,6 +55,20 @@ class Myth : public MythServices
 
         DTC::TimeZoneInfo*  GetTimeZone         ( );
 
+        DTC::LogMessageList* GetLogs            ( const QString   &HostName,
+                                                  const QString   &Application,
+                                                  int             PID,
+                                                  int             TID,
+                                                  const QString   &Thread,
+                                                  const QString   &Filename,
+                                                  int             Line,
+                                                  const QString   &Function,
+                                                  const QDateTime &FromTime,
+                                                  const QDateTime &ToTime,
+                                                  const QString   &Level,
+                                                  const QString   &MsgContains
+                                                );
+
         DTC::SettingList*   GetSetting          ( const QString   &HostName, 
                                                   const QString   &Key, 
                                                   const QString   &Default );
@@ -152,6 +166,24 @@ class ScriptableMyth : public QObject
         }
 
         QObject* GetTimeZone() { return m_obj.GetTimeZone( ); }
+
+        QObject* GetLogs( const QString   &HostName,
+                          const QString   &Application,
+                          int             PID,
+                          int             TID,
+                          const QString   &Thread,
+                          const QString   &Filename,
+                          int             Line,
+                          const QString   &Function,
+                          const QDateTime &FromTime,
+                          const QDateTime &ToTime,
+                          const QString   &Level,
+                          const QString   &MsgContains )
+        {
+            return m_obj.GetLogs( HostName, Application, PID, TID, Thread,
+                                  Filename, Line, Function, FromTime, ToTime,
+                                  Level, MsgContains );
+        }
 
         QObject* GetSetting ( const QString   &HostName, 
                               const QString   &Key, 
