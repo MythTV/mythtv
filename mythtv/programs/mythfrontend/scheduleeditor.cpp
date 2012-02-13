@@ -249,29 +249,11 @@ void ScheduleEditor::Load()
     m_rulesList->SetValueByData(ENUM_TO_QVARIANT(type));
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
-
-    switch (m_recordingRule->m_searchType)
-    {
-        case kPowerSearch:
-            progMap["searchType"] = tr("Power Search");
-            break;
-        case kTitleSearch:
-            progMap["searchType"] = tr("Title Search");
-            break;
-        case kKeywordSearch:
-            progMap["searchType"] = tr("Keyword Search");
-            break;
-        case kPeopleSearch:
-            progMap["searchType"] = tr("People Search");
-            break;
-        default:
-            progMap["searchType"] = tr("Unknown Search");
-            break;
-    }
 
     SetTextFromMap(progMap);
 }
