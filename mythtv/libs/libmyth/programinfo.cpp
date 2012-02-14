@@ -1889,7 +1889,7 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     if (dupmethod & kDupCheckNone)
         return false;
 
-    if (title.toLower() != other.title.toLower())
+    if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
 
     if (catType == "series")
@@ -1916,25 +1916,25 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 
     if ((dupmethod & kDupCheckSub) &&
         ((subtitle.isEmpty()) ||
-         (subtitle.toLower() != other.subtitle.toLower())))
+         (subtitle.compare(other.subtitle, Qt::CaseInsensitive) != 0)))
         return false;
 
     if ((dupmethod & kDupCheckDesc) &&
         ((description.isEmpty()) ||
-         (description.toLower() != other.description.toLower())))
+         (description.compare(other.description, Qt::CaseInsensitive) != 0)))
         return false;
 
     if ((dupmethod & kDupCheckSubThenDesc) &&
         ((subtitle.isEmpty() &&
           ((!other.subtitle.isEmpty() &&
-            description.toLower() != other.subtitle.toLower()) ||
+            description.compare(other.subtitle, Qt::CaseInsensitive) != 0) ||
            (other.subtitle.isEmpty() &&
-            description.toLower() != other.description.toLower()))) ||
+            description.compare(other.description, Qt::CaseInsensitive) != 0))) ||
          (!subtitle.isEmpty() &&
           ((other.subtitle.isEmpty() &&
-            subtitle.toLower() != other.description.toLower()) ||
+            subtitle.compare(other.description, Qt::CaseInsensitive) != 0) ||
            (!other.subtitle.isEmpty() &&
-            subtitle.toLower() != other.subtitle.toLower())))))
+            subtitle.compare(other.subtitle, Qt::CaseInsensitive) != 0)))))
         return false;
 
     return true;
@@ -1947,12 +1947,12 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
  */
 bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 {
-    if (title.toLower() != other.title.toLower())
+    if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
     if (startts == other.startts &&
         (chanid == other.chanid ||
          (!chansign.isEmpty() && 
-          chansign.toLower() == other.chansign.toLower())))
+          chansign.compare(other.chansign, Qt::CaseInsensitive) == 0)))
         return true;
 
     return false;
@@ -1966,11 +1966,11 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
  */
 bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 {
-    if (title.toLower() != other.title.toLower())
+    if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
     if ((chanid == other.chanid ||
          (!chansign.isEmpty() && 
-          chansign.toLower() == other.chansign.toLower())) &&
+          chansign.compare(other.chansign, Qt::CaseInsensitive) == 0)) &&
         startts < other.endts &&
         endts > other.startts)
         return true;
