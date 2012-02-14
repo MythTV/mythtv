@@ -6202,32 +6202,29 @@ NULL
             {
                 update.bindValue(":IP4ADDY", "127.0.0.1");
                 insert.bindValue(":IP6ADDY", query.value(0).toString());
-                if (!update.exec() || !insert.exec())
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to separate IPv4 "
-                              "and IPv6 addresses for %1").arg(hostname));
-                    return false;
-                }
             }
             else if (oldaddr.protocol() == QAbstractSocket::IPv4Protocol)
             {
                 update.bindValue(":IP4ADDY", query.value(0).toString());
                 insert.bindValue(":IP6ADDY", "::1");
-                if (!update.exec() || !insert.exec())
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to separate IPv4 "
-                              "and IPv6 addresses for %1").arg(hostname));
-                    return false;
-                }
             }
             else
             {
-                LOG(VB_GENERAL, LOG_WARNING,
+                update.bindValue(":IP4ADDY", "127.0.0.1");
+                insert.bindValue(":IP6ADDY", "::1");
+                LOG(VB_GENERAL, LOG_CRIT,
                     QString("Invalid address string '%1' found on %2. "
-                            "Skipping update")
+                            "Reverting to localhost defaults.")
                         .arg(query.value(0).toString()).arg(hostname));
+            }
+
+            if (!update.exec() || !insert.exec())
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to separate IPv4 "
+                          "and IPv6 addresses for %1").arg(hostname));
                 return false;
             }
+
         }
 
         if (!UpdateDBVersionNumber("1296", dbver))
