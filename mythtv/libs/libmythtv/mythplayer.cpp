@@ -3241,8 +3241,10 @@ void MythPlayer::SetWatched(bool forceWatched)
 
     long long numFrames = totalFrames;
 
-    if (player_ctx->playingInfo->QueryTranscodeStatus() !=
-        TRANSCODING_COMPLETE)
+    // Handle in-progress recordings where totalFrames doesn't represent
+    // the full length of the recording
+    if (player_ctx->playingInfo->IsRecording() &&
+        player_ctx->playingInfo->GetRecordingStatus() == rsRecording)
     {
         uint endtime;
 
