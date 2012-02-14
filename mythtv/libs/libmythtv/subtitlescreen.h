@@ -67,7 +67,7 @@ class SubtitleScreen : public MythScreenType
     void AddScaledImage(QImage &img, QRect &pos);
     void Clear708Cache(int num);
     MythFontProperties* Get708Font(CC708CharacterAttribute attr) const;
-    void SetFontSizes(int small, int medium, int large);
+    void SetFontSizes(int nSmall, int nMedium, int nLarge);
 
     MythPlayer        *m_player;
     SubtitleReader    *m_subreader;

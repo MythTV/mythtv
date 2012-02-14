@@ -861,7 +861,7 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers)
         int y = (int)(((float)orig_y / (float)yscale) *
                       (float)m_safeArea.height());
         FormattedTextLine line(x, y, orig_x, orig_y);
-        for (int chunk = 0; text != QString::null; chunk++)
+        while (!text.isNull())
         {
             QString captionText =
                 extract_cc608(text, cc->teletextmode,
@@ -1304,11 +1304,11 @@ QStringList FormattedTextSubtitle::ToSRT(void) const
     return result;
 }
 
-void SubtitleScreen::SetFontSizes(int small, int medium, int large)
+void SubtitleScreen::SetFontSizes(int nSmall, int nMedium, int nLarge)
 {
-    m_708fontSizes[k708AttrSizeSmall]    = small;
-    m_708fontSizes[k708AttrSizeStandard] = medium;
-    m_708fontSizes[k708AttrSizeLarge]    = large;
+    m_708fontSizes[k708AttrSizeSmall]    = nSmall;
+    m_708fontSizes[k708AttrSizeStandard] = nMedium;
+    m_708fontSizes[k708AttrSizeLarge]    = nLarge;
 }
 
 QSize SubtitleScreen::CalcTextSize(const QString &text,
