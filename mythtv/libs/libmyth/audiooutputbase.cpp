@@ -392,8 +392,7 @@ bool AudioOutputBase::ToggleUpmix(void)
  */
 bool AudioOutputBase::CanUpmix(void)
 {
-    return needs_upmix && IS_VALID_UPMIX_CHANNEL(source_channels) &&
-           configured_channels > 2;
+    return !passthru && source_channels <= 2 && max_channels > 2;
 }
 
 /*
