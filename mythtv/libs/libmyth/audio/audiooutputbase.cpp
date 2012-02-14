@@ -688,7 +688,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             src_out = new float[kAudioSRCOutputSize];
         }
         src_data.data_out       = src_out;
-        src_data.output_frames  = kAudioSRCOutputSize;
+        src_data.output_frames  = kAudioSRCOutputSize / chans;
         src_data.end_of_input = 0;
     }
 
