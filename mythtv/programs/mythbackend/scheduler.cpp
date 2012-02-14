@@ -894,7 +894,7 @@ void Scheduler::BuildListMaps(void)
             p->GetRecordingStatus() == rsUnknown)
         {
             conflictlist.push_back(p);
-            titlelistmap[p->GetTitle()].push_back(p);
+            titlelistmap[p->GetTitle().toLower()].push_back(p);
             recordidlistmap[p->GetRecordingRuleID()].push_back(p);
         }
     }
@@ -1021,7 +1021,7 @@ void Scheduler::MarkOtherShowings(RecordingInfo *p)
 {
     RecList *showinglist;
 
-    showinglist = &titlelistmap[p->GetTitle()];
+    showinglist = &titlelistmap[p->GetTitle().toLower()];
     MarkShowingsList(*showinglist, p);
 
     if (p->GetRecordingRuleType() == kFindOneRecord ||
