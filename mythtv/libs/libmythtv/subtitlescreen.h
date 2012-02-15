@@ -110,7 +110,7 @@ class FormattedTextChunk
         : text(t), format(formatting), parent(p)
     {
     }
-    FormattedTextChunk(void) {}
+    FormattedTextChunk(void) : parent(0) {}
 
     QSize CalcSize(void) const
     {
@@ -155,9 +155,23 @@ class FormattedTextSubtitle
     FormattedTextSubtitle(const QRect &safearea, bool useBackground,
                           SubtitleScreen *p)
         : m_safeArea(safearea), m_useBackground(useBackground),
-          parent(p) {}
+          parent(p)
+    {
+        // make cppcheck happy
+        m_xAnchorPoint = 0;
+        m_yAnchorPoint = 0;
+        m_xAnchor = 0;
+        m_yAnchor = 0;
+    }
     FormattedTextSubtitle(void)
-        : m_safeArea(QRect()), m_useBackground(false), parent(0) {}
+        : m_safeArea(QRect()), m_useBackground(false), parent(0)
+    {
+        // make cppcheck happy
+        m_xAnchorPoint = 0;
+        m_yAnchorPoint = 0;
+        m_xAnchor = 0;
+        m_yAnchor = 0;
+    }
     void InitFromCC608(vector<CC608Text*> &buffers);
     void InitFromCC708(const CC708Window &win, int num,
                        const vector<CC708String*> &list,
