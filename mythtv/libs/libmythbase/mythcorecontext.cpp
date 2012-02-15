@@ -993,18 +993,20 @@ QString MythCoreContext::GetBackendServerIP(const QString &host)
 {
     QString addr4, addr6;
 #if !defined(QT_NO_IPV6)
-    if (!d->m_IPv6.empty())
+    if (!d->m_IPv6.isEmpty())
         // we have IPv6 addresses, assume we can connect to them
-        QString addr6 = GetSettingOnHost("BackendServerIP6", host, "");
+        addr6 = GetSettingOnHost("BackendServerIP6", host, "");
 #endif
-    if (!d->m_IPv4.empty())
-        QString addr4 = GetSettingOnHost("BackendServerIP", host, "");
+    if (!d->m_IPv4.isEmpty())
+        addr4 = GetSettingOnHost("BackendServerIP", host, "");
 
     if (addr6.isEmpty())
     {
         if (addr4.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR, "No address defined for host: "+host);
+sleep(2);
+abort();
             return "";
         }
 
