@@ -37,7 +37,6 @@
 #include "channelscantypes.h"
 
 class ScanMonitor;
-class IPTVChannelFetcher;
 class ChannelScanSM;
 class ChannelBase;
 
@@ -74,9 +73,6 @@ class MTV_PUBLIC ChannelScanner
     virtual DTVConfParser::return_t ImportDVBUtils(
         uint sourceid, int cardtype, const QString &file);
 
-    virtual bool ImportM3U(uint cardid, const QString &inputname,
-                           uint sourceid);
-
   protected:
     virtual void Teardown(void);
 
@@ -98,7 +94,6 @@ class MTV_PUBLIC ChannelScanner
 
     // Low level channel scanners
     ChannelScanSM      *sigmonScanner;
-    IPTVChannelFetcher *freeboxScanner;
 
     /// imported channels
     DTVChannelList      channels;

@@ -1,12 +1,9 @@
 // -*- Mode: c++ -*-
 
-#include <unistd.h>
-
 // MythTV headers
+#include "iptvsignalmonitor.h"
 #include "mpegstreamdata.h"
 #include "iptvchannel.h"
-#include "iptvfeederwrapper.h"
-#include "iptvsignalmonitor.h"
 #include "mythlogging.h"
 
 #undef DBG_SM
@@ -42,12 +39,8 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
     DTVSignalMonitor(db_cardnum, _channel, _flags),
     dtvMonitorRunning(false), tableMonitorThread(NULL)
 {
-    bool isLocked = false;
-    IPTVChannelInfo chaninfo = GetChannel()->GetCurrentChanInfo();
-    if (chaninfo.isValid())
-    {
-        isLocked = GetChannel()->GetFeeder()->Open(chaninfo.m_url);
-    }
+    // TODO init isLocked
+    bool isLocked = true;
 
     QMutexLocker locker(&statusLock);
     signalLock.SetValue((isLocked) ? 1 : 0);
@@ -59,7 +52,6 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
  */
 IPTVSignalMonitor::~IPTVSignalMonitor()
 {
-    GetChannel()->GetFeeder()->RemoveListener(this);
     Stop();
 }
 
@@ -74,11 +66,9 @@ IPTVChannel *IPTVSignalMonitor::GetChannel(void)
 void IPTVSignalMonitor::Stop(void)
 {
     DBG_SM("Stop", "begin");
-    GetChannel()->GetFeeder()->RemoveListener(this);
     SignalMonitor::Stop();
     if (tableMonitorThread)
     {
-        GetChannel()->GetFeeder()->Stop();
         dtvMonitorRunning = false;
         tableMonitorThread->wait();
         delete tableMonitorThread;
@@ -96,20 +86,12 @@ void IPTVSignalMonitor::RunTableMonitor(void)
 
     GetStreamData()->AddListeningPID(0);
 
-    GetChannel()->GetFeeder()->AddListener(this);
-    GetChannel()->GetFeeder()->Run();
-    GetChannel()->GetFeeder()->RemoveListener(this);
+    // TODO IMPLEMENT -- RTP/UDP reading..
 
     while (dtvMonitorRunning)
         usleep(10000);
 
     DBG_SM("Run", "end");
-}
-
-void IPTVSignalMonitor::AddData(
-    const unsigned char *data, unsigned int dataSize)
-{
-    GetStreamData()->ProcessData((unsigned char*)data, dataSize);
 }
 
 /** \fn IPTVSignalMonitor::UpdateValues(void)

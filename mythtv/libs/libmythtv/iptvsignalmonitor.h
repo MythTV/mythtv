@@ -20,7 +20,7 @@ class IPTVTableMonitorThread : public MThread
     IPTVSignalMonitor *m_parent;
 };
 
-class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
+class IPTVSignalMonitor : public DTVSignalMonitor
 {
     friend class IPTVTableMonitorThread;
   public:
@@ -29,9 +29,6 @@ class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
     virtual ~IPTVSignalMonitor();
 
     void Stop(void);
-
-    // implements TSDataListener
-    void AddData(const unsigned char *data, unsigned int dataSize);
 
   protected:
     IPTVSignalMonitor(void);
