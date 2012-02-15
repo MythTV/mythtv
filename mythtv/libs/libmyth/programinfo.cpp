@@ -1528,6 +1528,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["recstatus"] = ::toString(GetRecordingStatus(),
                                       GetRecordingRuleType());
+    progMap["recstatuslong"] = ::toDescription(GetRecordingStatus(),
+                                               GetRecordingRuleType(),
+                                               GetRecordingStartTime());
 
     if (IsRepeat())
     {
@@ -1609,7 +1612,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         case kProgramInfoTypeRecording : // Fall through
         default :
             mediaType = "recording";
-            mediaTypeString = tr("Recording", "Recorded file, object not action");
+            mediaTypeString = QObject::tr("Recording",
+                                          "Recorded file, object not action");
     }
     progMap["mediatype"] = mediaType;
     progMap["mediatypestring"] = mediaTypeString;

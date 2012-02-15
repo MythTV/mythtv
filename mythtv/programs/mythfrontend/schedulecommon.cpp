@@ -9,7 +9,7 @@
 #include "programinfo.h"
 #include "remoteutil.h"
 
-// libmythtv 
+// libmythtv
 #include "recordinginfo.h"
 #include "tvremoteutil.h"
 
@@ -31,23 +31,23 @@ void ScheduleCommon::ShowDetails(ProgramInfo *pginfo) const
 {
     if (!pginfo)
         return;
-    
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgDetails *details_dialog  = new ProgDetails(mainStack, pginfo);
-    
+
     if (!details_dialog->Create())
     {
         delete details_dialog;
         return;
     }
-    
+
     mainStack->AddScreen(details_dialog);
 }
 
 /**
 *  \brief Show the upcoming recordings for this title
 */
-void ScheduleCommon::ShowUpcoming(const QString &title, 
+void ScheduleCommon::ShowUpcoming(const QString &title,
                                   const QString &seriesid) const
 {
     if (title.isEmpty())
@@ -106,7 +106,7 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
 {
     if (!pginfo)
         return;
-    
+
     RecordingInfo ri(*pginfo);
 
     if (!ri.GetRecordingRuleID())
@@ -124,7 +124,7 @@ void ScheduleCommon::EditScheduled(ProgramInfo *pginfo)
 {
     if (!pginfo)
         return;
-    
+
     RecordingInfo ri(*pginfo);
     EditScheduled(&ri);
 }
@@ -167,10 +167,10 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo, bool startActive)
         return;
 
     RecordingRule *recrule = new RecordingRule();
-    
+
     if (!recrule->LoadByProgram(static_cast<ProgramInfo*>(recinfo)))
         LOG(VB_GENERAL, LOG_ERR, "Failed to load by program info");
-    
+
     if (!recrule->MakeOverride())
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to make Override");
@@ -195,21 +195,22 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo, bool startActive)
 void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
 {
     QString message = recinfo.toString(ProgramInfo::kTitleSubtitle, " - ");
-    
+
     message += "\n\n";
-    message += toDescription(
-        recinfo.GetRecordingStatus(), recinfo.GetRecordingStartTime());
-    
+    message += toDescription(recinfo.GetRecordingStatus(),
+                             recinfo.GetRecordingRuleType(),
+                             recinfo.GetRecordingStartTime());
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythDialogBox *menuPopup = new MythDialogBox(message, popupStack,
                                                  "recOptionPopup", true);
-    
+
     if (menuPopup->Create())
     {
         menuPopup->SetReturnEvent(this, "schedulerecording");
 
         QDateTime now = QDateTime::currentDateTime();
-        
+
         if (recinfo.GetRecordingStartTime() < now &&
             recinfo.GetRecordingEndTime() > now)
         {
@@ -257,7 +258,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                                              qVariantFromValue(recinfo));
                     }
             }
-            
+
             if (recinfo.GetRecordingRuleType() != kOverrideRecord &&
                 recinfo.GetRecordingRuleType() != kDontRecord)
             {
@@ -270,7 +271,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                 {
                     menuPopup->AddButton(tr("Edit Options"),
                                          qVariantFromValue(recinfo));
-                    
+
                     if (recinfo.GetRecordingRuleType() != kSingleRecord &&
                         recinfo.GetRecordingRuleType() != kFindOneRecord)
                     {
@@ -279,7 +280,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                     }
                 }
             }
-            
+
             if (recinfo.GetRecordingRuleType() == kOverrideRecord ||
                 recinfo.GetRecordingRuleType() == kDontRecord)
             {
@@ -296,8 +297,8 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                                          qVariantFromValue(recinfo));
                 }
             }
-        }        
-        
+        }
+
         popupStack->AddScreen(menuPopup);
     }
     else
@@ -315,8 +316,9 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
     QString message = recinfo.toString(ProgramInfo::kTitleSubtitle, " - ");
 
     message += "\n\n";
-    message += toDescription(
-        recinfo.GetRecordingStatus(), recinfo.GetRecordingStartTime());
+    message += toDescription(recinfo.GetRecordingStatus(),
+                             recinfo.GetRecordingRuleType(),
+                             recinfo.GetRecordingStartTime());
 
     if (recinfo.GetRecordingStatus() == rsConflict ||
         recinfo.GetRecordingStatus() == rsLaterShowing)
@@ -454,7 +456,7 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
                                     qVariantFromValue(recinfo));
             }
         }
-        
+
         popupStack->AddScreen(menuPopup);
     }
     else
@@ -513,10 +515,10 @@ void ScheduleCommon::customEvent(QEvent *event)
         {
             if (!qVariantCanConvert<RecordingInfo>(dce->GetData()))
                 return;
-            
+
             RecordingInfo recInfo = qVariantValue<RecordingInfo>
                                                             (dce->GetData());
-            
+
             if (resulttext == tr("Reactivate"))
                 recInfo.ReactivateRecording();
             else if (resulttext == tr("Stop recording"))

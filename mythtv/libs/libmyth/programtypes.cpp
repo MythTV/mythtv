@@ -215,8 +215,12 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
 }
 
 /// \brief Converts "recstatus" into a long human readable description.
-QString toDescription(RecStatusType recstatus, const QDateTime &recstartts)
+QString toDescription(RecStatusType recstatus, RecordingType rectype,
+                      const QDateTime &recstartts)
 {
+    if (rectype == kNotRecording)
+        return QObject::tr("This showing is not scheduled to record");
+
     QString message;
     QDateTime now = QDateTime::currentDateTime();
 

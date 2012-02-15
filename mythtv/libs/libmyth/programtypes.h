@@ -99,7 +99,7 @@ typedef enum SkipTypes {
      * are just too many false positives from non-commercial cut scenes. */
     COMM_DETECT_2_ALL       = (COMM_DETECT_2_LOGO | COMM_DETECT_2_BLANK),
 
-    COMM_DETECT_PREPOSTROLL = 0x00000200,    
+    COMM_DETECT_PREPOSTROLL = 0x00000200,
     COMM_DETECT_PREPOSTROLL_ALL = (COMM_DETECT_PREPOSTROLL
                                    | COMM_DETECT_BLANKS
                                    | COMM_DETECT_SCENE)
@@ -144,7 +144,7 @@ typedef enum FlagMask {
 } ProgramFlag;
 
 typedef enum ProgramInfoType {
-    kProgramInfoTypeRecording = 0,    
+    kProgramInfoTypeRecording = 0,
     kProgramInfoTypeVideoFile,
     kProgramInfoTypeVideoDVD,
     kProgramInfoTypeVideoStreamingHTML,
@@ -227,7 +227,8 @@ typedef enum RecStatusTypes {
 MPUBLIC QString toUIState(RecStatusType);
 MPUBLIC QString toString(RecStatusType, uint id);
 MPUBLIC QString toString(RecStatusType, RecordingType);
-MPUBLIC QString toDescription(RecStatusType, const QDateTime &recstartts);
+MPUBLIC QString toDescription(RecStatusType, RecordingType,
+                              const QDateTime &recstartts);
 
 typedef enum AvailableStatusTypes {
     asAvailable = 0,
