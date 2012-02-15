@@ -630,7 +630,8 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
         // subtitle, it's *probably* a movie.  If it's some
         // weird combination of both, we've got to try everything.
         RecordingRule *rule = new RecordingRule();
-        rule->LoadByProgram(pginfo);
+        rule->m_recordID = pginfo->GetRecordingRuleID();
+        rule->Load();
         int ruleepisode = rule->m_episode;
         delete rule;
 
