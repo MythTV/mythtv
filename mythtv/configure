@@ -4304,12 +4304,15 @@ if enabled bindings_perl; then
     check_pl_lib "Sys::Hostname"  || disable_bindings_perl "Sys::Hostname"
 # Modules not distributed in Perl core
     check_pl_lib DBI              || disable_bindings_perl DBI
+    check_pl_lib "DBD::mysql"     || disable_bindings_perl "DBD::mysql"
     check_pl_lib "HTTP::Request"  || disable_bindings_perl "HTTP::Request"
     check_pl_lib "LWP::UserAgent" || disable_bindings_perl "LWP::UserAgent"
     check_pl_lib "Net::UPnP::QueryResponse" ||
         disable_bindings_perl "Net::UPnP::QueryResponse"
     check_pl_lib "Net::UPnP::ControlPoint"  ||
         disable_bindings_perl "Net::UPnP::ControlPoint"
+    check_pl_lib "IO::Socket::INET6"  ||
+        disable_bindings_perl "IO::Socket::INET6"
 fi
 
 # Check for php dependencies
