@@ -1005,8 +1005,6 @@ QString MythCoreContext::GetBackendServerIP(const QString &host)
         if (addr4.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR, "No address defined for host: "+host);
-sleep(2);
-abort();
             return "";
         }
 
