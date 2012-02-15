@@ -463,6 +463,12 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
         if (state)
             state->DisplayState(map["nightmode"]);
     }
+    if (map.contains("mediatype"))
+    {
+        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("mediatype"));
+        if (state)
+            state->DisplayState(map["mediatype"]);
+    }
 
     MythUIProgressBar *bar =
         dynamic_cast<MythUIProgressBar *>(win->GetChild("elapsedpercent"));

@@ -1578,6 +1578,41 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["originalairdate"] = MythDateToString(originalAirDate, kDateFull);
         progMap["shortoriginalairdate"] = MythDateToString(originalAirDate, kDateShort);
     }
+
+    // 'mediatype' for a statetype, so untranslated
+    // 'mediatypestring' for textarea, so translated
+    // TODO Move to a dedicated ToState() method?
+    QString mediaType;
+    QString mediaTypeString;
+    switch (GetProgramInfoType())
+    {
+        case kProgramInfoTypeVideoFile :
+            mediaType = "video";
+            mediaTypeString = QObject::tr("Video");
+            break;
+        case kProgramInfoTypeVideoDVD :
+            mediaType = "dvd";
+            mediaTypeString = QObject::tr("DVD");
+            break;
+        case kProgramInfoTypeVideoStreamingHTML :
+            mediaType = "httpstream";
+            mediaTypeString = QObject::tr("HTTP Streaming");
+            break;
+        case kProgramInfoTypeVideoStreamingRTSP :
+            mediaType = "rtspstream";
+            mediaTypeString = QObject::tr("RTSP Streaming");
+            break;
+        case kProgramInfoTypeVideoBD :
+            mediaType = "bluraydisc";
+            mediaTypeString = QObject::tr("Blu-Ray Disc");
+            break;
+        case kProgramInfoTypeRecording : // Fall through
+        default :
+            mediaType = "recording";
+            mediaTypeString = tr("Recording", "Recorded file, object not action");
+    }
+    progMap["mediatype"] = mediaType;
+    progMap["mediatypestring"] = mediaTypeString;
 }
 
 /// \brief Returns length of program/recording in seconds.
@@ -1951,7 +1986,7 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
         return false;
     if (startts == other.startts &&
         (chanid == other.chanid ||
-         (!chansign.isEmpty() && 
+         (!chansign.isEmpty() &&
           chansign.compare(other.chansign, Qt::CaseInsensitive) == 0)))
         return true;
 
@@ -1969,7 +2004,7 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
     if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
     if ((chanid == other.chanid ||
-         (!chansign.isEmpty() && 
+         (!chansign.isEmpty() &&
           chansign.compare(other.chansign, Qt::CaseInsensitive) == 0)) &&
         startts < other.endts &&
         endts > other.startts)
@@ -2003,7 +2038,7 @@ void ProgramInfo::CheckProgramIDAuthorities(void)
     }
 
     int numAuths = authMap.count();
-    LOG(VB_GENERAL, LOG_INFO, 
+    LOG(VB_GENERAL, LOG_INFO,
         QString("Found %1 distinct programid authorities").arg(numAuths));
 
     usingProgIDAuth = (numAuths > 1);
