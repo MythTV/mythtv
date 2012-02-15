@@ -3055,7 +3055,12 @@ void MythPlayer::SetWatched(bool forceWatched)
 
     long long numFrames = totalFrames;
 
-    if (player_ctx->playingInfo->QueryTranscodeStatus() !=
+    // For recordings we want to ignore the post-roll and account for
+    // in-progress recordings where totalFrames doesn't represent
+    // the full length of the recording. For videos we can only rely on
+    // totalFrames as duration metadata can be wrong
+    if (player_ctx->playingInfo->IsRecording() &&
+        player_ctx->playingInfo->QueryTranscodeStatus() !=
         TRANSCODING_COMPLETE)
     {
         uint endtime;
