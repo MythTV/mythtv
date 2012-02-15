@@ -110,7 +110,7 @@ class FormattedTextChunk
         : text(t), format(formatting), parent(p)
     {
     }
-    FormattedTextChunk(void) : parent(0) {}
+    FormattedTextChunk(void) : parent(NULL) {}
 
     QSize CalcSize(void) const
     {
@@ -164,7 +164,7 @@ class FormattedTextSubtitle
         m_yAnchor = 0;
     }
     FormattedTextSubtitle(void)
-        : m_safeArea(QRect()), m_useBackground(false), parent(0)
+        : m_safeArea(QRect()), m_useBackground(false), parent(NULL)
     {
         // make cppcheck happy
         m_xAnchorPoint = 0;
