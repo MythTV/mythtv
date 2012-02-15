@@ -488,6 +488,17 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     infoMap["searchtype"] = SearchTypeToString(m_searchType);
     if (m_searchType != kNoSearch)
         infoMap["searchforwhat"] = m_description;
+
+
+    if (m_nextRecording.isValid())
+        infoMap["nextrecording"] = MythDateTimeToString(m_nextRecording,
+                                                        kDateFull | kAddYear);
+    if (m_lastRecorded.isValid())
+        infoMap["lastrecorded"] = MythDateTimeToString(m_lastRecorded,
+                                                       kDateFull | kAddYear);
+    if (m_lastDeleted.isValid())
+        infoMap["lastdeleted"] = MythDateTimeToString(m_lastDeleted,
+                                                      kDateFull | kAddYear);
 }
 
 void RecordingRule::UseTempTable(bool usetemp, QString table)
