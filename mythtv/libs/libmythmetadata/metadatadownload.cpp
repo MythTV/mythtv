@@ -620,9 +620,11 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
     args.append("-M");
     QString title = lookup->GetTitle();
     args.append(title);
-    lookup->SetSubtype(kProbableGenericTelevision);
+    LookupType origtype = lookup->GetSubtype();
     int origseason = lookup->GetSeason();
     int origepisode = lookup->GetEpisode();
+
+    lookup->SetSubtype(kProbableTelevision);
 
     if (origseason == 0 && origepisode == 0)
     {
@@ -640,6 +642,7 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
 
     lookup->SetSeason(origseason);
     lookup->SetEpisode(origepisode);
+    lookup->SetSubtype(origtype);
 
     return list;
 }
