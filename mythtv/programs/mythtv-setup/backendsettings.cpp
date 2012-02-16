@@ -31,6 +31,12 @@ static HostLineEdit *LocalServerIP6()
                     "Use an externally accessible address (ie, not "
                     "::1) if you are going to be running a frontend "
                     "on a different machine than this one."));
+#if defined(QT_NO_IPV6)
+    gc->setEnabled(false);
+#else
+    if (gCoreContext->MythHostAddress6().isEmpty())
+        gc->setEnabled(false);
+#endif
     return gc;
 }
 

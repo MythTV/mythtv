@@ -8613,13 +8613,13 @@ void TV::customEvent(QEvent *e)
     }
     else if (message.left(14) == "DONE_RECORDING")
     {
-        // int seconds = 0;
-        long long frames = 0;
+        int seconds = 0;
+        //long long frames = 0;
         if (tokens.size() >= 4)
         {
             cardnum = tokens[1].toUInt();
-            // seconds = tokens[2].toInt();
-            frames = tokens[3].toLongLong();
+            seconds = tokens[2].toInt();
+            //frames = tokens[3].toLongLong();
         }
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
@@ -8634,7 +8634,7 @@ void TV::customEvent(QEvent *e)
                     if (ctx->player)
                     {
                         ctx->player->SetWatchingRecording(false);
-                        ctx->player->SetLength((int)(frames / ctx->player->GetFrameRate()));
+                        ctx->player->SetLength(seconds);
                     }
                     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -8651,8 +8651,7 @@ void TV::customEvent(QEvent *e)
                     if (ctx->player)
                     {
                         ctx->player->SetWatchingRecording(false);
-                        ctx->player->SetLength((int)(frames /
-                                                  ctx->player->GetFrameRate()));
+                        ctx->player->SetLength(seconds);
                     }
                     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
                 }

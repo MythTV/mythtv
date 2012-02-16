@@ -1527,16 +1527,6 @@ int main(int argc, char **argv)
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    if (!cmdline.toBool("noupnp"))
-    {
-        g_pUPnp  = new MediaRenderer();
-        if (!g_pUPnp->initialized())
-        {
-            delete g_pUPnp;
-            g_pUPnp = NULL;
-        }
-    }
-
     if (!gContext->Init(true, bPromptForBackend, bBypassAutoDiscovery))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
@@ -1553,6 +1543,16 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("reset"))
         ResetSettings = true;
+
+    if (!cmdline.toBool("noupnp"))
+    {
+        g_pUPnp  = new MediaRenderer();
+        if (!g_pUPnp->initialized())
+        {
+            delete g_pUPnp;
+            g_pUPnp = NULL;
+        }
+    }
 
     QString fileprefix = GetConfDir();
 

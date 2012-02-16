@@ -25,8 +25,6 @@ class SubtitleScreen : public MythScreenType
 {
     friend class FormattedTextSubtitle;
 
-    static bool Initialise708Fonts(int fontStretch = QFont::Unstretched);
-
   public:
     SubtitleScreen(MythPlayer *player, const char * name, int fontStretch);
     virtual ~SubtitleScreen();
@@ -66,6 +64,7 @@ class SubtitleScreen : public MythScreenType
     void DisplayCC708Subtitles(void);
     void AddScaledImage(QImage &img, QRect &pos);
     void Clear708Cache(int num);
+    bool InitializeFonts(bool wasResized);
     MythFontProperties* Get708Font(CC708CharacterAttribute attr) const;
     void SetFontSizes(int nSmall, int nMedium, int nLarge);
 
@@ -83,6 +82,9 @@ class SubtitleScreen : public MythScreenType
     bool               m_refreshArea;
     QHash<int,QList<MythUIType*> > m_708imageCache;
     int                m_fontStretch;
+    bool               m_fontsAreInitialized;
+    QStringList        m_fontNames;
+    QHash<int, MythFontProperties*> m_fontSet;
 
 #ifdef USING_LIBASS
     bool InitialiseAssLibrary(void);
