@@ -7,6 +7,7 @@
  */
 
 // MythTV headers
+#include "iptvstreamhandler.h"
 #include "iptvchannel.h"
 #include "mythlogging.h"
 #include "mythdb.h"
@@ -40,6 +41,8 @@ bool IPTVChannel::Open(void)
     }
 
     m_open = true;
+    if (!m_last_channel_id.isEmpty())
+        m_stream_handler = IPTVStreamHandler::Get(m_last_channel_id);
 
     return m_open;
 }
@@ -48,14 +51,13 @@ void IPTVChannel::Close(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Close()");
     QMutexLocker locker(&m_lock);
-    m_open = false;
+    if (m_stream_handler)
+        IPTVStreamHandler::Return(m_stream_handler);
 }
 
 bool IPTVChannel::IsOpen(void) const
 {
     QMutexLocker locker(&m_lock);
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("IsOpen() -> %1")
-        .arg(m_open ? "true" : "false"));
     return m_open;
 }
 
@@ -66,7 +68,24 @@ bool IPTVChannel::Tune(const QString &freqid, int finetune)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Tune(%1) TO BE IMPLEMENTED")
         .arg(freqid));
 
-    // TODO IMPLEMENT
+    // TODO IMPLEMENT query from DB
+
+    QHostAddress addr(QHostAddress::Any);
+
+    int ports[3];
+    ports[0] = 5555;
+    ports[1] = -1;
+    ports[2] = -1;
+
+    QString channel_id = QString("%1!%2!%3!%4")
+        .arg(addr.toString()).arg(ports[0]).arg(ports[1]).arg(ports[2]);
+
+    if (m_stream_handler)
+        IPTVStreamHandler::Return(m_stream_handler);
+
+    m_stream_handler = IPTVStreamHandler::Get(channel_id);
+
+    m_last_channel_id = channel_id;
 
     return false;
 }

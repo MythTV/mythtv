@@ -15,6 +15,8 @@
 // MythTV headers
 #include "dtvchannel.h"
 
+class IPTVStreamHandler;
+
 class IPTVChannel : public DTVChannel
 {
   public:
@@ -32,6 +34,8 @@ class IPTVChannel : public DTVChannel
   private:
     mutable QMutex m_lock;
     volatile bool m_open;
+    QString m_last_channel_id;
+    IPTVStreamHandler *m_stream_handler;
 };
 
 #endif // _IPTV_CHANNEL_H_
