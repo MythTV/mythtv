@@ -24,6 +24,8 @@ class IPTVChannel;
 
 class IPTVStreamHandlerReadHelper : QObject
 {
+    Q_OBJECT
+
   public:
     IPTVStreamHandlerReadHelper(IPTVStreamHandler *p, QUdpSocket *s, uint stream) :
         m_parent(p), m_socket(s), m_stream(stream)
@@ -43,6 +45,8 @@ class IPTVStreamHandlerReadHelper : QObject
 
 class IPTVStreamHandlerWriteHelper : QObject
 {
+    Q_OBJECT
+
   public:
     IPTVStreamHandlerWriteHelper(IPTVStreamHandler *p) : m_parent(p) { }
     ~IPTVStreamHandlerWriteHelper()
@@ -86,10 +90,9 @@ class IPTVStreamHandler : public StreamHandler
   private:
     IPTVStreamHandler(const QString &);
 
-    bool Open(void) { return true; }
-    void Close(void) { MThread::exit(0); }
-
     virtual void run(void); // MThread
+
+    virtual void SetRunningDesired(bool desired); // StreamHandler
 
   private:
     // TODO should we care about who is broadcasting to us?

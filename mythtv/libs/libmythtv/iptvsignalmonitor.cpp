@@ -63,6 +63,13 @@ void IPTVSignalMonitor::Stop(void)
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
 
+void IPTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
+{
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("HandlePAT pn: %1")
+        .arg(programNumber));
+    DTVSignalMonitor::HandlePAT(pat);
+}
+
 /** \fn IPTVSignalMonitor::UpdateValues(void)
  *  \brief Fills in frontend stats and emits status Qt signals.
  *

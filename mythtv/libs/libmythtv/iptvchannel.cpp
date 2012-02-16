@@ -16,7 +16,8 @@
 #define LOC QString("IPTVChan(%1): ").arg(GetCardID())
 
 IPTVChannel::IPTVChannel(TVRec *rec, const QString&) :
-    DTVChannel(rec), m_open(false), m_stream_data(NULL)
+    DTVChannel(rec), m_open(false),
+    m_stream_handler(NULL), m_stream_data(NULL)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 }
@@ -53,7 +54,7 @@ void IPTVChannel::SetStreamData(MPEGStreamData *sd)
 {
     QMutexLocker locker(&m_lock);
     if (m_stream_data && m_stream_handler)
-        m_stream_handler->RemoveListener(sd);
+        m_stream_handler->RemoveListener(m_stream_data);
     m_stream_data = sd;
     if (m_stream_data && m_stream_handler)
         m_stream_handler->AddListener(m_stream_data);
@@ -105,7 +106,7 @@ bool IPTVChannel::Tune(const QString &freqid, int finetune)
 
     m_last_channel_id = channel_id;
 
-    return false;
+    return true;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

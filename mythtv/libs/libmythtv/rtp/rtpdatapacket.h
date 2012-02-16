@@ -9,6 +9,7 @@
 #include <arpa/inet.h> // for ntohs()/ntohl()
 
 #include "udppacket.h"
+#include "mythlogging.h"
 
 /** \brief RTP Data Packet
  *
@@ -33,32 +34,46 @@ class RTPDataPacket : public UDPPacket
     bool IsValid(void) const
     {
         if (m_data.size() < 12)
+        {
             return false;
-
+        }
         if (2 != GetVersion())
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Version incorrect %1")
+                .arg(GetVersion()));
             return false;
-
+        }
         if (HasPadding() && (m_data.size() < 1328))
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("HasPadding && %1 < 1328")
+                .arg(m_data.size()));
             return false;
+        }
 
         int off = 12 + 4 * GetCSRCCount();
         if (off > m_data.size())
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("off %1 > sz %2")
+                .arg(off).arg(m_data.size()));
             return false;
-
+        }
         if (HasExtension())
         {
             uint ext_size = m_data[off+2] << 8 | m_data[off+3];
             off += 4 * (1 + ext_size);
         }
         if (off > m_data.size())
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("off + ext %1 > sz %2")
+                .arg(off).arg(m_data.size()));
             return false;
-
+        }
         m_off = off;
 
         return true;
     }
 
-    uint GetVersion(void) const { return (m_data[0] >> 6); }
+    uint GetVersion(void) const { return (m_data[0] >> 6) & 0x3; }
     bool HasPadding(void) const { return (m_data[0] >> 5) & 0x1; }
     bool HasExtension(void) const { return (m_data[0] >> 4) & 0x1; }
     uint GetCSRCCount(void) const { return m_data[0] & 0xf; }

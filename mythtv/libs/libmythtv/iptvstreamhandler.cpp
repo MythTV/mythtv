@@ -28,7 +28,7 @@ IPTVStreamHandler *IPTVStreamHandler::Get(const QString &devname)
     if (it == s_handlers.end())
     {
         IPTVStreamHandler *newhandler = new IPTVStreamHandler(devkey);
-        newhandler->Open();
+        newhandler->Start();
         s_handlers[devkey] = newhandler;
         s_handlers_refcnt[devkey] = 1;
 
@@ -71,7 +71,7 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
     {
         LOG(VB_RECORD, LOG_INFO, QString("IPTVSH: Closing handler for %1")
                            .arg(devname));
-        ref->Close();
+        ref->Stop();
         delete *it;
         s_handlers.erase(it);
     }
@@ -89,6 +89,7 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
 IPTVStreamHandler::IPTVStreamHandler(const QString &device) :
     StreamHandler(device)
 {
+    memset(m_sockets, 0, sizeof(m_sockets));
     QStringList parts = device.split("!");
     if (parts.size() >= 5)
     {
@@ -107,9 +108,20 @@ IPTVStreamHandler::IPTVStreamHandler(const QString &device) :
     }
 }
 
+void IPTVStreamHandler::SetRunningDesired(bool desired)
+{
+    StreamHandler::SetRunningDesired(desired);
+    if (!desired)
+        exit(0);
+}
+
 void IPTVStreamHandler::run(void)
 {
     RunProlog();
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + "run()");
+
+    SetRunning(true, false, false);
 
     // TODO Error handling..
 
@@ -125,6 +137,7 @@ void IPTVStreamHandler::run(void)
     }
     m_buffer = new RTPPacketBuffer(m_bitrate);
     m_write_helper = new IPTVStreamHandlerWriteHelper(this);
+    m_write_helper->Start();
 
     // Enter event loop
     exec();
@@ -145,6 +158,7 @@ void IPTVStreamHandler::run(void)
     delete m_write_helper;
     m_write_helper = NULL;
 
+    SetRunning(false, false, false);
     RunEpilog();
 }
 
@@ -209,7 +223,10 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent*)
             IPTVStreamHandler::StreamDataList::const_iterator sit;
             sit = m_parent->_stream_data_list.begin();
             for (; sit != m_parent->_stream_data_list.end(); ++sit)
-                remainder = sit.key()->ProcessData(ts_packet.GetTSData(), ts_packet.GetTSDataSize());
+            {
+                remainder = sit.key()->ProcessData(
+                    ts_packet.GetTSData(), ts_packet.GetTSDataSize());
+            }
 
             m_parent->_listener_lock.unlock();
 
