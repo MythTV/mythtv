@@ -569,9 +569,13 @@ using_backend {
     # Support for RTP/UDP streams
     HEADERS += iptvchannel.h              iptvrecorder.h
     HEADERS += iptvsignalmonitor.h        iptvstreamhandler.h
+    HEADERS += rtppacketbuffer.h          udppacket.h                
+    HEADERS += rtpdatapacket.h            rtpfecpacket.h
 
     SOURCES += iptvchannel.cpp            iptvrecorder.cpp
     SOURCES += iptvsignalmonitor.cpp      iptvstreamhandler.cpp
+    SOURCES += rtppacketbuffer.cpp
+    DEFINES += USING_IPTV
 
     # Support for HDHomeRun box
     using_hdhomerun {

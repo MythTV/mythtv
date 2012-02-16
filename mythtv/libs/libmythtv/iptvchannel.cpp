@@ -8,14 +8,15 @@
 
 // MythTV headers
 #include "iptvstreamhandler.h"
+#include "iptvrecorder.h"
 #include "iptvchannel.h"
 #include "mythlogging.h"
 #include "mythdb.h"
 
 #define LOC QString("IPTVChan(%1): ").arg(GetCardID())
 
-IPTVChannel::IPTVChannel(TVRec *rec) :
-    DTVChannel(rec), m_open(false)
+IPTVChannel::IPTVChannel(TVRec *rec, const QString&) :
+    DTVChannel(rec), m_open(false), m_recorder(NULL)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 }
@@ -47,6 +48,16 @@ bool IPTVChannel::Open(void)
     return m_open;
 }
 
+void IPTVChannel::SetRecorder(IPTVRecorder *rec)
+{
+    QMutexLocker locker(&m_lock);
+    if (m_recorder && m_stream_handler && m_recorder->GetStreamData())
+        m_stream_handler->RemoveListener(m_recorder->GetStreamData());
+    m_recorder = rec;
+    if (m_recorder && m_stream_handler && m_recorder->GetStreamData())
+        m_stream_handler->AddListener(m_recorder->GetStreamData());
+}
+
 void IPTVChannel::Close(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Close()");
@@ -72,13 +83,12 @@ bool IPTVChannel::Tune(const QString &freqid, int finetune)
 
     QHostAddress addr(QHostAddress::Any);
 
-    int ports[3];
-    ports[0] = 5555;
-    ports[1] = -1;
-    ports[2] = -1;
+    int ports[3] = { 5555, -1, -1, };
+    int bitrate = 5000000;
 
-    QString channel_id = QString("%1!%2!%3!%4")
-        .arg(addr.toString()).arg(ports[0]).arg(ports[1]).arg(ports[2]);
+    QString channel_id = QString("%1!%2!%3!%4!%5")
+        .arg(addr.toString()).arg(ports[0]).arg(ports[1]).arg(ports[2])
+        .arg(bitrate);
 
     if (m_stream_handler)
         IPTVStreamHandler::Return(m_stream_handler);

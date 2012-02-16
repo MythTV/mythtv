@@ -21,11 +21,13 @@ class IPTVRecorder : public DTVRecorder
     IPTVRecorder(TVRec*, IPTVChannel*);
     ~IPTVRecorder();
 
-    bool Open(void);
+    virtual bool Open(void); // RecorderBase
+    virtual void Close(void); // RecorderBase
     bool IsOpen(void) const;
-    void Close(void);
 
-    virtual void run(void);
+    virtual void SetStreamData(MPEGStreamData*); // DTVRecorder
+
+    virtual void run(void); // QRunnable
 
   private:
     IPTVChannel *m_channel;

@@ -16,17 +16,22 @@
 #include "dtvchannel.h"
 
 class IPTVStreamHandler;
+class IPTVRecorder;
 
 class IPTVChannel : public DTVChannel
 {
   public:
-    IPTVChannel(TVRec*);
+    IPTVChannel(TVRec*, const QString&);
     ~IPTVChannel();
 
     // Commands
-    bool Open(void);
-    void Close(void);
-    bool Tune(const QString &freqid, int finetune);
+    virtual bool Open(void);
+    virtual void Close(void); 
+    virtual bool Tune(const QString &freqid, int finetune);
+    virtual bool Tune(const DTVMultiplex&, QString) { return false; }
+
+    // Sets
+    void SetRecorder(IPTVRecorder*);
 
     // Gets
     bool IsOpen(void) const;
@@ -36,6 +41,7 @@ class IPTVChannel : public DTVChannel
     volatile bool m_open;
     QString m_last_channel_id;
     IPTVStreamHandler *m_stream_handler;
+    IPTVRecorder *m_recorder;
 };
 
 #endif // _IPTV_CHANNEL_H_

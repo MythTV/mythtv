@@ -7,8 +7,9 @@
  */
 
 // MythTV headers
-#include "iptvrecorder.h"
 #include "mpegstreamdata.h"
+#include "iptvrecorder.h"
+#include "iptvchannel.h"
 
 #define LOC QString("IPTVRec: ")
 
@@ -34,6 +35,8 @@ bool IPTVRecorder::Open(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "opened successfully");
 
+    m_channel->SetRecorder(this);
+
     return true;
 }
 
@@ -45,7 +48,17 @@ bool IPTVRecorder::IsOpen(void) const
 void IPTVRecorder::Close(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Close()");
+
+    m_channel->SetRecorder(NULL);
+
     m_open = false;
+}
+
+void IPTVRecorder::SetStreamData(MPEGStreamData *data)
+{
+    DTVRecorder::SetStreamData(data);
+    if (m_open)
+        m_channel->SetRecorder(this);
 }
 
 void IPTVRecorder::run(void)
@@ -84,6 +97,14 @@ void IPTVRecorder::run(void)
         if (!IsRecordingRequested())
             break;
 
+        {   // sleep 100 milliseconds unless StopRecording() or Unpause()
+            // is called, just to avoid running this too often.
+            QMutexLocker locker(&pauseLock);
+            if (!request_recording || request_pause)
+                continue;
+            unpauseWait.wait(&pauseLock, 100);
+        }
+
         if (!_input_pmt)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -91,9 +112,6 @@ void IPTVRecorder::run(void)
             usleep(5000);
             continue;
         }
-
-        // TODO IMPLEMENT -- RTP/UDP reading..
-        usleep(100 * 1000);
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- ending...");
