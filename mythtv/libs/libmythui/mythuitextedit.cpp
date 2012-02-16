@@ -148,7 +148,8 @@ void MythUITextEdit::Finalize()
     // cursor in the right place.  Toggle text, to force an area recalc.
     m_Text->SetText(".");
     m_Text->SetText("");
-    m_cursorImage->SetPosition(m_Text->CursorPosition(0));
+    if (m_cursorImage)
+        m_cursorImage->SetPosition(m_Text->CursorPosition(0));
 }
 
 void MythUITextEdit::SetInitialStates()
