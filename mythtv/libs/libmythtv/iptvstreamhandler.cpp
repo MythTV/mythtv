@@ -131,7 +131,8 @@ void IPTVStreamHandler::run(void)
         if (m_ports[i] >= 0)
         {
             m_sockets[i] = new QUdpSocket();
-            m_read_helpers[i] = new IPTVStreamHandlerReadHelper(this, m_sockets[i], i);
+            m_read_helpers[i] = new IPTVStreamHandlerReadHelper(
+                this, m_sockets[i], i);
             m_sockets[i]->bind(m_addr, m_ports[i]);
         }
     }

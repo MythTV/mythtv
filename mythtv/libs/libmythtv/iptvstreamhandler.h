@@ -27,7 +27,8 @@ class IPTVStreamHandlerReadHelper : QObject
     Q_OBJECT
 
   public:
-    IPTVStreamHandlerReadHelper(IPTVStreamHandler *p, QUdpSocket *s, uint stream) :
+    IPTVStreamHandlerReadHelper(
+        IPTVStreamHandler *p, QUdpSocket *s, uint stream) :
         m_parent(p), m_socket(s), m_stream(stream)
     {
         connect(m_socket, SIGNAL(readyRead()),
