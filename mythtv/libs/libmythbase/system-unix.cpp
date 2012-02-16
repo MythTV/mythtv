@@ -781,6 +781,11 @@ void MythSystemUnix::Fork(time_t timeout)
                 _exit(GENERIC_EXIT_PIPE_FAILURE);
             }
         }
+        else
+        {
+            /* We aren't sucking this down, close stdout */
+            close(1);
+        }
 
         /* handle standard err */
         if( p_stderr[1] >= 0 )
@@ -793,6 +798,11 @@ void MythSystemUnix::Fork(time_t timeout)
                      << strerror(errno) << endl;
                 _exit(GENERIC_EXIT_PIPE_FAILURE);
             }
+        }
+        else
+        {
+            /* We aren't sucking this down, close stderr */
+            close(2);
         }
 
         /* Close all open file descriptors except stdin/stdout/stderr */
