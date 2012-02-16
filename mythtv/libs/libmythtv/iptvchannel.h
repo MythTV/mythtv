@@ -31,7 +31,7 @@ class IPTVChannel : public DTVChannel
     virtual bool Tune(const DTVMultiplex&, QString) { return false; }
 
     // Sets
-    void SetRecorder(IPTVRecorder*);
+    void SetStreamData(MPEGStreamData*);
 
     // Gets
     bool IsOpen(void) const;
@@ -41,7 +41,7 @@ class IPTVChannel : public DTVChannel
     volatile bool m_open;
     QString m_last_channel_id;
     IPTVStreamHandler *m_stream_handler;
-    IPTVRecorder *m_recorder;
+    MPEGStreamData *m_stream_data;
 };
 
 #endif // _IPTV_CHANNEL_H_

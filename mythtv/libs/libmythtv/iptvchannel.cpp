@@ -16,7 +16,7 @@
 #define LOC QString("IPTVChan(%1): ").arg(GetCardID())
 
 IPTVChannel::IPTVChannel(TVRec *rec, const QString&) :
-    DTVChannel(rec), m_open(false), m_recorder(NULL)
+    DTVChannel(rec), m_open(false), m_stream_data(NULL)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 }
@@ -24,6 +24,7 @@ IPTVChannel::IPTVChannel(TVRec *rec, const QString&) :
 IPTVChannel::~IPTVChannel()
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "dtor");
+    m_stream_data = NULL;
 }
 
 bool IPTVChannel::Open(void)
@@ -48,14 +49,14 @@ bool IPTVChannel::Open(void)
     return m_open;
 }
 
-void IPTVChannel::SetRecorder(IPTVRecorder *rec)
+void IPTVChannel::SetStreamData(MPEGStreamData *sd)
 {
     QMutexLocker locker(&m_lock);
-    if (m_recorder && m_stream_handler && m_recorder->GetStreamData())
-        m_stream_handler->RemoveListener(m_recorder->GetStreamData());
-    m_recorder = rec;
-    if (m_recorder && m_stream_handler && m_recorder->GetStreamData())
-        m_stream_handler->AddListener(m_recorder->GetStreamData());
+    if (m_stream_data && m_stream_handler)
+        m_stream_handler->RemoveListener(sd);
+    m_stream_data = sd;
+    if (m_stream_data && m_stream_handler)
+        m_stream_handler->AddListener(m_stream_data);
 }
 
 void IPTVChannel::Close(void)
@@ -74,6 +75,7 @@ bool IPTVChannel::IsOpen(void) const
 
 bool IPTVChannel::Tune(const QString &freqid, int finetune)
 {
+    QMutexLocker locker(&m_lock);
     (void) finetune;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Tune(%1) TO BE IMPLEMENTED")
@@ -91,9 +93,15 @@ bool IPTVChannel::Tune(const QString &freqid, int finetune)
         .arg(bitrate);
 
     if (m_stream_handler)
+    {
+        if (m_stream_data)
+            m_stream_handler->RemoveListener(m_stream_data);
         IPTVStreamHandler::Return(m_stream_handler);
+    }
 
     m_stream_handler = IPTVStreamHandler::Get(channel_id);
+    if (m_stream_data)
+        m_stream_handler->AddListener(m_stream_data);
 
     m_last_channel_id = channel_id;
 

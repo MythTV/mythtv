@@ -35,7 +35,8 @@ bool IPTVRecorder::Open(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "opened successfully");
 
-    m_channel->SetRecorder(this);
+    if (_stream_data)
+        m_channel->SetStreamData(_stream_data);
 
     return true;
 }
@@ -49,7 +50,7 @@ void IPTVRecorder::Close(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Close()");
 
-    m_channel->SetRecorder(NULL);
+    m_channel->SetStreamData(NULL);
 
     m_open = false;
 }
@@ -58,7 +59,7 @@ void IPTVRecorder::SetStreamData(MPEGStreamData *data)
 {
     DTVRecorder::SetStreamData(data);
     if (m_open)
-        m_channel->SetRecorder(this);
+        m_channel->SetStreamData(_stream_data);
 }
 
 void IPTVRecorder::run(void)

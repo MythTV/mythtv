@@ -4,21 +4,9 @@
 #define _IPTVSIGNALMONITOR_H_
 
 #include "dtvsignalmonitor.h"
-#include "mthread.h"
 
 class IPTVChannel;
 class IPTVSignalMonitor;
-
-class IPTVTableMonitorThread : public MThread
-{
-  public:
-    IPTVTableMonitorThread(IPTVSignalMonitor *p) :
-        MThread("IPTVTableMonitor"), m_parent(p) { start(); }
-    virtual ~IPTVTableMonitorThread() { wait(); m_parent = NULL; }
-    virtual void run(void);
-  private:
-    IPTVSignalMonitor *m_parent;
-};
 
 class IPTVSignalMonitor : public DTVSignalMonitor
 {
@@ -35,14 +23,10 @@ class IPTVSignalMonitor : public DTVSignalMonitor
     IPTVSignalMonitor(const IPTVSignalMonitor&);
 
     virtual void UpdateValues(void);
-
-    void RunTableMonitor(void);
-
     IPTVChannel *GetChannel(void);
 
   protected:
-    volatile bool dtvMonitorRunning;
-    IPTVTableMonitorThread *tableMonitorThread;
+    bool m_streamHandlerStarted;
 };
 
 #endif // _IPTVSIGNALMONITOR_H_

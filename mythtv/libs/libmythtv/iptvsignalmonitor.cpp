@@ -6,21 +6,9 @@
 #include "iptvchannel.h"
 #include "mythlogging.h"
 
-#undef DBG_SM
-#define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
-    QString("IPTVSM(%1)::%2: %3").arg(channel->GetDevice()).arg(FUNC).arg(MSG))
-
 #define LOC QString("IPTVSM(%1): ").arg(channel->GetDevice())
 
-void IPTVTableMonitorThread::run(void)
-{
-    RunProlog();
-    m_parent->RunTableMonitor();
-    RunEpilog();
-}
-
-/** \fn IPTVSignalMonitor::IPTVSignalMonitor(int,IPTVChannel*,uint64_t)
- *  \brief Initializes signal lock and signal values.
+/** \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous
  *   signal monitoring. The timeout is set to 3 seconds,
@@ -36,9 +24,10 @@ void IPTVTableMonitorThread::run(void)
 IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
                                      IPTVChannel *_channel,
                                      uint64_t _flags) :
-    DTVSignalMonitor(db_cardnum, _channel, _flags),
-    dtvMonitorRunning(false), tableMonitorThread(NULL)
+    DTVSignalMonitor(db_cardnum, _channel, _flags)
 {
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
+
     // TODO init isLocked
     bool isLocked = true;
 
@@ -52,6 +41,7 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
  */
 IPTVSignalMonitor::~IPTVSignalMonitor()
 {
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
 }
 
@@ -65,33 +55,12 @@ IPTVChannel *IPTVSignalMonitor::GetChannel(void)
  */
 void IPTVSignalMonitor::Stop(void)
 {
-    DBG_SM("Stop", "begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
-    if (tableMonitorThread)
-    {
-        dtvMonitorRunning = false;
-        tableMonitorThread->wait();
-        delete tableMonitorThread;
-        tableMonitorThread = NULL;
-    }
-    DBG_SM("Stop", "end");
-}
-
-/** \fn IPTVSignalMonitor::RunTableMonitor(void)
- */
-void IPTVSignalMonitor::RunTableMonitor(void)
-{
-    DBG_SM("Run", "begin");
-    dtvMonitorRunning = true;
-
-    GetStreamData()->AddListeningPID(0);
-
-    // TODO IMPLEMENT -- RTP/UDP reading..
-
-    while (dtvMonitorRunning)
-        usleep(10000);
-
-    DBG_SM("Run", "end");
+    if (GetStreamData())
+        GetChannel()->SetStreamData(GetStreamData());
+    m_streamHandlerStarted = false;
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
 
 /** \fn IPTVSignalMonitor::UpdateValues(void)
@@ -105,7 +74,7 @@ void IPTVSignalMonitor::UpdateValues(void)
     if (!running || exit)
         return;
 
-    if (dtvMonitorRunning)
+    if (m_streamHandlerStarted)
     {
         EmitStatus();
         if (IsAllGood())
@@ -133,11 +102,8 @@ void IPTVSignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        tableMonitorThread = new IPTVTableMonitorThread(this);
-        DBG_SM("UpdateValues", "Waiting for table monitor to start");
-        while (!dtvMonitorRunning)
-            usleep(5000);
-        DBG_SM("UpdateValues", "Table monitor started");
+        GetChannel()->SetStreamData(GetStreamData());
+        m_streamHandlerStarted = true;
     }
 
     update_done = true;
