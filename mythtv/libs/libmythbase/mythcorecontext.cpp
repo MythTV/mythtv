@@ -725,7 +725,8 @@ void MythCoreContext::ConfigureHostAddress(void)
                 .arg(it->toString()));
     }
 
-    if (!config_v4.isNull() && !d->m_IPv4.contains(config_v4))
+    if (!config_v4.isNull() && !d->m_IPv4.contains(config_v4) &&
+        !d->m_IPv4.isEmpty())
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
                 "on %1, but address is not used on any local network "
@@ -733,7 +734,8 @@ void MythCoreContext::ConfigureHostAddress(void)
     }
 #if !defined(QT_NO_IPV6)
 
-    if (!config_v6.isNull() && !d->m_IPv6.contains(config_v6))
+    if (!config_v6.isNull() && !d->m_IPv6.contains(config_v6) && 
+        !d->m_IPv6.isEmpty())
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
                 "on %1, but address is not used on any local network "
