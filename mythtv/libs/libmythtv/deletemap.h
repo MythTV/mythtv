@@ -19,7 +19,9 @@ typedef struct DeleteMapUndoEntry
 class MTV_PUBLIC DeleteMap
 {
   public:
-    DeleteMap(): m_editing(false),   m_nextCutStart(0), m_changed(true),
+    DeleteMap(): m_editing(false),
+                 m_nextCutStartIsValid(false),
+                 m_nextCutStart(0), m_changed(true),
                  m_seekamountpos(4), m_seekamount(30),
                  m_ctx(0), m_undoStackPointer(-1) { Push(""); }
 
@@ -56,7 +58,8 @@ class MTV_PUBLIC DeleteMap
     void Move(uint64_t frame, uint64_t to, uint64_t total);
 
     bool     IsInDelete(uint64_t frame) const;
-    uint64_t GetNearestMark(uint64_t frame, uint64_t total, bool right) const;
+    uint64_t GetNearestMark(uint64_t frame, uint64_t total, bool right,
+                            bool *hasMark = 0) const;
     bool     IsTemporaryMark(uint64_t frame) const;
     bool     HasTemporaryMark(void) const;
     uint64_t GetLastFrame(uint64_t total) const;
@@ -79,6 +82,7 @@ class MTV_PUBLIC DeleteMap
     void Push(QString undoMessage);
 
     bool          m_editing;
+    bool          m_nextCutStartIsValid;
     uint64_t      m_nextCutStart;
     frm_dir_map_t m_deleteMap;
     QString       m_seekText;

@@ -549,13 +549,18 @@ bool DeleteMap::IsTemporaryMark(uint64_t frame) const
 }
 
 /**
- * \brief Returns the next or previous mark. If these do not exist, returns
- *        either zero (the first frame) or total (the last frame).
+ * \brief Returns the next or previous mark. If these do not exist,
+ *        returns either zero (the first frame) or total (the last
+ *        frame).  If hasMark is non-NULL, it is set to true if the
+ *        next/previous mark exists, and false otherwise.
  */
 uint64_t DeleteMap::GetNearestMark(
-    uint64_t frame, uint64_t total, bool right) const
+    uint64_t frame, uint64_t total, bool right,
+    bool *hasMark) const
 {
     uint64_t result;
+    if (hasMark)
+        *hasMark = true;
     frm_dir_map_t::const_iterator it = m_deleteMap.begin();
     if (right)
     {
@@ -574,6 +579,8 @@ uint64_t DeleteMap::GetNearestMark(
             result = it.key();
         }
     }
+    if (hasMark)
+        *hasMark = false;
     return result;
 }
 
@@ -740,6 +747,7 @@ void DeleteMap::SaveMap(uint64_t total, bool isAutoSave)
 void DeleteMap::TrackerReset(uint64_t frame, uint64_t total)
 {
     m_nextCutStart = 0;
+    m_nextCutStartIsValid = false;
     if (IsEmpty())
         return;
 
@@ -748,16 +756,19 @@ void DeleteMap::TrackerReset(uint64_t frame, uint64_t total)
     {
         if (cutpoint.value() == MARK_CUT_START)
         {
+            m_nextCutStartIsValid = true;
             m_nextCutStart = cutpoint.key();
         }
         else
         {
             ++cutpoint;
-            m_nextCutStart = cutpoint != m_deleteMap.end() ? cutpoint.key() : total;
+            m_nextCutStartIsValid = (cutpoint != m_deleteMap.end());
+            m_nextCutStart = m_nextCutStartIsValid ? cutpoint.key() : total;
         }
     }
     else
-        m_nextCutStart = GetNearestMark(frame, total, !IsInDelete(frame));
+        m_nextCutStart = GetNearestMark(frame, total, !IsInDelete(frame),
+                                        &m_nextCutStartIsValid);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Tracker next CUT_START: %1")
                                    .arg(m_nextCutStart));
 }
@@ -768,7 +779,7 @@ void DeleteMap::TrackerReset(uint64_t frame, uint64_t total)
  */
 bool DeleteMap::TrackerWantsToJump(uint64_t frame, uint64_t total, uint64_t &to)
 {
-    if (IsEmpty() || frame < m_nextCutStart)
+    if (IsEmpty() || !m_nextCutStartIsValid || frame < m_nextCutStart)
         return false;
 
     to = GetNearestMark(m_nextCutStart, total, true);

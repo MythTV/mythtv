@@ -714,7 +714,8 @@ void MythCoreContext::ConfigureHostAddress(void)
                             .arg(it->toString()));
                 d->m_IPv6.append(*it);
             }
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping link-local "
+            else
+                LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping link-local "
                         "address during IPv6 autoselection: %1")
                             .arg(it->toString()));
         }
@@ -964,6 +965,25 @@ double MythCoreContext::GetFloatSettingOnHost(const QString &key,
     return d->m_database->GetFloatSettingOnHost(key, host, defaultval);
 }
 
+#if 0
+QString MythCoreContext::GetMasterServerIP(void)
+{
+    QString saddr = GetSetting("MasterServerIP");
+    QHostAddress addr(saddr);
+
+    if (!d->m_IPv6.empty() &&
+            (addr.protocol() == QAbstractSocket::IPv6Protocol))
+        // we have IPv6 addresses, assume we can connect to them
+        return saddr;
+    else if (!d->m_IPv4.empty() &&
+            (addr.protocol() == QAbstractSocket::IPv4Protocol))
+        // we have IPv4 addresses, assume we can connect to them
+        return saddr;
+    else
+        return GetBackendServerIP(GetMasterHostName());
+}
+#endif
+
 QString MythCoreContext::GetBackendServerIP(void)
 {
     return GetBackendServerIP(d->m_localHostname);
@@ -971,23 +991,33 @@ QString MythCoreContext::GetBackendServerIP(void)
 
 QString MythCoreContext::GetBackendServerIP(const QString &host)
 {
+    QString addr4, addr6;
 #if !defined(QT_NO_IPV6)
-    // prefer IPv6 address if optional
-    if (!d->m_IPv6.empty())
-    {
+    if (!d->m_IPv6.isEmpty())
         // we have IPv6 addresses, assume we can connect to them
-        QString address = GetSettingOnHost("BackendServerIP6", host, "");
-        if (!address.isEmpty())
-            return address;
-    }
+        addr6 = GetSettingOnHost("BackendServerIP6", host, "");
 #endif
-    // fall back to IPv4 address
-    QString address = GetSettingOnHost("BackendServerIP", host, "");
-    if (!address.isEmpty())
-        return address;
+    if (!d->m_IPv4.isEmpty())
+        addr4 = GetSettingOnHost("BackendServerIP", host, "");
 
-    LOG(VB_GENERAL, LOG_WARNING, "No address defined for host: "+host);
-    return "";
+    if (addr6.isEmpty())
+    {
+        if (addr4.isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "No address defined for host: "+host);
+            return "";
+        }
+
+        // IPv6 is empty, so return this regardless
+        return addr4;
+    }
+    else if ((QHostAddress(addr6) == QHostAddress::LocalHostIPv6) &&
+              !addr4.isEmpty() &&
+             (QHostAddress(addr4) != QHostAddress::LocalHost))
+        // IPv6 set to localhost, but IPv4 address if network accessible
+        return addr4;
+    else
+        return addr6;
 }
 
 void MythCoreContext::SetSetting(const QString &key, const QString &newValue)

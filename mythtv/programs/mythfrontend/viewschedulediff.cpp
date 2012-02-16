@@ -102,8 +102,9 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
 
     QString message = pi->toString(ProgramInfo::kTitleSubtitle, " - ");
     message += "\n\n";
-    message += toDescription(
-        pi->GetRecordingStatus(), pi->GetRecordingStartTime());
+    message += toDescription(pi->GetRecordingStatus(),
+                             pi->GetRecordingRuleType(),
+                             pi->GetRecordingStartTime());
 
     if (pi->GetRecordingStatus() == rsConflict ||
         pi->GetRecordingStatus() == rsLaterShowing)

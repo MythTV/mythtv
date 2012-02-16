@@ -350,7 +350,7 @@ static inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #endif
 
 #include <stdio.h> /* for FILENAME_MAX */
-#if defined(USING_MINGW) && defined(FILENAME_MAX)
+#if defined(USING_MINGW) && defined(FILENAME_MAX) && !defined( _MSC_VER )
 #include <errno.h>
 #include <dirent.h>
 #include <string.h>

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# A MythTV Socket class that extends IO::Socket::INET to include some
+# A MythTV Socket class that extends IO::Socket::INET6 to include some
 # MythTV-specific data queries
 #
 # @url       $URL$
@@ -11,9 +11,9 @@
 #
 
 package IO::Socket::INET::MythTV;
-    use base 'IO::Socket::INET';
+    use base 'IO::Socket::INET6';
 
-# Basically, just inherit the constructor from IO::Socket::INET
+# Basically, just inherit the constructor from IO::Socket::INET6
     sub new {
         my $class = shift;
         return $class->SUPER::new(@_);
