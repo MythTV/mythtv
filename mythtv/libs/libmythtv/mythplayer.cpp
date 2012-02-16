@@ -2839,8 +2839,8 @@ void MythPlayer::EventLoop(void)
     }
 
     // Handle cutlist skipping
-    if (deleteMap.TrackerWantsToJump(framesPlayed, totalFrames, jumpto) &&
-        (ffrew_skip == 1))
+    if (!allpaused && (ffrew_skip == 1) &&
+        deleteMap.TrackerWantsToJump(framesPlayed, totalFrames, jumpto))
     {
         if (jumpto == totalFrames)
         {
