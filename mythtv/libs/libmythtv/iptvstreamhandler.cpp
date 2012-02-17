@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 
+// System headers
+#include <sys/socket.h>
+
 // Qt headers
 #include <QUdpSocket>
 
@@ -135,6 +138,30 @@ void IPTVStreamHandler::run(void)
             m_sockets[i] = new QUdpSocket();
             m_read_helpers[i] = new IPTVStreamHandlerReadHelper(
                 this, m_sockets[i], i);
+
+            // we need to open the descriptor ourselves so we
+            // can set some socket options
+            int fd = socket(AF_INET, SOCK_DGRAM, 0); // create IPv4 socket
+            int buf_size = 2 * 1024 * max(m_bitrate/1000, 500);
+            int ok = setsockopt(fd, SOL_SOCKET, SO_RCVBUF,
+                                (char *)&buf_size, sizeof(buf_size));
+            if (ok)
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC +
+                    QString("Increasing buffer size to %1 failed")
+                    .arg(buf_size) + ENO);
+            }
+            int broadcast = 1;
+            ok = setsockopt(fd, SOL_SOCKET, SO_BROADCAST,
+                            (char *)&broadcast, sizeof(broadcast));
+            if (ok)
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC +
+                    QString("Enabling broadcast failed") + ENO);
+            }
+            m_sockets[i]->setSocketDescriptor(
+                fd, QAbstractSocket::UnconnectedState, QIODevice::ReadOnly);
+
             m_sockets[i]->bind(m_addr, m_ports[i]);
         }
     }
