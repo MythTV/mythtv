@@ -1370,7 +1370,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             gCoreContext->SendSystemEvent(
                 QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
-    if (commands[1] == "MediaServer")
+    else if (commands[1] == "MediaServer")
     {
         if (commands.size() < 3)
         {

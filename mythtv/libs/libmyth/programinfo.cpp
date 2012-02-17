@@ -3665,7 +3665,7 @@ void ProgramInfo::SaveTotalFrames(int64_t frames)
     query.bindValue(":DATA", (uint)(frames));
 
     if (!query.exec())
-        MythDB::DBError("Frames insert", query);
+        MythDB::DBError("Total Frames insert", query);
 }
 
 /// \brief Store the Resolution at frame in the recordedmarkup table

@@ -18,7 +18,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import smolt
-import simplejson, urllib
+import json, urllib
 from i18n import _
 from smolt_config import get_config_attr
 
@@ -27,7 +27,7 @@ def rating(profile, smoonURL, gate):
     print _("Current rating for vendor/model.")
     print ""
     scanURL='%s/client/host_rating?vendor=%s&system=%s' % (smoonURL, urllib.quote(profile.host.systemVendor), urllib.quote(profile.host.systemModel))
-    r = simplejson.load(urllib.urlopen(scanURL))['ratings']
+    r = json.load(urllib.urlopen(scanURL))['ratings']
     rating_system = { '0' : _('Unrated/Unknown'),
                       '1' : _('Non-working'),
                       '2' : _('Partially-working'),
@@ -57,7 +57,7 @@ def scan(profile, smoonURL, gate):
     scanURL='%s/smolt-w/api.php' % smoonURL
     scanData = 'action=query&titles=%s&format=json' % searchDevices
     try:
-         r = simplejson.load(urllib.urlopen(scanURL, scanData))
+         r = json.load(urllib.urlopen(scanURL, scanData))
     except ValueError:
         print "Could not wiki for errata!"
         return
